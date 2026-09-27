@@ -26,6 +26,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class ReferenceRules implements ObjectRules {
 
+  private static final String CODE = "code";
+
+  private static final String NEXT_NO = "next_no";
+
+  private static final String EFFECTIVE_FROM = "effective_from";
+
   private static final String LOOKUP = "DQ-003";
 
   @Override
@@ -51,25 +57,25 @@ public class ReferenceRules implements ObjectRules {
         continue;
       }
       String source = scope.source(row);
-      Optional<CodeMaps.Resolution> r = maps.resolve(set, source, v.get("code"));
+      Optional<CodeMaps.Resolution> r = maps.resolve(set, source, v.get(CODE));
       if (r.isEmpty()) {
         sink.error(
             row,
             LOOKUP,
-            "code",
-            v.get("code"),
-            "Code " + v.get("code") + " of " + set + " is not mapped");
+            CODE,
+            v.get(CODE),
+            "Code " + v.get(CODE) + " of " + set + " is not mapped");
       } else if (r.get().action() == EntryAction.REJECT) {
         sink.error(
             row,
             LOOKUP,
-            "code",
-            v.get("code"),
-            "Code " + v.get("code") + " of " + set + " is rejected by the code map");
+            CODE,
+            v.get(CODE),
+            "Code " + v.get(CODE) + " of " + set + " is rejected by the code map");
       } else {
         scope
             .values(row)
-            .put("target_code", r.get().target() == null ? v.get("code") : r.get().target());
+            .put("target_code", r.get().target() == null ? v.get(CODE) : r.get().target());
         scope.values(row).put("map_set", set);
         scope.values(row).put("map_action", r.get().action().name());
       }
@@ -102,8 +108,8 @@ public class ReferenceRules implements ObjectRules {
             sink.error(
                 group.get(j),
                 "DQ-043",
-                "effective_from",
-                v.get("effective_from"),
+                EFFECTIVE_FROM,
+                v.get(EFFECTIVE_FROM),
                 "Rates of " + v.get("insurer_code") + " " + v.get("risk_code") + " overlap");
           }
         }
@@ -112,9 +118,9 @@ public class ReferenceRules implements ObjectRules {
   }
 
   private static boolean overlap(ValidationScope scope, StageRow a, StageRow b) {
-    LocalDate af = Values.date(scope.values(a).get("effective_from")).orElse(LocalDate.MIN);
+    LocalDate af = Values.date(scope.values(a).get(EFFECTIVE_FROM)).orElse(LocalDate.MIN);
     LocalDate at = Values.date(scope.values(a).get("effective_to")).orElse(LocalDate.MAX);
-    LocalDate bf = Values.date(scope.values(b).get("effective_from")).orElse(LocalDate.MIN);
+    LocalDate bf = Values.date(scope.values(b).get(EFFECTIVE_FROM)).orElse(LocalDate.MIN);
     LocalDate bt = Values.date(scope.values(b).get("effective_to")).orElse(LocalDate.MAX);
     return !af.isAfter(bt) && !bf.isAfter(at);
   }
@@ -125,7 +131,7 @@ public class ReferenceRules implements ObjectRules {
       Optional<BigDecimal> from = Values.decimal(v.get("from_no"));
       Optional<BigDecimal> to = Values.decimal(v.get("to_no"));
       Optional<BigDecimal> last = Values.decimal(v.get("last_used_no"));
-      Optional<BigDecimal> next = Values.decimal(v.get("next_no"));
+      Optional<BigDecimal> next = Values.decimal(v.get(NEXT_NO));
       if (from.isEmpty() || to.isEmpty() || last.isEmpty() || next.isEmpty()) {
         continue;
       }
@@ -137,9 +143,9 @@ public class ReferenceRules implements ObjectRules {
         sink.error(
             row,
             "DQ-041",
-            "next_no",
-            v.get("next_no"),
-            "Next number " + v.get("next_no") + " is outside the series");
+            NEXT_NO,
+            v.get(NEXT_NO),
+            "Next number " + v.get(NEXT_NO) + " is outside the series");
       }
     }
   }

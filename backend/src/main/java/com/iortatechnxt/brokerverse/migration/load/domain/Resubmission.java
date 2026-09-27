@@ -106,6 +106,17 @@ public class Resubmission extends BaseEntity {
    * @param when time
    */
   public void decide(boolean approve, String user, String note, Instant when) {
+    requireDecidableBy(user);
+    if (!approve && (note == null || note.isBlank())) {
+      throw new BusinessRuleException("MIG_REASON_REQUIRED", "Enter the reason for the return");
+    }
+    this.status = approve ? Status.APPROVED : Status.RETURNED;
+    this.decidedBy = user;
+    this.decidedAt = when;
+    this.decisionNote = note;
+  }
+
+  private void requireDecidableBy(String user) {
     if (status != Status.PREPARED) {
       throw new BusinessRuleException(
           "MIG_RESUBMISSION_DECIDED", "Resubmission " + resubmissionNo + " is already decided");
@@ -114,13 +125,6 @@ public class Resubmission extends BaseEntity {
       throw new BusinessRuleException(
           "MAKER_CHECKER_VIOLATION", "A record cannot be authorized by the user who maintained it");
     }
-    if (!approve && (note == null || note.isBlank())) {
-      throw new BusinessRuleException("MIG_REASON_REQUIRED", "Enter the reason for the return");
-    }
-    this.status = approve ? Status.APPROVED : Status.RETURNED;
-    this.decidedBy = user;
-    this.decidedAt = when;
-    this.decisionNote = note;
   }
 
   public void setRerunBatchId(Long rerunBatchId) {

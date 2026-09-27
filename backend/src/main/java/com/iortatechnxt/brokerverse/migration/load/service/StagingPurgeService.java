@@ -16,6 +16,8 @@ import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.EnumSet;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class StagingPurgeService {
+
+  private static final Logger LOG = LoggerFactory.getLogger(StagingPurgeService.class);
 
   private final MigBatchRepository batches;
   private final MigExtractRepository extracts;
@@ -138,6 +142,7 @@ public class StagingPurgeService {
         files.delete(id);
       } catch (RuntimeException e) {
         // already deleted by the 5-day lifecycle of the migration bucket
+        LOG.debug("Extract file {} already removed: {}", id, e.getMessage());
       }
     }
   }

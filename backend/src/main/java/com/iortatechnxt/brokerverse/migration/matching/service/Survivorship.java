@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.TreeSet;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,7 +58,7 @@ public class Survivorship {
     Member survivor = ordered.get(0);
     Map<String, String> merged = new LinkedHashMap<>();
     Map<String, List<String>> lost = new LinkedHashMap<>();
-    TreeSet<String> fields = new TreeSet<>();
+    SortedSet<String> fields = new TreeSet<>();
     members.forEach(m -> fields.addAll(m.values().keySet()));
     for (String field : fields) {
       SurvivorshipRule rule = byField.get(field);

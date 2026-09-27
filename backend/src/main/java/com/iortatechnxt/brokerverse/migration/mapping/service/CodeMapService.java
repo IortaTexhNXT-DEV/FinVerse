@@ -14,7 +14,6 @@ import com.iortatechnxt.brokerverse.migration.mapping.domain.CodeMapSet;
 import com.iortatechnxt.brokerverse.migration.mapping.domain.CodeMapSetRepository;
 import com.iortatechnxt.brokerverse.migration.mapping.domain.CodeMapVersion;
 import com.iortatechnxt.brokerverse.migration.mapping.domain.CodeMapVersionRepository;
-import com.iortatechnxt.brokerverse.migration.mapping.domain.EntryAction;
 import com.iortatechnxt.brokerverse.migration.mapping.domain.MapVersionStatus;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import java.time.Clock;
@@ -206,7 +205,7 @@ public class CodeMapService {
     CodeMapVersion draft = createDraft(companyId, setCode, false, comment);
     Set<String> keys = new HashSet<>();
     for (EntryData data : imported) {
-      requireEntry(data);
+      data.requireValid();
       CodeMapEntry entry = new CodeMapEntry(draft.getId(), data);
       if (!keys.add(entry.key())) {
         throw duplicate(entry);
@@ -227,7 +226,7 @@ public class CodeMapService {
   public CodeMapEntry saveEntry(Long versionId, Long entryId, EntryData data) {
     CodeMapVersion version = version(versionId);
     version.requireDraft();
-    requireEntry(data);
+    data.requireValid();
     CodeMapEntry entry =
         entryId == null
             ? new CodeMapEntry(versionId, data)
@@ -268,21 +267,6 @@ public class CodeMapService {
         "Legacy code " + e.getLegacyCode() + " of " + e.getSourceSystem() + " is mapped twice");
   }
 
-  private static void requireEntry(EntryData d) {
-    if (d.sourceSystem() == null
-        || d.sourceSystem().isBlank()
-        || d.legacyCode() == null
-        || d.legacyCode().isBlank()
-        || d.action() == null) {
-      throw new BusinessRuleException(
-          "MIG_MAP_ENTRY", "Enter the source system, the legacy code and the action");
-    }
-    if (d.action() == EntryAction.MAP && (d.targetCode() == null || d.targetCode().isBlank())) {
-      throw new BusinessRuleException(
-          "MIG_MAP_TARGET_REQUIRED", "Enter the target code of legacy code " + d.legacyCode());
-    }
-  }
-
   /**
    * Submits a draft to the business owner.
    *
@@ -313,16 +297,8 @@ public class CodeMapService {
     CodeMapVersion version = version(versionId);
     CodeMapSet set = set(version.getSetCode());
     List<CodeMapEntry> list = entries(versionId);
-    Set<String> mapTargets = new TreeSet<>();
-    List<String> toCreate = new ArrayList<>();
-    for (CodeMapEntry e : list) {
-      if (e.getAction() == EntryAction.MAP || e.getAction() == EntryAction.DEFAULT) {
-        Optional.ofNullable(e.getTargetCode()).ifPresent(mapTargets::add);
-      } else if (e.getAction() == EntryAction.CREATE) {
-        toCreate.add(e.getTargetCode() == null ? e.getLegacyCode() : e.getTargetCode());
-      }
-    }
-    Set<String> missing = targets.missing(set, mapTargets);
+    CodeMapEntry.Targets found = CodeMapEntry.targetsOf(list);
+    Set<String> missing = targets.missing(set, found.mapped());
     if (!missing.isEmpty()) {
       throw new BusinessRuleException(
           "MIG_MAP_TARGET_MISSING",
@@ -350,7 +326,7 @@ public class CodeMapService {
         version.label(),
         AuditAction.AUTHORIZE,
         "Approved with " + list.size() + " entries" + (comment == null ? "" : ": " + comment));
-    return new Approval(version, toCreate);
+    return new Approval(version, found.created());
   }
 
   /**

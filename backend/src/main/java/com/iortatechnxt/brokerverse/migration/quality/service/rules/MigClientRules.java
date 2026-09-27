@@ -21,6 +21,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class MigClientRules implements ObjectRules {
 
+  private static final String BIRTH_DATE = "birth_date";
+
   private static final int TIN_MIN = 9;
   private static final int TIN_MAX = 12;
   private static final int MAX_AGE = 120;
@@ -43,7 +45,7 @@ public class MigClientRules implements ObjectRules {
       tin(row, v.get("tin"), sink);
       contact(row, v, sink);
       names(row, v, sink);
-      birth(row, v.get("birth_date"), today, sink);
+      birth(row, v.get(BIRTH_DATE), today, sink);
     }
     Map<String, Integer> primaries = new HashMap<>();
     for (StageRow row : scope.rows("C02")) {
@@ -102,8 +104,8 @@ public class MigClientRules implements ObjectRules {
     if ("I".equals(type)) {
       requireName(row, v, "last_name", sink);
       requireName(row, v, "first_name", sink);
-      if (Values.blank(v.get("birth_date"))) {
-        sink.error(row, "DQ-009", "birth_date", null, "birth_date is mandatory for client type I");
+      if (Values.blank(v.get(BIRTH_DATE))) {
+        sink.error(row, "DQ-009", BIRTH_DATE, null, "birth_date is mandatory for client type I");
       }
     } else if ("C".equals(type)) {
       requireName(row, v, "corporate_name", sink);
@@ -128,10 +130,6 @@ public class MigClientRules implements ObjectRules {
         .ifPresent(
             d ->
                 sink.error(
-                    row,
-                    "DQ-008",
-                    "birth_date",
-                    value,
-                    "Birth date " + value + " is not plausible"));
+                    row, "DQ-008", BIRTH_DATE, value, "Birth date " + value + " is not plausible"));
   }
 }

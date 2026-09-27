@@ -22,6 +22,7 @@ import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import java.time.Clock;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class DecisionService {
 
-  private static final EnumSet<BatchStatus> HOLDING_DATA =
+  private static final Set<BatchStatus> HOLDING_DATA =
       EnumSet.of(
           BatchStatus.LOADING,
           BatchStatus.LOADED,

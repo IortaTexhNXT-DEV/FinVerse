@@ -18,6 +18,8 @@ import org.springframework.context.annotation.Configuration;
 @Configuration(proxyBeanMethods = false)
 public class MigrationReports {
 
+  private static final String DECISION = "decision";
+
   private static final String OBJECT = "object_code";
   private static final String OBJECT_LABEL = "Object";
   private static final String STATUS = "status";
@@ -421,11 +423,11 @@ public class MigrationReports {
             ReportColumn.text("matched_origin", "Origin"),
             ReportColumn.count("score", "Score"),
             ReportColumn.text("matched_keys", "Keys matched"),
-            ReportColumn.text("decision", "Decision"),
+            ReportColumn.text(DECISION, "Decision"),
             ReportColumn.text("survivor_key", "Survivor"),
             ReportColumn.text("decided_by", "Decided by"))
         .groupBy(BATCH, BATCH_LABEL)
-        .row(MigReport.relabel("decision"))
+        .row(MigReport.relabel(DECISION))
         .build();
   }
 
@@ -456,12 +458,12 @@ public class MigrationReports {
             ReportColumn.text("gate", "Gate"),
             ReportColumn.text("role_code", "Role"),
             ReportColumn.text("username", "Signed by"),
-            ReportColumn.text("decision", "Decision"),
+            ReportColumn.text(DECISION, "Decision"),
             ReportColumn.text("signed_at", "Signed"),
             ReportColumn.text("comment", "Comment"),
             ReportColumn.text("evidence_name", "Evidence"))
         .groupBy(OBJECT, OBJECT_LABEL)
-        .row(MigReport.relabel("decision"))
+        .row(MigReport.relabel(DECISION))
         .build();
   }
 }

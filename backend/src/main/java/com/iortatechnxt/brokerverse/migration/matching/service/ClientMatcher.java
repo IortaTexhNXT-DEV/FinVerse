@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -172,17 +173,21 @@ public class ClientMatcher {
   private static void pairsOf(List<Candidate> block, Map<String, Pair> out) {
     for (int i = 0; i < block.size(); i++) {
       for (int j = i + 1; j < block.size(); j++) {
-        Candidate a = block.get(i);
-        Candidate b = block.get(j);
-        if (a.rowId() != null || b.rowId() != null) {
-          Pair p = score(a.rowId() == null ? b : a, a.rowId() == null ? a : b);
-          out.merge(
-              pairKey(p.left().key(), p.right().key()),
-              p,
-              (x, y) -> x.score() >= y.score() ? x : y);
-        }
+        pairOf(block.get(i), block.get(j)).ifPresent(p -> keepBest(out, p));
       }
     }
+  }
+
+  private static Optional<Pair> pairOf(Candidate a, Candidate b) {
+    if (a.rowId() == null && b.rowId() == null) {
+      return Optional.empty();
+    }
+    return Optional.of(a.rowId() == null ? score(b, a) : score(a, b));
+  }
+
+  private static void keepBest(Map<String, Pair> out, Pair p) {
+    out.merge(
+        pairKey(p.left().key(), p.right().key()), p, (x, y) -> x.score() >= y.score() ? x : y);
   }
 
   private static Pair score(Candidate a, Candidate b) {

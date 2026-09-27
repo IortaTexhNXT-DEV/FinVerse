@@ -234,8 +234,7 @@ public class LoadRunner {
       int part = Math.floorMod(loader.partitionKey(u).hashCode(), partitions);
       byPartition.computeIfAbsent(part, k -> new ArrayList<>()).add(u);
     }
-    ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor();
-    try {
+    try (ExecutorService pool = Executors.newVirtualThreadPerTaskExecutor()) {
       List<Future<?>> futures = new ArrayList<>();
       for (List<LoadUnit> part : byPartition.values()) {
         futures.add(
@@ -248,9 +247,7 @@ public class LoadRunner {
       Thread.currentThread().interrupt();
       throw new IllegalStateException("The load was interrupted", e);
     } catch (ExecutionException e) {
-      throw new IllegalStateException(e.getCause().getMessage(), e.getCause());
-    } finally {
-      pool.shutdown();
+      throw new IllegalStateException("A partition of the load failed", e);
     }
   }
 

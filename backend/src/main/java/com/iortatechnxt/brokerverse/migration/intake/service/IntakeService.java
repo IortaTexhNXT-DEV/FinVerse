@@ -8,7 +8,6 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.bulk.service.BulkFileReader;
 import com.iortatechnxt.brokerverse.bulk.service.ParsedFile;
-import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
@@ -31,18 +30,13 @@ import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
 import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
 import com.iortatechnxt.brokerverse.storage.service.StoredFileService.StoreRequest;
 import java.time.Clock;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -60,18 +54,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class IntakeService {
 
-  private static final int G_LAYOUT = 1;
-  private static final int G_SOURCE = 2;
-  private static final int G_DAY = 3;
-  private static final int G_SEQ = 4;
-
-  private static final Pattern FILE_NAME =
-      Pattern.compile("^([A-Z0-9]+)_([A-Z]+)_(\\d{8})_(\\d{2})\\.(CSV|XLSX)$");
-  private static final DateTimeFormatter DAY = DateTimeFormatter.BASIC_ISO_DATE;
   private static final String CSV_TYPE = "text/csv";
   private static final String XLSX_TYPE =
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-  private static final String DELTA = "DELTA";
   private static final String DUPLICATE = "MIG_DUPLICATE_FILE";
   private static final String AS_OF_ORDER = "MIG_ASOF_ORDER";
 
@@ -152,17 +137,18 @@ public class IntakeService {
    * @return the extract, STAGED or REJECTED
    */
   public MigExtract receive(Long companyId, Upload upload) {
-    Name name = parseName(upload.fileName());
+    ExtractNames.Name name = ExtractNames.parse(upload.fileName());
     Layout layout = layouts.requireCurrent(name.layout());
     MigDataObject object = register.get(layout.getObjectCode());
-    requireReceivable(object, name, upload.objectCode());
+    ExtractNames.requireReceivable(object, name, upload.objectCode());
     boolean production = parameters.production();
     if (!production) {
       masker.requireConfigured();
     }
     String sha = Sha256.hex(upload.content());
     ControlFile control =
-        ControlFile.of(reader.read(csvName(upload.controlName()), upload.control()));
+        ControlFile.of(
+            reader.read(ExtractNames.controlName(upload.controlName()), upload.control()));
     LocalDateTime asOf = control.asOf() != null ? control.asOf() : name.day().atStartOfDay();
     MigExtract extract =
         extracts.save(
@@ -176,7 +162,7 @@ public class IntakeService {
                     name.source(),
                     asOf,
                     name.sequence(),
-                    mode(upload.mode()),
+                    ExtractNames.mode(upload.mode()),
                     upload.fileName(),
                     upload.controlName(),
                     sha),
@@ -231,7 +217,7 @@ public class IntakeService {
               DUPLICATE,
               "This file was already received as extract " + earlier.get().getExtractNo()));
     }
-    if (DELTA.equals(extract.getMode())) {
+    if (ExtractNames.DELTA.equals(extract.getMode())) {
       Optional<MigExtract> last =
           extracts
               .findByCompanyIdAndLayoutCodeAndStatusInOrderByAsOfDesc(
@@ -341,69 +327,6 @@ public class IntakeService {
     }
   }
 
-  private static void requireReceivable(MigDataObject object, Name name, String expectedObject) {
-    if (expectedObject != null
-        && !expectedObject.isBlank()
-        && !expectedObject.equals(object.getCode())) {
-      throw new BusinessRuleException(
-          "MIG_FILE_OBJECT",
-          "File layout "
-              + name.layout()
-              + " belongs to object "
-              + object.getCode()
-              + ", not "
-              + expectedObject);
-    }
-    if (!object.loadable() && !object.archive()) {
-      throw new BusinessRuleException(
-          "MIG_OBJECT_NOT_DECIDED",
-          "Object "
-              + object.getCode()
-              + " is not decided for migration; extracts cannot be received");
-    }
-    if (!object.sources().isEmpty() && !object.sources().contains(name.source())) {
-      throw new BusinessRuleException(
-          "MIG_FILE_SOURCE",
-          "Source system " + name.source() + " is not a source of object " + object.getCode());
-    }
-  }
-
-  private static String mode(String mode) {
-    return DELTA.equalsIgnoreCase(mode) ? DELTA : "FULL";
-  }
-
-  private static String csvName(String controlName) {
-    return controlName != null && controlName.toLowerCase(Locale.ROOT).endsWith(".xlsx")
-        ? controlName
-        : "control.csv";
-  }
-
-  /**
-   * Parses a data file name {@code <LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv|xlsx}.
-   *
-   * @param fileName file name
-   * @return its parts
-   */
-  static Name parseName(String fileName) {
-    Matcher m =
-        FILE_NAME.matcher(fileName == null ? "" : fileName.strip().toUpperCase(Locale.ROOT));
-    if (!m.matches()) {
-      throw new BusinessRuleException(
-          "MIG_FILE_NAME",
-          "Name the file <LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv or .xlsx, for example F01C_EBIX_20271231_01.csv");
-    }
-    try {
-      return new Name(
-          m.group(G_LAYOUT),
-          m.group(G_SOURCE),
-          LocalDate.parse(m.group(G_DAY), DAY),
-          Integer.parseInt(m.group(G_SEQ)));
-    } catch (DateTimeParseException e) {
-      throw new BusinessRuleException(
-          "MIG_FILE_NAME", "The date in the file name is not a valid yyyyMMdd date", e);
-    }
-  }
-
   /**
    * An extract.
    *
@@ -449,14 +372,4 @@ public class IntakeService {
       byte[] content,
       String controlName,
       byte[] control) {}
-
-  /**
-   * Parts of a file name.
-   *
-   * @param layout layout code
-   * @param source source system
-   * @param day as-of date
-   * @param sequence sequence of the day
-   */
-  record Name(String layout, String source, LocalDate day, int sequence) {}
 }

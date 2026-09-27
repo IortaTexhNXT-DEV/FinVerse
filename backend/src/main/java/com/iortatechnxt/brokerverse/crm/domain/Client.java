@@ -14,6 +14,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -254,7 +255,7 @@ public class Client extends BaseEntity {
    */
   public void applyProfile(ClientProfile profile) {
     requireChangeable();
-    ClientProfile p = profile == null ? ClientProfile.EMPTY : profile;
+    ClientProfile p = Objects.requireNonNullElse(profile, ClientProfile.EMPTY);
     this.nationality = p.nationality();
     this.civilStatus = p.civilStatus();
     this.occupation = p.occupation();
@@ -337,7 +338,7 @@ public class Client extends BaseEntity {
   }
 
   public RecordOrigin getRecordOrigin() {
-    return recordOrigin == null ? RecordOrigin.BIBS : recordOrigin;
+    return recordOrigin;
   }
 
   private static void requireText(String value, String field) {
@@ -413,7 +414,7 @@ public class Client extends BaseEntity {
    * @return code
    */
   public String getCode() {
-    return clientCode != null ? clientCode : prospectCode;
+    return Objects.requireNonNullElse(clientCode, prospectCode);
   }
 
   public Long getCompanyId() {

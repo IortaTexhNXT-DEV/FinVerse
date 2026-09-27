@@ -6,28 +6,15 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.migration.common.service.MigrationParameters;
 import com.iortatechnxt.brokerverse.migration.load.domain.BatchStatus;
 import com.iortatechnxt.brokerverse.migration.load.domain.MigBatch;
-import com.iortatechnxt.brokerverse.migration.load.domain.MigBatchRepository;
 import com.iortatechnxt.brokerverse.migration.load.service.BatchLogger;
 import com.iortatechnxt.brokerverse.migration.load.service.BatchPlanService;
-import com.iortatechnxt.brokerverse.migration.mapping.domain.Layout;
-import com.iortatechnxt.brokerverse.migration.mapping.domain.LayoutColumn;
-import com.iortatechnxt.brokerverse.migration.mapping.service.CodeMapService;
-import com.iortatechnxt.brokerverse.migration.mapping.service.LayoutService;
-import com.iortatechnxt.brokerverse.migration.matching.domain.ClientMatch;
-import com.iortatechnxt.brokerverse.migration.matching.domain.ClientMatchRepository;
-import com.iortatechnxt.brokerverse.migration.object.domain.MigDataObject;
-import com.iortatechnxt.brokerverse.migration.object.service.ObjectRegisterService;
 import com.iortatechnxt.brokerverse.migration.recon.domain.MigReconRun;
 import com.iortatechnxt.brokerverse.migration.recon.service.ReconciliationService;
 import com.iortatechnxt.brokerverse.migration.signoff.domain.Gate;
 import com.iortatechnxt.brokerverse.migration.signoff.domain.MigSignoff;
 import com.iortatechnxt.brokerverse.migration.signoff.domain.MigSignoffRepository;
 import java.time.Clock;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,67 +34,51 @@ public class SignoffService {
   private static final String STEWARD = "DATA_STEWARD";
   private static final String RECON = "MIGRATION_RECON_APPROVER";
 
-  private final ObjectRegisterService register;
   private final BatchPlanService plans;
-  private final MigBatchRepository batches;
-  private final LayoutService layouts;
-  private final CodeMapService maps;
-  private final ClientMatchRepository matches;
   private final ReconciliationService recon;
   private final MigSignoffRepository signoffs;
   private final GateRecorder gates;
+  private final GateRules rules;
+  private final MappingGate mapping;
   private final BatchLogger log;
   private final MigrationParameters parameters;
-  private final JdbcTemplate jdbc;
   private final CurrentUser currentUser;
   private final Clock clock;
 
   /**
    * Creates the service.
    *
-   * @param register objects
    * @param plans batches
-   * @param batches batch repository
-   * @param layouts layouts
-   * @param maps code maps
-   * @param matches client pairs
    * @param recon reconciliation
    * @param signoffs sign-offs
    * @param gates gate recorder
+   * @param rules gate conditions
+   * @param mapping mapping readiness
    * @param log run log
-   * @param parameters thresholds
-   * @param jdbc JDBC (roles of the signer)
+   * @param parameters retention
    * @param currentUser current user
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // constructor injection
   public SignoffService(
-      ObjectRegisterService register,
       BatchPlanService plans,
-      MigBatchRepository batches,
-      LayoutService layouts,
-      CodeMapService maps,
-      ClientMatchRepository matches,
       ReconciliationService recon,
       MigSignoffRepository signoffs,
       GateRecorder gates,
+      GateRules rules,
+      MappingGate mapping,
       BatchLogger log,
       MigrationParameters parameters,
-      JdbcTemplate jdbc,
       CurrentUser currentUser,
       Clock clock) {
-    this.register = register;
     this.plans = plans;
-    this.batches = batches;
-    this.layouts = layouts;
-    this.maps = maps;
-    this.matches = matches;
     this.recon = recon;
     this.signoffs = signoffs;
     this.gates = gates;
+    this.rules = rules;
+    this.mapping = mapping;
     this.log = log;
     this.parameters = parameters;
-    this.jdbc = jdbc;
     this.currentUser = currentUser;
     this.clock = clock;
   }
@@ -124,30 +95,9 @@ public class SignoffService {
    */
   public MigSignoff signMapping(
       Long companyId, String objectCode, boolean approve, String comment) {
-    MigDataObject object = register.get(objectCode);
-    requireApproved(companyId, objectCode, null, Gate.G1);
+    rules.requireApproved(companyId, objectCode, null, Gate.G1);
     if (approve) {
-      List<Layout> inForce = layouts.inForce(objectCode);
-      if (inForce.isEmpty() && !object.getSourceSystems().isBlank()) {
-        throw new BusinessRuleException(
-            "MIG_LAYOUT_NOT_FROZEN",
-            "Freeze the layouts of object " + objectCode + " before signing the mapping");
-      }
-      Set<String> missing = new TreeSet<>();
-      for (Layout l : inForce) {
-        for (LayoutColumn c : layouts.columns(l.getId())) {
-          if (c.getMapSet() != null
-              && !c.getMapSet().isBlank()
-              && maps.approved(c.getMapSet()).isEmpty()) {
-            missing.add(c.getMapSet());
-          }
-        }
-      }
-      if (!missing.isEmpty()) {
-        throw new BusinessRuleException(
-            "MIG_MAP_NOT_APPROVED",
-            "These code maps have no approved version: " + String.join(", ", missing));
-      }
+      mapping.requireReady(objectCode);
     }
     return sign(
         companyId, new MigSignoff.Scope(objectCode, null, null), Gate.G2, OWNER, approve, comment);
@@ -165,9 +115,9 @@ public class SignoffService {
   public MigSignoff signValidation(String batchNo, boolean approve, String comment) {
     MigBatch batch = plans.get(batchNo);
     batch.requireStatus("signed for validation", BatchStatus.VALIDATED);
-    requireApproved(batch.getCompanyId(), batch.getObjectCode(), null, Gate.G2);
+    rules.requireApproved(batch.getCompanyId(), batch.getObjectCode(), null, Gate.G2);
     if (approve) {
-      requireLoadable(batch);
+      rules.requireLoadable(batch);
     }
     return sign(batch, Gate.G3, STEWARD, approve, comment);
   }
@@ -182,9 +132,9 @@ public class SignoffService {
    */
   public MigBatch approveLoad(String batchNo, String comment) {
     MigBatch batch = plans.get(batchNo);
-    requireApproved(batch.getCompanyId(), batch.getObjectCode(), batch.getId(), Gate.G3);
-    requireLoadable(batch);
-    requireDependenciesAccepted(batch);
+    rules.requireApproved(batch.getCompanyId(), batch.getObjectCode(), batch.getId(), Gate.G3);
+    rules.requireLoadable(batch);
+    rules.requireDependenciesAccepted(batch);
     batch.approveLoad(currentUser.username(), clock.instant());
     sign(batch, Gate.G4, LEAD, true, comment);
     log.info(batch, "APPROVE", "Load approved by " + currentUser.username());
@@ -201,8 +151,8 @@ public class SignoffService {
    */
   public MigSignoff signReconciliation(String batchNo, boolean approve, String comment) {
     MigBatch batch = plans.get(batchNo);
-    requireApproved(batch.getCompanyId(), batch.getObjectCode(), batch.getId(), Gate.G4);
-    requireNotOperator(batch);
+    rules.requireApproved(batch.getCompanyId(), batch.getObjectCode(), batch.getId(), Gate.G4);
+    GateRules.requireNotOperator(batch, currentUser.username());
     MigReconRun run =
         recon
             .latest(batch.getId())
@@ -237,8 +187,8 @@ public class SignoffService {
           "MIG_GATE_ROLE", "Accept the object as data owner or Data Migration Lead");
     }
     MigBatch batch = plans.get(batchNo);
-    requireApproved(batch.getCompanyId(), batch.getObjectCode(), batch.getId(), Gate.G5);
-    requireNotOperator(batch);
+    rules.requireApproved(batch.getCompanyId(), batch.getObjectCode(), batch.getId(), Gate.G5);
+    GateRules.requireNotOperator(batch, currentUser.username());
     MigSignoff s = sign(batch, Gate.G6, role, approve, comment);
     List<MigSignoff> g6 =
         signoffs.findByBatchIdOrderByIdAsc(batch.getId()).stream()
@@ -269,8 +219,7 @@ public class SignoffService {
    */
   @Transactional(readOnly = true)
   public boolean accepted(Long companyId, String objectCode) {
-    return batches.existsByCompanyIdAndObjectCodeAndStatusIn(
-        companyId, objectCode, EnumSet.of(BatchStatus.SIGNED_OFF));
+    return rules.accepted(companyId, objectCode);
   }
 
   /**
@@ -284,75 +233,8 @@ public class SignoffService {
     return signoffs.findByCompanyIdOrderByIdAsc(companyId);
   }
 
-  private void requireLoadable(MigBatch batch) {
-    MigDataObject object = register.get(batch.getObjectCode());
-    if (batch.getErrorRate() != null
-        && batch.getErrorRate().compareTo(parameters.maxErrorRate(object.isFinancial())) > 0) {
-      throw new BusinessRuleException(
-          "MIG_ERROR_RATE",
-          batch.getErrorRate().stripTrailingZeros().toPlainString()
-              + " percent of rows have errors; the limit for this object is "
-              + parameters.maxErrorRate(object.isFinancial()).stripTrailingZeros().toPlainString()
-              + " percent");
-    }
-    Integer unmapped =
-        jdbc.queryForObject(
-            "select count(*) from mig_issue where batch_id = ? and rule_code = 'DQ-003' and severity = 'ERROR'"
-                + " and resolution = 'OPEN'",
-            Integer.class,
-            batch.getId());
-    if (unmapped != null && unmapped > 0) {
-      throw new BusinessRuleException(
-          "MIG_UNMAPPED_CODES",
-          "The batch has " + unmapped + " unmapped codes; map them before approving the load");
-    }
-    long review = matches.countByBatchIdAndDecision(batch.getId(), ClientMatch.Decision.REVIEW);
-    if (review > 0) {
-      throw new BusinessRuleException(
-          "MIG_REVIEW_QUEUE",
-          review + " client pairs are waiting for review; decide them before approving the load");
-    }
-  }
-
-  private void requireDependenciesAccepted(MigBatch batch) {
-    MigDataObject object = register.get(batch.getObjectCode());
-    for (String dep : object.dependencies()) {
-      if (!accepted(batch.getCompanyId(), dep)) {
-        throw new BusinessRuleException(
-            "MIG_DEPENDENCY_NOT_ACCEPTED",
-            "Object " + dep + " must be accepted before this object can load");
-      }
-    }
-  }
-
-  private void requireNotOperator(MigBatch batch) {
-    String user = currentUser.username();
-    if (CurrentUser.sameUser(user, batch.getLoadedBy())
-        || CurrentUser.sameUser(user, batch.getValidatedBy())) {
-      throw new BusinessRuleException(
-          "MAKER_CHECKER_VIOLATION", "A record cannot be authorized by the user who maintained it");
-    }
-  }
-
-  private void requireApproved(Long companyId, String objectCode, Long batchId, Gate gate) {
-    List<MigSignoff> list =
-        batchId == null || gate == Gate.G1 || gate == Gate.G2
-            ? signoffs.findByCompanyIdAndObjectCodeOrderByIdAsc(companyId, objectCode)
-            : signoffs.findByBatchIdOrderByIdAsc(batchId);
-    MigSignoff last = null;
-    for (MigSignoff s : list) {
-      if (s.getGate() == gate) {
-        last = s;
-      }
-    }
-    if (last == null || !last.approved()) {
-      throw new BusinessRuleException(
-          "MIG_GATE_ORDER", "Sign gate " + gate + " (" + gate.label() + ") first");
-    }
-  }
-
   private MigSignoff sign(MigBatch batch, Gate gate, String role, boolean approve, String comment) {
-    requireSegregation(batch, gate, role);
+    rules.requireSegregation(batch, gate, role, currentUser.username());
     return sign(
         batch.getCompanyId(),
         new MigSignoff.Scope(batch.getObjectCode(), batch.getId(), null),
@@ -370,43 +252,11 @@ public class SignoffService {
       boolean approve,
       String comment) {
     String user = currentUser.username();
-    requireRole(user, role);
+    rules.requireRole(user, role);
     if (!approve && (comment == null || comment.isBlank())) {
       throw new BusinessRuleException("MIG_REASON_REQUIRED", "Enter the reason for the rejection");
     }
     return gates.record(
         companyId, scope, gate, new MigSignoff.Signer(role, user), approve, comment);
-  }
-
-  private void requireSegregation(MigBatch batch, Gate gate, String role) {
-    String user = currentUser.username();
-    for (MigSignoff s : signoffs.findByBatchIdOrderByIdAsc(batch.getId())) {
-      boolean otherGate = s.getGate() != gate;
-      if (CurrentUser.sameUser(s.getUsername(), user)
-          && otherGate
-          && !s.getRoleCode().equals(role)) {
-        throw new BusinessRuleException(
-            "MAKER_CHECKER_VIOLATION",
-            "A record cannot be authorized by the user who maintained it");
-      }
-      if (CurrentUser.sameUser(s.getUsername(), user) && !otherGate && s.approved()) {
-        throw new BusinessRuleException(
-            "MIG_GATE_SIGNED", "You have already signed gate " + gate + " of this batch");
-      }
-    }
-  }
-
-  private void requireRole(String user, String role) {
-    Integer holds =
-        jdbc.queryForObject(
-            "select count(*) from sec_user_role ur join sec_user u on u.id = ur.user_id"
-                + " join sec_role r on r.id = ur.role_id where lower(u.username) = lower(?) and r.code = ?",
-            Integer.class,
-            user,
-            role);
-    if (holds == null || holds == 0) {
-      throw new BusinessRuleException(
-          "MIG_GATE_ROLE", "This gate is signed in the role " + role + ", which you do not hold");
-    }
   }
 }

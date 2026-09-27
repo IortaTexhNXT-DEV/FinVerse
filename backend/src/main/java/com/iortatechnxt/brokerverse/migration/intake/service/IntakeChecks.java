@@ -2,13 +2,8 @@ package com.iortatechnxt.brokerverse.migration.intake.service;
 
 import com.iortatechnxt.brokerverse.bulk.service.ParsedFile;
 import com.iortatechnxt.brokerverse.migration.mapping.domain.Layout;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,9 +29,6 @@ final class IntakeChecks {
 
   /** Hash total differs. */
   static final String HASH_TOTAL = "MIG_HASH_TOTAL";
-
-  private static final String CURRENCY = "currency";
-  private static final int SCALE = 2;
 
   private IntakeChecks() {}
 
@@ -64,8 +56,8 @@ final class IntakeChecks {
       return fail(
           ROW_COUNT, "The file has " + rows + " rows; the control file says " + control.rowCount());
     }
-    Optional<Failure> amounts = amounts(control, parsed);
-    return amounts.isPresent() ? amounts : hash(control, layout, parsed);
+    Optional<Failure> amounts = AmountTotals.check(control, parsed);
+    return amounts.isPresent() ? amounts : HashTotals.check(control, layout, parsed);
   }
 
   private static Optional<Failure> header(
@@ -94,182 +86,7 @@ final class IntakeChecks {
             + (extra.isEmpty() ? "none" : String.join(", ", extra)));
   }
 
-  private static Optional<Failure> amounts(ControlFile control, ParsedFile parsed) {
-    boolean hasCurrency = parsed.headers().contains(CURRENCY);
-    for (ControlFile.AmountTotal total : control.amounts()) {
-      BigDecimal sum = BigDecimal.ZERO;
-      for (ParsedFile.RawRow row : parsed.rows()) {
-        if (applies(total, row.values(), hasCurrency)) {
-          sum = sum.add(amount(row.values().get(total.column())));
-        }
-      }
-      BigDecimal declared = total.value().setScale(SCALE, RoundingMode.HALF_UP);
-      if (sum.setScale(SCALE, RoundingMode.HALF_UP).compareTo(declared) != 0
-          && !multiCurrency(control, total, hasCurrency)) {
-        return fail(
-            CONTROL_TOTAL,
-            "The total of "
-                + total.label()
-                + " is "
-                + sum.setScale(SCALE, RoundingMode.HALF_UP)
-                + "; the control file says "
-                + declared);
-      }
-    }
-    return multiCurrencyTotals(control, parsed, hasCurrency);
-  }
-
-  /**
-   * A layout without a currency column (for example the invoice components) cannot split its totals
-   * by currency: the totals of the same column and filter are compared across currencies.
-   */
-  private static boolean multiCurrency(
-      ControlFile control, ControlFile.AmountTotal total, boolean hasCurrency) {
-    return !hasCurrency
-        && control.amounts().stream().filter(t -> sameMeasure(t, total)).count() > 1;
-  }
-
-  private static Optional<Failure> multiCurrencyTotals(
-      ControlFile control, ParsedFile parsed, boolean hasCurrency) {
-    if (hasCurrency) {
-      return Optional.empty();
-    }
-    Set<String> done = new HashSet<>();
-    for (ControlFile.AmountTotal total : control.amounts()) {
-      String key = total.column() + "|" + total.filterColumn() + "|" + total.filterValue();
-      if (!done.add(key) || !multiCurrency(control, total, false)) {
-        continue;
-      }
-      BigDecimal declared =
-          control.amounts().stream()
-              .filter(t -> sameMeasure(t, total))
-              .map(ControlFile.AmountTotal::value)
-              .reduce(BigDecimal.ZERO, BigDecimal::add)
-              .setScale(SCALE, RoundingMode.HALF_UP);
-      BigDecimal sum = BigDecimal.ZERO;
-      for (ParsedFile.RawRow row : parsed.rows()) {
-        if (applies(total, row.values(), false)) {
-          sum = sum.add(amount(row.values().get(total.column())));
-        }
-      }
-      if (sum.setScale(SCALE, RoundingMode.HALF_UP).compareTo(declared) != 0) {
-        return fail(
-            CONTROL_TOTAL,
-            "The total of "
-                + total.column()
-                + " in all currencies is "
-                + sum.setScale(SCALE, RoundingMode.HALF_UP)
-                + "; the control file says "
-                + declared);
-      }
-    }
-    return Optional.empty();
-  }
-
-  private static boolean sameMeasure(ControlFile.AmountTotal a, ControlFile.AmountTotal b) {
-    return a.column().equals(b.column())
-        && String.valueOf(a.filterColumn()).equals(String.valueOf(b.filterColumn()))
-        && String.valueOf(a.filterValue()).equals(String.valueOf(b.filterValue()));
-  }
-
-  private static boolean applies(
-      ControlFile.AmountTotal total, Map<String, String> values, boolean hasCurrency) {
-    if (total.filterColumn() != null
-        && !total.filterValue().equalsIgnoreCase(values.getOrDefault(total.filterColumn(), ""))) {
-      return false;
-    }
-    return !hasCurrency
-        || total.currency() == null
-        || total.currency().equalsIgnoreCase(values.getOrDefault(CURRENCY, ""));
-  }
-
-  private static BigDecimal amount(String raw) {
-    if (raw == null || raw.isBlank()) {
-      return BigDecimal.ZERO;
-    }
-    try {
-      return new BigDecimal(raw.strip());
-    } catch (NumberFormatException e) {
-      return BigDecimal.ZERO;
-    }
-  }
-
-  private static Optional<Failure> hash(ControlFile control, Layout layout, ParsedFile parsed) {
-    if (control.hashTotal() == null || control.hashTotal().isBlank()) {
-      return fail(HASH_TOTAL, "The control file has no hash total");
-    }
-    String computed = computeHash(control, layout, parsed);
-    if (!normalise(control.hashTotal()).equals(computed)) {
-      return fail(
-          HASH_TOTAL,
-          "The hash total of the key column is "
-              + computed
-              + "; the control file says "
-              + control.hashTotal());
-    }
-    return Optional.empty();
-  }
-
-  /**
-   * The hash total of a parsed file: the count of distinct values of the columns named in the
-   * control file (or of the layout's hash columns), the row count, or the sum of the numeric part.
-   *
-   * @param control control file
-   * @param layout layout
-   * @param parsed file
-   * @return hash total as text
-   */
-  static String computeHash(ControlFile control, Layout layout, ParsedFile parsed) {
-    List<String> cols = new ArrayList<>();
-    if (control.hashColumns() != null && !control.hashColumns().isBlank()) {
-      for (String c : control.hashColumns().split("[+,]")) {
-        cols.add(c.strip());
-      }
-    }
-    Layout.HashRule rule = layout.getHashRule();
-    if (!cols.isEmpty() && rule == Layout.HashRule.ROW_COUNT) {
-      rule = Layout.HashRule.DISTINCT_COUNT;
-    }
-    List<String> keys = cols.isEmpty() ? layout.hashCols() : cols;
-    return switch (rule) {
-      case ROW_COUNT -> String.valueOf(parsed.rows().size());
-      case NUMERIC_SUM -> numericSum(parsed, keys.get(0));
-      default -> String.valueOf(distinct(parsed, keys));
-    };
-  }
-
-  private static int distinct(ParsedFile parsed, List<String> keys) {
-    Set<String> seen = new HashSet<>();
-    for (ParsedFile.RawRow row : parsed.rows()) {
-      seen.add(
-          keys.stream()
-              .map(k -> row.values().getOrDefault(k, ""))
-              .collect(Collectors.joining("|")));
-    }
-    return seen.size();
-  }
-
-  private static String numericSum(ParsedFile parsed, String column) {
-    BigDecimal sum = BigDecimal.ZERO;
-    for (ParsedFile.RawRow row : parsed.rows()) {
-      String digits = row.values().getOrDefault(column, "").replaceAll("\\D", "");
-      if (!digits.isEmpty()) {
-        sum = sum.add(new BigDecimal(digits));
-      }
-    }
-    return sum.toPlainString();
-  }
-
-  private static String normalise(String value) {
-    String v = value.strip();
-    try {
-      return new BigDecimal(v).stripTrailingZeros().toPlainString();
-    } catch (NumberFormatException e) {
-      return v;
-    }
-  }
-
-  private static Optional<Failure> fail(String code, String message) {
+  static Optional<Failure> fail(String code, String message) {
     return Optional.of(new Failure(code, message));
   }
 

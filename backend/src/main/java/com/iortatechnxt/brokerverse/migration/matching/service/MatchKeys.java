@@ -65,25 +65,45 @@ public record MatchKeys(
    * @return keys
    */
   public static MatchKeys of(Map<String, String> v) {
-    String tinDigits = digits(v.get("tin"));
-    String idNo = norm(v.get("id_number"));
     String last = norm(v.get("last_name"));
     String first = norm(v.get("first_name"));
     String birth = blankToNull(v.get("birth_date"));
     String corp = corporate(v.get("corporate_name"));
-    String mobileDigits = digits(v.get("mobile"));
     return new MatchKeys(
-        tinDigits != null && tinDigits.length() >= MIN_TIN ? tinDigits : null,
-        idNo == null ? null : norm(v.get("id_type")) + ":" + idNo,
-        last == null || first == null || birth == null ? null : last + "|" + first + "|" + birth,
+        tinKey(v.get("tin")),
+        idKey(v.get("id_type"), v.get("id_number")),
+        personKey(last, first, birth),
         corp,
         norm(v.get("registration_no")),
         digits(v.get("bank_cif")),
-        v.get("email") == null ? null : v.get("email").strip().toLowerCase(Locale.ROOT),
-        mobileDigits == null ? null : mobileDigits.replaceFirst("^63", "0"),
+        emailKey(v.get("email")),
+        mobileKey(v.get("mobile")),
         corp != null ? corp : join(last, first),
         birth,
         norm(v.get("city")));
+  }
+
+  private static String tinKey(String tin) {
+    String d = digits(tin);
+    return d != null && d.length() >= MIN_TIN ? d : null;
+  }
+
+  private static String idKey(String type, String number) {
+    String idNo = norm(number);
+    return idNo == null ? null : norm(type) + ":" + idNo;
+  }
+
+  private static String personKey(String last, String first, String birth) {
+    return last == null || first == null || birth == null ? null : last + "|" + first + "|" + birth;
+  }
+
+  private static String emailKey(String email) {
+    return email == null ? null : email.strip().toLowerCase(Locale.ROOT);
+  }
+
+  private static String mobileKey(String mobile) {
+    String d = digits(mobile);
+    return d == null ? null : d.replaceFirst("^63", "0");
   }
 
   private static String join(String last, String first) {

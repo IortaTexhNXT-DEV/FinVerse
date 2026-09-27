@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.stereotype.Component;
 
 /**
@@ -50,7 +51,8 @@ public class ClientLoader implements MigrationLoader {
   private static final String SEGMENT = "market_segment";
   private static final int TIN_SHORT = 9;
   private static final int TIN_LONG = 12;
-  private static final EnumSet<ClientMatch.Decision> MERGED =
+  private static final int TIN_GROUP = 3;
+  private static final Set<ClientMatch.Decision> MERGED =
       EnumSet.of(ClientMatch.Decision.AUTO_MERGE, ClientMatch.Decision.MERGE);
 
   private final MigratedClientRegistration registration;
@@ -124,7 +126,8 @@ public class ClientLoader implements MigrationLoader {
     Map<String, List<StageRow>> children = new HashMap<>(main.children());
     List<LoadUnit.Alias> aliases = new ArrayList<>();
     for (LoadUnit u : members) {
-      if (u != main) {
+      if (!u.legacyKey().equals(main.legacyKey())
+          || !u.sourceSystem().equals(main.sourceSystem())) {
         aliases.add(new LoadUnit.Alias(u.sourceSystem(), u.legacyKey(), u.hash()));
         children.merge(LoadUnit.MERGED, List.of(u.main()), ClientLoader::concat);
         u.children().forEach((k, v) -> children.merge(k, v, ClientLoader::concat));
@@ -234,12 +237,11 @@ public class ClientLoader implements MigrationLoader {
     if (digits.length() != TIN_LONG) {
       return Values.text(value);
     }
-    return String.join(
-        "-",
-        digits.substring(0, 3),
-        digits.substring(3, 6),
-        digits.substring(6, 9),
-        digits.substring(9));
+    List<String> groups = new ArrayList<>();
+    for (int at = 0; at < TIN_LONG; at += TIN_GROUP) {
+      groups.add(digits.substring(at, at + TIN_GROUP));
+    }
+    return String.join("-", groups);
   }
 
   private static MigratedClient.Kyc kyc(Map<String, String> v) {

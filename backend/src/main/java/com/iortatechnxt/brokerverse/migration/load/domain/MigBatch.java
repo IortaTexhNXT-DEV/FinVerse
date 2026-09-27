@@ -29,7 +29,6 @@ import java.util.Set;
  */
 @Entity
 @Table(name = "mig_batch")
-@SuppressWarnings("PMD.GodClass") // lifecycle of a batch: counts, approvals, rollback and purge
 public class MigBatch extends BaseEntity {
 
   @Column(name = "company_id", nullable = false, updatable = false)

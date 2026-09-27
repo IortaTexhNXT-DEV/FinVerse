@@ -73,6 +73,10 @@ public record ControlFile(
     return new BusinessRuleException("MIG_CONTROL_FILE", message);
   }
 
+  private static BusinessRuleException invalid(String message, Exception cause) {
+    return new BusinessRuleException("MIG_CONTROL_FILE", message, cause);
+  }
+
   private static LocalDateTime stamp(String value, String field) {
     if (value == null || value.isBlank()) {
       return null;
@@ -83,7 +87,7 @@ public record ControlFile(
           ? LocalDateTime.parse(v + " 00:00:00", STAMP)
           : LocalDateTime.parse(v, STAMP);
     } catch (DateTimeParseException e) {
-      throw invalid("The " + field + " of the control file is not yyyy-MM-dd HH:mm:ss");
+      throw invalid("The " + field + " of the control file is not yyyy-MM-dd HH:mm:ss", e);
     }
   }
 
@@ -159,7 +163,7 @@ public record ControlFile(
       try {
         return Integer.valueOf(value);
       } catch (NumberFormatException e) {
-        throw invalid("The row count of the control file is not a number");
+        throw invalid("The row count of the control file is not a number", e);
       }
     }
 
@@ -167,7 +171,7 @@ public record ControlFile(
       try {
         return new BigDecimal(value);
       } catch (NumberFormatException e) {
-        throw invalid("The amount total " + value + " of the control file is not a number");
+        throw invalid("The amount total " + value + " of the control file is not a number", e);
       }
     }
 

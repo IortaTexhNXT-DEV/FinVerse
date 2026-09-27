@@ -20,6 +20,24 @@ public class MigrationHomeService {
 
   private static final int NEXT_TASKS = 8;
 
+  private static final String OBJECTS =
+      "select status, count(*) from mig_data_object group by status";
+
+  private static final String BATCHES =
+      "select status, count(*) from mig_batch where company_id = ? group by status";
+
+  private static final String COUNTS =
+      "select (select count(*) from mig_recon_line l join mig_recon_run r on r.id = l.run_id"
+          + " where r.company_id = ? and l.status = 'BREAK') as open_breaks,"
+          + " (select count(distinct i.value) from mig_issue i join mig_batch b on b.id = i.batch_id"
+          + " where b.company_id = ? and i.rule_code = 'DQ-003' and i.resolution = 'OPEN')"
+          + " as unmapped,"
+          + " (select count(*) from mig_issue i join mig_batch b on b.id = i.batch_id"
+          + " where b.company_id = ? and i.resolution = 'OPEN' and i.severity = 'ERROR')"
+          + " as open_errors,"
+          + " (select count(*) from mig_client_match m join mig_batch b on b.id = m.batch_id"
+          + " where b.company_id = ? and m.decision = 'REVIEW') as pairs";
+
   private final JdbcTemplate jdbc;
 
   /**
@@ -38,45 +56,33 @@ public class MigrationHomeService {
    * @return tiles
    */
   public Tiles tiles(Long companyId) {
+    Map<String, Integer> objects = new LinkedHashMap<>();
+    jdbc.query(
+        OBJECTS,
+        rs -> {
+          objects.put(rs.getString(1), rs.getInt(2));
+        });
+    Map<String, Integer> batches = new LinkedHashMap<>();
+    jdbc.query(
+        BATCHES,
+        rs -> {
+          batches.put(rs.getString(1), rs.getInt(2));
+        },
+        companyId);
+    Map<String, Object> c = jdbc.queryForMap(COUNTS, companyId, companyId, companyId, companyId);
     return new Tiles(
-        counts("select status, count(*) from mig_data_object group by status"),
-        counts(
-            "select status, count(*) from mig_batch where company_id = ? group by status",
-            companyId),
-        count(
-            "select count(*) from mig_recon_line l join mig_recon_run r on r.id = l.run_id"
-                + " where r.company_id = ? and l.status = 'BREAK'",
-            companyId),
-        count(
-            "select count(distinct i.value) from mig_issue i join mig_batch b on b.id = i.batch_id"
-                + " where b.company_id = ? and i.rule_code = 'DQ-003' and i.resolution = 'OPEN'",
-            companyId),
-        count(
-            "select count(*) from mig_issue i join mig_batch b on b.id = i.batch_id"
-                + " where b.company_id = ? and i.resolution = 'OPEN' and i.severity = 'ERROR'",
-            companyId),
-        count(
-            "select count(*) from mig_client_match m join mig_batch b on b.id = m.batch_id"
-                + " where b.company_id = ? and m.decision = 'REVIEW'",
-            companyId),
+        objects,
+        batches,
+        number(c.get("open_breaks")),
+        number(c.get("unmapped")),
+        number(c.get("open_errors")),
+        number(c.get("pairs")),
         nextTasks(companyId),
         runoff(companyId));
   }
 
-  private Map<String, Integer> counts(String sql, Object... args) {
-    Map<String, Integer> out = new LinkedHashMap<>();
-    jdbc.query(
-        sql,
-        rs -> {
-          out.put(rs.getString(1), rs.getInt(2));
-        },
-        args);
-    return out;
-  }
-
-  private int count(String sql, Object... args) {
-    Integer n = jdbc.queryForObject(sql, Integer.class, args);
-    return n == null ? 0 : n;
+  private static int number(Object value) {
+    return value instanceof Number n ? n.intValue() : 0;
   }
 
   private List<Task> nextTasks(Long companyId) {

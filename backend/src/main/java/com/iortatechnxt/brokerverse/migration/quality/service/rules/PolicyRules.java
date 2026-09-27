@@ -23,6 +23,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class PolicyRules implements ObjectRules {
 
+  private static final String EXPIRY = "expiry_date";
+
   private static final String CLIENT_NO = "legacy_client_no";
 
   private final JdbcTemplate jdbc;
@@ -52,20 +54,16 @@ public class PolicyRules implements ObjectRules {
     for (StageRow row : headers) {
       Map<String, String> v = row.getRawPayload();
       Optional<LocalDate> from = Values.date(v.get("inception_date"));
-      Optional<LocalDate> to = Values.date(v.get("expiry_date"));
+      Optional<LocalDate> to = Values.date(v.get(EXPIRY));
       if (from.isPresent() && to.isPresent() && !to.get().isAfter(from.get())) {
         sink.error(
-            row,
-            "DQ-014",
-            "expiry_date",
-            v.get("expiry_date"),
-            "The expiry date is before the inception date");
+            row, "DQ-014", EXPIRY, v.get(EXPIRY), "The expiry date is before the inception date");
       } else if (to.isPresent() && to.get().isBefore(cutover)) {
         sink.error(
             row,
             "DQ-014",
-            "expiry_date",
-            v.get("expiry_date"),
+            EXPIRY,
+            v.get(EXPIRY),
             "The policy expired before the cut-over date " + cutover + " and is not in force");
       }
       if (!loaded.contains(v.get(CLIENT_NO))) {

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.migration.mapping.domain;
 
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -8,7 +9,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  * An entry of a code map version: the legacy code of a source system and its action (MAP to a
@@ -172,5 +178,49 @@ public class CodeMapEntry {
       String qualifierValue,
       EntryAction action,
       String targetCode,
-      String remarks) {}
+      String remarks) {
+
+    /** Checks the mandatory parts of an entry: source, legacy code, action and a MAP target. */
+    public void requireValid() {
+      if (blank(sourceSystem) || blank(legacyCode) || action == null) {
+        throw new BusinessRuleException(
+            "MIG_MAP_ENTRY", "Enter the source system, the legacy code and the action");
+      }
+      if (action == EntryAction.MAP && blank(targetCode)) {
+        throw new BusinessRuleException(
+            "MIG_MAP_TARGET_REQUIRED", "Enter the target code of legacy code " + legacyCode);
+      }
+    }
+
+    private static boolean blank(String s) {
+      return s == null || s.isBlank();
+    }
+  }
+
+  /**
+   * The BIBS codes an approved version maps to, and the values it creates.
+   *
+   * @param entries entries of a version
+   * @return targets
+   */
+  public static Targets targetsOf(List<CodeMapEntry> entries) {
+    Set<String> mapped = new TreeSet<>();
+    List<String> created = new ArrayList<>();
+    for (CodeMapEntry e : entries) {
+      if (e.getAction() == EntryAction.MAP || e.getAction() == EntryAction.DEFAULT) {
+        Optional.ofNullable(e.getTargetCode()).ifPresent(mapped::add);
+      } else if (e.getAction() == EntryAction.CREATE) {
+        created.add(e.getTargetCode() == null ? e.getLegacyCode() : e.getTargetCode());
+      }
+    }
+    return new Targets(mapped, created);
+  }
+
+  /**
+   * Targets of a version.
+   *
+   * @param mapped existing BIBS codes mapped to
+   * @param created codes created through the reference-data load
+   */
+  public record Targets(Set<String> mapped, List<String> created) {}
 }

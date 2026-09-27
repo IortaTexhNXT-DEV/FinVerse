@@ -208,22 +208,32 @@ public class ValidationService {
     Map<Long, List<MigIssue>> kept =
         pagedIssues(ids).stream().collect(Collectors.groupingBy(MigIssue::getStageRowId));
     for (StageRow row : all) {
-      List<MigIssue> previous = kept.getOrDefault(row.getId(), List.of());
-      boolean error = false;
-      boolean warning = false;
-      for (Finding f : outcome.findings(row.getId())) {
-        boolean waived =
-            previous.stream()
-                .anyMatch(i -> same(i, f) && i.getResolution() == MigIssue.Resolution.WAIVED);
-        if (!waived) {
-          issues.save(new MigIssue(row.getId(), batch.getId(), f));
-        }
-        error |= f.severity() == MigIssue.Severity.ERROR && !waived;
-        warning |= f.severity() == MigIssue.Severity.WARNING || waived;
-      }
-      RowStatus status = error ? RowStatus.INVALID : warning ? RowStatus.WARNING : RowStatus.VALID;
+      RowStatus status =
+          record(
+              batch, row, outcome.findings(row.getId()), kept.getOrDefault(row.getId(), List.of()));
       row.validated(status, outcome.mapped(row.getId()), batch.getId());
     }
+  }
+
+  /** Stores the findings of a row (a waived finding stays waived) and gives the row status. */
+  private RowStatus record(
+      MigBatch batch, StageRow row, List<Finding> findings, List<MigIssue> kept) {
+    boolean error = false;
+    boolean warning = false;
+    for (Finding f : findings) {
+      boolean waived =
+          kept.stream()
+              .anyMatch(i -> same(i, f) && i.getResolution() == MigIssue.Resolution.WAIVED);
+      if (!waived) {
+        issues.save(new MigIssue(row.getId(), batch.getId(), f));
+      }
+      error |= f.severity() == MigIssue.Severity.ERROR && !waived;
+      warning |= f.severity() == MigIssue.Severity.WARNING || waived;
+    }
+    if (error) {
+      return RowStatus.INVALID;
+    }
+    return warning ? RowStatus.WARNING : RowStatus.VALID;
   }
 
   private List<MigIssue> pagedIssues(List<Long> ids) {

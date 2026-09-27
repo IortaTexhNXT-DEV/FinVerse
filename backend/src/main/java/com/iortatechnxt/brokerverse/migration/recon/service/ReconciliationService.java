@@ -1,8 +1,5 @@
 package com.iortatechnxt.brokerverse.migration.recon.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iortatechnxt.brokerverse.alert.domain.AlertFacts;
 import com.iortatechnxt.brokerverse.alert.service.AlertService;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
@@ -14,14 +11,11 @@ import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.migration.common.service.MigrationCodes;
 import com.iortatechnxt.brokerverse.migration.common.service.MigrationParameters;
-import com.iortatechnxt.brokerverse.migration.common.service.Values;
 import com.iortatechnxt.brokerverse.migration.intake.domain.MigExtract;
 import com.iortatechnxt.brokerverse.migration.intake.domain.MigExtractRepository;
 import com.iortatechnxt.brokerverse.migration.intake.domain.RowStatus;
 import com.iortatechnxt.brokerverse.migration.intake.domain.StageRow;
 import com.iortatechnxt.brokerverse.migration.intake.domain.StageRowRepository;
-import com.iortatechnxt.brokerverse.migration.intake.service.ControlFile;
-import com.iortatechnxt.brokerverse.migration.load.domain.KeyXref;
 import com.iortatechnxt.brokerverse.migration.load.domain.MigBatch;
 import com.iortatechnxt.brokerverse.migration.load.domain.MigBatchRepository;
 import com.iortatechnxt.brokerverse.migration.load.service.BatchLogger;
@@ -38,13 +32,8 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,13 +49,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class ReconciliationService implements LoadListener {
 
-  private static final String L1 = "L1";
-  private static final String L2 = "L2";
-  private static final String L3 = "L3";
-  private static final String L4 = "L4";
-  private static final int MAX_DETAIL_KEYS = 10;
-  private static final Set<RowStatus> LOADED = EnumSet.of(RowStatus.LOADED, RowStatus.SKIPPED);
-
   private final MigBatchRepository batches;
   private final MigExtractRepository extracts;
   private final StageRowRepository rows;
@@ -80,7 +62,7 @@ public class ReconciliationService implements LoadListener {
   private final MigrationParameters parameters;
   private final AlertService alerts;
   private final AuditTrailService audit;
-  private final ObjectMapper json;
+  private final ReconMeasures measures;
   private final CurrentUser currentUser;
   private final Clock clock;
 
@@ -100,7 +82,7 @@ public class ReconciliationService implements LoadListener {
    * @param parameters tolerance
    * @param alerts alerts
    * @param audit audit trail
-   * @param json JSON
+   * @param measures reconciliation measures
    * @param currentUser current user
    * @param clock clock
    */
@@ -119,7 +101,7 @@ public class ReconciliationService implements LoadListener {
       MigrationParameters parameters,
       AlertService alerts,
       AuditTrailService audit,
-      ObjectMapper json,
+      ReconMeasures measures,
       CurrentUser currentUser,
       Clock clock) {
     this.batches = batches;
@@ -135,7 +117,7 @@ public class ReconciliationService implements LoadListener {
     this.parameters = parameters;
     this.alerts = alerts;
     this.audit = audit;
-    this.json = json;
+    this.measures = measures;
     this.currentUser = currentUser;
     this.clock = clock;
   }
@@ -181,15 +163,9 @@ public class ReconciliationService implements LoadListener {
                 currentUser.username(),
                 clock.instant()));
     List<StageRow> all = familyRows(batch);
-    List<ReconLineSpec> specs = new ArrayList<>();
-    counts(batch, ext, all, specs);
     MigrationLoader loader = loaders.find(batch.getObjectCode()).orElse(null);
-    List<KeyXref> loaded = xrefs.ofBatch(batch.getId());
-    amounts(ext, all, loader, loaded, specs);
-    hashes(batch, all, loaded, specs);
-    if (loader != null) {
-      fields(all, loader, loaded, specs);
-    }
+    List<ReconLineSpec> specs =
+        measures.lines(batch, ext, all, loader, xrefs.ofBatch(batch.getId()));
     for (ReconCheck check : checks) {
       if (check.appliesTo(batch.getObjectCode())) {
         specs.addAll(check.lines(batch));
@@ -221,207 +197,6 @@ public class ReconciliationService implements LoadListener {
           rows.findByBatchIdAndStatusInOrderByIdAsc(child.getId(), EnumSet.allOf(RowStatus.class)));
     }
     return all;
-  }
-
-  private static void counts(
-      MigBatch batch, List<MigExtract> ext, List<StageRow> all, List<ReconLineSpec> specs) {
-    for (MigExtract e : ext) {
-      BigDecimal declared =
-          e.getDeclaredRows() == null ? null : BigDecimal.valueOf(e.getDeclaredRows());
-      specs.add(
-          new ReconLineSpec(
-              L1,
-              "Rows received " + e.getFileName(),
-              null,
-              ReconLine.Values.of(
-                  declared,
-                  BigDecimal.valueOf(e.getParsedRows()),
-                  BigDecimal.valueOf(e.getStagedRows())),
-              e.getExtractNo()));
-    }
-    Map<RowStatus, Integer> by = new HashMap<>();
-    all.forEach(r -> by.merge(r.getStatus(), 1, Integer::sum));
-    int processed =
-        by.getOrDefault(RowStatus.LOADED, 0)
-            + by.getOrDefault(RowStatus.SKIPPED, 0)
-            + by.getOrDefault(RowStatus.REJECTED, 0)
-            + by.getOrDefault(RowStatus.EXCLUDED, 0)
-            + by.getOrDefault(RowStatus.ROLLED_BACK, 0);
-    specs.add(
-        new ReconLineSpec(
-            L1,
-            "Loaded + skipped + rejected + excluded = staged",
-            null,
-            ReconLine.Values.of(
-                BigDecimal.valueOf(all.size()),
-                BigDecimal.valueOf(all.size()),
-                BigDecimal.valueOf(processed)),
-            "Batch " + batch.getBatchNo() + ": " + by));
-  }
-
-  private void amounts(
-      List<MigExtract> ext,
-      List<StageRow> all,
-      MigrationLoader loader,
-      List<KeyXref> loaded,
-      List<ReconLineSpec> specs) {
-    for (MigExtract e : ext) {
-      List<StageRow> ofExtract =
-          all.stream().filter(r -> r.getExtractId().equals(e.getId())).toList();
-      for (ControlFile.AmountTotal total : totals(e)) {
-        BigDecimal staged = sum(ofExtract, total, false);
-        BigDecimal target =
-            loader == null
-                ? null
-                : loader
-                    .targetTotal(
-                        new MigrationLoader.AmountMeasure(
-                            e.getLayoutCode(),
-                            total.column(),
-                            total.filterColumn(),
-                            total.filterValue(),
-                            total.currency()),
-                        loaded)
-                    .orElse(sum(ofExtract, total, true));
-        specs.add(
-            new ReconLineSpec(
-                L2,
-                e.getLayoutCode() + " " + total.label(),
-                total.currency(),
-                ReconLine.Values.of(total.value(), staged, target),
-                e.getExtractNo()));
-      }
-    }
-  }
-
-  private List<ControlFile.AmountTotal> totals(MigExtract e) {
-    if (e.getControlTotals() == null || e.getControlTotals().isBlank()) {
-      return List.of();
-    }
-    try {
-      return json.readValue(
-          e.getControlTotals(), new TypeReference<List<ControlFile.AmountTotal>>() {});
-    } catch (JsonProcessingException ex) {
-      return List.of();
-    }
-  }
-
-  private static BigDecimal sum(
-      List<StageRow> rows, ControlFile.AmountTotal total, boolean loadedOnly) {
-    BigDecimal sum = BigDecimal.ZERO;
-    for (StageRow r : rows) {
-      Map<String, String> v = r.getRawPayload();
-      boolean filter =
-          total.filterColumn() == null
-              || total.filterValue().equalsIgnoreCase(v.getOrDefault(total.filterColumn(), ""));
-      boolean currency =
-          total.currency() == null
-              || !v.containsKey("currency")
-              || total.currency().equalsIgnoreCase(v.get("currency"));
-      if (filter && currency && (!loadedOnly || LOADED.contains(r.getStatus()))) {
-        sum = sum.add(Values.amount(v.get(total.column())));
-      }
-    }
-    return sum;
-  }
-
-  private static void hashes(
-      MigBatch batch, List<StageRow> all, List<KeyXref> loaded, List<ReconLineSpec> specs) {
-    Set<String> keys = new HashSet<>();
-    all.stream()
-        .filter(
-            r ->
-                r.getLayoutCode().equals(batch.getObjectCode())
-                    || all.stream().noneMatch(x -> x.getLayoutCode().equals(batch.getObjectCode())))
-        .filter(r -> r.getStatus() == RowStatus.LOADED)
-        .forEach(r -> keys.add(r.getLegacyKey()));
-    Set<String> xref = new HashSet<>();
-    loaded.forEach(x -> xref.add(x.getLegacyKey()));
-    Set<String> missing = new HashSet<>(keys);
-    missing.removeAll(xref);
-    specs.add(
-        new ReconLineSpec(
-            L3,
-            "Keys loaded = keys in the cross-reference",
-            null,
-            ReconLine.Values.of(
-                null,
-                BigDecimal.valueOf(keys.size()),
-                BigDecimal.valueOf(keys.size() - missing.size())),
-            missing.isEmpty()
-                ? null
-                : "Missing: " + missing.stream().limit(MAX_DETAIL_KEYS).toList()));
-  }
-
-  /**
-   * The entry of each target record that carries its values: the first key loaded into it (legacy
-   * records merged into one target keep the survivor's values).
-   */
-  private static List<KeyXref> survivors(List<KeyXref> loaded) {
-    Map<Long, KeyXref> first = new LinkedHashMap<>();
-    for (KeyXref x : loaded) {
-      first.merge(x.getTargetId(), x, (a, b) -> a.getId() < b.getId() ? a : b);
-    }
-    return new ArrayList<>(first.values());
-  }
-
-  private static void fields(
-      List<StageRow> all, MigrationLoader loader, List<KeyXref> loaded, List<ReconLineSpec> specs) {
-    List<String> cols = loader.reconciledColumns();
-    if (cols.isEmpty() || loaded.isEmpty()) {
-      return;
-    }
-    Map<String, StageRow> byKey = new HashMap<>();
-    all.stream()
-        .filter(r -> r.getStatus() == RowStatus.LOADED)
-        .forEach(r -> byKey.putIfAbsent(r.getLegacyKey(), r));
-    Map<String, int[]> result = new HashMap<>();
-    Map<String, List<String>> diffs = new HashMap<>();
-    for (KeyXref x : survivors(loaded)) {
-      StageRow row = byKey.get(x.getLegacyKey());
-      if (row == null) {
-        continue;
-      }
-      Map<String, String> target = loader.readBack(x);
-      for (String col : cols) {
-        int[] r = result.computeIfAbsent(col, k -> new int[2]);
-        r[0]++;
-        if (equal(row.getMappedPayload().get(col), target.get(col))) {
-          r[1]++;
-        } else {
-          List<String> d = diffs.computeIfAbsent(col, k -> new ArrayList<>());
-          if (d.size() < MAX_DETAIL_KEYS) {
-            d.add(
-                x.getLegacyKey()
-                    + ": "
-                    + row.getMappedPayload().get(col)
-                    + " / "
-                    + target.get(col));
-          }
-        }
-      }
-    }
-    for (String col : cols) {
-      int[] r = result.getOrDefault(col, new int[2]);
-      specs.add(
-          new ReconLineSpec(
-              L4,
-              "Field " + col,
-              null,
-              ReconLine.Values.of(BigDecimal.valueOf(r[0]), null, BigDecimal.valueOf(r[1])),
-              diffs.containsKey(col) ? String.join("; ", diffs.get(col)) : null));
-    }
-  }
-
-  private static boolean equal(String staged, String target) {
-    String a = staged == null ? "" : staged.strip();
-    String b = target == null ? "" : target.strip();
-    if (a.equalsIgnoreCase(b)) {
-      return true;
-    }
-    Optional<BigDecimal> x = Values.decimal(a);
-    Optional<BigDecimal> y = Values.decimal(b);
-    return x.isPresent() && y.isPresent() && x.get().compareTo(y.get()) == 0;
   }
 
   private void summarise(MigReconRun run, MigBatch batch) {

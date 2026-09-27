@@ -132,6 +132,18 @@ public class ObjectRegisterService {
   }
 
   private void validate(String code, ObjectData data) {
+    requireRationale(data);
+    Map<String, MigDataObject> all =
+        objects.findAll().stream()
+            .collect(Collectors.toMap(MigDataObject::getCode, Function.identity()));
+    List<String> deps = dependencies(data.dependsOn());
+    for (String dep : deps) {
+      requireBefore(all.get(dep), dep, data.loadOrder());
+    }
+    requireNoCycle(code, deps, all);
+  }
+
+  private static void requireRationale(ObjectData data) {
     if (data.rationale() == null || data.rationale().isBlank()) {
       throw new BusinessRuleException(
           "MIG_RATIONALE_REQUIRED", "Enter the rationale for the proposed class");
@@ -140,26 +152,25 @@ public class ObjectRegisterService {
       throw new BusinessRuleException(
           "MIG_RATIONALE_LENGTH", "The rationale is limited to 2,000 characters");
     }
+    requireCondition(data);
+  }
+
+  private static void requireCondition(ObjectData data) {
     if (data.proposedClass() == MigrationClass.CONDITIONAL
         && (data.conditionText() == null || data.conditionText().isBlank())) {
       throw new BusinessRuleException(
           "MIG_CONDITION_REQUIRED", "Enter the condition of a conditional object");
     }
-    Map<String, MigDataObject> all =
-        objects.findAll().stream()
-            .collect(Collectors.toMap(MigDataObject::getCode, Function.identity()));
-    List<String> deps = dependencies(data.dependsOn());
-    for (String dep : deps) {
-      MigDataObject parent = all.get(dep);
-      if (parent == null) {
-        throw new BusinessRuleException("MIG_OBJECT_UNKNOWN", "Object " + dep + " does not exist");
-      }
-      if (data.loadOrder() <= parent.getLoadOrder()) {
-        throw new BusinessRuleException(
-            "MIG_LOAD_ORDER", "The load order must follow the objects this object depends on");
-      }
+  }
+
+  private static void requireBefore(MigDataObject parent, String dep, int loadOrder) {
+    if (parent == null) {
+      throw new BusinessRuleException("MIG_OBJECT_UNKNOWN", "Object " + dep + " does not exist");
     }
-    requireNoCycle(code, deps, all);
+    if (loadOrder <= parent.getLoadOrder()) {
+      throw new BusinessRuleException(
+          "MIG_LOAD_ORDER", "The load order must follow the objects this object depends on");
+    }
   }
 
   private static void requireNoCycle(

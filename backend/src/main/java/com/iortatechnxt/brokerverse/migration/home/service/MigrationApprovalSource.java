@@ -111,34 +111,44 @@ public class MigrationApprovalSource implements PendingApprovalSource {
     for (MigBatch b :
         batches.findByStatusInOrderByIdAsc(
             EnumSet.of(BatchStatus.VALIDATED, BatchStatus.ROLLBACK_REQUESTED))) {
-      String link = "/migration/batches?batch=" + b.getBatchNo();
-      if (load
-          && b.getStatus() == BatchStatus.VALIDATED
-          && viewer.mayApproveItemOf(b.getValidatedBy())) {
-        out.add(
-            item(
-                "Migration load",
-                b.getBatchNo(),
-                "Load of object " + b.getObjectCode(),
-                b.getValidatedBy(),
-                b.getValidatedAt(),
-                b.getCompanyId(),
-                link));
-      }
-      if (rollback
-          && b.getStatus() == BatchStatus.ROLLBACK_REQUESTED
-          && viewer.mayApproveItemOf(b.getRollbackRequestedBy())) {
-        out.add(
-            item(
-                "Migration rollback",
-                b.getBatchNo(),
-                "Rollback of object " + b.getObjectCode(),
-                b.getRollbackRequestedBy(),
-                b.getRollbackRequestedAt(),
-                b.getCompanyId(),
-                link));
+      if (load && b.getStatus() == BatchStatus.VALIDATED) {
+        loadItem(viewer, b, out);
+      } else if (rollback && b.getStatus() == BatchStatus.ROLLBACK_REQUESTED) {
+        rollbackItem(viewer, b, out);
       }
     }
+  }
+
+  private static void loadItem(ApprovalViewer viewer, MigBatch b, List<PendingApproval> out) {
+    if (viewer.mayApproveItemOf(b.getValidatedBy())) {
+      out.add(
+          item(
+              "Migration load",
+              b.getBatchNo(),
+              "Load of object " + b.getObjectCode(),
+              b.getValidatedBy(),
+              b.getValidatedAt(),
+              b.getCompanyId(),
+              link(b)));
+    }
+  }
+
+  private static void rollbackItem(ApprovalViewer viewer, MigBatch b, List<PendingApproval> out) {
+    if (viewer.mayApproveItemOf(b.getRollbackRequestedBy())) {
+      out.add(
+          item(
+              "Migration rollback",
+              b.getBatchNo(),
+              "Rollback of object " + b.getObjectCode(),
+              b.getRollbackRequestedBy(),
+              b.getRollbackRequestedAt(),
+              b.getCompanyId(),
+              link(b)));
+    }
+  }
+
+  private static String link(MigBatch b) {
+    return "/migration/batches/" + b.getBatchNo();
   }
 
   private void otherItems(ApprovalViewer viewer, List<PendingApproval> out) {

@@ -649,11 +649,12 @@ def r_messages(doc: Any, pack: Pack, **_: Any) -> None:
         counts[m["kind"]] = counts.get(m["kind"], 0) + 1
     doc.paragraph(f"{len(pack.messages)} messages: " + ", ".join(f"{v} {k.lower()}" for k, v in sorted(counts.items()))
                   + ". The text is quoted exactly as the system shows it; <name> marks a value filled in by the "
-                    "system. Server messages also show their code as the Reference under the message.")
+                    "system. The user sees the message only, in the notice standard of the screen standards appendix; the "
+                    "code identifies the message for the project team and support and is not shown on the screen.")
     for where, rows in by_where.items():
         doc.heading(where, level=2, toc=False)
         table = [[m["id"], m["code"], m["text"], m["kind"], m["fix"]] for m in rows]
-        doc.table(["ID", "Code (Reference)", "Message", "Type", "What the user does"], table,
+        doc.table(["ID", "Code (not shown)", "Message", "Type", "What the user does"], table,
                   widths=[1.9, 3.8, 7.2, 1.7, 5.0], size=7, keep_rows=False)
 
 
@@ -916,7 +917,7 @@ def build_workbook(pack: Pack) -> Path:
         Column("id", "Message ID", 13, "Message identifier in this set"),
         Column("where", "Where it appears", 34, "Screen or dialog that shows it"),
         Column("layer", "Shown by", 11, "Screen (checked as you type), Server (checked on save or action) or Upload row"),
-        Column("code", "Code (Reference)", 26, "Code shown as the Reference under a server message"),
+        Column("code", "Code (not shown)", 26, "Identifies the message for the project team and support; not shown on the screen"),
         Column("text", "Message", 60, "Exact text; <name> is filled in by the system"),
         Column("kind", "Type", 13, "Validation, Error, Warning, Confirmation or Information",
                values=["Validation", "Error", "Warning", "Confirmation", "Information"]),

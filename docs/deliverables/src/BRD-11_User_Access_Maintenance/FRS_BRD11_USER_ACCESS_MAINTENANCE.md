@@ -2454,17 +2454,16 @@ The User Access Maintenance screens are built to the screen standards agreed wit
 | Four eyes | Nothing changes access until a second person approves; the screens offer a decision only to the users who may take it. |
 | Notifications | The bell opens the panel grouped by day, with Mark Read, Mark All Read and View All; the Notifications page lists every notice with filters. |
 
-The project team checks each screen against these standards before UAT and records the result in the UX readiness checklist. A screen found not to follow a standard during the review is recorded as Change requested in the sign-off workbook and corrected before UAT without a change request. The preparation of this set found these points against the Wording and Dates standards, to be corrected before UAT:
+The project team checks each screen against these standards before UAT and records the result in the UX readiness checklist. A screen found not to follow a standard during the review is recorded as Change requested in the sign-off workbook and corrected before UAT without a change request. The preparation of this set found points against the Wording and Dates standards. Those in the first rows were corrected in this release and are shown corrected in the screenshots; the last two remain, to be corrected before UAT:
 
-<!-- table: widths=5.2,12.4 caption="Points found against the screen standards" size=8.5 -->
-| Where | Point |
-|---|---|
-| New Group Profile Request, Roles & Permissions, User Access Matrix | Permissions are shown by their codes (for example UAM_ENROLL) in the permission picker, the implementation dialog and the matrix; the matrix columns show profile codes |
-| New Request (user ID check) | The format check shows the pattern of the parameter (The user ID must follow the format ^[a-zA-Z][0-9]{9}$) instead of a readable format |
-| System Parameters | The parameter descriptions carry internal requirement and question references |
-| User Access Reports and the report runner | The report codes are shown under each report and in the report description; the parameters Group Profile (code) and Module (area code) take codes; the back arrow of a report returns to the Report Centre, not to User Access Reports |
-| Deactivation reason list | The values carry "(to confirm)" in their labels |
-| Notice for second approval and alert Privileged access change | The risk flags are shown as codes in brackets ([OUTSIDE_HOURS], [PRIVILEGE_INCREASE]) |
-| Decision notice and alert of a scheduled change | The effective date is shown as yyyy-mm-dd |
-| Roles & Permissions (emergency path open) | The warning names the parameter and the alert by their codes |
-| New Request, Effective Date | The earliest date the picker offers is today in UTC: between 00:00 and 08:00 Philippine time the picker accepts yesterday, and the server then refuses it with The effective date cannot be before today |
+<!-- table: widths=5.2,10.2,2.2 caption="Points found against the screen standards" size=8.5 -->
+| Where | Point | Status |
+|---|---|---|
+| New Group Profile Request, Roles & Permissions, User Access Matrix | Permissions were shown by their codes; they are now shown by name, with the code in small print below, and the matrix columns by profile name | Corrected |
+| New Request (user ID check) | The format check showed the pattern of the parameter; it now gives the format in words (The user ID must be a letter followed by nine digits, for example a013000196) | Corrected |
+| System Parameters; deactivation reasons | Internal requirement references in the descriptions and "(to confirm)" in the reason labels were removed | Corrected |
+| User Access Reports and the report runner | The report codes are no longer shown under the reports nor in the runner description | Corrected |
+| Notices and alerts of the access requests | The risk flags are shown as words (privilege increase, outside working hours) and the dates as dd-MMM-yyyy | Corrected |
+| Every date picker | The earliest date and the date "today" were the UTC date; they are now the business date in Philippine time, on every screen | Corrected |
+| Report runner | The parameters Group Profile (code) and Module (area code) take codes, and the back arrow of a report returns to the Report Centre, not to User Access Reports | Open |
+| Roles & Permissions (emergency path open) | The warning names the parameter and the alert by their codes | Open |

@@ -22,6 +22,7 @@ import type { Escalation, EscalationItem } from './api';
 import { escalationsApi } from './api';
 import { LEVEL_LABELS } from './labels';
 import { displayNameOf } from '@/api/users';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 const ENTITY = 'CollectionEscalation';
 const BUSINESS_ACTIONS = new Set(['escalate_further', 'resolve', 'resubmit']);
@@ -57,7 +58,11 @@ function Summary({ e }: Readonly<{ e: Escalation }>) {
         </>
       }
       facts={[
-        { icon: Gavel, label: 'Reason', value: humanize(e.reasonCode) },
+        {
+          icon: Gavel,
+          label: 'Reason',
+          value: <LovLabel type="CLX_ESCALATION_REASON" code={e.reasonCode} />,
+        },
         {
           icon: UserRound,
           label: 'Escalated To',

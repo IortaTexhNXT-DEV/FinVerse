@@ -18,6 +18,7 @@ import { LovField, StepDialog } from './StepDialog';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { UserName } from '@/components/ui/UserName';
 import { DateInput } from '@/components/ui/DateInput';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 function UploadDialog({
   detail,
@@ -151,7 +152,9 @@ export function DocumentsTab({ detail }: Readonly<{ detail: CaseDetail }>) {
             render: (d) => (
               <>
                 {humanize(d.formType)}
-                <span className="cell-sub">{humanize(d.documentType)}</span>
+                <span className="cell-sub">
+                  <LovLabel type="SCR_DOCUMENT_TYPE" code={d.documentType} />
+                </span>
               </>
             ),
           },

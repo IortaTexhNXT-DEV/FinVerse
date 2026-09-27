@@ -98,7 +98,7 @@ tobe:
     - {id: b6, lane: bibs, col: 6, text: Requester and user notified, kind: doc}
     - {id: b7, lane: adm, col: 5, text: Group profile approved and implemented}
     - {id: b8, lane: adm, col: 6, text: Four access reports; audit log}
-    - {id: b9, lane: dir, col: 1, text: Sign-in by EUA (parked), kind: parked}
+    - {id: b9, lane: dir, col: 1, text: Sign-in by EUA (on hold), kind: parked}
   edges:
     - [b1, b2]
     - [b2, b3]

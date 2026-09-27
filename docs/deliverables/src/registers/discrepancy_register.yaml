@@ -1432,7 +1432,7 @@ items:
   desc: 'The current PEP screening notes "Applicable for Corporate only" under the NLDS validation step. The PEP source for individual clients is not stated.'
   impact: 'Compliance: PEP coverage for individuals. System: list sources.'
   modules: 'Sanction Screening'
-  resolution: 'Screen individuals and corporates against the same lists; NLDS kept as a parked source.'
+  resolution: 'Screen individuals and corporates against the same lists; NLDS kept as a source on hold.'
   question: 'Which list is used for PEP screening of individual clients?'
   status: Open
   related: [SANC-SQ01]
@@ -1566,7 +1566,7 @@ items:
   desc: 'The documentation NFR "instruction guide on how to manage users and extract users list and group profile list for" is cut off. NFR 1.i asks for "interfacing with an external ACL" without naming it.'
   impact: 'Minor.'
   modules: 'User Access'
-  resolution: 'User administration guide in the Help Center; external ACL parked.'
+  resolution: 'User administration guide in the Help Center; external ACL on hold.'
   question: 'Please complete the sentence and name the external ACL, if any.'
   status: Open
   related: [UQ18, UQ14]
@@ -2138,7 +2138,7 @@ items:
   desc: 'Core asks for unclaimed cheque safekeeping and hand-over to / retrieval from Cashiering; BRD-7 has no claim money through BDOI.'
   impact: 'System: cheque custody in Claims and Cashiering; possible GL impact.'
   modules: 'Claims; Cashiering'
-  resolution: 'Parked; if yes, a cheque custody register in Claims.'
+  resolution: 'On hold; if yes, a cheque custody register in Claims.'
   question: 'Does BDOI hold settlement cheques, who keeps them, what is recorded?'
   owner: 'Claims and Risk Management'
   status: Open
@@ -3427,7 +3427,7 @@ nfr:
   BRD-12: 'Not stated'
   BRD-13: 'Not stated; refers to the consolidated NFR, not in the pack (p.13-14)'
   conflict: true
-  proposed: 'Several roles per user; single session per device parked until answered'
+  proposed: 'Several roles per user; single session per device on hold until answered'
   refs: [DCR-044, DCR-045, DCR-141]
 - theme: Audit logging
   BRD-01: 'Audit log report (BRNB.089, p.127)'

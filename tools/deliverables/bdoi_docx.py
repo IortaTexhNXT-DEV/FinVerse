@@ -58,7 +58,7 @@ CALLOUT_KINDS = {
     "note": ("Note", brand.HEADER_BLUE, brand.BG_BLUE),
     "info": ("Note", brand.HEADER_BLUE, brand.BG_BLUE),
     "warning": ("Warning", brand.DANGER, brand.DANGER_BG),
-    "parked": ("Parked", brand.MUTED, brand.DIRTY_WHITE),
+    "parked": ("On hold", brand.MUTED, brand.DIRTY_WHITE),
     "decision": ("Decision", brand.SUCCESS, brand.SUCCESS_BG),
     "question": ("Open question", brand.AMBER, brand.AMBER_BG),
 }

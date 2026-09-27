@@ -17,14 +17,14 @@ notes:
     Swimlanes: one lane per BDOI role, external party or system. Yellow circles are pain points; the slide after the
     As-Is diagram explains each one with its BRD page. On the envisioned diagram, light blue boxes are steps a BDOI
     user takes on a BIBS screen and solid CTA Blue boxes are steps BIBS runs by itself (jobs, checks, matching,
-    postings). Dashed lines are hand-offs by e-mail or file, or parked interfaces.
+    postings). Dashed lines are hand-offs by e-mail or file, or interfaces on hold.
 
 reading:
   - 'Each business area has seven slides: at a glance, As-Is swimlane, pain points, envisioned swimlane, before and after, gaps, best practice'
   - 'Lanes are BDOI roles (Header Blue), external parties (grey) and today''s systems (light blue)'
   - 'Yellow numbered circles mark pain points: manual steps, re-keying, hand-offs, weak controls'
   - 'On the envisioned diagram, solid blue boxes are what BIBS does automatically'
-  - 'Dashed lines are e-mail or file hand-offs, or interfaces that are parked until BDO or the insurers provide them'
+  - 'Dashed lines are e-mail or file hand-offs, or interfaces that are on hold until BDO or the insurers provide them'
   - 'References: BRD PDF page, BRD requirement ID, FRS section, register item (DCR-nnn), open question (Qnn)'
 
 holistic:

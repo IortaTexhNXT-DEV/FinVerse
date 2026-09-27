@@ -157,7 +157,7 @@ gaps:
   - {sev: High, gap: Motor OD / Theft base 81% or 90% of TSI, impact: Motor premium differs by 9 points of TSI, owner: Marketing / TSU, decision: When each base applies, ref: DCR-006}
   - {sev: High, gap: CLPC payments and endorsements specified twice, impact: Two payment intakes and two endorsement paths, owner: 'NB and Operations', decision: Confirm Cashiering as the single payment intake and Adjustment for endorsements, ref: DCR-027}
   - {sev: High, gap: Sanctions match blocks or warns, impact: Business placed with a possible sanctioned party, owner: Compliance, decision: Block or warn on quotation to booking, ref: DCR-112}
-  - {sev: Parked, gap: 'HLS, mailbox, insurer SFTP / API, OCR', impact: Uploads and manual capture remain, owner: BDO IT and insurers, decision: Interface specifications, ref: 'Q11, Q12, Q06, Q24'}
+  - {sev: On hold, gap: 'HLS, mailbox, insurer SFTP / API, OCR', impact: Uploads and manual capture remain, owner: BDO IT and insurers, decision: Interface specifications, ref: 'Q11, Q12, Q06, Q24'}
 best:
   - {practice: Straight-through processing with exception queues, status: PARTLY, bibs: 'Bulk uploads with row checks, batch booking, work queues per stage.', bdoi: 'Give the product matrix and minimum fields per line (Q01, Q02) so clean cases pass untouched.'}
   - {practice: KYC at onboarding and a single client view, status: BIBS, bibs: 'Prospect to confirmed client with four-eyes KYC; one client record for every module.', bdoi: 'Confirm the BDO KYC standard fields, CIF and duplicate keys (Q16, Q17).'}

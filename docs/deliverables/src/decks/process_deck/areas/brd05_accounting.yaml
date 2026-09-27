@@ -97,7 +97,7 @@ tobe:
     seven modes; statuses and CWT are tagged automatically and by bank files, and BIR 2307 is generated. ACSL uploads the
     insurer statements and reconciles them per invoice, and posts corrections through create, review, approve and post.
     Accounting reconciles the bank by check number and amount, closes the books on schedule and runs the reports on
-    demand. The BDO Business Online Banking interface is parked (AQ09): approvals are confirmed manually or by file.
+    demand. The BDO Business Online Banking interface is on hold (AQ09): approvals are confirmed manually or by file.
   cols: 6
   lanes:
     - {id: mkt, label: 'Marketing, requesters'}
@@ -147,7 +147,7 @@ gaps:
   - {sev: High, gap: Payee master and open items at go-live, impact: Disbursement cannot start without payees, owner: Comptrollership, decision: 'Migration file, cut-off and reconciliation', ref: 'DCR-157, AQ11'}
   - {sev: Medium, gap: GL month-end closing rule, impact: 'Close date, reopening, period controls', owner: FRBS, decision: '2nd banking day or a preferred date; can a month reopen?', ref: 'DCR-054, AQ04'}
   - {sev: Medium, gap: RRF and RFP mandatory fields, impact: Marketing request screens and tests, owner: 'Comptrollership, Marketing', decision: Mandatory fields and approval chain per segment, ref: 'DCR-052, AQ18'}
-  - {sev: Parked, gap: BDO Business Online Banking and DCTF channel, impact: Funding approvals confirmed by hand or file, owner: BDO IT, decision: 'Channel per payment mode; DCTF specification', ref: 'AQ09, AQ10'}
+  - {sev: On hold, gap: BDO Business Online Banking and DCTF channel, impact: Funding approvals confirmed by hand or file, owner: BDO IT, decision: 'Channel per payment mode; DCTF specification', ref: 'AQ09, AQ10'}
 best:
   - {practice: Maker-checker and dual approval on payments, status: BIBS, bibs: 'DV verifier and approvers; account funding with a verifier and two approvers; maker cannot approve.', bdoi: 'Confirm the approvers, their order and limits (AQ10, AQ28).'}
   - {practice: Balanced posting and a closed period, status: BIBS, bibs: 'Unbalanced entries refused; posting only to open periods; scheduled close with a checklist.', bdoi: 'Agree the close calendar and reopen rule (AQ04).'}

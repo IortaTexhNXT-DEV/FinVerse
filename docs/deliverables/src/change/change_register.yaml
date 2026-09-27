@@ -1052,7 +1052,7 @@ rows:
   fr: 'FR-NB-015'
   type: INT
   req: 'Data synchronised with the BDOI tracking systems.'
-  proposed: 'Internal events only; the external feed is parked until BDOI names the systems.'
+  proposed: 'Internal events only; the external feed is on hold until BDOI names the systems.'
   reason: 'Q08 open.'
   impact: 'Other BDOI systems do not receive NB data automatically.'
   depts: 'Marketing; BDOI IT'
@@ -1121,7 +1121,7 @@ rows:
   fr: 'FR-NB-040'
   type: INT
   req: 'Quotation requests come directly from HLS with a source check.'
-  proposed: 'The user uploads the HLS extract; the direct interface is parked. HLS (Drop 0) and LOAS (Drop 2) are one system, HL-LOAS; proposed one interface specification delivered in Drop 0.'
+  proposed: 'The user uploads the HLS extract; the direct interface is on hold. HLS (Drop 0) and LOAS (Drop 2) are one system, HL-LOAS; proposed one interface specification delivered in Drop 0.'
   reason: 'Q11, IQ07 open.'
   impact: 'Home-loan quotation requests are uploaded by hand until the interface exists.'
   depts: 'Marketing (CBG); BDOI IT'
@@ -1366,7 +1366,7 @@ rows:
   fr: 'FR-NB-036'
   type: PARK
   req: 'Tags and instructions are enforced.'
-  proposed: 'Banner only (warn); blocking is parked until BDOI lists the tags that block.'
+  proposed: 'Banner only (warn); blocking is on hold until BDOI lists the tags that block.'
   reason: 'Q18 open.'
   impact: 'Users can proceed past a tag after the warning.'
   depts: 'Marketing; Compliance'
@@ -1417,7 +1417,7 @@ rows:
   fr: 'FR-NB-037'
   type: PARK
   req: 'Leads management.'
-  proposed: 'Prospects only; leads management is parked.'
+  proposed: 'Prospects only; leads management is on hold.'
   reason: 'Q19 open.'
   impact: 'Leads are tracked outside BIBS.'
   depts: 'Marketing'
@@ -2006,7 +2006,7 @@ rows:
   fr: 'FR-CL (CLX-APPLICATION-TO-INVOICE)'
   type: INT
   req: 'Text file loaded to FS04 before 06:00; EBIX invoice number format I########.'
-  proposed: 'The pipe-delimited file is written at 05:00 to the in-system folder FS04/CLX_APPLICATION_TO_INVOICE; the transport to FS04 is parked. Invoice pattern accepts EBIX and BIBS numbers.'
+  proposed: 'The pipe-delimited file is written at 05:00 to the in-system folder FS04/CLX_APPLICATION_TO_INVOICE; the transport to FS04 is on hold. Invoice pattern accepts EBIX and BIBS numbers.'
   reason: 'OQ17, CQ12, CQ13; keep FS04 only if a downstream system reads it.'
   impact: 'Downstream readers of FS04 need the transport.'
   depts: 'Collections; BDOI IT'
@@ -2060,7 +2060,7 @@ rows:
   req: 'Delivery date and receipt date on billing statements; ageing from billing statements, invoice dates and policy periods.'
   proposed: 'The first AR date is shown as the receipt date; the delivery date is blank. CLX_AGING_BASIS takes BOOKING or INCEPTION; ageing from the SOA due date is not proposed.'
   reason: 'CQ14, CQ17 open.'
-  impact: 'Statement tracking and SOA ageing incomplete.'
+  impact: 'Statement delivery tracking and ageing from the SOA due date wait for the BDOI answers to CQ14 and CQ17.'
   depts: 'Collections'
   eff: [1, 3, 2, 0]
   prio: Low
@@ -2585,7 +2585,7 @@ rows:
   req: 'General renewal persistency report.'
   proposed: 'Submitted Policies proposes SBM-PERSISTENCY for submitted accounts; Renewal has no persistency report. Proposed: a renewal report over closed candidates.'
   reason: 'XQ06 open (layout and definition).'
-  impact: 'Persistency is measured outside BIBS until the report is delivered.'
+  impact: 'Renewal persistency is measured outside BIBS until BDOI confirms the report layout and definition (XQ06).'
   depts: 'Marketing; MIS'
   eff: [1, 3, 2, 1]
   prio: Low
@@ -3105,7 +3105,7 @@ rows:
   fr: 'FR-SP-062'
   type: INT
   req: 'Letters and proposals sent automatically, including printed letters.'
-  proposed: 'Print batches (merged PDF and control list); the mail-house (COG) transport is parked.'
+  proposed: 'Print batches (merged PDF and control list); the mail-house (COG) transport is on hold.'
   reason: 'Mail-house channel and layout not given.'
   impact: 'Print batches handed to the mail house by hand.'
   depts: 'Submitted Policies; Marketing'
@@ -3294,7 +3294,7 @@ rows:
   fr: 'FR-DM-110, FR-DM-111; FR-DM-010'
   type: MIG
   req: 'Keep legacy read-only for history; receive the extracts. No retention for migration evidence; transport not stated.'
-  proposed: 'Archive search with logged access; migration evidence kept 10 years as project records; staging purged within 5 days. Extracts are received by upload; an SFTP drop from BDOI IT and links into the legacy systems are parked.'
+  proposed: 'Archive search with logged access; migration evidence kept 10 years as project records; staging purged within 5 days. Extracts are received by upload; an SFTP drop from BDOI IT and links into the legacy systems are on hold.'
   reason: 'DMQ28 open (extract transport); hosting appendix (5-day purge).'
   impact: 'Extract delivery by hand until the SFTP drop exists.'
   depts: 'Business Project Services; BDOI IT; Compliance'

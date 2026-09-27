@@ -134,7 +134,7 @@ gaps:
   - {sev: Medium, gap: Role-to-action matrix; ManCom decision rule, impact: Approval routing and persona tests, owner: 'MBS and TSU', decision: 'Approve the matrix; ManCom membership and quorum', ref: DCR-035}
   - {sev: Medium, gap: Non-package product maintenance, impact: Scope of the module, owner: MBS, decision: Confirm out of scope for this phase, ref: DCR-036}
   - {sev: Medium, gap: BRQID.008 dropped without a revision entry, impact: Renewals repriced without client evidence, owner: MBS, decision: Confirm BRRN.038 now governs, ref: DCR-030}
-  - {sev: Parked, gap: Product master feed to other BDOI systems, impact: Other systems not updated automatically, owner: BDO IT, decision: 'Which systems receive product changes', ref: PQ16}
+  - {sev: On hold, gap: Product master feed to other BDOI systems, impact: Other systems not updated automatically, owner: BDO IT, decision: 'Which systems receive product changes', ref: PQ16}
 best:
   - {practice: Configurable rules owned by the business, status: BIBS, bibs: 'Products, package versions, rates and incentive criteria kept as masters, maintained without IT.', bdoi: 'Name the business owner of each master and its approver.'}
   - {practice: Maker-checker on product changes, status: BIBS, bibs: 'Marketing approval, TSU Head approval, ManCom sign-off and release validation; never the maker.', bdoi: 'Approve the role-to-action matrix (DCR-035).'}

@@ -45,7 +45,7 @@ digraph holistic_envisioned_map {
   r9 [pos="264.0,13.0!", shape=box, style="rounded,filled", fillcolor="@CTA_BLUE", color="@CTA_BLUE", penwidth=1.2, width=0.361, height=0.222, fixedsize=true, margin="0.03,0.02", label=""];
   r10 [pos="319.7,13.0!", shape=box, style="filled", fillcolor="@WHITE", color="@WHITE", penwidth=0.8, width=1.047, height=0.250, fixedsize=true, margin="0.03,0.02", label=<<font point-size="10.5" color="@TEXT">Shared service</font>>];
   r11 [pos="384.4,13.0!", shape=box, style="rounded,filled,dashed", fillcolor="@WHITE", color="@MUTED", penwidth=1.2, width=0.361, height=0.222, fixedsize=true, margin="0.03,0.02", label=""];
-  r12 [pos="445.2,13.0!", shape=box, style="filled", fillcolor="@WHITE", color="@WHITE", penwidth=0.8, width=1.189, height=0.250, fixedsize=true, margin="0.03,0.02", label=<<font point-size="10.5" color="@TEXT">Parked interface</font>>];
+  r12 [pos="447.8,13.0!", shape=box, style="filled", fillcolor="@WHITE", color="@WHITE", penwidth=0.8, width=1.260, height=0.250, fixedsize=true, margin="0.03,0.02", label=<<font point-size="10.5" color="@TEXT">Interface on hold</font>>];
   x_cli -> chan [color="@HEADER_BLUE", style=solid, penwidth=1.3, arrowsize=0.7, tailport=e, headport=w];
   x_ins -> chan [color="@HEADER_BLUE", style=solid, penwidth=1.3, arrowsize=0.7, tailport=e, headport=w];
   x_bank -> chan [color="@HEADER_BLUE", style=solid, penwidth=1.3, arrowsize=0.7, tailport=e, headport=w];

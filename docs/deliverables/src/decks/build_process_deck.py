@@ -55,7 +55,7 @@ SEVERITY = {  # gap severity: (fill, font)
     "High": (brand.DANGER_BG, brand.DANGER),
     "Medium": (brand.AMBER_BG, brand.AMBER),
     "Low": (brand.DIRTY_WHITE, brand.MUTED),
-    "Parked": ("EDE7F6", "4527A0"),
+    "On hold": ("EDE7F6", "4527A0"),
     "Answered": (brand.SUCCESS_BG, brand.SUCCESS),
 }
 PRACTICE = {  # best-practice support: (label, fill, font)
@@ -626,7 +626,7 @@ def envisioned_map_spec(m: dict) -> dict:
               "label": "Shared services and hosting", "label_w": 300}]
     return {"bands": bands, "nodes": nodes, "edges": edges,
             "legend": [["external", "External party"], ["group", "Navigation group"],
-                       ["service", "Shared service"], ["parked", "Parked interface"]]}
+                       ["service", "Shared service"], ["parked", "Interface on hold"]]}
 
 
 def value_chain_spec(m: dict) -> dict:

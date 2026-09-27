@@ -140,7 +140,7 @@ gaps:
   - {sev: Medium, gap: AML Committee decision rule, impact: When a case is final, owner: Compliance, decision: 'Any member, majority, all, or a quorum', ref: 'DCR-108'}
   - {sev: Medium, gap: Adverse media and EDD template, impact: Scope of the review, owner: Compliance, decision: 'Adverse media in scope? EDD fields', ref: 'DCR-111'}
   - {sev: Medium, gap: 287 concurrent investigators, impact: Load target and role design, owner: Compliance, decision: 'Who the investigators are; real concurrency', ref: 'DCR-110'}
-  - {sev: Parked, gap: AMLC portal filing, impact: Filing stays manual, owner: Compliance, decision: Keep manual filing with the extract, ref: 'SNSRP-706'}
+  - {sev: On hold, gap: AMLC portal filing, impact: Filing stays manual, owner: Compliance, decision: Keep manual filing with the extract, ref: 'SNSRP-706'}
 best:
   - {practice: Screening on every trigger, status: BIBS, bibs: 'New client, identity change, account application, list change and a monthly full re-screen.', bdoi: 'Confirm the screening scope and batch window.'}
   - {practice: Maker-checker on rules and lists, status: BIBS, bibs: 'Criteria, matrices and manual list entries are approved by the Compliance Checker.', bdoi: 'Name the checker and a back-up.'}

@@ -141,7 +141,7 @@ gaps:
   - {sev: High, gap: Paid AR above the DTIP balance, impact: Remittance capped or withheld, owner: Operations, decision: 'Remit the DTIP balance or exclude the account', ref: DCR-015}
   - {sev: High, gap: CWT 2307 cash payments without entries, impact: GL entries for CWT unclear, owner: Comptrollership, decision: 'Give the entries and when Dr DTIP / Cr PR2307 posts', ref: DCR-028}
   - {sev: High, gap: CLPC payments and endorsements also in BRD-1, impact: Two payment intakes and two endorsement paths, owner: 'Operations and NB', decision: Confirm Cashiering and Adjustment as owners, ref: DCR-027}
-  - {sev: Parked, gap: 'Insurer report pick-up; Collection and Disbursement links', impact: 'Uploads and in-app queue until BRD-4 / BRD-5 replace them', owner: 'Insurers, BDO IT', decision: 'Mailbox or SFTP channel per insurer', ref: 'OQ29, OQ01, OQ02'}
+  - {sev: On hold, gap: 'Insurer report pick-up; Collection and Disbursement links', impact: 'Uploads and in-app queue until BRD-4 / BRD-5 replace them', owner: 'Insurers, BDO IT', decision: 'Mailbox or SFTP channel per insurer', ref: 'OQ29, OQ01, OQ02'}
 best:
   - {practice: Automated bank and insurer reconciliation, status: BIBS, bibs: 'Bank files uploaded and matched; insurer feedback matched within 1.00; duplicate files refused.', bdoi: 'Give the bank file layouts and an OR tolerance (OQ03, OQ22).'}
   - {practice: Premium remittance discipline, status: BIBS, bibs: 'Only paid, cleared (3 banking days) and eligible premium is batched; holds need a reason.', bdoi: 'Agree a remittance calendar per insurer and the DTIP rule (DCR-015).'}

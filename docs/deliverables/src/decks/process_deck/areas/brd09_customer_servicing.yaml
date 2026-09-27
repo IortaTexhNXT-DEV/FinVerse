@@ -97,7 +97,7 @@ tobe:
     - {id: b3, lane: bibs, col: 2, text: 'All accounts, 12 months payments, RAs', kind: auto}
     - {id: b4, lane: agt, col: 3, text: Caller verified; contact changed with reason}
     - {id: b5, lane: bibs, col: 3, text: Client master updated and logged, kind: auto}
-    - {id: b6, lane: leg, col: 4, text: Write-back queued (parked), kind: parked}
+    - {id: b6, lane: leg, col: 4, text: Write-back queued (on hold), kind: parked}
     - {id: b7, lane: agt, col: 4, text: RA or e-policy resent}
     - {id: b8, lane: cli, col: 5, text: 'Protected file; password apart', kind: external}
     - {id: b9, lane: sup, col: 5, text: 'Audit trail, agent activity (PDF, Excel)'}

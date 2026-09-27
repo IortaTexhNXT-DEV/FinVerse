@@ -102,7 +102,7 @@ tobe:
     - {id: ins, label: Insurers, kind: external}
     - {id: bibs, label: BIBS (automatic), kind: bibs}
   steps:
-    - {id: b1, lane: bank, col: 1, text: 'Source files (feeds parked)', kind: external}
+    - {id: b1, lane: bank, col: 1, text: 'Source files (feeds on hold)', kind: external}
     - {id: b2, lane: hdl, col: 1, text: Upload; extracted fields confirmed}
     - {id: b3, lane: bibs, col: 2, text: One masterlist with history, kind: auto}
     - {id: b4, lane: bibs, col: 3, text: 'Sanitise, match, classify', kind: auto}
@@ -140,7 +140,7 @@ gaps:
   - {sev: High, gap: One LAMD intake or two, impact: Loan status for buckets and renewal eligibility, owner: 'Marketing, LAMD', decision: 'One report, one owner, frequency', ref: 'DCR-146, XQ01'}
   - {sev: Medium, gap: One IAAF per policy, impact: IAAF generation and approvals, owner: Non-CBG Corporate Marketing, decision: 'One IAAF per policy; approval matrix', ref: 'DCR-125'}
   - {sev: Medium, gap: Handling fee undefined, impact: 'Amount, payer, VAT, OR, GL account', owner: 'Marketing, Comptrollership', decision: 'Define the fee and who dispositions it', ref: 'DCR-126'}
-  - {sev: Parked, gap: 'Source feeds, OCR, e-signature, COG', impact: 'Uploads, manual entry, stamped signature, print batch', owner: 'BDO IT, COG', decision: 'Interface specifications per source', ref: 'FRS BRD-12 section 7'}
+  - {sev: On hold, gap: 'Source feeds, OCR, e-signature, COG', impact: 'Uploads, manual entry, stamped signature, print batch', owner: 'BDO IT, COG', decision: 'Interface specifications per source', ref: 'FRS BRD-12 section 7'}
 best:
   - {practice: Automated matching with bank loan data, status: BIBS, bibs: 'LAMD matching by PN in the processing run; fallout with reason codes.', bdoi: 'One LAMD report and owner (DCR-146).'}
   - {practice: Rules owned by the business, status: BIBS, bibs: 'Sanitation, bucket and insurer-assignment rules maintained by a rule administrator.', bdoi: 'Give the bucket precedence (DCR-124).'}

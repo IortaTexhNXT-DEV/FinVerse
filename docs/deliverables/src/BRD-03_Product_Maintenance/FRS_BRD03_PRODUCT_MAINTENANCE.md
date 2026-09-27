@@ -388,7 +388,7 @@ alternate_flows:
   - Delivery failure. The e-mail shows the failed status in the E-mails tab; the user resends it.
 rules:
   - [R1, "Every Product Maintenance document e-mailed outside BIBS is protected; protection cannot be switched off per e-mail.", Fixed, "-"]
-  - [R2, "The password convention is the one BDOI confirms under Q07; until then BIBS generates a password per e-mail.", Configurable, Messaging settings (parked Q07 / PQ21)]
+  - [R2, "The password convention is the one BDOI confirms under Q07; until then BIBS generates a password per e-mail.", Configurable, Messaging settings (on hold, Q07 / PQ21)]
 validations:
   - [User without permission opens a document, You are not permitted to perform this action, ACCESS_DENIED]
 notifications:
@@ -1613,7 +1613,7 @@ brd: [BRPM.022 (p.31)]
 actor: System
 priority: Must have
 screens: Notifications (bell); E-mails tab
-description: BIBS notifies users on every stage entry, return, SLA breach, release, expiry and advisory. Released and expired package versions are also handed to the product master feed, which is the point where other BDOI tracking and reporting systems will receive product changes. The feed's transport is parked until BDOI names the systems (PQ16); today it logs each change.
+description: BIBS notifies users on every stage entry, return, SLA breach, release, expiry and advisory. Released and expired package versions are also handed to the product master feed, which is the point where other BDOI tracking and reporting systems will receive product changes. The feed's transport is on hold until BDOI names the systems (PQ16); today it logs each change.
 preconditions:
   - "None."
 main_flow:

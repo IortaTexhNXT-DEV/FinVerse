@@ -14,6 +14,7 @@ import { humanize } from '@/utils/format';
 import { AcceptRequestDialog, ConfirmValidationDialog, RejectDialog } from './RequestDialogs';
 import { REQUEST_COLUMNS, REVERSAL_COLUMNS, VALIDATION_COLUMNS } from './requestColumns';
 import { requestsApi } from './requestsApi';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 /** The three queues of the Cashiering requests screen (wave C1-C). */
 
@@ -284,14 +285,18 @@ export function ReversalsPanel({
             >
               Reject Reversal
             </Button>
-            <Button
+            <ConfirmButton
               variant="accent"
               busy={approve.isPending}
               disabled={selected === undefined}
-              onClick={() => approve.mutate()}
+              confirm={{
+                title: 'Approve Reversal',
+                effect: 'The selected receipt is reversed as requested.',
+              }}
+              onConfirm={() => approve.mutateAsync()}
             >
               Approve Reversal
-            </Button>
+            </ConfirmButton>
           </div>
         </div>
       )}

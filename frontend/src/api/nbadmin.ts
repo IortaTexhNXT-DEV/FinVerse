@@ -370,5 +370,6 @@ export const nbadminApi = {
   createSodRule: (body: SodRuleInput) => api.post<SodRule>(SOD, body),
   deactivateSodRule: (id: number) => api.post<SodRule>(`${SOD}/${String(id)}/deactivate`),
   authorizeSodRule: (id: number) => api.post<SodRule>(`${SOD}/${String(id)}/authorize`),
-  rejectSodRule: (id: number) => api.post<SodRule>(`${SOD}/${String(id)}/reject`),
+  rejectSodRule: (id: number, reason: string) =>
+    api.post<SodRule>(`${SOD}/${String(id)}/reject`, { reason }),
 };

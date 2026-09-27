@@ -18,6 +18,7 @@ import { InsurerChoices } from '@/features/proposals/ProposalFormParts';
 import { formatAmount, formatDate, formatDateTime } from '@/utils/format';
 import { ResponseDialog } from './ResponseDialog';
 import { displayNameOf } from '@/api/users';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 interface RoundProps {
   request: PackageRequest;
@@ -163,14 +164,18 @@ function RoundActions({ request, round, onChanged }: Readonly<RoundProps>) {
         </Button>
       )}
       {approvable && (
-        <Button
+        <ConfirmButton
           size="sm"
           variant="accent"
           busy={approve.isPending}
-          onClick={() => approve.mutate()}
+          confirm={{
+            title: 'Approve and Send',
+            effect: 'The quotation slip is approved and sent to the insurers.',
+          }}
+          onConfirm={() => approve.mutateAsync()}
         >
           Approve and Send
-        </Button>
+        </ConfirmButton>
       )}
       <ErrorAlert error={approve.error ?? download.error} />
     </span>

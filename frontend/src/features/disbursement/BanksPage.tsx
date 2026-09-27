@@ -19,6 +19,7 @@ import type { Bank, CheckBook } from './api';
 import { DialogFooter } from './VoucherDialogs';
 import './disbursement.css';
 import { displayNameOf } from '@/api/users';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 interface BookTarget {
   bank: Bank;
@@ -201,20 +202,33 @@ export default function BanksPage() {
       render: (b) => (
         <div className="dsb-actions">
           {review && b.requestedStatus === undefined && (
-            <Button
+            <ConfirmButton
               size="sm"
               variant="secondary"
               icon={<Power size={16} />}
               busy={status.isPending}
-              onClick={() => status.mutate(b)}
+              confirm={{
+                title: `${b.status === 'ACTIVE' ? 'Deactivate' : 'Activate'} Bank ${b.code}`,
+                effect: 'The status change is sent for authorisation.',
+                destructive: b.status === 'ACTIVE',
+              }}
+              onConfirm={() => status.mutateAsync(b)}
             >
               {b.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
-            </Button>
+            </ConfirmButton>
           )}
           {can('DISB_APPROVE') && b.recordStatus === 'PENDING_AUTHORIZATION' && (
-            <Button size="sm" busy={authorize.isPending} onClick={() => authorize.mutate(b)}>
+            <ConfirmButton
+              size="sm"
+              busy={authorize.isPending}
+              confirm={{
+                title: 'Authorise Bank Account',
+                effect: 'The bank account change takes effect.',
+              }}
+              onConfirm={() => authorize.mutateAsync(b)}
+            >
               Authorise
-            </Button>
+            </ConfirmButton>
           )}
           {review && (
             <Button

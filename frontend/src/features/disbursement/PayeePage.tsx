@@ -32,6 +32,7 @@ import {
 import type { PayeeForm } from './payeeForm';
 import './disbursement.css';
 import { displayNameOf } from '@/api/users';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const ENTITY = 'DisbursementPayee';
 const ACTIONS: Record<string, string> = {
@@ -70,14 +71,19 @@ function Accounts({ payee, onChanged }: Readonly<{ payee: Payee; onChanged: (p: 
           header: 'Action',
           render: (a) =>
             a.active ? (
-              <Button
+              <ConfirmButton
                 size="sm"
                 variant="secondary"
                 busy={deactivate.isPending}
-                onClick={() => deactivate.mutate(a.id)}
+                confirm={{
+                  title: 'Deactivate Bank Account',
+                  effect: "The payee's bank account can no longer be used for payments.",
+                  destructive: true,
+                }}
+                onConfirm={() => deactivate.mutateAsync(a.id)}
               >
                 Deactivate
-              </Button>
+              </ConfirmButton>
             ) : null,
         },
       ]
@@ -261,14 +267,19 @@ function ExistingPayee({ id }: Readonly<{ id: number }>) {
             <OriginBadge record={p.summary} />
             <StatusBadge status={p.summary.stage} />
             {can('DISB_PAYEE_MAINTAIN') && !p.summary.used && (
-              <Button
+              <ConfirmButton
                 variant="secondary"
                 icon={<Trash2 size={16} />}
                 busy={remove.isPending}
-                onClick={() => remove.mutate()}
+                confirm={{
+                  title: 'Delete Payee',
+                  effect: 'The payee is deleted; it was never used on a payment.',
+                  destructive: true,
+                }}
+                onConfirm={() => remove.mutateAsync()}
               >
                 Delete Payee
-              </Button>
+              </ConfirmButton>
             )}
           </div>
         }

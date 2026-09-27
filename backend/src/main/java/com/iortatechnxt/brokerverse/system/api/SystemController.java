@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.system.service.SystemInfoService.ConfigEntry
 import com.iortatechnxt.brokerverse.system.service.SystemInfoService.SystemInfo;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import java.time.Clock;
 import java.time.Duration;
 import java.util.List;
@@ -125,13 +126,22 @@ public class SystemController {
    * Rejects the change of a security parameter; its requester may withdraw it.
    *
    * @param key key
+   * @param request the reason (mandatory unless the requester withdraws the change)
    * @return parameter
    */
   @PostMapping("/parameters/{key}/reject")
   @PreAuthorize("hasAnyAuthority('SECURITY_PARAMETER_APPROVE','SYSTEM_PARAMETER_MANAGE')")
-  public ParameterResponse rejectParameter(@PathVariable String key) {
-    return ParameterResponse.from(approvals.reject(key));
+  public ParameterResponse rejectParameter(
+      @PathVariable String key, @Valid @RequestBody(required = false) RejectRequest request) {
+    return ParameterResponse.from(approvals.reject(key, request == null ? null : request.reason()));
   }
+
+  /**
+   * The reason of a rejection.
+   *
+   * @param reason reason text
+   */
+  public record RejectRequest(@Size(max = 200) String reason) {}
 
   /**
    * Read-only non-secret configuration.

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { ReactNode } from 'react';
 import { Button } from './Button';
+import { actionPhrase } from '@/utils/format';
 import { ErrorAlert } from './ErrorAlert';
 import { Modal } from './Modal';
 
@@ -69,7 +70,7 @@ export function ConfirmDialog({
       }
     >
       <div className="stack">
-        <ErrorAlert error={error} />
+        <ErrorAlert error={error} title={`Cannot ${actionPhrase(confirmLabel)}`} />
         {record !== undefined && (
           <p className="confirm-record">
             <strong>{record}</strong>

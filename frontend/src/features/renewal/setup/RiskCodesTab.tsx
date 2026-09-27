@@ -16,6 +16,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
 import { ApprovalCell } from './setupBits';
 import { pending } from './setupCodes';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 function blankToUndefined(value: string): string | undefined {
   return value.trim() === '' ? undefined : value.trim();
@@ -180,21 +181,33 @@ export function RiskCodesTab() {
               maintain && (
                 <span className="rnw-actions">
                   {pending(r.approval) && (
-                    <Button size="sm" onClick={() => act.mutate({ id: r.id, action: 'AUTHORIZE' })}>
+                    <ConfirmButton
+                      size="sm"
+                      confirm={{
+                        title: 'Authorize Risk Code',
+                        effect: 'The risk code change takes effect.',
+                      }}
+                      onConfirm={() => act.mutateAsync({ id: r.id, action: 'AUTHORIZE' })}
+                    >
                       Authorize
-                    </Button>
+                    </ConfirmButton>
                   )}
                   <Button size="sm" variant="ghost" onClick={() => setEditing(r)}>
                     Edit
                   </Button>
                   {r.approval.recordStatus === 'ACTIVE' && (
-                    <Button
+                    <ConfirmButton
                       size="sm"
                       variant="ghost"
-                      onClick={() => act.mutate({ id: r.id, action: 'DEACTIVATE' })}
+                      confirm={{
+                        title: 'Deactivate Risk Code',
+                        effect: 'The risk code is no longer used for new renewals.',
+                        destructive: true,
+                      }}
+                      onConfirm={() => act.mutateAsync({ id: r.id, action: 'DEACTIVATE' })}
                     >
                       Deactivate
-                    </Button>
+                    </ConfirmButton>
                   )}
                 </span>
               ),

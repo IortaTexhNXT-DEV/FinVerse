@@ -268,7 +268,7 @@ box:
 | Session expiry | Warning before the time-out; signing in again returns to the same page | `SessionTimeoutGuard`, `RequireAuth` (remembers the page) |
 | 403 and 404 | Themed page with Go Back and Back to Homepage | `StatusPage` |
 | Uploads | Validate before commit, summary (rows read, valid, rejected) and a preview of the rows; Download Error File (the template layout with an Error column and the offending cells highlighted); the rule stated on screen (valid rows are processed, rejected rows are returned in the error file); Upload Corrected File keeps the link to the previous upload; duplicate files refused with the earlier upload named; progress; Download Template next to the upload | `BulkUploadWizard`, `FileDropZone`, `/bulk/jobs/{id}/error-file` |
-| Confirmations | Themed dialog naming the record and the effect, with a reason where the process needs one; destructive actions confirm with the danger button | `ConfirmDialog`, `ActionDialog` |
+| Confirmations | No approve, authorise, reject, post, release, cancel, void, deactivate or delete acts at once: a themed dialog names the record and the effect; every rejection asks for a mandatory reason (the requester withdrawing their own change needs none); destructive actions confirm with the danger button | `ConfirmButton`, `ConfirmDialog`, `ActionDialog` |
 | Unsaved changes | Leaving a changed form asks first | `useUnsavedChangesGuard` |
 | Loading and empty | Skeletons for tables, cards and panels; empty states with the next action; buttons disabled while submitting | `DataTable`, `EmptyState`, `Button busy` |
 | Search and filters | Active filters as removable chips with Clear All; the search kept in the URL | `FilterChips`, `WorklistToolbar` |

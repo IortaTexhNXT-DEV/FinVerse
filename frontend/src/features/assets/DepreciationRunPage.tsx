@@ -4,7 +4,6 @@ import { assetsApi } from '@/api/assets';
 import type { DepreciationLine, DepreciationRun } from '@/api/assets';
 import { useAuth } from '@/auth/authContext';
 import { Amount } from '@/components/ui/Amount';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -19,6 +18,7 @@ import { summarize } from './runSummary';
 import { useAssetLookups } from './useAssetLookups';
 import { displayNameOf } from '@/api/users';
 import { UserName } from '@/components/ui/UserName';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 /** Monthly depreciation: preview the charge of a period, then post it once (idempotent). */
 export default function DepreciationRunPage() {
@@ -56,14 +56,19 @@ export default function DepreciationRunPage() {
         description="Monthly depreciation of every capitalized asset up to the period end."
         actions={
           can('PERIOD_END_RUN') && (
-            <Button
+            <ConfirmButton
               variant="accent"
               busy={post.isPending}
               disabled={!summary.postable}
-              onClick={() => post.mutate()}
+              confirm={{
+                title: 'Post Depreciation',
+                effect:
+                  'The depreciation of every capitalized asset up to the period end is posted to the general ledger.',
+              }}
+              onConfirm={() => post.mutateAsync()}
             >
               Post Depreciation
-            </Button>
+            </ConfirmButton>
           )
         }
       />

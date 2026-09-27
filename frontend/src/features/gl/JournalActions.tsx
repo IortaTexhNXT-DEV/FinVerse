@@ -14,6 +14,7 @@ import { today } from '@/utils/format';
 import { PostingConfirmation } from './PostingConfirmation';
 import type { PostingStep } from './PostingConfirmation';
 import { DateInput } from '@/components/ui/DateInput';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 type Dialog = 'reject' | 'reverse' | PostingStep | null;
 
@@ -102,9 +103,17 @@ export function JournalActions({ journal }: Readonly<{ journal: Journal }>) {
           >
             Submit
           </Button>
-          <Button variant="ghost" onClick={() => action.mutate(() => glApi.cancelJournal(id))}>
+          <ConfirmButton
+            variant="ghost"
+            confirm={{
+              title: 'Cancel Voucher',
+              effect: 'The draft voucher is cancelled and can no longer be submitted.',
+              destructive: true,
+            }}
+            onConfirm={() => action.mutateAsync(() => glApi.cancelJournal(id))}
+          >
             Cancel Voucher
-          </Button>
+          </ConfirmButton>
         </>
       )}
       {allowed.authorize && (

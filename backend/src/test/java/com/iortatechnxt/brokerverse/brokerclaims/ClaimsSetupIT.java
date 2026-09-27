@@ -205,7 +205,10 @@ class ClaimsSetupIT {
     as.run(
         UH,
         () -> attributes.proposeSettlement(type, new SettlementAttributes("SETTLED", false, true)));
-    as.run(UH, () -> attributes.reject(ClaimCodes.LOV_SETTLEMENT_TYPE, type));
+    as.run(
+        UH,
+        () ->
+            attributes.reject(ClaimCodes.LOV_SETTLEMENT_TYPE, type, "Keep the current attributes"));
     as.run(
         UH,
         () -> attributes.proposeSettlement(type, new SettlementAttributes("SETTLED", false, true)));

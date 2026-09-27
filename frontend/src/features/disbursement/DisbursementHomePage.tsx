@@ -26,6 +26,7 @@ import { REQUEST_COLUMNS, VOUCHER_COLUMNS } from './columns';
 import { RequestDialog } from './WorkbenchParts';
 import './disbursement.css';
 import { DateInput } from '@/components/ui/DateInput';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 interface Filters {
   type: string;
@@ -218,14 +219,19 @@ function BulkApprove({ selection }: Readonly<{ selection: RowSelection }>) {
   const ids = selection.keys.map(Number);
   return (
     <>
-      <Button
+      <ConfirmButton
         icon={<CheckCheck size={16} />}
         disabled={ids.length === 0}
         busy={bulk.isPending}
-        onClick={() => bulk.mutate(ids)}
+        confirm={{
+          title: `Approve ${String(ids.length)} Item(s)`,
+          effect:
+            'Each selected item is approved on its own; an item that cannot be approved is reported and stays pending.',
+        }}
+        onConfirm={() => bulk.mutateAsync(ids)}
       >
         Approve Selected
-      </Button>
+      </ConfirmButton>
       <ErrorAlert error={bulk.error} />
     </>
   );

@@ -28,6 +28,7 @@ import { formatDateTime, humanize } from '@/utils/format';
 import { GROUP_TYPES, REQUEST_TYPE_LABELS, USER_TYPES } from './accessRequest';
 import { UserName } from '@/components/ui/UserName';
 import { TypedInput } from '@/components/ui/DateInput';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const STATUSES: AccessRequestStatus[] = [
   'DRAFT',
@@ -252,14 +253,19 @@ export function AccessRequestWorklist({
           filters={{ open: showFilters, onToggle: () => setShowFilters(!showFilters) }}
         >
           {decidable && (
-            <Button
+            <ConfirmButton
               icon={<Check size={16} />}
               disabled={selection.keys.length === 0}
               busy={approveSelected.isPending}
-              onClick={() => approveSelected.mutate(selection.keys.map(Number))}
+              confirm={{
+                title: `Approve ${String(selection.keys.length)} Request(s)`,
+                effect:
+                  'Each selected request is approved on its own; a request that breaks a rule is refused and stays pending.',
+              }}
+              onConfirm={() => approveSelected.mutateAsync(selection.keys.map(Number))}
             >
               Approve Selected
-            </Button>
+            </ConfirmButton>
           )}
         </WorklistToolbar>
         {showFilters && <Filters filters={filters} types={types} onChange={set} />}

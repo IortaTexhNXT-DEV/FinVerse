@@ -81,7 +81,8 @@ export const systemApi = {
   updateParameter: (key: string, value: string) =>
     api.put<SystemParameter>(`/system/parameters/${key}`, { value }),
   approveParameter: (key: string) => api.post<SystemParameter>(`/system/parameters/${key}/approve`),
-  rejectParameter: (key: string) => api.post<SystemParameter>(`/system/parameters/${key}/reject`),
+  rejectParameter: (key: string, reason?: string) =>
+    api.post<SystemParameter>(`/system/parameters/${key}/reject`, { reason }),
   configuration: () => api.get<ConfigEntry[]>('/system/configuration'),
   info: () => api.get<SystemInfo>('/system/info'),
   about: () => api.get<AboutInfo>('/system/about'),

@@ -12,6 +12,7 @@ import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { ApprovalCell } from './setupBits';
 import { SEVERITIES, pending, severityLabel } from './setupCodes';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 function CheckDialog({ row, onClose }: Readonly<{ row: CheckSettingView; onClose: () => void }>) {
   const queryClient = useQueryClient();
@@ -124,9 +125,16 @@ export function ChecksTab() {
               maintain && (
                 <span className="rnw-actions">
                   {pending(r.approval) && (
-                    <Button size="sm" onClick={() => authorize.mutate(r.checkCode)}>
+                    <ConfirmButton
+                      size="sm"
+                      confirm={{
+                        title: 'Authorize Check',
+                        effect: 'The renewal check change takes effect.',
+                      }}
+                      onConfirm={() => authorize.mutateAsync(r.checkCode)}
+                    >
                       Authorize
-                    </Button>
+                    </ConfirmButton>
                   )}
                   <Button size="sm" variant="ghost" onClick={() => setEditing(r)}>
                     Edit

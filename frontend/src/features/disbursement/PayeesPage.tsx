@@ -24,6 +24,7 @@ import type { PayeeRequest, PayeeSummary } from './api';
 import { MODE_LABELS, PAYEE_TABS } from './labels';
 import type { PayeeTab } from './labels';
 import './disbursement.css';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const PAYEE_COLUMNS: Column<PayeeSummary>[] = [
   {
@@ -88,14 +89,19 @@ function RequestsTable({ companyId }: Readonly<{ companyId: number }>) {
             >
               Create Payee
             </Button>
-            <Button
+            <ConfirmButton
               size="sm"
               variant="secondary"
               busy={close.isPending}
-              onClick={() => close.mutate(r.id)}
+              confirm={{
+                title: 'Close Payee Request',
+                effect: 'The request is closed without creating a payee.',
+                destructive: true,
+              }}
+              onConfirm={() => close.mutateAsync(r.id)}
             >
               Close
-            </Button>
+            </ConfirmButton>
           </div>
         ) : null,
     },

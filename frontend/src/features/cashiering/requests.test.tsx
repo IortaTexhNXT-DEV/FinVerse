@@ -194,6 +194,9 @@ describe('incoming requests', () => {
     await userEvent.click(screen.getByRole('tab', { name: /Payment Reversals/ }));
     await userEvent.click(await screen.findByLabelText('Select PRV-2026-000009'));
     await userEvent.click(screen.getByRole('button', { name: 'Approve Reversal' }));
+    expect(approve).not.toHaveBeenCalled();
+    const confirm = screen.getAllByRole('button', { name: 'Approve Reversal' });
+    await userEvent.click(confirm[confirm.length - 1]!);
     await waitFor(() => expect(approve).toHaveBeenCalledWith(9));
   });
 });

@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { organizationApi } from '@/api/organization';
 import type { Company } from '@/api/types';
 import { useAuth } from '@/auth/authContext';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -10,6 +9,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useWorkspace } from '@/context/workspaceContext';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -62,9 +62,18 @@ export default function CompaniesPage() {
               render: (c) =>
                 awaitsOtherChecker(c, user?.username) &&
                 can('MASTER_AUTHORIZE') && (
-                  <Button size="sm" variant="secondary" onClick={() => authorize.mutate(c.id)}>
+                  <ConfirmButton
+                    size="sm"
+                    variant="secondary"
+                    confirm={{
+                      title: `Authorize Company ${c.code}`,
+                      record: c.name,
+                      effect: 'The company becomes active.',
+                    }}
+                    onConfirm={() => authorize.mutateAsync(c.id)}
+                  >
                     Authorize
-                  </Button>
+                  </ConfirmButton>
                 ),
             },
           ]}

@@ -12,6 +12,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { FxPreviewView, FxRunsTable } from './FxPreviewView';
 import { PeriodSelectors } from './PeriodSelectors';
 import { usePeriodPicker } from './usePeriodPicker';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 function isPosted(preview: FxPreview | undefined): boolean {
   return preview?.existingRunId !== undefined;
@@ -84,16 +85,21 @@ export default function FxRevaluationPage() {
             />
             Auto-reverse on the first day of the next period
           </label>
-          <Button
+          <ConfirmButton
             variant="accent"
             icon={<Play size={16} />}
             busy={post.isPending}
             disabled={blocked}
-            onClick={() => post.mutate()}
+            confirm={{
+              title: 'Post Revaluation',
+              effect: 'The revaluation journals of the period are posted.',
+              confirmLabel: 'Post Revaluation',
+            }}
+            onConfirm={() => post.mutateAsync()}
             style={{ alignSelf: 'end' }}
           >
             {posted ? 'Already revalued' : 'Post revaluation'}
-          </Button>
+          </ConfirmButton>
         </div>
       </Card>
       <ErrorAlert error={post.error ?? preview.error} />

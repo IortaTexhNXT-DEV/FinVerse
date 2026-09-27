@@ -11,6 +11,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { NumberInput, TextInput } from '@/features/assets/FormControls';
 import { takafulProducts } from './reserveMath';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 /** One-line description of the settings in force. */
 function takafulSummary(s: TakafulSetting | undefined): string {
@@ -109,9 +110,17 @@ export function TakafulSettingsCard({ companyId }: Readonly<{ companyId: number 
         <>
           {s?.recordStatus && <StatusBadge status={s.recordStatus} />}
           {canAuthorize && (
-            <Button size="sm" variant="secondary" onClick={() => authorize.mutate()}>
+            <ConfirmButton
+              size="sm"
+              variant="secondary"
+              confirm={{
+                title: 'Authorize Takaful Settings',
+                effect: 'The settings take effect for the next valuation runs.',
+              }}
+              onConfirm={() => authorize.mutateAsync()}
+            >
               Authorize
-            </Button>
+            </ConfirmButton>
           )}
           {canEdit && (
             <Button size="sm" variant="secondary" onClick={() => setForm({ ...s, companyId })}>

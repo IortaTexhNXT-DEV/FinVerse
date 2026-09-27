@@ -420,6 +420,9 @@ brokerverse:
     sbm-hold-cover-watch-cron: ${BROKERVERSE_JOB_SBM_HOLD_COVER_WATCH_CRON:0 0 23 * * *}
     # Tags the unapplied payments of billed handling fees (BRIDSP-31), every 30 minutes.
     sbm-handling-fee-tagger-cron: ${BROKERVERSE_JOB_SBM_HANDLING_FEE_TAGGER_CRON:0 */30 * * * *}
+    # Customer Servicing Facility (BRD-9): contact changes to the legacy systems (FR-CSF-022); manual
+    # ("-") until CSF_LEGACY_SYNC_ENABLED is on, then every 15 minutes (0 */15 * * * *).
+    csf-legacy-sync-cron: ${BROKERVERSE_JOB_CSF_LEGACY_SYNC_CRON:-}
 
 management:
   health:

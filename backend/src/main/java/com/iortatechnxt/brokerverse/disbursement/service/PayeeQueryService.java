@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.disbursement.service;
 
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeRequestStatus;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeStage;
@@ -79,6 +80,9 @@ public class PayeeQueryService {
       if (s.payeeClass() != null && !s.payeeClass().isBlank()) {
         where.add(cb.equal(root.get("payeeClass"), s.payeeClass()));
       }
+      if (s.origin() != null) {
+        where.add(cb.equal(root.get("recordOrigin").get("origin"), s.origin()));
+      }
       if (s.text() != null && !s.text().isBlank()) {
         String like = "%" + s.text().strip().toLowerCase(Locale.ROOT) + "%";
         where.add(
@@ -146,5 +150,22 @@ public class PayeeQueryService {
    * @param text code or name contains
    */
   public record PayeeSearch(
-      Long companyId, List<PayeeStage> stages, String payeeClass, String text) {}
+      Long companyId,
+      List<PayeeStage> stages,
+      String payeeClass,
+      String text,
+      RecordOrigin.Origin origin) {
+
+    /**
+     * Filters without the origin.
+     *
+     * @param companyId company
+     * @param stages stages
+     * @param payeeClass class
+     * @param text code or name fragment
+     */
+    public PayeeSearch(Long companyId, List<PayeeStage> stages, String payeeClass, String text) {
+      this(companyId, stages, payeeClass, text, null);
+    }
+  }
 }

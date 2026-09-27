@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.collections.common.domain.ItemParts.Classifi
 import com.iortatechnxt.brokerverse.collections.common.domain.ItemParts.Figures;
 import com.iortatechnxt.brokerverse.collections.common.domain.ItemParts.Parties;
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -99,6 +100,8 @@ public class CollectionItem extends BaseEntity {
   @Column(name = "editing_since")
   private Instant editingSince;
 
+  @Embedded private RecordOrigin recordOrigin = RecordOrigin.BIBS;
+
   @ElementCollection
   @CollectionTable(name = "clx_item_balance", joinColumns = @JoinColumn(name = "item_id"))
   private final List<Balance> balances = new ArrayList<>();
@@ -150,6 +153,20 @@ public class CollectionItem extends BaseEntity {
       completedOn = newStatus == ItemStatus.COMPLETED ? today : null;
     }
     return previous;
+  }
+
+  /**
+   * Copies the origin of the ledger invoice (Data Migration): a legacy invoice migrated at cut-over
+   * is listed with origin MIGRATED, its source system, legacy invoice number and batch.
+   *
+   * @param origin origin of the invoice
+   */
+  public void markOrigin(RecordOrigin origin) {
+    this.recordOrigin = origin == null ? RecordOrigin.BIBS : origin;
+  }
+
+  public RecordOrigin getRecordOrigin() {
+    return recordOrigin == null ? RecordOrigin.BIBS : recordOrigin;
   }
 
   private void apply(Snapshot s, Instant at) {

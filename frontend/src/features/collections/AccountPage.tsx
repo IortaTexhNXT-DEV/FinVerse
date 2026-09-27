@@ -7,6 +7,7 @@ import { RecordSummary } from '@/components/broking/RecordSummary';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { OriginBadge } from '@/components/ui/OriginBadge';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
@@ -19,6 +20,7 @@ import { collectionsApi } from './api';
 import type { Account } from './api';
 import { ACCOUNT_TABS } from './collectionsLogic';
 import type { AccountTabId } from './collectionsLogic';
+import { LegacyFollowUpCard } from './LegacyFollowUpCard';
 import { DetailsDialog, DispositionDialog, EffortDialog } from './WorkDialogs';
 import './collections.css';
 import { UserName } from '@/components/ui/UserName';
@@ -55,6 +57,7 @@ function Summary({ account }: Readonly<{ account: Account }>) {
       chips={
         <>
           <ReferenceChip label="Invoice" value={i.invoiceNo} />
+          <OriginBadge record={i} />
           <ReferenceChip label="ARN" value={i.arn} />
           <StatusBadge status={i.status} />
           <StatusBadge status={account.ledger?.paymentStatus ?? i.paymentStatus} />
@@ -275,6 +278,7 @@ export default function AccountPage() {
       )}
       <ErrorAlert error={refresh.error} />
       <Summary account={a} />
+      <LegacyFollowUpCard item={a.item} />
       <Tabs tabs={ACCOUNT_TABS} active={tab} onChange={setTab} />
       <TabBody tab={tab} account={a} />
       {dialog === 'disposition' && (

@@ -282,6 +282,32 @@ public class PayeeService {
       throw new BusinessRuleException(
           "PAYEE_IN_USE", "Only a draft payee never used can be deleted; deactivate it instead");
     }
+    remove(payee);
+  }
+
+  /**
+   * Undoes a payee of a rolled-back migration batch (Data Migration, R09): a payee not yet
+   * authorised nor used is removed with its case; an authorised one is put up for deactivation.
+   *
+   * @param id payee
+   */
+  public void rollbackMigrated(Long id) {
+    Payee payee = query.get(id);
+    if (payee.getSource() != PayeeSource.MIGRATION) {
+      throw new BusinessRuleException(
+          "PAYEE_NOT_MIGRATED", "Payee " + payee.getPayeeCode() + " was not migrated");
+    }
+    boolean pending =
+        payee.getStage() == PayeeStage.DRAFT || payee.getStage() == PayeeStage.FOR_AUTHORIZATION;
+    if (!payee.isUsed() && pending) {
+      remove(payee);
+    } else if (payee.getStage() == PayeeStage.ACTIVE) {
+      deactivate(id);
+    }
+  }
+
+  private void remove(Payee payee) {
+    Long id = payee.getId();
     cases
         .findByEntityTypeAndEntityId(DisbursementSettings.PAYEE, id.toString())
         .ifPresent(

@@ -1,4 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
+import type { RecordOriginKind } from '@/api/types';
+import { OriginBadge } from '@/components/ui/OriginBadge';
+import { OriginFilter } from '@/components/ui/OriginFilter';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -31,13 +34,16 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]['id'];
 
+/** The product filters with the Data Migration origin (BIBS or migrated products). */
+type OriginProductFilter = ProductFilter & { origin?: RecordOriginKind };
+
 const PRODUCT_MAINTAINERS = ['MASTER_MAINTAIN', 'PRODUCT_MAINTAIN'] as const;
 const PRODUCT_AUTHORIZERS = ['MASTER_AUTHORIZE', 'PRODUCT_AUTHORIZE'] as const;
 
 function ProductFilters({
   filter,
   onChange,
-}: Readonly<{ filter: ProductFilter; onChange: (f: ProductFilter) => void }>) {
+}: Readonly<{ filter: OriginProductFilter; onChange: (f: OriginProductFilter) => void }>) {
   const { can } = useAuth();
   const archive = can('PRODUCT_ARCHIVE_VIEW');
   const lines = useQuery({ queryKey: ['catalog', 'lines'], queryFn: catalogApi.lines });
@@ -123,6 +129,7 @@ function ProductFilters({
           )}
         </Field>
       )}
+      <OriginFilter value={filter.origin} onChange={(origin) => onChange({ ...filter, origin })} />
       <label className="checkbox" style={{ alignSelf: 'end' }}>
         <input
           type="checkbox"
@@ -137,7 +144,7 @@ function ProductFilters({
 
 function ProductList() {
   const navigate = useNavigate();
-  const [filter, setFilter] = useState<ProductFilter>({});
+  const [filter, setFilter] = useState<OriginProductFilter>({});
   const products = useQuery({
     queryKey: ['catalog', 'products', filter],
     queryFn: () => catalogApi.products(filter),
@@ -153,7 +160,15 @@ function ProductList() {
         onRowClick={(p) => void navigate(`/catalog/products/${p.code}`)}
         emptyMessage="No product matches the filters."
         columns={[
-          { key: 'c', header: 'Code', render: (p) => <strong>{p.code}</strong> },
+          {
+            key: 'c',
+            header: 'Code',
+            render: (p) => (
+              <>
+                <strong>{p.code}</strong> <OriginBadge record={p} />
+              </>
+            ),
+          },
           { key: 'n', header: 'Name', render: (p) => p.name },
           { key: 'l', header: 'Line', render: (p) => p.lineCode },
           { key: 'p', header: 'Package', render: (p) => (p.packaged ? 'Yes' : '') },

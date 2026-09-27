@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService.Produc
 import com.iortatechnxt.brokerverse.catalog.service.ProductRuleService;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQueries;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQueries.VersionFacts;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -157,6 +158,7 @@ public class ProductCatalogController {
    * @param activeOnly only usable products
    * @param lifecycle only products in this lifecycle; EXPIRED and RETIRED need PRODUCT_ARCHIVE_VIEW
    *     (BRPM.006)
+   * @param origin BIBS or MIGRATED (Data Migration origin filter), all when absent
    * @return products with their current version
    */
   @GetMapping("/products")
@@ -167,7 +169,8 @@ public class ProductCatalogController {
       @RequestParam(required = false) String segment,
       @RequestParam(required = false) String q,
       @RequestParam(defaultValue = "false") boolean activeOnly,
-      @RequestParam(required = false) ProductLifecycle lifecycle) {
+      @RequestParam(required = false) ProductLifecycle lifecycle,
+      @RequestParam(required = false) RecordOrigin.Origin origin) {
     if (lifecycle != null
         && lifecycle != ProductLifecycle.ACTIVE
         && !currentUser.hasAuthority("PRODUCT_ARCHIVE_VIEW")) {
@@ -177,6 +180,7 @@ public class ProductCatalogController {
     return catalog
         .products(new ProductFilter(line, packaged, segment, q, activeOnly, lifecycle, false))
         .stream()
+        .filter(p -> origin == null || p.getRecordOrigin().origin() == origin)
         .map(p -> ProductResponse.from(p, facts.getOrDefault(p.getCode(), VersionFacts.NONE)))
         .toList();
   }

@@ -29,7 +29,7 @@ select c.id, 'MGD-2026-9000' || lpad(o.seq::text, 2, '0'), d.code, d.proposed_cl
        now() - interval '20 day', 'miglead'
 from (values ('R01', 1), ('R02', 2), ('R03', 3), ('R04', 4), ('R05', 5), ('R06', 6), ('R07', 7),
              ('R08', 8), ('R11', 9), ('C01', 10), ('C03', 11), ('P01', 12), ('P03', 13), ('F01', 14),
-             ('G01', 15), ('G03', 16), ('F02', 17), ('F03', 18))
+             ('G01', 15), ('G03', 16), ('F02', 17), ('F03', 18), ('R09', 19))
      as o(code, seq)
 join mig_data_object d on d.code = o.code
 cross join org_company c
@@ -57,7 +57,7 @@ select s.code, 1, 'APPROVED', 'First mapping of the legacy values', 'migsteward'
 from mig_code_map_set s
 where (s.code in ('LOV:MARKET_SEGMENT', 'LOV:CIVIL_STATUS')
        or s.code in (select c.map_set from mig_layout_column c join mig_layout l on l.id = c.layout_id
-                     where l.object_code in ('C01', 'C03', 'P01', 'P03', 'F01', 'G01', 'G03', 'F02', 'F03')
+                     where l.object_code in ('C01', 'C03', 'P01', 'P03', 'F01', 'G01', 'G03', 'F02', 'F03', 'R05', 'R09')
                      and c.map_set is not null))
   and not exists (select 1 from mig_code_map_version v where v.set_code = s.code);
 
@@ -111,7 +111,14 @@ from (values ('LOV:MARKET_SEGMENT', 'QPS',  'CBG',  'Consumer Banking',   'MAP',
              ('DISPOSITION_TYPE', 'EBIX', 'APPLY', 'Apply to another invoice', 'MAP', 'APPLY_OTHER_INVOICE', null),
              ('DISPOSITION_TYPE', 'EBIX', 'REF', 'Refund to payor', 'MAP', 'REFUND', null),
              ('STATUS:UPP', 'CMS', 'OPEN', 'Open unapplied payment', 'MAP', 'UNAPPLIED', null),
-             ('BRANCH', 'CMS', 'MKT', 'Makati', 'MAP', 'HO', null))
+             ('BRANCH', 'CMS', 'MKT', 'Makati', 'MAP', 'HO', null),
+             ('USER', 'CMS', 'COL01', 'Collector 01', 'MAP', 'clxhandler', null),
+             ('DISPOSITION_CLX', 'CMS', 'PTP', 'Promise to pay', 'MAP', 'PROMISE_TO_PAY', null),
+             ('DISPOSITION_CLX', 'CMS', 'NA', 'No answer', 'MAP', 'NO_ANSWER', null),
+             ('PRODUCT', 'EBIX', 'LGY-EAR', 'Erection all risks (legacy)', 'CREATE', 'EAR77',
+              'Legacy product without a BIBS equivalent; completed by the Product Owner'),
+             ('STATUS:PRODUCT', 'EBIX', 'A', 'Active', 'MAP', 'ACTIVE', null),
+             ('BANK', 'EBIX', 'BDO', 'BDO Unibank', 'MAP', 'BDO Unibank', null))
      as e(set_code, source_system, legacy_code, legacy_description, action, target_code, remarks)
 join mig_code_map_version v on v.set_code = e.set_code and v.version_no = 1
 where not exists (select 1 from mig_code_map_entry x where x.version_id = v.id and x.legacy_code = e.legacy_code

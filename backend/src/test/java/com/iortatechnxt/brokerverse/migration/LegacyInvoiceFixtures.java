@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +40,7 @@ final class LegacyInvoiceFixtures {
     r.put("client_type", "I");
     r.put("last_name", "Santos" + t);
     r.put("first_name", "Lea");
-    r.put("birth_date", "1980-02-11");
+    r.put("birth_date", LocalDate.of(1960, 1, 1).plusDays(Long.parseLong(t) % 15_000L).toString());
     r.put("tin", "");
     r.put("market_segment", "CBG");
     r.put("email", "e" + t + "@example.ph");

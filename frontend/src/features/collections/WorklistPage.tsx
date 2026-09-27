@@ -10,6 +10,7 @@ import { CellStack, EmptyCell } from '@/components/ui/CellStack';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
+import { OriginBadge } from '@/components/ui/OriginBadge';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
@@ -54,7 +55,7 @@ const COLUMNS: Column<CollectionItem>[] = [
     header: 'Invoice No.',
     render: (i) => (
       <>
-        <strong>{i.invoiceNo}</strong>
+        <strong>{i.invoiceNo}</strong> <OriginBadge record={i} />
         <div className="clx-muted">{i.policyNo ?? i.arn}</div>
       </>
     ),

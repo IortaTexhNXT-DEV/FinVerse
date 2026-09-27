@@ -81,8 +81,9 @@ public class QuotationRules {
   public Resolved resolve(Long companyId, QuotationDraft draft) {
     requireHeader(draft);
     Client client = clients.requireUsable(draft.clientId());
-    Offer offer = offer(companyId, draft);
-    return new Resolved(client, offer.product(), offer.content());
+    QuotationDraft effective = draft.withDefaultSegment(client.getMarketSegment());
+    Offer offer = offer(companyId, effective);
+    return new Resolved(client, offer.product(), offer.content(), effective.marketSegment());
   }
 
   /**
@@ -232,8 +233,10 @@ public class QuotationRules {
    * @param client client
    * @param product product
    * @param content content, not yet priced
+   * @param marketSegment market segment chosen, else the client's (may be null)
    */
-  public record Resolved(Client client, RiskProduct product, QuotationContent content) {}
+  public record Resolved(
+      Client client, RiskProduct product, QuotationContent content, String marketSegment) {}
 
   /**
    * The product and content of a draft.

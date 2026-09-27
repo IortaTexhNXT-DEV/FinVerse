@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.productmaint.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageInsurerResponse;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageTerms.CoverageTerm;
 import java.math.BigDecimal;
@@ -233,7 +234,7 @@ public record ComparativeTable(int roundNo, List<String> fields, List<Row> rows)
      */
     public String value(String field) {
       return switch (field) {
-        case "OUTCOME" -> outcome;
+        case "OUTCOME" -> outcomeText(outcome);
         case "RATE" -> PackageDocuments.text(rate);
         case "MINIMUM_PREMIUM" -> PackageDocuments.money(minimumPremium);
         case "COVERAGES" -> PackageDocuments.text(coverages);
@@ -243,6 +244,12 @@ public record ComparativeTable(int roundNo, List<String> fields, List<Row> rows)
         default -> PackageDocuments.text(remarks);
       };
     }
+  }
+
+  /** An insurer's outcome in words: APPROVED_WITH_CHANGES becomes "Approved with changes". */
+  static String outcomeText(String outcome) {
+    String words = DisplayFormat.words(outcome);
+    return words.isEmpty() ? words : Character.toUpperCase(words.charAt(0)) + words.substring(1);
   }
 
   /**

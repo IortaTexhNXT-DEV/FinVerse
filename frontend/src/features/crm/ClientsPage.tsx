@@ -20,6 +20,7 @@ import { ClientSearchPanel } from './ClientSearchPanel';
 import type { SearchCriteria } from './ClientSearchPanel';
 import { QUICK_FILTERS, applyQuickFilter } from './clientLabels';
 import type { QuickFilter } from './clientLabels';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 /**
  * Clients (BRNB.046/090): search prospects and confirmed clients by any criterion, with quick
@@ -101,7 +102,11 @@ export default function ClientsPage() {
             { key: 'code', header: 'Code', render: (c) => <span className="mono">{c.code}</span> },
             { key: 'name', header: 'Name', render: (c) => c.displayName },
             { key: 'type', header: 'Type', render: (c) => humanize(c.clientType) },
-            { key: 'segment', header: 'Segment', render: (c) => c.marketSegment ?? '' },
+            {
+              key: 'segment',
+              header: 'Segment',
+              render: (c) => <LovLabel type="MARKET_SEGMENT" code={c.marketSegment} empty="" />,
+            },
             { key: 'bank', header: 'Bank', render: (c) => (c.bankClient ? 'Yes' : 'No') },
             { key: 'status', header: 'Status', render: (c) => <StatusBadge status={c.status} /> },
             { key: 'kyc', header: 'KYC', render: (c) => <StatusBadge status={c.kycStatus} /> },

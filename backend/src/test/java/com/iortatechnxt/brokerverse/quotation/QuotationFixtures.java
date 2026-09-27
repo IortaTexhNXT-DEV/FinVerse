@@ -67,8 +67,13 @@ public class QuotationFixtures {
     return clients.requireByCode(company(), code);
   }
 
-  /** A new prospect. */
+  /** A new prospect of the CBG segment. */
   Client prospect() {
+    return prospect("CBG");
+  }
+
+  /** A new prospect of a market segment (null for none). */
+  Client prospect(String segment) {
     return as.run(
         "ao",
         () ->
@@ -80,7 +85,7 @@ public class QuotationFixtures {
                     LocalDate.of(1991, 2, 2),
                     null,
                     null,
-                    "CBG",
+                    segment,
                     false,
                     null)));
   }

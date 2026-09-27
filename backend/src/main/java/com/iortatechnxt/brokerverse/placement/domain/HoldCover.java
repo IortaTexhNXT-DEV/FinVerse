@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.placement.domain;
 import com.iortatechnxt.brokerverse.account.domain.HoldCoverStatus;
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -90,7 +91,9 @@ public class HoldCover extends BaseEntity {
       if (expiry.isBefore(startDate)) {
         throw new BusinessRuleException(
             "HOLD_COVER_DATES",
-            "The hold cover cannot expire before it starts (" + startDate + ")");
+            "The hold cover cannot expire before it starts ("
+                + DisplayFormat.date(startDate)
+                + ")");
       }
       this.expiryDate = expiry;
       this.alertedOn = null;
@@ -134,7 +137,7 @@ public class HoldCover extends BaseEntity {
   private void requireOpen() {
     if (!isOpen()) {
       throw new BusinessRuleException(
-          "HOLD_COVER_CLOSED", "The hold cover of " + arn + " is " + status);
+          "HOLD_COVER_CLOSED", "The hold cover of " + arn + " is " + DisplayFormat.words(status));
     }
   }
 

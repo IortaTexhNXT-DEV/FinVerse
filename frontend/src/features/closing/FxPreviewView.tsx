@@ -6,6 +6,7 @@ import { Kpi } from '@/components/ui/Kpi';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useWorkspace } from '@/context/workspaceContext';
 import { formatAmount, formatDate } from '@/utils/format';
+import { UserName } from '@/components/ui/UserName';
 
 function reversalText(r: FxRun): string {
   if (r.reversalBatchNo) {
@@ -153,7 +154,7 @@ export function FxRunsTable({ runs, loading }: Readonly<{ runs: FxRun[]; loading
             numeric: true,
             render: (r) => <Amount value={r.totalLoss} />,
           },
-          { key: 'u', header: 'By', render: (r) => r.createdBy },
+          { key: 'u', header: 'By', render: (r) => <UserName login={r.createdBy} /> },
         ]}
       />
     </Card>

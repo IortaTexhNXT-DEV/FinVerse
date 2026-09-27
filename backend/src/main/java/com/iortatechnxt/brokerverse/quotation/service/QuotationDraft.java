@@ -32,6 +32,22 @@ public record QuotationDraft(
   }
 
   /**
+   * The same draft with the client's market segment when none was chosen (the segment defaults from
+   * the client).
+   *
+   * @param clientSegment the client's market segment, may be null
+   * @return this draft, or a copy with the segment
+   */
+  public QuotationDraft withDefaultSegment(String clientSegment) {
+    boolean chosen = marketSegment != null && !marketSegment.isBlank();
+    if (chosen || clientSegment == null || clientSegment.isBlank()) {
+      return this;
+    }
+    return new QuotationDraft(
+        clientId, productCode, clientSegment, sourceChannel, requestId, currency, terms, items);
+  }
+
+  /**
    * The commercial terms of the offer.
    *
    * @param insurerCode insurer party code, may be null

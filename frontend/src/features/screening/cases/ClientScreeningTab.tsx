@@ -10,6 +10,7 @@ import type { RiskProfileRow, ScreeningMatch } from '../matches/api';
 import { matchedText, scoreText } from '../matches/matchLogic';
 import { casesApi } from './api';
 import type { CaseRow } from './api';
+import { UserName } from '@/components/ui/UserName';
 
 /**
  * The Screening tab of the client page (design section 9; SNSRP-302, 303, 402): the client's
@@ -49,7 +50,7 @@ export function ClientScreeningTab({ clientId }: Readonly<{ clientId: number }>)
             },
             { key: 'type', header: 'Case Type', render: (c) => humanize(c.caseType) },
             { key: 'stage', header: 'Stage', render: (c) => <StatusBadge status={c.stage} /> },
-            { key: 'assignee', header: 'Assignee', render: (c) => c.assignee ?? '—' },
+            { key: 'assignee', header: 'Assignee', render: (c) => <UserName login={c.assignee} /> },
             { key: 'created', header: 'Created', render: (c) => formatDate(c.createdAt) },
           ]}
         />

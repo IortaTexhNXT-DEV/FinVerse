@@ -42,7 +42,7 @@ function tsuText(a: Account): string {
 function tagRows(a: Account): DetailRow[] {
   return [
     ['Free First Year', ffyText(a)],
-    ['Direct payment', a.directPayment ? `Yes (${a.directPaymentTaggedBy ?? ''})` : 'No'],
+    ['Direct payment', a.directPayment ? `Yes (${displayNameOf(a.directPaymentTaggedBy)})` : 'No'],
     ['TSU review', tsuText(a)],
   ];
 }

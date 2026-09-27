@@ -10,7 +10,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime, humanize, statusPhrase } from '@/utils/format';
 import { cashieringApi } from './cashieringApi';
 import type { ReceiptAction } from './cashieringApi';
 import { UserName } from '@/components/ui/UserName';
@@ -35,7 +35,7 @@ export function ReceiptActionsTab({ companyId }: Readonly<{ companyId: number }>
   const act = useMutation({
     mutationFn: (fn: () => Promise<ReceiptAction>) => fn(),
     onSuccess: async (a) => {
-      toast.success(`${a.transactionNo} is now ${humanize(a.stage).toLowerCase()}`);
+      toast.success(`${a.transactionNo} is now ${statusPhrase(a.stage)}`);
       await queryClient.invalidateQueries({ queryKey: ['cashiering'] });
     },
   });

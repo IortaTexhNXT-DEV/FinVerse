@@ -12,6 +12,7 @@ import { formatDate } from '@/utils/format';
 import type { Statement } from '../billing/api';
 import type { Installment, PaymentPromise, Plan } from './api';
 import { plansApi } from './api';
+import { UserName } from '@/components/ui/UserName';
 
 /** Tabs of the installment plan record (BRCLXN.053/055/058). */
 
@@ -120,7 +121,7 @@ const PROMISE_COLUMNS: Column<PaymentPromise>[] = [
     numeric: true,
     render: (p) => <Amount value={p.actualPaid} />,
   },
-  { key: 'by', header: 'Recorded By', render: (p) => p.recordedBy },
+  { key: 'by', header: 'Recorded By', render: (p) => <UserName login={p.recordedBy} /> },
   { key: 'status', header: 'Status', render: (p) => <StatusBadge status={p.status} /> },
 ];
 

@@ -37,6 +37,7 @@ import { RequirementsTab } from './RequirementsTab';
 import { DetailsTab, HistoryTab, SetupTab } from './RequestTabs';
 import { TermsView } from './TermsView';
 import '@/styles/quotation.css';
+import { InsurerNames } from '@/components/broking/LovLabel';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -78,11 +79,15 @@ function facts(p: PackageRequest): Fact[] {
     {
       icon: Building2,
       label: p.chosenInsurers.length > 0 ? 'Chosen insurers' : 'Target insurers',
-      value:
-        (p.chosenInsurers.length > 0
-          ? p.chosenInsurers
-          : p.requestedTerms.insurers.map((i) => i.insurerCode)
-        ).join(', ') || '—',
+      value: (
+        <InsurerNames
+          codes={
+            p.chosenInsurers.length > 0
+              ? p.chosenInsurers
+              : p.requestedTerms.insurers.map((i) => i.insurerCode)
+          }
+        />
+      ),
     },
   ];
 }

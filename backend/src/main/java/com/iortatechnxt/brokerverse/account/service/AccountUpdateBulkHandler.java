@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkImportHandler;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -154,7 +155,8 @@ public class AccountUpdateBulkHandler implements BulkImportHandler {
     }
     if (!UPDATABLE.contains(account.getStatus())) {
       throw new BusinessRuleException(
-          "ACCOUNT_NOT_EDITABLE", "Account " + account.getArn() + " is " + account.getStatus());
+          "ACCOUNT_NOT_EDITABLE",
+          "Account " + account.getArn() + " is " + DisplayFormat.words(account.getStatus()));
     }
     return account;
   }

@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -89,7 +90,8 @@ public class InvoiceBooker {
   public BookedInvoice book(BookedInvoice invoice, LocalDate date, BookingSource source) {
     if (date.isAfter(BusinessClock.today(clock))) {
       throw new BusinessRuleException(
-          "BOOKING_DATE_FUTURE", "The booking date " + date + " is in the future");
+          "BOOKING_DATE_FUTURE",
+          "The booking date " + DisplayFormat.date(date) + " is in the future");
     }
     String branch = settings.branch(invoice.getCompanyId()).code();
     String number = numbers.next("BI-" + branch + "-" + date.getYear());

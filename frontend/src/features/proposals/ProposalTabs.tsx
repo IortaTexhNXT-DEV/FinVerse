@@ -18,10 +18,12 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useAuth } from '@/auth/authContext';
 import { DetailList } from '@/features/catalog/DetailList';
-import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { formatDate, formatDateTime, humanize, versionLabel } from '@/utils/format';
 import { DocumentChecklist, InsurerChoices } from './ProposalFormParts';
 import { SLIP_EDIT_STAGES, slipSent } from './proposalList';
 import { displayNameOf } from '@/api/users';
+import { InsurerNames, InsurerName } from '@/components/broking/LovLabel';
+import { UserName } from '@/components/ui/UserName';
 
 function useDownload() {
   return useMutation({
@@ -77,9 +79,9 @@ export function DetailsTab({ proposal: p }: Readonly<{ proposal: Proposal }>) {
         <DetailList
           rows={[
             ['TSU routing', p.tsuReason ?? 'Evaluated at submission'],
-            ['Requested insurers', p.insurers.join(', ') || '—'],
-            ['Submitted', p.slips.submittedBy ?? '—'],
-            ['Approved (Marketing)', p.slips.approvedBy ?? '—'],
+            ['Requested insurers', <InsurerNames key="i" codes={p.insurers} />],
+            ['Submitted', <UserName key="s" login={p.slips.submittedBy} />],
+            ['Approved (Marketing)', <UserName key="a" login={p.slips.approvedBy} />],
             ['Accounts', p.accountArns.join(', ') || '—'],
           ]}
         />
@@ -144,10 +146,10 @@ export function QuotationSlipTab({ proposal: p }: Readonly<{ proposal: Proposal 
         <DetailList
           rows={[
             ['QS number', p.slips.qsNo ?? 'Numbered when submitted'],
-            ['Template', p.slips.qsTemplate],
+            ['Template', versionLabel(p.slips.qsTemplate) || '—'],
             ['Reply by', formatDate(p.slips.qsReplyBy) || '—'],
-            ['Prepared by', p.slips.qsSubmittedBy],
-            ['Approved by', p.slips.qsApprovedBy],
+            ['Prepared by', <UserName key="p" login={p.slips.qsSubmittedBy} />],
+            ['Approved by', <UserName key="a" login={p.slips.qsApprovedBy} />],
             ['Sent to insurers', formatDateTime(p.slips.qsSentAt) || '—'],
           ]}
         />
@@ -277,9 +279,9 @@ export function ProposalSlipTab({ proposal: p }: Readonly<{ proposal: Proposal }
           rows={[
             ['PS number', p.slips.psNo ?? 'Numbered when submitted'],
             ['Version', p.slips.psVersion > 0 ? String(p.slips.psVersion) : '—'],
-            ['Chosen insurer', p.slips.chosenInsurer],
-            ['Prepared by', p.slips.psSubmittedBy],
-            ['Approved by', p.slips.psApprovedBy],
+            ['Chosen insurer', <InsurerName key="c" code={p.slips.chosenInsurer} />],
+            ['Prepared by', <UserName key="p" login={p.slips.psSubmittedBy} />],
+            ['Approved by', <UserName key="a" login={p.slips.psApprovedBy} />],
             ['Sent to client', formatDateTime(p.slips.sentAt) || '—'],
             ['Accepted', formatDateTime(p.slips.acceptedAt) || '—'],
           ]}

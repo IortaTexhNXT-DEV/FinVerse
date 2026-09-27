@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { casesApi } from './api';
 import type { CaseDetail, CaseOutcome } from './api';
 import { LovField, StepDialog, TextField } from './StepDialog';
+import { UserName } from '@/components/ui/UserName';
 
 /** Props of a case action dialog. */
 export interface CaseDialogProps {
@@ -92,8 +93,8 @@ export function ResubmitDialog({ detail, onDone, onClose }: Readonly<CaseDialogP
       }}
     >
       <p className="muted">
-        Returned from {detail.returnedFrom ?? 'approval'} by {detail.returnedBy ?? '—'}. The case
-        goes back to that stage.
+        Returned from {detail.returnedFrom ?? 'approval'} by <UserName login={detail.returnedBy} />.
+        The case goes back to that stage.
       </p>
       <TextField
         label="Response"

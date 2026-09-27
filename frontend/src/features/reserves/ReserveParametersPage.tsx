@@ -45,7 +45,7 @@ export default function ReserveParametersPage() {
     onSuccess: async (p) => {
       await queryClient.invalidateQueries({ queryKey: ['reserve-parameters'] });
       toast.success(
-        `Parameters ${p.businessLine} from ${p.effectiveFrom}: ${humanize(p.recordStatus)}`,
+        `Parameters ${p.businessLine} from ${formatDate(p.effectiveFrom)}: ${humanize(p.recordStatus)}`,
       );
     },
   });

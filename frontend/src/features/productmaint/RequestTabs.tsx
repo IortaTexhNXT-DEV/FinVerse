@@ -14,9 +14,11 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDateTime, humanize } from '@/utils/format';
 import { typeLabel } from './packageRequest';
+import { UserName } from '@/components/ui/UserName';
+import { displayNameOf } from '@/api/users';
 
 function step(by: string | undefined, at: string | undefined): string {
-  return by === undefined ? '—' : `${by} · ${formatDateTime(at)}`;
+  return by === undefined ? '—' : `${displayNameOf(by)} · ${formatDateTime(at)}`;
 }
 
 /** Request header, recommendation and who did what (BRPM.008/009/024). */
@@ -95,7 +97,7 @@ export function SetupTab({ request: p }: Readonly<{ request: PackageRequest }>) 
         </dd>
       </dl>
       <p className="muted">
-        MBS completes the draft version and submits it for validation; a PRODUCT_VALIDATE holder
+        MBS completes the draft version and submits it for validation; a user who validates products
         (never the maker) validates and releases it, which releases this request.
       </p>
       <Link
@@ -110,7 +112,7 @@ export function SetupTab({ request: p }: Readonly<{ request: PackageRequest }>) 
 
 const HISTORY_COLUMNS: Column<ResponseHistory>[] = [
   { key: 'at', header: 'Changed', render: (h) => formatDateTime(h.changedAt) },
-  { key: 'by', header: 'By', render: (h) => h.changedBy },
+  { key: 'by', header: 'By', render: (h) => <UserName login={h.changedBy} /> },
   { key: 'rev', header: 'Rev.', numeric: true, render: (h) => h.revision },
   { key: 'outcome', header: 'Outcome', render: (h) => <StatusBadge status={h.outcome} /> },
   { key: 'rate', header: 'Rate %', numeric: true, render: (h) => h.rate ?? '—' },

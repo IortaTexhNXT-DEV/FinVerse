@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.booking.service;
 
 import com.iortatechnxt.brokerverse.booking.domain.ServiceInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.SiKind;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -16,10 +17,7 @@ import com.iortatechnxt.brokerverse.storage.service.FileDownload;
 import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
 import com.iortatechnxt.brokerverse.storage.service.StoredFileService.StoreRequest;
 import java.math.BigDecimal;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
@@ -91,7 +89,7 @@ public class ServiceInvoiceDocument {
                     List.of(
                         new Field("Recipient", si.getRecipientName()),
                         new Field("Code", si.getRecipientCode()),
-                        new Field("Issue date", si.getIssueDate().toString()),
+                        new Field("Issue date", DisplayFormat.date(si.getIssueDate())),
                         new Field("Booked invoice", nz(si.getInvoiceNo())),
                         new Field("Account (ARN)", nz(si.getArn())),
                         new Field("Credit of", nz(si.getCreditOf())))),
@@ -106,7 +104,7 @@ public class ServiceInvoiceDocument {
                     AMOUNT_COLUMN),
                 new Text(text.title(), text.text())),
             List.of("Prepared by", "Approved by"),
-            text.versionTag() + (si.getRemarks() == null ? "" : " - " + si.getRemarks()));
+            text.versionLabel() + (si.getRemarks() == null ? "" : " - " + si.getRemarks()));
     byte[] pdf = composer.pdf(spec);
     Long stored =
         storedFiles
@@ -153,6 +151,6 @@ public class ServiceInvoiceDocument {
   }
 
   private static String amount(BigDecimal value) {
-    return new DecimalFormat("#,##0.00", DecimalFormatSymbols.getInstance(Locale.US)).format(value);
+    return DisplayFormat.amount(value);
   }
 }

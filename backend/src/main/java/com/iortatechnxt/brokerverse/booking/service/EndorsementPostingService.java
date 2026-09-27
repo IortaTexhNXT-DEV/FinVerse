@@ -24,6 +24,7 @@ import com.iortatechnxt.brokerverse.booking.service.EndorsementCalculator.Policy
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -327,7 +328,11 @@ public class EndorsementPostingService {
     if (account.getStatus() != AccountStatus.BOOKED) {
       throw new BusinessRuleException(
           "ACCOUNT_NOT_BOOKED",
-          "Account " + arn + " is " + account.getStatus() + ": only booked accounts are endorsed");
+          "Account "
+              + arn
+              + " is "
+              + DisplayFormat.words(account.getStatus())
+              + ": only booked accounts are endorsed");
     }
     return account;
   }

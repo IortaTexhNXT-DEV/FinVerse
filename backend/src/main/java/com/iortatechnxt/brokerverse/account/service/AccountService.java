@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import com.iortatechnxt.brokerverse.workflow.service.StartCase;
@@ -215,7 +216,8 @@ public class AccountService {
             && currentUser.hasAuthority("ACCOUNT_PROCESS");
     if (!marketing && !processing) {
       throw new BusinessRuleException(
-          "ACCOUNT_NOT_EDITABLE", "Account " + account.getArn() + " is " + account.getStatus());
+          "ACCOUNT_NOT_EDITABLE",
+          "Account " + account.getArn() + " is " + DisplayFormat.words(account.getStatus()));
     }
   }
 

@@ -57,7 +57,7 @@ export const PACKAGE_REQUEST_HELP_SCREENS: readonly HelpScreen[] = [
     ],
     controls: [
       'A package with an open renewal request is never renewed twice.',
-      'Expired packages are never deleted: they stay readable on the Products screen and are reactivated through a REACTIVATE request.',
+      'Expired packages are never deleted: they stay readable on the Products screen and are reactivated through a reactivation request.',
     ],
   },
 ];

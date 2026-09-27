@@ -20,6 +20,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { GenerateAdviceDialog, SendAdviceDialog } from './AdviceDialogs';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 /**
  * Insurance Advice register (BRNB.060/070/095/035): search by IA number, ARN or client; view and
@@ -111,7 +112,11 @@ export default function InsuranceAdvicePage() {
                 </span>
               ),
             },
-            { key: 'mortgagee', header: 'Mortgagee', render: (a) => humanize(a.mortgageeBank) },
+            {
+              key: 'mortgagee',
+              header: 'Mortgagee',
+              render: (a) => <LovLabel type="MORTGAGEE_BANK" code={a.mortgageeBank} />,
+            },
             { key: 'policy', header: 'Policy No.', render: (a) => a.policyNumbers ?? 'to follow' },
             {
               key: 'trigger',

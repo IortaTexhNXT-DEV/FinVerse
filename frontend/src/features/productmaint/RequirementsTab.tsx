@@ -15,11 +15,12 @@ import { useToast } from '@/components/ui/toastContext';
 import { NumberInput, TextInput } from '@/features/assets/FormControls';
 import { formatDateTime } from '@/utils/format';
 import { TermsView } from './TermsView';
+import { UserName } from '@/components/ui/UserName';
 
 const SIGNOFF_COLUMNS: Column<Signoff>[] = [
   { key: 'ref', header: 'Reference', render: (s) => <span className="mono">{s.reference}</span> },
   { key: 'decision', header: 'Decision', render: (s) => <StatusBadge status={s.decision} /> },
-  { key: 'by', header: 'By', render: (s) => s.signedBy },
+  { key: 'by', header: 'By', render: (s) => <UserName login={s.signedBy} /> },
   { key: 'at', header: 'On', render: (s) => formatDateTime(s.signedAt) },
   { key: 'comment', header: 'Comment', render: (s) => s.comment ?? '—' },
 ];

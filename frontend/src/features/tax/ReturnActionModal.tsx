@@ -8,7 +8,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, today } from '@/utils/format';
+import { formatAmount, today, statusPhrase } from '@/utils/format';
 import { DateInput } from '@/components/ui/DateInput';
 
 /** Action performed by the modal. */
@@ -55,7 +55,7 @@ export function ReturnActionModal({ action, taxReturn, onClose }: Readonly<Props
     onSuccess: async (r) => {
       await queryClient.invalidateQueries({ queryKey: ['tax-returns'] });
       await queryClient.invalidateQueries({ queryKey: ['tax-calendar'] });
-      toast.success(`Return ${r.returnNo} is now ${r.status.toLowerCase()}`);
+      toast.success(`Return ${r.returnNo} is now ${statusPhrase(r.status)}`);
       onClose();
     },
   });

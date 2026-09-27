@@ -21,6 +21,7 @@ import type { CorrectionTab } from './acsl';
 import { acslApi } from './api';
 import type { CorrectionStage, CorrectionSummary, Counts } from './api';
 import { FormDialog } from './FormDialog';
+import { UserName } from '@/components/ui/UserName';
 
 const KINDS = [
   { value: 'WRONG_ACCOUNT', label: 'Posting to a wrong GL account' },
@@ -44,7 +45,7 @@ const COLUMNS: Column<CorrectionSummary>[] = [
   { key: 'invoice', header: 'Invoice', render: (c) => c.invoiceNo ?? '—' },
   { key: 'description', header: 'Description', render: (c) => c.description },
   { key: 'journal', header: 'Journal', render: (c) => c.journalBatchNo ?? '—' },
-  { key: 'by', header: 'Raised By', render: (c) => c.createdBy },
+  { key: 'by', header: 'Raised By', render: (c) => <UserName login={c.createdBy} /> },
   { key: 'status', header: 'Status', render: (c) => <StatusBadge status={c.stage} /> },
 ];
 

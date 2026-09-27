@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Field } from '@/components/ui/Field';
 import type { VersionForm } from './versionForm';
+import { TypedInput } from '@/components/ui/DateInput';
 
 type TextKey = Exclude<keyof VersionForm, 'coverages' | 'insurers' | 'terms'>;
 
@@ -73,7 +74,7 @@ function Inputs({
           hint={spec.hint}
         >
           {(id) => (
-            <input
+            <TypedInput
               id={id}
               className="input"
               type={spec.type ?? 'text'}

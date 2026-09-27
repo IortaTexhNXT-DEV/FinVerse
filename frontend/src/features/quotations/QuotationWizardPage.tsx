@@ -1,11 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ChevronLeft, ChevronRight, Save, Send } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { catalogApi } from '@/api/catalog';
 import type { ProductDetail } from '@/api/catalog';
+import { crmApi } from '@/api/crm';
 import { quotationsApi } from '@/api/quotations';
 import type { Quotation } from '@/api/quotations';
+import { LovLabel } from '@/components/broking/LovLabel';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -23,6 +25,7 @@ import {
   newQuotationForm,
   QUOTATION_STEPS,
   quotationStepErrors,
+  quotationSubmitErrors,
   toQuotationInput,
 } from './quotationForm';
 import type { Preselection, QuotationForm, QuotationStep } from './quotationForm';
@@ -50,6 +53,16 @@ function ReviewStep({ form }: Readonly<{ form: QuotationForm }>) {
     <DetailList
       rows={[
         ['Client', form.clientName || '—'],
+        [
+          'Market segment',
+          form.marketSegment ? (
+            <LovLabel key="m" type="MARKET_SEGMENT" code={form.marketSegment} />
+          ) : (
+            <span key="m" className="text-danger">
+              Not chosen – required to submit
+            </span>
+          ),
+        ],
         ['Product', form.productCode],
         ['Insurer', form.insurerCode || 'To be advised'],
         ['Period', `${formatDate(form.periodFrom)} to ${formatDate(form.periodTo)}`],
@@ -160,13 +173,34 @@ function WizardFooter({
 
 const PREMIUM_STEPS = new Set<QuotationStep>(['items', 'premium', 'review']);
 
+/**
+ * Defaults the market segment from the client when the quotation has none (a client preselected
+ * from the client record or a request, or a draft saved before the segment was chosen).
+ */
+function useClientSegment(form: QuotationForm, set: (patch: Partial<QuotationForm>) => void) {
+  const client = useQuery({
+    queryKey: ['client-summary', form.clientId],
+    queryFn: () => crmApi.summary(form.clientId ?? 0),
+    enabled: form.clientId !== undefined && form.marketSegment === '',
+  });
+  const segment = client.data?.marketSegment;
+  useEffect(() => {
+    if (segment && form.marketSegment === '' && client.data?.id === form.clientId) {
+      set({ marketSegment: segment });
+    }
+  }, [segment, form.marketSegment, form.clientId, client.data?.id, set]);
+}
+
 function Wizard({ initial }: Readonly<{ initial: QuotationForm }>) {
   const [form, setForm] = useState(initial);
   const [step, setStep] = useState<QuotationStep>(
     initial.clientId === undefined ? 'client' : 'product',
   );
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const set = (patch: Partial<QuotationForm>) => setForm((f) => ({ ...f, ...patch }));
+  const set = useCallback(
+    (patch: Partial<QuotationForm>) => setForm((f) => ({ ...f, ...patch })),
+    [],
+  );
   const companyId = useCompanyId();
   const detail = useQuery({
     queryKey: ['catalog', 'product', form.productCode],
@@ -174,6 +208,7 @@ function Wizard({ initial }: Readonly<{ initial: QuotationForm }>) {
     enabled: form.productCode !== '',
   });
   const { save, submit } = useQuotationSaver(setForm);
+  useClientSegment(form, set);
   const index = QUOTATION_STEPS.findIndex((s) => s.id === step);
   const go = (target: QuotationStep) => {
     const forward = QUOTATION_STEPS.findIndex((s) => s.id === target) > index;
@@ -226,7 +261,15 @@ function Wizard({ initial }: Readonly<{ initial: QuotationForm }>) {
         onGo={go}
         canSubmit={canSaveQuotation(form)}
         submitting={submit.isPending}
-        onSubmit={() => submit.mutate(form)}
+        onSubmit={() => {
+          const blocking = quotationSubmitErrors(form);
+          setErrors(blocking);
+          if (Object.keys(blocking).length === 0) {
+            submit.mutate(form);
+          } else {
+            setStep('client');
+          }
+        }}
       />
     </div>
   );

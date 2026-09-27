@@ -6,6 +6,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, humanize } from '@/utils/format';
 import { placementLink } from './placementLogic';
+import { LineLabel, InsurerName } from '@/components/broking/LovLabel';
 
 function PlacementNote({ row }: Readonly<{ row: WorkbenchRow }>) {
   if (row.holdCoverStatus !== undefined && row.holdCoverExpiry !== undefined) {
@@ -79,10 +80,15 @@ export function WorkbenchTable({
           header: 'Product Line',
           render: (r) => (
             <span>
-              {humanize(r.lineCode)}
+              <LineLabel code={r.lineCode} />
               <span className="cell-sub">
                 {r.productCode}
-                {r.insurerCode !== undefined && ` · ${r.insurerCode}`}
+                {r.insurerCode !== undefined && (
+                  <>
+                    {' · '}
+                    <InsurerName code={r.insurerCode} />
+                  </>
+                )}
               </span>
             </span>
           ),

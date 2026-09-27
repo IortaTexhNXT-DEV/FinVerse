@@ -28,6 +28,18 @@ public record DocumentSpec(
     signatures = signatures == null ? List.of() : List.copyOf(signatures);
   }
 
+  /**
+   * A signature caption with the name of the person who signs, e.g. "Prepared by: Maria Santos";
+   * the caption alone while nobody has done the step.
+   *
+   * @param caption caption
+   * @param name display name, may be null
+   * @return caption text
+   */
+  public static String signature(String caption, String name) {
+    return name == null || name.isBlank() ? caption : caption + ": " + name;
+  }
+
   /** A content block (typed in JSON, for the Word rendition of a composed PDF). */
   @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "kind")
   @JsonSubTypes({

@@ -22,6 +22,7 @@ import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.stereotype.Component;
 
 /**
@@ -57,7 +58,8 @@ public class PdfReportRenderer implements ReportRenderer {
   private static final float NATURAL_POINTS_PER_WEIGHT = 40f;
   private static final Color GRID = BrandAssets.color(BrandAssets.GRID);
   private static final DateTimeFormatter STAMP =
-      DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withZone(BusinessClock.zone());
+      DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm", Locale.ENGLISH)
+          .withZone(BusinessClock.zone());
 
   private static final Font TITLE = new Font(Font.HELVETICA, 13, Font.BOLD, BRAND_NAVY);
   private static final Font COMPANY = new Font(Font.HELVETICA, 10, Font.BOLD, BRAND_BLUE);

@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -49,7 +50,8 @@ public class OdsReportRenderer implements ReportRenderer {
   private static final String CELL = "table-cell";
   private static final String ROW = "table-row";
   private static final DateTimeFormatter STAMP =
-      DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withZone(BusinessClock.zone());
+      DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm", Locale.ENGLISH)
+          .withZone(BusinessClock.zone());
 
   @Override
   public ExportFormat format() {

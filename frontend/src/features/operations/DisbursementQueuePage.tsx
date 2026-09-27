@@ -16,7 +16,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime, humanize, statusPhrase } from '@/utils/format';
 import './operations.css';
 
 const TABS: readonly { id: DisbursementStatus; label: string }[] = [
@@ -147,7 +147,7 @@ export default function DisbursementQueuePage() {
     onSuccess: async (r) => {
       setDialog(undefined);
       await queryClient.invalidateQueries({ queryKey: ['ops'] });
-      toast.success(`${r.requestNo} is now ${humanize(r.status).toLowerCase()}`);
+      toast.success(`${r.requestNo} is now ${statusPhrase(r.status)}`);
     },
   });
   const on = {

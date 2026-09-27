@@ -16,6 +16,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { TextInput } from '@/features/assets/FormControls';
 import { formatDate, formatDateTime, today } from '@/utils/format';
 import { monthEnd } from './reserveMath';
+import { UserName } from '@/components/ui/UserName';
 
 /** Valuation runs of the company: history and preview of a new month. */
 export default function ValuationRunsPage() {
@@ -82,8 +83,16 @@ export default function ValuationRunsPage() {
             { key: 'p', header: 'Month', render: (r) => <strong>{r.periodName}</strong> },
             { key: 'd', header: 'Valuation Date', render: (r) => formatDate(r.valuationDate) },
             { key: 's', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
-            { key: 'm', header: 'Prepared by', render: (r) => r.submittedBy ?? r.preparedBy },
-            { key: 'a', header: 'Approved by', render: (r) => r.approvedBy ?? '' },
+            {
+              key: 'm',
+              header: 'Prepared by',
+              render: (r) => <UserName login={r.submittedBy ?? r.preparedBy} />,
+            },
+            {
+              key: 'a',
+              header: 'Approved by',
+              render: (r) => <UserName login={r.approvedBy} empty="" />,
+            },
             { key: 'j', header: 'Journals', numeric: true, render: (r) => r.journalCount },
             { key: 'c', header: 'Calculated', render: (r) => formatDateTime(r.calculatedAt) },
           ]}

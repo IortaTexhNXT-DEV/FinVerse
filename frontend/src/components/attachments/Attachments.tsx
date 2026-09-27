@@ -11,9 +11,11 @@ import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
 import { formatBytes } from '@/utils/files';
 import { AttachmentUploadBar } from './AttachmentUploadBar';
+import { UserName } from '@/components/ui/UserName';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 interface AttachmentsProps {
   /** Owning record type, e.g. "JournalBatch". */
@@ -43,10 +45,14 @@ const INFO_COLUMNS: Column<AttachmentInfo>[] = [
       </>
     ),
   },
-  { key: 'k', header: 'Type', render: (a) => (a.documentType ? humanize(a.documentType) : '') },
+  {
+    key: 'k',
+    header: 'Type',
+    render: (a) => <LovLabel type="DOCUMENT_TYPE" code={a.documentType} empty="" />,
+  },
   { key: 'd', header: 'Description', render: (a) => a.description ?? '' },
   { key: 's', header: 'Size', numeric: true, render: (a) => formatBytes(a.sizeBytes) },
-  { key: 'u', header: 'Uploaded by', render: (a) => a.uploadedBy },
+  { key: 'u', header: 'Uploaded by', render: (a) => <UserName login={a.uploadedBy} /> },
   { key: 't', header: 'Uploaded', render: (a) => formatDateTime(a.uploadedAt) },
   {
     key: 'c',

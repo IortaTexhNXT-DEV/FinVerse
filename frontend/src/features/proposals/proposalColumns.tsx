@@ -4,6 +4,7 @@ import { Amount } from '@/components/ui/Amount';
 import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate } from '@/utils/format';
+import { InsurerName } from '@/components/broking/LovLabel';
 
 /** Columns of the PRF lists. */
 export const PROPOSAL_COLUMNS: Column<ProposalListItem>[] = [
@@ -49,6 +50,10 @@ export const PROPOSAL_COLUMNS: Column<ProposalListItem>[] = [
     header: 'Slips',
     render: (p) => [p.qsNo, p.psNo].filter(Boolean).join(' / ') || '—',
   },
-  { key: 'insurer', header: 'Chosen Insurer', render: (p) => p.chosenInsurer ?? '—' },
+  {
+    key: 'insurer',
+    header: 'Chosen Insurer',
+    render: (p) => <InsurerName code={p.chosenInsurer} />,
+  },
   { key: 'status', header: 'Stage', render: (p) => <StatusBadge status={p.status} /> },
 ];

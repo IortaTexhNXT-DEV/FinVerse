@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.remittance.domain.RemittanceAmounts;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.DocumentKind;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.RemittanceType;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -78,6 +79,7 @@ public class BatchDocuments {
   private final OrganizationService organization;
   private final PartyService parties;
   private final Clock clock;
+  private final UserDirectory users;
 
   /**
    * Creates the documents.
@@ -86,6 +88,7 @@ public class BatchDocuments {
    * @param composer PDF / XLSX composer
    * @param organization company names
    * @param parties insurer names
+   * @param users user names
    * @param clock clock
    */
   public BatchDocuments(
@@ -93,11 +96,13 @@ public class BatchDocuments {
       DocumentComposer composer,
       OrganizationService organization,
       PartyService parties,
+      UserDirectory users,
       Clock clock) {
     this.templates = templates;
     this.composer = composer;
     this.organization = organization;
     this.parties = parties;
+    this.users = users;
     this.clock = clock;
   }
 
@@ -220,7 +225,7 @@ public class BatchDocuments {
                 "approvedBy",
                     batch.getApprovedBy() == null
                         ? "the Remittance Team Leader"
-                        : batch.getApprovedBy()));
+                        : users.displayName(batch.getApprovedBy())));
     DocumentSpec spec =
         new DocumentSpec(
             companyName(batch),

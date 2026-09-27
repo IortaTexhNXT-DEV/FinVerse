@@ -10,6 +10,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { runActions } from './reserveMath';
+import { statusPhrase } from '@/utils/format';
 
 type ReasonAction = 'reject' | 'cancel';
 
@@ -50,7 +51,7 @@ export function RunActionBar({ run }: Readonly<{ run: ValuationRun }>) {
     onSuccess: async (r) => {
       setReasonFor(null);
       setReason('');
-      await refresh(`Run ${r.periodName} is now ${r.status.toLowerCase().replace('_', ' ')}`);
+      await refresh(`Run ${r.periodName} is now ${statusPhrase(r.status)}`);
     },
   });
   const busy = step.isPending || withReason.isPending;

@@ -12,6 +12,7 @@ import type { InsurerLine, InsurerUpdate, NewInsurerLine, NewUpdate } from './ap
 import { insurerApi } from './api';
 import { AddInsurerDialog, AdjusterDialog, NumberDialog } from './InsurerDialogs';
 import { UpdateDialog } from './UpdateDialog';
+import { displayNameOf } from '@/api/users';
 
 type Dialog =
   { kind: 'add' } | { kind: 'update' } | { kind: 'number' | 'adjuster'; line: InsurerLine };
@@ -71,7 +72,9 @@ function UpdatesTable({ updates }: Readonly<{ updates: InsurerUpdate[] }>) {
           key: 'b',
           header: 'Recorded',
           render: (u) =>
-            [u.recordedBy, formatDateTime(u.recordedAt), u.uploadRef].filter(Boolean).join(', '),
+            [displayNameOf(u.recordedBy), formatDateTime(u.recordedAt), u.uploadRef]
+              .filter(Boolean)
+              .join(', '),
         },
       ]}
     />

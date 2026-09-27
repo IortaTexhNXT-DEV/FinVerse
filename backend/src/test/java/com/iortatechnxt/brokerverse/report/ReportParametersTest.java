@@ -49,6 +49,14 @@ class ReportParametersTest {
   }
 
   @Test
+  void theFiltersPrintedOnAReportShowDatesAsPeopleReadThem() {
+    ReportParameters params = ReportParameters.validate(PL, Map.of("partyFrom", "C-1"), CLOCK);
+    assertThat(params.echo())
+        .containsExactly(
+            "From Date : 01-Sep-2026", "To Date : 23-Sep-2026", "Party Code From : C-1");
+  }
+
+  @Test
   void requiredParameterSentBlankIsRejectedInsteadOfDefaulted() {
     Map<String, String> raw = new HashMap<>();
     raw.put("toDate", " ");

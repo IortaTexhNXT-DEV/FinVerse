@@ -13,6 +13,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDate, today } from '@/utils/format';
 import { RevaluationRatesCard } from './RevaluationRatesCard';
 import { DateInput } from '@/components/ui/DateInput';
+import { UserName } from '@/components/ui/UserName';
 
 const RATE_TYPES: RateType[] = ['SPOT', 'CLOSING', 'AVERAGE', 'BUDGET', 'BOOK'];
 
@@ -137,7 +138,7 @@ export default function CurrencyRatesPage() {
             { key: 't', header: 'Type', render: (r) => r.rateType },
             { key: 'd', header: 'Effective', render: (r) => formatDate(r.effectiveDate) },
             { key: 'r', header: 'Rate', numeric: true, render: (r) => r.rate.toFixed(6) },
-            { key: 'b', header: 'Maintained by', render: (r) => r.createdBy },
+            { key: 'b', header: 'Maintained by', render: (r) => <UserName login={r.createdBy} /> },
           ]}
         />
       </Card>

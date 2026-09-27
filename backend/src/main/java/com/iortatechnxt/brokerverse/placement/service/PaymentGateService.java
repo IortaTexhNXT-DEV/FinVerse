@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.placement.domain.EvidenceKind;
 import com.iortatechnxt.brokerverse.placement.domain.GateRule;
@@ -204,7 +205,8 @@ public class PaymentGateService {
     Account account = accounts.require(payment.arn());
     if (account.getStatus() != AccountStatus.AWAITING_PAYMENT) {
       return new ApplyOutcome(
-          false, "Account is " + account.getStatus() + ", not awaiting payment");
+          false,
+          "Account is " + DisplayFormat.words(account.getStatus()) + ", not awaiting payment");
     }
     PaymentEvidence saved =
         record(
@@ -222,7 +224,11 @@ public class PaymentGateService {
     if (account.getStatus() != AccountStatus.AWAITING_PAYMENT) {
       throw new BusinessRuleException(
           "ACCOUNT_NOT_AWAITING_PAYMENT",
-          "Account " + arn + " is " + account.getStatus() + ", not awaiting payment");
+          "Account "
+              + arn
+              + " is "
+              + DisplayFormat.words(account.getStatus())
+              + ", not awaiting payment");
     }
     return account;
   }

@@ -126,7 +126,11 @@ export default function TaxReturnsPage() {
                 </div>
               ),
             },
-            { key: 'b', header: 'Filed by', render: (r) => r.filedBy ?? '' },
+            {
+              key: 'b',
+              header: 'Filed by',
+              render: (r) => <UserName login={r.filedBy} empty="" />,
+            },
             {
               key: 'x',
               header: 'Actions',

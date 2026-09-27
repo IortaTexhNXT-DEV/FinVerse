@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.booking.domain.QueueEntryRepository;
 import com.iortatechnxt.brokerverse.booking.domain.QueueStatus;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -172,7 +173,11 @@ public class BookingService {
     if (account.getStatus() != AccountStatus.POLICY_ISSUED) {
       throw new BusinessRuleException(
           "ACCOUNT_NOT_BOOKABLE",
-          "Account " + arn + " is " + account.getStatus() + ": only issued policies are booked");
+          "Account "
+              + arn
+              + " is "
+              + DisplayFormat.words(account.getStatus())
+              + ": only issued policies are booked");
     }
     return account;
   }

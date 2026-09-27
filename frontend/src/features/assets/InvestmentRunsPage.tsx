@@ -18,6 +18,7 @@ import { periodOf } from './assetMath';
 import { TextInput } from './FormControls';
 import { summarize } from './runSummary';
 import { useAssetLookups } from './useAssetLookups';
+import { UserName } from '@/components/ui/UserName';
 
 const TABS = [
   { id: 'ACCRUAL', label: 'Interest accrual' },
@@ -133,7 +134,7 @@ export default function InvestmentRunsPage() {
               numeric: true,
               render: (r) => <Amount value={r.totalAmount} />,
             },
-            { key: 'u', header: 'Posted by', render: (r) => r.createdBy },
+            { key: 'u', header: 'Posted by', render: (r) => <UserName login={r.createdBy} /> },
             { key: 'w', header: 'Posted at', render: (r) => formatDateTime(r.createdAt) },
           ]}
         />

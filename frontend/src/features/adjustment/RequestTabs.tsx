@@ -13,6 +13,7 @@ import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/form
 import { adjustmentApi, REQUEST_ENTITY } from './api';
 import type { EndorsementRequest, GlLine } from './api';
 import { RecomputePreview } from './RecomputePreview';
+import { displayNameOf } from '@/api/users';
 
 type Row = [string, string | undefined];
 
@@ -73,7 +74,7 @@ function requestRows(r: EndorsementRequest): Row[] {
 }
 
 function done(by: string | undefined, at: string | undefined): string | undefined {
-  return at === undefined ? undefined : `${by ?? ''} · ${formatDateTime(at)}`;
+  return at === undefined ? undefined : `${displayNameOf(by)} · ${formatDateTime(at)}`;
 }
 
 function processingRows(r: EndorsementRequest): Row[] {

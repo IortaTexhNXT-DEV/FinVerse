@@ -36,6 +36,7 @@ import {
 } from './caseLogic';
 import type { CaseFilters, FilterKey } from './caseLogic';
 import { DateInput } from '@/components/ui/DateInput';
+import { UserName } from '@/components/ui/UserName';
 
 function Select({
   label,
@@ -198,7 +199,9 @@ function columns(
       render: (c: CaseRow) => (
         <>
           <StatusBadge status={c.stage} />
-          <span className="cell-sub">{c.assignee ?? 'Queue'}</span>
+          <span className="cell-sub">
+            <UserName login={c.assignee} empty="Queue" />
+          </span>
         </>
       ),
     },

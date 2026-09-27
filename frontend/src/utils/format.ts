@@ -195,3 +195,32 @@ export function titleCase(label: string): string {
     .map((word, i) => titleWord(word, i === 0))
     .join(' ');
 }
+
+/**
+ * The template version of a generated document as users read it: "QUOTATION_SLIP v2" (the stored
+ * tag) becomes "Version 2"; other texts are returned as they are.
+ */
+export function versionLabel(tag: string | null | undefined): string {
+  if (!tag) {
+    return '';
+  }
+  const m = /\bv(\d+)$/.exec(tag.trim());
+  return m === null ? tag : `Version ${m[1] ?? ''}`;
+}
+
+/**
+ * A status code as words inside a sentence: "QS_SENT" becomes "QS sent", "APPROVED" becomes
+ * "approved" (acronyms kept in capitals), for messages such as "PRF-2026-000001 is now QS sent".
+ */
+export function statusPhrase(code: string | null | undefined): string {
+  if (!code) {
+    return '';
+  }
+  return code
+    .split('_')
+    .map((word) => {
+      const w = word.toUpperCase();
+      return ACRONYMS.has(w) ? w : w.toLowerCase();
+    })
+    .join(' ');
+}

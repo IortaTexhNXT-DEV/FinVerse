@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.catalog.service.TsuRoutingService.TsuDecisio
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.nonpackage.domain.ProposalRequest;
 import com.iortatechnxt.brokerverse.nonpackage.domain.ProposalRequest.ClientFacts;
@@ -151,7 +152,8 @@ public class ProposalService {
             && currentUser.hasAuthority("TSU_PROCESS");
     if (!marketing && !tsu) {
       throw new BusinessRuleException(
-          "PRF_NOT_EDITABLE", "PRF " + p.getPrfNo() + " cannot be changed while " + p.getStatus());
+          "PRF_NOT_EDITABLE",
+          "PRF " + p.getPrfNo() + " cannot be changed while " + DisplayFormat.words(p.getStatus()));
     }
     if (!p.getProductCode().equals(draft.productCode())) {
       throw new BusinessRuleException("PRF_PRODUCT_FIXED", "The product of a PRF cannot change");

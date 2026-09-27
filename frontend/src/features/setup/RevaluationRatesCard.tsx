@@ -11,6 +11,7 @@ import { Field } from '@/components/ui/Field';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate, today } from '@/utils/format';
 import { frbsSetupApi } from './frbsSetupApi';
+import { UserName } from '@/components/ui/UserName';
 
 const previousMonth = (): string => {
   const d = new Date(`${today()}T00:00:00`);
@@ -126,7 +127,7 @@ export function RevaluationRatesCard({ currencies }: Readonly<{ currencies: Curr
           { key: 'm', header: 'Month End', render: (r) => formatDate(r.effectiveDate) },
           { key: 'c', header: 'Currency', render: (r) => <strong>{r.currencyCode}</strong> },
           { key: 'r', header: 'Rate', numeric: true, render: (r) => r.rate.toFixed(6) },
-          { key: 'b', header: 'Entered By', render: (r) => r.createdBy },
+          { key: 'b', header: 'Entered By', render: (r) => <UserName login={r.createdBy} /> },
           {
             key: 'copy',
             header: '',

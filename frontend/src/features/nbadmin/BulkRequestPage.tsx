@@ -13,6 +13,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime } from '@/utils/format';
+import { UserName } from '@/components/ui/UserName';
 
 /** Handler of the bulk access requests (template UAM_ACCESS_REQUEST). */
 export const ACCESS_BULK_HANDLER = 'UAM_ACCESS_REQUEST';
@@ -67,7 +68,7 @@ export default function BulkRequestPage() {
             { key: 'l', header: 'Lines', numeric: true, render: (b) => b.lines },
             { key: 's', header: 'Status', render: (b) => <StatusBadge status={b.status} /> },
             { key: 'r', header: 'Remarks', render: (b) => b.remarks ?? '' },
-            { key: 'b', header: 'Requested By', render: (b) => b.createdBy },
+            { key: 'b', header: 'Requested By', render: (b) => <UserName login={b.createdBy} /> },
             { key: 'a', header: 'Uploaded', render: (b) => formatDateTime(b.createdAt) },
           ]}
         />

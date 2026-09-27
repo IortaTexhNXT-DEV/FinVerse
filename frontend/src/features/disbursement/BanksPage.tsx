@@ -18,6 +18,7 @@ import { disbursementApi } from './api';
 import type { Bank, CheckBook } from './api';
 import { DialogFooter } from './VoucherDialogs';
 import './disbursement.css';
+import { displayNameOf } from '@/api/users';
 
 interface BookTarget {
   bank: Bank;
@@ -120,7 +121,7 @@ function Books({
     {
       key: 'prev',
       header: 'Previous Range',
-      render: (b) => (b.previousRange ? `${b.previousRange} (${b.editedBy ?? ''})` : ''),
+      render: (b) => (b.previousRange ? `${b.previousRange} (${displayNameOf(b.editedBy)})` : ''),
     },
     { key: 'status', header: 'Status', render: (b) => <StatusBadge status={b.status} /> },
     {

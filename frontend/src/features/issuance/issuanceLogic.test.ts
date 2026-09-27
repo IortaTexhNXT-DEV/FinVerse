@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import type { Review } from '@/api/issuance';
-import { addresses, issuanceTiles, numbersError, proposedNumbers } from './issuanceLogic';
+import {
+  addresses,
+  issuanceTiles,
+  matchText,
+  numbersError,
+  proposedNumbers,
+} from './issuanceLogic';
 
 const review = (termYears: number, extracted: string[], onAccount: string[] = []): Review => ({
   epolicy: {
@@ -55,5 +61,13 @@ describe('issuance logic', () => {
     expect(numbersError(['A', 'B'])).toBeUndefined();
     expect(addresses('a@b.ph; c@d.ph ,e@f.ph')).toEqual(['a@b.ph', 'c@d.ph', 'e@f.ph']);
     expect(addresses('  ')).toEqual([]);
+  });
+});
+
+describe('how an e-policy was matched', () => {
+  it('says how the e-policy was matched in words', () => {
+    expect(matchText('MANUAL')).toBe('the account chosen at upload');
+    expect(matchText('POLICY_NUMBER')).toBe('the policy number');
+    expect(matchText(undefined)).toBe('—');
   });
 });

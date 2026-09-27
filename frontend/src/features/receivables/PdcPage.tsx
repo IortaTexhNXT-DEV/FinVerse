@@ -20,6 +20,7 @@ import { formatDate, humanize, today } from '@/utils/format';
 import { pdcActions } from './receivablesMath';
 import { useReceivablesLookups } from './useReceivablesLookups';
 import { DateInput } from '@/components/ui/DateInput';
+import { UserName } from '@/components/ui/UserName';
 
 const TABS = [
   { id: 'held', label: 'On hand & due' },
@@ -201,7 +202,7 @@ export default function PdcPage() {
             { key: 'to', header: 'To', render: (e) => humanize(e.toStatus) },
             { key: 'rcpt', header: 'Receipt', render: (e) => e.receiptNo ?? '' },
             { key: 'rem', header: 'Remarks', render: (e) => e.remarks ?? '' },
-            { key: 'by', header: 'User', render: (e) => e.createdBy },
+            { key: 'by', header: 'User', render: (e) => <UserName login={e.createdBy} /> },
           ]}
         />
       </Modal>

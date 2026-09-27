@@ -16,6 +16,7 @@ import { formatAmount, formatDate } from '@/utils/format';
 import { csvPreview } from './receivablesMath';
 import { bankOptions, useReceivablesLookups } from './useReceivablesLookups';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { UserName } from '@/components/ui/UserName';
 
 /**
  * Bank statement import (CSV: date, description, reference, debit, credit, balance - see
@@ -189,7 +190,7 @@ export default function BankStatementsPage() {
               render: (s) => <Amount value={s.closingBalance} />,
             },
             { key: 'n', header: 'Lines', numeric: true, render: (s) => s.lineCount },
-            { key: 'by', header: 'Imported by', render: (s) => s.createdBy },
+            { key: 'by', header: 'Imported by', render: (s) => <UserName login={s.createdBy} /> },
           ]}
         />
       </Card>

@@ -8,6 +8,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
+import { displayNameOf } from '@/api/users';
 
 interface ReportVariantsProps {
   code: string;
@@ -131,7 +132,7 @@ export function ReportVariants({ code, values, onApply }: Readonly<ReportVariant
             {(variants.data ?? []).map((v) => (
               <option key={v.id} value={v.id}>
                 {v.name}
-                {v.mine ? '' : ` (shared by ${v.owner})`}
+                {v.mine ? '' : ` (shared by ${displayNameOf(v.owner)})`}
               </option>
             ))}
           </select>

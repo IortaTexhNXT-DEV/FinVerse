@@ -35,6 +35,7 @@ import { RateSchemePanel } from './RateExceptionDialog';
 import { DetailsTab, HistoryTab, ItemsTab, VersionsTab } from './QuotationTabs';
 import { RecordSummary } from '@/components/broking/RecordSummary';
 import type { Fact } from '@/components/broking/RecordSummary';
+import { ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -51,8 +52,16 @@ function facts(q: Quotation): Fact[] {
   const c = q.content;
   return [
     { icon: User, label: 'Client', value: `${q.clientCode} – ${q.clientName}` },
-    { icon: Layers, label: 'Product', value: `${q.productCode} (${q.lineCode})` },
-    { icon: Building2, label: 'Insurer', value: c.insurerCode ?? 'To be advised' },
+    {
+      icon: Layers,
+      label: 'Product',
+      value: <ProductLineLabel product={q.productCode} line={q.lineCode} />,
+    },
+    {
+      icon: Building2,
+      label: 'Insurer',
+      value: <InsurerName code={c.insurerCode} empty="To be advised" />,
+    },
     {
       icon: CalendarRange,
       label: 'Period',

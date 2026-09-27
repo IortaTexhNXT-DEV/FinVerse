@@ -5,6 +5,8 @@ import {
   formOfQuotation,
   newQuotationForm,
   quotationStepErrors,
+  quotationSubmitErrors,
+  SEGMENT_REQUIRED,
   toQuotationInput,
   withGroup,
   yearAfter,
@@ -165,5 +167,16 @@ describe('quotation requests', () => {
         marketSegment: 'SME',
       }),
     ).toBe('/quotations/new?request=5&channel=WEB&client=2&product=MC-PC&segment=SME');
+  });
+});
+
+describe('market segment at submission', () => {
+  it('requires the market segment to submit, with a clear message', () => {
+    const f = newQuotationForm('2026-03-01', { clientId: 4, productCode: 'MTR10' });
+    expect(quotationSubmitErrors(f)).toEqual({ marketSegment: SEGMENT_REQUIRED });
+    expect(quotationSubmitErrors({ ...f, marketSegment: 'CBG' })).toEqual({});
+    expect(newQuotationForm('2026-03-01', { marketSegment: 'RETAIL' }).marketSegment).toBe(
+      'RETAIL',
+    );
   });
 });

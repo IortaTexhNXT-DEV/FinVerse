@@ -6,17 +6,32 @@ package com.iortatechnxt.brokerverse.productmaint.domain;
  */
 public enum RequestType {
   /** A new package: the MBS set-up creates the product and its first version. */
-  NEW,
+  NEW("New package"),
   /** Changed commercial terms of an existing package (new version). */
-  AMEND,
+  AMEND("Amendment"),
   /** Updated package details (new version). */
-  UPDATE,
+  UPDATE("Update"),
   /** Renewal of a package reaching its end date (BRPM.017); negotiation is optional. */
-  RENEW,
+  RENEW("Renewal"),
   /** Retirement of a package ("deletion", BRPM.011 / BRPM.006): no negotiation, no version. */
-  RETIRE,
+  RETIRE("Retirement"),
   /** Reactivation of an expired package through a new version (BRPM.006). */
-  REACTIVATE;
+  REACTIVATE("Reactivation");
+
+  private final String label;
+
+  RequestType(String label) {
+    this.label = label;
+  }
+
+  /**
+   * The type as users read it (documents, messages).
+   *
+   * @return label
+   */
+  public String label() {
+    return label;
+  }
 
   /**
    * Whether the request works on an existing product.

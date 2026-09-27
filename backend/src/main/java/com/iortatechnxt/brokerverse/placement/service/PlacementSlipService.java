@@ -33,10 +33,13 @@ import com.iortatechnxt.brokerverse.storage.service.StoredFileService.StoreReque
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
+import java.util.Comparator;
 import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -171,11 +174,61 @@ public class PlacementSlipService {
                     Collectors.toList()));
     String prefix = "PL-" + BusinessClock.today(clock).getYear();
     return groups.entrySet().stream()
-        .map(
-            g ->
-                create(
-                    companyId, new SlipNumber(numbers.next(prefix), 1), g.getKey(), g.getValue()))
+        .map(g -> createReplacing(companyId, prefix, g.getKey(), g.getValue()))
         .toList();
+  }
+
+  /**
+   * Creates the slip of one insurer branch. When the accounts were already on a live slip (placed
+   * again after an insurer return), that slip is replaced: a slip to the same insurer branch with
+   * no other account gets its next version (PL-2026-000001 v2), and every such earlier slip is
+   * marked SUPERSEDED, as Regenerate does.
+   */
+  private PlacementSlip createReplacing(
+      Long companyId, String prefix, SlipInsurer insurer, List<Account> slipAccounts) {
+    List<PlacementSlip> replaced = replacedSlips(slipAccounts);
+    SlipNumber number =
+        replaced.stream()
+            .filter(s -> sameInsurer(s, insurer))
+            .findFirst()
+            .map(s -> new SlipNumber(s.getSlipNo(), latestVersion(s.getSlipNo()) + 1))
+            .orElseGet(() -> new SlipNumber(numbers.next(prefix), 1));
+    replaced.forEach(PlacementSlip::supersede);
+    PlacementSlip created = create(companyId, number, insurer, slipAccounts);
+    replaced.forEach(s -> recordSuperseded(s, created));
+    return created;
+  }
+
+  /** Live slips whose accounts are all on the new slip (they are replaced by it). */
+  private List<PlacementSlip> replacedSlips(List<Account> slipAccounts) {
+    Set<String> arns = slipAccounts.stream().map(Account::getArn).collect(Collectors.toSet());
+    return arns.stream()
+        .flatMap(arn -> slips.findByArn(arn).stream())
+        .filter(s -> s.getStatus() != SlipStatus.SUPERSEDED)
+        .filter(s -> s.getAccounts().stream().allMatch(a -> arns.contains(a.arn())))
+        .distinct()
+        .sorted(Comparator.comparing(PlacementSlip::getId))
+        .toList();
+  }
+
+  private static boolean sameInsurer(PlacementSlip slip, SlipInsurer insurer) {
+    return Objects.equals(slip.getInsurerCode(), insurer.insurerCode())
+        && Objects.equals(slip.getBranchCode(), insurer.branchCode());
+  }
+
+  private int latestVersion(String slipNo) {
+    return slips.findBySlipNo(slipNo).stream()
+        .mapToInt(PlacementSlip::getVersionNo)
+        .max()
+        .orElse(1);
+  }
+
+  private void recordSuperseded(PlacementSlip previous, PlacementSlip replacement) {
+    audit.record(
+        ENTITY,
+        previous.displayNo(),
+        AuditAction.UPDATE,
+        "Superseded by placement slip " + replacement.displayNo());
   }
 
   /**
@@ -197,11 +250,14 @@ public class PlacementSlipService {
                 previous.getCompanyId(),
                 previous.getAccounts().stream().map(SlipAccount::arn).toList()));
     previous.supersede();
-    return create(
-        previous.getCompanyId(),
-        new SlipNumber(previous.getSlipNo(), previous.getVersionNo() + 1),
-        new SlipInsurer(previous.getInsurerCode(), previous.getBranchCode()),
-        ready);
+    PlacementSlip created =
+        create(
+            previous.getCompanyId(),
+            new SlipNumber(previous.getSlipNo(), previous.getVersionNo() + 1),
+            new SlipInsurer(previous.getInsurerCode(), previous.getBranchCode()),
+            ready);
+    recordSuperseded(previous, created);
+    return created;
   }
 
   private static List<Account> requireReady(List<Readiness> readiness) {
@@ -241,7 +297,8 @@ public class PlacementSlipService {
                 slipAccounts.stream().map(a -> new SlipAccount(a.getId(), a.getArn())).toList()));
     String name = slip.displayNo().replace(' ', '_');
     SlipHeader header =
-        new SlipHeader(companyId, slip.displayNo(), insurer.insurerCode(), address, text);
+        new SlipHeader(
+            companyId, slip.displayNo(), insurer.insurerCode(), address, text, slip.getCreatedBy());
     store(slip, PDF, name + ".pdf", documents.slipPdf(header, slipAccounts));
     store(slip, XLSX, name + ".xlsx", documents.slipXlsx(slip.displayNo(), slipAccounts));
     audit.record(

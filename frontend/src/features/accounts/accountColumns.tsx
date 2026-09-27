@@ -4,6 +4,8 @@ import { Amount } from '@/components/ui/Amount';
 import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate } from '@/utils/format';
+import { UserName } from '@/components/ui/UserName';
+import { InsurerName } from '@/components/broking/LovLabel';
 
 /** Columns of the account lists: ARN chip, client, product, insurer, period, premium, status, flags. */
 export const ACCOUNT_COLUMNS: Column<AccountSummary>[] = [
@@ -27,7 +29,11 @@ export const ACCOUNT_COLUMNS: Column<AccountSummary>[] = [
     ),
   },
   { key: 'p', header: 'Product', render: (a) => a.productCode },
-  { key: 'i', header: 'Insurer', render: (a) => a.insurerCode ?? '' },
+  {
+    key: 'i',
+    header: 'Insurer',
+    render: (a) => <InsurerName code={a.insurerCode} empty="" />,
+  },
   {
     key: 'd',
     header: 'Period',
@@ -50,5 +56,5 @@ export const ACCOUNT_COLUMNS: Column<AccountSummary>[] = [
       </div>
     ),
   },
-  { key: 'o', header: 'Officer', render: (a) => a.accountOfficer ?? '' },
+  { key: 'o', header: 'Officer', render: (a) => <UserName login={a.accountOfficer} empty="" /> },
 ];

@@ -14,6 +14,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, humanize } from '@/utils/format';
 import type { Claim } from './api';
 import { PREMIUM_LABELS, flagLabels } from './recordLogic';
+import { displayNameOf } from '@/api/users';
 
 /**
  * Summary card of a claim (design 11): claim number and ARN chips, the status pill, the flags
@@ -67,12 +68,12 @@ export function ClaimSummary({ claim }: Readonly<{ claim: Claim }>) {
         {
           icon: Users,
           label: 'Marketing Team / AO',
-          value: `${c.salesTeam ?? '—'} · ${c.accountOfficer ?? '—'}`,
+          value: `${c.salesTeam ?? '—'} · ${displayNameOf(c.accountOfficer) || '—'}`,
         },
         {
           icon: UserRound,
           label: 'Handler',
-          value: [claim.handler, claim.unitLabel].filter(Boolean).join(' · '),
+          value: [displayNameOf(claim.handler), claim.unitLabel].filter(Boolean).join(' · '),
         },
         {
           icon: CalendarClock,

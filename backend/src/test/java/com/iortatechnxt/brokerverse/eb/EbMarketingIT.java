@@ -334,8 +334,7 @@ class EbMarketingIT {
         as.run(TL, () -> approval.signOff(fx.company(), built.getId(), "Agreed"));
     assertThat(signed.getStatus()).isEqualTo(EbComparative.Status.APPROVED);
     assertThat(stage(cycle)).isEqualTo(EbCycleStage.READY_TO_PRESENT);
-    assertThat(as.run(AO, () -> export.xlsx(fx.company(), built.getId())))
-        .isNotEmpty();
+    assertThat(as.run(AO, () -> export.xlsx(fx.company(), built.getId()))).isNotEmpty();
 
     as.run(AO, () -> presenter.present(fx.company(), built.getId()));
     assertThat(stage(cycle)).isEqualTo(EbCycleStage.WITH_CLIENT);

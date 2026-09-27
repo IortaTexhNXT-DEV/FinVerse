@@ -61,6 +61,7 @@ STATUS_COLOURS: dict[str, tuple[str, str]] = {
     "ANSWERED": (SUCCESS_BG, SUCCESS),
     "CONFIGURE": (BG_BLUE, HEADER_BLUE),
     "RECOMMENDED": (BG_BLUE, HEADER_BLUE),
+    "IN SCOPE": (BG_BLUE, HEADER_BLUE),
     "CHANGE": (AMBER_BG, AMBER),
     "PARTIAL": (AMBER_BG, AMBER),
     "IN PROGRESS": (AMBER_BG, AMBER),
@@ -72,6 +73,7 @@ STATUS_COLOURS: dict[str, tuple[str, str]] = {
     "BLOCKED": (DANGER_BG, DANGER),
     "OUT": (DIRTY_WHITE, MUTED),
     "PARKED": (DIRTY_WHITE, MUTED),
+    "ON HOLD": (DIRTY_WHITE, MUTED),
     "N/A": (DIRTY_WHITE, MUTED),
 }
 

@@ -259,7 +259,7 @@ priority: Must have
 screens: All EB screens; Reports; Documents tabs
 description:
   - Only authorised users view, download, print or access EB documents and reports. Each EB screen, action and report requires one of the permissions of section 3.2; menus show only what the user's roles allow. Document lists and downloads also apply the department access classes of FR-EB-002.
-  - Insurer and client HR users never reach the core BIBS screens or API (FR-EB-010).
+  - Insurer and client HR users never reach the core BIBS screens or direct requests (FR-EB-010).
 preconditions:
   - "The user is logged in."
 main_flow:

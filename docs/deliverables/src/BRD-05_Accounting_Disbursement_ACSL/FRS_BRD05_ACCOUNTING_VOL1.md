@@ -1533,7 +1533,7 @@ acceptance:
 ```
 
 > [!NOTE] Gap G2
-> Return, resubmit and bulk approval work through the API. The Access Requests screen and My Approvals do not show the Return, Resubmit and bulk-approve buttons yet; the screens offer approve and decline one at a time.
+> Return, resubmit and bulk approval work by a direct request. The Access Requests screen and My Approvals do not show the Return, Resubmit and bulk-approve buttons yet; the screens offer approve and decline one at a time.
 
 # Workflows, statuses and accounting events
 

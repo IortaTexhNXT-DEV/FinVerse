@@ -394,7 +394,7 @@ audit:
   - Exports of the audit trail are themselves audited.
 acceptance:
   - Every action of a test run appears in the audit trail with the right user and time.
-  - An audit entry cannot be edited through any screen or API.
+  - An audit entry cannot be edited through any screen or direct request.
 ```
 
 ```fr

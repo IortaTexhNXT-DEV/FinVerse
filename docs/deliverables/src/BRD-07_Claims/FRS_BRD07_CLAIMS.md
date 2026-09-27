@@ -364,7 +364,7 @@ audit:
 acceptance:
   - For a closed claim, the History tab lists every status change, the settlement and the closure with user and time.
   - A reserve amendment shows the previous and new amounts and the reason.
-  - No screen or API allows history rows to be edited or deleted.
+  - No screen or direct request allows history rows to be edited or deleted.
 ```
 
 ## Cover, policy and premium

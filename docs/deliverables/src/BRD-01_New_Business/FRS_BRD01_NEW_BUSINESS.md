@@ -725,7 +725,7 @@ notifications:
 audit:
   - "Submit and approve recorded with user and time."
 acceptance:
-  - "A draft quotation cannot be sent, even through the API."
+  - "A draft quotation cannot be sent, even by a direct request."
   - "The maker of a quotation cannot approve it."
   - "A quotation slip is e-mailed to insurers only after a second TSU officer approves it."
 ```
@@ -783,7 +783,7 @@ audit:
   - "This FR is the audit."
 acceptance:
   - "A changed client e-mail shows the old and new value, user and time on the client's History tab."
-  - "No screen or API allows audit rows to be changed or deleted."
+  - "No screen or direct request allows audit rows to be changed or deleted."
 ```
 
 ```fr

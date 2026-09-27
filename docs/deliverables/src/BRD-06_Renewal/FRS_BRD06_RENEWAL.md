@@ -451,7 +451,7 @@ audit:
 acceptance:
   - For a renewed account, the History tab lists extraction, initiation, bucket, disposition, post, insurer response, RA, acceptance and booking with user or source and time.
   - An extraction and the later initiation of the same candidate appear as two events with different users and times.
-  - No screen or API allows history or audit rows to be edited or deleted.
+  - No screen or direct request allows history or audit rows to be edited or deleted.
 ```
 
 ## Extraction and the expiring list

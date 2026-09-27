@@ -392,7 +392,7 @@ audit:
 acceptance:
   - Changing the category of an account from A to B writes one row with From A, To B, the user, the time and the source IP.
   - Changing CLX_MIN_BALANCE_THRESHOLD on Collections Setup writes a row with the old and new value.
-  - No screen or API allows an audit row to be edited or deleted.
+  - No screen or direct request allows an audit row to be edited or deleted.
 ```
 
 ```fr

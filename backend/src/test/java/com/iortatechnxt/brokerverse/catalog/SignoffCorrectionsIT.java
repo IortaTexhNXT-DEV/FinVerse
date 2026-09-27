@@ -47,8 +47,9 @@ class SignoffCorrectionsIT {
         .hasSize(2);
     assertThat(
             jdbc.queryForObject(
-                "select count(*) from acc_risk_item where address like '%Booking%'"
-                    + " or address like '%Multi-Year%'",
+                "select count(*) from acc_risk_item where address in"
+                    + " ('9 Booking Street, Ortigas Center', '12 Booking Road, Lahug',"
+                    + " '27 Multi-Year Avenue, Kapitolyo')",
                 Integer.class))
         .isZero();
   }

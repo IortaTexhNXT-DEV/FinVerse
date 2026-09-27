@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.booking.service.BookingService;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidateRepository;
 import com.iortatechnxt.brokerverse.renewal.extraction.service.ExtractionService;
+import com.iortatechnxt.brokerverse.renewal.rules.service.InitiationService;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import java.time.LocalDate;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -45,6 +46,7 @@ public class RenewalFixtures {
   private final BookingService bookings;
   private final ExtractionService extraction;
   private final RenewalCandidateRepository candidates;
+  private final InitiationService initiation;
   private final AsUser as;
 
   RenewalFixtures(
@@ -52,11 +54,13 @@ public class RenewalFixtures {
       BookingService bookings,
       ExtractionService extraction,
       RenewalCandidateRepository candidates,
+      InitiationService initiation,
       AsUser as) {
     this.booking = booking;
     this.bookings = bookings;
     this.extraction = extraction;
     this.candidates = candidates;
+    this.initiation = initiation;
     this.as = as;
   }
 
@@ -94,6 +98,17 @@ public class RenewalFixtures {
    */
   public RenewalCandidate extractedMotor() {
     return extracted(book("MTR10", "CBG"));
+  }
+
+  /**
+   * Books a retail motor account (Marketing disposition path), extracts and initiates it.
+   *
+   * @return the renewal in Unassigned Disposition
+   */
+  public RenewalCandidate unassignedRetail() {
+    RenewalCandidate c = extracted(book("MTR10", "RETAIL"));
+    as.run(TL, () -> initiation.initiate(company(), java.util.List.of(c.getRenewalRef())));
+    return reload(c);
   }
 
   /**

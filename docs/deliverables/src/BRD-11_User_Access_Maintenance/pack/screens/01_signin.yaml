@@ -36,7 +36,7 @@ screens:
       - "Every successful and failed sign-in is written to the audit trail with the user and the time (FR-UA-001, FR-UA-064)."
       - "More than 20 sign-in attempts within a minute from one computer are refused until the minute ends: Too many sign-in attempts. Wait a minute and try again. (FR-UA-001)."
       - "The menu shows only the screens of the user's active group profiles; a deactivated group profile grants nothing (FR-UA-001, FR-UA-042)."
-      - "In directory mode the password is checked by the BDO directory and never stored in BIBS; until the directory adapter exists that mode refuses every sign-in (FR-UA-003)."
+      - "In directory mode the password is checked by the BDO directory and never stored in BIBS; until BDO supplies the directory interface that mode refuses every sign-in (FR-UA-003)."
     outcome: The user is signed in with exactly the menus of the assigned group profiles, or refused with a message that does not reveal which credential was wrong.
     frs: [FR-UA-001, FR-UA-003]
     tests: [LOGIN]

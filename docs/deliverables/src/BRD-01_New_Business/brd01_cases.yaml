@@ -13,7 +13,7 @@ meta:
   version: "2.0"
   date: 26 September 2026
   signoff: pack/pack.yaml
-  built: true
+  verify_messages: true
 
 personas:
   MKT_AO: {name: Marketing AO, user: ao, short: MKT AO}
@@ -92,52 +92,52 @@ screens:
   JOBS: Administration > Scheduled Jobs
   NOTIF: Notifications (bell icon in the page header)
   PREFS: Operations > Notification Settings
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-NB-01
     name: SIT/UAT users and roles
     content: ao and ao2 (MKT_AO), mkttl (MKT_TL), tsu and tsulead (TSU; two officers for four-eyes), proc (PROCESSOR), proctl (PROCESSING_TL), approver (NB_APPROVER), epol (EPOLICY_SENDER), adjust (ADJUSTMENT), badmin (BUSINESS_ADMIN), admin (SYSADMIN), auditor (AUDITOR). The SIT/UAT password is issued by the test lead.
-    source: Seeds V980 (broking users), V900 (admin, auditor); roles and grants V750
+    source: Seed data (broking users, administrator and auditor, with their roles and grants)
   - id: TD-NB-02
     name: Seed clients
     content: Confirmed clients CL-2026-000001 Santos, Maria Clara Reyes (VIP, e-mail-only instruction), CL-2026-000003 Pacific Harbor Logistics Inc. (VIP, quarterly billing instruction), CL-2026-000004 Luzon Agri-Industrial Corp., CL-2026-000005 Garcia, Antonio Luis Dizon; prospects PR-2026-000007 to 000011 (Bayside Builders Co. is PR-2026-000008); inactive PR-2026-000012; one client with an overdue KYC review
-    source: Seed V981
+    source: Seed data (clients)
   - id: TD-NB-03
     name: Catalogue, insurers and TSU rules
     content: Products MTR08, MTR10, MTR15, MTR22 (Motor), CTP01 (CTPL), PAR01, PAR08, PAR13 (Property), CGL01 (Liability), CAR00, CAR11 (Engineering), EEI01, MOP05, PA001; insurers INS-MGIC, INS-LAC, INS-VMI, INS-MPI with branches, LGT and placement e-mail addresses; TSU rules NON_PACKAGE, FLEET_5, TSI_50M
-    source: Seed V982 (catalogue, insurers, sales organisation); rates V811
+    source: Seed data (catalogue, insurers, sales organisation and rates)
   - id: TD-NB-04
     name: Seed quotations and requests
     content: QT-2026-900001 DRAFT (MTR10), 900002 FOR_REVIEW (MTR10, maker ao), 900003 APPROVED (PAR01), 900004 SENT_TO_CLIENT (PAR08), 900005 ACCEPTED (MTR22, direct payment), 900006 CONVERTED (CGL01), 900007 NOT_PROCEEDED, 900008 DRAFT revised to version 2; requests REQ-2026-9000nn (two in the inbox)
-    source: Seed V984
+    source: Seed data (quotations and requests)
   - id: TD-NB-05
     name: Seed proposal requests (PRF)
     content: PRF-2026-900001 DRAFT (CAR00, Pacific Harbor), 900002 FOR_MKT_APPROVAL (EEI01), 900003 WITH_TSU (CAR00, Bayside Builders), 900004 TERMS_RECEIVED with three responses (two terms, one declined) and its comparative table, 900005 ACCEPTED (EPF05)
-    source: Seed V985
+    source: Seed data (proposal requests)
   - id: TD-NB-06
     name: Seed accounts
     content: ARN-2026-900001 DRAFT (MTR10), 900002 and 900003 SUBMITTED, 900004 and 900013 RETURNED_TO_MARKETING, 900005 and 900012 AWAITING_PAYMENT, 900006, 900007, 900010 and 900014 READY_FOR_PLACEMENT, 900008 and 900011 DRAFT, 900009 SUBMITTED (CAR11), 900015 VOIDED
-    source: Seed V983
+    source: Seed data (accounts)
   - id: TD-NB-07
     name: Seed placement and billing
     content: ARN-2026-910001 to 910005 PLACED on slips PL-2026-900001 to 900004 (910001 hold cover confirmed, 910003 hold cover requested and expiring), 910006 and 910007 AWAITING_PAYMENT, 910008 RETURNED_BY_INSURER; billing batches BILL-2026-900001 (closed) and 900002 (generated); payment reports PMT-2026-900001 to 900003 (900003 under review with two unmatched lines)
-    source: Seed V986
+    source: Seed data (placement and billing)
   - id: TD-NB-08
     name: Seed issuance
     content: E-policies of ARN-2026-910002, 910004 and 910005 CONFIRMED; 910003 in REVIEW; Insurance Advices IA-2026-900001 and 900002; e-policy of 910005 dispatched
-    source: Seed V987
+    source: Seed data (issuance)
   - id: TD-NB-09
     name: Seed booking
     content: Seven accounts of CL-2026-000001 to 000006 in POLICY_ISSUED; four booked at start-up with one positive endorsement and one partial cancellation; one queued by the seed auto-book rule (PAR08 CBG); two ready to book, one of them multi-year
-    source: Seed V988 and the booking seed runner (BookingSeedData)
+    source: Seed data (booking)
   - id: TD-NB-10
     name: Report targets and variants
     content: 2026 monthly production targets per region, department, team and AO; one shared variant of the Account Status Report
-    source: Seed V989
+    source: Seed data (report targets and variants)
   - id: TD-NB-11
     name: Bulk upload files
-    content: Files built from the template downloaded in each upload wizard - CLIENT_CREATE (50 rows, 5 existing codes, 1 invalid mobile), QUOTATION_CREATE (30 PAR01 rows), ACCOUNT_CREATE (200 CBG Fire rows with 3 duplicates), FFY_TAGGING, QUOTATION_ACCEPTANCE, BOOKING_UPLOAD; one file with a column removed; one empty file
+    content: Files prepared from the template downloaded in each upload wizard - CLIENT_CREATE (50 rows, 5 existing codes, 1 invalid mobile), QUOTATION_CREATE (30 PAR01 rows), ACCOUNT_CREATE (200 CBG Fire rows with 3 duplicates), FFY_TAGGING, QUOTATION_ACCEPTANCE, BOOKING_UPLOAD; one file with a column removed; one empty file
     source: Prepared by the test lead from the wizard templates; masked names and identifiers
   - id: TD-NB-12
     name: Documents to upload
@@ -146,7 +146,7 @@ data:
   - id: TD-NB-13
     name: E-policy and payment report files
     content: Text e-policy PDFs named by ARN for the placed accounts; a 3-year e-policy with three policy numbers; CLPC payment report (.xlsx) for BILL-2026-900002 with paid and unpaid lines; reference payment report by ARN with one unknown ARN
-    source: Prepared by the test lead in the layouts of the seed files (PlacementFilesTest, EpolicyPdf)
+    source: Prepared by the test lead in the layouts of the insurer e-policy and payment report files
   - id: TD-NB-14
     name: New records keyed in the test
     content: Individual prospect "Dela Cruz, Juan Test" (born 12-Mar-1990, TIN 123-456-789-000, mobile 09171234567); corporate prospect "UAT Trading Corp."; Motor item Toyota Vios 2024, plate UAT1234, engine 2NZUAT001, chassis MHFUAT0000000001, value PHP 1,100,000
@@ -213,7 +213,6 @@ frs:
           - Open ARN-2026-900004 (CGL01) and ARN-2026-900001 (MTR10), History tab of each.
           - Compare the stage list of the workflow panel.
         expected: Both accounts use workflow NB_ACCOUNT with the same stages (Draft, Submitted, Awaiting payment, Ready for placement, Placed, Policy issued, Booked).
-        auto: AccountLifecycleIT#accountGoesFromPaymentToBookingAndCancellation
       - c: 2
         type: Negative
         persona: BUSINESS_ADMIN
@@ -221,10 +220,9 @@ frs:
         title: A product pending authorisation cannot be quoted
         pre: badmin created product CGL91 (Liability) and it is still Pending authorisation.
         steps:
-          - As ao, New Quotation; look for CGL91 in the product list; call POST /api/v1/quotations with product CGL91.
-        expected: CGL91 is not offered; the API call is refused.
+          - As ao, New Quotation; look for CGL91 in the product list; send a direct request to create a quotation with product CGL91.
+        expected: CGL91 is not offered; the direct request is refused.
         msg: [Product CGL91 is not authorized or is inactive, PRODUCT_NOT_ACTIVE]
-        auto: CatalogIT#productsAreMakerCheckerAndListedInTheInbox
       - c: 2
         type: Negative
         persona: BUSINESS_ADMIN
@@ -234,7 +232,6 @@ frs:
           - Products > New Product on line MOTOR with cover type FIRE_LIGHTNING; save.
         expected: Not saved.
         msg: [Cover type FIRE_LIGHTNING does not belong to MOTOR, COVER_TYPE_INVALID]
-        auto: CatalogIT#productsAreMakerCheckerAndListedInTheInbox
       - c: 3
         type: Negative
         title: CBG-only product on a CORBANK quotation
@@ -242,14 +239,12 @@ frs:
           - New Quotation for CL-2026-000003 (segment CORBANK) with product PAR01 (offered to CBG only).
         expected: The quotation is not saved.
         msg: [Product PAR01 is not offered to segment CORBANK, SEGMENT_NOT_ALLOWED]
-        auto: AccountRulesIT#draftRulesComeFromTheProduct
       - c: 3
         type: Positive
         title: CBG product on a CBG quotation
         steps:
           - New Quotation for CL-2026-000001 (segment CBG) with product PAR01; save.
         expected: The quotation is saved with a QT number.
-        auto: QuotationIT#createdQuotationHasNumbersPremiumTemplateVersionAndWorkCase
 
   FR-NB-002:
     scenario: SC-NB-02
@@ -268,14 +263,12 @@ frs:
           - New Account for CL-2026-000001, product MTR10, one vehicle with plate, chassis, make, model and year but no engine number; attach the IDF; click Submit.
         expected: Submission is refused and the check panel names the engine number.
         msg: ["Complete the mandatory fields of {MTR10}: {engine number}", ACCOUNT_INCOMPLETE]
-        auto: AccountIT#submitNeedsMinimumFieldsDocumentsAndPremiumThenProcessingValidates
       - c: 2
         type: Positive
         title: Conduction sticker instead of plate number
         steps:
           - Same account with the engine number entered, no plate number and conduction sticker CS-2026-0099; click Submit.
         expected: The account is submitted; the plate rule is met by the conduction sticker.
-        auto: AccountRulesIT#draftRulesComeFromTheProduct
       - c: 3
         type: Positive
         persona: BUSINESS_ADMIN
@@ -285,7 +278,6 @@ frs:
           - As badmin open product CGL01, Field Rules tab; add a rule scope Product, target Account, field Contact e-mail, check Presence; have approver authorise it.
           - As ao submit a CGL01 account without a contact e-mail.
         expected: The submission is refused and names the contact e-mail; no deployment was needed.
-        auto: CatalogIT#minimumFieldMatrixAppliesTheNarrowestScope
       - c: 3
         type: Negative
         persona: BUSINESS_ADMIN
@@ -295,7 +287,6 @@ frs:
           - Add a rule with scope All products and scope code MOTOR; save.
         expected: Not saved.
         msg: ["Rules for every product use the scope code '*'", RULE_SCOPE_INVALID]
-        auto: CatalogIT#minimumFieldMatrixAppliesTheNarrowestScope
 
   FR-NB-003:
     scenario: SC-NB-02
@@ -314,7 +305,6 @@ frs:
           - New Account on MTR10 (maximum term 1 year) with a term of 3 years; save.
         expected: Not saved.
         msg: ["Product MTR10 allows a term of up to 1 year(s)", MULTI_YEAR_NOT_ALLOWED]
-        auto: AccountRulesIT#draftRulesComeFromTheProduct
       - c: 1
         type: Negative
         title: FFY on a product that is not FFY eligible
@@ -322,7 +312,6 @@ frs:
           - New Account on PAR01 with Free First Year from today; save.
         expected: Not saved.
         msg: [Product PAR01 is not Free First Year eligible, FFY_NOT_ELIGIBLE]
-        auto: AccountRulesIT#freeFirstYearIsTaggedAndCancelledWithAudit
       - c: 1
         type: Negative
         title: Direct payment on a product that does not allow it
@@ -330,7 +319,6 @@ frs:
           - New Account on PAR01 with Payment = Direct payment to the insurer; save.
         expected: Not saved.
         msg: [Product PAR01 cannot be paid directly to the insurer, DIRECT_PAYMENT_NOT_ELIGIBLE]
-        auto: AccountIT#directPaymentAccountsSkipThePaymentGate
       - c: 2
         type: Positive
         data: [TD-NB-06]
@@ -338,7 +326,6 @@ frs:
         steps:
           - Open draft ARN-2026-900008 (PA001); open the check panel.
         expected: The panel lists every missing mandatory field and the missing valid ID in one list.
-        auto: accountForm.test.ts#lists what blocks the submission
       - c: 3
         type: Negative
         title: Period end before period start
@@ -346,16 +333,14 @@ frs:
           - New Account with period from 01-Nov-2026 to 31-Oct-2026; save.
         expected: Not saved.
         msg: [The period end must be after the period start, ACCOUNT_PERIOD_INVALID]
-        auto: AccountRulesIT#draftRulesComeFromTheProduct
       - c: 3
         type: Negative
         screen: API
         title: List value not valid on the date
         steps:
-          - Call POST /api/v1/accounts with source channel XYZ.
+          - Send a direct request to create an account with source channel XYZ.
         expected: Refused.
         msg: ["'XYZ' is not a valid value of {SOURCE_CHANNEL} on {2026-09-25}", LOV_VALUE_INVALID]
-        auto: AccountRulesIT#freeFirstYearIsTaggedAndCancelledWithAudit
 
   FR-NB-004:
     scenario: SC-NB-02
@@ -375,7 +360,6 @@ frs:
         steps:
           - Open QT-2026-900003, Details tab.
         expected: The quotation shows the intake template code and version it was captured with.
-        auto: QuotationIT#createdQuotationHasNumbersPremiumTemplateVersionAndWorkCase
       - c: 2
         type: Upload-download
         persona: MKT_AO
@@ -384,7 +368,6 @@ frs:
         steps:
           - Download the quotation PDF of QT-2026-900003 (PAR01) and of QT-2026-900002 (MTR10).
         expected: Both use the same letter layout; the Fire letter lists the location and insured items, the Motor letter the vehicle details.
-        auto: DocTemplateServiceIT#mergesTheVersionInForceOnTheDate
       - c: 3
         type: Positive
         title: New template version does not change earlier documents
@@ -392,7 +375,6 @@ frs:
           - Save a new version of QUOTATION_LETTER effective today with an extra sentence.
           - Download the PDF of QT-2026-900003 again and create and download a new quotation.
         expected: The earlier quotation keeps the old text and version; the new quotation uses the new version.
-        auto: DocTemplateServiceIT#mergesTheVersionInForceOnTheDate
       - c: 3
         type: Negative
         title: Template version without text
@@ -400,7 +382,6 @@ frs:
           - New version of QUOTATION_LETTER with an empty body; save.
         expected: Not saved.
         msg: [Enter the template text, TEMPLATE_BODY_REQUIRED]
-        auto: DocTemplateServiceIT#mergesTheVersionInForceOnTheDate
 
   FR-NB-005:
     scenario: SC-NB-02
@@ -418,14 +399,12 @@ frs:
         steps:
           - New Quotation on MTR10 for CL-2026-000005 with 6 vehicles; open the routing result.
         expected: The quotation shows "TSU required (FLEET_5)".
-        auto: CatalogIT#tsuRoutingFollowsTheRules
       - c: 1
         type: Boundary
         title: Fleet of 4 vehicles is not routed
         steps:
           - Same quotation with 4 vehicles.
         expected: No TSU routing is shown; the quotation is a package quotation.
-        auto: CatalogIT#tsuRoutingFollowsTheRules
       - c: 2
         type: Negative
         persona: PROCESSOR
@@ -436,7 +415,6 @@ frs:
           - As proc click Validate.
         expected: Refused; the account stays SUBMITTED.
         msg: ["TSU must clear the account first: {TSI_50M}", TSU_CLEARANCE_REQUIRED]
-        auto: AccountIT#validationNeedsAConfirmedClientAndTsuClearance
       - c: 2
         type: Workflow
         persona: TSU
@@ -446,7 +424,6 @@ frs:
           - As tsu open the account, TSU Clearance; record the clearance with a comment.
           - As proc click Validate.
         expected: The clearance shows tsu and the time; the account moves to AWAITING_PAYMENT.
-        auto: AccountIT#validationNeedsAConfirmedClientAndTsuClearance
       - c: 2
         type: Negative
         persona: TSU
@@ -464,7 +441,6 @@ frs:
           - New Proposal Request on MTR10 with one vehicle of PHP 1,100,000; submit.
         expected: Refused.
         msg: ["No TSU rule applies to this package risk: quote it directly as a package quotation", PRF_NOT_NEEDED]
-        auto: ProposalIT#packageRisksNeedDocumentsAndATsuReasonAndVoidedPrfsAreRetentionCandidates
       - c: 3
         type: Positive
         persona: BUSINESS_ADMIN
@@ -491,14 +467,13 @@ frs:
         steps:
           - Open a booked account of CL-2026-000001; History tab.
         expected: Every stage from Draft to Booked is listed with action, user and time; the status field cannot be edited.
-        auto: WorkflowServiceIT#accountMovesThroughTheStagesWithPermissionChecksHistoryAndNotifications
       - c: 2
         type: Negative
         screen: API
         data: [TD-NB-07]
         title: Book an account in stage Placed
         steps:
-          - As proc call POST /api/v1/booking/book for ARN-2026-910001 (PLACED).
+          - As proc send a direct request to book ARN-2026-910001 (PLACED).
         expected: Refused.
         msg: ["Account ARN-2026-910001 is PLACED: only issued policies are booked", ACCOUNT_NOT_BOOKABLE]
       - c: 2
@@ -506,16 +481,15 @@ frs:
         screen: API
         title: Marketing runs a Processing action
         steps:
-          - As ao call the workflow action validate on ARN-2026-900002.
+          - As ao send a direct request for the workflow action Validate on ARN-2026-900002.
         expected: Refused.
         msg: ["You are not allowed to 'Validate'", WORKFLOW_ACTION_NOT_PERMITTED]
-        auto: AccountLifecycleIT#accountGoesFromPaymentToBookingAndCancellation
       - c: 3
         type: Negative
         screen: API
         title: Business action from the generic panel
         steps:
-          - Call POST /api/v1/workflow/cases/{id}/actions/submit on draft ARN-2026-900001.
+          - Send a direct request for the Submit action on draft ARN-2026-900001.
         expected: Refused; submission runs only from the account screen.
         msg: ["'Submit to Processing' must be done from the record screen", WORKFLOW_ACTION_NOT_GENERIC]
       - c: 3
@@ -527,7 +501,6 @@ frs:
         steps:
           - Run the Account Status Report with exception filter Stalled.
         expected: The account is listed as stalled with its days since the last movement.
-        auto: NbReportsIT#theAccountStatusReportFlagsSlaBreachesAndStalledAccounts
 
   FR-NB-011:
     scenario: SC-NB-02
@@ -546,7 +519,6 @@ frs:
           - As ao submit ARN-2026-900001 (after completing it).
           - As proc open My Work, team queue.
         expected: ARN-2026-900001 is listed with submission date, unit and stage Submitted.
-        auto: WorkflowServiceIT#queuesShowOnlyTheStagesOfTheUsersTeamAndSupportClaimAndAssignment
       - c: 2
         type: Workflow
         persona: PROCESSING_TL
@@ -555,17 +527,15 @@ frs:
           - As proctl select ARN-2026-900002; click Assign; choose proc.
           - As proc open Assigned to me.
         expected: The item is under Assigned to me for proc; the assignment is in the case history.
-        auto: WorkflowServiceIT#queuesShowOnlyTheStagesOfTheUsersTeamAndSupportClaimAndAssignment
       - c: 3
         type: Negative
         persona: MKT_AO
         screen: API
         title: Marketing claims a Processing item
         steps:
-          - As ao call POST /api/v1/workflow/cases/{id}/claim for ARN-2026-900002.
+          - As ao send a direct request to claim ARN-2026-900002.
         expected: Refused.
         msg: [This item is not in your queue, WORK_CLAIM_NOT_ALLOWED]
-        auto: WorkflowServiceIT#queuesShowOnlyTheStagesOfTheUsersTeamAndSupportClaimAndAssignment
       - c: 3
         type: Negative
         persona: PROCESSING_TL
@@ -582,7 +552,6 @@ frs:
           - Claim the work case of voided ARN-2026-900015.
         expected: Refused.
         msg: [The item is closed, WORK_CASE_CLOSED]
-        auto: WorkflowServiceIT#terminalStageClosesTheCaseAndDuplicatesAreRejected
 
   FR-NB-012:
     scenario: SC-NB-02
@@ -591,7 +560,7 @@ frs:
     data: [TD-NB-06]
     conditions:
       - A draft voided with a reason leaves the Accounts list and appears with Include voided.
-      - A finalised record (booked, placed, approved) has no Void action and a direct call is refused.
+      - A finalised record (booked, placed, approved) has no Void action and a direct request is refused.
       - The Account Status Report shows VOIDED and CANCELLED as different outcomes.
     cases:
       - c: 1
@@ -608,15 +577,14 @@ frs:
           - Click Void on ARN-2026-900008 and confirm without a reason.
         expected: Refused.
         msg: ["Select a reason for 'Void'", WORKFLOW_REASON_REQUIRED]
-        auto: WorkflowServiceIT#accountMovesThroughTheStagesWithPermissionChecksHistoryAndNotifications
       - c: 2
         type: Negative
         screen: API
         data: [TD-NB-07]
         title: Void a placed account
         steps:
-          - Open ARN-2026-910001 (PLACED); check the actions; call the void action through the API.
-        expected: No Void action is shown; the call is refused.
+          - Open ARN-2026-910001 (PLACED); check the actions; send a direct request to void it.
+        expected: No Void action is shown; a direct request is refused.
         msg: ["'void' is not allowed while ARN-2026-910001 is in stage {Placed with insurer}", WORKFLOW_TRANSITION_NOT_ALLOWED]
       - c: 3
         type: Report-output
@@ -627,7 +595,6 @@ frs:
         steps:
           - Run the Account Status Report including closed accounts.
         expected: ARN-2026-900015 shows VOIDED; the account cancelled after booking shows CANCELLED.
-        auto: NbReportsIT#theStageReportListsEveryAccountStage
 
   FR-NB-013:
     scenario: SC-NB-02
@@ -647,16 +614,14 @@ frs:
           - Open QT-2026-900003 (APPROVED); Send via Email to the test mailbox of the client.
           - Open the mailbox; open the PDF without and with the password of the second e-mail.
         expected: Two e-mails arrive; the PDF asks for a password; the second e-mail holds only the password.
-        auto: MessagingIT#protectedAttachmentsAreEncryptedAndThePasswordFollowsSeparately
       - c: 2
         type: Negative
         screen: API
         title: A CSV file cannot be protected
         steps:
-          - Send a message with a .csv attachment through the messaging API used by the send dialog.
+          - Send a message with a .csv attachment from the send dialog.
         expected: Refused.
         msg: ["{notes.csv} cannot be password protected. Send it as PDF, Excel or Word", DOCUMENT_NOT_PROTECTABLE]
-        auto: MessagingIT#rejectsBadAddressesAndUnprotectableFiles
       - c: 2
         type: Negative
         title: Invalid recipient address
@@ -664,7 +629,6 @@ frs:
           - Send via Email with To = client@@example.
         expected: Refused.
         msg: ["Invalid e-mail address: {client@@example}", EMAIL_ADDRESS_INVALID]
-        auto: MessagingIT#rejectsBadAddressesAndUnprotectableFiles
       - c: 2
         type: Negative
         title: No recipient
@@ -672,7 +636,6 @@ frs:
           - Send via Email with To empty.
         expected: Refused.
         msg: [Enter at least one recipient, EMAIL_RECIPIENT_REQUIRED]
-        auto: MessagingIT#rejectsBadAddressesAndUnprotectableFiles
       - c: 3
         type: Workflow
         persona: BUSINESS_ADMIN
@@ -682,27 +645,24 @@ frs:
         steps:
           - Send a quotation to that address; after 3 attempts open Outbound Messages; correct and resend.
         expected: The message shows FAILED with the reason after 3 attempts; the resend is logged and delivered.
-        auto: MessagingIT#failedDeliveriesAreRetriedThenMarkedFailedAndCanBeResent
       - c: 3
         type: Negative
         persona: BUSINESS_ADMIN
         screen: MESSAGES
         title: Resend a message that did not fail
         steps:
-          - Click Retry on a SENT message (API POST /api/v1/messages/{id}/retry).
+          - Click Retry on a SENT message.
         expected: Refused.
         msg: [Only a failed message can be resent, MESSAGE_NOT_FAILED]
-        auto: MessagingIT#failedDeliveriesAreRetriedThenMarkedFailedAndCanBeResent
       - c: 4
         type: Security-access
         persona: BUSINESS_ADMIN
         screen: API
         title: User without account view cannot open its documents
         steps:
-          - As badmin (no ACCOUNT_VIEW, no ATTACHMENT_VIEW) call GET /api/v1/attachments/{id}/content for a document of ARN-2026-900002.
-        expected: HTTP 403.
+          - As badmin (no ACCOUNT_VIEW, no ATTACHMENT_VIEW) send a direct request to open a document of ARN-2026-900002.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
-        auto: AttachmentIT#viewersCannotUpload
 
   FR-NB-014:
     scenario: SC-NB-02
@@ -710,19 +670,18 @@ frs:
     screen: QT
     data: [TD-NB-04, TD-NB-05]
     conditions:
-      - A draft quotation cannot be sent, even through the API.
+      - A draft quotation cannot be sent, even by a direct request.
       - The maker of a quotation or PRF cannot approve it.
       - A quotation slip or proposal slip is e-mailed only after a second TSU officer approves it.
     cases:
       - c: 1
         type: Negative
         screen: API
-        title: Send a draft quotation through the API
+        title: Send a draft quotation by a direct request
         steps:
-          - Call POST /api/v1/quotations/{id}/send for QT-2026-900001 (DRAFT).
+          - Send a direct request to send QT-2026-900001 (DRAFT) to the client.
         expected: Refused; nothing is e-mailed.
         msg: [Quotation QT-2026-900001 must be approved before it is sent, QUOTATION_NOT_APPROVED]
-        auto: QuotationIT#approvedQuotationIsSentProtectedAcceptedAndConvertedIntoAccountsPerGroup
       - c: 2
         type: Negative
         persona: MKT_TL
@@ -732,7 +691,6 @@ frs:
           - As mkttl click Approve.
         expected: Refused; the quotation stays FOR_REVIEW.
         msg: [A quotation is approved by someone other than its maker, QUOTATION_FOUR_EYES]
-        auto: QuotationIT#approvalIsFourEyesAndARevisionOpensANewVersionWithADiff
       - c: 2
         type: Negative
         persona: MKT_TL
@@ -743,7 +701,6 @@ frs:
           - As mkttl click Approve on the PRF.
         expected: Refused.
         msg: [A PRF is approved by someone other than its maker, PRF_FOUR_EYES]
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts
       - c: 3
         type: Workflow
         persona: TSU
@@ -753,7 +710,6 @@ frs:
         steps:
           - As tsu check the E-mails tab; as tsulead approve the slip; check again.
         expected: No e-mail before approval; after tsulead's approval one protected e-mail per insurer is logged.
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts
 
   FR-NB-015:
     scenario: SC-NB-02
@@ -770,7 +726,6 @@ frs:
         steps:
           - As ao submit an account; as proc open the bell.
         expected: One notification with the ARN; clicking it opens the account.
-        auto: WorkflowServiceIT#accountMovesThroughTheStagesWithPermissionChecksHistoryAndNotifications
       - c: 2
         type: Positive
         persona: MKT_AO
@@ -779,7 +734,6 @@ frs:
         steps:
           - As ao set the return event to in-app and e-mail; as proc return ARN-2026-900002 with a reason.
         expected: ao has the in-app notification and an e-mail in the test mailbox.
-        auto: OperationsFoundationApiIT#notificationPreferencesAreKeptPerUser
       - c: 2
         type: Negative
         persona: MKT_AO
@@ -788,7 +742,6 @@ frs:
         steps:
           - Set the return event to in-app only; have another account returned.
         expected: The in-app notification appears; no e-mail is sent.
-        auto: MessagingIT#notificationsArePerUserAndCanBeMarkedRead
 
   FR-NB-016:
     scenario: SC-NB-01
@@ -797,7 +750,7 @@ frs:
     data: [TD-NB-02]
     conditions:
       - A changed client field shows the old and new value, user and time on the History tab.
-      - No screen or API allows audit rows to be changed or deleted.
+      - No screen or direct request allows audit rows to be changed or deleted.
     cases:
       - c: 1
         type: Positive
@@ -805,7 +758,6 @@ frs:
         steps:
           - Edit CL-2026-000005; change the e-mail; save; open the History tab.
         expected: The history shows the old and the new e-mail with ao and the time.
-        auto: CrmAdminApiIT#clientIsCreatedValidatedAndOnboardedOverHttp
       - c: 2
         type: Negative
         persona: AUDITOR
@@ -814,7 +766,6 @@ frs:
         steps:
           - Look for edit or delete on Audit Trail rows; the DBA runs UPDATE, DELETE and TRUNCATE on the audit table in SIT.
         expected: No such action on screen; the database refuses all three statements.
-        auto: AuditTrailImmutabilityIT#updateDeleteAndTruncateAreRejected
 
   FR-NB-017:
     scenario: SC-NB-02
@@ -833,14 +784,12 @@ frs:
         steps:
           - On ARN-2026-900001, Documents tab, upload IDF, valid ID, KYC form, policy copy and request e-mail in one step with their types.
         expected: Five documents are listed with type, size and uploader, linked to the account.
-        auto: DocumentServiceIT#filesAreTypedNamedLinkedAndZipped
       - c: 1
         type: Positive
         title: One file linked to three accounts
         steps:
           - Link the uploaded account list to ARN-2026-900001, 900008 and 900011.
         expected: The file appears on the Documents tab of each account.
-        auto: DocumentServiceIT#filesAreTypedNamedLinkedAndZipped
       - c: 2
         type: Negative
         title: Executable file refused
@@ -848,7 +797,6 @@ frs:
           - Upload the .exe file.
         expected: Refused and nothing is stored.
         msg: ["Only these file types are allowed: <list>", ATTACHMENT_TYPE_NOT_ALLOWED]
-        auto: AttachmentIT#httpUploadAndDownload
       - c: 2
         type: Boundary
         neg: true
@@ -857,7 +805,6 @@ frs:
           - Upload the 11 MB PDF; then a 9.9 MB PDF.
         expected: The 11 MB file is refused; the 9.9 MB file is stored.
         msg: ["The file exceeds the maximum size of 10 MB", ATTACHMENT_TOO_LARGE]
-        auto: AttachmentServiceTest#configuredLimitApplies
       - c: 2
         type: Negative
         title: Content does not match the extension
@@ -865,7 +812,6 @@ frs:
           - Upload the .txt file renamed .pdf.
         expected: Refused.
         msg: ["The file content does not match its .{pdf} type", ATTACHMENT_CONTENT_MISMATCH]
-        auto: AttachmentIT#rejectsDisallowedTypesMismatchedContentAndOversizedFiles
       - c: 2
         type: Negative
         title: Empty file
@@ -873,7 +819,6 @@ frs:
           - Upload the empty file.
         expected: Refused.
         msg: [The file is empty, ATTACHMENT_EMPTY]
-        auto: AttachmentIT#rejectsDisallowedTypesMismatchedContentAndOversizedFiles
       - c: 3
         type: Negative
         title: Motor account without IDF
@@ -881,7 +826,6 @@ frs:
           - Submit a complete MTR10 account without an IDF.
         expected: Refused.
         msg: ["Upload the mandatory documents: {IDF}", MISSING_DOCUMENTS]
-        auto: AccountIT#submitNeedsMinimumFieldsDocumentsAndPremiumThenProcessingValidates
       - c: 4
         type: Boundary
         neg: true
@@ -890,16 +834,14 @@ frs:
           - Select 51 small PDFs and upload.
         expected: Refused; 50 files are accepted.
         msg: [Upload between 1 and 50 files at a time, DOCUMENT_FILE_COUNT]
-        auto: DocumentServiceIT#uploadRulesAreEnforced
       - c: 4
         type: Negative
         screen: API
         title: Nominated names without a reference
         steps:
-          - Call POST /api/v1/attachments/batch with name nomination on and no reference.
+          - Send a direct request to attach documents with name nomination on and no reference.
         expected: Refused.
         msg: [A reference is needed to nominate the file names, DOCUMENT_REFERENCE_REQUIRED]
-        auto: DocumentServiceIT#uploadRulesAreEnforced
 
   FR-NB-018:
     scenario: SC-NB-02
@@ -917,14 +859,13 @@ frs:
         steps:
           - Open CL-2026-000001, KYC & Documents; select the ID and the KYC form; click Download.
         expected: One ZIP with the two files, named as stored.
-        auto: DocumentServiceIT#filesAreTypedNamedLinkedAndZipped
       - c: 1
         type: Boundary
         neg: true
         screen: API
         title: ZIP of 51 documents
         steps:
-          - Call GET /api/v1/attachments/zip with 51 ids.
+          - Send a direct request to download 51 documents as one ZIP file.
         expected: Refused.
         msg: [Select between 1 and 50 documents, DOCUMENT_FILE_COUNT]
       - c: 2
@@ -934,7 +875,6 @@ frs:
         steps:
           - Open ARN-2026-910002, Documents tab.
         expected: The e-policy MGIC-FI-2026-004411 uploaded by Processing is listed and downloads.
-        auto: EpolicyIT#aReceivedEpolicyIsMatchedExtractedReviewedAndUpdatesThePolicy
       - c: 3
         type: Negative
         title: Tampered file fails its checksum
@@ -943,7 +883,6 @@ frs:
           - Download that file.
         expected: The download is refused.
         msg: [Stored file failed its checksum verification, ATTACHMENT_INTEGRITY_FAILURE]
-        auto: AttachmentServiceTest#tamperedContentFailsIntegrityCheck
 
   FR-NB-019:
     scenario: SC-NB-02
@@ -963,7 +902,6 @@ frs:
           - Bulk Uploads > Bulk client creation and update; upload a 100-row file with 3 invalid mobiles; validate; commit.
           - Download the error report.
         expected: 97 rows are committed; the report lists the 3 rows with their reasons.
-        auto: BulkServiceIT#csvIsSanitisedValidatedAndCommittedRowByRow
       - c: 2
         type: Negative
         title: File with a missing column
@@ -971,7 +909,6 @@ frs:
           - Upload the file with the Mobile column removed.
         expected: Refused; no row is processed.
         msg: ["The file does not follow the current template; missing column(s): {Mobile}", BULK_TEMPLATE_MISMATCH]
-        auto: BulkServiceIT#rejectsWrongTemplatesTypesAndPermissions
       - c: 2
         type: Negative
         title: Empty file
@@ -979,7 +916,6 @@ frs:
           - Upload the template with no data rows.
         expected: Refused.
         msg: [The file has no data rows, BULK_FILE_EMPTY]
-        auto: BulkServiceIT#rejectsWrongTemplatesTypesAndPermissions
       - c: 2
         type: Negative
         title: Wrong file type
@@ -987,14 +923,12 @@ frs:
           - Upload a PDF.
         expected: Refused.
         msg: ["Upload an Excel (.xlsx), OpenDocument (.ods), CSV (.csv) or text (.txt) file", BULK_FILE_TYPE]
-        auto: BulkServiceIT#rejectsWrongTemplatesTypesAndPermissions
       - c: 3
         type: Positive
         title: Template round trip
         steps:
           - Download the template (xlsx) and the ODS version; fill two rows; upload each.
         expected: Both files are accepted.
-        auto: BulkServiceIT#templateRoundTripsAsXlsxAndOdsIsAccepted
       - c: 3
         type: Negative
         title: Same file twice
@@ -1002,16 +936,14 @@ frs:
           - Upload the same committed file again.
         expected: Refused and the earlier job is named.
         msg: ["This file was already uploaded as <job> (<file>)", BULK_DUPLICATE_FILE]
-        auto: BulkExtensionsIT#aFixedWidthFileIsCategorisedReprocessedAndNeverUploadedTwice
       - c: 4
         type: Security-access
         persona: MKT_AO
         title: AO cannot use the booking upload
         steps:
-          - As ao open /bulk/BOOKING_UPLOAD and upload a file.
+          - As ao open the address of the Booking Upload wizard directly in the browser and upload a file.
         expected: Refused.
         msg: ["You are not allowed to use 'Booking upload'", BULK_NOT_PERMITTED]
-        auto: BulkServiceIT#rejectsWrongTemplatesTypesAndPermissions
 
   FR-NB-020:
     scenario: SC-NB-02
@@ -1025,8 +957,8 @@ frs:
         type: Negative
         title: Policy number cannot be edited on the account
         steps:
-          - Open ARN-2026-910002 (POLICY_ISSUED); click Edit; look for the policy number field; send PUT /api/v1/accounts/{id} with a new policy number.
-        expected: The field is read-only on screen; the API ignores or refuses the change and the policy number stays MGIC-FI-2026-004411.
+          - Open ARN-2026-910002 (POLICY_ISSUED); click Edit; look for the policy number field; send a direct request to update the account with a new policy number.
+        expected: The field is read-only on screen; a direct request to change it is ignored or refused and the policy number stays MGIC-FI-2026-004411.
       - c: 1
         type: Positive
         persona: PROCESSOR
@@ -1035,7 +967,6 @@ frs:
         steps:
           - Confirm the e-policy of ARN-2026-910003 in the Extraction Review.
         expected: The account shows the confirmed policy number MGIC-MC-2026-018329.
-        auto: EpolicyIT#aReceivedEpolicyIsMatchedExtractedReviewedAndUpdatesThePolicy
 
   FR-NB-030:
     scenario: SC-NB-03
@@ -1067,15 +998,14 @@ frs:
         steps:
           - Open CL-2026-000003 Pacific Harbor Logistics Inc.; Linked Records tab.
         expected: The CGL01, MOP05, CAR11, EEI01 and INL01 accounts and the CGL01 quotation are listed with their stages.
-        auto: CrmAdminApiIT#seedDataShowsTheClientBannerDuplicatesAndOverdueKyc
       - c: 3
         type: Security-access
         persona: BUSINESS_ADMIN
         screen: API
         title: No client search without CLIENT_VIEW
         steps:
-          - As badmin open the menu and call GET /api/v1/crm/clients.
-        expected: The Clients section is not in the menu; the call returns HTTP 403.
+          - As badmin open the menu and send a direct request to search the clients.
+        expected: The Clients section is not in the menu; a direct request is refused.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-NB-031:
@@ -1095,7 +1025,6 @@ frs:
         steps:
           - New Client; type Individual; last name Dela Cruz, first name Juan Test; save.
         expected: The client is saved with code PR-2026-nnnnnn, status Prospect and the incomplete-information flag.
-        auto: ClientServiceIT#prospectGetsAProspectCodeAndIsNotYetConfirmed; clientForm.test.ts#needs only the type and the name of a prospect
       - c: 2
         type: Negative
         title: TIN without separators
@@ -1103,7 +1032,6 @@ frs:
           - Enter TIN 123456789; save.
         expected: Not saved.
         msg: [Enter the TIN as 000-000-000-000, CLIENT_TIN_FORMAT]
-        auto: ClientRulesTest#reportsEveryBrokenRule
       - c: 2
         type: Negative
         title: Mobile in a wrong format
@@ -1111,7 +1039,6 @@ frs:
           - Enter mobile 9171234567; save.
         expected: Not saved.
         msg: [Enter the mobile number as 09xxxxxxxxx or +639xxxxxxxxx, CLIENT_MOBILE_FORMAT]
-        auto: ClientRulesTest#reportsEveryBrokenRule
       - c: 2
         type: Negative
         title: Invalid e-mail
@@ -1119,7 +1046,6 @@ frs:
           - Enter e-mail juan.test@; save.
         expected: Not saved.
         msg: [Enter a valid e-mail address, CLIENT_EMAIL_FORMAT]
-        auto: ClientRulesTest#reportsEveryBrokenRule
       - c: 2
         type: Boundary
         neg: true
@@ -1128,7 +1054,6 @@ frs:
           - Enter a birth date 17 years and 364 days ago; save. Then exactly 18 years ago; save.
         expected: The first is refused; the second is saved.
         msg: [An individual policyholder must be at least 18 years old, CLIENT_UNDER_AGE]
-        auto: ClientOnboardingIT#validatesFormatsListsAndAge
       - c: 2
         type: Negative
         title: Birth date in the future
@@ -1136,7 +1061,6 @@ frs:
           - Enter tomorrow as birth date; save.
         expected: Not saved.
         msg: [The birth date must be in the past, CLIENT_BIRTH_DATE]
-        auto: ClientRulesTest#reportsEveryBrokenRule
       - c: 3
         type: Negative
         title: Same TIN as an existing client
@@ -1144,7 +1068,6 @@ frs:
           - New corporate client "UAT Trading Corp." with the TIN of CL-2026-000003; save.
         expected: Not saved; the existing code is named.
         msg: ["This client already exists: {CL-2026-000003}", CLIENT_DUPLICATE]
-        auto: CrmAdminApiIT#clientIsCreatedValidatedAndOnboardedOverHttp
       - c: 4
         type: Negative
         title: Corporate without registered name
@@ -1152,7 +1075,6 @@ frs:
           - New Client, type Corporate, no registered name; save.
         expected: Not saved.
         msg: ["Enter the {registered name}", CLIENT_NAME_REQUIRED]
-        auto: ClientServiceIT#validatesListsAndNames
 
   FR-NB-032:
     scenario: SC-NB-03
@@ -1169,21 +1091,19 @@ frs:
         steps:
           - Edit CL-2026-000005; change the street address; save; open History.
         expected: The new address shows on the client page; History has the old and new address with ao and time.
-        auto: CrmAdminApiIT#clientIsCreatedValidatedAndOnboardedOverHttp
       - c: 2
         type: Negative
         title: Edit an inactive client
         steps:
-          - Open PR-2026-000012 (inactive); look for Edit; call PUT /api/v1/crm/clients/{id}.
-        expected: No Edit action; the call is refused.
+          - Open PR-2026-000012 (inactive); look for Edit; send a direct request to update the client.
+        expected: No Edit action; a direct request is refused.
         msg: [An inactive client cannot be changed, CLIENT_INACTIVE]
-        auto: ClientOnboardingIT#prospectIsOnboardedThroughKycVerificationAndConfirmation
       - c: 2
         type: Negative
         screen: API
         title: Change the type of a confirmed client
         steps:
-          - Call PUT /api/v1/crm/clients/{id} for CL-2026-000001 with type CORPORATE.
+          - Send a direct request to change the type of CL-2026-000001 to CORPORATE.
         expected: Refused.
         msg: [The client type of a confirmed client cannot be changed, CLIENT_TYPE_LOCKED]
 
@@ -1204,7 +1124,6 @@ frs:
           - As auditor open the Audit Trail for today.
         expected: Refused with the existing code; the refused attempt is in the audit trail.
         msg: ["This client already exists: {CL-2026-000001}", CLIENT_DUPLICATE]
-        auto: ClientOnboardingIT#hardDuplicatesAreBlockedAndLoggedSoftOnesOnlyWarn
       - c: 1
         type: Negative
         title: Same name written differently
@@ -1212,14 +1131,12 @@ frs:
           - Enter the last name in upper case with an extra space; same first name and birth date; save.
         expected: Refused; keys are compared normalised.
         msg: ["This client already exists: {CL-2026-000001}", CLIENT_DUPLICATE]
-        auto: ClientRulesTest#normalisesDuplicateKeys
       - c: 2
         type: Positive
         title: Same mobile only gives a warning
         steps:
           - New individual Dela Cruz, Juan Test with the mobile of CL-2026-000005; save.
         expected: The client is saved; the page shows the possible-duplicate warning naming CL-2026-000005.
-        auto: ClientOnboardingIT#hardDuplicatesAreBlockedAndLoggedSoftOnesOnlyWarn
 
   FR-NB-034:
     scenario: SC-NB-03
@@ -1239,7 +1156,6 @@ frs:
           - On prospect Dela Cruz, Juan Test upload the KYC form only; click Submit KYC for verification.
         expected: Refused; the valid ID is named.
         msg: ["Upload the mandatory KYC documents before you <step>: {valid ID}", KYC_DOCUMENTS_MISSING]
-        auto: ClientOnboardingIT#prospectIsOnboardedThroughKycVerificationAndConfirmation
       - c: 1
         type: Negative
         title: Submit KYC with incomplete information
@@ -1247,7 +1163,6 @@ frs:
           - Upload all documents; leave the TIN and address blank; submit.
         expected: Refused; the missing fields are listed.
         msg: ["Complete the client information before you <step>: <fields>", CLIENT_INFO_INCOMPLETE]
-        auto: ClientOnboardingIT#incompleteInformationBlocksSubmission
       - c: 2
         type: Negative
         persona: MKT_TL
@@ -1257,7 +1172,6 @@ frs:
           - As mkttl click Verify KYC.
         expected: Refused.
         msg: [The KYC must be verified by a user other than its maker, KYC_FOUR_EYES]
-        auto: ClientOnboardingIT#kycIsVerifiedByAnotherUserThanItsMaker
       - c: 3
         type: Workflow
         title: Verify and confirm the client
@@ -1266,7 +1180,6 @@ frs:
           - As mkttl click Verify KYC.
           - As ao click Confirm client.
         expected: The client moves Prospect, KYC for verification, KYC verified, Confirmed client; it shows the PR and the new CL-2026-nnnnnn codes and the next KYC review date.
-        auto: ClientOnboardingIT#prospectIsOnboardedThroughKycVerificationAndConfirmation
       - c: 3
         type: Negative
         screen: API
@@ -1275,7 +1188,6 @@ frs:
           - Call the confirm action on a prospect in KYC for verification.
         expected: Refused.
         msg: ["Client <code> has no verified KYC", KYC_NOT_VERIFIED]
-        auto: ClientOnboardingIT#prospectIsOnboardedThroughKycVerificationAndConfirmation
       - c: 4
         type: Negative
         screen: QT
@@ -1286,7 +1198,6 @@ frs:
           - Click Create accounts.
         expected: Refused.
         msg: ["Client {PR-2026-000007} is not yet confirmed (onboarding and KYC incomplete)", CLIENT_NOT_CONFIRMED]
-        auto: QuotationIT#prospectMayBeQuotedButNotConvertedAndClientsMayDecline
       - c: 4
         type: Negative
         title: Deactivate without a reason
@@ -1294,7 +1205,6 @@ frs:
           - Click Deactivate on prospect PR-2026-000011 and confirm without a reason.
         expected: Refused.
         msg: ["Select a reason for 'Deactivate'", WORKFLOW_REASON_REQUIRED]
-        auto: ClientOnboardingIT#deactivationNeedsAReason
 
   FR-NB-035:
     scenario: SC-NB-03
@@ -1311,7 +1221,6 @@ frs:
         steps:
           - Bulk client creation and update; upload the CLIENT_CREATE file of TD-NB-11; validate; commit.
         expected: 5 clients are updated, 44 prospects created and the row with the invalid mobile is listed.
-        auto: ClientBulkIT#createsUpdatesByCodeOrKeyAndReportsEveryProblem
       - c: 2
         type: Negative
         title: Invalid mobile in a row
@@ -1319,14 +1228,12 @@ frs:
           - Download the error report of the job.
         expected: The row is listed with the message of the mobile format.
         msg: [Enter the mobile number as 09xxxxxxxxx or +639xxxxxxxxx, CLIENT_MOBILE_FORMAT]
-        auto: ClientBulkIT#createsUpdatesByCodeOrKeyAndReportsEveryProblem
       - c: 2
         type: Negative
         title: Row matching two clients on hard keys
         steps:
           - Upload a row whose TIN is that of one client and whose name and birth date are those of another.
         expected: The row is refused and names both clients; the other rows are committed.
-        auto: ClientBulkIT#createsUpdatesByCodeOrKeyAndReportsEveryProblem
 
   FR-NB-036:
     scenario: SC-NB-03
@@ -1346,14 +1253,12 @@ frs:
         steps:
           - Open ARN-2026-900004 of CL-2026-000003.
         expected: The banner shows "Bill quarterly; send the statement of account to treasury@pacificharbor.example."
-        auto: ClientNotesIT#tagsAndInstructionsShowOnTheBannerAndKeepHistory
       - c: 2
         type: Positive
         title: Remove a tag and see the history
         steps:
           - On CL-2026-000001 remove tag VIP; open the tag history.
         expected: VIP is no longer shown; the history keeps who added and removed it and when.
-        auto: ClientNotesIT#tagsAndInstructionsShowOnTheBannerAndKeepHistory
       - c: 3
         type: Negative
         title: Tag already set
@@ -1361,7 +1266,6 @@ frs:
           - Add tag VIP to CL-2026-000003 (already VIP).
         expected: Refused.
         msg: ["The client is already tagged {VIP}", CLIENT_TAG_EXISTS]
-        auto: ClientNotesIT#tagsAndInstructionsShowOnTheBannerAndKeepHistory
       - c: 3
         type: Negative
         title: Instruction ending before it starts
@@ -1369,7 +1273,6 @@ frs:
           - New instruction type Collection, text, from 01-Nov-2026 to 31-Oct-2026; save.
         expected: Not saved.
         msg: [The end date must not be before the start date, INSTRUCTION_DATES]
-        auto: ClientNotesIT#tagsAndInstructionsShowOnTheBannerAndKeepHistory; instructionRules.test.ts#requires type, text and ordered dates
       - c: 3
         type: Negative
         title: Change an ended instruction
@@ -1393,14 +1296,12 @@ frs:
         steps:
           - Open CL-2026-000001; Linked Records, Quotation and Confirmed Proposals tabs.
         expected: The quotations, accounts and booked invoices of the client are listed, each opening its record.
-        auto: CrmAdminApiIT#seedDataShowsTheClientBannerDuplicatesAndOverdueKyc
       - c: 2
         type: Negative
         title: Client with an overdue KYC review
         steps:
           - Open the seed client whose KYC review date has passed.
         expected: The banner shows "KYC expired" next to the client name.
-        auto: KycReviewIT#overdueKycExpiresIsListedAndReviewedAgain
 
   FR-NB-038:
     scenario: SC-NB-03
@@ -1419,14 +1320,12 @@ frs:
         steps:
           - Run job KYC_REVIEW_DUE; as ao open the bell.
         expected: A notification gives the count of non-bank clients due within 30 days or overdue.
-        auto: KycReviewIT#overdueKycExpiresIsListedAndReviewedAgain
       - c: 2
         type: Report-output
         title: High-risk filter and export
         steps:
           - Open KYC Reviews Due; filter High risk; export to Excel.
         expected: Only high-risk clients are listed; the Excel file has the same rows and the columns of NB-KYC-DUE.
-        auto: CrmAdminApiIT#kycReportRunsAndExports
       - c: 2
         type: Workflow
         persona: MKT_TL
@@ -1435,15 +1334,14 @@ frs:
         steps:
           - Open the overdue client; click Record periodic KYC review; reopen KYC Reviews Due.
         expected: The client has a new review date (36 or 12 months by risk) and leaves the list.
-        auto: KycReviewIT#overdueKycExpiresIsListedAndReviewedAgain
       - c: 2
         type: Security-access
         persona: MKT_AO
         screen: CLIENT
         title: AO cannot record the periodic review
         steps:
-          - As ao open the overdue client and call the review_kyc action.
-        expected: The action is not offered; the call is refused.
+          - As ao open the overdue client and send a direct request for the periodic KYC review.
+        expected: The action is not offered; a direct request is refused.
         msg: ["You are not allowed to 'Record periodic KYC review'", WORKFLOW_ACTION_NOT_PERMITTED]
 
   FR-NB-040:
@@ -1462,7 +1360,6 @@ frs:
         steps:
           - Quotation Requests; Capture Quotation Request; channel E-mail; existing client CL-2026-000001; requested cover "Motor own damage and theft for a new car"; attach the request e-mail; save.
         expected: The request has number REQ-2026-nnnnnn, channel E-mail and is listed under To Quote.
-        auto: QuotationIntakeIT#requestsAreCapturedGivenAProspectQuotedOrClosed
       - c: 1
         type: Upload-download
         screen: BULK
@@ -1470,7 +1367,6 @@ frs:
         steps:
           - Upload a quotation request file with 3 HLS rows.
         expected: Three requests with channel Home Loan System (HLS) are created.
-        auto: QuotationIntakeIT#bulkQuotationsRequestsAndAcceptancesAreProcessedRowByRow
       - c: 2
         type: Negative
         title: Same HLS reference twice
@@ -1478,7 +1374,6 @@ frs:
           - Capture a request with channel HLS and a source reference already loaded.
         expected: Refused.
         msg: ["Request {HLS-778812} of {HLS} was already received", QUOTATION_REQUEST_DUPLICATE]
-        auto: QuotationIntakeIT#requestsAreCapturedGivenAProspectQuotedOrClosed
       - c: 3
         type: Negative
         title: Request without client or prospect name
@@ -1486,7 +1381,6 @@ frs:
           - Capture a request with neither client nor prospect name.
         expected: Refused.
         msg: ["Give the client code or the prospect's name", QUOTATION_REQUEST_CLIENT]
-        auto: quotationForm.test.ts#needs a client or prospect and the cover
       - c: 3
         type: Negative
         title: Close without reason, then act on a closed request
@@ -1494,7 +1388,6 @@ frs:
           - Close a request without a reason; then close it with reason; then click Create prospect on it.
         expected: The first close is refused; after closing, further actions are refused.
         msg: ["Request <number> is already <status>", QUOTATION_REQUEST_CLOSED]
-        auto: QuotationIntakeIT#requestsAreCapturedGivenAProspectQuotedOrClosed
 
   FR-NB-041:
     scenario: SC-NB-04
@@ -1512,14 +1405,12 @@ frs:
         steps:
           - New Quotation; client CL-2026-000001; product MTR10; insurer INS-MGIC branch Makati; one vehicle of PHP 1,100,000; save.
         expected: QT-2026-nnnnnn, ARN-2026-nnnnnn and version 1 are shown; the premium breakdown is computed; valid until is today + 30 days.
-        auto: QuotationIT#createdQuotationHasNumbersPremiumTemplateVersionAndWorkCase
       - c: 1
         type: Positive
         title: Quotation for a prospect
         steps:
           - New Quotation for prospect PR-2026-000009; save.
         expected: Saved; the incomplete-client flag is shown.
-        auto: QuotationIT#prospectMayBeQuotedButNotConvertedAndClientsMayDecline
       - c: 2
         type: Negative
         title: Item without sum insured
@@ -1534,7 +1425,6 @@ frs:
           - Save a quotation with no risk item; submit.
         expected: Refused.
         msg: [Add at least one risk item, QUOTATION_NO_ITEMS]
-        auto: QuotationIT#submissionNeedsItemsAndAPremium
       - c: 2
         type: Negative
         title: Validity in the past
@@ -1547,10 +1437,9 @@ frs:
         screen: API
         title: Change the product after save
         steps:
-          - Call PUT /api/v1/quotations/{id} with product MTR15.
+          - Send a direct request to change the product of the quotation to MTR15.
         expected: Refused; on screen the product is read-only after save.
         msg: [The product of a quotation cannot change, QUOTATION_PRODUCT_FIXED]
-        auto: QuotationIT#approvalIsFourEyesAndARevisionOpensANewVersionWithADiff
       - c: 3
         type: Negative
         title: Quotation without product
@@ -1558,7 +1447,6 @@ frs:
           - New Quotation with a client and no product; save.
         expected: Refused.
         msg: [Select the client and the product, QUOTATION_INCOMPLETE]
-        auto: QuotationIT#submissionNeedsItemsAndAPremium
 
   FR-NB-042:
     scenario: SC-NB-04
@@ -1576,22 +1464,19 @@ frs:
         steps:
           - Open QT-2026-900004 (SENT_TO_CLIENT); click Revise (new version); change the sum insured; save.
         expected: Version 2 is a draft; version 1 is listed read only on the Versions tab.
-        auto: QuotationIT#approvalIsFourEyesAndARevisionOpensANewVersionWithADiff
       - c: 2
         type: Report-output
         title: Compare versions 1 and 2
         steps:
           - Versions tab; Compare versions 1 and 2.
         expected: The sum insured change and the premium difference are shown.
-        auto: QuotationDiffTest#reportsChangedTermsItemsAndPremiumDelta
       - c: 3
         type: Negative
         title: Edit a quotation in review
         steps:
-          - Open QT-2026-900002 (FOR_REVIEW); click Edit or call PUT.
+          - Open QT-2026-900002 (FOR_REVIEW); click Edit or send a direct request to update it.
         expected: Refused.
         msg: ["Quotation QT-2026-900002 is {FOR_REVIEW}", QUOTATION_NOT_EDITABLE]
-        auto: QuotationIT#prospectMayBeQuotedButNotConvertedAndClientsMayDecline
       - c: 3
         type: Negative
         screen: API
@@ -1617,9 +1502,8 @@ frs:
         title: Maker approves
         pre: ao is the maker of QT-2026-900002.
         steps:
-          - As ao call the approve endpoint of QT-2026-900002.
+          - As ao send a direct request to approve QT-2026-900002.
         expected: Refused (ao has no QUOTE_APPROVE; the button is not shown).
-        auto: QuotationProposalApiIT#quotationIsCreatedPricedAndSubmittedOverHttp
       - c: 2
         type: Workflow
         title: TL approves the quotation
@@ -1627,7 +1511,6 @@ frs:
           - As mkttl open QT-2026-900002 from the For Review tab; click Approve.
           - Look for Edit on the approved quotation.
         expected: The quotation is APPROVED; Edit is not offered, only Revise (new version).
-        auto: QuotationIT#approvalIsFourEyesAndARevisionOpensANewVersionWithADiff
       - c: 3
         type: Workflow
         title: Return to maker with a reason
@@ -1658,7 +1541,6 @@ frs:
         steps:
           - Quotations, Approved tab; tick the three; click Send via Email; enter a password hint.
         expected: Two e-mails and two password e-mails are logged; the three quotations are SENT_TO_CLIENT.
-        auto: QuotationIT#batchSendGroupsApprovedQuotationsByClientAndRefusesOthers
       - c: 2
         type: Negative
         title: Draft quotation in the batch
@@ -1666,16 +1548,14 @@ frs:
           - Tick QT-2026-900003 and QT-2026-900001 (DRAFT); click Send via Email.
         expected: Nothing is sent; the problem of QT-2026-900001 is listed.
         msg: ["Cannot send: <problems>", QUOTATION_BATCH_INVALID]
-        auto: QuotationIT#batchSendGroupsApprovedQuotationsByClientAndRefusesOthers
       - c: 2
         type: Negative
         screen: API
         title: Empty selection
         steps:
-          - Call POST /api/v1/quotations/batch-send with an empty list.
+          - Send a direct request to send quotations with an empty selection.
         expected: Refused.
         msg: [Select the quotations to send, QUOTATION_BATCH_EMPTY]
-        auto: QuotationIT#batchSendGroupsApprovedQuotationsByClientAndRefusesOthers
 
   FR-NB-045:
     scenario: SC-NB-04
@@ -1695,7 +1575,6 @@ frs:
           - Attach the client acceptance e-mail; Record acceptance with group 1.
           - Click Create accounts.
         expected: One account is created with the quotation's ARN; the quotation is CONVERTED.
-        auto: QuotationIT#approvedQuotationIsSentProtectedAcceptedAndConvertedIntoAccountsPerGroup
       - c: 2
         type: Negative
         title: Acceptance without the e-mail
@@ -1703,7 +1582,6 @@ frs:
           - Record acceptance on QT-2026-900004 without the acceptance e-mail.
         expected: Refused.
         msg: ["Attach the client's acceptance e-mail (document type Client acceptance e-mail) first", ACCEPTANCE_EMAIL_REQUIRED]
-        auto: QuotationIT#approvedQuotationIsSentProtectedAcceptedAndConvertedIntoAccountsPerGroup
       - c: 2
         type: Negative
         title: Unknown risk group
@@ -1711,7 +1589,6 @@ frs:
           - Record acceptance with group 3 on a quotation offering groups 1 and 2.
         expected: Refused.
         msg: ["The quotation offers risk groups {1, 2} only", ACCEPTANCE_GROUP_UNKNOWN]
-        auto: QuotationIT#approvedQuotationIsSentProtectedAcceptedAndConvertedIntoAccountsPerGroup
       - c: 2
         type: Negative
         screen: API
@@ -1728,7 +1605,6 @@ frs:
         steps:
           - Bulk Quotation Acceptance; upload 20 ARNs with createAccounts on (two belong to prospects).
         expected: Accounts are created for the 18 confirmed clients; the 2 prospect rows fail with CLIENT_NOT_CONFIRMED.
-        auto: QuotationIntakeIT#bulkQuotationsRequestsAndAcceptancesAreProcessedRowByRow
 
   FR-NB-046:
     scenario: SC-NB-04
@@ -1745,14 +1621,12 @@ frs:
         steps:
           - Bulk Quotations; product PAR01; upload the 30-row file; validate; commit.
         expected: 30 quotations, each with its own QT number and ARN.
-        auto: QuotationIntakeIT#bulkQuotationsRequestsAndAcceptancesAreProcessedRowByRow
       - c: 1
         type: Positive
         title: New name creates a prospect
         steps:
           - Include a row with prospect name "Tan, Grace Test" and no client code.
         expected: A prospect and its quotation are created.
-        auto: QuotationIntakeIT#bulkQuotationsRequestsAndAcceptancesAreProcessedRowByRow
       - c: 2
         type: Negative
         title: Upload without product
@@ -1783,7 +1657,6 @@ frs:
         steps:
           - Open QT-2026-900006; follow its account; open the account's slip and invoice (or a booked seed account and its quotation).
         expected: The same ARN is shown on the quotation, account, placement slip and invoice.
-        auto: AccountIT#arnFromAQuotationIsKeptAndPremiumTaken
       - c: 1
         type: Report-output
         screen: NBREP
@@ -1791,25 +1664,22 @@ frs:
         steps:
           - Run the Placement Update Report and the Booked Accounts Register for one ARN.
         expected: Each report shows only that account.
-        auto: NbReportsIT#theIndividualPlacementUpdateCoversOneAccount
       - c: 2
         type: Negative
         screen: API
         title: Account with a malformed ARN
         steps:
-          - Call POST /api/v1/accounts with ARN "ARN-26-1".
+          - Send a direct request to create an account with ARN "ARN-26-1".
         expected: Refused.
         msg: [The ARN must read ARN-yyyy-nnnnnn (or ARN-yyyy-nnnnnn-nn), ARN_INVALID]
-        auto: AccountIT#arnFromAQuotationIsKeptAndPremiumTaken
       - c: 2
         type: Negative
         screen: API
         title: ARN already used
         steps:
-          - Call POST /api/v1/accounts with ARN ARN-2026-900001.
+          - Send a direct request to create an account with ARN ARN-2026-900001.
         expected: Refused.
         msg: ["An account already has ARN ARN-2026-900001", ARN_IN_USE]
-        auto: AccountIT#arnFromAQuotationIsKeptAndPremiumTaken
 
   FR-NB-050:
     scenario: SC-NB-05
@@ -1827,7 +1697,6 @@ frs:
         steps:
           - New Proposal Request; client CL-2026-000004; product CAR00; period one year; risk sections; save.
         expected: PRF-2026-nnnnnn and an ARN are shown; the PRF number is not an input on any screen.
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts; QuotationProposalApiIT#proposalIsCreatedAndWalkedToTsuOverHttp
       - c: 2
         type: Negative
         title: Submit without the mandatory documents
@@ -1835,7 +1704,6 @@ frs:
           - Click Submit for approval without the documents of the product.
         expected: Refused and the missing types are named.
         msg: ["Attach the mandatory documents: <types>", MISSING_DOCUMENTS]
-        auto: ProposalIT#packageRisksNeedDocumentsAndATsuReasonAndVoidedPrfsAreRetentionCandidates
       - c: 2
         type: Negative
         title: Submit without risk description
@@ -1850,13 +1718,12 @@ frs:
           - Set period from 01-Dec-2026 to 30-Nov-2026; save.
         expected: Not saved.
         msg: [The period end must be after the period start, PRF_PERIOD_INVALID]
-        auto: proposalForm.test.ts#needs the client and product and an ordered period
       - c: 3
         type: Negative
         screen: API
         title: Change the product of a saved PRF
         steps:
-          - Call PUT /api/v1/proposals/{id} with product EEI01.
+          - Send a direct request to change the product of the PRF to EEI01.
         expected: Refused.
         msg: [The product of a PRF cannot change, PRF_PRODUCT_FIXED]
       - c: 3
@@ -1864,10 +1731,9 @@ frs:
         data: [TD-NB-05]
         title: Marketing edits a PRF in the TSU queue
         steps:
-          - As ao call PUT on PRF-2026-900003 (WITH_TSU).
+          - As ao send a direct request to update PRF-2026-900003 (WITH_TSU).
         expected: Refused.
         msg: ["PRF PRF-2026-900003 cannot be changed while {WITH_TSU}", PRF_NOT_EDITABLE]
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts
 
   FR-NB-051:
     scenario: SC-NB-05
@@ -1883,10 +1749,9 @@ frs:
         persona: MKT_AO
         title: Submitter cannot approve
         steps:
-          - As ao open PRF-2026-900002 and call the approve endpoint.
-        expected: No approve button; the call returns HTTP 403 (no PROPOSAL_APPROVE).
+          - As ao open PRF-2026-900002 and send a direct request to approve it.
+        expected: No approve button; a direct request is refused (no PROPOSAL_APPROVE).
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
-        auto: QuotationProposalApiIT#proposalIsCreatedAndWalkedToTsuOverHttp
       - c: 2
         type: Workflow
         title: TL approves and sends to TSU
@@ -1894,7 +1759,6 @@ frs:
           - As mkttl open PRF-2026-900002; click Approve and send to TSU.
           - As tsu open the TSU Workbench.
         expected: The PRF is WITH_TSU and listed in the Received tile.
-        auto: QuotationProposalApiIT#proposalIsCreatedAndWalkedToTsuOverHttp
       - c: 2
         type: Negative
         title: Return without a reason
@@ -1919,7 +1783,6 @@ frs:
         steps:
           - As tsu open the TSU Workbench; filter stage Received by TSU; search PRF-2026-900003.
         expected: PRF-2026-900003 is listed with client, product and stage age.
-        auto: proposalForm.test.ts#covers every tab and filters by stage
       - c: 2
         type: Workflow
         title: Return to Marketing
@@ -1940,7 +1803,6 @@ frs:
         steps:
           - Click Accept and prepare quotation slip; edit a risk section; save.
         expected: The PRF is in QS_PREPARATION and the change is saved with tsu in the history.
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts
       - c: 3
         type: Negative
         screen: API
@@ -1967,14 +1829,12 @@ frs:
           - As tsu select INS-MGIC and INS-LAC; Submit quotation slip; then click Approve and send to insurers.
         expected: The slip gets QS-2026-nnnnnn; tsu's approval is refused.
         msg: [The quotation slip is approved by another TSU officer, QS_FOUR_EYES]
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts
       - c: 2
         type: Workflow
         title: Second officer approves and the slip is sent
         steps:
           - As tsulead click Approve and send to insurers; open the E-mails tab.
         expected: One protected QS e-mail and one password e-mail per insurer; reply by = send date + 5 days; the PRF is QS_SENT.
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts
       - c: 3
         type: Negative
         title: Slip without insurer
@@ -1996,7 +1856,7 @@ frs:
         screen: API
         title: Change insurers after submission
         steps:
-          - Call PUT /api/v1/proposals/{id}/insurers on a slip for approval.
+          - Send a direct request to change the insurers of a slip for approval.
         expected: Refused.
         msg: [Insurers are selected before the quotation slip is submitted, QS_CLOSED]
 
@@ -2017,14 +1877,12 @@ frs:
           - On a PRF in QS_SENT key INS-MGIC Terms received, premium 185,000; INS-LAC Terms received, premium 172,500; INS-VMI Declined.
           - Click Insurer terms complete.
         expected: The PRF is TERMS_RECEIVED; the comparative table lists INS-LAC and INS-MGIC offers, then INS-VMI declined.
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts
       - c: 2
         type: Positive
         title: Premium correction in the history
         steps:
           - Change the INS-MGIC premium to 180,000; open the response history.
         expected: Both premiums with user and time.
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts
       - c: 3
         type: Negative
         title: Terms without premium
@@ -2032,7 +1890,6 @@ frs:
           - Response Terms received with no premium; save.
         expected: Refused.
         msg: ["Enter the premium quoted by <insurer>", RESPONSE_PREMIUM_REQUIRED]
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts
       - c: 3
         type: Negative
         title: Complete with a pending insurer
@@ -2040,7 +1897,6 @@ frs:
           - Leave INS-VMI pending; click Insurer terms complete.
         expected: Refused.
         msg: ["{1} insurer(s) have not answered: close the request to proceed", TERMS_PENDING]
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts
       - c: 3
         type: Negative
         title: Recommend a declined response
@@ -2064,30 +1920,26 @@ frs:
         steps:
           - Open PRF-2026-900004, Comparative Table tab.
         expected: The two insurers with terms come first by premium ascending with the lowest flagged; the declined insurer follows.
-        auto: ComparativeTableTest#receivedTermsComeFirstCheapestFirstWithLowestAndRecommendedFlags
       - c: 1
         type: Positive
         title: Table follows a premium change
         steps:
           - Lower the premium of the second insurer below the first; reopen the tab.
         expected: The order and the lowest-premium flag change without any manual step.
-        auto: ComparativeTableTest#receivedTermsComeFirstCheapestFirstWithLowestAndRecommendedFlags
       - c: 2
         type: Upload-download
         title: Excel and PDF exports
         steps:
           - Download comparative.xlsx and comparative.pdf.
         expected: Both files contain the same rows and values as the screen.
-        auto: QuotationProposalApiIT#seedProposalReadsAndTsuEndpoints
       - c: 2
         type: Security-access
         persona: MKT_AO
         title: Marketing cannot change responses
         steps:
-          - As ao open PRF-2026-900004; call PUT on a response.
-        expected: The table is shown read only; the call returns HTTP 403.
+          - As ao open PRF-2026-900004; send a direct request to change a response.
+        expected: The table is shown read only; a direct request to change it is refused.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
-        auto: QuotationProposalApiIT#seedProposalReadsAndTsuEndpoints
 
   FR-NB-056:
     scenario: SC-NB-05
@@ -2106,14 +1958,12 @@ frs:
           - On PRF-2026-900004 as tsu choose INS-LAC; Submit proposal slip; click Approve and release to Marketing.
         expected: Refused; the PRF stays PS_FOR_APPROVAL.
         msg: [The proposal slip is approved by another TSU officer, PS_FOUR_EYES]
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts
       - c: 1
         type: Workflow
         title: Second officer releases to Marketing
         steps:
           - As tsulead click Approve and release to Marketing.
         expected: The PRF is PS_RELEASED; the proposal slip PS-2026-nnnnnn is available to ao.
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts
       - c: 2
         type: Workflow
         title: Return and resubmit keeps both versions
@@ -2151,7 +2001,6 @@ frs:
           - On the released PRF click Send to client; attach the acceptance e-mail; Record acceptance; Create accounts.
           - Open the client page, Confirmed Proposals tab.
         expected: The account has the chosen insurer, the quoted premium and the PRF's ARN; the PRF is listed under Confirmed Proposals.
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts
       - c: 2
         type: Negative
         title: Acceptance without the e-mail
@@ -2159,7 +2008,6 @@ frs:
           - Record acceptance without the acceptance e-mail.
         expected: Refused.
         msg: ["Attach the client's acceptance e-mail first", ACCEPTANCE_EMAIL_REQUIRED]
-        auto: ProposalIT#aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts
       - c: 2
         type: Negative
         screen: API
@@ -2206,7 +2054,6 @@ frs:
         steps:
           - As ao click the quick filter Returned to me.
         expected: ARN-2026-900004 and ARN-2026-900013 (RETURNED_TO_MARKETING) are listed with the return reason.
-        auto: AccountIT#processingReturnsAndMarketingResubmits
       - c: 2
         type: Negative
         title: Voided account hidden by default
@@ -2219,8 +2066,8 @@ frs:
         screen: API
         title: No account search without ACCOUNT_VIEW
         steps:
-          - As badmin call GET /api/v1/accounts.
-        expected: HTTP 403; the Accounts & Placement section is not in badmin's menu.
+          - As badmin send a direct request to search the accounts.
+        expected: The request is refused; the Accounts & Placement section is not in badmin's menu.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-NB-061:
@@ -2239,7 +2086,6 @@ frs:
         steps:
           - New Account for CL-2026-000001; product PAR01; segment CBG; insurer INS-MGIC Makati branch; PN numbers PN-7001 and PN-7002; three insured items (building, contents, improvements); save.
         expected: The account gets ARN-2026-nnnnnn, status Draft and the premium breakdown; both PN numbers are shown.
-        auto: AccountIT#createdAccountGetsArnPremiumSalesUnitContactAndWorkCase
       - c: 2
         type: Positive
         title: Autosaved draft
@@ -2247,7 +2093,6 @@ frs:
           - Start a new account; enter client, product and one item; wait 40 seconds; close the tab.
           - Open Accounts, My drafts.
         expected: The draft is listed with the values last typed.
-        auto: useAutosave.test.ts#saves changed drafts on the interval only
       - c: 3
         type: Negative
         title: Plate number on a live account
@@ -2255,7 +2100,6 @@ frs:
           - New Account on MTR15 with plate NAB1234 (insured under ARN-2026-900001); save.
         expected: Refused; the message names ARN-2026-900001.
         msg: ["Duplicate of existing account {ARN-2026-900001}: <findings>", DUPLICATE_ACCOUNT]
-        auto: AccountRulesIT#motorDuplicatesAreRejectedExceptCtplAgainstComprehensive; accountForm.test.ts#names the existing accounts of a duplicate rejection
       - c: 3
         type: Negative
         title: Account without client
@@ -2263,7 +2107,6 @@ frs:
           - New Account with product but no client; save.
         expected: Refused.
         msg: [Select the client, ACCOUNT_CLIENT_REQUIRED]
-        auto: AccountRulesIT#draftRulesComeFromTheProduct
       - c: 3
         type: Boundary
         neg: true
@@ -2289,28 +2132,24 @@ frs:
         steps:
           - Premium Calculator; product PAR01; insurer INS-MGIC branch; one item TSI 1,000,000 at 0.25 %; compute.
         expected: Net premium 2,500.00, DST 312.50, premium tax 300.00, FST 50.00 plus the branch LGT; the total equals the sum.
-        auto: PremiumCalculatorTest#netChargesGrossAndCommissionAsInAppendixA
       - c: 1
         type: Boundary
         title: DST rounding to the half peso
         steps:
           - Compute a premium whose DST is 101.20.
         expected: DST shows 101.50.
-        auto: PremiumCalculatorTest#dstOfAnOddNetPremiumRoundsUpToTheHalfPeso
       - c: 2
         type: Positive
         title: Pro-rata period of 180 days
         steps:
           - Rating basis Pro-rata; period of 180 days; compute.
         expected: The net premium is 180/365 of the annual premium; the minimum premium is not applied.
-        auto: PremiumCalculatorTest#proRataUsesDaysOverThreeSixtyFive
       - c: 2
         type: Positive
         title: Short-period rate
         steps:
           - Rating basis Short period; period of 3 months; compute.
         expected: The premium is the table percentage for 3 months of the annual premium.
-        auto: PremiumCalculatorTest#shortPeriodAppliesTheTablePercentage
       - c: 3
         type: Negative
         title: Negative sum insured
@@ -2318,7 +2157,6 @@ frs:
           - Item TSI -1; compute.
         expected: Refused.
         msg: [Enter a sum insured of zero or more for every item, RATING_SUM_INSURED_INVALID]
-        auto: PremiumCalculatorTest#itemsAreRequiredAndSumsInsuredCannotBeNegative
       - c: 3
         type: Negative
         title: No item to rate
@@ -2326,7 +2164,6 @@ frs:
           - Compute with no item.
         expected: Refused.
         msg: [Enter at least one item to rate, RATING_NO_ITEMS]
-        auto: PremiumCalculatorTest#itemsAreRequiredAndSumsInsuredCannotBeNegative
       - c: 3
         type: Negative
         title: Rate missing on a product without default rate
@@ -2351,14 +2188,12 @@ frs:
           - New MTR15 account with chassis MHFAB8EM0K1234567 (ARN-2026-900001); save.
         expected: Refused; ARN-2026-900001 and the chassis number are named.
         msg: ["Duplicate of existing account {ARN-2026-900001}: <identifier> <value> (item <n>)", DUPLICATE_ACCOUNT]
-        auto: AccountRulesIT#motorDuplicatesAreRejectedExceptCtplAgainstComprehensive
       - c: 1
         type: Positive
         title: CTPL for a vehicle insured under a Motor package
         steps:
           - New CTP01 account for the vehicle of ARN-2026-900001; save.
         expected: Saved; the CTPL exception applies.
-        auto: AccountRulesIT#motorDuplicatesAreRejectedExceptCtplAgainstComprehensive
       - c: 2
         type: Negative
         title: Same Fire location and items
@@ -2366,7 +2201,6 @@ frs:
           - New PAR01 account for CL-2026-000001 at 22 Acacia Lane, Ayala Alabang, Muntinlupa with the items of ARN-2026-900003; save.
         expected: Refused; ARN-2026-900003 is named.
         msg: ["Duplicate of existing account {ARN-2026-900003}: <findings>", DUPLICATE_ACCOUNT]
-        auto: AccountRulesIT#fireDuplicatesNeedTheSameClientLocationAndItem
       - c: 2
         type: Positive
         title: Vehicle of a voided account
@@ -2388,17 +2222,15 @@ frs:
         type: Negative
         title: Marketing edits a submitted account
         steps:
-          - As ao open ARN-2026-900002 (SUBMITTED); click Edit or call PUT.
+          - As ao open ARN-2026-900002 (SUBMITTED); click Edit or send a direct request to update it.
         expected: Refused.
         msg: ["Account ARN-2026-900002 is {SUBMITTED}", ACCOUNT_NOT_EDITABLE]
-        auto: AccountIT#submitNeedsMinimumFieldsDocumentsAndPremiumThenProcessingValidates
       - c: 2
         type: Workflow
         title: Submit a complete account
         steps:
           - Complete draft ARN-2026-900001 with the IDF; click Submit to Processing.
         expected: The account is SUBMITTED and in the Processing queue.
-        auto: AccountIT#submitNeedsMinimumFieldsDocumentsAndPremiumThenProcessingValidates
       - c: 2
         type: Negative
         title: Submit without a rated premium
@@ -2415,7 +2247,6 @@ frs:
           - As proc click Validate.
         expected: Refused.
         msg: ["Client {PR-2026-000010} is not yet confirmed (onboarding and KYC incomplete)", CLIENT_NOT_CONFIRMED]
-        auto: AccountIT#validationNeedsAConfirmedClientAndTsuClearance
       - c: 3
         type: Workflow
         persona: PROCESSOR
@@ -2423,7 +2254,6 @@ frs:
         steps:
           - As proc open ARN-2026-900002; correct the plate number; save; click Validate.
         expected: The account is AWAITING_PAYMENT; the history shows the plate change by proc.
-        auto: AccountIT#submitNeedsMinimumFieldsDocumentsAndPremiumThenProcessingValidates
 
   FR-NB-065:
     scenario: SC-NB-06
@@ -2440,14 +2270,12 @@ frs:
         steps:
           - Bulk Account Creation; product PAR01; upload the ACCOUNT_CREATE file; validate; commit.
         expected: 197 drafts are created; the 3 duplicates are listed with the existing ARN.
-        auto: AccountBulkIT#accountsAreCreatedForExistingClientsAndNewProspects
       - c: 1
         type: Upload-download
         title: Upload with submit
         steps:
           - Repeat with the parameter submit on for a product whose documents are not mandatory.
         expected: The created accounts are SUBMITTED.
-        auto: AccountBulkIT#accountsAreSubmittedDirectlyWhenNoDocumentIsMandatory
       - c: 2
         type: Negative
         data: [TD-NB-07]
@@ -2456,7 +2284,6 @@ frs:
           - ACCOUNT_UPDATE row for ARN-2026-910001 (PLACED).
         expected: The row is refused.
         msg: ["Account ARN-2026-910001 is {PLACED}", ACCOUNT_NOT_EDITABLE]
-        auto: AccountBulkIT#draftsAreUpdatedAndSubmittedByUploadAndFfyIsTaggedBySerialNumber
       - c: 2
         type: Negative
         title: Row without client
@@ -2487,7 +2314,6 @@ frs:
         steps:
           - New Account for CL-2026-000005; leave the contact step blank; save.
         expected: The account contact shows the client's e-mail and mobile.
-        auto: accountForm.test.ts#defaults segment and contact from the chosen client without overwriting
       - c: 1
         type: Positive
         persona: EPOLICY_SENDER
@@ -2497,7 +2323,6 @@ frs:
         steps:
           - Open the dispatch draft of its e-policy.
         expected: The recipient is the account contact e-mail.
-        auto: AccountIT#createdAccountGetsArnPremiumSalesUnitContactAndWorkCase
       - c: 2
         type: Negative
         title: Invalid contact e-mail
@@ -2522,7 +2347,6 @@ frs:
           - As proc open ARN-2026-900003; click Return to Marketing; reason Missing supporting documents; confirm.
           - As ao open Returned to me.
         expected: The account is RETURNED_TO_MARKETING with the reason; ao sees it in Returned to me.
-        auto: AccountIT#processingReturnsAndMarketingResubmits
       - c: 1
         type: Negative
         title: Return without a reason
@@ -2537,7 +2361,6 @@ frs:
         steps:
           - As ao correct ARN-2026-900004; click Resubmit to Processing.
         expected: The account is SUBMITTED and in the Processing queue.
-        auto: AccountIT#processingReturnsAndMarketingResubmits
       - c: 2
         type: Negative
         persona: MKT_AO
@@ -2564,14 +2387,12 @@ frs:
         steps:
           - Account page, Tags card; Free First Year from 01-Mar-2026; save; open the FFY Register.
         expected: The register shows start 01-Mar-2026 and end 28-Feb-2027.
-        auto: AccountRulesIT#freeFirstYearIsTaggedAndCancelledWithAudit
       - c: 1
         type: Workflow
         title: Cancel the FFY tag
         steps:
           - Cancel FFY with reason Tagged in error.
         expected: The register keeps the dates and shows Cancelled with the reason.
-        auto: AccountRulesIT#freeFirstYearIsTaggedAndCancelledWithAudit
       - c: 2
         type: Negative
         title: Cancel FFY of an untagged account
@@ -2579,7 +2400,6 @@ frs:
           - Call the FFY cancel on an account without FFY.
         expected: Refused.
         msg: ["Account <ARN> is not tagged Free First Year", FFY_NOT_TAGGED]
-        auto: AccountRulesIT#freeFirstYearIsTaggedAndCancelledWithAudit
       - c: 3
         type: Negative
         screen: BULK
@@ -2588,7 +2408,6 @@ frs:
           - FFY tagging upload with a TAG row whose engine number is on two live accounts.
         expected: The row is refused and both ARNs are named.
         msg: ["Several accounts insure vehicle <id>: <ARNs>", FFY_VEHICLE_NOT_UNIQUE]
-        auto: AccountBulkIT#draftsAreUpdatedAndSubmittedByUploadAndFfyIsTaggedBySerialNumber
       - c: 3
         type: Negative
         screen: BULK
@@ -2614,7 +2433,6 @@ frs:
         steps:
           - Submit; as proc validate.
         expected: The account moves to READY_FOR_PLACEMENT with no payment step.
-        auto: AccountIT#directPaymentAccountsSkipThePaymentGate
       - c: 1
         type: Positive
         persona: PROCESSOR
@@ -2623,16 +2441,14 @@ frs:
         steps:
           - Book the account; open the invoice.
         expected: The journal holds only the commission receivable; there is no client premium receivable.
-        auto: BookingServiceIT#directPaymentBooksOnlyTheCommissionReceivable
       - c: 2
         type: Negative
         screen: API
         title: Change the arrangement after the gate
         steps:
-          - Call PUT /api/v1/accounts/{id}/payment-arrangement on an account in READY_FOR_PLACEMENT.
+          - Send a direct request to change the payment arrangement of an account in READY_FOR_PLACEMENT.
         expected: Refused.
         msg: ["The payment gate of <ARN> is passed", PAYMENT_ARRANGEMENT_LOCKED]
-        auto: AccountIT#directPaymentAccountsSkipThePaymentGate
       - c: 2
         type: Negative
         persona: PROCESSOR
@@ -2642,7 +2458,6 @@ frs:
           - On ARN-2026-900005 (AWAITING_PAYMENT, not direct payment) click Direct payment on the gate panel.
         expected: Refused.
         msg: ["Account ARN-2026-900005 is not paid directly to the insurer", GATE_NOT_DIRECT_PAYMENT]
-        auto: PaymentGateIT#otherLinesOpenOnARecordedClientConfirmation
 
   FR-NB-080:
     scenario: SC-NB-07
@@ -2660,7 +2475,6 @@ frs:
         steps:
           - For Placement tab; tick ARN-2026-900006, 900007, 900010 and 900014 (two insurer branches); click Generate Placement Slips.
         expected: Two slips PL-2026-nnnnnn are generated, one per branch, each listing its accounts; PDF and Excel files download.
-        auto: PlacementSlipIT#slipsNeedEveryPrerequisiteAndGroupAccountsByInsurerBranch
       - c: 2
         type: Negative
         title: Account awaiting payment on a slip
@@ -2668,16 +2482,14 @@ frs:
           - Select ARN-2026-900005 (AWAITING_PAYMENT) and generate.
         expected: No slip is generated; the dialog names the payment problem of the account.
         msg: ["Placement prerequisites not met - <ARN>: <problem> | ...", SLIP_PREREQUISITES_UNMET]
-        auto: PlacementSlipIT#slipsNeedEveryPrerequisiteAndGroupAccountsByInsurerBranch
       - c: 2
         type: Negative
         screen: API
         title: Generate with nothing selected
         steps:
-          - Call POST /api/v1/placement/slips/generate with no ARN.
+          - Send a direct request to generate placement slips with no ARN.
         expected: Refused.
         msg: [Select the accounts to place, SLIP_NO_ACCOUNTS]
-        auto: PlacementSlipIT#slipsNeedEveryPrerequisiteAndGroupAccountsByInsurerBranch
       - c: 3
         type: Workflow
         screen: SLIPS
@@ -2685,7 +2497,6 @@ frs:
         steps:
           - Resubmit ARN-2026-910008 (returned by insurer); regenerate its slip.
         expected: Version 2 of the slip is generated; version 1 shows SUPERSEDED.
-        auto: PlacementSlipIT#anInsurerReturnIsResubmittedWithANewSlipVersion
       - c: 3
         type: Negative
         screen: SLIPS
@@ -2694,7 +2505,6 @@ frs:
           - Click Regenerate on version 1.
         expected: Refused.
         msg: ["Slip <number> was already replaced", SLIP_SUPERSEDED]
-        auto: PlacementSlipIT#anInsurerReturnIsResubmittedWithANewSlipVersion
 
   FR-NB-081:
     scenario: SC-NB-07
@@ -2711,7 +2521,6 @@ frs:
         steps:
           - Open a generated slip of TC-NB-080.1-01; click Send.
         expected: The slip is SENT; its accounts are PLACED with the slip reference and date; the e-mail is logged.
-        auto: PlacementIssuanceActionsApiIT#gateBillingAndPlacementActions
       - c: 2
         type: Workflow
         persona: BUSINESS_ADMIN
@@ -2721,7 +2530,6 @@ frs:
         steps:
           - Send a slip; open Outbound Messages; resend after correcting.
         expected: The first send shows FAILED with the reason; the resend is logged as sent.
-        auto: MessagingIT#failedDeliveriesAreRetriedThenMarkedFailedAndCanBeResent
       - c: 2
         type: Negative
         persona: SYSADMIN
@@ -2730,7 +2538,6 @@ frs:
           - Set the placement channel of an insurer branch to SFTP; save.
         expected: Refused; only e-mail is available.
         msg: ["Only e-mail placement is available; SFTP and API channels await BDOI (Q06)", PLACEMENT_CHANNEL_PARKED]
-        auto: CatalogIT#insurersComeWithTheirPartyBranchesAndLgt
 
   FR-NB-082:
     scenario: SC-NB-07
@@ -2747,7 +2554,6 @@ frs:
         steps:
           - Open ARN-2026-910002; Hold Cover panel; click Request hold cover.
         expected: Status REQUESTED; expiry = today + 30 days; the request e-mail is in the account's E-mails tab.
-        auto: HoldCoverIT#aRequestIsSentConfirmedAndMonitoredUntilItExpires
       - c: 2
         type: Negative
         title: Second hold cover while one is open
@@ -2755,16 +2561,14 @@ frs:
           - Request a hold cover on ARN-2026-910003 (hold cover requested).
         expected: Refused.
         msg: ["Account ARN-2026-910003 already has a hold cover requested or confirmed", HOLD_COVER_OPEN]
-        auto: HoldCoverIT#aRequestIsSentConfirmedAndMonitoredUntilItExpires
       - c: 2
         type: Negative
         data: [TD-NB-06]
         title: Hold cover on a draft account
         steps:
-          - Request a hold cover on ARN-2026-900001 (DRAFT) through the API.
+          - Request a hold cover on ARN-2026-900001 (DRAFT) by a direct request.
         expected: Refused.
         msg: ["A hold cover is requested while the account is being placed, not {DRAFT}", HOLD_COVER_NOT_ALLOWED]
-        auto: HoldCoverIT#confirmationsWithoutRequestAndDeclines
 
   FR-NB-083:
     scenario: SC-NB-07
@@ -2783,7 +2587,6 @@ frs:
           - On ARN-2026-910003 click Record Confirmation; insurer reference HC-MGIC-2026-0091; expires on today + 30; save.
           - Run the Placement Update Report for the ARN.
         expected: The hold cover is CONFIRMED with the reference and expiry, shown on the account and in the report.
-        auto: HoldCoverIT#aRequestIsSentConfirmedAndMonitoredUntilItExpires
       - c: 2
         type: Positive
         persona: SYSTEM
@@ -2792,7 +2595,6 @@ frs:
         steps:
           - Run job HOLD_COVER_EXPIRY twice; as proc open the bell and the Hold cover expiring tile.
         expected: One alert for the hold cover expiring within 5 days; the tile counts it once.
-        auto: HoldCoverIT#aRequestIsSentConfirmedAndMonitoredUntilItExpires
       - c: 3
         type: Negative
         title: Confirmation without reference
@@ -2800,7 +2602,6 @@ frs:
           - Record Confirmation with an empty reference.
         expected: Refused.
         msg: ["Enter the insurer's reference", HOLD_COVER_REFERENCE]
-        auto: HoldCoverIT#aRequestIsSentConfirmedAndMonitoredUntilItExpires
       - c: 3
         type: Negative
         title: Expiry before the start
@@ -2808,16 +2609,14 @@ frs:
           - Record Confirmation with expiry yesterday.
         expected: Refused.
         msg: ["The hold cover cannot expire before it starts (<date>)", HOLD_COVER_DATES]
-        auto: HoldCoverIT#aRequestIsSentConfirmedAndMonitoredUntilItExpires
       - c: 3
         type: Negative
         screen: API
         title: Confirm without an open hold cover
         steps:
-          - Call the confirm endpoint for ARN-2026-910004 (no hold cover).
+          - Send a direct request to confirm the hold cover of ARN-2026-910004 (no hold cover).
         expected: Refused.
         msg: ["Account ARN-2026-910004 has no open hold cover", HOLD_COVER_NONE]
-        auto: HoldCoverIT#aRequestIsSentConfirmedAndMonitoredUntilItExpires
 
   FR-NB-084:
     scenario: SC-NB-07
@@ -2835,7 +2634,6 @@ frs:
         steps:
           - Open the Returned by insurer tile.
         expected: ARN-2026-910008 is listed with the reason and the insurer's remarks.
-        auto: PlacementIssuanceApiIT#aReportIsUploadedAndAnAccountPlacedOverHttp
       - c: 2
         type: Workflow
         screen: ACCPL
@@ -2843,7 +2641,6 @@ frs:
         steps:
           - Open ARN-2026-910008; click Resubmit for placement; generate and send the new slip version.
         expected: The account is PLACED again; the return shows as resolved.
-        auto: PlacementSlipIT#anInsurerReturnIsResubmittedWithANewSlipVersion
       - c: 3
         type: Negative
         screen: ACCPL
@@ -2860,7 +2657,6 @@ frs:
           - Record an insurer return on ARN-2026-910001 with insurer INS-VMI.
         expected: Refused.
         msg: ["Account ARN-2026-910001 is set up with insurer {INS-MGIC}", PLACEMENT_INSURER_MISMATCH]
-        auto: AccountLifecycleIT#accountGoesFromPaymentToBookingAndCancellation
 
   FR-NB-085:
     scenario: SC-NB-07
@@ -2878,7 +2674,6 @@ frs:
         steps:
           - Tick ARN-2026-910001, 910002 and a booked account; click Cancel Placement; reason Client request.
         expected: Two accounts are PLACEMENT_CANCELLED; the booked account is reported as refused.
-        auto: PlacementSlipIT#placementsAreCancelledAndReactivatedInBulk
       - c: 2
         type: Report-output
         persona: MKT_TL
@@ -2887,15 +2682,13 @@ frs:
         steps:
           - Run the Account Status Report.
         expected: The two accounts show Placement cancelled.
-        auto: NbReportsIT#theStageReportListsEveryAccountStage
       - c: 3
         type: Negative
         title: Cancel with nothing selected
         steps:
-          - Click Cancel Placement with no account ticked (API with an empty list).
+          - Click Cancel Placement with no account ticked (direct request with an empty list).
         expected: Refused.
         msg: [Select at least one account, PLACEMENT_NO_ACCOUNTS]
-        auto: PlacementSlipIT#placementsAreCancelledAndReactivatedInBulk
       - c: 3
         type: Negative
         title: Cancel without reason
@@ -2919,7 +2712,6 @@ frs:
         steps:
           - Tick the accounts cancelled in TC-NB-085.1-01; click Reactivate; generate a new slip.
         expected: The accounts are READY_FOR_PLACEMENT and go on a new slip; the payment evidence is kept.
-        auto: PlacementSlipIT#placementsAreCancelledAndReactivatedInBulk
       - c: 1
         type: Workflow
         persona: MKT_AO
@@ -2952,23 +2744,20 @@ frs:
         steps:
           - CLPC Billing, CBG Fire Awaiting Payment; tick all; create the batch; download ODS and XLSX.
         expected: Batch BILL-2026-nnnnnn; both files hold one row per account with PN No., Loan Application No., Booking Date, Borrower, Originating Unit, BDOI Location, Premium, Reference (ARN) and Amortised.
-        auto: BillingIT#cbgFireAccountsAreBilledAndTheClpcReportOpensTheirGate; PlacementFilesTest#theOdsBillingFileIsAReadableSpreadsheet
       - c: 2
         type: Negative
         title: Billed account offered again
         steps:
           - Reopen CBG Fire Awaiting Payment after the batch.
         expected: The billed accounts are not offered for a second batch.
-        auto: BillingIT#cbgFireAccountsAreBilledAndTheClpcReportOpensTheirGate
       - c: 2
         type: Negative
         screen: API
         title: Motor account in a billing batch
         steps:
-          - Call POST /api/v1/placement/billing/batches with ARN-2026-910006 (Motor).
+          - Send a direct request to add ARN-2026-910006 (Motor) to a billing batch.
         expected: Refused and the ARN is named.
         msg: ["Not CBG Fire accounts awaiting payment, or already billed: <ARNs>", BILLING_NOT_CANDIDATE]
-        auto: BillingIT#cbgFireAccountsAreBilledAndTheClpcReportOpensTheirGate
       - c: 2
         type: Negative
         screen: API
@@ -2977,7 +2766,6 @@ frs:
           - Download the batch file with format=CSV.
         expected: Refused.
         msg: [Choose the billing file format XLSX or ODS, BILLING_FORMAT]
-        auto: BillingIT#cbgFireAccountsAreBilledAndTheClpcReportOpensTheirGate
 
   FR-NB-091:
     scenario: SC-NB-07
@@ -2995,7 +2783,6 @@ frs:
         steps:
           - Upload the CLPC report for BILL-2026-900002; review; confirm.
         expected: Paid accounts move to READY_FOR_PLACEMENT; unpaid ones stay AWAITING_PAYMENT; the batch is REPORT_RECEIVED.
-        auto: BillingIT#cbgFireAccountsAreBilledAndTheClpcReportOpensTheirGate
       - c: 2
         type: Workflow
         screen: API
@@ -3003,7 +2790,6 @@ frs:
         steps:
           - Open PMT-2026-900003; match an UNMATCHED line to ARN-2026-910007; confirm.
         expected: The line is MATCHED; ARN-2026-910007 leaves AWAITING_PAYMENT.
-        auto: BillingIT#otherSegmentsAreMatchedByArnWithAReviewOfUnmatchedLines
       - c: 2
         type: Negative
         title: Match a line already matched
@@ -3011,7 +2797,6 @@ frs:
           - Match the same line again to another ARN.
         expected: Refused.
         msg: ["Row <n> is already matched to <ARN>", PAYMENT_LINE_MATCHED]
-        auto: BillingIT#otherSegmentsAreMatchedByArnWithAReviewOfUnmatchedLines
       - c: 3
         type: Negative
         title: Reference report without ARN column
@@ -3019,7 +2804,6 @@ frs:
           - Upload a reference payment report without the ARN / Reference column.
         expected: Refused.
         msg: ["The payment report needs an 'ARN' or 'Reference' column", PAYMENT_REPORT_LAYOUT]
-        auto: PlacementFilesTest#referenceReportsNeedAnArnColumnAndReadableValues
       - c: 3
         type: Negative
         title: CLPC report for a closed batch
@@ -3027,7 +2811,6 @@ frs:
           - Upload a CLPC report for BILL-2026-900001 (closed).
         expected: Refused.
         msg: ["Billing batch {BILL-2026-900001} is closed", BILLING_BATCH_CLOSED]
-        auto: BillingIT#cbgFireAccountsAreBilledAndTheClpcReportOpensTheirGate
       - c: 3
         type: Negative
         title: Amount that is not a number
@@ -3035,7 +2818,6 @@ frs:
           - Upload a report with amount "abc" in row 2.
         expected: Refused and the row is named.
         msg: ["Row 2: 'abc' is not an amount", PAYMENT_REPORT_VALUE]
-        auto: PlacementFilesTest#referenceReportsNeedAnArnColumnAndReadableValues
 
   FR-NB-092:
     scenario: SC-NB-07
@@ -3054,7 +2836,6 @@ frs:
           - On ARN-2026-910006 (CBG Motor, AWAITING_PAYMENT) click Record client confirmation.
         expected: Refused; the account must be paid.
         msg: ["Account ARN-2026-910006 must be paid: match its payment from a payment report", GATE_REQUIRES_PAYMENT]
-        auto: PaymentGateIT#otherLinesOpenOnARecordedClientConfirmation
       - c: 2
         type: Workflow
         data: [TD-NB-06, TD-NB-12]
@@ -3062,14 +2843,12 @@ frs:
         steps:
           - On ARN-2026-900012 (EEI01, AWAITING_PAYMENT) record client confirmation channel Signed confirmation form with the form attached.
         expected: The account is READY_FOR_PLACEMENT.
-        auto: PaymentGateIT#otherLinesOpenOnARecordedClientConfirmation
       - c: 3
         type: Positive
         title: Gate rule by segment and line
         steps:
           - Open the Payment Gate panel of a CBG Property, a CBG Motor and a CORBANK Liability account.
         expected: The panel shows Payment matched for the two CBG accounts and Client confirmation for the Liability account.
-        auto: PaymentGateIT#theRuleFollowsTheSegmentAndLine
       - c: 3
         type: Negative
         screen: API
@@ -3078,7 +2857,6 @@ frs:
           - Record client confirmation on ARN-2026-910004 (PLACED).
         expected: Refused.
         msg: ["{ARN-2026-910004} is {PLACED}, not awaiting payment", ACCOUNT_NOT_AWAITING_PAYMENT]
-        auto: PaymentGateIT#otherLinesOpenOnARecordedClientConfirmation
 
   FR-NB-100:
     scenario: SC-NB-08
@@ -3096,7 +2874,6 @@ frs:
         steps:
           - E-policy Upload, bulk; upload the e-policy PDFs named by ARN for ARN-2026-910001 and 910002; confirm.
         expected: Each file is matched to its account and goes to review; the upload is confirmed.
-        auto: EpolicyIT#manyEpoliciesAreUploadedReviewedAndConfirmed
       - c: 2
         type: Negative
         data: [TD-NB-07]
@@ -3105,7 +2882,6 @@ frs:
           - Upload an e-policy for ARN-2026-910006 (AWAITING_PAYMENT).
         expected: Refused.
         msg: ["Account ARN-2026-910006 is {AWAITING_PAYMENT}; an e-policy is received once placed", EPOLICY_ACCOUNT_STATUS]
-        auto: EpolicyIT#filesAreMatchedByArnPolicyNumberOrFileNameAndMayBeRejected
       - c: 2
         type: Negative
         title: File with no matching account
@@ -3113,7 +2889,6 @@ frs:
           - Upload "scan001.pdf" with no ARN in the name or text.
         expected: BIBS asks for the ARN.
         msg: ["No account found for {scan001.pdf}: choose the account (ARN)", EPOLICY_ACCOUNT_NOT_FOUND]
-        auto: EpolicyIT#filesAreMatchedByArnPolicyNumberOrFileNameAndMayBeRejected
       - c: 3
         type: Boundary
         neg: true
@@ -3122,7 +2897,6 @@ frs:
           - Upload 51 PDFs.
         expected: Refused; 50 are accepted.
         msg: [Upload between 1 and 50 e-policies at a time, EPOLICY_FILE_COUNT]
-        auto: EpolicyIT#manyEpoliciesAreUploadedReviewedAndConfirmed
 
   FR-NB-101:
     scenario: SC-NB-08
@@ -3139,7 +2913,6 @@ frs:
         steps:
           - Open the e-policy MGIC-MC-2026-018329 in Extraction Review; check the extracted policy number and issue date; click Confirm.
         expected: The account shows policy number MGIC-MC-2026-018329 and stage Policy issued - for booking.
-        auto: EpolicyIT#aReceivedEpolicyIsMatchedExtractedReviewedAndUpdatesThePolicy
       - c: 2
         type: Negative
         data: [TD-NB-13]
@@ -3148,22 +2921,19 @@ frs:
           - Confirm the 3-year e-policy with only one policy number.
         expected: Refused.
         msg: ["Account <ARN> needs 3 policy number(s), one per year", POLICY_NUMBERS_MISMATCH]
-        auto: EpolicyIT#aReceivedEpolicyIsMatchedExtractedReviewedAndUpdatesThePolicy; issuanceLogic.test.ts#proposes one policy number per policy year
       - c: 2
         type: Negative
         title: Review an e-policy already confirmed
         steps:
-          - Open the confirmed e-policy of ARN-2026-910002 and confirm again (API).
+          - Open the confirmed e-policy of ARN-2026-910002 and confirm again (direct request).
         expected: Refused.
         msg: ["The e-policy <file> of <ARN> is already <status>", EPOLICY_REVIEWED]
-        auto: EpolicyIT#aReceivedEpolicyIsMatchedExtractedReviewedAndUpdatesThePolicy
       - c: 2
         type: Workflow
         title: Reject an e-policy with a reason
         steps:
           - Reject a reviewed e-policy with reason Not the issued policy.
         expected: The e-policy is REJECTED with the reason; the account stays Placed.
-        auto: EpolicyIT#filesAreMatchedByArnPolicyNumberOrFileNameAndMayBeRejected
 
   FR-NB-102:
     scenario: SC-NB-08
@@ -3180,7 +2950,6 @@ frs:
         steps:
           - On ARN-2026-910001 (PLACED) Documents tab upload a PDF with type E-policy; open the Issuance Workbench.
         expected: The file is listed under Extraction review for ARN-2026-910001.
-        auto: EpolicyIT#aReceivedEpolicyIsMatchedExtractedReviewedAndUpdatesThePolicy
       - c: 2
         type: Negative
         title: Other document type
@@ -3204,7 +2973,6 @@ frs:
         steps:
           - Confirm the e-policy; open Insurance Advice.
         expected: An advice IA-2026-nnnnnn exists for the account.
-        auto: AdviceAndDispatchIT#theTriggerParameterGeneratesTheAdviceOnPlacement
       - c: 2
         type: Negative
         title: Advice for an account without mortgagee
@@ -3212,7 +2980,6 @@ frs:
           - Generate Insurance Advice for ARN-2026-910004 (no mortgagee).
         expected: Refused.
         msg: ["Account ARN-2026-910004 has no mortgagee bank: no Insurance Advice", IA_NOT_MORTGAGED]
-        auto: AdviceAndDispatchIT#adviceIsOnlyForMortgagedAccountsAndIsSentProtected
       - c: 2
         type: Negative
         data: [TD-NB-07]
@@ -3221,7 +2988,6 @@ frs:
           - Generate Insurance Advice for mortgaged ARN-2026-910006 (AWAITING_PAYMENT).
         expected: Refused.
         msg: ["Account ARN-2026-910006 is {AWAITING_PAYMENT}; it must be placed first", IA_ACCOUNT_STATUS]
-        auto: AdviceAndDispatchIT#adviceIsOnlyForMortgagedAccountsAndIsSentProtected
 
   FR-NB-104:
     scenario: SC-NB-08
@@ -3239,31 +3005,28 @@ frs:
         steps:
           - Insurance Advice register; search policy number MGIC-FI-2026-004411; download.
         expected: IA-2026-900001 is listed and its PDF downloads.
-        auto: AdviceAndDispatchIT#adviceIsOnlyForMortgagedAccountsAndIsSentProtected
       - c: 2
         type: Workflow
         title: Send two advices together
         steps:
           - Tick IA-2026-900001 and 900002; Send.
         expected: Each advice is e-mailed protected and followed by its password e-mail.
-        auto: AdviceAndDispatchIT#adviceIsOnlyForMortgagedAccountsAndIsSentProtected
       - c: 2
         type: Negative
         screen: API
         title: Send with no advice selected
         steps:
-          - Call POST /api/v1/issuance/insurance-advice/send with an empty list.
+          - Send a direct request to send Insurance Advices with an empty selection.
         expected: Refused.
         msg: [Select between 1 and 50 Insurance Advices, IA_SELECTION]
-        auto: AdviceAndDispatchIT#adviceIsOnlyForMortgagedAccountsAndIsSentProtected
       - c: 2
         type: Security-access
         persona: MKT_AO
         screen: API
         title: Marketing cannot send advices
         steps:
-          - As ao call the send endpoint.
-        expected: HTTP 403.
+          - As ao send a direct request to send an Insurance Advice.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-NB-105:
@@ -3281,12 +3044,11 @@ frs:
         steps:
           - Ready to Dispatch; tick the e-policies of ARN-2026-910002 and 910004; Send E-policies.
         expected: Two protected e-mails and two password e-mails; the dispatch report lists 2 sent.
-        auto: AdviceAndDispatchIT#epoliciesAreSentEncryptedWithThePasswordApart
       - c: 2
         type: Negative
         title: E-policy still in review
         steps:
-          - Try to send the e-policy of ARN-2026-910003 (REVIEW) through the API.
+          - Try to send the e-policy of ARN-2026-910003 (REVIEW) by a direct request.
         expected: Refused.
         msg: ["Confirm the policy data of ARN-2026-910003 before sending the e-policy", EPOLICY_NOT_CONFIRMED]
       - c: 2
@@ -3297,7 +3059,6 @@ frs:
           - Send its e-policy without entering a recipient.
         expected: Refused.
         msg: ["Account <ARN> has no contact e-mail: enter the recipient", EPOLICY_NO_RECIPIENT]
-        auto: AdviceAndDispatchIT#epoliciesAreSentEncryptedWithThePasswordApart
 
   FR-NB-106:
     scenario: SC-NB-08
@@ -3315,15 +3076,14 @@ frs:
         steps:
           - Open Dispatch Report; compare the counts with the Sent and Failed lists; run report NB-DISPATCH.
         expected: The failure is under Failed with its reason and attempts; the counts equal the list sizes; the report has the same rows.
-        auto: NbReportsIT#everyNewBusinessReportRunsAndExportsInEveryFormat
       - c: 2
         type: Security-access
         persona: BUSINESS_ADMIN
         screen: API
         title: No dispatch log without ACCOUNT_VIEW
         steps:
-          - As badmin call GET /api/v1/issuance/dispatch/log.
-        expected: HTTP 403.
+          - As badmin send a direct request to open the dispatch log.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-NB-110:
@@ -3342,7 +3102,6 @@ frs:
         steps:
           - Booking Workbench, Ready to Book; open a seed account ready to book; enter booking date today and the cost center; click Book.
         expected: The Booked Invoice opens with the invoice number, premium components and commission; the journal is balanced; a service invoice INSURER_COMMISSION is issued; the account is BOOKED.
-        auto: BookingServiceIT#bookingPostsBalancedJournalOpenItemsServiceInvoiceAndEvent; BookingApiIT#anAccountIsPreviewedBookedAndReadBack
       - c: 2
         type: Negative
         persona: SYSADMIN
@@ -3351,16 +3110,14 @@ frs:
         steps:
           - As proc book an issued account.
         expected: The booking is refused; the account stays POLICY_ISSUED and no invoice or service invoice exists.
-        auto: BookingServiceIT#aFailedPostingRollsTheWholeBookingBack
       - c: 2
         type: Negative
         screen: API
         title: Book the same account twice
         steps:
-          - Call POST /api/v1/booking/book again for the account booked in TC-NB-110.1-01.
+          - Send a direct request to book again the account booked in TC-NB-110.1-01.
         expected: No second invoice is created.
         msg: ["Account <ARN> is already booked (BRNB.076)", DUPLICATE_BOOKING]
-        auto: BookingServiceIT#anAccountIsBookedOnlyOnce
       - c: 3
         type: Negative
         title: Booking date in the future
@@ -3368,7 +3125,6 @@ frs:
           - Enter tomorrow as booking date; Book.
         expected: Refused.
         msg: ["The booking date <date> is in the future", BOOKING_DATE_FUTURE]
-        auto: BookingServiceIT#invalidChoicesAreRefused
       - c: 3
         type: Negative
         title: Booking without cost center
@@ -3394,7 +3150,6 @@ frs:
         steps:
           - Queue ten issued accounts, one without cost center; click Confirm batch (or Book now); open the Batch Run.
         expected: Batch BB-2026-n shows nine booked and one failed with COST_CENTER_REQUIRED.
-        auto: BookingBatchIT#aConfirmedBatchBooksEachAccountOnItsOwnWithPartialSuccess
       - c: 2
         type: Negative
         title: Removed entry is not booked
@@ -3402,7 +3157,6 @@ frs:
           - Remove one queued entry; run the batch; try to change the removed entry.
         expected: The removed account is not booked; the change is refused.
         msg: ["Account <ARN> is no longer queued (<status>)", QUEUE_ENTRY_CLOSED]
-        auto: BookingBatchIT#queuedAccountsCanBeChangedRemovedOrTheBatchCancelled
       - c: 2
         type: Negative
         title: Confirm an empty batch
@@ -3410,7 +3164,6 @@ frs:
           - Empty the queue; click Confirm batch.
         expected: Refused.
         msg: [No queued account to book, BATCH_EMPTY]
-        auto: BookingBatchIT#queuedAccountsCanBeChangedRemovedOrTheBatchCancelled
       - c: 3
         type: Upload-download
         screen: BULK
@@ -3418,7 +3171,6 @@ frs:
         steps:
           - Booking upload with 50 ARNs, 3 not issued.
         expected: 47 accounts are booked; the 3 rows are listed with their reason.
-        auto: BookingBatchIT#theUploadBooksEachValidRow
       - c: 1
         type: Positive
         persona: SYSTEM
@@ -3427,7 +3179,6 @@ frs:
         steps:
           - Run job BOOKING_BATCH; open Batch Runs.
         expected: The queued seed account is booked by the run.
-        auto: BookingBatchIT#theEndOfDayJobBooksTheQueueAndStartedMultiYearPolicyYears
 
   FR-NB-112:
     scenario: SC-NB-09
@@ -3436,7 +3187,7 @@ frs:
     data: [TD-NB-09]
     conditions:
       - With an auto-book rule for a product, an account of that product is queued when its policy is confirmed.
-      - A second booking call for the same ARN and transaction does not create a second invoice.
+      - A second booking request for the same ARN and transaction does not create a second invoice.
     cases:
       - c: 1
         type: Workflow
@@ -3445,7 +3196,6 @@ frs:
           - Booking Setup, Auto-book Rules; add product CTP01, enabled; save.
           - As proc confirm the e-policy of a CTP01 account; open Queued for Batch.
         expected: The CTP01 account is queued automatically.
-        auto: BookingBatchIT#autoBookRulesQueueIssuedAccountsForTheNextBatch
       - c: 1
         type: Negative
         title: Disabled rule does not queue
@@ -3457,10 +3207,9 @@ frs:
         screen: API
         title: Second booking of the same transaction
         steps:
-          - Call POST /api/v1/booking/book twice for the same ARN.
-        expected: The second call is refused and the invoice list of the account has one NB invoice.
+          - Send two direct requests to book the same ARN.
+        expected: The second request is refused and the invoice list of the account has one NB invoice.
         msg: ["Account <ARN> is already booked (BRNB.076)", DUPLICATE_BOOKING]
-        auto: BookingServiceIT#anAccountIsBookedOnlyOnce
 
   FR-NB-113:
     scenario: SC-NB-09
@@ -3478,14 +3227,12 @@ frs:
           - On submitted ARN-2026-900009 click Direct booking (policy already issued).
         expected: Refused.
         msg: [Attach the issued policy (policy copy or e-policy) before direct booking, POLICY_DOCUMENT_REQUIRED]
-        auto: AccountIT#directBookingNeedsTheIssuedPolicy
       - c: 2
         type: Workflow
         title: Direct booking with the policy copy
         steps:
           - Attach the policy copy; click Direct booking; record the policy number; book it from the Booking Workbench.
         expected: The account goes to Policy issued without a slip and is booked with its invoice.
-        auto: AccountIT#directBookingNeedsTheIssuedPolicy; AccountLifecycleIT#directlyBookedAccountsOnlyRecordThePolicyNumbers
 
   FR-NB-114:
     scenario: SC-NB-09
@@ -3502,7 +3249,6 @@ frs:
         steps:
           - Book the seed multi-year account; open Invoices of the Account.
         expected: Three invoices NB, NB-Y2, NB-Y3 with three policy numbers; year 1 booked, years 2 and 3 scheduled.
-        auto: BookingBatchIT#theEndOfDayJobBooksTheQueueAndStartedMultiYearPolicyYears
       - c: 2
         type: Negative
         screen: API
@@ -3520,7 +3266,6 @@ frs:
         steps:
           - Run BOOKING_BATCH.
         expected: The NB-Y2 invoice is booked.
-        auto: BookingBatchIT#theEndOfDayJobBooksTheQueueAndStartedMultiYearPolicyYears
 
   FR-NB-115:
     scenario: SC-NB-09
@@ -3537,14 +3282,12 @@ frs:
         steps:
           - New Endorsement; ARN of a booked Fire account; type Positive; effective date within the term; sum insured change +500,000; description; post.
         expected: An EN invoice with the additional premium for the remaining days and its service invoice.
-        auto: EndorsementIT#aPositiveEndorsementBooksAdditionalPremiumWithItsServiceInvoice
       - c: 1
         type: Positive
         title: Non-financial endorsement
         steps:
           - Type Non-financial; description "Change of mailing address"; post.
         expected: The endorsement is recorded without journal or invoice.
-        auto: EndorsementIT#aNonFinancialEndorsementIsRecordedWithoutPosting
       - c: 2
         type: Negative
         persona: ADJUSTMENT
@@ -3553,7 +3296,6 @@ frs:
           - As adjust, type Negative with a premium change larger than the year's premium.
         expected: Refused.
         msg: ["The return premium exceeds the premium in force of policy year <n>", RETURN_EXCEEDS_PREMIUM]
-        auto: EndorsementIT#invalidEndorsementsAreRefused
       - c: 2
         type: Negative
         title: Positive endorsement returning premium
@@ -3561,7 +3303,6 @@ frs:
           - Type Positive with a negative sum insured change.
         expected: Refused.
         msg: [A positive endorsement must add premium, ENDORSEMENT_SIGN_MISMATCH]
-        auto: EndorsementIT#invalidEndorsementsAreRefused; bookingForm.test.ts#checks the sign, the change, the rate and the text
       - c: 2
         type: Negative
         title: Effective date outside the term
@@ -3569,13 +3310,12 @@ frs:
           - Effective date after the period end.
         expected: Refused.
         msg: ["The effective date <date> is not within a booked policy year of <ARN>", ENDORSEMENT_DATE_OUTSIDE_TERM]
-        auto: EndorsementIT#invalidEndorsementsAreRefused
       - c: 2
         type: Security-access
         title: Processing cannot post a negative endorsement
         steps:
           - As proc choose type Negative.
-        expected: The type is not offered to proc; the API refuses it (BOOKING_ADJUST only).
+        expected: The type is not offered to proc; a direct request with it is refused (BOOKING_ADJUST only).
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-NB-116:
@@ -3594,14 +3334,12 @@ frs:
         steps:
           - Open a booked invoice; Cancel Booking; return basis FLAT; reason Client request; description; confirm.
         expected: A cancellation reverses premium and commission; the account is CANCELLED.
-        auto: EndorsementIT#aFlatCancellationReturnsEverythingAndCancelsTheAccount
       - c: 2
         type: Workflow
         title: Partial pro-rata cancellation
         steps:
           - Cancel Booking with basis PARTIAL, cancellation date mid-term.
         expected: The return equals the premium of the unexpired days.
-        auto: EndorsementIT#aPartialProRataCancellationReturnsTheUnexpiredPremium
       - c: 3
         type: Negative
         screen: API
@@ -3610,16 +3348,14 @@ frs:
           - Post a cancellation for an issued, unbooked account.
         expected: Refused.
         msg: ["Account <ARN> is <status>: only booked accounts are endorsed", ACCOUNT_NOT_BOOKED]
-        auto: EndorsementIT#aFlatCancellationReturnsEverythingAndCancelsTheAccount
       - c: 3
         type: Security-access
         persona: PROCESSOR
         title: Processing cannot cancel a booking
         steps:
-          - As proc open a booked invoice; look for Cancel Booking; call the endpoint.
-        expected: No action; HTTP 403.
+          - As proc open a booked invoice; look for Cancel Booking; send a direct request to cancel the booking.
+        expected: No action is offered; a direct request is refused.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
-        auto: BookingApiIT#usersWithoutBookingRightsAreRefused
 
   FR-NB-117:
     scenario: SC-NB-09
@@ -3637,7 +3373,6 @@ frs:
         steps:
           - Open the service invoice of the booking of TC-NB-110.1-01; download the PDF.
         expected: Type INSURER_COMMISSION, the next number, status SENT with the e-mail logged; the PDF shows commission and VAT.
-        auto: ServiceInvoiceIT#anInsurerServiceInvoiceIsMailedAndCreditedUpToItsAmount; ServiceInvoiceIT#numbersAreSequentialWithoutGapsEvenWhenATransactionRollsBack
       - c: 2
         type: Negative
         title: Failed dispatch
@@ -3652,7 +3387,6 @@ frs:
           - Credit the service invoice with more commission than it has left.
         expected: Refused.
         msg: ["Service invoice <number> has <commission> commission and <vat> VAT left to credit", CREDIT_EXCEEDS_INVOICE]
-        auto: ServiceInvoiceIT#anInsurerServiceInvoiceIsMailedAndCreditedUpToItsAmount
       - c: 3
         type: Negative
         title: Credit of a credit
@@ -3660,7 +3394,6 @@ frs:
           - Open a credit note; click Credit.
         expected: Refused.
         msg: ["<number> is itself a credit", CREDIT_OF_CREDIT]
-        auto: ServiceInvoiceIT#anInsurerServiceInvoiceIsMailedAndCreditedUpToItsAmount
       - c: 3
         type: Negative
         persona: BUSINESS_ADMIN
@@ -3670,7 +3403,6 @@ frs:
           - Deactivate type SERVICE_INVOICE_NOTE; as proc create a manual service invoice of that type.
         expected: Refused.
         msg: ["Service invoice type {SERVICE_INVOICE_NOTE} is inactive", SERVICE_INVOICE_TYPE_INACTIVE]
-        auto: ServiceInvoiceIT#typesAreMaintainedAndInactiveTypesRefused
 
   FR-NB-118:
     scenario: SC-NB-09
@@ -3687,7 +3419,6 @@ frs:
         steps:
           - Book an account on a Motor package covered by CPC2 (seed); open the invoice and the Booked Accounts Register.
         expected: Incentive = Yes with code CPC2; the field is read only.
-        auto: IncentiveCriteriaIT#bookingStampsTheMatchedCriteriaCodes
       - c: 1
         type: Negative
         title: No criterion, no indicator
@@ -3703,7 +3434,6 @@ frs:
           - Booking Setup; edit a booking incentive rule.
         expected: Refused.
         msg: [Incentive rules are maintained in Product Maintenance > Incentive Criteria, INCENTIVE_RULES_FROZEN]
-        auto: BookingApiIT#theSetupIsMaintainedByTheBusinessAdministrator
 
   FR-NB-119:
     scenario: SC-NB-09
@@ -3722,7 +3452,6 @@ frs:
           - Edit a queued entry and clear its cost center; Book now.
         expected: The entry fails.
         msg: ["Enter the cost center of account <ARN> (BRNB.108)", COST_CENTER_REQUIRED]
-        auto: BookingBatchIT#aConfirmedBatchBooksEachAccountOnItsOwnWithPartialSuccess
       - c: 2
         type: Report-output
         persona: MKT_TL
@@ -3731,7 +3460,6 @@ frs:
         steps:
           - Run NB-BOOKED-REG for this month.
         expected: Each invoice shows its cost center and NB in the NB / Renewal column.
-        auto: NbReportsIT#everyNewBusinessReportRunsAndExportsInEveryFormat
 
   FR-NB-120:
     scenario: SC-NB-10
@@ -3749,24 +3477,21 @@ frs:
         steps:
           - Note the Submitted count; as ao submit an account; refresh the dashboard.
         expected: The count increases by one.
-        auto: NbReportApiIT#theDashboardCarriesEverySection; NbReportsIT#theDashboardSummarisesNewBusiness
       - c: 2
         type: Positive
         title: Placed bar opens the filtered list
         steps:
           - Click the Placed bar of Accounts by Stage.
         expected: Accounts opens filtered on Placed with ARN-2026-910001 to 910005.
-        auto: nbreports.test.ts#builds the drill-down routes
       - c: 3
         type: Security-access
         persona: BUSINESS_ADMIN
         screen: API
         title: Dashboard refused without the right
         steps:
-          - Call GET /api/v1/nb/dashboard as a user without WORK_VIEW.
-        expected: HTTP 403.
+          - Send a direct request to open the New Business dashboard as a user without WORK_VIEW.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
-        auto: NbReportApiIT#usersWithoutTheRightsAreRefused
 
   FR-NB-121:
     scenario: SC-NB-10
@@ -3783,14 +3508,12 @@ frs:
         steps:
           - Run NB-PLC-UPDATE with ARN ARN-2026-910001.
         expected: One row with stage, slip PL-2026-nnnnnn, placed on, hold cover and reference, policy issued and officer.
-        auto: NbReportsIT#theIndividualPlacementUpdateCoversOneAccount
       - c: 2
         type: Report-output
         title: Collective report for the month
         steps:
           - Run NB-PLC-UPDATE for this month.
         expected: Accounts grouped by insurer; drafts and submitted accounts are not included.
-        auto: NbReportsIT#everyNewBusinessReportRunsAndExportsInEveryFormat
       - c: 2
         type: Security-access
         persona: BUSINESS_ADMIN
@@ -3816,14 +3539,12 @@ frs:
         steps:
           - Run NB-ACC-STATUS with exception filter Breach.
         expected: Only accounts past their stage SLA are listed, each with its stage and hours overdue.
-        auto: NbReportsIT#theAccountStatusReportFlagsSlaBreachesAndStalledAccounts
       - c: 2
         type: Report-output
         title: Production against target
         steps:
           - Run NB-PRODUCTION for team T-CBG1 for this month.
         expected: Booked premium, the monthly target (pro rata for a partial month) and the achievement percentage.
-        auto: NbReportsIT#productionIsComparedWithTargetsProRata
       - c: 2
         type: Report-output
         title: Placement Summary with failed e-mails
@@ -3838,7 +3559,6 @@ frs:
           - Production Targets; enter -100 for a month; save.
         expected: Not saved.
         msg: [Targets cannot be negative, TARGET_NEGATIVE]
-        auto: NbReportApiIT#aTargetIsSavedAndChanged
 
   FR-NB-123:
     scenario: SC-NB-10
@@ -3854,17 +3574,15 @@ frs:
         persona: MKT_AO
         title: AO does not see the CLPC Billing Report
         steps:
-          - As ao open New Business Reports; run NB-CLPC-BILLING through the API.
+          - As ao open New Business Reports; run NB-CLPC-BILLING by a direct request.
         expected: The report is not listed; the run is refused.
         msg: ["Report NB-CLPC-BILLING is not available to you", REPORT_NOT_AVAILABLE]
-        auto: NbReportsIT#theCatalogueIsFilteredByPermission
       - c: 2
         type: Positive
         title: Shared variant used by another TL
         steps:
           - Open the shared variant of the Account Status Report; run it.
         expected: The report runs with the saved parameters.
-        auto: NbReportsIT#reportVariantsAreSavedSharedAndDeletedByTheirOwner
       - c: 2
         type: Negative
         title: Delete another user's variant
@@ -3872,7 +3590,6 @@ frs:
           - Delete the shared variant saved by another user.
         expected: Refused.
         msg: [Only the user who saved a report variant may delete it, VARIANT_NOT_OWNER]
-        auto: NbReportApiIT#aVariantIsSavedListedAndDeleted
 
   FR-NB-124:
     scenario: SC-NB-10
@@ -3889,7 +3606,6 @@ frs:
         steps:
           - Run NB-ACC-STATUS with a stage filter; click Print.
         expected: The PDF shows the report name, user, date and the filter, with as many rows as the screen.
-        auto: NbReportsIT#everyNewBusinessReportRunsAndExportsInEveryFormat
       - c: 2
         type: Negative
         title: Print before running
@@ -3912,17 +3628,15 @@ frs:
         steps:
           - Run NB-STAGE-OUTCOME; download PDF, XLSX, ODS, CSV and XML.
         expected: Each file has the same rows; the XML lists the report metadata and typed columns.
-        auto: NbReportApiIT#reportsExportAsOdsAndXmlWithTheirMetadata
       - c: 2
         type: Security-access
         persona: MKT_AO
         screen: API
         title: Export without the permission
         steps:
-          - As ao call GET /api/v1/reports/NB-CLPC-BILLING/export?format=XLSX.
+          - As ao send a direct request to export the NB-CLPC-BILLING report as XLSX.
         expected: Refused.
         msg: ["Report NB-CLPC-BILLING is not available to you", REPORT_NOT_AVAILABLE]
-        auto: NbReportApiIT#usersWithoutTheRightsAreRefused
 
   FR-NB-126:
     scenario: SC-NB-10
@@ -3930,20 +3644,20 @@ frs:
     screen: NBREP
     conditions:
       - The Late Renewal Requests Report is not offered until BDOI answers Q09.
-      - A direct call to the parked report is refused.
+      - A direct request for the report held for Q09 is refused.
     cases:
       - c: 1
         type: Positive
-        title: Report list without the parked report
+        title: Report list without the report held for Q09
         steps:
           - Open New Business Reports.
-        expected: No Late Renewal Requests Report is listed; the FRS marks it parked (Q09).
+        expected: No Late Renewal Requests Report is listed; the FRS holds it until BDOI answers Q09.
       - c: 2
         type: Negative
         screen: API
-        title: Run the parked report
+        title: Run the report held for Q09
         steps:
-          - Call the run endpoint with a late renewal report code.
+          - Send a direct request to run the late renewal report.
         expected: Refused as an unknown report.
 
   FR-NB-130:
@@ -3968,14 +3682,12 @@ frs:
         steps:
           - Log in; leave the browser idle 15 minutes; then click Stay signed in.
         expected: The warning dialog appears at 15 minutes; Stay signed in keeps the session.
-        auto: idleTimer.test.ts#moves from active to warning to expired
       - c: 2
         type: Negative
         title: Session expired after 30 minutes
         steps:
           - Leave the warning unanswered until 30 minutes; click a menu item.
         expected: The user is signed out and returned to the Login page.
-        auto: idleTimer.test.ts#warns, then expires and stops ticking
       - c: 3
         type: Negative
         title: Wrong password
@@ -3983,7 +3695,6 @@ frs:
           - Log in as proc with a wrong password.
         expected: Refused.
         msg: [Invalid user name or password, AUTHENTICATION_FAILED]
-        auto: ApiSmokeIT#loginReturnsTokenAndWrongPasswordIsRejected
       - c: 3
         type: Boundary
         neg: true
@@ -3993,7 +3704,6 @@ frs:
           - Enter a wrong password 3 times for proctl; then the correct one.
         expected: The account locks at the third failure and the correct password is refused.
         msg: [Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
-        auto: LoginLockoutTest#theAccountLocksAtTheConfiguredThreshold
 
   FR-NB-131:
     scenario: SC-NB-01
@@ -4010,14 +3720,12 @@ frs:
         steps:
           - Log in; open an account; open the same address in a new tab.
         expected: The second tab shows the account without asking for the password.
-        auto: tabSync.test.ts#gives a new tab the session of a signed-in tab
       - c: 2
         type: Negative
         title: Sign-out applies to every tab
         steps:
           - Sign out in the first tab; click a menu item in the second tab.
         expected: The second tab returns to the Login page.
-        auto: tabSync.test.ts#signs out, signs in and shares activity with every other tab; LogoutIT#logoutRevokesTheTokenAndIsAudited
 
   FR-NB-132:
     scenario: SC-NB-01
@@ -4035,22 +3743,19 @@ frs:
           - Lists of Values, RETURN_REASON; add code UAT_RR "Wrong premium basis", effective today; save.
           - As proc return an account and look for the reason; as approver authorise it in My Approvals; retry.
         expected: Before authorisation the reason is not offered; after authorisation it is.
-        auto: LovServiceIT#newValueIsUsableOnlyAfterAuthorizationAndWithinEffectivity; BrokingFoundationApiIT#lovMaintenanceOverHttp
       - c: 1
         type: Boundary
         title: Value effective next month
         steps:
           - Add and authorise a value effective the first of next month.
         expected: It is not offered today.
-        auto: LovServiceIT#newValueIsUsableOnlyAfterAuthorizationAndWithinEffectivity
       - c: 2
         type: Negative
         title: Maker authorises the value
         steps:
-          - As badmin authorise UAT_RR through the API.
+          - As badmin authorise UAT_RR by a direct request.
         expected: Refused.
         msg: [A record cannot be authorized by the user who maintained it, MAKER_CHECKER_VIOLATION]
-        auto: LovServiceIT#newValueIsUsableOnlyAfterAuthorizationAndWithinEffectivity
       - c: 2
         type: Negative
         title: Effective-to before effective-from
@@ -4058,13 +3763,12 @@ frs:
           - Value with effective from 01-Nov-2026 and to 31-Oct-2026.
         expected: Refused.
         msg: [The effective-to date is before the effective-from date, LOV_EFFECTIVITY_INVALID]
-        auto: LovServiceIT#rejectsDuplicatesInvalidDatesAndOptionalBlank; lovForm.test.ts#validates code, label, order and dates
       - c: 2
         type: Negative
         screen: API
         title: Change a system-maintained list
         steps:
-          - Add a value to a system-maintained list through the API.
+          - Add a value to a system-maintained list by a direct request.
         expected: Refused.
         msg: ["The list <type> is maintained by the system", LOV_NOT_MAINTAINABLE]
 
@@ -4084,7 +3788,6 @@ frs:
         steps:
           - As approver open My Approvals.
         expected: Both items are listed with maker, date and type.
-        auto: ApprovalInboxIT#pendingMasterDataIsOfferedToAuthorizersOtherThanTheMaker
       - c: 2
         type: Negative
         title: Reject without reason
@@ -4092,7 +3795,6 @@ frs:
           - Reject the access request without a reason.
         expected: Refused.
         msg: [Enter the reason of the rejection, ACCESS_REJECT_REASON]
-        auto: AccessRequestIT#createdUserIsAppliedOnApprovalWithATemporaryPassword
       - c: 2
         type: Negative
         title: Decide the own request
@@ -4101,7 +3803,6 @@ frs:
           - As that user approve it.
         expected: Refused.
         msg: [A request cannot be decided by the user who submitted it, ACCESS_FOUR_EYES]
-        auto: AccessRequestIT#requestsAreValidatedAndDecidedUnderFourEyes
 
   FR-NB-134:
     scenario: SC-NB-01
@@ -4118,7 +3819,6 @@ frs:
         steps:
           - Open the User Access Matrix by permission; find BOOKING_ADJUST; export to Excel.
         expected: Only ADJUSTMENT holds BOOKING_ADJUST; the Excel file lists every role and permission shown.
-        auto: AccessRequestIT#accessMatrixListsRolesAgainstPermissions
       - c: 2
         type: Negative
         screen: ACCREQ
@@ -4127,7 +3827,6 @@ frs:
           - New Access Request, Create user, role NB_SUPERUSER.
         expected: Refused.
         msg: ["Unknown role(s): <codes>", ACCESS_UNKNOWN_ROLE]
-        auto: AccessRequestIT#requestsAreValidatedAndDecidedUnderFourEyes
       - c: 2
         type: Negative
         screen: USERS
@@ -4135,7 +3834,6 @@ frs:
         steps:
           - Administration > Users; open admin; add a role; save.
         expected: Refused.
-        auto: UserAdminApiIT#administratorCannotChangeOwnRoles
 
   FR-NB-135:
     scenario: SC-NB-01
@@ -4154,7 +3852,6 @@ frs:
           - New Access Request, Create user; user name uat.proc1, full name, e-mail, branch HO, role PROCESSOR, justification; submit.
           - Check Administration > Users; as approver approve; check again.
         expected: The user does not exist before approval; after approval it exists with a temporary password.
-        auto: AccessRequestIT#createdUserIsAppliedOnApprovalWithATemporaryPassword
       - c: 2
         type: Negative
         title: Second request for the same user
@@ -4162,7 +3859,6 @@ frs:
           - Submit another request for uat.proc1 while the first is pending.
         expected: Refused.
         msg: ["A request for <subject> is already waiting for approval", ACCESS_REQUEST_PENDING]
-        auto: AccessRequestIT#createdUserIsAppliedOnApprovalWithATemporaryPassword
       - c: 3
         type: Negative
         title: User name too short
@@ -4170,7 +3866,6 @@ frs:
           - Create user with user name "ab".
         expected: Refused.
         msg: ["The user name has 3 to 50 letters, digits, dots, dashes or underscores", ACCESS_USERNAME]
-        auto: AccessRequestIT#requestsAreValidatedAndDecidedUnderFourEyes
       - c: 3
         type: Negative
         title: Existing user
@@ -4178,7 +3873,6 @@ frs:
           - Create user ao.
         expected: Refused.
         msg: ["User {ao} already exists", ACCESS_USER_EXISTS]
-        auto: AccessRequestIT#requestsAreValidatedAndDecidedUnderFourEyes
       - c: 3
         type: Negative
         title: Permission added and removed
@@ -4186,7 +3880,6 @@ frs:
           - Modify role permissions of MKT_AO adding and removing PKG_REQUEST.
         expected: Refused.
         msg: ["Permission(s) both added and removed: <list>", ACCESS_PERMISSION_CONFLICT]
-        auto: RolePermissionRequestIT#invalidChangesAreRefused
 
   FR-NB-136:
     scenario: SC-NB-01
@@ -4209,8 +3902,8 @@ frs:
         screen: API
         title: AO cannot read the audit log
         steps:
-          - As ao call GET /api/v1/audit-logs.
-        expected: HTTP 403.
+          - As ao send a direct request to read the audit log.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
       - c: 2
         type: Negative
@@ -4219,7 +3912,6 @@ frs:
         steps:
           - Look for edit or delete on audit rows.
         expected: None is offered; the database refuses changes.
-        auto: AuditTrailImmutabilityIT#updateDeleteAndTruncateAreRejected
 
   FR-NB-137:
     scenario: SC-NB-01
@@ -4236,7 +3928,6 @@ frs:
         steps:
           - Data Retention; run the review; open the eligible records of the voided quotation rule.
         expected: Candidates are counted per rule; running the review deletes nothing (the counts stay the same after a second run).
-        auto: RetentionIT#reviewCountsEligibleRecordsPerRuleWithoutDeletingAnything; RetentionIT#everyBrokingRecordTypeReportsItsCandidates
       - c: 2
         type: Negative
         title: Years online of zero
@@ -4244,7 +3935,6 @@ frs:
           - Edit a rule with years online 0; save.
         expected: Refused.
         msg: [Years online must be positive and years in archive not negative, RETENTION_YEARS]
-        auto: RetentionIT#rulesAreMaintainedWithValidation
       - c: 2
         type: Negative
         title: Rule without status
@@ -4252,7 +3942,6 @@ frs:
           - Remove every status of a rule; save.
         expected: Refused.
         msg: [Enter at least one status, RETENTION_STATUSES]
-        auto: RetentionIT#rulesAreMaintainedWithValidation
 
 access:
   - action: Create and update clients
@@ -4260,156 +3949,118 @@ access:
     permission: CLIENT_MAINTAIN
     allow: [MKT_AO, MKT_TL]
     deny: [PROCESSOR, TSU, AUDITOR]
-    denied: New Client is not in the menu; POST /api/v1/crm/clients returns HTTP 403 (ACCESS_DENIED).
-    auto: CrmAdminApiIT#clientIsCreatedValidatedAndOnboardedOverHttp
+    denied: New Client is not in the menu; a direct request to create a client is refused (ACCESS_DENIED).
   - action: Verify a client's KYC
     screen: CLIENT
     permission: CLIENT_APPROVE
     allow: [MKT_TL]
     deny: [MKT_AO, PROCESSOR]
     denied: Verify KYC is not shown; the workflow action is refused (WORKFLOW_ACTION_NOT_PERMITTED).
-    auto: ClientOnboardingIT#kycIsVerifiedByAnotherUserThanItsMaker
   - action: Create and send quotations
     screen: NEWQT
     permission: QUOTE_MAINTAIN
     allow: [MKT_AO, MKT_TL]
     deny: [TSU, PROCESSOR, NB_APPROVER, AUDITOR]
-    denied: New Quotation is not in the menu; POST /api/v1/quotations returns HTTP 403.
-    auto: QuotationProposalApiIT#quotationIsCreatedPricedAndSubmittedOverHttp
+    denied: New Quotation is not in the menu; a direct request to create a quotation is refused.
   - action: Approve quotations
     screen: QT
     permission: QUOTE_APPROVE
     allow: [MKT_TL, NB_APPROVER]
     deny: [MKT_AO, PROCESSOR]
-    denied: Approve is not shown; POST /quotations/{id}/approve returns HTTP 403.
-    auto: QuotationProposalApiIT#quotationIsCreatedPricedAndSubmittedOverHttp
+    denied: Approve is not shown; a direct request to approve is refused.
   - action: Create and submit PRFs
     screen: NEWPRF
     permission: PROPOSAL_REQUEST
     allow: [MKT_AO, MKT_TL]
     deny: [TSU, PROCESSOR]
-    denied: New Proposal Request is not in the menu; POST /api/v1/proposals returns HTTP 403.
+    denied: New Proposal Request is not in the menu; a direct request to create a PRF is refused.
   - action: Approve PRFs (Marketing)
     screen: PRF
     permission: PROPOSAL_APPROVE
     allow: [MKT_TL]
     deny: [MKT_AO, TSU]
-    denied: Approve and send to TSU is not shown; the call returns HTTP 403.
-    auto: QuotationProposalApiIT#proposalIsCreatedAndWalkedToTsuOverHttp
+    denied: Approve and send to TSU is not shown; a direct request is refused.
   - action: Work the TSU queue, slips and insurer terms
     screen: NPTSU
     permission: TSU_PROCESS, TSU_APPROVE
     allow: [TSU]
     deny: [MKT_AO, MKT_TL, PROCESSOR]
-    denied: The TSU Workbench is not in the menu; slip and response calls return HTTP 403.
-    auto: QuotationProposalApiIT#seedProposalReadsAndTsuEndpoints
+    denied: The TSU Workbench is not in the menu; direct slip and response requests are refused.
   - action: Create and submit accounts
     screen: NEWACC
     permission: ACCOUNT_MAINTAIN
     allow: [MKT_AO, MKT_TL, PROCESSOR, PROCESSING_TL]
     deny: [TSU, NB_APPROVER, EPOLICY_SENDER, AUDITOR]
-    denied: New Account is not in the menu; POST /api/v1/accounts returns HTTP 403.
-    auto: CatalogAccountApiIT#fieldErrorsAndPermissionsAreReported
+    denied: New Account is not in the menu; a direct request to create an account is refused.
   - action: Validate and return accounts
     screen: ACC
     permission: ACCOUNT_PROCESS
     allow: [PROCESSOR, PROCESSING_TL]
     deny: [MKT_AO, MKT_TL]
     denied: Validate is not shown; the workflow action is refused (WORKFLOW_ACTION_NOT_PERMITTED).
-    auto: AccountLifecycleIT#accountGoesFromPaymentToBookingAndCancellation
   - action: Placement slips, hold cover, returns, cancellation
     screen: PLWB
     permission: PLACEMENT_MANAGE
     allow: [PROCESSOR, PROCESSING_TL]
     deny: [MKT_AO, MKT_TL, EPOLICY_SENDER]
-    denied: The actions are not shown; placement calls return HTTP 403.
-    auto: PlacementIssuanceApiIT#marketingCannotRunProcessingActions
+    denied: The actions are not shown; direct placement requests are refused.
   - action: CLPC billing and payment reports
     screen: BILLING
     permission: BILLING_MANAGE
     allow: [PROCESSOR, PROCESSING_TL]
     deny: [MKT_AO, NB_APPROVER]
-    denied: CLPC Billing is not in the menu; billing calls return HTTP 403.
-    auto: PlacementIssuanceApiIT#marketingCannotRunProcessingActions
+    denied: CLPC Billing is not in the menu; direct billing requests are refused.
   - action: Receive and confirm e-policies
     screen: EPUP
     permission: EPOLICY_MANAGE
     allow: [PROCESSOR, PROCESSING_TL]
     deny: [MKT_AO, EPOLICY_SENDER]
-    denied: E-policy Upload is not in the menu; upload and confirm calls return HTTP 403.
+    denied: E-policy Upload is not in the menu; direct upload and confirm requests are refused.
   - action: Send e-policies and Insurance Advices
     screen: DISPATCH
     permission: EPOLICY_SEND
     allow: [EPOLICY_SENDER]
     deny: [MKT_AO, ADJUSTMENT]
-    denied: Send is not shown; dispatch calls return HTTP 403.
+    denied: Send is not shown; direct dispatch requests are refused.
   - action: Book accounts
     screen: BOOKWB
     permission: BOOKING_PROCESS
     allow: [PROCESSOR, PROCESSING_TL]
     deny: [MKT_AO, ADJUSTMENT, AUDITOR]
-    denied: Book is not shown; POST /api/v1/booking/book returns HTTP 403.
-    auto: BookingApiIT#usersWithoutBookingRightsAreRefused
+    denied: Book is not shown; a direct booking request is refused.
   - action: Cancel bookings and post negative endorsements
     screen: INVOICE
     permission: BOOKING_ADJUST
     allow: [ADJUSTMENT]
     deny: [PROCESSOR, PROCESSING_TL, MKT_AO]
-    denied: Cancel Booking and the Negative type are not offered; the call returns HTTP 403.
-    auto: BookingApiIT#usersWithoutBookingRightsAreRefused
+    denied: Cancel Booking and the Negative type are not offered; a direct request is refused.
   - action: Maintain lists of values
     screen: LOV
     permission: LOV_MANAGE
     allow: [BUSINESS_ADMIN, SYSADMIN]
     deny: [MKT_AO, PROCESSOR]
-    denied: Lists of Values is not in the menu; POST /api/v1/lov/{type}/values returns HTTP 403.
-    auto: BrokingFoundationApiIT#lovMaintenanceOverHttp
+    denied: Lists of Values is not in the menu; a direct request to add a list value is refused.
   - action: Submit access requests
     screen: ACCREQ
     permission: ACCESS_REQUEST
     allow: [BUSINESS_ADMIN, SYSADMIN]
     deny: [MKT_TL, NB_APPROVER]
-    denied: Access Requests is not in the menu; POST /api/v1/nbadmin/access-requests returns HTTP 403.
-    auto: CrmAdminApiIT#accessRequestsAndRetentionOverHttp
+    denied: Access Requests is not in the menu; a direct request to submit an access request is refused.
   - action: Approve access requests and master records
     screen: APPROVALS
     permission: ACCESS_APPROVE, MASTER_AUTHORIZE
     allow: [NB_APPROVER]
     deny: [BUSINESS_ADMIN, SYSADMIN]
-    denied: The items are not offered in My Approvals; the approve call returns HTTP 403.
+    denied: The items are not offered in My Approvals; a direct approve request is refused.
   - action: View the audit trail
     screen: AUDIT
     permission: AUDIT_VIEW
     allow: [BUSINESS_ADMIN, AUDITOR]
     deny: [MKT_AO, PROCESSOR]
-    denied: Audit Trail is not in the menu; GET /api/v1/audit-logs returns HTTP 403.
+    denied: Audit Trail is not in the menu; a direct request to read the audit log is refused.
   - action: Assign work
     screen: MYWORK
     permission: WORK_ASSIGN
     allow: [MKT_TL, PROCESSING_TL, NB_APPROVER]
     deny: [MKT_AO, PROCESSOR]
-    denied: Assign is not shown; POST /workflow/cases/{id}/assign returns HTTP 403.
-    auto: WorkflowServiceIT#queuesShowOnlyTheStagesOfTheUsersTeamAndSupportClaimAndAssignment
-
-findings:
-  - fr: FR-NB-130
-    issue: 'The FRS messages "Invalid user ID or password" and "Your account is locked. Contact the System Administrator" (code "-") differ from the build: "Invalid user name or password" and "Account is locked. Contact your administrator.", both with code AUTHENTICATION_FAILED (HTTP 401).'
-    proposal: Quote the built messages and code in FRS v1.1; the cases use the built wording.
-  - fr: FR-NB-126
-    issue: The FR is parked until BDOI answers Q09 and its only acceptance criterion is "Parked; acceptance criteria are written when Q09 is answered". It cannot be tested beyond checking that the report is not offered.
-    proposal: Keep the FR parked in v1.1 and add the acceptance criteria when Q09 is answered; the two cases here only check that nothing is offered.
-  - fr: FR-NB-020
-    issue: The precondition "BDOI answers Q37" makes the FR untestable except for its one acceptance criterion (the policy number is read-only). The FR does not list the other data elements and their authoritative sources.
-    proposal: List the data elements and their source systems once Q37 is answered; until then the cases test only the policy number rule.
-  - fr: FR-NB-083
-    issue: 'Rule "What happens at expiry without a policy waits for Q27" leaves the outcome of an expired hold cover open; the build raises the alert only.'
-    proposal: State the expected outcome at expiry (alert only, return to Marketing or cancellation) when Q27 is answered.
-  - fr: FR-NB-001
-    issue: 'Several FRs trace to references that are not BRNB IDs ("Annex (p.84-90)", "Appendix A (p.216)", "BRD 2.1.16 (p.180)", "BRD 3.4.2.2.35 (p.208)", "BRD 2.3.1 (p.188)", "Data retention (p.82)"). The coverage by BRD ID lists them as separate items, so the BRD ID count differs from the number of BRNB IDs.'
-    proposal: Keep BRD section references in a separate "BRD section" field of the FR header, so that the BRD trace holds requirement IDs only.
-  - fr: FR-NB-066
-    issue: 'The validation "Enter a valid e-mail address / mobile number" has code "-", but the account contact is checked by the same rules as the client (CLIENT_EMAIL_FORMAT, CLIENT_MOBILE_FORMAT). The FRS does not say whether the account screen returns those codes.'
-    proposal: Quote the code the account contact check returns; TC-NB-066.2-01 records the actual message at first run.
-  - fr: FR-NB-005
-    issue: The FRS says a change to a TSU rule threshold applies to the next evaluation without a release, but does not say whether the change needs maker-checker authorisation like other catalogue masters.
-    proposal: State whether TSU rule changes are authorised by a second user; TC-NB-005.3-02 assumes the change is authorised by the approver.
+    denied: Assign is not shown; a direct request to assign is refused.

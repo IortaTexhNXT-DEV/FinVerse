@@ -32,7 +32,7 @@ distribution:
 
 # What this pack is for
 
-This pack shows BRD-1 New Business as built in BIBS on 27-Sep-2026, screen by screen, so that each BDOI business unit can confirm what it will get and sign it off. Signing freezes the content, the screens and the navigation of New Business; a later change goes through the Change Management Register with its mandays. The screenshots use fictitious seed data only.
+This pack shows the proposed BRD-1 New Business of BIBS, screen by screen, so that each BDOI business unit can confirm what it will get and sign it off. Signing freezes the content, the screens and the navigation of New Business; a later change goes through the Change Management Register with its mandays. The screenshots use fictitious seed data only.
 
 # The pack at a glance
 

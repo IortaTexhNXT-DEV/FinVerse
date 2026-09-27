@@ -42,7 +42,6 @@ from bdoi_xlsx import BdoiWorkbook, Column  # noqa: E402
 OUT = brand.out_dir("BRD-00", "Alignment")  # Programme/Alignment (brand.BRD_DROP)
 DOC = "PROGRAMME_ALIGNMENT.md"
 PLACEHOLDER = re.compile(r"^<!--\s*al:(\w+)\s*(.*?)-->\s*$")
-FITS = ["FIT", "CONFIGURE", "CHANGE", "NEW", "OUT"]
 IER_FIGURES = {"al_application_architecture.dot": "BIBS_IER_Application_Architecture.png",
                "al_deployment.dot": "BIBS_IER_Infrastructure_Deployment.png"}
 FILLER = ("seamless", "robust", "comprehensive", "leverage", "cutting-edge", "state-of-the-art", "best-in-class",
@@ -69,19 +68,17 @@ def check(d: dict[str, Any]) -> list[str]:
     if len(ids) != len(set(ids)):
         problems.append("duplicate integration ids")
     for x in d["integrations"]:
-        if x["fit"] not in FITS:
-            problems.append(f"{x['id']}: fit {x['fit']}")
         for ref in re.findall(r"IQ\d+", str(x.get("questions", ""))):
             if ref not in qids:
                 problems.append(f"{x['id']}: unknown question {ref}")
-        for key in ("name", "drop", "bdoi", "understanding", "direction", "data", "module", "seam", "build"):
+        for key in ("name", "drop", "bdoi", "understanding", "direction", "data", "open"):
             if not x.get(key):
                 problems.append(f"{x['id']}: missing {key}")
     for row in d["drop_items"]:
         for ref in re.findall(r"IQ\d+", row["refs"]):
             if ref not in qids:
                 problems.append(f"drop item {row['num']}: unknown question {ref}")
-    for table, width in (("s3_changes", 3), ("k8s", 7), ("timeline", 4), ("concept", 4), ("other_interfaces", 4)):
+    for table, width in (("s3_changes", 2), ("k8s", 7), ("timeline", 3), ("concept", 3), ("other_interfaces", 3)):
         for row in d[table]:
             if len(row) != width:
                 problems.append(f"{table}: row with {len(row)} cells, expected {width}: {row[0]}")
@@ -101,51 +98,49 @@ def md_table(headers: list[str], rows: list[list[Any]], opts: str) -> list[str]:
 def placeholders(d: dict[str, Any], name: str, opts: dict[str, str]) -> list[str]:
     if name == "drop_items":
         drop = opts.get("drop", "").replace("_", " ")
-        rows = [[r["num"], r["item"], r["bdoi_brd"], r["brd"], r["frs"], r["bibs"], r["status"], r["gap"], r["refs"]]
+        rows = [[r["num"], r["item"], r["bdoi_brd"], r["brd"], r["frs"], r["gap"], r["refs"]]
                 for r in d["drop_items"] if not drop or r["drop"] == drop]
-        return md_table(["#", "Drop item", "BRD named by BDOI", "BIBS BRD", "FRS", "BIBS modules and screens",
-                         "Status", "Gap or mismatch", "Refs"], rows,
-                        f'widths=0.9,2.2,2.2,2.2,1.9,3.2,1.3,4.2,1.5 caption="{opts.get("caption", "Drop items")}" '
-                        'status=Status size=7.5 bold=first')
+        return md_table(["#", "Drop item", "BRD named by BDOI", "BIBS BRD", "FRS", "Gap or mismatch", "Refs"], rows,
+                        f'widths=0.9,2.8,2.8,3,2.4,6,1.8 caption="{opts.get("caption", "Drop items")}" '
+                        'size=7.5 bold=first')
     if name == "documents":
         rows = [[r["doc"], r["kind"], r["drop"], r["shared"], r["note"]] for r in d["documents"]]
         return md_table(["Document", "Kind", "Drop (folder)", "Shared with", "Note"], rows,
                         'widths=4.2,3.6,2.2,4,3.6 caption="Drop-to-document map" size=8 bold=first')
     if name == "integrations":
-        rows = [[x["id"], x["name"], x["drop"], x["bdoi"], x["direction"], x["module"], x["fit"], x["questions"]]
+        rows = [[x["id"], x["name"], x["drop"], x["bdoi"], x["direction"], x["questions"]]
                 for x in d["integrations"]]
-        return md_table(["ID", "Integration", "Drop", "BDOI meaning", "Direction", "BIBS module", "Fit", "Questions"],
-                        rows, 'widths=1.2,2.6,2,4.2,2.6,3.4,2,1.4 caption="Integration inventory (summary)" '
-                              'status=Fit size=7.5 bold=first')
+        return md_table(["ID", "Integration", "Drop", "BDOI meaning", "Direction", "Questions"],
+                        rows, 'widths=1.2,3,2.2,6.4,3.4,1.8 caption="Integration inventory (summary)" '
+                              'size=7.5 bold=first')
     if name == "integration_detail":
-        rows = [[x["id"], x["name"], x["understanding"], x["data"], x["seam"], x["build"], x["open"]]
+        rows = [[x["id"], x["name"], x["understanding"], x["data"], x["open"]]
                 for x in d["integrations"]]
-        return md_table(["ID", "Integration", "Our understanding (to confirm)", "Data", "Existing seam in BIBS",
-                         "Build needed", "Open"], rows,
-                        'widths=1.1,2,4.6,3,4.4,4,2.6 caption="Integration inventory (detail)" size=7 bold=first')
+        return md_table(["ID", "Integration", "Our understanding (to confirm)", "Data", "Open points"], rows,
+                        'widths=1.1,2.2,7.4,5,4 caption="Integration inventory (detail)" size=7 bold=first')
     if name == "other_interfaces":
-        return md_table(["Interface", "Named in", "BIBS seam", "To confirm"], d["other_interfaces"],
-                        'widths=4,4,5,4.6 caption="Interfaces named in the BRDs but not on the slide" size=8 '
+        return md_table(["Interface", "Named in", "To confirm"], d["other_interfaces"],
+                        'widths=6,5.6,6 caption="Interfaces named in the BRDs but not on the slide" size=8 '
                         'bold=first')
     if name == "infra":
         rows = [[r["topic"], r["ier"], r["bibs"], r["assessment"], r["change"], r["ref"]] for r in d["infra"]]
-        return md_table(["Topic", "IER (BDOI IT)", "BIBS as built", "Assessment", "Change needed", "Ref"], rows,
+        return md_table(["Topic", "IER (BDOI IT)", "BIBS", "Assessment", "Change needed", "Ref"], rows,
                         'widths=2.2,6,5.6,1.8,5.4,1.8 caption="IER against BIBS" status=Assessment size=7 '
                         'bold=first')
     if name == "s3":
-        return md_table(["Area", "Today", "Change"], d["s3_changes"],
-                        'widths=4.4,5.2,8 caption="Documents in S3 only: changes in BIBS" size=7.5 bold=first')
+        return md_table(["Area", "Proposal"], d["s3_changes"],
+                        'widths=4.6,13 caption="Documents in S3 only" size=7.5 bold=first')
     if name == "k8s":
         return md_table(["Environment", "Deployment", "Min", "Max", "Requests CPU / memory", "Limits CPU / memory",
                          "Note"], d["k8s"],
                         'widths=2,3.2,1,1,2.6,2.6,5.2 caption="Proposed Kubernetes sizing of the BIBS workloads" '
                         'size=8 bold=first')
     if name == "timeline":
-        return md_table(["Stream", "BDOI window", "Status today", "What we deliver, by when"], d["timeline"],
-                        'widths=3.4,3.4,5.2,7.6 caption="BDOI timeline against the BIBS plan" size=7.5 bold=first')
+        return md_table(["Stream", "BDOI window", "What we deliver, by when"], d["timeline"],
+                        'widths=3.8,4,11.8 caption="BDOI timeline against the BIBS plan" size=7.5 bold=first')
     if name == "concept":
-        return md_table(["Concept paper capability", "BIBS design", "Status", "Note"], d["concept"],
-                        'widths=4.4,6.6,2.4,4.2 caption="Concept paper capabilities against the BIBS designs" '
+        return md_table(["Concept paper capability", "Where the FRS covers it", "Note"], d["concept"],
+                        'widths=4.8,8.6,4.2 caption="Concept paper capabilities against the FRS" '
                         'size=8 bold=first')
     if name == "questions":
         rows = sorted(d["questions"], key=lambda q: (q[1], q[0]))
@@ -191,17 +186,14 @@ def build_workbook(d: dict[str, Any]) -> Path:
     m = d["meta"]
     wb = BdoiWorkbook("BIBS Integration Inventory", doc_type="Integration inventory", brd="BRD-00",
                       version=m["version"], date=m["date"],
-                      subtitle="Drops, integrations and infrastructure: BDOI plan against BIBS as built")
-    wb.legend = [("FIT", "Works today"), ("CONFIGURE", "Set-up only (layout, parameters)"),
-                 ("CHANGE", "Extends an existing seam or module"), ("NEW", "New build"),
-                 ("OUT", "Out of scope"), ("BUILT", "BRD built in BIBS"), ("GAP", "Missing in the IER or the plan")]
+                      subtitle="Drops, integrations and infrastructure: BDOI plan against BIBS")
+    wb.legend = [("GAP", "Missing in the IER or the plan")]
     wb.cover_notes = [
         "Integration meanings are those given by BDOI on 26-Sep-2026 (answer A2); 'Our understanding' is the "
         "project team's reading and is confirmed through the IQ questions.",
-        "Documents and attachments live in Amazon S3 only (answer A4); the sheet 'S3 changes' lists the build "
-        "item.",
-        "Sources: BDOI drop plan and timeline slides, IER workbook v20, concept paper (superseded), "
-        "docs/architecture/PROGRAMME_ALIGNMENT.md.",
+        "Documents and attachments live in Amazon S3 only (answer A4); the sheet 'S3 documents' lists the "
+        "proposal.",
+        "Sources: BDOI drop plan and timeline slides, IER workbook v20, concept paper (superseded).",
     ]
     wb.sheet("Integrations", [
         Column("id", "ID", 8, "Integration identifier INT-nn"),
@@ -212,25 +204,19 @@ def build_workbook(d: dict[str, Any]) -> Path:
                                                                           "team reads it"),
         Column("direction", "Direction", 18, "Inbound to BIBS, outbound, both, manual"),
         Column("data", "Data", 30, "Main data exchanged"),
-        Column("module", "BIBS module", 24, "Module(s) that own the interface"),
-        Column("seam", "Existing seam in BIBS", 42, "Port, handler or mechanism in the code today"),
-        Column("fit", "Fit", 11, "FIT / CONFIGURE / CHANGE / NEW / OUT", values=FITS, status=True),
-        Column("build", "Build needed", 40, "What must be built or configured"),
         Column("open", "Open points", 30, "What BDOI IT still has to specify"),
         Column("questions", "Questions", 10, "IQ questions of this document"),
     ], d["integrations"], description="One row per integration named on the drop plan or by BDOI")
     wb.sheet("Other interfaces", [
         Column("a", "Interface", 34, "Interface named in a BRD"), Column("b", "Named in", 30, "BRD and requirement"),
-        Column("c", "BIBS seam", 38, "Mechanism in BIBS"), Column("d", "To confirm", 34, "What BDOI confirms"),
-    ], [dict(zip("abcd", r)) for r in d["other_interfaces"]],
+        Column("d", "To confirm", 34, "What BDOI confirms"),
+    ], [dict(zip("abd", r)) for r in d["other_interfaces"]],
         description="Interfaces named in the BRDs that the drop plan does not list")
     wb.sheet("Drop map", [
         Column("drop", "Drop", 14, "Drop of the BDOI plan"), Column("num", "#", 6, "Line item"),
         Column("item", "Drop item", 26, "Module / functionality on the slide"),
         Column("bdoi_brd", "BRD named by BDOI", 26, "BRD file column of the slide"),
         Column("brd", "BIBS BRD", 28, "BIBS BRD number(s)"), Column("frs", "FRS", 24, "FRS and requirement prefix"),
-        Column("bibs", "BIBS modules and screens", 40, "Where it is in BIBS"),
-        Column("status", "Status", 12, "Built / Being built / Designed / Mixed", status=True),
         Column("gap", "Gap or mismatch", 50, "Observation"), Column("refs", "Refs", 18, "Questions and register"),
     ], d["drop_items"], description="Every line item of the drop plan mapped to BRDs, FRS and BIBS")
     wb.sheet("Documents by drop", [
@@ -240,14 +226,14 @@ def build_workbook(d: dict[str, Any]) -> Path:
     ], d["documents"], description="Drop-to-document map for the folder restructure (answer A5)")
     wb.sheet("Infrastructure", [
         Column("topic", "Topic", 20, "Area"), Column("ier", "IER (BDOI IT)", 50, "What the IER workbook states"),
-        Column("bibs", "BIBS as built", 46, "Code, deployment files, architecture documents"),
+        Column("bibs", "BIBS", 46, "BIBS architecture and deployment"),
         Column("assessment", "Assessment", 14, "Aligned / Mismatch / Gap", status=True),
         Column("change", "Change needed", 46, "Change in the IER or in BIBS"), Column("ref", "Ref", 14, "Register, IQ"),
     ], d["infra"], description="IER workbook v20 against the BIBS architecture and deployment")
-    wb.sheet("S3 changes", [
-        Column("a", "Area", 40, "What is stored"), Column("b", "Today", 44, "Tables and classes"),
-        Column("c", "Change", 70, "Change for S3-only storage (answer A4)"),
-    ], [dict(zip("abc", r)) for r in d["s3_changes"]], description="Build item: documents and files in Amazon S3")
+    wb.sheet("S3 documents", [
+        Column("a", "Area", 40, "What is stored"),
+        Column("c", "Proposal", 90, "S3-only storage (answer A4)"),
+    ], [dict(zip("ac", r)) for r in d["s3_changes"]], description="Documents and files in Amazon S3")
     wb.sheet("K8s sizing", [
         Column("a", "Environment", 12, "Environment"), Column("b", "Deployment", 22, "Kubernetes deployment"),
         Column("c", "Min replicas", 10, "HPA minimum"), Column("d", "Max replicas", 10, "HPA maximum"),
@@ -257,8 +243,8 @@ def build_workbook(d: dict[str, Any]) -> Path:
         description="Replaces the bv-* rows of the IER K8s sheets (to be proved by the performance test)")
     wb.sheet("Timeline", [
         Column("a", "Stream", 30, "Timeline bar"), Column("b", "BDOI window", 30, "From the slide"),
-        Column("c", "Status today", 44, "BIBS status"), Column("d", "What we deliver, by when", 60, "Plan"),
-    ], [dict(zip("abcd", r)) for r in d["timeline"]], description="BDOI timeline against the BIBS plan")
+        Column("d", "What we deliver, by when", 80, "Plan"),
+    ], [dict(zip("abd", r)) for r in d["timeline"]], description="BDOI timeline against the BIBS plan")
     wb.sheet("Questions", [
         Column("a", "ID", 7, "IQ question"), Column("b", "Priority", 8, "1 = answer by 16 Oct 2026"),
         Column("c", "Topic", 24, "Topic"), Column("d", "Question", 90, "Question to BDOI"),

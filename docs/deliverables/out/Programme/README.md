@@ -1,22 +1,19 @@
 # Programme (cross-drop): deliverables index
 
 BIBS client pack for BDO Insurance and Reinsurance Brokers (BDOI), grouped by BDOI drop (answer A5 of 26-Sep-2026).
-Written by `python tools/deliverables/drop_index.py` from the files of this folder and the drop map in
-`tools/deliverables/brand.py`; do not edit by hand.
 
 | | |
 |---|---|
 | BDOI dates | Performance and penetration test Nov - Dec 2027, ORR / PRR Dec 2027 - Jan 2028, go-live of all modules together in January 2028 (proposed Monday 3 January 2028) |
 | Scope (BDOI drop plan) | Documents that cover every drop: the umbrella BRD-00 FRS, the discrepancy and clarification register, the business process deck, the programme alignment pack with the integration inventory and the IER diagrams, and the UAT readiness programme. |
-| Status | Status as of 26-Sep-2026; final refresh at build completion (deliverables README, "Document status and the final as-built refresh") |
+| Status | Status as of 26-Sep-2026; the documents are refreshed before UAT |
 
 ## Documents in this drop
 
 One folder per BRD release set (`BRD-nn_<Name>/`): every file of the BRD (Start Here, guide deck, FRS, sign-off
 workbook, test plan and summary, migration documents and templates), released and signed off together; in an
 issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, "Release and
-sign-off per BRD"). The sources of a BRD are in one folder, `docs/deliverables/src/BRD-nn_<Name>/`, and
-`tools/deliverables/check_pack.py` refuses duplicated files and older versions left next to newer ones.
+sign-off per BRD"). Each document is kept once, in its latest version.
 
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
@@ -37,4 +34,4 @@ sign-off per BRD"). The sources of a BRD are in one folder, `docs/deliverables/s
 | UAT readiness programme and readiness statements (deliverables README) | - | Drop 1 by 30-Jul-2027, Drop 2 by 30-Sep-2027 |
 | End-to-end UAT script | - | UAT runs end to end (BDOI answer A1) |
 | Performance, penetration test and ORR / PRR evidence (items 28, 37) | - | Nov 2027 - Jan 2028 |
-| Requirements traceability matrix (item 21) and the final as-built refresh | - | At build completion |
+| Requirements traceability matrix (item 21) and the final refresh of the documents | - | Before UAT |

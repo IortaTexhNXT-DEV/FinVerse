@@ -15,16 +15,16 @@ digraph wf_remittance {
   OR_RECEIVED [label="OR_RECEIVED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
   RETURNED [label="RETURNED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
 
-  REVIEW_IN_PROCESS -> FOR_APPROVAL [label=" submit"];
-  REVIEW_IN_PROCESS -> ON_HOLD [label=" hold", style=dashed, constraint=false];
-  ON_HOLD -> REVIEW_IN_PROCESS [label=" release", style=dashed, constraint=false];
-  FOR_APPROVAL -> APPROVED [label=" approve"];
-  FOR_APPROVAL -> REVIEW_IN_PROCESS [label=" send_back", style=dashed, constraint=false];
-  APPROVED -> FULLY_REMITTED [label=" dv_full"];
-  APPROVED -> PARTIALLY_REMITTED [label=" dv_partial"];
-  FULLY_REMITTED -> OR_RECEIVED [label=" or_received"];
-  PARTIALLY_REMITTED -> OR_RECEIVED [label=" or_received"];
-  FOR_APPROVAL -> RETURNED [label=" return", style=dotted];
+  REVIEW_IN_PROCESS -> FOR_APPROVAL [label=" Submit for approval"];
+  REVIEW_IN_PROCESS -> ON_HOLD [label=" Hold batch", style=dashed, constraint=false];
+  ON_HOLD -> REVIEW_IN_PROCESS [label=" Release batch", style=dashed, constraint=false];
+  FOR_APPROVAL -> APPROVED [label=" Approve and push to Disbursement"];
+  FOR_APPROVAL -> REVIEW_IN_PROCESS [label=" Send back to processor", style=dashed, constraint=false];
+  APPROVED -> FULLY_REMITTED [label=" DV assigned - fully remitted"];
+  APPROVED -> PARTIALLY_REMITTED [label=" DV assigned - partially remitted"];
+  FULLY_REMITTED -> OR_RECEIVED [label=" Insurer OR uploaded"];
+  PARTIALLY_REMITTED -> OR_RECEIVED [label=" Insurer OR uploaded"];
+  FOR_APPROVAL -> RETURNED [label=" Return batch", style=dotted];
   { rank=same; REVIEW_IN_PROCESS; ON_HOLD; }
   { rank=same; FULLY_REMITTED; PARTIALLY_REMITTED; }
   { rank=same; OR_RECEIVED; RETURNED; }

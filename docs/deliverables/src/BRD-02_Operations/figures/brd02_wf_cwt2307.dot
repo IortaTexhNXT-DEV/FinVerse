@@ -14,12 +14,12 @@ digraph wf_cwt2307 {
   SETTLED_CASH [label="SETTLED_CASH", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
   CANCELLED [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
 
-  TAGGED -> VALIDATING [label=" receive"];
-  VALIDATING -> REPORT_POSTED [label=" validate"];
-  REPORT_POSTED -> WITH_DISBURSEMENT [label=" route"];
-  WITH_DISBURSEMENT -> RELEASED [label=" release_to_insurer"];
-  VALIDATING -> SETTLED_CASH [label=" settle_cash", style=dashed];
-  VALIDATING -> TAGGED [label=" return", style=dashed, constraint=false];
-  TAGGED -> CANCELLED [label=" cancel", style=dotted];
+  TAGGED -> VALIDATING [label=" Receive for Validation"];
+  VALIDATING -> REPORT_POSTED [label=" Validate and Post"];
+  REPORT_POSTED -> WITH_DISBURSEMENT [label=" Route to Disbursement"];
+  WITH_DISBURSEMENT -> RELEASED [label=" Release to Insurer"];
+  VALIDATING -> SETTLED_CASH [label=" Settle in Cash", style=dashed];
+  VALIDATING -> TAGGED [label=" Return to Marketing", style=dashed, constraint=false];
+  TAGGED -> CANCELLED [label=" Cancel Tag", style=dotted];
   { rank=same; VALIDATING; CANCELLED; }
 }

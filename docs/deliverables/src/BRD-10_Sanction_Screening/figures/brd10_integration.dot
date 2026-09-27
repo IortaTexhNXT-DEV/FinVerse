@@ -24,7 +24,7 @@ digraph sc_integration {
   amlc  [label="AMLC portal\n(manual filing)", color="@MUTED"];
 
   src -> wl [label="scheduled / upload"];
-  api -> wl [label="parked (SQ01)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+  api -> wl [label="on hold (SQ01)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
   crm -> eng [label="client registered /\nidentity changed"];
   acct -> eng [label="account submitted;\nactive policy"];
   wl -> eng [label="entry changes"];
@@ -32,6 +32,6 @@ digraph sc_integration {
   eng -> cs [label="matches"];
   cs -> notif; cs -> rep;
   cs -> arch [label="AMLC file"];
-  arch -> fold [label="parked (SQ16)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+  arch -> fold [label="on hold (SQ16)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
   arch -> amlc [label="filed by CO", style=dashed];
 }

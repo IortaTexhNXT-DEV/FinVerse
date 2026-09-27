@@ -9,24 +9,22 @@ notes:
   title: >-
     Deck for the BDOI steering committee and the department heads. It shows each business area in pictures: how the
     work runs today, how it runs in BIBS, what is still open, and which practices BDOI should adopt. Every statement
-    cites the BRD (PDF page of the source pack), the FRS or the discrepancy register (DCR numbers). The deck is
-    rebuilt from docs/deliverables/src/decks/.
+    cites the BRD (PDF page of the source pack), the FRS or the discrepancy register (DCR numbers).
   agenda: >-
     Chapter 0 gives the enterprise view across all twelve BRDs. Chapters 1 to 12 follow the business order, from New
-    Business to Submitted Policies; each chapter has the same seven slides. The status chip shows whether the area is
-    built, in build or designed in BIBS. The summary repeats the maturity view, the decisions and the roadmap.
+    Business to Submitted Policies; each chapter has the same seven slides. The status chip shows the FRS of the area. The summary repeats the maturity view, the decisions and the roadmap.
   reading: >-
     Swimlanes: one lane per BDOI role, external party or system. Yellow circles are pain points; the slide after the
     As-Is diagram explains each one with its BRD page. On the envisioned diagram, light blue boxes are steps a BDOI
     user takes on a BIBS screen and solid CTA Blue boxes are steps BIBS runs by itself (jobs, checks, matching,
-    postings). Dashed lines are hand-offs by e-mail or file, or parked interfaces.
+    postings). Dashed lines are hand-offs by e-mail or file, or interfaces on hold.
 
 reading:
   - 'Each business area has seven slides: at a glance, As-Is swimlane, pain points, envisioned swimlane, before and after, gaps, best practice'
   - 'Lanes are BDOI roles (Header Blue), external parties (grey) and today''s systems (light blue)'
   - 'Yellow numbered circles mark pain points: manual steps, re-keying, hand-offs, weak controls'
   - 'On the envisioned diagram, solid blue boxes are what BIBS does automatically'
-  - 'Dashed lines are e-mail or file hand-offs, or interfaces that are parked until BDO or the insurers provide them'
+  - 'Dashed lines are e-mail or file hand-offs, or interfaces that are on hold until BDO or the insurers provide them'
   - 'References: BRD PDF page, BRD requirement ID, FRS section, register item (DCR-nnn), open question (Qnn)'
 
 holistic:
@@ -73,14 +71,14 @@ holistic:
 
   envisioned_map:
     title: 'Envisioned: BIBS as one platform'
-    caption: 'Module map by navigation group (* designed, not yet built); shared services; external parties; hosting'
+    caption: 'Module map by navigation group; shared services; external parties; hosting'
     notes: >-
       BIBS puts the twelve areas in one application with six navigation groups, following the BDOI navigation of the
-      BDO Insure UX design (frontend/src/navigation/modules.ts; BDO UX guidelines section 3). Every module uses the same
+      BDO Insure UX design (BDO UX guidelines section 3). Every module uses the same
       shared services: workflow with SLA, documents and templates, notifications, the report centre, the insert-only
       audit trail and the configuration masters that the business maintains. External parties reach BIBS by e-mail
       with a send log, by file upload, or through the partner portal for Employee Benefits. The HLS, insurer API, CLPC
-      transfer and BDO directory (EUA) interfaces are parked seams until BDO and the insurers give the specifications.
+      transfer and BDO directory (EUA) interfaces are on hold until BDO and the insurers give the specifications.
       Redis caching, Kafka events and the AWS Singapore hosting are the client technology bill of materials; their
       conformance is tracked in the bill of materials deliverable (item 4) and the technical architecture (item 12).
     externals:
@@ -88,22 +86,22 @@ holistic:
       - {id: x_ins, text: 'Insurers, HMO', sub: [e-mail; files; EB portal]}
       - {id: x_bank, text: 'BDO bank units', sub: ['HLS, LAMD, CLPC', 'and BOB']}
       - {id: x_reg, text: 'BIR, AMLC', sub: [forms and extracts]}
-      - {id: x_dir, text: 'BDO directory (EUA)', sub: [parked], kind: parked}
-    channels: 'Interfaces: e-mail with send log, file upload, partner portal, parked APIs'
+      - {id: x_dir, text: 'BDO directory (EUA)', sub: [on hold], kind: parked}
+    channels: 'Interfaces: e-mail with send log, file upload, partner portal, APIs on hold'
     groups:
-      - {title: 'Client & Policy', w: 172, modules: 'Clients, Screening*, Quotations, Accounts, Non-Package (PRF), Employee Benefits*, Placement, Issuance, Booking, Renewal*, Submitted Policies*, Customer Service*, Prod. Recon, Adjustment, Products'}
+      - {title: 'Client & Policy', w: 172, modules: 'Clients, Screening, Quotations, Accounts, Non-Package (PRF), Employee Benefits, Placement, Issuance, Booking, Renewal, Submitted Policies, Customer Service, Prod. Recon, Adjustment, Products'}
       - {title: Operations, w: 80, modules: 'Operations home, invoice ledger, interfaces'}
       - {title: Finance, w: 124, modules: 'Collections, Cashiering, Remittance, Commission, Disbursement, Refund requests, ACSL, GL, AR, AP, tax'}
-      - {title: 'Claims & Insurance', w: 82, modules: 'Claims Handling*, insurer-side modules'}
+      - {title: 'Claims & Insurance', w: 82, modules: 'Claims Handling, insurer-side modules'}
       - {title: Reports, w: 62, modules: 'Report Centre, NB reports'}
-      - {title: 'Setup & Admin', w: 91, modules: 'Broking setup, Compliance setup*, User Access, Portal users*, Admin'}
+      - {title: 'Setup & Admin', w: 91, modules: 'Broking setup, Compliance setup, User Access, Portal users, Admin'}
     services: ['Workflow and SLA', 'Documents, templates', 'Notifications', 'Reports, exports', 'Audit trail', 'Masters and rules', 'Redis cache', 'Kafka events']
     hosting: 'Hosting: AWS, Singapore region; production and non-production environments (client BOM)'
-    links: [[x_cli, 'e-mail, portal'], [x_ins, 'e-mail, files, portal'], [x_bank, 'files'], [x_reg, 'extracts'], [x_dir, 'parked']]
+    links: [[x_cli, 'e-mail, portal'], [x_ins, 'e-mail, files, portal'], [x_bank, 'files'], [x_reg, 'extracts'], [x_dir, 'on hold']]
 
   value_chain:
     title: 'End-to-end value chain'
-    caption: 'From client to claims: the stage, the BDOI owner and the BIBS module (status in brackets)'
+    caption: 'From client to claims: the stage, the BDOI owner and the BIBS module'
     notes: >-
       The chain follows one policy and its money. Marketing owns the client and the quotation; Processing places,
       issues and books; Operations receives the cash, remits the premium net of commission to the insurer and
@@ -111,33 +109,33 @@ holistic:
       the cycle; Claims serves the client during the cover. In BIBS every stage reads the same client, account (ARN)
       and invoice ledger, so no stage re-keys the output of the previous one.
     stages:
-      - {text: 1 Client, owner: Marketing AO, module: 'Clients, Screening', status: Built / designed}
-      - {text: 2 Quotation, owner: 'Marketing, TSU', module: 'Quotations, PRF, Products', status: Built}
-      - {text: 3 Placement, owner: Processing, module: Placement, status: Built}
-      - {text: 4 Issuance, owner: 'Processing, E-policy Sender', module: Issuance, status: Built}
-      - {text: 5 Booking, owner: 'Processing, Comptrollership', module: Booking, status: Built}
-      - {text: 6 Cash, owner: Cashiering, module: Cashiering, status: Built}
-      - {text: 7 Remittance, owner: 'Remittance, Disbursement', module: 'Remittance, Disbursement', status: Built / in build}
-      - {text: 8 Commission, owner: Commission Receivable, module: Commission, status: Built}
-      - {text: 9 Accounting, owner: 'Comptrollership (FRBS, ACSL)', module: 'GL, ACSL, FRBS', status: In build}
-      - {text: 10 Collections, owner: Collection Handlers, module: Collections, status: In build}
-      - {text: 11 Renewal, owner: 'Marketing, Processing', module: 'Renewal, Submitted Policies', status: Designed}
-      - {text: 12 Claims, owner: 'Claims unit', module: Claims Handling, status: Designed}
+      - {text: 1 Client, owner: Marketing AO, module: 'Clients, Screening'}
+      - {text: 2 Quotation, owner: 'Marketing, TSU', module: 'Quotations, PRF, Products'}
+      - {text: 3 Placement, owner: Processing, module: Placement}
+      - {text: 4 Issuance, owner: 'Processing, E-policy Sender', module: Issuance}
+      - {text: 5 Booking, owner: 'Processing, Comptrollership', module: Booking}
+      - {text: 6 Cash, owner: Cashiering, module: Cashiering}
+      - {text: 7 Remittance, owner: 'Remittance, Disbursement', module: 'Remittance, Disbursement'}
+      - {text: 8 Commission, owner: Commission Receivable, module: Commission}
+      - {text: 9 Accounting, owner: 'Comptrollership (FRBS, ACSL)', module: 'GL, ACSL, FRBS'}
+      - {text: 10 Collections, owner: Collection Handlers, module: Collections}
+      - {text: 11 Renewal, owner: 'Marketing, Processing', module: 'Renewal, Submitted Policies'}
+      - {text: 12 Claims, owner: 'Claims unit', module: Claims Handling}
 
   maturity:
     title: 'Best-practice target view'
     notes: >-
-      The scale is the project team's reading of the current-process sections of the twelve BRDs, the BIBS designs and
+      The scale is the project team's reading of the current-process sections of the twelve BRDs, the FRS and
       the practices named in each chapter. It is a discussion aid for the steering committee, not an audit rating.
-      Integration stays at level 3 in BIBS until the parked interfaces (HLS, insurer APIs, CLPC transfer, BDO
+      Integration stays at level 3 in BIBS until the interfaces on hold (HLS, insurer APIs, CLPC transfer, BDO
       directory, mailbox reading, OCR) are specified by BDO and the insurers.
-    basis: 'Scale: project team assessment from the BRD current-process sections and the BIBS designs'
+    basis: 'Scale: project team assessment from the BRD current-process sections and the FRS'
     levels: ['Manual: paper, e-mail', 'Tool-assisted: spreadsheets, separate systems', 'One workflow in one system', 'Automated, with exception queues', 'Integrated and measured']
     themes:
       - {theme: Automation, now: 1, bibs: 4, best: 5, why: 'Today most steps are manual (BRD-1 p.133, BRD-2 p.11, BRD-5 p.44). BIBS runs jobs, matching and straight-through steps with exception queues.'}
       - {theme: Controls, now: 2, bibs: 4, best: 5, why: 'Approvals run by e-mail and paper (BRD-5 p.45, BRD-10 p.6). BIBS enforces maker-checker, four-eyes and approval matrices.'}
       - {theme: Data, now: 1, bibs: 4, best: 5, why: 'Separate masterlists and re-keying (BRD-12 p.4, BRD-1 p.133). BIBS has one client, one ARN and one invoice ledger.'}
-      - {theme: Integration, now: 2, bibs: 3, best: 5, why: 'Files and e-mail with banks and insurers. BIBS adds uploads and seams; APIs are parked.'}
+      - {theme: Integration, now: 2, bibs: 3, best: 5, why: 'Files and e-mail with banks and insurers. BIBS adds uploads; APIs are on hold until specified.'}
       - {theme: Customer service, now: 2, bibs: 4, best: 5, why: 'The Front-End shows full details for CBG accounts only (BRD-9 p.4). BIBS shows every account, with resends.'}
       - {theme: Compliance, now: 1, bibs: 4, best: 5, why: 'Name matching by hand, no EDD for PEPs (BRD-10 p.6-7). BIBS screens on every trigger and routes cases.'}
       - {theme: Reporting, now: 1, bibs: 4, best: 5, why: 'Reports depend on IT (BRD-2 p.11, BRD-5 p.44). BIBS users run reports and exports themselves.'}
@@ -146,14 +144,14 @@ holistic:
     title: 'Open items per area (discrepancy register)'
     text: |-
       162 items are raised against the 12 BRDs and the Report List; 8 are answered by a later signed BDOI document.
-      High items change what is built, the money, compliance or access; they are resolved before the FRS of the area is signed off.
+      High items change what the system does, the money, compliance or access; they are resolved before the FRS of the area is signed off.
       Items that touch several BRDs, such as the service window, RPO and retention, count under each BRD.
       The next slide lists the decisions that unblock the most areas.
 
   decisions:
     title: 'Cross-BRD gaps: decisions for BDOI'
     notes: >-
-      The priority items of the discrepancy register and the open cross-BRD questions of BDOI_CROSS_BRD_DECISIONS.md.
+      The priority items of the discrepancy register and the open cross-BRD questions.
       Each blocks more than one area. The proposals in the register are the project's default until BDOI decides.
     rows:
       - {sev: High, gap: 'Directory sign-in (EUA) for every user', impact: 'Identity source for all BIBS users', owner: 'UAM owner with BDO ITIO', decision: 'Provide the EUA interface; are contact centre agents in the directory?', ref: 'DCR-143'}
@@ -166,22 +164,21 @@ holistic:
       - {sev: High, gap: 'Go-live data migration scope', impact: 'Open items and history at cut-over', owner: 'All BRD owners', decision: 'What is migrated from EBIX, ISYS, QPS, Excel', ref: 'DCR-157'}
 
   roadmap:
-    title: 'Roadmap: built, in build, designed'
+    title: 'Roadmap: from FRS review to sign-off'
     notes: >-
-      Status on 25 September 2026. The build order of the designed areas follows the cross-BRD decisions (section
-      6.2): User Access with Sanction Screening first, then Claims, Employee Benefits, Customer Servicing, Renewal and
-      Submitted Policies, with the Renewal hand-off and the CSF integration last. The decisions below move the gaps of
-      several areas at once.
+      Status on 25 September 2026. Every area has its FRS issued for BDOI review. Department heads review their FRS and
+      its proposed business rules; BDOI answers the decisions below; each FRS is then signed off through the sign-off
+      tracker. The decisions below move the open points of several areas at once.
     columns:
-      - title: Built
-        status: BUILT
-        items: ['BRD-1 New Business', 'BRD-2 Operations', 'BRD-3 Product Maintenance', 'BRD-11 baseline: users, roles, access requests, lock-out, session', 'Finance platform for BRD-5: chart, journals, engine, periods, FX, bank reconciliation']
-      - title: In build
-        status: IN BUILD
-        items: ['BRD-4 Collections (foundation and worklist)', 'BRD-5 Disbursement, ACSL, FRBS reports', 'BRD-5 Refund and cash-advance requests', 'Shared work item BT0: business type New Business / Renewal']
-      - title: Designed, next
-        status: DESIGNED
-        items: ['BRD-11 changes and BRD-10 Sanction Screening', 'BRD-7 Claims', 'BRD-8 Employee Benefits and partner portal', 'BRD-9 Customer Servicing Facility', 'BRD-6 Renewal and BRD-12 Submitted Policies']
+      - title: FRS for review
+        status: FRS ISSUED
+        items: ['BRD-1 New Business, BRD-2 Operations, BRD-3 Product Maintenance (reference FRS)', 'BRD-4 Collections, BRD-5 Accounting (two volumes)', 'BRD-6 Renewal, BRD-12 Submitted Policies', 'BRD-7 Claims, BRD-8 Employee Benefits', 'BRD-9 Customer Servicing, BRD-10 Sanction Screening, BRD-11 User Access']
+      - title: BDOI review
+        status: REVIEW
+        items: ['Department heads review their chapter with the FRS of their BRD', 'BDOI decides the proposed business rules and clarifications of each FRS', 'BDOI answers the High items of the discrepancy register']
+      - title: Sign-off
+        status: SIGN-OFF
+        items: ['FRS sign-off per BRD (sign-off tracker, item 32)', 'Test plans aligned with the signed FRS', 'Deck refreshed with screenshots of the BIBS screens']
     decisions_title: 'What BDOI must decide to move forward'
     decisions:
       - 'EUA interface and the BIBS-wide access matrix (DCR-143, 121)'
@@ -199,7 +196,7 @@ closing:
   maturity_title: 'Summary: from today to best practice'
   maturity_notes: >-
     BIBS moves every theme to one workflow in one system or better. Integration is the theme that stays furthest from
-    best practice, because the bank, insurer and directory interfaces are parked until their owners specify them.
+    best practice, because the bank, insurer and directory interfaces are on hold until their owners specify them.
   decisions_title: 'Summary: decisions for BDOI'
   decisions_notes: The same eight decisions as in the holistic chapter; each unblocks more than one area.
   roadmap_title: 'Summary: roadmap'
@@ -207,8 +204,8 @@ closing:
   next_steps:
     - 'Department heads review their chapter with the FRS of their BRD and return comments through the sign-off tracker'
     - 'BDOI answers the High items of the discrepancy register, starting with the eight decisions of this deck'
-    - 'The project team refreshes this deck after the end-to-end build, with screenshots of the BIBS screens'
-    - 'The steering committee confirms the build order of the designed areas'
+    - 'The project team refreshes this deck after FRS sign-off, with screenshots of the BIBS screens'
+    - 'The steering committee confirms the FRS sign-off plan per area'
   next_notes: >-
-    The deck is refreshed in phase B (after the end-to-end build) from the running platform. Comments go to the
+    The deck is refreshed after FRS sign-off with screenshots of the BIBS screens. Comments go to the
     document review and sign-off tracker (deliverable 32).

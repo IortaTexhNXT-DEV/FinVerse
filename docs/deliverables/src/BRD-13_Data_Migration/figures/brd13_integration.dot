@@ -7,7 +7,7 @@ digraph dm_integration {
   edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2, fontname="Arial", fontsize=10, fontcolor="@MUTED"];
 
   src  [label=<<b>BDOI extracts</b><br/><font point-size="10">EBIX, QPS, ISYS, Excel, CMS</font>>, fillcolor="@DIRTY_WHITE"];
-  sftp [label=<<b>SFTP drop</b><br/><font point-size="10">parked seam</font>>, style="rounded,dashed,filled", color="@MUTED"];
+  sftp [label=<<b>SFTP drop</b><br/><font point-size="10">on hold</font>>, style="rounded,dashed,filled", color="@MUTED"];
   up   [label=<<b>Console upload</b><br/><font point-size="10">data and control files</font>>];
   mig  [label=<<b>Migration module</b><br/><font point-size="10">intake, staging, maps, rules,<br/>loads, reconciliation, sign-off</font>>, fillcolor="@BG_BLUE"];
 

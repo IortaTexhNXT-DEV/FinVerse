@@ -29,5 +29,5 @@ digraph pm_integration {
   cat -> nb [label="scheme version,\nrating, criteria codes"];
   cat -> ops [label="version for re-rating,\ncriteria codes"];
   cat -> rnw [label="version of the\nexpiring account"];
-  pm -> feed [label="ProductMasterFeed\n(parked, PQ16)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+  pm -> feed [label="product master feed\n(on hold, PQ16)", style=dashed, color="@MUTED", fontcolor="@MUTED"];
 }

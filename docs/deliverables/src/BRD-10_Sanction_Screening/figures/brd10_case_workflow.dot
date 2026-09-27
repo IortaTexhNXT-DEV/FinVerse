@@ -16,17 +16,17 @@ digraph sc_case {
   STR_EXTRACTION     [label="STR_EXTRACTION\nCompliance Officer"];
   CLOSED             [label="CLOSED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
 
-  NEW -> INVESTIGATION [label=" route (assignment matrix)", weight=10];
-  INVESTIGATION -> UNIT_HEAD_APPROVAL [label=" submit (validated; approval matrix)", weight=10];
-  UNIT_HEAD_APPROVAL -> COMPLIANCE_REVIEW [label=" approve", weight=10];
-  COMPLIANCE_REVIEW -> AML_COMMITTEE [label=" escalate_committee", weight=10];
+  NEW -> INVESTIGATION [label=" Route to investigation (assignment matrix)", weight=10];
+  INVESTIGATION -> UNIT_HEAD_APPROVAL [label=" Submit for approval (validated; approval matrix)", weight=10];
+  UNIT_HEAD_APPROVAL -> COMPLIANCE_REVIEW [label=" Approve and escalate to Compliance", weight=10];
+  COMPLIANCE_REVIEW -> AML_COMMITTEE [label=" Escalate to the AML Committee", weight=10];
   AML_COMMITTEE -> STR_PREPARATION [label=" finalise: approve STR", weight=10];
-  STR_PREPARATION -> STR_EXTRACTION [label=" str_ready", weight=10];
-  STR_EXTRACTION -> CLOSED [label=" filed (AMLC reference)", weight=10];
+  STR_PREPARATION -> STR_EXTRACTION [label=" STR ready for extraction", weight=10];
+  STR_EXTRACTION -> CLOSED [label=" Record AMLC filing (AMLC reference)", weight=10];
 
-  UNIT_HEAD_APPROVAL -> RETURNED [label=" disapprove", style=dashed];
-  COMPLIANCE_REVIEW -> RETURNED [label=" return_for_rework", style=dashed];
-  RETURNED -> UNIT_HEAD_APPROVAL [label=" resubmit (to the stage\n that returned it)", style=dashed, constraint=false];
+  UNIT_HEAD_APPROVAL -> RETURNED [label=" Disapprove and return", style=dashed];
+  COMPLIANCE_REVIEW -> RETURNED [label=" Return for rework", style=dashed];
+  RETURNED -> UNIT_HEAD_APPROVAL [label=" Resubmit to the unit head (to the stage\n that returned it)", style=dashed, constraint=false];
   AML_COMMITTEE -> COMPLIANCE_REVIEW [label=" finalise: return", style=dashed, constraint=false];
 
   closeside [shape=box, style="rounded,dotted", color="@MUTED", fontcolor="@MUTED", fontsize=10,

@@ -1,7 +1,7 @@
 # Configuration inputs the business provides for BRD-11 User Access Maintenance (Drop 0, Setup and Data Migration).
 # Read by docs/deliverables/src/signoff/config_inputs.py: the FRS chapter "Configuration inputs the business provides"
 # (```pack blocks) and the workbook of input templates of the release set (one sheet per template, with the column
-# descriptions and one fictitious example row). The columns follow the fields of the screens as built (screens/*.yaml).
+# descriptions and one fictitious example row). The columns follow the fields of the screens (screens/*.yaml).
 # Columns of a template: header | mandatory (Y, N or the condition) | format | what to enter | example
 meta:
   title: Configuration Input Templates
@@ -65,15 +65,15 @@ templates:
   - id: CI-04
     name: Separation-of-duties rules
     sheet: SoD rules
-    content: The rules BIBS enforces as built, for confirmation, and the combinations of profiles or permissions that BDOI Information Security does not allow one user to hold
+    content: The rules BIBS enforces, for confirmation, and the combinations of profiles or permissions that BDOI Information Security does not allow one user to hold
     owner: BDOI Information Security
     source: BDOI information security policy; the separation-of-duties rules of FRS chapter 13
-    load: "The rules marked Built are fixed in BIBS; the privileged profiles are set by the privilege level of CI-02. Each combination of two profiles is entered on Separation of Duties (SCR-UA-19) by the Business Administrator and authorised by Information Security; BIBS then refuses every request and bulk line that breaks it. A combination of permissions is reviewed with the reports"
+    load: "The rules marked Enforced are fixed in BIBS; the privileged profiles are set by the privilege level of CI-02. Each combination of two profiles is entered on Separation of Duties (SCR-UA-19) by the Business Administrator and authorised by Information Security; BIBS then refuses every request and bulk line that breaks it. A combination of permissions is reviewed with the reports"
     frs: [FR-UA-031, FR-UA-034, FR-UA-045, FR-UA-053]
     columns:
       - "Rule ID | Y | SOD-nn | Identifier of the rule | SOD-01"
       - "Rule | Y | Text | The rule | The requester never decides his own request"
-      - "Status | Y | Built, To confirm, New | Built = enforced by BIBS today | Built"
+      - "Status | Y | Enforced, To confirm, New | Enforced = a fixed rule of BIBS | Enforced"
       - "Profile or permission A | Cond.: combination rule | Profile or permission of CI-02 | First profile or permission of a combination | User Access Requestor"
       - "Profile or permission B | Cond.: combination rule | Profile or permission of CI-02 | Profile or permission that may not be held with A | User Access Approver"
       - "Control | Y | Prevent (a rule of Separation of Duties, for two profiles), Detect by review, Second approval | How the rule is controlled | Prevent"
@@ -88,7 +88,7 @@ templates:
     frs: [FR-UA-001, FR-UA-002, FR-UA-005, FR-UA-006, FR-UA-034, FR-UA-052, FR-UA-054]
     columns:
       - "Parameter | Y | LOGIN_MAX_FAILED_ATTEMPTS, SESSION_IDLE_WARNING_MINUTES, SESSION_TIMEOUT_MINUTES, SESSION_EXPIRY_WARNING_MINUTES, AUTH_MODE, USER_ID_PATTERN, USER_ID_FORMAT_TEXT, PASSWORD_HISTORY_COUNT, PASSWORD_MAX_AGE_DAYS, PASSWORD_MIN_AGE_DAYS, UAM_WORKING_HOURS, UAM_ANY_APPROVER, UAM_ROLE_APPLY_ON_APPROVAL, UAM_EXTERNAL_USERS, UAM_DORMANT_DAYS, UAM_DORMANT_NOTICE_DAYS, JOB_FAILURE_RECIPIENTS | One row per parameter | PASSWORD_MAX_AGE_DAYS"
-      - "Value as delivered | Y | As on System Parameters | The value of the build | 90"
+      - "Value as delivered | Y | As on System Parameters | The value proposed with the system | 90"
       - "Value wanted | Y | Same type and range | The value BDOI wants | 90"
       - "Reason | Cond.: value changed | Text | Policy reference or reason | BDO password policy"
       - "Approved by | Y | Name | Information Security or BDOI IT approver of the value | -"

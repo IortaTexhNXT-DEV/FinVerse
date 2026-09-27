@@ -15,7 +15,7 @@ Inputs (the source folder of the BRD, docs/deliverables/src/<BRD-nn_Name>/, bran
 
 Outputs (docs/deliverables/out/<drop folder of the BRD>/TestPlans, tools/deliverables/brand.py BRD_DROP)
   * BIBS_TestPlan_BRD-nn_<Name>_v<version>.xlsx          Cover, README, Document Control, Test
-    Conditions, Scenarios, Test Cases, Coverage, Test Data, Roles and Access, FRS Findings;
+    Conditions, Scenarios, Test Cases, Coverage, Screens (with meta.signoff), Test Data, Roles and Access;
   * BIBS_TestPlan_BRD-nn_<Name>_Summary_v<version>.docx  from the summary source.
 
 YAML schema (brdnn_cases.yaml)
@@ -33,10 +33,9 @@ meta:
                                    # screen or dialog of the messages catalogue (TC-<code>-MSG-nn), a Screen ID
                                    # on every case (from the test aliases of the screens), the Screens sheet and
                                    # the <!-- tp:screens --> table
-  built: true                      # BRDs 1-5: message codes must exist in backend/src/main and
-                                   # automation references must exist; false (BRDs 6-12): codes
-                                   # and automation references are refused
-personas:                          # role code -> name, the SIT/UAT user (built BRDs) and an optional
+  verify_messages: true            # true: every quoted message text and code is checked against the
+                                   # application; false: message codes are refused (the text only)
+personas:                          # role code -> name, the SIT/UAT user and an optional
   MKT_AO: {name: Marketing AO, user: ao, short: MKT AO}   # short column label for the access table
 screens:                           # optional aliases for menu paths; a case may also give the path
   REQ: Product Maintenance > Package Requests > (request) Package Request page
@@ -63,10 +62,7 @@ frs:                               # one entry per FR of the FRS, in FRS order
         steps: [Open ..., Click ...]
         expected: The request gets a PKR-yyyy-nnnnnn number ...   # text or list
         msg: [Enter the package or programme name, PKG_REQUEST_INCOMPLETE]   # optional; the code
-                                   # only for built BRDs; shown as: Message "<text>" (<CODE>)
-        auto: PackageRequestProcessIT#aNewPackageRunsFromDraftToReleasedWithTwoRoundsAndAnAdvisory
-                                   # optional; <test file name>#<method or test name>; several
-                                   # references are separated by "; "
+                                   # only with verify_messages; shown as: Message "<text>" (<CODE>)
         neg: true                  # optional polarity override (see below)
         persona / screen / brd / priority / scenario     # optional overrides
 access:                            # roles-and-access matrix: one row per action and role
@@ -76,10 +72,12 @@ access:                            # roles-and-access matrix: one row per action
     allow: [MKT_AO, MKT_TL, TSU]
     deny: [MBS, MANCOM, AUDITOR]
     allowed: The New Package Request button is shown and the draft is saved.   # optional
-    denied: The button is not shown; POST /requests returns HTTP 403 (ACCESS_DENIED).
-    auto: ProductMaintenanceApiIT#permissionsAreEnforced                      # optional
-findings:                          # FRS defects found while writing the cases (for the FRS owner)
-  - {fr: FR-PM-002, issue: ..., proposal: ...}
+    denied: The button is not shown; a direct link shows "You do not have access to this screen".
+
+A test plan is a client document: it holds the scenarios, steps, test data and expected results only (BDOI
+instruction of 27-Sep-2026). References to automated tests ("auto") and FRS findings ("findings") are refused; a
+point that needs a business decision goes to the chapter "Proposed business rules and clarifications for
+confirmation" of the FRS.
 
 Polarity. Coverage counts a case as positive (the action succeeds) or negative (the system refuses
 it). Positive, Workflow, Report-output, Upload-download and Boundary cases are positive, and
@@ -89,7 +87,7 @@ case, every condition at least one case, and every BRD ID of the FRS at least on
 
 Placeholders in the Word summary (a line on its own): <!-- tp:counts -->, <!-- tp:coverage -->
 (per FR), <!-- tp:brd-coverage -->, <!-- tp:scenarios -->, <!-- tp:data -->, <!-- tp:personas -->,
-<!-- tp:access -->, <!-- tp:automation -->, <!-- tp:findings -->, <!-- tp:screens --> (with meta.signoff).
+<!-- tp:access -->, <!-- tp:screens --> (with meta.signoff).
 """
 
 from __future__ import annotations
@@ -119,7 +117,7 @@ NEGATIVE_TYPES = {"Negative", "Security-access", "Message"}
 PRIORITIES = ["High", "Medium", "Low"]
 STATUSES = ["Not run", "Pass", "Fail", "Blocked", "N/A"]
 PRIORITY_OF = {"must have": "High", "should have": "Medium", "could have": "Low", "nice to have": "Low"}
-CASE_KEYS = {"c", "type", "title", "pre", "data", "steps", "expected", "msg", "auto", "neg", "persona",
+CASE_KEYS = {"c", "type", "title", "pre", "data", "steps", "expected", "msg", "neg", "persona",
              "screen", "brd", "priority", "scenario"}
 FR_KEYS = {"scenario", "persona", "screen", "data", "brd", "conditions", "cases"}
 FILLER = ("seamless", "robust", "comprehensive", "leverage", "cutting-edge", "state-of-the-art",
@@ -154,7 +152,6 @@ class Case:
     steps: str
     expected: str
     priority: str
-    auto: str
     data: list[str] = field(default_factory=list)
     raw_messages: list[str] = field(default_factory=list)
     screen_id: str = ""
@@ -172,14 +169,14 @@ class Plan:
     conditions: list[dict[str, Any]] = field(default_factory=list)
     cases: list[Case] = field(default_factory=list)
     access: list[dict[str, Any]] = field(default_factory=list)
-    findings: list[dict[str, Any]] = field(default_factory=list)
     signoff: Any = None  # the sign-off Pack (src/signoff/signoff_pack.py) when meta.signoff is set
     errors: list[str] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
 
     @property
-    def built(self) -> bool:
-        return bool(self.meta.get("built"))
+    def verify_messages(self) -> bool:
+        """True when the quoted messages and codes are checked against the application sources."""
+        return bool(self.meta.get("verify_messages"))
 
     @property
     def all_brd_ids(self) -> list[str]:
@@ -254,7 +251,9 @@ def load(path: Path) -> Plan:
     plan = Plan(meta=meta, path=path, frs=read_frs(files, path.parent), personas=raw.get("personas") or {},
                 screens=raw.get("screens") or {}, data=raw.get("data") or [], scenarios=raw.get("scenarios") or [])
     plan.access = raw.get("access") or []
-    plan.findings = raw.get("findings") or []
+    if raw.get("findings"):
+        plan.errors.append("findings are not part of a client test plan; put a point that needs a business decision "
+                           "in the clarifications chapter of the FRS")
     code = meta["code"]
     data_ids = {d["id"] for d in plan.data}
     scen_ids = {s["id"] for s in plan.scenarios}
@@ -343,13 +342,10 @@ def load(path: Path) -> Plan:
                 else:
                     shown = f'Message "{str(msg[0]).replace("{", "").replace("}", "")}"'
                     if len(msg) == 2 and msg[1] not in ("-", None):
-                        if not plan.built:
-                            plan.errors.append(f"{cid}: message codes are quoted only for built BRDs")
+                        if not plan.verify_messages:
+                            plan.errors.append(f"{cid}: message codes are quoted only with verify_messages")
                         shown += f" ({msg[1]})"
                     expected = (expected + "\n" if expected else "") + shown + "."
-            auto = _text(c.get("auto"))
-            if auto and not plan.built:
-                plan.errors.append(f"{cid}: automation references are given only for built BRDs")
             priority = c.get("priority") or fr_priority(fr)
             if priority not in PRIORITIES:
                 plan.errors.append(f"{cid}: priority {priority} is not one of {PRIORITIES}")
@@ -358,7 +354,7 @@ def load(path: Path) -> Plan:
                 title=_text(c.get("title")), type=ctype or "", negative=negative, persona=persona or "",
                 screen=screen, pre=pre,
                 steps="\n".join(f"{i}. {_text(s)}" for i, s in enumerate(steps, start=1)),
-                expected=expected, priority=priority, auto=auto, data=list(data),
+                expected=expected, priority=priority, data=list(data),
                 raw_messages=[str(msg[0])] if msg else [])
             plan.cases.append(case)
             cond_rows[ci - 1]["cases"].append(cid)
@@ -373,14 +369,14 @@ def load(path: Path) -> Plan:
         for r in list(a.get("allow") or []) + list(a.get("deny") or []):
             if r not in plan.personas:
                 plan.errors.append(f"{a['id']}: role {r} is not in personas")
-        if a.get("auto") and not plan.built:
-            plan.errors.append(f"{a['id']}: automation references are given only for built BRDs")
+        for key in ("auto",):
+            if key in a:
+                plan.errors.append(f"{a['id']}: '{key}' is not part of a client test plan")
     _check_coverage(plan)
     _check_text(plan)
-    if plan.built:
+    if plan.verify_messages:
         _check_codes(plan)
         _check_messages(plan)
-        _check_automation(plan)
     return plan
 
 
@@ -437,7 +433,7 @@ def _add_signoff_cases(plan: Plan) -> None:
                     title=f"Screen {scr.id} {scr.title} matches the signed specification", type="Screen",
                     negative=False, persona=role, screen=pack.menu_path(scr), pre="Seed data of the SIT environment.",
                     steps="\n".join(f"{i}. {t}" for i, t in enumerate(steps, start=1)),
-                    expected="\n".join(expected), priority="High", auto="", screen_id=scr.id)
+                    expected="\n".join(expected), priority="High", screen_id=scr.id)
         plan.cases.append(case)
 
     groups: "OrderedDict[str, list[dict[str, str]]]" = OrderedDict()
@@ -461,7 +457,7 @@ def _add_signoff_cases(plan: Plan) -> None:
                     steps="\n".join(f"{i}. {t}" for i, t in enumerate(steps, start=1)),
                     expected="Each message is shown word for word, with its code as the Reference for a server "
                              "message, and nothing is saved:\n" + listed,
-                    priority="Medium", auto="", screen_id=scr.id if scr else "")
+                    priority="Medium", screen_id=scr.id if scr else "")
         plan.cases.append(case)
 
 
@@ -569,34 +565,6 @@ def _check_codes(plan: Plan) -> None:
                 plan.errors.append(f"{c.id}: code {code} does not occur in backend/src/main or frontend/src")
 
 
-def _test_files() -> dict[str, list[Path]]:
-    if "tests" not in _SOURCE_CACHE:
-        index: dict[str, list[Path]] = {}
-        roots = [REPO / "backend" / "src" / "test", REPO / "frontend" / "src"]
-        for root in roots:
-            for p in root.rglob("*"):
-                if p.is_file() and "node_modules" not in p.parts and (
-                        p.suffix == ".java" or re.search(r"\.(test|spec)\.tsx?$", p.name)):
-                    index.setdefault(p.name, []).append(p)
-                    index.setdefault(p.stem, []).append(p)
-        _SOURCE_CACHE["tests"] = index  # type: ignore[assignment]
-    return _SOURCE_CACHE["tests"]  # type: ignore[return-value]
-
-
-def _check_automation(plan: Plan) -> None:
-    index = _test_files()
-    refs = [(c.id, c.auto) for c in plan.cases] + [(a["id"], _text(a.get("auto"))) for a in plan.access]
-    for ident, auto in refs:
-        for ref in [r.strip() for r in auto.split(";") if r.strip()]:
-            cls, _, method = ref.partition("#")
-            files = index.get(cls)
-            if not files:
-                plan.errors.append(f"{ident}: test class {cls} not found under backend/src/test or frontend/src")
-                continue
-            if method and not any(method in f.read_text(encoding="utf-8", errors="ignore") for f in files):
-                plan.errors.append(f"{ident}: {method} not found in {cls}")
-
-
 # --------------------------------------------------------------------------- statistics
 
 def fr_stats(plan: Plan) -> list[dict[str, Any]]:
@@ -609,7 +577,6 @@ def fr_stats(plan: Plan) -> list[dict[str, Any]]:
             "positive": sum(1 for c in cases if not c.negative),
             "negative": sum(1 for c in cases if c.negative),
             "total": len(cases),
-            "automated": sum(1 for c in cases if c.auto),
             "types": Counter(c.type for c in cases),
         })
     for r in rows:
@@ -627,7 +594,7 @@ def brd_stats(plan: Plan) -> list[dict[str, Any]]:
             "conditions": len({c.cond for c in cases}),
             "positive": sum(1 for c in cases if not c.negative),
             "negative": sum(1 for c in cases if c.negative),
-            "total": len(cases), "automated": sum(1 for c in cases if c.auto),
+            "total": len(cases),
         })
         rows[-1]["result"] = "Covered" if cases else "GAP"
     return rows
@@ -647,7 +614,6 @@ def totals(plan: Plan) -> dict[str, Any]:
         "positive": sum(1 for c in plan.cases if not c.negative),
         "negative": sum(1 for c in plan.cases if c.negative),
         "types": types,
-        "automated": sum(1 for c in plan.cases if c.auto),
         "access_rows": sum(len(a.get("allow") or []) + len(a.get("deny") or []) for a in plan.access),
         "data": len(plan.data),
     }
@@ -671,15 +637,14 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
                       subtitle=f"Test conditions, scenarios and test cases for {brd_label} {m['name']}")
     t = totals(plan)
     wb.legend = [("Pass", "The case ran and the actual result matches the expected result"),
-                 ("Fail", "The actual result differs; a defect ID is recorded"),
-                 ("Blocked", "The case cannot run (environment, data or a defect elsewhere)"),
+                 ("Fail", "The actual result differs; an issue ID is recorded"),
+                 ("Blocked", "The case cannot run (environment, data or an open issue elsewhere)"),
                  ("N/A", "Not applicable in this cycle, with the reason in Actual result")]
-    frs = ", ".join(m["frs"]) if isinstance(m["frs"], list) else m["frs"]
     wb.cover_notes = [
-        f"Source: FRS {brd_label} ({frs}). {t['frs']} FRs, {t['brd_ids']} BRD IDs, {t['conditions']} test "
+        f"Source: FRS {brd_label} {m['name']}. {t['frs']} FRs, {t['brd_ids']} BRD IDs, {t['conditions']} test "
         f"conditions, {t['scenarios']} scenarios, {t['cases']} test cases ({t['positive']} positive, "
-        f"{t['negative']} negative), {t['automated']} with an automation reference.",
-        "Status starts as Not run. Testers fill Status, Actual result, Tester, Date and Defect ID during execution.",
+        f"{t['negative']} negative).",
+        "Status starts as Not run. Testers fill Status, Actual result, Tester, Date and Issue ID during execution.",
     ]
 
     wb.sheet("Document Control", [
@@ -725,27 +690,25 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
         Column("brd", "BRD ID", 12, "BRD requirement ID(s)"),
         Column("title", "Test case", 30, "What the case checks"),
         Column("type", "Type", 13, "Kind of test", values=TYPES),
-        Column("persona", "Persona", 22, "Role code and name (and SIT/UAT user for built BRDs)"),
+        Column("persona", "Persona", 22, "Role code and name (and the SIT/UAT user)"),
         Column("screen", "Screen (menu path)", 26, "Where the tester starts"),
     ] + ([Column("screen_id", "Screen ID", 12, "Screen of the FRS screen specifications (business sign-off pack)")]
          if plan.signoff else []) + [
         Column("pre", "Preconditions and test data", 36, "State before the first step and the named data set"),
         Column("steps", "Steps", 52, "Numbered steps"),
         Column("expected", "Expected result", 50,
-               "What the system must do, with the exact message text and, for built BRDs, its code"),
+               "What the system must do, with the exact message text and, where the system shows one, its code"),
         Column("priority", "Priority", 9, "High / Medium / Low", values=PRIORITIES),
-        Column("auto", "Automation reference", 30,
-               "Existing automated test (class#method) that covers the case; blank when none"),
         Column("status", "Status", 11, "Execution status", values=STATUSES, status=True),
         Column("actual", "Actual result", 30, "What happened, filled by the tester"),
         Column("tester", "Tester", 14, "Who ran the case"),
         Column("date", "Date", 12, "Date of the run", kind="date"),
-        Column("defect", "Defect ID", 12, "Defect raised when the case fails"),
+        Column("issue", "Issue ID", 12, "Issue raised when the case fails"),
     ], rows=[{
         "id": c.id, "scenario": c.scenario, "fr": c.fr, "brd": ", ".join(c.brd), "title": c.title,
         "type": c.type, "persona": persona_label(plan, c.persona), "screen": c.screen, "screen_id": c.screen_id,
         "pre": c.pre,
-        "steps": c.steps, "expected": c.expected, "priority": c.priority, "auto": c.auto, "status": "Not run",
+        "steps": c.steps, "expected": c.expected, "priority": c.priority, "status": "Not run",
     } for c in plan.cases], description="Test cases with steps and expected results; execution columns start blank")
 
     cov = []
@@ -760,7 +723,6 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
         Column("positive", "Positive", 10, "Cases where the action succeeds", kind="number"),
         Column("negative", "Negative", 10, "Cases where BIBS refuses the action", kind="number"),
         Column("total", "Total", 8, "All cases", kind="number"),
-        Column("automated", "Automated", 11, "Cases with an automation reference", kind="number"),
         Column("result", "Coverage", 11, "Covered: at least one positive and one negative case (FR) or one case "
                "(BRD ID); GAP otherwise", values=["Covered", "GAP"], status=True),
     ], rows=cov, description="Every FR and every BRD ID with its count of positive and negative cases")
@@ -786,7 +748,7 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
         Column("id", "Data set", 11, "Data set ID"),
         Column("name", "Name", 28, "Short name used in the cases"),
         Column("content", "Content", 64, "Records and values in the set"),
-        Column("source", "Source", 40, "Seed that provides it (built BRDs) or how to prepare it; "
+        Column("source", "Source", 40, "Seed data set that provides it, or how the tester prepares it; "
                "non-production data is masked"),
         Column("n", "Cases", 8, "Number of cases that use it", kind="number"),
     ], rows=data_rows, description="Named test data sets; UAT uses masked copies of production-like data")
@@ -800,13 +762,13 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
                              "permission": a.get("permission", ""), "role": persona_label(plan, role),
                              "access": "Allowed",
                              "expected": _text(a.get("allowed")) or "The action is offered and completes.",
-                             "auto": _text(a.get("auto")), "status": "Not run"})
+                             "status": "Not run"})
         for role in a.get("deny") or []:
             k += 1
             acc_rows.append({"id": f"{a['id']}.{k}", "action": a.get("action"), "screen": a["screen"],
                              "permission": a.get("permission", ""), "role": persona_label(plan, role),
                              "access": "Denied", "expected": _text(a.get("denied")),
-                             "auto": _text(a.get("auto")), "status": "Not run"})
+                             "status": "Not run"})
     access_ws = wb.sheet("Roles and Access", [
         Column("id", "Case ID", 11, "Access case ID: AC-<code>-<nn>.<n>"),
         Column("action", "Action", 30, "Screen or action checked"),
@@ -815,26 +777,16 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
         Column("role", "Role", 28, "Role tested (log in as a user who holds only this role)"),
         Column("access", "Access", 10, "Expected access", values=["Allowed", "Denied"]),
         Column("expected", "Expected result", 50, "What the user sees"),
-        Column("auto", "Automation reference", 28, "Existing automated test, if any"),
         Column("status", "Status", 11, "Execution status", values=STATUSES, status=True),
         Column("actual", "Actual result", 28, "Filled by the tester"),
         Column("tester", "Tester", 14, "Who ran the case"),
         Column("date", "Date", 12, "Date of the run", kind="date"),
-        Column("defect", "Defect ID", 12, "Defect raised when the case fails"),
+        Column("issue", "Issue ID", 12, "Issue raised when the case fails"),
     ], rows=acc_rows, description="Who can and cannot see or do each action (one row per action and role)")
 
     # The two execution sheets are wide: they print on A3 landscape, fitted to the page width.
     for ws in (cases_ws, access_ws):
         ws.page_setup.paperSize = ws.PAPERSIZE_A3
-
-    if plan.findings:
-        wb.sheet("FRS Findings", [
-            Column("id", "ID", 10, "Finding ID"),
-            Column("fr", "FR ID", 12, "FR concerned"),
-            Column("issue", "Finding", 70, "Ambiguous or untestable point found while writing the cases"),
-            Column("proposal", "Proposed resolution", 60, "What the test team proposes to the FRS owner"),
-        ], rows=[{"id": f"TF-{plan.meta['code']}-{i:02d}", **f} for i, f in enumerate(plan.findings, start=1)],
-            description="FRS points raised for the FRS owner; the affected cases assume the proposed resolution")
 
     name = brand.output_name("TestPlan", m["brd"], m["name"], str(m["version"]), "xlsx")
     return wb.save(brand.out_dir(m["brd"], "TestPlans") / name)
@@ -878,16 +830,15 @@ def placeholder(plan: Plan, name: str) -> list[str]:
             ["of which positive / negative", f"{t['positive']} / {t['negative']}"],
         ]
         rows += [[f"of type {k}", types.get(k, 0)] for k in TYPES if types.get(k)]
-        rows += [["Test cases with an automation reference", t["automated"]],
-                 ["Roles-and-access checks (action x role)", t["access_rows"]],
+        rows += [["Roles-and-access checks (action x role)", t["access_rows"]],
                  ["Named test data sets", t["data"]]]
         return _table('widths=10,5 caption="Test plan in numbers"', ["Item", "Count"], rows)
     if name == "coverage":
-        rows = [[r["item"], r["title"], r["traces"], r["conditions"], r["positive"], r["negative"], r["total"],
-                 r["automated"]] for r in fr_stats(plan)]
+        rows = [[r["item"], r["title"], r["traces"], r["conditions"], r["positive"], r["negative"], r["total"]]
+                for r in fr_stats(plan)]
         size = "7.5" if len(rows) > 50 else "8"
-        return _table(f'widths=2.3,6.4,3.2,1.5,1.5,1.5,1.3,1.6 caption="Coverage by FR" size={size}',
-                      ["FR", "Title", "BRD IDs", "Cond.", "Pos.", "Neg.", "Total", "Auto."], rows)
+        return _table(f'widths=2.3,7.4,3.8,1.5,1.5,1.5,1.4 caption="Coverage by FR" size={size}',
+                      ["FR", "Title", "BRD IDs", "Cond.", "Pos.", "Neg.", "Total"], rows)
     if name == "brd-coverage":
         stats = brd_stats(plan)
         if len(stats) >= 40:
@@ -913,11 +864,13 @@ def placeholder(plan: Plan, name: str) -> list[str]:
         for code, p in plan.personas.items():
             n = sum(1 for c in plan.cases if c.persona == code)
             row = [code, p.get("name", "")]
-            if plan.built:
+            users = any(x.get("user") for x in plan.personas.values())
+            if users:
                 row.append(p.get("user", "-") or "-")
             rows.append(row + [n])
-        headers = ["Role", "Persona"] + (["SIT/UAT user"] if plan.built else []) + ["Cases"]
-        widths = "3.4,8,2.6,1.6" if plan.built else "3.6,10.4,1.6"
+        users = any(x.get("user") for x in plan.personas.values())
+        headers = ["Role", "Persona"] + (["SIT/UAT user"] if users else []) + ["Cases"]
+        widths = "3.4,8,2.6,1.6" if users else "3.6,10.4,1.6"
         return _table(f'widths={widths} caption="Personas used by the cases" size=8.5', headers, rows)
     if name == "access":
         used = {r for a in plan.access for r in (a.get("allow") or []) + (a.get("deny") or [])}
@@ -930,23 +883,6 @@ def placeholder(plan: Plan, name: str) -> list[str]:
         return _table(f'widths={w} caption="Roles-and-access checks (Y = allowed, N = refused, blank = not tested)" '
                       'size=7.5', ["Action"] + [str(plan.personas[r].get("short") or r.replace("_", " "))
                                                 for r in roles], rows)
-    if name == "automation":
-        classes: Counter[str] = Counter()
-        for c in plan.cases:
-            for ref in [r.strip() for r in c.auto.split(";") if r.strip()]:
-                classes[ref.partition("#")[0]] += 1
-        rows = [[k, v] for k, v in sorted(classes.items(), key=lambda x: (-x[1], x[0]))]
-        if not rows:
-            return ["No automated test exists yet for this BRD; every case is run manually.", ""]
-        return _paired('widths=6,1.6 caption="Automated tests referenced by the cases" size=8',
-                       ["Test class", "Cases"], rows, min_rows=24)
-    if name == "findings":
-        if not plan.findings:
-            return ["No FRS finding was raised while the cases were written.", ""]
-        rows = [[f"TF-{plan.meta['code']}-{i:02d}", f.get("fr", ""), _text(f.get("issue")), _text(f.get("proposal"))]
-                for i, f in enumerate(plan.findings, start=1)]
-        return _table('widths=1.8,2.2,7.2,5.8 caption="FRS findings for the FRS owner" size=8.5',
-                      ["ID", "FR", "Finding", "Proposed resolution"], rows)
     if name == "screens":
         if not plan.signoff:
             raise ValueError("tp:screens needs meta.signoff")
@@ -986,8 +922,8 @@ def report(plan: Plan) -> str:
     types = ", ".join(f"{k} {t['types'][k]}" for k in TYPES if t["types"].get(k))
     return (f"{plan.meta['brd']} {plan.meta['name']}: FRs {t['frs_covered']}/{t['frs']}, BRD IDs "
             f"{t['brd_covered']}/{t['brd_ids']}, conditions {t['conditions']}, scenarios {t['scenarios']}, "
-            f"cases {t['cases']} (positive {t['positive']}, negative {t['negative']}; {types}), automated "
-            f"{t['automated']}, access checks {t['access_rows']}, findings {len(plan.findings)}")
+            f"cases {t['cases']} (positive {t['positive']}, negative {t['negative']}; {types}), "
+            f"access checks {t['access_rows']}")
 
 
 def main(argv: list[str] | None = None) -> int:

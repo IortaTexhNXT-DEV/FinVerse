@@ -52,7 +52,7 @@ contract:
     party: BRD-6 Renewal
     direction: Out
     what: Package versions for renewal pricing (purpose Renewal) and the sellable check of a product at renewal
-    how: A renewal priced as is keeps the expiring account's package version while it is released or superseded; an expired package with no current version is refused (check PRODUCT_RENEWABLE); the Renewal design uses the catalog contracts as built
+    how: A renewal priced as is keeps the expiring account's package version while it is released or superseded; an expired package with no current version is refused (check PRODUCT_RENEWABLE); Renewal uses these catalogue rules
     owner: MBS; TSU
     screens: Package Version, Product record
     frs: [FR-PM-050, FR-PM-051, FR-PM-052]

@@ -13,6 +13,7 @@ meta:
   status_as_of: 05-Oct-2026
   release_set: BRD-13 Data Migration – Business Sign-off Pack
   frs: HANDBOOK_BRD13_DATA_MIGRATION.md
+  source_doc: Data Migration Handbook
   test_plan: brd13_cases.yaml
   screens_dir: screens
   screenshot_dir: ../screenshots

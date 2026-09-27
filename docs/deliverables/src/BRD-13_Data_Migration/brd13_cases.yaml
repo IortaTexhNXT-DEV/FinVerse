@@ -10,6 +10,7 @@ meta:
   name: Data Migration
   code: DM
   frs: HANDBOOK_BRD13_DATA_MIGRATION.md
+  source_doc: Data Migration Handbook
   summary: TP_BRD13_DATA_MIGRATION.md
   version: "2.0"
   date: 5 October 2026

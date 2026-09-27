@@ -835,6 +835,7 @@ def build_workbook(pack: Pack, extend: Any = None, out_dir: Path | None = None) 
     m = pack.meta
     nm = pack.module
     wbm = m.get("workbook") or {}
+    doc = m.get("source_doc", "FRS")  # the document the screens and FRs are specified in (BRD-13: the handbook)
     wb = BdoiWorkbook(wbm.get("title") or f"Sign-off Workbook {m['brd_label']} {m['name']}",
                       doc_type=wbm.get("doc_type") or "Business sign-off workbook",
                       brd=m["brd"], version=str(m["version"]), date=str(m["date"]),
@@ -844,7 +845,7 @@ def build_workbook(pack: Pack, extend: Any = None, out_dir: Path | None = None) 
                  ("Change requested", "The row must change: describe the change in BU comment"),
                  ("Comment", "A remark that does not change the row")]
     wb.cover_notes = [
-        f"Issued on {m['status_as_of']}. The rows are generated from FRS v{m['version']} and match its screen "
+        f"Issued on {m['status_as_of']}. The rows are generated from {doc} v{m['version']} and match its screen "
         "specifications row for row.",
         "Fill in the BU review columns only. After sign-off the screens, fields, navigation and messages are "
         "frozen; later changes go through the Change Management Register.",
@@ -852,8 +853,8 @@ def build_workbook(pack: Pack, extend: Any = None, out_dir: Path | None = None) 
     date_sheets = []
 
     howto = [
-        ("1", "Read the FRS chapter Screen specifications with the screenshots, or walk through the screens on the SIT "
-              "environment during the review sessions of the Start Here guide."),
+        ("1", f"Read the {doc} chapter Screen specifications with the screenshots, or walk through the screens on "
+              "the SIT environment during the review sessions of the Start Here guide."),
         ("2", "On the sheets Screen standards, Screen catalogue, Field register, Business rules and Messages, set BU "
               "review to Accept, "
               "Change requested or Comment for each row you review, and write the change in BU comment."),
@@ -899,7 +900,7 @@ def build_workbook(pack: Pack, extend: Any = None, out_dir: Path | None = None) 
             "shots": "\n".join(x.get("caption", "") for x in s.get("shots") or []),
             "fields": len(s.fields), "actions": len(s.actions)})
     ws = wb.sheet("Screen catalogue", [
-        Column("id", "Screen ID", 12, "Screen identifier used in the FRS"),
+        Column("id", "Screen ID", 12, f"Screen identifier used in the {doc}"),
         Column("area", "Area", 22, "Process area"),
         Column("title", "Screen", 26, "Screen name as in the menu or page title"),
         Column("menu", "Menu path", 38, "Where the screen is in the sidebar (› separates the levels)"),
@@ -908,9 +909,9 @@ def build_workbook(pack: Pack, extend: Any = None, out_dir: Path | None = None) 
         Column("purpose", "Purpose", 50, "What the screen is for"),
         Column("entry", "Other entry points", 36, "How the user reaches it from other screens"),
         Column("outcome", "Expected outcome", 40, "What is achieved on the screen"),
-        Column("frs", "FRs", 20, "Functional requirements of the FRS"),
+        Column("frs", "FRs", 20, f"Functional requirements of the {doc}"),
         Column("tests", "Test cases", 30, "Test cases of the test plan on this screen"),
-        Column("shots", "Screenshots", 36, "Screenshots of the screen in the FRS"),
+        Column("shots", "Screenshots", 36, f"Screenshots of the screen in the {doc}"),
         Column("fields", "Fields", 8, "Number of fields and columns", kind="number"),
         Column("actions", "Actions", 8, "Number of actions", kind="number"),
     ] + review_columns(), screen_rows, description=f"One row per {nm} screen")
@@ -1048,7 +1049,7 @@ def build_workbook(pack: Pack, extend: Any = None, out_dir: Path | None = None) 
         Column("id", "ID", 9, "Comment identifier"),
         Column("raised_by", "Raised by", 22, "Name and unit of the reviewer"),
         Column("date", "Date", 13, "Date raised", kind="date"),
-        Column("where", "Page / screen", 24, "FRS page or section, screen ID or workbook row"),
+        Column("where", "Page / screen", 24, f"{doc} page or section, screen ID or workbook row"),
         Column("type", "Type", 16, "Clarification, Correction or Change request", values=COMMENT_TYPES),
         Column("comment", "Comment", 50, "The question, the correction or the change asked for"),
         Column("response", "Response", 50, "Answer of the project team; for a change request, its register number"),
@@ -1079,7 +1080,7 @@ def build_workbook(pack: Pack, extend: Any = None, out_dir: Path | None = None) 
         Column("change", "Change", 70, "What changed; for a revision, the comment IDs answered"),
         Column("rows", "Rows changed", 24, "Sheets and rows changed"),
     ], [{"version": str(m["version"]), "date": str(m["date"]), "author": f"{brand.VENDOR} project team",
-         "change": "First issue of the business sign-off pack, from the FRS of the same version", "rows": "All"}],
+         "change": f"First issue of the business sign-off pack, from the {doc} of the same version", "rows": "All"}],
         description="Versions of this release set (a revision after review is v2.1; after sign-off, a change request)",
         freeze_first_column=False)
 

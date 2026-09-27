@@ -174,7 +174,7 @@ def write_index(key: str) -> Path:
             home = brand.DROPS[brand.drop_of(b)]["folder"]
             folder = brand.out_dir(b, "FRS")
             files = sorted(f for f in folder.glob(f"*BIBS_*_{b}_*")
-                           if (m := NAME_RE.match(f.name)) and m["type"] in ("FRS", "TestPlan"))
+                           if (m := NAME_RE.match(f.name)) and m["type"] in ("FRS", "Handbook", "TestPlan"))
             links = "<br>".join(f"[`{f.name}`](../{home}/{folder.name}/{f.name})" for f in files)
             lines.append(f"| {b} | {what} | {links or f'[{home}/](../{home}/README.md)'} |")
     lines += ["", "## Still to write", "", "| Document | BRD | Note |", "|---|---|---|"]

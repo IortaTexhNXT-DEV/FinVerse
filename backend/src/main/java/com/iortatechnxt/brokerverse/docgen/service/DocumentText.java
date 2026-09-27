@@ -3,9 +3,7 @@ package com.iortatechnxt.brokerverse.docgen.service;
 import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -62,11 +60,15 @@ public final class DocumentText {
    * SERVICE INVOICE) in title case (Service Invoice), like every other document footer.
    */
   private static String titleCase(String title) {
-    if (title == null || !title.equals(title.toUpperCase(Locale.ROOT))) {
+    if (title == null || title.chars().anyMatch(Character::isLowerCase)) {
       return title;
     }
-    return Arrays.stream(title.toLowerCase(Locale.ROOT).split(" "))
-        .map(w -> w.isEmpty() ? w : Character.toUpperCase(w.charAt(0)) + w.substring(1))
-        .collect(Collectors.joining(" "));
+    StringBuilder out = new StringBuilder(title.length());
+    boolean wordStart = true;
+    for (char c : title.toCharArray()) {
+      out.append(wordStart ? c : Character.toLowerCase(c));
+      wordStart = c == ' ';
+    }
+    return out.toString();
   }
 }

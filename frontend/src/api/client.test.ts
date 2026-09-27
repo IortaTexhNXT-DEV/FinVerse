@@ -1,4 +1,4 @@
-import { api, ApiError, fileNameOf, tokenStore, toQuery } from './client';
+import { api, ApiError, businessDetail, fileNameOf, tokenStore, toQuery } from './client';
 
 describe('api client', () => {
   afterEach(() => {
@@ -91,5 +91,22 @@ describe('api client', () => {
     expect(error).toBeInstanceOf(ApiError);
     expect((error as ApiError).code).toBe('PERIOD_NOT_OPEN');
     expect((error as ApiError).message).toBe('Period closed');
+  });
+});
+
+describe('record names in server messages', () => {
+  it('writes a class-style record name in words', () => {
+    expect(businessDetail('AutoBookRule not found: 7')).toBe('Auto book rule not found: 7');
+    expect(businessDetail('ServiceInvoiceType not found: 3')).toBe(
+      'Service invoice type not found: 3',
+    );
+    expect(businessDetail('IncentiveRule already exists: R1')).toBe(
+      'Incentive rule already exists: R1',
+    );
+  });
+
+  it('keeps messages already in words', () => {
+    expect(businessDetail('Auto-booking rule not found: 7')).toBe('Auto-booking rule not found: 7');
+    expect(businessDetail('Enter the justification')).toBe('Enter the justification');
   });
 });

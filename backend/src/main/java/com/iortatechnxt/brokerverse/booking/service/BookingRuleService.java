@@ -29,6 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class BookingRuleService {
 
   private static final String AUTO_BOOK = "AutoBookRule";
+
+  /** Name of an auto-booking rule in messages. */
+  private static final String AUTO_BOOK_NAME = "Auto-booking rule";
   private static final String INCENTIVE = "IncentiveRule";
 
   private final AutoBookRuleRepository autoBook;
@@ -101,7 +104,7 @@ public class BookingRuleService {
    */
   public AutoBookRule updateAutoBookRule(Long id, AutoBookRule.Criteria criteria) {
     AutoBookRule rule =
-        autoBook.findById(id).orElseThrow(() -> new ResourceNotFoundException(AUTO_BOOK, id));
+        autoBook.findById(id).orElseThrow(() -> new ResourceNotFoundException(AUTO_BOOK_NAME, id));
     rule.apply(criteria);
     audit.record(AUTO_BOOK, rule.getId(), AuditAction.UPDATE, describe(rule));
     return rule;

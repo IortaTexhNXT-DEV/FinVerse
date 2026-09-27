@@ -289,7 +289,9 @@ async function drawCallouts(page, callouts) {
     // With a dialog open, only the dialog is described.
     const dialogs = [...document.querySelectorAll('dialog[open], [role=dialog]')].filter((d) => d.getBoundingClientRect().width > 0);
     const scope = dialogs.length ? dialogs[dialogs.length - 1] : null;
-    const inChrome = (el) => !!el.closest('nav, aside, header, [data-callout-layer]') || (scope !== null && !scope.contains(el));
+    // The application menu and top bar are not described; a page or card header inside the content area is.
+    const inChrome = (el) => !!el.closest('nav, aside, [data-callout-layer]') || (!!el.closest('header') && !el.closest('main'))
+      || (scope !== null && !scope.contains(el));
     const byType = {
       column: ['th', '[role=columnheader]'],
       tab: ['[role=tab]'],

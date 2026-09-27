@@ -10,8 +10,9 @@ meta:
   code: PM
   frs: FRS_BRD03_PRODUCT_MAINTENANCE.md
   summary: TP_BRD03_PRODUCT_MAINTENANCE.md
-  version: "1.0"
-  date: 25 September 2026
+  version: "2.0"
+  date: 27 September 2026
+  signoff: pack/pack.yaml
   built: true
 
 personas:
@@ -54,6 +55,10 @@ screens:
   COVCL: Product Maintenance > Coverages & Clauses
   INCENT: Product Maintenance > Incentive Criteria
   CALC: Product Maintenance > Premium Calculator
+  INSURERS: Product Maintenance > Insurers
+  INSURER: Product Maintenance > Insurers > Insurer page
+  RATES: Product Maintenance > Rates & Taxes
+  SALESORG: Product Maintenance > Sales Organisation
   QUOTE: Quotation / Proposal > New Quotation
   APPROVALS: My Approvals
   ACCREQ: Broking Setup > Access Requests
@@ -1819,7 +1824,7 @@ frs:
         steps:
           - On the RETIRE request click Set up package version (API).
         expected: Refused.
-        msg: [A RETIRE request retires the package instead, PKG_REQUEST_TYPE_MISMATCH]
+        msg: [A retirement request retires the package; it has no version to set up, PKG_REQUEST_TYPE_MISMATCH]
         auto: PackageRequestProcessIT#aRetireRequestRetiresThePackageWithAnAdvisoryDraft
       - c: 1
         type: Negative

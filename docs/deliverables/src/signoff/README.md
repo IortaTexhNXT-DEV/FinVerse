@@ -31,6 +31,12 @@ python docs/deliverables/src/signoff/build_guide_deck.py BRD-01                 
 python tools/deliverables/drop_index.py
 ```
 
+Optional keys of `pack.yaml`: `foreign_packs` (paths of the packs of other BRDs, relative to `pack.yaml`, whose
+screens a walkthrough step may show, for example My Approvals of New Business in a Product Maintenance walkthrough)
+and `signatories` (`[role, organisation, signs for]` of the sign-off certificate; the New Business list by default).
+Optional key of `messages.yaml` › `sources`: `bulk_screen` (the screen named for upload row messages). The two column
+checks of every upload type are listed only for a pack with upload types.
+
 The check refuses: a field label or button that is not a text of `frontend/src` (or a workflow stage or action), a
 route that is not a screen of the menu, a screen no persona can open, an FR that is not in the FRS, a test-plan screen
 alias that does not exist, an error or validation message without a fix, a flow or walkthrough link to an unknown

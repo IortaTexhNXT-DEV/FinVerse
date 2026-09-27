@@ -449,7 +449,7 @@ def _add_signoff_cases(plan: Plan) -> None:
         scr = pack.by_id.get(ids[0]) if ids else None
         role = persona_of(scr) if scr else next(iter(plan.personas))
         fr, brd = first_fr(scr) if scr else ("", [])
-        screen = pack.menu_path(scr) if scr else "Any New Business record"
+        screen = pack.menu_path(scr) if scr else f"Any {pack.module} record"
         listed = "\n".join(f"{m['id']}: \"{m['text']}\"" + (f" ({m['code']})" if m["code"] != "-" else "")
                            for m in msgs)
         steps = [f"Sign in as {user(role)}.", f"Open {screen}.",

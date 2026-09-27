@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.catalog.domain;
 
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -13,6 +15,8 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "cat_commission_rate")
 public class CommissionRate extends EffectiveDatedRecord {
+
+  @Embedded private RecordOrigin recordOrigin = RecordOrigin.BIBS;
 
   private static final String LABEL = "The commission rate";
 
@@ -101,4 +105,22 @@ public class CommissionRate extends EffectiveDatedRecord {
    * @param effectiveTo last valid date, null when open ended
    */
   public record RateValidity(BigDecimal rate, LocalDate effectiveFrom, LocalDate effectiveTo) {}
+
+  /**
+   * Marks a record loaded from a legacy system (DATA_MIGRATION_DESIGN section 10).
+   *
+   * @param origin source system, legacy reference and batch
+   */
+  public void markMigrated(RecordOrigin origin) {
+    this.recordOrigin = origin;
+  }
+
+  /**
+   * Where the record comes from.
+   *
+   * @return BIBS or the legacy origin
+   */
+  public RecordOrigin getRecordOrigin() {
+    return recordOrigin == null ? RecordOrigin.BIBS : recordOrigin;
+  }
 }

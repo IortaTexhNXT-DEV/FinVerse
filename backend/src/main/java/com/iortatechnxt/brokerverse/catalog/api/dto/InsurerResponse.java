@@ -3,6 +3,8 @@ package com.iortatechnxt.brokerverse.catalog.api.dto;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.domain.PlacementChannel;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -22,6 +24,7 @@ import java.util.List;
  * @param recordStatus maker-checker status
  * @param maker last maintainer
  * @param authorizedBy checker
+ * @param origin BIBS or the legacy origin (source system, legacy reference, batch)
  */
 public record InsurerResponse(
     Long id,
@@ -36,7 +39,8 @@ public record InsurerResponse(
     int defaultCreditDays,
     RecordStatus recordStatus,
     String maker,
-    String authorizedBy) {
+    String authorizedBy,
+    @JsonUnwrapped RecordOrigin origin) {
 
   /**
    * Maps an entity.
@@ -58,6 +62,7 @@ public record InsurerResponse(
         e.getDefaultCreditDays(),
         e.getRecordStatus(),
         e.getMaker(),
-        e.getAuthorizedBy());
+        e.getAuthorizedBy(),
+        e.getRecordOrigin());
   }
 }

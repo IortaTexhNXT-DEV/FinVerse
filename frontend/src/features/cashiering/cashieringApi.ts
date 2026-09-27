@@ -145,7 +145,8 @@ export const cashieringApi = {
   routeCwt: (id: number) => post<CwtBatch>(`/cwt/batches/${id}/route`),
   releaseCwt: (id: number) => post<CwtBatch>(`/cwt/batches/${id}/release`),
 
-  series: (companyId: number) => get<Series[]>(`/series${toQuery({ companyId })}`),
+  series: (companyId: number, origin?: RecordOriginKind) =>
+    get<Series[]>(`/series${toQuery({ companyId, origin })}`),
   createSeries: (body: SeriesBody) => post<Series>('/series', body),
   updateSeries: (id: number, atpNo: string | undefined, toNo: number, warnAt: number) =>
     api.put<Series>(`${BASE}/series/${id}`, { atpNo, toNo, warnAt }),

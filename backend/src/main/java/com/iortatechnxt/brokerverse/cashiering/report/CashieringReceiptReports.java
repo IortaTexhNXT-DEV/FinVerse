@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.cashiering.report.SqlReport.Spec;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
+import com.iortatechnxt.brokerverse.report.core.ReportOrigin;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,6 +36,7 @@ public class CashieringReceiptReports {
           + " 1 as cnt from csh_application a join csh_receipt r on r.id = a.receipt_id"
           + " left join ops_invoice i on i.invoice_no = a.invoice_no"
           + " where a.company_id = :company and a.status = 'ACTIVE' and r.kind = 'AR'"
+          + ReportOrigin.sql("coalesce(i.origin, 'BIBS')")
           + " and a.value_date between :from and :to order by a.value_date, r.receipt_no, a.id";
 
   private static final String APPLIED_COMMISSION =
@@ -101,12 +103,14 @@ public class CashieringReceiptReports {
           + " c.booked as commission, c.balance as outstanding, cast(:to as date) - i.booking_date as age_days"
           + " from ops_invoice i join ops_invoice_component c on c.invoice_id = i.id"
           + " and c.component = 'COMMISSION' where i.company_id = :company and c.balance > 0"
+          + ReportOrigin.sql("i.origin")
           + " and i.booking_date between :from and :to order by i.insurer_code, i.booking_date, i.invoice_no";
 
   private static final String COMMISSION_YTD =
       "select i.insurer_code, i.segment, count(*) as invoices, sum(c.booked) as commission,"
           + " sum(c.balance) as outstanding from ops_invoice i join ops_invoice_component c"
           + " on c.invoice_id = i.id and c.component = 'COMMISSION' where i.company_id = :company"
+          + ReportOrigin.sql("i.origin")
           + " and c.balance > 0 and i.booking_date between cast(date_trunc('year', cast(:to as date)) as date)"
           + " and :to group by i.insurer_code, i.segment order by i.insurer_code, i.segment";
 

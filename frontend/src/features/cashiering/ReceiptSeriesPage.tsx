@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import type { RecordOriginKind } from '@/api/types';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -8,6 +9,8 @@ import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Modal } from '@/components/ui/Modal';
+import { OriginBadge } from '@/components/ui/OriginBadge';
+import { OriginFilter } from '@/components/ui/OriginFilter';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
@@ -174,9 +177,10 @@ export default function ReceiptSeriesPage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
+  const [origin, setOrigin] = useState<RecordOriginKind>();
   const list = useQuery({
-    queryKey: ['cashiering', 'series', companyId],
-    queryFn: () => cashieringApi.series(companyId),
+    queryKey: ['cashiering', 'series', companyId, origin],
+    queryFn: () => cashieringApi.series(companyId, origin),
     enabled: companyId > 0,
   });
   const act = useMutation({
@@ -194,7 +198,7 @@ export default function ReceiptSeriesPage() {
       header: 'Series',
       render: (s) => (
         <>
-          <strong>{s.prefix}</strong>
+          <strong>{s.prefix}</strong> <OriginBadge record={s} />
           <span className="cell-sub">
             {s.kind} · ATP {s.atpNo ?? '—'}
           </span>
@@ -252,6 +256,9 @@ export default function ReceiptSeriesPage() {
         }
       />
       <ErrorAlert error={list.error ?? act.error} />
+      <Card>
+        <OriginFilter value={origin} onChange={setOrigin} />
+      </Card>
       <Card flush>
         <DataTable
           caption="Receipt series"

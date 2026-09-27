@@ -15,6 +15,9 @@ import java.util.List;
  */
 final class Runbook {
 
+  private static final String MANUAL = "MANUAL";
+  private static final String VERIFICATION = "Verification";
+
   private static final String LEAD = "DATA_MIGRATION_LEAD";
   private static final String OPERATOR = "MIGRATION_OPERATOR";
   private static final String LOADS = "Final loads";
@@ -63,8 +66,6 @@ final class Runbook {
               "complete; confirmed",
               MANUAL));
 
-  private static final String MANUAL = "MANUAL";
-  private static final String VERIFICATION = "Verification";
   private static final int PHASE = 2;
   private static final int TASK = 3;
   private static final int OWNER = 4;

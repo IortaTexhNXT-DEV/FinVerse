@@ -2,6 +2,8 @@ package com.iortatechnxt.brokerverse.catalog.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -19,6 +21,8 @@ import java.util.List;
 @Entity
 @Table(name = "cat_insurer")
 public class InsurerProfile extends AuthorizableEntity implements CatalogRecord {
+
+  @Embedded private RecordOrigin recordOrigin = RecordOrigin.BIBS;
 
   private static final String SEPARATOR = ",";
   private static final int MAX_CREDIT_DAYS = 365;
@@ -183,4 +187,22 @@ public class InsurerProfile extends AuthorizableEntity implements CatalogRecord 
       PlacementChannel placementChannel,
       List<String> placementEmails,
       int defaultCreditDays) {}
+
+  /**
+   * Marks a record loaded from a legacy system (DATA_MIGRATION_DESIGN section 10).
+   *
+   * @param origin source system, legacy reference and batch
+   */
+  public void markMigrated(RecordOrigin origin) {
+    this.recordOrigin = origin;
+  }
+
+  /**
+   * Where the record comes from.
+   *
+   * @return BIBS or the legacy origin
+   */
+  public RecordOrigin getRecordOrigin() {
+    return recordOrigin == null ? RecordOrigin.BIBS : recordOrigin;
+  }
 }

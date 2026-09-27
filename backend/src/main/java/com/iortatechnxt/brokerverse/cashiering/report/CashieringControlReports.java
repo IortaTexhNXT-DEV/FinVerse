@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.cashiering.report.SqlReport.Spec;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
+import com.iortatechnxt.brokerverse.report.core.ReportOrigin;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -118,6 +119,7 @@ public class CashieringControlReports {
           + " sum(c.balance) as outstanding from ops_invoice i join ops_invoice_component c"
           + " on c.invoice_id = i.id and c.component in ('BASIC', 'DST', 'PREMIUM_TAX_VAT', 'LGT',"
           + " 'FST', 'OTHER') where i.company_id = :company and not i.cancelled"
+          + ReportOrigin.sql("i.origin")
           + " and i.booking_date <= :to group by i.client_code, i.assured_name, i.invoice_no,"
           + " i.booking_date having sum(c.balance) > 0 order by i.client_code, i.booking_date, i.invoice_no";
 

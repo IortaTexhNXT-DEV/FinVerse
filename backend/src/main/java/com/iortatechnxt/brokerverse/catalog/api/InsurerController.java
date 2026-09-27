@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.catalog.api;
 
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.catalog.api.dto.BranchRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.BranchResponse;
 import com.iortatechnxt.brokerverse.catalog.api.dto.CommissionRequest;
@@ -47,12 +48,18 @@ public class InsurerController {
    * Insurers of a company.
    *
    * @param companyId company
+   * @param origin BIBS or MIGRATED (Data Migration origin filter), all when absent
    * @return insurers
    */
   @GetMapping
   @PreAuthorize(CatalogAccess.READ)
-  public List<InsurerResponse> list(@RequestParam Long companyId) {
-    return insurers.insurers(companyId).stream().map(InsurerResponse::from).toList();
+  public List<InsurerResponse> list(
+      @RequestParam Long companyId,
+      @RequestParam(required = false) RecordOrigin.Origin origin) {
+    return insurers.insurers(companyId).stream()
+        .filter(i -> origin == null || i.getRecordOrigin().origin() == origin)
+        .map(InsurerResponse::from)
+        .toList();
   }
 
   /**

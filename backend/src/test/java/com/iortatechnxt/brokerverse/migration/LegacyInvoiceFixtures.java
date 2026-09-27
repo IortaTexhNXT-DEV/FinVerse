@@ -97,6 +97,70 @@ final class LegacyInvoiceFixtures {
     return h;
   }
 
+  private static Map<String, String> withPolicy(Map<String, String> h, String policyRef) {
+    if (policyRef != null) {
+      h.put("legacy_policy_ref", policyRef);
+    }
+    return h;
+  }
+
+  /** Loads and accepts an EBIX policy header of the client of the token; returns its reference. */
+  String loadHeader(String t) throws Exception {
+    String ref = "EP" + t;
+    Map<String, String> h = new HashMap<>();
+    h.put("legacy_policy_ref", ref);
+    h.put("cover_no", "EC" + t);
+    h.put("cover_version", "1");
+    h.put("policy_no", "MC-" + t);
+    h.put("legacy_client_no", "E" + t);
+    h.put("assured_name", "Lea Santos");
+    h.put("risk_code", "CAR-A");
+    h.put("package_code", "PKG-CAR");
+    h.put("package_version", "2");
+    h.put("line_code", "ENG");
+    h.put("business_type", "NB");
+    h.put("policy_status", "IF");
+    h.put("inception_date", "2027-11-01");
+    h.put("expiry_date", "2028-11-01");
+    h.put("currency", "PHP");
+    h.put("sum_insured", "900000.00");
+    h.put("net_premium", "10000.00");
+    h.put("gross_premium", "11200.00");
+    h.put("payment_arrangement", "VIA_BDOI");
+    h.put("ao_user_id", "AO01");
+    h.put("sales_unit_code", "U01");
+    h.put("branch_code", "MKT");
+    h.put("market_segment", "CBG");
+    String seq = t.substring(t.length() - 2);
+    JsonNode p01 =
+        mig.upload(
+            "P01",
+            "P01",
+            "P01_EBIX_20271231_" + seq + ".csv",
+            List.of(h),
+            List.of("legacy_policy_ref"));
+    JsonNode p01s =
+        mig.upload(
+            "P01",
+            "P01S",
+            "P01S_EBIX_20271231_" + seq + ".csv",
+            List.of(
+                Map.of(
+                    "legacy_policy_ref", ref,
+                    "share_seq", "1",
+                    "insurer_code", "MGIC",
+                    "share_pct", "100",
+                    "lead_flag", "Y")),
+            List.of("legacy_policy_ref", "share_seq"));
+    JsonNode batch =
+        mig.load("P01", List.of(p01.get("extractNo").asText(), p01s.get("extractNo").asText()));
+    assertThat(batch.get("counts").get("loaded").asInt())
+        .as(mig.rows(batch.get("batchNo").asText()))
+        .isEqualTo(2);
+    mig.accept(batch.get("batchNo").asText());
+    return ref;
+  }
+
   private static Map<String, String> position(
       String no, String component, String booked, String paid, String open) {
     Map<String, String> p = new HashMap<>();
@@ -113,13 +177,20 @@ final class LegacyInvoiceFixtures {
 
   /** Uploads and loads one invoice; returns the batch. */
   JsonNode loadInvoice(String no, String t) throws Exception {
+    return loadInvoice(no, t, null);
+  }
+
+  /**
+   * Uploads and loads one invoice of a migrated policy header (P01 reference); returns the batch.
+   */
+  JsonNode loadInvoice(String no, String t, String policyRef) throws Exception {
     String seq = t.substring(t.length() - 2);
     JsonNode f01 =
         mig.upload(
             "F01",
             "F01",
             "F01_EBIX_20271231_" + seq + ".csv",
-            List.of(header(no, t)),
+            List.of(withPolicy(header(no, t), policyRef)),
             List.of("legacy_invoice_no"));
     JsonNode f01s =
         mig.upload(

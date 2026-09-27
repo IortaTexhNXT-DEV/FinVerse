@@ -3,6 +3,8 @@ package com.iortatechnxt.brokerverse.cashiering.domain;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.ReceiptKind;
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,6 +19,8 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "csh_receipt_series")
 public class ReceiptSeries extends AuthorizableEntity {
+
+  @Embedded private RecordOrigin recordOrigin = RecordOrigin.BIBS;
 
   @Column(name = "company_id", nullable = false, updatable = false)
   private Long companyId;
@@ -89,6 +93,21 @@ public class ReceiptSeries extends AuthorizableEntity {
     this.toNo = lastNo;
     this.warnAt = warningAt;
     markModified();
+  }
+
+  /**
+   * Continues a legacy series from the next number the legacy system would have issued (Data
+   * Migration object R11).
+   *
+   * @param legacyNextNo next number in legacy
+   */
+  public void continueFrom(long legacyNextNo) {
+    if (legacyNextNo < fromNo || legacyNextNo > toNo + 1) {
+      throw new BusinessRuleException(
+          "RECEIPT_SERIES_NEXT_OUT_OF_RANGE",
+          "Next number " + legacyNextNo + " is outside " + fromNo + "-" + toNo);
+    }
+    this.nextNo = legacyNextNo;
   }
 
   /**
@@ -169,5 +188,23 @@ public class ReceiptSeries extends AuthorizableEntity {
 
   public int getWarnAt() {
     return warnAt;
+  }
+
+  /**
+   * Marks a record loaded from a legacy system (DATA_MIGRATION_DESIGN section 10).
+   *
+   * @param origin source system, legacy reference and batch
+   */
+  public void markMigrated(RecordOrigin origin) {
+    this.recordOrigin = origin;
+  }
+
+  /**
+   * Where the record comes from.
+   *
+   * @return BIBS or the legacy origin
+   */
+  public RecordOrigin getRecordOrigin() {
+    return recordOrigin == null ? RecordOrigin.BIBS : recordOrigin;
   }
 }

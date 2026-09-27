@@ -215,7 +215,7 @@ export interface CwtTagBody {
   remarks?: string;
 }
 
-export interface Series {
+export interface Series extends RecordOriginFields {
   id: number;
   branchId: number;
   kind: ReceiptKind;

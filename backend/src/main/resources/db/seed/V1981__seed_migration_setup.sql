@@ -60,7 +60,7 @@ from mig_code_map_set s
 where (s.code in ('LOV:MARKET_SEGMENT', 'LOV:CIVIL_STATUS')
        or s.code in (select c.map_set from mig_layout_column c join mig_layout l on l.id = c.layout_id
                      where l.object_code in ('C01', 'C03', 'P01', 'P03', 'F01', 'G01', 'G03', 'F02', 'F03', 'R05', 'R09',
-                                             'H01', 'H02')
+                                             'H01', 'H02', 'R02', 'R03', 'R04', 'R07', 'R11')
                      and c.map_set is not null))
   and not exists (select 1 from mig_code_map_version v where v.set_code = s.code);
 
@@ -125,7 +125,11 @@ from (values ('LOV:MARKET_SEGMENT', 'QPS',  'CBG',  'Consumer Banking',   'MAP',
              ('DOCUMENT_TYPE', 'EBIX', 'OR', 'Official receipt', 'MAP', 'OFFICIAL_RECEIPT', null),
              ('DOCUMENT_TYPE', 'EBIX', 'POL', 'Policy copy', 'MAP', 'POLICY_COPY', null),
              ('DOCUMENT_TYPE', 'EBIX', 'ID', 'Identification document', 'MAP', 'VALID_ID', null),
-             ('DOCUMENT_TYPE', 'EBIX', 'SOA', 'Statement of account', 'MAP', 'LEGACY_DOCUMENT', null))
+             ('DOCUMENT_TYPE', 'EBIX', 'SOA', 'Statement of account', 'MAP', 'LEGACY_DOCUMENT', null),
+             ('INSURER', 'EBIX', 'NWG', 'New World General', 'CREATE', 'INS-NWG',
+              'Legacy insurer without a BIBS record; authorised by the Head of Operations'),
+             ('STATUS:INSURER', 'EBIX', 'A', 'Active', 'MAP', 'ACTIVE', null),
+             ('SALES_UNIT', 'EBIX', 'U02', 'Metro unit 2', 'MAP', 'T-CBG1', null))
      as e(set_code, source_system, legacy_code, legacy_description, action, target_code, remarks)
 join mig_code_map_version v on v.set_code = e.set_code and v.version_no = 1
 where not exists (select 1 from mig_code_map_entry x where x.version_id = v.id and x.legacy_code = e.legacy_code

@@ -2,6 +2,8 @@ package com.iortatechnxt.brokerverse.catalog.api.dto;
 
 import com.iortatechnxt.brokerverse.catalog.domain.CommissionRate;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -17,6 +19,7 @@ import java.time.LocalDate;
  * @param recordStatus maker-checker status
  * @param maker last maintainer
  * @param authorizedBy checker
+ * @param origin BIBS or the legacy origin (source system, legacy reference, batch)
  */
 public record CommissionResponse(
     Long id,
@@ -27,7 +30,8 @@ public record CommissionResponse(
     LocalDate effectiveTo,
     RecordStatus recordStatus,
     String maker,
-    String authorizedBy) {
+    String authorizedBy,
+    @JsonUnwrapped RecordOrigin origin) {
 
   /**
    * Maps an entity.
@@ -45,6 +49,7 @@ public record CommissionResponse(
         e.getEffectiveTo(),
         e.getRecordStatus(),
         e.getMaker(),
-        e.getAuthorizedBy());
+        e.getAuthorizedBy(),
+        e.getRecordOrigin());
   }
 }

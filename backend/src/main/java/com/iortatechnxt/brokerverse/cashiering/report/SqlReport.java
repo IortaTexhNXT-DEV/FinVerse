@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
+import com.iortatechnxt.brokerverse.report.core.ReportOrigin;
 import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.TabularReportBuilder;
@@ -62,6 +63,9 @@ public class SqlReport implements ReportDefinition {
     params.add(ParameterSpec.required(COMPANY, "Company", ParameterType.COMPANY));
     params.add(ParameterSpec.required(FROM, "From", ParameterType.DATE).withDefault("MONTH_START"));
     params.add(ParameterSpec.required(TO, "To", ParameterType.DATE).withDefault("TODAY"));
+    if (spec.sql().contains(":" + ReportOrigin.PARAM)) {
+      params.add(ReportOrigin.parameter());
+    }
     return ReportMetadata.operations(spec.code(), spec.title(), spec.description(), params);
   }
 
@@ -71,7 +75,8 @@ public class SqlReport implements ReportDefinition {
         new MapSqlParameterSource()
             .addValue("company", p.longValue(COMPANY))
             .addValue(FROM, p.optionalDate(FROM).orElse(EARLIEST))
-            .addValue(TO, p.optionalDate(TO).orElse(LATEST));
+            .addValue(TO, p.optionalDate(TO).orElse(LATEST))
+            .addValue(ReportOrigin.PARAM, ReportOrigin.value(p));
     List<Map<String, Object>> rows =
         jdbc.queryForList(spec.sql(), args).stream().map(SqlReport::normalise).toList();
     TabularReportBuilder builder = TabularReportBuilder.of(p).columns(spec.columns());

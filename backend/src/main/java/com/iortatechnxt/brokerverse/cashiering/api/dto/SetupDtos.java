@@ -6,6 +6,8 @@ import com.iortatechnxt.brokerverse.cashiering.domain.MinimalBalanceRule;
 import com.iortatechnxt.brokerverse.cashiering.domain.PaymentFileLayout;
 import com.iortatechnxt.brokerverse.cashiering.domain.PrintBatch;
 import com.iortatechnxt.brokerverse.cashiering.domain.ReceiptSeries;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -41,6 +43,7 @@ public final class SetupDtos {
    * @param recordStatus maker-checker status
    * @param maker maker
    * @param authorizedBy checker
+   * @param origin BIBS or the legacy origin (source system, legacy reference, batch)
    */
   public record SeriesResponse(
       Long id,
@@ -56,7 +59,8 @@ public final class SetupDtos {
       boolean low,
       String recordStatus,
       String maker,
-      String authorizedBy) {
+      String authorizedBy,
+      @JsonUnwrapped RecordOrigin origin) {
 
     /**
      * Maps a series.
@@ -79,7 +83,8 @@ public final class SetupDtos {
           s.isLow(),
           s.getRecordStatus().name(),
           s.getMaker(),
-          s.getAuthorizedBy());
+          s.getAuthorizedBy(),
+          s.getRecordOrigin());
     }
   }
 

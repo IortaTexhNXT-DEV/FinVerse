@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.cashiering.api;
 
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.cashiering.api.dto.SetupDtos.CommissionLineResponse;
 import com.iortatechnxt.brokerverse.cashiering.api.dto.SetupDtos.LayoutRequest;
 import com.iortatechnxt.brokerverse.cashiering.api.dto.SetupDtos.LayoutResponse;
@@ -67,12 +68,18 @@ public class CashieringSetupController {
    * Receipt series of a company.
    *
    * @param companyId company
+   * @param origin BIBS or MIGRATED (Data Migration origin filter), all when absent
    * @return series
    */
   @GetMapping("/series")
   @PreAuthorize("hasAnyAuthority('CASH_SERIES_MANAGE', 'MASTER_AUTHORIZE', 'CASH_RECEIPT')")
-  public List<SeriesResponse> series(@RequestParam Long companyId) {
-    return series.list(companyId).stream().map(SeriesResponse::from).toList();
+  public List<SeriesResponse> series(
+      @RequestParam Long companyId,
+      @RequestParam(required = false) RecordOrigin.Origin origin) {
+    return series.list(companyId).stream()
+        .filter(x -> origin == null || x.getRecordOrigin().origin() == origin)
+        .map(SeriesResponse::from)
+        .toList();
   }
 
   /**

@@ -2107,17 +2107,17 @@ Figure 5 shows the interfaces of Sanction Screening. Screening reads the client 
 
 ![Interfaces of Sanction Screening (dashed = parked)](figures/brd10_integration.dot){width=15}
 
-<!-- table: widths=3.8,1.8,7.4,2.4,2.4 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.8,1.8,7.4,2.4,2.4 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| List files (AML advisory, NLDS-PEP) | In | CSV / XLSX by upload or file drop, on schedule | SNSRP-201 | DESIGNED |
-| List feeds by API; direct NLDS query | In | Real-time or scheduled feed from list providers or BDO NLDS | SNSRP-201 | PARKED |
-| Client master | In / Out | In - client registered and identity changed events, client data. Out - risk rating, PEP and watchlist tags, KYC review date | SNSRP-302, 304, 602 | DESIGNED |
-| Accounts (BRD-1) | In | Account submitted event; active policy (accounts POLICY_ISSUED / BOOKED) | SNSRP-303 | DESIGNED |
-| Attachments and client KYC documents | Out | Case documents, KYC documents registered on the client | SNSRP-601 | DESIGNED |
-| Notifications, e-mail and alerts | Out | Case, SLA, document, ingestion and list notices | SNSRP-202, 801, 802 | DESIGNED |
-| Report archive | Out | STR extraction file for download | SNSRP-706 | DESIGNED |
-| Designated STR folder (shared drive / SFTP) | Out | Automatic saving of the extraction file | SNSRP-706 | PARKED |
+| List files (AML advisory, NLDS-PEP) | In | CSV / XLSX by upload or file drop, on schedule | SNSRP-201 | IN SCOPE |
+| List feeds by API; direct NLDS query | In | Real-time or scheduled feed from list providers or BDO NLDS | SNSRP-201 | ON HOLD |
+| Client master | In / Out | In - client registered and identity changed events, client data. Out - risk rating, PEP and watchlist tags, KYC review date | SNSRP-302, 304, 602 | IN SCOPE |
+| Accounts (BRD-1) | In | Account submitted event; active policy (accounts POLICY_ISSUED / BOOKED) | SNSRP-303 | IN SCOPE |
+| Attachments and client KYC documents | Out | Case documents, KYC documents registered on the client | SNSRP-601 | IN SCOPE |
+| Notifications, e-mail and alerts | Out | Case, SLA, document, ingestion and list notices | SNSRP-202, 801, 802 | IN SCOPE |
+| Report archive | Out | STR extraction file for download | SNSRP-706 | IN SCOPE |
+| Designated STR folder (shared drive / SFTP) | Out | Automatic saving of the extraction file | SNSRP-706 | ON HOLD |
 | AMLC portal | Out | STR filing; manual, outside BIBS | p.8 | OUT |
 
 > [!PARKED] Parked seams

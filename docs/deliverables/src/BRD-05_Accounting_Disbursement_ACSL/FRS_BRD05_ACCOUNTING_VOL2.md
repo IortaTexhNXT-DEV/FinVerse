@@ -2945,20 +2945,20 @@ Reports run in the Report Centre with the options of Volume 1 (view, export to X
 
 ![Interfaces of Disbursement, Payment Requests and ACSL (dashed = external)](figures/brd05_v2_integration.dot){width=13}
 
-<!-- table: widths=3.8,2,7.2,2.4,2 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.8,2,7.2,2.4,2 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| Operations disbursement gateway | In / Out | Payment requests of remittance, cashiering, commission, FRBS and Payment Requests; DV status back (DisbursementStatusChanged) | DIS 2.6.0, 3.25.0; MKT 1.20.0 | BUILT |
-| Refund validation | Out / In | ACSL case and Cashiering task per cancelled-policy line; results back | MKT 1.11.0; ACSL 2.5.5 | BUILT |
-| Payment reversal | Out / In | ACSL request to Cashiering (PRV-); result back | ACSL 2.6.1 | BUILT |
-| DV cancellation hand-off | Out | Approved check cancellation to the Disbursement approvers (DV_CANCELLATION) | MKT 1.19.0 | BUILT, PARKED (AQ15) |
-| General ledger | Out | DV, check, funding, correction, liquidation, CPC2 and deduction postings | DIS 2.19.0; ACSL 2.15.0 | BUILT |
-| TPD (ACA) | Out | DCTF text file downloaded and sent by the user | DIS 2.16.1 | BUILT (file) |
-| Bank branches | Out / In | ATD e-mail and bank forms; confirmations recorded by the user | DIS 2.7.7-2.7.9 | BUILT (manual) |
-| Bank files | In | Deposited checks, credited accounts, BOB approvals (CSV uploads) | DIS 2.22.0, 3.26.x | BUILT, PARKED (AQ09) |
+| Operations disbursement gateway | In / Out | Payment requests of remittance, cashiering, commission, FRBS and Payment Requests; DV status back (DisbursementStatusChanged) | DIS 2.6.0, 3.25.0; MKT 1.20.0 | IN SCOPE |
+| Refund validation | Out / In | ACSL case and Cashiering task per cancelled-policy line; results back | MKT 1.11.0; ACSL 2.5.5 | IN SCOPE |
+| Payment reversal | Out / In | ACSL request to Cashiering (PRV-); result back | ACSL 2.6.1 | IN SCOPE |
+| DV cancellation hand-off | Out | Approved check cancellation to the Disbursement approvers (DV_CANCELLATION); part on hold until BDOI answers AQ15 | MKT 1.19.0 | IN SCOPE |
+| General ledger | Out | DV, check, funding, correction, liquidation, CPC2 and deduction postings | DIS 2.19.0; ACSL 2.15.0 | IN SCOPE |
+| TPD (ACA) | Out | DCTF text file downloaded and sent by the user | DIS 2.16.1 | IN SCOPE |
+| Bank branches | Out / In | ATD e-mail and bank forms; confirmations recorded by the user | DIS 2.7.7-2.7.9 | IN SCOPE |
+| Bank files | In | Deposited checks, credited accounts, BOB approvals (CSV uploads); part on hold until BDOI answers AQ09 | DIS 2.22.0, 3.26.x | IN SCOPE |
 | BDO Business Online Banking | Out | Funding and online payments done in BOB; reference recorded | DIS 2.17.1 | OUT |
-| Insurer SOA | In | SOA file upload per insurer and period | ACSL 2.2.1, 2.4.0 | BUILT, PARKED (AQ21) |
-| E-mail | Out | Payment advice, ATD, notifications | DIS 2.7.12 | BUILT |
+| Insurer SOA | In | SOA file upload per insurer and period; part on hold until BDOI answers AQ21 | ACSL 2.2.1, 2.4.0 | IN SCOPE |
+| E-mail | Out | Payment advice, ATD, notifications | DIS 2.7.12 | IN SCOPE |
 
 # Non-functional requirements
 

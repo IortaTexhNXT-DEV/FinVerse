@@ -1811,22 +1811,22 @@ Figure 3 shows the interfaces of the Claims module. Claims reads the BRD-1 and B
 > [!PARKED] Parked seams
 > The migration of EBIX / ISYS claims keeps a source value "migrated" and a legacy reference on the claim (CLQ14). Claim money through BDOI would use the existing Cashiering and Disbursement paths with a new receipt type and payee class (CLQ10). Neither is simulated.
 
-<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| Accounts (BRD-1) | In | Cover snapshot: client, product, period, insurer, sum insured, sales stamp, locations | BRCLM.002, 003, 016, 037 | DESIGNED |
-| Endorsements (BRD-1 booking) | In | Cover version; newer endorsement event | BRCLM.039 | DESIGNED |
-| Invoice ledger (BRD-2) | In | Invoices of the cover with payment and remittance status; payment and remittance events | BRCLM.001 | DESIGNED |
-| Special remittance (BRD-2) | Out | Feed CLAIMS_SPECIAL_REMIT through the port ClaimsFeed | BRCLM.010; OQ46 | DESIGNED |
-| E-mail outbox | Out | Loss advice to insurers; send log | p.24-25 | DESIGNED |
-| Documents | Out | Claims reports as CLAIM_REPORT, linked to claim, account and client | BRCSF-009; D3 | DESIGNED |
-| Client 360 view (CRM) | Out | Claims of the client | BRCLM.040 | DESIGNED |
-| Renewal (BRD-6) | Out | Loss experience per account and policy year (decision D4) | BRCLM.030, 040 | DESIGNED |
-| Notifications and alerts | Out | Assignment, status, follow-up, premium, newer version, past due | NFR 15.14 | DESIGNED |
-| EBIX / ISYS claims | In | Migration of open and historical claims | p.23; BRCLM.007 | PARKED |
-| Claim proceeds through BDOI | Out | Cashiering receipt and Disbursement payout, only if CLQ10 is answered yes | BRCLM.010 status 12 | PARKED |
-| Insurer channels (portal, API, bordereaux) | In | Manual recording and upload cover the need today | BRCLM.041, 043 | PARKED |
-| Shared drive for report files | Out | Report archive in BIBS; drop to a drive only if BDOI confirms | NFR 15.09-15.13 | PARKED |
+| Accounts (BRD-1) | In | Cover snapshot: client, product, period, insurer, sum insured, sales stamp, locations | BRCLM.002, 003, 016, 037 | IN SCOPE |
+| Endorsements (BRD-1 booking) | In | Cover version; newer endorsement event | BRCLM.039 | IN SCOPE |
+| Invoice ledger (BRD-2) | In | Invoices of the cover with payment and remittance status; payment and remittance events | BRCLM.001 | IN SCOPE |
+| Special remittance (BRD-2) | Out | Feed CLAIMS_SPECIAL_REMIT through the port ClaimsFeed | BRCLM.010; OQ46 | IN SCOPE |
+| E-mail outbox | Out | Loss advice to insurers; send log | p.24-25 | IN SCOPE |
+| Documents | Out | Claims reports as CLAIM_REPORT, linked to claim, account and client | BRCSF-009; D3 | IN SCOPE |
+| Client 360 view (CRM) | Out | Claims of the client | BRCLM.040 | IN SCOPE |
+| Renewal (BRD-6) | Out | Loss experience per account and policy year (decision D4) | BRCLM.030, 040 | IN SCOPE |
+| Notifications and alerts | Out | Assignment, status, follow-up, premium, newer version, past due | NFR 15.14 | IN SCOPE |
+| EBIX / ISYS claims | In | Migration of open and historical claims | p.23; BRCLM.007 | ON HOLD |
+| Claim proceeds through BDOI | Out | Cashiering receipt and Disbursement payout, only if CLQ10 is answered yes | BRCLM.010 status 12 | ON HOLD |
+| Insurer channels (portal, API, bordereaux) | In | Manual recording and upload cover the need today | BRCLM.041, 043 | ON HOLD |
+| Shared drive for report files | Out | Report archive in BIBS; drop to a drive only if BDOI confirms | NFR 15.09-15.13 | ON HOLD |
 
 
 # Non-functional requirements

@@ -1808,22 +1808,22 @@ Figure 7 shows the interfaces. External parties reach only the portal; the porta
 > [!PARKED] Parked seams
 > The insurer system-to-system API (OAuth2 client credentials on the portal endpoints), e-signature verification of the BOR, HRIS feeds of master lists, reading insurer mailboxes and SMS notices each have a seam and no simulation. The virus scanner adapter is required before the portal goes live.
 
-<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| Partner portal | In / Out | Sign-in, tasks, staged uploads, notices, downloads for insurer and client HR users | BRID-005, 014 | DESIGNED |
-| User Access Maintenance (BRD-11) | In | Approved External requests provision portal users (decision D7) | BRID-005, 014 | DESIGNED |
-| Client master (CRM) | Out | Prospect and client capture; EB tab on the client page | BRID-006 | DESIGNED |
-| Accounts (BRD-1, BT0) | Out | One account per line from the chosen proposal, with business type | BRID-017, 022.01 | DESIGNED |
-| Placement, issuance, booking (BRD-1) | Out | Placement queue; e-policy from validated policy forms; billing number at booking | BRID-019, 020 | DESIGNED |
-| Endorsement requests (BRD-2) | Out | Financial member changes | BRID-013 | DESIGNED |
-| Invoice ledger (BRD-2) | In | Payment status and payment events | BRID-021 | DESIGNED |
-| Documents | Out | Access classes, process tags, RENEWAL_ADVICE for Renewal and CSF | BRID-025; D3 | DESIGNED |
-| E-mail outbox | Out | Protected TOR, RA, comparative, advices, follow-ups; separate password | BRID-007 | DESIGNED |
-| Reports | Out | EB reports; Word export; business type filter | BRID-022, 022.01 | DESIGNED |
-| Insurer API | In | System-to-system proposals and billing | BRID-005.01 | PARKED |
-| HRIS master lists | In | Payroll feeds of master lists | BRID-014 | PARKED |
-| BOR e-signature | In | Verification of the signature | BRID-008 | PARKED |
+| Partner portal | In / Out | Sign-in, tasks, staged uploads, notices, downloads for insurer and client HR users | BRID-005, 014 | IN SCOPE |
+| User Access Maintenance (BRD-11) | In | Approved External requests provision portal users (decision D7) | BRID-005, 014 | IN SCOPE |
+| Client master (CRM) | Out | Prospect and client capture; EB tab on the client page | BRID-006 | IN SCOPE |
+| Accounts (BRD-1, BT0) | Out | One account per line from the chosen proposal, with business type | BRID-017, 022.01 | IN SCOPE |
+| Placement, issuance, booking (BRD-1) | Out | Placement queue; e-policy from validated policy forms; billing number at booking | BRID-019, 020 | IN SCOPE |
+| Endorsement requests (BRD-2) | Out | Financial member changes | BRID-013 | IN SCOPE |
+| Invoice ledger (BRD-2) | In | Payment status and payment events | BRID-021 | IN SCOPE |
+| Documents | Out | Access classes, process tags, RENEWAL_ADVICE for Renewal and CSF | BRID-025; D3 | IN SCOPE |
+| E-mail outbox | Out | Protected TOR, RA, comparative, advices, follow-ups; separate password | BRID-007 | IN SCOPE |
+| Reports | Out | EB reports; Word export; business type filter | BRID-022, 022.01 | IN SCOPE |
+| Insurer API | In | System-to-system proposals and billing | BRID-005.01 | ON HOLD |
+| HRIS master lists | In | Payroll feeds of master lists | BRID-014 | ON HOLD |
+| BOR e-signature | In | Verification of the signature | BRID-008 | ON HOLD |
 
 # Non-functional requirements
 

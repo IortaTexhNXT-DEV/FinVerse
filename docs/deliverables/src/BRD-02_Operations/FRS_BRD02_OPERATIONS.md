@@ -3612,29 +3612,29 @@ Figure 12 shows the interfaces of Operations. The modules exchange data only thr
 
 ![Interfaces of Operations (dashed = parked or replaced by a later BRD)](figures/brd02_integration.dot)
 
-<!-- table: widths=4.4,1.8,5.6,2.6,2.6 caption="Interfaces and flow-in feeds" status=Status size=8 -->
-| Interface / feed | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=4.4,1.8,5.6,2.6,2.6 caption="Interfaces and flow-in feeds" status=Scope size=8 -->
+| Interface / feed | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| OPS_INVOICE_FEED (booking) | In | Booked invoices, endorsements and returns after commit; replay | RMTID.038 | BUILT |
-| Booking posting and service invoice | Out | Endorsement and cancellation posting; service invoice issue and credit | ADJID.011, 014 | BUILT |
-| Catalogue | In | Endorsement rating, commission rates, package limits | ADJID.008, 014 | BUILT |
-| Placement payment gate | Out | Applications and pre-booked payments per ARN | CSHID.020 | BUILT |
-| Accounting engine | Out | Business events of section 5.3 | CSHID.012-014; ADJID.011 | BUILT |
-| E-mail outbox | Out | Protected register, schedule, billing; passwords separately | PRCID.007, 008; MKTID.001; CMRID.009 | BUILT |
-| INSURER_REMIT_OR | In (upload) | Insurer OR schedules | RMTID.012, 013 | BUILT |
-| INSURER_PRODUCTION | In (upload) | Insurer production reports | PRCID.009, 022 | BUILT |
-| INSURER_DP_RESPONSE | In (upload) | Insurer answers to DP billings | CMRID.009 | BUILT |
+| OPS_INVOICE_FEED (booking) | In | Booked invoices, endorsements and returns after commit; replay | RMTID.038 | IN SCOPE |
+| Booking posting and service invoice | Out | Endorsement and cancellation posting; service invoice issue and credit | ADJID.011, 014 | IN SCOPE |
+| Catalogue | In | Endorsement rating, commission rates, package limits | ADJID.008, 014 | IN SCOPE |
+| Placement payment gate | Out | Applications and pre-booked payments per ARN | CSHID.020 | IN SCOPE |
+| Accounting engine | Out | Business events of section 5.3 | CSHID.012-014; ADJID.011 | IN SCOPE |
+| E-mail outbox | Out | Protected register, schedule, billing; passwords separately | PRCID.007, 008; MKTID.001; CMRID.009 | IN SCOPE |
+| INSURER_REMIT_OR | In (upload) | Insurer OR schedules | RMTID.012, 013 | IN SCOPE |
+| INSURER_PRODUCTION | In (upload) | Insurer production reports | PRCID.009, 022 | IN SCOPE |
+| INSURER_DP_RESPONSE | In (upload) | Insurer answers to DP billings | CMRID.009 | IN SCOPE |
 | COLLECTION_CHECK_PICKUP | In (upload) | Checks for pick-up | CSHID.009 | SUPERSEDED |
 | COLLECTION_CWT2307 | In (upload) | BIR 2307 tags | CSHID.026; MKTID.013 | SUPERSEDED |
-| COLLECTION_COMMISSION_PAYMENT | In (upload) | Commission payment details | CSHID.007 | BUILT |
-| COLLECTION_HOLD | In (upload) | Hold requests | RMTID.021; MKTID.003 | BUILT |
-| COLLECTION_SPECIAL_REMIT | In (upload) | Special remittance requests | RMTID.030; MKTID.009 | BUILT |
+| COLLECTION_COMMISSION_PAYMENT | In (upload) | Commission payment details | CSHID.007 | IN SCOPE |
+| COLLECTION_HOLD | In (upload) | Hold requests | RMTID.021; MKTID.003 | IN SCOPE |
+| COLLECTION_SPECIAL_REMIT | In (upload) | Special remittance requests | RMTID.030; MKTID.009 | IN SCOPE |
 | COLLECTION_DP_LIST | In (upload) | DP lists of HO and branches | CMRID.001 | SUPERSEDED |
-| COLLECTION_DP_RETURNED, COLLECTION_REFUND | Out | Rejected DP accounts; refunds | CMRID.009; CSHID.024 | BUILT |
+| COLLECTION_DP_RETURNED, COLLECTION_REFUND | Out | Rejected DP accounts; refunds | CMRID.009; CSHID.024 | IN SCOPE |
 | DISBURSEMENT_REQUEST / _STATUS | Out / In | Payment requests; DV and status (in-app queue) | RMTID.034; DBMID.001 | SUPERSEDED |
-| Shared drive (FileDropPort) | Out | Extract files | RMTID.001; PRCID.005 | PARKED |
-| OBPCS, Old BOB, PMS, TFS (BDOI channels, Drop 0) | In (upload) | Bills payment, SOA funds-transfer, PDC and Trade payment files on the handlers PAY_BILLS, PAY_DIRECT_CREDIT, PAY_PDC, PAY_TRADE | CSHID.008 | CONFIGURE |
-| MarketingFeed, ClaimsFeed | In | Marketing data; claims for special remittance | BRQID.004; MKTID.009 | PARKED |
+| Shared drive (FileDropPort) | Out | Extract files | RMTID.001; PRCID.005 | ON HOLD |
+| OBPCS, Old BOB, PMS, TFS (BDOI channels, Drop 0) | In (upload) | Bills payment, SOA funds-transfer, PDC and Trade payment files on the handlers PAY_BILLS, PAY_DIRECT_CREDIT, PAY_PDC, PAY_TRADE | CSHID.008 | IN SCOPE |
+| MarketingFeed, ClaimsFeed | In | Marketing data; claims for special remittance | BRQID.004; MKTID.009 | ON HOLD |
 
 SUPERSEDED means built as a seam in Operations, with the replacement designed in BRD-4 Collections or BRD-5 Accounting and Disbursement (R4). PARKED means the transport waits for BDOI's specification (OQ17, OQ45, OQ46).
 

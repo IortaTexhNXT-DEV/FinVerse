@@ -2053,19 +2053,19 @@ Figure 4 shows the interfaces of the migration module. It writes into BIBS only 
 
 ![Interfaces of the migration module (dashed = parked seam or link only)](figures/brd13_integration.dot)
 
-<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| Extract upload (console) | In | Data and control files per object | 1.1b | NEW |
-| SFTP drop from BDOI IT | In | Same files, picked up by a job | 1.1b | PARKED |
-| Reference masters (LOV, catalogue, sales organisation) | Out | Mapped and created values | 3.1 | NEW |
-| Client master and screening | Out | Migrated clients; one full screening run | 2.1 | NEW |
-| Accounts | Out | Migrated policy headers | 4.1 | NEW |
-| Operations ledger and Cashiering | Out | Legacy invoices, UPP | 5.1-10.1 | NEW |
-| GL | Out | Opening entries, provisional opening trial balance and FY2027 true-ups | 1.1b | NEW |
-| Renewal (legacy policy source; package map) | Out | Migrated headers for the go-live and daily extractions; renewal advices already sent; PACKAGE map for the sanitation check | 12.1 | NEW |
-| Customer Servicing (legacy account lookup) | Out | Legacy references and archive records | 11.1 | NEW |
-| Legacy read-only systems | Link | Link and legacy reference only | 11.1 | PARKED |
+| Extract upload (console) | In | Data and control files per object | 1.1b | IN SCOPE |
+| SFTP drop from BDOI IT | In | Same files, picked up by a job | 1.1b | ON HOLD |
+| Reference masters (LOV, catalogue, sales organisation) | Out | Mapped and created values | 3.1 | IN SCOPE |
+| Client master and screening | Out | Migrated clients; one full screening run | 2.1 | IN SCOPE |
+| Accounts | Out | Migrated policy headers | 4.1 | IN SCOPE |
+| Operations ledger and Cashiering | Out | Legacy invoices, UPP | 5.1-10.1 | IN SCOPE |
+| GL | Out | Opening entries, provisional opening trial balance and FY2027 true-ups | 1.1b | IN SCOPE |
+| Renewal (legacy policy source; package map) | Out | Migrated headers for the go-live and daily extractions; renewal advices already sent; PACKAGE map for the sanitation check | 12.1 | IN SCOPE |
+| Customer Servicing (legacy account lookup) | Out | Legacy references and archive records | 11.1 | IN SCOPE |
+| Legacy read-only systems | Link | Link and legacy reference only | 11.1 | ON HOLD |
 | Write-back to QPS / EBIX | Out | Not needed after the freeze (legacy read-only) | - | OUT |
 
 > [!PARKED] Parked seams

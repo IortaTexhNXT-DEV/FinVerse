@@ -1728,15 +1728,15 @@ Figure 6 shows the interfaces of Accounting. The general ledger is inside BIBS: 
 
 ![Interfaces of Accounting (dashed = external or parked)](figures/brd05_v1_integration.dot){width=11.5}
 
-<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| Business modules (booking, Operations, Collections, Disbursement, Payment Requests, ACSL, FRBS) | In | Business events posted by the accounting engine | FRBS 3.1.0 | BUILT |
-| Disbursement | Out / In | Service-fee payouts (SERVICE_FEE) and their status (PAID, RETURNED, CANCELLED) | FRBS 2.10.x | BUILT |
-| Bank files | In | Cash-in-bank statements (XLSX, ODS, CSV) per layout | FRBS 3.3.1 | BUILT |
-| Report archive and batches | Out | Report files, ZIP and merged PDF | FRBS 2.4.x | BUILT |
-| BIR (eFPS, eBIRForms, CAS) | Out | Worksheets and loose-leaf books; no electronic filing | FRBS 3.2.0 | PARKED |
-| BDO Unibank (GARD) | Out | Reports exported in PDF and Excel; submission channel not defined | FRBS 3.2.0 | PARKED |
+| Business modules (booking, Operations, Collections, Disbursement, Payment Requests, ACSL, FRBS) | In | Business events posted by the accounting engine | FRBS 3.1.0 | IN SCOPE |
+| Disbursement | Out / In | Service-fee payouts (SERVICE_FEE) and their status (PAID, RETURNED, CANCELLED) | FRBS 2.10.x | IN SCOPE |
+| Bank files | In | Cash-in-bank statements (XLSX, ODS, CSV) per layout | FRBS 3.3.1 | IN SCOPE |
+| Report archive and batches | Out | Report files, ZIP and merged PDF | FRBS 2.4.x | IN SCOPE |
+| BIR (eFPS, eBIRForms, CAS) | Out | Worksheets and loose-leaf books; no electronic filing | FRBS 3.2.0 | ON HOLD |
+| BDO Unibank (GARD) | Out | Reports exported in PDF and Excel; submission channel not defined | FRBS 3.2.0 | ON HOLD |
 | Payroll | In | HDMF, SSS, PhilHealth, 1601-C, 1604-C | Appendix A VII | OUT |
 
 # Non-functional requirements

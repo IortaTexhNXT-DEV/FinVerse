@@ -2651,24 +2651,24 @@ Figure 6 shows the interfaces of Renewal. Renewal reads the expiring population 
 
 ![Interfaces of Renewal (dashed = upload or parked)](figures/brd06_integration.dot)
 
-<!-- table: widths=3.8,1.8,7.2,2.4,1.6 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.8,1.8,7.2,2.4,1.6 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| Operations ledger | In | Booked root invoices, balances, movements; InvoiceBooked, InvoiceMovementPosted events | BRRN.005, 030; BRD 1.011 | BUILT |
-| Account (BRD-1) | In / Out | Expiring policy data; renewal account (business type RENEWAL, BT0), fast track, status events | BRRN.033, 040 | CHANGE |
-| Quotation, PRF (BRD-1) | Out | NB path with the renewal reference | BRRN.033 | CHANGE |
-| Placement, issuance, booking (BRD-1) | Out | Slip, hold cover, booking queue source RENEWAL; InvoiceBooked back | BRRN.040 | CHANGE |
-| Product catalogue (BRD-3) | In | Rating purpose RENEWAL; package version of the expiring account | PQ11 | BUILT |
-| Adjustment | In | Open endorsement requests of the invoice family | BRRN.032 | BUILT |
-| Claims (BRD-7) | In | Claims summary per ARN and policy year (decision D4) | BRRN.027, 031, 034 | NEW |
-| Client master | In | KYC review date | BRRN.028 | BUILT |
-| Submitted Policies (BRD-12) | In | RenewalHandOff; status query back | Decision D2 | NEW |
-| E-mail outbox | Out | Protected RA, letters, insurer extract; send log | BRRN.010; BRD 3.009.5 | BUILT |
-| Insurers | In | Response file by upload; no insurer API or SFTP | BRD 3.009.6; BRRN.035 | PARKED |
-| LAMD | In | Paid-off and RMU reports by upload | BRRN.029 | PARKED |
-| Data migration (BRD-13) | In | Migrated in-force policies for the go-live and daily extraction (NB path only); legacy package codes and the package code map; no renewal carried from legacy (DMQ37) | RQ27; DMQ36, DMQ37 | NEW |
-| Renewal Advice trackers (Excel) | In | RAs sent by hand before go-live, by upload once at go-live | DMQ37, DMQ38 | NEW |
-| Directory sign-in | In | BDO EUA / Windows ID (decision D6) | BRD x.001 | PARKED |
+| Operations ledger | In | Booked root invoices, balances, movements; InvoiceBooked, InvoiceMovementPosted events | BRRN.005, 030; BRD 1.011 | IN SCOPE |
+| Account (BRD-1) | In / Out | Expiring policy data; renewal account (business type RENEWAL, BT0), fast track, status events | BRRN.033, 040 | IN SCOPE |
+| Quotation, PRF (BRD-1) | Out | NB path with the renewal reference | BRRN.033 | IN SCOPE |
+| Placement, issuance, booking (BRD-1) | Out | Slip, hold cover, booking queue source RENEWAL; InvoiceBooked back | BRRN.040 | IN SCOPE |
+| Product catalogue (BRD-3) | In | Rating purpose RENEWAL; package version of the expiring account | PQ11 | IN SCOPE |
+| Adjustment | In | Open endorsement requests of the invoice family | BRRN.032 | IN SCOPE |
+| Claims (BRD-7) | In | Claims summary per ARN and policy year (decision D4) | BRRN.027, 031, 034 | IN SCOPE |
+| Client master | In | KYC review date | BRRN.028 | IN SCOPE |
+| Submitted Policies (BRD-12) | In | RenewalHandOff; status query back | Decision D2 | IN SCOPE |
+| E-mail outbox | Out | Protected RA, letters, insurer extract; send log | BRRN.010; BRD 3.009.5 | IN SCOPE |
+| Insurers | In | Response file by upload; no insurer API or SFTP | BRD 3.009.6; BRRN.035 | ON HOLD |
+| LAMD | In | Paid-off and RMU reports by upload | BRRN.029 | ON HOLD |
+| Data migration (BRD-13) | In | Migrated in-force policies for the go-live and daily extraction (NB path only); legacy package codes and the package code map; no renewal carried from legacy (DMQ37) | RQ27; DMQ36, DMQ37 | IN SCOPE |
+| Renewal Advice trackers (Excel) | In | RAs sent by hand before go-live, by upload once at go-live | DMQ37, DMQ38 | IN SCOPE |
+| Directory sign-in | In | BDO EUA / Windows ID (decision D6) | BRD x.001 | ON HOLD |
 
 > [!PARKED] Parked seams
 > Insurer channels, the LAMD feed, legacy policies, the recipient-domain policy and directory sign-in each have a port or an upload. The default is a manual upload or "not connected"; adding a channel is a new adapter with no change to the workflow.

@@ -1730,20 +1730,20 @@ Figure 4 shows the interfaces. Every BIBS module reads the effective permissions
 
 ![Interfaces of User Access Maintenance (dashed = parked)](figures/brd11_integration.dot){width=16}
 
-<!-- table: widths=3.8,1.8,7.6,2.8,2.2 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.8,1.8,7.6,2.8,2.2 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| EIAM (Microsoft Entra ID), Drop 0 | Out / In | OpenID Connect sign-in: redirect to Entra ID, ID token returned and mapped to the BIBS user by Windows ID or user principal name; log-out ends the Entra session. Target of FR-UA-003 (IQ04) | NFR p.13-14, p.17 | NEW |
+| EIAM (Microsoft Entra ID), Drop 0 | Out / In | OpenID Connect sign-in: redirect to Entra ID, ID token returned and mapped to the BIBS user by Windows ID or user principal name; log-out ends the Entra session. Target of FR-UA-003 (IQ04) | NFR p.13-14, p.17 | IN SCOPE |
 | UIDM-ISC (identity governance), Drop 0 | In / Out | Joiner, mover and leaver provisioning and access certification. Options: the IGA provisions user accounts while role changes stay BIBS requests (proposal), the IGA provisions users and roles, or aggregation only (IQ05, DCR-229) | 1.001-1.009 (request rule, p.6) | OPEN |
-| BDO EUA with Windows ID | Out / In | User ID and password passed at log-in; success or failure with message returned | NFR p.14 | PARKED |
-| LDAP / Active Directory | Out / In | Bind authentication, same port | NFR 1.h (p.13) | PARKED |
-| SSO (SAML / OIDC) | In | Identity-provider assertion exchanged for a BIBS session | Other BU NFR 4 (p.17) | PARKED |
-| External ACL | In | Authorisation by an external access-control list | NFR 1.i (p.13) | PARKED |
-| All BIBS modules | Out | Effective permissions of the user (menus, buttons, API checks) | 4.002.2 | BUILT |
+| BDO EUA with Windows ID | Out / In | User ID and password passed at log-in; success or failure with message returned | NFR p.14 | ON HOLD |
+| LDAP / Active Directory | Out / In | Bind authentication, same port | NFR 1.h (p.13) | ON HOLD |
+| SSO (SAML / OIDC) | In | Identity-provider assertion exchanged for a BIBS session | Other BU NFR 4 (p.17) | ON HOLD |
+| External ACL | In | Authorisation by an external access-control list | NFR 1.i (p.13) | ON HOLD |
+| All BIBS modules | Out | Effective permissions of the user (menus, buttons, API checks) | 4.002.2 | IN SCOPE |
 | Portal users (BRD-8 Employee Benefits) | Out | External user requests provisioned on approval (decision D7). Dormant: BDOI drops the EB portal (drop plan item 2.4, IQ22); EXTERNAL requests stay refused | D7 (R4) | OUT |
-| Notifications and e-mail | Out | Request, access-change and batch-failure notices | 1.006.1.1, 1.008.1.4, 2.002.1; NFR 10 | BUILT |
-| Bulk upload | In | Template file of access requests (Bulk Request) | 1.009 | BUILT |
-| Remote log server / syslog | Out | Application and error logs | NFR p.14 | PARKED |
+| Notifications and e-mail | Out | Request, access-change and batch-failure notices | 1.006.1.1, 1.008.1.4, 2.002.1; NFR 10 | IN SCOPE |
+| Bulk upload | In | Template file of access requests (Bulk Request) | 1.009 | IN SCOPE |
+| Remote log server / syslog | Out | Application and error logs | NFR p.14 | ON HOLD |
 
 > [!PARKED] Parked seams
 > The EUA, LDAP / AD and SSO interfaces are required by the BRD but their protocol, host and messages are not given (UQ04). BIBS captures the Windows ID now and authenticates through a port with a LOCAL default, so connecting EUA is a configuration of a new adapter, with no change to users, roles or requests (decision D6, R4).

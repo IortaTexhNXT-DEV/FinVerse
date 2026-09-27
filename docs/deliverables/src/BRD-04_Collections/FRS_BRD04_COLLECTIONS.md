@@ -2315,23 +2315,23 @@ Figure 6 shows the interfaces of Collections. Collections reads the Operations i
 
 ![Interfaces of Collections (dashed = parked)](figures/brd04_integration.dot){width=15}
 
-<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| Invoice ledger (opsledger) | In | Invoices, PR by component, movements, flags, shares; nightly refresh and after each movement | BRCLXN.001-015, 046 | BUILT |
-| Sales organisation (catalog) | In | Unit Head of each sales unit, department or region | BRCLXN.011 | BUILT |
-| Account, issuance, client master | In | Policy, account and client data of the account page | BRCLXN.056 | BUILT |
-| Cashiering: check pick-up | Out | COLLECTION_CHECK_PICKUP, pulled by the pick-up queue | p.40 | BUILT |
-| Cashiering: BIR 2307 tags | Out | COLLECTION_CWT2307; Cashiering pull not yet built | BRCLXN.026 | PARTIAL |
-| Commission: DP list | Out | COLLECTION_DP_LIST, pulled by the DP list intake | BRCLXN.024 | BUILT |
-| Commission: DP returned | In | COLLECTION_DP_RETURNED reopens the account | CMRID.009 | BUILT |
-| Cashiering: unapplied items | In | UnappliedDirectory (list, item, history) | BRCLXN.034-036, 040 | BUILT |
-| Cashiering: collector requests | Out / In | UnappliedDispositionRequests; UnappliedDispositionChanged back | BRCLXN.030-033 | BUILT |
-| Cashiering: refunds | In | COLLECTION_REFUND recorded on the collector side | BRCLXN.040 | BUILT |
-| Messaging and alerts | Out | Notifications, SOA e-mails, alerts | BRCLXN.049-058 | BUILT |
-| BDOI file server FS04 | Out | Daily application file; in-system repository until OQ17 | BRCLXN.041-042 | PARKED |
-| ISYS Marketing Diary | In | Client payment instructions | p.40-42 | PARKED |
-| Legacy EBIX / QPS open items | In | One-time migration of open PRs and dispositions | BRCLXN.013-015 | PARKED |
+| Invoice ledger (opsledger) | In | Invoices, PR by component, movements, flags, shares; nightly refresh and after each movement | BRCLXN.001-015, 046 | IN SCOPE |
+| Sales organisation (catalog) | In | Unit Head of each sales unit, department or region | BRCLXN.011 | IN SCOPE |
+| Account, issuance, client master | In | Policy, account and client data of the account page | BRCLXN.056 | IN SCOPE |
+| Cashiering: check pick-up | Out | COLLECTION_CHECK_PICKUP, pulled by the pick-up queue | p.40 | IN SCOPE |
+| Cashiering: BIR 2307 tags | Out | COLLECTION_CWT2307; Cashiering pull not yet built | BRCLXN.026 | IN SCOPE |
+| Commission: DP list | Out | COLLECTION_DP_LIST, pulled by the DP list intake | BRCLXN.024 | IN SCOPE |
+| Commission: DP returned | In | COLLECTION_DP_RETURNED reopens the account | CMRID.009 | IN SCOPE |
+| Cashiering: unapplied items | In | UnappliedDirectory (list, item, history) | BRCLXN.034-036, 040 | IN SCOPE |
+| Cashiering: collector requests | Out / In | UnappliedDispositionRequests; UnappliedDispositionChanged back | BRCLXN.030-033 | IN SCOPE |
+| Cashiering: refunds | In | COLLECTION_REFUND recorded on the collector side | BRCLXN.040 | IN SCOPE |
+| Messaging and alerts | Out | Notifications, SOA e-mails, alerts | BRCLXN.049-058 | IN SCOPE |
+| BDOI file server FS04 | Out | Daily application file; in-system repository until OQ17 | BRCLXN.041-042 | ON HOLD |
+| ISYS Marketing Diary | In | Client payment instructions | p.40-42 | ON HOLD |
+| Legacy EBIX / QPS open items | In | One-time migration of open PRs and dispositions | BRCLXN.013-015 | ON HOLD |
 
 > [!PARKED] Parked seams
 > The FS04 transport (OQ17, CQ12), the Marketing Diary (CQ20) and the legacy migration (CQ07) are seams without content. Each is a configuration of a new adapter or a one-time load, with no change to the Collections functions.

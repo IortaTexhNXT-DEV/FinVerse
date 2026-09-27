@@ -3873,19 +3873,19 @@ Figure 6 shows the interfaces of New Business. The broking modules talk to each 
 
 ![Interfaces of New Business (dashed = parked)](figures/brd01_integration.dot)
 
-<!-- table: widths=3.9,2,7.1,2.6,2 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.9,2,7.1,2.6,2 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| HLS and other source systems | In | Quotation requests; bulk quotations and accounts by upload of the extract; intake port | BRNB.023, 028, 064 | PARKED |
-| Shared mailboxes | In | Requests and e-policies read automatically | BRNB.041, 073 | PARKED |
-| E-mail outbox | Out | Protected quotations, slips, hold cover requests, advices, e-policies, service invoices; send log | BRNB.008, 013, 035, 071 | BUILT |
-| Insurers | Out / In | Slips and requests by e-mail; replies keyed in; SFTP / API channels | BRNB.008, 071 | PARTIAL |
-| CLPC | Out / In | Billing file download and payment report upload; SFTP transfer | BRNB.067 | PARTIAL |
-| Operations (BRD-2) | Out / In | Booked invoices (InvoiceBooked), pre-booked look-up; cashier receipts as payment confirmations | BRNB.027, 068 | BUILT |
-| Product Maintenance (BRD-3) | In | Products, package versions, rate exceptions, incentive criteria | BRNB.001, 107 | BUILT |
-| Accounting engine | Out | BROKER_BOOKING events, journals, open items, cost center dimension | BRNB.027, 108 | BUILT |
-| Other BDOI systems | Out | NB data feed (QPS / EBIX contact updates per BRD-9) | BRNB.015 | PARKED |
-| BDO directory (EUA / AD / SSO) | In | Sign-in | BRNB.040 | PARKED |
+| HLS and other source systems | In | Quotation requests; bulk quotations and accounts by upload of the extract; intake port | BRNB.023, 028, 064 | ON HOLD |
+| Shared mailboxes | In | Requests and e-policies read automatically | BRNB.041, 073 | ON HOLD |
+| E-mail outbox | Out | Protected quotations, slips, hold cover requests, advices, e-policies, service invoices; send log | BRNB.008, 013, 035, 071 | IN SCOPE |
+| Insurers | Out / In | Slips and requests by e-mail; replies keyed in; SFTP / API channels | BRNB.008, 071 | IN SCOPE |
+| CLPC | Out / In | Billing file download and payment report upload; SFTP transfer | BRNB.067 | IN SCOPE |
+| Operations (BRD-2) | Out / In | Booked invoices (InvoiceBooked), pre-booked look-up; cashier receipts as payment confirmations | BRNB.027, 068 | IN SCOPE |
+| Product Maintenance (BRD-3) | In | Products, package versions, rate exceptions, incentive criteria | BRNB.001, 107 | IN SCOPE |
+| Accounting engine | Out | BROKER_BOOKING events, journals, open items, cost center dimension | BRNB.027, 108 | IN SCOPE |
+| Other BDOI systems | Out | NB data feed (QPS / EBIX contact updates per BRD-9) | BRNB.015 | ON HOLD |
+| BDO directory (EUA / AD / SSO) | In | Sign-in | BRNB.040 | ON HOLD |
 | BIR CAS / e-invoicing | Out | Service invoice transmission | BRNB.100 | OUT |
 
 > [!PARKED] Parked seams
@@ -4115,128 +4115,128 @@ The table lists every point where the delivered system does what the BRD asks in
 
 Every BRD-1 requirement is met by at least one FR. The table lists the 119 rows of the requirements baseline (R2): BRNB.001-115, the unnumbered row BRNB.100b, BRD 2.1.16 and the two out-of-scope items. Status is the build status of the traceability record (R3): BUILT, CONFIGURED (built capability, BDOI content pending), PARKED (seam built, waiting for a BDOI answer) or OUT.
 
-<!-- table: widths=2.4,2.6,4.6,5.2,2.2 caption="BRD ID to FR, page, main screen and status" status=Status size=8 -->
-| BRD ID | Page | FR | Main screen | Status |
+<!-- table: widths=2.4,2.6,4.6,5.2,5.2 caption="BRD ID to FR, page, main screen and test cases" size=8 -->
+| BRD ID | Page | FR | Main screen | Test cases |
 |---|---|---|---|---|
-| BRNB.001 | p.49 | FR-NB-001 | Products | CONFIGURED |
-| BRNB.002 | p.49 | FR-NB-002 | New Account (Risk Items step) | CONFIGURED |
-| BRNB.003 | p.49-50 | FR-NB-003 | New Account | CONFIGURED |
-| BRNB.004 | p.50; updated p.18 | FR-NB-004, FR-NB-041 | Document Templates | BUILT |
-| BRNB.005 | p.50-51 | FR-NB-014, FR-NB-050, FR-NB-051 | Proposal Requests | BUILT |
-| BRNB.006 | p.51-52 | FR-NB-047, FR-NB-050 | New Proposal Request; Proposal Requests | BUILT |
-| BRNB.007 | p.52-53 | FR-NB-052 | TSU Workbench | BUILT |
-| BRNB.008 | p.53-54 | FR-NB-053 | Proposal Request page (Quotation Slip) | BUILT |
-| BRNB.009 | p.54 | FR-NB-054, FR-NB-055 | Proposal Request page (Insurer Responses) | BUILT |
-| BRNB.010 | p.54-55 | FR-NB-055 | Proposal Request page (Comparative Table) | BUILT |
-| BRNB.011 | p.55 | FR-NB-121 | New Business Reports | BUILT |
-| BRNB.012 | p.55 | FR-NB-120 | NB Dashboard | BUILT |
-| BRNB.013 | p.55-56 | FR-NB-013, FR-NB-044, FR-NB-057 | Send via Email dialog; Outbound Messages | BUILT |
-| BRNB.014 | p.56 | FR-NB-014, FR-NB-043, FR-NB-051 | Quotation page | BUILT |
-| BRNB.015 | p.56 | FR-NB-015 | Notifications (bell) | BUILT |
-| BRNB.016 | p.56 | FR-NB-016 | History tab of every record | BUILT |
-| BRNB.017 | p.57 | FR-NB-056, FR-NB-057 | Proposal Request page (Proposal Slip) | BUILT |
-| BRNB.018 | p.57 | FR-NB-126 | - | PARKED |
-| BRNB.019 | p.58 | FR-NB-012 | Workflow panel (Void) | BUILT |
-| BRNB.020 | p.58-59 | FR-NB-042 | Edit Quotation | BUILT |
-| BRNB.021 | p.59-60 | FR-NB-043 | Quotations (For Review tab) | BUILT |
-| BRNB.022 | p.60-61; updated p.18 | FR-NB-010, FR-NB-122 | Workflow panel; History tab | BUILT |
-| BRNB.023 | p.61 | FR-NB-040 | Quotation Requests | PARKED |
-| BRNB.024 | p.62-63 | FR-NB-019, FR-NB-045 | Bulk Uploads | BUILT |
-| BRNB.025 | p.63-65 | FR-NB-064, FR-NB-065 | Edit Account | BUILT |
-| BRNB.026 | p.65-66 | FR-NB-017 | Documents tab | BUILT |
-| BRNB.027 | p.66-67 | FR-NB-110, FR-NB-115 | Booking Workbench (Ready to Book) | BUILT |
-| BRNB.028 | p.67-68 | FR-NB-046 | Bulk Quotations | BUILT |
-| BRNB.029 | p.68-69 | FR-NB-031, FR-NB-034, FR-NB-041, FR-NB-061 | New Client; New Quotation | BUILT |
-| BRNB.030 | p.69-71 | FR-NB-031, FR-NB-032, FR-NB-033, FR-NB-034 | New Client | BUILT |
-| BRNB.031 | p.71-72 | FR-NB-124 | Report runner (Print) | BUILT |
-| BRNB.032 | p.72-73 | FR-NB-033, FR-NB-063 | New Client | BUILT |
-| BRNB.033 | p.73-74 | FR-NB-067 | Accounts (Returned to me) | BUILT |
-| BRNB.034 | p.74-75 | FR-NB-084 | Placement Workbench; Account Placement | BUILT |
-| BRNB.035 | p.75-76 | FR-NB-013, FR-NB-104, FR-NB-105 | Send via Email dialog; Outbound Messages | BUILT |
-| BRNB.036 | p.77-78 | FR-NB-111 | Booking Workbench | BUILT |
-| BRNB.037 | p.78-79 | FR-NB-125 | Report runner (Download) | BUILT |
-| BRNB.038 | p.79-80 | FR-NB-113 | Account page (Direct booking) | BUILT |
-| BRNB.039 | p.80-81 | FR-NB-019, FR-NB-065 | Bulk Uploads | BUILT |
-| BRNB.040 | p.93-94 | FR-NB-130 | Login | CONFIGURED |
-| BRNB.041 | p.94 | FR-NB-040 | Quotation Requests | BUILT |
-| BRNB.042 | p.94-95 | FR-NB-044, FR-NB-046 | Quotation page (Send) | BUILT |
-| BRNB.043 | p.95-96 | FR-NB-041, FR-NB-044 | New Quotation (wizard) | BUILT |
-| BRNB.044 | p.96-97 | FR-NB-030, FR-NB-045, FR-NB-065 | Bulk Quotation Acceptance; Clients | BUILT |
-| BRNB.045 | p.97 | FR-NB-045, FR-NB-057 | Quotation page (Record Acceptance) | BUILT |
-| BRNB.046 | p.97 | FR-NB-030 | Clients | BUILT |
-| BRNB.047 | p.97-98 | FR-NB-035 | Bulk Upload (CLIENT_CREATE) | BUILT |
-| BRNB.048 | p.98 | FR-NB-031 | New Client | BUILT |
-| BRNB.049 | p.98-99 | FR-NB-032 | Edit Client | BUILT |
-| BRNB.050 | p.99 | FR-NB-060 | Accounts | BUILT |
-| BRNB.051 | p.99-101 | FR-NB-061, FR-NB-062, FR-NB-063 | New Account (six-step wizard) | BUILT |
-| BRNB.052 | p.101-102 | FR-NB-065 | Bulk Account Creation | BUILT |
-| BRNB.053 | p.102-103 | FR-NB-064 | Edit Account | BUILT |
-| BRNB.054 | p.103-104 | FR-NB-064 | Edit Account | BUILT |
-| BRNB.055 | p.104-105 | FR-NB-017 | Documents tab | BUILT |
-| BRNB.056 | p.105 | FR-NB-018 | Documents tab (client, account) | BUILT |
-| BRNB.057 | p.106 | FR-NB-123 | New Business Reports | BUILT |
-| BRNB.058 | p.106-107 | FR-NB-067 | Accounts (Returned to me) | BUILT |
-| BRNB.059 | p.107 | FR-NB-084 | Placement Workbench; Account Placement | BUILT |
-| BRNB.060 | p.107-108 | FR-NB-104 | Insurance Advice register | BUILT |
-| BRNB.061 | p.108-109 | FR-NB-110, FR-NB-111, FR-NB-115 | Endorsements | BUILT |
-| BRNB.062 | p.109 | FR-NB-085 | Placement Workbench (Cancel Placement) | BUILT |
-| BRNB.063 | p.109-110 | FR-NB-046 | Bulk Quotations | BUILT |
-| BRNB.064 | p.110 | FR-NB-019, FR-NB-065 | Bulk Uploads | BUILT |
-| BRNB.065 | p.110-111 | FR-NB-035 | Bulk Upload (CLIENT_CREATE) | BUILT |
-| BRNB.066 | p.111-114 | FR-NB-063, FR-NB-065 | Bulk Account Creation | BUILT |
-| BRNB.067 | p.114-115 | FR-NB-090, FR-NB-091 | CLPC Billing | BUILT |
-| BRNB.068 | p.115 | FR-NB-091, FR-NB-092 | Account Placement (Payment Gate panel) | BUILT |
-| BRNB.069 | p.115-116; updated p.19 | FR-NB-080 | Placement Workbench (For Placement) | BUILT |
-| BRNB.070 | p.116 | FR-NB-103 | Insurance Advice (Generate Insurance Advice) | BUILT |
-| BRNB.071 | p.116 | FR-NB-081 | Placement Slips (Send, Send Slips) | BUILT |
-| BRNB.072 | p.116 | FR-NB-082 | Account Placement (Hold Cover panel) | BUILT |
-| BRNB.073 | p.116-117 | FR-NB-100 | E-policy Upload (single, bulk) | BUILT |
-| BRNB.074 | p.117 | FR-NB-101 | Extraction Review | BUILT |
-| BRNB.075 | p.117-118 | FR-NB-122 | New Business Reports | BUILT |
-| BRNB.076 | p.118 | FR-NB-112, FR-NB-115 | Booking Setup (Auto-book Rules) | BUILT |
-| BRNB.077 | p.118-119 | FR-NB-105 | E-policy Dispatch | BUILT |
-| BRNB.078 | p.119 | FR-NB-106 | E-policy Dispatch (Dispatch Report) | BUILT |
-| BRNB.079 | p.119-120 | FR-NB-133 | My Approvals | BUILT |
-| BRNB.080 | p.120 | FR-NB-011 | My Work | BUILT |
-| BRNB.081 | p.120 | FR-NB-115, FR-NB-116 | Booked Invoice (Cancel Booking) | BUILT |
-| BRNB.082 | p.121 | FR-NB-131 | Every screen | BUILT |
-| BRNB.083 | p.121 | FR-NB-132 | Lists of Values (Broking Setup) | BUILT |
-| BRNB.084 | p.121 | FR-NB-134 | Roles & Permissions | CONFIGURED |
-| BRNB.085 | p.121-122 | FR-NB-135 | Access Requests | BUILT |
-| BRNB.086 | p.122 | FR-NB-136 | Audit Trail (Administration) | BUILT |
-| BRNB.087 | p.122 | FR-NB-130 | Login | CONFIGURED |
-| BRNB.088 | p.122-127 | FR-NB-134 | Roles & Permissions | CONFIGURED |
-| BRNB.089 | p.127 | FR-NB-136 | Audit Trail (Administration) | BUILT |
-| BRNB.090 | p.4 | FR-NB-034 | Client page (KYC & Documents) | BUILT |
-| BRNB.091 | p.4 | FR-NB-036 | Client page (Tags & Instructions) | BUILT |
-| BRNB.092 | p.5 | FR-NB-020 | - | PARKED |
-| BRNB.093 | p.5 | FR-NB-002 | New Account (Risk Items step) | CONFIGURED |
-| BRNB.094 | p.5-6 | FR-NB-012, FR-NB-116 | Workflow panel (Void) | BUILT |
-| BRNB.095 | p.6 | FR-NB-103 | Insurance Advice (Generate Insurance Advice) | CONFIGURED |
-| BRNB.096 | p.6 | FR-NB-011, FR-NB-064 | My Work | BUILT |
-| BRNB.097 | p.6-7 | FR-NB-011, FR-NB-119 | My Work; Booked Accounts Register | BUILT |
-| BRNB.098 | p.7 | FR-NB-005 | Products (TSU Rules tab) | CONFIGURED |
-| BRNB.099 | p.8 | FR-NB-037 | Client page (Linked Records) | BUILT |
-| BRNB.100 | p.8-9 | FR-NB-117 | Service Invoices | BUILT |
-| BRNB.100b | p.9 | FR-NB-117 | Service Invoices | BUILT |
-| BRNB.101 | p.9-10 | FR-NB-034 | Client page (KYC & Documents) | BUILT |
-| BRNB.102 | p.10 | FR-NB-041, FR-NB-047 | ARN chip; Account by ARN | BUILT |
-| BRNB.103 | p.10-11 | FR-NB-083 | Account Placement (Hold Cover panel) | BUILT |
-| BRNB.104 | p.11 | FR-NB-101 | Extraction Review | BUILT |
-| BRNB.105 | p.11-12 | FR-NB-102 | Issuance Workbench | BUILT |
-| BRNB.106 | p.12 | FR-NB-137 | Data Retention (Broking Setup) | BUILT |
-| BRNB.107 | p.12-13 | FR-NB-118 | Booked Invoice | CONFIGURED |
-| BRNB.108 | p.13-14 | FR-NB-110, FR-NB-119 | Pre-booking Confirmation | BUILT |
-| BRNB.109 | p.14 | FR-NB-066 | New Account (contact step) | BUILT |
-| BRNB.110 | p.14 | FR-NB-038 | KYC Reviews Due | BUILT |
-| BRNB.111 | p.15 | FR-NB-113 | Account page (Direct booking) | BUILT |
-| BRNB.112 | p.15-16 | FR-NB-062, FR-NB-114 | Booked Invoice | BUILT |
-| BRNB.113 | p.16-17 | FR-NB-068 | FFY Register | BUILT |
-| BRNB.114 | p.17 | FR-NB-069, FR-NB-092 | New Account (Payment) | BUILT |
-| BRNB.115 | p.18-19 | FR-NB-010, FR-NB-120, FR-NB-122 | Workflow panel; History tab | BUILT |
-| BRD 2.1.16 | p.180 | FR-NB-086 | Placement Workbench (Reactivate) | BUILT |
-| OOS-1 | p.83 | Section 1.2 (out of scope) | - | OUT |
-| OOS-2 | p.83 | Section 1.2; FR-NB-047, 090 | - | OUT |
+| BRNB.001 | p.49 | FR-NB-001 | Products | TC-NB-001.1, 001.2, 001.3 (5 cases) |
+| BRNB.002 | p.49 | FR-NB-002 | New Account (Risk Items step) | TC-NB-002.1, 002.2, 002.3 (4 cases) |
+| BRNB.003 | p.49-50 | FR-NB-003 | New Account | TC-NB-003.1, 003.2, 003.3 (6 cases) |
+| BRNB.004 | p.50; updated p.18 | FR-NB-004, FR-NB-041 | Document Templates | TC-NB-004.1, 004.2, 004.3, 041.1, 041.2, 041.3 (11 cases) |
+| BRNB.005 | p.50-51 | FR-NB-014, FR-NB-050, FR-NB-051 | Proposal Requests | TC-NB-014.1, 014.2, 014.3, 050.1, 050.2, 050.3, 051.1, 051.2 (13 cases) |
+| BRNB.006 | p.51-52 | FR-NB-047, FR-NB-050 | New Proposal Request; Proposal Requests | TC-NB-047.1, 047.2, 050.1, 050.2, 050.3 (10 cases) |
+| BRNB.007 | p.52-53 | FR-NB-052 | TSU Workbench | TC-NB-052.1, 052.2, 052.3 (5 cases) |
+| BRNB.008 | p.53-54 | FR-NB-053 | Proposal Request page (Quotation Slip) | TC-NB-053.1, 053.2, 053.3 (5 cases) |
+| BRNB.009 | p.54 | FR-NB-054, FR-NB-055 | Proposal Request page (Insurer Responses) | TC-NB-054.1, 054.2, 054.3, 055.1, 055.2 (9 cases) |
+| BRNB.010 | p.54-55 | FR-NB-055 | Proposal Request page (Comparative Table) | TC-NB-055.1, 055.2 (4 cases) |
+| BRNB.011 | p.55 | FR-NB-121 | New Business Reports | TC-NB-121.1, 121.2 (3 cases) |
+| BRNB.012 | p.55 | FR-NB-120 | NB Dashboard | TC-NB-120.1, 120.2, 120.3 (3 cases) |
+| BRNB.013 | p.55-56 | FR-NB-013, FR-NB-044, FR-NB-057 | Send via Email dialog; Outbound Messages | TC-NB-013.1, 013.2, 013.3, 013.4, 044.1, 044.2, 057.1, 057.2 (14 cases) |
+| BRNB.014 | p.56 | FR-NB-014, FR-NB-043, FR-NB-051 | Quotation page | TC-NB-014.1, 014.2, 014.3, 043.1, 043.2, 043.3, 051.1, 051.2 (11 cases) |
+| BRNB.015 | p.56 | FR-NB-015 | Notifications (bell) | TC-NB-015.1, 015.2 (3 cases) |
+| BRNB.016 | p.56 | FR-NB-016 | History tab of every record | TC-NB-016.1, 016.2 (2 cases) |
+| BRNB.017 | p.57 | FR-NB-056, FR-NB-057 | Proposal Request page (Proposal Slip) | TC-NB-056.1, 056.2, 056.3, 057.1, 057.2 (9 cases) |
+| BRNB.018 | p.57 | FR-NB-126 | - | TC-NB-126.1, 126.2 (2 cases) |
+| BRNB.019 | p.58 | FR-NB-012 | Workflow panel (Void) | TC-NB-012.1, 012.2, 012.3 (4 cases) |
+| BRNB.020 | p.58-59 | FR-NB-042 | Edit Quotation | TC-NB-042.1, 042.2, 042.3 (4 cases) |
+| BRNB.021 | p.59-60 | FR-NB-043 | Quotations (For Review tab) | TC-NB-043.1, 043.2, 043.3 (4 cases) |
+| BRNB.022 | p.60-61; updated p.18 | FR-NB-010, FR-NB-122 | Workflow panel; History tab | TC-NB-010.1, 010.2, 010.3, 122.1, 122.2, 122.3 (9 cases) |
+| BRNB.023 | p.61 | FR-NB-040 | Quotation Requests | TC-NB-040.1, 040.2, 040.3 (5 cases) |
+| BRNB.024 | p.62-63 | FR-NB-019, FR-NB-045 | Bulk Uploads | TC-NB-019.1, 019.2, 019.3, 019.4, 045.1, 045.2, 045.3 (12 cases) |
+| BRNB.025 | p.63-65 | FR-NB-064, FR-NB-065 | Edit Account | TC-NB-064.1, 064.2, 064.3, 065.1, 065.2 (10 cases) |
+| BRNB.026 | p.65-66 | FR-NB-017 | Documents tab | TC-NB-017.1, 017.2, 017.3, 017.4 (9 cases) |
+| BRNB.027 | p.66-67 | FR-NB-110, FR-NB-115 | Booking Workbench (Ready to Book) | TC-NB-110.1, 110.2, 110.3, 115.1, 115.2 (11 cases) |
+| BRNB.028 | p.67-68 | FR-NB-046 | Bulk Quotations | TC-NB-046.1, 046.2 (4 cases) |
+| BRNB.029 | p.68-69 | FR-NB-031, FR-NB-034, FR-NB-041, FR-NB-061 | New Client; New Quotation | TC-NB-031.1, 031.2, 031.3, 031.4, 034.1, 034.2, 034.3, 034.4, 041.1, 041.2, 041.3, 061.1, 061.2, 061.3 (27 cases) |
+| BRNB.030 | p.69-71 | FR-NB-031, FR-NB-032, FR-NB-033, FR-NB-034 | New Client | TC-NB-031.1, 031.2, 031.3, 031.4, 032.1, 032.2, 033.1, 033.2, 034.1, 034.2, 034.3, 034.4 (21 cases) |
+| BRNB.031 | p.71-72 | FR-NB-124 | Report runner (Print) | TC-NB-124.1, 124.2 (2 cases) |
+| BRNB.032 | p.72-73 | FR-NB-033, FR-NB-063 | New Client | TC-NB-033.1, 033.2, 063.1, 063.2 (7 cases) |
+| BRNB.033 | p.73-74 | FR-NB-067 | Accounts (Returned to me) | TC-NB-067.1, 067.2 (4 cases) |
+| BRNB.034 | p.74-75 | FR-NB-084 | Placement Workbench; Account Placement | TC-NB-084.1, 084.2, 084.3 (4 cases) |
+| BRNB.035 | p.75-76 | FR-NB-013, FR-NB-104, FR-NB-105 | Send via Email dialog; Outbound Messages | TC-NB-013.1, 013.2, 013.3, 013.4, 104.1, 104.2, 105.1, 105.2 (14 cases) |
+| BRNB.036 | p.77-78 | FR-NB-111 | Booking Workbench | TC-NB-111.1, 111.2, 111.3 (5 cases) |
+| BRNB.037 | p.78-79 | FR-NB-125 | Report runner (Download) | TC-NB-125.1, 125.2 (2 cases) |
+| BRNB.038 | p.79-80 | FR-NB-113 | Account page (Direct booking) | TC-NB-113.1, 113.2 (2 cases) |
+| BRNB.039 | p.80-81 | FR-NB-019, FR-NB-065 | Bulk Uploads | TC-NB-019.1, 019.2, 019.3, 019.4, 065.1, 065.2 (12 cases) |
+| BRNB.040 | p.93-94 | FR-NB-130 | Login | TC-NB-130.1, 130.2, 130.3 (5 cases) |
+| BRNB.041 | p.94 | FR-NB-040 | Quotation Requests | TC-NB-040.1, 040.2, 040.3 (5 cases) |
+| BRNB.042 | p.94-95 | FR-NB-044, FR-NB-046 | Quotation page (Send) | TC-NB-044.1, 044.2, 046.1, 046.2 (7 cases) |
+| BRNB.043 | p.95-96 | FR-NB-041, FR-NB-044 | New Quotation (wizard) | TC-NB-041.1, 041.2, 041.3, 044.1, 044.2 (10 cases) |
+| BRNB.044 | p.96-97 | FR-NB-030, FR-NB-045, FR-NB-065 | Bulk Quotation Acceptance; Clients | TC-NB-030.1, 030.2, 030.3, 045.1, 045.2, 045.3, 065.1, 065.2 (14 cases) |
+| BRNB.045 | p.97 | FR-NB-045, FR-NB-057 | Quotation page (Record Acceptance) | TC-NB-045.1, 045.2, 045.3, 057.1, 057.2 (9 cases) |
+| BRNB.046 | p.97 | FR-NB-030 | Clients | TC-NB-030.1, 030.2, 030.3 (4 cases) |
+| BRNB.047 | p.97-98 | FR-NB-035 | Bulk Upload (CLIENT_CREATE) | TC-NB-035.1, 035.2 (3 cases) |
+| BRNB.048 | p.98 | FR-NB-031 | New Client | TC-NB-031.1, 031.2, 031.3, 031.4 (8 cases) |
+| BRNB.049 | p.98-99 | FR-NB-032 | Edit Client | TC-NB-032.1, 032.2 (3 cases) |
+| BRNB.050 | p.99 | FR-NB-060 | Accounts | TC-NB-060.1, 060.2, 060.3 (5 cases) |
+| BRNB.051 | p.99-101 | FR-NB-061, FR-NB-062, FR-NB-063 | New Account (six-step wizard) | TC-NB-061.1, 061.2, 061.3, 062.1, 062.2, 062.3, 063.1, 063.2 (16 cases) |
+| BRNB.052 | p.101-102 | FR-NB-065 | Bulk Account Creation | TC-NB-065.1, 065.2 (5 cases) |
+| BRNB.053 | p.102-103 | FR-NB-064 | Edit Account | TC-NB-064.1, 064.2, 064.3 (5 cases) |
+| BRNB.054 | p.103-104 | FR-NB-064 | Edit Account | TC-NB-064.1, 064.2, 064.3 (5 cases) |
+| BRNB.055 | p.104-105 | FR-NB-017 | Documents tab | TC-NB-017.1, 017.2, 017.3, 017.4 (9 cases) |
+| BRNB.056 | p.105 | FR-NB-018 | Documents tab (client, account) | TC-NB-018.1, 018.2, 018.3 (4 cases) |
+| BRNB.057 | p.106 | FR-NB-123 | New Business Reports | TC-NB-123.1, 123.2 (3 cases) |
+| BRNB.058 | p.106-107 | FR-NB-067 | Accounts (Returned to me) | TC-NB-067.1, 067.2 (4 cases) |
+| BRNB.059 | p.107 | FR-NB-084 | Placement Workbench; Account Placement | TC-NB-084.1, 084.2, 084.3 (4 cases) |
+| BRNB.060 | p.107-108 | FR-NB-104 | Insurance Advice register | TC-NB-104.1, 104.2 (4 cases) |
+| BRNB.061 | p.108-109 | FR-NB-110, FR-NB-111, FR-NB-115 | Endorsements | TC-NB-110.1, 110.2, 110.3, 111.1, 111.2, 111.3, 115.1, 115.2 (16 cases) |
+| BRNB.062 | p.109 | FR-NB-085 | Placement Workbench (Cancel Placement) | TC-NB-085.1, 085.2, 085.3 (4 cases) |
+| BRNB.063 | p.109-110 | FR-NB-046 | Bulk Quotations | TC-NB-046.1, 046.2 (4 cases) |
+| BRNB.064 | p.110 | FR-NB-019, FR-NB-065 | Bulk Uploads | TC-NB-019.1, 019.2, 019.3, 019.4, 065.1, 065.2 (12 cases) |
+| BRNB.065 | p.110-111 | FR-NB-035 | Bulk Upload (CLIENT_CREATE) | TC-NB-035.1, 035.2 (3 cases) |
+| BRNB.066 | p.111-114 | FR-NB-063, FR-NB-065 | Bulk Account Creation | TC-NB-063.1, 063.2, 065.1, 065.2 (9 cases) |
+| BRNB.067 | p.114-115 | FR-NB-090, FR-NB-091 | CLPC Billing | TC-NB-090.1, 090.2, 091.1, 091.2, 091.3 (10 cases) |
+| BRNB.068 | p.115 | FR-NB-091, FR-NB-092 | Account Placement (Payment Gate panel) | TC-NB-091.1, 091.2, 091.3, 092.1, 092.2, 092.3 (10 cases) |
+| BRNB.069 | p.115-116; updated p.19 | FR-NB-080 | Placement Workbench (For Placement) | TC-NB-080.1, 080.2, 080.3 (5 cases) |
+| BRNB.070 | p.116 | FR-NB-103 | Insurance Advice (Generate Insurance Advice) | TC-NB-103.1, 103.2 (3 cases) |
+| BRNB.071 | p.116 | FR-NB-081 | Placement Slips (Send, Send Slips) | TC-NB-081.1, 081.2 (3 cases) |
+| BRNB.072 | p.116 | FR-NB-082 | Account Placement (Hold Cover panel) | TC-NB-082.1, 082.2 (3 cases) |
+| BRNB.073 | p.116-117 | FR-NB-100 | E-policy Upload (single, bulk) | TC-NB-100.1, 100.2, 100.3 (4 cases) |
+| BRNB.074 | p.117 | FR-NB-101 | Extraction Review | TC-NB-101.1, 101.2 (4 cases) |
+| BRNB.075 | p.117-118 | FR-NB-122 | New Business Reports | TC-NB-122.1, 122.2, 122.3 (4 cases) |
+| BRNB.076 | p.118 | FR-NB-112, FR-NB-115 | Booking Setup (Auto-book Rules) | TC-NB-112.1, 112.2, 115.1, 115.2 (9 cases) |
+| BRNB.077 | p.118-119 | FR-NB-105 | E-policy Dispatch | TC-NB-105.1, 105.2 (3 cases) |
+| BRNB.078 | p.119 | FR-NB-106 | E-policy Dispatch (Dispatch Report) | TC-NB-106.1, 106.2 (2 cases) |
+| BRNB.079 | p.119-120 | FR-NB-133 | My Approvals | TC-NB-133.1, 133.2 (3 cases) |
+| BRNB.080 | p.120 | FR-NB-011 | My Work | TC-NB-011.1, 011.2, 011.3 (5 cases) |
+| BRNB.081 | p.120 | FR-NB-115, FR-NB-116 | Booked Invoice (Cancel Booking) | TC-NB-115.1, 115.2, 116.1, 116.2, 116.3 (10 cases) |
+| BRNB.082 | p.121 | FR-NB-131 | Every screen | TC-NB-131.1, 131.2 (2 cases) |
+| BRNB.083 | p.121 | FR-NB-132 | Lists of Values (Broking Setup) | TC-NB-132.1, 132.2 (5 cases) |
+| BRNB.084 | p.121 | FR-NB-134 | Roles & Permissions | TC-NB-134.1, 134.2 (3 cases) |
+| BRNB.085 | p.121-122 | FR-NB-135 | Access Requests | TC-NB-135.1, 135.2, 135.3 (5 cases) |
+| BRNB.086 | p.122 | FR-NB-136 | Audit Trail (Administration) | TC-NB-136.1, 136.2 (3 cases) |
+| BRNB.087 | p.122 | FR-NB-130 | Login | TC-NB-130.1, 130.2, 130.3 (5 cases) |
+| BRNB.088 | p.122-127 | FR-NB-134 | Roles & Permissions | TC-NB-134.1, 134.2 (3 cases) |
+| BRNB.089 | p.127 | FR-NB-136 | Audit Trail (Administration) | TC-NB-136.1, 136.2 (3 cases) |
+| BRNB.090 | p.4 | FR-NB-034 | Client page (KYC & Documents) | TC-NB-034.1, 034.2, 034.3, 034.4 (7 cases) |
+| BRNB.091 | p.4 | FR-NB-036 | Client page (Tags & Instructions) | TC-NB-036.1, 036.2, 036.3 (5 cases) |
+| BRNB.092 | p.5 | FR-NB-020 | - | TC-NB-020.1 (2 cases) |
+| BRNB.093 | p.5 | FR-NB-002 | New Account (Risk Items step) | TC-NB-002.1, 002.2, 002.3 (4 cases) |
+| BRNB.094 | p.5-6 | FR-NB-012, FR-NB-116 | Workflow panel (Void) | TC-NB-012.1, 012.2, 012.3, 116.1, 116.2, 116.3 (8 cases) |
+| BRNB.095 | p.6 | FR-NB-103 | Insurance Advice (Generate Insurance Advice) | TC-NB-103.1, 103.2 (3 cases) |
+| BRNB.096 | p.6 | FR-NB-011, FR-NB-064 | My Work | TC-NB-011.1, 011.2, 011.3, 064.1, 064.2, 064.3 (10 cases) |
+| BRNB.097 | p.6-7 | FR-NB-011, FR-NB-119 | My Work; Booked Accounts Register | TC-NB-011.1, 011.2, 011.3, 119.1, 119.2 (7 cases) |
+| BRNB.098 | p.7 | FR-NB-005 | Products (TSU Rules tab) | TC-NB-005.1, 005.2, 005.3 (7 cases) |
+| BRNB.099 | p.8 | FR-NB-037 | Client page (Linked Records) | TC-NB-037.1, 037.2 (2 cases) |
+| BRNB.100 | p.8-9 | FR-NB-117 | Service Invoices | TC-NB-117.1, 117.2, 117.3 (5 cases) |
+| BRNB.100b | p.9 | FR-NB-117 | Service Invoices | TC-NB-117.1, 117.2, 117.3 (5 cases) |
+| BRNB.101 | p.9-10 | FR-NB-034 | Client page (KYC & Documents) | TC-NB-034.1, 034.2, 034.3, 034.4 (7 cases) |
+| BRNB.102 | p.10 | FR-NB-041, FR-NB-047 | ARN chip; Account by ARN | TC-NB-041.1, 041.2, 041.3, 047.1, 047.2 (11 cases) |
+| BRNB.103 | p.10-11 | FR-NB-083 | Account Placement (Hold Cover panel) | TC-NB-083.1, 083.2, 083.3 (5 cases) |
+| BRNB.104 | p.11 | FR-NB-101 | Extraction Review | TC-NB-101.1, 101.2 (4 cases) |
+| BRNB.105 | p.11-12 | FR-NB-102 | Issuance Workbench | TC-NB-102.1, 102.2 (2 cases) |
+| BRNB.106 | p.12 | FR-NB-137 | Data Retention (Broking Setup) | TC-NB-137.1, 137.2 (3 cases) |
+| BRNB.107 | p.12-13 | FR-NB-118 | Booked Invoice | TC-NB-118.1, 118.2 (3 cases) |
+| BRNB.108 | p.13-14 | FR-NB-110, FR-NB-119 | Pre-booking Confirmation | TC-NB-110.1, 110.2, 110.3, 119.1, 119.2 (7 cases) |
+| BRNB.109 | p.14 | FR-NB-066 | New Account (contact step) | TC-NB-066.1, 066.2 (3 cases) |
+| BRNB.110 | p.14 | FR-NB-038 | KYC Reviews Due | TC-NB-038.1, 038.2 (4 cases) |
+| BRNB.111 | p.15 | FR-NB-113 | Account page (Direct booking) | TC-NB-113.1, 113.2 (2 cases) |
+| BRNB.112 | p.15-16 | FR-NB-062, FR-NB-114 | Booked Invoice | TC-NB-062.1, 062.2, 062.3, 114.1, 114.2 (10 cases) |
+| BRNB.113 | p.16-17 | FR-NB-068 | FFY Register | TC-NB-068.1, 068.2, 068.3 (5 cases) |
+| BRNB.114 | p.17 | FR-NB-069, FR-NB-092 | New Account (Payment) | TC-NB-069.1, 069.2, 092.1, 092.2, 092.3 (8 cases) |
+| BRNB.115 | p.18-19 | FR-NB-010, FR-NB-120, FR-NB-122 | Workflow panel; History tab | TC-NB-010.1, 010.2, 010.3, 120.1, 120.2, 120.3, 122.1, 122.2, 122.3 (12 cases) |
+| BRD 2.1.16 | p.180 | FR-NB-086 | Placement Workbench (Reactivate) | TC-NB-086.1, 086.2 (3 cases) |
+| OOS-1 | p.83 | Section 1.2 (out of scope) | - | - |
+| OOS-2 | p.83 | Section 1.2; FR-NB-047, 090 | - | TC-NB-047.1, 047.2 (4 cases) |
 
 Page numbers are pages of the BRD PDF (R1). The traceability record R3 names the module, API and test class of each row.
 

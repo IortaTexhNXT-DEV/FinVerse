@@ -866,18 +866,18 @@ Figure 3 shows the interfaces. The CSF depends on the BIBS modules through their
 
 ![Interfaces of the Customer Servicing Facility (dashed = parked)](figures/brd09_integration.dot)
 
-<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| Client master (CRM) | In / Out | Client information; contact-only update with reason, source and verification | BRCSF-002, 004, 008 | DESIGNED |
-| Accounts (BRD-1) | In | Accounts by client, PN numbers, stage | BRCSF-002, 003 | DESIGNED |
-| Placement (BRD-1) | In | Accounts by loan application number | BRCSF-003 | DESIGNED |
-| Issuance (BRD-1) | In / Out | Policy numbers, e-policies; resend through the dispatch service | CSF-EM09 | DESIGNED |
-| Invoice ledger and Cashiering (BRD-2) | In | Invoices, balances, payments of a client | BRCSF-005 | DESIGNED |
-| Documents | In / Out | RENEWAL_ADVICE, CLAIM_REPORT and other documents; uploads | BRCSF-006, 007, 009 | DESIGNED |
-| E-mail outbox | Out | RA resend, protected, with separate password | BRCSF-006 | DESIGNED |
-| QPS / EBIX contact write-back | Out | Contact changes through the outbox | p.3; BRCSF-002 | PARKED |
-| QPS / EBIX / LOS account lookup | In | Accounts not migrated to BIBS by PN or application number | BRCSF-003 | PARKED |
+| Client master (CRM) | In / Out | Client information; contact-only update with reason, source and verification | BRCSF-002, 004, 008 | IN SCOPE |
+| Accounts (BRD-1) | In | Accounts by client, PN numbers, stage | BRCSF-002, 003 | IN SCOPE |
+| Placement (BRD-1) | In | Accounts by loan application number | BRCSF-003 | IN SCOPE |
+| Issuance (BRD-1) | In / Out | Policy numbers, e-policies; resend through the dispatch service | CSF-EM09 | IN SCOPE |
+| Invoice ledger and Cashiering (BRD-2) | In | Invoices, balances, payments of a client | BRCSF-005 | IN SCOPE |
+| Documents | In / Out | RENEWAL_ADVICE, CLAIM_REPORT and other documents; uploads | BRCSF-006, 007, 009 | IN SCOPE |
+| E-mail outbox | Out | RA resend, protected, with separate password | BRCSF-006 | IN SCOPE |
+| QPS / EBIX contact write-back | Out | Contact changes through the outbox | p.3; BRCSF-002 | ON HOLD |
+| QPS / EBIX / LOS account lookup | In | Accounts not migrated to BIBS by PN or application number | BRCSF-003 | ON HOLD |
 | Case management | - | Inquiry logging and case tracking | CSF-EM10 | OUT |
 
 > [!PARKED] Parked seams

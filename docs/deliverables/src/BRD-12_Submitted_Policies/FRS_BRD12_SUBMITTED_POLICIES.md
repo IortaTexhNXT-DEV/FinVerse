@@ -1392,20 +1392,20 @@ Figure 7 shows the interfaces. Sources arrive as uploads; the renewal leaves thr
 
 ![Interfaces of Submitted Policies (dashed = parked or upload)](figures/brd12_integration.dot)
 
-<!-- table: widths=3.8,1.8,7.2,2.4,1.6 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.8,1.8,7.2,2.4,1.6 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| LFS, HLS, CIU, SPI, Loan Booking Report, IA masterlist | In | Excel uploads per source layout; feeds parked (SubmittedSourceFeed) | BRIDSP-01 | PARKED |
-| LAMD | In | Loan snapshot upload by PN | BRIDSP-13 | PARKED |
-| Policy documents | In | Extraction of text PDFs; OCR parked | BRIDSP-02 | CHANGE |
-| Excel masterlists | In | One-time migration | BRIDSP-33 | NEW |
-| Renewal (BRD-6) | Out / In | RenewalHandOff; status query of a hand-off | BRIDSP-22, 23, 25, 26 | NEW |
-| Placement (BRD-1) | Out | Hold cover re-assignment | BRIDSP-32 | CHANGE |
-| Account and booking (BRD-1) | In | AccountStatusChanged; InvoiceBooked with business type RENEWAL (BT0) | BRIDSP-26, 27 | CHANGE |
-| Cashiering and Collections | Out | Disposition request RECOGNIZE_INCOME for handling fees | BRIDSP-31 | CHANGE |
-| E-mail outbox | Out | IAAF, TOR, letters | BRIDSP-07, 22 | BUILT |
-| Mail house (COG) | Out | Print batches (merged PDF and control list) | BRIDSP-22 | PARKED |
-| E-signature | Out | Qualified e-signature of IAAF and TOR; stamped signature until then | BRIDSP-07, 18 | PARKED |
+| LFS, HLS, CIU, SPI, Loan Booking Report, IA masterlist | In | Excel uploads per source layout; feeds parked (SubmittedSourceFeed) | BRIDSP-01 | ON HOLD |
+| LAMD | In | Loan snapshot upload by PN | BRIDSP-13 | ON HOLD |
+| Policy documents | In | Extraction of text PDFs; OCR parked | BRIDSP-02 | IN SCOPE |
+| Excel masterlists | In | One-time migration | BRIDSP-33 | IN SCOPE |
+| Renewal (BRD-6) | Out / In | RenewalHandOff; status query of a hand-off | BRIDSP-22, 23, 25, 26 | IN SCOPE |
+| Placement (BRD-1) | Out | Hold cover re-assignment | BRIDSP-32 | IN SCOPE |
+| Account and booking (BRD-1) | In | AccountStatusChanged; InvoiceBooked with business type RENEWAL (BT0) | BRIDSP-26, 27 | IN SCOPE |
+| Cashiering and Collections | Out | Disposition request RECOGNIZE_INCOME for handling fees | BRIDSP-31 | IN SCOPE |
+| E-mail outbox | Out | IAAF, TOR, letters | BRIDSP-07, 22 | IN SCOPE |
+| Mail house (COG) | Out | Print batches (merged PDF and control list) | BRIDSP-22 | ON HOLD |
+| E-signature | Out | Qualified e-signature of IAAF and TOR; stamped signature until then | BRIDSP-07, 18 | ON HOLD |
 | ISYS / ARF | - | Not fed; the ARN is the reference (SP SQ20) | p.5 | OUT |
 
 # Non-functional requirements

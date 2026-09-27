@@ -50,4 +50,19 @@ public enum RemittanceStatus {
   public static RemittanceStatus derivedFrom(PaymentStatus payment) {
     return payment == PaymentStatus.PAID ? UNPROCESSED : WITH_OUTSTANDING_BALANCE;
   }
+
+  /**
+   * Status of an invoice entering the ledger: not applicable for direct payment, with outstanding
+   * balance for a receivable invoice, unprocessed for a return invoice.
+   *
+   * @param directPayment direct payment invoice
+   * @param receivable the client owes premium on it
+   * @return initial status
+   */
+  public static RemittanceStatus initial(boolean directPayment, boolean receivable) {
+    if (directPayment) {
+      return NOT_APPLICABLE;
+    }
+    return receivable ? WITH_OUTSTANDING_BALANCE : UNPROCESSED;
+  }
 }

@@ -18,6 +18,7 @@ import java.util.Map;
  * @param history status, flag and lock history
  * @param adjustments cumulative adjustments of the original invoice, null when none
  * @param related records of the Operations modules by section
+ * @param legacy frozen original values of a legacy invoice, null for BIBS invoices
  */
 public record Invoice360Response(
     OpsInvoiceResponse invoice,
@@ -25,7 +26,8 @@ public record Invoice360Response(
     List<MovementResponse> movements,
     List<StatusChangeResponse> history,
     Adjustments adjustments,
-    Map<Section, List<RelatedItem>> related) {
+    Map<Section, List<RelatedItem>> related,
+    OriginSnapshotResponse legacy) {
 
   /**
    * Maps the view.
@@ -40,7 +42,8 @@ public record Invoice360Response(
         v.movements().stream().map(MovementResponse::from).toList(),
         v.history().stream().map(StatusChangeResponse::from).toList(),
         v.adjustments() == null ? null : Adjustments.from(v.adjustments()),
-        v.related());
+        v.related(),
+        v.origin() == null ? null : OriginSnapshotResponse.from(v.origin()));
   }
 
   /**

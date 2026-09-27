@@ -13,13 +13,13 @@ digraph acc_fee {
   CANCELLED    [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
   disb         [label="Disbursement\n(SERVICE_FEE DV)", fillcolor="@WHITE", style="rounded,dashed,filled"];
 
-  COMPUTED -> FOR_APPROVAL [label=" submit"];
-  FOR_APPROVAL -> COMPUTED [label=" return", style=dashed, constraint=false];
-  FOR_APPROVAL -> APPROVED [label=" approve (four eyes)"];
+  COMPUTED -> FOR_APPROVAL [label=" Submit for approval"];
+  FOR_APPROVAL -> COMPUTED [label=" Return to processor", style=dashed, constraint=false];
+  FOR_APPROVAL -> APPROVED [label=" Approve and send for payment (four eyes)"];
   APPROVED -> disb [style=dashed];
   disb -> RELEASED [label=" PAID", style=dashed];
   APPROVED -> RELEASED [label=" tag released"];
   RELEASED -> LIQUIDATED [label=" liquidation report\n per line"];
-  COMPUTED -> CANCELLED [label=" cancel", style=dotted];
+  COMPUTED -> CANCELLED [label=" Cancel run", style=dotted];
   { rank=same; APPROVED; disb; }
 }

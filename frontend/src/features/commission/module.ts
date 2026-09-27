@@ -8,6 +8,7 @@ import {
   ListChecks,
   MailQuestionMark,
   Percent,
+  Undo2,
 } from 'lucide-react';
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
@@ -107,6 +108,23 @@ export const commissionModule: FeatureModule = {
       permission: CERT,
       alsoPermissions: CERT_READERS,
       component: lazy(() => import('./CertificatePage')),
+      hidden: true,
+    },
+    {
+      path: '/commission/dppr-batches',
+      label: 'DP PR Legacy Reversal',
+      icon: Undo2,
+      permission: 'LEGACY_REVERSAL_REQUEST',
+      alsoPermissions: ['LEGACY_REVERSAL_APPROVE'],
+      component: lazy(() => import('./DpprBatchesPage')),
+    },
+    {
+      path: '/commission/dppr-batches/:batchNo',
+      label: 'DP PR Legacy Reversal Batch',
+      icon: Undo2,
+      permission: 'LEGACY_REVERSAL_REQUEST',
+      alsoPermissions: ['LEGACY_REVERSAL_APPROVE'],
+      component: lazy(() => import('./DpprBatchPage')),
       hidden: true,
     },
     {

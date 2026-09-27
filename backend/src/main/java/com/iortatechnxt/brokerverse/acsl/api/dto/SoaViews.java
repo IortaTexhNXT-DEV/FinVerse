@@ -337,6 +337,7 @@ public interface SoaViews {
    * @param documentTypes open-item document types
    * @param currency Operations invoice currency
    * @param active used or not
+   * @param ledgerContext ANY, NEW or LEGACY Operations invoices
    */
   record ControlView(
       String accountCode,
@@ -344,7 +345,8 @@ public interface SoaViews {
       String components,
       String documentTypes,
       String currency,
-      boolean active) {
+      boolean active,
+      String ledgerContext) {
 
     /**
      * Maps a configuration.
@@ -359,7 +361,8 @@ public interface SoaViews {
           c.getComponents(),
           c.getDocumentTypes(),
           c.getCurrency(),
-          c.isActive());
+          c.isActive(),
+          c.getLedgerContext());
     }
   }
 }

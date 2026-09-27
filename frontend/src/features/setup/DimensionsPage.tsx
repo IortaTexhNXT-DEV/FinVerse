@@ -12,6 +12,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const TABS = [
   { id: 'COST_CENTER', label: 'Cost centres' },
@@ -109,9 +110,17 @@ export default function DimensionsPage() {
               header: 'Actions',
               render: (v) =>
                 can('MASTER_MAINTAIN') && (
-                  <Button size="sm" variant="ghost" onClick={() => toggle.mutate(v)}>
+                  <ConfirmButton
+                    size="sm"
+                    variant="ghost"
+                    confirm={{
+                      title: `${v.active ? 'Deactivate' : 'Activate'} Value`,
+                      effect: 'The value can, or can no longer, be chosen on new postings.',
+                    }}
+                    onConfirm={() => toggle.mutateAsync(v)}
+                  >
                     {v.active ? 'Deactivate' : 'Activate'}
-                  </Button>
+                  </ConfirmButton>
                 ),
             },
           ]}

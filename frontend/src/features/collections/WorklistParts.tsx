@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
+import { OriginFilter } from '@/components/ui/OriginFilter';
 import { Tabs } from '@/components/ui/Tabs';
 import { formatAmount } from '@/utils/format';
 import { collectionsApi } from './api';
@@ -32,6 +33,10 @@ export function FilterPanel({
           )}
         </Field>
       ))}
+      <OriginFilter
+        value={values.origin === 'BIBS' || values.origin === 'MIGRATED' ? values.origin : undefined}
+        onChange={(origin) => setValues((v) => ({ ...v, origin }))}
+      />
       <label className="checkbox">
         <input
           type="checkbox"

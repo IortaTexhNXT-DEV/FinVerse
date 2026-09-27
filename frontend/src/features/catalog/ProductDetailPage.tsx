@@ -7,6 +7,7 @@ import type { FieldRule, ProductDetail } from '@/api/catalog';
 import { useAuth } from '@/auth/authContext';
 import { RecordSummary } from '@/components/broking/RecordSummary';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
+import { OriginBadge } from '@/components/ui/OriginBadge';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -147,6 +148,7 @@ function Summary({ detail }: Readonly<{ detail: ProductDetail }>) {
       chips={
         <>
           <ReferenceChip label="Risk code" value={p.code} />
+          <OriginBadge record={p} />
           <StatusBadge status={p.lifecycleStatus ?? 'ACTIVE'} />
           <StatusBadge status={p.recordStatus} />
         </>

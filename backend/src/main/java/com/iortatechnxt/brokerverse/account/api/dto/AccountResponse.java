@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.account.api.dto;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.AccountContact;
+import com.iortatechnxt.brokerverse.account.domain.AccountLegacyHeader;
 import com.iortatechnxt.brokerverse.account.domain.AccountOrigin;
 import com.iortatechnxt.brokerverse.account.domain.AccountPremium;
 import com.iortatechnxt.brokerverse.account.domain.AccountStatus;
@@ -62,6 +63,7 @@ import java.util.List;
  * @param businessType New Business or Renewal (BRNB.097, BRID-022.01; BT0)
  * @param renewalOfRef what a renewal renews (expiring ARN, SBM number, legacy reference)
  * @param origin how the account was created
+ * @param legacy legacy header of an account imported from a legacy system, null otherwise
  */
 public record AccountResponse(
     Long id,
@@ -107,7 +109,8 @@ public record AccountResponse(
     String rateOverrideRef,
     BusinessType businessType,
     String renewalOfRef,
-    AccountOrigin origin) {
+    AccountOrigin origin,
+    LegacyHeader legacy) {
 
   /**
    * Maps an account (items and numbers loaded).
@@ -116,6 +119,17 @@ public record AccountResponse(
    * @return response
    */
   public static AccountResponse from(Account a) {
+    return from(a, null);
+  }
+
+  /**
+   * Maps an account with the legacy header of an imported account.
+   *
+   * @param a account
+   * @param header legacy header, null for an account created in BIBS
+   * @return response
+   */
+  public static AccountResponse from(Account a, AccountLegacyHeader header) {
     return new AccountResponse(
         a.getId(),
         a.getCompanyId(),
@@ -160,6 +174,42 @@ public record AccountResponse(
         a.getRateOverrideRef(),
         a.getBusinessType(),
         a.getClassification().renewalOfRef(),
-        a.getClassification().origin());
+        a.getClassification().origin(),
+        header == null ? null : LegacyHeader.of(header));
+  }
+
+  /**
+   * The legacy header of an imported account (BRD-13).
+   *
+   * @param sourceSystem legacy source system
+   * @param legacyRef legacy policy reference
+   * @param policyNo policy number
+   * @param coverNo cover number
+   * @param legacyPackageCode legacy package, kept as given until Renewal sanitation
+   * @param legacyPackageVersion legacy package version
+   * @param legacyStatus legacy policy status
+   * @param migrationBatch migration batch that imported it
+   */
+  public record LegacyHeader(
+      String sourceSystem,
+      String legacyRef,
+      String policyNo,
+      String coverNo,
+      String legacyPackageCode,
+      Integer legacyPackageVersion,
+      String legacyStatus,
+      String migrationBatch) {
+
+    static LegacyHeader of(AccountLegacyHeader h) {
+      return new LegacyHeader(
+          h.getSourceSystem(),
+          h.getLegacyRef(),
+          h.getPolicyNo(),
+          h.getCoverNo(),
+          h.getLegacyPackageCode(),
+          h.getLegacyPackageVersion(),
+          h.getLegacyStatus(),
+          h.getMigrationBatch());
+    }
   }
 }

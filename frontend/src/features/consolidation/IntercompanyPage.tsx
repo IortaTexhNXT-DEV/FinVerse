@@ -18,6 +18,7 @@ import { useCompanyId, useWorkspace } from '@/context/workspaceContext';
 import { formatDate, today } from '@/utils/format';
 import { IcTransactionForm } from './IcTransactionForm';
 import { DateInput } from '@/components/ui/DateInput';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const ACCOUNT_FIELDS = [
   ['aDueFromAccount', 'Due-from account (this company)'],
@@ -124,9 +125,18 @@ export default function IntercompanyPage() {
               header: 'Actions',
               render: (r) =>
                 manage && (
-                  <Button size="sm" variant="ghost" onClick={() => toggle.mutate(r)}>
+                  <ConfirmButton
+                    size="sm"
+                    variant="ghost"
+                    confirm={{
+                      title: `${r.active ? 'Deactivate' : 'Activate'} Intercompany Link`,
+                      effect:
+                        'The link is used, or no longer used, for new intercompany transactions.',
+                    }}
+                    onConfirm={() => toggle.mutateAsync(r)}
+                  >
                     {r.active ? 'Deactivate' : 'Activate'}
-                  </Button>
+                  </ConfirmButton>
                 ),
             },
           ]}

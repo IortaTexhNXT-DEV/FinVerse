@@ -8,6 +8,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Which sub-ledger backs a control account in the GL-SL reconciliation (ACSL 2.13.2). Configuration
@@ -18,6 +19,9 @@ import java.util.List;
 @Entity
 @Table(name = "acsl_glsl_control")
 public class GlSlControl extends BaseEntity {
+
+  /** Every ledger context. */
+  public static final String ANY = "ANY";
 
   @Column(name = "company_id", nullable = false, updatable = false)
   private Long companyId;
@@ -41,6 +45,9 @@ public class GlSlControl extends BaseEntity {
   @Column(nullable = false)
   private boolean active = true;
 
+  @Column(name = "ledger_context", nullable = false, length = 10)
+  private String ledgerContext = ANY;
+
   protected GlSlControl() {}
 
   /**
@@ -58,6 +65,7 @@ public class GlSlControl extends BaseEntity {
     this.documentTypes = setting.documentTypes();
     this.currency = setting.currency();
     this.active = setting.active();
+    this.ledgerContext = setting.ledgerContext();
   }
 
   /**
@@ -71,6 +79,7 @@ public class GlSlControl extends BaseEntity {
     this.documentTypes = setting.documentTypes();
     this.currency = setting.currency();
     this.active = setting.active();
+    this.ledgerContext = setting.ledgerContext();
   }
 
   /**
@@ -126,6 +135,16 @@ public class GlSlControl extends BaseEntity {
   }
 
   /**
+   * The Operations ledger context the account reconciles to (DATA_MIGRATION_DESIGN 14.2): ANY, NEW
+   * (invoices of BIBS) or LEGACY (open legacy invoices migrated at cut-over).
+   *
+   * @return context
+   */
+  public String getLedgerContext() {
+    return ledgerContext;
+  }
+
+  /**
    * A configuration.
    *
    * @param source sub-ledger
@@ -135,5 +154,33 @@ public class GlSlControl extends BaseEntity {
    * @param active whether it is used
    */
   public record Setting(
-      SlSource source, String components, String documentTypes, String currency, boolean active) {}
+      SlSource source,
+      String components,
+      String documentTypes,
+      String currency,
+      boolean active,
+      String ledgerContext) {
+
+    /** A blank ledger context reads as ANY. */
+    public Setting {
+      ledgerContext =
+          ledgerContext == null || ledgerContext.isBlank()
+              ? ANY
+              : ledgerContext.strip().toUpperCase(Locale.ROOT);
+    }
+
+    /**
+     * A setting for every ledger context.
+     *
+     * @param source sub-ledger
+     * @param components Operations components
+     * @param documentTypes open-item document types
+     * @param currency currency
+     * @param active used or not
+     */
+    public Setting(
+        SlSource source, String components, String documentTypes, String currency, boolean active) {
+      this(source, components, documentTypes, currency, active, ANY);
+    }
+  }
 }

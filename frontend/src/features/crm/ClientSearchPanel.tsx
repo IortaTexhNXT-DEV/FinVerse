@@ -5,6 +5,7 @@ import type { ClientStatus, KycStatus } from '@/api/crm';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
+import { OriginFilter } from '@/components/ui/OriginFilter';
 import { humanize } from '@/utils/format';
 
 export type SearchCriteria = Omit<ClientSearch, 'companyId' | 'page'>;
@@ -31,7 +32,7 @@ const blank = (value: string) => (value.trim() === '' ? undefined : value.trim()
 
 /**
  * Advanced filters of the client work list (BRNB.046 multi-criteria search): codes, name,
- * identifiers, status, KYC status, segment and bank relationship.
+ * identifiers, status, KYC status, segment, origin (BIBS or migrated) and bank relationship.
  */
 export function ClientSearchPanel({
   value,
@@ -107,6 +108,7 @@ export function ClientSearchPanel({
               />
             )}
           </Field>
+          <OriginFilter value={draft.origin} onChange={(origin) => set({ origin })} />
           <Field label="BDO Bank Client">
             {(id) => (
               <select

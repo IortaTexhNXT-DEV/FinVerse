@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import type { RecordOriginKind } from '@/api/types';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -8,6 +9,8 @@ import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Modal } from '@/components/ui/Modal';
+import { OriginBadge } from '@/components/ui/OriginBadge';
+import { OriginFilter } from '@/components/ui/OriginFilter';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
@@ -17,6 +20,7 @@ import { cashieringApi } from './cashieringApi';
 import type { ReceiptKind, Series, SeriesBody } from './cashieringApi';
 import { seriesUsedPercent } from './cashieringLogic';
 import './cashiering.css';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 function Gauge({ s }: Readonly<{ s: Series }>) {
   const used = seriesUsedPercent(s);
@@ -174,9 +178,10 @@ export default function ReceiptSeriesPage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [adding, setAdding] = useState(false);
+  const [origin, setOrigin] = useState<RecordOriginKind>();
   const list = useQuery({
-    queryKey: ['cashiering', 'series', companyId],
-    queryFn: () => cashieringApi.series(companyId),
+    queryKey: ['cashiering', 'series', companyId, origin],
+    queryFn: () => cashieringApi.series(companyId, origin),
     enabled: companyId > 0,
   });
   const act = useMutation({
@@ -194,7 +199,7 @@ export default function ReceiptSeriesPage() {
       header: 'Series',
       render: (s) => (
         <>
-          <strong>{s.prefix}</strong>
+          <strong>{s.prefix}</strong> <OriginBadge record={s} />
           <span className="cell-sub">
             {s.kind} · ATP {s.atpNo ?? '—'}
           </span>
@@ -220,18 +225,30 @@ export default function ReceiptSeriesPage() {
       render: (s) => (
         <div className="row">
           {s.recordStatus === 'PENDING_AUTHORIZATION' && (can('MASTER_AUTHORIZE') || manage) && (
-            <Button size="sm" onClick={() => act.mutate(() => cashieringApi.authorizeSeries(s.id))}>
+            <ConfirmButton
+              size="sm"
+              confirm={{
+                title: 'Authorize Receipt Series',
+                effect: 'The series becomes active for issuing receipts.',
+              }}
+              onConfirm={() => act.mutateAsync(() => cashieringApi.authorizeSeries(s.id))}
+            >
               Authorize
-            </Button>
+            </ConfirmButton>
           )}
           {s.recordStatus === 'ACTIVE' && manage && (
-            <Button
+            <ConfirmButton
               size="sm"
               variant="ghost"
-              onClick={() => act.mutate(() => cashieringApi.deactivateSeries(s.id))}
+              confirm={{
+                title: 'Deactivate Receipt Series',
+                effect: 'No more receipts can be issued from this series.',
+                destructive: true,
+              }}
+              onConfirm={() => act.mutateAsync(() => cashieringApi.deactivateSeries(s.id))}
             >
               Deactivate
-            </Button>
+            </ConfirmButton>
           )}
         </div>
       ),
@@ -252,6 +269,9 @@ export default function ReceiptSeriesPage() {
         }
       />
       <ErrorAlert error={list.error ?? act.error} />
+      <Card>
+        <OriginFilter value={origin} onChange={setOrigin} />
+      </Card>
       <Card flush>
         <DataTable
           caption="Receipt series"

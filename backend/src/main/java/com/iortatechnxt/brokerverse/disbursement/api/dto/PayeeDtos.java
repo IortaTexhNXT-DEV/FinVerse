@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.disbursement.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.DisbursementMode;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeRequestSource;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeRequestStatus;
@@ -39,6 +41,7 @@ public final class PayeeDtos {
    * @param stage stage
    * @param accountNo primary account (masked without {@code DISB_PAYEE_VIEW_FULL})
    * @param used used by a voucher
+   * @param origin BIBS or MIGRATED with the legacy facts (unwrapped; LEGACY badge)
    */
   public record PayeeSummary(
       Long id,
@@ -50,7 +53,8 @@ public final class PayeeDtos {
       PayeeSource source,
       PayeeStage stage,
       String accountNo,
-      boolean used) {
+      boolean used,
+      @JsonUnwrapped RecordOrigin origin) {
 
     /**
      * Maps a payee.
@@ -70,7 +74,8 @@ public final class PayeeDtos {
           p.getSource(),
           p.getStage(),
           p.primaryAccount().map(a -> number(a, full)).orElse(null),
-          p.isUsed());
+          p.isUsed(),
+          p.getRecordOrigin());
     }
   }
 

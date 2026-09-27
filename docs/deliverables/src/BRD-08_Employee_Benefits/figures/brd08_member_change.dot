@@ -12,11 +12,11 @@ digraph eb_member_change {
   CLOSED    [label="CLOSED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
   CANCELLED [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
 
-  CAPTURED -> RELAYED [label="  relay"];
+  CAPTURED -> RELAYED [label="  Relay to Insurer"];
   RELAYED -> BILLED [label="  billing uploaded"];
-  BILLED -> VALIDATED [label="  validate"];
-  VALIDATED -> CLOSED [label="  close (endorsement raised\n  if financial)"];
-  BILLED -> CAPTURED [label="  return (reason)", style=dashed, constraint=false];
-  CAPTURED -> CANCELLED [label="  cancel", style=dotted];
+  BILLED -> VALIDATED [label="  Validate"];
+  VALIDATED -> CLOSED [label="  Close (endorsement raised\n  if financial)"];
+  BILLED -> CAPTURED [label="  Return (reason)", style=dashed, constraint=false];
+  CAPTURED -> CANCELLED [label="  Cancel", style=dotted];
   { rank=same; CAPTURED; CANCELLED; }
 }

@@ -129,6 +129,18 @@ public class InvoiceLedgerQueryService {
   }
 
   /**
+   * Open legacy invoices by their number in the source system (DATA_MIGRATION_DESIGN 14.1).
+   *
+   * @param legacyInvoiceNo legacy number
+   * @return invoices with components and shares loaded, oldest first
+   */
+  public List<OpsInvoice> findByLegacyNo(String legacyInvoiceNo) {
+    List<OpsInvoice> list = invoices.findByLegacyLegacyInvoiceNoOrderByIdAsc(legacyInvoiceNo);
+    list.forEach(InvoiceLedgerQueryService::load);
+    return list;
+  }
+
+  /**
    * Searches invoices (collections not loaded).
    *
    * @param search criteria
@@ -234,6 +246,9 @@ public class InvoiceLedgerQueryService {
     if (s.to() != null) {
       where.add(cb.lessThanOrEqualTo(root.get(CLASSIFICATION).get(BOOKING_DATE), s.to()));
     }
+    if (s.origin() != null) {
+      where.add(cb.equal(root.get("recordOrigin").get("origin"), s.origin()));
+    }
   }
 
   /** Assured, inception and account officer filters (DIS 3.27.2 invoice search). */
@@ -267,7 +282,8 @@ public class InvoiceLedgerQueryService {
             cb.like(cb.lower(root.get("arn")), like),
             cb.like(cb.lower(root.get("policyNo")), like),
             cb.like(cb.lower(root.get("clientCode")), like),
-            cb.like(cb.lower(root.get("assuredName")), like)));
+            cb.like(cb.lower(root.get("assuredName")), like),
+            cb.like(cb.lower(root.get("legacy").get("legacyInvoiceNo")), like)));
   }
 
   private static void equalsIfSet(

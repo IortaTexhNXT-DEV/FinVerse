@@ -45,7 +45,7 @@ screens:
     route: /quotations/new
     also: [/quotations/:id/edit]
     purpose: >-
-      A five-step wizard that builds a package quotation for a client or prospect: client, product and terms, risk
+      A five-step wizard that prepares a package quotation for a client or prospect: client, product and terms, risk
       items with their risk groups, the premium computed live with the rates in force, and a review before submission
       for approval. A change after submission opens the next version.
     entry:

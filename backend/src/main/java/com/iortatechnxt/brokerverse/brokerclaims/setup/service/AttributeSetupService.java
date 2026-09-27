@@ -133,16 +133,28 @@ public class AttributeSetupService {
   }
 
   /**
-   * Withdraws or rejects the pending attributes of a value.
+   * Withdraws (the maker, no reason needed) or rejects (another user, with the reason) the pending
+   * attributes of a value.
    *
    * @param typeCode list
    * @param code value
+   * @param reason why the change is rejected; mandatory unless the maker withdraws it
    * @return the value with its current attributes
    */
-  public ValueAttributes reject(String typeCode, String code) {
+  public ValueAttributes reject(String typeCode, String code, String reason) {
     List<AttributeChange> pending = pending(typeCode, code);
+    String user = currentUser.username();
+    boolean withdrawn = pending.stream().allMatch(c -> user.equals(c.getMaker()));
+    if (!withdrawn && (reason == null || reason.isBlank())) {
+      throw new BusinessRuleException("REASON_REQUIRED", "Give the reason for the rejection");
+    }
     pending.forEach(AttributeChange::deactivate);
-    audit.record(ENTITY, typeCode + ":" + code, AuditAction.REJECT, describe(pending));
+    audit.record(
+        ENTITY,
+        typeCode + ":" + code,
+        AuditAction.REJECT,
+        describe(pending)
+            + (reason == null || reason.isBlank() ? "" : ". Reason: " + reason.strip()));
     return single(typeCode, code);
   }
 

@@ -19,7 +19,7 @@ control:
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Solution Architect
     approver: ""
-    change: Internal draft from the BRD-13 baseline and the build design
+    change: Internal draft from the BRD-13 baseline
   - version: "1.0"
     date: 26 Sep 2026
     author: iorta TechNXT Business Analysis
@@ -45,7 +45,7 @@ distribution:
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: "Review of the client master and reference data"}
   - {name: "Heads of Retail and Corporate Marketing", role: Approver, organisation: BDOI, purpose: "Review of the client master and the renewal-driven transition"}
   - {name: "Unit Head, Analytics and Risk Management; Unit Head, Claims, RI and TU", role: Approver, organisation: BDOI, purpose: "Review of history, archive and inquiry"}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Build, test, rehearsals and cutover"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, test, rehearsals and cutover"}
 ---
 
 # Introduction
@@ -54,9 +54,9 @@ distribution:
 
 This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker System, on iNXT BrokerVerse) meets the Data Migration business requirements of BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It turns each BRD requirement into functional requirements with actors, flows, rules, validations, screens, fields, notifications, audit and acceptance criteria.
 
-BDOI uses this document to confirm that the migration and the processing of legacy items in BIBS behave as the business expects. The project team uses it to build the Data Migration module and the changes to the Operations modules, to test them, and to prepare the rehearsals and the cutover. Every functional requirement (FR) cites the BRD requirements it meets and their BRD pages.
+BDOI uses this document to confirm that the migration and the processing of legacy items in BIBS behave as the business expects. The project team uses it to deliver and test the Data Migration functions and the changes to the Operations modules, and to prepare the rehearsals and the cutover. Every functional requirement (FR) cites the BRD requirements it meets and their BRD pages.
 
-Data Migration is **designed and not yet built**. The FRs describe the behaviour of the build design (R3). Screen names and API paths are those of the design and are confirmed at build. Error codes are assigned at build; this document gives the message text only, except where a check reuses a code that already exists in BIBS (section 1.5).
+The FRs describe the proposed behaviour of the Data Migration screens and of the processing of legacy items. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, chapter 12 lists each such point for confirmation. Messages are given with their text; a code is quoted where it is confirmed.
 
 The source BRD is a **draft (v0.01, 14-Apr-2026) that is not signed** (R1 p.15-16). This FRS will be re-issued when the BRD is signed or amended.
 
@@ -75,24 +75,21 @@ BDOI replaces its legacy platforms (EBIX and QPS in the BRD; ISYS and Excel mast
 | History | Read-only legacy and archive inquiry with access logging | BRID 11.1 |
 | Cutover | Cutover plan and rehearsals on the BDOI timeline (go-live January 2028) at the year-end boundary, go / no-go, provisional GL opening and FY2027 true-ups, go-live renewal extraction of the January-May 2028 expiries with the renewal advices already sent, PACKAGE map for Renewal sanitation, run-off, decommissioning | BRID 1.1b, 3.1, 12.1 |
 
-**Out of scope of this FRS until BDOI decides (DMQ30):** open claims, Employee Benefits programmes, the Excel submitted-policy masterlists, payees and users. Where BDOI brings them into scope, they are loaded through the same framework with the loaders that their own modules provide (R3 section 10).
+**Out of scope of this FRS until BDOI decides (DMQ30):** open claims, Employee Benefits programmes, the Excel submitted-policy masterlists, payees and users. Where BDOI brings them into scope, they are loaded through the same framework with the loaders that their own modules provide.
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | BDO Insure Core Modernization - Data Migration BRD | draft v0.01, 14-Apr-2026; not signed | `docs/source-documents/BRD - Data Migration - draft V0.01.pdf` |
-| R2 | BDOI Data Migration (BRD-13) requirements baseline and fit/gap | current | `docs/requirements/BDOI_DM_BRD_SPEC.md` |
-| R3 | Data Migration build design | current | `docs/architecture/DATA_MIGRATION_DESIGN.md` |
-| R4 | BRD BDOI Core Replacement (umbrella BRD) | v01 | `docs/source-documents/00 - BRD BDOI Core Replacement v01.pdf` |
-| R5 | Operations build design and FRS BRD-2 (cashiering, remittance, Prod Recon, adjustment, commission) | current | `docs/architecture/OPERATIONS_DESIGN.md`; FRS BRD-2 |
-| R6 | Collections, Accounting / ACSL, Renewal and Customer Servicing designs | current | `docs/architecture/` |
-| R7 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R8 | Deliverables plan (hosting appendix: masked non-production data, staging purge within 5 days, access from the Philippines only) | current | `docs/deliverables/README.md` |
-| R9 | BDOI drop plan and programme timeline | received 26-Sep-2026 | `docs/source-documents/BDOI_DROP_PLAN.md` |
-| R10 | Concept Paper - Advance Implementation of Renewal Processing (early renewal release) | V1.0, signed 06-Sep-2026; superseded by the single January 2028 go-live (BDOI, 26-Sep-2026) | `docs/source-documents/Concept Paper - Advance Implementation of Renewal Processing V1.0 (signed).pdf` |
-| R11 | BDOI answers to DMQ36-DMQ39 (package remapping, January-May 2028 renewals, RMEL and disposition sources, year-end cut-over) | 26-Sep-2026; DMQ39 awaits Comptrollership confirmation | R2 section 10.2 |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | BDO Insure Core Modernization - Data Migration BRD | draft v0.01, 14-Apr-2026; not signed |
+| R2 | BDOI Data Migration (BRD-13) requirements baseline | current |
+| R4 | BRD BDOI Core Replacement (umbrella BRD) | v01 |
+| R7 | Cross-BRD decisions and answered questions | current |
+| R8 | Deliverables plan (hosting appendix: masked non-production data, staging purge within 5 days, access from the Philippines only) | current |
+| R9 | BDOI drop plan and programme timeline | received 26-Sep-2026 |
+| R10 | Concept Paper - Advance Implementation of Renewal Processing (early renewal release) | V1.0, signed 06-Sep-2026; superseded by the single January 2028 go-live (BDOI, 26-Sep-2026) |
+| R11 | BDOI answers to DMQ36-DMQ39 (package remapping, January-May 2028 renewals, RMEL and disposition sources, year-end cut-over) | 26-Sep-2026; DMQ39 awaits Comptrollership confirmation |
 
 Page references ("p.8") are pages of the Data Migration BRD (R1) unless another document is named.
 
@@ -147,25 +144,18 @@ Xref: Key cross-reference from a legacy key to the BIBS record created from it
 
 Each FR in section 4 has the same parts:
 
-- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority**, the **fit** class of the baseline (R2), and the **screens** and **API** that implement it.
+- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority** and the **screens** where the user performs it.
 - **Description**, **preconditions**, **main flow** and **alternate and exception flows**.
 - **Business rules**. *Configurable* rules are maintained in BIBS (parameter, list of values, code map or master record, section 9). *Fixed* rules are part of the system and change only through a change request.
-- **Validations and messages**: the check, the message the user sees and its code. A "-" marks a check whose code is assigned at build, or a screen check without a code. Codes that already exist in BIBS are quoted (for example `MAKER_CHECKER_VIOLATION`, `ACCESS_DENIED`, `DISPOSITION_AMOUNT`).
+- **Validations and messages**: the check, the message the user sees and its code. A "-" marks a check whose code is still to be confirmed, or a screen check without a code. Confirmed codes are quoted (for example MAKER_CHECKER_VIOLATION, ACCESS_DENIED, DISPOSITION_AMOUNT).
 - **Screens and fields**: label, type, whether mandatory ("Cond." = mandatory when the condition in the Validation column applies), the source list and the validation.
 - **Notifications**, **audit** and numbered **acceptance criteria**. The acceptance criteria are the basis of the test cases of the migration test plan.
 
 The BRD numbers two requirements "BRID 1.1" (p.7). This FRS calls the first one (decision gates) **BRID 1.1a** and the second one (reconciliation) **BRID 1.1b**.
 
 > [!NOTE]
-> Values marked "default" (thresholds, retention days, chunk sizes, timings) are placeholders that BDOI confirms through the open questions of section 10.3. They are configuration, so a changed answer does not need a new build.
+> Values marked "default" (thresholds, retention days, chunk sizes, timings) are placeholders that BDOI confirms through the open questions of section 10.3. They are configuration, so a changed answer does not need a change to the system.
 
-<!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R2)" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Works today in BIBS |
-| CONFIGURE | Needs set-up only (parameters, lists, rules) |
-| CHANGE | Extends or re-purposes an existing capability |
-| NEW | A capability that did not exist before BRD-13 |
 
 # Business context and process overview
 
@@ -218,7 +208,7 @@ A legacy invoice is not re-booked. It enters the BIBS Operations ledger with its
 
 ## Cutover and transition
 
-The cutover follows the BDOI programme timeline (R9, Figure 3): requirements and mapping in September-October 2026, build from November 2026 to March 2027, Trial migrations 1 and 2 in the SIT migration window (April and July 2027), Trial migrations 3 and 4 in the UAT migration window (August and October 2027), the dress rehearsal in November 2027, and the production cutover over the year end, with go-live in January 2028 (DMQ25). In every trial migration, reference data and clients load first. Reference data and clients are pre-loaded in production two weeks before go-live and kept current with daily client deltas. Open items, UPP, policy headers, the renewal advices already sent and the provisional GL opening are loaded once, after the legacy freeze, over the cutover weekend.
+The cutover follows the BDOI programme timeline (R9, Figure 3): requirements and mapping in September-October 2026, development from November 2026 to March 2027, Trial migrations 1 and 2 in the SIT migration window (April and July 2027), Trial migrations 3 and 4 in the UAT migration window (August and October 2027), the dress rehearsal in November 2027, and the production cutover over the year end, with go-live in January 2028 (DMQ25). In every trial migration, reference data and clients load first. Reference data and clients are pre-loaded in production two weeks before go-live and kept current with daily client deltas. Open items, UPP, policy headers, the renewal advices already sent and the provisional GL opening are loaded once, after the legacy freeze, over the cutover weekend.
 
 **Year-end cut-over (DMQ39, recommendation awaiting Comptrollership confirmation).** Go-live is on Monday 3 January 2028, at the year-end boundary (option A). Legacy processes to 31 December 2027 and closes FY2027. BIBS opens with the open items at 31 December and a provisional GL opening trial balance taken from the preliminary December trial balance: balance-sheet accounts only, with the FY2027 result in retained earnings, so that the FY2028 P&L starts at zero (FR-DM-022). After the freeze the legacy GL stays open only for the FY2027 closing and audit adjustments, restricted to Comptrollership, with no new business. Each adjustment reaches BIBS as a controlled opening-balance adjustment journal in the opening period: the first true-up after the legacy year-end close, about mid to late January 2028, and the final one after the audited financial statements, about March-April 2028 (FR-DM-023, FR-DM-024). Comptrollership completes a December soft close by about 20 December 2027. The FY2027 BIR annual returns and the FY2027 audit come from legacy; FY2028 comes from BIBS. Two other options were considered and are not recommended: go-live after the first-quarter close in April 2028 with a migration of the year-to-date P&L (option B), and two sets of books in parallel for the first quarter of 2028 (option C). If BDOI wants more assurance in January, the key January reports are compared with the opening position instead of keeping two books (R3 section 17.7).
 
@@ -337,9 +327,7 @@ title: Maintain the data object register
 brd: [BRID 1.1a (p.7)]
 actor: Data Migration Lead
 priority: Must have
-fit: NEW
 screens: Data Objects
-api: GET/POST /api/v1/migration/objects; PUT /api/v1/migration/objects/{code}
 description:
   - BIBS keeps one register of every data object that could be migrated, with its source systems, target in BIBS, business owner, data steward, dependencies and load order. The register starts from the catalogue of the design (R3 section 2), for example clients, policy headers, open legacy invoices, UPP, GL trial balance and history.
   - For each object the Data Migration Lead records the four criteria of the BRD, Day-1 need, compliance need, read-only / archival option and data trust, and proposes a class.
@@ -396,9 +384,7 @@ title: Decide the migration class of a data object
 brd: [BRID 1.1a (p.7)]
 actor: Data Migration Lead (maker); business owner (approver)
 priority: Must have
-fit: NEW
 screens: Data Objects (Decision tab); My Approvals
-api: POST /api/v1/migration/objects/{code}/decision; .../decision/approve; .../decision/return
 description:
   - The class of an object is decided through a recorded approval (gate G1). The Data Migration Lead submits the proposal; the business owner of the object approves or returns it. The approved class is the one BIBS enforces.
   - This meets the BRD acceptance criterion that each data object is "actioned upon" as Migrate / Carry-Forward (Open Items) / Archive / Excluded once the business owners have assigned the four criteria.
@@ -438,9 +424,7 @@ title: Sign off each object through gates
 brd: [BRID 1.1a (p.7), BRID 1.1b (p.7)]
 actor: Data owner, Data Steward, Data Migration Lead, reconciliation approver
 priority: Must have
-fit: NEW
 screens: Sign-off; Batches
-api: POST /api/v1/migration/batches/{no}/signoff/{gate}
 description:
   - Every object passes seven gates, each recorded with the role, user, decision, comment, time and evidence. The gates are G1 Decision, G2 Mapping, G3 Validation, G4 Load approval, G5 Reconciliation, G6 Object accepted and G7 Go-live.
   - The Sign-off screen shows the gates per object and environment as a matrix, so the Data Migration Lead sees what is missing before a trial migration or the cutover.
@@ -479,9 +463,7 @@ title: Receive a source extract with control totals
 brd: [BRID 1.1b (p.7)]
 actor: Migration Operator
 priority: Must have
-fit: NEW
 screens: Extracts
-api: POST /api/v1/migration/extracts (multipart - data file and control file)
 description:
   - BDOI sends one file per layout and source system with a control file. Most objects have one layout; R04 (insurers and insurer branches R04B), P01 (headers and insurer shares P01S) and F01 (invoice headers, insurer shares F01S and components F01C) have sub-layouts sent as separate files with the same as-of date. BIBS checks each file before any row is staged, so that what BIBS loads is exactly what BDOI extracted.
   - The file contract (names, CSV or XLSX, date and amount formats, control file content) is published to BDOI in the data requirements workbook, which BIBS generates from the layouts.
@@ -535,9 +517,7 @@ title: Maintain and approve versioned code maps
 brd: [BRID 3.1 (p.7)]
 actor: Data Steward (maker); data owner (approver)
 priority: Must have
-fit: NEW
 screens: Code Maps
-api: GET/POST /api/v1/migration/maps; .../maps/{set}/versions; .../versions/{v}/submit; .../approve; .../export; .../import
 description:
   - A code map set exists per domain, for example each LOV type, insurers, insurer branches, products and risk codes, packages, lines, branches, sales units, account officers, each MIS field, GL accounts and the status lists of each object. An entry maps a legacy code of a source system to a BIBS code, or says DEFAULT, REJECT or CREATE.
   - A set has versions. Only the approved version is used by a batch, and the batch records which version it used, so every loaded row can be traced to the mapping that produced it.
@@ -584,9 +564,7 @@ title: Report unmapped and invalid codes before load
 brd: [BRID 3.1 (p.7)]
 actor: Data Steward
 priority: Must have
-fit: NEW
 screens: Code Maps (Unmapped tab); Batches
-api: GET /api/v1/migration/maps/unmapped; report MIG-UNMAPPED-CODES
 description:
   - When staged rows are validated, every coded column is looked up in its code map. Codes without an entry, and entries whose target is no longer active, are reported with the number of rows and sample keys. A batch with unmapped codes in a mandatory column cannot be approved for load, so "all required codes exist" before any transaction loads.
 preconditions:
@@ -616,9 +594,7 @@ title: Validate staged data against data-quality rules
 brd: [BRID 1.1b (p.7), BRID 2.1 (p.7), BRID 3.1 (p.7)]
 actor: BIBS job (MIG_VALIDATE); Data Steward
 priority: Must have
-fit: NEW
 screens: Batches (Issues tab); Layouts and Rules
-api: POST /api/v1/migration/batches/{no}/validate; GET .../issues
 description:
   - A batch is validated before it can load. Each staged row is mapped and checked against the rules of its object - mandatory fields, formats, lookups, uniqueness, references to loaded parents, cross-field rules (for example components that add up to the gross premium, open balance equal to booked less paid) and plausibility warnings.
   - Each failed rule is an issue with severity ERROR (the row is not loaded) or WARNING (the row loads and is reported).
@@ -657,9 +633,7 @@ title: Load a batch through the BIBS services
 brd: [BRID 1.1b (p.7)]
 actor: Data Migration Lead (approval); Migration Operator; BIBS job (MIG_LOAD)
 priority: Must have
-fit: NEW
 screens: Batches
-api: POST /api/v1/migration/batches/{no}/approve-load; .../load
 description:
   - A validated batch is approved for load (gate G4) and then loaded. Each row is loaded through the same BIBS service that the screens use (for example client registration, account import, the Operations ledger, the unapplied workbench, the journal service), so every BIBS rule, audit entry and accounting entry applies. BIBS never writes directly into business tables.
   - Each loaded record gets a key cross-reference from its legacy key, which makes the load rerunnable and the record traceable.
@@ -698,9 +672,7 @@ title: Rerun and roll back a batch
 brd: [BRID 1.1b (p.7)]
 actor: Data Migration Lead (request); reconciliation approver (approval); Migration Operator
 priority: Must have
-fit: NEW
 screens: Batches
-api: POST /api/v1/migration/batches/{no}/rerun; .../rollback; .../rollback/approve
 description:
   - Rejected rows are corrected and loaded again in a RERUN batch that belongs to the original batch and is reconciled with it.
   - A batch that is not yet signed off can be rolled back when its loader supports it and the records have not been changed since the load. Otherwise the environment is restored from the snapshot taken before the load.
@@ -737,9 +709,7 @@ title: Reconcile each data object from source to target
 brd: [BRID 1.1b (p.7)]
 actor: Reconciliation approver; BIBS job (MIG_RECONCILE)
 priority: Must have
-fit: NEW
 screens: Reconciliation
-api: POST /api/v1/migration/batches/{no}/reconcile; GET /api/v1/migration/reconciliation; reports MIG-RECON-SUMMARY, MIG-RECON-DETAIL
 description:
   - After each load BIBS reconciles the object at four levels, and financial objects at a fifth. L1 counts - control file, received, staged, loaded, skipped, rejected and excluded. L2 amounts - sums per amount column and currency against the control totals and the values in BIBS. L3 hash totals - key column hash and a checksum per row. L4 fields - every mapped field of every loaded row read back from BIBS and compared with the staged value. L5 GL - see FR-DM-021.
   - Every difference is a break. A break is fixed (rerun) or explained; the explanation is approved by the reconciliation approver. This makes "all data objects and items reconcilable from source to target" (BRD acceptance criterion) a signed, reproducible result.
@@ -780,9 +750,7 @@ title: Reconcile carried-forward balances to the GL
 brd: [BRID 1.1b (p.7), BRID 5.1 (p.8)]
 actor: Reconciliation approver (Comptrollership)
 priority: Must have
-fit: NEW
 screens: Reconciliation (GL tab); ACSL GL to Sub-ledger Reconciliation
-api: Reports MIG-GL-CLEARING, MIG-LEGACY-POSITIONS; ACSL GL-SL reconciliation
 description:
   - Each open legacy invoice and each legacy UPP item is loaded with an opening entry against the Migration Clearing account. The GL trial balance of the legacy systems is loaded as an opening journal in which the lines of the legacy control accounts are replaced by Migration Clearing. When the detail and the trial balance agree, Migration Clearing is 0.00 per branch and currency.
   - The legacy control accounts are reconciled to the legacy sub-ledgers in the ACSL GL to Sub-ledger Reconciliation, which gets a ledger-context filter (legacy / new).
@@ -818,9 +786,7 @@ title: Load the provisional GL opening at the year-end boundary
 brd: [BRID 1.1b (p.7), BRID 5.1 (p.8), BRID 12.1 (p.12)]
 actor: Head, Comptrollership; Migration Operator
 priority: Must have
-fit: NEW
 screens: Batches (object G01); Reconciliation (GL tab); Journal inquiry
-api: Batch of object G01; reports MIG-GL-CLEARING, MIG-RECON-SUMMARY
 description:
   - For a go-live on 3 January 2028 at the year-end boundary (DMQ39, option A, recommended and awaiting Comptrollership confirmation), the BIBS GL opens from the preliminary December 2027 trial balance of legacy, taken after the December soft close and the last legacy EOD. Only the balance-sheet accounts are opened. The FY2027 P&L accounts are not opened; their net result per branch and currency goes to retained earnings, so the FY2028 P&L in BIBS starts at zero.
   - The opening is provisional. The FY2027 closing and audit adjustments that Comptrollership posts in legacy after the freeze reach BIBS as true-ups (FR-DM-023). The FY2027 BIR annual returns and the FY2027 audit use legacy; FY2028 uses BIBS.
@@ -856,9 +822,7 @@ title: Post the FY2027 true-ups as opening-balance adjustment journals
 brd: [BRID 1.1b (p.7), BRID 5.1 (p.8), BRID 12.1 (p.12)]
 actor: Comptrollership GL lead (prepares); Head, Comptrollership (approves); Migration Operator
 priority: Must have
-fit: NEW
 screens: True-ups; Extracts; Batches (object G03); Journal inquiry
-api: GET/POST /api/v1/migration/trueups; POST .../trueups/{no}/submit, .../approve, .../return; batch of object G03
 description:
   - After the freeze the legacy GL stays open only for the FY2027 closing and audit adjustments, restricted to named Comptrollership users, with no new business. Each adjustment reaches BIBS in a true-up - the first after the legacy year-end close (about mid to late January 2028), the final one after the audited financial statements (about March-April 2028), and interim ones only when Comptrollership posts material adjustments in between.
   - A true-up is an opening-balance adjustment journal in the opening period (January 2028, value date 1 January 2028), never a FY2028 transaction. FY2027 P&L effects go to retained earnings. Adjustments on legacy control accounts, which BIBS holds invoice by invoice and UPP by UPP, come with their open-item detail and change those items.
@@ -879,7 +843,7 @@ rules:
   - [R2, "FY2027 P&L lines post to retained earnings. Lines on legacy control accounts post to Migration Clearing and are matched by the open-item detail, which changes the open balance of each legacy invoice or UPP item (movement Legacy adjusted or Legacy written off) against Migration Clearing.", Fixed, "-"]
   - [R3, "Only journals dated in FY2027, posted in legacy after the freeze and entered in the FY2027 adjustment register are accepted.", Fixed, "-"]
   - [R4, "The preparer and the approver are different users; the approver holds MIG_TRUEUP_APPROVE.", Fixed, "-"]
-  - [R5, "Posting is idempotent on the reference; the same true-up posted twice creates no second journal.", Fixed, "-"]
+  - [R5, "Posting happens once per reference; the same true-up posted twice creates no second journal.", Fixed, "-"]
 validations:
   - [Journal dated outside FY2027, "Journal {no} is dated {date}, outside FY2027", "-"]
   - [Journal not in the register, "Journal {no} is not in the FY2027 adjustment register", "-"]
@@ -912,9 +876,7 @@ title: Reconcile each true-up to the legacy trial balance and close the FY2027 c
 brd: [BRID 1.1b (p.7), BRID 12.1 (p.12)]
 actor: Head, Comptrollership; Data Migration Lead; Program Manager
 priority: Must have
-fit: NEW
 screens: True-ups (Reconciliation tab); Run-off and Decommissioning
-api: GET /api/v1/migration/trueups/{no}/reconciliation; POST .../signoff, POST /api/v1/migration/trueups/closure; reports MIG-TRUEUP-RECON, MIG-TRUEUP-REGISTER
 description:
   - Each true-up is reconciled to the legacy trial balance before it is signed, and the legacy GL stays under cut-off controls until the final true-up. The checks are cut-off (every legacy journal since the freeze is in the register and in a true-up, dated in FY2027 and posted by a named Comptrollership user, and no legacy business module posted after the freeze), movement (the true-up equals the change of the legacy trial balance since the previous true-up), balance (the BIBS opening balances equal the legacy trial balance of the true-up), Migration Clearing and the legacy sub-ledgers, and, when the opening period was reopened, no other journal in it during the window.
   - After the final true-up, the balance check against the audited FY2027 trial balance is signed and shared with the external auditor, the legacy GL is locked for all users, and the true-ups are closed. A FY2027 finding after that is a prior-period adjustment in BIBS through the normal Comptrollership journal, outside the migration.
@@ -956,9 +918,7 @@ title: Load reference data through the code maps
 brd: [BRID 3.1 (p.7)]
 actor: Data Steward; data owner
 priority: Must have
-fit: NEW
 screens: Code Maps; Batches; the reference-data screens of each master
-api: Batches of objects R01-R07
 description:
   - Reference data (LOV and MIS values, sales organisation, insurers and branches, product lines, products and risk codes, packages, commission rates) is loaded first. Legacy values already present in BIBS are mapped; values marked CREATE are created through the master's own service and authorised through its maker-checker.
 preconditions:
@@ -989,19 +949,17 @@ title: Match and deduplicate legacy clients
 brd: [BRID 2.1 (p.7)]
 actor: BIBS job; Data Steward
 priority: Must have
-fit: CHANGE
 screens: Client Matching
-api: GET /api/v1/migration/matching/queue; POST .../matching/{pair}/decision
 description:
   - Legacy clients of all source systems are matched with each other and with clients already in BIBS before any is loaded. Exact matches on hard keys merge automatically; likely matches go to the Data Steward's review queue; the rest become new clients. The keys start from the BIBS duplicate keys (TIN, ID type and number, name with birth date, corporate name) and the keys BDOI agrees (DMQ04).
-  - Clients that match form one cluster and become one BIBS client, built field by field from the best source (survivorship rules).
+  - Clients that match form one cluster and become one BIBS client, completed field by field from the best source (survivorship rules).
 preconditions:
   - The client batch is being validated (FR-DM-013).
 main_flow:
   - BIBS scores every candidate pair on the keys.
   - Pairs at or above the auto-merge score merge; pairs between the review and auto-merge scores go to the review queue; lower pairs are separate clients.
   - The Data Steward opens Client Matching, compares the records side by side with the matching keys and decides merge or keep separate.
-  - BIBS builds each cluster's record with the survivorship rules and shows the result before load.
+  - BIBS prepares each cluster's record with the survivorship rules and shows the result before load.
 alternate_flows:
   - Match with a client already in BIBS. The legacy record merges into the existing client; the load updates only blank fields and adds the cross-reference.
 rules:
@@ -1033,9 +991,7 @@ title: Create migrated clients in the Client Master
 brd: [BRID 2.1 (p.7)]
 actor: BIBS job (client load)
 priority: Must have
-fit: CHANGE
 screens: Batches; Client (existing screens)
-api: Batch of object C01-C03
 description:
   - Migrated clients are created as active clients, not as prospects, with their contacts, addresses, payout accounts and the KYC status and review date given by legacy. The onboarding workflow is not repeated.
   - Sanction screening does not run client by client during the load. After the client object is loaded, one full screening run covers every client (DMQ06).
@@ -1070,9 +1026,7 @@ title: Find migrated clients and policies by legacy reference
 brd: [BRID 2.1 (p.7), BRID 4.1 (p.8)]
 actor: Marketing User, Operations User, Contact Center
 priority: Must have
-fit: CHANGE
 screens: Client search; Account search; Customer Servicing search
-api: GET /api/v1/crm/clients?legacyRef=; GET /api/v1/accounts?legacyRef=
 description:
   - Users find a migrated client or policy by its BIBS code and also by its legacy client number, cover number or policy number. The record shows the source system and the legacy reference.
 preconditions:
@@ -1101,9 +1055,7 @@ title: Load the PACKAGE code map for the Renewal package remapping
 brd: [BRID 3.1 (p.7), BRID 12.1 (p.12)]
 actor: TSU (prepares the PACKAGE map); Product Owner, Marketing Business System (approves); Renewal processing team (Exception bucket)
 priority: Must have
-fit: NEW
 screens: Code Maps (set PACKAGE); Batches (object R06); Renewal candidates (Exception bucket)
-api: GET/POST /api/v1/migration/maps/PACKAGE/versions; batch of object R06; report MIG-MAP-VERSIONS
 description:
   - Legacy packages are remapped to the package versions that TSU maintains in BIBS (BRD-3) at Renewal sanitation, per candidate, and not at migration intake (DMQ36, answered 26 September 2026). The migration loads the PACKAGE code map as reference data only - entries from a legacy package and version to a BIBS package version, with conditional entries where one legacy package splits (one qualifier - risk code, insurer or sum-insured band).
   - Policy headers (FR-DM-040) and the renewal advices already sent (FR-DM-125) keep the legacy package as given; no package is resolved, rejected or warned at intake. At renewal the Renewal sanitation check PACKAGE_REMAP resolves the BIBS package through the map. A package without an entry, with a REJECT entry or with no matching qualifier sends the candidate to the Exception bucket, where the Renewal processing team chooses the package; each choice is passed to TSU for the next map version.
@@ -1153,9 +1105,7 @@ title: Load in-force policy headers
 brd: [BRID 4.1 (p.8)]
 actor: BIBS job (header load); Data Migration Lead
 priority: Must have
-fit: CHANGE
 screens: Batches; Account (existing screens, read only for header fields)
-api: Batch of object P01
 description:
   - When the condition of BRID 4.1 is met (DMQ09), the in-force legacy policies are loaded as BIBS accounts with a minimal header - status, key dates, insurer and shares, line of business and product, policy number, sum insured, currency, AO, unit and branch, payment arrangement and PN numbers - linked to the migrated client.
   - The header is created without quotation, placement, issuance or invoice. It is what allows legacy invoices to be endorsed in BIBS (FR-DM-090 to 092) and the policy to be renewed in BIBS (FR-DM-122, FR-DM-124).
@@ -1194,9 +1144,7 @@ title: Search migrated policies for servicing
 brd: [BRID 4.1 (p.8)]
 actor: Operations User
 priority: Must have
-fit: CHANGE
 screens: Account search; Account page; Invoice 360
-api: GET /api/v1/accounts
 description:
   - The Operations User searches a migrated policy by ARN, policy number, legacy reference or client and sees the key header details and its legacy invoices with their balances.
 preconditions:
@@ -1226,9 +1174,7 @@ title: Carry forward legacy invoices with their open balances
 brd: [BRID 5.2 (p.8), BRID 6.1 (p.9), BRID 8.1 (p.10), BRID 10.1 (p.11)]
 actor: BIBS job (open invoice load); Reconciliation approver
 priority: Must have
-fit: CHANGE
 screens: Batches; Invoice 360; Operations invoice lists
-api: Batch of object F01
 description:
   - Every legacy invoice open at cutover (premium receivable, premium paid and not remitted, commission receivable or PR2307 still open) enters the BIBS Operations ledger with origin LEGACY. It keeps its legacy number, source system and legacy reference. Each component is loaded with its original amount and what was paid, remitted, adjusted or written off in legacy, so its open balance equals the legacy open balance.
   - The original values are frozen at load. Every later change is compared with them (FR-DM-100).
@@ -1266,9 +1212,7 @@ title: Carry forward legacy UPP
 brd: [BRID 5.1 (p.8)]
 actor: BIBS job (UPP load); Cashiering User
 priority: Must have
-fit: CHANGE
 screens: Unapplied Payments workbench; Batches
-api: Batch of object F02; GET /api/v1/cashiering/unapplied?origin=MIGRATED
 description:
   - Every legacy UPP item open at cutover is created in the Unapplied Payments workbench with origin MIGRATED, its legacy AR number and date, payor, client, sales unit, amount, balance, status and the references that help to match it. A disposition in progress in legacy keeps its type and details.
   - An opening entry puts the balance on the UPP legacy sub-ledger against Migration Clearing.
@@ -1302,9 +1246,7 @@ title: Automatch rerun of UPP across legacy and new invoices
 brd: [BRID 5.2 (p.8), BRID 6.3 (p.9)]
 actor: BIBS job (PAYMENT_AUTOMATCH); Cashiering User
 priority: Must have
-fit: CHANGE
 screens: Unapplied Payments workbench; Payments
-api: POST /api/v1/cashiering/matching/run
 description:
   - The existing automatch job also takes migrated UPP items. It matches them on the references carried from legacy (invoice number, cover number, PN, payor reference) and applies the balance, oldest invoice first, to the booked invoices found - legacy or new. One item can be applied to both kinds (mixed UPP).
   - Each application posts the UPP side to the sub-ledger of the item (legacy or new) and the invoice side to the sub-ledger of the invoice, and updates the invoice's balances.
@@ -1336,9 +1278,7 @@ title: Apply legacy UPP to another invoice
 brd: [BRID 5.3 (p.8), BRID 6.4 (p.10)]
 actor: Cashiering User; Cashiering TL where approval applies
 priority: Must have
-fit: CHANGE
 screens: Unapplied Payments workbench (disposition drawer)
-api: POST /api/v1/cashiering/unapplied/{id}/disposition
 description:
   - On client instruction the Cashiering User applies a legacy UPP item to another invoice, legacy or new, with the existing dispositions "Apply to other invoice" and "DST application". The application posts by context as in FR-DM-052.
 preconditions:
@@ -1367,9 +1307,7 @@ title: Refund legacy UPP
 brd: [BRID 5.4 (p.8-9)]
 actor: Cashiering User (request); Cashiering TL (approval); Disbursement
 priority: Must have
-fit: CHANGE
 screens: Unapplied Payments workbench; Disbursement queue
-api: POST /api/v1/cashiering/unapplied/{id}/disposition (REFUND); .../approve
 description:
   - An approved refund of a legacy UPP item is recorded, posted from the UPP legacy sub-ledger to the refund payable and sent to Disbursement as a payment request, as for any UPP refund.
 preconditions:
@@ -1399,9 +1337,7 @@ title: Reclassify UPP to other income with top-management approval
 brd: [BRID 5.5 (p.9)]
 actor: Cashiering User (maker); Cashiering TL; Finance Approver (top management)
 priority: Must have
-fit: CHANGE
 screens: UPP Income Reclassification; My Approvals
-api: POST /api/v1/cashiering/income-reclass-batches; .../{no}/submit; .../approve; .../return
 description:
   - Exceptional dispositions of UPP to other income are made in a reclassification batch. The Cashiering User selects the items (filters on age, amount, origin), the batch is approved by the Cashiering TL and then by top management, and only then executed. On execution each item's balance is posted from the UPP sub-ledger (legacy or new) to other income and the item is closed.
 preconditions:
@@ -1446,9 +1382,7 @@ title: Apply an OTC payment to a legacy invoice
 brd: [BRID 6.1 (p.9)]
 actor: Cashiering User
 priority: Must have
-fit: CHANGE
 screens: Receive payment (OTC)
-api: POST /api/v1/cashiering/payments/preview; POST /api/v1/cashiering/payments
 description:
   - The Cashiering User receives a payment at the counter against a legacy invoice number or reference. BIBS finds the legacy invoice in the Operations ledger, issues the AR, applies the payment by component and posts it - the cash to unapplied collections and the application from unapplied collections to the Premium Receivable legacy sub-ledger. The receipt appears in the Cash Receipts Book.
 preconditions:
@@ -1480,9 +1414,7 @@ title: Match autopay payments to legacy invoices
 brd: [BRID 6.2 (p.9)]
 actor: BIBS (payment file handlers and matching); Cashiering User
 priority: Must have
-fit: CHANGE
 screens: Payment uploads
-api: Bulk handlers PAY_BILLS, PAY_TRADE, PAY_CLPC, PAY_DIRECT_CREDIT
 description:
   - Autopay payment files are uploaded as today. Payment rows that carry a legacy invoice number or reference (for example the EBIX reference of the Direct Credit file) are matched to the legacy invoice and applied as in FR-DM-060.
 preconditions:
@@ -1514,9 +1446,7 @@ title: Reverse DPPR legacy invoices in batch
 brd: [BRID 7.1 (p.10)]
 actor: Accounting User (request); Commission TL or Comptrollership (approval)
 priority: Must have
-fit: CHANGE
 screens: DPPR Legacy Reversal; My Approvals
-api: POST /api/v1/commission/dppr-batches; .../{no}/submit; .../approve; bulk handler DPPR_LEGACY_REVERSAL
 description:
   - Legacy invoices whose premium was paid directly to the insurer (DPPR) are reversed in a batch. The list comes from an upload (invoice number, amount, reason) or from the Collections "DP PR for Reversal" tags of legacy invoices. The batch is approved before it runs. Each line reverses the premium receivable against DTIP on the legacy sub-ledgers and records the reversal on the invoice.
 preconditions:
@@ -1551,9 +1481,7 @@ title: Reverse PR2307 legacy invoices in batch
 brd: [BRID 7.2 (p.10)]
 actor: Accounting User (request); Cashiering TL or Comptrollership (approval)
 priority: Must have
-fit: CHANGE
 screens: PR2307 Legacy Reversal; My Approvals
-api: POST /api/v1/cashiering/pr2307-reversal-batches; .../{no}/submit; .../approve
 description:
   - Legacy PR2307 balances (premium receivable covered by the client's BIR 2307) are reversed in an approved batch. Each line offsets the PR2307 legacy balance against DTIP legacy, first moving any amount still on premium receivable to PR2307.
 preconditions:
@@ -1585,9 +1513,7 @@ title: Include legacy invoices in remittance extracts
 brd: [BRID 8.1 (p.10)]
 actor: Remittance User
 priority: Must have
-fit: CHANGE
 screens: Extraction workbench; Remittance batch; Remittance reports
-api: As the remittance module
 description:
   - The remittance extraction takes every invoice with applied premium not yet remitted - legacy or new. Premium paid in legacy before cutover counts as applied, and amounts remitted in legacy before cutover are not remitted again. The batch, schedule, commission OR and push to Disbursement work as today; the lines of legacy invoices post to the DTIP and Commission Receivable legacy sub-ledgers; the disbursement flows to the Cash Disbursements Book.
 preconditions:
@@ -1619,9 +1545,7 @@ title: Process a positive endorsement on a legacy invoice
 brd: [BRID 9.1 (p.11)]
 actor: Operations User (Adjustment processor); Adjustment TL
 priority: Must have
-fit: CHANGE
 screens: New Endorsement Request; Request page; Posting batches
-api: As the adjustment module (/api/v1/adjustment/requests)
 description:
   - A positive financial endorsement (additional premium) of a legacy policy is processed in BIBS with the Adjustment screens. The policy header must be migrated (FR-DM-040). BIBS computes the change from the legacy original invoice, books an endorsement invoice (BIBS number) whose parent is the legacy invoice, issues the service invoice, posts the entries to the legacy sub-ledgers and keeps the before / after snapshot linked to the endorsement number.
 preconditions:
@@ -1654,9 +1578,7 @@ title: Process a negative endorsement on a legacy invoice
 brd: [BRID 9.2 (p.11)]
 actor: Operations User; Adjustment TL
 priority: Must have
-fit: CHANGE
 screens: New Endorsement Request; Request page; Posting batches
-api: As the adjustment module
 description:
   - A negative financial endorsement (return premium, decrease, cancellation) of a legacy policy is processed like FR-DM-090 with a return invoice. Payments already applied are re-applied and any excess goes to UPP; if the premium was already remitted, the AR Insurer is set up; all on the legacy sub-ledgers. The account is updated, so the renewal is based on the net values.
 preconditions:
@@ -1684,9 +1606,7 @@ title: Process a non-financial endorsement on a legacy policy
 brd: [BRID 9.3 (p.11)]
 actor: Operations User; approver per the Adjustment workflow
 priority: Must have
-fit: CHANGE
 screens: New Endorsement Request; Request page
-api: As the adjustment module
 description:
   - A non-financial change (for example address, mortgagee, description) of a legacy policy goes through the Adjustment approval workflow and updates the migrated account without any posting. Renewal uses the updated values.
 preconditions:
@@ -1716,9 +1636,7 @@ title: Report changes made to legacy invoices
 brd: [BRID 10.1 (p.11)]
 actor: Prod Recon Analyst
 priority: Must have
-fit: NEW
 screens: Reports (Operations - Production Reconciliation)
-api: Report PRC-LEGACY-CHANGES
 description:
   - The report lists every change made in BIBS to a legacy invoice in a period, with the original value (frozen at load), the updated value and the delta, per field and component. Changes are endorsement invoices of the invoice's family, corrections, DPPR and PR2307 reversals, write-offs, minimal balance reversals and non-financial changes; payments and remittances are included if BDOI asks (DMQ23).
 preconditions:
@@ -1748,9 +1666,7 @@ title: Search the legacy archive
 brd: [BRID 11.1 (p.11-12)]
 actor: Audit / Compliance User
 priority: Must have
-fit: NEW
 screens: Legacy Inquiry
-api: GET /api/v1/legacy-inquiry/records; GET .../records/{id}; GET .../records/{id}/documents/{docId}
 description:
   - Historical records not migrated into BIBS (closed invoices, receipts, remittances, endorsements, claims, renewal advices, GL journals, expired policies, documents) are kept either in the legacy system in read-only mode or in the BIBS archive. The BIBS archive is loaded before a legacy system is decommissioned (DMQ24).
   - The Legacy Inquiry screen searches the archive by client, policy or cover number, invoice, receipt, claim, dates and record type, and shows each record read only with its documents.
@@ -1795,9 +1711,7 @@ title: Log and review access to legacy history
 brd: [BRID 11.1 (p.11-12)]
 actor: Compliance reviewer
 priority: Must have
-fit: NEW
 screens: Legacy Access Log
-api: GET /api/v1/legacy-inquiry/access-log; report MIG-ACCESS-LOG
 description:
   - Every access to legacy history in BIBS is logged - user, time, source address, action (search, view, download, export), criteria, records and reason. The log cannot be changed or deleted. Compliance reviews it on screen and receives a monthly digest; unusual exports raise an alert.
 preconditions:
@@ -1827,9 +1741,7 @@ title: Plan the cutover and run rehearsals
 brd: [BRID 12.1 (p.12)]
 actor: Data Migration Lead; Program Manager
 priority: Must have
-fit: NEW
 screens: Cutover
-api: GET/POST /api/v1/migration/cutover-plans; .../tasks
 description:
   - The cutover is run from a plan in the console - tasks with phase, owner role, dependencies, planned and actual times, status and evidence. The same plan structure is used for the four trial migrations, the dress rehearsal and the production cutover, so timings are measured before go-live. The runbook is an export of the plan.
   - In every plan the reference data and the client master are loaded and accepted first. They are the prerequisites of renewal testing, which the Drop 1 SIT and UAT run on the trial-migration data (concept paper R10, section VI).
@@ -1863,9 +1775,7 @@ title: Decide go / no-go on measured criteria
 brd: [BRID 12.1 (p.12)]
 actor: Go / no-go board
 priority: Must have
-fit: NEW
 screens: Cutover (Go / No-go tab)
-api: GET /api/v1/migration/cutover-plans/{id}/gonogo; POST .../gonogo/decision
 description:
   - Go-live is decided on criteria that BIBS measures - all Day-1 objects accepted, counts and amounts reconciled, zero financial rejects, Migration Clearing 0.00, legacy control accounts equal to their sub-ledgers, empty client review queue, business smoke test passed, rollback snapshot taken, hypercare in place, the preliminary trial balance signed as the provisional opening with the legacy GL restricted to the named FY2027 adjustment users, and, for Renewal, the headers of every expiry up to 31 May 2028 loaded, the RA-sent file loaded and the January staffing plan confirmed. The board records the decision with the values it saw.
 preconditions:
@@ -1895,9 +1805,7 @@ title: Transition renewals by RMEL cohort and track the run-off
 brd: [BRID 12.1 (p.12), BRID 4.1 (p.8)]
 actor: Program Manager; Renewal (BIBS module); Marketing
 priority: Must have
-fit: NEW
 screens: Run-off and Decommissioning; Renewal screens
-api: GET /api/v1/migration/runoff; report MIG-RUNOFF
 description:
   - Renewal in BIBS is enabled from go-live. Policies expiring before go-live renew or lapse in legacy. The policies expiring from go-live to 31 May 2028 are extracted by BIBS at go-live from the migrated headers (FR-DM-124); later expiries are extracted by BIBS from the migrated headers on the normal lead time. A legacy policy renews on the new-business path pre-filled from its header, or as is on the package that the Renewal sanitation resolves (FR-DM-034), and the new BIBS account refers to the legacy policy.
   - The run-off tracker shows, per expiry month, how many legacy policies were in force at go-live, renewed in BIBS, not renewed, lapsed or still open.
@@ -1928,9 +1836,7 @@ title: Decommission legacy systems on agreed criteria
 brd: [BRID 12.1 (p.12), BRID 11.1 (p.11-12)]
 actor: Program Manager; system owners; Compliance; Comptrollership
 priority: Must have
-fit: NEW
 screens: Run-off and Decommissioning
-api: GET/POST /api/v1/migration/decommissioning
 description:
   - Each legacy system has a decommissioning checklist with measurable criteria and sign-offs. A second checklist closes the legacy context in BIBS when the legacy positions have run off.
 preconditions:
@@ -1960,9 +1866,7 @@ title: Renew the January to May 2028 expiries in BIBS from go-live
 brd: [BRID 12.1 (p.12), BRID 4.1 (p.8)]
 actor: Renewal (BIBS module); Renewal processing team; Data Migration Lead
 priority: Must have
-fit: NEW
 screens: Renewal candidates (day-1 worklist); Reconciliation
-api: LegacyPolicySource (go-live extraction); report MIG-RENEWAL-GOLIVE
 description:
   - The renewals of the policies expiring from go-live to 31 May 2028 are processed in BIBS after go-live; no renewal candidate is carried from legacy (DMQ37, answered 26 September 2026). At go-live, before business opens, BIBS extracts every migrated policy header expiring in this window into the renewal pipeline, prioritised by expiry date, with the January expiries flagged urgent.
   - A renewal advice already sent by hand before go-live is recorded on the candidate from the RA-sent file (FR-DM-125) and is not sent again. A header whose cover has a later term booked in legacy that starts on its expiry is not extracted, because it is already renewed.
@@ -2003,9 +1907,7 @@ title: Load the renewal advices already sent before go-live
 brd: [BRID 12.1 (p.12)]
 actor: Renewal processing team (maker and checker); Migration Operator; Head of the Renewal processing team (data owner)
 priority: Must have
-fit: NEW
 screens: Extracts; Batches (Issues tab); Resubmissions; Reconciliation
-api: Batch of object P03; POST /api/v1/migration/batches/{no}/resubmissions; POST .../resubmissions/{id}/approve, .../return; report MIG-REJECTS
 description:
   - The RMEL and the dispositions are kept in Excel trackers today (DMQ38, answered 26 September 2026). The migration takes one thing from them - the renewal advices (RAs) already sent by hand before go-live for the expiries from go-live to 31 May 2028 - so that BIBS does not send them again. The trackers themselves are not migrated.
   - The Renewal processing team compiles the RAs in the Excel template of layout P03, one row per expiring term (legacy policy reference, cover, expiry, RA date and reference, channel, recipient, proposed insurer and premium quoted, sender, tracker and sheet). The rows are validated; rejected rows come back in an Excel rejection report with correction columns; the maker corrects them and the checker approves the resubmission. The Head of the Renewal processing team owns the object.
@@ -2140,42 +2042,42 @@ All reports export to Excel and PDF. The MIG reports need MIG_VIEW; PRC and CSH 
 
 # Interfaces and integration
 
-Figure 4 shows the interfaces of the migration module. It writes into BIBS only through the services of the owning modules and serves the Renewal and Customer Servicing modules through their ports.
+Figure 4 shows the interfaces of the migration module. It writes into BIBS only through the functions of the owning modules and serves the Renewal and Customer Servicing modules.
 
-![Interfaces of the migration module (dashed = parked seam or link only)](figures/brd13_integration.dot)
+![Interfaces of the migration module (dashed = on hold or link only)](figures/brd13_integration.dot)
 
-<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.8,2.2,7,2.4,2.2 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| Extract upload (console) | In | Data and control files per object | 1.1b | NEW |
-| SFTP drop from BDOI IT | In | Same files, picked up by a job | 1.1b | PARKED |
-| Reference masters (LOV, catalogue, sales organisation) | Out | Mapped and created values | 3.1 | NEW |
-| Client master and screening | Out | Migrated clients; one full screening run | 2.1 | NEW |
-| Accounts | Out | Migrated policy headers | 4.1 | NEW |
-| Operations ledger and Cashiering | Out | Legacy invoices, UPP | 5.1-10.1 | NEW |
-| GL | Out | Opening entries, provisional opening trial balance and FY2027 true-ups | 1.1b | NEW |
-| Renewal (legacy policy source; package map) | Out | Migrated headers for the go-live and daily extractions; renewal advices already sent; PACKAGE map for the sanitation check | 12.1 | NEW |
-| Customer Servicing (legacy account lookup) | Out | Legacy references and archive records | 11.1 | NEW |
-| Legacy read-only systems | Link | Link and legacy reference only | 11.1 | PARKED |
+| Extract upload (console) | In | Data and control files per object | 1.1b | IN SCOPE |
+| SFTP drop from BDOI IT | In | Same files, picked up by a job | 1.1b | ON HOLD |
+| Reference masters (LOV, catalogue, sales organisation) | Out | Mapped and created values | 3.1 | IN SCOPE |
+| Client master and screening | Out | Migrated clients; one full screening run | 2.1 | IN SCOPE |
+| Accounts | Out | Migrated policy headers | 4.1 | IN SCOPE |
+| Operations ledger and Cashiering | Out | Legacy invoices, UPP | 5.1-10.1 | IN SCOPE |
+| GL | Out | Opening entries, provisional opening trial balance and FY2027 true-ups | 1.1b | IN SCOPE |
+| Renewal (legacy policy source; package map) | Out | Migrated headers for the go-live and daily extractions; renewal advices already sent; PACKAGE map for the sanitation check | 12.1 | IN SCOPE |
+| Customer Servicing (legacy account lookup) | Out | Legacy references and archive records | 11.1 | IN SCOPE |
+| Legacy read-only systems | Link | Link and legacy reference only | 11.1 | ON HOLD |
 | Write-back to QPS / EBIX | Out | Not needed after the freeze (legacy read-only) | - | OUT |
 
-> [!PARKED] Parked seams
+> [!NOTE] Interfaces on hold
 > The SFTP drop, automated delta extracts, bulk transfer of legacy documents and the legacy read-only links depend on BDOI IT (DMQ24, DMQ28). BIBS works with console uploads until then; adding a transport is a configuration of the intake, with no change to the checks.
 
 # Non-functional requirements
 
 The BRD refers every usage table to "the consolidated NFR requirements for BDO Insure Core Modernization project" (p.13-14), which is not in the pack (DMQ29). The values below are proposals.
 
-<!-- table: widths=3,5.4,5.6,2.6 caption="Non-functional requirements" size=8.5 -->
-| Topic | BRD value | BIBS target and approach | Status |
-|---|---|---|---|
-| Volumes | Not given | Loaders sized for 1,000,000 client rows and 500,000 open-item rows; planning bounds from the umbrella BRD (clients 2020 to present, p.43; 21,200 bookings and 25,800 renewal accounts a month, p.44-45) | OPEN |
-| Cutover window | Not given | 48 hours over a weekend from the last legacy EOD to go / no-go; BIBS open 08:00 on the first business day; at the year-end boundary (recommended 3 January 2028), with FY2027 true-ups until about April 2028 | OPEN |
-| Load performance | Not given | At least 50,000 rows an hour per partition, 4 partitions; reconciliation of an object within 1 hour; full production load within 20 hours, proven in the dress rehearsal | NEW |
-| Staging security | Hosting appendix | Masked data outside production; staging and files purged within 5 days of sign-off; access only for migration roles and from the Philippines; encryption at rest and in transit | NEW |
-| Audit | Not given | Every intake, validation, load, rerun, rollback, reconciliation, sign-off and archive access is audited | NEW |
-| Retention | Consolidated NFR; umbrella p.45 (5 years online, 15 years archive) | Archive and access log by retention rule; migration evidence kept as project records (proposed 10 years) | OPEN |
-| Availability and recovery | Consolidated NFR | Same as BIBS; database snapshot before each production load gate | FIT |
+<!-- table: widths=3,5.4,5.6 caption="Non-functional requirements" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Volumes | Not given | Loaders sized for 1,000,000 client rows and 500,000 open-item rows; planning bounds from the umbrella BRD (clients 2020 to present, p.43; 21,200 bookings and 25,800 renewal accounts a month, p.44-45) |
+| Cutover window | Not given | 48 hours over a weekend from the last legacy EOD to go / no-go; BIBS open 08:00 on the first business day; at the year-end boundary (recommended 3 January 2028), with FY2027 true-ups until about April 2028 |
+| Load performance | Not given | At least 50,000 rows an hour per partition, 4 partitions; reconciliation of an object within 1 hour; full production load within 20 hours, proven in the dress rehearsal |
+| Staging security | Hosting appendix | Masked data outside production; staging and files purged within 5 days of sign-off; access only for migration roles and from the Philippines; encryption at rest and in transit |
+| Audit | Not given | Every intake, validation, load, rerun, rollback, reconciliation, sign-off and archive access is audited |
+| Retention | Consolidated NFR; umbrella p.45 (5 years online, 15 years archive) | Archive and access log by retention rule; migration evidence kept as project records (proposed 10 years) |
+| Availability and recovery | Consolidated NFR | Same as BIBS; database snapshot before each production load gate |
 
 # Configuration items
 
@@ -2210,7 +2112,7 @@ The BRD refers every usage table to "the consolidated NFR requirements for BDO I
 ## Lists of values
 
 <!-- table: widths=5.4,11.2 caption="Lists of values" size=8.5 -->
-| List | Values delivered |
+| List | Values provided |
 |---|---|
 | MIG_SOURCE_SYSTEM | EBIX; QPS; ISYS; Excel; CMS |
 | MIG_OBJECT_CATEGORY | Reference; Client; Policy; Open item; GL; History |
@@ -2268,7 +2170,7 @@ The BRD refers every usage table to "the consolidated NFR requirements for BDO I
 | D-DM-03 | BDOI agrees the client dedupe keys and survivorship | FR-DM-031 (DMQ04) |
 | D-DM-04 | The Renewal module is in SIT for Trial migration 1 (April 2027) and live at go-live, with the go-live extraction (priority by expiry date, URGENT flag, RA already sent) and the sanitation check PACKAGE_REMAP with the Exception bucket | FR-DM-034, 122, 124, 125 |
 | D-DM-05 | BDOI IT keeps the legacy systems read-only with access logging until the archive is loaded | FR-DM-110 (DMQ24) |
-| D-DM-06 | The account business-type change (BT0) is built before the header load | FR-DM-040 |
+| D-DM-06 | The account business type (BT0) is available before the header load | FR-DM-040 |
 | D-DM-07 | TSU maintains the BIBS packages and the PACKAGE map in time for Trial migration 2 (June 2027) | FR-DM-034 (DMQ36) |
 | D-DM-08 | The Renewal processing team compiles the RAs already sent from its Excel trackers in the P03 template, reviews the rejects with a maker and a checker, and is staffed and trained for the January expiries | FR-DM-124, 125 (DMQ38) |
 | D-DM-09 | Comptrollership confirms option A by M6 (1 October 2027), completes the December soft close by about 20 December 2027, keeps the FY2027 adjustment register and restricts the legacy GL after the freeze | FR-DM-022 to 024 (DMQ39) |
@@ -2323,36 +2225,52 @@ The BRD refers every usage table to "the consolidated NFR requirements for BDO I
 
 Every BRD-13 requirement is met by at least one FR. The screen and API columns name the main entry points.
 
-<!-- table: widths=2.8,3.6,4.8,5.4 caption="BRD ID to FR, screen and API" size=8 -->
-| BRD ID | FR | Screen | API |
+<!-- table: widths=2.8,3.6,4.8,5.2 caption="BRD ID to FR, screen and test cases" size=8 -->
+| BRD ID | FR | Screen | Test cases |
 |---|---|---|---|
-| BRID 1.1a (p.7) | FR-DM-001, FR-DM-002, FR-DM-003 | Data Objects; Sign-off | /migration/objects; .../decision; /migration/batches/{no}/signoff |
-| BRID 1.1b (p.7) | FR-DM-010, 013, 014, 015, 020, 021, 022, 023, 024, 003 | Extracts; Batches; Reconciliation; True-ups | /migration/extracts; /migration/batches; /migration/trueups; reports MIG-RECON-*, MIG-TRUEUP-RECON |
-| BRID 2.1 (p.7) | FR-DM-031, FR-DM-032, FR-DM-033 | Client Matching; Client search | /migration/matching; /crm/clients?legacyRef= |
-| BRID 3.1 (p.7) | FR-DM-011, FR-DM-012, FR-DM-030, FR-DM-034 | Code Maps | /migration/maps; report MIG-UNMAPPED-CODES |
-| BRID 4.1 (p.8) | FR-DM-040, FR-DM-041, FR-DM-033, FR-DM-124 | Account search; Account page | /accounts |
-| BRID 5.1 (p.8) | FR-DM-051, FR-DM-021, FR-DM-022, FR-DM-023 | Unapplied Payments | /cashiering/unapplied |
-| BRID 5.2 (p.8) | FR-DM-052, FR-DM-050 | Unapplied Payments; Payments | /cashiering/matching/run |
-| BRID 5.3 (p.8) | FR-DM-053 | Unapplied Payments | /cashiering/unapplied/{id}/disposition |
-| BRID 5.4 (p.8-9) | FR-DM-054 | Unapplied Payments; Disbursement queue | .../disposition (REFUND) |
-| BRID 5.5 (p.9) | FR-DM-055 | UPP Income Reclassification; My Approvals | /cashiering/income-reclass-batches |
-| BRID 6.1 (p.9) | FR-DM-060, FR-DM-050 | Receive payment (OTC) | /cashiering/payments |
-| BRID 6.2 (p.9) | FR-DM-061 | Payment uploads | PAY_* handlers |
-| BRID 6.3 (p.9) | FR-DM-052 | Unapplied Payments | /cashiering/matching/run |
-| BRID 6.4 (p.10) | FR-DM-053 | Unapplied Payments | .../disposition |
-| BRID 7.1 (p.10) | FR-DM-070 | DPPR Legacy Reversal | /commission/dppr-batches |
-| BRID 7.2 (p.10) | FR-DM-071 | PR2307 Legacy Reversal | /cashiering/pr2307-reversal-batches |
-| BRID 8.1 (p.10) | FR-DM-080, FR-DM-050 | Remittance screens | remittance module |
-| BRID 9.1 (p.11) | FR-DM-090 | Endorsement request | /adjustment/requests |
-| BRID 9.2 (p.11) | FR-DM-091 | Endorsement request | /adjustment/requests |
-| BRID 9.3 (p.11) | FR-DM-092 | Endorsement request | /adjustment/requests |
-| BRID 10.1 (p.11) | FR-DM-100, FR-DM-050 | Reports | report PRC-LEGACY-CHANGES |
-| BRID 11.1 (p.11-12) | FR-DM-110, FR-DM-111 | Legacy Inquiry; Legacy Access Log | /legacy-inquiry |
-| BRID 12.1 (p.12) | FR-DM-120, 121, 122, 123, 124, 125, 022, 023, 024, 034 | Cutover; Run-off and Decommissioning; Renewal candidates; True-ups | /migration/cutover-plans; /migration/runoff; /migration/trueups; LegacyPolicySource |
+| BRID 1.1a (p.7) | FR-DM-001, FR-DM-002, FR-DM-003 | Data Objects; Sign-off | TC-DM-001.1, 001.2, 001.3, 001.4, 002.1, 002.2, 002.3, 002.4, 002.5, 003.1, 003.2, 003.3, 003.4 (14 cases) |
+| BRID 1.1b (p.7) | FR-DM-010, 013, 014, 015, 020, 021, 022, 023, 024, 003 | Extracts; Batches; Reconciliation; True-ups | TC-DM-003.1, 003.2, 003.3, 003.4, 010.1, 010.2, 010.3, 010.4, 013.1, 013.2, 013.3, 013.4, 014.1, 014.2, 014.3, 014.4, 015.1, 015.2, 015.3, 015.4, 020.1, 020.2, 020.3, 020.4, 021.1, 021.2, 021.3, 021.4, 022.1, 022.2, 022.3, 022.4, 022.5, 023.1, 023.2, 023.3, 023.4, 023.5, 023.6, 023.7, 024.1, 024.2, 024.3, 024.4 (49 cases) |
+| BRID 2.1 (p.7) | FR-DM-031, FR-DM-032, FR-DM-033 | Client Matching; Client search | TC-DM-031.1, 031.2, 031.3, 031.4, 032.1, 032.2, 032.3, 032.4, 033.1, 033.2, 033.3 (11 cases) |
+| BRID 3.1 (p.7) | FR-DM-011, FR-DM-012, FR-DM-030, FR-DM-034 | Code Maps | TC-DM-011.1, 011.2, 011.3, 011.4, 011.5, 012.1, 012.2, 012.3, 030.1, 030.2, 034.1, 034.2, 034.3, 034.4, 034.5, 034.6 (17 cases) |
+| BRID 4.1 (p.8) | FR-DM-040, FR-DM-041, FR-DM-033, FR-DM-124 | Account search; Account page | TC-DM-033.1, 033.2, 033.3, 040.1, 040.2, 040.3, 040.4, 040.5, 041.1, 041.2, 041.3, 124.1, 124.2, 124.3, 124.4, 124.5 (17 cases) |
+| BRID 5.1 (p.8) | FR-DM-051, FR-DM-021, FR-DM-022, FR-DM-023 | Unapplied Payments | TC-DM-021.1, 021.2, 021.3, 021.4, 022.1, 022.2, 022.3, 022.4, 022.5, 023.1, 023.2, 023.3, 023.4, 023.5, 023.6, 023.7, 051.1, 051.2, 051.3, 051.4 (20 cases) |
+| BRID 5.2 (p.8) | FR-DM-052, FR-DM-050 | Unapplied Payments; Payments | TC-DM-050.1, 050.2, 050.3, 050.4, 052.1, 052.2, 052.3, 052.4 (8 cases) |
+| BRID 5.3 (p.8) | FR-DM-053 | Unapplied Payments | TC-DM-053.1, 053.2 (3 cases) |
+| BRID 5.4 (p.8-9) | FR-DM-054 | Unapplied Payments; Disbursement queue | TC-DM-054.1, 054.2 (2 cases) |
+| BRID 5.5 (p.9) | FR-DM-055 | UPP Income Reclassification; My Approvals | TC-DM-055.1, 055.2, 055.3, 055.4 (5 cases) |
+| BRID 6.1 (p.9) | FR-DM-060, FR-DM-050 | Receive payment (OTC) | TC-DM-050.1, 050.2, 050.3, 050.4, 060.1, 060.2, 060.3 (7 cases) |
+| BRID 6.2 (p.9) | FR-DM-061 | Payment uploads | TC-DM-061.1, 061.2, 061.3, 061.4 (4 cases) |
+| BRID 6.3 (p.9) | FR-DM-052 | Unapplied Payments | TC-DM-052.1, 052.2, 052.3, 052.4 (4 cases) |
+| BRID 6.4 (p.10) | FR-DM-053 | Unapplied Payments | TC-DM-053.1, 053.2 (3 cases) |
+| BRID 7.1 (p.10) | FR-DM-070 | DPPR Legacy Reversal | TC-DM-070.1, 070.2, 070.3 (4 cases) |
+| BRID 7.2 (p.10) | FR-DM-071 | PR2307 Legacy Reversal | TC-DM-071.1, 071.2 (3 cases) |
+| BRID 8.1 (p.10) | FR-DM-080, FR-DM-050 | Remittance screens | TC-DM-050.1, 050.2, 050.3, 050.4, 080.1, 080.2, 080.3 (7 cases) |
+| BRID 9.1 (p.11) | FR-DM-090 | Endorsement request | TC-DM-090.1, 090.2, 090.3, 090.4 (4 cases) |
+| BRID 9.2 (p.11) | FR-DM-091 | Endorsement request | TC-DM-091.1, 091.2, 091.3 (3 cases) |
+| BRID 9.3 (p.11) | FR-DM-092 | Endorsement request | TC-DM-092.1, 092.2, 092.3 (3 cases) |
+| BRID 10.1 (p.11) | FR-DM-100, FR-DM-050 | Reports | TC-DM-050.1, 050.2, 050.3, 050.4, 100.1, 100.2, 100.3 (7 cases) |
+| BRID 11.1 (p.11-12) | FR-DM-110, FR-DM-111 | Legacy Inquiry; Legacy Access Log | TC-DM-110.1, 110.2, 110.3, 111.1, 111.2, 111.3 (6 cases) |
+| BRID 12.1 (p.12) | FR-DM-120, 121, 122, 123, 124, 125, 022, 023, 024, 034 | Cutover; Run-off and Decommissioning; Renewal candidates; True-ups | TC-DM-022.1, 022.2, 022.3, 022.4, 022.5, 023.1, 023.2, 023.3, 023.4, 023.5, 023.6, 023.7, 024.1, 024.2, 024.3, 024.4, 034.1, 034.2, 034.3, 034.4, 034.5, 034.6, 120.1, 120.2, 120.3, 120.4, 121.1, 121.2, 121.3, 121.4, 122.1, 122.2, 122.3, 122.4, 123.1, 123.2, 123.3, 123.4, 124.1, 124.2, 124.3, 124.4, 124.5, 125.1, 125.2, 125.3, 125.4, 125.5, 125.6 (51 cases) |
 
-API paths start with `/api/v1`.
 
 The concept paper on an early renewal release (R10) is superseded by the single January 2028 go-live. Early migration of the client master and the renewal reference data (section VI) is met by the trial-migration load order of FR-DM-120. Its RMEL ingestion (Annex C) is replaced by the go-live extraction and the RA-sent file (FR-DM-124, FR-DM-125), and its package remapping question (p.2, Annex B and C) is answered by the remapping at Renewal sanitation (FR-DM-034). No placement or booking happens in BIBS before the January 2028 cut-over, because BIBS is not live before it.
+
+# Proposed business rules and clarifications for confirmation
+
+The table lists each point where the proposed rule differs from the BRD text, fills a gap the BRD leaves open, or rests on a recommendation that BDOI confirms. The open questions of section 10.3 stay open; each item below gives the proposed rule that applies until BDOI answers. BDOI records its decision with the sign-off of this FRS (chapter 13); a decision that changes a screen, field, rule or message is applied in the next version of the FRS.
+
+<!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
+| Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
+|---|---|---|---|---|
+| CLR-DM-01 | Year-end cut-over (FR-DM-022 to 024, 120, 121) | Go-live on Monday 3 January 2028 at the year-end boundary (option A): BIBS opens with the open items at 31 December and a provisional GL opening trial balance; FY2027 closing and audit adjustments reach BIBS as controlled true-ups. | Recommendation awaiting Comptrollership confirmation (DMQ39). | Confirm option A by 1 October 2027 (DMQ39). |
+| CLR-DM-02 | Legacy invoices (FR-DM-050) | A legacy invoice is not re-booked: it enters the Operations ledger with its open balances and is processed like a BIBS invoice, with its postings on the legacy sub-accounts. | The BRD asks that legacy items be processed in BIBS without saying how they are booked. | Confirm the treatment of legacy invoices (DMQ10, DMQ18). |
+| CLR-DM-03 | Package remapping (FR-DM-034, 040) | The migration loads the legacy package code and the PACKAGE map; the remapping is done at Renewal sanitation. | BDOI decision of 26-Sep-2026 (DMQ36). | Confirm the decision. |
+| CLR-DM-04 | Renewals January to May 2028 (FR-DM-122, 124, 125) | No renewal cohort is carried from legacy; the January-May 2028 expiries are extracted at go-live and processed in BIBS, and the Renewal Advices already sent are loaded from the Excel trackers. | BDOI decisions of 26-Sep-2026 (DMQ26, DMQ37, DMQ38). | Confirm the decisions. |
+| CLR-DM-05 | Objects out of scope (scope) | Open claims, Employee Benefits programmes, the Excel submitted-policy masterlists, payees and users are out of scope until BDOI decides; if brought into scope they use the same framework. | The scope is open (DMQ30). | Decide the scope (DMQ30). |
+| CLR-DM-06 | Load through the BIBS functions (FR-DM-014) | Each row is loaded through the same BIBS function that the screens use, so every rule, audit entry and accounting entry applies; each record keeps a cross-reference to its legacy key. | The BRD asks for complete and reconcilable loads. | Confirm the approach. |
+| CLR-DM-07 | Reconciliation tolerance (FR-DM-020) | An amount difference is a break unless it is within MIG_AMOUNT_TOLERANCE (default 0.00) per currency; every break is fixed or explained and approved. | The tolerance is not given in the BRD. | Confirm the tolerance. |
+| CLR-DM-08 | Extract transfer (1.1b; section 7) | Extracts are uploaded on the migration console; an SFTP drop from BDOI IT is added when agreed. | The transfer and delta frequency depend on BDOI IT (DMQ24, DMQ28). | Confirm the transfer (DMQ28). |
+| CLR-DM-09 | Legacy systems after go-live (FR-DM-110, 111) | Legacy systems stay read-only with access logging until the archive is loaded; no write-back to QPS or EBIX is needed after the freeze. | Read-only or archive per system is open (DMQ24). | Decide read-only or archive per system (DMQ24). |
 
 # Sign-off
 

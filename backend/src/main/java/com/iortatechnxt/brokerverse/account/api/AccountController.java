@@ -9,18 +9,24 @@ import com.iortatechnxt.brokerverse.account.api.dto.FfyCancelRequest;
 import com.iortatechnxt.brokerverse.account.api.dto.FfyRequest;
 import com.iortatechnxt.brokerverse.account.api.dto.PaymentArrangementRequest;
 import com.iortatechnxt.brokerverse.account.domain.Account;
+import com.iortatechnxt.brokerverse.account.domain.AccountLegacyHeader;
 import com.iortatechnxt.brokerverse.account.domain.AccountStatus;
 import com.iortatechnxt.brokerverse.account.domain.BusinessType;
 import com.iortatechnxt.brokerverse.account.service.AccountQueryService;
 import com.iortatechnxt.brokerverse.account.service.AccountSearch;
 import com.iortatechnxt.brokerverse.account.service.AccountService;
 import com.iortatechnxt.brokerverse.account.service.AccountTaggingService;
+import com.iortatechnxt.brokerverse.account.service.LegacyAccountImport;
 import com.iortatechnxt.brokerverse.account.service.NewAccount;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -53,6 +59,7 @@ public class AccountController {
   private final AccountQueryService queries;
   private final AccountTaggingService tagging;
   private final CurrentUser currentUser;
+  private final LegacyAccountImport legacy;
 
   /**
    * Creates the controller.
@@ -61,16 +68,19 @@ public class AccountController {
    * @param queries account reads
    * @param tagging FFY and payment arrangement
    * @param currentUser current user
+   * @param legacy legacy headers of imported accounts
    */
   public AccountController(
       AccountService accounts,
       AccountQueryService queries,
       AccountTaggingService tagging,
-      CurrentUser currentUser) {
+      CurrentUser currentUser,
+      LegacyAccountImport legacy) {
     this.accounts = accounts;
     this.queries = queries;
     this.tagging = tagging;
     this.currentUser = currentUser;
+    this.legacy = legacy;
   }
 
   /**
@@ -116,13 +126,19 @@ public class AccountController {
             periodTo,
             officer,
             Boolean.TRUE.equals(criteria.includeVoided()),
-            criteria.businessType());
+            criteria.businessType(),
+            criteria.origin() == null ? null : criteria.origin() == RecordOrigin.Origin.MIGRATED);
     PageRequest pageable =
         PageRequest.of(
             Math.max(page, 0),
             Math.min(Math.max(size, 1), MAX_PAGE),
             Sort.by(Sort.Direction.DESC, "createdAt", "id"));
-    return PageResponse.of(queries.search(search, pageable), AccountSummaryResponse::from);
+    Page<Account> found = queries.search(search, pageable);
+    Map<Long, AccountLegacyHeader> headers = new HashMap<>();
+    legacy
+        .headersOf(found.getContent().stream().map(Account::getId).toList())
+        .forEach(h -> headers.put(h.getAccountId(), h));
+    return PageResponse.of(found, a -> AccountSummaryResponse.from(a, headers.get(a.getId())));
   }
 
   /**
@@ -134,7 +150,8 @@ public class AccountController {
   @GetMapping("/{id}")
   @PreAuthorize(VIEW)
   public AccountResponse get(@PathVariable Long id) {
-    return AccountResponse.from(queries.get(id));
+    Account a = queries.get(id);
+    return AccountResponse.from(a, legacy.headerOf(a.getId()).orElse(null));
   }
 
   /**
@@ -146,7 +163,8 @@ public class AccountController {
   @GetMapping("/by-arn/{arn}")
   @PreAuthorize(VIEW)
   public AccountResponse byArn(@PathVariable String arn) {
-    return AccountResponse.from(queries.requireByArn(arn));
+    Account a = queries.requireByArn(arn);
+    return AccountResponse.from(a, legacy.headerOf(a.getId()).orElse(null));
   }
 
   /**
@@ -318,6 +336,7 @@ public class AccountController {
    * @param mine only the current user's accounts
    * @param includeVoided include voided accounts
    * @param businessType New Business or Renewal (BT0), null for both
+   * @param origin BIBS or MIGRATED accounts, null for both
    */
   public record SearchParams(
       String text,
@@ -332,5 +351,6 @@ public class AccountController {
       String officer,
       Boolean mine,
       Boolean includeVoided,
-      BusinessType businessType) {}
+      BusinessType businessType,
+      RecordOrigin.Origin origin) {}
 }

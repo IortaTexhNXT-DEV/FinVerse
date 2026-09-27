@@ -156,7 +156,7 @@ screens:
       - "Print | As Run Report | Required parameters valid | Opens the printable report with the paper, orientation and width chosen | - | -"
       - "[PDF / Excel / CSV download] | As Run Report | Required parameters valid | Downloads the report; the header carries the report name, the user who generated it, the date coverage and the time generated | - | -"
     rules:
-      - "The as-of reports show the access held at the end of the as-of date (Philippine time), rebuilt from the access change log (FR-UA-060, FR-UA-062)."
+      - "The as-of reports show the access held at the end of the as-of date (Philippine time), derived from the access change log (FR-UA-060, FR-UA-062)."
       - "Created by and Modified by show the approver and the request number, or the user of a direct change (FR-UA-060)."
       - "The audit log merges the access change log, the request history and, on request, the sign-ins, failed sign-ins and sign-outs (FR-UA-063)."
     outcome: The reports of the BRD samples A to D, and the request list, are produced with their coverage and exported for audit.

@@ -10,6 +10,7 @@ import { RecordHeader } from '@/components/broking/RecordHeader';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { OriginBadge } from '@/components/ui/OriginBadge';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { useTabParam } from '@/components/ui/useTabParam';
@@ -55,6 +56,18 @@ function profileFields(c: ClientDetail): unknown[] {
   return c.clientType === 'CORPORATE' ? common : [...common, c.birthDate, c.profile.nationality];
 }
 
+/** Source system, legacy client code and migration batch of a migrated client (BRD-13). */
+function legacyFacts(c: ClientDetail) {
+  if (c.origin !== 'MIGRATED') {
+    return [];
+  }
+  return [
+    { label: 'Migrated From', value: c.sourceSystem },
+    { label: 'Legacy Client Code', value: c.legacyRef },
+    { label: 'Migration Batch', value: c.migrationBatch },
+  ];
+}
+
 function Header({ client: c }: Readonly<{ client: ClientDetail }>) {
   const fields = profileFields(c);
   const filled = fields.filter((v) => v !== undefined && v !== null && v !== '').length;
@@ -70,6 +83,7 @@ function Header({ client: c }: Readonly<{ client: ClientDetail }>) {
       statuses={[{ label: 'KYC', status: c.kyc.status }]}
       flags={
         <>
+          <OriginBadge record={c} />
           {!c.infoComplete && (
             <Tag title={`Missing: ${c.missingFields.join(', ')}`}>Information Incomplete</Tag>
           )}
@@ -88,6 +102,7 @@ function Header({ client: c }: Readonly<{ client: ClientDetail }>) {
         { label: 'E-mail', value: c.email },
         { label: 'TIN', value: c.tin },
         { label: 'Next KYC Review', value: formatDate(c.kyc.reviewDue) },
+        ...legacyFacts(c),
         { label: 'Created By', value: <UserName login={c.lifecycle.createdBy} /> },
         { label: 'Created', value: formatDate(c.lifecycle.createdAt) },
       ]}

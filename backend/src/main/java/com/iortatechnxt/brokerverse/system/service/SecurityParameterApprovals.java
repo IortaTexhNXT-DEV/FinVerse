@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.system.service;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.system.domain.SystemParameter;
 import com.iortatechnxt.brokerverse.system.domain.SystemParameterRepository;
@@ -111,21 +112,33 @@ public class SecurityParameterApprovals {
   }
 
   /**
-   * Rejects the change that waits (the requester may withdraw it too).
+   * Rejects the change that waits, with the reason; the requester may withdraw it without one.
    *
    * @param key key
+   * @param reason why the change is rejected (mandatory unless the requester withdraws it)
    * @return the parameter
    */
-  public SystemParameter reject(String key) {
+  public SystemParameter reject(String key, String reason) {
     SystemParameter p = parameters.get(key);
     String value = p.getPendingValue();
     String requestedBy = p.getPendingBy();
+    boolean withdrawn = currentUser.username().equals(requestedBy);
+    if (!withdrawn && (reason == null || reason.isBlank())) {
+      throw new BusinessRuleException("REASON_REQUIRED", "Give the reason for the rejection");
+    }
     p.rejectChange();
     audit.record(
         ENTITY,
         key,
         AuditAction.REJECT,
-        "Rejected the change of " + key + " to '" + value + "' asked by " + requestedBy);
+        (withdrawn ? "Withdrew" : "Rejected")
+            + " the change of "
+            + key
+            + " to '"
+            + value
+            + "' asked by "
+            + requestedBy
+            + (reason == null || reason.isBlank() ? "" : ". Reason: " + reason.strip()));
     return p;
   }
 

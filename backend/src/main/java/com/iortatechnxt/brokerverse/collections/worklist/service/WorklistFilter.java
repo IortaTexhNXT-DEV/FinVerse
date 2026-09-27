@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.collections.worklist.service;
 
 import com.iortatechnxt.brokerverse.collections.common.domain.ClxEnums.ItemStatus;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -73,12 +74,32 @@ public record WorklistFilter(
    * @param unitHead Unit Head
    * @param aoUsername account officer
    * @param clientCode client
+   * @param origin BIBS or MIGRATED (Data Migration origin filter), null for both
    */
   public record Scope(
-      String segment, String salesUnit, String unitHead, String aoUsername, String clientCode) {
+      String segment,
+      String salesUnit,
+      String unitHead,
+      String aoUsername,
+      String clientCode,
+      RecordOrigin.Origin origin) {
 
     /** No scope criterion. */
-    public static final Scope ANY = new Scope(null, null, null, null, null);
+    public static final Scope ANY = new Scope(null, null, null, null, null, null);
+
+    /**
+     * A scope without the origin filter.
+     *
+     * @param segment market segment
+     * @param salesUnit sales unit
+     * @param unitHead Unit Head
+     * @param aoUsername account officer
+     * @param clientCode client
+     */
+    public Scope(
+        String segment, String salesUnit, String unitHead, String aoUsername, String clientCode) {
+      this(segment, salesUnit, unitHead, aoUsername, clientCode, null);
+    }
   }
 
   /**

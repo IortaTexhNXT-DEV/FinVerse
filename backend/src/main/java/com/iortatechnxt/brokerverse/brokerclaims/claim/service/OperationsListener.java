@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.brokerclaims.claim.service;
 
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
+import com.iortatechnxt.brokerverse.opsledger.domain.FeedSource;
 import com.iortatechnxt.brokerverse.opsledger.domain.RemittanceStatus;
 import com.iortatechnxt.brokerverse.opsledger.service.OpsLedgerEvents.InvoiceFlagChanged;
 import com.iortatechnxt.brokerverse.opsledger.service.OpsLedgerEvents.InvoiceMovementPosted;
@@ -76,7 +77,7 @@ public class OperationsListener {
    */
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void onBooked(OpsInvoiceBooked event) {
-    if (event.kind() != InvoiceKind.BOOKING) {
+    if (event.kind() != InvoiceKind.BOOKING && event.source() != FeedSource.MIGRATION) {
       safely(event.invoiceNo(), () -> sync.endorsementBooked(event.invoiceNo()));
     }
   }

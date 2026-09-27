@@ -32,7 +32,7 @@ distribution:
 
 # What this pack is for
 
-This pack shows BRD-3 Product Maintenance as built in BIBS on 27-Sep-2026, screen by screen, so that each BDOI business unit can confirm what it will get and sign it off. Product Maintenance is the first set of Drop 0 (Setup and Data Migration): it holds the products, package versions, rates and incentive criteria that New Business, Renewal, Employee Benefits, Submitted Policies, Operations and Accounting use, and the data migration loads its masters at go-live. Signing freezes the content, the screens and the navigation of Product Maintenance; a later change goes through the Change Management Register with its mandays. The screenshots use fictitious seed data only.
+This pack shows the proposed BRD-3 Product Maintenance of BIBS, screen by screen, so that each BDOI business unit can confirm what it will get and sign it off. Product Maintenance is the first set of Drop 0 (Setup and Data Migration): it holds the products, package versions, rates and incentive criteria that New Business, Renewal, Employee Benefits, Submitted Policies, Operations and Accounting use, and the data migration loads its masters at go-live. Signing freezes the content, the screens and the navigation of Product Maintenance; a later change goes through the Change Management Register with its mandays. The screenshots use fictitious seed data only.
 
 # The pack at a glance
 

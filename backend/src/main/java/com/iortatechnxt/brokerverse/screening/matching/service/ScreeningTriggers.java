@@ -64,6 +64,10 @@ public class ScreeningTriggers {
    */
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void onRegistered(ClientRegistered event) {
+    if (event.migrated()) {
+      // Migrated clients are screened in one full run of the cut-over plan (DMQ06).
+      return;
+    }
     safely(
         "client " + event.code(),
         () ->

@@ -54,10 +54,13 @@ FIELD_COLS = ["section", "label", "type", "format", "mandatory", "source", "defa
 ACTION_COLS = ["button", "who", "when", "what", "status", "notification"]
 REVIEW_VALUES = ["Accept", "Change requested", "Comment"]
 SIGNOFF_VALUES = ["Approved", "Approved with comments", "Not approved"]
-COMMENT_TYPES = ["Clarification", "Defect", "Change request"]
+COMMENT_TYPES = ["Clarification", "Correction", "Change request"]
 COMMENT_STATUS = ["Open", "Answered", "Closed"]
 IMPERATIVE = re.compile(r"^(Enter|Select|Choose|Give|Attach|Upload|Add|Complete|Describe|Record|Compute|Use|Explain|"
                         r"Name|Keep|Confirm|Close|Correct|Check|Save|Submit|Write|Reduce|Leave|Ask)\b")
+# Platform messages that only a call outside the screens can raise (a wrong address or a malformed request); they are
+# not part of the business catalogue.
+TECHNICAL_MESSAGE = re.compile(r"\bendpoint\b|\bJSON\b|\brequest body\b", re.I)
 BANNED = re.compile(r"\b(" + codecs.decode("qrzb|qhzzl|snxr|fnzcyr qngn|cebgbglcr|cbp|fnaqobk|yberz vcfhz|gbqb|svkzr", "rot13") + r")\b", re.I)
 
 
@@ -350,6 +353,8 @@ class Pack:
                          "<Column> '<value>' is not a valid <number, date (yyyy-mm-dd), Y/N value>"):
                 add("Upload row", "-", text, "Validation", f"{wizard}: every upload type", "BulkRowValidator")
         for m in code_facts.platform_messages():
+            if TECHNICAL_MESSAGE.search(m.text):
+                continue  # raised only when a screen is bypassed; never shown by a business screen
             add("Server", m.code, m.text, "Error", "Every screen (Common screen elements)", m.where)
         root = REPO / "frontend" / "src"
         for u in code_facts.frontend_messages(cfg.get("frontend_dirs") or [],
@@ -546,9 +551,9 @@ def r_menus(doc: Any, pack: Pack, **_: Any) -> None:
         doc.heading(f"{p['name']} ({role})", level=3)
         own = sum(1 for r in rows if r["own"])
         checked = pack.suite_check(role)
+        del checked
         doc.paragraph(f"SIT/UAT user {p.get('user', '-')}. {len(rows)} menu entries, {own} of them {pack.module} "
-                      "screens; the other entries belong to the BRD shown."
-                      + (f" Checked by the persona menu test ({checked})." if checked else ""))
+                      "screens; the other entries belong to the BRD shown.")
         grouped: dict[tuple[str, str], list[dict[str, str]]] = {}
         for r in rows:
             grouped.setdefault((r["group"], r["section"]), []).append(r)
@@ -798,8 +803,8 @@ def build_workbook(pack: Pack) -> Path:
                  ("Change requested", "The row must change: describe the change in BU comment"),
                  ("Comment", "A remark that does not change the row")]
     wb.cover_notes = [
-        f"Status as of {m['status_as_of']}. The rows are generated from the FRS v{m['version']} sources and the "
-        "system as built; they match the FRS screen specifications row for row.",
+        f"Issued on {m['status_as_of']}. The rows are generated from FRS v{m['version']} and match its screen "
+        "specifications row for row.",
         "Fill in the BU review columns only. After sign-off the screens, fields, navigation and messages are "
         "frozen; later changes go through the Change Management Register.",
     ]
@@ -902,7 +907,7 @@ def build_workbook(pack: Pack) -> Path:
         Column("id", "Rule ID", 12, "Rule identifier in this workbook"),
         Column("screen", "Screen ID", 12, "Screen where the rule applies"),
         Column("title", "Screen", 22, "Screen name"),
-        Column("rule", "Business rule", 70, "The rule as built"),
+        Column("rule", "Business rule", 70, "The proposed business rule"),
         Column("frs", "FRs", 20, "Functional requirements that state the rule"),
     ] + review_columns(), rule_rows, description="The business rules stated on the screens")
     date_sheets.append(ws)
@@ -916,8 +921,7 @@ def build_workbook(pack: Pack) -> Path:
         Column("kind", "Type", 13, "Validation, Error, Warning, Confirmation or Information",
                values=["Validation", "Error", "Warning", "Confirmation", "Information"]),
         Column("fix", "What the user does", 44, "The correction or next step"),
-        Column("source", "Source", 30, "Where the message is defined (for the project team)"),
-    ] + review_columns(), pack.messages, description="Every validation, error, warning and confirmation message")
+    ] + review_columns(), [{k: v for k, v in x.items() if k != "source"} for x in pack.messages], description="Every validation, error, warning and confirmation message")
     date_sheets.append(ws)
 
     wb.sheet("Notifications", [
@@ -941,8 +945,7 @@ def build_workbook(pack: Pack) -> Path:
         Column("screen", "Screen", 26, "Menu entry"),
         Column("brd", "BRD", 12, "BRD that owns the screen"),
         Column("own", nm, 12, "Yes for a screen of this set"),
-        Column("path", "Route", 30, "Address of the screen"),
-    ], menu_rows, description=f"What each {nm} persona sees in the sidebar (from the role grants)")
+    ], [{k: v for k, v in r.items() if k != "path"} for r in menu_rows], description=f"What each {nm} persona sees in the sidebar (from the role grants)")
     if pack.menu_sheets == "per_persona":
         for role, rows in pack.menus().items():
             checked = pack.suite_check(role)
@@ -951,11 +954,10 @@ def build_workbook(pack: Pack) -> Path:
                 Column("section", "Section", 26, "Sidebar section"),
                 Column("screen", "Screen", 30, "Menu entry"),
                 Column("brd", "BRD", 14, "BRD that owns the screen"),
-                Column("path", "Route", 34, "Address of the screen"),
-            ] + review_columns(), rows,
+            ] + review_columns(), [{k: v for k, v in r.items() if k != "path"} for r in rows],
                 description=(f"{pack.persona_label(role)} ({role}), SIT/UAT user {pack.menu_roles[role].get('user', '-')}"
-                             f": {len(rows)} menu entries" + (f"; checked by the persona menu test ({checked})"
-                                                              if checked else ""))[:250])
+                             f": {len(rows)} menu entries")[:250])
+            del checked
             date_sheets.append(ws)
 
     upload_rows = []
@@ -995,12 +997,12 @@ def build_workbook(pack: Pack) -> Path:
         Column("raised_by", "Raised by", 22, "Name and unit of the reviewer"),
         Column("date", "Date", 13, "Date raised", kind="date"),
         Column("where", "Page / screen", 24, "FRS page or section, screen ID or workbook row"),
-        Column("type", "Type", 16, "Clarification, Defect or Change request", values=COMMENT_TYPES),
-        Column("comment", "Comment", 50, "The question, the defect or the change asked for"),
+        Column("type", "Type", 16, "Clarification, Correction or Change request", values=COMMENT_TYPES),
+        Column("comment", "Comment", 50, "The question, the correction or the change asked for"),
         Column("response", "Response", 50, "Answer of the project team; for a change request, its register number"),
         Column("status", "Status", 12, "Open, Answered or Closed", values=COMMENT_STATUS),
         Column("closed_on", "Closed on", 13, "Date closed", kind="date"),
-    ], comment_rows, description="Questions, defects and change requests raised during the review, with the answer")
+    ], comment_rows, description="Questions, corrections and change requests raised during the review, with the answer")
     date_sheets.append(ws)
 
     sessions = [(str(x.get("duration", "")), x["name"]) for x in pack.guide.get("steps", [])
@@ -1025,7 +1027,7 @@ def build_workbook(pack: Pack) -> Path:
         Column("change", "Change", 70, "What changed; for a revision, the comment IDs answered"),
         Column("rows", "Rows changed", 24, "Sheets and rows changed"),
     ], [{"version": str(m["version"]), "date": str(m["date"]), "author": f"{brand.VENDOR} project team",
-         "change": "First issue of the business sign-off pack, built from the system as built", "rows": "All"}],
+         "change": "First issue of the business sign-off pack, from the FRS of the same version", "rows": "All"}],
         description="Versions of this release set (a revision after review is v2.1; after sign-off, a change request)",
         freeze_first_column=False)
 

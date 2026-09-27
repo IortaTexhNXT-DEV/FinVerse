@@ -1,3 +1,4 @@
+import type { RecordOriginFields } from '@/api/types';
 /** Types of the Disbursement API (DIS 2.2-3.28): requests, vouchers, instruments, payees, EOD, funding, banks. */
 
 export type Mode = 'CTA' | 'ATD' | 'MC_DD' | 'CREDIT_TICKET' | 'TT' | 'ONLINE_BANKING' | 'CHECK';
@@ -232,7 +233,7 @@ export interface PayeeAccount {
   active: boolean;
 }
 
-export interface PayeeSummary {
+export interface PayeeSummary extends RecordOriginFields {
   id: number;
   payeeCode: string;
   payeeClass: string;

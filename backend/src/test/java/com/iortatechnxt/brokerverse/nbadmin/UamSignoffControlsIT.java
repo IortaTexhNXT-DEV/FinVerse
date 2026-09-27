@@ -154,7 +154,10 @@ class UamSignoffControlsIT {
 
     as.run(BADMIN, () -> sodRules.requestDeactivation(rule.getId()));
     assertThat(inboxOf(INFOSEC)).contains(rule.getRuleCode());
-    as.run(INFOSEC, () -> sodRules.reject(rule.getId()));
+    assertThatThrownBy(() -> as.run(INFOSEC, () -> sodRules.reject(rule.getId(), " ")))
+        .extracting("code")
+        .isEqualTo("REASON_REQUIRED");
+    as.run(INFOSEC, () -> sodRules.reject(rule.getId(), "Both profiles are still needed"));
     assertThat(sodRules.list())
         .filteredOn(r -> r.getId().equals(rule.getId()))
         .singleElement()
@@ -173,7 +176,9 @@ class UamSignoffControlsIT {
         .isEqualTo(AccessRequestStatus.PENDING);
 
     SodRule refused = as.run(BADMIN, () -> sodRules.create(a, b, "Asked again"));
-    assertThat(as.run(INFOSEC, () -> sodRules.reject(refused.getId())).isActive()).isFalse();
+    assertThat(
+            as.run(INFOSEC, () -> sodRules.reject(refused.getId(), "Already refused")).isActive())
+        .isFalse();
     assertThat(sodRules.pending()).extracting(SodRule::getId).doesNotContain(refused.getId());
   }
 
@@ -313,9 +318,15 @@ class UamSignoffControlsIT {
     assertThat(parameters.intValue(key, 0)).isEqualTo(2);
 
     as.run("admin", () -> parameterApprovals.change(key, before));
-    as.run(INFOSEC, () -> parameterApprovals.reject(key));
+    assertThatThrownBy(() -> as.run(INFOSEC, () -> parameterApprovals.reject(key, "")))
+        .extracting("code")
+        .isEqualTo("REASON_REQUIRED");
+    as.run(INFOSEC, () -> parameterApprovals.reject(key, "Keep the current value"));
     assertThat(parameters.get(key).getValue()).isEqualTo("2");
-    assertThatThrownBy(() -> as.run(INFOSEC, () -> parameterApprovals.reject(key)))
+    as.run("admin", () -> parameterApprovals.change(key, "3"));
+    as.run("admin", () -> parameterApprovals.reject(key, null));
+    assertThat(parameters.get(key).getPendingValue()).isNull();
+    assertThatThrownBy(() -> as.run(INFOSEC, () -> parameterApprovals.reject(key, "Again")))
         .extracting("code")
         .isEqualTo("PARAMETER_NO_PENDING_CHANGE");
     as.run("admin", () -> parameterApprovals.change(key, before));

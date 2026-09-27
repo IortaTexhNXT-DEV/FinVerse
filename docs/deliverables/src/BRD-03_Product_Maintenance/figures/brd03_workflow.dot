@@ -21,28 +21,28 @@ digraph pm_workflow {
   NOT_PROCEEDED     [label="NOT_PROCEEDED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
   VOIDED            [label="VOIDED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
 
-  DRAFT -> FOR_MKT_APPROVAL [label=" submit"];
-  FOR_MKT_APPROVAL -> FOR_TSU_REVIEW [label=" approve"];
-  FOR_TSU_REVIEW -> FOR_TSU_APPROVAL [label=" recommend"];
-  FOR_TSU_APPROVAL -> NEGOTIATION [label=" approve"];
-  NEGOTIATION -> NEGOTIATION [label=" revise_qs\n (round n+1)"];
-  NEGOTIATION -> TERMS_REVIEW [label=" terms_final"];
-  TERMS_REVIEW -> FOR_MKT_REVIEW [label=" release_to_marketing\n (client-specific)"];
-  TERMS_REVIEW -> REQUIREMENTS_PREP [label=" skip_marketing_review\n (generic)"];
-  FOR_MKT_REVIEW -> REQUIREMENTS_PREP [label=" accept_terms"];
-  FOR_MKT_REVIEW -> NEGOTIATION [label=" request_changes", style=dashed, constraint=false];
-  FOR_TSU_APPROVAL -> FOR_MANCOM [label=" approve_no_negotiation", style=dashed];
-  REQUIREMENTS_PREP -> FOR_MANCOM [label=" submit_requirements"];
-  FOR_MANCOM -> WITH_MBS [label=" signoff"];
-  FOR_MANCOM -> REQUIREMENTS_PREP [label=" return", style=dashed, constraint=false];
-  WITH_MBS -> REQUIREMENTS_PREP [label=" return_incomplete", style=dashed, constraint=false];
-  WITH_MBS -> FOR_VALIDATION [label=" setup"];
-  WITH_MBS -> RETIRED [label=" retire\n (RETIRE)"];
-  FOR_VALIDATION -> RELEASED [label=" version_released"];
-  FOR_VALIDATION -> WITH_MBS [label=" version_returned", style=dashed, constraint=false];
-  NEGOTIATION -> NOT_PROCEEDED [label=" not_proceeded", style=dotted];
+  DRAFT -> FOR_MKT_APPROVAL [label=" Submit for approval"];
+  FOR_MKT_APPROVAL -> FOR_TSU_REVIEW [label=" Approve and send to TSU"];
+  FOR_TSU_REVIEW -> FOR_TSU_APPROVAL [label=" Recommend for approval"];
+  FOR_TSU_APPROVAL -> NEGOTIATION [label=" Approve and send to TSU"];
+  NEGOTIATION -> NEGOTIATION [label=" Revise quotation slip (new round)\n (round n+1)"];
+  NEGOTIATION -> TERMS_REVIEW [label=" Terms final"];
+  TERMS_REVIEW -> FOR_MKT_REVIEW [label=" Release terms to Marketing\n (client-specific)"];
+  TERMS_REVIEW -> REQUIREMENTS_PREP [label=" Proceed to requirements (generic package)\n (generic)"];
+  FOR_MKT_REVIEW -> REQUIREMENTS_PREP [label=" Accept terms"];
+  FOR_MKT_REVIEW -> NEGOTIATION [label=" Request changes", style=dashed, constraint=false];
+  FOR_TSU_APPROVAL -> FOR_MANCOM [label=" Approve without negotiation", style=dashed];
+  REQUIREMENTS_PREP -> FOR_MANCOM [label=" Submit requirements for ManCom sign-off"];
+  FOR_MANCOM -> WITH_MBS [label=" Sign off and send to MBS"];
+  FOR_MANCOM -> REQUIREMENTS_PREP [label=" Return to requester", style=dashed, constraint=false];
+  WITH_MBS -> REQUIREMENTS_PREP [label=" Return incomplete requirements to TSU", style=dashed, constraint=false];
+  WITH_MBS -> FOR_VALIDATION [label=" Set up package version"];
+  WITH_MBS -> RETIRED [label=" Retire package\n (RETIRE)"];
+  FOR_VALIDATION -> RELEASED [label=" Package version released"];
+  FOR_VALIDATION -> WITH_MBS [label=" Package version returned to MBS", style=dashed, constraint=false];
+  NEGOTIATION -> NOT_PROCEEDED [label=" Not proceeded", style=dotted];
   FOR_MKT_REVIEW -> NOT_PROCEEDED [style=dotted];
-  FOR_TSU_REVIEW -> VOIDED [label=" void", style=dotted];
+  FOR_TSU_REVIEW -> VOIDED [label=" Void", style=dotted];
 
   { rank=same; FOR_TSU_REVIEW; VOIDED; }
   { rank=same; FOR_MKT_REVIEW; NOT_PROCEEDED; }

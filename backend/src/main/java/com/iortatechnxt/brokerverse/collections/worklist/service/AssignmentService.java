@@ -139,6 +139,24 @@ public class AssignmentService {
     return new Reassigned(bulkRef, selected.size());
   }
 
+  /**
+   * Assigns an item to the collector who followed it in legacy (Data Migration, F03): a permanent
+   * assignment recorded in the history, without the notification of a reassignment (migrated data
+   * raises no notification).
+   *
+   * @param item listed item of a legacy invoice
+   * @param handler collector
+   * @param reason reason (the migration batch)
+   */
+  public void assignCarried(CollectionItem item, String handler, String reason) {
+    requireHandler(handler);
+    move(
+        item,
+        handler,
+        new Terms(AssignmentKind.PERMANENT, BusinessClock.today(clock), null, reason),
+        null);
+  }
+
   private void validate(Reassign command, LocalDate today) {
     requireHandler(command.handler());
     if (command.reason() == null || command.reason().isBlank()) {

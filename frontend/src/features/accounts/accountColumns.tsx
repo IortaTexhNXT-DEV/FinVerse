@@ -1,6 +1,7 @@
 import type { AccountSummary } from '@/api/accounts';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { Amount } from '@/components/ui/Amount';
+import { OriginBadge } from '@/components/ui/OriginBadge';
 import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
@@ -55,6 +56,7 @@ export const ACCOUNT_COLUMNS: Column<AccountSummary>[] = [
       <div className="tag-list">
         {a.ffy && <span className="tag">FFY</span>}
         {a.directPayment && <span className="tag">Direct Payment</span>}
+        <OriginBadge record={{ ...a, origin: a.origin === 'MIGRATED' ? 'MIGRATED' : 'BIBS' }} />
       </div>
     ),
   },

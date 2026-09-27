@@ -30,7 +30,7 @@ digraph clm_integration {
   bkg -> clm [label="cover version"];
   led -> clm [label="payment status"];
   leg -> clm [style=dashed, color="@MUTED"];
-  clm -> rem [label="ClaimsFeed"];
+  clm -> rem [label="claims feed"];
   clm -> mail;
   clm -> docs;
   clm -> crm;

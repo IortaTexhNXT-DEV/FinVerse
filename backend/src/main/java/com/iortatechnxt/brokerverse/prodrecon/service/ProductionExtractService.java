@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.prodrecon.service;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
@@ -188,6 +189,7 @@ public class ProductionExtractService {
     extract.stored(fileName, file.id(), file.sha256(), written.size(), added);
   }
 
+  /** Invoices booked in BIBS (legacy production was reconciled in legacy). */
   private List<OpsInvoice> booked(ExtractRequest r) {
     LedgerSearch search =
         new LedgerSearch(
@@ -201,7 +203,12 @@ public class ProductionExtractService {
             null,
             null,
             r.from(),
-            r.to());
+            r.to(),
+            null,
+            null,
+            null,
+            null,
+            RecordOrigin.Origin.BIBS);
     List<OpsInvoice> out = new ArrayList<>();
     Pageable pageable = PageRequest.of(0, PAGE, Sort.by("id"));
     Page<OpsInvoice> page;

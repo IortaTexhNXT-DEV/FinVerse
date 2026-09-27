@@ -24,6 +24,7 @@ import './disbursement.css';
 import { UserName } from '@/components/ui/UserName';
 import { CellStack } from '@/components/ui/CellStack';
 import { DataTable } from '@/components/ui/DataTable';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const PROMPTS: Partial<
   Record<InstrumentAction, { field: string; required: boolean; hint?: string }>
@@ -150,9 +151,17 @@ function PendingEdit({ edit, onChanged }: Readonly<{ edit: StatusEdit; onChanged
         onChanged={onChanged}
         renderBusinessActions={(actions) =>
           actions.some((a) => a.action === 'approve') ? (
-            <Button size="sm" busy={approve.isPending} onClick={() => approve.mutate()}>
+            <ConfirmButton
+              size="sm"
+              busy={approve.isPending}
+              confirm={{
+                title: 'Approve Status Edit',
+                effect: 'The instrument status is changed as requested.',
+              }}
+              onConfirm={() => approve.mutateAsync()}
+            >
               Approve Status Edit
-            </Button>
+            </ConfirmButton>
           ) : null
         }
       />

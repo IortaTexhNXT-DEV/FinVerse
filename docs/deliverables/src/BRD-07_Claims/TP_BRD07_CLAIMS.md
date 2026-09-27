@@ -19,7 +19,7 @@ control:
     author: iorta TechNXT QA
     reviewer: iorta TechNXT Business Analysis
     approver: ""
-    change: Internal draft from FRS BRD-7 v1.0 and the Claims build design
+    change: Internal draft from FRS BRD-7 v1.0
   - version: "1.0"
     date: 25 Sep 2026
     author: iorta TechNXT QA
@@ -33,7 +33,7 @@ distribution:
   - {name: "Retail and Corporate Marketing", role: Business tester, organisation: BDOI, purpose: Loss information and reports}
   - {name: "Operations, Remittance", role: Business tester, organisation: BDOI, purpose: Claims special remittance}
   - {name: Business Project Services, role: UAT coordinator, organisation: BDO Unibank ESG, purpose: UAT planning and traceability}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "System test, defect fixing, UAT support"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "System test, issue resolution, UAT support"}
 ---
 
 # Introduction
@@ -42,7 +42,7 @@ distribution:
 
 This document summarises the test plan for BRD-7 Claims in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-07_Claims_v1.0.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-7 v1.0 and to the BRD requirement IDs (BRCLM.001-043, the NFR items and the process and report pages) that the FR meets. The Claims module is **designed and not yet built**. The expected results therefore quote the message texts of the FRS without codes, the screen paths are those of the build design, and no case names an automated test yet. Where a Claims check reuses a message that the platform already shows (log-in, report parameters, e-mail address), the case quotes the text BIBS shows today and a finding records the difference from the FRS (section 9).
+Every case traces to a functional requirement (FR) of FRS BRD-7 v1.0 and to the BRD requirement IDs (BRCLM.001-043, the NFR items and the process and report pages) that the FR meets. The expected results quote the message texts of the FRS, and the screen paths are those of the FRS. Where a Claims check reuses a message that the platform already shows (log-in, report parameters, e-mail address), the case quotes the text BIBS shows on that screen.
 
 ## Scope
 
@@ -72,9 +72,8 @@ The roles-and-access sheet checks each Claims action against the roles that may 
 | Ref. | Document | Version |
 |---|---|---|
 | R1 | Functional Requirements Specification BRD-7 Claims (`BIBS_FRS_BRD-07_Claims_v1.0.docx`) | 1.0, 25 Sep 2026 |
-| R2 | Claims BRD pack: Workshop addendum, renumbering addendum and Motor and Non-Motor Claims Logging BRD (`docs/source-documents/Claims (CLM).PDF`) | BRD v1 22-Jan-2025; addenda 17-Dec-2025 and 8-Apr-2026 |
+| R2 | Claims BRD pack: Workshop addendum, renumbering addendum and Motor and Non-Motor Claims Logging BRD | BRD v1 22-Jan-2025; addenda 17-Dec-2025 and 8-Apr-2026 |
 | R3 | Test plan workbook BRD-7 (`BIBS_TestPlan_BRD-07_Claims_v1.0.xlsx`) | 1.0 |
-| R4 | Claims build design (`docs/architecture/CLAIMS_BROKING_DESIGN.md`) | proposal for review |
 | R5 | BDOI Report List as of 27-Apr-2026 (Claims reports) | 27-Apr-2026 |
 | R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |
 
@@ -85,12 +84,10 @@ The roles-and-access sheet checks each Claims action against the roles that may 
 <!-- table: widths=3.2,6.2,3.6,3.6 caption="Test levels" -->
 | Level | What is tested | Who | When |
 |---|---|---|---|
-| Unit and integration (automated) | Premium check, status matrix, phases, ages, settlement rules, permissions, uploads and reports of each FR, against a PostgreSQL database | iorta TechNXT developers | Written with the build; every change in CI (`mvn verify`, `npm run verify`) |
 | System test | Every case of the workbook, screen by screen, with the named data sets | iorta TechNXT QA | Before UAT, on the SIT environment |
 | Persona end-to-end | The eight scenarios run from start to finish by the persona that owns each step, with notifications and e-mails checked | iorta TechNXT QA with the BDOI department testers | After the system test passes |
 | User acceptance test (UAT) | The scenarios and the High-priority cases, run by BDOI testers on masked production-like data | BDOI Claims, Marketing and Remittance testers | After the entry criteria of section 3 are met |
 
-The automation reference column is blank in this version. When the module is built, the developers name the integration test that asserts each case; a case with an automation reference is still run on the screen once per cycle.
 
 ## How the cases were derived
 
@@ -113,7 +110,7 @@ The automation reference column is blank in this version. When the module is bui
 
 ## Reading the workbook
 
-The workbook has a README sheet that explains every column. Case IDs carry their condition: TC-CM-045.2-01 is the first case of condition 2 of FR-CM-045. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Defect ID.
+The workbook has a README sheet that explains every column. Case IDs carry their condition: TC-CM-045.2-01 is the first case of condition 2 of FR-CM-045. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Issue ID.
 
 # Entry and exit criteria
 
@@ -122,8 +119,8 @@ The workbook has a README sheet that explains every column. Case IDs carry their
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | The Claims module is deployed on SIT with its jobs (follow-up due, premium re-check, ageing alerts) and the feed CLAIMS_SPECIAL_REMIT; CI is green on the deployed commit; the data sets of section 4.2 are loaded; the insurer test mailboxes receive mail; the developers have added the automation references. |
-| Persona end-to-end | All High-priority system test cases are run; no open Critical defect; notifications and the e-mail relay work on SIT; the Remittance screen of BRD-2 reads the feed. |
+| System test | The Claims module is deployed on SIT with its jobs (follow-up due, premium re-check, ageing alerts) and the feed CLAIMS_SPECIAL_REMIT; the data sets of section 4.2 are loaded; the insurer test mailboxes receive mail. |
+| Persona end-to-end | All High-priority system test cases are run; no open Critical issue; notifications and the e-mail relay work on SIT; the Remittance screen of BRD-2 reads the feed. |
 | UAT | FRS BRD-7 v1.0 is signed off or its open comments are agreed; the open questions that change expected results (CLQ01, CLQ04, CLQ05, CLQ06, CLQ15) are answered or their test values agreed; the system test exit criteria are met; the UAT environment holds masked data; BDOI testers have user IDs with the roles of section 5. |
 
 ## Exit criteria
@@ -131,11 +128,11 @@ The workbook has a README sheet that explains every column. Case IDs carry their
 <!-- table: widths=2.4,11 caption="Exit criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | 100 % of cases run; 100 % of High-priority cases passed; no open Critical or High defect; open Medium and Low defects have an agreed fix date. |
+| System test | 100 % of cases run; 100 % of High-priority cases passed; no open Critical or High issue; open Medium and Low issues have an agreed fix date. |
 | Persona end-to-end | All eight scenarios passed end to end with the expected notifications and e-mails. |
-| UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High defect; open defects listed with an agreed plan in the UAT sign-off; the sign-off of section 10 is signed. |
+| UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High issue; open issues listed with an agreed plan in the UAT sign-off; the sign-off of section 9 is signed. |
 
-**Suspension.** Testing of a scenario stops when a Critical defect blocks it, when the environment is down for more than half a day, or when the test data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
+**Suspension.** Testing of a scenario stops when a Critical issue blocks it, when the environment is down for more than half a day, or when the test data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
 
 # Environments and test data
 
@@ -144,7 +141,6 @@ The workbook has a README sheet that explains every column. Case IDs carry their
 <!-- table: widths=2.6,6.4,5.4 caption="Test environments" -->
 | Environment | Use | Data |
 |---|---|---|
-| CI | Automated unit and integration tests on every change | Created by each test; PostgreSQL in a container |
 | SIT | System test and persona end-to-end runs by iorta TechNXT QA | Data sets of section 4.2 on covers booked through BRD-1; insurer test mailboxes |
 | UAT | Acceptance by BDOI testers | Masked copy of production-like data plus the data sets; no real client, claimant or third-party names, addresses or e-mail addresses |
 
@@ -152,7 +148,7 @@ Non-production data is always masked. Client, claimant and third-party names, ad
 
 ## Named data sets
 
-Claims is not built, so no seed provides the data yet. The test lead prepares each set on SIT as its source column says; the ageing sets need reported dates in the past, which the test lead sets in the test database. When the module is built, the sets become a seed data.
+The test lead prepares each set on SIT as its source column says; the ageing sets need reported dates in the past, which the test lead sets in the test database.
 
 <!-- tp:data -->
 
@@ -161,22 +157,22 @@ Claims is not built, so no seed provides the data yet. The test lead prepares ea
 <!-- table: widths=4,5.4,5 caption="Test roles" -->
 | Role | Organisation | Responsibilities |
 |---|---|---|
-| Test lead | iorta TechNXT QA | Owns this plan and the workbook; prepares environments and data; runs the daily defect triage; reports progress |
-| System testers | iorta TechNXT QA | Run the system test and the persona end-to-end scenarios; raise defects with evidence |
-| Developers | iorta TechNXT | Write and keep the automated tests green; add the automation references; fix defects |
-| BDOI department testers | BDOI Claims, Marketing, Remittance | Run the UAT scenarios of their department; confirm the expected results; raise defects |
-| BDOI process owner | BDOI Product Owner, Claims | Decides on disputed expected results and accepted defects; signs off UAT |
+| Test lead | iorta TechNXT QA | Owns this plan and the workbook; prepares environments and data; runs the daily issue triage; reports progress |
+| System testers | iorta TechNXT QA | Run the system test and the persona end-to-end scenarios; raise issues with evidence |
+| Developers | iorta TechNXT | Resolve issues; support triage |
+| BDOI department testers | BDOI Claims, Marketing, Remittance | Run the UAT scenarios of their department; confirm the expected results; raise issues |
+| BDOI process owner | BDOI Product Owner, Claims | Decides on disputed expected results and accepted issues; signs off UAT |
 | UAT coordinator | Business Project Services, BDO Unibank ESG | Plans the UAT sessions; checks traceability to the BRD |
 
 The Claims teams test recording, handling, closure and follow-up (SC-CM-02 to 06); the Unit Head the set-up and reports (SC-CM-07, 08); Marketing the loss information (FR-CM-065); Remittance the special remittance (FR-CM-046). The personas are:
 
 <!-- tp:personas -->
 
-# Defect management
+# Issue management
 
 ## Severity
 
-<!-- table: widths=2.2,8.4,5 caption="Defect severity" -->
+<!-- table: widths=2.2,8.4,5 caption="Issue severity" -->
 | Severity | Definition | Example in Claims |
 |---|---|---|
 | Critical | A main flow cannot be completed, data is lost or wrong in a way that reaches a client or insurer, or a security rule is broken | The authorization code is issued on an unpaid cover; a Marketing user maintains a claim; a loss advice goes to the wrong insurer |
@@ -186,10 +182,10 @@ The Claims teams test recording, handling, closure and follow-up (SC-CM-02 to 06
 
 ## Triage and fixing
 
-- Testers raise a defect for each failed case, with the case ID, steps, actual result, screenshot and the claim number.
-- The test lead triages new defects daily with the development lead and, during UAT, the BDOI process owner. A disputed expected result goes to the BDOI process owner; an FRS change goes to the FRS owner (section 9).
+- Testers raise an issue for each failed case, with the case ID, steps, actual result, screenshot and the claim number.
+- The test lead triages new issues daily with the development lead and, during UAT, the BDOI process owner. A disputed expected result goes to the BDOI process owner; an FRS change goes to the FRS owner, who records it in the clarifications chapter of the FRS.
 - Target fix times on the test environments: Critical within 1 working day, High within 3 working days, Medium within the cycle, Low by agreement.
-- A fixed defect is retested with its case and the cases of the same condition; the automated tests of the FR must also pass.
+- A resolved issue is retested with its case and the cases of the same condition.
 
 # Coverage summary
 
@@ -197,7 +193,7 @@ The Claims teams test recording, handling, closure and follow-up (SC-CM-02 to 06
 
 <!-- tp:counts -->
 
-Every FR has at least one positive and one negative case, and every BRD ID is covered. The builder of the workbook checks this each time the plan is built and refuses to produce a plan with a gap.
+Every FR has at least one positive and one negative case, and every BRD ID is covered. The coverage is checked each time the workbook is issued, and a plan with a gap is not issued.
 
 ## Coverage by FR
 
@@ -217,27 +213,17 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 
 <!-- tp:access -->
 
-## Automated tests
-
-<!-- tp:automation -->
-
 # Risks
 
 <!-- table: widths=5.4,2,7.2 caption="Test risks and mitigations" -->
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Claims is not built; screen names, labels and messages may change at build | High | The cases name the design's screens and the FRS texts; the test lead updates the workbook from the build before the system test |
-| Open questions change expected results (CLQ01 code, CLQ04 matrix and units, CLQ05 closing types, CLQ06 closure rights and ageing, CLQ15 Marketing rights) | High | The matrix, lists and roles are configuration; the cases use the delivered defaults and are re-run with BDOI's values |
+| Screen names, labels or messages change after BDOI's review of the FRS | High | The cases name the FRS screens and texts; the test lead updates the workbook before the system test and records the changes in the document control |
+| Open questions change expected results (CLQ01 code, CLQ04 matrix and units, CLQ05 closing types, CLQ06 closure rights and ageing, CLQ15 Marketing rights) | High | The matrix, lists and roles are configuration; the cases use the proposed defaults and are re-run with BDOI's values |
 | Ageing and follow-up cases need past dates | Medium | The test lead sets reported and status dates in the test database and runs the jobs on demand |
 | The Remittance feed and the BRD-1 endorsement events are needed by FR-CM-015, 016 and 046 | Medium | Run those cases after the BRD-2 remittance change is deployed; they are marked in their preconditions |
 | Insurer test mailboxes not reachable from SIT or UAT | Medium | Check the relay before the cycle; loss advice cases read the send log when the mailbox is down and are re-run later |
 | BDOI Claims testers from the branches are not available in the UAT window | Medium | Agree named testers and dates in the UAT plan (deliverable 30) |
-
-# FRS findings
-
-Writing the cases showed the points below, where the FRS is ambiguous, cannot be tested as written, or differs from what the platform shows today. The cases follow the proposed resolution; the FRS owner decides the correction for FRS v1.1.
-
-<!-- tp:findings -->
 
 <!-- pagebreak -->
 

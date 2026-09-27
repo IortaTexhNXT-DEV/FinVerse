@@ -65,7 +65,7 @@ signatories:
   - ["Product Owner, Marketing Business System", BDOI, "Business owner: the whole set"]
   - ["Process Owner, User Access Maintenance (Business Administration)", BDOI, "Requests, approvals, group-profile requests, bulk requests, reports and the configuration inputs"]
   - ["Head, BDOI Information Security", BDOI, "Information Security: the role matrix, the menus by persona, the separation-of-duties rules, the second approval of privileged changes, password and session rules, the audit log"]
-  - ["Head, BDOI IT", BDOI, "BDOI IT: sign-in and identity integration assumptions (EIAM on Entra ID, UIDM-ISC identity governance; integrations owned by BDOI IT, seams only in this set), System Administrator functions"]
+  - ["Head, BDOI IT", BDOI, "BDOI IT: sign-in and identity integration assumptions (EIAM on Entra ID, UIDM-ISC identity governance; integrations owned by BDOI IT), System Administrator functions"]
   - ["Program Manager, Business Project Services", BDO Unibank ESG, "Traceability to the BRD"]
   - [Project Manager, iorta TechNXT, "Delivery of the set as signed"]
 

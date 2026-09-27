@@ -357,6 +357,52 @@ public enum Permission {
   BCL_REPORT_EXPORT,
   BCL_DATA_EXTRACT,
 
+  // Data Migration (BDOI BRD-13). See docs/architecture/DATA_MIGRATION_DESIGN.md section 18.1 and
+  // V1080. Segregation of duties is enforced by the migration services on top of these grants.
+  // Migration Console, read only
+  MIG_VIEW,
+  // Data object register and decisions (gate G1)
+  MIG_OBJECT_MANAGE,
+  MIG_DECISION_APPROVE,
+  // Code maps, layouts, rules and masking rules (gate G2)
+  MIG_MAPPING_EDIT,
+  MIG_MAPPING_APPROVE,
+  // Upload extracts and run the intake checks
+  MIG_INTAKE,
+  // Resolve data-quality issues; waive rows (gate G3)
+  MIG_DQ_RESOLVE,
+  MIG_DQ_WAIVE,
+  // Client review queue
+  MIG_MATCH_DECIDE,
+  // Run validation and loads; approve a load (gate G4)
+  MIG_LOAD_RUN,
+  MIG_LOAD_APPROVE,
+  // Batch rollback
+  MIG_ROLLBACK_REQUEST,
+  MIG_ROLLBACK_APPROVE,
+  // Reconciliation sign-off and break explanations (gate G5)
+  MIG_RECON_SIGNOFF,
+  // Object acceptance (gate G6)
+  MIG_SIGNOFF,
+  // Cutover plans and tasks; go / no-go (gate G7)
+  MIG_CUTOVER_MANAGE,
+  MIG_GONOGO_DECIDE,
+  // FY2027 opening-balance true-ups (section 17.7)
+  MIG_TRUEUP_PREPARE,
+  MIG_TRUEUP_APPROVE,
+  // Approve a resubmission of corrected rejected rows (checker, section 15.1)
+  MIG_RESUBMIT_APPROVE,
+  // Legacy Inquiry and its access log (section 16)
+  LEGACY_INQUIRY_VIEW,
+  LEGACY_INQUIRY_EXPORT,
+  LEGACY_ACCESS_LOG_VIEW,
+  // Reclassification of unapplied payments to other income (section 14.4 D)
+  CASH_UPP_INCOME_REQUEST,
+  CASH_UPP_INCOME_APPROVE,
+  // DPPR and PR2307 legacy batch reversals (section 14.4 E, F)
+  LEGACY_REVERSAL_REQUEST,
+  LEGACY_REVERSAL_APPROVE,
+
   // Employee Benefits (BDOI BRD-8). See docs/architecture/EMPLOYEE_BENEFITS_DESIGN.md section 6.1
   // and V1030. Documents are further restricted by the access classes of V1031 (BRID-025).
   // EB screens, programmes, cycles and documents (BRID-023)

@@ -26,7 +26,7 @@ digraph sp_policy {
   MANUAL -> FOR_RENEWAL [label=" dispose", style=dashed, constraint=false];
   FOR_RENEWAL -> RIP [label=" expiry scan /\n Renew with BDOI"];
   RIP -> PLACED [label=" slip sent"];
-  PLACED -> BOOKED [label=" InvoiceBooked"];
+  PLACED -> BOOKED [label=" renewal booked"];
   RIP -> NOT_RENEWED [label=" declined, lost,\n expired", style=dashed];
 
   { rank=same; MANUAL; IN_REVIEW; }

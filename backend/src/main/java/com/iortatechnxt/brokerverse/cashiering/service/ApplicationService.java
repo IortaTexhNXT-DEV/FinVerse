@@ -5,12 +5,14 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.cashiering.domain.Application;
 import com.iortatechnxt.brokerverse.cashiering.domain.ApplicationRepository;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashReceiptRepository;
+import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedRepository;
 import com.iortatechnxt.brokerverse.cashiering.service.ApplicationPlanner.InvoiceBalances;
 import com.iortatechnxt.brokerverse.cashiering.service.ApplicationPlanner.Plan;
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringPosting.PostingContext;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.Money;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
+import com.iortatechnxt.brokerverse.opsledger.domain.LedgerContext;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceComponent;
@@ -51,6 +53,7 @@ public class ApplicationService {
   private final CashieringSettings settings;
   private final AuditTrailService audit;
   private final Clock clock;
+  private final UnappliedRepository unappliedItems;
 
   /**
    * Creates the service.
@@ -62,7 +65,9 @@ public class ApplicationService {
    * @param settings parameters
    * @param audit audit trail
    * @param clock clock
+   * @param unappliedItems unapplied items (ledger context of a legacy unapplied payment)
    */
+  @SuppressWarnings("java:S107") // collaborators
   public ApplicationService(
       ApplicationRepository applications,
       CashReceiptRepository receipts,
@@ -70,7 +75,9 @@ public class ApplicationService {
       CashieringPosting posting,
       CashieringSettings settings,
       AuditTrailService audit,
-      Clock clock) {
+      Clock clock,
+      UnappliedRepository unappliedItems) {
+    this.unappliedItems = unappliedItems;
     this.applications = applications;
     this.receipts = receipts;
     this.ledger = ledger;
@@ -169,11 +176,8 @@ public class ApplicationService {
         realize ? Money.round(invoice.getCommission().multiply(ratio)) : BigDecimal.ZERO;
     BigDecimal vat =
         realize ? Money.round(invoice.getVatOnCommission().multiply(ratio)) : BigDecimal.ZERO;
-    Map<String, BigDecimal> amounts = new LinkedHashMap<>();
-    amounts.put("APPLIED", plan.applied());
-    amounts.putAll(CashieringPosting.prAmounts(plan.allocation(), false));
-    amounts.put("REALIZED_COMMISSION", commission);
-    amounts.put("REALIZED_VAT", vat);
+    Map<String, BigDecimal> amounts =
+        amounts(invoice, app, plan.applied(), plan.allocation(), new Realized(commission, vat));
     String batch =
         posting.publish(
             context(invoice, valueDate, "Payment application " + app.reference()),
@@ -183,6 +187,43 @@ public class ApplicationService {
     app.posted(commission, vat, batch);
     return batch;
   }
+
+  /**
+   * The amounts of {@code OPS_PAYMENT_APPLY} (DATA_MIGRATION_DESIGN 14.4 B): the unapplied side in
+   * the context of the unapplied item (LG_APPLIED for a legacy unapplied payment), the premium
+   * receivable and the realised commission in the context of the invoice (LG_PR_*, LG_REALIZED_*
+   * for a legacy invoice).
+   */
+  private Map<String, BigDecimal> amounts(
+      OpsInvoice invoice,
+      Application app,
+      BigDecimal applied,
+      Map<LedgerComponent, BigDecimal> allocation,
+      Realized realized) {
+    LedgerContext invoiceContext = invoice.getLegacy().ledgerContext();
+    LedgerContext uppContext =
+        app.getUnappliedId() == null
+            ? LedgerContext.NEW
+            : unappliedItems
+                .findById(app.getUnappliedId())
+                .map(u -> u.getLegacy().ledgerContext())
+                .orElse(LedgerContext.NEW);
+    Map<String, BigDecimal> amounts = new LinkedHashMap<>();
+    amounts.put(uppContext.component("APPLIED"), applied);
+    CashieringPosting.prAmounts(allocation, false)
+        .forEach((k, v) -> amounts.merge(invoiceContext.component(k), v, BigDecimal::add));
+    amounts.put(invoiceContext.component("REALIZED_COMMISSION"), realized.commission());
+    amounts.put(invoiceContext.component("REALIZED_VAT"), realized.vat());
+    return amounts;
+  }
+
+  /**
+   * Commission and VAT realised on collection.
+   *
+   * @param commission commission
+   * @param vat VAT on commission
+   */
+  private record Realized(BigDecimal commission, BigDecimal vat) {}
 
   /**
    * Reverses an application: negative {@code OPS_PAYMENT_APPLY}, {@code UNAPPLIED} movement.
@@ -209,11 +250,15 @@ public class ApplicationService {
     String reason = reversal.reason();
     LocalDate today = BusinessClock.today(clock);
     Map<LedgerComponent, BigDecimal> allocation = app.allocation();
-    Map<String, BigDecimal> amounts = new LinkedHashMap<>();
-    amounts.put("APPLIED", app.getAmount().negate());
-    amounts.putAll(CashieringPosting.prAmounts(allocation, true));
-    amounts.put("REALIZED_COMMISSION", app.getRealizedCommission().negate());
-    amounts.put("REALIZED_VAT", app.getRealizedVat().negate());
+    Map<LedgerComponent, BigDecimal> negated = new EnumMap<>(LedgerComponent.class);
+    allocation.forEach((c, v) -> negated.put(c, v.negate()));
+    Map<String, BigDecimal> amounts =
+        amounts(
+            invoice,
+            app,
+            app.getAmount().negate(),
+            negated,
+            new Realized(app.getRealizedCommission().negate(), app.getRealizedVat().negate()));
     String batch =
         posting.publish(
             context(invoice, today, "Reversal of " + app.reference() + ": " + reason),

@@ -29,6 +29,12 @@ import java.util.List;
 @Table(name = "bkg_invoice")
 public class BookedInvoice extends BaseEntity {
 
+  /** Ledger context of the invoices booked in BIBS. */
+  public static final String NEW_CONTEXT = "NEW";
+
+  /** Ledger context of a migrated invoice and its endorsements (DATA_MIGRATION_DESIGN 14.4 H). */
+  public static final String LEGACY_CONTEXT = "LEGACY";
+
   @Column(name = "company_id", nullable = false, updatable = false)
   private Long companyId;
 
@@ -102,6 +108,10 @@ public class BookedInvoice extends BaseEntity {
 
   @Column(name = "booked_at")
   private Instant bookedAt;
+
+  /** NEW, or LEGACY for an endorsement of a migrated invoice (posted on the legacy accounts). */
+  @Column(name = "ledger_context", nullable = false, length = 10)
+  private String ledgerContext = NEW_CONTEXT;
 
   @Column(name = "insurer_billing_no", length = 60)
   private String insurerBillingNo;
@@ -180,6 +190,23 @@ public class BookedInvoice extends BaseEntity {
     this.bookedBy = user;
     this.bookedAt = when;
     this.status = InvoiceStatus.BOOKED;
+  }
+
+  /**
+   * Marks an endorsement of a migrated invoice: it posts on the legacy control accounts and its
+   * operations invoice joins the family of the legacy invoice.
+   */
+  public void markLegacy() {
+    this.ledgerContext = LEGACY_CONTEXT;
+  }
+
+  /**
+   * Whether the invoice belongs to the legacy context.
+   *
+   * @return true for a migrated invoice or an endorsement of one
+   */
+  public boolean isLegacy() {
+    return LEGACY_CONTEXT.equals(ledgerContext);
   }
 
   /**

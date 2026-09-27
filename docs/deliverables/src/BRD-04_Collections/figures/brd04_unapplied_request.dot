@@ -7,7 +7,7 @@ digraph clx_upp {
 
   disp     [label="Collector disposition\nwith a Cashiering action", fillcolor="@WHITE"];
   SENT     [label="SENT\nqueued as CRQ-yyyy-n"];
-  DEFERRED [label="DEFERRED\nhand-off (no adapter)", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  DEFERRED [label="DEFERRED\nhand-off to the team", fillcolor="@DIRTY_WHITE", color="@MUTED"];
   ACCEPTED [label="ACCEPTED\ncashier assigns\nOPS_DISPOSITION"];
   APPLIED  [label="APPLIED\napplied, refunded,\nreclassified, transferred", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
   REJECTED [label="REJECTED\nchecks, cashier\nor withdrawn", fillcolor="@AMBER_BG"];

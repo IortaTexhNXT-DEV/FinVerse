@@ -20,6 +20,11 @@ const BUSINESS_TYPE_OPTIONS = [
   { value: 'RENEWAL', label: 'Renewal' },
 ];
 
+const ORIGIN_OPTIONS = [
+  { value: 'BIBS', label: 'BIBS' },
+  { value: 'MIGRATED', label: 'Migrated' },
+];
+
 /** The advanced filters of the account work list (BRNB.050 multi-criteria search). */
 function FilterPanel({
   initial,
@@ -72,6 +77,13 @@ function FilterPanel({
           value={panel.businessType}
           options={BUSINESS_TYPE_OPTIONS}
           onChange={(businessType) => set({ businessType })}
+        />
+        <SelectInput
+          label="Origin"
+          blank="All origins"
+          value={panel.origin}
+          options={ORIGIN_OPTIONS}
+          onChange={(origin) => set({ origin })}
         />
         <TextInput
           label="Starts On or After"

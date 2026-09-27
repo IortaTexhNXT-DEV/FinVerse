@@ -38,7 +38,7 @@ distribution:
   - {name: "Head, Operations; Operations - Financial Transactions", role: Business tester, organisation: BDOI, purpose: "Legacy invoices, UPP, remittance, endorsements"}
   - {name: "Product Owner, MBS; Marketing", role: Business tester, organisation: BDOI, purpose: "Client master, reference data, renewal transition"}
   - {name: "Audit / Compliance", role: Business tester, organisation: BDOI, purpose: "Legacy Inquiry and access log"}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "System test, trial migrations, defect fixing"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "System test, trial migrations, issue resolution"}
 ---
 
 # Introduction
@@ -49,11 +49,7 @@ This document summarises the test plan for BRD-13 Data Migration in BIBS (BDOI B
 
 Every case traces to a functional requirement (FR) of FRS BRD-13 v1.2 and to the BRD requirement IDs (BRID 1.1a to 12.1) that the FR meets.
 
-Data Migration is designed and not yet built. The cases are written from the FRS and the build design, so:
-
-- expected results quote the message text of the FRS without a message code; the codes are added in the version issued after the module is built;
-- the automation reference column is blank; the automated tests written during the build are referenced in that version;
-- screen paths and button labels are those of the build design and are checked against the screens before the system test starts.
+The cases are written from the FRS: the expected results quote the message texts of the FRS, and the screen paths and button labels are those of the FRS. They are checked against the screens before the system test starts.
 
 ## Scope
 
@@ -78,7 +74,7 @@ This plan tests the **functions** of the migration and of legacy item processing
 
 - Loaders owned by other modules and decided under DMQ30: open claims (Claims), EB programmes, submitted-policy masterlists; they are tested in those modules' plans when BDOI brings them into scope.
 - Performance at full volume (1,000,000 client rows, 500,000 open items): tested in the dress rehearsal and the performance plan (deliverable 28).
-- The SFTP drop and the legacy read-only links (parked seams); the cases use console uploads.
+- The SFTP drop and the legacy read-only links (on hold); the cases use console uploads.
 
 ## References
 
@@ -86,8 +82,7 @@ This plan tests the **functions** of the migration and of legacy item processing
 | Ref. | Document | Version |
 |---|---|---|
 | R1 | Functional Requirements Specification BRD-13 Data Migration (`BIBS_FRS_BRD-13_Data_Migration_v1.2.docx`) | 1.2, 26 Sep 2026 |
-| R2 | BDOI Data Migration BRD (`docs/source-documents/BRD - Data Migration - draft V0.01.pdf`) | draft v0.01, 14-Apr-2026 |
-| R3 | Data Migration build design (`docs/architecture/DATA_MIGRATION_DESIGN.md`) | current |
+| R2 | BDOI Data Migration BRD | draft v0.01, 14-Apr-2026 |
 | R4 | Data Migration Strategy and Approach; Reconciliation Approach and Sign-off; Cutover Runbook | 1.2 |
 | R5 | BDOI Data Requirements Workbook and extract templates | 1.2 |
 | R6 | BRD discrepancy and clarification register | 1.2 |
@@ -99,8 +94,7 @@ This plan tests the **functions** of the migration and of legacy item processing
 <!-- table: widths=3.2,6.2,3.6,3.6 caption="Test levels" -->
 | Level | What is tested | Who | When |
 |---|---|---|---|
-| Unit and integration (automated) | Intake checks, masking, rule engine, matching, loaders through the services, reconciliation, gates, legacy postings per module, against a PostgreSQL database | iorta TechNXT developers | During the build waves DM0 to DM3; in CI on every change |
-| System test | Every case of the workbook, screen by screen, with the test extracts | iorta TechNXT QA | After each build wave is deployed on SIT (DM0 and DM1-C by 9 Apr 2027, the rest by 18 Jun 2027), before the trial migration that needs it |
+| System test | Every case of the workbook, screen by screen, with the test extracts | iorta TechNXT QA | When the migration functions are on SIT (the first set by 9 Apr 2027, the rest by 18 Jun 2027), before the trial migration that needs them |
 | Persona end-to-end | The nine scenarios by the persona that owns each step | iorta TechNXT QA with BDOI testers | Before Trial migration 2 |
 | Trial migrations and dress rehearsal | Full cutover with masked full extracts, reference data and clients first; reconciliation and sign-off per object | Migration team with BDOI owners | Trial migration 1 19-30 Apr 2027, Trial migration 2 5-16 Jul 2027 (SIT); Trial migration 3 2-13 Aug 2027, Trial migration 4 4-15 Oct 2027 (UAT); dress rehearsal 15-26 Nov 2027 |
 | User acceptance test (UAT) | Scenarios SC-DM-05 to SC-DM-09 and the High-priority cases on the Trial migration 3 and Trial migration 4 data | BDOI testers | UAT migration window (August-October 2027) |
@@ -130,8 +124,8 @@ This plan tests the **functions** of the migration and of legacy item processing
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | The build wave under test is deployed on SIT with its roles, parameters, lists and seed data (V1980-V1982); legacy control accounts, Migration Clearing and the LG_ rule lines are on the test chart; the test extracts of section 4 are prepared in the workbook layouts; CI is green. |
-| Persona end-to-end | All High-priority system test cases run; no open Critical defect; Renewal (for FR-DM-122) and the Operations modules deployed on SIT. |
+| System test | The migration functions under test are on SIT with their roles, parameters, lists and seed data; legacy control accounts, Migration Clearing and the LG_ rule lines are on the test chart; the test extracts of section 4 are prepared in the workbook layouts. |
+| Persona end-to-end | All High-priority system test cases run; no open Critical issue; Renewal (for FR-DM-122) and the Operations modules deployed on SIT. |
 | UAT | FRS BRD-13 v1.2 signed or its comments agreed; the M1 decisions of the Strategy applied; Trial migration 2 exit criteria met; UAT holds the Trial migration 3 data; BDOI testers have their users. |
 
 ## Exit criteria
@@ -139,11 +133,11 @@ This plan tests the **functions** of the migration and of legacy item processing
 <!-- table: widths=2.4,11 caption="Exit criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | 100 % of cases run; 100 % of High-priority cases passed; no open Critical or High defect. |
+| System test | 100 % of cases run; 100 % of High-priority cases passed; no open Critical or High issue. |
 | Persona end-to-end | All nine scenarios passed end to end with the expected postings, reconciliation results and notifications. |
-| UAT | All scenarios and High-priority cases passed or accepted by the process owner; no open Critical or High defect; the sign-off of section 10 is signed. |
+| UAT | All scenarios and High-priority cases passed or accepted by the process owner; no open Critical or High issue; the sign-off of section 9 is signed. |
 
-**Suspension.** Testing stops when a Critical defect blocks a scenario, when a test extract leaves the environment unusable (staging or ledger corrupted), or when unmasked data is found outside production. It resumes after the fix or after the environment is restored from its snapshot.
+**Suspension.** Testing stops when a Critical issue blocks a scenario, when a test extract leaves the environment unusable (staging or ledger corrupted), or when unmasked data is found outside production. It resumes after the fix or after the environment is restored from its snapshot.
 
 # Environments and test data
 
@@ -152,7 +146,6 @@ This plan tests the **functions** of the migration and of legacy item processing
 <!-- table: widths=2.6,6.4,5.4 caption="Test environments" -->
 | Environment | Use | Data |
 |---|---|---|
-| CI | Automated tests on every change | Created by each test |
 | SIT | System test, persona runs, Trial migrations 1 and 2 | Test extracts of section 4.2; masked full extracts for the trial migrations |
 | UAT | Trial migrations 3 and 4 and UAT | Masked full extracts |
 | Production-sized | Dress rehearsal | Masked full-volume extracts |
@@ -168,19 +161,19 @@ Non-production data is always masked at intake (names, addresses, TIN, ID, accou
 <!-- table: widths=4,5.4,5 caption="Test roles" -->
 | Role | Organisation | Responsibilities |
 |---|---|---|
-| Test lead | iorta TechNXT QA | Owns this plan and the workbook; prepares the test extracts with the stewards; runs the defect triage |
+| Test lead | iorta TechNXT QA | Owns this plan and the workbook; prepares the test extracts with the stewards; runs the issue triage |
 | System testers | iorta TechNXT QA | Run the system test and persona scenarios |
-| Developers | iorta TechNXT | Automated tests; defect fixes |
+| Developers | iorta TechNXT | Resolve issues; support triage |
 | BDOI testers | Data Migration Lead, stewards, owners, Comptrollership, Cashiering, Remittance, Adjustment, Marketing, Compliance | Run the UAT scenarios of their role; confirm expected results and figures |
-| BDOI process owner | Program Manager with the Head of Comptrollership | Decides disputed expected results and accepted defects; signs off UAT |
+| BDOI process owner | Program Manager with the Head of Comptrollership | Decides disputed expected results and accepted issues; signs off UAT |
 
 The personas are:
 
 <!-- tp:personas -->
 
-# Defect management
+# Issue management
 
-<!-- table: widths=2.2,8.4,5 caption="Defect severity" -->
+<!-- table: widths=2.2,8.4,5 caption="Issue severity" -->
 | Severity | Definition | Example in Data Migration |
 |---|---|---|
 | Critical | A load, posting or reconciliation gives a wrong financial result, data is lost, or a control (gate, maker-checker, masking) is broken | Migration Clearing not zero for a correct extract; unmasked data in SIT; operator signs own reconciliation |
@@ -188,7 +181,7 @@ The personas are:
 | Medium | Works with a workaround, or a message, label or report column is wrong | A report column missing; wrong break reason list |
 | Low | Cosmetic | Alignment, spelling |
 
-Defects are triaged daily; Critical within 1 working day, High within 3. A fixed defect is retested with its case and the cases of the same condition.
+Issues are triaged daily; Critical within 1 working day, High within 3. A resolved issue is retested with its case and the cases of the same condition.
 
 # Coverage summary
 
@@ -212,28 +205,18 @@ Defects are triaged daily; Critical within 1 working day, High within 3. A fixed
 
 <!-- tp:access -->
 
-## Automated tests referenced
-
-<!-- tp:automation -->
-
 # Risks
 
 <!-- table: widths=5.4,2,7.2 caption="Test risks and mitigations" -->
 | Risk | Impact | Mitigation |
 |---|---|---|
 | Open decisions change expected results (DMQ09 headers, DMQ12 components, DMQ14 UPP receipt, DMQ18 accounts, DMQ19 / DMQ20 reversal entries; DMQ39 until Comptrollership confirms option A) | High | Values are configuration; affected cases are re-run after the answer; the next FRS issue updates the texts |
-| Renewal FRS does not yet describe the go-live extraction and the check PACKAGE_REMAP (findings) | Medium | Cases check the worklist and the Exception bucket; messages added when the Renewal FRS is issued |
+| Renewal FRS does not yet describe the go-live extraction and the check PACKAGE_REMAP | Medium | Cases check the worklist and the Exception bucket; messages added when the Renewal FRS is issued |
 | True-up cases need a legacy GL extract with adjustment journals and a journal listing | Medium | TD-DM-11 prepared with Comptrollership; a true-up is rehearsed in Trial migration 4 |
 | Test extracts do not reflect real legacy data quality | High | Trial migrations use masked full extracts; profiling after Trial migration 1 adds cases for the issues found |
-| Screens and messages differ from the design when built | Medium | Compare before the system test; workbook re-issued with the built texts and codes |
-| Renewal not deployed for FR-DM-122, 124 and 125 | Medium | Test the port with the stub; re-run when Renewal is deployed |
+| Screen names, labels or messages change after BDOI's review of the FRS | Medium | Compare before the system test; re-issue the workbook with the confirmed texts |
+| Renewal not yet on SIT for FR-DM-122, 124 and 125 | Medium | Test the hand-over with a prepared file; re-run when Renewal is on SIT |
 | Real personal data reaches a test environment | High | Masking at intake; test lead checks staged rows after each upload |
-
-# FRS findings
-
-The seven findings of version 1.0 are resolved in FRS BRD-13 v1.1. The two findings of version 1.1 are closed by the BDOI answers: the STATUS:RENEWAL map of carried candidates is no longer needed (no candidate is carried, DMQ37), and the Renewal check PACKAGE_REMAP is named in FRS BRD-13 v1.2 (DMQ36). The findings below were raised while writing the cases of version 1.2; both are for the Renewal FRS.
-
-<!-- tp:findings -->
 
 <!-- pagebreak -->
 

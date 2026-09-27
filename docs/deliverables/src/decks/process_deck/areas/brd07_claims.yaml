@@ -7,8 +7,8 @@ num: 7
 title: Claims
 brd: BRD-7
 scope: 'Claims logging and monitoring, from notice of loss to closure and loss analytics'
-status: DESIGNED
-status_text: Designed, not yet built; FRS v1.0 issued for review
+status: FRS ISSUED
+status_text: FRS v1.0 issued for review
 department: Claims and Risk Management
 roles:
   - Claims Officer / Claims Assistant (Motor and Non-Motor teams)
@@ -31,7 +31,7 @@ notes:
     BDOI is a broker: the insurer accepts, evaluates and pays a claim; BDOI files and follows the claim for the client.
     The scope is claims logging and monitoring. Motor and Non-Motor claims use the same record and statuses; they
     differ in the notice document (PLA or CRF) and the settlement path (LOA or cash offer, adjuster, signed release).
-    Claims is designed; Renewal reads its loss experience through the Claims query service (decision D4).
+    Renewal reads its loss experience through the Claims query service (decision D4).
   pains: The seven points are the current-process rows of FRS BRD-7 section 2.1, from the BRD (p.23-27).
   after: 'The usage table gives volumes and response times (p.32-41); no claim turnaround target is given.'
   gaps: 'The Claims Authorization Code (DCR-085) decides how unpaid premium stops a claim.'

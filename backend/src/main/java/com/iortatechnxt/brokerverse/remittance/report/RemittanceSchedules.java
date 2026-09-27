@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
+import com.iortatechnxt.brokerverse.report.core.ReportOrigin;
 import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.TabularReportBuilder;
@@ -18,7 +19,8 @@ import org.springframework.stereotype.Component;
  * The remittance schedules of Annex III (RMTID.011/039): Normal (#3), Special (#4) and With
  * Incentives (#7), one line per account of the batches extracted in the period (or of one batch),
  * grouped by batch. The Mall Assurance columns of the Normal schedule and the incentive expiry date
- * wait for their definitions (OQ42, OQ23).
+ * wait for their definitions (OQ42, OQ23). The Origin filter keeps the accounts of migrated or of
+ * system invoices.
  */
 @SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // holder of the reports
 public final class RemittanceSchedules {
@@ -31,7 +33,9 @@ public final class RemittanceSchedules {
           + " l.commission, l.commission_vat, l.wtax, l.dtip, l.net_due, l.basic_premium,"
           + " l.incentive + l.incentive_vat as incentive,"
           + " l.net_due - l.incentive - l.incentive_vat as net_after_incentive,"
-          + " l.insurer_or_date, l.insurer_or_no, l.insurer_or_amount"
+          + " l.insurer_or_date, l.insurer_or_no, l.insurer_or_amount,"
+          + " coalesce((select i.origin from ops_invoice i where i.invoice_no = l.invoice_no"
+          + " limit 1), 'BIBS') as origin"
           + " from rem_batch_line l join rem_batch b on b.id = l.batch_id"
           + " where b.company_id = :companyId and b.remittance_type in (:types)"
           + " and cast(b.created_at at time zone '"
@@ -39,6 +43,8 @@ public final class RemittanceSchedules {
           + "' as date) between :from and :to"
           + " and (cast(:insurer as varchar) is null or b.insurer_code = :insurer)"
           + " and (cast(:batchNo as varchar) is null or b.batch_no = :batchNo)"
+          + " and (cast(:origin as varchar) is null or exists (select 1 from ops_invoice i"
+          + " where i.invoice_no = l.invoice_no and i.origin = :origin))"
           + " and not l.excluded order by b.id, l.id";
 
   private RemittanceSchedules() {}
@@ -49,7 +55,8 @@ public final class RemittanceSchedules {
         title,
         description,
         true,
-        ParameterSpec.optional(BATCH, "Batch No.", ParameterType.TEXT));
+        ParameterSpec.optional(BATCH, "Batch No.", ParameterType.TEXT),
+        ReportOrigin.parameter());
   }
 
   private static ReportResult schedule(
@@ -67,6 +74,7 @@ public final class RemittanceSchedules {
                 ReportColumn.text("assured_name", "Name of Assured"),
                 ReportColumn.text("risk_code", "Risk Code"),
                 ReportColumn.text("record_status", "Record Status"),
+                ReportColumn.text("origin", "Origin"),
                 ReportColumn.date("last_paid_on", "Date Last Paid"),
                 ReportColumn.date("inception_date", "Date Inception"),
                 ReportColumn.date("booking_date", "Date Booked"),
@@ -120,7 +128,7 @@ public final class RemittanceSchedules {
 
     @Override
     public ReportResult generate(ReportParameters p) {
-      return RemittanceSchedules.schedule(sql, p, List.of("NORMAL_PHP", "NORMAL_USD"), false);
+      return schedule(sql, p, List.of("NORMAL_PHP", "NORMAL_USD"), false);
     }
   }
 
@@ -149,7 +157,7 @@ public final class RemittanceSchedules {
 
     @Override
     public ReportResult generate(ReportParameters p) {
-      return RemittanceSchedules.schedule(sql, p, List.of("SPECIAL"), false);
+      return schedule(sql, p, List.of("SPECIAL"), false);
     }
   }
 
@@ -178,7 +186,7 @@ public final class RemittanceSchedules {
 
     @Override
     public ReportResult generate(ReportParameters p) {
-      return RemittanceSchedules.schedule(sql, p, List.of("WITH_INCENTIVES"), true);
+      return schedule(sql, p, List.of("WITH_INCENTIVES"), true);
     }
   }
 }

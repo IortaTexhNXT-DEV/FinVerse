@@ -190,7 +190,14 @@ public class InvoiceBuilder {
     }
   }
 
-  private InvoiceFacts facts(Account account, String costCenterOverride) {
+  /**
+   * The invoice facts of an account (client, insurer, product, sales stamp and cost center).
+   *
+   * @param account account
+   * @param costCenterOverride cost center chosen, null for the account's
+   * @return facts
+   */
+  InvoiceFacts facts(Account account, String costCenterOverride) {
     return new InvoiceFacts(
         account.getClientId(),
         account.getClientCode(),

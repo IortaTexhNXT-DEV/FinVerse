@@ -175,7 +175,7 @@ public class DispositionExecutor {
             context(item, "Refund reversed"),
             CashieringPosting.UNAPPLIED_REFUND,
             ref,
-            Map.of(CashieringPosting.AMOUNT, d.getAmount().negate()));
+            Map.of(legacy(item, CashieringPosting.AMOUNT), d.getAmount().negate()));
         item.restore(d.getAmount());
       }
       case RECLASS, TRANSFER -> {
@@ -183,8 +183,12 @@ public class DispositionExecutor {
             context(item, "Reclass reversed"),
             CashieringPosting.UNAPPLIED_RECLASS,
             ref,
-            Map.of(RELEASED, d.getAmount(), ASSIGNED, d.getAmount()),
-            Map.of(RELEASED, nz(item.getClientCode()), ASSIGNED, nz(d.getPreviousClientCode())));
+            Map.of(legacy(item, RELEASED), d.getAmount(), legacy(item, ASSIGNED), d.getAmount()),
+            Map.of(
+                legacy(item, RELEASED),
+                nz(item.getClientCode()),
+                legacy(item, ASSIGNED),
+                nz(d.getPreviousClientCode())));
         item.reassign(d.getPreviousClientCode(), d.getPreviousUnit());
       }
       default -> item.restore(d.getAmount());
@@ -220,7 +224,7 @@ public class DispositionExecutor {
             context(item, "Refund of unapplied payment"),
             CashieringPosting.UNAPPLIED_REFUND,
             ref,
-            Map.of(CashieringPosting.AMOUNT, d.getAmount()));
+            Map.of(legacy(item, CashieringPosting.AMOUNT), d.getAmount()));
     String payee = d.getPayeeName() != null ? d.getPayeeName() : item.getPayorName();
     DisbursementTicket ticket =
         disbursement.send(
@@ -248,10 +252,20 @@ public class DispositionExecutor {
             context(item, d.getDispositionType() + " of unapplied payment"),
             CashieringPosting.UNAPPLIED_RECLASS,
             ref,
-            Map.of(RELEASED, d.getAmount(), ASSIGNED, d.getAmount()),
-            Map.of(RELEASED, nz(previousClient), ASSIGNED, nz(newClient)));
+            Map.of(legacy(item, RELEASED), d.getAmount(), legacy(item, ASSIGNED), d.getAmount()),
+            Map.of(
+                legacy(item, RELEASED), nz(previousClient), legacy(item, ASSIGNED), nz(newClient)));
     item.reassign(d.getTargetClientCode(), d.getTargetUnit());
     return new Execution(null, null, batch, previousClient, previousUnit);
+  }
+
+  /**
+   * The event component in the ledger context of the item: an unapplied payment carried from legacy
+   * posts on the legacy unapplied collections account (LG_ components, DATA_MIGRATION_DESIGN 14.4
+   * C).
+   */
+  private static String legacy(Unapplied item, String component) {
+    return item.getLegacy().ledgerContext().component(component);
   }
 
   private void requireInvoice(Unapplied item, String invoiceNo) {

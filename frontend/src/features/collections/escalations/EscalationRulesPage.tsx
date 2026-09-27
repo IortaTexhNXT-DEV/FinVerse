@@ -19,6 +19,7 @@ import { escalationsApi } from './api';
 import { RuleDialog } from './EscalationDialogs';
 import { describeRule } from './labels';
 import { LovLabel } from '@/components/broking/LovLabel';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const MATCH_COLUMNS: Column<RuleMatch>[] = [
   { key: 'inv', header: 'Invoice No.', render: (m) => <strong>{m.invoiceNo}</strong> },
@@ -141,22 +142,31 @@ export default function EscalationRulesPage() {
           {can('MASTER_AUTHORIZE') &&
             r.recordStatus === 'PENDING_AUTHORIZATION' &&
             r.maker !== user?.username && (
-              <Button
+              <ConfirmButton
                 size="sm"
                 busy={decide.isPending}
-                onClick={() => decide.mutate({ rule: r, authorize: true })}
+                confirm={{
+                  title: 'Authorize Escalation Rule',
+                  effect: 'The rule takes effect for new escalations.',
+                }}
+                onConfirm={() => decide.mutateAsync({ rule: r, authorize: true })}
               >
                 Authorize
-              </Button>
+              </ConfirmButton>
             )}
           {can('CLX_SETUP') && r.recordStatus === 'ACTIVE' && (
-            <Button
+            <ConfirmButton
               size="sm"
               variant="danger"
-              onClick={() => decide.mutate({ rule: r, authorize: false })}
+              confirm={{
+                title: 'Deactivate Escalation Rule',
+                effect: 'The rule no longer applies to new escalations.',
+                destructive: true,
+              }}
+              onConfirm={() => decide.mutateAsync({ rule: r, authorize: false })}
             >
               Deactivate
-            </Button>
+            </ConfirmButton>
           )}
         </span>
       ),

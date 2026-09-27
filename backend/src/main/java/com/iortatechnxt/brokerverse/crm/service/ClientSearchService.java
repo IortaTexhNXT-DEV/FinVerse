@@ -66,6 +66,9 @@ public class ClientSearchService {
       equalIfPresent(p, cb, root, "marketSegment", blankToNull(s.marketSegment()));
       equalIfPresent(p, cb, root, "bankClient", s.bankClient());
       equalIfPresent(p, cb, root, "clientType", s.clientType());
+      if (s.origin() != null) {
+        p.add(cb.equal(root.get("recordOrigin").get("origin"), s.origin()));
+      }
       if (s.kycDue()) {
         p.add(
             cb.or(

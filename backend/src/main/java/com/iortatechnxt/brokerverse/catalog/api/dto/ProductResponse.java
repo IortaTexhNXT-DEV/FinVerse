@@ -1,11 +1,13 @@
 package com.iortatechnxt.brokerverse.catalog.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.iortatechnxt.brokerverse.catalog.domain.PaymentGate;
 import com.iortatechnxt.brokerverse.catalog.domain.ProductLifecycle;
 import com.iortatechnxt.brokerverse.catalog.domain.ProductVersionStatus;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.catalog.domain.TsuInvolvement;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQueries.VersionFacts;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -41,6 +43,7 @@ import java.util.List;
  * @param recordStatus maker-checker status
  * @param maker last maintainer
  * @param authorizedBy checker
+ * @param origin BIBS or MIGRATED with the legacy facts (unwrapped; LEGACY badge)
  */
 public record ProductResponse(
     Long id,
@@ -69,7 +72,8 @@ public record ProductResponse(
     LocalDate packageEndDate,
     RecordStatus recordStatus,
     String maker,
-    String authorizedBy) {
+    String authorizedBy,
+    @JsonUnwrapped RecordOrigin origin) {
 
   /**
    * Maps an entity.
@@ -116,6 +120,7 @@ public record ProductResponse(
         v.currentPackageEndDate(),
         e.getRecordStatus(),
         e.getMaker(),
-        e.getAuthorizedBy());
+        e.getAuthorizedBy(),
+        e.getRecordOrigin());
   }
 }

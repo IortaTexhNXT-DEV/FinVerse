@@ -9,8 +9,11 @@ import com.iortatechnxt.brokerverse.booking.domain.PremiumComponent;
 import com.iortatechnxt.brokerverse.booking.service.BookingEvents;
 import com.iortatechnxt.brokerverse.booking.service.BookingQueryService;
 import com.iortatechnxt.brokerverse.booking.service.InvoiceBooked;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.opsledger.domain.FeedSource;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
+import com.iortatechnxt.brokerverse.opsledger.domain.LedgerContext;
+import com.iortatechnxt.brokerverse.opsledger.domain.LegacyInvoiceRef;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceAdjustmentTotal;
@@ -96,12 +99,13 @@ public class InvoiceLedgerWriter {
       return Optional.empty();
     }
     BookedInvoice booked = bookings.byNo(event.invoiceNo());
-    OpsInvoice invoice =
-        invoices.save(
-            OpsInvoice.of(
-                data(event, booked, rootOf(event.invoiceNo(), booked.getParentInvoiceNo())),
-                shares(event, booked),
-                source));
+    OpsInvoice created =
+        OpsInvoice.of(
+            data(event, booked, rootOf(event.invoiceNo(), booked.getParentInvoiceNo())),
+            shares(event, booked),
+            source);
+    inheritContext(created);
+    OpsInvoice invoice = invoices.save(created);
     ledger.record(
         invoice,
         new MovementRequest(
@@ -147,6 +151,23 @@ public class InvoiceLedgerWriter {
         .findByInvoiceNo(parentInvoiceNo)
         .map(OpsInvoice::getRootInvoiceNo)
         .orElse(parentInvoiceNo);
+  }
+
+  /**
+   * An invoice of a legacy family (endorsement of a legacy invoice) posts to the legacy control
+   * accounts: it takes the LEGACY context of its root (DATA_MIGRATION_DESIGN 14.4 H).
+   */
+  private void inheritContext(OpsInvoice invoice) {
+    if (invoice.getRootInvoiceNo().equals(invoice.getInvoiceNo())) {
+      return;
+    }
+    invoices
+        .findByInvoiceNo(invoice.getRootInvoiceNo())
+        .filter(root -> root.getLegacy().isLegacy())
+        .ifPresent(
+            root ->
+                invoice.markLegacy(
+                    RecordOrigin.BIBS, new LegacyInvoiceRef(LedgerContext.LEGACY, null)));
   }
 
   private static OpsInvoiceData data(InvoiceBooked e, BookedInvoice b, String root) {

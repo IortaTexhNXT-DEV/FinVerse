@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.remittance.service;
 
 import com.iortatechnxt.brokerverse.accounting.service.AccountingEventPublisher;
 import com.iortatechnxt.brokerverse.accounting.service.BusinessEvent;
+import com.iortatechnxt.brokerverse.opsledger.domain.LedgerContext;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.BookRates;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceAmounts;
@@ -87,10 +88,25 @@ public class RemittancePostings {
    * @return amounts by component
    */
   public static Map<String, BigDecimal> lineAmounts(RemittanceAmounts a, int sign) {
+    return lineAmounts(a, sign, LedgerContext.NEW);
+  }
+
+  /**
+   * Amounts of the remittance event of a line in the ledger context of its invoice: a legacy
+   * invoice settles the legacy due to insurer and commission receivable (LG_DTIP,
+   * LG_COMMISSION_RECEIVABLE; DATA_MIGRATION_DESIGN 14.4 G).
+   *
+   * @param a line amounts
+   * @param sign 1 to post, -1 to reverse
+   * @param context ledger context of the invoice
+   * @return amounts by component
+   */
+  public static Map<String, BigDecimal> lineAmounts(
+      RemittanceAmounts a, int sign, LedgerContext context) {
     Map<String, BigDecimal> amounts = new LinkedHashMap<>();
-    amounts.put("DTIP", signed(a.dtip(), sign));
+    amounts.put(context.component("DTIP"), signed(a.dtip(), sign));
     amounts.put("CWT", signed(a.wtax(), sign));
-    amounts.put("COMMISSION_RECEIVABLE", signed(a.commissionReceivable(), sign));
+    amounts.put(context.component("COMMISSION_RECEIVABLE"), signed(a.commissionReceivable(), sign));
     amounts.put(DUE_FOR_DISBURSEMENT, signed(a.netDue(), sign));
     return amounts;
   }

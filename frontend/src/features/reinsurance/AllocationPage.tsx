@@ -18,6 +18,7 @@ import { formatAmount, formatDate, humanize, today } from '@/utils/format';
 import { PolicyCessionsCard } from './PolicyCessionsCard';
 import { previewTotals } from './allocation';
 import { Notice } from '@/components/ui/Notice';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 /** RI allocation run (preview, then post) and the per-policy cession view. */
 export default function AllocationPage() {
@@ -68,14 +69,18 @@ export default function AllocationPage() {
             Preview
           </Button>
           {can('REINSURANCE_MAINTAIN') && (
-            <Button
+            <ConfirmButton
               variant="accent"
               icon={<Play size={16} />}
               busy={post.isPending}
-              onClick={() => post.mutate()}
+              confirm={{
+                title: 'Post Allocation',
+                effect: 'The reinsurance allocation is posted to the general ledger.',
+              }}
+              onConfirm={() => post.mutateAsync()}
             >
               Post Allocation
-            </Button>
+            </ConfirmButton>
           )}
         </div>
         {result !== null && (

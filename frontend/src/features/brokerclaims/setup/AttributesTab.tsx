@@ -11,6 +11,7 @@ import type { ValueAttributes } from './api';
 import { SettlementAttributesDialog, StatusAttributesDialog } from './AttributeDialogs';
 import { describeSettlement, describeStatus } from './setupLogic';
 import { displayNameOf } from '@/api/users';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 /**
  * Status or settlement type attributes on Claims Setup (FR-CM-040/043): each value with its
@@ -37,11 +38,12 @@ export function AttributesTab({ list }: Readonly<{ list: string }>) {
     onSuccess: () => done('Attributes submitted for authorization'),
   });
   const decide = useMutation({
-    mutationFn: ({ code, approve }: { code: string; approve: boolean }) =>
+    mutationFn: ({ code, approve, reason }: { code: string; approve: boolean; reason?: string }) =>
       approve
         ? claimsSetupApi.authorizeAttributes(list, code)
-        : claimsSetupApi.rejectAttributes(list, code),
-    onSuccess: (_, v) => done(v.approve ? 'Attributes authorized' : 'Proposal withdrawn'),
+        : claimsSetupApi.rejectAttributes(list, code, reason),
+    onSuccess: (_, v) =>
+      done(v.approve ? 'Attributes authorized' : 'Proposal withdrawn or rejected'),
   });
   const mine = (v: ValueAttributes) => v.pendingBy?.toLowerCase() === user?.username.toLowerCase();
   return (
@@ -83,22 +85,45 @@ export function AttributesTab({ list }: Readonly<{ list: string }>) {
                   Edit
                 </Button>
                 {v.pendingBy !== undefined && !mine(v) && (
-                  <Button
+                  <ConfirmButton
                     size="sm"
                     variant="ghost"
-                    onClick={() => decide.mutate({ code: v.code, approve: true })}
+                    confirm={{
+                      title: 'Authorize Attributes',
+                      record: v.label,
+                      effect: 'The attribute change takes effect.',
+                    }}
+                    onConfirm={() => decide.mutateAsync({ code: v.code, approve: true })}
                   >
                     Authorize
-                  </Button>
+                  </ConfirmButton>
                 )}
                 {v.pendingBy !== undefined && (
-                  <Button
+                  <ConfirmButton
                     size="sm"
                     variant="ghost"
-                    onClick={() => decide.mutate({ code: v.code, approve: false })}
+                    confirm={
+                      mine(v)
+                        ? {
+                            title: 'Withdraw Attribute Change',
+                            record: v.label,
+                            effect:
+                              'Your pending change is withdrawn; the current attributes stay.',
+                          }
+                        : {
+                            title: 'Reject Attribute Change',
+                            record: v.label,
+                            effect: 'The pending change is rejected; the current attributes stay.',
+                            reason: 'required',
+                            destructive: true,
+                          }
+                    }
+                    onConfirm={(reason) =>
+                      decide.mutateAsync({ code: v.code, approve: false, reason })
+                    }
                   >
                     {mine(v) ? 'Withdraw' : 'Reject'}
-                  </Button>
+                  </ConfirmButton>
                 )}
               </span>
             ),

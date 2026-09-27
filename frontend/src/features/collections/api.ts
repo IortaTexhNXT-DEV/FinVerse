@@ -1,11 +1,11 @@
 import { api } from '@/api/client';
-import type { PageResponse } from '@/api/types';
+import type { RecordOriginFields, PageResponse } from '@/api/types';
 
 /** Collections core API client (BRCLXN.001-029, 043-057): /api/v1/collections. */
 
 export type ItemStatus = 'OPEN' | 'COMPLETED' | 'EXCLUDED_CANCELLED' | 'CREDIT';
 
-export interface CollectionItem {
+export interface CollectionItem extends RecordOriginFields {
   id: number;
   invoiceNo: string;
   arn: string;

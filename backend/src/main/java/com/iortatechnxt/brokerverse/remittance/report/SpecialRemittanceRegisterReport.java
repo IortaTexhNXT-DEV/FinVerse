@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
+import com.iortatechnxt.brokerverse.report.core.ReportOrigin;
 import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.TabularReportBuilder;
@@ -38,6 +39,8 @@ public class SpecialRemittanceRegisterReport implements ReportDefinition {
           + BusinessClock.zoneId()
           + "' as date) between :from and :to"
           + " and (cast(:insurer as varchar) is null or s.insurer_code = :insurer)"
+          + " and (cast(:origin as varchar) is null or exists (select 1 from ops_invoice i"
+          + " where i.invoice_no = s.invoice_no and i.origin = :origin))"
           + " order by s.id";
 
   private final RemittanceReportSql sql;
@@ -57,7 +60,8 @@ public class SpecialRemittanceRegisterReport implements ReportDefinition {
         CODE,
         "Special Remittance Register",
         "Special remittance requests with requestor, processor and ages",
-        true);
+        true,
+        ReportOrigin.parameter());
   }
 
   @Override

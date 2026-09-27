@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.opsledger.api.dto;
 
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.opsledger.domain.InvoiceFlag;
 import com.iortatechnxt.brokerverse.opsledger.domain.PaymentStatus;
 import com.iortatechnxt.brokerverse.opsledger.domain.RemittanceStatus;
@@ -24,6 +25,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  * @param inceptionFrom period starting on or after
  * @param inceptionTo period starting on or before
  * @param ao account officer
+ * @param origin BIBS or MIGRATED, null for both
  */
 public record LedgerSearchParams(
     String q,
@@ -39,7 +41,8 @@ public record LedgerSearchParams(
     String assured,
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inceptionFrom,
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate inceptionTo,
-    String ao) {
+    String ao,
+    RecordOrigin.Origin origin) {
 
   /**
    * The search criteria of a company.
@@ -63,6 +66,7 @@ public record LedgerSearchParams(
         assured,
         inceptionFrom,
         inceptionTo,
-        ao);
+        ao,
+        origin);
   }
 }

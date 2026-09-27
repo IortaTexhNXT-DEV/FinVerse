@@ -42,7 +42,7 @@ SCOPE = {
 # Documents still to write, per drop (PROGRAMME_ALIGNMENT.md section 2.3; deliverables README).
 TO_WRITE = {
     "Drop 0": [
-        ("Bill of materials, technical and deployment architecture (items 4, 12)", "BRD-00", "From PROGRAMME_ALIGNMENT section 6, the IER and ARCHITECTURE_OPTION_DECISION.md"),
+        ("Bill of materials, technical and deployment architecture (items 4, 12)", "BRD-00", "From the programme alignment pack (chapter 6), the IER and the architecture option decision"),
         ("Security and data-protection controls mapping (item 26)", "BRD-00", "EIAM, UIDM-ISC, S3 encryption, masking"),
         ("Interface specifications of the Drop 0 integrations", "-", "After BDOI IT answers the IQ questions"),
     ],
@@ -58,7 +58,7 @@ TO_WRITE = {
         ("UAT readiness programme and readiness statements (deliverables README)", "-", "Drop 1 by 30-Jul-2027, Drop 2 by 30-Sep-2027"),
         ("End-to-end UAT script", "-", "UAT runs end to end (BDOI answer A1)"),
         ("Performance, penetration test and ORR / PRR evidence (items 28, 37)", "-", "Nov 2027 - Jan 2028"),
-        ("Requirements traceability matrix (item 21) and the final as-built refresh", "-", "At build completion"),
+        ("Requirements traceability matrix (item 21) and the final refresh of the documents", "-", "Before UAT"),
     ],
 }
 
@@ -144,22 +144,19 @@ def write_index(key: str) -> Path:
         f"# {drop['title']}: deliverables index",
         "",
         "BIBS client pack for BDO Insurance and Reinsurance Brokers (BDOI), grouped by BDOI drop (answer A5 of 26-Sep-2026).",
-        "Written by `python tools/deliverables/drop_index.py` from the files of this folder and the drop map in",
-        "`tools/deliverables/brand.py`; do not edit by hand.",
         "",
         "| | |",
         "|---|---|",
         f"| BDOI dates | {drop['dates']} |",
         f"| Scope (BDOI drop plan) | {SCOPE[key]} |",
-        f"| Status | Status as of {STATUS_AS_OF}; final refresh at build completion (deliverables README, \"Document status and the final as-built refresh\") |",
+        f"| Status | Status as of {STATUS_AS_OF}; the documents are refreshed before UAT |",
         "",
         "## Documents in this drop",
         "",
         "One folder per BRD release set (`BRD-nn_<Name>/`): every file of the BRD (Start Here, guide deck, FRS, sign-off",
         "workbook, test plan and summary, migration documents and templates), released and signed off together; in an",
         "issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, \"Release and",
-        "sign-off per BRD\"). The sources of a BRD are in one folder, `docs/deliverables/src/BRD-nn_<Name>/`, and",
-        "`tools/deliverables/check_pack.py` refuses duplicated files and older versions left next to newer ones.",
+        "sign-off per BRD\"). Each document is kept once, in its latest version.",
         "",
         "| Document | BRD | Kind | Version | File |",
         "|---|---|---|---|---|",

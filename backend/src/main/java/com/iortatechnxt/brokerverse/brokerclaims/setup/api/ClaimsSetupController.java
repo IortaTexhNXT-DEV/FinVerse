@@ -13,6 +13,8 @@ import com.iortatechnxt.brokerverse.brokerclaims.setup.service.AttributeSetupSer
 import com.iortatechnxt.brokerverse.brokerclaims.setup.service.HandlerSetupService;
 import com.iortatechnxt.brokerverse.brokerclaims.setup.service.MatrixSetupService;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
@@ -123,14 +125,24 @@ public class ClaimsSetupController {
    *
    * @param typeCode list
    * @param code value
+   * @param request the reason (mandatory unless the maker withdraws the change)
    * @return the value
    */
   @PostMapping("/attributes/{typeCode}/{code}/reject")
   @PreAuthorize(CHECKER)
   public ValueAttributes rejectAttributes(
-      @PathVariable String typeCode, @PathVariable String code) {
-    return attributes.reject(typeCode, code);
+      @PathVariable String typeCode,
+      @PathVariable String code,
+      @Valid @RequestBody(required = false) OptionalReason request) {
+    return attributes.reject(typeCode, code, request == null ? null : request.reason());
   }
+
+  /**
+   * An optional reason (a withdrawal needs none).
+   *
+   * @param reason reason text
+   */
+  public record OptionalReason(@Size(max = 200) String reason) {}
 
   /**
    * The status access matrix.

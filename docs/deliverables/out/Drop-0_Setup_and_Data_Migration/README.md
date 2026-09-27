@@ -1,22 +1,19 @@
 # Drop 0 - Setup and Data Migration: deliverables index
 
 BIBS client pack for BDO Insurance and Reinsurance Brokers (BDOI), grouped by BDOI drop (answer A5 of 26-Sep-2026).
-Written by `python tools/deliverables/drop_index.py` from the files of this folder and the drop map in
-`tools/deliverables/brand.py`; do not edit by hand.
 
 | | |
 |---|---|
-| BDOI dates | Setup with the Drop 1 requirements (Sep - Nov 2026) and build wave 1; migration requirements and mapping Sep - Nov 2026, build Nov 2026 - Mar 2027, SIT Apr - Jul 2027, UAT Aug - Oct 2027, full migration and cut-over Nov 2027 - Jan 2028 |
+| BDOI dates | Setup with the Drop 1 requirements (Sep - Nov 2026); migration requirements and mapping Sep - Nov 2026, development Nov 2026 - Mar 2027, SIT Apr - Jul 2027, UAT Aug - Oct 2027, full migration and cut-over Nov 2027 - Jan 2028 |
 | Scope (BDOI drop plan) | Setup: 0.1 Accessibility and Login, 0.2 Authorization, 0.3 User Maintenance, 0.4 Data Management (GL accounts, reference tables), 0.5 Workflow, 0.6 Product Maintenance; the Data Migration stream; the Drop 0 integrations (EIAM, UIDM-ISC, LMS, HL-LOAS, PMS, CMS / New BOB, OBPCS, AFTS, Old BOB, ECM, CCM, M365, TFS). |
-| Status | Status as of 26-Sep-2026; final refresh at build completion (deliverables README, "Document status and the final as-built refresh") |
+| Status | Status as of 26-Sep-2026; the documents are refreshed before UAT |
 
 ## Documents in this drop
 
 One folder per BRD release set (`BRD-nn_<Name>/`): every file of the BRD (Start Here, guide deck, FRS, sign-off
 workbook, test plan and summary, migration documents and templates), released and signed off together; in an
 issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, "Release and
-sign-off per BRD"). The sources of a BRD are in one folder, `docs/deliverables/src/BRD-nn_<Name>/`, and
-`tools/deliverables/check_pack.py` refuses duplicated files and older versions left next to newer ones.
+sign-off per BRD"). Each document is kept once, in its latest version.
 
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
@@ -53,6 +50,6 @@ A BRD that spans drops lives in the folder of its primary drop; nothing is copie
 
 | Document | BRD | Note |
 |---|---|---|
-| Bill of materials, technical and deployment architecture (items 4, 12) | BRD-00 | From PROGRAMME_ALIGNMENT section 6, the IER and ARCHITECTURE_OPTION_DECISION.md |
+| Bill of materials, technical and deployment architecture (items 4, 12) | BRD-00 | From the programme alignment pack (chapter 6), the IER and the architecture option decision |
 | Security and data-protection controls mapping (item 26) | BRD-00 | EIAM, UIDM-ISC, S3 encryption, masking |
 | Interface specifications of the Drop 0 integrations | - | After BDOI IT answers the IQ questions |

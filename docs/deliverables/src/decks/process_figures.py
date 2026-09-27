@@ -53,7 +53,7 @@ LEGENDS = {
     "asis": [("manual", "Manual step (BDOI)"), ("legacy", "Step in today's system or file"),
              ("external", "External party"), ("pain", "Pain point (see next slide)")],
     "tobe": [("screen", "BDOI user on a BIBS screen"), ("auto", "BIBS does it automatically"),
-             ("doc", "Document or notice"), ("external", "External party"), ("parked", "Parked interface")],
+             ("doc", "Document or notice"), ("external", "External party"), ("parked", "Interface on hold")],
 }
 
 

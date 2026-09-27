@@ -1,15 +1,15 @@
 # BRD-4 Collections: chapter 4 of the business process deck.
 # Sources: "Collections (CLXN) BRD.pdf": CMS BRD current process p.40-41, target p.42, NFR p.51-58, reports p.59-61,
-# signed workshop addendum p.13-20, caveat p.93; requirements baseline BDOI_CLXN_BRD_SPEC.md sections 2, 4, 8, 10;
-# build design COLLECTIONS_DESIGN.md; discrepancy register (DCR-037, 039, 041, 044, 157). No FRS yet.
+# signed workshop addendum p.13-20, caveat p.93; requirements baseline sections 2, 4, 8, 10; FRS BRD-4 v1.0;
+# discrepancy register (DCR-037, 039, 041, 044, 157).
 id: brd04
 key: clxn
 num: 4
 title: Collections
 brd: BRD-4
 scope: Premium receivable follow-up, unapplied payments, escalation and billing statements
-status: IN BUILD
-status_text: In build (foundation and worklist); FRS to follow
+status: FRS ISSUED
+status_text: FRS v1.0 issued for review
 department: Operations - Collections, with Marketing collection staff
 roles:
   - Collection Handler; Marketing AO and Marketing Handler
@@ -25,18 +25,18 @@ figures:
 sources:
   - CMS BRD p.40-42 (current and target process)
   - BRCLXN.001-060 (signed); 061-064 draft only
-  - Requirements baseline BDOI_CLXN_BRD_SPEC.md; design COLLECTIONS_DESIGN.md
+  - Requirements baseline; FRS BRD-4 v1.0
 chevrons: [Booking, Nightly refresh, Assignment, Follow-up, Promise, Escalation, Disposition, Hand-off]
 notes:
   glance: >-
     Collections follows unpaid premium receivables (PR) until they are paid, reversed or cancelled. The CMS BRD
     describes a separate application fed nightly from EBIX and QPS; in BIBS it is a module that reads the Operations
     invoice ledger and hands work to Cashiering and Commission inside the application. It posts no money itself.
-    The module is in build; there is no FRS yet, so this chapter uses the requirements baseline and the design.
+    FRS BRD-4 v1.0 describes the screens.
   pains: 'Steps 1-10 of the current process (CMS BRD p.40-41) and the handler''s other tasks (p.40).'
   after: 'The CMS BRD gives volume and response targets (NFR 15.01-15.14) but no collection-rate targets.'
   gaps: >-
-    BRCLXN.061-064 appear only in the unsigned draft of the workshop addendum; they are designed as Draft and built only
+    BRCLXN.061-064 appear only in the unsigned draft of the workshop addendum; they are proposed as Draft and delivered only
     after BDOI confirms them (CQ01). The Operations Head's caveat on exports (p.93) is met by asynchronous,
     permission-gated exports.
 asis:
@@ -89,7 +89,7 @@ pains:
   - {n: 7, title: DP report extracted monthly, text: 'Operations extracts the Direct Payment report as the basis for PR reversal.', ref: 'CMS BRD p.40-41, step 10'}
   - {n: 8, title: Side tasks by e-mail, text: 'Cheque pick-up requests and 2307 certificates received by e-mail.', ref: 'CMS BRD p.40, other tasks'}
 tobe:
-  caption: 'Collections in BIBS: worklist, promises, escalation (workflow CLX_ESCALATION) and hand-offs (design COLLECTIONS_DESIGN)'
+  caption: 'Collections in BIBS: worklist, promises, escalation (workflow CLX_ESCALATION) and hand-offs (FRS BRD-4)'
   notes: >-
     In BIBS a nightly job after the 22:00 end of day turns every invoice with PR above the threshold into a collection
     item, refreshes existing items and closes items at zero, keeping their history. The TL assigns items by rule

@@ -43,6 +43,7 @@ export function searchFromParams(params: URLSearchParams): InvoiceSearch {
     insurer: value('insurer'),
     from: value('from'),
     to: value('to'),
+    origin: value('origin') as InvoiceSearch['origin'],
     assured: value('assured'),
     inceptionFrom: value('inceptionFrom'),
     inceptionTo: value('inceptionTo'),
@@ -61,6 +62,7 @@ export function keptFilters(s: InvoiceSearch): InvoiceSearch {
     inceptionFrom: s.inceptionFrom,
     inceptionTo: s.inceptionTo,
     ao: s.ao,
+    origin: s.origin,
   };
 }
 

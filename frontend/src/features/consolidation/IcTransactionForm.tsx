@@ -3,12 +3,12 @@ import { useState } from 'react';
 import { intercompanyApi } from '@/api/consolidation';
 import type { IcTransactionInput, IcTransactionType } from '@/api/consolidation';
 import type { Company } from '@/api/types';
-import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { useToast } from '@/components/ui/toastContext';
 import { today } from '@/utils/format';
 import { DateInput } from '@/components/ui/DateInput';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 interface Props {
   companies: Company[];
@@ -128,7 +128,7 @@ export function IcTransactionForm({ companies, companyId }: Readonly<Props>) {
         {text('Narration', 'narration')}
       </div>
       <div className="row">
-        <Button
+        <ConfirmButton
           variant="accent"
           busy={post.isPending}
           disabled={
@@ -136,10 +136,14 @@ export function IcTransactionForm({ companies, companyId }: Readonly<Props>) {
             form.narration.trim() === '' ||
             debtor === form.creditorCompanyId
           }
-          onClick={() => post.mutate()}
+          confirm={{
+            title: 'Post Mirror Journals',
+            effect: 'The intercompany transaction is posted in both companies.',
+          }}
+          onConfirm={() => post.mutateAsync()}
         >
           Post Mirror Journals
-        </Button>
+        </ConfirmButton>
       </div>
     </div>
   );

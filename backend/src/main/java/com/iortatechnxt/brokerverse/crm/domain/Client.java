@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.crm.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails.Contact;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails.Identity;
@@ -13,6 +14,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -165,6 +167,8 @@ public class Client extends BaseEntity {
 
   @Embedded private ClientKeys keys;
 
+  @Embedded private RecordOrigin recordOrigin = RecordOrigin.BIBS;
+
   protected Client() {}
 
   /**
@@ -251,7 +255,7 @@ public class Client extends BaseEntity {
    */
   public void applyProfile(ClientProfile profile) {
     requireChangeable();
-    ClientProfile p = profile == null ? ClientProfile.EMPTY : profile;
+    ClientProfile p = Objects.requireNonNullElse(profile, ClientProfile.EMPTY);
     this.nationality = p.nationality();
     this.civilStatus = p.civilStatus();
     this.occupation = p.occupation();
@@ -322,6 +326,19 @@ public class Client extends BaseEntity {
     this.deactivationNote = note;
     this.deactivatedBy = user;
     this.deactivatedAt = when;
+  }
+
+  /**
+   * Marks the client as migrated from a legacy system (BRD-13); set before the first save.
+   *
+   * @param origin source system, legacy client code and loading batch
+   */
+  public void migratedFrom(RecordOrigin origin) {
+    this.recordOrigin = origin;
+  }
+
+  public RecordOrigin getRecordOrigin() {
+    return recordOrigin;
   }
 
   private static void requireText(String value, String field) {
@@ -397,7 +414,7 @@ public class Client extends BaseEntity {
    * @return code
    */
   public String getCode() {
-    return clientCode != null ? clientCode : prospectCode;
+    return Objects.requireNonNullElse(clientCode, prospectCode);
   }
 
   public Long getCompanyId() {

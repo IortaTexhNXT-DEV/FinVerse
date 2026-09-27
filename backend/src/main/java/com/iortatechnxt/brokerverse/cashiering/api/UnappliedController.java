@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
 import com.iortatechnxt.brokerverse.cashiering.service.DispositionService;
 import com.iortatechnxt.brokerverse.cashiering.service.UnappliedService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import jakarta.validation.Valid;
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class UnappliedController {
    * @param companyId company
    * @param tab UNAPPLIED, MONITORING, FOR_APPROVAL, FOR_REVERSAL or DONE
    * @param q search text
+   * @param origin BIBS or MIGRATED (Data Migration origin filter), all when absent
    * @param page page
    * @param size size
    * @return items, newest first
@@ -67,10 +69,11 @@ public class UnappliedController {
       @RequestParam Long companyId,
       @RequestParam(defaultValue = "UNAPPLIED") String tab,
       @RequestParam(required = false) String q,
+      @RequestParam(required = false) RecordOrigin.Origin origin,
       @RequestParam(defaultValue = "0") int page,
       @RequestParam(defaultValue = "20") int size) {
     return PageResponse.of(
-        dispositions.list(companyId, stages(tab), q, CashAccess.page(page, size)),
+        dispositions.list(companyId, stages(tab), q, origin, CashAccess.page(page, size)),
         u -> UnappliedResponse.from(u, null));
   }
 

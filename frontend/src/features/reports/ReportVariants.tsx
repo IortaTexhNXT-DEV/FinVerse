@@ -9,6 +9,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { displayNameOf } from '@/api/users';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 interface ReportVariantsProps {
   code: string;
@@ -142,14 +143,19 @@ export function ReportVariants({ code, values, onApply }: Readonly<ReportVariant
         Save Variant
       </Button>
       {current?.mine === true && (
-        <Button
+        <ConfirmButton
           variant="ghost"
           icon={<Trash2 size={16} />}
           busy={remove.isPending}
-          onClick={() => remove.mutate(current)}
+          confirm={{
+            title: 'Delete Variant',
+            effect: 'The saved parameter variant is deleted.',
+            destructive: true,
+          }}
+          onConfirm={() => remove.mutateAsync(current)}
         >
           Delete Variant
-        </Button>
+        </ConfirmButton>
       )}
       <ErrorAlert error={variants.error ?? remove.error} />
       {saving !== null && (

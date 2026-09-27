@@ -96,7 +96,7 @@ The workbook sheet "Control Totals" lists the same measures one per row, with co
 The open-item objects and the trial balance are loaded from two independent sources in legacy: the invoice and UPP detail (F01, F02) and the GL (G01). Migration Clearing proves that they agree (Figure 1):
 
 - each legacy invoice and each UPP item is loaded with an opening entry whose balancing line goes to Migration Clearing;
-- the trial balance is loaded as OPENING journals; its lines on the legacy control accounts (premium receivable, PR2307, DTIP, commission receivable, unrealised commission, deferred VAT, unapplied collections) are mapped to Migration Clearing instead of the legacy control accounts, because the opening entries build those balances in detail;
+- the trial balance is loaded as OPENING journals; its lines on the legacy control accounts (premium receivable, PR2307, DTIP, commission receivable, unrealised commission, deferred VAT, unapplied collections) are mapped to Migration Clearing instead of the legacy control accounts, because the opening entries create those balances in detail;
 - when the detail equals the GL, Migration Clearing is 0.00 per branch and currency.
 
 ![Migration Clearing nets to zero when the detail equals the legacy GL](../figures/dm_clearing.dot){width=15}
@@ -189,7 +189,7 @@ The Migration Lead draws the samples from the loaded batch (random with a fixed 
 | Row rejected by a data-quality rule | Fixed at source and re-extracted, fixed by a new map version, or waived (master data only) | Data steward; waiver by the data owner |
 | Financial row that cannot be fixed before go-live | Excluded from the batch with a manual-entry plan (who keys it in BIBS after go-live, when, and the amount) | Data owner and Comptrollership |
 | Amount or count difference between control file and staging | The extract is rejected at intake; BDOI IT re-sends | - |
-| Difference between staging and BIBS (L2, L4) | Loader or mapping defect: fixed and rerun; never explained away | iorta Migration Lead |
+| Difference between staging and BIBS (L2, L4) | Loader or mapping issue: fixed and rerun; never explained away | iorta Migration Lead |
 | Migration Clearing not 0.00 | Traced to the invoice, UPP or TB line; fixed by rerun or by a legacy correction and a new extract; a residual rounding difference is explained with its amount | Reconciliation approver (Comptrollership) |
 | Late legacy transaction after the freeze | Recorded as a break; the transaction is re-keyed in BIBS after go-live and the legacy system owner explains the access. A FY2027 GL adjustment by a named Comptrollership user is not a late transaction: it goes through the next true-up | Data owner; BDOI IT |
 | True-up check not met | The true-up is not signed; the cause is corrected by a new extract before sign-off or by the next true-up; a posted journal is never edited | Head, Comptrollership |

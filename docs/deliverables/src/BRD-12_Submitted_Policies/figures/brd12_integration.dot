@@ -7,12 +7,12 @@ digraph sp_integration {
 
   src    [label="Bank sources (upload)\nLFS, HLS, CIU, SPI,\nLoan Booking, IA masterlist"];
   lamd   [label="LAMD loan snapshot\n(upload)"];
-  docs   [label="Policy documents\n(extraction; OCR parked)"];
+  docs   [label="Policy documents\n(extraction; OCR on hold)"];
   legacy [label="Excel masterlists\n(migration)"];
 
   sbm  [label="Submitted Policies (BIBS)\nmasterlist, rules, IAAF, TOR,\nexpiry scan, handling fee", fillcolor="@HEADER_BLUE", fontcolor="@WHITE", width=4.2, height=1.0];
 
-  rn    [label="Renewal (BRD-6)\nRenewalHandOff"];
+  rn    [label="Renewal (BRD-6)\nrenewal hand-off"];
   plc   [label="Placement (hold cover\nre-assignment)"];
   bkg   [label="Account, booking\n(BRD-1) events"];
   csh   [label="Cashiering / Collections\nunapplied payments"];

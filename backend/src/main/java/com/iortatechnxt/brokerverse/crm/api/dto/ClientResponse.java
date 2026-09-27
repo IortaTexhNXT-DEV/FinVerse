@@ -46,6 +46,10 @@ import java.util.List;
  * @param infoComplete whether the configured minimum fields are present (BRNB.029)
  * @param missingFields missing minimum fields
  * @param lifecycle confirmation and deactivation
+ * @param origin BIBS or MIGRATED
+ * @param sourceSystem legacy source system of a migrated client
+ * @param legacyRef legacy client code
+ * @param migrationBatch migration batch that loaded the client
  */
 public record ClientResponse(
     Long id,
@@ -81,7 +85,11 @@ public record ClientResponse(
     Kyc kyc,
     boolean infoComplete,
     List<String> missingFields,
-    Lifecycle lifecycle) {
+    Lifecycle lifecycle,
+    String origin,
+    String sourceSystem,
+    String legacyRef,
+    String migrationBatch) {
 
   /**
    * Maps a client.
@@ -139,7 +147,11 @@ public record ClientResponse(
             c.getDeactivationReason(),
             c.getDeactivationNote(),
             c.getDeactivatedBy(),
-            c.getDeactivatedAt()));
+            c.getDeactivatedAt()),
+        c.getRecordOrigin().origin().name(),
+        c.getRecordOrigin().sourceSystem(),
+        c.getRecordOrigin().legacyRef(),
+        c.getRecordOrigin().migrationBatch());
   }
 
   /**

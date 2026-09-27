@@ -119,7 +119,7 @@ The workbook has a README sheet that explains every column. Case IDs carry their
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | The Claims module is deployed on SIT with its jobs (follow-up due, premium re-check, ageing alerts) and the feed CLAIMS_SPECIAL_REMIT; the data sets of section 4.2 are loaded; the insurer test mailboxes receive mail; the developers have added the automation references. |
+| System test | The Claims module is deployed on SIT with its jobs (follow-up due, premium re-check, ageing alerts) and the feed CLAIMS_SPECIAL_REMIT; the data sets of section 4.2 are loaded; the insurer test mailboxes receive mail. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; notifications and the e-mail relay work on SIT; the Remittance screen of BRD-2 reads the feed. |
 | UAT | FRS BRD-7 v1.0 is signed off or its open comments are agreed; the open questions that change expected results (CLQ01, CLQ04, CLQ05, CLQ06, CLQ15) are answered or their test values agreed; the system test exit criteria are met; the UAT environment holds masked data; BDOI testers have user IDs with the roles of section 5. |
 
@@ -219,7 +219,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 | Risk | Impact | Mitigation |
 |---|---|---|
 | Screen names, labels or messages change after BDOI's review of the FRS | High | The cases name the FRS screens and texts; the test lead updates the workbook before the system test and records the changes in the document control |
-| Open questions change expected results (CLQ01 code, CLQ04 matrix and units, CLQ05 closing types, CLQ06 closure rights and ageing, CLQ15 Marketing rights) | High | The matrix, lists and roles are configuration; the cases use the delivered defaults and are re-run with BDOI's values |
+| Open questions change expected results (CLQ01 code, CLQ04 matrix and units, CLQ05 closing types, CLQ06 closure rights and ageing, CLQ15 Marketing rights) | High | The matrix, lists and roles are configuration; the cases use the proposed defaults and are re-run with BDOI's values |
 | Ageing and follow-up cases need past dates | Medium | The test lead sets reported and status dates in the test database and runs the jobs on demand |
 | The Remittance feed and the BRD-1 endorsement events are needed by FR-CM-015, 016 and 046 | Medium | Run those cases after the BRD-2 remittance change is deployed; they are marked in their preconditions |
 | Insurer test mailboxes not reachable from SIT or UAT | Medium | Check the relay before the cycle; loss advice cases read the send log when the mailbox is down and are re-run later |

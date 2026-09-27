@@ -1,10 +1,7 @@
 # Test plan BRD-7 Claims - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-07_Claims/brd07_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# Claims is designed and not built: messages are the FRS texts (no codes), screen paths are those of the
-# build design (docs/architecture/CLAIMS_BROKING_DESIGN.md) and there is no automation reference. Where a
-# check reuses a platform message that exists today (log-in, report parameters, e-mail address), the case
-# quotes the text BIBS shows and a finding records the FRS difference.
+# Messages are the FRS texts; where a check reuses a platform message, the case quotes the text BIBS shows.
 # The FRS priority "High (BRD p.21)" is read as High by the builder.
 
 meta:
@@ -83,7 +80,7 @@ data:
   - id: TD-CM-06
     name: Lists and matrix
     content: The 18 statuses, 10 settlement types, 25 adjusters, 7 catastrophe codes of the FRS; default status access matrix (TL and TH all statuses; officers statuses 1, 2, 17 and 18); claims handler register (Motor HO, Non-Motor HO, branches)
-    source: Delivered list values of FRS section 9.2; register keyed in by cl.uh1
+    source: Seed data (list values of FRS section 9.2); register keyed in by cl.uh1
   - id: TD-CM-07
     name: Upload files
     content: "Insurer claim numbers file (10 rows); insurer updates file of 50 rows with one row whose insurer claim number matches no claim; insurer location references file"

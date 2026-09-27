@@ -28,6 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@SuppressWarnings(
+    "PMD.GodClass") // the two EB set-up masters, each with the same maker-checker steps
 public class EbSetupService {
 
   private static final String DEFAULT_CURRENCY = "PHP";
@@ -132,6 +134,24 @@ public class EbSetupService {
   }
 
   private EbThresholdRule.Data check(EbThresholdRule.Data data) {
+    checkValues(data);
+    String line = blankToNull(data.benefitLine());
+    if (line != null) {
+      lovs.requireValid(EbCodes.LOV_BENEFIT_LINE, line, BusinessClock.today(clock));
+    }
+    return new EbThresholdRule.Data(
+        line,
+        data.measure(),
+        data.amount(),
+        blankToNull(data.currency()) == null ? DEFAULT_CURRENCY : data.currency().strip(),
+        approver(data.approverPermission()),
+        Math.max(1, data.approvalLevel()),
+        data.effectiveFrom(),
+        data.effectiveTo(),
+        blankToNull(data.description()));
+  }
+
+  private static void checkValues(EbThresholdRule.Data data) {
     if (data.measure() == null) {
       throw new BusinessRuleException(
           "EB_THRESHOLD_MEASURE", "Select the measure: TSI or annual premium");
@@ -139,6 +159,10 @@ public class EbSetupService {
     if (data.amount() == null || data.amount().signum() <= 0) {
       throw new BusinessRuleException("EB_THRESHOLD_AMOUNT", "Enter an amount greater than zero");
     }
+    checkDates(data);
+  }
+
+  private static void checkDates(EbThresholdRule.Data data) {
     if (data.effectiveFrom() == null) {
       throw new BusinessRuleException("EB_THRESHOLD_FROM", "Enter the effective date");
     }
@@ -146,30 +170,18 @@ public class EbSetupService {
       throw new BusinessRuleException(
           "EB_THRESHOLD_DATES", "The end date must be on or after the start date");
     }
-    String line = blankToNull(data.benefitLine());
-    if (line != null) {
-      lovs.requireValid(EbCodes.LOV_BENEFIT_LINE, line, BusinessClock.today(clock));
-    }
+  }
+
+  private static String approver(String given) {
     String permission =
-        blankToNull(data.approverPermission()) == null
-            ? EbCodes.PERMISSION_THRESHOLD_APPROVE
-            : data.approverPermission().strip();
+        blankToNull(given) == null ? EbCodes.PERMISSION_THRESHOLD_APPROVE : given.strip();
     try {
       Permission.valueOf(permission);
     } catch (IllegalArgumentException e) {
       throw new BusinessRuleException(
-          "EB_THRESHOLD_PERMISSION", "Select an existing approver permission");
+          "EB_THRESHOLD_PERMISSION", "Select an existing approver permission", e);
     }
-    return new EbThresholdRule.Data(
-        line,
-        data.measure(),
-        data.amount(),
-        blankToNull(data.currency()) == null ? DEFAULT_CURRENCY : data.currency().strip(),
-        permission,
-        Math.max(1, data.approvalLevel()),
-        data.effectiveFrom(),
-        data.effectiveTo(),
-        blankToNull(data.description()));
+    return permission;
   }
 
   private static String describe(EbThresholdRule rule) {

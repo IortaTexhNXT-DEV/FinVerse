@@ -134,19 +134,7 @@ public class ConfirmationService {
     LocalDate on = checkEvidence(input);
     EbProgramme programme = records.programmeOf(cycle);
     Map<EbProgrammeLine, EbProposal> chosen = chosen(programme, cycle, input);
-    Long evidence =
-        documents
-            .store(
-                cycle,
-                new Registration(
-                    EbDocumentTypes.CLIENT_CONFIRMATION,
-                    placementProcess(cycle),
-                    EbDocumentSource.CLIENT,
-                    true,
-                    "Client confirmation"),
-                List.of(input.evidence()))
-            .get(0)
-            .getAttachmentId();
+    Long evidence = storeEvidence(cycle, input);
     EbClientConfirmation confirmation =
         new EbClientConfirmation(
             cycle,
@@ -183,6 +171,21 @@ public class ConfirmationService {
             + chosen.size()
             + " line(s)");
     return saved;
+  }
+
+  private Long storeEvidence(EbCycle cycle, ConfirmationInput input) {
+    return documents
+        .store(
+            cycle,
+            new Registration(
+                EbDocumentTypes.CLIENT_CONFIRMATION,
+                placementProcess(cycle),
+                EbDocumentSource.CLIENT,
+                true,
+                "Client confirmation"),
+            List.of(input.evidence()))
+        .get(0)
+        .getAttachmentId();
   }
 
   private EbComparative presented(EbCycle cycle) {

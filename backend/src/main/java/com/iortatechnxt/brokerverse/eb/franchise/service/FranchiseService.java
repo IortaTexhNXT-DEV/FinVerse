@@ -208,18 +208,7 @@ public class FranchiseService {
     EbFranchiseRequest request = require(companyId, requestId);
     EbCycle cycle = records.cycle(companyId, request.getCycleId());
     LocalDate today = BusinessClock.today(clock);
-    LocalDate on = input.decidedOn() == null ? today : input.decidedOn();
-    if (on.isAfter(today)) {
-      throw new BusinessRuleException(
-          "EB_FRANCHISE_DATE_FUTURE", "The decision date cannot be after today");
-    }
-    if (input.evidence() == null) {
-      throw new BusinessRuleException(
-          "EB_FRANCHISE_EVIDENCE_REQUIRED", "Attach the insurer's reply");
-    }
-    if (!input.approve() && (input.reasonCode() == null || input.reasonCode().isBlank())) {
-      throw new BusinessRuleException("WORKFLOW_REASON_REQUIRED", "Select a reason for 'reject'");
-    }
+    LocalDate on = checkDecision(input, today);
     Long evidence = mail.storeReply(cycle, request, input.evidence());
     EbFranchiseRequest.Status outcome =
         input.approve() ? EbFranchiseRequest.Status.APPROVED : EbFranchiseRequest.Status.REJECTED;
@@ -244,6 +233,27 @@ public class FranchiseService {
         AuditAction.UPDATE,
         "Insurer decision recorded: " + outcome + " on " + on);
     return request;
+  }
+
+  private static LocalDate checkDecision(DecisionInput input, LocalDate today) {
+    LocalDate on = input.decidedOn() == null ? today : input.decidedOn();
+    if (on.isAfter(today)) {
+      throw new BusinessRuleException(
+          "EB_FRANCHISE_DATE_FUTURE", "The decision date cannot be after today");
+    }
+    if (input.evidence() == null) {
+      throw new BusinessRuleException(
+          "EB_FRANCHISE_EVIDENCE_REQUIRED", "Attach the insurer's reply");
+    }
+    requireReason(input);
+    return on;
+  }
+
+  private static void requireReason(DecisionInput input) {
+    boolean noReason = input.reasonCode() == null || input.reasonCode().isBlank();
+    if (!input.approve() && noReason) {
+      throw new BusinessRuleException("WORKFLOW_REASON_REQUIRED", "Select a reason for 'reject'");
+    }
   }
 
   /**

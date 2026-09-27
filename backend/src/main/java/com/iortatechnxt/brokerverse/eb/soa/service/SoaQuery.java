@@ -1,13 +1,11 @@
 package com.iortatechnxt.brokerverse.eb.soa.service;
 
-import com.iortatechnxt.brokerverse.eb.domain.EbProgramme;
 import com.iortatechnxt.brokerverse.eb.domain.EbSoa;
 import com.iortatechnxt.brokerverse.eb.domain.EbSoaRepository;
+import com.iortatechnxt.brokerverse.eb.service.EbSearch;
 import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Subquery;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -53,20 +51,7 @@ public class SoaQuery {
             where.add(cb.equal(root.get("programmeId"), filter.programmeId()));
           }
           if (filter.text() != null && !filter.text().isBlank()) {
-            String like = "%" + filter.text().strip().toLowerCase(Locale.ROOT) + "%";
-            Subquery<Long> programme = query.subquery(Long.class);
-            var p = programme.from(EbProgramme.class);
-            programme
-                .select(p.get("id"))
-                .where(
-                    cb.or(
-                        cb.like(cb.lower(p.get("programmeNo")), like),
-                        cb.like(cb.lower(p.get("clientName")), like)));
-            where.add(
-                cb.or(
-                    cb.like(cb.lower(root.get("soaNo")), like),
-                    cb.like(cb.lower(root.get("insurerSoaNo")), like),
-                    root.get("programmeId").in(programme)));
+            where.add(EbSearch.text(root, query, cb, filter.text(), "soaNo", "insurerSoaNo"));
           }
           query.orderBy(cb.desc(root.get("id")));
           return cb.and(where.toArray(Predicate[]::new));

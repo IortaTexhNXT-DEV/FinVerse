@@ -114,7 +114,9 @@ public class MasterListBulkHandler implements BulkImportHandler {
   @Override
   public String sanitize(String header, String value) {
     String clean = BulkImportHandler.super.sanitize(header, value);
-    return GENDER.equals(header) || CIVIL.equals(header) ? clean.toUpperCase(Locale.ROOT) : clean;
+    return GENDER.equals(header) || CIVIL.equals(header)
+        ? BulkImportHandler.identifier(clean)
+        : clean;
   }
 
   @Override
@@ -136,6 +138,11 @@ public class MasterListBulkHandler implements BulkImportHandler {
     if (birth != null && birth.isAfter(context.businessDate())) {
       errors.add("Birth Date cannot be in the future");
     }
+    personErrors(row, errors);
+    return errors;
+  }
+
+  private void personErrors(BulkRow row, List<String> errors) {
     String gender = row.text(GENDER);
     if (gender != null && !GENDERS.contains(gender)) {
       errors.add("Gender must be MALE or FEMALE");
@@ -148,7 +155,6 @@ public class MasterListBulkHandler implements BulkImportHandler {
     if (row.number(DEPENDANTS) != null && row.number(DEPENDANTS).signum() < 0) {
       errors.add("Dependants cannot be negative");
     }
-    return errors;
   }
 
   @Override

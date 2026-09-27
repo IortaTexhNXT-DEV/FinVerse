@@ -166,12 +166,15 @@ public class MemberChangeEffects {
         members.findByRosterVersionIdOrderByEmployeeNoAsc(roster.getId()).stream()
             .collect(Collectors.toMap(EbMember::getId, Function.identity()));
     for (EbMemberChange.Line line : change.getLines()) {
-      switch (line.getAction()) {
-        case ADD -> add(programme, change, roster, line);
-        case DELETE -> byId.get(line.getMemberId()).delete(line.getEffectiveDate().minusDays(1));
-        case CHANGE_PLAN -> byId.get(line.getMemberId()).changePlan(line.getPlanCode());
-        case CHANGE_DATA -> byId.get(line.getMemberId()).update(line.memberData());
-        default -> throw new IllegalStateException("Unknown action " + line.getAction());
+      EbMemberChange.Action action = line.getAction();
+      if (action == EbMemberChange.Action.ADD) {
+        add(programme, change, roster, line);
+      } else if (action == EbMemberChange.Action.DELETE) {
+        byId.get(line.getMemberId()).delete(line.getEffectiveDate().minusDays(1));
+      } else if (action == EbMemberChange.Action.CHANGE_PLAN) {
+        byId.get(line.getMemberId()).changePlan(line.getPlanCode());
+      } else {
+        byId.get(line.getMemberId()).update(line.memberData());
       }
     }
     members.flush();

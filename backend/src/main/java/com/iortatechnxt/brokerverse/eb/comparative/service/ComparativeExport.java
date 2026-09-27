@@ -32,6 +32,9 @@ public class ComparativeExport {
 
   private static final String RECOMMENDED = "Recommended";
 
+  /** Room left for the sheet name after its number (Excel allows 31 characters). */
+  private static final int SHEET_NAME = 25;
+
   private final EbComparativeService comparatives;
   private final EbRecords records;
   private final EbParties parties;
@@ -134,8 +137,7 @@ public class ComparativeExport {
 
   private static String safe(String heading) {
     String clean = heading.replaceAll("[\\\\/?*\\[\\]:]", " ");
-    int max = 25;
-    return clean.length() > max ? clean.substring(0, max) : clean;
+    return clean.length() > SHEET_NAME ? clean.substring(0, SHEET_NAME) : clean;
   }
 
   /**

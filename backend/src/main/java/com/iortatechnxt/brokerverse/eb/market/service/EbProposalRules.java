@@ -59,7 +59,12 @@ public class EbProposalRules {
     for (EbProposalLine.Data line : input.lines()) {
       checkLine(line, row++, today);
     }
-    for (EbProposalItem.Data item : input.items()) {
+    checkItems(input.items(), torItemIds);
+    checkFactors(input.factors(), today);
+  }
+
+  private static void checkItems(List<EbProposalItem.Data> items, Set<Long> torItemIds) {
+    for (EbProposalItem.Data item : items) {
       if (!torItemIds.contains(item.torItemId())) {
         throw new BusinessRuleException(
             "EB_PROPOSAL_ITEM_UNKNOWN", "Answer the items of the TOR released on this cycle");
@@ -69,8 +74,11 @@ public class EbProposalRules {
             "EB_PROPOSAL_ITEM_EMPTY", "Enter what the insurer offers for each answered item");
       }
     }
+  }
+
+  private void checkFactors(List<EbProposalFactor.Data> factors, LocalDate today) {
     Set<String> seen = new HashSet<>();
-    for (EbProposalFactor.Data factor : input.factors()) {
+    for (EbProposalFactor.Data factor : factors) {
       lovs.requireValid(EbCodes.LOV_CAPABILITY_FACTOR, factor.factorCode(), today);
       if (!seen.add(factor.factorCode())) {
         throw new BusinessRuleException(
@@ -89,13 +97,16 @@ public class EbProposalRules {
           "EB_PROPOSAL_LINE_PLAN", "Plan " + row + ": select the benefit line and enter the plan");
     }
     lovs.requireValid(EbCodes.LOV_BENEFIT_LINE, line.benefitLine(), today);
+    checkAmounts(line, row);
+  }
+
+  private static void checkAmounts(EbProposalLine.Data line, int row) {
     if (line.annualPremium() == null || line.annualPremium().signum() < 0) {
       throw new BusinessRuleException(
           "EB_PROPOSAL_PREMIUM", "Plan " + row + ": enter an annual premium of zero or more");
     }
-    if (negative(line.sumInsured())
-        || negative(line.premiumRate())
-        || (line.members() != null && line.members() < 0)) {
+    boolean negativeMembers = line.members() != null && line.members() < 0;
+    if (negative(line.sumInsured()) || negative(line.premiumRate()) || negativeMembers) {
       throw new BusinessRuleException(
           "EB_PROPOSAL_AMOUNTS", "Plan " + row + ": amounts and members cannot be negative");
     }

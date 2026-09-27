@@ -268,19 +268,7 @@ public class MemberChangeService {
       Long companyId, Long changeId, EbMemberChange.Billing billing, List<UploadedFile> files) {
     EbMemberChange change = require(companyId, changeId);
     LocalDate today = BusinessClock.today(clock);
-    if (billing.billedOn() != null && billing.billedOn().isAfter(today)) {
-      throw new BusinessRuleException(
-          "EB_BILLING_DATE_FUTURE", "The billing date cannot be after today");
-    }
-    if (billing.direct() && (files == null || files.isEmpty())) {
-      throw new BusinessRuleException(
-          "EB_BILLING_FILE_REQUIRED", "Attach the insurer's direct billing");
-    }
-    if (change.isFinancial() && (billing.amount() == null || billing.amount().signum() == 0)) {
-      throw new BusinessRuleException(
-          "EB_BILLING_AMOUNT_REQUIRED",
-          "Enter the amount billed for a change with a premium effect");
-    }
+    checkBilling(change, billing, files, today);
     change.billed(
         new EbMemberChange.Billing(
             billing.billedOn() == null ? today : billing.billedOn(),
@@ -293,19 +281,7 @@ public class MemberChangeService {
     }
     transition(change, "bill", TransitionNote.NONE);
     trackedItems.receiveLinked(change.getId(), MemberChangeEffects.BILLING, change.getBilledOn());
-    Notice notice =
-        new Notice(
-            change.getChangeNo()
-                + ": member change billed"
-                + (billing.direct() ? " (direct billing)" : ""),
-            programme.getName(),
-            EbCodes.MEMBER_CHANGE_LINK + change.getId(),
-            EbCodes.ENTITY_MEMBER_CHANGE,
-            change.getId().toString());
-    notifications.notifyPermission(
-        EbCodes.PERMISSION_PROCESS, notice, EbCodes.EVENT_MEMBER_CHANGE_BILLED);
-    notifications.notifyPermission(
-        EbCodes.PERMISSION_COLLECT, notice, EbCodes.EVENT_MEMBER_CHANGE_BILLED);
+    tellBilled(programme, change);
     audit.record(
         EbCodes.ENTITY_MEMBER_CHANGE,
         change.getChangeNo(),
@@ -314,6 +290,55 @@ public class MemberChangeService {
             + (billing.direct() ? " directly by the insurer" : "")
             + (billing.reference() == null ? "" : ", billing " + billing.reference()));
     return change;
+  }
+
+  private static void checkBilling(
+      EbMemberChange change,
+      EbMemberChange.Billing billing,
+      List<UploadedFile> files,
+      LocalDate today) {
+    if (billing.billedOn() != null && billing.billedOn().isAfter(today)) {
+      throw new BusinessRuleException(
+          "EB_BILLING_DATE_FUTURE", "The billing date cannot be after today");
+    }
+    checkContent(change, billing, files);
+  }
+
+  private static void checkContent(
+      EbMemberChange change, EbMemberChange.Billing billing, List<UploadedFile> files) {
+    if (billing.direct() && noFile(files)) {
+      throw new BusinessRuleException(
+          "EB_BILLING_FILE_REQUIRED", "Attach the insurer's direct billing");
+    }
+    if (change.isFinancial() && noAmount(billing)) {
+      throw new BusinessRuleException(
+          "EB_BILLING_AMOUNT_REQUIRED",
+          "Enter the amount billed for a change with a premium effect");
+    }
+  }
+
+  private static boolean noFile(List<UploadedFile> files) {
+    return files == null || files.isEmpty();
+  }
+
+  private static boolean noAmount(EbMemberChange.Billing billing) {
+    return billing.amount() == null || billing.amount().signum() == 0;
+  }
+
+  private void tellBilled(EbProgramme programme, EbMemberChange change) {
+    Notice notice =
+        new Notice(
+            change.getChangeNo()
+                + ": member change billed"
+                + (change.isDirectBilled() ? " (direct billing)" : ""),
+            programme.getName(),
+            EbCodes.MEMBER_CHANGE_LINK + change.getId(),
+            EbCodes.ENTITY_MEMBER_CHANGE,
+            change.getId().toString());
+    notifications.notifyPermission(
+        EbCodes.PERMISSION_PROCESS, notice, EbCodes.EVENT_MEMBER_CHANGE_BILLED);
+    notifications.notifyPermission(
+        EbCodes.PERMISSION_COLLECT, notice, EbCodes.EVENT_MEMBER_CHANGE_BILLED);
   }
 
   /**

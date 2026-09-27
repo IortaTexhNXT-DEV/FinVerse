@@ -117,22 +117,8 @@ public class RevisionService {
       throw new BusinessRuleException(
           "EB_CYCLE_STAGE", "Cycle " + cycle.getCycleNo() + " is not with the client");
     }
-    List<Change> changes =
-        input.changes() == null
-            ? List.of()
-            : input.changes().stream()
-                .filter(c -> c.change() != null && !c.change().isBlank())
-                .toList();
-    if (changes.isEmpty()) {
-      throw new BusinessRuleException("EB_REVISION_EMPTY", "Add at least one requested change");
-    }
-    Set<String> codes = new LinkedHashSet<>();
-    if (input.insurerCodes() != null) {
-      input.insurerCodes().stream().filter(c -> c != null && !c.isBlank()).forEach(codes::add);
-    }
-    if (codes.isEmpty()) {
-      throw new BusinessRuleException("EB_INSURER_REQUIRED", "Select the insurers");
-    }
+    List<Change> changes = changes(input);
+    Set<String> codes = insurers(input);
     LocalDate due =
         workingDays.plus(companyId, BusinessClock.today(clock), parameters.proposalReplyDays());
     EbRevisionRequest revision =
@@ -165,6 +151,30 @@ public class RevisionService {
         AuditAction.UPDATE,
         "Revision " + saved.getRevisionNo() + " relayed to " + String.join(", ", codes));
     return saved;
+  }
+
+  private static List<Change> changes(RevisionInput input) {
+    List<Change> changes =
+        input.changes() == null
+            ? List.of()
+            : input.changes().stream()
+                .filter(c -> c.change() != null && !c.change().isBlank())
+                .toList();
+    if (changes.isEmpty()) {
+      throw new BusinessRuleException("EB_REVISION_EMPTY", "Add at least one requested change");
+    }
+    return changes;
+  }
+
+  private static Set<String> insurers(RevisionInput input) {
+    Set<String> codes = new LinkedHashSet<>();
+    if (input.insurerCodes() != null) {
+      input.insurerCodes().stream().filter(c -> c != null && !c.isBlank()).forEach(codes::add);
+    }
+    if (codes.isEmpty()) {
+      throw new BusinessRuleException("EB_INSURER_REQUIRED", "Select the insurers");
+    }
+    return codes;
   }
 
   private EbProposal validatedProposal(EbCycle cycle, InsurerProfile insurer) {

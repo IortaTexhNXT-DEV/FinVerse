@@ -52,7 +52,7 @@ public class EbInsurerRequest extends EbCycleRecord {
   private LocalDate dueDate;
 
   @Column(nullable = false, length = 10)
-  private String channel = "EMAIL";
+  private String channel;
 
   @Column(name = "message_id")
   private Long messageId;
@@ -82,6 +82,7 @@ public class EbInsurerRequest extends EbCycleRecord {
     this.insurerCode = insurerCode;
     this.torId = tor.getId();
     this.torVersion = tor.getVersionNo();
+    this.channel = "EMAIL";
     this.sentAt = sending.at();
     this.sentBy = sending.by();
     this.dueDate = sending.dueDate();

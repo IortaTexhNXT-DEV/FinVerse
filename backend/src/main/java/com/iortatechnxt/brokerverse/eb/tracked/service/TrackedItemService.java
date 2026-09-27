@@ -39,6 +39,8 @@ public class TrackedItemService {
   /** Item type of the contract after placement. */
   public static final String CONTRACT = "CONTRACT";
 
+  private static final String DUE = " due ";
+
   /** Longest subject of an item. */
   static final int MAX_SUBJECT = 200;
 
@@ -106,7 +108,7 @@ public class TrackedItemService {
         EbCodes.ENTITY_TRACKED_ITEM,
         item.getId(),
         AuditAction.CREATE,
-        programme.getProgrammeNo() + ": " + item.getSubject() + " due " + item.getDueDate());
+        programme.getProgrammeNo() + ": " + item.getSubject() + DUE + item.getDueDate());
     return item;
   }
 
@@ -145,7 +147,7 @@ public class TrackedItemService {
         EbCodes.ENTITY_TRACKED_ITEM,
         item.getId(),
         AuditAction.CREATE,
-        cycle.getCycleNo() + ": " + item.getSubject() + " due " + due);
+        cycle.getCycleNo() + ": " + item.getSubject() + DUE + due);
   }
 
   /**
@@ -174,7 +176,7 @@ public class TrackedItemService {
         EbCodes.ENTITY_TRACKED_ITEM,
         item.getId(),
         AuditAction.CREATE,
-        programme.getProgrammeNo() + ": " + item.getSubject() + " due " + item.getDueDate());
+        programme.getProgrammeNo() + ": " + item.getSubject() + DUE + item.getDueDate());
     return item;
   }
 
@@ -213,7 +215,7 @@ public class TrackedItemService {
         EbCodes.ENTITY_TRACKED_ITEM,
         item.getId(),
         AuditAction.UPDATE,
-        item.getSubject() + " due " + item.getDueDate());
+        item.getSubject() + DUE + item.getDueDate());
     return item;
   }
 

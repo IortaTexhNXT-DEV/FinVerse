@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.eb.domain.EbThresholdRuleRepository;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,42 +52,46 @@ public class SetupApprovalSource implements PendingApprovalSource {
       return List.of();
     }
     List<PendingApproval> items = new ArrayList<>();
-    for (EbThresholdRule r : rules.findByRecordStatus(RecordStatus.PENDING_AUTHORIZATION)) {
-      if (viewer.mayApproveItemOf(r.getMaker())) {
-        items.add(
-            new PendingApproval(
-                MODULE,
-                "EB threshold rule",
-                "TR-" + r.getId(),
-                (r.getBenefitLine() == null ? "All lines" : r.getBenefitLine())
-                    + " "
-                    + r.getMeasure().name().replace('_', ' ').toLowerCase(java.util.Locale.ROOT),
-                r.getAmount(),
-                r.getCurrency(),
-                r.getMaker(),
-                r.getUpdatedAt() == null ? r.getCreatedAt() : r.getUpdatedAt(),
-                r.getCompanyId(),
-                LINK + "?tab=thresholds"));
-      }
-    }
-    for (EbRequiredDocument d : required.findByRecordStatus(RecordStatus.PENDING_AUTHORIZATION)) {
-      if (viewer.mayApproveItemOf(d.getMaker())) {
-        items.add(
-            new PendingApproval(
-                MODULE,
-                "EB required document",
-                "RD-" + d.getId(),
-                lovs.label("DOCUMENT_TYPE", d.getDocumentType())
-                    + " for "
-                    + lovs.label(EbDocumentTypes.PROCESS_TYPE_LOV, d.getProcessType()),
-                null,
-                null,
-                d.getMaker(),
-                d.getUpdatedAt() == null ? d.getCreatedAt() : d.getUpdatedAt(),
-                d.getCompanyId(),
-                LINK + "?tab=documents"));
-      }
-    }
+    rules.findByRecordStatus(RecordStatus.PENDING_AUTHORIZATION).stream()
+        .filter(r -> viewer.mayApproveItemOf(r.getMaker()))
+        .map(SetupApprovalSource::rule)
+        .forEach(items::add);
+    required.findByRecordStatus(RecordStatus.PENDING_AUTHORIZATION).stream()
+        .filter(d -> viewer.mayApproveItemOf(d.getMaker()))
+        .map(this::requirement)
+        .forEach(items::add);
     return items;
+  }
+
+  private static PendingApproval rule(EbThresholdRule r) {
+    return new PendingApproval(
+        MODULE,
+        "EB threshold rule",
+        "TR-" + r.getId(),
+        (r.getBenefitLine() == null ? "All lines" : r.getBenefitLine())
+            + " "
+            + r.getMeasure().name().replace('_', ' ').toLowerCase(Locale.ROOT),
+        r.getAmount(),
+        r.getCurrency(),
+        r.getMaker(),
+        r.getUpdatedAt() == null ? r.getCreatedAt() : r.getUpdatedAt(),
+        r.getCompanyId(),
+        LINK + "?tab=thresholds");
+  }
+
+  private PendingApproval requirement(EbRequiredDocument d) {
+    return new PendingApproval(
+        MODULE,
+        "EB required document",
+        "RD-" + d.getId(),
+        lovs.label("DOCUMENT_TYPE", d.getDocumentType())
+            + " for "
+            + lovs.label(EbDocumentTypes.PROCESS_TYPE_LOV, d.getProcessType()),
+        null,
+        null,
+        d.getMaker(),
+        d.getUpdatedAt() == null ? d.getCreatedAt() : d.getUpdatedAt(),
+        d.getCompanyId(),
+        LINK + "?tab=documents");
   }
 }

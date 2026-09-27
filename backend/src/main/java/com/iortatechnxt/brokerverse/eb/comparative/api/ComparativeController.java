@@ -246,7 +246,7 @@ public class ComparativeController {
       @RequestParam Long companyId,
       @RequestParam(defaultValue = "pdf") String format) {
     EbComparative c = comparatives.require(companyId, id);
-    boolean excel = "xlsx".equalsIgnoreCase(format);
+    boolean excel = "xlsx".equals(format) || "XLSX".equals(format);
     byte[] body = excel ? export.xlsx(c) : export.pdf(c);
     return ResponseEntity.ok()
         .header(

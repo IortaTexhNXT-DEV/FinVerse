@@ -101,10 +101,10 @@ public class EbThresholdRule extends AuthorizableEntity {
    * @return true when active, effective and for the line or every line
    */
   public boolean appliesTo(String line, LocalDate date) {
-    return isActive()
-        && (benefitLine == null || benefitLine.equals(line))
-        && !date.isBefore(effectiveFrom)
-        && (effectiveTo == null || !date.isAfter(effectiveTo));
+    boolean ofLine = benefitLine == null || benefitLine.equals(line);
+    boolean effective =
+        !date.isBefore(effectiveFrom) && (effectiveTo == null || !date.isAfter(effectiveTo));
+    return isActive() && ofLine && effective;
   }
 
   /**

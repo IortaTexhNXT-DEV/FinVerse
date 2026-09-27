@@ -257,46 +257,51 @@ public class SubmissionService {
     if (scope.processType() == null || scope.processType().isBlank()) {
       throw new BusinessRuleException("EB_PROCESS_REQUIRED", "Select the process of the document");
     }
+    return scope.memberChangeId() != null
+        ? ofMemberChange(companyId, programme, scope.memberChangeId())
+        : ofCycle(companyId, programme, scope.cycleId());
+  }
+
+  private Found ofMemberChange(Long companyId, EbProgramme programme, Long changeId) {
+    EbMemberChange change =
+        changes
+            .findByIdAndCompanyId(changeId, companyId)
+            .filter(c -> c.getProgrammeId().equals(programme.getId()))
+            .orElseThrow(
+                () -> new ResourceNotFoundException(EbCodes.ENTITY_MEMBER_CHANGE, changeId));
     Map<String, List<Long>> byType = new LinkedHashMap<>();
     Map<Long, String> typeOf = new LinkedHashMap<>();
-    List<String> lines;
-    if (scope.memberChangeId() != null) {
-      EbMemberChange change =
-          changes
-              .findByIdAndCompanyId(scope.memberChangeId(), companyId)
-              .filter(c -> c.getProgrammeId().equals(programme.getId()))
-              .orElseThrow(
-                  () ->
-                      new ResourceNotFoundException(
-                          EbCodes.ENTITY_MEMBER_CHANGE, scope.memberChangeId()));
-      for (Attachment a :
-          documents.all(
-              new AttachmentTarget(EbCodes.ENTITY_MEMBER_CHANGE, change.getId().toString()))) {
-        if (a.getDocumentType() != null) {
-          byType.computeIfAbsent(a.getDocumentType(), t -> new ArrayList<>()).add(a.getId());
-          typeOf.put(a.getId(), a.getDocumentType());
-        }
+    for (Attachment a :
+        documents.all(
+            new AttachmentTarget(EbCodes.ENTITY_MEMBER_CHANGE, change.getId().toString()))) {
+      if (a.getDocumentType() != null) {
+        byType.computeIfAbsent(a.getDocumentType(), t -> new ArrayList<>()).add(a.getId());
+        typeOf.put(a.getId(), a.getDocumentType());
       }
-      lines = List.of(change.getBenefitLine());
-    } else {
-      if (scope.cycleId() == null) {
-        throw new BusinessRuleException(
-            "EB_DOCUMENT_TRANSACTION_REQUIRED", "Link the document to its cycle or member change");
-      }
-      EbCycle cycle = records.cycle(companyId, scope.cycleId());
-      LocalDate today = BusinessClock.today(clock);
-      for (String type : cycleDocuments.presentTypes(cycle, today)) {
-        List<Long> ids = cycleDocuments.files(cycle, List.of(type), today);
-        byType.put(type, ids);
-        ids.forEach(id -> typeOf.put(id, type));
-      }
-      lines =
-          programme.getLines().stream()
-              .filter(EbProgrammeLine::isActive)
-              .map(EbProgrammeLine::getBenefitLine)
-              .distinct()
-              .toList();
     }
+    return new Found(programme, List.of(change.getBenefitLine()), byType, typeOf);
+  }
+
+  private Found ofCycle(Long companyId, EbProgramme programme, Long cycleId) {
+    if (cycleId == null) {
+      throw new BusinessRuleException(
+          "EB_DOCUMENT_TRANSACTION_REQUIRED", "Link the document to its cycle or member change");
+    }
+    EbCycle cycle = records.cycle(companyId, cycleId);
+    LocalDate today = BusinessClock.today(clock);
+    Map<String, List<Long>> byType = new LinkedHashMap<>();
+    Map<Long, String> typeOf = new LinkedHashMap<>();
+    for (String type : cycleDocuments.presentTypes(cycle, today)) {
+      List<Long> ids = cycleDocuments.files(cycle, List.of(type), today);
+      byType.put(type, ids);
+      ids.forEach(id -> typeOf.put(id, type));
+    }
+    List<String> lines =
+        programme.getLines().stream()
+            .filter(EbProgrammeLine::isActive)
+            .map(EbProgrammeLine::getBenefitLine)
+            .distinct()
+            .toList();
     return new Found(programme, lines, byType, typeOf);
   }
 

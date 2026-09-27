@@ -49,6 +49,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class EbSoaService {
 
+  private static final String SOA_PREFIX = "SOA ";
+
   private static final Set<String> SOA_FILES = Set.of("pdf", "xls", "xlsx");
 
   private final EbSoaRepository soas;
@@ -131,20 +133,7 @@ public class EbSoaService {
     refuseDuplicate(companyId, insurer, clean.insurerSoaNo(), hash);
     List<String> billed = invoices.requireOfProgramme(programme, invoiceNos);
     Long attachment =
-        documents
-            .storeOn(
-                programme,
-                new AttachmentTarget(EbCodes.ENTITY_PROGRAMME, programme.getId().toString()),
-                new Registration(
-                    EbDocumentTypes.SOA,
-                    EbDocumentTypes.RENEWAL_PLACEMENT,
-                    EbDocumentSource.INSURER,
-                    false,
-                    "SOA " + clean.insurerSoaNo() + " of " + insurer.getName()),
-                List.of(file),
-                List.of())
-            .get(0)
-            .getAttachmentId();
+        store(programme, SOA_PREFIX + clean.insurerSoaNo() + " of " + insurer.getName(), file);
     String number =
         numbers.next(
             EbCodes.series(EbCodes.PREFIX_SOA, BusinessClock.currentYear(clock).getValue()));
@@ -163,7 +152,7 @@ public class EbSoaService {
                 EbCodes.ENTITY_SOA,
                 soa.getId().toString(),
                 number,
-                "SOA " + clean.insurerSoaNo() + " - " + programme.getName(),
+                SOA_PREFIX + clean.insurerSoaNo() + " - " + programme.getName(),
                 EbCodes.SOA_LINK + soa.getId(),
                 programme.getTeamCode()),
             null));
@@ -173,7 +162,7 @@ public class EbSoaService {
         EbCodes.ENTITY_SOA,
         number,
         AuditAction.CREATE,
-        "SOA "
+        SOA_PREFIX
             + clean.insurerSoaNo()
             + " of "
             + insurer.getName()
@@ -184,19 +173,25 @@ public class EbSoaService {
     return soa;
   }
 
+  private Long store(EbProgramme programme, String description, UploadedFile file) {
+    return documents
+        .storeOn(
+            programme,
+            new AttachmentTarget(EbCodes.ENTITY_PROGRAMME, programme.getId().toString()),
+            new Registration(
+                EbDocumentTypes.SOA,
+                EbDocumentTypes.RENEWAL_PLACEMENT,
+                EbDocumentSource.INSURER,
+                false,
+                description),
+            List.of(file),
+            List.of())
+        .get(0)
+        .getAttachmentId();
+  }
+
   private EbSoa.Intake check(EbSoa.Intake intake, InsurerProfile insurer) {
-    if (intake.insurerSoaNo() == null || intake.insurerSoaNo().isBlank()) {
-      throw new BusinessRuleException("EB_SOA_NO_REQUIRED", "Enter the SOA number");
-    }
-    if (intake.periodFrom() == null
-        || intake.periodTo() == null
-        || intake.periodTo().isBefore(intake.periodFrom())) {
-      throw new BusinessRuleException(
-          "EB_SOA_PERIOD", "Enter the period of the SOA, the end on or after the start");
-    }
-    if (intake.amount() == null || intake.amount().signum() < 0) {
-      throw new BusinessRuleException("EB_SOA_AMOUNT", "Enter an amount of zero or more");
-    }
+    requireFields(intake);
     LocalDate today = BusinessClock.today(clock);
     LocalDate received = intake.receivedOn() == null ? today : intake.receivedOn();
     if (received.isAfter(today)) {
@@ -216,6 +211,25 @@ public class EbSoaService {
         intake.remarks());
   }
 
+  private static void requireFields(EbSoa.Intake intake) {
+    if (intake.insurerSoaNo() == null || intake.insurerSoaNo().isBlank()) {
+      throw new BusinessRuleException("EB_SOA_NO_REQUIRED", "Enter the SOA number");
+    }
+    requirePeriodAndAmount(intake);
+  }
+
+  private static void requirePeriodAndAmount(EbSoa.Intake intake) {
+    if (intake.periodFrom() == null
+        || intake.periodTo() == null
+        || intake.periodTo().isBefore(intake.periodFrom())) {
+      throw new BusinessRuleException(
+          "EB_SOA_PERIOD", "Enter the period of the SOA, the end on or after the start");
+    }
+    if (intake.amount() == null || intake.amount().signum() < 0) {
+      throw new BusinessRuleException("EB_SOA_AMOUNT", "Enter an amount of zero or more");
+    }
+  }
+
   private static void requireSoaFile(String name) {
     int dot = name == null ? -1 : name.lastIndexOf('.');
     String ext = dot < 0 ? "" : name.substring(dot + 1).toLowerCase(Locale.ROOT);
@@ -230,7 +244,7 @@ public class EbSoaService {
         companyId, insurer.getPartyCode(), soaNo, EbSoa.Status.REJECTED)) {
       throw new BusinessRuleException(
           "EB_SOA_DUPLICATE",
-          "SOA " + soaNo + " of " + insurer.getName() + " is already registered");
+          SOA_PREFIX + soaNo + " of " + insurer.getName() + " is already registered");
     }
     soas.findFirstByCompanyIdAndFileHashAndStatusNot(companyId, hash, EbSoa.Status.REJECTED)
         .ifPresent(
@@ -334,7 +348,7 @@ public class EbSoaService {
     if (soa.getStatus() != status) {
       throw new BusinessRuleException(
           "EB_SOA_STATUS",
-          "SOA " + soa.getSoaNo() + " is " + soa.getStatus().name().toLowerCase(Locale.ROOT));
+          SOA_PREFIX + soa.getSoaNo() + " is " + soa.getStatus().name().toLowerCase(Locale.ROOT));
     }
   }
 }

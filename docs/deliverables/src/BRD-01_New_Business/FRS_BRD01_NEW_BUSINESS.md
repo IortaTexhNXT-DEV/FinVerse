@@ -18,19 +18,19 @@ control:
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Solution Architect
     approver: ""
-    change: Internal draft from the BRD-1 baseline, the traceability record and the broking design
+    change: Internal draft from the BRD-1 baseline
   - version: "1.0"
     date: 25 Sep 2026
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
-    change: First issue for BDOI review; aligned with the as-built screens, codes and the cross-BRD decisions
+    change: First issue for BDOI review; aligned with the screens, message codes and the cross-BRD decisions
   - version: "2.0"
     date: 27 Sep 2026
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Project Manager
     approver: BDOI business units (sign-off)
-    change: "Business sign-off pack: navigation by persona, screen specifications with screenshots, walkthroughs, messages, notifications, document outputs, upload templates, cross-BRD contract, sign-off and change control (chapters 12-20). Status as of 27-Sep-2026. Chapters 1-11 unchanged; FR, BRD and test IDs kept"
+    change: "Business sign-off pack: proposed business rules and clarifications for confirmation (chapter 21), navigation by persona, screen specifications with screenshots, walkthroughs, messages, notifications, document outputs, upload templates, cross-BRD contract, sign-off and change control (chapters 12-20). Issued 27-Sep-2026. Chapters 1-11 unchanged; FR, BRD and test IDs kept"
 distribution:
   - {name: "Product Owner, BDOI", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: Marketing Business Services and System Support (MBS), role: Business owner, organisation: BDOI, purpose: Review of all FRs}
@@ -39,7 +39,7 @@ distribution:
   - {name: Processing, role: Business user, organisation: BDOI, purpose: "Review of payment, placement, issuance and booking FRs"}
   - {name: Comptrollership, role: Business user, organisation: BDOI, purpose: Review of the booking and service invoice FRs}
   - {name: Business Project Services, role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Build, test and UAT preparation"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, test and UAT preparation"}
 ---
 
 # Introduction
@@ -48,9 +48,9 @@ distribution:
 
 This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker System, on iNXT BrokerVerse) meets the New Business business requirements of BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It turns each BRD requirement into functional requirements with actors, flows, rules, validations, screens, fields, notifications, audit and acceptance criteria.
 
-New Business is built. Every FR therefore describes the behaviour of the delivered system, with the error codes, messages, lists of values, parameters, permissions and screen names of the build. Where the built behaviour differs from the BRD, the FR says so in a note and section 10.4 lists every difference.
+Every FR describes the proposed behaviour of BIBS, with the messages and their codes, the lists of values, parameters, permissions and screen names that the users see. Where the proposed rule or screen differs from the BRD, or needs a decision of BDOI, the FR refers to chapter 21, which lists each such point for confirmation.
 
-Version 2.0 is the business sign-off version. Chapters 1 to 11 keep the requirements of version 1.0 with their IDs. Chapters 12 to 19 show the system as the users see it: the menu of each persona, one specification per screen with its fields, actions, rules and messages, three end-to-end walkthroughs, every message and notification, the generated documents, the upload templates and what New Business exchanges with the other BRDs. Chapter 20 states what signing freezes and how a later change is made. The same rows are in the sign-off workbook, where each business unit records its review. Status as of 27-Sep-2026.
+Version 2.0 is the business sign-off version. Chapters 1 to 11 keep the requirements of version 1.0 with their IDs. Chapters 12 to 19 show the system as the users see it: the menu of each persona, one specification per screen with its fields, actions, rules and messages, three end-to-end walkthroughs, every message and notification, the generated documents, the upload templates and what New Business exchanges with the other BRDs. Chapter 20 states what signing freezes and how a later change is made, and chapter 21 lists the proposed business rules and clarifications for confirmation. The same rows are in the sign-off workbook, where each business unit records its review.
 
 BDOI uses this document to confirm that the system behaves as the business expects. The project team uses it to test and to prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
 
@@ -140,7 +140,7 @@ UH: Unit Head (Marketing)
 Each FR in section 4 has the same parts:
 
 - A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority** and the **screens** where the user performs it.
-- **Description**, **preconditions**, **main flow** and **alternate and exception flows**. A description paragraph that starts with **Built behaviour** records a difference from the BRD.
+- **Description**, **preconditions**, **main flow** and **alternate and exception flows**. A description paragraph that refers to chapter 21 (CLR-NB-nn) states a proposed rule that differs from the BRD or needs a decision of BDOI.
 - **Business rules**. *Configurable* rules are maintained by the Business Administrator, the System Administrator or the business owner in BIBS (parameter, list of values or master record, section 9). *Fixed* rules are part of the system and change only through a change request.
 - **Validations and messages**: the check, the message the user sees and its code. The code is the one BIBS returns for a business rule. A "-" marks a screen or platform check (for example a blank mandatory field); its message follows the same wording but has no business code. Text in angle brackets (`<ARN>`) is filled in by BIBS.
 - **Screens and fields**: label, type, whether mandatory ("Cond." = mandatory when the condition in the Validation column applies), the source list and the validation.
@@ -161,7 +161,7 @@ BDOI is an insurance broker: insurers issue the policies. Today most New Busines
 |---|---|---|
 | 1 | Quotation requests arrive by e-mail; HLS requests are keyed in | Requests are captured in a request inbox or loaded from a source-system file; each gets a number |
 | 2 | Quotations and proposals are prepared in QPS or Excel | Quotations are rated in BIBS with the Appendix A formulas, versioned, approved and sent protected |
-| 3 | Non-package risks go to TSU by e-mail; comparative tables are built in Excel | Marketing raises a PRF; TSU sends quotation slips, keys in insurer terms, and BIBS compiles the comparative table |
+| 3 | Non-package risks go to TSU by e-mail; comparative tables are prepared in Excel | Marketing raises a PRF; TSU sends quotation slips, keys in insurer terms, and BIBS compiles the comparative table |
 | 4 | Clients are created without a standard onboarding step | Every client starts as a prospect and is confirmed after KYC verification |
 | 5 | Accounts are tracked in spreadsheets; duplicates are found late | Each account has one ARN, a workflow stage and duplicate checks at creation |
 | 6 | CBG Fire billing and payment matching are manual | BIBS produces the CLPC billing file and matches payment reports |
@@ -215,7 +215,7 @@ Other Lines follow the Fire and Motor workflow with product-specific set-up (p.4
 | System Administrator | SYSADMIN | Users, roles, parameters, jobs; submits access requests; maintains lists of values | BRNB.087-089 (p.122-127) |
 | Auditor | AUDITOR | Read access to clients, quotations, accounts, work queues and messages | BRNB.016 |
 
-The BRD persona footnote says that user roles "will be further defined in succeeding documentations" (p.49, footnote 2; p.4). BRD-11 User Access Maintenance governs the final matrix; the roles above are the build's matrix until BDOI confirms it.
+The BRD persona footnote says that user roles "will be further defined in succeeding documentations" (p.49, footnote 2; p.4). BRD-11 User Access Maintenance governs the final matrix; the roles above are the proposed matrix until BDOI confirms it.
 
 ## Permissions
 
@@ -253,9 +253,9 @@ The BRD persona footnote says that user roles "will be further defined in succee
 
 ## Permissions matrix
 
-The table below is the role-to-permission matrix provided with the system ("Y" = granted, migration V750). Changes go through access requests of type "Modify role permissions" (FR-NB-135). The User Access Matrix screen shows it by permission and by action class and exports it to Excel.
+The table below is the proposed role-to-permission matrix ("Y" = granted). Changes go through access requests of type "Modify role permissions" (FR-NB-135). The User Access Matrix screen shows it by permission and by action class and exports it to Excel.
 
-<!-- table: widths=4.3,1.12,1.12,1.12,1.12,1.12,1.12,1.12,1.12,1.12,1.12,1.12 caption="Role-to-permission matrix for New Business (build V750)" size=7.5 -->
+<!-- table: widths=4.3,1.12,1.12,1.12,1.12,1.12,1.12,1.12,1.12,1.12,1.12,1.12 caption="Role-to-permission matrix for New Business" size=7.5 -->
 | Permission | MKT AO | MKT TL | TSU | Proc. | Proc. TL | NB Appr. | E-pol. Send. | Adjust. | Bus. Admin | Sys. Admin | Audit. |
 |---|---|---|---|---|---|---|---|---|---|---|---|
 | CLIENT_VIEW | Y | Y | Y | Y | Y | Y | Y | Y | | | Y |
@@ -308,7 +308,7 @@ BRNB.088 (p.122-127) lists the functions that the System Administrator assigns t
 | 5-6 | Search accounts; update accounts | ACCOUNT_VIEW; ACCOUNT_MAINTAIN |
 | 7-8 | Upload files / documents; view uploaded documents | ATTACHMENT_MANAGE; ATTACHMENT_VIEW |
 | 9 | Access reports | REPORT_VIEW (each report also checks its own permission) |
-| 10, 20 | Request / approve override | Not built: Renewal only (OOS-1) |
+| 10, 20 | Request / approve override | Not in New Business: a Renewal function (OOS-1) |
 | 11 | Handle returned placement request | ACCOUNT_MAINTAIN (Marketing); PLACEMENT_MANAGE (Processing) |
 | 12, 34 | Access generated Insurance Advice | ACCOUNT_VIEW (register); EPOLICY_SEND (send) |
 | 13 | Approve requests | ACCESS_APPROVE, MASTER_AUTHORIZE, QUOTE_APPROVE |
@@ -321,7 +321,7 @@ BRNB.088 (p.122-127) lists the functions that the System Administrator assigns t
 | 28 | Send e-policy to client | EPOLICY_SEND |
 | 29-30 | Generate list of accounts (individual); confirm issuance or payment | QUOTE_MAINTAIN (create accounts); BILLING_MANAGE |
 | 31-32 | Book accounts; cancel placement | BOOKING_PROCESS; PLACEMENT_MANAGE |
-| 33 | Manually build accounts for bulk processing | BULK_PROCESS, QUOTE_MAINTAIN |
+| 33 | Manually prepare accounts for bulk processing | BULK_PROCESS, QUOTE_MAINTAIN |
 | 35-36 | Reactivate cancelled placed accounts; cancel booking | PLACEMENT_MANAGE or ACCOUNT_MAINTAIN; BOOKING_ADJUST |
 | 37-39 | Maintain LOVs; maintain users; submit profile requests | LOV_MANAGE; ACCESS_REQUEST (user changes go through requests); ACCESS_REQUEST |
 
@@ -466,7 +466,7 @@ alternate_flows:
   - "A new template version is saved by the Business Administrator. Documents generated before keep their version; new documents use the new one."
 rules:
   - [R1, "Templates are versioned; a new version supersedes the old one from its effective date.", Fixed, "-"]
-  - [R2, "Template layouts are the build's drafts until BDOI provides its layouts (Q03).", Configurable, Document Templates]
+  - [R2, "Template layouts are proposed drafts until BDOI provides its layouts (Q03; chapter 21, CLR-NB-37).", Configurable, Document Templates]
   - [R3, "Completeness is checked before quotation creation and submission (FR-NB-041).", Fixed, "-"]
 validations:
   - [Template text blank, Enter the template text, TEMPLATE_BODY_REQUIRED]
@@ -590,7 +590,7 @@ alternate_flows:
 rules:
   - [R1, "An item can be assigned only to a user who holds the stage's owner permission.", Fixed, "-"]
   - [R2, "Processing actions start only from submitted accounts (stage SUBMITTED onwards).", Fixed, "-"]
-  - [R3, "Assignment is manual (claim or assign); automatic round-robin allocation is not built.", Fixed, "-"]
+  - [R3, "Assignment is manual (claim or assign); there is no automatic round-robin allocation (chapter 21, CLR-NB-21).", Fixed, "-"]
 validations:
   - [Claim outside the user's queue, This item is not in your queue, WORK_CLAIM_NOT_ALLOWED]
   - [Assignee does not work the queue, "<user> does not work this queue", WORK_ASSIGNEE_NOT_ELIGIBLE]
@@ -615,7 +615,7 @@ screens: "Workflow panel (Void) of quotations, PRFs and accounts"
 description:
   - "A record that is still in process can be voided with a reason from VOID_REASON and a comment: a quotation in DRAFT or FOR_REVIEW, a PRF in DRAFT, FOR_MKT_APPROVAL or WITH_TSU, an account in DRAFT, SUBMITTED or RETURNED_TO_MARKETING. Voiding is the BRD's \"deletion\": the record is removed from active lists and searches but kept, with its history, for audit."
   - "BIBS keeps two distinct lifecycle outcomes (BRNB.094). VOIDED is the internal reversal of a record before issuance, with no insurer impact. CANCELLED is the cancellation of a booked account after issuance, posted as a cancellation invoice (FR-NB-116). A placement can also be cancelled before issuance (PLACEMENT_CANCELLED, FR-NB-085)."
-  - "**Built behaviour:** records are never physically deleted. A voided record is hidden from standard lists and reports and found with the filter Include voided."
+  - "Records are never physically deleted (chapter 21, CLR-NB-04). A voided record is hidden from standard lists and reports and found with the filter Include voided."
 preconditions:
   - "The record is in a stage that allows void; the user holds the transition's permission."
 main_flow:
@@ -663,7 +663,7 @@ alternate_flows:
   - "Delivery failure. The message shows FAILED with the reason; the user resends it."
 rules:
   - [R1, "Protection cannot be switched off for documents sent outside BDOI.", Fixed, "-"]
-  - [R2, "Password: a generated 12-character password per e-mail until BDOI states its convention (Q07).", Configurable, Password policy (parked Q07)]
+  - [R2, "Password: a generated 12-character password per e-mail until BDOI states its convention (Q07).", Configurable, Password policy (Q07)]
   - [R3, "Mail is dispatched every 2 minutes and right after the commit; 3 delivery attempts before FAILED.", Configurable, Parameter MAIL_MAX_ATTEMPTS; job MAIL_DISPATCH]
 validations:
   - [File cannot be protected, "<file> cannot be password protected (only PDF and Excel files can)", DOCUMENT_NOT_PROTECTABLE]
@@ -695,7 +695,7 @@ screens: "Quotation page; PRF page (Quotation Slip, Proposal Slip tabs)"
 description:
   - "A document leaves BIBS only after its checks and approval. A quotation is sent only in stage APPROVED; a quotation slip is sent only by its approval; a proposal slip reaches Marketing only by its approval; a placement slip is generated only when the placement prerequisites are met (FR-NB-080)."
   - "Approvals follow four-eyes: the approver is never the maker or submitter of a quotation or PRF, nor the preparer of a slip."
-  - "**Built behaviour:** the BRD asks for multi-level approval (Marketing TL, then TH, then UH for PRFs). BIBS has one approval stage per document; the approver permission decides who approves. A chain by amount, product or segment waits for Q05."
+  - "The BRD asks for multi-level approval (Marketing TL, then TH, then UH for PRFs). BIBS proposes one approval stage per document, in which the approver permission decides who approves (chapter 21, CLR-NB-01; Q05)."
 preconditions:
   - "None."
 main_flow:
@@ -731,7 +731,7 @@ priority: "Must have"
 screens: "Notifications (bell); Notification preferences (My Profile)"
 description:
   - "BIBS notifies users in the application on every stage entry (the owners of the new stage or the assignee), when someone other than the originator changes a record, on returns, on failed dispatches, on hold covers about to expire and when the monthly KYC list is ready. Users choose per event whether they also receive an e-mail."
-  - "**Built behaviour:** the BRD also asks for data synchronised with BDOI tracking and reporting systems. BIBS publishes events for its own modules (Operations, Collections, Renewal); a feed to other BDOI systems waits for Q08, which names QPS and EBIX for client contact updates only (BRD-9)."
+  - "The BRD also asks for data synchronised with BDOI tracking and reporting systems. BIBS passes each event to its own modules (Operations, Collections, Renewal); a feed to other BDOI systems is added when BDOI names them (chapter 21, CLR-NB-02; Q08 names QPS and EBIX for client contact updates only, BRD-9)."
 preconditions:
   - "None."
 main_flow:
@@ -861,7 +861,7 @@ title: "Upload records in bulk with a standard template"
 brd: [BRNB.039 (p.80-81), BRNB.064 (p.110), BRNB.024 (p.62-63)]
 actor: "Marketing; Processing; System"
 priority: "Must have"
-screens: "Bulk Uploads; Bulk Upload wizard (/bulk/<type>)"
+screens: "Bulk Uploads; Bulk Upload wizard of each upload type"
 description:
   - "All bulk processing uses one upload wizard. The user downloads the current template (Excel with an instructions sheet), fills it, and uploads it as .xlsx, .ods, .csv or .txt. BIBS checks the header against the template, sanitises each row (trim, case, format), validates every row, and shows valid and invalid rows for review. The user commits; each valid row is processed in its own transaction, so one failure does not stop the others. A summary and an error report (Excel, one line per failed row with the reason) are available after commit."
   - "Delivered uploads - CLIENT_CREATE (bulk client creation and update), QUOTATION_CREATE (bulk quotations), QUOTATION_ACCEPTANCE (bulk quotation acceptance), QUOTATION_REQUEST (quotation requests), ACCOUNT_CREATE (bulk account creation), ACCOUNT_UPDATE (bulk account update), FFY_TAGGING (Free First Year tagging), BOOKING_UPLOAD (booking upload)."
@@ -908,18 +908,20 @@ priority: "Must have"
 screens: "-"
 description:
   - "The BRD asks for one authoritative source per key data element (client, vehicle, property, address, policy, invoice), with primary and fallback sources, enforced as read-only or editable fields, and conflicts logged."
-  - "**Built behaviour:** the data ownership register is not built; it waits for BDOI's list of sources (Q37). In the build, BIBS is the source for clients, accounts and invoices it creates; the policy number is owned by the account and set only from the insurer's e-policy (FR-NB-101); BRD-7 and BRD-9 confirm that the policy number flows from the policy system and that QPS and EBIX stay the systems of record for contact data during coexistence (R5)."
+  - "BIBS is the source of the clients, accounts and invoices it creates; the policy number is owned by the account and set only from the insurer's e-policy (FR-NB-101); BRD-7 and BRD-9 confirm that the policy number flows from the policy system and that QPS and EBIX stay the systems of record for contact data during coexistence. The register of authoritative sources for the other data elements is completed when BDOI gives its list of sources (chapter 21, CLR-NB-24; Q37)."
 preconditions:
-  - "BDOI answers Q37."
+  - "The data element has an authoritative source outside the screen (for the policy number, the insurer's e-policy)."
 main_flow:
-  - "Parked: no flow in this phase."
+  - "The user opens a record that shows the element."
+  - "BIBS shows the element read-only and names its source."
+  - "The element changes only through its source (for the policy number, the e-policy confirmation of FR-NB-101)."
 rules:
   - [R1, "The policy number of an account changes only through the e-policy confirmation.", Fixed, "-"]
 validations: []
 notifications:
   - "None."
 audit:
-  - "Not applicable until built."
+  - "A change of the element through its source is recorded in the history of the record."
 acceptance:
   - "The policy number field of an account is read-only on the account screens."
 ```
@@ -1106,7 +1108,7 @@ main_flow:
 alternate_flows:
   - "Return. The verifier returns the KYC with a reason; the client goes back to PROSPECT."
   - "Deactivate. A client in any stage is deactivated with a reason from CLIENT_DEACTIVATION_REASON (INACTIVE)."
-  - "Periodic review. For a confirmed client, the verifier records the periodic KYC review (**review_kyc**), which sets the next review date."
+  - "Periodic review. For a confirmed client, the verifier records the periodic KYC review (**Record periodic KYC review**), which sets the next review date."
 rules:
   - [R1, "Mandatory KYC documents - individual - KYC form, valid ID; corporate - KYC form, SEC / DTI certificate, GIS, secretary's certificate.", Configurable, "LOV KYC_DOCS_INDIVIDUAL, KYC_DOCS_CORPORATE"]
   - [R2, "Submit and confirm need the minimum client information and the mandatory documents.", Fixed, "-"]
@@ -1143,11 +1145,11 @@ title: "Create and update clients in bulk"
 brd: [BRNB.047 (p.97-98), BRNB.065 (p.110-111)]
 actor: "Marketing; System"
 priority: "Must have"
-screens: "Bulk Upload (Bulk client creation and update, /bulk/CLIENT_CREATE)"
+screens: "Bulk Upload (Bulk client creation and update)"
 description:
   - "Marketing uploads a list of clients on the standard template (FR-NB-019). For each row, BIBS updates the client found by prospect or client code (blank cells keep the current values), else the client found by a single hard duplicate key, else creates a new prospect. Every row is validated like the screen (formats, lists, duplicates), invalid rows are flagged with the reason and not saved."
   - "Bulk quotation and account uploads (FR-NB-046, FR-NB-065) use the same client look-up and create prospects for new names, which follow the onboarding of FR-NB-034."
-  - "**Built behaviour:** a bulk row is saved directly when valid; there is no separate draft state for bulk rows. Review before commit takes the place of the BRD's save-draft and cancel."
+  - "A bulk row is saved directly when valid; there is no separate draft state for bulk rows. Review before commit takes the place of the BRD's save-draft and cancel (chapter 21, CLR-NB-13)."
 preconditions:
   - "The user has BULK_PROCESS and CLIENT_MAINTAIN."
 main_flow:
@@ -1185,7 +1187,7 @@ priority: "Must have"
 screens: "Client page (Tags & Instructions tab); instructions banner on client, quotation, PRF and account pages"
 description:
   - "Users tag a client with controlled values (list CLIENT_TAG) and record special instructions with a type, text and effective dates. The tags and instructions in force are shown as a banner on every screen of the client's records (quotations, PRFs, accounts, placement, booking), so servicing, collections and processing follow them."
-  - "**Built behaviour:** tags and instructions warn only; they do not block a process. Blocking, and the final list of tags and instruction types, wait for Q18. BRD-10 Sanction Screening sets PEP and WATCHLIST_REVIEW by rule."
+  - "Tags and instructions warn only; they do not block a process. Blocking, and the final list of tags and instruction types, follow BDOI's answer to Q18 (chapter 21, CLR-NB-23). BRD-10 Sanction Screening sets PEP and WATCHLIST_REVIEW by rule."
 preconditions:
   - "The user has CLIENT_MAINTAIN to change tags and instructions."
 main_flow:
@@ -1227,7 +1229,7 @@ screens: "Client page (Linked Records, Quotation, Confirmed Proposals, History t
 description:
   - "The client page lists every record linked to the client - quotations, PRFs, accounts with their ARN, Insurance Advices and booked invoices - with reference, description, status and date, and flags missing linkages - a confirmed client without an active party, incomplete client information, or an expired KYC. Key identifier changes (codes, names, TIN, IDs) are in the History tab."
   - "Prospects are the leads of this phase; client-level special instructions are reused by Renewal and servicing."
-  - "**Built behaviour:** lead management before the prospect (for example bank referrals) is not built; it waits for Q19."
+  - "Lead management before the prospect (for example bank referrals) is not part of this FRS until BDOI answers Q19 (chapter 21, CLR-NB-25)."
 preconditions:
   - "The user has CLIENT_VIEW."
 main_flow:
@@ -1255,7 +1257,7 @@ priority: "Must have"
 screens: "KYC Reviews Due; Report NB-KYC-DUE"
 description:
   - "A monthly job (KYC_REVIEW_DUE, first day of the month) expires the KYC of clients past their review date and notifies the CLIENT_MAINTAIN holders with the number of non-bank clients due. The KYC Reviews Due screen lists the clients due by a date, filtered by non-bank / bank / all, risk rating and market segment, and downloads or prints the list (Excel, PDF)."
-  - "**Built behaviour:** the BRD's 'shared path' is replaced by the in-system list and the report, which the user downloads to any folder."
+  - "The BRD's 'shared path' is replaced by the in-system list and the report, which the user downloads to any folder (chapter 21, CLR-NB-29)."
 preconditions:
   - "The user has CLIENT_VIEW."
 main_flow:
@@ -1293,7 +1295,7 @@ screens: "Quotation Requests; Capture Quotation Request dialog; Bulk Upload (Quo
 description:
   - "Every request is logged in the Quotation Requests inbox with a number REQ-yyyy-nnnnnn, its channel (list SOURCE_CHANNEL), source reference, client or prospect, requested product, segment and cover. A request received by e-mail is captured by the AO with the e-mail attached (document type REQUEST_EMAIL). Requests from a source system are loaded as a file (upload QUOTATION_REQUEST) or through the source-system intake port."
   - "From the inbox the AO creates the prospect when the client is new, creates the quotation (the request becomes QUOTED) or closes the request with a reason."
-  - "**Built behaviour:** HLS requests (BRNB.023) are loaded by upload of the HLS extract. The direct HLS interface, with its source signature check, waits for Q11; the intake port and the staging of requests are built. Reading a shared mailbox automatically waits for Q12."
+  - "HLS requests (BRNB.023) are loaded by upload of the HLS extract. The direct HLS interface, with its source signature check, is added when BDOI specifies it (Q11); BIBS keeps each loaded request in the request inbox. Requests received in a shared mailbox are captured manually with the e-mail attached (Q12). See chapter 21, CLR-NB-06 and CLR-NB-12."
 preconditions:
   - "The user has QUOTE_MAINTAIN (capture) or QUOTE_VIEW (view)."
 main_flow:
@@ -1507,7 +1509,7 @@ priority: "Must have"
 screens: "Quotation page (Record Acceptance, Create Accounts); Bulk Quotation Acceptance"
 description:
   - "When the client accepts by e-mail, the AO attaches the acceptance e-mail (document type CLIENT_ACCEPTANCE), records the acceptance with the accepted risk groups and a comment (ACCEPTED), and creates the accounts. BIBS creates one draft account per accepted risk group with the premium of the group, the insurer, the payment arrangement and the quotation's creator as account officer (CONVERTED). A quotation with one account passes its own ARN; with several, the accounts carry ARN-yyyy-nnnnnn-01, -02 and so on."
-  - "Accepted quotations are received in bulk with the upload QUOTATION_ACCEPTANCE (ARN, risk groups, remarks), which can create the accounts at once; the uploaded list is kept as the acceptance evidence. This is also how Marketing builds accounts for bulk processing (BRNB.044)."
+  - "Accepted quotations are received in bulk with the upload QUOTATION_ACCEPTANCE (ARN, risk groups, remarks), which can create the accounts at once; the uploaded list is kept as the acceptance evidence. This is also how Marketing prepares accounts for bulk processing (BRNB.044)."
   - "A client who declines is recorded with **Client declined** (NOT_PROCEEDED)."
 preconditions:
   - "The quotation is SENT_TO_CLIENT (accept) or ACCEPTED (create accounts); account creation needs a confirmed client (FR-NB-034)."
@@ -1547,7 +1549,7 @@ title: "Create quotations in bulk"
 brd: [BRNB.028 (p.67-68), BRNB.063 (p.109-110), BRNB.042 (p.94-95)]
 actor: "Marketing; System"
 priority: "Must have"
-screens: "Bulk Quotations (/bulk/QUOTATION_CREATE); Quotations"
+screens: "Bulk Quotations; Quotations"
 description:
   - "Marketing uploads a list of request details (or the extract of a source system) with the parameters product and default market segment. Each valid row becomes one quotation with one risk item, rated, numbered and given an ARN. The client is found by code, or by name and birth date, or created as a prospect, so a quotation can be created without an existing client code (BRNB.063). The job reports each quotation number or the reason of failure; duplicate rows of the same file are refused."
   - "The quotations then follow the normal approval and are sent singly or in a batch (FR-NB-044)."
@@ -1600,7 +1602,7 @@ main_flow:
   - "A user enters an ARN in any search to find the record."
 rules:
   - [R1, "ARN format ARN-<yyyy>-nnnnnn, or ARN-<yyyy>-nnnnnn-nn for split accounts; gap-free, never re-used, not editable.", Fixed, "-"]
-  - [R2, "Format of the BDOI number waits for Q15; the ARN prefix is the build default.", Configurable, Numbering (Q15)]
+  - [R2, "The format of the BDOI number follows BDOI's answer to Q15; the ARN prefix is the proposed default (chapter 21, CLR-NB-35).", Configurable, Numbering (Q15)]
 validations:
   - [Invalid ARN given, "The ARN must read ARN-yyyy-nnnnnn (or ARN-yyyy-nnnnnn-nn)", ARN_INVALID]
   - [ARN already used, "An account already has ARN <arn>", ARN_IN_USE]
@@ -1680,7 +1682,7 @@ priority: Must have
 screens: Proposal Requests (For Approval tab); Proposal Request page
 description:
   - A Marketing approver reviews the submitted PRF and approves it, which sends it to the TSU (WITH_TSU), or returns it to the AO with a reason (DRAFT). The approver is never the maker or submitter.
-  - "**Built behaviour:** the BRD's chain TL, then TH, then UH is one approval stage in the build; any holder of PROPOSAL_APPROVE approves. The chain waits for Q05."
+  - "The BRD's chain TL, then TH, then UH is one approval stage; any holder of PROPOSAL_APPROVE other than the maker approves (chapter 21, CLR-NB-01; Q05)."
 preconditions:
   - The PRF is in FOR_MKT_APPROVAL; the user has PROPOSAL_APPROVE.
 main_flow:
@@ -1840,7 +1842,7 @@ brd: [BRNB.010 (p.54-55), BRNB.009 (p.54)]
 actor: System; TSU; Marketing (view)
 priority: Must have
 screens: Proposal Request page (Comparative Table tab)
-description: BIBS compiles the insurer responses of the PRF into one comparative table - received terms first, cheapest first, then declines - with premium, rate, deductibles, conditions, validity and remarks per insurer, the lowest premium flagged and the recommended insurer marked. The table is always built from the current responses, so an amended response shows at once. It is exported as PDF and Excel, attached to the PRF (document type COMPARATIVE_TABLE) and sent protected with the proposal slip.
+description: BIBS compiles the insurer responses of the PRF into one comparative table - received terms first, cheapest first, then declines - with premium, rate, deductibles, conditions, validity and remarks per insurer, the lowest premium flagged and the recommended insurer marked. The table is always compiled from the current responses, so an amended response shows at once. It is exported as PDF and Excel, attached to the PRF (document type COMPARATIVE_TABLE) and sent protected with the proposal slip.
 preconditions:
   - At least one response exists.
 main_flow:
@@ -2059,7 +2061,7 @@ acceptance:
 ```
 
 > [!QUESTION] Appendix A to confirm
-> Appendix A (p.216) gives the Fire premium tax as 12% of net premium and two Motor OD / Theft bases (90% and 81% of TSI). The build applies them as written, as rates in the catalogue. BDOI confirms the premium tax basis (Q43) and the multi-year basis (Q35).
+> Appendix A (p.216) gives the Fire premium tax as 12% of net premium and two Motor OD / Theft bases (90% and 81% of TSI). BIBS applies them as written, as rates in the catalogue (chapter 21, CLR-NB-32). BDOI confirms the premium tax basis (Q43) and the multi-year basis (Q35).
 
 ```fr
 id: FR-NB-063
@@ -2071,7 +2073,7 @@ screens: "New Account; Edit Account; bulk account uploads"
 description:
   - "Before an account is saved, BIBS compares its risks with the live accounts of the company (every status except VOIDED and CANCELLED). Motor - the plate number, conduction sticker, engine number or chassis / serial number (normalised alphanumeric) of any item matches an item of another account. Fire and property - the same client, the same normalised location of risk and the same insured items. A match blocks the save, and the fall-out names the existing ARN and the matching identifier."
   - "A CTPL product (CTP01, CTP02) may share a vehicle with a Motor package account (MTR codes), as the BRD allows. For an endorsement the duplicate is allowed and returned as a flagged finding."
-  - "**Built behaviour:** the BRD's example keys for accounts (e-mail, phone, ID number) are the client duplicate keys of FR-NB-033; accounts are compared on their risks, as BRNB.051 and 066 specify."
+  - "The BRD's example keys for accounts (e-mail, phone, ID number) are the client duplicate keys of FR-NB-033; accounts are compared on their risks, as BRNB.051 and 066 specify (chapter 21, CLR-NB-09)."
 preconditions:
   - "None."
 main_flow:
@@ -2143,7 +2145,7 @@ title: "Create and update accounts in bulk"
 brd: [BRNB.066 (p.111-114), BRNB.052 (p.101-102), BRNB.025 (p.63-65), BRNB.064 (p.110), BRNB.039 (p.80-81), BRNB.044 (p.96-97)]
 actor: "Marketing; Processing; System"
 priority: "Must have"
-screens: "Bulk Account Creation (/bulk/ACCOUNT_CREATE); Bulk Upload (ACCOUNT_UPDATE)"
+screens: "Bulk Account Creation; Bulk Upload (ACCOUNT_UPDATE)"
 description:
   - "ACCOUNT_CREATE takes a list of accounts from a source-system extract or a manual upload (.xlsx, .ods, .csv), with the parameters product, default segment and submit. For each row BIBS sanitises the values, finds the client by code or by name and birth date or creates a prospect, validates the fields and duplicates, prices the account, assigns the ARN (and associates the quotation reference given in the row), and saves it as a draft - or submits it when the parameter submit is set. Failed rows, including duplicate fall-outs with the existing ARN, are listed in the error report."
   - "ACCOUNT_UPDATE takes the ARN and the columns to change (segment, insurer and branch, mortgagee, loan application number, PN list, contact e-mail and mobile); blank cells keep the current value. Only editable accounts are updated."
@@ -2285,7 +2287,7 @@ screens: "New Account (Payment); Direct Payment; Account page (Tags card)"
 description:
   - "The payment arrangement of an account is \"Premium paid through BDOI\" or \"Direct payment to the insurer\". Direct payment is offered only for products that allow it (configurable criterion). The tag drives the process - the account skips the payment gate, booking opens no client premium receivable, and the tag shows on billing, placement, booking and report views."
   - "Users change the arrangement until the payment gate is passed. The Direct Payment screen lists the direct-payment accounts, searchable and filterable by status."
-  - "**Built behaviour:** the accounting variant for direct payment (commission receivable only) follows the build's booking rules; BDOI confirms it under Q29."
+  - "The accounting of a direct payment account books the commission receivable only (chapter 21, CLR-NB-30; Q29)."
 preconditions:
   - "The product allows direct payment."
 main_flow:
@@ -2363,7 +2365,7 @@ priority: "Must have"
 screens: "Placement Slips (Send, Send Slips); Placement Workbench (Send Slips)"
 description:
   - "BIBS e-mails each slip to the placement mailbox of its insurer branch (from the insurer master), with the PDF and Excel protected and the password sent separately. The first send records the placement of each account (PLACED); later sends are resends, for example after a return or a failed delivery. The send log shows recipients, time and outcome per slip."
-  - "**Built behaviour:** slips are sent by e-mail when the user clicks Send; SFTP and insurer API channels wait for Q06, and an insurer set up for them is refused."
+  - "Slips are sent by e-mail when the user clicks Send. SFTP and insurer API channels are added when BDOI specifies them (Q06); until then an insurer set up for them is refused with a message (chapter 21, CLR-NB-17)."
 preconditions:
   - "The slip is GENERATED or SENT; the user has PLACEMENT_MANAGE."
 main_flow:
@@ -2395,7 +2397,7 @@ priority: "Must have"
 screens: "Account Placement (Hold Cover panel)"
 description:
   - "For an account in placement (Ready for placement, Placed or Returned by insurer), Processing clicks **Request Hold Cover**. BIBS generates the request from the HOLD_COVER_REQUEST template with the start date and an expiry of 30 days, and e-mails it to the insurer branch (REQUESTED)."
-  - "**Built behaviour:** the request is sent when the user clicks the button, not automatically for every placement; which accounts need an automatic request waits for Q27."
+  - "The request is sent when the user clicks the button, not automatically for every placement; which accounts need an automatic request follows BDOI's answer to Q27 (chapter 21, CLR-NB-18)."
 preconditions:
   - "The account is in placement and has an insurer; no open hold cover."
 main_flow:
@@ -2437,7 +2439,7 @@ alternate_flows:
 rules:
   - [R1, "Statuses - REQUESTED, CONFIRMED, DECLINED, EXPIRED.", Fixed, "-"]
   - [R2, "Expiry alert 5 days before (default); job HOLD_COVER_EXPIRY daily at 08:30 PHT.", Configurable, Parameter HOLD_COVER_ALERT_DAYS]
-  - [R3, "What happens at expiry without a policy waits for Q27.", Configurable, "-"]
+  - [R3, "At expiry without a policy BIBS raises an alert; any further outcome follows BDOI's answer to Q27 (chapter 21, CLR-NB-18).", Configurable, "-"]
 validations:
   - [Reference missing, "Enter the insurer's reference", HOLD_COVER_REFERENCE]
   - [No open hold cover, "Account <ARN> has no open hold cover", HOLD_COVER_NONE]
@@ -2500,7 +2502,7 @@ priority: "Must have"
 screens: "Placement Workbench (Cancel Placement); Account Placement"
 description:
   - "Processing selects one or several accounts that are Ready for placement, Placed or Returned by insurer, clicks **Cancel Placement**, and enters a reason (CANCELLATION_REASON) and a comment. Each account is tagged Placement cancelled (PLACEMENT_CANCELLED); each gets its own result, so one failure does not stop the others."
-  - "**Built behaviour:** the BRD says the account returns to the previous workflow. In BIBS a cancelled placement stays in the stage Placement cancelled, visible and reportable, until it is reactivated (FR-NB-086), which returns it to Ready for placement. This is the pre-issuance reversal of BRNB.094; it has no accounting."
+  - "The BRD says the account returns to the previous workflow. In BIBS a cancelled placement stays in the stage Placement cancelled, visible and reportable, until it is reactivated (FR-NB-086), which returns it to Ready for placement. This is the pre-issuance reversal of BRNB.094; it has no accounting (chapter 21, CLR-NB-15)."
 preconditions:
   - "The user has PLACEMENT_MANAGE."
 main_flow:
@@ -2529,7 +2531,7 @@ brd: [BRD 2.1.16 (p.180), BRD 3.4.2.2.35 (p.208)]
 actor: "Marketing; Processing"
 priority: "Must have"
 screens: "Placement Workbench (Reactivate); Account page"
-description: "The user selects one or several accounts in Placement cancelled and clicks **Reactivate** with a comment. Each account moves automatically to Ready for placement, the next workflow step. The requirement is in the role matrix of the BRD without a BRNB ID (Q25); it is built as specified in BRD 2.1.16."
+description: "The user selects one or several accounts in Placement cancelled and clicks **Reactivate** with a comment. Each account moves automatically to Ready for placement, the next workflow step. The requirement is in the role matrix of the BRD without a BRNB ID (Q25); BIBS meets it as specified in BRD 2.1.16."
 preconditions:
   - "The user has ACCOUNT_MAINTAIN or PLACEMENT_MANAGE; the accounts are in PLACEMENT_CANCELLED."
 main_flow:
@@ -2559,7 +2561,7 @@ priority: "Must have"
 screens: "CLPC Billing (CBG Fire Awaiting Payment, Billing Batches)"
 description:
   - "BIBS lists the CBG Fire (CBG, Property) accounts awaiting payment that are not already on an unpaid billing item. Processing creates a billing batch BILL-yyyy-nnnnnn with all or selected accounts. The batch file holds PN number (loan account), loan application number, booking date (inception date), borrower (assured's name), originating unit (department code), premium, reference (ARN), BDOI location and amortised Y/N, and downloads as .xlsx or .ods."
-  - "**Built behaviour:** the file is downloaded and forwarded to CLPC by the user; the automatic transfer to CLPC waits for Q28. The ARN replaces the QPS reference number (OOS-2)."
+  - "The file is downloaded and forwarded to CLPC by the user; an automatic transfer to CLPC is added when BDOI specifies it (Q28). The ARN replaces the QPS reference number (OOS-2). See chapter 21, CLR-NB-16."
 preconditions:
   - "CBG Fire accounts are in AWAITING_PAYMENT."
 main_flow:
@@ -2680,7 +2682,7 @@ priority: "Must have"
 screens: "E-policy Upload (single, bulk); Issuance Workbench (Placed - awaiting policy)"
 description:
   - "Processing uploads the insurer's e-policy PDF, singly or in a bulk of up to 50 files. BIBS matches each file to its account by ARN, policy number or PN number found in the file name, or the user chooses the account. The file is stored as document type EPOLICY on the account (the designated folder), and the e-policy enters review (FR-NB-101). In a bulk upload, the user reviews the matches, fixes or skips items and confirms."
-  - "**Built behaviour:** e-policies are received by upload. Reading an insurer mailbox or SFTP folder automatically waits for Q31 (Q12)."
+  - "E-policies are received by upload. Reading an insurer mailbox or SFTP folder automatically is added when BDOI specifies it (Q31, Q12; chapter 21, CLR-NB-19)."
 preconditions:
   - "The account is placed (PLACED, or later for a replacement)."
 main_flow:
@@ -2722,7 +2724,7 @@ screens: "Extraction Review; Account page (Policy tab)"
 description:
   - "BIBS reads the text of the e-policy PDF and applies the extraction patterns of the insurer (default patterns when the insurer has none) to find the policy number, the period from and to, and the premium. The Extraction Review shows the extracted values next to the account's values. The user corrects them if needed and clicks **Confirm Policy**; BIBS then updates the policy number and issue date of the account, links the e-policy, and moves the account to POLICY_ISSUED. A multi-year account takes one policy number per year."
   - "The user can **Reject** the e-policy with a reason; the file is kept."
-  - "**Built behaviour:** extraction reads text PDFs only; OCR of scanned documents waits for Q24 (a parked port)."
+  - "Extraction reads text PDFs; OCR of scanned documents follows BDOI's answer to Q24 (chapter 21, CLR-NB-26)."
 preconditions:
   - "An e-policy is in REVIEW."
 main_flow:
@@ -2841,7 +2843,7 @@ brd: [BRNB.077 (p.118-119), BRNB.035 (p.75-76)]
 actor: "E-policy Sender"
 priority: "Must have"
 screens: "E-policy Dispatch (Ready to Dispatch, Send E-policies); Issuance Workbench (Ready to dispatch)"
-description: "The E-policy Sender sends confirmed e-policies to the clients, one or a batch. BIBS uses the account contact e-mail (FR-NB-066), the EPOLICY_EMAIL template with the password hint that tells the client how the password is built, attaches the encrypted e-policy, and sends the password in a separate e-mail."
+description: "The E-policy Sender sends confirmed e-policies to the clients, one or a batch. BIBS uses the account contact e-mail (FR-NB-066), the EPOLICY_EMAIL template with the password hint that tells the client how the password is formed, attaches the encrypted e-policy, and sends the password in a separate e-mail."
 preconditions:
   - "The e-policy is CONFIRMED; the user has EPOLICY_SEND."
 main_flow:
@@ -2905,9 +2907,9 @@ title: "Book an account with its GL entry and service invoice"
 brd: [BRNB.027 (p.66-67), BRNB.061 (p.108-109), BRNB.108 (p.13-14)]
 actor: "Processing (BOOKING_PROCESS); System"
 priority: "Must have"
-screens: "Booking Workbench (Ready to Book); Pre-booking Confirmation (/booking/book/<ARN>); Booked Invoice"
+screens: "Booking Workbench (Ready to Book); Pre-booking Confirmation; Booked Invoice"
 description:
-  - "Processing books an account whose policy is issued (or that is flagged for direct booking). The Pre-booking Confirmation shows the invoice(s) with the premium breakdown and commission, and the journal preview. On **Book Account** BIBS, in one transaction - checks the account, the cost center and the insurer shares; builds the invoice BI-<branch>-yyyy-n on the booking date; posts the BROKER_BOOKING accounting event per insurer share (premium receivable from the client unless direct payment, premium payable to the insurer, commission receivable, VAT on commission, withholding tax); opens the open items; issues the service invoice when a type is triggered on booking (FR-NB-117); and moves the account to BOOKED."
+  - "Processing books an account whose policy is issued (or that is flagged for direct booking). The Pre-booking Confirmation shows the invoice(s) with the premium breakdown and commission, and the journal preview. On **Book Account** BIBS, in one transaction - checks the account, the cost center and the insurer shares; creates the invoice BI-<branch>-yyyy-n on the booking date; posts the BROKER_BOOKING accounting event per insurer share (premium receivable from the client unless direct payment, premium payable to the insurer, commission receivable, VAT on commission, withholding tax); opens the open items; issues the service invoice when a type is triggered on booking (FR-NB-117); and moves the account to BOOKED."
   - "If any step fails, nothing is kept and the error is shown. Booking twice returns the invoice already booked."
 preconditions:
   - "The account is POLICY_ISSUED; the user has BOOKING_PROCESS."
@@ -3057,7 +3059,7 @@ main_flow:
   - "The batch job books each scheduled year when it becomes due."
 rules:
   - [R1, "One invoice per policy year, transaction numbers NB, NB-Y2 ... NB-Yn.", Fixed, "-"]
-  - [R2, "Premium and commission basis of multi-year (upfront or yearly) waits for Q35.", Configurable, "-"]
+  - [R2, "The premium and commission basis of a multi-year policy (upfront or yearly) follows BDOI's answer to Q35 (chapter 21, CLR-NB-31).", Configurable, "-"]
 validations:
   - [Year not due, "Policy year <n> of <ARN> is not due for booking", POLICY_YEAR_NOT_DUE]
   - [Policy numbers missing, "Account <ARN> needs <n> policy number(s), one per year", POLICY_NUMBERS_MISMATCH]
@@ -3170,7 +3172,7 @@ alternate_flows:
   - "**Credit** with the commission and VAT to credit and a reason."
 rules:
   - [R1, "Types, triggers (ON_BOOKING, ON_ENDORSEMENT, MANUAL), recipient and owner are set up per type.", Configurable, Booking Setup (Service Invoice Types)]
-  - [R2, "BIR CAS / e-invoicing transmission is not built; numbering, PDF and dispatch are local.", Fixed, "-"]
+  - [R2, "Numbering, PDF and dispatch of service invoices are done in BIBS; transmission to BIR CAS / e-invoicing is not part of this phase (chapter 21, CLR-NB-33).", Fixed, "-"]
 validations:
   - [Type inactive, "Service invoice type <code> is inactive", SERVICE_INVOICE_TYPE_INACTIVE]
   - [Credit above open amount, "Service invoice <number> has <commission> commission and <vat> VAT left to credit", CREDIT_EXCEEDS_INVOICE]
@@ -3200,7 +3202,7 @@ priority: "Must have"
 screens: "Booked Invoice; Booked Accounts Register; Incentive Criteria (BRD-3)"
 description:
   - "At booking, BIBS evaluates the active incentive criteria against the invoice facts (product, cover type, segment, channel, lead insurer, booking date), stores the matched criteria codes on the invoice and sets the incentive indicator when at least one criterion matches. The indicator is rule-based and cannot be changed by hand; it is visible on the invoice and in the Booked Accounts Register, and endorsements inherit it from the original invoice."
-  - "**Built behaviour:** the booking incentive rules first built for BRD-1 are frozen; the criteria are maintained in Product Maintenance > Incentive Criteria (BRD-3, PMADD07 and 08), which took over this set-up. The criteria content waits for Q33; computation and payout are out of scope."
+  - "The incentive criteria are maintained in Product Maintenance > Incentive Criteria (BRD-3, PMADD07 and 08); the booking stamps the codes of the matching criteria on the invoice. The criteria content follows BDOI's answer to Q33; computation and payout are out of scope (chapter 21, CLR-NB-28)."
 preconditions:
   - "Active incentive criteria exist."
 main_flow:
@@ -3230,7 +3232,7 @@ screens: "Pre-booking Confirmation; Booking Workbench (Edit); Booked Invoice; Bo
 description:
   - "Every booked transaction carries a cost center from the standard sales organisation master (region, department, team; the cost center is inherited by the team). It defaults from the account officer's team, stamped on the account at creation, and can be changed before booking. Booking is refused without it. The cost center is posted as a dimension on the journal and shown on the invoice, in reports and in the Operations feed."
   - "Each booking also carries the business type (New Business or Renewal) on the accounting event and in the Booked Accounts Register."
-  - "**Built behaviour:** the invoice is stamped New Business by the NB booking path. Taking the type from the account (work item BT0, decision D1 of R5) is planned with BRD-6 and is not yet built."
+  - "The invoice takes its type, New Business or Renewal, from the business type of the account, which New Business and Renewal set (decision D1)."
 preconditions:
   - "The sales organisation and cost centers are set up."
 main_flow:
@@ -3325,7 +3327,7 @@ screens: "New Business Reports; Production Targets"
 description:
   - "The reports of BRNB.075 are in the category New Business of the Report Centre, each with a date range - Successful and Fall-out Accounts per Stage (NB-STAGE-OUTCOME); Account Status Report (NB-ACC-STATUS) with stage age, SLA due and breach, stalled flag and an exceptions filter; Placement Summary (NB-PLC-SUMMARY) with slips sent, resent and failed per insurer and branch; CLPC Billing Report (NB-CLPC-BILLING); Matched and Unmatched Payments (NB-PAY-MATCH); Production Statistics (NB-PRODUCTION) per region, department, team or officer against target. Columns are in section 6.1."
   - "Targets per unit and period (bookings, premium, commission) are maintained on Production Targets and pro-rated by days to the report period."
-  - "**Built behaviour:** the QPS Placement Report is replaced by the Placement Summary (OOS-2). The BRD's production 'per system' is read as per officer; the sales hierarchy and target values wait for Q41 (seed targets delivered)."
+  - "The QPS Placement Report is replaced by the Placement Summary (OOS-2). The BRD's production 'per system' is read as per officer; the sales hierarchy and target values follow BDOI's answer to Q41 (chapter 21, CLR-NB-20)."
 preconditions:
   - "The user holds the report's permission (section 6.1)."
 main_flow:
@@ -3358,7 +3360,7 @@ screens: "New Business Reports; Report runner (/reports/<code>)"
 description:
   - "Each user sees only the reports his roles allow (each report has its own permission). The user selects a date range and parameters, views the result, downloads it (.xlsx, .ods and the formats of FR-NB-125), saves it to the chosen folder, and prints it."
   - "The user saves the parameters of a report as a named variant, optionally shared with the other users who may run the report; only the owner deletes it."
-  - "**Built behaviour:** 'create dynamic reports' is delivered as saved variants with column filters; an ad-hoc report builder is not built (Q40, which BRD-8 and BRD-12 answer as enough)."
+  - "'Create dynamic reports' is met by saved variants with column filters; there is no ad-hoc report designer (Q40, which BRD-8 and BRD-12 answer as enough; chapter 21, CLR-NB-14)."
 preconditions:
   - "The user has REPORT_VIEW."
 main_flow:
@@ -3388,7 +3390,7 @@ priority: "Must have"
 screens: "Report runner (Print)"
 description:
   - "Once a report is shown, the **Print** button opens the PDF in the browser's print preview. The PDF has the same rows, columns and filters as the screen, and a header block with the report name and ID, the user, the run date and time and a \"Filters:\" line. Pages are A4, portrait or landscape by report, in the BDO style. Only data the user may see is printed."
-  - "**Built behaviour:** A4 only (no Letter). Summary reports (placement summary, stage outcome, production) and detail reports with group subtotals are separate reports; there is no per-report summary / detail switch."
+  - "A4 only (no Letter). Summary reports (placement summary, stage outcome, production) and detail reports with group subtotals are separate reports; there is no per-report summary / detail switch (chapter 21, CLR-NB-08)."
 preconditions:
   - "The report has been run."
 main_flow:
@@ -3440,19 +3442,21 @@ priority: "Must have"
 screens: "-"
 description:
   - "The BRD asks for a scheduled report of renewals received after expiry, restricted by role."
-  - "**Built behaviour:** not built. The report concerns renewals; BRD-6 Renewal has no such report and Report List #182 is a package report. The proposal is a variant of the Renewal listing (RNW-LISTING) once BDOI confirms under Q09 / RQ29."
+  - "BIBS proposes the report as a variant of the Renewal listing (RNW-LISTING) of BRD-6, restricted by role: the renewals received after the expiry date of the expiring policy, with the days late. The report concerns renewals, and Report List #182 is a package report (chapter 21, CLR-NB-03; Q09 / RQ29)."
 preconditions:
-  - "BDOI answers Q09."
+  - "BDOI confirms the report as a variant of the Renewal listing (Q09)."
 main_flow:
-  - "Parked: no flow in this phase."
+  - "The user opens the Renewal reports and selects the listing variant Late Renewal Requests."
+  - "BIBS lists the renewals received after the expiry date of the expiring policy, with the days late, within the user's scope."
+  - "The user exports the list or schedules the report."
 rules: []
 validations: []
 notifications:
   - "None."
 audit:
-  - "Not applicable until built."
+  - "Each run and export is logged with the user, parameters and time."
 acceptance:
-  - "Parked; acceptance criteria are written when Q09 is answered."
+  - "The variant lists only renewals received after the expiry date, within the user's scope."
 ```
 
 ## Administration
@@ -3467,7 +3471,7 @@ screens: "Login; session warning dialog"
 description:
   - "Users of every profile (Marketing, Processing, E-policy Sender, Approver, Adjustment, Business Administrator, System Administrator) log in with their BIBS user ID and password from any BDO-issued device or workstation through the browser. The menu shows the screens of their roles."
   - "The web client warns after 15 minutes of inactivity and signs the user out at the session timeout; it also warns 30 minutes before the system-triggered sign-out at the end of the session."
-  - "**Built behaviour:** sign-in is local to BIBS. BRD-11 requires directory sign-in (BDO EUA / Windows ID, LDAP / AD or SSO); it is a parked port until BDO supplies the interface (decision D6, R5)."
+  - "Sign-in is local to BIBS. BRD-11 requires directory sign-in (BDO EUA / Windows ID, LDAP / AD or SSO); it is added when BDO supplies the interface (decision D6; chapter 21, CLR-NB-11)."
 preconditions:
   - "The user has an active BIBS account with at least one role."
 main_flow:
@@ -3526,7 +3530,7 @@ priority: "Must have"
 screens: "Lists of Values (Broking Setup)"
 description:
   - "The Business Administrator views the lists of values, adds values, edits them and deactivates them, with effective-from and effective-to dates. Each new or changed value is saved for authorisation and becomes usable when another user with MASTER_AUTHORIZE authorises it. Screens and validations use only the values active on the date."
-  - "**Built behaviour:** the BRD's 'delete LOVs' is deactivation; values are never deleted, so old records keep their labels."
+  - "The BRD's 'delete LOVs' is deactivation; values are never deleted, so old records keep their labels (chapter 21, CLR-NB-22)."
 preconditions:
   - "The user has LOV_MANAGE; the list is maintainable by business users."
 main_flow:
@@ -3596,7 +3600,7 @@ screens: "Roles & Permissions; Users; User Access Matrix"
 description:
   - "BIBS delivers the profiles of the BRD - Marketing User (MKT_AO), Marketing TL (MKT_TL), Processing (PROCESSOR, PROCESSING_TL), Approver (NB_APPROVER), Business Administrator, Adjustment, E-policy Sender - plus TSU. Each BRD function is a permission (section 3.4); a profile is a role with its permissions. Users are assigned roles per the agreed User Access Matrix; a user may hold several roles (decision D5)."
   - "The User Access Matrix screen shows roles against permissions (By Permission) and against areas and actions (By Action), with the enabled users per role, and exports to Excel."
-  - "**Built behaviour:** role and user changes go through approved access requests (FR-NB-135); the direct role edit stays for the System Administrator as in BRD-11."
+  - "Role and user changes go through approved access requests (FR-NB-135); the direct role edit stays with the System Administrator as in BRD-11."
 preconditions:
   - "The user has the administration permissions."
 main_flow:
@@ -3624,7 +3628,7 @@ priority: "Must have"
 screens: "Access Requests; New Access Request dialog; request detail"
 description:
   - "The requester creates a request of type Create user (user name, full name, e-mail, home branch, roles), Modify roles, Disable user, Enable user or Modify role permissions (role, permissions to add and remove), with a justification, and submits it for approval. The approver (ACCESS_APPROVE), who is not the requester, approves and applies it or rejects it with a reason. A created user gets a temporary password shown once to the approver."
-  - "BRD-11 extends the lifecycle (drafts, return, cancel, chosen approver, bulk); that extension belongs to the BRD-11 build."
+  - "BRD-11 extends the lifecycle (drafts, return, cancel, chosen approver, bulk); that extension is specified in FRS BRD-11."
 preconditions:
   - "The user has ACCESS_REQUEST."
 main_flow:
@@ -3699,7 +3703,7 @@ priority: "Must have"
 screens: "Data Retention (Broking Setup)"
 description:
   - "Retention rules per record type and status (years online, years in archive, action REVIEW or ARCHIVE) cover clients (inactive, never-confirmed prospects), quotations and PRFs (not proceeded, voided) and accounts (voided, cancelled). A monthly job (RETENTION_REVIEW) counts the eligible records per rule; users list them from the rule. Records stay available until the retention period ends, and every run is logged."
-  - "**Built behaviour:** the physical archive and purge are not built; they wait for the DBA's storage and backup decision (Q39). Nothing is deleted. Retention values for other record types come from later BRDs (R5)."
+  - "Nothing is deleted. The physical archive and purge follow the storage and backup decision of Q39 (chapter 21, CLR-NB-27). Retention values for other record types come from later BRDs."
 preconditions:
   - "The user has MASTER_VIEW (view) and MASTER_MAINTAIN (edit rules)."
 main_flow:
@@ -3730,7 +3734,7 @@ acceptance:
 
 # Workflow and status model
 
-The four New Business workflows are data (stages and transitions, migrations V751, V801 and V830). In the figures, solid arrows are the main path, dashed arrows are returns and alternative paths, and dotted arrows close a record. The second line of a stage is its owner.
+The four New Business workflows are configured as stages and transitions. In the figures, solid arrows are the main path, dashed arrows are returns and alternative paths, and dotted arrows close a record. The second line of a stage is its owner.
 
 ## Client onboarding (NB_CLIENT)
 
@@ -3802,9 +3806,9 @@ The four New Business workflows are data (stages and transitions, migrations V75
 
 ## SLA, escalation and status reporting
 
-- SLA hours are held per stage and start when a record enters the stage. The values above are the build's defaults until BDOI confirms the stage list and targets (Q10).
+- SLA hours are held per stage and start when a record enters the stage. The values above are the proposed defaults until BDOI confirms the stage list and targets (Q10).
 - The daily alert check raises WORK_SLA_BREACH for work items past their stage SLA. Overdue items are counted on the NB Dashboard and listed in the Account Status Report; stalled accounts (no movement for NB_STALLED_DAYS) are flagged there too.
-- Escalation beyond the stage owners (for example to a unit head) is not in the BRD and is not built.
+- Escalation beyond the stage owners (for example to a unit head) is not in the BRD and is not proposed (chapter 21, CLR-NB-36).
 - Every transition writes an insert-only history row; the status reports of FR-NB-122 read that history.
 
 # Reports and documents
@@ -3843,7 +3847,7 @@ Every report takes the company and a date range (default from the start of the m
 
 ## Documents
 
-Documents are generated from versioned templates (FR-NB-004). The layouts are the build's drafts; BDOI's layouts replace them when provided (Q03).
+Documents are generated from versioned templates (FR-NB-004). The layouts are proposed drafts; BDOI's layouts replace them when provided (Q03).
 
 <!-- table: widths=3.8,3.2,9.6 caption="New Business documents" size=8.5 -->
 | Template | Output | Content |
@@ -3863,7 +3867,7 @@ Documents are generated from versioned templates (FR-NB-004). The layouts are th
 
 Figure 6 shows the interfaces of New Business. The broking modules talk to each other through published services and events; external parties are reached by e-mail or by file.
 
-![Interfaces of New Business (dashed = parked)](figures/brd01_integration.dot)
+![Interfaces of New Business (dashed = on hold)](figures/brd01_integration.dot)
 
 <!-- table: widths=3.9,2,7.1,2.6,2 caption="Interfaces" status=Scope size=8.5 -->
 | Interface | Direction | Content and trigger | BRD | Scope |
@@ -3880,8 +3884,8 @@ Figure 6 shows the interfaces of New Business. The broking modules talk to each 
 | BDO directory (EUA / AD / SSO) | In | Sign-in | BRNB.040 | ON HOLD |
 | BIR CAS / e-invoicing | Out | Service invoice transmission | BRNB.100 | OUT |
 
-> [!PARKED] Parked seams
-> The parked interfaces are built as seams - a port, a staging table or a manual upload - so that adding the transport is a new adapter with no change to the workflows: `QuotationRequestSource` (HLS, Q11), manual capture with the e-mail attached (Q12, Q31), `PaymentConfirmationSource` and file upload (CLPC, Q28), the e-mail channel only (insurers, Q06), `DirectoryAuthenticator` (sign-in, D6), and the OCR port of the extraction (Q24).
+> [!PARKED] Interfaces on hold
+> Each interface on hold has a manual step until BDOI specifies it, so that adding the transfer does not change the workflows: upload of the HLS extract (Q11); manual capture of e-mailed requests and e-policies with the e-mail attached (Q12, Q31); download and upload of the CLPC files (Q28); the e-mail channel for insurers (Q06); local sign-in until the BDO directory is supplied (D6); and text PDFs for the e-policy extraction until OCR is decided (Q24).
 
 # Non-functional requirements
 
@@ -3923,7 +3927,7 @@ The items below are changed in BIBS without a release. Changes to parameters, li
 | HOLD_COVER_DAYS | 30 | Hold cover period requested from the insurer |
 | HOLD_COVER_ALERT_DAYS | 5 | Days before expiry when Processing is alerted |
 | IA_TRIGGER | ON_POLICY_ISSUE | When the Insurance Advice is generated: ON_POLICY_ISSUE, ON_PLACEMENT or MANUAL |
-| EPOLICY_PASSWORD_HINT | Standard text (password sent separately) | Text telling the client how the e-policy password is built |
+| EPOLICY_PASSWORD_HINT | Standard text (password sent separately) | Text telling the client how the e-policy password is formed |
 | OPS_COMMISSION_REALIZATION | ON_COLLECTION | Commission unrealised at booking and realised on collection, or realised at booking |
 | BOOKING_WTAX_RATE | 10 | Withholding tax on commission (%) |
 | BOOKING_CWT2_SEGMENTS | (empty) | Segments on the second creditable withholding rate |
@@ -4065,47 +4069,10 @@ The items below are changed in BIBS without a release. Changes to parameters, li
 | Q43 | Premium tax basis per line | FR-NB-062 | OPEN |
 | Q44 | Insurer-only functions not required | Platform | ANSWERED |
 
-## Built behaviour that differs from the BRD
-
-The table lists every point where the delivered system does what the BRD asks in a different way, or not yet. Each is also stated in its FR.
-
-<!-- table: widths=2.6,6.6,6,1.4 caption="Differences between the BRD and the built behaviour" size=8 -->
-| BRD ID | BRD asks | BIBS does | FR |
-|---|---|---|---|
-| BRNB.005, 014 | Multi-level approval TL, TH, UH | One approval stage per document; the approver permission decides (Q05) | 014, 051 |
-| BRNB.015 | Data synchronised with BDOI tracking systems | Internal events only; external feed parked (Q08) | 015 |
-| BRNB.018 | Late Renewal Requests Report | Not built; proposed as a Renewal listing variant (Q09) | 126 |
-| BRNB.019 | Delete in-process records | Void with a reason; records kept and hidden from standard lists | 012 |
-| BRNB.022 | Status list incl. "Endorsed" | Stages of four workflows; endorsements are invoices on a booked account | 010 |
-| BRNB.023 | Requests directly from HLS with source check | Upload of the HLS extract; direct interface parked (Q11) | 040 |
-| BRNB.029 / 063 | Client code required / quotation without client code | Prospect code created automatically; confirmed client required from account creation | 041, 046 |
-| BRNB.031 | Print on A4 or Letter; summary or detail | A4 only; summary and detail are separate reports | 124 |
-| BRNB.032 | Account duplicates by e-mail, phone, ID | Clients checked on identity keys; accounts on vehicle and location keys | 033, 063 |
-| BRNB.036 | Edit or delete accounts before batch booking | Edit booking date and cost center, remove from the queue, cancel the batch | 111 |
-| BRNB.040, 087 | Log-in with BDO profile (directory) | Local sign-in; directory port parked (D6) | 130 |
-| BRNB.041 | Requests received by e-mail | Captured manually with the e-mail attached (Q12) | 040 |
-| BRNB.047, 065 | Save draft and cancel in bulk updates | Review before commit; valid rows saved directly | 035 |
-| BRNB.057 | Create dynamic reports | Saved report variants; no ad-hoc builder (Q40) | 123 |
-| BRNB.062 | Cancelled placement returns to the previous workflow | Stage Placement cancelled until reactivated to Ready for placement | 085 |
-| BRNB.067 | Billing file forwarded to CLPC automatically; QPS reference | Download and upload by the user (Q28); ARN instead of QPS reference | 090 |
-| BRNB.071 | Placement file sent automatically | Sent by e-mail on the user's action; SFTP / API parked (Q06) | 081 |
-| BRNB.072 | Hold cover request sent automatically | Sent when Processing clicks Request Hold Cover (Q27) | 082 |
-| BRNB.073 | E-policy received from insurers | Uploaded by Processing; mailbox / SFTP parked (Q31) | 100 |
-| BRNB.075 | Production per system; QPS placement report | Per region, department, team, officer; Placement Summary | 122 |
-| BRNB.080 | Assign and re-assign workload | Manual claim and assignment; no automatic allocation | 011 |
-| BRNB.083 | Delete LOVs | Deactivate; values never deleted | 132 |
-| BRNB.091 | Tags and instructions enforced | Banner (warn only); blocking parked (Q18) | 036 |
-| BRNB.092 | Authoritative source per data element | Register not built (Q37) | 020 |
-| BRNB.097 | NB / Renewal classified per transaction | NB booking stamps New Business; type from the account planned (BT0) | 119 |
-| BRNB.099 | Leads management | Prospects only; leads parked (Q19) | 037 |
-| BRNB.104 | Extraction from uploaded documents | Text PDFs only; OCR parked (Q24) | 101 |
-| BRNB.106 | Retain, archive, purge | Rules and review counts; archive and purge parked (Q39) | 137 |
-| BRNB.107 | Incentive indicator on booking | From BRD-3 incentive criteria; booking incentive rules frozen | 118 |
-| BRNB.110 | List in a shared path | In-system list and report with notification | 038 |
 
 # Traceability
 
-Every BRD-1 requirement is met by at least one FR. The table lists the 119 rows of the requirements baseline (R2): BRNB.001-115, the unnumbered row BRNB.100b, BRD 2.1.16 and the two out-of-scope items. Status is the build status of the traceability record (R3): BUILT, CONFIGURED (built capability, BDOI content pending), PARKED (seam built, waiting for a BDOI answer) or OUT.
+Every BRD-1 requirement is met by at least one FR. The table lists the 119 rows of the requirements baseline (R2): BRNB.001-115, the unnumbered row BRNB.100b, BRD 2.1.16 and the two out-of-scope items. The test cases are listed by test condition (TC-NB-nnn.n); the test plan workbook lists each case.
 
 <!-- table: widths=2.4,2.6,4.6,5.2,5.2 caption="BRD ID to FR, page, main screen and test cases" size=8 -->
 | BRD ID | Page | FR | Main screen | Test cases |
@@ -4236,7 +4203,7 @@ Page numbers are pages of the BRD PDF (R1). The traceability record R3 names the
 
 # Navigation
 
-This chapter shows how each New Business user reaches the screens. The menus are those of the build: the sidebar shows a screen only when the user's role holds its permission (section 3.2), so each persona sees a different menu. The tables are generated from the menu definition and the role grants of the build, not typed.
+This chapter shows how each New Business user reaches the screens. The sidebar shows a screen only when the user's role holds its permission (section 3.2), so each persona sees a different menu. The tables follow the proposed role grants.
 
 ## Screens of New Business
 
@@ -4337,7 +4304,7 @@ id: WT-C
 
 # Messages catalogue
 
-Every message a New Business user can see, grouped by the screen or dialog that shows it, with its code, its type and what the user does. The texts are read from the build; a message is never retyped here.
+Every message a New Business user can see, grouped by the screen or dialog that shows it, with its code, its type and what the user does. The texts are quoted exactly as the screens show them.
 
 - **Validation**: shown on the screen while the user fills in a field or before the form is sent.
 - **Error**: the system refused the action; nothing was saved. The code is shown under the message as the Reference.
@@ -4419,7 +4386,7 @@ render: counts
 
 ## How the review is recorded
 
-Each business unit records its review in the sign-off workbook: Accept, Change requested or Comment on each row of the screen standards, screen catalogue, field register, business rules and messages, with the comment, the reviewer and the date. Questions, defects and change requests go to the comments log of the workbook, where the project team answers them. The project team answers every Change requested row in the comments log before sign-off: either the row is corrected in the next version of the set, or the change is raised as a change request (below) and the row is signed as built.
+Each business unit records its review in the sign-off workbook: Accept, Change requested or Comment on each row of the screen standards, screen catalogue, field register, business rules and messages, with the comment, the reviewer and the date. Questions, corrections and change requests go to the comments log of the workbook, where the project team answers them. The project team answers every Change requested row in the comments log before sign-off: either the row is corrected in the next version of the set, or the change is raised as a change request (below) and the row is signed as specified.
 
 ## What signing freezes
 
@@ -4436,15 +4403,15 @@ Configuration values marked "default" (SLA hours, thresholds, list entries, temp
 
 A change to anything frozen is raised in the Change Management Register. The request states the screen, field, rule or message concerned, the reason and the business priority. The project team assesses it, including its effect on the other BRDs through the interface contract of chapter 19, and the owners of every BRD it touches approve it. An approved change is delivered as a new version of this release set (v2.1, v2.2 and so on) with its own Start Here guide, and only the changed pages and rows are reviewed and signed again (delta sign-off).
 
-## As-built status
+## Proposed rules for confirmation
 
-This FRS describes the system as built on 27-Sep-2026; the screenshots were taken on the SIT environment on that date. Where the build differs from the BRD, section 10.4 says so; such a difference is settled through the register or a change request, not by changing the text. At the end of the build, the final as-built refresh re-issues this set with the system as delivered.
+Chapter 21 lists the proposed business rules and screen behaviour that differ from the BRD or need a decision of BDOI. BDOI records its decision on each item with its review; a decision that changes a screen, field, rule or message is applied in the next version of this set.
 
 <!-- pagebreak -->
 
 ## Signatures
 
-By signing, BDOI confirms that this FRS and the sign-off workbook describe the New Business functions, screens and messages it expects in BIBS, accepts the assumptions in section 10.1 and notes the differences in section 10.4. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
+By signing, BDOI confirms that this FRS and the sign-off workbook describe the New Business functions, screens and messages it expects in BIBS, accepts the assumptions in section 10.1 and records its decisions on the items of chapter 21. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
 
 ```signoff
 rows:
@@ -4461,9 +4428,54 @@ rows:
 
 <!-- pagebreak -->
 
+# Proposed business rules and clarifications for confirmation
+
+The table lists each point where the proposed screen or rule differs from the BRD text, or where BIBS needs a decision of BDOI to complete the rule. Each item names the proposed behaviour, the reason and the decision requested. BDOI records its decision with the review of this set (section 20.5); a decision that changes a screen, field, rule or message is applied in the next version of the set, and an answer that only sets a value (a list, a parameter, a template) is applied as configuration.
+
+<!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
+| Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
+|---|---|---|---|---|
+| CLR-NB-01 | Approval levels (BRNB.005, 014; FR-NB-014, 043, 051) | One approval stage per quotation and per PRF: any holder of the approval permission other than the maker approves. | The BRD asks for TL, then TH, then UH; the chain by amount, product or segment is not given (Q05). | Give the approval chain by amount, product or segment, or confirm one approval stage (Q05). |
+| CLR-NB-02 | Data synchronisation (BRNB.015; FR-NB-015) | BIBS passes each event to its own modules (Operations, Collections, Renewal). A feed to other BDOI systems is added when BDOI names them. | Q08 names QPS and EBIX for client contact updates only (BRD-9). | Confirm that no other BDOI system needs a New Business feed (Q08). |
+| CLR-NB-03 | Late Renewal Requests Report (BRNB.018; FR-NB-126) | A variant of the Renewal listing (RNW-LISTING) of BRD-6, restricted by role, in place of a New Business report. | The report concerns renewals; Report List #182 is a package report. | Confirm the Renewal listing variant (Q09, RQ29). |
+| CLR-NB-04 | Delete in-process records (BRNB.019; FR-NB-012) | A record is voided with a reason, hidden from the standard lists and found with the filter Include voided; it is never deleted. | Every record is kept for the audit trail. | Confirm void in place of delete. |
+| CLR-NB-05 | Status list (BRNB.022; FR-NB-010) | The statuses are the stages of the four workflows (client, quotation, PRF, account). "Endorsed" shows as the endorsement invoices of a booked account. | Endorsements are transactions on a booked account, not a stage of the account. | Confirm the stage list and its service levels (Q10). |
+| CLR-NB-06 | HLS requests (BRNB.023; FR-NB-040) | HLS requests are loaded by upload of the HLS extract and kept in the request inbox. The direct HLS interface with its source check is added when BDOI specifies it. | The HLS interface is not specified (Q11). | Specify the HLS interface (Q11). |
+| CLR-NB-07 | Client code of a quotation (BRNB.029, 063; FR-NB-041, 046) | A quotation without a client code creates a prospect automatically; a confirmed client is required from account creation. | The BRD requires a client code and also allows a quotation without one. | Confirm the automatic prospect and the confirmed client at account creation. |
+| CLR-NB-08 | Print options (BRNB.031; FR-NB-124) | Reports print on A4 only. Summary reports and detail reports with group subtotals are separate reports. | BDOI stationery is A4; a summary / detail switch per report is replaced by separate reports. | Confirm A4 only and separate summary and detail reports. |
+| CLR-NB-09 | Duplicate checks (BRNB.032, 051, 066; FR-NB-033, 063) | Clients are checked on their identity keys (e-mail, phone, ID number); accounts are compared on their risks (vehicle identifiers, location and insured items). | BRNB.051 and 066 define account duplicates by risk; the BRD's example keys belong to the client. | Confirm the client and account duplicate keys. |
+| CLR-NB-10 | Changes before batch booking (BRNB.036; FR-NB-111) | Before a batch is booked, Processing changes the booking date and the cost center, removes an account from the queue or cancels the batch. Other account details are changed on the account. | Account details are owned by the account workflow. | Confirm the changes allowed in the booking queue. |
+| CLR-NB-11 | Directory sign-in (BRNB.040, 087; FR-NB-130) | Sign-in is local to BIBS until BDO supplies the directory interface (BDO EUA / Windows ID, LDAP / AD or SSO). | The directory interface is not yet specified (decision D6; BRD-11 UQ04). | Supply the directory interface and the date it is available. |
+| CLR-NB-12 | Requests received by e-mail (BRNB.041; FR-NB-040) | Requests received in a shared mailbox are captured in the request inbox with the e-mail attached. | Automatic reading of a shared mailbox is not specified (Q12). | Confirm manual capture, or specify the mailbox reading (Q12). |
+| CLR-NB-13 | Draft and cancel in bulk updates (BRNB.047, 065; FR-NB-035) | The upload is reviewed before commit; valid rows are then saved directly, without a separate draft state. | The review before commit gives the same control as a draft. | Confirm the review before commit in place of save-draft and cancel. |
+| CLR-NB-14 | Dynamic reports (BRNB.057; FR-NB-123) | Users save report variants with their own column filters; there is no ad-hoc report designer. | BRD-8 and BRD-12 answer Q40 that saved variants are enough. | Confirm saved variants (Q40). |
+| CLR-NB-15 | Cancelled placement (BRNB.062; FR-NB-085, 086) | A cancelled placement stays in the stage Placement cancelled, visible and reportable, until it is reactivated to Ready for placement. | The account keeps its history and can be reactivated (BRD 2.1.16). | Confirm the stage Placement cancelled and the reactivation. |
+| CLR-NB-16 | CLPC billing file (BRNB.067; FR-NB-090) | The billing file is downloaded and forwarded to CLPC by the user, and the ARN replaces the QPS reference number. An automatic transfer is added when BDOI specifies it. | The CLPC transfer is not specified (Q28); QPS references end with the migration (OOS-2). | Specify the CLPC transfer or confirm the manual forwarding (Q28). |
+| CLR-NB-17 | Placement file to insurers (BRNB.071; FR-NB-081) | Slips are sent by e-mail when Processing clicks Send. An insurer set up for SFTP or API is refused with a message until those channels are specified. | The insurer SFTP and API channels are not specified (Q06). | Specify the insurer channels or confirm e-mail only (Q06). |
+| CLR-NB-18 | Hold cover request (BRNB.072; FR-NB-082, 083) | The request is sent when Processing clicks Request Hold Cover. At expiry without a policy BIBS raises an alert. | Which accounts need an automatic request, and the outcome at expiry, are not given (Q27). | Name the accounts that need an automatic request and the outcome at expiry (Q27). |
+| CLR-NB-19 | E-policy receipt (BRNB.073; FR-NB-100) | E-policies are uploaded by Processing. Automatic reading of an insurer mailbox or SFTP folder is added when specified. | The insurer channels for e-policies are not specified (Q31, Q12). | Specify the e-policy channels or confirm the upload (Q31). |
+| CLR-NB-20 | Production reports (BRNB.075; FR-NB-122) | Production is shown per region, department, team and officer; the Placement Summary replaces the QPS Placement Report. | "Per system" is read as per officer; QPS reports end with the migration (OOS-2); the sales hierarchy and targets are not given (Q41). | Confirm the grouping and provide the sales hierarchy and targets (Q41). |
+| CLR-NB-21 | Workload allocation (BRNB.080; FR-NB-011) | Work is claimed by a user or assigned by a team lead; there is no automatic allocation. | The BRD does not define an allocation rule. | Confirm manual claim and assignment. |
+| CLR-NB-22 | Delete lists of values (BRNB.083; FR-NB-132) | A list value is deactivated, never deleted, so older records keep their labels. | Records keep their meaning over time. | Confirm deactivation in place of delete. |
+| CLR-NB-23 | Tags and instructions (BRNB.091; FR-NB-036) | Tags and instructions show as a banner that warns; they do not block a process. BRD-10 sets PEP and WATCHLIST_REVIEW by rule. | Which tags block a process, and the final list, are not given (Q18). | Name the tags that block and the final list of tags and instructions (Q18). |
+| CLR-NB-24 | Authoritative source per data element (BRNB.092; FR-NB-020) | BIBS is the source of the clients, accounts and invoices it creates; the policy number is set only from the e-policy. The register of sources of the other elements is completed with BDOI's list. | BDOI's list of sources is not yet given (Q37). | Give the list of data elements and their sources (Q37). |
+| CLR-NB-25 | Leads (BRNB.099; FR-NB-037) | Business starts at the prospect; lead management before the prospect (for example bank referrals) is not part of this FRS. | The lead process is not described in the BRD (Q19). | Confirm that leads are out of scope, or describe the lead process (Q19). |
+| CLR-NB-26 | Extraction from uploaded documents (BRNB.104; FR-NB-101) | BIBS reads the e-policy data from text PDFs; scanned documents are keyed in. | OCR of scanned documents is not decided (Q24). | Decide whether scanned e-policies need OCR (Q24). |
+| CLR-NB-27 | Retention, archive and purge (BRNB.106; FR-NB-137) | Retention rules and review counts are kept in BIBS; nothing is deleted. The physical archive and purge follow the storage and backup decision. | The storage and backup decision is open (Q39). | Decide the archive and purge approach (Q39). |
+| CLR-NB-28 | Incentive indicator (BRNB.107; FR-NB-118) | The incentive criteria are maintained in Product Maintenance (BRD-3) and stamped on the invoice at booking; computation and payout are out of scope. | BRD-3 PMADD07 and 08 give Product Maintenance the criteria; their content is not given (Q33). | Provide the criteria content (Q33). |
+| CLR-NB-29 | Shared path (BRNB.110; FR-NB-038) | The list is kept in BIBS with its report and a notification; the user downloads it to any folder. | A shared network path is replaced by the in-system list. | Confirm the in-system list. |
+| CLR-NB-30 | Direct payment accounting (FR-NB-069) | For a direct payment account, booking records the commission receivable only. | The accounting variant is not given in the BRD (Q29). | Confirm the direct payment accounting (Q29). |
+| CLR-NB-31 | Multi-year policies (FR-NB-114) | The premium and commission basis of a multi-year policy follows BDOI's answer; each year is invoiced separately until then. | The basis (upfront or yearly) is not given (Q35). | Give the multi-year basis (Q35). |
+| CLR-NB-32 | Premium tax and Motor bases (Appendix A) | The Fire premium tax of 12% of net premium and the Motor OD / Theft bases of 90% and 81% of TSI are applied as written, as rates in the catalogue. | The premium tax basis is to be confirmed (Q43). | Confirm the premium tax basis (Q43) and the multi-year basis (Q35). |
+| CLR-NB-33 | BIR CAS / e-invoicing (FR-NB-117) | Service invoices are numbered, produced and dispatched in BIBS; transmission to BIR CAS / e-invoicing is not part of this phase. | The BIR transmission is not in the BRD. | Confirm that BIR transmission is out of this phase. |
+| CLR-NB-34 | TSU rule thresholds (FR-NB-005) | A change of a TSU rule threshold applies to the next evaluation and is authorised by a second user, like the other catalogue masters. | The BRD does not say whether a threshold change needs authorisation. | Confirm maker-checker on TSU rule changes. |
+| CLR-NB-35 | BDOI number format (FR-NB-047) | The account reference is ARN-yyyy-nnnnnn until BDOI states the format of its number. | The format is not given (Q15). | Give the number format (Q15). |
+| CLR-NB-36 | Escalation beyond the stage owners (FR-NB-010, 011) | Overdue work alerts the owners of the stage and shows on the NB Dashboard; it is not escalated to a higher level. | The BRD does not ask for escalation beyond the stage owners. | Confirm that no escalation to the unit head is needed. |
+| CLR-NB-37 | Document layouts (FR-NB-004) | Documents are produced from versioned templates in proposed draft layouts; BDOI's layouts are loaded as new template versions. | BDOI's layouts are not yet provided (Q03). | Provide the document layouts (Q03). |
+
 # Appendix: Screen standards
 
-The New Business screens are built to the screen standards agreed with BDOI on 26-Sep-2026. They are listed here so that the business units can check the screenshots against them; they are not repeated in each screen specification.
+The New Business screens follow the screen standards agreed with BDOI on 26-Sep-2026. They are listed here so that the business units can check the screenshots against them; they are not repeated in each screen specification.
 
 <!-- table: widths=4.2,13.4 caption="Screen standards of BIBS" -->
 | Area | Standard |
@@ -4480,5 +4492,5 @@ The New Business screens are built to the screen standards agreed with BDOI on 2
 | Confirmations | A dialog naming the record and the effect; a reason where the process needs one (for example the Reason for Closing of a quotation request); destructive actions confirmed with the red button. |
 | Notifications | The bell opens the panel grouped by day, with Mark Read, Mark All Read and View All; the Notifications page lists every notice with filters. |
 
-The project team checks each screen against these standards before UAT and records the result in the UX readiness checklist (UX_READINESS_CHECKLIST.md). A screen found not to follow a standard during the review is recorded as Change requested in the sign-off workbook and corrected before UAT without a change request.
+The project team checks each screen against these standards before UAT and records the result in the screen readiness checklist. A screen found not to follow a standard during the review is recorded as Change requested in the sign-off workbook and corrected before UAT without a change request.
 

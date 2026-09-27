@@ -1960,7 +1960,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | PKG_SLA_NEGOTIATION | 120 | SLA hours of the negotiation stage |
 | PKG_SLA_MANCOM | 72 | SLA hours of the ManCom sign-off |
 | PKG_SLA_MBS_SETUP | 48 | SLA hours of the MBS set-up |
-| Job schedule package-expiry-cron | 01:00 PHT daily | Time of PACKAGE_EXPIRY_MONITOR and PACKAGE_VERSION_LIFECYCLE |
+| Job schedule (package expiry) | 01:00 PHT daily | Time of PACKAGE_EXPIRY_MONITOR and PACKAGE_VERSION_LIFECYCLE |
 
 ## Lists of values
 

@@ -68,7 +68,8 @@ BUILD_STATUS: list[tuple[str, re.Pattern]] = [(label, re.compile(pat, re.I)) for
     ("Flyway version", r"\bflyway\b|(?-i:\bV[0-9]{3,4}(?:__\w+)?\b)"),
     ("internal code", r"(?-i:\b[a-z]{2,}(?:_[a-z0-9]+)+\b|\b[A-Z][a-z]+(?:[A-Z][a-z0-9]+)+(?:Service|Controller|"
                       r"Repository|Entity|Dto|DTO|Mapper|Job|Listener|Handler|Config|Page|Inbox|Client|Adapter|Port|"
-                      r"Gateway)\b|\bST[0-9]+\b)|\bstub(?:s|bed)?\b|\bmocked\b|\b(?:parked )?seams?\b"),
+                      r"Gateway)\b|\bST[0-9]+\b|\b[a-z]+(?:-[a-z]+)*-cron\b|\b(?:com\.iortatechnxt|brokerverse)\.[\w.-]+)|"
+                      r"\bstub(?:s|bed)?\b|\bmocked\b|\b(?:parked )?seams?\b|\badapters?\b|\bidempotent\b"),
     ("development status", r"\bnot (?:yet )?(?:implemented|developed|coded|wired)\b|\bimplemented (?:in|by) the (?:code|build)\b|"
                            r"\bin development\b|\bunder development\b|\bto be (?:built|developed|coded)\b|"
                            r"\bsprints?\b|\bjira\b|\bbacklog item\b|"

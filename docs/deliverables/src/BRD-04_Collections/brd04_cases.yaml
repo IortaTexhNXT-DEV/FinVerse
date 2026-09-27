@@ -1,8 +1,8 @@
 # Test plan BRD-4 Collections - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-04_Collections/brd04_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# Messages and codes are the ones BIBS returns (backend/src/main, collections and the Operations
-# modules it hands over to); labels are those of frontend/src/features/collections.
+# Messages and codes are the ones BIBS shows on the Collections screens and the Operations screens it hands
+# over to; labels are those of the Collections screens.
 
 meta:
   brd: BRD-04
@@ -1250,13 +1250,13 @@ frs:
         expected: The row is rejected.
         msg: ["Name the user in {Escalate To} for a USER escalation", "-"]
       - c: 4
-        type: Negative
+        type: Positive
         screen: BULK
-        title: Disposition column filled in the upload
+        title: Disposition, effort and remarks in the upload
         steps:
-          - Upload a row with the disposition column set to "Coordinate further".
-        expected: The row is rejected; dispositions are recorded in the worklist.
-        msg: ["Dispositions, efforts and remarks are updated through the collection worklist, which is not available", CLX_WORKLIST_UNAVAILABLE]
+          - Upload a row with the disposition "Coordinate further", an effort code and remarks.
+          - Open the account from the PR Worklist.
+        expected: The row is accepted; the account shows the disposition and the effort with its remarks, each with the bulk reference.
 
   FR-CL-040:
     scenario: SC-CL-05
@@ -2032,7 +2032,7 @@ frs:
         steps:
           - POST a disposition on Grace Villanueva's payment.
         expected: The disposition is refused.
-        msg: ["{ref} has no unapplied balance left", CLX_UNAPPLIED_NO_BALANCE]
+        msg: ["<ref> has no unapplied balance left", CLX_UNAPPLIED_NO_BALANCE]
       - c: 2
         type: Boundary
         neg: true

@@ -1410,7 +1410,7 @@ alternate_flows:
 rules:
   - [R1, "The remittance type is WITH_INCENTIVES when an early remittance rule covers the invoice (FR-OP-038), otherwise NORMAL_PHP or NORMAL_USD by currency.", Configurable, "Incentive rules; classification to confirm (OQ17)"]
   - [R2, "Batch numbers RMB-<insurer>-yyyy-n are unique and never reused.", Fixed, "-"]
-  - [R3, "Schedule of the job.", Configurable, "Job REMITTANCE_EXTRACTION (brokerverse.jobs.remittance-extraction-cron)"]
+  - [R3, "Schedule of the job.", Configurable, "Job REMITTANCE_EXTRACTION (schedule set by the System Administrator)"]
   - [R4, "Extract file naming.", Configurable, Parameter REMIT_FILE_PATTERN (OQ17)]
 validations:
   - [Invoice of another insurer, "Invoice <no> is not an invoice of <insurer>", REMIT_INVOICE_INSURER]
@@ -1614,7 +1614,7 @@ alternate_flows:
   - Return. The TL returns the batch (RETURNED).
 rules:
   - [R1, "The approver is never the submitter.", Fixed, "-"]
-  - [R2, "Posting, payment request and ORs are idempotent on the batch.", Fixed, "-"]
+  - [R2, "Posting, the payment request and the ORs happen once per batch; a repeat does not duplicate them.", Fixed, "-"]
 validations:
   - [Approver is the submitter, "Batch <no> must be approved by another user", REMIT_FOUR_EYES]
   - [Line no longer valid, "Batch <no> cannot go on: <problems>", REMIT_SUBMISSION_INVALID]
@@ -2084,7 +2084,7 @@ alternate_flows:
   - Return selected requests before posting (FR-OP-053).
 rules:
   - [R1, "GL entries per endorsement type are Comptrollership rules (OQ07).", Configurable, Accounting rules]
-  - [R2, "Posting is idempotent on the request.", Fixed, "-"]
+  - [R2, "Posting happens once per request; a repeat does not duplicate it.", Fixed, "-"]
 validations:
   - [Nothing selected, Select the requests to post, ADJ_BATCH_EMPTY]
   - [Posting failed, "<message of the failed request>", ADJ_POSTING_FAILED]
@@ -2118,7 +2118,7 @@ main_flow:
 alternate_flows:
   - Re-application unavailable. The request waits in AWAITING_REAPPLICATION.
 rules:
-  - [R1, "Re-application is idempotent per request and invoice.", Fixed, "-"]
+  - [R1, "Re-application happens once per request and invoice; a repeat does not duplicate it.", Fixed, "-"]
   - [R2, "AR Insurer never exceeds the DTIP remitted.", Fixed, "-"]
 validations:
   - [Re-application unavailable, "Payments can only be re-applied once Cashiering is available; the request stays awaiting re-application", PAYMENT_REAPPLIER_UNAVAILABLE]

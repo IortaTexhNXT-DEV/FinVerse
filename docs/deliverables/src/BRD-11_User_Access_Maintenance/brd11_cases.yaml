@@ -1,9 +1,8 @@
 # Test plan BRD-11 User Access Maintenance - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-11_User_Access_Maintenance/brd11_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# Version 2.0 (business sign-off pack): BRD-11 is built. The expected results quote the messages and codes of the
-# build (backend/src/main, frontend/src), the cases are traced to the screens of FRS v2.0 (pack/pack.yaml adds one
-# screen case per screen and one message case per screen or dialog), and the test data are the seed data of V1960.
+# Version 2.0 (business sign-off pack): the expected results quote the messages and codes of the screens, the
+# cases are traced to the screens of FRS v2.0, and the test data are the seed data.
 
 meta:
   brd: BRD-11

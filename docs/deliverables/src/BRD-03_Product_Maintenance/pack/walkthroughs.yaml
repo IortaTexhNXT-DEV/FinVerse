@@ -37,7 +37,8 @@ walkthroughs:
       - [TSU, SCR-PM-08, "Opens the Advisories tab of the released request, checks that both supporting documents are Attached and clicks Send Advisory", "Toast: Advisory sent; the advisory shows Sent with the date; Marketing users receive the notice", Advisory sent, wt-a-20]
       - [MKT_AO, SCR-PM-21, "Opens Premium Calculator, chooses MTR30 and INS-MGIC, enters a vehicle value and clicks Calculate", "Priced on package version 1 (effective <date>, scheme rate 1.2%) with every charge and the commission", Priced on version 1, wt-a-21]
       - [MKT_AO, SCR-PM-22, "Creates a New Business quotation of MTR30 for the seed client with an item rate of 1.10%, opens it and clicks Request Rate Exception with the reason", "The rate scheme panel shows the exception pending approval", Exception requested, wt-a-22]
-      - [NB_APPROVER, SCR-PM-22, "Approves the exception in My Approvals and opens the quotation", "The rate scheme panel lists the exception Active; the quotation can be submitted for review", Exception approved, wt-a-23]
+      - [NB_APPROVER, SCR-NB-39, "Opens My Approvals, finds the rate exception of the quotation and approves it", "The exception leaves the list of items waiting for approval", Exception approved, wt-a-23]
+      - [MKT_AO, SCR-PM-22, "Opens the quotation again", "The rate scheme panel lists the exception Active; the quotation can be submitted for review", Quotation ready for review, wt-a-24]
     downstream:
       - "New Business (BRD-1): New Quotation and New Account offer MTR30 to the segments of the package; the quotation, the account and the booked invoice keep version 1 and the approved exception."
       - "Booking and Operations: the booked invoice stores version 1 and the incentive criteria it matches; endorsements re-rate on version 1."

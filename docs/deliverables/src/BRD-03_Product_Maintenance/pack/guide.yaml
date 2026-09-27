@@ -27,7 +27,7 @@ reading:
   - role: TSU (requests, negotiation, requirements, advisories, expiry)
     order: "FRS chapter 13 screens SCR-PM-01 to SCR-PM-10; walkthroughs A (steps 5-14 and 20) and B; chapter 17 (documents); chapter 19 template CI-07 (package map); workbook rows of those screens"
   - role: Marketing (requests, approval, client-specific terms, pricing)
-    order: "FRS chapter 13 screens SCR-PM-02 to SCR-PM-04, SCR-PM-21 and SCR-PM-22; walkthrough A steps 3-4 and 21-23; chapter 20 lines IC-01 to IC-03"
+    order: "FRS chapter 13 screens SCR-PM-02 to SCR-PM-04, SCR-PM-21 and SCR-PM-22; walkthrough A steps 3-4 and 21-24; chapter 20 lines IC-01 to IC-03"
   - role: Finance (Comptrollership)
     order: "Rates & Taxes (SCR-PM-19), Insurer record commission rates (SCR-PM-18), Incentive Criteria (SCR-PM-16); contract lines IC-10 and IC-11 (chapter 20); templates CI-04 and CI-10"
   - role: BDOI IT

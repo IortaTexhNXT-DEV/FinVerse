@@ -68,7 +68,7 @@ render: guide-steps
 | Date | Time | Session | Units |
 |---|---|---|---|
 | Wed 4-Nov-2026 | 09:30-12:00 | Kick-off; the package request from the form to the ManCom sign-off (walkthrough A steps 1-14) | Marketing, TSU, MBS |
-| Thu 5-Nov-2026 | 09:30-12:00 | Set-up, versions and validation, insurers and commission, advisory, pricing and the rate exception (walkthrough A steps 15-23); returns and messages (walkthrough B) | MBS, TSU, Business Administration, Marketing |
+| Thu 5-Nov-2026 | 09:30-12:00 | Set-up, versions and validation, insurers and commission, advisory, pricing and the rate exception (walkthrough A steps 15-24); returns and messages (walkthrough B) | MBS, TSU, Business Administration, Marketing |
 | Fri 6-Nov-2026 | 09:30-11:30 | Catalogue screens, rates and taxes, incentive criteria, package expiry; the configuration input templates and the package map | MBS, Comptrollership, Data Migration working group, BDOI IT |
 
 # Configuration inputs

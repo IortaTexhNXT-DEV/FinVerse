@@ -29,6 +29,20 @@ personas:
   SYSADMIN: {name: System Administrator, user: admin}
   AUDITOR: {name: Auditor, user: auditor}
 
+# Packs of other BRDs whose screens a walkthrough step may show (My Approvals of New Business, WT-A).
+foreign_packs: [../../BRD-01_New_Business/pack/pack.yaml]
+
+# Signatories of the sign-off certificate: role, organisation, what the signatory confirms.
+signatories:
+  - ["Product Owner, Marketing Business System", BDOI, "Business owner: the whole set"]
+  - ["Head, Marketing Business Services and System Support", BDOI, "Set-up, versions, masters, incentive criteria and the configuration inputs"]
+  - ["Head, Technical Support Unit", BDOI, "Package requests, negotiation, requirements, advisories and expiry"]
+  - ["Head, Retail Marketing", BDOI, "Package requests, approvals and pricing screens"]
+  - ["Head, Comptrollership", BDOI, "Finance: rates and taxes, commission rates, incentive criteria"]
+  - ["Head, BDOI IT", BDOI, "BDOI IT: interfaces, user access and menus"]
+  - ["Program Manager, Business Project Services", BDO Unibank ESG, "Traceability to the BRD"]
+  - [Project Manager, iorta TechNXT, "Delivery of the set as signed"]
+
 # Sidebar sections that belong to this BRD (navigation/modules.ts module ids) and the BRD of every other section,
 # used to mark each menu entry of a persona.
 own_sections: [catalog]

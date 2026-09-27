@@ -947,7 +947,11 @@ def frontend_messages(dirs: Iterable[str]) -> list[UiMessage]:
     out: list[UiMessage] = []
     root = REPO / "frontend" / "src"
     for d in dirs:
-        for p in sorted((root / d).rglob("*.ts*")):
+        base = root / d
+        # A folder is read with its sub-folders; a single file (features/nbadmin/LovPage.tsx) is read on its own
+        # (Path.rglob of a file yields nothing before Python 3.13).
+        candidates = [base] if base.is_file() else sorted(base.rglob("*.ts*"))
+        for p in candidates:
             if re.search(r"\.(test|spec)\.tsx?$", p.name) or p.name == "help.ts":
                 continue
             raw = p.read_text(encoding="utf-8")
@@ -986,6 +990,14 @@ def frontend_messages(dirs: Iterable[str]) -> list[UiMessage]:
                 add(_ts_text(m.group(1)), "Confirmation", m.start(), "done")
             for m in re.finditer(r'emptyMessage="([^"]+)"', text):
                 add(m.group(1), "Information", m.start(), "empty list")
+            # Form checks written as require(ok, 'field', 'message'): the message is the last argument.
+            for m in re.finditer(r"\brequire\(", text):
+                args = split_top(text[m.end():matching(text, m.end() - 1)])
+                if len(args) >= 2:
+                    add(_ts_text(args[-1]), "Validation", m.start(), "require")
+            # Inline field errors: error={condition ? 'message' : undefined}.
+            for m in re.finditer(r"\berror=\{[^{}?]*\?\s*(`[^`]*`|'[^']*'|\"[^\"]*\")\s*:", text):
+                add(_ts_text(m.group(1)), "Validation", m.start(), "field error")
     seen: set[tuple[str, str]] = set()
     unique = []
     for u in out:

@@ -50,7 +50,7 @@ screens:
       - "TSU routing | Priority / Code / Description / Criteria / TSI Above / Status | Column | Lower priority evaluated first | - | TSU routing rules | - | Read only | - | -"
     actions:
       - "New Product | MBS (PRODUCT_MAINTAIN, MASTER_MAINTAIN) | Products tab | Opens New product; Save for Authorization saves it pending authorisation | Pending Authorization | -"
-      - "Add Rule | MASTER_MAINTAIN | Field rules, Document rules or TSU routing tab | Opens New Rule (see SCR-PM-12) | Pending Authorization | -"
+      - "Add Rule | MBS (PRODUCT_MAINTAIN), Business Administrator (MASTER_MAINTAIN) | Field rules, Document rules or TSU routing tab | Opens New Rule (see SCR-PM-12) | Pending Authorization | -"
       - "Authorize | PRODUCT_AUTHORIZE or MASTER_AUTHORIZE (Business Administrator, New Business Approver), not the maker | Row pending authorisation | Authorises the record; it is used by quotations, accounts and rating from now | Active | -"
       - "Deactivate | PRODUCT_MAINTAIN or MASTER_MAINTAIN | Active row | Ends the use of the record; its history stays | Inactive | -"
       - "[Open a row] | Every user of the screen | Products tab | Opens the product record | - | -"
@@ -155,7 +155,7 @@ screens:
       - "Coverages | Included / Optional | Check box | - | N | - | Included | Draft | - | -"
       - "Coverages | Limit / Deductible | Number | Amounts in PHP | N | - | Blank | Draft | Zero or more | -"
       - "Coverages | Add coverage | Drop-down | Active coverages of the line not yet added, (basic) marked | N | Coverages & Clauses | - | Draft | - | -"
-      - "Insurers | Insurer | Column | Insurer code | N | Insurers (authorised, active) | Copied panel | Draft | Every insurer with terms is on the package | Insurer <insurer code> has terms but is not on the package"
+      - "Insurers | Insurer | Column | Insurer name | N | Insurers (authorised, active) | Copied panel | Draft | Every insurer with terms is on the package | Insurer <insurer code> has terms but is not on the package"
       - "Insurers | Role | Drop-down | Panel, Lead, Participant | Y | Fixed list | Panel | Draft | - | -"
       - "Insurers | Share % | Number | Co-insurance share | Cond.: lead and participants | - | Blank | Draft | 0 to 100; lead and participant shares total 100% | Enter a share between 0 and 100 / The co-insurance shares must add up to 100%"
       - "Insurers | Rate % | Number | Insurer's own rate; wins over the package rate | Cond.: when there is no package rate | - | Blank | Draft | 0 to 100 | Enter a rate between 0 and 100"

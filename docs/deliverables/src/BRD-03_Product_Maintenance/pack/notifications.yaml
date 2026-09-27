@@ -68,18 +68,18 @@ notifications:
   - id: NT-08
     channel: Alert inbox
     trigger: The daily PACKAGE_EXPIRY_MONITOR job (01:00 PHT) finds a released package ending within 60 days (PACKAGE_EXPIRY_NOTICE_DAYS), then within 30 and 7 days (PACKAGE_EXPIRY_REMINDER_DAYS); once per threshold
-    recipient: Users of the Alerts screen (System Administrator, Auditor); TSU and MBS see the same packages on Package Expiry and the home tiles
-    template: "Exception PACKAGE_EXPIRING (Package expiring): Package <risk code> version <n> ends on <date> (<n> days); no renewal request yet (or: renewal <request no.>)"
-    content: The package, its end date, the days left and the renewal request if any
+    recipient: "Users of the Alerts screen (System Administrator, Auditor); in the app, every user with PKG_NEGOTIATE (TSU) and every user with PRODUCT_MAINTAIN (MBS)"
+    template: "Exception PACKAGE_EXPIRING (Package expiring): Package <risk code> version <n> ends on <dd-MMM-yyyy> (<n> days); no renewal request yet (or: renewal <request no.>). In-app notice: Title: Package ending: <risk code>, with the same text"
+    content: The package, its end date, the days left and the renewal request if any; the in-app notice opens Package Expiry
     screen: Alerts; Package Expiry; Product Maintenance Home
     frs: [FR-PM-060]
     source: PackageExpiryService.alert
   - id: NT-09
     channel: Alert inbox
     trigger: A package that an active incentive criterion names expires or is retired
-    recipient: Users of the Alerts screen (System Administrator, Auditor)
-    template: "Exception INCENTIVE_PRODUCT_INACTIVE (Incentive criterion on an inactive product): Incentive criterion <code> applies to package <risk code>, which <expired or retired>: review or deactivate it"
-    content: The criterion and the package
+    recipient: "Users of the Alerts screen (System Administrator, Auditor); in the app, every user with PKG_NEGOTIATE (TSU) and every user with PRODUCT_MAINTAIN (MBS)"
+    template: "Exception INCENTIVE_PRODUCT_INACTIVE (Incentive criterion on an inactive product): Incentive criterion <code> applies to package <risk code>, which <expired or retired>: review or deactivate it. In-app notice: Title: Incentive criterion to review: <code>, with the same text"
+    content: The criterion and the package; the in-app notice opens Incentive Criteria
     screen: Alerts; Incentive Criteria
     frs: [FR-PM-081]
     source: PackageIncentiveReview.productInactive

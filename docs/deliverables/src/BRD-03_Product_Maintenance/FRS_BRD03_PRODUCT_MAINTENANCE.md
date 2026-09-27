@@ -2140,7 +2140,7 @@ The table lists every point where the delivered system does what the BRD asks in
 | BRPM.011 | Deletion of a package | Retire request; the product and its versions stay readable and are never deleted | 045 |
 | BRPM.015 | ManCom sign-off | One ManCom member's sign-off in BIBS completes the step; an uploaded signed sheet is linked, else a sign-off record is generated (PQ07) | 041 |
 | BRPM.016 | Advisories to the relevant units | In-app notice to the users of each recipient group by permission, and the protected PDF by e-mail when addresses are entered (PQ12) | 044 |
-| BRPM.017, PMADD08 | Expiry and incentive alerts to TSU and MBS | The expiry and incentive alerts are raised in the Alert inbox (System Administrator, Auditor); TSU and MBS see the packages on Package Expiry and the home tiles, and receive an in-app notice when a package has expired | 060, 081 |
+| BRPM.017, PMADD08 | Expiry and incentive alerts to TSU and MBS | The expiry and incentive alerts are raised in the Alert inbox (System Administrator, Auditor) and sent to TSU and MBS as in-app notices | 060, 081 |
 | BRPM.018 | Package Status Update Report as named by BDOI | Report PM-PKG-STATUS with draft columns until PQ15 is answered | 071 |
 | BRPM.020 | Password convention of BDOI | A password generated per e-mail, sent in a separate e-mail (Q07, PQ21) | 004 |
 | BRPM.022 | Data synchronised with BDOI systems | Every release and expiry is handed to the product master port, which records it; the transport waits for PQ16 | 072 |

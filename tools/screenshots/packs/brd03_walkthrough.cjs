@@ -284,9 +284,12 @@ const steps = {
     const page = await go(ctx, 'approver', '/approvals');
     const row = page.locator('table tbody tr').filter({ hasText: ref }).first();
     if (await row.count()) {
-      await row.getByRole('button', { name: /^(approve|authorize)$/i }).first().click().catch(() => {});
+      await row.getByRole('button', { name: /^(approve|authorize)$/i }).first().click();
       await settle(page, 1500);
     }
+    return page;
+  },
+  'wt-a-24': async (ctx) => {
     const q = ctx.one(`select id from quo_quotation where product_code = '${RISK_CODE}' order by id desc limit 1`);
     return go(ctx, 'ao', `/quotations/${q}`);
   },

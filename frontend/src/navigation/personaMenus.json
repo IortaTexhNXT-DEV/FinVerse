@@ -468,6 +468,7 @@
             "/migration/layouts",
             "/migration/batches",
             "/migration/reconciliation",
+            "/migration/trueups",
             "/migration/signoff"
           ]
         },
@@ -488,6 +489,7 @@
             "/migration/batches",
             "/migration/matching",
             "/migration/reconciliation",
+            "/migration/trueups",
             "/migration/signoff"
           ]
         },
@@ -509,6 +511,7 @@
             "/migration/layouts",
             "/migration/batches",
             "/migration/reconciliation",
+            "/migration/trueups",
             "/migration/signoff"
           ]
         },
@@ -523,6 +526,7 @@
             "/migration/extracts",
             "/migration/batches",
             "/migration/reconciliation",
+            "/migration/trueups",
             "/migration/signoff"
           ]
         },
@@ -543,6 +547,7 @@
             "/migration/layouts",
             "/migration/batches",
             "/migration/reconciliation",
+            "/migration/trueups",
             "/migration/signoff"
           ]
         },
@@ -556,6 +561,7 @@
             "/migration/layouts",
             "/migration/batches",
             "/migration/reconciliation",
+            "/migration/trueups",
             "/migration/signoff"
           ]
         }

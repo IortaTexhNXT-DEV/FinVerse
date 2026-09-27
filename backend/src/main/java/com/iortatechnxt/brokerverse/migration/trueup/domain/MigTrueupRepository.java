@@ -31,4 +31,20 @@ public interface MigTrueupRepository extends JpaRepository<MigTrueup, Long> {
    * @return true-ups
    */
   List<MigTrueup> findByStatusOrderByIdAsc(MigTrueup.Status status);
+
+  /**
+   * The true-up of a G03 batch.
+   *
+   * @param batchId batch
+   * @return true-up
+   */
+  Optional<MigTrueup> findByBatchId(Long batchId);
+
+  /**
+   * A true-up by its reference.
+   *
+   * @param reference MIG-TU-n
+   * @return true-up
+   */
+  Optional<MigTrueup> findByReference(String reference);
 }

@@ -95,6 +95,17 @@ export const MIGRATION_HELP: HelpSection = {
       controls: ['The reconciliation is signed (G5) only when no break is open.'],
     },
     {
+      name: 'Opening-Balance Adjustments',
+      path: '/migration/trueups',
+      summary:
+        'The year-end adjustments of the legacy books after go-live. The Comptrollership GL lead prepares an adjustment on a validated batch of adjustment journals and the legacy trial balance of the same version; the Head of Comptrollership approves it; loading the batch posts the adjustment journals into the opening period and adjusts the open legacy invoices; the adjustment is then reconciled and signed.',
+      controls: [
+        'The preparer never approves or signs the same adjustment.',
+        'Only an approved adjustment is posted; a posted adjustment is corrected by the next one, never edited.',
+        'Income and expense lines go to retained earnings; legacy control accounts go to Migration Clearing, which must stay at zero.',
+      ],
+    },
+    {
       name: 'Sign-off',
       path: '/migration/signoff',
       summary:

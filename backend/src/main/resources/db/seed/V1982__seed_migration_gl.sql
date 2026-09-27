@@ -102,3 +102,14 @@ where not exists (select 1 from acc_rule_line x where x.rule_id = r.id);
 
 update sys_parameter set param_value = '2026-09-01', updated_at = now(), updated_by = 'SYSTEM'
 where param_key = 'MIG_OPENING_VALUE_DATE';
+
+-- ---------- GL-SL reconciliation of the legacy control accounts (ACSL, context LEGACY) --------
+insert into acsl_glsl_control (company_id, account_code, source, components, document_types, currency, active,
+    ledger_context, created_at, created_by)
+select c.id, x.code, 'OPS_LEDGER', x.components, null, null, true, 'LEGACY', now(), 'SYSTEM'
+from org_company c
+cross join (values ('1215.01', 'BASIC'), ('1215.02', 'DST'), ('1215.03', 'PREMIUM_TAX_VAT'),
+                   ('1215.04', 'LGT'), ('1215.05', 'FST'), ('1215.06', 'OTHER'), ('1216', 'PR2307'),
+                   ('LGC-DTIP', 'DTIP')) as x(code, components)
+where c.code = 'FVI'
+  and not exists (select 1 from acsl_glsl_control g where g.company_id = c.id and g.account_code = x.code);

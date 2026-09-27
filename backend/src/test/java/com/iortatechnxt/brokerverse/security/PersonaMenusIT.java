@@ -76,6 +76,7 @@ class PersonaMenusIT {
           Map.entry("/migration/batches", "/api/v1/migration/batches?companyId={c}"),
           Map.entry("/migration/matching", "/api/v1/migration/matches"),
           Map.entry("/migration/reconciliation", "/api/v1/migration/batches?companyId={c}"),
+          Map.entry("/migration/trueups", "/api/v1/migration/trueups?companyId={c}"),
           Map.entry("/migration/signoff", "/api/v1/migration/signoffs/matrix?companyId={c}"));
 
   @Autowired private Api api;

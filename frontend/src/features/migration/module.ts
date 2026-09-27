@@ -7,6 +7,7 @@ import {
   Layers,
   ListTree,
   Scale,
+  Scroll,
   Users,
 } from 'lucide-react';
 import { lazy } from 'react';
@@ -15,7 +16,8 @@ import type { FeatureModule } from '@/navigation/types';
 /**
  * Data Migration (BRD-13; docs/architecture/DATA_MIGRATION_DESIGN.md section 22): the migration
  * console in its own sidebar group - home, data objects, code maps, layouts and load templates,
- * extracts, batches, client matching, reconciliation and sign-off. Migration reports are in the
+ * extracts, batches, client matching, reconciliation, the opening-balance adjustments of the
+ * year-end cut-over and sign-off. Migration reports are in the
  * Report Centre under Data Migration.
  */
 export const migrationModule: FeatureModule = {
@@ -85,6 +87,13 @@ export const migrationModule: FeatureModule = {
       icon: Scale,
       permission: 'MIG_VIEW',
       component: lazy(() => import('./reconciliation/ReconciliationPage')),
+    },
+    {
+      path: '/migration/trueups',
+      label: 'Opening Adjustments',
+      icon: Scroll,
+      permission: 'MIG_VIEW',
+      component: lazy(() => import('./trueups/TrueUpsPage')),
     },
     {
       path: '/migration/signoff',

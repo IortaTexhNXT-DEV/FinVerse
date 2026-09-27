@@ -46,6 +46,9 @@ public class LegacyInvoicePosting {
   /** Opening event of a legacy invoice. */
   public static final String EVENT = "MIG_LEGACY_INVOICE_OPENING";
 
+  /** Year-end adjustment event of a legacy position. */
+  public static final String TRUEUP_EVENT = "MIG_LEGACY_POSITION_TRUEUP";
+
   private static final String CLEARING = "CLEARING";
   private static final String ROLLBACK = ":RB";
   private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
@@ -61,7 +64,8 @@ public class LegacyInvoicePosting {
           LedgerComponent.FST, "PR_FST",
           LedgerComponent.OTHER, "PR_OTHER",
           LedgerComponent.PR2307, "PR2307");
-  private static final List<String> CREDITS = List.of("DTIP", "UNREALIZED", "DEFERRED_VAT");
+  private static final List<String> CREDITS =
+      List.of("DTIP", "UNREALIZED", "DEFERRED_VAT", "AMOUNT");
 
   private final AccountingEventPublisher publisher;
   private final BookRates rates;
@@ -172,45 +176,120 @@ public class LegacyInvoicePosting {
 
   private String publish(OpsInvoice invoice, ShareAmounts share, LocalDate date, boolean reverse) {
     Map<String, BigDecimal> amounts = new LinkedHashMap<>();
+    share.amounts().forEach((k, v) -> amounts.put(k, reverse ? v.negate() : v));
+    return publish(
+        new Posting(
+            invoice,
+            EVENT,
+            sourceRef(invoice) + ":" + share.insurerCode() + (reverse ? ROLLBACK : ""),
+            share.insurerCode(),
+            date,
+            "Legacy invoice "
+                + invoice.getLegacy().legacyInvoiceNo()
+                + (reverse ? " - migration batch rolled back" : " - opening at cut-over")),
+        amounts);
+  }
+
+  /**
+   * Posts a year-end adjustment of the position of a legacy invoice ({@code
+   * MIG_LEGACY_POSITION_TRUEUP}): the legacy control account of each component against migration
+   * clearing.
+   *
+   * @param invoice the invoice
+   * @param changes change of each position by component name without the legacy prefix (PR_BASIC,
+   *     DTIP, COMMISSION, UNREALIZED...), in its natural sign
+   * @param sourceRef true-up reference of the item and component
+   * @param date value date
+   * @return journal batch, null when nothing changed
+   */
+  public String trueUp(
+      OpsInvoice invoice, Map<String, BigDecimal> changes, String sourceRef, LocalDate date) {
+    return publish(
+        new Posting(
+            invoice,
+            TRUEUP_EVENT,
+            sourceRef,
+            invoice.getInsurerCode(),
+            date,
+            "Year-end adjustment of legacy invoice " + invoice.getLegacy().legacyInvoiceNo()),
+        changes);
+  }
+
+  /**
+   * The name of the event component of a ledger component (without the legacy prefix).
+   *
+   * @param component ledger component
+   * @return PR_BASIC, PR_DST..., PR2307, DTIP, COMMISSION or COMMISSION_VAT; WTAX nets the
+   *     commission receivable
+   */
+  public static String eventComponent(LedgerComponent component) {
+    return switch (component) {
+      case DTIP, COMMISSION, COMMISSION_VAT -> component.name();
+      case WTAX -> "COMMISSION";
+      default -> PR.get(component);
+    };
+  }
+
+  private String publish(Posting p, Map<String, BigDecimal> changes) {
+    Map<String, BigDecimal> amounts = new LinkedHashMap<>();
     Map<String, String> componentParties = new LinkedHashMap<>();
     BigDecimal clearing = BigDecimal.ZERO;
-    for (Map.Entry<String, BigDecimal> e : share.amounts().entrySet()) {
+    for (Map.Entry<String, BigDecimal> e : changes.entrySet()) {
       if (e.getValue().signum() == 0) {
         continue;
       }
-      BigDecimal value = reverse ? e.getValue().negate() : e.getValue();
       String component = LedgerContext.LEGACY.component(e.getKey());
-      amounts.put(component, value);
-      clearing = CREDITS.contains(e.getKey()) ? clearing.subtract(value) : clearing.add(value);
+      amounts.merge(component, e.getValue(), BigDecimal::add);
+      clearing =
+          CREDITS.contains(e.getKey())
+              ? clearing.subtract(e.getValue())
+              : clearing.add(e.getValue());
       if (!e.getKey().startsWith("PR")) {
-        componentParties.put(component, share.insurerCode());
+        componentParties.put(component, p.insurerCode());
       }
     }
     if (amounts.isEmpty()) {
       return null;
     }
     amounts.put(CLEARING, clearing);
+    OpsInvoice invoice = p.invoice();
     BusinessEvent event =
         new BusinessEvent(
-            EVENT,
+            p.eventType(),
             invoice.getCompanyId(),
             invoice.getBranchId(),
-            date,
+            p.date(),
             invoice.getCurrency(),
             LegacyInvoiceIntake.MODULE,
-            sourceRef(invoice) + ":" + share.insurerCode() + (reverse ? ROLLBACK : ""),
+            p.sourceRef(),
             invoice.getInvoiceNo(),
             invoice.getClientCode(),
             invoice.getClassification().productLine(),
             invoice.getClassification().costCenter(),
-            "Legacy invoice "
-                + invoice.getLegacy().legacyInvoiceNo()
-                + (reverse ? " - migration batch rolled back" : " - opening at cut-over"),
+            p.narration(),
             amounts,
             Map.of(),
             componentParties);
     return publisher.publish(rates.price(event)).getBatchNo();
   }
+
+  /**
+   * An event to publish for an invoice.
+   *
+   * @param invoice invoice
+   * @param eventType event type
+   * @param sourceRef idempotency key
+   * @param insurerCode party of the insurer components
+   * @param date value date
+   * @param narration narration
+   */
+  private record Posting(
+      OpsInvoice invoice,
+      String eventType,
+      String sourceRef,
+      String insurerCode,
+      LocalDate date,
+      String narration) {}
 
   private static String sourceRef(OpsInvoice invoice) {
     return "MIG:INV:" + invoice.getInvoiceNo();

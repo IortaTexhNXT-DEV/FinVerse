@@ -171,9 +171,11 @@ module.exports = [
   { slug: 'mig-extracts', title: 'Extracts and intake checks', user: 'migops', path: '/migration/extracts' },
   { slug: 'mig-batches', title: 'Migration Batches', user: 'migops', path: '/migration/batches' },
   { slug: 'mig-batch-record', title: 'Migration Batch record', user: 'migops', path: '/migration/batches', open: 'first' },
+  { slug: 'ops-invoice-legacy', title: 'Invoice Search with the Origin filter (legacy invoices)', user: 'recon', path: '/operations/invoices?origin=MIGRATED' },
   { slug: 'mig-plan-batch', title: 'Modal (Plan Batch)', user: 'migops', path: '/migration/batches', click: '^plan batch$' },
   { slug: 'mig-matching', title: 'Client Matching review queue', user: 'migsteward', path: '/migration/matching' },
   { slug: 'mig-reconciliation', title: 'Reconciliation', user: 'migrecon', path: '/migration/reconciliation' },
+  { slug: 'mig-trueups', title: 'Opening-Balance Adjustments', user: 'migrecon', path: '/migration/trueups' },
   { slug: 'mig-signoff', title: 'Sign-off gate matrix', user: 'miglead', path: '/migration/signoff' },
   // Reports
   { slug: 'nb-reports', title: 'New Business Reports', user: 'mkttl', path: '/nb/reports' },

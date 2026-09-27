@@ -205,13 +205,16 @@ public class LedgerEffects {
     String tag = Adjustments.MODULE + ":" + Adjustments.sourceRef(request.getRequestNo());
     return queries.movements(request.getSubject().invoiceNo()).stream()
         .filter(m -> m.getJournalBatchNo() != null)
-        .filter(
-            m ->
-                m.getSourceRef().endsWith(":RA:" + tag)
-                    || (m.getRemarks() != null && m.getRemarks().endsWith(" " + tag)))
+        .filter(m -> isReapplication(m, tag))
         .map(OpsInvoiceMovement::getJournalBatchNo)
         .distinct()
         .toList();
+  }
+
+  /** A reversal (":RA:" reference) or new application (remarks) of a request's re-application. */
+  private static boolean isReapplication(OpsInvoiceMovement m, String tag) {
+    String remarks = m.getRemarks() == null ? "" : m.getRemarks();
+    return m.getSourceRef().endsWith(":RA:" + tag) || remarks.endsWith(" " + tag);
   }
 
   /**

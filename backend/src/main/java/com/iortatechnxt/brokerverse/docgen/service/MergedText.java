@@ -18,4 +18,13 @@ public record MergedText(String code, int versionNo, String title, String text) 
   public String versionTag() {
     return code + " v" + versionNo;
   }
+
+  /**
+   * The version as users read it in a document footer, e.g. {@code Version 2}.
+   *
+   * @return label
+   */
+  public String versionLabel() {
+    return "Version " + versionNo;
+  }
 }

@@ -1,11 +1,15 @@
 package com.iortatechnxt.brokerverse.bulk.service;
 
 import com.iortatechnxt.brokerverse.bulk.domain.BulkJob;
+import com.iortatechnxt.brokerverse.bulk.domain.BulkJobStatus;
 import com.iortatechnxt.brokerverse.bulk.domain.BulkRowRecord;
 import com.iortatechnxt.brokerverse.bulk.domain.BulkRowStatus;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -110,6 +114,7 @@ final class BulkWorkbooks {
    * @param rows rows
    * @param values row values by row id
    * @param outcomes committed rows per outcome category (BRQID.006)
+   * @param uploadedBy display name of the user who uploaded the file
    * @return xlsx bytes
    */
   static byte[] report(
@@ -117,10 +122,11 @@ final class BulkWorkbooks {
       List<BulkColumn> columns,
       List<BulkRowRecord> rows,
       Map<Long, Map<String, String>> values,
-      Map<String, Long> outcomes) {
+      Map<String, Long> outcomes,
+      String uploadedBy) {
     try (XSSFWorkbook wb = new XSSFWorkbook()) {
       CellStyle head = headStyle(wb);
-      summarySheet(wb, job, outcomes);
+      summarySheet(wb, job, uploadedBy, outcomes);
       rowsSheet(wb, head, columns, rows, values);
       return bytes(wb);
     } catch (IOException e) {
@@ -142,7 +148,7 @@ final class BulkWorkbooks {
       List<BulkColumn> columns, List<BulkRowRecord> rows, Map<Long, Map<String, String>> values) {
     try (XSSFWorkbook wb = new XSSFWorkbook()) {
       CellStyle head = headStyle(wb);
-      CellStyle marked = errorStyle(wb);
+      Marks marks = new Marks(errorStyle(wb, false), errorStyle(wb, true), dateStyle(wb));
       Sheet sheet = wb.createSheet("Data");
       Row header = sheet.createRow(0);
       for (int c = 0; c < columns.size(); c++) {
@@ -162,7 +168,7 @@ final class BulkWorkbooks {
           continue;
         }
         errorRow(
-            sheet.createRow(r++), columns, row, values.getOrDefault(row.getId(), Map.of()), marked);
+            sheet.createRow(r++), columns, row, values.getOrDefault(row.getId(), Map.of()), marks);
       }
       sheet.createFreezePane(0, 1);
       return bytes(wb);
@@ -171,32 +177,62 @@ final class BulkWorkbooks {
     }
   }
 
+  /**
+   * Styles of the error file: an offending cell, an offending date cell, and a date cell (dates are
+   * real date cells shown as dd-MMM-yyyy; the upload reads them back as dates).
+   */
+  private record Marks(CellStyle marked, CellStyle markedDate, CellStyle date) {}
+
   /** One rejected row of the error file: its values, then its messages in the Error column. */
   private static void errorRow(
-      Row out,
-      List<BulkColumn> columns,
-      BulkRowRecord row,
-      Map<String, String> v,
-      CellStyle marked) {
+      Row out, List<BulkColumn> columns, BulkRowRecord row, Map<String, String> v, Marks marks) {
     String messages = textOf(row.getMessages());
     String lower = messages.toLowerCase(Locale.ROOT);
     for (int c = 0; c < columns.size(); c++) {
       String name = columns.get(c).header();
       var cell = out.createCell(c);
-      cell.setCellValue(v.getOrDefault(name, ""));
-      if (!messages.isEmpty() && lower.contains(name.toLowerCase(Locale.ROOT))) {
-        cell.setCellStyle(marked);
+      boolean marked = !messages.isEmpty() && lower.contains(name.toLowerCase(Locale.ROOT));
+      LocalDate date = columns.get(c).type() == BulkColumn.Type.DATE ? dateOf(v.get(name)) : null;
+      if (date == null) {
+        cell.setCellValue(v.getOrDefault(name, ""));
+        if (marked) {
+          cell.setCellStyle(marks.marked());
+        }
+      } else {
+        cell.setCellValue(date);
+        cell.setCellStyle(marked ? marks.markedDate() : marks.date());
       }
     }
     var error = out.createCell(columns.size());
     error.setCellValue(messages);
     if (!messages.isEmpty()) {
-      error.setCellStyle(marked);
+      error.setCellStyle(marks.marked());
     }
   }
 
-  private static CellStyle errorStyle(XSSFWorkbook wb) {
+  /** The date of a value entered as yyyy-MM-dd, or null when it is blank or not a date. */
+  private static LocalDate dateOf(String value) {
+    if (value == null || value.isBlank()) {
+      return null;
+    }
+    try {
+      return LocalDate.parse(value.strip());
+    } catch (DateTimeParseException e) {
+      return null;
+    }
+  }
+
+  private static CellStyle dateStyle(XSSFWorkbook wb) {
     CellStyle style = wb.createCellStyle();
+    style.setDataFormat(wb.createDataFormat().getFormat(DisplayFormat.SHEET_DATE_FORMAT));
+    return style;
+  }
+
+  private static CellStyle errorStyle(XSSFWorkbook wb, boolean date) {
+    CellStyle style = wb.createCellStyle();
+    if (date) {
+      style.setDataFormat(wb.createDataFormat().getFormat(DisplayFormat.SHEET_DATE_FORMAT));
+    }
     Font font = wb.createFont();
     font.setColor(IndexedColors.DARK_RED.getIndex());
     style.setFont(font);
@@ -205,19 +241,33 @@ final class BulkWorkbooks {
     return style;
   }
 
-  private static void summarySheet(XSSFWorkbook wb, BulkJob job, Map<String, Long> outcomes) {
+  private static String statusText(BulkJobStatus status) {
+    return switch (status) {
+      case VALIDATED -> "Validated, waiting for commit";
+      case COMPLETED -> "Completed";
+      case CANCELLED -> "Cancelled";
+    };
+  }
+
+  private static String rowStatusText(BulkRowStatus status) {
+    String words = status.name().toLowerCase(Locale.ROOT).replace('_', ' ');
+    return Character.toUpperCase(words.charAt(0)) + words.substring(1);
+  }
+
+  private static void summarySheet(
+      XSSFWorkbook wb, BulkJob job, String uploadedBy, Map<String, Long> outcomes) {
     Sheet summary = wb.createSheet("Summary");
     Object[][] facts = {
       {"Upload", job.getJobNo()},
       {"File", job.getFileName()},
-      {"Status", job.getStatus().name()},
+      {"Status", statusText(job.getStatus())},
       {"Rows", job.getTotalRows()},
       {"Valid", job.getValidRows()},
       {"Invalid", job.getInvalidRows()},
       {"Committed", job.getCommittedRows()},
       {"Failed at commit", job.getFailedRows()},
-      {"Uploaded by", job.getCreatedBy()},
-      {"Uploaded at", String.valueOf(job.getCreatedAt())},
+      {"Uploaded by", uploadedBy},
+      {"Uploaded at", DisplayFormat.dateTime(job.getCreatedAt())},
       {"Reprocessed", job.getReprocessCount()}
     };
     for (int i = 0; i < facts.length; i++) {
@@ -260,7 +310,7 @@ final class BulkWorkbooks {
     for (BulkRowRecord row : rows) {
       Row out = sheet.createRow(r++);
       out.createCell(0).setCellValue(row.getRowNo());
-      out.createCell(1).setCellValue(row.getStatus().name());
+      out.createCell(1).setCellValue(rowStatusText(row.getStatus()));
       out.createCell(MESSAGES_COLUMN).setCellValue(textOf(row.getMessages()));
       out.createCell(REFERENCE_COLUMN).setCellValue(textOf(row.getResultRef()));
       out.createCell(OUTCOME_COLUMN).setCellValue(textOf(row.getOutcome()));

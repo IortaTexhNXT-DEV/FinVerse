@@ -20,6 +20,7 @@ import com.iortatechnxt.brokerverse.payrequest.domain.PaymentRequest;
 import com.iortatechnxt.brokerverse.payrequest.domain.RefundLine;
 import com.iortatechnxt.brokerverse.payrequest.domain.RequestKind;
 import com.iortatechnxt.brokerverse.payrequest.domain.RequestTrail;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -51,6 +52,7 @@ public class PayRequestDocuments {
   private final LovService lovs;
   private final AuditTrailService audit;
   private final Clock clock;
+  private final UserDirectory users;
 
   /**
    * Creates the service.
@@ -62,6 +64,7 @@ public class PayRequestDocuments {
    * @param organization company name
    * @param lovs labels
    * @param audit audit trail
+   * @param users user names (signatories)
    * @param clock clock
    */
   public PayRequestDocuments(
@@ -72,6 +75,7 @@ public class PayRequestDocuments {
       OrganizationService organization,
       LovService lovs,
       AuditTrailService audit,
+      UserDirectory users,
       Clock clock) {
     this.queries = queries;
     this.liquidations = liquidations;
@@ -80,6 +84,7 @@ public class PayRequestDocuments {
     this.organization = organization;
     this.lovs = lovs;
     this.audit = audit;
+    this.users = users;
     this.clock = clock;
   }
 
@@ -254,11 +259,11 @@ public class PayRequestDocuments {
         LIQUIDATION_AMOUNTS);
   }
 
-  private static List<String> signatories(RequestTrail t, PaymentRequest r) {
+  private List<String> signatories(RequestTrail t, PaymentRequest r) {
     return List.of(
-        "Prepared by: " + r.getCreatedBy(),
-        "Checked by: " + text(t.reviewedBy()),
-        "Approved by: " + text(t.approvedBy()));
+        "Prepared by: " + users.displayName(r.getCreatedBy()),
+        "Checked by: " + text(users.displayName(t.reviewedBy())),
+        "Approved by: " + text(users.displayName(t.approvedBy())));
   }
 
   private static String plain(BigDecimal amount) {

@@ -1,7 +1,9 @@
 package com.iortatechnxt.brokerverse.nonpackage.service;
 
 import com.iortatechnxt.brokerverse.account.domain.RiskItemData;
+import com.iortatechnxt.brokerverse.catalog.service.CatalogNames;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -18,11 +20,11 @@ import com.iortatechnxt.brokerverse.nonpackage.domain.ProposalRequest;
 import com.iortatechnxt.brokerverse.nonpackage.domain.RiskDetails;
 import com.iortatechnxt.brokerverse.nonpackage.service.ComparativeTable.Row;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
@@ -66,6 +68,8 @@ public class ProposalDocuments {
   private final DocTemplateService templates;
   private final OrganizationService organization;
   private final RiskDetailsCodec codec;
+  private final CatalogNames names;
+  private final UserDirectory users;
   private final Clock clock;
 
   /**
@@ -75,6 +79,8 @@ public class ProposalDocuments {
    * @param templates document templates
    * @param organization companies (letterhead)
    * @param codec risk details JSON
+   * @param names product and line names
+   * @param users user names (signatures)
    * @param clock clock
    */
   public ProposalDocuments(
@@ -82,11 +88,15 @@ public class ProposalDocuments {
       DocTemplateService templates,
       OrganizationService organization,
       RiskDetailsCodec codec,
+      CatalogNames names,
+      UserDirectory users,
       Clock clock) {
     this.composer = composer;
     this.templates = templates;
     this.organization = organization;
     this.codec = codec;
+    this.names = names;
+    this.users = users;
     this.clock = clock;
   }
 
@@ -101,7 +111,7 @@ public class ProposalDocuments {
         templates.merge(
             QS_TEMPLATE,
             BusinessClock.today(clock),
-            Map.of(REFERENCE, p.getQsNo(), "replyBy", String.valueOf(p.getQsReplyBy())));
+            Map.of(REFERENCE, p.getQsNo(), "replyBy", DisplayFormat.date(p.getQsReplyBy())));
     List<Section> sections = new ArrayList<>();
     sections.add(new Text(null, text.text()));
     sections.add(new Fields(RISK, riskFields(p)));
@@ -113,8 +123,8 @@ public class ProposalDocuments {
                 "Quotation Slip",
                 p.getQsNo() + " / " + p.getArn(),
                 sections,
-                List.of("Prepared by", "Approved by"),
-                text.versionTag()));
+                signatures(p.getQsSubmittedBy(), p.getQsApprovedBy()),
+                text.versionLabel()));
     return new MessageFile(p.getQsNo() + ".pdf", PDF, pdf);
   }
 
@@ -157,7 +167,7 @@ public class ProposalDocuments {
     for (Row r : ComparativeTable.of(responses).rows()) {
       List<Object> row = new ArrayList<>();
       row.add(r.insurerName());
-      row.add(r.status().name());
+      row.add(r.status().label());
       row.add(r.premium());
       row.add(r.rate());
       row.add(r.deductibles());
@@ -193,10 +203,10 @@ public class ProposalDocuments {
             List.of(
                 new Field("Insurer", chosen.getInsurerName()),
                 new Field(PREMIUM, money(chosen.getPremium())),
-                new Field("Rate %", text(chosen.getRate())),
+                new Field("Rate %", DisplayFormat.rate(chosen.getRate())),
                 new Field("Deductibles", text(chosen.getDeductibles())),
                 new Field("Conditions", text(chosen.getConditions())),
-                new Field("Valid until", text(chosen.getValidUntil())))));
+                new Field("Valid until", DisplayFormat.date(chosen.getValidUntil())))));
     sections.addAll(riskSections(codec.of(p)));
     byte[] pdf =
         composer.pdf(
@@ -205,8 +215,8 @@ public class ProposalDocuments {
                 "Proposal Slip",
                 p.getPsNo() + " / " + p.getArn(),
                 sections,
-                List.of("Prepared by", "Approved by"),
-                text.versionTag() + " / version " + p.getPsVersion()));
+                signatures(p.getPsSubmittedBy(), p.getPsApprovedBy()),
+                text.versionLabel() + " | Proposal slip version " + p.getPsVersion()));
     return new MessageFile(p.getPsNo() + "_v" + p.getPsVersion() + ".pdf", PDF, pdf);
   }
 
@@ -214,13 +224,22 @@ public class ProposalDocuments {
     return organization.getCompany(p.getCompanyId()).getName();
   }
 
-  private static List<Field> riskFields(ProposalRequest p) {
+  /** "Prepared by: <name>" and "Approved by: <name>" of the TSU preparer and approver. */
+  private List<String> signatures(String preparer, String approver) {
+    return List.of(
+        DocumentSpec.signature("Prepared by", users.displayName(preparer)),
+        DocumentSpec.signature("Approved by", users.displayName(approver)));
+  }
+
+  private List<Field> riskFields(ProposalRequest p) {
     return List.of(
         new Field("PRF", p.getPrfNo()),
         new Field("ARN", p.getArn()),
         new Field("Client", p.getClientName()),
-        new Field("Product", p.getProductCode() + " (" + p.getLineCode() + ")"),
-        new Field("Period", text(p.getPeriodFrom()) + " to " + text(p.getPeriodTo())),
+        new Field(
+            "Product",
+            names.product(p.getProductCode()) + " (" + names.line(p.getLineCode()) + ")"),
+        new Field("Period", DisplayFormat.period(p.getPeriodFrom(), p.getPeriodTo())),
         new Field("Total sum insured", p.getCurrency() + " " + money(p.getTotalSumInsured())));
   }
 
@@ -248,12 +267,12 @@ public class ProposalDocuments {
   private static List<String> cells(Row r) {
     return List.of(
         r.insurerName(),
-        r.status().name(),
-        money(r.premium()),
-        text(r.rate()),
+        r.status().label(),
+        money(r.premium()) + (r.lowest() ? " (lowest)" : ""),
+        DisplayFormat.rate(r.rate()),
         text(r.deductibles()),
         text(r.conditions()),
-        text(r.validUntil()),
+        DisplayFormat.date(r.validUntil()),
         text(r.remarks()),
         r.recommended() ? "Recommended" : "");
   }
@@ -276,7 +295,7 @@ public class ProposalDocuments {
   }
 
   private static String money(BigDecimal amount) {
-    return amount == null ? "" : String.format(Locale.ROOT, "%,.2f", amount);
+    return DisplayFormat.amount(amount);
   }
 
   private static String text(Object value) {

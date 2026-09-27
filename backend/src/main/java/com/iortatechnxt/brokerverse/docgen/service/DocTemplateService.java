@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.domain.DocTemplate;
 import com.iortatechnxt.brokerverse.docgen.domain.DocTemplateRepository;
 import java.time.LocalDate;
@@ -73,7 +74,8 @@ public class DocTemplateService {
   }
 
   /**
-   * Replaces {@code {{name}}} placeholders.
+   * Replaces {@code {{name}}} placeholders; dates and amounts are written as users read them
+   * (dd-MMM-yyyy, 80,000,000.00).
    *
    * @param text text
    * @param values values
@@ -84,7 +86,7 @@ public class DocTemplateService {
     StringBuilder sb = new StringBuilder();
     while (m.find()) {
       Object v = values.get(m.group(1));
-      m.appendReplacement(sb, Matcher.quoteReplacement(v == null ? "" : v.toString()));
+      m.appendReplacement(sb, Matcher.quoteReplacement(DisplayFormat.value(v)));
     }
     m.appendTail(sb);
     return sb.toString();

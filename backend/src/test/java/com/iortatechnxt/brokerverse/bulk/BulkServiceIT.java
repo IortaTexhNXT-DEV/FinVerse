@@ -51,7 +51,7 @@ class BulkServiceIT {
         "﻿Plate No,Amount,Inception,Fleet,Remarks\n"
             + "abc 1234,\"850,000.00\",2026-10-01,yes,\"said \"\"hello\"\"\"\n"
             + "ABC-1234,100,,,duplicate of row 2\n"
-            + "XYZ 999,2000000,,,too high\n"
+            + "XYZ 999,2000000,2026-11-15,,too high\n"
             + ",5,,,missing plate\n"
             + "DEF 1,12a,31-12-2026,maybe,bad types\n"
             + "FAIL,10,,,fails at commit\n"
@@ -96,7 +96,9 @@ class BulkServiceIT {
           .isEqualTo("2");
       assertThat(report.getSheet("Rows").getPhysicalNumberOfRows()).isEqualTo(8);
       assertThat(report.getSheet("Rows").getRow(3).getCell(1).getStringCellValue())
-          .isEqualTo("INVALID");
+          .isEqualTo("Invalid");
+      assertThat(report.getSheet("Summary").getRow(2).getCell(1).getStringCellValue())
+          .isEqualTo("Completed");
     }
 
     // Error file: the five rows not processed, in the template layout with an Error column last
@@ -113,6 +115,13 @@ class BulkServiceIT {
           .isEqualTo(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND);
       assertThat(missingPlate.getCell(1).getCellStyle().getFillPattern())
           .isEqualTo(org.apache.poi.ss.usermodel.FillPatternType.NO_FILL);
+      // Dates are date cells shown as dd-MMM-yyyy (read back as dates on upload); a value that
+      // is not a date stays as the user typed it.
+      var tooHigh = sheet.getRow(2).getCell(2);
+      assertThat(tooHigh.getLocalDateTimeCellValue().toLocalDate())
+          .isEqualTo(java.time.LocalDate.of(2026, 11, 15));
+      assertThat(tooHigh.getCellStyle().getDataFormatString()).isEqualTo("dd-mmm-yyyy");
+      assertThat(sheet.getRow(4).getCell(2).getStringCellValue()).isEqualTo("31-12-2026");
     }
   }
 

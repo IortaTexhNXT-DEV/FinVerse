@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
@@ -61,7 +62,8 @@ public class XlsxReportRenderer implements ReportRenderer {
   private static final int NUMBER_WIDTH = 16 * 256;
   private static final String AMOUNT_FORMAT = "#,##0.00;(#,##0.00)";
   private static final DateTimeFormatter STAMP =
-      DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withZone(BusinessClock.zone());
+      DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm", Locale.ENGLISH)
+          .withZone(BusinessClock.zone());
 
   @Override
   public ExportFormat format() {
@@ -247,7 +249,7 @@ public class XlsxReportRenderer implements ReportRenderer {
       bold.setFont(boldFont);
       date = wb.createCellStyle();
       date.setFont(bodyFont);
-      date.setDataFormat(wb.createDataFormat().getFormat("dd-mm-yyyy"));
+      date.setDataFormat(wb.createDataFormat().getFormat("dd-mmm-yyyy"));
       for (ColumnType t : ColumnType.values()) {
         String fmt = t == ColumnType.NUMBER ? "#,##0" : AMOUNT_FORMAT;
         CellStyle n = wb.createCellStyle();

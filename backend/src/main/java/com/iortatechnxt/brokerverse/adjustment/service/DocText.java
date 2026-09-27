@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.adjustment.service;
 
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -20,13 +21,13 @@ public final class DocText {
   private DocText() {}
 
   /**
-   * A value or the placeholder.
+   * A value as people read it (dates dd-MMM-yyyy), or the placeholder.
    *
    * @param value value
    * @return text
    */
   public static String text(Object value) {
-    return value == null ? NONE : value.toString();
+    return value == null ? NONE : DisplayFormat.value(value);
   }
 
   /**

@@ -99,7 +99,7 @@ screens:
       - Account Placement › Placement Slips tab
     shots:
       - {state: list, user: proc, caption: "Placement Slips, All Slips tab"}
-      - {state: send, user: proc, open_slip: generated, click: "^send$", caption: "Send placement slip dialog"}
+      - {state: send, user: proc, click: "^resend$", caption: "Send placement slip dialog (Resend of a sent slip)"}
     fields:
       - "Tabs | All Slips / To Send / Sent / Superseded | Tab | - | - | Fixed | All Slips | - | - | -"
       - "List | Slip | Column | PL-yyyy-nnnnnn with its version | - | Numbering | - | Read only | - | -"

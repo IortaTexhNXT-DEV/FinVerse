@@ -486,7 +486,12 @@ async function reachState(page, shot, recipe, ctx) {
     await openTab(page, escapeRx(shot.tab));
   }
   if (shot.step) {
-    await openTab(page, `\\d+\\. ${escapeRx(shot.step)}`);
+    // Wizard steps ahead of the furthest step reached are not clickable: go there with Next.
+    const step = page.getByRole('tab', { name: new RegExp(`^\\d+\\. ${escapeRx(shot.step)}`, 'i') }).first();
+    for (let i = 0; i < 8 && (await step.getAttribute('aria-selected')) !== 'true'; i += 1) {
+      await page.getByRole('button', { name: /^next$/i }).first().click();
+      await settle(page, 500);
+    }
   }
   if (shot.fill) {
     const steps = recipe.fills[shot.fill];

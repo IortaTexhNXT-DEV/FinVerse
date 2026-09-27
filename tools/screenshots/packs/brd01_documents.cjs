@@ -10,7 +10,7 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'nb-pack-docs-'));
 const SOFFICE = process.env.SOFFICE || 'soffice';
 
 /** Renders the first page of a PDF, Word, Excel or OpenDocument file to a PNG at `out`. */
-function render(buffer, ext, out, dpi = 110) {
+function render(buffer, ext, out, dpi = 110, keep = []) {
   const base = path.join(TMP, `doc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
   let pdfFile = `${base}.${ext}`;
   fs.writeFileSync(pdfFile, buffer);
@@ -24,9 +24,19 @@ function render(buffer, ext, out, dpi = 110) {
       '    ws.sheet_properties.pageSetUpPr.fitToPage = True',
       '    ws.page_setup.fitToWidth = 1',
       '    ws.page_setup.fitToHeight = 0',
+      // Only the named columns are shown (a wide file would print too small to read).
+      'keep = [k for k in sys.argv[2].split("|") if k]',
+      'if keep:',
+      '    from openpyxl.utils import get_column_letter',
+      '    for ws in wb.worksheets:',
+      '        for c in range(1, ws.max_column + 1):',
+      '            name = str(ws.cell(1, c).value or "")',
+      '            dim = ws.column_dimensions[get_column_letter(c)]',
+      '            dim.hidden = name not in keep',
+      '            dim.width = 60 if name == keep[-1] else 20',
       'wb.save(sys.argv[1])',
     ].join('\n');
-    execFileSync(process.env.PYTHON || 'python3', ['-c', fit, pdfFile], { cwd: TMP, stdio: 'ignore' });
+    execFileSync(process.env.PYTHON || 'python3', ['-c', fit, pdfFile, keep.join('|')], { cwd: TMP, stdio: 'ignore' });
   }
   if (ext !== 'pdf') {
     execFileSync(SOFFICE, ['--headless', '--convert-to', 'pdf', '--outdir', TMP, pdfFile], { stdio: 'ignore',
@@ -43,7 +53,7 @@ function render(buffer, ext, out, dpi = 110) {
       'box = ImageOps.invert(im).getbbox()',
       'if box:',
       '    l, t, r, b = box',
-      '    im = im.crop((max(0, l - 40), max(0, t - 40), min(im.width, r + 40), min(im.height, max(b + 60, t + 260))))',
+      '    im = im.crop((max(0, l - 40), max(0, t - 40), min(im.width, r + 40), min(im.height, max(b + 40, t + 120))))',
       'im.save(sys.argv[1])',
     ].join('\n');
     execFileSync(process.env.PYTHON || 'python3', ['-c', crop, `${base}.png`], { cwd: TMP });

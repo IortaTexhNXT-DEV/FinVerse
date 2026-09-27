@@ -747,6 +747,51 @@ function quotationId(ctx) {
   return ctx.one(`select q.id from quo_quotation q join crm_client c on c.client_code = q.client_code or c.prospect_code = q.client_code where c.tin = '${person(ctx).tin}' order by q.id desc limit 1`);
 }
 
+// ------------------------------------------------------------------ bulk upload with the error file
+
+const BULK = '/bulk/CLIENT_CREATE';
+
+async function uploadBulk(page, file) {
+  await page.locator('main input[type=file]').first().setInputFiles(file);
+  await page.waitForTimeout(600);
+  await button(page, 'Upload and Validate').click();
+  await settle(page, 2500);
+}
+
+const bulk = {
+  // Review of an upload with valid and rejected rows.
+  'scr-nb-36-02-review': async (ctx) => {
+    const page = await go(ctx, 'ao', BULK);
+    await uploadBulk(page, await bulkClientFile(ctx, false));
+    ctx.state.bulkJob = ctx.one("select id from bulk_job where handler_code = 'CLIENT_CREATE' order by id desc limit 1");
+    return page;
+  },
+  // The valid rows processed; the error file actions offered.
+  'scr-nb-36-03-processed': async (ctx) => {
+    const page = await ctx.pageOf('ao');
+    await button(page, /^Process \d+ Valid Row/i).click();
+    await settle(page, 2500);
+    return page;
+  },
+  // The error file as downloaded, first page.
+  'scr-nb-36-04-errorfile': async (ctx, shot, file) => {
+    const { render } = require('./brd01_documents.cjs');
+    const data = await ctx.api('ao', 'GET', `/bulk/jobs/${ctx.state.bulkJob}/error-file`);
+    render(data, 'xlsx', file, 110, ['Client Type', 'Last Name', 'First Name', 'Birth Date', 'TIN', 'Error']);
+    return null;
+  },
+  // The corrected rows uploaded through Upload Corrected File, validated and processed.
+  'scr-nb-36-05-corrected': async (ctx) => {
+    const page = await ctx.pageOf('ao');
+    await button(page, /^Upload Corrected File$/i).click();
+    await settle(page, 800);
+    await uploadBulk(page, await bulkClientFile(ctx, true));
+    await button(page, /^Process \d+ Valid Row/i).click();
+    await settle(page, 2500);
+    return page;
+  },
+};
+
 async function prepare() {}
 
-module.exports = { steps, prepare, addItem, bulkClientFile, pdf, csv, act, tab, go, button, settle, uploadDocument, TMP };
+module.exports = { steps, bulk, prepare, addItem, bulkClientFile, pdf, csv, act, tab, go, button, settle, uploadDocument, TMP };

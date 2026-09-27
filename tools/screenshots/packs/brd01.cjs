@@ -143,21 +143,46 @@ const fills = {
     ['Loan application no.', 'HL-2026-0417'],
     ['PN numbers', 'PN-0417-2026'],
   ],
+  // The same client and location twice: the first draft is saved, the second is refused with the first ARN.
   account_duplicate: (ctx) => {
-    const code = ctx.one("select client_code from acc_account where arn = 'ARN-2026-940007'");
+    const once = [
+      pickClient('Client', 'CL-2026-900001'),
+      NEXT,
+      ...accountProduct,
+      NEXT,
+      NEXT,
+      click('add location'),
+      ['Address', '7 Sampaguita Street, Barangay Poblacion'],
+      ['City', 'Makati City'],
+      NEXT,
+      NEXT,
+      click('^save draft$'),
+      async (page) => page.waitForTimeout(1500),
+    ];
     return [
-      pickClient('Client', code),
-      NEXT,
-      ['Market segment', 'CBG'],
-      ['Product', '^PAR01'],
-      ['Source channel', 'Walk-in'],
-      ['Insurer', 'Mabuhay'],
-      NEXT,
-      NEXT,
+      ...once,
+      async (page) => {
+        await page.goto(`${ctx.BASE}/accounts/new`);
+        await ctx.settle(page);
+      },
+      ...once,
+    ];
+  },
+  // Two insurer e-policies named by their ARN, uploaded together and matched to the accounts.
+  epolicy_bulk: (ctx) => {
+    const rows = ctx.sql("select arn from acc_account where status = 'PLACED' order by id limit 2");
+    const files = rows.map(([arn], i) => walkthrough.pdf(`${arn}.pdf`, 'Insurer e-policy', [
+      `Policy No.: SEED-POL-2026-${String(i + 1).padStart(5, '0')}`, `Account Reference No.: ${arn}`,
+      'Seed data for the SIT environment']));
+    return [
+      async (page) => {
+        await page.getByLabel(/^E-policy PDFs/).setInputFiles(files);
+        await page.waitForTimeout(600);
+      },
+      click('^upload and match$'),
       async (page) => page.waitForTimeout(1500),
     ];
   },
-  epolicy_bulk: [],
 };
 
 // ------------------------------------------------------------------ records by status
@@ -169,9 +194,8 @@ const opens = {
   terms_received: (ctx) => `/proposals/${ctx.one("select id from npk_proposal where status = 'TERMS_RECEIVED' order by id limit 1")}`,
   draft_account: (ctx) => `/accounts/${ctx.one("select id from acc_account where status = 'DRAFT' and product_code like 'PAR%' order by id limit 1")}/edit`,
   submitted_account: (ctx) => `/accounts/${ctx.one("select id from acc_account where status = 'SUBMITTED' and product_code like 'PAR%' order by id limit 1")}`,
-  awaiting_payment_other_lines: (ctx) => `/placement/accounts/${ctx.one("select arn from acc_account where status = 'AWAITING_PAYMENT' order by id desc limit 1")}`,
+  awaiting_payment_other_lines: (ctx) => `/placement/accounts/${ctx.one("select arn from acc_account where status = 'AWAITING_PAYMENT' and product_code not like 'PAR%' order by id limit 1")}`,
   placed_with_hold_cover: (ctx) => `/placement/accounts/${ctx.one("select arn from acc_account where hold_cover_status is not null order by id limit 1")}`,
-  'open_slip:generated': () => '/placement/slips',
   'open_report:review': (ctx) => `/placement/billing/reports/${ctx.one("select id from plc_payment_report where status = 'REVIEW' order by id limit 1")}`,
   'open_epolicy:review': (ctx) => `/issuance/epolicies/${ctx.one("select id from iss_epolicy where status = 'REVIEW' order by id limit 1")}`,
   'open_booking:first_ready': (ctx) => `/booking/book/${ctx.one("select arn from acc_account a where status = 'POLICY_ISSUED' and not exists (select 1 from bkg_queue q where q.arn = a.arn) order by id desc limit 1")}`,
@@ -187,22 +211,8 @@ const selects = {
   first_ready: tickRow('ARN-'),
 };
 
-const uploads = {
-  client_create_file: async (page, ctx) => {
-    const file = await walkthrough.bulkClientFile(ctx, false);
-    await page.locator('input[type=file]').first().setInputFiles(file);
-    await page.waitForTimeout(800);
-    await page.getByRole('button', { name: /upload|validate|next/i }).last().click().catch(() => {});
-    await page.waitForTimeout(3000);
-  },
-};
-
 // Extra steps after the standard ones, by slug.
-const after = {
-  'scr-nb-20-02-send': async (page) => {
-    await page.locator('table tbody tr').first().click().catch(() => {});
-  },
-};
+const after = {};
 
-module.exports = { opens, fills, selects, uploads, after, walkthrough: walkthrough.steps, documents: documents.shots,
+module.exports = { opens, fills, selects, after, custom: walkthrough.bulk, walkthrough: walkthrough.steps, documents: documents.shots,
   prepare: walkthrough.prepare };

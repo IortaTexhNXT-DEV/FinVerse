@@ -131,7 +131,10 @@ public class PackageRequestService {
     if (!maker && !reviewer) {
       throw new BusinessRuleException(
           "PKG_REQUEST_NOT_EDITABLE",
-          "Request " + p.getRequestNo() + " cannot be changed while " + p.getStatus());
+          "Request "
+              + p.getRequestNo()
+              + " cannot be changed at the stage "
+              + p.getStatus().label());
     }
     if (draft.type() != null && draft.type() != p.getRequestType()) {
       throw new BusinessRuleException("PKG_TYPE_FIXED", "The type of a request cannot change");

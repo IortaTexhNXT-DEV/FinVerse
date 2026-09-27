@@ -183,7 +183,7 @@ public class PackageSetupHandoff {
     PackageRequest p = withMbs(id);
     if (p.getRequestType() != RequestType.RETIRE) {
       throw new BusinessRuleException(
-          "PKG_REQUEST_TYPE_MISMATCH", "Only a RETIRE request retires the package");
+          "PKG_REQUEST_TYPE_MISMATCH", "Only a request to retire the package can retire it");
     }
     setup.retireProduct(
         p.getTargetProductCode(),

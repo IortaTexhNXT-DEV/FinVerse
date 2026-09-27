@@ -121,8 +121,7 @@ public class PackageDocuments {
     List<Section> sections = new ArrayList<>();
     sections.add(new Text(null, text.text()));
     sections.add(new Fields("Request", requestFields(p)));
-    sections.addAll(
-        termsSections(p.getCompanyId(), codec.terms(p.getRequestedTerms()), "Requested"));
+    sections.addAll(termsSections(p, codec.terms(p.getRequestedTerms()), "Requested"));
     return pdf(p, "Package Request Form", p.getRequestNo(), sections, text.versionLabel());
   }
 
@@ -151,8 +150,7 @@ public class PackageDocuments {
     if (r.getQsNotes() != null && !r.getQsNotes().isBlank()) {
       sections.add(new Text("Round " + r.getRoundNo() + " notes", r.getQsNotes()));
     }
-    sections.addAll(
-        termsSections(p.getCompanyId(), codec.terms(p.getRequestedTerms()), "Requested"));
+    sections.addAll(termsSections(p, codec.terms(p.getRequestedTerms()), "Requested"));
     MessageFile f = pdf(p, "Package Quotation Slip", r.getQsNo(), sections, text.versionLabel());
     return new MessageFile(r.getQsNo() + PDF_EXTENSION, PDF, f.content());
   }
@@ -231,7 +229,7 @@ public class PackageDocuments {
     sections.add(new Fields(PACKAGE, requestFields(p)));
     PackageTerms terms =
         codec.terms(p.getProposedTerms() == null ? p.getRequestedTerms() : p.getProposedTerms());
-    sections.addAll(termsSections(p.getCompanyId(), terms, "Proposed"));
+    sections.addAll(termsSections(p, terms, "Proposed"));
     MessageFile f = pdf(p, "Package Slip", p.getRequestNo(), sections, text.versionLabel());
     return new MessageFile(p.getRequestNo() + "_package_slip.pdf", PDF, f.content());
   }
@@ -317,11 +315,13 @@ public class PackageDocuments {
   /**
    * Sections of a set of terms: text sections, coverages, rate scheme and dates, insurers.
    *
+   * @param p request (company and line of the names)
    * @param t terms
    * @param label "Requested" or "Proposed"
    * @return sections
    */
-  List<Section> termsSections(Long companyId, PackageTerms t, String label) {
+  List<Section> termsSections(PackageRequest p, PackageTerms t, String label) {
+    Long companyId = p.getCompanyId();
     List<Section> sections = new ArrayList<>();
     t.sections().forEach(s -> sections.add(new Text(s.heading(), s.text())));
     if (!t.coverages().isEmpty()) {
@@ -329,7 +329,7 @@ public class PackageDocuments {
           new Table(
               label + " coverages",
               List.of("Coverage", "Included", "Limit", "Sub-limit", "Deductible"),
-              t.coverages().stream().map(PackageDocuments::coverageRow).toList(),
+              t.coverages().stream().map(c -> coverageRow(p.getLineCode(), c)).toList(),
               AMOUNT_COLUMNS));
     }
     PackageTerms.Scheme s = t.scheme();
@@ -357,7 +357,7 @@ public class PackageDocuments {
                       i ->
                           List.of(
                               names.insurer(companyId, i.insurerCode()),
-                              roleText(i.role()),
+                              roleLabel(i.role()),
                               text(i.sharePercent()),
                               text(i.rate()),
                               money(i.minimumPremium())))
@@ -367,9 +367,9 @@ public class PackageDocuments {
     return sections;
   }
 
-  private static List<String> coverageRow(CoverageTerm c) {
+  private List<String> coverageRow(String lineCode, CoverageTerm c) {
     return List.of(
-        c.coverageCode(),
+        names.coverage(lineCode, c.coverageCode()),
         c.included() ? "Yes" : "No",
         money(c.limitAmount()),
         money(c.subLimit()),
@@ -386,13 +386,22 @@ public class PackageDocuments {
     return DisplayFormat.amount(amount);
   }
 
-  /** The role of an insurer in a package: Panel, Lead or Participant. */
-  private static String roleText(Object role) {
+  /**
+   * The role of an insurer in a package as the FRS lists it (FR-PM-014 R1): Lead, Participant or
+   * Panel.
+   *
+   * @param role role code, null for Panel
+   * @return label
+   */
+  static String roleLabel(Object role) {
     if (role == null) {
       return "Panel";
     }
-    String words = role.toString().toLowerCase(Locale.ROOT).replace('_', ' ');
-    return Character.toUpperCase(words.charAt(0)) + words.substring(1);
+    return switch (role.toString()) {
+      case "LEAD" -> "Lead";
+      case "PARTICIPANT" -> "Participant";
+      default -> "Panel";
+    };
   }
 
   /**

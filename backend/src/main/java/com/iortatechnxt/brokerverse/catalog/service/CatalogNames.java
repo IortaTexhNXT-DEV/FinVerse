@@ -2,6 +2,8 @@ package com.iortatechnxt.brokerverse.catalog.service;
 
 import com.iortatechnxt.brokerverse.catalog.domain.CoverType;
 import com.iortatechnxt.brokerverse.catalog.domain.CoverTypeRepository;
+import com.iortatechnxt.brokerverse.catalog.domain.Coverage;
+import com.iortatechnxt.brokerverse.catalog.domain.CoverageRepository;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfileRepository;
 import com.iortatechnxt.brokerverse.catalog.domain.ProductLine;
@@ -24,6 +26,7 @@ public class CatalogNames {
   private final ProductLineRepository lines;
   private final InsurerProfileRepository insurers;
   private final CoverTypeRepository coverTypes;
+  private final CoverageRepository coverages;
 
   /**
    * Creates the service.
@@ -32,16 +35,34 @@ public class CatalogNames {
    * @param lines product lines
    * @param insurers insurers
    * @param coverTypes cover types
+   * @param coverages coverages and perils
    */
   public CatalogNames(
       RiskProductRepository products,
       ProductLineRepository lines,
       InsurerProfileRepository insurers,
-      CoverTypeRepository coverTypes) {
+      CoverTypeRepository coverTypes,
+      CoverageRepository coverages) {
     this.products = products;
     this.lines = lines;
     this.insurers = insurers;
     this.coverTypes = coverTypes;
+    this.coverages = coverages;
+  }
+
+  /**
+   * The name of a coverage or peril of a line ("Fire and lightning"), the code when the line has no
+   * such coverage.
+   *
+   * @param lineCode line
+   * @param code coverage code, may be null
+   * @return name, empty when null
+   */
+  public String coverage(String lineCode, String code) {
+    if (code == null) {
+      return "";
+    }
+    return coverages.findByLineCodeAndCode(lineCode, code).map(Coverage::getName).orElse(code);
   }
 
   /**

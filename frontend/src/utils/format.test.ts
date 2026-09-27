@@ -3,6 +3,7 @@ import {
   formatCompact,
   formatDate,
   formatDateTime,
+  formatRate,
   statusPhrase,
   versionLabel,
   formatDuration,
@@ -12,6 +13,20 @@ import {
 } from './format';
 
 describe('format', () => {
+  it('shows rates with two to four decimals, as the documents do', () => {
+    expect(formatRate(1.2)).toBe('1.20');
+    expect(formatRate('1.2')).toBe('1.20');
+    expect(formatRate(0.425)).toBe('0.425');
+    expect(formatRate('0.42500000')).toBe('0.425');
+    expect(formatRate(0.123456)).toBe('0.1235');
+    expect(formatRate(0.12345)).toBe('0.1235');
+    expect(formatRate(15)).toBe('15.00');
+    expect(formatRate(-0.5)).toBe('-0.50');
+    expect(formatRate(0)).toBe('0.00');
+    expect(formatRate(undefined)).toBe('');
+    expect(formatRate(null, 'Per insurer')).toBe('Per insurer');
+  });
+
   it('gives the business date in Philippine time, not the UTC date', () => {
     expect(today(new Date('2026-09-26T20:30:00Z'))).toBe('2026-09-27');
     expect(today(new Date('2026-09-27T15:59:00Z'))).toBe('2026-09-27');

@@ -1,9 +1,8 @@
 # Test plan BRD-12 Submitted Policies - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-12_Submitted_Policies/brd12_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# BRD-12 is designed, not built: the expected results quote the message text of the FRS and the build
-# design (docs/architecture/SUBMITTED_POLICIES_DESIGN.md) without codes, and no case names an automated
-# test. Screen paths follow section 12 of the build design (section Submitted Policies).
+# The expected results quote the message text of the FRS; screen paths follow the Submitted Policies screens
+# of the FRS.
 
 meta:
   brd: BRD-12
@@ -13,7 +12,7 @@ meta:
   summary: TP_BRD12_SUBMITTED_POLICIES.md
   version: "1.0"
   date: 25 September 2026
-  built: false
+  verify_messages: false
 
 personas:
   SBM_HANDLER: {name: Submitted Handler (CBG), short: SBM Hand.}
@@ -60,13 +59,13 @@ screens:
   AUDIT: Administration > Audit Trail
   NOTIF: Notifications (bell icon in the page header)
   MAIL: Test mailbox of the recipient
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-SP-01
     name: Test users per role and scope
     content: sbmhandler (SBM_HANDLER, scope CBG Motor), firehandler (SBM_HANDLER, scope CBG Fire), sbmchecker (SBM_CHECKER, IAAF level 1), sanitation (SBM_SANITATION), sbmtl (SBM_TL), polreview (SBM_POLICY_REVIEWER), badmin (SBM_RULE_ADMIN), upphandler (SBM_UPP_HANDLER), ao and ao2 (MKT_AO, own records), mkttl (MKT_TL, IAAF level 2 and rule approval), tsu (TSU), proc (PROCESSOR).
-    source: Planned seed V1970 of the build design; firehandler and ao2 created by the test lead with their user scope
+    source: Seed data; firehandler and ao2 created by the test lead with their user scope
   - id: TD-SP-02
     name: Source files
     content: LFS insurance report of 300 CBG Motor rows; the same file again; an LFS file with 5 rows without PN; an LFS file with one row that updates an existing policy (new premium); a CSV without header row; a PDF file.
@@ -82,27 +81,27 @@ data:
   - id: TD-SP-05
     name: LAMD snapshot
     content: PN rows with active non-amortised loans (FFY and generic), fully paid loans, RMU (remedial) and open-market loans; one row without PN.
-    source: Planned seed V1971; masked rows added by the test lead
+    source: Seed data; masked rows added by the test lead
   - id: TD-SP-06
     name: Rules and masters
     content: Active seed rule sets for sanitation, matching, classification and disposition; SM Group employee list; No Touch list; limit rule for insurer INS-MGIC Motor, maximum vehicle age 10 years; insurer rules by vehicle type (Motor) and different-from-expiring (Fire); letter rules; IAAF matrix (level 1 SBM_CHECKER, level 2 MKT_TL) and TSU matrix for TOR.
-    source: Planned seed V1970 of the build design
+    source: Seed data
   - id: TD-SP-07
     name: Masterlist records
     content: About 60 records over the four segments, NB and RB, including migrated records, with handlers and conversion statuses.
-    source: Planned seed V1971 of the build design
+    source: Seed data
   - id: TD-SP-08
     name: Review, TOR and handling-fee data
     content: A Non-CBG Corporate record IN_REVIEW with its documents; a CBG Motor record with a 12-year-old vehicle insured with INS-MGIC; billed handling-fee records with PN and location reference; a CLPC unapplied payment carrying a billed PN; an OTC payment with an unknown location reference; one payment matching two records.
-    source: Planned seed V1972; payments keyed in Collections by the test lead
+    source: Seed data; payments keyed in Collections by the test lead
   - id: TD-SP-09
     name: Renewal candidates
     content: A For Renewal CBG Fire record expiring in 150 days (expiring insurer INS-LAC); a For Renewal CBG Motor record expiring in 120 days; a Non-CBG Retail record of ao; a renewal account with a hold cover request open for 6 days.
-    source: Planned seeds V1971-V1972; expiry dates set by the test lead
+    source: Seed data; expiry dates set by the test lead
   - id: TD-SP-10
-    name: Parameters and jobs as delivered
+    name: Parameters and jobs at their defaults
     content: "SBM_RENEWAL_LEAD_DAYS CBG_FIRE=150, CBG_MOTOR=120; SBM_MASTERLIST_DAYS_FROM_EXTRACTION 30; SBM_INSURER_ACCEPT_DAYS 5; SBM_HOLD_COVER_UNBOOKED_ALERT_DAYS 5; jobs SBM_PROCESSING 21:30, SBM_EXPIRY_SCAN 22:00, SBM_LETTER_DISPATCH 06:30, SBM_HOLD_COVER_WATCH 07:00 PHT, SBM_HANDLING_FEE_TAGGER every 30 minutes."
-    source: Configuration delivered with the build (FRS section 9.1)
+    source: Configuration of the SIT environment (FRS section 9.1)
 
 scenarios:
   - id: SC-SP-01
@@ -423,8 +422,8 @@ frs:
         screen: API
         title: Export without SBM_EXPORT
         steps:
-          - As polreview look for Export; call the export.
-        expected: No Export button; the call is refused.
+          - As polreview look for Export; send a direct export request.
+        expected: No Export button; a direct request is refused.
         msg: [You are not permitted to perform this action]
 
   FR-SP-012:
@@ -461,7 +460,7 @@ frs:
         screen: API
         title: Handler not active
         steps:
-          - Assign the disabled user as handler through the API.
+          - Assign the disabled user as handler by a direct request.
         expected: Refused.
         msg: ["{uatdisabled} is not an active user"]
 
@@ -978,7 +977,7 @@ frs:
     conditions:
       - A For Renewal CBG Fire record 150 days before expiry is handed over with an insurer different from the expiring one; the record is RENEWAL_IN_PROGRESS and the handler and AO are notified.
       - A second scan does not hand the same record over again.
-      - Before the Renewal adapter exists, the hand-off shows as pending and no letter is sent.
+      - While Renewal is not in use, the hand-off shows as pending and no letter is sent.
       - A record with no insurer rule stays For Renewal and appears in the fallout; Renew with BDOI works only on a For Renewal record.
     cases:
       - c: 1
@@ -1002,8 +1001,8 @@ frs:
         expected: No second hand-off.
       - c: 3
         type: Positive
-        title: Renewal adapter not deployed
-        pre: Renewal module not deployed on the test environment.
+        title: Renewal not in use
+        pre: Renewal module not available on the test environment.
         steps:
           - Run the scan; open tab Hand-off Pending; check the letters.
         expected: The hand-off is PENDING; no account and no letter.
@@ -1298,8 +1297,8 @@ frs:
         persona: SBM_CHECKER
         title: Export without permission
         steps:
-          - As sbmchecker run the report; call the export.
-        expected: No Export; the call is refused.
+          - As sbmchecker run the report; send a direct export request.
+        expected: No Export; a direct request is refused.
         msg: [You are not permitted to perform this action]
 
   FR-SP-082:
@@ -1346,120 +1345,88 @@ access:
     permission: SBM_VIEW
     allow: [SBM_HANDLER, SBM_CHECKER, SBM_SANITATION, SBM_TL, SBM_POLICY_REVIEWER, SBM_UPP_HANDLER, MKT_AO, MKT_TL, PROCESSOR]
     deny: [SBM_RULE_ADMIN, TSU]
-    denied: Submitted Policies is not in the menu; the list call returns HTTP 403.
+    denied: Submitted Policies is not in the menu; a direct list request is refused.
   - action: Create and edit records, tag renewal, confirm extraction
     screen: REC
     permission: SBM_MAINTAIN
     allow: [SBM_HANDLER, SBM_SANITATION, SBM_TL, SBM_POLICY_REVIEWER, MKT_AO]
     deny: [SBM_CHECKER, MKT_TL, PROCESSOR]
-    denied: New Policy, Edit and the tag actions are not shown; the call returns HTTP 403.
+    denied: New Policy, Edit and the tag actions are not shown; the request is refused.
   - action: Upload sources and LAMD snapshots
     screen: INTAKE
     permission: SBM_INTAKE
     allow: [SBM_HANDLER, SBM_SANITATION, SBM_TL]
     deny: [SBM_POLICY_REVIEWER, MKT_AO]
-    denied: Upload & Intake is not in the menu; the call returns HTTP 403.
+    denied: Upload & Intake is not in the menu; the request is refused.
   - action: Run processing, resolve fallout, hand off, re-assign insurer
     screen: RUNS
     permission: SBM_PROCESS
     allow: [SBM_SANITATION, SBM_TL]
     deny: [SBM_HANDLER, MKT_AO]
-    denied: Run Processing and Re-assign Insurer are not shown; the call returns HTTP 403.
+    denied: Run Processing and Re-assign Insurer are not shown; the request is refused.
   - action: Maintain rule sets and matrices (maker)
     screen: SETUP
     permission: SBM_RULE_MAINTAIN
     allow: [SBM_RULE_ADMIN, SBM_TL]
     deny: [SBM_HANDLER, MKT_TL]
-    denied: Submitted Policies Setup is read only or not in the menu; the call returns HTTP 403.
+    denied: Submitted Policies Setup is read only or not in the menu; the request is refused.
   - action: Approve rule sets
     screen: APPROVALS
     permission: SBM_RULE_APPROVE
     allow: [MKT_TL]
     deny: [SBM_RULE_ADMIN, SBM_TL]
-    denied: The rule set is not offered in My Approvals; the call returns HTTP 403.
+    denied: The rule set is not offered in My Approvals; the request is refused.
   - action: Prepare reviews and IAAF
     screen: IAAF
     permission: IAAF_PREPARE
     allow: [SBM_HANDLER, SBM_TL, SBM_POLICY_REVIEWER]
     deny: [SBM_CHECKER, MKT_AO]
-    denied: Generate IAAF is not shown; the call returns HTTP 403.
+    denied: Generate IAAF is not shown; the request is refused.
   - action: Approve an IAAF level
     screen: APPROVALS
     permission: IAAF_APPROVE
     allow: [SBM_CHECKER, MKT_TL]
     deny: [SBM_POLICY_REVIEWER, SBM_HANDLER]
-    denied: The IAAF is not offered in My Approvals; the call returns HTTP 403.
+    denied: The IAAF is not offered in My Approvals; the request is refused.
   - action: Prepare a TOR
     screen: TOR
     permission: TOR_PREPARE
     allow: [SBM_HANDLER, SBM_TL, MKT_AO]
     deny: [TSU, SBM_SANITATION]
-    denied: Generate TOR is not shown; the call returns HTTP 403.
+    denied: Generate TOR is not shown; the request is refused.
   - action: Approve a TOR
     screen: APPROVALS
     permission: TOR_APPROVE
     allow: [TSU]
     deny: [MKT_AO, SBM_TL]
-    denied: The TOR is not offered in My Approvals; the call returns HTTP 403.
+    denied: The TOR is not offered in My Approvals; the request is refused.
   - action: Send and print letters
     screen: LETTERS
     permission: SBM_LETTER_SEND
     allow: [SBM_SANITATION, SBM_TL]
     deny: [SBM_HANDLER, MKT_AO]
-    denied: Letters & Print Batches actions are not shown; the call returns HTTP 403.
+    denied: Letters & Print Batches actions are not shown; the request is refused.
   - action: Handling-fee records and manual tag
     screen: HF
     permission: SBM_HANDLING_FEE
     allow: [SBM_UPP_HANDLER, SBM_TL]
     deny: [SBM_SANITATION, SBM_HANDLER]
-    denied: Handling Fees is not in the menu; the call returns HTTP 403.
+    denied: Handling Fees is not in the menu; the request is refused.
   - action: Migrate Excel masterlists
     screen: INTAKE
     permission: SBM_MIGRATE
     allow: [SBM_TL]
     deny: [SBM_HANDLER, SBM_SANITATION]
-    denied: The Migration upload is not shown; the call returns HTTP 403.
+    denied: The Migration upload is not shown; the request is refused.
   - action: Extract the masterlist
     screen: ML
     permission: SBM_EXPORT
     allow: [SBM_HANDLER, SBM_SANITATION, SBM_TL]
     deny: [SBM_POLICY_REVIEWER, SBM_CHECKER, MKT_AO]
-    denied: Export is not shown; the call returns HTTP 403.
+    denied: Export is not shown; the request is refused.
   - action: Run Submitted Policies reports
     screen: REPORTS
     permission: SBM_REPORT_VIEW
     allow: [SBM_HANDLER, SBM_CHECKER, SBM_SANITATION, SBM_TL, SBM_POLICY_REVIEWER]
     deny: [SBM_UPP_HANDLER, MKT_AO, TSU]
-    denied: The Submitted Policies category is not listed; the run call returns HTTP 403.
-
-findings:
-  - fr: FR-SP-001
-    issue: 'The natural key includes the expiry date, so a row for the next term of the same policy creates a new record, while acceptance criterion 3 speaks of "a row updating an existing policy". The FRS does not say which fields may change on an update and which make a new record.'
-    proposal: List the fields that update a record and state that a new expiry date makes a new term record linked to the previous one.
-  - fr: FR-SP-030
-    issue: 'The default classification uses "BDOI did not place the policy", which is not a field of the masterlist or LAMD; the definition is open (SP SQ04).'
-    proposal: Name the data element that tells whether BDOI placed the policy; the cases test the PN match only.
-  - fr: FR-SP-031
-    issue: Bucket precedence and the RMU / FFY conflicts are open (SP SQ05) and the conflicting rules are seeded inactive, so a record that is both FFY and RMU cannot be tested.
-    proposal: Answer SP SQ05 and add the precedence to the FRS; a case is added then.
-  - fr: FR-SP-032
-    issue: The rule that chooses the Generic or the FFY RA is to be confirmed (SP SQ06); the cases follow the seed rule.
-    proposal: State the rule in the FRS when SP SQ06 is answered.
-  - fr: FR-SP-040
-    issue: The FRS keeps one IAAF per policy with links, while the BRD's current process lets one IAAF cover several policies (SP SQ07). The bank counterpart may expect one form.
-    proposal: Confirm with BDOI; the cases test one IAAF per policy.
-  - fr: FR-SP-053
-    issue: The meaning of Released is to be confirmed (SP SQ08); the default is the AO's first opening, which a preview by another user could not trigger but a download by the assigned AO does.
-    proposal: Define Released (first opening, first download or explicit acknowledgement) in the FRS.
-  - fr: FR-SP-062
-    issue: The owner of the renewal notice and renewal proposal letters is not confirmed (XQ03); the cases may move to the BRD-6 plan.
-    proposal: Record the owner after XQ03; the cases here test the reminder letter and the print batch.
-  - fr: FR-SP-063
-    issue: The BRD gives an acceptance window of 3-5 days; the FRS default is 5 (SP SQ12). The FRS does not say whether days are calendar or working days.
-    proposal: State calendar or working days; the boundary cases use calendar days.
-  - fr: FR-SP-070
-    issue: Amount, VAT, OR and GL account of the handling fee are to be confirmed (SP SQ13), so the accounting of the applied payment cannot be checked.
-    proposal: Add the accounting entry to the FRS after SP SQ13; the cases check tagging and the OR only.
-  - fr: FR-SP-080
-    issue: BRIDSP-30 repeats BRIDSP-20 word for word; the FRS traces both to one FR, which inflates the BRD ID count.
-    proposal: Ask the BRD owner to confirm that BRIDSP-30 is a duplicate and mark it so in the traceability.
+    denied: The Submitted Policies category is not listed; a direct run request is refused.

@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ApiError } from '@/api/client';
+import { Card } from './Card';
+import { calloutName } from './calloutName';
 import { DataTable } from './DataTable';
 import { ErrorAlert } from './ErrorAlert';
 import { Modal } from './Modal';
@@ -84,5 +86,25 @@ describe('ui components', () => {
     );
     await userEvent.keyboard('{Escape}');
     expect(onClose).toHaveBeenCalled();
+  });
+});
+
+describe('card callout names', () => {
+  it('names a card by its title unless a callout name is given', () => {
+    expect(calloutName('Rate Exceptions')).toBe('rate-exceptions');
+    expect(calloutName('Items & Premium')).toBe('items-premium');
+    expect(calloutName(undefined)).toBeUndefined();
+    const { container } = render(
+      <>
+        <Card title="Status History">x</Card>
+        <Card title="Rate Exceptions" callout="quotation-rate-exceptions">
+          y
+        </Card>
+      </>,
+    );
+    const names = [...container.querySelectorAll('section.card')].map((c) =>
+      c.getAttribute('data-callout'),
+    );
+    expect(names).toEqual(['status-history', 'quotation-rate-exceptions']);
   });
 });

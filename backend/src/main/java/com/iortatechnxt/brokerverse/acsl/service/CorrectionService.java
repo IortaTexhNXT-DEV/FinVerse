@@ -229,7 +229,10 @@ public class CorrectionService {
             .orElseThrow(() -> new ResourceNotFoundException(Acsl.CORRECTION_ENTITY, id));
     assignments.assign(caseId, username, users.usersWithPermission("ACSL_PROCESS"));
     audit.record(
-        Acsl.CORRECTION_ENTITY, c.getCorrectionNo(), AuditAction.UPDATE, "Assigned to " + username);
+        Acsl.CORRECTION_ENTITY,
+        c.getCorrectionNo(),
+        AuditAction.UPDATE,
+        "Assigned to " + users.displayName(username));
     return c;
   }
 

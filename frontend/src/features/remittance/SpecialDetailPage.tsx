@@ -117,6 +117,8 @@ export default function SpecialDetailPage() {
       <WorkflowPanel
         entityType={ENTITY}
         entityId={id}
+        recordStatus={s.stage}
+        onChanged={() => void special.refetch()}
         renderBusinessActions={(actions) =>
           actions
             .filter((a) => a.action === 'approve' || a.action === 'reject')

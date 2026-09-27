@@ -254,6 +254,7 @@ export default function ReconCyclePage() {
       <WorkflowPanel
         entityType={CYCLE_ENTITY}
         entityId={c.id}
+        recordStatus={c.stage}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['prodrecon'] })}
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />

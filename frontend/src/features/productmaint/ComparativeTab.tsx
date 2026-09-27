@@ -14,7 +14,7 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { TextInput } from '@/features/assets/FormControls';
-import { formatAmount, formatDateTime } from '@/utils/format';
+import { formatAmount, formatDateTime, formatRate } from '@/utils/format';
 import { COMPARATIVE_FIELDS } from './packageRequest';
 import { displayNameOf } from '@/api/users';
 
@@ -34,7 +34,7 @@ const ROW_COLUMNS: Column<ComparativeRow>[] = [
     ),
   },
   { key: 'outcome', header: 'Outcome', render: (r) => <StatusBadge status={r.outcome} /> },
-  { key: 'rate', header: 'Rate %', numeric: true, render: (r) => r.rate ?? '—' },
+  { key: 'rate', header: 'Rate %', numeric: true, render: (r) => formatRate(r.rate, '—') },
   {
     key: 'min',
     header: 'Minimum',

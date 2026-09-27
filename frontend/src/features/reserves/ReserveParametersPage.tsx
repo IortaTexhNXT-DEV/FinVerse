@@ -12,7 +12,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, humanize, today } from '@/utils/format';
+import { formatDate, formatRate, humanize, today } from '@/utils/format';
 import { ParameterFormModal } from './ParameterFormModal';
 import { NEW_PARAMETERS } from './reserveMath';
 import type { ParameterForm } from './reserveMath';
@@ -22,7 +22,7 @@ import { UserName } from '@/components/ui/UserName';
 
 function method(p: ReserveParameter): string {
   return p.ibnrMethod === 'RATE'
-    ? `Rate ${p.ibnrRate}%`
+    ? `Rate ${formatRate(p.ibnrRate)}%`
     : `Chain-ladder ${humanize(p.triangleBasis)} / ${humanize(p.developmentPeriod)} × ${p.accidentPeriods}`;
 }
 

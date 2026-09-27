@@ -187,6 +187,7 @@ export default function ClientDetailPage() {
       <WorkflowPanel
         entityType="Client"
         entityId={c.id}
+        recordStatus={`${c.status} ${c.kyc.status}`}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['crm'] })}
       />
       <Tabs

@@ -25,6 +25,7 @@ import { newProductForm } from './productForm';
 import type { ProductForm } from './productForm';
 import { RecordActions } from './RecordActions';
 import { LineLabel, LovLabels } from '@/components/broking/LovLabel';
+import { formatRate } from '@/utils/format';
 
 const TABS = [
   { id: 'products', label: 'Products' },
@@ -188,7 +189,7 @@ function ProductList() {
             header: 'Segments',
             render: (p) => <LovLabels type="MARKET_SEGMENT" codes={p.marketSegments} empty="All" />,
           },
-          { key: 'r', header: 'Rate %', numeric: true, render: (p) => p.defaultRate ?? '' },
+          { key: 'r', header: 'Rate %', numeric: true, render: (p) => formatRate(p.defaultRate) },
           {
             key: 'm',
             header: 'Min. Premium',

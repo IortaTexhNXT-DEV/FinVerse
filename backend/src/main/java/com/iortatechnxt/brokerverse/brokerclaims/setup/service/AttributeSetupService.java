@@ -144,7 +144,7 @@ public class AttributeSetupService {
   public ValueAttributes reject(String typeCode, String code, String reason) {
     List<AttributeChange> pending = pending(typeCode, code);
     String user = currentUser.username();
-    boolean withdrawn = pending.stream().allMatch(c -> user.equalsIgnoreCase(c.getMaker()));
+    boolean withdrawn = pending.stream().allMatch(c -> user.equals(c.getMaker()));
     if (!withdrawn && (reason == null || reason.isBlank())) {
       throw new BusinessRuleException("REASON_REQUIRED", "Give the reason for the rejection");
     }

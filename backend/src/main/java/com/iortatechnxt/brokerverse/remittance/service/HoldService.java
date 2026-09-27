@@ -459,7 +459,11 @@ public class HoldService {
           "HOLD_ASSIGNEE_NOT_ELIGIBLE", processor + " is not an active remittance processor");
     }
     hold.assign(processor);
-    audit.record(ENTITY, hold.getRequestNo(), AuditAction.UPDATE, "Assigned to " + processor);
+    audit.record(
+        ENTITY,
+        hold.getRequestNo(),
+        AuditAction.UPDATE,
+        "Assigned to " + users.displayName(processor));
     notifications.notifyUser(
         processor, notice(hold, HOLD + hold.getRequestNo() + " assigned to you"));
     return hold;

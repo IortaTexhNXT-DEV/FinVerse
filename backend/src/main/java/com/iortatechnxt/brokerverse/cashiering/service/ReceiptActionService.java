@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.lov.domain.LovValue;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import com.iortatechnxt.brokerverse.workflow.service.StartCase;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
@@ -61,6 +62,7 @@ public class ReceiptActionService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final UserDirectory directory;
 
   /**
    * Creates the service.
@@ -75,6 +77,7 @@ public class ReceiptActionService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param directory user directory (display names in texts)
    */
   public ReceiptActionService(
       ReceiptActionRepository actions,
@@ -86,7 +89,8 @@ public class ReceiptActionService {
       NotificationService notifications,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      UserDirectory directory) {
     this.actions = actions;
     this.receipts = receipts;
     this.reversal = reversal;
@@ -97,6 +101,7 @@ public class ReceiptActionService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.directory = directory;
   }
 
   /**
@@ -201,7 +206,11 @@ public class ReceiptActionService {
         CashReceiptService.ENTITY,
         receipt.getReceiptNo(),
         AuditAction.POST,
-        action.getAction() + " " + action.getTransactionNo() + " approved by " + approver);
+        action.getAction()
+            + " "
+            + action.getTransactionNo()
+            + " approved by "
+            + directory.displayName(approver));
     return action;
   }
 

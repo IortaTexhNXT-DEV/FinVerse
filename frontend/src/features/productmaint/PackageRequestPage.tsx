@@ -27,7 +27,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
-import { formatPeriod } from '@/utils/format';
+import { formatPeriod, formatRate } from '@/utils/format';
 import { AdvisoriesTab } from './AdvisoriesTab';
 import { ComparativeTab } from './ComparativeTab';
 import { NegotiationTab } from './NegotiationTab';
@@ -74,7 +74,8 @@ function facts(p: PackageRequest): Fact[] {
     {
       icon: Percent,
       label: 'Scheme rate',
-      value: terms.scheme.defaultRate === undefined ? '—' : `${terms.scheme.defaultRate}%`,
+      value:
+        terms.scheme.defaultRate === undefined ? '—' : `${formatRate(terms.scheme.defaultRate)}%`,
     },
     {
       icon: CalendarRange,
@@ -217,6 +218,7 @@ export default function PackageRequestPage() {
       <WorkflowPanel
         entityType={PACKAGE_REQUEST_ENTITY}
         entityId={p.id}
+        recordStatus={p.status}
         showHistory={false}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['package-request', id] })}
         renderBusinessActions={(actions) => <PackageActions request={p} actions={actions} />}

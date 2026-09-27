@@ -247,6 +247,7 @@ function ExistingFunding({ id }: Readonly<{ id: number }>) {
       <WorkflowPanel
         entityType={ENTITY}
         entityId={f.id}
+        recordStatus={f.stage}
         renderBusinessActions={businessActions}
         onChanged={() => void funding.refetch()}
       />

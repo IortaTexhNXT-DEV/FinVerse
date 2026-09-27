@@ -1,7 +1,7 @@
 # Configuration inputs the business provides for BRD-3 Product Maintenance (Drop 0, Setup and Data Migration).
 # Read by config_inputs.py: the FRS chapter "Configuration inputs the business provides" (```pack blocks) and the
 # workbook of input templates of the release set (one sheet per template, with the column descriptions and one
-# fictitious example row). The columns follow the fields of the screens as built (screens/*.yaml).
+# fictitious example row). The columns follow the fields of the screens (screens/*.yaml).
 # Columns of a template: header | mandatory (Y, N or the condition) | format | what to enter | example
 meta:
   title: Configuration Input Templates

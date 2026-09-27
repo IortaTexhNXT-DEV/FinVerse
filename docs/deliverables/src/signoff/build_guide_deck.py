@@ -181,7 +181,7 @@ def workbook_image(xlsx: Path, sheet: str, out: Path, rows: int = 12, keep: Sequ
         wb.save(src)
         subprocess.run(["soffice", "--headless", "--convert-to", "pdf", "--outdir", tmp, str(src)], check=True,
                        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=180)
-        subprocess.run(["pdftoppm", "-png", "-r", "150", "-f", "1", "-l", "1", "-singlefile",
+        subprocess.run(["pdftoppm", "-png", "-r", "220", "-f", "1", "-l", "1", "-singlefile",
                         str(Path(tmp) / "sheet.pdf"), str(Path(tmp) / "page")], check=True)
         im = Image.open(Path(tmp) / "page.png").convert("RGB")
         # Keep the table: from the top to the first long white gap (the page footer is left out).
@@ -189,7 +189,7 @@ def workbook_image(xlsx: Path, sheet: str, out: Path, rows: int = 12, keep: Sequ
         used = [y for y in range(im.height) if gray.crop((0, y, im.width, y + 1)).getbbox()]
         end = used[0]
         for a, b in zip(used, used[1:]):
-            if b - a > 80:
+            if b - a > 117:  # about 0.5 inch at 220 dpi
                 break
             end = b
         box = ImageOps.invert(im.crop((0, 0, im.width, end + 1))).getbbox()

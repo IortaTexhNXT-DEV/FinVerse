@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotPremium;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotProduct;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateSource;
 import com.iortatechnxt.brokerverse.renewal.domain.CheckTrigger;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalStage;
@@ -131,7 +132,14 @@ public class RenewalAccountService {
     Account account =
         accounts.createDraft(
             NewAccount.renewal(
-                c.getCompanyId(), AccountOrigin.RENEWAL, draft, renewalOf, officer, version));
+                c.getCompanyId(),
+                c.getSource() == CandidateSource.SUBMITTED_POLICY
+                    ? AccountOrigin.SUBMITTED_POLICY
+                    : AccountOrigin.RENEWAL,
+                draft,
+                renewalOf,
+                officer,
+                version));
     c.linkRenewalAccount(account.getArn());
     linkDocuments(c, account);
     audit.record(

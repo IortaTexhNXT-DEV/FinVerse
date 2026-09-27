@@ -16,7 +16,7 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
+import { formatDate, formatRate } from '@/utils/format';
 import { UserName } from '@/components/ui/UserName';
 
 function NewVersionModal({ code, onClose }: Readonly<{ code: string; onClose: () => void }>) {
@@ -130,7 +130,7 @@ export function ProductVersionsTab({ product }: Readonly<{ product: Product }>) 
           { key: 's', header: 'Status', render: (v) => <StatusBadge status={v.status} /> },
           { key: 'f', header: 'Effective From', render: (v) => formatDate(v.effectiveFrom) },
           { key: 't', header: 'Effective To', render: (v) => formatDate(v.effectiveTo) },
-          { key: 'r', header: 'Rate %', numeric: true, render: (v) => v.defaultRate ?? '' },
+          { key: 'r', header: 'Rate %', numeric: true, render: (v) => formatRate(v.defaultRate) },
           { key: 'e', header: 'Package End', render: (v) => formatDate(v.packageEndDate) },
           { key: 'q', header: 'Request', render: (v) => v.sourceRequestNo ?? '' },
           {

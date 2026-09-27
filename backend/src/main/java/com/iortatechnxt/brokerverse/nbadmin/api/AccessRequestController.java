@@ -142,7 +142,7 @@ public class AccessRequestController {
   }
 
   /**
-   * Edits a draft or corrects a returned request (creator).
+   * Edits a draft (keeping the approvers chosen so far) or corrects a returned request (creator).
    *
    * @param id request
    * @param request new content
@@ -152,7 +152,7 @@ public class AccessRequestController {
   @PreAuthorize(REQUEST)
   public AccessRequestResponse edit(
       @PathVariable Long id, @Valid @RequestBody AccessRequestRequest request) {
-    return view(requests.edit(id, request.content()));
+    return view(requests.edit(id, request.content(), request.approvers()));
   }
 
   /**

@@ -34,7 +34,7 @@ public class CashieringUnappliedDirectory implements UnappliedDirectory {
           + " coalesce(p.value_date, r.receipt_date, cast(u.created_at at time zone '"
           + BusinessClock.zoneId()
           + "' as date)) as payment_date,"
-          + " p.batch_ref, coalesce(p.payment_no, r.receipt_no) as transaction_no,"
+          + " p.batch_ref, p.channel, coalesce(p.payment_no, r.receipt_no) as transaction_no,"
           + " coalesce(p.payment_mode, r.payment_mode) as payment_type,"
           + " coalesce(p.check_bank, r.check_bank) as bank_code,"
           + " coalesce(p.check_no, r.check_no) as check_no, p.reference as payment_reference,"
@@ -139,7 +139,8 @@ public class CashieringUnappliedDirectory implements UnappliedDirectory {
         rs.getString("invoice_no"),
         rs.getString("sales_unit"),
         rs.getString("tab"),
-        rs.getString("disposition_status"));
+        rs.getString("disposition_status"),
+        rs.getString("channel"));
   }
 
   private static String like(String text) {

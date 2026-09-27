@@ -350,7 +350,7 @@ frs:
         title: Checksum and header mismatch
         steps:
           - Upload a file edited after the control file was made; then a file with column open_balance renamed OpenBal.
-        expected: "Both Rejected. The second check shows \"The file columns do not match layout version 1: missing open_balance, extra OpenBal\"."
+        expected: "Both rejected. The second check shows \"The file columns do not match layout version 1: missing open_balance, extra OpenBal\"."
         msg: ["The file does not match the checksum in the control file"]
       - c: 2
         type: Negative

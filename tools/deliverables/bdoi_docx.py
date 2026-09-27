@@ -58,7 +58,7 @@ CALLOUT_KINDS = {
     "note": ("Note", brand.HEADER_BLUE, brand.BG_BLUE),
     "info": ("Note", brand.HEADER_BLUE, brand.BG_BLUE),
     "warning": ("Warning", brand.DANGER, brand.DANGER_BG),
-    "parked": ("Parked", brand.MUTED, brand.DIRTY_WHITE),
+    "parked": ("On hold", brand.MUTED, brand.DIRTY_WHITE),
     "decision": ("Decision", brand.SUCCESS, brand.SUCCESS_BG),
     "question": ("Open question", brand.AMBER, brand.AMBER_BG),
 }
@@ -365,11 +365,20 @@ class BdoiDocument:
         self._toc_paragraphs: list[Any] = []
         self._first_body_heading = True
         self._cover_end: Any = None
+        self._volume_marks: list[Any] = []
+        self._home_landscape = False
+        self._turned = False
         self._setup_page(self.doc.sections[0])
         self._setup_styles()
         self._header_footer(self.doc.sections[0])
 
     # ---------------------------------------------------------------- page and styles
+
+    @property
+    def landscape(self) -> bool:
+        """True when the current (last) section is landscape."""
+        s = self.doc.sections[-1]
+        return s.page_width > s.page_height
 
     @property
     def text_width_cm(self) -> float:
@@ -488,6 +497,7 @@ class BdoiDocument:
         p = header.paragraphs[0]
         p.text = ""
         p.style = self.doc.styles["Normal"]  # the built-in Header style has its own tab stops
+        p.paragraph_format.tab_stops.clear_all()
         p.paragraph_format.tab_stops.add_tab_stop(Cm(width), WD_TAB_ALIGNMENT.RIGHT)
         p.paragraph_format.space_after = Pt(0)
         title = self.meta.header_title or self.meta.title
@@ -509,6 +519,7 @@ class BdoiDocument:
         f = footer.paragraphs[0]
         f.text = ""
         f.style = self.doc.styles["Normal"]
+        f.paragraph_format.tab_stops.clear_all()
         f.paragraph_format.tab_stops.add_tab_stop(Cm(width / 2), WD_TAB_ALIGNMENT.CENTER)
         f.paragraph_format.tab_stops.add_tab_stop(Cm(width), WD_TAB_ALIGNMENT.RIGHT)
         _para_border(f, "top", 4, brand.BORDER, space=4)
@@ -529,7 +540,18 @@ class BdoiDocument:
         section.first_page_footer.is_linked_to_previous = False
 
     def new_section(self, landscape: bool = False) -> None:
-        """Starts a new page section (portrait or landscape) with its own header and footer."""
+        """Starts a new page section (portrait or landscape) with its own header and footer. When the current
+        section is still empty (two orientation changes in a row), it is turned instead, so no blank page is left."""
+        self._home_landscape = landscape
+        self._turned = False
+        body = self.doc.element.body
+        if len(body) > 1 and body[-2].tag == qn("w:p") and not body[-2].xpath("./w:r") \
+                and body[-2].find(qn("w:pPr") + "/" + qn("w:sectPr")) is not None:
+            section = self.doc.sections[-1]
+            self._setup_page(section, landscape)
+            self._header_footer(section)
+            section.different_first_page_header_footer = False
+            return
         section = self.doc.add_section(WD_SECTION.NEW_PAGE)
         self._setup_page(section, landscape)
         self._header_footer(section)
@@ -680,6 +702,8 @@ class BdoiDocument:
         """Heading 1-3 (numbered 1 / 1.1 / 1.1.1 unless numbered=False) or 4 (a label)."""
         # A new chapter starts on a new page. "Page break before" on the heading itself never leaves
         # an empty page when the previous page is exactly full (a break paragraph would).
+        if self._turned and level <= 2:
+            self._turn(self._home_landscape)
         break_before = level == 1 and (self.h1_page_break or self._first_body_heading)
         if level == 1:
             self._first_body_heading = False
@@ -949,12 +973,34 @@ class BdoiDocument:
         (screens are captured from the SIT environment at build), a framed placeholder with the caption is
         written in its place, so the document can be reviewed before the capture.
         """
-        width = width_cm or self.text_width_cm
         target = None
         if path:
             target = Path(path)
             if not target.is_absolute():
                 target = (self.base_dir / target).resolve()
+        # The page orientation that prints the screenshot largest: a full-window shot (menu and header kept for
+        # the navigation context) always goes on a landscape page; any other shot turns the page when the other
+        # orientation prints it at least a third wider (a tall record on a portrait page, a wide screen on a
+        # landscape one), with the image nearly filling the page. A portrait chapter stays turned until its next
+        # heading; a landscape chapter (the screen specifications, with their wide tables) turns back at once.
+        turned = False
+        if target is not None and target.exists() and width_cm is None:
+            try:
+                from PIL import Image
+
+                with Image.open(target) as im:
+                    ratio = im.size[1] / im.size[0]
+            except Exception:  # pragma: no cover
+                ratio = 0.6
+            full = image_crop(target) == "full"
+            here = min(self.text_width_cm, max_height_ratio * self.text_height_cm / ratio)
+            ow, oh = self._text_size(not self.landscape)
+            there = min(ow, TURNED_HEIGHT_RATIO * oh / ratio)
+            if (full and not self.landscape) or (not full and there > 1.33 * here):
+                self._turn(not self.landscape)
+                turned = True
+                max_height_ratio = TURNED_HEIGHT_RATIO
+        width = width_cm or self.text_width_cm
         if target is not None and target.exists():
             try:
                 from PIL import Image
@@ -971,8 +1017,7 @@ class BdoiDocument:
             p.paragraph_format.space_before = Pt(4)
             p.paragraph_format.space_after = Pt(0)
             _keep_with_next(p)
-            run = p.add_run().add_picture(str(print_image(target, width)), width=Cm(width))
-            del run
+            p.add_run().add_picture(str(print_image(target, width, screenshot=True)), width=Cm(width))
         else:
             table = self.doc.add_table(rows=1, cols=1)
             table.alignment = WD_TABLE_ALIGNMENT.CENTER
@@ -996,6 +1041,21 @@ class BdoiDocument:
         self.caption("Figure", caption)
         if legend:
             self.callout_legend(legend)
+        if turned and self._home_landscape:
+            self._turn(True)
+
+    def _text_size(self, landscape: bool) -> tuple[float, float]:
+        """Text width and height (cm) of a page of the given orientation."""
+        if landscape:
+            return PAGE_H_CM - 2 * MARGIN_LR_CM, PAGE_W_CM - 2 * MARGIN_TB_CM - 0.3
+        return PAGE_W_CM - 2 * MARGIN_LR_CM, PAGE_H_CM - 2 * MARGIN_TB_CM - 0.3
+
+    def _turn(self, landscape: bool) -> None:
+        """Turns the page for a screenshot; the chapter's own orientation is kept in _home_landscape."""
+        home = self._home_landscape
+        self.new_section(landscape=landscape)
+        self._home_landscape = home
+        self._turned = landscape != home
 
     def callout_legend(self, items: Sequence[tuple[Any, str]], columns: int = 3) -> Table:
         """The legend of the numbered callouts of a screenshot: badge number and field, in columns."""
@@ -1049,8 +1109,10 @@ class BdoiDocument:
     def requirement(self, fr: dict[str, Any]) -> None:
         """A functional requirement in the house pattern (see README "Functional requirement block").
 
-        Keys: id, title, brd (list), actor, priority, fit, screens, api, description, preconditions,
-        main_flow, alternate_flows, rules, validations, fields, notifications, audit, acceptance.
+        Keys: id, title, brd (list), actor, priority, screens, description, preconditions, main_flow,
+        alternate_flows, rules, validations, fields, notifications, audit, acceptance. A client document presents
+        the proposed system only (BDOI instruction of 27-Sep-2026), so the header shows no fit class, API or other
+        build reference; the keys "fit" and "api" are refused by --check.
         """
         self.heading(f"{fr['id']} {fr['title']}", level=3, numbered=False)
         brd_refs = fr.get("brd", [])
@@ -1060,12 +1122,9 @@ class BdoiDocument:
             ("BRD trace", ", ".join(str(ref) for ref in brd_refs)),
             ("Actor", fr.get("actor", "")),
             ("Priority", fr.get("priority", "Must have")),
-            ("Fit", fr.get("fit", "")),
         ]
         if fr.get("screens"):
             pairs.append(("Screens", fr["screens"]))
-        if fr.get("api"):
-            pairs.append(("API", fr["api"]))
         self.key_values(pairs, columns=2, label_width=2.2)
         if fr.get("description"):
             self.label("Description")
@@ -1158,6 +1217,66 @@ class BdoiDocument:
         for off, p in enumerate(new_paras, start=1):
             body.insert(idx + off, p)
         self._toc_paragraphs = new_paras
+
+    # ---------------------------------------------------------------- volumes
+
+    def volume_break(self) -> None:
+        """Marks the end of a volume (the `<!-- volume: title -->` directive of a source); see keep_volume."""
+        body = self.doc.element.body
+        self._volume_marks.append(body[-2] if len(body) > 1 else None)
+
+    def body_start(self) -> None:
+        """Marks the end of the cover and front matter: every volume keeps what comes before."""
+        self._volume_marks = [self.doc.element.body[-2]]
+
+    def keep_volume(self, k: int) -> None:
+        """Keeps the cover, the front matter and volume k (1-based) of the body and removes the other volumes.
+
+        Chapter, figure and table numbers stay those of the whole document, so a reference such as "chapter 13"
+        or "Figure 42" reads the same in every volume. Section breaks inside the removed parts are handled so
+        that the front matter and the kept volume keep their page orientation; the pictures of the removed parts
+        are dropped from the file."""
+        body = self.doc.element.body
+        children = list(body)
+        final = children[-1] if children[-1].tag == qn("w:sectPr") else None
+        index = {id(el): i for i, el in enumerate(children)}
+        marks = [index[id(m)] for m in self._volume_marks] + [len(children) - (2 if final is not None else 1)]
+        head = children[marks[0] + 1: marks[k - 1] + 1]
+        tail = children[marks[k] + 1: len(children) - (1 if final is not None else 0)]
+
+        def breaks(elements):
+            return [el for el in elements if el.tag == qn("w:p") and el.find(qn("w:pPr") + "/" + qn("w:sectPr")) is not None]
+
+        head_breaks = breaks(head)
+        if head_breaks:
+            # The first break closes the section of the front matter: keep it, empty.
+            keep = head_breaks[0]
+            for child in list(keep):
+                if child.tag != qn("w:pPr"):
+                    keep.remove(child)
+            head = [el for el in head if el is not keep]
+        tail_breaks = breaks(tail)
+        if tail_breaks and final is not None:
+            # The first break closes the last section of the kept volume: it becomes the document's last section.
+            sect = copy.deepcopy(tail_breaks[0].find(qn("w:pPr") + "/" + qn("w:sectPr")))
+            body.replace(final, sect)
+        for el in head + tail:
+            body.remove(el)
+        # A volume that ends with a section break (an orientation change just before the next volume) would end
+        # with an empty page: its last break becomes the document's last section instead.
+        last = list(body)
+        if final is not None and len(last) > 1 and last[-2].tag == qn("w:p") and not last[-2].xpath("./w:r"):
+            sect = last[-2].find(qn("w:pPr") + "/" + qn("w:sectPr"))
+            if sect is not None:
+                body.replace(body[-1], copy.deepcopy(sect))
+                body.remove(last[-2])
+        kept = body.xml if hasattr(body, "xml") else ""
+        names = set(re.findall(r'w:name="([^"]+)"', kept))
+        self.headings = [h for h in self.headings if h.bookmark in names]
+        used = set(re.findall(r'r:(?:embed|id|link)="([^"]+)"', kept))
+        for rid, rel in list(self.doc.part.rels.items()):
+            if rel.reltype.endswith("/image") and rid not in used:
+                del self.doc.part.rels[rid]
 
     @staticmethod
     def _fld(para: Paragraph, kind: str) -> None:
@@ -1258,24 +1377,57 @@ def _pad(row: Any, n: int) -> list[Any]:
 
 
 PRINT_DPI = 170
+# Screenshots are captured at twice the screen resolution; they are embedded at up to this many pixels per inch
+# of printed width, so the smallest screen text stays sharp on paper. They are never enlarged.
+SCREENSHOT_DPI = 250
+# Height share of the text area a screenshot may take on a page turned for it (caption and legend follow).
+TURNED_HEIGHT_RATIO = 0.8
 
 
-def print_image(path: Path, width_cm: float, dpi: int = PRINT_DPI) -> Path:
-    """An optimised print copy of a raster image for Word: scaled to the printed width at `dpi` and saved as
-    JPEG (photos and screenshots) or PNG (figures with few colours) in a `_print` folder next to the image,
-    which is not committed. Keeps a document with many screenshots well under 20 MB. Returns the original
-    when it is already small enough or PIL is missing."""
+def image_crop(path: Path) -> str:
+    """The crop kind written into a pack screenshot by the capture ("full", "main", "dialog", "region",
+    "document"), or "" for any other image."""
+    try:
+        from PIL import Image
+
+        with Image.open(path) as im:
+            return str(im.info.get("bibs-crop", ""))
+    except Exception:  # pragma: no cover
+        return ""
+
+
+def print_image(path: Path, width_cm: float, dpi: int = PRINT_DPI, screenshot: bool = False) -> Path:
+    """An optimised print copy of a raster image for Word, in a `_print` folder next to the image (not committed).
+
+    Screenshots (screenshot=True) keep their sharpness: they are scaled down only to SCREENSHOT_DPI at the printed
+    width, never enlarged, and stay PNG (a 256-colour palette without dither for flat screens, full colour for a
+    photo-like image). Figures are scaled to `dpi`; flat ones stay PNG, photo-like ones become JPEG. Returns the
+    original when it is already small enough or PIL is missing."""
     try:
         from PIL import Image
     except Exception:  # pragma: no cover
         return path
     if path.suffix.lower() not in (".png", ".jpg", ".jpeg"):
         return path
-    target_px = int(width_cm / 2.54 * dpi)
+    target_px = int(width_cm / 2.54 * (SCREENSHOT_DPI if screenshot else dpi))
     out_dir = path.parent / "_print"
     try:
         with Image.open(path) as im:
             w, h = im.size
+            if screenshot:
+                if w <= target_px:
+                    return path
+                out = out_dir / f"{path.stem}_{target_px}s.png"
+                if out.exists() and out.stat().st_mtime >= path.stat().st_mtime:
+                    return out
+                out_dir.mkdir(exist_ok=True)
+                img = im.convert("RGB").resize((target_px, round(h * target_px / w)), Image.LANCZOS)
+                if img.getcolors(maxcolors=60000) is None:
+                    img.save(out, optimize=True)
+                else:
+                    img.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE).save(
+                        out, optimize=True)
+                return out
             colours = im.convert("RGB").getcolors(maxcolors=256) if w * h < 4_000_000 else None
             figure_like = colours is not None
             suffix = ".png" if figure_like else ".jpg"
@@ -1290,9 +1442,9 @@ def print_image(path: Path, width_cm: float, dpi: int = PRINT_DPI) -> Path:
             if w > target_px:
                 img = img.resize((target_px, round(h * target_px / w)), Image.LANCZOS)
             if figure_like:
-                # Scaling brings back intermediate colours: a palette of 256 keeps screenshots and figures small.
+                # Scaling brings back intermediate colours: a palette of 256 keeps figures small.
                 img.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE).save(out, optimize=True)
-                if out.stat().st_size > 250_000:  # a photo-like page (sign-in background) prints better as JPEG
+                if out.stat().st_size > 250_000:  # a photo-like picture prints better as JPEG
                     out.unlink()
                     out = out.with_suffix(".jpg")
                     img.save(out, quality=84, optimize=True, progressive=True)
@@ -1443,6 +1595,8 @@ def render_body(doc: BdoiDocument, lines: list[str]) -> None:
                 doc.new_section(landscape=True)
             elif name == "portrait":
                 doc.new_section(landscape=False)
+            elif name == "volume":
+                doc.volume_break()
             elif name == "table":
                 pending_opts = _parse_opts(rest)
             i += 1
@@ -1643,7 +1797,8 @@ def lint_source(src: str | Path) -> list[str]:
       cell, or a cell is missing);
     * a one-line flow list ``key: [a, b]`` whose items contain a comma inside parentheses or text
       (YAML splits it into several items);
-    * missing mandatory keys (id, title, brd, actor, description, main_flow, acceptance).
+    * missing mandatory keys (id, title, brd, actor, description, main_flow, acceptance);
+    * the build references "fit" and "api", which a client FR does not carry.
     """
     src = Path(src)
     text = src.read_text(encoding="utf-8")
@@ -1662,6 +1817,9 @@ def lint_source(src: str | Path) -> list[str]:
         for key in ("id", "title", "brd", "actor", "description", "main_flow", "acceptance"):
             if not fr.get(key):
                 problems.append(f"{rid}: missing '{key}'")
+        for key in ("fit", "api"):
+            if key in fr:
+                problems.append(f"{rid}: '{key}' is a build reference and is not part of a client FR")
         brd_refs = fr.get("brd")
         for ref in brd_refs if isinstance(brd_refs, list) else []:
             if not isinstance(ref, str):
@@ -1689,17 +1847,78 @@ def lint_source(src: str | Path) -> list[str]:
 
 
 def build_markdown(src: str | Path, out: str | Path | None = None, pdf: bool = True,
-                   keep_pdf: bool = False) -> tuple[Path, Path | None]:
-    """Builds one Markdown-like source into .docx (and .pdf). Returns the output paths."""
+                   keep_pdf: bool = False) -> list[tuple[Path, Path | None]]:
+    """Builds one Markdown-like source into .docx (and .pdf), one file per volume. Returns the output paths."""
     src = Path(src).resolve()
     front, lines = load_source(src)
+    volumes = volume_titles(front, lines)
+    if len(volumes) > 1:
+        return build_volumes(src, front, lines, volumes, out, pdf=pdf, keep_pdf=keep_pdf)
     doc = BdoiDocument(meta_from(front), h1_page_break=bool(front.get("h1_page_break", True)),
                        base_dir=src.parent)
     doc.cover()
     doc.front_matter()
     render_body(doc, lines)
     target = Path(out) if out else output_path(front, src)
-    return doc.publish(target, pdf=pdf, keep_pdf=keep_pdf)
+    for k in range(1, 10):  # volumes of an earlier split build of this source
+        volume_path(target, k).unlink(missing_ok=True)
+    return [doc.publish(target, pdf=pdf, keep_pdf=keep_pdf)]
+
+
+def volume_titles(front: dict[str, Any], lines: list[str]) -> list[str]:
+    """The titles of the volumes of a source: `volume_title` of the front matter (the first volume), then the
+    title of each `<!-- volume: title -->` directive. One title means one document."""
+    titles = [str(front.get("volume_title", "Requirements"))]
+    fenced = False
+    for line in lines:
+        if line.strip().startswith("```"):
+            fenced = not fenced
+            continue
+        m = _DIRECTIVE.fullmatch(line.strip())
+        if not fenced and m and m.group(1).lower() == "volume":
+            titles.append(m.group(2) or f"Volume {len(titles) + 1}")
+    return titles
+
+
+def volume_path(target: Path, k: int) -> Path:
+    """File of volume k: the name gains "_Volume_k" before the version (the reading-order prefix stays, so
+    the volumes of the FRS sort together as 02 in the release set)."""
+    m = re.match(r"(.*)(_v\d+(?:\.\d+)*)(\.\w+)$", target.name)
+    if not m:
+        return target.with_name(f"{target.stem}_Volume_{k}{target.suffix}")
+    return target.with_name(f"{m.group(1)}_Volume_{k}{m.group(2)}{m.group(3)}")
+
+
+def build_volumes(src: Path, front: dict[str, Any], lines: list[str], titles: list[str], out: str | Path | None,
+                  pdf: bool = True, keep_pdf: bool = False) -> list[tuple[Path, Path | None]]:
+    """Builds a source with `<!-- volume -->` directives as one Word file per volume, so that a document with many
+    screenshots stays small enough to share while every picture keeps its print resolution. Each volume has the
+    cover (with "Volume k of n"), the document control, its own table of contents and its part of the body; the
+    numbering of chapters, figures and tables runs on through the volumes."""
+    target = Path(out) if out else output_path(front, src)
+    n = len(titles)
+    results = []
+    for k, title in enumerate(titles, start=1):
+        meta = meta_from(front)
+        meta.subtitle = f"{meta.subtitle} | Volume {k} of {n}: {title}".lstrip(" |")
+        if meta.doc_id:
+            meta.doc_id = f"{meta.doc_id} Vol. {k}"
+        doc = BdoiDocument(meta, h1_page_break=bool(front.get("h1_page_break", True)), base_dir=src.parent)
+        doc.cover()
+        doc.front_matter()
+        others = "; ".join(f"Volume {i}: {t}" for i, t in enumerate(titles, start=1) if i != k)
+        doc.paragraph()
+        doc.paragraph(f"This document is issued in {n} volumes. This is Volume {k}: {title}. The other "
+                      f"volume{'s' if n > 2 else ''}: {others}. Chapter, figure and table numbers run on through "
+                      "the volumes.", size=9)
+        doc.body_start()
+        render_body(doc, lines)
+        doc.keep_volume(k)
+        results.append(doc.publish(volume_path(target, k), pdf=pdf, keep_pdf=keep_pdf))
+    # A single-file build of the same source left from before the split is not kept next to its volumes.
+    if target.exists():
+        target.unlink()
+    return results
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -1722,17 +1941,17 @@ def main(argv: list[str] | None = None) -> int:
         return 1 if failed else 0
     for s in args.sources:
         keep = args.keep_pdf or args.previews
-        docx_path, pdf_path = build_markdown(s, args.out, pdf=not args.no_pdf, keep_pdf=keep)
-        print(f"docx: {docx_path}")
-        if pdf_path and args.previews:
-            import render
+        for docx_path, pdf_path in build_markdown(s, args.out, pdf=not args.no_pdf, keep_pdf=keep):
+            print(f"docx: {docx_path} ({docx_path.stat().st_size / 1e6:.1f} MB)")
+            if pdf_path and args.previews:
+                import render
 
-            sheets = render.previews(pdf_path)
-            print(f"previews: {sheets[0].parent} ({len(sheets)} files)")
-        if pdf_path and not args.keep_pdf:
-            pdf_path.unlink(missing_ok=True)
-        elif pdf_path:
-            print(f"pdf:  {pdf_path}")
+                sheets = render.previews(pdf_path)
+                print(f"previews: {sheets[0].parent} ({len(sheets)} files)")
+            if pdf_path and not args.keep_pdf:
+                pdf_path.unlink(missing_ok=True)
+            elif pdf_path:
+                print(f"pdf:  {pdf_path}")
     return 0
 
 

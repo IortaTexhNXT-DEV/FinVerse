@@ -10,7 +10,7 @@ digraph eb_portal_review {
   REJECTED  [label="REJECTED\nportal user told why", fillcolor="@AMBER_BG"];
 
   RECEIVED -> RECEIVED [label="  re-map target"];
-  RECEIVED -> VALIDATED [label="  validate (owner)"];
-  RECEIVED -> REJECTED [label="  reject (reason)"];
+  RECEIVED -> VALIDATED [label="  Validate (owner)"];
+  RECEIVED -> REJECTED [label="  Reject (reason)"];
   { rank=same; VALIDATED; REJECTED; }
 }

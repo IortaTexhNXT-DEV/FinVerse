@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { CheckboxField, NumberField, SelectField, TextField } from './FormFields';
 import { useUwLookups } from './useUwLookups';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { formatRate } from '@/utils/format';
 
 type ProductForm = ProductInput & { id?: number };
 
@@ -110,7 +111,12 @@ export default function ProductsPage() {
             { key: 'c', header: 'Code', render: (p) => <strong>{p.code}</strong> },
             { key: 'n', header: 'Name', render: (p) => p.name },
             { key: 'l', header: 'Class', render: (p) => p.businessLine },
-            { key: 'cm', header: 'Comm. %', numeric: true, render: (p) => p.defaultCommissionRate },
+            {
+              key: 'cm',
+              header: 'Comm. %',
+              numeric: true,
+              render: (p) => formatRate(p.defaultCommissionRate),
+            },
             {
               key: 't',
               header: 'DST / VAT / LGT / FST %',

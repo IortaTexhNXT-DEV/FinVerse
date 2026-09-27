@@ -189,6 +189,21 @@ public class RenewalLetter extends BaseEntity {
   }
 
   /**
+   * Records the hand-over to the mail house (printed letter of a submitted policy).
+   *
+   * @param batchNo print batch
+   * @param at time
+   */
+  public void printed(String batchNo, Instant at) {
+    requireStatus(LetterStatus.GENERATED, LetterStatus.FAILED);
+    this.recipients = "Mail house batch " + batchNo;
+    this.protectedFile = false;
+    this.status = LetterStatus.SENT;
+    this.sentAt = at;
+    this.failure = null;
+  }
+
+  /**
    * Records a refusal before sending (recipient policy, no address).
    *
    * @param reason reason

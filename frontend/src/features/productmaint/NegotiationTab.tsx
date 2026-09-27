@@ -15,7 +15,7 @@ import { Field } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { InsurerChoices } from '@/features/proposals/ProposalFormParts';
-import { formatAmount, formatDate, formatDateTime } from '@/utils/format';
+import { formatAmount, formatDate, formatDateTime, formatRate } from '@/utils/format';
 import { ResponseDialog } from './ResponseDialog';
 import { displayNameOf } from '@/api/users';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
@@ -83,7 +83,7 @@ function responseColumns(
   return [
     { key: 'insurer', header: 'Insurer', render: (r) => <strong>{r.insurerName}</strong> },
     { key: 'outcome', header: 'Outcome', render: (r) => <StatusBadge status={r.outcome} /> },
-    { key: 'rate', header: 'Rate %', numeric: true, render: (r) => r.rate ?? '—' },
+    { key: 'rate', header: 'Rate %', numeric: true, render: (r) => formatRate(r.rate, '—') },
     {
       key: 'min',
       header: 'Minimum',

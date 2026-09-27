@@ -33,7 +33,7 @@ async function apiLogin(ctx, username, password) {
 
 /** A browser page of its own, signed in as `user` with `password` (users that are not seed personas). */
 async function freshPage(ctx, user, password, clock = false) {
-  const context = await ctx.browser.newContext({ viewport: { width: 1600, height: 1000 } });
+  const context = await ctx.newContext();
   const page = await context.newPage();
   page.setDefaultTimeout(20000);
   if (clock) {
@@ -90,11 +90,15 @@ const fills = {
   modify_user: [['Request Type', 'Modify user'], ['User ID', 'a013000101'], ['Full Name', 'SIT Enrolled User Santos']],
   new_profile: [
     ['Profile Code', 'UAT_ENQUIRY'], ['Name', 'Client enquiry (seed data)'],
-    ['Description', 'Read-only enquiry of clients and reports'], ['Client view', true], ['Report view', true],
+    ['Description', 'Read-only enquiry of clients and reports'],
+    // Each permission shows its name; its check box is found by the permission code (id perm-CODE).
+    async (page) => page.locator('#perm-CLIENT_VIEW').check(),
+    async (page) => page.locator('#perm-REPORT_VIEW').check(),
     ['Approvers in Order', 'Ulysses'], ['Approvers in Order', '\\(approver\\)'],
     ['Remarks (Justification)', 'Enquiry profile for the contact centre (seed data)'],
   ],
-  modify_profile: [['Request Type', 'Modify group profile'], ['Group Profile', '^Marketing Account Officer'], ['User access view', true]],
+  modify_profile: [['Request Type', 'Modify group profile'], ['Group Profile', '^Marketing Account Officer'],
+    async (page) => page.locator('#perm-UAM_VIEW').check()],
   deactivate_profile: [['Request Type', 'Deactivate group profile'], ['Group Profile', '^Processing Team Lead']],
   report_profile: [['Group Profile (code)', 'UAM_APPROVER']],
 };
@@ -108,13 +112,20 @@ const opens = {
   seed_batch: (ctx) => `/user-access/bulk/${ctx.one("select id from nba_access_request_batch where batch_no = 'BLK-2026-900001'")}`,
   // A reset link requested for requestor; the token is read from the e-mail queued for it.
   reset_link: async (ctx) => {
+    const before = Number(ctx.one("select coalesce(max(id), 0) from msg_outbound where purpose = 'PASSWORD_RESET'"));
     await fetch(`${ctx.API}/api/v1/auth/password-reset/request`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', Origin: ctx.BASE },
       body: JSON.stringify({ userId: 'requestor' }),
     });
-    await new Promise((r) => setTimeout(r, 1500));
-    const body = ctx.one("select body from msg_outbound where purpose = 'PASSWORD_RESET' order by id desc limit 1");
-    const token = /token=([A-Za-z0-9_-]+)/.exec(body);
+    // The e-mail is queued after the answer: wait for it (the last one is used when a new one is not sent). The
+    // token is cut out in the query, as psql prints one line per row.
+    const tokenOf = (where) => ctx.sql(`select substring(body from 'token=([A-Za-z0-9_-]+)') from msg_outbound where purpose = 'PASSWORD_RESET' ${where} order by id desc limit 1`)[0]?.[0];
+    let found;
+    for (let i = 0; i < 20 && !found; i += 1) {
+      await new Promise((r) => setTimeout(r, 750));
+      found = tokenOf(`and id > ${before}`);
+    }
+    const token = found ? [null, found] : (tokenOf('') ? [null, tokenOf('')] : null);
     if (!token) {
       throw new Error('no reset link in the last PASSWORD_RESET e-mail');
     }
@@ -219,7 +230,11 @@ const documents = {
   'doc-access-matrix': (ctx, out) => download(ctx, 'auditor', '/nbadmin/access-matrix/export', out, 'xlsx'),
 };
 
+// Shots kept as the whole window (the sign-in pages have no menu and are always whole; the home page shows the
+// menu of the persona); every other shot is cropped to its dialog or content area (capture_pack.cjs, cropOf).
+const crops = { 'scr-ua-05-01-view': 'full' };
+
 module.exports = {
-  opens, fills, selects: {}, uploads: {}, after: {}, custom, walkthrough: walkthrough.steps, documents,
+  crops, opens, fills, selects: {}, uploads: {}, after: {}, custom, walkthrough: walkthrough.steps, documents,
   prepare: walkthrough.prepare, render,
 };

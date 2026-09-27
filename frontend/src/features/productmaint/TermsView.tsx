@@ -3,7 +3,7 @@ import type { CoverageTerm, InsurerLine, PackageTerms } from '@/api/productmaint
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
-import { formatAmount, formatDate } from '@/utils/format';
+import { formatAmount, formatDate, formatRate } from '@/utils/format';
 import { CoverageName, InsurerName } from '@/components/broking/LovLabel';
 import { insurerRoleLabel } from './packageRequest';
 
@@ -44,7 +44,7 @@ const INSURER_COLUMNS: Column<InsurerLine>[] = [
   },
   { key: 'role', header: 'Role', render: (i) => insurerRoleLabel(i.role) },
   { key: 'share', header: 'Share %', numeric: true, render: (i) => i.sharePercent ?? '—' },
-  { key: 'rate', header: 'Rate %', numeric: true, render: (i) => i.rate ?? '—' },
+  { key: 'rate', header: 'Rate %', numeric: true, render: (i) => formatRate(i.rate, '—') },
   {
     key: 'min',
     header: 'Minimum',
@@ -73,12 +73,12 @@ export function TermsView({
           ))}
           <dt>Rate / minimum premium</dt>
           <dd>
-            {s.defaultRate ?? '—'}% /{' '}
+            {formatRate(s.defaultRate, '—')}% /{' '}
             {s.minimumPremium === undefined ? '—' : formatAmount(s.minimumPremium)}
           </dd>
           <dt>Commission / TSI limit</dt>
           <dd>
-            {s.commissionRate ?? '—'}% /{' '}
+            {formatRate(s.commissionRate, '—')}% /{' '}
             {s.maxSumInsured === undefined ? '—' : formatAmount(s.maxSumInsured)}
           </dd>
           <dt>Computation basis</dt>

@@ -56,6 +56,20 @@ menu_personas:
   CLM_TH: {name: Claims Team Head, user: clmth}
   CLM_UH: {name: Claims Unit Head, user: clmuh}
   CLM_RISK: {name: Claims / Risk Analyst, user: clmrisk}
+  DATA_MIGRATION_LEAD: {name: Data Migration Lead, user: miglead}
+  DATA_STEWARD: {name: Data Steward, user: migsteward}
+  DATA_OWNER: {name: Data Owner, user: migowner}
+  MIGRATION_OPERATOR: {name: Migration Operator, user: migops}
+  MIGRATION_RECON_APPROVER: {name: Migration Reconciliation Approver, user: migrecon}
+  MIGRATION_GONOGO: {name: Go-Live Board (migration go / no-go), user: miggonogo}
+  LEGACY_INQUIRY: {name: Legacy Inquiry (auditor), user: legacyaudit}
+  LEGACY_ACCESS_REVIEWER: {name: Legacy Access Reviewer, user: legacyrev}
+  SBM_HANDLER: {name: Submitted Handler, user: sbmhandler}
+  SBM_CHECKER: {name: Submitted Checker, user: sbmchecker}
+  SBM_SANITATION: {name: Sanitation Handler (Submitted Policies), user: sanitation}
+  SBM_TL: {name: Submitted Policies Team Lead, user: sbmtl}
+  SBM_POLICY_REVIEWER: {name: Policy Review Officer (Submitted Policies), user: polreview}
+  SBM_UPP_HANDLER: {name: Handling Fee Handler (Unapplied Payments), user: sbmfee}
 
 # Packs of other BRDs whose screens a walkthrough step may show (My Approvals and Lists of Values of New Business).
 foreign_packs: [../../BRD-01_New_Business/pack/pack.yaml]
@@ -65,7 +79,7 @@ signatories:
   - ["Product Owner, Marketing Business System", BDOI, "Business owner: the whole set"]
   - ["Process Owner, User Access Maintenance (Business Administration)", BDOI, "Requests, approvals, group-profile requests, bulk requests, reports and the configuration inputs"]
   - ["Head, BDOI Information Security", BDOI, "Information Security: the role matrix, the menus by persona, the separation-of-duties rules, the second approval of privileged changes, password and session rules, the audit log"]
-  - ["Head, BDOI IT", BDOI, "BDOI IT: sign-in and identity integration assumptions (EIAM on Entra ID, UIDM-ISC identity governance; integrations owned by BDOI IT, seams only in this set), System Administrator functions"]
+  - ["Head, BDOI IT", BDOI, "BDOI IT: sign-in and identity integration assumptions (EIAM on Entra ID, UIDM-ISC identity governance; integrations owned by BDOI IT), System Administrator functions"]
   - ["Program Manager, Business Project Services", BDO Unibank ESG, "Traceability to the BRD"]
   - [Project Manager, iorta TechNXT, "Delivery of the set as signed"]
 
@@ -114,6 +128,9 @@ section_brd:
   nb-reports: BRD-1
   reports: Platform
   broking-setup: BRD-1
+  submitted: BRD-12
+  migration: BRD-13
+  legacy-inquiry: BRD-13
   screening-setup: BRD-10
   setup: Platform
   user-access: BRD-11
@@ -157,7 +174,11 @@ common:
     text: >-
       A request opens with its reference (AR-yyyy-nnnnnn for a request, BLK-yyyy-nnnnnn for a bulk batch), its status
       pill, its risk flags (Privilege Increase, Outside Hours) and the key facts: requested by and when, approver,
-      effective date and decision. A reference chip copies the reference.
+      effective date and decision. A reference chip copies the reference. Under the header a stepper shows the stages
+      of the request: Draft, Pending approval, Second approval (where one is needed), then Approved, or For
+      implementation and Implemented for a group profile; Scheduled while an approved change waits for its effective
+      date; a returned request in amber, a rejected or cancelled one in red. Under the stepper one row gives Current
+      Stage, Since and Assigned To (the approver's name).
   - name: Decisions with a reason
     text: >-
       Approve, Return, Reject, Cancel and Implement open a dialog that names the request and its change. Return,
@@ -191,6 +212,9 @@ common:
       after sign-in, whatever the activity, and a dialog warns 30 minutes before.
   - name: Messages
     text: >-
-      Field errors appear under the field in red with the field outlined. A refusal by a business rule shows the
-      business message and a reference for support (the message code and a request number). Success is confirmed by a
-      short message at the bottom right of the page.
+      Every message follows one notice standard: a white notice with a thin bar and an icon in the colour of its kind
+      (red error, amber warning, blue information, green success), a bold short title, then the business message with
+      one bullet per missing item. Field errors appear under the field with the field outlined, and a long form lists
+      its errors in a notice at the top with a link to the first field. A refusal by a business rule shows the business
+      message only, without codes or references; only an unexpected system error offers Retry and a reference for
+      support behind Details. Success is confirmed by a short message in the same standard.

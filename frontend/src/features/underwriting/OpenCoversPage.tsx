@@ -16,7 +16,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useDefaultBranchId } from '@/context/workspaceContext';
-import { today } from '@/utils/format';
+import { formatRate, today } from '@/utils/format';
 import { DateField, NumberField, SelectField, TextField } from './FormFields';
 import { oneYearFrom } from './premiumMath';
 import { useUwLookups } from './useUwLookups';
@@ -120,7 +120,7 @@ export default function OpenCoversPage() {
               numeric: true,
               render: (c) => <Amount value={c.annualLimit} />,
             },
-            { key: 'rate', header: 'Rate %', numeric: true, render: (c) => c.rate },
+            { key: 'rate', header: 'Rate %', numeric: true, render: (c) => formatRate(c.rate) },
             { key: 'st', header: 'Status', render: (c) => <StatusBadge status={c.recordStatus} /> },
             {
               key: 'a',

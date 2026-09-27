@@ -114,6 +114,7 @@ export function RateExceptionsCard({ quotation }: Readonly<{ quotation: Quotatio
     <Card
       title="Rate Exceptions"
       className="rate-exceptions-card"
+      callout="rate-exceptions"
       actions={
         mayRequest && (
           <Button
@@ -129,7 +130,7 @@ export function RateExceptionsCard({ quotation }: Readonly<{ quotation: Quotatio
     >
       <div className="stack">
         {deviation && (
-          <Notice tone="info" className="subtle">
+          <Notice tone="info" className="subtle" callout="rate-exceptions-notice">
             Priced on package version {quotation.content.schemeVersion}. An item rate differs from
             the scheme rate, so submission needs an approved rate exception.
           </Notice>
@@ -137,6 +138,7 @@ export function RateExceptionsCard({ quotation }: Readonly<{ quotation: Quotatio
         <ErrorAlert error={exceptions.error} />
         <DataTable
           caption="Rate exceptions"
+          callout="rate-exceptions-table"
           columns={rateExceptionColumns(scheme.data?.schemeRate)}
           rows={requested}
           rowKey={(e) => e.referenceNo}

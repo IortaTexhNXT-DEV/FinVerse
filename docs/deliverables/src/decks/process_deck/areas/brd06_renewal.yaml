@@ -8,8 +8,8 @@ num: 6
 title: Renewal
 brd: BRD-6
 scope: 'Expiring list, disposition, insurer round-trip, Renewal Advice, acceptance to booking'
-status: DESIGNED
-status_text: Designed, not yet built; FRS v1.0 issued for review
+status: FRS ISSUED
+status_text: FRS v1.0 issued for review
 department: Marketing and Processing (RMEL renewal)
 roles:
   - Marketing Team Leader (75) and AO / Account Broker (319)
@@ -32,8 +32,8 @@ notes:
     BDOI renews the policies it has placed. RMEL Phase 2 moves the renewal online: the Business Units extract the list
     themselves, disposition online in a staged workflow, export the accounts per insurer and monitor each renewal. The
     workshop addendum adds rule-based governance: sanitation, a mandatory reference, buckets, a decision matrix and
-    automatic progression to booking. Renewal is designed; the build needs the shared business-type change BT0 first
-    (decision D1).
+    automatic progression to booking. Renewal uses the business type BT0 shared with
+    New Business booking (decision D1).
   pains: The eight points are the current-process rows of the BRD (p.42-43) and the workshop addendum (p.3).
   after: The volumes and response times come from the usage table (p.186-188).
   gaps: >-
@@ -92,7 +92,7 @@ tobe:
     any date range. BIBS runs the sanitation, matching and eligibility checks and classifies each record Clean, Review
     or Exception. An authorised user initiates the renewal, in bulk (for example CLG) or one by one. The decision matrix
     proposes a disposition; a Clean case with an automatic rule proceeds straight through. Otherwise the AO dispositions
-    online and the TL reviews and posts. Processing updates the renewal account; BIBS builds the extract per insurer and
+    online and the TL reviews and posts. Processing updates the renewal account; BIBS creates the extract per insurer and
     sends it protected, and the insurer's decision file is applied: Renew As Is advances, Reject or Revise stops or
     reroutes. The Renewal Advice (first or second notice) goes out in batch, protected. Acceptance moves the account to
     placement and booking without re-keying, and it books as business type RENEWAL.
@@ -149,5 +149,5 @@ best:
   - {practice: Rules owned by the business, status: BIBS, bibs: 'Lead days, buckets, eligibility checks and the matrix are maintained as configuration.', bdoi: 'Name the rule owner and approver in RMEL.'}
   - {practice: Evidence of client acceptance, status: BIBS, bibs: 'Acceptance recorded; changed terms need evidence (BRRN.038).', bdoi: 'Agree which evidence is enough (e-mail, signed RA).'}
   - {practice: Protected digital documents, status: PARTLY, bibs: 'Extracts and RAs sent protected in batch with a send log.', bdoi: 'Agree the password convention (DCR-153).'}
-  - {practice: Loss experience in the renewal decision, status: PARTLY, bibs: 'Account history reads claims through the Claims query service (decision D4).', bdoi: 'Build Claims first; decide the total-loss indicator (XQ10).'}
+  - {practice: Loss experience in the renewal decision, status: PARTLY, bibs: 'Account history reads claims through the Claims query service (decision D4).', bdoi: 'Decide the total-loss indicator (XQ10).'}
   - {practice: Persistency KPI, status: ADOPT, bibs: 'Status report and summary counters by unit and segment.', bdoi: 'Define the persistency report (XQ06) and a retention target per segment.'}

@@ -10,7 +10,7 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'nb-pack-docs-'));
 const SOFFICE = process.env.SOFFICE || 'soffice';
 
 /** Renders the first page of a PDF, Word, Excel or OpenDocument file to a PNG at `out`. */
-function render(buffer, ext, out, dpi = 110, keep = []) {
+function render(buffer, ext, out, dpi = Number(process.env.DOC_DPI || 200), keep = []) {
   const base = path.join(TMP, `doc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
   let pdfFile = `${base}.${ext}`;
   fs.writeFileSync(pdfFile, buffer);

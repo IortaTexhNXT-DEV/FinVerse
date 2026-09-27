@@ -137,6 +137,8 @@ public class AccessRequestService {
     history.record(saved, AccessRequestAction.SAVE, null, clean.justification());
     if (!draft) {
       submitSaved(saved, chosenApprovers, AccessRequestAction.SUBMIT, null);
+    } else if (chosenApprovers != null) {
+      saved.planApprovers(planned(chosenApprovers));
     }
     return saved;
   }
@@ -149,13 +151,38 @@ public class AccessRequestService {
    * @return the request
    */
   public AccessRequest edit(Long id, AccessRequestContent content) {
+    return edit(id, content, null);
+  }
+
+  /**
+   * Edits a draft with the approvers chosen so far (kept until it is submitted), or corrects a
+   * returned request (its approvers stay those it was submitted to).
+   *
+   * @param id request
+   * @param content new content
+   * @param chosenApprovers approvers in order chosen on a draft; null keeps the saved ones
+   * @return the request
+   */
+  public AccessRequest edit(Long id, AccessRequestContent content, List<String> chosenApprovers) {
     AccessRequest r = requireCreator(get(id), "edit");
     permissions.requireCorrectionRight(r);
     AccessRequestContent clean = validator.validateDraft(content);
     AccessRequestStatus from = r.getStatus();
     r.edit(clean);
+    if (chosenApprovers != null && from == AccessRequestStatus.DRAFT) {
+      r.planApprovers(planned(chosenApprovers));
+    }
     history.record(r, AccessRequestAction.EDIT, from, null);
     return r;
+  }
+
+  /** Approvers chosen on a draft: named, each once, in the order chosen (checked on submission). */
+  private static List<String> planned(List<String> chosen) {
+    return chosen.stream()
+        .filter(name -> name != null && !name.isBlank())
+        .map(String::strip)
+        .distinct()
+        .toList();
   }
 
   /**

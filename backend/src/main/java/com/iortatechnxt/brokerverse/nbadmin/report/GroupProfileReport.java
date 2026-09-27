@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.report;
 
+import com.iortatechnxt.brokerverse.nbadmin.service.PermissionNames;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -155,7 +156,8 @@ public class GroupProfileReport implements ReportDefinition {
             + (active ? ")" : ", inactive)"));
     m.put("module", UamReportSupport.words(areas.getOrDefault(permission, OTHER)));
     String action = actions.get(permission);
-    m.put("task", action == null ? permission : permission + " (" + action + ")");
+    String task = PermissionNames.name(permission);
+    m.put("task", action == null ? task : task + " (" + UamReportSupport.words(action) + ")");
     m.put("access", perms.contains(permission) ? "With Access" : "No Access");
     m.put("createdAt", UamReportSupport.date(UamReportSupport.instant(role.get("created_at"))));
     m.put("createdBy", UamReportSupport.text(role, "created_by"));

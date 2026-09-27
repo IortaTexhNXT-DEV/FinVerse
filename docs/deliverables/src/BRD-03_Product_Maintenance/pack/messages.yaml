@@ -153,3 +153,6 @@ fixes:
   "Select requests of one stage": Select requests of one stage only.
   "Correct the highlighted fields": Correct the fields marked in red on each tab.
   "<problems>": Correct the points listed in the warning.
+  "The quotation slip is approved and sent to the insurers.": Confirm to approve and send the quotation slip, or cancel to review it first.
+  "The package version is validated and released for use.": Confirm to validate and release the version, or cancel to review it first.
+  PRODUCT_NOT_MIGRATED: No action on this screen; only products created by the data migration can be withdrawn by it. Report it to the data migration team if the product should be withdrawn.

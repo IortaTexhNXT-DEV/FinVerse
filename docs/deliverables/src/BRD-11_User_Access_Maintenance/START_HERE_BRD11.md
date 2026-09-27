@@ -33,7 +33,7 @@ distribution:
 
 # What this pack is for
 
-This pack shows BRD-11 User Access Maintenance as built in BIBS on 27-Sep-2026, screen by screen, so that BDOI can confirm what it will get and sign it off. User Access Maintenance is a set of Drop 0 (Setup and Data Migration): it holds the users, the group profiles and the permissions that every other BRD checks, and it decides the menu each persona sees. The pack therefore shows the menu of every persona, and BDOI Information Security signs the role matrix and the separation-of-duties rules with the business owner, while BDOI IT signs the sign-in and identity integration assumptions. Signing freezes the content, the screens and the navigation of User Access Maintenance; a later change goes through the Change Management Register with its mandays. The screenshots use fictitious seed data only.
+This pack shows the proposed BRD-11 User Access Maintenance of BIBS, screen by screen, so that BDOI can confirm what it will get and sign it off. User Access Maintenance is a set of Drop 0 (Setup and Data Migration): it holds the users, the group profiles and the permissions that every other BRD checks, and it decides the menu each persona sees. The pack therefore shows the menu of every persona, and BDOI Information Security signs the role matrix and the separation-of-duties rules with the business owner, while BDOI IT signs the sign-in and identity integration assumptions. Signing freezes the content, the screens and the navigation of User Access Maintenance; a later change goes through the Change Management Register with its mandays. The screenshots use fictitious seed data only.
 
 # The pack at a glance
 

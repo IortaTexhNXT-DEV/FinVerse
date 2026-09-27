@@ -53,16 +53,16 @@ owners:
   CROSS: 'BIBS Product Owner, with the owners of the BRDs involved'
 
 severity_rule:
-  - ['High', 'The item changes what is built or how data is structured, affects money (premium, commission, GL, remittance), regulatory compliance, security or access, or leaves a requirement without a testable result. Resolve before the FRS of the area is signed off.']
-  - ['Medium', 'The item changes a rule, value, screen, report or test case, but a documented default can be built now and changed later by configuration or a small change.']
-  - ['Low', 'Document quality only (typing, numbering, headings, working notes, names). No effect on the build; correct it in the next BRD revision.']
+  - ['High', 'The item changes what the system does or how data is structured, affects money (premium, commission, GL, remittance), regulatory compliance, security or access, or leaves a requirement without a testable result. Resolve before the FRS of the area is signed off.']
+  - ['Medium', 'The item changes a rule, value, screen, report or test case, but a documented default can apply now and be changed later by configuration or a small change.']
+  - ['Low', 'Document quality only (typing, numbering, headings, working notes, names). No effect on the system; correct it in the next BRD revision.']
 
 type_rule:
   - ['Contradiction within BRD', 'Two statements in the same BRD pack cannot both be met.']
   - ['Conflict between BRDs', 'Two BRDs give different owners, values, roles or rules for the same thing.']
-  - ['Gap / missing detail', 'A value, list, layout or rule needed to build or test is missing or marked TBD.']
+  - ['Gap / missing detail', 'A value, list, layout or rule needed to specify or test is missing or marked TBD.']
   - ['Ambiguity', 'The text can be read in more than one way.']
-  - ['BRD vs platform', 'The BRD differs from BIBS as built or designed, or assumes a legacy system (EBIX, QPS, ISYS) that BIBS replaces.']
+  - ['BRD vs platform', 'The BRD differs from BIBS as specified in the FRS, or assumes a legacy system (EBIX, QPS, ISYS) that BIBS replaces.']
   - ['NFR inconsistency', 'Non-functional values (hours, availability, RPO / RTO, backup, retention, response time, session, password) differ within or between BRDs.']
   - ['Data / numbering issue', 'Duplicate, missing or misnumbered requirement IDs, or data values that do not add up.']
   - ['Document quality', 'Headings, names, dates, working notes, approvals or confidential content in the pack.']
@@ -79,7 +79,7 @@ priority:
   - [DCR-229, 'IGA (UIDM-ISC) against BRD-11 requests', 'Decides whether access requests stay in BIBS.']
   - [DCR-217, 'Go-live date and migration calendar', 'Fixes T, the freeze weekend and the trial-migration dates.']
   - [DCR-222, 'Architecture in the IER', 'The IER sizes and costs ten microservices, Aurora / Mongo and a portal tenant that BIBS does not have.']
-  - [DCR-227, 'Documents in S3 only', 'Build item ST0 / ST1 across every module that stores files.']
+  - [DCR-227, 'Documents in S3 only', 'Affects every module that stores files.']
   - [DCR-129, 'Renewal of submitted policies: boundary', 'Two BRDs specify the same renewal letters, hold cover and booking.']
   - [DCR-146, 'One LAMD intake or two', 'Loan status drives both renewal eligibility and submitted-policy buckets.']
   - [DCR-062, 'Online vs offline renewal disposition', 'Decides the AO disposition screens and the upload path.']
@@ -97,7 +97,7 @@ items:
   type: Contradiction within BRD
   sev: High
   desc: 'BRNB.029: "Quotation/Proposal creation must require a client code." BRNB.063: "Generate a quotation/proposal reference number creation without client code."'
-  impact: 'Business: walk-in and bank-referred prospects may not be quotable. Build: decides whether a prospect client code is created at quotation. Test: one of the two rows fails whichever rule is built.'
+  impact: 'Business: walk-in and bank-referred prospects may not be quotable. System: decides whether a prospect client code is created at quotation. Test: one of the two rows fails whichever rule applies.'
   modules: 'Quotation; Client (CRM)'
   resolution: 'Allow a quotation without a confirmed client, and create a prospect client code automatically at quotation (BRNB.029 then holds for the prospect code).'
   question: 'Can a quotation be created before the client exists? If yes, may BIBS create a prospect client code automatically at that point?'
@@ -109,7 +109,7 @@ items:
   type: Data / numbering issue
   sev: Medium
   desc: '"Reactivate cancelled placed accounts" is in the role matrix and in legacy BRD 2.1.16, but no BRNB ID carries it, so it is missing from the BRNB consolidation.'
-  impact: 'Build: the function is not traced to a governing requirement. Test: no acceptance criteria in the BRNB set.'
+  impact: 'System: the function is not traced to a governing requirement. Test: no acceptance criteria in the BRNB set.'
   modules: 'Placement'
   resolution: 'Add a BRNB ID for reactivation of cancelled placements, or confirm it is dropped.'
   question: 'Is reactivation of a cancelled placement in scope? If yes, please confirm the BRNB ID and who may reactivate.'
@@ -145,7 +145,7 @@ items:
   type: Ambiguity
   sev: High
   desc: 'Appendix A gives "PTX (Premium Tax) 12% of the Net Premium" for Fire, next to FST 2% and LGT. 12% is the VAT rate; the premium tax rate and base are not stated elsewhere.'
-  impact: 'Business: gross premium on quotations and invoices is wrong if the rate is wrong. Build: premium calculator and tax table. Test: expected premiums in test cases.'
+  impact: 'Business: gross premium on quotations and invoices is wrong if the rate is wrong. System: premium calculator and tax table. Test: expected premiums in test cases.'
   modules: 'Quotation; Product Maintenance (rates and taxes); Booking'
   resolution: 'Keep tax rates and bases in the Rates and Taxes master; seed them only after Comptrollership confirms.'
   question: 'For Fire, which taxes apply (VAT or premium tax, DST, FST, LGT), at what rate and on which base? Does BDOI compute them or copy the insurer''s figures?'
@@ -157,7 +157,7 @@ items:
   type: Ambiguity
   sev: High
   desc: 'OD / Theft cover formula gives two bases on one line: "81% of TSI" and "90% of TSI", without saying which applies when (new vs used vehicle, year of cover, multi-year).'
-  impact: 'Business: Motor premium differs by 9 points of TSI. Build: motor rating rule. Test: expected premiums.'
+  impact: 'Business: Motor premium differs by 9 points of TSI. System: motor rating rule. Test: expected premiums.'
   modules: 'Quotation; Product Maintenance'
   resolution: 'Model the OD / Theft base as a parameter per product and policy year until confirmed.'
   question: 'When does the OD / Theft base use 81% of TSI and when 90%? Is it tied to multi-year policies (year 2 onwards)?'
@@ -169,7 +169,7 @@ items:
   type: NFR inconsistency
   sev: Medium
   desc: 'The addendum sets 5 years online, 15 years offline, backup every 4 hours, backup retention 5 years (p.82). The main BRD says "Follow existing QPS set up" (p.212).'
-  impact: 'Build: retention and archive rules. The baseline applies the addendum (later document).'
+  impact: 'System: retention and archive rules. The baseline applies the addendum (later document).'
   modules: 'Platform (retention and archive)'
   resolution: 'Apply the addendum values (5 / 15 years, 4-hour backup, 5-year backup retention).'
   question: 'Please confirm that the addendum retention values replace "Follow existing QPS set up" for New Business.'
@@ -181,7 +181,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'BRD-1: "Receive warning 30 minutes prior to system triggered log out" after an inactivity warning at 15 minutes; it is unclear whether 30 minutes is an absolute session length. BRD-11 states "inactivity warning (15 minutes)" and "warning prior to system triggered log out (30 minutes)".'
-  impact: 'Build: session timer. Test: logout timing cases.'
+  impact: 'System: session timer. Test: logout timing cases.'
   modules: 'Security (sessions)'
   resolution: 'Inactivity log-out at 30 minutes with a warning at 15 minutes (SESSION_TIMEOUT_MINUTES = 30, SESSION_IDLE_WARNING_MINUTES = 15).'
   question: 'Confirm that the 30 minutes is inactivity, not a maximum session length.'
@@ -195,9 +195,9 @@ items:
   type: Conflict between BRDs
   sev: Medium
   desc: 'BRNB.018 asks for a "Late Renewal Requests Report" in New Business. The Renewal BRD has no such report, and Report List #182 "Late Renewal" is a TSU package report ("This should be under a separate TSU module").'
-  impact: 'Build: no owner for the report. Test: BRNB.018 cannot be accepted.'
+  impact: 'System: no owner for the report. Test: BRNB.018 cannot be accepted.'
   modules: 'Renewal; Reports'
-  resolution: 'Build it in Renewal as a variant of the renewal listing (renewals booked after expiry).'
+  resolution: 'Provide it in Renewal as a variant of the renewal listing (renewals booked after expiry).'
   question: 'Is the Late Renewal Requests Report still needed? If yes, is it the renewal listing filtered on late requests, and who uses it?'
   owner: 'Marketing and Processing - Renewal (RMEL)'
   status: Open
@@ -208,9 +208,9 @@ items:
   type: BRD vs platform
   sev: High
   desc: 'Four BRDs require New Business / Renewal classification from creation to the invoice and as a report filter. BIBS booking sets every invoice to NEW_BUSINESS (booking InvoiceBuilder, line 129).'
-  impact: 'Business: renewal production cannot be reported apart from new business. Build: shared change BT0 (account business type, invoice, report filters). Test: every booking and production report test.'
+  impact: 'Business: renewal production cannot be reported apart from new business. System: shared change BT0 (account business type, invoice, report filters). Test: every booking and production report test.'
   modules: 'Account; Booking; Reports; Renewal; Employee Benefits; Submitted Policies'
-  resolution: 'Build work item BT0 once for all three BRDs: business type on the account, carried to the invoice and used as a report filter.'
+  resolution: 'One business type on the account (BT0) for all three BRDs, carried to the invoice and used as a report filter.'
   question: 'Confirm the two values (New Business, Renewal) and that a renewal with changed terms stays a Renewal (BRRN.033).'
   owner: 'BIBS Product Owner, with the owners of the BRDs involved'
   status: Answered
@@ -223,9 +223,9 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: 'Main BRD: "Facility to allow User to edit the extracted file" and push it "with or without edit". Addendum 1: users "mark specific record or row for exclusion"; only non-excluded data is pushed; no editing of financial data.'
-  impact: 'Build: remittance extraction screen. The addendum governs.'
+  impact: 'System: remittance extraction screen. The addendum governs.'
   modules: 'Remittance'
-  resolution: 'Build exclusion only (no edit of financial fields), per Addendum 1.'
+  resolution: 'Exclusion only (no edit of financial fields), per Addendum 1.'
   question: 'None; recorded for traceability. BDOI to confirm the main-BRD wording is superseded.'
   status: Answered
   response: 'Operations Addendum 1 (p.3-4): exclusion instead of edit; "When the file is pushed to Disbursement, only non-excluded data" is sent.'
@@ -236,9 +236,9 @@ items:
   type: Data / numbering issue
   sev: Medium
   desc: 'ADJID.015 (persona "User", "Note: This is a Marketing activity") and MKTID.008 describe the same Endorsement Slip.'
-  impact: 'Build: one function, two IDs. Test: two rows cite one screen.'
+  impact: 'System: one function, two IDs. Test: two rows cite one screen.'
   modules: 'Adjustment'
-  resolution: 'Build the Endorsement Slip once, available to Marketing and Adjustment users.'
+  resolution: 'One Endorsement Slip, available to Marketing and Adjustment users.'
   question: 'Who prepares the Endorsement Slip: Marketing, the Adjustment unit, or both?'
   status: Open
   related: [OQ32]
@@ -249,7 +249,7 @@ items:
   type: Contradiction within BRD
   sev: High
   desc: 'RMTID.023 (Remittance) and PRCID.028 (Production Reconciliation) both automate the early-remittance incentive. PRCID.028 limits it to CLG / CBG motor and fire; RMTID.023 does not.'
-  impact: 'Business: incentive income may be computed twice or on the wrong lines. Build: one computation owner. Test: incentive amounts.'
+  impact: 'Business: incentive income may be computed twice or on the wrong lines. System: one computation owner. Test: incentive amounts.'
   modules: 'Remittance; Production Reconciliation; Commission'
   resolution: 'One computation in Remittance, with eligible lines as data (CLG / CBG motor and fire at go-live).'
   question: 'Is the early-remittance incentive one programme? Which lines and rates apply, and does the window start at inception or booking?'
@@ -261,7 +261,7 @@ items:
   type: Contradiction within BRD
   sev: High
   desc: 'Three minimal-balance rules: summary 5.f "Auto-reverse records with minimal balances (Php 10.00 and below) to AP overages"; CSHID.016 balances "<= Php 10.00" compared with PR2307; ADJID.026 "balances between 10.00 and 100.00 ... may be written off or credited". 10.00 is in both ranges.'
-  impact: 'Business: small balances post to different GL accounts. Build: cashiering and adjustment rules. Test: boundary cases at 10.00.'
+  impact: 'Business: small balances post to different GL accounts. System: cashiering and adjustment rules. Test: boundary cases at 10.00.'
   modules: 'Cashiering; Adjustment; FRBS / GL'
   resolution: 'Up to 9.99 auto-reversed to AP overages; 10.00-100.00 write-off or credit through an adjustment. Thresholds as parameters.'
   question: 'Please give one rule for small balances: the boundary at exactly 10.00, GL accounts, and who approves a write-off.'
@@ -273,7 +273,7 @@ items:
   type: Contradiction within BRD
   sev: High
   desc: 'RMTID.014 "Validate that paid AR is not more than" the DTIP balance: the expected result remits only the DTIP balance, while the acceptance criteria flag and exclude the account.'
-  impact: 'Business: remittance to insurers is capped or withheld. Build: remittance validation. Test: expected result differs.'
+  impact: 'Business: remittance to insurers is capped or withheld. System: remittance validation. Test: expected result differs.'
   modules: 'Remittance'
   resolution: 'Flag and exclude the account from the batch until resolved (acceptance criteria).'
   question: 'When paid AR is more than the DTIP balance, should BIBS remit the DTIP balance or exclude the account?'
@@ -285,7 +285,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'RMTID.019 "Validate remittance status upon submission" lists payment states (Unapplied Payment, With Outstanding Balance) together with remittance states.'
-  impact: 'Build: remittance status model. Test: status transitions.'
+  impact: 'System: remittance status model. Test: status transitions.'
   modules: 'Remittance'
   resolution: 'Keep payment state and remittance state as two separate fields.'
   question: 'Please confirm the remittance status list and who approves a remittance batch (TL / TH).'
@@ -297,7 +297,7 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: 'CSHID.007: "One OR per Remittance Batch number" and "OR is issued per individual payment unless consolidation" criteria are met. Key capability f: "one OR per settlement batch per Insurer".'
-  impact: 'Business: number of ORs issued for commission. Build: OR generation. Test: OR count.'
+  impact: 'Business: number of ORs issued for commission. System: OR generation. Test: OR count.'
   modules: 'Cashiering; Commission'
   resolution: 'One OR per remittance batch per insurer by default; individual OR as an option.'
   question: 'For commission received from insurers, which prevails: one OR per remittance batch, or one per payment?'
@@ -309,7 +309,7 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: '"Extension of Cover" is a financial endorsement with additional premium and approval (ADJID.002e, ADJID.010) and a non-financial endorsement (ADJID.004: "extensions of cover/clauses/warranties/deductibles are added").'
-  impact: 'Business: approval and premium may be skipped. Build: endorsement type list. Test: endorsement cases.'
+  impact: 'Business: approval and premium may be skipped. System: endorsement type list. Test: endorsement cases.'
   modules: 'Adjustment'
   resolution: 'Two types: "Extension of cover (period, with premium)" and "Additional clause / warranty (no premium)".'
   question: 'Please confirm the endorsement type list and who approves additional premium.'
@@ -322,9 +322,9 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'Values left open in the signed BRD: "Batch Run: TDB" (RMTID.001); "Standard naming convention: TBD" (PRCID.004); company-concerned list "to be provided" (PRCID.016); automatch frequency blank (PRCID.024 / 025); supporting document list blank (ADJID.025).'
-  impact: 'Build: defaults must be assumed. Test: no expected values.'
+  impact: 'System: defaults must be assumed. Test: no expected values.'
   modules: 'Remittance; Production Reconciliation; Adjustment'
-  resolution: 'Build each as a parameter or list with a documented default.'
+  resolution: 'Each as a parameter or list with a documented default.'
   question: 'Please give the remittance extraction schedule, the production register naming, the company-concerned list, the automatch frequency and the endorsement document list.'
   status: Open
   related: [OQ17, OQ29, OQ30, OQ31, OQ32]
@@ -334,7 +334,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'Trade, Direct Credit and CLPC files are "manually prepared by BU, send to IT, IT to run batch process - FS04", while Operations users upload payment files. The PDC list is an Excel upload and also "PDC from PMS".'
-  impact: 'Build: upload screen vs batch intake. Test: file intake cases.'
+  impact: 'System: upload screen vs batch intake. Test: file intake cases.'
   modules: 'Cashiering'
   resolution: 'Operations users upload all files in BIBS; a scheduled pick-up from FS04 can be added later.'
   question: 'Who loads each payment file (Operations or IT batch)? What is PMS? Please share sample files and layouts.'
@@ -358,7 +358,7 @@ items:
   type: Conflict between BRDs
   sev: Medium
   desc: 'BRD-2 treats Collection, Accounting, Disbursement, Marketing and Claims as other systems that Operations integrates with. BRD-4, BRD-5 and BRD-7 describe Collections, Accounting, Disbursement and Claims as functions inside the target system.'
-  impact: 'Build: in-app interfaces instead of external integrations.'
+  impact: 'System: in-app interfaces instead of external integrations.'
   modules: 'Cashiering; Remittance; Collections; Disbursement; FRBS / GL; Claims'
   resolution: 'Collections, Disbursement, FRBS and Claims are BIBS modules; Operations uses in-app ports.'
   question: 'Confirm that the Marketing (ISYS) link is the only external system left in BRQID.004.'
@@ -372,7 +372,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'MKTID (Marketing) and DBMID (Disbursement) rows are requirements on other units. BRD-4 covers only the 2307 and DP tagging dispositions; holds, special remittance, send-schedule and DP tagging at quotation (MKTID.001-009, 011) have no other BRD.'
-  impact: 'Build: the Marketing screens stay in the Operations build.'
+  impact: 'System: the Marketing screens stay in Operations.'
   modules: 'Remittance; Collections; Adjustment'
   resolution: 'MKTID.001-009 and 011 stay in Operations; MKTID.010 / 013 tagging moves to Collections dispositions.'
   question: 'Confirm that Marketing performs holds, special remittance requests and the schedule request inside BIBS.'
@@ -397,7 +397,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'The Commission Receivables volume table is headed "Volume and Performance - Adjustment / Endorsement" (copy error). Transaction volumes and growth rates are blank for every area.'
-  impact: 'Build: sizing assumed from BRD-1. Test: no volume targets for performance tests.'
+  impact: 'System: sizing assumed from BRD-1. Test: no volume targets for performance tests.'
   modules: 'Platform (sizing)'
   resolution: 'Size with the BRD-1 volumes plus Operations users.'
   question: 'Please give monthly transaction volumes and growth per Operations area.'
@@ -421,7 +421,7 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'The same functions are specified twice: CLPC payment matching before placement (BRNB.067 / 068) and CLPC payment upload (CSHID.008); endorsements and cancellation in booking (BRNB.076 / 081 / 094) and in Adjustment (ADJID.001 / 003 / 011); DP tagging (BRNB.114, MKTID.011).'
-  impact: 'Business: two owners for one process. Build: risk of two payment intakes and two endorsement paths. Test: duplicated cases.'
+  impact: 'Business: two owners for one process. System: risk of two payment intakes and two endorsement paths. Test: duplicated cases.'
   modules: 'Placement; Booking; Cashiering; Adjustment'
   resolution: 'Cashiering is the single payment intake and placement reads its result; Adjustment owns endorsements and cancellations after booking; Marketing raises the request.'
   question: 'Confirm Cashiering as the single payment intake, and who raises (Marketing) and processes (Adjustment) endorsements.'
@@ -434,7 +434,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'For 2307 cash payments CSHID.026 says only "Premium is reversed" and the remittance is processed, with no accounting entries. CSHID.027 / DBMID.001 give Dr PR2307 / Cr PR and Dr DTIP / Cr PR2307.'
-  impact: 'Business: GL entries for CWT unclear. Build: posting rules. Test: GL expected entries.'
+  impact: 'Business: GL entries for CWT unclear. System: posting rules. Test: GL expected entries.'
   modules: 'Cashiering; Remittance; FRBS / GL'
   resolution: 'Post Dr PR2307 / Cr PR on application and Dr DTIP / Cr PR2307 when the 2307 batch is released with the remittance.'
   question: 'Please give the entries for CSHID.026 and the moment Dr DTIP / Cr PR2307 is posted.'
@@ -459,7 +459,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'The pack holds an earlier signed version (pp.36-61). Its BRQID.008 required documented client negotiation before a new rate scheme applies to a renewal already advised. The final version drops it without a revision-log entry and keeps only "old packages locked for new business but accessible for renewals".'
-  impact: 'Business: a renewal could be repriced after the RA without client evidence. Build: renewal acceptance evidence.'
+  impact: 'Business: a renewal could be repriced after the RA without client evidence. System: renewal acceptance evidence.'
   modules: 'Product Maintenance; Renewal'
   resolution: 'BRRN.038 AC 3 (acceptance evidence when a renewal has a financial impact) covers the dropped rule; no separate Product Maintenance control.'
   question: 'Confirm that BRQID.008 was dropped on purpose and that BRRN.038 now governs.'
@@ -473,7 +473,7 @@ items:
   desc: 'Copied headings: the addendum is titled "Business Requirements for New Business" (p.3) and "Table of New Business Requirements" (p.4); its approval says "New Business Fire and Motor" (p.8); the main BRD approval says "for the OPERATIONS request" (p.34, p.59). Revision log: "Added BRID PMADD07 and PMADD07" (p.2); preparer date "11/06/205" (p.34).'
   impact: 'Approval record: the signatures refer to another BRD title.'
   modules: '-'
-  resolution: 'None for the build.'
+  resolution: 'None for the system.'
   question: 'Please confirm the approvals apply to Product Maintenance, and correct the headings in the next revision.'
   status: Open
   related: []
@@ -507,7 +507,7 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: 'BRPM.018 is titled "Placement Update Reports" but its result speaks of "Package Status Update Reports" of package creation. BRD-1 already has a Placement Update Report (BRNB.011).'
-  impact: 'Build: two reports with one name. Test: wrong report tested.'
+  impact: 'System: two reports with one name. Test: wrong report tested.'
   modules: 'Product Maintenance; Reports'
   resolution: 'Name it "Package Status Update Report", separate from the BRD-1 Placement Update Report.'
   question: 'Confirm BRPM.018 is a package status report and give its columns.'
@@ -520,7 +520,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'Persona "User": "User could be but not limited to Marketing AO, TSU, Processing. User roles and authorization will be further defined in succeeding documentations." MBS and ManCom are not defined in the final version.'
-  impact: 'Build: role-to-action matrix (PMADD05) has no agreed content. Test: access tests.'
+  impact: 'System: role-to-action matrix (PMADD05) has no agreed content. Test: access tests.'
   modules: 'Product Maintenance; User Access'
   resolution: 'Seed roles from the design persona list; BDOI confirms the matrix.'
   question: 'Please provide the Product Maintenance role-to-action matrix and the ManCom membership and decision rule.'
@@ -532,7 +532,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'The revision log of 27-Oct-2025 says "Exclude Non-Package and include this as part of an addendum". The April 2026 addendum does not add it; PMADD01 mentions "non-package items if/when added".'
-  impact: 'Build: scope of product maintenance for non-package products is undefined.'
+  impact: 'System: scope of product maintenance for non-package products is undefined.'
   modules: 'Product Maintenance'
   resolution: 'Non-package product maintenance out of this phase; non-package placement stays in New Business.'
   question: 'Confirm that maintenance of non-package products is out of scope for this phase.'
@@ -544,7 +544,7 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'Incentives are specified in four BRDs: criteria on the products matrix "(i.e. CPC2)" (BRD-3, no definition); CPC2 as package Fire / Motor incentive computed per remittance, and early incentive with service invoice and 2% withholding (BRD-5); No Touch, Top Up and Motor Mania schemes (BRD-2); incentive campaigns (BRD-4 draft rows). No BRD gives rates, tiers or targets.'
-  impact: 'Business: incentive income and pass-on to branches. Build: one incentive model across modules. Test: no expected values.'
+  impact: 'Business: incentive income and pass-on to branches. System: one incentive model across modules. Test: no expected values.'
   modules: 'Product Maintenance; Remittance; Commission; Collections; FRBS / GL'
   resolution: 'Criteria kept once in Product Maintenance; CPC2 and early incentive computed in Remittance; schemes in Commission reference the criteria.'
   question: 'Please list the incentive programmes (CPC2, early remittance, No Touch, Top Up, Motor Mania, campaigns) with rates, base, period, payer and whether each is billed by service invoice.'
@@ -570,9 +570,9 @@ items:
   type: Document quality
   sev: High
   desc: 'The pack holds two versions of the workshop addendum. The draft ("x of 14", pages 13-14 not in the pack) has BRCLXN.049-064. The signed version stops at BRCLXN.060. BRCLXN.061-064 (commission, incentive campaigns, mixed payments) are therefore not approved.'
-  impact: 'Business: scope of four requirements unclear. Build: rows designed as Draft. Test: no approved criteria.'
+  impact: 'Business: scope of four requirements unclear. System: rows specified as Draft. Test: no approved criteria.'
   modules: 'Collections; Commission'
-  resolution: 'Build BRCLXN.061-064 only after BDOI confirms them.'
+  resolution: 'Deliver BRCLXN.061-064 only after BDOI confirms them.'
   question: 'Are BRCLXN.061-064 in scope, and who owns them (Collections or Commission)? Please provide the signed version if it exists.'
   status: Open
   related: [CQ01, CQ19, CQ24]
@@ -596,7 +596,7 @@ items:
   type: Contradiction within BRD
   sev: High
   desc: 'FRID-001: outstanding premium receivable "at the Cover Number level". BRCLXN.001 (renumbering): "at the Invoice Number level". The change has no explanation.'
-  impact: 'Build: grain of the collection list and the threshold rule (BRCLXN.003). Test: list totals.'
+  impact: 'System: grain of the collection list and the threshold rule (BRCLXN.003). Test: list totals.'
   modules: 'Collections'
   resolution: 'Invoice level (the governing BRCLXN wording), with totals per account and client.'
   question: 'Confirm the invoice level, and whether the threshold applies per invoice, per account (ARN) or per client.'
@@ -609,7 +609,7 @@ items:
   type: Data / numbering issue
   sev: Low
   desc: 'BRCLXN.036 adds a field "BOOKER - Should be name of the booker" that FRID-036 does not have. FRID-045-048 have no RQ ID, and RQ IDs jump from RQID-031 to RQID-033.'
-  impact: 'Traceability only; the BOOKER field is built.'
+  impact: 'Traceability only; the BOOKER field is in BIBS.'
   modules: 'Collections'
   resolution: 'Follow the BRCLXN wording.'
   question: 'None; confirm BOOKER is the user who booked the invoice.'
@@ -622,7 +622,7 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: 'Stakeholder functions include "Export the disposition list" and "View and export unapplied payment lists". The Head of BDOI Operations wrote on the approval sheet that export and download from the UI "may lead to slowdown & performance issues" and "were not part of the original requirement".'
-  impact: 'Build: exports allowed or not. Test: export cases.'
+  impact: 'System: exports allowed or not. Test: export cases.'
   modules: 'Collections; Reports'
   resolution: 'Exports run as asynchronous jobs with row limits and a separate export permission.'
   question: 'May Collections users export lists? If yes, which roles?'
@@ -634,9 +634,9 @@ items:
   type: Contradiction within BRD
   sev: High
   desc: 'NFR 9.02: "For internal systems, concurrent open sessions should be allowed". NFR 10.07: "limit the number of concurrent sessions to a single device. An opened session to a different device will prompt a logoff on the previous device session."'
-  impact: 'Security: session policy. Build: session registry. Test: multi-device login cases.'
+  impact: 'Security: session policy. System: session registry. Test: multi-device login cases.'
   modules: 'Security (sessions)'
-  resolution: 'Session log built; the single-device rule is enforced only after BDOI confirms it (parameter, off by default).'
+  resolution: 'Session log kept; the single-device rule is enforced only after BDOI confirms it (parameter, off by default).'
   question: 'Is one active session per user (a new device logs off the old one) required, and for all BIBS users or Collections only?'
   status: Open
   related: [CQ23, UQ09, XQ11]
@@ -646,7 +646,7 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'BRD-4: "The system should not allow users to have multiple roles." BRD-11: "More than one user can be assigned to a role"; "User can have more than one role".'
-  impact: 'Security: segregation of duties. Build: role assignment rule.'
+  impact: 'Security: segregation of duties. System: role assignment rule.'
   modules: 'User Access; Security'
   resolution: 'Several roles per user allowed (BRD-11 governs access BIBS-wide); incompatible role pairs can be blocked as a segregation rule.'
   question: 'Confirm that the single-role rule is dropped, or name the role pairs that one user must not hold together.'
@@ -661,7 +661,7 @@ items:
   type: BRD vs platform
   sev: Medium
   desc: 'The BRD is written for EBIX, QPS and the Automated Payment System: "EBIX INVOICE NUMBER - Should be in this format - I00622656", cover number, QPS reference, BDOI SYS REF, and a daily "For Application To Invoice" file loaded to FS04 "before 6:00 AM". In BIBS, invoices have BIBS numbers and payments are applied in the application.'
-  impact: 'Build: validation of invoice numbers during migration. Test: field mapping.'
+  impact: 'System: validation of invoice numbers during migration. Test: field mapping.'
   modules: 'Collections; Cashiering'
   resolution: 'Accept BIBS invoice numbers, and legacy EBIX numbers only for migrated items; keep the FS04 file only if a downstream system still reads it.'
   question: 'After go-live, is the daily application file to FS04 still needed? How should legacy fields (cover no., QPS ref., BDOI SYS REF) map to BIBS?'
@@ -688,7 +688,7 @@ items:
   desc: 'Signed addendum: one Product Owner "for regularization - on leave", Head of Comptrollership "not required", two approvers "with signing". The CMS BRD sign-off approver block is unsigned; approval is by e-mail (p.64-65).'
   impact: 'Governance: approval evidence incomplete for one Product Owner.'
   modules: '-'
-  resolution: 'None for the build.'
+  resolution: 'None for the system.'
   question: 'Please complete the regularization signature.'
   status: Open
   related: []
@@ -735,7 +735,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'MKT 1.10.0: "Refund Request Form (for refund requests) - populate the below details:" and no list follows. The fields exist only on the Appendix D form images.'
-  impact: 'Build: mandatory fields of the RRF / RFP. Test: field validations.'
+  impact: 'System: mandatory fields of the RRF / RFP. Test: field validations.'
   modules: 'Marketing Requests; Disbursement'
   resolution: 'Use the Appendix D form fields as the field list.'
   question: 'Please confirm the mandatory RRF and RFP fields.'
@@ -759,7 +759,7 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: 'Main BRD FRBS 2.6.0: close previous-month GL books "every 2nd banking day of the current month". Addendum 1: close "on a preferred date and time in the current month". FRBS 2.6.1 still refers to the closing date of the previous month.'
-  impact: 'Business: month-end close. Build: closing validation. Test: closing-date cases.'
+  impact: 'Business: month-end close. System: closing validation. Test: closing-date cases.'
   modules: 'FRBS / GL'
   resolution: 'Manual close on a date chosen in the current month (Addendum 1); FRBS 2.6.1 validates against that date.'
   question: 'Confirm the closing rule and whether a closed month may be reopened.'
@@ -771,7 +771,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'Appendix A lists BIR Form 2550-M (monthly VAT) and payroll reports (SSS, 1601-C and others), although BIBS has no payroll. The last group ends with an unlabelled line "Referrers share in commission earned by BDOI. Computed at 2.5%/1% of fully paid commission", read as the service-fee definition.'
-  impact: 'Build: reports with no data source in BIBS. Test: report scope.'
+  impact: 'System: reports with no data source in BIBS. Test: report scope.'
   modules: 'FRBS / GL; Reports'
   resolution: 'Payroll reports out of scope; 2550-M kept only if BDOI still files it.'
   question: 'Is 2550-M still filed? Are payroll reports imported or out of scope? Confirm the service-fee definition.'
@@ -783,7 +783,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'Account funding requirements refer to the "Main BDOIR China bank account", funded "via Business Online banking (BOB)".'
-  impact: 'Build: bank account master and funding flow. Test: funding cases.'
+  impact: 'System: bank account master and funding flow. Test: funding cases.'
   modules: 'Disbursement'
   resolution: 'Bank accounts as master data; no bank name in code.'
   question: 'Which bank holds the main disbursement account, which accounts fund it, and are both approvers required in order?'
@@ -795,7 +795,7 @@ items:
   type: NFR inconsistency
   sev: Medium
   desc: 'Main BRD: availability, downtime, maintenance and BCP "Follow existing QPS/EBIX Setup". Addendum 1: availability 100%, maintenance 7PM to 7AM, BCP threshold less than 3 days. 100% is not a measurable service level.'
-  impact: 'Build: HA design. Test: availability cannot be verified at 100%.'
+  impact: 'System: HA design. Test: availability cannot be verified at 100%.'
   modules: 'Platform (availability)'
   resolution: 'Apply Addendum 1 with a measurable target (for example 99.9% in service hours).'
   question: 'Please give a measurable availability target for Accounting, Disbursement and ACSL.'
@@ -807,7 +807,7 @@ items:
   type: BRD vs platform
   sev: High
   desc: 'Current process: "A different invoice number is generated for transaction cancellations". ACSL 2.16.0 requires related transactions (booking, adjustment, cancellation) to be linked to a single invoice number. BIBS issues a new number per transaction.'
-  impact: 'Business: BIR invoice uniqueness vs one reference per policy. Build: invoice numbering and sub-ledger. Test: ACSL reconciliation.'
+  impact: 'Business: BIR invoice uniqueness vs one reference per policy. System: invoice numbering and sub-ledger. Test: ACSL reconciliation.'
   modules: 'Booking; Adjustment; ACSL'
   resolution: 'Keep a new BIR-compliant number per document, linked to a root invoice number shown on every related transaction.'
   question: 'Is a root invoice number that links related transactions acceptable, or must the same invoice number be reused?'
@@ -819,9 +819,9 @@ items:
   type: Document quality
   sev: Medium
   desc: 'The role matrices lost their tick marks in the digital pages and were read from the scanned copies; a few ticks are ambiguous.'
-  impact: 'Build: role grants. Test: access tests.'
+  impact: 'System: role grants. Test: access tests.'
   modules: 'FRBS / GL; Disbursement; Marketing Requests; ACSL; User Access'
-  resolution: 'Roles built from the scans; BDOI confirms.'
+  resolution: 'Roles taken from the scans; BDOI confirms.'
   question: 'Please confirm the role matrices, and that the verifier must differ from the maker.'
   status: Open
   related: [AQ28, OQ48]
@@ -831,7 +831,7 @@ items:
   type: Document quality
   sev: Low
   desc: 'The Business and System Administration table is headed "Accounting Controls and Subsidiary Ledger (ACSL) Unit Business Requirements". "Edit beginning check series" reads "User should be able to add edit series".'
-  impact: 'None on the build.'
+  impact: 'None on the system.'
   modules: '-'
   resolution: 'None.'
   question: 'None; correct in the next revision.'
@@ -844,7 +844,7 @@ items:
   type: Document quality
   sev: Low
   desc: 'Working notes are left in the signed main BRD: "Discussed - 11/20/2025" (p.58), "Start here - next meeting" (p.76), "Type text here" (p.78), "Resume here" (p.84).'
-  impact: 'None on the build; shows the text was edited after the May 2025 signature.'
+  impact: 'None on the system; shows the text was edited after the May 2025 signature.'
   modules: '-'
   resolution: 'None.'
   question: 'Please confirm that the signed text is final and remove the notes in the next revision.'
@@ -856,9 +856,9 @@ items:
   type: Contradiction within BRD
   sev: High
   desc: 'BRRN.018: "Dispositioning is performed outside the system, and the system''s role is to accept a batch upload". The main BRD is "RMEL Phase 2 - Online Dispositioning" with AO disposition screens (2.004).'
-  impact: 'Business: where AOs record dispositions. Build: disposition screens and upload. Test: both paths.'
+  impact: 'Business: where AOs record dispositions. System: disposition screens and upload. Test: both paths.'
   modules: 'Renewal'
-  resolution: 'Build both: online disposition for AOs and batch upload for bulk segments (CLG, insurer files).'
+  resolution: 'Provide both: online disposition for AOs and batch upload for bulk segments (CLG, insurer files).'
   question: 'Which segments disposition online and which by uploaded file? Who prepares the file and in which layout?'
   status: Open
   related: [RQ14, RQ15]
@@ -868,7 +868,7 @@ items:
   type: Contradiction within BRD
   sev: High
   desc: 'BRRN.021: "Extraction does not automatically trigger renewal"; accounts do not progress "without explicit user initiation". BRRN.035: an "Approve / Renew As Is" insurer response advances the renewal "without manual user action"; BRRN.031 / 039 / 040 require straight-through processing.'
-  impact: 'Business: control over renewal start. Build: workflow triggers. Test: STP scenarios.'
+  impact: 'Business: control over renewal start. System: workflow triggers. Test: STP scenarios.'
   modules: 'Renewal'
   resolution: 'Explicit initiation step after extraction (CLG in bulk, Non-Mortgage individually); straight-through processing only after initiation.'
   question: 'Confirm: initiation is always manual, and every step after initiation may run without user action. Is CBG STP initiated automatically?'
@@ -880,7 +880,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'BRRN.025 sets the NRNS reminder "at the defined follow-up checkpoint (e.g., +90 days)" and "at the defined checkpoint (e.g., +90 days before expiry)".'
-  impact: 'Build: reminder schedule. Test: reminder dates.'
+  impact: 'System: reminder schedule. Test: reminder dates.'
   modules: 'Renewal; Notifications'
   resolution: 'Checkpoint as a parameter in days before expiry, default 90.'
   question: 'Is the NRNS checkpoint 90 days before expiry, and what does "not yet submitted" mean?'
@@ -904,7 +904,7 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: 'In the Processing Officer section the requirement reads "Log in with a Operations Team Leader user profile" and the result "Processing Team Leader user profile". The RA encryption item (x.010.7.1) exists for the other personas but not for the Processing Officer, although BRRN.010 applies to all.'
-  impact: 'Build: role of the Processing Officer; RA protection. Test: access and encryption cases.'
+  impact: 'System: role of the Processing Officer; RA protection. Test: access and encryption cases.'
   modules: 'Renewal; User Access'
   resolution: 'Processing Officer logs in with its own profile; RA encryption applies to every persona (BRRN.010).'
   question: 'Confirm the Processing Officer profile and that RA encryption applies to Processing Officers.'
@@ -916,7 +916,7 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: 'Requirement 2.004.9 locks accounts after RA generation ("account should be locked on the marketing side"); its result reads "User should be able to provide disposition and edit locked accounts".'
-  impact: 'Build: edit lock. Test: expected result inverted.'
+  impact: 'System: edit lock. Test: expected result inverted.'
   modules: 'Renewal'
   resolution: 'Locked accounts cannot be edited by Marketing; the negative scenario is the test.'
   question: 'What unlocks an account after RA generation, and may Processing still edit it?'
@@ -942,7 +942,7 @@ items:
   desc: 'The Unit Head Combank / Corbank approved the main BRD "with email approval (see attached)"; the e-mail is not in the pack. The Head of Comptrollership line is blank (p.189).'
   impact: 'Governance: approval evidence incomplete.'
   modules: '-'
-  resolution: 'None for the build.'
+  resolution: 'None for the system.'
   question: 'Please add the approval e-mail to the pack.'
   status: Open
   related: []
@@ -952,7 +952,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'The summary counters include "For ARF", "Renew to TSU", "Disapproved Accounts" and "unrenewed ... to other bank", which no disposition, reason or step in the BRD produces. ARF is not defined.'
-  impact: 'Build: counters cannot be computed. Test: counter values.'
+  impact: 'System: counters cannot be computed. Test: counter values.'
   modules: 'Renewal; Reports'
   resolution: 'Counters mapped to renewal stages; unmapped counters show zero until defined.'
   question: 'Please define each of the 34 counters, including For ARF, Renew to TSU, Disapproved and to Other Bank.'
@@ -964,7 +964,7 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: 'Availability, downtime, maintenance, DR, retention and anonymisation are "Follow existing QPS set up", while Addendum 1 states "Requirements referencing BDOIsys, EBIX, or QPS ... are excluded".'
-  impact: 'Build: no NFR values for Renewal. Test: no targets.'
+  impact: 'System: no NFR values for Renewal. Test: no targets.'
   modules: 'Platform'
   resolution: 'Apply the BIBS-wide NFR set once agreed (DCR-133 to DCR-139).'
   question: 'Please give the Renewal NFR values (availability, maintenance, DR, retention).'
@@ -976,7 +976,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'BRRN.010 treats sending the RA "outside BDOI''s approved domains or without TLS" as a data-privacy violation, but clients use any e-mail domain.'
-  impact: 'Build: recipient policy for RA e-mails. Test: sending rules.'
+  impact: 'System: recipient policy for RA e-mails. Test: sending rules.'
   modules: 'Renewal; Notifications'
   resolution: 'Send to the registered client e-mail over TLS; restrict only internal copies to BDO domains.'
   question: 'What are the "approved domains"? Is the RA sent to the client, the AO or the bank unit?'
@@ -988,7 +988,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: '"Non-renewable Accounts" is both a reason the AO selects (2.004.4.9) and a system tag (BRRN.009, 3.004.4) that triggers the NFR letter.'
-  impact: 'Build: reason list vs tag. Test: NFR letter trigger.'
+  impact: 'System: reason list vs tag. Test: NFR letter trigger.'
   modules: 'Renewal'
   resolution: 'System tag from the non-renewable risk codes; AO reason kept for manual cases.'
   question: 'Is the NFR sent automatically on the system tag without review? Is NFR the same letter as NRL?'
@@ -1000,7 +1000,7 @@ items:
   type: BRD vs platform
   sev: Low
   desc: 'BRRN.004 / 011 require one scrollable view with no pagination. The BDO UX guidelines use a pager ("Showing 1 to n of N").'
-  impact: 'Build: grid pattern. Test: large list performance.'
+  impact: 'System: grid pattern. Test: large list performance.'
   modules: 'Renewal'
   resolution: 'Virtualised grid with a row count, no pager.'
   question: 'Is a virtualised scrollable grid with a total row count acceptable?'
@@ -1012,7 +1012,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'Addendum 1 excludes requirements that reference BDOIsys, EBIX or QPS, but policies booked in EBIX / QPS that expire after go-live are not in BIBS. No requirement covers loading them for renewal.'
-  impact: 'Business: first-year renewals of legacy policies could be missed. Build: one-time load of expiring policies. Test: renewal list completeness.'
+  impact: 'Business: first-year renewals of legacy policies could be missed. System: one-time load of expiring policies. Test: renewal list completeness.'
   modules: 'Renewal; Data migration'
   resolution: 'One-time load of policies expiring in the first 12 months after go-live, keyed by the EBIX invoice number.'
   question: 'Is a load of expiring legacy policies required? From which system, and for how many months of expiry?'
@@ -1025,7 +1025,7 @@ items:
   type: Document quality
   sev: Low
   desc: 'The Renewal workshop addendum table is titled "Table of New Business Requirements" (p.4). Addendum 1 pages are headed "Renewal Addendum" while the approval text says "RMEL Phase 2 - Online Dispositioning request".'
-  impact: 'None on the build.'
+  impact: 'None on the system.'
   modules: '-'
   resolution: 'None.'
   question: 'None; correct in the next revision.'
@@ -1050,7 +1050,7 @@ items:
   type: Ambiguity
   sev: High
   desc: 'The "Requested Type of Settlement" values are outcomes (e.g. "Closed - Denied", "Settled - LOA Issued"). The overview lists "Settlement Types" and "Settlement Status" separately, and p.27 / p.28 ask to "Maintain Settlement Type Status values" with no ID and no values.'
-  impact: 'Business: claim closure and reporting. Build: status and settlement model. Test: closure cases.'
+  impact: 'Business: claim closure and reporting. System: status and settlement model. Test: closure cases.'
   modules: 'Claims'
   resolution: 'One settlement-type list with a "closes claim" flag, maintained as a list of values.'
   question: 'Are settlement type and settlement status one list or two? Which values close the claim?'
@@ -1062,7 +1062,7 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: 'Claims Officers "Tag closures as temporary or permanent" (p.28, BRCLM.035), while closing a claim is a Team Head / Team Lead permission (BRCLM.005).'
-  impact: 'Build: closure permissions. Test: access cases.'
+  impact: 'System: closure permissions. Test: access cases.'
   modules: 'Claims'
   resolution: 'Officers set temporary closure; TL / TH close permanently and reopen.'
   question: 'Who may close a claim permanently, and who may reopen it?'
@@ -1074,7 +1074,7 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: 'Audit logs are archived "16 years" while every record type is purged "after 15 years". The table header says "Values on the table are sample requirements you can use" (also the capacity table, p.39).'
-  impact: 'Build: retention rules; whether the values are binding. Test: purge cases.'
+  impact: 'System: retention rules; whether the values are binding. Test: purge cases.'
   modules: 'Claims; Platform (retention)'
   resolution: 'Treat the values as requirements; audit logs purged after 16 years.'
   question: 'Are the capacity and retention values requirements or samples? Is the audit-log archive 15 or 16 years?'
@@ -1085,8 +1085,8 @@ items:
   loc: 'Overview and assumptions (p.23)'
   type: BRD vs platform
   sev: Medium
-  desc: 'The BRD asks for "a facility in eBIX" and assumes "the existing claims module is functional and can be enhanced"; assumption 3: "Data migration and integration with existing systems will be seamless". In BIBS the broker claims module is a new build; the platform''s insurer-side claims module does not fit a broker.'
-  impact: 'Build: new module; claims history must be migrated. Test: migration.'
+  desc: 'The BRD asks for "a facility in eBIX" and assumes "the existing claims module is functional and can be enhanced"; assumption 3: "Data migration and integration with existing systems will be seamless". In BIBS the broker claims module is a new module; the platform''s insurer-side claims module does not fit a broker.'
+  impact: 'System: new module; claims history must be migrated. Test: migration.'
   modules: 'Claims; Data migration'
   resolution: 'New broker claims module; open and historical claims migrated from EBIX / ISYS.'
   question: 'Which open and historical claims (years, format) must be migrated?'
@@ -1098,7 +1098,7 @@ items:
   type: Document quality
   sev: Low
   desc: 'ID printed "1BRCLM.004"; BRCLM.027, 029 and 030 have no process component; the glossary and references page is empty (CNR, CASA, LOA, PLA, CRF undefined); a reviewer name is printed "Dan Ace Cəuton".'
-  impact: 'None on the build; acronyms need a glossary.'
+  impact: 'None on the system; acronyms need a glossary.'
   modules: 'Claims'
   resolution: 'None.'
   question: 'Please expand CNR and CASA.'
@@ -1110,7 +1110,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'The workshop addendum "does not introduce a change in project scope", yet it adds seven must-have requirements (multi-location, claims-prone locations, insurer updates, location references, several insurer claim numbers).'
-  impact: 'Business: scope baseline. Build: BRCLM.037-043 are baselined in scope.'
+  impact: 'Business: scope baseline. System: BRCLM.037-043 are baselined in scope.'
   modules: 'Claims'
   resolution: 'Treat BRCLM.037-043 as in scope.'
   question: 'Confirm BRCLM.037-043 are in scope for the first release.'
@@ -1122,7 +1122,7 @@ items:
   type: Conflict between BRDs
   sev: Medium
   desc: 'The Report List names ISYS as source of the claims reports and adds fields (adjuster appointed, loss reserve, paid to date, last action date) and age brackets 0-30 / 31-60 / 61-90 / 91-180 / 181+ that the Claims BRD does not list. The BRD sends report files to a "Shared Drive" (p.39-40).'
-  impact: 'Build: report layouts and delivery. Test: report columns.'
+  impact: 'System: report layouts and delivery. Test: report columns.'
   modules: 'Claims; Reports'
   resolution: 'BIBS replaces ISYS for claims reports; columns from both documents; files kept in BIBS.'
   question: 'Does BIBS replace ISYS for claims reporting? Confirm the columns and aging brackets and whether files must be placed on a shared drive.'
@@ -1135,7 +1135,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'BRCLM.001 blocks a claim on unpaid premium by disabling the "Claims Authorization Code", which is not defined (EBIX function, code to the insurer, or internal approval), nor is "unpaid" (any invoice of the policy year, the invoice covering the loss date, instalments, direct payment).'
-  impact: 'Business: valid claims could be blocked. Build: premium validation rule. Test: claim intake cases.'
+  impact: 'Business: valid claims could be blocked. System: premium validation rule. Test: claim intake cases.'
   modules: 'Claims; Collections'
   resolution: 'Block when the invoice covering the loss date has an outstanding balance, with TL / TH override and reason.'
   question: 'What is the Claims Authorization Code, which unpaid invoices block a claim, and may a TL / TH override?'
@@ -1147,7 +1147,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'Claims statuses include "With BDOI - For Transmittal of Settlement Check", but no BRD says whether claim money ever passes through BDOI (cheque payable to BDOI, fund transfer) or what is recorded for the transmittal.'
-  impact: 'Business: cash handling. Build: Cashiering and Disbursement flows only if money passes through BDOI. Test: settlement cases.'
+  impact: 'Business: cash handling. System: Cashiering and Disbursement flows only if money passes through BDOI. Test: settlement cases.'
   modules: 'Claims; Cashiering; Disbursement'
   resolution: 'No claim money through BDOI; record cheque number, bank, amount and received / released dates only.'
   question: 'Does BDOI ever receive or pay claim money? What must be recorded when transmitting a settlement cheque?'
@@ -1161,7 +1161,7 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: 'BRID-001 sends the renewal advice "at a defined period (e.g., 180 days)" before expiry; the TAT annex says "Send renewal notice to client: 135 days prior to inception date".'
-  impact: 'Build: RA schedule. Test: RA dates.'
+  impact: 'System: RA schedule. Test: RA dates.'
   modules: 'Employee Benefits; Notifications'
   resolution: 'Lead time as a parameter, default 135 days (the specific value).'
   question: 'Is the EB renewal advice sent 180 or 135 days before expiry? How many reminders?'
@@ -1173,7 +1173,7 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: 'The BRID-008 negative scenario treats a BOR uploaded for a renewal transaction as invalid, while both flow charts request the BOR in the renewal lane.'
-  impact: 'Build: BOR validation. Test: renewal with BOR.'
+  impact: 'System: BOR validation. Test: renewal with BOR.'
   modules: 'Employee Benefits; Documents'
   resolution: 'BOR required for new business and for renewals being remarketed to other insurers.'
   question: 'When is a Broker on Record needed for a renewal: never, when remarketing, or always?'
@@ -1185,7 +1185,7 @@ items:
   type: Contradiction within BRD
   sev: Low
   desc: 'The addendum states "BRID-0028 as high risks account is not applicable to Employee Benefits", but BRID-028 remains in the main BRD and in the current role matrix.'
-  impact: 'Build: none (OUT).'
+  impact: 'System: none (OUT).'
   modules: 'Employee Benefits'
   resolution: 'BRID-028 out of scope.'
   question: 'Confirm that no high-risk handling applies to EB.'
@@ -1198,7 +1198,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'The addendum flow adds steps not in the main flow and without requirement rows: franchise approval before TOR release, and an ISACOM approval "if the policy will be awarded to a non-accredited provider". ISACOM and franchise are not defined.'
-  impact: 'Build: approval steps. Test: no criteria.'
+  impact: 'System: approval steps. Test: no criteria.'
   modules: 'Employee Benefits'
   resolution: 'Franchise approval and ISACOM approval as optional workflow steps, off until defined.'
   question: 'What is ISACOM and when is its approval needed? What is a franchise, and is it needed for the incumbent?'
@@ -1222,7 +1222,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'The EB usage table gives users only (Marketing 13, Processing 4, Collection 3); transaction volume, growth and expected response time are blank. Peak hours are written "08:30 - 07:00pm". Insurer and client portal users are not sized.'
-  impact: 'Build: portal sizing. Test: no response-time target.'
+  impact: 'System: portal sizing. Test: no response-time target.'
   modules: 'Employee Benefits; Insurer / Client Portal'
   resolution: 'Apply the BIBS response-time target; size the portal after EBQ13.'
   question: 'Please give response times, and the number of insurer and client portal users.'
@@ -1234,7 +1234,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'The executive summary cites internal guidelines "MIS Credit / no payment no booking on adjustment"; no requirement row defines them.'
-  impact: 'Business: booking of member movements. Build: adjustment booking rule.'
+  impact: 'Business: booking of member movements. System: adjustment booking rule.'
   modules: 'Employee Benefits; Adjustment; Booking'
   resolution: 'Book a member-movement adjustment only after payment, when the guideline applies.'
   question: 'What is "MIS Credit", and does "no payment no booking" apply to every EB adjustment?'
@@ -1246,7 +1246,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'EB handles employee master lists and utilization reports (health-related data). The BRD has no data-privacy requirement (access, masking, retention) beyond password protection of outbound files.'
-  impact: 'Business: Data Privacy Act exposure. Build: access classes and masking. Test: privacy tests.'
+  impact: 'Business: Data Privacy Act exposure. System: access classes and masking. Test: privacy tests.'
   modules: 'Employee Benefits; Documents; Insurer / Client Portal'
   resolution: 'Treat master lists and utilization as sensitive personal information: need-to-know access classes, download logging, encryption.'
   question: 'Please confirm the access, masking and retention rules for member data and utilization reports.'
@@ -1258,7 +1258,7 @@ items:
   type: Document quality
   sev: Low
   desc: 'Revision log starts "February 04,2025" (other entries 2026); an input date reads "11/124/2025"; the TAT annex still says "Booking in EBIX".'
-  impact: 'None on the build.'
+  impact: 'None on the system.'
   modules: '-'
   resolution: 'None.'
   question: 'None; correct in the next revision.'
@@ -1270,7 +1270,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'EB gives insurers and clients "secure access to the system". These are the first external users of BIBS. No BRD defines their hosting, authentication (MFA), who creates and approves them, or several users per insurer / client. BRD-11 covers internal users only.'
-  impact: 'Security: internet-facing access. Build: portal realm and user provisioning. Test: security tests.'
+  impact: 'Security: internet-facing access. System: portal realm and user provisioning. Test: security tests.'
   modules: 'Insurer / Client Portal; User Access; Security'
   resolution: 'Portal users provisioned through User Access requests as external users (decision D7); hosting and MFA per BDO Information Security.'
   question: 'Who creates and approves portal users? Hosting (DMZ), MFA and password policy for external users?'
@@ -1283,7 +1283,7 @@ items:
   type: BRD vs platform
   sev: Medium
   desc: 'EB benefit lines include HMO, whose providers are not insurance companies. BIBS holds placement counterparties as insurers in the catalog.'
-  impact: 'Build: catalog party type and commission rates for HMO providers.'
+  impact: 'System: catalog party type and commission rates for HMO providers.'
   modules: 'Product Maintenance; Employee Benefits'
   resolution: 'Hold HMO providers in the insurer master with a provider type.'
   question: 'Please list the EB benefit lines and confirm HMO providers are held with the insurers.'
@@ -1333,7 +1333,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'Agents must see statuses "Pending", "Awaiting", "Booked" and "Open / Closed". Pending and Awaiting are not defined, nor mapped to account or invoice states.'
-  impact: 'Build: status mapping. Test: expected status.'
+  impact: 'System: status mapping. Test: expected status.'
   modules: 'Customer Servicing'
   resolution: 'Map to BIBS account and invoice states in the CSF design; BDOI confirms.'
   question: 'Please define Pending, Awaiting, Booked, Open and Closed.'
@@ -1345,7 +1345,7 @@ items:
   type: Contradiction within BRD
   sev: High
   desc: 'BRCSF-011.001: "Initiate a back-up every 15minutes". The retention table: backup "Every 4 hours"; RPO 4 hours.'
-  impact: 'Build: backup and WAL archiving design for the whole platform. Test: recovery tests.'
+  impact: 'System: backup and WAL archiving design for the whole platform. Test: recovery tests.'
   modules: 'Platform (backup)'
   resolution: 'Continuous WAL archiving (15 minutes or better) with 4-hourly base backups meets both.'
   question: 'Is the 15-minute backup a BIBS-wide requirement (RPO 15 minutes) or specific to CSF data?'
@@ -1357,7 +1357,7 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: 'Users work "Between 6:00 AM - 10:00 PM"; maintenance "During weekdays and Saturdays, 9:00 PM to 5:00" AM. The window overlaps usage from 21:00 to 22:00.'
-  impact: 'Build: maintenance scheduling.'
+  impact: 'System: maintenance scheduling.'
   modules: 'Platform'
   resolution: 'Maintenance from 22:00.'
   question: 'Confirm the maintenance window and Sunday usage.'
@@ -1369,7 +1369,7 @@ items:
   type: BRD vs platform
   sev: High
   desc: 'The BRD describes a front end over QPS and EBIX that writes contact updates back to them. In BIBS the data sources are BIBS modules; QPS / EBIX stay systems of record only during coexistence.'
-  impact: 'Build: write-back interface to legacy systems. Test: coexistence cases.'
+  impact: 'System: write-back interface to legacy systems. Test: coexistence cases.'
   modules: 'Customer Servicing; Client (CRM)'
   resolution: 'Contact updates in BIBS, queued for QPS / EBIX in an outbox during coexistence.'
   question: 'Until when are QPS and EBIX systems of record? Must updates be written back, and must CSF show accounts that exist only in QPS / EBIX?'
@@ -1406,7 +1406,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'SNSRP-404 persona is "Investigator", but the criteria re-assign "to another eligible reviewer/approver", which suggests a coordinator role.'
-  impact: 'Build: re-assignment permission. Test: access cases.'
+  impact: 'System: re-assignment permission. Test: access cases.'
   modules: 'Sanction Screening'
   resolution: 'Re-assignment by the Unit Compliance Coordinator; investigators may hand back their own cases.'
   question: 'May investigators re-assign their own cases, or only the coordinator / team lead?'
@@ -1418,7 +1418,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'The AML Committee is plural in the process, but SNSRP-704 describes one member''s decision; the decision rule is not given.'
-  impact: 'Build: committee approval step. Test: approval cases.'
+  impact: 'System: committee approval step. Test: approval cases.'
   modules: 'Sanction Screening'
   resolution: 'Any one member decides until a rule is given; rule as a parameter.'
   question: 'Does the AML Committee decide by any member, majority, all members or a quorum?'
@@ -1430,9 +1430,9 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'The current PEP screening notes "Applicable for Corporate only" under the NLDS validation step. The PEP source for individual clients is not stated.'
-  impact: 'Compliance: PEP coverage for individuals. Build: list sources.'
+  impact: 'Compliance: PEP coverage for individuals. System: list sources.'
   modules: 'Sanction Screening'
-  resolution: 'Screen individuals and corporates against the same lists; NLDS kept as a parked source.'
+  resolution: 'Screen individuals and corporates against the same lists; NLDS kept as a source on hold.'
   question: 'Which list is used for PEP screening of individual clients?'
   status: Open
   related: [SANC-SQ01]
@@ -1442,7 +1442,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'Investigators: 287 maximum and 287 concurrent users (KYC uploads) and 120 / 120 (case review). A concurrency equal to the named population is unusual, and the investigators are not identified.'
-  impact: 'Build: sizing and role provisioning. Test: load tests.'
+  impact: 'System: sizing and role provisioning. Test: load tests.'
   modules: 'Sanction Screening; User Access'
   resolution: 'Size for 287 named users with normal concurrency.'
   question: 'Who are the 287 investigators (AOs, branch staff), and is 287 concurrent a real load target?'
@@ -1454,7 +1454,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'BSP M-2025-017 (adverse media) is cited and EDD appears in the benefits, but no requirement ID covers adverse-media screening or defines an EDD template (only "KYC Review / Enhanced Due Diligence" in SNSRP-303).'
-  impact: 'Compliance scope. Build: list types and review templates.'
+  impact: 'Compliance scope. System: list types and review templates.'
   modules: 'Sanction Screening'
   resolution: 'Adverse media as a manual list source; EDD as a review template type.'
   question: 'Is adverse-media screening in scope? Please give the EDD template fields.'
@@ -1466,9 +1466,9 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'BRD-10 sets PEP and high-risk tags and opens review cases, but does not say whether an open match blocks quotation, placement or booking. BRD-6: KYC "does not automatically block, stop, or reroute renewal processing". BRD-1 tags (BRNB.091) are warnings.'
-  impact: 'Compliance: business with a possible sanctioned party. Build: client compliance gate. Test: blocking cases.'
+  impact: 'Compliance: business with a possible sanctioned party. System: client compliance gate. Test: blocking cases.'
   modules: 'Sanction Screening; Client (CRM); Quotation; Placement; Booking; Renewal'
-  resolution: 'Warn by banner; a block is built behind a parameter, off by default.'
+  resolution: 'Warn by banner; a block is available behind a parameter, off by default.'
   question: 'While a potential or true match is open, must BIBS block or only warn on quotation, placement, booking and renewal?'
   owner: 'Compliance (Chief Compliance Officer)'
   status: Open
@@ -1492,7 +1492,7 @@ items:
   type: Ambiguity
   sev: High
   desc: 'The BRD is the "QPS User Access Maintenance Module" (April 2025); scope, definitions and overview refer to QPS (Quotation and Pre-processing System) only.'
-  impact: 'Build: whether one access process covers every BIBS module and persona.'
+  impact: 'System: whether one access process covers every BIBS module and persona.'
   modules: 'User Access'
   resolution: 'Apply BRD-11 to BIBS as a whole.'
   question: 'Confirm that BRD-11 applies to all of BIBS, not only the quotation and pre-processing screens.'
@@ -1504,7 +1504,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'The 160 requirement lines have no acceptance criteria and no high-risk flags; the NFR ID column is empty; almost every infrastructure NFR is "Follow existing QPS set up" and retention is "Follow QPS retention policy".'
-  impact: 'Test: acceptance criteria must be written by the project. Build: NFR values unknown.'
+  impact: 'Test: acceptance criteria must be written by the project. System: NFR values unknown.'
   modules: 'User Access; Platform'
   resolution: 'FRS writes acceptance criteria for BDOI concurrence; NFR IDs UAM-NFR-01 to 41 assigned by the analyst.'
   question: 'Please concur with the acceptance criteria in the FRS, and give the QPS retention values.'
@@ -1528,7 +1528,7 @@ items:
   type: BRD vs platform
   sev: Medium
   desc: 'The diagram shows the system granting user access on approval, but the System Administrator creating or modifying group profiles after approval. BIBS today applies both on approval.'
-  impact: 'Build: FOR_IMPLEMENTATION step for group profiles. Test: approval cases.'
+  impact: 'System: FOR_IMPLEMENTATION step for group profiles. Test: approval cases.'
   modules: 'User Access'
   resolution: 'User access applied on approval; group-profile changes wait for the System Administrator to implement (parameter to apply on approval).'
   question: 'Must the System Administrator implement approved group-profile changes by hand?'
@@ -1540,7 +1540,7 @@ items:
   type: BRD vs platform
   sev: Medium
   desc: 'NFR 1.j: "Supports user id of at least ten (10) alphanumeric characters in length, supports ''a999999999'' format". BIBS accepts 3 to 50 characters of letters, digits, dot, underscore and hyphen.'
-  impact: 'Build: user ID validation. Test: user creation.'
+  impact: 'System: user ID validation. Test: user creation.'
   modules: 'User Access; Security'
   resolution: 'Parameter USER_ID_PATTERN (default a999999999) for new users; existing service users exempt.'
   question: 'Is the user ID the employee number in the a999999999 format, and how does it relate to the Windows ID?'
@@ -1551,8 +1551,8 @@ items:
   loc: 'Other BU NFR 6 (p.17)'
   type: BRD vs platform
   sev: Medium
-  desc: 'NFR 6 requires logging of user log-in and log-out. BIBS records log-in and failed log-in, but has no log-out endpoint, so log-out is not recorded.'
-  impact: 'Audit: session history incomplete. Build: log-out endpoint and session log.'
+  desc: 'NFR 6 requires logging of user log-in and log-out. The session log must record the log-out as well as the log-in and failed log-in.'
+  impact: 'Audit: session history complete only when the log-out is recorded. System: log-out recorded in the session log.'
   modules: 'Security; User Access'
   resolution: 'Add log-out and a session log (also used for the single-session question).'
   question: 'None; confirm the audit log report columns.'
@@ -1566,7 +1566,7 @@ items:
   desc: 'The documentation NFR "instruction guide on how to manage users and extract users list and group profile list for" is cut off. NFR 1.i asks for "interfacing with an external ACL" without naming it.'
   impact: 'Minor.'
   modules: 'User Access'
-  resolution: 'User administration guide in the Help Center; external ACL parked.'
+  resolution: 'User administration guide in the Help Center; external ACL on hold.'
   question: 'Please complete the sentence and name the external ACL, if any.'
   status: Open
   related: [UQ18, UQ14]
@@ -1576,7 +1576,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'BRD-11 assumes "there''s a defined User Access Matrix in place". No BIBS-wide matrix is in the pack; each BRD gives its own personas.'
-  impact: 'Build: roles and permissions for every module. Test: persona-based access tests.'
+  impact: 'System: roles and permissions for every module. Test: persona-based access tests.'
   modules: 'User Access; all modules'
   resolution: 'Project proposes a matrix from the personas of each BRD; BDOI approves it.'
   question: 'Please provide or approve the BIBS-wide user access matrix.'
@@ -1592,7 +1592,7 @@ items:
   desc: 'BRIDSP-20 and BRIDSP-30 have identical text, persona and criteria (reports on sanitation, disposition and account classification, with fallout report).'
   impact: 'Test: duplicate rows.'
   modules: 'Submitted Policies; Reports'
-  resolution: 'Build once; both rows point to the same reports.'
+  resolution: 'One set of reports; both rows point to the same reports.'
   question: 'Confirm BRIDSP-30 is a duplicate.'
   status: Open
   related: []
@@ -1602,7 +1602,7 @@ items:
   type: Document quality
   sev: Low
   desc: 'No business goal box is ticked (p.2). BRIDSP-09 carries two blocks of criteria, the second titled "Acceptance Criteria". BRIDSP-27 (booking) is under key capability 2; key-capability numbers do not follow ID order.'
-  impact: 'None on the build.'
+  impact: 'None on the system.'
   modules: '-'
   resolution: 'None.'
   question: 'None; correct in the next revision.'
@@ -1614,7 +1614,7 @@ items:
   type: Contradiction within BRD
   sev: High
   desc: 'BRIDSP-12 groups matched policies into "For Renewal, For Manual Disposition, Non-Renewal, No Touch, FFY, BDO/SM Group Employee Accounts, or RMU buckets". BRIDSP-14 puts "Free First Year, SM Group Employee, No-Touch, CARI, Bonds, RMU" in Non-Renewal buckets. BRIDSP-15 has "Fully Paid Loan" as an inforced renewal bucket; the Sanitation report counts it as not for renewal.'
-  impact: 'Business: which submitted policies are renewed. Build: bucket rules. Test: classification cases.'
+  impact: 'Business: which submitted policies are renewed. System: bucket rules. Test: classification cases.'
   modules: 'Submitted Policies; Renewal'
   resolution: 'Bucket rules as data with precedence; renewal side decided per bucket by BDOI.'
   question: 'Please give the complete bucket list with precedence, and for FFY, RMU and Fully Paid whether they are renewed.'
@@ -1627,7 +1627,7 @@ items:
   type: Contradiction within BRD
   sev: Medium
   desc: 'BRIDSP-05: "generate one IAAF (Insurance Adequacy Assessment Form) per policy"; "only one IAAF is created". The current process: "IAAF may consist of multiple policies".'
-  impact: 'Build: IAAF structure. Test: IAAF cases.'
+  impact: 'System: IAAF structure. Test: IAAF cases.'
   modules: 'Submitted Policies'
   resolution: 'One IAAF per policy, linked to related policies by reference.'
   question: 'Confirm one IAAF per policy in the target process, and give the IAAF approval matrix.'
@@ -1639,7 +1639,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'The handling-fee flow has a manual loop (Admin Team UPP handler, NB TL, AO, NB TL, via SharePoint). BRIDSP-31 automates only the tagging by PN (CLPC) or Location Reference (OTC); the disposition steps have no requirement, and the fee itself is not defined.'
-  impact: 'Business: handling-fee income. Build: disposition steps and GL. Test: no criteria.'
+  impact: 'Business: handling-fee income. System: disposition steps and GL. Test: no criteria.'
   modules: 'Submitted Policies; Collections; Cashiering'
   resolution: 'Tagging per BRIDSP-31; disposition in the Collections unapplied view.'
   question: 'What is the handling fee (amount, payer, VAT, OR, GL account), and who dispositions it?'
@@ -1675,7 +1675,7 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'BRD-12 requires the renewal of submitted policies (renewable list, RA / NRNS / NAL / SFU letters, hold cover, placement, booking). BRD-6 covers the renewal of every expiring policy with the same letters. Neither states the boundary.'
-  impact: 'Business: two renewal paths. Build: one owner for renewal letters and hold cover. Test: duplicated cases.'
+  impact: 'Business: two renewal paths. System: one owner for renewal letters and hold cover. Test: duplicated cases.'
   modules: 'Submitted Policies; Renewal'
   resolution: 'Renewal owns renewal from the hand-off (candidate, account, hold cover, RA / NRNS / NAL / SFU); Submitted Policies keeps intake, classification, buckets and the expiry scan (decision D2).'
   question: 'Confirm the boundary, and whether renewal notices and renewal proposals to submitted accounts belong to Renewal.'
@@ -1689,9 +1689,9 @@ items:
   type: Document quality
   sev: Low
   desc: '#73 and #168 carry "DELETE - Same as Policy Transmittal Report / Report on ... e-Policies"; #69 "BU confirmed that they do not need this report anymore".'
-  impact: 'Build: three reports dropped.'
+  impact: 'System: three reports dropped.'
   modules: 'Reports'
-  resolution: 'Rows marked DROPPED; not built.'
+  resolution: 'Rows marked DROPPED; not in scope.'
   question: 'None.'
   status: Answered
   response: 'Report List remarks on #69, #73 and #168.'
@@ -1702,7 +1702,7 @@ items:
   type: BRD vs platform
   sev: Medium
   desc: 'The TSU rows state "there should be a separate TSU module" / "This should be under a separate TSU module". In BIBS, TSU work is part of non-package placement and Product Maintenance.'
-  impact: 'Business: scope expectation. Build: menu structure.'
+  impact: 'Business: scope expectation. System: menu structure.'
   modules: 'Product Maintenance; Placement; Reports'
   resolution: 'Keep TSU functions in the existing modules, with a TSU menu section.'
   question: 'Is a TSU section inside BIBS enough, or is a separate module expected?'
@@ -1715,7 +1715,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'The Report List asks for reports without a BRD in the pack: Trade Accumulation and Trade Monitoring from a "TPC System" (#131, #132), four Reinsurance reports (#112-115), and sustainability reports with BRD "N/A" (#169, #178).'
-  impact: 'Business: scope. Build: no requirements, sources or layouts.'
+  impact: 'Business: scope. System: no requirements, sources or layouts.'
   modules: 'Reports; Placement'
   resolution: 'Out of the first release until a BRD or specification is supplied.'
   question: 'Is a Reinsurance BRD to follow? What is the TPC System and its feed? Who owns the sustainability reports?'
@@ -1728,7 +1728,7 @@ items:
   type: NFR inconsistency
   sev: High
   desc: 'Service hours differ in every BRD: 07:00-22:00 Mon-Sat (NB, RN); 07:00-18:30 (OPS, PM); 06:00-22:00 Mon-Fri plus month-end weekends (CLXN); 07:00-18:00 Mon-Sat (ACCT); 06:00-20:00 Mon-Fri (CLM); 08:30-19:00 (EB); 06:00-22:00 (CSF); 08:00-18:00 Mon-Fri (SANC); "business hours" (SP). See the NFR comparison sheet.'
-  impact: 'Build: one platform serves all modules, so the widest window applies and batch windows shrink. Test: availability tests per window.'
+  impact: 'System: one platform serves all modules, so the widest window applies and batch windows shrink. Test: availability tests per window.'
   modules: 'Platform (all modules)'
   resolution: 'One BIBS service window 06:00-22:00 Mon-Sat plus month-end weekends; batch after 22:00.'
   question: 'Please agree one BIBS-wide service window and the batch window.'
@@ -1741,7 +1741,7 @@ items:
   type: NFR inconsistency
   sev: Medium
   desc: 'Availability targets: 99.9% (OPS, PM, CSF, SANC, SP); 99.99% (EB); 100% (ACCT Addendum 1); "Follow existing QPS set up" (NB, RN, UAM, ACCT main BRD). Allowed downtime: 45 minutes a month (SANC, SP) vs less than 24 hours (ACCT).'
-  impact: 'Build: HA design; 99.99% and 100% need a different architecture and cost. Test: availability measurement.'
+  impact: 'System: HA design; 99.99% and 100% need a different architecture and cost. Test: availability measurement.'
   modules: 'Platform'
   resolution: '99.9% within service hours for BIBS; 99.99% only if confirmed for the EB portal.'
   question: 'Please agree one availability target and the allowed downtime per month.'
@@ -1754,7 +1754,7 @@ items:
   type: NFR inconsistency
   sev: High
   desc: 'Recovery objectives: RPO 24 hours (OPS, PM, EB); RPO 4 hours (CLXN, CLM, CSF); backup every 15 minutes (CSF BRCSF-011.001). RTO 4 hours (OPS, PM, CLXN, CLM, EB, CSF); SP "restored within 4 hours for critical services; full recovery within 24 hours". ACCT and SANC give only a BCP threshold of less than 3 days.'
-  impact: 'Build: backup frequency and DR design follow the strictest RPO. Test: DR drill targets.'
+  impact: 'System: backup frequency and DR design follow the strictest RPO. Test: DR drill targets.'
   modules: 'Platform (backup and DR)'
   resolution: 'RPO 15 minutes (continuous WAL archiving) and RTO 4 hours for the whole platform.'
   question: 'Please agree one RPO and RTO for BIBS.'
@@ -1768,7 +1768,7 @@ items:
   type: NFR inconsistency
   sev: High
   desc: 'Retention: 5 years online and 15 years archive (NB, OPS, CLXN, EB, CSF); 10 years online and 15 archive, purge after 15, audit logs 16 (CLM); 5 and 5 (ACCT, SANC, SP); "Follow QPS" (RN, UAM); not stated (PM). Backup retention: 5 years (NB, CLXN, CLM, CSF, ACCT, SANC, SP) vs 7 years (OPS, EB).'
-  impact: 'Business: legal record keeping (AMLA, BIR). Build: retention rules per record type and archive design. Test: purge cases.'
+  impact: 'Business: legal record keeping (AMLA, BIR). System: retention rules per record type and archive design. Test: purge cases.'
   modules: 'Platform (retention); all modules'
   resolution: 'Retention per record type as data; default 5 years online, 15 years archive; backup retention 7 years (the longest).'
   question: 'Please give one retention schedule per record type, and whether data is purged or archived at the end.'
@@ -1794,7 +1794,7 @@ items:
   type: NFR inconsistency
   sev: High
   desc: 'Maintenance windows conflict with other BRDs'' service hours: ACCT 19:00-07:00 (NB and RN work to 22:00; CLXN and CSF start at 06:00); CSF 21:00-05:00 on weekdays and Saturdays; SANC and SP 00:00-04:00; OPS, PM, EB "as per bank standard".'
-  impact: 'Build: no common maintenance slot unless one window is agreed.'
+  impact: 'System: no common maintenance slot unless one window is agreed.'
   modules: 'Platform'
   resolution: 'One window 00:00-04:00, outside every service window.'
   question: 'Please agree the BIBS maintenance window.'
@@ -1807,7 +1807,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'Many NFR answers are "Follow existing QPS set up" (or "QPS/EBIX Setup"), but QPS and EBIX are replaced by BIBS and their values are not in the pack.'
-  impact: 'Build: no values. Test: no targets.'
+  impact: 'System: no values. Test: no targets.'
   modules: 'Platform'
   resolution: 'Apply the agreed BIBS-wide set.'
   question: 'Please provide the QPS / EBIX values referred to, or confirm the BIBS-wide set replaces them.'
@@ -1821,7 +1821,7 @@ items:
   type: NFR inconsistency
   sev: Medium
   desc: 'BRD-4 and BRD-7: "Session timeout is set to 15 minutes for active session opened." BRD-1 and BRD-11: inactivity warning at 15 minutes and log-out at 30 minutes. BIBS: SESSION_TIMEOUT_MINUTES = 30.'
-  impact: 'Build: one session policy. Test: timeout cases.'
+  impact: 'System: one session policy. Test: timeout cases.'
   modules: 'Security (sessions)'
   resolution: '30-minute inactivity log-out with warning at 15 minutes (BRD-11 governs), configurable in System Administration.'
   question: 'Confirm that one 30-minute inactivity timeout applies to all BIBS users.'
@@ -1834,9 +1834,9 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'BRD-7: "For internal systems, concurrent open sessions should be allowed". BRD-4 NFR 10.07: one session per device, a new device logs off the old one. BRD-11 does not address it.'
-  impact: 'Security: session control for all users. Build: session enforcement.'
+  impact: 'Security: session control for all users. System: session enforcement.'
   modules: 'Security (sessions)'
-  resolution: 'Session log built; enforcement parked behind a parameter until answered.'
+  resolution: 'Session log kept; enforcement is a parameter, off until answered.'
   question: 'Does the single-session rule apply to all BIBS users, Collections users only, or no one?'
   owner: 'UAM process owner (Product Owner) with ITIO'
   status: Open
@@ -1861,7 +1861,7 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'BRD-11 requires authentication of the Windows ID through BDO EUA and LDAP / AD or SSO; BRD-7 and BRD-4 ask for Windows credentials; BRD-9 asks agents to "log-in to the system via entering user ID and password". BIBS signs in with local user ID and password; the EUA interface is not specified.'
-  impact: 'Security: identity source for all users. Build: directory authentication port. Test: login cases.'
+  impact: 'Security: identity source for all users. System: directory authentication port. Test: login cases.'
   modules: 'Security; User Access'
   resolution: 'Directory sign-in for all internal users once BDO supplies the EUA interface; local sign-in until then (AUTH_MODE).'
   question: 'Please provide the EUA interface (protocol, host, error codes). Is every BIBS user in the BDO directory, including Contact Center agents? Is a local administrator account allowed?'
@@ -1874,7 +1874,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'BRD-4 and BRD-7 give password values (minimum 8, 12 for administrators, history 8, change every 90 days, minimum age 1 day). BRD-11 asks to "enforce strong password policies" and self-service reset without values, and hands password checks to EUA.'
-  impact: 'Build: password policy applies only to local accounts if EUA is used.'
+  impact: 'System: password policy applies only to local accounts if EUA is used.'
   modules: 'Security'
   resolution: 'BRD-4 values as parameters for local accounts; none for directory accounts.'
   question: 'Confirm the password values for local accounts, and the channel for self-service reset.'
@@ -1900,7 +1900,7 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'BRD-6 ingests "LAMD-provided reports" of paid-off loans (PN as the matching key) and gives LAMD a validation-only role. BRD-12 matches submitted policies "PN vs LAMD" and identifies active loans per LAMD. Two intakes, two owners.'
-  impact: 'Business: one loan status or two. Build: one LAMD intake.'
+  impact: 'Business: one loan status or two. System: one LAMD intake.'
   modules: 'Renewal; Submitted Policies'
   resolution: 'One LAMD intake owned by one module and read by the other.'
   question: 'Is it one LAMD report or two? Who uploads it, how often, and do LAMD users log in to BIBS?'
@@ -1913,7 +1913,7 @@ items:
   type: Conflict between BRDs
   sev: Medium
   desc: 'BRD-6 gives "Contact Center users" access to renewal lists with remarks and status updates. BRD-9 defines Contact Center agents and supervisors who see all accounts (CBG and non-CBG). The same people may be described twice with different access.'
-  impact: 'Build: one or two roles; data visible to each.'
+  impact: 'System: one or two roles; data visible to each.'
   modules: 'Renewal; Customer Servicing; User Access'
   resolution: 'Two roles; one user may hold both.'
   question: 'Are the Renewal Contact Center users the BDO Insure Contact Center agents of BRD-9? Which renewal data may they see?'
@@ -1926,7 +1926,7 @@ items:
   type: Conflict between BRDs
   sev: Medium
   desc: 'CSF agents must view and resend renewal advices and retrieve "claims reports". EB restricts documents by process; claims documents may be confidential; BRD-7 has its own claim document types and does not name a "claims report".'
-  impact: 'Security: document confidentiality. Build: access classes per document type.'
+  impact: 'Security: document confidentiality. System: access classes per document type.'
   modules: 'Documents; Customer Servicing; Claims; Employee Benefits; Renewal'
   resolution: 'Access class per document type; CSF may view RENEWAL_ADVICE and CLAIM_REPORT; the loss advice and insurer claim reports stored as CLAIM_REPORT.'
   question: 'Please give the confidentiality matrix per document type, and which claim documents the Contact Center may retrieve.'
@@ -1938,8 +1938,8 @@ items:
   loc: 'Report List #135 (p.44); BRD-6 reports'
   type: Gap / missing detail
   sev: Medium
-  desc: 'Report List #135 "Renewal Persistency" is tagged "Renewal/Submitted Policy". The Renewal BRD has no persistency report; only the submitted-accounts part is designed.'
-  impact: 'Build: no owner or layout for the general report.'
+  desc: 'Report List #135 "Renewal Persistency" is tagged "Renewal/Submitted Policy". The Renewal BRD has no persistency report; only the submitted-accounts part is specified.'
+  impact: 'System: no owner or layout for the general report.'
   modules: 'Renewal; Submitted Policies; Reports'
   resolution: 'General persistency report in Renewal over closed renewal candidates.'
   question: 'Please define the Renewal Persistency Report (period, base, grouping).'
@@ -1952,7 +1952,7 @@ items:
   type: Conflict between BRDs
   sev: Medium
   desc: 'BRD-6 uses "Total Loss Claim" as a non-renewal reason and shows the number and status of claims per account. BRD-7 records no total-loss indicator and defines no feed to Renewal.'
-  impact: 'Build: renewal decision matrix cannot test total loss automatically.'
+  impact: 'System: renewal decision matrix cannot test total loss automatically.'
   modules: 'Renewal; Claims'
   resolution: 'Renewal reads claim experience from Claims; "Total Loss Claim" stays a manual reason until Claims records an indicator.'
   question: 'Should Claims record a total-loss indicator (settlement type, loss nature or flag)?'
@@ -1965,7 +1965,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'BRD-8 has its own renewal cycle for EB programmes (renewal advice, incumbent proposal, remarketing). BRD-6 covers the renewal of expiring policies without excluding group benefits.'
-  impact: 'Build: EB programmes must be excluded from the general renewal lists.'
+  impact: 'System: EB programmes must be excluded from the general renewal lists.'
   modules: 'Renewal; Employee Benefits'
   resolution: 'EB renewals stay in EB; the general renewal lists exclude EB benefit lines; one renewal advice document type (decision D3).'
   question: 'Confirm that EB renewals are handled only in EB, and whether EB and Renewal share an RA template.'
@@ -1978,7 +1978,7 @@ items:
   type: Conflict between BRDs
   sev: Medium
   desc: 'BRD-12 replaces shared-drive masterlists with "a single, master database". BRD-7 delivers report files to a "Shared Drive"; BRD-4 loads files to FS04; BRD-10 saves the STR to a "designated folder path"; BRD-2 names a shared-drive path for remittance files.'
-  impact: 'Build: file drop targets. Test: delivery cases.'
+  impact: 'System: file drop targets. Test: delivery cases.'
   modules: 'Reports; Claims; Collections; Sanction Screening; Remittance'
   resolution: 'Files kept in BIBS with download; a shared-drive drop added only where a downstream system reads it.'
   question: 'Which outputs must still be placed on a shared drive or FS04, and for which downstream user or system?'
@@ -1991,7 +1991,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'Every outbound document must be encrypted or password protected (BRNB.013, BRNB.035, BRRN.010, BRID-007), with the password sent separately. BRD-8 allows "a standard assigned password or system-generated with a defined syntax". No BRD gives the convention.'
-  impact: 'Business: clients cannot open documents without a known rule. Build: password policy per document type. Test: protection cases.'
+  impact: 'Business: clients cannot open documents without a known rule. System: password policy per document type. Test: protection cases.'
   modules: 'Documents; Notifications; all modules sending documents'
   resolution: 'Password policy per document type as configuration; default a generated password sent by SMS or separate e-mail.'
   question: 'Please give the password convention for documents to clients and to insurers.'
@@ -2004,7 +2004,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'Allowed file types differ: EB "PDF, Word, Excel, and other agreed formats"; CSF doc, docx, txt, xls, xlsx, ods, csv, PNG, JPG, HEIF, PDF. No BRD gives a maximum file size. Only BRD-10 gives a naming syntax ("<Form Type>_<Client Name>_<Date Received>_<Document Type>_<n>").'
-  impact: 'Build: upload validation. Test: file cases.'
+  impact: 'System: upload validation. Test: file cases.'
   modules: 'Documents'
   resolution: 'One allowed-type list and size limit as configuration; the screening naming pattern for screening documents only.'
   question: 'Please give the allowed file types, the maximum size, and whether the screening naming syntax applies elsewhere.'
@@ -2017,7 +2017,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'Hold covers: BRD-1 requests a hold cover (30 days) at placement; BRD-12 sends submitted renewals with a 30-day hold cover request, "accepted within 3-5 days", else follow up or re-assign; BRD-6 reports "Hold Cover" and "HC End Date". What happens when a hold cover expires is not stated.'
-  impact: 'Business: uncovered risk after expiry. Build: hold cover monitoring. Test: expiry cases.'
+  impact: 'Business: uncovered risk after expiry. System: hold cover monitoring. Test: expiry cases.'
   modules: 'Placement; Submitted Policies; Renewal'
   resolution: 'One hold-cover record with expiry monitoring and alerts; acceptance window a parameter (default 5 working days).'
   question: 'Which accounts need an automatic hold cover, is the window 3 or 5 days (working or calendar), and what happens at hold-cover expiry?'
@@ -2030,7 +2030,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'BRD-1 requires a single Account Reference Number; BRD-6 a "unique reference number" as the matching key of renewal records (no format); BRD-12 replaces the ISYS reference and the ARF in the renewal flow. No BRD gives a format or says whether the renewal reference is the ARN.'
-  impact: 'Build: reference formats; matching keys of insurer and LAMD files.'
+  impact: 'System: reference formats; matching keys of insurer and LAMD files.'
   modules: 'Account; Renewal; Submitted Policies'
   resolution: 'ARN for accounts; renewal reference RNW-<yyyy>-nnnnnn; prefixes as parameters.'
   question: 'Please give the reference formats and the key carried by insurer and LAMD files.'
@@ -2043,7 +2043,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'Go-live data is covered unevenly: BRD-12 requires migration of Excel masterlists (BRIDSP-33); BRD-7 assumes migration "will be seamless"; BRD-4 needs open EBIX PRs and history; BRD-6 excludes legacy references; BRD-5 needs the payee master. No BRD gives scope, cut-off or format.'
-  impact: 'Business: go-live readiness. Build: migration loads. Test: reconciliation.'
+  impact: 'Business: go-live readiness. System: migration loads. Test: reconciliation.'
   modules: 'Data migration; Collections; Claims; Renewal; Submitted Policies; Disbursement'
   resolution: 'One data migration approach per source (EBIX, ISYS, QPS, Excel) with reconciliation, agreed with BDOI.'
   question: 'Please confirm, per source, what is migrated (open items, history, years), the cut-off date and the file format.'
@@ -2057,7 +2057,7 @@ items:
   type: Conflict between BRDs
   sev: Medium
   desc: 'Ageing buckets differ: ACSL 0-30, 31-90, 91-180, 181-365, 366-730, over 730 days; claims 0-30, 31-60, 61-90, 91-180, 181+; Collections reports show "Aging Bracket" without buckets; Cashiering reports "with aging" without buckets.'
-  impact: 'Build: ageing configuration. Test: report totals per bucket.'
+  impact: 'System: ageing configuration. Test: report totals per bucket.'
   modules: 'Reports; ACSL; Claims; Collections; Cashiering'
   resolution: 'Ageing buckets configurable per report family; ACSL buckets as the default.'
   question: 'Please confirm the ageing buckets per report family.'
@@ -2096,7 +2096,7 @@ items:
   type: BRD vs platform
   sev: Medium
   desc: 'BRD-8 asks for reports "exportable (PDF/XLSX/CSV/WORD)". Other BRDs ask for Excel and PDF. BIBS exports PDF, XLSX, ODS, CSV and XML, not Word.'
-  impact: 'Build: Word renderer for reports.'
+  impact: 'System: Word renderer for reports.'
   modules: 'Reports'
   resolution: 'Add Word export for reports (work item P2); available to all reports.'
   question: 'Is Word export needed for all reports or only EB?'
@@ -2109,7 +2109,7 @@ items:
   type: Ambiguity
   sev: Low
   desc: 'Some Report List rows span or mis-file BRDs: #62 and #71 "New Business/Renewal/FRBS"; #138 "New Business / Submitted Policies"; #135 "Renewal/Submitted Policy"; #104 (Production Reconciliation Summary) under Remittance; #105 (unapplied payments by disposition) under Remittance, a Cashiering subject.'
-  impact: 'Build: report owner.'
+  impact: 'System: report owner.'
   modules: 'Reports'
   resolution: 'Owner as mapped in the Report List traceability.'
   question: 'Confirm the owning unit of each shared report.'
@@ -2123,7 +2123,7 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'Core asks for case resolution (add / edit case details and status); BRD-9 puts case management out of scope (SharePoint interim).'
-  impact: 'Build: a CSF case module or not.'
+  impact: 'System: a CSF case module or not.'
   modules: 'CSF'
   resolution: 'Keep out of phase 1 until answered.'
   question: 'Is CSF case resolution in phase 1?'
@@ -2136,9 +2136,9 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'Core asks for unclaimed cheque safekeeping and hand-over to / retrieval from Cashiering; BRD-7 has no claim money through BDOI.'
-  impact: 'Build: cheque custody in Claims and Cashiering; possible GL impact.'
+  impact: 'System: cheque custody in Claims and Cashiering; possible GL impact.'
   modules: 'Claims; Cashiering'
-  resolution: 'Parked; if yes, a cheque custody register in Claims (V1026-V1029).'
+  resolution: 'On hold; if yes, a cheque custody register in Claims.'
   question: 'Does BDOI hold settlement cheques, who keeps them, what is recorded?'
   owner: 'Claims and Risk Management'
   status: Open
@@ -2266,7 +2266,7 @@ items:
   type: BRD vs platform
   sev: Medium
   desc: 'Master data change logging for users, products, insurers, LOVs; BIBS audits actions with a summary, not field old / new values.'
-  impact: 'New change log (V1091).'
+  impact: 'New change log.'
   modules: 'Audit; Catalog; LOV; Security'
   resolution: 'Field-level change log of registered master types (FR-CR-031).'
   question: 'Which master data, fields and approver details?'
@@ -2279,7 +2279,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: '"Define MIS fields for all core entities": fixed list per entity or user-defined fields?'
-  impact: 'MIS field catalogue (V1092).'
+  impact: 'MIS field catalogue.'
   modules: 'Reports; Catalog'
   resolution: 'Catalogue of existing data, no user-added columns.'
   question: 'Fixed list or user-defined fields; who maintains?'
@@ -2292,7 +2292,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'Insurer record to hold contact, accreditation, products, commission, payment terms, remittance schedules, risk participation, chart of accounts; meaning of risk participation, payment terms and remittance schedule not given.'
-  impact: 'Insurer page (V1095).'
+  impact: 'Insurer page.'
   modules: 'Catalog; Remittance'
   resolution: 'Insurer page with the missing attributes (FR-CR-061).'
   question: 'Meaning of the attributes; owners; approval?'
@@ -2305,7 +2305,7 @@ items:
   type: BRD vs platform
   sev: Medium
   desc: 'Customised reports with fields, charts and summaries, scheduled or on demand; BIBS has fixed columns, saved parameter variants and system-scheduled files only.'
-  impact: 'Report layout and subscriptions (V1093).'
+  impact: 'Report layout and subscriptions.'
   modules: 'Reports'
   resolution: 'FR-CR-042 and FR-CR-043.'
   question: 'Which reports, schedules, formats, delivery?'
@@ -2318,7 +2318,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'Centralised dashboards for all roles; dashboard details "to be defined".'
-  impact: 'Role home page (V1094).'
+  impact: 'Role home page.'
   modules: 'Dashboard'
   resolution: 'Default widget sets per role (FR-CR-010).'
   question: 'Which figures per role?'
@@ -2344,7 +2344,7 @@ items:
   type: Gap / missing detail
   sev: Low
   desc: '"Include any other / additional system capabilities" is not testable.'
-  impact: 'No build.'
+  impact: 'No system work.'
   modules: 'None'
   resolution: 'Withdraw or list.'
   question: 'List the capabilities or withdraw BR-176.'
@@ -2383,7 +2383,7 @@ items:
   type: Data / numbering issue
   sev: Low
   desc: 'BR-196, 197, 198 repeat BR-184, 185, 186; BR-004 has no priority.'
-  impact: 'None on build.'
+  impact: 'None on the system.'
   modules: 'EB; LOV'
   resolution: 'Correct in the next revision.'
   question: 'Confirm the duplicates can be removed.'
@@ -2395,11 +2395,11 @@ items:
   loc: 'Volumes "Invoice Batch Printing" (p.43)'
   type: Gap / missing detail
   sev: Medium
-  desc: 'Daily batch invoice printing, delivery to insurers by SFTP and delivery report, per insurer; no format or endpoints; BIBS e-mails each service invoice.'
-  impact: 'Insurer invoice batch (V1096); SFTP adapter parked.'
+  desc: 'Daily batch invoice printing, delivery to insurers by SFTP and delivery report, per insurer; no format or SFTP addresses; BIBS e-mails each service invoice.'
+  impact: 'Insurer invoice batch; SFTP delivery on hold.'
   modules: 'Booking'
   resolution: 'FR-CR-081.'
-  question: 'Batch format, SFTP endpoints; replaces e-mail?'
+  question: 'Batch format, SFTP addresses; replaces e-mail?'
   owner: 'Marketing and Processing - New Business (Product Owner)'
   status: Open
   related: [CRQ18]
@@ -2411,7 +2411,7 @@ items:
   desc: '"ALeA - Email Address Encoding, as needed" is not explained.'
   impact: 'Unknown.'
   modules: 'None'
-  resolution: 'No build until defined.'
+  resolution: 'No system work until defined.'
   question: 'What is ALeA?'
   owner: 'Business Project Services (BRD owner) with the BIBS Product Owner'
   status: Open
@@ -2435,7 +2435,7 @@ items:
   type: Document quality
   sev: Low
   desc: 'Every revision row is version 1.0; BR-178-183 are RFI vendor-qualification items (brand, icons, Figma), not system requirements.'
-  impact: 'None on build; icon set needed (CRQ17).'
+  impact: 'None on the system; icon set needed (CRQ17).'
   modules: 'UI'
   resolution: 'Treat as design-system items (FR-CR-092).'
   question: 'Supply the BDO icon set and design files.'
@@ -2462,9 +2462,9 @@ items:
   type: Document quality
   sev: Medium
   desc: 'The BRD is draft v0.01 of 14-Apr-2026 with one revision entry ("Initial Draft"). None of the 13 approvers has signed or dated the approval pages.'
-  impact: 'Business: the migration scope is not agreed. Build: the answers BRD-13 gives to other BRDs (CQ13, CQ07, RQ27, CSQ01) may change at the walk-through. Test: no signed baseline for the migration test cases.'
+  impact: 'Business: the migration scope is not agreed. System: the answers BRD-13 gives to other BRDs (CQ13, CQ07, RQ27, CSQ01) may change at the walk-through. Test: no signed baseline for the migration test cases.'
   modules: 'Data migration'
-  resolution: 'Use the draft as the working baseline; start the migration build (wave DM0) after the walk-through and sign-off.'
+  resolution: 'Use the draft as the working baseline; start the migration functions after the walk-through and sign-off.'
   question: 'When will the Data Migration BRD be walked through and signed, and by whom?'
   status: Open
   related: []
@@ -2474,7 +2474,7 @@ items:
   type: Document quality
   sev: Low
   desc: 'Template text is left in: the cover reads "Business Requirements Document (BRD) Template"; the business-goal answers are in the blue sample style and the footer "Texts highlighted in blue are provided as samples only. Please remove them when drafting the actual BRD" is still on p.3; template instructions remain on p.6 and p.13. "Compliance / Regulatory Requirement" and "Tech Obsolescence" are not ticked, although BRID 11.1 serves audit and regulatory inquiries and the programme replaces the legacy platforms.'
-  impact: 'None on build. The business goals cannot be read as BDOI''s answers.'
+  impact: 'None on the system. The business goals cannot be read as BDOI''s answers.'
   modules: 'None'
   resolution: 'Remove the template text and confirm the business goals in the next revision.'
   question: 'Are the ticked business goals on p.3 BDOI''s answers or template samples? Should Compliance / Regulatory Requirement and Tech Obsolescence be ticked?'
@@ -2498,7 +2498,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'The acceptance criterion reads "Then it data objects been actioned upon ie. as Migrate / Carry-Forward (Open Items) / Archive / Excluded". The rule that turns the four criteria (Day-1 need, compliance need, read-only / archival option, data trust) into a class is missing, and so are the rating scale, who rates and who approves.'
-  impact: 'Build: the decision register and gate G1 of the Migration Console. Business: every data object''s treatment depends on it. Test: no acceptance rule for BRID 1.1a.'
+  impact: 'System: the decision register and gate G1 of the Migration Console. Business: every data object''s treatment depends on it. Test: no acceptance rule for BRID 1.1a.'
   modules: 'Data migration'
   resolution: 'The business owner rates each criterion per object and proposes the class; the Program Manager approves; the object catalogue of the design gives the default class per object.'
   question: 'How are the four criteria rated, who assigns and approves them, and what rule gives Migrate / Carry-Forward / Archive / Excluded?'
@@ -2510,7 +2510,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'Every usage table (volume and performance, availability, data retention and archiving) says "Not Applicable - Refer to the consolidated NFR requirements for BDO Insure Core Modernization project"; the table rows are empty and that document is not in the pack. There are no migration volumes, no cutover window and no data-quality thresholds. The umbrella BRD gives only "2020 to present" for clients (p.43).'
-  impact: 'Build: load sizing and the cutover window are project assumptions (1,000,000 client rows, 500,000 open-item rows, 48-hour window). Test: performance targets of the dress rehearsal.'
+  impact: 'System: load sizing and the cutover window are project assumptions (1,000,000 client rows, 500,000 open-item rows, 48-hour window). Test: performance targets of the dress rehearsal.'
   modules: 'Data migration'
   resolution: 'Plan on the design assumptions; confirm them with the row counts from the first profiling extract.'
   question: 'Please send the consolidated NFR document (name, version, owner) and the row counts per data object and source.'
@@ -2522,7 +2522,7 @@ items:
   type: Contradiction within BRD
   sev: High
   desc: 'Capability 4 (in-force policy header) is "conditional" and capability 9 (endorsements on legacy invoices) is "subject to coexistence decision", but BRID 4.1 and 9.1-9.3 are "Must have". Neither the condition nor the decision is stated. BRID 9 cannot be met in BIBS without the header of BRID 4.1.'
-  impact: 'Build: account import of legacy headers (V823) and endorsements of legacy invoices (booking V873, adjustment). Business: where endorsements of legacy policies are processed after cutover. Test: endorsement scenarios on legacy invoices.'
+  impact: 'System: account import of legacy headers and endorsements of legacy invoices (booking, adjustment). Business: where endorsements of legacy policies are processed after cutover. Test: endorsement scenarios on legacy invoices.'
   modules: 'Account; Booking; Adjustment; Data migration'
   resolution: 'Migrate the header of every policy in force at cutover, and process endorsements of legacy invoices in BIBS from cutover.'
   question: 'Which in-force policies get a header, with which fields? Confirm that endorsements of legacy invoices are processed in BIBS from cutover, and which endorsement types.'
@@ -2534,7 +2534,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'The BRD names no data objects and only two source systems, "e.g. QPS and EBIX" (p.3). ISYS, the CMS, LOS / LAMD and the Excel masterlists used by other BRDs are not named; no object has an owner or a system of record.'
-  impact: 'Build: the object register, layouts and loaders. Business: extract owners cannot be named. Test: reconciliation per object needs the list.'
+  impact: 'System: the object register, layouts and loaders. Business: extract owners cannot be named. Test: reconciliation per object needs the list.'
   modules: 'Data migration'
   resolution: 'Use the object catalogue of the Data Migration design (reference, client, policy, financial, GL and archive objects) as the proposal for BDOI to confirm.'
   question: 'Please confirm the data object inventory, the source system of each object and its business owner.'
@@ -2546,7 +2546,7 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'Other BRDs expect data that BRD-13 does not mention: open claims (BRD-7 assumes migration "will be seamless"), the in-force Employee Benefits programmes (the EB design holds a programme load), the Excel submitted-policy masterlists (BRD-12 BRIDSP-33), the payee master (BRD-5), open disbursements, check pick-ups, PDCs on hand, users and roles. BRD-13 keeps historical claims read-only or archived.'
-  impact: 'Build: loaders for objects F07, P04, P05, R09 and V1025 (Claims) stay parked. Business: go-live readiness of Claims, EB, Submitted Policies and Disbursement. Test: migration test scope.'
+  impact: 'System: the migration of objects F07, P04, P05 and R09 stays on hold. Business: go-live readiness of Claims, EB, Submitted Policies and Disbursement. Test: migration test scope.'
   modules: 'Data migration; Claims; Employee Benefits; Submitted Policies; Disbursement'
   resolution: 'Run the loaders the other designs already hold (BCL_CLAIM_MIGRATION, EB_PROGRAMME_LOAD, SBM_MIGRATION, DISB_PAYEE_MIGRATION) under the migration framework, once BDOI puts the objects in scope.'
   question: 'Are open claims, EB programmes, the submitted-policy masterlists, payees, open disbursements, PDCs, users and roles in scope of the migration?'
@@ -2559,7 +2559,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'BRD-13 asks for legacy sub-ledgers (Premium Receivable, Commission Receivable, DTIP, UPP) and accounting entries on legacy invoices, but not for the GL opening balances those sub-ledgers must agree with, nor for the mapping of the legacy chart. BRD-5 gives no chart either (AQ01).'
-  impact: 'Business: GL and sub-ledgers may not agree at go-live. Build: legacy control accounts, clearing account, OPENING journals (V1087, seed V1982). Test: clearing account at 0.00 is a go / no-go criterion.'
+  impact: 'Business: GL and sub-ledgers may not agree at go-live. System: legacy control accounts, clearing account, OPENING journals. Test: clearing account at 0.00 is a go / no-go criterion.'
   modules: 'Accounting; ACSL; Data migration'
   resolution: 'Separate legacy control accounts plus a migration clearing account; the legacy trial balance loaded per branch and currency as OPENING journals; cutover after a legacy month-end close, preferably at year start.'
   question: 'Are the legacy sub-ledgers separate GL control accounts? Is the whole trial balance migrated at cutover, per branch and currency, and what is the end state after run-off?'
@@ -2572,7 +2572,7 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'Terms are used without definition: UPP, DPPR, PR2307, DTIP, RMEL, OTC, autopay, MIS, LOV, Prod Recon, "Cash Receipts Books", "Cash Disbursements Books" and "top management". DPPR is read as "direct-payment premium receivable".'
-  impact: 'Build: the DPPR reversal batch and the top-management approval step rest on assumed meanings. Test: acceptance of BRID 5.5 and 7.1.'
+  impact: 'System: the DPPR reversal batch and the top-management approval step rest on assumed meanings. Test: acceptance of BRID 5.5 and 7.1.'
   modules: 'Cashiering; Commission; Data migration'
   resolution: 'Read the terms as in the Operations, Collections and Accounting BRDs (FRS glossary); add a glossary in the next revision.'
   question: 'Please confirm the meaning of DPPR and who "top management" is (role, names, delegation).'
@@ -2584,7 +2584,7 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'BRD-13 makes the transition renewal-driven: policies "follow the agreed transition model" and renew into BIBS as clean records, but the model is not described. BRD-6 Addendum 1 excludes requirements that reference EBIX or QPS. At go-live the RMEL of the next months (BIBS extracts 140 days before expiry) has already been extracted in legacy.'
-  impact: 'Business: first months of renewals after go-live. Build: legacy cohorts through LegacyPolicySource, run-off tracker. Test: renewal of a legacy policy.'
+  impact: 'Business: first months of renewals after go-live. System: legacy cohorts given to Renewal with the migrated headers, run-off tracker. Test: renewal of a legacy policy.'
   modules: 'Renewal; Account; Data migration'
   resolution: 'Cohorts expiring before go-live stay in legacy; cohorts up to go-live plus 140 days are carried forward with disposition, handler and status; later cohorts are extracted by BIBS from the migrated headers; legacy renewals take the new-business path.'
   question: 'Which transition model applies to the RMEL cohorts already extracted in legacy at go-live, and which is the first cohort extracted by BIBS?'
@@ -2597,7 +2597,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'The BRD asks for a cutover aligned to RMEL but gives no go-live date or month, freeze length, trial migrations, dress rehearsal, go / no-go criteria, point of no return, fallback or hypercare, nor the treatment of transactions in flight at the freeze.'
-  impact: 'Build: cutover plan, go / no-go and runbook in the Migration Console. Business: cutover calendar and freeze. Test: trial migrations and dress rehearsal.'
+  impact: 'System: cutover plan, go / no-go and runbook in the Migration Console. Business: cutover calendar and freeze. Test: trial migrations and dress rehearsal.'
   modules: 'Data migration'
   resolution: 'Go-live on the first business day of a month after a legacy month-end close; two trial migrations and a dress rehearsal; go / no-go on the reconciliation results; fallback only before the point of no return.'
   question: 'Please give the go-live month, freeze window, number of rehearsals, fallback rule and the treatment of in-flight items.'
@@ -2609,7 +2609,7 @@ items:
   type: Document quality
   sev: Low
   desc: 'The page header reads "BDOI Core Modernization Data Migration" while the umbrella BRD is titled "BDOI CORE REPLACEMENT"; BRD-13 is not in the umbrella''s BRD list (p.3).'
-  impact: 'None on build.'
+  impact: 'None on the system.'
   modules: 'None'
   resolution: 'Align the programme name in the next revision.'
   question: 'Which programme name is used in the documents?'
@@ -2621,9 +2621,9 @@ items:
   type: Conflict between BRDs
   sev: Medium
   desc: 'BRD-9 says QPS and EBIX must receive client contact updates during coexistence. BRD-13 makes legacy read-only after cutover, with the new Core as the trusted client master, and asks for no write-back.'
-  impact: 'Build: a write-back transport for ContactSyncGateway, or none. Test: coexistence cases in CSF.'
+  impact: 'System: a write-back transfer from CSF to legacy, or none. Test: coexistence cases in CSF.'
   modules: 'Customer Servicing; Client (CRM)'
-  resolution: 'Legacy read-only from cutover; the CSF outbox stays NOT_CONFIGURED; accounts that exist only in legacy are found through LegacyAccountLookup.'
+  resolution: 'Legacy read-only from cutover; the CSF outbox stays NOT_CONFIGURED; accounts that exist only in legacy are found through the legacy account lookup.'
   question: 'After cutover, must contact updates still be written back to QPS / EBIX?'
   owner: 'BIBS Product Owner, with the owners of the BRDs involved'
   status: Open
@@ -2634,7 +2634,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'BRD-4 needs open EBIX PRs and the disposition history at go-live. BRD-13 carries the receivables forward and keeps history read-only or archived, but says nothing about open dispositions, promises to pay, installment plans and collector assignments.'
-  impact: 'Business: collectors lose open promises at cutover. Build: legacy item state loader (V1007). Test: worklist of legacy invoices.'
+  impact: 'Business: collectors lose open promises at cutover. System: legacy item state migration. Test: worklist of legacy invoices.'
   modules: 'Collections; Data migration'
   resolution: 'Carry the open dispositions, promises, installment plans and assignments; history stays in the archive.'
   question: 'Are open dispositions, promises, installment plans and collector assignments of legacy invoices carried into BIBS?'
@@ -2647,7 +2647,7 @@ items:
   type: Ambiguity
   sev: High
   desc: 'BRID 5.1 says the system "can issue acknowledgment receipt" for a migrated UPP item. The cash was already acknowledged in legacy with an AR; a second AR from the BIBS series for the same cash would count the receipt twice.'
-  impact: 'Business: receipt books and BIR reporting. Build: migrated UPP creation. Test: UPP intake.'
+  impact: 'Business: receipt books and BIR reporting. System: migrated UPP creation. Test: UPP intake.'
   modules: 'Cashiering; Data migration'
   resolution: 'No new AR for a migrated UPP item; the legacy AR number and date are shown on the item.'
   question: 'Must BIBS issue a new AR for a migrated UPP item, reprint the legacy AR number, or issue nothing until application?'
@@ -2660,7 +2660,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'BRID 5.5 asks to reclassify legacy UPP to other income with "top management approval". Criteria (age, amount, client not found), batch frequency, GL account, client notification and reversal are not given, and neither BRD-2 nor BRD-4 has an income-reclass disposition or a top-management approver.'
-  impact: 'Business: income recognition of unclaimed collections. Build: new disposition with a two-step approval. Test: reclass and reversal.'
+  impact: 'Business: income recognition of unclaimed collections. System: new disposition with a two-step approval. Test: reclass and reversal.'
   modules: 'Cashiering; Collections; Accounting'
   resolution: 'New disposition RECLASS_OTHER_INCOME in batches, approved by the TL and then by a top-management approver; reversal only by a new approved batch.'
   question: 'Who approves as top management, on which criteria, and to which GL account is the UPP reclassified?'
@@ -2673,9 +2673,9 @@ items:
   type: Ambiguity
   sev: Medium
   desc: 'BRD-13 asks for batch reversal of "DPPR legacy invoices approved for reversal" and of PR2307 legacy invoices, updating Premium Receivable, Commission Receivable and DTIP. BRD-2 reverses DP PR per invoice after confirmed collection, and BRD-4 tags "DP PR for reversal". The source of the approved list, the approver and the commission receivable entry are not given.'
-  impact: 'Business: GL entries on legacy DP and CWT items. Build: DPPR and PR2307 reversal batches. Test: reversal entries.'
+  impact: 'Business: GL entries on legacy DP and CWT items. System: DPPR and PR2307 reversal batches. Test: reversal entries.'
   modules: 'Commission; Cashiering; Collections'
-  resolution: 'Batches built from an upload or from the Collections "for reversal" tags of legacy invoices, with maker-checker approval; the commission receivable entry per BDOI answer.'
+  resolution: 'Batches from an upload or from the Collections "for reversal" tags of legacy invoices, with maker-checker approval; the commission receivable entry per BDOI answer.'
   question: 'What is a DPPR legacy invoice, which list is "approved for reversal", who approves the batch, and what are the entries including Commission Receivable?'
   owner: 'BIBS Product Owner, with the owners of the BRDs involved'
   status: Open
@@ -2686,7 +2686,7 @@ items:
   type: Data / numbering issue
   sev: Medium
   desc: 'Legacy invoices are processed in BIBS by their legacy number, but it is not stated whether EBIX and QPS numbers are unique across both systems, what the QPS format is, and whether the extract can give open balances per component (basic, DST, taxes, DTIP, commission, WTAX, PR2307) and per insurer share.'
-  impact: 'Build: invoice key rule and "open-balance mode" of the intake. Test: component reconciliation.'
+  impact: 'System: invoice key rule and "open-balance mode" of the intake. Test: component reconciliation.'
   modules: 'Operations ledger; Collections; Data migration'
   resolution: 'Keep the legacy number as the BIBS invoice number unless it collides (then source prefix); load by component, or in open-balance mode if legacy cannot split.'
   question: 'Are EBIX and QPS invoice numbers unique across both systems; what is the QPS format; can the extract give components and paid / remitted splits?'
@@ -2699,7 +2699,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'BRD-10 triggers name matching whenever a client is created. BRD-13 loads the client master in bulk and does not say whether migrated clients are screened one by one, once in a full run after the load, or not at all, nor whether legacy risk ratings are kept.'
-  impact: 'Compliance: screening coverage at go-live. Build: screening trigger suppression for migrated clients and a full re-screen. Test: screening of the migrated population.'
+  impact: 'Compliance: screening coverage at go-live. System: screening trigger suppression for migrated clients and a full re-screen. Test: screening of the migrated population.'
   modules: 'Screening; Client (CRM); Data migration'
   resolution: 'No screening per migrated client; one full screening run after the client load; legacy risk ratings kept until the run completes.'
   question: 'Are migrated clients screened once after the load instead of one by one, and are legacy risk ratings migrated or recomputed?'
@@ -2712,7 +2712,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'BRD-13 keeps history in read-only legacy or an archive with logged access, but gives no retention per record type, no rule for how long legacy stays read-only, and no retention for the migration evidence (reconciliations, sign-offs). The umbrella gives 5 years online and 15 years archive for historical data; the hosting appendix purges migration staging within 5 days.'
-  impact: 'Business: audit access to legacy history. Build: archive retention and decommissioning criteria. Test: archive inquiry.'
+  impact: 'Business: audit access to legacy history. System: archive retention and decommissioning criteria. Test: archive inquiry.'
   modules: 'Data migration; Retention'
   resolution: 'Archive records follow the retention rules per record type (default 5 / 15); migration evidence kept 10 years as project records; staging purged within 5 days.'
   question: 'For each legacy system: kept read-only (how long, hosted by whom) or archived into BIBS? Retention of the archive and of the migration evidence?'
@@ -2726,7 +2726,7 @@ items:
   type: Ambiguity
   sev: High
   desc: 'The drop plan names the Reinsurance BRD for Remittance in Drop 1, while the ReInsurance BRD is phase 2. BDOI answered that Remittance handles the reinsurance transactions in Drop 1 and the reinsurance module is phase 2, but no document says which reinsurance transactions (premium from cedants remitted to reinsurers, RI claim recoveries) or how they are accounted for.'
-  impact: 'Build: counterparties and remittance types in remittance; accounting rules. Test: Drop 1 remittance cases with reinsurance transactions.'
+  impact: 'System: counterparties and remittance types in remittance; accounting rules. Test: Drop 1 remittance cases with reinsurance transactions.'
   modules: 'Remittance; Accounting; Party'
   resolution: 'Handle the named reinsurance transactions in remittance as remittance types with reinsurer counterparties and their own accounting rules; treaty and facultative processing stays phase 2.'
   question: 'Which reinsurance transactions does Remittance handle in Drop 1, with which accounting entries? Please supply the Remittance Addendum named on the slide.'
@@ -2739,7 +2739,7 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'The drop plan says Employee Benefits has no portal feature. BRD-8 (BRID-005, 005.01, 014) and the answers to Q06 / Q31 have insurers and client HR uploading through a secure portal; the EB design adds a portal module; the IER diagram sizes an EB insurer portal tenant.'
-  impact: 'Build: the portal module and external users are dropped; EB uploads are done by internal users. FRS BRD-8 and its test plan change. IER sizing loses a tenant.'
+  impact: 'System: the portal module and external users are dropped; EB uploads are done by internal users. FRS BRD-8 and its test plan change. IER sizing loses a tenant.'
   modules: 'Employee Benefits; User Access; Infrastructure'
   resolution: 'No portal: insurers and client HR send documents by e-mail, EB users upload and validate them; EXTERNAL access requests stay refused.'
   question: 'Please confirm that the EB portal requirements of BRD-8 (BRID-005, 005.01, 014) are out of scope.'
@@ -2752,8 +2752,8 @@ items:
   loc: 'Drop plan slide, Drop 2 item 1 "Marketing Collection (extraction)"; BRD-4 (Collection Management System BRD p.35-61)'
   type: Ambiguity
   sev: Medium
-  desc: 'Drop 2 lists "Marketing Collection (extraction)". BRD-4 Collections is built as a BIBS module fed by the Operations invoice ledger, replacing the separate Collection Management System that legacy fed nightly. "Extraction" suggests a feed from BIBS to a separate collection application.'
-  impact: 'Build: an outbound extraction only if a separate system remains. Test: which drop tests BRD-4.'
+  desc: 'Drop 2 lists "Marketing Collection (extraction)". BRD-4 Collections is a BIBS module fed by the Operations invoice ledger, replacing the separate Collection Management System that legacy fed nightly. "Extraction" suggests a feed from BIBS to a separate collection application.'
+  impact: 'System: an outbound extraction only if a separate system remains. Test: which drop tests BRD-4.'
   modules: 'Collections; Operations'
   resolution: 'BRD-4 in BIBS replaces the Collection Management System; the item means the Collections daily files; BRD-4 tested in Drop 2 except the DP rows (Drop 1).'
   question: 'What is "Marketing Collection (extraction)"? Is a separate Collection Management System kept after go-live?'
@@ -2765,7 +2765,7 @@ items:
   loc: 'Drop plan slide (all drops)'
   type: Gap / missing detail
   sev: Medium
-  desc: 'BRD-10 Sanction Screening and Risk Profiling (built) and the Customer Servicing Facility service-request functions of BRD-9 (designed) are not placed in any drop; only "Account Creation and Maintenance (NB, CSF)" names CSF, and Bridger Insight XG appears among the Drop 2 integrations.'
+  desc: 'BRD-10 Sanction Screening and Risk Profiling and the Customer Servicing Facility service-request functions of BRD-9 are not placed in any drop; only "Account Creation and Maintenance (NB, CSF)" names CSF, and Bridger Insight XG appears among the Drop 2 integrations.'
   impact: 'Planning: requirements sign-off, SIT and UAT slots for two BRDs.'
   modules: 'Sanction Screening; Customer Servicing'
   resolution: 'BRD-10 in Drop 1 with Client Onboarding (screening at onboarding); CSF service requests in Drop 2.'
@@ -2816,11 +2816,11 @@ items:
 - ref: DCR-217
   brds: [BRD-00, BRD-13]
   drop: Programme
-  loc: 'Programme timeline slide (go-live marker at the end of January 2028; bars); BDOI_DROP_PLAN.md timeline table; BRD-13 design section 17.2'
+  loc: 'Programme timeline slide (go-live marker at the end of January 2028; bars); BDOI drop plan, timeline table; BRD-13 migration strategy, cutover'
   type: Gap / missing detail
   sev: High
   desc: 'The go-live day in January 2028 is not fixed; the slide marker sits at the end of January. The migration design takes T as the first business day of a month after a legacy month-end close (Mon 3-Jan-2028, freeze after the EOD of Wed 29-Dec-2027). The transcription of the timeline gives the Drop 1 requirements as Sep-Oct and Drop 2 as Nov-Feb; the bars show Sep-Nov and Dec-Feb. Drop 0 has no bar.'
-  impact: 'Cut-over calendar, year-end close in legacy, GL opening (January stub period if T is later), trial-migration dates.'
+  impact: 'Cut-over calendar, year-end close in legacy, GL opening (a short January period if T is later), trial-migration dates.'
   modules: 'Data migration; Accounting; all'
   resolution: 'T = Monday 3 January 2028; absolute trial-migration calendar Trial migration 1 Apr-May, Trial migration 2 Jun-Jul, Trial migration 3 Aug, re-load Oct, dress rehearsal Nov-Dec 2027.'
   question: 'Which date in January 2028 is the go-live, and does the legacy December / year-end close complete before the final extracts?'
@@ -2833,7 +2833,7 @@ items:
   type: Document quality
   sev: Medium
   desc: 'The signed concept paper proposes an early renewal release by 15-Aug-2027 for January-May 2028 expiries, with early migration of the client master and reference data. BDOI answered that all modules go live together in January 2028 and there is no early go-live. The paper still carries a MANCOM decision block.'
-  impact: 'None on the build if the paper is withdrawn; otherwise a separate production release, early client migration and a five-month legacy-to-BIBS client sync.'
+  impact: 'None on the system if the paper is withdrawn; otherwise a separate production release, early client migration and a five-month legacy-to-BIBS client sync.'
   modules: 'Renewal; Data migration'
   resolution: 'The paper is recorded as superseded as an operating model; its capabilities stay in scope for January 2028.'
   question: 'Please confirm that MANCOM will not approve the early release and that the paper is withdrawn.'
@@ -2847,7 +2847,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'Legacy package names must be remapped to the BIBS packages for the migrated policy headers (P01), the carried-forward RMEL cohorts (P03) and the package versions (R06). The paper asks for a design decision owner and whether mapping happens during upload or during sanitation. The data requirements workbook has no PACKAGE code map set.'
-  impact: 'Build: code map set and a renewal sanitation check. Test: sample RMEL validation in Trial migration 1.'
+  impact: 'System: code map set and a renewal sanitation check. Test: sample RMEL validation in Trial migration 1.'
   modules: 'Data migration; Renewal; Product Maintenance'
   resolution: 'Both: a versioned PACKAGE code map at intake for one-to-one mappings, plus a renewal check that sends unmapped, retired or split packages to Review for TSU; owner TSU with the MBS steward; rules agreed before 15-Jan-2027.'
   question: 'Who owns package remapping, and do you agree to map at intake with a sanitation check for exceptions?'
@@ -2857,11 +2857,11 @@ items:
   related: [IQ03, DMQ26]
 - ref: DCR-220
   brds: [BRD-06, BRD-13]
-  loc: 'Concept paper IV (p.1); BRD-13 BRID 12.1; renewal lead time 140 days (RENEWAL_DESIGN section 9)'
+  loc: 'Concept paper IV (p.1); BRD-13 BRID 12.1; renewal lead time 140 days (FRS BRD-6)'
   type: Gap / missing detail
   sev: Medium
   desc: 'Renewals expiring between the legacy freeze and go-live, and the RMEL cohorts expiring from T to T+140 days that legacy has already extracted, need an agreed treatment. With no early release, legacy processes renewals until the freeze.'
-  impact: 'Business: no lapse of cover over the cut-over. Build: P03 carry-forward.'
+  impact: 'Business: no lapse of cover over the cut-over. System: P03 carry-forward.'
   modules: 'Renewal; Data migration; Placement'
   resolution: 'Legacy places and books all renewals up to the freeze; cohorts T to T+140 days are carried forward with their disposition (P03); expiries in the freeze window are placed before the freeze or held by hold covers.'
   question: 'Please confirm the renewal treatment across the cut-over.'
@@ -2888,10 +2888,10 @@ items:
   type: BRD vs platform
   sev: High
   desc: 'The IER describes a multi-tenant microservice platform: ten services (bv-policy-admin-svc to bv-batch-notification-svc), three tenants (BDOI ~1,200 users, EB insurer portal ~50 partners, broker / RI network ~200 accounts), Aurora and MongoDB per tenant, Apigee X, Istio + OPA, EventBridge with ~80 topics, and "no cross-DB transactions". BIBS is one modular monolith (Spring Boot 3.5, Java 21) and one React frontend on EKS, with one PostgreSQL database where a business record, its journal, ledger and sub-ledger rows commit in one transaction.'
-  impact: 'Infrastructure sizing and cost; security and network design; the IER diagram would be signed off for a system that is not built.'
+  impact: 'Infrastructure sizing and cost; security and network design; the IER diagram would be signed off for an architecture BIBS does not use.'
   modules: 'Platform; Infrastructure'
-  resolution: 'Proposed: BIBS modular monolith with IER enterprise elements (edge security, managed AWS services, separate web, jobs and integration workloads), docs/architecture/ARCHITECTURE_OPTION_DECISION.md, awaiting BDOI confirmation. Replace the IER diagrams with the BIBS application and deployment diagrams (alignment document figures 3 and 4); restate the K8s sheets for the BIBS workloads.'
-  question: 'Please confirm that the IER will describe BIBS as built, and name the mandatory edge component (ALB + WAF, CloudFront, Apigee X).'
+  resolution: 'Proposed: BIBS modular monolith with IER enterprise elements (edge security, managed AWS services, separate web, jobs and integration workloads), per the architecture option decision, awaiting BDOI confirmation. Replace the IER diagrams with the BIBS application and deployment diagrams (alignment document figures 3 and 4); restate the K8s sheets for the BIBS workloads.'
+  question: 'Please confirm that the IER will describe the BIBS architecture, and name the mandatory edge component (ALB + WAF, CloudFront, Apigee X).'
   owner: 'BIBS Product Owner with BDO Cloud and Digital Operations Engineering'
   status: Open
   related: [IQ25, DCR-223, DCR-232]
@@ -2903,17 +2903,17 @@ items:
   desc: 'Column "Total PV (GB) EFS" computes max replicas x CPU limit (=E*H) instead of max replicas x PV (=E*K), giving 21,800 GB (DEV), 32,760 GB (UAT) and 43,600 to 87,200 GB (PROD Y1-Y5) where the declared PV is 20 GB. There are no K8s sheets for Pre-Prod and DR. The Pre-Prod sheet is titled "UAT ENVIRONMENT". The environment sheets hold template rows (Windows Server, EXACC, ON PREM, 0 CPU), so the SUMMARY (PHP 3.55 million over 5 years) does not cost RDS, MSK, ElastiCache or the EKS nodes. The enterprise discount is 10.5 % in Assumptions and 13 % in SUMMARY.'
   impact: 'Cost estimate and storage request are not usable.'
   modules: 'Infrastructure'
-  resolution: 'Proposed: BIBS modular monolith with IER enterprise elements (edge security, managed AWS services, separate web, jobs and integration workloads), docs/architecture/ARCHITECTURE_OPTION_DECISION.md, awaiting BDOI confirmation. BDOI IT corrects the formula (or removes EFS), adds Pre-Prod and DR cluster sheets, fills the environment sheets from the alignment sizing and re-costs.'
+  resolution: 'Proposed: BIBS modular monolith with IER enterprise elements (edge security, managed AWS services, separate web, jobs and integration workloads), per the architecture option decision, awaiting BDOI confirmation. BDOI IT corrects the formula (or removes EFS), adds Pre-Prod and DR cluster sheets, fills the environment sheets from the alignment sizing and re-costs.'
   question: 'Will BDOI IT correct and complete the IER from the BIBS sizing?'
   owner: 'BDO Cloud and Digital Operations Engineering'
   status: Open
   related: [IQ33, DCR-222]
 - ref: DCR-224
   brds: [BRD-00]
-  loc: 'IER workbook v20, VDI Requirements (OpenJDK Temurin 17, Node.js 20, Angular), HW & SW Requirements ("RHEL 9.x + PostgreSQL 16 (Amazon RDS)", GitLab Runner), Architecture Diagram (Infra) (a second CI toolchain named in the IER), Architecture Diagram (ArgoCD, Terraform + Crossplane), K8s sheets (Dynatrace)'
+  loc: 'IER workbook v20, VDI Requirements (OpenJDK Temurin 17, Node 20, Angular), HW & SW Requirements ("RHEL 9.x + PostgreSQL 16 (Amazon RDS)", GitLab Runner), Architecture Diagram (Infra) (a second CI toolchain named in the IER), Architecture Diagram (ArgoCD, Terraform + Crossplane), K8s sheets (Dynatrace)'
   type: BRD vs platform
   sev: Medium
-  desc: 'The IER names JDK 17, Node 20 and an Angular SPA; BIBS uses Java 21, Node 22 and React 19. RDS rows name "RHEL 9.x" for a managed engine. Three CI/CD toolchains are named (GitLab, a second CI toolchain named in the IER, ArgoCD) and two observability stacks (Dynatrace; CloudWatch, X-Ray, Prometheus, Loki, Grafana). BIBS builds on the CI pipeline (GitLab CI definition in the delivery) and exposes Prometheus metrics.'
+  desc: 'The IER names JDK 17, Node 20 and an Angular SPA; BIBS uses Java 21, Node 22 and React 19. RDS rows name "RHEL 9.x" for a managed engine. Three CI/CD toolchains are named (GitLab, a second CI toolchain named in the IER, ArgoCD) and two observability stacks (Dynatrace; CloudWatch, X-Ray, Prometheus, Loki, Grafana). BIBS is delivered through one pipeline and exposes Prometheus metrics.'
   impact: 'VDI images, pipelines and monitoring set up for the wrong stack.'
   modules: 'Infrastructure; Delivery'
   resolution: 'VDI list: Temurin 21, Maven 3.9, Node 22; RDS rows without an OS; one toolchain and one APM named by BDOI IT.'
@@ -2936,7 +2936,7 @@ items:
   related: [IQ26, DCR-135]
 - ref: DCR-226
   brds: [BRD-00]
-  loc: 'IER workbook v20, Assumptions 3 (non-production 12 x 5); BIBS job schedules (application.yml)'
+  loc: 'IER workbook v20, Assumptions 3 (non-production 12 x 5); BIBS job schedules (FRS configuration chapters)'
   type: NFR inconsistency
   sev: Medium
   desc: 'Non-production runs 12 hours a day, 5 days a week. BIBS night jobs run at 20:00, 22:15-23:00, 01:00, 05:00 and 06:00 Philippine time; month-end close, trial migrations (weekend loads) and the dress rehearsal need longer hours. MSK and ElastiCache cannot be stopped.'
@@ -2949,14 +2949,14 @@ items:
   related: [IQ27]
 - ref: DCR-227
   brds: [BRD-00, BRD-13]
-  loc: 'BDOI answer A4 (26-Sep-2026); IER HW & SW Requirements (S3 document store + EFS shared PV); DOCUMENT_STORAGE_DECISION.md'
+  loc: 'BDOI answer A4 (26-Sep-2026); IER HW & SW Requirements (S3 document store + EFS shared PV); document storage proposal'
   type: BRD vs platform
   sev: High
   desc: 'BDOI requires documents and attachments in S3 only. BIBS keeps file bytes in PostgreSQL bytea columns in 13 tables (attachments, slips, advices, service invoices, remittance and billing documents, print batches, EOD outputs, report runs and batches, extracts, e-mail attachments, issuance uploads). The IER also plans EFS for shared volumes, which BIBS does not use.'
-  impact: 'Build items ST0 (storage port, stored_file, presigned links) and ST1 (every module moved, existing bytes copied); IER rows for buckets, KMS, endpoint, replication and malware scanning; EFS removed.'
+  impact: 'S3 document store and the copy of the existing files; IER rows for buckets, KMS, VPC gateway, replication and malware scanning; EFS removed.'
   modules: 'Attachments; Documents; Reports; all modules storing files; Infrastructure'
-  resolution: 'Option C of DOCUMENT_STORAGE_DECISION.md: S3 for bytes, PostgreSQL metadata, 5-minute presigned links after the permission check and audit, four buckets per environment, SSE-KMS, Object Lock governance, cross-region replication.'
-  question: 'Please confirm option C and the five decisions of DOCUMENT_STORAGE_DECISION.md section 5.'
+  resolution: 'Option C of the document storage proposal: S3 for the file content, PostgreSQL metadata, 5-minute signed links after the permission check and audit, four buckets per environment, SSE-KMS, Object Lock governance, cross-region replication.'
+  question: 'Please confirm option C and the five decisions of the document storage proposal.'
   owner: 'BIBS Product Owner with BDO Cloud and Digital Operations Engineering'
   status: Answered
   response: 'BDOI answer of 26-Sep-2026: documents and attachments are stored in an S3 bucket only. Design options still to confirm (IQ31).'
@@ -2980,7 +2980,7 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'BRD-11 makes an approved request in BIBS the only way to change a user or a group profile. The drop plan adds UIDM-ISC, an identity governance tool that normally owns access requests, approvals, provisioning and certification.'
-  impact: 'Build: provisioning API and aggregation; the BRD-11 request screens may be reduced. Test: joiner / mover / leaver cases.'
+  impact: 'System: provisioning API and aggregation; the BRD-11 request screens may be reduced. Test: joiner / mover / leaver cases.'
   modules: 'User Access; Security'
   resolution: 'UIDM-ISC provisions users and group-profile assignments through an API (SCIM 2.0 or its connector) with the ISC request number in the change log; group-profile definitions stay in BIBS under BRD-11.'
   question: 'Does UIDM-ISC own access requests and approvals? Which connector?'
@@ -2993,7 +2993,7 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'BRD-11 asks for authentication of the Windows ID through BDO EUA with a password, and for lockout after 3 invalid attempts in BIBS. The drop plan names EIAM on Entra ID, which is a redirect-based sign-in (OpenID Connect) where the password, MFA and lockout sit in Entra ID. The BIBS directory port checks a password and does not fit a redirect.'
-  impact: 'Build: OIDC sign-in in the frontend and backend, user mapping, break-glass administrator; lockout and password rules move to Entra ID. Test: log-in cases of every BRD.'
+  impact: 'System: OIDC sign-in in the frontend and backend, user mapping, break-glass administrator; lockout and password rules move to Entra ID. Test: log-in cases of every BRD.'
   modules: 'Security; User Access'
   resolution: 'EIAM OIDC sign-in for all internal users; roles and permissions stay in BIBS; local sign-in kept only for a break-glass administrator.'
   question: 'Please confirm OIDC against Entra ID, the identifying claim, MFA, session lifetimes and whether EIAM replaces EUA.'
@@ -3006,7 +3006,7 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'The IER plans 15 VDI users. The hosting appendix restricts access to personnel in the Philippines, without saying whether this applies to DEV and SIT with masked data or to vendor staff outside the Philippines.'
-  impact: 'Delivery model of the build and support teams; VDI count.'
+  impact: 'Delivery model of the delivery and support teams; VDI count.'
   modules: 'Delivery; Security'
   resolution: 'Production and UAT only from the Philippines; DEV and SIT with masked data reachable by named vendor staff through VDI.'
   question: 'Does the access restriction apply to DEV and SIT with masked data? Which vendor staff need VDI?'
@@ -3033,7 +3033,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'EDP ingestion and the Enterprise General Ledger are named without specification. No BRD describes what BIBS sends to EGL (journal detail or balances, frequency, account mapping) or what EDP ingests; "SD 11" is not explained. BIBS has no GL or data-platform interface today.'
-  impact: 'Build: two new outbound interfaces in Drop 2 (build Mar-Apr 2027). Test: reconciliation of EGL to the BIBS GL.'
+  impact: 'System: two new outbound interfaces in Drop 2 (Mar-Apr 2027). Test: reconciliation of EGL to the BIBS GL.'
   modules: 'Accounting (GL); Platform'
   resolution: 'EGL: daily journal extract with a code map to EGL accounts and control totals; EDP: daily extracts to an S3 drop per SD 11. Final once specified.'
   question: 'Please provide the EGL and EDP (SD 11) interface specifications by 31-Jan-2027.'
@@ -3047,9 +3047,9 @@ items:
   type: Gap / missing detail
   sev: Medium
   desc: 'Bank and payment channels are named without layouts or transport: CMS / New BOB for outward payments, OBPCS for bills payment, Old BOB for SOA funds transfers, PMS for PDCs. AFTS is not explained. BIBS has configurable payment-file handlers (PAY_BILLS, PAY_DIRECT_CREDIT, PAY_PDC, PAY_TRADE, PAY_CLPC) and a BOB approval upload, with layouts still open (OQ03, AQ09).'
-  impact: 'Build: layouts and possibly host-to-host transfer in Drop 0.'
+  impact: 'System: layouts and possibly host-to-host transfer in Drop 0.'
   modules: 'Cashiering; Disbursement'
-  resolution: 'Layouts configured in the payment-file layout table; CMS / New BOB outward file built in disbursement; automated transfer if BDOI IT offers it.'
+  resolution: 'Layouts configured in the payment-file layout table; CMS / New BOB outward file from Disbursement; automated transfer if BDOI IT offers it.'
   question: 'Please provide the layouts, transport and cut-off times for CMS / New BOB, OBPCS, Old BOB, PMS and AFTS.'
   owner: 'Operations - Financial Transactions and Processing, with Comptrollership and BDOI IT'
   status: Open
@@ -3075,9 +3075,9 @@ items:
   type: Conflict between BRDs
   sev: High
   desc: 'The concept paper, signed by MANCOM on 06-Sep-2026, proposes an early renewal release on or before 15-Aug-2027 for January-May 2028 expiries, with the client master and all renewal-related reference data migrated before it (section VI, p.2). BDOI decided on 26-Sep-2026 that everything goes live together in January 2028 (drop plan and timeline: go-live January 2028, full migration and cut-over Nov 2027-Jan 2028). The concept paper is therefore superseded, but the January-May 2028 expiries it targeted are exactly the cohorts that are in their renewal cycle in legacy at a January 2028 go-live (T to T + 140 days).'
-  impact: 'Business: renewals of January-May 2028 expiries (about 25,800 accounts a month, umbrella p.44-45). Build: carried RMEL cohorts (layout P03), catch-up extraction in Renewal, no pre-cut-over production load. Test: renewal of a carried legacy policy; trial-migration load order.'
+  impact: 'Business: renewals of January-May 2028 expiries (about 25,800 accounts a month, umbrella p.44-45). System: carried RMEL cohorts (layout P03), catch-up extraction in Renewal, no pre-cut-over production load. Test: renewal of a carried legacy policy; trial-migration load order.'
   modules: 'Data migration; Renewal'
-  resolution: 'Concept paper recorded as superseded by the single January 2028 go-live. Kept from it: reference data and clients load first in every trial migration (prerequisite for renewal testing); RMEL validation and exception handling for the carried January-May 2028 cohorts; the package remapping decision. Proposal for the cohorts: prepared in legacy from August 2027 as today, carried at the freeze with their disposition, placed and booked in BIBS from go-live; catch-up extraction at go-live as the safety net (DATA_MIGRATION_DESIGN section 15.1).'
+  resolution: 'Concept paper recorded as superseded by the single January 2028 go-live. Kept from it: reference data and clients load first in every trial migration (prerequisite for renewal testing); RMEL validation and exception handling for the carried January-May 2028 cohorts; the package remapping decision. Proposal for the cohorts: prepared in legacy from August 2027 as today, carried at the freeze with their disposition, placed and booked in BIBS from go-live; catch-up extraction at go-live as the safety net (BRD-13 migration strategy).'
   question: 'Are the renewals of the January-May 2028 expiries prepared in legacy and carried into BIBS at the freeze (proposal), or processed in BIBS only after go-live from a catch-up extraction? Confirm that renewals whose new term starts before go-live are placed and booked in legacy before the freeze.'
   owner: 'Marketing and Processing - Renewal (RMEL); Program Manager'
   status: Answered
@@ -3089,7 +3089,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'The concept paper names package remapping as a key risk: legacy package names must be remapped to the correct BIBS package names, with "a firm design choice, clear ownership, and testing", and asks MANCOM to assign a design decision owner and to decide whether mapping happens during upload processing or during sanitation. The paper is superseded, but the decision is still needed: the in-force headers (P01), the carried renewals (P03) and the package versions (R06) all carry legacy packages, and BRD-13 BRID 3.1 does not say how packages are remapped or by whom.'
-  impact: 'Business: correct package on renewals and endorsements of legacy policies. Build: PACKAGE code map with conditional entries; Renewal sanitation check for unresolved packages. Test: package split by sum-insured band; unresolved package in the Exception bucket.'
+  impact: 'Business: correct package on renewals and endorsements of legacy policies. System: PACKAGE code map with conditional entries; Renewal sanitation check for unresolved packages. Test: package split by sum-insured band; unresolved package in the Exception bucket.'
   modules: 'Data migration; Product Maintenance; Renewal'
   resolution: 'Proposal: remap at upload through an approved PACKAGE code map (maker-checker, gate G2), with conditional entries where one legacy package splits; rows the map cannot resolve load as UNRESOLVED and go to the Renewal Exception bucket, where TSU chooses the package and the choice is added to the next map version. TSU prepares the map, the Product Owner of Marketing Business System approves it, MANCOM confirms the owner.'
   question: 'Is package remapping done at upload (proposal) or during Renewal sanitation, and who owns the decision and the map? Which legacy packages split into several BIBS packages, and on which attributes?'
@@ -3100,11 +3100,11 @@ items:
 - ref: DCR-242
   brds: [BRD-13, BRD-00]
   drop: Programme
-  loc: 'BDOI Programme Timeline (image, go-live marker at the end of the January 2028 column); BRD-13 BRID 12.1 (p.12); DATA_MIGRATION_DESIGN section 17.2'
+  loc: 'BDOI Programme Timeline (image, go-live marker at the end of the January 2028 column); BRD-13 BRID 12.1 (p.12); BRD-13 migration strategy, cutover'
   type: Ambiguity
   sev: Medium
   desc: 'The timeline sets go-live in January 2028 and draws the marker at the end of the January column. The migration plan proposes Monday 3 January 2028, the first business day after the legacy year-end close, so the opening trial balance is a closed year-end balance and the January expiries can be placed in BIBS on time. That date puts the cut-over over the year-end holidays (24-25 and 30-31 December, 1 January): the last legacy business day would be 29 December and the production load would run on New Year''s Day. A later January date keeps legacy running into January and needs a January cut-off of the trial balance.'
-  impact: 'Business: availability of staff and bank channels over the holidays; year-end closing and audit adjustments. Build: none. Test: dress rehearsal timings.'
+  impact: 'Business: availability of staff and bank channels over the holidays; year-end closing and audit adjustments. System: none. Test: dress rehearsal timings.'
   modules: 'Data migration; Accounting'
   resolution: 'Proposal: T = Monday 3 January 2028; last legacy business day Wednesday 29 December 2027; legacy EOD and year-end close on 31 December; tasks moved off the holidays in the runbook. Date confirmed at M6 (1-Oct-2027).'
   question: 'Is go-live on Monday 3 January 2028 (after the legacy year-end close) or later in January? If 3 January: is 29 December the last legacy business day, does the year-end close complete on 31 December, and how are late 2027 and audit adjustments booked after go-live?'
@@ -3118,7 +3118,7 @@ items:
   type: Gap / missing detail
   sev: High
   desc: 'Carrying the January-May 2028 renewals "with their disposition" needs the legacy disposition, RA status, insurer approval and proposed terms per policy. The Renewal BRD says dispositions are made in spreadsheets and communicated by e-mail, and only packaged accounts go through the QPS upload and the RMEL text file (p.42). There is no system source for the disposition part of the carried rows, and the concept paper flags RMEL data quality as a risk that needs validation, exception reporting and review checkpoints.'
-  impact: 'Business: business units must consolidate their disposition files monthly. Build: layout P03 combines the legacy RMEL extract with the disposition file; cohort completeness check. Test: rejected rows in every trial migration.'
+  impact: 'Business: business units must consolidate their disposition files monthly. System: layout P03 combines the legacy RMEL extract with the disposition file; cohort completeness check. Test: rejected rows in every trial migration.'
   modules: 'Data migration; Renewal'
   resolution: 'Proposal: one consolidated disposition template per cohort month from Trial migration 1, merged with the legacy RMEL extract into P03; rejected rows to the Heads of Retail and Corporate Marketing after every trial migration; completeness check per month; catch-up extraction at go-live for any header without a carried row.'
   question: 'Who produces the legacy RMEL extract for the January-May 2028 expiries, where are the dispositions, RA status, insurer approvals and proposed terms kept, will the business units fill one consolidated template per month, and who reviews the rejected rows?'
@@ -3427,7 +3427,7 @@ nfr:
   BRD-12: 'Not stated'
   BRD-13: 'Not stated; refers to the consolidated NFR, not in the pack (p.13-14)'
   conflict: true
-  proposed: 'Several roles per user; single session per device parked until answered'
+  proposed: 'Several roles per user; single session per device on hold until answered'
   refs: [DCR-044, DCR-045, DCR-141]
 - theme: Audit logging
   BRD-01: 'Audit log report (BRNB.089, p.127)'

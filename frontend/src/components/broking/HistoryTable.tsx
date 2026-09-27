@@ -81,6 +81,7 @@ export function HistoryTable({
               <tr key={`${entry.occurredAt}-${String(order)}`}>
                 <td className="col-status">
                   <StatusBadge
+                    full
                     status={entry.toStage}
                     label={stageLabel(entry.toStage, entry.toStageName)}
                   />

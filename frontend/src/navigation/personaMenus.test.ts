@@ -92,10 +92,10 @@ describe.each(SUITES.map((s) => [s.id, s] as const))('persona menus of %s', (_id
 });
 
 describe('persona menus across suites', () => {
-  it('lists every persona once, 39 in all', () => {
+  it('lists every persona once, 45 in all', () => {
     const codes = SUITES.flatMap((s) => Object.keys(s.roles));
     expect(new Set(codes).size).toBe(codes.length);
-    expect(codes).toHaveLength(39);
+    expect(codes).toHaveLength(45);
   });
 
   it('lists a role in a suite once', () => {

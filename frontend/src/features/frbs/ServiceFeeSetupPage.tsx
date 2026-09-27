@@ -16,6 +16,7 @@ import { frbsApi } from './api';
 import type { ServiceFeeRecipient, ServiceFeeRule } from './api';
 import { RecipientDialog, RuleDialog } from './SetupDialogs';
 import './frbs.css';
+import { formatRate } from '@/utils/format';
 
 const RULE_COLUMNS: Column<ServiceFeeRule>[] = [
   {
@@ -28,7 +29,7 @@ const RULE_COLUMNS: Column<ServiceFeeRule>[] = [
       </>
     ),
   },
-  { key: 'rate', header: 'Rate', numeric: true, render: (r) => `${String(r.rate)}%` },
+  { key: 'rate', header: 'Rate', numeric: true, render: (r) => `${formatRate(r.rate)}%` },
   {
     key: 'base',
     header: 'Base',

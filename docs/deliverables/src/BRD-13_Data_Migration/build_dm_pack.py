@@ -411,8 +411,14 @@ class Catalogue:
             return []
         allowed = self.field_names
         hits: set[str] = set()
-        texts = [self._seed_texts(), yaml.safe_dump(self.data, width=10000), yaml.safe_dump(self.cutover, width=10000)]
-        texts = [re.sub(r"(?m)^\s*#.*$", "", t) for t in texts]
+        def values(node: Any) -> list[str]:
+            if isinstance(node, dict):
+                return [v for x in node.values() for v in values(x)]
+            if isinstance(node, list):
+                return [v for x in node for v in values(x)]
+            return [str(node)] if isinstance(node, str) else []
+
+        texts = [self._seed_texts(), "\n".join(values(self.data)), "\n".join(values(self.cutover))]
         for text in texts:
             for line in text.splitlines():
                 for label, pattern in patterns:

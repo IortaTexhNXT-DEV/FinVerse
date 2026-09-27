@@ -11,7 +11,7 @@ digraph sc_str {
   EXTRACTED    [label="EXTRACTED\n(AMLC file saved)"];
   FILED        [label="FILED\n(AMLC reference)", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
 
-  DRAFT -> FOR_APPROVAL [label=" str_ready (completeness check)"];
+  DRAFT -> FOR_APPROVAL [label=" STR ready for extraction (completeness check)"];
   FOR_APPROVAL -> APPROVED [label=" committee-approved STR"];
   FOR_APPROVAL -> DRAFT [label=" returned", style=dashed];
   APPROVED -> EXTRACTED [label=" Extract Approved STRs (batch)"];

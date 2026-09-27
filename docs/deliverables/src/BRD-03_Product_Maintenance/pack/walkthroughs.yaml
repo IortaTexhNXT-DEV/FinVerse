@@ -39,7 +39,7 @@ walkthroughs:
       - [MKT_AO, SCR-PM-21, "Opens Premium Calculator, chooses MTR30 and Mabuhay General Insurance Corp., enters a vehicle value and clicks Calculate", "Priced on package version 1 (effective <date>, scheme rate 1.2%) with every charge and the commission", Priced on version 1, wt-a-21]
       - [MKT_AO, SCR-PM-22, "Creates a New Business quotation of MTR30 for the seed client with an item rate of 1.10%, opens it and clicks Request Rate Exception with the reason", "The rate scheme panel shows the exception pending approval", Exception requested, wt-a-22]
       - [NB_APPROVER, SCR-PM-22, "Opens My Approvals, clicks the rate exception of the quotation, compares the requested rate with the scheme in force on the exception record, clicks Approve, writes the comment and confirms", "Toast: Rate exception RSE-yyyy-nnnnnn approved; the record shows Approved with the approver, the date and the comment; the Account Officer receives the notice", Exception approved, wt-a-23]
-      - [MKT_AO, SCR-PM-22, "Opens the quotation again after the approval", "The rate scheme panel lists the exception Approved; the quotation can be submitted for review", Quotation ready for review, wt-a-24]
+      - [MKT_AO, SCR-PM-22, "Opens the quotation again after the approval", "The Rate Exceptions table lists the exception Approved; the quotation can be submitted for review", Quotation ready for review, wt-a-24]
     downstream:
       - "New Business (BRD-1): New Quotation and New Account offer MTR30 to the segments of the package; the quotation, the account and the booked invoice keep version 1 and the approved exception."
       - "Booking and Operations: the booked invoice stores version 1 and the incentive criteria it matches; endorsements re-rate on version 1."

@@ -38,7 +38,12 @@ public interface UnappliedDispositionRequests {
     /** Reclassify the payment (other client or type). */
     RECLASS,
     /** Transfer the payment to another marketing unit. */
-    TRANSFER
+    TRANSFER,
+    /**
+     * Recognise the payment as BDOI income of the given income type, with an official receipt
+     * (handling fee of submitted policies, BRIDSP-31; SUBMITTED_POLICIES_DESIGN section 3.6).
+     */
+    RECOGNIZE_INCOME
   }
 
   /** Where a request stands when it is answered. */
@@ -63,6 +68,8 @@ public interface UnappliedDispositionRequests {
    * @param source requesting module (COLLECTIONS)
    * @param sourceRef its reference (idempotency key)
    * @param remarks remarks, may be null
+   * @param incomeType income type of a RECOGNIZE_INCOME request (e.g. HANDLING_FEE), null for the
+   *     other actions
    */
   record DispositionRequest(
       Long companyId,
@@ -73,7 +80,46 @@ public interface UnappliedDispositionRequests {
       String requestedBy,
       String source,
       String sourceRef,
-      String remarks) {}
+      String remarks,
+      String incomeType) {
+
+    /**
+     * A request of an action other than RECOGNIZE_INCOME (no income type).
+     *
+     * @param companyId company
+     * @param unappliedRef item reference (Cashiering key)
+     * @param action what to do
+     * @param invoiceNo target invoice (mandatory for APPLY_TO_INVOICE), may be null
+     * @param amount amount, null for the whole unapplied balance
+     * @param requestedBy collector
+     * @param source requesting module (COLLECTIONS)
+     * @param sourceRef its reference (idempotency key)
+     * @param remarks remarks, may be null
+     */
+    @SuppressWarnings("java:S107") // the components of the request
+    public DispositionRequest(
+        Long companyId,
+        String unappliedRef,
+        Action action,
+        String invoiceNo,
+        BigDecimal amount,
+        String requestedBy,
+        String source,
+        String sourceRef,
+        String remarks) {
+      this(
+          companyId,
+          unappliedRef,
+          action,
+          invoiceNo,
+          amount,
+          requestedBy,
+          source,
+          sourceRef,
+          remarks,
+          null);
+    }
+  }
 
   /**
    * Answer to a request.

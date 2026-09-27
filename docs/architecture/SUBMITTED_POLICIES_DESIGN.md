@@ -1,6 +1,6 @@
 # iNXT BrokerVerse - BDOI Submitted Policies (BRD-12) Build Design
 
-Status: **proposal for review**. It extends `docs/architecture/BROKING_ARCHITECTURE.md` (binding), `OPERATIONS_DESIGN.md`,
+Status: **built** (section 17 records what was built and where it departs from the sections above; the Renewal side of the hand-off is wave R3 of `RENEWAL_DESIGN.md`, section 17). It extends `docs/architecture/BROKING_ARCHITECTURE.md` (binding), `OPERATIONS_DESIGN.md`,
 `COLLECTIONS_DESIGN.md` and `ACCOUNTING_DISBURSEMENT_DESIGN.md`, and it does not change them. Requirements baseline:
 [`BDOI_SP_BRD_SPEC.md`](../requirements/BDOI_SP_BRD_SPEC.md) (33 requirement IDs BRIDSP-01 to 33, questions SQ01-SQ25).
 Every class, migration and screen cites its BRD ID in Javadoc or a comment, for example `BRIDSP-12`.
@@ -523,3 +523,102 @@ Parallel-work rules:
 4. **Handling-fee tagging depends on two modules being built** (cashiering, collections). Mitigation: the tagger works
    against the ports; with the default adapters the request is DEFERRED to the hand-off queue.
 5. **2-second response NFR.** Mitigation: indexed masterlist queries, asynchronous runs and exports.
+
+## 17. As built
+
+The module is built in the package `submitted` and the screens `frontend/src/features/submitted`. The module guide is
+[`docs/modules/SUBMITTED_POLICIES.md`](../modules/SUBMITTED_POLICIES.md). The Renewal side of the hand-off
+(`SubmittedPolicyRenewalHandOff`) is wave R3 of [`RENEWAL_DESIGN.md`](RENEWAL_DESIGN.md) section 17.
+
+### 17.1 Code layout
+
+| Package (`submitted.*`) | Content |
+|---|---|
+| `domain` | The masterlist record `SbmPolicy` (embedded loan, assured, terms, risk and marks; origin and tracking), its history, sources, status map, intake runs, LAMD loans, extractions, user scopes; rule sets, rules and conditions, runs and results, limit rules and checks; reviews, IAAF with links, TOR, approval matrix and signatures (`SbmApprovable`); hand-offs, insurer and letter rules, letters, print batches; handling fees and No Touch batches with their lines |
+| `service` | `SubmittedCodes`, `SbmScopeService` (segments and own records, as a query condition and as report SQL), `SbmPolicyFlow` (the `SBM_POLICY` work case), `SbmHistoryService`, `SbmPolicyChecks`, `SbmParameters`, `SubmittedRetentionProvider`; `service.port` (`RenewalHandOff`, `SubmittedSourceFeed`, `MailHouseGateway`, `SignatureProvider`) and `service.adapter` (the pending hand-off, no source feed, stamped signature, print batches of the mail house, owner access of the stored files) |
+| `masterlist` | Masterlist list with tabs and filters, record, create and change, renewal tag, tracking, assignment, handler actions, field history; document extraction with its proposal and confirmation |
+| `intake` | Intake runs, the six source uploads (`SBM_LFS_INSURANCE`, `SBM_HLS_INSURANCE`, `SBM_CIU`, `SBM_SPI`, `SBM_LOAN_BOOKING`, `SBM_IA_MASTERLIST`), the LAMD snapshot `SBM_LAMD`, the migration `SBM_MIGRATION`, the pull job `SBM_INTAKE_PULL`, the intake runs and home counts API |
+| `processing` | Facts, rule engine, active rules, the four steps and the limits, runs (manual, intake, scheduled) with `SBM_PROCESSING`, rule sets with maker and checker |
+| `review` | Reviews, IAAF and TOR with the matrix approvals, signed PDFs, the approval inbox source, the SLA alert check |
+| `renewal` | Hand-off and Renew with BDOI, the expiry scan, the follow-up of the renewal account (`AccountStatusChanged`, `InvoiceBooked`), the hold cover watch and the insurer re-assignment, letters and print batches with their jobs, the work list API |
+| `fee` | Handling fees (billing upload `SBM_HANDLING_FEE_BILLING`, tagger job, answer of Cashiering), No Touch export, return upload `SBM_NO_TOUCH_RETURN` and billing |
+| `setup` | Limit, insurer and letter rules and the approval matrix (maker and checker), sources, status map, user scopes, rule sets API |
+| `report` | The 20 reports of section 11 (`SbmSqlReport` and `SbmReportSupport`: company, date range, scope, labels) |
+| `seed` | `SubmittedSeedData` (seed profile) |
+
+### 17.2 Flyway as built
+
+| Version | Content |
+|---|---|
+| V769 (cashiering; V766-V768 are Data Migration's) | Disposition action INCOME, type HANDLING_FEE with its event, OR type and VAT rate, `csh_disposition.or_no` |
+| V1008 (collections) | Collector request action RECOGNIZE_INCOME with its income type |
+| V851 (placement) | Hold cover status REASSIGNED with its reason |
+| V861 (issuance) | Extraction pattern kind (EPOLICY, SUBMITTED_POLICY), the submitted-policy fields and their default patterns |
+| V1070 | Roles, grants, permission actions, lists of values, document types, parameters, exception and alert codes, notification events, accounting event types `SBM_HANDLING_FEE` and `SBM_NO_TOUCH_FEE`, workflows `SBM_POLICY`, `SBM_IAAF`, `SBM_TOR`, templates |
+| V1071 | Masterlist, history, sources and status map (global), intake runs, extractions and their fields, LAMD loans, user scopes |
+| V1072 | Rule sets, rules and conditions, runs and results, limit rules and checks |
+| V1073 | Reviews, IAAF and links, TOR, approval matrix, signatures |
+| V1074 | Hand-offs, insurer and letter rules, letters, print batches; parameter `SBM_MANUAL_RENEWAL_SEGMENTS` |
+| V1075 | Handling fees, No Touch batches and lines; service invoice type `SERVICE_FEE_NO_TOUCH` |
+| V1076 | Retention rule `SUBMITTED_POLICY` (booked, not renewed, excluded and closed records; 5 years, then review) |
+| V1970 | Seed users `sbmhandler`, `firehandler`, `sbmchecker`, `sanitation`, `sbmtl`, `polreview`, `sbmfee`, user scopes, GL accounts 4115 and 1236 with the rules of the two events, active rule sets, insurer limits, insurer assignment and letter rules, the approval matrix, the LAMD snapshot |
+| V1971-V1979 | Not used: the seed records are created by `SubmittedSeedData` through the services |
+
+### 17.3 Jobs, uploads, alerts and reports
+
+- Jobs: `SBM_PROCESSING` (21:30 PHT), `SBM_EXPIRY_SCAN` (22:00 PHT), `SBM_LETTER_DISPATCH` (06:30 PHT),
+  `SBM_HOLD_COVER_WATCH` (07:00 PHT), `SBM_HANDLING_FEE_TAGGER` (every 30 minutes), `SBM_INTAKE_PULL` (not scheduled).
+  Crons `brokerverse.jobs.sbm-*-cron` in `application.yml`, listed in `docs/operations/CONFIGURATION.md`.
+- Uploads: the six source uploads, `SBM_LAMD`, `SBM_MIGRATION`, `SBM_HANDLING_FEE_BILLING`, `SBM_NO_TOUCH_RETURN`.
+- Alerts: `SBM_IAAF_SLA` and `SBM_TOR_SLA` (daily check `ReviewSlaCheck`, a document waiting at its level longer than
+  `SBM_REVIEW_SLA_DAYS`), `SBM_INSURER_NOT_ACCEPTED`, `SBM_HOLD_COVER_UNBOOKED` (hold cover watch), `SBM_LETTER_FAILED`.
+- Reports (category Submitted Policies): the 20 codes of section 11, each with the company and a date range; the
+  reports that read the masterlist are limited to the user's scope.
+
+### 17.4 Screens as built
+
+Submitted Policies Home, Masterlist, the policy record (tabs Details, Rule Results, Review & IAAF, TOR, Renewal, Letters,
+Documents, History), Upload & Intake, Extraction Review, Processing Runs, Reviews & IAAF, Terms of Reference, Renewal
+Work List, Letters & Print Batches, Handling Fees, No Touch Billing and Submitted Policies Setup (tabs Rule Sets,
+Insurer Limits, Insurer Assignment, Letter Rules, Approval Matrix, Sources, User Scopes). The Rule Sets tab is the rule editor:
+a new rule set (draft), its header, rules added, changed and removed with their conditions and outcome, Submit by the
+maker, Approve or Reject (with a reason) by another checker, and New Version of an active set. Approve, reject, release,
+send, bill and the other acting buttons confirm in a dialog naming the record and the effect (`ConfirmButton`); the
+messages use the notice standard (`Notice`). The persona suite `BRD-12` of
+`personaMenus.json` lists the six roles of the module; the screenshots are in `tools/screenshots/screens.cjs` (slugs
+`submitted-*`).
+
+### 17.5 Departures from the sections above
+
+| Topic | Design | As built | Why |
+|---|---|---|---|
+| Rule content | Rule sets, limits, insurer and letter rules and the matrix in V1072-V1074 | Tables in V1072-V1074, content per company in the seed V1970; production content through Setup | The rules are BDOI's (SQ03, SQ11); schema migrations stay free of business content |
+| Source register and status map | Per company | Global tables | The sources and legacy statuses are the bank's, the same for every company |
+| Extraction input | An attachment already stored | The uploaded document is read at once and stored as the record's document | One step for the handler; the same storage |
+| Unapplied payment of a fee | PN and location fields on the unapplied view | The view gained `channel`; the PN and the location are matched on the payment reference | Cashiering keeps a single reference field |
+| OR of the income | Read back from Cashiering | Carried on `UnappliedDispositionChanged.documentNo` | No read port needed |
+| JSON columns | Extracted fields, rule conditions and findings as JSON | Child tables (`sbm_extraction_field`, `sbm_rule_condition`) and a text list | Queryable and validated by Hibernate |
+| Pending hand-offs | Replayed by Renewal at deployment | Offered again by every expiry scan until Renewal takes them | No deployment step |
+| Collections list | Label "Handling fee (auto)" in the collector list | Not built; the request carries the income type | Display only |
+| Limits step | Package limits of the catalog | The limit rules of `sbm_limit_rule` (sum insured, vehicle age, attribute) | The catalog has no package limits of submitted policies |
+| Letter files | Attachments | Stored files (`StoredFileService`, owners `SubmittedLetter`, `SubmittedPrintBatch`); IAAF and TOR PDFs are attachments of the record | Letters are system output; the IAAF and TOR are record documents |
+| Handling fee seed user | `upphandler` (the Collections unapplied handler) also holds `SBM_UPP_HANDLER` | Own seed user `sbmfee` holding only `SBM_UPP_HANDLER` | A persona seed user holds one role; the Collections user keeps its role |
+| Rule upload | `SBM_RULES` upload | Not built: the rule sets are kept in Setup and through the rule-set API | Rules are few and changed with maker and checker |
+| Seed records | V1971-V1972 | `SubmittedSeedData` through the services | The work cases, runs and approvals are created exactly as in production |
+| Renewal account and hold cover (R3) | At hand-off | By Renewal's processing when the client and package are resolved (origin SUBMITTED_POLICY, renewing the masterlist number); kept by decision, a clarification item for BDOI | A submitted policy has no BIBS client or package at hand-off |
+
+### 17.6 Notes for the FRS v1.1
+
+- FR-SP-001 to 006: the source layouts are placeholders until BDOI supplies them (SQ01); the intake pull is off.
+- FR-SP-020 to 024: a record no rule places falls out with `SBM_NO_RULE`; a manual tag overrides the rules of the next
+  runs and is reported as overridden.
+- FR-SP-040, 041: the IAAF is generated only after an adequate review; the preparer cannot approve; the levels follow the
+  matrix band of the segment and sum insured.
+- FR-SP-051 to 053: a TOR needs a limit breach of the last run; the Account Officer's first download releases it.
+- FR-SP-060 to 064: Renew with BDOI is open to For Renewal records; the insurer is re-assigned only while the hold cover
+  is not accepted.
+- Clarification item for BDOI: the renewal account and hold cover of a handed-over record are created by Renewal's
+  processing once the client and package are resolved, not at hand-off.
+- FR-SP-070 to 075: a payment matching several fees waits for the handler; the income and the OR are Cashiering's.
+- The report layouts without fields in the Report List are flagged "layout to confirm" (SQ25).
+

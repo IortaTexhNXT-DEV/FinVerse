@@ -171,6 +171,8 @@ export default function HoldDetailPage() {
       <WorkflowPanel
         entityType={ENTITY}
         entityId={id}
+        recordStatus={h.stage}
+        onChanged={() => void hold.refetch()}
         renderBusinessActions={(actions) =>
           actions
             .filter((a) => a.action === 'extend' || a.action in CALLS)

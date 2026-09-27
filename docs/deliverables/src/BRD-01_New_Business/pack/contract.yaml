@@ -16,7 +16,7 @@ contract:
     what: Package versions with their rate scheme, rate exceptions approved for a transaction, rates and taxes, short-period table, motor limits
     how: Read at every premium computation (Appendix A); a quotation or account priced on an old version is re-priced or needs an approved rate exception
     owner: MBS; the approver of the rate exception
-    screens: New Quotation, Quotation record (rate scheme panel), New Account, New Endorsement
+    screens: New Quotation, Quotation record (Rate Exceptions card), New Account, New Endorsement
     frs: [FR-NB-062, FR-NB-041]
   - id: IC-03
     party: BRD-3 Product Maintenance
@@ -54,7 +54,7 @@ contract:
     party: BRD-2 Operations
     direction: Out
     what: Every booked invoice (booking, endorsement, cancellation) with its premium components, commission, DTIP, insurer shares and parties
-    how: Copied to the Operations invoice ledger when the booking is committed (event InvoiceBooked); a copy that fails is listed in Operations › Interfaces for replay
+    how: Copied to the Operations invoice ledger when the booking is committed; a copy that fails is listed in Operations › Interfaces for replay
     owner: Processing (booking); Operations after hand-off
     screens: Booking Workbench, Pre-booking Confirmation, Booked Invoice, New Endorsement
     frs: [FR-NB-110, FR-NB-115, FR-NB-116]
@@ -158,4 +158,4 @@ change_rule: >-
   This contract is part of the signed BRD-1 set. A later change in BRD-2, BRD-3, BRD-4, BRD-5, BRD-6, BRD-9, BRD-10,
   BRD-11, BRD-12 or BRD-13, or in an external interface, that changes what New Business takes or hands over as listed
   here is raised as a change request against this signed set through the Change Management Register, with its effort
-  in man-days, before it is built.
+  in man-days, before it is delivered.

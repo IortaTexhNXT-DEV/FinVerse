@@ -70,7 +70,7 @@ contract:
     party: EIAM (BDO Enterprise Identity Access Management on Microsoft Entra ID), owned by BDOI IT
     direction: In
     what: The target sign-in of BDO users with OpenID Connect; BIBS keeps the roles, permissions, the inactivity sign-out and the session log
-    how: Seam only in this set. BIBS signs users in locally (AUTH_MODE = LOCAL) and has the directory port; the Entra ID sign-in is built when BDOI IT gives the tenant, the application registration, the claims and the session rules (IQ04). Until then, BIBS password, lock-out and expiry rules apply
+    how: In this set BIBS signs users in locally (AUTH_MODE = LOCAL); the Entra ID sign-in is added when BDOI IT gives the tenant, the application registration, the claims and the session rules (IQ04). Until then, BIBS password, lock-out and expiry rules apply
     owner: BDOI IT
     screens: Login; My Profile
     frs: [FR-UA-003]
@@ -78,7 +78,7 @@ contract:
     party: UIDM-ISC (BDO identity governance), owned by BDOI IT
     direction: In / Out
     what: Joiner, mover and leaver provisioning and access certification
-    how: Seam only in this set. Every access change is a BIBS request under four eyes; the options for BDOI (the governance tool provisions users while group-profile changes stay BIBS requests, the tool provisions users and profiles, or aggregation only) are open (IQ05). The reports of this set give the user and profile lists for certification
+    how: In this set every access change is a BIBS request under four eyes; the options for BDOI (the governance tool provisions users while group-profile changes stay BIBS requests, the tool provisions users and profiles, or aggregation only) are open (IQ05). The reports of this set give the user and profile lists for certification
     owner: BDOI IT; BDOI Information Security
     screens: User Access Reports; Access Requests
     frs: [FR-UA-010, FR-UA-060, FR-UA-062]

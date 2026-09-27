@@ -6,11 +6,11 @@ section 17 records what was built. The requirements are in
 [`docs/requirements/BDOI_RN_BRD_SPEC.md`](../requirements/BDOI_RN_BRD_SPEC.md) and the functional specification in
 [`FRS_BRD06_RENEWAL.md`](../deliverables/src/frs/FRS_BRD06_RENEWAL.md) (FR-RN-001 to 112).
 
-Status: built for waves R0 to R2 (extraction and go-live take-over, sanitation with package remapping, Classification
+Status: built for waves R0 to R3 (extraction and go-live take-over, sanitation with package remapping, Classification
 and decision matrix, Marketing disposition and Team Leader review, processing with the renewal account, insurer batches
 and responses, LAMD reports, Renewal Advice and closing letters, acceptance, fast track to placement and booking,
 Contact Center follow-ups, the Renewal Home, the eleven reports and the seed data). The hand-off of submitted policies
-(wave R3) waits for the Submitted Policies module.
+(wave R3) creates the renewals of the Submitted Policies masterlist: see [`SUBMITTED_POLICIES.md`](SUBMITTED_POLICIES.md).
 
 ## 1. Purpose
 

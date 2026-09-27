@@ -137,14 +137,17 @@ common:
       A record opens with its reference (package request number PKR-yyyy-nnnnnn, risk code, version), its status pill,
       its flags (Generic or Client-specific, No negotiation, Package, Version n Draft) and the key facts. A reference
       chip copies the reference.
-  - name: Workflow status strip and history
+  - name: Workflow header and history
     text: >-
-      The current stage of a package request is shown as a status strip: Stage (status pill and stage name), In Stage
-      Since, Due (the service level due time, Overdue in red) and Assigned To, with the actions the user may take now on
-      the right. The History tab lists every step, newest first: Stage, From Stage, Action, By (name and role), Date
-      and Time, Remarks and Duration in Stage. Actions that need a reason (Return to requester, Void, Not proceeded,
-      Request changes, Return to TSU) open a dialog with the mandatory reason from its list of values and an optional
-      comment; the comment is kept in the history and sent with the workflow notice.
+      A package request shows the workflow header under the record header: a stepper of the stages of the request in
+      their order (passed stages ticked in blue, the current stage highlighted, the stages ahead in grey with their
+      number; a returned stage in amber, a voided or not proceeded request in red, Released in green once reached), and
+      under it one row with Current Stage, Since, Due (the service level due time, with the Overdue pill) and Assigned
+      To (the user's name), with the actions the user may take now on the right. The History tab lists every step,
+      newest first: Stage, From Stage, Action, By (name and role), Date and Time, Remarks and Duration in Stage.
+      Actions that need a reason (Return to requester, Void, Not proceeded, Request changes, Return to TSU) open a
+      dialog with the mandatory reason from its list of values and an optional comment; the comment is kept in the
+      history and sent with the workflow notice.
   - name: Maker-checker on product masters
     text: >-
       Products, coverages, clauses, field, document and TSU routing rules, insurers, branches, commission rates, rates
@@ -155,9 +158,10 @@ common:
       Head or the Business Administrator.
   - name: Status pills and tags
     text: >-
-      Stages and record statuses are pills of one size and colour per state group; a pill never wraps. Flags such as
-      Generic, Client-specific, No negotiation, Package, Basic, Lowest rate and Locked are tags next to the name or in
-      their own column.
+      Stages and record statuses are pills of one size and colour per state group, with their full label (for example
+      Pending Authorization, Requirements Preparation); a pill never wraps. Flags such as Generic, Client-specific, No
+      negotiation, Package, Basic, Lowest rate and Locked are tags next to the name or in their own column. Records
+      that belong to a record, such as the rate exceptions of a quotation, are rows of a titled table.
   - name: Dates, amounts and rates
     text: >-
       Dates are entered with the date picker and shown as dd-MMM-yyyy (for example 27-Sep-2026). Amounts show two
@@ -181,6 +185,9 @@ common:
       screen.
   - name: Messages
     text: >-
-      Field errors appear under the field in red with the field outlined; a banner at the top lists the errors of a
-      form. A refusal by a business rule shows the business message and a reference for support (the message code and
-      a request number). Success is confirmed by a short message at the bottom right of the page.
+      Every message follows one notice standard: a white notice with a thin bar and an icon in the colour of its kind
+      (red error, amber warning, blue information, green success), a bold short title, then the business message with
+      one bullet per missing item. Field errors appear under the field with the field outlined, and a long form lists
+      its errors in a notice at the top with a link to the first field. A refusal by a business rule shows the business
+      message only, without codes or references; only an unexpected system error offers Retry and a reference for
+      support behind Details. Success is confirmed by a short message in the same standard.

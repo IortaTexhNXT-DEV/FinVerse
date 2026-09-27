@@ -14,7 +14,7 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormControls';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { formatDate, formatDateTime, formatRate } from '@/utils/format';
 import { RESPONSE_STAGES } from './proposalList';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { displayNameOf } from '@/api/users';
@@ -159,7 +159,7 @@ function ResponseHistory({ proposalId }: Readonly<{ proposalId: number }>) {
               <CellStack main={insurer(h.responseId)} sub={`Revision ${String(h.revision)}`} />
             ),
           },
-          { key: 's', header: 'Status', render: (h) => <StatusBadge status={h.status} /> },
+          { key: 's', header: 'Status', render: (h) => <StatusBadge full status={h.status} /> },
           {
             key: 'p',
             header: 'Premium',
@@ -234,7 +234,7 @@ export function ResponsesTab({ proposal }: Readonly<{ proposal: Proposal }>) {
               numeric: true,
               render: (r) => <Amount value={r.premium} />,
             },
-            { key: 'r', header: 'Rate %', numeric: true, render: (r) => r.rate ?? '' },
+            { key: 'r', header: 'Rate %', numeric: true, render: (r) => formatRate(r.rate) },
             { key: 'd', header: 'Deductibles', render: (r) => r.deductibles ?? '' },
             { key: 'c', header: 'Conditions', render: (r) => r.conditions ?? '' },
             { key: 'v', header: 'Valid Until', render: (r) => formatDate(r.validUntil) },

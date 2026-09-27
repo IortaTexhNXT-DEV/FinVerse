@@ -17,4 +17,14 @@ public interface PolicyDataExtractor {
    * @return the values found; missing values are null and explained in the note
    */
   ExtractedPolicy extract(byte[] pdf, String insurerCode);
+
+  /**
+   * Proposes the fields of a document of a kind (BRIDSP-02): every field of the kind's patterns
+   * found in the text, with its confidence. A document without text is read by the {@link
+   * OcrEngine}; when that reads nothing either, the proposal is not readable (manual entry).
+   *
+   * @param request kind, document and insurer
+   * @return the proposal
+   */
+  ExtractionProposal propose(ExtractionRequest request);
 }

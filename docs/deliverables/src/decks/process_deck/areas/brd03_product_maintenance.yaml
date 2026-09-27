@@ -7,8 +7,8 @@ num: 3
 title: Product Maintenance
 brd: BRD-3
 scope: Package products, from the Package Request Form to release and expiry
-status: BUILT
-status_text: Built; FRS v1.0 issued for review (reference FRS)
+status: FRS ISSUED
+status_text: FRS v1.0 issued for review (reference FRS)
 department: Marketing Business Services (MBS) and TSU
 roles:
   - Marketing AO and Marketing TL / TH / UH
@@ -30,7 +30,7 @@ notes:
   glance: >-
     A package is a pre-arranged programme whose terms, rates and conditions BDOI negotiates with one or more insurers
     and then offers through Marketing. Product Maintenance feeds the products and package versions that quotations,
-    accounts and booking read. It is built; FRS BRD-3 is the reference FRS for the pack. The BRD states no volumes
+    accounts and booking read. FRS BRD-3 is the reference FRS for the pack. The BRD states no volumes
     (the project assumes tens of package requests a month).
   pains: The eight points are the current-process rows of the BRD (p.12-13).
   after: No turnaround targets are given in the BRD; the measures are the controls BIBS adds.
@@ -134,7 +134,7 @@ gaps:
   - {sev: Medium, gap: Role-to-action matrix; ManCom decision rule, impact: Approval routing and persona tests, owner: 'MBS and TSU', decision: 'Approve the matrix; ManCom membership and quorum', ref: DCR-035}
   - {sev: Medium, gap: Non-package product maintenance, impact: Scope of the module, owner: MBS, decision: Confirm out of scope for this phase, ref: DCR-036}
   - {sev: Medium, gap: BRQID.008 dropped without a revision entry, impact: Renewals repriced without client evidence, owner: MBS, decision: Confirm BRRN.038 now governs, ref: DCR-030}
-  - {sev: Parked, gap: Product master feed to other BDOI systems, impact: Other systems not updated automatically, owner: BDO IT, decision: 'Which systems receive product changes', ref: PQ16}
+  - {sev: On hold, gap: Product master feed to other BDOI systems, impact: Other systems not updated automatically, owner: BDO IT, decision: 'Which systems receive product changes', ref: PQ16}
 best:
   - {practice: Configurable rules owned by the business, status: BIBS, bibs: 'Products, package versions, rates and incentive criteria kept as masters, maintained without IT.', bdoi: 'Name the business owner of each master and its approver.'}
   - {practice: Maker-checker on product changes, status: BIBS, bibs: 'Marketing approval, TSU Head approval, ManCom sign-off and release validation; never the maker.', bdoi: 'Approve the role-to-action matrix (DCR-035).'}

@@ -3,7 +3,7 @@ import { Amount } from '@/components/ui/Amount';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { Kpi } from '@/components/ui/Kpi';
-import { formatAmount, formatDate, humanize } from '@/utils/format';
+import { formatAmount, formatDate, formatRate, humanize } from '@/utils/format';
 import { Notice } from '@/components/ui/Notice';
 import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
 
@@ -24,14 +24,14 @@ function lines(r: RatingResult): Line[] {
     ...motor,
     ['Annual premium', b.annualPremium],
     ['Net premium', b.netPremium, b.minimumApplied ? 'minimum premium applied' : undefined],
-    ['Documentary stamp tax', b.dst, `${r.rates.dst}%, rounded up to the next 0.50`],
-    ['Premium tax', b.premiumTax, `${r.rates.premiumTax}%`],
-    ['VAT', b.vat, `${r.rates.vatPremium}%`],
-    ['Fire service tax', b.fst, `${r.rates.fireServiceTax}%`],
-    ['Local government tax', b.lgt, `${r.rates.lgt}%`],
+    ['Documentary stamp tax', b.dst, `${formatRate(r.rates.dst)}%, rounded up to the next 0.50`],
+    ['Premium tax', b.premiumTax, `${formatRate(r.rates.premiumTax)}%`],
+    ['VAT', b.vat, `${formatRate(r.rates.vatPremium)}%`],
+    ['Fire service tax', b.fst, `${formatRate(r.rates.fireServiceTax)}%`],
+    ['Local government tax', b.lgt, `${formatRate(r.rates.lgt)}%`],
     ['Total charges', b.totalCharges],
-    ['Commission', b.commission, `${r.rates.commission}%`],
-    ['VAT on commission', b.vatOnCommission, `${r.rates.vatCommission}%`],
+    ['Commission', b.commission, `${formatRate(r.rates.commission)}%`],
+    ['VAT on commission', b.vatOnCommission, `${formatRate(r.rates.vatCommission)}%`],
   ];
 }
 
@@ -82,7 +82,7 @@ export function CalculatorResult({ result }: Readonly<{ result: RatingResult }>)
         <Kpi
           label="Commission"
           value={formatAmount(b.commission)}
-          hint={`${result.rates.commission}%`}
+          hint={`${formatRate(result.rates.commission)}%`}
         />
       </div>
       <Card title={`Breakdown (${humanize(b.method)} rating)`} flush>
@@ -113,7 +113,12 @@ export function CalculatorResult({ result }: Readonly<{ result: RatingResult }>)
                 numeric: true,
                 render: (i) => <Amount value={i.sumInsured} />,
               },
-              { key: 'r', header: 'Rate %', numeric: true, render: (i) => i.ratePercent ?? '' },
+              {
+                key: 'r',
+                header: 'Rate %',
+                numeric: true,
+                render: (i) => formatRate(i.ratePercent),
+              },
               {
                 key: 'p',
                 header: 'Premium',

@@ -137,6 +137,20 @@ public interface BulkImportHandler {
   }
 
   /**
+   * Called once after the valid rows of an upload were committed (and after a reprocess of the
+   * failed rows), in its own transaction: closes what the rows opened together, for example the
+   * intake run of a submitted policy file and its processing run (BRIDSP-01/09). The default does
+   * nothing.
+   *
+   * @param context run context
+   * @param committed rows committed by this call
+   * @param failed rows that failed
+   */
+  default void afterCommit(BulkContext context, int committed, int failed) {
+    // nothing to close by default
+  }
+
+  /**
    * Upper-cases and removes spaces (helper for identifiers such as plate or engine numbers).
    *
    * @param value value

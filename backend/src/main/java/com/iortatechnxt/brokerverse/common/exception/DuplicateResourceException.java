@@ -12,6 +12,6 @@ public class DuplicateResourceException extends RuntimeException {
    * @param key duplicated business key
    */
   public DuplicateResourceException(String resource, Object key) {
-    super(resource + " already exists: " + key);
+    super(ResourceNames.of(resource) + " already exists: " + key);
   }
 }

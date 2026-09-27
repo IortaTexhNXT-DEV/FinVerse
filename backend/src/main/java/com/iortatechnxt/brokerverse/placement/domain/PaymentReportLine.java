@@ -104,7 +104,7 @@ public class PaymentReportLine {
    * Records a match chosen by the user for an ambiguous or unmatched line.
    *
    * @param account chosen account
-   * @param user user
+   * @param user display name of the user who matched it
    */
   public void matchManually(MatchedAccount account, String user) {
     this.matchStatus = paid ? MatchStatus.MATCHED : MatchStatus.UNPAID;

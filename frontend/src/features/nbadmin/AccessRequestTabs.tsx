@@ -186,7 +186,7 @@ export function RequestDetails({ request: r }: Readonly<{ request: AccessRequest
 
 const APPROVER_COLUMNS: Column<ApproverStep>[] = [
   { key: 's', header: 'Order', numeric: true, render: (a) => a.sequence },
-  { key: 'a', header: 'Approver', render: (a) => a.approver },
+  { key: 'a', header: 'Approver', render: (a) => <UserName login={a.approver} /> },
   { key: 'd', header: 'Decision', render: (a) => <StatusBadge status={a.decision} /> },
   { key: 'r', header: 'Remarks', render: (a) => a.remarks ?? '' },
   { key: 't', header: 'Decided', render: (a) => formatDateTime(a.decidedAt) },
@@ -214,7 +214,7 @@ export function RequestApprovers({ request: r }: Readonly<{ request: AccessReque
 const HISTORY_COLUMNS: Column<AccessRequestEvent>[] = [
   { key: 't', header: 'Date', render: (e) => formatDateTime(e.occurredAt) },
   { key: 'a', header: 'Action', render: (e) => humanize(e.action) },
-  { key: 's', header: 'Status', render: (e) => <StatusBadge status={e.toStatus} /> },
+  { key: 's', header: 'Status', render: (e) => <StatusBadge full status={e.toStatus} /> },
   { key: 'u', header: 'By', render: (e) => <UserName login={e.actor} /> },
   { key: 'r', header: 'Remarks', render: (e) => e.remarks ?? '' },
 ];

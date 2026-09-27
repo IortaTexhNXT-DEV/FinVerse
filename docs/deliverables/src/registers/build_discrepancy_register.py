@@ -90,6 +90,30 @@ def clean(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+# Wording of the question sources (engineering specs) put into client terms on the way into the register.
+CLIENT_TEXT = [
+    (r"BDOI_CROSS_BRD_DECISIONS\.md", "Cross-BRD decisions"),
+    (r"DOCUMENT_STORAGE_DECISION\.md section 5", "the document storage proposal"),
+    (r"DOCUMENT_STORAGE_DECISION\.md", "Document storage proposal"),
+    (r"BDOI_(\w+?)_BRD_SPEC\.md", r"\1 requirements baseline"),
+    (r"the SFTP endpoint per insurer", "the SFTP address per insurer"),
+    (r"delivered in the Operations build", "delivered in the Operations module"),
+    (r"a January stub period", "a short January period"),
+    (r"describes BIBS as built:", "describes the BIBS architecture:"),
+    (r"\(RNW_LAMD_REPORT, rnw_lamd_report / rnw_lamd_line, role LAMD\)", "(role LAMD)"),
+    (r"\(SBM_LAMD, sbm_lamd_loan\)", ""),
+    (r"Background: sbm_letter types RENEWAL_NOTICE and RENEWAL_PROPOSAL", "Background: the Submitted Policies letter types RENEWAL_NOTICE and RENEWAL_PROPOSAL"),
+    (r"SP builds SBM-PERSISTENCY", "SP proposes SBM-PERSISTENCY"),
+    (r"the Renewal design has no persistency report", "the Renewal FRS has no persistency report"),
+]
+
+
+def client_text(text: str) -> str:
+    for pat, repl in CLIENT_TEXT:
+        text = re.sub(pat, repl, text)
+    return re.sub(r"\s+([,.;])", r"\1", re.sub(r"\s{2,}", " ", text)).strip()
+
+
 def table_rows(path: Path, heading: str) -> list[list[str]]:
     lines = path.read_text(encoding="utf-8").splitlines()
     start = next(i for i, line in enumerate(lines) if line.startswith(heading))
@@ -146,6 +170,9 @@ def load_questions(data: dict) -> list[dict]:
         members = data.get("question_groups", {}).get(q["id"], [])
         q["same"] = ", ".join(members)
         q["items"] = ", ".join(item_links.get(q["id"], []))
+    for q in questions:
+        for key in ("topic", "question", "source", "answer"):
+            q[key] = client_text(q[key])
     unknown = sorted(set(primary_of) | set(status) | set(item_links) - ids)
     unknown = [u for u in unknown if u not in ids]
     if unknown:
@@ -256,13 +283,13 @@ REGISTER_COLUMNS = [
     Column("ref", "Ref", 10, "Register reference DCR-nnn. Stable: a new item gets the next number."),
     Column("brds", "BRD(s) involved", 15, "BRDs the item involves (BRD-n and short name; Report List where relevant). Several BRDs are separated by semicolons."),
     Column("drop", "Drop", 11, "BDOI drop in which the item is resolved: Drop 0 (setup and data migration), Drop 1 (transactional), Drop 2 (independent), Programme (platform-wide) or Phase 2 (outside the January 2028 scope). Default: the earliest drop of the BRDs involved.", values=DROPS),
-    Column("loc", "BRD ID / section / page", 26, "Requirement ID, section and PDF page of the source file in docs/source-documents, for each BRD involved."),
+    Column("loc", "BRD ID / section / page", 26, "Requirement ID, section and PDF page of the source BRD, for each BRD involved."),
     Column("type", "Type", 16, "Kind of issue (definitions below).", values=TYPES),
     Column("desc", "Description", 50, "What the BRD says, with the conflicting statements quoted briefly."),
-    Column("impact", "Impact (business / build / test)", 38, "Effect on the business process, on what is built, and on testing."),
+    Column("impact", "Impact (business / system / test)", 38, "Effect on the business process, on the system, and on testing."),
     Column("sev", "Severity", 10, "High, Medium or Low (rule below).", values=SEVERITIES),
     Column("modules", "Affected modules", 20, "BIBS modules affected."),
-    Column("resolution", "Proposed resolution / recommendation", 36, "What the project proposes, and builds as the default until BDOI answers."),
+    Column("resolution", "Proposed resolution / recommendation", 36, "What the project proposes, and applies as the default until BDOI answers."),
     Column("question", "Clarification question to BDOI", 38, "The question BDOI is asked to answer."),
     Column("owner", "Owner (BDOI)", 22, "BDOI business unit that owns the answer, from the BRD approval sheets. Items involving several BRDs go to the BIBS Product Owner with the owners involved."),
     Column("raised", "Raised on", 12, "Date the item was raised.", kind="date"),
@@ -274,7 +301,7 @@ REGISTER_COLUMNS = [
 
 QUESTION_COLUMNS = [
     Column("id", "Question ID", 11, "Original ID of the question. SQ is used by two specs, so it is written SP-SQnn (Submitted Policies) and SANC-SQnn (Sanction Screening)."),
-    Column("brd", "BRD", 12, "Spec that raised the question (Cross-BRD: BDOI_CROSS_BRD_DECISIONS.md)."),
+    Column("brd", "BRD", 12, "Requirements baseline that raised the question (Cross-BRD: the cross-BRD decisions)."),
     Column("topic", "Topic", 20, "Topic of the question."),
     Column("question", "Question", 62, "Question as asked in the spec."),
     Column("source", "Source reference", 22, "Requirement IDs and earlier questions the question refers to."),
@@ -513,7 +540,7 @@ def write_summary(ws, data: dict, questions: list[dict], live: bool, register_ti
     row += 2
 
     # 6. Resolve first
-    row = title(row, "Resolve first", "The 15 items that most affect the build, money or compliance, in the order proposed for resolution.")
+    row = title(row, "Resolve first", "The 15 items that most affect the system, money or compliance, in the order proposed for resolution.")
     header(row, ["Item", "Ref", "Severity", "Status", "BRD(s)", "", "Why first"])
     ws.merge_cells(start_row=row, start_column=6, end_row=row, end_column=7)
     row += 1
@@ -562,18 +589,18 @@ def build(make_pdf: bool = True, previews: bool = False) -> Path:
                  ("Closed", "BDOI confirmed the resolution")]
     wb.cover_notes = [
         "Severity rule, types and status values: see the README sheet.",
-        "Page numbers are PDF pages of the source files in docs/source-documents.",
+        "Page numbers are PDF pages of the source BRD files.",
         "The CSF pack holds meeting credentials in an attached e-mail (DCR-098); they are not copied here.",
     ]
     wb.readme_sections = [
         ("Severity rule", [(k, v) for k, v in data["severity_rule"]]),
         ("Types", [(k, v) for k, v in data["type_rule"]]),
         ("Status", [(k, v) for k, v in data["status_rule"]]),
-        ("Sources", [(b["short"], f"{b['name']}: docs/source-documents/{b['file']}; baseline docs/requirements/{b['spec']}")
+        ("Sources", [(b["short"], f"{b['name']}: {b['file']}; with its requirements baseline")
                      for b in data["brds"].values()] + [
-            ("Cross-BRD", "docs/requirements/BDOI_CROSS_BRD_DECISIONS.md (decisions D1-D8, questions XQ01-XQ13)"),
-            ("Programme", "docs/architecture/PROGRAMME_ALIGNMENT.md (BDOI drop plan, timeline, IER workbook v20, integrations; "
-                          "questions IQ01-IQ35) and docs/architecture/DOCUMENT_STORAGE_DECISION.md (questions DSQ01-DSQ04)"),
+            ("Cross-BRD", "Cross-BRD decisions (decisions D1-D8, questions XQ01-XQ13)"),
+            ("Programme", "Programme alignment (BDOI drop plan, timeline, IER workbook v20, integrations; "
+                          "questions IQ01-IQ35) and the document storage proposal (questions DSQ01-DSQ04)"),
             ("Drop", "Drop in which the item is resolved: the item's own value, else the earliest primary drop of the BRDs "
                      "involved (Drop 0 BRD-3, 11, 13; Drop 1 BRD-1, 2, 4, 5, 6, 9, 10, 12; Drop 2 BRD-7, 8; umbrella BRD and "
                      "Report List alone: Programme). Items about Production Reconciliation or Marketing Collection go to Drop 2; "
@@ -581,10 +608,9 @@ def build(make_pdf: bool = True, previews: bool = False) -> Path:
             ("Numbering", "DCR numbers are never reused. DCR-236 to DCR-239 are not used."),
             ("Method", "Each item was checked against the source page (text layer, or the rendered page for scanned pages) and cites it. "
                        "Items come from the observations, NFR and open-question sections of the specs, the cross-BRD decisions, "
-                       "the Report List, and a comparison with BIBS as built or designed."),
-            ("Refresh", "Edit docs/deliverables/src/registers/discrepancy_register.yaml and run "
-                        "python docs/deliverables/src/registers/build_discrepancy_register.py. "
-                        "Open questions are re-read from the specs at every build.")]),
+                       "the Report List, and a comparison with BIBS as specified in the FRS."),
+            ("Refresh", "The register is re-issued with each update; open questions are refreshed from the "
+                        "requirements baselines at every issue.")]),
     ]
     summary_ws = wb.custom_sheet("Summary", "Counts by BRD, type and severity; status pivot; items to resolve first")
     rows = build_register_rows(data)

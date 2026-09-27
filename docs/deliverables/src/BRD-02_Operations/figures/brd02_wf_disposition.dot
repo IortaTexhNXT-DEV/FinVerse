@@ -14,15 +14,15 @@ digraph wf_disposition {
   FOR_REVERSAL [label="FOR_REVERSAL\nTL (CASH_DISPOSITION_APPROVE)"];
   CLOSED [label="CLOSED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
 
-  UNAPPLIED -> MONITORING [label=" assign_disposition"];
-  MONITORING -> FOR_APPROVAL [label=" submit"];
-  FOR_APPROVAL -> IN_PROCESS [label=" approve"];
-  IN_PROCESS -> COMPLETED [label=" complete"];
-  MONITORING -> COMPLETED [label=" complete\n(no approval)", style=dashed];
-  FOR_APPROVAL -> MONITORING [label=" return", style=dashed, constraint=false];
-  MONITORING -> UNAPPLIED [label=" withdraw", style=dashed, constraint=false];
-  COMPLETED -> FOR_REVERSAL [label=" mark_reversal"];
-  FOR_REVERSAL -> UNAPPLIED [label=" approve_reversal", style=dashed];
-  COMPLETED -> CLOSED [label=" close", style=dotted];
+  UNAPPLIED -> MONITORING [label=" Assign Disposition"];
+  MONITORING -> FOR_APPROVAL [label=" Submit for Approval"];
+  FOR_APPROVAL -> IN_PROCESS [label=" Approve"];
+  IN_PROCESS -> COMPLETED [label=" Process Disposition"];
+  MONITORING -> COMPLETED [label=" Process Disposition\n(no approval)", style=dashed];
+  FOR_APPROVAL -> MONITORING [label=" Return to Cashier", style=dashed, constraint=false];
+  MONITORING -> UNAPPLIED [label=" Withdraw Disposition", style=dashed, constraint=false];
+  COMPLETED -> FOR_REVERSAL [label=" Mark for Reversal"];
+  FOR_REVERSAL -> UNAPPLIED [label=" Approve Reversal", style=dashed];
+  COMPLETED -> CLOSED [label=" Close", style=dotted];
   UNAPPLIED -> CLOSED [label=" overages, automatch,\nreceipt cancelled", style=dotted];
 }

@@ -181,3 +181,5 @@ fixes:
   "The profile has no members.": No action.
   "Grant or withdraw at least one permission": Tick or untick at least one permission, or change the name, description or level.
   "The approvers are chosen on submission.": No action; the approvers are listed once the request is submitted.
+  "The deactivation is sent to Information Security; the rule stays active until it is authorised.": Confirm to send the deactivation for authorisation, or cancel to keep the rule.
+  "The pending change is rejected and the rule stays as it was.": Enter the reason and confirm the rejection, or cancel to leave the change pending.

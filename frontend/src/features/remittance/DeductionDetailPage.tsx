@@ -180,6 +180,7 @@ export default function DeductionDetailPage() {
       <WorkflowPanel
         entityType={ENTITY}
         entityId={id}
+        recordStatus={d.stage}
         renderBusinessActions={(actions) =>
           actions
             .filter((a) => ACTIONS[a.action] !== undefined)

@@ -14,6 +14,7 @@ import { calcProblems, EMPTY_ITEM, newCalcForm, toRatingInput } from './calculat
 import type { CalcForm, CalcItem } from './calculatorForm';
 import { CalculatorResult } from './CalculatorResult';
 import { Notice } from '@/components/ui/Notice';
+import { formatRate } from '@/utils/format';
 
 const BASES = [
   { value: 'ANNUAL', label: 'Annual' },
@@ -183,7 +184,10 @@ export default function PremiumCalculatorPage() {
             label="Insurer branch (LGT)"
             blank="No LGT"
             value={form.branchCode}
-            options={branches.map((b) => ({ value: b.code, label: `${b.name} (${b.lgtRate}%)` }))}
+            options={branches.map((b) => ({
+              value: b.code,
+              label: `${b.name} (${formatRate(b.lgtRate)}%)`,
+            }))}
             onChange={(branchCode) => set({ branchCode })}
           />
           <SelectInput

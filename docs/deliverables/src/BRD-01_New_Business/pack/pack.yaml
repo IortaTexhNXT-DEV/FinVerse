@@ -131,23 +131,28 @@ common:
       dd-MMM-yyyy HH:mm in Philippine time.
   - name: Record summary and reference chips
     text: >-
-      A record opens with its reference (Quotation No., PRF No., ARN, invoice), its status badge and the key facts. A
-      reference chip copies the reference and an ARN chip opens the account.
-  - name: Workflow status strip and history
+      A record opens with its reference (Quotation No., PRF No., ARN, invoice), its status pill, its tags and the key
+      facts. A reference chip copies the reference and an ARN chip opens the account. Records that belong to the
+      record, such as the rate exceptions of a quotation, are rows of a titled table, never a coloured box.
+  - name: Workflow header and history
     text: >-
-      The current stage is shown as a status strip: Stage (status pill and stage name), In Stage Since, Due (the SLA
-      due time, Overdue in red) and Assigned To, with the actions the user may take now on the right. Under it the
-      history table lists every step, newest first: Stage, From Stage, Action, By (name and role), Date and Time,
-      Remarks and Duration in Stage; the date column can be sorted. Actions that need a reason (return, void, cancel)
-      open a dialog with the mandatory reason from its list of values and an optional comment; the comment is kept in
-      the history and sent with the notification. "Workflow notice" in the action tables means the in-app notice NT-01.
+      Every record with a workflow (client onboarding, quotation, proposal request, account, placement, issuance,
+      booking) shows the workflow header under the record header: a stepper of the stages of the workflow in their
+      order (passed stages ticked in blue, the current stage highlighted, the stages ahead in grey with their number; a
+      returned stage in amber, a rejected, cancelled or voided stage in red, the last stage in green once reached), and
+      under it one row with Current Stage, Since, Due (with the Overdue pill) and Assigned To (the user's name), with
+      the actions the user may take now on the right. The history table lists every step, newest first: Stage, From
+      Stage, Action, By (name and role), Date and Time, Remarks and Duration in Stage; the date column can be sorted.
+      Actions that need a reason (return, void, cancel) open a dialog with the mandatory reason from its list of values
+      and an optional comment; the comment is kept in the history and sent with the notification. "Workflow notice" in
+      the action tables means the in-app notice NT-01.
   - name: Status pills and tags
     text: >-
-      Statuses are pills of one size and colour per state group; a pill never wraps. Long statuses use the agreed short
-      forms with the full label in the tooltip, for example Returned to Mktg (Returned to Marketing), Insurer Returned
-      (Returned by Insurer) and For Placement (Ready for Placement); other labels longer than 18 characters end with an
-      ellipsis and keep the tooltip. Flags such as FFY, Direct Payment and Information Incomplete are tags in the record
-      header or in their own column.
+      Statuses are pills of one size and colour per state group; a pill never wraps. Statuses show their full label
+      (for example Returned to Marketing, Ready for Placement, Pending Authorization); an agreed short form, with the
+      full label in the tooltip, is used only for a label longer than 21 characters. Flags such as FFY, Direct
+      Payment and Information Incomplete, and client tags such as BDO employee, are tags in the record header or in
+      their own column. Special instructions of the client show as one information notice.
   - name: Dates, amounts and names
     text: >-
       Dates are entered with one date picker and shown as dd-MMM-yyyy (for example 27-Sep-2026); times as dd-MMM-yyyy
@@ -180,9 +185,12 @@ common:
       refused.
   - name: Messages
     text: >-
-      Field errors appear under the field in red with the field outlined; a banner at the top lists the errors of a
-      form. A refusal by a business rule shows the business message and a reference for support (the message code and
-      a request number). Success is confirmed by a short message at the bottom right of the page.
+      Every message follows one notice standard: a white notice with a thin bar and an icon in the colour of its kind
+      (red error, amber warning, blue information, green success), a bold short title, then the business message with
+      one bullet per missing item. Field errors appear under the field with the field outlined, and a long form lists
+      its errors in a notice at the top with a link to the first field. A refusal by a business rule shows the business
+      message only, without codes or references; only an unexpected system error offers Retry and a reference for
+      support behind Details. Success is confirmed by a short message in the same standard.
   - name: Bulk action results
     text: >-
       An action run on several selected rows processes each record on its own and lists the outcome of each (done or

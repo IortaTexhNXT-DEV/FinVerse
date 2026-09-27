@@ -1,11 +1,8 @@
 # Test plan BRD-8 Employee Benefits - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-08_Employee_Benefits/brd08_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# Employee Benefits and the partner portal are designed and not built: messages are the FRS texts (no
-# codes), screen paths are those of the build design (docs/architecture/EMPLOYEE_BENEFITS_DESIGN.md) and
-# there is no automation reference. Where a check reuses a platform message that exists today (attachment
-# rules, client duplicate, workflow reason), the case quotes the text BIBS shows and a finding records the
-# FRS difference.
+# Messages are the FRS texts; where a check reuses a platform message (attachment rules, client duplicate,
+# workflow reason), the case quotes the text BIBS shows.
 
 meta:
   brd: BRD-08

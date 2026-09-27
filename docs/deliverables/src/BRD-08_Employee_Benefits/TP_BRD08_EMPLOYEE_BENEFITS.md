@@ -61,7 +61,7 @@ The roles-and-access sheet checks each EB and portal action against the roles th
 ## Out of scope
 
 - BRID-028, documents for high-risk accounts (out of scope per the addendum, p.13).
-- The insurer system-to-system API, e-signature verification of the BOR, HRIS master list feeds and reading insurer mailboxes (parked seams, FRS section 7).
+- The insurer system-to-system API, e-signature verification of the BOR, HRIS master list feeds and reading insurer mailboxes (on hold, FRS section 7).
 - EB renewals in the general Renewal module (decision D3); the BRD-6 test plan confirms that HMO lines are not extracted.
 - Penetration testing of the internet-facing portal. The portal security cases here check the functional rules; the penetration test is part of BDO Information Security's approval (EBQ13).
 - Performance and volume testing (deliverable 28), and BDOI's own templates and report layouts (EBQ08, EBQ21).
@@ -118,7 +118,7 @@ The workbook has a README sheet that explains every column. Case IDs carry their
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | The EB module and the portal are deployed on SIT, with the RA and follow-up jobs; the shared change BT0 and the User Access External request type are deployed; a virus scanner adapter is active for portal uploads; CI is green; the data sets of section 4.2 are loaded; test mailboxes receive mail; the developers have added the automation references. |
+| System test | The EB module and the portal are deployed on SIT, with the RA and follow-up jobs; the business type BT0 and the User Access External request type are available; the virus scan of portal uploads is active; the data sets of section 4.2 are loaded; test mailboxes receive mail. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; portal users of TD-EB-02 are provisioned; the e-mail relay and one-time codes work on SIT. |
 | UAT | FRS BRD-8 v1.0 is signed off or its open comments are agreed; the open questions that change expected results (EBQ02, EBQ05, EBQ07, EBQ11, EBQ13) are answered or their test values agreed; BDO Information Security has approved the portal hosting for UAT; the UAT environment holds masked data; BDOI testers have user IDs with the roles of section 5. |
 
@@ -218,7 +218,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 | Risk | Impact | Mitigation |
 |---|---|---|
 | Screen names, labels or messages change after BDOI's review of the FRS | High | The cases name the FRS screens and texts; the test lead updates the workbook before the system test and records the changes in the document control |
-| The portal hosting, multi-factor method and virus scanner are not approved (EBQ13) | High | Run the portal cases on SIT with the e-mail code and the scanner adapter; repeat the security cases in the approved zone before UAT |
+| The portal hosting, multi-factor method and virus scanner are not approved (EBQ13) | High | Run the portal cases on SIT with the e-mail code and the virus scan; repeat the security cases in the approved zone before UAT |
 | Open questions change expected results (EBQ02 RA lead time, EBQ05 BOR on renewal, EBQ07 franchise, EBQ11 thresholds) | High | The values are parameters and rules; the cases use the defaults and seed values and are re-run with BDOI's values |
 | Personal and health-related data in master lists and utilization reports | High | Only masked and synthetic files are used (section 4.1); the test lead checks each file before upload |
 | BDOI testers must act as insurer and client users | Medium | The test lead provisions one portal user per role and party and briefs the testers on the portal |

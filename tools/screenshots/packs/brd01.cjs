@@ -129,6 +129,8 @@ const fills = {
         await details.nth(i).fill(texts[i]);
       }
     },
+    walkthrough.addItem('Contract works: four-storey warehouse and office building', '85000000'),
+    walkthrough.addItem('Construction plant and equipment', '6500000'),
     ['Luzon Assurance Co.', true],
     ['Mabuhay General Insurance Corp.', true],
     ['Visayas Mutual Insurance', true],

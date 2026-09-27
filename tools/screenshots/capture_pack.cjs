@@ -418,6 +418,9 @@ function optimise(file) {
           document.activeElement.blur();
         }
         document.querySelectorAll('main').forEach((m) => m.scrollTo(0, 0));
+        // Only the latest message stays on screen, so earlier confirmations do not hide the content.
+        const toasts = [...document.querySelectorAll('.toast-region .toast')];
+        toasts.slice(0, -1).forEach((t) => { t.style.display = 'none'; });
         window.scrollTo(0, 0);
       });
       await fitViewport(page, shot.tall);

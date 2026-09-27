@@ -401,7 +401,167 @@ const steps = {
     await tab(page, 'Journal');
     return page;
   },
+  // ---------------------------------------------------------------- walkthrough B
+  // 1. PRF raised by the Account Officer and submitted for approval.
+  'wt-b-01': async (ctx) => {
+    const page = await go(ctx, 'ao', '/proposals/new');
+    await ctx.runSteps(page, [
+      async (pg) => {
+        await pg.getByLabel(/^Client or prospect/).fill('Pacific Harbor');
+        await pg.locator('.client-option').filter({ hasText: 'CL-2026-000003' }).first().click();
+        await pg.waitForTimeout(500);
+      },
+      ['Product line and risk code', '^CAR00'], ['Market segment', 'Commercial'],
+      ['Period from', '01-Nov-2026'], ['Period to', '01-Nov-2027'],
+      async (pg) => {
+        const texts = [
+          'Construction of a four-storey warehouse and office building, Laguna Technopark, Binan City, Laguna.',
+          'Warehouse and office; main contractor Pacific Harbor Logistics Inc. with its sub-contractors.',
+          'No claims in the last five years.',
+          "Contractor's all risks on the contract works of PHP 85,000,000 and third party liability of PHP 5,000,000.",
+        ];
+        const details = pg.getByLabel(/^Details/);
+        for (let i = 0; i < texts.length && i < (await details.count()); i += 1) {
+          await details.nth(i).fill(texts[i]);
+        }
+      },
+      addItem('Contract works: four-storey warehouse and office building', '85000000'),
+      addItem('Construction plant and equipment', '6500000'),
+      ['Luzon Assurance Co.', true], ['Mabuhay General Insurance Corp.', true], ['Visayas Mutual Insurance', true],
+    ]);
+    await button(page, 'Save Draft').click();
+    await settle(page, 1500);
+    await act(page, 'Submit for Approval', { reason: false });
+    return page;
+  },
+  // 2. PRF approved by the Marketing Team Leader and sent to TSU.
+  'wt-b-02': async (ctx) => {
+    const page = await go(ctx, 'mkttl', `/proposals/${prfId(ctx)}`);
+    await act(page, /^Approve and send to TSU$/i, { reason: false });
+    return page;
+  },
+  // 3. PRF claimed on the TSU Workbench.
+  'wt-b-03': async (ctx) => {
+    const page = await go(ctx, 'tsu', '/proposals/tsu');
+    const row = page.locator('table tbody tr').filter({ hasText: prfNo(ctx) }).first();
+    if (await row.isVisible().catch(() => false)) {
+      const claim = button(row, 'Claim');
+      if (await claim.isVisible().catch(() => false)) {
+        await claim.click();
+        await settle(page, 1200);
+      }
+    }
+    return page;
+  },
+  // 4. Quotation slip prepared and submitted for approval.
+  'wt-b-04': async (ctx) => {
+    const page = await go(ctx, 'tsu', `/proposals/${prfId(ctx)}`);
+    await act(page, /^Accept and Prepare Quotation Slip$/i, { reason: false });
+    await tab(page, 'Quotation Slip');
+    await act(page, /^Submit quotation slip$/i, { reason: false,
+      fill: async (dialog) => {
+        const date = dialog.locator('input[placeholder="dd-MMM-yyyy"]').first();
+        if (await date.isVisible().catch(() => false)) {
+          await date.fill('');
+          await date.pressSequentially('09-Oct-2026');
+          await date.press('Tab');
+        }
+      } });
+    return page;
+  },
+  // 5. Quotation slip approved by a second TSU officer and sent to the insurers.
+  'wt-b-05': async (ctx) => {
+    const page = await go(ctx, 'tsulead', `/proposals/${prfId(ctx)}`);
+    await act(page, /^Approve and send to insurers$/i, { reason: false });
+    await tab(page, 'E-mails');
+    return page;
+  },
+  // 6. Insurer terms keyed in (one insurer declines), the lowest premium recommended, terms complete.
+  'wt-b-06': async (ctx) => {
+    const page = await go(ctx, 'tsu', `/proposals/${prfId(ctx)}`);
+    await tab(page, 'Insurer Responses');
+    const terms = [
+      ['Luzon Assurance', 'Terms received', '412500', '0.45', 'PHP 50,000 each and every loss', 'Standard CAR wording; 12 months maintenance', 'Valid for 30 days'],
+      ['Mabuhay General', 'Terms received', '389750', '0.425', 'PHP 75,000 each and every loss', 'Standard CAR wording; 12 months maintenance; typhoon and flood covered', 'Lowest premium'],
+      ['Visayas Mutual', 'Declined to quote', '', '', '', '', "Outside the insurer's current capacity for warehouse projects"],
+    ];
+    for (const [insurer, response, premium, rate, deductibles, conditions, remarks] of terms) {
+      const row = page.locator('main table tbody tr').filter({ hasText: insurer }).first();
+      if (!(await button(row, 'Terms').isVisible().catch(() => false))) {
+        continue;
+      }
+      await button(row, 'Terms').click();
+      await page.waitForTimeout(700);
+      const dialog = page.locator('dialog.modal[open]').last();
+      const select = dialog.locator('select').first();
+      await select.selectOption({ label: response });
+      if (premium) {
+        await dialog.getByLabel(/^Premium/).fill(premium);
+        await dialog.getByLabel(/^Rate %/).fill(rate);
+        const until = dialog.locator('input[placeholder="dd-MMM-yyyy"]').first();
+        await until.fill('');
+        await until.pressSequentially('31-Oct-2026');
+        await until.press('Tab');
+        await dialog.getByLabel(/^Deductibles/).fill(deductibles);
+        await dialog.getByLabel(/^Conditions/).fill(conditions);
+      }
+      await dialog.getByLabel(/^Remarks/).fill(remarks);
+      await dialog.getByRole('button', { name: /^Save Terms$/ }).click();
+      await settle(page, 1000);
+    }
+    const lowest = page.locator('main table tbody tr').filter({ hasText: 'Mabuhay General' }).first();
+    if (await button(lowest, 'Recommend').isVisible().catch(() => false)) {
+      await button(lowest, 'Recommend').click();
+      await settle(page, 1000);
+    }
+    await act(page, /^Insurer terms complete$/i, { reason: false });
+    await tab(page, 'Comparative Table');
+    return page;
+  },
+  // 7. Proposal slip submitted for the recommended insurer, approved and released by a second TSU officer.
+  'wt-b-07': async (ctx) => {
+    const page = await go(ctx, 'tsu', `/proposals/${prfId(ctx)}`);
+    await act(page, /^Submit proposal slip$/i, { reason: false });
+    const lead = await go(ctx, 'tsulead', `/proposals/${prfId(ctx)}`);
+    await act(lead, /^Approve and release to Marketing$/i, { reason: false });
+    await tab(lead, 'Proposal Slip');
+    return lead;
+  },
+  // 8. Proposal slip and comparative table sent to the client.
+  'wt-b-08': async (ctx) => {
+    const page = await go(ctx, 'ao', `/proposals/${prfId(ctx)}`);
+    await act(page, /^(Send via Email|Send to client)$/i, { reason: false, confirm: /^Send$/i });
+    return page;
+  },
+  // 9. Client acceptance recorded and the account created.
+  'wt-b-09': async (ctx) => {
+    const page = await go(ctx, 'ao', `/proposals/${prfId(ctx)}`);
+    const reply = pdf('prf-acceptance.pdf', 'Client acceptance e-mail', [
+      `Re: Proposal ${prfNo(ctx)} - Contractor's All Risks`,
+      'We accept the proposal of Mabuhay General Insurance Corp. Please proceed with the cover.',
+      'Pacific Harbor Logistics Inc.', 'Seed data for the SIT environment']);
+    await act(page, /^Record acceptance$/i, {
+      reason: false,
+      fill: async (dialog) => {
+        const file = dialog.locator('input[type=file]').first();
+        if ((await file.count()) > 0) {
+          await file.setInputFiles(reply);
+          await page.waitForTimeout(400);
+        }
+      },
+    });
+    await act(page, /^Create accounts?$/i, { reason: false });
+    return page;
+  },
 };
+
+function prfId(ctx) {
+  return ctx.one("select id from npk_proposal where client_code = 'CL-2026-000003' and created_by = 'ao' order by id desc limit 1");
+}
+
+function prfNo(ctx) {
+  return ctx.one(`select prf_no from npk_proposal where id = ${prfId(ctx)}`);
+}
 
 function policyNo(ctx) {
   return `MGIC-FI-2026-${person(ctx).mobile.slice(-5)}`;
@@ -417,6 +577,17 @@ function loanNo(ctx) {
 
 function accountArn(ctx) {
   return ctx.one(`select arn from acc_account where id = ${accountId(ctx)}`);
+}
+
+/** Adds a risk item of a generic product (description and sum insured). */
+function addItem(description, sum) {
+  return async (page) => {
+    await button(page, /^Add item$/i).click();
+    await page.waitForTimeout(400);
+    await page.getByLabel(/^Description$/).last().fill(description);
+    await page.getByLabel(/^Sum insured$/).last().fill(sum);
+    await page.waitForTimeout(300);
+  };
 }
 
 /** Adds an insured item (name and sum insured) to the first location of a risk items step. */
@@ -443,4 +614,4 @@ function quotationId(ctx) {
 
 async function prepare() {}
 
-module.exports = { steps, prepare, bulkClientFile, pdf, csv, act, tab, go, button, settle, uploadDocument, TMP };
+module.exports = { steps, prepare, addItem, bulkClientFile, pdf, csv, act, tab, go, button, settle, uploadDocument, TMP };

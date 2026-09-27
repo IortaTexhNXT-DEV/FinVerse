@@ -58,6 +58,7 @@ personas:
 # Signatories of the sign-off certificate: role, organisation, what the signatory confirms.
 signatories:
   - ["Program Manager, Business Project Services", BDO Unibank ESG, "Business owner of BRD-13: the whole set, the approach and the cut-over"]
+  - ["Data Migration Lead", BDOI, "Data Migration Lead: the object decisions, the gates G4 and G6, the trial migrations and the cut-over plan"]
   - ["Head, Comptrollership", BDOI, "Comptrollership: open items, GL opening, legacy accounts, reconciliation and the opening-balance adjustments"]
   - ["Head, Operations", BDOI, "Data owner: insurers, commission rates, policy headers, open invoices, unapplied payments, collection state, remittance"]
   - ["Product Owner, Marketing Business System", BDOI, "Data owner: lists of values, products, packages, clients and payout accounts"]

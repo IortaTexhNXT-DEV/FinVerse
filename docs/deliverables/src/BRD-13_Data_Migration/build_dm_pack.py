@@ -54,6 +54,7 @@ import brand  # noqa: E402
 SEED_SQL = REPO / "backend" / "src" / "main" / "resources" / "db" / "migration" / "V1081__migration_objects_maps.sql"
 JAVA = REPO / "backend" / "src" / "main" / "java" / "com" / "iortatechnxt" / "brokerverse"
 TEMPLATE_EXPORT = JAVA / "migration" / "mapping" / "service" / "TemplateExport.java"
+CODE_MAP_EXCEL = JAVA / "migration" / "mapping" / "service" / "CodeMapExcel.java"
 REPORT_ROOTS = [JAVA / "migration" / "report", JAVA / "prodrecon" / "report", JAVA / "cashiering" / "report"]
 
 CLASS_LABEL = {"MIGRATE": "Migrate", "CARRY_FORWARD": "Carry forward", "CONDITIONAL": "Conditional",
@@ -82,6 +83,17 @@ DECISION_VALUES = ["Agree", "Agree with change", "Disagree", "Need more informat
 CLIENT_WORDING = [
     (r"\(cat_product\.line_code\)", "(line of the product in the product master)"),
     (r"Code map GL_ACCOUNT to coa_account", "GL account code map to the chart of accounts"),
+    (r"\bcoa_account codes\b", "Account codes of the BIBS chart of accounts"),
+    (r"The payee migration handler exists \(DISB_PAYEE_MIGRATION\); in scope if BDOI confirms\.",
+     "Loaded through the payee registration of Disbursement if BDOI confirms (DMQ30)."),
+    (r"Loaded through the Submitted Policies migration handler \(SBM_MIGRATION\) if BDOI confirms; layout issued with "
+     r"that module\.", "Loaded through the policy registration of Submitted Policies if BDOI confirms (DMQ30); the layout "
+     "is issued with the Submitted Policies set."),
+    (r"Loaded through EB_PROGRAMME_LOAD if BDOI confirms; layout issued with the EB module\.",
+     "Loaded through the programme set-up of Employee Benefits if BDOI confirms (DMQ30); the layout is issued with the "
+     "Employee Benefits set."),
+    (r"Loaded through the Claims migration \(BCL_CLAIM_MIGRATION, V1025 held\) if BDOI decides; closed claims are "
+     r"archived\.", "Loaded through the claim registration of Claims if BDOI decides (DMQ30); closed claims are archived."),
     (r"\bupp_ref of F02\b", "legacy_upp_ref of F02"),
     (r"whose balance F01 or F02 rebuilds in detail", "whose balance F01 or F02 carries in detail"),
     (r"\bthe crm formats\b", "the client formats of BIBS"),
@@ -188,6 +200,10 @@ def java_strings(expr: str) -> str:
 # ============================================================================ catalogue
 
 
+# Columns of a code map version in Excel, as the Code Maps screen exports and imports it.
+CODE_MAP_COLUMNS = ["source_system", "legacy_code", "legacy_description", "qualifier", "qualifier_value", "action",
+                    "target_code", "remarks"]
+
 # Archive layouts shared by the history objects that are archived (closed records and documents).
 ARCHIVE_LAYOUTS = ("H01", "H02")
 
@@ -276,7 +292,7 @@ class Catalogue:
         """Every column name of the extract layouts and of the control file: the agreed interface of the files BDOI
         extracts (the header row of each template), business names although written in lower case."""
         names = {c["name"] for layout in self.layouts.values() for c in layout.columns}
-        return names | set(self.control_columns)
+        return names | set(self.control_columns) | set(CODE_MAP_COLUMNS)
 
     # ------------------------------------------------------------------ checks
 
@@ -320,6 +336,10 @@ class Catalogue:
                     problems.append(f"layout {layout.code}: {k} is not a column")
         if [f[0] for f in self.data.get("control_fields") or []] != self.control_columns:
             problems.append(f"control_fields differ from the control-file template of the console {self.control_columns}")
+        java_cols = re.findall(r'"([a-z_]+)"', re.search(r"COLUMNS\s*=\s*List\.of\((.*?)\);",
+                                                           CODE_MAP_EXCEL.read_text(encoding="utf-8"), re.S).group(1))
+        if java_cols != CODE_MAP_COLUMNS:
+            problems.append(f"code map columns differ from the Excel of the Code Maps screen {java_cols}")
         if not self.how_to_fill:
             problems.append("the How to fill rules of the console workbook were not read")
         decision_ids = {d[0] for d in self.decisions}
@@ -439,7 +459,7 @@ def r_criteria(doc: Any, cat: Catalogue, **_: Any) -> None:
         s = cat.seed_objects[o["code"]]
         yes = lambda flag: "Yes" if str(flag).lower() == "true" else "No"  # noqa: E731
         rows.append([o["code"], yes(s["day1_need"]), yes(s["compliance_need"]), yes(s["archival_option"]),
-                     str(s["data_trust"]).title(), CLASS_LABEL[o["decision"]], s.get("condition_text") or ""])
+                     str(s["data_trust"]).title(), CLASS_LABEL[o["decision"]], client_text(s.get("condition_text"))])
     _table(doc, ["Object", "Day-1 need", "Compliance need", "Archive option", "Data trust", "Proposed class",
                  "Condition"], rows, [1.3, 1.6, 1.9, 1.8, 1.6, 2.2, 6.2],
            "The four criteria of the BRD per object, as proposed in the Migration Console", size=8)
@@ -703,7 +723,7 @@ def workbook_sheets(wb: Any, pack: Any, date_sheets: list[Any]) -> None:
                      "decision": CLASS_LABEL[o["decision"]], "rationale": o["rationale"],
                      "day1": yes(s["day1_need"]), "compliance": yes(s["compliance_need"]),
                      "archive": yes(s["archival_option"]), "trust": str(s["data_trust"]).title(),
-                     "condition": s.get("condition_text") or "", "source": o["source"],
+                     "condition": client_text(s.get("condition_text")), "source": o["source"],
                      "layouts": ", ".join(o["layouts"]) or "-", "target": o["target"], "order": o["order"] or "-",
                      "depends": s.get("depends_on") or "-", "brd": o["brd"], "questions": o["questions"]})
     reviewed(wb.sheet("Object catalogue", [
@@ -874,21 +894,21 @@ def workbook_sheets(wb: Any, pack: Any, date_sheets: list[Any]) -> None:
     ] + review(), rows, description="Code map sets of the Migration Console (BRID 3.1): one per domain, versioned and "
                                     "approved by the business owner"))
     wb.sheet("Code map template", [
-        Column("set", "Code map", 20, "Code map set"),
-        Column("source", "Source system", 12, "Legacy system of the code", values=SOURCES),
-        Column("legacy_code", "Legacy code", 16, "Code as stored in legacy"),
-        Column("legacy_desc", "Legacy description", 28, "Description in legacy"),
-        Column("rows", "Rows using it", 11, "From the profiling of the extracts"),
-        Column("action", "Action", 10, "MAP to a BIBS value, DEFAULT to the default of the set, REJECT the rows, "
+        Column("set", "Code map", 20, "Code map set; the console exports one sheet per set, named after it"),
+        Column("source_system", "source_system", 13, "Legacy system of the code", values=SOURCES),
+        Column("legacy_code", "legacy_code", 16, "Code as stored in legacy"),
+        Column("legacy_description", "legacy_description", 28, "Description in legacy"),
+        Column("qualifier", "qualifier", 12, "Attribute that splits one legacy code into several BIBS values "
+               "(package code map: RISK_CODE, INSURER or SI_BAND); empty otherwise"),
+        Column("qualifier_value", "qualifier_value", 18, "Value of the qualifier (a code, or a from-to amount band)"),
+        Column("action", "action", 10, "MAP to a BIBS value, DEFAULT to the default of the set, REJECT the rows, "
                "CREATE a new BIBS value", values=["MAP", "DEFAULT", "REJECT", "CREATE"]),
-        Column("bibs_code", "BIBS value", 16, "Target value; mandatory for MAP and CREATE"),
-        Column("bibs_desc", "BIBS description", 28, "Description of the BIBS value"),
-        Column("remarks", "Remarks", 34, "Reason for DEFAULT, REJECT or CREATE; condition of a conditional entry"),
-        Column("by", "Prepared by", 14, "Data steward"), Column("approved", "Approved by", 14, "Business owner"),
-    ], [dict(zip(["set", "source", "legacy_code", "legacy_desc", "rows", "action", "bibs_code", "bibs_desc",
-                  "remarks"], [str(x) for x in r])) for r in cat.data["map_example"]],
-        description="Layout of a code map version as exported and imported in Excel on the Code Maps screen "
-                    "(made-up example rows)")
+        Column("target_code", "target_code", 18, "BIBS value; mandatory for MAP and CREATE"),
+        Column("remarks", "remarks", 34, "Reason for DEFAULT, REJECT or CREATE; condition of a conditional entry"),
+        Column("rows", "Rows using it", 11, "From the profiling of the extracts (not part of the file)"),
+    ], [dict(zip(["set"] + CODE_MAP_COLUMNS + ["rows"], [str(x) for x in r])) for r in cat.data["map_example"]],
+        description="Columns of a code map version as exported and imported in Excel on the Code Maps screen "
+                    "(the columns source_system to remarks; illustrative rows)")
 
     rows = [{"code": r["code"], "scope": r["layout_scope"], "columns": client_text(r["columns"]),
              "kind": KIND_LABEL.get(r["kind"], r["kind"]), "rule": client_text(r["description"]),

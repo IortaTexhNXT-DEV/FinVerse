@@ -652,17 +652,19 @@ control_example:
 # Example rows of a code map version (made-up values): [set, source, legacy code, legacy description, rows, action,
 # BIBS value, BIBS description, remarks].
 map_example:
-  - [INSURER, EBIX, MAL, "Malayan Insurance Co., Inc.", "1,240", MAP, INS-MAL, "Malayan Insurance Co., Inc.", ""]
-  - [INSURER, QPS, 0012, Malayan Insurance, "310", MAP, INS-MAL, "Malayan Insurance Co., Inc.", QPS numeric code of the same insurer]
-  - [LOV:MARKET_SEGMENT, QPS, CBG, Consumer Banking Group, "88,410", MAP, CBG, Consumer Banking Group, ""]
-  - [LOV:MARKET_SEGMENT, QPS, OLD-RET, Retail (discontinued 2019), "12", DEFAULT, RETAIL, Retail, Set default]
-  - [PRODUCT, EBIX, MC-PC-COMP, Private Car Own Damage and Theft, "41,002", MAP, MCPC01, Private Car - Own Damage and Theft, ""]
-  - [STATUS:UPP, EBIX, FOR_MONITORING, For monitoring, "815", MAP, MONITORING, Monitoring tab, ""]
-  - [USER, QPS, mreyes, Maria Reyes, "3,112", MAP, maria.reyes, Maria Reyes, BIBS user created through User Access]
-  - [MIS:BUSINESS_ORIGIN, QPS, WALKIN, Walk-in, "57", CREATE, WALK_IN, Walk-in, New MIS value; authorised in the LOV master]
-  - [PACKAGE, QPS, PKG-MC-PRIV v3, Private Car Package 2027, "18,240", MAP, MC-PRIVATE-STD v1, Private Car Standard, "Conditional entry - sum insured up to 2,000,000.00 (DMQ36)"]
-  - [PACKAGE, QPS, PKG-MC-PRIV v3, Private Car Package 2027, "1,115", MAP, MC-PRIVATE-HV v1, Private Car High Value, "Conditional entry - sum insured above 2,000,000.00 (DMQ36)"]
-  - [PACKAGE, QPS, PKG-HOME-01 v2, Home Protect (withdrawn), "96", REJECT, "", "", "No BIBS package; at renewal the candidate goes to the Exception bucket (Renewal processing team)"]
+  # Columns: code map, source_system, legacy_code, legacy_description, qualifier, qualifier_value, action,
+  # target_code, remarks, rows using the code (from the profiling). The console exports one sheet per code map.
+  - [INSURER, EBIX, MAL, "Malayan Insurance Co., Inc.", "", "", MAP, INS-MAL, "", "1,240"]
+  - [INSURER, QPS, "0012", Malayan Insurance, "", "", MAP, INS-MAL, QPS numeric code of the same insurer, "310"]
+  - ["LOV:MARKET_SEGMENT", QPS, CBG, Consumer Banking Group, "", "", MAP, CBG, "", "88,410"]
+  - ["LOV:MARKET_SEGMENT", QPS, OLD-RET, Retail (discontinued 2019), "", "", DEFAULT, "", Segment discontinued; the default of the set applies, "12"]
+  - [PRODUCT, EBIX, MC-PC-COMP, Private Car Own Damage and Theft, "", "", MAP, MCPC01, "", "41,002"]
+  - ["STATUS:UPP", EBIX, FOR_MONITORING, For monitoring, "", "", MAP, MONITORING, Monitoring tab of the Unapplied workbench, "815"]
+  - [USER, QPS, mreyes, Maria Reyes, "", "", MAP, maria.reyes, BIBS user created through User Access, "3,112"]
+  - ["MIS:BUSINESS_ORIGIN", QPS, WALKIN, Walk-in, "", "", CREATE, WALK_IN, New MIS value; authorised in the LOV master, "57"]
+  - [PACKAGE, QPS, PKG-MC-PRIV, Private Car Package 2027, SI_BAND, "0.00-2000000.00", MAP, MC-PRIVATE-STD v1, "Sum insured up to 2,000,000.00 (DMQ36)", "18,240"]
+  - [PACKAGE, QPS, PKG-MC-PRIV, Private Car Package 2027, SI_BAND, "2000000.01-999999999.99", MAP, MC-PRIVATE-HV v1, "Sum insured above 2,000,000.00 (DMQ36)", "1,115"]
+  - [PACKAGE, QPS, PKG-HOME-01, Home Protect (withdrawn), "", "", REJECT, "", "No BIBS package; at renewal the candidate goes to the Exception bucket (Renewal processing team)", "96"]
 
 # --------------------------------------------------------------------------------------------------------------
 # Item of the BRD discrepancy and clarification register (v1.2) for each open decision.

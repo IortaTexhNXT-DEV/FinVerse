@@ -334,6 +334,7 @@ class ApiSmokeIT {
   @ParameterizedTest
   @CsvSource({
     "ebao, /api/v1/eb/home?companyId={c}",
+    "ebao, /api/v1/eb/account-officers",
     "ebao, /api/v1/eb/programmes?companyId={c}",
     "ebao, /api/v1/eb/programmes?companyId={c}&tab=RENEWAL_DUE",
     "ebtl, /api/v1/eb/programmes?companyId={c}&tab=IN_PROGRESS&stage=RA_SENT",

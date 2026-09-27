@@ -27,6 +27,12 @@ module.exports = [
   { slug: 'proposal-requests', title: 'Proposal Requests', user: 'ao', path: '/proposals' },
   { slug: 'proposal-record', title: 'Proposal Request record', user: 'ao', path: '/proposals', open: 'first' },
   { slug: 'tsu-workbench', title: 'TSU Workbench', user: 'tsu', path: '/proposals/tsu' },
+  // Employee Benefits (BRD-8, Drop 2 without the partner portal)
+  { slug: 'eb-home', title: 'EB Home', user: 'ebao', path: '/eb' },
+  { slug: 'eb-programmes', title: 'EB Programmes work list', user: 'ebao', path: '/eb/programmes?tab=ALL' },
+  { slug: 'eb-programme-record', title: 'EB Programme record', user: 'ebao', path: '/eb/programmes?tab=ALL', open: 'first' },
+  { slug: 'eb-new-programme', title: 'EB New Programme', user: 'ebao', path: '/eb/programmes/new' },
+  { slug: 'eb-pending-items', title: 'EB Pending Items', user: 'ebao', path: '/eb/pending-items' },
   { slug: 'placement-workbench', title: 'Placement Workbench', user: 'proc', path: '/placement' },
   { slug: 'placement-slips', title: 'Placement Slips', user: 'proc', path: '/placement/slips' },
   { slug: 'clpc-billing', title: 'CLPC Billing', user: 'proc', path: '/placement/billing' },

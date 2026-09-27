@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.eb.programme.service.ProgrammeView;
 import com.iortatechnxt.brokerverse.eb.programme.service.ProgrammeViewService;
 import com.iortatechnxt.brokerverse.eb.programme.service.ProgrammeViewService.ActivityRow;
 import com.iortatechnxt.brokerverse.eb.renewal.service.RenewalAdviceBatch;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
@@ -47,6 +48,7 @@ public class ProgrammeController {
   private final ProgrammeQuery query;
   private final RenewalAdviceBatch sendRa;
   private final EbHomeService home;
+  private final UserDirectory users;
 
   /**
    * Creates the controller.
@@ -56,18 +58,32 @@ public class ProgrammeController {
    * @param query work list
    * @param sendRa Send RA
    * @param home EB Home counts
+   * @param users EB account officers
    */
   public ProgrammeController(
       ProgrammeService programmes,
       ProgrammeViewService views,
       ProgrammeQuery query,
       RenewalAdviceBatch sendRa,
-      EbHomeService home) {
+      EbHomeService home,
+      UserDirectory users) {
     this.programmes = programmes;
     this.views = views;
     this.query = query;
     this.sendRa = sendRa;
     this.home = home;
+    this.users = users;
+  }
+
+  /**
+   * The EB account officers (users holding EB_MARKET) for the AO pick lists.
+   *
+   * @return user names, sorted
+   */
+  @GetMapping("/account-officers")
+  @PreAuthorize(VIEW)
+  public List<String> accountOfficers() {
+    return users.usersWithPermission("EB_MARKET");
   }
 
   /**

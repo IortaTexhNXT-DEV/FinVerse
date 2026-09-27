@@ -1,37 +1,18 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { AuthContext } from '@/auth/authContext';
-import type { AuthState } from '@/auth/authContext';
+import { ebApi } from '@/api/eb';
 import { mayOpen } from '@/navigation/access';
 import { MODULES, NAV_GROUPS } from '@/navigation/modules';
 import { EbPlaceholder } from './EbPlaceholder';
 import EbHomePage from './home/EbHomePage';
-import { EB_HOME_TILES } from './home/ebHomeTiles';
+import { EB_HOME_TILES, tileValue } from './home/ebHomeTiles';
 import { ebModule } from './module';
+import { ebWrapper } from './testWrapper';
 
 /** Permissions of the EB_AO role (V1030). */
 const AO = new Set(['EB_VIEW', 'EB_MARKET', 'EB_REPORT_VIEW', 'WORK_VIEW']);
 
 const paths = ebModule.screens.map((s) => s.path);
-
-function renderHome(permissions: ReadonlySet<string>) {
-  const auth: AuthState = {
-    user: null,
-    loading: false,
-    login: () => Promise.resolve(),
-    logout: () => undefined,
-    can: (p) => permissions.has(p),
-    passwordChange: null,
-    passwordChanged: () => undefined,
-  };
-  render(
-    <MemoryRouter>
-      <AuthContext.Provider value={auth}>
-        <EbHomePage />
-      </AuthContext.Provider>
-    </MemoryRouter>,
-  );
-}
 
 function openFor(permissions: readonly string[]) {
   const can = (p: string) => permissions.includes(p);
@@ -39,6 +20,8 @@ function openFor(permissions: readonly string[]) {
 }
 
 describe('Employee Benefits module', () => {
+  afterEach(() => vi.restoreAllMocks());
+
   it('declares every internal route of the design under /eb and no portal route', () => {
     expect(paths).toEqual([
       '/eb',
@@ -83,29 +66,43 @@ describe('Employee Benefits module', () => {
     render(
       <MemoryRouter>
         <EbPlaceholder
-          title="Programmes"
-          description="Every programme."
-          emptyMessage="No programmes to display"
+          title="Comparative"
+          description="The comparative."
+          emptyMessage="No comparative to display"
         />
       </MemoryRouter>,
     );
-    expect(screen.getByRole('heading', { level: 1, name: 'Programmes' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 1, name: 'Comparative' })).toBeInTheDocument();
     expect(screen.getByText('Client & Policy · Employee Benefits')).toBeInTheDocument();
-    expect(screen.getByText('No programmes to display')).toBeInTheDocument();
+    expect(screen.getByText('No comparative to display')).toBeInTheDocument();
   });
 
-  it('shows EB Home with its tiles and New Programme for an AO', () => {
-    renderHome(AO);
+  it('shows EB Home with its tiles, counts and New Programme for an AO', async () => {
+    vi.spyOn(ebApi, 'home').mockResolvedValue({
+      raDue: 4,
+      awaitingFeedback: 2,
+      pendingItemsOverdue: 0,
+    });
+    render(ebWrapper(AO)(<EbHomePage />));
     expect(screen.getByRole('heading', { level: 1, name: 'EB Home' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'New Programme' })).toBeInTheDocument();
     EB_HOME_TILES.forEach((t) =>
       expect(screen.getByRole('link', { name: t.label })).toHaveAttribute('href', t.to),
     );
+    expect(await screen.findByText('4')).toBeInTheDocument();
+    expect(screen.getByText('Needs attention')).toBeInTheDocument();
   });
 
   it('hides New Programme without EB_MARKET', () => {
-    renderHome(new Set(['EB_VIEW']));
+    vi.spyOn(ebApi, 'home').mockResolvedValue({});
+    render(ebWrapper(new Set(['EB_VIEW']))(<EbHomePage />));
     expect(screen.queryByRole('button', { name: 'New Programme' })).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Open Programmes' })).toBeInTheDocument();
+  });
+
+  it('shows a dash for a tile without a count', () => {
+    expect(tileValue({ raDue: 3 }, 'raDue')).toBe('3');
+    expect(tileValue({ raDue: 3 }, 'memberChangesOpen')).toBe('–');
+    expect(tileValue(undefined, 'raDue')).toBe('–');
   });
 });

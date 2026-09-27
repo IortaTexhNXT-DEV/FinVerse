@@ -121,17 +121,15 @@ public final class ResourceNames {
     return lower && capitals > 1 && !Character.isUpperCase(token.charAt(1));
   }
 
-  /** EB_MEMBER: capitals and digits in parts joined by underscores. */
+  /** EB_MEMBER: capitals and digits in parts joined by single underscores. */
   private static boolean codeStyle(String token) {
-    if (!token.contains("_") || token.startsWith("_") || token.endsWith("_")) {
+    if (!token.contains("_") || token.contains("__") || !Character.isLetter(token.charAt(0))) {
       return false;
     }
-    for (int i = 0; i < token.length(); i++) {
-      char c = token.charAt(i);
-      if (!(c == '_' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9')) {
-        return false;
-      }
-    }
-    return !token.contains("__") && Character.isLetter(token.charAt(0));
+    return !token.endsWith("_") && token.chars().allMatch(ResourceNames::codeChar);
+  }
+
+  private static boolean codeChar(int c) {
+    return c == '_' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9';
   }
 }

@@ -2719,7 +2719,7 @@ The BRD refers every usage table to "the consolidated NFR requirements for BDO I
 | the list of data trust levels | High; Medium; Low |
 | the list of break reasons | Timing difference between extract and ledger; Rounding in the legacy extract; Rows excluded by the data owner; Error in the legacy source, corrected by manual entry; Code map difference; Other (see explanation) |
 | the list of waiver reasons | Record not needed in BIBS; Entered manually in BIBS after go-live |
-| the list of access reasons | Audit request; Regulatory inquiry; Client request; Claim support; Internal investigation; Other (see text) |
+| the list of access reasons | Internal or external audit; Compliance review; Regulator request; Client request or complaint; Claim on a legacy policy; Other (give details) |
 | the list of legacy record types | Client; Policy; Invoice; Receipt; Remittance; Endorsement; Claim; GL journal; Renewal advice; Letter; Other |
 | the list of reclassification reasons | Client cannot be identified; Unclaimed after follow-up; Below refund threshold; Other (see remarks) |
 

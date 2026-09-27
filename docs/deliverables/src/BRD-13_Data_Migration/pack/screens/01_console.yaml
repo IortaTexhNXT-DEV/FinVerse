@@ -183,7 +183,7 @@ screens:
     entry: ["Migration Home › Upload Extract"]
     shots:
       - {state: list, user: migops, caption: Extracts with the upload card and the intake results}
-      - {state: rejected, user: migops, custom: extract_rejected, caption: An extract rejected at intake with its reason}
+      - {state: rejected, user: migops, caption: An extract rejected at intake with its reason}
     fields:
       - "Upload an extract | Data file | File | LAYOUT_SOURCE_yyyyMMdd_nn.csv or .xlsx | Y | - | - | - | Name, layout, source system and date of the name are valid; the object is decided | Name the file <LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv or .xlsx, for example F01C_EBIX_20271231_01.csv"
       - "Upload an extract | Control file | File | <data file name>.ctl.csv | Y | - | - | - | Row count, hash total, amount totals and SHA-256 agree with the data file | The file has <n> rows; the control file says <m>"
@@ -259,7 +259,7 @@ screens:
     shots:
       - {state: validated, user: miglead, open: batch_validated, caption: "A validated batch: steps, counts, facts and the Issues tab"}
       - {state: rows, user: migowner, open: batch_validated, tab: Rows, caption: "Rows tab with the waiver and exclusion of failing rows"}
-      - {state: waive, user: migowner, open: batch_validated, tab: Rows, custom: batch_waive, caption: Waive Rows dialog}
+      - {state: waive, user: migowner, open: batch_validated, tab: Rows, caption: Waive Rows dialog}
       - {state: signoffs, user: miglead, open: batch_accepted, tab: Sign-offs, caption: "Sign-offs tab of an accepted batch"}
       - {state: log, user: migops, open: batch_accepted, tab: Run Log, caption: Run Log tab}
     fields:
@@ -346,7 +346,7 @@ screens:
     entry: ["Migration Home › Open reconciliation breaks", "Batch › Reconciliation tab"]
     shots:
       - {state: list, user: migrecon, open: recon_batch, caption: A loaded batch and its reconciliation lines by level}
-      - {state: explain, user: migsteward, open: recon_break, custom: recon_explain, caption: Explain Break dialog}
+      - {state: explain, user: migsteward, open: recon_break, caption: Explain Break dialog}
     fields:
       - "Loaded batches | Batch, Object, Loaded, Load ended, Status | Columns | - | - | Batches loaded, reconciled or accepted | - | - | - | -"
       - "Reconciliation | [Title] | Text | Run number, date and time, user; status on the right | - | Latest run | - | - | - | -"

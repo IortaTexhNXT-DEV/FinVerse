@@ -52,7 +52,7 @@ screens:
     entry: ["Migration Home › Next cut-over tasks"]
     shots:
       - {state: plans, user: miglead, open: plan_mock, caption: Cut-over plans and the runbook of a mock run}
-      - {state: criteria, user: miggonogo, open: plan_mock, custom: plan_criteria, caption: Go / No-Go Criteria and Decisions of a plan}
+      - {state: criteria, user: miggonogo, open: plan_mock, caption: Go / No-Go Criteria and Decisions of a plan}
       - {state: new, user: miglead, click: "^new plan$", caption: New Cutover Plan dialog}
     fields:
       - "Plans | Plan | Column | Name; plan number under it | - | Plans | - | - | - | -"

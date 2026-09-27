@@ -1687,7 +1687,7 @@ frs:
         type: Positive
         title: Find a 2022 invoice
         steps:
-          - Enter reason Audit request; search invoice I00098765; open it and its document.
+          - Enter reason Internal or external audit; search invoice I00098765; open it and its document.
         expected: The record opens read only with labelled columns; the document opens; no edit action.
       - c: 2
         type: Boundary

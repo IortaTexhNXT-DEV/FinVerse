@@ -207,8 +207,7 @@ function escapeRx(s) {
  * ticked, a date field gets the value typed as shown (dd-MMM-yyyy), every other input gets the text.
  */
 async function fillField(page, label, value) {
-  const field = page.getByLabel(rx(`^${escapeRx(label)}\\s*\\*?$`)).first();
-  await field.waitFor({ state: 'visible', timeout: 10000 });
+  const field = await pickField(page.getByLabel(rx(`^${escapeRx(label)}\\s*\\*?$`)), value);
   const tag = await field.evaluate((e) => e.tagName.toLowerCase());
   const type = await field.evaluate((e) => (e.getAttribute('type') || '').toLowerCase());
   if (tag === 'select') {
@@ -230,6 +229,27 @@ async function fillField(page, label, value) {
     await field.press('Tab').catch(() => {});
   }
   await page.waitForTimeout(150);
+}
+
+/**
+ * The field of a label for a value: when several fields carry the label (a group profile check box named
+ * "Approver" next to the Approver drop-down), a text value goes to the drop-down or text field and a true / false
+ * value to the check box.
+ */
+async function pickField(matches, value) {
+  await matches.first().waitFor({ state: 'visible', timeout: 10000 });
+  const n = await matches.count();
+  if (n > 1) {
+    const wantBox = typeof value === 'boolean';
+    for (let i = 0; i < n; i += 1) {
+      const el = matches.nth(i);
+      const type = await el.evaluate((e) => (e.getAttribute('type') || e.tagName).toLowerCase());
+      if (wantBox === (type === 'checkbox' || type === 'radio') && (await el.isVisible())) {
+        return el;
+      }
+    }
+  }
+  return matches.first();
 }
 
 /** Runs a list of steps: [label, value] fills a field; functions get the page. */
@@ -585,7 +605,15 @@ async function cropOf(page, shot, recipe) {
         toasts.slice(0, -1).forEach((t) => { t.style.display = 'none'; });
         window.scrollTo(0, 0);
       });
-      await fitViewport(page, shot.tall);
+      // A walkthrough step shows the top of the page (record header, stepper, the message of the step) at a
+      // size that stays readable next to its text; the recipe sets `tall` for a step that needs the whole page.
+      // A step cropped to a named region (recipe.crops) gets the whole page, so the region is in view.
+      const named = recipe.crops && recipe.crops[shot.slug] && !['main', 'dialog', 'full'].includes(recipe.crops[shot.slug]);
+      await fitViewport(page, shot.state === 'walkthrough' ? (shot.tall ?? Boolean(named)) : shot.tall);
+      if (named) {
+        // A message of the step would cover the rows of the region.
+        await page.evaluate(() => document.querySelectorAll('.toast-region .toast').forEach((t) => { t.style.display = 'none'; }));
+      }
       const missing = shot.state === 'walkthrough' ? [] : await drawCallouts(page, calloutsOf[shot.screen]);
       const { kind, clip } = await cropOf(page, shot, recipe);
       await page.screenshot(clip ? { path: file, clip } : { path: file });

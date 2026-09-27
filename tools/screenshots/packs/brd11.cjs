@@ -90,11 +90,15 @@ const fills = {
   modify_user: [['Request Type', 'Modify user'], ['User ID', 'a013000101'], ['Full Name', 'SIT Enrolled User Santos']],
   new_profile: [
     ['Profile Code', 'UAT_ENQUIRY'], ['Name', 'Client enquiry (seed data)'],
-    ['Description', 'Read-only enquiry of clients and reports'], ['Client view', true], ['Report view', true],
+    ['Description', 'Read-only enquiry of clients and reports'],
+    // Each permission shows its name with the code as the second line of its label; the code finds it.
+    async (page) => page.getByLabel(/CLIENT_VIEW$/).first().check(),
+    async (page) => page.getByLabel(/REPORT_VIEW$/).first().check(),
     ['Approvers in Order', 'Ulysses'], ['Approvers in Order', '\\(approver\\)'],
     ['Remarks (Justification)', 'Enquiry profile for the contact centre (seed data)'],
   ],
-  modify_profile: [['Request Type', 'Modify group profile'], ['Group Profile', '^Marketing Account Officer'], ['User access view', true]],
+  modify_profile: [['Request Type', 'Modify group profile'], ['Group Profile', '^Marketing Account Officer'],
+    async (page) => page.getByLabel(/UAM_VIEW$/).first().check()],
   deactivate_profile: [['Request Type', 'Deactivate group profile'], ['Group Profile', '^Processing Team Lead']],
   report_profile: [['Group Profile (code)', 'UAM_APPROVER']],
 };
@@ -108,13 +112,20 @@ const opens = {
   seed_batch: (ctx) => `/user-access/bulk/${ctx.one("select id from nba_access_request_batch where batch_no = 'BLK-2026-900001'")}`,
   // A reset link requested for requestor; the token is read from the e-mail queued for it.
   reset_link: async (ctx) => {
+    const before = Number(ctx.one("select coalesce(max(id), 0) from msg_outbound where purpose = 'PASSWORD_RESET'"));
     await fetch(`${ctx.API}/api/v1/auth/password-reset/request`, {
       method: 'POST', headers: { 'Content-Type': 'application/json', Origin: ctx.BASE },
       body: JSON.stringify({ userId: 'requestor' }),
     });
-    await new Promise((r) => setTimeout(r, 1500));
-    const body = ctx.one("select body from msg_outbound where purpose = 'PASSWORD_RESET' order by id desc limit 1");
-    const token = /token=([A-Za-z0-9_-]+)/.exec(body);
+    // The e-mail is queued after the answer: wait for it (the last one is used when a new one is not sent). The
+    // token is cut out in the query, as psql prints one line per row.
+    const tokenOf = (where) => ctx.sql(`select substring(body from 'token=([A-Za-z0-9_-]+)') from msg_outbound where purpose = 'PASSWORD_RESET' ${where} order by id desc limit 1`)[0]?.[0];
+    let found;
+    for (let i = 0; i < 20 && !found; i += 1) {
+      await new Promise((r) => setTimeout(r, 750));
+      found = tokenOf(`and id > ${before}`);
+    }
+    const token = found ? [null, found] : (tokenOf('') ? [null, tokenOf('')] : null);
     if (!token) {
       throw new Error('no reset link in the last PASSWORD_RESET e-mail');
     }

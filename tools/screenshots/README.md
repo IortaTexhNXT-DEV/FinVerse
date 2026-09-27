@@ -55,7 +55,27 @@ PLAYWRIGHT_MODULE=/opt/node22/lib/node_modules/playwright CHROMIUM=/opt/pw-brows
 node tools/screenshots/capture_pack.cjs brd01 [slug-regex]
 ```
 
-Recipes exist for `brd01`, `brd03` and `brd11` (`packs/brdNN.cjs`). The BRD-11 recipe also signs in users that are
+**Sharp, cropped images.** Pages are rendered at device scale factor 2 (`SCALE`, default 2) in a 1440 x 900 window
+(`WIDTH`, `HEIGHT`), so every image holds two pixels per screen pixel. Each shot is cropped to what it is about, with
+a 12-pixel margin: the open dialog, otherwise the content area without the menu and the header (trimmed to what is
+drawn), or the element the recipe names in `crops` (a Playwright selector; `'full'` keeps the whole window where the
+menu gives the navigation context, `'main'` or `'dialog'` force those crops). A walkthrough step shows the top of its
+page (the record header, the stepper and the message of the step), unless the recipe names a region for it. The crop
+kind is stored in the PNG (text `bibs-crop`); the Word builder puts `full` shots on landscape pages. Callout badges are
+26 pixels with bold 15-pixel digits, so they stay legible in print. Generated documents are rendered at 200 dpi
+(`DOC_DPI`). The PNG keeps a 256-colour palette without dither for flat screens and full colour for photo-like images.
+
+**Order on a fresh database.** The walkthroughs change seed records that some screen states need, so each pack runs in
+this order, BRD-01 first:
+
+| Pack | Runs, in order |
+|---|---|
+| brd01 | `'^wt-(a|b)-|^wt-c-01$'`, then `'^(scr|doc)-'` (the KYC approval shot needs the client that step C-01 submits), then `'^wt-c-(0[2-9]|1)'` |
+| brd03 | `'^wt-a-'`, then `'^(scr|doc)-'` (the set-up shot needs the seed request that walkthrough B returns), then `'^wt-b-'` |
+| brd11 | `'^wt-'`, then `'^(scr|doc)-'` |
+
+A run with a slug filter keeps the other images; a run without a filter deletes the images that are no longer in the
+pack. Recipes exist for `brd01`, `brd03` and `brd11` (`packs/brdNN.cjs`). The BRD-11 recipe also signs in users that are
 not seed personas (the user enrolled in walkthrough A, a user whose password the administrator set), locks a seed
 subject user through failed sign-ins, and moves the browser clock (Playwright `page.clock`) to show the inactivity
 warning; its walkthroughs run in order (A before B, C and D).

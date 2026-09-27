@@ -14,7 +14,13 @@ const requestOf = (ctx, where) => ctx.sql(`select id from nba_access_request whe
 const seedRequest = (ctx, no) => ctx.one(`select id from nba_access_request where request_no = '${no}'`);
 
 async function fill(page, label, value) {
-  const field = page.getByLabel(new RegExp(`^${label}`)).first();
+  // A text value goes to the drop-down or text field of the label, not to a check box of the same name (the
+  // group profile "Approver" next to the Approver drop-down).
+  const matches = page.getByLabel(new RegExp(`^${label}`));
+  let field = matches.first();
+  if (typeof value !== 'boolean' && (await matches.count()) > 1) {
+    field = matches.and(page.locator('select, input:not([type=checkbox]), textarea')).first();
+  }
   const tag = await field.evaluate((e) => e.tagName.toLowerCase());
   if (tag === 'select') {
     const options = await field.locator('option').allTextContents();
@@ -89,6 +95,8 @@ const steps = {
     if (ctx.one(`select status from nba_access_request where id = ${id}`) === 'DRAFT') {
       await button(page, /^edit request$/i).click();
       await settle(page);
+      // The approver is chosen when the request is submitted (a draft does not keep it).
+      await fill(page, 'Approver', 'Ulysses');
       await button(page, /^submit$/i).click();
       await settle(page, 1500);
     }
@@ -162,8 +170,9 @@ const steps = {
     await fill(page, 'Profile Code', PROFILE);
     await fill(page, 'Name', 'Renewal enquiry');
     await fill(page, 'Description', 'Read-only enquiry of clients and reports for the contact centre (seed data)');
-    await page.getByLabel('CLIENT_VIEW', { exact: true }).check();
-    await page.getByLabel('REPORT_VIEW', { exact: true }).check();
+    // Each permission shows its name with the code as the second line of its label; the code finds it.
+    await page.getByLabel(/CLIENT_VIEW$/).first().check();
+    await page.getByLabel(/REPORT_VIEW$/).first().check();
     await fill(page, 'Approvers in Order', 'Ulysses');
     await fill(page, 'Approvers in Order', '\\(approver\\)');
     await fill(page, 'Remarks \\(Justification\\)', 'Enquiry profile for the renewal follow-up (seed data)');

@@ -222,7 +222,7 @@ const callouts = {
 
 // Shots kept as the whole window (menu and header give the navigation context); every other shot is cropped to
 // its dialog or content area (capture_pack.cjs, cropOf).
-const exceptionsCard = 'main section.card:has(.card-header :text-is("Rate Exceptions"))';
+const exceptionsCard = '[data-callout="rate-exceptions"]';
 const crops = {
   'scr-pm-01-01-view': 'full',
   // The quotation steps of walkthrough A show the Rate Exceptions card with its rows.

@@ -3,7 +3,7 @@ import { RecordSummary } from '@/components/broking/RecordSummary';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatAmount, formatDate, humanize } from '@/utils/format';
+import { formatAmount, formatPeriod, humanize } from '@/utils/format';
 import type { ClaimDraft, PremiumCheck, UnpaidInvoice } from '../cover/api';
 import { PREMIUM_LABELS } from './recordLogic';
 import { displayNameOf } from '@/api/users';
@@ -70,7 +70,7 @@ export function CoverCard({ draft }: Readonly<{ draft: ClaimDraft }>) {
           {
             icon: CalendarRange,
             label: `Policy Year ${draft.policyYear}`,
-            value: `${formatDate(draft.periodFrom)} – ${formatDate(draft.periodTo)}`,
+            value: formatPeriod(draft.periodFrom, draft.periodTo),
           },
           {
             icon: Wallet,

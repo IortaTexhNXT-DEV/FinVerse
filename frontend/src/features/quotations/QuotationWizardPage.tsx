@@ -17,7 +17,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { DetailList } from '@/features/catalog/DetailList';
-import { formatDate, today } from '@/utils/format';
+import { formatDate, formatPeriod, today } from '@/utils/format';
 import { LivePremium } from './PremiumBreakdown';
 import {
   canSaveQuotation,
@@ -65,7 +65,7 @@ function ReviewStep({ form }: Readonly<{ form: QuotationForm }>) {
         ],
         ['Product', form.productCode],
         ['Insurer', form.insurerCode || 'To be advised'],
-        ['Period', `${formatDate(form.periodFrom)} to ${formatDate(form.periodTo)}`],
+        ['Period', formatPeriod(form.periodFrom, form.periodTo)],
         [
           'Valid until',
           form.validUntil === '' ? 'Configured validity' : formatDate(form.validUntil),

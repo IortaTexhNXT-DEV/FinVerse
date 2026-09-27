@@ -1,6 +1,6 @@
 import type { DocumentStatus, Policy, Premium } from '@/api/underwriting';
 import { Card } from '@/components/ui/Card';
-import { formatDate } from '@/utils/format';
+import { formatDate, formatPeriod } from '@/utils/format';
 import { PremiumSummary } from './PremiumSummary';
 
 interface Props {
@@ -28,7 +28,7 @@ export function DebitNote({ policy, document, premium, reference }: Readonly<Pro
     ['Bill to', `${policy.customerCode} – ${policy.customerName}`],
     ['Insured', policy.insuredName],
     ['Reference', reference],
-    ['Period', `${formatDate(policy.periodFrom)} – ${formatDate(policy.periodTo)}`],
+    ['Period', formatPeriod(policy.periodFrom, policy.periodTo)],
     ['Intermediary', policy.intermediaryName ?? 'Direct business'],
     ['Broker / agent note', document.creditNoteNo ?? '—'],
     ['Premium journal', document.premiumBatchNo ?? '—'],

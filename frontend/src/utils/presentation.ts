@@ -1,9 +1,21 @@
 import type { ReactNode } from 'react';
 import { extensionOf } from './files';
 
-/** Whether a displayed value counts as empty: null, undefined, '' or false (shown as a dash). */
+/** Texts that stand for "no value" (a dash typed by a screen, or a period with no dates). */
+const EMPTY_TEXT = new Set(['', '—', '–', '-', 'to', 'from']);
+
+/**
+ * Whether a displayed value counts as empty: null, undefined, '', false or a text standing for no
+ * value (a dash, or "to" of a period without dates); shown as the muted dash.
+ */
 export function isEmptyValue(value: ReactNode): boolean {
-  return value === null || value === undefined || value === '' || value === false;
+  return (
+    value === null ||
+    value === undefined ||
+    value === '' ||
+    value === false ||
+    (typeof value === 'string' && EMPTY_TEXT.has(value.trim()))
+  );
 }
 
 const FORMAT_TOKENS = new Set([

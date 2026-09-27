@@ -12,7 +12,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { TextInput } from '@/features/assets/FormControls';
 import { DetailList } from '@/features/catalog/DetailList';
 import type { DetailRow } from '@/features/catalog/DetailList';
-import { formatDate, formatDateTime, today } from '@/utils/format';
+import { formatDateTime, formatPeriod, today } from '@/utils/format';
 import { useAccountRefresh } from './useAccountRefresh';
 import { displayNameOf } from '@/api/users';
 
@@ -23,7 +23,7 @@ const CLOSED = new Set(['BOOKED', 'CANCELLED', 'VOIDED']);
 function ffyText(a: Account): string {
   const f = a.freeFirstYear;
   if (f.active) {
-    return `${formatDate(f.start)} to ${formatDate(f.end)}`;
+    return formatPeriod(f.start, f.end);
   }
   return f.cancelledAt
     ? `Cancelled ${formatDateTime(f.cancelledAt)} (${f.cancelReason ?? ''})`

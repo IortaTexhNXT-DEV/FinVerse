@@ -1,4 +1,4 @@
-import { formatAmount, formatDate } from '@/utils/format';
+import { formatAmount, formatDate, formatPeriod } from '@/utils/format';
 import type { Statement, StatementStatus } from './api';
 
 /** Tabs and texts of the statements of account screens (BRCLXN.058/060). */
@@ -22,7 +22,7 @@ export function statusesOfTab(tab: StatementTab): StatementStatus[] {
 
 /** The billing cycle of a statement as text. */
 export function cycleText(s: Pick<Statement, 'cycleFrom' | 'cycleTo'>): string {
-  return `${formatDate(s.cycleFrom)} – ${formatDate(s.cycleTo)}`;
+  return formatPeriod(s.cycleFrom, s.cycleTo);
 }
 
 /** Subject and body proposed for e-mailing a statement (wording to confirm, CQ18). */

@@ -73,3 +73,15 @@ export function formatRate(rate: number): string {
   const [whole, decimals = ''] = text.split('.');
   return `${whole ?? '0'}.${decimals.padEnd(2, '0')}`;
 }
+
+/** The requested rate less the scheme rate, signed, in percentage points. */
+export function rateDifference(requested?: number, scheme?: number): string {
+  if (requested === undefined || scheme === undefined) {
+    return '';
+  }
+  const diff = Number((requested - scheme).toFixed(6));
+  if (diff === 0) {
+    return '0.00';
+  }
+  return `${diff > 0 ? '+' : '−'}${formatRate(Math.abs(diff))}`;
+}

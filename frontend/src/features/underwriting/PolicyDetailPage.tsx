@@ -13,7 +13,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, humanize } from '@/utils/format';
+import { formatDate, formatPeriod, humanize } from '@/utils/format';
 import { DebitNote } from './DebitNote';
 import { EndorsementDialog } from './EndorsementDialog';
 import { EndorsementHistory } from './EndorsementHistory';
@@ -31,7 +31,7 @@ function Terms({ policy: p }: Readonly<{ policy: Policy }>) {
         ? 'Direct'
         : `${humanize(p.sourceType)}: ${p.intermediaryName}`,
     ],
-    ['Period', `${formatDate(p.periodFrom)} – ${formatDate(p.periodTo)}`],
+    ['Period', formatPeriod(p.periodFrom, p.periodTo)],
     ['Issue date', formatDate(p.issueDate)],
     ['UW year', String(p.uwYear)],
     ['Currency', p.currency],

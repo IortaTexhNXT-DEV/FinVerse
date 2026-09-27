@@ -9,7 +9,7 @@ import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { DetailList } from '@/features/catalog/DetailList';
 import type { DetailRow } from '@/features/catalog/DetailList';
-import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { formatDate, formatDateTime, formatPeriod, humanize } from '@/utils/format';
 import { displayNameOf } from '@/api/users';
 import { LovLabel, ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
 
@@ -26,7 +26,7 @@ function detailRows(a: Account): DetailRow[] {
         {a.insurerBranch ? ` / ${a.insurerBranch}` : ''}
       </span>,
     ],
-    ['Period', `${formatDate(a.periodFrom)} to ${formatDate(a.periodTo)}`],
+    ['Period', formatPeriod(a.periodFrom, a.periodTo)],
     ['Term', a.multiYear ? `${a.termYears} years` : '1 year'],
     ['Total sum insured', <Amount key="tsi" value={a.totalSumInsured} />],
     ['Mortgagee bank', <LovLabel key="b" type="MORTGAGEE_BANK" code={a.mortgageeBank} />],

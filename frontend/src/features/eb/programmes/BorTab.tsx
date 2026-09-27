@@ -20,7 +20,7 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { formatDateTime, formatPeriod } from '@/utils/format';
 import { DialogFooter } from '../common/DialogFooter';
 import { useEbMutation } from '../common/useEbMutation';
 import { checklistErrors } from './borChecklist';
@@ -170,7 +170,7 @@ function borColumns({
     {
       key: 'validity',
       header: 'Valid',
-      render: (b) => (b.validFrom ? `${formatDate(b.validFrom)} – ${formatDate(b.validTo)}` : ''),
+      render: (b) => (b.validFrom ? formatPeriod(b.validFrom, b.validTo) : ''),
     },
     {
       key: 'uploaded',

@@ -20,7 +20,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { formatDate, formatDateTime, formatPeriod } from '@/utils/format';
 import { DialogFooter } from '../common/DialogFooter';
 import { EB_LOV } from '../common/ebCodes';
 import { useEbMutation } from '../common/useEbMutation';
@@ -91,7 +91,7 @@ function SoaFacts({ s }: Readonly<{ s: Soa }>) {
           { label: 'Client', value: s.clientName ?? '' },
           {
             label: 'Period',
-            value: `${formatDate(s.periodFrom)} – ${formatDate(s.periodTo)}`,
+            value: formatPeriod(s.periodFrom, s.periodTo),
           },
           { label: 'Amount', value: <Amount value={s.amount} /> },
           { label: 'Received On', value: formatDate(s.receivedOn) },

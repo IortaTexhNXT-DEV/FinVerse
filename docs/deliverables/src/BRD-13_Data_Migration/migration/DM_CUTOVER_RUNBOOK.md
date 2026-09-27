@@ -132,7 +132,7 @@ The rollback returns BDOI to legacy with no loss of data. It is available until 
 
 <!-- dm:rollback -->
 
-After the point of no return, there is no technical rollback. A defect is fixed forward in BIBS through the normal business functions (correction, reversal, adjustment), with the change visible in the Prod Recon legacy change report where it touches a legacy invoice. The true-ups come after the point of no return; a true-up that is wrong is corrected by the next true-up, never by editing a posted journal.
+After the point of no return, there is no technical rollback. An issue is corrected forward in BIBS through the normal business functions (correction, reversal, adjustment), with the change visible in the Prod Recon legacy change report where it touches a legacy invoice. The true-ups come after the point of no return; a true-up that is wrong is corrected by the next true-up, never by editing a posted journal.
 
 # Year-end cut-over and FY2027 true-ups
 
@@ -152,7 +152,7 @@ Options B (go-live after the first-quarter close in April 2028, with a year-to-d
 
 Hypercare runs from go-live to the first month-end close with the legacy control accounts (about T+30). The command centre stays open to T+5, then the daily 17:00 call continues until exit.
 
-**Daily checks** (task CT-071): Migration Clearing 0.00 per branch and currency; legacy control accounts against their sub-ledgers (ACSL, context LEGACY); automatch runs and the unapplied items they left; URGENT January renewals without an RA sent or an insurer request; payment file results; exception queues (rejected receipts, remittance exclusions, failed postings); failed jobs and alerts; open defects by severity; user tickets by department.
+**Daily checks** (task CT-071): Migration Clearing 0.00 per branch and currency; legacy control accounts against their sub-ledgers (ACSL, context LEGACY); automatch runs and the unapplied items they left; URGENT January renewals without an RA sent or an insurer request; payment file results; exception queues (rejected receipts, remittance exclusions, failed postings); failed jobs and alerts; open issues by severity; user tickets by department.
 
 ## Roster
 

@@ -51,7 +51,8 @@ BUILD_STATUS: list[tuple[str, re.Pattern]] = [(label, re.compile(pat, re.I)) for
     ("designed", r"\b(?:as[- ]|not[- ])?designed\b"),
     # "Rebuild from rule" and "Build Comparative" are button labels of the screens.
     ("build", r"\b(?:re)?builds?\b(?!-up)(?! from (?:the )?rule)(?<!\bBuild(?= Comparative))(?! Comparative\b)"),
-    ("build wave or step", r"\b(?:build|delivery)[- ](?:wave|step|phase)s?\b|\bwaves? [0-9]\b"),
+    ("build wave or step", r"\b(?:build|delivery)[- ](?:wave|step|phase)s?\b|\bwaves? [0-9]\b|\bwaves? (?-i:[A-Z]{1,4}[0-9])|"
+                           r"(?-i:\bDM[0-3](?:-[A-C])?\b|\b(?:A1-(?:GL|FRBS|OPSX|DSB|PRQ)|C1-[ABC]|CL1-[AB])\b)"),
     ("internal design document", r"\b(?:build|solution|module) designs?\b|(?-i:\b[A-Z_]+_DESIGN\b)"),
     ("work in progress", r"\bwork[- ]in[- ]progress\b|\bWIP\b"),
     ("defect or known issue", r"\bdefects?\b|\bknown (?:issues?|gaps?|limitations?)\b|\bbugs?\b"),
@@ -61,7 +62,7 @@ BUILD_STATUS: list[tuple[str, re.Pattern]] = [(label, re.compile(pat, re.I)) for
     ("test class name", r"(?-i:\b[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]+)*(?:Test|Tests|IT|Spec)\b)"),
     ("code or file path", r"\b[\w.-]+\.(?:java|kt|tsx?|jsx?|py|sql|md|ya?ml|properties|xml|json|dot|sh)\b|"
                           r"(?:^|[\s(`'\"])(?:\.{0,2}/)?(?:src|docs|tools|backend|frontend|deploy|main|test)/[\w./-]+"),
-    ("source code", r"\b(?:source code|code ?base|in the code|from the code|the code (?:reads|returns|checks))\b|"
+    ("source code", r"\b(?:source code|code ?base|in the code(?! maps?\b| lists?\b| of\b)|from the code(?! maps?\b| lists?\b| of\b)|the code (?:reads|returns|checks))\b|"
                     r"\b(?:source|code|git) repository\b|\brepository URLs?\b|\b(?:deployed|git) commits?\b|\bcommit (?:hash|id)\b|"
                     r"\bpull requests?\b"),
     ("API path", r"/api/|\b(?:GET|POST|PUT|PATCH|DELETE) (?:\.\.\.)?/|(?:^|[\s(])(?:\.\.\.)?/[a-z][\w-]*(?:/[\w{}.-]+)+|/\{\w+\}|\bendpoints?\b|\bHTTP [1-5][0-9]{2}\b|\bREST API\b"),
@@ -182,7 +183,8 @@ def extract_field_names() -> set[str]:
     if not path.exists():
         return set()
     names: set[str] = set()
-    for layout in (yaml.safe_load(path.read_text(encoding="utf-8")).get("layouts") or {}).values():
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    for layout in [*(data.get("layouts") or {}).values(), data.get("control") or {}]:
         for key in ("key",):
             names.update(str(k) for k in layout.get(key) or [])
         for line in str(layout.get("fields") or "").splitlines():

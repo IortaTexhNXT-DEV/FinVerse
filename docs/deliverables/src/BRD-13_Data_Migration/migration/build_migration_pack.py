@@ -179,8 +179,6 @@ def field_columns() -> list[Column]:
                "the legacy value to BIBS"),
         Column("format", "Format", 20, "How the value is written in the file"),
         Column("example", "Example", 20, "A made-up example value"),
-        Column("target", "BIBS target field", 32, "Table and column (or service field) in BIBS; '(new)' = added by "
-               "the migration build"),
         Column("rule", "Validation rule", 36, "Check BIBS applies in staging (data-quality rules catalogue)"),
         Column("hint", "Source system hint", 24, "Where the value is expected to come from in legacy; BDOI IT "
                "confirms"),
@@ -198,11 +196,11 @@ def register_columns() -> list[Column]:
         Column("rationale", "Rationale", 44, "Why this class"),
         Column("source", "Source system", 14, "Legacy system(s) that hold the object"),
         Column("layouts", "Templates", 11, "Extract layouts (sheets of this workbook, CSV templates)"),
-        Column("target", "BIBS target", 32, "Where the object lands in BIBS"),
+        Column("target", "Loaded into (BIBS)", 32, "Where the object is loaded in BIBS"),
         Column("owner", "Business owner (sign-off)", 24, "Signs gates G1, G2 and G6"),
         Column("steward", "Data steward", 20, "Resolves data-quality issues and prepares code maps"),
         Column("volume", "Volume estimate (BDOI to fill)", 14, "Row count per source system at the last extract"),
-        Column("bound", "Planning bound", 18, "Known bound from the umbrella BRD or the design"),
+        Column("bound", "Planning bound", 18, "Known bound from the umbrella BRD or the planning"),
         Column("history", "History depth", 22, "Which records and how far back"),
         Column("delta", "Delta frequency", 22, "Extracts after the first full one"),
         Column("format", "Extract format", 12, "CSV or XLSX, with a control file"),
@@ -319,7 +317,7 @@ def build_workbook(lay: dict[str, Any]) -> Path:
     wb.sheet("Control Totals", cols, control_rows(lay),
              description="Control totals required per layout; also the tie-out template of the reconciliation (L1-L3)")
     cols = [Column("set", "Map set", 20, "Code map set"), Column("domain", "What is mapped", 46, "Legacy codes mapped"),
-            Column("target", "BIBS master", 26, "Target master of the codes"),
+            Column("target", "BIBS master", 26, "Master or list of the BIBS values"),
             Column("owner", "Business owner (approves)", 26, "Approves the map versions (gate G2)"),
             Column("steward", "Data steward (prepares)", 24, "Prepares the entries"),
             Column("used", "Used by layouts", 26, "Layouts whose columns use the set"),
@@ -351,7 +349,7 @@ def build_workbook(lay: dict[str, Any]) -> Path:
                                                             "DUPLICATE_CLIENT"]),
             Column("rule", "Rule", 50, "What is checked"), Column("severity", "Severity", 14, "ERROR = the row is not "
                                                                  "loaded; WARNING = loaded and reported"),
-            Column("message", "Message shown in BIBS", 36, "Message text; codes are assigned at build"),
+            Column("message", "Message shown in BIBS", 36, "Message text; codes are confirmed with BDOI's review"),
             Column("fixed_by", "Fixed by", 24, "Who corrects a failing row")]
     wb.sheet("DQ Rules", cols, [dict(zip(["id", "layout", "columns", "kind", "rule", "severity", "message",
                                           "fixed_by"], r)) for r in lay["dq_rules"]],
@@ -362,7 +360,7 @@ def build_workbook(lay: dict[str, Any]) -> Path:
             Column("register", "Register", 12, "Item of the BRD discrepancy and clarification register v1.2"),
             Column("topic", "Topic", 22, "Subject"),
             Column("question", "Decision needed", 60, "What BDOI decides"),
-            Column("blocks", "Blocks", 28, "Objects, gates or build waves that wait for the answer"),
+            Column("blocks", "Blocks", 28, "Objects, gates or migration steps that wait for the answer"),
             Column("due", "Needed by", 20, "Milestone and date"), Column("owner", "BDOI owner", 22, "Who answers"),
             Column("status", "Status", 13, "OPEN, PARTIAL, ANSWERED, RECOMMENDED (answered with a recommendation that BDOI still confirms)",
                    values=["OPEN", "PARTIAL", "ANSWERED", "RECOMMENDED"],
@@ -470,7 +468,7 @@ def write_templates(lay: dict[str, Any]) -> list[Path]:
         "One CSV template per extract layout. Each file holds only the header row: the field names exactly as in "
         "the layout sheet of the BDOI Data Requirements Workbook "
         f"(`../{brand.output_name('Migration', 'BRD-13', 'Data Requirements Workbook', lay['meta']['version'], 'xlsx')}`), "
-        "which gives the type, length, mandatory flag, allowed values, format, example, BIBS target and "
+        "which gives the type, length, mandatory flag, allowed values, format, example and "
         "validation rule of every field.",
         "",
         "How to use a template:",
@@ -645,7 +643,7 @@ def placeholders(lay: dict[str, Any], cut: dict[str, Any], name: str, opts: dict
     if name == "targets":
         rows = [[o["code"], o["target"], o["brd"], str(o["order"] or "-")] for o in objects
                 if o["decision"] != "EXCLUDED"]
-        return md_table(["Object", "BIBS target (service or table)", "BRD", "Load order"], rows,
+        return md_table(["Object", "Loaded into (BIBS)", "BRD", "Load order"], rows,
                         'widths=1.3,10,3.6,1.7 caption="Target in BIBS and load order" size=8 bold=first')
     if name == "owners":
         rows = [[o["code"], o["owner"], o["steward"]] for o in objects if o["decision"] != "EXCLUDED"]

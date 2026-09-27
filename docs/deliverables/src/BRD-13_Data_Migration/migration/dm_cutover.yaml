@@ -20,7 +20,7 @@ roles:
   - [IML, "iorta TechNXT Migration Lead (loaders, reconciliation, console)", iorta TechNXT]
   - [IOP, "iorta TechNXT Migration Operator (intake, validation, loads)", iorta TechNXT]
   - [IDO, "iorta TechNXT DevOps (AWS environment, snapshots, access, monitoring)", iorta TechNXT]
-  - [IQA, "iorta TechNXT QA (smoke tests, defect triage)", iorta TechNXT]
+  - [IQA, "iorta TechNXT QA (smoke tests, issue triage)", iorta TechNXT]
 
 phases:
   - [A, Readiness, "T-30 to T-15 (4 to 19 Dec 2027)"]
@@ -68,7 +68,7 @@ tasks:
   - ["CT-002", "A", "T-30", "", "Confirm the go-live date, the freeze start (last legacy EOD) and the blackout dates (DMQ25) with Comptrollership's confirmation of the year-end option A (DMQ39); publish the cutover calendar", "PM", 2, "CT-001", "Calendar approved by the Program Manager and circulated; option A confirmed in writing by the Head of Comptrollership", ""]
   - ["CT-003", "A", "T-29", "", "Name the cutover team, the command centre room and bridge line, and the hypercare roster (section Hypercare)", "PM", 4, "CT-002", "Roster with names and phone numbers in the runbook annex", ""]
   - ["CT-004", "A", "T-28", "", "Freeze the production cutover plan in the Migration Console (plan kind PRODUCTION, tasks and owners from this list)", "IML", 4, "CT-002", "MIG-CUTOVER-STATUS shows the plan with every task owned", ""]
-  - ["CT-005", "A", "T-28", "", "Production environment ready - BIBS release of the go-live build deployed, MIG_ENVIRONMENT_CLASS = PRODUCTION, MIG_CUTOVER_DATE = T, MIG_OPENING_VALUE_DATE = 1-Jan-2028, MIG_GOLIVE_RENEWAL_TO = 31-May-2028, MIG_RENEWAL_URGENT_TO = 31-Jan-2028, jobs scheduled", "IDO", 8, "", "Deployment record; parameter screen; job list", ""]
+  - ["CT-005", "A", "T-28", "", "Production environment ready - BIBS release of the go-live release deployed, MIG_ENVIRONMENT_CLASS = PRODUCTION, MIG_CUTOVER_DATE = T, MIG_OPENING_VALUE_DATE = 1-Jan-2028, MIG_GOLIVE_RENEWAL_TO = 31-May-2028, MIG_RENEWAL_URGENT_TO = 31-Jan-2028, jobs scheduled", "IDO", 8, "", "Deployment record; parameter screen; job list", ""]
   - ["CT-006", "A", "T-27", "", "Grant the migration roles in production (DATA_MIGRATION_LEAD, DATA_STEWARD, DATA_OWNER, MIGRATION_OPERATOR, MIGRATION_RECON_APPROVER, MIGRATION_GONOGO), the true-up permissions (MIG_TRUEUP_PREPARE, MIG_TRUEUP_APPROVE) and the P03 permissions of the Renewal processing team (MIG_DQ_RESOLVE, MIG_RESUBMIT_APPROVE) through User Access requests; check PH-only network access", "IDO", 8, "CT-005", "User Access approvals; access test from an allowed and a blocked location", ""]
   - ["CT-007", "A", "T-25", "", "Comptrollership sets up in production the legacy control accounts, Migration Clearing, the LG_ accounting rule lines (DMQ18) and the retained earnings account of the opening, through maker-checker", "COMP", 16, "CT-005", "Chart and accounting rules approved; test posting in the dress rehearsal environment matched", ""]
   - ["CT-008", "A", "T-25", "", "Approve the final code map versions for production (all sets, including the PACKAGE map loaded for Renewal); record versions in the plan", "OWN", 16, "", "MIG-MAP-VERSIONS lists one APPROVED version per set", ""]
@@ -121,7 +121,7 @@ tasks:
   - ["CT-055", "E", "T-1", "08:00", "P03 rejects - the maker corrects each row and prepares the resubmission; the checker approves it by 12:00 (MIG_RESUBMIT_DEADLINE); the operator loads the rerun batch; rows still rejected are listed for the day-1 queue", "RNW", 4, "CT-049", "Resubmission approved by a checker other than the maker; rerun reconciled; list of rows still rejected", ""]
   - ["CT-056", "E", "T-1", "09:00", "Business smoke test on production with test-marked transactions reversed afterwards - OTC payment preview on a legacy invoice, automatch preview, remittance extraction preview, Invoice 360, client and policy search by legacy reference", "IQA", 4, "CT-052", "Smoke test checklist passed; no posting left open", ""]
   - ["CT-057", "E", "T-1", "13:00", "Check jobs, alerts and integrations for Monday (Renewal go-live extraction at T 04:00, PAYMENT_AUTOMATCH hourly, payment file handlers, daily Renewal extraction, e-mail)", "IDO", 2, "CT-056", "Job schedule and alert routing checked", ""]
-  - ["CT-058", "E", "T-1", "15:00", "Prepare the go / no-go pack - MIG-GONOGO with measured criteria, open defects, sign-off status", "IML", 2, "CT-053, CT-054, CT-055, CT-056, CT-057", "Pack circulated to the board by 17:00", ""]
+  - ["CT-058", "E", "T-1", "15:00", "Prepare the go / no-go pack - MIG-GONOGO with measured criteria, open issues, sign-off status", "IML", 2, "CT-053, CT-054, CT-055, CT-056, CT-057", "Pack circulated to the board by 17:00", ""]
   - ["CT-059", "E", "T-1", "18:00", "Go / no-go decision GNG-3 (go-live)", "GNG", 1, "CT-058", "Decision recorded in the console with every criterion value", "GNG-3"]
   - ["CT-060", "E", "T-1", "19:00", "If NO-GO - execute the rollback procedure (section Rollback) and reopen legacy for Monday", "IDO", 6, "CT-059", "Legacy open for business Monday 08:00; BIBS restored to the rollback point", ""]
   - ["CT-061", "E", "T-1", "19:00", "If GO - send the go-live notice; open BIBS roles for business users from 06:00 Monday", "PM", 1, "CT-059", "Communication plan item 8 sent", ""]
@@ -131,15 +131,15 @@ tasks:
   - ["CT-065", "F", "T", "08:00", "BIBS open for business", "PM", 0, "CT-064", "First transactions observed in each branch", "GO-LIVE"]
   - ["CT-066", "F", "T", "08:00", "Renewal processing team works the day-1 priority queue - URGENT January expiries first, earliest expiry first; insurer requests and RAs for the expiries without an RA; the tracker is checked first for rows still rejected in P03", "RNW", 10, "CT-062, CT-065", "End-of-day count of URGENT candidates with an RA sent or an insurer request made", ""]
   - ["CT-067", "F", "T", "09:00", "First payment file uploads and the first automatch run including migrated UPP; review results", "OPS", 2, "CT-065", "Run summary; legacy and new postings in the right accounts", ""]
-  - ["CT-068", "F", "T", "12:00", "Midday check - defects, queues, Migration Clearing still 0.00, no legacy business posting", "IML", 1, "CT-065", "Midday report to the board", ""]
+  - ["CT-068", "F", "T", "12:00", "Midday check - issues, queues, Migration Clearing still 0.00, no legacy business posting", "IML", 1, "CT-065", "Midday report to the board", ""]
   - ["CT-069", "F", "T", "18:00", "End-of-day review - point of no return (DMQ32); decide continue or fallback", "GNG", 1, "CT-068", "Decision recorded", "POINT OF NO RETURN"]
   - ["CT-070", "F", "T", "20:00", "First BIBS EOD jobs; check GL posting, sub-ledgers and the Cash Receipts Book", "IDO", 2, "CT-069", "Job run log; CRB lists the day's receipts", ""]
   - ["CT-071", "G", "T+1", "", "Daily hypercare check - Migration Clearing 0.00, legacy control accounts vs sub-ledgers, automatch results, exception queues, URGENT January renewals without an RA or insurer request, failed jobs (daily until exit)", "IML", 1, "CT-070", "Daily hypercare report", ""]
-  - ["CT-072", "G", "T+1", "", "Defect triage twice a day (10:00 and 16:00) with Operations, Comptrollership, Renewal and iorta QA", "IQA", 1, "CT-070", "Defect log updated; severity agreed", ""]
+  - ["CT-072", "G", "T+1", "", "Issue triage twice a day (10:00 and 16:00) with Operations, Comptrollership, Renewal and iorta QA", "IQA", 1, "CT-070", "Issue log updated; severity agreed", ""]
   - ["CT-073", "G", "T+2", "", "First remittance extraction with legacy invoices for the main insurers; compare with the legacy remittance pattern", "OPS", 4, "CT-070", "Schedules show legacy invoice numbers; OPS_REMITTANCE posts to DTIP legacy", ""]
   - ["CT-074", "G", "T+3", "", "First Collections worklist refresh with legacy invoices; collectors confirm carried promises and assignments", "OPS", 2, "CT-070", "Worklist counts agree with F03", ""]
   - ["CT-075", "G", "T+5", "", "Staging purge - payloads and intake files of the signed-off production batches deleted within 5 days (MIG_STAGING_PURGE)", "IDO", 1, "CT-059", "No staging payload older than 5 days after sign-off; purge log", ""]
-  - ["CT-076", "G", "T+7", "", "Week-1 review with the board - defects, volumes, performance, renewal queue, user feedback", "GNG", 2, "CT-071", "Minutes; actions", ""]
+  - ["CT-076", "G", "T+7", "", "Week-1 review with the board - issues, volumes, performance, renewal queue, user feedback", "GNG", 2, "CT-071", "Minutes; actions", ""]
   - ["CT-077", "G", "T+10", "", "First daily Renewal extraction that creates new candidates - expiry 1-Jun-2028 on 13-Jan-2028; headers already extracted at go-live are skipped", "RNW", 1, "CT-062", "Candidates of 1-Jun-2028 created; no duplicate of a go-live candidate", ""]
   - ["CT-078", "G", "T+10", "", "First DPPR or PR2307 legacy reversal batch (if any) approved and posted", "COMP", 4, "CT-070", "Run report; legacy sub-ledgers reduced by the batch total", ""]
   - ["CT-079", "G", "T+14", "", "Hypercare mid-point review against the exit criteria", "GNG", 2, "CT-076", "Criteria status recorded", "CHECKPOINT"]
@@ -166,7 +166,7 @@ freeze_windows:
   - [Business transactions, "T-3 22:00 (after the last legacy EOD)", Go-live, "All postings of the business modules of EBIX, QPS, CMS - bookings, receipts, UPP, dispositions, remittances, endorsements; GL journals other than the FY2027 adjustments", "None; an urgent item is recorded on paper and keyed in BIBS on T"]
   - [Legacy GL (FY2027 adjustments), "T-3 22:00", "Legacy GL lock (T+106)", "Only FY2027 closing and audit adjustments, by the Comptrollership users on the signed access list; FY2028 periods never opened in legacy; no new business", "Each journal in the FY2027 adjustment register; it reaches BIBS in the next true-up"]
   - [BIBS configuration, T-2 00:00, T+3, "Parameters, accounting rules, code maps, workflows in production", "Emergency change approved by the go / no-go board"]
-  - [BIBS releases, T-7, T+14, "Deployments to production", "Hotfix of a Critical defect approved by the go / no-go board"]
+  - [BIBS releases, T-7, T+14, "Deployments to production", "Hotfix of a Critical issue approved by the go / no-go board"]
 
 checkpoints:
   - id: GNG-1
@@ -180,7 +180,7 @@ checkpoints:
       - Transfer path (SFTP or console) tested
       - December soft close on track for 20 December 2027
       - Renewal processing team ready - January staffing plan signed, training done, day-1 queue rehearsed
-      - No open Critical defect of the migration or of a Day-1 module
+      - No open Critical issue of the migration or of a Day-1 module
   - id: GNG-2
     when: T-5
     decision: Enter the legacy freeze on T-3
@@ -213,7 +213,7 @@ checkpoints:
     when: T 18:00
     decision: Continue in BIBS; fallback to legacy no longer offered (DMQ32)
     criteria:
-      - No Critical defect that stops receipts, payment application, remittance or booking
+      - No Critical issue that stops receipts, payment application, remittance or booking
       - Migration Clearing still 0.00; no posting in legacy since the freeze
       - Every branch has transacted in BIBS
   - id: TRUE-UP CLOSED
@@ -261,7 +261,7 @@ hypercare_roster:
   - [Service desk (L1), BDOI service desk, Service hours, BDOI IT head]
 
 hypercare_exit:
-  - No open Critical or High defect; Medium defects have an agreed fix date
+  - No open Critical or High issue; Medium issues have an agreed fix date
   - Migration Clearing 0.00 and legacy control accounts equal their sub-ledgers on 10 consecutive business days
   - First month-end close completed with the ACSL GL-SL reconciliation (context LEGACY) without difference
   - Payment files, automatch, remittance, DPPR / PR2307 batches and endorsements on legacy invoices each processed at least once in production without incident

@@ -20,7 +20,7 @@ control:
     author: iorta TechNXT Solution Architect
     reviewer: iorta TechNXT Business Analysis
     approver: ""
-    change: Internal draft from the BRD-13 baseline, the build design and FRS BRD-13 v1.0
+    change: Internal draft from the BRD-13 baseline and FRS BRD-13 v1.0
   - version: "1.0"
     date: 26 Sep 2026
     author: iorta TechNXT Solution Architect
@@ -46,7 +46,7 @@ distribution:
   - {name: "Product Owner, Marketing Business System; Heads of Retail and Corporate Marketing", role: Approver, organisation: BDOI, purpose: "Client master, reference data, renewal transition"}
   - {name: "Compliance; Unit Head, Analytics and Risk Management", role: Reviewer, organisation: BDOI, purpose: "Data protection, archive, access logging"}
   - {name: "BDOI IT (legacy EBIX, QPS, ISYS, CMS)", role: Reviewer, organisation: BDOI, purpose: "Extracts, transfer, legacy read-only and decommissioning"}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Build, rehearsals, cutover, hypercare"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, rehearsals, cutover, hypercare"}
 ---
 
 # Introduction
@@ -66,9 +66,9 @@ It also explains, for business readers, how legacy invoices and unapplied paymen
 
 The basis is the Data Migration BRD (R1), a **draft v0.01 of 14-Apr-2026 that is not signed** (p.2, p.15-16; register DCR-189). The BRD asks for a **selective, continuity-focused migration** (p.3): migrate clean master and reference data for Day 1, carry forward only the open operational financial positions, keep history in read-only legacy or an archive, and let renewals recreate clean records in BIBS (p.5). This document follows that approach and fills the gaps the BRD leaves with proposals, each tied to an open decision (DMQ##) that BDOI confirms.
 
-Data Migration is **designed and not yet built** in BIBS. The mechanisms named here (Migration Console, loaders, reconciliation, legacy invoice processing) are those of the build design (R3) and the FRS (R4).
+The mechanisms named here (Migration Console, loaders, reconciliation, legacy invoice processing) are those of the FRS (R4).
 
-**Programme calendar and the early-renewal concept paper.** This version follows the BDOI drop plan and timeline (R9): data migration is part of Drop 0, requirements and mapping run in September-October 2026, the build from November 2026 to March 2027, SIT migration from April to July 2027, UAT migration from August to October 2027, full migration and cut-over from November 2027 to January 2028, and go-live is in January 2028. The concept paper on an early renewal release (R10), signed on 6 September 2026, proposed to take renewal processing live by 15 August 2027 with the client master and reference data migrated ahead of it. BDOI decided on 26 September 2026 that everything goes live together in January 2028; the concept paper is therefore superseded and there is **one production cut-over** (register DCR-240). Of its points, the trial-migration load order still applies: reference data and clients are loaded first in every trial migration (section 10.1).
+**Programme calendar and the early-renewal concept paper.** This version follows the BDOI drop plan and timeline (R9): data migration is part of Drop 0, requirements and mapping run in September-October 2026, system preparation from November 2026 to March 2027, SIT migration from April to July 2027, UAT migration from August to October 2027, full migration and cut-over from November 2027 to January 2028, and go-live is in January 2028. The concept paper on an early renewal release (R10), signed on 6 September 2026, proposed to take renewal processing live by 15 August 2027 with the client master and reference data migrated ahead of it. BDOI decided on 26 September 2026 that everything goes live together in January 2028; the concept paper is therefore superseded and there is **one production cut-over** (register DCR-240). Of its points, the trial-migration load order still applies: reference data and clients are loaded first in every trial migration (section 10.1).
 
 **BDOI answers of 26 September 2026.** This version applies BDOI's answers to four open decisions: legacy packages are remapped at Renewal sanitation and the migration only loads the PACKAGE code map (DMQ36, section 6.6.1); the renewals of the January-May 2028 expiries are processed in BIBS after go-live from a go-live extraction of the migrated policy headers, with the renewal advices already sent loaded so they are not sent again (DMQ37, section 8.2); the RMEL and dispositions are kept in Excel, and the Renewal processing team reviews rejected rows with a maker and a checker (DMQ38, section 8.2); and, as a recommendation that Comptrollership still confirms, the go-live sits on the year-end boundary with a provisional GL opening and controlled true-ups of the FY2027 closing and audit adjustments (DMQ39, section 11.1).
 
@@ -87,19 +87,18 @@ Data Migration is **designed and not yet built** in BIBS. The mechanisms named h
 
 ## References
 
-<!-- table: widths=1.2,8.4,3.2,5.4 caption="Reference documents" size=8.5 -->
-| Ref. | Document | Version | Location |
-|---|---|---|---|
-| R1 | BDO Insure Core Modernization - Data Migration BRD | draft v0.01, 14-Apr-2026 | `docs/source-documents/BRD - Data Migration - draft V0.01.pdf` |
-| R2 | Data Migration (BRD-13) requirements baseline and fit/gap | current | `docs/requirements/BDOI_DM_BRD_SPEC.md` |
-| R3 | Data Migration build design | current | `docs/architecture/DATA_MIGRATION_DESIGN.md` |
-| R4 | Functional Requirements Specification BRD-13 Data Migration | 1.2 | `BIBS_FRS_BRD-13_Data_Migration_v1.2.docx` |
-| R5 | BRD BDOI Core Replacement (umbrella BRD) and its analysis | v01 | `docs/source-documents/00 - BRD BDOI Core Replacement v01.pdf`; `BDOI_CORE_BRD_SPEC.md` |
-| R6 | BRD discrepancy and clarification register | 1.2 | `BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx` |
-| R7 | Deliverables plan, UAT readiness programme and hosting appendix | current | `docs/deliverables/README.md` |
-| R8 | Operations, Collections, Accounting / ACSL and Renewal designs | current | `docs/architecture/` |
-| R9 | BDOI drop plan and programme timeline | received 26-Sep-2026 | `docs/source-documents/BDOI_DROP_PLAN.md`; `BDOI Programme Timeline.webp` |
-| R10 | Concept Paper - Advance Implementation of Renewal Processing | V1.0, signed 06-Sep-2026; superseded 26-Sep-2026 | `docs/source-documents/Concept Paper - Advance Implementation of Renewal Processing V1.0 (signed).pdf` |
+<!-- table: widths=1.2,11.4,4 caption="Reference documents" size=8.5 -->
+| Ref. | Document | Version |
+|---|---|---|
+| R1 | BDO Insure Core Modernization - Data Migration BRD | draft v0.01, 14-Apr-2026 |
+| R2 | Data Migration (BRD-13) requirements baseline | current |
+| R4 | Functional Requirements Specification BRD-13 Data Migration | 1.2 |
+| R5 | BRD BDOI Core Replacement (umbrella BRD) | v01 |
+| R6 | BRD discrepancy and clarification register | 1.2 |
+| R7 | Deliverables plan and UAT readiness programme | current |
+| R8 | FRS of Operations, Collections, Accounting / ACSL and Renewal | v1.0 |
+| R9 | BDOI drop plan and programme timeline | received 26-Sep-2026 |
+| R10 | Concept Paper - Advance Implementation of Renewal Processing | V1.0, signed 06-Sep-2026; superseded 26-Sep-2026 |
 
 # Objectives and principles
 
@@ -151,13 +150,13 @@ BRID 1.1a asks that each data object is classed Migrate, Carry forward (open ite
 | Carry forward | Day-1 need = Yes and the record is an open operational or financial position that BDOI must still act on | Open legacy invoices, UPP, open promises to pay |
 | Conditional | Day-1 need depends on a business condition that BDOI states (BRID 4.1 "when operationally required") | In-force policy headers; objects not named in the BRD (claims, EB, submitted policies, payees) |
 | Archive | Day-1 need = No and compliance need = Yes, or the read-only / archival option is required | Closed invoices, receipts, remittances, expired policies, GL history, documents |
-| Excluded | Day-1 need = No and compliance need = No, or the data is rebuilt in BIBS | Users and roles, screening results |
+| Excluded | Day-1 need = No and compliance need = No, or the data is set up again in BIBS | Users and roles, screening results |
 
 The Data Migration Lead records the four criteria and the proposed class per object in the Migration Console; the business owner of the object approves it (gate G1, FR-DM-002). A later change of class needs a new approval, and an object whose data is loaded cannot be moved to Archive or Excluded until the load is rolled back.
 
 ## Data object register
 
-The register below is the proposal for gate G1 (R3 section 2; DMQ01, DCR-195). The workbook sheet "Object Register" holds the same rows with the columns BDOI fills in (volumes, named owners and stewards, status).
+The register below is the proposal for gate G1 (DMQ01, DCR-195). The workbook sheet "Object Register" holds the same rows with the columns BDOI fills in (volumes, named owners and stewards, status).
 
 <!-- dm:register -->
 
@@ -261,7 +260,7 @@ What BDOI provides per object:
 
 ## Secure transfer and staging
 
-- Files are received through the Migration Console upload, or through an SFTP drop that BDOI IT and iorta TechNXT set up (a seam of the intake; DMQ28). E-mail is never used.
+- Files are received through the Migration Console upload, or through an SFTP drop that BDOI IT and iorta TechNXT set up (DMQ28). E-mail is never used.
 - Files land in an encrypted intake bucket in AWS ap-southeast-1 with a 5-day lifecycle.
 - The intake checks run before any row is staged. A file that fails is rejected with the reason and the difference, and BDOI IT re-sends it.
 - Staged rows keep the raw values as received and the mapped values. Outside production, names, addresses, TIN, ID, account and phone numbers, e-mail addresses and birth dates are masked at intake with a keyed, repeatable masking, so dedupe still works on masked data.
@@ -285,7 +284,7 @@ Cleansing is shared. BDOI owns the data and fixes it where it lives; iorta TechN
 | Open balances that do not add up | Components do not equal gross premium; open not equal to booked less paid | BDOI data steward with Comptrollership | In legacy (correction entry) before the freeze |
 | Data that cannot be fixed before go-live | UPP without payor reference | Business owner waives with a reason and a plan | Waiver in the batch (G3) |
 
-Thresholds for loading an object (configurable): master data may be loaded with at most 0.5 percent of rows rejected or waived; financial objects (open invoices, UPP, trial balance) load only with 0 errors, or with each excluded row approved by the business owner with a manual-entry plan (R3 section 8).
+Thresholds for loading an object (configurable): master data may be loaded with at most 0.5 percent of rows rejected or waived; financial objects (open invoices, UPP, trial balance) load only with 0 errors, or with each excluded row approved by the business owner with a manual-entry plan.
 
 ## Mapping and code maps
 
@@ -502,7 +501,7 @@ History is not migrated into BIBS business tables. For each legacy system BDOI c
 
 ## Trial migrations, dress rehearsal and production
 
-The migration is run five times before it counts, inside the SIT and UAT migration windows of the BDOI timeline and the full migration and cut-over window. Each run follows the same plan in the Migration Console, so timings and defects are measured and the production cutover repeats a rehearsed plan.
+The migration is run five times before it counts, inside the SIT and UAT migration windows of the BDOI timeline and the full migration and cut-over window. Each run follows the same plan in the Migration Console, so timings and issues are measured and the production cutover repeats a rehearsed plan.
 
 **Trial-migration load order.** In every run, reference data (R01-R07) and the client master (C01-C03) are loaded and accepted first, before any policy header, RA-sent file or open item. This follows the load order, and it gives the SIT and UAT of the Drop 1 modules, Renewal first, migrated clients and reference data to test with from the first trial migration: the prerequisite the concept paper sets for renewal (R10 section VI).
 
@@ -511,14 +510,14 @@ The migration is run five times before it counts, inside the SIT and UAT migrati
 <!-- table: widths=2.2,2.4,2.6,4.7,4.7 caption="Migration cycles with entry and exit criteria" size=8 -->
 | Cycle | When / where | Data and objects | Entry criteria | Exit criteria |
 |---|---|---|---|---|
-| Trial migration 1 | 19-30 Apr 2027; SIT | Masked full extracts; reference data and clients first, then policy headers and the RA-sent file (P03) | Build waves DM0 and DM1-C deployed on SIT by 9 Apr 2027; layouts frozen (M2); draft code maps; extracts for Trial migration 1 received (M4) | Objects loaded; L1-L4 run; defects logged; timing per object recorded; profiling report to the owners; P03 rejects reviewed by the Renewal processing team (maker-checker) |
-| Trial migration 2 | 5-16 Jul 2027; SIT | Masked full extracts; all objects | Trial migration 1 exit met; build waves DM1-A, DM1-B, DM2-A, DM2-B deployed by 18 Jun 2027; code maps approved (M5); legacy accounts and rules configured on SIT | All objects loaded; L1-L5 reconciled; Migration Clearing 0.00 per branch and currency; no open Critical migration defect |
+| Trial migration 1 | 19-30 Apr 2027; SIT | Masked full extracts; reference data and clients first, then policy headers and the RA-sent file (P03) | Migration functions for reference data, clients, policy headers, the RA-sent file and the PACKAGE map available on SIT by 9 Apr 2027; layouts frozen (M2); draft code maps; extracts for Trial migration 1 received (M4) | Objects loaded; L1-L4 run; issues logged; timing per object recorded; profiling report to the owners; P03 rejects reviewed by the Renewal processing team (maker-checker) |
+| Trial migration 2 | 5-16 Jul 2027; SIT | Masked full extracts; all objects | Trial migration 1 exit met; migration functions for legacy invoices, UPP, reversals, remittance, endorsements, Prod Recon, the cutover plan and run-off available on SIT by 18 Jun 2027; code maps approved (M5); legacy accounts and rules configured on SIT | All objects loaded; L1-L5 reconciled; Migration Clearing 0.00 per branch and currency; no open Critical migration issue |
 | Trial migration 3 (UAT load) | 2-13 Aug 2027; UAT | Masked extracts refreshed; all objects | Trial migration 2 exit met; UAT readiness statement issued (R7, programme item 11) | Business owners verify samples on screen (G6 rehearsal); the Drop 1 end-to-end UAT (Aug-Dec 2027) runs on the migrated data; data-quality issues below the thresholds |
 | Trial migration 4 (UAT refresh) | 4-15 Oct 2027; UAT | Fresh masked extracts; all objects; go-live renewal extraction of the January-May 2028 expiries; a test true-up | Trial migration 3 exit met; cut-over date, year-end option, fallback and decommissioning criteria agreed (M6) | Run as a timed cut-over; go-live extraction check balanced and the day-1 queue worked by the Renewal team; test true-up reconciled; UAT continues on the refreshed data |
 | Dress rehearsal | 15-26 Nov 2027 (reserve 6-10 Dec 2027); production-sized environment | Masked full-volume extracts taken after a legacy EOD | Trial migration 4 exit met; production-sized environment (performance test window); cutover plan frozen | Full cutover within the window with at least 20 percent margin; rollback (snapshot restore) rehearsed; go / no-go criteria measured |
 | Production | 20 Dec 2027 (T-14) to 3 Jan 2028 (T) | Real data in production only | GNG-1 passed (Cutover Runbook) | GNG-3 GO; hypercare exit criteria (Cutover Runbook) |
 
-Defects found in a cycle are fixed before the next one: in legacy (cleansing), in the code maps, in the layouts or in the loaders. The next cycle uses fresh extracts, so every fix is proven with new data.
+Issues found in a cycle are resolved before the next one: in legacy (cleansing), in the code maps, in the layouts or in the loaders. The next cycle uses fresh extracts, so every fix is proven with new data.
 
 ## Test data and masking
 
@@ -590,7 +589,7 @@ Until the go / no-go decision the rollback is a restore of the production databa
 
 ## Hypercare
 
-Hypercare runs from go-live to the first month-end close. Every day: Migration Clearing 0.00, legacy control accounts against their sub-ledgers, automatch results, the urgent January renewals, exception queues and failed jobs; defect triage twice a day. True-up 1 is posted and reconciled before the January close. Exit requires no open Critical or High defect, 10 consecutive business days of clean daily checks, true-up 1 signed, and the first month-end close with the ACSL GL-SL reconciliation (context LEGACY) without difference.
+Hypercare runs from go-live to the first month-end close. Every day: Migration Clearing 0.00, legacy control accounts against their sub-ledgers, automatch results, the urgent January renewals, exception queues and failed jobs; issue triage twice a day. True-up 1 is posted and reconciled before the January close. Exit requires no open Critical or High issue, 10 consecutive business days of clean daily checks, true-up 1 signed, and the first month-end close with the ACSL GL-SL reconciliation (context LEGACY) without difference.
 
 ## In-flight items at the freeze
 
@@ -667,7 +666,7 @@ R = responsible, A = accountable, C = consulted, I = informed.
 | 1 | Legacy cannot give open balances per component or the paid / remitted split (DMQ12, DCR-207) | High | Profiling of the first full extracts (29 January 2027); "open-balance mode" (open balance loaded as booked, original values in the snapshot); split rules as configuration agreed with Comptrollership |
 | 2 | Migration Clearing not 0.00 at cutover (detail and trial balance disagree) | High | Reconciliation in every trial migration from Trial migration 2; trial balance extracted after the same EOD as the detail; break explanations agreed with Comptrollership before GNG-3 |
 | 3 | Duplicate clients merged wrongly, or not merged | High | Auto-merge only on hard keys; review queue for the rest; every lost value kept; client batches can be rolled back before sign-off |
-| 4 | Answers to the build-shaping decisions arrive late (M1) | High | Decisions listed with dates (chapter 15); defaults in configuration where possible; build waves sequenced so late answers change configuration, not code |
+| 4 | Answers to the scope-shaping decisions arrive late (M1) | High | Decisions listed with dates (chapter 15); defaults in configuration where possible, so late answers change configuration |
 | 5 | Load time exceeds the cutover window | Medium | Pre-load of reference data and clients; four partitions; dress rehearsal at full volume with 20 percent margin |
 | 6 | Endorsements of legacy invoices without policy headers (BRID 9 depends on BRID 4.1) | High | Decide DMQ09 / DMQ22 by M1; proposal: headers of every in-force policy |
 | 7 | Real personal data in a test environment | High | Masking at intake; unmasked files never leave production; 5-day purge; access only from the Philippines |
@@ -691,9 +690,9 @@ R = responsible, A = accountable, C = consulted, I = informed.
 <!-- table: widths=1.2,9.4,3.2,2.8 caption="Dependencies" size=8.5 -->
 | # | Dependency | Owner | Needed by |
 |---|---|---|---|
-| D1 | Build waves DM0 and DM1-C of the migration module (reference data, clients, headers, RA-sent file, PACKAGE map) deployed on SIT | iorta TechNXT | Trial migration 1 (deployed by 9 Apr 2027) |
-| D2 | Build waves DM1-A, DM1-B, DM2-A, DM2-B (legacy invoices, UPP, reversals, remittance, endorsements, Prod Recon, cutover plan, run-off) deployed on SIT | iorta TechNXT | Trial migration 2 (deployed by 18 Jun 2027) |
-| D3 | Build wave DM3 (end-to-end test, performance harness) | iorta TechNXT | Trial migration 2 (end-to-end test); dress rehearsal (performance harness) |
+| D1 | Migration functions for reference data, clients, headers, the RA-sent file and the PACKAGE map available on SIT | iorta TechNXT | Trial migration 1 (by 9 Apr 2027) |
+| D2 | Migration functions for legacy invoices, UPP, reversals, remittance, endorsements, Prod Recon, the cutover plan and run-off available on SIT | iorta TechNXT | Trial migration 2 (by 18 Jun 2027) |
+| D3 | End-to-end migration run and performance run at full volume | iorta TechNXT | Trial migration 2 (end-to-end run); dress rehearsal (performance run) |
 | D4 | Renewal module (BRD-6) in SIT for Trial migration 1 and live at go-live, with the legacy policy source, the go-live extraction (priority, urgent flag, RAs already sent) and the sanitation check PACKAGE_REMAP with the Exception bucket | iorta TechNXT | Trial migration 1; go-live |
 | D5 | Legacy control accounts, Migration Clearing and legacy rule lines set up by Comptrollership | BDOI Comptrollership | Trial migration 2 (SIT); T-25 (production) |
 | D6 | Extracts in the templates with control files, and volumes per object | BDOI IT | M3 (29 Jan 2027), M4 (9 Apr 2027) and every trial migration |
@@ -706,7 +705,7 @@ R = responsible, A = accountable, C = consulted, I = informed.
 
 ## Open decisions and the date each is needed by
 
-Decisions marked M1 change what is built and are needed by **16 October 2026**; M2 decisions are needed by **30 October 2026**. Both dates are inside the requirements and mapping window of the BDOI timeline (September-October 2026), so the build can start in November 2026 on agreed layouts. The others are tied to the migration calendar. The register column refers to the BRD discrepancy and clarification register (R6). BDOI answered DMQ36, DMQ37 and DMQ38 on 26 September 2026 and answered DMQ39 with a recommendation that Comptrollership confirms at M6; DMQ26 is answered by DMQ37.
+Decisions marked M1 change the migration functions and are needed by **16 October 2026**; M2 decisions are needed by **30 October 2026**. Both dates are inside the requirements and mapping window of the BDOI timeline (September-October 2026), so the system preparation can start in November 2026 on agreed layouts. The others are tied to the migration calendar. The register column refers to the BRD discrepancy and clarification register (R6). BDOI answered DMQ36, DMQ37 and DMQ38 on 26 September 2026 and answered DMQ39 with a recommendation that Comptrollership confirms at M6; DMQ26 is answered by DMQ37.
 
 <!-- dm:decisions -->
 
@@ -714,16 +713,16 @@ Decisions marked M1 change what is built and are needed by **16 October 2026**; 
 
 ## Alignment with the BDOI timeline
 
-The migration timeline follows the BDOI drop plan and timeline (R9): Drop 0 "Setup & Data Migration", go-live January 2028 (DMQ25), recommended Monday 3 January 2028 at the year-end boundary (DMQ39). It ties into the build of the migration module and into the UAT readiness programme (R7) as follows.
+The migration timeline follows the BDOI drop plan and timeline (R9): Drop 0 "Setup & Data Migration", go-live January 2028 (DMQ25), recommended Monday 3 January 2028 at the year-end boundary (DMQ39). It ties into the preparation of the migration functions and into the UAT readiness programme (R7) as follows.
 
 <!-- table: widths=3.4,5.2,8 caption="Migration timeline on the BDOI calendar" size=8.5 -->
-| When (BDOI timeline stream) | Migration step | Link to build and UAT readiness |
+| When (BDOI timeline stream) | Migration step | Link to system preparation and UAT readiness |
 |---|---|---|
 | 26 Sep 2026 (M0) | This document set issued (version 1.2 with the BDOI answers to DMQ36-DMQ39) | FRS BRD-13 v1.2 under review |
-| 16 Oct 2026 (M1) - requirements and mapping | Remaining build-shaping decisions answered (package remapping DMQ36 and the January-May 2028 renewals DMQ37 answered on 26 Sep 2026) | Needed before the build waves start |
-| 30 Oct 2026 (M2) - requirements and mapping | Owners, stewards, keys, remaining rules; object decisions signed (G1); layouts frozen, version 1 | Build starts in November 2026 on agreed layouts; migration test plan cases finalised |
-| Nov 2026 to Mar 2027 - build | Build waves in trial-migration order: DM0 and DM1-C first, then DM1-A, DM1-B, DM2-A, DM2-B; DM3 | DM0 and DM1-C on SIT by 9 Apr 2027; the rest by 18 Jun 2027 |
-| 29 Jan 2027 (M3) | First full extracts with volumes; profiling | DM3 performance harness sized from the volumes |
+| 16 Oct 2026 (M1) - requirements and mapping | Remaining scope-shaping decisions answered (package remapping DMQ36 and the January-May 2028 renewals DMQ37 answered on 26 Sep 2026) | Needed before the system preparation starts |
+| 30 Oct 2026 (M2) - requirements and mapping | Owners, stewards, keys, remaining rules; object decisions signed (G1); layouts frozen, version 1 | System preparation starts in November 2026 on agreed layouts; migration test plan cases finalised |
+| Nov 2026 to Mar 2027 - system preparation | Migration functions prepared in trial-migration order: reference data, clients, headers and the RA-sent file first, then open items, reversals, remittance, endorsements, cutover and run-off | First set on SIT by 9 Apr 2027; the rest by 18 Jun 2027 |
+| 29 Jan 2027 (M3) | First full extracts with volumes; profiling | Performance run sized from the volumes |
 | 9 Apr 2027 (M4) - SIT migration | Extracts for Trial migration 1 | - |
 | 19-30 Apr 2027 - SIT migration | Trial migration 1 on SIT: reference data and clients first, then headers and the RA-sent file | Drop 1 SIT (Renewal first) tests on migrated clients and reference data |
 | 18 Jun 2027 (M5) | Code maps approved for Trial migration 2, including the PACKAGE map loaded for Renewal | - |
@@ -737,7 +736,7 @@ The migration timeline follows the BDOI drop plan and timeline (R9): Drop 0 "Set
 | About March to 2 May 2028 (T+85 to T+120) | Final true-up after the audited FY2027 financial statements; legacy GL locked; true-ups closed | FY2027 BIR annual returns and audit from legacy |
 | Run-off (about 12-15 months) | Monthly run-off tracking; archive loads; decommissioning | - |
 
-The plan has no slack between the build and Trial migration 1: if DM0 and DM1-C are not on SIT by 9 April 2027, Trial migration 1 moves within the SIT migration window (to May 2027) and Trial migration 2 stays in July; the reserve slot of the dress rehearsal (6-10 December 2027) is the last buffer before the cut-over.
+The plan has no slack between the system preparation and Trial migration 1: if the first set of migration functions is not on SIT by 9 April 2027, Trial migration 1 moves within the SIT migration window (to May 2027) and Trial migration 2 stays in July; the reserve slot of the dress rehearsal (6-10 December 2027) is the last buffer before the cut-over.
 
 # Glossary {-}
 

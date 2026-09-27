@@ -24,6 +24,8 @@ import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.organization.domain.Branch;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -112,6 +114,25 @@ public class CashReceiptService {
     Receipt r = receipts.findById(id).orElseThrow(() -> new ResourceNotFoundException(ENTITY, id));
     Hibernate.initialize(r.getLines());
     return r;
+  }
+
+  /**
+   * Mode of payment of receipts by number (read contract of the Customer Servicing Facility payment
+   * history, BRCSF-005).
+   *
+   * @param receiptNos AR or OR numbers
+   * @return mode code by receipt number; unknown numbers are left out
+   */
+  @Transactional(readOnly = true)
+  public Map<String, String> modesOf(Collection<String> receiptNos) {
+    if (receiptNos.isEmpty()) {
+      return Map.of();
+    }
+    Map<String, String> modes = new HashMap<>();
+    receipts
+        .findByReceiptNoIn(receiptNos)
+        .forEach(r -> modes.put(r.getReceiptNo(), r.getMode().name()));
+    return modes;
   }
 
   /**

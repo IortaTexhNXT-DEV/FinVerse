@@ -36,4 +36,12 @@ public interface CashReceiptRepository
    * @return receipts
    */
   List<Receipt> findByIdInOrderByIdAsc(Collection<Long> ids);
+
+  /**
+   * Receipts by number (payment history of the Customer Servicing Facility).
+   *
+   * @param receiptNos AR or OR numbers
+   * @return receipts
+   */
+  List<Receipt> findByReceiptNoIn(Collection<String> receiptNos);
 }

@@ -7,15 +7,22 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
+import com.iortatechnxt.brokerverse.crm.domain.ClientContactChanged;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails;
 import com.iortatechnxt.brokerverse.crm.domain.ClientProfile;
 import com.iortatechnxt.brokerverse.crm.domain.ClientRepository;
 import com.iortatechnxt.brokerverse.crm.domain.ClientStatus;
 import com.iortatechnxt.brokerverse.crm.domain.ClientType;
+import com.iortatechnxt.brokerverse.crm.domain.ContactChange;
+import com.iortatechnxt.brokerverse.crm.domain.ContactChange.FieldChange;
 import java.time.Clock;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -30,7 +37,9 @@ import org.springframework.transaction.annotation.Transactional;
  *
  * <p>Events (SANCTION_SCREENING_DESIGN section 9): {@link ClientRegistered} when a client is
  * created and {@link ClientIdentityChanged} when an update changes the name, birth date,
- * nationality, TIN or ID document; both are published inside the transaction.
+ * nationality, TIN or ID document; both are published inside the transaction. The contact-only
+ * contract {@link #updateContact} (CUSTOMER_SERVICING_DESIGN section 11) publishes {@link
+ * ClientContactChanged}.
  */
 @Service
 @Transactional
@@ -40,6 +49,7 @@ public class ClientService {
   public static final String ENTITY = "Client";
 
   private static final int LOOKUP_SIZE = 20;
+  private static final int AUDIT_MAX = 500;
 
   private final ClientRepository clients;
   private final DocumentNumberService numbers;
@@ -156,6 +166,121 @@ public class ClientService {
       events.publishEvent(new ClientIdentityChanged(client.getCompanyId(), client.getId()));
     }
     return client;
+  }
+
+  /**
+   * Changes the contact details only (BRCSF-004; the contract of the Customer Servicing Facility):
+   * e-mail, mobile, phone and address lines, validated with the client master rules; the duplicate
+   * keys are recomputed and the change is audited with the values before and after, its source,
+   * reason and reference. Other client data cannot be changed through it.
+   *
+   * @param id client
+   * @param change new contact values (null keeps a value, blank clears it) with source and reason
+   * @return the fields that changed, empty when nothing changed
+   */
+  public List<FieldChange> updateContact(Long id, ContactChange change) {
+    Client client = get(id);
+    List<FieldChange> changed = new ArrayList<>();
+    for (String field : ContactChange.FIELDS) {
+      String before = currentContact(client, field);
+      String asked = change.valueOf(field);
+      String after = asked == null ? before : blankToNull(asked.strip());
+      if (!Objects.equals(before, after)) {
+        changed.add(new FieldChange(field, before, after));
+      }
+    }
+    if (changed.isEmpty()) {
+      return List.of();
+    }
+    ClientDetails.Contact contact = newContact(client, changed);
+    List<ClientRules.Violation> found = ClientRules.contactViolations(contact);
+    if (!found.isEmpty()) {
+      throw new BusinessRuleException(found.get(0).code(), found.get(0).message());
+    }
+    client.changeContact(contact);
+    audit.record(
+        ENTITY,
+        client.getProspectCode(),
+        AuditAction.UPDATE,
+        cut(
+            "Contact of "
+                + client.getCode()
+                + " changed by "
+                + change.source()
+                + " "
+                + nz(change.reference())
+                + " ("
+                + nz(change.reason())
+                + "): "
+                + describe(changed)));
+    events.publishEvent(
+        new ClientContactChanged(
+            client.getCompanyId(),
+            client.getId(),
+            client.getCode(),
+            changed.stream().map(FieldChange::field).toList(),
+            change.source()));
+    return List.copyOf(changed);
+  }
+
+  /**
+   * The current value of a contact field.
+   *
+   * @param client client
+   * @param field one of {@link ContactChange#FIELDS}
+   * @return value, may be null
+   */
+  public static String currentContact(Client client, String field) {
+    return switch (field) {
+      case "EMAIL" -> client.getEmail();
+      case "MOBILE" -> client.getMobile();
+      case "PHONE" -> client.getPhone();
+      case "ADDRESS_LINE" -> client.getAddressLine();
+      case "CITY" -> client.getCity();
+      case "PROVINCE" -> client.getProvince();
+      case "POSTAL_CODE" -> client.getPostalCode();
+      default -> throw new IllegalArgumentException("Not a contact field: " + field);
+    };
+  }
+
+  private static ClientDetails.Contact newContact(Client client, List<FieldChange> changed) {
+    Map<String, String> values = new HashMap<>();
+    ContactChange.FIELDS.forEach(f -> values.put(f, currentContact(client, f)));
+    changed.forEach(c -> values.put(c.field(), c.newValue()));
+    return new ClientDetails.Contact(
+        values.get("EMAIL"),
+        values.get("MOBILE"),
+        values.get("PHONE"),
+        values.get("ADDRESS_LINE"),
+        values.get("CITY"),
+        values.get("PROVINCE"),
+        values.get("POSTAL_CODE"));
+  }
+
+  private static String describe(List<FieldChange> changed) {
+    return String.join(
+        "; ",
+        changed.stream()
+            .map(
+                c ->
+                    c.field().toLowerCase(Locale.ROOT)
+                        + " "
+                        + nz(c.oldValue())
+                        + " -> "
+                        + nz(c.newValue()))
+            .toList());
+  }
+
+  private static String blankToNull(String value) {
+    return value.isEmpty() ? null : value;
+  }
+
+  private static String nz(String value) {
+    return value == null ? "-" : value;
+  }
+
+  private static String cut(String summary) {
+    return summary.length() <= AUDIT_MAX ? summary : summary.substring(0, AUDIT_MAX);
   }
 
   /** What identifies a client for screening: names, birth date, nationality, TIN and ID. */

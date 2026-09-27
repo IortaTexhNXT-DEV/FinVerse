@@ -141,7 +141,7 @@ class AttachmentIT {
         .andExpect(jsonPath("$[0].fileName").value("logo.png"));
     mvc.perform(
             multipart("/api/v1/attachments")
-                .file(new MockMultipartFile("file", "notes.txt", "text/plain", PDF))
+                .file(new MockMultipartFile("file", "setup.exe", "application/octet-stream", PDF))
                 .param("entityType", "JournalBatch")
                 .param("entityId", "ATT-3"))
         .andExpect(status().isUnprocessableEntity())

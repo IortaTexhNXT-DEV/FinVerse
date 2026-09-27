@@ -17,6 +17,7 @@ import { claimsModule } from '@/features/claims/module';
 import { collectionsModule } from '@/features/collections/module';
 import { commissionModule } from '@/features/commission/module';
 import { crmModule } from '@/features/crm/module';
+import { csfModule } from '@/features/csf/module';
 import { proposalsModule } from '@/features/proposals/module';
 import { quotationsModule } from '@/features/quotations/module';
 import { planningModule } from '@/features/closing/module';
@@ -86,6 +87,8 @@ export const NAV_GROUPS: NavGroup[] = [
       // Operations (BRD-2), UX design placement: Production Reconciliation and Adjustment here.
       prodreconModule,
       adjustmentModule,
+      // Customer Service Facility (BRD-9), UX guidelines section 3: after Adjustment.
+      csfModule,
       // Product Maintenance (BRD-3): catalog screens with the package request screens.
       withPackageRequests(catalogModule),
       bulkModule,

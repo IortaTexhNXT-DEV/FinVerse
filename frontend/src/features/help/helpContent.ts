@@ -5,6 +5,7 @@ import { ADJUSTMENT_HELP } from '@/features/adjustment/help';
 import { ADMIN_HELP } from '@/features/admin/help';
 import { ASSETS_HELP } from '@/features/assets/help';
 import { BOOKING_HELP } from '@/features/booking/help';
+import { CSF_HELP } from '@/features/csf/help';
 import { RENEWAL_HELP } from '@/features/renewal/help';
 import { SUBMITTED_HELP } from '@/features/submitted/help';
 import { BROKER_CLAIMS_HELP } from '@/features/brokerclaims/help';
@@ -131,6 +132,7 @@ export const HELP_SECTIONS: HelpSection[] = [
   SUBMITTED_HELP,
   PRODRECON_HELP,
   ADJUSTMENT_HELP,
+  CSF_HELP,
   withPackageRequestHelp(CATALOG_HELP),
   BULK_HELP,
   OPERATIONS_HELP,

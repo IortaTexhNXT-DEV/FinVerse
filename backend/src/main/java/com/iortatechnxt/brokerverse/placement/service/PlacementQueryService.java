@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.AccountStatus;
 import com.iortatechnxt.brokerverse.account.domain.HoldCoverStatus;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.placement.domain.BillingBatchRepository;
 import com.iortatechnxt.brokerverse.placement.domain.HoldCover;
 import com.iortatechnxt.brokerverse.placement.domain.HoldCoverRepository;
 import com.iortatechnxt.brokerverse.placement.domain.PlacementSlip;
@@ -13,6 +14,7 @@ import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,6 +37,7 @@ public class PlacementQueryService {
   private final PlacementSlipRepository slips;
   private final HoldCoverRepository holdCovers;
   private final PlacementAccounts accounts;
+  private final BillingBatchRepository billing;
   private final SystemParameterService parameters;
   private final Clock clock;
 
@@ -44,6 +47,7 @@ public class PlacementQueryService {
    * @param slips placement slips
    * @param holdCovers hold covers
    * @param accounts account look-ups
+   * @param billing CLPC billing batches
    * @param parameters business parameters
    * @param clock clock
    */
@@ -51,11 +55,13 @@ public class PlacementQueryService {
       PlacementSlipRepository slips,
       HoldCoverRepository holdCovers,
       PlacementAccounts accounts,
+      BillingBatchRepository billing,
       SystemParameterService parameters,
       Clock clock) {
     this.slips = slips;
     this.holdCovers = holdCovers;
     this.accounts = accounts;
+    this.billing = billing;
     this.parameters = parameters;
     this.clock = clock;
   }
@@ -100,6 +106,22 @@ public class PlacementQueryService {
    */
   public List<HoldCover> holdCovers(String arn) {
     return holdCovers.findByArnOrderByIdDesc(arn);
+  }
+
+  /**
+   * ARNs billed under a loan application number (contract of the Customer Servicing Facility
+   * search, BRCSF-003): read from the CLPC billing items.
+   *
+   * @param companyId company
+   * @param loanApplicationNo loan application number
+   * @return ARNs, each once
+   */
+  public List<String> arnsByLoanApplication(Long companyId, String loanApplicationNo) {
+    if (loanApplicationNo == null || loanApplicationNo.isBlank()) {
+      return List.of();
+    }
+    return billing.arnsByLoanApplication(
+        companyId, loanApplicationNo.strip().toUpperCase(Locale.ROOT));
   }
 
   /**

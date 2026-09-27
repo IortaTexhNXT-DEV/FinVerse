@@ -279,6 +279,23 @@ public class Client extends BaseEntity {
     }
   }
 
+  /** Changes the contact details only (BRCSF-004) and recomputes the duplicate keys. */
+  public void changeContact(Contact c) {
+    requireChangeable();
+    this.email = c.email();
+    this.mobile = c.mobile();
+    this.phone = c.phone();
+    this.addressLine = c.addressLine();
+    this.city = c.city();
+    this.province = c.province();
+    this.postalCode = c.postalCode();
+    this.keys =
+        ClientKeys.of(
+            new Identity(null, idType, idNumber),
+            mobile,
+            new PersonName(lastName, firstName, null, null, corporateName));
+  }
+
   /**
    * The KYC profile.
    *

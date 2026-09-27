@@ -36,7 +36,24 @@ public enum AllowedFileType {
   /** Outlook message (e.g. a client acceptance e-mail). */
   MSG("application/vnd.ms-outlook", List.of("msg"), Signatures.OLE2),
   /** Internet e-mail message. */
-  EML("message/rfc822", List.of("eml"), new byte[0]);
+  EML("message/rfc822", List.of("eml"), new byte[0]),
+  /** Plain text (BRCSF-007): text without NUL bytes. */
+  TXT("text/plain", List.of("txt"), new byte[0]),
+  /** Rich text (BRCSF-007). */
+  RTF("application/rtf", List.of("rtf"), "{\\rtf".getBytes(StandardCharsets.US_ASCII)),
+  /**
+   * HEIF / HEIC photo (BRCSF-007): an ISO media file whose {@code ftyp} box at offset 4 names an
+   * image brand.
+   */
+  HEIC("image/heic", List.of("heic", "heif"), "ftyp".getBytes(StandardCharsets.US_ASCII)),
+  /** GIF image (BRCSF-007). */
+  GIF("image/gif", List.of("gif"), "GIF8".getBytes(StandardCharsets.US_ASCII)),
+  /** Bitmap image (BRCSF-007). */
+  BMP("image/bmp", List.of("bmp"), "BM".getBytes(StandardCharsets.US_ASCII)),
+  /** TIFF image, little or big endian (BRCSF-007). */
+  TIFF("image/tiff", List.of("tif", "tiff"), new byte[] {'I', 'I', '*', 0}),
+  /** WebP image: a RIFF container of form type WEBP (BRCSF-007). */
+  WEBP("image/webp", List.of("webp"), "RIFF".getBytes(StandardCharsets.US_ASCII));
 
   /** Bytes inspected for text detection. */
   private static final int TEXT_PROBE = 4096;
@@ -73,17 +90,29 @@ public enum AllowedFileType {
    * @return true when the signature matches (text without NUL bytes for CSV)
    */
   public boolean matches(byte[] content) {
-    if (this == CSV || this == EML) {
-      int limit = Math.min(content.length, TEXT_PROBE);
-      for (int i = 0; i < limit; i++) {
-        if (content[i] == 0) {
-          return false;
-        }
+    return switch (this) {
+      case CSV, EML, TXT -> isText(content);
+      case HEIC -> Signatures.isHeif(content);
+      case TIFF -> startsWith(content, signature) || startsWith(content, Signatures.TIFF_BIG);
+      case WEBP ->
+          startsWith(content, signature)
+              && Signatures.at(content, Signatures.BRAND_OFFSET, Signatures.WEBP);
+      default -> startsWith(content, signature);
+    };
+  }
+
+  private static boolean isText(byte[] content) {
+    int limit = Math.min(content.length, TEXT_PROBE);
+    for (int i = 0; i < limit; i++) {
+      if (content[i] == 0) {
+        return false;
       }
-      return true;
     }
-    return content.length >= signature.length
-        && Arrays.equals(content, 0, signature.length, signature, 0, signature.length);
+    return true;
+  }
+
+  private static boolean startsWith(byte[] content, byte[] prefix) {
+    return Signatures.at(content, 0, prefix);
   }
 
   /**
@@ -106,6 +135,32 @@ public enum AllowedFileType {
       (byte) 0xD0, (byte) 0xCF, 0x11, (byte) 0xE0, (byte) 0xA1, (byte) 0xB1, 0x1A, (byte) 0xE1
     };
 
+    static final byte[] TIFF_BIG = {'M', 'M', 0, '*'};
+    static final byte[] WEBP = "WEBP".getBytes(StandardCharsets.US_ASCII);
+    static final byte[] FTYP = "ftyp".getBytes(StandardCharsets.US_ASCII);
+
+    /** Brands of an ISO media file that hold a HEIF / HEIC image. */
+    static final List<String> HEIF_BRANDS = List.of("heic", "heix", "heif", "mif1", "msf1", "hevc");
+
+    private static final int FTYP_OFFSET = 4;
+    static final int BRAND_OFFSET = 8;
+    private static final int BRAND_LENGTH = 4;
+
     private Signatures() {}
+
+    static boolean at(byte[] content, int offset, byte[] expected) {
+      return content.length >= offset + expected.length
+          && Arrays.equals(content, offset, offset + expected.length, expected, 0, expected.length);
+    }
+
+    static boolean isHeif(byte[] content) {
+      if (!at(content, FTYP_OFFSET, FTYP) || content.length < BRAND_OFFSET + BRAND_LENGTH) {
+        return false;
+      }
+      String brand =
+          new String(content, BRAND_OFFSET, BRAND_LENGTH, StandardCharsets.US_ASCII)
+              .toLowerCase(Locale.ROOT);
+      return HEIF_BRANDS.contains(brand);
+    }
   }
 }

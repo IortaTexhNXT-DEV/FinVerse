@@ -1,5 +1,5 @@
 import { api, toQuery } from '@/api/client';
-import type { PageResponse } from '@/api/types';
+import type { PageResponse, RecordOriginKind } from '@/api/types';
 import type {
   IntakeResult,
   OrBody,
@@ -83,8 +83,14 @@ export const cashieringApi = {
     post<Prebooked>(`/prebooked/${id}/release`, { reason }),
   runMatching: () => post<Counts>('/matching/run'),
 
-  unapplied: (companyId: number, tab: UnappliedTab, q: string, page = 0) =>
-    get<PageResponse<UnappliedItem>>(`/unapplied${toQuery({ companyId, tab, q, page })}`),
+  unapplied: (
+    companyId: number,
+    tab: UnappliedTab,
+    q: string,
+    page = 0,
+    origin?: RecordOriginKind,
+  ) =>
+    get<PageResponse<UnappliedItem>>(`/unapplied${toQuery({ companyId, tab, q, origin, page })}`),
   unappliedItem: (id: number) => get<UnappliedItem>(`/unapplied/${id}`),
   dispositions: (id: number) => get<Disposition[]>(`/unapplied/${id}/dispositions`),
   dispositionTypes: () => get<DispositionType[]>('/disposition-types'),

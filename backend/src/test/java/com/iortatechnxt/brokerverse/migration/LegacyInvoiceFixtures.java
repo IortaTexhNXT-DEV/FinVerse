@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -15,6 +16,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * its insurer share and component positions (basic premium partly paid in legacy).
  */
 final class LegacyInvoiceFixtures {
+
+  private static final AtomicLong SEQUENCE =
+      new AtomicLong(System.currentTimeMillis() / 1000 % 900_000L);
 
   private final MigrationTestSupport mig;
   private final JdbcTemplate jdbc;
@@ -24,8 +28,9 @@ final class LegacyInvoiceFixtures {
     this.jdbc = jdbc;
   }
 
+  /** A six-digit token unique within the run (keys of the seed extracts). */
   static String token() {
-    return Long.toString(System.nanoTime() % 1_000_000L);
+    return Long.toString(100_000L + SEQUENCE.getAndIncrement() % 900_000L);
   }
 
   String client(String t) throws Exception {

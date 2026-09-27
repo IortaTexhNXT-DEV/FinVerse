@@ -14,11 +14,13 @@ import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { OriginBadge } from '@/components/ui/OriginBadge';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { cashieringApi } from './cashieringApi';
 import type { Disposition, DispositionBody, UnappliedItem } from './cashieringApi';
+import { unappliedOrigin } from './cashieringQueueTypes';
 import { DispositionForm } from './DispositionForm';
 import { displayNameOf } from '@/api/users';
 
@@ -70,6 +72,27 @@ function facts(u: UnappliedItem) {
       value: u.sourceRef ? `${humanize(u.sourceModule ?? '')} ${u.sourceRef}` : humanize(u.origin),
     },
     { icon: CalendarDays, label: 'Received', value: formatDate(u.createdAt) },
+    ...legacyFacts(u),
+  ];
+}
+
+/** The legacy receipt and references of an unapplied payment carried from legacy. */
+function legacyFacts(u: UnappliedItem) {
+  if (u.origin !== 'MIGRATED') {
+    return [];
+  }
+  return [
+    {
+      icon: FileText,
+      label: 'Legacy Receipt',
+      value: [u.legacyArNo, formatDate(u.legacyArDate)].filter(Boolean).join(' · '),
+    },
+    {
+      icon: FileText,
+      label: 'Legacy Reference',
+      value: [u.sourceSystem, u.legacyRef, u.migrationBatch].filter(Boolean).join(' · '),
+    },
+    { icon: FileText, label: 'Automatch References', value: u.matchRefs ?? '' },
   ];
 }
 
@@ -149,6 +172,7 @@ export default function UnappliedDetailPage() {
         chips={
           <>
             <ReferenceChip value={u.reference} />
+            <OriginBadge record={unappliedOrigin(u)} />
             <StatusBadge status={u.stage} />
           </>
         }

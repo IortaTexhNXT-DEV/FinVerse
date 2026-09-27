@@ -72,7 +72,7 @@ class MigrationClientsHeadersApiIT {
   }
 
   private static String token() {
-    return Long.toString(System.nanoTime() % 1_000_000L);
+    return LegacyInvoiceFixtures.token();
   }
 
   @Test

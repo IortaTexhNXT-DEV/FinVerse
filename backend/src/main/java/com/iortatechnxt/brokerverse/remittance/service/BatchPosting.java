@@ -184,7 +184,7 @@ public class BatchPosting {
                 today,
                 RemittancePostings.sourceRef(batch, line.getInvoiceNo()),
                 invoice,
-                RemittancePostings.lineAmounts(a, 1),
+                RemittancePostings.lineAmounts(a, 1, invoice.getLegacy().ledgerContext()),
                 "Remittance " + invoice.getInvoiceNo() + " " + batch.getBatchNo()));
     Map<LedgerComponent, BigDecimal> moved = new EnumMap<>(LedgerComponent.class);
     moved.put(LedgerComponent.DTIP, a.dtip());

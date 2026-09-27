@@ -55,7 +55,7 @@ class MigrationLegacyInvoicesApiIT {
   void anOpenLegacyInvoiceIsLoadedWithItsPositionsEntryAndOpenItems() throws Exception {
     String t = LegacyInvoiceFixtures.token();
     String clientCode = fx.client(t);
-    String no = "I" + String.format("%08d", Long.parseLong(t));
+    String no = "I" + String.format("%08d", Long.parseLong(t) * 10);
     JsonNode batch = fx.loadInvoice(no, t);
     String batchNo = batch.get("batchNo").asText();
 
@@ -141,7 +141,7 @@ class MigrationLegacyInvoicesApiIT {
   void aRolledBackInvoiceBatchReversesTheInvoiceItsEntryAndOpenItems() throws Exception {
     String t = LegacyInvoiceFixtures.token();
     fx.client(t);
-    String no = "I" + String.format("%08d", Long.parseLong(t) + 1);
+    String no = "I" + String.format("%08d", Long.parseLong(t) * 10 + 1);
     String batchNo = fx.loadInvoice(no, t).get("batchNo").asText();
     String invoiceNo =
         jdbc.queryForObject(

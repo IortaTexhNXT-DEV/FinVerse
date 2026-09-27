@@ -2,13 +2,16 @@ package com.iortatechnxt.brokerverse.cashiering.service;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.UnappliedOrigin;
 import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
 import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied.UnappliedSpec;
+import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedLegacy;
 import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedRepository;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.opsledger.domain.LedgerContext;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import com.iortatechnxt.brokerverse.workflow.service.StartCase;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
@@ -34,6 +37,9 @@ public class UnappliedService {
 
   /** Workflow of the dispositions. */
   public static final String WORKFLOW = "OPS_DISPOSITION";
+
+  /** Source module of the items carried from legacy. */
+  public static final String MIGRATION = "MIGRATION";
 
   private final UnappliedRepository items;
   private final DocumentNumberService numbers;
@@ -72,6 +78,11 @@ public class UnappliedService {
    * @return the item
    */
   public Unapplied create(Long companyId, Long branchId, UnappliedSpec spec) {
+    return create(companyId, branchId, spec, UnappliedLegacy.NONE);
+  }
+
+  private Unapplied create(
+      Long companyId, Long branchId, UnappliedSpec spec, UnappliedLegacy legacy) {
     Optional<Unapplied> earlier =
         items.findByCompanyIdAndSourceModuleAndSourceRef(
             companyId, spec.sourceModule(), spec.sourceRef());
@@ -82,13 +93,11 @@ public class UnappliedService {
       throw new BusinessRuleException(
           "UNAPPLIED_AMOUNT", "An unapplied item needs an amount above zero");
     }
-    Unapplied item =
-        items.save(
-            new Unapplied(
-                companyId,
-                branchId,
-                numbers.next("UNP-" + BusinessClock.today(clock).getYear()),
-                spec));
+    Unapplied created =
+        new Unapplied(
+            companyId, branchId, numbers.next("UNP-" + BusinessClock.today(clock).getYear()), spec);
+    created.markMigrated(legacy);
+    Unapplied item = items.save(created);
     workflow.start(
         new StartCase(
             companyId,
@@ -138,6 +147,100 @@ public class UnappliedService {
         ENTITY, String.valueOf(item.getId()), action, TransitionNote.comment(comment));
     audit.record(ENTITY, item.getReference(), AuditAction.CLOSE, action + ": " + comment);
     return used;
+  }
+
+  /**
+   * Creates an unapplied payment carried from legacy at cut-over (Data Migration, F02): origin
+   * MIGRATED, ledger context LEGACY, source module MIGRATION with the legacy reference; no BIBS
+   * receipt is issued (the legacy acknowledgement receipt is kept). Idempotent on the legacy
+   * reference.
+   *
+   * @param companyId company
+   * @param branchId branch
+   * @param spec party, money, disposition hint and remarks (origin and source are set here)
+   * @param facts legacy facts
+   * @return the item
+   */
+  public Unapplied createMigrated(
+      Long companyId, Long branchId, UnappliedSpec spec, UnappliedLegacy facts) {
+    return create(
+        companyId,
+        branchId,
+        new UnappliedSpec(
+            UnappliedOrigin.MIGRATED,
+            null,
+            null,
+            spec.invoiceNo(),
+            spec.clientCode(),
+            spec.payorName(),
+            spec.salesUnit(),
+            spec.currency(),
+            spec.amount(),
+            spec.dispositionHint(),
+            MIGRATION,
+            "MIG:UPP:" + facts.sourceSystem() + ":" + facts.legacyRef(),
+            spec.remarks()),
+        new UnappliedLegacy(
+            facts.sourceSystem(),
+            facts.legacyRef(),
+            facts.migrationBatch(),
+            LedgerContext.LEGACY,
+            facts.legacyArNo(),
+            facts.legacyArDate(),
+            facts.matchRefs()));
+  }
+
+  /**
+   * Sets the balance of a migrated item at cut-over (the amount received in legacy may be larger
+   * than what is still unapplied).
+   *
+   * @param item migrated item
+   * @param balance open balance at cut-over
+   */
+  public void openAt(Unapplied item, BigDecimal balance) {
+    BigDecimal used = item.getAmount().subtract(balance);
+    if (used.signum() > 0) {
+      item.consume(used);
+    }
+  }
+
+  /**
+   * Adjusts the open balance of a migrated item after go-live (year-end true-up, section 17.7).
+   *
+   * @param item migrated item
+   * @param change signed change of the balance
+   */
+  public void adjustMigratedOpening(Unapplied item, BigDecimal change) {
+    requireMigrated(item);
+    if (change.signum() < 0) {
+      item.consume(change.negate());
+    } else if (change.signum() > 0) {
+      item.restore(change);
+    }
+    audit.record(ENTITY, item.getReference(), AuditAction.UPDATE, "Opening adjusted by " + change);
+  }
+
+  /**
+   * Closes a migrated item of a rolled-back migration batch. Refused when it was worked in BIBS.
+   *
+   * @param item migrated item
+   * @param batchNo rolled-back batch
+   */
+  public void rollbackMigrated(Unapplied item, String batchNo) {
+    requireMigrated(item);
+    if (!Unapplied.STAGE_INITIAL.equals(item.getStage())) {
+      throw new BusinessRuleException(
+          "MIG_UPP_WORKED",
+          "Unapplied payment " + item.getReference() + " is being worked and cannot be undone");
+    }
+    close(item, "migration_rollback", "Migration batch " + batchNo + " rolled back");
+  }
+
+  private static void requireMigrated(Unapplied item) {
+    if (item.getOrigin() != UnappliedOrigin.MIGRATED) {
+      throw new BusinessRuleException(
+          "MIG_UPP_NOT_MIGRATED", item.getReference() + " is not a migrated unapplied payment");
+    }
   }
 
   private static String title(Unapplied item) {

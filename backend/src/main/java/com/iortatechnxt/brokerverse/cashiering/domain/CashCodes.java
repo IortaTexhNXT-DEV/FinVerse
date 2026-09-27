@@ -151,7 +151,9 @@ public final class CashCodes {
     /** Pre-booked payment released to unapplied. */
     PREBOOKED,
     /** Other. */
-    OTHER
+    OTHER,
+    /** Unapplied payment carried from legacy at cut-over (Data Migration, F02). */
+    MIGRATED
   }
 
   /** What a disposition type does (CSHID.024). */

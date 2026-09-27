@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.cashiering.service;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.DispositionStatus;
+import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.UnappliedOrigin;
 import com.iortatechnxt.brokerverse.cashiering.domain.Disposition;
 import com.iortatechnxt.brokerverse.cashiering.domain.Disposition.DispositionDetails;
 import com.iortatechnxt.brokerverse.cashiering.domain.DispositionRepository;
@@ -10,6 +11,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.DispositionTypeRule;
 import com.iortatechnxt.brokerverse.cashiering.domain.DispositionTypeRuleRepository;
 import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
 import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedRepository;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
@@ -134,6 +136,37 @@ public class DispositionService {
     String like =
         text == null || text.isBlank() ? null : "%" + text.strip().toLowerCase(Locale.ROOT) + "%";
     return items.search(companyId, stages, like, pageable);
+  }
+
+  /**
+   * Items of a tab with the Data Migration origin filter.
+   *
+   * @param companyId company
+   * @param stages stages
+   * @param text search text
+   * @param origin BIBS or MIGRATED, null for both
+   * @param pageable page
+   * @return items
+   */
+  @Transactional(readOnly = true)
+  public Page<Unapplied> list(
+      Long companyId,
+      List<String> stages,
+      String text,
+      RecordOrigin.Origin origin,
+      Pageable pageable) {
+    if (origin == null) {
+      return list(companyId, stages, text, pageable);
+    }
+    String like =
+        text == null || text.isBlank() ? null : "%" + text.strip().toLowerCase(Locale.ROOT) + "%";
+    return items.searchByOrigin(
+        companyId,
+        stages,
+        like,
+        origin == RecordOrigin.Origin.MIGRATED,
+        UnappliedOrigin.MIGRATED,
+        pageable);
   }
 
   /**

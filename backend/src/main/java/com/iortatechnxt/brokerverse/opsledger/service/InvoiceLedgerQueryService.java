@@ -111,6 +111,18 @@ public class InvoiceLedgerQueryService {
   }
 
   /**
+   * Open legacy invoices by their number in the source system (DATA_MIGRATION_DESIGN 14.1).
+   *
+   * @param legacyInvoiceNo legacy number
+   * @return invoices with components and shares loaded, oldest first
+   */
+  public List<OpsInvoice> findByLegacyNo(String legacyInvoiceNo) {
+    List<OpsInvoice> list = invoices.findByLegacyLegacyInvoiceNoOrderByIdAsc(legacyInvoiceNo);
+    list.forEach(InvoiceLedgerQueryService::load);
+    return list;
+  }
+
+  /**
    * Searches invoices (collections not loaded).
    *
    * @param search criteria

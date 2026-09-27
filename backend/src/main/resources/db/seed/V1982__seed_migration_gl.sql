@@ -7,8 +7,9 @@
 --               unapplied collections (2206) and the migration clearing account (LGC-CLR). The real
 --               codes come from Comptrollership.
 --   Rules:      seed rules of the opening events MIG_LEGACY_INVOICE_OPENING and MIG_UPP_OPENING and
---               of the year-end adjustment MIG_LEGACY_POSITION_TRUEUP, balanced on LGC-CLR; the
---               legacy lines of the Operations events are added in the Operations waves.
+--               of the year-end adjustment MIG_LEGACY_POSITION_TRUEUP, balanced on LGC-CLR, and the
+--               legacy lines (LG_ components) added to the seed rules of the Operations events:
+--               payment application, unapplied refund and reclass, remittance.
 --   Parameter:  the opening value date of the rehearsals, inside the open seed year (production
 --               keeps 1-Jan-2028).
 -- =====================================================================================
@@ -113,3 +114,29 @@ cross join (values ('1215.01', 'BASIC'), ('1215.02', 'DST'), ('1215.03', 'PREMIU
                    ('LGC-DTIP', 'DTIP')) as x(code, components)
 where c.code = 'FVI'
   and not exists (select 1 from acsl_glsl_control g where g.company_id = c.id and g.account_code = x.code);
+
+-- ---------- Legacy lines of the Operations events (DATA_MIGRATION_DESIGN 14.4) ------------------
+insert into acc_rule_line (rule_id, line_no, side, account_code, amount_component, party_line, narration)
+select r.id, l.n, l.side, l.acc, l.comp, l.party, l.narr
+from acc_rule r
+join (values
+  ('OPS_PAYMENT_APPLY', 101, 'DEBIT', '2206', 'LG_APPLIED', true, 'Legacy unapplied collections applied'),
+  ('OPS_PAYMENT_APPLY', 102, 'CREDIT', '1215.02', 'LG_PR_DST', true, 'Legacy premium receivable - DST'),
+  ('OPS_PAYMENT_APPLY', 103, 'CREDIT', '1215.03', 'LG_PR_PTX_VAT', true, 'Legacy premium receivable - premium tax / VAT'),
+  ('OPS_PAYMENT_APPLY', 104, 'CREDIT', '1215.04', 'LG_PR_LGT', true, 'Legacy premium receivable - LGT'),
+  ('OPS_PAYMENT_APPLY', 105, 'CREDIT', '1215.05', 'LG_PR_FST', true, 'Legacy premium receivable - fire service tax'),
+  ('OPS_PAYMENT_APPLY', 106, 'CREDIT', '1215.06', 'LG_PR_OTHER', true, 'Legacy premium receivable - other charges'),
+  ('OPS_PAYMENT_APPLY', 107, 'CREDIT', '1215.01', 'LG_PR_BASIC', true, 'Legacy premium receivable - basic premium'),
+  ('OPS_PAYMENT_APPLY', 108, 'DEBIT', '2222', 'LG_REALIZED_COMMISSION', false, 'Legacy commission realized on collection'),
+  ('OPS_PAYMENT_APPLY', 109, 'CREDIT', '4101', 'LG_REALIZED_COMMISSION', false, 'Commission income'),
+  ('OPS_PAYMENT_APPLY', 110, 'DEBIT', '2223', 'LG_REALIZED_VAT', false, 'Legacy deferred output VAT made due'),
+  ('OPS_PAYMENT_APPLY', 111, 'CREDIT', '2504', 'LG_REALIZED_VAT', false, 'Output VAT on commission'),
+  ('OPS_UNAPPLIED_REFUND', 101, 'DEBIT', '2206', 'LG_AMOUNT', true, 'Legacy unapplied collections refunded'),
+  ('OPS_UNAPPLIED_REFUND', 102, 'CREDIT', '2216', 'LG_AMOUNT', true, 'Refund payable to client'),
+  ('OPS_UNAPPLIED_RECLASS', 101, 'DEBIT', '2206', 'LG_RELEASED', true, 'Legacy unapplied collections released'),
+  ('OPS_UNAPPLIED_RECLASS', 102, 'CREDIT', '2206', 'LG_ASSIGNED', true, 'Legacy unapplied collections assigned'),
+  ('OPS_REMITTANCE', 101, 'DEBIT', 'LGC-DTIP', 'LG_DTIP', true, 'Legacy due to insurer - paid AR remitted'),
+  ('OPS_REMITTANCE', 102, 'CREDIT', 'LGC-COMM', 'LG_COMMISSION_RECEIVABLE', true, 'Legacy commission and VAT retained')
+) as l(event_type, n, side, acc, comp, party, narr) on l.event_type = r.event_type
+join org_company c on c.id = r.company_id and c.code = 'FVI'
+where not exists (select 1 from acc_rule_line x where x.rule_id = r.id and x.line_no = l.n);

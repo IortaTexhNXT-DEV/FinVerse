@@ -128,7 +128,7 @@ class MigrationGlOpeningApiIT {
     String t = LegacyInvoiceFixtures.token();
     String seq = t.substring(t.length() - 2);
     fx.client(t);
-    String no = "I" + String.format("%08d", Long.parseLong(t) + 7);
+    String no = "I" + String.format("%08d", Long.parseLong(t) * 10 + 7);
     mig.accept(fx.loadInvoice(no, t).get("batchNo").asText());
     String invoiceNo =
         jdbc.queryForObject(

@@ -1,8 +1,10 @@
 package com.iortatechnxt.brokerverse.cashiering.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.iortatechnxt.brokerverse.cashiering.domain.Disposition;
 import com.iortatechnxt.brokerverse.cashiering.domain.DispositionTypeRule;
 import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
+import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedLegacy;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -10,6 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 /** Request and response records of the unapplied payments workbench (CSHID.024/025). */
@@ -40,6 +43,8 @@ public final class UnappliedDtos {
    * @param remarks remarks
    * @param createdAt created
    * @param current current disposition, may be null
+   * @param legacy source system, legacy reference, batch and legacy AR of a migrated item
+   *     (unwrapped; the screens show a LEGACY badge for origin MIGRATED)
    */
   public record UnappliedResponse(
       Long id,
@@ -60,7 +65,8 @@ public final class UnappliedDtos {
       String sourceRef,
       String remarks,
       Instant createdAt,
-      DispositionResponse current) {
+      DispositionResponse current,
+      @JsonUnwrapped LegacyFacts legacy) {
 
     /**
      * Maps an item.
@@ -89,7 +95,40 @@ public final class UnappliedDtos {
           u.getSourceRef(),
           u.getRemarks(),
           u.getCreatedAt(),
-          current == null ? null : DispositionResponse.from(current));
+          current == null ? null : DispositionResponse.from(current),
+          LegacyFacts.from(u.getLegacy()));
+    }
+  }
+
+  /**
+   * Legacy facts of an item carried from legacy at cut-over.
+   *
+   * @param sourceSystem source system
+   * @param legacyRef legacy UPP reference
+   * @param migrationBatch loading batch
+   * @param ledgerContext NEW or LEGACY
+   * @param legacyArNo acknowledgement receipt of legacy
+   * @param legacyArDate its date
+   * @param matchRefs automatch references
+   */
+  public record LegacyFacts(
+      String sourceSystem,
+      String legacyRef,
+      String migrationBatch,
+      String ledgerContext,
+      String legacyArNo,
+      LocalDate legacyArDate,
+      String matchRefs) {
+
+    static LegacyFacts from(UnappliedLegacy l) {
+      return new LegacyFacts(
+          l.sourceSystem(),
+          l.legacyRef(),
+          l.migrationBatch(),
+          l.ledgerContext().name(),
+          l.legacyArNo(),
+          l.legacyArDate(),
+          l.matchRefs());
     }
   }
 

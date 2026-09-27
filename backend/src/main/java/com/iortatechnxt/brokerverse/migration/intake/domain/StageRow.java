@@ -25,6 +25,8 @@ import org.hibernate.type.SqlTypes;
 @Table(name = "mig_stage_row")
 public class StageRow {
 
+  private static final int MAX_MESSAGE = 1000;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -120,7 +122,8 @@ public class StageRow {
    */
   public void finish(RowStatus newStatus, String reason) {
     this.status = newStatus;
-    this.message = reason == null ? null : reason.substring(0, Math.min(reason.length(), 1000));
+    this.message =
+        reason == null ? null : reason.substring(0, Math.min(reason.length(), MAX_MESSAGE));
   }
 
   /**

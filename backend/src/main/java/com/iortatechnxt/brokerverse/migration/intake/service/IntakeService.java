@@ -60,6 +60,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class IntakeService {
 
+  private static final int G_LAYOUT = 1;
+  private static final int G_SOURCE = 2;
+  private static final int G_DAY = 3;
+  private static final int G_SEQ = 4;
+
   private static final Pattern FILE_NAME =
       Pattern.compile("^([A-Z0-9]+)_([A-Z]+)_(\\d{8})_(\\d{2})\\.(CSV|XLSX)$");
   private static final DateTimeFormatter DAY = DateTimeFormatter.BASIC_ISO_DATE;
@@ -389,7 +394,10 @@ public class IntakeService {
     }
     try {
       return new Name(
-          m.group(1), m.group(2), LocalDate.parse(m.group(3), DAY), Integer.parseInt(m.group(4)));
+          m.group(G_LAYOUT),
+          m.group(G_SOURCE),
+          LocalDate.parse(m.group(G_DAY), DAY),
+          Integer.parseInt(m.group(G_SEQ)));
     } catch (DateTimeParseException e) {
       throw new BusinessRuleException(
           "MIG_FILE_NAME", "The date in the file name is not a valid yyyyMMdd date", e);

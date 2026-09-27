@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -352,6 +353,18 @@ public class ReconciliationService implements LoadListener {
                 : "Missing: " + missing.stream().limit(MAX_DETAIL_KEYS).toList()));
   }
 
+  /**
+   * The entry of each target record that carries its values: the first key loaded into it (legacy
+   * records merged into one target keep the survivor's values).
+   */
+  private static List<KeyXref> survivors(List<KeyXref> loaded) {
+    Map<Long, KeyXref> first = new LinkedHashMap<>();
+    for (KeyXref x : loaded) {
+      first.merge(x.getTargetId(), x, (a, b) -> a.getId() < b.getId() ? a : b);
+    }
+    return new ArrayList<>(first.values());
+  }
+
   private static void fields(
       List<StageRow> all, MigrationLoader loader, List<KeyXref> loaded, List<ReconLineSpec> specs) {
     List<String> cols = loader.reconciledColumns();
@@ -364,7 +377,7 @@ public class ReconciliationService implements LoadListener {
         .forEach(r -> byKey.putIfAbsent(r.getLegacyKey(), r));
     Map<String, int[]> result = new HashMap<>();
     Map<String, List<String>> diffs = new HashMap<>();
-    for (KeyXref x : loaded) {
+    for (KeyXref x : survivors(loaded)) {
       StageRow row = byKey.get(x.getLegacyKey());
       if (row == null) {
         continue;

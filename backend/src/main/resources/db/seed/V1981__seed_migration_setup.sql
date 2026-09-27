@@ -4,8 +4,9 @@
 --   Owners:     migowner is the business owner and migsteward the Data Steward of every object.
 --   Decisions:  the objects of Mock 1 (reference data, clients, policy headers, the RA-sent file)
 --               decided by migowner on the proposal of miglead (gate G1 signed).
---   Code maps:  approved first versions of the market segment and civil status lists, with a
---               legacy value created in BIBS (CREATE) and one mapped to an existing value.
+--   Code maps:  approved first versions of the market segment and civil status lists (with a
+--               legacy value created in BIBS), and of the product, line, status, user, sales unit,
+--               branch and insurer maps used by the client and policy header extracts.
 -- The register, layouts and rules themselves are delivered in V1081 (production catalogue).
 -- =====================================================================================
 
@@ -52,7 +53,9 @@ insert into mig_code_map_version (set_code, version_no, status, comment, submitt
 select s.code, 1, 'APPROVED', 'First mapping of the legacy values', 'migsteward', now() - interval '15 day',
        'migowner', now() - interval '14 day', now() - interval '16 day', 'migsteward'
 from mig_code_map_set s
-where s.code in ('LOV:MARKET_SEGMENT', 'LOV:CIVIL_STATUS')
+where (s.code in ('LOV:MARKET_SEGMENT', 'LOV:CIVIL_STATUS')
+       or s.code in (select c.map_set from mig_layout_column c join mig_layout l on l.id = c.layout_id
+                     where l.object_code in ('C01', 'C03', 'P01', 'P03') and c.map_set is not null))
   and not exists (select 1 from mig_code_map_version v where v.set_code = s.code);
 
 insert into mig_code_map_entry (version_id, source_system, legacy_code, legacy_description, action, target_code,
@@ -62,12 +65,35 @@ from (values ('LOV:MARKET_SEGMENT', 'QPS',  'CBG',  'Consumer Banking',   'MAP',
              ('LOV:MARKET_SEGMENT', 'QPS',  'COMM', 'Commercial Banking', 'MAP',    'COMBANK', null),
              ('LOV:MARKET_SEGMENT', 'QPS',  'CORP', 'Corporate Banking',  'MAP',    'CORBANK', null),
              ('LOV:MARKET_SEGMENT', 'EBIX', 'RTL',  'Retail',             'MAP',    'RETAIL',  null),
+             ('LOV:MARKET_SEGMENT', 'EBIX', 'CBG',  'Consumer Banking',   'MAP',    'CBG',     null),
              ('LOV:MARKET_SEGMENT', 'EBIX', 'PBG',  'Private Banking Group', 'CREATE', 'PBG',
               'New segment used by legacy private banking clients'),
              ('LOV:CIVIL_STATUS',   'QPS',  'S',    'Single',             'MAP',    'SINGLE',  null),
              ('LOV:CIVIL_STATUS',   'QPS',  'M',    'Married',            'MAP',    'MARRIED', null),
              ('LOV:CIVIL_STATUS',   'QPS',  'W',    'Widow/er',           'MAP',    'WIDOWED', null),
-             ('LOV:CIVIL_STATUS',   'EBIX', 'SEP',  'Separated',          'MAP',    'SEPARATED', null))
+             ('LOV:CIVIL_STATUS',   'EBIX', 'SEP',  'Separated',          'MAP',    'SEPARATED', null),
+             ('PRODUCT', 'QPS', 'CAR-A', 'Contractor''s all risk (employees)', 'MAP', 'CAR01', null),
+             ('LINE', 'QPS', 'ENG', 'Engineering', 'MAP', 'ENGINEERING', null),
+             ('STATUS:CLIENT', 'QPS', 'A', 'Active', 'MAP', 'ACTIVE', null),
+             ('STATUS:CLIENT', 'QPS', 'I', 'Inactive', 'MAP', 'INACTIVE', null),
+             ('STATUS:KYC', 'QPS', 'COMPLETE', 'KYC complete', 'MAP', 'VERIFIED', null),
+             ('STATUS:KYC', 'QPS', 'PEND', 'KYC pending', 'MAP', 'PENDING', null),
+             ('STATUS:POLICY', 'QPS', 'IF', 'In force', 'MAP', 'IN_FORCE', null),
+             ('USER', 'QPS', 'AO01', 'Account officer 01', 'MAP', 'ao', null),
+             ('SALES_UNIT', 'QPS', 'U01', 'Metro unit 1', 'MAP', 'T-CBG1', null),
+             ('BRANCH', 'QPS', 'MKT', 'Makati', 'MAP', 'HO', null),
+             ('INSURER', 'QPS', 'MGIC', 'Mabuhay General', 'MAP', 'INS-MGIC', null),
+             ('PRODUCT', 'EBIX', 'CAR-A', 'Contractor''s all risk (employees)', 'MAP', 'CAR01', null),
+             ('LINE', 'EBIX', 'ENG', 'Engineering', 'MAP', 'ENGINEERING', null),
+             ('STATUS:CLIENT', 'EBIX', 'A', 'Active', 'MAP', 'ACTIVE', null),
+             ('STATUS:CLIENT', 'EBIX', 'I', 'Inactive', 'MAP', 'INACTIVE', null),
+             ('STATUS:KYC', 'EBIX', 'COMPLETE', 'KYC complete', 'MAP', 'VERIFIED', null),
+             ('STATUS:KYC', 'EBIX', 'PEND', 'KYC pending', 'MAP', 'PENDING', null),
+             ('STATUS:POLICY', 'EBIX', 'IF', 'In force', 'MAP', 'IN_FORCE', null),
+             ('USER', 'EBIX', 'AO01', 'Account officer 01', 'MAP', 'ao', null),
+             ('SALES_UNIT', 'EBIX', 'U01', 'Metro unit 1', 'MAP', 'T-CBG1', null),
+             ('BRANCH', 'EBIX', 'MKT', 'Makati', 'MAP', 'HO', null),
+             ('INSURER', 'EBIX', 'MGIC', 'Mabuhay General', 'MAP', 'INS-MGIC', null))
      as e(set_code, source_system, legacy_code, legacy_description, action, target_code, remarks)
 join mig_code_map_version v on v.set_code = e.set_code and v.version_no = 1
 where not exists (select 1 from mig_code_map_entry x where x.version_id = v.id and x.legacy_code = e.legacy_code

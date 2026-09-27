@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.crm.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientListItem;
 import com.iortatechnxt.brokerverse.crm.api.dto.ClientRequest;
@@ -99,7 +100,8 @@ public class ClientController {
             f.marketSegment(),
             f.bankClient(),
             f.clientType(),
-            Boolean.TRUE.equals(f.kycDue()));
+            Boolean.TRUE.equals(f.kycDue()),
+            f.origin());
     return PageResponse.of(
         search.search(
             criteria,
@@ -195,6 +197,7 @@ public class ClientController {
    * @param bankClient bank client flag
    * @param clientType type
    * @param kycDue KYC due or overdue only
+   * @param origin BIBS or migrated clients
    */
   public record SearchParams(
       Long companyId,
@@ -209,7 +212,8 @@ public class ClientController {
       String marketSegment,
       Boolean bankClient,
       ClientType clientType,
-      Boolean kycDue) {}
+      Boolean kycDue,
+      RecordOrigin.Origin origin) {}
 
   /**
    * Entered data to check for duplicates.

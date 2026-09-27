@@ -281,28 +281,34 @@ public class LoadRunner {
     Optional<KeyXref> existing =
         xrefs.find(batch.getCompanyId(), u.sourceSystem(), p.objectCode(), u.legacyKey());
     if (existing.isPresent() && existing.get().isLive()) {
-      KeyXref x = existing.get();
-      if (x.getRowHash().equals(u.hash())) {
-        statuses.finish(u.allRows(), RowStatus.SKIPPED, "Already loaded as " + x.getTargetCode());
-        return;
-      }
+      reload(batch, loader, u, existing.get(), ctx);
+    } else {
+      LoadOutcome outcome = loader.load(u, ctx);
+      KeyXref x =
+          existing.orElseGet(
+              () ->
+                  new KeyXref(
+                      batch.getCompanyId(), u.sourceSystem(), p.objectCode(), u.legacyKey()));
+      record(batch, u, x, outcome);
+    }
+  }
+
+  /** A key loaded before: unchanged rows are skipped, changed rows update or are rejected. */
+  private void reload(
+      MigBatch batch, MigrationLoader loader, LoadUnit u, KeyXref x, LoadContext ctx) {
+    if (x.getRowHash().equals(u.hash())) {
+      statuses.finish(u.allRows(), RowStatus.SKIPPED, "Already loaded as " + x.getTargetCode());
+    } else {
       Optional<LoadOutcome> updated = loader.update(u, x, ctx);
-      if (updated.isEmpty()) {
+      if (updated.isPresent()) {
+        record(batch, u, x, updated.get());
+      } else {
         statuses.finish(
             u.allRows(),
             RowStatus.REJECTED,
             CHANGED + ": the record was loaded before with other values");
-        return;
       }
-      record(batch, u, x, updated.get());
-      return;
     }
-    LoadOutcome outcome = loader.load(u, ctx);
-    KeyXref x =
-        existing.orElseGet(
-            () ->
-                new KeyXref(batch.getCompanyId(), u.sourceSystem(), p.objectCode(), u.legacyKey()));
-    record(batch, u, x, outcome);
   }
 
   private void record(MigBatch batch, LoadUnit u, KeyXref x, LoadOutcome outcome) {

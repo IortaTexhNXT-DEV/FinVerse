@@ -61,29 +61,36 @@ public class GateMatrix {
               .filter(b -> b.getStatus() != BatchStatus.ROLLED_BACK)
               .findFirst()
               .orElse(null);
-      Map<Gate, Cell> cells = new EnumMap<>(Gate.class);
-      for (MigSignoff s : all) {
-        boolean objectGate = s.getGate() == Gate.G1 || s.getGate() == Gate.G2;
-        boolean mine = s.getObjectCode().equals(o.getCode());
-        boolean ofBatch = latest != null && latest.getId().equals(s.getBatchId());
-        if (mine && (objectGate || ofBatch)) {
-          cells.merge(s.getGate(), Cell.of(s), Cell::combine);
-        }
-      }
+      Map<Gate, Cell> cells = cells(all, o.getCode(), latest);
       golive.ifPresent(s -> cells.put(Gate.G7, Cell.of(s)));
       out.add(
           new Row(
               o.getCode(),
               o.getName(),
-              o.getDecidedClass() == null
-                  ? o.getProposedClass().name()
-                  : o.getDecidedClass().name(),
+              classOf(o),
               o.getStatus().name(),
-              latest == null ? null : latest.getBatchNo(),
-              latest == null ? null : latest.getStatus().name(),
+              Optional.ofNullable(latest).map(MigBatch::getBatchNo).orElse(null),
+              Optional.ofNullable(latest).map(b -> b.getStatus().name()).orElse(null),
               cells));
     }
     return out;
+  }
+
+  private static String classOf(MigDataObject o) {
+    return o.getDecidedClass() == null ? o.getProposedClass().name() : o.getDecidedClass().name();
+  }
+
+  /** The object gates G1-G2 and the gates of the latest batch. */
+  private static Map<Gate, Cell> cells(List<MigSignoff> all, String code, MigBatch latest) {
+    Map<Gate, Cell> cells = new EnumMap<>(Gate.class);
+    for (MigSignoff s : all) {
+      boolean objectGate = s.getGate() == Gate.G1 || s.getGate() == Gate.G2;
+      boolean ofBatch = latest != null && latest.getId().equals(s.getBatchId());
+      if (s.getObjectCode().equals(code) && (objectGate || ofBatch)) {
+        cells.merge(s.getGate(), Cell.of(s), Cell::combine);
+      }
+    }
+    return cells;
   }
 
   /**

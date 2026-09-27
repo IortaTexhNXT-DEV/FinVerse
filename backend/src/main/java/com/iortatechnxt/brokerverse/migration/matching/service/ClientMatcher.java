@@ -163,13 +163,18 @@ public class ClientMatcher {
     }
     Map<String, Pair> out = new LinkedHashMap<>();
     for (List<Candidate> block : blocks.values()) {
-      for (int i = 0; i < block.size(); i++) {
-        for (int j = i + 1; j < block.size(); j++) {
-          Candidate a = block.get(i);
-          Candidate b = block.get(j);
-          if (a.rowId() == null && b.rowId() == null) {
-            continue;
-          }
+      pairsOf(block, out);
+    }
+    return new ArrayList<>(out.values());
+  }
+
+  /** Every pair of a block with at least one legacy record, the best score per pair. */
+  private static void pairsOf(List<Candidate> block, Map<String, Pair> out) {
+    for (int i = 0; i < block.size(); i++) {
+      for (int j = i + 1; j < block.size(); j++) {
+        Candidate a = block.get(i);
+        Candidate b = block.get(j);
+        if (a.rowId() != null || b.rowId() != null) {
           Pair p = score(a.rowId() == null ? b : a, a.rowId() == null ? a : b);
           out.merge(
               pairKey(p.left().key(), p.right().key()),
@@ -178,32 +183,41 @@ public class ClientMatcher {
         }
       }
     }
-    return new ArrayList<>(out.values());
   }
 
   private static Pair score(Candidate a, Candidate b) {
     MatchKeys x = a.keys();
     MatchKeys y = b.keys();
     Set<String> keys = new TreeSet<>();
-    int hard = 0;
-    hard = Math.max(hard, same(x.tin(), y.tin()) ? add(keys, "K1", HARD) : 0);
-    hard = Math.max(hard, same(x.id(), y.id()) ? add(keys, "K2", HARD) : 0);
-    hard = Math.max(hard, same(x.person(), y.person()) ? add(keys, "K3", PERSON) : 0);
+    int hard = hardScore(x, y, keys);
+    int soft =
+        keyScore(same(x.email(), y.email()), keys, "K6 e-mail", SOFT)
+            + keyScore(same(x.mobile(), y.mobile()), keys, "K6 mobile", SOFT);
+    boolean similarBlock = same(x.birthDate(), y.birthDate()) || same(x.city(), y.city());
+    int similar =
+        keyScore(
+            similarBlock && MatchKeys.similarity(x.name(), y.name()) >= SIMILARITY,
+            keys,
+            "K7",
+            SIMILAR);
+    return new Pair(
+        a, b, Math.min(HARD, Math.max(hard, Math.max(soft, similar))), List.copyOf(keys));
+  }
+
+  /** The best of the hard keys K1 to K5. */
+  private static int hardScore(MatchKeys x, MatchKeys y, Set<String> keys) {
+    int hard = keyScore(same(x.tin(), y.tin()), keys, "K1", HARD);
+    hard = Math.max(hard, keyScore(same(x.id(), y.id()), keys, "K2", HARD));
+    hard = Math.max(hard, keyScore(same(x.person(), y.person()), keys, "K3", PERSON));
     if (same(x.corporate(), y.corporate())) {
       boolean reg = same(x.registration(), y.registration());
       hard = Math.max(hard, add(keys, "K4", reg ? CORPORATE_REG : CORPORATE));
     }
-    hard = Math.max(hard, same(x.cif(), y.cif()) ? add(keys, "K5", HARD) : 0);
-    int soft =
-        (same(x.email(), y.email()) ? add(keys, "K6 e-mail", SOFT) : 0)
-            + (same(x.mobile(), y.mobile()) ? add(keys, "K6 mobile", SOFT) : 0);
-    boolean similarBlock = same(x.birthDate(), y.birthDate()) || same(x.city(), y.city());
-    int similar =
-        similarBlock && MatchKeys.similarity(x.name(), y.name()) >= SIMILARITY
-            ? add(keys, "K7", SIMILAR)
-            : 0;
-    return new Pair(
-        a, b, Math.min(HARD, Math.max(hard, Math.max(soft, similar))), List.copyOf(keys));
+    return Math.max(hard, keyScore(same(x.cif(), y.cif()), keys, "K5", HARD));
+  }
+
+  private static int keyScore(boolean matched, Set<String> keys, String key, int score) {
+    return matched ? add(keys, key, score) : 0;
   }
 
   private static int add(Set<String> keys, String key, int score) {

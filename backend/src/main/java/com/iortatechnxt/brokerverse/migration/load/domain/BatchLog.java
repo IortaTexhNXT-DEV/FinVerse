@@ -16,6 +16,8 @@ import java.time.Instant;
 @Table(name = "mig_batch_log")
 public class BatchLog {
 
+  private static final int MAX_MESSAGE = 2000;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -65,7 +67,7 @@ public class BatchLog {
     this.batchId = batchId;
     this.step = step;
     this.level = level;
-    this.message = message.length() > 2000 ? message.substring(0, 2000) : message;
+    this.message = message.length() > MAX_MESSAGE ? message.substring(0, MAX_MESSAGE) : message;
     this.counts = counts;
     this.loggedBy = user;
     this.loggedAt = when;

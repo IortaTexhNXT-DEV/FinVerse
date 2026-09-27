@@ -17,6 +17,10 @@ import java.time.Instant;
 @Table(name = "mig_access_log")
 public class AccessLog {
 
+  private static final int MAX_CRITERIA = 1000;
+  private static final int MAX_KEYS = 2000;
+  private static final int MAX_REASON = 500;
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
@@ -68,11 +72,11 @@ public class AccessLog {
     this.accessedAt = who.when();
     this.sourceAddress = who.address();
     this.action = action;
-    this.criteria = clip(what.criteria(), 1000);
-    this.recordKeys = clip(what.keys(), 2000);
+    this.criteria = clip(what.criteria(), MAX_CRITERIA);
+    this.recordKeys = clip(what.keys(), MAX_KEYS);
     this.resultCount = what.count();
     this.reasonCode = reason.code();
-    this.reasonText = clip(reason.text(), 500);
+    this.reasonText = clip(reason.text(), MAX_REASON);
   }
 
   private static String clip(String text, int max) {

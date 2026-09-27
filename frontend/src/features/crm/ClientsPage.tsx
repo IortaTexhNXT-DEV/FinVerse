@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
+import { OriginBadge } from '@/components/ui/OriginBadge';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
@@ -99,7 +100,16 @@ export default function ClientsPage() {
           emptyMessage="No items to display"
           columns={[
             { key: 'code', header: 'Code', render: (c) => <span className="mono">{c.code}</span> },
-            { key: 'name', header: 'Name', render: (c) => c.displayName },
+            {
+              key: 'name',
+              header: 'Name',
+              render: (c) => (
+                <span className="row">
+                  {c.displayName}
+                  <OriginBadge record={c} />
+                </span>
+              ),
+            },
             { key: 'type', header: 'Type', render: (c) => humanize(c.clientType) },
             { key: 'segment', header: 'Segment', render: (c) => c.marketSegment ?? '' },
             { key: 'bank', header: 'Bank', render: (c) => (c.bankClient ? 'Yes' : 'No') },

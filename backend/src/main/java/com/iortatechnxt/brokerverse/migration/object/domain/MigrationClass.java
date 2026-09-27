@@ -23,6 +23,6 @@ public enum MigrationClass {
    * @return true for MIGRATE, CARRY_FORWARD and a met CONDITIONAL
    */
   public boolean loadable(boolean conditionMet) {
-    return this == MIGRATE || this == CARRY_FORWARD || (this == CONDITIONAL && conditionMet);
+    return this == MIGRATE || this == CARRY_FORWARD || this == CONDITIONAL && conditionMet;
   }
 }

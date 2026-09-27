@@ -333,7 +333,6 @@ public class CodeMapService {
         versions.findBySetCodeAndStatus(version.getSetCode(), MapVersionStatus.APPROVED).stream()
             .filter(p -> !p.getId().equals(versionId))
             .toList();
-    version.approve(user, clock.instant());
     for (CodeMapVersion p : previous) {
       p.supersede();
       versions.saveAndFlush(p);
@@ -343,6 +342,7 @@ public class CodeMapService {
           "supersede",
           version.label());
     }
+    version.approve(user, clock.instant());
     versions.saveAndFlush(version);
     workflow.move(MigrationCodes.ENTITY_MAP_VERSION, String.valueOf(versionId), "approve", comment);
     audit.record(

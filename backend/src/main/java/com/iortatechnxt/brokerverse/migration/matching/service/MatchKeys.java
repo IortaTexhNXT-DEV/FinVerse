@@ -39,6 +39,8 @@ public record MatchKeys(
     String birthDate,
     String city) {
 
+  private static final int GRAM = 3;
+
   private static final int MIN_TIN = 9;
   private static final Pattern MARKS = Pattern.compile("\\p{M}+");
   private static final List<String> SUFFIXES =
@@ -158,7 +160,7 @@ public record MatchKeys(
     String padded = "  " + s + " ";
     Set<String> out = new HashSet<>();
     for (int i = 0; i + 2 < padded.length(); i++) {
-      out.add(padded.substring(i, i + 3));
+      out.add(padded.substring(i, i + GRAM));
     }
     return out;
   }

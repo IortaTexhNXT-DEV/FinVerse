@@ -17,6 +17,9 @@ import java.time.Instant;
 @Table(name = "mig_issue")
 public class MigIssue extends BaseEntity {
 
+  private static final int MAX_VALUE = 300;
+  private static final int MAX_MESSAGE = 1000;
+
   /** Severity of an issue. */
   public enum Severity {
     /** The row does not load. */
@@ -92,8 +95,8 @@ public class MigIssue extends BaseEntity {
     this.ruleCode = finding.ruleCode();
     this.severity = finding.severity();
     this.field = finding.field();
-    this.value = clip(finding.value(), 300);
-    this.message = clip(finding.message(), 1000);
+    this.value = clip(finding.value(), MAX_VALUE);
+    this.message = clip(finding.message(), MAX_MESSAGE);
   }
 
   private static String clip(String text, int max) {

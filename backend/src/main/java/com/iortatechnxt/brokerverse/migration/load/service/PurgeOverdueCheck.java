@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class PurgeOverdueCheck implements AlertCheck {
 
+  private static final int DUE_COLUMN = 3;
+
   private final JdbcTemplate jdbc;
 
   /**
@@ -44,7 +46,7 @@ public class PurgeOverdueCheck implements AlertCheck {
                   "Staging data of batch "
                       + batchNo
                       + " is kept past its purge date "
-                      + rs.getObject(3, LocalDate.class),
+                      + rs.getObject(DUE_COLUMN, LocalDate.class),
                   null,
                   MigrationCodes.ALERT_PURGE_OVERDUE + ":" + batchNo));
         },

@@ -21,6 +21,9 @@ import java.time.Instant;
 @Table(name = "mig_recon_line")
 public class ReconLine extends BaseEntity {
 
+  private static final int MAX_MEASURE = 200;
+  private static final int MAX_DETAIL = 1000;
+
   /** Status of a line. */
   public enum Status {
     MATCHED,
@@ -103,7 +106,7 @@ public class ReconLine extends BaseEntity {
       String detail) {
     this.runId = runId;
     this.level = level;
-    this.measure = measure.length() > 200 ? measure.substring(0, 200) : measure;
+    this.measure = measure.length() > MAX_MEASURE ? measure.substring(0, MAX_MEASURE) : measure;
     this.currency = currency;
     this.sourceValue = values.source();
     this.stagedValue = values.staged();
@@ -115,7 +118,8 @@ public class ReconLine extends BaseEntity {
     boolean matched =
         difference == null ? values.matched() : difference.abs().compareTo(tolerance) <= 0;
     this.status = matched ? Status.MATCHED : Status.BREAK;
-    this.detail = detail == null || detail.length() <= 1000 ? detail : detail.substring(0, 1000);
+    this.detail =
+        detail == null || detail.length() <= MAX_DETAIL ? detail : detail.substring(0, MAX_DETAIL);
   }
 
   /**

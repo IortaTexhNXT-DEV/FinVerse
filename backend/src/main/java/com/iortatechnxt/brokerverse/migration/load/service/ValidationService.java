@@ -136,21 +136,7 @@ public class ValidationService {
     batch.requireStatus("validated", BatchStatus.PLANNED, BatchStatus.VALIDATED);
     Map<String, List<StageRow>> byLayout = plans.rowsByLayout(batch, TO_VALIDATE);
     Map<String, List<LayoutColumn>> columns = new HashMap<>();
-    Set<String> sets = new HashSet<>();
-    for (String code : byLayout.keySet()) {
-      Layout layout = layouts.current(code).orElseGet(() -> layouts.requireCurrent(code));
-      List<LayoutColumn> cols = layouts.columns(layout.getId());
-      columns.put(code, cols);
-      cols.stream()
-          .map(LayoutColumn::getMapSet)
-          .filter(s -> s != null && !s.isBlank())
-          .forEach(sets::add);
-    }
-    if (REFERENCE_LISTS.equals(batch.getObjectCode())) {
-      sets.addAll(maps.approvedWithPrefix("LOV:").versions().keySet());
-      sets.addAll(maps.approvedWithPrefix("MIS:").versions().keySet());
-    }
-    CodeMaps approved = maps.approved(sets);
+    CodeMaps approved = maps.approved(mapSets(batch, byLayout.keySet(), columns));
     Map<Long, String> sources =
         extracts.findAllById(batch.getExtractIds()).stream()
             .collect(Collectors.toMap(MigExtract::getId, MigExtract::getSourceSystem));
@@ -191,6 +177,26 @@ public class ValidationService {
             + " client pairs to review");
     raiseUnmapped(batch, unmapped);
     return batch;
+  }
+
+  /** The columns of the layouts in force and the code map sets they use (all lists for R01). */
+  private Set<String> mapSets(
+      MigBatch batch, Set<String> layoutCodes, Map<String, List<LayoutColumn>> columns) {
+    Set<String> sets = new HashSet<>();
+    for (String code : layoutCodes) {
+      Layout layout = layouts.current(code).orElseGet(() -> layouts.requireCurrent(code));
+      List<LayoutColumn> cols = layouts.columns(layout.getId());
+      columns.put(code, cols);
+      cols.stream()
+          .map(LayoutColumn::getMapSet)
+          .filter(s -> s != null && !s.isBlank())
+          .forEach(sets::add);
+    }
+    if (REFERENCE_LISTS.equals(batch.getObjectCode())) {
+      sets.addAll(maps.approvedWithPrefix("LOV:").versions().keySet());
+      sets.addAll(maps.approvedWithPrefix("MIS:").versions().keySet());
+    }
+    return sets;
   }
 
   private void apply(MigBatch batch, List<StageRow> all, RuleEngine.Outcome outcome) {
@@ -278,25 +284,10 @@ public class ValidationService {
       String batchNo, List<Long> rowIds, MigIssue.Resolution how, String reason, String note) {
     MigBatch batch = plans.get(batchNo);
     batch.requireStatus("changed", BatchStatus.VALIDATED);
-    if (reason == null || reason.isBlank() || note == null || note.isBlank()) {
-      throw new BusinessRuleException(
-          "MIG_REASON_REQUIRED",
-          how == MigIssue.Resolution.EXCLUDED
-              ? "Enter the reason and the manual-entry plan of the excluded rows"
-              : "Enter the reason and the remarks of the waiver");
-    }
+    requireReason(how, reason, note);
     String user = currentUser.username();
     for (StageRow row : rows.findAllById(rowIds)) {
-      if (!batch.getId().equals(row.getBatchId())) {
-        throw new ResourceNotFoundException("StageRow", row.getId());
-      }
-      for (MigIssue i : issues.findByStageRowId(row.getId())) {
-        boolean applies = how == MigIssue.Resolution.EXCLUDED || i.isOpenError();
-        if (applies && i.getResolution() == MigIssue.Resolution.OPEN) {
-          i.resolve(how, reason, note, user, clock.instant());
-        }
-      }
-      row.mark(how == MigIssue.Resolution.EXCLUDED ? RowStatus.EXCLUDED : RowStatus.WARNING);
+      resolveRow(batch, row, new Resolving(how, reason, note, user));
     }
     counter.recount(batch);
     log.info(
@@ -316,6 +307,31 @@ public class ValidationService {
         rowIds.size() + " rows " + how + " (" + reason + "): " + note);
     return batch;
   }
+
+  private static void requireReason(MigIssue.Resolution how, String reason, String note) {
+    if (reason == null || reason.isBlank() || note == null || note.isBlank()) {
+      throw new BusinessRuleException(
+          "MIG_REASON_REQUIRED",
+          how == MigIssue.Resolution.EXCLUDED
+              ? "Enter the reason and the manual-entry plan of the excluded rows"
+              : "Enter the reason and the remarks of the waiver");
+    }
+  }
+
+  private void resolveRow(MigBatch batch, StageRow row, Resolving r) {
+    if (!batch.getId().equals(row.getBatchId())) {
+      throw new ResourceNotFoundException("StageRow", row.getId());
+    }
+    boolean exclude = r.how() == MigIssue.Resolution.EXCLUDED;
+    for (MigIssue i : issues.findByStageRowId(row.getId())) {
+      if ((exclude || i.isOpenError()) && i.getResolution() == MigIssue.Resolution.OPEN) {
+        i.resolve(r.how(), r.reason(), r.note(), r.user(), clock.instant());
+      }
+    }
+    row.mark(exclude ? RowStatus.EXCLUDED : RowStatus.WARNING);
+  }
+
+  private record Resolving(MigIssue.Resolution how, String reason, String note, String user) {}
 
   /**
    * Records the resolution of an issue by the Data Steward (fixed at source or mapped); the row is

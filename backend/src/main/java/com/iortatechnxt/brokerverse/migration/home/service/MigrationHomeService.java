@@ -89,29 +89,30 @@ public class MigrationHomeService {
             + NEXT_TASKS,
         (rs, i) ->
             new Task(
-                rs.getString(1),
-                rs.getInt(2),
-                rs.getString(3),
-                rs.getString(4),
-                rs.getString(5),
-                rs.getObject(6, LocalDateTime.class),
-                rs.getString(7)),
+                rs.getString("plan_no"),
+                rs.getInt("seq"),
+                rs.getString("phase"),
+                rs.getString("task"),
+                rs.getString("owner_role"),
+                rs.getObject("planned_start", LocalDateTime.class),
+                rs.getString("status")),
         companyId);
   }
 
   private List<Runoff> runoff(Long companyId) {
     return jdbc.query(
-        "select expiry_month, sum(headers_in_force), sum(renewed), sum(not_renewed + lapsed),"
-            + " sum(still_open) from mig_runoff_cohort where company_id = ? and snapshot_date ="
+        "select expiry_month, sum(headers_in_force) as in_force, sum(renewed) as renewed,"
+            + " sum(not_renewed + lapsed) as not_renewed, sum(still_open) as still_open"
+            + " from mig_runoff_cohort where company_id = ? and snapshot_date ="
             + " (select max(snapshot_date) from mig_runoff_cohort where company_id = ?)"
             + " group by expiry_month order by expiry_month",
         (rs, i) ->
             new Runoff(
-                rs.getObject(1, LocalDate.class),
-                rs.getInt(2),
-                rs.getInt(3),
-                rs.getInt(4),
-                rs.getInt(5)),
+                rs.getObject("expiry_month", LocalDate.class),
+                rs.getInt("in_force"),
+                rs.getInt("renewed"),
+                rs.getInt("not_renewed"),
+                rs.getInt("still_open")),
         companyId,
         companyId);
   }

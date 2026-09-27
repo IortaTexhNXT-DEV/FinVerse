@@ -23,6 +23,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class Masker {
 
+  private static final int THIRD = 3;
+
   private static final List<String> LAST_NAMES =
       List.of(
           "Abad",
@@ -165,7 +167,7 @@ public class Masker {
       case CORPORATE_NAME ->
           pick(COMPANY_WORDS, d, 0) + " " + pick(COMPANY_WORDS, d, 1) + " Corporation";
       case ADDRESS ->
-          (1 + unsigned(d, 2) * unsigned(d, 3) % HOUSE_NUMBERS)
+          (1 + unsigned(d, 2) * unsigned(d, THIRD) % HOUSE_NUMBERS)
               + " "
               + pick(STREETS, d, 0)
               + " Street";

@@ -21,6 +21,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class CodeMapExcel {
 
+  private static final int MAX_SHEET_NAME = 31;
+
   /** Columns of the code map sheet. */
   public static final List<String> COLUMNS =
       List.of(
@@ -73,7 +75,7 @@ public class CodeMapExcel {
 
   private static String sheet(String setCode) {
     String name = setCode.replaceAll("[\\\\/?*\\[\\]:]", "_");
-    return name.length() > 31 ? name.substring(0, 31) : name;
+    return name.length() > MAX_SHEET_NAME ? name.substring(0, MAX_SHEET_NAME) : name;
   }
 
   /**

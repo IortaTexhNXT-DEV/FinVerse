@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class TemplateExport {
 
+  private static final int MAX_SHEET_NAME = 31;
+
   /** Columns of the control file sent with every data file (one row per measure). */
   public static final List<String> CONTROL_COLUMNS =
       List.of(
@@ -161,7 +163,7 @@ public class TemplateExport {
 
   private static String sheetName(Layout layout) {
     String name = layout.getCode() + " " + layout.getTitle().replaceAll("[\\\\/?*\\[\\]:]", " ");
-    return name.length() > 31 ? name.substring(0, 31).trim() : name;
+    return name.length() > MAX_SHEET_NAME ? name.substring(0, MAX_SHEET_NAME).trim() : name;
   }
 
   private List<String> header(Layout layout) {

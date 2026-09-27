@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.crm.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails.Contact;
 import com.iortatechnxt.brokerverse.crm.domain.ClientDetails.Identity;
@@ -165,6 +166,8 @@ public class Client extends BaseEntity {
 
   @Embedded private ClientKeys keys;
 
+  @Embedded private RecordOrigin recordOrigin = RecordOrigin.BIBS;
+
   protected Client() {}
 
   /**
@@ -322,6 +325,19 @@ public class Client extends BaseEntity {
     this.deactivationNote = note;
     this.deactivatedBy = user;
     this.deactivatedAt = when;
+  }
+
+  /**
+   * Marks the client as migrated from a legacy system (BRD-13); set before the first save.
+   *
+   * @param origin source system, legacy client code and loading batch
+   */
+  public void migratedFrom(RecordOrigin origin) {
+    this.recordOrigin = origin;
+  }
+
+  public RecordOrigin getRecordOrigin() {
+    return recordOrigin == null ? RecordOrigin.BIBS : recordOrigin;
   }
 
   private static void requireText(String value, String field) {

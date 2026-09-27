@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class XrefService {
 
+  private static final int PAGE = 1000;
+
   private final KeyXrefRepository xrefs;
 
   /**
@@ -93,7 +95,7 @@ public class XrefService {
   public Set<String> loaded(Long companyId, String objectCode, Collection<String> keys) {
     Set<String> out = new HashSet<>();
     List<String> list = keys.stream().filter(k -> k != null && !k.isBlank()).distinct().toList();
-    int page = 1000;
+    int page = PAGE;
     for (int from = 0; from < list.size(); from += page) {
       xrefs
           .findByCompanyIdAndObjectCodeAndLegacyKeyInAndRolledBackAtIsNull(

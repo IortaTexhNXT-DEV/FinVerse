@@ -191,21 +191,19 @@ public class RuleEngine {
     String set = c.getMapSet();
     Optional<CodeMaps.Resolution> r = m.maps().resolve(set, m.source(), value.strip());
     if (r.isEmpty()) {
-      Finding f =
-          new Finding(
-              LOOKUP,
-              c.isMandatory() ? Severity.ERROR : Severity.WARNING,
-              c.getName(),
-              value,
-              "Code " + value + " of " + set + " is not mapped");
-      m.sink().add(row, f);
+      m.sink()
+          .add(
+              row,
+              new Finding(
+                  LOOKUP,
+                  c.isMandatory() ? Severity.ERROR : Severity.WARNING,
+                  c.getName(),
+                  value,
+                  "Code " + value + " of " + set + " is not mapped"));
       if (!c.isMandatory()) {
         m.mapped().remove(c.getName());
       }
-      return;
-    }
-    CodeMaps.Resolution res = r.get();
-    if (res.action() == EntryAction.REJECT) {
+    } else if (r.get().action() == EntryAction.REJECT) {
       m.sink()
           .error(
               row,
@@ -213,9 +211,9 @@ public class RuleEngine {
               c.getName(),
               value,
               "Code " + value + " of " + set + " is rejected by the code map");
-      return;
+    } else {
+      m.mapped().put(c.getName(), r.get().target() == null ? value.strip() : r.get().target());
     }
-    m.mapped().put(c.getName(), res.target() == null ? value.strip() : res.target());
   }
 
   private record Mapping(

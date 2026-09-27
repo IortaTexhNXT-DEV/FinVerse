@@ -60,7 +60,8 @@ class MigrationFoundationApiIT {
     String head =
         "R01,R01,QPS," + fileName + ",2026-11-20 18:00:00,2026-11-20 19:00:00,qps-extract,";
     String control =
-        "object,layout,source_system,data_file,as_of,extracted_at,extracted_by,measure,column_name,currency,filter,value\n"
+        "object,layout,source_system,data_file,as_of,extracted_at,extracted_by,"
+            + "measure,column_name,currency,filter,value\n"
             + head
             + "ROW_COUNT,,,,"
             + rows.size()

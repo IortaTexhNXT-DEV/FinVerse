@@ -90,12 +90,12 @@ const fills = {
   modify_user: [['Request Type', 'Modify user'], ['User ID', 'a013000101'], ['Full Name', 'SIT Enrolled User Santos']],
   new_profile: [
     ['Profile Code', 'UAT_ENQUIRY'], ['Name', 'Client enquiry (seed data)'],
-    ['Description', 'Read-only enquiry of clients and reports'], ['CLIENT_VIEW', true], ['REPORT_VIEW', true],
+    ['Description', 'Read-only enquiry of clients and reports'], ['Client view', true], ['Report view', true],
     ['Approvers in Order', 'Ulysses'], ['Approvers in Order', '\\(approver\\)'],
     ['Remarks (Justification)', 'Enquiry profile for the contact centre (seed data)'],
   ],
-  modify_profile: [['Request Type', 'Modify group profile'], ['Group Profile', '^MKT_AO '], ['UAM_VIEW', true]],
-  deactivate_profile: [['Request Type', 'Deactivate group profile'], ['Group Profile', '^PROCESSING_TL ']],
+  modify_profile: [['Request Type', 'Modify group profile'], ['Group Profile', '^Marketing Account Officer'], ['User access view', true]],
+  deactivate_profile: [['Request Type', 'Deactivate group profile'], ['Group Profile', '^Processing Team Lead']],
   report_profile: [['Group Profile (code)', 'UAM_APPROVER']],
 };
 
@@ -171,6 +171,19 @@ const custom = {
     await page.waitForTimeout(600);
     await page.getByRole('button', { name: /^upload and validate$/i }).first().click();
     await ctx.settle(page, 2500);
+    return page;
+  },
+  // A change of a security setting asked by the System Administrator, as the Information Security Officer sees it.
+  'scr-ua-18-02-approve': async (ctx) => {
+    const pending = ctx.sql("select 1 from sys_parameter where param_key = 'PASSWORD_MIN_AGE_DAYS' and pending_value is not null");
+    if (pending.length === 0) {
+      await ctx.api('admin', 'PUT', '/system/parameters/PASSWORD_MIN_AGE_DAYS', { value: '2' });
+    }
+    const page = await ctx.pageOf('infosec');
+    await page.goto(`${ctx.BASE}/admin/parameters`);
+    await ctx.settle(page);
+    await page.locator('table tbody tr').filter({ hasText: 'PASSWORD_MIN_AGE_DAYS' }).first().click();
+    await ctx.settle(page, 800);
     return page;
   },
   // The sessions of the Requestor, opened from the Users screen.

@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.RolePermissionChange;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessImplementationService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessMatrix;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessMatrixService;
+import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestDescriber;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
 import com.iortatechnxt.brokerverse.security.api.dto.RoleRequest;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
@@ -44,6 +45,7 @@ class RolePermissionRequestIT {
   @Autowired private ApprovalInboxService inbox;
   @Autowired private AsUser as;
   @Autowired private Api api;
+  @Autowired private AccessRequestDescriber describer;
 
   private String newRole() {
     String code = "PM_TEST_" + System.nanoTime();
@@ -80,9 +82,10 @@ class RolePermissionRequestIT {
     RolePermissionChange stored = request.permissionChange();
     assertThat(stored.added()).containsExactly("PRODUCT_VIEW");
     assertThat(stored.removed()).containsExactly("AUDIT_VIEW");
-    assertThat(AccessRequestService.describe(request))
+    assertThat(describer.describe(request))
         .isEqualTo(
-            "Change permissions of role " + role + ": add [PRODUCT_VIEW]; remove [AUDIT_VIEW]");
+            "Change the permissions of group profile Test role: add Product view; remove Audit"
+                + " view");
     assertThat(as.run("approver", () -> inbox.inbox(null)))
         .extracting(PendingApproval::reference)
         .contains(request.getRequestNo());
@@ -136,8 +139,8 @@ class RolePermissionRequestIT {
         .extracting("code")
         .isEqualTo("ACCESS_NO_PERMISSION_CHANGE");
     AccessRequest removal = submit(role, Set.of(), Set.of("AUDIT_VIEW"));
-    assertThat(AccessRequestService.describe(removal))
-        .isEqualTo("Change permissions of role " + role + ": remove [AUDIT_VIEW]");
+    assertThat(describer.describe(removal))
+        .isEqualTo("Change the permissions of group profile Test role: remove Audit view");
     as.run("approver", () -> requests.reject(removal.getId(), "Keep audit access"));
     assertThat(permissionsOf(role)).contains(Permission.AUDIT_VIEW);
   }
@@ -206,7 +209,7 @@ class RolePermissionRequestIT {
         .andExpect(jsonPath("$.type").value("MODIFY_ROLE_PERMISSIONS"))
         .andExpect(
             jsonPath("$.summary")
-                .value("Change permissions of role " + role + ": add [PRODUCT_VIEW]"));
+                .value("Change the permissions of group profile Test role: add Product view"));
     api.doGet("badmin", "/api/v1/nbadmin/access-matrix/by-action?area=PRODUCT_MAINTENANCE")
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.rows[0].area").value("PRODUCT_MAINTENANCE"))

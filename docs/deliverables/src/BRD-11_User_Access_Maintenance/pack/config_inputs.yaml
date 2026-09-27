@@ -8,7 +8,7 @@ meta:
   workbook_name: Configuration Inputs
   subtitle: What the business provides to set up User Access Maintenance, its role matrix and its rules
   due: "Drafts with the sign-off of this set; the role matrix and the users before the first data migration mock; the parameters agreed with Information Security before UAT"
-  codes_note: "Codes must be the codes of the other templates: the group profile codes of Role-to-permission matrix in Users and roles and in Separation-of-duties rules, the list codes of Lists of values in Users and roles."
+  codes_note: "Codes must be the codes of the other templates: the group profile codes of Role-to-permission matrix in Users and roles, and their names in Separation-of-duties rules, the list codes of Lists of values in Users and roles."
 templates:
   - id: CI-01
     name: Users and roles load
@@ -53,8 +53,8 @@ templates:
     content: Who requests and who approves user access, the order of the approvers of group-profile requests, the second approvers, the implementers, and the authorisation limits of the users whose work other modules approve by amount
     owner: Business Administration; BDOI Information Security for the second approval; Comptrollership for the authorisation limits
     source: BDOI's approval matrix (UQ01, UQ02)
-    load: "The users are given the Requestor, Approver, Second Approver and System Administrator profiles by requests (CI-01); the approvers are chosen on each request; UAM_ANY_APPROVER is set on System Parameters. The authorisation limit has no request field in this build: it is set by the System Administrator on the emergency path until the change request of section 10.4 is delivered"
-    frs: [FR-UA-015, FR-UA-034, FR-UA-044, FR-UA-045]
+    load: "The users are given the Requestor, Approver, Second Approver and System Administrator profiles by requests (CI-01); the approvers are chosen on each request; UAM_ANY_APPROVER is set on System Parameters. The authorisation limit is set by an Enrol new user or Modify user request (field Authorisation Limit) decided by an approver; the bulk file has no limit column, so the limits are requested after the users are loaded"
+    frs: [FR-UA-011, FR-UA-012, FR-UA-015, FR-UA-034, FR-UA-044, FR-UA-045]
     columns:
       - "Role in user access | Y | Requestor, Approver, Second Approver, Group-profile requester, Implementer | The user access role of the user | Approver"
       - "User ID | Y | User ID of CI-01 | The user who holds the role | a013000205"
@@ -68,15 +68,15 @@ templates:
     content: The rules BIBS enforces as built, for confirmation, and the combinations of profiles or permissions that BDOI Information Security does not allow one user to hold
     owner: BDOI Information Security
     source: BDOI information security policy; the separation-of-duties rules of FRS chapter 13
-    load: "The rules marked Built are fixed in BIBS; the privileged profiles are set by the privilege level of CI-02. Combinations of profiles are checked by review with the reports (the build has no automatic check of profile combinations; section 10.4)"
-    frs: [FR-UA-031, FR-UA-034, FR-UA-045]
+    load: "The rules marked Built are fixed in BIBS; the privileged profiles are set by the privilege level of CI-02. Each combination of two profiles is entered on Separation of Duties (SCR-UA-19) by the Business Administrator and authorised by Information Security; BIBS then refuses every request and bulk line that breaks it. A combination of permissions is reviewed with the reports"
+    frs: [FR-UA-031, FR-UA-034, FR-UA-045, FR-UA-053]
     columns:
       - "Rule ID | Y | SOD-nn | Identifier of the rule | SOD-01"
       - "Rule | Y | Text | The rule | The requester never decides his own request"
       - "Status | Y | Built, To confirm, New | Built = enforced by BIBS today | Built"
-      - "Profile or permission A | Cond.: combination rule | Code of CI-02 | First profile or permission of a combination | UAM_REQUESTOR"
-      - "Profile or permission B | Cond.: combination rule | Code of CI-02 | Profile or permission that may not be held with A | UAM_APPROVER"
-      - "Control | Y | Prevent, Detect by review, Second approval | How the rule is controlled | Detect by review"
+      - "Profile or permission A | Cond.: combination rule | Profile or permission of CI-02 | First profile or permission of a combination | User Access Requestor"
+      - "Profile or permission B | Cond.: combination rule | Profile or permission of CI-02 | Profile or permission that may not be held with A | User Access Approver"
+      - "Control | Y | Prevent (a rule of Separation of Duties, for two profiles), Detect by review, Second approval | How the rule is controlled | Prevent"
       - "Review frequency | Cond.: Detect by review | Monthly, Quarterly | How often the reports are reviewed | Quarterly"
   - id: CI-05
     name: Password, session and sign-in parameters
@@ -84,10 +84,10 @@ templates:
     content: The values of the sign-in, password, session and access-request parameters, as delivered and as BDOI Information Security wants them
     owner: BDOI Information Security; BDOI IT for the sign-in mode
     source: BDOI security policy (UQ07, UQ08); the values delivered (FRS section 9.1)
-    load: "System Parameters (SCR-UA-18) by the System Administrator, audited; checked in SIT with the test plan"
-    frs: [FR-UA-001, FR-UA-002, FR-UA-005, FR-UA-034, FR-UA-052]
+    load: "System Parameters (SCR-UA-18): entered by the System Administrator and approved by the Information Security Officer, audited; checked in SIT with the test plan"
+    frs: [FR-UA-001, FR-UA-002, FR-UA-005, FR-UA-006, FR-UA-034, FR-UA-052, FR-UA-054]
     columns:
-      - "Parameter | Y | LOGIN_MAX_FAILED_ATTEMPTS, SESSION_IDLE_WARNING_MINUTES, SESSION_TIMEOUT_MINUTES, SESSION_EXPIRY_WARNING_MINUTES, AUTH_MODE, USER_ID_PATTERN, PASSWORD_HISTORY_COUNT, PASSWORD_MAX_AGE_DAYS, PASSWORD_MIN_AGE_DAYS, UAM_WORKING_HOURS, UAM_ANY_APPROVER, UAM_ROLE_APPLY_ON_APPROVAL, JOB_FAILURE_RECIPIENTS | One row per parameter | PASSWORD_MAX_AGE_DAYS"
+      - "Parameter | Y | LOGIN_MAX_FAILED_ATTEMPTS, SESSION_IDLE_WARNING_MINUTES, SESSION_TIMEOUT_MINUTES, SESSION_EXPIRY_WARNING_MINUTES, AUTH_MODE, USER_ID_PATTERN, USER_ID_FORMAT_TEXT, PASSWORD_HISTORY_COUNT, PASSWORD_MAX_AGE_DAYS, PASSWORD_MIN_AGE_DAYS, UAM_WORKING_HOURS, UAM_ANY_APPROVER, UAM_ROLE_APPLY_ON_APPROVAL, UAM_EXTERNAL_USERS, UAM_DORMANT_DAYS, UAM_DORMANT_NOTICE_DAYS, JOB_FAILURE_RECIPIENTS | One row per parameter | PASSWORD_MAX_AGE_DAYS"
       - "Value as delivered | Y | As on System Parameters | The value of the build | 90"
       - "Value wanted | Y | Same type and range | The value BDOI wants | 90"
       - "Reason | Cond.: value changed | Text | Policy reference or reason | BDO password policy"
@@ -95,7 +95,7 @@ templates:
   - id: CI-06
     name: Lists of values
     sheet: Lists of values
-    content: The values of the lists of user access (business unit groups and user levels, empty as delivered; deactivation reasons, to confirm)
+    content: The values of the lists of user access (business unit groups and user levels, empty as delivered; deactivation reasons, to confirm with BDOI; the reason No sign-in for the dormancy period is used by the dormant-user job and stays)
     owner: Business Administration
     source: BDOI organisation (UQ05)
     load: "Lists of Values (New Business set) under maker-checker; before the users of CI-01 are loaded"

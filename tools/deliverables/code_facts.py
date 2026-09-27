@@ -668,7 +668,7 @@ def backend_messages(packages: Iterable[str]) -> list[Message]:
             consts = _java_constants(text)
             for m in re.finditer(r"new (BusinessRuleException|FieldValidationException|ResourceNotFoundException|"
                                  r"DuplicateResourceException|Violation|Warning|Unmet|BadCredentialsException|"
-                                 r"LockedException)\(", text):
+                                 r"LockedException|DisabledException)\(", text):
                 start = m.end() - 1
                 args = split_top(text[start + 1:matching(text, start)])
                 kind = m.group(1)
@@ -697,7 +697,7 @@ def backend_messages(packages: Iterable[str]) -> list[Message]:
                 elif kind == "DuplicateResourceException" and args:
                     pairs = [("DUPLICATE", f"{java_text(args[0], consts, p.stem)} already exists: <key>")]
                     label = "Duplicate"
-                elif kind in ("BadCredentialsException", "LockedException") and len(args) == 1:
+                elif kind in ("BadCredentialsException", "LockedException", "DisabledException") and len(args) == 1:
                     # Refused sign-ins: the platform handler answers AUTHENTICATION_FAILED with the text.
                     pairs = [("AUTHENTICATION_FAILED", java_text(args[0], consts, p.stem))]
                     label = "Business rule"

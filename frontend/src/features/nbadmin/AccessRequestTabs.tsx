@@ -7,7 +7,9 @@ import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { useLovLabel } from '@/components/broking/useLabels';
+import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
+import { permissionLabels } from '@/utils/permissionLabel';
 import { isGroupProfile, roleChanges, userStatus } from './accessRequest';
 
 interface Row {
@@ -22,29 +24,69 @@ const COMPARE: Column<Row>[] = [
   { key: 'r', header: 'Requested', render: (r) => r.requested ?? '—' },
 ];
 
-function rolesRequested(requested: string[], added: string[], removed: string[]): string {
-  if (added.length + removed.length === 0) {
-    return requested.join(', ');
-  }
-  const change = `added: ${added.join(', ') || '—'}; removed: ${removed.join(', ') || '—'}`;
-  return `${requested.join(', ')} (${change})`;
+/** Names of group profiles and of list values, for the rows of a request. */
+interface Names {
+  profile: (code: string) => string;
+  businessUnit: (code: string | null | undefined) => string;
+  userLevel: (code: string | null | undefined) => string;
 }
 
-function userRows(r: AccessRequest, user: UserAccess | undefined): Row[] {
+function profileList(codes: string[], names: Names): string {
+  return codes.map(names.profile).join(', ');
+}
+
+function rolesRequested(
+  requested: string[],
+  added: string[],
+  removed: string[],
+  names: Names,
+): string {
+  if (added.length + removed.length === 0) {
+    return profileList(requested, names);
+  }
+  const change = `added: ${profileList(added, names) || '—'}; removed: ${profileList(removed, names) || '—'}`;
+  return `${profileList(requested, names)} (${change})`;
+}
+
+function amount(value: number | null | undefined): string | undefined {
+  return value === undefined || value === null ? undefined : formatAmount(value);
+}
+
+function label(
+  of: (code: string | null | undefined) => string,
+  code: string | undefined,
+): string | undefined {
+  return code ? of(code) : undefined;
+}
+
+function userRows(r: AccessRequest, user: UserAccess | undefined, names: Names): Row[] {
   const d = r.details;
   const { added, removed } = roleChanges(user?.roleCodes ?? [], r.roleCodes);
   const rows: Row[] = [
     { attribute: 'Full name', current: user?.fullName, requested: r.fullName },
     { attribute: 'E-mail', current: user?.email, requested: r.email },
     { attribute: 'Windows ID', current: user?.windowsId, requested: d.windowsId },
-    { attribute: 'Business unit', current: user?.businessUnitCode, requested: d.businessUnitCode },
-    { attribute: 'User level', current: user?.userLevel, requested: d.userLevel },
+    {
+      attribute: 'Business unit',
+      current: label(names.businessUnit, user?.businessUnitCode),
+      requested: label(names.businessUnit, d.businessUnitCode),
+    },
+    {
+      attribute: 'User level',
+      current: label(names.userLevel, user?.userLevel),
+      requested: label(names.userLevel, d.userLevel),
+    },
+    {
+      attribute: 'Authorisation limit',
+      current: amount(user?.authorizationLimit),
+      requested: amount(d.authorizationLimit),
+    },
   ];
   if (r.roleCodes.length > 0) {
     rows.push({
       attribute: 'Group profiles',
-      current: user?.roleCodes.join(', '),
-      requested: rolesRequested(r.roleCodes, added, removed),
+      current: user === undefined ? undefined : profileList(user.roleCodes, names),
+      requested: rolesRequested(r.roleCodes, added, removed, names),
     });
   }
   if (user !== undefined) {
@@ -56,26 +98,39 @@ function userRows(r: AccessRequest, user: UserAccess | undefined): Row[] {
   return rows.filter((row) => row.requested !== undefined || row.attribute === 'Status');
 }
 
-function profileRows(r: AccessRequest): Row[] {
+function profileRows(r: AccessRequest, names: Names): Row[] {
   const d = r.details;
   return [
-    { attribute: 'Group profile', requested: r.roleCode },
+    {
+      attribute: 'Group profile',
+      requested: r.type === 'CREATE_ROLE' ? r.roleCode : names.profile(r.roleCode ?? ''),
+    },
     { attribute: 'Name', requested: d.roleName },
     { attribute: 'Description', requested: d.roleDescription },
     { attribute: 'Privilege level', requested: d.privilegeLevel && humanize(d.privilegeLevel) },
-    { attribute: 'Permissions added', requested: r.permissionsAdded.join(', ') || undefined },
-    { attribute: 'Permissions removed', requested: r.permissionsRemoved.join(', ') || undefined },
+    {
+      attribute: 'Permissions added',
+      requested: permissionLabels(r.permissionsAdded) || undefined,
+    },
+    {
+      attribute: 'Permissions removed',
+      requested: permissionLabels(r.permissionsRemoved) || undefined,
+    },
   ].filter((row) => row.requested !== undefined && row.requested !== '');
 }
 
-function extraFacts(r: AccessRequest, members: string[]): [string, string][] {
+function extraFacts(
+  r: AccessRequest,
+  members: string[],
+  reason: (code: string | null | undefined) => string,
+): [string, string][] {
   const d = r.details;
   const facts: [string, string][] = [['Remarks', r.justification ?? '—']];
   if (d.effectiveFrom) {
     facts.push(['Effective date', formatDate(d.effectiveFrom)]);
   }
   if (d.reasonCode) {
-    facts.push(['Reason', humanize(d.reasonCode)]);
+    facts.push(['Reason', reason(d.reasonCode)]);
   }
   if (d.partyCode) {
     facts.push(['Party', `${humanize(d.partyKind ?? '')} ${d.partyCode} · ${d.portalRole ?? ''}`]);
@@ -92,6 +147,15 @@ function extraFacts(r: AccessRequest, members: string[]): [string, string][] {
 /** Current and requested values of a request (FR-UA-030). */
 export function RequestDetails({ request: r }: Readonly<{ request: AccessRequest }>) {
   const users = useQuery({ queryKey: ['nbadmin', 'users'], queryFn: nbadminApi.users });
+  const roles = useQuery({ queryKey: ['nbadmin', 'roles'], queryFn: nbadminApi.roles });
+  const businessUnit = useLovLabel('UAM_BUSINESS_UNIT');
+  const userLevel = useLovLabel('UAM_USER_LEVEL');
+  const reason = useLovLabel('UAM_DEACTIVATION_REASON');
+  const names: Names = {
+    profile: (code) => roles.data?.find((x) => x.code === code)?.name ?? code,
+    businessUnit,
+    userLevel,
+  };
   const group = isGroupProfile(r.type);
   const user = users.data?.find((u) => u.username === r.username);
   const members = (users.data ?? [])
@@ -103,11 +167,11 @@ export function RequestDetails({ request: r }: Readonly<{ request: AccessRequest
         <DataTable<Row>
           caption="Current and requested values"
           columns={COMPARE}
-          rows={group ? profileRows(r) : userRows(r, user)}
+          rows={group ? profileRows(r, names) : userRows(r, user, names)}
           rowKey={(row) => row.attribute}
         />
         <dl className="detail-list">
-          {extraFacts(r, members).map(([label, value]) => (
+          {extraFacts(r, members, reason).map(([label, value]) => (
             <Fragment key={label}>
               <dt>{label}</dt>
               <dd>{value}</dd>

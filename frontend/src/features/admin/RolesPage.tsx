@@ -18,6 +18,8 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
+import { PermissionName } from '@/components/ui/PermissionName';
+import { permissionLabel, permissionLabels } from '@/utils/permissionLabel';
 
 function roleHeader(r: Role): string {
   const level = r.privilegeLevel ? ` · ${humanize(r.privilegeLevel)}` : '';
@@ -112,9 +114,9 @@ function ToImplement() {
             <p>{chosen.summary}</p>
             <dl className="detail-list">
               <dt>Permissions added</dt>
-              <dd className="mono">{chosen.permissionsAdded.join(', ') || '—'}</dd>
+              <dd>{permissionLabels(chosen.permissionsAdded) || '—'}</dd>
               <dt>Permissions removed</dt>
-              <dd className="mono">{chosen.permissionsRemoved.join(', ') || '—'}</dd>
+              <dd>{permissionLabels(chosen.permissionsRemoved) || '—'}</dd>
               <dt>Approved by</dt>
               <dd>
                 <UserName login={chosen.decidedBy} />
@@ -198,12 +200,14 @@ export default function RolesPage() {
             <tbody>
               {(permissions.data ?? []).map((p) => (
                 <tr key={p}>
-                  <td>{humanize(p)}</td>
+                  <td>
+                    <PermissionName code={p} />
+                  </td>
                   {list.map((r) => (
                     <td key={r.id} style={{ textAlign: 'center' }}>
                       <input
                         type="checkbox"
-                        aria-label={`${humanize(p)} for ${r.name}`}
+                        aria-label={`${permissionLabel(p)} for ${r.name}`}
                         disabled={!direct}
                         checked={(draft[r.id] ?? r.permissions).includes(p)}
                         onChange={() => toggle(r, p)}

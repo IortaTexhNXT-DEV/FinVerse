@@ -106,17 +106,33 @@ export const USER_ACCESS_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Separation of Duties',
+      path: '/user-access/sod-rules',
+      summary:
+        'The pairs of group profiles one user may not hold together. Every user request and every line of a bulk request is checked against the active rules, on submission and again at approval.',
+      workflow: [
+        'New Rule: the Business Administrator chooses the two group profiles and says why they are not held together; the rule waits for authorisation.',
+        'Information Security authorises or rejects the rule from this screen or from My Approvals; an authorised rule is active at once.',
+        'Deactivate asks for the end of an active rule; it stays active until Information Security authorises the deactivation.',
+      ],
+      controls: [
+        'Maker-checker: the user who created a rule or asked for its deactivation cannot authorise it.',
+        'A request giving a user both profiles of an active rule is refused with the names of the two profiles.',
+        'Every change and authorisation is recorded in the audit trail.',
+      ],
+    },
+    {
       name: 'User Access Reports',
       path: '/user-access/reports',
       summary:
-        'The five user access reports, each opened in the report runner with PDF, Excel and CSV exports: User Access Report (UAM-USER-ACCESS), User Group Profile Report (UAM-GROUP-PROFILE), Group Profile Membership (UAM-GROUP-MEMBERS), User Access Audit Log (UAM-AUDIT-LOG) and Access Requests (UAM-REQUESTS).',
+        'The five user access reports, each opened in the report runner with PDF, Excel and CSV exports: User Access Report, User Group Profile Report, Group Profile Membership, User Access Audit Log and Access Requests.',
       workflow: [
         'Open a report, set its parameters (as-of date, period, group profile, user...) and click Run; export the result to PDF, Excel or CSV.',
         'User Access Report and Group Profile Membership show the group profiles held at the end of the as-of date, rebuilt from the access change log.',
         'User Access Audit Log lists each activity with its from and to values, done by, approved by and request number; tick Include Log-ins and Log-outs to add the sign-in activity of the audit trail.',
       ],
       controls: [
-        'Needs UAM_REPORT_VIEW (Approver, Business Administrator, System Administrator, Auditor). Every run and export is kept in the report archive.',
+        'Open to the Approver, the Business Administrator, the System Administrator, the Information Security Officer and the Auditor. Every run and export is kept in the report archive.',
         'An as-of date in the future and a period ending before it starts are refused.',
         '"Created by" and "Modified by" show the approver and request number of the access request that applied the change, or the user who made a direct change.',
       ],

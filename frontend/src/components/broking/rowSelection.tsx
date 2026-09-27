@@ -34,15 +34,18 @@ export function useRowSelection(): RowSelection {
 
 /**
  * The checkbox column of a work list (BDO Insure table pattern): one box per row and a box in
- * the header that selects or clears the rows shown.
+ * the header that selects or clears the rows shown. A row that must be decided on its own
+ * (`reasonNotSelectable` gives the reason) shows a disabled box with the reason as its tooltip.
  */
 export function selectionColumn<T>(
   rows: T[],
   keyOf: (row: T) => string,
   selection: RowSelection,
   labelOf: (row: T) => string,
+  reasonNotSelectable?: (row: T) => string | undefined,
 ): Column<T> {
-  const keys = rows.map(keyOf);
+  const selectable = (row: T) => reasonNotSelectable?.(row) === undefined;
+  const keys = rows.filter(selectable).map(keyOf);
   const allOn = keys.length > 0 && keys.every((k) => selection.has(k));
   return {
     key: 'select',
@@ -56,14 +59,19 @@ export function selectionColumn<T>(
         onChange={(e) => selection.setAll(keys, e.target.checked)}
       />
     ),
-    render: (row) => (
-      <input
-        type="checkbox"
-        aria-label={`Select ${labelOf(row)}`}
-        checked={selection.has(keyOf(row))}
-        onClick={(e) => e.stopPropagation()}
-        onChange={() => selection.toggle(keyOf(row))}
-      />
-    ),
+    render: (row) => {
+      const reason = reasonNotSelectable?.(row);
+      return (
+        <input
+          type="checkbox"
+          aria-label={`Select ${labelOf(row)}`}
+          title={reason}
+          disabled={reason !== undefined}
+          checked={reason === undefined && selection.has(keyOf(row))}
+          onClick={(e) => e.stopPropagation()}
+          onChange={() => selection.toggle(keyOf(row))}
+        />
+      );
+    },
   };
 }

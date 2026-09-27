@@ -149,7 +149,9 @@ class UserAccessEndToEndApiIT {
     api.doGet("admin", "/api/v1/admin/sessions?username=" + userId)
         .andExpect(jsonPath("$.content[*].endReason", hasItem("ADMIN_ENDED")));
     bearer(get("/api/v1/auth/me"), token, null).andExpect(status().isUnauthorized());
-    login(userId, NEW_PASSWORD, status().is4xxClientError());
+    // A deactivated user is told so, and the attempt does not count towards the lock-out.
+    assertThat(login(userId, NEW_PASSWORD, status().isUnauthorized()).get("detail").asText())
+        .isEqualTo("Your account is deactivated. Contact your administrator.");
 
     assertTheAuditLog(userId, modifyNo, disableNo);
     assertThat(auditLog(null)).contains(profileNo);
@@ -279,8 +281,16 @@ class UserAccessEndToEndApiIT {
     return null;
   }
 
+  /** UAM_WORKING_HOURS is a security parameter: the change waits for Information Security. */
   private void setHours(String value) throws Exception {
-    api.doPut("admin", HOURS, Json.of("value", value)).andExpect(status().isOk());
+    api.doPut("admin", HOURS, Json.of("value", value))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.pendingValue").value(value));
+    api.doPost("admin", HOURS + "/approve", null).andExpect(status().isForbidden());
+    api.doPost("infosec", HOURS + "/approve", null)
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.value").value(value))
+        .andExpect(jsonPath("$.pendingValue").doesNotExist());
   }
 
   private JsonNode login(String username, String password) throws Exception {

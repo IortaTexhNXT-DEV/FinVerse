@@ -100,7 +100,7 @@ function Activation({ form, set, errors }: Readonly<FieldsProps>) {
             </option>
             {offered.map((r) => (
               <option key={r.code} value={r.code}>
-                {r.code} – {r.name}
+                {r.name}
               </option>
             ))}
           </select>
@@ -110,7 +110,7 @@ function Activation({ form, set, errors }: Readonly<FieldsProps>) {
         <div className="alert warning" role="status">
           {members.length === 0
             ? 'The profile has no members.'
-            : `Members who lose the profile's screens: ${members.map((m) => m.username).join(', ')}`}
+            : `Members who lose the profile's screens, and are told when it is implemented: ${members.map((m) => m.username).join(', ')}`}
         </div>
       )}
     </>

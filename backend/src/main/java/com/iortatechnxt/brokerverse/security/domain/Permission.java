@@ -319,6 +319,12 @@ public enum Permission {
   UAM_REPORT_VIEW,
   // Second approval of privileged or out-of-hours changes (UAM-NFR-40)
   UAM_SECOND_APPROVE,
+  // Separation-of-duties rules (pairs of group profiles one user may not hold), V1065: maintain
+  // (maker) and authorise (checker)
+  UAM_SOD_MAINTAIN,
+  UAM_SOD_AUTHORIZE,
+  // Second approval of a change of a security parameter (sign-in, password, session, access), V1065
+  SECURITY_PARAMETER_APPROVE,
 
   // Claims Handling (BDOI BRD-7, broking claims). See docs/architecture/CLAIMS_BROKING_DESIGN.md
   // section 7.1 and V1020. The insurer-side CLAIM_* permissions above stay hidden from BDOI roles.

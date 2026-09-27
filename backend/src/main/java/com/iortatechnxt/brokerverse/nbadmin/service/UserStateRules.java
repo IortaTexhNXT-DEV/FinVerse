@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedUserData;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.Role;
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -63,7 +64,12 @@ final class UserStateRules {
   private static boolean attributesChange(RequestedUserData d, AppUser user) {
     return differs(d.windowsId(), user.getWindowsId())
         || differs(d.businessUnitCode(), user.getBusinessUnitCode())
-        || differs(d.userLevel(), user.getUserLevel());
+        || differs(d.userLevel(), user.getUserLevel())
+        || limitDiffers(d.authorizationLimit(), user.getAuthorizationLimit());
+  }
+
+  private static boolean limitDiffers(BigDecimal requested, BigDecimal current) {
+    return requested != null && (current == null || requested.compareTo(current) != 0);
   }
 
   private static boolean differs(Object requested, Object current) {

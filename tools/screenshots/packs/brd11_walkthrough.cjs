@@ -263,6 +263,18 @@ const steps = {
     await settle(page, 1200);
     return page;
   },
+  'wt-c-12': async (ctx) => {
+    const page = await go(ctx, 'requestor', `${REQUESTS}/new`);
+    await fill(page, 'User ID', 'a013000197');
+    await fill(page, 'Full Name', 'Paolo Mendoza');
+    await page.getByLabel('User Access Requestor', { exact: true }).check();
+    await page.getByLabel('User Access Approver', { exact: true }).check();
+    await fill(page, 'Approver', 'Ulysses');
+    await fill(page, 'Remarks \\(Justification\\)', 'Raises and approves access requests (seed data)');
+    await button(page, /^submit$/i).click();
+    await settle(page, 1200);
+    return page;
+  },
   'wt-c-05': async (ctx) => openRequest(ctx, 'approver', seedRequest(ctx, 'AR-2026-900002')),
   'wt-c-06': async (ctx) => {
     // A group-profile request raised by the System Administrator and approved, so that he may try to implement it.

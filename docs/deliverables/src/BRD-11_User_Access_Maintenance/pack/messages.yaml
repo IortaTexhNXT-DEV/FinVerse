@@ -2,9 +2,9 @@
 # The message texts are read from the code by tools/deliverables/code_facts.py at every build (never typed here).
 # This file says where each message appears (by the class or file that raises it) and what the user does.
 sources:
-  backend_packages: [nbadmin, security]
-  # Data retention (Broking Setup › Data Retention) belongs to the New Business set.
-  exclude_classes: [RetentionRule, RetentionService]
+  backend_packages: [nbadmin, security, system]
+  # Data retention (Broking Setup › Data Retention) belongs to the New Business set; the job monitor to the platform.
+  exclude_classes: [RetentionRule, RetentionService, JobRegistry]
   bulk_handlers: [AccessRequestBulkHandler]
   bulk_screen: Bulk Request (SCR-UA-09)
   ui_patterns: extended
@@ -32,6 +32,9 @@ sources:
     - features/admin/UsersPage.tsx
     - features/admin/UserSessionsDialog.tsx
     - features/admin/RolesPage.tsx
+    - features/nbadmin/SodRulesPage.tsx
+    - features/nbadmin/sodRules.ts
+    - features/system/SystemParametersPage.tsx
 
 # Where a message appears: the first rule whose pattern matches the class (backend) or file (frontend) wins.
 places:
@@ -52,6 +55,8 @@ places:
   - [ "^(UserAccessReportsPage|UamReportSupport)$", "User access reports (SCR-UA-14, SCR-UA-17)" ]
   - [ "^(UsersPage|UserSessionsDialog|UserAdminService)$", "Users (SCR-UA-15)" ]
   - [ "^(RolesPage|RoleEditGuard|Role|AccessImplementationService)$", "Roles & Permissions: implementation (SCR-UA-16)" ]
+  - [ "^(SystemParametersPage|SecurityParameterApprovals|SystemParameter)$", "System Parameters (SCR-UA-18)" ]
+  - [ "^(SodRulesPage|sodRules|SodRuleService|SodRule)$", "Separation of Duties (SCR-UA-19)" ]
 
 # The fix the user makes. Messages that tell the user what to do ("Enter ...", "Select ...") are their own fix and are
 # not repeated here. Keys are message codes; frontend messages without a code use their text.
@@ -73,7 +78,8 @@ fixes:
   ACCESS_TYPE: Choose the type of request.
   ACCESS_USERNAME: Enter a user ID of 3 to 50 letters, digits, dots, dashes or underscores.
   ACCESS_USER_EXISTS: Choose Modify user for an existing user, or enter another user ID.
-  ACCESS_USER_ID_FORMAT: Enter the user ID in the BDOI format (a letter followed by nine digits, for example a013000196).
+  ACCESS_USER_ID_FORMAT: Enter the user ID in the BDOI format given in the message.
+  ACCESS_SOD_CONFLICT: Remove one of the two group profiles named in the message, or ask Information Security whether the rule still applies.
   ACCESS_UNKNOWN_USER: Choose an existing user from the list.
   ACCESS_USER_ALREADY_INACTIVE: No action; the user is already deactivated.
   ACCESS_USER_ALREADY_ACTIVE: No action; the user is already active and not locked.
@@ -125,6 +131,16 @@ fixes:
   PERMISSION_NOT_OFFERED: Remove the insurer permissions; they are not offered to BDOI profiles.
   UNKNOWN_ROLE: Choose the group profiles from the list.
   WINDOWS_ID_IN_USE: Enter the user's own Windows ID; a Windows ID belongs to one user only.
+  # Separation of duties and security settings
+  SOD_RULE_EXISTS: No action; the pair of profiles already has a rule. Deactivate the old rule first to replace it.
+  SOD_RULE_NOT_PENDING: Refresh the list; the rule was already decided or is not active.
+  SOD_SAME_PROFILE: Choose two different group profiles.
+  SOD_UNKNOWN_PROFILE: Choose the group profiles from the list.
+  SOD_DESCRIPTION: Enter why the two profiles are not held together.
+  MAKER_CHECKER_VIOLATION: Ask another authoriser; the user who made the change never authorises it.
+  PARAMETER_CHANGE_PENDING: Wait for the decision on the change already asked for, or withdraw it first.
+  PARAMETER_NO_PENDING_CHANGE: Refresh the list; the change was already decided.
+  INVALID_PARAMETER_VALUE: Enter a value of the type and range shown under the field.
   # Reports
   AS_OF_IN_FUTURE: Enter today or an earlier date.
   DATE_RANGE_REVERSED: Enter an end date on or after the start date.
@@ -144,7 +160,8 @@ fixes:
   "This user already exists": Choose Modify user for an existing user, or enter another user ID.
   "This user is already deactivated": No action; the user is already deactivated.
   "This user is already active": No action; the user is already active and not locked.
-  "The user ID must follow the format <pattern>": Enter the user ID in the BDOI format (a letter followed by nine digits, for example a013000196).
+  "The user ID must be <user id format text>": Enter the user ID in the BDOI format given in the message.
+  "The user ID does not have the BDOI format": Enter the user ID in the BDOI format (a letter followed by nine digits, for example a013000196).
   "The effective date cannot be before today": Enter today or a later date, or leave the date blank to apply the change on approval.
   "At least 10 characters": Lengthen the new password to at least 10 characters.
   "An upper-case letter": Add an upper-case letter to the new password.

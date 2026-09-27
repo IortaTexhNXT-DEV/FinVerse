@@ -16,7 +16,7 @@ walkthroughs:
     steps:
       - [UAM_REQUESTOR, SCR-UA-07, "Opens User Access › Access Requests › New Request, keeps Enrol new user, enters the user ID a013000196, the full name, e-mail, Windows ID and home branch, ticks Marketing Account Officer, chooses the approver Ulysses Access Approver, writes the justification and clicks Save Draft", "Toast: AR-yyyy-nnnnnn saved as a draft; the request opens as Draft with Approver Chosen on submission", Draft request, wt-a-01]
       - [UAM_REQUESTOR, SCR-UA-08, "Clicks Edit Request, checks the data and clicks Submit", "Toast: AR-yyyy-nnnnnn submitted; the status is Pending and the History tab lists Saved and Submitted", Pending, wt-a-02]
-      - [UAM_APPROVER, SCR-UA-06, "Opens the notice Access request AR-yyyy-nnnnnn to approve, or User Access › Access Requests", "The request is on the Assigned to Me tab with its change: Create user a013000196 with roles [MKT_AO]", Request found, wt-a-03]
+      - [UAM_APPROVER, SCR-UA-06, "Opens the notice Access request AR-yyyy-nnnnnn to approve, or User Access › Access Requests", "The request is on the Assigned to Me tab with its change: Create user a013000196 with group profiles Marketing Account Officer", Request found, wt-a-03]
       - [UAM_APPROVER, SCR-UA-08, "Opens the request, reads the Details tab (current and requested values), clicks Approve and Apply, adds a comment and confirms", "User a013000196 was created, with the temporary password shown once to be given through a secure channel; the status is Approved", Approved and applied, wt-a-04]
       - [MKT_AO, SCR-UA-01, "The new user opens BIBS and signs in with a013000196 and the temporary password", "Change Your Password: Your password was set by an administrator. Choose your own password to continue.", Forced change, wt-a-05]
       - [MKT_AO, SCR-UA-03, "Enters the temporary password as the current password and a personal password twice, and clicks Change Password", "Toast: Password changed; the home page opens", Signed in, wt-a-06]
@@ -39,7 +39,7 @@ walkthroughs:
     steps:
       - [UAM_REQUESTOR, SCR-UA-07, "Opens a New Request of type Modify user for a013000196, ticks Marketing Team Leader / Head (approver) besides the current profile, chooses the approver, writes the justification and clicks Submit", "The Group Profiles show (current) after Marketing Account Officer; toast AR-yyyy-nnnnnn submitted", Pending, wt-b-01]
       - [UAM_APPROVER, SCR-UA-08, "Opens the request: the Details tab shows the group profiles added; clicks Approve and Apply", "The status is Approved; the user receives Your access changed in the app and by e-mail", Change applied, wt-b-02]
-      - [UAM_SECOND_APPROVER, SCR-UA-08, "Opens AR-2026-900008 from the Second Approval tab: the tag Privilege Increase, first approved by the Approver; clicks Second Approval and confirms", "The status is Approved; the alert Privileged access change stays in the Alert inbox as evidence", Second approval given, wt-b-03]
+      - [UAM_SECOND_APPROVER, SCR-UA-08, "Opens AR-2026-900008 from the Second Approval tab: the tag Privilege increase, first approved by the Approver; clicks Second Approval and confirms", "The status is Approved; the alert Privileged access change stays in the Alert inbox as evidence", Second approval given, wt-b-03]
       - [BUSINESS_ADMIN, SCR-UA-12, "Opens Group Profile Requests › New Group Profile Request, enters the code RENEWAL_ENQUIRY, the name and description, keeps the level Standard, ticks two permissions, adds the approvers Ulysses Access Approver then the New Business Approver, writes the justification and clicks Submit", "Toast: AR-yyyy-nnnnnn submitted; the Approvers tab lists the two approvers in order", Pending (first approver), wt-b-04]
       - [UAM_APPROVER, SCR-UA-08, "Approves the group-profile request", "The status stays Pending; the request moves to the New Business Approver, who receives the notice", Next approver, wt-b-05]
       - [NB_APPROVER, SCR-UA-08, "Opens the request from My Approvals and approves it", "The status is For Implementation; the System Administrators receive Access request AR-yyyy-nnnnnn to implement", For implementation, wt-b-06]
@@ -57,23 +57,25 @@ walkthroughs:
       The same processes when something is wrong or not allowed: an incomplete or badly formatted enrolment, a second
       request for a user who already has one open, a change of one's own profiles, a decision by someone other than
       the chosen approver, an implementation by the requester, a locked account, a deactivated user signing in, and a
-      password that breaks the rules. Each step shows the message and what the user does next.
+      password that breaks the rules, and two profiles that one user may not hold together. Each step shows the message and what the user does next.
     data: "Seed data: seed requests AR-2026-900002 (pending for uamapprover); users a013000101 (active) and a013000196 (deactivated in walkthrough B); a group-profile request raised by the System Administrator and approved for implementation (prepared by the capture)"
     steps:
       - [UAM_REQUESTOR, SCR-UA-07, "Opens New Request, enters the user ID ab and clicks Submit without a full name, profile, approver or justification", "Under the fields: Use 3 to 50 letters, digits, dots, dashes or underscores; Enter the full name of the new user; Select at least one role; Select the approver; Enter the justification. Nothing is saved", Form corrected, wt-c-01]
-      - [UAM_REQUESTOR, SCR-UA-07, "Enters the user ID a01300019X with the other fields complete and clicks Submit", "Under the user ID: The user ID must follow the format ^[a-zA-Z][0-9]{9}$ (the format parameter is shown as it is set)", User ID corrected, wt-c-02]
+      - [UAM_REQUESTOR, SCR-UA-07, "Enters the user ID a01300019X with the other fields complete and clicks Submit", "Under the user ID: The user ID must be a letter followed by nine digits, for example a013000196", User ID corrected, wt-c-02]
       - [UAM_REQUESTOR, SCR-UA-07, "Raises a Modify user request for a013000101, which already has a pending request, and clicks Submit", "A request for user a013000101 is already waiting for approval, with its reference", Wait for the open request, wt-c-03]
       - [UAM_REQUESTOR, SCR-UA-07, "Raises a Modify user request for himself (requestor), ticks an additional profile and clicks Submit", "You cannot change your own roles", Another requester raises it, wt-c-04]
+      - [UAM_REQUESTOR, SCR-UA-07, "Enrols a new user with both the User Access Requestor and the User Access Approver profiles and clicks Submit", "One user may not hold both User Access Requestor and User Access Approver (separation-of-duties rule SOD-900001): the rule authorised by Information Security", One of the two profiles removed, wt-c-12]
       - [NB_APPROVER, SCR-UA-08, "Opens AR-2026-900002, assigned to Ulysses Access Approver", "The request shows no decision button for this approver; a decision would be refused: Request AR-2026-900002 is assigned to uamapprover for approval", Left to the chosen approver, wt-c-05]
       - [SYSADMIN, SCR-UA-16, "Clicks Implement Request on a group-profile request he raised himself", "A request is implemented by someone other than its requester", Another System Administrator implements it, wt-c-06]
       - [MKT_AO, SCR-UA-01, "User a013000101 enters a wrong password three times, then the right one", "Invalid user name or password, then Account is locked. Contact your administrator.", Account locked, wt-c-07]
       - [SYSADMIN, SCR-UA-15, "Opens Users with the status Locked and clicks Unlock on a013000101", "The user is Active again; the unlock is in the access change log", Account unlocked, wt-c-08]
-      - [MKT_AO, SCR-UA-01, "The deactivated user a013000196 tries to sign in", "Invalid user name or password: the message does not tell a deactivated user from a wrong password", Refused, wt-c-09]
+      - [MKT_AO, SCR-UA-01, "The deactivated user a013000196 tries to sign in", "Your account is deactivated. Contact your administrator. The attempt does not count towards the lock-out", Refused, wt-c-09]
       - [UAM_REQUESTOR, SCR-UA-05, "On My Profile, types a new password that is too short and has no symbol", "Still needed: At least 10 characters; A symbol; Change Password stays disabled", Password rules shown, wt-c-10]
       - [UAM_REQUESTOR, SCR-UA-05, "Enters the current password as the new password and clicks Change Password", "You used this password recently. Choose another one", Another password chosen, wt-c-11]
     downstream:
       - "A refused action changes nothing; the message names what to correct, and a server refusal shows its reference for support."
       - "Every failed sign-in, lock and unlock is in the audit trail and the User Access Audit Log."
+      - "A combination of profiles refused by a separation-of-duties rule is refused the same way on a bulk line and again at approval."
 
   - id: WT-D
     title: The evidence of access, and the insurer roles hidden from BDOI

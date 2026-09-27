@@ -24,6 +24,7 @@ personas:
   SYSADMIN: {name: System Administrator, user: admin, short: Sys Admin}
   NB_APPROVER: {name: New Business approver (keeps ACCESS_APPROVE), user: approver, short: NB Appr.}
   AUDITOR: {name: Auditor, user: auditor, short: Audit.}
+  INFOSEC_OFFICER: {name: Information Security Officer, user: infosec, short: InfoSec}
   MKT_AO: {name: Business user without access-maintenance rights (Marketing AO), user: ao, short: MKT AO}
   SYSTEM: {name: BIBS scheduled job or event, user: "-"}
 
@@ -41,6 +42,7 @@ screens:
   GP: User Access > Group Profile Requests
   MATRIX: User Access > User Access Matrix
   UAREP: User Access > User Access Reports
+  SOD: User Access > Separation of Duties
   APPROVALS: My Approvals
   AUDIT: Administration > Audit Trail
   PARAMS: Administration > System Parameters
@@ -128,6 +130,7 @@ frs:
       - A user with the Requestor profile logs in and sees the User Access screens of the Requestor only; a user with several roles sees the union of their screens.
       - Wrong credentials are refused and the attempt is counted.
       - The third wrong password locks the account and the next attempt is refused.
+      - A deactivated user is refused with its own message and the attempt is not counted.
       - The audit trail lists the failed and successful attempts.
     cases:
       - c: 1
@@ -160,13 +163,21 @@ frs:
           - Enter requestor2 with a wrong password three times; then the correct password.
         expected: The account is locked; the fourth attempt is refused.
         msg: [Account is locked. Contact your administrator.]
+      - c: 4
+        type: Negative
+        title: A deactivated user signs in
+        auto: UamSignoffControlsIT#limitIsSetByRequestAndDeactivatedUserIsRefusedWithoutCount; UserAccessEndToEndApiIT
+        steps:
+          - Log in as the disabled user of TD-UA-01 with the right password, then with a wrong one.
+        expected: Both attempts are refused with the deactivated message; the failed-attempt count stays 0 and the account is not locked.
+        msg: [Your account is deactivated. Contact your administrator.]
       - c: 3
         type: Boundary
         title: Two wrong passwords do not lock
         steps:
           - Enter uamapprover2 with a wrong password twice; then the correct password.
         expected: The log-in succeeds.
-      - c: 4
+      - c: 5
         type: Positive
         persona: AUDITOR
         screen: AUDIT
@@ -396,6 +407,39 @@ frs:
           - Run PASSWORD_EXPIRY_NOTICE.
         expected: requestor is notified that the password expires within 7 days.
 
+  FR-UA-006:
+    scenario: SC-UA-08
+    persona: SYSTEM
+    screen: JOBS
+    data: [TD-UA-01, TD-UA-06]
+    conditions:
+      - The job deactivates the users without a sign-in for UAM_DORMANT_DAYS days by a Deactivate user request with the reason No sign-in for the dormancy period.
+      - The user is told UAM_DORMANT_NOTICE_DAYS days before; the requesters are told who was deactivated.
+      - The System Administrator profile is never deactivated by the job; 0 days switches the job off.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Dormant user deactivated
+        auto: UamSignoffControlsIT#dormantUsersAreWarnedThenDeactivatedByRequest
+        pre: The test lead sets the last sign-in of subject user a013000104 to 91 days ago (database console).
+        steps:
+          - As admin run UAM_DORMANT_USERS from Scheduled Jobs.
+          - As requestor open Access Requests; as a013000104 try to sign in.
+        expected: A Deactivate user request of the system is Approved with the dormancy reason; the user is refused with the deactivated message; the requesters receive Dormant users deactivated.
+      - c: 2
+        type: Boundary
+        title: Notice seven days before
+        pre: The last sign-in of a013000103 is set to 83 days ago.
+        steps:
+          - Run the job; open the notifications and the mailbox of a013000103.
+        expected: Your account will be deactivated, with the date; the user stays active.
+      - c: 3
+        type: Negative
+        title: The administrator is never deactivated
+        steps:
+          - Set the last sign-in of admin2 (SYSADMIN) to 200 days ago; run the job.
+        expected: admin2 stays active.
+
   FR-UA-010:
     scenario: SC-UA-02
     persona: UAM_REQUESTOR
@@ -500,7 +544,7 @@ frs:
         steps:
           - Enrol user ID a01300019X; submit.
         expected: Refused.
-        msg: ["The user ID must follow the format {^[a-zA-Z][0-9]{9}$}"]
+        msg: ["The user ID must be {a letter followed by nine digits, for example a013000196}"]
       - c: 2
         type: Negative
         title: User ID too short
@@ -1196,7 +1240,7 @@ frs:
         steps:
           - Add a permission the role already holds.
         expected: Refused.
-        msg: ["The request does not change the permissions of role {MKT_TL}"]
+        msg: ["The request does not change the permissions of group profile {Marketing Team Lead}"]
       - c: 2
         type: Negative
         title: No role selected
@@ -1481,6 +1525,102 @@ frs:
           - Look for New User on the Users screen.
         expected: New User is replaced by Raise request, which opens New Request.
 
+  FR-UA-053:
+    scenario: SC-UA-06
+    persona: BUSINESS_ADMIN
+    screen: SOD
+    data: [TD-UA-01, TD-UA-03]
+    conditions:
+      - A new rule waits for the authorisation of Information Security and applies once authorised; the maker never authorises it.
+      - A request or bulk line that gives one user both profiles of an active rule is refused with the names of the two profiles.
+      - A deactivation applies only once authorised; a rejected rule never applies.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Rule created, authorised and enforced
+        auto: UamSignoffControlsIT#separationOfDutiesRulesAreAuthorisedAndRefuseConflictingProfiles
+        steps:
+          - As badmin add a rule on Marketing Account Officer and Marketing Team Lead with a reason.
+          - As infosec authorise it (Separation of Duties or My Approvals).
+          - As requestor enrol a new user with both profiles.
+        expected: The rule is active after the authorisation; the enrolment is refused.
+        msg: ["One user may not hold both {Marketing Account Officer} and {Marketing Team Lead} (separation-of-duties rule {SOD-000001})", ACCESS_SOD_CONFLICT]
+      - c: 2
+        type: Security-access
+        title: The maker authorises
+        steps:
+          - As badmin try to authorise the rule just created (API call).
+        expected: Refused; the Authorise button is not shown to the maker.
+        msg: [A record cannot be authorized by the user who maintained it]
+      - c: 2
+        type: Negative
+        title: Same pair twice
+        steps:
+          - Add a second rule on the same two profiles, in the other order.
+        expected: Refused.
+        msg: [A rule for these two group profiles already exists]
+      - c: 3
+        type: Negative
+        persona: UAM_REQUESTOR
+        screen: BULK
+        title: Bulk line breaking a rule
+        steps:
+          - Upload a bulk file with one enrolment holding both profiles of the active rule.
+        expected: The row is reported with the conflict message and is not saved.
+      - c: 3
+        type: Workflow
+        persona: INFOSEC_OFFICER
+        title: Deactivation authorised
+        steps:
+          - As badmin deactivate the rule; as infosec reject, then after a new deactivation authorise.
+        expected: The rule stays active after the rejection and becomes inactive after the authorisation; the enrolment of case 1 is then accepted.
+
+  FR-UA-054:
+    scenario: SC-UA-06
+    persona: SYSADMIN
+    screen: PARAMS
+    data: [TD-UA-06]
+    conditions:
+      - A change of a security setting waits for the approval of a holder of SECURITY_PARAMETER_APPROVE other than the requester.
+      - The value in force does not change until the approval; a rejection keeps it.
+      - Opening the emergency path UAM_DIRECT_ROLE_EDIT needs the same approval.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Security setting approved
+        auto: UamSignoffControlsIT#securityParametersWaitForASecondApproval; UserAccessEndToEndApiIT
+        steps:
+          - As admin set PASSWORD_MIN_AGE_DAYS to 2.
+          - As infosec open the setting and approve.
+        expected: The list shows Waiting for approval under the value; after the approval the value is 2.
+      - c: 2
+        type: Security-access
+        title: The requester approves
+        steps:
+          - As admin call the approval of the own change (API).
+        expected: Refused.
+        msg: [A change cannot be approved by the user who asked for it]
+      - c: 2
+        type: Negative
+        title: Second change while one waits
+        steps:
+          - As admin change the same setting again before the decision.
+        expected: Refused.
+        msg: ["A change of {PASSWORD_MIN_AGE_DAYS} already waits for approval; approve or reject it first"]
+      - c: 3
+        type: Workflow
+        persona: INFOSEC_OFFICER
+        title: Emergency path under four eyes
+        steps:
+          - As admin set UAM_DIRECT_ROLE_EDIT to true; as infosec reject.
+        expected: The emergency path stays closed; Roles & Permissions stays read only.
+      - c: 3
+        type: Positive
+        title: Other parameters change at once
+        steps:
+          - As admin change REPORT_FOOTER_TEXT.
+        expected: The value changes at once, without approval.
+
   FR-UA-060:
     scenario: SC-UA-07
     persona: BUSINESS_ADMIN
@@ -1751,9 +1891,27 @@ access:
   - action: Generate the user access reports
     screen: UAREP
     permission: UAM_REPORT_VIEW
-    allow: [UAM_APPROVER, BUSINESS_ADMIN, SYSADMIN, AUDITOR]
+    allow: [UAM_APPROVER, BUSINESS_ADMIN, SYSADMIN, INFOSEC_OFFICER, AUDITOR]
     deny: [UAM_REQUESTOR, UAM_SECOND_APPROVER, MKT_AO]
     denied: User Access Reports is not in the menu; the run call returns HTTP 403.
+  - action: Maintain the separation-of-duties rules
+    screen: SOD
+    permission: UAM_SOD_MAINTAIN
+    allow: [BUSINESS_ADMIN]
+    deny: [UAM_REQUESTOR, INFOSEC_OFFICER, SYSADMIN]
+    denied: New Rule and Deactivate are not shown; the call returns HTTP 403.
+  - action: Authorise the separation-of-duties rules
+    screen: SOD
+    permission: UAM_SOD_AUTHORIZE
+    allow: [INFOSEC_OFFICER]
+    deny: [BUSINESS_ADMIN, SYSADMIN, UAM_APPROVER]
+    denied: Authorise and Reject are not shown; the call returns HTTP 403.
+  - action: Approve a change of a security setting
+    screen: PARAMS
+    permission: SECURITY_PARAMETER_APPROVE
+    allow: [INFOSEC_OFFICER]
+    deny: [SYSADMIN, BUSINESS_ADMIN, AUDITOR]
+    denied: Approve is not offered; the call returns HTTP 403.
   - action: Unlock users and reset passwords
     screen: USERS
     permission: USER_MANAGE
@@ -1763,32 +1921,29 @@ access:
 
 findings:
   - fr: FR-UA-001
-    issue: '"Access only from BDO-issued devices" is enforced by the BDO network and endpoint policy, not by BIBS, so it cannot be tested in BIBS. A deactivated user who signs in gets the wrong-password message and the attempt counts towards the lock-out.'
-    proposal: Move the device condition to the assumptions and ask BDOI IT for the evidence; confirm with Information Security that the deactivated user's message and count are acceptable.
+    issue: '"Access only from BDO-issued devices" is enforced by the BDO network and endpoint policy, not by BIBS, so it cannot be tested in BIBS.'
+    proposal: Move the device condition to the assumptions and ask BDOI IT for the evidence.
   - fr: FR-UA-003
     issue: The directory adapter is not built (UQ04); BDOI named EIAM on Microsoft Entra ID as the target (IQ04). The directory mode refuses every sign-in with a service message, so the directory cases stay Blocked.
     proposal: Specify the Entra ID sign-in with BDOI IT as a change request; the cases then test it with a test tenant.
-  - fr: FR-UA-011
-    issue: 'The user ID check shows the pattern of the parameter to the user ("The user ID must follow the format ^[a-zA-Z][0-9]{9}$"), and the baseline check "3 to 50 letters, digits, dots, dashes or underscores" also applies, so two messages can answer the same wrong ID. The New Request screen offers the user type External although external users are refused.'
-    proposal: Show the format in words (a letter and nine digits); hide the user type External while no portal is installed.
+  - fr: FR-UA-006
+    issue: The dormancy period (90 days) and the notice (7 days) are proposals; BDOI Information Security has not given its values.
+    proposal: Confirm the two values at sign-off (template CI-05); they are parameters under the second approval.
   - fr: FR-UA-017
     issue: The approver who scheduled a request can cancel it (as built); the FRS acceptance covers the creator only.
     proposal: Add an acceptance criterion for the approver's cancellation of a scheduled request.
   - fr: FR-UA-019
-    issue: The maximum number of rows is open (UQ10). The Business Administrator and the System Administrator see Bulk Request but cannot upload (no bulk upload right).
-    proposal: Set the maximum rows with UQ10; decide whether these profiles upload bulk files (a group-profile request) or the menu entry is hidden for them.
+    issue: The maximum number of rows is open (UQ10).
+    proposal: Set the maximum rows with UQ10.
   - fr: FR-UA-034
     issue: UAM_WORKING_HOURS has no holiday calendar, so a request submitted or approved on a public holiday during office hours is not flagged. The risk rules are evaluated both at submission and at approval (as built).
     proposal: Use the BIBS holiday calendar for the out-of-hours flag; the cases assume both moments.
   - fr: FR-UA-042
-    issue: A profile with members is deactivated (UQ16 open); the members lose its screens at once and are not told one by one.
-    proposal: Answer UQ16; if members must be told, add a notice per member (change request).
-  - fr: FR-UA-052
-    issue: The authorisation limit of a user, used by the journal and payables approvals, cannot be set through an access request; only the emergency direct edit sets it.
-    proposal: Add the authorisation limit to the Modify user request (change request); until then the System Administrator sets it on the emergency path, audited and alerted.
+    issue: A profile with members is deactivated (UQ16 open); the members are told when the request is implemented.
+    proposal: Answer UQ16 if members must be moved before a deactivation.
+  - fr: FR-UA-053
+    issue: A new separation-of-duties rule does not change the users who already hold both profiles.
+    proposal: After each new rule, Information Security reviews the User Access Report and raises the requests to remove one of the profiles.
   - fr: FR-UA-060
     issue: 'The report parameters "Group Profile (code)" and "Module (area code)" take codes typed by hand, and the User Group Profile Report shows the module and the task as codes (UQ11).'
     proposal: Offer the profiles and modules as drop-downs by name; answer UQ11 for the task names.
-  - fr: FR-UA-070
-    issue: 'The notice for the second approval shows the risk flags as codes ([OUTSIDE_HOURS]); the decision notice of a scheduled request gives the date as yyyy-mm-dd.'
-    proposal: Show the flags by their labels and the date as dd-MMM-yyyy.

@@ -122,7 +122,7 @@ export default function ReportRunnerPage() {
         section={`Reports · ${entry.categoryLabel}`}
         backTo={entry.category === 'NEW_BUSINESS' ? '/nb/reports' : '/reports'}
         title={entry.title}
-        description={`${entry.code} — ${entry.description}`}
+        description={entry.description}
       />
       <Card
         title="Parameters"

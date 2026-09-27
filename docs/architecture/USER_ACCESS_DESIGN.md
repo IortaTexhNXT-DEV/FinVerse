@@ -160,6 +160,7 @@ No `workflow` case. The request keeps its own state machine (section 4.3), as th
 | Job | Cron property (default) | Work |
 |---|---|---|
 | `UAM_EFFECTIVE_CHANGES` | `brokerverse.jobs.uam-effective-changes-cron` (`0 5 0 * * *`) | Apply SCHEDULED requests whose `effective_from` is today or earlier (UAM-NFR-14) |
+| `UAM_DORMANT_USERS` | `brokerverse.jobs.uam-dormant-users-cron` (`0 15 0 * * *` PHT) | Deactivate the users without a sign-in for `UAM_DORMANT_DAYS` by a system DISABLE_USER request (reason `DORMANT`), after a notice `UAM_DORMANT_NOTICE_DAYS` days before; SYSADMIN exempt (V1065) |
 | `PASSWORD_EXPIRY_NOTICE` | `brokerverse.jobs.password-expiry-notice-cron` (`0 0 6 * * *`) | LOCAL mode only: notify users whose password expires within 7 days |
 
 | Parameter (`sys_parameter`, category SECURITY) | Default | Source |

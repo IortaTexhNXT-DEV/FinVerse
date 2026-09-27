@@ -71,6 +71,18 @@ class MigrationClientsHeadersApiIT {
     return r;
   }
 
+  /**
+   * A second person with another first name and birth date: masking maps names to short lists and
+   * shifts a birth date by an offset keyed on the date, so two rows sharing both would match on the
+   * person key whenever their masked last names coincide.
+   */
+  private static Map<String, String> otherPerson(String no, String last) {
+    Map<String, String> r = client(no, last, "");
+    r.put("first_name", "Marco");
+    r.put("birth_date", "1979-11-02");
+    return r;
+  }
+
   private static String token() {
     return LegacyInvoiceFixtures.token();
   }
@@ -87,7 +99,7 @@ class MigrationClientsHeadersApiIT {
             "C01",
             "C01",
             "C01_QPS_20271120_" + t.substring(t.length() - 2) + ".csv",
-            List.of(client("Q" + t, "Reyes" + t, tin), client("Q2" + t, "Cruz" + t, "")),
+            List.of(client("Q" + t, "Reyes" + t, tin), otherPerson("Q2" + t, "Cruz" + t)),
             List.of("legacy_client_no"));
     JsonNode ebix =
         mig.upload(

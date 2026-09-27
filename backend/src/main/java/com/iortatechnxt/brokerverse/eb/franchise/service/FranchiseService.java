@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -267,16 +268,20 @@ public class FranchiseService {
         EbCodes.ENTITY_FRANCHISE,
         request.getFranchiseNo(),
         AuditAction.UPDATE,
-        "Client advised of the " + request.getDecision().name().toLowerCase(java.util.Locale.ROOT));
+        "Client advised of the " + request.getDecision().name().toLowerCase(Locale.ROOT));
     return request;
   }
 
   /**
    * Expires a request left without a decision after the TAT and the grace period (job).
    *
-   * @param request submitted request past its due date and grace
+   * @param requestId submitted request past its due date and grace
    */
-  public void expire(EbFranchiseRequest request) {
+  public void expireById(Long requestId) {
+    EbFranchiseRequest request =
+        requests
+            .findById(requestId)
+            .orElseThrow(() -> new ResourceNotFoundException(EbCodes.ENTITY_FRANCHISE, requestId));
     transition(request, "expire", TransitionNote.comment("No decision after the franchise TAT"));
     activity.released(TatActivity.FRANCHISE_DECISION, request.getFranchiseNo(), "EXPIRED");
     audit.record(

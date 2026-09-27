@@ -44,4 +44,36 @@ public interface EbSoaRepository
    */
   @Query("select s from EbSoa s join s.invoices i where i.invoiceNo = :invoiceNo")
   List<EbSoa> findByInvoiceNo(@Param("invoiceNo") String invoiceNo);
+
+  /**
+   * Whether a live SOA of an insurer has a number (duplicate check).
+   *
+   * @param companyId company
+   * @param insurerCode insurer
+   * @param insurerSoaNo insurer's SOA number
+   * @param status REJECTED (not counted)
+   * @return true when present
+   */
+  boolean existsByCompanyIdAndInsurerCodeAndInsurerSoaNoIgnoreCaseAndStatusNot(
+      Long companyId, String insurerCode, String insurerSoaNo, EbSoa.Status status);
+
+  /**
+   * A live SOA with the same file (duplicate check).
+   *
+   * @param companyId company
+   * @param fileHash SHA-256 of the file
+   * @param status REJECTED (not counted)
+   * @return SOA
+   */
+  Optional<EbSoa> findFirstByCompanyIdAndFileHashAndStatusNot(
+      Long companyId, String fileHash, EbSoa.Status status);
+
+  /**
+   * SOAs of a company in a status (EB Home).
+   *
+   * @param companyId company
+   * @param status status
+   * @return count
+   */
+  long countByCompanyIdAndStatus(Long companyId, EbSoa.Status status);
 }

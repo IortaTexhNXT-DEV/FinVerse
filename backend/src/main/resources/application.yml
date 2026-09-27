@@ -372,6 +372,8 @@ brokerverse:
     eb-renewal-advice-cron: ${BROKERVERSE_JOB_EB_RENEWAL_ADVICE_CRON:0 0 22 * * *}
     # Follow-ups of overdue tracked items, escalation after EB_FOLLOWUP_MAX (BRID-030), 07:00 PHT.
     eb-item-followup-cron: ${BROKERVERSE_JOB_EB_ITEM_FOLLOWUP_CRON:0 0 23 * * *}
+    # Expires franchise requests left without a decision after the TAT and the grace days, 06:30 PHT.
+    eb-franchise-expiry-cron: ${BROKERVERSE_JOB_EB_FRANCHISE_EXPIRY_CRON:0 30 22 * * *}
 
 management:
   health:

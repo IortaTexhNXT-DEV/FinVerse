@@ -77,7 +77,7 @@ function pendingText(p: SystemParameter): string {
   if (p.pendingValue === undefined || p.pendingValue === null) {
     return '';
   }
-  return `Waiting for approval: ${shown(p.pendingValue)}, asked by ${displayNameOf(p.pendingBy)}`;
+  return `Waiting for approval: ${shown(p.pendingValue)}, requested by ${displayNameOf(p.pendingBy)}`;
 }
 
 function PendingDialog({
@@ -138,8 +138,8 @@ function PendingDialog({
             { label: 'Parameter', value: parameter.key },
             { label: 'Current value', value: parameter.value },
             { label: 'New value', value: parameter.pendingValue },
-            { label: 'Asked by', value: <UserName login={parameter.pendingBy} /> },
-            { label: 'Asked on', value: formatDateTime(parameter.pendingAt) },
+            { label: 'Requested by', value: <UserName login={parameter.pendingBy} /> },
+            { label: 'Requested on', value: formatDateTime(parameter.pendingAt) },
           ]}
         />
         {!mayApprove && (

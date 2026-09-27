@@ -332,6 +332,21 @@ class UamSignoffControlsIT {
     as.run("admin", () -> parameterApprovals.change(key, before));
     as.run(INFOSEC, () -> parameterApprovals.approve(key));
     assertThat(parameters.get(key).getValue()).isEqualTo(before);
+    // Texts about the change say requested, and name the requester by display name.
+    assertThat(
+            jdbc.queryForList(
+                "select summary from audit_log where entity_type = 'SystemParameter'"
+                    + " and entity_id = ?",
+                String.class,
+                key))
+        .anyMatch(t -> t.startsWith("Requested a change of " + key))
+        .anyMatch(t -> t.endsWith("requested by SIT System Administrator"))
+        .noneMatch(t -> t.contains("asked"))
+        .noneMatch(t -> t.endsWith(" by admin"));
+    assertThat(notifications.findAll())
+        .filteredOn(n -> n.getTitle().startsWith("Security setting to approve"))
+        .extracting(Notification::getBody)
+        .anyMatch(b -> b.startsWith("SIT System Administrator requests a change from"));
 
     String footer = parameters.get(SystemParameterService.REPORT_FOOTER_TEXT).getValue();
     SystemParameter direct =

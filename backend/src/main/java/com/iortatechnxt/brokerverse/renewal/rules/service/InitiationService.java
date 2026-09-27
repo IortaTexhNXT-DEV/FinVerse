@@ -115,9 +115,25 @@ public class InitiationService {
    * @return its evaluation
    */
   public Evaluation initiateOne(RenewalCandidate c) {
+    return initiateOne(c, false);
+  }
+
+  /**
+   * Initiates one renewal; a hand-off of another module initiates it as a system action (the
+   * handing module checked its own user's rights).
+   *
+   * @param c extracted renewal
+   * @param handedOver whether another module hands the renewal over
+   * @return its evaluation
+   */
+  public Evaluation initiateOne(RenewalCandidate c, boolean handedOver) {
     RenewalRecords.requireStage(c, RenewalStage.EXTRACTED);
     c.initiate(currentUser.username(), clock.instant());
-    flow.act(c, "initiate", TransitionNote.comment("Renewal processing initiated"));
+    if (handedOver) {
+      flow.system(c, "initiate", "Renewal handed over and initiated");
+    } else {
+      flow.act(c, "initiate", TransitionNote.comment("Renewal processing initiated"));
+    }
     Evaluation evaluation = engine.run(c, CheckTrigger.INITIATION);
     routing.route(c, evaluation);
     audit.record(

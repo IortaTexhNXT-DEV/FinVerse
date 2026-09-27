@@ -31,9 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
  * Carries out a disposition of an unapplied item (CSHID.024, OPERATIONS_DESIGN section 5 row 8):
  * apply to another invoice or to its DST (application engine), refund (refund payable and a payment
  * request to Disbursement through {@code DisbursementGateway}), reclass or transfer (unapplied
- * collections moved to another client or unit), or others (released). A reversal undoes it; a
- * refund is reversed only once Disbursement returned it.
+ * collections moved to another client or unit), income (recognised as BDOI income with an official
+ * receipt, {@link IncomeDispositions}) or others (released). A reversal undoes it; a refund is
+ * reversed only once Disbursement returned it.
  */
+@SuppressWarnings(
+    "PMD.GodClass") // one executor per disposition action, including the income action
 @Component
 @Transactional(propagation = Propagation.MANDATORY)
 public class DispositionExecutor {
@@ -49,6 +52,7 @@ public class DispositionExecutor {
   private final DisbursementGateway disbursement;
   private final AuditTrailService audit;
   private final CollectorRequestTracker collectorRequests;
+  private final IncomeDispositions income;
   private final Clock clock;
 
   /**
@@ -61,6 +65,7 @@ public class DispositionExecutor {
    * @param disbursement Disbursement gateway
    * @param audit audit trail
    * @param collectorRequests collector requests of the dispositions (BRCLXN.030-033)
+   * @param income income dispositions (BRIDSP-31)
    * @param clock clock
    */
   public DispositionExecutor(
@@ -71,6 +76,7 @@ public class DispositionExecutor {
       DisbursementGateway disbursement,
       AuditTrailService audit,
       CollectorRequestTracker collectorRequests,
+      IncomeDispositions income,
       Clock clock) {
     this.applier = applier;
     this.applications = applications;
@@ -79,6 +85,7 @@ public class DispositionExecutor {
     this.disbursement = disbursement;
     this.audit = audit;
     this.collectorRequests = collectorRequests;
+    this.income = income;
     this.clock = clock;
   }
 
@@ -130,9 +137,10 @@ public class DispositionExecutor {
           case APPLY, DST_APPLY -> apply(item, d, ref);
           case REFUND -> refund(item, d, ref);
           case RECLASS, TRANSFER -> move(item, d, ref);
+          case INCOME -> income.recognise(item, d, ref);
           case MANUAL -> {
             item.consume(d.getAmount());
-            yield new Execution(null, null, null, null, null);
+            yield new Execution(null, null, null, null, null, null);
           }
         };
     d.complete(result, clock.instant());
@@ -150,6 +158,7 @@ public class DispositionExecutor {
    * @param item unapplied item
    * @param d completed disposition
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity") // one reversal per disposition action
   public void reverse(Unapplied item, Disposition d) {
     String ref = PREFIX + d.getId() + ":REV";
     switch (d.getAction()) {
@@ -191,6 +200,7 @@ public class DispositionExecutor {
                 nz(d.getPreviousClientCode())));
         item.reassign(d.getPreviousClientCode(), d.getPreviousUnit());
       }
+      case INCOME -> income.reverse(item, d, ref);
       default -> item.restore(d.getAmount());
     }
   }
@@ -215,7 +225,7 @@ public class DispositionExecutor {
                             + d.getTargetInvoiceNo()
                             + " has nothing outstanding to apply to"));
     item.consume(app.getAmount());
-    return new Execution(app.getId(), null, app.getJournalBatchNo(), null, null);
+    return new Execution(app.getId(), null, app.getJournalBatchNo(), null, null, null);
   }
 
   private Execution refund(Unapplied item, Disposition d, String ref) {
@@ -240,7 +250,7 @@ public class DispositionExecutor {
                 "Refund of unapplied payment " + item.getReference(),
                 null));
     item.consume(d.getAmount());
-    return new Execution(null, ticket.requestNo(), batch, null, null);
+    return new Execution(null, ticket.requestNo(), batch, null, null, null);
   }
 
   private Execution move(Unapplied item, Disposition d, String ref) {
@@ -256,7 +266,7 @@ public class DispositionExecutor {
             Map.of(
                 legacy(item, RELEASED), nz(previousClient), legacy(item, ASSIGNED), nz(newClient)));
     item.reassign(d.getTargetClientCode(), d.getTargetUnit());
-    return new Execution(null, null, batch, previousClient, previousUnit);
+    return new Execution(null, null, batch, previousClient, previousUnit, null);
   }
 
   /**

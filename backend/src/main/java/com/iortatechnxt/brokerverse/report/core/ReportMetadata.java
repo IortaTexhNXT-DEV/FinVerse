@@ -356,4 +356,27 @@ public record ReportMetadata(
         Permission.RNW_EXPORT,
         true);
   }
+
+  /**
+   * A Submitted Policies report (SUBMITTED_POLICIES_DESIGN section 11, BRIDSP-20/21/28): viewed
+   * with {@code SBM_REPORT_VIEW}, exported with {@code SBM_REPORT_EXPORT}, archived.
+   *
+   * @param code report code (e.g. {@code SBM-MASTERLIST})
+   * @param title title
+   * @param description one line purpose
+   * @param parameters parameters
+   * @return metadata in the Submitted Policies category
+   */
+  public static ReportMetadata submitted(
+      String code, String title, String description, List<ParameterSpec> parameters) {
+    return new ReportMetadata(
+        code,
+        title,
+        ReportCategory.SUBMITTED_POLICIES,
+        description,
+        parameters,
+        Permission.SBM_REPORT_VIEW,
+        Permission.SBM_REPORT_EXPORT,
+        true);
+  }
 }

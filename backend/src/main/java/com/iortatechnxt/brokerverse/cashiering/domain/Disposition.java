@@ -76,6 +76,9 @@ public class Disposition extends BaseEntity {
   @Column(name = "journal_batch_no", length = 40)
   private String journalBatchNo;
 
+  @Column(name = "or_no", length = 30)
+  private String orNo;
+
   @Column(name = "reversal_reason", length = 250)
   private String reversalReason;
 
@@ -148,6 +151,7 @@ public class Disposition extends BaseEntity {
     this.applicationId = result.applicationId();
     this.disbursementRequestNo = result.disbursementRequestNo();
     this.journalBatchNo = result.journalBatchNo();
+    this.orNo = result.orNo();
     this.previousClientCode = result.previousClientCode();
     this.previousUnit = result.previousUnit();
     this.completedAt = at;
@@ -238,6 +242,15 @@ public class Disposition extends BaseEntity {
     return journalBatchNo;
   }
 
+  /**
+   * Official receipt issued by an income disposition.
+   *
+   * @return OR number, null for the other actions
+   */
+  public String getOrNo() {
+    return orNo;
+  }
+
   public String getReversalReason() {
     return reversalReason;
   }
@@ -272,11 +285,13 @@ public class Disposition extends BaseEntity {
    * @param journalBatchNo journal, may be null
    * @param previousClientCode client before a reclass, may be null
    * @param previousUnit unit before a transfer, may be null
+   * @param orNo official receipt of an income disposition, may be null
    */
   public record Execution(
       Long applicationId,
       String disbursementRequestNo,
       String journalBatchNo,
       String previousClientCode,
-      String previousUnit) {}
+      String previousUnit,
+      String orNo) {}
 }

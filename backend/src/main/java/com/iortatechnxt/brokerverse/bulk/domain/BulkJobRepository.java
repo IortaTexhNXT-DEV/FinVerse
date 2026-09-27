@@ -40,4 +40,12 @@ public interface BulkJobRepository extends JpaRepository<BulkJob, Long> {
    */
   Optional<BulkJob> findFirstByCompanyIdAndHandlerCodeAndFileSha256AndStatusNotOrderByIdAsc(
       Long companyId, String handlerCode, String fileSha256, BulkJobStatus status);
+
+  /**
+   * An upload by its number.
+   *
+   * @param jobNo upload number
+   * @return upload
+   */
+  Optional<BulkJob> findByJobNo(String jobNo);
 }

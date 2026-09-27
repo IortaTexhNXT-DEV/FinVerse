@@ -1,6 +1,6 @@
 # iNXT BrokerVerse - BDOI Renewal (BRD-6, RN) Build Design
 
-Status: **built** for waves R0 to R2 (section 17 records what was built and where it departs from the sections above); wave R3 (submitted-policy hand-off) waits for the Submitted Policies module. This design extends `docs/architecture/BROKING_ARCHITECTURE.md`, `OPERATIONS_DESIGN.md`, `PRODUCT_MAINTENANCE_DESIGN.md` and the Developer Guide, which stay binding. It changes them only through the contract changes listed in section 13. The Collections (`COLLECTIONS_DESIGN.md`) and Accounting / Disbursement (`ACCOUNTING_DISBURSEMENT_DESIGN.md`) designs are authoritative for their modules; Renewal only reads from them.
+Status: **built** for waves R0 to R3 (section 17 records what was built and where it departs from the sections above). This design extends `docs/architecture/BROKING_ARCHITECTURE.md`, `OPERATIONS_DESIGN.md`, `PRODUCT_MAINTENANCE_DESIGN.md` and the Developer Guide, which stay binding. It changes them only through the contract changes listed in section 13. The Collections (`COLLECTIONS_DESIGN.md`) and Accounting / Disbursement (`ACCOUNTING_DISBURSEMENT_DESIGN.md`) designs are authoritative for their modules; Renewal only reads from them.
 
 It is aligned with the parallel designs of the same build: Submitted Policies (`SUBMITTED_POLICIES_DESIGN.md`, `RenewalHandOff` port and the shared account change V822), Employee Benefits (`EMPLOYEE_BENEFITS_DESIGN.md`, boundary EBQ28) and Claims (`CLAIMS_BROKING_DESIGN.md`, `ClaimExperienceQueryService`, CLQ28). Section 2.3 records the decisions.
 
@@ -652,11 +652,11 @@ Rules for parallel work:
 7. **Legacy policies at go-live** (EBIX / QPS). Mitigation: a legacy upload; renewals of legacy policies take the NB path until they are booked once in BIBS.
 8. **Two renewal paths for submitted policies** (default hand-off vs Renewal). Settled: the default hand-off of `submitted` only records PENDING hand-offs, Renewal implements `RenewalHandOff` (`@ConditionalOnMissingBean`), one letter engine, candidate idempotent on the SBM number. Remaining risk: PENDING hand-offs wait if R3 is late; build R3 right after Submitted Policies S1-D.
 
-## 17. As built (waves R0 to R2)
+## 17. As built (waves R0 to R3)
 
 Waves R0, R1-A, R1-B, R1-C, R1-D and R2 are built in the package `renewal` and the screens `features/renewal`. The
-module guide is [`docs/modules/RENEWAL.md`](../modules/RENEWAL.md). Wave R3 is not built: the Submitted Policies module
-that declares `RenewalHandOff` is not in the code base yet (section 17.6).
+module guide is [`docs/modules/RENEWAL.md`](../modules/RENEWAL.md). Wave R3 (the hand-off of the submitted policies)
+is built in `renewal.submitted` with V1017, after the Submitted Policies module (`SUBMITTED_POLICIES_DESIGN.md` section 17).
 
 ### 17.1 Code layout
 
@@ -673,13 +673,14 @@ that declares `RenewalHandOff` is not in the code base yet (section 17.6).
 | `insurer`, `lamd` | Insurer batches (28-column extract, sent protected), responses (manual and upload, matching, latest valid), LAMD reports matched by PN |
 | `letter`, `acceptance` | RA first and second notice, NAL / NFR closing letters, NRNS reminders, expiry sweep, letter delivery status, acceptance (single and upload), `RenewalProgression` (fast track, placement slips, booking queue, closure on booking), Contact Center follow-ups |
 | `report`, `home`, `alert`, `retention`, `seed` | The 11 reports, Renewal Home figures, the five renewal alerts, retention of closed renewals (V1018), the seed-profile loader `RenewalSeedData` |
+| `submitted` (R3) | `SubmittedPolicyRenewalHandOff` implementing `submitted.service.port.RenewalHandOff` (the default pending hand-off of Submitted Policies steps aside), `SubmittedHandOffRecord` (`rnw_submitted_handoff`: RA template, assigned insurer, handler, Account Officer, mailing address, Renew with BDOI) |
 
 ### 17.2 Flyway as built
 
 | Version | Content |
 |---|---|
 | V1010-V1016 | As section 3 |
-| V1017 | Not used (kept for R3) |
+| V1017 `renewal_submitted_handoff` | Table `rnw_submitted_handoff`; templates `RNW_RA_FFY` (Renewal Advice of a Free First Year policy) and `RNW_SFU` (follow-up of a mortgaged account) |
 | V1018 `renewal_retention` | Retention rule `RENEWAL_CANDIDATE` (renewed and closed renewals, 5 years, then review) |
 | V1910 `seed_renewal_reference` | SIT/UAT users `rnwtl` (Marketing Team Leader of T-CORP1), `lamd`, `contactc`; non-renewable risk code `CAR07`; active bucket rule set and decision matrix v1 (seed content); package map rows `QPS-MOTOR-A` (mapped) and `QPS-HOME-OLD` (rejected) |
 | V1911 | Not used: the renewals of the seed profile are created by `RenewalSeedData` (seed profile, after the booking seed), which extracts seven migrated policies and walks them through the flows so that every list has rows |
@@ -731,8 +732,7 @@ The screens of section 12 are built, with these differences:
 
 ### 17.6 Not built
 
-- Wave R3: `SubmittedPolicyRenewalHandOff`, the FFY RA and SFU templates and the print channel (V1017). They wait for the
-  Submitted Policies module (S1-D).
+- Nothing of wave R3 is left: the SFU follow-up is the no-response reminder of a mortgaged submitted policy (section 17.7).
 - Claims: the claims check and the Account History read the claims summary when the broker claims bean is present; the
   history shows "Claims are not connected yet" otherwise.
 
@@ -759,9 +759,32 @@ The FRS is not edited by the build; these notes are applied at its next issue.
 - FR-RN-082: the NAL reasons and the reasons that need a new invoice number are parameters.
 - FR-RN-084: acceptance by payment is recorded with the payment reference; automatic placement generates the slips and
   notifies the Processing Officer, who sends them.
-- FR-RN-090: not built (wave R3).
+- FR-RN-090: built by wave R3 (section 17.7).
 - FR-RN-100: Renewal Home shows the tiles due in 30 / 60 / 90 / 140 days, at risk, urgent, returned, NRNS, insurer
   replies overdue and failed letters, the renewals by status and Classification and the workload per officer.
 - FR-RN-101: the "Renew to TSU" and "Renew to Other Bank" counters are 0 until RQ10 is answered; the account columns
   listed in section 17.5 are not in the report.
 - FR-RN-111: the letter templates are maintained on the document template screen by holders of `RNW_TEMPLATE_MAINTAIN`.
+
+### 17.7 Wave R3 as built (submitted-policy hand-off)
+
+- `SubmittedPolicyRenewalHandOff` answers `RenewalHandOff.handOff` in its own transaction: the candidate of source
+  `SUBMITTED_POLICY` keyed by the masterlist number (a record offered again gets its existing renewal), a snapshot from
+  the policy, risk and loan data with the insurer assigned by the Submitted Policies insurer rules, the checks and the
+  initiation at once (the expiry scan is the initiation, BRRN.021). A failure is answered REFUSED with its reason, so the
+  masterlist keeps the hand-off and offers it again at the next scan. `status` answers from the candidate: open, or
+  closed as renewed, not renewed, lost or expired unrenewed.
+- The first Renewal Advice of a Free First Year record uses `RNW_RA_FFY`, and the no-response reminder (NRNS) of a mortgaged
+  submitted policy is the follow-up letter `RNW_SFU` (`LetterContent.templateOf`).
+- A letter of a submitted policy whose client has no e-mail is handed to the mail house through
+  `MailHouseGateway` (a print batch of Submitted Policies with the merged PDF and the control list) and recorded as sent
+  with the batch number.
+- The renewal account of a submitted policy has the origin `SUBMITTED_POLICY` and renews the masterlist number.
+
+| Topic | Design (section 2.3) | As built | Why |
+|---|---|---|---|
+| Renewal account and hold cover | Created by the adapter at hand-off | Created by the processing flow once the client and package are resolved, like a migrated policy; the hold cover follows in placement. Kept as built by decision; listed as a clarification item for BDOI | A submitted policy has no BIBS client or package at hand-off |
+| Renew with BDOI | Candidate starts at UNASSIGNED | Initiated like a scanned record; the routing of the checks and matrix decides the stage | One initiation path |
+| SFU letter | Own letter type | The NRNS reminder of a mortgaged submitted policy is written with `RNW_SFU` | Same timing and tracking as the reminder; no new letter type |
+| Print channel | Every printed letter | Letters of clients without an e-mail | The e-mail stays the default channel of the renewal letters |
+

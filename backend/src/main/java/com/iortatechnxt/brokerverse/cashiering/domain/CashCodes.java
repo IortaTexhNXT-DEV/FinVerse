@@ -169,7 +169,12 @@ public final class CashCodes {
     /** Transfer to another marketing unit. */
     TRANSFER,
     /** Settled outside the system. */
-    MANUAL
+    MANUAL,
+    /**
+     * Recognised as BDOI income with an official receipt (handling fee of submitted policies,
+     * BRIDSP-31).
+     */
+    INCOME
   }
 
   /** Status of a disposition. */

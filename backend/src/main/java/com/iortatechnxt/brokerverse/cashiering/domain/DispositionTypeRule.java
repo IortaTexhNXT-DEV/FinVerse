@@ -7,6 +7,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 
 /**
  * What a disposition type of LOV {@code DISPOSITION_TYPE} does and whether it needs the team
@@ -30,6 +31,15 @@ public class DispositionTypeRule {
   @Column(nullable = false, length = 250)
   private String description;
 
+  @Column(name = "income_event", length = 40)
+  private String incomeEvent;
+
+  @Column(name = "or_type", length = 40)
+  private String orType;
+
+  @Column(name = "vat_rate", precision = 9, scale = 6)
+  private BigDecimal vatRate;
+
   protected DispositionTypeRule() {}
 
   public String getTypeCode() {
@@ -46,5 +56,32 @@ public class DispositionTypeRule {
 
   public String getDescription() {
     return description;
+  }
+
+  /**
+   * Accounting event of an income type (action INCOME), e.g. {@code SBM_HANDLING_FEE}.
+   *
+   * @return event type, null for the other actions
+   */
+  public String getIncomeEvent() {
+    return incomeEvent;
+  }
+
+  /**
+   * Official receipt type issued for an income type (LOV {@code OR_TYPE}).
+   *
+   * @return OR type, null for the other actions
+   */
+  public String getOrType() {
+    return orType;
+  }
+
+  /**
+   * Output VAT rate included in the amount of an income type (0.12 for 12 %).
+   *
+   * @return rate, null when the income carries no VAT
+   */
+  public BigDecimal getVatRate() {
+    return vatRate;
   }
 }

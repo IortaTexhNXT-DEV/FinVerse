@@ -116,7 +116,8 @@ public class ApplicationRequestService {
                 d.getCreatedBy(),
                 SOURCE,
                 r.getSourceRef(),
-                d.getRemarks()));
+                d.getRemarks(),
+                incomeTypeOf(d.getCashieringAction(), d.getDispositionCode())));
     r.answer(statusOf(ticket), ticket.reference(), ticket.message(), clock.instant());
     audit.record(
         ENTITY,
@@ -234,5 +235,17 @@ public class ApplicationRequestService {
       case "APPLIED" -> Optional.of(Status.APPLIED);
       default -> Optional.empty();
     };
+  }
+
+  /**
+   * The income type of a disposition that recognises the payment as income: the disposition code
+   * itself (for example HANDLING_FEE, BRIDSP-31); null for the other actions.
+   *
+   * @param action Cashiering action of the disposition
+   * @param code disposition code
+   * @return income type or null
+   */
+  static String incomeTypeOf(String action, String code) {
+    return Action.RECOGNIZE_INCOME.name().equals(action) ? code : null;
   }
 }

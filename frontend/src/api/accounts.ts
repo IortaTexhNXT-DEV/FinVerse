@@ -35,7 +35,7 @@ export const ACCOUNT_STATUSES: AccountStatus[] = [
 
 export type PaymentArrangement = 'VIA_BDOI' | 'DIRECT_TO_INSURER';
 export type PaymentStatus = 'UNPAID' | 'PAID' | 'CLIENT_CONFIRMED' | 'DIRECT';
-export type HoldCoverStatus = 'REQUESTED' | 'CONFIRMED' | 'DECLINED' | 'EXPIRED';
+export type HoldCoverStatus = 'REQUESTED' | 'CONFIRMED' | 'DECLINED' | 'EXPIRED' | 'REASSIGNED';
 
 export interface Vehicle {
   plateNo?: string;

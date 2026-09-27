@@ -1,0 +1,293 @@
+# Screen specifications of BRD-3 Product Maintenance: the product catalogue, package versions and their validation,
+# coverages and clauses, incentive criteria. Schema: docs/deliverables/src/signoff/README.md.
+area: Products and package versions
+screens:
+  - id: SCR-PM-11
+    title: Products
+    route: /catalog/products
+    purpose: >-
+      The product catalogue: every product (risk code) with its line, package flag, current version, market segments,
+      rate and minimum premium, and its lifecycle; and, on their own tabs, the field rules, document rules and TSU
+      routing rules that decide what an account needs and when TSU reviews it. MBS creates products and rules; a second
+      user authorises them. Expired and retired products are listed for the users who may see the archive.
+    entry:
+      - Sidebar entry Products
+      - Package Expiry › Expired tab › Products
+      - Product record › back arrow
+    shots:
+      - {state: list, user: mbs, caption: "Products with the package filter"}
+      - {state: new, user: mbs, click: "^new product$", caption: "New product dialog"}
+      - {state: rules, user: badmin, tab: Field rules, caption: "Field rules tab with the authorisation actions"}
+    fields:
+      - "Tabs | Products / Field rules / Document rules / TSU routing | Tab | - | - | Fixed | Products | - | - | -"
+      - "Filters | Search | Text | Code or name | N | - | Blank | - | Contains search | -"
+      - "Filters | Product line | Drop-down | All lines or one line | N | Product lines | All lines | - | - | -"
+      - "Filters | Package | Drop-down | Package and non-package, Package only, Non-package only | N | Fixed list | Package and non-package | - | - | -"
+      - "Filters | Market segment | Drop-down | All segments or one | N | List MARKET_SEGMENT | All segments | - | - | -"
+      - "Filters | Lifecycle | Drop-down | Sellable, Expired, Retired | N | Fixed list | Sellable | - | Shown only to users who may see the archive (PRODUCT_ARCHIVE_VIEW) | -"
+      - "Filters | Active only | Check box | - | N | - | Not ticked | - | Authorised and active records only | -"
+      - "List | Code / Name / Line | Column | Risk code, product name, line code | - | Product master | - | Read only | - | No product matches the filters."
+      - "List | Package | Column | Yes for a package product | - | Product master | - | Read only | - | -"
+      - "List | Version | Column | Current version (v2) and the pill of a version being set up (Draft, For validation) | - | Package versions | - | Read only | - | -"
+      - "List | Segments | Column | Market segments, or All | - | Product master | - | Read only | - | -"
+      - "List | Rate % / Min. Premium | Column | Product rate and minimum premium (of the version in force for a package) | - | Product master | - | Read only | - | -"
+      - "List | Status | Column | Pending Authorization, Active, Inactive; Expired or Retired for a package no longer sold | - | Product master | - | Read only | - | -"
+      - "New product | Code | Text | 1 to 20 capitals or digits | Y | - | Blank | New product only | Unique; the naming convention of the line when set | Code: 1 to 20 capital letters or digits."
+      - "New product | Name | Text | Up to 200 characters | Y | - | Blank | Pending, active | Not blank | Name is required."
+      - "New product | Product line | Drop-down | Line name | Y | Product lines | Select | Pending, active | - | Choose the product line."
+      - "New product | Cover type | Drop-down | Cover types of the line | Cond.: package product | Cover types | None | Pending, active | A cover type of the line; a package needs one | A package needs its cover type"
+      - "New product | Placement after | Drop-down | Paid, Client confirmation | Y | Fixed list | Paid | Pending, active | - | -"
+      - "New product | TSU review | Drop-down | By rules, Always, Never | N | Fixed list | By rules | Pending, active | - | -"
+      - "New product | Default rate % | Number | Up to four decimals | N | - | Blank | Pending, active (package: through a new version) | 0 to 100 | The rate, minimum premium, commission and TSI limit of package <code> change through a new version (Versions tab)"
+      - "New product | Default commission % | Number | Percentage | Y | - | Blank | Pending, active (package: through a new version) | 0 to 100 | Default commission rate is required."
+      - "New product | Minimum premium | Number | Amount in PHP | Y | - | 0 | Pending, active (package: through a new version) | Zero or more | The minimum premium cannot be negative"
+      - "New product | Package TSI limit | Number | Amount in PHP; above it the account goes to TSU | N | - | Blank | Pending, active (package: through a new version) | Zero or more | -"
+      - "New product | Maximum term (years) | Number | 1 to 10 | Cond.: multi-year term allowed | - | 1 | Pending, active | At least 2 for a multi-year product | A multi-year product needs a maximum term of at least 2 years."
+      - "New product › Features | Package product (fixed cover) / Fleet (several vehicles) / Mortgage / loan related / Direct payment to insurer allowed / Multi-year term allowed / Free First Year eligible | Check box | - | N | - | Not ticked | Pending, active | - | -"
+      - "New product | Market segments (none = all) | Check boxes | Segments the product is offered to | N | List MARKET_SEGMENT | None (all segments) | Pending, active | Active values | -"
+      - "Field rules | Applies to / Level / Field / Key / Mandatory / Status | Column | All products, a line or a product; Account or Risk item | - | Field rules | - | Read only | - | -"
+      - "Document rules | Applies to / Document / Before Submission / Status | Column | Document type; Required or Optional | - | Document rules | - | Read only | - | -"
+      - "TSU routing | Priority / Code / Description / Criteria / TSI Above / Status | Column | Lower priority evaluated first | - | TSU routing rules | - | Read only | - | -"
+    actions:
+      - "New Product | MBS (PRODUCT_MAINTAIN, MASTER_MAINTAIN) | Products tab | Opens New product; Save for Authorization saves it pending authorisation | Pending Authorization | -"
+      - "Add Rule | MASTER_MAINTAIN | Field rules, Document rules or TSU routing tab | Opens New Rule (see SCR-PM-12) | Pending Authorization | -"
+      - "Authorize | PRODUCT_AUTHORIZE or MASTER_AUTHORIZE (Business Administrator, New Business Approver), not the maker | Row pending authorisation | Authorises the record; it is used by quotations, accounts and rating from now | Active | -"
+      - "Deactivate | PRODUCT_MAINTAIN or MASTER_MAINTAIN | Active row | Ends the use of the record; its history stays | Inactive | -"
+      - "[Open a row] | Every user of the screen | Products tab | Opens the product record | - | -"
+    rules:
+      - "Every product and rule is maker-checker: saved changes wait for a second user's authorisation and are not used until then (FR-PM-010, FR-PM-012)."
+      - "A package product needs its cover type; the risk code follows the naming convention of its line once BDOI has stated it (FR-PM-010)."
+      - "The rate, minimum premium, commission and TSI limit of a package change only through a new version, so a released package stays sellable while it is changed (FR-PM-050)."
+      - "Sellable lists show active products only; expired and retired products are shown to the archive users and are never deleted (FR-PM-052)."
+      - "Field rules check presence, a list of values, a number range or a format; document rules name the documents an account needs before submission (FR-PM-012, FR-PM-013)."
+    outcome: The business finds any product with its current version and lifecycle, and maintains products and their rules under maker-checker.
+    frs: [FR-PM-010, FR-PM-012, FR-PM-013, FR-PM-050, FR-PM-052]
+    tests: [PRODUCTS]
+
+  - id: SCR-PM-12
+    title: Product record
+    route: /catalog/products/:code
+    parent: /catalog/products
+    purpose: >-
+      One product: its risk code, lifecycle and authorisation status, package and version flags, line and cover type,
+      current version, rate, package end and TSU review; the tabs Versions (every package version with its status,
+      dates, source request and validator), Features (all product attributes) and Field Rules & Documents (the field
+      matrix and the documents an account needs). MBS creates the next version of a package from here.
+    entry:
+      - Products › a row
+      - Package Version › back arrow
+      - Incentive Criteria (products matrix)
+    shots:
+      - {state: record, user: mbs, open: packaged_product, caption: "Product record of a package, Versions tab"}
+      - {state: new_version, user: mbs, open: released_product, click: "^new version$", caption: "New Version dialog"}
+      - {state: rules, user: mbs, open: packaged_product, tab: Field Rules & Documents, caption: "Field Rules & Documents tab"}
+    fields:
+      - "Header | Risk code | Reference chip | Product code | - | Product master | - | Read only | - | -"
+      - "Header | [Lifecycle and record status pills] | Pill | Active, Expired, Retired; Pending Authorization, Active, Inactive | - | Product master | - | Read only | - | -"
+      - "Header | [Package and version tags] | Tag | Package; Version n Draft or For validation | - | Product master | - | Read only | - | -"
+      - "Header | Line › Type / Current Version / Rate % / Package End / TSU Review | Fact | As in the catalogue | - | Product master, version in force | - | Read only | - | -"
+      - "Versions | Version / Status / Effective From / Effective To / Rate % / Package End / Request / Validated By / Change | Column | Newest first; Draft, For validation, Released, Superseded, Expired | - | Package versions | - | Read only | - | No version yet."
+      - "New Version | What changes | Text | Free text | Y | - | Blank | - | Not blank | Describe the change"
+      - "Features | Line / Cover type / Risk items / Rating / Package / Package TSI limit / Fleet / Market segments / Mortgage related / Direct payment allowed / Multi-year / Free First Year / Placement after / Default rate % / Default commission % / Minimum premium / TSU review | Detail | As on the product | - | Product master | - | Read only (Edit opens the product dialog) | - | -"
+      - "Field Rules & Documents › Field matrix | Level / Field / Key / Mandatory / Check / From | Column | Rules of all products, the line and the product | - | Field rules | - | Read only | - | No field rules apply."
+      - "Field Rules & Documents | Documents required before submission | List | Document types | - | Document rules | - | Read only | - | No document is required."
+      - "New Rule (field) | Applies to | Drop-down | All, Line, Product | Y | Fixed list | Product (from the product record) | New rule | Rules for every product use the scope code * | Rules for every product use the scope code '*'"
+      - "New Rule (field) | Level | Drop-down | Account or Risk item | N | Fixed list | Account | New rule | - | -"
+      - "New Rule (field) | Field key / Label | Text | Field key (one of several keys with a vertical bar) and its label | Y | - | Blank | New rule | Unique per scope | Minimum-field rule already exists: <key>"
+      - "New Rule (field) | Check | Drop-down | Presence only, List of values, Number range, Format (pattern) | N | Fixed list | Presence only | New rule | The parameters of the check are complete | Complete the parameters of the <type> rule"
+      - "New Rule (field) | List of values / Minimum / Maximum / Pattern | Text / Number | List code; range; regular expression | Cond.: by check | Lists of values | Blank | New rule | Known list; valid pattern | Unknown list of values <lov type>"
+      - "New Rule (document) | Document type | Drop-down | Document types | Y | List DOCUMENT_TYPE | Blank | New rule | Active value | -"
+      - "New Rule | Mandatory | Check box | - | N | - | Ticked | New rule | - | -"
+    actions:
+      - "Edit | PRODUCT_MAINTAIN or MASTER_MAINTAIN | Always | Opens the product dialog (as New product, code fixed); Save for Authorization | Pending Authorization | -"
+      - "Authorize / Deactivate | As on Products | As on Products | As on Products | Active / Inactive | -"
+      - "New Version | MBS (PRODUCT_MAINTAIN) | Package product with a version in force and no version being set up | Opens New Version; Create Draft copies the version in force into a new draft effective tomorrow and opens it | Draft version | -"
+      - "Add Product Rule | PRODUCT_MAINTAIN or MASTER_MAINTAIN | Field Rules & Documents tab | Opens New Rule with the scope set to this product; Save for Authorization | Pending Authorization | -"
+      - "[Open a version row] | Every user of the screen | Versions tab | Opens the Package Version | - | -"
+    rules:
+      - "A non-package product has no versions; it is rated on the product rate (FR-PM-050)."
+      - "A package has at most one version being set up (draft or for validation) at a time (FR-PM-042, FR-PM-050)."
+      - "Every version is kept: superseded and expired versions stay readable with their validator and source request (FR-PM-050, FR-PM-005)."
+      - "Field rules of all products, of the line and of the product apply together; the account checks refuse a missing or invalid value (FR-PM-012)."
+    outcome: MBS and the approvers see the whole history of a product and start its next version from the terms in force.
+    frs: [FR-PM-050, FR-PM-012, FR-PM-013, FR-PM-042]
+    tests: [PRODUCT, VERSIONS, RULES]
+
+  - id: SCR-PM-13
+    title: Package Version
+    route: /catalog/products/:code/versions/:versionNo
+    parent: /catalog/products/:code
+    purpose: >-
+      One version of a package: the rate scheme, dates and origin, the coverages and perils, the insurers of the panel
+      with their role, share, rate and minimum premium, and the insurer terms per coverage with their clauses. MBS
+      edits a draft and submits it for validation; the validator (TSU Head or Business Administrator, never the maker or
+      submitter) confirms the checklist and releases it, or returns it to MBS with a reason. Released versions are read
+      only and show who validated them.
+    entry:
+      - Product record › Versions tab › a row
+      - Product record › New Version
+      - Package Request record › Set-up tab › Open Version Editor
+      - Validation Queue › a row
+    shots:
+      - {state: draft, user: mbs, open: draft_version, caption: "Draft version of the MTR12 package, Rate Scheme & Dates tab"}
+      - {state: insurers, user: mbs, open: draft_version, tab: Insurers, caption: "Insurers tab of the draft"}
+      - {state: terms, user: mbs, open: draft_version, tab: Insurer Terms, caption: "Insurer Terms tab: terms and clauses per insurer and coverage"}
+      - {state: error, user: mbs, open: draft_version, fill: version_invalid, submit: "^save draft$", caption: "Field messages of the version form"}
+      - {state: validation, user: tsuhead, open: version_for_validation, caption: "Validation Checklist of the TSU Head"}
+      - {state: released, user: mbs, open: released_version, caption: "Released version with its validation"}
+    fields:
+      - "Header | Product / Version | Reference chip | Risk code; version number | - | Package version | - | Read only | - | -"
+      - "Header | [Version status pill] | Pill | Draft, For validation, Released, Superseded, Expired | - | Package version | - | Read only | - | -"
+      - "Header | [Request tag] | Tag | Request PKR-yyyy-nnnnnn that produced the version | - | Package version | - | Read only | - | -"
+      - "Header | Effective / Package End / Rate % / Set Up By / ManCom Ref. | Fact | Rate % shows Per insurer when every insurer has its own rate | - | Package version | - | Read only | - | -"
+      - "Rate Scheme | Package Rate % | Number | Up to four decimals; empty when every insurer has its own rate | Cond.: or a rate for every insurer | - | Rate of the version it was copied from | Draft | 0 to 100; the package rate or a rate for every insurer | Enter a rate between 0 and 100 / Enter the package rate or a rate for every insurer"
+      - "Rate Scheme | Minimum Premium | Number | Amount in PHP | Y | - | Copied value | Draft | Zero or more | Enter the minimum premium"
+      - "Rate Scheme | Commission % | Number | Percentage | Y | - | Copied value | Draft | 0 to 100 | Enter a commission between 0 and 100"
+      - "Rate Scheme | Package TSI Limit | Number | Amount in PHP; above it TSU prices the risk | N | - | Copied value | Draft | Zero or more | Enter a positive amount"
+      - "Dates | Effective From | Date | dd-MMM-yyyy | Y | - | Tomorrow (new version) or the signed-off date | Draft | Today or later; after the start of the version in force | Enter the effective date / The effective date cannot be before today / The effective date must be after the start of version <version no>"
+      - "Dates | Package Start | Date | dd-MMM-yyyy | N | - | Copied value | Draft | - | -"
+      - "Dates | Package End | Date | dd-MMM-yyyy; expiry monitoring | N | - | Copied value | Draft | After the effective date | The package end date must be after the effective date"
+      - "Dates | Anniversary | Date | dd-MMM-yyyy | N | - | Copied value | Draft | - | -"
+      - "Origin | Change Summary | Text | Up to 500 characters | N | - | What changes (new version) or the request's summary | Draft | - | -"
+      - "Origin | ManCom Sign-off Reference | Text | MC-PKR-yyyy-nnnnnn | N | ManCom sign-off | From the request | Draft | - | -"
+      - "Origin | Computation Basis | Text | As agreed with the insurers | N | Proposed terms | From the request | Draft | - | -"
+      - "Coverages | Coverage | Column | Coverage name, with the Basic tag | Y (at least one included) | Coverages of the line | Copied coverages | Draft | At least one included coverage; a basic coverage | Include at least one coverage / The package needs its cover type and at least one included basic coverage"
+      - "Coverages | Included / Optional | Check box | - | N | - | Included | Draft | - | -"
+      - "Coverages | Limit / Deductible | Number | Amounts in PHP | N | - | Blank | Draft | Zero or more | -"
+      - "Coverages | Add coverage | Drop-down | Active coverages of the line not yet added, (basic) marked | N | Coverages & Clauses | - | Draft | - | -"
+      - "Insurers | Insurer | Column | Insurer code | N | Insurers (authorised, active) | Copied panel | Draft | Every insurer with terms is on the package | Insurer <insurer code> has terms but is not on the package"
+      - "Insurers | Role | Drop-down | Panel, Lead, Participant | Y | Fixed list | Panel | Draft | - | -"
+      - "Insurers | Share % | Number | Co-insurance share | Cond.: lead and participants | - | Blank | Draft | 0 to 100; lead and participant shares total 100% | Enter a share between 0 and 100 / The co-insurance shares must add up to 100%"
+      - "Insurers | Rate % | Number | Insurer's own rate; wins over the package rate | Cond.: when there is no package rate | - | Blank | Draft | 0 to 100 | Enter a rate between 0 and 100"
+      - "Insurers | Minimum Premium | Number | Insurer's own minimum premium | N | - | Blank | Draft | Zero or more | -"
+      - "Insurers | Add insurer | Drop-down | Active insurers not yet on the panel | N | Insurers | - | Draft | - | -"
+      - "Insurer Terms | Insurer / Coverage | Column | One row per panel insurer and included coverage | Y (every pair) | Panel and coverages | Added with the coverage's values | Draft | Every panel insurer has terms for each included coverage | Insurer <insurer code> has no terms for coverage <coverage>"
+      - "Insurer Terms | Covered | Check box | - | N | - | Ticked | Draft | - | -"
+      - "Insurer Terms | Limit / Deductible / Deductible Wording | Number / Text | Amounts in PHP; wording | N | - | The coverage's values | Draft | - | -"
+      - "Insurer Terms | Clauses | Multi-select | Active clauses of the line or of every line | N | Clause library | None | Draft | Active clauses | -"
+      - "Validation Checklist | Hierarchy complete: cover type and basic coverage / Every panel insurer has terms for each included coverage / Rates and minimum premiums match the signed-off terms / Dates and package term are correct / Test premium reviewed | Check box | Every item | Y (all five) | Fixed checklist | Not ticked | For validation | Every item confirmed | -"
+      - "Validation | [Validated by, date and test premium] | Detail | Validated by <name> on dd-MMM-yyyy HH:mm · Test premium; the confirmed checklist | - | Package version | - | Read only | - | -"
+      - "Return Version to MBS | Return reason / Comment | Drop-down / Text | Return reason list; free text | Y (reason) | List RETURN_REASON | Select | For validation | Not blank | Enter the reason of the return"
+    actions:
+      - "Save Draft | MBS (PRODUCT_MAINTAIN) | Draft | Checks the fields and saves the whole draft | Draft | -"
+      - "Submit for Validation | MBS (PRODUCT_MAINTAIN) | Draft; no field message | Saves the draft and checks completeness (cover type and basic coverage, insurer terms for every included coverage, shares, rate, dates) | For validation | -"
+      - "Validate and Release | TSU Head or Business Administrator (PRODUCT_VALIDATE), not the maker or the submitter | For validation; every checklist item ticked | Computes the test premium, releases the version and ends the previous version the day before; releases the source request, drafts its advisory and, for a new package, authorises the product | Released | Package available notice to Marketing (NT-02)"
+      - "Return to MBS | As Validate and Release | For validation | Opens Return Version n to MBS; Return sends the version back to draft with the reason, and the request back to MBS | Draft | Workflow notice on the request"
+    rules:
+      - "A draft is invisible to rating; only a released version prices new business (FR-PM-050, FR-PM-051)."
+      - "Submission needs the cover type and at least one included basic coverage, terms for every panel insurer on every included coverage, the package rate or a rate for every insurer, co-insurance shares totalling 100%, an effective date today or later and after the start of the version in force, and a package end after the effective date (FR-PM-043, FR-PM-014)."
+      - "The validator is never the maker or the submitter of the version; the validator confirms the five checklist items and a test premium is computed (FR-PM-043)."
+      - "On release the previous version ends the day before the new one takes effect and becomes Superseded; a version whose package end has passed without a renewal becomes Expired and the product is no longer sold (FR-PM-050, FR-PM-052)."
+      - "An insurer's own rate and minimum premium win over the package's; a package with a panel is placed only with its panel insurers (FR-PM-014, FR-PM-051)."
+    outcome: A package version is set up once, checked by a second person and released on its effective date; every earlier version stays on record.
+    frs: [FR-PM-043, FR-PM-050, FR-PM-014, FR-PM-011, FR-PM-042]
+    tests: [VERSION]
+
+  - id: SCR-PM-14
+    title: Validation Queue
+    route: /catalog/validation
+    purpose: >-
+      The package versions submitted by MBS that wait for the post-set-up validation, oldest first, with their age. A row
+      opens the version with its checklist.
+    entry:
+      - Sidebar entry Validation Queue
+      - Product Maintenance Home › Versions for validation
+    shots:
+      - {state: list, user: tsuhead, caption: "Validation Queue of the TSU Head"}
+    fields:
+      - "Search | Search Product | Text | Code or name | N | - | Blank | - | Contains search | -"
+      - "List | Product / Name / Version / Status | Column | Risk code, product name, v<n>, For validation pill | - | Package versions | - | Read only | - | No package version waits for validation."
+      - "List | Effective From | Column | dd-MMM-yyyy | - | Package version | - | Read only | - | -"
+      - "List | Request | Column | PKR-yyyy-nnnnnn | - | Package version | - | Read only | - | -"
+      - "List | Submitted By / Submitted | Column | User; dd-MMM-yyyy HH:mm | - | Package version | - | Read only | - | -"
+      - "List | Age (days) | Column | Whole days since the submission | - | Computed | - | Read only | - | -"
+    actions:
+      - "[Open a row] | TSU Head, Business Administrator (PRODUCT_VALIDATE) | Always | Opens the Package Version with the Validation Checklist | - | -"
+    rules:
+      - "Only users who validate package versions see the queue; a version they set up or submitted is shown but cannot be validated by them (FR-PM-043)."
+    outcome: No submitted version waits unseen; the validator works the oldest first.
+    frs: [FR-PM-043]
+    tests: [VALQ]
+
+  - id: SCR-PM-15
+    title: Coverages & Clauses
+    route: /catalog/coverages
+    purpose: >-
+      The coverage and peril level of the product hierarchy, per line, and the clause library (warranties, clauses,
+      exclusions and deductible wordings) that package versions use in their insurer terms. MBS maintains them; a second
+      user authorises them.
+    entry:
+      - Sidebar entry Coverages & Clauses
+    shots:
+      - {state: list, user: mbs, caption: "Coverages & Perils tab"}
+      - {state: clauses, user: mbs, tab: Clause Library, caption: "Clause Library tab"}
+      - {state: new, user: mbs, click: "^new coverage$", caption: "New Coverage dialog"}
+    fields:
+      - "Tabs | Coverages & Perils / Clause Library | Tab | - | - | Fixed | Coverages & Perils | - | - | -"
+      - "Coverages & Perils | Product line | Drop-down | All lines or one line | N | Product lines | All lines | - | - | -"
+      - "Coverages & Perils | Line / Code / Name / Kind / Basic / Status | Column | Coverage of the line; Basic Yes | - | Coverages | - | Read only | - | No coverage is set up for this line."
+      - "Clause Library | Code / Kind / Title / Line / Effective / Until / Status | Column | Line or All lines; dd-MMM-yyyy | - | Clauses | - | Read only | - | The clause library is empty."
+      - "New Coverage | Product line | Drop-down | Line name | Y | Product lines | Select the line | New coverage only | - | Select the product line"
+      - "New Coverage | Code | Text | A-Z, 0-9 and _ | Y | - | Blank | New coverage only | Unique per line | Use A-Z, 0-9 and _"
+      - "New Coverage | Name | Text | Free text | Y | - | Blank | Pending, active | Not blank | Enter the name"
+      - "New Coverage | Kind | Drop-down | Coverage kinds | Y | List COVERAGE_KIND | Blank | Pending, active | Active value | Select the kind"
+      - "New Coverage | Display order | Number | Whole number | N | - | 100 | Pending, active | - | -"
+      - "New Coverage | Basic coverage | Check box | - | N | - | Not ticked | Pending, active | - | -"
+      - "New Clause | Code | Text | A-Z, 0-9 and _ | Y | - | Blank | New clause only | Unique | Use A-Z, 0-9 and _"
+      - "New Clause | Kind | Drop-down | Clause kinds | Y | List CLAUSE_KIND | Blank | Pending, active | Active value | Select the kind"
+      - "New Clause | Product line | Drop-down | Every line or one line | N | Product lines | Every line | Pending, active | - | -"
+      - "New Clause | Title | Text | Free text | Y | - | Blank | Pending, active | Not blank | Enter the title"
+      - "New Clause | Effective from / Effective to | Date | dd-MMM-yyyy | Y (from) | - | Blank | Pending, active | To on or after from | Enter the effective date / The end is before the start"
+      - "New Clause | Wording | Text | Full wording | Y | - | Blank | Pending, active | Not blank | Enter the wording"
+    actions:
+      - "New Coverage / New Clause | MBS (PRODUCT_MAINTAIN) | Tab of the kind | Opens the dialog; Save for Authorization saves it pending authorisation | Pending Authorization | -"
+      - "[Open a row] | MBS (PRODUCT_MAINTAIN) | Always | Opens the coverage or clause for change (code fixed) | Pending Authorization | -"
+      - "Authorize | PRODUCT_AUTHORIZE (Business Administrator, New Business Approver), not the maker | Pending row | Authorises the coverage or clause | Active | -"
+      - "Deactivate | PRODUCT_MAINTAIN | Active row | Ends its use; versions already released keep it | Inactive | -"
+    rules:
+      - "The hierarchy is line, cover type with at most one subtype level, product, and coverage or peril of the line (FR-PM-010)."
+      - "A package version offers only the active coverages of its line and the active clauses of its line or of every line (FR-PM-010, FR-PM-011)."
+      - "Coverages and clauses are maker-checker and never deleted (FR-PM-011)."
+    outcome: The business keeps one library of coverages and clause wordings that every package version reuses.
+    frs: [FR-PM-010, FR-PM-011]
+    tests: [COVCL]
+
+  - id: SCR-PM-16
+    title: Incentive Criteria
+    route: /catalog/incentives
+    purpose: >-
+      Incentive criteria, such as CPC2, on the products matrix: their value (rate, fixed amount or rule), the products
+      and segments they apply to, and their effective dates. An active criterion is changed by an amendment that starts
+      later and is deactivated, never deleted. Booking stamps on each invoice the criteria it matches.
+    entry:
+      - Sidebar entry Incentive Criteria
+      - The incentive alert when a product of a criterion expires or is retired
+    shots:
+      - {state: list, user: mbs, caption: "Incentive Criteria, Current tab"}
+      - {state: new, user: mbs, click: "^new criterion$", caption: "New Incentive Criterion dialog"}
+    fields:
+      - "Tabs | Current / Pending Authorization / History | Tab | - | - | Fixed | Current | - | Current = active and not ended; History = ended, replaced or inactive | -"
+      - "Search | Search Criterion or Product | Text | Code of a criterion or a product | N | - | Blank | - | Contains search | -"
+      - "List | Code / Name / Type / Value / Products / From / Until / Status | Column | Value as n%, an amount, or Rule | - | Incentive criteria | - | Read only | - | No incentive criterion in this list."
+      - "New Incentive Criterion | Code | Text | A-Z, 0-9, _ and - | Y | - | Blank | New criterion only | Unique | Use A-Z, 0-9, _ and -"
+      - "New Incentive Criterion | Name | Text | Up to 150 characters | Y | - | Blank | Pending; amendment | Not blank | Enter the name"
+      - "New Incentive Criterion | Incentive type | Drop-down | Incentive types | Y | List INCENTIVE_TYPE | Blank | Pending; amendment | Active value | Select the type"
+      - "New Incentive Criterion | Value basis | Drop-down | Rate (%), Fixed amount, Rule (parameters) | Y | Fixed list | Rate (%) | Pending; amendment | - | -"
+      - "New Incentive Criterion | Value | Number | Rate 0 to 100 or an amount | Cond.: rate or fixed amount | - | Blank | Pending; amendment | Zero or more; a rate up to 100 | Enter the value / A rate is between 0 and 100"
+      - "New Incentive Criterion | Effective from | Date | dd-MMM-yyyy | Y | - | Blank | Pending; amendment | An amendment starts after the active row; no overlap with another row of the code | Enter the start date / The change must start after <active from> / Criterion <code> already covers part of this period"
+      - "New Incentive Criterion | Effective to | Date | dd-MMM-yyyy | N | - | Blank | Pending; amendment | On or after the start | The end is before the start"
+      - "New Incentive Criterion | Rule parameters (JSON) | Text | For example {\"minimumPremium\": 5000} | N | - | Blank | Pending; amendment | Valid JSON | Enter valid JSON, e.g. {\"minimumPremium\": 5000}"
+      - "New Incentive Criterion | Description | Text | Free text | N | - | Blank | Pending; amendment | - | -"
+      - "New Incentive Criterion | Products matrix | Drop-down and rows | Active product, with a segment per product (Any segment) | Y (at least one) | Active products; list MARKET_SEGMENT | None | Pending; amendment | Active products only | Select at least one product of the matrix"
+    actions:
+      - "New Criterion | MBS (INCENTIVE_CRITERIA_MAINTAIN) | Always | Opens New Incentive Criterion; Save for Authorization | Pending Authorization | -"
+      - "[Open a row] | MBS (INCENTIVE_CRITERIA_MAINTAIN) | Row not inactive | Opens Change <code> (pending row) or Amend <code> (active row: a successor from a later date) | Pending Authorization | -"
+      - "Authorize | PRODUCT_AUTHORIZE (Business Administrator, New Business Approver), not the maker | Pending row | Authorises the criterion; an authorised amendment ends the active row the day before it starts | Active | -"
+      - "Deactivate | MBS (INCENTIVE_CRITERIA_MAINTAIN) | Active row | Ends the criterion; its history stays | Inactive | -"
+    rules:
+      - "A criterion names at least one active product of the matrix; a product that expires or is retired raises an alert to review or deactivate the criterion (FR-PM-080, FR-PM-081)."
+      - "An active criterion is changed only by an amendment starting after it; the active row ends when the amendment is authorised, so there is never a gap or an overlap (FR-PM-080)."
+      - "At booking, the invoice stores the codes of the criteria that match its product, cover type, segment, channel, lead insurer and booking date (FR-PM-081)."
+    outcome: The incentive criteria are maintained once, on the products matrix, and applied the same way to every booking.
+    frs: [FR-PM-080, FR-PM-081]
+    tests: [INCENT]

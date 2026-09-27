@@ -1,0 +1,444 @@
+# Screen specifications of BRD-3 Product Maintenance: package requests, from the request form to the release.
+# Schema: docs/deliverables/src/signoff/README.md. Field rows:
+#   section | label | type | length / format | mandatory | source / master | default | editable in | validation | message
+# Action rows:
+#   button | who | enabled when | what happens | resulting status | notification
+area: Package requests
+screens:
+  - id: SCR-PM-01
+    title: Product Maintenance Home
+    route: /product-maintenance
+    purpose: >-
+      The starting point of Product Maintenance: where every package request stands, by stage, with the requests past
+      their service level; the packages ending within 30, 60 and 90 days; the package versions waiting for validation,
+      the advisories not yet sent and the comparative outputs of the week. Every tile opens its list.
+    entry:
+      - Sign in, then the sidebar entry Product Maintenance Home
+    shots:
+      - {state: view, user: tsuhead, caption: "Product Maintenance Home of the TSU Head"}
+    fields:
+      - "Package requests by stage | Drafts / For Approval / TSU Review / Negotiation / ManCom / With MBS / For Validation / Released | Tile | Count of requests; '· n overdue' added when a request of the tile is past its due time | - | Package requests of the company | - | Read only | Red marker when a request is overdue or due within eight hours | -"
+      - "Packages ending soon | Within 30 days / Within 60 days / Within 90 days | Tile | Count of released packages whose package end date falls in the window | - | Package versions in force | - | Read only | The 30-day tile is always marked | -"
+      - "Shortcuts | Versions for validation | Tile | 'n set up by MBS, waiting for the checkpoint' | - | Package requests in For Validation | - | Read only | - | -"
+      - "Shortcuts | Advisories pending | Tile | 'n drafted, not sent yet' | - | Draft advisories of the company | - | Read only | - | -"
+      - "Shortcuts | Comparative outputs this week | Tile | 'n master and client outputs generated' | - | Comparative outputs of the last seven days | - | Read only | - | -"
+      - "Shortcuts | Package Expiry | Tile | Link | - | - | - | Read only | - | -"
+    actions:
+      - "New Package Request | Marketing AO, Marketing TL, TSU Officer (permission PKG_REQUEST) | Always | Opens the New Package Request form | - | -"
+      - "[A stage tile] | Every user of the screen | Always | Opens Package Requests on the tab of the tile | - | -"
+      - "[An expiry tile] | Every user of the screen | Always | Opens Package Expiry with the window of the tile | - | -"
+    rules:
+      - "The counts are those of the company selected in the page header (FR-PM-070)."
+      - "A request is marked overdue when its stage due time has passed and due soon within eight hours of it; the due time comes from the service level hours of the stage (FR-PM-073)."
+    outcome: Each user sees at once the package work waiting in each stage and the packages that end soon, and opens the list in one click.
+    frs: [FR-PM-070, FR-PM-073]
+    tests: [HOME]
+
+  - id: SCR-PM-02
+    title: Package Requests
+    route: /product-maintenance/requests
+    purpose: >-
+      The work list of package requests of the company, by stage, from the draft to the released or closed request.
+      Team leaders assign the selected requests of one stage to a user of the team.
+    entry:
+      - Product Maintenance Home › a stage tile (opens the tab of the stage)
+      - Package Request record › back arrow
+    shots:
+      - {state: list, user: tsu, tab: Negotiation, caption: "Package Requests, Negotiation tab"}
+      - {state: filters, user: tsu, click: "^filters$", caption: "Package Requests with the request type filter"}
+    fields:
+      - "Tabs | Drafts / For Approval / TSU Review / Negotiation / ManCom / With MBS / For Validation / Released / Closed | Tab | - | - | Fixed | Drafts (or the tab of the home tile) | - | Each tab lists its stages: TSU Review = TSU review and TSU Head approval; Negotiation = negotiation, terms review, Marketing review and requirements; Closed = retired, not proceeded and voided | -"
+      - "Search | Search Request No. | Text | PKR-yyyy-nnnnnn, part of a number allowed | N | - | Blank | - | Contains search on the request number | -"
+      - "Search | Only My Requests | Check box | - | N | - | Not ticked | - | Requests created by the user or assigned to the user | -"
+      - "Filters | Request type | Drop-down | All types, New package, Amend package terms, Update package details, Renew package, Retire package, Reactivate expired package | N | Fixed list | All types | - | - | -"
+      - "List | Request No. | Column | PKR-yyyy-nnnnnn with the creation date under it | - | Package request | - | Read only | - | -"
+      - "List | Type | Column | Request type | - | Package request | - | Read only | - | -"
+      - "List | Scope | Column | Generic or Client-specific tag | - | Package request | - | Read only | - | -"
+      - "List | Client / Programme | Column | Package or programme name, with the client name or Programme under it | - | Package request | - | Read only | - | -"
+      - "List | Line | Column | Product line | - | Package request | - | Read only | - | -"
+      - "List | Product | Column | Risk code and resulting version (v2), or New package | - | Package request | - | Read only | - | -"
+      - "List | Stage | Column | Status pill | - | Workflow | - | Read only | - | -"
+      - "List | In Stage | Column | n days, with overdue or due soon | - | Workflow | - | Read only | Red when past the due time | -"
+      - "List | Assignee | Column | User or a dash | - | Workflow | - | Read only | - | -"
+    actions:
+      - "Package Expiry | Every user of the screen | Always | Opens Package Expiry | - | -"
+      - "New Package Request | Marketing AO, Marketing TL, TSU Officer (PKG_REQUEST) | Always | Opens the New Package Request form | - | -"
+      - "Assign | Team leaders (WORK_ASSIGN) | Rows of one stage are selected | Opens Assign Package Requests: choose a user of the team of the stage, or Team queue (unassigned), and click Assign | Unchanged | Assignment notice to the new assignee"
+      - "Filters | Every user of the screen | Always | Shows or hides the request type filter | - | -"
+      - "[Open a row] | Every user of the screen | Always | Opens the package request | - | -"
+    rules:
+      - "The list shows the requests of the company selected in the page header (FR-PM-024)."
+      - "Assign is offered only for requests of one stage; the assignee is chosen among the users who work that stage (FR-PM-024)."
+      - "The time in stage turns red when the stage due time has passed (FR-PM-073)."
+    outcome: The user finds any package request by stage or number and opens it; team leaders spread the work.
+    frs: [FR-PM-024, FR-PM-073]
+    tests: [REQS]
+
+  - id: SCR-PM-03
+    title: New Package Request and Edit Package Request
+    route: /product-maintenance/requests/new
+    also: [/product-maintenance/requests/:id/edit]
+    parent: /product-maintenance/requests
+    purpose: >-
+      The Package Request Form. Marketing or TSU describe the package: the request type and scope, the package or
+      programme name, the client of a client-specific package, the product line, cover type and product, the reason,
+      the requested terms by section and coverage, the requested rate scheme and package term, and the insurers to
+      approach. The draft is saved at any time; submission checks that the request is complete. The TSU Team Lead can
+      complete the form during the TSU review.
+    entry:
+      - Package Requests › New Package Request
+      - Product Maintenance Home › New Package Request
+      - Package Request record › Edit (draft, or TSU review for the TSU Team Lead)
+      - Package Expiry › Generate Renewal Request (opens the drafted renewal request)
+    shots:
+      - {state: empty, user: ao, caption: "New Package Request form"}
+      - {state: filled, user: ao, fill: new_request, caption: "New Package Request with the requested terms and target insurers entered"}
+      - {state: error, user: ao, fill: new_request_invalid, submit: "^save draft$", caption: "Field messages after Save Draft without the name, line and reason"}
+    fields:
+      - "Request | Request type | Drop-down | New package, Amend package terms, Update package details, Renew package, Retire package, Reactivate expired package | Y | List PKG_REQUEST_TYPE | New package | New request only (fixed once saved) | The type of a saved request cannot change | The type of a request cannot change"
+      - "Request | Scope | Drop-down | Generic programme or Client-specific package | Y | Fixed list | Generic programme | Draft; TSU review | - | Select the request type and the package scope"
+      - "Request | Package / programme name | Text | Up to 200 characters | Y | - | Blank | Draft; TSU review | Not blank | Enter the package or programme name"
+      - "Request | Client or prospect | Look-up | Client code or name | Cond.: client-specific package | Client master (BRD-1) | Blank | Draft; TSU review | An active client | Select the client"
+      - "Request | Product line | Drop-down | Line name | Y | Product lines | Select | Draft; TSU review | An existing line | Select the product line"
+      - "Request | Cover type / subtype | Drop-down | Cover types of the line | Cond.: New package | Cover types | Select | Draft; TSU review | A cover type of the chosen line | Select the cover type"
+      - "Request | Package product | Drop-down | Code – name of the packaged products of the line | Cond.: every type except New package | Products flagged Package | Select | New request only (fixed once saved) | A packaged product of the chosen line | Select the package product"
+      - "Request | Reason | Drop-down | Client requirement, New programme for a market segment, Market competitiveness, Change in insurer terms or rates, Loss experience, Regulatory change, Package expiry or anniversary, Others | Y | List PKG_REQUEST_REASON | Select | Draft; TSU review | An active value of the list | Select the reason"
+      - "Request | Comment on the reason | Text | Up to 500 characters | N | - | Blank | Draft; TSU review | - | -"
+      - "Request | Negotiate with the insurers | Check box | Shown for Renew, Update and Reactivate | N | - | Ticked | Draft; TSU review | New and Amend always negotiate; Retire never | -"
+      - "Request | Market segments | Check boxes | One or more | N | List MARKET_SEGMENT | None | Draft; TSU review | Active values of the list | -"
+      - "Requested terms | Heading / Details | Text | Heading and up to 4,000 characters per section; suggested sections Target market / client and Requested cover and features | Cond.: sections or coverages before submission | - | Two empty sections | Draft; TSU review | Empty sections are dropped | Complete the request: the requested terms (coverages or sections)"
+      - "Coverages and perils | Coverage code | Text | Coverage code of the line, in capitals | Cond.: sections or coverages before submission | Coverages of the line | Blank | Draft; TSU review | Every line has a code | Enter a code for every coverage or remove the line"
+      - "Coverages and perils | Included | Check box | - | N | - | Ticked | Draft; TSU review | - | -"
+      - "Coverages and perils | Limit | Number | Amount in PHP | N | - | Blank | Draft; TSU review | Zero or more | Rates and amounts cannot be negative"
+      - "Coverages and perils | Deductible | Text | Wording, for example 1% of loss, minimum PHP 20,000 | N | - | Blank | Draft; TSU review | - | -"
+      - "Rate scheme and package term | Requested rate % | Number | Up to four decimals | N | - | Blank | Draft; TSU review | Zero or more | Rates and amounts cannot be negative"
+      - "Rate scheme and package term | Minimum premium | Number | Amount in PHP | N | - | Blank | Draft; TSU review | Zero or more | Rates and amounts cannot be negative"
+      - "Rate scheme and package term | Commission % | Number | Percentage | N | - | Blank | Draft; TSU review | Zero or more | Rates and amounts cannot be negative"
+      - "Rate scheme and package term | Package TSI limit | Number | Amount in PHP | N | - | Blank | Draft; TSU review | Zero or more | Rates and amounts cannot be negative"
+      - "Rate scheme and package term | Effective from | Date | dd-MMM-yyyy | N | - | Blank | Draft; TSU review | - | -"
+      - "Rate scheme and package term | Package start | Date | dd-MMM-yyyy | N | - | Blank | Draft; TSU review | - | -"
+      - "Rate scheme and package term | Package end | Date | dd-MMM-yyyy; monitored for expiry and renewal | Cond.: before submission (not for Retire) | - | Blank | Draft; TSU review | After the package start | The package end date must be after its start date"
+      - "Rate scheme and package term | Anniversary | Date | dd-MMM-yyyy | N | - | Blank | Draft; TSU review | - | -"
+      - "Target insurers | [Insurer check boxes] | Check boxes | Name of each insurer of the panel | Cond.: at least one when the insurers are approached | Insurers (authorised, active) | None | Draft; TSU review | Authorised and active insurers | Complete the request: at least one target insurer"
+      - "Documents | [Documents panel] | Upload | See Common screen elements | N | Document types | - | After the first save | File checks of every upload | Save the draft to attach the supporting documents."
+    actions:
+      - "Load Current Terms | Users of the form | Type other than New package and a package product chosen | Copies the terms of the version in force (coverages, rate scheme, dates, insurers) into the requested terms; the sections typed stay | Unchanged | -"
+      - "Save Draft | Marketing AO, Marketing TL, TSU Officer (PKG_REQUEST); TSU Team Lead during the TSU review | No field message on the form | Checks the fields and saves the draft; a new request is numbered PKR-yyyy-nnnnnn | Draft request (new); unchanged (edit) | -"
+      - "Submit for Approval | As Save Draft | No field message on the form | Saves the request, checks that it is complete (requested terms, target insurers when negotiated, package end date, cover type of a new package) and sends it to Marketing approval | For Marketing approval | Workflow notice to the Marketing approvers"
+    rules:
+      - "The request number PKR-yyyy-nnnnnn is given at the first save (parameter PKG_REQUEST_PREFIX) (FR-PM-020)."
+      - "A new package needs its cover type; every other type needs the packaged product it changes, of the chosen line (FR-PM-010, FR-PM-020)."
+      - "A client-specific package needs an active client of the client master (FR-PM-020)."
+      - "New and Amend always go to the insurers; Retire never; Renew, Update and Reactivate go to the insurers only when Negotiate with the insurers is ticked (FR-PM-020, FR-PM-045)."
+      - "Before submission the request needs its requested terms (coverages or sections), at least one target insurer when negotiated, and the package end date; a retirement needs none of these (FR-PM-020)."
+      - "The type and the product of a saved request cannot change (FR-PM-020)."
+      - "A draft is edited by the Marketing or TSU users who create requests; during the TSU review, by the TSU Team Lead (FR-PM-020, FR-PM-022)."
+    outcome: The package request is numbered, complete and waiting for the Marketing approval, with its supporting documents attached.
+    frs: [FR-PM-020, FR-PM-010, FR-PM-045]
+    tests: [NEWREQ]
+
+  - id: SCR-PM-04
+    title: Package Request record
+    route: /product-maintenance/requests/:id
+    parent: /product-maintenance/requests
+    purpose: >-
+      One package request: its number, stage and flags, the key facts (type, client or programme, line and product,
+      scheme rate, package term, insurers), the workflow status strip with the actions of the stage, and the tabs
+      Details, Requested Terms, Negotiation, Comparative, Requirements & Sign-off, Set-up, Advisories, Documents,
+      E-mails and History. This section specifies the header, the stage actions and the tabs Details, Requested Terms,
+      Documents, E-mails and History; the other tabs have their own sections (SCR-PM-05 to SCR-PM-08).
+    entry:
+      - Package Requests › a row
+      - TSU Workbench › a row
+      - A workflow notice or an assignment notice (bell)
+      - Package Expiry › the renewal request number
+    shots:
+      - {state: record, user: mkttl, open: for_mkt_approval, caption: "Package request waiting for the Marketing approval, Details tab"}
+      - {state: approval, user: tsuhead, open: for_tsu_approval, caption: "TSU Head approval with the recommendation of the TSU Team Lead"}
+      - {state: return, user: mkttl, open: for_mkt_approval, click: "^return to requester$", caption: "Return to requester dialog with the mandatory reason"}
+      - {state: history, user: tsu, open: released, tab: History, caption: "History tab of a released request"}
+    fields:
+      - "Header | Request | Reference chip | PKR-yyyy-nnnnnn | - | Package request | - | Read only | - | -"
+      - "Header | [Stage pill] | Pill | Stage of the request | - | Workflow | - | Read only | - | -"
+      - "Header | [Scope and negotiation tags] | Tag | Generic or Client-specific; No negotiation | - | Package request | - | Read only | - | -"
+      - "Header | Request type | Fact | Request type | - | Package request | - | Read only | - | -"
+      - "Header | Client / programme | Fact | Client name or Generic programme | - | Package request | - | Read only | - | -"
+      - "Header | Line / product | Fact | Line · risk code and resulting version, or new package | - | Package request | - | Read only | - | -"
+      - "Header | Scheme rate | Fact | Rate % of the proposed terms, else of the requested terms | - | Terms | - | Read only | - | -"
+      - "Header | Package term | Fact | Package start – package end | - | Terms | - | Read only | - | -"
+      - "Header | Target insurers / Chosen insurers | Fact | Insurer codes; the chosen insurers once the terms are final | - | Terms | - | Read only | - | -"
+      - "Workflow | [Status strip] | Panel | Stage, In Stage Since, Due, Assigned To | - | Workflow | - | Read only | Due in red when overdue | -"
+      - "Details › Request | Type / Scope / Client / Line / cover type / Market segments / Reason / Negotiation / TSU recommendation | Detail | As entered on the form; Negotiation: Insurers approached or No negotiation | - | Package request | - | Read only | - | -"
+      - "Details › Approvals and steps | Submitted / Marketing approval / TSU recommendation / TSU Head approval / Terms final / Requirements to ManCom / MBS set-up / Released | Detail | User · dd-MMM-yyyy HH:mm, or a dash | - | Request milestones | - | Read only | - | -"
+      - "Requested Terms | [Sections, coverages, rate scheme, dates and insurers] | Read-only view | Sections; Coverage, Included, Limit, Deductible; Rate / minimum premium; Commission / TSI limit; Computation basis; Effective from; Package term; Insurer, Role, Share %, Rate %, Minimum | - | Requested terms | - | Read only | - | -"
+      - "History › Status history | Stage / From Stage / Action / By / Date and Time / Remarks / Duration in Stage | Table | Newest first | - | Workflow history | - | Read only | - | -"
+      - "History › Insurer response revisions | Changed / By / Rev. / Outcome / Rate % / Remarks | Table | Every saved revision of every insurer response | - | Response history | - | Read only | - | No insurer response keyed in yet"
+      - "Documents | [Documents panel] | Table and upload | See Common screen elements | - | Attachments of the request | - | Every stage (PKG_REQUEST, PKG_NEGOTIATE, attachment permission) | File checks | -"
+      - "E-mails | [Sent e-mails] | Table | Recipient, subject, attachments, status | - | Outbound messages of the request | - | Read only | - | -"
+    actions:
+      - "Request Form | Every user of the screen | Always | Downloads the Package Request Form (PDF) with the requested terms | Unchanged | -"
+      - "Edit | PKG_REQUEST in Draft; PKG_TSU_RECOMMEND (TSU Team Lead) in For TSU review | Draft or For TSU review | Opens Edit Package Request | Unchanged | -"
+      - "Submit for approval | PKG_REQUEST | Draft; the request is complete | Checks completeness and submits | For Marketing approval | Workflow notice"
+      - "Approve and send to TSU | Marketing TL / TH / UH (PKG_REQUEST_APPROVE) | For Marketing approval; the user is not the maker or the submitter | Records the Marketing approval | For TSU review | Workflow notice"
+      - "Return to requester | Marketing TL (For Marketing approval); TSU Team Lead (For TSU review); TSU Head (For TSU Head approval) | Those stages | Opens the reason dialog (Return reason, mandatory; Comment) and returns the request | Draft request | Workflow notice with the comment"
+      - "Void | The requester (Draft, For Marketing approval); the Marketing approver; the TSU Team Lead; the TSU Head | Draft to For TSU Head approval | Opens the reason dialog (Void reason, mandatory) and closes the request without a package | Voided | Workflow notice"
+      - "Recommend for approval | TSU Team Lead (PKG_TSU_RECOMMEND) | For TSU review | Opens Recommend for Approval: the Recommendation (mandatory, up to 2,000 characters) is kept on the request and shown to the TSU Head | For TSU Head approval | Workflow notice"
+      - "Approve for negotiation | TSU Head (PKG_TSU_APPROVE) | For TSU Head approval; the request is negotiated; the user is not the recommender | Approves the request and opens negotiation round 1 with the target insurers | Insurer negotiation | Workflow notice"
+      - "Approve without negotiation | TSU Head (PKG_TSU_APPROVE) | For TSU Head approval; no negotiation (Retire, or Renew, Update, Reactivate without insurers) | The requested terms become the proposed terms; the request goes to ManCom | For ManCom sign-off | Workflow notice"
+      - "Not proceeded | TSU Officer or TSU Head (Insurer negotiation); Marketing (Marketing review of terms) | Those stages | Opens the reason dialog (Not proceeded reason, mandatory) and closes the request | Not proceeded | Workflow notice"
+      - "Release terms to Marketing | TSU Head (PKG_TSU_APPROVE) | Negotiated terms review; client-specific package | Sends the negotiated terms to Marketing for the client | Marketing review of terms | Workflow notice"
+      - "Proceed to requirements (generic package) | TSU Head (PKG_TSU_APPROVE) | Negotiated terms review; generic programme | Skips the Marketing review | Requirements preparation | Workflow notice"
+      - "Accept terms | Marketing (PKG_REQUEST) | Marketing review of terms | Records the client's acceptance of the terms | Requirements preparation | Workflow notice"
+      - "Request changes | Marketing (PKG_REQUEST) | Marketing review of terms | Opens the reason dialog; the latest round stays open so that TSU revises the slip or makes the terms final again | Insurer negotiation | Workflow notice with the comment"
+      - "Return to TSU | ManCom (PKG_MANCOM_SIGNOFF) | For ManCom sign-off | Opens the reason dialog; the return is kept as a ManCom decision Returned | Requirements preparation | Workflow notice"
+      - "Retire package | MBS (PRODUCT_MAINTAIN) | With MBS for set-up; request type Retire | Retires the product: it is no longer sold; its versions stay readable; the retirement advisory is drafted and incentive criteria on the product are flagged | Package retired | Workflow notice; incentive alert"
+      - "Return incomplete requirements to TSU | MBS (PRODUCT_MAINTAIN) | With MBS for set-up | Opens Return Incomplete Requirements (Return reason, mandatory; Comment; Return to TSU) | Requirements preparation | Workflow notice"
+    rules:
+      - "A request is never approved by its maker or submitter, and the TSU Head approval is never given by the recommender (FR-PM-021, FR-PM-023)."
+      - "The TSU Team Lead's recommendation is mandatory and is shown to the TSU Head (FR-PM-022)."
+      - "Return, void, not proceeded and request changes need a reason from their list of values; the comment is kept in the history (FR-PM-021, FR-PM-073)."
+      - "Void is possible from the draft to the TSU Head approval; after that a request ends as not proceeded, released or retired (FR-PM-073)."
+      - "Every stage has a due time from its service level hours (parameters PKG_SLA_*): Marketing approval 24, TSU review 24, TSU Head approval 24, negotiation 120, ManCom 72, MBS set-up 48 hours by default (FR-PM-073)."
+      - "Every action is written to the history and the audit trail; audit rows cannot be changed or deleted (FR-PM-005)."
+    outcome: The request moves stage by stage with every decision, reason and document recorded, and each user sees only the actions of his stage.
+    frs: [FR-PM-021, FR-PM-022, FR-PM-023, FR-PM-024, FR-PM-005, FR-PM-073]
+    tests: [REQ, DETAILS, HIST, DOCS, EMAILS]
+
+  - id: SCR-PM-05
+    title: "Package Request record: Negotiation tab"
+    route: /product-maintenance/requests/:id
+    parent: /product-maintenance/requests
+    purpose: >-
+      The negotiation with the insurers, one card per round, newest first. TSU prepares the quotation slip of the
+      round (insurers and notes), a TSU Team Lead or a co-officer approves it and BIBS e-mails it to each insurer,
+      password protected. TSU keys in each insurer's reply with its outcome, rate and terms; a further round revises
+      the slip. When every insurer has answered, TSU makes the terms final with the insurers the package takes.
+    entry:
+      - Package Request record › Negotiation tab
+    shots:
+      - {state: tab, user: tsu, open: negotiation, tab: Negotiation, caption: "Negotiation tab: round 2 sent, round 1 closed with three outcomes"}
+      - {state: response, user: tsu, open: negotiation, tab: Negotiation, click: "^key in$", caption: "Terms of an insurer: outcome, rate and deductibles"}
+      - {state: terms_final, user: tsu, open: negotiation, click: "^terms final$", caption: "Terms Final dialog: insurers, role and share"}
+      - {state: revise, user: tsu, open: negotiation, click: "^revise quotation slip", caption: "Revise Quotation Slip dialog: insurers of the next round"}
+    fields:
+      - "Round card | [Round n · slip number] | Card title | Round number and quotation slip number | - | Negotiation round | - | Read only | - | -"
+      - "Round card | [Round status pill and Locked tag] | Pill | Preparation, For approval, Sent, Superseded; Locked after the ManCom sign-off | - | Negotiation round | - | Read only | - | -"
+      - "Round card | [Round note] | Text | Notes of the round; Reply by dd-MMM-yyyy; Sent dd-MMM-yyyy HH:mm (approved by user) | - | Negotiation round | - | Read only | - | -"
+      - "Slip preparation | [Insurer check boxes] | Check boxes | Insurers of the round | Y (at least one) | Insurers (authorised, active) | Target insurers (round 1) or the insurers chosen at the revision | Round in preparation | At least one insurer; each insurer authorised and with a placement e-mail | Select at least one insurer for the quotation slip"
+      - "Slip preparation | Notes to the insurers | Text | Up to 4,000 characters | N | - | Blank (round 1) or the change of the revision | Round in preparation | - | -"
+      - "Responses | Insurer | Column | Insurer name | - | Insurer response | - | Read only | - | -"
+      - "Responses | Outcome | Column | Pending, Accepted as requested, Approved with changes, Counter-proposal, Declined, No response | - | Insurer response | Pending | Read only | - | -"
+      - "Responses | Rate % / Minimum / Conditions / Valid Until | Column | As keyed in | - | Insurer response | - | Read only | - | -"
+      - "Responses | Rev. | Column | Revision number of the response | - | Insurer response | 0 | Read only | - | -"
+      - "Terms of <insurer> | Outcome | Drop-down | Accepted as requested, Approved with changes, Counter-proposal, Declined, No response | Y | List PKG_RESPONSE_OUTCOME | Blank for a pending response | Round sent and open | An active value of the list | -"
+      - "Terms of <insurer> | Rate % | Number | Up to four decimals | Cond.: an offer (accepted, approved with changes, counter-proposal) | - | Blank | Round sent and open | Zero or more | Enter the rate offered"
+      - "Terms of <insurer> | Minimum premium | Number | Amount in PHP | N | - | Blank | Round sent and open | Zero or more | Rates and amounts cannot be negative"
+      - "Terms of <insurer> | Valid until | Date | dd-MMM-yyyy | N | - | Blank | Round sent and open | - | -"
+      - "Terms of <insurer> | [Deductible per coverage] | Text | One field per requested coverage | N | Requested coverages | The requested deductible | Round sent and open | - | -"
+      - "Terms of <insurer> | Conditions and warranties | Text | Up to 2,000 characters | N | - | Blank | Round sent and open | - | -"
+      - "Terms of <insurer> | Remarks | Text | Up to 1,000 characters | N | - | Blank | Round sent and open | - | -"
+      - "Terms of <insurer> | Response document | File | The insurer's reply (PDF, e-mail or image) | N | - | - | Round sent and open | File checks of every upload | The file could not be read"
+      - "Terms Final | [Offer check box] | Check box | Insurer name · rate %, one per insurer that offered terms in the latest round | Y (at least one) | Latest round | Not ticked | Insurer negotiation | Only insurers that offered terms | Choose the insurer(s) whose terms the package takes"
+      - "Terms Final | Role | Drop-down | Panel, Lead, Participant | Y | Fixed list | Panel | Insurer negotiation | - | -"
+      - "Terms Final | Share % | Number | Co-insurance share | Cond.: co-insurance (lead and participants) | - | Blank | Insurer negotiation | Shares given for every co-insurer and totalling 100 | Co-insurance shares must be given for every insurer and total 100"
+      - "Terms Final | Comment | Text | Up to 1,000 characters | N | - | Blank | Insurer negotiation | - | -"
+      - "Revise Quotation Slip | [Insurer check boxes] | Check boxes | Insurers of the next round | Y (at least one) | Insurers | Every insurer of the latest round that did not decline | Insurer negotiation | - | -"
+      - "Revise Quotation Slip | What changes in this round | Text | Up to 4,000 characters | N | - | Blank | Insurer negotiation | - | -"
+    actions:
+      - "Save Slip | TSU Officer or Team Lead (PKG_NEGOTIATE) | Round in preparation | Saves the insurers and notes of the slip | Round in preparation | -"
+      - "Submit for Approval | TSU Officer or Team Lead (PKG_NEGOTIATE) | Round in preparation; at least one insurer | Saves the slip, numbers it PQS-yyyy-nnnnnn and sets the reply date (today + PKG_QS_REPLY_DAYS, 5 days) | Round for approval | -"
+      - "Approve and Send | TSU Team Lead or a co-officer (PKG_QS_APPROVE), not the preparer | Round for approval | Approves the slip and e-mails it to each insurer, password protected; a pending response is opened per insurer | Round sent | Quotation slip e-mail to each insurer (NT-05)"
+      - "Quotation Slip | Every user of the screen | The slip is numbered | Downloads the quotation slip PDF of the round | Unchanged | -"
+      - "Key In | PKG_NEGOTIATE | Round sent, open and not locked | Opens Terms of <insurer> | Unchanged | -"
+      - "Save Terms | PKG_NEGOTIATE | Outcome chosen; a rate for an offer | Saves the response as a new revision (the previous values stay in the history) and attaches the response document | Response outcome | -"
+      - "Resend | PKG_NEGOTIATE | Round sent, open and not locked | E-mails the slip again to that insurer | Unchanged | Quotation slip e-mail (NT-05)"
+      - "Revise quotation slip (new round) | PKG_NEGOTIATE | Insurer negotiation; the latest slip was sent | Opens Revise Quotation Slip; Open New Round closes the sent round and opens round n+1 with the chosen insurers | Insurer negotiation (round n+1) | Workflow notice"
+      - "Terms final | PKG_NEGOTIATE | Insurer negotiation; every insurer of the latest round has an outcome | Opens Terms Final; Make Terms Final records the chosen insurers with role and share as the proposed terms and compiles the comparative master | Negotiated terms review | Workflow notice"
+    rules:
+      - "A quotation slip is approved by a TSU Team Lead or a co-officer, never by its preparer (FR-PM-030)."
+      - "Each insurer receives its own protected e-mail; an insurer without a placement e-mail address stops the sending (FR-PM-030, FR-PM-004)."
+      - "An offer (accepted as requested, approved with changes, counter-proposal) needs the rate offered; every change of a response is kept as a revision (FR-PM-031)."
+      - "Only the latest round is keyed in; a sent round is revised through a new round, never changed (FR-PM-032)."
+      - "The terms are final only when every insurer of the latest round has an outcome and the chosen insurers offered terms; co-insurance shares total 100 (FR-PM-033)."
+      - "The slips are locked at the ManCom sign-off (FR-PM-041)."
+    outcome: The negotiated terms of each insurer are recorded round by round with their documents, and the insurers the package takes are chosen.
+    frs: [FR-PM-030, FR-PM-031, FR-PM-032, FR-PM-033, FR-PM-004]
+    tests: [NEG]
+
+  - id: SCR-PM-06
+    title: "Package Request record: Comparative tab"
+    route: /product-maintenance/requests/:id
+    parent: /product-maintenance/requests
+    purpose: >-
+      The comparison of the insurer terms of the latest round, the one current comparative master kept for audit, and
+      the client views derived from it for a client presentation. Every output is stored with its PDF and Excel file.
+    entry:
+      - Package Request record › Comparative tab
+    shots:
+      - {state: tab, user: tsu, open: negotiation, tab: Comparative, caption: "Comparative tab with the round 2 comparison and the stored outputs"}
+      - {state: client_view, user: tsu, open: negotiation, tab: Comparative, click: "^generate client view$", caption: "Generate Client View dialog"}
+    fields:
+      - "Round n comparison | Insurer | Column | Insurer name, with the Lowest rate tag | - | Latest round | - | Read only | - | No insurer terms to compare yet"
+      - "Round n comparison | Outcome / Rate % / Minimum / Coverages / Deductibles / Conditions | Column | As keyed in | - | Insurer responses | - | Read only | - | -"
+      - "Stored outputs | Output | Column | Title, with Audit master or Client view and the round | - | Comparative outputs | - | Read only | - | No comparative output yet"
+      - "Stored outputs | Status | Column | Current or Superseded (master) | - | Comparative outputs | - | Read only | - | -"
+      - "Stored outputs | Fields | Column | All, or the number of fields shown | - | Comparative outputs | - | Read only | - | -"
+      - "Stored outputs | Generated | Column | User · dd-MMM-yyyy HH:mm | - | Comparative outputs | - | Read only | - | -"
+      - "Stored outputs | SHA-256 | Column | First 12 characters of the file fingerprint | - | Comparative outputs | - | Read only | - | -"
+      - "Generate Client View | Title | Text | Up to 200 characters | Y | - | Client view – <client or package name> | - | Not blank | Enter the title of the view"
+      - "Generate Client View | Fields shown | Check boxes | Outcome, Rate %, Minimum Premium, Coverages, Deductibles, Conditions / Warranties, Valid Until, Remarks | Y (at least one) | Fixed list | Outcome, Rate %, Coverages, Deductibles | - | Known fields only | -"
+      - "Generate Client View | Insurers shown | Check boxes | Insurers of the master | Y (at least one) | Current master | Every insurer | - | Insurers of the master | Select at least one insurer of the master"
+    actions:
+      - "Compile Master | PKG_NEGOTIATE | The slip of the latest round was sent | Compiles a new comparative master from the latest round; the previous master becomes Superseded | - | -"
+      - "Generate Client View | PKG_NEGOTIATE | A current master exists | Opens Generate Client View; Generate stores a view with the chosen fields and insurers, taken from the master's values | - | -"
+      - "PDF / Excel | Every user of the screen | Always | Downloads the stored output | - | -"
+    rules:
+      - "There is one current comparative master per request; a new master supersedes the previous one (FR-PM-034)."
+      - "A client view is taken from the current master and never changes a value; it shows only the fields and insurers chosen (FR-PM-035)."
+      - "Every output is attached to the request with its SHA-256 and written to the audit trail (FR-PM-034, FR-PM-005)."
+    outcome: TSU and Marketing compare the insurers on one current table and give the client a tailored view that matches it.
+    frs: [FR-PM-034, FR-PM-035]
+    tests: [COMP]
+
+  - id: SCR-PM-07
+    title: "Package Request record: Requirements & Sign-off tab"
+    route: /product-maintenance/requests/:id
+    parent: /product-maintenance/requests
+    purpose: >-
+      The requirements pack that ManCom signs off: what the pack still lacks, the proposed rate scheme, computation
+      basis and dates (editable while the requirements are prepared), the package slip to print and sign, and the
+      ManCom decisions with their sign-off reference.
+    entry:
+      - Package Request record › Requirements & Sign-off tab
+    shots:
+      - {state: tab, user: tsu, open: requirements_prep, tab: Requirements, caption: "Requirements & Sign-off tab during the requirements preparation"}
+      - {state: signoff, user: mancom, open: for_mancom, tab: Requirements, caption: "ManCom view before the sign-off"}
+    fields:
+      - "Requirements pack | [Checklist] | Checklist | Missing items, or The requirements pack is complete. | - | Requirements check | - | Read only | The effective date and package end date, a scheme rate or a rate for every insurer, the computation basis, the chosen insurer(s) and the signed package slip | Complete the requirements: <missing>"
+      - "Rate scheme, computation basis and dates | Scheme rate % | Number | Up to four decimals | Cond.: or a rate for every insurer | Proposed terms | The negotiated rate | Requirements preparation | Zero or more | Rates and amounts cannot be negative"
+      - "Rate scheme, computation basis and dates | Minimum premium / Commission % / Package TSI limit | Number | Amount in PHP; percentage | N | Proposed terms | Negotiated values | Requirements preparation | Zero or more | Rates and amounts cannot be negative"
+      - "Rate scheme, computation basis and dates | Computation basis | Text | How the premium is computed | Y | Proposed terms | Blank | Requirements preparation | Not blank before submission | Complete the requirements: the computation basis"
+      - "Rate scheme, computation basis and dates | Effective from | Date | dd-MMM-yyyy | Y | Proposed terms | Requested date | Requirements preparation | - | Complete the requirements: the effective date and the package end date"
+      - "Rate scheme, computation basis and dates | Package start / Anniversary | Date | dd-MMM-yyyy | N | Proposed terms | Requested dates | Requirements preparation | - | -"
+      - "Rate scheme, computation basis and dates | Package end | Date | dd-MMM-yyyy | Y | Proposed terms | Requested date | Requirements preparation | After the effective date | The package end date must be after the effective date"
+      - "Proposed terms | [Sections, coverages, rate scheme, dates and insurers] | Read-only view | As on the Requested Terms tab | - | Proposed terms | - | Read only | - | -"
+      - "ManCom decisions | Reference / Decision / By / On / Comment | Table | MC-PKR-yyyy-nnnnnn; Signed or Returned | - | ManCom sign-offs | - | Read only | - | No ManCom decision yet"
+    actions:
+      - "Package Slip | Every user of the screen | Always | Downloads the package slip (PDF) with the proposed terms, to be printed and signed | Unchanged | -"
+      - "Save Requirements | PKG_NEGOTIATE | Requirements preparation | Saves the rate scheme, computation basis and dates of the proposed terms | Unchanged | -"
+      - "Submit requirements for ManCom sign-off | PKG_NEGOTIATE | Requirements preparation; the pack is complete | Sends the pack to ManCom | For ManCom sign-off | Workflow notice"
+      - "Sign off and send to MBS | ManCom (PKG_MANCOM_SIGNOFF), not the submitter of the requirements | For ManCom sign-off | Records the sign-off MC-<request no.>, locks the quotation slips and attaches the sign-off record (or links the uploaded ManCom sign-off sheet) | With MBS for set-up | Workflow notice"
+    rules:
+      - "The requirements pack needs the effective date and package end date, a scheme rate or a rate for every insurer, the computation basis, at least one chosen insurer and the signed package slip attached as Package slip (signed) (FR-PM-040)."
+      - "ManCom never signs off requirements it submitted; a single ManCom sign-off is recorded (FR-PM-041)."
+      - "At the sign-off the quotation slips of every round are locked (FR-PM-041)."
+    outcome: ManCom signs off a complete pack in BIBS and the request goes to MBS for the set-up.
+    frs: [FR-PM-040, FR-PM-041, FR-PM-036]
+    tests: [REQM]
+
+  - id: SCR-PM-08
+    title: "Package Request record: Set-up and Advisories tabs"
+    route: /product-maintenance/requests/:id
+    parent: /product-maintenance/requests
+    purpose: >-
+      MBS turns the signed-off terms into a draft catalog version (Set up package version), completes it in the version
+      editor and submits it for validation; the request is released when the version is validated. On release (or
+      retirement) BIBS drafts the advisory, which TSU edits and sends to the recipient groups once the signed package
+      slip and the ManCom sign-off are attached.
+    entry:
+      - Package Request record › Set-up tab, Advisories tab
+    shots:
+      - {state: setup, user: mbs, open: with_mbs, click: "^set up package version$", caption: "Set Up Package Version dialog of MBS"}
+      - {state: setup_tab, user: mbs, open: released, tab: Set-up, caption: "Set-up tab with the catalog version"}
+      - {state: advisories, user: tsu, open: released, tab: Advisories, caption: "Advisories tab of a released request"}
+    fields:
+      - "Set Up Package Version | Risk code of the new package | Text | Up to 20 capitals or digits; the naming convention of the line when set | Cond.: New package | - | Blank | With MBS for set-up | Not blank; not an existing product | Enter the risk code of the new package"
+      - "Set Up Package Version | Product name | Text | Up to 200 characters | N | - | The package or programme name | With MBS for set-up | - | -"
+      - "Set Up Package Version | Change summary | Text | Up to 500 characters | N | - | Blank | With MBS for set-up | - | -"
+      - "Set Up Package Version | Comment | Text | Up to 1,000 characters | N | - | Blank | With MBS for set-up | - | -"
+      - "Set-up › Catalog version | Product / Version / Request stage | Detail | Risk code, version number, stage pill | - | Package version | - | Read only | - | MBS sets the package up after the ManCom sign-off"
+      - "Advisories | [Advisory card] | Card | Subject, status pill, type · recipient groups, sent date and user, text | - | Advisory | Drafted on release or retirement | Draft | - | An advisory is drafted when the package is released or retired"
+      - "Advisories | [Supporting documents checklist] | Checklist | Package slip (signed) and ManCom sign-off (retirement: ManCom sign-off only), each Attached or Missing | - | Documents of the request | - | Read only | Both documents attached before sending | The advisory cannot be sent until the supporting documents are attached (Documents tab)."
+      - "Edit Advisory | Recipient groups | Check boxes | Marketing, TSU, MBS, Processing, Operations | Y (at least one) | List PKG_ADVISORY_GROUP | Parameter PKG_ADVISORY_GROUPS (Marketing, TSU, MBS, Operations) | Draft | Active values of the list | Select at least one recipient group"
+      - "Edit Advisory | E-mail to (optional) | Text | Comma-separated addresses | N | - | Blank | Draft | - | -"
+      - "Edit Advisory | Subject | Text | Up to 200 characters | Y | - | From the template PKG_ADVISORY or PKG_RENEWAL_ADVISORY | Draft | Not blank | Enter the subject and the text"
+      - "Edit Advisory | Text | Text | Up to 8,000 characters | Y | - | From the template | Draft | Not blank | Enter the subject and the text"
+    actions:
+      - "Set up package version | MBS (PRODUCT_MAINTAIN) | With MBS for set-up; not a Retire request | Opens Set Up Package Version; Set Up Version creates the draft catalog version from the signed-off terms (a new package also creates its product, pending authorisation) | Package version for validation | Workflow notice"
+      - "Open Version Editor | Every user of the screen | A version was set up | Opens the Package Version (SCR-PM-13) | - | -"
+      - "Edit | TSU (PKG_ADVISORY) | Draft advisory | Opens Edit Advisory; Save keeps the changes | Draft | -"
+      - "Send Advisory | TSU (PKG_ADVISORY) | Draft advisory; the supporting documents are attached | Stores the advisory PDF on the request, notifies the users of each recipient group in the app and, when addresses are given, e-mails the protected PDF | Sent | Advisory notice (NT-03); advisory e-mail (NT-06)"
+    rules:
+      - "The set-up creates a draft version; a product can have only one version being set up at a time (FR-PM-042)."
+      - "A new package needs its risk code; the product is authorised when its first version is validated (FR-PM-042, FR-PM-043)."
+      - "The request is released automatically when its version is validated, and returns to MBS when the validator returns the version (FR-PM-043)."
+      - "An advisory is sent only with the signed package slip and the ManCom sign-off attached; a retirement advisory needs the ManCom sign-off only (FR-PM-044)."
+      - "Recipient groups are notified in the app: Marketing, TSU, MBS, Processing and Operations users by their permissions; e-mail addresses are optional (FR-PM-044)."
+    outcome: The signed-off terms reach the catalog without re-keying, and every unit is told, with the documents, that the package is available, changed or retired.
+    frs: [FR-PM-042, FR-PM-043, FR-PM-044, FR-PM-045]
+    tests: [SETUP, ADV]
+
+  - id: SCR-PM-09
+    title: TSU Workbench
+    route: /product-maintenance/tsu
+    purpose: >-
+      The package request queues of the TSU Officer, Team Lead and Head: one tile per stage they work (review,
+      approval, negotiation, terms review, requirements), with the open and overdue counts, and the queue of the
+      chosen stage, oldest due first. A user claims a request to work it; team leads assign requests.
+    entry:
+      - Sidebar entry TSU Workbench
+    shots:
+      - {state: list, user: tsulead, caption: "TSU Workbench of the TSU Team Lead"}
+    fields:
+      - "Package requests | [Stage tiles] | Tile | Stage name, open count, 'n overdue', 'n mine' | - | Workflow queues | - | Read only | - | -"
+      - "Queue | Reference | Column | PKR-yyyy-nnnnnn | - | Work item | - | Read only | - | -"
+      - "Queue | Description | Column | Request type, product and name | - | Work item | - | Read only | - | -"
+      - "Queue | Stage | Column | Stage pill | - | Workflow | - | Read only | - | -"
+      - "Queue | From | Column | Unit or user that raised the request | - | Work item | - | Read only | - | -"
+      - "Queue | In Stage | Column | Time in the stage | - | Workflow | - | Read only | - | -"
+      - "Queue | Due | Column | dd-MMM-yyyy HH:mm; Overdue in red | - | Workflow | - | Read only | - | -"
+      - "Queue | Assignee | Column | User or unassigned | - | Workflow | - | Read only | - | -"
+    actions:
+      - "[A stage tile] | Every user of the screen | Always | Shows the queue of that stage | - | -"
+      - "Claim | A user of the stage | Unassigned item | Assigns the request to the user | Unchanged | -"
+      - "Assign | Team leaders (WORK_ASSIGN) | Always | Opens the assignment dialog: a user of the stage or the team queue | Unchanged | Assignment notice"
+      - "[Open a row] | Every user of the screen | Always | Opens the package request | - | -"
+    rules:
+      - "Only the stages the user's permissions work are shown (FR-PM-024)."
+      - "A claimed request is worked by the user who claimed it; a team leader can re-assign it (FR-PM-024)."
+    outcome: TSU users pick up their package work by stage and due time; team leaders balance the queues.
+    frs: [FR-PM-024, FR-PM-022, FR-PM-023]
+    tests: [TSUWB]
+
+  - id: SCR-PM-10
+    title: Package Expiry
+    route: /product-maintenance/expiry
+    purpose: >-
+      The released packages by package end date, with their renewal status: packages ending without a renewal request,
+      packages whose renewal is in progress, and the pointer to the expired packages kept in the catalog. TSU drafts
+      renewal requests for the selected packages, pre-filled from the version in force.
+    entry:
+      - Product Maintenance Home › Packages ending soon tiles
+      - Package Requests › Package Expiry
+      - The expiry alert (Alert inbox) and the package expired notice
+    shots:
+      - {state: list, user: tsu, caption: "Package Expiry, Expiring tab"}
+      - {state: dialog, user: tsu, click: "^generate expiry list$", caption: "Generate Expiry List dialog"}
+    fields:
+      - "Tabs | Expiring / Renewal in Progress / Expired | Tab | - | - | Fixed | Expiring | - | Expiring = no renewal request yet; Renewal in Progress = an open renewal or reactivation request | -"
+      - "List | Package | Column | Risk code v<version>, with the product name | - | Version in force | - | Read only | - | -"
+      - "List | Package End | Column | dd-MMM-yyyy | - | Version in force | - | Read only | - | -"
+      - "List | Days Left | Column | Days until the package end, red up to 7, amber up to 30 | - | Computed | - | Read only | - | -"
+      - "List | Anniversary | Column | dd-MMM-yyyy | - | Version in force | - | Read only | - | -"
+      - "List | Renewal Request | Column | Request number and its stage pill | - | Package requests | - | Read only | - | -"
+      - "Generate Expiry List | Packages ending within (days) | Number | Whole days from today | Y | - | 90 (or the window of the home tile) | - | Zero or more | -"
+    actions:
+      - "Generate Expiry List | Every user of the screen | Always | Opens the dialog; Generate lists the packages ending within the days entered | - | -"
+      - "Generate Renewal Request | TSU (PKG_NEGOTIATE) | Expiring tab; at least one package selected | Drafts one Renew request per package, pre-filled from the version in force with the next term (start = old end + 1 day, same length); a package with an open renewal keeps it; one request opens directly | Draft request | -"
+    rules:
+      - "A package is listed from its version in force; the expiry monitor alerts at 60 days (PACKAGE_EXPIRY_NOTICE_DAYS) and again at 30 and 7 days (FR-PM-060)."
+      - "A renewal request is never drafted twice for the same package; when PACKAGE_RENEWAL_AUTODRAFT is on, the monitor drafts it itself (FR-PM-061)."
+      - "Expired packages stay readable on Products with the Expired filter; an expired package is sold again only through a Reactivate request (FR-PM-052)."
+    outcome: No package ends unnoticed, and its renewal request starts from the current terms without re-keying.
+    frs: [FR-PM-060, FR-PM-061, FR-PM-052]
+    tests: [EXPIRY]

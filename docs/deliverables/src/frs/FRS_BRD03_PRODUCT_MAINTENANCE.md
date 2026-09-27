@@ -8,11 +8,11 @@ doc_code: FRS
 brd: BRD-03
 name: Product Maintenance
 doc_id: BIBS-FRS-BRD-03
-version: "1.0"
-date: 25 September 2026
-status: Issued for BDOI review
+version: "2.0"
+date: 27 September 2026
+status: Issued for BDOI business sign-off
 header_title: FRS BRD-3 Product Maintenance
-output: FRS/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx
+output: FRS/BIBS_FRS_BRD-03_Product_Maintenance_v2.0.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review; aligned with the as-built screens and the cross-BRD decisions
+  - version: "2.0"
+    date: 27 Sep 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Business sign-off pack: built behaviour that differs from the BRD (section 10.4), navigation by persona, screen specifications with screenshots, walkthroughs, messages, notifications, document outputs, uploads, configuration inputs the business provides, cross-BRD contract, sign-off and change control (chapters 12-21). Status as of 27-Sep-2026. Chapters 1-11 otherwise unchanged; FR, BRD and test IDs kept"
 distribution:
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: Marketing Business Services and System Support (MBS), role: Business owner, organisation: BDOI, purpose: Review of all FRs}
@@ -2121,6 +2127,27 @@ The items below are changed in BIBS without a release. Changes to parameters and
 
 PQ01, PQ13, PQ19 and PQ20 are covered by assumptions A-PM-02, A-PM-05, A-PM-06 and A-PM-07; BDOI confirms them with the sign-off of this document.
 
+## Built behaviour that differs from the BRD
+
+The table lists every point where the delivered system does what the BRD asks in a different way, or not yet. Each is settled through the register or a change request, not by changing the text.
+
+<!-- table: widths=2.6,6.4,6.2,1.4 caption="Differences between the BRD and the built behaviour" size=8 -->
+| BRD ID | BRD asks | BIBS does | FR |
+|---|---|---|---|
+| BRPM.003, PMADD01 | Risk codes follow the naming convention of their line | The check is built; the conventions are not set until BDOI states them (PQ02), so no risk code is refused today | 010 |
+| BRPM.005 | Package documents in the BDOI layouts | Draft layouts of the templates; BDOI's layouts replace them as new template versions (Q03). The quotation slip is one document per round, e-mailed separately to each insurer, not one document per insurer. A package brochure is not a document of the build | 013, 030 |
+| BRPM.008, 021 | Approval by Marketing TL, TH or UH | One Marketing approval stage; any holder of the approval permission other than the maker approves (PQ08) | 021 |
+| BRPM.011 | Deletion of a package | Retire request; the product and its versions stay readable and are never deleted | 045 |
+| BRPM.015 | ManCom sign-off | One ManCom member's sign-off in BIBS completes the step; an uploaded signed sheet is linked, else a sign-off record is generated (PQ07) | 041 |
+| BRPM.016 | Advisories to the relevant units | In-app notice to the users of each recipient group by permission, and the protected PDF by e-mail when addresses are entered (PQ12) | 044 |
+| BRPM.017, PMADD08 | Expiry and incentive alerts to TSU and MBS | The expiry and incentive alerts are raised in the Alert inbox (System Administrator, Auditor); TSU and MBS see the packages on Package Expiry and the home tiles, and receive an in-app notice when a package has expired | 060, 081 |
+| BRPM.018 | Package Status Update Report as named by BDOI | Report PM-PKG-STATUS with draft columns until PQ15 is answered | 071 |
+| BRPM.020 | Password convention of BDOI | A password generated per e-mail, sent in a separate e-mail (Q07, PQ21) | 004 |
+| BRPM.022 | Data synchronised with BDOI systems | Every release and expiry is handed to the product master port, which records it; the transport waits for PQ16 | 072 |
+| PMADD03 | Client-tailored comparative fields | A fixed field catalogue of eight fields (PQ06) | 035 |
+| BRD-13 BRID 3.1 (package remapping) | Legacy packages mapped to BIBS packages | The package map (object R06) and the Renewal sanitation check PACKAGE_REMAP are designed in the Data Migration and Renewal designs; they are not in the build of 27-Sep-2026. Product Maintenance provides the package versions the map names | 050 |
+| - | Upload of product masters in bulk | No bulk upload in Product Maintenance: the go-live load runs through the data migration (objects R01, R03-R05, R07); later changes are made on the screens under maker-checker | 010, 014 |
+
 # Traceability
 
 Every BRD-3 requirement is met by at least one FR. The screen and API columns name the main entry points.
@@ -2162,9 +2189,230 @@ Every BRD-3 requirement is met by at least one FR. The screen and API columns na
 
 API paths start with `/api/v1`; "..." stands for `/api/v1/product-maintenance/requests/{id}`.
 
-# Sign-off
+<!-- landscape -->
 
-By signing, BDOI confirms that this FRS describes the Product Maintenance functions it expects in BIBS, and accepts the assumptions in section 10.1. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
+# Navigation
+
+This chapter shows how each Product Maintenance user reaches the screens. The menus are those of the build: the sidebar shows a screen only when the user's role holds its permission (section 3.2), so each persona sees a different menu. The tables are generated from the menu definition and the role grants of the build, not typed.
+
+## Screens of Product Maintenance
+
+The 22 screens specified in chapter 13, with the menu path and the roles that can open them. A screen without its own menu entry (a record, a form, a tab of a record) is reached from the screen before it; its path ends with that screen. The package request record is specified in five parts (SCR-PM-04 to SCR-PM-08) because its tabs are worked by different teams.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../BRD-03_Product_Maintenance/pack.yaml
+render: screen-index
+```
+
+## Screen flow
+
+How the screens link: from a list to its record, from a record action to the next screen, and from the package request to the catalogue version and to New Business pricing. The walkthroughs of chapter 14 follow these links with real steps.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../BRD-03_Product_Maintenance/pack.yaml
+render: flow
+```
+
+<!-- portrait -->
+
+## Menu by persona
+
+For each Product Maintenance persona, the SIT and UAT user of the seed data and the sidebar that user sees, section by section. The BRD column shows which BRD owns a section; entries of other BRDs are listed so the business unit sees the whole menu of its users.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../BRD-03_Product_Maintenance/pack.yaml
+render: menus
+```
+
+## Common screen elements
+
+Elements that behave the same on every Product Maintenance screen are described once here and not repeated in the screen specifications.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../BRD-03_Product_Maintenance/pack.yaml
+render: common
+```
+
+<!-- landscape -->
+
+# Screen specifications
+
+One specification per screen, grouped by area. Each gives:
+
+- **Purpose**, **who can open it** (personas and the permission), **navigation** (menu path and the other ways in) and the related **FRs**;
+- **screenshots** of the SIT environment with seed data; the numbered markers on the first screenshot match the **No.** column of the field table;
+- the **field table**: section of the screen, label as shown, type, length or format, mandatory (Y, N or the condition), source list or master, default, the statuses in which the field can be changed, the validation and the message shown when it fails, word for word;
+- the **actions table**: button, who sees it, when it is enabled, what happens, the resulting status and the notification sent;
+- the **business rules** of the screen with their FRs, the **expected outcome** and the **test cases** of the test plan that run on the screen.
+
+A message in angle brackets (`<risk code>`) is completed by the system with the value shown. "Workflow notice" means the in-app notification NT-01 of chapter 16.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../BRD-03_Product_Maintenance/pack.yaml
+render: screens
+```
+
+<!-- portrait -->
+
+# End-to-end walkthroughs
+
+Two walkthroughs follow a package through the screens, persona by persona, with what the user does, what the user sees and the result of each step. They use seed data only. They are the script of the SIT review sessions of the Start Here guide.
+
+## WT-A A new package from the request to its first New Business quotation
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../BRD-03_Product_Maintenance/pack.yaml
+render: walkthrough
+id: WT-A
+```
+
+## WT-B Returns and refusals, and the messages the user sees
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../BRD-03_Product_Maintenance/pack.yaml
+render: walkthrough
+id: WT-B
+```
+
+<!-- landscape -->
+
+# Messages catalogue
+
+Every message a Product Maintenance user can see, grouped by the screen or dialog that shows it, with its code, its type and what the user does. The texts are read from the build; a message is never retyped here.
+
+- **Validation**: shown on the screen while the user fills in a field or before the form is sent.
+- **Error**: the system refused the action; nothing was saved. The code is shown under the message as the Reference.
+- **Warning**: the action is possible, but the user should check something first.
+- **Confirmation** and **Information**: the outcome of an action, or a hint on the screen.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../BRD-03_Product_Maintenance/pack.yaml
+render: messages
+```
+
+# Notifications catalogue
+
+The in-app notifications, alerts and e-mails that Product Maintenance sends: what triggers each, who receives it and what it contains. Documents e-mailed outside BIBS are password protected; the password follows in a separate e-mail.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../BRD-03_Product_Maintenance/pack.yaml
+render: notifications
+```
+
+<!-- portrait -->
+
+# Document outputs
+
+The documents Product Maintenance generates, each from a document template maintained on the Document Templates screen of the New Business set (SCR-NB-44), with the BDO Insure letterhead, the "Confidential" footer and page numbers. For each: the template, the format, the screen that produces it, the password protection, where every field comes from and the first page as generated from seed data. The templates delivered are draft layouts; BDOI's own layouts replace them as new template versions (configuration input CI-08).
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../BRD-03_Product_Maintenance/pack.yaml
+render: documents
+```
+
+# Upload screens
+
+Product Maintenance has no bulk upload screen. Files are added to a package request in three places, each with the file type, size, content and malware checks of every upload and with the SHA-256 fingerprint kept for audit:
+
+<!-- table: widths=4.2,5.4,8 caption="Uploads of Product Maintenance" -->
+| Where | What is uploaded | Rules |
+|---|---|---|
+| Package Request record › Documents tab (and the form after the first save) | Supporting documents of the request; the signed package slip (type Package slip (signed)); the ManCom sign-off sheet (type ManCom sign-off) | The signed package slip is needed before the requirements go to ManCom and before an advisory is sent; the ManCom sign-off before an advisory is sent. Files can be named after the request number |
+| Negotiation tab › Terms of an insurer › Response document | The insurer's reply (PDF, e-mail or image), stored with the type Insurer package terms | One file per saved response; a file that cannot be read is refused with its message |
+| Advisories tab › Send Advisory | The advisory PDF is generated and stored by BIBS (type Package advisory) | No user upload |
+
+The product masters of go-live (lists of values, sales organisation, insurers, products, commission rates) and the package map are loaded by the data migration from the templates of chapter 19; after go-live they are changed on the screens of chapter 13 under maker-checker.
+
+<!-- landscape -->
+
+# Configuration inputs the business provides
+
+Product Maintenance is a setup object of Drop 0: before New Business, Renewal and the data migration can use it, BDOI provides the product catalogue, the rate tables, the packages in force, the document templates and the lists of values. Products, insurers, commission rates, lists and the sales organisation of the legacy systems are loaded by the data migration; the packages themselves are not migrated but set up by TSU and MBS through package requests, and the package map (object R06) tells Renewal which BIBS package version renews each legacy package at sanitation (check PACKAGE_REMAP). Each input has a template in the workbook of configuration input templates of this set, with one fictitious example row.
+
+```pack
+plugin: ../BRD-03_Product_Maintenance/config_inputs.py
+source: ../BRD-03_Product_Maintenance/config_inputs.yaml
+render: summary
+```
+
+```pack
+plugin: ../BRD-03_Product_Maintenance/config_inputs.py
+source: ../BRD-03_Product_Maintenance/config_inputs.yaml
+render: templates
+```
+
+# Cross-BRD dependencies and interface contract
+
+Product Maintenance is the source of the products, package versions, rate schemes, rules and incentive criteria that the selling and servicing BRDs use, and it takes its clients, templates, users and go-live load from other BRDs. The contract below lists each exchange: the BRD or system, the direction, what is exchanged, when and how, and who owns the data. Chapter 7 describes the interfaces with the external systems.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../BRD-03_Product_Maintenance/pack.yaml
+render: contract
+```
+
+<!-- portrait -->
+
+# Sign-off and change control
+
+## What is signed
+
+The business sign-off covers the release set BRD-03 Product Maintenance v2.0:
+
+<!-- table: widths=6,11.6 caption="Documents of the release set" -->
+| Document | Content |
+|---|---|
+| Start Here guide | The map of the set, who reads what, the steps and the dates |
+| Sign-off Pack Guide deck | Purpose, approach, the module at a glance, caveats, entry and exit criteria, change control |
+| This FRS v2.0 | Requirements (chapters 1-11) and the business view of the system (chapters 12-21) |
+| Sign-off workbook v2.0 | The screens, fields, actions, rules, messages, notifications, menus and contract of this FRS, one row each, with the BU review columns |
+| Test plan v2.0 | The test cases traced to the FRs and to the screens of chapter 13 |
+| Configuration input templates | The templates of chapter 19 |
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: ../BRD-03_Product_Maintenance/pack.yaml
+render: counts
+```
+
+## How the review is recorded
+
+Each business unit records its review in the sign-off workbook: Accept, Change requested or Comment on each row of the screen catalogue, field register, business rules and messages, with the comment, the reviewer and the date. The project team answers every Change requested row before sign-off: either the row is corrected in the next version of the set, or the change is raised as a change request (below) and the row is signed as built.
+
+## What signing freezes
+
+Signing this release set freezes, for Product Maintenance:
+
+- the screens and their navigation (chapters 12 and 13), the fields with their order, labels, types, mandatory rules, lists and validations;
+- the actions with their conditions and resulting statuses, and the business rules;
+- the messages (chapter 15), the notifications (chapter 16) and the generated documents (chapter 17);
+- the configuration input templates (chapter 19) and the interface contract with the other BRDs (chapter 20).
+
+The content of the configuration (products, versions, rates, clauses, templates, list values, parameters such as the service level hours) is not frozen: the business maintains it in the system under maker-checker without a change request.
+
+## Change after sign-off
+
+A change to anything frozen is raised in the Change Management Register. The request states the screen, field, rule or message concerned, the reason and the business priority. The project team assesses it with its mandays, including its effect on the other BRDs through the interface contract of chapter 20, and the owners of every BRD it touches approve it. An approved change is delivered as a new version of this release set (v2.1, v2.2 and so on), and the changed rows are reviewed again.
+
+## As-built status
+
+This FRS describes the system as built on 27-Sep-2026; the screenshots were taken on the SIT environment. Where the build differs from the BRD, section 10.4 says so; such a difference is settled through the register or a change request, not by changing the text. At the end of the build, the final as-built refresh re-issues this set with the system as delivered.
+
+<!-- pagebreak -->
+
+## Signatures
+
+By signing, BDOI confirms that this FRS and the sign-off workbook describe the Product Maintenance functions, screens and messages it expects in BIBS, accepts the assumptions in section 10.1 and notes the differences in section 10.4. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
 
 ```signoff
 rows:
@@ -2172,6 +2420,31 @@ rows:
   - {name: "", role: "Head, Marketing Business Services and System Support", organisation: BDOI}
   - {name: "", role: "Head, Technical Support Unit", organisation: BDOI}
   - {name: "", role: "Head, Retail Marketing", organisation: BDOI}
+  - {name: "", role: "Head, Comptrollership", organisation: BDOI}
   - {name: "", role: "Program Manager, Business Project Services", organisation: BDO Unibank ESG}
   - {name: "", role: Project Manager, organisation: iorta TechNXT}
 ```
+
+<!-- pagebreak -->
+
+# Appendix: Screen standards
+
+The Product Maintenance screens are built to the screen standards agreed with BDOI on 26-Sep-2026. They are listed here so that the business units can check the screenshots against them; they are not repeated in each screen specification.
+
+<!-- table: widths=4.2,13.4 caption="Screen standards of BIBS" -->
+| Area | Standard |
+|---|---|
+| Record pages | Back arrow and breadcrumb, title, then the record header with the name, reference chips, status pill, flags and key facts. Page actions on the right in one order: secondary, primary, and the destructive action last and apart. |
+| Workflow | The current stage is a status strip (Stage, In Stage Since, Due, Assigned To); the history is a table (Stage, From Stage, Action, By, Date and Time, Remarks, Duration in Stage), newest first. |
+| Status pills | One size and one colour per state group, never wrapped; labels over 18 characters end with an ellipsis and show the full label in the tooltip. |
+| Tables | Header row in BDO blue that stays in view; text left, amounts right with two decimals and thousand separators, dates centred in one format; one value per cell with at most one muted line; a dash for an empty value; "Showing x to y of n results" with page numbers. |
+| Dates and numbers | One date picker; dates entered and shown as dd-MMM-yyyy, times as dd-MMM-yyyy HH:mm (Philippine time); amounts with two decimals; rates with up to four decimals. |
+| Wording | Business wording only: no internal requirement or question references and no internal codes on screens, in messages or in documents; list values shown by their label; users shown by their names; short placeholders; format hints only, other guidance in the tooltip of the label. |
+| Forms | Labels above the fields, fields of one height on one line, required fields marked, the error under the field, and the actions at the bottom right (Cancel, then the main action). |
+| Uploads | Drop zone with the accepted types and size; file checks before anything is saved; a file uploaded before is refused. |
+| Messages | Field errors under the field; a banner listing the errors of a form; a business refusal with its message and a support reference; a short confirmation after success. |
+| Confirmations | A dialog naming the record and the effect; a reason where the process needs one (return, void, not proceeded); destructive actions confirmed with the red button. |
+| Maker-checker | Save for Authorization on every product master; Pending Authorization until a second user authorises it; Deactivate instead of delete. |
+| Notifications | The bell opens the panel grouped by day, with Mark Read, Mark All Read and View All; the Notifications page lists every notice with filters. |
+
+The project team checks each screen against these standards before UAT and records the result in the UX readiness checklist. A screen found not to follow a standard during the review is recorded as Change requested in the sign-off workbook and corrected before UAT without a change request.

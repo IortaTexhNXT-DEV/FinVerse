@@ -1,0 +1,69 @@
+# End-to-end walkthroughs of BRD-3 Product Maintenance, shown step by step with screenshots of the seed profile.
+# Each step: persona (role code), screen (SCR id), what the user does, what the user sees, the result, and the
+# screenshot taken after the step (captured live by tools/screenshots/capture_pack.cjs, which performs the steps).
+walkthroughs:
+  - id: WT-A
+    title: A new package from the request to its first New Business quotation
+    summary: >-
+      Marketing asks for a new generic motor package for SME fleets. MBS first adds a clause wording to the library,
+      which the Business Administrator authorises. The request is approved by Marketing, recommended and approved by
+      TSU, negotiated with two insurers and made final; the requirements pack with the signed package slip is signed
+      off by ManCom. MBS sets up version 1 with its rate scheme, coverages, panel insurers and clauses; the TSU Head
+      validates and releases it, the Business Administrator adds the insurer's commission rate for the new product and
+      the New Business Approver authorises it. TSU sends the advisory. Marketing then prices the package and quotes it;
+      a quotation with a different item rate needs a rate exception, which the New Business Approver approves. The
+      package documents use the templates of the Document Templates screen (New Business set, SCR-NB-44).
+    data: "Seed data: new request Motor Fleet Plus (fictitious), line MOTOR, cover type Comprehensive, insurers INS-MGIC and INS-LAC, new risk code MTR30, client Garcia (seed client)"
+    steps:
+      - [MBS, SCR-PM-15, "Opens Coverages & Clauses › Clause Library, clicks New Clause, enters the code FLEET_REPAIR, kind, line Motor, title, effective date and wording, and clicks Save for Authorization", "Toast: Clause FLEET_REPAIR saved – pending authorization; the row shows Pending Authorization", Clause pending authorisation, wt-a-01]
+      - [BUSINESS_ADMIN, SCR-PM-15, "Opens the Clause Library and clicks Authorize on FLEET_REPAIR", "Toast: FLEET_REPAIR authorized; the status is Active", Clause active, wt-a-02]
+      - [MKT_AO, SCR-PM-03, "Opens Package Requests › New Package Request, chooses New package and Generic programme, enters Motor Fleet Plus, line Motor, cover type Comprehensive, reason New programme for a market segment, the segments, the requested coverages, rate 1.20%, minimum premium and package dates, ticks INS-MGIC and INS-LAC, and clicks Submit for Approval", "Toast: PKR-yyyy-nnnnnn submitted for Marketing approval; the request opens in For Marketing approval", For Marketing approval, wt-a-03]
+      - [MKT_TL, SCR-PM-04, "Opens the request from the For Approval tab and clicks Approve and send to TSU", "The stage becomes For TSU review; the history lists the approval", For TSU review, wt-a-04]
+      - [TSU_TL, SCR-PM-04, "Clicks Recommend for approval, writes the recommendation and clicks Recommend", "The TSU recommendation shows on the Details tab; the stage becomes For TSU Head approval", For TSU Head approval, wt-a-05]
+      - [TSU_HEAD, SCR-PM-04, "Reads the recommendation and clicks Approve for negotiation", "The stage becomes Insurer negotiation; round 1 is opened with the two target insurers", Insurer negotiation, wt-a-06]
+      - [TSU, SCR-PM-05, "Opens the Negotiation tab, adds a note to the insurers and clicks Submit for Approval", "Toast: PQS-yyyy-nnnnnn submitted for approval; round 1 shows For approval", Slip for approval, wt-a-07]
+      - [TSU_TL, SCR-PM-05, "Clicks Approve and Send on round 1", "Toast: PQS-yyyy-nnnnnn sent to 2 insurer(s); both responses show Pending; the E-mails tab lists the slip and password e-mails", Slip sent, wt-a-08]
+      - [TSU, SCR-PM-05, "Clicks Key In for each insurer, enters the outcome, rate, minimum premium and deductibles, attaches the insurer's reply and clicks Save Terms", "Toast: Terms of <insurer> saved; the responses show Approved with changes and Counter-proposal with their rates", Responses recorded, wt-a-09]
+      - [TSU, SCR-PM-05, "Clicks Terms final, ticks INS-MGIC as Panel and clicks Make Terms Final", "The stage becomes Negotiated terms review; the chosen insurer shows in the header", Terms final, wt-a-10]
+      - [TSU, SCR-PM-06, "Opens the Comparative tab", "The round 1 comparison with the Lowest rate tag and the current audit master in Stored outputs", Comparative master stored, wt-a-11]
+      - [TSU_HEAD, SCR-PM-04, "Clicks Proceed to requirements (generic package)", "The stage becomes Requirements preparation", Requirements preparation, wt-a-12]
+      - [TSU, SCR-PM-07, "Enters the computation basis, clicks Save Requirements, downloads the Package Slip, uploads the signed slip on the Documents tab as Package slip (signed), and clicks Submit requirements for ManCom sign-off", "The checklist reads The requirements pack is complete.; the stage becomes For ManCom sign-off", For ManCom sign-off, wt-a-13]
+      - [MANCOM, SCR-PM-07, "Reviews the proposed terms and clicks Sign off and send to MBS", "ManCom decisions lists MC-PKR-yyyy-nnnnnn Signed; the slips show Locked; the stage becomes With MBS for set-up", Signed off, wt-a-14]
+      - [MBS, SCR-PM-08, "Clicks Set up package version, enters the risk code MTR30 and the product name, and clicks Set Up Version", "Toast: Version 1 set up; the Set-up tab shows MTR30 version 1; the stage becomes Package version for validation", Draft version 1, wt-a-15]
+      - [MBS, SCR-PM-13, "Clicks Open Version Editor, adds the clause FLEET_REPAIR on the insurer terms, saves and clicks Submit for Validation", "Toast: Version 1 submitted for validation; the version shows For validation", For validation, wt-a-16]
+      - [TSU_HEAD, SCR-PM-13, "Opens the version from the Validation Queue, ticks the five checklist items and clicks Validate and Release", "Toast: Version 1 released; the Validation card shows the validator, the date and the test premium", Released, wt-a-17]
+      - [BUSINESS_ADMIN, SCR-PM-18, "Opens Insurers › Mabuhay General Insurance Corp., clicks Add rate, chooses MTR30, 15% from today and clicks Save for Authorization", "Toast: Commission rate saved – pending authorization", Commission rate pending, wt-a-18]
+      - [NB_APPROVER, SCR-PM-18, "Opens the insurer and clicks Authorize on the new commission rate", "The rate for MTR30 shows Active", Commission rate active, wt-a-19]
+      - [TSU, SCR-PM-08, "Opens the Advisories tab of the released request, checks that both supporting documents are Attached and clicks Send Advisory", "Toast: Advisory sent; the advisory shows Sent with the date; Marketing users receive the notice", Advisory sent, wt-a-20]
+      - [MKT_AO, SCR-PM-21, "Opens Premium Calculator, chooses MTR30 and INS-MGIC, enters a vehicle value and clicks Calculate", "Priced on package version 1 (effective <date>, scheme rate 1.2%) with every charge and the commission", Priced on version 1, wt-a-21]
+      - [MKT_AO, SCR-PM-22, "Creates a New Business quotation of MTR30 for the seed client with an item rate of 1.10%, opens it and clicks Request Rate Exception with the reason", "The rate scheme panel shows the exception pending approval", Exception requested, wt-a-22]
+      - [NB_APPROVER, SCR-PM-22, "Approves the exception in My Approvals and opens the quotation", "The rate scheme panel lists the exception Active; the quotation can be submitted for review", Exception approved, wt-a-23]
+    downstream:
+      - "New Business (BRD-1): New Quotation and New Account offer MTR30 to the segments of the package; the quotation, the account and the booked invoice keep version 1 and the approved exception."
+      - "Booking and Operations: the booked invoice stores version 1 and the incentive criteria it matches; endorsements re-rate on version 1."
+      - "Renewal (BRD-6): renewal candidates of MTR30 accounts are priced on version 1 while it is released or superseded; the package map of the data migration may name MTR30 version 1 as the target of a legacy package."
+      - "Package Expiry: MTR30 appears on the Expiring tab 90 days before its package end date; the monitor alerts at 60, 30 and 7 days."
+  - id: WT-B
+    title: Returns and refusals, and the messages the user sees
+    summary: >-
+      The same process when something is missing or not allowed: an incomplete form, an approval by the maker, a return
+      by TSU, a slip approved by its preparer, terms made final before every insurer answered, a ManCom return, a
+      requirements pack without the signed slip, and a version returned by the validator. Each step shows the message
+      on the screen and what the user does next.
+    data: "Seed data: package requests PKR-2026-900002 (For TSU review), PKR-2026-900003 (round 2 with one insurer pending), PKR-2026-900004 (For ManCom sign-off), PKR-2026-900005 (With MBS) and the draft version 2 of MTR12"
+    steps:
+      - [MKT_AO, SCR-PM-03, "Opens New Package Request and clicks Save Draft without the name, line and reason", "Under the fields: Enter the package or programme name; Select the product line; Select the reason. Nothing is saved", Form corrected, wt-b-01]
+      - [MKT_AO, SCR-PM-03, "Completes the header only and clicks Submit for Approval", "The hint Before submitting, complete the requested terms (coverages or sections); at least one target insurer; the package end date, and the refusal Complete the request: ... with its reference", Request stays a draft, wt-b-02]
+      - [MKT_TL, SCR-PM-04, "Creates and submits a request himself, then clicks Approve and send to TSU on it", "A package request is approved by someone other than its maker", Another Marketing approver is needed, wt-b-03]
+      - [TSU_TL, SCR-PM-04, "Opens PKR-2026-900002 and clicks Return to requester, chooses the reason and writes what is missing", "The stage becomes Draft request; the requester receives the workflow notice with the comment", Returned to the requester, wt-b-04]
+      - [TSU_TL, SCR-PM-05, "Prepares and submits a slip himself, then clicks Approve and Send on it", "The quotation slip is approved by a TL or a co-officer", Another approver is needed, wt-b-05]
+      - [TSU, SCR-PM-05, "Opens PKR-2026-900003 and clicks Terms final while Luzon Assurance is still pending in round 2", "Every insurer of round 2 needs an outcome before the terms are final (1 pending)", Outcome to be keyed in first, wt-b-06]
+      - [MANCOM, SCR-PM-04, "Opens PKR-2026-900004 and clicks Return to TSU with the reason", "The stage becomes Requirements preparation; ManCom decisions lists the return", Returned to TSU, wt-b-07]
+      - [TSU, SCR-PM-07, "Clicks Submit requirements for ManCom sign-off before uploading the signed package slip", "The checklist lists the missing signed package slip; the refusal Complete the requirements: ...", Signed slip to be uploaded, wt-b-08]
+      - [MBS, SCR-PM-08, "Opens PKR-2026-900005 and clicks Return incomplete requirements to TSU with the reason", "The stage becomes Requirements preparation", Returned to TSU, wt-b-09]
+      - [MBS, SCR-PM-13, "Opens MTR12 version 2, clears the minimum premium and sets an effective date before today, then clicks Submit for Validation", "Toast Correct the highlighted fields; under the fields Enter the minimum premium and The effective date cannot be before today", Version stays a draft, wt-b-10]
+      - [TSU_HEAD, SCR-PM-13, "Opens the submitted MTR12 version 2 and clicks Return to MBS with the reason", "Toast: Version 2 returned to MBS", Returned to MBS, wt-b-11]
+      - [MBS, SCR-PM-13, "Opens MTR12 version 2", "The banner Returned by the validator: <reason> above the tabs; the draft can be corrected and submitted again", Draft to correct, wt-b-12]
+    downstream:
+      - "Every return keeps its reason and comment in the history of the request, and the notice reaches the user who must act."
+      - "A refused action changes nothing; the message names what to correct, and a server refusal shows its reference for support."

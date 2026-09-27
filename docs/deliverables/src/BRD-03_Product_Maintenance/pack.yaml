@@ -1,0 +1,171 @@
+# BRD-3 Product Maintenance – Business Sign-off Pack, release set v2.0 (Drop 0, Setup and Data Migration).
+# Built by docs/deliverables/src/signoff/signoff_pack.py (workbook, checks) and read by the FRS source through
+# ```pack blocks (tools/deliverables/bdoi_docx.py). Schema: docs/deliverables/src/signoff/README.md.
+meta:
+  brd: BRD-03
+  brd_label: BRD-3
+  name: Product Maintenance
+  code: PM
+  version: "2.0"
+  date: 27 September 2026
+  status_as_of: 27-Sep-2026
+  release_set: BRD-03 Product Maintenance – Business Sign-off Pack
+  frs: FRS_BRD03_PRODUCT_MAINTENANCE.md
+  test_plan: brd03_cases.yaml
+  screens_dir: screens
+  screenshot_dir: figures
+
+# The Product Maintenance personas: role code, name, SIT/UAT user of the seed profile.
+personas:
+  MKT_AO: {name: Marketing Account Officer, user: ao}
+  MKT_TL: {name: Marketing TL / TH / UH, user: mkttl}
+  TSU: {name: TSU Officer, user: tsu}
+  TSU_TL: {name: TSU Team Lead, user: tsulead}
+  TSU_HEAD: {name: TSU Head, user: tsuhead}
+  MBS: {name: Marketing Business Services, user: mbs}
+  MANCOM: {name: ManCom member, user: mancom}
+  BUSINESS_ADMIN: {name: Business Administrator, user: badmin}
+  NB_APPROVER: {name: New Business Approver, user: approver}
+  SYSADMIN: {name: System Administrator, user: admin}
+  AUDITOR: {name: Auditor, user: auditor}
+
+# Sidebar sections that belong to this BRD (navigation/modules.ts module ids) and the BRD of every other section,
+# used to mark each menu entry of a persona.
+own_sections: [catalog]
+section_brd:
+  dashboard: Platform
+  nb-dashboard: BRD-1
+  workspace: BRD-1
+  crm: BRD-1
+  screening: BRD-10
+  quotations: BRD-1
+  accounts: BRD-1
+  proposals: BRD-1
+  eb: BRD-8
+  placement: BRD-1
+  issuance: BRD-1
+  booking: BRD-1
+  prodrecon: BRD-2
+  adjustment: BRD-2
+  catalog: BRD-3
+  bulk: BRD-1
+  operations: BRD-2
+  collections: BRD-4
+  cashiering: BRD-2
+  remittance: BRD-2
+  commission: BRD-2 / BRD-4
+  disbursement: BRD-5
+  payrequest: BRD-5
+  acsl: BRD-5
+  frbs: BRD-5
+  gl: BRD-5
+  receivables: BRD-5
+  payables: BRD-5
+  assets: BRD-5
+  planning: BRD-5
+  tax: BRD-5
+  accounting-engine: BRD-5
+  brokerclaims: BRD-7
+  underwriting: Platform
+  claims: Platform
+  reinsurance: Platform
+  reserves: Platform
+  nb-reports: BRD-1
+  reports: Platform
+  broking-setup: BRD-1
+  screening-setup: BRD-10
+  setup: Platform
+  user-access: BRD-11
+  admin: Platform / BRD-11
+  help: Platform
+
+# Screen-flow figure: the links between the screens (list → record → action → next screen).
+flow:
+  - [SCR-PM-01, SCR-PM-02, stage tile]
+  - [SCR-PM-01, SCR-PM-10, Packages ending soon]
+  - [SCR-PM-02, SCR-PM-03, New Package Request]
+  - [SCR-PM-03, SCR-PM-04, Submit for Approval]
+  - [SCR-PM-02, SCR-PM-04, open]
+  - [SCR-PM-09, SCR-PM-04, open]
+  - [SCR-PM-04, SCR-PM-03, Edit]
+  - [SCR-PM-04, SCR-PM-05, Approve for negotiation]
+  - [SCR-PM-05, SCR-PM-06, Terms final]
+  - [SCR-PM-06, SCR-PM-07, Proceed to requirements]
+  - [SCR-PM-07, SCR-PM-08, Sign off and send to MBS]
+  - [SCR-PM-08, SCR-PM-13, Open Version Editor]
+  - [SCR-PM-14, SCR-PM-13, open]
+  - [SCR-PM-13, SCR-PM-08, Validate and Release]
+  - [SCR-PM-11, SCR-PM-12, open]
+  - [SCR-PM-12, SCR-PM-13, New Version]
+  - [SCR-PM-15, SCR-PM-13, coverages and clauses]
+  - [SCR-PM-10, SCR-PM-04, Generate Renewal Request]
+  - [SCR-PM-17, SCR-PM-18, open]
+  - [SCR-PM-18, SCR-PM-13, panel insurer]
+  - [SCR-PM-13, SCR-PM-21, released version]
+  - [SCR-PM-21, SCR-PM-22, priced on the version]
+  - [SCR-PM-16, SCR-PM-12, products matrix]
+
+# Elements shared by many screens, described once.
+common:
+  - name: Page header and company
+    text: >-
+      Every page shows its section (Product Maintenance) and title, a one-line description and its actions on the right.
+      The company in the header decides the package requests, insurers, sales units and incentive criteria shown;
+      products, coverages, clauses and rates are the same for every company.
+  - name: Work lists
+    text: >-
+      Lists show status tabs, a search box, a Filters button where the list has advanced filters, and the paged table
+      ("Showing 1 to n of N results"). A row opens its record. Dates show as dd-MMM-yyyy and times as dd-MMM-yyyy
+      HH:mm in Philippine time.
+  - name: Record summary and reference chips
+    text: >-
+      A record opens with its reference (package request number PKR-yyyy-nnnnnn, risk code, version), its status pill,
+      its flags (Generic or Client-specific, No negotiation, Package, Version n Draft) and the key facts. A reference
+      chip copies the reference.
+  - name: Workflow status strip and history
+    text: >-
+      The current stage of a package request is shown as a status strip: Stage (status pill and stage name), In Stage
+      Since, Due (the service level due time, Overdue in red) and Assigned To, with the actions the user may take now on
+      the right. The History tab lists every step, newest first: Stage, From Stage, Action, By (name and role), Date
+      and Time, Remarks and Duration in Stage. Actions that need a reason (Return to requester, Void, Not proceeded,
+      Request changes, Return to TSU) open a dialog with the mandatory reason from its list of values and an optional
+      comment; the comment is kept in the history and sent with the workflow notice.
+  - name: Maker-checker on product masters
+    text: >-
+      Products, coverages, clauses, field, document and TSU routing rules, insurers, branches, commission rates, rates
+      and taxes, sales units and incentive criteria are saved with Save for Authorization and show Pending
+      Authorization until a second user authorises them with Authorize (on the list row or in My Approvals). The maker
+      never authorises his own record. An authorised record is not deleted: Deactivate ends its use and keeps its
+      history. Package versions follow their own check: Submit for Validation, then Validate and Release by the TSU
+      Head or the Business Administrator.
+  - name: Status pills and tags
+    text: >-
+      Stages and record statuses are pills of one size and colour per state group; a pill never wraps. Flags such as
+      Generic, Client-specific, No negotiation, Package, Basic, Lowest rate and Locked are tags next to the name or in
+      their own column.
+  - name: Dates, amounts and rates
+    text: >-
+      Dates are entered with the date picker and shown as dd-MMM-yyyy (for example 27-Sep-2026). Amounts show two
+      decimals and thousand separators in Philippine pesos. Rates are percentages with up to four decimals.
+  - name: Documents panel
+    text: >-
+      The Documents tab of a package request lists its files (File, Type, Description, Size, Uploaded by, Uploaded,
+      SHA-256) with the upload bar (document type, description, files and the option to name the files after the
+      request number), download of one file or a ZIP of the selected files, and removal. The signed package slip is
+      uploaded here with the type Package slip (signed); the ManCom sign-off sheet with the type ManCom sign-off. File
+      type, size, content and malware checks apply to every upload.
+  - name: Protected e-mails
+    text: >-
+      Quotation slips to insurers and advisories e-mailed outside BIBS are sent as password-protected PDF; the password
+      follows in a separate e-mail. Every e-mail is listed on the request's E-mails tab with its outcome and in
+      Outbound Messages.
+  - name: Notifications and help
+    text: >-
+      The bell in the header shows the unread count and opens the notifications panel, grouped by day; each notice
+      opens its record. Mark Read, Mark All Read and View All are offered. The Help button of each page explains the
+      screen.
+  - name: Messages
+    text: >-
+      Field errors appear under the field in red with the field outlined; a banner at the top lists the errors of a
+      form. A refusal by a business rule shows the business message and a reference for support (the message code and
+      a request number). Success is confirmed by a short message at the bottom right of the page.

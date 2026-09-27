@@ -40,4 +40,12 @@ public interface PlacementSlipRepository extends JpaRepository<PlacementSlip, Lo
       "select distinct s from PlacementSlip s join s.accounts a where a.arn = :arn"
           + " order by s.id desc")
   List<PlacementSlip> findByArn(@Param("arn") String arn);
+
+  /**
+   * Every version of a slip number.
+   *
+   * @param slipNo slip number
+   * @return versions
+   */
+  List<PlacementSlip> findBySlipNo(String slipNo);
 }

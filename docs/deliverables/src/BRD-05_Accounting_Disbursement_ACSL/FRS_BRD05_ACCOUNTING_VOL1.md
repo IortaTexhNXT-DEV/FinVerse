@@ -125,26 +125,18 @@ SL: Sub-ledger (open items per party)
 
 Each FR in section 4 has the same parts:
 
-- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority**, the **fit** class of the baseline (R4), and the **screens** and **API** that implement it.
+- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority** and the **screens** where the user performs it.
 - **Description**, **preconditions**, **main flow** and **alternate and exception flows**.
 - **Business rules**. *Configurable* rules are maintained by the business or the System Administrator in BIBS (parameter, list of values or master record, section 9). *Fixed* rules are part of the system and change only through a change request.
 - **Validations and messages**: the check, the message the user sees and its code. The code is the one BIBS returns for a business rule. A "-" marks a screen or platform check; its message has no business code. Text in angle brackets (`<account>`) is replaced by the value.
 - **Screens and fields**: label, type, whether mandatory ("Cond." = mandatory when the condition in the Validation column applies), the source list and the validation.
 - **Notifications**, **audit** and numbered **acceptance criteria**, the basis of the BRD-5 test cases.
 
-Every BRD-5 row carries the priority **Must have** in the BRD. API paths start with `/api/v1`.
+Every BRD-5 row carries the priority **Must have** in the BRD.
 
 > [!NOTE]
 > The real chart of accounts, the accounting rules, the report layouts and several rates are BDOI data that have not been given (AQ01-AQ07, AQ20, AQ26). BIBS holds them as configuration with seed values, so a BDOI answer does not need a change to the system.
 
-<!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R4)" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Worked with the finance platform before BRD-5 |
-| CONFIGURE | Needed set-up only (parameters, rules, report definitions) |
-| CHANGE | Extended an existing capability |
-| NEW | A capability that did not exist before BRD-5 |
-| OUT | Out of scope per the BRD |
 
 ## Differences between the built behaviour and the BRD
 
@@ -1964,7 +1956,6 @@ Every Volume 1 requirement is met by at least one FR. The Build column gives the
 | BASAU 2.6.2 | p.131 | FR-AC-072 | My Approvals; Access Requests | /nbadmin/access-requests/{id}/*; /approvals/bulk-approve | Built |
 | BASAU 2.6.3 | p.132 | FR-AC-072 | My Approvals; Access Requests | /nbadmin/access-requests/{id}/*; /approvals/bulk-approve | Built |
 
-API paths start with `/api/v1`.
 
 ## Coverage summary
 

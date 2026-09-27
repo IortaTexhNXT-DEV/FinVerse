@@ -130,21 +130,13 @@ UPP: Unapplied payment
 
 ## How to read the functional requirements
 
-Each FR in section 4 has the same parts as in Volume 1: a header table (BRD trace with page, actor, priority, fit class of the baseline R4, screens, API), description, preconditions, main flow, alternate and exception flows, business rules (*Configurable* or *Fixed*), validations with the message and its code ("-" for a screen or platform check), screens and fields, notifications, audit and numbered acceptance criteria. Text in angle brackets (`<DV>`) is replaced by the value. Every BRD-5 row carries the priority **Must have**. API paths start with `/api/v1`; "..." in a header table stands for the module path given in the section introduction.
+Each FR in section 4 has the same parts as in Volume 1: a header table (BRD trace with page, actor, priority, screens), description, preconditions, main flow, alternate and exception flows, business rules (*Configurable* or *Fixed*), validations with the message and its code ("-" for a screen or platform check), screens and fields, notifications, audit and numbered acceptance criteria. Text in angle brackets (`<DV>`) is replaced by the value. Every BRD-5 row carries the priority **Must have**.
 
 Where a built function waits for BDOI data, the Fit column adds "parked" with the question it waits for (for example AQ24); the FR describes the delivered behaviour until the answer.
 
 > [!NOTE]
 > Bank channel layouts, form layouts, the payee migration file, the real accounting entries and several lists are BDOI data not given yet (AQ02, AQ09-AQ19, AQ21-AQ25). BIBS holds them as configuration or draft templates, so an answer does not need a change to the system.
 
-<!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R4)" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Worked with the platform before BRD-5 |
-| CONFIGURE | Needed set-up only |
-| CHANGE | Extended an existing capability |
-| NEW | A capability that did not exist before BRD-5 |
-| OUT | Out of scope per the BRD |
 
 ## Differences between the built behaviour and the BRD
 
@@ -327,7 +319,7 @@ acceptance:
 
 ### Payee maintenance
 
-API paths of this section are under `/api/v1/disbursement` unless stated.
+
 
 ```fr
 id: FR-DS-010
@@ -1773,7 +1765,7 @@ acceptance:
 
 ## Payment Requests (Marketing)
 
-API paths of this section are under `/api/v1/payment-requests` unless stated. Access (MKT 1.1.0-1.1.3) is FR-DS-001.
+ Access (MKT 1.1.0-1.1.3) is FR-DS-001.
 
 ```fr
 id: FR-PQ-001
@@ -2296,7 +2288,7 @@ acceptance:
 
 ## ACSL
 
-API paths of this section are under `/api/v1/acsl` unless stated. Access (ACSL 1.1.0-1.1.3) is FR-DS-001.
+ Access (ACSL 1.1.0-1.1.3) is FR-DS-001.
 
 ### Input files and reports
 
@@ -3320,7 +3312,6 @@ Every Volume 2 requirement is met by at least one FR. The Build column gives the
 | ACSL 2.15.0 | p.125 | FR-AS-024 | Correction | - | Built |
 | ACSL 2.16.0 | p.126; Add.1 p.34 | FR-AS-026 | Invoice 360 | GET /ops/invoices/{no}/family | Built |
 
-API paths start with `/api/v1`; "..." stands for the module path of the FR.
 
 ## Coverage summary
 

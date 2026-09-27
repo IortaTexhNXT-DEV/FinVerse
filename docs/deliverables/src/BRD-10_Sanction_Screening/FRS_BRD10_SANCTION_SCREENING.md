@@ -121,7 +121,7 @@ Watchlist: The sanctions and PEP entries held in BIBS, by source
 
 Each FR in section 4 has the same parts:
 
-- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority** (every BRD-10 requirement is "Must have"), the **fit** class of the baseline (R2), the **screens** that implement it and the **service** or job of the design (R3).
+- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority** (every BRD-10 requirement is "Must have") and the **screens** where the user performs it.
 - **Description**, **preconditions**, **main flow** and **alternate and exception flows**.
 - **Business rules**. *Configurable* rules are maintained by Compliance or the System Administrator in BIBS (configuration version, parameter or list of values, section 9). *Fixed* rules are part of the system and change only through a change request.
 - **Validations and messages**: the check and the message the user sees. The message codes are assigned when the module is built; the column shows "To be assigned at build". A "-" marks a screen check (for example a blank mandatory field), which has no business code.
@@ -131,13 +131,6 @@ Each FR in section 4 has the same parts:
 > [!NOTE]
 > Thresholds, SLA hours, template fields, dispositions and routing rules shown as "default" or "seed" are placeholders until BDOI answers the open questions in section 10.3. They are configuration entered by Compliance, so a changed answer does not need a change to the system.
 
-<!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R2)" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Works today with the BIBS platform |
-| CONFIGURE | Needs set-up only (parameters, lists, templates) |
-| CHANGE | Extends an existing platform capability |
-| NEW | A capability that does not exist in BIBS before BRD-10 |
 
 The 37 BRD requirements split into 1 FIT, 2 CONFIGURE, 20 CHANGE and 14 NEW (R2, section 3).
 

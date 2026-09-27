@@ -133,25 +133,17 @@ WTAX: Withholding tax
 
 Each FR in section 4 has the same parts:
 
-- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority**, the **fit** class of the baseline (R3), and the **screens** and **API** that implement it.
+- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority** and the **screens** where the user performs it.
 - **Description**, **preconditions**, **main flow** and **alternate and exception flows**.
 - **Business rules**. *Configurable* rules are maintained by the System Administrator or the business owner in BIBS (parameter, list of values or master record, section 9). *Fixed* rules are part of the system and change only through a change request.
 - **Validations and messages**: the check, the message the user sees and its code. The code is the one BIBS returns for a business rule. A "-" marks a screen or platform check (for example a blank mandatory field); its message follows the same wording but has no business code. Text in angle brackets (`<invoice>`) is replaced by the value.
 - **Screens and fields**: label, type, whether mandatory ("Cond." = mandatory when the condition in the Validation column applies), the source list and the validation.
 - **Notifications**, **audit** and numbered **acceptance criteria**. The acceptance criteria are the basis of the test cases of the BRD-2 test plan.
 
-API paths start with `/api/v1`. In the header tables "..." stands for the module path given in the section introduction.
 
 > [!NOTE]
 > Values marked "default" (holding days, tolerances, SLA hours, list entries) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a change to the system.
 
-<!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R3)" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Works with the platform built for BRD-1 |
-| CONFIGURE | Needs set-up only (parameters, templates, rules) |
-| CHANGE | Extends or re-purposes an existing capability |
-| NEW | A capability that did not exist before BRD-2 |
 
 ## Differences between the built behaviour and the BRD
 
@@ -325,7 +317,7 @@ The table below is the role-to-permission matrix provided with the system (migra
 
 ## Access, invoice ledger and Invoice 360
 
-The foundation module `opsledger` serves every team: access, the Operations home, the invoice ledger and its views, locks, co-insurance shares, batch run reports and report access. API paths of this section are under `/api/v1/ops`.
+The foundation module `opsledger` serves every team: access, the Operations home, the invoice ledger and its views, locks, co-insurance shares, batch run reports and report access.
 
 ```fr
 id: FR-OP-001
@@ -642,7 +634,7 @@ acceptance:
 
 ## Cashiering
 
-Cashiering receives premium and non-premium payments, issues ARs and Head Office ORs, applies payments to the invoice ledger by component, keeps unapplied payments with their dispositions and runs the BIR 2307 flow. API paths of this section are under `/api/v1/cashiering`.
+Cashiering receives premium and non-premium payments, issues ARs and Head Office ORs, applies payments to the invoice ledger by component, keeps unapplied payments with their dispositions and runs the BIR 2307 flow.
 
 ```fr
 id: FR-OP-010
@@ -1420,7 +1412,7 @@ acceptance:
 
 ## Remittance
 
-Remittance extracts what clients paid, groups it into batches per insurer and type, gets the batches approved, asks Disbursement to pay the insurer and records the insurer's OR. API paths of this section are under `/api/v1/remittance`.
+Remittance extracts what clients paid, groups it into batches per insurer and type, gets the batches approved, asks Disbursement to pay the insurer and records the insurer's OR.
 
 **Reinsurance transactions (BDOI answer of 26-Sep-2026).** Remittance handles the reinsurance transactions in Drop 1; the reinsurance module is phase 2. A reinsurer or reinsurance broker is set up as a counterparty and its payable follows the extraction, batch, hold, approval and payment steps of this section, with the same accounting. Which reinsurance transactions are in scope and the "Remittance Addendum" named in the drop plan are not yet defined (IQ20); no treaty or cession processing is in Drop 1.
 
@@ -1869,7 +1861,7 @@ acceptance:
 
 ## Adjustment / Cancellation
 
-Adjustment processes endorsement and cancellation requests on booked invoices: financial, non-financial and internal, singly or in batches. API paths of this section are under `/api/v1/adjustment`.
+Adjustment processes endorsement and cancellation requests on booked invoices: financial, non-financial and internal, singly or in batches.
 
 ```fr
 id: FR-OP-050
@@ -2321,7 +2313,7 @@ acceptance:
 
 ## Production Reconciliation
 
-Production Reconciliation sends each insurer a register of the accounts BDOI booked with it, takes in the insurer's answer, matches both sides and follows every difference to closure. The work is organised in cycles: one open cycle per insurer and production month (workflow OPS_RECON, section 5). API paths of this section are under `/api/v1/prodrecon`.
+Production Reconciliation sends each insurer a register of the accounts BDOI booked with it, takes in the insurer's answer, matches both sides and follows every difference to closure. The work is organised in cycles: one open cycle per insurer and production month (workflow OPS_RECON, section 5).
 
 BDOI places Production Reconciliation in **Drop 2** (drop plan of 26-Sep-2026): it is built with Operations and is tested and signed off in the Drop 2 SIT and UAT. The deliverables index of Drop 2 points to this chapter.
 
@@ -2680,7 +2672,7 @@ acceptance:
 
 ## Commission Receivables / Direct Payment
 
-Commission Receivables handles direct payment (DP) accounts, where the client paid the insurer directly: BDOI bills the insurer for its commission, follows the answer, collects the commission and reverses the premium receivable. It also runs the incentive programmes and tracks BIR certificates. API paths of this section are under `/api/v1/commission`.
+Commission Receivables handles direct payment (DP) accounts, where the client paid the insurer directly: BDOI bills the insurer for its commission, follows the answer, collects the commission and reverses the premium receivable. It also runs the incentive programmes and tracks BIR certificates.
 
 ```fr
 id: FR-OP-090
@@ -3221,7 +3213,7 @@ acceptance:
 
 ## Disbursement queue
 
-Until the Disbursement module of BRD-5 is delivered, Operations sends its payment requests to an in-app Disbursement queue. API paths are under `/api/v1/ops/disbursements`.
+Until the Disbursement module of BRD-5 is delivered, Operations sends its payment requests to an in-app Disbursement queue.
 
 ```fr
 id: FR-OP-120
@@ -3825,7 +3817,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 
 # Traceability
 
-Every BRD-2 requirement ID (169) is met by at least one FR. The page is the page of the BRD-2 PDF ("add." = Addendum 1). The build status comes from the requirements traceability (R4): BUILT = built and tested; SEAM = built and tested, with a value, layout or integration BDOI has not given kept as a seam; SUPERSEDED = built as a seam, with the replacement designed in BRD-4 or BRD-5. API paths start with `/api/v1`.
+Every BRD-2 requirement ID (169) is met by at least one FR. The page is the page of the BRD-2 PDF ("add." = Addendum 1). The build status comes from the requirements traceability (R4): BUILT = built and tested; SEAM = built and tested, with a value, layout or integration BDOI has not given kept as a seam; SUPERSEDED = built as a seam, with the replacement designed in BRD-4 or BRD-5.
 
 ## General requirements (BRQID)
 

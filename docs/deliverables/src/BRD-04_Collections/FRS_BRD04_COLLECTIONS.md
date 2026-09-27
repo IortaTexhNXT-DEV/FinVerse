@@ -125,27 +125,19 @@ UPP: Unapplied payment, a payment Cashiering received but could not apply to an 
 
 Each FR in section 4 has the same parts:
 
-- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority**, the **fit** class of the baseline (R5), and the **screens** and **API** that implement it.
+- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority** and the **screens** where the user performs it.
 - **Description**, **preconditions**, **main flow** and **alternate and exception flows**.
 - **Business rules**. *Configurable* rules are maintained by an authorised user in BIBS (parameter, list of values or master record, section 9). *Fixed* rules are part of the system and change only through a change request.
 - **Validations and messages**: the check, the message the user sees and its code. The code is the one BIBS returns for a business rule. A "-" marks a screen or platform check (for example a blank mandatory field); its message follows the same wording but has no business code. Text in angle brackets (`<invoice>`) is replaced by the value.
 - **Screens and fields**: label, type, whether mandatory ("Cond." = mandatory when the condition in the Validation column applies), the source list and the validation.
 - **Notifications**, **audit** and numbered **acceptance criteria**. The acceptance criteria are the basis of the test cases of the BRD-4 test plan.
 
-API paths start with `/api/v1/collections` unless another path is given; "..." in a header table stands for that prefix.
 
 The CMS BRD states that "unless otherwise stated, all requirements are considered high priority and committed for this phase" (p.37). BRCLXN.001-048 therefore carry the priority **High**. The signed addendum gives **Must have** for BRCLXN.049 and 051-060 and no priority for BRCLXN.050.
 
 > [!NOTE]
 > Values marked "to confirm" (threshold, disposition values, effort codes, escalation defaults) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a change to the system.
 
-<!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R5)" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Worked with the platform before BRD-4 |
-| CONFIGURE | Needed set-up only (parameters, lists, rules) |
-| CHANGE | Extended an existing capability |
-| NEW | A capability that did not exist before BRD-4 |
 
 ## Differences between the built behaviour and the BRD
 
@@ -1572,7 +1564,7 @@ acceptance:
 
 ## Unapplied payments
 
-Cashiering owns the unapplied payment, its tabs, its disposition workflow OPS_DISPOSITION and the money effects (BRD-2). Collections adds the collector side: the list as of today, the collector disposition and the request to Cashiering. Collections reads the unapplied items from Cashiering and never copies them. API paths of this section are under `/api/v1/collections/unapplied`.
+Cashiering owns the unapplied payment, its tabs, its disposition workflow OPS_DISPOSITION and the money effects (BRD-2). Collections adds the collector side: the list as of today, the collector disposition and the request to Cashiering. Collections reads the unapplied items from Cashiering and never copies them.
 
 ```fr
 id: FR-CL-070
@@ -2559,7 +2551,6 @@ Every BRD-4 requirement is met by at least one FR. The Build column gives the de
 | BRCLXN.063 | FR-CL-093 | - | to be assigned at build | Draft, not built |
 | BRCLXN.064 | FR-CL-094 | - | to be assigned at build | Draft, not built |
 
-API paths start with `/api/v1`; "..." stands for `/api/v1/collections`.
 
 <!-- table: widths=5,3,8.6 caption="Capabilities and NFRs without a BRCLXN ID" size=8 -->
 | Source | FR / section | Note |

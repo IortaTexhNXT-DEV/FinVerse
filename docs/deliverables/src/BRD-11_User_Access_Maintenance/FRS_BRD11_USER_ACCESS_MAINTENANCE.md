@@ -127,7 +127,7 @@ Windows ID: The user's BDO network log-on name, used for EUA authentication
 
 Each FR in section 4 has the same parts:
 
-- A header table with the **BRD trace** (requirement ID and page), the **actor**, the **priority** ("Must have" for the rows the BRD marks "Mandatory: Yes"; rows without a flag are noted), the **fit** class of the baseline (R2), and the **screens** and **API** that implement it.
+- A header table with the **BRD trace** (requirement ID and page), the **actor**, the **priority** ("Must have" for the rows the BRD marks "Mandatory: Yes"; rows without a flag are noted) and the **screens** where the user performs it.
 - **Description**, **preconditions**, **main flow** and **alternate and exception flows**. Where BIBS already has the function, the description starts with the baseline and then states the change.
 - **Business rules**. *Configurable* rules are maintained by the System Administrator in BIBS (parameter or list of values, section 9). *Fixed* rules are part of the system and change only through a change request.
 - **Validations and messages**: the check, the message the user sees and its code, as built. A "-" marks a screen check (for example a blank mandatory field), which has no business code. Chapter 15 lists every message of the build, read from the code.
@@ -135,13 +135,6 @@ Each FR in section 4 has the same parts:
 
 The BRD lists 160 requirement lines, many of them sub-steps of one function ("create request", "add remarks", "save remarks"). The FRs group them by function; section 11 lists every line with its FR.
 
-<!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R2)" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Works today in BIBS |
-| CONFIGURE | Needs set-up only (roles, parameters, lists) |
-| CHANGE | Extends a built function |
-| NEW | A function that does not exist in BIBS before BRD-11 |
 
 The 160 requirement lines split into 67 FIT, 4 CONFIGURE, 61 CHANGE and 28 NEW; the 41 NFR rows into 13 FIT, 8 CONFIGURE, 12 CHANGE and 8 NEW (R2, section 3).
 

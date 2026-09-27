@@ -144,7 +144,7 @@ Xref: Key cross-reference from a legacy key to the BIBS record created from it
 
 Each FR in section 4 has the same parts:
 
-- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority**, the **fit** class of the baseline (R2), and the **screens** and **API** that implement it.
+- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority** and the **screens** where the user performs it.
 - **Description**, **preconditions**, **main flow** and **alternate and exception flows**.
 - **Business rules**. *Configurable* rules are maintained in BIBS (parameter, list of values, code map or master record, section 9). *Fixed* rules are part of the system and change only through a change request.
 - **Validations and messages**: the check, the message the user sees and its code. A "-" marks a check whose code is assigned at build, or a screen check without a code. Codes that already exist in BIBS are quoted (for example `MAKER_CHECKER_VIOLATION`, `ACCESS_DENIED`, `DISPOSITION_AMOUNT`).
@@ -156,13 +156,6 @@ The BRD numbers two requirements "BRID 1.1" (p.7). This FRS calls the first one 
 > [!NOTE]
 > Values marked "default" (thresholds, retention days, chunk sizes, timings) are placeholders that BDOI confirms through the open questions of section 10.3. They are configuration, so a changed answer does not need a change to the system.
 
-<!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R2)" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Works today in BIBS |
-| CONFIGURE | Needs set-up only (parameters, lists, rules) |
-| CHANGE | Extends or re-purposes an existing capability |
-| NEW | A capability that did not exist before BRD-13 |
 
 # Business context and process overview
 
@@ -2259,7 +2252,6 @@ Every BRD-13 requirement is met by at least one FR. The screen and API columns n
 | BRID 11.1 (p.11-12) | FR-DM-110, FR-DM-111 | Legacy Inquiry; Legacy Access Log | /legacy-inquiry |
 | BRID 12.1 (p.12) | FR-DM-120, 121, 122, 123, 124, 125, 022, 023, 024, 034 | Cutover; Run-off and Decommissioning; Renewal candidates; True-ups | /migration/cutover-plans; /migration/runoff; /migration/trueups; LegacyPolicySource |
 
-API paths start with `/api/v1`.
 
 The concept paper on an early renewal release (R10) is superseded by the single January 2028 go-live. Early migration of the client master and the renewal reference data (section VI) is met by the trial-migration load order of FR-DM-120. Its RMEL ingestion (Annex C) is replaced by the go-live extraction and the RA-sent file (FR-DM-124, FR-DM-125), and its package remapping question (p.2, Annex B and C) is answered by the remapping at Renewal sanitation (FR-DM-034). No placement or booking happens in BIBS before the January 2028 cut-over, because BIBS is not live before it.
 

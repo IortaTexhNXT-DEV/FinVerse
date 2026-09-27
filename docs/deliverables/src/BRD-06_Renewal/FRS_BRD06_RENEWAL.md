@@ -135,7 +135,7 @@ UH: Unit Head
 
 Each FR in section 4 has the same parts:
 
-- A header table with the **BRD trace** (requirement IDs and pages), the **actor**, the BRD **priority**, the **fit** class of the baseline (R4), and the **screens** and **API** of the build design (R5).
+- A header table with the **BRD trace** (requirement IDs and pages), the **actor**, the BRD **priority** and the **screens** where the user performs it.
 - **Description**, **preconditions**, **main flow** and **alternate and exception flows**.
 - **Business rules**. *Configurable* rules are maintained by the Business Administrator or the System Administrator in BIBS (parameter, list of values, rule set or master record, section 9). *Fixed* rules are part of the system and change only through a change request.
 - **Validations and messages**: the check, the message the user sees and its code. Codes of the Renewal module are assigned at build ("To be assigned at build"). A code is quoted only where the check reuses a platform code that exists today (for example `ACCESS_DENIED`, `WORKFLOW_REASON_REQUIRED`). A "-" marks a screen check (for example a blank mandatory field).
@@ -147,14 +147,6 @@ The main BRD repeats most capabilities once per persona (for example report gene
 > [!NOTE]
 > Values marked "default" (lead days, notice days, thresholds, list entries) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a change to the system.
 
-<!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R4)" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Works today with the platform built for BRD-1 |
-| CONFIGURE | Needs set-up only (parameters, lists, roles, templates) |
-| CHANGE | Extends or re-purposes an existing capability |
-| NEW | A capability that does not exist before BRD-6 |
-| OUT | Out of scope per the BRD (Addendum 1, p.34) |
 
 # Business context and process overview
 
@@ -2880,7 +2872,6 @@ Every BRD-6 requirement ID is met by at least one FR or is out of scope by the B
 | BRRN.039 (p.14) | FR-RN-025, FR-RN-023 | LAMD Reports | Check PN_PRESENT, LAMD_STATUS |
 | BRRN.040 (p.14-15) | FR-RN-084 | Record page (Record Acceptance) | /renewal/candidates/{ref}/acceptance |
 
-API paths start with `/api/v1`. They are the paths of the build design (R5) and are confirmed at build.
 
 ## Main BRD line IDs
 

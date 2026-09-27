@@ -122,7 +122,7 @@ UPP: Unapplied Payment List
 
 Each FR in section 4 has the same parts:
 
-- A header table with the **BRD trace** (requirement ID and page), the **actor** (the BRD persona and the BIBS role), the BRD **priority**, the **fit** class of the baseline (R4), and the **screens** and **API** of the build design (R3).
+- A header table with the **BRD trace** (requirement ID and page), the **actor** (the BRD persona and the BIBS role), the BRD **priority** and the **screens** where the user performs it.
 - **Description**, **preconditions**, **main flow** and **alternate and exception flows**.
 - **Business rules**. *Configurable* rules are maintained by the business (rule sets, matrices, parameters, lists of values; section 9). *Fixed* rules are part of the system and change only through a change request.
 - **Validations and messages**: the check, the message the user sees and its code. Codes of the Submitted Policies module are assigned at build ("To be assigned at build"). A code is quoted only where the check reuses a platform code that exists today. A "-" marks a screen check (for example a blank mandatory field).
@@ -133,13 +133,6 @@ The BRD writes its personas as "As a System", "As a Marketing User", "As an Acco
 > [!NOTE]
 > Values marked "default" (lead days, acceptance days, thresholds, list entries) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a change to the system.
 
-<!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R4)" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Works today with the platform built for BRD-1 |
-| CONFIGURE | Needs set-up only (parameters, templates, rules) |
-| CHANGE | Extends or re-purposes an existing capability |
-| NEW | A capability that did not exist before BRD-12 |
 
 # Business context and process overview
 
@@ -1567,7 +1560,6 @@ Every BRD-12 requirement ID is met by at least one FR.
 | BRIDSP-33 (p.12) | FR-SP-004 | Upload & Intake (Migration) | Bulk SBM_MIGRATION |
 | Usage requirements (p.13-14) | Section 8 | - | - |
 
-API paths start with `/api/v1`. They are the paths of the build design (R3) and are confirmed at build.
 
 # Sign-off
 

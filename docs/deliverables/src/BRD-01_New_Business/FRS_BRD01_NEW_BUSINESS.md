@@ -139,7 +139,7 @@ UH: Unit Head (Marketing)
 
 Each FR in section 4 has the same parts:
 
-- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority**, the **fit** class of the baseline (R2), and the **screens** and **API** that implement it.
+- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority** and the **screens** where the user performs it.
 - **Description**, **preconditions**, **main flow** and **alternate and exception flows**. A description paragraph that starts with **Built behaviour** records a difference from the BRD.
 - **Business rules**. *Configurable* rules are maintained by the Business Administrator, the System Administrator or the business owner in BIBS (parameter, list of values or master record, section 9). *Fixed* rules are part of the system and change only through a change request.
 - **Validations and messages**: the check, the message the user sees and its code. The code is the one BIBS returns for a business rule. A "-" marks a screen or platform check (for example a blank mandatory field); its message follows the same wording but has no business code. Text in angle brackets (`<ARN>`) is filled in by BIBS.
@@ -149,14 +149,6 @@ Each FR in section 4 has the same parts:
 > [!NOTE]
 > Values marked "default" (SLA hours, days, thresholds, list entries) are the values provided with the system. They are configuration, so a changed BDOI answer to an open question in section 10.3 does not need a change to the system.
 
-<!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R2)" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Worked with the platform before BRD-1 |
-| CONFIGURE | Needed set-up only (parameters, templates, rules) |
-| CHANGE | Extended or re-purposed an existing capability |
-| NEW | A capability built for BRD-1 |
-| OUT | Out of scope according to the BRD |
 
 # Business context and process overview
 

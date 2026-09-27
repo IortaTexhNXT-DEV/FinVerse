@@ -116,7 +116,7 @@ Utilization report: The claims use of the current programme, from the client or 
 
 Each FR in section 4 has the same parts:
 
-- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority**, the **fit** class of the baseline (R3), the **screens** and the **API**.
+- A header table with the **BRD trace** (requirement ID and page), the **actor**, the BRD **priority** and the **screens** where the user performs it.
 - **Description**, **preconditions**, **main flow** and **alternate and exception flows**.
 - **Business rules**. *Configurable* rules are maintained in BIBS (parameter, list of values, rule table or template, section 9). *Fixed* rules are part of the system and change only through a change request.
 - **Validations and messages**: the check, the message the user sees and its code. A "-" marks a screen check (for example a blank mandatory field).
@@ -126,14 +126,6 @@ Each FR in section 4 has the same parts:
 > [!NOTE] Designed, not built
 > Screen names, permissions, parameters and lists come from the build design (R4). API paths and business message codes are fixed when the modules are built: the API entry reads "To be assigned at build" (portal endpoints live under `/api/portal`) and the Code column reads "To be assigned at build". Codes quoted in this document exist in the platform today (for example ACCESS_DENIED). Values marked "default" are placeholders that BDOI confirms through the open questions in section 10.3; they are configuration, so a changed answer does not need a change to the system.
 
-<!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R3)" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Works today with the platform built for BRD-1 and BRD-2 |
-| CONFIGURE | Needs set-up only (parameters, lists, rules) |
-| CHANGE | Extends or re-purposes an existing capability |
-| NEW | A capability that did not exist before BRD-8 |
-| OUT | Out of scope per the BRD |
 
 # Business context and process overview
 

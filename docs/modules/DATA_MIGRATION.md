@@ -62,6 +62,9 @@ the open questions still waiting for BDOI are listed at the end.
 | Sign-off | `/migration/signoff` | Gate matrix per object |
 | Legacy Inquiry | `/legacy-inquiry` | Reason once per session; search, record detail with legacy columns and documents, Excel export |
 | Access Log | `/legacy-inquiry/access-log` | Every search, view, download and export with user, address, criteria, records and reason |
+| Unapplied to Income | `/cashiering/unapplied-income` | Batches of old unapplied payments, new and legacy, reclassified to other income (Cashiering team lead, then top management) |
+| Legacy PR 2307 Reversal | `/cashiering/legacy-pr2307` | Batches settling the PR 2307 of legacy invoices against the due to insurer (Cashiering team lead) |
+| DP PR Legacy Reversal | `/commission/dppr-batches` | Batches reversing the premium receivable of legacy invoices paid directly to the insurer (Commission team lead) |
 
 LEGACY badge and Origin filter in the other modules: Clients, Accounts, Invoice search and Invoice 360 (with the
 legacy invoice block), Unapplied workbench and detail, Collections worklist and account (with the legacy follow-up),
@@ -95,7 +98,22 @@ LEGACY: their postings use the `LG_` components, which the accounting rules rout
 commission 2222, deferred output VAT 2223, unapplied collections 2206). The opening entries balance on Migration
 Clearing (LGC-CLR), which the GL opening trial balance clears; the reconciliation (L5) and the go / no-go measure it at
 zero per branch and currency. Payments, automatch, refunds, reclassifications, remittances and booking endorsements
-work on legacy invoices exactly as on BIBS invoices. Report `PRC-LEGACY-CHANGES` lists every change made in BIBS to a
+work on legacy invoices exactly as on BIBS invoices, and so do the BIR 2307 reclassification and DTIP offset, the
+minimal balance reversal, direct payment reversal, reinstatement and commission collection, write-offs and commission
+adjustments. The policy transaction history shows a migrated invoice as the original booking "(Migrated)" with its
+legacy system and number and its opening journals, and each year-end true-up as an adjustment.
+
+After go-live three batches work the legacy balances down, each requested by one user, approved by another and posted
+line by line (a line whose balance changed is refused, the others post):
+
+- Unapplied to Income: unapplied payments received at least a chosen number of days ago go to other income -
+  unclaimed collections (legacy items from 2206, new ones from 2205); the Cashiering team lead approves, then top
+  management (two different people); the item closes.
+- Legacy PR 2307 Reversal: the PR 2307 of a legacy invoice (reclassified from the premium receivable first when short)
+  is settled against the due to insurer; the Cashiering team lead approves.
+- DP PR Legacy Reversal: the open premium receivable of a legacy invoice paid directly to the insurer is reversed with
+  the same amount of the due to insurer (what was collected through the broker stays to remit); candidates are the legacy invoices tagged "DP PR for reversal" by Collections, or any legacy
+  invoice with open premium; the Commission team lead approves. Report `PRC-LEGACY-CHANGES` lists every change made in BIBS to a
 legacy invoice with its original, updated and delta amounts; report `MIG-LEGACY-POSITIONS` lists what is still open.
 
 ## 6. Jobs
@@ -115,8 +133,10 @@ legacy invoice with its original, updated and delta amounts; report `MIG-LEGACY-
 `MIG-BATCH-LOG`, `MIG-RECON-SUMMARY`, `MIG-RECON-DETAIL`, `MIG-CLIENT-MATCH`, `MIG-SIGNOFF-STATUS`,
 `MIG-RENEWAL-GOLIVE`, `MIG-GL-CLEARING`, `MIG-TRUEUP-REGISTER`, `MIG-TRUEUP-RECON`, `MIG-CUTOVER-STATUS`,
 `MIG-GONOGO`, `MIG-RUNOFF`, `MIG-LEGACY-POSITIONS` and `MIG-ACCESS-LOG` (Compliance). Operations report
-`PRC-LEGACY-CHANGES`. The Collections item reports, the DTIP status reports and the Cashiering receivable and
-commission reports have an Origin filter.
+`PRC-LEGACY-CHANGES`; Cashiering reports `CSH-UPP-LEGACY` (legacy unapplied payments with legacy receipt, age, stage,
+disposition and income batch) and `CSH-UPP-INCOME-RECLASS` (items taken to income). The Collections item reports, the
+DTIP status reports, the Cashiering receivable and commission reports, the remittance schedules and the special
+remittance register have an Origin filter.
 
 ## 8. Controls
 
@@ -132,8 +152,12 @@ commission reports have an Origin filter.
 
 Seed migrations V1980 (users), V1981 (decisions, code maps), V1982 (legacy GL chart and rules). The seed runner
 `LegacyMigrationSeedData` (profile `seed`) loads the storyline of `db/seed/migration/` - reference data, a client, a
-policy header, an open legacy invoice, a legacy unapplied payment and an archive record - through the real pipeline.
-Tests: one `Migration*ApiIT` per wave, `MigrationEndToEndIT` (storyline, automatch, endorsement, inquiry) and
+policy header, an open legacy invoice, a legacy unapplied payment and an archive record - through the real pipeline,
+then `MigrationTabsStoryline` fills the console tabs: a mock cutover plan under way with its criteria measured, the
+production plan, a run-off snapshot and the EBIX decommissioning checklist with its first criteria met.
+Tests: one `Migration*ApiIT` per wave, `MigrationLegacyBatchesApiIT` (the three legacy batches, the legacy reports,
+the history of a migrated invoice, the Origin filter of the remittance schedules), `MigrationEndToEndIT` (storyline,
+automatch, endorsement, inquiry, console tabs) and
 `MigrationPerformanceIT` (run with `-Dmig.perf.clients=1000000` on the production-sized environment).
 
 ## 10. Waiting for BDOI

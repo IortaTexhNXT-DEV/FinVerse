@@ -175,8 +175,9 @@ public class DpPostings {
 
   /**
    * Reverses the open premium receivable and due to insurer of a legacy invoice paid directly to
-   * the insurer (DPPR legacy reversal batch, DATA_MIGRATION_DESIGN 14.4 E); the entry always posts
-   * for a legacy invoice.
+   * the insurer (DPPR legacy reversal batch, DATA_MIGRATION_DESIGN 14.4 E): the due to insurer is
+   * reversed by the premium reversed, so what was collected through the broker stays to remit. The
+   * entry always posts for a legacy invoice.
    *
    * @param invoiceNo legacy invoice
    * @param sourceRef reference of the batch line
@@ -189,12 +190,20 @@ public class DpPostings {
             .find(invoiceNo)
             .orElseThrow(() -> new ResourceNotFoundException("Operations invoice", invoiceNo));
     Map<LedgerComponent, BigDecimal> amounts = new EnumMap<>(LedgerComponent.class);
+    BigDecimal premium = BigDecimal.ZERO;
+    BigDecimal dtip = BigDecimal.ZERO;
     for (OpsInvoiceComponent c : invoice.getComponents()) {
-      boolean reversible =
-          c.getComponent().isPremiumReceivable() || c.getComponent() == LedgerComponent.DTIP;
-      if (reversible && c.getBalance().signum() > 0) {
+      if (c.getComponent().isPremiumReceivable() && c.getBalance().signum() > 0) {
         amounts.put(c.getComponent(), c.getBalance());
+        premium = premium.add(c.getBalance());
+      } else if (c.getComponent() == LedgerComponent.DTIP) {
+        dtip = c.getBalance();
       }
+    }
+    // The part of the premium collected through the broker stays due to the insurer.
+    BigDecimal due = premium.min(dtip);
+    if (due.signum() > 0) {
+      amounts.put(LedgerComponent.DTIP, due);
     }
     return premiumMovement(
         invoice, new EventKeys(valueDate, sourceRef, invoice.getInsurerCode()), amounts, false);

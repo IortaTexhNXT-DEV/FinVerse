@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.JsonNode;
 import com.iortatechnxt.brokerverse.cashiering.service.AutomatchService;
 import com.iortatechnxt.brokerverse.migration.seed.MigrationStoryline;
+import com.iortatechnxt.brokerverse.migration.seed.MigrationTabsStoryline;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.support.Api;
@@ -37,6 +38,7 @@ class MigrationEndToEndIT {
   @Autowired private Api api;
   @Autowired private AutomatchService automatch;
   @Autowired private ReportService reports;
+  @Autowired private MigrationTabsStoryline tabs;
 
   @Test
   void theStorylineMigratesAndIsWorkedInBibs() throws Exception {
@@ -100,5 +102,37 @@ class MigrationEndToEndIT {
                         + "&invoiceNo=I95000021&reasonCode=AUDIT&reasonText=Storyline")
                 .andExpect(status().isOk()));
     assertThat(archive.get("content")).hasSize(1);
+
+    tabs.run(company, as::run);
+    tabs.run(company, as::run);
+    assertThat(
+            jdbc.queryForList(
+                "select name from mig_cutover_plan where company_id = ? and name in (?, ?)",
+                String.class,
+                company,
+                MigrationTabsStoryline.MOCK_PLAN,
+                MigrationTabsStoryline.PRODUCTION_PLAN))
+        .containsExactlyInAnyOrder(
+            MigrationTabsStoryline.MOCK_PLAN, MigrationTabsStoryline.PRODUCTION_PLAN);
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from mig_cutover_task t join mig_cutover_plan p on p.id = t.plan_id"
+                    + " where p.company_id = ? and t.status = 'DONE'",
+                Integer.class,
+                company))
+        .isPositive();
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from mig_decommission_item where company_id = ?"
+                    + " and system_code = 'EBIX' and status = 'MET'",
+                Integer.class,
+                company))
+        .isPositive();
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from mig_runoff_cohort where company_id = ?",
+                Integer.class,
+                company))
+        .isPositive();
   }
 }

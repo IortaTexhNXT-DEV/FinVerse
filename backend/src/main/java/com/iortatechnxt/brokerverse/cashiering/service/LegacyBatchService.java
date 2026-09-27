@@ -45,6 +45,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  */
 @Service
 @Transactional
+@SuppressWarnings("PMD.GodClass") // the two batch kinds share the same maker-checker life cycle
 public class LegacyBatchService {
 
   private static final String ENTITY = "CashLegacyBatch";

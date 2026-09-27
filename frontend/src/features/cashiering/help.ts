@@ -55,6 +55,36 @@ export const CASHIERING_HELP: HelpSection = {
       controls: ['Dispositions that need approval are processed by a second user.'],
     },
     {
+      name: 'Unapplied to Income',
+      path: '/cashiering/unapplied-income',
+      summary:
+        'Batches of old unapplied payments, created in BIBS or carried over from the legacy systems, reclassified to other income - unclaimed collections. Legacy items post on the legacy unapplied collections account.',
+      workflow: [
+        'New Batch: give the reason and the currency, then add unapplied payments received at least the number of days you choose; the Origin filter shows the migrated or BIBS items.',
+        'Submit the batch; the Cashiering team lead approves it, then top management.',
+        'After the second approval each item posts on its own and is closed; an item whose balance changed is refused.',
+      ],
+      controls: [
+        'The requester never approves, and the two approvals are given by two people.',
+        'An item can be on one batch at a time.',
+      ],
+    },
+    {
+      name: 'Legacy PR 2307 Reversal',
+      path: '/cashiering/legacy-pr2307',
+      summary:
+        'Batches settling the PR 2307 of legacy invoices against the amount due to the insurer, on the legacy control accounts.',
+      workflow: [
+        'New Batch: give the reason and the currency, then add each legacy invoice with the amount to reverse.',
+        'When the PR 2307 balance is short, the difference is first moved from the premium receivable.',
+        'Submit the batch; the Cashiering team lead approves or returns it, and each invoice then posts on its own.',
+      ],
+      controls: [
+        'The amount must be within the open PR 2307 and premium receivable and within the due to insurer.',
+        'The requester never approves their own batch.',
+      ],
+    },
+    {
       name: 'Incoming Requests',
       path: '/cashiering/requests',
       summary:

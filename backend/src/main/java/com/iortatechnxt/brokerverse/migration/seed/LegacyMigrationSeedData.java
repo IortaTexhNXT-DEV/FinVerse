@@ -28,6 +28,7 @@ public class LegacyMigrationSeedData implements ApplicationRunner {
   private final JdbcTemplate jdbc;
   private final SeedUsers users;
   private final CompanyRepository companies;
+  private final MigrationTabsStoryline tabs;
 
   /**
    * Creates the runner.
@@ -36,16 +37,19 @@ public class LegacyMigrationSeedData implements ApplicationRunner {
    * @param jdbc JDBC
    * @param users SIT/UAT sign-in
    * @param companies companies
+   * @param tabs the storyline of the console tabs after the loads
    */
   public LegacyMigrationSeedData(
       MigrationStoryline.Services services,
       JdbcTemplate jdbc,
       SeedUsers users,
-      CompanyRepository companies) {
+      CompanyRepository companies,
+      MigrationTabsStoryline tabs) {
     this.services = services;
     this.jdbc = jdbc;
     this.users = users;
     this.companies = companies;
+    this.tabs = tabs;
   }
 
   @Override
@@ -58,6 +62,7 @@ public class LegacyMigrationSeedData implements ApplicationRunner {
               if (!storyline.loaded(company.getId())) {
                 LOG.info("Migration seed storyline loaded: {}", storyline.run(company.getId()));
               }
+              tabs.run(company.getId(), users::as);
             });
   }
 }

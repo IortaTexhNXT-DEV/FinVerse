@@ -1297,15 +1297,17 @@ Branch of waves DM0 to DM3 (build window Sep 2026). Everything below is in the c
 | DM1-C | V803, V823, V767, V1088, V1089; clients with matching and review queue (C01), payout accounts (C03), policy headers as booked accounts (P01), RA-sent file (P03) with resubmissions, PACKAGE map (R06) handed to Renewal's package map, products (R05), payees (R09), branch and sales organisation checks (R02, R03), insurers (R04), commission rates (R07), receipt series (R11); Renewal's `LegacyPolicySource` served by the migrated headers | `MigrationClientsHeadersApiIT`, `MigrationReferenceMastersApiIT`, `MigrationReferenceChecksApiIT` |
 | DM2-A | V873, V1007; endorsements and cancellations of legacy invoices from the legacy original (booking port `LegacyInvoiceSource`, implemented by Operations) posted with `LG_` components; `PRC-LEGACY-CHANGES`; production extract without migrated invoices; collection state (F03) as legacy follow-up | `MigrationLegacyEndorsementApiIT`, `MigrationCollectionStateApiIT` |
 | DM2-B | Cutover plans with runbook tasks, twelve go / no-go criteria (seven measured) and the board's decision (G7), runbook workbook; run-off snapshots; decommissioning checklists (per system and for the legacy context, measured); archive records (H01) and documents (H02, checksum checked, seam `LegacyDocumentSource`); Legacy Inquiry with reason, access log (append-only), Excel export, unusual-access alert; jobs `MIG_RUNOFF_SNAPSHOT`, `MIG_ACCESS_LOG_DIGEST`; reports `MIG-CUTOVER-STATUS`, `MIG-GONOGO`, `MIG-RUNOFF`, `MIG-LEGACY-POSITIONS`, `MIG-ACCESS-LOG` | `MigrationCutoverApiIT`, `MigrationArchiveInquiryApiIT` |
-| DM3 | SIT/UAT storyline through the real pipeline (`MigrationStoryline`, seed runner `LegacyMigrationSeedData`, extracts in `db/seed/migration/`); end-to-end test; performance harness; module guide `docs/modules/DATA_MIGRATION.md` | `MigrationEndToEndIT`, `MigrationPerformanceIT` (on demand) |
+| DM3 | SIT/UAT storyline through the real pipeline (`MigrationStoryline`, seed runner `LegacyMigrationSeedData`, extracts in `db/seed/migration/`), then the console tabs (`MigrationTabsStoryline`: a mock cutover plan under way with measured criteria, the production plan, a run-off snapshot, the EBIX decommissioning checklist); end-to-end test; performance harness; module guide `docs/modules/DATA_MIGRATION.md` | `MigrationEndToEndIT`, `MigrationPerformanceIT` (on demand) |
+| Legacy context | V768, V782, V787; Cashiering batches (`csh_legacy_batch`): unapplied payments, new and legacy, to other income (`OPS_UNAPPLIED_TO_INCOME`, Cashiering team lead then top management) and legacy PR 2307 reversal (team lead); Commission legacy direct payment PR reversal (`cmr_dppr_batch`, Collections "DP PR for reversal" tags as candidates); each line posts in its own transaction; `LG_` routing of 2307 reclass and DTIP offset, minimal balance reversal, direct payment reversal / reinstatement / commission collection, write-off and commission adjustment; policy transaction history of migrated invoices (opening journals, year-end true-ups); reports `CSH-UPP-LEGACY`, `CSH-UPP-INCOME-RECLASS`; screens Unapplied to Income, Legacy PR 2307 Reversal, DP PR Legacy Reversal | `MigrationLegacyBatchesApiIT` |
 
 ### 28.2 Origin everywhere
 
 Migrated records carry `origin` MIGRATED, `source_system`, `legacy_ref` and `migration_batch` (plus the cross-reference
 `mig_key_xref` and the batch). LEGACY badge and Origin filter: Clients, Accounts, Invoice search and Invoice 360,
-Unapplied workbench and detail, Collections worklist and account, Products, Payees, Insurers, Receipt Series. Origin
-filter on the reports: Collections item reports, DTIP status summary and detail, Cashiering outstanding premium,
-outstanding and YTD commission, applied premium. Migrated records raise no notification and no outbound integration
+Unapplied workbench and detail, Unapplied to Income candidates, Collections worklist and account, Products, Payees,
+Insurers, Receipt Series. Origin filter on the reports: Collections item reports, DTIP status summary and detail,
+Cashiering outstanding premium, outstanding and YTD commission, applied premium, the remittance schedules (normal,
+special, with incentives, with an Origin column) and the special remittance register. Migrated records raise no notification and no outbound integration
 event; every loader undoes its records on a batch rollback.
 
 ### 28.3 Deviations from the design
@@ -1318,7 +1320,9 @@ event; every loader undoes its records on a batch rollback.
 - Co-insured legacy invoices post one opening entry per insurer share; withholding tax nets the commission receivable.
 - The Data Migration Lead signs G4 and G6 with the business owner; year-end option B opens profit and loss by account
   and refuses true-ups (`MIG_YEAR_END_OPTION`).
-- Not built: income reclassification of legacy unapplied payments and the PR2307 / DPPR legacy reversal batches,
-  `CSH-UPP-LEGACY`, the adjustment and CWT / DP / minimal-balance contexts beyond payments, refunds, remittances and
-  booking endorsements, and the conditional objects F04-F07, P04-P05.
+- The two Cashiering batch kinds share one table (`csh_legacy_batch` with a kind) and a status machine on the entity
+  instead of two tables on the workflow engine; the direct payment batch has its own table in Commission. The line
+  amount of a direct payment batch is the whole open premium receivable of the invoice (an uploaded amount must match).
+- An income reclassification is not reversed by a batch of its own; a wrong line is corrected with a journal.
+- Seams until BDOI decides: the conditional objects F04-F07 and P04-P05.
 

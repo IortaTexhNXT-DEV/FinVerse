@@ -255,7 +255,7 @@ def build_workbook(lay: dict[str, Any]) -> Path:
         "Each layout sheet is the contract of one extract file; the CSV template of the same code in the "
         "templates folder has exactly these field names as its header row.",
         "Volumes, owners and stewards marked 'to name' or blank are filled by BDOI (DMQ01, DMQ28).",
-        "Sources: BDOI_DM_BRD_SPEC.md and DATA_MIGRATION_DESIGN.md (sections 2, 5, 7, 8, 12, 15, 17, 27); dates on "
+        "Sources: the BRD-13 data migration requirements and the agreed migration approach; dates on "
         "the BDOI programme timeline (go-live January 2028).",
     ]
     wb.sheet("Object Register", register_columns(), register_rows(lay),

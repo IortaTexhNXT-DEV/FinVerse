@@ -968,8 +968,8 @@ acceptance:
   - A DP account returned by the insurer is open again in the handler's worklist with the disposition "DP returned by insurer".
 ```
 
-> [!WARNING] Open item
-> Cashiering does not yet take the COLLECTION_CWT2307 items from the Collections outbox; its 2307 upload stays the path. The items stay PENDING and CLX_OUTBOX_STALE reports them until the Cashiering owner adds the pull (R6, C1-A).
+> [!NOTE] For confirmation
+> Cashiering takes the COLLECTION_CWT2307 items in its 2307 intake; an item not taken within one day raises CLX_OUTBOX_STALE (chapter 12, CLR-CL-06).
 
 ```fr
 id: FR-CL-033

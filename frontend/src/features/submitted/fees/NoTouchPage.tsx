@@ -7,6 +7,7 @@ import { InsurerName } from '@/components/broking/LovLabel';
 import { useFileDownload } from '@/components/broking/useFileDownload';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
@@ -198,13 +199,18 @@ export default function NoTouchPage() {
                     </Button>
                   )}
                   {b.status === 'RETURNED' && (
-                    <Button
+                    <ConfirmButton
                       variant="ghost"
-                      disabled={bill.isPending}
-                      onClick={() => bill.mutate(b.id)}
+                      confirm={{
+                        title: `Bill ${b.batchNo}`,
+                        record: `${b.insurerCode} · ${b.period}`,
+                        effect:
+                          'A service invoice is issued to the insurer and the service fee is posted.',
+                      }}
+                      onConfirm={() => bill.mutateAsync(b.id)}
                     >
                       Bill Insurer
-                    </Button>
+                    </ConfirmButton>
                   )}
                 </span>
               ),

@@ -7,6 +7,7 @@ import { ActionDialog } from '@/components/broking/ActionDialog';
 import type { ActionNote } from '@/api/workflow';
 import { useFileDownload } from '@/components/broking/useFileDownload';
 import { Button } from '@/components/ui/Button';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { useToast } from '@/components/ui/toastContext';
 import { SBM_LOV } from '../common/submittedCodes';
@@ -85,13 +86,35 @@ export function IaafActions({ iaaf, onDone }: Readonly<{ iaaf: IaafView; onDone:
     <span className="form-actions">
       <ErrorAlert error={step.error} />
       {may.submit && <Button onClick={() => step.mutate('submit')}>Submit</Button>}
-      {may.approve && <Button onClick={() => step.mutate('approve')}>Approve</Button>}
+      {may.approve && (
+        <ConfirmButton
+          confirm={{
+            title: `Approve IAAF ${iaaf.iaafNo}`,
+            record: iaaf.assuredName,
+            effect: `Level ${String(iaaf.approval.currentLevel)} is signed; the IAAF moves to the next level or is approved.`,
+          }}
+          onConfirm={() => step.mutateAsync('approve')}
+        >
+          Approve
+        </ConfirmButton>
+      )}
       {may.approve && (
         <Button variant="secondary" onClick={() => setDialog('return')}>
           Return
         </Button>
       )}
-      {send && <Button onClick={() => step.mutate('issue')}>Send to Bank</Button>}
+      {send && (
+        <ConfirmButton
+          confirm={{
+            title: `Send IAAF ${iaaf.iaafNo}`,
+            record: iaaf.assuredName,
+            effect: 'The signed IAAF is e-mailed to the bank counterpart and the IAAF is issued.',
+          }}
+          onConfirm={() => step.mutateAsync('issue')}
+        >
+          Send to Bank
+        </ConfirmButton>
+      )}
       {may.cancel && (
         <Button variant="secondary" onClick={() => setDialog('cancel')}>
           Cancel IAAF
@@ -139,7 +162,19 @@ export function TorActions({ tor, onDone }: Readonly<{ tor: TorView; onDone: () 
     <span className="form-actions">
       <ErrorAlert error={step.error ?? download.error} />
       {may.submit && <Button onClick={() => step.mutate('submit')}>Submit</Button>}
-      {may.approve && <Button onClick={() => step.mutate('approve')}>Approve</Button>}
+      {may.approve && (
+        <ConfirmButton
+          confirm={{
+            title: `Approve TOR ${tor.torNo}`,
+            record: tor.assuredName ?? undefined,
+            effect:
+              'The level is signed; an approved TOR is released to the Account Officer on download.',
+          }}
+          onConfirm={() => step.mutateAsync('approve')}
+        >
+          Approve
+        </ConfirmButton>
+      )}
       {may.approve && (
         <Button variant="secondary" onClick={() => setDialog('return')}>
           Return

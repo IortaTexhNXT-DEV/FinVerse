@@ -63,7 +63,7 @@ A user sees the records of the segments of their scope (Setup, User Scopes); the
 | Letters & Print Batches | `/submitted/letters` | `SBM_LETTER_SEND` |
 | Handling Fees | `/submitted/fees` | `SBM_HANDLING_FEE` |
 | No Touch Billing | `/submitted/no-touch` | `SBM_HANDLING_FEE` |
-| Submitted Policies Setup | `/submitted/setup` | `SBM_RULE_MAINTAIN` or `SBM_RULE_APPROVE` |
+| Submitted Policies Setup | `/submitted/setup` | `SBM_RULE_MAINTAIN` or `SBM_RULE_APPROVE` (Rule Sets tab: the rule editor with maker and checker) |
 
 ## 4. Life of a record
 
@@ -131,6 +131,7 @@ started with Renew with BDOI, three handling fees and a No Touch export.
 
 | Symptom | Check |
 |---|---|
+| A rule set cannot be changed | Only a draft is changed: open the active set and create a New Version |
 | A record falls out with "No rule applies" | An active rule set of the step and segment exists (Setup, Rule Sets) and ends with a rule that always applies |
 | A CBG record falls out with "No record in the LAMD loan snapshot" | Upload the latest LAMD snapshot, then run the processing again |
 | Generate IAAF is disabled | The last review of the record is not adequate |

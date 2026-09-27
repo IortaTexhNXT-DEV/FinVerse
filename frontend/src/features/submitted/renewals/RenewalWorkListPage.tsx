@@ -8,6 +8,7 @@ import { useAuth } from '@/auth/authContext';
 import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -69,13 +70,17 @@ export default function RenewalWorkListPage() {
         description="Submitted policies handed to Renewal with their insurer, hold cover and outcome."
         actions={
           can('SBM_PROCESS') && (
-            <Button
+            <ConfirmButton
               icon={<ScanSearch size={16} />}
-              disabled={scan.isPending}
-              onClick={() => scan.mutate()}
+              confirm={{
+                title: 'Scan Now',
+                effect:
+                  'The policies For Renewal near their expiry are handed to Renewal now, as the nightly scan does.',
+              }}
+              onConfirm={() => scan.mutateAsync()}
             >
               Scan Now
-            </Button>
+            </ConfirmButton>
           )
         }
       />

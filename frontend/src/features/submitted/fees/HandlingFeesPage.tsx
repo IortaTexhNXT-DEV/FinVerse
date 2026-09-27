@@ -5,9 +5,11 @@ import { submittedApi } from '@/api/submitted';
 import type { AmbiguousView, FeeView } from '@/api/submitted';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
@@ -52,9 +54,7 @@ function Ambiguous({ onDone }: Readonly<{ onDone: () => void }>) {
     <div className="stack">
       <ErrorAlert error={list.error ?? tag.error} />
       {(list.data ?? []).length === 0 && !list.isLoading && (
-        <Card>
-          <p className="muted">No payment matches several handling fees.</p>
-        </Card>
+        <Notice tone="success">No payment matches several handling fees.</Notice>
       )}
       {(list.data ?? []).map((a: AmbiguousView) => (
         <Card
@@ -79,13 +79,18 @@ function Ambiguous({ onDone }: Readonly<{ onDone: () => void }>) {
                 key: 'tag',
                 header: 'Actions',
                 render: (f) => (
-                  <Button
+                  <ConfirmButton
                     variant="ghost"
-                    disabled={tag.isPending}
-                    onClick={() => tag.mutate({ feeId: f.id, ref: a.unappliedRef })}
+                    confirm={{
+                      title: `Tag ${f.feeNo}`,
+                      record: `Payment ${a.unappliedRef}`,
+                      effect:
+                        'The payment is recognised as handling fee income by Cashiering, which issues the official receipt.',
+                    }}
+                    onConfirm={() => tag.mutateAsync({ feeId: f.id, ref: a.unappliedRef })}
                   >
                     Tag This Fee
-                  </Button>
+                  </ConfirmButton>
                 ),
               },
             ]}

@@ -267,3 +267,25 @@ export interface RuleSetView {
   decisionRemarks: string | null;
   rules: RuleView[];
 }
+
+/** A new or changed rule of a draft rule set. */
+export interface RuleInput {
+  priority: number;
+  name: string;
+  conditions: RuleCondition[];
+  outcome: RuleOutcome;
+  reasonCode: string | null;
+  stop: boolean;
+  active: boolean;
+}
+
+/** A new rule set (version 1, draft). */
+export interface RuleSetCreate {
+  companyId: number;
+  code: string;
+  step: string;
+  segment: string | null;
+  businessType: string | null;
+  effectiveFrom: string;
+  description: string;
+}

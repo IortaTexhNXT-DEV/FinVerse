@@ -185,6 +185,48 @@ function mockApis() {
       rules: [],
     },
   ]);
+  vi.spyOn(submittedApi, 'ruleSet').mockResolvedValue({
+    id: 1,
+    code: 'DISPOSITION',
+    step: 'DISPOSITION',
+    segment: null,
+    businessType: null,
+    versionNo: 2,
+    status: 'DRAFT',
+    effectiveFrom: '2026-10-01',
+    description: 'Renewal buckets',
+    maker: 'sbmtl',
+    submittedAt: null,
+    approvedBy: null,
+    approvedAt: null,
+    decisionRemarks: 'Add the FFY rule',
+    rules: [
+      {
+        id: 5,
+        priority: 100,
+        name: 'Free First Year',
+        conditions: [{ field: 'ffy', operator: 'EQ', value: 'true' }],
+        outcome: { bucket: 'FFY', tag: null, classification: null, raTemplate: 'FFY', flag: null },
+        reasonCode: null,
+        stop: true,
+        active: true,
+      },
+    ],
+  });
+  vi.spyOn(submittedApi, 'vocabulary').mockResolvedValue({
+    facts: ['always', 'ffy', 'segment'],
+    operators: ['EQ', 'IN', 'EMPTY'],
+  });
+  vi.spyOn(submittedApi, 'addRule').mockResolvedValue({
+    id: 6,
+    priority: 110,
+    name: 'All',
+    conditions: [],
+    outcome: { bucket: null, tag: null, classification: null, raTemplate: null, flag: null },
+    reasonCode: null,
+    stop: true,
+    active: true,
+  });
   vi.spyOn(submittedApi, 'limits').mockResolvedValue([
     {
       id: 1,
@@ -283,6 +325,45 @@ describe('Submitted Policies screens', () => {
   it('lets a checker approve an IAAF but not its preparer', async () => {
     show(<IaafPage />, '/', ALL, 'sbmchecker');
     expect(await screen.findByRole('button', { name: 'Approve' })).toBeInTheDocument();
+  });
+
+  it('edits the rules of a draft rule set and checks a rule before saving it', async () => {
+    show(<SetupPage />, '/?tab=rules', ALL, 'sbmtl');
+    fireEvent.click(await screen.findByText('DISPOSITION'));
+    expect(await screen.findByText('Free First Year')).toBeInTheDocument();
+    expect(screen.getByText('Add the FFY rule')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Add Rule' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Save Rule' }));
+    expect(await screen.findByText('Enter the name of the rule')).toBeInTheDocument();
+    expect(submittedApi.addRule).not.toHaveBeenCalled();
+    fireEvent.change(screen.getByLabelText(/^Name/), { target: { value: 'All' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add Condition' }));
+    expect(screen.getAllByLabelText('Fact')).toHaveLength(2);
+    expect(screen.getByRole('button', { name: 'Submit' })).toBeInTheDocument();
+  });
+
+  it('asks a reason before a checker rejects a submitted rule set', async () => {
+    vi.spyOn(submittedApi, 'ruleSet').mockResolvedValue({
+      id: 1,
+      code: 'DISPOSITION',
+      step: 'DISPOSITION',
+      segment: null,
+      businessType: null,
+      versionNo: 2,
+      status: 'SUBMITTED',
+      effectiveFrom: '2026-10-01',
+      description: null,
+      maker: 'sbmtl',
+      submittedAt: '2026-09-27T00:00:00Z',
+      approvedBy: null,
+      approvedAt: null,
+      decisionRemarks: null,
+      rules: [],
+    });
+    show(<SetupPage />, '/?tab=rules', ALL, 'mkttl');
+    fireEvent.click(await screen.findByText('DISPOSITION'));
+    fireEvent.click(await screen.findByRole('button', { name: 'Reject' }));
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
   });
 
   it('shows the insurer limits of Setup with the approval', async () => {

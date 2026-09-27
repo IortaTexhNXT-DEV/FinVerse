@@ -106,7 +106,8 @@ public class LetterContent {
 
   /**
    * The template of a letter of a renewal: the first RA of a Free First Year submitted policy is
-   * the FFY variant (wave R3).
+   * the FFY variant, and the no-response reminder of a mortgaged submitted policy is the follow-up
+   * letter SFU (wave R3).
    *
    * @param c renewal
    * @param type letter type
@@ -114,16 +115,24 @@ public class LetterContent {
    * @return template code
    */
   public String templateOf(RenewalCandidate c, LetterType type, RaNotice notice) {
+    if (c.getSource() != CandidateSource.SUBMITTED_POLICY || c.getId() == null) {
+      return template(type, notice);
+    }
+    if (type == LetterType.NRNS_REMINDER && isMortgaged(c)) {
+      return RenewalCodes.TEMPLATE_SFU;
+    }
     boolean freeFirstYear =
         type == LetterType.RA
             && notice != RaNotice.SECOND
-            && c.getSource() == CandidateSource.SUBMITTED_POLICY
-            && c.getId() != null
             && handOffs
                 .findByCandidateId(c.getId())
                 .map(SubmittedHandOffRecord::isFreeFirstYear)
                 .orElse(false);
     return freeFirstYear ? RenewalCodes.TEMPLATE_RA_FFY : template(type, notice);
+  }
+
+  private static boolean isMortgaged(RenewalCandidate c) {
+    return c.getSnapshot().mortgage() != null && c.getSnapshot().mortgage().mortgaged();
   }
 
   /**

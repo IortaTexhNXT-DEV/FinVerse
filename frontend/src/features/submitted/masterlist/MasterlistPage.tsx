@@ -9,6 +9,7 @@ import { selectionColumn, useRowSelection } from '@/components/broking/rowSelect
 import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
@@ -147,13 +148,19 @@ export default function MasterlistPage() {
           </Button>
         )}
         {can('SBM_PROCESS') && (
-          <Button
+          <ConfirmButton
             icon={<PlayCircle size={16} />}
-            disabled={ids.length === 0 || run.isPending}
-            onClick={() => run.mutate()}
+            disabled={ids.length === 0}
+            confirm={{
+              title: 'Run Processing',
+              record: ids.length === 1 ? '1 record' : `${String(ids.length)} records`,
+              effect:
+                'Sanitation, matching, classification, disposition and the insurer limits run on the records selected.',
+            }}
+            onConfirm={() => run.mutateAsync()}
           >
             Run Processing
-          </Button>
+          </ConfirmButton>
         )}
       </WorklistToolbar>
       <ErrorAlert error={list.error ?? run.error} onRetry={() => void list.refetch()} />

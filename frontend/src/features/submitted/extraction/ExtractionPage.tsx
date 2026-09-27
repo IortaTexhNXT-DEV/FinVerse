@@ -9,6 +9,7 @@ import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { DataTable } from '@/components/ui/DataTable';
 import { DateInput } from '@/components/ui/DateInput';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { Notice } from '@/components/ui/Notice';
 import { Field } from '@/components/ui/Field';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -125,9 +126,11 @@ function Review({ x, onDone }: Readonly<{ x: ExtractionView; onDone: () => void 
     >
       <ErrorAlert error={confirm.error} />
       {!x.readable && (
-        <p className="muted">The document has no readable text: enter the fields by hand.</p>
+        <Notice tone="warning" title="No readable text">
+          The document has no readable text: enter the fields by hand.
+        </Notice>
       )}
-      {x.note && <p className="muted">{x.note}</p>}
+      {x.note && x.readable && <Notice tone="info">{x.note}</Notice>}
       <DataTable
         rows={FIELDS}
         rowKey={(f) => f.key}

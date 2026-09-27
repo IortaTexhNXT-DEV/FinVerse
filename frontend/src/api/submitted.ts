@@ -10,7 +10,10 @@ import type {
   PolicyDetail,
   PolicyRow,
   ResultView,
+  RuleInput,
+  RuleSetCreate,
   RuleSetView,
+  RuleView,
   RunView,
   Tracking,
 } from './submittedTypes';
@@ -47,6 +50,7 @@ export type * from './submittedWorkTypes';
  */
 const B = '/submitted';
 const P = `${B}/policies`;
+const RS = `${B}/setup/rule-sets`;
 const co = (companyId: number) => toQuery({ companyId });
 const statuses = (companyId: number, status: readonly string[], page = 0, size = 50) =>
   toQuery({ companyId, status: status.join(','), page, size });
@@ -180,6 +184,17 @@ export const submittedApi = {
     api.get<PageResponse<IntakeRunView>>(`${B}/intake-runs${toQuery({ companyId, size: 50 })}`),
 
   ruleSets: (companyId: number) => api.get<RuleSetView[]>(`${B}/setup/rule-sets${co(companyId)}`),
+  ruleSet: (id: number) => api.get<RuleSetView>(`${RS}/${String(id)}`),
+  vocabulary: () => api.get<{ facts: string[]; operators: string[] }>(`${RS}/vocabulary`),
+  createRuleSet: (body: RuleSetCreate) => api.post<RuleSetView>(RS, body),
+  newVersion: (id: number, effectiveFrom: string) =>
+    api.post<RuleSetView>(`${RS}/${String(id)}/versions`, { effectiveFrom }),
+  describeRuleSet: (id: number, effectiveFrom: string, description: string) =>
+    api.put<RuleSetView>(`${RS}/${String(id)}`, { effectiveFrom, description }),
+  addRule: (id: number, rule: RuleInput) => api.post<RuleView>(`${RS}/${String(id)}/rules`, rule),
+  changeRule: (ruleId: number, rule: RuleInput) =>
+    api.put<RuleView>(`${RS}/rules/${String(ruleId)}`, rule),
+  removeRule: (ruleId: number) => api.delete(`${RS}/rules/${String(ruleId)}`),
   ruleSetDecision: (id: number, decision: 'submit' | 'approve' | 'reject', remarks?: string) =>
     api.post<RuleSetView>(`${B}/setup/rule-sets/${String(id)}/${decision}`, { remarks }),
   limits: (companyId: number) =>

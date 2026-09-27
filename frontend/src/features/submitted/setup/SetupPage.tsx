@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { submittedApi } from '@/api/submitted';
 import type { Controlled, InsurerRule, LetterRule, LimitRule, MatrixRow } from '@/api/submitted';
 import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
@@ -33,7 +33,6 @@ const limitOf = (r: Controlled<LimitRule>) => r.limits ?? r.row;
 const rowOf = <T,>(r: Controlled<T>) => r.row ?? r.limits;
 
 function Body({ tab }: Readonly<{ tab: TabId }>) {
-  const queryClient = useQueryClient();
   const sources = useQuery({
     queryKey: ['submitted', 'sources'],
     queryFn: () => submittedApi.sources(),
@@ -213,13 +212,7 @@ function Body({ tab }: Readonly<{ tab: TabId }>) {
     case 'scopes':
       return <Scopes />;
     default:
-      return (
-        <RuleSets
-          onDone={() =>
-            void queryClient.invalidateQueries({ queryKey: ['submitted', 'rule-sets'] })
-          }
-        />
-      );
+      return <RuleSets />;
   }
 }
 

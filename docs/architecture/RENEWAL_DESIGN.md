@@ -732,8 +732,7 @@ The screens of section 12 are built, with these differences:
 
 ### 17.6 Not built
 
-- The SFU letter: the template `RNW_SFU` is loaded; the letter type is not yet in the letter engine (it follows the
-  answer on the follow-up of mortgaged accounts).
+- Nothing of wave R3 is left: the SFU follow-up is the no-response reminder of a mortgaged submitted policy (section 17.7).
 - Claims: the claims check and the Account History read the claims summary when the broker claims bean is present; the
   history shows "Claims are not connected yet" otherwise.
 
@@ -775,7 +774,8 @@ The FRS is not edited by the build; these notes are applied at its next issue.
   initiation at once (the expiry scan is the initiation, BRRN.021). A failure is answered REFUSED with its reason, so the
   masterlist keeps the hand-off and offers it again at the next scan. `status` answers from the candidate: open, or
   closed as renewed, not renewed, lost or expired unrenewed.
-- The first Renewal Advice of a Free First Year record uses `RNW_RA_FFY` (`LetterContent.templateOf`).
+- The first Renewal Advice of a Free First Year record uses `RNW_RA_FFY`, and the no-response reminder (NRNS) of a mortgaged
+  submitted policy is the follow-up letter `RNW_SFU` (`LetterContent.templateOf`).
 - A letter of a submitted policy whose client has no e-mail is handed to the mail house through
   `MailHouseGateway` (a print batch of Submitted Policies with the merged PDF and the control list) and recorded as sent
   with the batch number.
@@ -783,7 +783,8 @@ The FRS is not edited by the build; these notes are applied at its next issue.
 
 | Topic | Design (section 2.3) | As built | Why |
 |---|---|---|---|
-| Renewal account and hold cover | Created by the adapter at hand-off | Created by the processing flow once the client and package are resolved, like a migrated policy; the hold cover follows in placement | A submitted policy has no BIBS client or package at hand-off |
+| Renewal account and hold cover | Created by the adapter at hand-off | Created by the processing flow once the client and package are resolved, like a migrated policy; the hold cover follows in placement. Kept as built by decision; listed as a clarification item for BDOI | A submitted policy has no BIBS client or package at hand-off |
 | Renew with BDOI | Candidate starts at UNASSIGNED | Initiated like a scanned record; the routing of the checks and matrix decides the stage | One initiation path |
+| SFU letter | Own letter type | The NRNS reminder of a mortgaged submitted policy is written with `RNW_SFU` | Same timing and tracking as the reminder; no new letter type |
 | Print channel | Every printed letter | Letters of clients without an e-mail | The e-mail stays the default channel of the renewal letters |
 

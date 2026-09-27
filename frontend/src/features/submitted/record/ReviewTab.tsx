@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { DateInput } from '@/components/ui/DateInput';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { Notice } from '@/components/ui/Notice';
 import { Field } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
@@ -154,11 +155,11 @@ function IaafSection({
   return (
     <Card title="IAAF">
       <ErrorAlert error={iaaf.error ?? generate.error} />
-      <p>
+      <Notice tone="info">
         {lastAdequate
           ? 'The last review is adequate: the IAAF can be generated.'
           : 'Record an adequate review to generate the IAAF.'}
-      </p>
+      </Notice>
       <Button disabled={!lastAdequate || generate.isPending} onClick={() => generate.mutate()}>
         Generate IAAF
       </Button>

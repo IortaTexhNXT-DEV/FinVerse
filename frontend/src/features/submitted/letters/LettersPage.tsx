@@ -6,6 +6,7 @@ import { LovLabel } from '@/components/broking/LovLabel';
 import { useFileDownload } from '@/components/broking/useFileDownload';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -131,13 +132,17 @@ export default function LettersPage() {
         title="Letters & Print Batches"
         description="Reminders, renewal notices and proposals of the letter rules, and the mail house batches."
         actions={
-          <Button
+          <ConfirmButton
             icon={<Send size={16} />}
-            disabled={dispatch.isPending}
-            onClick={() => dispatch.mutate()}
+            confirm={{
+              title: 'Send Due Letters',
+              effect:
+                'The letters due by the letter rules are sent now and the printed ones are handed to the mail house.',
+            }}
+            onConfirm={() => dispatch.mutateAsync()}
           >
             Send Due Letters
-          </Button>
+          </ConfirmButton>
         }
       />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
@@ -159,13 +164,17 @@ export default function LettersPage() {
                 header: 'Actions',
                 render: (l) =>
                   l.status === 'FAILED' ? (
-                    <Button
+                    <ConfirmButton
                       variant="ghost"
-                      disabled={resend.isPending}
-                      onClick={() => resend.mutate(l.id)}
+                      confirm={{
+                        title: `Send ${l.letterNo} Again`,
+                        record: l.sbmNo ?? undefined,
+                        effect: 'The letter is written again with the current address and sent.',
+                      }}
+                      onConfirm={() => resend.mutateAsync(l.id)}
                     >
                       Send Again
-                    </Button>
+                    </ConfirmButton>
                   ) : null,
               },
             ]}

@@ -7,6 +7,7 @@ import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
 import { useFileDownload } from '@/components/broking/useFileDownload';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 import { DataTable } from '@/components/ui/DataTable';
 import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
 import { EmptyState } from '@/components/ui/EmptyState';
@@ -70,9 +71,17 @@ export function RenewalTab({ detail }: Readonly<{ detail: PolicyDetail }>) {
         <Card title="Renewal">
           <EmptyState message="Not handed to Renewal yet" />
           {can('SBM_PROCESS') && detail.row.status === 'FOR_RENEWAL' && (
-            <Button disabled={renew.isPending} onClick={() => renew.mutate()}>
+            <ConfirmButton
+              confirm={{
+                title: 'Renew with BDOI',
+                record: `${detail.row.sbmNo} · ${detail.row.assuredName}`,
+                effect:
+                  'The policy is handed to Renewal now with the insurer of the insurer rules.',
+              }}
+              onConfirm={() => renew.mutateAsync()}
+            >
               Renew with BDOI
-            </Button>
+            </ConfirmButton>
           )}
         </Card>
       ) : (

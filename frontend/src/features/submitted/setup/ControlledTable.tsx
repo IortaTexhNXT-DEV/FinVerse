@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { submittedApi } from '@/api/submitted';
 import type { Controlled } from '@/api/submitted';
 import { useAuth } from '@/auth/authContext';
-import { Button } from '@/components/ui/Button';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
@@ -50,22 +50,30 @@ function ControlActions<T>({
   return (
     <span className="form-actions">
       {can('SBM_RULE_APPROVE') && pending && user?.username !== row.control.maker && (
-        <Button
+        <ConfirmButton
           variant="ghost"
-          disabled={decide.isPending}
-          onClick={() => decide.mutate('authorize')}
+          confirm={{
+            title: 'Approve Setup Record',
+            record: `Made by ${row.control.maker}`,
+            effect: 'The record becomes active and is used by the next runs and documents.',
+          }}
+          onConfirm={() => decide.mutateAsync('authorize')}
         >
           Approve
-        </Button>
+        </ConfirmButton>
       )}
       {can('SBM_RULE_MAINTAIN') && row.control.recordStatus === 'ACTIVE' && (
-        <Button
+        <ConfirmButton
           variant="ghost"
-          disabled={decide.isPending}
-          onClick={() => decide.mutate('deactivate')}
+          confirm={{
+            title: 'Deactivate Setup Record',
+            effect: 'The record is no longer applied; it stays in the list as inactive.',
+            destructive: true,
+          }}
+          onConfirm={() => decide.mutateAsync('deactivate')}
         >
           Deactivate
-        </Button>
+        </ConfirmButton>
       )}
     </span>
   );

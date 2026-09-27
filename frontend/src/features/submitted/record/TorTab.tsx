@@ -8,6 +8,7 @@ import { Card } from '@/components/ui/Card';
 import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { Notice } from '@/components/ui/Notice';
 import { Field } from '@/components/ui/Field';
 import { useToast } from '@/components/ui/toastContext';
 import { UserName } from '@/components/ui/UserName';
@@ -38,10 +39,11 @@ function NewTor({ detail, onDone }: Readonly<{ detail: PolicyDetail; onDone: () 
   return (
     <Card title="Generate a TOR">
       <ErrorAlert error={create.error ?? breaches.error} />
-      <p>
-        {text === '' ? 'The last run found no limit exceeded.' : 'Limits exceeded in the last run:'}
-      </p>
-      {text !== '' && <pre className="pre-wrap">{text}</pre>}
+      {text === '' ? (
+        <Notice tone="info">The last run found no limit exceeded.</Notice>
+      ) : (
+        <Notice tone="warning" title="Limits exceeded in the last run" items={text.split('\n')} />
+      )}
       <div className="form-grid">
         <Field
           label="Proposed Terms"

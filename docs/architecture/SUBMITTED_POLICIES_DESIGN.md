@@ -580,7 +580,11 @@ The module is built in the package `submitted` and the screens `frontend/src/fea
 Submitted Policies Home, Masterlist, the policy record (tabs Details, Rule Results, Review & IAAF, TOR, Renewal, Letters,
 Documents, History), Upload & Intake, Extraction Review, Processing Runs, Reviews & IAAF, Terms of Reference, Renewal
 Work List, Letters & Print Batches, Handling Fees, No Touch Billing and Submitted Policies Setup (tabs Rule Sets,
-Insurer Limits, Insurer Assignment, Letter Rules, Approval Matrix, Sources, User Scopes). The persona suite `BRD-12` of
+Insurer Limits, Insurer Assignment, Letter Rules, Approval Matrix, Sources, User Scopes). The Rule Sets tab is the rule editor:
+a new rule set (draft), its header, rules added, changed and removed with their conditions and outcome, Submit by the
+maker, Approve or Reject (with a reason) by another checker, and New Version of an active set. Approve, reject, release,
+send, bill and the other acting buttons confirm in a dialog naming the record and the effect (`ConfirmButton`); the
+messages use the notice standard (`Notice`). The persona suite `BRD-12` of
 `personaMenus.json` lists the six roles of the module; the screenshots are in `tools/screenshots/screens.cjs` (slugs
 `submitted-*`).
 
@@ -600,9 +604,8 @@ Insurer Limits, Insurer Assignment, Letter Rules, Approval Matrix, Sources, User
 | Letter files | Attachments | Stored files (`StoredFileService`, owners `SubmittedLetter`, `SubmittedPrintBatch`); IAAF and TOR PDFs are attachments of the record | Letters are system output; the IAAF and TOR are record documents |
 | Handling fee seed user | `upphandler` (the Collections unapplied handler) also holds `SBM_UPP_HANDLER` | Own seed user `sbmfee` holding only `SBM_UPP_HANDLER` | A persona seed user holds one role; the Collections user keeps its role |
 | Rule upload | `SBM_RULES` upload | Not built: the rule sets are kept in Setup and through the rule-set API | Rules are few and changed with maker and checker |
-| Rule editing on screen | Rule editor | Setup lists the rule sets with their rules, submit, approve and reject; rules are added and changed through the rule-set API | The rule editor is the next increment of Setup |
 | Seed records | V1971-V1972 | `SubmittedSeedData` through the services | The work cases, runs and approvals are created exactly as in production |
-| Renewal account and hold cover (R3) | At hand-off | By Renewal's processing when the client and package are resolved (origin SUBMITTED_POLICY, renewing the masterlist number) | A submitted policy has no BIBS client or package at hand-off |
+| Renewal account and hold cover (R3) | At hand-off | By Renewal's processing when the client and package are resolved (origin SUBMITTED_POLICY, renewing the masterlist number); kept by decision, a clarification item for BDOI | A submitted policy has no BIBS client or package at hand-off |
 
 ### 17.6 Notes for the FRS v1.1
 
@@ -614,6 +617,8 @@ Insurer Limits, Insurer Assignment, Letter Rules, Approval Matrix, Sources, User
 - FR-SP-051 to 053: a TOR needs a limit breach of the last run; the Account Officer's first download releases it.
 - FR-SP-060 to 064: Renew with BDOI is open to For Renewal records; the insurer is re-assigned only while the hold cover
   is not accepted.
+- Clarification item for BDOI: the renewal account and hold cover of a handed-over record are created by Renewal's
+  processing once the client and package are resolved, not at hand-off.
 - FR-SP-070 to 075: a payment matching several fees waits for the handler; the income and the OR are Cashiering's.
 - The report layouts without fields in the Report List are flagged "layout to confirm" (SQ25).
 

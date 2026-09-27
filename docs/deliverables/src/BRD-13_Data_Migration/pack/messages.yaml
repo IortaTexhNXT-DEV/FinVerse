@@ -10,9 +10,6 @@ sources:
                     LegacyInvoicePosting, OpeningJournals]
   # A record looked up by its internal key: the screens always open an existing record.
   exclude_codes: [NOT_FOUND]
-  # The duplicate message of a new data object names the internal record type (MigrationCodes.ENTITY_OBJECT); it is
-  # left out until the system text reads "Data object already exists" (change requested from the development team).
-  exclude_texts: ["^MigDataObject already exists"]
   bulk_handlers: []
   frontend_dirs: [features/migration, features/legacy-inquiry, features/cashiering/legacy]
   ui_patterns: extended

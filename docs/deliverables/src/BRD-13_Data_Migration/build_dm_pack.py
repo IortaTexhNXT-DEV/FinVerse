@@ -52,6 +52,8 @@ import brand  # noqa: E402
 
 # The catalogue of the Migration Console (its seed data) and the template export of the console.
 SEED_SQL = REPO / "backend" / "src" / "main" / "resources" / "db" / "migration" / "V1081__migration_objects_maps.sql"
+# Later scripts that update the texts of the V1081 catalogue (applied in version order after the seed).
+SEED_UPDATES = [SEED_SQL.parent / "V1090__migration_catalogue_wording.sql"]
 JAVA = REPO / "backend" / "src" / "main" / "java" / "com" / "iortatechnxt" / "brokerverse"
 TEMPLATE_EXPORT = JAVA / "migration" / "mapping" / "service" / "TemplateExport.java"
 CODE_MAP_EXCEL = JAVA / "migration" / "mapping" / "service" / "CodeMapExcel.java"
@@ -169,6 +171,28 @@ def seed_rows(table: str, text: str) -> list[dict[str, Any]]:
     return rows
 
 
+def apply_updates(tables: dict[str, list[dict[str, Any]]], text: str) -> None:
+    """Applies the "update <table> set col = '...'[, ...] where ..." statements of a later script to the seed rows.
+    The where clause is a list of col = 'value' / number conditions; a column row is found by its layout code, version
+    and seq ("layout_id = (select id from mig_layout where code = 'X' and version_no = n)")."""
+    for m in re.finditer(r"^update (\w+) set (.*?) where (.*?);$", text, re.M):
+        table, assigns, where = m.group(1), m.group(2), m.group(3)
+        values = {}
+        for part in re.finditer(r"(\w+) = ('(?:[^']|'')*'|[\w.]+)", assigns):
+            values[part.group(1)] = sql_literals(part.group(2))[0]
+        sub = re.search(r"layout_id = \(select id from mig_layout where code = '([^']+)' and version_no = (\d+)\)", where)
+        conds = {k: sql_literals(v)[0] for k, v in re.findall(r"(\w+) = ('(?:[^']|'')*'|\d+)", re.sub(r"\(.*\)", "", where))}
+        if sub:
+            conds["layout_id"] = (sub.group(1), int(sub.group(2)))
+        hit = 0
+        for row in tables.get(table, []):
+            if all(str(row.get(k)) == str(v) for k, v in conds.items()):
+                row.update(values)
+                hit += 1
+        if hit == 0:
+            raise SystemExit(f"{table}: no seed row for the update where {where}")
+
+
 @dataclass
 class Layout:
     code: str
@@ -212,9 +236,14 @@ class Catalogue:
 
     def __init__(self) -> None:
         sql = SEED_SQL.read_text(encoding="utf-8")
-        self.seed_objects = {r["code"]: r for r in seed_rows("mig_data_object", sql)}
+        tables = {name: seed_rows(name, sql) for name in ("mig_data_object", "mig_layout", "mig_layout_column",
+                                                          "mig_rule", "mig_code_map_set", "mig_masking_rule")}
+        for script in SEED_UPDATES:
+            if script.exists():
+                apply_updates(tables, script.read_text(encoding="utf-8"))
+        self.seed_objects = {r["code"]: r for r in tables["mig_data_object"]}
         self.layouts: dict[str, Layout] = {}
-        for r in seed_rows("mig_layout", sql):
+        for r in tables["mig_layout"]:
             if r["status"] != "FROZEN":
                 continue
             self.layouts[r["code"]] = Layout(
@@ -222,16 +251,16 @@ class Catalogue:
                 key=[k.strip() for k in (r["key_columns"] or "").split(",") if k.strip()], hash_rule=r["hash_rule"],
                 hash_columns=[k.strip() for k in (r["hash_columns"] or "").split(",") if k.strip()],
                 amounts=[k.strip() for k in (r["amount_columns"] or "").split(",") if k.strip()])
-        for r in seed_rows("mig_layout_column", sql):
+        for r in tables["mig_layout_column"]:
             code, version = r["layout_id"]
             layout = self.layouts.get(code)
             if layout and layout.version == version:
                 layout.columns.append(r)
         for layout in self.layouts.values():
             layout.columns.sort(key=lambda c: int(c["seq"]))
-        self.rules = seed_rows("mig_rule", sql)
-        self.map_sets = seed_rows("mig_code_map_set", sql)
-        self.masking = seed_rows("mig_masking_rule", sql)
+        self.rules = tables["mig_rule"]
+        self.map_sets = tables["mig_code_map_set"]
+        self.masking = tables["mig_masking_rule"]
         java = TEMPLATE_EXPORT.read_text(encoding="utf-8")
         block = re.search(r"CONTROL_COLUMNS\s*=\s*List\.of\((.*?)\);", java, re.S)
         self.control_columns = re.findall(r'"([a-z_]+)"', block.group(1)) if block else []

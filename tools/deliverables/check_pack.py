@@ -175,22 +175,20 @@ def office_lines(p: Path) -> list[str]:
 
 
 def extract_field_names() -> set[str]:
-    """The field names of the BRD-13 extract layouts (dm_layouts.yaml). They are the agreed interface of the files
-    BDOI extracts from its legacy systems (the header row of each template), so they are business names, not
-    internal codes, even though they are written in lower case with underscores."""
-    import yaml  # noqa: PLC0415
-    path = brand.SRC_DIR / "BRD-13_Data_Migration" / "migration" / "dm_layouts.yaml"
+    """The column names of the BRD-13 load templates, the control file and the code map files (read by
+    build_dm_pack.py from the layouts of the Migration Console). They are the agreed interface of the files BDOI
+    extracts from its legacy systems (the header row of each template), so they are business names, not internal
+    codes, even though they are written in lower case with underscores."""
+    import importlib.util  # noqa: PLC0415
+    path = brand.SRC_DIR / "BRD-13_Data_Migration" / "build_dm_pack.py"
     if not path.exists():
         return set()
-    names: set[str] = set()
-    data = yaml.safe_load(path.read_text(encoding="utf-8"))
-    for layout in [*(data.get("layouts") or {}).values(), data.get("control") or {}]:
-        for key in ("key",):
-            names.update(str(k) for k in layout.get(key) or [])
-        for line in str(layout.get("fields") or "").splitlines():
-            if line.strip():
-                names.add(line.split("|", 1)[0].strip())
-    return names
+    if "build_dm_pack" not in sys.modules:
+        spec = importlib.util.spec_from_file_location("build_dm_pack", path)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules["build_dm_pack"] = module
+        spec.loader.exec_module(module)
+    return set(sys.modules["build_dm_pack"].extract_field_names())
 
 
 def build_status() -> list[str]:

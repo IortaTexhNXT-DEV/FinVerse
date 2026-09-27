@@ -23,6 +23,7 @@ public final class ResourceNames {
           Map.entry("BrokerClaimDiary", "Claim diary entry"),
           Map.entry("BrokerClaimStatusAccess", "Claim status access"),
           Map.entry("AccountLegacyHeader", "Legacy account header"),
+          Map.entry("MigDataObject", "Data object"),
           Map.entry("LovType", "List type"),
           Map.entry("LovValue", "List value"),
           Map.entry("EbBor", "Broker of record letter"),

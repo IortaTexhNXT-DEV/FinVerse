@@ -15,3 +15,6 @@ coverage/
 
 # Word and Excel are the masters; PDFs are produced at issue and not committed
 docs/deliverables/out/**/*.pdf
+
+# The user manual PDF is produced for circulation and not committed
+docs/user-manual/*.pdf

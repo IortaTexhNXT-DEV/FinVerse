@@ -383,8 +383,8 @@ brokerverse:
     renewal-nrns-letters-cron: ${BROKERVERSE_JOB_RENEWAL_NRNS_LETTERS_CRON:0 0 22 * * *}
     # Closes the renewals past expiry + RNW_NON_ACCEPTANCE_DAYS with the non-acceptance letter (BRRN.037), 00:15 PHT.
     renewal-expiry-sweep-cron: ${BROKERVERSE_JOB_RENEWAL_EXPIRY_SWEEP_CRON:0 15 16 * * *}
-    # Letter batches (RA, NAL, NFR) are started from the Letters screen; manual unless scheduled.
-    renewal-letter-batch-cron: ${BROKERVERSE_JOB_RENEWAL_LETTER_BATCH_CRON:-}
+    # Delivery status of the renewal letters sent by e-mail (alert RNW_LETTER_FAILED), hourly.
+    renewal-letter-batch-cron: ${BROKERVERSE_JOB_RENEWAL_LETTER_BATCH_CRON:0 5 * * * *}
     # Go-live take-over of the migrated policies expiring up to MIG_GOLIVE_RENEWAL_TO (DMQ37): run once from the cut-over runbook.
     renewal-golive-extraction-cron: ${BROKERVERSE_JOB_RENEWAL_GOLIVE_EXTRACTION_CRON:-}
 

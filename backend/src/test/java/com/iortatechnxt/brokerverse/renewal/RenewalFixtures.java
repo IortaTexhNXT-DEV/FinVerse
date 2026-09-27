@@ -77,11 +77,22 @@ public class RenewalFixtures {
    * @return booked invoice
    */
   public BookedInvoice book(String product, String segment) {
+    return book(product, segment, PaymentArrangement.VIA_BDOI);
+  }
+
+  /**
+   * Books a one-year account with a payment arrangement and an expiry of its own.
+   *
+   * @param product product
+   * @param segment segment
+   * @param arrangement payment arrangement
+   * @return booked invoice
+   */
+  public BookedInvoice book(String product, String segment, PaymentArrangement arrangement) {
     LocalDate from = FIRST_START.plusDays(NEXT.getAndIncrement() % SPREAD);
     Account account =
         booking.issued(
-            new BookingFixtures.Spec(
-                product, segment, PaymentArrangement.VIA_BDOI, from, from.plusYears(1), 1));
+            new BookingFixtures.Spec(product, segment, arrangement, from, from.plusYears(1), 1));
     return as.run(
         PO,
         () ->
@@ -98,6 +109,16 @@ public class RenewalFixtures {
    */
   public RenewalCandidate extractedMotor() {
     return extracted(book("MTR10", "CBG"));
+  }
+
+  /**
+   * Initiates a renewal.
+   *
+   * @param c renewal
+   * @return outcome
+   */
+  public Object initiate(RenewalCandidate c) {
+    return initiation.initiate(company(), java.util.List.of(c.getRenewalRef()));
   }
 
   /**

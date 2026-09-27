@@ -8,6 +8,8 @@ import com.iortatechnxt.brokerverse.account.service.AccountDraft;
 import com.iortatechnxt.brokerverse.account.service.AccountQueryService;
 import com.iortatechnxt.brokerverse.account.service.AccountService;
 import com.iortatechnxt.brokerverse.account.service.NewAccount;
+import com.iortatechnxt.brokerverse.attachment.domain.AttachmentTarget;
+import com.iortatechnxt.brokerverse.attachment.service.DocumentService;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
@@ -24,6 +26,7 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +42,18 @@ import org.springframework.transaction.annotation.Transactional;
 public class RenewalAccountService {
 
   private static final String PHP = "PHP";
+  private static final String ACCOUNT = "Account";
+
+  /** Documents of the expiring term that are not carried to the renewal account. */
+  private static final Set<String> TERM_DOCUMENTS =
+      Set.of(
+          "EPOLICY",
+          "POLICY_COPY",
+          "RENEWAL_ADVICE",
+          "RENEWAL_LETTER",
+          "RA_ACCEPTANCE",
+          "SIGNED_RA");
+
   private static final SnapshotProduct NO_PRODUCT =
       new SnapshotProduct(null, null, null, null, null, null);
   private static final SnapshotPremium NO_PREMIUM =
@@ -50,6 +65,7 @@ public class RenewalAccountService {
   private final AccountRepository accountRepository;
   private final ReevaluationService reevaluation;
   private final AuditTrailService audit;
+  private final DocumentService documents;
 
   /**
    * Creates the service.
@@ -60,6 +76,7 @@ public class RenewalAccountService {
    * @param accountRepository accounts (look-up)
    * @param reevaluation checks
    * @param audit audit trail
+   * @param documents documents of the expiring account
    */
   public RenewalAccountService(
       RenewalRecords records,
@@ -67,13 +84,15 @@ public class RenewalAccountService {
       AccountQueryService accountQueries,
       AccountRepository accountRepository,
       ReevaluationService reevaluation,
-      AuditTrailService audit) {
+      AuditTrailService audit,
+      DocumentService documents) {
     this.records = records;
     this.accounts = accounts;
     this.accountQueries = accountQueries;
     this.accountRepository = accountRepository;
     this.reevaluation = reevaluation;
     this.audit = audit;
+    this.documents = documents;
   }
 
   /**
@@ -114,6 +133,7 @@ public class RenewalAccountService {
             NewAccount.renewal(
                 c.getCompanyId(), AccountOrigin.RENEWAL, draft, renewalOf, officer, version));
     c.linkRenewalAccount(account.getArn());
+    linkDocuments(c, account);
     audit.record(
         RenewalCodes.ENTITY,
         c.getRenewalRef(),
@@ -134,6 +154,26 @@ public class RenewalAccountService {
     return c.getRenewalArn() == null
         ? Optional.empty()
         : accountRepository.findByArn(c.getRenewalArn());
+  }
+
+  /** The insured's documents of the expiring account also serve the renewal account. */
+  private void linkDocuments(RenewalCandidate c, Account renewal) {
+    if (c.getExpiringArn() == null) {
+      return;
+    }
+    accountRepository
+        .findByArn(c.getExpiringArn())
+        .ifPresent(
+            expiring ->
+                documents.all(new AttachmentTarget(ACCOUNT, expiring.getId().toString())).stream()
+                    .filter(a -> a.getDocumentType() != null)
+                    .filter(a -> !TERM_DOCUMENTS.contains(a.getDocumentType()))
+                    .forEach(
+                        a ->
+                            documents.link(
+                                a.getId(),
+                                List.of(
+                                    new AttachmentTarget(ACCOUNT, renewal.getId().toString())))));
   }
 
   private AccountDraft draft(RenewalCandidate c) {

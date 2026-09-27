@@ -117,4 +117,15 @@ public interface RenewalCandidateRepository
       "select c from RenewalCandidate c where c.stage in :stages and c.snapshot.pnNos like :pattern")
   List<RenewalCandidate> findOpenByPn(
       @Param("stages") Collection<RenewalStage> stages, @Param("pattern") String pattern);
+
+  /**
+   * Candidates of a unit in given stages (complete-file scope of a dispositioned upload).
+   *
+   * @param companyId company
+   * @param ownerUnit Marketing unit
+   * @param stages stages
+   * @return candidates
+   */
+  List<RenewalCandidate> findByCompanyIdAndOwnerUnitAndStageIn(
+      Long companyId, String ownerUnit, Collection<RenewalStage> stages);
 }

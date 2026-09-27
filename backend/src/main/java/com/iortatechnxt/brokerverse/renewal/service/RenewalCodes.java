@@ -16,6 +16,9 @@ public final class RenewalCodes {
   /** Record type of an insurer batch (attachments, audit trail). */
   public static final String ENTITY_BATCH = "RenewalInsurerBatch";
 
+  /** Audit entity of a renewal upload scope. */
+  public static final String ENTITY_UPLOAD = "RenewalUpload";
+
   /** Route of the record page. */
   public static final String LINK = "/renewal/candidates/";
 

@@ -1,9 +1,8 @@
 # Test plan BRD-12 Submitted Policies - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-12_Submitted_Policies/brd12_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# BRD-12 is designed, not built: the expected results quote the message text of the FRS and the build
-# design (docs/architecture/SUBMITTED_POLICIES_DESIGN.md) without codes, and no case names an automated
-# test. Screen paths follow section 12 of the build design (section Submitted Policies).
+# The expected results quote the message text of the FRS; screen paths follow the Submitted Policies screens
+# of the FRS.
 
 meta:
   brd: BRD-12
@@ -100,7 +99,7 @@ data:
     content: A For Renewal CBG Fire record expiring in 150 days (expiring insurer INS-LAC); a For Renewal CBG Motor record expiring in 120 days; a Non-CBG Retail record of ao; a renewal account with a hold cover request open for 6 days.
     source: Seed data; expiry dates set by the test lead
   - id: TD-SP-10
-    name: Parameters and jobs as delivered
+    name: Parameters and jobs at their defaults
     content: "SBM_RENEWAL_LEAD_DAYS CBG_FIRE=150, CBG_MOTOR=120; SBM_MASTERLIST_DAYS_FROM_EXTRACTION 30; SBM_INSURER_ACCEPT_DAYS 5; SBM_HOLD_COVER_UNBOOKED_ALERT_DAYS 5; jobs SBM_PROCESSING 21:30, SBM_EXPIRY_SCAN 22:00, SBM_LETTER_DISPATCH 06:30, SBM_HOLD_COVER_WATCH 07:00 PHT, SBM_HANDLING_FEE_TAGGER every 30 minutes."
     source: Configuration of the SIT environment (FRS section 9.1)
 
@@ -978,7 +977,7 @@ frs:
     conditions:
       - A For Renewal CBG Fire record 150 days before expiry is handed over with an insurer different from the expiring one; the record is RENEWAL_IN_PROGRESS and the handler and AO are notified.
       - A second scan does not hand the same record over again.
-      - Before the Renewal adapter exists, the hand-off shows as pending and no letter is sent.
+      - While Renewal is not in use, the hand-off shows as pending and no letter is sent.
       - A record with no insurer rule stays For Renewal and appears in the fallout; Renew with BDOI works only on a For Renewal record.
     cases:
       - c: 1
@@ -1002,8 +1001,8 @@ frs:
         expected: No second hand-off.
       - c: 3
         type: Positive
-        title: Renewal adapter not deployed
-        pre: Renewal module not deployed on the test environment.
+        title: Renewal not in use
+        pre: Renewal module not available on the test environment.
         steps:
           - Run the scan; open tab Hand-off Pending; check the letters.
         expected: The hand-off is PENDING; no account and no letter.

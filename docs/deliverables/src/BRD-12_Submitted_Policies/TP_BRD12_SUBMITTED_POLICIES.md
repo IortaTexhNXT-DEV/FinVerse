@@ -67,7 +67,7 @@ The roles-and-access sheet checks each Submitted Policies action against the rol
 - The renewal itself after the hand-off - renewal account, hold cover request, RA, NRNS, NAL and SFU letters - which belongs to the Renewal module (decision D2) and its BRD-6 test plan. The cases here check the hand-off, the insurer re-assignment and the status that comes back.
 - Placement and booking screens (BRD-1); the cases check only that the masterlist follows the account and invoice events.
 - System-to-system feeds from LFS, HLS, CIU, SPI, LAMD and the mail house (COG), and OCR of scanned documents; they are outside this phase. The cases use uploads and text PDFs.
-- Qualified e-signature of the IAAF and TOR (parked); the cases check the stamped signature.
+- Qualified e-signature of the IAAF and TOR (on hold); the cases check the stamped signature.
 - The accounting entries of the handling fee (SP SQ13); the cases stop at the tag and the OR.
 - Performance and volume testing, including the 2-second target of the NFRs. They are tested in the BIBS-wide performance test plan (deliverable 28).
 
@@ -125,7 +125,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 | Level | Criteria |
 |---|---|
 | System test | Submitted Policies is deployed on SIT with its roles, user scopes, parameters, lists, jobs and seed rule sets; the seed data is loaded; screen labels and messages have been compared with this plan and differences recorded; the test mailboxes receive mail. |
-| Persona end-to-end | All High-priority system test cases are run; no open Critical issue; the Renewal module (or its pending hand-off adapter) is deployed; Collections and Cashiering run on SIT for the handling-fee cases. |
+| Persona end-to-end | All High-priority system test cases are run; no open Critical issue; the Renewal module is available, or the hand-offs are recorded as pending; Collections and Cashiering run on SIT for the handling-fee cases. |
 | UAT | FRS BRD-12 v1.0 is signed off or its open comments are agreed; the answers to SP SQ04 to SQ08 are applied as rule sets, matrices and templates; the system test exit criteria are met; the UAT environment holds masked masterlists (section 4.1); BDOI testers have user IDs with the roles and scopes of section 5 and attended the walkthrough. |
 
 ## Exit criteria
@@ -227,7 +227,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 |---|---|---|
 | Screen names, labels or messages change after BDOI's review of the FRS | Medium | Compare the screens with this plan before the system test; re-issue the workbook with the confirmed texts |
 | BDOI answers to open questions change expected results (SP SQ04 classification, SQ05 bucket precedence, SQ06 RA template, SQ07 IAAF matrix, SQ08 TOR and Released, SQ12 acceptance window) | Medium | The values are rule sets, matrices and parameters; the affected cases name them and are re-run after the change without a change to the system |
-| The Renewal module is not deployed when Submitted Policies is tested | High | Test the hand-off with the pending adapter (TC-SP-060.3-01); re-run the renewal cases of SC-SP-07 when the Renewal adapter is deployed |
+| The Renewal module is not available when Submitted Policies is tested | High | Test the pending hand-off (TC-SP-060.3-01); re-run the renewal cases of SC-SP-07 when the Renewal module is available |
 | Source layouts and legacy masterlist layouts are not supplied (SP SQ01, SQ02) | High | Test with the draft templates; re-run the intake and migration cases on the BDOI layouts |
 | Real borrower data reaches a test environment through an unmasked file | High | The test lead masks every source file before upload and checks the masterlist after each intake |
 | Date-based cases (lead days, acceptance days, hold cover end) need the clock to pass | Medium | The test lead sets expiry and request dates in the test database and runs the jobs on demand |

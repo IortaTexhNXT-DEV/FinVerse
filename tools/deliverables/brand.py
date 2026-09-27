@@ -222,11 +222,26 @@ def out_path(brd: str, kind: str, filename: str) -> Path:
     return out_dir(brd, kind) / filename
 
 
+# Business sign-off release sets issued so far: BRD -> version of the set. The documents of such a set carry a
+# two-digit prefix so that they sort in reading order in the BRD folder (deliverables README, "Release and sign-off
+# per BRD").
+SIGNOFF_SETS = {"BRD-01": "2.0"}
+READING_ORDER = {"StartHere": "00", "GuideDeck": "01", "FRS": "02", "Signoff": "03", "TestPlan": "04",
+                 "TestPlanSummary": "05"}
+
+
 def output_name(doc_type: str, brd: str, name: str, version: str, ext: str) -> str:
-    """File name of a client-pack document: BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>.
+    """File name of a client-pack document: BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>, with the reading-order
+    prefix (00_ to 05_) for the documents of a business sign-off release set.
 
     >>> output_name("FRS", "BRD-03", "Product Maintenance", "1.0", "docx")
     'BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx'
+    >>> output_name("FRS", "BRD-01", "New Business", "2.0", "docx")
+    '02_BIBS_FRS_BRD-01_New_Business_v2.0.docx'
     """
     safe = "_".join(part for part in name.replace("&", "and").replace("/", " ").split() if part)
-    return f"BIBS_{doc_type}_{brd}_{safe}_v{version}.{ext.lstrip('.')}"
+    key = doc_type + ("Summary" if safe.endswith("_Summary") else "")
+    prefix = ""
+    if SIGNOFF_SETS.get(brd) == str(version) and key in READING_ORDER:
+        prefix = READING_ORDER[key] + "_"
+    return f"{prefix}BIBS_{doc_type}_{brd}_{safe}_v{version}.{ext.lstrip('.')}"

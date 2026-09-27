@@ -116,6 +116,7 @@ class Pack:
         self.documents = self._load("documents.yaml").get("documents", [])
         self.walkthroughs = self._load("walkthroughs.yaml").get("walkthroughs", [])
         self.msg_cfg = self._load("messages.yaml")
+        self.guide = self._load("guide.yaml")
 
     def _load(self, name: str) -> dict[str, Any]:
         p = self.dir / name
@@ -623,6 +624,29 @@ def r_counts(doc: Any, pack: Pack, **_: Any) -> None:
     doc.table(["Content of the set", "Count"], rows, widths=[10, 3], caption="The set in numbers", size=9)
 
 
+def doc_file(pack: Pack, d: dict[str, Any]) -> str:
+    """File name of a document of the set (with its reading-order prefix)."""
+    return brand.output_name(d["kind"], pack.meta["brd"], d["name"], str(pack.meta["version"]), d["ext"])
+
+
+def r_guide_map(doc: Any, pack: Pack, **_: Any) -> None:
+    rows = [[doc_file(pack, d), d["what"], d["readers"], d["when"]] for d in pack.guide.get("documents", [])]
+    doc.table(["File", "What it is for", "Who reads it", "When"], rows, widths=[5.2, 6.4, 3.4, 2.6],
+              caption="The documents of the set, in reading order", size=7.5, keep_rows=False)
+
+
+def r_guide_reading(doc: Any, pack: Pack, **_: Any) -> None:
+    rows = [[r["role"], r["order"]] for r in pack.guide.get("reading", [])]
+    doc.table(["Role", "Where to start"], rows, widths=[4.2, 13.4], caption="Reading order per role", size=8,
+              first_col_bold=True, keep_rows=False)
+
+
+def r_guide_steps(doc: Any, pack: Pack, **_: Any) -> None:
+    rows = [[str(x["step"]), x["name"], x["who"], x["outputs"], x["duration"]] for x in pack.guide.get("steps", [])]
+    doc.table(["No.", "Step", "Who (R, A, C, I)", "Output", "When / duration"], rows,
+              widths=[0.8, 3.0, 5.2, 5.2, 3.4], caption="From issue to closure", size=7.5, keep_rows=False)
+
+
 RENDERERS = {
     "screen-index": r_screen_index,
     "menus": r_menus,
@@ -636,6 +660,9 @@ RENDERERS = {
     "contract": r_contract,
     "walkthrough": r_walkthrough,
     "counts": r_counts,
+    "guide-map": r_guide_map,
+    "guide-reading": r_guide_reading,
+    "guide-steps": r_guide_steps,
 }
 
 

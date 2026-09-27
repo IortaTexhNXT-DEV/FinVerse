@@ -63,6 +63,8 @@ TO_WRITE = {
 }
 
 KINDS = {
+    "StartHere": "Start here guide",
+    "GuideDeck": "Sign-off pack guide deck",
     "FRS": "FRS",
     "TestPlans": "Test plan",
     "TestPlan": "Test plan",
@@ -78,8 +80,8 @@ KINDS = {
     "Change_Register": "Change register",
 }
 # Order of the kinds inside a release set.
-KIND_ORDER = ["ReleaseNote", "FRS", "Signoff", "TestPlan", "Migration"]
-NAME_RE = re.compile(r"BIBS_(?P<type>[A-Za-z_]+?)_(?P<brd>BRD-\d\d)_(?P<name>.+?)_v(?P<ver>\d+\.\d+)\.(?P<ext>\w+)$")
+KIND_ORDER = ["StartHere", "GuideDeck", "ReleaseNote", "FRS", "Signoff", "TestPlan", "Migration"]
+NAME_RE = re.compile(r"(?:\d\d_)?BIBS_(?P<type>[A-Za-z_]+?)_(?P<brd>BRD-\d\d)_(?P<name>.+?)_v(?P<ver>\d+\.\d+)\.(?P<ext>\w+)$")
 
 
 def describe(path: Path, kind: str | None = None) -> tuple[str, str, str, str]:
@@ -176,7 +178,8 @@ def write_index(key: str) -> Path:
         for b, what in shared_here:
             home = brand.DROPS[brand.drop_of(b)]["folder"]
             folder = brand.out_dir(b, "FRS")
-            files = sorted(f for f in folder.glob(f"BIBS_*_{b}_*") if f.name.startswith(("BIBS_FRS_", "BIBS_TestPlan_")))
+            files = sorted(f for f in folder.glob(f"*BIBS_*_{b}_*")
+                           if (m := NAME_RE.match(f.name)) and m["type"] in ("FRS", "TestPlan"))
             links = "<br>".join(f"[`{f.name}`](../{home}/{folder.name}/{f.name})" for f in files)
             lines.append(f"| {b} | {what} | {links or f'[{home}/](../{home}/README.md)'} |")
     lines += ["", "## Still to write", "", "| Document | BRD | Note |", "|---|---|---|"]

@@ -12,7 +12,6 @@ version: "2.0"
 date: 27 September 2026
 status: Issued for BDOI business sign-off
 header_title: FRS BRD-1 New Business
-output: FRS/BIBS_FRS_BRD-01_New_Business_v2.0.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026

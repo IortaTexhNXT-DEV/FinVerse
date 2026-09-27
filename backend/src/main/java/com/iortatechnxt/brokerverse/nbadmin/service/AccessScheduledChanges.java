@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.nbadmin.service;
 
 import com.iortatechnxt.brokerverse.alert.domain.AlertFacts;
 import com.iortatechnxt.brokerverse.alert.service.AlertService;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestAction;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestRepository;
@@ -120,7 +121,7 @@ public class AccessScheduledChanges {
             "Access request "
                 + r.getRequestNo()
                 + " could not be applied on "
-                + r.getEffectiveFrom()
+                + DisplayFormat.date(r.getEffectiveFrom())
                 + ": "
                 + message,
             null,

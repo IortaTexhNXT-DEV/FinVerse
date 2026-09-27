@@ -24,6 +24,8 @@ export interface AccessRequestForm {
   userLevel: string;
   reasonCode: string;
   unlock: boolean;
+  /** Authorisation limit (PHP); blank = none on a new user, unchanged on a modification. */
+  authorizationLimit: string;
   /** Date the change applies (yyyy-MM-dd); blank = on approval (UAM-NFR-14). */
   effectiveFrom: string;
   /** Approvers in order (a user request has one). */
@@ -58,6 +60,7 @@ export const EMPTY_ACCESS_REQUEST: AccessRequestForm = {
   userLevel: '',
   reasonCode: '',
   unlock: false,
+  authorizationLimit: '',
   effectiveFrom: '',
   approvers: [],
   roleCode: '',
@@ -148,21 +151,27 @@ export interface ValidationContext {
   submit: boolean;
   /** USER_ID_PATTERN of a new user ID, blank for none. */
   userIdPattern?: string;
+  /** The same format in words (USER_ID_FORMAT_TEXT), shown in the message. */
+  userIdFormatText?: string;
   /** Today (yyyy-MM-dd): an effective date cannot be earlier. */
   today?: string;
 }
 
-function patternError(pattern: string | undefined, username: string): string | undefined {
+function patternError(ctx: ValidationContext, username: string): string | undefined {
+  const pattern = ctx.userIdPattern;
   if (!pattern) {
     return undefined;
   }
   try {
-    return new RegExp(pattern).test(username)
-      ? undefined
-      : `The user ID must follow the format ${pattern}`;
+    if (new RegExp(pattern).test(username)) {
+      return undefined;
+    }
   } catch {
     return undefined;
   }
+  return ctx.userIdFormatText
+    ? `The user ID must be ${ctx.userIdFormatText}`
+    : 'The user ID does not have the BDOI format';
 }
 
 function existingUserError(f: AccessRequestForm, user: UserAccess | undefined): string | undefined {
@@ -190,7 +199,7 @@ function usernameError(f: AccessRequestForm, ctx: ValidationContext): string | u
   if (f.type !== 'CREATE_USER') {
     return existingUserError(f, user);
   }
-  return user === undefined ? patternError(ctx.userIdPattern, name) : 'This user already exists';
+  return user === undefined ? patternError(ctx, name) : 'This user already exists';
 }
 
 function userErrors(f: AccessRequestForm, ctx: ValidationContext): AccessRequestErrors {
@@ -206,11 +215,21 @@ function userErrors(f: AccessRequestForm, ctx: ValidationContext): AccessRequest
   if (f.userType === 'INTERNAL' && rolesNeeded && f.roleCodes.length === 0) {
     errors.roleCodes = 'Select at least one role';
   }
+  errors.authorizationLimit = limitError(f.authorizationLimit);
   if (f.userType === 'EXTERNAL') {
     errors.partyKind = f.partyKind === '' ? 'Select the insurer or client' : undefined;
     errors.partyCode = f.partyCode.trim() === '' ? 'Enter the party code' : undefined;
   }
   return errors;
+}
+
+const LIMIT = /^\d{1,16}(\.\d{1,2})?$/;
+
+function limitError(value: string): string | undefined {
+  const v = value.trim().replace(/,/g, '');
+  return v === '' || LIMIT.test(v)
+    ? undefined
+    : 'Enter an amount of zero or more, with up to 2 decimals';
 }
 
 function newProfileErrors(f: AccessRequestForm): AccessRequestErrors {
@@ -322,7 +341,13 @@ function userDataInput(f: AccessRequestForm): Partial<AccessRequestInput> {
     windowsId: text(f.windowsId),
     businessUnitCode: text(f.businessUnitCode),
     userLevel: text(f.userLevel),
+    authorizationLimit: amountOf(f.authorizationLimit),
   };
+}
+
+function amountOf(value: string): number | undefined {
+  const v = value.trim().replace(/,/g, '');
+  return v === '' ? undefined : Number(v);
 }
 
 function externalInput(f: AccessRequestForm): Partial<AccessRequestInput> {
@@ -381,6 +406,7 @@ function savedUser(r: AccessRequest): Partial<AccessRequestForm> {
     userLevel: blank(d.userLevel),
     reasonCode: blank(d.reasonCode),
     unlock: d.unlock,
+    authorizationLimit: String(d.authorizationLimit ?? ''),
     effectiveFrom: blank(d.effectiveFrom),
     partyKind: d.partyKind ?? '',
     partyCode: blank(d.partyCode),

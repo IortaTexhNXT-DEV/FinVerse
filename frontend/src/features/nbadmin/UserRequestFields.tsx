@@ -4,6 +4,7 @@ import type { UserAccess } from '@/api/nbadmin';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Field } from '@/components/ui/Field';
 import { useWorkspace } from '@/context/workspaceContext';
+import { formatAmount } from '@/utils/format';
 import { usersFor } from './accessRequest';
 import type { AccessRequestErrors, AccessRequestForm } from './accessRequest';
 
@@ -12,17 +13,18 @@ interface FieldsProps {
   set: (p: Partial<AccessRequestForm>) => void;
   errors: AccessRequestErrors;
   users: UserAccess[];
+  /** The user ID format in words (USER_ID_FORMAT_TEXT). */
+  userIdFormatText?: string;
 }
 
-function UserField({ form, set, errors, users }: Readonly<FieldsProps>) {
+function UserField({ form, set, errors, users, userIdFormatText }: Readonly<FieldsProps>) {
   const typed = form.type === 'CREATE_USER' || form.userType === 'EXTERNAL';
+  let hint: string | undefined;
+  if (typed) {
+    hint = userIdFormatText ? `BDOI format: ${userIdFormatText}` : 'BDOI format';
+  }
   return (
-    <Field
-      label="User ID"
-      required
-      error={errors.username}
-      hint={typed ? 'BDOI format, e.g. a013000196' : undefined}
-    >
+    <Field label="User ID" required error={errors.username} hint={hint}>
       {(id) =>
         typed ? (
           <input
@@ -65,6 +67,8 @@ function DataFields({ form, set, errors, users }: Readonly<FieldsProps>) {
   const modify = form.type === 'MODIFY_USER';
   const user = modify ? users.find((u) => u.username === form.username) : undefined;
   const hint = (value: string | undefined) => (modify ? current(value) : undefined);
+  const limit = user?.authorizationLimit ?? undefined;
+  const limitText = limit === undefined ? undefined : formatAmount(limit);
   const text = (label: string, key: 'fullName' | 'email' | 'windowsId', value?: string) => (
     <Field
       label={label}
@@ -126,6 +130,24 @@ function DataFields({ form, set, errors, users }: Readonly<FieldsProps>) {
           />
         )}
       </Field>
+      {form.userType === 'INTERNAL' && (
+        <Field
+          label="Authorisation Limit (PHP)"
+          error={errors.authorizationLimit}
+          hint={modify ? current(limitText) : 'Blank: no limit'}
+        >
+          {(id) => (
+            <input
+              id={id}
+              className="input num"
+              inputMode="decimal"
+              maxLength={22}
+              value={form.authorizationLimit}
+              onChange={(e) => set({ authorizationLimit: e.target.value })}
+            />
+          )}
+        </Field>
+      )}
     </div>
   );
 }

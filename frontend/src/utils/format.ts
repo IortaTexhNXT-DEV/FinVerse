@@ -174,8 +174,19 @@ export function formatDuration(fromIso: string, toIso: string | null | undefined
   return `${String(days)}d ${String(hours % 24)}h`;
 }
 
-export function today(): string {
-  return new Date().toISOString().slice(0, 10);
+const businessDateFormat = new Intl.DateTimeFormat('en-CA', {
+  timeZone: DISPLAY_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+/**
+ * The business date (ISO yyyy-MM-dd) in Philippine time, whatever the zone of the browser: from
+ * 00:00 to 07:59 in Manila the UTC date is still the day before.
+ */
+export function today(now: Date = new Date()): string {
+  return businessDateFormat.format(now);
 }
 
 export function humanize(code: string): string {

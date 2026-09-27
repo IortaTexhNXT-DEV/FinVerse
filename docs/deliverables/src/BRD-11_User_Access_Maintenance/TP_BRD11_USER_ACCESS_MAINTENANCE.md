@@ -8,9 +8,9 @@ doc_code: TestPlan
 brd: BRD-11
 name: User Access Maintenance Summary
 doc_id: BIBS-TP-BRD-11
-version: "1.0"
-date: 25 September 2026
-status: Issued for BDOI review
+version: "2.0"
+date: 27 September 2026
+status: Issued for BDOI business sign-off
 header_title: Test Plan BRD-11 User Access Maintenance
 h1_page_break: false
 control:
@@ -26,10 +26,18 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review, with the Excel workbook of the same version
+  - version: "2.0"
+    date: 27 Sep 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business owner, Information Security and BDOI IT (sign-off)
+    change: "Release set v2.0: BRD-11 is built; expected results quote the built messages and codes, 24 cases name their automated tests, the test data are the seed data V1960; cases re-traced to FRS v2.0 and its screen specifications (Screen ID on every case, Screens sheet); one screen case per screen and one message case per screen or dialog of the messages catalogue added; findings revised. Status as of 27-Sep-2026"
 distribution:
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Business Administrators (process owner)", role: Business tester, organisation: BDOI, purpose: "Requests, group-profile requests, reports"}
   - {name: "Unit Heads, Combank and Corbank Marketing / Corporate Processing", role: Business tester, organisation: BDOI, purpose: Approval and second approval}
+  - {name: "BDOI Information Security", role: Business tester, organisation: BDOI, purpose: "Separation of duties, second approval, password and session rules, menus by persona"}
+  - {name: "BDOI IT", role: Reviewer, organisation: BDOI, purpose: "Sign-in, identity integration assumptions, System Administrator functions"}
   - {name: "ITIO-SRE and ITSD-AMS", role: System administration, organisation: BDO Unibank, purpose: "System Administrator functions, directory sign-in, logs"}
   - {name: "ES-BPDS, Business Project Services", role: UAT coordinator, organisation: BDO Unibank ESG, purpose: UAT planning and traceability}
   - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "System test, defect fixing, UAT support"}
@@ -39,19 +47,18 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-11 User Access Maintenance in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the Business Administrators, the approvers and the system administrators what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-11_User_Access_Maintenance_v1.0.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-11 User Access Maintenance in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the Business Administrators, the approvers and the system administrators what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-11_User_Access_Maintenance_v2.0.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-11 v1.0 and to the BRD requirement IDs (the printed BRD numbers 1.001 to 4.003, and the non-functional rows UAM-NFR-nn) that the FR meets.
+Every case traces to a functional requirement (FR) of FRS BRD-11 v2.0, to the BRD requirement IDs (the printed BRD numbers 1.001 to 4.003, and the non-functional rows UAM-NFR-nn) that the FR meets, and to the screen of the FRS screen specifications where the tester starts. BRD-11 is built, so:
 
-Part of User Access Maintenance exists today: sign-in and lock-out, the session policy, the Users and Roles screens, one-step access requests and the User Access Matrix (FRS section 2.3, "the baseline"). The BRD-11 changes are designed and not yet built. The cases test the behaviour the FRS asks for after the change, so:
-
-- expected results quote the message text of the FRS without a message code, also where the baseline already has a code; the codes are added in version 1.1 when the change is built;
-- the automation reference column is blank; the existing access tests and those written during the build are referenced in version 1.1;
-- screen paths are those of the build design (the new section User Access) and are checked against the screens before the system test starts.
+- expected results quote the messages and codes that BIBS returns, word for word;
+- cases name the automated test that already covers them, where one exists;
+- the test data are the seed data of the SIT environment (V1960 and the broking seeds), and the screen paths are those of FRS chapter 12;
+- each screen has a screen case (its fields, actions and messages as specified) and each screen or dialog of the messages catalogue a message case.
 
 ## Scope
 
-In scope are all 37 FRs of FRS BRD-11 v1.0 and the BRD IDs they trace to:
+In scope are all 37 FRs of FRS BRD-11 v2.0 and the BRD IDs they trace to:
 
 - sign-in with a persona profile, the inactivity warning and sign-out, directory sign-in with the Windows ID, log-out and the session log, the password policy (FR-UA-001 to 005);
 - user access requests: draft, edit, cancel and submit; enrol, modify, deactivate and reactivate; the chosen approver; correction, cancellation, tracking, bulk requests and effective dates (FR-UA-010 to 020);
@@ -77,12 +84,12 @@ The roles-and-access sheet checks each access-maintenance function against the r
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-11 User Access Maintenance (`BIBS_FRS_BRD-11_User_Access_Maintenance_v1.0.docx`) | 1.0, 25 Sep 2026 |
+| R1 | Functional Requirements Specification BRD-11 User Access Maintenance (`02_BIBS_FRS_BRD-11_User_Access_Maintenance_v2.0.docx`) | 2.0, 27 Sep 2026 |
 | R2 | QPS User Access Maintenance Module BRD (`docs/source-documents/User Access Maintenance.pdf`) | v1, 15-Apr-2025; signed April-May 2025 |
-| R3 | Test plan workbook BRD-11 (`BIBS_TestPlan_BRD-11_User_Access_Maintenance_v1.0.xlsx`) | 1.0 |
-| R4 | User Access Maintenance build design (`docs/architecture/USER_ACCESS_DESIGN.md`) | proposal for review |
-| R5 | FRS BRD-3 Product Maintenance (role-permission change requests, PMADD05) | 1.0 |
-| R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |
+| R3 | Test plan workbook BRD-11 (`04_BIBS_TestPlan_BRD-11_User_Access_Maintenance_v2.0.xlsx`) | 2.0 |
+| R4 | User Access Maintenance build design (`docs/architecture/USER_ACCESS_DESIGN.md`) | as built (sections 16-19) |
+| R5 | FRS BRD-3 Product Maintenance (role-permission change requests, PMADD05) | 2.0 |
+| R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.2.xlsx`) | 1.2 |
 
 # Test approach
 
@@ -128,9 +135,9 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | The BRD-11 change is built and deployed on SIT with its roles, parameters, lists and jobs; the planned seed V1960 is loaded; CI is green on the deployed commit; the automated tests exist and pass; screen labels and messages have been compared with this plan and differences recorded; the test mailboxes receive mail. |
+| System test | BRD-11 is deployed on SIT with its roles, parameters, lists and jobs; the seed V1960 is loaded; CI is green on the deployed commit; the automated tests exist and pass; screen labels and messages have been compared with this plan and differences recorded; the test mailboxes receive mail. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical defect; the effective-date and password-expiry jobs run on SIT. |
-| UAT | FRS BRD-11 v1.0 is signed off or its open comments are agreed; the answers to UQ01, UQ02, UQ05 and UQ07 are applied as configuration; the system test exit criteria are met; the UAT environment holds masked user data (section 4.1); BDOI testers have user IDs with the roles of section 5 and attended the walkthrough of the User Access screens. |
+| UAT | FRS BRD-11 v2.0 is signed off or its open comments are agreed; the answers to UQ01, UQ02, UQ05 and UQ07 are applied as configuration; the system test exit criteria are met; the UAT environment holds masked user data (section 4.1); BDOI testers have user IDs with the roles of section 5 and attended the walkthrough of the User Access screens. |
 
 ## Exit criteria
 
@@ -151,7 +158,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 | Environment | Use | Data |
 |---|---|---|
 | CI | Automated unit and integration tests on every change | Created by each test; PostgreSQL in a container |
-| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed profile migrations, the planned seed V1960 and the data sets of section 4.2; directory stub when available; test mailboxes |
+| SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed profile migrations, the seed V1960 and the data sets of section 4.2; directory stub when available; test mailboxes |
 | UAT | Acceptance by BDOI testers | Masked copy of production-like user data plus the test users; no real names, Windows IDs or e-mail addresses of BDO staff |
 
 Non-production data is always masked. Full names, Windows IDs, e-mail addresses and mobile numbers of users are replaced before data is loaded into SIT or UAT, and user e-mail addresses point to test mailboxes. Test passwords are issued by the test lead and are never real directory passwords.
@@ -220,6 +227,12 @@ Every FR has at least one positive and one negative case, and every BRD ID is co
 
 <!-- tp:scenarios -->
 
+## Coverage by screen
+
+Every screen of the FRS v2.0 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
+
+<!-- tp:screens -->
+
 ## Roles and access
 
 The table shows the functions checked per role. Each Y and N is one row of the Roles and Access sheet.
@@ -235,9 +248,9 @@ The table shows the functions checked per role. Each Y and N is one row of the R
 <!-- table: widths=5.4,2,7.2 caption="Test risks and mitigations" -->
 | Risk | Impact | Mitigation |
 |---|---|---|
-| The screens, labels or messages differ from the build design when built | Medium | Compare the screens with this plan before the system test; update the workbook to version 1.1 with the built texts and message codes |
+| A later build changes a screen, label or message after the sign-off | Medium | The pack check compares the signed rows with the code at every build; a change is a change request and a new version of the set (FRS chapter 21) |
 | BDOI answers to open questions change expected results (UQ02 approver choice, UQ05 user ID format and lists, UQ07 privilege levels and working hours, UQ10 bulk rules, UQ16 profiles with members) | Medium | The values are parameters and lists; the affected cases name them and are re-run after the change without a new build |
-| The EUA interface is not supplied (UQ04) | Medium | Directory sign-in cases stay Blocked; LOCAL mode is tested now |
+| The directory sign-in (EIAM on Entra ID) is not specified by BDOI IT (UQ04, IQ04) | Medium | Directory sign-in cases stay Blocked; LOCAL mode is tested now |
 | A test locks out the administrators of the environment | High | Keep a second administrator (admin2) outside the lock-out cases; the test lead can unlock through the database |
 | Time-based cases (inactivity, token expiry, password age, effective dates, out-of-hours) need the clock to pass | Medium | The test lead shortens timers and moves dates in the test environment, as the preconditions describe |
 | Existing roles lose functions when the new permissions are introduced | High | FR-UA-050 cases check that ACCESS_REQUEST holders keep their request functions; the BRD-1 to BRD-5 access checks are re-run in the same cycle |
@@ -245,7 +258,7 @@ The table shows the functions checked per role. Each Y and N is one row of the R
 
 # FRS findings
 
-Writing the cases showed the points below, where the FRS is ambiguous or cannot be tested as written. The cases use the assumption stated in the proposal; the FRS owner decides the correction for FRS v1.1.
+Writing and re-tracing the cases showed the points below, where the FRS or the build is ambiguous, cannot be tested as written, or differs from the screen standards. The cases use the assumption stated in the proposal; the FRS owner decides the correction (a revision of the set or a change request).
 
 <!-- tp:findings -->
 
@@ -258,9 +271,10 @@ By signing, BDOI confirms that this test plan and its workbook cover the User Ac
 ```signoff
 rows:
   - {name: "", role: "Product Owner, Marketing Business System", organisation: BDOI}
-  - {name: "", role: "Process Owner, User Access Maintenance", organisation: BDOI}
-  - {name: "", role: "Unit Head, Combank / Corbank Marketing and Corporate Processing", organisation: BDOI}
-  - {name: "", role: "UAT coordinator, ES-BPS", organisation: BDO Unibank ESG}
+  - {name: "", role: "Process Owner, User Access Maintenance (Business Administration)", organisation: BDOI}
+  - {name: "", role: "Head, BDOI Information Security", organisation: BDOI}
+  - {name: "", role: "Head, BDOI IT", organisation: BDOI}
+  - {name: "", role: "UAT coordinator, Business Project Services", organisation: BDO Unibank ESG}
   - {name: "", role: Test Lead, organisation: iorta TechNXT}
   - {name: "", role: Project Manager, organisation: iorta TechNXT}
 ```

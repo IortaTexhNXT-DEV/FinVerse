@@ -19,15 +19,21 @@ import com.iortatechnxt.brokerverse.report.core.ReportRow;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.report.core.RowKind;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -55,6 +61,7 @@ class NbReportsIT {
   @Autowired private ReportVariantService variants;
   @Autowired private TestData data;
   @Autowired private AsUser as;
+  @Autowired private UserDirectory users;
 
   private Map<String, String> params(String... pairs) {
     Map<String, String> m = new HashMap<>();
@@ -125,6 +132,36 @@ class NbReportsIT {
         as.run("ao", () -> reports.run("NB-ACC-STATUS", params("exceptions", "STALLED")));
     assertThat(details(stalled))
         .allSatisfy(r -> assertThat(r.cells()).containsEntry("stalled", "Yes"));
+  }
+
+  @Test
+  void peopleAreShownByNameNotByLoginId() throws IOException {
+    ReportResult all = as.run("ao", () -> reports.run("NB-ACC-STATUS", params()));
+    String aoName = users.displayName("ao");
+    assertThat(aoName).isNotEqualTo("ao");
+    assertThat(details(all))
+        .extracting(r -> r.cells().get("officer"))
+        .contains(aoName)
+        .doesNotContain("ao", "ao2");
+    assertThat(details(all))
+        .extracting(r -> r.cells().get("assignee"))
+        .doesNotContain("ao", "ao2", "proc", "mkttl");
+    var file = as.run("proctl", () -> reports.export("NB-ACC-STATUS", params(), ExportFormat.DOCX));
+    String header = documentXml(file.content());
+    assertThat(header)
+        .contains("Run By: " + users.displayName("proctl"))
+        .doesNotContain("User ID:");
+  }
+
+  private static String documentXml(byte[] docx) throws IOException {
+    try (ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(docx))) {
+      for (ZipEntry e = zip.getNextEntry(); e != null; e = zip.getNextEntry()) {
+        if ("word/document.xml".equals(e.getName())) {
+          return new String(zip.readAllBytes(), StandardCharsets.UTF_8);
+        }
+      }
+    }
+    return "";
   }
 
   @Test

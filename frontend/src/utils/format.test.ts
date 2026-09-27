@@ -8,9 +8,16 @@ import {
   formatDuration,
   humanize,
   titleCase,
+  today,
 } from './format';
 
 describe('format', () => {
+  it('gives the business date in Philippine time, not the UTC date', () => {
+    expect(today(new Date('2026-09-26T20:30:00Z'))).toBe('2026-09-27');
+    expect(today(new Date('2026-09-27T15:59:00Z'))).toBe('2026-09-27');
+    expect(today(new Date('2026-09-27T16:00:00Z'))).toBe('2026-09-28');
+  });
+
   it('formats amounts in accounting style', () => {
     expect(formatAmount(1234.5)).toBe('1,234.50');
     expect(formatAmount(-99)).toBe('(99.00)');

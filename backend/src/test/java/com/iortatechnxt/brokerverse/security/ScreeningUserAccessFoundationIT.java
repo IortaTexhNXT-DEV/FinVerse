@@ -69,7 +69,8 @@ class ScreeningUserAccessFoundationIT {
     List<String> screening = permissionsStartingWith("SCR_");
     List<String> userAccess = permissionsStartingWith("UAM_");
     assertThat(screening).hasSize(14);
-    assertThat(userAccess).hasSize(10);
+    // + UAM_SOD_MAINTAIN and UAM_SOD_AUTHORIZE (separation-of-duties rules, V1065)
+    assertThat(userAccess).hasSize(12);
     assertThat(granted).containsAll(screening).containsAll(userAccess);
     assertThat(
             jdbc.queryForList(
@@ -208,8 +209,9 @@ class ScreeningUserAccessFoundationIT {
                     + " 'USER_ACCESS')",
                 String.class))
         .contains("SCR_CASE_ASSIGNED", "SCR_NO_POLICY_HIT", "UAM_REQUEST_TO_APPROVE")
-        // + PASSWORD_EXPIRY_NOTICE (U1-B, V1063)
-        .hasSize(18);
+        // + PASSWORD_EXPIRY_NOTICE (U1-B, V1063); + the dormant-user, security setting and
+        // separation-of-duties notices (V1065)
+        .hasSize(22);
     assertThat(
             jdbc.queryForList(
                 "select record_type from nba_retention_rule where years_online = 5"

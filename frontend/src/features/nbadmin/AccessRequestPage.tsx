@@ -30,6 +30,7 @@ import { isGroupProfile, REQUEST_TYPE_LABELS } from './accessRequest';
 import { accessRequestMoves, accessRequestStages } from './accessStages';
 import { StageStepper } from '@/components/broking/StageStepper';
 import { stageSteps } from '@/components/broking/stageSteps';
+import { riskFlagLabel } from './riskFlags';
 import { RequestApprovers, RequestDetails, RequestHistory } from './AccessRequestTabs';
 import { ReasonDialog } from './ReasonDialog';
 import { UserName } from '@/components/ui/UserName';
@@ -124,7 +125,9 @@ function decisionText(r: AccessRequest): string {
 }
 
 function Summary({ request: r }: Readonly<{ request: AccessRequest }>) {
-  const who = isGroupProfile(r.type) ? r.roleCode : r.username;
+  const roles = useQuery({ queryKey: ['nbadmin', 'roles'], queryFn: nbadminApi.roles });
+  const profile = roles.data?.find((x) => x.code === r.roleCode)?.name ?? r.roleCode;
+  const who = isGroupProfile(r.type) ? profile : r.username;
   return (
     <RecordSummary
       title={`${REQUEST_TYPE_LABELS[r.type]} · ${who ?? ''}`}
@@ -136,7 +139,7 @@ function Summary({ request: r }: Readonly<{ request: AccessRequest }>) {
       }
       flags={r.lifecycle.riskFlags.map((f) => (
         <span key={f} className="tag">
-          <ShieldAlert size={12} aria-hidden="true" /> {humanize(f)}
+          <ShieldAlert size={12} aria-hidden="true" /> {riskFlagLabel(f)}
         </span>
       ))}
       facts={[

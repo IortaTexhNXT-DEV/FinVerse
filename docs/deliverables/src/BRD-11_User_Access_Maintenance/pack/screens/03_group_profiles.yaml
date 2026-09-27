@@ -1,0 +1,80 @@
+# Screen specifications of BRD-11 User Access Maintenance: group-profile requests (create, change, deactivate and
+# reactivate a group profile), approved in order and implemented by the System Administrator.
+# Schema: docs/deliverables/src/signoff/README.md.
+area: Group profiles
+screens:
+  - id: SCR-UA-11
+    title: Group Profile Requests
+    route: /user-access/group-profiles
+    purpose: >-
+      The work list of the group-profile requests: new profiles, changes to the permissions, name, description or
+      privilege level of a profile, and the deactivation and reactivation of a profile. The approvers decide in the
+      order chosen by the requester; the System Administrator implements the approved request.
+    entry:
+      - The notice Access request AR-yyyy-nnnnnn to implement (System Administrator)
+      - Access Request record of a group-profile request › back arrow
+    shots:
+      - {state: list, user: badmin, tab: All, caption: "Group Profile Requests of the Business Administrator, All tab"}
+    fields:
+      - "Tabs | My Requests / Assigned to Me / Second Approval / For Implementation / All | Tab | - | - | Fixed; a tab is shown only to the users who work it | As Access Requests | - | As Access Requests, limited to group-profile requests | -"
+      - "Search | Search Request No., User or Role | Text | Part of a request number or group profile code | N | - | Blank | - | Contains search | -"
+      - "Filters | Status | Drop-down | All and the request statuses | N | Fixed list | All | - | - | -"
+      - "Filters | Request Type | Drop-down | All, New group profile, Modify group profile, Deactivate group profile, Reactivate group profile | N | Fixed list | All | - | - | -"
+      - "List | Request / Type / Change / Requested By / Requested / Approver / Status | Columns | As Access Requests | - | Access request | - | Read only | - | -"
+    actions:
+      - "New Group Profile Request | Business Administrator, System Administrator (group-profile request right) | Always | Opens New Request on the group-profile types (SCR-UA-12) | - | -"
+      - "Approve Selected | Approver on Assigned to Me; Second Approver on Second Approval | Rows selected | Approves each selected request in turn | Pending (next approver), Pending Second or For Implementation | Notice to the next approver, second approvers or System Administrators"
+      - "Filters | Every user of the screen | Always | Shows or hides the filters | - | -"
+      - "[Open a row] | Every user of the screen | Always | Opens the request (SCR-UA-08) | - | -"
+    rules:
+      - "Only one group-profile request per profile can be open at a time: A request for role <code> is already waiting for approval (FR-UA-040)."
+      - "Every approver in the list decides in turn; the request goes to the System Administrator only after the last approval (FR-UA-044)."
+    outcome: The Business Administrator follows each profile change from the request to its implementation.
+    frs: [FR-UA-040, FR-UA-044, FR-UA-045]
+    tests: [GP]
+
+  - id: SCR-UA-12
+    title: New Group Profile Request and Edit Request
+    route: /user-access/requests/new
+    also: [/user-access/requests/:id/edit]
+    parent: /user-access/group-profiles
+    purpose: >-
+      The request form on the group-profile types. New group profile: code, name, description, privilege level and
+      the permissions, grouped by functional area. Modify group profile: the profile, the permissions it should hold
+      after the change (added and removed shown against the current ones) and a new name, description or level.
+      Deactivate and reactivate: the profile, with the members who lose its screens. Approvers are listed in order.
+    entry:
+      - Group Profile Requests › New Group Profile Request
+      - Access Request record of a draft or returned group-profile request › Edit Request
+    shots:
+      - {state: new_profile, user: badmin, path: "/user-access/requests/new?kind=group", fill: new_profile, caption: "New group profile with its permissions and two approvers in order"}
+      - {state: modify_profile, user: badmin, path: "/user-access/requests/new?kind=group", fill: modify_profile, caption: "Modify group profile: permissions added and removed against the current ones"}
+      - {state: deactivate, user: badmin, path: "/user-access/requests/new?kind=group", fill: deactivate_profile, caption: "Deactivate group profile with the members who lose its screens"}
+    fields:
+      - "Request | Request Type | Drop-down | New group profile, Modify group profile, Deactivate group profile, Reactivate group profile | Y | Fixed list | New group profile | New request only (fixed after the first save) | The type of a saved request cannot change | The type of request <request no> cannot change"
+      - "New group profile | Profile Code | Text | Up to 40 capital letters, digits or underscores (A-Z, 0-9 and _) | Y | - | Blank | Draft; Returned | Format; not the code of an existing profile | Use up to 40 capital letters, digits or underscores"
+      - "New group profile | Name | Text | Up to 120 characters | Y | - | Blank | Draft; Returned | Not blank | Enter the name of the group profile"
+      - "Profile data | Description | Text | Up to 500 characters | N | - | Blank | Draft; Returned | - | -"
+      - "Profile data | Privilege Level | Drop-down | Low, Standard, High, Admin; Standard (new) or Unchanged (modify) when blank | N | Fixed list | Standard / Unchanged | Draft; Returned | High and Admin profiles need a second approval | -"
+      - "Modify / Deactivate / Reactivate | Group Profile | Drop-down | Profile name; active profiles (modify, deactivate, the System Administrator profile excluded) or inactive profiles (reactivate) | Y | Group profiles | Blank | Draft; Returned | An existing profile in the right state | Select the role to change"
+      - "Modify group profile | New Name | Text | Up to 120 characters | N | - | Blank | Draft; Returned | - | -"
+      - "Permissions | [Permission check boxes by area] | Check boxes | Permission names with the code below in small print, grouped by functional area (User Access, Administration, Clients, Product Maintenance...), unclassified permissions last | Cond.: new profile (at least one); a change must add or remove one, or change the data | Permissions of BIBS, less the insurer-only permissions | None (new); the current permissions (modify) | Draft; Returned | Known permissions; not both added and removed | Select at least one permission"
+      - "Permissions | Added / Removed | Text | Names of the permissions added and removed against the current ones | - | Computed | - | Read only | A change must grant or withdraw at least one permission, or change the name, description or level | Grant or withdraw at least one permission"
+      - "Deactivate group profile | [Members] | Warning | Members who lose the profile's screens, and are told when it is implemented: user IDs, or The profile has no members. | - | Users holding the profile | - | Read only | - | -"
+      - "Approval | Approvers in Order | List and drop-down | Name (user ID); arrows move an approver up; each approver decides in turn | Y | Holders of the approval right, less the requester | Blank | Draft; Returned | At least one; eligible; no approver twice | Add at least one approver"
+      - "Approval | Remarks (Justification) | Text area | Up to 1,000 characters | Y | - | Blank | Draft; Returned | Not blank on submission | Enter the justification"
+    actions:
+      - "Save Draft | Business Administrator, System Administrator (group-profile request right) | Profile code or profile chosen | Saves the draft with format checks only | Draft | -"
+      - "Submit | As Save Draft | Every field check passes | Runs the full checks, evaluates the risk rules and sends the request to the first approver in order | Pending | Access request AR-yyyy-nnnnnn to approve, to the first approver"
+      - "Resubmit | The requester | Returned request with correction remarks | Resubmits the corrected request to the approvers | Pending | As Submit"
+      - "Cancel | The requester | Always | Leaves the form without saving | Unchanged | -"
+    rules:
+      - "A group-profile request has no effective date; it applies when the System Administrator implements it: An effective date applies to user requests; group profiles are implemented (FR-UA-040)."
+      - "The System Administrator profile cannot be deactivated: Group profile System Administrator cannot be deactivated (FR-UA-042)."
+      - "A deactivated profile grants nothing at once to its members and is no longer offered on requests; the members are listed on the request, a deactivation with members is allowed, and each member is told when the request is implemented, in the app and by e-mail (FR-UA-042, FR-UA-043)."
+      - "The insurer-only permissions and the insurer roles hidden from BDOI are neither listed nor accepted: Permission(s) not available in BIBS: <permissions> (FR-UA-051)."
+      - "Creating or raising a profile to High or Admin, and reactivating a High or Admin profile, need a second approval (FR-UA-034)."
+      - "A change that lists too many permissions for one request is refused: Split the change into several requests (FR-UA-041)."
+    outcome: The profile change is checked, decided by every approver in order and waits for the System Administrator to implement it.
+    frs: [FR-UA-040, FR-UA-041, FR-UA-042, FR-UA-043, FR-UA-044, FR-UA-051]
+    tests: [GP]

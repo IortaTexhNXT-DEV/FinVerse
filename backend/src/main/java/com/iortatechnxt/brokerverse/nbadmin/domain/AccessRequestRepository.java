@@ -74,4 +74,8 @@ public interface AccessRequestRepository
    * @return line requests
    */
   List<AccessRequest> findByBatchIdOrderByIdAsc(Long batchId);
+
+  Optional<AccessRequest>
+      findFirstByUsernameIgnoreCaseAndRequestTypeAndAppliedAtNotNullOrderByAppliedAtDesc(
+          String username, AccessRequestType type);
 }

@@ -41,6 +41,8 @@ export const adminModule: FeatureModule = {
       label: 'System Parameters',
       icon: SlidersHorizontal,
       permission: 'SYSTEM_MONITOR',
+      // The approvers of the security parameters open the screen to approve a change.
+      alsoPermissions: ['SYSTEM_PARAMETER_MANAGE', 'SECURITY_PARAMETER_APPROVE'],
       component: lazy(() => import('@/features/system/SystemParametersPage')),
     },
     {

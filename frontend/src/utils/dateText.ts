@@ -1,3 +1,5 @@
+import { today } from '@/utils/format';
+
 const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
 
 function iso(year: number, month: number, day: number): string | undefined {
@@ -13,13 +15,17 @@ function iso(year: number, month: number, day: number): string | undefined {
 }
 
 /**
- * A typed date as ISO yyyy-mm-dd: "23-Sep-2026" (the BIBS format), "23/09/2026" or "2026-09-23";
- * '' for an empty text; undefined while the text is not a complete, valid date.
+ * A typed date as ISO yyyy-mm-dd: "23-Sep-2026" (the BIBS format), "23/09/2026" or "2026-09-23",
+ * or "today" (the business date in Philippine time); '' for an empty text; undefined while the
+ * text is not a complete, valid date.
  */
 export function parseDateText(text: string): string | undefined {
   const t = text.trim();
   if (t === '') {
     return '';
+  }
+  if (t.toLowerCase() === 'today') {
+    return today();
   }
   let m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(t);
   if (m !== null) {

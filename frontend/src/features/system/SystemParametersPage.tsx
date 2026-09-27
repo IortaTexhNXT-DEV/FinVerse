@@ -62,21 +62,106 @@ function ConfigurationTable() {
   );
 }
 
+/** A value as shown: a dash when blank. */
+function shown(value: string | null | undefined): string {
+  return value === undefined || value === null || value === '' ? '—' : value;
+}
+
+/** The change of a parameter that waits for approval, in words. */
+function pendingText(p: SystemParameter): string {
+  if (p.pendingValue === undefined || p.pendingValue === null) {
+    return '';
+  }
+  return `Waiting for approval: ${shown(p.pendingValue)}, asked by ${displayNameOf(p.pendingBy)}`;
+}
+
+function PendingDialog({
+  parameter,
+  mayApprove,
+  onClose,
+}: Readonly<{ parameter: SystemParameter; mayApprove: boolean; onClose: () => void }>) {
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  const decide = useMutation({
+    mutationFn: (approve: boolean) =>
+      approve
+        ? systemApi.approveParameter(parameter.key)
+        : systemApi.rejectParameter(parameter.key),
+    onSuccess: async (p, approve) => {
+      onClose();
+      await queryClient.invalidateQueries({ queryKey: ['system'] });
+      await queryClient.invalidateQueries({ queryKey: ['session-policy'] });
+      toast.success(approve ? `${p.description}: change approved` : 'Change rejected');
+    },
+  });
+  return (
+    <Modal
+      open
+      title="Security Setting to Approve"
+      onClose={onClose}
+      footer={
+        <>
+          <Button variant="secondary" busy={decide.isPending} onClick={() => decide.mutate(false)}>
+            {mayApprove ? 'Reject' : 'Withdraw'}
+          </Button>
+          {mayApprove && (
+            <Button variant="accent" busy={decide.isPending} onClick={() => decide.mutate(true)}>
+              Approve
+            </Button>
+          )}
+        </>
+      }
+    >
+      <div className="stack">
+        <ErrorAlert error={decide.error} />
+        <p>{parameter.description}</p>
+        <dl className="detail-list">
+          <dt>Current value</dt>
+          <dd>{shown(parameter.value)}</dd>
+          <dt>New value</dt>
+          <dd>{shown(parameter.pendingValue)}</dd>
+          <dt>Asked by</dt>
+          <dd>
+            {displayNameOf(parameter.pendingBy)}, {formatDateTime(parameter.pendingAt)}
+          </dd>
+        </dl>
+        {!mayApprove && (
+          <p className="muted">Another user with the approval right approves the change.</p>
+        )}
+      </div>
+    </Modal>
+  );
+}
+
 /**
  * System parameters: editable business parameters (validated by type, audited) and a read-only
- * view of the non-secret runtime configuration.
+ * view of the non-secret runtime configuration. A change of a security parameter waits until
+ * another user approves it (SECURITY_PARAMETER_APPROVE).
  */
 export default function SystemParametersPage() {
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>('parameters');
   const [editing, setEditing] = useState<SystemParameter | null>(null);
+  const [deciding, setDeciding] = useState<SystemParameter | null>(null);
   const parameters = useQuery({
     queryKey: ['system', 'parameters'],
     queryFn: systemApi.parameters,
   });
   const canEdit = can('SYSTEM_PARAMETER_MANAGE');
+  const canApprove = can('SECURITY_PARAMETER_APPROVE');
+  const mine = (p: SystemParameter) =>
+    user !== null && (p.pendingBy ?? '').toLowerCase() === user.username.toLowerCase();
+  const open = (p: SystemParameter) => {
+    if (pendingText(p) !== '') {
+      if ((canApprove && !mine(p)) || (canEdit && mine(p))) {
+        setDeciding(p);
+      }
+    } else if (canEdit) {
+      setEditing(p);
+    }
+  };
 
   const save = useMutation({
     mutationFn: (p: SystemParameter) => systemApi.updateParameter(p.key, p.value),
@@ -84,7 +169,11 @@ export default function SystemParametersPage() {
       setEditing(null);
       await queryClient.invalidateQueries({ queryKey: ['system'] });
       await queryClient.invalidateQueries({ queryKey: ['session-policy'] });
-      toast.success(`${p.key} updated`);
+      toast.success(
+        pendingText(p) === ''
+          ? `${p.description}: updated`
+          : `${p.description}: change sent for approval`,
+      );
     },
   });
 
@@ -104,11 +193,20 @@ export default function SystemParametersPage() {
             loading={parameters.isLoading}
             rows={parameters.data ?? []}
             rowKey={(p) => p.key}
-            onRowClick={canEdit ? (p) => setEditing(p) : undefined}
+            onRowClick={canEdit || canApprove ? open : undefined}
             columns={[
               { key: 'c', header: 'Category', render: (p) => humanize(p.category) },
               { key: 'k', header: 'Parameter', render: (p) => <strong>{p.key}</strong> },
-              { key: 'v', header: 'Value', render: (p) => p.value || '—' },
+              {
+                key: 'v',
+                header: 'Value',
+                render: (p) => (
+                  <>
+                    {p.value || '—'}
+                    {pendingText(p) && <span className="cell-sub">{pendingText(p)}</span>}
+                  </>
+                ),
+              },
               { key: 'd', header: 'Description', render: (p) => p.description },
               {
                 key: 'u',
@@ -140,6 +238,11 @@ export default function SystemParametersPage() {
         {editing !== null && (
           <div className="stack">
             <p className="muted">{editing.description}</p>
+            {editing.secondApproval && (
+              <div className="alert info" role="status">
+                A security setting: the change applies once another user approves it.
+              </div>
+            )}
             <Field label="Value" hint={hintFor(editing)}>
               {(id) => (
                 <input
@@ -154,6 +257,13 @@ export default function SystemParametersPage() {
           </div>
         )}
       </Modal>
+      {deciding !== null && (
+        <PendingDialog
+          parameter={deciding}
+          mayApprove={canApprove && !mine(deciding)}
+          onClose={() => setDeciding(null)}
+        />
+      )}
     </div>
   );
 }

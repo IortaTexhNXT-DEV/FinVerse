@@ -3,9 +3,12 @@ package com.iortatechnxt.brokerverse.nbadmin.api;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessDecisionResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessRequestResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.DecisionRequest;
+import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessDecisionService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessImplementationService;
+import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestDescriber;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestReturnService;
+import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService.Decision;
 import jakarta.validation.Valid;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +32,7 @@ public class AccessDecisionController {
   private final AccessDecisionService decisions;
   private final AccessRequestReturnService returns;
   private final AccessImplementationService implementations;
+  private final AccessRequestDescriber describer;
 
   /**
    * Creates the controller.
@@ -36,11 +40,14 @@ public class AccessDecisionController {
    * @param decisions approvals and rejections
    * @param returns return, resubmission and cancellation
    * @param implementations implementation of group-profile requests
+   * @param describer descriptions of the requests
    */
   public AccessDecisionController(
       AccessDecisionService decisions,
       AccessRequestReturnService returns,
-      AccessImplementationService implementations) {
+      AccessImplementationService implementations,
+      AccessRequestDescriber describer) {
+    this.describer = describer;
     this.decisions = decisions;
     this.returns = returns;
     this.implementations = implementations;
@@ -57,7 +64,7 @@ public class AccessDecisionController {
   @PreAuthorize(APPROVE)
   public AccessDecisionResponse approve(
       @PathVariable Long id, @Valid @RequestBody DecisionRequest body) {
-    return AccessDecisionResponse.from(decisions.approve(id, body.comment()));
+    return decision(decisions.approve(id, body.comment()));
   }
 
   /**
@@ -71,7 +78,7 @@ public class AccessDecisionController {
   @PreAuthorize("hasAuthority('UAM_SECOND_APPROVE')")
   public AccessDecisionResponse secondApprove(
       @PathVariable Long id, @Valid @RequestBody DecisionRequest body) {
-    return AccessDecisionResponse.from(decisions.secondApprove(id, body.comment()));
+    return decision(decisions.secondApprove(id, body.comment()));
   }
 
   /**
@@ -85,7 +92,7 @@ public class AccessDecisionController {
   @PreAuthorize(DECIDE)
   public AccessDecisionResponse reject(
       @PathVariable Long id, @Valid @RequestBody DecisionRequest body) {
-    return AccessDecisionResponse.from(decisions.reject(id, body.comment()));
+    return decision(decisions.reject(id, body.comment()));
   }
 
   /**
@@ -99,7 +106,7 @@ public class AccessDecisionController {
   @PreAuthorize(DECIDE)
   public AccessRequestResponse returnRequest(
       @PathVariable Long id, @Valid @RequestBody DecisionRequest body) {
-    return AccessRequestResponse.from(returns.returnRequest(id, body.comment()));
+    return view(returns.returnRequest(id, body.comment()));
   }
 
   /**
@@ -114,7 +121,7 @@ public class AccessDecisionController {
   @PreAuthorize("hasAnyAuthority('ACCESS_REQUEST', 'UAM_CORRECT')")
   public AccessRequestResponse resubmit(
       @PathVariable Long id, @Valid @RequestBody DecisionRequest body) {
-    return AccessRequestResponse.from(returns.resubmit(id, body.comment()));
+    return view(returns.resubmit(id, body.comment()));
   }
 
   /**
@@ -128,7 +135,7 @@ public class AccessDecisionController {
   @PreAuthorize("hasAnyAuthority('ACCESS_REQUEST', 'UAM_CANCEL', 'ACCESS_APPROVE')")
   public AccessRequestResponse cancel(
       @PathVariable Long id, @Valid @RequestBody DecisionRequest body) {
-    return AccessRequestResponse.from(returns.cancel(id, body.comment()));
+    return view(returns.cancel(id, body.comment()));
   }
 
   /**
@@ -140,6 +147,14 @@ public class AccessDecisionController {
   @PostMapping("/{id}/implement")
   @PreAuthorize("hasAuthority('ROLE_MANAGE')")
   public AccessRequestResponse implement(@PathVariable Long id) {
-    return AccessRequestResponse.from(implementations.implement(id));
+    return view(implementations.implement(id));
+  }
+
+  private AccessRequestResponse view(AccessRequest r) {
+    return AccessRequestResponse.from(r, describer.describe(r));
+  }
+
+  private AccessDecisionResponse decision(Decision d) {
+    return AccessDecisionResponse.from(d, describer.describe(d.request()));
   }
 }

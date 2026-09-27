@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.system.api.dto.SessionPolicyResponse;
 import com.iortatechnxt.brokerverse.system.domain.JobTrigger;
 import com.iortatechnxt.brokerverse.system.service.JobRegistry;
 import com.iortatechnxt.brokerverse.system.service.JobRunService;
+import com.iortatechnxt.brokerverse.system.service.SecurityParameterApprovals;
 import com.iortatechnxt.brokerverse.system.service.SystemInfoService;
 import com.iortatechnxt.brokerverse.system.service.SystemInfoService.About;
 import com.iortatechnxt.brokerverse.system.service.SystemInfoService.ConfigEntry;
@@ -40,6 +41,9 @@ public class SystemController {
   private static final String MONITOR =
       "hasAnyAuthority('SYSTEM_MONITOR','SYSTEM_PARAMETER_MANAGE')";
   private static final String MANAGE = "hasAuthority('SYSTEM_PARAMETER_MANAGE')";
+  private static final String PARAMETERS =
+      "hasAnyAuthority('SYSTEM_MONITOR','SYSTEM_PARAMETER_MANAGE','SECURITY_PARAMETER_APPROVE')";
+  private static final String APPROVE = "hasAuthority('SECURITY_PARAMETER_APPROVE')";
   private static final int DEFAULT_TIMEOUT_MINUTES = 30;
   private static final int WARNING_SECONDS = 60;
   private static final int SECONDS_PER_MINUTE = 60;
@@ -49,6 +53,7 @@ public class SystemController {
   private static final int MAX_PAGE_SIZE = 200;
 
   private final SystemParameterService parameters;
+  private final SecurityParameterApprovals approvals;
   private final SystemInfoService info;
   private final JobRegistry jobs;
   private final JobRunService runs;
@@ -58,6 +63,7 @@ public class SystemController {
    * Creates the controller.
    *
    * @param parameters parameter service
+   * @param approvals changes of the parameters (second approval of the security parameters)
    * @param info application information
    * @param jobs job registry
    * @param runs job run history
@@ -65,11 +71,13 @@ public class SystemController {
    */
   public SystemController(
       SystemParameterService parameters,
+      SecurityParameterApprovals approvals,
       SystemInfoService info,
       JobRegistry jobs,
       JobRunService runs,
       Clock clock) {
     this.parameters = parameters;
+    this.approvals = approvals;
     this.info = info;
     this.jobs = jobs;
     this.runs = runs;
@@ -82,13 +90,13 @@ public class SystemController {
    * @return parameters
    */
   @GetMapping("/parameters")
-  @PreAuthorize(MONITOR)
+  @PreAuthorize(PARAMETERS)
   public List<ParameterResponse> parameters() {
     return parameters.list().stream().map(ParameterResponse::from).toList();
   }
 
   /**
-   * Changes a business parameter.
+   * Changes a business parameter; a security parameter waits for a second approval.
    *
    * @param key key
    * @param request new value
@@ -98,7 +106,31 @@ public class SystemController {
   @PreAuthorize(MANAGE)
   public ParameterResponse updateParameter(
       @PathVariable String key, @Valid @RequestBody ParameterUpdateRequest request) {
-    return ParameterResponse.from(parameters.update(key, request.value()));
+    return ParameterResponse.from(approvals.change(key, request.value()));
+  }
+
+  /**
+   * Approves the change of a security parameter (not by its requester).
+   *
+   * @param key key
+   * @return parameter
+   */
+  @PostMapping("/parameters/{key}/approve")
+  @PreAuthorize(APPROVE)
+  public ParameterResponse approveParameter(@PathVariable String key) {
+    return ParameterResponse.from(approvals.approve(key));
+  }
+
+  /**
+   * Rejects the change of a security parameter; its requester may withdraw it.
+   *
+   * @param key key
+   * @return parameter
+   */
+  @PostMapping("/parameters/{key}/reject")
+  @PreAuthorize("hasAnyAuthority('SECURITY_PARAMETER_APPROVE','SYSTEM_PARAMETER_MANAGE')")
+  public ParameterResponse rejectParameter(@PathVariable String key) {
+    return ParameterResponse.from(approvals.reject(key));
   }
 
   /**

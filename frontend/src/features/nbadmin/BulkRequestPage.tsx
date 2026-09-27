@@ -33,7 +33,7 @@ export default function BulkRequestPage() {
     queryKey: ['nbadmin', 'batches', page],
     queryFn: () => nbadminApi.batches(page),
   });
-  const mayUpload = can('UAM_ENROLL') && can('BULK_PROCESS');
+  const mayUpload = (can('UAM_ENROLL') || can('UAM_MODIFY')) && can('BULK_PROCESS');
   return (
     <div className="stack">
       <PageHeader

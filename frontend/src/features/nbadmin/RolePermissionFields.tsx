@@ -4,6 +4,8 @@ import { Field } from '@/components/ui/Field';
 import { areaLabel, groupByArea } from './accessMatrix';
 import type { AccessRequestErrors, AccessRequestForm } from './accessRequest';
 import { roleChanges } from './accessRequest';
+import { PermissionName } from '@/components/ui/PermissionName';
+import { permissionLabels } from '@/utils/permissionLabel';
 
 /**
  * Permission picker grouped by functional area (PMADD05; BRD 3.002 "tasks by module"), with the
@@ -35,14 +37,16 @@ export function PermissionPicker({
           <div className="permission-area">{areaLabel(g.area)}</div>
           <div className="form-grid">
             {g.permissions.map((p) => (
-              <label key={p} className="checkbox-field mono" htmlFor={`perm-${p}`}>
+              <label key={p} className="checkbox-field" htmlFor={`perm-${p}`}>
                 <input
                   id={`perm-${p}`}
                   type="checkbox"
                   checked={selected.includes(p)}
                   onChange={(e) => toggle(p, e.target.checked)}
                 />
-                {p}
+                <span>
+                  <PermissionName code={p} />
+                </span>
               </label>
             ))}
           </div>
@@ -55,9 +59,9 @@ export function PermissionPicker({
       )}
       <dl className="detail-list">
         <dt>Added</dt>
-        <dd>{added.join(', ') || '—'}</dd>
+        <dd>{permissionLabels(added) || '—'}</dd>
         <dt>Removed</dt>
-        <dd>{removed.join(', ') || '—'}</dd>
+        <dd>{permissionLabels(removed) || '—'}</dd>
       </dl>
     </fieldset>
   );
@@ -96,7 +100,7 @@ export function RolePermissionFields({
               .filter((r) => r.active)
               .map((r) => (
                 <option key={r.code} value={r.code}>
-                  {r.code} – {r.name}
+                  {r.name}
                 </option>
               ))}
           </select>

@@ -10,7 +10,7 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.ExternalParty;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedRole;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedUserData;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RolePermissionChange;
-import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
@@ -74,16 +74,17 @@ public record AccessRequestResponse(
    * Maps a request.
    *
    * @param r request
+   * @param summary one-line description (AccessRequestDescriber)
    * @return response
    */
-  public static AccessRequestResponse from(AccessRequest r) {
+  public static AccessRequestResponse from(AccessRequest r, String summary) {
     RolePermissionChange change = r.permissionChange();
     return new AccessRequestResponse(
         r.getId(),
         r.getRequestNo(),
         r.getRequestType(),
         r.getUserType(),
-        AccessRequestService.describe(r),
+        summary,
         r.getUsername(),
         r.getFullName(),
         r.getEmail(),
@@ -120,6 +121,7 @@ public record AccessRequestResponse(
    * @param portalRole portal role
    * @param effectiveFrom date the change applies
    * @param batchId bulk batch
+   * @param authorizationLimit authorisation limit requested, null for none / unchanged
    */
   public record Details(
       String windowsId,
@@ -134,7 +136,8 @@ public record AccessRequestResponse(
       String partyCode,
       String portalRole,
       LocalDate effectiveFrom,
-      Long batchId) {
+      Long batchId,
+      BigDecimal authorizationLimit) {
 
     static Details from(AccessRequest r) {
       RequestedUserData d = r.getUserData();
@@ -153,7 +156,8 @@ public record AccessRequestResponse(
           party.map(ExternalParty::code).orElse(null),
           party.map(ExternalParty::portalRole).orElse(null),
           r.getEffectiveFrom(),
-          r.getBatchId());
+          r.getBatchId(),
+          d.authorizationLimit());
     }
   }
 

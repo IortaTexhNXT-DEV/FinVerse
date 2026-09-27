@@ -7,6 +7,8 @@ import { PRIVILEGE_LEVELS } from './accessRequest';
 import type { AccessRequestErrors, AccessRequestForm } from './accessRequest';
 import { PermissionPicker, RolePermissionFields } from './RolePermissionFields';
 import { Notice } from '@/components/ui/Notice';
+import { UserName } from '@/components/ui/UserName';
+import { Tag } from '@/components/ui/Tag';
 
 interface FieldsProps {
   form: AccessRequestForm;
@@ -101,17 +103,25 @@ function Activation({ form, set, errors }: Readonly<FieldsProps>) {
             </option>
             {offered.map((r) => (
               <option key={r.code} value={r.code}>
-                {r.code} – {r.name}
+                {r.name}
               </option>
             ))}
           </select>
         )}
       </Field>
-      {deactivate && form.roleCode !== '' && (
-        <Notice tone="warning">
-          {members.length === 0
-            ? 'The profile has no members.'
-            : `Members who lose the profile's screens: ${members.map((m) => m.username).join(', ')}`}
+      {deactivate && form.roleCode !== '' && members.length === 0 && (
+        <Notice tone="info">The profile has no members.</Notice>
+      )}
+      {deactivate && form.roleCode !== '' && members.length > 0 && (
+        <Notice tone="warning" title="Members who lose the profile's screens">
+          They are told when the change is implemented.
+          <span className="tag-list">
+            {members.map((m) => (
+              <Tag key={m.username} tone="neutral">
+                <UserName login={m.username} />
+              </Tag>
+            ))}
+          </span>
         </Notice>
       )}
     </>

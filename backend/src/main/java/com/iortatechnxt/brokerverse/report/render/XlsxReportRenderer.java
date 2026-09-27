@@ -157,7 +157,7 @@ public class XlsxReportRenderer implements ReportRenderer {
         0,
         "Report ID: "
             + result.code()
-            + "   User ID: "
+            + "   Run By: "
             + ctx.generatedBy()
             + "   Run Date: "
             + STAMP.format(ctx.generatedAt()),

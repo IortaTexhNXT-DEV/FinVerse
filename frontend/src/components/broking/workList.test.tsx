@@ -12,7 +12,12 @@ interface Row {
 function SelectableList({
   rows,
   onKeys,
-}: Readonly<{ rows: Row[]; onKeys: (keys: string[]) => void }>) {
+  reason,
+}: Readonly<{
+  rows: Row[];
+  onKeys: (keys: string[]) => void;
+  reason?: (row: Row) => string | undefined;
+}>) {
   const selection = useRowSelection();
   onKeys(selection.keys);
   return (
@@ -26,6 +31,7 @@ function SelectableList({
             (r) => r.arn,
             selection,
             (r) => r.arn,
+            reason,
           ),
           { key: 'arn', header: 'ARN', render: (r) => r.arn },
         ]}
@@ -62,6 +68,24 @@ describe('work list building blocks', () => {
     await user.click(screen.getByText('Clear'));
     expect(keys).toEqual([]);
   }, 20_000);
+
+  it('keeps rows decided on their own out of the selection', async () => {
+    const user = userEvent.setup();
+    let keys: string[] = [];
+    render(
+      <SelectableList
+        rows={[{ arn: 'ARN-1' }, { arn: 'ARN-2' }]}
+        reason={(r) => (r.arn === 'ARN-2' ? 'Open it to decide' : undefined)}
+        onKeys={(k) => {
+          keys = k;
+        }}
+      />,
+    );
+    expect(screen.getByLabelText('Select ARN-2')).toBeDisabled();
+    expect(screen.getByLabelText('Select ARN-2')).toHaveAttribute('title', 'Open it to decide');
+    await user.click(screen.getByLabelText('Select all rows shown'));
+    expect(keys).toEqual(['ARN-1']);
+  });
 
   it('shows tiles that open their list and flags those needing attention', async () => {
     const user = userEvent.setup();

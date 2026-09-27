@@ -43,7 +43,7 @@ public final class DocumentText {
    */
   public static String pageFooter(DocumentSpec spec) {
     List<String> parts = new ArrayList<>();
-    parts.add(spec.title());
+    parts.add(titleCase(spec.title()));
     parts.add(spec.companyName());
     String note =
         spec.footer() == null ? "" : TEMPLATE_TAG.matcher(spec.footer()).replaceAll("Version $1");
@@ -53,5 +53,22 @@ public final class DocumentText {
     return parts.stream()
         .filter(p -> p != null && !p.isBlank())
         .collect(Collectors.joining(FOOTER_SEPARATOR));
+  }
+
+  /**
+   * The document title as the small print writes it: a title printed in capitals on the page (e.g.
+   * SERVICE INVOICE) in title case (Service Invoice), like every other document footer.
+   */
+  private static String titleCase(String title) {
+    if (title == null || title.chars().anyMatch(Character::isLowerCase)) {
+      return title;
+    }
+    StringBuilder out = new StringBuilder(title.length());
+    boolean wordStart = true;
+    for (char c : title.toCharArray()) {
+      out.append(wordStart ? c : Character.toLowerCase(c));
+      wordStart = c == ' ';
+    }
+    return out.toString();
   }
 }

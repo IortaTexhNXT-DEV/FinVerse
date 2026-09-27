@@ -1,0 +1,50 @@
+// BRD-3: workflow PM_PACKAGE_REQUEST (V755). FRS section 5. Stage owner permission in the second line.
+digraph pm_workflow {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.22, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.2, height=0.45, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  DRAFT             [label="DRAFT\nMarketing AO / TSU"];
+  FOR_MKT_APPROVAL  [label="FOR_MKT_APPROVAL\nMarketing TL / TH / UH"];
+  FOR_TSU_REVIEW    [label="FOR_TSU_REVIEW\nTSU TL"];
+  FOR_TSU_APPROVAL  [label="FOR_TSU_APPROVAL\nTSU TH"];
+  NEGOTIATION       [label="NEGOTIATION\nTSU Officer / TL"];
+  TERMS_REVIEW      [label="TERMS_REVIEW\nTSU TH"];
+  FOR_MKT_REVIEW    [label="FOR_MKT_REVIEW\nMarketing"];
+  REQUIREMENTS_PREP [label="REQUIREMENTS_PREP\nTSU"];
+  FOR_MANCOM        [label="FOR_MANCOM\nManCom"];
+  WITH_MBS          [label="WITH_MBS\nMBS"];
+  FOR_VALIDATION    [label="FOR_VALIDATION\nTSU Head / Business Admin"];
+  RELEASED          [label="RELEASED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  RETIRED           [label="RETIRED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  NOT_PROCEEDED     [label="NOT_PROCEEDED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  VOIDED            [label="VOIDED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  DRAFT -> FOR_MKT_APPROVAL [label=" submit"];
+  FOR_MKT_APPROVAL -> FOR_TSU_REVIEW [label=" approve"];
+  FOR_TSU_REVIEW -> FOR_TSU_APPROVAL [label=" recommend"];
+  FOR_TSU_APPROVAL -> NEGOTIATION [label=" approve"];
+  NEGOTIATION -> NEGOTIATION [label=" revise_qs\n (round n+1)"];
+  NEGOTIATION -> TERMS_REVIEW [label=" terms_final"];
+  TERMS_REVIEW -> FOR_MKT_REVIEW [label=" release_to_marketing\n (client-specific)"];
+  TERMS_REVIEW -> REQUIREMENTS_PREP [label=" skip_marketing_review\n (generic)"];
+  FOR_MKT_REVIEW -> REQUIREMENTS_PREP [label=" accept_terms"];
+  FOR_MKT_REVIEW -> NEGOTIATION [label=" request_changes", style=dashed, constraint=false];
+  FOR_TSU_APPROVAL -> FOR_MANCOM [label=" approve_no_negotiation", style=dashed];
+  REQUIREMENTS_PREP -> FOR_MANCOM [label=" submit_requirements"];
+  FOR_MANCOM -> WITH_MBS [label=" signoff"];
+  FOR_MANCOM -> REQUIREMENTS_PREP [label=" return", style=dashed, constraint=false];
+  WITH_MBS -> REQUIREMENTS_PREP [label=" return_incomplete", style=dashed, constraint=false];
+  WITH_MBS -> FOR_VALIDATION [label=" setup"];
+  WITH_MBS -> RETIRED [label=" retire\n (RETIRE)"];
+  FOR_VALIDATION -> RELEASED [label=" version_released"];
+  FOR_VALIDATION -> WITH_MBS [label=" version_returned", style=dashed, constraint=false];
+  NEGOTIATION -> NOT_PROCEEDED [label=" not_proceeded", style=dotted];
+  FOR_MKT_REVIEW -> NOT_PROCEEDED [style=dotted];
+  FOR_TSU_REVIEW -> VOIDED [label=" void", style=dotted];
+
+  { rank=same; FOR_TSU_REVIEW; VOIDED; }
+  { rank=same; FOR_MKT_REVIEW; NOT_PROCEEDED; }
+  { rank=same; RELEASED; RETIRED; }
+}

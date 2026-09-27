@@ -1,0 +1,1305 @@
+# Test plan BRD-9 Customer Servicing Facility - test data file.
+# Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/testplans/brd09_cases.yaml
+# Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
+# BRD-9 is designed, not built: the expected results quote the message text of the FRS and the build
+# design (docs/architecture/CUSTOMER_SERVICING_DESIGN.md) without codes, and no case names an automated
+# test. Screen paths follow section 10 of the build design (section Customer Service Facility).
+
+meta:
+  brd: BRD-09
+  name: Customer Servicing Facility
+  code: CSF
+  frs: FRS_BRD09_CUSTOMER_SERVICING_FACILITY.md
+  summary: TP_BRD09_CUSTOMER_SERVICING_FACILITY.md
+  version: "1.0"
+  date: 25 September 2026
+  built: false
+
+personas:
+  CSF_AGENT: {name: BDO Insure Contact Center Agent, short: Agent}
+  CSF_SUPERVISOR: {name: Contact Center Supervisor, short: Supervisor}
+  CSF_MANAGEMENT: {name: "Contact Center Management (Leads / Heads)", short: Mgmt}
+  SYSADMIN: {name: System Administrator, short: Sys Admin}
+  MKT_AO: {name: Marketing AO without a CSF role, short: MKT AO}
+  INFRA: {name: Infrastructure team (database administrator), short: Infra}
+
+screens:
+  LOGIN: Login page
+  SEARCH: Customer Service Facility > Customer Search
+  VIEW: Customer Service Facility > Customer Search > Servicing View (summary card)
+  ACCTS: Customer Service Facility > Customer Search > Servicing View > Accounts tab
+  PAY: Customer Service Facility > Customer Search > Servicing View > Payments tab
+  RA: Customer Service Facility > Customer Search > Servicing View > Renewal Advice tab
+  EPOL: Customer Service Facility > Customer Search > Servicing View > E-policies tab
+  DOCS: Customer Service Facility > Customer Search > Servicing View > Documents tab
+  HIST: Customer Service Facility > Customer Search > Servicing View > Contact History tab
+  UPDATE: Customer Service Facility > Servicing View > Update Contact dialog
+  RESEND: Customer Service Facility > Servicing View > Resend dialog
+  REPORTS: Reports > Report Centre (category Customer Service)
+  AUDIT: Administration > Audit Trail
+  USERS: Administration > Users
+  PARAMS: Administration > System Parameters
+  JOBS: Administration > Scheduled Jobs
+  LOV: Broking Setup > Lists of Values
+  ACCREQ: User Access > Access Requests
+  NOTIF: Notifications (bell icon in the page header)
+  MAIL: Test mailbox of the recipient
+  DB: Database restore environment (infrastructure console)
+  API: API call with the user's token (tester tool, for example Postman)
+
+data:
+  - id: TD-CSF-01
+    name: Test users per role
+    content: One user per role - agent1 and agent2 (CSF_AGENT), sup1 (CSF_SUPERVISOR), mgmt1 (CSF_MANAGEMENT), the System Administrator, ao (MKT_AO, no CSF role). The build design plans the SIT/UAT users csfagent, csfagent2, csfsup and csfmgmt for the same roles.
+    source: Created by the test lead through User Access requests on SIT; planned seed V1940 of the build design
+  - id: TD-CSF-02
+    name: Client with CBG and non-CBG accounts
+    content: Masked client "UAT CSF Client One" with a CBG Motor account booked and in force (policy number, PN number, receipts paid) and a non-CBG Property account awaiting payment; registered e-mail and mobile point to the test mailbox and test phone.
+    source: Prepared by the test lead on SIT from masked seed clients (V981) and accounts keyed in the BRD-1 screens
+  - id: TD-CSF-03
+    name: Accounts in each CSF status
+    content: "Accounts of one client in stage DRAFT, SUBMITTED, AWAITING_PAYMENT, BOOKED with premium outstanding, BOOKED and paid in force, CANCELLED, and BOOKED with the policy period ended."
+    source: Prepared by the test lead on SIT through the BRD-1 and BRD-2 screens
+  - id: TD-CSF-04
+    name: Search keys
+    content: Client code, prospect code and government ID of TD-CSF-02; ARN with and without suffix; policy number; legacy account number of a migrated account; PN number of the CBG account; loan application number of a placement billing item; a surname shared by more than 50 masked clients; a PN that exists only in LOS.
+    source: Prepared by the test lead; the 50-client surname is loaded with the client bulk upload
+  - id: TD-CSF-05
+    name: Payment history over 14 months
+    content: Receipts of TD-CSF-02 spread over 14 months; one receipt applied to two invoices with a balance left on each; one receipt dated 12 months and 1 day before the test date.
+    source: Keyed in Cashiering (BRD-2) on SIT by the test lead; receipt dates set in the test database
+  - id: TD-CSF-06
+    name: Renewal advices and e-policies
+    content: One RA of the Renewal module, one RA of Employee Benefits and one RA of a submitted policy (document type RENEWAL_ADVICE); a confirmed e-policy on the CBG account; an account without a confirmed e-policy; a second client "UAT CSF Client Two" without a registered e-mail.
+    source: RAs loaded as RENEWAL_ADVICE attachments by the test lead until the Renewal and EB modules produce them (dependency D-CSF-01); e-policy from Issuance (BRD-1)
+  - id: TD-CSF-07
+    name: Files to upload
+    content: HEIF photo (2 MB); one file each of TXT, RTF, GIF, BMP, TIFF, WEBP, DOC, DOCX, XLS, XLSX, ODS, CSV, PNG, JPG and PDF; an .exe file; the same .exe renamed .pdf; an empty (0 byte) PDF; a PDF above the platform size limit.
+    source: Test document folder of the test lead (no client data)
+  - id: TD-CSF-08
+    name: Documents of the client
+    content: A quotation PDF, a claims report (CLAIM_REPORT) of a claim of TD-CSF-02, an invoice document, and a document of a type that the access classes do not open to the CSF roles.
+    source: Attached on SIT by the test lead through the owning modules
+  - id: TD-CSF-09
+    name: Parameters as delivered
+    content: "LOGIN_MAX_FAILED_ATTEMPTS 3; CSF_SEARCH_MIN_CHARS 3; CSF_SEARCH_MAX_RESULTS 50; CSF_PAYMENT_HISTORY_MONTHS 12; CSF_VERIFY_MIN_MATCHES 2; CSF_VERIFICATION_VALID_MINUTES 30; CSF_VERIFY_MAX_FAILS 3; CSF_LEGACY_SYNC_ENABLED false."
+    source: Configuration delivered with the build (FRS section 9.1)
+  - id: TD-CSF-10
+    name: Test mailboxes
+    content: Registered e-mail of each test client and the other address used by the supervisor point to test mailboxes of the test lead; no real client address.
+    source: Test mail relay of SIT and UAT
+
+scenarios:
+  - id: SC-CSF-01
+    persona: SYSADMIN
+    title: Access and roles. Agents, supervisors and management log in, land on the Customer Search and see only the CSF actions of their role; role grants go through User Access requests.
+    pre: Users of TD-CSF-01 are active; parameters of TD-CSF-09.
+  - id: SC-CSF-02
+    persona: CSF_AGENT
+    title: Find the caller. The agent searches by name, client ID, account number, PN number and application number and opens the client.
+    pre: Search keys of TD-CSF-04.
+  - id: SC-CSF-03
+    persona: CSF_AGENT
+    title: Servicing view. The agent reads the client information, every account with its CSF status and the payment history.
+    pre: Client TD-CSF-02, accounts TD-CSF-03, payments TD-CSF-05.
+  - id: SC-CSF-04
+    persona: CSF_AGENT
+    title: Verify and update the contact. The agent verifies the caller, changes the mobile or e-mail with a reason, and the change is queued for QPS and EBIX while they coexist.
+    pre: Client TD-CSF-02; parameters TD-CSF-09.
+  - id: SC-CSF-05
+    persona: CSF_AGENT
+    title: Resend documents. The agent resends a renewal advice and an e-policy to the registered e-mail; the supervisor sends to another address with a reason.
+    pre: Documents TD-CSF-06; mailboxes TD-CSF-10.
+  - id: SC-CSF-06
+    persona: CSF_AGENT
+    title: Documents. The agent uploads documents to the client or an account and retrieves quotations, renewal advices and claims reports.
+    pre: Files TD-CSF-07; documents TD-CSF-08.
+  - id: SC-CSF-07
+    persona: CSF_MANAGEMENT
+    title: Audit and reports. Management prints or saves the audit trail, the Contact Changes report and the Agent Activity report.
+    pre: Scenarios SC-CSF-02 to SC-CSF-06 ran on the test day.
+  - id: SC-CSF-08
+    persona: INFRA
+    title: Backup and restore. The infrastructure team proves the 15-minute log archiving and a restore.
+    pre: Restore environment available; log archiving configured.
+
+frs:
+  FR-CSF-001:
+    scenario: SC-CSF-01
+    persona: CSF_AGENT
+    screen: LOGIN
+    data: [TD-CSF-01, TD-CSF-09]
+    conditions:
+      - An agent with valid credentials and a CSF role lands on the Customer Search.
+      - Wrong credentials are refused and no session is created.
+      - The account locks at the third consecutive failed attempt and only the System Administrator unlocks it.
+      - A user without a CSF role does not see the Customer Service Facility menu section.
+      - Every successful and failed log-in is recorded with user, time and source address.
+    cases:
+      - c: 1
+        type: Positive
+        title: Agent logs in and lands on the Customer Search
+        steps:
+          - Open the BIBS URL.
+          - Enter user ID agent1 and the password; click Sign in.
+        expected: The Customer Search opens as the first page. The side menu shows the section Customer Service Facility with Customer Search.
+      - c: 1
+        type: Positive
+        persona: CSF_SUPERVISOR
+        title: Supervisor logs in and lands on the Customer Search
+        steps:
+          - Log in as sup1.
+        expected: The Customer Search opens as the first page; the Reports entry of the menu lists the Customer Service category.
+      - c: 2
+        type: Negative
+        title: Log-in with a wrong password is refused
+        steps:
+          - Enter user ID agent1 and a wrong password; click Sign in.
+        expected: The Login page stays open and no session starts. The failed attempt is counted.
+        msg: [Invalid user name or password]
+      - c: 3
+        type: Boundary
+        neg: true
+        title: The third failed attempt locks the account
+        steps:
+          - Enter user ID agent2 with a wrong password three times.
+          - Enter the correct password.
+        expected: The third wrong attempt locks the account; the correct password is then refused.
+        msg: [Account is locked. Contact your administrator.]
+      - c: 3
+        type: Boundary
+        title: Two failed attempts do not lock the account
+        steps:
+          - Enter user ID agent2 with a wrong password twice.
+          - Enter the correct password.
+        expected: The log-in succeeds and the Customer Search opens; the failed-attempt count starts again from zero.
+      - c: 3
+        type: Workflow
+        persona: SYSADMIN
+        screen: USERS
+        title: The System Administrator unlocks the account
+        pre: agent2 is locked (TC-CSF-001.3-01).
+        steps:
+          - Log in as the System Administrator; open Administration > Users; select agent2; click Unlock.
+          - Log in as agent2 with the correct password.
+        expected: The status of agent2 changes from Locked to Active; agent2 logs in and lands on the Customer Search.
+      - c: 4
+        type: Security-access
+        persona: MKT_AO
+        title: A user without a CSF role has no CSF menu section
+        steps:
+          - Log in as ao.
+          - Open the side menu.
+          - Type the address /csf in the browser.
+        expected: The menu has no Customer Service Facility section; the direct address shows the no-access page and no client data loads.
+      - c: 5
+        type: Positive
+        persona: SYSADMIN
+        screen: AUDIT
+        title: Successful and failed log-ins appear in the audit trail
+        pre: Cases TC-CSF-001.1-01 and TC-CSF-001.2-01 ran today.
+        steps:
+          - Open Administration > Audit Trail; filter on today and the user agent1.
+        expected: One row for the failed attempt and one for the successful log-in, each with user, time and source address.
+
+  FR-CSF-002:
+    scenario: SC-CSF-01
+    persona: CSF_MANAGEMENT
+    screen: VIEW
+    data: [TD-CSF-01, TD-CSF-02]
+    conditions:
+      - Each CSF role sees only the screens and actions its permissions allow.
+      - A direct call without the permission is refused and the refusal is logged.
+      - CSF role grants change only through an approved User Access request.
+    cases:
+      - c: 1
+        type: Security-access
+        neg: false
+        title: Management sees the client but not the change, resend and upload actions
+        steps:
+          - Log in as mgmt1; search TD-CSF-02 and open the Servicing View.
+          - Look for Update Contact on the summary card, Resend on the Renewal Advice and E-policies tabs, and Upload on the Documents tab.
+        expected: The summary card and the tabs are shown. Update Contact, Resend and Upload are not shown.
+      - c: 1
+        type: Security-access
+        neg: false
+        persona: CSF_AGENT
+        screen: REPORTS
+        title: The agent has the servicing actions but no CSF reports
+        steps:
+          - Log in as agent1; open the Servicing View of TD-CSF-02.
+          - Open Reports > Report Centre.
+        expected: Update Contact, Resend and Upload are shown. The Customer Service report category is not listed.
+      - c: 2
+        type: Security-access
+        persona: CSF_AGENT
+        screen: API
+        title: Agent calls the resend to another address directly
+        steps:
+          - Log in as agent1 and take the token.
+          - Call the resend of an RA of TD-CSF-06 with a recipient other than the registered e-mail.
+          - Log in as the System Administrator and open Administration > Audit Trail.
+        expected: The call returns HTTP 403 and nothing is sent. The audit trail shows the refused call with user, endpoint and time.
+        msg: [You are not permitted to perform this action]
+        data: [TD-CSF-06]
+      - c: 2
+        type: Security-access
+        screen: API
+        title: Management calls the contact update directly
+        steps:
+          - Log in as mgmt1 and take the token.
+          - Call the contact update of TD-CSF-02 with a new mobile number.
+        expected: The call returns HTTP 403; the client's mobile number is unchanged.
+        msg: [You are not permitted to perform this action]
+      - c: 3
+        type: Workflow
+        persona: SYSADMIN
+        screen: ACCREQ
+        title: A supervisor role is granted through an approved request
+        steps:
+          - As the Requestor of BRD-11, raise a Modify user request that adds CSF_SUPERVISOR to agent2; submit it to an approver.
+          - Log in as agent2 before the approval and open Reports.
+          - Approve the request as the approver; log in as agent2 again.
+        expected: Before approval agent2 sees no Customer Service reports. After approval agent2 sees them, and the Resend dialog lets agent2 change the recipient.
+      - c: 3
+        type: Negative
+        persona: SYSADMIN
+        screen: USERS
+        title: A CSF role cannot be added by a direct edit of the user
+        steps:
+          - Log in as the System Administrator; open Administration > Users; open agent1 and try to add CSF_SUPERVISOR directly.
+        expected: The role cannot be saved directly while the emergency parameter UAM_DIRECT_ROLE_EDIT is false; the screen offers Raise request instead.
+        msg: [A group profile is changed only by implementing an approved request]
+
+  FR-CSF-010:
+    scenario: SC-CSF-02
+    persona: CSF_AGENT
+    screen: SEARCH
+    data: [TD-CSF-02, TD-CSF-04]
+    conditions:
+      - A name search lists the matching clients, each with its matching accounts; a single match opens the Servicing View directly.
+      - A client ID search matches the client code, the prospect code and the government ID number.
+      - An account number search matches the ARN with or without suffix, the policy number and the legacy account number of a migrated account.
+      - A PN number search returns the client of the account with that PN.
+      - An application number search returns the client of the placement billing item.
+      - A search with no result shows "No client found" with the criteria; a PN or application number known only to QPS, EBIX or LOS returns nothing.
+      - A blank value and a name shorter than 3 characters are refused, and more than 50 matching clients ask the agent to refine the search.
+      - Each search returns within 3 seconds and is written to the activity log with key type and criteria.
+    cases:
+      - c: 1
+        type: Positive
+        title: Name search lists clients grouped with their accounts
+        steps:
+          - Select Search by Name; enter "UAT CSF"; click Search.
+        expected: Both UAT CSF clients are listed, each with its matching accounts (ARN, product, CSF status).
+      - c: 1
+        type: Positive
+        title: A single match opens the Servicing View directly
+        steps:
+          - Select Search by Name; enter "UAT CSF Client One"; click Search.
+        expected: The Servicing View of TD-CSF-02 opens without a result list.
+      - c: 2
+        type: Positive
+        title: Client ID search on client code, prospect code and government ID
+        steps:
+          - Select Search by Client ID; search the client code of TD-CSF-02.
+          - Repeat with its prospect code, then with its government ID number.
+        expected: Each of the three searches returns TD-CSF-02.
+      - c: 3
+        type: Positive
+        title: Account number search on ARN, ARN without suffix, policy number and legacy number
+        steps:
+          - Select Search by Account No.; search the full ARN of the CBG account.
+          - Repeat with the ARN without its suffix, with the policy number, and with the legacy account number of the migrated account.
+        expected: Each search returns the client of the account with the account shown under it.
+      - c: 4
+        type: Positive
+        title: PN number search returns the client of the account
+        steps:
+          - Select Search by PN No.; enter the PN of the CBG account of TD-CSF-02.
+        expected: TD-CSF-02 is returned with the CBG account that carries the PN.
+      - c: 5
+        type: Positive
+        title: Application number search returns the client of the placement billing item
+        steps:
+          - Select Search by Application No.; enter the loan application number of TD-CSF-04.
+        expected: The client of the placement billing item is returned with the account.
+      - c: 6
+        type: Negative
+        title: Search with no result
+        steps:
+          - Select Search by Name; enter "ZZQ NO SUCH CLIENT"; click Search.
+        expected: No result list is shown; the page states that no client was found for the criteria entered.
+        msg: ["No client found for {Name ZZQ NO SUCH CLIENT}"]
+      - c: 6
+        type: Negative
+        title: PN known only to LOS returns nothing
+        steps:
+          - Select Search by PN No.; enter the PN of TD-CSF-04 that exists only in LOS.
+        expected: No client is found; the legacy lookup is not connected (CSQ01, CSQ02).
+        msg: ["No client found for {PN No. of TD-CSF-04}"]
+      - c: 7
+        type: Negative
+        title: Blank search value
+        steps:
+          - Select Search by Name; leave Value blank; click Search.
+        expected: The Value field is marked and no search runs.
+        msg: [Enter the value to search]
+      - c: 7
+        type: Boundary
+        neg: true
+        title: Name search with 2 characters
+        steps:
+          - Select Search by Name; enter "UA"; click Search.
+        expected: No search runs.
+        msg: [Enter at least 3 characters]
+      - c: 7
+        type: Boundary
+        title: Name search with 3 characters
+        steps:
+          - Select Search by Name; enter "UAT"; click Search.
+        expected: The search runs and lists the matching clients.
+      - c: 7
+        type: Boundary
+        neg: true
+        title: More than 50 clients match
+        steps:
+          - Select Search by Name; enter the surname of TD-CSF-04 shared by more than 50 clients; click Search.
+        expected: BIBS asks the agent to refine the search.
+        msg: [More than 50 clients match. Refine the search]
+      - c: 8
+        type: Positive
+        title: Search response time and activity log
+        steps:
+          - Run ten searches over the five key types during the peak window 10:00-12:00 and time each from click to result.
+          - As sup1, run the Agent Activity report for today and agent1.
+        expected: Every search returns within 3 seconds. The report lists each search with key type, criteria and time.
+
+  FR-CSF-011:
+    scenario: SC-CSF-03
+    persona: CSF_AGENT
+    screen: VIEW
+    data: [TD-CSF-02]
+    conditions:
+      - The Servicing View shows the client's current information and every account, CBG and non-CBG, with CSF status, BIBS stage, policy number, period and balance.
+      - Each tab loads on its own within 3 seconds; a tab whose source does not answer shows a message and the other tabs still work.
+      - A contact change made in BIBS shows at once in the Servicing View.
+      - Only users with CLIENT_VIEW see the link to the full client page.
+      - Each opening of a Servicing View is written to the activity log.
+    cases:
+      - c: 1
+        type: Positive
+        title: Client with a CBG and a non-CBG account
+        steps:
+          - Search TD-CSF-02 and open it.
+          - Read the summary card and the Accounts tab.
+        expected: The summary card shows code, name, status, flags and contact details. The Accounts tab lists the CBG Motor and the non-CBG Property account, each with CSF status, BIBS stage, policy number, period and balance.
+      - c: 2
+        type: Positive
+        title: Each tab loads within 3 seconds
+        steps:
+          - Open each tab in turn (Accounts, Payments, Renewal Advice, E-policies, Documents, Contact History) and time it.
+        expected: Every tab shows its data within 3 seconds.
+      - c: 2
+        type: Negative
+        title: A source module does not answer
+        pre: The test lead stops the invoice ledger service on SIT for the test (or blocks its query endpoint).
+        steps:
+          - Open the Payments tab.
+          - Open the Accounts and Documents tabs.
+        expected: The Payments tab shows the message; the Accounts and Documents tabs load normally.
+        msg: [Information not available now. Try again]
+      - c: 3
+        type: Workflow
+        persona: SYSADMIN
+        title: A contact change made in the client master shows at once
+        steps:
+          - As a user with CLIENT_MAINTAIN, change the phone number of TD-CSF-02 in Client Management.
+          - As agent1, refresh the Servicing View of TD-CSF-02.
+        expected: The new phone number is shown on the summary card.
+      - c: 4
+        type: Security-access
+        title: The agent has no link to the full client page
+        steps:
+          - As agent1, open the Servicing View of TD-CSF-02 and look for Open client page.
+          - Type the client page address /crm/clients/{id}.
+        expected: The link is not shown; the direct address shows the no-access page.
+      - c: 5
+        type: Positive
+        persona: CSF_SUPERVISOR
+        screen: REPORTS
+        title: Servicing View openings are logged
+        steps:
+          - As agent1 open TD-CSF-02 twice.
+          - As sup1 run the Agent Activity report for today and agent1.
+        expected: Two view rows with agent, client and time.
+
+  FR-CSF-012:
+    scenario: SC-CSF-03
+    persona: CSF_AGENT
+    screen: ACCTS
+    data: [TD-CSF-03]
+    conditions:
+      - An account awaiting payment shows the CSF status Awaiting next to the BIBS stage AWAITING_PAYMENT.
+      - Draft and submitted accounts show Pending; a booked account with premium outstanding shows Booked; a booked account in force shows Open; a cancelled account or an ended policy period shows Closed.
+      - A change to the mapping list changes the displayed status without a new build, and the change is audited.
+      - Only the list maintainers can change the mapping.
+    cases:
+      - c: 1
+        type: Positive
+        title: Awaiting payment account
+        steps:
+          - Open the Accounts tab of the client of TD-CSF-03; find the AWAITING_PAYMENT account.
+        expected: The account shows the CSF status pill Awaiting and the stage AWAITING_PAYMENT.
+      - c: 2
+        type: Positive
+        title: Pending, Booked, Open and Closed accounts
+        steps:
+          - On the same tab read the status of the DRAFT, SUBMITTED, BOOKED with premium outstanding, BOOKED and paid, CANCELLED and period-ended accounts.
+        expected: DRAFT and SUBMITTED show Pending; BOOKED with premium outstanding shows Booked; BOOKED and paid in force shows Open; CANCELLED and the ended period show Closed.
+      - c: 2
+        type: Negative
+        title: A cancelled account is not shown as Open
+        steps:
+          - Read the CANCELLED account; cancel the booked and paid account in BRD-1 and read it again.
+        expected: Both cancelled accounts show Closed; neither shows Open or Booked.
+      - c: 3
+        type: Workflow
+        persona: SYSADMIN
+        screen: LOV
+        title: Change the mapping of RETURNED_TO_MARKETING
+        steps:
+          - Open Broking Setup > Lists of Values, CSF_STATUS_MAP; change the row of RETURNED_TO_MARKETING from Pending to Awaiting; have a second user approve it.
+          - As agent1, reopen the Accounts tab of an account in RETURNED_TO_MARKETING.
+          - Open Administration > Audit Trail for the list.
+        expected: The account shows Awaiting without a new build; the audit trail shows the row change with old and new value and the user.
+      - c: 4
+        type: Security-access
+        screen: LOV
+        title: The agent cannot change the mapping
+        steps:
+          - As agent1, type the address of Lists of Values, type CSF_STATUS_MAP.
+        expected: The screen is not in the menu and the direct address shows the no-access page.
+
+  FR-CSF-013:
+    scenario: SC-CSF-03
+    persona: CSF_AGENT
+    screen: PAY
+    data: [TD-CSF-05]
+    conditions:
+      - The Payments tab lists the payments of the last 12 months, newest first, with receipt number, date, mode, amount, invoices applied, and the balance and payment status of each invoice.
+      - A payment applied to two invoices shows both invoices and the remaining balance of each.
+      - Payments older than the window appear only after Show older.
+      - The account filter shows only the payments of the selected account.
+      - The window follows parameter CSF_PAYMENT_HISTORY_MONTHS.
+    cases:
+      - c: 1
+        type: Positive
+        title: Payments of the last 12 months
+        steps:
+          - Open the Payments tab of TD-CSF-02.
+        expected: The receipts of the last 12 months are listed newest first with receipt number, date, mode, amount, invoices applied, invoice balance and payment status.
+      - c: 2
+        type: Positive
+        title: Payment applied to two invoices
+        steps:
+          - Find the receipt of TD-CSF-05 applied to two invoices.
+        expected: The row shows both invoice numbers, the amount applied to each and the balance left on each.
+      - c: 3
+        type: Boundary
+        neg: true
+        title: A receipt 12 months and 1 day old is outside the window
+        steps:
+          - Look for the receipt dated 12 months and 1 day before today.
+        expected: The receipt is not listed.
+      - c: 3
+        type: Boundary
+        title: Show older brings the older receipts
+        steps:
+          - Click Show older.
+        expected: The receipt of 12 months and 1 day and the older receipts appear below the others.
+      - c: 4
+        type: Negative
+        title: Account filter hides the other account's payments
+        steps:
+          - Filter the tab on the CBG account.
+        expected: Only receipts applied to invoices of the CBG account are shown; the Property account receipts are hidden.
+      - c: 5
+        type: Positive
+        persona: SYSADMIN
+        screen: PARAMS
+        title: The window follows the parameter
+        steps:
+          - Set CSF_PAYMENT_HISTORY_MONTHS to 11 in Administration > System Parameters.
+          - As agent1, reopen the Payments tab; set the parameter back to 12.
+        expected: With 11, receipts older than 11 months are hidden until Show older; with 12 they are shown again.
+
+  FR-CSF-020:
+    scenario: SC-CSF-04
+    persona: CSF_AGENT
+    screen: UPDATE
+    data: [TD-CSF-02, TD-CSF-09]
+    conditions:
+      - A verification with at least 2 of the 4 checks matched passes and is recorded as PASSED with the channel.
+      - A verification with fewer matches fails, is recorded as FAILED and the update is not offered.
+      - A verification without any check recorded or without the channel is refused.
+      - A passed verification allows a change for 30 minutes; after that the agent verifies again.
+      - The third failed verification of the same client on one day raises an alert to the supervisors.
+    cases:
+      - c: 1
+        type: Positive
+        title: Verification with 3 of 4 matches passes
+        steps:
+          - Open TD-CSF-02; click Update Contact.
+          - Channel Hotline; Address Yes, Contact number Yes, E-mail Yes, Insured property No; confirm.
+        expected: The verification is recorded as PASSED and step 2 (contact fields) opens.
+      - c: 1
+        type: Boundary
+        title: Verification with exactly 2 matches passes
+        steps:
+          - Click Update Contact; Channel E-mail; Address Yes, Contact number Yes, E-mail No, Insured property No; confirm.
+        expected: The verification is PASSED and step 2 opens.
+      - c: 2
+        type: Boundary
+        neg: true
+        title: Verification with 1 match fails
+        steps:
+          - Click Update Contact; Channel Hotline; Address Yes, others No; confirm.
+        expected: The verification is recorded as FAILED; step 2 is not offered.
+        msg: [The caller could not be verified. The contact details cannot be changed]
+      - c: 2
+        type: Negative
+        title: Verification with no match fails
+        steps:
+          - Click Update Contact; Channel Website; all four checks No; confirm.
+        expected: The verification is FAILED and the update is not offered.
+        msg: [The caller could not be verified. The contact details cannot be changed]
+      - c: 3
+        type: Negative
+        title: Confirm without recording the checks
+        steps:
+          - Click Update Contact; select the channel; leave the four checks unanswered; confirm.
+        expected: Nothing is recorded and the checks are marked.
+        msg: [Record the result of the verification checks]
+      - c: 4
+        type: Boundary
+        title: Change 29 minutes after the verification
+        pre: A PASSED verification of TD-CSF-02 was recorded 29 minutes ago (the test lead sets the time in the test database, or the tester waits).
+        steps:
+          - Open step 2, change the mobile number, select a reason and save.
+        expected: The change is saved without a new verification.
+      - c: 4
+        type: Boundary
+        neg: true
+        title: Change 31 minutes after the verification
+        pre: A PASSED verification of TD-CSF-02 was recorded 31 minutes ago.
+        steps:
+          - Save a mobile change from the open step 2.
+        expected: The change is refused and BIBS asks for a new verification.
+        msg: [Verify the caller before changing the contact details]
+      - c: 5
+        type: Positive
+        persona: CSF_SUPERVISOR
+        screen: NOTIF
+        title: Third failed verification of one client in a day alerts supervisors
+        steps:
+          - As agent1 record three failed verifications of TD-CSF-02 today.
+          - As sup1 open the bell.
+        expected: One alert names TD-CSF-02, the agent and the three failures.
+      - c: 5
+        type: Boundary
+        persona: CSF_SUPERVISOR
+        screen: NOTIF
+        title: Two failed verifications raise no alert
+        pre: No failed verification of "UAT CSF Client Two" today.
+        steps:
+          - As agent1 record two failed verifications of UAT CSF Client Two.
+          - As sup1 open the bell.
+        expected: No alert for UAT CSF Client Two.
+
+  FR-CSF-021:
+    scenario: SC-CSF-04
+    persona: CSF_AGENT
+    screen: UPDATE
+    data: [TD-CSF-02, TD-CSF-09]
+    conditions:
+      - After a passed verification the agent changes e-mail, mobile, phone or address with a reason; the change gets a CSF-yyyy-nnnnnn number and the Contact History shows old and new values, verification, agent and reason.
+      - A change without a passed verification is refused.
+      - A change of any other field (name, civil status, ID) is refused and names the fulfilment unit.
+      - An invalid e-mail or mobile number, or a missing reason, is refused.
+      - The saved contact is used at once by every BIBS module and is saved within 3 seconds.
+      - The contacts of the client's open accounts are not changed (client master only, until CSQ14).
+    cases:
+      - c: 1
+        type: Positive
+        title: Verified agent changes the mobile number
+        pre: A PASSED verification of TD-CSF-02 younger than 30 minutes.
+        steps:
+          - In step 2 change Mobile to a new test number; Reason "Client request"; click Save.
+          - Open the Contact History tab.
+        expected: A confirmation shows the change number CSF-yyyy-nnnnnn. The Contact History shows the old and new mobile, the verification reference, agent1, the reason and the time.
+      - c: 1
+        type: Positive
+        title: Verified agent changes the e-mail and the address lines
+        pre: A PASSED verification of TD-CSF-02.
+        steps:
+          - Change E-mail and Address line 1; Reason "Correction"; save.
+        expected: Both fields are saved under one change number; the Contact History shows one row per field.
+      - c: 2
+        type: Negative
+        screen: API
+        title: Contact change without a verification
+        pre: No verification of UAT CSF Client Two today.
+        steps:
+          - Call the contact update of UAT CSF Client Two with a new mobile number using agent1's token.
+        expected: The change is refused and nothing is saved.
+        msg: [Verify the caller before changing the contact details]
+      - c: 3
+        type: Negative
+        screen: API
+        title: Civil status change is refused
+        pre: A PASSED verification of TD-CSF-02.
+        steps:
+          - Call the contact update of TD-CSF-02 with a civil status value.
+        expected: The change is refused and recorded as REFUSED; the civil status is unchanged.
+        msg: ["{Civil status} cannot be changed here. Refer the client to the fulfilment unit"]
+      - c: 3
+        type: Negative
+        title: The name is not editable in step 2
+        steps:
+          - Open step 2 after a passed verification.
+        expected: Only E-mail, Mobile, Phone, Address lines and Reason are editable; name, civil status and ID are not on the form.
+      - c: 4
+        type: Negative
+        title: Invalid e-mail
+        steps:
+          - In step 2 enter E-mail "client.at.test"; select a reason; save.
+        expected: The field is marked and nothing is saved.
+        msg: [Enter a valid e-mail address]
+      - c: 4
+        type: Negative
+        title: Invalid mobile number
+        steps:
+          - In step 2 enter Mobile "12345"; select a reason; save.
+        expected: The field is marked and nothing is saved.
+        msg: [Enter a valid mobile number]
+      - c: 4
+        type: Negative
+        title: No reason selected
+        steps:
+          - In step 2 change the phone; leave Reason blank; save.
+        expected: Reason is marked and nothing is saved.
+        msg: [Select the reason for the change]
+      - c: 5
+        type: Workflow
+        persona: SYSADMIN
+        title: The new mobile is used at once by Client Management and saved within 3 seconds
+        pre: TC-CSF-021.1-01 is done.
+        steps:
+          - Time the save of TC-CSF-021.1-01 from click to confirmation.
+          - Open TD-CSF-02 in Client Management (CLIENT_VIEW user).
+        expected: The save took less than 3 seconds; the client page shows the new mobile number.
+      - c: 6
+        type: Negative
+        persona: SYSADMIN
+        title: Contacts on the open accounts stay unchanged
+        pre: TC-CSF-021.1-02 is done.
+        steps:
+          - Open the booked CBG account of TD-CSF-02 in the BRD-1 account screen and read its contact e-mail.
+        expected: The account keeps the e-mail it had before the change; only the client master carries the new e-mail.
+
+  FR-CSF-022:
+    scenario: SC-CSF-04
+    persona: SYSADMIN
+    screen: HIST
+    data: [TD-CSF-02, TD-CSF-09]
+    conditions:
+      - With the legacy sync disabled, each contact change is stored in the outbox with status Not configured and nothing is sent.
+      - The CSF Contact Changes report lists the sync status of each change.
+      - With the sync enabled, the job sends the queued rows and sets SENT; a failed sending is retried, set FAILED and raises an alert.
+      - Every outbox row keeps its payload so the outbox can be replayed.
+    cases:
+      - c: 1
+        type: Positive
+        persona: CSF_AGENT
+        title: Sync status Not configured on a new change
+        pre: CSF_LEGACY_SYNC_ENABLED is false; TC-CSF-021.1-01 is done.
+        steps:
+          - Open the Contact History tab of TD-CSF-02.
+        expected: The mobile change shows the sync status Not configured for QPS and for EBIX.
+      - c: 1
+        type: Negative
+        persona: SYSADMIN
+        screen: JOBS
+        title: A manual run of the sync job sends nothing while sync is off
+        steps:
+          - Open Administration > Scheduled Jobs; run CSF_LEGACY_SYNC now.
+          - Open the Contact History tab of TD-CSF-02.
+        expected: The run completes with 0 rows sent; the change stays Not configured.
+      - c: 2
+        type: Report-output
+        persona: CSF_MANAGEMENT
+        screen: REPORTS
+        title: Contact Changes report shows the sync status
+        steps:
+          - Run CSF-CONTACT-CHANGES for today.
+        expected: Each change row shows the sync status (Not configured for the changes of today).
+      - c: 3
+        type: Workflow
+        persona: SYSADMIN
+        screen: JOBS
+        title: Sync enabled against the test interface sends the queued rows
+        pre: A test stub of the QPS / EBIX interface is available on SIT (only after BDOI specifies it, CSQ01); CSF_LEGACY_SYNC_ENABLED set to true.
+        steps:
+          - Make a contact change as agent1.
+          - Run CSF_LEGACY_SYNC; open the Contact History.
+        expected: The change moves from Queued to Sent for QPS and EBIX; the stub received the payload.
+      - c: 3
+        type: Negative
+        persona: SYSADMIN
+        screen: NOTIF
+        title: A failed sending is retried, set FAILED and alerted
+        pre: As the case before; the stub is stopped.
+        steps:
+          - Make a contact change; run CSF_LEGACY_SYNC until the retries are used up.
+          - Open the bell and the Contact History.
+        expected: The row shows Failed with the last error and the number of attempts; alert CSF_SYNC_FAILED is raised.
+      - c: 4
+        type: Positive
+        persona: SYSADMIN
+        screen: JOBS
+        title: Outbox rows keep the payload for replay
+        steps:
+          - Open the outbox rows of TD-CSF-02 (Scheduled Jobs, CSF_LEGACY_SYNC, run detail or the outbox view of the job).
+        expected: Each row holds the client, the fields with old and new values and the change number, so it can be sent again later.
+
+  FR-CSF-030:
+    scenario: SC-CSF-05
+    persona: CSF_AGENT
+    screen: RA
+    data: [TD-CSF-06, TD-CSF-10]
+    conditions:
+      - The Renewal Advice tab lists every RENEWAL_ADVICE document of the client and its accounts, from Renewal, Employee Benefits and submitted policies.
+      - The agent views and downloads an RA.
+      - A resend goes to the registered e-mail as a password-protected file; the password arrives in a separate e-mail; the resend is logged.
+      - An agent cannot change the recipient; a supervisor sends to another address only with a reason and a valid address.
+      - A client without a registered e-mail cannot receive a resend.
+      - A client without RA shows an empty tab.
+    cases:
+      - c: 1
+        type: Positive
+        title: RAs from Renewal, Employee Benefits and submitted policies are listed
+        steps:
+          - Open the Renewal Advice tab of TD-CSF-02.
+        expected: The three RAs of TD-CSF-06 are listed with account, source module and date.
+      - c: 2
+        type: Upload-download
+        title: View and download an RA
+        steps:
+          - Click the EB RA to preview it; click Download.
+        expected: The RA opens in the preview; the downloaded PDF is the same document.
+      - c: 3
+        type: Workflow
+        title: Resend an EB renewal advice to the registered e-mail
+        steps:
+          - Select the EB RA; click Resend; check the recipient and the preview; confirm.
+          - Open the test mailbox of the registered e-mail.
+        expected: BIBS confirms the resend. Two e-mails arrive - the RA as a protected PDF, then the password; the PDF opens only with that password.
+      - c: 4
+        type: Security-access
+        title: The agent cannot change the recipient
+        steps:
+          - Select an RA; click Resend.
+        expected: The recipient field shows the registered e-mail and is read only for agent1.
+      - c: 4
+        type: Workflow
+        persona: CSF_SUPERVISOR
+        screen: RESEND
+        title: Supervisor sends to another address with a reason
+        steps:
+          - As sup1 select the Renewal RA; click Resend; enter the test address of TD-CSF-10 and the reason "Client asked for the office e-mail"; confirm.
+        expected: The RA and the password go to the other address; the activity log shows the recipient and the reason.
+      - c: 4
+        type: Negative
+        persona: CSF_SUPERVISOR
+        screen: RESEND
+        title: Other address without a reason
+        steps:
+          - As sup1 click Resend; enter another address; leave Reason blank; confirm.
+        expected: Reason is marked and nothing is sent.
+        msg: [Enter the reason for sending to another address]
+      - c: 4
+        type: Negative
+        persona: CSF_SUPERVISOR
+        screen: RESEND
+        title: Other address that is not an e-mail address
+        steps:
+          - As sup1 click Resend; enter "client@@test"; enter a reason; confirm.
+        expected: The address is refused and nothing is sent.
+        msg: [Enter a valid e-mail address]
+      - c: 5
+        type: Negative
+        title: Client without a registered e-mail
+        pre: UAT CSF Client Two has an RA and no registered e-mail.
+        steps:
+          - Open the Renewal Advice tab of UAT CSF Client Two; select the RA; click Resend.
+        expected: The resend is refused.
+        msg: [The client has no registered e-mail. Update the contact details first]
+      - c: 6
+        type: Negative
+        title: Client without RA
+        pre: A client of TD-CSF-03 has no RENEWAL_ADVICE document.
+        steps:
+          - Open the Renewal Advice tab of that client.
+        expected: The tab shows the empty state and no Resend button.
+        msg: [No items to display]
+
+  FR-CSF-031:
+    scenario: SC-CSF-05
+    persona: CSF_AGENT
+    screen: EPOL
+    data: [TD-CSF-06, TD-CSF-10]
+    conditions:
+      - The agent resends the confirmed e-policy to the registered e-mail; it arrives protected with the password separately and appears in the e-policy dispatch report and the activity log.
+      - An account without a confirmed e-policy offers no resend, and a direct call is refused.
+      - The agent resends without holding EPOLICY_SEND and cannot use the Issuance send screen.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Resend a confirmed e-policy
+        steps:
+          - Open the E-policies tab of TD-CSF-02; select the confirmed e-policy; click Resend; confirm the recipient.
+          - Open the test mailbox; open the e-policy dispatch report of Issuance for today.
+        expected: BIBS confirms the dispatch. The e-policy arrives protected and the password arrives in a separate e-mail. The dispatch report lists the resend with agent1 as sender.
+      - c: 2
+        type: Negative
+        title: No resend for an account without a confirmed e-policy
+        steps:
+          - Open the E-policies tab; look at the account without a confirmed e-policy.
+        expected: No e-policy and no Resend button are shown for that account.
+      - c: 2
+        type: Negative
+        screen: API
+        title: Direct resend call for an account without a confirmed e-policy
+        steps:
+          - Call the e-policy resend of that account with agent1's token.
+        expected: The call is refused and nothing is sent.
+        msg: [The account has no confirmed e-policy]
+      - c: 3
+        type: Security-access
+        title: The agent cannot use the Issuance e-policy send screen
+        steps:
+          - As agent1 type the address of the Issuance e-policy screen of the CBG account.
+        expected: The screen is not offered (no EPOLICY_SEND); only the CSF resend is available.
+
+  FR-CSF-032:
+    scenario: SC-CSF-06
+    persona: CSF_AGENT
+    screen: DOCS
+    data: [TD-CSF-02, TD-CSF-07]
+    conditions:
+      - The agent uploads a document to the client or one of its accounts with a document type; BIBS stores it, confirms and lists it on the Documents tab.
+      - Every file type of the BRD list is accepted, including the seven types added to the platform list.
+      - A file type that is not allowed, or content that does not match the extension, is refused and nothing is stored.
+      - An empty file, a file above the size limit and a missing file are refused.
+      - An upload completes within 5 seconds and is logged with target, file name, size and hash.
+      - A user without CSF_DOCUMENT_UPLOAD cannot upload.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Upload a HEIF photo to an account
+        steps:
+          - Click Upload; Attach to the CBG account; Document type from the list; choose the HEIF photo; confirm.
+        expected: BIBS confirms the upload; the photo is listed on the Documents tab under the account with its type, name and date.
+      - c: 1
+        type: Upload-download
+        title: Upload a PDF to the client
+        steps:
+          - Click Upload; Attach to Client; choose a document type and the PDF; confirm.
+        expected: The PDF is stored and listed under the client.
+      - c: 2
+        type: Upload-download
+        title: The seven added types are accepted
+        steps:
+          - Upload one TXT, RTF, GIF, BMP, TIFF and WEBP file and a HEIC photo to the client.
+        expected: All seven uploads are stored and listed.
+      - c: 2
+        type: Upload-download
+        title: Office, spreadsheet and image types are accepted
+        steps:
+          - Upload one DOC, DOCX, XLS, XLSX, ODS, CSV, PNG and JPG file.
+        expected: All eight uploads are stored and listed.
+      - c: 3
+        type: Negative
+        title: Executable file refused
+        steps:
+          - Upload the .exe file.
+        expected: The upload is refused and nothing is stored.
+        msg: [The file type is not allowed]
+      - c: 3
+        type: Negative
+        title: Renamed executable with a .pdf extension refused
+        steps:
+          - Upload the .exe file renamed .pdf.
+        expected: The upload is refused and nothing is stored.
+        msg: [The file content does not match its type]
+      - c: 4
+        type: Negative
+        title: Empty file refused
+        steps:
+          - Upload the 0-byte PDF.
+        expected: The upload is refused.
+        msg: [The file is empty]
+      - c: 4
+        type: Boundary
+        neg: true
+        title: File above the size limit refused
+        steps:
+          - Upload the PDF above the platform size limit.
+        expected: The upload is refused.
+        msg: [The file is larger than the allowed size]
+      - c: 4
+        type: Negative
+        title: Confirm without a file
+        steps:
+          - Click Upload; select the target and type; confirm without choosing a file.
+        expected: The File field is marked.
+        msg: [Choose the file to upload]
+      - c: 5
+        type: Positive
+        persona: SYSADMIN
+        screen: AUDIT
+        title: Upload time and log entry
+        steps:
+          - Time the HEIF upload of TC-CSF-032.1-01 from confirm to confirmation.
+          - Open Administration > Audit Trail for the attachment.
+        expected: The upload took less than 5 seconds; the log shows agent1, the target account, file name, size and hash.
+      - c: 6
+        type: Security-access
+        persona: CSF_MANAGEMENT
+        title: Management cannot upload
+        steps:
+          - As mgmt1 open the Documents tab of TD-CSF-02.
+          - Call the attachment upload for the client with mgmt1's token.
+        expected: No Upload button; the call returns HTTP 403.
+        msg: [You are not permitted to perform this action]
+
+  FR-CSF-033:
+    scenario: SC-CSF-06
+    persona: CSF_AGENT
+    screen: DOCS
+    data: [TD-CSF-02, TD-CSF-08]
+    conditions:
+      - The Documents tab lists the documents of the client, its accounts, quotations, placement records and invoices, grouped by type, including the claims report.
+      - The agent previews a document, downloads one, or downloads a selection as a ZIP file; each download is logged.
+      - Document types that the access classes do not open to the CSF roles are not listed.
+      - A client without documents shows an empty tab.
+      - Documents are retrieved within 5 seconds.
+    cases:
+      - c: 1
+        type: Positive
+        title: Documents grouped by type, with the claims report
+        steps:
+          - Open the Documents tab of TD-CSF-02.
+        expected: The documents are grouped as quotations, renewal advices, e-policies, claims reports and others; the claims report of TD-CSF-08 is listed.
+      - c: 2
+        type: Upload-download
+        title: Preview a quotation PDF
+        steps:
+          - Click the quotation PDF.
+        expected: The quotation opens in the preview.
+      - c: 2
+        type: Upload-download
+        title: Download three documents as a ZIP file
+        steps:
+          - Tick the quotation, the claims report and the invoice document; click Download as ZIP.
+          - As sup1 run the Agent Activity report for today.
+        expected: One ZIP file with the three documents is downloaded; the report shows the ZIP download with the three documents.
+      - c: 3
+        type: Security-access
+        title: A restricted document type is not listed
+        steps:
+          - Look for the restricted document of TD-CSF-08 on the Documents tab.
+          - Call the attachment download of that document with agent1's token.
+        expected: The document is not listed; the call returns HTTP 403.
+        msg: [You are not permitted to perform this action]
+      - c: 4
+        type: Negative
+        title: Client without documents
+        pre: A masked client with no documents.
+        steps:
+          - Open the Documents tab of that client.
+        expected: The tab shows the empty state.
+        msg: [No items to display]
+      - c: 5
+        type: Positive
+        title: Retrieval within 5 seconds
+        steps:
+          - Time the opening of the Documents tab and the preview of the claims report.
+        expected: Each completes within 5 seconds.
+
+  FR-CSF-040:
+    scenario: SC-CSF-07
+    persona: CSF_MANAGEMENT
+    screen: AUDIT
+    data: [TD-CSF-02]
+    conditions:
+      - A contact change made in the CSF is in the audit trail with entity, field, old and new value, user, time, source CSF, verification reference and reason.
+      - A change to client information made in another module is also in the audit trail with its source.
+      - No screen or service allows an audit row to be changed or deleted.
+    cases:
+      - c: 1
+        type: Positive
+        title: CSF contact change in the audit trail
+        pre: TC-CSF-021.1-01 is done.
+        steps:
+          - Open Administration > Audit Trail; filter entity type Client, client TD-CSF-02, today.
+        expected: The row shows the mobile field, old and new value, agent1, time, source CSF, the verification reference and the reason.
+      - c: 2
+        type: Positive
+        title: Client master change in the audit trail
+        pre: TC-CSF-011.3-01 is done.
+        steps:
+          - Filter the audit trail on TD-CSF-02 and today.
+        expected: The phone change is listed with old and new value, the Client Management user and source Client Management.
+      - c: 3
+        type: Security-access
+        persona: SYSADMIN
+        title: Audit rows cannot be changed or deleted
+        steps:
+          - As the System Administrator open an audit row; look for edit and delete actions.
+          - Try an update and a delete of the row through the API.
+        expected: No edit or delete action is offered; the API has no update or delete of audit rows and the calls are refused.
+
+  FR-CSF-041:
+    scenario: SC-CSF-07
+    persona: CSF_MANAGEMENT
+    screen: REPORTS
+    data: [TD-CSF-02]
+    conditions:
+      - Management runs the Contact Changes report for a period and saves it in Excel and PDF with the same rows.
+      - Management opens the audit trail filtered on client records and prints or saves it.
+      - A date range with the end before the start is refused.
+      - An agent cannot run the audit trail or the CSF reports.
+      - A report is generated within 5 seconds and each run is logged with user and parameters.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Contact Changes report of the month in Excel and PDF
+        steps:
+          - Open CSF-CONTACT-CHANGES; date range = this month; run.
+          - Export to Excel, then to PDF; also export to CSV.
+        expected: One row per changed field with change number, date and time, client, field, old and new value, verification, channel, agent, reason and sync status. The Excel, PDF and CSV files hold the same rows as the screen.
+      - c: 2
+        type: Report-output
+        screen: AUDIT
+        title: Audit trail of client records printed and saved
+        steps:
+          - Open Administration > Audit Trail; entity type Client; this month; run; print; save as PDF and Excel.
+        expected: The client record changes of the month are listed; the print preview and the two files hold the same rows.
+      - c: 3
+        type: Negative
+        title: End date before start date
+        steps:
+          - Run CSF-CONTACT-CHANGES with start 30 of this month and end 1 of this month.
+        expected: The report does not run.
+        msg: [The end date must be on or after the start date]
+      - c: 4
+        type: Security-access
+        persona: CSF_AGENT
+        title: The agent cannot run the audit trail or the CSF reports
+        steps:
+          - As agent1 open Reports and Administration.
+          - Call the run of CSF-CONTACT-CHANGES with agent1's token.
+        expected: The Customer Service category and the Audit Trail are not offered; the call returns HTTP 403.
+        msg: [You are not permitted to perform this action]
+      - c: 5
+        type: Positive
+        persona: SYSADMIN
+        screen: AUDIT
+        title: Report time and run log
+        steps:
+          - Time the run of TC-CSF-041.1-01.
+          - Open the audit trail for report runs today.
+        expected: The report was on screen within 5 seconds; the run and each export are logged with mgmt1 and the parameters.
+
+  FR-CSF-042:
+    scenario: SC-CSF-07
+    persona: CSF_SUPERVISOR
+    screen: REPORTS
+    data: [TD-CSF-02]
+    conditions:
+      - Every CSF action - search with criteria, view, download, RA resend, e-policy resend, upload and contact change - writes an activity row.
+      - The Agent Activity report shows counts per agent and day by action, then the detail rows.
+      - The activity log cannot be switched off, changed or deleted.
+      - A date range with the end before the start is refused.
+      - An agent cannot run the Agent Activity report.
+    cases:
+      - c: 1
+        type: Positive
+        title: Each CSF action writes an activity row
+        pre: agent2 performs one search, one view, one download, one RA resend, one e-policy resend, one upload and one contact change on TD-CSF-02 today.
+        steps:
+          - Run CSF-ACTIVITY for today and agent2.
+        expected: Seven detail rows, one per action, each with client, reference and time; the search row shows the key type and criteria.
+      - c: 2
+        type: Report-output
+        persona: CSF_MANAGEMENT
+        title: Counts per agent and day
+        steps:
+          - Run CSF-ACTIVITY for the test week, all agents; export to Excel.
+        expected: The summary shows counts per agent and day by action, followed by the detail rows; the Excel file holds the same figures.
+      - c: 3
+        type: Negative
+        persona: SYSADMIN
+        screen: PARAMS
+        title: No setting switches the activity log off
+        steps:
+          - Search System Parameters and Scheduled Jobs for a CSF activity log setting.
+          - Try an update and a delete of an activity row through the API.
+        expected: No parameter or job disables the log; the API offers no update or delete and the calls are refused.
+      - c: 4
+        type: Negative
+        title: End date before start date
+        steps:
+          - Run CSF-ACTIVITY with the end date before the start date.
+        expected: The report does not run.
+        msg: [The end date must be on or after the start date]
+      - c: 5
+        type: Security-access
+        persona: CSF_AGENT
+        title: The agent cannot run the Agent Activity report
+        steps:
+          - As agent1 call the run of CSF-ACTIVITY.
+        expected: The call returns HTTP 403.
+        msg: [You are not permitted to perform this action]
+
+  FR-CSF-043:
+    scenario: SC-CSF-08
+    persona: INFRA
+    screen: DB
+    conditions:
+      - The database log is archived at least every 15 minutes, and a daily base backup runs outside the peak hours.
+      - A restore recovers the database to a point less than 15 minutes before the test.
+      - Online response times stay within the targets while the log is archived.
+      - A failed archive or backup alerts the infrastructure team.
+    cases:
+      - c: 1
+        type: Positive
+        title: Archive interval and base backup schedule
+        steps:
+          - Read the database setting archive_timeout and the backup schedule.
+          - List the archived log segments of the last two hours.
+        expected: archive_timeout is 15 minutes or less; at least one segment is archived in every 15-minute window; the daily base backup runs outside 10:00-12:00 and 14:00-16:00.
+      - c: 2
+        type: Positive
+        title: Restore to a point less than 15 minutes before the test
+        steps:
+          - Note the time T; make a contact change on SIT at T minus 20 minutes and another at T minus 5 minutes.
+          - Restore the last base backup and the archived log on the restore environment up to the latest point.
+          - Check the two contact changes.
+        expected: The restored database holds the change made at T minus 20 minutes and is recovered to a point less than 15 minutes before T.
+      - c: 3
+        type: Positive
+        persona: CSF_AGENT
+        screen: SEARCH
+        title: Response times during archiving
+        steps:
+          - During an archive cycle run ten searches and open ten Servicing Views.
+        expected: Every search and view answers within 3 seconds.
+      - c: 4
+        type: Negative
+        title: Failed archive raises an alert
+        steps:
+          - Make the archive storage unavailable on the test environment; wait for the next archive attempt.
+        expected: The archive fails and the infrastructure team receives the alert; archiving resumes when the storage is back.
+
+access:
+  - action: Open the Customer Search and the Servicing View
+    screen: SEARCH
+    permission: CSF_VIEW
+    allow: [CSF_AGENT, CSF_SUPERVISOR, CSF_MANAGEMENT]
+    deny: [SYSADMIN, MKT_AO]
+    allowed: The Customer Search is the landing page and clients open in the Servicing View.
+    denied: Customer Service Facility is not in the menu; /csf shows the no-access page.
+  - action: Verify the caller and change contact details
+    screen: UPDATE
+    permission: CSF_CONTACT_UPDATE
+    allow: [CSF_AGENT, CSF_SUPERVISOR]
+    deny: [CSF_MANAGEMENT, SYSADMIN]
+    denied: Update Contact is not shown; the contact update call returns HTTP 403.
+  - action: Resend the RA or e-policy to the registered e-mail
+    screen: RESEND
+    permission: CSF_RESEND
+    allow: [CSF_AGENT, CSF_SUPERVISOR]
+    deny: [CSF_MANAGEMENT]
+    denied: Resend is not shown; the resend call returns HTTP 403.
+  - action: Resend to another address with a reason
+    screen: RESEND
+    permission: CSF_RESEND_OTHER
+    allow: [CSF_SUPERVISOR]
+    deny: [CSF_AGENT, CSF_MANAGEMENT]
+    allowed: The recipient field is editable and the reason is asked.
+    denied: The recipient is read only; a call with another recipient returns HTTP 403.
+  - action: Upload documents from the Servicing View
+    screen: DOCS
+    permission: CSF_DOCUMENT_UPLOAD
+    allow: [CSF_AGENT, CSF_SUPERVISOR]
+    deny: [CSF_MANAGEMENT]
+    denied: Upload is not shown; the upload call returns HTTP 403.
+  - action: Open and download documents
+    screen: DOCS
+    permission: ATTACHMENT_VIEW
+    allow: [CSF_AGENT, CSF_SUPERVISOR]
+    deny: [CSF_MANAGEMENT]
+    denied: Documents cannot be opened or downloaded; the download call returns HTTP 403.
+  - action: Run the Contact Changes and Agent Activity reports
+    screen: REPORTS
+    permission: CSF_REPORT_VIEW
+    allow: [CSF_SUPERVISOR, CSF_MANAGEMENT]
+    deny: [CSF_AGENT, SYSADMIN]
+    denied: The Customer Service category is not listed; the run call returns HTTP 403.
+  - action: Run the Audit Trail report (CTL-AUDIT)
+    screen: AUDIT
+    permission: AUDIT_VIEW
+    allow: [CSF_MANAGEMENT, SYSADMIN]
+    deny: [CSF_AGENT, CSF_SUPERVISOR]
+    denied: Audit Trail is not in the menu; the run call returns HTTP 403.
+  - action: Maintain users and roles
+    screen: USERS
+    permission: USER_MANAGE, ROLE_MANAGE
+    allow: [SYSADMIN]
+    deny: [CSF_AGENT, CSF_SUPERVISOR, CSF_MANAGEMENT]
+    denied: Administration > Users is not in the menu; the call returns HTTP 403.
+
+findings:
+  - fr: FR-CSF-001
+    issue: The FRS messages "Invalid user ID or password" and "Your account is locked. Contact the System Administrator" differ from the platform log-in that BRD-9 reuses (fit FIT), which shows "Invalid user name or password" and "Account is locked. Contact your administrator." Acceptance criterion 3 repeats FR-CSF-002.
+    proposal: Quote the platform texts in FRS v1.1, as FRS BRD-11 FR-UA-001 does; the cases use the platform texts. Keep criterion 3 in FR-CSF-002 only.
+  - fr: FR-CSF-010
+    issue: 'The response target "within 3 seconds (p.13)" gives no load: number of clients and accounts, concurrent agents. The FRS does not say whether a name search matches the start of the name, any word, or ignores accents and case.'
+    proposal: 'State the measurement load (24 concurrent users, the year-5 volume of section 8) and the name-matching rule; the cases time searches in the peak window on SIT data.'
+  - fr: FR-CSF-012
+    issue: The mapping list CSF_STATUS_MAP has no rule for an account stage that no row matches, or for two rows that match the same account. A cancelled account with premium outstanding could match Booked and Closed.
+    proposal: State that the first row by order wins and that an unmatched stage shows a fixed value (for example "Other") with an alert to the list owner.
+  - fr: FR-CSF-020
+    issue: 'The checks are Yes / No, so a check the agent did not ask cannot be recorded; "Record the result of the verification checks" does not say whether all four or only one must be answered. Whether a verification is also needed before a resend is open (CSQ03), and it is not stated whether a PASSED verification belongs to the agent or to any agent of the client.'
+    proposal: Add a value "Not asked", state how many checks must be answered, and tie the verification to the agent and client. The cases assume all four are answered and the verification is per agent.
+  - fr: FR-CSF-021
+    issue: '"Add" contact details depends on CSQ15 and cannot be tested; "Philippine mobile format" is not defined (09xxxxxxxxx, +639xxxxxxxxx or both); the phone rule "digits and separators" has no length.'
+    proposal: Define the accepted mobile and phone formats with examples and remove "add" until CSQ15 is answered; the cases use 12345 as an invalid mobile only.
+  - fr: FR-CSF-022
+    issue: Acceptance covers only the disabled sync. The sending, the number and interval of retries and the FAILED state cannot be tested until the interface is specified (CSQ01).
+    proposal: Give the retry count and interval as parameters; TC-CSF-022.3-01 and 3-02 stay Blocked until a test stub of the interface exists.
+  - fr: FR-CSF-030
+    issue: The RA password convention (CSQ06) is open, so the cases can check only that the file needs a password and that the password arrives separately, not its value.
+    proposal: Add the password rule to FR-CSF-030 when CSQ06 is answered; the cases are then extended with the expected password.
+  - fr: FR-CSF-032
+    issue: 'The maximum file size (CSQ08) is not given, so the "too large" boundary cannot be set; the 5-second upload target has no file size.'
+    proposal: State the size limit and the file size for the 5-second target; until then the test uses the platform limit and a 2 MB file.
+  - fr: FR-CSF-033
+    issue: The permissions matrix gives CSF_MANAGEMENT the Servicing View (CSF_VIEW) but not ATTACHMENT_VIEW. The FRS does not say whether management sees the Documents, Renewal Advice and E-policies tabs as a list without download, or not at all.
+    proposal: State the behaviour for management in section 3.3; the access checks assume the lists are shown and opening a document is refused.
+  - fr: FR-CSF-043
+    issue: The requirement is an infrastructure control and has no screen; the BRD's 4-hour RPO and backup (retention table) conflict with the 15-minute backup (CSQ11).
+    proposal: Keep FR-CSF-043 for the infrastructure team's evidence (restore test log) and record the CSQ11 answer; the cases are run by the infrastructure team and witnessed by QA.

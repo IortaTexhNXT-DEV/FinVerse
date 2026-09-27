@@ -1,0 +1,163 @@
+# Screen specifications of BRD-1 New Business: non-package placement through the Proposal Request Form (PRF).
+area: Non-package placement (PRF)
+screens:
+  - id: SCR-NB-09
+    title: Proposal Requests
+    route: /proposals
+    purpose: >-
+      The work list of Proposal Request Forms by stage, from the Account Officer's draft to the client's acceptance,
+      with the PRF reference, the ARN, the quotation and proposal slip numbers and the chosen insurer.
+    entry:
+      - Client record › Confirmed Proposals tab
+      - My Work links
+    shots:
+      - {state: list, user: ao, caption: "Proposal Requests, Drafts tab"}
+      - {state: tsu, user: tsu, path: "/proposals", tab: "With TSU", caption: "With TSU tab as seen by the TSU officer"}
+    fields:
+      - "Tabs | Drafts / For Approval / With TSU / With Client / Accepted / Not Proceeded | Tab | - | - | Fixed | Drafts | - | With TSU lists every TSU stage; With Client lists released and sent proposals | -"
+      - "Search | Search Proposal No. | Text | PRF reference, ARN or client | N | - | Blank | - | Contains search | -"
+      - "Search | Only My PRFs | Check box | - | N | - | Not ticked | - | PRFs created by the user | -"
+      - "List | Proposal No. | Column | PRF-yyyy-nnnnnn and the creation date | - | Numbering (PROPOSAL_NUMBER_PREFIX) | - | Read only | - | -"
+      - "List | ARN | Column | ARN-yyyy-nnnnnn | - | Numbering | - | Read only | - | -"
+      - "List | Client | Column | Name and code | - | Client master | - | Read only | - | -"
+      - "List | Product | Column | Product code | - | Product catalogue | - | Read only | - | -"
+      - "List | Sum Insured | Column | Total sum insured | - | PRF items | - | Read only | - | -"
+      - "List | Slips | Column | QS-yyyy-nnnnnn / PS-yyyy-nnnnnn | - | Numbering | - | Read only | - | -"
+      - "List | Chosen Insurer | Column | Insurer of the proposal slip | - | Insurer responses | - | Read only | - | -"
+      - "List | Stage | Column | Stage badge | - | Workflow NB_PROPOSAL | - | Read only | - | -"
+    actions:
+      - "TSU Workbench | TSU_PROCESS or TSU_APPROVE | Always | Opens the TSU Workbench | - | -"
+      - "New PRF | PROPOSAL_REQUEST | Always | Opens the New Proposal Request form | - | -"
+      - "Open a row | Every user of the screen | Always | Opens the PRF record | - | -"
+    rules:
+      - "The list is shared by Marketing and TSU; each sees and acts on the stages its permissions allow (FR-NB-050, FR-NB-052)."
+    outcome: Marketing and TSU follow every non-package request from draft to acceptance.
+    frs: [FR-NB-050, FR-NB-052]
+    tests: [PRFS]
+
+  - id: SCR-NB-10
+    title: New Proposal Request and Edit Proposal Request
+    route: /proposals/new
+    also: [/proposals/:id/edit]
+    purpose: >-
+      The Proposal Request Form: client and product line, risk details in free-form sections, the risk items, the
+      insurers Marketing asks TSU to approach, and the mandatory documents of the product. Marketing edits a draft; TSU
+      edits the PRF while it is in the TSU queue.
+    entry:
+      - Non-Package Management › New Proposal Request
+      - Proposal Requests › New PRF
+      - PRF record › Edit
+    shots:
+      - {state: empty, user: ao, caption: "New Proposal Request form"}
+      - {state: filled, user: ao, fill: prf_form, caption: "PRF with risk details, items and requested insurers"}
+      - {state: error, user: ao, submit: "^submit for approval$", caption: "Messages when the PRF is submitted without client and product"}
+    fields:
+      - "Client and product | Client or prospect | Look-up | Code or name | Y | Client master | From the client page, when opened from there | Draft (fixed once saved) | - | Select the client or prospect"
+      - "Client and product | Product line and risk code | Drop-down | Code – name; (non-package) marked | Y | Active products (BRD-3 catalogue) | Select | Draft (fixed once saved) | Non-package risks always go to TSU; a package risk only when a TSU rule applies | Select the product / No TSU rule applies to this package risk: quote it directly as a package quotation"
+      - "Client and product | Market segment | Drop-down | - | N | List of values MARKET_SEGMENT | The client's segment | Draft; TSU queue | The product must be offered to the segment | Product <code> is not offered to segment <segment>"
+      - "Client and product | Period from | Date | dd-MMM-yyyy | N | - | Blank | Draft; TSU queue | - | -"
+      - "Client and product | Period to | Date | dd-MMM-yyyy | N | - | Blank | Draft; TSU queue | After Period from | The period end must be after the period start"
+      - "Risk details | Heading | Text | Suggested headings: Description of the risk, Occupancy / operations, Loss history, Requested cover and limits | N | - | The four suggested headings | Draft; TSU queue | - | -"
+      - "Risk details | Details | Text area | Up to 4,000 characters per section | Cond.: risk details or risk items before submission | - | Blank | Draft; TSU queue | Sections without text are not saved | Describe the risk (sections or risk items) before submitting"
+      - "Risk items | [Vehicle, location, person or item fields] | As on New Quotation | As on New Quotation | Per the product's field rules | As on New Quotation | Blank | Draft; TSU queue | As on New Quotation | -"
+      - "Insurers requested | Insurer check boxes | Check boxes | One per active insurer | N | Insurer master | None | Draft; TSU queue | TSU confirms the list on the Quotation Slip tab | -"
+      - "Mandatory documents | Checklist | Checklist | One line per mandatory document of the product, Attached or Missing | - | Product document rules (BRD-3) | - | Read only | Every mandatory document before submission | Attach the mandatory documents: <documents>"
+      - "Documents | Documents | Documents panel | See Common screen elements | - | Documents | - | Draft; TSU queue | - | -"
+    actions:
+      - "Save Draft | PROPOSAL_REQUEST (TSU_PROCESS in the TSU queue) | Client and product chosen | Saves the PRF; the first save gives the PRF reference and the ARN | Draft PRF | -"
+      - "Submit for Approval | PROPOSAL_REQUEST | Draft | Saves, checks the risk details and the mandatory documents, and sends the PRF for Marketing approval | For Marketing approval | Workflow notice"
+    rules:
+      - "A PRF is approved by a Marketing TL, TH or UH other than its maker (FR-NB-051)."
+      - "The PRF carries the ARN used for every account created from it (FR-NB-047, FR-NB-050)."
+      - "A package risk is sent to TSU only when a TSU routing rule applies (FR-NB-005)."
+    outcome: The PRF is complete with its documents and waits for Marketing approval.
+    frs: [FR-NB-050, FR-NB-005, FR-NB-017]
+    tests: [NEWPRF]
+
+  - id: SCR-NB-11
+    title: Proposal Request record
+    route: /proposals/:id
+    parent: /proposals
+    purpose: >-
+      One PRF through all its stages. Marketing approves it; TSU accepts it, selects the insurers, prepares the
+      quotation slip for approval by a second TSU officer, keys in the insurer terms, recommends an insurer and prepares
+      the proposal slip; Marketing sends the proposal to the client, records the acceptance and creates the accounts.
+    entry:
+      - Proposal Requests › open a row
+      - TSU Workbench › open a row
+      - Client record › Confirmed Proposals tab
+    shots:
+      - {state: record, user: ao, open: first, caption: "PRF record, Details tab"}
+      - {state: qs, user: tsu, open: with_tsu, tab: "Quotation Slip", caption: "Quotation Slip tab: insurers approached"}
+      - {state: responses, user: tsu, open: terms_received, tab: "Insurer Responses", caption: "Insurer Responses tab with the terms received"}
+      - {state: comparative, user: tsu, open: terms_received, tab: "Comparative Table", caption: "Comparative Table tab"}
+      - {state: terms, user: tsu, open: terms_received, tab: "Insurer Responses", click: "^terms$", caption: "Terms dialog of one insurer"}
+    fields:
+      - "Summary | Client, Product, Period, Total sum insured, Insurers, Slips | Display | - | - | PRF | - | Read only | - | -"
+      - "Summary | TSU tag | Tag | The TSU routing reason on hover | - | TSU routing rules | - | Read only | - | -"
+      - "Details tab | Risk details, Risk items, Routing and insurers, Mandatory documents | Display | TSU routing, requested insurers, submitted, approved (Marketing), accounts | - | PRF | - | Read only | - | -"
+      - "Quotation Slip tab | Insurers approached | Check boxes | Active insurers of the panel | Y (at least one) | Insurer master | The insurers requested by Marketing | With TSU; quotation slip in preparation (TSU_PROCESS) | Insurers are chosen before the slip is submitted; each needs a placement e-mail address | Select at least one insurer of the panel for the quotation slip / <insurer> has no placement e-mail address"
+      - "Quotation Slip tab | Quotation slip | Display | QS number, reply date, PDF per insurer | - | Numbering (QUOTATION_SLIP_PREFIX) | - | Read only | - | -"
+      - "Quotation slip dialog | Insurers reply by | Date | dd-MMM-yyyy | N | - | Blank = today plus QUOTATION_SLIP_REPLY_DAYS (5) | Quotation slip in preparation | - | -"
+      - "Insurer Responses tab | Responses | Table | Insurer, Response, Premium, Rate %, Deductibles, Conditions, Valid Until, Document | - | Insurer responses | Pending per insurer | Read only (changed through the Terms dialog) | - | -"
+      - "Terms dialog | Response | Drop-down | Terms received, Declined to quote | Y | Fixed list | Terms received | Awaiting insurer terms; terms received (TSU_PROCESS) | Terms are keyed in after the quotation slip is sent | Insurer terms are keyed in after the quotation slip is sent"
+      - "Terms dialog | Premium | Amount | 0 or more | Y when terms are received | - | Blank | As above | Needed for received terms | Enter the premium quoted"
+      - "Terms dialog | Rate %, Valid until, Deductibles, Conditions, Remarks | Number / Date / Text | Rate 4 decimals | N | - | Blank | As above | - | -"
+      - "Terms dialog | Response document | File | The insurer's quotation or e-mail | N | - | - | As above | Stored as document type Insurer response | -"
+      - "Insurer Responses tab | Version history | Table | Changed, Response / Revision, Status, Premium, Valid Until, Recommended | - | Response history | - | Read only | - | -"
+      - "Comparative Table tab | Comparative table | Table | Insurer, Response, Premium (lowest marked), Rate %, Deductibles, Conditions, Valid Until, Remarks | - | Insurer responses | - | Read only | - | -"
+      - "Proposal slip dialog | Insurer of the proposal slip | Drop-down | Insurers with terms received, with premium; recommended marked | N | Insurer responses | The recommended insurer | Insurer terms received | An insurer with terms must be chosen or recommended | Choose the insurer (or flag the recommended one) for the proposal slip"
+      - "Proposal Slip tab | [Proposal slip and archived versions] | Display / Table | PS number and version, chosen insurer; File, Description, Archived, Download | - | Documents | - | Read only | - | -"
+      - "Send via Email dialog | To, Cc, Subject, Message, Password hint | Text | As on the quotation | To, Subject and Message Y | Client e-mail; standard text | Insurance proposal <PS No.> – <product> | Proposal slip released | At least one valid address | Enter at least one recipient"
+      - "Record Acceptance dialog | Client's acceptance e-mail, Risk groups accepted, Comment | File / Check boxes / Text area | As on the quotation | As on the quotation | - | - | Sent to client | The acceptance e-mail is attached first | Attach the client's acceptance e-mail first"
+    actions:
+      - "Edit | PROPOSAL_REQUEST in Draft; TSU_PROCESS with TSU or in quotation slip preparation | As stated | Opens the PRF form | - | -"
+      - "Submit for approval | PROPOSAL_REQUEST | Draft | Checks the risk details and documents | For Marketing approval | Workflow notice"
+      - "Approve and send to TSU | PROPOSAL_APPROVE; not the maker | For Marketing approval | Approves the PRF and places it in the TSU queue | Received by TSU | Workflow notice to the maker"
+      - "Return To Account Officer | PROPOSAL_APPROVE | For Marketing approval | Asks for the return reason and a comment | Draft PRF | Workflow notice to the maker"
+      - "Accept and Prepare Quotation Slip | TSU_PROCESS | Received by TSU | Accepts the PRF into quotation slip preparation | Quotation slip in preparation | Workflow notice"
+      - "Return to Marketing | TSU_PROCESS | Received by TSU | Asks for the return reason and a comment | Draft PRF | Workflow notice to the maker"
+      - "Save Selection | TSU_PROCESS | With TSU; quotation slip in preparation | Saves the insurers approached | Unchanged | -"
+      - "Submit quotation slip | TSU_PROCESS | Quotation slip in preparation | Asks for the reply date; numbers the quotation slip and sends it for approval | Quotation slip for approval | Workflow notice"
+      - "Approve and send to insurers | TSU_APPROVE; not the preparer | Quotation slip for approval | Approves the slip and e-mails it to each insurer's placement address | Awaiting insurer terms | E-mail to each insurer; workflow notice"
+      - "Return for correction | TSU_APPROVE | Quotation slip or proposal slip for approval | Asks for the return reason and a comment | Previous preparation stage | Workflow notice"
+      - "Terms / Recommend | TSU_PROCESS | Awaiting insurer terms; insurer terms received | Records or changes one insurer's terms (each change is a revision); marks the recommended insurer | Unchanged | -"
+      - "Insurer terms complete | TSU_PROCESS | Awaiting insurer terms | Closes the request for terms; with the option ticked, closes it although insurers have not answered | Insurer terms received | Workflow notice"
+      - "Submit proposal slip | TSU_PROCESS | Insurer terms received | Asks for the insurer of the slip; generates the proposal slip for approval | Proposal slip for approval | Workflow notice"
+      - "Approve and release to Marketing | TSU_APPROVE; not the preparer | Proposal slip for approval | Releases the proposal slip to Marketing | Proposal slip released to Marketing | Workflow notice to the maker"
+      - "PDF / Excel (comparative table, slips) | Every user of the screen | Once the slip exists | Downloads the document | - | -"
+      - "Send via Email | PROPOSAL_REQUEST | Proposal slip released | Sends the protected proposal slip and comparative table, and the password e-mail | Sent to client | E-mail to the client and the password e-mail"
+      - "Record acceptance / Client Declined | PROPOSAL_REQUEST | Sent to client | As on the quotation | Accepted / Not proceeded | Workflow notice"
+      - "Create accounts | PROPOSAL_REQUEST | Accepted; the client is confirmed | Creates one draft account per accepted risk group under the PRF's ARN, priced on the chosen insurer's terms | Converted | Workflow notice"
+      - "Void | PROPOSAL_REQUEST (with PROPOSAL_APPROVE or TSU_PROCESS in their stages) | Draft, for Marketing approval, received by TSU | Asks for the void reason and a comment | Voided | Workflow notice"
+    rules:
+      - "A quotation slip or a proposal slip is never approved by the TSU officer who prepared it (FR-NB-053, FR-NB-056)."
+      - "Insurer terms are kept with every revision; the comparative table marks the lowest premium and the recommended insurer (FR-NB-054, FR-NB-055)."
+      - "Documents sent to the client are password protected (FR-NB-013, FR-NB-057)."
+      - "Accounts are created only for a confirmed client (FR-NB-057)."
+    outcome: The client has accepted the proposal and its accounts exist in draft under the PRF's ARN.
+    frs: [FR-NB-051, FR-NB-052, FR-NB-053, FR-NB-054, FR-NB-055, FR-NB-056, FR-NB-057]
+    tests: [PRF]
+
+  - id: SCR-NB-12
+    title: TSU Workbench
+    route: /proposals/tsu
+    purpose: >-
+      The queues of the Technical Support Unit: one tile per PRF stage with open and overdue counts, and the work items
+      oldest due first. A TSU officer claims a PRF and opens it; a team leader assigns PRFs.
+    entry:
+      - Proposal Requests › TSU Workbench
+    shots:
+      - {state: list, user: tsu, caption: "TSU Workbench"}
+    fields:
+      - "Stage tiles | Received by TSU, Quotation slip in preparation, Quotation slip for approval, Awaiting insurer terms, Insurer terms received, Proposal slip for approval | Tile | Open and overdue counts | - | Workflow NB_PROPOSAL | - | - | A tile filters the list to its stage | -"
+      - "List | Reference, Description, Stage, From, In Stage, Due, Assignee | Column | Due in red when overdue | - | Work items | - | Read only | - | -"
+    actions:
+      - "Claim | Holder of the stage's permission | Unassigned item | Assigns the item to the user | Unchanged | -"
+      - "Assign | WORK_ASSIGN | Always | Opens the Assign dialog: a user of the stage's team, or back to the team queue | Unchanged | In-app notice to the new assignee"
+      - "Open a row | Every user of the screen | Always | Opens the PRF record | - | -"
+    rules:
+      - "An item is assigned only to a user who holds the permission of its stage (FR-NB-011)."
+    outcome: TSU works its PRFs by due time and nothing waits unnoticed.
+    frs: [FR-NB-052, FR-NB-011]
+    tests: [NPTSU]

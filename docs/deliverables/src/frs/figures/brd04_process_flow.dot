@@ -1,0 +1,47 @@
+// BRD-4 Collections: collection cycle by actor (FRS section 2.2; BRD p.40-42, BRCLXN.001-060).
+// Colour tokens (@HEADER_BLUE ...) are replaced by tools/deliverables before rendering.
+// Layout: three rows of three steps; the fill colour of a step is its actor (legend at the bottom).
+digraph clx_process {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.5, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=2.3, height=0.85, margin="0.1,0.05"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1, fontname="Arial", fontsize=9, fontcolor="@MUTED"];
+
+  s1 [label=<<b>1. Booking</b><br/><font point-size="9">Processing (BRD-1)<br/>invoice ledger</font>>, fillcolor="@WHITE"];
+  s2 [label=<<b>2. Nightly refresh</b><br/><font point-size="9">System, 22:15<br/>BRCLXN.001-015</font>>, fillcolor="@DIRTY_WHITE"];
+  s3 [label=<<b>3. Assignment</b><br/><font point-size="9">Rules; TL reassigns<br/>BRCLXN.052</font>>, fillcolor="@AMBER_BG"];
+  s4 [label=<<b>4. Follow-up</b><br/><font point-size="9">Efforts, dispositions,<br/>promises, plans, SOA<br/>BRCLXN.016-058</font>>, fillcolor="@BG_BLUE"];
+  s5 [label=<<b>5. Escalation</b><br/><font point-size="9">Rules and manual;<br/>TL / UH act<br/>BRCLXN.049-050</font>>, fillcolor="@AMBER_BG"];
+  s6 [label=<<b>6. Hand-off</b><br/><font point-size="9">Pick-up, 2307 to Cashiering;<br/>DP list to Commission</font>>, fillcolor="@WHITE"];
+  s7 [label=<<b>7. Unapplied payments</b><br/><font point-size="9">Collector disposition;<br/>request to Cashiering<br/>BRCLXN.030-048</font>>, fillcolor="@BG_BLUE"];
+  s8 [label=<<b>8. Files and reports</b><br/><font point-size="9">Daily, weekly, monthly<br/>BRCLXN.024-029, 045</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  s9 [label=<<b>9. CR billing</b><br/><font point-size="9">CRU, confirmed DP only<br/>BRCLXN.059</font>>, fillcolor="@WHITE"];
+
+  { rank=same; s1; s2; s3; }
+  { rank=same; s4; s5; s6; }
+  { rank=same; s7; s8; s9; }
+
+  s1 -> s2 -> s3;
+  s1 -> s4 -> s7 [style=invis, weight=10];
+  s2 -> s5 -> s8 [style=invis, weight=10];
+  s3 -> s6 -> s9 [style=invis, weight=10];
+  s3 -> s4 [constraint=false];
+  s4 -> s5;
+  s5 -> s6;
+  s6 -> s9 [constraint=false, label=" DP accounts"];
+  s4 -> s7 [constraint=false];
+  s7 -> s8 [constraint=false, style=dashed, color="@MUTED"];
+
+  legend [shape=plaintext, style="", label=<
+    <table border="0" cellborder="1" cellspacing="4" cellpadding="4">
+      <tr>
+        <td border="0"><font point-size="9" color="@MUTED">Actor:</font></td>
+        <td bgcolor="@DIRTY_WHITE" color="@HEADER_BLUE"><font point-size="9">System</font></td>
+        <td bgcolor="@BG_BLUE" color="@HEADER_BLUE"><font point-size="9">Collector / AO</font></td>
+        <td bgcolor="@AMBER_BG" color="@HEADER_BLUE"><font point-size="9">TL / UH</font></td>
+        <td bgcolor="@WHITE" color="@HEADER_BLUE"><font point-size="9">Operations</font></td>
+        <td bgcolor="@SUCCESS_BG" color="@SUCCESS"><font point-size="9">Outputs</font></td>
+      </tr>
+    </table>>];
+  s8 -> legend [style=invis];
+}

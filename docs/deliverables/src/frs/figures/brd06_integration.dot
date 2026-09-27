@@ -1,0 +1,38 @@
+// BRD-6: interfaces of Renewal. FRS section 7. Inputs on top (two rows), outputs below. Dashed grey = upload or parked seam.
+digraph rn_integration {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.55, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", fillcolor="@WHITE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=13, fontcolor="@NEAR_BLACK", width=2.5, height=0.75];
+  edge  [color="@MUTED", arrowsize=0.7, fontname="Arial", fontsize=11, fontcolor="@TEXT"];
+
+  ledger [label="Operations ledger\nexpiring invoices, balances"];
+  acct   [label="Account (BRD-1)\nexpiring policy data"];
+  sbm    [label="Submitted Policies (BRD-12)\nRenewalHandOff"];
+  claims [label="Claims (BRD-7)\nclaims summary"];
+  adj    [label="Adjustment\nopen endorsements"];
+  crm    [label="Client master\nKYC due date"];
+  lamd   [label="LAMD reports\npaid-off / RMU (upload)", color="@MUTED", style="rounded,dashed,filled"];
+  legacy [label="Legacy EBIX / QPS\none-time load (RQ27)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+
+  rn  [label="Renewal (BIBS)\ncandidates, checks, disposition,\ninsurer round-trip, letters", fillcolor="@HEADER_BLUE", fontcolor="@WHITE", width=4.2, height=1.0];
+
+  nb     [label="Account, quotation, PRF,\nplacement, booking (BRD-1)"];
+  mail   [label="E-mail outbox\nprotected RA, insurer extract"];
+  ins    [label="Insurers\nresponse file (upload)", color="@MUTED", style="rounded,dashed,filled"];
+  rep    [label="Reports, home,\nnotifications and alerts"];
+
+  { rank=same; ledger; acct; sbm; claims; }
+  { rank=same; adj; crm; lamd; legacy; }
+  { rank=same; nb; mail; ins; rep; }
+  ledger -> adj [style=invis]; acct -> crm [style=invis]; sbm -> lamd [style=invis]; claims -> legacy [style=invis];
+
+  ledger -> rn; acct -> rn; sbm -> rn; claims -> rn;
+  adj -> rn; crm -> rn;
+  lamd -> rn [style=dashed];
+  legacy -> rn [style=dashed, color="@MUTED"];
+  rn -> nb [label=" renewal account,\n NB path"];
+  nb -> rn [label=" status,\n booked", style=dashed, constraint=false];
+  rn -> mail; mail -> ins [constraint=false];
+  ins -> rn [style=dashed];
+  rn -> rep;
+}

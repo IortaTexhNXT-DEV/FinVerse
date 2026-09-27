@@ -1,0 +1,23 @@
+// BRD-4: collector disposition and request to Cashiering (BRCLXN.030-033). FRS section 5.4.
+digraph clx_upp {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.5, ranksep=0.45, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=11.5, fontcolor="@NEAR_BLACK", width=2.4, height=0.55, margin="0.08,0.03"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10, fontcolor="@TEXT"];
+
+  disp     [label="Collector disposition\nwith a Cashiering action", fillcolor="@WHITE"];
+  SENT     [label="SENT\nqueued as CRQ-yyyy-n"];
+  DEFERRED [label="DEFERRED\nhand-off (no adapter)", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  ACCEPTED [label="ACCEPTED\ncashier assigns\nOPS_DISPOSITION"];
+  APPLIED  [label="APPLIED\napplied, refunded,\nreclassified, transferred", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  REJECTED [label="REJECTED\nchecks, cashier\nor withdrawn", fillcolor="@AMBER_BG"];
+
+  disp -> SENT [label=" request"];
+  disp -> DEFERRED [style=dashed];
+  SENT -> ACCEPTED [label=" accept"];
+  SENT -> REJECTED [label=" reject (reason)", style=dashed];
+  ACCEPTED -> APPLIED [label=" disposition executed\n (after its approval)"];
+  ACCEPTED -> REJECTED [label=" withdrawn", style=dashed];
+  { rank=same; SENT; DEFERRED; }
+  { rank=same; APPLIED; REJECTED; }
+}

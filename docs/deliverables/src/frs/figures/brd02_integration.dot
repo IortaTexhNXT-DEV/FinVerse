@@ -1,0 +1,47 @@
+// BRD-2: interfaces of Operations. FRS section 7. Dashed grey = parked seam or replaced by a later BRD.
+// Layout top-down: sources, the Operations modules, then the receivers.
+digraph ops_integration {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.55, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", fillcolor="@WHITE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.2, height=0.6];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  nb    [label="Booking (BRD-1)\nbooked invoices"];
+  coll  [label="Collection system\n(BRD-4 Collections)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+  ins   [label="Insurers\n(e-mail, file upload)"];
+
+  subgraph cluster_ops {
+    label="Operations (BIBS)"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=12;
+    style=filled; fillcolor="@BG_BLUE"; color="@BG_BLUE";
+    flow [label="Flow-in feeds\n(runs, records)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+    led  [label="Invoice ledger\n(opsledger)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+    mods [label="Cashiering, Remittance,\nAdjustment, Prod Recon,\nCommission", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+    dq   [label="Disbursement queue\n(in-app)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE"];
+  }
+
+  gl    [label="Accounting engine\nand GL (BIBS)"];
+  mail  [label="E-mail outbox\n(protected files)"];
+  plc   [label="Placement payment\ngate (BRD-1)"];
+  disb  [label="Disbursement module\n(BRD-5)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+  drive [label="Shared drive\n(FS04)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+
+  { rank=same; nb; coll; ins; }
+  { rank=same; flow; led; }
+  { rank=same; gl; mail; plc; }
+  { rank=same; disb; drive; }
+  gl -> disb [style=invis];
+  mail -> drive [style=invis];
+
+  nb -> led [label=" invoice after commit"];
+  coll -> flow [label=" upload now", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+  ins -> flow [label=" OR, production,\n DP answers"];
+  flow -> mods;
+  led -> mods [dir=both, label=" balances, flags,\n locks, movements"];
+  mods -> dq [label=" payment requests"];
+  mods -> gl [label=" business\n events"];
+  mods -> mail [label=" register, schedule,\n billing"];
+  mods -> plc [label=" payment\n confirmation"];
+  mods -> nb [label=" endorsement and\n service invoice", constraint=false];
+  mods -> drive [label=" extract files", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+  dq -> disb [label=" replaced by", style=dashed, color="@MUTED", fontcolor="@MUTED"];
+}

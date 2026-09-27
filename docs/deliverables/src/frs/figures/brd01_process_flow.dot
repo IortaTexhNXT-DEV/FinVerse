@@ -1,0 +1,55 @@
+// BRD-1 New Business: process by actor (FRS section 2.2; BRNB.001 p.49, BRD p.134).
+// Colour tokens (@HEADER_BLUE ...) are replaced by tools/deliverables before rendering.
+// Layout: rows of three steps; the fill colour of a step is its actor (legend at the bottom).
+digraph nb_process {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.42, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=2.3, height=0.8, margin="0.1,0.05"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1, fontname="Arial", fontsize=9, fontcolor="@MUTED"];
+
+  // Actors: Marketing = @BG_BLUE, TSU = @WHITE, Processing = @DIRTY_WHITE, system / all = @SUCCESS_BG
+  s1  [label=<<b>1. Request intake</b><br/><font point-size="9">Marketing AO; e-mail, HLS, upload<br/>BRNB.041, 023, 028</font>>, fillcolor="@BG_BLUE"];
+  s2  [label=<<b>2. Client onboarding</b><br/><font point-size="9">Prospect, KYC, confirmation<br/>BRNB.090, 101, 030</font>>, fillcolor="@BG_BLUE"];
+  s3a [label=<<b>3a. Package quotation</b><br/><font point-size="9">Rate, approve, send, accept<br/>BRNB.043, 020, 021, 045</font>>, fillcolor="@BG_BLUE"];
+  s3b [label=<<b>3b. Non-package PRF</b><br/><font point-size="9">TSU: QS, terms, comparative, PS<br/>BRNB.005-010, 017</font>>, fillcolor="@WHITE"];
+  s4  [label=<<b>4. Account creation</b><br/><font point-size="9">One ARN per account<br/>BRNB.051, 102</font>>, fillcolor="@BG_BLUE"];
+  s5  [label=<<b>5. Validation</b><br/><font point-size="9">Processing; returns to Marketing<br/>BRNB.096, 033</font>>, fillcolor="@DIRTY_WHITE"];
+  s6  [label=<<b>6. Payment confirmation</b><br/><font point-size="9">CLPC billing, payment reports,<br/>client confirmation; BRNB.067, 068</font>>, fillcolor="@DIRTY_WHITE"];
+  s7  [label=<<b>7. Placement</b><br/><font point-size="9">Slip, hold cover, returns<br/>BRNB.069, 071, 072, 034</font>>, fillcolor="@DIRTY_WHITE"];
+  s8  [label=<<b>8. Issuance</b><br/><font point-size="9">E-policy, policy no., IA, dispatch<br/>BRNB.073, 074, 070, 077</font>>, fillcolor="@DIRTY_WHITE"];
+  s9  [label=<<b>9. Booking</b><br/><font point-size="9">Invoice, GL, service invoice<br/>BRNB.027, 036, 111, 081</font>>, fillcolor="@DIRTY_WHITE"];
+  s10 [label=<<b>10. Monitoring</b><br/><font point-size="9">Dashboard and reports<br/>BRNB.012, 075, 115</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  ins [label=<<b>Insurers</b><br/><font point-size="9">QS, slips, hold cover (e-mail);<br/>terms, e-policies</font>>, fillcolor="@WHITE", color="@MUTED", style="rounded,dashed,filled"];
+
+  { rank=same; s1; s2; s3a; }
+  { rank=same; s3b; s4; s5; }
+  { rank=same; s6; s7; s8; }
+  { rank=same; s9; s10; ins; }
+
+  s1 -> s2 -> s3a;
+  s1 -> s3b [style=dashed, label="non-package"];
+  s3a -> s4;
+  s3b -> s4 [constraint=false];
+  s4 -> s5;
+  s5 -> s6;
+  s6 -> s7 -> s8;
+  s8 -> s9;
+  s9 -> s10 [constraint=false];
+  s7 -> ins [dir=both, style=dashed, color="@MUTED"];
+  s3b -> ins [dir=both, style=dashed, color="@MUTED", constraint=false];
+  s1 -> s3b -> s6 -> s9 [style=invis, weight=10];
+  s2 -> s4 -> s7 -> s10 [style=invis, weight=10];
+  s3a -> s5 -> s8 -> ins [style=invis, weight=10];
+
+  legend [shape=plaintext, style="", label=<
+    <table border="0" cellborder="1" cellspacing="4" cellpadding="4">
+      <tr>
+        <td border="0"><font point-size="9" color="@MUTED">Actor:</font></td>
+        <td bgcolor="@BG_BLUE" color="@HEADER_BLUE"><font point-size="9">Marketing</font></td>
+        <td bgcolor="@WHITE" color="@HEADER_BLUE"><font point-size="9">TSU</font></td>
+        <td bgcolor="@DIRTY_WHITE" color="@HEADER_BLUE"><font point-size="9">Processing</font></td>
+        <td bgcolor="@SUCCESS_BG" color="@SUCCESS"><font point-size="9">All users</font></td>
+      </tr>
+    </table>>];
+  s10 -> legend [style=invis];
+}

@@ -1,0 +1,24 @@
+// BRD-9 Customer Servicing Facility: servicing flow of a contact centre agent (FRS section 2.2; BRD p.5-12).
+// Top-down: sign-in, search, servicing view, then the four servicing actions side by side, then audit.
+digraph csf_process {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=13, fontcolor="@NEAR_BLACK", width=2.4, height=0.85, margin="0.1,0.05", fillcolor="@BG_BLUE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1, fontname="Arial", fontsize=11, fontcolor="@MUTED"];
+
+  s1 [label=<<b>1. Sign in</b><br/><font point-size="11">Agent; user ID and password<br/>BRCSF-001</font>>];
+  s2 [label=<<b>2. Find the client</b><br/><font point-size="11">Name, client ID, account,<br/>PN or application no. (BRCSF-003)</font>>];
+  s3 [label=<<b>3. Servicing view</b><br/><font point-size="11">Client, accounts and status,<br/>payments (BRCSF-002, 005, 008)</font>>];
+  s4 [label=<<b>4. Verify, update contact</b><br/><font point-size="11">Contact details only<br/>BRCSF-004</font>>];
+  s5 [label=<<b>5. Resend RA or e-policy</b><br/><font point-size="11">Registered e-mail, protected<br/>BRCSF-006; e-mail item 9</font>>];
+  s6 [label=<<b>6. Documents</b><br/><font point-size="11">Retrieve and upload<br/>BRCSF-007, 009</font>>];
+  s7 [label=<<b>7. Legacy sync</b><br/><font point-size="11">QPS / EBIX outbox<br/>(parked, CSQ01)</font>>, fillcolor="@DIRTY_WHITE", color="@MUTED", style="rounded,dashed,filled"];
+  s8 [label=<<b>8. Audit trail and reports</b><br/><font point-size="11">Contact Center Management<br/>BRCSF-010, 011</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+
+  s1 -> s2 -> s3;
+  s3 -> s4; s3 -> s5; s3 -> s6;
+  s4 -> s7 [style=dashed, color="@MUTED"];
+  s4 -> s8; s5 -> s8; s6 -> s8;
+  { rank=same; s4; s5; s6; }
+  { rank=same; s7; s8; }
+}

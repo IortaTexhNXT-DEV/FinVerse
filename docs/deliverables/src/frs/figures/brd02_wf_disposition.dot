@@ -1,0 +1,28 @@
+// BRD-2: workflow OPS_DISPOSITION (V764; CSHID.024/025). FRS section 5. Stage owner in the second line.
+// Solid = main path, dashed = return or optional path, dotted = closes the case.
+digraph wf_disposition {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.3, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.4, height=0.45, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  UNAPPLIED [label="UNAPPLIED\nCashier (CASH_DISPOSITION)"];
+  MONITORING [label="MONITORING\nCashier (CASH_DISPOSITION)"];
+  FOR_APPROVAL [label="FOR_APPROVAL\nTL (CASH_DISPOSITION_APPROVE)"];
+  IN_PROCESS [label="IN_PROCESS\nSystem"];
+  COMPLETED [label="COMPLETED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  FOR_REVERSAL [label="FOR_REVERSAL\nTL (CASH_DISPOSITION_APPROVE)"];
+  CLOSED [label="CLOSED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  UNAPPLIED -> MONITORING [label=" assign_disposition"];
+  MONITORING -> FOR_APPROVAL [label=" submit"];
+  FOR_APPROVAL -> IN_PROCESS [label=" approve"];
+  IN_PROCESS -> COMPLETED [label=" complete"];
+  MONITORING -> COMPLETED [label=" complete\n(no approval)", style=dashed];
+  FOR_APPROVAL -> MONITORING [label=" return", style=dashed, constraint=false];
+  MONITORING -> UNAPPLIED [label=" withdraw", style=dashed, constraint=false];
+  COMPLETED -> FOR_REVERSAL [label=" mark_reversal"];
+  FOR_REVERSAL -> UNAPPLIED [label=" approve_reversal", style=dashed];
+  COMPLETED -> CLOSED [label=" close", style=dotted];
+  UNAPPLIED -> CLOSED [label=" overages, automatch,\nreceipt cancelled", style=dotted];
+}

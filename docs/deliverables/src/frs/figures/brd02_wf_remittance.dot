@@ -1,0 +1,31 @@
+// BRD-2: workflow OPS_REMITTANCE (V771; RMTID.009-011/019/029/036). FRS section 5. Stage owner in the second line.
+// Solid = main path, dashed = return or optional path, dotted = closes the case.
+digraph wf_remittance {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.3, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.4, height=0.45, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  REVIEW_IN_PROCESS [label="REVIEW_IN_PROCESS\nProcessor (REMIT_PROCESS)"];
+  ON_HOLD [label="ON_HOLD\nProcessor (REMIT_PROCESS)"];
+  FOR_APPROVAL [label="FOR_APPROVAL\nRemittance TL (REMIT_APPROVE)"];
+  APPROVED [label="APPROVED\nWith Disbursement"];
+  FULLY_REMITTED [label="FULLY_REMITTED\nProcessor (REMIT_OR_UPLOAD)"];
+  PARTIALLY_REMITTED [label="PARTIALLY_REMITTED\nProcessor (REMIT_OR_UPLOAD)"];
+  OR_RECEIVED [label="OR_RECEIVED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  RETURNED [label="RETURNED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  REVIEW_IN_PROCESS -> FOR_APPROVAL [label=" submit"];
+  REVIEW_IN_PROCESS -> ON_HOLD [label=" hold", style=dashed, constraint=false];
+  ON_HOLD -> REVIEW_IN_PROCESS [label=" release", style=dashed, constraint=false];
+  FOR_APPROVAL -> APPROVED [label=" approve"];
+  FOR_APPROVAL -> REVIEW_IN_PROCESS [label=" send_back", style=dashed, constraint=false];
+  APPROVED -> FULLY_REMITTED [label=" dv_full"];
+  APPROVED -> PARTIALLY_REMITTED [label=" dv_partial"];
+  FULLY_REMITTED -> OR_RECEIVED [label=" or_received"];
+  PARTIALLY_REMITTED -> OR_RECEIVED [label=" or_received"];
+  FOR_APPROVAL -> RETURNED [label=" return", style=dotted];
+  { rank=same; REVIEW_IN_PROCESS; ON_HOLD; }
+  { rank=same; FULLY_REMITTED; PARTIALLY_REMITTED; }
+  { rank=same; OR_RECEIVED; RETURNED; }
+}

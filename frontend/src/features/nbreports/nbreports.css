@@ -1,0 +1,100 @@
+/* New Business dashboard and reports (BRNB.012). Brand tokens only (styles/tokens.css). */
+
+.nb-tile {
+  text-decoration: none;
+  color: inherit;
+  gap: var(--space-1);
+}
+
+.nb-tile .kpi-value {
+  color: var(--brand-navy);
+}
+
+.nb-bars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.nb-bar-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 34%) 1fr 56px;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.nb-bar-row:hover,
+.nb-bar-row:focus-visible {
+  background: var(--brand-blue-050);
+}
+
+.nb-bar-label {
+  font-size: 14px;
+  color: var(--color-heading);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nb-bar-track {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 24px;
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-sm);
+}
+
+.nb-bar-fill {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  background: var(--brand-navy);
+  border-radius: var(--radius-sm);
+}
+
+/* White label on the dark bar; dark label next to a short bar (contrast rule). */
+.nb-bar-value {
+  padding: 0 var(--space-2);
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.nb-bar-value.outside {
+  padding: 0;
+  color: var(--color-heading);
+}
+
+.nb-bar-note {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  text-align: right;
+}
+
+.nb-production {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+  gap: var(--space-5);
+  align-items: start;
+}
+
+/* Dashboard sections: two wide cards per row so the bars and charts stay readable */
+.nb-sections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(520px, 1fr));
+  gap: var(--space-4);
+}
+
+.nb-note {
+  margin: 0 0 var(--space-3);
+  font-size: 13px;
+}

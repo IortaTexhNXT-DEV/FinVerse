@@ -1,0 +1,41 @@
+// BRD-7 Claims: interfaces of the brokerclaims module (FRS section 7). Dashed grey = parked seam.
+// Left to right: sources, the Claims module, consumers stacked in one column.
+digraph clm_integration {
+  graph [rankdir=LR, fontname="Arial", nodesep=0.18, ranksep=1.1, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@WHITE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=13, fontcolor="@NEAR_BLACK", width=2.4, height=0.6];
+  edge  [color="@MUTED", arrowsize=0.7, fontname="Arial", fontsize=11, fontcolor="@TEXT"];
+
+  acc   [label="Accounts, locations\n(BRD-1 account)"];
+  bkg   [label="Endorsements\n(BRD-1 booking)"];
+  led   [label="Invoice ledger\n(BRD-2 opsledger)"];
+  leg   [label="EBIX / ISYS claims\n(migration, CLQ14)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+
+  subgraph cluster_clm {
+    label="Claims (BIBS)"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=13;
+    style=filled; fillcolor="@BG_BLUE"; color="@BG_BLUE";
+    clm [label="Claim case file\n(brokerclaims)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE", height=1.2];
+  }
+
+  rem   [label="Special remittance\n(BRD-2 remittance)"];
+  mail  [label="E-mail outbox:\nloss advice to insurers"];
+  docs  [label="Documents (CLAIM_REPORT)\nread by CSF (BRD-9)"];
+  crm   [label="Client 360 view (CRM)"];
+  rnw   [label="Renewal (BRD-6)"];
+  rep   [label="Claims Handling reports\n(Claims, Risk, Marketing)"];
+  ntf   [label="Notifications and alerts"];
+  money [label="Claim proceeds through\nBDOI (CLQ10)", color="@MUTED", fontcolor="@MUTED", style="rounded,dashed"];
+
+  acc -> clm [label="cover snapshot"];
+  bkg -> clm [label="cover version"];
+  led -> clm [label="payment status"];
+  leg -> clm [style=dashed, color="@MUTED"];
+  clm -> rem [label="ClaimsFeed"];
+  clm -> mail;
+  clm -> docs;
+  clm -> crm;
+  clm -> rnw [label="loss experience"];
+  clm -> rep;
+  clm -> ntf;
+  clm -> money [style=dashed, color="@MUTED"];
+}

@@ -1,0 +1,70 @@
+# End-to-end walkthroughs of BRD-1 New Business, shown step by step with screenshots of the seed profile.
+# Each step: persona (role code), screen (SCR id), what the user does, what the user sees, the result, and the
+# screenshot taken after the step (captured live by tools/screenshots/capture_pack.cjs, which performs the steps).
+walkthroughs:
+  - id: WT-A
+    title: Retail package policy from a new client to booking
+    summary: >-
+      A walk-in individual asks for a Fire cover of a home under a BDO home loan. Marketing onboards the client with KYC,
+      quotes the package product, sends the quotation and records the acceptance; Processing validates, confirms the
+      payment, places the account, receives the e-policy, issues the Insurance Advice, sends the e-policy and books the
+      account; Operations and Accounting then see the booked invoice.
+    data: "Seed data: a new individual prospect (fictitious name), product PAR01 (Property), insurer INS-MGIC, mortgagee BDO Home Loans"
+    steps:
+      - [MKT_AO, SCR-NB-02, "Opens Clients › New Client, enters the individual's identity, contact, address and segment, and clicks Save as prospect", "The Prospect saved panel with the prospect code PR-yyyy-nnnnnn", Prospect created, wt-a-01]
+      - [MKT_AO, SCR-NB-03, "Opens the client, uploads the KYC form and a valid ID on the KYC & Documents tab and clicks Submit KYC", "The checklist shows every document Uploaded; the workflow panel moves to KYC for verification", KYC review, wt-a-02]
+      - [MKT_TL, SCR-NB-03, "Opens the client from My Work and clicks Verify KYC", "Toast: <code>: KYC verified, next review <date>", KYC verified, wt-a-03]
+      - [MKT_AO, SCR-NB-03, "Clicks Confirm client", "Toast: Client confirmed as CL-yyyy-nnnnnn; the client code appears in the header", Client confirmed, wt-a-04]
+      - [MKT_AO, SCR-NB-06, "Clicks Generate Quotation, chooses PAR01 and the insurer, adds the location with its sum insured, reviews the live premium and clicks Submit for Review", "Toast: QT-yyyy-nnnnnn submitted for review; the quotation shows For review", Quotation for review, wt-a-05]
+      - [MKT_TL, SCR-NB-07, "Opens the quotation from the For Review tab and clicks Approve", "Toast: Approve: QT-yyyy-nnnnnn is now approved", Quotation approved, wt-a-06]
+      - [MKT_AO, SCR-NB-07, "Clicks Send via Email, keeps the proposed e-mail and clicks Send", "The quotation is Sent to client; the E-mails tab lists the quotation e-mail and the password e-mail", Sent to client, wt-a-07]
+      - [MKT_AO, SCR-NB-07, "Clicks Record acceptance, uploads the client's reply and clicks Record Acceptance, then Create accounts", "The quotation is Converted; the Control card lists the account ARN", Draft account created, wt-a-08]
+      - [MKT_AO, SCR-NB-14, "Opens the draft account, completes the mortgagee bank and PN number, reviews the completeness check and clicks Submit to Processing", "Complete: the account can be submitted; toast ARN-yyyy-nnnnnn submitted to Processing", Account submitted, wt-a-09]
+      - [PROCESSOR, SCR-NB-15, "Opens the account from My Work and clicks Validate", "The account moves to Awaiting payment (CBG Fire) or Ready for placement (after the gate)", Account validated, wt-a-10]
+      - [PROCESSOR, SCR-NB-21, "Bills the account on CLPC Billing, downloads the file, uploads CLPC's payment report and confirms the matches", "Payment Report: the line is Matched; Confirm Matches opens the payment gate", Ready for placement, wt-a-11]
+      - [PROCESSOR, SCR-NB-18, "Selects the account on the Placement Workbench, clicks For Placement, then Generate Slips, then Send Slips", "Generate Placement Slips shows every prerequisite valid; the result list shows the slip sent", Placed, wt-a-12]
+      - [PROCESSOR, SCR-NB-24, "Uploads the insurer's e-policy PDF with the ARN", "Toast: <file> stored on ARN-yyyy-nnnnnn; the Extraction Review opens", E-policy received, wt-a-13]
+      - [PROCESSOR, SCR-NB-25, "Checks the extracted policy number against the account and clicks Confirm Policy", "Policy <no> confirmed; the account is policy issued; the Insurance Advice is generated", Policy issued, wt-a-14]
+      - [EPOLICY_SENDER, SCR-NB-27, "Sends the e-policy to the client from Ready to Dispatch", "Toast: E-policy of ARN-yyyy-nnnnnn sent; the Dispatch Report shows it Sent", E-policy sent, wt-a-15]
+      - [PROCESSOR, SCR-NB-29, "Opens the account from Ready to Book, checks the invoice and the journal preview, and clicks Book Account", "Toast: ARN-yyyy-nnnnnn booked as <invoice>; the Booked Invoice opens", Booked, wt-a-16]
+      - [PROCESSOR, SCR-NB-30, "Reviews the Journal and Open Items tabs of the booked invoice", "The GL entry and the receivable from the client, the payable to the insurer and the commission", Hand-off to Accounting, wt-a-17]
+    downstream:
+      - "Operations (BRD-2): Operations › Invoice Search lists the invoice with its premium components and the ARN; Invoice 360 opens it (screenshot wt-a-18)."
+      - "Collections (BRD-4): the premium receivable appears on the PR Worklist of the account's collector when due."
+      - "Accounting (BRD-5): the journal posted at booking is in General Ledger › Journals; the commission service invoice is on Service Invoices."
+  - id: WT-B
+    title: Non-package commercial risk through a PRF with insurer quotations
+    summary: >-
+      A corporate client needs a Contractor's All Risks cover that no package covers. Marketing raises a PRF, the
+      Marketing TL approves it, TSU sends the quotation slip to three insurers, keys in their terms, compares them and
+      releases the proposal slip; Marketing sends the proposal, records the acceptance and creates the account.
+    data: "Seed data: corporate client CL-2026-000003 (fictitious), product CAR00 (Engineering), insurers INS-MGIC, INS-LAC, INS-VMI"
+    steps:
+      - [MKT_AO, SCR-NB-10, "Opens New Proposal Request, chooses the client and CAR00, describes the risk, adds the item, ticks three insurers, attaches the mandatory documents and clicks Submit for Approval", "Toast: PRF-yyyy-nnnnnn submitted for Marketing approval", For Marketing approval, wt-b-01]
+      - [MKT_TL, SCR-NB-11, "Opens the PRF and clicks Approve and send to TSU", "The PRF is Received by TSU", With TSU, wt-b-02]
+      - [TSU, SCR-NB-12, "Claims the PRF on the TSU Workbench and opens it", "Toast: PRF-yyyy-nnnnnn is now yours", Assigned, wt-b-03]
+      - [TSU, SCR-NB-11, "Clicks Accept and Prepare Quotation Slip, confirms the insurers on the Quotation Slip tab and clicks Submit quotation slip with the reply date", "The PRF is Quotation slip for approval with its QS number", QS for approval, wt-b-04]
+      - [TSU, SCR-NB-11, "A second TSU officer clicks Approve and send to insurers", "The PRF is Awaiting insurer terms; the E-mails tab lists one e-mail per insurer", QS sent, wt-b-05]
+      - [TSU, SCR-NB-11, "Keys in the terms of each insurer on the Insurer Responses tab (one declines), recommends the lowest premium and clicks Insurer terms complete", "The responses and the Comparative Table with the lowest premium marked", Terms received, wt-b-06]
+      - [TSU, SCR-NB-11, "Clicks Submit proposal slip for the recommended insurer; a second TSU officer approves and releases it", "The PRF is Proposal slip released to Marketing with its PS number", PS released, wt-b-07]
+      - [MKT_AO, SCR-NB-11, "Clicks Send via Email to send the proposal slip and the comparative table to the client", "The PRF is Sent to client", Sent to client, wt-b-08]
+      - [MKT_AO, SCR-NB-11, "Records the client's acceptance and clicks Create accounts", "The PRF is Converted; the account is created in draft under the PRF's ARN with the chosen insurer's rate", Account created, wt-b-09]
+    downstream:
+      - "The account then follows the placement, issuance and booking steps of walkthrough A (steps 9 to 17)."
+  - id: WT-C
+    title: Returns for correction and the messages the user sees
+    summary: >-
+      The paths where a record goes back to its maker: a KYC returned by the verifier, a quotation returned by the
+      approver, an account returned by Processing, and an account returned by the insurer, with the messages and
+      notices on screen.
+    data: "Seed data: prospect PR-2026-000008, quotation QT-2026-900002 (for review), accounts ARN-2026-900002 (submitted) and ARN-2026-910001 (placed)"
+    steps:
+      - [MKT_AO, SCR-NB-03, "Clicks Submit KYC on a prospect without the mandatory documents", "Message: Upload the mandatory KYC documents before you submit the KYC: <documents>", Refused, wt-c-01]
+      - [MKT_TL, SCR-NB-03, "Opens a client in KYC review and clicks Return To Account Officer, selects the reason and writes the comment", "The client is back to Prospect; the Account Officer's bell shows the notice with the comment", KYC returned, wt-c-02]
+      - [MKT_AO, SCR-NB-07, "Tries to approve his own quotation", "Message: A quotation is approved by someone other than its maker", Refused, wt-c-03]
+      - [MKT_TL, SCR-NB-07, "Clicks Return To Maker on the quotation with the reason Rate or terms to be reviewed", "The quotation is a Draft again; the History tab shows the reason and comment", Quotation returned, wt-c-04]
+      - [PROCESSOR, SCR-NB-15, "Clicks Validate on an account whose client is not confirmed", "Message: Client <code> is not yet confirmed (onboarding and KYC incomplete)", Refused, wt-c-05]
+      - [PROCESSOR, SCR-NB-15, "Clicks Return To Marketing with the reason Missing supporting documents", "The account is Returned to Marketing", Account returned, wt-c-06]
+      - [MKT_AO, SCR-NB-13, "Opens the Returned to Me tab, opens the account, attaches the document and clicks Resubmit to Processing", "Toast: ARN-yyyy-nnnnnn submitted to Processing", Resubmitted, wt-c-07]
+      - [PROCESSOR, SCR-NB-19, "Records an insurer return on a placed account with the reason Additional insurer requirements", "The account is Returned by insurer; the Insurer Returns tab lists the return", Returned by insurer, wt-c-08]
+      - [PROCESSOR, SCR-NB-19, "Clicks Resubmit for Placement, then regenerates and resends the slip", "The account is Ready for placement; the slip has a new version and the old one is Superseded", Placed again, wt-c-09]

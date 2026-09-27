@@ -1,0 +1,17 @@
+// BRD-2: workflow OPS_BIR_CERT (V785; CMRID.015). FRS section 5. Stage owner in the second line.
+// Solid = main path, dashed = return or optional path, dotted = closes the case.
+digraph wf_bir_cert {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.3, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.4, height=0.45, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  SUBMITTED [label="SUBMITTED\nComptrollership (BIR_CERT_ACK)"];
+  ACKNOWLEDGED [label="ACKNOWLEDGED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  REJECTED [label="REJECTED\nCommission handler (BIR_CERT_SUBMIT)"];
+
+  SUBMITTED -> ACKNOWLEDGED [label=" acknowledge"];
+  SUBMITTED -> REJECTED [label=" reject (reason)", style=dashed, constraint=false];
+  REJECTED -> SUBMITTED [label=" resubmit", style=dashed, constraint=false];
+  { rank=same; ACKNOWLEDGED; REJECTED; }
+}

@@ -1,0 +1,34 @@
+/*
+ * Placement & Booking and Policy Issuance work lists (BDO Insure work list pattern). Colours come
+ * from tokens.css only.
+ */
+
+.work-tabs {
+  padding: 0;
+}
+
+/* Two-line cell: name as a link with the code below */
+.cell-sub {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+/* Unmet prerequisites of a placement slip */
+.unmet-list {
+  margin: 0;
+  padding-left: var(--space-4);
+  color: var(--color-danger);
+  font-size: 13px;
+}
+
+/* Side-by-side comparison (extraction review) */
+.compare-table td.differs {
+  background: var(--color-warning-bg);
+  color: var(--color-warning);
+  font-weight: 600;
+}

@@ -1,0 +1,180 @@
+/* Cashiering screens (BRD-2 CSHID). Colours and spacing come from the design tokens. */
+
+.csh-two-pane {
+  display: grid;
+  grid-template-columns: minmax(320px, 5fr) minmax(360px, 6fr);
+  gap: var(--space-4);
+  align-items: start;
+}
+
+@media (max-width: 1100px) {
+  .csh-two-pane {
+    grid-template-columns: 1fr;
+  }
+}
+
+.csh-preview-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.csh-rate-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--brand-blue);
+  background: var(--brand-blue-050);
+  color: var(--brand-navy);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.csh-invoice {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-3);
+  background: var(--color-surface);
+}
+
+.csh-invoice-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.csh-alloc {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.csh-alloc th,
+.csh-alloc td {
+  padding: 4px 6px;
+  border-bottom: 1px solid var(--color-border);
+  text-align: right;
+}
+
+.csh-alloc th:first-child,
+.csh-alloc td:first-child {
+  text-align: left;
+}
+
+.csh-alloc tfoot td {
+  font-weight: 700;
+  border-bottom: none;
+}
+
+.csh-totals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+}
+
+.csh-total {
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-alt);
+}
+
+.csh-total-excess {
+  background: var(--color-warning-bg);
+}
+
+.csh-total-label {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.csh-total-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-heading);
+}
+
+.csh-gauge {
+  height: 8px;
+  border-radius: 999px;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+  min-width: 120px;
+}
+
+.csh-gauge-fill {
+  height: 100%;
+  background: var(--brand-blue);
+}
+
+.csh-gauge-low .csh-gauge-fill {
+  background: var(--color-danger);
+}
+
+.csh-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--space-3);
+}
+
+.csh-tile {
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--brand-blue);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.csh-tile-UNAPPLIED,
+.csh-tile-EXCESS {
+  border-top-color: var(--brand-gold);
+}
+
+.csh-tile-PREBOOKED {
+  border-top-color: var(--color-info);
+}
+
+.csh-tile-APPLIED {
+  border-top-color: var(--color-success);
+}
+
+.csh-tile-FAILED {
+  border-top-color: var(--color-danger);
+}
+
+.csh-tile-count {
+  display: block;
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--color-heading);
+}
+
+.csh-month {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-sm);
+}
+
+.csh-age-overdue {
+  color: var(--color-danger);
+  font-weight: 700;
+}
+
+.csh-age-ageing {
+  color: var(--brand-gold-600);
+  font-weight: 700;
+}
+
+.csh-filters {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-3);
+}

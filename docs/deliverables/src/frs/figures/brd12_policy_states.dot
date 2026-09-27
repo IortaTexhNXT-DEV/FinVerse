@@ -1,0 +1,36 @@
+// BRD-12: workflow SBM_POLICY (masterlist record). FRS section 5.1. User transitions are listed in Table 10.
+digraph sp_policy {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.5, ranksep=0.45, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=14, fontcolor="@NEAR_BLACK", width=2.6, height=0.55, margin="0.1,0.03"];
+  edge  [color="@MUTED", arrowsize=0.7, fontname="Arial", fontsize=12, fontcolor="@TEXT"];
+
+  RECEIVED    [label="RECEIVED\nintake row", fillcolor="@DIRTY_WHITE"];
+  VALIDATED   [label="VALIDATED\nconfirmed / manual"];
+  CLASSIFIED  [label="CLASSIFIED\nprocessing run", fillcolor="@DIRTY_WHITE"];
+  MANUAL      [label="FOR_MANUAL_DISPOSITION\nhandler decides"];
+  IN_REVIEW   [label="IN_REVIEW\npolicy review, IAAF"];
+  FOR_RENEWAL [label="FOR_RENEWAL\nwaits for expiry scan"];
+  EXCLUDED    [label="EXCLUDED\nnon-renewal bucket", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  RIP         [label="RENEWAL_IN_PROGRESS\nhanded to Renewal", fillcolor="@AMBER_BG"];
+  PLACED      [label="PLACED"];
+  BOOKED      [label="BOOKED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  NOT_RENEWED [label="NOT_RENEWED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  RECEIVED -> VALIDATED [label=" confirm"];
+  VALIDATED -> CLASSIFIED [label=" run"];
+  CLASSIFIED -> MANUAL [label=" Manual bucket"];
+  CLASSIFIED -> IN_REVIEW [label=" documents\n to review"];
+  CLASSIFIED -> FOR_RENEWAL [label=" For Renewal\n bucket"];
+  CLASSIFIED -> EXCLUDED [label=" non-renewal\n bucket"];
+  MANUAL -> FOR_RENEWAL [label=" dispose", style=dashed, constraint=false];
+  FOR_RENEWAL -> RIP [label=" expiry scan /\n Renew with BDOI"];
+  RIP -> PLACED [label=" slip sent"];
+  PLACED -> BOOKED [label=" InvoiceBooked"];
+  RIP -> NOT_RENEWED [label=" declined, lost,\n expired", style=dashed];
+
+  { rank=same; MANUAL; IN_REVIEW; }
+  { rank=same; FOR_RENEWAL; EXCLUDED; }
+  { rank=same; PLACED; NOT_RENEWED; }
+  MANUAL -> FOR_RENEWAL [style=invis];
+}

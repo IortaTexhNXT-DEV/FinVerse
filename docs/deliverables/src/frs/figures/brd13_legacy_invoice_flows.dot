@@ -1,0 +1,44 @@
+// BRD-13 Data Migration: a legacy invoice in the Operations ledger and the flows that process it after cutover
+// (FRS section 2.3; BRID 5.1-10.1). Colour tokens are replaced by tools/deliverables before rendering.
+// Layout: top to bottom; the processing steps sit in one box of three columns.
+digraph dm_legacy_flows {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.4, ranksep=0.5, bgcolor="white", pad=0.15, newrank=true, compound=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=12, fontcolor="@NEAR_BLACK", width=2.3, height=0.8, margin="0.12,0.06", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2, fontname="Arial", fontsize=10, fontcolor="@MUTED"];
+
+  lg  [label=<<b>EBIX / QPS</b><br/><font point-size="10">read-only from the freeze</font>>, fillcolor="@DIRTY_WHITE", color="@MUTED", style="rounded,dashed,filled"];
+  mig [label=<<b>Carry-forward load</b><br/><font point-size="10">open invoices and UPP;<br/>opening entries to clearing</font>>, fillcolor="@BG_BLUE"];
+  inv [label=<<b>Legacy invoice</b><br/><font point-size="10">origin LEGACY; open PR,<br/>DTIP, commission, PR2307</font>>, fillcolor="@AMBER_BG"];
+  upp [label=<<b>Legacy UPP</b><br/><font point-size="10">origin MIGRATED</font>>, fillcolor="@AMBER_BG"];
+
+  subgraph cluster_bibs {
+    label=<<b>Processed with the BIBS screens</b>>; fontname="Arial"; fontsize=11; fontcolor="@HEADER_BLUE";
+    style="rounded,dashed"; color="@HEADER_BLUE"; margin=14;
+    otc [label=<<b>OTC and autopay</b><br/><font point-size="10">BRID 6.1, 6.2</font>>];
+    am  [label=<<b>Automatch rerun</b><br/><font point-size="10">legacy, new, mixed<br/>BRID 5.2, 6.3</font>>];
+    dsp [label=<<b>UPP dispositions</b><br/><font point-size="10">apply, refund, income<br/>BRID 5.3-5.5, 6.4</font>>];
+    rev [label=<<b>Batch reversals</b><br/><font point-size="10">DPPR, PR2307<br/>BRID 7.1, 7.2</font>>];
+    rem [label=<<b>Remittance</b><br/><font point-size="10">extract, schedule, OR<br/>BRID 8.1</font>>];
+    end [label=<<b>Endorsements</b><br/><font point-size="10">+, -, non-financial<br/>BRID 9.1-9.3</font>>];
+    { rank=same; otc; am; dsp; }
+    { rank=same; rev; rem; end; }
+    otc -> rev [style=invis]; am -> rem [style=invis]; dsp -> end [style=invis];
+  }
+
+  prc [label=<<b>Prod Recon report</b><br/><font point-size="10">original, updated, delta<br/>BRID 10.1</font>>];
+  gl  [label=<<b>Legacy sub-ledgers</b><br/><font point-size="10">PR, PR2307, Commission Rec.,<br/>DTIP, UPP (legacy)</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  new [label=<<b>New sub-ledgers</b><br/><font point-size="10">mixed UPP applied<br/>to new invoices</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+
+  { rank=same; lg; mig; }
+  { rank=same; inv; upp; }
+  { rank=same; prc; gl; new; }
+
+  lg -> mig [style=dashed, color="@MUTED", label=" final extracts"];
+  mig -> inv; mig -> upp;
+  inv -> am [lhead=cluster_bibs];
+  upp -> am [lhead=cluster_bibs];
+  rem -> gl [ltail=cluster_bibs, label=" postings"];
+  rev -> prc [ltail=cluster_bibs, style=dashed, label=" changes"];
+  end -> new [ltail=cluster_bibs, style=dashed];
+}

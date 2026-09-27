@@ -1,0 +1,52 @@
+// BRD-8 Employee Benefits: EB cycle by actor (FRS section 2.2; Add. p.3-5, main p.3-6).
+// Colour tokens (@HEADER_BLUE ...) are replaced by tools/deliverables before rendering.
+// Layout: four rows of three steps; the fill colour of a step is its actor (legend at the bottom).
+digraph eb_process {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.45, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=13, fontcolor="@NEAR_BLACK", width=2.5, height=0.9, margin="0.1,0.05"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1, fontname="Arial", fontsize=11, fontcolor="@MUTED"];
+
+  // Actors: AO = @BG_BLUE, client HR = @SUCCESS_BG, insurer = @WHITE, management = @AMBER_BG, Processing / Collection = @DIRTY_WHITE
+  s1  [label=<<b>1. Renewal advice</b><br/><font point-size="11">System / AO, 135 days before<br/>BRID-001</font>>, fillcolor="@BG_BLUE"];
+  s2  [label=<<b>2. Requirements, feedback</b><br/><font point-size="11">Client HR; master list, utilization<br/>BRID-002, 003, 007, 014</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  s3  [label=<<b>3. BOR</b><br/><font point-size="11">AO uploads, validates<br/>BRID-008</font>>, fillcolor="@BG_BLUE"];
+  s4  [label=<<b>4. Franchise</b><br/><font point-size="11">Insurer approves or rejects<br/>BRID-026, 027, 029</font>>, fillcolor="@WHITE"];
+  s5  [label=<<b>5. TOR to insurers</b><br/><font point-size="11">AO; protected, portal task<br/>BRID-004, 007, 009</font>>, fillcolor="@BG_BLUE"];
+  s6  [label=<<b>6. Proposals</b><br/><font point-size="11">Insurer portal; AO validates<br/>BRID-005.01-005.03</font>>, fillcolor="@WHITE"];
+  s7  [label=<<b>7. Comparative</b><br/><font point-size="11">System, AO; sign-off<br/>BRID-010</font>>, fillcolor="@BG_BLUE"];
+  s8  [label=<<b>8. Threshold approval</b><br/><font point-size="11">BDOI Management<br/>BRID-016</font>>, fillcolor="@AMBER_BG"];
+  s9  [label=<<b>9. Client decision</b><br/><font point-size="11">Client HR; revisions relayed<br/>BRID-011, 012, 015, 017</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  s10 [label=<<b>10. Placement to booking</b><br/><font point-size="11">Processing; billing no. check<br/>BRID-018-020</font>>, fillcolor="@DIRTY_WHITE"];
+  s11 [label=<<b>11. SOA and payment</b><br/><font point-size="11">Processing, Collection<br/>BRID-021</font>>, fillcolor="@DIRTY_WHITE"];
+  s12 [label=<<b>12. Member servicing</b><br/><font point-size="11">AO, Processing, insurer<br/>BRID-013, 025, 030</font>>, fillcolor="@BG_BLUE"];
+
+  { rank=same; s1; s2; s3; }
+  { rank=same; s4; s5; s6; }
+  { rank=same; s7; s8; s9; }
+  { rank=same; s10; s11; s12; }
+
+  s1 -> s2 -> s3;
+  s3 -> s4 [constraint=false];
+  s4 -> s5 -> s6;
+  s6 -> s7 [constraint=false];
+  s7 -> s8 -> s9;
+  s9 -> s10 [constraint=false];
+  s10 -> s11 -> s12;
+  s1 -> s4 -> s7 -> s10 [style=invis, weight=10];
+  s2 -> s5 -> s8 -> s11 [style=invis, weight=10];
+  s3 -> s6 -> s9 -> s12 [style=invis, weight=10];
+
+  legend [shape=plaintext, style="", label=<
+    <table border="0" cellborder="1" cellspacing="4" cellpadding="4">
+      <tr>
+        <td border="0"><font point-size="11" color="@MUTED">Actor:</font></td>
+        <td bgcolor="@BG_BLUE" color="@HEADER_BLUE"><font point-size="11">Marketing AO</font></td>
+        <td bgcolor="@SUCCESS_BG" color="@SUCCESS"><font point-size="11">Client HR (portal)</font></td>
+        <td bgcolor="@WHITE" color="@HEADER_BLUE"><font point-size="11">Insurer (portal)</font></td>
+        <td bgcolor="@AMBER_BG" color="@HEADER_BLUE"><font point-size="11">Management</font></td>
+        <td bgcolor="@DIRTY_WHITE" color="@HEADER_BLUE"><font point-size="11">Processing / Collection</font></td>
+      </tr>
+    </table>>];
+  s11 -> legend [style=invis];
+}

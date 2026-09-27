@@ -1,0 +1,62 @@
+/* Booking screens (BRD-1 booking module). Colours and spacing come from the design tokens. */
+
+.booking-tiles .kpi-button.active {
+  border-top-color: var(--brand-gold);
+  box-shadow: var(--shadow-md);
+}
+
+.booking-select {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--brand-blue);
+}
+
+.summary-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-4);
+}
+
+.summary-fact {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.summary-fact svg {
+  color: var(--brand-blue);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.summary-fact-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.summary-fact-value {
+  font-weight: 600;
+  color: var(--color-heading);
+}
+
+.journal-total td {
+  font-weight: 700;
+  border-top: 2px solid var(--color-border-strong);
+}
+
+.amount-negative {
+  color: var(--color-danger);
+}
+
+.preview-note {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.booking-handed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}

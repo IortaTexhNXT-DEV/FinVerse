@@ -1,0 +1,205 @@
+# Screen specifications of BRD-1 New Business: client onboarding and KYC.
+# Schema: docs/deliverables/src/signoff/README.md. Field rows:
+#   section | label | type | length / format | mandatory | source / master | default | editable in | validation | message
+# Action rows:
+#   button | who | enabled when | what happens | resulting status | notification
+area: Client onboarding and KYC
+screens:
+  - id: SCR-NB-01
+    title: Clients
+    route: /crm/clients
+    purpose: >-
+      The work list of prospects and confirmed clients of the company. The user finds a client by code, name, TIN, ID
+      number, e-mail or mobile, sees its onboarding and KYC status at a glance and opens the client record.
+    entry:
+      - The Clients link of the client record header and of the Linked Records tab
+      - The KYC Review Due tab replaces the separate KYC list for users who work from this list
+    shots:
+      - {state: list, user: ao, caption: "Clients work list, All Clients tab"}
+      - {state: filters, user: ao, click: "^filters$", caption: "Clients work list with the advanced filters open"}
+    fields:
+      - "Tabs | All Clients / Prospects / Confirmed / KYC Review Due | Tab | - | - | Fixed | All Clients | - | Each tab narrows the list: status Prospect, status Confirmed, or KYC review due | -"
+      - "Search | Search client name | Text | Free text | N | - | Blank | - | Contains search on the client name | -"
+      - "Filters | Prospect or Client Code | Text | PR-yyyy-nnnnnn or CL-yyyy-nnnnnn, part of a code allowed | N | - | Blank | - | Contains search | -"
+      - "Filters | Name Contains | Text | Free text | N | - | Blank | - | Contains search on last, first, middle or registered name | -"
+      - "Filters | TIN | Text | 000-000-000-000 | N | - | Blank | - | Exact match | -"
+      - "Filters | ID Number | Text | Free text | N | - | Blank | - | Exact match on the ID number | -"
+      - "Filters | E-mail | Text | name@domain | N | - | Blank | - | Exact match, case ignored | -"
+      - "Filters | Mobile | Text | 09xxxxxxxxx | N | - | Blank | - | Exact match | -"
+      - "Filters | Status | Drop-down | All, Prospect, Confirmed, Inactive | N | Fixed list | All | - | - | -"
+      - "Filters | KYC Status | Drop-down | All, Not started, Pending, Verified, Expired | N | Fixed list | All | - | - | -"
+      - "Filters | Market Segment | Drop-down | - | N | List of values MARKET_SEGMENT | All | - | - | -"
+      - "Filters | BDO Bank Client | Drop-down | All, Bank clients, Non-bank clients | N | Fixed list | All | - | - | -"
+      - "List | Code | Column | Client code once confirmed, otherwise the prospect code | - | Client master | - | Read only | - | -"
+      - "List | Name | Column | Last, first middle (individual) or registered name (corporate) | - | Client master | - | Read only | - | -"
+      - "List | Type | Column | Individual or Corporate | - | Client master | - | Read only | - | -"
+      - "List | Segment | Column | Market segment | - | Client master | - | Read only | - | -"
+      - "List | Bank | Column | Yes / No | - | Client master | - | Read only | - | -"
+      - "List | Status | Column | Prospect, Confirmed, Inactive | - | Client onboarding | - | Read only | - | -"
+      - "List | KYC | Column | Not started, Pending, Verified, Expired | - | KYC record | - | Read only | - | -"
+      - "List | KYC Review | Column | dd-MMM-yyyy | - | KYC record | - | Read only | - | -"
+      - "List | Contact | Column | Mobile, otherwise e-mail | - | Client master | - | Read only | - | -"
+    actions:
+      - "New Client | CLIENT_MAINTAIN | Always | Opens the New Client form | - | -"
+      - "Bulk Upload | BULK_PROCESS and CLIENT_MAINTAIN | Always | Opens the Bulk Upload wizard of type Create or update clients | - | -"
+      - "Filters / Apply Filters / Clear Filters | Every user of the screen | Always | Shows the advanced filters, applies them, or clears them and lists every client | - | -"
+      - "Open a row | Every user of the screen | Always | Opens the client record | - | -"
+    rules:
+      - "The list shows the clients of the company selected in the page header only (FR-NB-030)."
+      - "Every criterion can be combined; the quick tab wins over the Status filter (FR-NB-030)."
+      - "Inactive clients stay searchable; they cannot be quoted or changed (FR-NB-031, FR-NB-034)."
+    outcome: The user finds any client in one search and opens the complete client record.
+    frs: [FR-NB-030, FR-NB-046]
+    tests: [CLIENTS]
+
+  - id: SCR-NB-02
+    title: New Client and Edit Client
+    route: /crm/clients/new
+    also: [/crm/clients/:id/edit]
+    purpose: >-
+      Creates a prospect with its identity, contact and address, market segment and KYC profile, or changes an
+      existing client. Only the client type and name are needed to save a prospect; the rest is completed before the
+      KYC is submitted. Possible duplicates are shown while the user types.
+    entry:
+      - Clients › New Client button
+      - Client record › Edit
+    shots:
+      - {state: empty, user: ao, caption: "New Client form (individual)"}
+      - {state: filled, user: ao, fill: new_client, caption: "New Client form with the identity, contact and segment entered"}
+      - {state: error, user: ao, fill: new_client_invalid, submit: "^save as prospect$", caption: "Field messages after Save as prospect with an invalid TIN and mobile"}
+      - {state: duplicate, user: ao, fill: new_client_duplicate, caption: "Duplicate warning: the TIN belongs to an existing client"}
+    fields:
+      - "Identity | Client type | Drop-down | Individual or Corporate | Y | Fixed list | Individual | New; prospect (locked once the client is confirmed) | A confirmed client keeps its type | The client type of a confirmed client cannot be changed"
+      - "Identity | Last name | Text | Up to 100 characters | Y (individual) | - | Blank | Prospect, confirmed | Not blank for an individual | Enter the last name"
+      - "Identity | First name | Text | Up to 100 characters | Y (individual) | - | Blank | Prospect, confirmed | Not blank for an individual | Enter the first name"
+      - "Identity | Middle name | Text | Up to 100 characters | N | - | Blank | Prospect, confirmed | - | -"
+      - "Identity | Suffix | Text | Up to 20 characters (Jr., III) | N | - | Blank | Prospect, confirmed | - | -"
+      - "Identity | Birth date | Date | dd-MMM-yyyy | Cond.: before the KYC is submitted (individual) | - | Blank | Prospect, confirmed | In the past; the holder is at least CLIENT_MIN_AGE (18) years old | The birth date must be in the past / An individual policyholder must be at least 18 years old"
+      - "Identity | Nationality | Drop-down | - | Cond.: when set as a minimum field | List of values NATIONALITY | Not specified | Prospect, confirmed | An active value of the list | '<code>' is not a valid value of NATIONALITY on <date>"
+      - "Identity | Civil status | Drop-down | - | N | List of values CIVIL_STATUS | Not specified | Prospect, confirmed | An active value of the list | -"
+      - "Identity | Occupation | Text | Up to 120 characters | Cond.: when set as a minimum field | - | Blank | Prospect, confirmed | - | -"
+      - "Identity | Registered name | Text | Up to 200 characters | Y (corporate) | - | Blank | Prospect, confirmed | Not blank for a corporate client | Enter the corporate name"
+      - "Identity | Nature of business | Text | Up to 120 characters | N | - | Blank | Prospect, confirmed | - | -"
+      - "Identity | TIN | Text | 000-000-000-000 (formatted as typed) | Cond.: before the KYC is submitted | - | Blank | Prospect, confirmed | Four groups of three digits; unique in the company | Use the format 000-000-000-000"
+      - "Identity | ID type | Drop-down | - | Cond.: when an ID number is entered | List of values ID_TYPE | Not specified | Prospect, confirmed | Needed with the ID number | Select the ID type"
+      - "Identity | ID number | Text | Up to 60 characters | Cond.: before the KYC is submitted (individual) | - | Blank | Prospect, confirmed | ID type and number unique in the company | -"
+      - "Contact & Address | E-mail | Text | name@domain, up to 120 characters | Cond.: e-mail or mobile before the KYC is submitted | - | Blank | Prospect, confirmed | One @ and a dotted domain | Enter a valid e-mail address"
+      - "Contact & Address | Mobile | Text | 09xxxxxxxxx or +639xxxxxxxxx | Cond.: e-mail or mobile before the KYC is submitted | - | Blank | Prospect, confirmed | Philippine mobile format | Use 09xxxxxxxxx or +639xxxxxxxxx"
+      - "Contact & Address | Landline | Text | Up to 30 characters | N | - | Blank | Prospect, confirmed | - | -"
+      - "Contact & Address | Street address | Text | Up to 300 characters | Cond.: before the KYC is submitted | - | Blank | Prospect, confirmed | - | -"
+      - "Contact & Address | City / municipality | Text | Up to 80 characters | Cond.: before the KYC is submitted | - | Blank | Prospect, confirmed | - | -"
+      - "Contact & Address | Province | Text | Up to 80 characters | N | - | Blank | Prospect, confirmed | - | -"
+      - "Contact & Address | Postal code | Text | Up to 10 characters | N | - | Blank | Prospect, confirmed | - | -"
+      - "Segment & Bank relationship | Market segment | Drop-down | - | Cond.: before the KYC is submitted | List of values MARKET_SEGMENT | Not specified | Prospect, confirmed | An active value of the list | '<code>' is not a valid value of MARKET_SEGMENT on <date>"
+      - "Segment & Bank relationship | BDO bank client | Check box | The client banks with BDO | N | - | Not ticked | Prospect, confirmed | - | -"
+      - "Segment & Bank relationship | BDO CIF number | Text | Up to 40 characters | N (shown when BDO bank client is ticked) | - | Blank | Prospect, confirmed | - | -"
+      - "Segment & Bank relationship | Source of funds | Drop-down | - | Cond.: when set as a minimum field | List of values SOURCE_OF_FUNDS | Not specified | Prospect, confirmed | An active value of the list | -"
+      - "Segment & Bank relationship | KYC risk rating | Drop-down | Low, Standard, High | N | List of values KYC_RISK_RATING | Not specified | Prospect, confirmed | An active value of the list; High sets the 12-month review cycle | -"
+    actions:
+      - "Save as prospect | CLIENT_MAINTAIN | No blocking duplicate is shown | Checks the fields, saves the prospect with a PR-yyyy-nnnnnn code and shows the Prospect saved panel with Open Client and Create Another | Prospect (onboarding stage Prospect) | -"
+      - "Save changes | CLIENT_MAINTAIN | Edit of an active client; no blocking duplicate | Saves the changes and returns to the client record | Unchanged | -"
+      - "Cancel | Every user of the screen | Always | Leaves without saving | - | -"
+    rules:
+      - "Only the client type and the name are needed to save a prospect; a prospect can be quoted (FR-NB-031, FR-NB-041)."
+      - "The minimum fields that must be complete before the KYC is submitted are the parameters CLIENT_MIN_FIELDS_INDIVIDUAL (birth date, TIN, ID, contact, address, market segment) and CLIENT_MIN_FIELDS_CORPORATE (TIN, contact, address, market segment) (FR-NB-031, FR-NB-034)."
+      - "A match on TIN, ID type and number, or name with birth date blocks saving; a match on e-mail, mobile or corporate name is a warning (FR-NB-033)."
+      - "An inactive client cannot be changed (FR-NB-032)."
+      - "Every change is written to the client's audit history (FR-NB-016, FR-NB-032)."
+    outcome: The prospect exists with its code and can be quoted at once; the Account Officer continues with the KYC documents on the client record.
+    frs: [FR-NB-031, FR-NB-032, FR-NB-033]
+    tests: [NEWCLIENT]
+
+  - id: SCR-NB-03
+    title: Client record
+    route: /crm/clients/:id
+    parent: /crm/clients
+    purpose: >-
+      The complete view of one client: codes, status and KYC badges, the onboarding workflow and its actions, and tabs
+      for details, KYC documents, tags and instructions, quotations, confirmed proposals, linked records, screening and
+      history. The Account Officer submits the KYC here and a second user verifies it; the client is then confirmed.
+    entry:
+      - Clients › open a row
+      - KYC Reviews Due › open a row
+      - The client link of a quotation, proposal request or account
+    shots:
+      - {state: record, user: ao, open: first, caption: "Client record, Details tab, with the onboarding workflow panel"}
+      - {state: kyc, user: ao, open: first, tab: "KYC & Documents", caption: "KYC & Documents tab: checklist and typed upload"}
+      - {state: notes, user: ao, open: first, tab: "Tags & Instructions", caption: "Tags & Instructions tab"}
+      - {state: approval, user: mkttl, open: kyc_review, caption: "Client in KYC review as seen by the verifier (Verify KYC offered)"}
+    fields:
+      - "Header | Prospect / Client | Reference | PR-yyyy-nnnnnn; CL-yyyy-nnnnnn once confirmed | - | Numbering | Generated | Read only | - | -"
+      - "Header | Status and KYC badges | Status | Prospect, Confirmed, Inactive; KYC Not started, Pending, Verified, Expired | - | Onboarding | - | Read only | - | -"
+      - "Header | Information Incomplete tag | Tag | Lists the missing minimum fields | - | Parameters CLIENT_MIN_FIELDS_* | - | Read only | - | Client information incomplete: <fields>. Complete it before submitting the KYC."
+      - "Header | Instructions banner | Banner | Tags and special instructions in force | - | Tags & Instructions tab | - | Read only | - | -"
+      - "Workflow panel | Stage, since, due, assignee | Panel | Stage name, entry date and time, SLA due time, assignee | - | Workflow NB_CLIENT | - | Read only | - | -"
+      - "Details tab | Identity, Contact & Address, Segment & Bank relationship, Onboarding | Display | As entered on the client form; Onboarding shows created, KYC submitted, KYC verified, next KYC review, confirmed and deactivated with user and time | - | Client master | - | Read only | - | -"
+      - "Details tab | Sub-ledger party | Display | Party code of the confirmed client | - | Accounting party | Created at confirmation | Read only | - | -"
+      - "KYC & Documents tab | KYC checklist | Checklist | One line per mandatory document of the client type, Uploaded or Not uploaded yet | - | Lists of values KYC_DOCS_INDIVIDUAL, KYC_DOCS_CORPORATE | - | Read only | Every mandatory document before the KYC is submitted | Upload the mandatory KYC documents before you <step>: <documents>"
+      - "KYC & Documents tab | Document type | Drop-down | - | Y | List of values DOCUMENT_TYPE | Blank | Prospect, confirmed | An active value | -"
+      - "KYC & Documents tab | File | File | PDF, image or office document; size limit of the document store | Y | - | - | Prospect, confirmed | Allowed type, not empty, within the size limit, content matches the extension | Only these file types are allowed: <extensions>"
+      - "Tags & Instructions tab | Add a tag | Drop-down | - | N | List of values CLIENT_TAG | Blank | Prospect, confirmed | A tag once per client | The client is already tagged <tag>"
+      - "Tags & Instructions tab | Special instructions | Table | Type, Instruction, Effective, Status (Active, Future, Inactive) | - | Client instructions | - | Read only (changed through the dialog) | - | -"
+      - "Tags & Instructions tab | Type | Drop-down (dialog) | - | Y | List of values INSTRUCTION_TYPE | Blank | Prospect, confirmed | - | Select the instruction type"
+      - "Tags & Instructions tab | Instruction | Text area (dialog) | Up to 1,000 characters | Y | - | Blank | Prospect, confirmed | Not blank | Enter the instruction"
+      - "Tags & Instructions tab | Effective from | Date (dialog) | dd-MMM-yyyy | Y | - | Today | Prospect, confirmed | - | Enter the first day"
+      - "Tags & Instructions tab | Effective to | Date (dialog) | dd-MMM-yyyy; blank = until further notice | N | - | Blank | Prospect, confirmed | Not before Effective from | The end date must not be before the start date"
+      - "Tags & Instructions tab | Change history | Table | When, User, Item, Change, From → to | - | Note history | - | Read only | - | -"
+      - "Quotation tab | [Quotations of the client] | Table | Proposal No., status, product, premium | - | Quotations | - | Read only | - | -"
+      - "Confirmed Proposals tab | [Accepted proposal requests] | Table | PRF, status, product | - | Proposal requests | - | Read only | - | -"
+      - "Linked Records tab | Linkage and data gaps | Warning list | Missing sub-ledger party, inactive party, incomplete data, expired KYC | - | Client 360 check | - | Read only | - | Confirmed client without a sub-ledger party code"
+      - "Linked Records tab | Records of the client | Table | Record, Reference, Description, Status, Date | - | Quotations, proposals, accounts | - | Read only | - | -"
+      - "Screening tab | Screening cases of the client | Table | Shown to users with the screening permission | - | Sanction Screening (BRD-10) | - | Read only | - | -"
+      - "History tab | Audit history | Table | When, User, Action, Details | - | Audit trail | - | Read only | - | -"
+    actions:
+      - "Generate Quotation | QUOTE_MAINTAIN | Always | Opens the New Quotation wizard with this client chosen | - | -"
+      - "Edit | CLIENT_MAINTAIN | Client not inactive | Opens the client form | - | -"
+      - "Submit KYC | CLIENT_MAINTAIN | Stage Prospect; minimum fields complete; mandatory KYC documents uploaded | Asks for an optional comment and sends the KYC for verification | KYC review (KYC Pending) | In-app notice to the verifiers' queue; the client's creator is told of each later move"
+      - "Verify KYC | CLIENT_APPROVE; not the creator of the client or the user who submitted the KYC | Stage KYC review, or a confirmed client whose KYC is due for its periodic review | Records the verification and sets the next review date (36 months, 12 for high risk) | KYC verified (KYC Verified) | In-app notice to the creator"
+      - "Return | CLIENT_APPROVE | Stage KYC review | Asks for the return reason and a comment; sends the KYC back to the Account Officer | Prospect | In-app notice to the creator with the comment"
+      - "Confirm client | CLIENT_MAINTAIN or CLIENT_APPROVE | Stage KYC verified and status Prospect | Gives the client its CL-yyyy-nnnnnn code and creates its sub-ledger party | Confirmed | In-app notice to the creator"
+      - "Deactivate | CLIENT_MAINTAIN or CLIENT_APPROVE | Client not inactive | Asks for the deactivation reason and a comment | Inactive | In-app notice to the creator"
+      - "Upload KYC Document | CLIENT_MAINTAIN | Client not inactive; document type and file chosen | Stores the file against the client and ticks the checklist line | Unchanged | -"
+      - "Add Tag / remove tag | CLIENT_MAINTAIN | Client not inactive | Adds or removes the tag; the change is kept in the change history | Unchanged | -"
+      - "New Instruction / Change / End | CLIENT_MAINTAIN | Client not inactive; the instruction is active | Adds, changes or ends a special instruction | Unchanged | -"
+    rules:
+      - "The KYC is never verified by the user who created the client or submitted the KYC (FR-NB-034)."
+      - "A client is confirmed only after its KYC is verified; accounts need a confirmed client (FR-NB-034, FR-NB-061)."
+      - "The next KYC review falls KYC_REVIEW_MONTHS (36) after verification, KYC_REVIEW_MONTHS_HIGH_RISK (12) for a high-risk client (FR-NB-038)."
+      - "Tags and instructions are shown as a banner on the client, its quotations and accounts; they warn and do not block (FR-NB-036)."
+      - "The linkage check lists what is missing for downstream processing, such as a confirmed client without a sub-ledger party (FR-NB-037)."
+    outcome: The client is confirmed with a verified KYC and a sub-ledger party, and can hold accounts; every step is in the workflow history and the audit history.
+    frs: [FR-NB-034, FR-NB-036, FR-NB-037, FR-NB-017, FR-NB-018]
+    tests: [CLIENT, KYC, TAGS]
+
+  - id: SCR-NB-04
+    title: KYC Reviews Due
+    route: /crm/kyc-reviews
+    purpose: >-
+      The monthly list of clients whose periodic KYC review is overdue or falls due within the review window, by
+      default the non-bank clients. The list is downloaded in Excel or PDF, or printed.
+    entry:
+      - The monthly KYC review notification links to this list
+    shots:
+      - {state: list, user: ao, caption: "KYC Reviews Due with the default filters"}
+    fields:
+      - "Filters | Due by | Date | dd-MMM-yyyy; blank = overdue and due within KYC_DUE_WINDOW_DAYS (30) | N | - | Blank | - | - | -"
+      - "Filters | Clients | Drop-down | Non-bank clients, BDO bank clients, All clients | N | Fixed list | Non-bank clients | - | - | -"
+      - "Filters | Risk rating | Drop-down | - | N | List of values KYC_RISK_RATING | All | - | - | -"
+      - "Filters | Market segment | Drop-down | - | N | List of values MARKET_SEGMENT | All | - | - | -"
+      - "List | Code | Column | Client code | - | Client master | - | Read only | - | -"
+      - "List | Client | Column | Name | - | Client master | - | Read only | - | -"
+      - "List | Segment | Column | Market segment | - | Client master | - | Read only | - | -"
+      - "List | Risk | Column | KYC risk rating | - | Client master | - | Read only | - | -"
+      - "List | Last Verified | Column | dd-MMM-yyyy HH:mm | - | KYC record | - | Read only | - | -"
+      - "List | Review Due | Column | dd-MMM-yyyy | - | KYC record | - | Read only | - | -"
+      - "List | KYC | Column | Verified or Expired | - | KYC record | - | Read only | - | -"
+    actions:
+      - "Excel / PDF | Every user of the screen | Always | Downloads the list as report NB-KYC-DUE with the filters shown | - | -"
+      - "Print | Every user of the screen | Always | Prints the page | - | -"
+      - "Open a row | Every user of the screen | Always | Opens the client record | - | -"
+    rules:
+      - "On the first day of the month the KYC_REVIEW_DUE job expires overdue KYC and notifies the Account Officers of the list (FR-NB-038)."
+      - "A client with an expired KYC keeps its code; its KYC is verified again from the client record (FR-NB-038)."
+    outcome: Marketing sees every KYC review to be done this month and works it from the client record.
+    frs: [FR-NB-038]
+    tests: [KYCDUE]

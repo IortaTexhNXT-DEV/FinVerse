@@ -1,0 +1,7 @@
+# nginx configuration of bibs-frontend (TLS listener), included by deploy/k8s/base.
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+configMapGenerator:
+  - name: bibs-frontend-nginx
+    files:
+      - default.conf.template

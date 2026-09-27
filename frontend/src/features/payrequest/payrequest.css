@@ -1,0 +1,31 @@
+/* Refund and cash-advance request screens (BRD-5 MKT). Colours and spacing come from the tokens. */
+
+.prq-inline-field {
+  display: flex;
+  gap: var(--space-1);
+  align-items: center;
+}
+
+.prq-lines .input,
+.prq-lines .select {
+  min-width: 110px;
+}
+
+.prq-lines td {
+  vertical-align: top;
+}
+
+.prq-lines .field-error {
+  display: block;
+  margin-top: var(--space-1);
+}
+
+.prq-total {
+  color: var(--color-heading);
+  font-weight: 700;
+}
+
+.prq-validation-note {
+  margin: 0;
+  color: var(--color-text-muted);
+}

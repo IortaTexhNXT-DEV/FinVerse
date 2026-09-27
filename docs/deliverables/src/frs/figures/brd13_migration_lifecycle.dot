@@ -1,0 +1,56 @@
+// BRD-13 Data Migration: lifecycle of a data object from decision to sign-off (FRS section 2.2; BRID 1.1a, 1.1b, 3.1).
+// Colour tokens (@HEADER_BLUE ...) are replaced by tools/deliverables before rendering.
+// Layout: four rows of three read left to right; the fill colour of a step is its actor (legend at the bottom);
+// sign-off gates are yellow.
+digraph dm_lifecycle {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.45, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=12, fontcolor="@NEAR_BLACK", width=2.3, height=0.85, margin="0.12,0.06"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.8, penwidth=1.2, fontname="Arial", fontsize=10, fontcolor="@MUTED"];
+
+  s1  [label=<<b>1. Data object</b><br/><font point-size="10">register, four criteria<br/>BRID 1.1a</font>>, fillcolor="@BG_BLUE"];
+  g1  [label=<<b>G1 Decision</b><br/><font point-size="10">Migrate / Carry-forward /<br/>Archive / Excluded</font>>, fillcolor="@YELLOW"];
+  s2  [label=<<b>2. Layout and code maps</b><br/><font point-size="10">versioned<br/>BRID 3.1</font>>, fillcolor="@DIRTY_WHITE"];
+
+  g2  [label=<<b>G2 Mapping</b><br/><font point-size="10">map versions approved</font>>, fillcolor="@YELLOW"];
+  s3  [label=<<b>3. Extract intake</b><br/><font point-size="10">control totals, checksum,<br/>masking outside production</font>>, fillcolor="@WHITE"];
+  s4  [label=<<b>4. Staging, validation</b><br/><font point-size="10">rules, unmapped codes,<br/>client matching</font>>, fillcolor="@DIRTY_WHITE"];
+
+  g3  [label=<<b>G3 Validation</b><br/><font point-size="10">error rate, waivers</font>>, fillcolor="@YELLOW"];
+  g4  [label=<<b>G4 Load approval</b><br/><font point-size="10">Data Migration Lead</font>>, fillcolor="@YELLOW"];
+  s5  [label=<<b>5. Load</b><br/><font point-size="10">through BIBS services,<br/>key cross-reference</font>>, fillcolor="@WHITE"];
+
+  s6  [label=<<b>6. Reconciliation</b><br/><font point-size="10">counts, amounts, hash,<br/>fields, GL clearing</font>>, fillcolor="@AMBER_BG"];
+  g5  [label=<<b>G5 Reconciled</b><br/><font point-size="10">breaks explained<br/>BRID 1.1b</font>>, fillcolor="@YELLOW"];
+  g6  [label=<<b>G6 Object accepted</b><br/><font point-size="10">data owner and DM Lead</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+
+  { rank=same; s1; g1; s2; }
+  { rank=same; g2; s3; s4; }
+  { rank=same; g3; g4; s5; }
+  { rank=same; s6; g5; g6; }
+
+  s1 -> g1 -> s2;
+  g2 -> s3 -> s4;
+  g3 -> g4 -> s5;
+  s6 -> g5 -> g6;
+  s1 -> g2 -> g3 -> s6 [style=invis, weight=10];
+  g1 -> s3 -> g4 -> g5 [style=invis, weight=10];
+  s2 -> s4 -> s5 -> g6 [style=invis, weight=10];
+  s2 -> g2 [constraint=false];
+  s4 -> g3 [constraint=false];
+  s5 -> s6 [constraint=false];
+  s6 -> s4 [constraint=false, style=dashed, color="@MUTED", label="  rerun: fix at source,\n  new map version, waiver"];
+
+  legend [shape=plaintext, style="", label=<
+    <table border="0" cellborder="1" cellspacing="4" cellpadding="4">
+      <tr>
+        <td border="0"><font point-size="10" color="@MUTED">Actor:</font></td>
+        <td bgcolor="@BG_BLUE" color="@HEADER_BLUE"><font point-size="10">DM Lead</font></td>
+        <td bgcolor="@DIRTY_WHITE" color="@HEADER_BLUE"><font point-size="10">Data Steward</font></td>
+        <td bgcolor="@WHITE" color="@HEADER_BLUE"><font point-size="10">Operator / job</font></td>
+        <td bgcolor="@AMBER_BG" color="@HEADER_BLUE"><font point-size="10">Recon approver</font></td>
+        <td bgcolor="@YELLOW" color="@HEADER_BLUE"><font point-size="10">Gate</font></td>
+      </tr>
+    </table>>];
+  g5 -> legend [style=invis];
+}

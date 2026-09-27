@@ -1,0 +1,23 @@
+// BRD-7 Claims: claim phases and the workflow BCL_CLAIM (FRS section 5.1).
+// The 18 BDOI claim statuses are values inside a phase; the phase drives the system behaviour.
+// A NEW claim can also close directly (for example Closed - Cancelled); see the transitions table.
+digraph clm_phases {
+  graph [rankdir=TB, fontname="Arial", nodesep=1.0, ranksep=0.6, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.2,
+         fontname="Arial", fontsize=16, fontcolor="@NEAR_BLACK", width=2.8, height=0.8, margin="0.1,0.05"];
+  edge  [color="@MUTED", arrowsize=0.8, fontname="Arial", fontsize=14, fontcolor="@TEXT"];
+
+  NEW         [label=<<b>NEW</b><br/><font point-size="13">statuses 1-2</font>>];
+  IN_PROGRESS [label=<<b>IN_PROGRESS</b><br/><font point-size="13">statuses 3-16</font>>];
+  TEMP_CLOSED [label=<<b>TEMP_CLOSED</b><br/><font point-size="13">statuses 17-18</font>>, fillcolor="@AMBER_BG"];
+  CLOSED      [label=<<b>CLOSED</b><br/><font point-size="13">closing settlement type</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+
+  NEW -> IN_PROGRESS [label="  progress"];
+  IN_PROGRESS -> TEMP_CLOSED [label="temp_close  "];
+  TEMP_CLOSED -> IN_PROGRESS [label="  resume", style=dashed];
+  IN_PROGRESS -> CLOSED [label="  close"];
+  TEMP_CLOSED -> CLOSED [label="close"];
+  CLOSED -> IN_PROGRESS [label="  reopen", style=dashed];
+
+  { rank=same; TEMP_CLOSED; CLOSED; }
+}

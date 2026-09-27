@@ -1,0 +1,89 @@
+# bibs-web: user screens and APIs (/api/**). Runtime role "web": no schedulers, no Kafka consumers,
+# no outbox relay. Scaled by the HorizontalPodAutoscaler (autoscaling.yaml), at least 2 pods spread
+# across availability zones.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bibs-web
+  labels: { app.kubernetes.io/name: bibs-web, app.kubernetes.io/component: backend }
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels: { app.kubernetes.io/name: bibs-web }
+  strategy:
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: bibs-web, app.kubernetes.io/component: backend, bibs/tier: backend }
+    spec:
+      serviceAccountName: bibs-web
+      terminationGracePeriodSeconds: 45
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        runAsGroup: 10001
+        fsGroup: 10001
+        seccompProfile: { type: RuntimeDefault }
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector: { matchLabels: { app.kubernetes.io/name: bibs-web } }
+        - maxSkew: 1
+          topologyKey: kubernetes.io/hostname
+          whenUnsatisfiable: ScheduleAnyway
+          labelSelector: { matchLabels: { app.kubernetes.io/name: bibs-web } }
+      containers:
+        - name: backend
+          image: bibs-backend
+          ports: [{ name: https, containerPort: 8443 }]
+          env:
+            - { name: BROKERVERSE_RUNTIME_ROLE, value: web }
+          envFrom:
+            - configMapRef: { name: bibs-backend-config }
+            - secretRef: { name: bibs-backend-secrets }
+          resources:
+            requests: { cpu: "1", memory: "2Gi" }
+            limits: { cpu: "2", memory: "3Gi" }
+          startupProbe:
+            httpGet: { path: /actuator/health/liveness, port: https, scheme: HTTPS }
+            periodSeconds: 10
+            failureThreshold: 30
+          readinessProbe:
+            httpGet: { path: /actuator/health/readiness, port: https, scheme: HTTPS }
+            periodSeconds: 10
+            failureThreshold: 3
+          livenessProbe:
+            httpGet: { path: /actuator/health/liveness, port: https, scheme: HTTPS }
+            periodSeconds: 20
+            failureThreshold: 3
+          lifecycle:
+            # Lets the load balancer deregister the pod before the graceful shutdown starts.
+            preStop: { sleep: { seconds: 15 } }
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          volumeMounts:
+            - { name: tls, mountPath: /etc/bibs/tls, readOnly: true }
+            - { name: rds-ca, mountPath: /etc/bibs/rds-ca, readOnly: true }
+            - { name: tmp, mountPath: /tmp }
+      volumes:
+        - name: tls
+          secret: { secretName: bibs-web-tls }
+        - name: rds-ca
+          configMap: { name: rds-ca-bundle }
+        - name: tmp
+          emptyDir: { sizeLimit: 1Gi }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bibs-web
+  labels: { app.kubernetes.io/name: bibs-web }
+  annotations:
+    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health/readiness
+spec:
+  selector: { app.kubernetes.io/name: bibs-web }
+  ports: [{ name: https, port: 8443, targetPort: https }]

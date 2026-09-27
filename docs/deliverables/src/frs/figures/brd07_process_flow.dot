@@ -1,0 +1,50 @@
+// BRD-7 Claims: claim lifecycle by actor (FRS section 2.2; BRD p.24-27, BRCLM.001-043).
+// Colour tokens (@HEADER_BLUE ...) are replaced by tools/deliverables before rendering.
+// Layout: three rows of four steps; the fill colour of a step is its actor (legend at the bottom).
+digraph clm_process {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.2, fontname="Arial",
+         fontsize=11, fontcolor="@NEAR_BLACK", width=1.9, height=0.8, margin="0.1,0.05"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.7, penwidth=1.1, fontname="Arial", fontsize=9, fontcolor="@MUTED"];
+
+  // Actors: client / Marketing = @BG_BLUE, Claims Officer = @WHITE, TL / TH = @AMBER_BG, system = @DIRTY_WHITE, report users = @SUCCESS_BG
+  s1  [label=<<b>1. Notice of loss</b><br/><font point-size="9">Client, AO or branch<br/>PLA / CRF (p.24-25)</font>>, fillcolor="@BG_BLUE"];
+  s2  [label=<<b>2. Record claim</b><br/><font point-size="9">Claims Officer; cover, version<br/>BRCLM.003, 004, 037</font>>, fillcolor="@WHITE"];
+  s3  [label=<<b>3. Premium check</b><br/><font point-size="9">System; invoice ledger<br/>BRCLM.001</font>>, fillcolor="@DIRTY_WHITE"];
+  s4  [label=<<b>4. Loss advice</b><br/><font point-size="9">Claims Officer to insurers<br/>BRCLM.041, 043</font>>, fillcolor="@WHITE"];
+  s5  [label=<<b>5. Handling</b><br/><font point-size="9">Status, adjuster, reserve<br/>BRCLM.010-024</font>>, fillcolor="@WHITE"];
+  s6  [label=<<b>6. Follow-up and diary</b><br/><font point-size="9">Next follow-up, action plan<br/>BRCLM.019-022, 034</font>>, fillcolor="@WHITE"];
+  s7  [label=<<b>7. Premium remittance</b><br/><font point-size="9">Status 11; special remittance<br/>BRCLM.010; OQ46</font>>, fillcolor="@DIRTY_WHITE"];
+  s8  [label=<<b>8. Settlement</b><br/><font point-size="9">Team Lead / Team Head<br/>BRCLM.014, 015</font>>, fillcolor="@AMBER_BG"];
+  s9  [label=<<b>9. Temporary closure</b><br/><font point-size="9">Statuses 17-18<br/>BRCLM.035</font>>, fillcolor="@WHITE"];
+  s10 [label=<<b>10. Permanent closure</b><br/><font point-size="9">Team Lead / Team Head<br/>BRCLM.005, 035</font>>, fillcolor="@AMBER_BG"];
+  s11 [label=<<b>11. Ageing and reports</b><br/><font point-size="9">Claims, Unit Head<br/>BRCLM.025-034</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  s12 [label=<<b>12. Loss analytics</b><br/><font point-size="9">Risk, Marketing, Renewal<br/>BRCLM.038, 040</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+
+  { rank=same; s1; s2; s3; s4; }
+  { rank=same; s5; s6; s7; s8; }
+  { rank=same; s9; s10; s11; s12; }
+
+  s1 -> s2 -> s3 -> s4;
+  s4 -> s5 [constraint=false];
+  s1 -> s5 -> s9 [style=invis, weight=10];
+  s2 -> s6 -> s10 [style=invis, weight=10];
+  s3 -> s7 -> s11 [style=invis, weight=10];
+  s4 -> s8 -> s12 [style=invis, weight=10];
+  s5 -> s6 -> s7 -> s8;
+  s8 -> s9 [constraint=false, style=dashed];
+  s9 -> s10 -> s11 -> s12;
+
+  legend [shape=plaintext, style="", label=<
+    <table border="0" cellborder="1" cellspacing="4" cellpadding="4">
+      <tr>
+        <td border="0"><font point-size="9" color="@MUTED">Actor:</font></td>
+        <td bgcolor="@BG_BLUE" color="@HEADER_BLUE"><font point-size="9">Client / Marketing</font></td>
+        <td bgcolor="@WHITE" color="@HEADER_BLUE"><font point-size="9">Claims Officer</font></td>
+        <td bgcolor="@AMBER_BG" color="@HEADER_BLUE"><font point-size="9">Team Lead / Team Head</font></td>
+        <td bgcolor="@DIRTY_WHITE" color="@HEADER_BLUE"><font point-size="9">System</font></td>
+        <td bgcolor="@SUCCESS_BG" color="@SUCCESS"><font point-size="9">Report users</font></td>
+      </tr>
+    </table>>];
+  s10 -> legend [style=invis];
+}

@@ -1,0 +1,31 @@
+// BRD-5 Volume 2: workflow DISB_VOUCHER (V890). FRS section 5.1.
+digraph v2_dv {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.7, ranksep=0.45, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=13, fontcolor="@NEAR_BLACK", width=2.4, height=0.6];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=11, fontcolor="@TEXT"];
+
+  REQ  [label="Request received\n(DSR-yyyy-n)", fillcolor="@DIRTY_WHITE"];
+  NOP  [label="NO_PAYEE\nwaits for the payee", fillcolor="@AMBER_BG"];
+  IP   [label="IN_PROCESS\nProcessor"];
+  FR   [label="FOR_REVIEW\nTeam Leader"];
+  FA   [label="FOR_APPROVAL\nApprover"];
+  AP   [label="APPROVED\nposted, instrument", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  RJ   [label="REJECTED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  CA   [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  { rank=same; REQ; NOP; }
+  { rank=same; IP; CA; }
+  { rank=same; AP; RJ; }
+  REQ -> NOP [label=" payee not found", style=dotted];
+  NOP -> IP [label=" payee authorised", style=dotted];
+  REQ -> IP [label=" DV created"];
+  IP -> FR [label=" submit"];
+  FR -> FA [label=" submit for approval"];
+  FA -> AP [label=" approve"];
+  FA -> RJ [label=" reject"];
+  IP -> CA [label=" cancel"];
+  FR -> IP [label=" return", style=dashed, constraint=false];
+  FA -> IP [label=" return", style=dashed, constraint=false];
+  FR -> CA [label=" cancel", constraint=false];
+  AP -> CA [label=" cancel approved DV", constraint=false];
+}

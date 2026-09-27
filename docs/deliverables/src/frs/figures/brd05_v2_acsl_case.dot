@@ -1,0 +1,19 @@
+// BRD-5 Volume 2: workflow ACSL_CASE (V890). FRS section 5.7.
+digraph v2_case {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.55, ranksep=0.5, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.2, height=0.55];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  RE [label="RECEIVED\nTeam Leader"];
+  AS [label="ASSIGNED\nprocessor"];
+  IV [label="INVESTIGATING\nprocessor"];
+  RP [label="RESULT_PROVIDED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  CO [label="CORRECTION\ncorrection raised", fillcolor="@AMBER_BG"];
+  RE -> AS [label=" assign"];
+  AS -> IV [label=" start"];
+  AS -> RE [label=" send back", style=dashed];
+  IV -> RP [label=" provide result"];
+  IV -> CO [label=" raise correction"];
+  { rank=same; RP; CO; }
+}

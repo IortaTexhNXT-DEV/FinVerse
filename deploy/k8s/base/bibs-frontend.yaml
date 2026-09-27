@@ -1,0 +1,66 @@
+# bibs-frontend: nginx serving the React build over TLS (deploy/nginx/default.conf.template mounted
+# over the template of the frontend image). Scaled by the HorizontalPodAutoscaler, 2 pods minimum.
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bibs-frontend
+  labels: { app.kubernetes.io/name: bibs-frontend, app.kubernetes.io/component: frontend }
+spec:
+  replicas: 2
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels: { app.kubernetes.io/name: bibs-frontend }
+  strategy:
+    rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
+  template:
+    metadata:
+      labels: { app.kubernetes.io/name: bibs-frontend, app.kubernetes.io/component: frontend }
+    spec:
+      serviceAccountName: bibs-frontend
+      automountServiceAccountToken: false
+      securityContext:
+        seccompProfile: { type: RuntimeDefault }
+      topologySpreadConstraints:
+        - maxSkew: 1
+          topologyKey: topology.kubernetes.io/zone
+          whenUnsatisfiable: DoNotSchedule
+          labelSelector: { matchLabels: { app.kubernetes.io/name: bibs-frontend } }
+      containers:
+        - name: frontend
+          image: bibs-frontend
+          ports: [{ name: https, containerPort: 8443 }]
+          resources:
+            requests: { cpu: "50m", memory: "64Mi" }
+            limits: { cpu: "500m", memory: "256Mi" }
+          readinessProbe:
+            httpGet: { path: /healthz, port: https, scheme: HTTPS }
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /healthz, port: https, scheme: HTTPS }
+            periodSeconds: 20
+          lifecycle:
+            preStop: { sleep: { seconds: 10 } }
+          securityContext:
+            allowPrivilegeEscalation: false
+          volumeMounts:
+            - name: nginx-config
+              mountPath: /etc/nginx/templates/default.conf.template
+              subPath: default.conf.template
+              readOnly: true
+            - { name: tls, mountPath: /etc/nginx/tls, readOnly: true }
+      volumes:
+        - name: nginx-config
+          configMap: { name: bibs-frontend-nginx }
+        - name: tls
+          secret: { secretName: bibs-frontend-tls }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bibs-frontend
+  labels: { app.kubernetes.io/name: bibs-frontend }
+  annotations:
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz
+spec:
+  selector: { app.kubernetes.io/name: bibs-frontend }
+  ports: [{ name: https, port: 8443, targetPort: https }]

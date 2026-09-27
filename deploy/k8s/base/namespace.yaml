@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bibs
+  labels:
+    # Pod Security Admission: restricted for the backend pods; the frontend image runs nginx as
+    # root today (see DEPLOYMENT.md), so the namespace enforces baseline and warns on restricted.
+    pod-security.kubernetes.io/enforce: baseline
+    pod-security.kubernetes.io/warn: restricted
+    pod-security.kubernetes.io/audit: restricted

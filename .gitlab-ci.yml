@@ -1,0 +1,135 @@
+# iNXT BrokerVerse (BIBS) - CI pipeline for GitLab (BDOI toolchain, IER workbook: GitLab Runner).
+# Same gates as the other pipeline definition of the project:
+#   backend   mvn verify (format, compile -Werror, unit and integration tests, JaCoCo coverage gate,
+#             Checkstyle, PMD / CPD, SpotBugs + FindSecBugs, ArchUnit, delivery wording check),
+#             then SonarQube with the quality gate when SONAR_TOKEN is set;
+#   frontend  npm verify (Prettier, ESLint + SonarJS, TypeScript, Vitest with coverage), build,
+#             then SonarQube when SONAR_TOKEN is set;
+#   security  static application security testing of the Java and TypeScript code (GitLab SAST),
+#             on every pipeline and weekly (schedule "weekly-security", Monday 03:00 UTC);
+#   images    backend and frontend container images, after both builds pass.
+# Variables (Settings > CI/CD > Variables): SONAR_TOKEN (masked), SONAR_HOST_URL; for the image push
+# the GitLab registry variables are used (CI_REGISTRY, CI_REGISTRY_USER, CI_REGISTRY_PASSWORD).
+
+stages:
+  - build
+  - quality
+  - security
+  - images
+
+include:
+  - template: Jobs/SAST.gitlab-ci.yml
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+  MAVEN_CLI_OPTS: "-B --no-transfer-progress"
+  GIT_DEPTH: "0"
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+
+# ---------------------------------------------------------------- backend
+backend:verify:
+  stage: build
+  image: maven:3.9-eclipse-temurin-21
+  cache:
+    key: maven-$CI_COMMIT_REF_SLUG
+    paths: [.m2/repository]
+  script:
+    - cd backend
+    - mvn $MAVEN_CLI_OPTS verify
+  artifacts:
+    when: always
+    expire_in: 14 days
+    reports:
+      junit:
+        - backend/target/surefire-reports/TEST-*.xml
+        - backend/target/failsafe-reports/TEST-*.xml
+    paths:
+      - backend/target/site/jacoco
+      - backend/target/surefire-reports
+      - backend/target/failsafe-reports
+      - backend/target/pmd.xml
+      - backend/target/spotbugsXml.xml
+      - backend/target/checkstyle-result.xml
+      - backend/target/classes
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+
+backend:sonarqube:
+  stage: quality
+  image: maven:3.9-eclipse-temurin-21
+  needs: [backend:verify]
+  cache:
+    key: maven-$CI_COMMIT_REF_SLUG
+    paths: [.m2/repository]
+    policy: pull
+  script:
+    - cd backend
+    - mvn $MAVEN_CLI_OPTS org.sonarsource.scanner.maven:sonar-maven-plugin:5.1.0.4751:sonar -Dsonar.qualitygate.wait=true
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "schedule" && $SONAR_TOKEN
+
+# ---------------------------------------------------------------- frontend
+frontend:verify:
+  stage: build
+  image: node:22
+  cache:
+    key:
+      files: [frontend/package-lock.json]
+    paths: [frontend/.npm]
+  script:
+    - cd frontend
+    - npm ci --no-audit --no-fund --cache .npm --prefer-offline
+    - npm run verify
+    - npm run build
+  artifacts:
+    when: always
+    expire_in: 14 days
+    paths:
+      - frontend/coverage
+      - frontend/dist
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+
+frontend:sonarqube:
+  stage: quality
+  image:
+    name: sonarsource/sonar-scanner-cli:11
+    entrypoint: [""]
+  needs: [frontend:verify]
+  script:
+    - cd frontend
+    - sonar-scanner -Dsonar.host.url="$SONAR_HOST_URL" -Dsonar.token="$SONAR_TOKEN" -Dsonar.qualitygate.wait=true
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "schedule" && $SONAR_TOKEN
+
+# ---------------------------------------------------------------- security (SAST template jobs)
+sast:
+  stage: security
+  variables:
+    SAST_EXCLUDED_PATHS: "spec, test, tests, tmp, node_modules, docs, tools"
+
+# ---------------------------------------------------------------- images
+.images:
+  stage: images
+  image: docker:27
+  services: [docker:27-dind]
+  needs: [backend:verify, frontend:verify]
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "schedule"
+
+images:backend:
+  extends: .images
+  script:
+    - docker build -t "brokerverse-backend:$CI_COMMIT_SHA" backend
+
+images:frontend:
+  extends: .images
+  script:
+    - docker build -t "brokerverse-frontend:$CI_COMMIT_SHA" frontend

@@ -1,0 +1,25 @@
+// BRD-5 Volume 1: workflow FRBS_SERVICE_FEE (V890). FRS section 5.3; FRBS 2.10.x.
+digraph acc_fee {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.6, ranksep=0.45, bgcolor="white", pad=0.15];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.4, height=0.55];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  COMPUTED     [label="COMPUTED\nGL Officer"];
+  FOR_APPROVAL [label="FOR_APPROVAL\nGL TL / Head"];
+  APPROVED     [label="APPROVED\naccrual posted, payouts sent"];
+  RELEASED     [label="RELEASED\nall paid lines released"];
+  LIQUIDATED   [label="LIQUIDATED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  CANCELLED    [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  disb         [label="Disbursement\n(SERVICE_FEE DV)", fillcolor="@WHITE", style="rounded,dashed,filled"];
+
+  COMPUTED -> FOR_APPROVAL [label=" submit"];
+  FOR_APPROVAL -> COMPUTED [label=" return", style=dashed, constraint=false];
+  FOR_APPROVAL -> APPROVED [label=" approve (four eyes)"];
+  APPROVED -> disb [style=dashed];
+  disb -> RELEASED [label=" PAID", style=dashed];
+  APPROVED -> RELEASED [label=" tag released"];
+  RELEASED -> LIQUIDATED [label=" liquidation report\n per line"];
+  COMPUTED -> CANCELLED [label=" cancel", style=dotted];
+  { rank=same; APPROVED; disb; }
+}

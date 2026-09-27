@@ -1,0 +1,25 @@
+// BRD-2: workflow OPS_CWT_2307 (V764; CSHID.026/027, MKTID.010/013, DBMID.001). FRS section 5. Stage owner in the second line.
+// Solid = main path, dashed = return or optional path, dotted = closes the case.
+digraph wf_cwt2307 {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.3, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.4, height=0.45, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  TAGGED [label="TAGGED\nMarketing Collection (CWT_TAG)"];
+  VALIDATING [label="VALIDATING\nCashier (CWT_PROCESS)"];
+  REPORT_POSTED [label="REPORT_POSTED\nCashier (CWT_PROCESS)"];
+  WITH_DISBURSEMENT [label="WITH_DISBURSEMENT\nDisbursement (DISB_PROCESS)"];
+  RELEASED [label="RELEASED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  SETTLED_CASH [label="SETTLED_CASH", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  CANCELLED [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  TAGGED -> VALIDATING [label=" receive"];
+  VALIDATING -> REPORT_POSTED [label=" validate"];
+  REPORT_POSTED -> WITH_DISBURSEMENT [label=" route"];
+  WITH_DISBURSEMENT -> RELEASED [label=" release_to_insurer"];
+  VALIDATING -> SETTLED_CASH [label=" settle_cash", style=dashed];
+  VALIDATING -> TAGGED [label=" return", style=dashed, constraint=false];
+  TAGGED -> CANCELLED [label=" cancel", style=dotted];
+  { rank=same; VALIDATING; CANCELLED; }
+}

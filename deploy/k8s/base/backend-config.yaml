@@ -1,0 +1,43 @@
+# Settings shared by the three backend deployments (bibs-web, bibs-jobs, bibs-integration). The role
+# (BROKERVERSE_RUNTIME_ROLE) is set on each deployment. Secrets are in the secret bibs-backend-secrets
+# (see secrets.example.yaml); both are overlaid per environment. Keys: docs/operations/CONFIGURATION.md.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bibs-backend-config
+data:
+  SPRING_PROFILES_ACTIVE: "prod"
+  BROKERVERSE_ENVIRONMENT: "production"
+  BROKERVERSE_ALLOWED_ORIGINS: "https://<BIBS_HOST>"
+  BROKERVERSE_TOKEN_VALIDITY: "PT8H"
+  BROKERVERSE_DB_POOL_SIZE: "20"
+  # Client address of the login rate limit comes from X-Forwarded-For set by the load balancer.
+  SERVER_FORWARD_HEADERS_STRATEGY: "native"
+  # ---- HTTPS of the backend pods (ALB -> pods), certificate from cert-manager ----
+  BROKERVERSE_PORT: "8443"
+  BROKERVERSE_SERVER_SSL_ENABLED: "true"
+  BROKERVERSE_SERVER_SSL_CERTIFICATE: "file:/etc/bibs/tls/tls.crt"
+  BROKERVERSE_SERVER_SSL_PRIVATE_KEY: "file:/etc/bibs/tls/tls.key"
+  # ---- PostgreSQL (Amazon RDS, rds.force_ssl=1): verify-full against the RDS CA bundle ----
+  BROKERVERSE_DB_SSL_MODE: "verify-full"
+  BROKERVERSE_DB_SSL_ROOT_CERT: "/etc/bibs/rds-ca/global-bundle.pem"
+  # ---- Redis 7 (ElastiCache, in-transit encryption); AUTH token in the secret ----
+  BROKERVERSE_REDIS_ENABLED: "true"
+  BROKERVERSE_REDIS_HOST: "<ELASTICACHE_PRIMARY_ENDPOINT>"
+  BROKERVERSE_REDIS_PORT: "6379"
+  BROKERVERSE_REDIS_TLS: "true"
+  BROKERVERSE_REDIS_KEY_PREFIX: "bv:"
+  # ---- Kafka (Amazon MSK, SASL/SCRAM over TLS, port 9096); JAAS configuration in the secret ----
+  BROKERVERSE_KAFKA_ENABLED: "true"
+  BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS: "<MSK_SASL_SCRAM_BOOTSTRAP_BROKERS>"
+  BROKERVERSE_KAFKA_SECURITY_PROTOCOL: "SASL_SSL"
+  BROKERVERSE_KAFKA_SASL_MECHANISM: "SCRAM-SHA-512"
+  BROKERVERSE_KAFKA_PARTITIONS: "3"
+  BROKERVERSE_KAFKA_REPLICATION_FACTOR: "3"
+  BROKERVERSE_KAFKA_CREATE_TOPICS: "true"
+  # ---- API gateway (Apigee X) tokens of /integration/** ----
+  BROKERVERSE_INTEGRATION_JWK_SET_URI: "<APIGEE_JWKS_URI>"
+  BROKERVERSE_INTEGRATION_ISSUER: "<APIGEE_TOKEN_ISSUER>"
+  BROKERVERSE_INTEGRATION_AUDIENCES: "<APIGEE_TOKEN_AUDIENCE>"
+  # Heap from the container memory limit.
+  JAVA_OPTS: "-XX:MaxRAMPercentage=75 -XX:+ExitOnOutOfMemoryError"

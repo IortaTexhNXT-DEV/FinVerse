@@ -1,0 +1,3662 @@
+# Test plan BRD-6 Renewal - test data file.
+# Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/testplans/brd06_cases.yaml
+# Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
+# Renewal is designed and not built: messages are the FRS texts (no codes), screen paths are those of the
+# build design (docs/architecture/RENEWAL_DESIGN.md) and there is no automation reference. Where a check
+# reuses a platform message that exists today (log-in, bulk upload, account checks), the case quotes the
+# text BIBS shows and a finding records the FRS difference.
+
+meta:
+  brd: BRD-06
+  name: Renewal
+  code: RN
+  frs: FRS_BRD06_RENEWAL.md
+  summary: TP_BRD06_RENEWAL.md
+  version: "1.1"
+  date: 26 September 2026
+  built: false
+
+personas:
+  MKT_TL: {name: Marketing Team Leader, short: MKT TL}
+  MKT_AO: {name: Marketing AO / Admin (Account Broker), short: MKT AO}
+  PROCESSING_TL: {name: Processing Team Leader, short: Proc. TL}
+  PROCESSOR: {name: Processing Officer / Broker, short: Proc. Off.}
+  BUSINESS_ADMIN: {name: Business Administrator, short: Bus. Admin}
+  CHECKER: {name: Authoriser holding MASTER_AUTHORIZE (second Business Administrator), short: Checker}
+  SYSADMIN: {name: System Administrator, short: Sys. Admin}
+  LAMD: {name: LAMD user, short: LAMD}
+  CONTACT_CENTER: {name: Contact Center user, short: Contact Ctr}
+  NB_BOOKING: {name: New Business placement and booking user (BRD-1), short: NB Book.}
+  SYSTEM: {name: BIBS scheduled job or event}
+
+screens:
+  LOGIN: Login page
+  HOME: Renewal > Renewal Home
+  EXPIRY: Renewal > Expiry List
+  EXPGEN: Renewal > Expiry List > Generate Expiry List dialog
+  EXPFILTER: Renewal > Expiry List > Filters panel
+  MYDISP: Renewal > My Dispositions
+  RECORD: Renewal > Expiry List > (reference) record page
+  DETAILS: Renewal > record page > Details tab
+  CHECKS: Renewal > record page > Checks & Bucket tab
+  ACCHIST: Renewal > record page > Account History tab
+  DISP: Renewal > record page > Disposition panel
+  COMP: Renewal > record page > Computations tab
+  INSTAB: Renewal > record page > Insurer tab
+  LETTAB: Renewal > record page > Letters tab
+  REMARKS: Renewal > record page > Remarks & Follow-ups tab
+  HIST: Renewal > record page > History tab
+  RACC: Renewal > record page > Renewal Account section
+  TRANSFERS: Renewal > Transfers
+  TLREVIEW: Renewal > TL Review
+  PROCWL: Renewal > Processing Worklist
+  BATCHES: Renewal > Insurer Batches
+  LETTERS: Renewal > Letters
+  LAMDR: Renewal > LAMD Reports
+  FOLLOWUPS: Renewal > Follow-ups
+  SETUP: Renewal > Renewal Setup
+  REPORTS: Reports > Report Centre (category Renewal)
+  LOV: Broking Setup > Lists of Values
+  TEMPLATES: Broking Setup > Document Templates
+  ACCREQ: Broking Setup > Access Requests
+  MATRIX: Broking Setup > User Access Matrix
+  PARAMS: Administration > System Parameters
+  APPROVALS: My Approvals
+  AUDIT: Administration > Audit Trail
+  NOTIF: Notifications (bell icon in the page header)
+  MAILBOX: Test mailbox of the client or insurer (SIT mail relay)
+  QUOTE: Quotation / Proposal > Quotation or PRF page (BRD-1)
+  BOOKING: Booking > Booking Workbench (BRD-1)
+  SUBPOL: Submitted Policies > Masterlist (BRD-12)
+  API: API call with the user's token (tester tool, for example Postman)
+
+data:
+  - id: TD-RN-01
+    name: Test users per Renewal role
+    content: rn.mkttl1 and rn.mkttl2 (MKT_TL of Retail Marketing 1 and Corporate Marketing 2), rn.ao1 and rn.ao2 (MKT_AO of Retail Marketing 1), rn.ao3 (MKT_AO of Corporate Marketing 2), rn.proctl (PROCESSING_TL), rn.po1 and rn.po2 (PROCESSOR), rn.badmin (BUSINESS_ADMIN), rn.checker (BUSINESS_ADMIN with MASTER_AUTHORIZE), rn.sysadmin (SYSADMIN), rn.lamd (LAMD), rn.cc (CONTACT_CENTER). Each user holds only the listed role unless a case says otherwise.
+    source: Created by the test lead on SIT through approved access requests (BRD-11); roles and grants of FRS section 3.3
+  - id: TD-RN-02
+    name: Non-CBG expiring invoices
+    content: 40 booked root invoices of Retail Marketing 1 (Motor MC01 and MC02, Fire FI01), policy expiry = business date + 140 days; 10 invoices of Corporate Marketing 2 with the same expiry; 12 invoices expiring in the next calendar month (range tests); one 3-year Motor policy (only the last year expires in the window)
+    source: Booked through the BRD-1 booking on SIT by the test lead; masked client names
+  - id: TD-RN-03
+    name: CBG mortgaged accounts
+    content: 6 CBG Motor and 4 CBG Fire accounts mortgaged to BDO, each with a PN (PN-2026-7001 to 7010); one CBG Motor account without a PN; segment CLG candidates (200) for bulk initiation; one Non-Mortgage candidate
+    source: Booked on SIT with mortgagee BDO Unibank; PN values agreed with the LAMD test file TD-RN-05
+  - id: TD-RN-04
+    name: Candidates with blocking conditions
+    content: "RNW-2026-000201 open claim on the expiring ARN; RNW-2026-000202 open endorsement request END-2026-000450; RNW-2026-000203 outstanding premium PHP 12,500; RNW-2026-000204 client KYC review due in 20 days; RNW-2026-000205 risk code XR99 (set up as non-renewable in the test); one HMO policy (line HMO)"
+    source: Prepared on SIT (claim in Claims or the claims stub, endorsement request in Operations, unpaid invoice left open)
+  - id: TD-RN-05
+    name: LAMD report files
+    content: "Paid-off report with PN-2026-7001 (matches) and PN-2026-9999 (no match); RMU report with PN-2026-7002; a row without PN; a PN shared by two candidates; a .exe file renamed to test the type check"
+    source: Test document folder of the test lead; layout of bulk template RNW_LAMD_REPORT (draft until RQ20)
+  - id: TD-RN-06
+    name: Dispositioned files
+    content: "RN_DISPO_500.xlsx - 500 rows of March expiries of Retail Marketing 1 with 3 unknown references; RN_DISPO_BADCODE.xlsx - a row with disposition RENEWLATER; RN_DISPO_LOCKED.xlsx - a row of an account in RA_SENT; RN_DISPO_NOHEADER.csv - no header row; RN_DISPO_PARTIAL.xlsx - 30 of the 40 accounts of TD-RN-02"
+    source: Prepared from template RNW_DISPOSITION_UPLOAD by the test lead
+  - id: TD-RN-07
+    name: Insurer response files
+    content: "INS-A response file with Renew As Is rows (matched), one Revise row with premium +10 %, one Reject row, one row whose policy number differs from the candidate, two conflicting rows for one reference, one row with response code MAYBE, one Revise row without revised values, one row received after the reply due date"
+    source: Prepared from bulk template RNW_INSURER_RESPONSE (layout draft until RQ15)
+  - id: TD-RN-08
+    name: Decision matrix and bucket rules
+    content: "Matrix version MX-2 (draft): rule 10 CBG, Motor, mortgaged, bucket Clean, claims None -> For Renewal AUTO; rule 20 claims Open -> For Renewal MANUAL; rule 30 payment Outstanding -> For Renewal MANUAL. Default bucket rule set: FAIL_EXCEPTION -> Exception; FAIL_REVIEW or WARN -> Review; otherwise Clean"
+    source: Keyed in Renewal Setup by rn.badmin and activated by rn.checker (content RQ24 still open; test values only)
+  - id: TD-RN-09
+    name: Insurers and mailboxes
+    content: INS-A (renewal e-mail rn-ins-a@test.bdoi.local), INS-B (placement e-mail only), INS-C (no renewal or placement e-mail); reply days 10
+    source: Insurer master on SIT; mailboxes of the SIT relay
+  - id: TD-RN-10
+    name: Clients and letters
+    content: Clients with a registered e-mail on the test mailbox domain; one client without e-mail; one client on a domain outside the recipient policy (when RQ16 policy is loaded)
+    source: Client master on SIT (masked)
+  - id: TD-RN-11
+    name: Submitted policy hand-off
+    content: SBM-2026-000123 CBG Motor mortgaged, assigned insurer INS-A, RA template FFY; SBM-2026-000124 Non-CBG Retail
+    source: Submitted Policies masterlist on SIT (BRD-12); hand-off by the expiry scan or "Renew with BDOI"
+  - id: TD-RN-12
+    name: Volume list
+    content: 20,000 candidates of one business date for the scroll, filter and report timing cases
+    source: Generated on the performance copy of SIT by the test lead's load script
+  - id: TD-RN-13
+    name: Acceptance evidence
+    content: Client acceptance e-mail saved as PDF; signed RA scan (PDF, 1 page); payment receipt in Cashiering for the renewal account
+    source: Test document folder of the test lead (no client data)
+  - id: TD-RN-14
+    name: Letter templates
+    content: RNW_RA_FIRST version 1 (active) and version 2 (draft with a changed footer); RNW_RA_SECOND, RNW_NAL, RNW_NFR, RNW_NRNS_REMINDER, RNW_NON_ACCEPTANCE drafts
+    source: Draft layouts delivered with the build until BDOI provides its own (RQ26)
+
+  - id: TD-RN-15
+    name: Migrated policies of the go-live window and the RA tracker
+    content: "Migrated in-force policies (source LEGACY) expiring 3-Jan-2028 (2), 31-Jan-2028 (1), 1-Feb-2028 (1), 31-May-2028 (1) and 1-Jun-2028 (1); one policy expiring 15-Feb-2028 already renewed in legacy (the later term is migrated too). Tracker RN_RA_SENT_JAN.xlsx: RA of the 3-Jan-2028 policies sent on 15-Dec-2027; a row with an unknown legacy reference; a second row for the same policy; a row with an RA date after go-live"
+    source: Loaded by the trial migration on SIT (BRD-13 objects P01, R06); tracker prepared by the test lead from template RNW_RA_ALREADY_SENT (masked)
+  - id: TD-RN-16
+    name: Package code map and legacy packages
+    content: "PACKAGE code map loaded by the migration: QPS package HOME-01 v2 -> BIBS package version PKG-HOME-2027 (one entry); MOTOR-CLG v1 -> two BIBS versions by sum-insured band (ambiguous); FIRE-OLD v1 not in the map. Migrated policies of TD-RN-15 carry these legacy packages"
+    source: Code map of the trial migration (maintained by MBS / TSU); package versions of the BRD-3 catalogue on SIT
+
+scenarios:
+  - id: SC-RN-01
+    persona: SYSADMIN
+    title: Access, roles and audit. Each Renewal persona logs in, sees only its own screens and records, profiles and function grants change only through approved access requests, and every renewal action is in the audit trail.
+    pre: Users of TD-RN-01 are active.
+  - id: SC-RN-02
+    persona: MKT_TL
+    title: Extraction and the expiring list. The daily job and on-demand ranges extract the expiring accounts; the TL filters, searches, exports and prints the list and initiates the candidates.
+    pre: Invoices TD-RN-02 and TD-RN-03 are booked; the job RNW_EXTRACTION is active.
+  - id: SC-RN-03
+    persona: BUSINESS_ADMIN
+    title: Governance rules. The checks, buckets and decision matrix classify each candidate; non-renewable risk codes, LAMD reports, KYC and endorsements are applied without manual pre-cleaning.
+    pre: Matrix and bucket rules TD-RN-08 active; candidates TD-RN-04; LAMD files TD-RN-05.
+  - id: SC-RN-04
+    persona: MKT_TL
+    title: Assignment and transfer. The Marketing TL assigns and re-assigns accounts to AOs and transfers accounts to another Marketing unit, whose TL accepts or declines them.
+    pre: Initiated non-CBG candidates of TD-RN-02 in UNASSIGNED.
+  - id: SC-RN-05
+    persona: MKT_AO
+    title: Disposition. The AO views his accounts and their history, gives the disposition with reason and remarks, updates returned accounts, re-opens Not for Renewal and starts the New Business path.
+    pre: Accounts assigned to rn.ao1 in FOR_DISPOSITION.
+  - id: SC-RN-06
+    persona: MKT_TL
+    title: TL review and overrides. The TL reviews, returns and posts the dispositioned accounts and overrides the outstanding-balance flag and other controlled blocks.
+    pre: Accounts pushed by rn.ao1 in FOR_TL_REVIEW; RNW-2026-000203 with outstanding premium.
+  - id: SC-RN-07
+    persona: PROCESSOR
+    title: Processing. Processing uploads dispositioned files, assigns officers, updates the renewal account, reviews the computations and returns accounts to Marketing.
+    pre: Posted For Renewal accounts in FOR_PROCESSING; files TD-RN-06.
+  - id: SC-RN-08
+    persona: PROCESSING_TL
+    title: Insurer round-trip. Processing builds the extract per insurer, sends it protected and applies the insurer's response file.
+    pre: IN_PROCESSING accounts of INS-A, INS-B and INS-C; response file TD-RN-07.
+  - id: SC-RN-09
+    persona: MKT_AO
+    title: Letters, acceptance and booking. Users generate and send RAs, NALs and NFRs; the jobs send NRNS reminders and non-acceptance letters; the Contact Center follows up; acceptance moves the renewal account to placement and booking without re-keying.
+    pre: RA_READY accounts; templates TD-RN-14; evidence TD-RN-13.
+  - id: SC-RN-10
+    persona: SYSTEM
+    title: Submitted policies. The Submitted Policies hand-off creates, initiates and renews a candidate once per SBM number and reports its status back to the masterlist.
+    pre: Hand-off records TD-RN-11.
+  - id: SC-RN-11
+    persona: MKT_TL
+    title: Monitoring and reports. Renewal Home, the renewal status report with its summary, the listings with escalation and the operational reports show the state of every renewal within the user's scope.
+    pre: Candidates in every stage from the earlier scenarios; volume list TD-RN-12 for timing.
+  - id: SC-RN-12
+    persona: BUSINESS_ADMIN
+    title: Administration. The Business Administrator maintains the renewal lists of values, templates, rules and parameters under maker-checker, without a release.
+    pre: rn.badmin and rn.checker available.
+
+frs:
+  FR-RN-001:
+    scenario: SC-RN-01
+    persona: MKT_TL
+    screen: LOGIN
+    data: [TD-RN-01]
+    conditions:
+      - A user of each Renewal persona logs in and sees the Renewal section with the screens of that persona only.
+      - Wrong credentials are refused and no session starts.
+      - The account locks at the third failed attempt (LOGIN_MAX_FAILED_ATTEMPTS = 3, decision D5).
+      - The idle warning appears after 15 minutes of inactivity and the expiry warning 30 minutes before the system log-out.
+      - Renewal screens work in several browser tabs of one session without losing the work of either tab.
+      - Every successful and failed log-in is recorded with user, time and source address.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRD 1.001.1-1.001.3.1]
+        title: Marketing TL logs in and sees the Marketing TL screens
+        steps:
+          - Open the BIBS URL on a BDO-issued laptop.
+          - Enter user ID rn.mkttl1 and the password; click Sign in.
+          - Open the side menu, section Renewal.
+        expected: The home page opens. The Renewal section lists Renewal Home, Expiry List, TL Review, Transfers, Letters and Renewal Reports; Processing Worklist, Insurer Batches, LAMD Reports and Renewal Setup are not listed.
+      - c: 1
+        type: Positive
+        persona: MKT_AO
+        brd: [2.001.1-2.001.1.3]
+        title: Marketing AO logs in and sees My Dispositions
+        steps:
+          - Log in as rn.ao1.
+          - Open the side menu, section Renewal.
+        expected: The section lists Renewal Home, My Dispositions, Letters and Renewal Reports only.
+      - c: 1
+        type: Positive
+        persona: PROCESSING_TL
+        brd: [3.001.1-3.001.1.3]
+        title: Processing TL logs in and sees the Processing screens only
+        steps:
+          - Log in as rn.proctl.
+          - Open the side menu, section Renewal.
+        expected: The section lists Renewal Home, Expiry List, Processing Worklist, Insurer Batches, Letters and Renewal Reports; TL Review, Transfers and My Dispositions are not listed.
+      - c: 1
+        type: Positive
+        persona: PROCESSOR
+        brd: [4.001.1-4.001.1.3]
+        title: Processing Officer logs in with the Processing Officer profile
+        pre: The BRD text "Log in with a Operations Team Leader user profile" (4.001.1.1) is read as the Processing Officer profile.
+        steps:
+          - Log in as rn.po1.
+          - Open the side menu, section Renewal.
+        expected: The section lists Renewal Home, Processing Worklist, Insurer Batches, Letters and Renewal Reports; Expiry List Generate, TL Review and Renewal Setup are not offered.
+      - c: 1
+        type: Positive
+        persona: BUSINESS_ADMIN
+        brd: [5.001.1-5.001.1.3]
+        title: Business Administrator logs in and sees the set-up screens
+        steps:
+          - Log in as rn.badmin.
+          - Open the side menu.
+        expected: Renewal Setup, Renewal Reports, Broking Setup > Lists of Values and Broking Setup > Document Templates are listed; no disposition, processing or letter screen is listed.
+      - c: 1
+        type: Positive
+        persona: SYSADMIN
+        brd: [6.001.1-6.001.1.1]
+        title: System Administrator accesses the application
+        steps:
+          - Log in as rn.sysadmin.
+          - Open the side menu.
+        expected: Access Requests, User Access Matrix and Administration are listed; no Renewal work screen is listed.
+      - c: 2
+        type: Negative
+        title: Log-in with a wrong password is refused
+        steps:
+          - Enter user ID rn.mkttl1 and a wrong password; click Sign in.
+        expected: The Login page stays open and no session starts.
+        msg: [Invalid user name or password]
+      - c: 3
+        type: Boundary
+        neg: true
+        persona: MKT_AO
+        title: The third wrong password locks the account
+        pre: Administration > System Parameters shows LOGIN_MAX_FAILED_ATTEMPTS = 3.
+        steps:
+          - Enter user ID rn.ao2 with a wrong password three times.
+          - Enter the correct password.
+        expected: The third wrong attempt locks the account; the correct password is refused until the System Administrator unlocks rn.ao2.
+        msg: [Account is locked. Contact your administrator.]
+      - c: 3
+        type: Boundary
+        persona: MKT_AO
+        title: Two wrong passwords do not lock the account
+        steps:
+          - Enter user ID rn.ao2 (unlocked) with a wrong password twice.
+          - Enter the correct password.
+        expected: The log-in succeeds and the failed-attempt counter resets.
+      - c: 4
+        type: Boundary
+        screen: EXPIRY
+        title: Idle warning after 15 minutes without activity
+        pre: SESSION_IDLE_WARNING_MINUTES = 15 and SESSION_EXPIRY_WARNING_MINUTES = 30.
+        steps:
+          - Log in as rn.mkttl1 and open the Expiry List.
+          - Leave the browser idle for 14 minutes, then for one more minute.
+        expected: No warning appears at 14 minutes; at 15 minutes the session warning dialog appears with Continue and Log out.
+      - c: 4
+        type: Positive
+        screen: EXPIRY
+        title: Warning 30 minutes before the system log-out
+        pre: The test lead shortens the session lifetime so the end falls within the test.
+        steps:
+          - Work on the Expiry List until 30 minutes before the session end.
+        expected: The dialog warns that the session ends in 30 minutes; the user continues working until the log-out.
+      - c: 5
+        type: Positive
+        screen: RECORD
+        brd: [BRD 1.002.1, 2.002.1, 3.002.1, 4.002.1, 5.002.1]
+        title: Expiry List in one tab and a record page in a second tab
+        steps:
+          - Log in as rn.mkttl1 and open the Expiry List; apply the filter Risk Code MC01.
+          - Open a record in a second browser tab and add a remark.
+          - Return to the first tab and scroll the list.
+        expected: Both tabs work in the same session; the filter of the first tab and the remark of the second tab are kept.
+      - c: 6
+        type: Positive
+        persona: SYSADMIN
+        screen: AUDIT
+        title: Log-ins and failed log-ins appear in the audit trail
+        pre: Cases TC-RN-001.2-01 and TC-RN-001.3-01 ran today.
+        steps:
+          - Log in as rn.sysadmin and open Administration > Audit Trail.
+          - Filter on today and users rn.mkttl1 and rn.ao2.
+        expected: Each successful and failed log-in and the lock of rn.ao2 are listed with user, time and source address.
+
+  FR-RN-002:
+    scenario: SC-RN-01
+    persona: MKT_AO
+    screen: MYDISP
+    data: [TD-RN-01, TD-RN-02]
+    conditions:
+      - Menus and buttons show only the screens and actions the user's roles allow.
+      - A direct link or API call without the permission is refused and logged.
+      - Lists, records, reports and exports are limited to the user's data scope by the server.
+      - The LAMD role uploads LAMD reports and views match results, and never generates, sends or disposes.
+      - LAMD and Contact Center users see a projection without premium columns.
+    cases:
+      - c: 1
+        type: Security-access
+        neg: false
+        brd: [BRD 6.002.2.1-6.002.2.24]
+        title: Marketing AO sees My Dispositions and not the Processing Worklist
+        steps:
+          - Log in as rn.ao1; open the side menu.
+          - Open an account of My Dispositions.
+        expected: My Dispositions and the record pages of rn.ao1's accounts open; Processing Worklist and Renewal Setup are not in the menu; the record page offers no Post, Assign PO or Upload action.
+      - c: 2
+        type: Security-access
+        screen: PROCWL
+        title: Direct link to the Processing Worklist without RNW_PROCESS
+        steps:
+          - Log in as rn.ao1.
+          - Type the address of the Processing Worklist in the browser.
+        expected: The page shows "You do not have access to this screen. Contact your administrator if you need it." and loads no data.
+      - c: 2
+        type: Security-access
+        screen: API
+        title: API call to post an account without RNW_REVIEW
+        steps:
+          - With rn.ao1's token call POST /api/v1/renewal/candidates/post for an account in FOR_TL_REVIEW.
+          - As rn.sysadmin open the Audit Trail.
+        expected: The call returns HTTP 403 and the account stays in FOR_TL_REVIEW; the audit trail lists the refused call with user, endpoint and time.
+        msg: [You are not permitted to perform this action]
+      - c: 3
+        type: Security-access
+        persona: MKT_TL
+        screen: EXPIRY
+        brd: [BRD p.43 key capability]
+        title: Marketing TL does not see the candidates of another sales unit
+        steps:
+          - Log in as rn.mkttl1 (Retail Marketing 1) and generate the Expiry List for the TD-RN-02 range.
+          - Search the reference of a Corporate Marketing 2 candidate.
+          - Open that record by its address.
+        expected: Only the 40 Retail Marketing 1 candidates are listed; the search finds nothing; the record address shows no data.
+      - c: 3
+        type: Security-access
+        persona: MKT_TL
+        screen: REPORTS
+        brd: [BRD p.43 key capability]
+        title: Exports apply the same data scope
+        steps:
+          - As rn.mkttl1 run RNW-STATUS for the TD-RN-02 range without filters and export it to Excel.
+        expected: The file holds only Retail Marketing 1 invoices.
+      - c: 4
+        type: Security-access
+        neg: false
+        persona: LAMD
+        screen: LAMDR
+        brd: [BRRN.024]
+        title: LAMD user uploads a report and views the match results
+        steps:
+          - Log in as rn.lamd and open LAMD Reports.
+          - Upload the paid-off report of TD-RN-05 and open the match results.
+        expected: The upload and the match results are available.
+      - c: 4
+        type: Security-access
+        persona: LAMD
+        screen: LETTERS
+        brd: [BRRN.024]
+        title: LAMD user cannot generate or send an RA
+        steps:
+          - As rn.lamd look for Letters in the menu.
+          - Call POST /api/v1/renewal/letters/ra with rn.lamd's token.
+        expected: Letters is not in the menu and the record page shows no disposition or letter action; the call returns HTTP 403 and is logged.
+        msg: [You are not permitted to perform this action]
+      - c: 5
+        type: Security-access
+        persona: CONTACT_CENTER
+        screen: FOLLOWUPS
+        title: Contact Center list has no premium columns
+        steps:
+          - Log in as rn.cc and open Follow-ups.
+          - Open the column chooser.
+        expected: The list shows the renewal status columns; Amount of Outstanding Premium, premium and commission columns are not listed and cannot be added.
+
+  FR-RN-003:
+    scenario: SC-RN-01
+    persona: SYSADMIN
+    screen: ACCREQ
+    data: [TD-RN-01]
+    conditions:
+      - The Renewal profiles exist as BIBS roles, and each of the 25 BRD functions maps to a permission.
+      - A function is granted to a profile only through a role-permission change request approved by another user.
+      - The Business Administrator assigns a profile to a user through an approved access request.
+      - The requester cannot approve the own request, and a request without a role or permission is refused.
+    cases:
+      - c: 1
+        type: Report-output
+        screen: MATRIX
+        brd: [BRD 6.002.2, 6.002.2.1-6.002.2.25]
+        title: User Access Matrix lists the Renewal roles and the 25 functions
+        steps:
+          - Open Broking Setup > User Access Matrix, area Renewal.
+          - Compare each BRD function 6.002.2.1 to 6.002.2.25 with the permission of FRS section 3.2.
+          - Export the matrix to Excel.
+        expected: Roles MKT_TL, MKT_AO, PROCESSING_TL, PROCESSOR, BUSINESS_ADMIN, LAMD and CONTACT_CENTER are shown with the grants of FRS section 3.3; every function 1 to 25 has its permission; the Excel file has the same rows.
+      - c: 2
+        type: Workflow
+        brd: [BRD 6.002.1, 6.002.1.2-6.002.1.6]
+        title: Grant "Extract accounts per insurer" to the Processing Officer profile
+        steps:
+          - As rn.sysadmin open Access Requests; New request, type Modify role permissions.
+          - Select role PROCESSOR, permission RNW_INSURER (function 6.002.2.20), justification; submit to rn.badmin.
+          - As rn.badmin open My Approvals and approve.
+        expected: The request is Approved; PROCESSOR holds RNW_INSURER; the role history shows the change with requester, approver and times.
+      - c: 3
+        type: Workflow
+        persona: BUSINESS_ADMIN
+        brd: [BRD 5.004.1]
+        title: Assign the Marketing AO profile to a new user
+        steps:
+          - As rn.badmin raise an access request of type Assign role for user rn.ao4 with role MKT_AO; submit to rn.sysadmin.
+          - As rn.sysadmin approve.
+          - Log in as rn.ao4.
+        expected: At the next log-in rn.ao4 sees the Marketing AO screens of TC-RN-001.1-02.
+      - c: 4
+        type: Security-access
+        title: The requester cannot approve the own request
+        steps:
+          - As rn.sysadmin raise a Modify role permissions request and choose rn.sysadmin as approver, or open the own request in My Approvals.
+        expected: The requester is not offered as approver and Approve is not shown on the own request; the permission is unchanged.
+      - c: 4
+        type: Negative
+        title: Request without a role or permission
+        steps:
+          - New request of type Modify role permissions for role PROCESSOR; select no permission; submit.
+        expected: The request is not submitted.
+        msg: [Select at least one role or permission]
+      - c: 2
+        type: Workflow
+        title: Rejected request changes nothing
+        steps:
+          - Raise a request adding RNW_OVERRIDE to MKT_AO; as rn.badmin reject it with a reason.
+        expected: The request is Rejected with the reason; MKT_AO does not hold RNW_OVERRIDE; the requester is notified.
+
+  FR-RN-004:
+    scenario: SC-RN-01
+    persona: MKT_TL
+    screen: HIST
+    data: [TD-RN-01, TD-RN-02]
+    conditions:
+      - The History tab lists every action on a candidate with user or source and time, from extraction to booking.
+      - Extraction and initiation are recorded as two events with their own users and times.
+      - System actions carry the job or rule that made them (matrix version and rule id).
+      - History and audit rows cannot be edited or deleted by any screen or API.
+    cases:
+      - c: 1
+        type: Positive
+        title: Full trail of a renewed account
+        pre: RNW-2026-000110 has run from extraction to booking in SC-RN-02 to SC-RN-09.
+        steps:
+          - Open RNW-2026-000110, History tab.
+        expected: The tab lists extraction, initiation, bucket, disposition, post, insurer response, RA generation and sending, acceptance and booking, each with user or source and time, in time order.
+      - c: 2
+        type: Positive
+        brd: [BRRN.021]
+        title: Extraction and initiation are separate events
+        pre: A candidate extracted by the job and initiated by rn.mkttl1 the next day.
+        steps:
+          - Open the candidate, History tab.
+        expected: EXTRACTED shows source RNW_EXTRACTION and the job time; INITIATED shows rn.mkttl1 and the initiation time.
+      - c: 3
+        type: Positive
+        brd: [BRRN.023, BRRN.031]
+        title: System disposition shows the matrix version and rule
+        pre: A CBG candidate disposed automatically by matrix MX-2 rule 10.
+        steps:
+          - Open the candidate, History tab.
+        expected: The disposition row shows source MATRIX, version MX-2 and rule 10; the bucket row shows the rule-set version and the check run.
+      - c: 3
+        type: Positive
+        brd: [BRRN.022, BRRN.035, BRRN.040]
+        title: Reference match, insurer response and acceptance are logged
+        steps:
+          - Open a candidate that was matched by an insurer response and accepted by e-mail.
+        expected: The history shows the REFERENCE_MATCH outcome, the response with source upload and match outcome, and the acceptance with method, evidence and user.
+      - c: 4
+        type: Security-access
+        screen: API
+        title: History rows cannot be changed
+        steps:
+          - Look for an edit or delete action on the History tab.
+          - Call PUT and DELETE on /api/v1/renewal/candidates/{ref}/history with rn.mkttl1's token.
+        expected: No edit or delete action exists; both calls are refused and the rows are unchanged.
+
+  FR-RN-010:
+    scenario: SC-RN-02
+    persona: SYSTEM
+    screen: HOME
+    data: [TD-RN-02]
+    conditions:
+      - The daily job extracts each booked root invoice whose expiry is the business date plus the lead days, with a renewal reference.
+      - A second run does not create a second open candidate for the same invoice.
+      - A change of the lead days takes effect at the next run without a release.
+      - Employee Benefits lines (HMO, GLI, GPA) are not extracted.
+      - For a multi-year account only the last policy year produces a candidate.
+      - A failed run raises RNW_EXTRACTION_FAILED and the next run picks up the missed dates.
+    cases:
+      - c: 1
+        type: Positive
+        title: Policies expiring in 140 days are extracted
+        steps:
+          - As rn.sysadmin run job RNW_EXTRACTION from Administration > Scheduled Jobs.
+          - As rn.mkttl1 open Renewal Home, Extraction runs, and the Expiry List for the expiry date.
+        expected: The run RXR-yyyy shows the counts read, new, existing and skipped; each TD-RN-02 invoice is a candidate in stage EXTRACTED with a reference RNW-yyyy-nnnnnn, its expiring invoice number, ARN and policy number.
+      - c: 2
+        type: Negative
+        title: A second run creates no duplicate
+        steps:
+          - Run RNW_EXTRACTION again for the same business date.
+        expected: The run counts the invoices as existing; the Expiry List still shows one candidate per invoice.
+      - c: 3
+        type: Positive
+        persona: SYSADMIN
+        screen: PARAMS
+        brd: [BRRN.030]
+        title: Lead days changed to 150
+        steps:
+          - Set RNW_EXTRACTION_LEAD_DAYS to 150 and save.
+          - Run the job.
+        expected: The run extracts the invoices expiring 150 days after the business date; no release is needed.
+      - c: 4
+        type: Negative
+        data: [TD-RN-04]
+        title: HMO policy is not extracted
+        steps:
+          - Run the job on the expiry date of the HMO policy of TD-RN-04.
+        expected: The HMO invoice is counted as skipped and is not on the Expiry List (RNW_EXCLUDED_LINES).
+      - c: 5
+        type: Positive
+        brd: [BRRN.005, restating BRD 1.003.4.1.2, 3.003.4.2]
+        title: 3-year Motor policy extracted once, in the last year
+        steps:
+          - Run the job on the business date where year 2 of the 3-year policy ends, then on the date the term ends.
+        expected: No candidate is created at the end of year 2; one candidate is created for the last policy year.
+      - c: 6
+        type: Negative
+        screen: NOTIF
+        title: Failed run raises the alert and is caught up
+        pre: The test lead makes the run fail (for example the ledger view is unavailable).
+        steps:
+          - Run the job; open the bell as the job owner.
+          - Restore the ledger and run the job the next business day.
+        expected: The run is Failed and alert RNW_EXTRACTION_FAILED is shown; the next run extracts the missed date and today's date.
+      - c: 1
+        type: Positive
+        brd: [BRRN.005]
+        title: Expired, not renewed candidates stay listed
+        steps:
+          - Open the Expiry List for a range that includes an expired candidate that is still open.
+        expected: The candidate stays listed until it closes; no account of the range is missing or duplicated.
+
+  FR-RN-011:
+    scenario: SC-RN-02
+    persona: MKT_TL
+    screen: EXPGEN
+    data: [TD-RN-02]
+    conditions:
+      - The TL generates the list for a start and end date and sees every candidate of the units in scope expiring in the range, and only those.
+      - Changing the range refreshes the list; dates beyond the job's extraction are extracted on demand and recorded as MANUAL_RANGE.
+      - A missing date or an end date before the start date is refused.
+      - A range without expiring accounts shows the empty-list message.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRRN.002, restating BRD 1.003.1, 1.003.1.1, 1.003.2]
+        title: Marketing TL generates the list for one month
+        steps:
+          - Open Expiry List; click Generate Expiry List.
+          - Enter 03/01/2027 and 03/31/2027 (the month of TD-RN-02); click Generate.
+        expected: The list shows every Retail Marketing 1 candidate expiring in March 2027 and none of other months or units; the row count equals the TD-RN-02 count.
+      - c: 1
+        type: Positive
+        persona: PROCESSING_TL
+        brd: [3.003.1, 3.003.1.1, 3.003.2, BRD 3.003.4, 3.003.4.1]
+        title: Processing TL generates the list for processing
+        steps:
+          - Log in as rn.proctl; Expiry List; Generate Expiry List for the same month.
+        expected: The list shows the candidates of the month with the Processing column set of FR-RN-013.
+      - c: 2
+        type: Positive
+        title: Range beyond the job is extracted on demand
+        steps:
+          - Generate the list for the month after the job's last extracted date.
+          - Open Renewal Home, Extraction runs.
+        expected: The candidates of that month are listed; a run with trigger MANUAL_RANGE, user rn.mkttl1, range and counts is recorded; no candidate is initiated.
+      - c: 2
+        type: Positive
+        title: Changing the range refreshes the list
+        steps:
+          - Change the end date to 03/15/2027.
+        expected: The list refreshes at once and shows only the expiries of 1 to 15 March.
+      - c: 3
+        type: Negative
+        title: End date before the start date
+        steps:
+          - Enter 03/31/2027 as start and 03/01/2027 as end; click Generate.
+        expected: The dialog is not submitted.
+        msg: [The end date must be on or after the start date]
+      - c: 3
+        type: Negative
+        title: Start date missing
+        steps:
+          - Leave the start date blank; enter an end date; click Generate.
+        expected: The dialog is not submitted.
+        msg: [Enter a valid start and end date]
+      - c: 4
+        type: Negative
+        title: Range without expiring accounts
+        steps:
+          - Generate the list for a past month with no booked policies.
+        expected: The grid is empty.
+        msg: [No expiring accounts in the selected range]
+
+  FR-RN-012:
+    scenario: SC-RN-02
+    persona: MKT_TL
+    screen: EXPFILTER
+    data: [TD-RN-02]
+    conditions:
+      - Each of the thirteen criteria filters the list with single, multiple, "all except" and all selections and a search in the drop-down.
+      - Apply filters at once and shows the active filters as chips and in the page address; Cancel changes nothing; Clear restores all.
+      - An "only" and an "all except" selection on the same criterion cannot be combined.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRRN.003, restating BRD 1.003.3, 1.003.3.1-1.003.3.1.13]
+        title: Risk Code "all except" MC01
+        steps:
+          - Open Filters; for Risk Code choose "all except" and tick MC01; Apply.
+        expected: Every expiring account except risk code MC01 is listed; the chip "Risk Code - all except MC01" is shown above the grid.
+      - c: 1
+        type: Positive
+        brd: [1.003.3.1-1.003.3.1.13]
+        title: Two Unit Heads selected together
+        steps:
+          - For Unit Head type part of a name in the drop-down search and tick two Unit Heads; Apply.
+        expected: The accounts of both Unit Heads are listed and no others.
+      - c: 1
+        type: Positive
+        persona: PROCESSING_TL
+        brd: [3.003.3, 3.003.3.1-3.003.3.13]
+        title: Every criterion of the Processing list filters
+        steps:
+          - As rn.proctl open Filters and, one criterion at a time, select one value of Unit Head, Business Origin, Account Type, Region, Area, Invoicing Branch, Risk Code, Market Segment, Department Name, Account Officer, Bucket, Disposition and Stage; Apply after each.
+        expected: For each criterion the list shows only the rows with the selected value; the row count changes accordingly.
+      - c: 2
+        type: Positive
+        title: Filtered list shared by its page address
+        steps:
+          - Apply Region = NCR and Bucket = Review.
+          - Copy the page address and open it in a new tab.
+        expected: The new tab shows the same filtered list and chips.
+      - c: 2
+        type: Positive
+        title: Cancel and Clear
+        steps:
+          - Open Filters, tick a value, click Cancel.
+          - Open Filters again and click Clear.
+        expected: Cancel closes the panel without change; Clear returns every criterion to All and shows the full list.
+      - c: 3
+        type: Negative
+        title: "'Only' and 'all except' on the same criterion"
+        steps:
+          - For Account Officer tick rn.ao1 in "only" mode, switch to "all except" and tick rn.ao2; Apply.
+        expected: The filter is not applied.
+        msg: ["Choose either 'only' or 'all except' for {Account Officer}"]
+
+  FR-RN-013:
+    scenario: SC-RN-02
+    persona: MKT_TL
+    screen: EXPIRY
+    data: [TD-RN-02]
+    conditions:
+      - The list shows every candidate of the range in one scrollable view without pages, with a row count.
+      - The Marketing list has the BRD columns (with the BIBS invoice number and renewal reference in place of the EBIX and BDOIsys columns), the Classification pill and the flag chips; the Processing list has the first 21 columns without the claims and outstanding-premium columns.
+      - Each column filters, and the keyword search filters and highlights the matches.
+      - Column width and order are kept per user.
+      - Until the Claims module is connected the claims columns show "claims not connected".
+    cases:
+      - c: 1
+        type: Boundary
+        data: [TD-RN-12]
+        brd: [BRRN.004, restating BRD 1.003.4.1]
+        title: 20,000 candidates in one scrollable view
+        steps:
+          - Generate the list for the TD-RN-12 business date.
+          - Scroll from the first to the last row.
+        expected: No pager is shown; further rows load as the user scrolls; the row count shows 20,000 and the last row is reached; each chunk loads within 10 seconds.
+      - c: 2
+        type: Report-output
+        brd: [1.003.4.1.1, 1.003.4.1.1.2-1.003.4.1.1.24]
+        title: Marketing list columns
+        steps:
+          - Open the column chooser and compare the columns with FRS section 6.2.
+        expected: The grid has Expiring Invoice No. (BIBS), Renewal Reference No., Cover No., Version No., Invoicing Branch, Department Code, Department Name, Unit Head, Client Name, Assured's Name, Business Origin, Account Officer, Expiring Policy No., Insurance Company, Risk Code, Risk Name, Risk Description, Renewal Stage / Status, Renewal Disposition, Disposition Remarks, Number of Claims, Status of Each Claim and Amount of Outstanding Premium, plus Classification and the flag chips; no EBIX or BDOIsys column.
+      - c: 2
+        type: Report-output
+        persona: PROCESSING_TL
+        brd: [3.003.4.1, 3.003.4.1.2-3.003.4.1.21]
+        title: Processing list columns
+        steps:
+          - As rn.proctl open the Expiry List and the column chooser.
+        expected: The first 21 columns of section 6.2 are shown with Classification and the flags; Number of Claims, Status of Each Claim and Amount of Outstanding Premium are not offered.
+      - c: 2
+        type: Positive
+        data: [TD-RN-04]
+        title: Classification pill and flag chips
+        steps:
+          - Search RNW-2026-000201 to 000204.
+        expected: RNW-2026-000201 shows the pill Review and the chip Claims; 000202 the chip Endorsed; 000203 the chip Outstanding; 000204 the chip KYC due with its pill unchanged.
+      - c: 3
+        type: Positive
+        brd: [BRRN.006, restating BRD 1.003.4.1.3, 1.003.4.1.4]
+        title: Keyword search filters and highlights
+        steps:
+          - Type a client name of TD-RN-02 in the search box.
+        expected: Only the rows with that name remain and the name is highlighted in each row.
+      - c: 3
+        type: Positive
+        persona: PROCESSOR
+        screen: PROCWL
+        brd: [3.003.4.3, 3.003.4.4, 3.006.1.5, 4.003.1.5]
+        title: Column filters on the Processing list
+        steps:
+          - As rn.po1 filter Insurance Company = INS-A and Expiring Policy No. containing "MC".
+          - Search a renewal reference.
+        expected: Both filters combine; the search finds the reference and highlights it.
+      - c: 3
+        type: Negative
+        title: Search for a legacy EBIX number finds nothing
+        steps:
+          - Type a legacy EBIX invoice number in the search box.
+        expected: No row is found; the EBIX and BDOIsys searches are out of scope (Addendum 1, p.34).
+      - c: 4
+        type: Positive
+        title: Column order kept after log-out
+        steps:
+          - Drag Client Name to the first position and widen it; log out and log in; open the list.
+        expected: Client Name is first with the new width.
+      - c: 5
+        type: Positive
+        title: Claims columns before the Claims module is connected
+        pre: Claims is not connected on the test environment.
+        steps:
+          - Open a candidate row and read Number of Claims and Status of Each Claim.
+        expected: Both show "claims not connected"; the row is still listed and filterable.
+
+  FR-RN-014:
+    scenario: SC-RN-02
+    persona: MKT_TL
+    screen: EXPIRY
+    data: [TD-RN-02]
+    conditions:
+      - The Excel export has exactly the rows and columns of the current view.
+      - The print preview (landscape, A4 or Legal) matches the printed pages.
+      - Keeping a copy stores the file in the report archive, and each export is logged.
+      - A user without RNW_EXPORT cannot export.
+    cases:
+      - c: 1
+        type: Report-output
+        brd: [BRRN.007, restating BRD 1.003.5, 1.003.6, 1.003.7]
+        title: Export a filtered list to Excel
+        steps:
+          - Filter Risk Code = MC01 and hide the column Risk Description.
+          - Click Export; choose Excel; save the file.
+        expected: The .xlsx file has the same rows (count equal to the row count) and the same columns in the same order; no value is truncated.
+      - c: 1
+        type: Report-output
+        persona: PROCESSING_TL
+        brd: [3.003.5, 3.003.6, 3.003.7]
+        title: Processing TL exports and saves the list
+        steps:
+          - As rn.proctl generate the list; Export to Excel; save it.
+        expected: The file has the Processing columns and the rows of the view.
+      - c: 2
+        type: Report-output
+        brd: [BRRN.008, restating BRD 1.003.7.1, 1.003.7.2]
+        title: Print preview and print
+        steps:
+          - Click Print; choose Legal, landscape.
+          - Print to the test printer.
+        expected: The PDF preview opens in landscape Legal; the printed pages have the same rows as the preview.
+      - c: 2
+        type: Report-output
+        persona: PROCESSING_TL
+        brd: [3.003.7.1, 3.003.7.2]
+        title: Processing TL prints on A4
+        steps:
+          - As rn.proctl click Print, A4, landscape; print.
+        expected: The preview and the printout match; columns fit the page width.
+      - c: 3
+        type: Upload-download
+        title: Keep a copy in the report archive
+        steps:
+          - Tick "Keep a copy" and export.
+          - Open Reports > Report archive; as rn.sysadmin open the Audit Trail.
+        expected: The file is in the archive; the audit lists the export with user, filters and time.
+      - c: 4
+        type: Security-access
+        persona: PROCESSOR
+        screen: PROCWL
+        title: Processing Officer cannot export
+        steps:
+          - As rn.po1 look for Export on the list; call GET /api/v1/reports/RNW-EXPIRY-LIST/export.
+        expected: Export is not shown; the call returns HTTP 403.
+
+  FR-RN-015:
+    scenario: SC-RN-02
+    persona: MKT_TL
+    screen: EXPIRY
+    data: [TD-RN-02, TD-RN-03]
+    conditions:
+      - An extracted candidate stays EXTRACTED and appears in no worklist until it is initiated.
+      - Initiation records the user and time and moves the candidate to EVALUATING and on by its bucket and the matrix.
+      - Segments in RNW_BULK_INITIATION_SEGMENTS (CLG) are initiated in bulk; a bulk selection refuses the segments initiated one by one.
+      - A candidate that is already initiated cannot be initiated again.
+    cases:
+      - c: 1
+        type: Negative
+        title: Extracted candidate is in no worklist
+        steps:
+          - After extraction, open My Dispositions as rn.ao1, TL Review as rn.mkttl1 and the Processing Worklist as rn.proctl.
+        expected: The new candidates are not in any of them; the Expiry List shows them with stage Extracted.
+      - c: 2
+        type: Workflow
+        title: Initiate one Non-Mortgage candidate
+        steps:
+          - Tick one Non-Mortgage candidate; click Initiate; confirm.
+        expected: The candidate moves to Evaluating, then to Unassigned Disposition; the History tab shows INITIATED with rn.mkttl1 and the time.
+      - c: 3
+        type: Workflow
+        title: Bulk initiation of 200 CLG candidates
+        steps:
+          - Filter Market Segment = CLG; select all; Initiate.
+        expected: All 200 are initiated; each shows the user and time of initiation.
+      - c: 3
+        type: Negative
+        title: Non-Mortgage candidate in a bulk selection
+        steps:
+          - Select 20 CLG candidates and one Non-Mortgage candidate; Initiate.
+        expected: The 20 CLG candidates are initiated; the Non-Mortgage candidate is listed as refused and stays Extracted.
+        msg: ["Segment {Non-Mortgage} is initiated one account at a time"]
+      - c: 4
+        type: Negative
+        screen: API
+        title: Initiate an already initiated candidate
+        steps:
+          - Call POST /api/v1/renewal/candidates/initiate for a candidate in UNASSIGNED.
+        expected: The call is refused and the candidate is unchanged.
+        msg: ["Renewal {RNW-2026-000105} is already initiated"]
+
+  FR-RN-016:
+    scenario: SC-RN-02
+    persona: PROCESSING_TL
+    screen: HOME
+    data: [TD-RN-15]
+    conditions:
+      - The go-live extraction creates exactly one candidate for every migrated policy expiring from go-live to 31 May 2028, and none for later expiries or for policies already renewed in legacy.
+      - Candidates expiring up to 31 January 2028 carry the Urgent flag and are listed first.
+      - A tracker row of an RA sent before go-live records the RA as Sent with the legacy date, and the RA cannot be generated or sent again.
+      - Rejected tracker rows are applied only after a second member of the Renewal processing team approves the correction.
+      - The first daily extraction after go-live does not extract again a policy already taken over.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRRN.005]
+        title: Go-live extraction takes the window up to 31 May 2028
+        steps:
+          - As rn.proctl run job RNW_GOLIVE_EXTRACTION from Administration > Scheduled Jobs.
+          - Open Renewal Home, Extraction runs, and report RNW-GOLIVE.
+        expected: One candidate in stage EXTRACTED, source Legacy, per TD-RN-15 policy expiring 3-Jan-2028 to 31-May-2028 (5 candidates); the 1-Jun-2028 policy is not extracted; the policy already renewed in legacy is counted as skipped.
+      - c: 1
+        type: Negative
+        title: A second go-live run creates nothing new
+        steps:
+          - Run RNW_GOLIVE_EXTRACTION again.
+        expected: The run is recorded with zero new candidates; the Expiry List still shows one candidate per policy.
+      - c: 2
+        type: Boundary
+        screen: EXPIRY
+        title: Urgent flag up to 31 January 2028
+        steps:
+          - Open the Expiry List sorted by default.
+        expected: The candidates expiring 3-Jan-2028 and 31-Jan-2028 show the Urgent pill and come first; the 1-Feb-2028 candidate has no Urgent pill.
+      - c: 3
+        type: Upload-download
+        persona: PROCESSOR
+        screen: PROCWL
+        title: Tracker of RAs already sent is recorded
+        steps:
+          - As rn.po1 upload RN_RA_SENT_JAN.xlsx with template RNW_RA_ALREADY_SENT.
+          - Open a 3-Jan-2028 candidate, tab Letters.
+        expected: The RA shows status Sent, source legacy, date 15-Dec-2027; Generate RA and Send are not offered for it.
+      - c: 3
+        type: Negative
+        persona: PROCESSOR
+        screen: PROCWL
+        title: Tracker rows with errors are rejected
+        steps:
+          - Open the result of the RN_RA_SENT_JAN.xlsx upload.
+        expected: "The rows with an unknown reference, a second row for the same policy and an RA date after go-live are rejected with the FRS messages (\"already recorded\", \"enter the date the Renewal Advice was sent (before go-live)\" for the last two); nothing is recorded from them."
+        msg: ["Row {n}: no renewal candidate for legacy policy {reference}"]
+      - c: 4
+        type: Workflow
+        persona: PROCESSOR
+        screen: PROCWL
+        title: Corrected tracker row applied after the checker approves
+        steps:
+          - As rn.po1 correct the rejected unknown-reference row and submit it.
+          - As rn.po2 approve the corrected row.
+        expected: The row is applied only after rn.po2 approves; the audit shows rn.po1 as maker and rn.po2 as checker.
+      - c: 4
+        type: Negative
+        persona: PROCESSOR
+        screen: PROCWL
+        title: The maker cannot approve his own correction
+        steps:
+          - As rn.po1 try to approve the row he corrected.
+        expected: The approval is refused; the row stays rejected.
+      - c: 5
+        type: Negative
+        persona: SYSTEM
+        title: Daily extraction skips policies already taken over
+        steps:
+          - Set the business date to 12-Jan-2028 (the date whose lead days reach 31-May-2028) and run RNW_EXTRACTION.
+        expected: The 31-May-2028 policy is counted as existing; no second candidate is created.
+
+  FR-RN-020:
+    scenario: SC-RN-03
+    persona: MKT_TL
+    screen: CHECKS
+    data: [TD-RN-04]
+    conditions:
+      - After extraction and every relevant event BIBS runs every active check and stores a result PASS, WARN, FAIL, INFO or NOT_APPLICABLE with its detail.
+      - A check turns PASS at the next event once its condition is resolved, without user action.
+      - When the Claims module is not connected the claims check is INFO "claims not connected" and does not block.
+      - The RNW-SANITATION report lists the check results of a date range.
+    cases:
+      - c: 1
+        type: Positive
+        title: Checks & Bucket tab after extraction
+        steps:
+          - Open RNW-2026-000202 (open endorsement request), tab Checks & Bucket.
+        expected: The tab lists the checks of FRS section 5.3 with their result and detail; ENDORSEMENT_PENDING is FAIL with END-2026-000450; the run shows its trigger and time.
+      - c: 1
+        type: Negative
+        data: [TD-RN-02]
+        title: A clean candidate has no failed check
+        steps:
+          - Open a TD-RN-02 candidate without claims, endorsements or balance, tab Checks & Bucket.
+        expected: No check is FAIL or WARN; KYC_DUE is NOT_APPLICABLE or INFO; the candidate is Clean.
+      - c: 2
+        type: Workflow
+        persona: SYSTEM
+        title: Posting the endorsement turns the check PASS
+        steps:
+          - In Operations post END-2026-000450.
+          - Open RNW-2026-000202, tab Checks & Bucket, after the InvoiceMovementPosted event.
+        expected: A new check run with trigger InvoiceMovementPosted shows ENDORSEMENT_PENDING = PASS; no user action was needed.
+      - c: 3
+        type: Positive
+        title: Claims check while Claims is not connected
+        pre: Claims is not connected on the environment.
+        steps:
+          - Open a candidate of TD-RN-02, tab Checks & Bucket.
+        expected: CLAIMS shows INFO "claims not connected"; the bucket is not changed by it.
+      - c: 4
+        type: Report-output
+        screen: REPORTS
+        title: RNW-SANITATION lists the failed checks of a range
+        steps:
+          - Run RNW-SANITATION for the TD-RN-04 expiry range, result = FAIL.
+        expected: Each failed check is listed with the candidate reference, check, result, detail and run time; the rows match the Checks & Bucket tabs.
+
+  FR-RN-021:
+    scenario: SC-RN-03
+    persona: PROCESSOR
+    screen: RECORD
+    data: [TD-RN-02, TD-RN-06]
+    conditions:
+      - Every candidate has a unique renewal reference RNW-yyyy-nnnnnn stored with the expiring ARN and invoice number.
+      - An upload row without a reference, or with an unknown reference, is kept as an exception line and updates nothing.
+      - REFERENCE_MATCH records MATCHED, MISSING, INVALID or AMBIGUOUS per record.
+    cases:
+      - c: 1
+        type: Positive
+        persona: MKT_TL
+        screen: EXPIRY
+        title: References are unique and follow the format
+        steps:
+          - Export the Expiry List of TD-RN-02 and sort the Renewal Reference No. column.
+        expected: Every row has a reference RNW-yyyy-nnnnnn; no reference appears twice; each row also shows the expiring invoice number and ARN.
+      - c: 2
+        type: Negative
+        screen: PROCWL
+        title: Row with an unknown reference
+        steps:
+          - Upload RN_DISPO_500.xlsx; open the result.
+        expected: The 3 rows with unknown references are exception lines and no account is updated by them.
+        msg: ["Row {12}: renewal reference {RNW-2026-999999} does not exist"]
+      - c: 2
+        type: Negative
+        screen: PROCWL
+        title: Row without a reference
+        steps:
+          - Upload a file whose row 5 has a blank renewal reference.
+        expected: Row 5 is an exception line; nothing is updated from it.
+        msg: ["Row {5} has no renewal reference"]
+      - c: 3
+        type: Positive
+        screen: CHECKS
+        title: Match outcome visible on the record
+        steps:
+          - Open a candidate updated by the upload, tab Checks & Bucket.
+        expected: REFERENCE_MATCH shows MATCHED with the upload job as source.
+
+  FR-RN-022:
+    scenario: SC-RN-03
+    persona: MKT_TL
+    screen: CHECKS
+    data: [TD-RN-04, TD-RN-08]
+    conditions:
+      - The bucket follows the active rule set - FAIL_EXCEPTION gives Exception, FAIL_REVIEW or WARN gives Review, otherwise Clean.
+      - Records move between buckets when conditions change, and each change is logged with rule-set version, rule, run and cause.
+      - Users filter and export by bucket and see Exceptions in their own tab.
+      - A failed check never gives Clean, by rule or by override; an override needs remarks.
+      - The owners of the stage are notified when a candidate enters Exception.
+    cases:
+      - c: 1
+        type: Positive
+        title: Open claim gives Review
+        pre: Claims is connected or its stub returns one open claim for RNW-2026-000201.
+        steps:
+          - Open RNW-2026-000201, tab Checks & Bucket.
+        expected: CLAIMS is FAIL_REVIEW and the Classification pill is Review, never Clean; the tab names the check that set it.
+      - c: 2
+        type: Workflow
+        persona: SYSTEM
+        title: Closed claim moves the candidate to Clean
+        steps:
+          - Close the claim; wait for the nightly RNW_REEVALUATE run or trigger it.
+          - Open the bucket history.
+        expected: The candidate is Clean; the bucket history shows Review then Clean, each with rule-set version, rule, check run and cause RULE.
+      - c: 3
+        type: Report-output
+        screen: EXPIRY
+        title: Exceptions tab and bucket filter
+        steps:
+          - Open the Exceptions tab; then filter Bucket = Review on All and export.
+        expected: The Exceptions tab lists only Exception candidates; the export holds only Review rows.
+      - c: 4
+        type: Negative
+        title: Override to Clean with a failed check
+        steps:
+          - On RNW-2026-000201 (claim open) click Override Bucket; choose Clean.
+        expected: Clean is not offered while a check fails; the API call with Clean is refused and the bucket stays Review.
+        msg: ["Renewal {RNW-2026-000201} has failed checks and cannot be Clean"]
+      - c: 4
+        type: Negative
+        title: Override without remarks
+        steps:
+          - Click Override Bucket on RNW-2026-000202; choose Exception; leave Remarks blank; Save.
+        expected: The override is not saved.
+        msg: [Enter the remarks of the override]
+      - c: 4
+        type: Positive
+        title: Override to Exception with remarks
+        steps:
+          - Override RNW-2026-000202 to Exception with remarks "Client disputes the endorsement".
+        expected: The pill is Exception; the bucket history shows cause OVERRIDE with rn.mkttl1 and the remarks.
+      - c: 5
+        type: Positive
+        screen: NOTIF
+        title: Stage owners notified on entry to Exception
+        steps:
+          - After the override, open the bell as rn.mkttl1 and rn.ao1.
+        expected: Each owner of the stage has a notice naming RNW-2026-000202 and the Exception bucket.
+
+  FR-RN-023:
+    scenario: SC-RN-03
+    persona: BUSINESS_ADMIN
+    screen: SETUP
+    data: [TD-RN-03, TD-RN-08]
+    conditions:
+      - A Clean candidate matching an AUTO rule receives a system disposition (source MATRIX) and moves on without user action.
+      - A candidate with claims, endorsements, a missing PN or unresolved payment is not disposed automatically and shows the proposal to the AO.
+      - A matrix version is activated only by a checker other than its maker; only one version is active.
+      - A rule without an outcome disposition cannot be saved.
+      - An authorised user overrides a system disposition with mandatory remarks; the override is logged.
+      - Every system decision stores the matrix version and rule id, shown in RNW-DECISIONS.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: MKT_TL
+        screen: RECORD
+        title: Clean CBG Motor candidate disposed For Renewal by the matrix
+        steps:
+          - Initiate a clean CBG Motor candidate of TD-RN-03 with a PN.
+          - Open the record, Disposition panel and History tab.
+        expected: The disposition is For Renewal with source MATRIX, version MX-2, rule 10; with RNW_STP_SKIP_TL_REVIEW = true the candidate moves to For Processing without AO or TL action.
+      - c: 2
+        type: Negative
+        persona: MKT_AO
+        screen: DISP
+        brd: [BRRN.031]
+        title: Candidate with an open claim is not disposed automatically
+        steps:
+          - Initiate a CBG Motor candidate with an open claim; open it as the AO.
+        expected: No system disposition is recorded; the Disposition panel proposes For Renewal (rule 20) as the default for the AO.
+      - c: 3
+        type: Workflow
+        title: Maker drafts a matrix version and a checker activates it
+        steps:
+          - As rn.badmin draft version MX-3 with the rules of TD-RN-08; submit.
+          - As rn.checker open My Approvals, compare MX-3 with MX-2 and activate it from tomorrow.
+        expected: MX-3 is Active from its effective date and MX-2 ends the day before; the checkers were notified on submission.
+      - c: 3
+        type: Security-access
+        title: The maker cannot activate the own matrix version
+        steps:
+          - As rn.badmin try to activate MX-3 that rn.badmin drafted.
+        expected: Activation is refused and MX-3 stays submitted.
+        msg: [A matrix version is activated by someone other than its maker]
+      - c: 4
+        type: Negative
+        title: Rule without an outcome
+        steps:
+          - Add rule 40 with Segment CBG and no Outcome disposition; save.
+        expected: The rule is not saved.
+        msg: [Select the disposition of the rule]
+      - c: 5
+        type: Positive
+        persona: MKT_TL
+        screen: RECORD
+        brd: [BRRN.031]
+        title: Override of a system disposition with remarks
+        steps:
+          - On a MATRIX-disposed candidate click Override; kind Disposition; choose For Quotation; reason; remarks; Save.
+        expected: The disposition is For Quotation with source USER; the history keeps the MATRIX row and shows the override with remarks.
+      - c: 5
+        type: Negative
+        persona: MKT_TL
+        screen: RECORD
+        title: Disposition override without remarks
+        steps:
+          - Repeat the override with blank remarks.
+        expected: The override is not saved.
+        msg: [Enter the remarks of the override]
+      - c: 6
+        type: Report-output
+        persona: MKT_TL
+        screen: REPORTS
+        brd: [BRRN.034]
+        title: RNW-DECISIONS shows matrix version and rule
+        steps:
+          - Run RNW-DECISIONS for today.
+        expected: Each system disposition shows matrix version and rule id; the override of TC-RN-023.5-01 shows the user and remarks.
+
+  FR-RN-024:
+    scenario: SC-RN-03
+    persona: BUSINESS_ADMIN
+    screen: SETUP
+    data: [TD-RN-04]
+    conditions:
+      - A candidate on a non-renewable risk code is tagged Not for Renewal (reason Non-renewable Accounts, source SYSTEM), kept out of Unassigned Disposition and an NFR is queued.
+      - The NFR is sent protected to the client's registered e-mail and its sent status shows on the Letters tab.
+      - A code change takes effect only after a checker authorises it; codes are end-dated, never deleted.
+      - An effective-to date before the effective-from date, or a risk code not in the catalogue, is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Risk code XR99 tags the candidate Not for Renewal
+        steps:
+          - As rn.badmin add XR99 with reason "Line withdrawn" effective today; rn.checker authorises it.
+          - Run the checks (RNW_REEVALUATE) and open RNW-2026-000205.
+          - As rn.mkttl1 open the tab Unassigned Disposition.
+        expected: RNW-2026-000205 has disposition Not for Renewal, reason Non-renewable Accounts, source SYSTEM, stage Letter pending; it is not in Unassigned Disposition.
+      - c: 2
+        type: Upload-download
+        screen: LETTAB
+        title: NFR generated and sent protected
+        steps:
+          - Open RNW-2026-000205, tab Letters; open the client's test mailbox.
+        expected: The NFR (NFR-yyyy) from template RNW_NFR is listed with status Sent; the mailbox holds the password-protected NFR and a separate password e-mail.
+      - c: 3
+        type: Negative
+        title: Code not in force before authorisation
+        steps:
+          - As rn.badmin add risk code MC02 as non-renewable; do not authorise; run the checks.
+        expected: MC02 candidates are not tagged while the change waits in My Approvals.
+      - c: 3
+        type: Positive
+        title: End-date a code instead of deleting it
+        steps:
+          - Open XR99 and set the effective-to date to today; rn.checker authorises.
+        expected: No Delete action exists; XR99 is listed as ended with its history; candidates extracted after the end date are not tagged.
+      - c: 4
+        type: Negative
+        title: Effective-to before effective-from
+        steps:
+          - Add a code with effective from 01-May-2027 and effective to 01-Apr-2027; save.
+        expected: The code is not saved.
+        msg: [The effective-to date is before the effective-from date]
+      - c: 4
+        type: Negative
+        title: Risk code not in the catalogue
+        steps:
+          - Type risk code ZZ00 and save.
+        expected: The code is not saved.
+        msg: ["Risk code {ZZ00} does not exist"]
+
+  FR-RN-025:
+    scenario: SC-RN-03
+    persona: LAMD
+    screen: LAMDR
+    data: [TD-RN-03, TD-RN-05]
+    conditions:
+      - A paid-off PN matching a candidate tags it Not for Renewal with reason Loan fully paid.
+      - An RMU PN tags the candidate Not for Renewal (RMU) or transfers it to the unit in RNW_RMU_UNIT when set.
+      - Unmatched, blank and ambiguous PN rows are kept and listed; a file of another type is refused.
+      - A CBG Motor or Fire candidate without a PN fails PN_PRESENT and is Exception; matched Clean CBG candidates follow the straight-through path without AO assignment.
+      - Upload, each match and routing are logged, and the owning TL is notified.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRRN.029]
+        title: Paid-off report tags the matching candidate
+        steps:
+          - Choose Report type Paid-off, the period, and upload the paid-off file of TD-RN-05.
+          - Open the match results; as rn.mkttl1 open the matched candidate.
+        expected: PN-2026-7001 is matched; the candidate is Not for Renewal with reason Loan fully paid, source LAMD.
+      - c: 2
+        type: Workflow
+        brd: [BRRN.029]
+        title: RMU report without an RMU unit
+        pre: RNW_RMU_UNIT is empty.
+        steps:
+          - Upload the RMU file with PN-2026-7002.
+        expected: The candidate is Not for Renewal with reason RMU.
+      - c: 2
+        type: Workflow
+        brd: [BRRN.029]
+        title: RMU report with an RMU unit set
+        pre: RNW_RMU_UNIT = Corporate RMU.
+        steps:
+          - Upload the RMU file again for a second candidate.
+        expected: The candidate is transferred to Corporate RMU and appears in its Transfers inbox.
+      - c: 3
+        type: Negative
+        title: Unmatched, blank and shared PN rows
+        steps:
+          - Upload the file with PN-2026-9999, a row without PN and a PN shared by two candidates.
+          - Run RNW-LAMD-MATCH for the period.
+        expected: The three rows are listed as unmatched or refused and change no candidate; row 6 shows "Row 6 - PN PN-2026-7005 matches several renewals"; RNW-LAMD-MATCH lists the three rows.
+        msg: ["Row {4} has no PN number"]
+      - c: 3
+        type: Negative
+        title: File of a type the upload refuses
+        steps:
+          - Upload the .exe file of TD-RN-05.
+        expected: Nothing is uploaded.
+        msg: ["Upload an Excel (.xlsx), OpenDocument (.ods), CSV (.csv) or text (.txt) file"]
+      - c: 4
+        type: Negative
+        persona: MKT_TL
+        screen: CHECKS
+        brd: [BRRN.039]
+        title: CBG Motor candidate without a PN is Exception
+        steps:
+          - Open the CBG Motor candidate without PN of TD-RN-03.
+        expected: PN_PRESENT is FAIL_EXCEPTION; the pill is Exception; it is not on the straight-through path.
+      - c: 4
+        type: Workflow
+        persona: MKT_TL
+        screen: RECORD
+        brd: [BRRN.039]
+        title: Matched Clean CBG candidate goes straight through
+        steps:
+          - Open a CBG Fire candidate whose PN matched with no LAMD status and that is Clean.
+        expected: The candidate was never in Unassigned Disposition; it moved by the matrix to For Processing (RA path) without AO assignment.
+      - c: 5
+        type: Positive
+        persona: SYSADMIN
+        screen: AUDIT
+        brd: [BRRN.024, BRRN.029]
+        title: LAMD actions logged and TL notified
+        steps:
+          - Open the Audit Trail for rn.lamd; as rn.mkttl1 open the bell.
+        expected: The upload, each match and routing are logged with time and data source; rn.mkttl1 has a notice for each tagged account.
+      - c: 5
+        type: Security-access
+        brd: [BRRN.024]
+        title: LAMD user sees no RA or disposition action
+        steps:
+          - As rn.lamd open a matched candidate.
+        expected: The page is read only; Generate RA, Disposition and Send are not offered.
+
+  FR-RN-026:
+    scenario: SC-RN-03
+    persona: MKT_TL
+    screen: EXPIRY
+    data: [TD-RN-04]
+    conditions:
+      - A candidate whose client KYC review is due within the window shows the KYC due chip with the date it was first identified.
+      - The KYC flag never changes the bucket or blocks the renewal.
+      - The renewal status report shows the flag and the date identified.
+      - The flag applies only to the segments in RNW_KYC_SEGMENTS when the parameter is set.
+    cases:
+      - c: 1
+        type: Positive
+        title: KYC due chip on a client due in 20 days
+        steps:
+          - Open RNW-2026-000204 in the Expiry List and on the record page.
+        expected: The chip KYC due is shown with the date it was identified.
+      - c: 2
+        type: Negative
+        screen: CHECKS
+        title: KYC flag does not change the bucket
+        steps:
+          - Open RNW-2026-000204, tab Checks & Bucket; push it through disposition and posting.
+        expected: KYC_DUE is INFO; the pill is Clean; post is not refused because of KYC.
+      - c: 3
+        type: Report-output
+        screen: REPORTS
+        title: Status report shows the KYC flag
+        steps:
+          - Run RNW-STATUS for the range of RNW-2026-000204.
+        expected: The row shows KYC due and the date identified.
+      - c: 4
+        type: Negative
+        persona: SYSADMIN
+        screen: PARAMS
+        title: Segment outside RNW_KYC_SEGMENTS
+        steps:
+          - Set RNW_KYC_SEGMENTS = CLG; run the checks.
+        expected: RNW-2026-000204 (not CLG) no longer shows the chip; the history records when it was cleared.
+
+  FR-RN-027:
+    scenario: SC-RN-03
+    persona: MKT_TL
+    screen: TLREVIEW
+    data: [TD-RN-04]
+    conditions:
+      - While an endorsement request on the expiring invoice family is open, the candidate is Review with the Endorsed flag and cannot be posted, get an RA or be accepted.
+      - After the endorsement is posted, the renewal account reflects the endorsed values (the policy as of the last posted endorsement).
+      - The record lists the linked endorsement numbers.
+    cases:
+      - c: 1
+        type: Negative
+        brd: [BRD 1.008.1.4, BRRN.032]
+        title: TL cannot post while an endorsement is open
+        steps:
+          - Push RNW-2026-000202 as the AO; as rn.mkttl1 select it in TL Review and click Post.
+        expected: The post is refused and the account stays in Review in progress.
+        msg: ["Renewal {RNW-2026-000202} has an endorsement in progress ({END-2026-000450})"]
+      - c: 1
+        type: Negative
+        persona: MKT_AO
+        screen: LETTERS
+        title: No RA while an endorsement is open
+        pre: A candidate in RA_READY with a new endorsement request opened on its expiring invoice.
+        steps:
+          - Select it in RA Ready; Generate RA.
+        expected: The RA is not generated.
+        msg: ["Renewal {RNW-2026-000212} has an endorsement in progress ({END-2026-000455})"]
+      - c: 2
+        type: Positive
+        persona: PROCESSOR
+        screen: RACC
+        title: Renewal account shows the endorsed sum insured
+        steps:
+          - Post END-2026-000450 (sum insured raised to PHP 1,800,000); after re-evaluation post and process the candidate.
+          - Open the Renewal Account section.
+        expected: The renewal account has sum insured PHP 1,800,000.
+      - c: 3
+        type: Positive
+        screen: ACCHIST
+        title: Linked endorsements listed on the record
+        steps:
+          - Open RNW-2026-000202, tab Account History, section Endorsements.
+        expected: END-2026-000450 is listed with source and status at link time.
+
+  FR-RN-028:
+    scenario: SC-RN-03
+    persona: PROCESSOR
+    screen: CHECKS
+    data: [TD-RN-15, TD-RN-16]
+    conditions:
+      - A migrated policy whose legacy package maps to one BIBS package version passes PACKAGE_REMAP and shows that version.
+      - An unmapped or ambiguous legacy package fails PACKAGE_REMAP and puts the candidate in the Exception bucket.
+      - The package chosen by a processor applies only after a second processor approves it; the maker cannot approve.
+      - The check is Not applicable to candidates booked in BIBS.
+    cases:
+      - c: 1
+        type: Positive
+        title: Mapped legacy package resolves
+        steps:
+          - Open the candidate whose legacy package is HOME-01 v2, tab Checks & Bucket.
+        expected: PACKAGE_REMAP is PASS; the Package panel shows PKG-HOME-2027.
+      - c: 2
+        type: Negative
+        title: Unmapped and ambiguous packages go to Exception
+        steps:
+          - Open the candidates with legacy packages FIRE-OLD v1 and MOTOR-CLG v1.
+        expected: PACKAGE_REMAP is FAIL for both, with the detail "not in the code map" and "several package versions"; the bucket is Exception.
+      - c: 3
+        type: Workflow
+        title: Package chosen and approved
+        steps:
+          - As rn.po1 choose the BIBS package version of the FIRE-OLD candidate with a reason and submit.
+          - As rn.po2 approve the choice.
+        expected: The check turns PASS, the bucket is recomputed, and RNW-PACKAGE-REMAP lists the legacy package, chosen version, maker rn.po1 and checker rn.po2.
+      - c: 3
+        type: Negative
+        title: Maker cannot approve his own package choice
+        steps:
+          - As rn.po1 choose a package version for the MOTOR-CLG candidate and try to approve it.
+        expected: The approval is refused.
+        msg: ["The package choice must be approved by another user"]
+      - c: 3
+        type: Negative
+        title: Choice without a reason is refused
+        steps:
+          - As rn.po1 submit a package choice without a reason.
+        expected: The choice is not saved.
+        msg: ["Choose the package version and give the reason"]
+      - c: 4
+        type: Positive
+        data: [TD-RN-02]
+        title: Not applicable to candidates booked in BIBS
+        steps:
+          - Open a TD-RN-02 candidate, tab Checks & Bucket.
+        expected: PACKAGE_REMAP shows Not applicable and does not affect the bucket.
+
+  FR-RN-030:
+    scenario: SC-RN-04
+    persona: MKT_TL
+    screen: EXPIRY
+    data: [TD-RN-01, TD-RN-02]
+    conditions:
+      - The TL assigns selected Unassigned Disposition accounts (single, multiple, all except, all) to an AO of the own unit; they move to the AO's My Dispositions.
+      - The AO list offers only the officers of the TL's unit; an AO of another unit is refused.
+      - The TL re-assigns accounts to another AO until the RA is generated; after the RA the account is locked.
+      - CBG accounts never appear in Unassigned Disposition.
+      - Nothing changes when no account is selected or the selection is cleared before pushing.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRD 1.005.1, 1.005.1.1, 1.005.1.1.1, 1.005.1.1.2]
+        title: Assign five accounts to rn.ao1 by name search
+        steps:
+          - Open the tab Unassigned Disposition; tick five accounts.
+          - Click Assign Disposition; type "ao1" in Account Officer and select rn.ao1.
+          - Click Assign and Push.
+        expected: The five accounts leave Unassigned Disposition and appear in rn.ao1's My Dispositions in stage For disposition; rn.ao1 receives RNW_ASSIGNED.
+      - c: 1
+        type: Workflow
+        brd: [1.005.1.2, 1.005.1.2.1-1.005.1.2.4]
+        title: Assign with "all except" from the officer list
+        steps:
+          - Select all accounts, untick two ("all except"); click Assign Disposition.
+          - Pick rn.ao2 from the list of the unit's officers; Assign and Push.
+        expected: All selected accounts except the two go to rn.ao2; the two stay Unassigned.
+      - c: 2
+        type: Negative
+        screen: API
+        title: Assign to an officer of another unit
+        steps:
+          - Check the Account Officer list for rn.ao3 (Corporate Marketing 2).
+          - Call POST /api/v1/renewal/candidates/assign with rn.ao3.
+        expected: rn.ao3 is not in the list; the call is refused and the accounts stay Unassigned.
+        msg: ["{rn.ao3} is not an officer of your unit"]
+      - c: 3
+        type: Workflow
+        brd: [BRD 1.005.2]
+        title: Re-assign an account to another AO
+        steps:
+          - Tick an account assigned to rn.ao1; click Re-assign Officer; select rn.ao2 and a reason; push.
+        expected: The account moves to rn.ao2's list; the history shows from rn.ao1 to rn.ao2 with rn.mkttl1 and the time.
+      - c: 3
+        type: Negative
+        brd: [BRD 1.005.2]
+        title: Re-assign after the RA was generated
+        steps:
+          - Tick an account in RA Generated; click Re-assign Officer.
+        expected: The re-assignment is refused.
+        msg: ["Renewal {RNW-2026-000130} is locked since the Renewal Advice was generated"]
+      - c: 4
+        type: Negative
+        data: [TD-RN-03]
+        title: CBG account not in Unassigned Disposition
+        steps:
+          - Initiate the CBG accounts of TD-RN-03; open Unassigned Disposition and search their references.
+        expected: No CBG account is listed; they follow the LAMD-driven path.
+      - c: 5
+        type: Negative
+        title: Assign with no account selected, and unselect
+        steps:
+          - Click Assign Disposition with nothing ticked.
+          - Tick three accounts, then clear the selection and close the dialog.
+        expected: The first attempt shows the message; after unselecting nothing is changed.
+        msg: [Select at least one account]
+
+  FR-RN-031:
+    scenario: SC-RN-04
+    persona: MKT_TL
+    screen: EXPIRY
+    data: [TD-RN-01, TD-RN-02]
+    conditions:
+      - The TL or the AO submits a transfer with receiving unit and remarks; the account moves to Transfer pending and leaves the sender's list, and the receiving TLs are notified.
+      - The receiving unit must be another active Marketing unit; the unit and the remarks are mandatory.
+      - One open transfer request per account; the sender may cancel it before it is decided.
+      - The non-renewal reason "Transfer to Another Marketing Unit" opens the same transfer.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRD 1.006.1-1.006.5]
+        title: TL transfers an unassigned account to Corporate Marketing 2
+        steps:
+          - Tick one Unassigned account; click Transfer; view the account.
+          - Select Corporate Marketing 2, reason, remarks "Client moved to corporate"; Submit and Push.
+        expected: The account is Transfer pending and no longer in rn.mkttl1's lists; rn.mkttl2 receives RNW_TRANSFER_REQUESTED and sees it in Transfers, tab Incoming.
+      - c: 1
+        type: Workflow
+        persona: MKT_AO
+        screen: MYDISP
+        brd: [BRD 2.005.1, 2.005.2, 2.005.3, 2.005.3.1, 2.005.3.2, 2.005.4, 2.005.5]
+        title: AO requests the transfer of an assigned account
+        steps:
+          - As rn.ao1 select an account in My Dispositions; click Transfer; view it.
+          - Select Corporate Marketing 2, write remarks; Submit and Push.
+        expected: The account leaves My Dispositions and is Transfer pending; the receiving TLs are notified.
+      - c: 2
+        type: Negative
+        title: Transfer to the same unit
+        steps:
+          - Transfer an account and try to select Retail Marketing 1 (the account's unit).
+        expected: The own unit is not offered; the API call with it is refused.
+        msg: [The receiving unit must be another unit]
+      - c: 2
+        type: Negative
+        title: Transfer without remarks
+        steps:
+          - Select the receiving unit, leave Remarks blank; Submit and Push.
+        expected: The transfer is not submitted.
+        msg: [Enter the remarks]
+      - c: 3
+        type: Negative
+        title: Second transfer on the same account
+        steps:
+          - Submit a transfer on an account that is already Transfer pending (API or a second tab).
+        expected: The second request is refused.
+        msg: ["Renewal {RNW-2026-000115} already has a transfer request"]
+      - c: 3
+        type: Workflow
+        screen: TRANSFERS
+        title: Sender cancels an open request
+        steps:
+          - Open Transfers, tab Outgoing; cancel the open request.
+        expected: The account returns to its previous stage and list; the receiving TL no longer sees it.
+      - c: 4
+        type: Workflow
+        persona: MKT_AO
+        screen: DISP
+        brd: [BRD 2.004.4.8]
+        title: Reason Transfer to Another Marketing Unit opens the transfer
+        steps:
+          - Dispose Not for Renewal with reason Transfer to Another Marketing Unit; select the receiving unit; push.
+        expected: The transfer request is created and the account is Transfer pending.
+
+  FR-RN-032:
+    scenario: SC-RN-04
+    persona: MKT_TL
+    screen: TRANSFERS
+    data: [TD-RN-01]
+    conditions:
+      - The receiving TL is notified and sees the transferred accounts flagged Transferred.
+      - An accepted account joins the receiving unit's Unassigned Disposition with the Transferred chip.
+      - A declined account returns to the sending unit at its previous stage with the decline remarks; a decline needs remarks.
+      - Only a TL of the receiving unit decides, and a decided request cannot be decided again.
+    cases:
+      - c: 1
+        type: Positive
+        screen: NOTIF
+        brd: [BRD 1.007.1, 1.007.2]
+        title: Receiving TL is notified
+        steps:
+          - Log in as rn.mkttl2; open the bell and Transfers, tab Incoming.
+        expected: The notice names the account and sender; the Incoming tab lists the account with the Transferred flag.
+      - c: 2
+        type: Workflow
+        brd: [1.007.3, 1.007.3.1, 1.007.5]
+        title: Accept a transferred account
+        steps:
+          - As rn.mkttl2 view the account; click Accept and push.
+        expected: The account is in Corporate Marketing 2's Unassigned Disposition with the Transferred chip; the requester and the sending TL receive RNW_TRANSFER_DECIDED.
+      - c: 3
+        type: Workflow
+        brd: [1.007.4, 1.007.4.1, 1.007.4.2]
+        title: Decline with remarks
+        steps:
+          - As rn.mkttl2 open another incoming request; click Decline; remarks "Not our client segment"; push.
+        expected: The account is back in Retail Marketing 1 at its previous stage and shows the decline remarks.
+      - c: 3
+        type: Negative
+        title: Decline without remarks
+        steps:
+          - Click Decline with blank remarks; push.
+        expected: The decline is not saved.
+        msg: [Enter the remarks of the decline]
+      - c: 4
+        type: Security-access
+        persona: MKT_TL
+        title: TL of another unit cannot decide
+        steps:
+          - As rn.mkttl1 (sending unit) open the request in Outgoing; call the accept endpoint.
+        expected: Accept and Decline are not shown; the call returns HTTP 403.
+        msg: [You are not permitted to perform this action]
+      - c: 4
+        type: Negative
+        screen: API
+        title: Request already decided
+        steps:
+          - Call accept on a request that rn.mkttl2 already declined.
+        expected: The call is refused; the account is unchanged.
+        msg: ["The transfer of {RNW-2026-000116} is already decided"]
+
+  FR-RN-040:
+    scenario: SC-RN-05
+    persona: MKT_AO
+    screen: MYDISP
+    data: [TD-RN-01, TD-RN-02]
+    conditions:
+      - My Dispositions lists every account ever assigned to the AO, of every status and year, in one scrollable view without a filter being chosen.
+      - Every column filters and sorts ascending and descending, and the keyword search highlights matches.
+      - The AO finds an account by client name or by renewal reference, ARN, expiring invoice or policy number, PN or client code.
+      - Policy fields are read live, so a posted endorsement shows without a new extraction.
+      - The AO sees no account assigned to another AO.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRRN.011, restating BRD 2.003.1, BRRN.012, restating BRD 2.003.1.1]
+        title: Accounts of the current and previous years without a filter
+        pre: rn.ao1 has renewals of 2025 (closed) and 2026 (open).
+        steps:
+          - Open My Dispositions.
+        expected: Both years and all statuses are listed in one scrollable view with a row count; no filter was needed.
+      - c: 2
+        type: Positive
+        brd: [BRRN.014, restating BRD 2.003.1.3, BRRN.015, restating BRD 2.003.1.4]
+        title: Sort and filter every column
+        steps:
+          - Sort by Expiry Date ascending, then descending; repeat for three other columns.
+          - Filter Status = For disposition.
+        expected: Each sort orders the rows correctly; the filter keeps only For disposition rows.
+      - c: 2
+        type: Positive
+        brd: [BRRN.016, restating BRD 2.003.1.5]
+        title: Keyword search like Ctrl+F
+        steps:
+          - Type "MC01" in the search box.
+        expected: Only rows containing MC01 remain and the text is highlighted.
+      - c: 3
+        type: Positive
+        brd: [BRRN.017, restating BRD 2.003.1.6 without the QPS / EBIX references]
+        title: Search by client name and by each reference
+        steps:
+          - Search the client's name; then the renewal reference, ARN, expiring invoice number, policy number, PN and client code of one account.
+        expected: The name search returns rn.ao1's accounts of that client; each reference search returns the account.
+      - c: 3
+        type: Negative
+        brd: [BRRN.017, restating BRD 2.003.1.6 without the QPS / EBIX references]
+        title: Search by QPS or EBIX number is not offered
+        steps:
+          - Type a legacy QPS reference in the search box.
+        expected: No account is found; there is no QPS / EBIX search field (out of scope, Addendum 1 p.34).
+      - c: 4
+        type: Positive
+        brd: [BRRN.011, restating BRD 2.003.1]
+        title: Posted endorsement shows at once
+        steps:
+          - Post an endorsement changing the sum insured of an account of rn.ao1; refresh My Dispositions.
+        expected: The new sum insured is shown without a new extraction.
+      - c: 5
+        type: Security-access
+        title: AO does not see another AO's accounts
+        steps:
+          - As rn.ao1 search the reference of an account assigned to rn.ao2.
+        expected: Nothing is found; opening the record by address shows no data.
+
+  FR-RN-041:
+    scenario: SC-RN-05
+    persona: MKT_AO
+    screen: DETAILS
+    data: [TD-RN-02]
+    conditions:
+      - The record page shows the summary card and every renewal field of the account, read live from the account and invoice.
+      - The user downloads the account details as PDF and Excel with the same values as the Details tab.
+      - The user saves and prints the details with a preview and print settings.
+      - Downloads are logged, and a user without RNW_VIEW or out of scope cannot open the record.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRRN.013, restating BRD 2.003.1.2, 2.003.2]
+        title: AO views the current renewal details
+        steps:
+          - Open an account from My Dispositions.
+        expected: The summary card shows reference, Classification pill, disposition and flag chips; the Details tab shows every field of the expiring list for the account.
+      - c: 1
+        type: Positive
+        persona: MKT_TL
+        brd: [BRD 1.004.1, 1.004.1.1, 1.004.1.2, 1.008.1.2, 1.008.1.3]
+        title: TL views an account from the list and from TL Review
+        steps:
+          - As rn.mkttl1 open an account from the Expiry List, then one from TL Review.
+        expected: Both open the record page with all tabs and live values.
+      - c: 1
+        type: Positive
+        persona: PROCESSING_TL
+        brd: [3.006.1.1, 3.006.1.2, 3.006.2]
+        title: Processing TL views an account for processing
+        steps:
+          - As rn.proctl open an account from the Processing Worklist.
+        expected: The record page opens with Details, Computations and Insurer tabs.
+      - c: 1
+        type: Positive
+        persona: PROCESSOR
+        brd: [4.003.1.1, 4.003.1.2, 4.003.2]
+        title: Processing Officer views an assigned account
+        steps:
+          - As rn.po1 open an account of the In Processing tab.
+        expected: The record page opens with the current values.
+      - c: 2
+        type: Upload-download
+        brd: [BRD 1.004.1.3-1.004.1.5.2, 2.003.3, 2.003.3.1]
+        title: Download the details as PDF and Excel
+        steps:
+          - Click Download, PDF; then Download, Excel; save both.
+        expected: Both files (template RNW_ACCOUNT_DETAILS) hold the same values as the Details tab.
+      - c: 3
+        type: Report-output
+        brd: [2.003.3.2, 3.006.3, 3.006.3.1, 3.006.3.2]
+        title: Print the details with preview
+        steps:
+          - Click Print; set Legal, landscape in the settings; print.
+        expected: The preview shows the settings; the printout matches the preview.
+      - c: 3
+        type: Report-output
+        persona: PROCESSOR
+        brd: [4.003.3, 4.003.3.1, 4.003.3.2]
+        title: Processing Officer saves and prints the details
+        steps:
+          - As rn.po1 download the PDF, save it, and print it.
+        expected: The saved file and the printout have the same values as the tab.
+      - c: 4
+        type: Security-access
+        persona: MKT_AO
+        brd: [BRRN.013]
+        title: Download logged; out-of-scope record refused
+        steps:
+          - As rn.sysadmin check the audit for the downloads of TC-RN-041.2-01.
+          - As rn.ao3 open by address an account of Retail Marketing 1.
+        expected: Each download is logged with user and time; rn.ao3 gets no data for the out-of-scope record.
+
+  FR-RN-042:
+    scenario: SC-RN-05
+    persona: MKT_AO
+    screen: ACCHIST
+    data: [TD-RN-02]
+    conditions:
+      - The Account History tab shows read-only the prior policies (chain of ARNs), endorsements, payments and claims, from the mother policy in BIBS.
+      - The disposition is refused until the user has opened the history; the view is recorded with user and time.
+      - Before the Claims module is connected the claims section shows "claims not connected".
+    cases:
+      - c: 1
+        type: Positive
+        title: History of an account renewed last year
+        steps:
+          - Open an account that was renewed from a 2025 policy; tab Account History.
+        expected: The previous year's ARN, its endorsements, payments and claims are listed; no field can be edited; Extract and Print are offered.
+      - c: 2
+        type: Negative
+        screen: DISP
+        title: Disposition before the history was opened
+        steps:
+          - Open a new account; go straight to the Disposition panel; choose For Renewal; Save.
+        expected: The disposition is refused.
+        msg: [Open the Account History before you give the disposition]
+      - c: 2
+        type: Positive
+        screen: DISP
+        title: Disposition accepted after the history was opened
+        steps:
+          - Open the Account History tab, then give the disposition For Renewal; Save.
+        expected: The disposition is saved; the audit shows the history view with user, time and sections viewed.
+      - c: 3
+        type: Positive
+        title: Claims section before the Claims module
+        pre: Claims not connected.
+        steps:
+          - Open the Account History, section Claims.
+        expected: The section shows "claims not connected"; the other sections are shown.
+
+  FR-RN-043:
+    scenario: SC-RN-05
+    persona: MKT_AO
+    screen: DISP
+    data: [TD-RN-02]
+    conditions:
+      - The AO gives one of the five dispositions (the matrix proposal is the default) and pushes; the account goes to TL review with status Review in progress.
+      - Not for Renewal needs one of the ten reasons; Booked to New Invoice needs an existing invoice number; Transfer to Another Marketing Unit needs the receiving unit.
+      - A push with missing mandatory fields names every missing field and keeps the account in For disposition; the AO may save and push later.
+      - Every disposition is a new row; earlier rows are kept with their source.
+      - A disposition is refused once the RA locks the account.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRD 2.004.1, 2.004.2, 2.004.3, 2.004.3.1-2.004.3.5]
+        title: Dispose For Renewal and push
+        steps:
+          - Open the account (history viewed); select For Renewal; add a remark; Save; Push.
+        expected: The account is in TL Review with status Review in progress; the TL queue is notified.
+      - c: 1
+        type: Positive
+        brd: [2.004.3.1-2.004.3.5]
+        title: The five dispositions are offered
+        steps:
+          - Open the Disposition list.
+        expected: For Renewal, Not for Renewal, For Quotation, For Proposal and Lost Business are offered; the matrix proposal is pre-selected when one exists.
+      - c: 2
+        type: Positive
+        brd: [BRD 2.004.4, 2.004.4.1-2.004.4.10]
+        title: The ten non-renewal reasons
+        steps:
+          - Select Not for Renewal and open the reason list.
+        expected: RMU, With submitted policy, Loan fully paid, Direct to Insurer, Total Loss Claim, Unit Sold, Canceled Policy, Transfer to Another Marketing Unit, Non-renewable Accounts and Booked to New Invoice are offered.
+      - c: 2
+        type: Negative
+        brd: [BRD 2.004.4]
+        title: Not for Renewal without a reason
+        steps:
+          - Select Not for Renewal; leave the reason blank; Push.
+        expected: The push is refused.
+        msg: [Select the reason for Not for Renewal]
+      - c: 2
+        type: Negative
+        brd: [2.004.4.1-2.004.4.10]
+        title: Booked to New Invoice without, then with an unknown invoice number
+        steps:
+          - Choose reason Booked to New Invoice; Push with the invoice number blank.
+          - Enter INV-2026-999999; Push.
+        expected: The first push shows "Enter the new invoice number"; the second is refused.
+        msg: ["Invoice {INV-2026-999999} does not exist"]
+      - c: 2
+        type: Positive
+        brd: [2.004.4.1-2.004.4.10]
+        title: Booked to New Invoice with an existing invoice
+        steps:
+          - Enter an existing invoice number of the client; Push.
+        expected: The account is in TL Review with the reason and invoice number.
+      - c: 3
+        type: Negative
+        brd: [BRD 2.004.5, 2.004.5.1, 2.004.5.2, 2.004.5.3]
+        title: Push with missing mandatory fields
+        pre: The product field rules make Mortgagee and Plate No. mandatory.
+        steps:
+          - Dispose For Renewal leaving Mortgagee and Plate No. blank; Push.
+        expected: The push is refused, both fields are named and marked, and the account stays For disposition.
+        msg: ["Complete the mandatory fields: {Mortgagee, Plate No.}"]
+      - c: 3
+        type: Positive
+        brd: [BRD 2.004.5, 2.004.5.1]
+        title: Save now and push later
+        steps:
+          - Save the disposition with fields missing; log out; complete the fields next day; Push.
+        expected: The saved disposition is kept; the push succeeds once complete.
+      - c: 4
+        type: Positive
+        screen: HIST
+        brd: [BRD 2.004.1, 2.004.2]
+        title: A new disposition row keeps the earlier one
+        steps:
+          - Change a saved For Quotation disposition to For Renewal; open the History tab.
+        expected: Both rows are listed with source USER, user and time; the latest one is current.
+      - c: 5
+        type: Negative
+        brd: [BRD 2.004.1]
+        title: Disposition refused on a locked account
+        steps:
+          - Open an account in RA Generated; change the disposition.
+        expected: The Disposition panel is read only; the API call is refused.
+        msg: ["Renewal {RNW-2026-000130} is locked since the Renewal Advice was generated"]
+
+  FR-RN-044:
+    scenario: SC-RN-05
+    persona: MKT_AO
+    screen: REMARKS
+    data: [TD-RN-02]
+    conditions:
+      - A saved remark is stamped with user ID, date, time and stage and is shown on the Remarks tab and in the column Remarks of Acct Officer.
+      - A remark has at most 200 characters; saved remarks are not edited.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRD 2.004.6, 2.004.7, 2.004.8]
+        title: Add a remark and push
+        steps:
+          - Type "Client asked for a lower deductible" and Save; push the account.
+        expected: The remark shows rn.ao1, date, time and stage For disposition; the Expiry List column Remarks of Acct Officer shows it.
+      - c: 1
+        type: Positive
+        screen: MYDISP
+        brd: [BRD 2.006.1.5, 2.006.1.5.1, 2.006.1.5.2, 2.006.1.6]
+        title: Remarks on a dispositioned account
+        steps:
+          - In the Dispositioned view select an account, add a remark, Save.
+        expected: The remark is stamped and listed.
+      - c: 2
+        type: Boundary
+        title: 200 characters are accepted
+        steps:
+          - Save a remark of exactly 200 characters.
+        expected: The remark is saved in full.
+      - c: 2
+        type: Boundary
+        neg: true
+        title: 201 characters are refused
+        steps:
+          - Save a remark of 201 characters.
+        expected: The remark is not saved.
+        msg: [Remarks may have at most 200 characters]
+      - c: 2
+        type: Negative
+        title: A saved remark cannot be edited
+        steps:
+          - Look for Edit on a saved remark; call PUT on it by API.
+        expected: No edit action exists; the call is refused.
+
+  FR-RN-045:
+    scenario: SC-RN-05
+    persona: MKT_AO
+    screen: MYDISP
+    data: [TD-RN-02, TD-RN-04]
+    conditions:
+      - The Dispositioned view lists the AO's dispositioned accounts with status, and the AO selects and views any of them.
+      - Accounts with endorsements and claims carry the chips Endorsed and Claims next to the reference, with the latest endorsement effective date.
+      - A padlock marks closed or locked accounts, which cannot be edited.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRD 2.006.1, 2.006.1.1, 2.006.1.1.1, 2.006.1.1.2]
+        title: Dispositioned view with renewal status
+        steps:
+          - Open My Dispositions, view Dispositioned; select an account.
+        expected: Each dispositioned account shows its renewal status; the selected one opens its record.
+      - c: 2
+        type: Positive
+        brd: [2.006.1.3, 2.006.1.4]
+        title: Endorsed and Claims chips
+        steps:
+          - Find RNW-2026-000202 (posted endorsement) and RNW-2026-000201 (claim).
+        expected: The Endorsed chip with the endorsement effective date and the Claims chip are shown next to the references, not inside the status pill.
+      - c: 3
+        type: Negative
+        brd: [2.006.1.5.3]
+        title: Closed account shows the padlock and cannot be edited
+        steps:
+          - Open a Lost Business account closed last week.
+        expected: The padlock is shown; the Disposition panel and Remarks are read only.
+
+  FR-RN-046:
+    scenario: SC-RN-05
+    persona: MKT_AO
+    screen: MYDISP
+    data: [TD-RN-02]
+    conditions:
+      - The AO is notified of a returned account, which carries the red Returned flag and the return remarks.
+      - The AO edits, saves or cancels, and pushes the account back; the flag clears on push.
+      - A push with missing fields is refused.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRD 2.007.1, 2.007.2, 2.007.3]
+        title: Returned account with flag and remarks
+        pre: rn.mkttl1 returned an account with reason Incomplete details and remarks.
+        steps:
+          - Open the notification; open the quick filter Returned to me.
+        expected: The account shows the red Returned chip, the return reason and the TL's remarks.
+      - c: 2
+        type: Workflow
+        brd: [2.007.4, 2.007.4.2-2.007.4.7, 2.007.5]
+        title: Correct and push back
+        steps:
+          - Search and select the returned account; correct the disposition details; add a remark; Save; Push.
+        expected: The account is back in TL Review without the Returned chip; the history shows the resubmission.
+      - c: 2
+        type: Positive
+        brd: [2.007.4.2-2.007.4.7]
+        title: Cancel keeps the account returned
+        steps:
+          - Edit a returned account and click Cancel.
+        expected: Nothing is saved; the Returned chip stays.
+      - c: 3
+        type: Negative
+        brd: [2.007.5]
+        title: Push of a returned account with a field missing
+        steps:
+          - Clear a mandatory field and Push.
+        expected: The push is refused and the account stays returned.
+        msg: ["Complete the mandatory fields: {Plate No.}"]
+
+  FR-RN-047:
+    scenario: SC-RN-05
+    persona: MKT_AO
+    screen: RECORD
+    data: [TD-RN-02, TD-RN-04]
+    conditions:
+      - A Not for Renewal account (by AO, system or upload) is re-opened with a reason until expiry plus RNW_REOPEN_DAYS and returns to For disposition.
+      - The earlier disposition and any NFR sent stay in the history; the record shows "NFR sent".
+      - Re-opening after the limit, or without a reason, is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRD 2.004.10]
+        title: AO re-opens an account ten days before expiry
+        steps:
+          - Open a closed Not for Renewal account; click Re-open Disposition; reason "Client decided to renew".
+        expected: The account is For disposition; rn.ao1 and rn.mkttl1 are notified.
+      - c: 1
+        type: Workflow
+        persona: PROCESSING_TL
+        brd: [BRD 3.004.5]
+        title: Processing TL re-opens an account tagged by the upload
+        steps:
+          - Open an account tagged Not for Renewal by the complete-file upload (FR-RN-060); Re-open Disposition with a reason.
+        expected: The account returns to For disposition for the assigned AO.
+      - c: 2
+        type: Positive
+        screen: HIST
+        brd: [BRD 2.004.10]
+        title: History keeps the superseded disposition and the NFR
+        steps:
+          - Re-open RNW-2026-000205 (NFR sent); open the History and Letters tabs.
+        expected: The earlier Not for Renewal row and the sent NFR are kept; the chip "NFR sent" is shown.
+      - c: 3
+        type: Boundary
+        neg: true
+        brd: [BRD 2.004.10]
+        title: Re-open 31 days after expiry
+        pre: RNW_REOPEN_DAYS = 30.
+        steps:
+          - Re-open an account that expired 31 days ago.
+        expected: The re-open is refused.
+        msg: ["Renewal {RNW-2026-000140} can no longer be re-opened (expired on {15-Feb-2027})"]
+      - c: 3
+        type: Boundary
+        brd: [BRD 2.004.10]
+        title: Re-open 30 days after expiry
+        steps:
+          - Re-open an account that expired 30 days ago.
+        expected: The re-open succeeds.
+      - c: 3
+        type: Negative
+        brd: [BRD 2.004.10]
+        title: Re-open without a reason
+        steps:
+          - Click Re-open Disposition with a blank reason.
+        expected: Nothing changes.
+        msg: [Enter the reason for re-opening]
+
+  FR-RN-048:
+    scenario: SC-RN-05
+    persona: MKT_AO
+    screen: RECORD
+    data: [TD-RN-02, TD-RN-07]
+    conditions:
+      - A posted For Quotation or For Proposal disposition, or a failed financial-impact check, tags the renewal For Proposal / New Business Path with the reason.
+      - Start NB Path creates a package quotation or a PRF pre-filled from the expiring account and linked by the renewal reference; its booked invoice has business type RENEWAL.
+      - The candidate closes RENEWED on booking of the quotation's account, or LOST when it is declined or voided.
+      - Only one NB path per candidate.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRRN.038]
+        title: Insurer revision with +10 % premium routes to the NB path
+        pre: RNW_FIN_IMPACT_TOLERANCE = 0.00; the INS-A Revise row of TD-RN-07 was applied.
+        steps:
+          - Open the candidate, tab Checks & Bucket and the summary card.
+        expected: FINANCIAL_IMPACT fails; the account is tagged For Proposal / New Business Path and the audit records the reason.
+      - c: 2
+        type: Workflow
+        brd: [BRRN.033]
+        title: Start NB Path creates a pre-filled quotation
+        steps:
+          - Post a For Quotation disposition; click Start NB Path; confirm quotation.
+        expected: A package quotation opens with the client, product, items and insurer of the expiring account and the renewal reference; the candidate is For Proposal / New Business Path.
+      - c: 2
+        type: Workflow
+        screen: QUOTE
+        brd: [BRRN.033]
+        title: For Proposal creates a PRF
+        steps:
+          - Post a For Proposal disposition on a non-package account; Start NB Path.
+        expected: A PRF opens pre-filled and linked by the renewal reference.
+      - c: 3
+        type: Workflow
+        persona: NB_BOOKING
+        screen: BOOKING
+        brd: [BRRN.033]
+        title: Candidate closes RENEWED when the quotation's account is booked
+        steps:
+          - Run the quotation through the BRD-1 flow to booking.
+          - Open the booked invoice and the candidate.
+        expected: The invoice has business type RENEWAL and points to the expiring ARN; the candidate is Renewed; the AO is notified.
+      - c: 3
+        type: Workflow
+        brd: [BRRN.033]
+        title: Declined quotation closes the candidate LOST
+        steps:
+          - Decline the quotation of another NB-path candidate.
+        expected: The candidate is Closed with reason LOST; the AO is notified.
+      - c: 4
+        type: Negative
+        brd: [BRRN.033]
+        title: Second NB path on the same candidate
+        steps:
+          - Click Start NB Path again on the candidate of TC-RN-048.2-01.
+        expected: No second quotation is created.
+        msg: ["Renewal {RNW-2026-000150} already has quotation {Q-2026-000812}"]
+
+  FR-RN-050:
+    scenario: SC-RN-06
+    persona: MKT_TL
+    screen: TLREVIEW
+    data: [TD-RN-02, TD-RN-04]
+    conditions:
+      - The TL sees every dispositioned account of the unit in one scrollable view with status Review in progress until it is posted.
+      - The TL posts selected accounts (single, multiple, all except, all) and each moves on by its disposition.
+      - The TL returns selected accounts to the AO with a reason and remarks; they show the red Returned flag.
+      - An account with a failing blocking check cannot be posted until the check is overridden.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRD 1.008.1, 1.008.1.1]
+        title: TL Review lists the unit's dispositioned accounts
+        steps:
+          - Open TL Review.
+        expected: All accounts pushed by rn.ao1 and rn.ao2 are listed in one scrollable view with status Review in progress and a row count; no account of Corporate Marketing 2 is listed.
+      - c: 2
+        type: Workflow
+        brd: [BRD 1.008.3, 1.008.3.1-1.008.3.4]
+        title: Post routes each account by its disposition
+        steps:
+          - Select four accounts disposed For Renewal, For Quotation, Not for Renewal and Lost Business; click Post.
+        expected: For Renewal is in the Processing Worklist, tab For Processing (Processing notified by RNW_POSTED); For Quotation is For Proposal / New Business Path; Not for Renewal is Letter pending; Lost Business is Closed.
+      - c: 2
+        type: Workflow
+        brd: [BRD 1.008.3, 1.008.3.1-1.008.3.4]
+        title: Post with "all except"
+        steps:
+          - Select all, untick one; Post.
+        expected: All but the unticked account are posted; the unticked one stays Review in progress.
+      - c: 3
+        type: Workflow
+        brd: [BRD 1.008.2, 1.008.2.1-1.008.2.7]
+        title: Return accounts to the AO
+        steps:
+          - Select two accounts; click Return; reason Incomplete details; remarks "Add the plate number"; push.
+        expected: Both are in rn.ao1's list with status Returned, the red flag and the remarks; rn.ao1 receives RNW_RETURNED.
+      - c: 3
+        type: Negative
+        brd: [BRD 1.008.2, 1.008.2.1-1.008.2.7]
+        title: Return without a reason
+        steps:
+          - Select an account; Return; leave Reason blank; push.
+        expected: The return is refused.
+        msg: ["Select a reason for 'Return'"]
+      - c: 4
+        type: Negative
+        brd: [1.008.1.4]
+        title: Post refused with a failing outstanding-premium check
+        steps:
+          - Select RNW-2026-000203 (outstanding PHP 12,500); Post.
+        expected: The post is refused and the check is named.
+        msg: ["Renewal {RNW-2026-000203} cannot be posted: {OUTSTANDING_PREMIUM} failed"]
+
+  FR-RN-051:
+    scenario: SC-RN-06
+    persona: MKT_TL
+    screen: TLREVIEW
+    data: [TD-RN-04]
+    conditions:
+      - An account whose invoice family has an open premium above RNW_OUTSTANDING_THRESHOLD shows the Outstanding flag and is Review.
+      - The TL overrides the flag on one or several accounts with a reason and remarks; the block clears and the account can be posted.
+      - The same controlled override clears a bucket, a system disposition or an insurer mismatch and cancels an RA to unlock an account.
+      - An override without remarks or without a reason is refused; overrides are listed in RNW-DECISIONS.
+      - Only users with RNW_OVERRIDE see the override.
+    cases:
+      - c: 1
+        type: Boundary
+        brd: [BRD 1.011.1, 1.011.1.1]
+        title: Balance above the threshold raises the flag
+        pre: RNW_OUTSTANDING_THRESHOLD = 0.00; RNW-2026-000203 has PHP 12,500 open; a second account has PHP 0.00 open.
+        steps:
+          - Filter TL Review on the Outstanding flag.
+        expected: RNW-2026-000203 shows the Outstanding flag and is Review; the account with PHP 0.00 has no flag.
+      - c: 2
+        type: Workflow
+        brd: [1.011.1.2, 1.011.1.3]
+        title: Override the outstanding balance and post
+        steps:
+          - Select RNW-2026-000203 and a second flagged account; click Override; kind Outstanding balance; reason; remarks "Payment promised by 30th"; Save.
+          - Post RNW-2026-000203.
+        expected: The block clears for both accounts; the post succeeds.
+      - c: 3
+        type: Workflow
+        screen: RECORD
+        brd: [BRRN.035 negative scenario 2d]
+        title: Override an insurer-response mismatch
+        pre: An account in WITH_INSURER in Exception because of a policy-number mismatch.
+        steps:
+          - Open the account; Override; kind Insurer mismatch; reason; remarks; Save.
+        expected: The mismatch is cleared by the override and the account progresses on the latest valid response; the override is logged.
+      - c: 3
+        type: Workflow
+        screen: RECORD
+        brd: [BRRN.023 AC5, BRRN.031 AC4]
+        title: Cancel an RA to unlock an account
+        steps:
+          - Open an account in RA Generated; Override; kind RA unlock; reason; remarks; Save.
+        expected: The RA is cancelled and kept in the history; the account is unlocked for disposition.
+      - c: 4
+        type: Negative
+        brd: [1.011.1.2]
+        title: Override without remarks
+        steps:
+          - Override with a reason and blank remarks.
+        expected: Nothing is saved.
+        msg: [Enter the remarks of the override]
+      - c: 4
+        type: Negative
+        brd: [1.011.1.2]
+        title: Override without a reason
+        steps:
+          - Override with remarks and no reason.
+        expected: Nothing is saved.
+        msg: [Select the reason of the override]
+      - c: 4
+        type: Report-output
+        screen: REPORTS
+        brd: [BRRN.023 AC5, BRRN.031 AC4]
+        title: Overrides in RNW-DECISIONS
+        steps:
+          - Run RNW-DECISIONS for today.
+        expected: Each override of this FR is listed with kind, from, to, reason, remarks, rn.mkttl1 and time.
+      - c: 5
+        type: Security-access
+        persona: MKT_AO
+        screen: RECORD
+        brd: [BRD 1.011.1]
+        title: AO cannot override
+        steps:
+          - As rn.ao1 open RNW-2026-000203; call POST /api/v1/renewal/candidates/override.
+        expected: Override is not shown; the call returns HTTP 403.
+        msg: [You are not permitted to perform this action]
+
+  FR-RN-060:
+    scenario: SC-RN-07
+    persona: PROCESSING_TL
+    screen: PROCWL
+    data: [TD-RN-06]
+    conditions:
+      - Processing uploads one or more dispositioned files; valid rows update the accounts (source UPLOAD) and push them to For Processing, and the result lists the errors per row.
+      - Rows with errors update nothing and can be downloaded; the upload commits the valid rows.
+      - With the complete-file scope ticked, candidates of the range and unit missing from the file are tagged Not for Renewal (Non-renewable Accounts); without it no account is tagged.
+      - Files of a wrong type, without a header row, with an invalid disposition or with a locked account are refused with their message.
+    cases:
+      - c: 1
+        type: Upload-download
+        brd: [BRRN.018, restating BRD 3.004.1, 3.004.1.1, 3.004.1.2]
+        title: 500-row file with 3 unknown references
+        steps:
+          - Click Upload Dispositioned File; select RN_DISPO_500.xlsx; confirm.
+        expected: 497 accounts are updated with source UPLOAD and moved to For Processing; the 3 rows are listed with "renewal reference does not exist"; the uploader receives the job result.
+      - c: 1
+        type: Upload-download
+        persona: PROCESSOR
+        brd: [4.004.1, 4.004.1.1, 4.004.1.2, 4.004.2, 4.004.3, 4.004.3.1]
+        title: Processing Officer uploads two files at once
+        steps:
+          - As rn.po1 select RN_DISPO_PARTIAL.xlsx and a second valid file; upload.
+        expected: Each file runs as its own job with its own result and confirmation; the accounts are pushed to the processing list.
+      - c: 2
+        type: Upload-download
+        brd: [BRD 3.004.2, 3.004.3, 3.004.3.1]
+        title: Download the error rows
+        steps:
+          - Open the result of TC-RN-060.1-01; click Download errors.
+        expected: The file lists the 3 rows with their reason; the disposition history of the 497 accounts shows source UPLOAD next to online dispositions.
+      - c: 3
+        type: Workflow
+        brd: [BRD 3.004.4]
+        title: Complete file for March, unit Retail Marketing 1
+        steps:
+          - Upload RN_DISPO_PARTIAL.xlsx (30 of 40 accounts) with "Complete file for" March 2027 and Retail Marketing 1 ticked.
+        expected: The 10 missing accounts are tagged Not for Renewal, reason Non-renewable Accounts, source SYSTEM, and kept out of processing; they can be re-opened (FR-RN-047).
+      - c: 3
+        type: Negative
+        brd: [BRD 3.004.4]
+        title: Without the complete-file tick no account is tagged
+        steps:
+          - Upload the same file again without the tick for another month's set.
+        expected: No missing account is tagged.
+      - c: 4
+        type: Negative
+        brd: [BRRN.018]
+        title: File without a header row
+        steps:
+          - Upload RN_DISPO_NOHEADER.csv.
+        expected: The file is refused; nothing is updated.
+        msg: [The file has no header row]
+      - c: 4
+        type: Negative
+        brd: [BRRN.018]
+        title: Wrong file type
+        steps:
+          - Upload a .pdf file.
+        expected: The file is refused.
+        msg: ["Upload an Excel (.xlsx), OpenDocument (.ods), CSV (.csv) or text (.txt) file"]
+      - c: 4
+        type: Negative
+        brd: [BRRN.018]
+        title: Invalid disposition and locked account rows
+        steps:
+          - Upload RN_DISPO_BADCODE.xlsx, then RN_DISPO_LOCKED.xlsx.
+        expected: The RENEWLATER row is refused ("Row 2 - disposition RENEWLATER is not valid"); the RA_SENT row is refused; neither account changes.
+        msg: ["Row {3}: renewal {RNW-2026-000160} cannot be updated in stage {RA_SENT}"]
+
+  FR-RN-061:
+    scenario: SC-RN-07
+    persona: PROCESSING_TL
+    screen: PROCWL
+    data: [TD-RN-01]
+    conditions:
+      - The Processing TL assigns selected For Processing accounts (single, multiple, all except, all) to a Processing Officer found by name or ID, or to himself; they move to In Processing.
+      - The TL re-assigns accounts to another PO.
+      - Only Processing Officers and the TL are selectable; an assignment without account or officer is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRD 3.005.1, 3.005.1.1, 3.005.1.1.1, 3.005.1.1.2]
+        title: Assign accounts to rn.po1
+        steps:
+          - Tab For Processing; tick three accounts; Assign PO; search "po1"; push.
+        expected: The accounts are In Processing with rn.po1 as assignee and appear in rn.po1's In Processing tab; rn.po1 receives RNW_ASSIGNED.
+      - c: 1
+        type: Workflow
+        brd: [3.005.1.2, 3.005.1.2.1, 3.005.1.2.2, 3.005.1.3]
+        title: Assign to Me with "all except"
+        steps:
+          - Select all, untick two; click Assign to Me; push.
+        expected: The TL is the assignee of the selected accounts.
+      - c: 2
+        type: Workflow
+        brd: [3.005.1.4, 3.005.1.5, 3.005.1.6]
+        title: Re-assign to another officer
+        steps:
+          - Tick an account of rn.po1; Assign PO; select rn.po2; push.
+        expected: The account moves to rn.po2; the history shows from, to, user and time.
+      - c: 3
+        type: Negative
+        title: Officer list and missing officer
+        steps:
+          - Open Assign PO and search "ao1".
+          - Push without selecting an officer.
+        expected: No Marketing user is found; the push is refused.
+        msg: [Select the Processing Officer]
+      - c: 3
+        type: Negative
+        title: No account selected
+        steps:
+          - Click Assign PO with nothing ticked.
+        expected: Nothing happens except the message.
+        msg: [Select at least one account]
+
+  FR-RN-062:
+    scenario: SC-RN-07
+    persona: PROCESSOR
+    screen: PROCWL
+    data: [TD-RN-01]
+    conditions:
+      - The Processing Worklist shows the processing stages in tabs, in one scrollable view with filter and sort on every column and the keyword search.
+      - A Processing Officer sees only the accounts assigned to him; the TL sees the unit's.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRD 3.006.1, 3.006.1.3, 3.006.1.4]
+        persona: PROCESSING_TL
+        title: TL works the list by tab, filter and sort
+        steps:
+          - Open each tab For Processing, In Processing, With Insurer, Insurer Responded and Returned.
+          - Sort by Expiry Date; filter Insurance Company = INS-A.
+        expected: Each tab lists the accounts of its stage; sort and filter work on every column.
+      - c: 1
+        type: Positive
+        brd: [BRD 4.003.1, 4.003.1.3, 4.003.1.4]
+        title: Officer sorts and searches his list
+        steps:
+          - As rn.po1 sort every column and search a reference.
+        expected: Sorting and search work; the matched reference is highlighted.
+      - c: 2
+        type: Security-access
+        brd: [BRD 4.003.1]
+        title: Officer sees only his own accounts
+        steps:
+          - As rn.po1 open In Processing and search a reference assigned to rn.po2.
+        expected: Only rn.po1's accounts are listed; the rn.po2 reference is not found.
+
+  FR-RN-063:
+    scenario: SC-RN-07
+    persona: PROCESSOR
+    screen: RACC
+    data: [TD-RN-02]
+    conditions:
+      - At For Processing BIBS creates the renewal account (draft, business type RENEWAL) with the client, product, items, insurer, PN, mortgage and contact of the expiring account, the next period and a link to the expiring ARN.
+      - Processing edits the renewal account; mandatory fields are prompted and the push is refused while any is missing.
+      - The renewal account is rated with purpose RENEWAL on the expiring package version; a product not sellable for renewal is refused.
+      - After placement the renewal account cannot be edited.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRD 3.007.1, 3.007.2]
+        title: Renewal account of a Motor policy
+        steps:
+          - Open a posted For Renewal Motor candidate; section Renewal Account.
+        expected: A draft account of business type RENEWAL exists with start date = old end + 1 day, the same term, the same vehicle, insurer, PN and mortgagee, and a link to the expiring ARN.
+      - c: 2
+        type: Positive
+        brd: [BRD 4.005.1, 4.005.2, 4.005.3, 4.005.3.1-4.005.3.4]
+        title: Officer updates and saves the renewal account
+        steps:
+          - Change the sum insured and the contact number; Save.
+        expected: The values are saved; the account audit shows before and after values.
+      - c: 2
+        type: Negative
+        brd: [3.007.3, 3.007.3.1-3.007.3.4]
+        title: Push with a mandatory field blank
+        steps:
+          - Clear the chassis number; push.
+        expected: The push is refused and the missing fields are listed.
+        msg: ["Complete the mandatory fields of {MC01}: {Chassis No.}"]
+      - c: 3
+        type: Negative
+        brd: [3.007.3]
+        title: Product no longer sellable for renewal
+        pre: The package version of the expiring account is retired (RQ30 open).
+        steps:
+          - Rate the renewal account.
+        expected: Rating is refused and PRODUCT_RENEWABLE is FAIL_REVIEW on the Checks & Bucket tab.
+        msg: ["Product {MC01} is {RETIRED} and cannot be sold"]
+      - c: 4
+        type: Negative
+        brd: [BRD 4.005.1]
+        title: Edit after placement
+        steps:
+          - Open a renewal account in For Placement and Booking; try to edit.
+        expected: The fields are read only; the save is refused by the account workflow.
+
+  FR-RN-064:
+    scenario: SC-RN-07
+    persona: PROCESSOR
+    screen: COMP
+    data: [TD-RN-02, TD-RN-07]
+    conditions:
+      - The Computations tab shows every calculated field of the renewal account next to the expiring invoice, with the difference.
+      - A renewal premium different from the expiring premium beyond the tolerance fails FINANCIAL_IMPACT, routes the account to Review and notifies the stage owner.
+      - A renewal within the tolerance passes the check.
+    cases:
+      - c: 1
+        type: Report-output
+        brd: [BRD 3.008.1, 3.008.1.1]
+        title: Computations next to the expiring invoice
+        steps:
+          - Open the Computations tab of a renew-as-is account.
+        expected: The premium components, taxes, commission and total of the renewal account are shown next to the expiring premium, sum insured, rate, commission and charges with a zero difference; the components equal the account's premium breakdown.
+      - c: 2
+        type: Negative
+        brd: [BRRN.038, BRD 4.006.1, 4.006.1.1]
+        title: Different premium fails FINANCIAL_IMPACT
+        steps:
+          - Raise the rate of the renewal account so the premium rises by PHP 1,000; save; open Computations and Checks & Bucket.
+        expected: The difference PHP 1,000 is shown; FINANCIAL_IMPACT is FAIL_REVIEW; the pill is Review; the stage owner is notified.
+      - c: 3
+        type: Boundary
+        persona: SYSADMIN
+        screen: PARAMS
+        brd: [BRRN.038]
+        title: Difference within the tolerance passes
+        steps:
+          - Set RNW_FIN_IMPACT_TOLERANCE to 1000.00; re-run the check on the same account.
+        expected: FINANCIAL_IMPACT is PASS for a difference of PHP 1,000.00; a difference of PHP 1,000.01 fails.
+
+  FR-RN-065:
+    scenario: SC-RN-07
+    persona: PROCESSOR
+    screen: PROCWL
+    data: [TD-RN-01]
+    conditions:
+      - Processing returns selected accounts (single, multiple, all except, all) to the assigned AO (For disposition) or to the Marketing TL (Review in progress) with a reason and remarks; they carry the Returned flag.
+      - A return without a reason or remarks is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: PROCESSING_TL
+        brd: [BRD 3.008.2, 3.008.2.1-3.008.2.7]
+        title: Return to the AO
+        steps:
+          - Select two accounts; Return to Marketing; Return to Account Officer; reason; remarks; push.
+        expected: Both are in rn.ao1's Returned to me filter with the red flag; rn.ao1 receives RNW_RETURNED.
+      - c: 1
+        type: Workflow
+        brd: [BRD 4.006.2, 4.006.2.1-4.006.2.7]
+        title: Officer returns to the Marketing TL
+        steps:
+          - As rn.po1 select an account; Return to Marketing; Team Leader; reason; remarks; push.
+        expected: The account is in TL Review, status Review in progress, with the Returned flag and remarks.
+      - c: 2
+        type: Negative
+        brd: [BRD 4.006.2]
+        title: Return without a reason
+        steps:
+          - Return to Marketing with Reason blank.
+        expected: The return is refused.
+        msg: ["Select a reason for 'Return to Marketing'"]
+      - c: 2
+        type: Negative
+        brd: [BRD 3.008.2]
+        title: Return without remarks
+        steps:
+          - Return to Marketing with a reason and blank remarks.
+        expected: The return is refused.
+        msg: [Enter the remarks]
+
+  FR-RN-070:
+    scenario: SC-RN-08
+    persona: PROCESSING_TL
+    screen: BATCHES
+    data: [TD-RN-09]
+    conditions:
+      - A batch for an insurer and expiry range lists every For Renewal account of that insurer with the 28 columns of BRD 3.009.1.4, in one scrollable view.
+      - The extract downloads as .xlsx and is saved and printed with preview and settings.
+      - Send e-mails the protected file to the insurer's renewal or placement mailbox with the password in a separate e-mail, and the accounts move to With Insurer; a failed send is resent.
+      - An account is in one open batch at a time; a batch without accounts, an insurer without e-mail or without selection is refused.
+      - After the reply due date the batch raises RNW_INSURER_OVERDUE.
+    cases:
+      - c: 1
+        type: Report-output
+        brd: [BRD 3.009.1, 3.009.1.1-3.009.1.4, 3.009.1.4.1-3.009.1.4.28]
+        title: Batch for INS-A and March with 28 columns
+        steps:
+          - Click New Batch; expiry 03/01/2027 to 03/31/2027; insurer INS-A (searched by name).
+        expected: Batch RIB-yyyy lists every For Renewal account of INS-A expiring in March with Insurance Company, Invoice No, Assured Name, Risk Code, Inception and Expiry Date, Sum Insured, Premium Amount, Commission Rate, AR Client, Is Mortgaged, Premium Rate, Policy No, Risk Description, Encoder Name (user who booked), Unit Head, Business Origin, Account Type, Region, Area, Branch, Account Officer Name, Remarks, BIPD, Seating Capacity, Auto PA, Sum Insured per cover and Packaged / Non-Packaged.
+      - c: 1
+        type: Report-output
+        persona: PROCESSOR
+        brd: [BRD 4.007.1, 4.007.1.1-4.007.1.4, 4.007.1.4.1-4.007.1.4.28]
+        title: Processing Officer builds the batch of INS-B
+        steps:
+          - As rn.po1 build a batch for INS-B and March.
+        expected: The 28 columns are shown for the INS-B accounts assigned in scope.
+      - c: 2
+        type: Upload-download
+        brd: [BRD 3.009.2-3.009.5.1]
+        title: Download, save and print the extract
+        steps:
+          - Click Download; save the .xlsx; click Print with preview; A4 landscape.
+        expected: The file has the 28 columns and the batch rows; the preview matches the printout; the download is logged.
+      - c: 3
+        type: Upload-download
+        screen: MAILBOX
+        brd: [BRD 3.009.2-3.009.5.1, 4.007.2-4.007.5.1]
+        title: Send the batch protected
+        steps:
+          - Click Send on the INS-A batch; open the INS-A test mailbox; open the batch accounts.
+        expected: The mailbox holds the extract as a password-protected Excel file with cover e-mail RNW_INSURER_COVER and, separately, the password; the send is logged with recipient, time and file hash; the accounts are With Insurer.
+      - c: 3
+        type: Workflow
+        brd: [4.007.2-4.007.5.1]
+        title: Resend after a delivery failure
+        pre: The test lead blocks the relay for the first send.
+        steps:
+          - Send the INS-B batch; restore the relay; click Resend.
+        expected: The batch shows the failed send, then Sent after the resend.
+      - c: 4
+        type: Negative
+        brd: [BRD 3.009.1]
+        title: Insurer without renewal or placement e-mail
+        steps:
+          - Build and send a batch for INS-C.
+        expected: The send is refused.
+        msg: ["{INS-C} has no e-mail address for renewals"]
+      - c: 4
+        type: Negative
+        brd: [BRD 3.009.1]
+        title: Range with no For Renewal account
+        steps:
+          - Build a batch for INS-A and a month without accounts.
+        expected: No batch is created.
+        msg: ["No For Renewal account of {INS-A} expires in the range"]
+      - c: 4
+        type: Negative
+        brd: [BRD 4.007.1]
+        title: Account already in an open batch
+        steps:
+          - Build a second batch for INS-A and March.
+        expected: The accounts of the open batch are not included again.
+      - c: 5
+        type: Negative
+        screen: NOTIF
+        brd: [BRD 3.009.2-3.009.5.1]
+        title: Overdue reply raises the alert
+        pre: The reply due date of the INS-B batch is yesterday.
+        steps:
+          - Open the bell as rn.proctl.
+        expected: Alert RNW_INSURER_OVERDUE names the batch and insurer.
+
+  FR-RN-071:
+    scenario: SC-RN-08
+    persona: PROCESSING_TL
+    screen: BATCHES
+    data: [TD-RN-07]
+    conditions:
+      - A matched Renew As Is moves the account to RA Ready with unchanged premium and terms, without re-keying.
+      - Revise returns the account to In Processing and runs the financial-impact check; Reject tags it Not for Renewal or returns it to Marketing.
+      - A mismatched, conflicting, unknown or late row never progresses the account; it is Exception until corrected or overridden.
+      - The user views the uploaded file and records a single response manually on the Insurer tab; every response is kept (append-only).
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRD 3.009.6, 3.009.6.1, 3.009.6.2, BRRN.035]
+        title: Renew As Is rows advance to RA Ready
+        steps:
+          - On the INS-A batch click Upload Response; select the TD-RN-07 file; view the rows; confirm.
+        expected: The matched Renew As Is accounts are RA Ready with the premium and terms unchanged; the officer receives RNW_INSURER_RESPONDED.
+      - c: 2
+        type: Workflow
+        brd: [BRRN.035]
+        title: Revise with a higher premium
+        steps:
+          - Open the account of the Revise row.
+        expected: The account is In Processing; FINANCIAL_IMPACT fails with the difference.
+      - c: 2
+        type: Workflow
+        brd: [BRRN.035]
+        title: Reject tags the account Not for Renewal
+        steps:
+          - Open the account of the Reject row.
+        expected: The account is Not for Renewal with reason insurer declined (Letter pending), or back For disposition when BDOI chooses re-marketing (RQ15).
+      - c: 3
+        type: Negative
+        brd: [BRRN.035]
+        title: Policy number mismatch
+        steps:
+          - Open the result line whose policy number differs from the candidate.
+        expected: The row is not applied; the account stays With Insurer in Exception.
+        msg: ["Row {7}: {RNW-2026-000171} does not match policy {MC01-2026-00455}"]
+      - c: 3
+        type: Negative
+        brd: [BRRN.035]
+        title: Conflicting and unknown response rows
+        steps:
+          - Open the result lines of the two conflicting rows and the row with code MAYBE.
+        expected: None is applied; the conflicting reference is Exception.
+        msg: ["Row {9}: {RNW-2026-000173} has conflicting responses"]
+      - c: 3
+        type: Negative
+        brd: [BRRN.035]
+        title: Revise without revised values
+        steps:
+          - Open the result of the Revise row without values.
+        expected: The row is refused.
+        msg: ["Row {11}: enter the revised premium, sum insured or rate"]
+      - c: 3
+        type: Negative
+        brd: [BRRN.035]
+        title: Late response blocks straight-through
+        steps:
+          - Open the account of the row received after the reply due date.
+        expected: The response is stored as late; the account is Review and does not move to RA Ready automatically.
+      - c: 4
+        type: Positive
+        persona: PROCESSOR
+        screen: INSTAB
+        brd: [BRD 4.007.6, 4.007.6.1, 4.007.6.2]
+        title: Manual Renew As Is on the Insurer tab
+        steps:
+          - Open a With Insurer account; Insurer tab; Response Renew As Is, insurer reference, received today; Save.
+        expected: The account is RA Ready; the Insurer tab lists the response with source manual and the earlier responses.
+      - c: 4
+        type: Negative
+        persona: PROCESSOR
+        screen: INSTAB
+        brd: [BRD 4.007.6]
+        title: Manual Revise without values, and a future date
+        steps:
+          - Record Revise without premium; then Renew As Is with Received on tomorrow.
+        expected: Both are refused; nothing is stored.
+
+  FR-RN-080:
+    scenario: SC-RN-09
+    persona: MKT_AO
+    screen: LETTERS
+    data: [TD-RN-14]
+    conditions:
+      - Authorised users generate First or Second Notice RAs for selected RA Ready accounts (single, multiple, all except, all) from the latest approved template; each gets an RA number and a stored PDF.
+      - Generation locks the account on the Marketing side; only an RA cancellation by RNW_OVERRIDE unlocks it.
+      - An RA less than RNW_RA_MIN_NOTICE_DAYS before expiry needs the user's confirmation, which is recorded.
+      - A second notice is offered only after RNW_RA_SECOND_NOTICE_DAYS without acceptance; a duplicate notice or an open blocking check is refused.
+      - The user previews, views, closes and downloads RAs one by one or as a ZIP; a user without RNW_RA_GENERATE cannot generate.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRRN.010, 2.009.1-2.009.7.1]
+        title: AO generates First Notice RAs for 50 accounts
+        steps:
+          - Open Letters, tab RA Ready; select 50 accounts; Generate RA; First Notice.
+          - Watch the job progress; open tab RA Generated.
+        expected: 50 RAs with numbers RA-yyyy are listed with a PDF each; each is stored as document type RENEWAL_ADVICE linked to the renewal account, client and candidate; the job ends within 20 seconds.
+      - c: 1
+        type: Workflow
+        persona: MKT_TL
+        brd: [restating BRD 1.010.1-1.010.7]
+        title: Marketing TL generates RAs with "all except"
+        steps:
+          - As rn.mkttl1 select all RA Ready accounts, untick one; Generate RA; First Notice.
+        expected: RAs are generated for all but the unticked account.
+      - c: 1
+        type: Workflow
+        persona: PROCESSING_TL
+        brd: [3.011.1-3.011.7.1]
+        title: Processing TL generates RAs
+        steps:
+          - As rn.proctl generate First Notice RAs for two accounts.
+        expected: Both RAs are generated with the template code and version recorded.
+      - c: 1
+        type: Workflow
+        persona: PROCESSOR
+        brd: [4.09.1-4.09.7]
+        title: Processing Officer generates an RA
+        steps:
+          - As rn.po1 generate a First Notice RA for one assigned account.
+        expected: The RA is generated and listed.
+      - c: 2
+        type: Negative
+        screen: DISP
+        brd: [BRD 2.004.9]
+        title: Disposition disabled after the RA
+        steps:
+          - Open an account of TC-RN-080.1-01; try to change the disposition or edit remarks of the disposition.
+        expected: The panel is locked; a padlock is shown; the API call is refused.
+        msg: ["Renewal {RNW-2026-000130} is locked since the Renewal Advice was generated"]
+      - c: 3
+        type: Boundary
+        brd: [BRRN.010]
+        title: RA 20 days before expiry needs confirmation
+        pre: RNW_RA_MIN_NOTICE_DAYS = 30.
+        steps:
+          - Select an account expiring in 20 days; Generate RA without ticking Confirm late notice.
+          - Tick Confirm late notice; generate.
+        expected: The first attempt is refused with the message; the second generates the RA and records the confirmation with user and time.
+        msg: ["The Renewal Advice is less than {30} days before expiry; confirm to continue"]
+      - c: 3
+        type: Boundary
+        brd: [BRRN.010]
+        title: RA exactly 30 days before expiry needs no confirmation
+        steps:
+          - Generate an RA for an account expiring in 30 days.
+        expected: No confirmation is asked.
+      - c: 4
+        type: Negative
+        brd: [BRRN.010]
+        title: Second First Notice on the same account
+        steps:
+          - Select an account in RA Generated; Generate RA; First Notice.
+        expected: No RA is generated.
+        msg: ["Renewal {RNW-2026-000130} already has a {First Notice} Renewal Advice"]
+      - c: 4
+        type: Workflow
+        brd: [BRRN.010]
+        title: Second Notice after 15 days without acceptance
+        pre: A First Notice sent 15 days ago without acceptance; RNW_RA_SECOND_NOTICE_DAYS = 15.
+        steps:
+          - Open the account in RA Sent; Generate RA; Second Notice.
+        expected: The Second Notice (template RNW_RA_SECOND) is generated; at 14 days it is not offered.
+      - c: 4
+        type: Negative
+        brd: [BRRN.010]
+        title: RA refused while a blocking check fails
+        steps:
+          - Generate an RA for an RA Ready account whose OUTSTANDING_PREMIUM check fails.
+        expected: The RA is not generated.
+        msg: ["Renewal {RNW-2026-000203} cannot get a Renewal Advice: {OUTSTANDING_PREMIUM} failed"]
+      - c: 5
+        type: Upload-download
+        brd: [BRRN.010, 2.009.1-2.009.7.1]
+        title: Preview, view and download as ZIP
+        steps:
+          - Preview one RA and close it; select ten RAs; Download ZIP.
+        expected: The preview shows policy details, renewal terms, premium and BDOI contacts; the ZIP holds ten PDFs named by RA number.
+      - c: 5
+        type: Security-access
+        persona: CONTACT_CENTER
+        brd: [BRRN.010]
+        title: User without RNW_RA_GENERATE cannot generate
+        steps:
+          - As rn.cc look for Generate RA; call POST /api/v1/renewal/letters/ra.
+        expected: The action is not shown; the call returns HTTP 403.
+        msg: [You are not permitted to perform this action]
+
+  FR-RN-081:
+    scenario: SC-RN-09
+    persona: MKT_AO
+    screen: LETTERS
+    data: [TD-RN-10]
+    conditions:
+      - The user extracts the send details (RNW-RA-DISPATCH) and sends generated RAs in batch; each client receives one protected PDF and a separate password e-mail, and the account is RA Sent / Awaiting Response.
+      - Each send shows its status (Queued, Sent, Failed); a failed send raises RNW_LETTER_FAILED and can be resent.
+      - A client without e-mail or a recipient outside the recipient policy is refused and the RA stays Generated.
+      - Every send, including failures, is logged with recipient, time, subject and attachment hash.
+    cases:
+      - c: 1
+        type: Upload-download
+        screen: MAILBOX
+        brd: [BRRN.010, 2.009.6, 2.009.7, 2.009.7.1]
+        title: Send 50 RAs in batch
+        steps:
+          - Tab RA Generated; Extract Details; select the 50 RAs of TC-RN-080.1-01; Send in Batch.
+          - Open the clients' test mailboxes.
+        expected: 50 protected RA e-mails and 50 password e-mails arrive; the accounts show RA Sent / Awaiting Response.
+      - c: 1
+        type: Report-output
+        persona: MKT_TL
+        screen: REPORTS
+        brd: [restating BRD 1.010.6, 1.010.7]
+        title: Extract the details for sending
+        steps:
+          - As rn.mkttl1 click Extract Details on RA Generated.
+        expected: RNW-RA-DISPATCH lists each RA with client, recipient address and status; it exports to Excel.
+      - c: 1
+        type: Upload-download
+        persona: PROCESSING_TL
+        brd: [3.011.6, 3.011.7, 3.011.7.1]
+        title: Processing TL sends RAs
+        steps:
+          - As rn.proctl send two generated RAs.
+        expected: Both are Sent; the password goes in a separate e-mail.
+      - c: 1
+        type: Upload-download
+        persona: PROCESSOR
+        brd: [4.09.6, 4.09.7]
+        title: Processing Officer sends an RA
+        steps:
+          - As rn.po1 send one generated RA.
+        expected: The RA is Sent and the account RA Sent / Awaiting Response.
+      - c: 2
+        type: Workflow
+        screen: NOTIF
+        brd: [BRRN.010]
+        title: Failed send and resend
+        pre: The relay rejects the first attempt for one recipient.
+        steps:
+          - Send in Batch; open the bell; restore the relay; Resend the failed RA.
+        expected: The RA shows Failed with the error and alert RNW_LETTER_FAILED; after the resend it is Sent.
+      - c: 3
+        type: Negative
+        brd: [BRRN.010]
+        title: Client without a registered e-mail
+        steps:
+          - Send the RA of the client without e-mail of TD-RN-10.
+        expected: The RA stays Generated with the reason.
+        msg: ["Client {Pacific Test Trading} has no registered e-mail address"]
+      - c: 3
+        type: Negative
+        brd: [BRRN.010]
+        title: Recipient outside the approved domains
+        pre: The recipient policy with approved domains is loaded (RQ16).
+        steps:
+          - Send the RA of the client on a domain outside the policy.
+        expected: The RA stays Generated.
+        msg: ["{client@outside.example} is not an approved recipient domain"]
+      - c: 4
+        type: Positive
+        persona: SYSADMIN
+        screen: AUDIT
+        brd: [BRRN.010]
+        title: Each send is logged
+        steps:
+          - Open the Audit Trail for the sends of today.
+        expected: Each send and failure is listed with recipient, time, subject, attachment hash and status.
+
+  FR-RN-082:
+    scenario: SC-RN-09
+    persona: MKT_AO
+    screen: LETTERS
+    data: [TD-RN-10]
+    conditions:
+      - The NAL tab lists eligible accounts; the user generates and sends the NAL to the client's registered e-mail; the account shows NAL Sent and a confirmation is shown.
+      - An account that already has an RA or NFR cannot receive a NAL.
+    cases:
+      - c: 1
+        type: Workflow
+        screen: MAILBOX
+        title: Generate and send a NAL
+        pre: An account disposed with a reason marked NAL-eligible, no RA or NFR.
+        steps:
+          - Open the NAL tab; select the account; Generate and Send NAL; open the mailbox.
+        expected: BIBS confirms; the NAL (NAL-yyyy, template RNW_NAL) is stored, e-mailed and the account shows NAL Sent.
+      - c: 1
+        type: Workflow
+        title: NAL for several accounts
+        steps:
+          - Select three eligible accounts; Generate and Send NAL.
+        expected: Three NALs are generated and sent; each account shows NAL Sent.
+      - c: 2
+        type: Negative
+        screen: API
+        title: NAL refused for an account with an RA
+        steps:
+          - Call POST /api/v1/renewal/letters/nal for an account in RA Sent.
+        expected: No NAL is generated; the account is not in the NAL tab.
+        msg: ["Renewal {RNW-2026-000130} already has a {Renewal Advice} and cannot receive a NAL"]
+
+  FR-RN-083:
+    scenario: SC-RN-09
+    persona: SYSTEM
+    screen: LETTERS
+    data: [TD-RN-02, TD-RN-10]
+    conditions:
+      - At RNW_NRNS_REMINDER_DAYS before expiry an account not yet submitted gets the NRNS chip and one reminder letter per checkpoint.
+      - Submitted or accepted accounts get no reminder.
+      - At the non-acceptance point the candidate closes EXPIRED_UNRENEWED with a non-acceptance letter and the owners are notified.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRRN.025]
+        title: Reminder 90 days before expiry
+        pre: A candidate without disposition expires in 90 days.
+        steps:
+          - Run job RNW_NRNS_LETTERS; open the NRNS tab and the Expiry List.
+        expected: One reminder (RNL-yyyy, template RNW_NRNS_REMINDER) is generated with its recipients logged; the candidate shows the NRNS chip.
+      - c: 1
+        type: Negative
+        brd: [BRRN.025]
+        title: Job run twice sends one reminder
+        steps:
+          - Run the job again the same day.
+        expected: No second reminder is generated for the same candidate and checkpoint.
+      - c: 2
+        type: Negative
+        brd: [BRRN.025, BRRN.037]
+        title: Accepted account gets no reminder
+        steps:
+          - Run the job for a candidate disposed For Renewal with the RA accepted, 90 days before expiry.
+        expected: No reminder and no NRNS chip.
+      - c: 3
+        type: Workflow
+        screen: NOTIF
+        brd: [BRRN.037]
+        title: Non-acceptance at expiry
+        pre: RNW_NON_ACCEPTANCE_DAYS = 0; a candidate in RA Sent expires today.
+        steps:
+          - Run job RNW_EXPIRY_SWEEP; open the candidate and the bell of the owners.
+        expected: The non-acceptance letter (NAC-yyyy) is sent; the candidate is Closed with reason EXPIRED_UNRENEWED; the AO and TL are notified.
+
+  FR-RN-084:
+    scenario: SC-RN-09
+    persona: MKT_AO
+    screen: RECORD
+    data: [TD-RN-13]
+    conditions:
+      - The user records the acceptance with method and evidence; the renewal is Accepted.
+      - With no open exception and the payment gate passed, the renewal account moves to placement and booking without resubmission, and books as RENEWAL; the candidate closes RENEWED.
+      - A payment on the renewal account records the acceptance with source SYSTEM.
+      - Method, evidence and an open blocking check are validated; evidence is mandatory when FINANCIAL_IMPACT failed.
+      - An incomplete renewal account stops the fast track with the account's message.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRRN.040]
+        title: Record acceptance by e-mail
+        steps:
+          - Open an account in RA Sent; Record Acceptance; method E-mail; attach the acceptance e-mail PDF (RA_ACCEPTANCE); Accepted on today; Save.
+        expected: The candidate is Accepted; the assigned users receive RNW_ACCEPTED; the History shows method, evidence and user.
+      - c: 2
+        type: Workflow
+        persona: NB_BOOKING
+        screen: BOOKING
+        brd: [BRRN.040]
+        title: Accepted renewal is placed and booked without re-keying
+        steps:
+          - After the payment gate passes, follow the renewal account through placement (slip sent automatically with RNW_AUTO_PLACEMENT = true), issuance and booking.
+          - Open the booked invoice and the candidate.
+        expected: No proposal is resubmitted and no field is re-keyed; the invoice shows business type RENEWAL; the candidate is Renewed and the users receive RNW_RENEWED.
+      - c: 3
+        type: Workflow
+        screen: HIST
+        brd: [BRRN.040]
+        title: Payment records the acceptance
+        steps:
+          - Apply the payment of TD-RN-13 to the renewal account in Cashiering; open the candidate History.
+        expected: The acceptance is recorded with method Payment and source SYSTEM.
+      - c: 4
+        type: Negative
+        brd: [BRRN.038 AC3]
+        title: Acceptance with a failed financial impact needs evidence
+        steps:
+          - On an account whose FINANCIAL_IMPACT failed, record method Signed RA without the attachment.
+        expected: The acceptance is not saved.
+        msg: [Attach the acceptance evidence]
+      - c: 4
+        type: Negative
+        brd: [BRRN.040]
+        title: Acceptance without a method
+        steps:
+          - Save Record Acceptance with no method.
+        expected: Nothing is saved.
+        msg: [Select the acceptance method]
+      - c: 4
+        type: Negative
+        brd: [BRRN.040]
+        title: Acceptance with an open endorsement
+        steps:
+          - Record acceptance on an account whose ENDORSEMENT_PENDING check fails.
+        expected: The acceptance is refused.
+        msg: ["Renewal {RNW-2026-000212} cannot be accepted: {ENDORSEMENT_PENDING} failed"]
+      - c: 5
+        type: Negative
+        brd: [BRRN.040]
+        title: Incomplete renewal account stops the fast track
+        steps:
+          - Clear a mandatory field of the renewal account; record acceptance.
+        expected: The candidate is Accepted but the fast track stops; the account stays in draft for Processing with the account message.
+        msg: ["Complete the mandatory fields of {MC01}: {Chassis No.}"]
+
+  FR-RN-085:
+    scenario: SC-RN-09
+    persona: CONTACT_CENTER
+    screen: FOLLOWUPS
+    data: [TD-RN-13]
+    conditions:
+      - A Contact Center user records a follow-up (channel, outcome, remarks, next action date) and uploads client documents; the AO sees both on the record.
+      - The outcome is mandatory and only allowed file types are accepted.
+      - The Contact Center cannot dispose, send letters or see premium columns.
+    cases:
+      - c: 1
+        type: Positive
+        title: Record a call and upload a signed RA
+        steps:
+          - Open Follow-ups; select an account; channel Call, outcome, remarks, next action date tomorrow; attach the signed RA; Save.
+          - As rn.ao1 open the account, tab Remarks & Follow-ups and Documents.
+        expected: The follow-up and the document are shown to the AO with rn.cc and the time.
+      - c: 2
+        type: Negative
+        title: Follow-up without outcome
+        steps:
+          - Save a follow-up with no outcome.
+        expected: Nothing is saved.
+        msg: [Select the outcome]
+      - c: 2
+        type: Negative
+        title: Upload of a file type not allowed
+        steps:
+          - Attach an .exe file.
+        expected: The file is refused.
+        msg: ["Only these file types are allowed: {pdf, docx, xlsx, jpg, png}"]
+      - c: 3
+        type: Security-access
+        title: Contact Center cannot dispose or send letters
+        steps:
+          - Open an account; look for Disposition, Generate RA and Send; open the column chooser.
+        expected: None of the actions is shown; premium columns are not offered.
+
+  FR-RN-090:
+    scenario: SC-RN-10
+    persona: SYSTEM
+    screen: RECORD
+    data: [TD-RN-11]
+    conditions:
+      - A hand-off creates one candidate (source SUBMITTED_POLICY, SBM number), initiates it at once, creates the renewal account with a hold cover request and queues the letters.
+      - A second hand-off of the same SBM number creates nothing new; pending hand-offs are replayed once.
+      - A Non-CBG Retail hand-off starts at Unassigned Disposition for a manual disposition.
+      - Renewal answers the status query, so the masterlist shows the renewal outcome.
+      - A second hold cover on the same account is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [Cross-BRD decision D2, BRRN.021]
+        title: CBG Motor submitted policy handed over
+        steps:
+          - In Submitted Policies run the expiry scan (or Renew with BDOI) for SBM-2026-000123.
+          - Open the new candidate, its renewal account and its Letters tab.
+        expected: One candidate with source SUBMITTED_POLICY and the SBM number, initiated at the hand-off; one renewal account (business type RENEWAL, renewal-of = SBM number, insurer INS-A) with a hold cover request; the FFY RA and the SFU letter are queued.
+      - c: 2
+        type: Negative
+        brd: [BRD-12 BRIDSP-22, "23"]
+        title: Second hand-off of the same SBM number
+        steps:
+          - Run the hand-off for SBM-2026-000123 again.
+        expected: No second candidate, account or RA is created.
+      - c: 2
+        type: Workflow
+        brd: ["25", "26"]
+        title: Pending hand-offs replayed once
+        pre: Hand-offs recorded as PENDING before the adapter was deployed.
+        steps:
+          - Run the replay; run it again.
+        expected: Each pending SBM number produces one candidate; the second replay creates nothing.
+      - c: 3
+        type: Workflow
+        persona: MKT_TL
+        screen: EXPIRY
+        brd: [BRRN.021]
+        title: Non-CBG Retail hand-off waits for a manual disposition
+        steps:
+          - Hand off SBM-2026-000124; open Unassigned Disposition.
+        expected: The candidate is listed in Unassigned Disposition for assignment.
+      - c: 4
+        type: Positive
+        screen: SUBPOL
+        brd: [BRRN.010, Cross-BRD decision D2]
+        title: Masterlist shows BOOKED when the renewal books
+        steps:
+          - Book the renewal account of SBM-2026-000123; open the masterlist record.
+        expected: The record shows BOOKED; a closed-not-renewed candidate shows its reason.
+      - c: 5
+        type: Negative
+        brd: [Cross-BRD decision D2]
+        title: Hold cover requested twice
+        steps:
+          - Request a hold cover again on the renewal account.
+        expected: The request is refused.
+        msg: ["Account {ARN-2027-000321} already has a hold cover requested or confirmed"]
+
+  FR-RN-100:
+    scenario: SC-RN-11
+    persona: MKT_TL
+    screen: HOME
+    data: [TD-RN-02]
+    conditions:
+      - Renewal Home shows tiles by stage and bucket, expiring in 30, 60, 90 and 140 days, at risk, exceptions, overdue insurer batches and failed letters; each tile opens its filtered list.
+      - The Marketing TL sees open accounts per AO, the Processing TL per Processing Officer, with overdue and returned counts and ageing to expiry.
+      - Counts follow the user's data scope.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRD 1.009.7]
+        title: Tile Expiring in 30 days opens the filtered list
+        steps:
+          - Open Renewal Home; click Expiring in 30 days.
+        expected: The list opens filtered to 30 days to expiry; its row count equals the tile count; it can be exported.
+      - c: 2
+        type: Report-output
+        brd: [BRD 1.009.7]
+        title: Marketing TL sees accounts per AO
+        steps:
+          - Read the officer table; click the row of rn.ao1.
+        expected: Each AO of the unit shows open, overdue against expiry and returned accounts with ageing; the row opens rn.ao1's accounts.
+      - c: 2
+        type: Report-output
+        persona: PROCESSING_TL
+        brd: [BRD 3.010.7]
+        title: Processing TL sees accounts per Processing Officer
+        steps:
+          - As rn.proctl open Renewal Home.
+        expected: The table shows rn.po1 and rn.po2 with their open, overdue and returned accounts.
+      - c: 3
+        type: Security-access
+        persona: MKT_TL
+        brd: [BRD 1.009.7]
+        title: Tile counts exclude other units
+        steps:
+          - Compare rn.mkttl1's and rn.mkttl2's Expiring in 140 days tiles with the Expiry List of each unit.
+        expected: Each tile counts only the own unit's candidates.
+
+  FR-RN-101:
+    scenario: SC-RN-11
+    persona: MKT_TL
+    screen: REPORTS
+    data: [TD-RN-02, TD-RN-12]
+    conditions:
+      - The user sets the expiry range (or a preset current, prior or next month) and the twenty criteria, each with single, multiple, all except and all and a search in the drop-down.
+      - The report shows the status per invoice in one scrollable view with 37 columns (Marketing) or 40 (Processing), and the 34 summary counters.
+      - The report exports to Excel and PDF with the same rows, prints with preview and saves as a variant.
+      - Data is limited to the user's scope, and the report answers within 20 seconds.
+      - A missing range or an end date before the start is refused.
+    cases:
+      - c: 1
+        type: Positive
+        brd: [BRD 1.009.1-1.009.6, BRRN.019, restating BRD 1.009.3.1.6]
+        title: Marketing TL runs RNW-STATUS with the twenty criteria
+        steps:
+          - Open RNW-STATUS; preset Next month; set in turn Unit Head, Risk Code, Insurance Company, Insurance Group, Business Origin, Market Category, BDO Branch, BDO Area, Region, Bank Officer, Bank Unit, Product Code, Account Type, BDOI Branch, Location, Account Broker, Business Type, Customer Segment, Specific Client and Renewal Status.
+        expected: Every criterion offers single, multiple, all except and all with a search; each run lists only the matching invoices.
+      - c: 1
+        type: Positive
+        persona: MKT_AO
+        brd: [2.008.1-2.008.6, 2.008.3.1.6]
+        title: AO runs RNW-STATUS for March with Risk Code "all except" MC01
+        steps:
+          - As rn.ao1 run RNW-STATUS for 01 to 31 March 2027, Risk Code all except MC01.
+        expected: The March invoices of rn.ao1 except MC01 are listed, with the 34 counters below.
+      - c: 2
+        type: Report-output
+        brd: [BRD 1.009.1-1.009.6, BRRN.019]
+        title: 37 Marketing columns and the BIBS invoice number
+        steps:
+          - Compare the columns with FRS section 6.3.
+        expected: Columns 1 to 37 are shown (Unit Head to Remarks of Acct Officer); column 6 is the BIBS Expiring Invoice No.; Hold Cover and HC End Date are read from the renewal account.
+      - c: 2
+        type: Report-output
+        persona: PROCESSING_TL
+        brd: [3.010.1-3.010.6, 3.010.3.1.6]
+        title: Processing variant with 40 columns
+        steps:
+          - As rn.proctl run RNW-STATUS for March.
+        expected: Columns 38 to 40 (Name of Renewal Processor, Name of Assigned Marketing AO, Sum Insured per Cover) are added.
+      - c: 2
+        type: Report-output
+        persona: PROCESSOR
+        brd: [4.008.1-4.008.6 with their sub-IDs, 4.008.3.1.6]
+        title: 34 summary counters
+        steps:
+          - As rn.po1 run RNW-STATUS for March; compare each counter with FRS section 6.5 by counting the rows per stage, disposition and reason.
+        expected: Each of the 34 counters equals its predicate; counters 5, 8, 14 and "to Other Bank" show 0 with "pending definition" (RQ10); counter 34 equals the row count.
+      - c: 3
+        type: Report-output
+        brd: [BRD 1.009.1-1.009.6]
+        title: Export, print and save as a variant
+        steps:
+          - Export to Excel and PDF; print with preview; save the criteria as variant "March MC01 excluded".
+        expected: Both files have the same rows as the screen; the printout matches the preview; the variant reloads the criteria.
+      - c: 4
+        type: Boundary
+        brd: [BRD 1.009.1-1.009.6]
+        title: 30,000-row report within 20 seconds
+        steps:
+          - Run RNW-STATUS on the volume data TD-RN-12 for the whole range.
+        expected: The result and summary show within 20 seconds, only for the user's scope.
+      - c: 5
+        type: Negative
+        brd: [BRD 1.009.1-1.009.6]
+        title: End date before the start date
+        steps:
+          - Set expiry from 31-Mar-2027 and to 01-Mar-2027; run.
+        expected: The report does not run.
+        msg: [The end date must be on or after the start date]
+
+  FR-RN-102:
+    scenario: SC-RN-11
+    persona: MKT_TL
+    screen: REPORTS
+    data: [TD-RN-02]
+    conditions:
+      - The user runs live renewal listings by unit and segment, expiry window and status (Renewed, Unrenewed, Expired) with the ageing to expiry, on screen and extracted.
+      - For IBG and Leasing an account not disposed or accepted within RNW_ESCALATION_DAYS raises RNW_RENEWAL_AT_RISK once to the unit head and shows at risk.
+      - Accounts outside the escalation days raise no alert.
+    cases:
+      - c: 1
+        type: Report-output
+        title: IBG listing for next month
+        steps:
+          - Run RNW-LISTING, segment IBG, window next month, status Unrenewed; export.
+        expected: Each account is listed with its status and days to expiry; the export has the same rows.
+      - c: 2
+        type: Workflow
+        screen: NOTIF
+        title: At-risk alert 59 days before expiry
+        pre: RNW_ESCALATION_DAYS IBG = 60; an IBG account not disposed expires in 59 days.
+        steps:
+          - Run the daily alert check twice; open the unit head's bell and the At risk tile.
+        expected: One RNW_RENEWAL_AT_RISK alert is raised to the unit head; the account is flagged at risk; the second run raises no second alert.
+      - c: 3
+        type: Boundary
+        neg: true
+        title: IBG account 61 days before expiry
+        steps:
+          - Run the alert check for an IBG account not disposed that expires in 61 days.
+        expected: No alert is raised and the account is not at risk.
+
+  FR-RN-103:
+    scenario: SC-RN-11
+    persona: MKT_TL
+    screen: REPORTS
+    data: [TD-RN-02]
+    conditions:
+      - RNW-SANITATION, RNW-DECISIONS, RNW-LAMD-MATCH, RNW-INSURER-EXTRACT, RNW-RA-DISPATCH and RNW-WORKLOAD run with their parameters and show the content of FRS section 6.1.
+      - Every report exports to PDF, XLSX, ODS and CSV, supports saved variants and applies the user's scope.
+      - A user without RNW_REPORT_VIEW cannot run them.
+    cases:
+      - c: 1
+        type: Report-output
+        brd: [BRRN.020, BRRN.023]
+        title: RNW-SANITATION with bucket changes
+        steps:
+          - Run RNW-SANITATION for the TD-RN-04 range.
+        expected: The check results and each bucket change are listed per candidate.
+      - c: 1
+        type: Report-output
+        brd: [BRRN.031, BRRN.034]
+        title: RNW-DECISIONS with matrix rules and overrides
+        steps:
+          - Run RNW-DECISIONS for the week.
+        expected: Each system disposition shows matrix version and rule; each override shows user, reason and remarks.
+      - c: 1
+        type: Report-output
+        brd: [BRRN.029]
+        title: RNW-LAMD-MATCH
+        steps:
+          - Run RNW-LAMD-MATCH for the period of TD-RN-05.
+        expected: Matched and unmatched LAMD lines are listed with the routing applied.
+      - c: 1
+        type: Report-output
+        persona: PROCESSING_TL
+        brd: [BRD 3.009.2-3.009.4.2, 4.007.2-4.007.4.2]
+        title: RNW-INSURER-EXTRACT
+        steps:
+          - As rn.proctl run RNW-INSURER-EXTRACT for INS-A and March.
+        expected: The 28 columns of section 6.4 are listed per insurer, the same as the batch.
+      - c: 1
+        type: Report-output
+        brd: [BRRN.001, "010", "025", "037"]
+        title: RNW-RA-DISPATCH lists every letter with status
+        steps:
+          - Run RNW-RA-DISPATCH for the month.
+        expected: Every RA, NAL, NFR and NRNS letter of the range is listed with recipient and send status.
+      - c: 1
+        type: Report-output
+        brd: [BRRN.031]
+        title: RNW-WORKLOAD per AO and PO
+        steps:
+          - Run RNW-WORKLOAD.
+        expected: The accounts per AO and per Processing Officer are counted by stage.
+      - c: 2
+        type: Report-output
+        brd: [BRRN.020]
+        title: Export formats and variants
+        steps:
+          - Export RNW-DECISIONS to PDF, XLSX, ODS and CSV; save a variant.
+        expected: The four files have the same rows; the variant reloads.
+      - c: 3
+        type: Security-access
+        persona: LAMD
+        brd: [BRRN.029]
+        title: User without RNW_REPORT_VIEW
+        steps:
+          - As rn.lamd open Reports, category Renewal.
+        expected: The Renewal reports are not listed; the run call returns HTTP 403.
+
+  FR-RN-110:
+    scenario: SC-RN-12
+    persona: BUSINESS_ADMIN
+    screen: LOV
+    data: [TD-RN-01]
+    conditions:
+      - The Business Administrator views, adds, edits and end-dates renewal list values with effective dates; a change takes effect on its date after a checker authorises it.
+      - Delete end-dates the value; records that used it stay readable.
+      - Disposition codes are fixed; only their labels change; lists maintained by the system are refused.
+      - An effective-to date before the effective-from date is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRD 5.003.1, 5.003.2, 5.003.3]
+        title: New non-renewal reason effective next month
+        steps:
+          - Open RNW_NONRENEWAL_REASON; add "Client relocated abroad" effective 1st of next month; save; rn.checker authorises.
+          - As rn.ao1 open the reason list today and on the effective date.
+        expected: The value is not offered today and is offered from its effective date.
+      - c: 2
+        type: Workflow
+        brd: [5.003.4, 5.003.5]
+        title: End-date a reason used by accounts
+        steps:
+          - Delete "Unit Sold"; rn.checker authorises; open an account that used it.
+        expected: The value is end-dated, not removed; the account still shows Unit Sold.
+      - c: 3
+        type: Negative
+        brd: [BRD 6.002.2.23]
+        title: Disposition codes cannot be changed
+        steps:
+          - Open RNW_DISPOSITION; try to change the code FOR_RENEWAL; change its label to "For renewal (standard)".
+        expected: The code is read only; the label change is saved after authorisation.
+      - c: 4
+        type: Negative
+        brd: [BRD 5.003.1]
+        title: Effective-to before effective-from
+        steps:
+          - Add a value with effective to before effective from.
+        expected: The value is not saved.
+        msg: [The effective-to date is before the effective-from date]
+
+  FR-RN-111:
+    scenario: SC-RN-12
+    persona: BUSINESS_ADMIN
+    screen: TEMPLATES
+    data: [TD-RN-14]
+    conditions:
+      - A new template version is used for every letter generated after its activation; earlier letters keep their version.
+      - A template with an unknown field is refused.
+    cases:
+      - c: 1
+        type: Workflow
+        brd: [BRD 5.005.1, BRD 6.002.2.25]
+        title: New RA template version
+        steps:
+          - Open RNW_RA_FIRST; save version 2 with the changed footer; activate it.
+          - Generate a First Notice RA; open an RA generated before.
+        expected: The new RA shows the new footer and template version 2; the earlier RA keeps version 1.
+      - c: 2
+        type: Negative
+        brd: [BRD 5.005.1]
+        title: Unknown placeholder in a template
+        steps:
+          - Add the field {{policy.colour}} to the template; save.
+        expected: The version is not saved.
+        msg: ["The template uses an unknown field {policy.colour}"]
+
+  FR-RN-112:
+    scenario: SC-RN-12
+    persona: BUSINESS_ADMIN
+    screen: SETUP
+    data: [TD-RN-08]
+    conditions:
+      - Rule sets and matrices are versioned drafts until a checker other than the maker activates them.
+      - Parameters (lead days, thresholds, notice days) change through the parameter screen and apply from the next run.
+      - A bucket rule that maps a failed check to Clean cannot be saved.
+    cases:
+      - c: 1
+        type: Workflow
+        persona: CHECKER
+        brd: [BRRN.023, BRRN.034]
+        title: Checker compares and activates a bucket rule set
+        steps:
+          - As rn.badmin draft bucket rule set version 2 (PRODUCT_RENEWABLE as FAIL_EXCEPTION); submit.
+          - As rn.checker compare it with version 1 and activate it.
+        expected: The differences are shown; version 2 is active from its effective date.
+      - c: 1
+        type: Security-access
+        brd: [BRRN.023]
+        title: Maker cannot activate the own rule set
+        steps:
+          - As rn.badmin activate the rule set rn.badmin drafted.
+        expected: The activation is refused.
+        msg: [A version is activated by someone other than its maker]
+      - c: 2
+        type: Positive
+        persona: SYSADMIN
+        screen: PARAMS
+        brd: [BRRN.030]
+        title: Lead days 140 to 120 from the next run
+        steps:
+          - Set RNW_EXTRACTION_LEAD_DAYS to 120; run RNW_EXTRACTION.
+        expected: The run extracts policies expiring 120 days after the business date.
+      - c: 3
+        type: Negative
+        brd: [BRRN.023, BRRN.009]
+        title: Rule mapping a failed check to Clean
+        steps:
+          - In a draft rule set map ENDORSEMENT_PENDING FAIL to Clean; save.
+        expected: The rule is not saved.
+        msg: [A failed check cannot give the Clean bucket]
+
+access:
+  - action: Choose the package of a migrated policy (PACKAGE_REMAP)
+    screen: RECORD
+    permission: RNW_PACKAGE_REMAP
+    allow: [PROCESSING_TL, PROCESSOR]
+    deny: [MKT_AO, MKT_TL, LAMD]
+    denied: The Package panel is read only; POST .../package returns HTTP 403.
+  - action: Generate the expiry list and initiate candidates
+    screen: EXPIRY
+    permission: RNW_EXTRACT
+    allow: [MKT_TL, PROCESSING_TL]
+    deny: [MKT_AO, PROCESSOR, LAMD]
+    denied: Generate Expiry List and Initiate are not shown; the API call returns HTTP 403.
+  - action: Assign, re-assign and receive transfers
+    screen: EXPIRY
+    permission: RNW_ASSIGN
+    allow: [MKT_TL]
+    deny: [MKT_AO, PROCESSING_TL]
+    denied: Assign Disposition, Re-assign Officer and the Incoming decisions are not shown (an AO only requests a transfer).
+  - action: Give the disposition and push
+    screen: DISP
+    permission: RNW_DISPOSE
+    allow: [MKT_AO, MKT_TL]
+    deny: [PROCESSOR, CONTACT_CENTER, LAMD]
+    denied: The Disposition panel is read only; POST .../disposition returns HTTP 403.
+  - action: Review, return and post
+    screen: TLREVIEW
+    permission: RNW_REVIEW
+    allow: [MKT_TL]
+    deny: [MKT_AO, PROCESSING_TL]
+    denied: TL Review is not in the menu; POST .../post returns HTTP 403.
+  - action: Controlled overrides (outstanding balance, bucket, disposition, insurer mismatch, RA unlock)
+    screen: RECORD
+    permission: RNW_OVERRIDE
+    allow: [MKT_TL]
+    deny: [MKT_AO, PROCESSING_TL, PROCESSOR]
+    denied: Override is not shown; POST .../override returns HTTP 403.
+  - action: Assign accounts to Processing Officers
+    screen: PROCWL
+    permission: RNW_PROCESS_ASSIGN
+    allow: [PROCESSING_TL]
+    deny: [PROCESSOR, MKT_TL]
+    denied: Assign PO and Assign to Me are not shown.
+  - action: Update the renewal account, computations and return to Marketing
+    screen: RACC
+    permission: RNW_PROCESS
+    allow: [PROCESSING_TL, PROCESSOR]
+    deny: [MKT_AO, MKT_TL]
+    denied: The Renewal Account section is read only; Return to Marketing is not shown.
+  - action: Upload dispositioned files
+    screen: PROCWL
+    permission: RNW_UPLOAD
+    allow: [PROCESSING_TL, PROCESSOR]
+    deny: [MKT_TL, MKT_AO]
+    denied: Upload Dispositioned File is not shown; the bulk upload call returns HTTP 403.
+  - action: Build, send and apply insurer batches
+    screen: BATCHES
+    permission: RNW_INSURER
+    allow: [PROCESSING_TL, PROCESSOR]
+    deny: [MKT_TL, MKT_AO]
+    denied: Insurer Batches is not in the menu; POST /insurer-batches returns HTTP 403.
+  - action: Generate and send RAs, NALs and NFRs
+    screen: LETTERS
+    permission: RNW_RA_GENERATE, RNW_RA_SEND
+    allow: [MKT_TL, MKT_AO, PROCESSING_TL, PROCESSOR]
+    deny: [LAMD, CONTACT_CENTER, BUSINESS_ADMIN]
+    denied: Letters is not in the menu; POST /letters/ra and /letters/send return HTTP 403.
+  - action: Record client acceptance
+    screen: RECORD
+    permission: RNW_ACCEPT
+    allow: [MKT_AO, PROCESSOR]
+    deny: [CONTACT_CENTER, LAMD]
+    denied: Record Acceptance is not shown.
+  - action: Record Contact Center follow-ups
+    screen: FOLLOWUPS
+    permission: RNW_FOLLOWUP
+    allow: [CONTACT_CENTER]
+    deny: [MKT_AO, LAMD]
+    denied: Follow-ups is not in the menu; POST .../followups returns HTTP 403.
+  - action: Upload LAMD reports and view match results
+    screen: LAMDR
+    permission: RNW_LAMD_UPLOAD, RNW_VALIDATE
+    allow: [LAMD]
+    deny: [MKT_TL, PROCESSING_TL, CONTACT_CENTER]
+    denied: LAMD Reports is not in the menu; the upload call returns HTTP 403.
+  - action: Run renewal reports
+    screen: REPORTS
+    permission: RNW_REPORT_VIEW
+    allow: [MKT_TL, MKT_AO, PROCESSING_TL, PROCESSOR, BUSINESS_ADMIN]
+    deny: [LAMD, CONTACT_CENTER, SYSADMIN]
+    denied: The Renewal category is not listed; the run call returns HTTP 403.
+  - action: Export lists and reports
+    screen: EXPIRY
+    permission: RNW_EXPORT
+    allow: [MKT_TL, MKT_AO, PROCESSING_TL]
+    deny: [PROCESSOR, CONTACT_CENTER]
+    denied: Export is not shown; the export call returns HTTP 403.
+  - action: Maintain checks, bucket rules, matrix and non-renewable risk codes
+    screen: SETUP
+    permission: RNW_SETUP
+    allow: [BUSINESS_ADMIN]
+    deny: [MKT_TL, PROCESSING_TL, SYSADMIN]
+    denied: Renewal Setup is not in the menu.
+  - action: Activate rule sets, matrices and risk codes (checker)
+    screen: APPROVALS
+    permission: MASTER_AUTHORIZE
+    allow: [CHECKER]
+    deny: [BUSINESS_ADMIN, MKT_TL]
+    denied: The item is not offered in My Approvals to the maker or a user without MASTER_AUTHORIZE.
+  - action: Maintain renewal lists of values and templates
+    screen: LOV
+    permission: LOV_MANAGE, RNW_TEMPLATE_MAINTAIN
+    allow: [BUSINESS_ADMIN]
+    deny: [MKT_TL, SYSADMIN]
+    denied: New Value and Edit Template are not shown.
+  - action: Change role-permission grants
+    screen: ACCREQ
+    permission: ACCESS_REQUEST (role-permission change request)
+    allow: [SYSADMIN]
+    deny: [MKT_TL, PROCESSING_TL]
+    denied: The request type Modify role permissions is not offered.
+
+findings:
+  - fr: FR-RN-001
+    issue: 'The FRS gives "Invalid user ID or password" for a wrong log-in. Renewal uses the platform log-in, which shows "Invalid user name or password" and, for a locked account, "Account is locked. Contact your administrator." (AuthService). The FRS gives no text for the lock.'
+    proposal: Quote the platform texts in FRS v1.1; the cases use them.
+  - fr: FR-RN-002
+    issue: 'The FRS no-access text "You do not have access to this page" differs from the platform screen "You do not have access to this screen. Contact your administrator if you need it." (frontend/src/auth/RequireAuth.tsx).'
+    proposal: Use the platform wording in FRS v1.1.
+  - fr: FR-RN-025
+    issue: 'For a wrong file type the FRS gives "The file type is not allowed" (FR-RN-025, 060, 085). The platform shows "Upload an Excel (.xlsx), OpenDocument (.ods), CSV (.csv) or text (.txt) file" for bulk uploads and "Only these file types are allowed - <list>" for attachments.'
+    proposal: Quote the platform texts, or state that Renewal replaces them; the cases use the platform texts.
+  - fr: FR-RN-080
+    issue: Rule R2 and the field rule say "less than 30 days" before expiry; whether exactly 30 days needs a confirmation is not stated. TC-RN-080.3-02 assumes it does not.
+    proposal: State the boundary ("fewer than RNW_RA_MIN_NOTICE_DAYS days") in R2 and in the field rule.
+  - fr: FR-RN-013
+    issue: Rule R1 asks for one scrollable view without pagination, which conflicts with the UX pager rule (UX-6, RQ05 open). Acceptance criterion 1 (20,000 rows without a pager) cannot be signed off until RQ05 is answered.
+    proposal: Close RQ05 before UAT; the case TC-RN-013.1-01 follows the FRS.
+  - fr: FR-RN-101
+    issue: Four of the 34 summary counters have no source in the BRD and show 0 with "pending definition" (RQ10), so they cannot be tested against a business rule. The report range check is a report-engine check whose message today reads "<to> must not be before <from>", not "The end date must be on or after the start date".
+    proposal: Define counters 5, 8, 14 and "to Other Bank" under RQ10; align the range message with the report engine or state that Renewal reports use their own check.
+  - fr: FR-RN-071
+    issue: The outcome of a Reject is "Not for Renewal (insurer declined) or back to Marketing to re-market"; the FRS does not say which, or who decides (RQ15). A late response is defined only as "after the reply due date" with no cut-off time.
+    proposal: Answer RQ15 and name the rule or parameter that chooses the Reject path and the late cut-off.
+  - fr: FR-RN-083
+    issue: '"Not yet submitted" is defined only in the description (no disposition, or For Renewal without RA acceptance); a candidate For Quotation on the NB path, or Not for Renewal awaiting its NFR, is not covered (RQ18).'
+    proposal: List the stages that count as "submitted" so the NRNS checkpoint can be tested for every stage.
+  - fr: FR-RN-090
+    issue: 'The BRD trace lists bare numbers ("BRIDSP-22, 23, 25, 26" in FR-RN-090; "BRRN.001, 010, 025, 037" in FR-RN-103) and prose ("restating BRD ...", "with their sub-IDs"), which appear as IDs in the coverage sheet.'
+    proposal: Write every BRD ID in full in the fr blocks (BRIDSP-23, BRRN.010) and keep the "restating" notes out of the brd list, so the coverage sheet lists clean IDs.
+  - fr: FR-RN-102
+    issue: The escalation rule gives the days per segment but not whether the alert is raised on the first day inside the window (59 or 60 days before expiry). Acceptance criterion 2 uses 59 days with a 60-day setting.
+    proposal: State "fewer than RNW_ESCALATION_DAYS days to expiry" or "at most RNW_ESCALATION_DAYS days"; the cases test 59 days (alert) and 61 days (no alert) and leave 60 days to the answer.

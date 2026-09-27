@@ -1,0 +1,3485 @@
+# Change Management Register - data file.
+# Built into Excel and into the tables of the Word summary by build_change_register.py (same folder).
+# Edit this file, then re-run the builder. Text fields are YAML single-quoted strings: write an apostrophe as two ('').
+#
+# The register is for documentation and change control. It does not change the platform build or the FRS baseline.
+#
+# Row keys
+#   id      CR-nnnn, unique and in sequence (checked)
+#   drop    Drop 0 | Drop 1 | Drop 2 | Programme | Phase 2
+#   brd     primary BRD (BRD-00 to BRD-13); other BRDs are named in ref
+#   ref     BRD requirement ID(s) with the BRD page (PDF page of the source BRD)
+#   fr      FRS FR ID(s), or the FRS section when the item has no FR
+#   module  BIBS module and screen
+#   type    code of the deviation type (types: below)
+#   req     what the BRD asks
+#   built   as-built or proposed behaviour
+#   reason  BDOI decision, question or technical constraint behind the deviation
+#   impact  business impact
+#   depts   affected BDOI departments
+#   eff     [analysis, build, test, documentation] in man-days for the work still needed to close the deviation
+#   alt     optional: man-days to build the BRD text as written instead (indicative)
+#   prio    High | Medium | Low
+#   status  code of the CR status (statuses: below)
+#   owner   optional owner code (owners: below); default is the owner of the BRD
+#   xref    register and question references (DCR-, question IDs, decisions)
+#   target  code of the target drop or release (targets: below)
+#   src     where the deviation is recorded (FRS section, spec, design, register, alignment)
+
+meta:
+  title: Change Management Register
+  subtitle: Deviations from the BRDs that go through change control, with effort in man-days
+  statement: 'For documentation and change control; does not change the platform build or the FRS baseline.'
+  doc_type: Change Register
+  brd: BRD-00
+  name: Change Management
+  doc_id: BIBS-CMR-BRD-00
+  version: '1.0'
+  date: 26 September 2026
+  status_as_of: 26 September 2026
+  baseline: 'FRS v1.0 of every BRD (BRD-2, BRD-6, BRD-11 and BRD-13 at v1.1 or later), discrepancy register v1.2, BDOI answers of 26 September 2026'
+
+types:
+  ADD: 'Scope addition — beyond BRD'
+  RED: 'Scope reduction / descoped'
+  DIFF: 'Behaviour differs from BRD (as built)'
+  PARK: 'Deferred / parked pending BDOI answer'
+  PH2: 'Deferred to Phase 2'
+  DEC: 'BRD conflict resolved by decision'
+  INT: 'Integration dependency'
+  NFR: 'NFR / infrastructure change'
+  MIG: 'Data migration'
+
+type_meaning:
+  ADD: 'BIBS does more than the BRD asks, or the umbrella FRS proposes a requirement that no function BRD owns. BDOI accepts the addition or removes it.'
+  RED: 'A BRD requirement is not built, or is built with less than the BRD asks, by a BDOI instruction or a proposal. BDOI confirms the descoping.'
+  DIFF: 'The requirement is met in a different way from the BRD text. Built (or designed) and working; BDOI accepts the behaviour or asks for the BRD text.'
+  PARK: 'The element is built as a seam or with a documented default and waits for a BDOI answer (values, layouts, rules, a yes / no on scope).'
+  PH2: 'Out of phase 1 by BDOI decision; kept for phase 2 with the seams left open.'
+  DEC: 'Two BRDs, or two parts of one BRD, conflict. A binding decision (D1-D10) or a proposed resolution settles the conflict; BDOI confirms it.'
+  INT: 'The requirement depends on an interface with a BDO or insurer system that is not yet specified. BIBS runs on an upload or a manual step until the interface exists.'
+  NFR: 'A non-functional value (hours, availability, recovery, retention, sizing) or an infrastructure choice differs from one or more BRDs, or from the IER workbook.'
+  MIG: 'The migration or cut-over treatment differs from what a BRD assumes, or adds work that a BRD does not state.'
+
+statuses:
+  DRAFT: 'Draft'
+  CCB: 'For CCB review'
+  APPR: 'Approved'
+  REJ: 'Rejected'
+  IMPL: 'Implemented (as built, for acceptance)'
+
+status_meaning:
+  DRAFT: 'Raised by the project team. Impact analysis done; the BDOI answer or decision it needs is still open.'
+  CCB: 'Impact analysis complete; ready for the Change Control Board to approve, reject or defer.'
+  APPR: 'Approved by the CCB; scheduled into a drop or release.'
+  REJ: 'Rejected by the CCB; the BRD text stands, or the item is closed without change.'
+  IMPL: 'The behaviour is built (or decided and documented) and differs from the BRD text; the CCB records the acceptance. No work remains.'
+
+priorities:
+  High: 'Affects money (premium, commission, GL, remittance), regulatory compliance, security or access, or blocks a drop. Decide before the FRS of the area is signed off.'
+  Medium: 'Changes a rule, screen, report or interface; a documented default runs until BDOI decides.'
+  Low: 'Wording, labels or presentation; no effect on money, control or data.'
+
+owners:
+  BRD-00: 'BIBS Product Owner with the Program Manager, Business Project Services'
+  BRD-01: 'Product Owner, New Business (Marketing and Processing)'
+  BRD-02: 'Head of Operations (Financial Transactions and Processing)'
+  BRD-03: 'Head, Marketing Business Services (MBS) with the TSU Head'
+  BRD-04: 'Head of BDOI Operations (Collections)'
+  BRD-05: 'Head, Comptrollership (FRBS, Disbursement and ACSL)'
+  BRD-06: 'Product Owner, Renewal (Marketing and Processing)'
+  BRD-07: 'Product Owner, Claims (Claims, Risk Management and Analytics)'
+  BRD-08: 'Product Owner, Employee Benefits'
+  BRD-09: 'Product Owner, CSF (Contact Center Management)'
+  BRD-10: 'Chief Compliance Officer'
+  BRD-11: 'UAM Product Owner with ITIO'
+  BRD-12: 'Product Owner, Submitted Policies (CBG and Non-CBG Marketing)'
+  BRD-13: 'Program Manager, Business Project Services, with Comptrollership and Operations'
+  IT: 'BDOI IT (integration owner) with the BIBS Product Owner'
+  INFRA: 'BDO Cloud and Digital Operations Engineering (IER owner) with BDOI IT'
+  COMPT: 'Head, Comptrollership (FRBS, Disbursement and ACSL)'
+
+targets:
+  FRS: 'FRS sign-off (Nov 2026)'
+  W1: 'Drop 1 build wave 1 (Nov - Dec 2026)'
+  W2: 'Drop 1 build wave 2 (Jan - Feb 2027)'
+  MIG: 'Migration build (Nov 2026 - Mar 2027)'
+  INF: 'Infrastructure before SIT (by Jan 2027)'
+  D2: 'Drop 2 build (Mar - Apr 2027)'
+  PRE: 'Before go-live (Oct - Dec 2027)'
+  PH2: 'Phase 2'
+  ANS: 'After BDOI answer (slot set by the CCB)'
+
+sizes:
+  - [S, 1, 3]
+  - [M, 4, 10]
+  - [L, 11, 25]
+  - [XL, 26, 9999]
+
+# Team roles used in the estimates (Effort basis sheet)
+roles:
+  - ['Business analyst', 'Analysis: impact analysis, BDOI workshops, rules and layouts, FRS and test plan updates (with the technical writer)']
+  - ['Solution architect', 'Analysis of interfaces, data and infrastructure items; design updates']
+  - ['Backend developer', 'Build: Java services, database migrations, jobs, adapters, reports']
+  - ['Frontend developer', 'Build: React screens, forms and lists']
+  - ['QA engineer', 'Test: unit and integration tests reviewed, SIT test cases written and run, regression']
+  - ['Technical writer', 'Documentation: FRS, design, test plan, user and configuration guides, release notes']
+
+assumptions:
+  - 'A man-day is 8 working hours of one team member. Figures are rounded to whole days.'
+  - 'Effort is the work still needed to close the deviation as proposed in the "As built / proposed" column. It is 0 when the behaviour is built (or decided and documented) and only needs acceptance.'
+  - 'For an item parked pending a BDOI answer, the effort is the work to complete it once BDOI answers as proposed (adapter, values, layouts, screens). A different answer is re-estimated at impact analysis.'
+  - 'The optional column "BRD as written" gives the indicative effort to build the BRD text instead of the proposed behaviour, for the CCB to compare.'
+  - 'Build includes unit and integration tests written by the developers. Test covers SIT test cases (writing and running) and regression. Documentation covers the FRS, design, test plan and guides.'
+  - 'Excluded: UAT support, BDOI staff time, infrastructure provisioning by BDO IT (buckets, keys, network routes, certificates), licences and third-party services, and the Phase 2 Reinsurance module.'
+  - 'Excluded: the baseline build of the designed BRDs (BRD-6, BRD-8, BRD-9, BRD-12, BRD-13, the rest of BRD-7). Only the delta caused by the deviation is estimated.'
+  - 'Estimates are at the accuracy of an impact analysis (about plus or minus 30 percent). The CCB re-estimates an item when BDOI''s answer differs from the proposal.'
+  - 'Status and counts are as of the date on the cover and are refreshed with the final as-built refresh of the documents.'
+
+# Change control process: [step, what happens, who, output, time]
+process:
+  - ['1. Request', 'Anyone in BDOI or the project team raises a change request on the CR form, or the project team raises a CR from a recorded deviation (FRS differences, register, alignment pack).', 'Requester; Project Manager (iorta TechNXT) logs it', 'CR row in this register, status Draft', 'Same day']
+  - ['2. Impact analysis', 'The business analyst and solution architect assess scope, BRD and FRS references, affected modules, data, interfaces, tests, documents and drop; estimate effort in man-days (Analysis, Build, Test, Documentation).', 'Business analyst, Solution architect; BDOI owner of the BRD for business impact', 'Impact analysis on the CR form; status For CCB review', '5 working days (10 for L / XL)']
+  - ['3. CCB review', 'The Change Control Board reviews the CR at its fortnightly meeting (or ad hoc for High priority items): accept, reject, defer, or ask for more analysis.', 'Change Control Board', 'Minutes with the decision per CR', 'Fortnightly']
+  - ['4. Approval', 'Approved CRs are signed on the CR form by the BDOI decision owner and the BIBS Product Owner. A CR above 25 man-days, or one that moves a drop date, also needs the Program Manager.', 'Decision owner; BIBS Product Owner; Program Manager (L / XL, date change)', 'Status Approved or Rejected; signed CR form', 'Within 5 working days of the CCB']
+  - ['5. Schedule', 'The Project Manager places the CR in a drop or build wave and updates the plan, the FRS change list and the test plan scope.', 'Project Manager (iorta TechNXT); BDOI Program Manager', 'Target drop / release set; plan updated', 'Next planning cycle']
+  - ['6. Implement', 'The team builds and documents the change: code, configuration, FRS revision, design, test cases, user and configuration guides.', 'Delivery team', 'Build, FRS revision, test cases', 'As scheduled']
+  - ['7. Verify', 'QA runs the SIT cases and regression; the BDOI owner checks the behaviour in SIT or UAT against the CR.', 'QA engineer; BDOI owner of the BRD', 'Test evidence; acceptance by the owner', 'Within the drop SIT / UAT window']
+  - ['8. Close', 'The Project Manager records the result, the FRS version that carries it and the closing date; the CR is reported in the release notes.', 'Project Manager; BIBS Product Owner', 'Status Implemented; release note entry', 'At release']
+
+# Proposed Change Control Board membership: [role, organisation, role on the board]
+ccb:
+  - ['BIBS Product Owner', 'BDOI', 'Chair; casting vote on scope and priority']
+  - ['Program Manager, Business Project Services', 'BDO Unibank ESG', 'Plan, drops and budget; approves L / XL items and date changes']
+  - ['Owner of the BRD concerned (department head or product owner)', 'BDOI', 'Decision owner of the CR; attends for the CRs of the BRD']
+  - ['Head, Comptrollership', 'BDOI', 'Member for any CR that touches posting, GL, tax or BIR reports']
+  - ['Chief Compliance Officer (or delegate)', 'BDOI', 'Member for any CR that touches screening, KYC, access control or retention']
+  - ['BDOI IT (integration owner)', 'BDOI', 'Member for interfaces and infrastructure items']
+  - ['Project Manager', 'iorta TechNXT', 'Secretary: agenda, register, minutes, schedule']
+  - ['Solution Architect', 'iorta TechNXT', 'Presents impact analysis and effort']
+  - ['Business Analyst lead', 'iorta TechNXT', 'Presents BRD / FRS references and test impact']
+
+# CR form fields: [section, field, guidance]
+form:
+  - ['Request', 'CR ID', 'CR-nnnn, given by the Project Manager when the CR is logged']
+  - ['Request', 'Title', 'Short name of the change']
+  - ['Request', 'Requested by / date', 'Name, department, date']
+  - ['Request', 'BRD and requirement ID(s), page', 'For example BRNB.071 (p.116)']
+  - ['Request', 'FRS FR ID(s)', 'For example FR-NB-081']
+  - ['Request', 'Drop', 'Drop 0 / Drop 1 / Drop 2 / Programme / Phase 2']
+  - ['Request', 'Deviation type', 'One of the nine types (How to read)']
+  - ['Request', 'What the BRD asks', 'Quote or summarise the BRD text']
+  - ['Request', 'Change requested or as-built behaviour', 'What BIBS does or should do instead']
+  - ['Request', 'Reason', 'BDOI decision, question reference or technical constraint']
+  - ['Impact analysis', 'Business impact', 'Effect on the process, money, control and customers']
+  - ['Impact analysis', 'Affected departments and modules', 'BDOI departments; BIBS modules and screens']
+  - ['Impact analysis', 'Interfaces and data', 'Systems, files, migration objects affected']
+  - ['Impact analysis', 'Documents affected', 'FRS, design, test plan, guides, register']
+  - ['Impact analysis', 'Effort (man-days)', 'Analysis / Build / Test / Documentation / Total; size S, M, L, XL']
+  - ['Impact analysis', 'Effect on the plan', 'Drop, build wave, dependency on other CRs']
+  - ['Impact analysis', 'Priority', 'High / Medium / Low']
+  - ['Decision', 'CCB decision and date', 'Approved / Rejected / Deferred, with the meeting date']
+  - ['Decision', 'Conditions', 'Any condition set by the CCB']
+  - ['Decision', 'Decision owner (BDOI)', 'Name and signature']
+  - ['Decision', 'BIBS Product Owner', 'Name and signature']
+  - ['Decision', 'Program Manager (L / XL or date change)', 'Name and signature']
+  - ['Implementation', 'Target drop / release', 'Build wave or release']
+  - ['Implementation', 'FRS version carrying the change', 'For example FRS BRD-1 v1.2']
+  - ['Implementation', 'Verified by / date', 'QA and BDOI owner']
+  - ['Implementation', 'Closed on', 'Date']
+
+# Decisions needed from BDOI, grouped for the Word summary: [topic, CRs, decision needed, owner, by]
+decisions:
+  - ['Identity and access', 'CR-0073, CR-0161', 'Confirm OpenID Connect with Entra ID and the user claim; decide whether UIDM-ISC provisions users only (proposal) or owns all access requests', 'UAM Product Owner with ITIO; BDOI IT', '16 Oct 2026']
+  - ['Reinsurance in Remittance', 'CR-0002, CR-0003', 'Name the reinsurance transactions and their accounting; send the Cashiering and Remittance addenda', 'Head of Operations; Head, Comptrollership', '16 Oct 2026']
+  - ['Employee Benefits without portal', 'CR-0147, CR-0074', 'Confirm that insurers and client HR send files by e-mail and EB users upload them; confirm EB placement through the NB placement screens', 'Product Owner, Employee Benefits', '16 Oct 2026']
+  - ['Documents in S3 and DR', 'CR-0028, CR-0046, CR-0020', 'Confirm the five storage decisions (presigned links, malware scanning, Object Lock, KMS keys, ECM copies) and the DR region', 'BDOI IT; Chief Compliance Officer', '16 Oct 2026']
+  - ['Money rules', 'CR-0084, CR-0092, CR-0125', 'Choose EXCLUDE or CAP; give incentive targets, amounts and the CPC2 base; confirm the 2% withholding entries', 'Head of Operations; Head, Comptrollership; Head, MBS', '30 Oct 2026']
+  - ['Sanctions match', 'CR-0155', 'Decide block or warn on an open sanctions match at quotation, placement, booking and renewal', 'Chief Compliance Officer', '30 Oct 2026']
+  - ['Interfaces', 'CR-0081, CR-0131, CR-0044, CR-0043, CR-0062, CR-0053, CR-0166, CR-0047', 'Give layouts, transport, frequency and owners of each interface', 'BDOI IT', '31 Jan 2027']
+  - ['NFR set', 'CR-0019, CR-0021, CR-0022, CR-0023', 'Approve one BIBS-wide NFR set and the retention per record type', 'BIBS Product Owner; BDOI IT; Chief Compliance Officer', '30 Nov 2026']
+  - ['FRBS report pack', 'CR-0117, CR-0118', 'Give the final layouts of the report pack and confirm that BIR books stay worksheets', 'Head, Comptrollership', '30 Nov 2026']
+  - ['Renewal and migration', 'CR-0134, CR-0146, CR-0139', 'Decide one LAMD intake; decide whether open claims migrate; confirm the go-live transition as recorded', 'Product Owner, Renewal; Product Owner, Claims; Program Manager', '30 Nov 2026']
+
+rows:
+# ============================================================== Programme and BRD-00 Core Replacement
+- id: CR-0001
+  drop: Phase 2
+  brd: BRD-00
+  ref: 'CORE-15.01-15.10; BR-153 to BR-160 (p.10-11); capability matrix (p.28); ReInsurance BRD'
+  fr: 'FRS BRD-00 section 6 (Reinsurance, phase 2); Gap G1'
+  module: 'None in phase 1; party types REINSURER and RI_BROKER kept'
+  type: PH2
+  req: 'Reinsurance placement, slips, SOA, claims reporting and payment, net settlement (capability 15).'
+  built: 'Not built in phase 1. The ReInsurance BRD is received and is phase 2. Seams kept open: reinsurer party types, template-driven slips and SOAs, report subscriptions, open-item matching, claim party model. The insurer-side reinsurance module of the platform stays hidden from BDOI roles.'
+  reason: 'BDOI answer A3 of 26-Sep-2026: the reinsurance module is phase 2.'
+  impact: 'Reinsurance placement stays outside BIBS until phase 2; only the transactions routed through Remittance (CR-0002) are in phase 1.'
+  depts: 'Reinsurance; Comptrollership; Operations'
+  eff: [0, 0, 0, 1]
+  prio: Medium
+  status: CCB
+  xref: 'A3; Gap G1; A-CR-04'
+  target: PH2
+  src: 'FRS BRD-00 sections 1.2, 5, 6; PROGRAMME_ALIGNMENT 1.2'
+- id: CR-0002
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'Drop plan item 1.D3 (Operations BRD, Remittance Addendum; Reinsurance BRD); RMTID.001-040 (p.49-70)'
+  fr: 'FR-OP-030 to FR-OP-041 (Remittance); FRS BRD-2 v1.1 introduction'
+  module: 'remittance (Remittance Workbench); party (reinsurer counterparties); accounting rules'
+  type: ADD
+  req: 'The Operations BRD specifies remittance to insurers only. The drop plan names the Reinsurance BRD for Remittance in Drop 1.'
+  built: 'Proposed: the named reinsurance transactions run in Remittance as remittance types with reinsurer counterparties and their own accounting rules; treaty and facultative processing stays phase 2. Not built.'
+  reason: 'BDOI answer A3 of 26-Sep-2026: Remittance handles the reinsurance transactions in Drop 1. Which transactions and their accounting are open (IQ20).'
+  impact: 'Reinsurance premium and recoveries settled through BIBS from go-live; new posting rules for Comptrollership.'
+  depts: 'Operations (Remittance); Comptrollership; Reinsurance'
+  eff: [4, 12, 6, 2]
+  prio: High
+  status: DRAFT
+  owner: BRD-02
+  xref: 'DCR-210; IQ20; A3'
+  target: W2
+  src: 'Register DCR-210; PROGRAMME_ALIGNMENT 2.2 item 1'
+- id: CR-0003
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'Drop plan items 1.D2 and 1.D3: Operations BRD (Cashiering Addendum), (Remittance Addendum)'
+  fr: 'FRS BRD-2 (Cashiering, Remittance chapters)'
+  module: 'cashiering; remittance'
+  type: PARK
+  req: 'The drop plan names a Cashiering Addendum and a Remittance Addendum to the Operations BRD.'
+  built: 'The Operations pack received has only Addendum 1 (RMTID.002, ADJID.014). FRS BRD-2 is written without the two addenda; they are taken into FRS BRD-2 v1.2 when received and their impact is estimated then.'
+  reason: 'Documents not received (DCR-215, IQ20).'
+  impact: 'Cashiering and Remittance requirements may change after FRS sign-off.'
+  depts: 'Operations (Cashiering, Remittance)'
+  eff: [3, 0, 0, 2]
+  prio: Medium
+  status: DRAFT
+  xref: 'DCR-215; IQ20'
+  target: ANS
+  src: 'Register DCR-215; PROGRAMME_ALIGNMENT 2.2'
+- id: CR-0004
+  drop: Drop 2
+  brd: BRD-00
+  ref: 'CORE-14.08-14.10; BR-146 to BR-148 (p.10); BRD-7 (no claim money through BDOI)'
+  fr: 'FRS BRD-00 Gap G2; FR-CM (none)'
+  module: 'brokerclaims (proposed cheque custody register); cashiering (cheque hand-over)'
+  type: PARK
+  req: 'Safekeeping of unclaimed settlement cheques, hand-over to and retrieval from Cashiering.'
+  built: 'Not built. BRD-7 has no claim money through BDOI (CLQ10) and Claims posts no accounting entry. If BDOI holds cheques: a cheque custody register in Claims using the Cashiering cheque hand-over (V1026-V1029).'
+  reason: 'Conflict between the umbrella BRD and BRD-7; CRQ03, CLQ10, XQ13.'
+  impact: 'Without a register, cheque custody stays manual outside BIBS.'
+  depts: 'Claims; Operations (Cashiering)'
+  eff: [2, 5, 3, 1]
+  alt: 11
+  prio: Medium
+  status: CCB
+  xref: 'DCR-164; CRQ03; CLQ10; XQ13'
+  target: D2
+  src: 'FRS BRD-00 section 5 (G2); BDOI_CROSS_BRD_DECISIONS XQ13'
+- id: CR-0005
+  drop: Drop 1
+  brd: BRD-00
+  ref: 'CORE-16.06; BR-165 (p.11); BRD-9 CSF-EM10 (e-mail of 13-Feb-2026)'
+  fr: 'FRS BRD-00 Gap G3; FRS BRD-9 recorded differences'
+  module: 'csf (no case entity); SharePoint interim'
+  type: RED
+  req: 'CSF case resolution: add and edit case details and status.'
+  built: 'Out of phase 1. BRD-9 puts case management out of scope and keeps case logging in SharePoint. If BDOI brings it in: a CSF case entity in the CSF range (V1043-V1049).'
+  reason: 'BRD-9 e-mail of 13-Feb-2026; CRQ04 open; XQ12.'
+  impact: 'Contact Center cases stay in SharePoint; no case history in BIBS.'
+  depts: 'Contact Center Management; Alternative Distribution'
+  eff: [0, 0, 0, 1]
+  alt: 18
+  prio: Medium
+  status: CCB
+  owner: BRD-09
+  xref: 'DCR-163; CRQ04; XQ12'
+  target: FRS
+  src: 'FRS BRD-00 section 5 (G3); FRS BRD-9 recorded differences'
+- id: CR-0006
+  drop: Programme
+  brd: BRD-00
+  ref: 'CORE-18.01; BR-176 (p.11)'
+  fr: 'FRS BRD-00 Gap G9'
+  module: 'None'
+  type: RED
+  req: 'Include any other or additional system capabilities (emerging capabilities).'
+  built: 'No build: the requirement has no content to build or test. BDOI lists the capabilities or withdraws BR-176.'
+  reason: 'CRQ10 open.'
+  impact: 'None until BDOI names a capability; a named capability becomes its own CR.'
+  depts: 'Business Project Services'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: CCB
+  xref: 'CRQ10; Gap G9'
+  target: FRS
+  src: 'FRS BRD-00 section 5'
+- id: CR-0007
+  drop: Programme
+  brd: BRD-00
+  ref: 'XC-21 ALeA e-mail address encoding (p.43)'
+  fr: 'FRS BRD-00 Gap G10'
+  module: 'messaging (if defined)'
+  type: PARK
+  req: 'ALeA e-mail address encoding, as needed.'
+  built: 'Not built; the term is not defined in the BRD pack.'
+  reason: 'CRQ20 open.'
+  impact: 'None known until BDOI explains ALeA.'
+  depts: 'BDOI IT'
+  eff: [1, 0, 0, 0]
+  prio: Low
+  status: DRAFT
+  xref: 'CRQ20; Gap G10'
+  target: ANS
+  src: 'FRS BRD-00 section 5'
+- id: CR-0008
+  drop: Programme
+  brd: BRD-00
+  ref: 'XC-16; BR-183 (p.23)'
+  fr: 'FRS BRD-00 traceability (OUT); A-CR-05'
+  module: 'Design system (BDO UX guidelines)'
+  type: DIFF
+  req: 'The vendor uses Figma for design execution.'
+  built: 'Screens follow the BDO UX guidelines and the BIBS design system in code; the vendor-qualification items are met by the alignment pass and persona walkthroughs. BDOI supplies the icon set and design files (CRQ17).'
+  reason: 'A-CR-05: BR-178 to BR-183 are vendor-qualification items.'
+  impact: 'None on the business process.'
+  depts: 'Business Project Services'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'CRQ17; A-CR-05'
+  target: FRS
+  src: 'FRS BRD-00 traceability XC-16'
+- id: CR-0009
+  drop: Drop 0
+  brd: BRD-00
+  ref: 'CORE-17.01; BR-170 (p.11)'
+  fr: 'FR-CR-031'
+  module: 'audit (field-level change log); Setup & Administration'
+  type: ADD
+  req: 'Master data change logging for users, products, insurers and LOVs. No function BRD owns it.'
+  built: 'BIBS audits each action with a summary. Proposed: a field-level log (old and new values) for the registered master types. Not built.'
+  reason: 'Umbrella requirement without an owning BRD (Drop 0 item 0.4); CRQ07 open on the master types, approver and viewers.'
+  impact: 'Auditors can see what changed on a master record, field by field.'
+  depts: 'Business Project Services; Compliance; MBS; Comptrollership'
+  eff: [2, 6, 4, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'DCR-174; CRQ07; Gap G4'
+  target: W2
+  src: 'FRS BRD-00 section 5 (G4); register DCR-174'
+- id: CR-0010
+  drop: Drop 0
+  brd: BRD-00
+  ref: 'CORE-17.02; BR-171 (p.11)'
+  fr: 'FR-CR-061'
+  module: 'catalog (Insurers page)'
+  type: ADD
+  req: 'Insurer management: risk participation, payment terms, remittance schedules on the insurer.'
+  built: 'Insurer page exists without these attributes. Proposed: add the attributes and LOV INSURER_CONTACT_FUNCTION. Not built.'
+  reason: 'Umbrella requirement without an owning BRD; CRQ08 open on meaning, owners and approval.'
+  impact: 'One place for insurer terms used by Remittance and Collections.'
+  depts: 'MBS; Operations (Remittance)'
+  eff: [2, 4, 2, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'CRQ08; Gap G5'
+  target: W2
+  src: 'FRS BRD-00 section 5 (G5)'
+- id: CR-0011
+  drop: Drop 0
+  brd: BRD-00
+  ref: 'CORE-17.04; BR-173, BR-174 (p.11)'
+  fr: 'FR-CR-062'
+  module: 'MIS field catalogue (new); Setup & Administration'
+  type: ADD
+  req: 'MIS field definition.'
+  built: 'Proposed: an MIS field catalogue that names existing data per entity; users do not add database fields (A-CR-06). Not built.'
+  reason: 'Umbrella requirement without an owning BRD; CRQ09 (fixed list or user-defined fields).'
+  impact: 'Consistent MIS reporting fields across modules and migration.'
+  depts: 'Business Project Services; MIS; Marketing'
+  eff: [2, 6, 3, 1]
+  alt: 30
+  prio: Medium
+  status: DRAFT
+  xref: 'CRQ09; Gap G6'
+  target: W2
+  src: 'FRS BRD-00 section 5 (G6)'
+- id: CR-0012
+  drop: Programme
+  brd: BRD-00
+  ref: 'CORE-21.04; BR-053 (p.12)'
+  fr: 'FR-CR-042'
+  module: 'report (Report Centre, saved variants)'
+  type: ADD
+  req: 'Dynamic report customisation: data fields, charts and summaries.'
+  built: 'BIBS has fixed report columns and saved parameter variants. Proposed: column layout stored in the variant. Not built.'
+  reason: 'Umbrella requirement without an owning BRD; CRQ11 open.'
+  impact: 'Users choose and order report columns without a change request.'
+  depts: 'All report users'
+  eff: [2, 8, 4, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'DCR-177; CRQ11; Gap G7'
+  target: W2
+  src: 'FRS BRD-00 section 5 (G7)'
+- id: CR-0013
+  drop: Programme
+  brd: BRD-00
+  ref: 'CORE-21.05; BR-054, BR-103 (p.12)'
+  fr: 'FR-CR-043'
+  module: 'report (subscriptions); job REPORT_SUBSCRIPTIONS'
+  type: ADD
+  req: 'Scheduled or on-demand report generation for any report.'
+  built: 'Only system-scheduled files exist. Proposed: report subscriptions per user (REPORT_SUBSCRIPTIONS_MAX 20; external domains limited). Not built.'
+  reason: 'Umbrella requirement without an owning BRD; CRQ11 open.'
+  impact: 'Users receive recurring reports by e-mail without manual runs.'
+  depts: 'All report users'
+  eff: [1, 6, 3, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'DCR-177; CRQ11; Gap G8'
+  target: W2
+  src: 'FRS BRD-00 section 5 (G8)'
+- id: CR-0014
+  drop: Programme
+  brd: BRD-00
+  ref: 'XC-02; BR-125, BR-152, BR-160, BR-203 (p.5, p.20-21)'
+  fr: 'FR-CR-010, FR-CR-011'
+  module: 'Role home pages (dashboards)'
+  type: ADD
+  req: 'Centralised, real-time dashboards for all roles, with drill-down.'
+  built: 'Module homes exist for built modules. Proposed: a role home with configurable widgets per role family (DASHBOARD_REFRESH_MINUTES 5). Not built.'
+  reason: 'Umbrella requirement without an owning BRD; CRQ06 open (figures per role).'
+  impact: 'Each role sees its work and figures on one page.'
+  depts: 'All departments'
+  eff: [3, 8, 4, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'CRQ06; Gap G11'
+  target: W2
+  src: 'FRS BRD-00 section 5 (G11)'
+- id: CR-0015
+  drop: Drop 1
+  brd: BRD-00
+  ref: 'XC-13; BR-175 (p.23)'
+  fr: 'FR-CR-090'
+  module: 'opsledger (invoice ledger view)'
+  type: ADD
+  req: 'Invoice Master List across workflows.'
+  built: 'Proposed: columns added to the Operations invoice ledger view. Not built.'
+  reason: 'Umbrella requirement without an owning BRD; CRQ13 open.'
+  impact: 'One list of invoices with their status across NB, Operations and Collections.'
+  depts: 'Operations; Collections; Comptrollership'
+  eff: [1, 3, 2, 1]
+  prio: Low
+  status: DRAFT
+  xref: 'CRQ13; Gap G12'
+  target: W2
+  src: 'FRS BRD-00 section 5 (G12)'
+- id: CR-0016
+  drop: Drop 1
+  brd: BRD-00
+  ref: 'XC-19 (p.43); BRNB.100 related'
+  fr: 'FR-CR-081; FR-NB-117'
+  module: 'booking (service invoice dispatch); job INSURER_INVOICE_BATCH'
+  type: INT
+  req: 'Invoice batch printing, delivery to insurers by SFTP and a delivery report, daily per insurer.'
+  built: 'Service invoices are issued and e-mailed. Proposed: daily batch per insurer at 20:00 PHT with SFTP delivery. Not built; insurer SFTP endpoints not given.'
+  reason: 'CRQ18 open (format, endpoints, replaces e-mail?).'
+  impact: 'Insurers receive invoices in one daily file instead of single e-mails.'
+  depts: 'Processing; Operations; BDOI IT'
+  eff: [2, 6, 4, 1]
+  prio: Medium
+  status: DRAFT
+  owner: IT
+  xref: 'CRQ18; Gap G13'
+  target: W2
+  src: 'FRS BRD-00 section 5 (G13)'
+- id: CR-0017
+  drop: Drop 0
+  brd: BRD-00
+  ref: 'XC-20 client migration and daily client batches (p.43); BRD-13 BRID 2.1 (p.7)'
+  fr: 'FR-CR-082; FR-DM-031, FR-DM-032'
+  module: 'migration (client load C01-C03)'
+  type: MIG
+  req: 'Umbrella BRD: one-time client migration 2020 to present plus daily midday and EOD client batches with a modification report.'
+  built: 'Selective migration of clean client master data by the Data Migration programme; legacy read-only after cut-over; no daily client batches after go-live.'
+  reason: 'Conflict between the umbrella and BRD-13, decided in the Data Migration design; CRQ19, DMQ05 open on the client scope.'
+  impact: 'Legacy client changes stop at the freeze; BIBS is the client master from go-live.'
+  depts: 'Business Project Services; Marketing; Processing'
+  eff: [0, 0, 0, 1]
+  prio: Medium
+  status: CCB
+  owner: BRD-13
+  xref: 'DCR-173; CRQ19; DMQ05; Gap G14'
+  target: MIG
+  src: 'FRS BRD-00 section 5 (G14); register DCR-173'
+- id: CR-0018
+  drop: Drop 1
+  brd: BRD-00
+  ref: 'XC-10; BR-039, BR-043 (p.14-15)'
+  fr: 'FR-CR-093'
+  module: 'placement; booking (SOA)'
+  type: PARK
+  req: 'SOA generated with the placement report and the Insurance Advice; service invoice issued to the insurer with the SOA at booking.'
+  built: 'Not built; which SOA is meant is not stated.'
+  reason: 'CRQ12 open.'
+  impact: 'Insurers and clients receive the SOA from BIBS instead of a manual document.'
+  depts: 'Processing; Operations'
+  eff: [1, 3, 2, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'CRQ12; Gap G15'
+  target: ANS
+  src: 'FRS BRD-00 section 5 (G15)'
+- id: CR-0019
+  drop: Programme
+  brd: BRD-00
+  ref: 'NFR sections of every BRD: service hours, availability, maintenance window, BCP (umbrella p.42-46)'
+  fr: 'FRS BRD-00 section 7'
+  module: 'Platform operations'
+  type: NFR
+  req: 'Service hours differ by BRD (07:00-22:00 Mon-Sat NB and RN; 06:00-20:00 Mon-Fri Claims; 08:00-18:00 Mon-Fri SANC; others); availability 99.9% to 100%; maintenance windows 19:00-07:00 (ACCT) to 00:00-04:00 (SANC, SP).'
+  built: 'Proposed one BIBS-wide set: service 06:00-22:00 Mon-Sat plus month-end weekends; 99.9% within service hours; maintenance 00:00-04:00; batch after 22:00.'
+  reason: 'XQ08; OQ44, CQ25, AQ27, PQ18, CLQ24, EBQ25, CSQ11, SP SQ21 / SQ22, RQ28.'
+  impact: 'One service level for all departments; month-end work covered.'
+  depts: 'All departments; BDOI IT'
+  eff: [2, 0, 0, 2]
+  prio: High
+  status: CCB
+  xref: 'DCR-133; DCR-134; DCR-138; DCR-057; XQ08'
+  target: FRS
+  src: 'Register DCR-133, 134, 138; FRS BRD-00 section 7'
+- id: CR-0020
+  drop: Programme
+  brd: BRD-00
+  ref: 'NFR recovery objectives: RPO 24 h (OPS, PM, EB), 4 h (CLXN, CLM, CSF); CSF backup every 15 minutes (BRCSF-011.001, p.11)'
+  fr: 'FRS BRD-00 section 7; FR-CSF-043'
+  module: 'Database (RDS), S3, EKS; DR runbook'
+  type: NFR
+  req: 'Recovery objectives and backup frequency differ by BRD; the DR location is not stated.'
+  built: 'RPO 15 minutes (continuous WAL archiving) and RTO 4 hours for the whole platform, as in the IER. Proposed DR: RDS cross-region replica, S3 cross-region replication, EKS standby scaled at failover, DR runbook and a failover test. DR region to be named after the data-residency check.'
+  reason: 'IER workbook v20 (BDO IT) states RPO 15 minutes, RTO 4 hours; IQ26 open on the DR region.'
+  impact: 'One recovery target; CSF 15-minute backup met by continuous archiving.'
+  depts: 'BDOI IT; all departments'
+  eff: [2, 3, 4, 2]
+  prio: High
+  status: CCB
+  owner: INFRA
+  xref: 'DCR-135; DCR-225; CSQ11; IQ26'
+  target: PRE
+  src: 'Register DCR-135, DCR-225; PROGRAMME_ALIGNMENT 6.2, 6.5'
+- id: CR-0021
+  drop: Programme
+  brd: BRD-00
+  ref: 'Retention: umbrella 5 years online / 15 offline (p.42-46); BRD-7 10 / 15; BRD-5, 10, 12 5 / 5; BRNB.106 (p.12)'
+  fr: 'FR-NB-137; FRS BRD-00 section 7'
+  module: 'Retention rules (Broking Setup > Data Retention); archive and purge jobs'
+  type: NFR
+  req: 'Retain, archive and purge per the BRD values, which differ by BRD.'
+  built: 'Retention rules per record type with review counts are built (default 5 years online, 15 years archive; backup kept 7 years). Archive and purge are parked until BDOI gives the retention per record type.'
+  reason: 'Q39, CRQ22 open.'
+  impact: 'Legal record keeping; database size and cost over time.'
+  depts: 'Compliance; Comptrollership; BDOI IT; all record owners'
+  eff: [2, 8, 4, 2]
+  prio: High
+  status: DRAFT
+  owner: BRD-00
+  xref: 'DCR-136; DCR-167; DCR-209; Q39; CRQ22'
+  target: ANS
+  src: 'FRS BRD-1 section 10.4 (BRNB.106); register DCR-136'
+- id: CR-0022
+  drop: Programme
+  brd: BRD-00
+  ref: 'Response times: 2 s (SP) to 10 s (NB, RN, UAM); umbrella under 5 s for every role (p.42)'
+  fr: 'FRS BRD-00 section 7'
+  module: 'Platform'
+  type: NFR
+  req: 'Response-time targets differ by BRD.'
+  built: 'Proposed: screens and single-record actions p95 under 2 seconds; reports and batches run as jobs with progress. Proved in the performance test (deliverable 28).'
+  reason: 'CRQ21 open.'
+  impact: 'One testable target for every screen.'
+  depts: 'All departments'
+  eff: [1, 0, 0, 1]
+  prio: Medium
+  status: CCB
+  xref: 'DCR-137; DCR-165; CRQ21'
+  target: FRS
+  src: 'Register DCR-137, DCR-165'
+- id: CR-0023
+  drop: Programme
+  brd: BRD-00
+  ref: 'Umbrella p.42: 1,344 named / 429 concurrent users; IER: about 1,200 internal users'
+  fr: 'FRS BRD-00 section 7'
+  module: 'Platform sizing; performance test'
+  type: NFR
+  req: 'User counts differ between the umbrella, BRD-3, BRD-7, BRD-8 and the IER.'
+  built: 'Sized and tested for 429 concurrent sessions as the peak case; no external users.'
+  reason: 'CRQ21, CRQ24, IQ32 open.'
+  impact: 'Infrastructure cost and the performance test depend on the figure.'
+  depts: 'BDOI IT'
+  eff: [1, 0, 0, 1]
+  prio: Medium
+  status: CCB
+  owner: INFRA
+  xref: 'DCR-166; DCR-232; IQ32; CRQ24'
+  target: FRS
+  src: 'Register DCR-166, DCR-232'
+- id: CR-0024
+  drop: Programme
+  brd: BRD-11
+  ref: 'BRD-4 and BRD-7 NFR: session timeout 15 minutes; BRD-1 and BRD-11 NFR 5 (p.17): warning at 15, log-out at 30'
+  fr: 'FR-UA-004; FR-CL-094'
+  module: 'security (session policy)'
+  type: DEC
+  req: 'BRD-4 and BRD-7 set a 15-minute session timeout; BRD-1 and BRD-11 a 15-minute warning and a 30-minute log-out.'
+  built: 'Built: inactivity warning at 15 minutes and log-out at 30 minutes for all users (SESSION_IDLE_WARNING_MINUTES 15, SESSION_TIMEOUT_MINUTES 30), configurable. BRD-11 governs access BIBS-wide.'
+  reason: 'BRD-11 p.17 NFR 5 (answer to DCR-008).'
+  impact: 'Collections and Claims users get 30 minutes instead of 15.'
+  depts: 'Collections; Claims'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'DCR-008; DCR-140'
+  target: FRS
+  src: 'Register DCR-008, DCR-140'
+- id: CR-0025
+  drop: Drop 0
+  brd: BRD-11
+  ref: 'BRD-4 NFR 10.07 (p.51-58), one session per device; BRD-7 NFR (p.32-41), concurrent sessions allowed; BRD-11 silent'
+  fr: 'FR-UA-004'
+  module: 'security (session log)'
+  type: PARK
+  req: 'BRD-4: one session per device, a new device logs off the old one. BRD-7: concurrent sessions allowed.'
+  built: 'Session log built; enforcement of a single session parked behind a parameter until BDOI decides whether it applies to all users.'
+  reason: 'UQ09; XQ11.'
+  impact: 'Shared-device risk in Collections if not enforced.'
+  depts: 'Collections; Claims; BDOI IT Security'
+  eff: [1, 3, 2, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'DCR-141; UQ09; XQ11'
+  target: ANS
+  src: 'Register DCR-141; BDOI_CROSS_BRD_DECISIONS XQ11'
+- id: CR-0026
+  drop: Drop 1
+  brd: BRD-04
+  ref: 'BRD-4 NFR 3.04 (users may not hold several roles); BRD-11 NFR 1.d (p.13)'
+  fr: 'FRS BRD-4 section 1.6; FR-CL-094'
+  module: 'security (roles)'
+  type: DEC
+  req: 'BRD-4: the system does not allow users to have multiple roles.'
+  built: 'Several roles per user allowed everywhere; no single-role check is built. Incompatible role pairs can be blocked as a segregation rule.'
+  reason: 'Decision D5 (CQ23 answered by BRD-11: "User can have more than one role").'
+  impact: 'A collector who also works in another unit keeps one user ID.'
+  depts: 'Collections; ITIO'
+  eff: [0, 0, 0, 0]
+  prio: Medium
+  status: IMPL
+  xref: 'DCR-045; D5; CQ23'
+  target: FRS
+  src: 'FRS BRD-4 section 1.6; BDOI_CROSS_BRD_DECISIONS D5'
+- id: CR-0027
+  drop: Programme
+  brd: BRD-00
+  ref: 'IER workbook v20: architecture diagram (multi-tenant microservices), Kubernetes sheets (ten bv-* services)'
+  fr: 'FRS BRD-00 section 7; ARCHITECTURE_OPTION_DECISION'
+  module: 'Deployment: EKS workloads, ALB and WAF, Apigee X, TLS, NetworkPolicies, IRSA'
+  type: NFR
+  req: 'The IER sizes ten microservices, three tenants, Aurora and MongoDB per tenant, Istio and EventBridge.'
+  built: 'BIBS stays a modular monolith on one PostgreSQL database, deployed on EKS as four workloads (web, jobs, integration, frontend) with RDS, ElastiCache, MSK and S3; internal ALB with AWS WAF for users; Apigee X for system APIs; TLS on every hop, deny-by-default NetworkPolicies, IRSA; no service mesh. Build step INF0: workload role switch, backend HTTPS, data-service TLS, Apigee token validation, manifests or Helm values with HPA and PDB.'
+  reason: 'Decision D10, confirmed by BDOI on 26-Sep-2026 ("go ahead with the best practices"); IQ25.'
+  impact: 'The IER is restated; infrastructure cost follows the real workloads.'
+  depts: 'BDOI IT; BDO Cloud and Digital Operations Engineering'
+  eff: [3, 15, 6, 4]
+  prio: High
+  status: CCB
+  owner: INFRA
+  xref: 'DCR-222; DCR-223; D10; IQ25'
+  target: INF
+  src: 'ARCHITECTURE_OPTION_DECISION 5.3-5.4; PROGRAMME_ALIGNMENT 6.2'
+- id: CR-0028
+  drop: Programme
+  brd: BRD-00
+  ref: 'BDOI answer A4 of 26-Sep-2026 (documents in S3 only); every BRD that stores files'
+  fr: 'FRS BRD-00 section 4 (document generation, data management)'
+  module: 'common/storage FileStore; stored_file; 13 tables with file content; attachment, docgen, report archive, uploads'
+  type: NFR
+  req: 'Documents and attachments are stored in an S3 bucket only.'
+  built: 'Today file bytes sit in PostgreSQL in 13 tables. Build steps ST0 (FileStore port, stored_file, presigned links after the permission check and audit, quarantine until the malware scan passes, retention and legal hold) and ST1 (every module through the port, one-off copy with SHA-256 check, bytea columns dropped). Not built.'
+  reason: 'Decision D9 (option C of DOCUMENT_STORAGE_DECISION, approved 26-Sep-2026); five design points still to confirm (IQ31).'
+  impact: 'Smaller database and backups; encryption with BDOI keys; Object Lock for records under legal hold.'
+  depts: 'BDOI IT; Compliance; all departments that upload or print documents'
+  eff: [3, 22, 8, 3]
+  prio: High
+  status: CCB
+  owner: IT
+  xref: 'DCR-227; D9; A4; IQ31; DSQ01-DSQ04'
+  target: W1
+  src: 'DOCUMENT_STORAGE_DECISION section 4; PROGRAMME_ALIGNMENT 6.3'
+- id: CR-0029
+  drop: Programme
+  brd: BRD-00
+  ref: 'IER HW and SW sheet: ElastiCache Redis 7 "(cluster)" in Pre-Prod and PROD'
+  fr: 'FRS BRD-00 section 7'
+  module: 'Cache and job lock (Redis)'
+  type: NFR
+  req: 'The IER asks for ElastiCache in cluster mode.'
+  built: 'BIBS runs Redis 7 with cluster mode disabled (one shard, Multi-AZ replica); the cache clear and the job lock assume one shard.'
+  reason: 'Technical constraint; IQ34 open.'
+  impact: 'None if accepted; cluster mode enabled needs a code change.'
+  depts: 'BDOI IT'
+  eff: [0, 0, 0, 1]
+  alt: 10
+  prio: Low
+  status: CCB
+  owner: INFRA
+  xref: 'DCR-228; IQ34'
+  target: INF
+  src: 'Register DCR-228; PROGRAMME_ALIGNMENT 6.2'
+- id: CR-0030
+  drop: Programme
+  brd: BRD-00
+  ref: 'IER VDI sheet: OpenJDK 17, Node 20, Angular SPA; RDS rows "RHEL 9.x"'
+  fr: 'FRS BRD-00 section 7'
+  module: 'Runtime and developer tools'
+  type: NFR
+  req: 'The IER names JDK 17, Node 20 and an Angular front end.'
+  built: 'BIBS runs on Java 21, Spring Boot 3.5, Node 22 and React 19. Proposed IER correction: Temurin 21, Maven 3.9, Node 22, no Angular; RDS rows without an operating system.'
+  reason: 'Technical constraint (as built); IQ28, IQ29.'
+  impact: 'VDI images and base images follow the real stack.'
+  depts: 'BDOI IT'
+  eff: [0, 0, 0, 1]
+  prio: Low
+  status: CCB
+  owner: INFRA
+  xref: 'DCR-224; IQ28; IQ29'
+  target: INF
+  src: 'Register DCR-224; PROGRAMME_ALIGNMENT 6.2'
+- id: CR-0031
+  drop: Programme
+  brd: BRD-00
+  ref: 'IER assumptions: non-production 12 x 5 hours'
+  fr: 'FRS BRD-00 section 7'
+  module: 'Job schedules (BROKERVERSE_JOB_*_CRON)'
+  type: NFR
+  req: 'Non-production environments run 12 hours a day, 5 days a week.'
+  built: 'Night jobs run from 20:00 to 06:00 PHT and would never fire. Proposed: non-production crons moved into the window by environment variables; extended hours booked for batch, month-end and migration rehearsal cycles.'
+  reason: 'Technical constraint; IQ27 open.'
+  impact: 'SIT and UAT can test the batch cycle and month-end.'
+  depts: 'BDOI IT; QA'
+  eff: [1, 1, 1, 1]
+  prio: Medium
+  status: CCB
+  owner: INFRA
+  xref: 'DCR-226; IQ27'
+  target: INF
+  src: 'Register DCR-226; PROGRAMME_ALIGNMENT 6.5'
+- id: CR-0032
+  drop: Programme
+  brd: BRD-00
+  ref: 'IER workbook v20 (HW and SW sheet, infrastructure diagram, architecture diagram): GitLab runner, Jenkins, ArgoCD and Helm'
+  fr: 'FRS BRD-00 section 7'
+  module: 'Build and deployment pipeline; Kubernetes manifests'
+  type: NFR
+  req: 'Three CI / CD toolchains appear in the IER; the BDO standard is not named.'
+  built: 'Proposed: a Helm chart or Kustomize overlays per environment and a pipeline on the toolchain BDO IT names (container registry, image base, code-quality server).'
+  reason: 'IQ29 open.'
+  impact: 'Releases follow BDO change management and tooling.'
+  depts: 'BDOI IT'
+  eff: [1, 5, 2, 1]
+  prio: Medium
+  status: DRAFT
+  owner: INFRA
+  xref: 'DCR-224; IQ29'
+  target: INF
+  src: 'PROGRAMME_ALIGNMENT 6.2, 6.6'
+- id: CR-0033
+  drop: Programme
+  brd: BRD-00
+  ref: 'IER: Dynatrace (VDI, K8s sheets) against CloudWatch, X-Ray, Prometheus, Loki, Grafana (diagram); BRD-11 NFR remote log server (p.14)'
+  fr: 'FRS BRD-11 interfaces (remote log server, parked)'
+  module: 'Observability: metrics, logs, alerts'
+  type: NFR
+  req: 'Two observability stacks named; BRD-11 asks for logs on a remote log server.'
+  built: 'Actuator health, metrics and a Prometheus endpoint; structured logs. Proposed: monitoring collectors and log shipping for the stack BDO IT chooses; alert routing per the alert catalogue (deliverable 38).'
+  reason: 'IQ30 open.'
+  impact: 'Production support sees BIBS in the BDO monitoring tools.'
+  depts: 'BDOI IT; production support'
+  eff: [1, 4, 2, 1]
+  prio: Medium
+  status: DRAFT
+  owner: INFRA
+  xref: 'IQ30'
+  target: INF
+  src: 'PROGRAMME_ALIGNMENT 6.2; FRS BRD-11 interfaces'
+- id: CR-0034
+  drop: Programme
+  brd: BRD-00
+  ref: 'Hosting appendix (access restricted to personnel in the Philippines); IER VDI sheet (15 users)'
+  fr: 'FRS BRD-00 section 7'
+  module: 'Environment access'
+  type: NFR
+  req: 'Access is restricted to personnel in the Philippines; the IER plans 15 VDI users without saying where they sit.'
+  built: 'Proposed: production and UAT reachable only from the Philippines; DEV and SIT with masked data reachable by named vendor staff through VDI.'
+  reason: 'IQ28 open.'
+  impact: 'Defines who can support the platform from where.'
+  depts: 'BDOI IT; Compliance'
+  eff: [1, 0, 0, 1]
+  prio: Medium
+  status: CCB
+  owner: INFRA
+  xref: 'DCR-231; IQ28'
+  target: INF
+  src: 'Register DCR-231'
+- id: CR-0035
+  drop: Programme
+  brd: BRD-00
+  ref: 'Concept paper "Advance Implementation of Renewal Processing" V1.0 (MANCOM, 06-Sep-2026); timeline slide'
+  fr: 'FRS BRD-6 v1.1 introduction; FRS BRD-13 (FR-DM-120)'
+  module: 'Programme plan'
+  type: DEC
+  req: 'The signed concept paper proposes an early renewal release by 15-Aug-2027 for January to May 2028 expiries, with early migration of client and reference data.'
+  built: 'Superseded: every module goes live together in January 2028; no early release and no early migration. Its capabilities stay in scope for January 2028.'
+  reason: 'BDOI answer A1 of 26-Sep-2026.'
+  impact: 'One cut-over; renewals of January to May 2028 run in BIBS after go-live (CR-0139).'
+  depts: 'Marketing; Processing; Business Project Services'
+  eff: [0, 0, 0, 1]
+  prio: High
+  status: CCB
+  xref: 'DCR-218; DCR-240; A1'
+  target: FRS
+  src: 'PROGRAMME_ALIGNMENT 3; register DCR-218, DCR-240'
+- id: CR-0036
+  drop: Programme
+  brd: BRD-00
+  ref: 'Drop plan: BRD-10 Sanction Screening and CSF service requests not placed; Drop 0 items 0.1, 0.4, 0.5 without a BRD'
+  fr: 'FRS BRD-00 section 3; FRS BRD-10; FRS BRD-9'
+  module: 'Programme plan (drops)'
+  type: DEC
+  req: 'The drop plan does not place BRD-10 or the CSF service-request functions, and names Drop 0 items without a governing BRD.'
+  built: 'Proposed: BRD-10 in Drop 1 with Client Onboarding; CSF service requests in Drop 2; Drop 0 acceptance on BRD-11 plus EIAM (item 0.1), CORE-17 of the umbrella (item 0.4) and the workflows of each BRD (item 0.5). Documents are filed by this map.'
+  reason: 'IQ23, IQ24 open.'
+  impact: 'Test and sign-off windows for the two BRDs.'
+  depts: 'Compliance; Contact Center Management; Business Project Services'
+  eff: [0, 0, 0, 1]
+  prio: Medium
+  status: CCB
+  xref: 'DCR-213; DCR-214; IQ23; IQ24'
+  target: FRS
+  src: 'PROGRAMME_ALIGNMENT 2.2 items 5-6'
+- id: CR-0037
+  drop: Programme
+  brd: BRD-00
+  ref: 'BRD-8 BRID-022.01 (PDF/XLSX/CSV/WORD); other BRDs Excel and PDF; FRBS 3.2.0 (p.63) board schedules in Word'
+  fr: 'FRS BRD-00 (report generation); FRS BRD-5 Vol.1 section 1.7'
+  module: 'report (DocxReportRenderer); docgen (Word renditions)'
+  type: ADD
+  req: 'BRD-8 asks for Word export of reports; BRD-5 asks for board schedules in Word; the other BRDs ask for Excel and PDF.'
+  built: 'Built: Word export for every report, Word on documents and schedules (GL-SCHEDULE, GL-BVA, FRBS-MANCOM-MARKET, RI-SOA, FIN-AP-VOUCHER), and a Word copy of each composed business document.'
+  reason: 'Work item P2; FRS BRD-5 Vol.1 Gap G1 closed by the build.'
+  impact: 'All departments can export to Word, beyond what their BRD asks.'
+  depts: 'All report users; Comptrollership'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'DCR-161; P2; EBQ21'
+  target: FRS
+  src: 'Deliverables plan item 17; register DCR-161'
+- id: CR-0038
+  drop: Programme
+  brd: BRD-00
+  ref: 'BRD-7, BRD-4, BRD-10, BRD-2, BRD-1 shared-drive and FS04 targets; BRNB.110 (p.14); SNSRP-706 (p.19-20)'
+  fr: 'FR-NB-038; FR-SS-071; FR-CM-064; FR-OP (FileDropPort)'
+  module: 'Report archive and in-system file repository (RepositoryFileDrop)'
+  type: DIFF
+  req: 'Several BRDs send files or lists to a shared drive or a designated folder.'
+  built: 'Files are kept in BIBS with download and notification; a shared-drive or SFTP drop is added only where a downstream system reads the file (for example FS04, CR-0104).'
+  reason: 'BRD-12 asks for one master database instead of shared-drive files; OQ17, CLQ21.'
+  impact: 'No uncontrolled copies on shared drives; users download from BIBS.'
+  depts: 'Claims; Compliance; Operations; Marketing'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'DCR-152; OQ17; CLQ21'
+  target: FRS
+  src: 'Register DCR-152; FRS BRD-1 section 10.4'
+- id: CR-0039
+  drop: Programme
+  brd: BRD-00
+  ref: 'Ageing buckets: ACSL 2.14.x (p.124); Claims report list; BRCLXN reports; Cashiering reports'
+  fr: 'FR-CM-060; FR-CL (reports); FR-AS (ACSL reports)'
+  module: 'report (ageing bucket set per report family)'
+  type: DEC
+  req: 'Ageing buckets differ: ACSL 0-30 to over 730 days; Claims 0-30 to 181+; Collections and Cashiering without buckets.'
+  built: 'Proposed: ageing buckets configurable per report family, ACSL buckets as the default. Not built as a shared setting.'
+  reason: 'Conflict between BRDs; OQ43.'
+  impact: 'Ageing reports agree across departments.'
+  depts: 'Comptrollership; Claims; Collections; Operations'
+  eff: [1, 3, 2, 0]
+  prio: Low
+  status: DRAFT
+  xref: 'DCR-158; OQ43'
+  target: W2
+  src: 'Register DCR-158'
+- id: CR-0040
+  drop: Programme
+  brd: BRD-00
+  ref: 'BRD-8 (documents restricted by process), BRD-9 BRCSF-006, 009 (p.9-10), BRD-7 claim document types'
+  fr: 'FR-CSF-030, FR-CSF-033; FR-EB-002'
+  module: 'attachment (document access classes, att_document_access)'
+  type: DEC
+  req: 'Contact Center users view and resend renewal advices and claims reports; EB restricts documents by process; claim documents may be confidential.'
+  built: 'Built (work item P3): access class per document type; CSF users may view RENEWAL_ADVICE and CLAIM_REPORT; the loss advice and insurer claim reports are stored as CLAIM_REPORT. Final confidentiality matrix to confirm.'
+  reason: 'XQ04, XQ05; CSQ07, EBQ15, CLQ26.'
+  impact: 'Contact Center sees only the document types it is cleared for.'
+  depts: 'Contact Center Management; Claims; Employee Benefits'
+  eff: [0, 0, 0, 0]
+  prio: Medium
+  status: IMPL
+  xref: 'DCR-148; XQ04; XQ05; P3'
+  target: FRS
+  src: 'BDOI_CROSS_BRD_DECISIONS 5, 6.1'
+- id: CR-0041
+  drop: Programme
+  brd: BRD-00
+  ref: 'Report List as of 27-Apr-2026: #69, #73, #168 (BDOI remarks "DELETE" / "no longer needed")'
+  fr: 'FRS BRD-00 report generation'
+  module: 'report (catalogue)'
+  type: RED
+  req: 'The Report List carries #69, #73 and #168.'
+  built: 'Marked DROPPED and not built, per the BDOI remarks in the Report List.'
+  reason: 'Report List remarks (DCR-130, answered).'
+  impact: 'None; the data is in the Policy Transmittal and e-policy reports.'
+  depts: 'Report SMEs named in the Report List'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'DCR-130'
+  target: FRS
+  src: 'Register DCR-130'
+- id: CR-0042
+  drop: Programme
+  brd: BRD-00
+  ref: 'Report List TSU rows ("there should be a separate TSU module", #182)'
+  fr: 'FRS BRD-3; FRS BRD-1 (non-package placement)'
+  module: 'nonpackage (TSU Workbench); productmaint'
+  type: DIFF
+  req: 'The Report List asks for a separate TSU module.'
+  built: 'TSU work stays in non-package placement and Product Maintenance, with a TSU menu section and the TSU Workbench.'
+  reason: 'Platform design; no BRD specifies a TSU module.'
+  impact: 'TSU users work in two modules from one menu section.'
+  depts: 'TSU; MBS'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  owner: BRD-03
+  xref: 'DCR-131'
+  target: FRS
+  src: 'Register DCR-131'
+- id: CR-0043
+  drop: Drop 2
+  brd: BRD-00
+  ref: 'Drop plan INT-19 "Insurer System"; PRCID.009 (p.81); RMTID.012 (p.55-56); BRNB.071, 073 (p.116-117); ACSL 2.2.1; CLQ17'
+  fr: 'FR-OP-070 to FR-OP-074; FR-OP-030 to 041; FR-NB-081, FR-NB-100; FR-CM-022'
+  module: 'opsledger InsurerFileInbox; FileDropPort; prodrecon, remittance, commission, renewal, acsl, issuance, brokerclaims'
+  type: INT
+  req: 'Insurer files are received and sent automatically: production feedback, remittance ORs, DP billing responses, renewal responses, SOAs, e-policies, claims.'
+  built: 'Users upload and download the files on the screens; the InsurerFileInbox port has no inbox by default. Proposed: an adapter per channel (SFTP to S3, API) and outbound drops once BDOI names the insurers and channels.'
+  reason: 'IQ18, Q06, OQ22, OQ29, CLQ17 open.'
+  impact: 'Manual upload and e-mail with insurers until the channels exist.'
+  depts: 'Operations; Processing; Claims; Comptrollership (ACSL); BDOI IT'
+  eff: [3, 12, 6, 2]
+  prio: Medium
+  status: DRAFT
+  owner: IT
+  xref: 'IQ18; Q06; OQ22; OQ29; CLQ17'
+  target: D2
+  src: 'PROGRAMME_ALIGNMENT 5 (INT-19); FRS BRD-2 section 1.6 (PRCID.009); FRS BRD-1 section 10.4 (BRNB.071, 073)'
+- id: CR-0044
+  drop: Drop 2
+  brd: BRD-00
+  ref: 'Drop plan INT-16 EDP - Data Ingestion (SD 11)'
+  fr: 'FRS BRD-00 integration and data flow'
+  module: 'integration (extracts to an S3 drop or change-data capture)'
+  type: INT
+  req: 'BIBS data is ingested by the BDO Enterprise Data Platform. No BRD specifies the data, frequency or format.'
+  built: 'Kafka integration events (9 topics) and report exports only. Proposed: daily extracts to an S3 drop per SD 11, with masking rules. Not built.'
+  reason: 'IQ15 open ("SD 11" not explained).'
+  impact: 'Group analytics receives BIBS data.'
+  depts: 'BDOI IT; MIS'
+  eff: [3, 10, 5, 2]
+  prio: Medium
+  status: DRAFT
+  owner: IT
+  xref: 'DCR-233; IQ15'
+  target: D2
+  src: 'PROGRAMME_ALIGNMENT 5 (INT-16)'
+- id: CR-0045
+  drop: Drop 2
+  brd: BRD-00
+  ref: 'Drop plan INT-18 CARMS'
+  fr: 'None'
+  module: 'To confirm'
+  type: INT
+  req: 'The drop plan names CARMS for Drop 2 without a description.'
+  built: 'Not built; purpose, data and direction unknown. Analysis only until BDOI explains it; the build becomes its own CR.'
+  reason: 'IQ17 open.'
+  impact: 'Unknown.'
+  depts: 'BDOI IT'
+  eff: [2, 0, 0, 1]
+  prio: Low
+  status: DRAFT
+  owner: IT
+  xref: 'IQ17'
+  target: ANS
+  src: 'PROGRAMME_ALIGNMENT 5 (INT-18)'
+- id: CR-0046
+  drop: Drop 0
+  brd: BRD-00
+  ref: 'Drop plan INT-12 ECM; decision D9 (final issued records archived to ECM)'
+  fr: 'FRS BRD-00 document generation'
+  module: 'attachment and docgen archive transfer; migration archive (legacy documents)'
+  type: INT
+  req: 'ECM is named as a Drop 0 integration; BDOI answer A4 places every document in S3.'
+  built: 'Documents live in S3 (CR-0028). Proposed: transfer of final issued records to ECM and, if ECM holds them, legacy documents into the archive. Not built.'
+  reason: 'IQ13 open; D9.'
+  impact: 'Records management follows the BDO ECM policy.'
+  depts: 'BDOI IT; Compliance'
+  eff: [2, 5, 3, 1]
+  prio: Medium
+  status: DRAFT
+  owner: IT
+  xref: 'IQ13; D9'
+  target: W2
+  src: 'PROGRAMME_ALIGNMENT 5 (INT-12); BDOI_CROSS_BRD_DECISIONS D9'
+- id: CR-0047
+  drop: Drop 0
+  brd: BRD-00
+  ref: 'Drop plan INT-13 CCM (e-mail sending); every BRD that sends e-mail or protected documents'
+  fr: 'FR-NB-013; FR-RN (letters); messaging'
+  module: 'messaging (MailTransport, outbox, MAIL_DISPATCH)'
+  type: INT
+  req: 'All outbound e-mail goes through CCM.'
+  built: 'SMTP transport and outbox are built. Proposed: SMTP relay to CCM (configuration); an API adapter with delivery status only if CCM requires it.'
+  reason: 'IQ11 open (SMTP or API, attachment limit, bounces).'
+  impact: 'Renewal advices and protected PDFs leave through the BDO mail platform.'
+  depts: 'BDOI IT; Marketing; Processing'
+  eff: [1, 2, 2, 0]
+  prio: Medium
+  status: DRAFT
+  owner: IT
+  xref: 'IQ11'
+  target: W2
+  src: 'PROGRAMME_ALIGNMENT 5 (INT-13)'
+# ============================================================== BRD-01 New Business
+- id: CR-0048
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.005 (p.50-51); BRNB.014 (p.56)'
+  fr: 'FR-NB-014, FR-NB-051'
+  module: 'nonpackage (Proposal Requests); quotation (approval)'
+  type: DIFF
+  req: 'Multi-level approval TL, TH, UH.'
+  built: 'One approval stage per document; the approver permission decides who approves.'
+  reason: 'Q05 open (approval chain).'
+  impact: 'Fewer approval hops; a chain needs a CR if BDOI requires it.'
+  depts: 'Marketing; TSU'
+  eff: [0, 0, 0, 0]
+  alt: 13
+  prio: Medium
+  status: IMPL
+  xref: 'Q05'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4'
+- id: CR-0049
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.015 (p.56)'
+  fr: 'FR-NB-015'
+  module: 'integration events; outbound feed (parked)'
+  type: INT
+  req: 'Data synchronised with the BDOI tracking systems.'
+  built: 'Internal events only; the external feed is parked until BDOI names the systems.'
+  reason: 'Q08 open.'
+  impact: 'Other BDOI systems do not receive NB data automatically.'
+  depts: 'Marketing; BDOI IT'
+  eff: [2, 5, 3, 1]
+  prio: Low
+  status: DRAFT
+  owner: IT
+  xref: 'Q08'
+  target: ANS
+  src: 'FRS BRD-1 section 10.4'
+- id: CR-0050
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.018 (p.57); Report List #182'
+  fr: 'FR-NB-126; FR-RN-112'
+  module: 'renewal (RNW-LISTING variant, proposed)'
+  type: PARK
+  req: 'Late Renewal Requests Report in New Business.'
+  built: 'Not built. Neither the RN BRD nor the Report List defines it (#182 is a package report). Proposed: a variant of the renewal listing (renewals booked after expiry).'
+  reason: 'Q09, RQ29, XQ09 open.'
+  impact: 'Late renewals are visible in the Renewal status report until then.'
+  depts: 'Marketing; Processing'
+  eff: [1, 2, 2, 1]
+  prio: Low
+  status: DRAFT
+  xref: 'DCR-009; Q09; RQ29; XQ09'
+  target: W2
+  src: 'FRS BRD-1 section 10.4; register DCR-009'
+- id: CR-0051
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.019 (p.58); BRNB.094 (p.5-6)'
+  fr: 'FR-NB-012'
+  module: 'Workflow panel (Void)'
+  type: DIFF
+  req: 'Delete in-process records.'
+  built: 'Void with a reason; records are kept and hidden from standard lists.'
+  reason: 'Audit trail and record retention.'
+  impact: 'Voided records remain available to audit.'
+  depts: 'Marketing; Processing'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'CRQ05'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4'
+- id: CR-0052
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.022 (p.60-61)'
+  fr: 'FR-NB-010'
+  module: 'Workflow panel; History tab'
+  type: DIFF
+  req: 'One status list including "Endorsed".'
+  built: 'Stages of four workflows (client, quotation, proposal, account); endorsements are invoices on a booked account.'
+  reason: 'Q10 (master list of stages).'
+  impact: 'Status reporting reads the workflow stages.'
+  depts: 'Marketing; Processing'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'Q10'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4'
+- id: CR-0053
+  drop: Drop 0
+  brd: BRD-01
+  ref: 'BRNB.023 (p.61); Submitted Policies HLS report; CLPC HLS billing'
+  fr: 'FR-NB-040'
+  module: 'quotation (QuotationRequestSource, job QUOTATION_REQUEST_INTAKE)'
+  type: INT
+  req: 'Quotation requests come directly from HLS with a source check.'
+  built: 'The user uploads the HLS extract; the direct interface is parked. HLS (Drop 0) and LOAS (Drop 2) are one system, HL-LOAS; proposed one interface specification delivered in Drop 0.'
+  reason: 'Q11, IQ07 open.'
+  impact: 'Home-loan quotation requests are uploaded by hand until the interface exists.'
+  depts: 'Marketing (CBG); BDOI IT'
+  eff: [2, 6, 4, 1]
+  prio: Medium
+  status: DRAFT
+  owner: IT
+  xref: 'DCR-216; Q11; IQ07'
+  target: W2
+  src: 'FRS BRD-1 section 10.4; PROGRAMME_ALIGNMENT 5 (INT-04)'
+- id: CR-0054
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.029 (p.68-69); BRNB.063 (p.109-110)'
+  fr: 'FR-NB-041, FR-NB-046'
+  module: 'crm (prospect code); quotation'
+  type: DEC
+  req: 'BRNB.029 requires a client code for a quotation; BRNB.063 allows a quotation without a client code.'
+  built: 'A prospect client code is created automatically at quotation; a confirmed client is required from account creation.'
+  reason: 'Contradiction within BRD-1 resolved by proposal.'
+  impact: 'Walk-in and bank-referred prospects can be quoted.'
+  depts: 'Marketing'
+  eff: [0, 0, 0, 0]
+  prio: Medium
+  status: IMPL
+  xref: 'DCR-001; Q13; Q20'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4; register DCR-001'
+- id: CR-0055
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.031 (p.71-72)'
+  fr: 'FR-NB-124'
+  module: 'Report runner (Print)'
+  type: DIFF
+  req: 'Print on A4 or Letter; summary or detail.'
+  built: 'A4 only; summary and detail are separate reports.'
+  reason: 'BDO document template is A4.'
+  impact: 'Letter-size printing not offered.'
+  depts: 'Marketing; Processing'
+  eff: [0, 0, 0, 0]
+  alt: 2
+  prio: Low
+  status: IMPL
+  xref: '-'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4'
+- id: CR-0056
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.032 (p.72-73)'
+  fr: 'FR-NB-033, FR-NB-063'
+  module: 'crm (duplicate check); account'
+  type: DIFF
+  req: 'Account duplicates checked by e-mail, phone and ID.'
+  built: 'Clients are checked on identity keys (TIN, ID, name with birth date; e-mail and mobile warn); accounts on vehicle and location keys.'
+  reason: 'Duplicate rules per record type.'
+  impact: 'Fewer false duplicates on accounts of the same client.'
+  depts: 'Marketing'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'DMQ04'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4'
+- id: CR-0057
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.036 (p.77-78)'
+  fr: 'FR-NB-111'
+  module: 'Booking Workbench'
+  type: DIFF
+  req: 'Edit or delete accounts before batch booking.'
+  built: 'Edit the booking date and cost center, remove from the queue, cancel the batch.'
+  reason: 'Account data is fixed once approved for booking.'
+  impact: 'Corrections go back through the account workflow.'
+  depts: 'Processing'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: '-'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4'
+- id: CR-0058
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.041 (p.94); BRNB.073 (p.116-117)'
+  fr: 'FR-NB-040, FR-NB-100'
+  module: 'quotation (request intake); issuance (e-policy upload); mailbox reader (proposed)'
+  type: INT
+  req: 'Requests received by e-mail and e-policies received from insurers are read automatically.'
+  built: 'Requests are captured manually with the e-mail attached; e-policies are uploaded by Processing. Proposed: a mailbox reader through Microsoft Graph (M365 Exchange) if BDOI confirms its role against CCM.'
+  reason: 'Q12, Q31, IQ12 open.'
+  impact: 'Manual capture of e-mailed requests and e-policies.'
+  depts: 'Marketing; Processing; BDOI IT'
+  eff: [2, 8, 4, 1]
+  prio: Medium
+  status: DRAFT
+  owner: IT
+  xref: 'Q12; Q31; IQ12'
+  target: ANS
+  src: 'FRS BRD-1 section 10.4; PROGRAMME_ALIGNMENT 5 (INT-14)'
+- id: CR-0059
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.047, BRNB.065 (p.97-98, p.110-111)'
+  fr: 'FR-NB-035'
+  module: 'Bulk Upload (CLIENT_CREATE)'
+  type: DIFF
+  req: 'Save draft and cancel in bulk updates.'
+  built: 'Review before commit; valid rows are saved directly.'
+  reason: 'Bulk framework design.'
+  impact: 'No draft bulk batches.'
+  depts: 'Marketing'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'Q14'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4'
+- id: CR-0060
+  drop: Programme
+  brd: BRD-01
+  ref: 'BRNB.057 (p.106); Claims dynamic reports (Q40)'
+  fr: 'FR-NB-123; FR-CM-064'
+  module: 'report (saved variants)'
+  type: RED
+  req: 'Users create dynamic reports.'
+  built: 'Saved report variants; no ad-hoc report builder.'
+  reason: 'Q40 open (scope of dynamic reports).'
+  impact: 'New report layouts need a change request (see also CR-0012).'
+  depts: 'Marketing; Claims; all report users'
+  eff: [0, 0, 0, 0]
+  alt: 33
+  prio: Medium
+  status: CCB
+  xref: 'Q40'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4; CLAIMS spec (parked Q40)'
+- id: CR-0061
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.062 (p.109); BRD 2.1.16 reactivate cancelled placements (p.180)'
+  fr: 'FR-NB-085, FR-NB-086'
+  module: 'Placement Workbench (Cancel, Reactivate)'
+  type: DIFF
+  req: 'A cancelled placement returns to the previous workflow; reactivation is in the role matrix without a BRNB ID.'
+  built: 'Stage "Placement cancelled" until reactivated to "Ready for placement"; reactivation built from BRD 2.1.16.'
+  reason: 'DCR-002 (no BRNB ID); Q25.'
+  impact: 'Cancelled placements are visible until reactivated.'
+  depts: 'Processing'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'DCR-002; Q25'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4 and traceability'
+- id: CR-0062
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.067 (p.114-115); BRNB.068 (p.115)'
+  fr: 'FR-NB-090, FR-NB-091'
+  module: 'CLPC Billing; cashiering PAY_CLPC'
+  type: INT
+  req: 'The billing file is forwarded to CLPC automatically; QPS reference used.'
+  built: 'The user downloads the billing file and uploads the payment report; the ARN replaces the QPS reference. Proposed: automated transfer once LMS / HL-LOAS layouts and transport are given.'
+  reason: 'Q28, IQ06 open.'
+  impact: 'Manual file hand-over with CLPC.'
+  depts: 'Processing; Operations (Cashiering); BDOI IT'
+  eff: [2, 5, 3, 1]
+  prio: Medium
+  status: DRAFT
+  owner: IT
+  xref: 'Q28; IQ06; DCR-027'
+  target: W2
+  src: 'FRS BRD-1 section 10.4; PROGRAMME_ALIGNMENT 5 (INT-03)'
+- id: CR-0063
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.072 (p.116); BRNB.103 (p.10-11)'
+  fr: 'FR-NB-082, FR-NB-083'
+  module: 'Account Placement (Hold Cover panel)'
+  type: DIFF
+  req: 'The hold cover request is sent automatically.'
+  built: 'Sent when Processing clicks Request Hold Cover.'
+  reason: 'Q27 open (accounts needing an automatic hold cover).'
+  impact: 'One click per hold cover.'
+  depts: 'Processing'
+  eff: [0, 0, 0, 0]
+  alt: 7
+  prio: Low
+  status: IMPL
+  xref: 'Q27'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4'
+- id: CR-0064
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.075 (p.117-118)'
+  fr: 'FR-NB-122'
+  module: 'New Business Reports (Placement Summary)'
+  type: DIFF
+  req: 'Production per system; QPS placement report.'
+  built: 'Production per region, department, team and officer; Placement Summary.'
+  reason: 'QPS is replaced by BIBS.'
+  impact: 'None.'
+  depts: 'Marketing'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: '-'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4'
+- id: CR-0065
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.080 (p.120)'
+  fr: 'FR-NB-011'
+  module: 'My Work'
+  type: DIFF
+  req: 'Assign and re-assign workload.'
+  built: 'Manual claim and assignment; no automatic allocation.'
+  reason: 'No allocation rule given in the BRD.'
+  impact: 'Team leads assign work by hand.'
+  depts: 'Marketing; Processing'
+  eff: [0, 0, 0, 0]
+  alt: 12
+  prio: Low
+  status: IMPL
+  xref: '-'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4'
+- id: CR-0066
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.083 (p.121)'
+  fr: 'FR-NB-132'
+  module: 'Lists of Values (Broking Setup)'
+  type: DIFF
+  req: 'Delete LOVs.'
+  built: 'Values are deactivated, never deleted.'
+  reason: 'Historical records keep their values.'
+  impact: 'None.'
+  depts: 'MBS; System Administrator'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: '-'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4'
+- id: CR-0067
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.091 (p.4)'
+  fr: 'FR-NB-036'
+  module: 'Client page (Tags & Instructions)'
+  type: PARK
+  req: 'Tags and instructions are enforced.'
+  built: 'Banner only (warn); blocking is parked until BDOI lists the tags that block.'
+  reason: 'Q18 open.'
+  impact: 'Users can proceed past a tag after the warning.'
+  depts: 'Marketing; Compliance'
+  eff: [1, 3, 2, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'Q18'
+  target: ANS
+  src: 'FRS BRD-1 section 10.4'
+- id: CR-0068
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.092 (p.5)'
+  fr: 'FR-NB-020'
+  module: 'Data governance register (proposed)'
+  type: PARK
+  req: 'Authoritative source per data element.'
+  built: 'Register not built.'
+  reason: 'Q37 open.'
+  impact: 'Source of truth per data element is documented outside BIBS.'
+  depts: 'Business Project Services; MIS'
+  eff: [2, 4, 2, 1]
+  prio: Low
+  status: DRAFT
+  xref: 'Q37'
+  target: ANS
+  src: 'FRS BRD-1 section 10.4 and traceability (PARKED)'
+- id: CR-0069
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.097 (p.6-7); BRRN.033 (p.10); BRID-022.01; BRIDSP-26, 27'
+  fr: 'FR-NB-119; FR-RN; FR-EB-061; FR-SP'
+  module: 'account (business type, V822); booking; nbreport filters'
+  type: DEC
+  req: 'NB and Renewal classification per transaction, from creation to the invoice and as a report filter (four BRDs).'
+  built: 'Built once as work item BT0: business type on the account, carried to the invoice and used as a report filter; NB booking stamps New Business.'
+  reason: 'Decision D1.'
+  impact: 'Production reports split NB and Renewal consistently.'
+  depts: 'Marketing; Processing; Comptrollership'
+  eff: [0, 0, 0, 0]
+  prio: Medium
+  status: IMPL
+  xref: 'DCR-010; D1; BT0'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4; BDOI_CROSS_BRD_DECISIONS D1, 6.1'
+- id: CR-0070
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.099 (p.8)'
+  fr: 'FR-NB-037'
+  module: 'crm (prospects)'
+  type: PARK
+  req: 'Leads management.'
+  built: 'Prospects only; leads management is parked.'
+  reason: 'Q19 open.'
+  impact: 'Leads are tracked outside BIBS.'
+  depts: 'Marketing'
+  eff: [2, 8, 4, 1]
+  prio: Low
+  status: DRAFT
+  xref: 'Q19'
+  target: ANS
+  src: 'FRS BRD-1 section 10.4'
+- id: CR-0071
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.104 (p.11); BRIDSP-02 (p.8)'
+  fr: 'FR-NB-101; FR-SP-002'
+  module: 'issuance (PolicyDataExtractor, OcrEngine port); submitted intake'
+  type: PARK
+  req: 'Extraction from uploaded documents, including scanned submitted policies.'
+  built: 'Text PDFs are extracted; OCR of scanned documents is parked behind the OcrEngine port.'
+  reason: 'Q24 open (documents to extract; OCR).'
+  impact: 'Scanned documents are keyed by the user.'
+  depts: 'Processing; Submitted Policies'
+  eff: [2, 8, 5, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'Q24'
+  target: ANS
+  src: 'FRS BRD-1 section 10.4; FRS BRD-12 scope'
+- id: CR-0072
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.107 (p.12-13); PMADD07, PMADD08 (p.5-6)'
+  fr: 'FR-NB-118; FR-PM-080'
+  module: 'booking (incentive indicator); catalog (incentive criteria)'
+  type: DIFF
+  req: 'Incentive indicator on booking.'
+  built: 'The indicator comes from the BRD-3 incentive criteria on the products matrix; the booking incentive rules are frozen.'
+  reason: 'One incentive master (DCR-037).'
+  impact: 'Incentive criteria maintained once by MBS.'
+  depts: 'Processing; MBS'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'DCR-037'
+  target: FRS
+  src: 'FRS BRD-1 section 10.4; BDOI_PM_BRD_SPEC section 3'
+- id: CR-0073
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'BRNB.040, BRNB.087 (p.93-94, p.122); BRD-11 NFR (p.13-14, 17); BRD-4, BRD-7 NFR (Windows credentials); BRCSF-001 (p.6)'
+  fr: 'FR-UA-003; FR-NB-130; FR-CM-001; FR-CSF-001'
+  module: 'security (login); frontend login page'
+  type: INT
+  req: 'Sign-in with the BDO profile: Windows ID through BDO EUA, LDAP / AD or SSO.'
+  built: 'Local sign-in with the DirectoryAuthenticator port (password bind) parked. BDOI named EIAM on Microsoft Entra ID: proposed OpenID Connect sign-in (authorisation code with PKCE), identity mapped to the BIBS user, roles kept in BIBS, local sign-in kept for a break-glass administrator. The OIDC flow is not built.'
+  reason: 'Decision D6; drop plan Drop 0 (EIAM); IQ04 open.'
+  impact: 'Single sign-on for all internal users; password, MFA and lock-out move to Entra ID.'
+  depts: 'All departments; ITIO; BDOI IT'
+  eff: [3, 12, 6, 2]
+  prio: High
+  status: DRAFT
+  owner: BRD-11
+  xref: 'DCR-143; DCR-230; D6; IQ04; Q42; UQ04'
+  target: W1
+  src: 'FRS BRD-11 v1.1 (FR-UA-003); FRS BRD-1 section 10.4; PROGRAMME_ALIGNMENT 5 (INT-01)'
+- id: CR-0074
+  drop: Drop 1
+  brd: BRD-01
+  ref: 'Drop plan item 1.U6 (EB placement in Drop 1); BRD-8 in Drop 2'
+  fr: 'FR-EB-046, FR-EB-051; FR-NB (placement)'
+  module: 'placement (Placement Workbench) for EB programmes'
+  type: DEC
+  req: 'EB placement and EB upstream reports are in Drop 1 while the EB module is in Drop 2.'
+  built: 'Proposed: EB programmes are placed through the NB placement screens in Drop 1; each Report List item goes with the drop of its owning module.'
+  reason: 'IQ22 open.'
+  impact: 'EB placement is tested with NB in Drop 1.'
+  depts: 'Employee Benefits; Processing'
+  eff: [1, 0, 1, 1]
+  prio: Low
+  status: CCB
+  owner: BRD-08
+  xref: 'DCR-235; IQ22'
+  target: FRS
+  src: 'PROGRAMME_ALIGNMENT 2.2 item 8'
+# ============================================================== BRD-02 Operations
+- id: CR-0075
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'BRQID.003 (p.17)'
+  fr: 'FR-OP-003'
+  module: 'Operations home'
+  type: DIFF
+  req: 'Users customise or filter the Operations sections.'
+  built: 'Sections are filtered by role; personal pin or hide of sections is not built.'
+  reason: 'Role menus meet the access need.'
+  impact: 'Users cannot hide sections they do not use.'
+  depts: 'Operations'
+  eff: [0, 0, 0, 0]
+  alt: 3
+  prio: Low
+  status: IMPL
+  xref: '-'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6'
+- id: CR-0076
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'RMTID.040 (p.69-70)'
+  fr: 'FR-OP (remittance locks)'
+  module: 'opsledger (invoice locks)'
+  type: PARK
+  req: 'Lock the invoice while it is "still with Comptrollership".'
+  built: 'Remittance and Adjustment locks are built; no Comptrollership lock until BDOI names the activity.'
+  reason: 'OQ28 open.'
+  impact: 'An invoice under Comptrollership review can still be adjusted.'
+  depts: 'Operations; Comptrollership'
+  eff: [1, 2, 1, 0]
+  prio: Medium
+  status: DRAFT
+  xref: 'OQ28'
+  target: ANS
+  src: 'FRS BRD-2 section 1.6'
+- id: CR-0077
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'MKTID.001 (p.70-71); RMTID.016 (p.57-58)'
+  fr: 'FR-OP (remittance schedule)'
+  module: 'remittance (batch schedule)'
+  type: DIFF
+  req: 'Marketing initiates the request to send the schedule.'
+  built: 'The Remittance processor sends the approved schedule from the batch, once.'
+  reason: 'OQ22.'
+  impact: 'Marketing no longer triggers the schedule.'
+  depts: 'Operations (Remittance); Marketing'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'OQ22'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6'
+- id: CR-0078
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'RMTID.002 (p.50); Addendum 1 (p.4-5)'
+  fr: 'FR-OP (remittance extraction)'
+  module: 'remittance (extraction review)'
+  type: DEC
+  req: 'Main BRD: edit the extracted file online and push it with or without edits.'
+  built: 'Addendum 1 governs: rows are excluded and restored with a reason; financial fields cannot be edited.'
+  reason: 'Operations Addendum 1 (DCR-011 answered).'
+  impact: 'No editing of financial data in the remittance file.'
+  depts: 'Operations (Remittance)'
+  eff: [0, 0, 0, 0]
+  prio: Medium
+  status: IMPL
+  xref: 'DCR-011'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6; register DCR-011'
+- id: CR-0079
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'CSHID.001-005 (p.23-28)'
+  fr: 'FR-OP (receipt cancellation and reinstatement)'
+  module: 'cashiering (OPS_RECEIPT_ACTION workflow)'
+  type: ADD
+  req: 'Cancellation and reinstatement of receipts without a stated approver.'
+  built: 'A cancellation or reinstatement is a request approved by a Cashiering TL / TH (four eyes) before it posts.'
+  reason: 'OQ06; control over receipts.'
+  impact: 'One more approval step per cancellation.'
+  depts: 'Operations (Cashiering)'
+  eff: [0, 0, 0, 0]
+  prio: Medium
+  status: IMPL
+  xref: 'OQ06'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6'
+- id: CR-0080
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'CSHID.007 (p.29)'
+  fr: 'FR-OP (OR issue)'
+  module: 'cashiering; remittance'
+  type: DIFF
+  req: 'One OR per remittance batch, or per payment unless consolidated.'
+  built: 'Remittance approval issues one commission OR per batch; the Collection upload issues one OR per insurer, certificate and payment.'
+  reason: 'OQ49.'
+  impact: 'OR count follows batch and insurer.'
+  depts: 'Operations (Cashiering); Comptrollership'
+  eff: [0, 0, 0, 0]
+  prio: Medium
+  status: IMPL
+  xref: 'OQ49'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6'
+- id: CR-0081
+  drop: Drop 0
+  brd: BRD-02
+  ref: 'CSHID.008 (p.29-32); DIS 2.22.0 (p.93); DIS 2.16.1 (p.88)'
+  fr: 'FR-OP-015; FR-DS (bank uploads, DCTF)'
+  module: 'cashiering (PAY_BILLS, PAY_TRADE, PAY_CLPC, PAY_PDC, PAY_DIRECT_CREDIT, layout table); disbursement (DCTF, DISB_BOB_APPROVED)'
+  type: INT
+  req: 'Payment files are encrypted and cannot be edited; Trade, CLPC and Direct Credit run by IT. Drop plan: OBPCS, Old BOB, PMS, TFS, AFTS and CMS / New BOB channels.'
+  built: 'Operations users upload the files; each file is stored read-only with its SHA-256 and a duplicate is refused; layouts are configurable. Disbursement uses a minimal CSV for bank uploads and a DCTF without trailer. Proposed: layouts per channel in the layout table, the CMS / New BOB outward file in Disbursement, automated transfer where BDO IT offers it; AFTS purpose to confirm.'
+  reason: 'OQ03, OQ04, AQ09, IQ09, IQ10, IQ14 open.'
+  impact: 'Bank files handled by upload until the layouts and transport are given.'
+  depts: 'Operations (Cashiering); Comptrollership (Disbursement); BDOI IT'
+  eff: [3, 10, 6, 1]
+  prio: High
+  status: DRAFT
+  owner: IT
+  xref: 'DCR-234; OQ03; OQ04; AQ09; IQ09; IQ10; IQ14'
+  target: W2
+  src: 'FRS BRD-2 section 1.6; FRS BRD-5 Vol.2 section 1.7; PROGRAMME_ALIGNMENT 5 (INT-06 to INT-10)'
+- id: CR-0082
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'CSHID.016 (p.37-38); ADJID.026'
+  fr: 'FR-OP (minimal balance sweep)'
+  module: 'cashiering (MinimalBalanceService); adjustment'
+  type: DIFF
+  req: 'PR up to 10.00 reversed; file 10.00-100.00 written off (10.00 in both ranges).'
+  built: 'The sweep skips an invoice already written off by the file, so a balance is never reversed twice.'
+  reason: 'OQ11.'
+  impact: 'No double reversal at 10.00.'
+  depts: 'Operations; Comptrollership'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'OQ11'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6'
+- id: CR-0083
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'RMTID.005 (p.52)'
+  fr: 'FR-OP (extraction queue)'
+  module: 'remittance (evening extraction)'
+  type: DIFF
+  req: 'Trigger extraction at end of day "if payment application is searched".'
+  built: 'A user queues the searched invoice for the evening extraction run.'
+  reason: 'OQ18.'
+  impact: 'None.'
+  depts: 'Operations (Remittance)'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'OQ18'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6'
+- id: CR-0084
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'RMTID.014 (p.56-57)'
+  fr: 'FR-OP (remittance extraction rules)'
+  module: 'remittance (parameter for paid AR above the DTIP balance)'
+  type: PARK
+  req: 'Expected result: remit the DTIP balance; acceptance criteria: flag and exclude.'
+  built: 'Excluded by default (EXCLUDE); CAP remits the DTIP balance only. BDOI chooses the setting.'
+  reason: 'OQ19 open; register priority item DCR-015.'
+  impact: 'Remittance to insurers withheld or capped when the paid AR exceeds the DTIP balance.'
+  depts: 'Operations (Remittance); Comptrollership'
+  eff: [0, 0, 1, 0]
+  prio: High
+  status: CCB
+  xref: 'DCR-015; OQ19'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6; register priority list'
+- id: CR-0085
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'RMTID.016 (p.57-58)'
+  fr: 'FR-OP (OR comparison)'
+  module: 'remittance (insurer OR comparison)'
+  type: PARK
+  req: 'Compare the insurer OR amount with the paid PR.'
+  built: 'Exact comparison per invoice; no tolerance until BDOI gives one.'
+  reason: 'OQ22 open.'
+  impact: 'Small differences are flagged for manual review.'
+  depts: 'Operations (Remittance)'
+  eff: [0, 1, 1, 0]
+  prio: Low
+  status: DRAFT
+  xref: 'OQ22'
+  target: ANS
+  src: 'FRS BRD-2 section 1.6'
+- id: CR-0086
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'RMTID.017 (p.58-59); RMTID.019 (p.59-60)'
+  fr: 'FR-OP (remittance eligibility, statuses)'
+  module: 'remittance; opsledger (payment and remittance status)'
+  type: DIFF
+  req: 'Checks at least 3 banking days old and cleared; eight statuses that mix payment and remittance states.'
+  built: 'Banking days counted from the last applied value date on the BDOI banking-day calendar, cleared status from the payment application; the invoice keeps a payment status and a remittance status, and the batch has its own stages.'
+  reason: 'OQ20, OQ21.'
+  impact: 'Status reports show two statuses per invoice.'
+  depts: 'Operations'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'OQ20; OQ21'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6'
+- id: CR-0087
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'PRCID.002 (p.79); PRCID.030 (p.85)'
+  fr: 'FR-OP-070 to FR-OP-074'
+  module: 'prodrecon (Reconciliation Workbench)'
+  type: ADD
+  req: 'Only the Remarks column is editable; four reconciliation statuses.'
+  built: 'Remarks and Incentive columns and 200 blank rows are editable so the insurer can add unbooked production; a fifth status BDOI_ONLY marks booked accounts the insurer did not return.'
+  reason: 'PRCID.022; analysis R6 5.1.'
+  impact: 'Unbooked production is captured in the same file.'
+  depts: 'Operations (Production Reconciliation)'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'PRCID.022'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6'
+- id: CR-0088
+  drop: Drop 2
+  brd: BRD-02
+  ref: 'PRCID.014, PRCID.021 (p.82); Annex IV #5'
+  fr: 'FR-OP-070 to FR-OP-074'
+  module: 'prodrecon (filters, production register)'
+  type: RED
+  req: 'Filter by BDOI location; Sum Insured on the production register.'
+  built: 'Items filter by AO, sales unit, segment and product line; the location filter is on the reports only. Sum Insured is left out: the invoice ledger does not hold it.'
+  reason: 'Data not held in the invoice ledger.'
+  impact: 'Sum Insured read from the account when needed.'
+  depts: 'Operations (Production Reconciliation)'
+  eff: [0, 0, 0, 0]
+  alt: 4
+  prio: Low
+  status: IMPL
+  xref: '-'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6'
+- id: CR-0089
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'ADJID.001 (p.89); ADJID.008 (p.92-93)'
+  fr: 'FR-OP-050 to FR-OP-055'
+  module: 'adjustment (Adjustment Workbench)'
+  type: DIFF
+  req: 'Multiple accounts in one transaction; prompt the AO to prepare a quotation.'
+  built: 'One request per invoice; the wizard and the upload raise several requests at once. A hand-off to Marketing; the quotation number is linked on the request by reference.'
+  reason: 'Analysis R6 4.1.'
+  impact: 'Approvals are per invoice.'
+  depts: 'Operations (Adjustment); Marketing'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: '-'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6'
+- id: CR-0090
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'ADJID.003 (p.90)'
+  fr: 'FR-OP-052'
+  module: 'adjustment; booking (non-financial endorsement)'
+  type: DIFF
+  req: 'Marketing updates the account through a non-financial endorsement.'
+  built: 'Booking records the non-financial endorsement with its description; the account data are not changed.'
+  reason: 'OQ32 open (endorsement ownership).'
+  impact: 'Account fields are corrected through the account workflow.'
+  depts: 'Marketing; Operations'
+  eff: [0, 0, 0, 0]
+  alt: 8
+  prio: Medium
+  status: IMPL
+  xref: 'OQ32'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6'
+- id: CR-0091
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'MKTID.012 (p.75-76)'
+  fr: 'FR-OP (DP PR reversal)'
+  module: 'commission (DpPostings); parameter DP_PR_REVERSAL_POSTING'
+  type: DIFF
+  req: 'Auto-reverse the DP premium receivable.'
+  built: 'The ledger reversal is always recorded; its GL entry is off because booking posts no PR for DP invoices.'
+  reason: 'OQ07 (chart and default entries).'
+  impact: 'No GL entry for a PR that was never posted.'
+  depts: 'Operations (Commission); Comptrollership'
+  eff: [0, 0, 0, 0]
+  prio: Medium
+  status: IMPL
+  xref: 'OQ07'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6'
+- id: CR-0092
+  drop: Drop 1
+  brd: BRD-03
+  ref: 'PMADD07, PMADD08 (p.5-6); DIS 3.29.1, 3.29.2 (Add. p.7-9); CMRID.005, 006 (p.108-109); BRCLXN.061-064'
+  fr: 'FR-PM-080; FR-OP-095; FR-DS (CPC2); FR-CL (incentives)'
+  module: 'catalog (incentive criteria); remittance (CPC2, early incentive); commission (schemes)'
+  type: DEC
+  req: 'Incentives are specified in four BRDs: criteria on the products matrix (BRD-3), CPC2 and early incentive (BRD-5), No Touch, Top Up and Motor Mania (BRD-2), incentive receivables (BRD-4 draft).'
+  built: 'Criteria kept once in Product Maintenance; CPC2 and early incentive computed in Remittance; schemes in Commission reference the criteria. The scheme engine is built; schemes stay inactive until BDOI gives targets, amounts and the CPC2 base and VAT treatment.'
+  reason: 'DCR-037 proposal; OQ39, AQ24, PQ04, Q33 open.'
+  impact: 'Incentive income not computed until the schemes are set up.'
+  depts: 'MBS; Operations (Remittance, Commission); Comptrollership'
+  eff: [2, 2, 3, 1]
+  prio: High
+  status: CCB
+  xref: 'DCR-037; OQ39; AQ24; PQ04; Q33'
+  target: ANS
+  src: 'Register DCR-037; FRS BRD-2 section 1.6; FRS BRD-5 Vol.2 section 1.7'
+- id: CR-0093
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'BRQID.004 (p.18); CSHID.009; MKTID.010, 013; CMRID.001; DBMID.001 (p.46); RMTID.034; MKTID.009 (p.74)'
+  fr: 'FR-OP-130 to FR-OP-132'
+  module: 'opsledger ports (CollectionFeed, DisbursementGateway, ClaimsFeed, MarketingFeed)'
+  type: DEC
+  req: 'Operations integrates with Collection, Accounting, Disbursement, Marketing and Claims as other systems.'
+  built: 'Collections, Disbursement, FRBS and Claims are BIBS modules; Operations uses in-app ports. The claims condition of a special remittance is confirmed through the Claims feed.'
+  reason: 'DCR-022 answered by BRD-4, BRD-5 and BRD-7.'
+  impact: 'No file interfaces between these functions.'
+  depts: 'Operations; Collections; Comptrollership; Claims'
+  eff: [0, 0, 0, 0]
+  prio: Medium
+  status: IMPL
+  xref: 'DCR-022; OQ01; OQ02; OQ45; OQ46'
+  target: FRS
+  src: 'FRS BRD-2 section 1.6; register DCR-022'
+- id: CR-0094
+  drop: Drop 1
+  brd: BRD-02
+  ref: 'BRNB.067 (p.114-115), 068 (p.115), 076 (p.118), 081 (p.120), 094 (p.5-6), 114 (p.17); CSHID.008 (p.29-32); ADJID.001 (p.89), 003 (p.90), 011 (p.94)'
+  fr: 'FR-NB-090, FR-NB-116; FR-OP-015; FR-OP-050'
+  module: 'cashiering; adjustment; placement'
+  type: DEC
+  req: 'The same functions are specified in BRD-1 and BRD-2: CLPC payment matching, endorsements and cancellation, DP tagging.'
+  built: 'Cashiering is the single payment intake and placement reads its result; Adjustment owns endorsements and cancellations after booking; Marketing raises the request.'
+  reason: 'Conflict between BRDs resolved by proposal.'
+  impact: 'One place for each function.'
+  depts: 'Marketing; Processing; Operations'
+  eff: [0, 0, 0, 0]
+  prio: High
+  status: IMPL
+  xref: 'DCR-027'
+  target: FRS
+  src: 'Register DCR-027'
+# ============================================================== BRD-03 Product Maintenance
+- id: CR-0095
+  drop: Drop 0
+  brd: BRD-03
+  ref: 'BRD revision log of 27-Oct-2025 (p.11); April 2026 addendum'
+  fr: 'FRS BRD-3 section 1.2 (out of scope)'
+  module: 'catalog; productmaint'
+  type: RED
+  req: 'Maintenance of non-package products.'
+  built: 'Out of this phase: the revision log moved it to an addendum and the April 2026 addendum does not add it.'
+  reason: 'PQ19 open.'
+  impact: 'Non-package products keep today''s set-up in the catalog without the package request workflow.'
+  depts: 'MBS; TSU'
+  eff: [0, 0, 0, 1]
+  alt: 15
+  prio: Medium
+  status: CCB
+  xref: 'PQ19'
+  target: FRS
+  src: 'FRS BRD-3 section 1.2'
+- id: CR-0096
+  drop: Drop 0
+  brd: BRD-03
+  ref: 'BRPM.022 (p.31)'
+  fr: 'FR-PM-081; FR-CR-063'
+  module: 'productmaint (ProductMasterFeed port, logs only)'
+  type: INT
+  req: 'Product master changes synchronised with BDOI tracking systems and repositories.'
+  built: 'The port logs each change; transport to other BDOI systems is parked.'
+  reason: 'PQ16 open.'
+  impact: 'Other systems do not receive product changes automatically.'
+  depts: 'MBS; BDOI IT'
+  eff: [1, 3, 2, 1]
+  prio: Low
+  status: DRAFT
+  owner: IT
+  xref: 'PQ16'
+  target: ANS
+  src: 'FRS BRD-3 section 1.2 and interfaces'
+- id: CR-0097
+  drop: Drop 0
+  brd: BRD-03
+  ref: 'PMADD07, PMADD08 (p.5-6)'
+  fr: 'FR-PM-080'
+  module: 'catalog (incentive criteria)'
+  type: RED
+  req: 'Incentive criteria on the products matrix, "i.e. CPC2".'
+  built: 'Criteria only; computation and payout of incentives are out of BRD-3 (they run in Remittance and Commission, CR-0092).'
+  reason: 'Q33.'
+  impact: 'None beyond CR-0092.'
+  depts: 'MBS'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'Q33; DCR-037'
+  target: FRS
+  src: 'FRS BRD-3 section 1.2'
+# ============================================================== BRD-04 Collections
+- id: CR-0098
+  drop: Drop 1
+  brd: BRD-04
+  ref: 'BRCLXN.013-015 (p.27 / p.47)'
+  fr: 'FR-CL (daily refresh)'
+  module: 'collections (job CLX_DAILY_REFRESH)'
+  type: DIFF
+  req: 'Daily batch extracts all data from EBIX after the 22:00 EOD.'
+  built: 'EBIX is replaced by BIBS booking: the job reads the BIBS invoice ledger at 22:15 and the balance of a listed account is also refreshed after each payment.'
+  reason: 'EBIX replaced by BIBS.'
+  impact: 'Collectors see balances updated during the day.'
+  depts: 'Collections'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'CQ07'
+  target: FRS
+  src: 'FRS BRD-4 section 1.6'
+- id: CR-0099
+  drop: Drop 1
+  brd: BRD-04
+  ref: 'BRCLXN.010 (p.27 / p.47); BRCLXN.011 (p.27)'
+  fr: 'FR-CL (worklist rules)'
+  module: 'collections (Outstanding PR worklist, Credit Balances tab); Collections Setup'
+  type: DIFF
+  req: 'Exclude negative balances of transaction type C; filter by Unit Head.'
+  built: 'Negatives of cancellations and return invoices are never listed; other negatives are kept on a Credit Balances tab. The Unit Head is the head of the invoice''s sales unit, maintained on Collections Setup.'
+  reason: 'CQ04, CQ05.'
+  impact: 'Credit balances are visible for follow-up.'
+  depts: 'Collections'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'CQ04; CQ05'
+  target: FRS
+  src: 'FRS BRD-4 section 1.6'
+- id: CR-0100
+  drop: Drop 1
+  brd: BRD-04
+  ref: 'BRCLXN.012 (p.27 / p.47)'
+  fr: 'FR-CL (data scope)'
+  module: 'collections (worklist filters)'
+  type: PARK
+  req: 'Show only the accounts of the selected segment and Unit Head.'
+  built: 'Server-side filters; no default data scope per user: every CLX_VIEW user sees every account and filters.'
+  reason: 'CQ06 open (CSF users see all accounts; other roles open).'
+  impact: 'Collectors see accounts outside their segment.'
+  depts: 'Collections; Compliance'
+  eff: [1, 3, 2, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'CQ06'
+  target: ANS
+  src: 'FRS BRD-4 section 1.6'
+- id: CR-0101
+  drop: Drop 1
+  brd: BRD-04
+  ref: 'BRCLXN.024, 026 (p.28-29 / p.48); BRCLXN.030, 032 (p.29)'
+  fr: 'FR-CL (hand-offs)'
+  module: 'collections (hand-offs to Commission and Cashiering); cashiering (Incoming Requests)'
+  type: ADD
+  req: 'A monthly batch "generates the file"; request application of payment.'
+  built: 'The file is also a hand-off: a DP PR disposition goes at once to the Commission DP list, a PR 2307 disposition to Cashiering''s 2307 intake; the monthly file is the audit copy. Application requests go to Cashiering''s Incoming Requests and the Operations disposition workflow.'
+  reason: 'OQ15, OQ16, OQ38.'
+  impact: 'Faster reversal and application.'
+  depts: 'Collections; Operations'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'OQ15; OQ16; OQ38'
+  target: FRS
+  src: 'FRS BRD-4 section 1.6'
+- id: CR-0102
+  drop: Drop 1
+  brd: BRD-04
+  ref: 'BRCLXN.026 (p.29 / p.48)'
+  fr: 'FR-CL (COLLECTION_CWT2307 hand-off)'
+  module: 'cashiering (2307 intake); alert CLX_OUTBOX_STALE'
+  type: DIFF
+  req: '2307 accounts reach Operations for reversal.'
+  built: 'Cashiering does not yet pull the COLLECTION_CWT2307 hand-offs; they stay pending and the alert CLX_OUTBOX_STALE reports them. Cashiering''s 2307 upload remains the path. Proposed: Cashiering reads the hand-offs.'
+  reason: 'Build sequence (analysis R6 C1-A).'
+  impact: 'Double handling of 2307 accounts until closed.'
+  depts: 'Collections; Operations (Cashiering)'
+  eff: [1, 3, 2, 0]
+  prio: Medium
+  status: DRAFT
+  xref: 'R6 C1-A'
+  target: W1
+  src: 'FRS BRD-4 section 1.6'
+- id: CR-0103
+  drop: Drop 1
+  brd: BRD-04
+  ref: 'BRCLXN.036 (p.31 / p.49)'
+  fr: 'FR-CL (account view columns)'
+  module: 'collections (account view)'
+  type: PARK
+  req: 'UH, AO and bank officer shown as names; booker name; Processing Stage, Business Origin, Client Code Match, System Remarks.'
+  built: 'User names shown for UH and AO; booker and bank officer names, Business Origin and System Remarks are not shown; "Processing Stage" is the Cashiering tab.'
+  reason: 'CQ11 open.'
+  impact: 'Collectors look up the missing fields on the account.'
+  depts: 'Collections'
+  eff: [1, 2, 1, 0]
+  prio: Low
+  status: DRAFT
+  xref: 'CQ11'
+  target: ANS
+  src: 'FRS BRD-4 section 1.6'
+- id: CR-0104
+  drop: Drop 2
+  brd: BRD-04
+  ref: 'BRCLXN.041-042 (p.32 / p.49); BRCLXN.047 (p.33)'
+  fr: 'FR-CL (CLX-APPLICATION-TO-INVOICE)'
+  module: 'collections (job CLX_APPLICATION_FILE, repository folder FS04)'
+  type: INT
+  req: 'Text file loaded to FS04 before 06:00; EBIX invoice number format I########.'
+  built: 'The pipe-delimited file is written at 05:00 to the in-system folder FS04/CLX_APPLICATION_TO_INVOICE; the transport to FS04 is parked. Invoice pattern accepts EBIX and BIBS numbers.'
+  reason: 'OQ17, CQ12, CQ13; keep FS04 only if a downstream system reads it.'
+  impact: 'Downstream readers of FS04 need the transport.'
+  depts: 'Collections; BDOI IT'
+  eff: [1, 2, 2, 0]
+  prio: Low
+  status: DRAFT
+  owner: IT
+  xref: 'DCR-046; OQ17; CQ12; CQ13'
+  target: D2
+  src: 'FRS BRD-4 section 1.6; register DCR-046'
+- id: CR-0105
+  drop: Drop 1
+  brd: BRD-04
+  ref: 'BRCLXN.051 (Add. p.5 / p.17)'
+  fr: 'FR-CL (bulk update)'
+  module: 'collections (worklist bulk actions; upload CLX_BULK_UPDATE)'
+  type: DIFF
+  req: 'Bulk update of several invoices.'
+  built: 'The worklist updates several accounts with a disposition or effort and reassigns them; promises and escalations are recorded in bulk on their screens. The upload records promises and escalations only; its disposition, effort and remarks columns are refused. Proposed: accept those columns in the upload.'
+  reason: 'FRS BRD-4 Gap G1.'
+  impact: 'Dispositions are bulk-updated on screen, not by file.'
+  depts: 'Collections'
+  eff: [1, 3, 2, 1]
+  prio: Low
+  status: DRAFT
+  xref: 'Gap G1 (FRS BRD-4)'
+  target: W2
+  src: 'FRS BRD-4 section 1.6'
+- id: CR-0106
+  drop: Drop 1
+  brd: BRD-04
+  ref: 'BRCLXN.053 (Add. p.5-6); BRCLXN.055 (Add. p.6); BRCLXN.059 (Add. p.7-8)'
+  fr: 'FR-CL (installments, promises, CR billing)'
+  module: 'collections (installment plans, promises); commission (DP billing)'
+  type: DIFF
+  req: 'Installment schedule per account; broken promises per installment; CR billing needs Premium Receivable confirmation.'
+  built: 'Plans made in Collections (policy years, generated or manual); a promise is KEPT, PARTIALLY_KEPT or BROKEN by the payments in the promise window (grace 0 days); Commission bills a DP account after the CRU reviewer confirms it fully paid to the insurer.'
+  reason: 'CQ15, CQ16, OQ38.'
+  impact: 'Installment terms are not taken from the quotation.'
+  depts: 'Collections; Operations (Commission)'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'CQ15; CQ16; OQ38'
+  target: FRS
+  src: 'FRS BRD-4 section 1.6'
+- id: CR-0107
+  drop: Drop 1
+  brd: BRD-04
+  ref: 'BRCLXN.056 (Add. p.6-7); BRCLXN.060 (Add. p.8)'
+  fr: 'FR-CL (billing statements, ageing)'
+  module: 'collections (billing statements; CLX_AGING_BASIS)'
+  type: PARK
+  req: 'Delivery date and receipt date on billing statements; ageing from billing statements, invoice dates and policy periods.'
+  built: 'The first AR date is shown as the receipt date; the delivery date is blank. CLX_AGING_BASIS takes BOOKING or INCEPTION; ageing from the SOA due date is not built.'
+  reason: 'CQ14, CQ17 open.'
+  impact: 'Statement tracking and SOA ageing incomplete.'
+  depts: 'Collections'
+  eff: [1, 3, 2, 0]
+  prio: Low
+  status: DRAFT
+  xref: 'CQ14; CQ17'
+  target: ANS
+  src: 'FRS BRD-4 section 1.6'
+- id: CR-0108
+  drop: Drop 1
+  brd: BRD-04
+  ref: 'BRCLXN.061-064 (Add. p.8-9, draft)'
+  fr: 'FR-CL (commission receivable and incentives, specified not built)'
+  module: 'collections; commission'
+  type: PARK
+  req: 'Draft requirements on commission receivables and incentives (drop plan item 1.D7).'
+  built: 'Specified, not built, until BDOI confirms the draft addendum.'
+  reason: 'CQ01 open (unsigned draft).'
+  impact: 'Commission receivable collection for these rows stays manual.'
+  depts: 'Collections; Operations (Commission)'
+  eff: [3, 12, 6, 2]
+  prio: Medium
+  status: DRAFT
+  xref: 'CQ01'
+  target: ANS
+  src: 'FRS BRD-4 section 1.6; PROGRAMME_ALIGNMENT 2.1 (1.D7)'
+- id: CR-0109
+  drop: Drop 1
+  brd: BRD-04
+  ref: 'BRD-4 NFR audit logging (p.51-58): source IP of each event; BRCLXN.043 (p.32 / p.49)'
+  fr: 'FR-CL (audit); FR-CR-030'
+  module: 'audit trail'
+  type: DIFF
+  req: 'Record the source IP address of each event and of back-office actions.'
+  built: 'The audit trail records user, time and change, not the source IP. Proposed: add source IP and resource to the audit record.'
+  reason: 'Platform audit design.'
+  impact: 'Investigations cannot trace the device.'
+  depts: 'Collections; Compliance; BDOI IT Security'
+  eff: [1, 2, 1, 0]
+  prio: Medium
+  status: DRAFT
+  xref: 'DCR-145'
+  target: W2
+  src: 'Register DCR-145'
+- id: CR-0110
+  drop: Drop 1
+  brd: BRD-04
+  ref: 'BRD-4 p.93 caveat (exports may slow the system)'
+  fr: 'FR-CL-084'
+  module: 'collections (background exports, CLX_EXPORT)'
+  type: ADD
+  req: 'The BRD warns that exports may slow the system.'
+  built: 'Exports run in the background, capped at CLX_EXPORT_MAX_ROWS, under their own permission CLX_EXPORT.'
+  reason: 'Performance and data-protection control.'
+  impact: 'Export needs a separate permission.'
+  depts: 'Collections'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: '-'
+  target: FRS
+  src: 'FRS BRD-4 section 1.6'
+- id: CR-0111
+  drop: Drop 2
+  brd: BRD-04
+  ref: 'Drop plan item 2.1 "Marketing Collection (extraction)"'
+  fr: 'FRS BRD-4; FR-OP (Marketing Collection items)'
+  module: 'collections (worklists, daily files); opsledger CollectionFeed'
+  type: INT
+  req: 'Drop 2 lists "Marketing Collection (extraction)", which suggests a feed from BIBS to a separate collection system.'
+  built: 'BRD-4 is built as a BIBS module fed by the Operations ledger, replacing the Collection Management System. Proposed: the item means the Collections daily files; BRD-4 is tested in Drop 2 except the DP rows (Drop 1).'
+  reason: 'IQ21 open.'
+  impact: 'If a separate system is kept, a new extract interface is needed.'
+  depts: 'Collections; Marketing; BDOI IT'
+  eff: [1, 0, 0, 1]
+  alt: 15
+  prio: Medium
+  status: CCB
+  xref: 'DCR-212; DCR-221; IQ21'
+  target: FRS
+  src: 'PROGRAMME_ALIGNMENT 2.2 item 3'
+# ============================================================== BRD-05 Accounting, Disbursement, ACSL
+- id: CR-0112
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'FRBS 2.2.0 (p.51); FRBS 3.5.0 (p.65)'
+  fr: 'FR-AC (revaluation)'
+  module: 'period / closing (revaluation); OPS_BOOK_RATE_SOURCE'
+  type: DIFF
+  req: 'Input the revaluation rate monthly; revalue daily (previous date against current date).'
+  built: 'The monthly rate is the CLOSING rate of the month end, copied as the BOOK rate of the next month; revaluation runs per period with automatic reversal. Daily revaluation only if BDOI confirms.'
+  reason: 'AQ03, OQ08 open.'
+  impact: 'Foreign-currency balances revalued monthly, not daily.'
+  depts: 'Comptrollership (FRBS)'
+  eff: [0, 0, 0, 0]
+  alt: 6
+  prio: Medium
+  status: CCB
+  xref: 'AQ03; OQ08'
+  target: FRS
+  src: 'FRS BRD-5 Vol.1 section 1.7'
+- id: CR-0113
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'FRBS 2.3.2 (p.52); FRBS 2.5.7 (p.57); FRBS 2.6.0 (p.58); FRBS 2.8.1 (p.60)'
+  fr: 'FR-AC (chart, journals, close)'
+  module: 'coa; journal; closing'
+  type: DIFF
+  req: 'Account number generated by the system; return a posting request; close the previous month on a preferred date; reversal posts in GL and sub-ledger.'
+  built: 'A number is proposed from the parent''s scheme when the code is left blank; "Reject" is labelled "Return to Maker" and the journal is resubmitted; FRBS schedules the close (proposal: 2nd banking day, 17:00); manual journals record no sub-ledger items, so the reversal posts in the GL only.'
+  reason: 'AQ01, AQ04.'
+  impact: 'None on the accounting result.'
+  depts: 'Comptrollership (FRBS)'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'AQ01; AQ04'
+  target: FRS
+  src: 'FRS BRD-5 Vol.1 section 1.7'
+- id: CR-0114
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'FRBS 2.5.4 (p.56); FRBS 2.8.4'
+  fr: 'FR-AC (posting checks)'
+  module: 'journal (negative balance policy ALLOW / WARN / BLOCK)'
+  type: PARK
+  req: 'Prevent posting with a negative balance.'
+  built: 'Each account has a policy ALLOW, WARN or BLOCK; only BLOCK accounts refuse the journal. BDOI names the accounts that may never be negative.'
+  reason: 'AQ30 open.'
+  impact: 'Until set, negative balances are allowed with a warning.'
+  depts: 'Comptrollership (FRBS)'
+  eff: [1, 0, 1, 0]
+  prio: Medium
+  status: DRAFT
+  owner: COMPT
+  xref: 'AQ30'
+  target: ANS
+  src: 'FRS BRD-5 Vol.1 section 1.7'
+- id: CR-0115
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'FRBS 3.4.0-3.4.1 (p.64)'
+  fr: 'FR-AC (broking-books close)'
+  module: 'closing (job broking-books-close, 23:00 on the last day)'
+  type: DIFF
+  req: 'Close the broking books automatically.'
+  built: 'The broking books close on the last day of the month at 23:00 Manila; the list of pending broking items is empty until the broking modules report them. Proposed: each broking module reports its pending items to the close checklist.'
+  reason: 'Build sequence.'
+  impact: 'The close can run with open broking items not listed.'
+  depts: 'Comptrollership; Operations'
+  eff: [1, 4, 2, 1]
+  prio: High
+  status: DRAFT
+  xref: 'AQ04'
+  target: W2
+  src: 'FRS BRD-5 Vol.1 section 1.7'
+- id: CR-0116
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'FRBS 3.1.2 (Add. p.6)'
+  fr: 'FR-AC (incentive income account)'
+  module: 'coa (account 4130)'
+  type: PARK
+  req: 'Early incentives reported as Other Income.'
+  built: 'The incentive component posts to its own account; moving 4130 under Other Income is a chart change for FRBS, not yet made in the delivered chart.'
+  reason: 'AQ01.'
+  impact: 'Financial statement grouping of incentive income.'
+  depts: 'Comptrollership (FRBS)'
+  eff: [1, 0, 1, 0]
+  prio: Low
+  status: DRAFT
+  owner: COMPT
+  xref: 'AQ01'
+  target: FRS
+  src: 'FRS BRD-5 Vol.1 section 1.7'
+- id: CR-0117
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'FRBS 3.2.0 (p.63), Appendix A (138 reports)'
+  fr: 'FR-AC (report pack); FRS BRD-5 Vol.1 Appendix A'
+  module: 'frbs report pack; finreport'
+  type: PARK
+  req: 'The 138 reports and schedules of Appendix A.'
+  built: '28 schedule definitions and 58 report-pack entries delivered with draft layouts; lease, DTA, ECL and placement data are not in BIBS; payroll outputs are out of scope (BIBS has no payroll). Proposed: final layouts built once BDOI supplies them.'
+  reason: 'AQ05, AQ06 open.'
+  impact: 'Part of the board and regulatory pack stays manual until layouts are final.'
+  depts: 'Comptrollership (FRBS)'
+  eff: [4, 15, 8, 2]
+  prio: High
+  status: CCB
+  owner: COMPT
+  xref: 'AQ05; AQ06'
+  target: ANS
+  src: 'FRS BRD-5 Vol.1 section 1.7'
+- id: CR-0118
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'FRBS 3.2.0 (VII) BIR books and forms (p.63); BRNB.100 (p.8-9) service invoice'
+  fr: 'FR-AC (BIR); FR-NB-117'
+  module: 'tax (BIR forms, alphalists, loose-leaf books); booking (service invoices)'
+  type: RED
+  req: 'BIR books and forms; service invoice transmission.'
+  built: 'Worksheets and loose-leaf books; not eFPS, DAT or CAS files. Service invoices are not transmitted to BIR electronically. Comptrollership uploads the forms manually.'
+  reason: 'AQ07 open.'
+  impact: 'Manual BIR filing continues.'
+  depts: 'Comptrollership (Tax)'
+  eff: [0, 0, 0, 0]
+  alt: 23
+  prio: High
+  status: CCB
+  owner: COMPT
+  xref: 'AQ07'
+  target: FRS
+  src: 'FRS BRD-5 Vol.1 section 1.7; FRS BRD-1 interfaces (BIR CAS)'
+- id: CR-0119
+  drop: Drop 0
+  brd: BRD-05
+  ref: 'BASAU 2.3.2 (p.129); BASAU 2.4.1, 2.5.3, 2.6.x (p.130)'
+  fr: 'FR-AC-072; FR-UA (access requests)'
+  module: 'nbadmin (Access Requests, My Approvals)'
+  type: DIFF
+  req: 'Assign functionality to a role; return requests; select several requests.'
+  built: 'A change of role permissions is an access request approved by a second user. The API returns a request with remarks, lets the requester resubmit it and approves in bulk; the Access Requests screen and My Approvals do not show Return, Resubmit or bulk approval yet. Proposed: add the three actions on the screens.'
+  reason: 'PQ17; FRS BRD-5 Vol.1 Gap G2.'
+  impact: 'Approvers approve one by one on screen.'
+  depts: 'Comptrollership; ITIO'
+  eff: [1, 3, 2, 1]
+  prio: Low
+  status: DRAFT
+  xref: 'PQ17; Gap G2 (FRS BRD-5 Vol.1)'
+  target: W1
+  src: 'FRS BRD-5 Vol.1 section 1.7'
+- id: CR-0120
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'DIS 3.25.0 (p.95); DIS 2.2.4 (p.70); DIS 2.7.6 (p.80); DIS 3.27.0 (p.99)'
+  fr: 'FR-DS (payee, request intake, proforma)'
+  module: 'disbursement (payees, requests, proforma entries)'
+  type: DIFF
+  req: 'Auto-reject a request whose payee is not maintained; delete payee details; proforma entry editable.'
+  built: 'By default the request waits as No Payee, a payee request is raised and an alert sent; DISB_NO_PAYEE_ACTION = RETURN returns it as the BRD says. Only a never-used draft payee is deleted; others are deactivated with authorisation. Lines are editable until approval and marked Edited.'
+  reason: 'AQ11, AQ12, AQ13.'
+  impact: 'Fewer rejected requests; payee history kept.'
+  depts: 'Comptrollership (Disbursement)'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'AQ11; AQ12; AQ13'
+  target: FRS
+  src: 'FRS BRD-5 Vol.2 section 1.7'
+- id: CR-0121
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'DIS 2.8.1 (p.83); DIS 2.16.2'
+  fr: 'FR-DS (check printing)'
+  module: 'disbursement (cheque books, check layout)'
+  type: PARK
+  req: 'Check statuses; checks printed at EOD.'
+  built: 'A check takes the next leaf of the paying account''s cheque book when printed; the layout is a draft template until BDOI gives the bank layout.'
+  reason: 'AQ14 open.'
+  impact: 'Checks cannot be printed on bank stock until the layout is final.'
+  depts: 'Comptrollership (Disbursement)'
+  eff: [1, 2, 2, 0]
+  prio: Medium
+  status: DRAFT
+  owner: COMPT
+  xref: 'AQ14'
+  target: ANS
+  src: 'FRS BRD-5 Vol.2 section 1.7'
+- id: CR-0122
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'DIS 2.20.0 (p.92); MKT 1.19.0 (p.110); DIS 2.17.x (p.90)'
+  fr: 'FR-DS (DV cancellation, funding); FR-PQ'
+  module: 'disbursement (DV cancellation, DISB_FUNDING); payrequest (DV_CANCELLATION hand-off)'
+  type: DIFF
+  req: 'Cancel an approved DV and regularise the source data; cancellation of a disbursed check routed to Disbursement; funding through BOB with a verifier and two approvers.'
+  built: 'The DV journal is reversed and the request goes back to its source (for a remittance DV the batch is returned to review and sent again under a new cycle); Marketing cancellations are handed to the Disbursement approvers; funding is a BIBS four-eyes workflow and the BOB transaction itself is done in BOB with its reference recorded.'
+  reason: 'AQ10, AQ15.'
+  impact: 'None on control; BOB stays the funding system.'
+  depts: 'Comptrollership (Disbursement); Operations (Remittance); Marketing'
+  eff: [0, 0, 0, 0]
+  prio: Medium
+  status: IMPL
+  xref: 'AQ10; AQ15'
+  target: FRS
+  src: 'FRS BRD-5 Vol.2 section 1.7'
+- id: CR-0123
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'DIS 2.10.x (p.86); DIS 2.11.x (p.86)'
+  fr: 'FR-DS (OR / AR tagging, CWT tagging)'
+  module: 'disbursement (tags); tax (Certificates Received)'
+  type: PARK
+  req: 'OR / AR tagging on DVs; CWT tagging.'
+  built: 'Every approved DV counts as unregularised until tagged; which DVs need an OR / AR back is open. The CWT tag records the certificate on the DV; insurer certificates on commission are kept in one register in Tax.'
+  reason: 'AQ16, AQ17 open.'
+  impact: 'The unregularised DV list includes DVs that need no OR.'
+  depts: 'Comptrollership (Disbursement, Tax)'
+  eff: [1, 1, 1, 0]
+  prio: Low
+  status: DRAFT
+  owner: COMPT
+  xref: 'AQ16; AQ17'
+  target: ANS
+  src: 'FRS BRD-5 Vol.2 section 1.7'
+- id: CR-0124
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'DIS 3.27.2 (p.100); ACSL 2.16.0 (p.126)'
+  fr: 'FR-DS (invoice family); FR-OP (Invoice 360)'
+  module: 'booking (root invoice number); opsledger (Invoice 360)'
+  type: DIFF
+  req: 'One invoice number for related transactions (booking, adjustment, cancellation).'
+  built: 'Endorsements and cancellations keep their own BIR invoice number and carry the root invoice number; Invoice 360 shows the family.'
+  reason: 'BIR numbering rules; AQ29.'
+  impact: 'Users trace a policy''s transactions through the root number.'
+  depts: 'Comptrollership; Operations; Processing'
+  eff: [0, 0, 0, 0]
+  prio: High
+  status: IMPL
+  xref: 'DCR-058; AQ29'
+  target: FRS
+  src: 'FRS BRD-5 Vol.2 section 1.7; register DCR-058'
+- id: CR-0125
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'DIS 3.29.1 (Add. p.7-8)'
+  fr: 'FR-DS (early incentive); FR-OP (remittance)'
+  module: 'remittance (early incentive service invoice)'
+  type: PARK
+  req: 'Service invoice of the early incentive issued automatically with 2% withholding.'
+  built: 'Built once per batch; the accounting of the insurer''s 2% withholding is parked and the incentive is still deducted in full from the remittance.'
+  reason: 'AQ25 open.'
+  impact: 'Remittance deduction overstated by the withholding until closed.'
+  depts: 'Operations (Remittance); Comptrollership (Tax)'
+  eff: [1, 3, 2, 1]
+  prio: High
+  status: DRAFT
+  owner: COMPT
+  xref: 'AQ25'
+  target: ANS
+  src: 'FRS BRD-5 Vol.2 section 1.7'
+- id: CR-0126
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'DIS 3.29.0 (Add. p.7)'
+  fr: 'FR-DS (CPC2 report)'
+  module: 'remittance reports'
+  type: DIFF
+  req: 'CPC2 report.'
+  built: 'Not built; the CPC2 amounts are on the remittance batch and its schedule. Proposed: a CPC2 report.'
+  reason: 'FRS BRD-5 Vol.2 Gap G4.'
+  impact: 'CPC2 figures are read from each batch.'
+  depts: 'Operations (Remittance); MBS'
+  eff: [1, 2, 1, 0]
+  prio: Low
+  status: DRAFT
+  xref: 'Gap G4 (FRS BRD-5 Vol.2)'
+  target: W2
+  src: 'FRS BRD-5 Vol.2 section 1.7'
+- id: CR-0127
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'MKT 1.7.0 (p.106); MKT 1.10.0; MKT 1.12.0, 1.13.0 (p.108); MKT 2.25.0 (p.112)'
+  fr: 'FR-PQ (Marketing payment requests)'
+  module: 'payrequest; cashiering reports'
+  type: RED
+  req: 'Unapplied payment report for Marketing; upload .txt files and preview documents side by side; CA / SA on the client record.'
+  built: 'Marketing runs the Cashiering reports (no segment filter); .txt is not an accepted type and files open one at a time; CA / SA recorded on approval with the BDO account number checked as 10 to 16 digits until AQ19.'
+  reason: 'AQ18, AQ19.'
+  impact: 'Marketing uses the Cashiering report; no side-by-side preview.'
+  depts: 'Marketing; Operations (Cashiering)'
+  eff: [0, 0, 0, 0]
+  alt: 6
+  prio: Low
+  status: IMPL
+  xref: 'AQ18; AQ19'
+  target: FRS
+  src: 'FRS BRD-5 Vol.2 section 1.7'
+- id: CR-0128
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'BRD-5 Appendix D (p.152-153), cash-advance liquidation form; MKT 1.10.0 (p.107)'
+  fr: 'FR-PQ (liquidation, return, post)'
+  module: 'payrequest (cash advance liquidation)'
+  type: ADD
+  req: 'The form is in Appendix D; its scope is to be confirmed.'
+  built: 'Built: liquidation, return and posting of cash advances.'
+  reason: 'AQ18 open on scope.'
+  impact: 'Cash advances liquidated in BIBS.'
+  depts: 'Marketing; Comptrollership'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'AQ18'
+  target: FRS
+  src: 'FRS BRD-5 Vol.2 section 1.7'
+- id: CR-0129
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'ACSL 2.4.0 (p.117); ACSL 2.9.2 (Add. p.13); ACSL 2.13.2 (p.121)'
+  fr: 'FR-AS (SOA reconciliation, deductions, GL-SL reconciliation)'
+  module: 'acsl; remittance (deductions)'
+  type: PARK
+  req: 'Upload SOA files that trigger reconciliation; remittance deduction on insurer confirmation; GL-SL reconciliation also at period end.'
+  built: 'The SOA file is read in one request (up to ACSL_SOA_MAX_ROWS) and reconciled once loaded, layouts per insurer as configuration; the deduction stays Confirmed while batches consume it and is Applied when every batch has the insurer OR (sources and spanning batches wait for BDOI); GL-SL reconciliation runs nightly and on demand, the period-end check is not built.'
+  reason: 'AQ21, AQ23 open.'
+  impact: 'Period-end GL-SL evidence is the last nightly run.'
+  depts: 'Comptrollership (ACSL); Operations (Remittance)'
+  eff: [2, 4, 4, 0]
+  prio: Medium
+  status: DRAFT
+  owner: COMPT
+  xref: 'AQ21; AQ23'
+  target: ANS
+  src: 'FRS BRD-5 Vol.2 section 1.7'
+- id: CR-0130
+  drop: Drop 1
+  brd: BRD-05
+  ref: 'ACSL 2.14.3, 2.14.4 (p.124)'
+  fr: 'FR-AS (ageing reports); FR-AC (account schedules)'
+  module: 'acsl reports; frbs account schedules'
+  type: DIFF
+  req: 'Ageing and schedule reports per account family in ACSL.'
+  built: 'Not built as ACSL reports; the premium receivable schedules with ageing are delivered as account schedules (Volume 1). Proposed: ACSL report entries that reuse the schedules.'
+  reason: 'FRS BRD-5 Vol.2 Gap G3.'
+  impact: 'ACSL users run the schedules from FRBS.'
+  depts: 'Comptrollership (ACSL)'
+  eff: [1, 3, 2, 0]
+  prio: Low
+  status: DRAFT
+  xref: 'Gap G3 (FRS BRD-5 Vol.2)'
+  target: W2
+  src: 'FRS BRD-5 Vol.2 section 1.7'
+- id: CR-0131
+  drop: Drop 2
+  brd: BRD-05
+  ref: 'Drop plan INT-17 EGL; BRD-5 Appendix A II (GARD submission)'
+  fr: 'FR-AC (GL reports)'
+  module: 'journal, ledger, coa, finreport; EGL extract job (proposed)'
+  type: INT
+  req: 'BDOI accounting is delivered to the BDO Enterprise General Ledger. No BRD specifies what BIBS sends.'
+  built: 'No GL interface; GL reports only. Proposed: daily journal extract with a code map to EGL accounts, control totals and a reconciliation report.'
+  reason: 'IQ16, AQ31 open.'
+  impact: 'Group consolidation takes BDOI figures from BIBS.'
+  depts: 'Comptrollership; BDOI IT; BDO Group Accounting'
+  eff: [3, 10, 6, 2]
+  prio: High
+  status: DRAFT
+  owner: IT
+  xref: 'DCR-233; IQ16; AQ31'
+  target: D2
+  src: 'PROGRAMME_ALIGNMENT 5 (INT-17)'
+# ============================================================== BRD-06 Renewal
+- id: CR-0132
+  drop: Drop 1
+  brd: BRD-06
+  ref: 'Addendum 1 (p.34): 1.003.4.1.1.1, 1.003.4.1.1.3 (p.47-48); 2.003.1.6 (p.80); 2.006.1.2 (p.86); 2.007.4.1 (p.88); 3.003.4.1.1, 3.003.4.1.3 (p.111-112); 3.003.4.5 (p.115); 4.003.1.6 (p.150)'
+  fr: 'FR-RN-013, FR-RN-040; FRS BRD-6 out-of-scope IDs'
+  module: 'renewal (Expiry List, search)'
+  type: RED
+  req: 'EBIX invoice number and BDOIsys reference columns; search by QPS / EBIX reference numbers.'
+  built: 'Out of scope per Addendum 1: the BIBS expiring invoice number, the renewal reference and the ARN replace them; search by name and BIBS reference.'
+  reason: 'BRD-6 Addendum 1 p.34.'
+  impact: 'Legacy references are found through the migrated legacy reference (FR-DM-033).'
+  depts: 'Marketing; Processing'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'RQ27'
+  target: FRS
+  src: 'FRS BRD-6 out-of-scope IDs'
+- id: CR-0133
+  drop: Drop 1
+  brd: BRD-06
+  ref: 'BRD-6 renewal lists; BRD-8 BRID-001 (p.7)'
+  fr: 'FR-RN (extraction); FR-EB-022'
+  module: 'renewal (RNW_EXCLUDED_LINES); eb (Renewal Due)'
+  type: DEC
+  req: 'The renewal lists cover every expiring policy; BRD-8 renews EB programmes in its own cycle.'
+  built: 'EB programmes are excluded from the general renewal lists and renewed in the EB module; every renewal advice is stored as document type RENEWAL_ADVICE.'
+  reason: 'Decision D3.'
+  impact: 'EB renewals do not appear twice.'
+  depts: 'Marketing; Employee Benefits'
+  eff: [0, 0, 0, 0]
+  prio: Medium
+  status: CCB
+  xref: 'D3'
+  target: FRS
+  src: 'BDOI_CROSS_BRD_DECISIONS D3; FRS BRD-6 section 1.2'
+- id: CR-0134
+  drop: Drop 1
+  brd: BRD-06
+  ref: 'BRRN.029 (p.8); BRIDSP-13 (p.10)'
+  fr: 'FR-RN-025; FR-SP (LAMD upload)'
+  module: 'renewal (RNW_LAMD_REPORT); submitted (SBM_LAMD)'
+  type: PARK
+  req: 'BRD-6 ingests LAMD reports of paid-off loans; BRD-12 matches submitted policies against LAMD active loans.'
+  built: 'Two LAMD intakes designed (one per module), both matching on the PN. Proposed: one intake owned by one module and read by the other through a query service, sourced from LMS if confirmed.'
+  reason: 'XQ01, RQ20, SP SQ06, IQ06 open.'
+  impact: 'Two uploads of the same data and two owners if not decided.'
+  depts: 'Marketing; Submitted Policies; LAMD'
+  eff: [1, 2, 2, 1]
+  prio: High
+  status: DRAFT
+  xref: 'DCR-146; XQ01; RQ20; SP SQ06; IQ06'
+  target: W1
+  src: 'BDOI_CROSS_BRD_DECISIONS XQ01; register DCR-146'
+- id: CR-0135
+  drop: Drop 1
+  brd: BRD-06
+  ref: 'BRRN.026 (p.6-7); BRD-9 Contact Center roles'
+  fr: 'FR-RN (Contact Center follow-up); FR-CSF-001'
+  module: 'renewal (role CONTACT_CENTER); csf (Contact Center roles of BRD-9)'
+  type: DEC
+  req: 'BRD-6 gives Contact Center users renewal lists with remarks and status updates; BRD-9 defines Contact Center users who see all accounts.'
+  built: 'Proposed: two roles; one user may hold both (decision D5 allows several roles).'
+  reason: 'XQ02, RQ21, CSQ10 open.'
+  impact: 'Access per role stays narrow.'
+  depts: 'Contact Center Management; Marketing'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: CCB
+  xref: 'DCR-147; XQ02'
+  target: FRS
+  src: 'BDOI_CROSS_BRD_DECISIONS XQ02'
+- id: CR-0136
+  drop: Drop 1
+  brd: BRD-06
+  ref: 'BRD-6 2.004.4 (p.82-83), reason "Total Loss Claim"'
+  fr: 'FR-RN-023, FR-RN-043; FR-CM'
+  module: 'renewal (decision matrix TOTAL_LOSS); brokerclaims (ClaimExperienceQueryService)'
+  type: PARK
+  req: 'Use "Total Loss Claim" as a non-renewal reason and show claims per account.'
+  built: 'Renewal reads loss experience from Claims (decision D4); "Total Loss Claim" stays a manual reason until Claims records a total-loss indicator.'
+  reason: 'CLQ28, XQ10 open.'
+  impact: 'Total-loss accounts are flagged by hand.'
+  depts: 'Marketing; Claims'
+  eff: [1, 3, 2, 1]
+  prio: Low
+  status: DRAFT
+  xref: 'DCR-150; CLQ28; XQ10; D4'
+  target: ANS
+  src: 'BDOI_CROSS_BRD_DECISIONS D4, XQ10'
+- id: CR-0137
+  drop: Drop 1
+  brd: BRD-06
+  ref: 'Report List #135 (p.44), Renewal Persistency Report'
+  fr: 'FR-RN (reports); SBM-PERSISTENCY'
+  module: 'renewal reports (proposed persistency report)'
+  type: PARK
+  req: 'General renewal persistency report.'
+  built: 'Submitted Policies designs SBM-PERSISTENCY for submitted accounts; the Renewal design has no persistency report. Proposed: a renewal report over closed candidates.'
+  reason: 'XQ06 open (layout and definition).'
+  impact: 'Persistency is measured outside BIBS until built.'
+  depts: 'Marketing; MIS'
+  eff: [1, 3, 2, 1]
+  prio: Low
+  status: DRAFT
+  xref: 'XQ06'
+  target: ANS
+  src: 'BDOI_CROSS_BRD_DECISIONS XQ06'
+- id: CR-0138
+  drop: Drop 1
+  brd: BRD-06
+  ref: 'BRRN.004 (p.23-24); BRRN.011 (p.28-29)'
+  fr: 'FR-RN (Expiry List grid)'
+  module: 'renewal (Expiry List)'
+  type: DIFF
+  req: 'One scrollable view with no pagination.'
+  built: 'Virtualised grid with a row count and no pager, instead of the BDO UX pager.'
+  reason: 'BDO UX guidelines use a pager.'
+  impact: 'None for users.'
+  depts: 'Marketing'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: CCB
+  xref: 'DCR-074'
+  target: FRS
+  src: 'Register DCR-074'
+- id: CR-0139
+  drop: Drop 0
+  brd: BRD-06
+  ref: 'BRD-13 BRID 12.1 (p.12), renewal-driven transition; BRRN.005 (p.24-25); concept paper (superseded)'
+  fr: 'FR-RN-016; FR-DM-122, FR-DM-124, FR-DM-125'
+  module: 'renewal (LegacyPolicySource.goLiveCandidates, MIG_GOLIVE_RENEWAL_TO, MIG_RENEWAL_URGENT_TO); migration (renewal advices already sent)'
+  type: MIG
+  req: 'BRD-13 makes the transition renewal-driven without describing it; the earlier design carried the RMEL cohorts expiring T to T+140 days with their dispositions.'
+  built: 'January to May 2028 expiries are processed in BIBS after go-live; no candidate is carried from legacy. At go-live Renewal extracts every expiry to 31-May-2028 (January urgent) and records the renewal advices already sent from the Excel trackers, rejected rows reviewed maker-checker by the Renewal processing team.'
+  reason: 'BDOI answers DMQ37 and DMQ38 of 26-Sep-2026.'
+  impact: 'Marketing works the first five months of renewals in BIBS; heavy load in January 2028.'
+  depts: 'Marketing; Processing (Renewal); Business Project Services'
+  eff: [1, 4, 3, 1]
+  prio: High
+  status: CCB
+  xref: 'DCR-199; DCR-220; DCR-240; DCR-243; DMQ37; DMQ38'
+  target: MIG
+  src: 'FRS BRD-6 v1.1 (FR-RN-016); FRS BRD-13 (FR-DM-124, 125); PENDING_EDITS (Data Migration v1.2)'
+- id: CR-0140
+  drop: Drop 0
+  brd: BRD-06
+  ref: 'BRRN.020 (p.4) sanitation; concept paper VII, VIII, Annex C (package remapping)'
+  fr: 'FR-RN-028; FR-DM-034'
+  module: 'renewal (check PACKAGE_REMAP, Exception bucket, RNW_PACKAGE_REMAP); migration (PACKAGE code map)'
+  type: MIG
+  req: 'Legacy package names must be remapped to BIBS packages; the paper asks where and by whom.'
+  built: 'Remapping at Renewal sanitation, not at upload: the migration loads the legacy package code and the PACKAGE code map only; the check PACKAGE_REMAP sends unmapped, retired or split packages to the Exception bucket for the Renewal processing team.'
+  reason: 'BDOI answer DMQ36 of 26-Sep-2026.'
+  impact: 'Renewals of migrated policies price on the right package version.'
+  depts: 'Processing (Renewal); TSU; MBS'
+  eff: [1, 4, 3, 1]
+  prio: High
+  status: CCB
+  xref: 'DCR-219; DCR-241; DMQ36; IQ03'
+  target: MIG
+  src: 'FRS BRD-6 v1.1 (FR-RN-028); FRS BRD-13 (FR-DM-034)'
+- id: CR-0141
+  drop: Drop 1
+  brd: BRD-06
+  ref: 'Umbrella CORE-06.07 (p.8) "Non-Renewal Letter (NRL)"; BRD-6 "Not for Renewal Letter (NFR)"'
+  fr: 'FR-RN-082'
+  module: 'renewal (letters)'
+  type: DEC
+  req: 'The umbrella and BRD-6 name the letter differently.'
+  built: 'The BRD-6 name is used until BDOI answers.'
+  reason: 'CRQ14 open.'
+  impact: 'Letter title only.'
+  depts: 'Marketing'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: CCB
+  xref: 'DCR-168; CRQ14'
+  target: FRS
+  src: 'Register DCR-168'
+# ============================================================== BRD-07 Claims
+- id: CR-0142
+  drop: Drop 2
+  brd: BRD-07
+  ref: 'BRD-7 p.23, assumption 1 ("enhance the existing claims module in eBIX"); BRCLM.007 (p.13)'
+  fr: 'FR-CM-013; FRS BRD-7 recorded differences'
+  module: 'brokerclaims (new module)'
+  type: DIFF
+  req: 'Enhance the claims facility in eBIX; get the policy number from EBIX and upload it.'
+  built: 'A new BIBS broker claims module; the platform''s insurer-side claims module does not fit a broker. The policy number is copied from the BIBS account; no upload.'
+  reason: 'EBIX is replaced; design R5 section 2.'
+  impact: 'Claims handling moves to BIBS.'
+  depts: 'Claims'
+  eff: [0, 0, 0, 0]
+  prio: Medium
+  status: IMPL
+  xref: 'DCR-081'
+  target: FRS
+  src: 'FRS BRD-7 recorded differences; register DCR-081'
+- id: CR-0143
+  drop: Drop 2
+  brd: BRD-07
+  ref: 'BRCLM.014 (p.14 / p.30); BRD-7 p.28 "Settlement Type Status values"; BRCLM.005 (p.13), BRCLM.035 (p.16)'
+  fr: 'FR-CM-043, FR-CM-045'
+  module: 'brokerclaims (settlement types, closure)'
+  type: PARK
+  req: 'Requested Type of Settlement values; a separate Settlement Type Status list maintained by the Unit Head; officers tag closures and TL / TH close.'
+  built: 'Settlement values are outcomes and each says whether it closes the claim; officers set temporary closures and TL / TH close permanently; the separate status list is not built until CLQ05 is answered.'
+  reason: 'CLQ05, CLQ06 open.'
+  impact: 'Settlement reporting uses the outcome list.'
+  depts: 'Claims'
+  eff: [1, 2, 1, 0]
+  prio: Low
+  status: DRAFT
+  xref: 'CLQ05; CLQ06'
+  target: ANS
+  src: 'FRS BRD-7 recorded differences'
+- id: CR-0144
+  drop: Drop 2
+  brd: BRD-07
+  ref: 'BRCLM.001-043 values and definitions (p.13-31)'
+  fr: 'FR-CM (parameters and LOVs)'
+  module: 'brokerclaims (Claims Setup, LOVs)'
+  type: PARK
+  req: 'BDOI values and definitions for Claims (statuses, SLA, ageing, adjusters, locations per endorsement).'
+  built: 'Built with documented defaults; 21 rows are "Built with parked item" waiting for BDOI values (CLQ01, CLQ02, CLQ04-CLQ08, CLQ11, CLQ15, CLQ16, CLQ20).'
+  reason: 'Open Claims questions.'
+  impact: 'Defaults may not match BDOI practice until set.'
+  depts: 'Claims'
+  eff: [2, 0, 2, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'CLQ01; CLQ02; CLQ04-CLQ08; CLQ11; CLQ15; CLQ16; CLQ20'
+  target: D2
+  src: 'BDOI_CLM_BRD_SPEC section 3 (as built)'
+- id: CR-0145
+  drop: Drop 2
+  brd: BRD-07
+  ref: 'Report List claims rows (ISYS source, extra fields, age brackets); BRCLM.026-033 (p.16 / p.30-31)'
+  fr: 'FR-CM-060 to FR-CM-064'
+  module: 'brokerclaims reports (BCL-*)'
+  type: DEC
+  req: 'The Report List names ISYS as the source and adds fields and age brackets that BRD-7 does not list.'
+  built: 'BIBS replaces ISYS for claims reports; columns from both documents; files kept in BIBS.'
+  reason: 'Conflict between BRD-7 and the Report List.'
+  impact: 'One set of claims reports.'
+  depts: 'Claims'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'DCR-084'
+  target: FRS
+  src: 'Register DCR-084'
+- id: CR-0146
+  drop: Drop 0
+  brd: BRD-07
+  ref: 'BRD-7 assumption 3 (data migration and integration with existing systems, p.23); BRD-13 (no claims object)'
+  fr: 'FR-CM-013; FRS BRD-13 (object F07 / F11, conditional)'
+  module: 'brokerclaims (BCL_CLAIM_MIGRATION, V1025 held); migration'
+  type: MIG
+  req: 'BRD-7 assumes open and historical claims are migrated; BRD-13 does not mention claims.'
+  built: 'The loader is designed and V1025 is held; open-claims migration runs only if BDOI puts the object in scope; history stays in legacy read-only.'
+  reason: 'CLQ14, DMQ30 open.'
+  impact: 'Without migration, open claims are finished in legacy or re-keyed.'
+  depts: 'Claims; Business Project Services'
+  eff: [2, 6, 4, 1]
+  prio: High
+  status: DRAFT
+  xref: 'DCR-081; DCR-196; CLQ14; DMQ30'
+  target: MIG
+  src: 'PENDING_EDITS (Claims); BDOI_DM_BRD_SPEC 6.1'
+# ============================================================== BRD-08 Employee Benefits
+- id: CR-0147
+  drop: Drop 2
+  brd: BRD-08
+  ref: 'BRID-005 (p.10-11); BRID-005.01 (Add. p.7-8); BRID-005.02; BRID-014 (p.20-22); portal NFRs'
+  fr: 'FR-EB-010 to FR-EB-015 (portal); FR-EB-040, FR-EB-051'
+  module: 'eb (internal upload replaces the portal); portal module removed; UAM EXTERNAL requests stay refused'
+  type: RED
+  req: 'Insurers and client HR use a secure portal or API: sign-in, uploads, downloads, requests for proposal, revisions.'
+  built: 'No portal: insurers and client HR send files by e-mail or an agreed channel and EB users upload and validate them. The portal module, its permissions, screens and wave E1-A are removed from the design; decision D7 is dormant. FRS BRD-8, the test plan and the EB design are updated by the EB team.'
+  reason: 'BDOI drop plan item 2.4 "Employee Benefits (no portal feature)"; IQ22.'
+  impact: 'EB users key or upload partner documents; no external users in BIBS.'
+  depts: 'Employee Benefits; Processing'
+  eff: [2, 3, 3, 3]
+  alt: 40
+  prio: High
+  status: CCB
+  xref: 'DCR-211; IQ22; D7; EBQ13'
+  target: D2
+  src: 'PENDING_EDITS (Employee Benefits); PROGRAMME_ALIGNMENT 2.2 item 2'
+- id: CR-0148
+  drop: Drop 2
+  brd: BRD-08
+  ref: 'BRID-008 (p.14-15); BRIDSP-07 (p.9); BRIDSP-18 (p.10)'
+  fr: 'FR-EB-031; FR-SP-041'
+  module: 'eb (BorValidator); submitted (SignatureProvider)'
+  type: PARK
+  req: 'The system validates that the BOR is signed; IAAF and TOR carry a signature.'
+  built: 'BOR: validator attestation with a checklist; e-signature verification parked. IAAF and TOR: stamped signature until a qualified e-signature provider is named.'
+  reason: 'EBQ06; SP e-signature question open.'
+  impact: 'Signature checks stay manual.'
+  depts: 'Employee Benefits; Submitted Policies (Policy Review); Compliance'
+  eff: [2, 5, 3, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'EBQ06'
+  target: ANS
+  src: 'FRS BRD-8 recorded differences; FRS BRD-12 scope'
+- id: CR-0149
+  drop: Drop 2
+  brd: BRD-08
+  ref: 'BRID-008 negative scenario (p.14-15); BRID-001 (p.7); TAT annex (p.42)'
+  fr: 'FR-EB-031, FR-EB-022, FR-EB-052'
+  module: 'eb (BOR tab, Renewal Due); booking'
+  type: DIFF
+  req: 'A BOR uploaded for a renewal transaction is invalid; RA a set number of days before expiry (example 180); booking in EBIX.'
+  built: 'The BOR is required for renewals that remarket; RA default 135 days from the TAT annex; booking in BIBS.'
+  reason: 'EBQ02, EBQ05; flow charts of the BRD.'
+  impact: 'Renewal advice issued 135 days before expiry unless BDOI sets another value.'
+  depts: 'Employee Benefits'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: CCB
+  xref: 'EBQ02; EBQ05'
+  target: FRS
+  src: 'FRS BRD-8 recorded differences'
+- id: CR-0150
+  drop: Drop 2
+  brd: BRD-08
+  ref: 'BRID-028 (Add. p.13; main p.33)'
+  fr: 'FRS BRD-8 traceability (out of scope)'
+  module: 'None'
+  type: RED
+  req: 'Present required documents for high-risk accounts.'
+  built: 'Out of scope per the EB addendum.'
+  reason: 'EB Addendum p.13 (DCR-089 answered).'
+  impact: 'None.'
+  depts: 'Employee Benefits'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: 'DCR-089'
+  target: FRS
+  src: 'FRS BRD-8 recorded differences'
+- id: CR-0151
+  drop: Drop 2
+  brd: BRD-08
+  ref: 'BRID-013 (p.20), benefit lines HMO, GPA, GLI'
+  fr: 'FR-EB-020, FR-EB-021'
+  module: 'catalog (insurer master, provider type)'
+  type: DIFF
+  req: 'HMO providers are placement counterparties but are not insurance companies.'
+  built: 'Proposed: HMO providers held in the insurer master with a provider type.'
+  reason: 'Platform holds counterparties as insurers.'
+  impact: 'HMO shown with insurers in lists and reports.'
+  depts: 'Employee Benefits; MBS'
+  eff: [1, 2, 1, 0]
+  prio: Low
+  status: DRAFT
+  xref: 'DCR-097'
+  target: D2
+  src: 'Register DCR-097'
+# ============================================================== BRD-09 Customer Servicing Facility
+- id: CR-0152
+  drop: Drop 1
+  brd: BRD-09
+  ref: 'BRCSF-002 (p.7); BRD-9 p.3, p.5 footnote 3; BRD-13 BRID 11.1 (p.11-12)'
+  fr: 'FR-CSF-022; FR-CSF-011'
+  module: 'csf (ContactSyncGateway outbox NOT_CONFIGURED; LegacyAccountLookup)'
+  type: DEC
+  req: 'Retrieve data from QPS and EBIX and send contact updates back to them.'
+  built: 'BIBS is the source; the write-back is an outbox seam left NOT_CONFIGURED because legacy is read-only from cut-over; accounts that exist only in legacy are found through LegacyAccountLookup.'
+  reason: 'BRD-13 legacy read-only (DCR-202); CSQ01.'
+  impact: 'No updates flow to legacy after go-live.'
+  depts: 'Contact Center Management'
+  eff: [0, 0, 0, 0]
+  alt: 13
+  prio: Medium
+  status: CCB
+  xref: 'DCR-104; DCR-202; CSQ01'
+  target: FRS
+  src: 'FRS BRD-9 recorded differences; register DCR-202'
+- id: CR-0153
+  drop: Drop 1
+  brd: BRD-09
+  ref: 'BRCSF-004 (p.8)'
+  fr: 'FR-CSF-020, FR-CSF-021'
+  module: 'csf (Update Contact dialog)'
+  type: PARK
+  req: 'View, add or update contact details.'
+  built: 'Update after a recorded verification; "add" means additional contacts only if BDOI confirms.'
+  reason: 'CSQ15 open.'
+  impact: 'Contact Center users cannot add second contacts until confirmed.'
+  depts: 'Contact Center Management'
+  eff: [0, 2, 1, 0]
+  prio: Low
+  status: DRAFT
+  xref: 'CSQ15'
+  target: ANS
+  src: 'FRS BRD-9 recorded differences'
+- id: CR-0154
+  drop: Drop 1
+  brd: BRD-09
+  ref: 'Umbrella CORE-16.04; BR-164 (p.11); BRCSF-006, BRCSF-009'
+  fr: 'FR-CSF-030, FR-CSF-033'
+  module: 'csf (Renewal Advice tab, E-policies tab)'
+  type: DEC
+  req: 'The umbrella asks Contact Center users to view and resend RAs and e-policies; BRD-9 asks for RAs only.'
+  built: 'RA resend only until BDOI answers; e-policies can be viewed.'
+  reason: 'CRQ16 open.'
+  impact: 'E-policy resend stays with Processing.'
+  depts: 'Contact Center Management; Processing'
+  eff: [0, 0, 0, 0]
+  alt: 3
+  prio: Low
+  status: CCB
+  xref: 'DCR-172; CRQ16'
+  target: FRS
+  src: 'Register DCR-172'
+# ============================================================== BRD-10 Sanction Screening
+- id: CR-0155
+  drop: Drop 1
+  brd: BRD-10
+  ref: 'SNSRP-301 (p.14); BRD-10 to-be diagram (p.8)'
+  fr: 'FR-SS-033'
+  module: 'screening; crm (ClientComplianceGate, off by default)'
+  type: PARK
+  req: 'The BRD asks for tags, cases and notifications on a match, not for a stop on business.'
+  built: 'No blocking. A blocking gate on quotation, account submission, placement, booking and renewal is proposed behind a parameter, off by default, if BDOI decides to block.'
+  reason: 'SANC SQ07 open; register priority item DCR-112.'
+  impact: 'Business can proceed while a match is under review.'
+  depts: 'Compliance; Marketing; Processing'
+  eff: [1, 4, 3, 1]
+  prio: High
+  status: DRAFT
+  xref: 'DCR-112; SANC SQ07'
+  target: ANS
+  src: 'FRS BRD-10 section 1.2'
+- id: CR-0156
+  drop: Drop 1
+  brd: BRD-10
+  ref: 'SNSRP-201 (p.12); SNSRP-706 (p.19-20)'
+  fr: 'FR-SS-020; FR-SS-071'
+  module: 'screening (WatchlistFeed, StrFileSink)'
+  type: INT
+  req: 'Receive the sanctions and NLDS-PEP lists in real time or on a schedule; save the STR extract to a designated folder.'
+  built: 'Lists come in as files through a staged-file feed; direct NLDS query and provider APIs are parked; the STR extract is downloaded, automatic saving to a folder is parked.'
+  reason: 'SANC SQ01 open (sources and transports).'
+  impact: 'Compliance loads list files by hand.'
+  depts: 'Compliance; BDOI IT'
+  eff: [2, 5, 3, 1]
+  prio: Medium
+  status: DRAFT
+  owner: IT
+  xref: 'SANC SQ01'
+  target: ANS
+  src: 'FRS BRD-10 section 1.2 and interfaces'
+- id: CR-0157
+  drop: Drop 1
+  brd: BRD-10
+  ref: 'SNSRP-301 (p.14) parties screened'
+  fr: 'FR-SS-030 to FR-SS-033'
+  module: 'screening; crm (party roles)'
+  type: PARK
+  req: 'Screening of clients; the parties are not listed.'
+  built: 'Clients held in BIBS are screened; beneficial owners, authorised signatories and beneficiaries are not held today and not screened.'
+  reason: 'SANC SQ11 open.'
+  impact: 'Related parties are screened outside BIBS.'
+  depts: 'Compliance; Marketing'
+  eff: [2, 6, 4, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'SANC SQ11'
+  target: ANS
+  src: 'FRS BRD-10 section 1.2'
+- id: CR-0158
+  drop: Drop 1
+  brd: BRD-10
+  ref: 'BRD-10 objectives (p.3), BSP M-2025-017'
+  fr: 'FRS BRD-10 section 1.2 (out of scope)'
+  module: 'screening'
+  type: RED
+  req: 'The objectives cite BSP M-2025-017; no requirement asks for adverse-media screening.'
+  built: 'Adverse-media screening not built.'
+  reason: 'SANC SQ20 open.'
+  impact: 'Adverse media checked outside BIBS.'
+  depts: 'Compliance'
+  eff: [0, 0, 0, 0]
+  alt: 18
+  prio: Medium
+  status: CCB
+  xref: 'SANC SQ20'
+  target: FRS
+  src: 'FRS BRD-10 section 1.2'
+- id: CR-0159
+  drop: Drop 1
+  brd: BRD-10
+  ref: 'SNSRP-101 to 109 (p.10-12), configuration; SNSRP-705, 706 (p.19-20), STR format'
+  fr: 'FR-SS (configuration); FR-SS-070, FR-SS-071'
+  module: 'screening (criteria, matrices, templates, STR extract)'
+  type: PARK
+  req: 'Production values, lists and the AMLC STR format.'
+  built: 'Built with documented defaults; the production values and lists, the AMLC STR format and reasons, and the active-policy definition wait for BDOI. Four follow-ups: working-hour SLA calendars, accent-insensitive case search, a guard against deleting case documents through the generic attachment API, and asynchronous screening after commit.'
+  reason: 'SANC SQ02, SQ03, SQ05, SQ06, SQ08, SQ09, SQ10, SQ15 open.'
+  impact: 'Screening runs on default thresholds until set.'
+  depts: 'Compliance'
+  eff: [3, 7, 5, 2]
+  prio: Medium
+  status: DRAFT
+  xref: 'SANC SQ02; SQ03; SQ05; SQ06; SQ08; SQ09; SQ10; SQ15'
+  target: W2
+  src: 'BDOI_SANC_BRD_SPEC section 3 (as built)'
+- id: CR-0160
+  drop: Drop 2
+  brd: BRD-10
+  ref: 'Drop plan INT-20 Bridger Insight XG (manual)'
+  fr: 'FR-SS (cases, evidence)'
+  module: 'screening (evidence document type, dispositions)'
+  type: INT
+  req: 'Compliance screens names in Bridger Insight XG.'
+  built: 'Proposed: Bridger results recorded in the BIBS case with evidence; evidence document type and disposition values configured; a client export for batch screening only if asked.'
+  reason: 'IQ19 open (replace or complement BIBS list matching).'
+  impact: 'Two screening tools unless BDOI decides.'
+  depts: 'Compliance'
+  eff: [1, 1, 1, 0]
+  prio: Low
+  status: DRAFT
+  xref: 'IQ19'
+  target: D2
+  src: 'PROGRAMME_ALIGNMENT 5 (INT-20)'
+# ============================================================== BRD-11 User Access Maintenance
+- id: CR-0161
+  drop: Drop 0
+  brd: BRD-11
+  ref: 'BRD 1.002-1.009 (p.7-8), BRD 2.002 (p.8), BRD 3.002 (p.9): an approved BIBS request is the only way to change access'
+  fr: 'FR-UA-010 to FR-UA-045'
+  module: 'nbadmin (access requests); security (UserAdminService); provisioning API (proposed)'
+  type: INT
+  req: 'BRD-11 makes an approved request in BIBS the only way to change a user or a group profile. The drop plan adds UIDM-ISC (identity governance).'
+  built: 'Proposed: UIDM-ISC provisions users and group-profile assignments through an API (SCIM 2.0 or its connector) with the ISC request number in the change log; group-profile definitions stay in BIBS under BRD-11; aggregation export for certification. Not built.'
+  reason: 'Drop plan Drop 0 (UIDM-ISC); IQ05 open.'
+  impact: 'Joiners, movers and leavers handled by the IGA; BRD-11 request types reduced.'
+  depts: 'ITIO; BDOI IT; all departments'
+  eff: [3, 15, 7, 2]
+  prio: High
+  status: DRAFT
+  xref: 'DCR-229; IQ05'
+  target: W1
+  src: 'FRS BRD-11 v1.1 interfaces; PROGRAMME_ALIGNMENT 5 (INT-02)'
+- id: CR-0162
+  drop: Drop 0
+  brd: BRD-11
+  ref: 'UAM-NFR-12 (p.13), NFR 1.i external ACL'
+  fr: 'FR-UA-003'
+  module: 'security (external authorisation port)'
+  type: PARK
+  req: 'Authorisation of users by interfacing with an external ACL.'
+  built: 'Not built; authorisation stays in BIBS roles and permissions.'
+  reason: 'UQ14 open; may be covered by UIDM-ISC (CR-0161).'
+  impact: 'None while roles stay in BIBS.'
+  depts: 'ITIO'
+  eff: [1, 4, 2, 1]
+  prio: Low
+  status: DRAFT
+  xref: 'UQ14'
+  target: ANS
+  src: 'BDOI_UAM_BRD_SPEC section 3 (as built)'
+- id: CR-0163
+  drop: Drop 0
+  brd: BRD-11
+  ref: 'NFR 1.j (p.13) user ID of at least ten characters, format a999999999; UAM-NFR-13 to 15'
+  fr: 'FR-UA-011, FR-UA-052'
+  module: 'security (USER_ID_PATTERN; business unit, user level)'
+  type: PARK
+  req: 'User IDs in the a999999999 format; business unit and user level values; privilege levels and working hours; QPS retention values; profile deactivation while it has members.'
+  built: 'Parameter USER_ID_PATTERN built (default a999999999 for new users; existing service users exempt); the value lists and rules wait for BDOI.'
+  reason: 'UQ05, UQ07, UQ12, UQ16 open.'
+  impact: 'Defaults apply until BDOI sets the values.'
+  depts: 'ITIO'
+  eff: [1, 1, 2, 1]
+  prio: Low
+  status: DRAFT
+  xref: 'DCR-118; UQ05; UQ07; UQ12; UQ16'
+  target: ANS
+  src: 'BDOI_UAM_BRD_SPEC section 3 (as built); register DCR-118'
+- id: CR-0164
+  drop: Drop 0
+  brd: BRD-11
+  ref: 'BRD-11 written for QPS in April 2025, process diagram (p.6); UQ19'
+  fr: 'FRS BRD-11 section 1.2'
+  module: 'security; nbadmin (all modules)'
+  type: ADD
+  req: 'User access maintenance for the Quotation and Pre-processing System (QPS).'
+  built: 'System-wide user access maintenance: every BIBS module uses the same users, group profiles and permissions.'
+  reason: 'UQ19.'
+  impact: 'One access process for all BIBS modules.'
+  depts: 'ITIO; all departments'
+  eff: [0, 0, 0, 0]
+  prio: Medium
+  status: IMPL
+  xref: 'UQ19'
+  target: FRS
+  src: 'FRS BRD-11 section 1.2'
+- id: CR-0165
+  drop: Drop 0
+  brd: BRD-11
+  ref: 'BRD-11 infrastructure rows "Follow existing QPS set up"; UAM-NFR-30 engagement terms (p.17); data migration "N/A" (p.12)'
+  fr: 'FRS BRD-11 section 1.2 (out of scope); FR-UA-019'
+  module: 'Deployment standards; bulk request'
+  type: RED
+  req: 'Servers, network, DR, environments and support follow the QPS set-up; engagement terms; user migration not applicable.'
+  built: 'Infrastructure follows the BIBS deployment standards (CR-0027); engagement terms are outside the application; existing users are loaded with the bulk request.'
+  reason: 'BRD-11 answers with QPS references.'
+  impact: 'None on the business process.'
+  depts: 'ITIO; BDOI IT'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: IMPL
+  xref: '-'
+  target: FRS
+  src: 'FRS BRD-11 section 1.2'
+# ============================================================== BRD-12 Submitted Policies
+- id: CR-0166
+  drop: Drop 1
+  brd: BRD-12
+  ref: 'BRIDSP-01 (p.8); BRIDSP-13 (p.10); BRD-12 p.4-5 (LFS, HLS, CIU, SPI, LAMD)'
+  fr: 'FR-SP-001; FR-SP (LAMD)'
+  module: 'submitted (SubmittedSourceFeed port; Excel uploads per source layout)'
+  type: INT
+  req: 'Receive submitted-policy details from the approved sources.'
+  built: 'Excel uploads per source layout; direct feeds from LFS SaaS, HL-LOAS, CIU, SPI and LMS (LAMD) are parked behind the port.'
+  reason: 'IQ06, IQ07, IQ08 open; LFS not on the drop plan.'
+  impact: 'Submissions arrive by upload until the feeds exist.'
+  depts: 'Submitted Policies; CBG and Non-CBG Marketing; BDOI IT'
+  eff: [3, 8, 5, 1]
+  prio: High
+  status: DRAFT
+  owner: IT
+  xref: 'IQ06; IQ07; IQ08; SP SQ01'
+  target: W1
+  src: 'FRS BRD-12 section 1.2 and interfaces; PROGRAMME_ALIGNMENT 5 (INT-03 to INT-05)'
+- id: CR-0167
+  drop: Drop 1
+  brd: BRD-12
+  ref: 'BRIDSP-22 (p.11)'
+  fr: 'FR-SP-062'
+  module: 'submitted (MailHouseGateway, print batches)'
+  type: INT
+  req: 'Letters and proposals sent automatically, including printed letters.'
+  built: 'Print batches (merged PDF and control list); the mail-house (COG) transport is parked.'
+  reason: 'Mail-house channel and layout not given.'
+  impact: 'Print batches handed to the mail house by hand.'
+  depts: 'Submitted Policies; Marketing'
+  eff: [1, 4, 2, 1]
+  prio: Low
+  status: DRAFT
+  owner: IT
+  xref: 'SP SQ09'
+  target: ANS
+  src: 'FRS BRD-12 section 1.2 and interfaces'
+- id: CR-0168
+  drop: Drop 1
+  brd: BRD-12
+  ref: 'BRIDSP-22, 23, 25, 26, 27, 32 (p.11-12) renewal of submitted policies; BRD-6 renewal letters'
+  fr: 'FR-SP (hand-off); FR-RN (RenewalHandOff)'
+  module: 'submitted (RenewalHandOff port); renewal (implements the port)'
+  type: DEC
+  req: 'BRD-12 requires the renewal of submitted policies (renewable list, RA / NRNS / NAL / SFU letters, hold cover, placement, booking); BRD-6 covers the same letters.'
+  built: 'Renewal owns the renewal from the hand-off (candidate, account, hold cover, RA / NRNS / NAL / SFU); Submitted Policies keeps intake, classification, buckets, the expiry scan and the masterlist status. Renewal notice and renewal proposal letters stay in Submitted Policies until answered.'
+  reason: 'Decision D2; XQ03 (SP SQ09) open for the two letters.'
+  impact: 'One renewal process for all policies.'
+  depts: 'Submitted Policies; Marketing (Renewal)'
+  eff: [1, 1, 1, 0]
+  prio: High
+  status: CCB
+  xref: 'DCR-129; D2; XQ03; SP SQ10'
+  target: FRS
+  src: 'BDOI_CROSS_BRD_DECISIONS D2, XQ03; FRS BRD-12 section 1.2'
+- id: CR-0169
+  drop: Drop 1
+  brd: BRD-12
+  ref: 'BRD-12 p.5 (ISYS reference and ARF of the current process)'
+  fr: 'FRS BRD-12 section 1.2'
+  module: 'submitted (ARN as reference)'
+  type: DIFF
+  req: 'The current process uses the ISYS reference and the ARF.'
+  built: 'The BIBS ARN replaces them; ISYS is not fed.'
+  reason: 'SP SQ20.'
+  impact: 'None after go-live.'
+  depts: 'Submitted Policies'
+  eff: [0, 0, 0, 0]
+  prio: Low
+  status: CCB
+  xref: 'SP SQ20'
+  target: FRS
+  src: 'FRS BRD-12 section 1.2'
+# ============================================================== BRD-13 Data Migration
+- id: CR-0170
+  drop: Drop 0
+  brd: BRD-13
+  ref: 'BRID 5.1 (p.8)'
+  fr: 'FR-DM-051'
+  module: 'migration (legacy UPP); cashiering'
+  type: MIG
+  req: 'The system "can issue acknowledgment receipt" for a migrated UPP item.'
+  built: 'No new AR for a migrated UPP item; the legacy AR number and date are shown on the item.'
+  reason: 'The cash was already acknowledged in legacy; DMQ14.'
+  impact: 'No double counting of receipts.'
+  depts: 'Operations (Cashiering); Comptrollership'
+  eff: [0, 0, 0, 0]
+  prio: High
+  status: CCB
+  xref: 'DCR-204; DMQ14'
+  target: MIG
+  src: 'Register DCR-204; FRS BRD-13 (FR-DM-051)'
+- id: CR-0171
+  drop: Drop 0
+  brd: BRD-13
+  ref: 'BRID 5.5 (p.9)'
+  fr: 'FR-DM-055'
+  module: 'migration; cashiering (disposition RECLASS_OTHER_INCOME)'
+  type: PARK
+  req: 'Reclassify legacy UPP to other income with top-management approval.'
+  built: 'New disposition RECLASS_OTHER_INCOME in batches, approved by the TL and then by a top-management approver; reversal only by a new approved batch. Criteria, GL account, frequency and notification wait for BDOI.'
+  reason: 'DMQ16 open.'
+  impact: 'Old unapplied cash stays on the books until criteria are set.'
+  depts: 'Operations (Cashiering); Comptrollership; top management'
+  eff: [1, 1, 1, 0]
+  prio: Medium
+  status: DRAFT
+  xref: 'DCR-205; DMQ16'
+  target: MIG
+  src: 'Register DCR-205; FRS BRD-13 (FR-DM-055)'
+- id: CR-0172
+  drop: Drop 0
+  brd: BRD-13
+  ref: 'BRID 7.1, 7.2 (p.10)'
+  fr: 'FR-DM-070, FR-DM-071'
+  module: 'migration; commission; cashiering (batch reversal)'
+  type: DEC
+  req: 'Batch reversal of DPPR and PR2307 legacy invoices; BRD-2 reverses DP PR per invoice after confirmed collection.'
+  built: 'Batches built from an upload or from the Collections "for reversal" tags of legacy invoices, with maker-checker approval; the commission receivable entry follows the BDOI answer.'
+  reason: 'Conflict between BRD-13, BRD-2 and BRD-4.'
+  impact: 'Legacy DP and 2307 items cleared in batches.'
+  depts: 'Operations; Collections; Comptrollership'
+  eff: [1, 1, 1, 0]
+  prio: Medium
+  status: CCB
+  xref: 'DCR-206'
+  target: MIG
+  src: 'Register DCR-206'
+- id: CR-0173
+  drop: Drop 0
+  brd: BRD-13
+  ref: 'BRID 6.1, 6.2 (p.9-10); BRCLXN.047 (p.33)'
+  fr: 'FR-DM-050; FR-DM-033'
+  module: 'migration (legacy invoice numbers); opsledger'
+  type: MIG
+  req: 'Legacy invoices are processed in BIBS by their legacy number; uniqueness across EBIX and QPS and component balances not stated.'
+  built: 'The legacy number is kept as the BIBS invoice number unless it collides (then a source prefix); loaded by component, or in open-balance mode if legacy cannot split.'
+  reason: 'DMQ11, DMQ12 open.'
+  impact: 'Users find legacy invoices by their known number.'
+  depts: 'Operations; Collections; Comptrollership'
+  eff: [0, 0, 0, 0]
+  prio: Medium
+  status: CCB
+  xref: 'DCR-207; DMQ11; DMQ12'
+  target: MIG
+  src: 'Register DCR-207'
+- id: CR-0174
+  drop: Drop 0
+  brd: BRD-13
+  ref: 'BRD-4 needs open EBIX PRs and disposition history; BRD-13 BRID 5-9 (p.8-11)'
+  fr: 'FR-DM (object F09); FR-CL'
+  module: 'migration (open dispositions, promises, installment plans, assignments); collections'
+  type: MIG
+  req: 'BRD-13 carries receivables forward but says nothing about open dispositions, promises, installment plans and collector assignments.'
+  built: 'Proposed: carry the open dispositions, promises, installment plans and assignments; history stays in the archive.'
+  reason: 'Gap between BRD-4 and BRD-13; CQ07.'
+  impact: 'Collectors continue their follow-up from day one.'
+  depts: 'Collections'
+  eff: [1, 3, 2, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'DCR-203; CQ07'
+  target: MIG
+  src: 'Register DCR-203; BDOI_DM_BRD_SPEC 6.1'
+- id: CR-0175
+  drop: Drop 0
+  brd: BRD-13
+  ref: 'BRD-12 BRIDSP-33 (p.12); EB programme load; payee migration; BRD-13 object list (none)'
+  fr: 'FR-DM-014; FR-SP (migration); FR-EB (programme load); FR-DS (payee migration)'
+  module: 'migration framework calling SBM_MIGRATION, EB_PROGRAMME_LOAD, DISB_PAYEE_MIGRATION'
+  type: MIG
+  req: 'Other BRDs expect data that BRD-13 does not mention: submitted-policy masterlists, in-force EB programmes, payees.'
+  built: 'The loaders the other designs hold run under the migration framework (reconciliation and sign-off) once BDOI puts the objects in scope (P04, P05, R09).'
+  reason: 'DMQ01 open (object inventory).'
+  impact: 'All masterlists and programmes arrive through one controlled migration.'
+  depts: 'Submitted Policies; Employee Benefits; Comptrollership (Disbursement); Business Project Services'
+  eff: [2, 6, 4, 1]
+  prio: Medium
+  status: DRAFT
+  xref: 'DCR-196; DMQ01'
+  target: MIG
+  src: 'Register DCR-196; BDOI_DM_BRD_SPEC 6.1'
+- id: CR-0176
+  drop: Drop 0
+  brd: BRD-13
+  ref: 'BRID 2.1 (p.7); BRD-10 SNSRP-301 (p.14)'
+  fr: 'FR-DM-032; FR-SS'
+  module: 'migration; screening (full screening run)'
+  type: MIG
+  req: 'BRD-10 screens each client when it is created; BRD-13 loads clients in bulk and is silent on screening.'
+  built: 'Proposed: no screening per migrated client; one full screening run after the client load; legacy risk ratings kept until the run completes.'
+  reason: 'DMQ06 open.'
+  impact: 'Compliance reviews one batch of matches after the load.'
+  depts: 'Compliance; Business Project Services'
+  eff: [1, 2, 2, 0]
+  prio: Medium
+  status: DRAFT
+  xref: 'DCR-208; DMQ06'
+  target: MIG
+  src: 'Register DCR-208'
+- id: CR-0177
+  drop: Drop 0
+  brd: BRD-13
+  ref: 'BRD-13 cut-over aligned to RMEL (no date, p.12-13); timeline slide (go-live January 2028)'
+  fr: 'FR-DM-022, FR-DM-023, FR-DM-024; FR-DM-120, FR-DM-121'
+  module: 'migration (provisional GL opening, FY2027 true-ups, cut-over plan)'
+  type: MIG
+  req: 'Cut-over aligned to RMEL; no go-live date, freeze, mocks, go / no-go criteria or treatment of the year-end.'
+  built: 'Go-live Monday 3-Jan-2028 at the year-end boundary (option A): provisional GL opening trial balance, legacy GL kept for the FY2027 close, true-ups posted as opening-balance adjustment journals and reconciled to the legacy trial balance; mocks Apr-May, Jun-Jul, Aug and Oct 2027, dress rehearsal Nov-Dec 2027.'
+  reason: 'BDOI answer DMQ39 of 26-Sep-2026 (recommended option A); IQ01 confirmed at M6.'
+  impact: 'FY2027 is closed in legacy; BIBS books start with a provisional opening.'
+  depts: 'Comptrollership; Business Project Services; all departments (freeze)'
+  eff: [0, 0, 0, 1]
+  prio: High
+  status: CCB
+  xref: 'DCR-200; DCR-217; DCR-242; DMQ39; IQ01'
+  target: MIG
+  src: 'FRS BRD-13 (FR-DM-022 to 024); register DCR-242'
+- id: CR-0178
+  drop: Drop 0
+  brd: BRD-13
+  ref: 'BRID 11.1 (p.11-12) legacy read-only history; BRID 1.1b (p.7) extract delivery'
+  fr: 'FR-DM-110, FR-DM-111; FR-DM-010'
+  module: 'migration (archive search, access log, extract intake)'
+  type: MIG
+  req: 'Keep legacy read-only for history; receive the extracts. No retention for migration evidence; transport not stated.'
+  built: 'Archive search with logged access; migration evidence kept 10 years as project records; staging purged within 5 days. Extracts are received by upload; an SFTP drop from BDOI IT and links into the legacy systems are parked.'
+  reason: 'DMQ28 open (extract transport); hosting appendix (5-day purge).'
+  impact: 'Extract delivery by hand until the SFTP drop exists.'
+  depts: 'Business Project Services; BDOI IT; Compliance'
+  eff: [1, 3, 2, 0]
+  prio: Medium
+  status: DRAFT
+  xref: 'DCR-209; DMQ28'
+  target: MIG
+  src: 'Register DCR-209; FRS BRD-13 interfaces'

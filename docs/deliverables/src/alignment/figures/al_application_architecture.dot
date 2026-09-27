@@ -1,0 +1,61 @@
+// BIBS application architecture as built (for the IER "Architecture Diagram" sheet and section 6 of the alignment document).
+digraph al_application_architecture {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.25, ranksep=0.35, bgcolor="white", pad=0.2, newrank=true, compound=true,
+         label=<<font point-size="16" color="@HEADER_BLUE"><b>BIBS (iNXT BrokerVerse) - application architecture as built</b></font><br/><font point-size="10" color="@MUTED">One backend deployment (modular monolith) and one frontend deployment on Amazon EKS, AWS ap-southeast-1. RPO 15 minutes, RTO 4 hours (IER). * = designed, to build.</font>>,
+         labelloc=t, labeljust=l];
+  node  [shape=box, style="rounded,filled", color="@HEADER_BLUE", penwidth=1.0, fontname="Arial",
+         fontsize=10, fontcolor="@NEAR_BLACK", margin="0.1,0.05", fillcolor="@WHITE"];
+  edge  [color="@HEADER_BLUE", arrowsize=0.6, penwidth=1.1, fontname="Arial", fontsize=8, fontcolor="@MUTED"];
+
+  users [label=<<b>BDOI users</b><br/><font point-size="9">browser only; Head Office and branches</font>>, fillcolor="@BG_BLUE", width=2.6];
+  eiam  [label=<<b>EIAM (Entra ID)</b><br/><font point-size="9">sign-in, OpenID Connect</font>>, fillcolor="@AMBER_BG", width=2.4];
+  edge_ [label=<<b>Edge</b><br/><font point-size="9">Route 53, AWS WAF, Application Load Balancer, TLS 1.2+</font>>, fillcolor="@DIRTY_WHITE", width=3.6];
+
+  subgraph cluster_eks {
+    label=<<b>Amazon EKS - namespace brokerverse</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded,dashed"; color="@HEADER_BLUE"; margin=10;
+    fe [label=<<b>brokerverse-frontend</b><br/><font point-size="9">nginx 1.27 serving the React 19 SPA; /api proxied to the backend</font>>, fillcolor="@BG_BLUE", width=4.2];
+    subgraph cluster_be {
+      label=<<b>brokerverse-backend</b> - Spring Boot 3.5, Java 21, one modular monolith (module rules checked by ArchUnit)>; fontsize=11; fontcolor="@NEAR_BLACK"; style="rounded,filled"; fillcolor="#F4F9FD"; color="@HEADER_BLUE"; margin=8;
+      cp  [label=<<b>Client and Policy</b><br/><font point-size="9">crm, screening, quotation,<br/>nonpackage, account, placement,<br/>issuance, booking, catalog,<br/>productmaint; renewal*,<br/>submitted*, eb*, csf*</font>>, width=2.3];
+      ops [label=<<b>Operations</b><br/><font point-size="9">opsledger (invoice ledger),<br/>cashiering, remittance,<br/>adjustment, prodrecon,<br/>commission, collections</font>>, width=2.3];
+      fin [label=<<b>Finance</b><br/><font point-size="9">accounting engine, journal,<br/>ledger, coa, period, closing,<br/>disbursement, payrequest,<br/>acsl, frbs, tax</font>>, width=2.3];
+      clm [label=<<b>Claims</b><br/><font point-size="9">brokerclaims<br/>(being built)</font>>, width=1.6];
+      plat [label=<<b>Platform services</b><br/><font point-size="9">security, nbadmin (user access), workflow, approval, lov, bulk, docgen, attachment, messaging,<br/>report, alert, audit, events (outbox), cache, sharedstate (job lock), migration*</font>>, fillcolor="@DIRTY_WHITE", width=8.5];
+      cp -> ops [label="InvoiceBooked"];
+      ops -> fin [label="accounting events"];
+      { rank=same; cp; ops; fin; clm; }
+      cp -> plat [style=invis];
+    }
+  }
+
+  subgraph cluster_data {
+    label=<<b>Managed data services</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded,dashed"; color="@HEADER_BLUE"; margin=10;
+    rds [label=<<b>Amazon RDS PostgreSQL 16</b><br/><font point-size="9">one database, Flyway schema;<br/>record, journal, ledger and<br/>sub-ledger in one transaction</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS", width=2.3];
+    redis [label=<<b>ElastiCache Redis 7</b><br/><font point-size="9">reference-data cache, job lock,<br/>token denylist, counters</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS", width=2.1];
+    msk [label=<<b>Amazon MSK (Kafka 3.6+)</b><br/><font point-size="9">9 topics bibs.*, outbox relay,<br/>dead-letter topics</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS", width=2.1];
+    s3 [label=<<b>Amazon S3</b><br/><font point-size="9">documents, reports, extracts,<br/>uploads; SSE-KMS (answer A4)</font>>, fillcolor="@AMBER_BG", width=2.1];
+  }
+
+  subgraph cluster_int {
+    label=<<b>Integrations owned by BDOI IT (files, APIs, SMTP)</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded,dashed"; color="@MUTED"; margin=10;
+    i1 [label=<<b>UIDM-ISC</b><br/><font point-size="9">provisioning</font>>, width=1.5];
+    i2 [label=<<b>CCM</b><br/><font point-size="9">e-mail</font>>, width=1.2];
+    i3 [label=<<b>Bank channels</b><br/><font point-size="9">CMS / New BOB, OBPCS,<br/>Old BOB, PMS, AFTS, TFS</font>>, width=2.0];
+    i4 [label=<<b>Loan systems</b><br/><font point-size="9">LMS, HL-LOAS,<br/>LFS SaaS</font>>, width=1.5];
+    i5 [label=<<b>Enterprise</b><br/><font point-size="9">EDP (SD 11), EGL,<br/>CARMS</font>>, width=1.6];
+    i6 [label=<<b>Insurer systems</b><br/><font point-size="9">files, responses</font>>, width=1.6];
+    { rank=same; i1; i2; i3; i4; i5; i6; }
+  }
+
+  { rank=same; users; eiam; }
+  users -> eiam [style=dashed, label="sign-in"];
+  users -> edge_ [label="HTTPS"];
+  edge_ -> fe;
+  fe -> ops [lhead=cluster_be, label="REST /api/v1 (JWT)"];
+  plat -> rds [ltail=cluster_be, label="JDBC (TLS)"];
+  plat -> redis [ltail=cluster_be];
+  plat -> msk [ltail=cluster_be, label="SASL/SCRAM"];
+  plat -> s3 [ltail=cluster_be, label="IRSA"];
+  rds -> i3 [style=invis];
+  plat -> i1 [ltail=cluster_be, lhead=cluster_int, style=dashed, constraint=false];
+}

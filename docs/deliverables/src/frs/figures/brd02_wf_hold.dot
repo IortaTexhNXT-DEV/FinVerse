@@ -1,0 +1,31 @@
+// BRD-2: workflow OPS_HOLD (V771; MKTID.002-007, RMTID.021). FRS section 5. Stage owner in the second line.
+// Solid = main path, dashed = return or optional path, dotted = closes the case.
+digraph wf_hold {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.3, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.4, height=0.45, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  DRAFT [label="DRAFT\nMarketing (HOLD_REQUEST)"];
+  FOR_APPROVAL [label="FOR_APPROVAL\nMarketing TL / UH (HOLD_APPROVE)"];
+  ACTIVE [label="ACTIVE\nRemittance processor", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  EXTENSION_FOR_APPROVAL [label="EXTENSION_FOR_APPROVAL\nHOLD_APPROVE"];
+  CANCEL_FOR_APPROVAL [label="CANCEL_FOR_APPROVAL\nHOLD_APPROVE"];
+  RELEASED [label="RELEASED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  REJECTED [label="REJECTED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  CANCELLED [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  DRAFT -> FOR_APPROVAL [label=" submit"];
+  FOR_APPROVAL -> ACTIVE [label=" approve"];
+  FOR_APPROVAL -> REJECTED [label=" reject", style=dotted];
+  DRAFT -> CANCELLED [label=" cancel", style=dotted];
+  ACTIVE -> EXTENSION_FOR_APPROVAL [label=" extend"];
+  EXTENSION_FOR_APPROVAL -> ACTIVE [label=" approve / reject\nextension", style=dashed, constraint=false];
+  ACTIVE -> CANCEL_FOR_APPROVAL [label=" request_cancel"];
+  CANCEL_FOR_APPROVAL -> RELEASED [label=" approve_cancel"];
+  CANCEL_FOR_APPROVAL -> ACTIVE [label=" reject_cancel", style=dashed, constraint=false];
+  ACTIVE -> RELEASED [label=" release, expire\n(HOLD_EXPIRY)"];
+  { rank=same; EXTENSION_FOR_APPROVAL; CANCEL_FOR_APPROVAL; }
+  { rank=same; DRAFT; CANCELLED; }
+  { rank=same; ACTIVE; REJECTED; }
+}

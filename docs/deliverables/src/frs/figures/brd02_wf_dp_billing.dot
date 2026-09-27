@@ -1,0 +1,25 @@
+// BRD-2: workflow OPS_DP_BILLING (V785; CMRID.008-013). FRS section 5. Stage owner in the second line.
+// Solid = main path, dashed = return or optional path, dotted = closes the case.
+digraph wf_dp_billing {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.3, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.4, height=0.45, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  DP_FOR_BILLING [label="DP_FOR_BILLING\nCommission handler (COMMREC_PROCESS)"];
+  AWAITING_INSURER [label="AWAITING_INSURER\nSLA 10 working days"];
+  APPROVED [label="APPROVED\nCommission handler"];
+  COLLECTED [label="COLLECTED\nCommission handler"];
+  CLOSED [label="CLOSED\nPR reversed", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  RETURNED_TO_COLLECTION [label="RETURNED_TO_COLLECTION", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  CANCELLED [label="CANCELLED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  DP_FOR_BILLING -> AWAITING_INSURER [label=" bill"];
+  AWAITING_INSURER -> APPROVED [label=" insurer_approved"];
+  AWAITING_INSURER -> RETURNED_TO_COLLECTION [label=" insurer_rejected", style=dotted];
+  APPROVED -> COLLECTED [label=" collected"];
+  COLLECTED -> CLOSED [label=" pr_reversed"];
+  DP_FOR_BILLING -> CANCELLED [label=" cancel", style=dotted];
+  { rank=same; DP_FOR_BILLING; CANCELLED; }
+  { rank=same; APPROVED; RETURNED_TO_COLLECTION; }
+}

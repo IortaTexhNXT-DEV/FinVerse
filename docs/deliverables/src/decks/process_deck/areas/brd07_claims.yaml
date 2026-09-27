@@ -1,0 +1,143 @@
+# BRD-7 Claims: chapter 7 of the business process deck.
+# Sources: "Claims (CLM).PDF" p.23-27 (current process, target facility), p.32-41 (NFR); workshop addendum p.5-7;
+# FRS BRD-7 sections 2, 5, 9; cross-BRD decisions D3, D4, XQ05, XQ10; discrepancy register (DCR-078, 079, 085, 086, 157).
+id: brd07
+key: clm
+num: 7
+title: Claims
+brd: BRD-7
+scope: 'Claims logging and monitoring, from notice of loss to closure and loss analytics'
+status: DESIGNED
+status_text: Designed, not yet built; FRS v1.0 issued for review
+department: Claims and Risk Management
+roles:
+  - Claims Officer / Claims Assistant (Motor and Non-Motor teams)
+  - Team Lead, Team Head, Unit Head
+  - Claims / Risk user (loss analytics)
+  - Marketing AO and TL (notice, loss information)
+  - Clients, insurers and adjusters (external)
+figures:
+  - ['55', 'claims booked a day; 10% growth (p.32-41)']
+  - ['1,096', 'status and settlement updates a day']
+  - ['37', 'Claims users: 28 head office, 9 branches']
+  - ['5 s', 'screens, booking, premium validation']
+sources:
+  - BRD-7 p.23-27 (current process and target facility)
+  - Workshop addendum p.5-7 (BRCLM.036-043)
+  - FRS BRD-7 v1.0, sections 2 and 5
+chevrons: [Notice, Record, Premium check, Loss advice, Handling, Follow-up, Settlement, Closure]
+notes:
+  glance: >-
+    BDOI is a broker: the insurer accepts, evaluates and pays a claim; BDOI files and follows the claim for the client.
+    The scope is claims logging and monitoring. Motor and Non-Motor claims use the same record and statuses; they
+    differ in the notice document (PLA or CRF) and the settlement path (LOA or cash offer, adjuster, signed release).
+    Claims is designed; Renewal reads its loss experience through the Claims query service (decision D4).
+  pains: The seven points are the current-process rows of FRS BRD-7 section 2.1, from the BRD (p.23-27).
+  after: 'The usage table gives volumes and response times (p.32-41); no claim turnaround target is given.'
+  gaps: 'The Claims Authorization Code (DCR-085) decides how unpaid premium stops a claim.'
+asis:
+  caption: 'Claims today (BRD-7 p.24-26)'
+  notes: >-
+    Today the notice of loss arrives by e-mail or call; Marketing prepares the Preliminary Loss Advice for Motor or the
+    Claims Reporting Form for Non-Motor. Policy details are looked up in EBIX and re-keyed. Premium payment is checked by
+    hand. The loss advice goes to the insurer by e-mail from a mailbox and the handler chases the client for documents.
+    Status and follow-up are tracked in spreadsheets, closure is tagged informally, and claims reports are extracted
+    from ISYS.
+  cols: 6
+  lanes:
+    - {id: cli, label: 'Client, branch', kind: external}
+    - {id: mkt, label: Marketing AO}
+    - {id: clm, label: Claims Officer}
+    - {id: ins, label: 'Insurers, adjusters', kind: external}
+    - {id: sys, label: 'EBIX, ISYS, Excel, e-mail', kind: system}
+  steps:
+    - {id: a1, lane: cli, col: 1, text: Notice of loss by e-mail or call, kind: external}
+    - {id: a2, lane: mkt, col: 1, text: Prepares PLA (Motor) or CRF, pain: [1]}
+    - {id: a3, lane: sys, col: 2, text: Policy looked up in EBIX, kind: legacy, pain: [2]}
+    - {id: a4, lane: clm, col: 2, text: Premium payment checked by hand, pain: [3]}
+    - {id: a5, lane: clm, col: 3, text: Loss advice e-mailed from a mailbox, pain: [4]}
+    - {id: a6, lane: ins, col: 3, text: 'Adjuster; LOA or cash offer', kind: external}
+    - {id: a7, lane: clm, col: 4, text: Chases documents; returns the offer}
+    - {id: a8, lane: sys, col: 4, text: Status and follow-up in Excel, kind: legacy, pain: [5]}
+    - {id: a9, lane: clm, col: 5, text: Closure tagged informally, pain: [6]}
+    - {id: a10, lane: sys, col: 6, text: Claims reports from ISYS, kind: legacy, pain: [7]}
+  edges:
+    - [a1, a2]
+    - [a2, a3, dashed, e-mail]
+    - [a3, a4]
+    - [a4, a5]
+    - [a5, a6, dashed]
+    - [a6, a7, dashed]
+    - [a7, a8]
+    - [a8, a9]
+    - [a9, a10]
+pains:
+  - {n: 1, title: Notice prepared by hand, text: 'PLA or CRF prepared by Marketing from an e-mail or a call.', ref: 'BRD-7 p.24-25'}
+  - {n: 2, title: Policy details re-keyed, text: 'Policy details are looked up in EBIX and keyed again.', ref: 'BRD-7 p.24-25; BRCLM.003, 004'}
+  - {n: 3, title: Premium checked by hand, text: 'Nothing stops a claim on an unpaid invoice.', ref: 'BRD-7 p.23; BRCLM.001'}
+  - {n: 4, title: Loss advice from a mailbox, text: 'No send log; insurer claim numbers kept outside a system.', ref: 'BRD-7 p.24-25; BRCLM.041, 043'}
+  - {n: 5, title: Status in spreadsheets, text: 'Status, adjuster, reserve and follow-up dates tracked in Excel.', ref: 'BRD-7 p.23, 27; BRCLM.010-024'}
+  - {n: 6, title: Informal closure, text: 'No distinction between temporary and permanent closure.', ref: 'BRD-7 p.27-28; BRCLM.005, 035'}
+  - {n: 7, title: Reports from ISYS, text: 'Claims reports are extracted from ISYS.', ref: 'BRD-7 p.39-42; Report List'}
+tobe:
+  caption: 'Claim lifecycle in BIBS: workflow BCL_CLAIM (FRS BRD-7 sections 2.2 and 5)'
+  notes: >-
+    In BIBS the Claims Officer records the claim on the client's cover; the claim number is BCL-yyyy-nnnnnn. The
+    cover, policy number, version, locations, Marketing unit and branch come from the BIBS account, read-only. BIBS reads
+    the invoice ledger and disables the authorization code while premium is unpaid. The loss advice is generated and
+    e-mailed to each insurer with a send log; insurer claim numbers are recorded per insurer. Status (restricted by role
+    and unit), adjuster, reserve, next follow-up date, action plan and diary are on the claim, with history. Settlement
+    type and amount are recorded; permanent closure needs a closing settlement type and a TL or TH. Ageing, outstanding,
+    settled, loss experience and loss ratio reports run in BIBS and export to Excel.
+  cols: 7
+  lanes:
+    - {id: cli, label: 'Client, AO, branch', kind: external}
+    - {id: clm, label: Claims Officer}
+    - {id: tl, label: 'Team Lead, Team Head'}
+    - {id: ins, label: 'Insurers, adjusters', kind: external}
+    - {id: bibs, label: BIBS (automatic), kind: bibs}
+  steps:
+    - {id: b1, lane: cli, col: 1, text: 'Notice of loss: PLA or CRF', kind: external}
+    - {id: b2, lane: clm, col: 1, text: Claim on the cover (BCL number)}
+    - {id: b3, lane: bibs, col: 2, text: Cover read-only; premium check, kind: auto}
+    - {id: b4, lane: bibs, col: 3, text: Loss advice to each insurer, kind: doc}
+    - {id: b5, lane: ins, col: 4, text: 'Claim no., reserve, adjuster', kind: external}
+    - {id: b6, lane: clm, col: 4, text: 'Status, reserve, adjuster recorded'}
+    - {id: b7, lane: clm, col: 5, text: 'Follow-up date, action plan, diary'}
+    - {id: b8, lane: bibs, col: 5, text: Ageing per status; reminders, kind: auto}
+    - {id: b9, lane: tl, col: 6, text: Settlement type and amount}
+    - {id: b10, lane: tl, col: 7, text: Permanent closure; reopen with reason}
+    - {id: b11, lane: bibs, col: 7, text: 'Loss ratio, claims-prone locations', kind: doc}
+  edges:
+    - [b1, b2]
+    - [b2, b3]
+    - [b3, b4]
+    - [b4, b5, dashed, e-mail + log]
+    - [b5, b6, dashed, updates]
+    - [b6, b7]
+    - [b7, b8]
+    - [b7, b9]
+    - [b9, b10]
+    - [b10, b11]
+after:
+  - {n: 1, bibs: 'Claim recorded on the cover in BIBS with the PLA / CRF data; number BCL-yyyy-nnnnnn', measure: '55 claims a day'}
+  - {n: 2, bibs: 'Cover, policy, version, locations, unit and branch read from the account, read-only', measure: 'No re-keying'}
+  - {n: 3, bibs: 'Invoice ledger read; authorization code disabled while premium is unpaid', measure: 'Check in 5 s'}
+  - {n: 4, bibs: 'Loss advice generated and e-mailed per insurer; insurer claim numbers recorded', measure: 'Send log'}
+  - {n: 5, bibs: 'Status within the role / unit matrix, adjuster, reserve, follow-up and diary on the claim', measure: '1,096 updates a day'}
+  - {n: 6, bibs: 'Temporary and permanent closure; permanent needs a settlement type and a TL / TH', measure: 'Four-eyes closure'}
+  - {n: 7, bibs: 'Ageing, outstanding, settled, loss experience and loss ratio reports in BIBS, to Excel', measure: 'No ISYS extract'}
+gaps:
+  - {sev: High, gap: Claims Authorization Code undefined, impact: Valid claims could be blocked, owner: Claims and Risk Management, decision: 'What the code is; which unpaid invoice blocks; TL / TH override', ref: 'DCR-085'}
+  - {sev: High, gap: Settlement type and settlement status, impact: Claim closure and reporting, owner: Claims and Risk Management, decision: 'One list or two; which values close the claim', ref: 'DCR-078'}
+  - {sev: High, gap: 'Does claim money pass through BDOI?', impact: Cashiering and Disbursement flows for settlements, owner: 'Claims, Operations', decision: 'Record the cheque only, or handle the money', ref: 'DCR-086'}
+  - {sev: High, gap: Open and historical claims at go-live, impact: Loss ratio and claims-prone analysis need history, owner: 'Claims, BDO IT', decision: 'Scope and years from EBIX / ISYS', ref: 'DCR-157, CLQ14'}
+  - {sev: Medium, gap: Who closes and reopens, impact: Closure permissions, owner: Claims and Risk Management, decision: Officer or TL / TH for permanent closure, ref: 'DCR-079'}
+  - {sev: Medium, gap: Total-loss indicator, impact: Renewal eligibility after a total loss, owner: 'Claims, Renewal', decision: 'Settlement type, loss nature or a flag', ref: 'XQ10'}
+best:
+  - {practice: Premium-paid check before filing, status: BIBS, bibs: 'Invoice ledger read at intake; authorization disabled while unpaid, with reason and history.', bdoi: 'Define the rule and the override (DCR-085).'}
+  - {practice: Claims diary with ageing control, status: BIBS, bibs: 'Next follow-up date, action plan, diary; age overall and per status; Claims home.', bdoi: 'Set follow-up targets per status.'}
+  - {practice: Four-eyes closure, status: BIBS, bibs: 'Permanent closure needs a closing settlement type and a TL or TH; reopen with a reason.', bdoi: 'Confirm who closes (DCR-079).'}
+  - {practice: Loss data for pricing and renewal, status: PARTLY, bibs: 'Loss experience and claims-prone locations; Renewal reads claims (decision D4).', bdoi: 'Migrate claims history (CLQ14).'}
+  - {practice: Confidential claim documents, status: PARTLY, bibs: 'Document access classes per type; claims reports as CLAIM_REPORT (decision D3).', bdoi: 'Approve the confidentiality matrix under the Data Privacy Act (XQ04).'}
+  - {practice: Claims service KPIs, status: ADOPT, bibs: 'Ageing, outstanding and settled reports, 90-days-past-due list.', bdoi: 'Adopt turnaround targets for notice-to-advice and advice-to-settlement.'}

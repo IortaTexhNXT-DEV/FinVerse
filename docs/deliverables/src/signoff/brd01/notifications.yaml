@@ -1,0 +1,175 @@
+# Notifications catalogue of BRD-1 New Business: in-app notices (bell in the page header) and e-mails.
+# Every row is traced to the code that raises it (source). Texts are verbatim; <name> is filled in by BIBS.
+# Columns: id | channel | trigger | recipient | template / text | content | screen | FR | source
+notifications:
+  - id: NT-01
+    channel: In-app
+    trigger: A client, quotation, PRF or account moves to another stage (any workflow action, including return and void)
+    recipient: The creator of the record and its current assignee, unless they made the move themselves
+    template: "Title: <reference>: <new stage name>. Text: <record description> - <comment>"
+    content: The new stage, the record and the comment typed with the action; the notice opens the record
+    screen: Client record, Quotation record, PRF record, Account record
+    frs: [FR-NB-010, FR-NB-015]
+    source: WorkflowService.notifyChange
+  - id: NT-02
+    channel: In-app
+    trigger: A team leader assigns a work item to a user (My Work, TSU Workbench)
+    recipient: The new assignee, unless the team leader assigns it to himself
+    template: "Title: <reference> assigned to you. Text: <record description>"
+    content: The record now assigned; the notice opens the record
+    screen: My Work, TSU Workbench
+    frs: [FR-NB-011]
+    source: WorkAssignmentService.assign
+  - id: NT-03
+    channel: In-app
+    trigger: The monthly KYC_REVIEW_DUE job (1st of the month, 10:00 PHT) finds non-bank clients whose KYC review is overdue or due within KYC_DUE_WINDOW_DAYS
+    recipient: Every user with CLIENT_MAINTAIN (Account Officers and Marketing TL)
+    template: "Title: KYC reviews due: <n> client(s). Text: Non-bank clients whose periodic KYC review is overdue or due by <date> (BRNB.110)."
+    content: The number of clients to review; the notice opens KYC Reviews Due
+    screen: KYC Reviews Due
+    frs: [FR-NB-038]
+    source: KycReviewService (KYC_REVIEW_DUE job)
+  - id: NT-04
+    channel: In-app
+    trigger: The daily HOLD_COVER_EXPIRY job (08:30 PHT) finds a hold cover expiring within HOLD_COVER_ALERT_DAYS (5) on an account whose policy is not yet received
+    recipient: Every user with PLACEMENT_MANAGE (Processing)
+    template: "Title: Hold cover expiring: <ARN>. Text: The hold cover of <insurer> expires on <date>; the policy has not been received yet."
+    content: The account and the expiry date; the notice opens the account placement
+    screen: Account Placement
+    frs: [FR-NB-083]
+    source: HoldCoverService.notify
+  - id: NT-05
+    channel: In-app
+    trigger: The same job expires a hold cover whose expiry date has passed while the policy is not received
+    recipient: Every user with PLACEMENT_MANAGE (Processing)
+    template: "Title: Hold cover expired: <ARN>. Text: The hold cover of <insurer> expired on <date>; the policy has not been received yet."
+    content: As above
+    screen: Account Placement
+    frs: [FR-NB-083]
+    source: HoldCoverService.notify
+  - id: NT-06
+    channel: In-app
+    trigger: An e-policy is stored on its account (single or bulk upload) and the document trigger opens its extraction review
+    recipient: Every user with EPOLICY_MANAGE (Processing) except the user who uploaded the file
+    template: "Title: E-policy to review: <ARN>. Text: <file name> was received; check the extracted policy data"
+    content: The e-policy to review; the notice opens the Extraction Review
+    screen: Extraction Review
+    frs: [FR-NB-100, FR-NB-102]
+    source: DocumentTriggerService
+  - id: NT-07
+    channel: In-app
+    trigger: A service invoice e-mail is delivered, fails, or cannot be sent because the recipient has no billing e-mail
+    recipient: The owner user and the owner team (permission) of the service invoice type
+    template: "Title: Service invoice <SI No.> sent / not delivered / not sent. Text: Sent to <recipient> (<e-mail>) / <delivery error> / No billing e-mail address for <recipient code>"
+    content: The dispatch outcome; the notice opens the service invoice
+    screen: Service Invoices
+    frs: [FR-NB-117]
+    source: ServiceInvoiceDispatch.notifyOwner, ServiceInvoiceDispatchWatcher
+  - id: NT-08
+    channel: In-app
+    trigger: An account is booked with an insurer billing number (Employee Benefits lines)
+    recipient: The user who booked and the Account Officer (unless switched off in Notification Settings)
+    template: "Title: Booked <invoice> with billing number. Text: <ARN> was booked as <invoice> with insurer billing number <billing no>."
+    content: The invoice and the billing number; the notice opens the booked invoice
+    screen: Booked Invoice
+    frs: [FR-NB-110]
+    source: InsurerBillingNumbers.notifyBooked
+  - id: NT-09
+    channel: In-app
+    trigger: A booking is refused because the insurer billing number is already on another invoice
+    recipient: The user who booked and the Account Officer (unless switched off in Notification Settings)
+    template: "Title: Duplicate billing number on <ARN>. Text: <refusal message>"
+    content: The refused booking; the notice opens the account
+    screen: Account record
+    frs: [FR-NB-110]
+    source: InsurerBillingNumbers.notifyDuplicate
+  - id: NT-10
+    channel: E-mail
+    trigger: Send via Email on an approved quotation, or the batch send of approved quotations (one e-mail per client)
+    recipient: The client (address on file, changeable in the dialog) and any Cc
+    template: "Subject: Insurance quotation <Proposal No.> – <product>. Body: Dear <client>, Please find attached our quotation <Proposal No.> (ARN <ARN>), valid until <date>. The documents are password protected; the password follows in a separate e-mail. To proceed, reply to this e-mail confirming your acceptance. BDO Insurance and Reinsurance Brokers, Inc."
+    content: The quotation letter (PDF) and schedule (Excel) of the current version, password protected
+    screen: Quotation record, Quotations
+    frs: [FR-NB-044, FR-NB-013]
+    source: QuotationActions (proposed text), QuotationDispatchService
+  - id: NT-11
+    channel: E-mail
+    trigger: Approve and send to insurers on a quotation slip
+    recipient: The placement e-mail address of each insurer approached
+    template: "Subject: Quotation slip <QS No.> - <client>. Body: Dear <insurer>, Please find attached our quotation slip <QS No.> for <product>. Kindly send your best terms on or before <reply date>. The document is password protected; the password follows separately. BDO Insurance and Reinsurance Brokers, Inc."
+    content: The quotation slip (PDF, from template QUOTATION_SLIP), password protected
+    screen: PRF record
+    frs: [FR-NB-053]
+    source: QuotationSlipService.sendTo
+  - id: NT-12
+    channel: E-mail
+    trigger: Send via Email on a released proposal slip
+    recipient: The client and any Cc
+    template: "Subject: Insurance proposal <PS No.> – <product>. Body: Dear <client>, Please find attached our proposal slip <PS No.> and the comparative table of the terms received from the insurers approached (ARN <ARN>). The documents are password protected; the password follows in a separate e-mail. To proceed, reply to this e-mail confirming your acceptance. BDO Insurance and Reinsurance Brokers, Inc."
+    content: The proposal slip and the comparative table (PDF), password protected
+    screen: PRF record
+    frs: [FR-NB-057, FR-NB-013]
+    source: ProposalActions (proposed text), ProposalSlipService.send
+  - id: NT-13
+    channel: E-mail
+    trigger: Send Slips on the Placement Workbench, or Send / Resend on a placement slip
+    recipient: The placement e-mail address of the insurer branch (changeable in the dialog)
+    template: "Subject: Placement <slip> - <ARNs>. Body: Dear <insurer>, Please find attached our placement slip <slip> for <n> risk(s) (ARN <ARNs>). Kindly issue the policy and send the e-policy quoting our Account Reference Number. BDO Insurance and Reinsurance Brokers, Inc."
+    content: The placement slip in PDF and Excel (template PLACEMENT_SLIP); password protection optional
+    screen: Placement Workbench, Placement Slips, Account Placement
+    frs: [FR-NB-081]
+    source: PlacementSlipService.draft, PlacementSlipService.send
+  - id: NT-14
+    channel: E-mail
+    trigger: Request Hold Cover on the account placement
+    recipient: The placement e-mail address of the insurer branch
+    template: "Subject: Hold cover request - <ARN> - <client>. Body: template HOLD_COVER_REQUEST: Please hold cover the risk below for thirty (30) days from <start date> under reference <ARN> while the placement is being completed. Kindly confirm the hold cover and your reference number."
+    content: The hold cover request (PDF)
+    screen: Account Placement
+    frs: [FR-NB-082]
+    source: HoldCoverService.request
+  - id: NT-15
+    channel: E-mail
+    trigger: Send Selected on the Insurance Advice register
+    recipient: The mortgagee bank unit entered in the dialog, and any Cc
+    template: "Subject: Insurance Advice <IA No.> - <client>. Body: Please find attached Insurance Advice <IA No.> for <client> (our reference <ARN>). The document is password protected; the password follows in a separate e-mail. BDO Insurance and Reinsurance Brokers, Inc."
+    content: The Insurance Advice (PDF, template INSURANCE_ADVICE), password protected
+    screen: Insurance Advice
+    frs: [FR-NB-104]
+    source: AdviceDispatchService.send
+  - id: NT-16
+    channel: E-mail
+    trigger: Send or Send Selected on E-policy Dispatch, or Send E-policies on the Issuance Workbench
+    recipient: The account contact e-mail (changeable for a single send)
+    template: "Subject: Your e-policy <policy no.>. Body: template EPOLICY_EMAIL: Dear <client>, Attached is your e-policy <policy no.> issued by <insurer> (our reference <ARN>). The document is password protected; the password is sent to you in a separate e-mail. Thank you for insuring through BDO Insurance and Reinsurance Brokers, Inc."
+    content: The e-policy (PDF), password protected; the password hint of parameter EPOLICY_PASSWORD_HINT
+    screen: E-policy Dispatch, Issuance Workbench
+    frs: [FR-NB-105]
+    source: EpolicyDispatchService
+  - id: NT-17
+    channel: E-mail
+    trigger: A booking or endorsement issues a service invoice of a type e-mailed to the insurer; Send via Email on the service invoice
+    recipient: The billing e-mail address of the insurer
+    template: "Subject: Service invoice <SI No.> (or Service invoice credit <SI No.>). Body: Dear <recipient>, Please find attached our service invoice <SI No.> for invoice <invoice>. BDO Insurance and Reinsurance Brokers, Inc."
+    content: The service invoice (PDF, template SERVICE_INVOICE_NOTE)
+    screen: Service Invoices, Booked Invoice
+    frs: [FR-NB-117]
+    source: ServiceInvoiceDispatch
+  - id: NT-18
+    channel: E-mail
+    trigger: Every e-mail sent with password-protected attachments (NT-10 to NT-16)
+    recipient: The same recipients as the document e-mail
+    template: "Subject: Password for: <subject of the document e-mail>. Body: The documents sent to you in the e-mail \"<subject>\" are password protected. Password: <password>. <hint> This e-mail was sent separately for your security. Please do not forward it."
+    content: The generated password and the optional hint
+    screen: All send dialogs
+    frs: [FR-NB-013]
+    source: MessageService.queuePasswordMail
+  - id: NT-19
+    channel: Alert inbox
+    trigger: The daily alert check (09:30 PHT) finds work items past their stage SLA
+    recipient: Users with the Alerts screen (System Administrator, Auditor); the New Business roles see the same items as Overdue on My Work and the NB Dashboard
+    template: "Exception WORK_SLA_BREACH: Work item overdue"
+    content: A broking work item (quotation, proposal request or account) has stayed in its stage beyond the stage SLA
+    screen: Alerts; My Work; NB Dashboard
+    frs: [FR-NB-010, FR-NB-120]
+    source: WorkSlaAlertCheck

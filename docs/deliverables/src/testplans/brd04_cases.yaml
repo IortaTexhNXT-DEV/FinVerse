@@ -1,0 +1,2752 @@
+# Test plan BRD-4 Collections - test data file.
+# Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/testplans/brd04_cases.yaml
+# Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
+# Messages and codes are the ones BIBS returns (backend/src/main, collections and the Operations
+# modules it hands over to); labels are those of frontend/src/features/collections.
+
+meta:
+  brd: BRD-04
+  name: Collections
+  code: CL
+  frs: FRS_BRD04_COLLECTIONS.md
+  summary: TP_BRD04_COLLECTIONS.md
+  version: "1.0"
+  date: 25 September 2026
+  built: true
+
+personas:
+  MKT_AO: {name: Marketing AO, user: ao, short: MKT AO}
+  MKT_TL: {name: Marketing Team Lead, user: mkttl, short: MKT TL}
+  MKT_HANDLER: {name: Marketing Handler, user: mkthandler, short: MKT Hdlr}
+  MKT_COLLECTION: {name: Collection Handler, user: "clxhandler, mktcoll", short: Coll. Hdlr}
+  CLX_TL: {name: Collection Team Lead, user: clxtl, short: CLX TL}
+  MKT_SECTION_HEAD: {name: Section Head, user: clxuh, short: Sect. Head}
+  UNAPPLIED_HANDLER: {name: Unapplied Payment Handler, user: upphandler, short: UPP Hdlr}
+  PROCESSOR: {name: Processing Unit, user: proc, short: Proc.}
+  CASHIER: {name: Cashier, user: "cashier, cashtl", short: Cashier}
+  COMMREC: {name: Commission Receivables Unit, user: "commrec, commtl", short: CRU}
+  DISBURSEMENT: {name: Disbursement Processor, user: disb, short: Disb.}
+  COMPTROLLERSHIP: {name: Comptrollership, user: comptrol, short: Compt.}
+  BUSINESS_ADMIN: {name: Business Administrator, user: badmin, short: Bus. Admin}
+  SYSADMIN: {name: System Administrator, user: admin, short: Sys. Admin}
+  AUDITOR: {name: Auditor, user: auditor, short: Audit.}
+  SYSTEM: {name: BIBS scheduled job or event, user: "-"}
+
+screens:
+  LOGIN: Login page
+  HOME: Finance > Collections > Collections Home
+  WL: Finance > Collections > PR Worklist
+  ACC: Finance > Collections > PR Worklist > Collection Account
+  SUM: Finance > Collections > PR Worklist > Collection Account > Summary tab
+  DISP: Finance > Collections > PR Worklist > Collection Account > Dispositions & Efforts tab
+  HIST: Finance > Collections > PR Worklist > Collection Account > History tab
+  TIMELINE: Finance > Collections > PR Worklist > Collection Account > Timeline tab
+  PAYTAB: Finance > Collections > PR Worklist > Collection Account > Payments tab
+  POLTAB: Finance > Collections > PR Worklist > Collection Account > Policy & Co-insurance tab
+  HANDOFF: Finance > Collections > PR Worklist > Collection Account > Hand-offs to Operations tab
+  CLIENT: Finance > Collections > PR Worklist > Client View
+  ASSIGN: Finance > Collections > Assignments
+  FILES: Finance > Collections > Collections Files
+  SETUP: Finance > Collections > Collections Setup
+  PLANS: Finance > Collections > Installment Plans
+  PLAN: Finance > Collections > Installment Plans > Installment Plan
+  DUE: Finance > Collections > Installments Due
+  PROM: Finance > Collections > Promises to Pay
+  ESC: Finance > Collections > Escalations
+  ESCD: Finance > Collections > Escalations > Escalation (workflow panel)
+  RULES: Finance > Collections > Escalation Rules
+  BILL: Finance > Collections > Billing Statements
+  SOA: Finance > Collections > Billing Statements > Statement of Account
+  UPP: Finance > Collections > Unapplied Payments
+  UPPD: Finance > Collections > Unapplied Payments > Unapplied Payment
+  CREQ: Finance > Collections > Requests to Cashiering
+  CASHREQ: Finance > Cashiering > Incoming Requests (Collector Requests)
+  PICKUP: Finance > Cashiering > Check Pick-up
+  DPACC: Finance > Commission Receivables > DP Accounts
+  BULK: Client & Policy > Bulk Processing > Bulk Uploads (template Collections Bulk Update)
+  LOV: Setup & Administration > Broking Setup > Lists of Values
+  MATRIX: Setup & Administration > Broking Setup > User Access Matrix
+  PARAMS: Setup & Administration > Administration > System Parameters
+  JOBS: Operations > Interfaces (job runs)
+  APPROVALS: My Approvals (home section)
+  REPORTS: Reports > Report Centre (category Collections)
+  ALERTS: Alerts (home section and bell icon in the page header)
+  INV360: Operations > Invoice 360
+  API: API call with the user's token (tester tool, for example Postman)
+
+data:
+  - id: TD-CL-01
+    name: SIT/UAT users and roles
+    content: ao (MKT_AO), mkttl (MKT_TL), mkthandler (MKT_HANDLER), clxhandler and mktcoll (MKT_COLLECTION), clxtl (CLX_TL), clxuh (MKT_SECTION_HEAD), upphandler (UNAPPLIED_HANDLER), proc (PROCESSOR), cashier and cashtl (CASHIER, CASHIER_TL), commrec and commtl (Commission), disb (DISBURSEMENT), comptrol (COMPTROLLERSHIP), badmin (BUSINESS_ADMIN), admin (SYSADMIN), auditor (AUDITOR). The SIT/UAT password is issued by the test lead.
+    source: Seeds V980, V990, V1900 (Collections users) and the UnappliedSeedData runner (upphandler); grants V1000
+  - id: TD-CL-02
+    name: Seed worklist
+    content: The unpaid seed invoices listed by the refresh of clxtl and assigned by the V1900 rules (segment CBG to clxhandler, team T-CORP1 to mkthandler, all others to mktcoll); an effort, dispositions of every kind (Coordinate further, DP PR for reversal, PR 2307 for reversal, For check pick-up, one superseded) and one temporary reassignment recorded
+    source: Seed runner CollectionsSeedData on the seed bookings (V988 and the Operations runners)
+  - id: TD-CL-03
+    name: Collections parameters as delivered
+    content: CLX_MIN_BALANCE_THRESHOLD 10.00; CLX_AGING_BASIS BOOKING; CLX_AGING_BRACKETS 0-30,31-45,46-60,61-90,91-120,121+; CLX_EDIT_LOCK_MINUTES 15 (1-240); CLX_PROMISE_GRACE_DAYS 0 (0-30); CLX_EXPORT_MAX_ROWS 50,000 (100-1,000,000); CLX_INVOICE_NO_PATTERN ^(I\d{8}|BI-.+)$; LOGIN_MAX_FAILED_ATTEMPTS 3
+    source: Migration V1000 (Collections foundation) and V790
+  - id: TD-CL-04
+    name: Sales units and Unit Heads
+    content: T-CBG1 headed by mkttl; CBG-NCR, CORP-NCR and VIS headed by clxuh
+    source: Seed V1900 (on the sales organisation of V819)
+  - id: TD-CL-05
+    name: Disposition lists
+    content: CLX_PR_DISPOSITION (DP PR for reversal, PR 2307 for reversal, For check pick-up, Cancel account, Coordinate further, Request bank AO assistance, No / missing policy number reserved to PROCESSOR, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD, DP returned by insurer); CLX_UPP_DISPOSITION (For application to invoice, For refund, For reclass, For transfer to other unit, Coordinate further); CLX_EFFORT_CODE
+    source: Migration V1000 (lists and Disposition Rules attributes)
+  - id: TD-CL-06
+    name: Escalation rules
+    content: CLX-BROKEN-PROMISE (to mkttl), CLX-AGING-45 (TL), CLX-INCEPTION-60 (UH), CLX-INSTALLMENT-15 (TL), all ACTIVE; CLX-AMOUNT-1M pending authorisation, maker badmin
+    source: Seed V1901
+  - id: TD-CL-07
+    name: Plans, promises and escalations
+    content: Three-year PAR01 account of client CL-2026-000005 (1-Sep-2026 to 1-Sep-2029) with an annual policy-year plan and an SOA per billing cycle; quarterly plan on ARN-2026-940002 with the first installment overdue; promise kept on ARN-2026-940004; broken promise on the three-year account escalated to mkttl
+    source: Seed runner CollectionsPlansSeedData with SeedMultiYearAccount
+  - id: TD-CL-08
+    name: Unapplied payments
+    content: Payments received without a match - Grace Villanueva (application requested by upphandler, applied by Cashiering), Juan Dela Cruz (Coordinate further), Mega Traders Inc. (refund requested by clxhandler), Liza Manalo (no disposition)
+    source: Seed runners UnappliedSeedPayments, UnappliedSeedData and CollectorRequestSeedData
+  - id: TD-CL-09
+    name: Invoice booked for the test
+    content: A new Motor policy booked by proc on the test day for a CBG client with a total premium of PHP 25,000.00, no payment
+    source: Keyed in by the tester through New Business booking (BRD-1 screens)
+  - id: TD-CL-10
+    name: Upload files
+    content: Collections Bulk Update template with 10 promise rows and 1 row of a paid invoice; one row with a disposition column filled
+    source: Prepared by the test lead from the template of the upload screen
+
+scenarios:
+  - id: SC-CL-01
+    persona: SYSADMIN
+    title: Access, audit and record lock. Each persona sees only the Collections screens of its role; changes are logged field by field and an account is locked while one user edits it.
+    pre: SIT/UAT users of TD-CL-01; seed worklist TD-CL-02.
+  - id: SC-CL-02
+    persona: MKT_COLLECTION
+    title: Worklist and daily refresh. New invoices above the threshold are listed at invoice level, totalled and filtered, refreshed every night and completed when paid.
+    pre: Worklist TD-CL-02; parameters TD-CL-03; a new invoice TD-CL-09.
+  - id: SC-CL-03
+    persona: CLX_TL
+    title: Assignment and reassignment. New accounts are assigned by rule; the team lead moves accounts permanently or until an end date.
+    pre: Assignment rules of V1900; worklist TD-CL-02.
+  - id: SC-CL-04
+    persona: MKT_COLLECTION
+    title: Follow-up and hand-offs. The handler logs efforts, records dispositions alone or in bulk and hands accounts to Cashiering and Commission.
+    pre: Worklist TD-CL-02; lists TD-CL-05; upload file TD-CL-10.
+  - id: SC-CL-05
+    persona: MKT_COLLECTION
+    title: Installment plans and promises to pay. Plans schedule multi-year and installment accounts, payments are allocated, promises are kept or broken.
+    pre: Plans and promises TD-CL-07.
+  - id: SC-CL-06
+    persona: MKT_TL
+    title: Escalation. Rules escalate accounts every night, users escalate by hand and the team lead or Unit Head works the escalation to its resolution.
+    pre: Rules TD-CL-06; data TD-CL-07.
+  - id: SC-CL-07
+    persona: MKT_COLLECTION
+    title: Billing statements. Statements of account are generated per billing cycle, e-mailed or cancelled; billing stays monitoring only.
+    pre: Three-year account TD-CL-07.
+  - id: SC-CL-08
+    persona: UNAPPLIED_HANDLER
+    title: Unapplied payments. The collector disposes of unapplied payments and asks Cashiering to apply, refund, reclass or transfer them; the daily application file lists the requests.
+    pre: Payments TD-CL-08.
+  - id: SC-CL-09
+    persona: MKT_SECTION_HEAD
+    title: Files, reports and commission receivable. Scheduled reversal files and daily reports are published on time, exports are capped, the home page shows the work and CR billing waits for the DP confirmation.
+    pre: Worklist TD-CL-02 with DP and PR 2307 dispositions.
+
+frs:
+  FR-CL-001:
+    scenario: SC-CL-01
+    persona: MKT_AO
+    screen: WL
+    data: [TD-CL-01]
+    conditions:
+      - A read-only role opens the PR Worklist but has no work action.
+      - The Collections set-up and assignment screens are not offered to roles without CLX_SETUP or CLX_ASSIGN, and a call without the permission is refused.
+      - The User Access Matrix lists the CLX_* permissions in the area COLLECTIONS with their action classes.
+      - The account locks after LOGIN_MAX_FAILED_ATTEMPTS consecutive wrong passwords.
+    cases:
+      - c: 1
+        type: Security-access
+        neg: false
+        persona: DISBURSEMENT
+        title: Disbursement user sees the worklist read only
+        steps:
+          - Log in as disb and open Finance > Collections > PR Worklist.
+          - Open any account of the Open Accounts tab.
+        expected: The list and the account open. Record Disposition, Log Effort, Update Remarks and Category and Reassign are not shown.
+        auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
+      - c: 1
+        type: Security-access
+        persona: DISBURSEMENT
+        screen: API
+        title: Disbursement user cannot record a disposition through the API
+        steps:
+          - With the token of disb, POST a disposition "Coordinate further" for an open account to /api/v1/collections/dispositions.
+        expected: HTTP 403; no disposition is recorded.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
+        auto: ApiSmokeIT#missingPermissionIsForbiddenNotUnauthorized
+      - c: 2
+        type: Security-access
+        title: Marketing AO does not see Collections Setup or Assignments
+        steps:
+          - Log in as ao and open the side menu, section Collections.
+          - Type the address /collections/setup in the browser.
+        expected: Collections Setup and Assignments are not in the menu. The direct link shows "You do not have access to this screen. Contact your administrator if you need it."
+        auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
+      - c: 2
+        type: Security-access
+        neg: false
+        persona: MKT_SECTION_HEAD
+        screen: SETUP
+        title: Section Head sees Collections Setup and Assignments
+        steps:
+          - Log in as clxuh and open the section Collections.
+        expected: Collections Home, PR Worklist, Assignments, Collections Files, Collections Setup and Escalation Rules are in the menu.
+        auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
+      - c: 3
+        type: Positive
+        persona: SYSADMIN
+        screen: MATRIX
+        title: User Access Matrix shows the Collections permissions
+        steps:
+          - Log in as admin and open Broking Setup > User Access Matrix.
+          - Choose the view by action and the area COLLECTIONS.
+        expected: CLX_VIEW (VIEW), CLX_WORK (CREATE / AMEND), CLX_BULK_UPDATE (AMEND), CLX_ESCALATE, CLX_ESCALATION_HANDLE (APPROVE), CLX_ASSIGN, CLX_UNAPPLIED_WORK, CLX_BILLING, CLX_SETUP, CLX_EXPORT, CLX_REPORT_VIEW and CLX_AUDIT_VIEW are listed with the roles of FRS section 3.3.
+        auto: CollectionsAccountingFoundationIT#everyNewPermissionIsGrantedAndTheBrokingOnesAreClassified; AccessRequestIT#accessMatrixListsRolesAgainstPermissions
+      - c: 4
+        type: Boundary
+        neg: true
+        persona: MKT_HANDLER
+        screen: LOGIN
+        data: [TD-CL-01, TD-CL-03]
+        title: Third wrong password locks the account
+        steps:
+          - Enter user ID mkthandler with a wrong password three times.
+          - Enter the correct password.
+        expected: The third attempt locks the account; the correct password is refused until the System Administrator unlocks the user.
+        msg: [Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
+        auto: LoginLockoutTest#theAccountLocksAtTheConfiguredThreshold
+      - c: 4
+        type: Boundary
+        persona: MKT_HANDLER
+        screen: LOGIN
+        data: [TD-CL-01, TD-CL-03]
+        title: Two wrong passwords do not lock the account
+        steps:
+          - Enter user ID mkthandler with a wrong password twice.
+          - Enter the correct password.
+        expected: The log-in succeeds and the failed-attempt counter resets.
+        msg: [Invalid user name or password, AUTHENTICATION_FAILED]
+        auto: ApiSmokeIT#loginReturnsTokenAndWrongPasswordIsRejected
+
+  FR-CL-002:
+    scenario: SC-CL-01
+    persona: MKT_COLLECTION
+    screen: DISP
+    data: [TD-CL-01, TD-CL-02]
+    conditions:
+      - Every Collections record shows the user and time that recorded it.
+      - A changed record shows the user of the last update, taken from the session.
+    cases:
+      - c: 1
+        type: Positive
+        title: A disposition shows who recorded it
+        steps:
+          - Log in as clxhandler and open an open account assigned to clxhandler.
+          - Record the disposition "Coordinate further" with remarks.
+          - Open the Dispositions & Efforts tab.
+        expected: The new row shows Recorded by clxhandler and the date and time of the save.
+        auto: CollectionsWorklistIT#dispositionRulesAreEnforced
+      - c: 2
+        type: Positive
+        persona: MKT_TL
+        screen: PROM
+        title: A promise changed by another user shows the last updater
+        pre: A running promise recorded by mktcoll (TD-CL-07).
+        steps:
+          - Log in as mkttl, open Promises to Pay and select the running promise.
+          - Click Withdraw Promise and confirm.
+        expected: The promise is CANCELLED and shows mkttl as the user of the last update, with the time.
+        auto: CollectionsEscalationIT#promisesAreKeptPartlyKeptSupersededAndWithdrawn
+      - c: 2
+        type: Negative
+        screen: API
+        title: The recorder cannot be sent in the request
+        steps:
+          - With the token of clxhandler, POST an effort to /api/v1/collections/efforts with an extra field recordedBy = mkttl.
+          - Open the account's Dispositions & Efforts tab.
+        expected: The effort is saved with clxhandler as the recorder; the field sent in the request is ignored.
+
+  FR-CL-003:
+    scenario: SC-CL-01
+    persona: MKT_COLLECTION
+    screen: HIST
+    data: [TD-CL-02]
+    conditions:
+      - A field change writes one audit row with From, To, user, time and source IP.
+      - A change on Collections Setup writes an audit row with the old and new value.
+      - A bulk change writes rows for every account with the shared bulk reference.
+      - No screen or API edits or deletes an audit row.
+    cases:
+      - c: 1
+        type: Positive
+        title: Category change from A to B is logged
+        steps:
+          - Open an account of clxhandler with category A.
+          - Click Update Remarks and Category, set the category to B and save.
+          - Open the History tab.
+        expected: One row shows field Category, From A, To B, user clxhandler, the time and the source IP address.
+        auto: CollectionsWorklistIT#effortsDetailsAndTheEditLock
+      - c: 2
+        type: Positive
+        persona: MKT_SECTION_HEAD
+        screen: SETUP
+        data: [TD-CL-03]
+        title: Threshold change is in the audit log
+        steps:
+          - Log in as clxuh, open Collections Setup, Parameters.
+          - Change CLX_MIN_BALANCE_THRESHOLD from 10.00 to 12.00 and save.
+          - Run the report Collections Audit Log for today.
+        expected: A row shows the record CLX_MIN_BALANCE_THRESHOLD, From 10.00, To 12.00, the user clxuh and the time. Reset the value to 10.00 after the case.
+      - c: 3
+        type: Positive
+        persona: MKT_TL
+        title: Every account of a bulk disposition carries the bulk reference
+        steps:
+          - Log in as mkttl, select three open accounts in the PR Worklist and record "Coordinate further" on all.
+          - Open the History tab of each account.
+        expected: Each account has its own change rows with the same bulk reference CLXBU-yyyy-n.
+        auto: CollectionsBulkUpdateIT#aRowRecordsThePromiseAndTheEscalationWithTheUploadNumber
+      - c: 4
+        type: Security-access
+        persona: SYSADMIN
+        screen: API
+        title: Audit rows cannot be changed or deleted
+        steps:
+          - Open the History tab of an account and look for edit or delete actions.
+          - With the token of admin, send PUT and DELETE to /api/v1/collections/items/{invoiceNo}/history.
+        expected: The tab has no edit or delete action; both calls are refused (HTTP 405 or 404) and the rows are unchanged.
+
+  FR-CL-004:
+    scenario: SC-CL-01
+    persona: MKT_SECTION_HEAD
+    screen: REPORTS
+    conditions:
+      - A user with CLX_AUDIT_VIEW runs the Collections Audit Log for a period and exports it.
+      - A period that ends before it starts is refused.
+      - A user without CLX_AUDIT_VIEW cannot open the report.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Section Head exports a month of the audit log
+        steps:
+          - Log in as clxuh and open the Report Centre, report Collections Audit Log.
+          - Enter the company and the first to the last day of the current month; run.
+          - Export to Excel.
+        expected: The report shows the columns Changed On, User ID, Source IP, Record, Reference, Field, From, To and Bulk Reference; the Excel file holds the same rows.
+        auto: CollectionsFilesIT#everyCollectionsReportRunsAndExports
+      - c: 1
+        type: Report-output
+        persona: AUDITOR
+        title: Auditor runs the audit log to PDF and CSV
+        steps:
+          - Log in as auditor, run Collections Audit Log for the current month.
+          - Export to PDF and to CSV.
+        expected: Both files are produced with the rows shown on screen and the run is kept in the report archive.
+      - c: 2
+        type: Negative
+        title: Period ending before its start is refused
+        steps:
+          - Enter the start date 30 of the month and the end date 1 of the same month; run.
+        expected: The report does not run; the parameter check names the reversed range.
+        auto: ReportParametersTest#reversedDateAndNumberRangesAreRejected
+      - c: 3
+        type: Security-access
+        persona: MKT_COLLECTION
+        title: Collection Handler cannot open the audit log
+        steps:
+          - Log in as clxhandler and open the Report Centre, category Collections.
+        expected: Collections Audit Log is not listed; running CLX-AUDIT-LOG through the API returns HTTP 403.
+
+  FR-CL-005:
+    scenario: SC-CL-01
+    persona: MKT_COLLECTION
+    screen: ACC
+    data: [TD-CL-02, TD-CL-03]
+    conditions:
+      - The user who opens an account with CLX_WORK takes the edit lock; another user cannot change the account while it is held.
+      - After CLX_EDIT_LOCK_MINUTES without release, the next user takes the lock.
+      - The nightly refresh updates a locked account.
+    cases:
+      - c: 1
+        type: Negative
+        persona: MKT_TL
+        title: Second user is refused while the lock is held
+        pre: clxhandler has the account open (first browser session).
+        steps:
+          - In a second browser, log in as mkttl and open the same account.
+          - Try to record the disposition "Coordinate further".
+        expected: The account shows the banner "clxhandler is editing" and opens read only; the save is refused.
+        msg: ["{clxhandler} is editing {invoice}", CLX_ITEM_LOCKED]
+        auto: CollectionsWorklistIT#effortsDetailsAndTheEditLock; CollectionsApiIT#theCollectorWorksAnAccountThroughTheApi
+      - c: 1
+        type: Positive
+        title: The lock is released when the holder leaves the account
+        steps:
+          - As clxhandler, open an account and then go back to the PR Worklist.
+          - As mkttl, open the same account and record an effort.
+        expected: No banner is shown to mkttl and the effort is saved.
+      - c: 2
+        type: Boundary
+        persona: MKT_TL
+        title: The lock expires after 15 minutes
+        pre: The test lead sets the lock time of the account 16 minutes back, or waits 15 minutes.
+        steps:
+          - As clxhandler, open the account and leave the browser open without action.
+          - After the lock time, as mkttl, open the account and record an effort.
+        expected: mkttl takes the lock; the effort is saved.
+      - c: 3
+        type: Workflow
+        persona: SYSTEM
+        title: The refresh updates a locked account
+        steps:
+          - As clxhandler, open an account that has a payment applied today.
+          - Ask the test lead to run CLX_DAILY_REFRESH (Collections Setup, Refresh now, by clxuh).
+        expected: The outstanding of the account is updated although clxhandler holds the lock.
+
+  FR-CL-010:
+    scenario: SC-CL-02
+    persona: MKT_COLLECTION
+    screen: WL
+    data: [TD-CL-02, TD-CL-09]
+    conditions:
+      - A booked invoice with outstanding premium becomes one collection account and appears on Open Accounts after the refresh.
+      - An applied payment reduces the account's net outstanding.
+      - The tabs group the accounts by status with their counts.
+      - An invoice without a client receivable (direct payment, return invoice) is never listed.
+    cases:
+      - c: 1
+        type: Positive
+        title: New invoice appears on Open Accounts
+        steps:
+          - Book the invoice of TD-CL-09.
+          - Ask clxuh to click Refresh now on Collections Setup (or wait for the nightly run).
+          - Search the PR Worklist for the invoice.
+        expected: One row on Open Accounts with net outstanding 25,000.00, client, assured, invoice, policy, ARN, booking and inception dates, aging 0 and bracket 0-30, segment, sales unit, Unit Head, AO and handler.
+        auto: CollectionsWorklistIT#aBookedInvoiceIsListedAssignedByRuleAndCompletedWhenPaid
+      - c: 2
+        type: Positive
+        title: A payment of 10,000.00 reduces the outstanding
+        steps:
+          - Ask the cashier to apply a payment of 10,000.00 to the invoice of TD-CL-09.
+          - Open the account in the PR Worklist.
+        expected: The net outstanding is 15,000.00.
+        auto: CollectionsWorklistIT#aBookedInvoiceIsListedAssignedByRuleAndCompletedWhenPaid
+      - c: 3
+        type: Positive
+        title: Status tabs show their counts
+        steps:
+          - Open the PR Worklist and click each tab.
+        expected: Open Accounts, Credit Balances, Completed Collections, Excluded and All show their counts, and All equals the sum of the others.
+        auto: collectionsLogic.test.ts#lists every status on the All tab and skips false flags
+      - c: 4
+        type: Negative
+        title: Direct-payment invoice is not listed
+        pre: A policy booked with direct payment to the insurer (payment status NOT_APPLICABLE).
+        steps:
+          - Run the refresh and search the worklist for the invoice.
+        expected: No collection account exists for the invoice on any tab.
+        auto: CollectionsWorklistIT#aDirectPaymentInvoiceWithoutReceivableIsNotListed
+      - c: 1
+        type: Security-access
+        neg: false
+        persona: CASHIER
+        title: A CLX_VIEW-only user opens the list and the account
+        steps:
+          - Log in as cashier and open the PR Worklist and one account.
+        expected: The list and the account open with no work action.
+
+  FR-CL-011:
+    scenario: SC-CL-02
+    persona: SYSTEM
+    screen: WL
+    data: [TD-CL-03]
+    conditions:
+      - An invoice is listed only when its total to collect is above CLX_MIN_BALANCE_THRESHOLD.
+      - A listed account at or below the threshold moves to COMPLETED at the next refresh.
+      - A completed account reopens when its balance comes back above the threshold.
+    cases:
+      - c: 1
+        type: Boundary
+        title: 10.01 outstanding is listed
+        pre: An invoice paid down to 10.01 by the cashier.
+        steps:
+          - Run the refresh; search the worklist for the invoice.
+        expected: The account is OPEN on Open Accounts with 10.01.
+      - c: 1
+        type: Boundary
+        neg: true
+        title: 10.00 outstanding is not listed
+        pre: A new invoice paid down to exactly 10.00 before its first refresh.
+        steps:
+          - Run the refresh; search the worklist for the invoice.
+        expected: The invoice is not on Open Accounts.
+      - c: 2
+        type: Workflow
+        title: Account paid down to 8.00 completes
+        steps:
+          - Apply a payment that leaves 8.00 on a listed account.
+          - Run the refresh.
+        expected: The account moves to Completed Collections with its history.
+        auto: CollectionsWorklistIT#aBookedInvoiceIsListedAssignedByRuleAndCompletedWhenPaid
+      - c: 3
+        type: Workflow
+        title: A reversed payment reopens the account
+        steps:
+          - Ask the cashier to reverse the payment of the completed account.
+          - Run the refresh.
+        expected: The account is OPEN again with the restored balance.
+
+  FR-CL-012:
+    scenario: SC-CL-02
+    persona: MKT_SECTION_HEAD
+    screen: SETUP
+    data: [TD-CL-03]
+    conditions:
+      - A Section Head changes the threshold and Refresh now applies it at once.
+      - Aging basis and aging brackets are validated.
+      - A value outside its limits or a key that is not a Collections parameter is refused.
+      - A Collection Handler does not see Collections Setup.
+    cases:
+      - c: 1
+        type: Positive
+        title: Threshold 100.00 applied by Refresh now
+        steps:
+          - Change CLX_MIN_BALANCE_THRESHOLD to 100.00 and save.
+          - Click Refresh now.
+        expected: Accounts with 100.00 or less move to Completed Collections; the audit log shows From 10.00 To 100.00. Reset to 10.00 afterwards.
+        auto: CollectionsApiIT#homeFilesExportsAndSetup
+      - c: 2
+        type: Negative
+        title: Aging basis other than BOOKING or INCEPTION
+        steps:
+          - Set CLX_AGING_BASIS to POLICY and save.
+        expected: The value is refused.
+        msg: [The aging basis is BOOKING or INCEPTION, CLX_AGING_BASIS]
+      - c: 2
+        type: Negative
+        title: Aging bracket that ends before it starts
+        steps:
+          - Set CLX_AGING_BRACKETS to 0-30,45-31,61+ and save.
+        expected: The value is refused.
+        msg: ["Aging bracket '{45-31}' ends before it starts", CLX_AGING_BRACKETS_INVALID]
+        auto: CollectionsRulesTest#invalidAgingBracketsAreRefused
+      - c: 2
+        type: Negative
+        title: Brackets out of order
+        steps:
+          - Set CLX_AGING_BRACKETS to 0-30,61-90,31-60,91+ and save.
+        expected: The value is refused.
+        msg: ["Aging brackets must be in ascending order: {0-30,61-90,31-60,91+}", CLX_AGING_BRACKETS_INVALID]
+        auto: CollectionsRulesTest#invalidAgingBracketsAreRefused
+      - c: 3
+        type: Boundary
+        neg: true
+        title: Lock time above its limit
+        steps:
+          - Set CLX_EDIT_LOCK_MINUTES to 241 and save.
+        expected: The value is refused; 240 is accepted.
+        msg: ["{CLX_EDIT_LOCK_MINUTES} must be between {1} and {240}", "-"]
+        auto: SystemAdminIT#parametersAreTypedValidatedAndAudited
+      - c: 3
+        type: Negative
+        screen: API
+        title: A parameter of another module cannot be changed here
+        steps:
+          - With the token of clxuh, PUT /api/v1/collections/setup/parameters/LOGIN_MAX_FAILED_ATTEMPTS with value 5.
+        expected: The change is refused and the parameter keeps its value.
+        msg: ["{LOGIN_MAX_FAILED_ATTEMPTS} is not a Collections parameter", CLX_PARAMETER_NOT_COLLECTIONS]
+      - c: 4
+        type: Security-access
+        persona: MKT_COLLECTION
+        title: Collection Handler does not see Collections Setup
+        steps:
+          - Log in as clxhandler and open the section Collections.
+        expected: Collections Setup is not in the menu; PUT .../setup/parameters returns HTTP 403.
+
+  FR-CL-013:
+    scenario: SC-CL-02
+    persona: MKT_COLLECTION
+    screen: WL
+    conditions:
+      - A negative cancellation or return invoice is EXCLUDED_CANCELLED and never OPEN.
+      - Any other negative total is CREDIT and shown on the Credit Balances tab and tile.
+    cases:
+      - c: 1
+        type: Negative
+        title: Return invoice of a cancelled policy is not an open account
+        pre: A policy cancelled flat by Adjustment; its return invoice carries a negative total.
+        steps:
+          - Run the refresh and search the worklist for the return invoice.
+        expected: The invoice is not on Open Accounts; if listed, it is on the Excluded tab with status EXCLUDED_CANCELLED.
+        auto: CollectionsWorklistIT#aDirectPaymentInvoiceWithoutReceivableIsNotListed
+      - c: 2
+        type: Positive
+        screen: HOME
+        title: Overpaid invoice shows as a credit balance
+        pre: An invoice overpaid by 500.00 (total to collect -500.00).
+        steps:
+          - Run the refresh.
+          - Open Collections Home and click the Credit Balances tile.
+        expected: The account is on the Credit Balances tab with -500.00 and status CREDIT.
+
+  FR-CL-014:
+    scenario: SC-CL-02
+    persona: MKT_COLLECTION
+    screen: WL
+    conditions:
+      - By Account and By Client total the outstanding and PR2307 of the invoices of each group.
+      - The threshold is applied per invoice, not per group.
+    cases:
+      - c: 1
+        type: Positive
+        title: Client with three invoices totals 15,000.00
+        pre: A client with open invoices of 5,000.00, 7,000.00 and 3,000.00.
+        steps:
+          - Open the PR Worklist, view By Client, search the client.
+          - Open the Client View of the client.
+        expected: By Client shows 3 invoices and 15,000.00; the Client View lists the three accounts with the same total.
+        auto: CollectionsApiIT#theWorklistAndTheAccountPageAreRead
+      - c: 1
+        type: Positive
+        title: By Account totals the invoices of an ARN
+        steps:
+          - View By Account and search an ARN with two open invoices.
+        expected: One row with 2 invoices, the sum of their outstanding and of their PR2307.
+      - c: 2
+        type: Negative
+        data: [TD-CL-03]
+        title: An invoice under the threshold is not counted into a group
+        pre: A client with one open invoice of 5,000.00 and one of 8.00.
+        steps:
+          - Run the refresh and view the client in By Client.
+        expected: The group shows 1 invoice and 5,000.00; the 8.00 invoice is not an open account.
+
+  FR-CL-015:
+    scenario: SC-CL-02
+    persona: MKT_COLLECTION
+    screen: WL
+    data: [TD-CL-04]
+    conditions:
+      - The server-side filters return and total only the matching accounts.
+      - The Unit Head of an account is the head of its sales unit, else of its department or region.
+      - A change of the Unit Head of a sales unit reaches its accounts at the next refresh.
+    cases:
+      - c: 1
+        type: Positive
+        title: Filter segment and Unit Head
+        steps:
+          - Filter the worklist on segment CBG and Unit Head clxuh.
+        expected: Only accounts of segment CBG whose sales unit is headed by clxuh are listed; the totals are those of the listed rows.
+        auto: CollectionsApiIT#theWorklistAndTheAccountPageAreRead
+      - c: 1
+        type: Negative
+        title: A filter without matches returns an empty list
+        steps:
+          - Filter on segment CBG and outstanding from 99,000,000.00.
+        expected: The list is empty with the count 0 and totals 0.00; no error.
+      - c: 2
+        type: Positive
+        title: Unit Head of a unit without a head comes from its department
+        pre: A sales unit without head_username under a department headed by clxuh.
+        steps:
+          - Open an account of that unit.
+        expected: The Unit Head shown is clxuh.
+      - c: 3
+        type: Workflow
+        persona: MKT_SECTION_HEAD
+        screen: SETUP
+        title: New Unit Head reaches the accounts at the refresh
+        steps:
+          - On Collections Setup, Unit Heads, change the head of T-CBG1 from mkttl to clxuh and save.
+          - Click Refresh now; filter the worklist on sales unit T-CBG1.
+        expected: The accounts of T-CBG1 show Unit Head clxuh. Reset the head to mkttl after the case.
+
+  FR-CL-016:
+    scenario: SC-CL-02
+    persona: MKT_COLLECTION
+    screen: SUM
+    conditions:
+      - The Summary tab shows the net outstanding and its movements in total and per component.
+      - The component rows add up to the net outstanding.
+    cases:
+      - c: 1
+        type: Positive
+        title: Invoice with an endorsement and a payment
+        pre: An invoice of 50,000.00 with a negative endorsement of 5,000.00 and a payment of 20,000.00.
+        steps:
+          - Open the account and its Summary tab.
+        expected: The Summary shows 50,000.00 booked, -5,000.00 endorsements and adjustments, 20,000.00 payments applied and 25,000.00 net outstanding.
+        auto: CollectionsApiIT#theWorklistAndTheAccountPageAreRead
+      - c: 2
+        type: Positive
+        title: Components add up to the net
+        steps:
+          - On the same Summary tab, add the rows basic premium, DST, VAT, LGT, other charges and PR2307.
+        expected: The sum equals the net outstanding shown.
+      - c: 2
+        type: Negative
+        title: The Summary cannot be edited
+        steps:
+          - Try to change any amount on the Summary tab.
+        expected: The figures are read only; there is no edit action.
+
+  FR-CL-017:
+    scenario: SC-CL-02
+    persona: SYSTEM
+    screen: JOBS
+    conditions:
+      - CLX_DAILY_REFRESH runs after the end of day and lists the invoices booked during the day.
+      - A payment applied during the day reduces the listed account within minutes.
+      - A failed run is recorded and raises CLX_REFRESH_FAILED.
+      - Running the refresh twice gives the same result; a CLX_WORK user refreshes one account on demand.
+    cases:
+      - c: 1
+        type: Positive
+        persona: BUSINESS_ADMIN
+        title: The nightly run lists the day's invoices and reports its counts
+        steps:
+          - The morning after TD-CL-09 is booked, log in as badmin and open the job run history of CLX_DAILY_REFRESH.
+          - Search the worklist for the invoice.
+        expected: The run of 22:15 shows start, end, counts and SUCCEEDED; the invoice is on Open Accounts.
+        auto: CollectionsWorklistIT#theDailyRefreshJobListsTheLedgerAndReportsItsCounts
+      - c: 2
+        type: Positive
+        persona: MKT_COLLECTION
+        screen: WL
+        title: A same-day payment is shown within five minutes
+        steps:
+          - At 10:00 ask the cashier to apply a payment of 5,000.00 to a listed account.
+          - Before 10:05 open the account.
+        expected: The outstanding is reduced by 5,000.00 without waiting for the nightly run.
+      - c: 3
+        type: Negative
+        screen: ALERTS
+        title: A failed run raises the alert
+        pre: The test lead makes the run fail on SIT (for example by stopping the database connection pool of the job).
+        steps:
+          - Run CLX_DAILY_REFRESH.
+          - Open the job run history and the alerts.
+        expected: The run is FAILED and the alert CLX_REFRESH_FAILED is raised; the next run repeats the refresh.
+      - c: 4
+        type: Positive
+        persona: MKT_SECTION_HEAD
+        screen: SETUP
+        title: A second refresh changes nothing
+        steps:
+          - Click Refresh now twice in a row.
+        expected: The second run creates and completes no account; counts and balances are unchanged.
+        auto: CollectionsSeedDataIT#aSecondStartChangesNothing
+      - c: 4
+        type: Positive
+        persona: MKT_COLLECTION
+        screen: ACC
+        title: Refresh from Ledger on one account
+        steps:
+          - Open an account with a payment applied a minute ago and click Refresh from Ledger.
+        expected: The outstanding, aging and flags of the account are refreshed.
+      - c: 4
+        type: Security-access
+        persona: MKT_AO
+        screen: API
+        title: Whole refresh needs CLX_SETUP
+        steps:
+          - With the token of ao, POST /api/v1/collections/refresh.
+        expected: HTTP 403; no run is started.
+        msg: [You are not permitted to perform this action, ACCESS_DENIED]
+
+  FR-CL-018:
+    scenario: SC-CL-02
+    persona: MKT_COLLECTION
+    screen: WL
+    data: [TD-CL-02]
+    conditions:
+      - A fully paid account moves to Completed Collections with all its history.
+      - A new disposition supersedes the previous one, which stays on the tab.
+      - Accounts, dispositions and efforts cannot be deleted.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Fully paid account keeps its dispositions
+        pre: An account with three dispositions.
+        steps:
+          - Ask the cashier to apply the full outstanding; run the refresh.
+          - Open Completed Collections and the account.
+        expected: The account is COMPLETED; the Dispositions & Efforts tab shows the three dispositions and the efforts.
+        auto: CollectionsWorklistIT#aBookedInvoiceIsListedAssignedByRuleAndCompletedWhenPaid
+      - c: 2
+        type: Positive
+        screen: DISP
+        title: A new disposition supersedes the previous one
+        steps:
+          - Record "Coordinate further" on an account, then "Request bank AO assistance".
+        expected: The current disposition is Request bank AO assistance; Coordinate further stays on the tab marked superseded.
+        auto: CollectionsWorklistIT#aDpDispositionReachesTheCommissionDpListAndASecondDispositionWithdrawsIt
+      - c: 3
+        type: Negative
+        screen: API
+        title: No delete of a disposition
+        steps:
+          - With the token of clxhandler, send DELETE to /api/v1/collections/items/{invoiceNo}/dispositions.
+        expected: The call is refused (HTTP 405 or 404) and the disposition stays.
+
+  FR-CL-020:
+    scenario: SC-CL-03
+    persona: CLX_TL
+    screen: ASSIGN
+    conditions:
+      - A new open account without a handler goes to the first active matching rule, tried in priority order.
+      - An account without a matching rule goes to its AO, else stays unassigned.
+      - A rule needs a name, ranges that start before they end and an eligible handler.
+      - A deactivated rule is not tried.
+    cases:
+      - c: 1
+        type: Positive
+        data: [TD-CL-09]
+        title: A CBG account goes to clxhandler
+        steps:
+          - Book TD-CL-09 for a CBG client and run the refresh.
+          - Open the account.
+        expected: The handler is clxhandler (rule "Consumer banking accounts", priority 10).
+        auto: CollectionsWorklistIT#aBookedInvoiceIsListedAssignedByRuleAndCompletedWhenPaid
+      - c: 2
+        type: Positive
+        title: No rule matches and the account goes to the AO
+        pre: Deactivate rule 90 "All other accounts" for the case.
+        steps:
+          - Book an invoice for a non-CBG client of sales unit VIS and run the refresh.
+        expected: The handler is the invoice's AO; activate rule 90 again after the case.
+      - c: 3
+        type: Negative
+        title: Rule without a name
+        steps:
+          - Click New Rule, leave the name blank, give segment RETAIL and handler clxhandler; save.
+        expected: The rule is not saved.
+        msg: [Give the rule a name, CLX_RULE_NAME]
+        auto: CollectionsWorklistIT#assignmentRulesAreMaintainedAndValidated
+      - c: 3
+        type: Negative
+        title: Outstanding range reversed
+        steps:
+          - Enter a rule with outstanding from 50,000.00 to 10,000.00; save.
+        expected: The rule is not saved.
+        msg: [A range must start before it ends, CLX_RULE_RANGE]
+        auto: CollectionsWorklistIT#assignmentRulesAreMaintainedAndValidated
+      - c: 3
+        type: Negative
+        title: Handler without CLX_WORK
+        steps:
+          - Enter a rule with handler disb; save.
+        expected: The rule is not saved.
+        msg: ["{disb} is not an active collection handler", CLX_HANDLER_NOT_ELIGIBLE]
+        auto: CollectionsWorklistIT#assignmentRulesAreMaintainedAndValidated
+      - c: 4
+        type: Workflow
+        title: Deactivated rule is skipped
+        steps:
+          - Deactivate rule 10; book a CBG invoice and run the refresh.
+        expected: The account goes to the next matching rule (90, mktcoll). Activate rule 10 again.
+      - c: 1
+        type: Security-access
+        persona: MKT_AO
+        title: Marketing AO cannot maintain rules
+        steps:
+          - Log in as ao and type /collections/assignments.
+        expected: The screen is refused ("You do not have access to this screen. Contact your administrator if you need it."); POST .../assignment-rules returns HTTP 403.
+
+  FR-CL-021:
+    scenario: SC-CL-03
+    persona: CLX_TL
+    screen: ASSIGN
+    data: [TD-CL-02]
+    conditions:
+      - A TL reassigns selected or matched accounts permanently or until an end date, after a preview.
+      - A temporary assignment returns to the previous handler after its end date.
+      - Each reassignment keeps the previous and new handler, kind, dates, reason and TL.
+      - A reassignment needs accounts, a reason, a kind, a future end date when temporary and an eligible handler.
+    cases:
+      - c: 1
+        type: Positive
+        title: Temporary reassignment of the accounts of one unit
+        steps:
+          - Open Reassign by Criteria, choose sales unit T-CORP1 and click Preview.
+          - Choose TEMPORARY until the last day of the month, new handler mktcoll, reason "Leave of handler"; confirm.
+        expected: The preview lists the matched accounts; after confirming they show handler mktcoll.
+        auto: CollectionsWorklistIT#reassignmentIsPreviewedAppliedAndATemporaryOneReverts
+      - c: 2
+        type: Workflow
+        persona: SYSTEM
+        title: Temporary assignment returns after its end date
+        pre: The test lead sets the end date of the case above to yesterday.
+        steps:
+          - Run the refresh; open one of the accounts.
+        expected: The handler is again mkthandler; both handlers are notified.
+        auto: CollectionsWorklistIT#reassignmentIsPreviewedAppliedAndATemporaryOneReverts
+      - c: 3
+        type: Positive
+        screen: HIST
+        title: The history shows the reassignment
+        steps:
+          - Open one reassigned account, History tab (assignments).
+        expected: The row shows previous handler, new handler, TEMPORARY, the dates, the reason and clxtl.
+      - c: 4
+        type: Negative
+        title: Reassignment without a reason
+        steps:
+          - Select two accounts in the worklist, click Reassign, choose PERMANENT and handler mktcoll, leave the reason blank.
+        expected: The reassignment is refused.
+        msg: [Give the reason of the reassignment, CLX_REASSIGN_REASON]
+        auto: CollectionsWorklistIT#reassignmentIsPreviewedAppliedAndATemporaryOneReverts
+      - c: 4
+        type: Boundary
+        neg: true
+        title: Temporary with today as end date
+        steps:
+          - Reassign one account TEMPORARY with end date today and a reason.
+        expected: The reassignment is refused.
+        msg: [A temporary reassignment needs an end date after today, CLX_REASSIGN_END_DATE]
+      - c: 4
+        type: Negative
+        title: Criteria that match nothing
+        steps:
+          - Reassign by criteria with a client code that has no open account.
+        expected: The reassignment is refused.
+        msg: [No account matches the selection, CLX_REASSIGN_EMPTY]
+      - c: 4
+        type: Negative
+        title: New handler not eligible
+        steps:
+          - Reassign one account to disb with a reason.
+        expected: The reassignment is refused.
+        msg: ["{disb} is not an active collection handler", CLX_HANDLER_NOT_ELIGIBLE]
+      - c: 4
+        type: Negative
+        screen: API
+        title: Kind missing
+        steps:
+          - POST /api/v1/collections/reassignments with accounts, reason and handler but no kind.
+        expected: The call is refused with HTTP 422.
+        msg: [A reassignment is PERMANENT or TEMPORARY, CLX_REASSIGN_KIND]
+
+  FR-CL-030:
+    scenario: SC-CL-04
+    persona: MKT_SECTION_HEAD
+    screen: LOV
+    data: [TD-CL-05]
+    conditions:
+      - A value added and approved on CLX_PR_DISPOSITION is offered in Record Disposition.
+      - A value past its end date is not offered and is refused on save.
+      - The rules of a value (category, tagging owner, Operations action, allowed roles) are kept on Collections Setup and validated.
+      - A value reserved to roles is refused for other roles.
+    cases:
+      - c: 1
+        type: Positive
+        persona: BUSINESS_ADMIN
+        title: New disposition value usable after approval
+        steps:
+          - Log in as badmin, open Lists of Values, CLX_PR_DISPOSITION, add "Client disputes premium" effective today; save.
+          - Log in as clxuh, approve it in My Approvals.
+          - As clxhandler, open Record Disposition on an account.
+        expected: The new value is offered after the approval, not before.
+        auto: LovServiceIT#newValueIsUsableOnlyAfterAuthorizationAndWithinEffectivity
+      - c: 2
+        type: Negative
+        persona: MKT_COLLECTION
+        screen: API
+        title: Value ended yesterday is refused
+        pre: The test lead ends "Request bank AO assistance" yesterday.
+        steps:
+          - Open Record Disposition on an account.
+          - POST the disposition with code of the ended value.
+        expected: The value is not offered; the call is refused. Restore the end date afterwards.
+        msg: ["{BANK_AO_ASSISTANCE} is not a value of {CLX_PR_DISPOSITION}", CLX_LOV_VALUE_UNKNOWN]
+        auto: CollectionsWorklistIT#dispositionRulesAreEnforced
+      - c: 3
+        type: Positive
+        screen: SETUP
+        title: Section Head sets the category and tagging owner of a value
+        steps:
+          - Open Collections Setup, Disposition Rules; set category B and tagging owner MARKETING on "Cancel account"; save.
+          - Record "Cancel account" on an account.
+        expected: The account shows category B and tagging owner Marketing. Restore the rule (OPERATIONS) after the case.
+      - c: 3
+        type: Negative
+        screen: SETUP
+        title: Invalid category on a value
+        steps:
+          - Set the category of "Coordinate further" to D and save.
+        expected: The rule is not saved.
+        msg: ["'{D}' is not a valid {category}", CLX_LOV_ATTRIBUTE_VALUE]
+      - c: 3
+        type: Negative
+        screen: API
+        title: Unknown attribute of a value
+        steps:
+          - PUT /api/v1/collections/setup/lov-attributes with attribute colour on CLX_PR_DISPOSITION.
+        expected: The call is refused.
+        msg: ["{colour} is not an attribute of {CLX_PR_DISPOSITION}", CLX_LOV_ATTRIBUTE_UNKNOWN]
+      - c: 4
+        type: Security-access
+        persona: MKT_HANDLER
+        screen: WL
+        title: Reserved value refused for a Marketing Handler
+        steps:
+          - Log in as mkthandler, select an own account and record "No / missing policy number".
+        expected: The disposition is refused.
+        msg: ["Disposition {NO_POLICY_NUMBER} is reserved to {PROCESSOR, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD}", CLX_DISPOSITION_NOT_ALLOWED]
+        auto: CollectionsWorklistIT#dispositionRulesAreEnforced
+      - c: 4
+        type: Security-access
+        neg: false
+        persona: PROCESSOR
+        screen: WL
+        title: Processing Unit records the reserved value
+        steps:
+          - Log in as proc, open an account and record "No / missing policy number".
+        expected: The disposition is saved.
+
+  FR-CL-031:
+    scenario: SC-CL-04
+    persona: MKT_COLLECTION
+    screen: WL
+    data: [TD-CL-02, TD-CL-05]
+    conditions:
+      - A disposition on one account becomes its current disposition with its category and tagging owner.
+      - A user with CLX_BULK_UPDATE records one disposition on several accounts under one bulk reference, at most 500.
+      - Several accounts without CLX_BULK_UPDATE are refused.
+      - A closed account, an account of another company or none selected is refused.
+    cases:
+      - c: 1
+        type: Positive
+        title: Coordinate further on one account
+        steps:
+          - Select one open account, click Record Disposition, choose "Coordinate further", enter remarks; save.
+        expected: The account's current disposition is Coordinate further with tagging owner Marketing; no hand-off is created.
+        auto: CollectionsWorklistIT#dispositionRulesAreEnforced; CollectionsApiIT#theCollectorWorksAnAccountThroughTheApi
+      - c: 2
+        type: Positive
+        persona: MKT_TL
+        title: Same disposition on 20 accounts
+        steps:
+          - Log in as mkttl, select 20 open accounts and record "Coordinate further".
+        expected: The result lists 20 successes; all accounts share one bulk reference CLXBU-yyyy-n.
+      - c: 2
+        type: Boundary
+        neg: true
+        persona: MKT_TL
+        screen: API
+        title: 501 accounts in one action
+        steps:
+          - POST /api/v1/collections/dispositions with 501 invoice numbers.
+        expected: Nothing is recorded.
+        msg: [Select at most 500 accounts at once, CLX_TOO_MANY_ACCOUNTS]
+      - c: 3
+        type: Security-access
+        persona: MKT_AO
+        title: Two accounts without CLX_BULK_UPDATE
+        steps:
+          - Log in as ao, select two own accounts and record "Coordinate further".
+        expected: The action is refused; neither account changes.
+        msg: [Updating several accounts at once needs CLX_BULK_UPDATE, CLX_BULK_NOT_ALLOWED]
+        auto: CollectionsWorklistIT#dispositionRulesAreEnforced
+      - c: 4
+        type: Negative
+        screen: API
+        title: Disposition on a completed account
+        steps:
+          - POST a disposition for an account of Completed Collections.
+        expected: The account is refused.
+        msg: ["{invoice} is {COMPLETED}", CLX_ITEM_CLOSED]
+      - c: 4
+        type: Negative
+        screen: API
+        title: No account selected
+        steps:
+          - POST a disposition with an empty invoice list.
+        expected: The call is refused.
+        msg: [Select at least one account, CLX_NO_ACCOUNT]
+      - c: 4
+        type: Negative
+        screen: API
+        title: Account of another company
+        pre: An invoice of the second seed company.
+        steps:
+          - POST a disposition for that invoice with the company FVI.
+        expected: The account is refused.
+        msg: ["{invoice} belongs to another company", CLX_ITEM_OTHER_COMPANY]
+
+  FR-CL-032:
+    scenario: SC-CL-04
+    persona: MKT_COLLECTION
+    screen: WL
+    data: [TD-CL-02, TD-CL-05]
+    conditions:
+      - '"For check pick-up" queues a request in Cashiering''s Check Pick-up with the details given.'
+      - '"DP PR for reversal" puts the account on the Commission DP list; "PR 2307 for reversal" queues a 2307 item for Cashiering.'
+      - A later disposition withdraws a PENDING hand-off; an item pending for more than a day raises CLX_OUTBOX_STALE.
+      - A DP account returned by the insurer reopens with the disposition "DP returned by insurer".
+      - The details of a hand-off are validated.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Check pick-up reaches Cashiering
+        steps:
+          - Record "For check pick-up" on an account with pick-up date tomorrow, address, contact person, check amount 12,000.00, check number and bank.
+          - Log in as cashier and open Check Pick-up.
+        expected: The request is in the pick-up queue with the date and address; the account's Hand-offs tab shows it PENDING, then TAKEN.
+        auto: CollectionsWorklistIT#aCheckPickupDispositionReachesTheCashieringPickupQueue
+      - c: 2
+        type: Workflow
+        persona: COMMREC
+        screen: DPACC
+        title: DP PR for reversal reaches the Commission DP list
+        steps:
+          - As clxhandler record "DP PR for reversal" on an account.
+          - Log in as commrec and open DP Accounts.
+        expected: The account is on the DP list with its invoicing branch.
+        auto: CollectionsWorklistIT#aDpDispositionReachesTheCommissionDpListAndASecondDispositionWithdrawsIt
+      - c: 2
+        type: Workflow
+        screen: HANDOFF
+        title: PR 2307 for reversal queues a 2307 item
+        steps:
+          - Record "PR 2307 for reversal" with path CERTIFICATE and the certificate number.
+          - Open the Hand-offs to Operations tab.
+        expected: A COLLECTION_CWT2307 item is PENDING for Cashiering's 2307 intake.
+      - c: 3
+        type: Workflow
+        screen: HANDOFF
+        title: A later disposition withdraws the pending hand-off
+        steps:
+          - On the DP account above, before Commission takes it, record "Coordinate further".
+        expected: The DP item is CANCELLED; the account leaves the DP list.
+        auto: CollectionsWorklistIT#aDpDispositionReachesTheCommissionDpListAndASecondDispositionWithdrawsIt
+      - c: 3
+        type: Negative
+        persona: SYSTEM
+        screen: ALERTS
+        title: Hand-off not taken for a day raises the alert
+        pre: A PR 2307 item left PENDING for more than a day (Cashiering does not pull it yet).
+        steps:
+          - Run the alert job and open the alerts.
+        expected: CLX_OUTBOX_STALE lists the pending item.
+      - c: 4
+        type: Workflow
+        persona: COMMREC
+        screen: DPACC
+        title: DP account returned by the insurer reopens
+        steps:
+          - As commrec, mark the DP account returned by the insurer with a reason.
+          - As clxhandler, open Collections Home and the account.
+        expected: The tile DP Returned by Insurer counts it; the account is OPEN with disposition "DP returned by insurer" and the reason; clxhandler is notified.
+        auto: CollectionsWorklistIT#aDirectPaymentReturnedByTheInsurerReopensTheAccount
+      - c: 5
+        type: Negative
+        title: Pick-up date in the past
+        steps:
+          - Record "For check pick-up" with pick-up date yesterday.
+        expected: The disposition is refused.
+        msg: [Give a pick-up date from today on for the check pick-up, CLX_PICKUP_DATE]
+        auto: collectionsLogic.test.ts#validates the fields
+      - c: 5
+        type: Negative
+        title: Check amount missing
+        steps:
+          - Record "For check pick-up" without check amount.
+        expected: The disposition is refused.
+        msg: [Give the check amount, CLX_PICKUP_AMOUNT]
+      - c: 5
+        type: Negative
+        screen: API
+        title: 2307 path other than CASH or CERTIFICATE
+        steps:
+          - POST "PR 2307 for reversal" with path CHECK.
+        expected: The disposition is refused.
+        msg: [The 2307 path is CASH or CERTIFICATE, CLX_CWT_PATH]
+      - c: 5
+        type: Negative
+        title: Certificate number missing on the CERTIFICATE path
+        steps:
+          - Record "PR 2307 for reversal", path CERTIFICATE, certificate number blank.
+        expected: The disposition is refused and names the missing detail.
+        msg: ["Give {the certificate number}", CLX_DISPOSITION_DETAIL]
+
+  FR-CL-033:
+    scenario: SC-CL-04
+    persona: MKT_COLLECTION
+    screen: WL
+    data: [TD-CL-02, TD-CL-05]
+    conditions:
+      - A logged effort appears on the Dispositions & Efforts tab and as the last effort on the worklist row.
+      - An effort cannot be dated in the future.
+      - Remarks and the tagging category A, B or C are updated; other categories are refused.
+    cases:
+      - c: 1
+        type: Positive
+        title: Log a phone call
+        steps:
+          - Select an account, click Log Effort, choose Phone call, today 09:30, contact person and remarks; save.
+        expected: The effort is on the Dispositions & Efforts tab; the worklist row shows its date, code and remarks as the last effort.
+        auto: CollectionsWorklistIT#effortsDetailsAndTheEditLock
+      - c: 2
+        type: Boundary
+        neg: true
+        title: Effort dated tomorrow
+        steps:
+          - Log an effort dated tomorrow.
+        expected: The effort is refused.
+        msg: [An effort cannot be in the future, CLX_EFFORT_FUTURE]
+        auto: CollectionsWorklistIT#effortsDetailsAndTheEditLock
+      - c: 3
+        type: Positive
+        title: Update remarks and category
+        steps:
+          - Click Update Remarks and Category, enter remarks and category C; save.
+        expected: The account shows category C and the new remarks.
+      - c: 3
+        type: Negative
+        screen: API
+        title: Category D is refused
+        steps:
+          - PUT /api/v1/collections/items/{invoiceNo}/details with category D.
+        expected: The update is refused.
+        msg: ["The tagging category is A, B or C", CLX_CATEGORY]
+      - c: 3
+        type: Security-access
+        persona: MKT_AO
+        title: Effort on two accounts without the bulk permission
+        steps:
+          - As ao, select two accounts and click Log Effort.
+        expected: The action is refused.
+        msg: [Updating several accounts at once needs CLX_BULK_UPDATE, CLX_BULK_NOT_ALLOWED]
+
+  FR-CL-034:
+    scenario: SC-CL-04
+    persona: MKT_TL
+    screen: WL
+    data: [TD-CL-02, TD-CL-10]
+    conditions:
+      - The grid applies one effort, disposition or reassignment to several accounts and reports the result per invoice.
+      - The upload records promises and escalations row by row with the upload number as bulk reference; invalid rows are rejected with their reason.
+      - A row with nothing to do, an incomplete promise, an unknown or paid invoice or an escalation without permission is rejected.
+      - Disposition, effort and remarks columns in the upload are refused.
+    cases:
+      - c: 1
+        type: Positive
+        title: Same effort on 30 accounts
+        steps:
+          - Select 30 open accounts and click Log Effort; choose Statement of account sent with remarks; save.
+        expected: The result lists 30 successes and each account shows the effort; each History has the bulk reference.
+        auto: CollectionsEscalationIT#oneBulkPromiseIsRecordedPerInvoiceWithItsOwnOutcome
+      - c: 2
+        type: Upload-download
+        screen: BULK
+        title: Upload of 10 promises and 1 paid invoice
+        steps:
+          - Download the template Collections Bulk Update and fill 10 promise rows and 1 row of a paid invoice (TD-CL-10).
+          - Upload the file.
+        expected: 10 promises are saved with the upload number as bulk reference; 1 row is rejected.
+        msg: ["Invoice {no} has nothing to collect", CLX_NOTHING_TO_COLLECT]
+        auto: CollectionsBulkUpdateIT#aRowRecordsThePromiseAndTheEscalationWithTheUploadNumber; CollectionsBulkUpdateIT#rowsAreValidatedOneByOne
+      - c: 3
+        type: Negative
+        screen: BULK
+        title: Row with nothing to do
+        steps:
+          - Upload a row with only the invoice number.
+        expected: The row is rejected.
+        msg: ["Fill a promise, Escalate = Y or a worklist field", "-"]
+        auto: CollectionsBulkUpdateIT#rowsAreValidatedOneByOne
+      - c: 3
+        type: Negative
+        screen: BULK
+        title: Promise amount without a date
+        steps:
+          - Upload a row with a promise amount and no promise date.
+        expected: The row is rejected.
+        msg: [A promise amount needs the promise date, "-"]
+        auto: CollectionsBulkUpdateIT#rowsAreValidatedOneByOne
+      - c: 3
+        type: Negative
+        screen: BULK
+        title: Invoice not in the ledger
+        steps:
+          - Upload a row with invoice BI-2026-999999.
+        expected: The row is rejected.
+        msg: ["Invoice {BI-2026-999999} is not in the ledger", "-"]
+      - c: 3
+        type: Security-access
+        persona: MKT_COLLECTION
+        screen: BULK
+        title: Escalation row without CLX_ESCALATE
+        pre: A test user holding CLX_BULK_UPDATE without CLX_ESCALATE (prepared by the test lead).
+        steps:
+          - Upload a row with Escalate = Y, level TL and a reason.
+        expected: The row is rejected.
+        msg: [You are not allowed to escalate accounts (CLX_ESCALATE), "-"]
+      - c: 3
+        type: Negative
+        screen: BULK
+        title: USER escalation without the user
+        steps:
+          - Upload a row with Escalate = Y, level USER and Escalate To blank.
+        expected: The row is rejected.
+        msg: ["Name the user in {Escalate To} for a USER escalation", "-"]
+        auto: CollectionsBulkUpdateIT#rowsAreValidatedOneByOne
+      - c: 4
+        type: Negative
+        screen: BULK
+        title: Disposition column filled in the upload
+        steps:
+          - Upload a row with the disposition column set to "Coordinate further".
+        expected: The row is rejected; dispositions are recorded in the worklist.
+        msg: ["Dispositions, efforts and remarks are updated through the collection worklist, which is not available", CLX_WORKLIST_UNAVAILABLE]
+        auto: CollectionsBulkUpdateIT#rowsAreValidatedOneByOne
+
+  FR-CL-040:
+    scenario: SC-CL-05
+    persona: MKT_COLLECTION
+    screen: PLANS
+    data: [TD-CL-07]
+    conditions:
+      - A POLICY_YEARS plan splits each policy year of a multi-year account into the cycles of the billing frequency.
+      - A GENERATED plan splits the outstanding of one invoice into equal installments; a MANUAL plan must add up to the outstanding.
+      - An account or invoice that cannot be scheduled, or that already has a live plan, is refused.
+      - An unpaid installment past its due date is OVERDUE and listed on Installments Due.
+      - An active plan can be cancelled; a plan that is not active cannot.
+    cases:
+      - c: 1
+        type: Positive
+        title: Three-year account with a quarterly frequency
+        pre: A three-year account booked with annual policy-year invoices and no live plan (book one with the TD-CL-07 values if the seed plan exists).
+        steps:
+          - Click New Installment Plan, basis POLICY_YEARS, the ARN, frequency Quarterly; save.
+        expected: The plan has 12 installments, four per coverage year, each within its coverage year.
+        auto: CollectionsPlansRulesTest#aThreeYearPeriodHasOneCycleAYearAnnuallyAndFourQuarterly; CollectionsPlansIT#aThreeYearAccountGetsAStatementOfAccountPerBillingCycle
+      - c: 2
+        type: Positive
+        title: Generated plan of 4 installments
+        pre: An invoice with 40,000.00 outstanding and no plan.
+        steps:
+          - New Installment Plan, basis GENERATED, the invoice, 4 installments, first due date next month; save.
+        expected: Four installments of 10,000.00 a month apart; the rounding, if any, is on the last.
+        auto: CollectionsPlansRulesTest#installmentsAreEqualWithTheRoundingOnTheLastAndAllocatedOldestFirst
+      - c: 2
+        type: Negative
+        title: Manual plan that does not add up
+        pre: An invoice with 40,000.00 outstanding.
+        steps:
+          - New Installment Plan, basis MANUAL, installments of 15,000.00 and 20,000.00; save.
+        expected: The plan is refused.
+        msg: ["The installments add up to {35,000.00} but the outstanding premium is {40,000.00}", CLX_PLAN_TOTAL_MISMATCH]
+        auto: labels.test.ts#checks the new plan form per kind
+      - c: 2
+        type: Negative
+        title: Manual plan with dates not increasing
+        steps:
+          - Enter two installments with the second due date before the first; save.
+        expected: The plan is refused.
+        msg: [Installment amounts must be positive and due dates increasing, CLX_PLAN_ENTRY_INVALID]
+      - c: 2
+        type: Negative
+        title: Manual plan without installments
+        steps:
+          - Choose basis MANUAL, enter no installment; save.
+        expected: The plan is refused.
+        msg: [Enter at least one installment, CLX_PLAN_EMPTY]
+      - c: 3
+        type: Negative
+        title: Second live plan on the same invoice
+        steps:
+          - Create a GENERATED plan on ARN-2026-940002's invoice, which has the quarterly plan.
+        expected: The plan is refused.
+        msg: ["Plan {no} already schedules this account; cancel it first", CLX_PLAN_EXISTS]
+        auto: CollectionsPlansIT#onlyOpenReceivablesCanBeScheduled
+      - c: 3
+        type: Negative
+        title: Invoice with nothing outstanding
+        steps:
+          - Create a GENERATED plan on a fully paid invoice.
+        expected: The plan is refused.
+        msg: ["Invoice {no} has no outstanding premium to schedule", CLX_PLAN_NOTHING_DUE]
+        auto: CollectionsPlansIT#onlyOpenReceivablesCanBeScheduled
+      - c: 3
+        type: Negative
+        title: Invoice not in the ledger
+        steps:
+          - Create a GENERATED plan on BI-2026-999999.
+        expected: The plan is refused.
+        msg: ["Invoice {BI-2026-999999} is not in the ledger", CLX_INVOICE_UNKNOWN]
+      - c: 3
+        type: Negative
+        title: Direct-payment invoice
+        steps:
+          - Create a GENERATED plan on a direct-payment invoice.
+        expected: The plan is refused; the invoice has no premium to collect.
+        msg: ["Invoice {no} is {paid directly to the insurer} and has no premium to collect", CLX_INVOICE_NOT_COLLECTIBLE]
+        auto: CollectionsPlansIT#onlyOpenReceivablesCanBeScheduled
+      - c: 3
+        type: Negative
+        title: Account without a booked policy year
+        steps:
+          - Create a POLICY_YEARS plan on an ARN whose first policy year is not booked.
+        expected: The plan is refused.
+        msg: ["Account {ARN} has no booked policy year", CLX_PLAN_NOT_BOOKED]
+      - c: 4
+        type: Workflow
+        screen: DUE
+        title: Overdue installment is listed on Installments Due
+        steps:
+          - Open Installments Due.
+        expected: The first installment of ARN-2026-940002 is listed OVERDUE with its due date and amount.
+        auto: CollectionsPlansIT#aGeneratedPlanAllocatesPaymentsOldestDueFirstAndFlagsOverdue; CollectionsPlansRulesTest#theInstallmentStatusFollowsTheDueDateAndThePayments
+      - c: 5
+        type: Workflow
+        screen: PLAN
+        title: Cancel an active plan and cancel it again
+        steps:
+          - Open the generated plan of this FR, click Cancel with a reason.
+          - Try to cancel the same plan again through POST .../plans/{id}/cancel.
+        expected: The first cancel sets the plan CANCELLED; the second is refused.
+        msg: ["Plan {no} is {CANCELLED} and cannot be cancelled", CLX_PLAN_NOT_ACTIVE]
+        auto: registration.test.tsx#asks for a reason before confirming
+      - c: 1
+        type: Security-access
+        persona: MKT_AO
+        title: Marketing AO cannot create a plan
+        steps:
+          - Log in as ao and open Installment Plans.
+        expected: New Installment Plan is not shown; POST .../plans/generated returns HTTP 403 (CLX_BILLING).
+
+  FR-CL-041:
+    scenario: SC-CL-05
+    persona: MKT_COLLECTION
+    screen: PAYTAB
+    data: [TD-CL-07]
+    conditions:
+      - The Payments tab lists every payment movement of the invoice with its AR / OR reference.
+      - Settled amounts are allocated to installments oldest due first, nightly, on Refresh Allocation and before billing.
+      - An unknown billing cycle is refused.
+    cases:
+      - c: 1
+        type: Positive
+        title: Payment listed with its AR number
+        steps:
+          - Open the account of ARN-2026-940004 and its Payments tab.
+        expected: The payment is listed with its AR number, date and amount, and the summary of booked, paid and outstanding.
+        auto: CollectionsPlansIT#aGeneratedPlanAllocatesPaymentsOldestDueFirstAndFlagsOverdue
+      - c: 2
+        type: Positive
+        screen: PLAN
+        title: 15,000.00 over installments of 10,000.00
+        pre: A generated plan of 4 x 10,000.00; the cashier applies 15,000.00 to the invoice.
+        steps:
+          - Open the plan and click Refresh Allocation.
+        expected: Installment 1 is PAID; installment 2 is PARTIAL with 5,000.00 paid; installments 3 and 4 unchanged.
+        auto: CollectionsPlansRulesTest#installmentsAreEqualWithTheRoundingOnTheLastAndAllocatedOldestFirst; CollectionsPlansIT#aGeneratedPlanAllocatesPaymentsOldestDueFirstAndFlagsOverdue
+      - c: 2
+        type: Workflow
+        persona: SYSTEM
+        screen: PLAN
+        title: A write-off counts as settled at the nightly allocation
+        pre: The adjustment team writes off 2,000.00 of an invoice with a plan.
+        steps:
+          - Let CLX_PROMISE_CHECK run (22:45) or ask the test lead to run it; open the plan.
+        expected: 2,000.00 more is allocated to the oldest open installment.
+      - c: 3
+        type: Negative
+        screen: API
+        title: Statement for a cycle the plan does not have
+        steps:
+          - POST /api/v1/collections/billing/statements for the generated plan with cycle 9.
+        expected: The call is refused.
+        msg: ["Plan {no} has no billing cycle {9}", CLX_CYCLE_UNKNOWN]
+
+  FR-CL-042:
+    scenario: SC-CL-05
+    persona: MKT_COLLECTION
+    screen: PROM
+    data: [TD-CL-07, TD-CL-03]
+    conditions:
+      - A promise is KEPT, PARTIALLY_KEPT or BROKEN by the payments applied between its day and the promised date plus the grace days.
+      - A broken promise notifies the recorder and the AO and escalates by the broken-promise rule.
+      - A new promise replaces the running one; an open promise can be withdrawn, a closed one cannot.
+      - Dates and amount of a promise are validated.
+    cases:
+      - c: 1
+        type: Positive
+        title: Kept promise
+        steps:
+          - Record a promise of 10,000.00 by the 15th on an invoice (day of promise today).
+          - Ask the cashier to apply 10,000.00 on the 14th; after CLX_PROMISE_CHECK of the 15th open the promise.
+        expected: Status KEPT.
+        auto: CollectionsPlansRulesTest#aPromiseIsKeptPartlyKeptOrBroken; CollectionsEscalationIT#promisesAreKeptPartlyKeptSupersededAndWithdrawn
+      - c: 1
+        type: Positive
+        title: Partly kept promise
+        steps:
+          - Record a promise of 10,000.00; apply 4,000.00 in time; run the promise check after the date.
+        expected: Status PARTIALLY_KEPT.
+        auto: CollectionsPlansRulesTest#aPromiseIsKeptPartlyKeptOrBroken
+      - c: 2
+        type: Workflow
+        persona: SYSTEM
+        screen: ESC
+        title: Broken promise escalates to the team lead
+        steps:
+          - Record a promise with nothing applied; run the promise check after the date.
+          - Log in as mkttl and open Escalations.
+        expected: The promise is BROKEN; clxhandler and the AO are notified; an escalation of CLX-BROKEN-PROMISE is WITH_TL for mkttl the same night.
+        auto: CollectionsEscalationIT#aBrokenPromiseEscalatesToTheTeamLead
+      - c: 3
+        type: Positive
+        title: A new promise supersedes the running one; withdraw a promise
+        steps:
+          - Record a second promise on the invoice of a running promise.
+          - Select the new promise and click Withdraw Promise.
+        expected: The first promise is superseded; the second becomes CANCELLED.
+        auto: CollectionsEscalationIT#promisesAreKeptPartlyKeptSupersededAndWithdrawn
+      - c: 3
+        type: Negative
+        title: Withdraw a kept promise
+        steps:
+          - Select the KEPT promise of ARN-2026-940004 and click Withdraw Promise.
+        expected: The withdrawal is refused.
+        msg: ["The promise of {invoice} is already {KEPT}", CLX_PROMISE_CLOSED]
+      - c: 4
+        type: Negative
+        title: Promised date before the day of the promise
+        steps:
+          - Record a promise dated yesterday with day of promise today.
+        expected: The promise is refused.
+        msg: [The promised date cannot be before the day of the promise, CLX_PROMISE_DATES]
+        auto: labels.test.ts#checks the promise form
+      - c: 4
+        type: Negative
+        title: Day of the promise in the future
+        steps:
+          - Record a promise with day of promise tomorrow.
+        expected: The promise is refused.
+        msg: [Enter the promised date; the day of the promise cannot be in the future, CLX_PROMISE_DATES]
+      - c: 4
+        type: Boundary
+        neg: true
+        title: Amount above the outstanding
+        pre: An invoice with 12,000.00 outstanding.
+        steps:
+          - Record a promise of 12,000.01.
+        expected: The promise is refused; 12,000.00 is accepted.
+        msg: ["The promised amount {12,000.01} is above the outstanding {12,000.00}", CLX_PROMISE_OVER_BALANCE]
+      - c: 4
+        type: Negative
+        title: Zero amount
+        steps:
+          - Record a promise of 0.00.
+        expected: The promise is refused.
+        msg: [The promised amount must be positive, CLX_PROMISE_AMOUNT]
+      - c: 4
+        type: Negative
+        title: Promise on a paid invoice
+        steps:
+          - Record a promise on a fully paid invoice.
+        expected: The promise is refused.
+        msg: ["Invoice {no} has nothing to collect", CLX_PROMISE_NOTHING_DUE]
+      - c: 4
+        type: Negative
+        screen: API
+        title: Installment of another invoice
+        steps:
+          - POST a promise on invoice A with the installment id of the plan of invoice B.
+        expected: The promise is refused.
+        msg: ["The installment does not bill invoice {no}", CLX_PROMISE_INSTALLMENT]
+
+  FR-CL-043:
+    scenario: SC-CL-05
+    persona: MKT_COLLECTION
+    screen: POLTAB
+    conditions:
+      - The Policy & Co-insurance tab shows the policy, account, first AR date, invoice family and co-insurance shares, read only.
+      - Open Invoice 360 opens the Operations view of the invoice.
+    cases:
+      - c: 1
+        type: Positive
+        title: Co-insured invoice shows its insurers
+        pre: A co-insured booked invoice (lead and one follower).
+        steps:
+          - Open the account, Policy & Co-insurance tab.
+        expected: Each insurer is listed with the lead flag, share % and amounts; the shares add up to 100; the delivery date is blank.
+        auto: CollectionsApiIT#theWorklistAndTheAccountPageAreRead
+      - c: 1
+        type: Positive
+        title: Endorsed invoice shows its family
+        pre: An invoice with an endorsement.
+        steps:
+          - Open the account of the original invoice, Policy & Co-insurance tab.
+        expected: Invoice Family lists the original and the endorsement invoice.
+        auto: CollectionsAccountingFoundationApiIT#theInvoiceFamilyIsReadThroughTheApi
+      - c: 1
+        type: Negative
+        title: The tab is read only
+        steps:
+          - Try to change the share % or the policy status on the tab.
+        expected: The fields are read only; there is no save action.
+      - c: 2
+        type: Positive
+        screen: INV360
+        title: Open Invoice 360
+        steps:
+          - Click Open Invoice 360.
+        expected: Invoice 360 opens on the same invoice.
+
+  FR-CL-044:
+    scenario: SC-CL-05
+    persona: MKT_COLLECTION
+    screen: TIMELINE
+    conditions:
+      - The Timeline merges ledger movements and Collections actions in date order with source, amount and user.
+      - Timeline entries cannot be edited or deleted.
+    cases:
+      - c: 1
+        type: Positive
+        title: Payment, disposition and reassignment in order
+        steps:
+          - On one account, have a payment applied, record a disposition and ask clxtl to reassign it.
+          - Open the Timeline tab.
+        expected: The three entries appear in date order with their sources (ledger, disposition, assignment), amounts and users.
+        auto: CollectionsApiIT#theWorklistAndTheAccountPageAreRead
+      - c: 2
+        type: Negative
+        title: No edit on the Timeline
+        steps:
+          - Look for edit or delete actions on the Timeline; send DELETE to .../items/{invoiceNo}/timeline.
+        expected: No action is offered; the call is refused and the entries stay.
+
+  FR-CL-050:
+    scenario: SC-CL-06
+    persona: CLX_TL
+    screen: RULES
+    data: [TD-CL-06]
+    conditions:
+      - A new or changed rule is applied only after another user with MASTER_AUTHORIZE authorises it.
+      - The maker cannot authorise the own rule.
+      - Preview lists the accounts the rule would escalate today.
+      - A rule needs a code, positive threshold and SLA, a user for a USER target, dates and amounts in order.
+      - A rule is deactivated instead of deleted.
+    cases:
+      - c: 1
+        type: Workflow
+        title: New rule waits for authorisation
+        steps:
+          - Click New Rule, code CLX-AGING-30-TEST, basis Aging from booking, threshold 30, target TL, SLA 24; save.
+          - Run CLX_ESCALATION; open Escalations.
+        expected: The rule is PENDING_AUTHORIZATION and in My Approvals; no escalation of this rule is raised.
+        auto: CollectionsEscalationIT#rulesAreMakerCheckedPreviewedAndRaiseOneEscalationPerMonth
+      - c: 2
+        type: Security-access
+        title: The maker cannot authorise the own rule
+        steps:
+          - As clxtl, open the rule above and click Authorise.
+        expected: The authorisation is refused.
+        msg: [A record cannot be authorized by the user who maintained it, MAKER_CHECKER_VIOLATION]
+        auto: CollectionsEscalationIT#rulesAreMakerCheckedPreviewedAndRaiseOneEscalationPerMonth
+      - c: 1
+        type: Positive
+        persona: MKT_SECTION_HEAD
+        screen: APPROVALS
+        title: Another user authorises the rule
+        steps:
+          - Log in as clxuh, open My Approvals and authorise CLX-AGING-30-TEST.
+        expected: The rule is ACTIVE; deactivate it after the scenario.
+      - c: 3
+        type: Positive
+        title: Preview of an authorised rule
+        steps:
+          - Open CLX-AGING-45 and click Preview.
+        expected: The accounts over 45 days from booking without an open escalation of the rule are listed.
+        auto: CollectionsEscalationIT#rulesAreMakerCheckedPreviewedAndRaiseOneEscalationPerMonth
+      - c: 4
+        type: Negative
+        title: Threshold zero
+        steps:
+          - Save a rule with threshold 0.
+        expected: The rule is not saved.
+        msg: [The threshold and the SLA hours must be positive, CLX_RULE_INVALID]
+        auto: CollectionsPlansRulesTest#aRuleIsValidatedAndAppliesOnceAuthorizedWithinItsDates; labels.test.ts#checks the rule form
+      - c: 4
+        type: Negative
+        title: USER target without a user
+        steps:
+          - Save a rule with target USER and no user.
+        expected: The rule is not saved.
+        msg: [Name the user who receives the escalations of this rule, CLX_RULE_TARGET]
+      - c: 4
+        type: Negative
+        title: Rule ends before it starts
+        steps:
+          - Save a rule effective from the 10th to the 1st.
+        expected: The rule is not saved.
+        msg: [The rule cannot end before it becomes effective, CLX_RULE_DATES]
+      - c: 4
+        type: Negative
+        title: Amount range reversed
+        steps:
+          - Save a rule with amount from 100,000.00 to 50,000.00.
+        expected: The rule is not saved.
+        msg: [The amount range ends below its start, CLX_RULE_AMOUNTS]
+      - c: 4
+        type: Negative
+        screen: API
+        title: Rule without a code
+        steps:
+          - POST /api/v1/collections/escalation-rules without code.
+        expected: The call is refused.
+        msg: [Enter the company and the rule code, CLX_RULE_CODE]
+      - c: 5
+        type: Workflow
+        title: Deactivate a rule
+        steps:
+          - Open CLX-AGING-30-TEST and click Deactivate.
+        expected: The rule is INACTIVE and kept in the list; it is no longer applied.
+
+  FR-CL-051:
+    scenario: SC-CL-06
+    persona: SYSTEM
+    screen: ESC
+    data: [TD-CL-06, TD-CL-07]
+    conditions:
+      - CLX_ESCALATION raises one escalation per rule, invoice and month, none while one of the rule is open.
+      - A broken promise is escalated the same night.
+      - An open escalation whose invoices are collected closes automatically.
+      - An escalation past the SLA of its stage raises CLX_ESCALATION_OVERDUE.
+    cases:
+      - c: 1
+        type: Workflow
+        title: 46 days from booking goes to the TL once
+        pre: An open invoice 46 days from booking.
+        steps:
+          - Run CLX_ESCALATION twice; open Escalations.
+        expected: One escalation ESC-yyyy-n of kind AUTO, rule CLX-AGING-45, WITH_TL; the second run adds none.
+        auto: CollectionsEscalationIT#rulesAreMakerCheckedPreviewedAndRaiseOneEscalationPerMonth; CollectionsPlansRulesTest#rulesMatchOnAgingCommitmentsPromisesInstallmentsAndAmount
+      - c: 1
+        type: Boundary
+        neg: true
+        title: 45 days from booking is not yet escalated
+        steps:
+          - Run CLX_ESCALATION with an invoice exactly 44 days from booking.
+        expected: No escalation of CLX-AGING-45 is raised for it.
+      - c: 2
+        type: Workflow
+        title: Broken promise reaches the team lead the same night
+        steps:
+          - Open the escalations of the three-year account.
+        expected: The CLX-BROKEN-PROMISE escalation is WITH_TL for mkttl, raised the night the promise broke.
+        auto: CollectionsPlansSeedDataIT#theBrokenPromiseEscalatedTheAccountToTheTeamLead
+      - c: 3
+        type: Workflow
+        title: Collected account closes its escalation
+        steps:
+          - Ask the cashier to pay the invoice of an open escalation in full; run CLX_ESCALATION.
+        expected: The escalation is RESOLVED by auto_close ("Closed - account collected").
+        auto: CollectionsEscalationIT#invoicesAreEscalatedManuallyWorkedAndClosedWhenCollected
+      - c: 4
+        type: Negative
+        screen: ALERTS
+        title: Escalation past its SLA
+        pre: The test lead moves the stage entry of a WITH_TL escalation 25 hours back.
+        steps:
+          - Run the alert job and open the alerts.
+        expected: CLX_ESCALATION_OVERDUE lists the escalation.
+        auto: CollectionsPlansRulesTest#anEscalationTotalsItsInvoicesMirrorsItsStageAndIsOverduePastItsSla
+
+  FR-CL-052:
+    scenario: SC-CL-06
+    persona: MKT_COLLECTION
+    screen: ESC
+    conditions:
+      - Selected invoices are escalated by account (ARN), one MANUAL escalation per account, whatever their automated status.
+      - The target level is required and a designated user must hold CLX_ESCALATION_HANDLE.
+      - An invoice with nothing to collect is refused while the others are escalated.
+      - A user without CLX_ESCALATE does not see Escalate Accounts.
+    cases:
+      - c: 1
+        type: Positive
+        title: Five invoices of two accounts
+        steps:
+          - Click Escalate Accounts, paste five invoices of two ARNs, level TL, reason and remarks; confirm.
+        expected: Two escalations of kind MANUAL are raised, one per ARN, WITH_TL.
+        auto: CollectionsEscalationIT#invoicesAreEscalatedManuallyWorkedAndClosedWhenCollected
+      - c: 1
+        type: Positive
+        title: Account already escalated by a rule
+        steps:
+          - Escalate by hand an invoice with an open CLX-AGING-45 escalation.
+        expected: A MANUAL escalation is raised next to the automatic one.
+      - c: 2
+        type: Negative
+        title: No level chosen
+        steps:
+          - Escalate one invoice without a level.
+        expected: The escalation is refused.
+        msg: ["Choose the level, and the user for a designated authority", CLX_ESCALATION_TARGET]
+      - c: 2
+        type: Negative
+        title: Designated user who cannot handle escalations
+        steps:
+          - Escalate one invoice to level USER, user ao.
+        expected: The escalation is refused.
+        msg: ["{ao} does not handle escalations (CLX_ESCALATION_HANDLE)", CLX_ESCALATION_TARGET]
+      - c: 3
+        type: Negative
+        title: One paid invoice among three
+        steps:
+          - Escalate three invoices of which one is fully paid.
+        expected: Two are escalated; the paid one is reported as refused.
+        msg: ["Invoice {no} has nothing to collect", CLX_NOTHING_TO_COLLECT]
+      - c: 4
+        type: Security-access
+        persona: CASHIER
+        title: Cashier does not see Escalate Accounts
+        steps:
+          - Log in as cashier and open Escalations.
+        expected: Escalate Accounts is not shown; POST .../bulk/escalate returns HTTP 403.
+
+  FR-CL-053:
+    scenario: SC-CL-06
+    persona: MKT_TL
+    screen: ESCD
+    data: [TD-CL-07]
+    conditions:
+      - The receiving level acknowledges and resolves an escalation with a resolution.
+      - Resolve without a resolution is refused.
+      - Escalate further and return need a reason; a returned escalation is resubmitted by the handler.
+      - Only holders of CLX_ESCALATION_HANDLE act on an escalation.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Acknowledge and resolve
+        steps:
+          - Open an escalation WITH_TL, click Acknowledge.
+          - Click Resolve, enter the resolution "Client paid through bills payment"; confirm.
+        expected: The escalation moves to IN_ACTION, then RESOLVED with the resolution in its trail.
+        auto: CollectionsEscalationIT#invoicesAreEscalatedManuallyWorkedAndClosedWhenCollected
+      - c: 2
+        type: Negative
+        title: Resolve without a resolution
+        steps:
+          - On an IN_ACTION escalation click Resolve with the resolution blank.
+        expected: The action is refused.
+        msg: [Describe how the escalation was resolved, CLX_RESOLUTION_REQUIRED]
+      - c: 3
+        type: Negative
+        title: Escalate further without a reason
+        steps:
+          - On a WITH_TL escalation click Escalate to the unit / section head without a reason.
+        expected: The action is refused.
+        msg: ["Select a reason for '{escalate_further}'", WORKFLOW_REASON_REQUIRED]
+      - c: 3
+        type: Workflow
+        title: Return to the handler and resubmit
+        steps:
+          - As mkttl, Return to the handler with a reason and an instruction.
+          - As clxhandler, open Escalations, the escalation, and click Resubmit to the team lead.
+        expected: The escalation is RETURNED in clxhandler's list, then WITH_TL again.
+      - c: 3
+        type: Negative
+        screen: API
+        title: Unknown action
+        steps:
+          - POST .../escalations/{id}/actions/close.
+        expected: The call is refused.
+        msg: ["'{close}' is not an escalation action", CLX_ESCALATION_ACTION]
+      - c: 4
+        type: Security-access
+        persona: MKT_AO
+        title: AO cannot acknowledge
+        steps:
+          - Log in as ao and open an escalation WITH_TL.
+        expected: No workflow action is offered; POST .../actions/acknowledge returns HTTP 403.
+
+  FR-CL-060:
+    scenario: SC-CL-07
+    persona: MKT_COLLECTION
+    screen: BILL
+    data: [TD-CL-07]
+    conditions:
+      - An SOA per billing cycle of a live plan lists the current installment, arrears and payments, numbered SOA-yyyy-n and rendered from CLX_SOA.
+      - A billing run generates the SOAs of the cycles due in a period and not yet billed.
+      - A second SOA for a billed cycle, a cancelled plan or a reversed period is refused.
+    cases:
+      - c: 1
+        type: Report-output
+        screen: SOA
+        title: Three SOAs of the three-year account
+        steps:
+          - Open Billing Statements and filter on client CL-2026-000005.
+          - Open each statement and its PDF.
+        expected: One SOA per billing cycle; each shows the installment of the cycle with its coverage period, any unpaid earlier installment as arrears, the payments allocated and the amount due; the template version is shown.
+        auto: CollectionsPlansSeedDataIT#theThreeYearAccountHasAStatementPerBillingCycle; CollectionsPlansIT#aThreeYearAccountGetsAStatementOfAccountPerBillingCycle
+      - c: 2
+        type: Positive
+        title: Billing run for the next month
+        steps:
+          - Click Billing Run with the period of next month.
+        expected: SOAs are generated for the cycles of the live plans falling due next month and not billed; the result lists them.
+        auto: CollectionsPlansApiIT#plansAndStatementsAreServedOverHttp
+      - c: 3
+        type: Negative
+        screen: PLAN
+        title: Second SOA for a billed cycle
+        steps:
+          - From the installment plan, generate the SOA of cycle 1 again.
+        expected: The statement is refused until the first is cancelled.
+        msg: ["Cycle {1} of {plan} is billed by {SOA}", CLX_SOA_EXISTS]
+      - c: 3
+        type: Negative
+        title: Billing run period reversed
+        steps:
+          - Run Billing Run from the 30th to the 1st of a month.
+        expected: The run is refused.
+        msg: [The period ends before it starts, CLX_SOA_PERIOD]
+        auto: labels.test.ts#checks the billing run period
+      - c: 3
+        type: Negative
+        screen: PLAN
+        title: SOA of a cancelled plan
+        steps:
+          - Generate an SOA from the plan cancelled in FR-CL-040.
+        expected: The statement is refused.
+        msg: ["Plan {no} is cancelled", CLX_PLAN_NOT_ACTIVE]
+
+  FR-CL-061:
+    scenario: SC-CL-07
+    persona: MKT_COLLECTION
+    screen: SOA
+    data: [TD-CL-07]
+    conditions:
+      - Sending an SOA e-mails the password-protected PDF and the password separately and sets it SENT.
+      - A statement needs a recipient before it is sent.
+      - A cancelled statement cannot be sent and its cycle can be billed again.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Send an SOA
+        steps:
+          - Open an SOA of the three-year account, enter the recipient e-mail (test mailbox), click Send Statement of Account.
+        expected: Two e-mails reach the test mailbox (PDF that opens only with the password, and the password); the statement is SENT and E-mails Sent lists both.
+        auto: CollectionsPlansIT#aThreeYearAccountGetsAStatementOfAccountPerBillingCycle
+      - c: 2
+        type: Negative
+        title: No recipient
+        steps:
+          - Remove the recipient and click Send Statement of Account.
+        expected: Nothing is sent.
+        msg: [Enter at least one recipient, CLX_SOA_RECIPIENT]
+      - c: 3
+        type: Workflow
+        title: Cancel a statement and bill the cycle again
+        steps:
+          - Click Cancel Statement of Account with a reason.
+          - From the plan, generate the SOA of the same cycle.
+        expected: The first SOA is CANCELLED; a new SOA number is issued for the cycle.
+      - c: 3
+        type: Negative
+        title: Send a cancelled statement
+        steps:
+          - Open the cancelled SOA and POST .../billing/statements/{id}/send.
+        expected: The send is refused.
+        msg: ["Statement {SOA} is cancelled", CLX_SOA_CANCELLED]
+        auto: CollectionsPlansRulesTest#aStatementTotalsItsLinesAndCannotBeSentOnceCancelled
+
+  FR-CL-062:
+    scenario: SC-CL-07
+    persona: MKT_COLLECTION
+    screen: BILL
+    conditions:
+      - Generating an SOA changes no ledger balance and creates no worklist account or CR billing.
+      - Aging counts from the booking or inception date only.
+    cases:
+      - c: 1
+        type: Positive
+        title: SOA of 10,000.00 changes nothing in the ledger
+        steps:
+          - Note the outstanding of the invoice and the number of Open Accounts.
+          - Generate an SOA of 10,000.00 for its next cycle.
+        expected: The outstanding and the number of accounts are unchanged; no CR billing appears in Commission.
+      - c: 1
+        type: Negative
+        screen: DPACC
+        persona: COMMREC
+        title: An SOA does not create a CR billing
+        steps:
+          - Log in as commrec and search DP Accounts and DP Billings for the invoice of the SOA.
+        expected: The invoice is not on any billing.
+      - c: 2
+        type: Positive
+        screen: SETUP
+        persona: MKT_SECTION_HEAD
+        data: [TD-CL-03]
+        title: Aging follows the basis parameter
+        steps:
+          - Set CLX_AGING_BASIS to INCEPTION and click Refresh now.
+          - Open an account whose inception is later than its booking.
+        expected: The aging counts from the inception date. Reset to BOOKING after the case.
+        auto: CollectionsRulesTest#agingBracketsPlaceEveryAge
+
+  FR-CL-070:
+    scenario: SC-CL-08
+    persona: UNAPPLIED_HANDLER
+    screen: UPP
+    data: [TD-CL-08]
+    conditions:
+      - The list shows the payments with an unapplied balance above zero as of today, with age and payment details.
+      - A payment matched to an invoice shows the invoice's collection details.
+      - A fully applied payment is no longer listed.
+    cases:
+      - c: 1
+        type: Positive
+        title: Payment received today without a match
+        pre: The cashier receives a payment today that matches no invoice.
+        steps:
+          - Open Unapplied Payments, tab Awaiting Disposition.
+        expected: The payment is listed with age 0, payment file, transaction no., amount, balance, payor and bank.
+        auto: CollectionsUnappliedApiIT#theCollectorEndpointsListDisposeAndShowTheRequest; unapplied.test.tsx#lists the unapplied payments and opens the disposition of the selected one
+      - c: 2
+        type: Positive
+        screen: UPPD
+        title: Matched payment shows assured, AO and PR balance
+        steps:
+          - Open a payment matched to an invoice.
+        expected: The Payment & Account tab shows the invoice in BIBS format, assured, PR balance, inception, segment, sales unit, Unit Head, AO, insurer, invoice category and the handler.
+      - c: 3
+        type: Negative
+        title: Applied payment is not listed
+        steps:
+          - Search the list for Grace Villanueva's payment.
+        expected: It is not in the open tabs (fully applied by Cashiering).
+        auto: CollectionsUnappliedSeedDataIT#theCollectorsDisposedOfTheSeedPaymentsAndCashieringAppliedOne
+
+  FR-CL-071:
+    scenario: SC-CL-08
+    persona: UNAPPLIED_HANDLER
+    screen: UPP
+    data: [TD-CL-08]
+    conditions:
+      - The list filters by segment, collector disposition (including none yet), tab, client, unit, dates and age, and searches by reference.
+      - A filter without matches returns an empty list.
+    cases:
+      - c: 1
+        type: Positive
+        title: Segment and "None yet"
+        steps:
+          - Filter on segment RETAIL and disposition None yet.
+        expected: Only Retail payments without a collector disposition are listed (Liza Manalo's if Retail).
+        auto: unapplied.test.tsx#builds the request body, the list filters and the status pills
+      - c: 1
+        type: Positive
+        title: Search by payor
+        steps:
+          - Search "Mega Traders".
+        expected: Mega Traders Inc.'s payment is listed.
+      - c: 2
+        type: Negative
+        title: Age range without payments
+        steps:
+          - Filter on age from 900 to 999 days.
+        expected: The list is empty; no error.
+
+  FR-CL-072:
+    scenario: SC-CL-08
+    persona: MKT_SECTION_HEAD
+    screen: LOV
+    data: [TD-CL-05]
+    conditions:
+      - A deactivated unapplied disposition is not offered and is refused on save.
+      - A value with Cashiering action NONE records a disposition without a request.
+      - The rules of a value (requires invoice, Cashiering action) are validated.
+    cases:
+      - c: 1
+        type: Negative
+        persona: UNAPPLIED_HANDLER
+        screen: API
+        title: Deactivated value refused
+        pre: The test lead ends "For transfer to other unit" yesterday.
+        steps:
+          - Open Record Disposition on a payment; POST the disposition FOR_TRANSFER.
+        expected: The value is not offered and the call is refused. Restore the value afterwards.
+        msg: ["{FOR_TRANSFER} is not a value of {CLX_UPP_DISPOSITION}", CLX_LOV_VALUE_UNKNOWN]
+      - c: 2
+        type: Positive
+        persona: BUSINESS_ADMIN
+        title: New value with action NONE
+        steps:
+          - As badmin add "Awaiting client documents" to CLX_UPP_DISPOSITION; clxuh approves it; set its Cashiering action NONE on Disposition Rules.
+          - As upphandler record it on a payment.
+        expected: The disposition is saved; no request to Cashiering is created.
+      - c: 3
+        type: Negative
+        screen: SETUP
+        title: Invalid Cashiering action
+        steps:
+          - Set the Cashiering action of "Coordinate further" to PAY.
+        expected: The rule is not saved.
+        msg: ["'{PAY}' is not a valid {cashiering_action}", CLX_LOV_ATTRIBUTE_VALUE]
+
+  FR-CL-073:
+    scenario: SC-CL-08
+    persona: UNAPPLIED_HANDLER
+    screen: UPP
+    data: [TD-CL-08]
+    conditions:
+      - A collector disposition with remarks is kept on the payment; a value without Cashiering action sends no request.
+      - A payment without balance or an amount out of range is refused.
+    cases:
+      - c: 1
+        type: Positive
+        screen: UPPD
+        title: Coordinate further on Juan Dela Cruz's payment
+        steps:
+          - Open Juan Dela Cruz's payment, tab Collector Dispositions.
+        expected: The disposition Coordinate further of upphandler is listed with its remarks; no request to Cashiering exists.
+        auto: CollectionsUnappliedSeedDataIT#theCollectorsDisposedOfTheSeedPaymentsAndCashieringAppliedOne
+      - c: 2
+        type: Negative
+        screen: API
+        title: Disposition on a fully applied payment
+        steps:
+          - POST a disposition on Grace Villanueva's payment.
+        expected: The disposition is refused.
+        msg: ["{ref} has no unapplied balance left", CLX_UNAPPLIED_NO_BALANCE]
+      - c: 2
+        type: Boundary
+        neg: true
+        title: Amount above the balance
+        pre: Liza Manalo's payment with its balance.
+        steps:
+          - Record "For refund" with an amount 0.01 above the balance.
+        expected: The disposition is refused; the exact balance is accepted.
+        msg: ["The amount must be above zero and at most the balance {balance}", CLX_UNAPPLIED_AMOUNT]
+        auto: CollectionsUnappliedIT#theInvoiceRulesAndTheAmountAreChecked; unapplied.test.tsx#checks the invoice rules and the amount of a disposition
+      - c: 1
+        type: Security-access
+        persona: CASHIER
+        title: Cashier cannot record a collector disposition
+        steps:
+          - Log in as cashier and open Unapplied Payments.
+        expected: Record Disposition is not shown; POST .../unapplied/{ref}/dispositions returns HTTP 403.
+
+  FR-CL-074:
+    scenario: SC-CL-08
+    persona: UNAPPLIED_HANDLER
+    screen: CREQ
+    data: [TD-CL-08]
+    conditions:
+      - A disposition with a Cashiering action sends one request; the cashier accepts and applies it and the request ends APPLIED.
+      - The cashier rejects a request with a reason; the handler sees REJECTED and the reason.
+      - A request stays SENT until a cashier acts; Check Status asks Cashiering again.
+      - A decided request or a disposition type that does not match the action is refused to the cashier.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Application request accepted and applied
+        steps:
+          - Record "For application to invoice" on a payment with an open invoice number.
+          - As cashier, open Incoming Requests, accept the request and execute the disposition.
+          - As upphandler, open Requests to Cashiering.
+        expected: The request is ACCEPTED, then APPLIED with its CRQ number; the invoice outstanding falls by the amount; upphandler is notified.
+        auto: CollectionsUnappliedIT#aCollectorApplicationIsAppliedByCashieringAndTheInvoiceIsPaid; CashieringAdaptersIT#aCollectorApplicationIsAcceptedAppliedAndPaysTheInvoice
+      - c: 2
+        type: Negative
+        persona: CASHIER
+        screen: CASHREQ
+        title: Reject without a reason
+        steps:
+          - Open a SENT request and click Reject with the reason blank.
+        expected: The rejection is refused.
+        msg: [Enter the reason for rejecting, REJECT_REASON_REQUIRED]
+        auto: CollectionsUnappliedApiIT#cashiersRejectRequestsAndReadTheValidationAndReversalQueues
+      - c: 2
+        type: Workflow
+        persona: CASHIER
+        screen: CASHREQ
+        title: Reject with a reason
+        steps:
+          - Reject the request with the reason "Payor asked for a refund".
+          - As upphandler, open Requests to Cashiering.
+        expected: The request is REJECTED; the status note shows the reason and upphandler is notified.
+        msg: ["Rejected by Cashiering: {Payor asked for a refund}", "-"]
+        auto: CashieringAdaptersIT#requestsAreRefusedCheckedAndRejected
+      - c: 3
+        type: Positive
+        title: Refund request waits for the cashier
+        steps:
+          - Open the refund request of Mega Traders Inc.; select it and click Check Status.
+        expected: The request stays SENT with its CRQ number until a cashier acts.
+      - c: 4
+        type: Negative
+        persona: CASHIER
+        screen: CASHREQ
+        title: Accept a request already decided
+        steps:
+          - Accept the request rejected above through POST /api/v1/cashiering/collector-requests/{id}/accept.
+        expected: The call is refused.
+        msg: ["{request} is already {REJECTED}", COLLECTOR_REQUEST_DECIDED]
+      - c: 4
+        type: Negative
+        persona: CASHIER
+        screen: CASHREQ
+        title: Disposition type that does not match
+        steps:
+          - Accept a refund request choosing the disposition type Apply to other invoice.
+        expected: The acceptance is refused.
+        msg: ["Disposition type {APPLY_OTHER} does not carry out a {REFUND} request", COLLECTOR_REQUEST_TYPE_MISMATCH]
+        auto: CashieringAdaptersIT#requestsAreRefusedCheckedAndRejected
+
+  FR-CL-075:
+    scenario: SC-CL-08
+    persona: UNAPPLIED_HANDLER
+    screen: UPP
+    data: [TD-CL-03, TD-CL-08]
+    conditions:
+      - '"For application to invoice" needs an invoice number.'
+      - The invoice number must match CLX_INVOICE_NO_PATTERN.
+      - The invoice must exist in the invoice ledger; a valid booked invoice is accepted.
+    cases:
+      - c: 1
+        type: Negative
+        title: No invoice number
+        steps:
+          - Record "For application to invoice" on Liza Manalo's payment without invoice number.
+        expected: The form asks for the invoice number; the server refuses the call.
+        msg: [Enter the invoice number to apply the payment to, CLX_INVOICE_REQUIRED]
+        auto: CollectionsUnappliedIT#theInvoiceRulesAndTheAmountAreChecked; unapplied.test.tsx#asks for the invoice number before requesting an application
+      - c: 2
+        type: Boundary
+        neg: true
+        title: EBIX number with 7 digits
+        steps:
+          - Enter the invoice number I1234567.
+        expected: The disposition is refused.
+        msg: ["Invoice number {I1234567} does not have the expected format ({pattern})", CLX_INVOICE_FORMAT]
+        auto: CollectionsUnappliedIT#theInvoiceRulesAndTheAmountAreChecked
+      - c: 3
+        type: Negative
+        title: Well-formed number not booked
+        steps:
+          - Enter the invoice number I12345678.
+        expected: The disposition is refused.
+        msg: ["Invoice {I12345678} is not in the invoice ledger", CLX_INVOICE_UNKNOWN]
+        auto: CollectionsUnappliedIT#theInvoiceRulesAndTheAmountAreChecked
+      - c: 3
+        type: Positive
+        title: Booked BIBS invoice accepted
+        steps:
+          - Enter the BI- number of an open booked invoice; save.
+        expected: The disposition is saved and the request goes to Cashiering.
+
+  FR-CL-076:
+    scenario: SC-CL-08
+    persona: UNAPPLIED_HANDLER
+    screen: UPPD
+    data: [TD-CL-08]
+    conditions:
+      - The history merges Cashiering events and collector dispositions in time order and stays after the payment is applied.
+      - Collector dispositions and requests cannot be deleted.
+    cases:
+      - c: 1
+        type: Positive
+        title: History of an applied payment
+        steps:
+          - Open Grace Villanueva's payment, History tab.
+        expected: Intake, the collector disposition, the request, the acceptance and the application are listed in time order.
+        auto: CollectionsUnappliedIT#aCollectorApplicationIsAppliedByCashieringAndTheInvoiceIsPaid
+      - c: 2
+        type: Negative
+        screen: API
+        title: No delete of a collector disposition
+        steps:
+          - Send DELETE to .../unapplied/{ref}/dispositions.
+        expected: The call is refused and the disposition stays.
+
+  FR-CL-077:
+    scenario: SC-CL-08
+    persona: SYSTEM
+    screen: CREQ
+    conditions:
+      - At 05:00 the file lists the application requests up to the end of the previous day that are not yet in a file, pipe-delimited, with the user ID of the disposition.
+      - A request is in one file only.
+      - A user with CLX_SETUP or CLX_EXPORT writes the file on demand; a failure raises CLX_FILE_NOT_PUBLISHED.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Monday's request in Tuesday's file
+        steps:
+          - On Monday record an application request.
+          - On Tuesday after 05:00 open Requests to Cashiering, column File, and download the file.
+        expected: The request lists FOR_APPLICATION_TO_INVOICE_<yyyyMMdd>_<time>.txt; the file has one pipe-delimited line per request with the p.60 fields and the user ID upphandler.
+        auto: CollectionsUnappliedIT#aCollectorApplicationIsAppliedByCashieringAndTheInvoiceIsPaid
+      - c: 2
+        type: Negative
+        title: The request is not repeated on Wednesday
+        steps:
+          - Open Wednesday's file.
+        expected: Monday's request is not in it.
+      - c: 3
+        type: Positive
+        persona: MKT_SECTION_HEAD
+        screen: REPORTS
+        title: Manual run and report
+        steps:
+          - Write the application file on demand; run the report For Application To Invoice for the week.
+        expected: A new file lists the requests not yet filed; the report lists every request of the week.
+        auto: FlowInAndPortsIT#extractsAreKeptByFolderAndCollectionItemsAreWrittenOut
+      - c: 3
+        type: Security-access
+        persona: UNAPPLIED_HANDLER
+        screen: API
+        title: The file cannot be written without CLX_SETUP or CLX_EXPORT
+        steps:
+          - With the token of upphandler, POST /api/v1/collections/unapplied/application-file.
+        expected: HTTP 403; no file is written.
+
+  FR-CL-080:
+    scenario: SC-CL-09
+    persona: MKT_COLLECTION
+    screen: FILES
+    conditions:
+      - On the first working day of the month the DP PR for Reversal file of the previous month is generated and available from 08:00.
+      - On a holiday the file is generated on the next working day.
+      - The file cannot be downloaded before its availability time.
+    cases:
+      - c: 1
+        type: Report-output
+        title: September file on 1 October
+        steps:
+          - On 1 October after 08:00 open Collections Files, Monthly, and download DP PR for Reversal.
+        expected: The Excel lists the accounts tagged DP PR for reversal in September; users with CLX_EXPORT were notified.
+        auto: CollectionsFilesIT#weeklyAndMonthlyFilesWaitForTheirAvailabilityTime; CollectionsRulesTest#theMonthlyFileIsForThePreviousMonthOnTheFirstWorkingDay
+      - c: 2
+        type: Boundary
+        title: First of the month on a holiday
+        pre: The test lead enters 1 October as a head office holiday.
+        steps:
+          - Run CLX_MONTHLY_FILES on 1 and 2 October (clock set by the test lead).
+        expected: No file on 1 October; the file is generated on 2 October.
+        auto: CollectionsRulesTest#theMonthlyFileIsForThePreviousMonthOnTheFirstWorkingDay
+      - c: 3
+        type: Negative
+        title: Download before 08:00
+        steps:
+          - At 07:30 on the day of generation, click the file.
+        expected: The download is refused.
+        msg: ["{file} is available from {08:00}", REPORT_FILE_NOT_AVAILABLE]
+        auto: CollectionsAccountingFoundationApiIT#scheduledFilesAreDownloadedFromTheirAvailabilityTime
+
+  FR-CL-081:
+    scenario: SC-CL-09
+    persona: MKT_COLLECTION
+    screen: FILES
+    conditions:
+      - The PR 2307 for Reversal file of the previous month lists the tagged accounts with the PR2307 amount and the difference to the premium balance.
+      - The file cannot be downloaded before its availability time.
+    cases:
+      - c: 1
+        type: Report-output
+        title: October file of September's 2307 tags
+        steps:
+          - On the first working day after 08:00 download PR 2307 for Reversal.
+        expected: Every account tagged PR 2307 for reversal in September is listed with the PR2307 amount and the difference between the premium balance and the PR2307.
+        auto: CollectionsFilesIT#weeklyAndMonthlyFilesWaitForTheirAvailabilityTime
+      - c: 2
+        type: Negative
+        title: Download before availability
+        steps:
+          - Before 08:00 click the file.
+        expected: The download is refused.
+        msg: ["{file} is available from {08:00}", REPORT_FILE_NOT_AVAILABLE]
+
+  FR-CL-082:
+    scenario: SC-CL-09
+    persona: MKT_COLLECTION
+    screen: FILES
+    conditions:
+      - Every Friday at 22:30 the weekly files of the Saturday-to-Friday week are generated per sales unit and invoicing branch.
+      - The weekly files are available from Monday 08:00.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Weekly files split by unit and branch
+        steps:
+          - Tag accounts of two sales units between Saturday and Friday.
+          - On Monday after 08:00 open Collections Files, Weekly.
+        expected: One DP PR and one PR 2307 file per sales unit and branch that has tags, each listing its accounts of the week.
+        auto: CollectionsRulesTest#theWeekRunsSaturdayToFridayAndIsAvailableMonday
+      - c: 2
+        type: Negative
+        title: Weekly file on Saturday
+        steps:
+          - On Saturday try to download the files generated on Friday.
+        expected: The download is refused.
+        msg: ["{file} is available from {Monday 08:00}", REPORT_FILE_NOT_AVAILABLE]
+        auto: CollectionsFilesIT#weeklyAndMonthlyFilesWaitForTheirAvailabilityTime
+
+  FR-CL-083:
+    scenario: SC-CL-09
+    persona: MKT_COLLECTION
+    screen: FILES
+    conditions:
+      - Every day at 22:30 the Outstanding PR List and the Full Production Report are generated and available at once.
+      - Each report is generated once per day.
+    cases:
+      - c: 1
+        type: Report-output
+        title: Yesterday's daily reports
+        steps:
+          - In the morning open Collections Files, Daily.
+        expected: The Outstanding PR List (open accounts with outstanding) and the Full Production Report (invoices booked from the start of the month) of the previous evening are downloadable.
+        auto: CollectionsFilesIT#dailyFilesArePublishedAvailableAtOnceAndOncePerDay
+      - c: 2
+        type: Negative
+        persona: SYSTEM
+        title: A second run the same day adds no file
+        steps:
+          - Run CLX_DAILY_FILES again the same evening.
+        expected: No second file of the same report and date is created.
+        auto: CollectionsFilesIT#dailyFilesArePublishedAvailableAtOnceAndOncePerDay
+
+  FR-CL-084:
+    scenario: SC-CL-09
+    persona: MKT_COLLECTION
+    screen: WL
+    data: [TD-CL-03]
+    conditions:
+      - An export of the filtered worklist runs in the background and appears under Collections Files, Exports.
+      - An export above CLX_EXPORT_MAX_ROWS is refused.
+      - A user without CLX_EXPORT sees the files but cannot download them.
+    cases:
+      - c: 1
+        type: Upload-download
+        title: Export the filtered worklist
+        steps:
+          - Filter on segment CBG and click Export to Files.
+          - Open Collections Files, Exports, and download the file.
+        expected: The Outstanding PR List export holds the filtered rows and is in the report archive.
+        auto: CollectionsFilesIT#exportsAreCappedAndAFailedFileIsRecorded
+      - c: 2
+        type: Boundary
+        neg: true
+        persona: MKT_SECTION_HEAD
+        title: Export above the cap
+        pre: The test lead sets CLX_EXPORT_MAX_ROWS to 100 (minimum) for the case.
+        steps:
+          - Export the unfiltered worklist of more than 100 accounts; narrow the filter to fewer than 100 and export again.
+        expected: The first export is refused; the second runs. Reset the cap to 50,000.
+        msg: ["{101} accounts exceed the export limit of {100}; narrow the filters", CLX_EXPORT_TOO_LARGE]
+        auto: CollectionsFilesIT#exportsAreCappedAndAFailedFileIsRecorded
+      - c: 3
+        type: Security-access
+        persona: UNAPPLIED_HANDLER
+        screen: FILES
+        title: User without CLX_EXPORT cannot download
+        steps:
+          - Log in as upphandler, open Collections Files and click a file.
+        expected: The files are listed; the download is refused (HTTP 403).
+
+  FR-CL-085:
+    scenario: SC-CL-09
+    persona: MKT_COLLECTION
+    screen: HOME
+    conditions:
+      - The home tiles count the user's work and open the worklist filtered to it.
+      - The unapplied tiles are shown only to users with CLX_UNAPPLIED_WORK.
+      - The chart shows the open amounts per aging bracket for all segments or one.
+    cases:
+      - c: 1
+        type: Positive
+        title: My Open Accounts opens the filtered worklist
+        steps:
+          - Log in as clxhandler; note the count of My Open Accounts; click the tile.
+        expected: The worklist opens filtered on handler clxhandler and status OPEN with the same count.
+        auto: collectionsLogic.test.ts#reads the tile links
+      - c: 2
+        type: Security-access
+        persona: CASHIER
+        title: No unapplied tiles without CLX_UNAPPLIED_WORK
+        steps:
+          - Log in as cashier and open Collections Home.
+        expected: Unapplied Awaiting Disposition and My Requests in Cashiering are not shown.
+        auto: CollectionsUnappliedIT#theHomeTilesAndReportsServeTheUnappliedHandlers
+      - c: 2
+        type: Security-access
+        neg: false
+        persona: UNAPPLIED_HANDLER
+        title: Unapplied handler sees the unapplied tiles
+        steps:
+          - Log in as upphandler and open Collections Home.
+        expected: Both unapplied tiles are shown with their counts.
+        auto: CollectionsUnappliedIT#theHomeTilesAndReportsServeTheUnappliedHandlers
+      - c: 3
+        type: Report-output
+        title: Aging chart per segment
+        steps:
+          - Choose segment CBG in the chart.
+        expected: The bars show the open amounts of CBG per bracket of CLX_AGING_BRACKETS, in bracket order.
+        auto: collectionsLogic.test.ts#orders the brackets and scales the bars
+
+  FR-CL-090:
+    scenario: SC-CL-09
+    persona: COMMREC
+    screen: DPACC
+    conditions:
+      - An account is billed only after the CRU reviewer confirms it fully paid to the insurer.
+      - A billing is refused for an account not confirmed, or when nothing is confirmed.
+      - A disposition or an SOA never creates a CR billing.
+    cases:
+      - c: 1
+        type: Workflow
+        title: Confirmed DP account is billed
+        steps:
+          - Open DP Accounts, select the account tagged DP PR for reversal and confirm it fully paid to the insurer (commtl as reviewer).
+          - Create a billing with the account.
+        expected: The account is on the billing of its insurer.
+        auto: CommissionIT#aBillingIsAnsweredCollectedAndThePremiumReceivableReversed
+      - c: 2
+        type: Negative
+        title: Account not confirmed
+        steps:
+          - Try to add a DP account not yet confirmed to a billing.
+        expected: The account is refused.
+        msg: ["Account {invoice} is not confirmed for billing ({tag})", DP_ITEM_STATE]
+      - c: 2
+        type: Negative
+        title: Nothing confirmed
+        steps:
+          - Create a billing when no account of the insurer is confirmed.
+        expected: No billing is created.
+        msg: [No account is confirmed for billing, DP_NOTHING_TO_BILL]
+      - c: 3
+        type: Negative
+        title: A DP disposition alone creates no billing
+        steps:
+          - As clxhandler record DP PR for reversal on a new account; as commrec open DP Billings.
+        expected: The account waits on DP Accounts with its tag; no billing line exists.
+
+  FR-CL-091:
+    scenario: SC-CL-09
+    persona: COMMREC
+    screen: DPACC
+    conditions:
+      - Regular commission and incentives are separate receivables with their own accounts.
+      - An incentive is not billed before its eligibility is met.
+    cases:
+      - c: 1
+        type: Positive
+        title: Commission and incentive as two receivables (run when built)
+        pre: Draft requirement BRCLXN.061, not built (CQ01). Run this case once BDOI confirms the draft and the function is delivered.
+        steps:
+          - Book an invoice with commission and an eligible incentive; open the receivables of the invoice.
+        expected: Two receivables with different accounts - commission receivable and incentive receivable (Other Income).
+      - c: 2
+        type: Negative
+        title: Incentive before eligibility (run when built)
+        pre: As above.
+        steps:
+          - Try to bill the incentive of an invoice that does not meet the criteria.
+        expected: The billing is refused; the incentive is not eligible for billing.
+
+  FR-CL-092:
+    scenario: SC-CL-09
+    persona: COMMREC
+    screen: DPACC
+    conditions:
+      - A campaign run bills the qualified invoices through a system-generated service invoice.
+      - Invoices with unresolved adjustments, cancellations or partial payments are excluded.
+    cases:
+      - c: 1
+        type: Positive
+        title: Invoice paid within the campaign window (run when built)
+        pre: Draft requirement BRCLXN.062, not built (CQ01).
+        steps:
+          - Run the campaign for a period with an invoice paid within X days of booking.
+        expected: The invoice is billed on a system-generated service invoice with the withholding tax and the campaign code.
+      - c: 2
+        type: Negative
+        title: Pending negative adjustment excluded (run when built)
+        pre: As above.
+        steps:
+          - Run the campaign with a qualified invoice that has a pending negative adjustment.
+        expected: The invoice is excluded and listed with the reason.
+
+  FR-CL-093:
+    scenario: SC-CL-09
+    persona: COMMREC
+    screen: DPACC
+    conditions:
+      - A negative adjustment on a collected commission creates a commission refund, not a negative CR line.
+    cases:
+      - c: 1
+        type: Positive
+        title: Refund from a negative endorsement (run when built)
+        pre: Draft requirement BRCLXN.063, not built (CQ01).
+        steps:
+          - Book a negative endorsement on an invoice whose commission is collected.
+        expected: A commission refund linked to the original commission and the endorsement is created.
+      - c: 1
+        type: Negative
+        title: The refund stays off the CR statement (run when built)
+        pre: As above.
+        steps:
+          - Open the CR statement of account and the CRU aging.
+        expected: The refund is not a CR line and is not in the CR aging.
+
+  FR-CL-094:
+    scenario: SC-CL-09
+    persona: COMMREC
+    screen: DPACC
+    conditions:
+      - On a mixed payment only the confirmed direct portion is CR-collectible.
+    cases:
+      - c: 1
+        type: Positive
+        title: 40 % paid directly (run when built)
+        pre: Draft requirement BRCLXN.064, not built (CQ01); formula to confirm (CQ19).
+        steps:
+          - Premium 100,000.00 with 40,000.00 paid directly and confirmed; open the CR receivable.
+        expected: The collectible commission is 40 % of the commission.
+      - c: 1
+        type: Negative
+        title: Unconfirmed direct portion not billed (run when built)
+        pre: As above.
+        steps:
+          - Leave the direct portion unconfirmed and run the CR billing.
+        expected: No CR is billed on the unconfirmed portion.
+
+access:
+  - action: View the PR Worklist and collection accounts
+    screen: WL
+    permission: CLX_VIEW
+    allow: [MKT_AO, MKT_COLLECTION, CASHIER, DISBURSEMENT, COMPTROLLERSHIP, AUDITOR]
+    deny: []
+    allowed: The worklist and the account open read only for roles without CLX_WORK.
+    auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
+  - action: Record dispositions, efforts and promises
+    screen: WL
+    permission: CLX_WORK
+    allow: [MKT_AO, MKT_TL, MKT_HANDLER, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD, PROCESSOR]
+    deny: [UNAPPLIED_HANDLER, CASHIER, DISBURSEMENT, COMPTROLLERSHIP, AUDITOR]
+    denied: Record Disposition and Log Effort are not shown; POST /dispositions returns HTTP 403 (ACCESS_DENIED).
+    auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
+  - action: Update several accounts at once
+    screen: WL
+    permission: CLX_BULK_UPDATE
+    allow: [MKT_TL, MKT_HANDLER, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD]
+    deny: [MKT_AO, PROCESSOR]
+    denied: A selection of several accounts is refused with CLX_BULK_NOT_ALLOWED.
+    auto: CollectionsWorklistIT#dispositionRulesAreEnforced
+  - action: Escalate accounts by hand
+    screen: ESC
+    permission: CLX_ESCALATE
+    allow: [MKT_AO, MKT_TL, MKT_HANDLER, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD]
+    deny: [UNAPPLIED_HANDLER, PROCESSOR, CASHIER]
+    denied: Escalate Accounts is not shown; POST /bulk/escalate returns HTTP 403.
+  - action: Act on an escalation
+    screen: ESCD
+    permission: CLX_ESCALATION_HANDLE
+    allow: [MKT_TL, CLX_TL, MKT_SECTION_HEAD]
+    deny: [MKT_AO, MKT_COLLECTION, MKT_HANDLER]
+    denied: Acknowledge, Escalate further, Return and Resolve are not shown; the action call returns HTTP 403.
+  - action: Maintain assignment rules and reassign
+    screen: ASSIGN
+    permission: CLX_ASSIGN
+    allow: [MKT_TL, CLX_TL, MKT_SECTION_HEAD]
+    deny: [MKT_AO, MKT_COLLECTION, MKT_HANDLER]
+    denied: Assignments is not in the menu; POST /reassignments returns HTTP 403.
+    auto: CollectionsApiIT#theTeamLeadAssignsAndReassigns
+  - action: Dispose of unapplied payments and request applications
+    screen: UPP
+    permission: CLX_UNAPPLIED_WORK
+    allow: [MKT_AO, MKT_COLLECTION, CLX_TL, UNAPPLIED_HANDLER]
+    deny: [PROCESSOR, CASHIER, DISBURSEMENT]
+    denied: Record Disposition is not shown on Unapplied Payments; the call returns HTTP 403.
+  - action: Create installment plans and billing statements
+    screen: PLANS
+    permission: CLX_BILLING
+    allow: [MKT_TL, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD]
+    deny: [MKT_AO, MKT_HANDLER, UNAPPLIED_HANDLER]
+    denied: New Installment Plan and Billing Run are not shown; the calls return HTTP 403.
+  - action: Collections Setup and escalation rules
+    screen: SETUP
+    permission: CLX_SETUP
+    allow: [MKT_SECTION_HEAD, BUSINESS_ADMIN, SYSADMIN]
+    deny: [MKT_TL, MKT_COLLECTION, CLX_TL, CASHIER]
+    denied: Collections Setup is not in the menu; PUT /setup/parameters returns HTTP 403.
+    auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
+  - action: Download files and exports
+    screen: FILES
+    permission: CLX_EXPORT
+    allow: [MKT_AO, MKT_COLLECTION, CLX_TL, CASHIER, DISBURSEMENT]
+    deny: [UNAPPLIED_HANDLER, PROCESSOR, COMPTROLLERSHIP]
+    denied: The files are listed but the download returns HTTP 403.
+    auto: CollectionsAccountingFoundationIT#seedPersonasHoldTheirPermissions
+  - action: Run the Collections reports
+    screen: REPORTS
+    permission: CLX_REPORT_VIEW
+    allow: [MKT_COLLECTION, UNAPPLIED_HANDLER, CASHIER, COMPTROLLERSHIP, AUDITOR]
+    deny: [PROCESSOR, BUSINESS_ADMIN]
+    denied: The Collections reports are not listed in the Report Centre.
+  - action: View and extract the Collections audit log
+    screen: REPORTS
+    permission: CLX_AUDIT_VIEW
+    allow: [MKT_SECTION_HEAD, BUSINESS_ADMIN, SYSADMIN, AUDITOR]
+    deny: [MKT_COLLECTION, CLX_TL, CASHIER]
+    denied: Collections Audit Log is not listed; the run call returns HTTP 403.
+  - action: Record the reserved disposition "No / missing policy number"
+    screen: WL
+    permission: CLX_WORK and the Disposition Rule allowed_roles
+    allow: [PROCESSOR, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD]
+    deny: [MKT_AO, MKT_HANDLER, MKT_TL]
+    denied: The disposition is refused with CLX_DISPOSITION_NOT_ALLOWED.
+    auto: CollectionsWorklistIT#dispositionRulesAreEnforced
+  - action: Accept or reject collector requests
+    screen: CASHREQ
+    permission: Cashiering collector request permission
+    allow: [CASHIER]
+    deny: [UNAPPLIED_HANDLER, MKT_COLLECTION]
+    denied: Incoming Requests is not in the menu; POST /cashiering/collector-requests/{id}/accept returns HTTP 403.
+    auto: CollectionsUnappliedApiIT#cashiersRejectRequestsAndReadTheValidationAndReversalQueues
+
+findings:
+  - fr: FR-CL-001
+    issue: 'The FRS messages "You do not have access to this page" and "Your account is locked. Contact the System Administrator" differ from the build ("You do not have access to this screen. Contact your administrator if you need it." in the frontend; "Account is locked. Contact your administrator." with code AUTHENTICATION_FAILED). The lock-out message is given without its code.'
+    proposal: Quote the built wording and the code AUTHENTICATION_FAILED in FR-CL-001; the cases use the built wording.
+  - fr: FR-CL-004
+    issue: 'The validation "The end date must be on or after the start date" has no match in the code. The Report Centre checks the range with its own parameter message (ReportParametersTest).'
+    proposal: Quote the report engine's range message in the FRS; TC-CL-004.2-01 records the actual text at first run.
+  - fr: FR-CL-032
+    issue: "The detail check \"'<value>' is not a date (yyyy-mm-dd) / an amount\" is written as one message; the build returns two messages under CLX_DISPOSITION_DETAIL (\"'<value>' is not a date (yyyy-mm-dd)\" and \"'<value>' is not an amount\"). The FRS also does not say which details each Operations action requires (only the pick-up date and check amount are named)."
+    proposal: List the required details per action (check pick-up, 2307 CASH / CERTIFICATE, DP reversal) and give the two messages apart.
+  - fr: FR-CL-074
+    issue: 'The FRS gives the status note of a rejected request as "Rejected by Cashiering - <reason>"; the screen shows "Rejected by Cashiering: <reason>". The refusal texts Cashiering returns at once (unknown payment, no balance, amount above balance, no invoice) are not quoted.'
+    proposal: Quote the refusal texts Cashiering returns and how the handler sees them on Requests to Cashiering.
+  - fr: FR-CL-091
+    issue: FR-CL-091 to FR-CL-094 specify draft requirements BRCLXN.061-064 that are not built; their validations ("The incentive is not eligible for billing", "The invoice has an unresolved adjustment and is excluded") have no code. The BRD trace of these FRs is written "BRCLXN.061 (p.8-9, draft)" without quotes, so the comma splits it into two BRD references ("BRCLXN.061 (p.8-9" and "draft)") when the FRS is read.
+    proposal: Quote the trace values (for example "BRCLXN.061 (p.8-9, draft)") and keep the cases of these FRs marked "run when built" until BDOI confirms the draft (CQ01).
+  - fr: FR-CL-033
+    issue: 'Several trace values of FR-CL-033 and FR-CL-084 contain commas ("Report fields Last Collection Effort Date, Code, Remarks (p.59)", "Categories A, B, C (p.41 / 61)"); they are split into references such as "B", "C" and "Code" when the traceability is read.'
+    proposal: Write these references without commas or quote them so they stay one trace each.
+  - fr: FR-CL-005
+    issue: 'Acceptance criterion 2 ("After 15 minutes without release, mkttl can take the lock") needs the tester to wait 15 minutes or change the lock time in the database; the FRS does not say whether the lock is renewed while the holder keeps working.'
+    proposal: State whether activity on the account renews the lock and how the expiry is shown to the holder.
+  - fr: FR-CL-017
+    issue: The acceptance criterion "A payment applied at 10:00 reduces the account's outstanding before 10:05" has no parameter or design reference for the five minutes; the refresh after a ledger movement is event-driven.
+    proposal: State the expected delay as a non-functional target, or remove the time from the criterion.

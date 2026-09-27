@@ -1,0 +1,44 @@
+# Drop 2 - Independent: deliverables index
+
+BIBS client pack for BDO Insurance and Reinsurance Brokers (BDOI), grouped by BDOI drop (answer A5 of 26-Sep-2026).
+Written by `python tools/deliverables/drop_index.py` from the files of this folder and the drop map in
+`tools/deliverables/brand.py`; do not edit by hand.
+
+| | |
+|---|---|
+| BDOI dates | Requirements Dec 2026 - Feb 2027, build Mar - Apr 2027, SIT Jul - Sep 2027, UAT Oct - Nov 2027 |
+| Scope (BDOI drop plan) | 2.1 Marketing Collection (extraction), 2.2 Claims, 2.3 Production Reconciliation, 2.4 Employee Benefits (no portal feature), 2.5 Other Reports; the Drop 2 integrations (EDP, EGL, CARMS, HL-LOAS, Insurer System, Bridger Insight XG). |
+| Status | Status as of 26-Sep-2026; final refresh at build completion (deliverables README, "Document status and the final as-built refresh") |
+
+## Documents in this drop
+
+One folder per BRD release set (`BRD-nn_<Name>/`): its FRS, sign-off workbook, test plan, release note and
+any other document of the BRD, released and signed off together (deliverables README, "Release and sign-off
+per BRD").
+
+| Document | BRD | Kind | Version | File |
+|---|---|---|---|---|
+| Claims | BRD-07 | FRS | 1.0 | [`BRD-07_Claims/BIBS_FRS_BRD-07_Claims_v1.0.docx`](BRD-07_Claims/BIBS_FRS_BRD-07_Claims_v1.0.docx) |
+| Claims | BRD-07 | Test plan summary (Word) | 1.0 | [`BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_Summary_v1.0.docx`](BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_Summary_v1.0.docx) |
+| Claims | BRD-07 | Test plan workbook (Excel) | 1.0 | [`BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_v1.0.xlsx`](BRD-07_Claims/BIBS_TestPlan_BRD-07_Claims_v1.0.xlsx) |
+| Employee Benefits | BRD-08 | FRS | 1.0 | [`BRD-08_Employee_Benefits/BIBS_FRS_BRD-08_Employee_Benefits_v1.0.docx`](BRD-08_Employee_Benefits/BIBS_FRS_BRD-08_Employee_Benefits_v1.0.docx) |
+| Employee Benefits | BRD-08 | Test plan summary (Word) | 1.0 | [`BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.0.docx`](BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.0.docx) |
+| Employee Benefits | BRD-08 | Test plan workbook (Excel) | 1.0 | [`BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_v1.0.xlsx`](BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_v1.0.xlsx) |
+
+## Also part of this drop (documents kept in their primary drop)
+
+A BRD that spans drops lives in the folder of its primary drop; nothing is copied.
+
+| BRD | Part in this drop | Documents (in the primary drop folder) |
+|---|---|---|
+| BRD-02 | Production Reconciliation chapter of the FRS and its test plan sheet (item 2.3) | [`BIBS_FRS_BRD-02_Operations_v1.1.docx`](../Drop-1_Transactional/BRD-02_Operations/BIBS_FRS_BRD-02_Operations_v1.1.docx)<br>[`BIBS_TestPlan_BRD-02_Operations_Summary_v1.0.docx`](../Drop-1_Transactional/BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx`](../Drop-1_Transactional/BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx) |
+| BRD-04 | Marketing Collection extraction: worklists, dispositions, daily files (item 2.1) | [`BIBS_FRS_BRD-04_Collections_v1.0.docx`](../Drop-1_Transactional/BRD-04_Collections/BIBS_FRS_BRD-04_Collections_v1.0.docx)<br>[`BIBS_TestPlan_BRD-04_Collections_Summary_v1.0.docx`](../Drop-1_Transactional/BRD-04_Collections/BIBS_TestPlan_BRD-04_Collections_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-04_Collections_v1.0.xlsx`](../Drop-1_Transactional/BRD-04_Collections/BIBS_TestPlan_BRD-04_Collections_v1.0.xlsx) |
+| BRD-09 | Service-request functions (proposed, IQ23) | [`BIBS_FRS_BRD-09_Customer_Servicing_Facility_v1.0.docx`](../Drop-1_Transactional/BRD-09_Customer_Servicing_Facility/BIBS_FRS_BRD-09_Customer_Servicing_Facility_v1.0.docx)<br>[`BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_Summary_v1.0.docx`](../Drop-1_Transactional/BRD-09_Customer_Servicing_Facility/BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_v1.0.xlsx`](../Drop-1_Transactional/BRD-09_Customer_Servicing_Facility/BIBS_TestPlan_BRD-09_Customer_Servicing_Facility_v1.0.xlsx) |
+| BRD-10 | Bridger Insight XG integration | [`BIBS_FRS_BRD-10_Sanction_Screening_v1.0.docx`](../Drop-1_Transactional/BRD-10_Sanction_Screening/BIBS_FRS_BRD-10_Sanction_Screening_v1.0.docx)<br>[`BIBS_TestPlan_BRD-10_Sanction_Screening_Summary_v1.0.docx`](../Drop-1_Transactional/BRD-10_Sanction_Screening/BIBS_TestPlan_BRD-10_Sanction_Screening_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-10_Sanction_Screening_v1.0.xlsx`](../Drop-1_Transactional/BRD-10_Sanction_Screening/BIBS_TestPlan_BRD-10_Sanction_Screening_v1.0.xlsx) |
+
+## Still to write
+
+| Document | BRD | Note |
+|---|---|---|
+| UAT plan and sign-off forms, Drop 2 (item 30) | - | Readiness statement by 30-Sep-2027 |
+| Interface specifications of the Drop 2 integrations (EDP, EGL, CARMS, Insurer System) | - | Specifications from BDOI IT by 31-Jan-2027 |

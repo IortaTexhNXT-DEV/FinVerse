@@ -1,0 +1,37 @@
+// BRD-4: collection account statuses set by the refresh, and hand-offs of dispositions. FRS section 5.2.
+digraph clx_items {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.4, ranksep=0.45, bgcolor="white", pad=0.15, newrank=true];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=11, fontcolor="@NEAR_BLACK", width=2.1, height=0.55, margin="0.08,0.03"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=9.5, fontcolor="@TEXT"];
+
+  subgraph cluster_items {
+    label="Collection account (set by the refresh)"; labeljust=l;
+    fontcolor="@HEADER_BLUE"; fontsize=11; style=rounded; color="@BORDER";
+    booked    [label="Booked invoice\n(ledger)", fillcolor="@WHITE"];
+    OPEN      [label="OPEN\ntotal > threshold"];
+    COMPLETED [label="COMPLETED\npaid or <= threshold", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    EXCL      [label="EXCLUDED_CANCELLED\nnegative cancellation", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+    CREDIT    [label="CREDIT\nother negative", fillcolor="@AMBER_BG"];
+    booked -> OPEN [label=" above threshold"];
+    OPEN -> COMPLETED [label=" paid down"];
+    COMPLETED -> OPEN [label=" balance back", style=dashed, constraint=false];
+    OPEN -> EXCL [label=" cancelled"];
+    OPEN -> CREDIT [label=" overpaid"];
+    { rank=same; COMPLETED; EXCL; CREDIT; }
+  }
+
+  subgraph cluster_handoff {
+    label="Disposition with an Operations action (outbox)"; labeljust=l;
+    fontcolor="@HEADER_BLUE"; fontsize=11; style=rounded; color="@BORDER";
+    disp      [label="Disposition recorded\n(FR-CL-031)", fillcolor="@WHITE"];
+    PENDING   [label="PENDING"];
+    TAKEN     [label="TAKEN\nCashiering / Commission", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+    CANCELLED [label="CANCELLED\nsuperseded", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+    disp -> PENDING;
+    PENDING -> TAKEN [label=" taken by the consumer"];
+    PENDING -> CANCELLED [label=" later disposition", style=dashed];
+    { rank=same; TAKEN; CANCELLED; }
+  }
+  EXCL -> disp [style=invis];
+}

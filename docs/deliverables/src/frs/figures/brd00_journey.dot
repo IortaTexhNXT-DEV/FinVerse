@@ -1,0 +1,47 @@
+// BRD-00 Core Replacement: end-to-end journey (umbrella BRD p.26) with the BIBS BRD of each step. FRS section 2.2.
+// Left column: new business and money flow. Right column: lifecycle services. Bottom: platform services.
+digraph core_journey {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.9, ranksep=0.28, bgcolor="white", pad=0.1, newrank=true];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.2,
+         fontname="Arial", fontsize=17, fontcolor="@NEAR_BLACK", width=3.6, height=0.62, margin="0.1,0.04"];
+  edge  [color="@MUTED", arrowsize=0.7, penwidth=1.1];
+
+  onb  [label="1 Client Onboarding\nBRD-1; screening BRD-10"];
+  quo  [label="2 Quotation, 4 Non-Package\nBRD-1"];
+  acc  [label="3 Account Creation\nBRD-1; submitted BRD-12"];
+  plc  [label="5 Placement and Booking\nBRD-1"];
+  clx  [label="7 Marketing Collection\nBRD-4"];
+  ops  [label="9-13 Cashiering, Remittance, Prod\nRecon, Adjustment, Commission - BRD-2"];
+  acct [label="8 Accounting, GL, Disbursement,\nACSL - BRD-5"];
+
+  uam  [label="User Access\nBRD-11", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  pm   [label="20 Product Maintenance\nBRD-3", fillcolor="@DIRTY_WHITE"];
+  eb   [label="19 Employee Benefits\nBRD-8 (designed)", fillcolor="@AMBER_BG", color="@YELLOW"];
+  rn   [label="6 Renewal\nBRD-6 (designed)", fillcolor="@AMBER_BG", color="@YELLOW"];
+  clm  [label="14 Claims\nBRD-7 (being built)", fillcolor="@AMBER_BG", color="@YELLOW"];
+  csf  [label="16 Customer Service Facility\nBRD-9 (designed)", fillcolor="@AMBER_BG", color="@YELLOW"];
+  ri   [label="15 Reinsurance\nPhase 2 - BRD received", fillcolor="@WHITE", color="@MUTED", style="rounded,dashed"];
+
+  plat [label="Platform services: 17 Data Management (LOV, insurer, MIS fields, change log),\n21 Report Generation, role dashboards, notifications, audit",
+        width=8.2, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+
+  onb -> quo -> acc -> plc -> clx -> ops -> acct;
+  uam -> pm -> eb -> rn -> clm -> csf -> ri [style=invis];
+  acct -> plat [style=invis];
+  ri -> plat [style=invis];
+
+  pm  -> quo [style=dashed, constraint=false];
+  eb  -> acc [style=dashed, constraint=false];
+  rn  -> plc [style=dashed, dir=both, constraint=false];
+  clm -> clx [style=dashed, constraint=false];
+  csf -> ops [style=dashed, constraint=false];
+  ri  -> acct [style=dotted, constraint=false];
+
+  { rank=same; onb; uam; }
+  { rank=same; quo; pm; }
+  { rank=same; acc; eb; }
+  { rank=same; plc; rn; }
+  { rank=same; clx; clm; }
+  { rank=same; ops; csf; }
+  { rank=same; acct; ri; }
+}

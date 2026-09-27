@@ -1,0 +1,49 @@
+// BRD-8 Employee Benefits: workflow EB_CYCLE (FRS section 5.1). Stage owner in the second line.
+digraph eb_cycle {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.35, ranksep=0.28, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=12, fontcolor="@NEAR_BLACK", width=2.4, height=0.5, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=10.5, fontcolor="@TEXT"];
+
+  OPEN               [label="OPEN\nsystem / AO"];
+  RA_SENT            [label="RA_SENT\nAO (renewal)"];
+  REQUIREMENTS       [label="REQUIREMENTS\nAO, client HR"];
+  INCUMBENT_TERMS    [label="INCUMBENT_TERMS\nAO (no remarketing)"];
+  FRANCHISE          [label="FRANCHISE\nAO, insurers"];
+  PROPOSALS          [label="PROPOSALS\ninsurers, AO"];
+  COMPARATIVE        [label="COMPARATIVE\nAO"];
+  FOR_SIGNOFF        [label="FOR_SIGNOFF\nsignatory"];
+  THRESHOLD_APPROVAL [label="THRESHOLD_APPROVAL\nBDOI Management"];
+  READY_TO_PRESENT   [label="READY_TO_PRESENT\nAO"];
+  WITH_CLIENT        [label="WITH_CLIENT\nclient HR, AO"];
+  REVISION           [label="REVISION\nAO, insurers"];
+  CONFIRMED          [label="CONFIRMED\nAO"];
+  IN_PLACEMENT       [label="IN_PLACEMENT\nProcessing"];
+  PLACED             [label="PLACED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  CLOSED_LOST        [label="CLOSED_LOST /\nNOT_RENEWED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  OPEN -> RA_SENT [label=" send_ra (renewal)"];
+  RA_SENT -> REQUIREMENTS [label=" record_feedback"];
+  OPEN -> REQUIREMENTS [label=" start (new business)", style=dashed];
+  REQUIREMENTS -> INCUMBENT_TERMS [label=" stay_with_incumbent"];
+  REQUIREMENTS -> FRANCHISE [label=" remarket (BOR validated)"];
+  FRANCHISE -> PROPOSALS [label=" release_tor"];
+  INCUMBENT_TERMS -> COMPARATIVE [label=" build_comparative"];
+  PROPOSALS -> COMPARATIVE [label=" build_comparative"];
+  COMPARATIVE -> FOR_SIGNOFF [label=" submit"];
+  FOR_SIGNOFF -> THRESHOLD_APPROVAL [label=" approve (rule matched)"];
+  FOR_SIGNOFF -> READY_TO_PRESENT [label=" approve"];
+  THRESHOLD_APPROVAL -> READY_TO_PRESENT [label=" approve"];
+  FOR_SIGNOFF -> COMPARATIVE [label=" return", style=dashed, constraint=false];
+  READY_TO_PRESENT -> WITH_CLIENT [label=" present"];
+  WITH_CLIENT -> REVISION [label=" request_revision"];
+  REVISION -> COMPARATIVE [label=" build_comparative", style=dashed, constraint=false];
+  WITH_CLIENT -> CONFIRMED [label=" confirm"];
+  CONFIRMED -> IN_PLACEMENT [label=" trigger_placement"];
+  IN_PLACEMENT -> PLACED [label=" all accounts booked (system)"];
+  WITH_CLIENT -> CLOSED_LOST [label=" close_lost / not_renewed", style=dotted];
+
+  { rank=same; INCUMBENT_TERMS; FRANCHISE; }
+  { rank=same; THRESHOLD_APPROVAL; READY_TO_PRESENT; }
+  { rank=same; REVISION; CONFIRMED; CLOSED_LOST; }
+}

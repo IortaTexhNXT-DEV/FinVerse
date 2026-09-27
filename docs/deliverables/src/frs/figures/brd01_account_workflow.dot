@@ -1,0 +1,42 @@
+// BRD-1: workflow NB_ACCOUNT (V751), account from creation to booking. FRS section 5.4.
+// BRNB.022, 033, 034, 062, 069, 094, 111, 115; BRD 2.1.16, 2.3.1.
+digraph nb_account {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.3, ranksep=0.28, bgcolor="white", pad=0.1];
+  node  [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", penwidth=1.1,
+         fontname="Arial", fontsize=15, fontcolor="@NEAR_BLACK", width=2.5, height=0.45, margin="0.08,0.02"];
+  edge  [color="@MUTED", arrowsize=0.6, fontname="Arial", fontsize=12.5, fontcolor="@TEXT"];
+
+  DRAFT                 [label="DRAFT\nMarketing"];
+  SUBMITTED             [label="SUBMITTED\nProcessing", fillcolor="@DIRTY_WHITE"];
+  RETURNED_TO_MARKETING [label="RETURNED_TO_MARKETING\nMarketing"];
+  AWAITING_PAYMENT      [label="AWAITING_PAYMENT\nProcessing (billing)", fillcolor="@DIRTY_WHITE"];
+  READY_FOR_PLACEMENT   [label="READY_FOR_PLACEMENT\nProcessing", fillcolor="@DIRTY_WHITE"];
+  PLACED                [label="PLACED\nProcessing (e-policy)", fillcolor="@DIRTY_WHITE"];
+  RETURNED_BY_INSURER   [label="RETURNED_BY_INSURER\nProcessing", fillcolor="@DIRTY_WHITE"];
+  PLACEMENT_CANCELLED   [label="PLACEMENT_CANCELLED", fillcolor="@AMBER_BG"];
+  POLICY_ISSUED         [label="POLICY_ISSUED\nProcessing (booking)", fillcolor="@DIRTY_WHITE"];
+  BOOKED                [label="BOOKED\n(endorsements)", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
+  CANCELLED             [label="CANCELLED\n(after issuance)", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+  VOIDED                [label="VOIDED\n(internal reversal)", fillcolor="@DIRTY_WHITE", color="@MUTED"];
+
+  DRAFT -> SUBMITTED [label=" submit"];
+  SUBMITTED -> AWAITING_PAYMENT [label=" validate"];
+  SUBMITTED -> RETURNED_TO_MARKETING [label=" return", style=dashed];
+  RETURNED_TO_MARKETING -> SUBMITTED [label=" resubmit", style=dashed, constraint=false];
+  AWAITING_PAYMENT -> READY_FOR_PLACEMENT [label=" payment_confirmed\n (gate; direct payment skips)"];
+  READY_FOR_PLACEMENT -> PLACED [label=" place (slip sent)"];
+  PLACED -> POLICY_ISSUED [label=" policy_received"];
+  POLICY_ISSUED -> BOOKED [label=" book"];
+  PLACED -> RETURNED_BY_INSURER [label=" insurer_return", style=dashed];
+  RETURNED_BY_INSURER -> READY_FOR_PLACEMENT [label=" resubmit", style=dashed, constraint=false];
+  READY_FOR_PLACEMENT -> PLACEMENT_CANCELLED [label=" cancel_placement", style=dashed];
+  PLACEMENT_CANCELLED -> READY_FOR_PLACEMENT [label=" reactivate", style=dashed, constraint=false];
+  SUBMITTED -> POLICY_ISSUED [label=" direct_booking\n (policy document)", style=dashed, constraint=false];
+  BOOKED -> CANCELLED [label=" cancel", style=dotted];
+  DRAFT -> VOIDED [xlabel="void", style=dotted];
+
+  { rank=same; SUBMITTED; RETURNED_TO_MARKETING; }
+  { rank=same; PLACED; PLACEMENT_CANCELLED; }
+  { rank=same; POLICY_ISSUED; RETURNED_BY_INSURER; }
+  { rank=same; DRAFT; VOIDED; }
+}

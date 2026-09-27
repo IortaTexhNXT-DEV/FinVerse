@@ -4,6 +4,7 @@ import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { Kpi } from '@/components/ui/Kpi';
 import { formatDate, humanize } from '@/utils/format';
+import { displayNameOf } from '@/api/users';
 
 function share(c: Claim): string {
   if (c.coinsurerCode === undefined) {
@@ -27,7 +28,7 @@ export function ClaimOverview({ claim: c }: Readonly<{ claim: Claim }>) {
     ['Place of loss', c.lossLocation],
     ['Currency', c.currency],
     ['Our share', share(c)],
-    ['Registered by', c.createdBy],
+    ['Registered by', displayNameOf(c.createdBy)],
     ['Closed on', c.closedOn === undefined ? '—' : formatDate(c.closedOn)],
   ];
   return (

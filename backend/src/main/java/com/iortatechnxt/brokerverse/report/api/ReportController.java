@@ -4,6 +4,8 @@ import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.report.api.dto.ReportCatalogueEntry;
 import com.iortatechnxt.brokerverse.report.api.dto.ReportRunResponse;
+import com.iortatechnxt.brokerverse.report.core.CodeSetSource.CodeOption;
+import com.iortatechnxt.brokerverse.report.core.CodeSetSources;
 import com.iortatechnxt.brokerverse.report.core.ExportOptions;
 import com.iortatechnxt.brokerverse.report.core.ReportAccess;
 import com.iortatechnxt.brokerverse.report.core.ReportArchiveService;
@@ -42,6 +44,7 @@ public class ReportController {
   private final ReportService service;
   private final ReportArchiveService archive;
   private final FileDownloads downloads;
+  private final CodeSetSources codeSets;
 
   /**
    * Creates the controller.
@@ -49,10 +52,15 @@ public class ReportController {
    * @param service report service
    * @param archive archive of generated reports
    * @param downloads file download answers
+   * @param codeSets options of the include / exclude list parameters
    */
   public ReportController(
-      ReportService service, ReportArchiveService archive, FileDownloads downloads) {
+      ReportService service,
+      ReportArchiveService archive,
+      FileDownloads downloads,
+      CodeSetSources codeSets) {
     this.downloads = downloads;
+    this.codeSets = codeSets;
     this.service = service;
     this.archive = archive;
   }
@@ -87,6 +95,18 @@ public class ReportController {
   @GetMapping("/runs/{id}/file")
   public ResponseEntity<byte[]> runFile(@PathVariable Long id, HttpServletRequest request) {
     return downloads.respond(archive.download(id), request);
+  }
+
+  /**
+   * The codes offered by an include / exclude list parameter (BRD x.009.2).
+   *
+   * @param source key of the code list, as named by the parameter
+   * @param companyId company
+   * @return options
+   */
+  @GetMapping("/code-sets/{source}")
+  public List<CodeOption> codeSet(@PathVariable String source, @RequestParam Long companyId) {
+    return codeSets.options(source, companyId);
   }
 
   /**

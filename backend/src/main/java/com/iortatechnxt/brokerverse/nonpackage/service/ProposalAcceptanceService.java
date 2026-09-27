@@ -2,7 +2,10 @@ package com.iortatechnxt.brokerverse.nonpackage.service;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.Account.Origin;
+import com.iortatechnxt.brokerverse.account.domain.AccountClassification;
 import com.iortatechnxt.brokerverse.account.domain.AccountData.Mortgage;
+import com.iortatechnxt.brokerverse.account.domain.AccountOrigin;
+import com.iortatechnxt.brokerverse.account.domain.BusinessType;
 import com.iortatechnxt.brokerverse.account.domain.PaymentArrangement;
 import com.iortatechnxt.brokerverse.account.domain.RiskItemData;
 import com.iortatechnxt.brokerverse.account.service.AccountDraft;
@@ -161,7 +164,13 @@ public class ProposalAcceptanceService {
                   new Origin(null, p.getPrfNo()),
                   accountOf(p, details.itemsOf(group), terms.getRate()),
                   null,
-                  p.getCreatedBy()));
+                  p.getCreatedBy(),
+                  null,
+                  null,
+                  p.getRenewalOfRef() == null
+                      ? null
+                      : new AccountClassification(
+                          BusinessType.RENEWAL, p.getRenewalOfRef(), AccountOrigin.PROPOSAL)));
       arns.add(account.getArn());
     }
     p.linkAccounts(arns);

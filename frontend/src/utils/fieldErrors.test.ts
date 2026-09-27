@@ -1,4 +1,4 @@
-import { fieldErrorLines, humanizeField, humanizeMessage } from './fieldErrors';
+import { fieldErrorLines, humanizeField, humanizeMessage, visibleErrors } from './fieldErrors';
 
 describe('field error labels', () => {
   it.each([
@@ -37,5 +37,33 @@ describe('field error labels', () => {
     expect(fieldErrorLines({ code: 'must match "[A-Z0-9_]+"' })).toEqual([
       'Code: has an invalid format (allowed: capital letters, digits, underscores)',
     ]);
+  });
+});
+
+describe('field error lines that already name their field', () => {
+  it('does not repeat the field in front of a message that names it', () => {
+    expect(
+      fieldErrorLines({
+        'items[0].sumInsured': 'Item 1: Sum insured is required',
+        marketSegment: 'Market segment is required',
+        productCode: 'Select the product',
+      }),
+    ).toEqual([
+      'Item 1: Sum insured is required',
+      'Market segment is required',
+      'Product code: Select the product',
+    ]);
+  });
+});
+
+describe('errors shown on touch or submit', () => {
+  const errors = { reasonCode: 'Choose the reason', description: 'Describe the cancellation' };
+
+  it('shows nothing before the user acts, then the touched fields, then all on submit', () => {
+    expect(visibleErrors(errors, [], false)).toEqual({});
+    expect(visibleErrors(errors, ['description'], false)).toEqual({
+      description: 'Describe the cancellation',
+    });
+    expect(visibleErrors(errors, [], true)).toEqual(errors);
   });
 });

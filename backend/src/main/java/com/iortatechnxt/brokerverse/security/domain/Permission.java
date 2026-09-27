@@ -415,7 +415,51 @@ public enum Permission {
   // Threshold rules, required documents, EB parameters and templates (BRID-016)
   EB_SETUP,
   // EB reports (BRID-022, 022.01)
-  EB_REPORT_VIEW;
+  EB_REPORT_VIEW,
+
+  // Renewal (BDOI BRD-6, BRD 6.002.2 functions). See docs/architecture/RENEWAL_DESIGN.md section
+  // 6.1 and V1010. The data scope (sales unit, assignee, processing stages) is applied by the
+  // renewal query services on top of these permissions.
+  // Renewal home, lists, record page, account history (functions 4, 11, 13, 17)
+  RNW_VIEW,
+  // Generate the expiring list for a range, run the extraction, initiate (3, 15; BRRN.021)
+  RNW_EXTRACT,
+  // Assign and re-assign AOs, transfer and receive transfers (5, 6, 7)
+  RNW_ASSIGN,
+  // Disposition, remarks, returned accounts, New Business path (12, 14)
+  RNW_DISPOSE,
+  // Team Leader review, return and post (8, 22)
+  RNW_REVIEW,
+  // Controlled overrides: outstanding balance, bucket, disposition, insurer mismatch, RA unlock
+  RNW_OVERRIDE,
+  // Assign accounts to Processing Officers (5, processing)
+  RNW_PROCESS_ASSIGN,
+  // Update data, review computations, return to Marketing (18, 19, 22)
+  RNW_PROCESS,
+  // Upload dispositioned files (16)
+  RNW_UPLOAD,
+  // Extract per insurer, send, upload insurer responses (20)
+  RNW_INSURER,
+  // Generate, view and download RA, NAL and NFR (10, 21)
+  RNW_RA_GENERATE,
+  // Send letters in batch (10)
+  RNW_RA_SEND,
+  // Record client acceptance (BRRN.040)
+  RNW_ACCEPT,
+  // Contact Center remarks, documents and follow-ups (BRRN.026)
+  RNW_FOLLOWUP,
+  // LAMD reports and validation checks (BRRN.024, 029)
+  RNW_LAMD_UPLOAD,
+  RNW_VALIDATE,
+  // Renewal reports and exports (9)
+  RNW_REPORT_VIEW,
+  RNW_EXPORT,
+  // Non-renewable risk codes, check settings, bucket rules, decision matrix, package map (23)
+  RNW_SETUP,
+  // Renewal templates (25)
+  RNW_TEMPLATE_MAINTAIN,
+  // Package version of a migrated policy whose legacy package is not mapped (DMQ36)
+  RNW_PACKAGE_REMAP;
 
   // The portal permissions of design 6.1 (PORTAL_USER_REQUEST, PORTAL_USER_APPROVE, PORTAL_ADMIN)
   // are parked with the partner portal (BDOI Drop 2 "Employee Benefits (No Portal Feature)"):

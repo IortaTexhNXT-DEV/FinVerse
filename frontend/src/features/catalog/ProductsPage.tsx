@@ -24,6 +24,7 @@ import { ProductEditorModal } from './ProductEditorModal';
 import { newProductForm } from './productForm';
 import type { ProductForm } from './productForm';
 import { RecordActions } from './RecordActions';
+import { LineLabel, LovLabels } from '@/components/broking/LovLabel';
 
 const TABS = [
   { id: 'products', label: 'Products' },
@@ -170,7 +171,7 @@ function ProductList() {
             ),
           },
           { key: 'n', header: 'Name', render: (p) => p.name },
-          { key: 'l', header: 'Line', render: (p) => p.lineCode },
+          { key: 'l', header: 'Line', render: (p) => <LineLabel code={p.lineCode} /> },
           { key: 'p', header: 'Package', render: (p) => (p.packaged ? 'Yes' : '') },
           {
             key: 'v',
@@ -185,7 +186,7 @@ function ProductList() {
           {
             key: 's',
             header: 'Segments',
-            render: (p) => (p.marketSegments.length ? p.marketSegments.join(', ') : 'All'),
+            render: (p) => <LovLabels type="MARKET_SEGMENT" codes={p.marketSegments} empty="All" />,
           },
           { key: 'r', header: 'Rate %', numeric: true, render: (p) => p.defaultRate ?? '' },
           {

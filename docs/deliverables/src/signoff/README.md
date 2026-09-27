@@ -1,30 +1,41 @@
 # Business sign-off packs
 
-One pack per BRD release set: the data behind the screen specifications and business chapters of FRS v2.0, the
+The builders of the business sign-off packs. The data of a pack lives in the source folder of its BRD,
+`docs/deliverables/src/<BRD-nn_Name>/` (`brand.src_dir`): `pack/` (the YAML below), `screenshots/`, `figures/`, the FRS
+and test plan sources and `START_HERE_<BRD>.md`. One pack per BRD release set: the data behind the screen specifications and business chapters of FRS v2.0, the
 sign-off workbook and the screen and message cases of the test plan (deliverables README, "Release and sign-off per
 BRD").
 
 | File | Content |
 |---|---|
 | `signoff_pack.py` | Loads a pack, checks it against the code and the FRS, renders the FRS chapters (```pack blocks) and builds the sign-off workbook |
-| `RELEASE_NOTE_<BRD>.md` | Release note of the set (Word source) |
-| `<brd>/pack.yaml` | Metadata, personas and their SIT users, sections of the BRD, the screen-flow links, common screen elements |
-| `<brd>/screens/*.yaml` | One file per process area; one entry per screen |
-| `<brd>/messages.yaml` | Where each message appears and the fix; the texts are read from the code |
-| `<brd>/notifications.yaml`, `contract.yaml`, `documents.yaml`, `walkthroughs.yaml` | Notifications, cross-BRD interface contract, generated documents, end-to-end walkthroughs |
-| `<brd>/screenshots/` | PNG screenshots captured on the SIT environment (`tools/screenshots/capture_pack.cjs`) |
+| `START_HERE_<BRD>.md` | 00 Start Here: guide to the set (Word source; map, reading order and steps from `guide.yaml`) |
+| `build_guide_deck.py` | 01 Sign-off Pack Guide deck of a BRD (PowerPoint, speaker notes on every slide), from `pack/guide.yaml` of the BRD and the pack |
+| `<BRD folder>/pack/guide.yaml` | Content of the guide deck and of Start Here: documents, reading order, steps with RACI and durations, key screens and rules, caveats with examples, entry and exit criteria, handover, governance |
+| `pack/pack.yaml` | Metadata, personas and their SIT users, sections of the BRD, the screen-flow links, common screen elements |
+| `pack/screens/*.yaml` | One file per process area; one entry per screen |
+| `pack/messages.yaml` | Where each message appears and the fix; the texts are read from the code |
+| `pack/notifications.yaml`, `contract.yaml`, `documents.yaml`, `walkthroughs.yaml` | Notifications, cross-BRD interface contract, generated documents, end-to-end walkthroughs |
+| `screenshots/` of the BRD folder | PNG screenshots and document pages captured with seed data (`tools/screenshots/capture_pack.cjs`, recipe `tools/screenshots/packs/brdNN.cjs`; see `tools/screenshots/README.md`) |
 
 ## Build and check
 
 ```bash
-python docs/deliverables/src/signoff/signoff_pack.py brd01/pack.yaml --check          # checks only
-python docs/deliverables/src/signoff/signoff_pack.py brd01/pack.yaml                  # sign-off workbook
-python docs/deliverables/src/signoff/signoff_pack.py brd01/pack.yaml --manifest m.json  # screenshot manifest
-python tools/deliverables/bdoi_docx.py docs/deliverables/src/frs/FRS_BRD01_NEW_BUSINESS.md  # FRS v2.0
+python docs/deliverables/src/signoff/signoff_pack.py BRD-01 --check                    # checks only
+python docs/deliverables/src/signoff/signoff_pack.py BRD-01                            # sign-off workbook
+python docs/deliverables/src/signoff/signoff_pack.py BRD-01 --manifest m.json          # screenshot manifest
+python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-01_New_Business/FRS_BRD01_NEW_BUSINESS.md  # FRS v2.0
 python docs/deliverables/src/testplans/build_test_plan.py brd01_cases.yaml               # test plan v2.0
-python tools/deliverables/bdoi_docx.py docs/deliverables/src/signoff/RELEASE_NOTE_BRD01.md   # release note
+python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-01_New_Business/START_HERE_BRD01.md   # 00 Start Here
+python docs/deliverables/src/signoff/build_guide_deck.py BRD-01                            # 01 guide deck (after the workbook)
 python tools/deliverables/drop_index.py
 ```
+
+Optional keys of `pack.yaml`: `foreign_packs` (paths of the packs of other BRDs, relative to `pack.yaml`, whose
+screens a walkthrough step may show, for example My Approvals of New Business in a Product Maintenance walkthrough)
+and `signatories` (`[role, organisation, signs for]` of the sign-off certificate; the New Business list by default).
+Optional key of `messages.yaml` › `sources`: `bulk_screen` (the screen named for upload row messages). The two column
+checks of every upload type are listed only for a pack with upload types.
 
 The check refuses: a field label or button that is not a text of `frontend/src` (or a workflow stage or action), a
 route that is not a screen of the menu, a screen no persona can open, an FR that is not in the FRS, a test-plan screen
@@ -60,4 +71,5 @@ a panel) instead of quoting a screen text and is not checked; the brackets are n
 ```
 
 Screenshots are named `<screen id>-<nn>-<state>.png` (walkthrough steps and documents by their slug) and are captured
-with seed data only. Until a screenshot exists, the FRS shows a framed placeholder with its caption.
+with seed data only by `tools/screenshots/capture_pack.cjs`. Until a screenshot exists, the FRS shows a framed
+placeholder with its caption.

@@ -25,6 +25,7 @@ import { ClientHistoryTab } from './ClientHistoryTab';
 import { KycTab } from './KycTab';
 import { LinkedRecordsTab } from './LinkedRecordsTab';
 import { NotesTab } from './NotesTab';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 type TabId =
   'details' | 'kyc' | 'notes' | 'quotations' | 'proposals' | 'records' | 'screening' | 'history';
@@ -93,7 +94,10 @@ function Header({ client: c }: Readonly<{ client: ClientDetail }>) {
       completeness={{ filled, total: fields.length }}
       facts={[
         { label: 'Client Type', value: humanize(c.clientType) },
-        { label: 'Market Segment', value: c.marketSegment },
+        {
+          label: 'Market Segment',
+          value: c.marketSegment && <LovLabel type="MARKET_SEGMENT" code={c.marketSegment} />,
+        },
         { label: 'Mobile', value: c.mobile },
         { label: 'E-mail', value: c.email },
         { label: 'TIN', value: c.tin },

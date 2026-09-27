@@ -63,6 +63,8 @@ TO_WRITE = {
 }
 
 KINDS = {
+    "StartHere": "Start here guide",
+    "GuideDeck": "Sign-off pack guide deck",
     "FRS": "FRS",
     "TestPlans": "Test plan",
     "TestPlan": "Test plan",
@@ -78,8 +80,8 @@ KINDS = {
     "Change_Register": "Change register",
 }
 # Order of the kinds inside a release set.
-KIND_ORDER = ["ReleaseNote", "FRS", "Signoff", "TestPlan", "Migration"]
-NAME_RE = re.compile(r"BIBS_(?P<type>[A-Za-z_]+?)_(?P<brd>BRD-\d\d)_(?P<name>.+?)_v(?P<ver>\d+\.\d+)\.(?P<ext>\w+)$")
+KIND_ORDER = ["StartHere", "GuideDeck", "ReleaseNote", "FRS", "Signoff", "TestPlan", "Migration"]
+NAME_RE = re.compile(r"(?:\d\d_)?BIBS_(?P<type>[A-Za-z_]+?)_(?P<brd>BRD-\d\d)_(?P<name>.+?)_v(?P<ver>\d+\.\d+)\.(?P<ext>\w+)$")
 
 
 def describe(path: Path, kind: str | None = None) -> tuple[str, str, str, str]:
@@ -101,7 +103,7 @@ def brd_sort(row: tuple[str, str, str, str, str]) -> tuple:
     m = NAME_RE.match(row[4].rsplit("/", 1)[-1])
     kind = m["type"] if m else "~"
     order = KIND_ORDER.index(kind) if kind in KIND_ORDER else len(KIND_ORDER)
-    return (row[1], order, row[0], row[2], row[3])
+    return (row[1], order, row[4].rsplit("/", 1)[-1], row[0], row[2], row[3])
 
 
 def is_listed(path: Path, root: Path) -> bool:
@@ -153,9 +155,11 @@ def write_index(key: str) -> Path:
         "",
         "## Documents in this drop",
         "",
-        "One folder per BRD release set (`BRD-nn_<Name>/`): its FRS, sign-off workbook, test plan, release note and",
-        "any other document of the BRD, released and signed off together (deliverables README, \"Release and sign-off",
-        "per BRD\").",
+        "One folder per BRD release set (`BRD-nn_<Name>/`): every file of the BRD (Start Here, guide deck, FRS, sign-off",
+        "workbook, test plan and summary, migration documents and templates), released and signed off together; in an",
+        "issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, \"Release and",
+        "sign-off per BRD\"). The sources of a BRD are in one folder, `docs/deliverables/src/BRD-nn_<Name>/`, and",
+        "`tools/deliverables/check_pack.py` refuses duplicated files and older versions left next to newer ones.",
         "",
         "| Document | BRD | Kind | Version | File |",
         "|---|---|---|---|---|",
@@ -176,7 +180,8 @@ def write_index(key: str) -> Path:
         for b, what in shared_here:
             home = brand.DROPS[brand.drop_of(b)]["folder"]
             folder = brand.out_dir(b, "FRS")
-            files = sorted(f for f in folder.glob(f"BIBS_*_{b}_*") if f.name.startswith(("BIBS_FRS_", "BIBS_TestPlan_")))
+            files = sorted(f for f in folder.glob(f"*BIBS_*_{b}_*")
+                           if (m := NAME_RE.match(f.name)) and m["type"] in ("FRS", "TestPlan"))
             links = "<br>".join(f"[`{f.name}`](../{home}/{folder.name}/{f.name})" for f in files)
             lines.append(f"| {b} | {what} | {links or f'[{home}/](../{home}/README.md)'} |")
     lines += ["", "## Still to write", "", "| Document | BRD | Note |", "|---|---|---|"]

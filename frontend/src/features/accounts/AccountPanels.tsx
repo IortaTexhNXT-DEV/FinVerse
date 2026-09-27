@@ -11,18 +11,25 @@ import { DetailList } from '@/features/catalog/DetailList';
 import type { DetailRow } from '@/features/catalog/DetailList';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { displayNameOf } from '@/api/users';
+import { LovLabel, ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
 
 function detailRows(a: Account): DetailRow[] {
   return [
     ['Client', `${a.clientCode ?? 'Prospect'} – ${a.clientName}`],
-    ['Product', `${a.productCode} (${a.lineCode})`],
-    ['Market segment', a.marketSegment],
-    ['Source', a.sourceChannel],
-    ['Insurer', [a.insurerCode, a.insurerBranch].filter(Boolean).join(' / ') || '—'],
+    ['Product', <ProductLineLabel key="p" product={a.productCode} line={a.lineCode} />],
+    ['Market segment', <LovLabel key="m" type="MARKET_SEGMENT" code={a.marketSegment} />],
+    ['Source', <LovLabel key="s" type="SOURCE_CHANNEL" code={a.sourceChannel} />],
+    [
+      'Insurer',
+      <span key="i">
+        <InsurerName code={a.insurerCode} />
+        {a.insurerBranch ? ` / ${a.insurerBranch}` : ''}
+      </span>,
+    ],
     ['Period', `${formatDate(a.periodFrom)} to ${formatDate(a.periodTo)}`],
     ['Term', a.multiYear ? `${a.termYears} years` : '1 year'],
     ['Total sum insured', <Amount key="tsi" value={a.totalSumInsured} />],
-    ['Mortgagee bank', a.mortgageeBank],
+    ['Mortgagee bank', <LovLabel key="b" type="MORTGAGEE_BANK" code={a.mortgageeBank} />],
     ['Loan application', a.loanApplicationNo],
     ['PN numbers', a.pnNumbers.join(', ') || '—'],
     ['Quotation / proposal', [a.quotationRef, a.proposalRef].filter(Boolean).join(' / ') || '—'],
@@ -30,7 +37,7 @@ function detailRows(a: Account): DetailRow[] {
       'Contact',
       [a.contact.name, a.contact.email, a.contact.mobile].filter(Boolean).join(' · ') || '—',
     ],
-    ['Account officer', a.sales.accountOfficer],
+    ['Account officer', displayNameOf(a.sales.accountOfficer)],
     [
       'Sales unit',
       [a.sales.region, a.sales.department, a.sales.team].filter(Boolean).join(' / ') || '—',

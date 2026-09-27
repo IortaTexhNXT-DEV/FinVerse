@@ -16,6 +16,7 @@ import { formatDate, formatDateTime } from '@/utils/format';
 import { acslApi } from './api';
 import type { SoaUpload } from './api';
 import { SoaUploadDialog } from './SoaUploadDialog';
+import { UserName } from '@/components/ui/UserName';
 
 const COLUMNS: Column<SoaUpload>[] = [
   {
@@ -53,7 +54,7 @@ const COLUMNS: Column<SoaUpload>[] = [
     numeric: true,
     render: (u) => (u.run ? String(u.run.notFound) : '—'),
   },
-  { key: 'by', header: 'Uploaded By', render: (u) => u.createdBy },
+  { key: 'by', header: 'Uploaded By', render: (u) => <UserName login={u.createdBy} /> },
 ];
 
 /**

@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import com.iortatechnxt.brokerverse.workflow.service.StartCase;
@@ -215,7 +216,8 @@ public class AccountService {
             && currentUser.hasAuthority("ACCOUNT_PROCESS");
     if (!marketing && !processing) {
       throw new BusinessRuleException(
-          "ACCOUNT_NOT_EDITABLE", "Account " + account.getArn() + " is " + account.getStatus());
+          "ACCOUNT_NOT_EDITABLE",
+          "Account " + account.getArn() + " is " + DisplayFormat.words(account.getStatus()));
     }
   }
 
@@ -290,6 +292,56 @@ public class AccountService {
     }
     String key = String.valueOf(id);
     workflow.transition(ENTITY, key, "validate", TransitionNote.comment(comment));
+    skipPaymentGateWhenDirect(account, key);
+    return account;
+  }
+
+  /**
+   * Fast track of an accepted renewal account (Renewal, BRRN.040; design 7.2): the system moves a
+   * RENEWAL account from DRAFT to AWAITING_PAYMENT without a submission, after the checks of submit
+   * and validate - confirmed client, mandatory fields and documents, rated premium on the scheme,
+   * TSU clearance - which fail with the same error codes. The payment gate, placement, issuance and
+   * booking then follow the New Business workflow unchanged; a direct-payment account skips the
+   * payment gate as on validation.
+   *
+   * @param arn renewal account in DRAFT
+   * @return the account
+   */
+  public Account fastTrackRenewal(String arn) {
+    Account account =
+        accounts.findByArn(arn).orElseThrow(() -> new ResourceNotFoundException(ENTITY, arn));
+    if (!account.getClassification().renewal()) {
+      throw new BusinessRuleException(
+          "ACCOUNT_NOT_RENEWAL", "Account " + arn + " is not a renewal account");
+    }
+    if (account.getStatus() != AccountStatus.DRAFT) {
+      throw new BusinessRuleException(
+          "ACCOUNT_STATUS_INVALID",
+          "Account " + arn + " is " + account.getStatus() + ", not DRAFT");
+    }
+    clients.requireConfirmed(account.getClientId());
+    checks.requireComplete(account);
+    pricing.requireScheme(
+        account, rules.product(account.getProductCode()), new Terms(PeriodBasis.ANNUAL, null));
+    TsuDecision decision = checks.applyTsu(account);
+    if (!account.getTsu().satisfied()) {
+      throw new BusinessRuleException(
+          "TSU_CLEARANCE_REQUIRED", "TSU must clear the account first: " + decision.reason());
+    }
+    String key = String.valueOf(account.getId());
+    workflow.systemTransition(
+        ENTITY,
+        key,
+        "renewal_fast_track",
+        TransitionNote.comment(
+            "Renewal of "
+                + account.getClassification().renewalOfRef()
+                + " accepted by the client"));
+    skipPaymentGateWhenDirect(account, key);
+    return account;
+  }
+
+  private void skipPaymentGateWhenDirect(Account account, String key) {
     if (account.getPaymentArrangement() == PaymentArrangement.DIRECT_TO_INSURER) {
       account.recordPayment(PaymentStatus.DIRECT, "Direct payment to insurer", clock.instant());
       workflow.systemTransition(
@@ -298,7 +350,6 @@ public class AccountService {
           "payment_confirmed",
           TransitionNote.comment("Paid directly to the insurer: payment gate not applicable"));
     }
-    return account;
   }
 
   /**

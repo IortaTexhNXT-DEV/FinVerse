@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
  * expiring from the go-live date to the end of the go-live renewal window that was not renewed in
  * legacy, with the January expiries flagged URGENT and the renewal advices already sent (P03).
  *
- * <p>The records mirror {@code renewal.service.port.LegacyPolicySource}; the Renewal adapter maps
- * them one to one when the Renewal module is merged (seam until then).
+ * <p>The records mirror {@code renewal.service.port.LegacyPolicySource}; {@link RenewalAdapters}
+ * serves them to Renewal one to one.
  */
 @Service
 @Transactional(readOnly = true)

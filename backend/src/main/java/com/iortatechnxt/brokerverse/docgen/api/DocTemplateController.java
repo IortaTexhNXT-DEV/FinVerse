@@ -50,7 +50,7 @@ public class DocTemplateController {
    * @return versions
    */
   @GetMapping
-  @PreAuthorize("hasAnyAuthority('MASTER_VIEW', 'LOV_MANAGE')")
+  @PreAuthorize("hasAnyAuthority('MASTER_VIEW', 'LOV_MANAGE', 'RNW_TEMPLATE_MAINTAIN')")
   public List<DocTemplateResponse> all() {
     return templates.all().stream().map(DocTemplateResponse::from).toList();
   }
@@ -63,7 +63,7 @@ public class DocTemplateController {
    * @return DOCX file
    */
   @GetMapping("/{code}/versions/{versionNo}/docx")
-  @PreAuthorize("hasAnyAuthority('MASTER_VIEW', 'LOV_MANAGE')")
+  @PreAuthorize("hasAnyAuthority('MASTER_VIEW', 'LOV_MANAGE', 'RNW_TEMPLATE_MAINTAIN')")
   public ResponseEntity<byte[]> word(@PathVariable String code, @PathVariable int versionNo) {
     return ResponseEntity.ok()
         .contentType(MediaType.parseMediaType(DocumentFormat.DOCX.contentType()))
@@ -81,7 +81,7 @@ public class DocTemplateController {
    * @return title, text and placeholder differences
    */
   @PostMapping("/{code}/docx")
-  @PreAuthorize("hasAnyAuthority('MASTER_MAINTAIN', 'LOV_MANAGE')")
+  @PreAuthorize("hasAnyAuthority('MASTER_MAINTAIN', 'LOV_MANAGE', 'RNW_TEMPLATE_MAINTAIN')")
   public TemplateDraftResponse readWord(
       @PathVariable String code, @RequestParam MultipartFile file) {
     try {
@@ -100,7 +100,7 @@ public class DocTemplateController {
    */
   @PostMapping("/{code}/versions")
   @ResponseStatus(HttpStatus.CREATED)
-  @PreAuthorize("hasAnyAuthority('MASTER_MAINTAIN', 'LOV_MANAGE')")
+  @PreAuthorize("hasAnyAuthority('MASTER_MAINTAIN', 'LOV_MANAGE', 'RNW_TEMPLATE_MAINTAIN')")
   public DocTemplateResponse newVersion(
       @PathVariable String code, @Valid @RequestBody DocTemplateRequest request) {
     return DocTemplateResponse.from(

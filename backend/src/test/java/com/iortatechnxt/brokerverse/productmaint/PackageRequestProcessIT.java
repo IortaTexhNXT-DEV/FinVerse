@@ -295,8 +295,7 @@ class PackageRequestProcessIT {
                     new BigDecimal("50000000"),
                     "Contract value x 0.34%"),
                 new Dates(START, START, START.plusYears(1).minusDays(1), null)));
-    assertThat(requirements.missing(id))
-        .containsExactly("the signed package slip (document PKG_SLIP_SIGNED)");
+    assertThat(requirements.missing(id)).containsExactly("the signed package slip");
     assertThat(requirements.packageSlip(id).content()).isNotEmpty();
     attach(id, RequirementsService.SIGNED_SLIP);
     as.run("tsu", () -> requirements.submitRequirements(id, "pack complete"));

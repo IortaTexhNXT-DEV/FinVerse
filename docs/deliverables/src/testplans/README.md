@@ -1,7 +1,8 @@
 # Test plans per BRD (client deliverable 3)
 
 One test plan per BRD: an Excel workbook (the master the testers execute) and a Word summary (10-20 pages for
-BDOI review and sign-off). Both are built from sources in this folder by `build_test_plan.py`.
+BDOI review and sign-off). Both are built by `build_test_plan.py` (this folder) from the sources in the source folder
+of each BRD, `docs/deliverables/src/<BRD-nn_Name>/` (`brand.src_dir`), next to its FRS.
 
 | File | Content |
 |---|---|
@@ -9,16 +10,17 @@ BDOI review and sign-off). Both are built from sources in this folder by `build_
 | `TP_BRDnn_<NAME>.md` | Word summary in the `bdoi_docx` source format; `<!-- tp:... -->` lines are filled from the YAML |
 | `build_test_plan.py` | Shared builder; the YAML schema is documented at the top of the file |
 
-Outputs go to `docs/deliverables/out/<drop folder of the BRD>/TestPlans/` (drop map `tools/deliverables/brand.py` `BRD_DROP`):
-`BIBS_TestPlan_BRD-nn_<Name>_v1.0.xlsx` and `BIBS_TestPlan_BRD-nn_<Name>_Summary_v1.0.docx`.
+Outputs go to the release-set folder of the BRD, `docs/deliverables/out/<drop folder>/<BRD-nn_Name>/` (`brand.out_dir`):
+`BIBS_TestPlan_BRD-nn_<Name>_v<version>.xlsx` and `..._Summary_v<version>.docx`, with the prefixes 04_ and 05_ in an
+issued business sign-off set. A file name alone (`brd03_cases.yaml`) is looked up in the folder of its BRD.
 
 ## Build and check
 
 ```bash
 # checks only: schema, coverage, message texts and codes, automation references
-python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/testplans/brd03_cases.yaml --check
+python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-03_Product_Maintenance/brd03_cases.yaml --check
 # build the workbook and the Word summary, with page previews of the summary
-python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/testplans/brd03_cases.yaml --previews
+python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-03_Product_Maintenance/brd03_cases.yaml --previews
 ```
 
 The build stops, and prints each problem, when:

@@ -134,7 +134,7 @@ public enum CatalogKind {
         Permissions.PM_MODULE,
         List.of("INCENTIVE_CRITERIA_MAINTAIN"),
         List.of(Permissions.PRODUCT_AUTHORIZE)),
-    /** Rate-scheme exceptions: the authoriser rejects by deactivating. */
+    /** Rate-scheme exceptions: approved or rejected with a reason on the exception record. */
     EXCEPTIONS(
         Permissions.PM_MODULE,
         List.of(Permissions.PRODUCT_MAINTAIN, Permissions.PRODUCT_AUTHORIZE),

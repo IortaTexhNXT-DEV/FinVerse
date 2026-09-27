@@ -123,7 +123,9 @@ class DocumentWordIT {
       assertThat(tables.get(2).getRow(0).getCell(1).getText()).isEqualTo("Approved by");
       assertThat(doc.getHeaderList().get(0).getText()).contains("BDO Insurance and Reinsurance");
       assertThat(doc.getFooterList().get(0).getText())
-          .contains("Confidential  |  PLACEMENT_SLIP v1")
+          .contains("Confidential  |  Placement Slip  |  BDO Insurance and Reinsurance")
+          .contains("Version 1")
+          .doesNotContain("PLACEMENT_SLIP")
           .contains("Page");
     }
 

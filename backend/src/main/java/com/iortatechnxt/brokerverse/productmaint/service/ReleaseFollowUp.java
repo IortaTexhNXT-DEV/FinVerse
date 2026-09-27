@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.productmaint.service;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductExpired;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionReleased;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionReturned;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.productmaint.domain.Advisory;
@@ -11,6 +12,7 @@ import com.iortatechnxt.brokerverse.productmaint.domain.PackageRequestRepository
 import com.iortatechnxt.brokerverse.productmaint.domain.RequestStage;
 import com.iortatechnxt.brokerverse.productmaint.domain.RequestType;
 import com.iortatechnxt.brokerverse.productmaint.service.ProductMasterFeed.ProductMasterChange;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
@@ -37,6 +39,7 @@ public class ReleaseFollowUp {
   private final AdvisoryService advisories;
   private final NotificationService notifications;
   private final ProductMasterFeed feed;
+  private final UserDirectory users;
   private final Clock clock;
 
   /**
@@ -47,6 +50,7 @@ public class ReleaseFollowUp {
    * @param advisories advisories
    * @param notifications in-app notifications
    * @param feed product master synchronisation port
+   * @param users user names
    * @param clock clock
    */
   public ReleaseFollowUp(
@@ -55,12 +59,14 @@ public class ReleaseFollowUp {
       AdvisoryService advisories,
       NotificationService notifications,
       ProductMasterFeed feed,
+      UserDirectory users,
       Clock clock) {
     this.requests = requests;
     this.workflow = workflow;
     this.advisories = advisories;
     this.notifications = notifications;
     this.feed = feed;
+    this.users = users;
     this.clock = clock;
   }
 
@@ -87,7 +93,10 @@ public class ReleaseFollowUp {
         String.valueOf(p.getId()),
         "version_released",
         TransitionNote.comment(
-            "Version " + event.versionNo() + " validated by " + event.validatedBy()));
+            "Version "
+                + event.versionNo()
+                + " validated by "
+                + users.displayName(event.validatedBy())));
     p.markReleased(event.versionNo(), clock.instant());
     advisories.draftFor(p, advisoryType(p.getRequestType()), event.versionNo());
     notifications.notifyPermission(
@@ -98,7 +107,7 @@ public class ReleaseFollowUp {
                 + " (version "
                 + event.versionNo()
                 + ") sells from "
-                + event.effectiveFrom()
+                + DisplayFormat.date(event.effectiveFrom())
                 + ".",
             PackageRequests.link(p),
             PackageRequests.ENTITY,
@@ -137,7 +146,7 @@ public class ReleaseFollowUp {
             "Version "
                 + event.versionNo()
                 + " ended on "
-                + event.packageEndDate()
+                + DisplayFormat.date(event.packageEndDate())
                 + " without a renewal; the package is no longer sold for new business.",
             "/product-maintenance/expiry",
             "Product",

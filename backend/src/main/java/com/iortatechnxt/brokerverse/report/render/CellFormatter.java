@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.report.render;
 
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.report.core.ColumnType;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -12,7 +13,8 @@ import java.util.Locale;
 /** Formats cell values for text based outputs (PDF, CSV). */
 public final class CellFormatter {
 
-  private static final DateTimeFormatter DATE = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+  private static final DateTimeFormatter DATE =
+      DateTimeFormatter.ofPattern(DisplayFormat.DATE_PATTERN, Locale.ENGLISH);
   private static final String AMOUNT_PATTERN = "#,##0.00;(#,##0.00)";
   private static final String NUMBER_PATTERN = "#,##0.##";
 

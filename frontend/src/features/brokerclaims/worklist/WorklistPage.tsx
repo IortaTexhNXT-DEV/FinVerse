@@ -22,6 +22,7 @@ import { claimsHomeApi } from '../home/api';
 import type { WorklistQuery, WorklistRow, WorklistTab } from '../home/api';
 import { ReassignDialog } from './ReassignDialog';
 import { WORKLIST_TABS, filterText, queryFromSearch } from './worklistLogic';
+import { UserName } from '@/components/ui/UserName';
 
 const COLUMNS: Column<WorklistRow>[] = [
   {
@@ -61,7 +62,7 @@ const COLUMNS: Column<WorklistRow>[] = [
     ),
   },
   { key: 'plan', header: 'Next Action', render: (r) => r.nextActionPlan ?? '' },
-  { key: 'handler', header: 'Handler', render: (r) => r.handling.handler },
+  { key: 'handler', header: 'Handler', render: (r) => <UserName login={r.handling.handler} /> },
   {
     key: 'status',
     header: 'Status',

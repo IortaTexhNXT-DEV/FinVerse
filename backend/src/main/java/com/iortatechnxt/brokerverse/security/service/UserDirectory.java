@@ -48,6 +48,24 @@ public class UserDirectory {
   }
 
   /**
+   * The name of a user as people read it (generated documents, notices): the full name, else the
+   * login id; null stays null (no user, e.g. a step not taken yet).
+   *
+   * @param username login id, may be null
+   * @return display name
+   */
+  public String displayName(String username) {
+    if (username == null || username.isBlank()) {
+      return null;
+    }
+    return users
+        .findByUsernameIgnoreCase(username)
+        .map(AppUser::getFullName)
+        .filter(name -> !name.isBlank())
+        .orElse(username);
+  }
+
+  /**
    * Returns the authorization limit of a user (null means unlimited).
    *
    * @param username user

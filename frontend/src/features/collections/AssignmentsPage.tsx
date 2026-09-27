@@ -16,6 +16,7 @@ import { collectionsApi } from './api';
 import type { Criteria, ReassignInput, Rule, RuleInput } from './api';
 import { ReassignDialog } from './WorkDialogs';
 import './collections.css';
+import { UserName } from '@/components/ui/UserName';
 
 const CRITERIA_FIELDS: readonly { key: keyof Criteria; label: string; numeric?: boolean }[] = [
   { key: 'segment', label: 'Market Segment' },
@@ -320,7 +321,7 @@ export default function AssignmentsPage() {
             { key: 'p', header: 'Priority', numeric: true, render: (r) => r.priority },
             { key: 'n', header: 'Rule', render: (r) => <strong>{r.name}</strong> },
             { key: 'c', header: 'Criteria', render: (r) => describe(r.criteria) },
-            { key: 'h', header: 'Handler', render: (r) => r.handler },
+            { key: 'h', header: 'Handler', render: (r) => <UserName login={r.handler} /> },
             {
               key: 's',
               header: 'Status',

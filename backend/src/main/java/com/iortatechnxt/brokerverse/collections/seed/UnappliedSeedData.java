@@ -50,6 +50,9 @@ public class UnappliedSeedData implements ApplicationRunner {
   /** The Unapplied Payment Handler SIT/UAT user. */
   public static final String UPP_HANDLER = "upphandler";
 
+  private static final String KEEP_PASSWORD =
+      "update sec_user set must_change_password = false where username = ?";
+
   private static final Logger LOG = LoggerFactory.getLogger(UnappliedSeedData.class);
   private static final String PASSWORD = "Brokerverse@2026";
   private static final String HANDLER = "clxhandler";
@@ -143,6 +146,8 @@ public class UnappliedSeedData implements ApplicationRunner {
                       Set.of("UNAPPLIED_HANDLER"),
                       true),
                   PASSWORD));
+      // Like the other seed users, the persona signs in with the seed password directly.
+      jdbc.update(KEEP_PASSWORD, UPP_HANDLER);
     }
   }
 

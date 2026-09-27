@@ -6,9 +6,11 @@ import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.catalog.service.TsuRoutingService.TsuDecision;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.exception.FieldValidationException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.docgen.domain.DocTemplate;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
@@ -25,6 +27,7 @@ import com.iortatechnxt.brokerverse.workflow.service.StartCase;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -134,7 +137,7 @@ public class QuotationService {
                 facts(resolved.client()),
                 product.getCode(),
                 product.getLineCode(),
-                QuotationRules.blankToNull(draft.marketSegment()),
+                QuotationRules.blankToNull(resolved.marketSegment()),
                 QuotationRules.blankToNull(draft.sourceChannel()),
                 QuotationRules.blankToNull(draft.currency()),
                 template.getCode() + " v" + template.getVersionNo()));
@@ -165,6 +168,38 @@ public class QuotationService {
   }
 
   /**
+   * Creates the quotation of a renewal with financial or structural changes (Renewal New Business
+   * path, BRRN.033; Renewal design section 13): an ordinary quotation linked to the renewal
+   * reference, whose accounts are created as RENEWAL of the expiring policy. One quotation per
+   * renewal.
+   *
+   * @param companyId company
+   * @param draft quotation data (pre-filled from the expiring account)
+   * @param renewalRef renewal reference of the candidate
+   * @param renewalOf what the renewal renews (expiring ARN or legacy reference)
+   * @return the quotation
+   */
+  public Quotation createForRenewal(
+      Long companyId, QuotationDraft draft, String renewalRef, String renewalOf) {
+    quotations
+        .findByRenewalRef(renewalRef)
+        .ifPresent(
+            q -> {
+              throw new BusinessRuleException(
+                  "QUOTATION_RENEWAL_EXISTS",
+                  "Renewal " + renewalRef + " already has quotation " + q.getQuotationNo());
+            });
+    Quotation quotation = create(companyId, draft);
+    quotation.linkRenewal(renewalRef, renewalOf);
+    audit.record(
+        ENTITY,
+        quotation.getQuotationNo(),
+        AuditAction.UPDATE,
+        QUOTATION + "for the renewal " + renewalRef + " of " + renewalOf);
+    return quotation;
+  }
+
+  /**
    * Prices a draft without saving it (live premium of the wizard); the client is not needed.
    *
    * @param companyId company
@@ -192,7 +227,10 @@ public class QuotationService {
     if (quotation.getStatus() != QuotationStatus.DRAFT) {
       throw new BusinessRuleException(
           "QUOTATION_NOT_EDITABLE",
-          QUOTATION + quotation.getQuotationNo() + " is " + quotation.getStatus());
+          QUOTATION
+              + quotation.getQuotationNo()
+              + " is "
+              + DisplayFormat.words(quotation.getStatus()));
     }
     if (!quotation.getProductCode().equals(draft.productCode())) {
       throw new BusinessRuleException(
@@ -205,7 +243,7 @@ public class QuotationService {
     }
     quotation.describe(
         facts(resolved.client()),
-        QuotationRules.blankToNull(draft.marketSegment()),
+        QuotationRules.blankToNull(resolved.marketSegment()),
         QuotationRules.blankToNull(draft.sourceChannel()));
     QuotationContent priced = show(quotation, resolved.product(), resolved.content());
     versions.write(quotation, priced);
@@ -238,6 +276,7 @@ public class QuotationService {
   public Quotation submit(Long id, String comment) {
     Quotation quotation = get(id);
     QuotationContent content = versions.current(quotation);
+    requireSegment(quotation);
     if (content.items().isEmpty()) {
       throw new BusinessRuleException("QUOTATION_NO_ITEMS", "Add at least one risk item");
     }
@@ -259,6 +298,19 @@ public class QuotationService {
     versions.freeze(quotation, currentUser.username(), clock.instant());
     quotation.markSubmitted(currentUser.username(), clock.instant());
     return quotation;
+  }
+
+  /**
+   * The market segment is required at submission: the account created from the quotation needs it,
+   * so a quotation without one is refused before review.
+   */
+  private static void requireSegment(Quotation quotation) {
+    if (QuotationRules.blankToNull(quotation.getMarketSegment()) == null) {
+      throw new FieldValidationException(
+          "QUOTATION_SEGMENT_REQUIRED",
+          "Choose the market segment on the Client step before you submit the quotation",
+          Map.of("marketSegment", "Choose the market segment"));
+    }
   }
 
   /**

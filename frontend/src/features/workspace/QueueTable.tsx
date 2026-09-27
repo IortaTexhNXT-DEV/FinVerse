@@ -8,6 +8,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDateTime } from '@/utils/format';
 import { ageText } from './age';
+import { UserName } from '@/components/ui/UserName';
 
 interface QueueTableProps {
   items: WorkItem[];
@@ -51,13 +52,17 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
             </span>
           ),
         },
-        { key: 'unit', header: 'From', render: (i) => i.originatingUnit ?? i.createdBy },
+        {
+          key: 'unit',
+          header: 'From',
+          render: (i) => i.originatingUnit ?? <UserName login={i.createdBy} />,
+        },
         { key: 'age', header: 'In Stage', render: (i) => ageText(i.stageEnteredAt) },
         { key: 'due', header: 'Due', render: (i) => <DueCell item={i} /> },
         {
           key: 'assignee',
           header: 'Assignee',
-          render: (i) => i.assignee ?? <span className="muted">Unassigned</span>,
+          render: (i) => <UserName login={i.assignee} empty="Unassigned" />,
         },
         {
           key: 'actions',

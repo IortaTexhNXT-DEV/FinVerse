@@ -17,6 +17,7 @@ import { formatDate, humanize } from '@/utils/format';
 import { RateModal } from './RateModals';
 import type { RateTable } from './RateModals';
 import { RecordActions } from './RecordActions';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 const TABS: readonly { id: RateTable; label: string }[] = [
   { id: 'taxes', label: 'Taxes & factors' },
@@ -52,7 +53,11 @@ function Taxes() {
         rowKey={(r) => r.id}
         columns={[
           { key: 'c', header: 'Rate', render: (r) => <strong>{humanize(r.rateCode)}</strong> },
-          { key: 'l', header: 'Line', render: (r) => r.lineCode ?? 'All lines' },
+          {
+            key: 'l',
+            header: 'Line',
+            render: (r) => (r.lineCode ? <LineLabel code={r.lineCode} /> : 'All lines'),
+          },
           { key: 'r', header: '%', numeric: true, render: (r) => r.rate },
           ...dated<TaxRate>('RATE'),
         ]}

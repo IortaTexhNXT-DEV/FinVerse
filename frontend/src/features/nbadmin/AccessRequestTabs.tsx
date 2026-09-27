@@ -9,6 +9,7 @@ import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { isGroupProfile, roleChanges, userStatus } from './accessRequest';
+import { UserName } from '@/components/ui/UserName';
 
 interface Row {
   attribute: string;
@@ -150,7 +151,7 @@ const HISTORY_COLUMNS: Column<AccessRequestEvent>[] = [
   { key: 't', header: 'Date', render: (e) => formatDateTime(e.occurredAt) },
   { key: 'a', header: 'Action', render: (e) => humanize(e.action) },
   { key: 's', header: 'Status', render: (e) => <StatusBadge status={e.toStatus} /> },
-  { key: 'u', header: 'By', render: (e) => e.actor },
+  { key: 'u', header: 'By', render: (e) => <UserName login={e.actor} /> },
   { key: 'r', header: 'Remarks', render: (e) => e.remarks ?? '' },
 ];
 

@@ -26,6 +26,9 @@ final class CatalogAccess {
   static final String REQUEST_EXCEPTION =
       "hasAnyAuthority('QUOTE_MAINTAIN', 'ACCOUNT_MAINTAIN', 'PRODUCT_MAINTAIN')";
 
+  /** Deciding a rate-scheme exception: approve or reject (BRPM.007). */
+  static final String DECIDE_EXCEPTION = "hasAuthority('PRODUCT_AUTHORIZE')";
+
   /** Authorizing catalog records (checker; the permission per kind is checked by the service). */
   static final String AUTHORIZE = "hasAnyAuthority('MASTER_AUTHORIZE', 'PRODUCT_AUTHORIZE')";
 

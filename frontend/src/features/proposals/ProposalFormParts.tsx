@@ -8,8 +8,8 @@ import { Card } from '@/components/ui/Card';
 import { Field } from '@/components/ui/Field';
 import { useCompanyId } from '@/context/workspaceContext';
 import { TextInput } from '@/features/assets/FormControls';
-import { humanize } from '@/utils/format';
 import { toggleInsurer } from './proposalForm';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 /** Free-form sections of the risk details (BRNB.005). */
 export function SectionsCard({
@@ -120,7 +120,7 @@ export function DocumentChecklist({ proposalId }: Readonly<{ proposalId: number 
               ) : (
                 <CircleAlert size={16} className="text-danger" aria-label="Missing" />
               )}{' '}
-              {humanize(c.documentType)}
+              <LovLabel type="DOCUMENT_TYPE" code={c.documentType} />
             </li>
           ))}
         </ul>

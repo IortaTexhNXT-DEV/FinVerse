@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.report.core.RowKind;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
@@ -44,7 +45,8 @@ public class DocxReportRenderer implements ReportRenderer {
   private static final long LEGAL_HEIGHT = 20_160;
   private static final long MARGIN = 28L * BrandedDocx.TWIPS_PER_POINT;
   private static final DateTimeFormatter STAMP =
-      DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm").withZone(BusinessClock.zone());
+      DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm", Locale.ENGLISH)
+          .withZone(BusinessClock.zone());
 
   @Override
   public ExportFormat format() {

@@ -15,9 +15,10 @@ import { OriginFilter } from '@/components/ui/OriginFilter';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, humanize, today } from '@/utils/format';
+import { formatDate, today } from '@/utils/format';
 import { InsurerEditorModal } from './InsurerEditorModal';
 import { RecordActions } from './RecordActions';
+import { placementChannelLabel } from './insurerForm';
 
 function accreditation(i: Insurer) {
   const expired = i.accreditedUntil !== undefined && i.accreditedUntil < today();
@@ -77,7 +78,11 @@ export default function InsurersPage() {
             },
             { key: 'n', header: 'Name', render: (i) => i.name },
             { key: 'a', header: 'Accredited Until', render: accreditation },
-            { key: 'p', header: 'Placement', render: (i) => humanize(i.placementChannel) },
+            {
+              key: 'p',
+              header: 'Placement',
+              render: (i) => placementChannelLabel(i.placementChannel),
+            },
             { key: 'e', header: 'Placement e-mails', render: (i) => i.placementEmails.join(', ') },
             { key: 'd', header: 'Credit Days', numeric: true, render: (i) => i.defaultCreditDays },
             { key: 's', header: 'Status', render: (i) => <StatusBadge status={i.recordStatus} /> },

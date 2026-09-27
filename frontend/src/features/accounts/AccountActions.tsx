@@ -7,6 +7,7 @@ import { ActionDialog } from '@/components/broking/ActionDialog';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/toastContext';
 import { useAccountRefresh } from './useAccountRefresh';
+import { statusPhrase } from '@/utils/format';
 
 /** Workflow actions of an account run by this screen (others belong to later stages). */
 const HANDLED: Record<string, (id: number, comment?: string) => Promise<Account>> = {
@@ -38,9 +39,7 @@ export function AccountActions({
     onSuccess: async (updated, { action }) => {
       setPending(null);
       await refresh(updated);
-      toast.success(
-        `${action.label}: ${updated.arn} is now ${updated.status.toLowerCase().replace(/_/g, ' ')}`,
-      );
+      toast.success(`${action.label}: ${updated.arn} is now ${statusPhrase(updated.status)}`);
     },
   });
   const offered = actions.filter((a) => a.action in HANDLED);

@@ -1,6 +1,6 @@
 # iNXT BrokerVerse - BDOI Renewal (BRD-6, RN) Build Design
 
-Status: **proposal for review**. This design extends `docs/architecture/BROKING_ARCHITECTURE.md`, `OPERATIONS_DESIGN.md`, `PRODUCT_MAINTENANCE_DESIGN.md` and the Developer Guide, which stay binding. It changes them only through the contract changes listed in section 13. The Collections (`COLLECTIONS_DESIGN.md`) and Accounting / Disbursement (`ACCOUNTING_DISBURSEMENT_DESIGN.md`) designs are authoritative for their modules; Renewal only reads from them.
+Status: **built** for waves R0 to R2 (section 17 records what was built and where it departs from the sections above); wave R3 (submitted-policy hand-off) waits for the Submitted Policies module. This design extends `docs/architecture/BROKING_ARCHITECTURE.md`, `OPERATIONS_DESIGN.md`, `PRODUCT_MAINTENANCE_DESIGN.md` and the Developer Guide, which stay binding. It changes them only through the contract changes listed in section 13. The Collections (`COLLECTIONS_DESIGN.md`) and Accounting / Disbursement (`ACCOUNTING_DISBURSEMENT_DESIGN.md`) designs are authoritative for their modules; Renewal only reads from them.
 
 It is aligned with the parallel designs of the same build: Submitted Policies (`SUBMITTED_POLICIES_DESIGN.md`, `RenewalHandOff` port and the shared account change V822), Employee Benefits (`EMPLOYEE_BENEFITS_DESIGN.md`, boundary EBQ28) and Claims (`CLAIMS_BROKING_DESIGN.md`, `ClaimExperienceQueryService`, CLQ28). Section 2.3 records the decisions.
 
@@ -651,3 +651,117 @@ Rules for parallel work:
 6. **Claims module timing** (`brokerclaims`). Mitigation: the check reports INFO "claims not connected" while the bean is absent, and the matrix can treat "unknown claims" as MANUAL.
 7. **Legacy policies at go-live** (EBIX / QPS). Mitigation: a legacy upload; renewals of legacy policies take the NB path until they are booked once in BIBS.
 8. **Two renewal paths for submitted policies** (default hand-off vs Renewal). Settled: the default hand-off of `submitted` only records PENDING hand-offs, Renewal implements `RenewalHandOff` (`@ConditionalOnMissingBean`), one letter engine, candidate idempotent on the SBM number. Remaining risk: PENDING hand-offs wait if R3 is late; build R3 right after Submitted Policies S1-D.
+
+## 17. As built (waves R0 to R2)
+
+Waves R0, R1-A, R1-B, R1-C, R1-D and R2 are built in the package `renewal` and the screens `features/renewal`. The
+module guide is [`docs/modules/RENEWAL.md`](../modules/RENEWAL.md). Wave R3 is not built: the Submitted Policies module
+that declares `RenewalHandOff` is not in the code base yet (section 17.6).
+
+### 17.1 Code layout
+
+| Package (`renewal.*`) | Content |
+|---|---|
+| `domain` | Candidate (with the embedded policy, party and money snapshot, flags and lifecycle), stages, buckets, dispositions, check results, rules, letters, acceptances, transfers, overrides, insurer batches and responses, LAMD reports |
+| `service` | `RenewalRecords`, `RenewalFlow` (the `RNW_CASE` work case), `RenewalBatch` (one transaction per renewal of a bulk action, `BatchOutcome` of done and refused renewals), `RenewalParameters`, `RenewalNotices`, `RenewalCodes`; `service.port` (`LegacyPolicySource`, `RecipientPolicy`) and `service.adapter` (the defaults) |
+| `candidate` | Lists (tabs, search, multi-select criteria with "all except", quick filters, 200-row chunks, xlsx export), the record page API, the details PDF, the option sources of the filters (`renewal.*` code sets) |
+| `extraction` | Daily extraction, extraction for a range, go-live take-over, `RNW_LEGACY_POLICIES` and `RNW_RA_ALREADY_SENT` uploads, corrections of the advices already sent (maker and checker) |
+| `check`, `rules` | The 15 checks of `rnw_check_setting` (section 8.1, `PACKAGE_REMAP` included), the bucket rules, the decision matrix, initiation, re-evaluation job and the ledger listener (invoice booked, movements posted) |
+| `setup` | Non-renewable risk codes and check settings (maker and checker), bucket-rule and matrix versions (draft, submit, activate, reject; activation retires the active version), package map (`RNW_PACKAGE_MAP` upload), package choices, the My Approvals source |
+| `marketing` | Assignment, transfers, disposition with the account-history gate, push, remarks, re-opening, Team Leader return and post, overrides, New Business path, client 360 tab |
+| `processing` | Renewal account (`NewAccount.renewal`) on reaching For Processing, Processing Officer assignment, return to Marketing, computations, disposition upload with the complete-file scope |
+| `insurer`, `lamd` | Insurer batches (28-column extract, sent protected), responses (manual and upload, matching, latest valid), LAMD reports matched by PN |
+| `letter`, `acceptance` | RA first and second notice, NAL / NFR closing letters, NRNS reminders, expiry sweep, letter delivery status, acceptance (single and upload), `RenewalProgression` (fast track, placement slips, booking queue, closure on booking), Contact Center follow-ups |
+| `report`, `home`, `alert`, `retention`, `seed` | The 11 reports, Renewal Home figures, the five renewal alerts, retention of closed renewals (V1018), the seed-profile loader `RenewalSeedData` |
+
+### 17.2 Flyway as built
+
+| Version | Content |
+|---|---|
+| V1010-V1016 | As section 3 |
+| V1017 | Not used (kept for R3) |
+| V1018 `renewal_retention` | Retention rule `RENEWAL_CANDIDATE` (renewed and closed renewals, 5 years, then review) |
+| V1910 `seed_renewal_reference` | SIT/UAT users `rnwtl` (Marketing Team Leader of T-CORP1), `lamd`, `contactc`; non-renewable risk code `CAR07`; active bucket rule set and decision matrix v1 (seed content); package map rows `QPS-MOTOR-A` (mapped) and `QPS-HOME-OLD` (rejected) |
+| V1911 | Not used: the renewals of the seed profile are created by `RenewalSeedData` (seed profile, after the booking seed), which extracts seven migrated policies and walks them through the flows so that every list has rows |
+
+### 17.3 Jobs, uploads and reports
+
+- Jobs: `RNW_EXTRACTION` (daily 01:00 PHT), `RNW_REEVALUATE` (01:30 PHT), `RNW_NRNS_LETTERS` (06:00 PHT),
+  `RNW_EXPIRY_SWEEP` (00:15 PHT), `RNW_LETTER_BATCH` (hourly at minute 5: delivery status of the letters) and
+  `RNW_GOLIVE_EXTRACTION` (no schedule; run once from the cut-over runbook). Crons in `application.yml`
+  (`brokerverse.jobs.renewal-*-cron`), listed in `docs/operations/CONFIGURATION.md`.
+- Bulk handlers: `RNW_DISPOSITION_UPLOAD`, `RNW_INSURER_RESPONSE`, `RNW_LAMD_REPORT` (parameters `reportType`, `period`),
+  `RNW_ACCEPTANCE`, `RNW_LEGACY_POLICIES`, `RNW_RA_ALREADY_SENT`, `RNW_PACKAGE_MAP`.
+- Reports (category Renewal, Report Centre): `RNW-EXPIRY-LIST`, `RNW-STATUS` (Marketing and Processing variants, detail
+  and the 34-counter summary), `RNW-LISTING`, `RNW-INSURER-EXTRACT`, `RNW-RA-DISPATCH`, `RNW-SANITATION`,
+  `RNW-DECISIONS`, `RNW-LAMD-MATCH`, `RNW-WORKLOAD`, `RNW-GOLIVE`, `RNW-PACKAGE-REMAP`. Their multi-select criteria (unit,
+  unit head, risk code, insurer, segment, origin, officer, branch, stage) accept "all except"; every report is limited to
+  the user's scope (own unit for Marketing, all units for the Renewal team).
+
+### 17.4 Screens as built
+
+The screens of section 12 are built, with these differences:
+- The lists use the shared `DataTable` with 200-row chunks and the page footer, not a virtualised `GridTable`: the
+  filters are the Filters panel (expiry range and the multi-select criteria) and the search, not per-column filters.
+- There is no `/renewal/reports` screen: the Renewal reports are in the Report Centre under Renewal.
+- Acceptance: on the record page (Record Acceptance) and as **Upload Acceptances** on the Letters screen.
+- Uploads open on the screen that owns them: dispositions (My Dispositions, with **Declare Complete File** after the
+  commit), insurer responses (Insurer Batches), LAMD reports (LAMD Reports), acceptances (Letters), package map, migrated
+  policies and advices already sent (Renewal Setup, tabs Package Map and Go-live).
+- Renewal Setup has the tabs Non-renewable Risk Codes, Checks, Classification Rules, Decision Matrix, Package Map,
+  Package Choices and Go-live; the parameters and lists of values are maintained on the platform screens.
+- The persona suite `BRD-6` of `personaMenus.json` lists seven of the eight roles with Renewal permissions (the Auditor seed user holds a second role, so it is not listed) (keys `RNW:<role>`,
+  field `role`, scope `RNW_`); the screenshots are in `tools/screenshots/screens.cjs` (slugs `renewal-*`).
+
+### 17.5 Departures from the sections above
+
+| Topic | Design | As built | Why |
+|---|---|---|---|
+| Legacy policies (13.1) | `LegacyPolicySource` implemented by the migration | Default `NotConnectedLegacyPolicySource` plus the `RNW_LEGACY_POLICIES` upload; `MIG_GOLIVE_RENEWAL_TO` (2028-05-31) and `MIG_RENEWAL_URGENT_TO` (2028-01-31) are parameters | The Data Migration module is not in the code base; the migration replaces the bean |
+| Automatic placement (BRRN.040) | Slips generated and sent | Slips generated; the Processing Officer is notified and sends them | Sending needs a user holding the placement permission |
+| Payment as acceptance | Payment event before booking | Acceptance method Payment with the payment reference | No payment event exists before booking |
+| Renewal account period | - | Starts on the expiry date of the expiring account (same-day convention of the account module) | Account module rule |
+| Duplicate risk check of accounts | - | The renewal account is not refused as a duplicate of the account it renews (`RiskDuplicateService` exempts `renewalOfRef`) | Otherwise every renewal account was refused |
+| Blocking checks at post | Every FAIL blocks | Blocking checks stop For Renewal and the NB path; Not for Renewal and Lost Business are posted with failing checks | A renewal that is not renewed does not need the checks to pass |
+| Letter PDF | Stored at generation | Stored at generation and rendered again at sending (the send reads the stored template version) | The letter carries the sending date |
+| Package choice checker | `RNW_OVERRIDE` | A second holder of `RNW_PACKAGE_REMAP` (not the maker) | The Renewal processing team holds `RNW_PACKAGE_REMAP`, not `RNW_OVERRIDE` |
+| RNW-STATUS columns | Account broker, location, address, contact, hold cover, sum insured per cover | Not in the report | Not held on the renewal or the account yet |
+| RNW-STATUS counters "Renew to TSU", "to Other Bank" | Counted | Always 0 | RQ10 not answered |
+| NAL reasons, invoice-number reasons | Fixed | Parameters `RNW_NAL_REASONS`, `RNW_INVOICE_NO_REASONS` | Configurable per BDOI answer |
+
+### 17.6 Not built
+
+- Wave R3: `SubmittedPolicyRenewalHandOff`, the FFY RA and SFU templates and the print channel (V1017). They wait for the
+  Submitted Policies module (S1-D).
+- Claims: the claims check and the Account History read the claims summary when the broker claims bean is present; the
+  history shows "Claims are not connected yet" otherwise.
+
+### 17.7 Tests
+
+`RenewalFoundationIT`, `RenewalMarketingIT`, `RenewalProcessingIT`, `RenewalLettersIT`, `RenewalReportsIT`,
+`RenewalSeedDataIT` (seed profile), the renewal rows of `ApiSmokeIT`, `PersonaMenusIT` (suite BRD-6); in the web client
+`features/renewal/renewal.test.tsx` and `pages.test.tsx`, and the persona menu test.
+
+### 17.8 Notes for the next issue of FRS BRD-06 (v1.1)
+
+The FRS is not edited by the build; these notes are applied at its next issue.
+- FR-RN-013, FR-RN-040, FR-RN-062: the lists load in chunks of 200 rows with a page footer; filtering is by the Filters
+  panel and the search (no per-column filters). RQ05 stays open.
+- FR-RN-016: the go-live take-over reads the migrated policies through the migration port or, until it is connected, the
+  migrated-policies upload; the window and the urgent flag are the parameters `MIG_GOLIVE_RENEWAL_TO` and
+  `MIG_RENEWAL_URGENT_TO`. Advices already sent are uploaded (`RNW_RA_ALREADY_SENT`); rejected rows are corrected with
+  maker and checker in Renewal Setup, Go-live.
+- FR-RN-028: the check is named `PACKAGE_REMAP`; the package choice is approved by a second member of the Renewal
+  processing team holding `RNW_PACKAGE_REMAP`.
+- FR-RN-050: Not for Renewal and Lost Business are posted even when checks fail.
+- FR-RN-060: the "not in the file" tag applies when the uploader declares the file complete for an expiry range and
+  unit after the commit.
+- FR-RN-082: the NAL reasons and the reasons that need a new invoice number are parameters.
+- FR-RN-084: acceptance by payment is recorded with the payment reference; automatic placement generates the slips and
+  notifies the Processing Officer, who sends them.
+- FR-RN-090: not built (wave R3).
+- FR-RN-100: Renewal Home shows the tiles due in 30 / 60 / 90 / 140 days, at risk, urgent, returned, NRNS, insurer
+  replies overdue and failed letters, the renewals by status and Classification and the workload per officer.
+- FR-RN-101: the "Renew to TSU" and "Renew to Other Bank" counters are 0 until RQ10 is answered; the account columns
+  listed in section 17.5 are not in the report.
+- FR-RN-111: the letter templates are maintained on the document template screen by holders of `RNW_TEMPLATE_MAINTAIN`.

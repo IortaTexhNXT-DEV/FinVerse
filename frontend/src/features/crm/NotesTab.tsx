@@ -20,6 +20,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDate, formatDateTime, humanize, today } from '@/utils/format';
 import { InstructionDialog } from './InstructionDialog';
 import { inForce } from './instructionRules';
+import { UserName } from '@/components/ui/UserName';
 
 type Editing = { instruction?: ClientInstruction } | null;
 
@@ -201,7 +202,7 @@ export function NotesTab({ client }: Readonly<{ client: ClientDetail }>) {
           emptyMessage="No changes yet."
           columns={[
             { key: 'when', header: 'When', render: (h) => formatDateTime(h.occurredAt) },
-            { key: 'who', header: 'User', render: (h) => h.actor },
+            { key: 'who', header: 'User', render: (h) => <UserName login={h.actor} /> },
             { key: 'what', header: 'Item', render: (h) => humanize(h.kind) },
             { key: 'action', header: 'Change', render: (h) => humanize(h.action) },
             { key: 'value', header: 'From → to', render: historyText },

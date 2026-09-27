@@ -24,6 +24,7 @@ import type { PayRequest, RequestKind, RequestSummary, StageCounts } from './api
 import { KIND_LABELS, STAGE_TABS, tabOf } from './requestForm';
 import type { StageTab } from './requestForm';
 import { DateInput } from '@/components/ui/DateInput';
+import { UserName } from '@/components/ui/UserName';
 
 const keyOf = (r: RequestSummary) => String(r.id);
 
@@ -60,7 +61,7 @@ const COLUMNS: Column<RequestSummary>[] = [
       </>
     ),
   },
-  { key: 'by', header: 'Requested By', render: (r) => r.createdBy },
+  { key: 'by', header: 'Requested By', render: (r) => <UserName login={r.createdBy} /> },
   { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.stage} /> },
   {
     key: 'flags',

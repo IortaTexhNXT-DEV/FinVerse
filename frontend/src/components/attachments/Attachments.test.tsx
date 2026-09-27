@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { attachmentsApi } from '@/api/attachments';
 import type { AttachmentInfo } from '@/api/attachments';
 import { lovApi } from '@/api/lov';
+import { setUserDirectory } from '@/api/users';
 import { AuthContext } from '@/auth/authContext';
 import { ToastContext } from '@/components/ui/toastContext';
 import { Attachments } from './Attachments';
@@ -55,6 +56,18 @@ describe('attachments', () => {
     vi.spyOn(lovApi, 'options').mockResolvedValue([{ code: 'IDF', label: 'IDF' }]);
   });
   afterEach(() => vi.restoreAllMocks());
+
+  it('names the uploader and the document type, never their codes', async () => {
+    setUserDirectory([{ username: 'ao', displayName: 'Aileen Account Officer' }]);
+    vi.spyOn(lovApi, 'options').mockResolvedValue([{ code: 'IDF', label: 'Valid ID' }]);
+    render(wrap(<Attachments entityType="Account" entityId={7} />));
+    await screen.findByText('a.pdf');
+    expect(screen.getAllByText('Aileen Account Officer')).toHaveLength(2);
+    await screen.findAllByText('Valid ID');
+    expect(screen.getAllByRole('cell', { name: 'Valid ID' })).toHaveLength(2);
+    expect(screen.queryByText('ao')).not.toBeInTheDocument();
+    setUserDirectory([]);
+  });
 
   it('downloads the selected files as one ZIP named after the reference', async () => {
     const zip = vi

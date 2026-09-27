@@ -14,6 +14,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { ageInDays, oldestAge } from './age';
+import { UserName } from '@/components/ui/UserName';
 
 /**
  * Universal approval inbox: everything waiting for the signed-in user's authorization across
@@ -98,7 +99,11 @@ export default function MyApprovalsPage() {
                   </>
                 ),
             },
-            { key: 'b', header: 'Submitted by', render: (i) => i.submittedBy ?? '' },
+            {
+              key: 'b',
+              header: 'Submitted by',
+              render: (i) => <UserName login={i.submittedBy} empty="" />,
+            },
             { key: 's', header: 'Submitted', render: (i) => formatDateTime(i.submittedAt) },
             {
               key: 'g',

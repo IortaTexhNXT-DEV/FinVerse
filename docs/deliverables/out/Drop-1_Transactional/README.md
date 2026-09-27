@@ -12,20 +12,20 @@ Written by `python tools/deliverables/drop_index.py` from the files of this fold
 
 ## Documents in this drop
 
-One folder per BRD release set (`BRD-nn_<Name>/`): its FRS, sign-off workbook, test plan, release note and
-any other document of the BRD, released and signed off together (deliverables README, "Release and sign-off
-per BRD").
+One folder per BRD release set (`BRD-nn_<Name>/`): every file of the BRD (Start Here, guide deck, FRS, sign-off
+workbook, test plan and summary, migration documents and templates), released and signed off together; in an
+issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, "Release and
+sign-off per BRD"). The sources of a BRD are in one folder, `docs/deliverables/src/BRD-nn_<Name>/`, and
+`tools/deliverables/check_pack.py` refuses duplicated files and older versions left next to newer ones.
 
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
-| New Business | BRD-01 | Release note | 2.0 | [`BRD-01_New_Business/BIBS_ReleaseNote_BRD-01_New_Business_v2.0.docx`](BRD-01_New_Business/BIBS_ReleaseNote_BRD-01_New_Business_v2.0.docx) |
-| New Business | BRD-01 | FRS | 1.0 | [`BRD-01_New_Business/BIBS_FRS_BRD-01_New_Business_v1.0.docx`](BRD-01_New_Business/BIBS_FRS_BRD-01_New_Business_v1.0.docx) |
-| New Business | BRD-01 | FRS | 2.0 | [`BRD-01_New_Business/BIBS_FRS_BRD-01_New_Business_v2.0.docx`](BRD-01_New_Business/BIBS_FRS_BRD-01_New_Business_v2.0.docx) |
-| New Business | BRD-01 | Sign-off workbook (Excel) | 2.0 | [`BRD-01_New_Business/BIBS_Signoff_BRD-01_New_Business_v2.0.xlsx`](BRD-01_New_Business/BIBS_Signoff_BRD-01_New_Business_v2.0.xlsx) |
-| New Business | BRD-01 | Test plan summary (Word) | 1.0 | [`BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_Summary_v1.0.docx`](BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_Summary_v1.0.docx) |
-| New Business | BRD-01 | Test plan summary (Word) | 2.0 | [`BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_Summary_v2.0.docx`](BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_Summary_v2.0.docx) |
-| New Business | BRD-01 | Test plan workbook (Excel) | 1.0 | [`BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_v1.0.xlsx`](BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_v1.0.xlsx) |
-| New Business | BRD-01 | Test plan workbook (Excel) | 2.0 | [`BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx`](BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx) |
+| New Business | BRD-01 | Start here guide | 2.0 | [`BRD-01_New_Business/00_BIBS_StartHere_BRD-01_New_Business_v2.0.docx`](BRD-01_New_Business/00_BIBS_StartHere_BRD-01_New_Business_v2.0.docx) |
+| New Business | BRD-01 | Sign-off pack guide deck | 2.0 | [`BRD-01_New_Business/01_BIBS_GuideDeck_BRD-01_New_Business_v2.0.pptx`](BRD-01_New_Business/01_BIBS_GuideDeck_BRD-01_New_Business_v2.0.pptx) |
+| New Business | BRD-01 | FRS | 2.0 | [`BRD-01_New_Business/02_BIBS_FRS_BRD-01_New_Business_v2.0.docx`](BRD-01_New_Business/02_BIBS_FRS_BRD-01_New_Business_v2.0.docx) |
+| New Business | BRD-01 | Sign-off workbook (Excel) | 2.0 | [`BRD-01_New_Business/03_BIBS_Signoff_BRD-01_New_Business_v2.0.xlsx`](BRD-01_New_Business/03_BIBS_Signoff_BRD-01_New_Business_v2.0.xlsx) |
+| New Business | BRD-01 | Test plan workbook (Excel) | 2.0 | [`BRD-01_New_Business/04_BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx`](BRD-01_New_Business/04_BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx) |
+| New Business | BRD-01 | Test plan summary (Word) | 2.0 | [`BRD-01_New_Business/05_BIBS_TestPlan_BRD-01_New_Business_Summary_v2.0.docx`](BRD-01_New_Business/05_BIBS_TestPlan_BRD-01_New_Business_Summary_v2.0.docx) |
 | Operations | BRD-02 | FRS | 1.1 | [`BRD-02_Operations/BIBS_FRS_BRD-02_Operations_v1.1.docx`](BRD-02_Operations/BIBS_FRS_BRD-02_Operations_v1.1.docx) |
 | Operations | BRD-02 | Test plan summary (Word) | 1.0 | [`BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_Summary_v1.0.docx`](BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_Summary_v1.0.docx) |
 | Operations | BRD-02 | Test plan workbook (Excel) | 1.0 | [`BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx`](BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx) |
@@ -58,7 +58,7 @@ A BRD that spans drops lives in the folder of its primary drop; nothing is copie
 
 | BRD | Part in this drop | Documents (in the primary drop folder) |
 |---|---|---|
-| BRD-03 | Quotation or proposal with packages (item 1.U2) | [`BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx`](../Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx)<br>[`BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v1.0.docx`](../Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-03_Product_Maintenance_v1.0.xlsx`](../Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/BIBS_TestPlan_BRD-03_Product_Maintenance_v1.0.xlsx) |
+| BRD-03 | Quotation or proposal with packages (item 1.U2) | [`02_BIBS_FRS_BRD-03_Product_Maintenance_v2.0.docx`](../Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/02_BIBS_FRS_BRD-03_Product_Maintenance_v2.0.docx)<br>[`04_BIBS_TestPlan_BRD-03_Product_Maintenance_v2.0.xlsx`](../Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/04_BIBS_TestPlan_BRD-03_Product_Maintenance_v2.0.xlsx)<br>[`05_BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v2.0.docx`](../Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/05_BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v2.0.docx) |
 | BRD-08 | EB placement and ePolicy, EB upstream reports (items 1.U6, 1.U9) | [`BIBS_FRS_BRD-08_Employee_Benefits_v1.0.docx`](../Drop-2_Independent/BRD-08_Employee_Benefits/BIBS_FRS_BRD-08_Employee_Benefits_v1.0.docx)<br>[`BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.0.docx`](../Drop-2_Independent/BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-08_Employee_Benefits_v1.0.xlsx`](../Drop-2_Independent/BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_v1.0.xlsx) |
 | BRD-13 | Legacy invoices in cashiering, commission and BIR reports (items 1.U1, 1.D2, 1.D6) | [`BIBS_FRS_BRD-13_Data_Migration_v1.2.docx`](../Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/BIBS_FRS_BRD-13_Data_Migration_v1.2.docx)<br>[`BIBS_TestPlan_BRD-13_Data_Migration_Summary_v1.2.docx`](../Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/BIBS_TestPlan_BRD-13_Data_Migration_Summary_v1.2.docx)<br>[`BIBS_TestPlan_BRD-13_Data_Migration_v1.2.xlsx`](../Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/BIBS_TestPlan_BRD-13_Data_Migration_v1.2.xlsx) |
 

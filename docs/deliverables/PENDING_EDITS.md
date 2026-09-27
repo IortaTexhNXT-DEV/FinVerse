@@ -14,8 +14,8 @@ dormant.
 
 | Document | Edit |
 |---|---|
-| `docs/deliverables/src/frs/FRS_BRD08_EMPLOYEE_BENEFITS.md` (v1.1) | Portal requirements (BRID-005, 005.01, 014 portal parts; the portal user, log-in, upload, download and notice FRs) become OUT with the reason "BDOI drop plan 2.4: no portal feature"; the file exchange they carry is met by internal upload FRs; interfaces table: portal row OUT; open questions EBQ13 (portal users) closed as not applicable; document control row 1.1 with "Status as of" date |
-| `docs/deliverables/src/testplans/brd08_cases.yaml`, `TP_BRD08_EMPLOYEE_BENEFITS.md` (v1.1) | Remove the portal cases and the portal personas (insurer user, client HR user) and their access rows; add cases for the internal upload that replaces them; rebuild the workbook and summary as v1.1 and delete v1.0 |
+| `docs/deliverables/src/BRD-08_Employee_Benefits/FRS_BRD08_EMPLOYEE_BENEFITS.md` (v1.1) | Portal requirements (BRID-005, 005.01, 014 portal parts; the portal user, log-in, upload, download and notice FRs) become OUT with the reason "BDOI drop plan 2.4: no portal feature"; the file exchange they carry is met by internal upload FRs; interfaces table: portal row OUT; open questions EBQ13 (portal users) closed as not applicable; document control row 1.1 with "Status as of" date |
+| `docs/deliverables/src/BRD-08_Employee_Benefits/brd08_cases.yaml`, `TP_BRD08_EMPLOYEE_BENEFITS.md` (v1.1) | Remove the portal cases and the portal personas (insurer user, client HR user) and their access rows; add cases for the internal upload that replaces them; rebuild the workbook and summary as v1.1 and delete v1.0 |
 | `docs/requirements/BDOI_EB_BRD_SPEC.md` | Mark the portal rows (BRID-005, 005.01, 014 and the portal NFRs) as out of scope by the BDOI drop plan of 26-Sep-2026 |
 
 ## Claims (Drop 2)
@@ -32,7 +32,7 @@ dormant.
 | Document | Edit | When |
 |---|---|---|
 | `docs/deliverables/src/alignment/PROGRAMME_ALIGNMENT.md`, `alignment_data.yaml` (client document v1.1) | IQ02 and IQ03 answered (DMQ37, DMQ36); the renewal check is named `PACKAGE_REMAP`; the link to `ARCHITECTURE_OPTION_DECISION.md` at IQ25 / DCR-222 / DCR-223; the drop folders as built (`out/Drop-0_Setup_and_Data_Migration/`, `out/Drop-1_Transactional/`, `out/Drop-2_Independent/`, `out/Programme/`); "Status as of" date | Next alignment pack issue |
-| `docs/deliverables/src/migration/build_migration_pack.py` | Example file name `F01C_EBIX_20270226_01.csv` in the workbook README and the templates README: use a December 2027 date for a January 2028 go-live | Next migration pack issue |
+| `docs/deliverables/src/BRD-13_Data_Migration/migration/build_migration_pack.py` | Example file name `F01C_EBIX_20270226_01.csv` in the workbook README and the templates README: use a December 2027 date for a January 2028 go-live | Next migration pack issue |
 | Data Migration documents (DATA_MIGRATION_DESIGN section 15, dm_layouts.yaml object P03, FRS BRD-13, test plan BRD-13, migration pack) | BDOI answers DMQ36-DMQ39: no carried RMEL cohorts (P03), remapping at sanitation (the PACKAGE map is loaded only), RMEL and dispositions in Excel, year-end option A | Data Migration team (in progress) |
 | Test plan summaries BRD-2 and BRD-11 | Reference FRS v1.1 and register v1.2 | Next test plan issue |
 
@@ -43,10 +43,8 @@ descriptive message. The working branch is deleted afterwards. `main` then carri
 
 ## From Data Migration v1.2 (26-Sep-2026)
 
-- Renewal design and FRS BRD-06: the `PACKAGE_REMAP` sanitation check (reads the R06 package map; Exception bucket for
-  the Renewal processing team) with its message; `LegacyPolicySource.goLiveCandidates` (window to 31-May-2028 via
-  `MIG_GOLIVE_RENEWAL_TO`, URGENT flag to 31-Jan-2028 via `MIG_RENEWAL_URGENT_TO`, advices already sent from P03 not re-sent,
-  daily extraction skips headers that already have a candidate); the Renewal service holding the package map.
+- FRS BRD-06 (next issue): apply the notes of RENEWAL_DESIGN section 17.8 (the design and the code carry the
+  `PACKAGE_REMAP` check, the go-live window and urgent flag parameters, the advices already sent and the package map).
 - `tools/deliverables/brand.py`: add `RECOMMENDED` to `STATUS_COLOURS`. `drop_index.py`: skip the `_previews/` folders.
 - Register: DCR-240, 241 and 243 texts to the final answers (no carried cohorts; remapping at sanitation); DCR-242 to
   answered-with-recommendation.

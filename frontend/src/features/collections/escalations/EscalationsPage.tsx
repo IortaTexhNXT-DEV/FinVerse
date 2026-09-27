@@ -16,13 +16,16 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
 import type { ItemResult } from '../plans/api';
 import type { EscalateInput, Escalation } from './api';
 import { escalationsApi } from './api';
 import { EscalateDialog } from './EscalationDialogs';
 import type { EscalationTab } from './labels';
 import { ESCALATION_TABS, LEVEL_LABELS, stagesOf } from './labels';
+import { UserName } from '@/components/ui/UserName';
+import { displayNameOf } from '@/api/users';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 const COLUMNS: Column<Escalation>[] = [
   {
@@ -31,17 +34,24 @@ const COLUMNS: Column<Escalation>[] = [
     render: (e) => (
       <>
         <strong>{e.escalationNo}</strong>
-        <div className="muted">{e.kind === 'AUTO' ? `Rule ${e.ruleCode ?? ''}` : e.raisedBy}</div>
+        <div className="muted">
+          {e.kind === 'AUTO' ? `Rule ${e.ruleCode ?? ''}` : displayNameOf(e.raisedBy)}
+        </div>
       </>
     ),
   },
   { key: 'arn', header: 'ARN', render: (e) => e.arn },
   { key: 'assured', header: 'Name of Assured', render: (e) => e.assuredName },
-  { key: 'reason', header: 'Reason', render: (e) => humanize(e.reasonCode) },
+  {
+    key: 'reason',
+    header: 'Reason',
+    render: (e) => <LovLabel type="CLX_ESCALATION_REASON" code={e.reasonCode} />,
+  },
   {
     key: 'target',
     header: 'Escalated To',
-    render: (e) => e.targetUsername ?? LEVEL_LABELS[e.targetLevel],
+    render: (e) =>
+      e.targetUsername ? <UserName login={e.targetUsername} /> : LEVEL_LABELS[e.targetLevel],
   },
   {
     key: 'balance',

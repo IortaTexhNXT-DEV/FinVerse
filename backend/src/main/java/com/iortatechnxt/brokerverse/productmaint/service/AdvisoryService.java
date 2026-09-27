@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Field;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Fields;
@@ -76,6 +77,7 @@ public class AdvisoryService {
 
   private static final String ADVISORY = "Package advisory";
   private static final String GROUP_LIST = "PKG_ADVISORY_GROUP";
+  private static final String DOCUMENT_TYPES = "DOCUMENT_TYPE";
 
   private final PackageRequests requests;
   private final AdvisoryRepository advisories;
@@ -186,7 +188,7 @@ public class AdvisoryService {
     values.put("productCode", p.getTargetProductCode());
     values.put("productName", p.getTitle());
     values.put("versionNo", String.valueOf(versionNo));
-    values.put("effectiveFrom", String.valueOf(terms.dates().effectiveFrom()));
+    values.put("effectiveFrom", DisplayFormat.date(terms.dates().effectiveFrom()));
     values.put("reference", p.getRequestNo());
     String template = type == Type.RENEWAL ? "PKG_RENEWAL_ADVISORY" : "PKG_ADVISORY";
     return templates.merge(template, BusinessClock.today(clock), values);
@@ -338,13 +340,23 @@ public class AdvisoryService {
                     null,
                     List.of(
                         new Field("Subject", a.getSubject()),
-                        new Field("Recipients", String.join(", ", a.getRecipientGroupList())))),
+                        new Field(
+                            "Recipients",
+                            String.join(
+                                ", ",
+                                a.getRecipientGroupList().stream()
+                                    .map(g -> lovs.label(GROUP_LIST, g))
+                                    .toList())))),
                 new Text(null, a.getBody()),
                 new Table(
                     "Supporting documents (kept in BIBS)",
                     List.of("Document", "Type"),
                     supporting.stream()
-                        .map(d -> List.of(d.getFileName(), d.getDocumentType()))
+                        .map(
+                            d ->
+                                List.of(
+                                    d.getFileName(),
+                                    lovs.label(DOCUMENT_TYPES, d.getDocumentType())))
                         .toList(),
                     List.of())),
             a.getTemplateVersion() == null ? "Package advisory" : a.getTemplateVersion());

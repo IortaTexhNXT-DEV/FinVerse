@@ -13,6 +13,7 @@ import { casesApi } from './api';
 import type { CaseDetail, CaseEvent, CommitteeVote } from './api';
 import { stageLabel } from './caseLogic';
 import { StepDialog, TextField } from './StepDialog';
+import { UserName } from '@/components/ui/UserName';
 
 interface MatchDecision {
   match: ScreeningMatch;
@@ -186,7 +187,7 @@ export function TimelineTab({ caseId }: Readonly<{ caseId: number }>) {
             render: (e) => (e.reasonCode ? humanize(e.reasonCode) : '—'),
           },
           { key: 'remarks', header: 'Remarks', render: (e) => e.remarks ?? '—' },
-          { key: 'actor', header: 'User', render: (e) => e.actor },
+          { key: 'actor', header: 'User', render: (e) => <UserName login={e.actor} /> },
         ]}
       />
     </Card>

@@ -4,6 +4,8 @@ import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { formatAmount, formatDate } from '@/utils/format';
+import { CoverageName, InsurerName } from '@/components/broking/LovLabel';
+import { insurerRoleLabel } from './packageRequest';
 
 function deductible(c: CoverageTerm): string {
   const parts = [
@@ -14,11 +16,11 @@ function deductible(c: CoverageTerm): string {
   return parts.length === 0 ? '—' : parts.join(' / ');
 }
 
-const COVERAGE_COLUMNS: Column<CoverageTerm>[] = [
+const coverageColumns = (line: string | undefined): Column<CoverageTerm>[] => [
   {
     key: 'code',
     header: 'Coverage',
-    render: (c) => <span className="mono">{c.coverageCode}</span>,
+    render: (c) => <CoverageName line={line} code={c.coverageCode} />,
   },
   { key: 'included', header: 'Included', render: (c) => (c.included ? 'Yes' : 'No') },
   {
@@ -31,8 +33,16 @@ const COVERAGE_COLUMNS: Column<CoverageTerm>[] = [
 ];
 
 const INSURER_COLUMNS: Column<InsurerLine>[] = [
-  { key: 'insurer', header: 'Insurer', render: (i) => <strong>{i.insurerCode}</strong> },
-  { key: 'role', header: 'Role', render: (i) => i.role ?? 'Panel' },
+  {
+    key: 'insurer',
+    header: 'Insurer',
+    render: (i) => (
+      <strong>
+        <InsurerName code={i.insurerCode} />
+      </strong>
+    ),
+  },
+  { key: 'role', header: 'Role', render: (i) => insurerRoleLabel(i.role) },
   { key: 'share', header: 'Share %', numeric: true, render: (i) => i.sharePercent ?? '—' },
   { key: 'rate', header: 'Rate %', numeric: true, render: (i) => i.rate ?? '—' },
   {
@@ -44,7 +54,11 @@ const INSURER_COLUMNS: Column<InsurerLine>[] = [
 ];
 
 /** Read-only package terms: sections, coverages, rate scheme and term, insurers (BRPM.008/015). */
-export function TermsView({ terms, title }: Readonly<{ terms: PackageTerms; title: string }>) {
+export function TermsView({
+  terms,
+  title,
+  lineCode,
+}: Readonly<{ terms: PackageTerms; title: string; lineCode?: string }>) {
   const s = terms.scheme;
   const d = terms.dates;
   return (
@@ -83,7 +97,7 @@ export function TermsView({ terms, title }: Readonly<{ terms: PackageTerms; titl
           rows={terms.coverages}
           rowKey={(c) => c.coverageCode}
           emptyMessage="No coverage listed"
-          columns={COVERAGE_COLUMNS}
+          columns={coverageColumns(lineCode)}
         />
       </Card>
       <Card title="Insurers" flush>

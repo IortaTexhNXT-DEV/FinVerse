@@ -22,6 +22,13 @@ interface Props {
 
 const ROLES: InsurerRole[] = ['PANEL', 'LEAD', 'PARTICIPANT'];
 
+/** Names of the insurer roles in a package. */
+const ROLE_LABELS: Record<InsurerRole, string> = {
+  PANEL: 'Panel',
+  LEAD: 'Lead',
+  PARTICIPANT: 'Participant',
+};
+
 /** A text or number cell input with an accessible label. */
 function CellInput({
   label,
@@ -289,7 +296,15 @@ export function VersionInsurersSection({ form, errors, readOnly, onChange }: Rea
         rowKey={(r) => r.insurerCode}
         emptyMessage="No insurer yet: the package is placed with any insurer at the scheme rate."
         columns={[
-          { key: 'n', header: 'Insurer', render: (r) => <strong>{r.insurerCode}</strong> },
+          {
+            key: 'n',
+            header: 'Insurer',
+            render: (r) => (
+              <strong>
+                {insurers.data?.find((i) => i.partyCode === r.insurerCode)?.name ?? r.insurerCode}
+              </strong>
+            ),
+          },
           {
             key: 'r',
             header: 'Role',
@@ -305,7 +320,7 @@ export function VersionInsurersSection({ form, errors, readOnly, onChange }: Rea
               >
                 {ROLES.map((role) => (
                   <option key={role} value={role}>
-                    {role}
+                    {ROLE_LABELS[role]}
                   </option>
                 ))}
               </select>

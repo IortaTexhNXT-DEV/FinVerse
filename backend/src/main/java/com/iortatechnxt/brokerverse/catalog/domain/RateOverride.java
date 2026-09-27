@@ -1,11 +1,16 @@
 package com.iortatechnxt.brokerverse.catalog.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
+import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Objects;
 
 /**
  * An approval to price one transaction on a non-current package version or on a rate other than the
@@ -16,6 +21,13 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "cat_rate_scheme_exception")
 public class RateOverride extends AuthorizableEntity implements CatalogRecord {
+
+  /** Error code of a decision by the requester (four eyes). */
+  public static final String OWN_REQUEST = "MAKER_CHECKER_VIOLATION";
+
+  /** Message of a decision by the requester. */
+  public static final String OWN_REQUEST_TEXT =
+      "A rate exception is decided by someone other than its requester";
 
   @Column(name = "reference_no", nullable = false, length = 30, updatable = false)
   private String referenceNo;
@@ -41,6 +53,15 @@ public class RateOverride extends AuthorizableEntity implements CatalogRecord {
   @Column(name = "valid_until", nullable = false, updatable = false)
   private LocalDate validUntil;
 
+  @Column(name = "decided_by", length = 50)
+  private String decidedBy;
+
+  @Column(name = "decided_at")
+  private Instant decidedAt;
+
+  @Column(name = "decision_comment", length = 1000)
+  private String decisionComment;
+
   protected RateOverride() {}
 
   /**
@@ -58,6 +79,38 @@ public class RateOverride extends AuthorizableEntity implements CatalogRecord {
     this.transactionRef = request.transactionRef();
     this.reason = request.reason();
     this.validUntil = request.validUntil();
+  }
+
+  /**
+   * Records the approver's decision (after {@link #authorize} or {@link #reject}).
+   *
+   * @param approver user who decided
+   * @param when decision time
+   * @param comment comment of an approval or reason of a rejection, may be null
+   */
+  public void recordDecision(String approver, Instant when, String comment) {
+    this.decidedBy = approver;
+    this.decidedAt = when;
+    this.decisionComment = comment;
+  }
+
+  /**
+   * Rejects the pending exception (checker, never the requester); it can no longer be used.
+   *
+   * @param approver user who rejects
+   * @param when decision time
+   * @param reason why it is rejected
+   */
+  public void reject(String approver, Instant when, String reason) {
+    if (getRecordStatus() != RecordStatus.PENDING_AUTHORIZATION) {
+      throw new BusinessRuleException(
+          "RECORD_NOT_PENDING", "Rate exception " + referenceNo + " is already decided");
+    }
+    if (Objects.equals(getCreatedBy(), approver)) {
+      throw new BusinessRuleException(OWN_REQUEST, OWN_REQUEST_TEXT);
+    }
+    deactivate();
+    recordDecision(approver, when, reason);
   }
 
   /**
@@ -81,7 +134,7 @@ public class RateOverride extends AuthorizableEntity implements CatalogRecord {
     String what =
         requestedVersionNo != null
             ? "version " + requestedVersionNo
-            : "rate " + requestedRate.stripTrailingZeros().toPlainString() + "%";
+            : "rate " + DisplayFormat.rate(requestedRate) + "%";
     return productCode + " " + what + " for " + transactionRef;
   }
 
@@ -115,6 +168,18 @@ public class RateOverride extends AuthorizableEntity implements CatalogRecord {
 
   public LocalDate getValidUntil() {
     return validUntil;
+  }
+
+  public String getDecidedBy() {
+    return decidedBy;
+  }
+
+  public Instant getDecidedAt() {
+    return decidedAt;
+  }
+
+  public String getDecisionComment() {
+    return decisionComment;
   }
 
   /**

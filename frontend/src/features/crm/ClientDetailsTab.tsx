@@ -6,6 +6,7 @@ import type { Definition } from '@/components/ui/DefinitionGrid';
 import { UserName } from '@/components/ui/UserName';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { describeBank } from './clientLabels';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 function Section({ title, facts }: Readonly<{ title: string; facts: Definition[] }>) {
   return (
@@ -20,6 +21,10 @@ const joined = (...parts: (string | undefined)[]) =>
 
 const code = (value: string | undefined) => (value === undefined ? undefined : humanize(value));
 
+/** The label of a list-of-values code, nothing when there is no code. */
+const lov = (type: string, value: string | undefined) =>
+  value ? <LovLabel type={type} code={value} /> : undefined;
+
 function identityFacts(c: ClientDetail): Definition[] {
   if (c.clientType === 'CORPORATE') {
     return [
@@ -30,7 +35,7 @@ function identityFacts(c: ClientDetail): Definition[] {
   return [
     { label: 'Name', value: c.displayName },
     { label: 'Birth Date', value: formatDate(c.birthDate) },
-    { label: 'Nationality', value: code(c.profile.nationality) },
+    { label: 'Nationality', value: lov('NATIONALITY', c.profile.nationality) },
     { label: 'Civil Status', value: code(c.profile.civilStatus) },
     { label: 'Occupation', value: c.profile.occupation },
   ];
@@ -98,10 +103,10 @@ export function ClientDetailsTab({ client: c }: Readonly<{ client: ClientDetail 
       <Section
         title="Segment & Bank Relationship"
         facts={[
-          { label: 'Market Segment', value: c.marketSegment },
+          { label: 'Market Segment', value: lov('MARKET_SEGMENT', c.marketSegment) },
           { label: 'Bank Relationship', value: describeBank(c) },
-          { label: 'Source of Funds', value: code(c.profile.sourceOfFunds) },
-          { label: 'KYC Risk Rating', value: code(c.profile.riskRating) },
+          { label: 'Source of Funds', value: lov('SOURCE_OF_FUNDS', c.profile.sourceOfFunds) },
+          { label: 'KYC Risk Rating', value: lov('KYC_RISK_RATING', c.profile.riskRating) },
           { label: 'Sub-ledger Party', value: c.partyCode },
         ]}
       />

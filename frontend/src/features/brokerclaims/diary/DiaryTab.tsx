@@ -67,7 +67,11 @@ export function DiaryTab({ claimId, companyId }: Readonly<{ claimId: number; com
           { key: 'type', header: 'Type', render: (e) => e.typeLabel },
           { key: 'text', header: 'Text', render: (e) => e.text },
           { key: 'due', header: 'Due', render: (e) => formatDate(e.dueDate) },
-          { key: 'who', header: 'Assignee', render: (e) => e.assignee ?? e.createdBy },
+          {
+            key: 'who',
+            header: 'Assignee',
+            render: (e) => <UserName login={e.assignee ?? e.createdBy} />,
+          },
           {
             key: 'state',
             header: 'Status',

@@ -19,18 +19,9 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.FillPatternType;
-import org.apache.poi.ss.usermodel.IndexedColors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
 /**
@@ -62,7 +53,6 @@ public class DocumentComposer {
   private static final float LABEL_WIDTH = 1.2f;
   private static final float VALUE_WIDTH = 2.8f;
   private static final float SIGNATURE_SPACING = 36f;
-  private static final int SHEET_COLUMN_WIDTH = 20 * 256;
 
   private static final Font COMPANY = new Font(Font.HELVETICA, 11, Font.BOLD, COMPANY_BLUE);
   private static final Font TITLE = new Font(Font.HELVETICA, 15, Font.BOLD, NAVY);
@@ -126,7 +116,7 @@ public class DocumentComposer {
     try (Document doc = new Document(PageSize.A4, MARGIN, MARGIN, MARGIN, MARGIN)) {
       PdfWriter writer = PdfWriter.getInstance(doc, out);
       doc.open();
-      writer.setPageEvent(new PdfBrandFooter(spec.footer(), "", writer));
+      writer.setPageEvent(new PdfBrandFooter(DocumentText.pageFooter(spec), "", writer));
       letterhead(doc, spec, date);
       for (Section section : spec.sections()) {
         render(doc, section);
@@ -152,7 +142,7 @@ public class DocumentComposer {
     title.setSpacingBefore(SPACING);
     doc.add(title);
     if (spec.reference() != null) {
-      doc.add(new Paragraph("Reference: " + spec.reference() + "    Date: " + date, REF));
+      doc.add(new Paragraph(DocumentText.referenceLine(spec, date), REF));
     }
   }
 
@@ -261,56 +251,6 @@ public class DocumentComposer {
    * @return xlsx bytes
    */
   public byte[] xlsx(List<SheetSpec> specs) {
-    try (XSSFWorkbook wb = new XSSFWorkbook()) {
-      CellStyle head = wb.createCellStyle();
-      org.apache.poi.ss.usermodel.Font font = wb.createFont();
-      font.setBold(true);
-      font.setColor(IndexedColors.WHITE.getIndex());
-      head.setFont(font);
-      head.setFillForegroundColor(IndexedColors.DARK_BLUE.getIndex());
-      head.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-      CellStyle date = wb.createCellStyle();
-      date.setDataFormat(wb.getCreationHelper().createDataFormat().getFormat("yyyy-mm-dd"));
-      for (SheetSpec spec : specs) {
-        writeSheet(wb.createSheet(spec.sheetName()), spec, head, date);
-      }
-      ByteArrayOutputStream out = new ByteArrayOutputStream();
-      wb.write(out);
-      return out.toByteArray();
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
-  }
-
-  private static void writeSheet(Sheet sheet, SheetSpec spec, CellStyle head, CellStyle date) {
-    Row header = sheet.createRow(0);
-    for (int c = 0; c < spec.headers().size(); c++) {
-      var cell = header.createCell(c);
-      cell.setCellValue(spec.headers().get(c));
-      cell.setCellStyle(head);
-      sheet.setColumnWidth(c, SHEET_COLUMN_WIDTH);
-    }
-    int r = 1;
-    for (List<Object> values : spec.rows()) {
-      Row row = sheet.createRow(r++);
-      for (int c = 0; c < values.size(); c++) {
-        write(row.createCell(c), values.get(c), date);
-      }
-    }
-    sheet.createFreezePane(0, 1);
-  }
-
-  private static void write(org.apache.poi.ss.usermodel.Cell cell, Object value, CellStyle date) {
-    switch (value) {
-      case null -> cell.setBlank();
-      case BigDecimal n -> cell.setCellValue(n.doubleValue());
-      case Number n -> cell.setCellValue(n.doubleValue());
-      case LocalDate d -> {
-        cell.setCellValue(d);
-        cell.setCellStyle(date);
-      }
-      case Boolean b -> cell.setCellValue(Boolean.TRUE.equals(b) ? "Y" : "N");
-      default -> cell.setCellValue(value.toString());
-    }
+    return SheetWriter.write(specs);
   }
 }

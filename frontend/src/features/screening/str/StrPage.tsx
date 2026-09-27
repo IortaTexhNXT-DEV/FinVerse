@@ -195,7 +195,7 @@ export default function StrPage() {
                 </>
               ),
             },
-            { key: 'by', header: 'Prepared By', render: (s) => s.createdBy },
+            { key: 'by', header: 'Prepared By', render: (s) => <UserName login={s.createdBy} /> },
           ]}
         />
         <PageFooter data={register.data} noun="STRs" onPage={setPage} />

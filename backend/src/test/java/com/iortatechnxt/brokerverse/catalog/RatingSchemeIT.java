@@ -7,20 +7,25 @@ import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.RiskItemData;
 import com.iortatechnxt.brokerverse.account.domain.RiskItemData.Vehicle;
 import com.iortatechnxt.brokerverse.account.service.AccountQueryService;
+import com.iortatechnxt.brokerverse.approval.service.ApprovalViewer;
 import com.iortatechnxt.brokerverse.attachment.domain.AttachmentTarget;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadOptions;
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
 import com.iortatechnxt.brokerverse.catalog.domain.RateOverride;
+import com.iortatechnxt.brokerverse.catalog.service.CatalogApprovalSource;
 import com.iortatechnxt.brokerverse.catalog.service.CatalogKind;
 import com.iortatechnxt.brokerverse.catalog.service.CatalogRecords;
+import com.iortatechnxt.brokerverse.catalog.service.RateExceptionDecisions;
 import com.iortatechnxt.brokerverse.catalog.service.RateSchemeExceptionService;
 import com.iortatechnxt.brokerverse.catalog.service.RatingQuery;
 import com.iortatechnxt.brokerverse.catalog.service.RatingQuery.Purpose;
 import com.iortatechnxt.brokerverse.catalog.service.RatingService;
 import com.iortatechnxt.brokerverse.catalog.service.RatingService.Rating;
 import com.iortatechnxt.brokerverse.catalog.service.version.PackageSetupService;
+import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
+import com.iortatechnxt.brokerverse.messaging.domain.NotificationRepository;
 import com.iortatechnxt.brokerverse.quotation.domain.Quotation;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationAcceptanceService;
 import com.iortatechnxt.brokerverse.quotation.service.QuotationDispatchService;
@@ -36,8 +41,10 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 
 /**
  * The rate scheme that prices a transaction (BRPM.007): new business on the current released
@@ -54,7 +61,10 @@ class RatingSchemeIT {
   @Autowired private PackageSetupService setup;
   @Autowired private RatingService rating;
   @Autowired private RateSchemeExceptionService exceptions;
+  @Autowired private RateExceptionDecisions decisions;
   @Autowired private CatalogRecords records;
+  @Autowired private CatalogApprovalSource approvals;
+  @Autowired private NotificationRepository notifications;
   @Autowired private QuotationService quotations;
   @Autowired private QuotationDispatchService dispatch;
   @Autowired private QuotationAcceptanceService acceptance;
@@ -117,13 +127,107 @@ class RatingSchemeIT {
                 as.run(
                     "ao",
                     () -> records.authorize(CatalogKind.RATE_SCHEME_EXCEPTION, pending.getId())))
-        .isInstanceOf(org.springframework.security.access.AccessDeniedException.class);
+        .isInstanceOf(AccessDeniedException.class);
     as.run("approver", () -> records.authorize(CatalogKind.RATE_SCHEME_EXCEPTION, pending.getId()));
     Rating onOld = rating.rate(old.withScheme(Purpose.NEW_BUSINESS, 1, pending.getReferenceNo()));
     assertThat(onOld.schemeVersion()).isEqualTo(1);
     assertThat(onOld.overrideRef()).isEqualTo(pending.getReferenceNo());
     assertThat(onOld.schemeDeviation()).isTrue();
     assertThat(exceptions.latestApproved(ref, code)).isEqualTo(pending.getReferenceNo());
+  }
+
+  @Test
+  void theApproverDecidesTheExceptionOnItsRecordOpenedFromMyApprovals() {
+    String code = twoVersions();
+    String ref = "QT-DECIDE-" + code;
+    RateOverride requested =
+        as.run(
+            "ao",
+            () ->
+                exceptions.request(
+                    new RateOverride.Request(
+                        code, null, null, new BigDecimal("1.10"), ref, "Fleet discount", null)));
+    String reference = requested.getReferenceNo();
+    assertThat(approvals.pendingFor(ApprovalViewer.user("approver", Set.of("PRODUCT_AUTHORIZE"))))
+        .filteredOn(a -> reference.equals(a.reference()))
+        .singleElement()
+        .satisfies(a -> assertThat(a.link()).isEqualTo("/catalog/rate-exceptions/" + reference));
+    RateExceptionDecisions.Detail detail = decisions.detail(reference);
+    assertThat(detail.currentVersionNo()).isEqualTo(2);
+    assertThat(detail.schemeRate()).isEqualByComparingTo(NEW_RATE);
+    assertThat(detail.productName()).isNotBlank();
+
+    assertThatThrownBy(() -> as.run("ao", () -> decisions.approve(reference, null)))
+        .isInstanceOf(AccessDeniedException.class);
+    assertThatThrownBy(() -> as.run("approver", () -> decisions.reject(reference, " ")))
+        .extracting("code")
+        .isEqualTo("RATE_EXCEPTION_REASON_REQUIRED");
+    RateOverride approved =
+        as.run("approver", () -> decisions.approve(reference, "Loss-free fleet"));
+    assertThat(approved.getRecordStatus()).isEqualTo(RecordStatus.ACTIVE);
+    assertThat(approved.getDecidedBy()).isEqualTo("approver");
+    assertThat(approved.getDecisionComment()).isEqualTo("Loss-free fleet");
+    assertThat(approved.getDecidedAt()).isNotNull();
+    assertThat(exceptions.latestApproved(ref, code)).isEqualTo(reference);
+    assertThatThrownBy(() -> as.run("approver", () -> decisions.reject(reference, "late")))
+        .extracting("code")
+        .isEqualTo("RECORD_NOT_PENDING");
+    assertThat(notifications.findAll())
+        .filteredOn(n -> reference.equals(n.getEntityId()))
+        .singleElement()
+        .satisfies(
+            n -> {
+              assertThat(n.getRecipient()).isEqualTo("ao");
+              assertThat(n.getTitle()).isEqualTo("Rate exception " + reference + " approved");
+              assertThat(n.getLink()).isEqualTo("/catalog/rate-exceptions/" + reference);
+              assertThat(n.getBody()).contains("rate 1.10% until").contains(" approved by ");
+            });
+  }
+
+  @Test
+  void aRejectedExceptionKeepsItsReasonAndNeverPricesTheTransaction() {
+    String code = twoVersions();
+    String ref = "QT-REJECT-" + code;
+    RateOverride requested =
+        as.run(
+            "ao",
+            () ->
+                exceptions.request(
+                    new RateOverride.Request(
+                        code, null, 1, null, ref, "Keep last year's version", null)));
+    String reference = requested.getReferenceNo();
+    assertThatThrownBy(() -> as.run("ao", () -> decisions.reject(reference, "own request")))
+        .isInstanceOf(AccessDeniedException.class);
+    RateOverride rejected =
+        as.run("approver", () -> decisions.reject(reference, "Version 2 applies to new business"));
+    assertThat(rejected.getRecordStatus()).isEqualTo(RecordStatus.INACTIVE);
+    assertThat(rejected.getDecisionComment()).isEqualTo("Version 2 applies to new business");
+    assertThat(exceptions.latestApproved(ref, code)).isNull();
+    assertThat(approvals.pendingFor(ApprovalViewer.user("approver", Set.of("PRODUCT_AUTHORIZE"))))
+        .noneMatch(a -> reference.equals(a.reference()));
+    RatingQuery old = fx.query(code, null, null).withScheme(Purpose.NEW_BUSINESS, 1, reference);
+    assertThatThrownBy(() -> rating.rate(old))
+        .extracting("code")
+        .isEqualTo("RATE_SCHEME_NOT_CURRENT");
+    assertThatThrownBy(() -> as.run("approver", () -> decisions.approve(reference, null)))
+        .extracting("code")
+        .isEqualTo("RECORD_NOT_PENDING");
+
+    RateOverride own =
+        as.run(
+            "approver",
+            () ->
+                exceptions.request(
+                    new RateOverride.Request(
+                        code, null, 1, null, ref, "Requested by an approver", null)));
+    assertThatThrownBy(
+            () -> as.run("approver", () -> decisions.approve(own.getReferenceNo(), "mine")))
+        .extracting("code")
+        .isEqualTo("MAKER_CHECKER_VIOLATION");
+    assertThatThrownBy(
+            () -> as.run("approver", () -> decisions.reject(own.getReferenceNo(), "mine")))
+        .extracting("code")
+        .isEqualTo("MAKER_CHECKER_VIOLATION");
   }
 
   @Test

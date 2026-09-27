@@ -231,6 +231,55 @@ class CatalogProductMaintenanceApiIT {
         .andExpect(jsonPath("$.recordStatus").value("INACTIVE"));
   }
 
+  @Test
+  void theApproverApprovesOrRejectsAnExceptionOnItsRecordOverHttp() throws Exception {
+    String product = fx.released();
+    String token = PackageFixtures.code();
+    String first = requestException(product, "QT-A" + token);
+    String second = requestException(product, "QT-B" + token);
+    String record = "/api/v1/catalog/rate-scheme-exceptions/";
+
+    api.doGet("approver", record + first)
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.exception.referenceNo").value(first))
+        .andExpect(jsonPath("$.exception.requestedBy").value("ao"))
+        .andExpect(jsonPath("$.productName").isNotEmpty());
+    api.doPost("ao", record + first + "/approve", Map.of()).andExpect(status().isForbidden());
+    api.doPost("approver", record + first + "/approve", Map.of("comment", "Loyal client"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.recordStatus").value("ACTIVE"))
+        .andExpect(jsonPath("$.decidedBy").value("approver"))
+        .andExpect(jsonPath("$.decisionComment").value("Loyal client"));
+
+    api.doPost("approver", record + second + "/reject", Map.of())
+        .andExpect(status().is4xxClientError());
+    api.doPost("approver", record + second + "/reject", Map.of("comment", "Scheme applies"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.recordStatus").value("INACTIVE"))
+        .andExpect(jsonPath("$.decisionComment").value("Scheme applies"));
+    api.doPost("approver", record + second + "/approve", Map.of())
+        .andExpect(status().is4xxClientError());
+  }
+
+  private String requestException(String product, String transactionRef) throws Exception {
+    return api.read(
+            api.doPost(
+                    "ao",
+                    "/api/v1/catalog/rate-scheme-exceptions",
+                    Map.of(
+                        "productCode",
+                        product,
+                        "requestedRate",
+                        2.5,
+                        "transactionRef",
+                        transactionRef,
+                        "reason",
+                        "Loyal client"))
+                .andExpect(status().isCreated()))
+        .get("referenceNo")
+        .asText();
+  }
+
   private static Map<String, Object> coverage(String code) {
     return Map.of(
         "lineCode",

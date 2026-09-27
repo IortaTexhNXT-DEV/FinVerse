@@ -27,6 +27,8 @@ import { DetailsPanel, HistoryPanel, ItemsPanel } from './AccountPanels';
 import { AccountTagsCard } from './AccountTagsCard';
 import { PremiumSummary } from './PremiumSummary';
 import { useAccountRefresh } from './useAccountRefresh';
+import { UserName } from '@/components/ui/UserName';
+import { InsurerName, ProductLineLabel } from '@/components/broking/LovLabel';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -50,8 +52,16 @@ const EDITABLE = new Set(['DRAFT', 'RETURNED_TO_MARKETING']);
 function accountFacts(a: Account): Fact[] {
   return [
     { icon: User, label: 'Client', value: `${a.clientCode ?? '—'} – ${a.clientName}` },
-    { icon: Layers, label: 'Product', value: `${a.productCode} (${a.lineCode})` },
-    { icon: Building2, label: 'Insurer', value: a.insurerCode ?? 'To be advised' },
+    {
+      icon: Layers,
+      label: 'Product',
+      value: <ProductLineLabel product={a.productCode} line={a.lineCode} />,
+    },
+    {
+      icon: Building2,
+      label: 'Insurer',
+      value: <InsurerName code={a.insurerCode} empty="To be advised" />,
+    },
     {
       icon: CalendarRange,
       label: 'Period',
@@ -60,9 +70,16 @@ function accountFacts(a: Account): Fact[] {
     {
       icon: Wallet,
       label: 'Gross Premium',
-      value: `${a.currency} ${formatAmount(a.premium.grossPremium)}`,
+      value:
+        a.premium.grossPremium === undefined || a.premium.grossPremium === null
+          ? 'Not rated yet'
+          : `${a.currency} ${formatAmount(a.premium.grossPremium)}`,
     },
-    { icon: UserCheck, label: 'Account Officer', value: a.sales.accountOfficer },
+    {
+      icon: UserCheck,
+      label: 'Account Officer',
+      value: <UserName login={a.sales.accountOfficer} />,
+    },
     ...legacyFacts(a),
   ];
 }

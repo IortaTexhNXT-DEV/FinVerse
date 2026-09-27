@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadOpt
 import com.iortatechnxt.brokerverse.attachment.service.DocumentService.UploadedFile;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.catalog.service.CatalogNames;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
@@ -55,6 +56,7 @@ public class PackageResponseService {
   private final DocumentService documents;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
+  private final CatalogNames names;
   private final Clock clock;
 
   /**
@@ -69,6 +71,7 @@ public class PackageResponseService {
    * @param documents documents of the request
    * @param audit audit trail
    * @param currentUser current user
+   * @param names coverage names
    * @param clock clock
    */
   public PackageResponseService(
@@ -81,6 +84,7 @@ public class PackageResponseService {
       DocumentService documents,
       AuditTrailService audit,
       CurrentUser currentUser,
+      CatalogNames names,
       Clock clock) {
     this.requests = requests;
     this.rounds = rounds;
@@ -91,6 +95,7 @@ public class PackageResponseService {
     this.documents = documents;
     this.audit = audit;
     this.currentUser = currentUser;
+    this.names = names;
     this.clock = clock;
   }
 
@@ -150,7 +155,9 @@ public class PackageResponseService {
    */
   @Transactional(readOnly = true)
   public ComparativeTable comparative(NegotiationRound round) {
-    return ComparativeTable.compile(round.getRoundNo(), ofRound(round), codec::coverages);
+    String line = requests.get(round.getRequestId()).getLineCode();
+    return ComparativeTable.compile(
+        round.getRoundNo(), ofRound(round), codec::coverages, code -> names.coverage(line, code));
   }
 
   /**

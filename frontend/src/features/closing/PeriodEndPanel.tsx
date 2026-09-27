@@ -13,6 +13,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { ChecklistView } from './ChecklistView';
 import { PeriodSelectors } from './PeriodSelectors';
 import type { usePeriodPicker } from './usePeriodPicker';
+import { statusPhrase } from '@/utils/format';
 
 type Transition = 'startClosing' | 'close';
 
@@ -68,7 +69,7 @@ export function PeriodEndPanel({
     onSuccess: async (p) => {
       await queryClient.invalidateQueries({ queryKey: ['periods'] });
       await queryClient.invalidateQueries({ queryKey: ['period-checklist'] });
-      toast.success(`Period ${p.name} is now ${p.status}`);
+      toast.success(`Period ${p.name} is now ${statusPhrase(p.status)}`);
     },
   });
 

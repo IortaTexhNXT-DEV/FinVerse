@@ -2,6 +2,8 @@ package com.iortatechnxt.brokerverse.placement.service;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.RiskItem;
+import com.iortatechnxt.brokerverse.catalog.service.CatalogNames;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Field;
@@ -13,6 +15,7 @@ import com.iortatechnxt.brokerverse.docgen.service.SheetSpec;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
 import com.iortatechnxt.brokerverse.placement.service.InsurerDirectory.PlacementAddress;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -30,7 +33,6 @@ import org.springframework.stereotype.Component;
 public class SlipDocuments {
 
   private static final String DEFAULT_COMPANY = "BDO Insurance and Reinsurance Brokers, Inc.";
-  private static final List<String> SIGNATURES = List.of("Prepared by", "Approved by");
   private static final List<String> RISK_HEADERS =
       List.of("ARN", "Insured", "Product", "Period", "Sum insured", "Gross premium");
   private static final List<Integer> AMOUNT_COLUMNS = List.of(4, 5);
@@ -53,16 +55,26 @@ public class SlipDocuments {
 
   private final DocumentComposer composer;
   private final CompanyRepository companies;
+  private final CatalogNames names;
+  private final UserDirectory users;
 
   /**
    * Creates the renderer.
    *
    * @param composer document composer
    * @param companies companies (letterhead)
+   * @param names product names
+   * @param users user names (signatures)
    */
-  public SlipDocuments(DocumentComposer composer, CompanyRepository companies) {
+  public SlipDocuments(
+      DocumentComposer composer,
+      CompanyRepository companies,
+      CatalogNames names,
+      UserDirectory users) {
     this.composer = composer;
     this.companies = companies;
+    this.names = names;
+    this.users = users;
   }
 
   /**
@@ -80,12 +92,11 @@ public class SlipDocuments {
     List<Field> facts =
         List.of(
             new Field("Slip", header.slipNo()),
-            new Field(
-                "Insurer", header.address().insurerName() + " (" + header.insurerCode() + ")"),
+            new Field("Insurer", header.address().insurerName()),
             new Field("Branch", header.address().branchName()),
             new Field("Accounts", String.valueOf(accounts.size())),
-            new Field("Total gross premium", total.toPlainString()));
-    List<List<String>> risks = accounts.stream().map(SlipDocuments::riskRow).toList();
+            new Field("Total gross premium", DisplayFormat.amount(total)));
+    List<List<String>> risks = accounts.stream().map(this::riskRow).toList();
     return composer.pdf(
         new DocumentSpec(
             companyName(header.companyId()),
@@ -95,8 +106,8 @@ public class SlipDocuments {
                 new Fields("Placement", facts),
                 new Text(null, header.text().text()),
                 new Table("Risks", RISK_HEADERS, risks, AMOUNT_COLUMNS)),
-            SIGNATURES,
-            header.text().versionTag()));
+            signatures(header),
+            header.text().versionLabel()));
   }
 
   /**
@@ -145,28 +156,35 @@ public class SlipDocuments {
         List.of(
             new Field("ARN", account.getArn()),
             new Field("Insured", account.getClientName()),
-            new Field("Product", account.getProductCode()),
+            new Field("Product", names.product(account.getProductCode())),
             new Field("Insurer", header.address().insurerName()),
-            new Field("Hold cover", start + " to " + expiry),
-            new Field("Sum insured", account.getTotalSumInsured().toPlainString()));
+            new Field("Hold cover", DisplayFormat.period(start, expiry)),
+            new Field("Sum insured", DisplayFormat.amount(account.getTotalSumInsured())));
     return composer.pdf(
         new DocumentSpec(
             companyName(header.companyId()),
             header.text().title(),
             header.slipNo(),
             List.of(new Text(null, header.text().text()), new Fields("Risk", facts)),
-            SIGNATURES,
-            header.text().versionTag()));
+            signatures(header),
+            header.text().versionLabel()));
   }
 
-  private static List<String> riskRow(Account a) {
+  /** "Prepared by: <name>" of the user who generated the document, and "Approved by". */
+  private List<String> signatures(SlipHeader header) {
+    return List.of(
+        DocumentSpec.signature("Prepared by", users.displayName(header.preparedBy())),
+        "Approved by");
+  }
+
+  private List<String> riskRow(Account a) {
     return List.of(
         a.getArn(),
         a.getClientName(),
-        a.getProductCode(),
-        a.getPeriodFrom() + " to " + a.getPeriodTo(),
-        a.getTotalSumInsured().toPlainString(),
-        a.getPremium().grossPremium() == null ? "" : a.getPremium().grossPremium().toPlainString());
+        names.product(a.getProductCode()),
+        DisplayFormat.period(a.getPeriodFrom(), a.getPeriodTo()),
+        DisplayFormat.amount(a.getTotalSumInsured()),
+        DisplayFormat.amount(a.getPremium().grossPremium()));
   }
 
   private static String items(Account a) {
@@ -185,11 +203,13 @@ public class SlipDocuments {
    * @param insurerCode insurer party code
    * @param address insurer and branch names
    * @param text merged template
+   * @param preparedBy login id of the user who generates the document, may be null
    */
   public record SlipHeader(
       Long companyId,
       String slipNo,
       String insurerCode,
       PlacementAddress address,
-      MergedText text) {}
+      MergedText text,
+      String preparedBy) {}
 }

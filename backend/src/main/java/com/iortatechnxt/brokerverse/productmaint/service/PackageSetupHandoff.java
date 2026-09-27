@@ -94,7 +94,8 @@ public class PackageSetupHandoff {
     PackageRequest p = withMbs(id);
     if (p.getRequestType() == RequestType.RETIRE) {
       throw new BusinessRuleException(
-          "PKG_REQUEST_TYPE_MISMATCH", "A RETIRE request retires the package instead");
+          "PKG_REQUEST_TYPE_MISMATCH",
+          "A retirement request retires the package; it has no version to set up");
     }
     String code =
         p.getTargetProductCode() == null ? blank(input.productCode()) : p.getTargetProductCode();
@@ -182,7 +183,7 @@ public class PackageSetupHandoff {
     PackageRequest p = withMbs(id);
     if (p.getRequestType() != RequestType.RETIRE) {
       throw new BusinessRuleException(
-          "PKG_REQUEST_TYPE_MISMATCH", "Only a RETIRE request retires the package");
+          "PKG_REQUEST_TYPE_MISMATCH", "Only a request to retire the package can retire it");
     }
     setup.retireProduct(
         p.getTargetProductCode(),

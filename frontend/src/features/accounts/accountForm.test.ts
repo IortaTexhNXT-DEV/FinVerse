@@ -12,6 +12,7 @@ import {
   splitRefs,
   stepProblems,
   toAccountInput,
+  unsavedReviewText,
   withClient,
 } from './accountForm';
 import { checkLines } from './accountChecks';
@@ -178,5 +179,30 @@ describe('account check', () => {
       'Attach the Idf.',
       'The premium could not be rated yet (sum insured, period and rates).',
     ]);
+  });
+});
+
+describe('review step of an unsaved draft', () => {
+  const duplicate = new ApiError(422, {
+    code: 'DUPLICATE_ACCOUNT',
+    detail: 'Duplicate of existing account ARN-2026-900002',
+  });
+
+  it('says why the draft is not saved instead of asking for the client and product', () => {
+    const d = { ...newDraft('2026-01-01'), clientId: 3, productCode: 'PAR01' };
+    expect(unsavedReviewText(d, { pending: false, error: duplicate })).toMatch(
+      /already on the account shown above/,
+    );
+    expect(
+      unsavedReviewText(d, {
+        pending: false,
+        error: new ApiError(422, { code: 'X', detail: 'y' }),
+      }),
+    ).toMatch(/correct what the message above describes/);
+    expect(unsavedReviewText(d, { pending: true, error: null })).toBe('Saving the draft…');
+    expect(unsavedReviewText(d, { pending: false, error: null })).toMatch(/Save Draft/);
+    expect(unsavedReviewText(newDraft('2026-01-01'), { pending: false, error: null })).toBe(
+      'Choose the client and product to save the draft.',
+    );
   });
 });

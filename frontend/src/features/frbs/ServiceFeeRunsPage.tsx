@@ -52,7 +52,7 @@ const COLUMNS: Column<ServiceFeeRun>[] = [
     numeric: true,
     render: (r) => <Amount value={r.feeTotal} />,
   },
-  { key: 'approved', header: 'Approved By', render: (r) => r.approvedBy ?? '—' },
+  { key: 'approved', header: 'Approved By', render: (r) => <UserName login={r.approvedBy} /> },
   { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.stage} /> },
 ];
 

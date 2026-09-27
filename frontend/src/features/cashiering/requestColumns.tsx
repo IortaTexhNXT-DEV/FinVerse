@@ -3,12 +3,13 @@ import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import type { CollectorRequest, PaymentReversal, RefundValidation } from './requestsApi';
+import { UserName } from '@/components/ui/UserName';
 
 /** Columns of the Incoming Requests queues (wave C1-C). */
 
 const who = (by: string, at: string) => (
   <>
-    {by}
+    <UserName login={by} />
     <div className="muted">{formatDateTime(at)}</div>
   </>
 );

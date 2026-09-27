@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.catalog.api.dto;
 
 import com.iortatechnxt.brokerverse.catalog.domain.RateOverride;
+import com.iortatechnxt.brokerverse.catalog.service.RateExceptionDecisions;
 import com.iortatechnxt.brokerverse.catalog.service.RatingQuery.Purpose;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import jakarta.validation.constraints.DecimalMax;
@@ -71,6 +72,9 @@ public final class RateExceptionDtos {
    * @param requestedBy requester
    * @param requestedAt when
    * @param authorizedBy approver
+   * @param decidedBy user who approved or rejected it
+   * @param decidedAt when
+   * @param decisionComment approval comment or rejection reason
    */
   public record ExceptionResponse(
       Long id,
@@ -85,7 +89,10 @@ public final class RateExceptionDtos {
       RecordStatus recordStatus,
       String requestedBy,
       Instant requestedAt,
-      String authorizedBy) {
+      String authorizedBy,
+      String decidedBy,
+      Instant decidedAt,
+      String decisionComment) {
 
     /**
      * Maps an entity.
@@ -107,7 +114,47 @@ public final class RateExceptionDtos {
           e.getRecordStatus(),
           e.getCreatedBy(),
           e.getCreatedAt(),
-          e.getAuthorizedBy());
+          e.getAuthorizedBy(),
+          e.getDecidedBy(),
+          e.getDecidedAt(),
+          e.getDecisionComment());
     }
   }
+
+  /**
+   * The exception record as the approver sees it (SCR-PM-22): the exception, the product name and
+   * the scheme in force.
+   *
+   * @param exception exception
+   * @param productName product name
+   * @param currentVersionNo version in force today, null when none
+   * @param schemeRate its scheme rate in percent, null when per insurer
+   */
+  public record ExceptionDetail(
+      ExceptionResponse exception,
+      String productName,
+      Integer currentVersionNo,
+      BigDecimal schemeRate) {
+
+    /**
+     * Maps the service view.
+     *
+     * @param d detail
+     * @return response
+     */
+    public static ExceptionDetail from(RateExceptionDecisions.Detail d) {
+      return new ExceptionDetail(
+          ExceptionResponse.from(d.exception()),
+          d.productName(),
+          d.currentVersionNo(),
+          d.schemeRate());
+    }
+  }
+
+  /**
+   * The approver's decision.
+   *
+   * @param comment comment of an approval (optional) or reason of a rejection (required)
+   */
+  public record Decision(@Size(max = 1000) String comment) {}
 }

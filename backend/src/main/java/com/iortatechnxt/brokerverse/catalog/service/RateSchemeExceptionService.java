@@ -21,8 +21,10 @@ import org.springframework.transaction.annotation.Transactional;
  * Rate-scheme exceptions (BRPM.007; PRODUCT_MAINTENANCE_DESIGN sections 4.2 and 9.1): "a
  * non-current rate triggers an approval workflow and is logged". A requester asks to price one
  * quotation or account on a non-current package version or on another item rate; a
- * PRODUCT_AUTHORIZE holder other than the requester authorises it in My Approvals (maker-checker
- * through {@link CatalogRecords}); rating accepts the deviation only with the approved reference.
+ * PRODUCT_AUTHORIZE holder other than the requester decides it on the exception record opened from
+ * My Approvals: approves it (maker-checker through {@link CatalogRecords}) with an optional
+ * comment, or rejects it with a reason; the requester is notified of the decision. Rating accepts
+ * the deviation only with the approved reference.
  */
 @Service
 @Transactional

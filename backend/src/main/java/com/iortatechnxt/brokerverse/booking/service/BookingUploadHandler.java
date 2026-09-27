@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkImportHandler;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.dimension.domain.DimensionType;
 import com.iortatechnxt.brokerverse.dimension.service.DimensionService;
 import java.time.LocalDate;
@@ -119,7 +120,7 @@ public class BookingUploadHandler implements BulkImportHandler {
     }
     LocalDate date = row.date(BOOKING_DATE);
     if (date != null && date.isAfter(context.businessDate())) {
-      errors.add("The booking date " + date + " is in the future");
+      errors.add("The booking date " + DisplayFormat.date(date) + " is in the future");
     }
     return errors;
   }

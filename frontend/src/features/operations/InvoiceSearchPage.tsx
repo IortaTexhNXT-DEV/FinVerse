@@ -31,6 +31,7 @@ import {
   tabOf,
 } from './invoiceSearch';
 import type { SearchTab } from './invoiceSearch';
+import { UserName } from '@/components/ui/UserName';
 
 const COLUMNS: Column<OpsInvoiceSummary>[] = [
   {
@@ -68,7 +69,11 @@ const COLUMNS: Column<OpsInvoiceSummary>[] = [
       </>
     ),
   },
-  { key: 'ao', header: 'Account Officer', render: (i) => i.aoUsername ?? '' },
+  {
+    key: 'ao',
+    header: 'Account Officer',
+    render: (i) => <UserName login={i.aoUsername} empty="" />,
+  },
   {
     key: 'gross',
     header: 'Gross Premium',

@@ -18,6 +18,7 @@ import { TextInput } from './FormControls';
 import { summarize } from './runSummary';
 import { useAssetLookups } from './useAssetLookups';
 import { displayNameOf } from '@/api/users';
+import { UserName } from '@/components/ui/UserName';
 
 /** Monthly depreciation: preview the charge of a period, then post it once (idempotent). */
 export default function DepreciationRunPage() {
@@ -131,7 +132,7 @@ export default function DepreciationRunPage() {
               numeric: true,
               render: (r) => <Amount value={r.totalDepreciation} />,
             },
-            { key: 'u', header: 'Posted by', render: (r) => r.createdBy },
+            { key: 'u', header: 'Posted by', render: (r) => <UserName login={r.createdBy} /> },
             { key: 'w', header: 'Posted at', render: (r) => formatDateTime(r.createdAt) },
           ]}
         />

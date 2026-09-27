@@ -22,6 +22,7 @@ import { JournalFiltersCard } from './JournalFiltersCard';
 import type { ListFilters } from './JournalFiltersCard';
 import { glPlatformApi } from './glPlatformApi';
 import type { BulkPostOutcome, FrbsJournal } from './glPlatformApi';
+import { UserName } from '@/components/ui/UserName';
 
 type Dialog = 'assign' | 'post' | null;
 
@@ -155,9 +156,17 @@ export default function JournalsPage() {
             { key: 'date', header: 'Value Date', render: (j) => formatDate(j.valueDate) },
             { key: 'type', header: 'Type', render: (j) => humanize(j.journalType) },
             { key: 'nar', header: 'Narration', render: (j) => j.narration },
-            { key: 'by', header: 'Inputter', render: (j) => j.createdBy },
-            { key: 'to', header: 'Assigned To', render: (j) => j.assignedTo ?? '' },
-            { key: 'auth', header: 'Authorizer', render: (j) => j.authorizedBy ?? '' },
+            { key: 'by', header: 'Inputter', render: (j) => <UserName login={j.createdBy} /> },
+            {
+              key: 'to',
+              header: 'Assigned To',
+              render: (j) => <UserName login={j.assignedTo} empty="" />,
+            },
+            {
+              key: 'auth',
+              header: 'Authorizer',
+              render: (j) => <UserName login={j.authorizedBy} empty="" />,
+            },
             {
               key: 'amt',
               header: 'Amount',

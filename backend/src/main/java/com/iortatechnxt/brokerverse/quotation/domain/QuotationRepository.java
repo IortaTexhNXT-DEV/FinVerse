@@ -35,4 +35,12 @@ public interface QuotationRepository
    * @return quotations
    */
   List<Quotation> findByClientIdOrderByCreatedAtDesc(Long clientId);
+
+  /**
+   * The record of a renewal on the New Business path (Renewal, BRRN.033).
+   *
+   * @param renewalRef renewal reference
+   * @return the record
+   */
+  Optional<Quotation> findByRenewalRef(String renewalRef);
 }

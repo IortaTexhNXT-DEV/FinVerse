@@ -14,7 +14,7 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { TextInput } from '@/features/assets/FormControls';
-import { formatDateTime } from '@/utils/format';
+import { formatAmount, formatDateTime } from '@/utils/format';
 import { COMPARATIVE_FIELDS } from './packageRequest';
 import { displayNameOf } from '@/api/users';
 
@@ -35,7 +35,12 @@ const ROW_COLUMNS: Column<ComparativeRow>[] = [
   },
   { key: 'outcome', header: 'Outcome', render: (r) => <StatusBadge status={r.outcome} /> },
   { key: 'rate', header: 'Rate %', numeric: true, render: (r) => r.rate ?? '—' },
-  { key: 'min', header: 'Minimum', numeric: true, render: (r) => r.minimumPremium ?? '—' },
+  {
+    key: 'min',
+    header: 'Minimum',
+    numeric: true,
+    render: (r) => (r.minimumPremium === undefined ? '—' : formatAmount(r.minimumPremium)),
+  },
   { key: 'coverages', header: 'Coverages', render: (r) => orDash(r.coverages) },
   { key: 'deductibles', header: 'Deductibles', render: (r) => orDash(r.deductibles) },
   { key: 'conditions', header: 'Conditions', render: (r) => r.conditions ?? '—' },
@@ -118,7 +123,7 @@ function ClientViewDialog({
           </div>
         </fieldset>
         <p className="muted">
-          A client view is derived from the current master and never changes a value (PMADD03).
+          A client view is derived from the current master and never changes a value.
         </p>
       </div>
     </Modal>

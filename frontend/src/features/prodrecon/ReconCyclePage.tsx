@@ -19,7 +19,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { formatDate, formatDateTime, statusPhrase } from '@/utils/format';
 import { CycleItemsTab } from './CycleItemsTab';
 import { SendExtractDialog } from './ExtractParts';
 import { extractColumns } from './extractColumns';
@@ -214,7 +214,7 @@ export default function ReconCyclePage() {
     onSuccess: async (c) => {
       setClosing(false);
       await queryClient.invalidateQueries({ queryKey: ['prodrecon'] });
-      toast.success(`${c.cycleNo} is now ${c.stage.toLowerCase().replaceAll('_', ' ')}`);
+      toast.success(`${c.cycleNo} is now ${statusPhrase(c.stage)}`);
     },
   });
   if (cycle.data === undefined) {

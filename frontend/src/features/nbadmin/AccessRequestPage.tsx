@@ -30,6 +30,8 @@ import type { RequestAction } from './accessActions';
 import { isGroupProfile, REQUEST_TYPE_LABELS } from './accessRequest';
 import { RequestApprovers, RequestDetails, RequestHistory } from './AccessRequestTabs';
 import { ReasonDialog } from './ReasonDialog';
+import { UserName } from '@/components/ui/UserName';
+import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -114,7 +116,7 @@ function decisionText(r: AccessRequest): string {
   if (!r.decidedBy) {
     return 'Pending';
   }
-  const when = `${r.decidedBy} · ${formatDateTime(r.decidedAt)}`;
+  const when = `${displayNameOf(r.decidedBy)} · ${formatDateTime(r.decidedAt)}`;
   return r.decisionComment ? `${when} – ${r.decisionComment}` : when;
 }
 
@@ -138,12 +140,13 @@ function Summary({ request: r }: Readonly<{ request: AccessRequest }>) {
         {
           icon: UserRound,
           label: 'Requested',
-          value: `${r.requestedBy} · ${formatDateTime(r.requestedAt)}`,
+          value: `${displayNameOf(r.requestedBy)} · ${formatDateTime(r.requestedAt)}`,
         },
         {
           icon: Users,
           label: 'Approver',
-          value: r.lifecycle.assignedApprover ?? r.decidedBy ?? 'Chosen on submission',
+          value:
+            displayNameOf(r.lifecycle.assignedApprover ?? r.decidedBy) || 'Chosen on submission',
         },
         {
           icon: CalendarClock,
@@ -185,12 +188,12 @@ function Banners({
       {decision && <Password decision={decision} />}
       {r.status === 'RETURNED' && r.decisionComment && (
         <div className="alert warning" role="status">
-          Returned by {r.decidedBy}: {r.decisionComment}
+          Returned by <UserName login={r.decidedBy} />: {r.decisionComment}
         </div>
       )}
       {r.lifecycle.cancelReason && (
         <div className="alert" role="status">
-          Cancelled by {r.lifecycle.cancelledBy}: {r.lifecycle.cancelReason}
+          Cancelled by <UserName login={r.lifecycle.cancelledBy} />: {r.lifecycle.cancelReason}
         </div>
       )}
     </>

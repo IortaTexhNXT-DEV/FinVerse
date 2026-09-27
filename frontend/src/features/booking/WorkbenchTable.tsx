@@ -8,6 +8,7 @@ import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate } from '@/utils/format';
 import { rowLink, toggle, toggleAll } from './bookingForm';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 interface Props {
   tab: WorkbenchTab;
@@ -112,7 +113,7 @@ export function WorkbenchTable({
         </>
       ),
     },
-    { key: 'line', header: 'Product Line', render: (r) => r.lineCode ?? '' },
+    { key: 'line', header: 'Product Line', render: (r) => <LineLabel code={r.lineCode} /> },
     { key: 'department', header: 'Department', render: (r) => r.department ?? '' },
     { key: 'date', header: 'Booking Date', render: (r) => formatDate(r.bookingDate) },
   ];

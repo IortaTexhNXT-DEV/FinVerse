@@ -52,4 +52,13 @@ public interface AccountRepository
       @Param("companyId") Long companyId,
       @Param("statuses") Collection<AccountStatus> statuses,
       @Param("reference") String reference);
+
+  /**
+   * The accounts that renew a policy (shared work item BT0; Renewal duplicate check and booking of
+   * the renewal, BRRN.005/040).
+   *
+   * @param renewalOfRef expiring ARN, SBM number or legacy reference
+   * @return accounts
+   */
+  List<Account> findByClassificationRenewalOfRef(String renewalOfRef);
 }

@@ -8,7 +8,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
-import { humanize } from '@/utils/format';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 
 interface BulkAssignDialogProps {
   /** Selected requests, all in the same stage. */
@@ -73,7 +73,7 @@ export function BulkAssignDialog({ requests, onClose, onDone }: Readonly<BulkAss
         <ErrorAlert error={firstCase.error ?? users.error ?? assign.error} />
         <p className="muted">
           {requests.map((r) => r.requestNo).join(', ')} ·{' '}
-          {first === undefined ? '' : humanize(first.status)}
+          {first !== undefined && <StatusBadge status={first.status} />}
         </p>
         <Field label="Assignee" hint="Users of the team that works this stage.">
           {(id) => (

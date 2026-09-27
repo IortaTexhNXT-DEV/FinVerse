@@ -16,10 +16,12 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -260,14 +262,19 @@ public class ProductCatalogService {
     if (product.getLifecycleStatus() != ProductLifecycle.ACTIVE) {
       throw new BusinessRuleException(
           NOT_SELLABLE,
-          "Product " + code + " is " + product.getLifecycleStatus() + " and cannot be sold");
+          "Product "
+              + code
+              + " is "
+              + product.getLifecycleStatus().name().toLowerCase(Locale.ROOT)
+              + " and cannot be sold");
     }
     if (product.isPackaged()
         && versions.existsByProductCode(code)
         && versions.findByProductCodeOrderByVersionNoDesc(code).stream()
             .noneMatch(v -> v.isInForce(date))) {
       throw new BusinessRuleException(
-          NOT_SELLABLE, "Package " + code + " has no released version in force on " + date);
+          NOT_SELLABLE,
+          "Package " + code + " has no released version in force on " + DisplayFormat.date(date));
     }
     return product;
   }

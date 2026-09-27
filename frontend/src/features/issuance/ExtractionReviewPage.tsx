@@ -16,6 +16,7 @@ import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/form
 import { ConfirmPolicyCard } from './ConfirmPolicyCard';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
+import { matchText } from './issuanceLogic';
 
 interface Row {
   field: string;
@@ -113,7 +114,7 @@ export default function ExtractionReviewPage() {
         backTo="/issuance"
         section="Policy Issuance · Extraction Review"
         title={r.account.clientName}
-        description={`${r.epolicy.fileName} · received ${formatDateTime(r.epolicy.createdAt)} by ${displayNameOf(r.epolicy.createdBy)} · matched by ${humanize(r.epolicy.matchMethod)}`}
+        description={`${r.epolicy.fileName} · received ${formatDateTime(r.epolicy.createdAt)} by ${displayNameOf(r.epolicy.createdBy)} · matched by ${matchText(r.epolicy.matchMethod)}`}
         actions={
           <>
             <ReferenceChip label="ARN" value={r.account.arn} />

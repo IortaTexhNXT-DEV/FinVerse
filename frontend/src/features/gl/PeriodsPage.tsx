@@ -12,7 +12,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { defaultYear } from '@/features/closing/periodDefaults';
-import { formatDate, formatDateTime, today } from '@/utils/format';
+import { formatDate, formatDateTime, today, statusPhrase } from '@/utils/format';
 import { PeriodActionDialog } from './PeriodActionDialog';
 import type { PendingPeriodAction } from './PeriodActionDialog';
 import { PERIOD_ACTIONS } from './periodActions';
@@ -46,7 +46,7 @@ export default function PeriodsPage() {
     onSuccess: async (p) => {
       setPending(null);
       await queryClient.invalidateQueries({ queryKey: ['periods'] });
-      toast.success(`Period ${p.name} is now ${p.status}`);
+      toast.success(`Period ${p.name} is now ${statusPhrase(p.status)}`);
     },
   });
   const ask = (period: Period, action: PeriodAction) => {

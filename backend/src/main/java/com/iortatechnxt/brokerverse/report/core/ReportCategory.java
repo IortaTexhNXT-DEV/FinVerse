@@ -23,7 +23,8 @@ public enum ReportCategory {
   COMPLIANCE("Compliance"),
   DATA_MIGRATION("Data Migration"),
   CLAIMS_HANDLING("Claims Handling"),
-  EMPLOYEE_BENEFITS("Employee Benefits");
+  EMPLOYEE_BENEFITS("Employee Benefits"),
+  RENEWAL("Renewal");
 
   private final String label;
 

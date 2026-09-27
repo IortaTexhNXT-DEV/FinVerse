@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -95,6 +96,18 @@ public class QuotationQueryService {
             .or(() -> quotations.findByArn(key.replaceFirst("-\\d{2}$", "")))
             .orElseThrow(() -> new ResourceNotFoundException(QuotationService.ENTITY, key));
     return QuotationSummary.of(q);
+  }
+
+  /**
+   * The quotation of a renewal on the New Business path (Renewal status tracking, BRRN.033).
+   *
+   * @param renewalRef renewal reference
+   * @return the quotation, empty when the renewal has none
+   */
+  public Optional<Quotation> getByRenewalRef(String renewalRef) {
+    Optional<Quotation> q = quotations.findByRenewalRef(renewalRef);
+    q.ifPresent(x -> Hibernate.initialize(x.getAccountArns()));
+    return q;
   }
 
   /**

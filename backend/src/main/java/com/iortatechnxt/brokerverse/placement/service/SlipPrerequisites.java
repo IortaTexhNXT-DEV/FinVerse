@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.catalog.service.ProductRuleService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -64,7 +65,9 @@ public class SlipPrerequisites {
       unmet.add(
           new Unmet(
               "NOT_READY_FOR_PLACEMENT",
-              "The account is " + account.getStatus() + "; a slip needs Ready for placement"));
+              "The account is "
+                  + DisplayFormat.words(account.getStatus())
+                  + "; a slip needs Ready for placement"));
     }
     if (!account.isDirectPayment()
         && account.getLifecycle().getPaymentStatus() == PaymentStatus.UNPAID) {

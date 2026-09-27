@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -159,9 +160,9 @@ public class InsuranceAdviceService {
           "IA_NOT_MORTGAGED", "Account " + arn + " has no mortgagee bank: no Insurance Advice");
     }
     if (!ADVISABLE.contains(account.getStatus())) {
+      String status = DisplayFormat.words(account.getStatus());
       throw new BusinessRuleException(
-          "IA_ACCOUNT_STATUS",
-          "Account " + arn + " is " + account.getStatus() + "; it must be placed first");
+          "IA_ACCOUNT_STATUS", "Account " + arn + " is " + status + "; it must be placed first");
     }
     LocalDate today = BusinessClock.today(clock);
     String iaNo = numbers.next("IA-" + today.getYear());
@@ -232,10 +233,11 @@ public class InsuranceAdviceService {
             new Field("Loan application no.", account.getLoanApplicationNo()),
             new Field("Insurer", parties.insurerName()),
             new Field("Policy no.", parties.policies() == null ? TO_FOLLOW : parties.policies()),
-            new Field("Period", account.getPeriodFrom() + " to " + account.getPeriodTo()),
+            new Field(
+                "Period", DisplayFormat.period(account.getPeriodFrom(), account.getPeriodTo())),
             new Field(
                 "Sum insured",
-                account.getCurrency() + " " + account.getTotalSumInsured().toPlainString()));
+                account.getCurrency() + " " + DisplayFormat.amount(account.getTotalSumInsured())));
     List<List<String>> items =
         account.getItems().stream()
             .map(i -> List.of(String.valueOf(i.getItemNo()), i.label(), amount(i)))
@@ -249,11 +251,11 @@ public class InsuranceAdviceService {
             new Fields("Insurance", facts),
             new Table("Insured items", List.of("No.", "Item", "Sum insured"), items, List.of(2))),
         List.of("Authorized signatory"),
-        text.versionTag());
+        text.versionLabel());
   }
 
   private static String amount(RiskItem item) {
-    return item.getSumInsured() == null ? "" : item.getSumInsured().toPlainString();
+    return DisplayFormat.amount(item.getSumInsured());
   }
 
   /**

@@ -9,7 +9,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormControls';
 import { InsurerChoices } from '@/features/proposals/ProposalFormParts';
-import { offered } from './packageRequest';
+import { INSURER_ROLES, offered } from './packageRequest';
 
 interface DialogProps {
   request: PackageRequest;
@@ -164,12 +164,6 @@ export function ReviseDialog({ request, onClose, onDone }: Readonly<DialogProps>
   );
 }
 
-const ROLES = [
-  { value: 'PANEL', label: 'Panel' },
-  { value: 'LEAD', label: 'Lead' },
-  { value: 'PARTICIPANT', label: 'Participant' },
-];
-
 /** Terms final: the insurers whose terms the package takes, with role and share (BRPM.010). */
 export function TermsFinalDialog({ request, onClose, onDone }: Readonly<DialogProps>) {
   const rounds = useQuery({
@@ -222,7 +216,7 @@ export function TermsFinalDialog({ request, onClose, onDone }: Readonly<DialogPr
               <SelectInput
                 label="Role"
                 value={choices[r.insurerCode]?.role}
-                options={ROLES}
+                options={INSURER_ROLES}
                 onChange={(role) => patch(r.insurerCode, { role })}
               />
               <NumberInput

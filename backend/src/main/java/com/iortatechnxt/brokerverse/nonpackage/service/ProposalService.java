@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.catalog.service.TsuRoutingService.TsuDecisio
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.nonpackage.domain.ProposalRequest;
 import com.iortatechnxt.brokerverse.nonpackage.domain.ProposalRequest.ClientFacts;
@@ -135,6 +136,37 @@ public class ProposalService {
   }
 
   /**
+   * Creates the PRF of a renewal with financial or structural changes (Renewal New Business path,
+   * BRRN.033; Renewal design section 13): an ordinary PRF linked to the renewal reference, whose
+   * accounts are created as RENEWAL of the expiring policy. One PRF per renewal.
+   *
+   * @param companyId company
+   * @param draft PRF data (pre-filled from the expiring account)
+   * @param renewalRef renewal reference of the candidate
+   * @param renewalOf what the renewal renews (expiring ARN or legacy reference)
+   * @return the PRF
+   */
+  public ProposalRequest createForRenewal(
+      Long companyId, ProposalDraft draft, String renewalRef, String renewalOf) {
+    proposals
+        .findByRenewalRef(renewalRef)
+        .ifPresent(
+            p -> {
+              throw new BusinessRuleException(
+                  "PROPOSAL_RENEWAL_EXISTS",
+                  "Renewal " + renewalRef + " already has proposal request " + p.getPrfNo());
+            });
+    ProposalRequest proposal = create(companyId, draft);
+    proposal.linkRenewal(renewalRef, renewalOf);
+    audit.record(
+        ENTITY,
+        proposal.getPrfNo(),
+        AuditAction.UPDATE,
+        "PRF for the renewal " + renewalRef + " of " + renewalOf);
+    return proposal;
+  }
+
+  /**
    * Changes a PRF: Marketing while it is a draft, TSU while it is in the TSU queue (BRNB.007).
    *
    * @param id PRF
@@ -151,7 +183,8 @@ public class ProposalService {
             && currentUser.hasAuthority("TSU_PROCESS");
     if (!marketing && !tsu) {
       throw new BusinessRuleException(
-          "PRF_NOT_EDITABLE", "PRF " + p.getPrfNo() + " cannot be changed while " + p.getStatus());
+          "PRF_NOT_EDITABLE",
+          "PRF " + p.getPrfNo() + " cannot be changed while " + DisplayFormat.words(p.getStatus()));
     }
     if (!p.getProductCode().equals(draft.productCode())) {
       throw new BusinessRuleException("PRF_PRODUCT_FIXED", "The product of a PRF cannot change");

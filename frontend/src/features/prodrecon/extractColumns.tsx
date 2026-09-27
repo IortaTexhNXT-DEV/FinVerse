@@ -3,6 +3,7 @@ import type { Column } from '@/components/ui/DataTable';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { DownloadButton } from './ExtractParts';
 import type { ReconExtract } from './prodreconApi';
+import { displayNameOf } from '@/api/users';
 
 /** Columns of an extract list. */
 export function extractColumns(
@@ -31,7 +32,8 @@ export function extractColumns(
     {
       key: 'sent',
       header: 'Sent',
-      render: (e) => (e.sentAt ? `${formatDateTime(e.sentAt)} · ${e.sentBy ?? ''}` : 'Not sent'),
+      render: (e) =>
+        e.sentAt ? `${formatDateTime(e.sentAt)} · ${displayNameOf(e.sentBy)}` : 'Not sent',
     },
     {
       key: 'actions',

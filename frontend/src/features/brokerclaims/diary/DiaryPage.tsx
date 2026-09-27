@@ -16,6 +16,7 @@ import { formatDate } from '@/utils/format';
 import { CLAIMS_SECTION } from '../ClaimsPlaceholder';
 import { diaryApi } from './api';
 import type { DiaryItem } from './api';
+import { UserName } from '@/components/ui/UserName';
 
 type DiaryTabId = 'open' | 'all';
 
@@ -92,7 +93,7 @@ export default function DiaryPage() {
             },
             { key: 'type', header: 'Type', render: (d) => d.typeLabel },
             { key: 'text', header: 'Text', render: (d) => d.text },
-            { key: 'from', header: 'From', render: (d) => d.createdBy },
+            { key: 'from', header: 'From', render: (d) => <UserName login={d.createdBy} /> },
             { key: 'state', header: 'Status', render: (d) => <StatusBadge status={dueState(d)} /> },
             {
               key: 'act',

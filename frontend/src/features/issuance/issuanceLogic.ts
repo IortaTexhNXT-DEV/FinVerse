@@ -1,4 +1,5 @@
 import type { IssuanceCounts, IssuanceRow, IssuanceTab, Review } from '@/api/issuance';
+import { humanize } from '@/utils/format';
 
 /** Issuance Workbench tabs. */
 export const ISSUANCE_TABS: readonly { id: IssuanceTab; label: string }[] = [
@@ -62,4 +63,19 @@ export function addresses(text: string): string[] {
 /** Key of a workbench row: the e-policy on the e-policy tabs, else the account. */
 export function rowKeyOf(row: IssuanceRow): string {
   return row.epolicyId === undefined ? row.arn : String(row.epolicyId);
+}
+
+const MATCH_TEXTS: Record<string, string> = {
+  MANUAL: 'the account chosen at upload',
+  POLICY_NUMBER: 'the policy number',
+  FILE_NAME: 'the ARN in the file name',
+  CONTENT: 'the ARN printed in the document',
+};
+
+/** How an e-policy was matched to its account, as a phrase ("matched by the policy number"). */
+export function matchText(method: string | null | undefined): string {
+  if (!method) {
+    return '—';
+  }
+  return MATCH_TEXTS[method] ?? humanize(method).toLowerCase();
 }

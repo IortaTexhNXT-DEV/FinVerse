@@ -392,6 +392,19 @@ brokerverse:
     eb-item-followup-cron: ${BROKERVERSE_JOB_EB_ITEM_FOLLOWUP_CRON:0 0 23 * * *}
     # Expires franchise requests left without a decision after the TAT and the grace days, 06:30 PHT.
     eb-franchise-expiry-cron: ${BROKERVERSE_JOB_EB_FRANCHISE_EXPIRY_CRON:0 30 22 * * *}
+    # ---- Renewal (BRD-6), docs/architecture/RENEWAL_DESIGN.md section 9 (PHT = UTC+8) ----
+    # Extracts the policies expiring at the business date + RNW_EXTRACTION_LEAD_DAYS and runs the checks (BRRN.030), 01:00 PHT.
+    renewal-extraction-cron: ${BROKERVERSE_JOB_RENEWAL_EXTRACTION_CRON:0 0 17 * * *}
+    # Re-runs the checks of open renewals changed since the last run or within 30 days of expiry (BRRN.023), 01:30 PHT.
+    renewal-reevaluate-cron: ${BROKERVERSE_JOB_RENEWAL_REEVALUATE_CRON:0 30 17 * * *}
+    # NRNS flag and reminders, second-notice offers (BRRN.025/037), 06:00 PHT.
+    renewal-nrns-letters-cron: ${BROKERVERSE_JOB_RENEWAL_NRNS_LETTERS_CRON:0 0 22 * * *}
+    # Closes the renewals past expiry + RNW_NON_ACCEPTANCE_DAYS with the non-acceptance letter (BRRN.037), 00:15 PHT.
+    renewal-expiry-sweep-cron: ${BROKERVERSE_JOB_RENEWAL_EXPIRY_SWEEP_CRON:0 15 16 * * *}
+    # Delivery status of the renewal letters sent by e-mail (alert RNW_LETTER_FAILED), hourly.
+    renewal-letter-batch-cron: ${BROKERVERSE_JOB_RENEWAL_LETTER_BATCH_CRON:0 5 * * * *}
+    # Go-live take-over of the migrated policies expiring up to MIG_GOLIVE_RENEWAL_TO (DMQ37): run once from the cut-over runbook.
+    renewal-golive-extraction-cron: ${BROKERVERSE_JOB_RENEWAL_GOLIVE_EXTRACTION_CRON:-}
 
 management:
   health:

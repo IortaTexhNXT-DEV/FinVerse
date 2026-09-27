@@ -17,6 +17,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
+import { UserName } from '@/components/ui/UserName';
 
 function NewVersionModal({ code, onClose }: Readonly<{ code: string; onClose: () => void }>) {
   const companyId = useCompanyId();
@@ -132,7 +133,11 @@ export function ProductVersionsTab({ product }: Readonly<{ product: Product }>) 
           { key: 'r', header: 'Rate %', numeric: true, render: (v) => v.defaultRate ?? '' },
           { key: 'e', header: 'Package End', render: (v) => formatDate(v.packageEndDate) },
           { key: 'q', header: 'Request', render: (v) => v.sourceRequestNo ?? '' },
-          { key: 'v', header: 'Validated By', render: (v) => v.validatedBy ?? '' },
+          {
+            key: 'v',
+            header: 'Validated By',
+            render: (v) => <UserName login={v.validatedBy} empty="" />,
+          },
           { key: 'c', header: 'Change', render: (v) => v.changeSummary ?? '' },
         ]}
       />

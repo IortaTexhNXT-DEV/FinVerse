@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.productmaint.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageInsurerResponse;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageTerms.CoverageTerm;
 import java.math.BigDecimal;
@@ -65,6 +66,23 @@ public record ComparativeTable(int roundNo, List<String> fields, List<Row> rows)
       int roundNo,
       List<PackageInsurerResponse> responses,
       Function<String, List<CoverageTerm>> terms) {
+    return compile(roundNo, responses, terms, Function.identity());
+  }
+
+  /**
+   * Compiles the table of a round from its responses, naming the coverages as users read them.
+   *
+   * @param roundNo round
+   * @param responses responses of the round
+   * @param terms reads the coverage terms of a response (JSON)
+   * @param coverageName name of a coverage code of the request's line
+   * @return table with every field
+   */
+  public static ComparativeTable compile(
+      int roundNo,
+      List<PackageInsurerResponse> responses,
+      Function<String, List<CoverageTerm>> terms,
+      Function<String, String> coverageName) {
     BigDecimal lowest =
         responses.stream()
             .filter(r -> offered(r.getOutcome()))
@@ -79,12 +97,16 @@ public record ComparativeTable(int roundNo, List<String> fields, List<Row> rows)
                     .thenComparing(
                         PackageInsurerResponse::getRate,
                         Comparator.nullsLast(Comparator.naturalOrder())))
-            .map(r -> row(r, terms.apply(r.getTerms()), lowest))
+            .map(r -> row(r, terms.apply(r.getTerms()), lowest, coverageName))
             .toList();
     return new ComparativeTable(roundNo, List.copyOf(FIELDS.keySet()), rows);
   }
 
-  private static Row row(PackageInsurerResponse r, List<CoverageTerm> terms, BigDecimal lowest) {
+  private static Row row(
+      PackageInsurerResponse r,
+      List<CoverageTerm> terms,
+      BigDecimal lowest,
+      Function<String, String> coverageName) {
     return new Row(
         r.getInsurerCode(),
         r.getInsurerName(),
@@ -93,11 +115,11 @@ public record ComparativeTable(int roundNo, List<String> fields, List<Row> rows)
         r.getMinimumPremium(),
         terms.stream()
             .filter(CoverageTerm::included)
-            .map(ComparativeTable::coverage)
+            .map(t -> coverage(t, coverageName))
             .collect(Collectors.joining("; ")),
         terms.stream()
             .filter(t -> !deductible(t).isEmpty())
-            .map(t -> t.coverageCode() + ": " + deductible(t))
+            .map(t -> coverageName.apply(t.coverageCode()) + ": " + deductible(t))
             .collect(Collectors.joining("; ")),
         r.getConditions(),
         r.getValidUntil(),
@@ -118,10 +140,11 @@ public record ComparativeTable(int roundNo, List<String> fields, List<Row> rows)
     return outcome != null && !NOT_OFFERED.contains(outcome);
   }
 
-  private static String coverage(CoverageTerm t) {
+  private static String coverage(CoverageTerm t, Function<String, String> coverageName) {
+    String name = coverageName.apply(t.coverageCode());
     return t.limitAmount() == null
-        ? t.coverageCode()
-        : t.coverageCode() + " (" + PackageDocuments.money(t.limitAmount()) + ")";
+        ? name
+        : name + " (" + PackageDocuments.money(t.limitAmount()) + ")";
   }
 
   /**
@@ -233,7 +256,7 @@ public record ComparativeTable(int roundNo, List<String> fields, List<Row> rows)
      */
     public String value(String field) {
       return switch (field) {
-        case "OUTCOME" -> outcome;
+        case "OUTCOME" -> outcomeText(outcome);
         case "RATE" -> PackageDocuments.text(rate);
         case "MINIMUM_PREMIUM" -> PackageDocuments.money(minimumPremium);
         case "COVERAGES" -> PackageDocuments.text(coverages);
@@ -243,6 +266,12 @@ public record ComparativeTable(int roundNo, List<String> fields, List<Row> rows)
         default -> PackageDocuments.text(remarks);
       };
     }
+  }
+
+  /** An insurer's outcome in words: APPROVED_WITH_CHANGES becomes "Approved with changes". */
+  static String outcomeText(String outcome) {
+    String words = DisplayFormat.words(outcome);
+    return words.isEmpty() ? words : Character.toUpperCase(words.charAt(0)) + words.substring(1);
   }
 
   /**

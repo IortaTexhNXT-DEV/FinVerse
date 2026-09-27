@@ -376,6 +376,7 @@ def role_grants(include_seed: bool = True) -> dict[str, set[str]]:
                    (list((DB_ROOT / "seed").glob("V*.sql")) if include_seed else []), key=_version)
     roles: dict[str, set[str]] = {}
     unread: list[str] = []
+    temp: dict[str, list[str]] = {}  # temporary permission lists of a migration (insert into tmp_x values ...)
     for f in files:
         text = re.sub(r"--[^\n]*", "", f.read_text(encoding="utf-8"))
         for stmt in text.split(";"):
@@ -384,7 +385,42 @@ def role_grants(include_seed: bool = True) -> dict[str, set[str]]:
             for m in re.finditer(r"insert into sec_role \(code[^)]*\) values (.*)", s, re.I):
                 for code in re.findall(r"\(\s*'([A-Z][A-Z0-9_]*)'", m.group(1)):
                     roles.setdefault(code, set())
+            tmp = re.match(r"insert into (tmp_\w+) \(permission\) values (.*)", s, re.I)
+            if tmp:
+                temp[tmp.group(1).lower()] = _codes(tmp.group(2))
+                continue
+            # Derived roles: insert into sec_role (code, ...) select '<PREFIX>' || r.code ... where r.code in (...)
+            derived = re.match(r"insert into sec_role \(code[^)]*\) select '([A-Z0-9_]+)' \|\| r\.code .* where "
+                               r"r\.code in (\([^)]*\))", s, re.I)
+            if derived:
+                for code in _codes(derived.group(2)):
+                    roles.setdefault(derived.group(1) + code, set())
+                continue
             if "sec_role_permission" not in low or low.startswith("create table"):
+                continue
+            if low.startswith("insert into") and not low.startswith("insert into sec_role_permission"):
+                continue  # only reads the grants (for example the access change log)
+            using = re.match(r"delete from sec_role_permission p using sec_role r where r\.id = p\.role_id and "
+                             r"r\.code not in (\([^)]*\)) and p\.permission in \(select permission from (tmp_\w+)\)",
+                             s, re.I)
+            if using:
+                keep = set(_codes(using.group(1)))
+                for r, ps in roles.items():
+                    if r not in keep:
+                        ps.difference_update(temp.get(using.group(2).lower(), []))
+                continue
+            prefixed = re.search(r"join sec_role s on s\.code = '([A-Z0-9_]+)' \|\| (r\.code|g\.role_code)", s, re.I)
+            if prefixed and low.startswith("insert into sec_role_permission"):
+                prefix = prefixed.group(1)
+                if prefixed.group(2).lower() == "r.code":
+                    where = re.search(r"where r\.code in (\([^)]*\))", s, re.I)
+                    for code in _codes(where.group(1)) if where else []:
+                        roles.setdefault(prefix + code, set()).update(roles.get(code, set()))
+                else:
+                    pairs = re.search(r"from \(values (.*?)\) as g\(role_code, permission\)", s, re.I)
+                    for r, p in re.findall(r"\('([A-Z][A-Z0-9_]*)',\s*'([A-Z][A-Z0-9_]*)'\)",
+                                           pairs.group(1) if pairs else ""):
+                        roles.setdefault(prefix + r, set()).add(p)
                 continue
             if low.startswith("delete from sec_role_permission"):
                 perms = _codes(re.search(r"permission\s*(?:=|in)\s*(\([^)]*\)|'[^']*')", s, re.I).group(1))
@@ -897,7 +933,10 @@ def jsx_text(chunk: str) -> str:
             continue
         out.append(ch)
         i += 1
-    text = re.sub(r"<[^<>]*>", " ", "".join(out))
+    joined = "".join(out)
+    # Components that render a value in the text (the user name of a login) read as that value.
+    joined = re.sub(r"<UserName\b[^<>]*/>", "\u27e8user\u27e9", joined)
+    text = re.sub(r"<[^<>]*>", " ", joined)
     text = text.replace("\u27e8", "<").replace("\u27e9", ">").replace("&nbsp;", " ")
     return " ".join(text.split())
 
@@ -908,7 +947,11 @@ def frontend_messages(dirs: Iterable[str]) -> list[UiMessage]:
     out: list[UiMessage] = []
     root = REPO / "frontend" / "src"
     for d in dirs:
-        for p in sorted((root / d).rglob("*.ts*")):
+        base = root / d
+        # A folder is read with its sub-folders; a single file (features/nbadmin/LovPage.tsx) is read on its own
+        # (Path.rglob of a file yields nothing before Python 3.13).
+        candidates = [base] if base.is_file() else sorted(base.rglob("*.ts*"))
+        for p in candidates:
             if re.search(r"\.(test|spec)\.tsx?$", p.name) or p.name == "help.ts":
                 continue
             raw = p.read_text(encoding="utf-8")
@@ -947,6 +990,14 @@ def frontend_messages(dirs: Iterable[str]) -> list[UiMessage]:
                 add(_ts_text(m.group(1)), "Confirmation", m.start(), "done")
             for m in re.finditer(r'emptyMessage="([^"]+)"', text):
                 add(m.group(1), "Information", m.start(), "empty list")
+            # Form checks written as require(ok, 'field', 'message'): the message is the last argument.
+            for m in re.finditer(r"\brequire\(", text):
+                args = split_top(text[m.end():matching(text, m.end() - 1)])
+                if len(args) >= 2:
+                    add(_ts_text(args[-1]), "Validation", m.start(), "require")
+            # Inline field errors: error={condition ? 'message' : undefined}.
+            for m in re.finditer(r"\berror=\{[^{}?]*\?\s*(`[^`]*`|'[^']*'|\"[^\"]*\")\s*:", text):
+                add(_ts_text(m.group(1)), "Validation", m.start(), "field error")
     seen: set[tuple[str, str]] = set()
     unique = []
     for u in out:

@@ -1,7 +1,9 @@
 package com.iortatechnxt.brokerverse.quotation.service;
 
 import com.iortatechnxt.brokerverse.account.domain.AccountPremium;
+import com.iortatechnxt.brokerverse.catalog.service.CatalogNames;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -17,12 +19,12 @@ import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.quotation.domain.Quotation;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationContent;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationItem;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import org.springframework.stereotype.Component;
 
@@ -50,6 +52,8 @@ public class QuotationDocuments {
   private final DocTemplateService templates;
   private final OrganizationService organization;
   private final QuotationVersions versions;
+  private final CatalogNames names;
+  private final UserDirectory users;
   private final Clock clock;
 
   /**
@@ -59,6 +63,8 @@ public class QuotationDocuments {
    * @param templates document templates
    * @param organization companies (letterhead)
    * @param versions version store
+   * @param names product, line and insurer names
+   * @param users user names (signatures)
    * @param clock clock
    */
   public QuotationDocuments(
@@ -66,11 +72,15 @@ public class QuotationDocuments {
       DocTemplateService templates,
       OrganizationService organization,
       QuotationVersions versions,
+      CatalogNames names,
+      UserDirectory users,
       Clock clock) {
     this.composer = composer;
     this.templates = templates;
     this.organization = organization;
     this.versions = versions;
+    this.names = names;
+    this.users = users;
     this.clock = clock;
   }
 
@@ -113,8 +123,8 @@ public class QuotationDocuments {
             Map.of(
                 "clientName", q.getClientName(),
                 "reference", q.getQuotationNo(),
-                "productName", q.getProductCode(),
-                "validUntil", String.valueOf(c.validUntil())));
+                "productName", names.productName(q.getProductCode()),
+                "validUntil", DisplayFormat.date(c.validUntil())));
     MergedText terms = templates.merge(TERMS, today, Map.of());
     List<Section> sections = new ArrayList<>();
     sections.add(new Text(null, letter.text()));
@@ -136,24 +146,31 @@ public class QuotationDocuments {
             "Insurance Quotation",
             q.getQuotationNo() + " / " + q.getArn(),
             sections,
-            List.of("Prepared by", "Approved by"),
-            q.getTemplateVersion()
-                + " / "
-                + terms.versionTag()
-                + " / version "
-                + q.getCurrentVersion()));
+            List.of(
+                DocumentSpec.signature("Prepared by", users.displayName(maker(q))),
+                DocumentSpec.signature("Approved by", users.displayName(q.getApprovedBy()))),
+            letter.versionLabel() + " | Quotation version " + q.getCurrentVersion()));
   }
 
-  private static List<Field> header(Quotation q, QuotationContent c) {
+  /** The maker of the quotation: who submitted it, else who created it. */
+  private static String maker(Quotation q) {
+    return q.getSubmittedBy() != null ? q.getSubmittedBy() : q.getCreatedBy();
+  }
+
+  private List<Field> header(Quotation q, QuotationContent c) {
     return List.of(
         new Field("Quotation no.", q.getQuotationNo()),
         new Field("ARN", q.getArn()),
         new Field("Version", String.valueOf(q.getCurrentVersion())),
         new Field("Client", q.getClientCode() + " - " + q.getClientName()),
-        new Field("Product", q.getProductCode()),
-        new Field("Insurer", c.insurerCode() == null ? "To be advised" : c.insurerCode()),
-        new Field("Period", c.periodFrom() + " to " + c.periodTo()),
-        new Field("Valid until", String.valueOf(c.validUntil())),
+        new Field("Product", names.product(q.getProductCode())),
+        new Field(
+            "Insurer",
+            c.insurerCode() == null
+                ? "To be advised"
+                : names.insurer(q.getCompanyId(), c.insurerCode())),
+        new Field("Period", DisplayFormat.period(c.periodFrom(), c.periodTo())),
+        new Field("Valid until", DisplayFormat.date(c.validUntil())),
         new Field("Premium payment", c.directPayment() ? "Directly to the insurer" : "Via BDOI"));
   }
 
@@ -167,7 +184,7 @@ public class QuotationDocuments {
               String.valueOf(i.riskGroup()),
               QuotationPricing.label(i.data()),
               money(QuotationPricing.sumInsured(i.data())),
-              i.ratePercent() == null ? "" : i.ratePercent().stripTrailingZeros().toPlainString(),
+              DisplayFormat.rate(i.ratePercent()),
               money(i.premium())));
     }
     return rows;
@@ -224,6 +241,6 @@ public class QuotationDocuments {
    * @return text
    */
   static String money(BigDecimal amount) {
-    return amount == null ? "" : String.format(Locale.ROOT, "%,.2f", amount);
+    return DisplayFormat.amount(amount);
   }
 }

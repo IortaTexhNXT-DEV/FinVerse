@@ -12,11 +12,14 @@ import { DataTable } from '@/components/ui/DataTable';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
+import { CoverTypeLabel, LineLabel, LovLabel, LovLabels } from '@/components/broking/LovLabel';
 import { typeLabel } from './packageRequest';
+import { UserName } from '@/components/ui/UserName';
+import { displayNameOf } from '@/api/users';
 
 function step(by: string | undefined, at: string | undefined): string {
-  return by === undefined ? '—' : `${by} · ${formatDateTime(at)}`;
+  return by === undefined ? '—' : `${displayNameOf(by)} · ${formatDateTime(at)}`;
 }
 
 /** Request header, recommendation and who did what (BRPM.008/009/024). */
@@ -34,13 +37,16 @@ export function DetailsTab({ request: p }: Readonly<{ request: PackageRequest }>
           <dd>{p.clientName === undefined ? '—' : `${p.clientCode ?? ''} – ${p.clientName}`}</dd>
           <dt>Line / cover type</dt>
           <dd>
-            {p.lineCode} / {p.coverTypeCode === undefined ? '—' : humanize(p.coverTypeCode)}
+            <LineLabel code={p.lineCode} /> /{' '}
+            <CoverTypeLabel line={p.lineCode} code={p.coverTypeCode} />
           </dd>
           <dt>Market segments</dt>
-          <dd>{p.marketSegments.join(', ') || '—'}</dd>
+          <dd>
+            <LovLabels type="MARKET_SEGMENT" codes={p.marketSegments} />
+          </dd>
           <dt>Reason</dt>
           <dd>
-            {humanize(p.reason)}
+            <LovLabel type="PKG_REQUEST_REASON" code={p.reason} />
             {p.reasonNote && ` – ${p.reasonNote}`}
           </dd>
           <dt>Negotiation</dt>
@@ -86,7 +92,10 @@ export function SetupTab({ request: p }: Readonly<{ request: PackageRequest }>) 
     <Card title="Catalog version">
       <dl className="detail-list">
         <dt>Product</dt>
-        <dd className="mono">{p.productCode}</dd>
+        <dd>
+          <span className="mono">{p.productCode}</span>
+          {` – ${p.title}`}
+        </dd>
         <dt>Version</dt>
         <dd>{p.resultingVersionNo}</dd>
         <dt>Request stage</dt>
@@ -95,7 +104,7 @@ export function SetupTab({ request: p }: Readonly<{ request: PackageRequest }>) 
         </dd>
       </dl>
       <p className="muted">
-        MBS completes the draft version and submits it for validation; a PRODUCT_VALIDATE holder
+        MBS completes the draft version and submits it for validation; a user who validates products
         (never the maker) validates and releases it, which releases this request.
       </p>
       <Link
@@ -110,7 +119,7 @@ export function SetupTab({ request: p }: Readonly<{ request: PackageRequest }>) 
 
 const HISTORY_COLUMNS: Column<ResponseHistory>[] = [
   { key: 'at', header: 'Changed', render: (h) => formatDateTime(h.changedAt) },
-  { key: 'by', header: 'By', render: (h) => h.changedBy },
+  { key: 'by', header: 'By', render: (h) => <UserName login={h.changedBy} /> },
   { key: 'rev', header: 'Rev.', numeric: true, render: (h) => h.revision },
   { key: 'outcome', header: 'Outcome', render: (h) => <StatusBadge status={h.outcome} /> },
   { key: 'rate', header: 'Rate %', numeric: true, render: (h) => h.rate ?? '—' },

@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.productmaint.domain.PackageTerms.CoverageTer
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageTerms.Dates;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageTerms.InsurerLine;
 import com.iortatechnxt.brokerverse.productmaint.domain.PackageTerms.Scheme;
+import com.iortatechnxt.brokerverse.productmaint.domain.RequestStage;
 import com.iortatechnxt.brokerverse.productmaint.service.ComparativeTable.Selection;
 import com.iortatechnxt.brokerverse.productmaint.service.VersionTerms.SetupFacts;
 import java.math.BigDecimal;
@@ -82,15 +83,39 @@ class PackageLogicTest {
     assertThat(client.headers()).containsExactly("Insurer", "Rate %", "Remarks");
     assertThat(client.cells()).containsExactly(List.of("A Insurance", "0.40", "rem"));
     assertThat(t.select(Selection.ALL).rows()).hasSize(4);
-    assertThat(t.rows().get(1).value("VALID_UNTIL")).isEqualTo("2027-01-01");
+    assertThat(t.rows().get(1).value("VALID_UNTIL")).isEqualTo("01-Jan-2027");
     assertThat(t.rows().get(1).value("MINIMUM_PREMIUM")).isEmpty();
     assertThat(t.rows().get(1).value("CONDITIONS")).isEqualTo("cond");
-    assertThat(t.rows().get(1).value("OUTCOME")).isEqualTo("APPROVED_WITH_CHANGES");
+    assertThat(t.rows().get(1).value("OUTCOME")).isEqualTo("Approved with changes");
     assertThatThrownBy(() -> t.select(new Selection(List.of("PREMIUM"), List.of())))
         .extracting("code")
         .isEqualTo("COMPARATIVE_FIELD_UNKNOWN");
     assertThat(ComparativeTable.offered("NO_RESPONSE")).isFalse();
     assertThat(ComparativeTable.offered(null)).isFalse();
+  }
+
+  @Test
+  void theComparativeNamesTheCoveragesAsUsersReadThem() {
+    ComparativeTable t =
+        ComparativeTable.compile(
+            1,
+            List.of(response("A", "ACCEPTED_AS_REQUESTED", "0.40")),
+            json -> List.of(OWN_DAMAGE),
+            code -> "OWN_DAMAGE".equals(code) ? "Own damage" : code);
+    assertThat(t.rows().get(0).coverages()).isEqualTo("Own damage (1,000,000.00)");
+    assertThat(t.rows().get(0).deductibles()).isEqualTo("Own damage: each claim / 3,000.00 / 0.5%");
+    assertThat(t.cells().get(0)).noneMatch(cell -> cell.contains("OWN_DAMAGE"));
+  }
+
+  @Test
+  void insurerRolesAndStagesAreShownInWords() {
+    assertThat(PackageDocuments.roleLabel(PackageInsurerRole.LEAD)).isEqualTo("Lead");
+    assertThat(PackageDocuments.roleLabel(PackageInsurerRole.PARTICIPANT)).isEqualTo("Participant");
+    assertThat(PackageDocuments.roleLabel(null)).isEqualTo("Panel");
+    assertThat(RequestStage.FOR_MKT_APPROVAL.label()).isEqualTo("For Marketing approval");
+    for (RequestStage stage : RequestStage.values()) {
+      assertThat(stage.label()).doesNotContain("_").isNotEqualTo(stage.name());
+    }
   }
 
   @Test

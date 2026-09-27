@@ -15,9 +15,10 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { DetailList } from '@/features/catalog/DetailList';
-import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { formatDate, formatDateTime, humanize, versionLabel } from '@/utils/format';
 import { PremiumCard } from './PremiumBreakdown';
 import { displayNameOf } from '@/api/users';
+import { LovLabel, ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
 
 /** Details: client, product, terms and the workflow facts of the quotation. */
 export function DetailsTab({ quotation: q }: Readonly<{ quotation: Quotation }>) {
@@ -31,12 +32,19 @@ export function DetailsTab({ quotation: q }: Readonly<{ quotation: Quotation }>)
             ['ARN', q.arn],
             ['Client', `${q.clientCode} – ${q.clientName}`],
             ['Client e-mail', q.clientEmail],
-            ['Product', `${q.productCode} (${q.lineCode})`],
-            ['Market segment', q.marketSegment],
-            ['Source channel', q.sourceChannel],
+            ['Product', <ProductLineLabel key="p" product={q.productCode} line={q.lineCode} />],
+            ['Market segment', <LovLabel key="m" type="MARKET_SEGMENT" code={q.marketSegment} />],
+            ['Source channel', <LovLabel key="s" type="SOURCE_CHANNEL" code={q.sourceChannel} />],
             [
               'Insurer',
-              [c.insurerCode, c.insurerBranch].filter(Boolean).join(' / ') || 'To be advised',
+              c.insurerCode ? (
+                <span key="i">
+                  <InsurerName code={c.insurerCode} />
+                  {c.insurerBranch ? ` / ${c.insurerBranch}` : ''}
+                </span>
+              ) : (
+                'To be advised'
+              ),
             ],
             ['Period', `${formatDate(c.periodFrom)} to ${formatDate(c.periodTo)}`],
             ['Valid until', formatDate(c.validUntil)],
@@ -48,7 +56,7 @@ export function DetailsTab({ quotation: q }: Readonly<{ quotation: Quotation }>)
       <Card title="Control">
         <DetailList
           rows={[
-            ['Intake template', q.templateVersion],
+            ['Intake template', versionLabel(q.templateVersion)],
             ['Version', `${q.currentVersion}${q.versionOpen ? ' (open)' : ' (submitted)'}`],
             ['Created', `${displayNameOf(q.createdBy)} ${formatDateTime(q.createdAt)}`],
             [

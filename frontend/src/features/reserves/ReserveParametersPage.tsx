@@ -18,6 +18,7 @@ import { NEW_PARAMETERS } from './reserveMath';
 import type { ParameterForm } from './reserveMath';
 import { TakafulSettingsCard } from './TakafulSettingsCard';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { UserName } from '@/components/ui/UserName';
 
 function method(p: ReserveParameter): string {
   return p.ibnrMethod === 'RATE'
@@ -45,7 +46,7 @@ export default function ReserveParametersPage() {
     onSuccess: async (p) => {
       await queryClient.invalidateQueries({ queryKey: ['reserve-parameters'] });
       toast.success(
-        `Parameters ${p.businessLine} from ${p.effectiveFrom}: ${humanize(p.recordStatus)}`,
+        `Parameters ${p.businessLine} from ${formatDate(p.effectiveFrom)}: ${humanize(p.recordStatus)}`,
       );
     },
   });
@@ -91,7 +92,7 @@ export default function ReserveParametersPage() {
               render: (p) => `${p.treatyCommissionPct} / ${p.facCommissionPct}`,
             },
             { key: 's', header: 'Status', render: (p) => <StatusBadge status={p.recordStatus} /> },
-            { key: 'k', header: 'Maker', render: (p) => p.maker },
+            { key: 'k', header: 'Maker', render: (p) => <UserName login={p.maker} /> },
             {
               key: 'x',
               header: 'Actions',

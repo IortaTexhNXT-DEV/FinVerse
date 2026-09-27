@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.booking.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -178,7 +179,8 @@ public class BookedInvoice extends BaseEntity {
       String number, LocalDate date, BookingSource bookingSource, String user, Instant when) {
     if (status != InvoiceStatus.SCHEDULED) {
       throw new BusinessRuleException(
-          "INVOICE_ALREADY_BOOKED", "Invoice " + arn + "/" + transactionNo + " is " + status);
+          "INVOICE_ALREADY_BOOKED",
+          "Invoice " + arn + "/" + transactionNo + " is " + DisplayFormat.words(status));
     }
     this.invoiceNo = number;
     // Endorsements and cancellations always name the original booking as parent (DIS 3.27.2)

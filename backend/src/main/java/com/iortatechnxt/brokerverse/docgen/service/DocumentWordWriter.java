@@ -46,10 +46,10 @@ final class DocumentWordWriter {
   static byte[] write(DocumentSpec spec, LocalDate date) {
     BrandedDocx docx = new BrandedDocx(Page.A4_PORTRAIT, spec.title());
     docx.pageHeader(spec.companyName());
-    docx.pageFooter(spec.footer(), "");
+    docx.pageFooter(DocumentText.pageFooter(spec), "");
     docx.paragraph(spec.title(), TextStyle.TITLE);
     if (spec.reference() != null) {
-      docx.paragraph("Reference: " + spec.reference() + "    Date: " + date, TextStyle.META);
+      docx.paragraph(DocumentText.referenceLine(spec, date), TextStyle.META);
     }
     for (Section section : spec.sections()) {
       switch (section) {

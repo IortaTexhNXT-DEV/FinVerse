@@ -14,6 +14,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
 import { displayNameOf } from '@/api/users';
+import { LovLabel, LineLabel } from '@/components/broking/LovLabel';
 
 function ClientConfirmationDialog({
   gate,
@@ -129,7 +130,8 @@ export function GatePanel({ gate, onChanged }: Readonly<{ gate: Gate; onChanged:
           </dd>
           <dt>Segment / line</dt>
           <dd>
-            {gate.marketSegment ?? '—'} / {humanize(gate.lineCode)}
+            <LovLabel type="MARKET_SEGMENT" code={gate.marketSegment} /> /{' '}
+            <LineLabel code={gate.lineCode} />
           </dd>
         </dl>
         {gate.rule === 'PAYMENT_MATCHED' && gate.status === 'AWAITING_PAYMENT' && (

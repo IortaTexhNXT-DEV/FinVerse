@@ -16,7 +16,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
-import { formatDate, humanize } from '@/utils/format';
+import { formatDate, humanize, statusPhrase } from '@/utils/format';
 import { DetailList } from './DetailList';
 import type { DetailRow } from './DetailList';
 import { ProductEditorModal } from './ProductEditorModal';
@@ -25,6 +25,7 @@ import { productFormOf } from './productForm';
 import { RecordActions } from './RecordActions';
 import { RuleEditorModal } from './RuleEditorModal';
 import type { RuleKind } from './RuleEditorModal';
+import { CoverTypeLabel, LovLabel, LovLabels } from '@/components/broking/LovLabel';
 
 const yes = (flag: boolean) => (flag ? 'Yes' : 'No');
 
@@ -42,14 +43,17 @@ const PRODUCT_AUTHORIZERS = ['MASTER_AUTHORIZE', 'PRODUCT_AUTHORIZE'] as const;
 function Attributes({ detail }: Readonly<{ detail: ProductDetail }>) {
   const p = detail.product;
   const rows: DetailRow[] = [
-    ['Line', `${p.lineCode} – ${detail.lineName}`],
-    ['Cover type', p.coverTypeCode ?? '–'],
+    ['Line', detail.lineName],
+    ['Cover type', <CoverTypeLabel key="ct" line={p.lineCode} code={p.coverTypeCode} empty="–" />],
     ['Risk items', humanize(detail.riskItemKind)],
     ['Rating', humanize(detail.ratingMethod)],
     ['Package', yes(p.packaged)],
     ['Package TSI limit', p.maxSumInsured ? <Amount value={p.maxSumInsured} /> : '–'],
     ['Fleet', yes(p.fleetCapable)],
-    ['Market segments', p.marketSegments.length ? p.marketSegments.join(', ') : 'All'],
+    [
+      'Market segments',
+      <LovLabels key="ms" type="MARKET_SEGMENT" codes={p.marketSegments} empty="All" />,
+    ],
     ['Mortgage related', yes(p.mortgageApplicable)],
     ['Direct payment allowed', yes(p.directPaymentEligible)],
     ['Multi-year', p.multiYearAllowed ? `Up to ${p.maxTermYears} years` : 'No'],
@@ -118,7 +122,9 @@ function Rules({ detail, maintain }: Readonly<{ detail: ProductDetail; maintain:
         ) : (
           <ul>
             {detail.requiredDocuments.map((t) => (
-              <li key={t}>{humanize(t)}</li>
+              <li key={t}>
+                <LovLabel type="DOCUMENT_TYPE" code={t} />
+              </li>
             ))}
           </ul>
         )}
@@ -153,7 +159,7 @@ function Summary({ detail }: Readonly<{ detail: ProductDetail }>) {
             {p.packaged && <span className="tag">Package</span>}
             {p.openVersionStatus && (
               <span className="tag">
-                Version {p.openVersionNo} {humanize(p.openVersionStatus)}
+                Version {p.openVersionNo} {statusPhrase(p.openVersionStatus)}
               </span>
             )}
           </>
@@ -163,7 +169,12 @@ function Summary({ detail }: Readonly<{ detail: ProductDetail }>) {
         {
           icon: Layers,
           label: 'Line › Type',
-          value: `${detail.lineName} › ${p.coverTypeCode ?? '–'}`,
+          value: (
+            <>
+              {detail.lineName} ›{' '}
+              <CoverTypeLabel line={p.lineCode} code={p.coverTypeCode} empty="–" />
+            </>
+          ),
         },
         {
           icon: Package,

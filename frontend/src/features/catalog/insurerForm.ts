@@ -5,3 +5,11 @@ export function splitEmails(text: string): string[] {
     .map((e) => e.trim())
     .filter((e) => e !== '');
 }
+
+/** Placement channels of an insurer with their labels. */
+export const PLACEMENT_CHANNELS = [{ value: 'EMAIL', label: 'E-mail' }];
+
+/** The label of an insurer's placement channel. */
+export function placementChannelLabel(code: string | undefined): string {
+  return PLACEMENT_CHANNELS.find((c) => c.value === code)?.label ?? code ?? '';
+}

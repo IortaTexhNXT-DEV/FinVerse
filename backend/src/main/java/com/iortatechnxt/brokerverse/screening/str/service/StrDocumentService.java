@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.screening.cases.service.CaseDocumentService;
 import com.iortatechnxt.brokerverse.screening.config.service.ReviewTemplate;
 import com.iortatechnxt.brokerverse.screening.str.domain.StrTransaction.Line;
 import com.iortatechnxt.brokerverse.screening.str.domain.SuspiciousTransactionReport;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ public class StrDocumentService {
   private final OrganizationDirectory organizations;
   private final DocumentComposer composer;
   private final AuditTrailService audit;
+  private final UserDirectory users;
 
   /**
    * Creates the service.
@@ -48,6 +50,7 @@ public class StrDocumentService {
    * @param organizations company names
    * @param composer document composer
    * @param audit audit trail
+   * @param users user names
    */
   public StrDocumentService(
       StrService strs,
@@ -55,13 +58,15 @@ public class StrDocumentService {
       CaseDocumentService documents,
       OrganizationDirectory organizations,
       DocumentComposer composer,
-      AuditTrailService audit) {
+      AuditTrailService audit,
+      UserDirectory users) {
     this.strs = strs;
     this.cases = cases;
     this.documents = documents;
     this.organizations = organizations;
     this.composer = composer;
     this.audit = audit;
+    this.users = users;
   }
 
   /**
@@ -128,8 +133,9 @@ public class StrDocumentService {
             List.of(
                 field("Committee decision", Objects.toString(c.getCommitteeDecision(), "-")),
                 field("Decided at", Objects.toString(c.getCommitteeDecidedAt(), "-")),
-                field("Prepared by", str.getCreatedBy()),
-                field("Marked ready by", Objects.toString(str.getReadyBy(), "-")),
+                field("Prepared by", users.displayName(str.getCreatedBy())),
+                field(
+                    "Marked ready by", Objects.toString(users.displayName(str.getReadyBy()), "-")),
                 field("AMLC reference", Objects.toString(str.getAmlcReference(), "-")))));
     return new DocumentSpec(
         organizations.company(str.getCompanyId()).name(),

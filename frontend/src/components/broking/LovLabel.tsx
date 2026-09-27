@@ -1,19 +1,92 @@
-import { useQuery } from '@tanstack/react-query';
-import { lovApi } from '@/api/lov';
-import { humanize } from '@/utils/format';
+import {
+  useCoverTypeName,
+  useCoverageName,
+  useInsurerName,
+  useLineName,
+  useLovLabel,
+} from './useLabels';
 
 interface LovLabelProps {
   /** List of values the code belongs to (e.g. SOURCE_CHANNEL). */
   type: string;
-  code: string;
+  code: string | null | undefined;
+  /** Text when there is no code. */
+  empty?: string;
 }
 
 /** The label of a list-of-values code (never the code itself); the humanized code while loading. */
-export function LovLabel({ type, code }: Readonly<LovLabelProps>) {
-  const options = useQuery({
-    queryKey: ['lov', type],
-    queryFn: () => lovApi.options(type),
-    staleTime: 5 * 60_000,
-  });
-  return <>{options.data?.find((o) => o.code === code)?.label ?? humanize(code)}</>;
+export function LovLabel({ type, code, empty = '—' }: Readonly<LovLabelProps>) {
+  const label = useLovLabel(type);
+  if (!code) {
+    return <span className="muted">{empty}</span>;
+  }
+  return <>{label(code)}</>;
+}
+
+/** Labels of several codes of one list, comma separated; the given text when there is none. */
+export function LovLabels({
+  type,
+  codes,
+  empty = '—',
+}: Readonly<{ type: string; codes: readonly string[]; empty?: string }>) {
+  const label = useLovLabel(type);
+  return <>{codes.length > 0 ? codes.map((c) => label(c)).join(', ') : empty}</>;
+}
+
+/** The name of a product line (e.g. "Personal Accident"), never its code. */
+export function LineLabel({ code }: Readonly<{ code: string | null | undefined }>) {
+  const name = useLineName();
+  return <>{name(code)}</>;
+}
+
+/** "CAR00 (Engineering)": a product code with the name of its line. */
+export function ProductLineLabel({
+  product,
+  line,
+}: Readonly<{ product: string; line: string | null | undefined }>) {
+  const name = useLineName();
+  return <>{line ? `${product} (${name(line)})` : product}</>;
+}
+
+/** The name of an insurer, from its party code (the code while the list loads). */
+export function InsurerName({
+  code,
+  empty = '—',
+}: Readonly<{ code: string | null | undefined; empty?: string }>) {
+  const name = useInsurerName();
+  if (!code) {
+    return <span className="muted">{empty}</span>;
+  }
+  return <>{name(code)}</>;
+}
+
+/** Names of several insurers, comma separated; the given text when there is none. */
+export function InsurerNames({
+  codes,
+  empty = '—',
+}: Readonly<{ codes: readonly string[]; empty?: string }>) {
+  const name = useInsurerName();
+  return <>{codes.length > 0 ? codes.map((c) => name(c)).join(', ') : empty}</>;
+}
+
+/** The name of a cover type of a line (e.g. "Comprehensive"), never its code. */
+export function CoverTypeLabel({
+  line,
+  code,
+  empty = '—',
+}: Readonly<{ line?: string | null; code: string | null | undefined; empty?: string }>) {
+  const name = useCoverTypeName();
+  if (!code) {
+    return <span className="muted">{empty}</span>;
+  }
+  return <>{name(line, code)}</>;
+}
+
+/** The name of a coverage or peril of a line (e.g. "Fire and Lightning"), never its code. */
+export function CoverageName({
+  line,
+  code,
+}: Readonly<{ line: string | null | undefined; code: string }>) {
+  const name = useCoverageName(line);
+  return <>{name(code)}</>;
 }

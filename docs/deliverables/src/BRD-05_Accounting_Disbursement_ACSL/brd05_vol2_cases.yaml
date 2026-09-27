@@ -1,8 +1,8 @@
 # Test plan BRD-5 Volume 2 (Disbursement, Payment Requests and ACSL) - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-05_Accounting_Disbursement_ACSL/brd05_vol2_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# Messages and codes are the ones BIBS returns (backend/src/main: disbursement, payrequest, acsl,
-# remittance, tax, organization); labels are those of frontend/src/features.
+# Messages and codes are the ones BIBS shows on the Disbursement, Payment Requests and ACSL screens; labels
+# are those of the screens.
 
 meta:
   brd: BRD-05
@@ -1742,8 +1742,8 @@ frs:
     persona: DISBURSEMENT
     screen: DREP
     conditions:
-      - CPC2 amounts are on the batch, payment request and schedule until the report is built (gap G4).
-      - The CPC2 report is not offered.
+      - The CPC2 of each line (code, rate, amount, VAT) is shown on the batch and its payment request.
+      - The CPC2 report lists the CPC2 lines of a period and its total agrees with the CPC2 income in the ledger.
     cases:
       - c: 1
         type: Positive
@@ -1754,11 +1754,18 @@ frs:
           - Open the batch of FR-DS-090 and its payment request.
         expected: Code, rate, amount and VAT of CPC2 per line are shown.
       - c: 2
-        type: Negative
-        title: DSB-CPC2-INCENTIVE not offered (gap G4)
+        type: Report-output
+        title: CPC2 report of the month
         steps:
-          - Look for the CPC2 report in Disbursement Reports.
-        expected: The report is not listed; the case is re-run when the report is built.
+          - Run the CPC2 report in Disbursement Reports for September; export it to Excel.
+        expected: Every CPC2 line of the September batches is listed with user, product, code, rate, amount and VAT; the total equals the CPC2 income posted in September.
+      - c: 2
+        type: Negative
+        title: CPC2 report without the period
+        steps:
+          - Run the CPC2 report with the period blank.
+        expected: The report does not run.
+        msg: ["Parameter <name> is required", MISSING_PARAMETER]
 
   FR-DS-093:
     scenario: SC-DPA-06
@@ -2597,21 +2604,22 @@ frs:
     persona: ACSL_PROCESSOR
     screen: REPORTS
     conditions:
-      - Until the ACSL aging reports are built (gap G3) the Volume 1 account schedules and the GL-SL reconciliation give the balances and differences.
-      - The ACSL aging reports are not offered.
+      - The ACSL aging report of an account family ages the open items per party, in PHP and USD, with the GL balance and the SL-GL difference.
+      - The report needs its parameters.
     cases:
       - c: 1
         type: Report-output
-        title: Aged premium receivable from the account schedules
+        title: Premium receivable aging of the month
         steps:
-          - Run SCH-PR with ageing (Volume 1 Account Schedules) for September.
-        expected: The balances are aged per party; the GL-SL reconciliation gives the SL-GL difference.
+          - Run the premium receivable aging report in the Report Centre, category ACSL, for September in PHP.
+        expected: The open items are aged per party in the slots; the totals, the GL balance and the SL-GL difference are shown, and the difference equals that of the GL-SL reconciliation (FR-AS-004).
       - c: 2
         type: Negative
-        title: ACSL aging reports not offered (gap G3)
+        title: Aging report without the period
         steps:
-          - Look for the ACSL aging reports in the Report Centre, category ACSL.
-        expected: They are not listed; the case is re-run when they are built.
+          - Run the aging report with the period blank.
+        expected: The report does not run.
+        msg: ["Parameter <name> is required", MISSING_PARAMETER]
 
   FR-AS-010:
     scenario: SC-DPA-09

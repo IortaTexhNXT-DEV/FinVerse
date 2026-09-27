@@ -60,10 +60,10 @@ The roles-and-access sheet checks each action against the roles that may and may
 
 ## Out of scope
 
-- Volume 1 of BRD-5 (FRBS accounting and administration), which has its own test plan. The account schedules used in place of the ACSL aging reports (FR-AS-005) are tested there.
+- Volume 1 of BRD-5 (FRBS accounting and administration), which has its own test plan. The account schedules of Volume 1 are tested there.
 - The Operations steps before Disbursement (remittance extraction, cashiering application) and the Cashiering side of the validations and payment reversals, beyond what the ACSL and Payment Requests cases need; they are in the BRD-2 Operations test plan.
-- The bank interfaces (BDO Business Online Banking, the TPD transport of the DCTF) and the bank file layouts, which wait for AQ09; the cases use the minimal CSV uploads delivered.
-- The final layouts of the CPC2 report and the ACSL ageing reports, which BDOI confirms through the clarifications of FRS Volume 2; their cases check the interim views and are re-run once the layouts are confirmed.
+- The bank interfaces (BDO Business Online Banking, the TPD transport of the DCTF) and the bank file layouts, which wait for AQ09; the cases use the minimal CSV uploads.
+- The final layouts of the CPC2 report and the ACSL ageing reports, which BDOI confirms through the clarifications of FRS Volume 2; their cases check the proposed layouts and are re-run once the layouts are confirmed.
 - The final layouts of the checks, vouchers, forms and RRF / RFP (AQ14, AQ18); the cases run on the draft templates.
 - Performance and volume testing, including SOA files at the 20,000-row limit under load; this is the BIBS-wide performance test plan (deliverable 28).
 
@@ -221,7 +221,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 <!-- table: widths=5.4,2,7.2 caption="Test risks and mitigations" -->
 | Risk | Impact | Mitigation |
 |---|---|---|
-| Bank layouts and interfaces are not given (AQ09); the uploads take a minimal CSV | Medium | The cases use the delivered CSV; the upload cases are re-run when BDOI gives the layouts |
+| Bank layouts and interfaces are not given (AQ09); the uploads take a minimal CSV | Medium | The cases use the minimal CSV; the upload cases are re-run when BDOI gives the layouts |
 | Document layouts and signatories are drafts (AQ14, AQ18) | Medium | The Report-output and Upload-download cases are re-run when the layouts are loaded |
 | Four-eyes cases need combined test users and two users per role | Medium | The test lead creates them before the cycle (entry criterion) and removes them after it |
 | Stale-check and date-driven cases need the clock (180 days, end of day, SLA) | Medium | The test lead moves print dates and business dates in the test database and runs the jobs on demand |

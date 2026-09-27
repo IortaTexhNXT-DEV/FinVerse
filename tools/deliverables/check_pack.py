@@ -64,7 +64,7 @@ BUILD_STATUS: list[tuple[str, re.Pattern]] = [(label, re.compile(pat, re.I)) for
     ("source code", r"\b(?:source code|code ?base|in the code|from the code|the code (?:reads|returns|checks))\b|"
                     r"\b(?:source|code|git) repository\b|\brepository URLs?\b|\b(?:deployed|git) commits?\b|\bcommit (?:hash|id)\b|"
                     r"\bpull requests?\b"),
-    ("API path", r"/api/|\b(?:GET|POST|PUT|PATCH|DELETE) (?:\.\.\.)?/|(?:^|[\s(])(?:\.\.\.)?/[a-z][\w-]*(?:/[\w{}.-]+)+|\{(?:id|ref|aid|code|n|invoiceNo|sessionId)\}|\bendpoints?\b|\bHTTP [1-5][0-9]{2}\b|\bREST API\b"),
+    ("API path", r"/api/|\b(?:GET|POST|PUT|PATCH|DELETE) (?:\.\.\.)?/|(?:^|[\s(])(?:\.\.\.)?/[a-z][\w-]*(?:/[\w{}.-]+)+|/\{\w+\}|\bendpoints?\b|\bHTTP [1-5][0-9]{2}\b|\bREST API\b"),
     ("Flyway version", r"\bflyway\b|(?-i:\bV[0-9]{3,4}(?:__\w+)?\b)"),
     ("internal code", r"(?-i:\b[a-z]{2,}(?:_[a-z0-9]+)+\b|\b[A-Z][a-z]+(?:[A-Z][a-z0-9]+)+(?:Service|Controller|"
                       r"Repository|Entity|Dto|DTO|Mapper|Job|Listener|Handler|Config|Page|Inbox|Client|Adapter|Port|"

@@ -24,7 +24,7 @@ distribution:
   - {name: "Head, Comptrollership", role: Approver, organisation: BDOI, purpose: Review and sign-off of both volumes}
   - {name: "FRBS, Disbursement, ACSL, Marketing, Business and System Administration", role: Business owners, organisation: BDOI, purpose: Review of their volume}
   - {name: Business Project Services, role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Build, test and UAT preparation"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, test and UAT preparation"}
 ---
 
 # The two volumes
@@ -53,7 +53,7 @@ Both volumes follow the structure of the reference FRS of BRD-3:
 <!-- table: widths=1,5,10.6 caption="Chapters of each volume" -->
 | # | Chapter | Content |
 |---|---|---|
-| 1 | Introduction | Purpose, scope, references, definitions, how to read the FRs, and the table of recorded differences between the built behaviour and the BRD |
+| 1 | Introduction | Purpose, scope, references, definitions and how to read the FRs |
 | 2 | Business context | Current and envisioned process; process overview with a figure |
 | 3 | Personas and roles | Personas, permissions and the role-to-permission matrix |
 | 4 | Functional requirements | One FR per requirement group, each citing the BRD IDs and pages |
@@ -63,50 +63,41 @@ Both volumes follow the structure of the reference FRS of BRD-3:
 | 8 | Non-functional requirements | BRD values and the BIBS approach |
 | 9 | Configuration | Parameters, jobs, lists of values, alerts, masters |
 | 10 | Assumptions, dependencies, open questions | Items that need a BDOI answer (AQ numbers) |
-| 11 | Traceability | Every BRD ID to its FR, screen, API and build status, with a coverage summary |
-| 12 | Sign-off | Signatories of the volume |
+| 11 | Traceability | Every BRD ID to its FR, screen and test cases, with a coverage summary |
+| 12 | Proposed business rules and clarifications for confirmation | Each point where the proposed rule or screen differs from the BRD or needs a decision of BDOI |
+| 13 | Sign-off | Signatories of the volume |
 
 ## Conventions
 
 - **BRD references.** Each FR cites the BRD ID and the page of the BRD-5 PDF ("p.69"); "Add.1" is Addendum 1 (pp.28-39) and "Add.2" the Workshop Addendum (pp.1-15). Rows renumbered by Addendum 1 are used in their new form.
-- **Messages and codes.** Validation messages, error codes, lists of values, parameters and permissions are those of the delivered system. A validation done by the screen or the platform shows "-" as code.
-- **Differences.** Where the delivered behaviour differs from the BRD text, the FR describes the delivered behaviour and a note records the difference; section 1.7 of each volume lists them all.
-- **Parked items.** A function that is built but waits for BDOI data (layouts, accounts, lists) is marked "parked" with its open question. The answer is applied as configuration, without a change to the system, unless the FR says otherwise.
-- **Gaps.** Requirements not met by the delivered system carry a gap number, listed below.
+- **Messages and codes.** Validation messages, error codes, lists of values, parameters and permissions are those shown on the screens. A validation done by the screen or the platform shows "-" as code.
+- **Clarifications.** Where the proposed rule or screen differs from the BRD text or needs a decision of BDOI, the FR says so in a note; chapter 12 of each volume lists each point with the decision requested.
+- **Items waiting for BDOI data.** A function that waits for BDOI data (layouts, accounts, lists) names its open question. The answer is applied as configuration, without a change to the system, unless the FR says otherwise.
 - **Cross-references.** A reference to the other volume names the FR and the volume, for example "FR-DS-041, Volume 2". The accounting events of BRD-5 and their seed entries are in Volume 1, section 5.5.
 
 # Coverage and references
 
-## Coverage and gaps
+## Coverage
 
-<!-- table: widths=5.2,1.9,1.9,1.9,2,2,1.7 caption="Coverage of BRD-5" size=8.5 -->
-| Volume | BRD IDs | Covered by an FR | Built | Built, parked | Built with gap / not built | Out |
-|---|---|---|---|---|---|---|
-| Volume 1 | 85 | 85 | 66 | 14 | 5 | 0 |
-| Volume 2 | 192 | 192 | 165 | 23 | 3 | 1 |
-| **Total** | **277** | **277** | **231** | **37** | **8** | **1** |
-
-<!-- table: widths=1.4,7.4,4.2,3.6 caption="Gaps recorded in the FRS" size=8.5 -->
-| Gap | Description | BRD IDs | Volume |
-|---|---|---|---|
-| G1 | The report platform has no Word renderer; the GARD, subsidiaries and Mancom schedules asked in Word are delivered in PDF and Excel | FRBS 3.2.0 | Volume 1, FR-AC-060 |
-| G2 | Return, resubmit and bulk approval of access requests exist in the API only, not in the screens | BASAU 2.4.1, 2.5.3, 2.6.0, 2.6.1 | Volume 1, FR-AC-072 |
-| G3 | ACSL aging and schedule reports per account family are not built; they need eight ageing slots in the ledger | ACSL 2.14.3, 2.14.4 | Volume 2, FR-AS-005 |
-| G4 | The CPC2 incentive report is not built | DIS 3.29.0 | Volume 2, FR-DS-092 |
+<!-- table: widths=5.2,1.9,1.9,1.9,2.4 caption="Coverage of BRD-5" size=8.5 -->
+| Volume | BRD IDs | Covered by an FR | Out | Clarifications |
+|---|---|---|---|---|
+| Volume 1 | 85 | 85 | 0 | 14 |
+| Volume 2 | 192 | 192 | 1 | 25 |
+| **Total** | **277** | **277** | **1** | **39** |
 
 The login to BDO Business Online Banking (DIS 2.17.1) is outside BIBS and marked OUT in the BRD baseline.
 
 ## Shared references
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="References common to both volumes" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | Accounting, Disbursement and ACSL BRD (main BRD), pages 40-153; signed scan pp.154-267 | v1.0, 23-Jul-2025 | `docs/source-documents/Accounting, Disbursement, and Accounting Controls and Subsidiary Ledger BRD.zip` |
-| R2 | Addendum 1, pages 28-39 | v1.0, 18-Dec-2025; signed 13-Jan-2026 | same file |
-| R3 | Addendum 2 (Workshop), pages 1-15 | v1.0, 10-Apr-2026; signed 8 to 15-Apr-2026 | same file |
-| R4 | BRD-5 requirements baseline | current | `docs/requirements/BDOI_ACCT_BRD_SPEC.md` |
-| R5 | Accounting, Disbursement and ACSL build design with the as-built notes | current | `docs/architecture/ACCOUNTING_DISBURSEMENT_DESIGN.md` |
-| R6 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
+<!-- table: widths=1.2,11.4,4 caption="References common to both volumes" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | Accounting, Disbursement and ACSL BRD (main BRD), pages 40-153; signed scan pp.154-267 | v1.0, 23-Jul-2025 |
+| R2 | Addendum 1, pages 28-39 | v1.0, 18-Dec-2025; signed 13-Jan-2026 |
+| R3 | Addendum 2 (Workshop), pages 1-15 | v1.0, 10-Apr-2026; signed 8 to 15-Apr-2026 |
+| R4 | BRD-5 requirements baseline | current |
+| R6 | Cross-BRD decisions and answered questions | current |
 
 # Sign-off route
 

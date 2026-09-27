@@ -1,8 +1,8 @@
 # Test plan BRD-5 Volume 1 (Accounting - FRBS, and business and system administration) - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-05_Accounting_Disbursement_ACSL/brd05_vol1_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# Messages and codes are the ones BIBS returns (backend/src/main: journal, coa, closing, period,
-# receivables, frbs, finreport, tax, nbadmin, lov); labels are those of frontend/src/features.
+# Messages and codes are the ones BIBS shows on the Accounting and administration screens; labels are those
+# of the screens.
 
 meta:
   brd: BRD-05
@@ -79,7 +79,7 @@ data:
     source: Seed data (chart of accounts and posting rules)
   - id: TD-AC-03
     name: Currencies and rates
-    content: Base currency PHP; USD active with BOOK and CLOSING rates; parameter OPS_BOOK_RATE_SOURCE as delivered
+    content: Base currency PHP; USD active with BOOK and CLOSING rates; parameter OPS_BOOK_RATE_SOURCE at its default
     source: Seed data and the currency master
   - id: TD-AC-04
     name: Chart upload sample file
@@ -1472,13 +1472,13 @@ frs:
     persona: FRBS_PROCESSOR
     screen: SCHED
     conditions:
-      - Every delivered schedule definition runs and exports to Excel and PDF.
+      - Every provided schedule definition runs and exports to Excel and PDF.
       - An aged schedule spreads each balance into its buckets, which add up to the balance.
       - The TL maintains definitions and the monthly commentary; incomplete or invalid definitions are refused.
     cases:
       - c: 1
         type: Report-output
-        title: Every delivered definition runs
+        title: Every provided definition runs
         steps:
           - Run each of the 28 definitions for August and export one to Excel and PDF.
         expected: All run; the files hold the rows shown.

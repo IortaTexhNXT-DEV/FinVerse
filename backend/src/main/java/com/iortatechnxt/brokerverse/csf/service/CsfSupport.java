@@ -15,6 +15,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class CsfSupport {
 
+  /** Longest audit summary and hand-off summary. */
+  static final int SUMMARY_MAX = 500;
+
   private final DocumentNumberService numbers;
   private final LovService lovs;
   private final AuditTrailService audit;
@@ -49,6 +52,16 @@ public class CsfSupport {
     this.currentUser = currentUser;
     this.clock = clock;
     this.json = json;
+  }
+
+  /**
+   * A summary cut to the audit and hand-off column length.
+   *
+   * @param text summary
+   * @return summary of at most {@value #SUMMARY_MAX} characters
+   */
+  static String cut(String text) {
+    return text.length() <= SUMMARY_MAX ? text : text.substring(0, SUMMARY_MAX);
   }
 
   DocumentNumberService numbers() {

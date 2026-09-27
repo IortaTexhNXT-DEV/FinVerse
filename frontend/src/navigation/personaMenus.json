@@ -895,6 +895,45 @@
           ]
         }
       }
+    },
+    {
+      "id": "BRD-9",
+      "description": "Customer Servicing Facility (V1040 roles and grants; V1940 seed users)",
+      "sections": ["csf"],
+      "sharedGroups": ["home", "client-policy", "reports"],
+      "sharedModules": ["help", "admin", "user-access"],
+      "roles": {
+        "CSF_AGENT": {
+          "seedUser": "csfagent",
+          "permissions": [
+            "ATTACHMENT_VIEW",
+            "CSF_CONTACT_UPDATE",
+            "CSF_DOCUMENT_UPLOAD",
+            "CSF_RESEND",
+            "CSF_VIEW"
+          ],
+          "screens": ["/csf", "/csf/changes"]
+        },
+        "CSF_SUPERVISOR": {
+          "seedUser": "csfsup",
+          "permissions": [
+            "ATTACHMENT_VIEW",
+            "CSF_CONTACT_UPDATE",
+            "CSF_DOCUMENT_UPLOAD",
+            "CSF_REPORT_VIEW",
+            "CSF_RESEND",
+            "CSF_RESEND_OTHER",
+            "CSF_VIEW",
+            "REPORT_VIEW"
+          ],
+          "screens": ["/csf", "/csf/changes", "/csf/reports"]
+        },
+        "CSF_MANAGEMENT": {
+          "seedUser": "csfmgmt",
+          "permissions": ["AUDIT_VIEW", "CSF_REPORT_VIEW", "CSF_VIEW", "REPORT_VIEW"],
+          "screens": ["/csf", "/csf/changes", "/csf/reports"]
+        }
+      }
     }
   ]
 }

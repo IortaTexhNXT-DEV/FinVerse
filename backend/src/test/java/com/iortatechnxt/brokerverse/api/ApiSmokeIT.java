@@ -438,6 +438,28 @@ class ApiSmokeIT {
         .andExpect(status().isOk());
   }
 
+  /**
+   * The reads of the Customer Servicing Facility (BRD-9), each as the persona whose screen makes
+   * it; the tabs of one client are in the CSF integration tests.
+   */
+  @ParameterizedTest
+  @CsvSource({
+    "csfagent, /api/v1/csf/search?companyId={c}&keyType=NAME&q=Santos",
+    "csfagent, /api/v1/csf/search?companyId={c}&keyType=CLIENT_ID&q=CL-2026-000001",
+    "csfagent2, /api/v1/csf/search?companyId={c}&keyType=ACCOUNT_NO&q=ARN-2026-900001",
+    "csfagent, /api/v1/csf/search?companyId={c}&keyType=PN_NO&q=PN-0441101",
+    "csfagent, /api/v1/csf/search?companyId={c}&keyType=APPLICATION_NO&q=AL-2026-004411",
+    "csfagent, /api/v1/csf/contact-changes?companyId={c}",
+    "csfsup, /api/v1/csf/contact-changes?companyId={c}&status=APPLIED&from=2026-01-01&to=2030-12-31",
+    "csfmgmt, /api/v1/csf/contact-changes?companyId={c}&status=REFUSED&agent=csfagent2&q=CSF",
+  })
+  void customerServicingReadsRespondOk(String user, String url) throws Exception {
+    mvc.perform(
+            get(url.replace("{c}", data.company().getId().toString()))
+                .with(user(users.loadUserByUsername(user))))
+        .andExpect(status().isOk());
+  }
+
   @ParameterizedTest
   @ValueSource(
       strings = {

@@ -222,7 +222,7 @@ public class ResendService {
             CsfCodes.ENTITY_CLIENT,
             client.getProspectCode(),
             AuditAction.UPDATE,
-            document + " resent to " + to + other);
+            CsfSupport.cut(document + " resent to " + to + other));
     support
         .activity()
         .record(

@@ -49,6 +49,7 @@ public class ClientService {
   public static final String ENTITY = "Client";
 
   private static final int LOOKUP_SIZE = 20;
+  private static final int AUDIT_MAX = 500;
 
   private final ClientRepository clients;
   private final DocumentNumberService numbers;
@@ -275,6 +276,10 @@ public class ClientService {
 
   private static String nz(String value) {
     return value == null ? "-" : value;
+  }
+
+  private static String cut(String summary) {
+    return summary.length() <= AUDIT_MAX ? summary : summary.substring(0, AUDIT_MAX);
   }
 
   /** What identifies a client for screening: names, birth date, nationality, TIN and ID. */

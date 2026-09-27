@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.csf.service;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
+import com.iortatechnxt.brokerverse.catalog.service.CatalogNames;
 import com.iortatechnxt.brokerverse.csf.service.CsfViews.AccountLine;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
@@ -20,16 +21,19 @@ public class AccountLines {
 
   private final InvoiceLedgerQueryService ledger;
   private final CsfStatusMapper mapper;
+  private final CatalogNames names;
 
   /**
    * Creates the builder.
    *
    * @param ledger Operations invoice ledger
    * @param mapper CSF status mapping
+   * @param names product and insurer names (agents do not read the catalog)
    */
-  public AccountLines(InvoiceLedgerQueryService ledger, CsfStatusMapper mapper) {
+  public AccountLines(InvoiceLedgerQueryService ledger, CsfStatusMapper mapper, CatalogNames names) {
     this.ledger = ledger;
     this.mapper = mapper;
+    this.names = names;
   }
 
   /**
@@ -56,8 +60,10 @@ public class AccountLines {
         a.getId(),
         a.getArn(),
         a.getProductCode(),
+        names.productName(a.getProductCode()),
         a.getLineCode(),
         a.getInsurerCode(),
+        a.getInsurerCode() == null ? null : names.insurer(a.getCompanyId(), a.getInsurerCode()),
         a.getStatus().name(),
         mapper.statusOf(rules, a, balance).orElse(null),
         a.getPolicyNumbers(),

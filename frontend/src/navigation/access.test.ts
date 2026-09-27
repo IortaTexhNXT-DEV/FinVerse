@@ -48,4 +48,12 @@ describe('landing page', () => {
     expect(landingPath(screens.slice(3), (p) => p === 'CLIENT_VIEW')).toBe('/crm/clients');
     expect(landingPath([screen('/', 'X')], () => false)).toBeUndefined();
   });
+
+  it('sends the contact centre roles to the Customer Search', () => {
+    const withCsf = [...screens, screen('/csf', 'CSF_VIEW'), screen('/csf/changes', 'CSF_VIEW')];
+    expect(landingPath(withCsf, (p) => p === 'CSF_VIEW')).toBe('/csf');
+    expect(landingPath(withCsf, (p) => p === 'CSF_VIEW' || p === 'WORK_VIEW')).toBe(
+      '/nb/dashboard',
+    );
+  });
 });

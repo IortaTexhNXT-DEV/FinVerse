@@ -72,8 +72,10 @@ public final class CsfViews {
    * @param id account id
    * @param arn ARN
    * @param productCode product
+   * @param productName product name
    * @param lineCode product line
    * @param insurerCode insurer
+   * @param insurerName insurer name
    * @param stage BIBS account stage
    * @param csfStatus CSF status, null when no mapping row applies
    * @param policyNumbers policy numbers
@@ -92,8 +94,10 @@ public final class CsfViews {
       Long id,
       String arn,
       String productCode,
+      String productName,
       String lineCode,
       String insurerCode,
+      String insurerName,
       String stage,
       String csfStatus,
       List<String> policyNumbers,

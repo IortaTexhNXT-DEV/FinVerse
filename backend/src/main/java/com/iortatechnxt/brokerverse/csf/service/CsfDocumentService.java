@@ -167,12 +167,16 @@ public class CsfDocumentService {
     if (upload.documentType() == null || upload.documentType().isBlank()) {
       throw new BusinessRuleException("CSF_DOCUMENT_TYPE_REQUIRED", "Select the document type");
     }
-    support
-        .lovs()
-        .requireValid(
-            CsfCodes.LOV_DOCUMENT_TYPE,
-            upload.documentType(),
-            BusinessClock.today(support.clock()));
+    boolean allowed =
+        support
+            .lovs()
+            .activeValues(CsfCodes.LOV_DOCUMENT_TYPE, BusinessClock.today(support.clock()))
+            .stream()
+            .anyMatch(v -> v.getCode().equals(upload.documentType()));
+    if (!allowed) {
+      throw new BusinessRuleException(
+          "CSF_DOCUMENT_TYPE_NOT_ALLOWED", "This document type cannot be uploaded here");
+    }
     Owner owner =
         upload.accountId() == null
             ? new Owner(

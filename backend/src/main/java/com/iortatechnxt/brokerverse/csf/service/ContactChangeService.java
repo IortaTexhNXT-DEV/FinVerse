@@ -231,15 +231,17 @@ public class ContactChangeService {
                     .map(e -> new ChangedField(e.getKey(), null, blankToNull(e.getValue())))
                     .toList()));
     String summary =
-        "Change of "
-            + String.join(", ", request.fields().keySet().stream().map(this::fieldLabel).toList())
-            + " asked by client "
-            + client.getCode()
-            + " "
-            + client.getDisplayName()
-            + " through the contact centre ("
-            + no
-            + ")";
+        CsfSupport.cut(
+            "Change of "
+                + String.join(
+                    ", ", request.fields().keySet().stream().map(this::fieldLabel).toList())
+                + " asked by client "
+                + client.getCode()
+                + " "
+                + client.getDisplayName()
+                + " through the contact centre ("
+                + no
+                + ")");
     OpsHandoff handoff =
         handoffs.record(
             companyId,

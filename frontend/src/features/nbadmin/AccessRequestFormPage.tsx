@@ -30,6 +30,7 @@ import { UserRequestFields } from './UserRequestFields';
 import { DateInput } from '@/components/ui/DateInput';
 import { UserName } from '@/components/ui/UserName';
 import { Notice } from '@/components/ui/Notice';
+import { FormErrorSummary } from '@/components/ui/FormErrorSummary';
 
 type Mode = 'draft' | 'submit';
 
@@ -257,9 +258,17 @@ function RequestEditor({ id, initial, saved, users, userIdPattern }: Readonly<Ed
         }
       />
       <ErrorAlert error={save.error} />
+      <FormErrorSummary errors={errors} />
       {returned && saved.decisionComment && (
-        <Notice tone="warning">
-          Returned by <UserName login={saved.decidedBy} />: {saved.decisionComment}
+        <Notice
+          tone="warning"
+          title={
+            <>
+              Returned by <UserName login={saved.decidedBy} />
+            </>
+          }
+        >
+          {saved.decisionComment}
         </Notice>
       )}
       <Card>

@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ApiError } from '@/api/client';
 import { ErrorAlert } from './ErrorAlert';
+import { FormErrorSummary } from './FormErrorSummary';
 import { messageParts, plainMessage } from './errorView';
 import { Notice } from './Notice';
 import { ToastProvider } from './ToastProvider';
@@ -123,5 +124,22 @@ describe('notice standard', () => {
     expect(screen.getByText('Not saved').parentElement).toHaveClass('toast', 'error');
     expect(screen.getByText('Check').parentElement).toHaveClass('toast', 'warning');
     expect(container.querySelectorAll('.toast svg.notice-icon')).toHaveLength(3);
+  });
+
+  it('summarises the field errors of a long form at the top, each field once', async () => {
+    const { rerender } = render(
+      <>
+        <FormErrorSummary errors={{ tin: 'Use the format 000-000-000-000', email: undefined }} />
+        <input aria-label="TIN" aria-invalid="true" />
+      </>,
+    );
+    expect(screen.getByText('Correct the highlighted fields')).toHaveClass('notice-title');
+    expect(screen.getAllByRole('listitem').map((li) => li.textContent)).toEqual([
+      'TIN: Use the format 000-000-000-000',
+    ]);
+    await userEvent.click(screen.getByRole('button', { name: 'Go to First Field' }));
+    expect(screen.getByLabelText('TIN')).toHaveFocus();
+    rerender(<FormErrorSummary errors={{}} />);
+    expect(screen.queryByRole('alert')).toBeNull();
   });
 });

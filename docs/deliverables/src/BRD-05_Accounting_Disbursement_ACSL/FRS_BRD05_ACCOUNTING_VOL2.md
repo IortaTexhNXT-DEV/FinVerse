@@ -2893,45 +2893,45 @@ The events and seed entries are listed in Volume 1, section 5.5 (rows 1-19). The
 
 ## Reports
 
-<!-- table: widths=4.4,5,5.4,1.8 caption="Reports of Volume 2" status=Status size=8.5 -->
-| Code | Name | BRD | Status |
-|---|---|---|---|
-| DSB-MASTERLIST | Masterlist of Disbursements | DIS 2.3.1, 3.28.3 | Built |
-| DSB-UNRELEASED-CHECKS | Unreleased Checks (aged to 180 days) | DIS 2.3.2, 3.28.3 | Built |
-| DSB-CWT-COMMISSION | CWT / BIR 2307 on Commission | DIS 2.3.3, 3.28.3 | Built |
-| DSB-ATD | Authority to Debit | DIS 2.3.4, 3.28.3 | Built |
-| DSB-ML-STALE | Miscellaneous Liability - Stale Checks | DIS 2.3.5, 3.28.3 | Built |
-| DSB-CASH-FLOW | Disbursement Cash Flow | DIS 2.3.6, 3.28.3 | Built |
-| DSB-PAYEE | Payee Report | DIS 2.3.7, 3.28.1 | Built |
-| DSB-UPLOAD-FALLOUT | Request Upload Fall-out | DIS 2.3.8, 3.28.4 | Built |
-| DSB-PAYEE-NOMATCH | Payees Not Matched | DIS 3.25.2 | Built |
-| DSB-UNREGULARIZED | Unregularised Transactions | DIS 2.3.9, 3.27.0 | Built |
-| DSB-EOD-REMIT, -REFUND, -SUPPLIER, -EMPLOYEE, -OTHER, -SUMMARY | End-of-day reports | DIS 3.28.0, 3.28.2 | Built |
-| DSB-CPC2-INCENTIVE | CPC2 incentive report | DIS 3.29.0 | Not built (G4) |
-| PRQ-STATUS | Request status | MKT 1.18.0 | Built |
-| PRQ-REGISTER | Request register | MKT 1.18.1 | Built |
-| ACSL-BOOKED-FIN-DETAILS | List of all booked accounts with financial details | ACSL 2.2.0, 2.14.2 | Built |
-| ACSL-SOA-RECON | SOA reconciliation | ACSL 2.14.1 | Built |
-| ACSL-SOA-UPLOAD-LOG | SOA upload log | ACSL 2.4.0 | Built |
-| ACSL-GL-SL-RECON | GL-SL reconciliation | ACSL 2.13.2 | Built |
-| ACSL aging and schedule reports | Five account families, PHP and USD | ACSL 2.14.3, 2.14.4 | Not built (G3) |
+<!-- table: widths=4.4,5,5.4 caption="Reports of Volume 2" size=8.5 -->
+| Code | Name | BRD |
+|---|---|---|
+| DSB-MASTERLIST | Masterlist of Disbursements | DIS 2.3.1, 3.28.3 |
+| DSB-UNRELEASED-CHECKS | Unreleased Checks (aged to 180 days) | DIS 2.3.2, 3.28.3 |
+| DSB-CWT-COMMISSION | CWT / BIR 2307 on Commission | DIS 2.3.3, 3.28.3 |
+| DSB-ATD | Authority to Debit | DIS 2.3.4, 3.28.3 |
+| DSB-ML-STALE | Miscellaneous Liability - Stale Checks | DIS 2.3.5, 3.28.3 |
+| DSB-CASH-FLOW | Disbursement Cash Flow | DIS 2.3.6, 3.28.3 |
+| DSB-PAYEE | Payee Report | DIS 2.3.7, 3.28.1 |
+| DSB-UPLOAD-FALLOUT | Request Upload Fall-out | DIS 2.3.8, 3.28.4 |
+| DSB-PAYEE-NOMATCH | Payees Not Matched | DIS 3.25.2 |
+| DSB-UNREGULARIZED | Unregularised Transactions | DIS 2.3.9, 3.27.0 |
+| DSB-EOD-REMIT, -REFUND, -SUPPLIER, -EMPLOYEE, -OTHER, -SUMMARY | End-of-day reports | DIS 3.28.0, 3.28.2 |
+| DSB-CPC2-INCENTIVE | CPC2 incentive report | DIS 3.29.0 |
+| PRQ-STATUS | Request status | MKT 1.18.0 |
+| PRQ-REGISTER | Request register | MKT 1.18.1 |
+| ACSL-BOOKED-FIN-DETAILS | List of all booked accounts with financial details | ACSL 2.2.0, 2.14.2 |
+| ACSL-SOA-RECON | SOA reconciliation | ACSL 2.14.1 |
+| ACSL-SOA-UPLOAD-LOG | SOA upload log | ACSL 2.4.0 |
+| ACSL-GL-SL-RECON | GL-SL reconciliation | ACSL 2.13.2 |
+| ACSL aging and schedule reports | Five account families, PHP and USD | ACSL 2.14.3, 2.14.4 |
 
 Reports run in the Report Centre with the options of Volume 1 (view, export to XLSX, ODS or PDF, print, archive, batches).
 
 ## Documents
 
-<!-- table: widths=4.4,6.6,5.6 caption="Documents produced" size=8.5 -->
-| Template | Document | Status |
-|---|---|---|
-| DSB_VOUCHER | Disbursement voucher | Draft layout (AQ14) |
-| DSB_CHECK | Check | Draft layout per bank (AQ14) |
-| DSB_ATD, DSB_ATD_EMAIL | Authority to Debit and its e-mail to the branch | Draft layout (AQ14) |
-| DSB_MC_DD, DSB_CREDIT_TICKET, DSB_TT | Bank forms | Draft layouts (AQ14) |
-| DSB_PAYMENT_ADVICE | Payment advice e-mailed to the payee | Built |
-| DCTF | Direct Credit Transaction File (text) | Header and details (AQ09) |
-| PRQ_RRF, PRQ_RFP, PRQ_LIQUIDATION | Refund Request Form, Request for Payment, cash-advance liquidation (Appendix D) | Draft layouts (AQ18) |
-| BIR Form 2307 | Certificate of creditable tax withheld | Built |
-| EARLY_INCENTIVE service invoice | Service invoice of the early incentive (booking) | Built |
+<!-- table: widths=4.4,6.6 caption="Documents produced" size=8.5 -->
+| Template | Document |
+|---|---|
+| DSB_VOUCHER | Disbursement voucher |
+| DSB_CHECK | Check |
+| DSB_ATD, DSB_ATD_EMAIL | Authority to Debit and its e-mail to the branch |
+| DSB_MC_DD, DSB_CREDIT_TICKET, DSB_TT | Bank forms |
+| DSB_PAYMENT_ADVICE | Payment advice e-mailed to the payee |
+| DCTF | Direct Credit Transaction File (text) |
+| PRQ_RRF, PRQ_RFP, PRQ_LIQUIDATION | Refund Request Form, Request for Payment, cash-advance liquidation (Appendix D) |
+| BIR Form 2307 | Certificate of creditable tax withheld |
+| EARLY_INCENTIVE service invoice | Service invoice of the early incentive (booking) |
 
 # Interfaces and integration
 
@@ -2954,17 +2954,17 @@ Reports run in the Report Centre with the options of Volume 1 (view, export to X
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.8,5.4,2.4 caption="Non-functional requirements (BRD p.133-139; Add.1 p.37)" size=8.5 -->
-| Topic | BRD value | BIBS target and approach | Status |
-|---|---|---|---|
-| Users | Disbursement 8; ACSL 6; Marketing 394 named, 40 concurrent | Within the BRD-1 sizing (145 concurrent) | FIT |
-| Volumes | Remittance DVs 198 a year (+20%), refunds 246, supplier payments 293, government 9, other bank units 31, employee-related 56, CWT tagging 50; corrections 400; Marketing RFP / refund 302 | Small; no special tuning | FIT |
-| Response time | Screen load 5-10 s, refresh 5 s, field display 2 s, save 5 s (2 s for some Disbursement and ACSL saves); reports 10-20 s first load; upload or download 3 s per file | Online p95 under 3 s; end of day, reports and SOA reconciliation run as jobs or batches | FIT |
-| Peaks | Month end and year end; 08:00-12:00 Disbursement; 10:00-15:00 ACSL and Marketing | End of day after the peak; GL-SL reconciliation at 20:00; stale-check job at 00:20 | FIT |
-| Devices | Same performance on mobile and desktop | Responsive screens | FIT |
-| Availability (Add.1) | 100%; 07:00-18:00 Monday to Saturday; downtime under 24 hours; maintenance 19:00-07:00; BCP under 3 days | Same deployment as BRD-1; 100% is not a measurable SLA; one BIBS-wide NFR set is being agreed (AQ27) | OPEN |
-| Retention (Add.1) | Reports and vouchers 5 years online, 5 years archive; daily backup kept 5 years | Retention rules of BRD-1 with a document class for vouchers and generated reports | FIT |
-| Security and audit | Authorised users; maker-checker | Role-based access; four-eyes rules of section 3.3; masked account numbers; audit of every change | FIT |
+<!-- table: widths=3,5.8,5.4 caption="Non-functional requirements (BRD p.133-139; Add.1 p.37)" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Users | Disbursement 8; ACSL 6; Marketing 394 named, 40 concurrent | Within the BRD-1 sizing (145 concurrent) |
+| Volumes | Remittance DVs 198 a year (+20%), refunds 246, supplier payments 293, government 9, other bank units 31, employee-related 56, CWT tagging 50; corrections 400; Marketing RFP / refund 302 | Small; no special tuning |
+| Response time | Screen load 5-10 s, refresh 5 s, field display 2 s, save 5 s (2 s for some Disbursement and ACSL saves); reports 10-20 s first load; upload or download 3 s per file | Online p95 under 3 s; end of day, reports and SOA reconciliation run as jobs or batches |
+| Peaks | Month end and year end; 08:00-12:00 Disbursement; 10:00-15:00 ACSL and Marketing | End of day after the peak; GL-SL reconciliation at 20:00; stale-check job at 00:20 |
+| Devices | Same performance on mobile and desktop | Responsive screens |
+| Availability (Add.1) | 100%; 07:00-18:00 Monday to Saturday; downtime under 24 hours; maintenance 19:00-07:00; BCP under 3 days | Same deployment as BRD-1; 100% is not a measurable SLA; one BIBS-wide NFR set is being agreed (AQ27) |
+| Retention (Add.1) | Reports and vouchers 5 years online, 5 years archive; daily backup kept 5 years | Retention rules of BRD-1 with a document class for vouchers and generated reports |
+| Security and audit | Authorised users; maker-checker | Role-based access; four-eyes rules of section 3.3; masked account numbers; audit of every change |
 
 # Configuration items owned by the business and the System Administrator
 

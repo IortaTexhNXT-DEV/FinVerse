@@ -3889,18 +3889,18 @@ Figure 6 shows the interfaces of New Business. The broking modules talk to each 
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.6,5.4,2.6 caption="Non-functional requirements (BRD p.82, p.210-212)" size=8.5 -->
-| Topic | BRD value | BIBS target and approach | Status |
-|---|---|---|---|
-| Users | 485 named (392 Marketing AO / TL, 82 Processing, 3 System Admin); up to 145 concurrent | Stateless application scaled horizontally; sized for 150 concurrent users plus 20% a year | FIT |
-| Volumes | 21,200 transactions a month (quotation, client, account, uploads, booking); 1,300 endorsements a month; growth 20% a year | About 1,000 transactions a day; bulk uploads up to 5,000 rows per file, committed row by row | FIT |
-| Response time | 10 seconds for every listed function | Online p95 under 3 seconds; bulk jobs, e-mails and batch booking run asynchronously | FIT |
-| Peak hours | 08:00-10:00 and 15:00-17:00 | Batch booking at 20:00; KYC and retention jobs outside peaks | FIT |
-| Availability | 07:00-22:00, Monday to Saturday; other items "follow existing QPS set-up" | Maintenance window outside service hours; one BIBS-wide NFR set is being agreed (XQ08) | OPEN |
-| Devices | Any BDO-issued device or workstation; same performance on mobile and desktop | Browser application, responsive screens; no device restriction | FIT |
-| Security | Outbound documents encrypted or password protected; insurers have no access | Protected PDF / Excel with separate passwords; no external user role; role-based access and four-eyes | FIT |
-| Audit | All actions logged | Append-only audit and workflow history (FR-NB-016) | FIT |
-| Retention | Application, database and audit logs and historical data: 5 years online, 15 years archive; backup every 4 hours kept 5 years (addendum p.82; the original BRD says "follow QPS") | Retention rules and monthly review (FR-NB-137); archive and purge wait for Q39; backups are an infrastructure setting | PARTIAL |
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.82, p.210-212)" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Users | 485 named (392 Marketing AO / TL, 82 Processing, 3 System Admin); up to 145 concurrent | Stateless application scaled horizontally; sized for 150 concurrent users plus 20% a year |
+| Volumes | 21,200 transactions a month (quotation, client, account, uploads, booking); 1,300 endorsements a month; growth 20% a year | About 1,000 transactions a day; bulk uploads up to 5,000 rows per file, committed row by row |
+| Response time | 10 seconds for every listed function | Online p95 under 3 seconds; bulk jobs, e-mails and batch booking run asynchronously |
+| Peak hours | 08:00-10:00 and 15:00-17:00 | Batch booking at 20:00; KYC and retention jobs outside peaks |
+| Availability | 07:00-22:00, Monday to Saturday; other items "follow existing QPS set-up" | Maintenance window outside service hours; one BIBS-wide NFR set is being agreed (XQ08) |
+| Devices | Any BDO-issued device or workstation; same performance on mobile and desktop | Browser application, responsive screens; no device restriction |
+| Security | Outbound documents encrypted or password protected; insurers have no access | Protected PDF / Excel with separate passwords; no external user role; role-based access and four-eyes |
+| Audit | All actions logged | Append-only audit and workflow history (FR-NB-016) |
+| Retention | Application, database and audit logs and historical data: 5 years online, 15 years archive; backup every 4 hours kept 5 years (addendum p.82; the original BRD says "follow QPS") | Retention rules and monthly review (FR-NB-137); archive and purge wait for Q39; backups are an infrastructure setting |
 
 # Configuration items owned by the System Administrator and the Business Administrator
 

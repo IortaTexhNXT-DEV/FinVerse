@@ -139,23 +139,23 @@ Figure 1 shows the flow of the umbrella BRD (p.26) with the BIBS BRD of each ste
 
 ![End-to-end journey and the BIBS BRD of each step (amber = designed or being built; dashed box = phase 2)](figures/brd00_journey.dot){width=16}
 
-<!-- table: widths=3.6,4.6,2.4,6 caption="Umbrella BRD list (p.3) and BIBS" status=Status size=8.5 -->
-| Umbrella BRD (p.3) | BIBS BRD and FRS | Status | Note |
-|---|---|---|---|
-| 1 New Business | BRD-1, FR-NB | BUILT | Capabilities 1-5 |
-| 2 Renewal | BRD-6, FR-RN | OPEN | Designed, not built |
-| 3 Collection Management | BRD-4, FR-CL (BRD-4) | BUILT | Capability 7 |
-| 4 Accounting, Disbursement and ACSL | BRD-5, FR-AC / FR-DS / FR-AS | BUILT | Capability 8 |
-| 5 Claims | BRD-7, FR-CM (BRD-7) | IN PROGRESS | Claim recording and insurer updates merged |
-| 6 Operations | BRD-2, FR-OP | BUILT | Capabilities 9-13 |
-| 7 Reinsurance | ReInsurance BRD | PARKED | Phase 2 - BRD received |
-| 8 Customer Service Facility | BRD-9, FR-CSF | OPEN | Designed, not built |
-| 9 Product Maintenance | BRD-3, FR-PM | BUILT | Capability 20 |
-| 10 Employee Benefits | BRD-8, FR-EB | OPEN | Designed, not built |
-| Not listed | BRD-10 Sanction Screening, FR-SS | BUILT | Screening of clients (capability 1) |
-| Not listed | BRD-11 User Access Maintenance, FR-UA | BUILT | BR-000 to BR-003 |
-| Not listed | BRD-12 Submitted Policies, FR-SP | OPEN | Designed, not built |
-| Not listed | Data Migration BRD | OPEN | Draft; client migration volumes (p.43) |
+<!-- table: widths=3.6,4.6,6 caption="Umbrella BRD list (p.3) and BIBS" size=8.5 -->
+| Umbrella BRD (p.3) | BIBS BRD and FRS | Note |
+|---|---|---|
+| 1 New Business | BRD-1, FR-NB | Capabilities 1-5 |
+| 2 Renewal | BRD-6, FR-RN | Designed, not built |
+| 3 Collection Management | BRD-4, FR-CL (BRD-4) | Capability 7 |
+| 4 Accounting, Disbursement and ACSL | BRD-5, FR-AC / FR-DS / FR-AS | Capability 8 |
+| 5 Claims | BRD-7, FR-CM (BRD-7) | Claim recording and insurer updates merged |
+| 6 Operations | BRD-2, FR-OP | Capabilities 9-13 |
+| 7 Reinsurance | ReInsurance BRD | Phase 2 - BRD received |
+| 8 Customer Service Facility | BRD-9, FR-CSF | Designed, not built |
+| 9 Product Maintenance | BRD-3, FR-PM | Capability 20 |
+| 10 Employee Benefits | BRD-8, FR-EB | Designed, not built |
+| Not listed | BRD-10 Sanction Screening, FR-SS | Screening of clients (capability 1) |
+| Not listed | BRD-11 User Access Maintenance, FR-UA | BR-000 to BR-003 |
+| Not listed | BRD-12 Submitted Policies, FR-SP | Designed, not built |
+| Not listed | Data Migration BRD | Draft; client migration volumes (p.43) |
 
 # Personas, navigation and capability map
 
@@ -208,15 +208,15 @@ The umbrella BRD names four generic personas (System, User, Administrator, Autho
 
 The row-level map (every bullet, BR ID, BRD requirement ID and FR) is in section 10. Totals of the 192 capability rows and 23 cross-cutting rows:
 
-<!-- table: widths=2.4,6.4,2.4,2.4,2 caption="Rows per fit class" status=Fit -->
-| Fit | Meaning | Capability rows | Cross-cutting rows | Total |
-|---|---|---|---|---|
-| FIT | Works today | 135 | 12 | 147 |
-| CONFIGURE | Set-up only | 1 | 2 | 3 |
-| CHANGE | Extends an existing capability | 15 | 6 | 21 |
-| NEW | New build (in BIBS, or in a designed BRD not yet built) | 29 | 1 | 30 |
-| OUT | Out of phase 1 scope | 12 | 2 | 14 |
-| **Total** | | **192** | **23** | **215** |
+<!-- table: widths=6.4,2.4,2.4,2 caption="Rows per fit class" -->
+| Meaning | Capability rows | Cross-cutting rows | Total |
+|---|---|---|---|
+| Works today | 135 | 12 | 147 |
+| Set-up only | 1 | 2 | 3 |
+| Extends an existing capability | 15 | 6 | 21 |
+| New build (in BIBS, or in a designed BRD not yet built) | 29 | 1 | 30 |
+| Out of phase 1 scope | 12 | 2 | 14 |
+| | **192** | **23** | **215** |  |
 
 # Cross-cutting functional requirements
 
@@ -1042,24 +1042,24 @@ acceptance:
 
 # Gaps and proposed requirements
 
-<!-- table: widths=0.9,4,2.5,5.6,2.1,1.9 caption="Gaps of the umbrella BRD" status=Fit size=8 -->
-| # | Gap | Rows | Proposal | FR | Fit |
-|---|---|---|---|---|---|
-| G1 | Reinsurance | CORE-15.01-15.10 | Phase 2 - BRD received; seams kept open (section 6) | - | OUT |
-| G2 | Claims cheque safekeeping and hand-over to / from Cashiering | CORE-14.08-14.10 | Parked until CRQ03 (with CLQ10); if yes, a cheque custody register in Claims | - | NEW |
-| G3 | CSF case resolution | CORE-16.06 | Out until CRQ04; BRD-9 keeps case logging in SharePoint | - | OUT |
-| G4 | Master data change log | CORE-17.01 | Field-level log of registered master data | FR-CR-031 | CHANGE |
-| G5 | Insurer management | CORE-17.02 | Insurer page with the missing attributes | FR-CR-061 | CHANGE |
-| G6 | MIS field definition | CORE-17.04 | MIS field catalogue | FR-CR-062 | NEW |
-| G7 | Report customisation | CORE-21.04 | Layout in the variant | FR-CR-042 | CHANGE |
-| G8 | Scheduled reports | CORE-21.05 | Report subscriptions | FR-CR-043 | CHANGE |
-| G9 | Emerging capabilities | CORE-18.01 | No build until listed (CRQ10) | - | OUT |
-| G10 | ALeA e-mail address encoding | XC-21 | No build until defined (CRQ20) | - | OUT |
-| G11 | Role dashboards | XC-02 | Role home page | FR-CR-010, 011 | CHANGE |
-| G12 | Invoice Master List | XC-13 | Columns added to the invoice ledger view | FR-CR-090 | CHANGE |
-| G13 | Insurer invoice batch and SFTP | XC-19 | Daily batch per insurer | FR-CR-081 | CHANGE |
-| G14 | Client migration and daily client batches | XC-20 | Load and feed through the Data Migration programme | FR-CR-082 | NEW |
-| G15 | SOA at booking | XC-10 | After CRQ12 | FR-CR-093 | CHANGE |
+<!-- table: widths=0.9,4,2.5,5.6,2.1 caption="Gaps of the umbrella BRD" size=8 -->
+| # | Gap | Rows | Proposal | FR |
+|---|---|---|---|---|
+| G1 | Reinsurance | CORE-15.01-15.10 | Phase 2 - BRD received; seams kept open (section 6) | - |
+| G2 | Claims cheque safekeeping and hand-over to / from Cashiering | CORE-14.08-14.10 | Parked until CRQ03 (with CLQ10); if yes, a cheque custody register in Claims | - |
+| G3 | CSF case resolution | CORE-16.06 | Out until CRQ04; BRD-9 keeps case logging in SharePoint | - |
+| G4 | Master data change log | CORE-17.01 | Field-level log of registered master data | FR-CR-031 |
+| G5 | Insurer management | CORE-17.02 | Insurer page with the missing attributes | FR-CR-061 |
+| G6 | MIS field definition | CORE-17.04 | MIS field catalogue | FR-CR-062 |
+| G7 | Report customisation | CORE-21.04 | Layout in the variant | FR-CR-042 |
+| G8 | Scheduled reports | CORE-21.05 | Report subscriptions | FR-CR-043 |
+| G9 | Emerging capabilities | CORE-18.01 | No build until listed (CRQ10) | - |
+| G10 | ALeA e-mail address encoding | XC-21 | No build until defined (CRQ20) | - |
+| G11 | Role dashboards | XC-02 | Role home page | FR-CR-010, 011 |
+| G12 | Invoice Master List | XC-13 | Columns added to the invoice ledger view | FR-CR-090 |
+| G13 | Insurer invoice batch and SFTP | XC-19 | Daily batch per insurer | FR-CR-081 |
+| G14 | Client migration and daily client batches | XC-20 | Load and feed through the Data Migration programme | FR-CR-082 |
+| G15 | SOA at booking | XC-10 | After CRQ12 | FR-CR-093 |
 
 # Reinsurance (phase 2)
 
@@ -1069,18 +1069,18 @@ Phase 1 keeps these seams open so that the phase 2 module can reuse them: party 
 
 # Non-functional requirements
 
-<!-- table: widths=2.8,4.6,4.8,3.4,1.6 caption="Non-functional requirements of the umbrella (p.42-46)" status=Status size=8 -->
-| Topic | Umbrella value | Function BRDs | BIBS target and approach | Status |
-|---|---|---|---|---|
-| Users | 1,344 named / 429 concurrent (sum of the BRD rows; 388 without Reinsurance) | 150 concurrent + 20% a year (register proposal); BRD-8 20 internal; BRD-7 47 / 25 | Performance tests at 429 concurrent sessions as the peak case (CRQ21, CRQ24) | OPEN |
-| Response time | Under 5 seconds for every role | 2 s (BRD-12) to 10 s (BRD-1, BRD-6, BRD-11); reports 20 s to 15 min | p95 under 2 s for screens; reports and batches as jobs with progress (CRQ21) | OPEN |
-| Volumes | Per BRD (p.42-45), e.g. NB 21,200 a month per transaction type, RMEL 25,800, CSF 144,400 a year, CMS reports 60,000 weekly | Same values in the BRDs | Sized in the performance plan (deliverable 28) | FIT |
-| Peak, availability, maintenance, BCP | "Refer to BRD" | 99.9%-99.99%; windows differ | Register proposal: 99.9% in service hours 06:00-22:00 Mon-Sat, maintenance 00:00-04:00, RTO 4 h | OPEN |
-| Retention | Application, database and audit logs, historical data: 5 years online, 15 years offline | BRD-7 10 / 15; BRD-5, 10, 12 5 / 5 | Default 5 / 15 per record type through the retention rules; exceptions after CRQ22 | PARTIAL |
-| Backup | Every 4 hours, kept 5 years | Daily to every 15 minutes; kept 5 or 7 years | Continuous log archiving plus a base backup every 4 hours, kept 7 years | FIT |
-| Anonymisation | No | - | Production data not anonymised; non-production data masked (hosting appendix) | FIT |
-| Hosting and access | - | - | AWS ap-southeast-1; access restricted to personnel in the Philippines; migration staging purged within 5 days | FIT |
-| Security and audit | Role-based access; password protection; audit logs (p.4-5) | Per BRD | FR-CR-001, 030, 031, 070, 071 | FIT |
+<!-- table: widths=2.8,4.6,4.8,3.4 caption="Non-functional requirements of the umbrella (p.42-46)" size=8 -->
+| Topic | Umbrella value | Function BRDs | BIBS target and approach |
+|---|---|---|---|
+| Users | 1,344 named / 429 concurrent (sum of the BRD rows; 388 without Reinsurance) | 150 concurrent + 20% a year (register proposal); BRD-8 20 internal; BRD-7 47 / 25 | Performance tests at 429 concurrent sessions as the peak case (CRQ21, CRQ24) |
+| Response time | Under 5 seconds for every role | 2 s (BRD-12) to 10 s (BRD-1, BRD-6, BRD-11); reports 20 s to 15 min | p95 under 2 s for screens; reports and batches as jobs with progress (CRQ21) |
+| Volumes | Per BRD (p.42-45), e.g. NB 21,200 a month per transaction type, RMEL 25,800, CSF 144,400 a year, CMS reports 60,000 weekly | Same values in the BRDs | Sized in the performance plan (deliverable 28) |
+| Peak, availability, maintenance, BCP | "Refer to BRD" | 99.9%-99.99%; windows differ | Register proposal: 99.9% in service hours 06:00-22:00 Mon-Sat, maintenance 00:00-04:00, RTO 4 h |
+| Retention | Application, database and audit logs, historical data: 5 years online, 15 years offline | BRD-7 10 / 15; BRD-5, 10, 12 5 / 5 | Default 5 / 15 per record type through the retention rules; exceptions after CRQ22 |
+| Backup | Every 4 hours, kept 5 years | Daily to every 15 minutes; kept 5 or 7 years | Continuous log archiving plus a base backup every 4 hours, kept 7 years |
+| Anonymisation | No | - | Production data not anonymised; non-production data masked (hosting appendix) |
+| Hosting and access | - | - | AWS ap-southeast-1; access restricted to personnel in the Philippines; migration staging purged within 5 days |
+| Security and audit | Role-based access; password protection; audit logs (p.4-5) | Per BRD | FR-CR-001, 030, 031, 070, 071 |
 
 # Configuration items owned by the System Administrator
 
@@ -1160,224 +1160,224 @@ Phase 1 keeps these seams open so that the phase 2 module can reuse them: party 
 
 Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that specifies it and the FR that meets it. "Covered by" gives the BIBS BRD and its requirement IDs; FR IDs without a prefix note belong to the FRS of that BRD. FR-CL-nnn are the FRs of BRD-4 Collections; BRD-7 Claims numbers its FRs FR-CM-nnn (renumbered from FR-CL-nnn, DCR-188). Reinsurance rows are "Phase 2".
 
-<!-- table: widths=1.7,6.2,2.4,5.4,4.4,2.0 caption="Traceability of the umbrella BRD" status=Fit size=7 -->
-| ID | Capability (Core BRD page) | Core BR | Covered by | FR | Fit |
-|---|---|---|---|---|---|
-| CORE-01.01 | Create prospect / record (p.6) | BR-005 | BRD-1 BRNB.090, BRNB.101, BRNB.048 | FR-NB-034, FR-NB-031 | FIT |
-| CORE-01.02 | Update prospect / record (p.6) | BR-006 | BRD-1 BRNB.049, BRNB.047 | FR-NB-032, FR-NB-035 | FIT |
-| CORE-01.03 | Convert prospect into client record (p.6) | BR-007 | BRD-1 BRNB.090, BRNB.101 | FR-NB-034 | FIT |
-| CORE-01.04 | Delete prospect / record (p.6) | BR-008 | BRD-1 BRNB.019, BRNB.106 | FR-NB-012, FR-NB-137 | FIT |
-| CORE-01.05 | Upload and validate client documents (p.6) | BR-009, BR-010, BR-011 | BRD-1 BRNB.030, BRNB.049, BRNB.026 | FR-NB-031, FR-NB-032, FR-NB-033, FR-NB-034 ... | FIT |
-| CORE-01.06 | Client search (p.6) | BR-012 | BRD-1 BRNB.046 | FR-NB-030 | FIT |
-| CORE-01.07 | Generate client code (p.6) | BR-013 | BRD-1 BRNB.030, BRNB.101 | FR-NB-031, FR-NB-032, FR-NB-033, FR-NB-034 | FIT |
-| CORE-02.01 | Receive request for quotation / proposal (p.6) | BR-014 | BRD-1 BRNB.041, BRNB.023 | FR-NB-040 | FIT |
-| CORE-02.02 | Create quotation / proposal (individual or bulk) (p.6) | BR-015, BR-016 | BRD-1 BRNB.043, BRNB.042, BRNB.028 | FR-NB-041, FR-NB-044, FR-NB-046 | FIT |
-| CORE-02.03 | Track proposal status (p.6) | BR-017 | BRD-1 BRNB.022, BRNB.115 | FR-NB-010, FR-NB-122, FR-NB-120 | FIT |
-| CORE-02.04 | Edit quotation / proposal (p.6) | BR-018 | BRD-1 BRNB.020 | FR-NB-042 | FIT |
-| CORE-02.05 | Approve quotation / proposal (p.6) | BR-019 | BRD-1 BRNB.021, BRNB.014 | FR-NB-043, FR-NB-014, FR-NB-051 | FIT |
-| CORE-02.06 | Print quotation / proposal (p.6) | BR-020 | BRD-1 BRNB.043 | FR-NB-041, FR-NB-044 | FIT |
-| CORE-02.07 | Upload documents (p.6) | BR-021 | BRD-1 BRNB.055, BRNB.026 | FR-NB-017 | FIT |
-| CORE-02.08 | Send quotation / proposal (p.6) | BR-022 | BRD-1 BRNB.043, BRNB.042 | FR-NB-041, FR-NB-044, FR-NB-046 | FIT |
-| CORE-02.09 | Generate and customise report (p.6) | BR-053 | BRD-1 BRNB.057, BRNB.075 | FR-NB-123, FR-NB-122 | FIT |
-| CORE-03.01 | Create account (manual, bulk upload, system) (p.6) | BR-023, BR-024, BR-025, BR-028 | BRD-1 BRNB.051, BRNB.066, BRNB.039 | FR-NB-061, FR-NB-062, FR-NB-063, FR-NB-065 ... | FIT |
-| CORE-03.02 | Update account (p.6) | BR-029 | BRD-1 BRNB.025, BRNB.053, BRNB.054 | FR-NB-064, FR-NB-065 | FIT |
-| CORE-03.03 | Link to client record (p.6) | BR-030 | BRD-1 BRNB.051, BRNB.099 | FR-NB-061, FR-NB-062, FR-NB-063, FR-NB-037 | FIT |
-| CORE-03.04 | Approve account (p.6) | BR-031 | BRD-1 BRNB.022, BRNB.079 | FR-NB-010, FR-NB-122, FR-NB-133 | FIT |
-| CORE-03.05 | Initiate placement request (p.6) | BR-033 | BRD-1 BRNB.069 | FR-NB-080 | FIT |
-| CORE-03.06 | Client confirmation (capability matrix p.26) | BR-038 | BRD-1 BRNB.045 | FR-NB-045, FR-NB-057 | FIT |
-| CORE-04.01 | Create proposal request form (PRF) (p.7) | - | BRD-1 BRNB.005 | FR-NB-014, FR-NB-050, FR-NB-051 | FIT |
-| CORE-04.02 | Approve PRF (p.7) | - | BRD-1 BRNB.005, BRNB.014 | FR-NB-014, FR-NB-050, FR-NB-051, FR-NB-043 | FIT |
-| CORE-04.03 | Submit PRF (p.7) | - | BRD-1 BRNB.005 | FR-NB-014, FR-NB-050, FR-NB-051 | FIT |
-| CORE-04.04 | Receive PRF (TSU) (p.7) | - | BRD-1 BRNB.007 | FR-NB-052 | FIT |
-| CORE-04.05 | Edit PRF (p.7) | - | BRD-1 BRNB.007 | FR-NB-052 | FIT |
-| CORE-04.06 | Create Quotation Slip (p.7) | - | BRD-1 BRNB.008 | FR-NB-053 | FIT |
-| CORE-04.07 | Send Quotation Slip to insurers (p.7) | - | BRD-1 BRNB.008 | FR-NB-053 | FIT |
-| CORE-04.08 | Input insurers' feedback in the comparative table (p.7) | - | BRD-1 BRNB.009 | FR-NB-054, FR-NB-055 | FIT |
-| CORE-04.09 | Submit comparative table (p.7) | - | BRD-1 BRNB.010 | FR-NB-055 | FIT |
-| CORE-04.10 | Finalise Proposal Slip (p.7) | - | BRD-1 BRNB.017 | FR-NB-056, FR-NB-057 | FIT |
-| CORE-04.11 | Submit Proposal Slip (p.7) | - | BRD-1 BRNB.017 | FR-NB-056, FR-NB-057 | FIT |
-| CORE-04.12 | Receive and print quotation (p.7) | - | BRD-1 BRNB.017, BRNB.043 | FR-NB-056, FR-NB-057, FR-NB-041, FR-NB-044 | FIT |
-| CORE-04.13 | Send quotation (p.7) | - | BRD-1 BRNB.043 | FR-NB-041, FR-NB-044 | FIT |
-| CORE-04.14 | Convert quotation to account (p.7) | - | BRD-1 BRNB.045 | FR-NB-045, FR-NB-057 | FIT |
-| CORE-04.15 | Edit account (p.7) | - | BRD-1 BRNB.053 | FR-NB-064 | FIT |
-| CORE-04.16 | Approve account (p.7) | - | BRD-1 BRNB.022 | FR-NB-010, FR-NB-122 | FIT |
-| CORE-04.17 | Initiate policy placement request (p.7) | - | BRD-1 BRNB.069 | FR-NB-080 | FIT |
-| CORE-04.18 | Track PRF / proposal placement slip / quotation / placement request status (p.7) | - | BRD-1 BRNB.012, BRNB.022, BRNB.115 | FR-NB-120, FR-NB-010, FR-NB-122 | FIT |
-| CORE-04.19 | Upload documents (p.7) | - | BRD-1 BRNB.055 | FR-NB-017 | FIT |
-| CORE-04.20 | Generate and customise report (p.7) | - | BRD-1 BRNB.011, BRNB.057 | FR-NB-121, FR-NB-123 | FIT |
-| CORE-04.21 | Automated reference number generation (p.7) | - | BRD-1 BRNB.006 | FR-NB-047, FR-NB-050 | FIT |
-| CORE-04.22 | Password protection and encryption of shared documents (p.7) | - | BRD-1 BRNB.013 | FR-NB-013, FR-NB-044, FR-NB-057 | FIT |
-| CORE-04.23 | System notification on status changes (p.7) | - | BRD-1 BRNB.015 | FR-NB-015 | FIT |
-| CORE-04.24 | Complete logging of all actions (p.7) | - | BRD-1 BRNB.016 | FR-NB-016 | FIT |
-| CORE-05.01 | Submit for placement and booking (p.7) | BR-032 | BRD-1 BRNB.022, BRNB.096 | FR-NB-010, FR-NB-122, FR-NB-011, FR-NB-064 | FIT |
-| CORE-05.02 | Generate placement slip (p.7) | BR-036 | BRD-1 BRNB.069 | FR-NB-080 | FIT |
-| CORE-05.03 | Generate placement report (p.7) | BR-039 | BRD-1 BRNB.011, BRNB.075 | FR-NB-121, FR-NB-122 | FIT |
-| CORE-05.04 | Send placement slip to insurer (p.7) | BR-037 | BRD-1 BRNB.071 | FR-NB-081 | FIT |
-| CORE-05.05 | Generate Insurance Advice (p.7) | BR-039 | BRD-1 BRNB.070, BRNB.060 | FR-NB-103, FR-NB-104 | FIT |
-| CORE-05.06 | Receive e-policy (individual or batch) (p.7) | BR-040 | BRD-1 BRNB.073 | FR-NB-100 | FIT |
-| CORE-05.07 | Send e-policy to client (individual or batch) (p.7) | BR-041 | BRD-1 BRNB.077 | FR-NB-105 | FIT |
-| CORE-05.08 | Update client record with the e-policy and policy number (p.7) | BR-042 | BRD-1 BRNB.074 | FR-NB-101 | FIT |
-| CORE-06.01 | Generate RMEL (list of expiring accounts) (p.8) | BR-055 | BRD-6 BRRN.002, BRRN.030, BRRN.005 | FR-RN-011, FR-RN-010, FR-RN-112 | NEW |
-| CORE-06.02 | Filter and distribute RMEL (p.8) | BR-056 | BRD-6 BRRN.003, BRRN.011, BRRN.036 | FR-RN-012, FR-RN-040, FR-RN-102 | CHANGE |
-| CORE-06.03 | Rules-based sanitation of accounts (bulk / individual) (p.8) | BR-026, BR-057 | BRD-6 BRRN.020, BRRN.023, BRRN.009 | FR-RN-020, FR-RN-103, FR-RN-004, FR-RN-022 ... | NEW |
-| CORE-06.04 | Provide disposition (online or by upload) (p.8) | BR-058, BR-059 | BRD-6 BRRN.031, BRRN.018 | FR-RN-004, FR-RN-023, FR-RN-051, FR-RN-103 ... | NEW |
-| CORE-06.05 | Process and generate renewal proposal (p.8) | - | BRD-6 BRRN.033, BRRN.038 | FR-RN-048, FR-RN-064, FR-RN-084 | CHANGE |
-| CORE-06.06 | Generate and send Renewal Advice (p.8) | BR-060, BR-061 | BRD-6 BRRN.010 | FR-RN-080, FR-RN-081, FR-RN-090 | NEW |
-| CORE-06.07 | Send No Advice Letter (NAL) and Non-Renewal Letter (NRL) (p.8) | BR-060, BR-061 | BRD-6 BRRN.001, BRRN.009 | FR-RN-082, FR-RN-103, FR-RN-024, FR-RN-112 | NEW |
-| CORE-06.08 | Check renewal payment (capability matrix p.27) | BR-062 | BRD-6 BRRN.027 | FR-RN-042 | CHANGE |
-| CORE-06.09 | Track renewal status (BR table only) | BR-064 | BRD-6 BRRN.036 | FR-RN-102 | NEW |
-| CORE-07.01 | Premium Receivable (PR) management (p.8) | BR-044, BR-045 | BRD-4 BRCLXN.001, BRCLXN.011, BRCLXN.046 | FR-CL-010, FR-CL-015, FR-CL-016 | FIT |
-| CORE-07.02 | Disposition tracking and management (p.8) | BR-048 | BRD-4 BRCLXN.016, BRCLXN.021, BRCLXN.023 | FR-CL-030, FR-CL-031, FR-CL-018 | FIT |
-| CORE-07.03 | Tag CWT, premium / PR2307 (p.8) | BR-118, BR-139 | BRD-4 BRCLXN.026, BRCLXN.027, CSHID.026 | FR-CL-032, FR-CL-081, FR-OP-026 | FIT |
-| CORE-07.04 | Unapplied payment disposition (excess payment) (p.8) | BR-046, BR-047, BR-090 | BRD-4 BRCLXN.030, BRCLXN.034, BRCLXN.041 | FR-CL-074, FR-CL-070, FR-CL-077 | FIT |
-| CORE-07.05 | Reporting and audit (p.8) | BR-053, BR-054 | BRD-4 BRCLXN.028, BRCLXN.043, BRCLXN.045 | FR-CL-082, FR-CL-003, FR-CL-083 | FIT |
-| CORE-07.06 | Batch processing and automation (capability matrix p.27) | BR-049 | BRD-4 BRCLXN.013, BRCLXN.024, BRCLXN.041 | FR-CL-017, FR-CL-032, FR-CL-080, FR-CL-077 | FIT |
-| CORE-08.01 | Daily financial report reconciliation (p.8) | BR-065 | BRD-5 ACSL 2.13.0, ACSL 2.13.2 | FR-AS-003, FR-AS-004 | FIT |
-| CORE-08.02 | Daily cash movement reconciliation (p.8) | BR-067 | BRD-5 FRBS 3.3.0 | FR-AC-050 | FIT |
-| CORE-08.03 | Insurer's statement of accounts (SOA) reconciliation (p.8) | BR-068 | BRD-5 ACSL 2.13.1, ACSL 2.14.1 | FR-AS-003 | FIT |
-| CORE-08.04 | Generate automated journal entries (p.8) | BR-069 | BRD-5 ACSL 2.15.0, FRBS 3.1.0 | FR-AS-024, FR-AC-030 | FIT |
-| CORE-08.05 | Perform manual entries (p.8) | BR-070 | BRD-5 FRBS 2.8.0, FRBS 2.8.5 | FR-AC-032 | FIT |
-| CORE-08.06 | Perform manual / invoice adjustments (p.8) | BR-071 | BRD-5 ACSL 2.9.0, ACSL 2.9.1 | FR-AS-021 | FIT |
-| CORE-08.07 | Perform accrual (p.8) | BR-072 | BRD-5 FRBS 2.8.1 | FR-AC-032, FR-AC-033 | FIT |
-| CORE-08.08 | Perform revaluation (p.8) | BR-073 | BRD-5 FRBS 2.2.0, FRBS 3.5.0 | FR-AC-010, FR-AC-043 | FIT |
-| CORE-08.09 | Perform month-end and year-end closing (p.8) | - | BRD-5 FRBS 3.4.0 | FR-AC-042 | FIT |
-| CORE-08.10 | Generate financial reports (p.8) | BR-066 | BRD-5 FRBS 3.2.0, DIS 3.28.0 | FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 ... | FIT |
-| CORE-08.11 | Accounts analysis (p.8) | BR-074 | BRD-5 ACSL 2.5.0, ACSL 2.5.3 | FR-AS-010 | FIT |
-| CORE-08.12 | Receive and release CWT (commission / supplier) (p.8) | BR-075, BR-076 | BRD-5 DIS 2.11.0, DIS 2.12.0 | FR-DS-057, FR-DS-058 | FIT |
-| CORE-08.13 | Disbursement to insurer, client, supplier, BDO subsidiaries (p.8) | BR-077 | BRD-5 DIS 2.7.0 | FR-DS-033 | FIT |
-| CORE-08.14 | Reporting and documentation (p.8) | BR-078, BR-084 | BRD-5 DIS 3.28.0, FRBS 3.2.0 | FR-DS-081, FR-AC-060, FR-AC-061, FR-AC-062 ... | FIT |
-| CORE-08.15 | Release BIR 2307 on premiums (PR2307) to insurer (p.8) | BR-078 | BRD-2 CSHID.027 | FR-OP-026 | FIT |
-| CORE-08.16 | Generate Direct Credit transactions file (p.8) | BR-077 | BRD-5 DIS 2.7.0 | FR-DS-033 | FIT |
-| CORE-08.17 | Disbursement to government agencies and employees (p.8) | BR-077 | BRD-5 DIS 2.7.0 | FR-DS-033 | FIT |
-| CORE-08.18 | Payee management (p.8) | BR-079 | BRD-5 DIS 2.2.0 | FR-DS-010 | FIT |
-| CORE-08.19 | Check printing and series management (p.8) | BR-080 | BRD-5 DIS 2.7.0 | FR-DS-033 | FIT |
-| CORE-08.20 | Status tagging and tracking (p.8) | BR-081, BR-082 | BRD-5 DIS 2.8.0, DIS 3.26.0 | FR-DS-050, FR-DS-052 | FIT |
-| CORE-08.21 | Bank account operations (p.9) | - | BRD-5 DIS 2.7.0 | FR-DS-033 | FIT |
-| CORE-08.22 | Generate manual service invoice (Other Income) (p.9) | BR-085 | BRD-1 BRNB.100 | FR-NB-117 | FIT |
-| CORE-09.01 | Manual issuance of AR, OR, invoice, cash and cheque OTC payment (p.9) | BR-086 | BRD-2 CSHID.001, CSHID.002 | FR-OP-011, FR-OP-013, FR-OP-014, FR-OP-012 | FIT |
-| CORE-09.02 | Automated accounting entries (p.9) | BR-087 | BRD-2 CSHID.012, CSHID.014 | FR-OP-013, FR-OP-027 | FIT |
-| CORE-09.03 | Batch payment files processing (automatching) (p.9) | BR-089 | BRD-2 CSHID.008 | FR-OP-015, FR-OP-016 | FIT |
-| CORE-09.04 | Batch processing and automation (automatch re-run) (p.9) | BR-092 | BRD-2 CSHID.020 | FR-OP-018, FR-OP-132 | FIT |
-| CORE-09.05 | Batch reversal processing (p.9) | - | BRD-2 CSHID.012, CSHID.016 | FR-OP-013, FR-OP-027, FR-OP-023 | FIT |
-| CORE-09.06 | Unapplied payment management (excess payment) (p.9) | BR-090, BR-093 | BRD-2 CSHID.024, CSHID.025 | FR-OP-022 | FIT |
-| CORE-09.07 | Payment auto matching (p.9) | BR-091 | BRD-2 CSHID.020 | FR-OP-018, FR-OP-132 | FIT |
-| CORE-09.08 | Generate acknowledgement receipt, official receipt, invoice (p.9) | BR-094, BR-095, BR-096 | BRD-2 CSHID.001, CSHID.006, CSHID.019 | FR-OP-011, FR-OP-013, FR-OP-014, FR-OP-010 ... | FIT |
-| CORE-09.09 | Premium payment monitoring (p.9) | BR-097 | BRD-2 CSHID.023, CSHID.017 | FR-OP-028, FR-OP-009 | FIT |
-| CORE-09.10 | Commission fee collection (p.9) | BR-098, BR-099 | BRD-2 CSHID.007, CMRID.002 | FR-OP-021, FR-OP-091 | FIT |
-| CORE-09.11 | PDC management (p.9) | BR-100 | BRD-2 CSHID.008 | FR-OP-015, FR-OP-016 | FIT |
-| CORE-09.12 | Traceability and auditability (p.9) | - | BRD-2 CSHID.011 | FR-OP-024 | FIT |
-| CORE-10.01 | Extraction and remittance processing (scheduled or manual) (p.9) | BR-102, BR-103 | BRD-2 RMTID.001, RMTID.003, RMTID.004 | FR-OP-030 | FIT |
-| CORE-10.02 | Sending and uploading of files (p.9) | BR-104, BR-105 | BRD-2 RMTID.011, RMTID.013 | FR-OP-034, FR-OP-037 | FIT |
-| CORE-10.03 | Validation and filtering criteria (p.9) | BR-106, BR-107, BR-108 | BRD-2 RMTID.014, RMTID.017, RMTID.020 | FR-OP-031 | FIT |
-| CORE-10.04 | Search and view (p.9) | BR-109 | BRD-2 RMTID.025, RMTID.026 | FR-OP-039, FR-OP-005 | FIT |
-| CORE-10.05 | Hold remittance management (p.9) | BR-110, BR-112, BR-113, BR-114, BR-115, BR-116 | BRD-2 RMTID.020, RMTID.031, RMTID.032 | FR-OP-031, FR-OP-005 | FIT |
-| CORE-10.06 | Special remittance request and processing (p.9) | BR-117 | BRD-2 RMTID.030 | FR-OP-040 | FIT |
-| CORE-10.07 | Notifications and tracking (p.9) | BR-111 | BRD-2 RMTID.033, RMTID.035, RMTID.036 | FR-OP-040, FR-OP-031, FR-OP-036 | FIT |
-| CORE-11.01 | Data extraction and file management (p.9) | BR-119, BR-120 | BRD-2 PRCID.001, PRCID.009 | FR-OP-070, FR-OP-074 | FIT |
-| CORE-11.02 | Production register viewing and filtering (p.9) | BR-121 | BRD-2 PRCID.012, PRCID.021 | FR-OP-071, FR-OP-077 | FIT |
-| CORE-11.03 | Matching and automation (p.9) | BR-122, BR-123 | BRD-2 PRCID.023, PRCID.024, PRCID.033 | FR-OP-076, FR-OP-075 | FIT |
-| CORE-11.04 | Tracking and monitoring (p.9) | BR-124 | BRD-2 PRCID.029, PRCID.030, PRCID.032 | FR-OP-079, FR-OP-075, FR-OP-074 | FIT |
-| CORE-11.05 | Reports generation (p.9) | - | BRD-2 PRCID.034, PRCID.035, PRCID.039 | FR-OP-071, FR-OP-080 | FIT |
-| CORE-12.01 | Transaction management (endorsements, cancellations) (p.9) | BR-126 | BRD-2 ADJID.001, ADJID.003, ADJID.005 | FR-OP-050, FR-OP-053 | FIT |
-| CORE-12.02 | Automated accounting entries (p.9) | BR-127, BR-132 | BRD-2 ADJID.011, ADJID.012 | FR-OP-056, FR-OP-057 | FIT |
-| CORE-12.03 | Traceability and auditability (p.10) | BR-128, BR-129 | BRD-2 ADJID.020, ADJID.022 | FR-OP-050, FR-OP-061 | FIT |
-| CORE-12.04 | Reporting and monitoring (p.10) | - | BRD-2 ADJID.016, ADJID.019, ADJID.021 | FR-OP-062, FR-OP-061 | FIT |
-| CORE-12.05 | Search and document management (p.10) | BR-130, BR-131 | BRD-2 ADJID.024, ADJID.025 | FR-OP-005, FR-OP-061, FR-OP-052 | FIT |
-| CORE-12.06 | Sending and uploading of files (p.10) | - | BRD-2 ADJID.026 | FR-OP-059 | FIT |
-| CORE-12.07 | Batch posting (p.10) | - | BRD-2 ADJID.006 | FR-OP-056 | FIT |
-| CORE-13.01 | Automated incentive calculation (p.10) | BR-166, BR-167 | BRD-2 CMRID.005 | FR-OP-095 | FIT |
-| CORE-13.02 | Motor Mania incentive plan (p.10) | BR-168 | BRD-2 CMRID.006 | FR-OP-095 | FIT |
-| CORE-13.03 | Production data validation and exclusion handling (p.10) | BR-169 | BRD-2 CMRID.003 | FR-OP-095 | FIT |
-| CORE-13.04 | Automated commission receivables processing (p.10) | BR-133 | BRD-2 CMRID.007 | FR-OP-091 | FIT |
-| CORE-13.05 | Comprehensive production reporting (p.10) | BR-134 | BRD-2 CMRID.014, PRCID.035 | FR-OP-097, FR-OP-080 | FIT |
-| CORE-13.06 | Risk mitigation and error handling (p.10) | BR-135 | BRD-2 CMRID.008 | FR-OP-091, FR-OP-093 | FIT |
-| CORE-13.07 | Collection of commission receivables (direct payment) (p.10) | BR-052, BR-136, BR-137, BR-140 | BRD-2 CMRID.002, CMRID.004 | FR-OP-091, FR-OP-098 | FIT |
-| CORE-13.08 | Auto-match reversals (p.10) | BR-138, BR-139 | BRD-2 CMRID.007, CSHID.027 | FR-OP-091, FR-OP-026 | FIT |
-| CORE-14.01 | Process claims advice from BDOI Marketing (p.10) | BR-141 | BRD-7 BRCLM.003, BRCLM.016 | FR-CM-010, FR-CM-011, FR-CM-015, FR-CM-014 | NEW |
-| CORE-14.02 | Process claims advice from client (p.10) | BR-141 | BRD-7 BRCLM.003, BRCLM.006 | FR-CM-010, FR-CM-011, FR-CM-015, FR-CM-002 ... | NEW |
-| CORE-14.03 | Process claims advice from insurer (p.10) | BR-141 | BRD-7 BRCLM.041, BRCLM.043 | FR-CM-003, FR-CM-011, FR-CM-022, FR-CM-024 ... | NEW |
-| CORE-14.04 | Process LOA from insurer (p.10) | BR-142 | BRD-7 BRCLM.014, BRCLM.010 | FR-CM-043, FR-CM-040, FR-CM-046 | NEW |
-| CORE-14.05 | Process settlement offer from insurer (p.10) | BR-143 | BRD-7 BRCLM.010, BRCLM.014 | FR-CM-040, FR-CM-046, FR-CM-043 | NEW |
-| CORE-14.06 | Tag permanent closure (p.10) | BR-144 | BRD-7 BRCLM.035, BRCLM.005 | FR-CM-045, FR-CM-002 | NEW |
-| CORE-14.07 | Tag temporary closure (p.10) | BR-145 | BRD-7 BRCLM.035 | FR-CM-045 | NEW |
-| CORE-14.08 | Unclaimed checks safekeeping (p.10) | BR-146 | BRD-7 | Gap G2 (CRQ03) | NEW |
-| CORE-14.09 | Handover of settlement checks to Cashiering (p.10) | BR-147 | BRD-7 | Gap G2 (CRQ03) | NEW |
-| CORE-14.10 | Retrieval of checks from Cashiering for release (p.10) | BR-148 | BRD-7 | Gap G2 (CRQ03) | NEW |
-| CORE-14.11 | Maintain full claims history for audit and compliance (p.10) | BR-151 | BRD-7 BRCLM.004, BRCLM.022 | FR-CM-012, FR-CM-052, FR-CM-054 | NEW |
-| CORE-14.12 | Reports and analytics viewing (p.10) | BR-149, BR-152 | BRD-7 BRCLM.026, BRCLM.029, BRCLM.030, BRCLM.031, BRCLM.032 | FR-CM-060, FR-CM-044, FR-CM-061, FR-CM-062 | NEW |
-| CORE-14.13 | Encode / override the next follow-up date (p.10) | BR-150 | BRD-7 BRCLM.019 | FR-CM-002, FR-CM-050, FR-CM-054 | NEW |
-| CORE-15.01 | Placement request initiation (p.10) | BR-153 | ReInsurance BRD FRID-001-FRID-010 | Phase 2 | OUT |
-| CORE-15.02 | Placement slip management (p.10) | BR-154 | ReInsurance BRD FRID-017-FRID-028 | Phase 2 | OUT |
-| CORE-15.03 | Statement of Account (SOA) generation (p.10) | BR-155, BR-156 | ReInsurance BRD FRID-033-FRID-041 | Phase 2 | OUT |
-| CORE-15.04 | Claims reporting and settlement (p.10) | BR-157 | ReInsurance BRD FRID-101-FRID-105 | Phase 2 | OUT |
-| CORE-15.05 | Claims payment processing (p.10) | BR-158 | ReInsurance BRD FRID-058-FRID-066 | Phase 2 | OUT |
-| CORE-15.06 | Direct client claims payment (p.11) | BR-159 | ReInsurance BRD FRID-075-FRID-082 | Phase 2 | OUT |
-| CORE-15.07 | Receive and validate file from stakeholders (capability matrix p.28) | - | ReInsurance BRD | Phase 2 | OUT |
-| CORE-15.08 | Notification to stakeholders (capability matrix p.28) | - | ReInsurance BRD | Phase 2 | OUT |
-| CORE-15.09 | Log, audit and history for traceability (capability matrix p.28) | - | ReInsurance BRD | Phase 2 | OUT |
-| CORE-15.10 | Net settlement (capability matrix p.28) | - | ReInsurance BRD | Phase 2 | OUT |
-| CORE-16.01 | Search, retrieve and display client contact and insurance account details (p.11) | BR-161 | BRD-9 BRCSF-002, BRCSF-003, BRCSF-008 | FR-CSF-011, FR-CSF-021, FR-CSF-022, FR-CSF-010 | CHANGE |
-| CORE-16.02 | View, add and update client contact information (p.11) | BR-162 | BRD-9 BRCSF-004 | FR-CSF-020, FR-CSF-021 | CHANGE |
-| CORE-16.03 | View mode of payment (history) and current status (p.11) | BR-163 | BRD-9 BRCSF-005 | FR-CSF-012, FR-CSF-013 | CHANGE |
-| CORE-16.04 | View and resend RA (and e-policy) (p.11) | BR-164 | BRD-9 BRCSF-006, BRCSF-009 | FR-CSF-030, FR-CSF-033 | NEW |
-| CORE-16.05 | Upload supporting documents (p.11) | - | BRD-9 BRCSF-007 | FR-CSF-032 | CHANGE |
-| CORE-16.06 | Case resolution: add / edit case details and status (p.11) | BR-165 | BRD-9 | Gap G3 (CRQ04) | OUT |
-| CORE-17.01 | Master data change logging (user, product, insurer, LOVs) (p.11) | BR-170 | None (BRNB.016, BRNB.083, BRPM.024, BRCLXN.043 related) | FR-CR-031; FR-NB-016, FR-NB-132, FR-PM-005, FR-CL-003 | CHANGE |
-| CORE-17.02 | Insurer management (p.11) | BR-171 | None (BRNB.008 related) | FR-CR-061; FR-NB-053 | CHANGE |
-| CORE-17.03 | LOV maintenance (p.11) | BR-004, BR-172 | BRD-1 BRNB.083, BASAU 2.2.0 | FR-CR-060; FR-NB-132, FR-AC-070 | FIT |
-| CORE-17.04 | MIS field definition (p.11) | BR-173, BR-174 | None (BRNB.108 related) | FR-CR-062; FR-NB-110, FR-NB-119 | NEW |
-| CORE-17.05 | Product maintenance (p.11) | - | BRD-3 BRPM.003, PMADD01 | FR-CR-063; FR-PM-012, FR-PM-010 | FIT |
-| CORE-18.01 | Include any other / additional system capabilities (p.11) | BR-176 | None | Gap G9 (CRQ10) | OUT |
-| CORE-19.01 | Automated renewal notifications (p.11) | BR-184, BR-196 | BRD-8 BRID-001 | FR-EB-022 | NEW |
-| CORE-19.02 | Manual and system-based proposal generation (p.11) | BR-185, BR-197 | BRD-8 BRID-003 | FR-EB-024 | NEW |
-| CORE-19.03 | Document and data upload management (p.11) | BR-186, BR-198 | BRD-8 BRID-005, BRID-005.01, BRID-014, BRID-025 | FR-EB-001, FR-EB-010, FR-EB-011, FR-EB-014 ... | NEW |
-| CORE-19.04 | Broker on record management (p.11) | BR-187 | BRD-8 BRID-008 | FR-EB-031 | NEW |
-| CORE-19.05 | Terms of Reference generation and distribution (p.11) | BR-188 | BRD-8 BRID-007, BRID-009 | FR-EB-004, FR-EB-030, FR-EB-035 | CHANGE |
-| CORE-19.06 | Comparative report management (p.11) | BR-189 | BRD-8 BRID-010, BRID-011 | FR-EB-040, FR-EB-041, FR-EB-015, FR-EB-043 | CHANGE |
-| CORE-19.07 | Client feedback, change, additional or amendment request capture and relay (p.11) | BR-190 | BRD-8 BRID-002, BRID-012, BRID-013, BRID-015 | FR-EB-023, FR-EB-044, FR-EB-054, FR-EB-055 ... | NEW |
-| CORE-19.08 | Automated and manual sending of proposals (p.11) | BR-191 | BRD-8 BRID-003, BRID-009 | FR-EB-024, FR-EB-035 | NEW |
-| CORE-19.09 | Approval workflow based on defined thresholds (p.11) | BR-192 | BRD-8 BRID-016 | FR-EB-042 | CHANGE |
-| CORE-19.10 | Placement and booking management (p.11) | BR-193 | BRD-8 BRID-017, BRID-019, BRID-020 | FR-EB-046, FR-EB-051, FR-EB-052 | CHANGE |
-| CORE-19.11 | Centralised reporting and analytics (p.11) | BR-194 | BRD-8 BRID-022, BRID-023, BRID-024 | FR-EB-060, FR-EB-062, FR-EB-001, FR-EB-003 | NEW |
-| CORE-19.12 | Manage franchise requests and approvals (p.11) | BR-195 | BRD-8 BRID-026, BRID-027, BRID-029 | FR-EB-032, FR-EB-034, FR-EB-033 | NEW |
-| CORE-20.01 | Automated request handling (p.12) | BR-199 | BRD-3 BRPM.011, BRPM.008 | FR-PM-020, FR-PM-024, FR-PM-045, FR-PM-021 | FIT |
-| CORE-20.02 | Automatic reference numbers (p.12) | BR-200 | BRD-3 BRPM.008 | FR-PM-020, FR-PM-021 | FIT |
-| CORE-20.03 | Quotation / proposal management (p.12) | BR-201 | BRD-3 BRPM.012, BRPM.013 | FR-PM-030, FR-PM-031, FR-PM-034, FR-PM-036 | FIT |
-| CORE-20.04 | Automatic comparison tables (p.12) | BR-202 | BRD-3 BRPM.014, PMADD03 | FR-PM-034, FR-PM-035 | FIT |
-| CORE-20.05 | Real-time dashboard / reports (p.12) | BR-203 | BRD-3 BRPM.019, BRPM.018 | FR-PM-070, FR-PM-071 | FIT |
-| CORE-20.06 | Built-in checks / approvals (p.12) | BR-204 | BRD-3 BRPM.021, PMADD06 | FR-PM-021, FR-PM-073, FR-PM-043 | FIT |
-| CORE-20.07 | Secure document sharing (p.12) | BR-205 | BRD-3 BRPM.020, BRPM.002 | FR-PM-004, FR-PM-002 | FIT |
-| CORE-20.08 | Works with existing systems (p.12) | BR-206 | BRD-3 BRPM.022 | FR-PM-072 | CONFIGURE |
-| CORE-20.09 | Track all changes (p.12) | BR-207 | BRD-3 BRPM.024 | FR-PM-005 | FIT |
-| CORE-20.10 | Expiring packages monitoring (p.12) | BR-208 | BRD-3 BRPM.017, BRPM.006 | FR-PM-044, FR-PM-060, FR-PM-061, FR-PM-071 ... | FIT |
-| CORE-21.01 | Generate standard reports for operational and analytical purposes (p.12) | BR-054 | BRD-1 BRNB.057, BRNB.075 | FR-CR-040; FR-NB-123, FR-NB-122 | FIT |
-| CORE-21.02 | Extract, download and print reports in multiple formats (p.12) | BR-078 | BRD-1 BRNB.031, BRNB.037 | FR-CR-040; FR-NB-124, FR-NB-125 | FIT |
-| CORE-21.03 | Create tailored reports by parameters, filters and business requirements (p.12) | BR-053 | BRD-1 BRNB.057 | FR-CR-041; FR-NB-123 | FIT |
-| CORE-21.04 | Dynamic customisation: data fields, charts and summaries (p.12) | BR-053 | None | FR-CR-042 | CHANGE |
-| CORE-21.05 | Scheduled or on-demand report generation (p.12) | BR-054, BR-103 | None (DIS 3.28.0, BRCLXN.028 related) | FR-CR-043; FR-DS-081, FR-CL-082 | CHANGE |
-| XC-01 | Log-in, password reset, several types of user access, user administration (p.13) | BR-000, BR-001, BR-002, BR-003 | BRD-11 BRNB.040, BRNB.084 | FR-CR-070; FR-NB-130, FR-NB-134 | FIT |
-| XC-02 | Centralised, real-time dashboards for all roles; details invoked from the dashboard (p.5, p.20-21) | BR-125, BR-152, BR-160, BR-203 | None (BRNB.012, BRQID.003, BRPM.019 related) | FR-CR-010, FR-CR-011; FR-NB-120, FR-OP-003, FR-PM-070 | CHANGE |
-| XC-03 | Automated notifications, approvals and feedback tracking (p.5, p.19, p.24) | BR-083, BR-111, BR-206 | None (BRNB.015, RMTID.033 related) | FR-CR-020; FR-NB-015, FR-OP-040 | FIT |
-| XC-04 | Audit logs and full transaction history (p.4-5, p.20, p.25) | BR-124, BR-129, BR-151, BR-207 | None (BRNB.016, BRNB.086, BRNB.089 related) | FR-CR-030; FR-NB-016, FR-NB-136 | FIT |
-| XC-05 | Workflow maintained at the back end; data flows to the next process by rules (p.15, p.18, p.23) | BR-051, BR-101, BR-177, BR-182 | None (BRNB.096, BRNB.022 related) | FR-CR-080; FR-NB-011, FR-NB-064, FR-NB-010, FR-NB-122 | CONFIGURE |
-| XC-06 | Batch and individual processing; concurrent users and high-volume bulk uploads (p.4, p.16) | BR-063 | None (BRNB.064, BRQID.006 related) | FR-CR-083; FR-NB-019, FR-NB-065, FR-OP-008 | FIT |
-| XC-07 | Currency selection and multi-currency support (p.15, p.18) | BR-027, BR-088 | None (BRCLM.009 related) | FR-CR-091; FR-CM-011 | FIT |
-| XC-08 | 30-day hold cover request, assigned to a role (p.14) | BR-034 | BRD-1 BRNB.072, BRNB.103 | FR-NB-082, FR-NB-083 | FIT |
-| XC-09 | Tag direct payment (DP) accounts (p.14) | BR-035 | BRD-1 BRNB.114 | FR-NB-069, FR-NB-092 | FIT |
-| XC-10 | SOA generated with placement report and Insurance Advice; service invoice to insurer issued with the SOA at booking (p.14-15) | BR-039, BR-043 | BRD-1 BRNB.100, BRCLXN.058 | FR-CR-093; FR-NB-117, FR-CL-060, FR-CL-061 | CHANGE |
-| XC-11 | Billing reports with premium and loan details; payment reports matched to accounts (p.15) | BR-049, BR-050 | BRD-1 BRNB.067, BRNB.068 | FR-NB-090, FR-NB-091, FR-NB-092 | FIT |
-| XC-12 | BIR standard books (sales, purchase, cash receipts, cash disbursements, general journal) (p.17) | BR-084 | BRD-5 FRBS 3.2.0 | FR-CR-040; FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 | FIT |
-| XC-13 | Invoice Master List across workflows (p.23) | BR-175 | None (BRCLXN.001, ACSL 2.16.0 related) | FR-CR-090; FR-CL-010, FR-AS-026 | CHANGE |
-| XC-14 | BDO brand colours, logos, icons and design system (p.23) | BR-178, BR-179, BR-180 | None | FR-CR-092 | CHANGE |
-| XC-15 | Identified user journeys and customisable interaction flows (with a walkthrough) (p.23) | BR-181, BR-182 | None | FR-CR-001 | FIT |
-| XC-16 | Vendor uses Figma for design execution (p.23) | BR-183 | None | - | OUT |
-| XC-17 | Regulatory compliance: BIR and Insurance Commission reportorial requirements (p.4) | - | BRD-5 FRBS 3.2.0 | FR-CR-040; FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 | CHANGE |
-| XC-18 | Retail and wholesale business (p.4) | - | BRD-1 BRNB.001 | FR-CR-001; FR-NB-001 | FIT |
-| XC-19 | Invoice batch printing, delivery to insurers by SFTP and delivery report (daily, per insurer) (p.43) | - | None (BRNB.100 related) | FR-CR-081; FR-NB-117 | CHANGE |
-| XC-20 | Client migration (one-time, 2020 to present) and daily midday / EOD client batches with modification report (p.43) | - | Data Migration BRD | FR-CR-082 | NEW |
-| XC-21 | ALeA e-mail address encoding (as needed) (p.43) | - | None | Gap G10 (CRQ20) | OUT |
-| XC-22 | Daily synchronisation from source systems (CMS, Reinsurance) (p.42-43) | - | BRD-4 BRCLXN.013, BRCLXN.014, BRCLXN.015 | FR-CR-082; FR-CL-017 | CONFIGURE |
-| XC-23 | MIS LOV, QPS insurer, LGT rates and insurer branch maintenance (MILB, 24 a year) (p.45) | - | BRD-1 BRNB.083 | FR-CR-060; FR-NB-132 | FIT |
+<!-- table: widths=1.7,6.2,2.4,5.4,4.4 caption="Traceability of the umbrella BRD" size=7 -->
+| ID | Capability (Core BRD page) | Core BR | Covered by | FR |
+|---|---|---|---|---|
+| CORE-01.01 | Create prospect / record (p.6) | BR-005 | BRD-1 BRNB.090, BRNB.101, BRNB.048 | FR-NB-034, FR-NB-031 |
+| CORE-01.02 | Update prospect / record (p.6) | BR-006 | BRD-1 BRNB.049, BRNB.047 | FR-NB-032, FR-NB-035 |
+| CORE-01.03 | Convert prospect into client record (p.6) | BR-007 | BRD-1 BRNB.090, BRNB.101 | FR-NB-034 |
+| CORE-01.04 | Delete prospect / record (p.6) | BR-008 | BRD-1 BRNB.019, BRNB.106 | FR-NB-012, FR-NB-137 |
+| CORE-01.05 | Upload and validate client documents (p.6) | BR-009, BR-010, BR-011 | BRD-1 BRNB.030, BRNB.049, BRNB.026 | FR-NB-031, FR-NB-032, FR-NB-033, FR-NB-034 ... |
+| CORE-01.06 | Client search (p.6) | BR-012 | BRD-1 BRNB.046 | FR-NB-030 |
+| CORE-01.07 | Generate client code (p.6) | BR-013 | BRD-1 BRNB.030, BRNB.101 | FR-NB-031, FR-NB-032, FR-NB-033, FR-NB-034 |
+| CORE-02.01 | Receive request for quotation / proposal (p.6) | BR-014 | BRD-1 BRNB.041, BRNB.023 | FR-NB-040 |
+| CORE-02.02 | Create quotation / proposal (individual or bulk) (p.6) | BR-015, BR-016 | BRD-1 BRNB.043, BRNB.042, BRNB.028 | FR-NB-041, FR-NB-044, FR-NB-046 |
+| CORE-02.03 | Track proposal status (p.6) | BR-017 | BRD-1 BRNB.022, BRNB.115 | FR-NB-010, FR-NB-122, FR-NB-120 |
+| CORE-02.04 | Edit quotation / proposal (p.6) | BR-018 | BRD-1 BRNB.020 | FR-NB-042 |
+| CORE-02.05 | Approve quotation / proposal (p.6) | BR-019 | BRD-1 BRNB.021, BRNB.014 | FR-NB-043, FR-NB-014, FR-NB-051 |
+| CORE-02.06 | Print quotation / proposal (p.6) | BR-020 | BRD-1 BRNB.043 | FR-NB-041, FR-NB-044 |
+| CORE-02.07 | Upload documents (p.6) | BR-021 | BRD-1 BRNB.055, BRNB.026 | FR-NB-017 |
+| CORE-02.08 | Send quotation / proposal (p.6) | BR-022 | BRD-1 BRNB.043, BRNB.042 | FR-NB-041, FR-NB-044, FR-NB-046 |
+| CORE-02.09 | Generate and customise report (p.6) | BR-053 | BRD-1 BRNB.057, BRNB.075 | FR-NB-123, FR-NB-122 |
+| CORE-03.01 | Create account (manual, bulk upload, system) (p.6) | BR-023, BR-024, BR-025, BR-028 | BRD-1 BRNB.051, BRNB.066, BRNB.039 | FR-NB-061, FR-NB-062, FR-NB-063, FR-NB-065 ... |
+| CORE-03.02 | Update account (p.6) | BR-029 | BRD-1 BRNB.025, BRNB.053, BRNB.054 | FR-NB-064, FR-NB-065 |
+| CORE-03.03 | Link to client record (p.6) | BR-030 | BRD-1 BRNB.051, BRNB.099 | FR-NB-061, FR-NB-062, FR-NB-063, FR-NB-037 |
+| CORE-03.04 | Approve account (p.6) | BR-031 | BRD-1 BRNB.022, BRNB.079 | FR-NB-010, FR-NB-122, FR-NB-133 |
+| CORE-03.05 | Initiate placement request (p.6) | BR-033 | BRD-1 BRNB.069 | FR-NB-080 |
+| CORE-03.06 | Client confirmation (capability matrix p.26) | BR-038 | BRD-1 BRNB.045 | FR-NB-045, FR-NB-057 |
+| CORE-04.01 | Create proposal request form (PRF) (p.7) | - | BRD-1 BRNB.005 | FR-NB-014, FR-NB-050, FR-NB-051 |
+| CORE-04.02 | Approve PRF (p.7) | - | BRD-1 BRNB.005, BRNB.014 | FR-NB-014, FR-NB-050, FR-NB-051, FR-NB-043 |
+| CORE-04.03 | Submit PRF (p.7) | - | BRD-1 BRNB.005 | FR-NB-014, FR-NB-050, FR-NB-051 |
+| CORE-04.04 | Receive PRF (TSU) (p.7) | - | BRD-1 BRNB.007 | FR-NB-052 |
+| CORE-04.05 | Edit PRF (p.7) | - | BRD-1 BRNB.007 | FR-NB-052 |
+| CORE-04.06 | Create Quotation Slip (p.7) | - | BRD-1 BRNB.008 | FR-NB-053 |
+| CORE-04.07 | Send Quotation Slip to insurers (p.7) | - | BRD-1 BRNB.008 | FR-NB-053 |
+| CORE-04.08 | Input insurers' feedback in the comparative table (p.7) | - | BRD-1 BRNB.009 | FR-NB-054, FR-NB-055 |
+| CORE-04.09 | Submit comparative table (p.7) | - | BRD-1 BRNB.010 | FR-NB-055 |
+| CORE-04.10 | Finalise Proposal Slip (p.7) | - | BRD-1 BRNB.017 | FR-NB-056, FR-NB-057 |
+| CORE-04.11 | Submit Proposal Slip (p.7) | - | BRD-1 BRNB.017 | FR-NB-056, FR-NB-057 |
+| CORE-04.12 | Receive and print quotation (p.7) | - | BRD-1 BRNB.017, BRNB.043 | FR-NB-056, FR-NB-057, FR-NB-041, FR-NB-044 |
+| CORE-04.13 | Send quotation (p.7) | - | BRD-1 BRNB.043 | FR-NB-041, FR-NB-044 |
+| CORE-04.14 | Convert quotation to account (p.7) | - | BRD-1 BRNB.045 | FR-NB-045, FR-NB-057 |
+| CORE-04.15 | Edit account (p.7) | - | BRD-1 BRNB.053 | FR-NB-064 |
+| CORE-04.16 | Approve account (p.7) | - | BRD-1 BRNB.022 | FR-NB-010, FR-NB-122 |
+| CORE-04.17 | Initiate policy placement request (p.7) | - | BRD-1 BRNB.069 | FR-NB-080 |
+| CORE-04.18 | Track PRF / proposal placement slip / quotation / placement request status (p.7) | - | BRD-1 BRNB.012, BRNB.022, BRNB.115 | FR-NB-120, FR-NB-010, FR-NB-122 |
+| CORE-04.19 | Upload documents (p.7) | - | BRD-1 BRNB.055 | FR-NB-017 |
+| CORE-04.20 | Generate and customise report (p.7) | - | BRD-1 BRNB.011, BRNB.057 | FR-NB-121, FR-NB-123 |
+| CORE-04.21 | Automated reference number generation (p.7) | - | BRD-1 BRNB.006 | FR-NB-047, FR-NB-050 |
+| CORE-04.22 | Password protection and encryption of shared documents (p.7) | - | BRD-1 BRNB.013 | FR-NB-013, FR-NB-044, FR-NB-057 |
+| CORE-04.23 | System notification on status changes (p.7) | - | BRD-1 BRNB.015 | FR-NB-015 |
+| CORE-04.24 | Complete logging of all actions (p.7) | - | BRD-1 BRNB.016 | FR-NB-016 |
+| CORE-05.01 | Submit for placement and booking (p.7) | BR-032 | BRD-1 BRNB.022, BRNB.096 | FR-NB-010, FR-NB-122, FR-NB-011, FR-NB-064 |
+| CORE-05.02 | Generate placement slip (p.7) | BR-036 | BRD-1 BRNB.069 | FR-NB-080 |
+| CORE-05.03 | Generate placement report (p.7) | BR-039 | BRD-1 BRNB.011, BRNB.075 | FR-NB-121, FR-NB-122 |
+| CORE-05.04 | Send placement slip to insurer (p.7) | BR-037 | BRD-1 BRNB.071 | FR-NB-081 |
+| CORE-05.05 | Generate Insurance Advice (p.7) | BR-039 | BRD-1 BRNB.070, BRNB.060 | FR-NB-103, FR-NB-104 |
+| CORE-05.06 | Receive e-policy (individual or batch) (p.7) | BR-040 | BRD-1 BRNB.073 | FR-NB-100 |
+| CORE-05.07 | Send e-policy to client (individual or batch) (p.7) | BR-041 | BRD-1 BRNB.077 | FR-NB-105 |
+| CORE-05.08 | Update client record with the e-policy and policy number (p.7) | BR-042 | BRD-1 BRNB.074 | FR-NB-101 |
+| CORE-06.01 | Generate RMEL (list of expiring accounts) (p.8) | BR-055 | BRD-6 BRRN.002, BRRN.030, BRRN.005 | FR-RN-011, FR-RN-010, FR-RN-112 |
+| CORE-06.02 | Filter and distribute RMEL (p.8) | BR-056 | BRD-6 BRRN.003, BRRN.011, BRRN.036 | FR-RN-012, FR-RN-040, FR-RN-102 |
+| CORE-06.03 | Rules-based sanitation of accounts (bulk / individual) (p.8) | BR-026, BR-057 | BRD-6 BRRN.020, BRRN.023, BRRN.009 | FR-RN-020, FR-RN-103, FR-RN-004, FR-RN-022 ... |
+| CORE-06.04 | Provide disposition (online or by upload) (p.8) | BR-058, BR-059 | BRD-6 BRRN.031, BRRN.018 | FR-RN-004, FR-RN-023, FR-RN-051, FR-RN-103 ... |
+| CORE-06.05 | Process and generate renewal proposal (p.8) | - | BRD-6 BRRN.033, BRRN.038 | FR-RN-048, FR-RN-064, FR-RN-084 |
+| CORE-06.06 | Generate and send Renewal Advice (p.8) | BR-060, BR-061 | BRD-6 BRRN.010 | FR-RN-080, FR-RN-081, FR-RN-090 |
+| CORE-06.07 | Send No Advice Letter (NAL) and Non-Renewal Letter (NRL) (p.8) | BR-060, BR-061 | BRD-6 BRRN.001, BRRN.009 | FR-RN-082, FR-RN-103, FR-RN-024, FR-RN-112 |
+| CORE-06.08 | Check renewal payment (capability matrix p.27) | BR-062 | BRD-6 BRRN.027 | FR-RN-042 |
+| CORE-06.09 | Track renewal status (BR table only) | BR-064 | BRD-6 BRRN.036 | FR-RN-102 |
+| CORE-07.01 | Premium Receivable (PR) management (p.8) | BR-044, BR-045 | BRD-4 BRCLXN.001, BRCLXN.011, BRCLXN.046 | FR-CL-010, FR-CL-015, FR-CL-016 |
+| CORE-07.02 | Disposition tracking and management (p.8) | BR-048 | BRD-4 BRCLXN.016, BRCLXN.021, BRCLXN.023 | FR-CL-030, FR-CL-031, FR-CL-018 |
+| CORE-07.03 | Tag CWT, premium / PR2307 (p.8) | BR-118, BR-139 | BRD-4 BRCLXN.026, BRCLXN.027, CSHID.026 | FR-CL-032, FR-CL-081, FR-OP-026 |
+| CORE-07.04 | Unapplied payment disposition (excess payment) (p.8) | BR-046, BR-047, BR-090 | BRD-4 BRCLXN.030, BRCLXN.034, BRCLXN.041 | FR-CL-074, FR-CL-070, FR-CL-077 |
+| CORE-07.05 | Reporting and audit (p.8) | BR-053, BR-054 | BRD-4 BRCLXN.028, BRCLXN.043, BRCLXN.045 | FR-CL-082, FR-CL-003, FR-CL-083 |
+| CORE-07.06 | Batch processing and automation (capability matrix p.27) | BR-049 | BRD-4 BRCLXN.013, BRCLXN.024, BRCLXN.041 | FR-CL-017, FR-CL-032, FR-CL-080, FR-CL-077 |
+| CORE-08.01 | Daily financial report reconciliation (p.8) | BR-065 | BRD-5 ACSL 2.13.0, ACSL 2.13.2 | FR-AS-003, FR-AS-004 |
+| CORE-08.02 | Daily cash movement reconciliation (p.8) | BR-067 | BRD-5 FRBS 3.3.0 | FR-AC-050 |
+| CORE-08.03 | Insurer's statement of accounts (SOA) reconciliation (p.8) | BR-068 | BRD-5 ACSL 2.13.1, ACSL 2.14.1 | FR-AS-003 |
+| CORE-08.04 | Generate automated journal entries (p.8) | BR-069 | BRD-5 ACSL 2.15.0, FRBS 3.1.0 | FR-AS-024, FR-AC-030 |
+| CORE-08.05 | Perform manual entries (p.8) | BR-070 | BRD-5 FRBS 2.8.0, FRBS 2.8.5 | FR-AC-032 |
+| CORE-08.06 | Perform manual / invoice adjustments (p.8) | BR-071 | BRD-5 ACSL 2.9.0, ACSL 2.9.1 | FR-AS-021 |
+| CORE-08.07 | Perform accrual (p.8) | BR-072 | BRD-5 FRBS 2.8.1 | FR-AC-032, FR-AC-033 |
+| CORE-08.08 | Perform revaluation (p.8) | BR-073 | BRD-5 FRBS 2.2.0, FRBS 3.5.0 | FR-AC-010, FR-AC-043 |
+| CORE-08.09 | Perform month-end and year-end closing (p.8) | - | BRD-5 FRBS 3.4.0 | FR-AC-042 |
+| CORE-08.10 | Generate financial reports (p.8) | BR-066 | BRD-5 FRBS 3.2.0, DIS 3.28.0 | FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 ... |
+| CORE-08.11 | Accounts analysis (p.8) | BR-074 | BRD-5 ACSL 2.5.0, ACSL 2.5.3 | FR-AS-010 |
+| CORE-08.12 | Receive and release CWT (commission / supplier) (p.8) | BR-075, BR-076 | BRD-5 DIS 2.11.0, DIS 2.12.0 | FR-DS-057, FR-DS-058 |
+| CORE-08.13 | Disbursement to insurer, client, supplier, BDO subsidiaries (p.8) | BR-077 | BRD-5 DIS 2.7.0 | FR-DS-033 |
+| CORE-08.14 | Reporting and documentation (p.8) | BR-078, BR-084 | BRD-5 DIS 3.28.0, FRBS 3.2.0 | FR-DS-081, FR-AC-060, FR-AC-061, FR-AC-062 ... |
+| CORE-08.15 | Release BIR 2307 on premiums (PR2307) to insurer (p.8) | BR-078 | BRD-2 CSHID.027 | FR-OP-026 |
+| CORE-08.16 | Generate Direct Credit transactions file (p.8) | BR-077 | BRD-5 DIS 2.7.0 | FR-DS-033 |
+| CORE-08.17 | Disbursement to government agencies and employees (p.8) | BR-077 | BRD-5 DIS 2.7.0 | FR-DS-033 |
+| CORE-08.18 | Payee management (p.8) | BR-079 | BRD-5 DIS 2.2.0 | FR-DS-010 |
+| CORE-08.19 | Check printing and series management (p.8) | BR-080 | BRD-5 DIS 2.7.0 | FR-DS-033 |
+| CORE-08.20 | Status tagging and tracking (p.8) | BR-081, BR-082 | BRD-5 DIS 2.8.0, DIS 3.26.0 | FR-DS-050, FR-DS-052 |
+| CORE-08.21 | Bank account operations (p.9) | - | BRD-5 DIS 2.7.0 | FR-DS-033 |
+| CORE-08.22 | Generate manual service invoice (Other Income) (p.9) | BR-085 | BRD-1 BRNB.100 | FR-NB-117 |
+| CORE-09.01 | Manual issuance of AR, OR, invoice, cash and cheque OTC payment (p.9) | BR-086 | BRD-2 CSHID.001, CSHID.002 | FR-OP-011, FR-OP-013, FR-OP-014, FR-OP-012 |
+| CORE-09.02 | Automated accounting entries (p.9) | BR-087 | BRD-2 CSHID.012, CSHID.014 | FR-OP-013, FR-OP-027 |
+| CORE-09.03 | Batch payment files processing (automatching) (p.9) | BR-089 | BRD-2 CSHID.008 | FR-OP-015, FR-OP-016 |
+| CORE-09.04 | Batch processing and automation (automatch re-run) (p.9) | BR-092 | BRD-2 CSHID.020 | FR-OP-018, FR-OP-132 |
+| CORE-09.05 | Batch reversal processing (p.9) | - | BRD-2 CSHID.012, CSHID.016 | FR-OP-013, FR-OP-027, FR-OP-023 |
+| CORE-09.06 | Unapplied payment management (excess payment) (p.9) | BR-090, BR-093 | BRD-2 CSHID.024, CSHID.025 | FR-OP-022 |
+| CORE-09.07 | Payment auto matching (p.9) | BR-091 | BRD-2 CSHID.020 | FR-OP-018, FR-OP-132 |
+| CORE-09.08 | Generate acknowledgement receipt, official receipt, invoice (p.9) | BR-094, BR-095, BR-096 | BRD-2 CSHID.001, CSHID.006, CSHID.019 | FR-OP-011, FR-OP-013, FR-OP-014, FR-OP-010 ... |
+| CORE-09.09 | Premium payment monitoring (p.9) | BR-097 | BRD-2 CSHID.023, CSHID.017 | FR-OP-028, FR-OP-009 |
+| CORE-09.10 | Commission fee collection (p.9) | BR-098, BR-099 | BRD-2 CSHID.007, CMRID.002 | FR-OP-021, FR-OP-091 |
+| CORE-09.11 | PDC management (p.9) | BR-100 | BRD-2 CSHID.008 | FR-OP-015, FR-OP-016 |
+| CORE-09.12 | Traceability and auditability (p.9) | - | BRD-2 CSHID.011 | FR-OP-024 |
+| CORE-10.01 | Extraction and remittance processing (scheduled or manual) (p.9) | BR-102, BR-103 | BRD-2 RMTID.001, RMTID.003, RMTID.004 | FR-OP-030 |
+| CORE-10.02 | Sending and uploading of files (p.9) | BR-104, BR-105 | BRD-2 RMTID.011, RMTID.013 | FR-OP-034, FR-OP-037 |
+| CORE-10.03 | Validation and filtering criteria (p.9) | BR-106, BR-107, BR-108 | BRD-2 RMTID.014, RMTID.017, RMTID.020 | FR-OP-031 |
+| CORE-10.04 | Search and view (p.9) | BR-109 | BRD-2 RMTID.025, RMTID.026 | FR-OP-039, FR-OP-005 |
+| CORE-10.05 | Hold remittance management (p.9) | BR-110, BR-112, BR-113, BR-114, BR-115, BR-116 | BRD-2 RMTID.020, RMTID.031, RMTID.032 | FR-OP-031, FR-OP-005 |
+| CORE-10.06 | Special remittance request and processing (p.9) | BR-117 | BRD-2 RMTID.030 | FR-OP-040 |
+| CORE-10.07 | Notifications and tracking (p.9) | BR-111 | BRD-2 RMTID.033, RMTID.035, RMTID.036 | FR-OP-040, FR-OP-031, FR-OP-036 |
+| CORE-11.01 | Data extraction and file management (p.9) | BR-119, BR-120 | BRD-2 PRCID.001, PRCID.009 | FR-OP-070, FR-OP-074 |
+| CORE-11.02 | Production register viewing and filtering (p.9) | BR-121 | BRD-2 PRCID.012, PRCID.021 | FR-OP-071, FR-OP-077 |
+| CORE-11.03 | Matching and automation (p.9) | BR-122, BR-123 | BRD-2 PRCID.023, PRCID.024, PRCID.033 | FR-OP-076, FR-OP-075 |
+| CORE-11.04 | Tracking and monitoring (p.9) | BR-124 | BRD-2 PRCID.029, PRCID.030, PRCID.032 | FR-OP-079, FR-OP-075, FR-OP-074 |
+| CORE-11.05 | Reports generation (p.9) | - | BRD-2 PRCID.034, PRCID.035, PRCID.039 | FR-OP-071, FR-OP-080 |
+| CORE-12.01 | Transaction management (endorsements, cancellations) (p.9) | BR-126 | BRD-2 ADJID.001, ADJID.003, ADJID.005 | FR-OP-050, FR-OP-053 |
+| CORE-12.02 | Automated accounting entries (p.9) | BR-127, BR-132 | BRD-2 ADJID.011, ADJID.012 | FR-OP-056, FR-OP-057 |
+| CORE-12.03 | Traceability and auditability (p.10) | BR-128, BR-129 | BRD-2 ADJID.020, ADJID.022 | FR-OP-050, FR-OP-061 |
+| CORE-12.04 | Reporting and monitoring (p.10) | - | BRD-2 ADJID.016, ADJID.019, ADJID.021 | FR-OP-062, FR-OP-061 |
+| CORE-12.05 | Search and document management (p.10) | BR-130, BR-131 | BRD-2 ADJID.024, ADJID.025 | FR-OP-005, FR-OP-061, FR-OP-052 |
+| CORE-12.06 | Sending and uploading of files (p.10) | - | BRD-2 ADJID.026 | FR-OP-059 |
+| CORE-12.07 | Batch posting (p.10) | - | BRD-2 ADJID.006 | FR-OP-056 |
+| CORE-13.01 | Automated incentive calculation (p.10) | BR-166, BR-167 | BRD-2 CMRID.005 | FR-OP-095 |
+| CORE-13.02 | Motor Mania incentive plan (p.10) | BR-168 | BRD-2 CMRID.006 | FR-OP-095 |
+| CORE-13.03 | Production data validation and exclusion handling (p.10) | BR-169 | BRD-2 CMRID.003 | FR-OP-095 |
+| CORE-13.04 | Automated commission receivables processing (p.10) | BR-133 | BRD-2 CMRID.007 | FR-OP-091 |
+| CORE-13.05 | Comprehensive production reporting (p.10) | BR-134 | BRD-2 CMRID.014, PRCID.035 | FR-OP-097, FR-OP-080 |
+| CORE-13.06 | Risk mitigation and error handling (p.10) | BR-135 | BRD-2 CMRID.008 | FR-OP-091, FR-OP-093 |
+| CORE-13.07 | Collection of commission receivables (direct payment) (p.10) | BR-052, BR-136, BR-137, BR-140 | BRD-2 CMRID.002, CMRID.004 | FR-OP-091, FR-OP-098 |
+| CORE-13.08 | Auto-match reversals (p.10) | BR-138, BR-139 | BRD-2 CMRID.007, CSHID.027 | FR-OP-091, FR-OP-026 |
+| CORE-14.01 | Process claims advice from BDOI Marketing (p.10) | BR-141 | BRD-7 BRCLM.003, BRCLM.016 | FR-CM-010, FR-CM-011, FR-CM-015, FR-CM-014 |
+| CORE-14.02 | Process claims advice from client (p.10) | BR-141 | BRD-7 BRCLM.003, BRCLM.006 | FR-CM-010, FR-CM-011, FR-CM-015, FR-CM-002 ... |
+| CORE-14.03 | Process claims advice from insurer (p.10) | BR-141 | BRD-7 BRCLM.041, BRCLM.043 | FR-CM-003, FR-CM-011, FR-CM-022, FR-CM-024 ... |
+| CORE-14.04 | Process LOA from insurer (p.10) | BR-142 | BRD-7 BRCLM.014, BRCLM.010 | FR-CM-043, FR-CM-040, FR-CM-046 |
+| CORE-14.05 | Process settlement offer from insurer (p.10) | BR-143 | BRD-7 BRCLM.010, BRCLM.014 | FR-CM-040, FR-CM-046, FR-CM-043 |
+| CORE-14.06 | Tag permanent closure (p.10) | BR-144 | BRD-7 BRCLM.035, BRCLM.005 | FR-CM-045, FR-CM-002 |
+| CORE-14.07 | Tag temporary closure (p.10) | BR-145 | BRD-7 BRCLM.035 | FR-CM-045 |
+| CORE-14.08 | Unclaimed checks safekeeping (p.10) | BR-146 | BRD-7 | Gap G2 (CRQ03) |
+| CORE-14.09 | Handover of settlement checks to Cashiering (p.10) | BR-147 | BRD-7 | Gap G2 (CRQ03) |
+| CORE-14.10 | Retrieval of checks from Cashiering for release (p.10) | BR-148 | BRD-7 | Gap G2 (CRQ03) |
+| CORE-14.11 | Maintain full claims history for audit and compliance (p.10) | BR-151 | BRD-7 BRCLM.004, BRCLM.022 | FR-CM-012, FR-CM-052, FR-CM-054 |
+| CORE-14.12 | Reports and analytics viewing (p.10) | BR-149, BR-152 | BRD-7 BRCLM.026, BRCLM.029, BRCLM.030, BRCLM.031, BRCLM.032 | FR-CM-060, FR-CM-044, FR-CM-061, FR-CM-062 |
+| CORE-14.13 | Encode / override the next follow-up date (p.10) | BR-150 | BRD-7 BRCLM.019 | FR-CM-002, FR-CM-050, FR-CM-054 |
+| CORE-15.01 | Placement request initiation (p.10) | BR-153 | ReInsurance BRD FRID-001-FRID-010 | Phase 2 |
+| CORE-15.02 | Placement slip management (p.10) | BR-154 | ReInsurance BRD FRID-017-FRID-028 | Phase 2 |
+| CORE-15.03 | Statement of Account (SOA) generation (p.10) | BR-155, BR-156 | ReInsurance BRD FRID-033-FRID-041 | Phase 2 |
+| CORE-15.04 | Claims reporting and settlement (p.10) | BR-157 | ReInsurance BRD FRID-101-FRID-105 | Phase 2 |
+| CORE-15.05 | Claims payment processing (p.10) | BR-158 | ReInsurance BRD FRID-058-FRID-066 | Phase 2 |
+| CORE-15.06 | Direct client claims payment (p.11) | BR-159 | ReInsurance BRD FRID-075-FRID-082 | Phase 2 |
+| CORE-15.07 | Receive and validate file from stakeholders (capability matrix p.28) | - | ReInsurance BRD | Phase 2 |
+| CORE-15.08 | Notification to stakeholders (capability matrix p.28) | - | ReInsurance BRD | Phase 2 |
+| CORE-15.09 | Log, audit and history for traceability (capability matrix p.28) | - | ReInsurance BRD | Phase 2 |
+| CORE-15.10 | Net settlement (capability matrix p.28) | - | ReInsurance BRD | Phase 2 |
+| CORE-16.01 | Search, retrieve and display client contact and insurance account details (p.11) | BR-161 | BRD-9 BRCSF-002, BRCSF-003, BRCSF-008 | FR-CSF-011, FR-CSF-021, FR-CSF-022, FR-CSF-010 |
+| CORE-16.02 | View, add and update client contact information (p.11) | BR-162 | BRD-9 BRCSF-004 | FR-CSF-020, FR-CSF-021 |
+| CORE-16.03 | View mode of payment (history) and current status (p.11) | BR-163 | BRD-9 BRCSF-005 | FR-CSF-012, FR-CSF-013 |
+| CORE-16.04 | View and resend RA (and e-policy) (p.11) | BR-164 | BRD-9 BRCSF-006, BRCSF-009 | FR-CSF-030, FR-CSF-033 |
+| CORE-16.05 | Upload supporting documents (p.11) | - | BRD-9 BRCSF-007 | FR-CSF-032 |
+| CORE-16.06 | Case resolution: add / edit case details and status (p.11) | BR-165 | BRD-9 | Gap G3 (CRQ04) |
+| CORE-17.01 | Master data change logging (user, product, insurer, LOVs) (p.11) | BR-170 | None (BRNB.016, BRNB.083, BRPM.024, BRCLXN.043 related) | FR-CR-031; FR-NB-016, FR-NB-132, FR-PM-005, FR-CL-003 |
+| CORE-17.02 | Insurer management (p.11) | BR-171 | None (BRNB.008 related) | FR-CR-061; FR-NB-053 |
+| CORE-17.03 | LOV maintenance (p.11) | BR-004, BR-172 | BRD-1 BRNB.083, BASAU 2.2.0 | FR-CR-060; FR-NB-132, FR-AC-070 |
+| CORE-17.04 | MIS field definition (p.11) | BR-173, BR-174 | None (BRNB.108 related) | FR-CR-062; FR-NB-110, FR-NB-119 |
+| CORE-17.05 | Product maintenance (p.11) | - | BRD-3 BRPM.003, PMADD01 | FR-CR-063; FR-PM-012, FR-PM-010 |
+| CORE-18.01 | Include any other / additional system capabilities (p.11) | BR-176 | None | Gap G9 (CRQ10) |
+| CORE-19.01 | Automated renewal notifications (p.11) | BR-184, BR-196 | BRD-8 BRID-001 | FR-EB-022 |
+| CORE-19.02 | Manual and system-based proposal generation (p.11) | BR-185, BR-197 | BRD-8 BRID-003 | FR-EB-024 |
+| CORE-19.03 | Document and data upload management (p.11) | BR-186, BR-198 | BRD-8 BRID-005, BRID-005.01, BRID-014, BRID-025 | FR-EB-001, FR-EB-010, FR-EB-011, FR-EB-014 ... |
+| CORE-19.04 | Broker on record management (p.11) | BR-187 | BRD-8 BRID-008 | FR-EB-031 |
+| CORE-19.05 | Terms of Reference generation and distribution (p.11) | BR-188 | BRD-8 BRID-007, BRID-009 | FR-EB-004, FR-EB-030, FR-EB-035 |
+| CORE-19.06 | Comparative report management (p.11) | BR-189 | BRD-8 BRID-010, BRID-011 | FR-EB-040, FR-EB-041, FR-EB-015, FR-EB-043 |
+| CORE-19.07 | Client feedback, change, additional or amendment request capture and relay (p.11) | BR-190 | BRD-8 BRID-002, BRID-012, BRID-013, BRID-015 | FR-EB-023, FR-EB-044, FR-EB-054, FR-EB-055 ... |
+| CORE-19.08 | Automated and manual sending of proposals (p.11) | BR-191 | BRD-8 BRID-003, BRID-009 | FR-EB-024, FR-EB-035 |
+| CORE-19.09 | Approval workflow based on defined thresholds (p.11) | BR-192 | BRD-8 BRID-016 | FR-EB-042 |
+| CORE-19.10 | Placement and booking management (p.11) | BR-193 | BRD-8 BRID-017, BRID-019, BRID-020 | FR-EB-046, FR-EB-051, FR-EB-052 |
+| CORE-19.11 | Centralised reporting and analytics (p.11) | BR-194 | BRD-8 BRID-022, BRID-023, BRID-024 | FR-EB-060, FR-EB-062, FR-EB-001, FR-EB-003 |
+| CORE-19.12 | Manage franchise requests and approvals (p.11) | BR-195 | BRD-8 BRID-026, BRID-027, BRID-029 | FR-EB-032, FR-EB-034, FR-EB-033 |
+| CORE-20.01 | Automated request handling (p.12) | BR-199 | BRD-3 BRPM.011, BRPM.008 | FR-PM-020, FR-PM-024, FR-PM-045, FR-PM-021 |
+| CORE-20.02 | Automatic reference numbers (p.12) | BR-200 | BRD-3 BRPM.008 | FR-PM-020, FR-PM-021 |
+| CORE-20.03 | Quotation / proposal management (p.12) | BR-201 | BRD-3 BRPM.012, BRPM.013 | FR-PM-030, FR-PM-031, FR-PM-034, FR-PM-036 |
+| CORE-20.04 | Automatic comparison tables (p.12) | BR-202 | BRD-3 BRPM.014, PMADD03 | FR-PM-034, FR-PM-035 |
+| CORE-20.05 | Real-time dashboard / reports (p.12) | BR-203 | BRD-3 BRPM.019, BRPM.018 | FR-PM-070, FR-PM-071 |
+| CORE-20.06 | Built-in checks / approvals (p.12) | BR-204 | BRD-3 BRPM.021, PMADD06 | FR-PM-021, FR-PM-073, FR-PM-043 |
+| CORE-20.07 | Secure document sharing (p.12) | BR-205 | BRD-3 BRPM.020, BRPM.002 | FR-PM-004, FR-PM-002 |
+| CORE-20.08 | Works with existing systems (p.12) | BR-206 | BRD-3 BRPM.022 | FR-PM-072 |
+| CORE-20.09 | Track all changes (p.12) | BR-207 | BRD-3 BRPM.024 | FR-PM-005 |
+| CORE-20.10 | Expiring packages monitoring (p.12) | BR-208 | BRD-3 BRPM.017, BRPM.006 | FR-PM-044, FR-PM-060, FR-PM-061, FR-PM-071 ... |
+| CORE-21.01 | Generate standard reports for operational and analytical purposes (p.12) | BR-054 | BRD-1 BRNB.057, BRNB.075 | FR-CR-040; FR-NB-123, FR-NB-122 |
+| CORE-21.02 | Extract, download and print reports in multiple formats (p.12) | BR-078 | BRD-1 BRNB.031, BRNB.037 | FR-CR-040; FR-NB-124, FR-NB-125 |
+| CORE-21.03 | Create tailored reports by parameters, filters and business requirements (p.12) | BR-053 | BRD-1 BRNB.057 | FR-CR-041; FR-NB-123 |
+| CORE-21.04 | Dynamic customisation: data fields, charts and summaries (p.12) | BR-053 | None | FR-CR-042 |
+| CORE-21.05 | Scheduled or on-demand report generation (p.12) | BR-054, BR-103 | None (DIS 3.28.0, BRCLXN.028 related) | FR-CR-043; FR-DS-081, FR-CL-082 |
+| XC-01 | Log-in, password reset, several types of user access, user administration (p.13) | BR-000, BR-001, BR-002, BR-003 | BRD-11 BRNB.040, BRNB.084 | FR-CR-070; FR-NB-130, FR-NB-134 |
+| XC-02 | Centralised, real-time dashboards for all roles; details invoked from the dashboard (p.5, p.20-21) | BR-125, BR-152, BR-160, BR-203 | None (BRNB.012, BRQID.003, BRPM.019 related) | FR-CR-010, FR-CR-011; FR-NB-120, FR-OP-003, FR-PM-070 |
+| XC-03 | Automated notifications, approvals and feedback tracking (p.5, p.19, p.24) | BR-083, BR-111, BR-206 | None (BRNB.015, RMTID.033 related) | FR-CR-020; FR-NB-015, FR-OP-040 |
+| XC-04 | Audit logs and full transaction history (p.4-5, p.20, p.25) | BR-124, BR-129, BR-151, BR-207 | None (BRNB.016, BRNB.086, BRNB.089 related) | FR-CR-030; FR-NB-016, FR-NB-136 |
+| XC-05 | Workflow maintained at the back end; data flows to the next process by rules (p.15, p.18, p.23) | BR-051, BR-101, BR-177, BR-182 | None (BRNB.096, BRNB.022 related) | FR-CR-080; FR-NB-011, FR-NB-064, FR-NB-010, FR-NB-122 |
+| XC-06 | Batch and individual processing; concurrent users and high-volume bulk uploads (p.4, p.16) | BR-063 | None (BRNB.064, BRQID.006 related) | FR-CR-083; FR-NB-019, FR-NB-065, FR-OP-008 |
+| XC-07 | Currency selection and multi-currency support (p.15, p.18) | BR-027, BR-088 | None (BRCLM.009 related) | FR-CR-091; FR-CM-011 |
+| XC-08 | 30-day hold cover request, assigned to a role (p.14) | BR-034 | BRD-1 BRNB.072, BRNB.103 | FR-NB-082, FR-NB-083 |
+| XC-09 | Tag direct payment (DP) accounts (p.14) | BR-035 | BRD-1 BRNB.114 | FR-NB-069, FR-NB-092 |
+| XC-10 | SOA generated with placement report and Insurance Advice; service invoice to insurer issued with the SOA at booking (p.14-15) | BR-039, BR-043 | BRD-1 BRNB.100, BRCLXN.058 | FR-CR-093; FR-NB-117, FR-CL-060, FR-CL-061 |
+| XC-11 | Billing reports with premium and loan details; payment reports matched to accounts (p.15) | BR-049, BR-050 | BRD-1 BRNB.067, BRNB.068 | FR-NB-090, FR-NB-091, FR-NB-092 |
+| XC-12 | BIR standard books (sales, purchase, cash receipts, cash disbursements, general journal) (p.17) | BR-084 | BRD-5 FRBS 3.2.0 | FR-CR-040; FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 |
+| XC-13 | Invoice Master List across workflows (p.23) | BR-175 | None (BRCLXN.001, ACSL 2.16.0 related) | FR-CR-090; FR-CL-010, FR-AS-026 |
+| XC-14 | BDO brand colours, logos, icons and design system (p.23) | BR-178, BR-179, BR-180 | None | FR-CR-092 |
+| XC-15 | Identified user journeys and customisable interaction flows (with a walkthrough) (p.23) | BR-181, BR-182 | None | FR-CR-001 |
+| XC-16 | Vendor uses Figma for design execution (p.23) | BR-183 | None | - |
+| XC-17 | Regulatory compliance: BIR and Insurance Commission reportorial requirements (p.4) | - | BRD-5 FRBS 3.2.0 | FR-CR-040; FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 |
+| XC-18 | Retail and wholesale business (p.4) | - | BRD-1 BRNB.001 | FR-CR-001; FR-NB-001 |
+| XC-19 | Invoice batch printing, delivery to insurers by SFTP and delivery report (daily, per insurer) (p.43) | - | None (BRNB.100 related) | FR-CR-081; FR-NB-117 |
+| XC-20 | Client migration (one-time, 2020 to present) and daily midday / EOD client batches with modification report (p.43) | - | Data Migration BRD | FR-CR-082 |
+| XC-21 | ALeA e-mail address encoding (as needed) (p.43) | - | None | Gap G10 (CRQ20) |
+| XC-22 | Daily synchronisation from source systems (CMS, Reinsurance) (p.42-43) | - | BRD-4 BRCLXN.013, BRCLXN.014, BRCLXN.015 | FR-CR-082; FR-CL-017 |
+| XC-23 | MIS LOV, QPS insurer, LGT rates and insurer branch maintenance (MILB, 24 a year) (p.45) | - | BRD-1 BRNB.083 | FR-CR-060; FR-NB-132 |
 
 <!-- portrait -->
 

@@ -1819,18 +1819,18 @@ Figure 7 shows the interfaces. External parties reach only the portal; the porta
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.6,5.4,2.6 caption="Non-functional requirements (p.36-37; Add. p.14)" size=8.5 -->
-| Topic | BRD value | BIBS target and approach | Status |
-|---|---|---|---|
-| Users | Marketing 13, Processing 4, Collection 3 (all concurrent); plus insurer and client HR portal users (not sized) | Within the BRD-1 sizing; portal sized separately (EBQ13) | FIT |
-| Volumes | 2025 / 2026 transactions: BDO 400 / 550; SM 2,500 / 3,500; Voluntary 550 / 560; Solicited 700 / 900; New Business 50 / 55 | Low volume; the roster is the larger dataset and is indexed by programme and year | FIT |
-| Peak | Month-end; 08:30-19:00 | Jobs run at 06:00 and 07:00, before the peak | CONFIGURE |
-| Availability | 99.99%; used 08:30-19:00; maintenance per bank standard | 99.99% is above every other BRD (99.9%); HA deployment; the portal adds an internet-facing part (EBQ25, XQ08) | CONFIGURE |
-| Recovery | RTO 4 hours; RPO 24 hours | Platform backup and recovery; one BIBS-wide NFR set is being agreed (XQ08) | FIT |
-| Retention | Application, database, audit logs and historical data 5 years online, 15 years offline; backup every 4 hours, kept 7 years; no anonymisation | Retention rules EB_PROGRAMME and EB_MEMBER | CHANGE |
-| Devices | Same speed on mobile and desktop | Responsive screens, portal included | FIT |
-| Portal security (derived) | Portal or API with authentication, RBAC, audit, validation before effect (BRID-005, 014) | Separate realm, scoped queries, lockout, one-time code, virus scanning, download log; BDO Information Security approval (EBQ13) | NEW |
-| Data privacy (derived) | Master lists hold personal data; utilization reports are health-related | Treated as sensitive personal information under the Data Privacy Act: access classes, encryption in transit and at rest, download logging, no health data in the roster (EBQ15) | NEW |
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (p.36-37; Add. p.14)" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Users | Marketing 13, Processing 4, Collection 3 (all concurrent); plus insurer and client HR portal users (not sized) | Within the BRD-1 sizing; portal sized separately (EBQ13) |
+| Volumes | 2025 / 2026 transactions: BDO 400 / 550; SM 2,500 / 3,500; Voluntary 550 / 560; Solicited 700 / 900; New Business 50 / 55 | Low volume; the roster is the larger dataset and is indexed by programme and year |
+| Peak | Month-end; 08:30-19:00 | Jobs run at 06:00 and 07:00, before the peak |
+| Availability | 99.99%; used 08:30-19:00; maintenance per bank standard | 99.99% is above every other BRD (99.9%); HA deployment; the portal adds an internet-facing part (EBQ25, XQ08) |
+| Recovery | RTO 4 hours; RPO 24 hours | Platform backup and recovery; one BIBS-wide NFR set is being agreed (XQ08) |
+| Retention | Application, database, audit logs and historical data 5 years online, 15 years offline; backup every 4 hours, kept 7 years; no anonymisation | Retention rules EB_PROGRAMME and EB_MEMBER |
+| Devices | Same speed on mobile and desktop | Responsive screens, portal included |
+| Portal security (derived) | Portal or API with authentication, RBAC, audit, validation before effect (BRID-005, 014) | Separate realm, scoped queries, lockout, one-time code, virus scanning, download log; BDO Information Security approval (EBQ13) |
+| Data privacy (derived) | Master lists hold personal data; utilization reports are health-related | Treated as sensitive personal information under the Data Privacy Act: access classes, encryption in transit and at rest, download logging, no health data in the roster (EBQ15) |
 
 # Configuration items
 

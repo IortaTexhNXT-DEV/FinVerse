@@ -1824,23 +1824,23 @@ Figure 3 shows the interfaces of the Claims module. Claims reads the BRD-1 and B
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.6,5.4,2.6 caption="Non-functional requirements (BRD p.32-41)" size=8.5 -->
-| Topic | BRD value | BIBS target and approach | Status |
-|---|---|---|---|
-| Authentication | Windows credentials; masked password; plain log-on errors; lockout after 3 attempts; password change every 90 days | Platform log-in (FR-CM-001); directory sign-in as the parked port of decision D6 | CHANGE |
-| Passwords | BDO password standard; minimum 8 (admin 12); history of 8; minimum age 1 day | Platform password policy | FIT |
-| Access control | Custom roles; protection against direct object reference manipulation; user administration | Roles and permissions (FR-CM-002); company check on every claim | FIT |
-| Audit logging | Access attempts, privileged use, admin changes, customer record access and updates; timestamp, user, source IP | Claim history and platform audit (FR-CM-003) | FIT |
-| Sessions | Idle timeout 15 minutes; random session IDs; renewed on log-in | Session policy parameter; value to align (CLQ24) | CONFIGURE |
-| Users | HO Claims 28 (15 concurrent); branch Claims 9 (5); HO Marketing 10 (5); support, IT, DCO 10 each (2) | Well within the BRD-1 sizing | FIT |
-| Volumes | Claims booking 55 a day; status and settlement updates 1,096 a day; activity log 1,206 a day; notifications 50 a week; 10% growth | Indexed claim tables; reports as SQL aggregates | FIT |
-| Response time | Screens, dashboard, booking, premium validation 5 s; status updates 1 minute; activity log and reports 5 minutes | Online p95 under 3 seconds; reports synchronous under 5 minutes | FIT |
-| Operating hours | Monday-Friday 06:00-20:00 | Same deployment as BRD-1 (07:00-22:00); the earlier start is aligned under CLQ24 | CONFIGURE |
-| Locations | Head Office Makati and Ortigas; branches Angeles, Cebu, CDO, Davao, GenSan | BDO network, web | FIT |
-| Recovery | RTO 4 hours; RPO 4 hours; DR server | Platform HA and DR; one BIBS-wide NFR set is being agreed (XQ08) | CONFIGURE |
-| Scalability | No downtime when scaling the application; database scaling up to 120 minutes downtime | Container scaling; DBA procedure | FIT |
-| Retention | 10 years online, 15 years archive, purge after 15 years; audit logs archive 16 years; backup every 4 hours, kept 5 years | Retention rule for record type BrokerClaim; the 16-year audit archive is aligned under CLQ24 | CONFIGURE |
-| Interface | Follow the existing BDO Insurance UI | BDO UX guidelines (R8) | FIT |
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.32-41)" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Authentication | Windows credentials; masked password; plain log-on errors; lockout after 3 attempts; password change every 90 days | Platform log-in (FR-CM-001); directory sign-in as the parked port of decision D6 |
+| Passwords | BDO password standard; minimum 8 (admin 12); history of 8; minimum age 1 day | Platform password policy |
+| Access control | Custom roles; protection against direct object reference manipulation; user administration | Roles and permissions (FR-CM-002); company check on every claim |
+| Audit logging | Access attempts, privileged use, admin changes, customer record access and updates; timestamp, user, source IP | Claim history and platform audit (FR-CM-003) |
+| Sessions | Idle timeout 15 minutes; random session IDs; renewed on log-in | Session policy parameter; value to align (CLQ24) |
+| Users | HO Claims 28 (15 concurrent); branch Claims 9 (5); HO Marketing 10 (5); support, IT, DCO 10 each (2) | Well within the BRD-1 sizing |
+| Volumes | Claims booking 55 a day; status and settlement updates 1,096 a day; activity log 1,206 a day; notifications 50 a week; 10% growth | Indexed claim tables; reports as SQL aggregates |
+| Response time | Screens, dashboard, booking, premium validation 5 s; status updates 1 minute; activity log and reports 5 minutes | Online p95 under 3 seconds; reports synchronous under 5 minutes |
+| Operating hours | Monday-Friday 06:00-20:00 | Same deployment as BRD-1 (07:00-22:00); the earlier start is aligned under CLQ24 |
+| Locations | Head Office Makati and Ortigas; branches Angeles, Cebu, CDO, Davao, GenSan | BDO network, web |
+| Recovery | RTO 4 hours; RPO 4 hours; DR server | Platform HA and DR; one BIBS-wide NFR set is being agreed (XQ08) |
+| Scalability | No downtime when scaling the application; database scaling up to 120 minutes downtime | Container scaling; DBA procedure |
+| Retention | 10 years online, 15 years archive, purge after 15 years; audit logs archive 16 years; backup every 4 hours, kept 5 years | Retention rule for record type BrokerClaim; the 16-year audit archive is aligned under CLQ24 |
+| Interface | Follow the existing BDO Insurance UI | BDO UX guidelines (R8) |
 
 # Configuration items
 

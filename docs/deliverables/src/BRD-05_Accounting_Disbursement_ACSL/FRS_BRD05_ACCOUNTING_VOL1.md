@@ -1733,17 +1733,17 @@ Figure 6 shows the interfaces of Accounting. The general ledger is inside BIBS: 
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.6,5.4,2.6 caption="Non-functional requirements (BRD p.133-139; Add.1 p.37)" size=8.5 -->
-| Topic | BRD value | BIBS target and approach | Status |
-|---|---|---|---|
-| Users | Accounting 5 (GL officer, TL, TH); Business / System Admin 7 | Within the BRD-1 sizing (145 concurrent) | FIT |
-| Volumes | Manual adjustments about 100 a year; 6 GL closings | Small; no special tuning | FIT |
-| Response time | Screen load 5-10 s, refresh 5 s, field display 2 s, save 5 s; reports 10-20 s first load, 10 s next | Online p95 under 3 s; heavy reports in batches | FIT |
-| Peaks | Month end and year end; 10:00-15:00 | Close and reversal jobs outside the peak | FIT |
-| Devices | Same performance on mobile and desktop | Responsive screens | FIT |
-| Availability (Add.1) | 100%; use 07:00-18:00 Monday to Saturday; downtime under 24 hours; maintenance 19:00-07:00 | Same deployment as BRD-1; 100% is not a measurable SLA; one BIBS-wide NFR set is being agreed (AQ27, XQ08) | OPEN |
-| Retention (Add.1) | Reports and vouchers 5 years online, 5 years archive; daily backup kept 5 years | Retention rules of BRD-1 with a document class for vouchers and generated reports | FIT |
-| Security and audit | Authorised users only; maker-checker | Role-based access, four-eyes rules and audit on every change (section 3) | FIT |
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.133-139; Add.1 p.37)" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Users | Accounting 5 (GL officer, TL, TH); Business / System Admin 7 | Within the BRD-1 sizing (145 concurrent) |
+| Volumes | Manual adjustments about 100 a year; 6 GL closings | Small; no special tuning |
+| Response time | Screen load 5-10 s, refresh 5 s, field display 2 s, save 5 s; reports 10-20 s first load, 10 s next | Online p95 under 3 s; heavy reports in batches |
+| Peaks | Month end and year end; 10:00-15:00 | Close and reversal jobs outside the peak |
+| Devices | Same performance on mobile and desktop | Responsive screens |
+| Availability (Add.1) | 100%; use 07:00-18:00 Monday to Saturday; downtime under 24 hours; maintenance 19:00-07:00 | Same deployment as BRD-1; 100% is not a measurable SLA; one BIBS-wide NFR set is being agreed (AQ27, XQ08) |
+| Retention (Add.1) | Reports and vouchers 5 years online, 5 years archive; daily backup kept 5 years | Retention rules of BRD-1 with a document class for vouchers and generated reports |
+| Security and audit | Authorised users only; maker-checker | Role-based access, four-eyes rules and audit on every change (section 3) |
 
 # Configuration items owned by the business and the System Administrator
 

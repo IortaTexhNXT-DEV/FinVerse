@@ -1403,16 +1403,16 @@ Figure 7 shows the interfaces. Sources arrive as uploads; the renewal leaves thr
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.6,5.4,2.6 caption="Non-functional requirements (BRD p.13-14)" size=8.5 -->
-| Topic | BRD value | BIBS target and approach | Status |
-|---|---|---|---|
-| Users | CBG Admin / Mktg 30 (15 concurrent) for log-in and sanitation; Non-CBG Corporate Policy Review officers 8 (6) for log-in and policy review | Within the BRD-1 sizing of 145 concurrent users | FIT |
-| Volumes | Log-ins 22,000 a year (+5%); sanitation 63,000 a year (+25% a year); Non-CBG log-ins and policy reviews 2,000 a year each (+5%) | Processing runs set-based per step; about 154,000 sanitations in year 5 | FIT |
-| Response time | 2 seconds for all listed transactions | Screens and single-record actions within 2 seconds; runs, exports and letters asynchronous with progress. Tighter than BRD-1 (10 s) and Operations (5 s) (SP SQ21) | CHANGE |
-| Peak | End of month and year-end; 08:00-18:00 daily; no mobile vs desktop difference | Batch jobs at night (processing 21:30, expiry scan 22:00, letters 06:30 PHT) | FIT |
-| Availability | 99.9%; business hours; at most 45 minutes of planned downtime a month; maintenance 00:00-04:00 | Platform deployment; one BIBS-wide NFR set is being agreed (XQ08) | FIT |
-| Continuity | Critical services restored within 4 hours; full recovery within 24 hours | Platform backup and recovery | FIT |
-| Retention | Transaction and submitted policy records 5 years online, 5 years archive; daily backup kept 5 years; no anonymisation | Retention rule SUBMITTED_POLICY; differs from BRD-1 (5 / 15 years) (SP SQ22) | CONFIGURE |
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.13-14)" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Users | CBG Admin / Mktg 30 (15 concurrent) for log-in and sanitation; Non-CBG Corporate Policy Review officers 8 (6) for log-in and policy review | Within the BRD-1 sizing of 145 concurrent users |
+| Volumes | Log-ins 22,000 a year (+5%); sanitation 63,000 a year (+25% a year); Non-CBG log-ins and policy reviews 2,000 a year each (+5%) | Processing runs set-based per step; about 154,000 sanitations in year 5 |
+| Response time | 2 seconds for all listed transactions | Screens and single-record actions within 2 seconds; runs, exports and letters asynchronous with progress. Tighter than BRD-1 (10 s) and Operations (5 s) (SP SQ21) |
+| Peak | End of month and year-end; 08:00-18:00 daily; no mobile vs desktop difference | Batch jobs at night (processing 21:30, expiry scan 22:00, letters 06:30 PHT) |
+| Availability | 99.9%; business hours; at most 45 minutes of planned downtime a month; maintenance 00:00-04:00 | Platform deployment; one BIBS-wide NFR set is being agreed (XQ08) |
+| Continuity | Critical services restored within 4 hours; full recovery within 24 hours | Platform backup and recovery |
+| Retention | Transaction and submitted policy records 5 years online, 5 years archive; daily backup kept 5 years; no anonymisation | Retention rule SUBMITTED_POLICY; differs from BRD-1 (5 / 15 years) (SP SQ22) |
 
 # Configuration items owned by the business and the System Administrator
 

@@ -1924,19 +1924,19 @@ Figure 4 shows the interfaces of Product Maintenance. Package requests talk to t
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.6,5.4,2.6 caption="Non-functional requirements (BRD p.33)" size=8.5 -->
-| Topic | BRD value | BIBS target and approach | Status |
-|---|---|---|---|
-| Users | Marketing 485 max / 145 concurrent; MBS 5 / 5; TSU 13 / 13 | Within the BRD-1 sizing (150 concurrent + 20% a year); the Marketing figures equal BRD-1's (PQ18) | FIT |
-| Volumes | Not stated | Assumed tens of package requests a month; no special sizing | OPEN |
-| Response time | Under 5 seconds for every role | Online p95 under 3 seconds; documents and e-mails generated asynchronously | FIT |
-| Peak | 15th and 30th of the month; 08:00-17:30 | Expiry monitor and version lifecycle run at 01:00 | FIT |
-| Availability | 99.9%; use 07:00-18:30; maintenance per bank standard | Same deployment as BRD-1 (window 07:00-22:00 governs, OQ44) | FIT |
-| Recovery | RTO 4 hours, RPO 24 hours | Platform backup and recovery; one BIBS-wide NFR set is being agreed (XQ08) | FIT |
-| Devices | Same performance on mobile and desktop | Responsive screens | FIT |
-| Security | Authorised users only; protected documents | Role-based access, four-eyes rules, protected e-mails (FR-PM-002, 004) | FIT |
-| Audit | All actions logged | Append-only audit and workflow history (FR-PM-005) | FIT |
-| Retention | Not stated | BRD-1 rule (5 years online, 15 years archive); product versions never purged (PQ18) | OPEN |
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.33)" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Users | Marketing 485 max / 145 concurrent; MBS 5 / 5; TSU 13 / 13 | Within the BRD-1 sizing (150 concurrent + 20% a year); the Marketing figures equal BRD-1's (PQ18) |
+| Volumes | Not stated | Assumed tens of package requests a month; no special sizing |
+| Response time | Under 5 seconds for every role | Online p95 under 3 seconds; documents and e-mails generated asynchronously |
+| Peak | 15th and 30th of the month; 08:00-17:30 | Expiry monitor and version lifecycle run at 01:00 |
+| Availability | 99.9%; use 07:00-18:30; maintenance per bank standard | Same deployment as BRD-1 (window 07:00-22:00 governs, OQ44) |
+| Recovery | RTO 4 hours, RPO 24 hours | Platform backup and recovery; one BIBS-wide NFR set is being agreed (XQ08) |
+| Devices | Same performance on mobile and desktop | Responsive screens |
+| Security | Authorised users only; protected documents | Role-based access, four-eyes rules, protected e-mails (FR-PM-002, 004) |
+| Audit | All actions logged | Append-only audit and workflow history (FR-PM-005) |
+| Retention | Not stated | BRD-1 rule (5 years online, 15 years archive); product versions never purged (PQ18) |
 
 # Configuration items owned by the System Administrator
 

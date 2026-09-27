@@ -2118,19 +2118,19 @@ Figure 5 shows the interfaces of Sanction Screening. Screening reads the client 
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.6,5.4,2.6 caption="Non-functional requirements (BRD p.22-25)" status=Status size=8.5 -->
-| Topic | BRD value | BIBS target and approach | Status |
-|---|---|---|---|
-| Users | Compliance Officer 2 / 2; Checker 1 / 1; Investigator 287 / 287 (risk tags, uploads) and 120 / 120 (case review); Operations Lead 1 / 1; Unit Head 8 / 8; CO BU escalation and STR 2 / 2; AML Committee 5 / 5; reports 3 / 3; Auditor 2 / 2; System Admin 3 / 1 | Under 300 named users, within the BIBS sizing. 287 "concurrent" investigators is read as the named population (SQ19) | CONFIGURE |
-| Volumes | Configuration and approvals 10 a month; list intake and matching 10 to 300 a day; cases, reviews, uploads, approvals, escalations 1 to 15 a week; STR 1 to 5 a week; reports 10 a month; audit reports 20 a year; 20% growth a year | Delta screening per list change; full re-screen monthly in the batch window | FIT |
-| Response time | 3 to 5 seconds per screen; not applicable to system jobs | Online p95 under 3 seconds; matching, ingestion and extraction run asynchronously | FIT |
-| Peak | End of month and year-end; 08:00-17:00 daily | Jobs run from 01:00, outside the peak | FIT |
-| Devices | Same speed on mobile and desktop | Responsive screens | FIT |
-| Availability | 99.9%; use 08:00-18:00 Monday to Friday; downtime at most 45 minutes a month, planned only; maintenance 00:00-04:00; BCP threshold under 3 days | Same deployment as the rest of BIBS; the service-hours variants are consolidated in one BIBS-wide NFR set (XQ08) | CONFIGURE |
-| Retention | Transaction records, KYC and supporting documents - 5 years online, 5 years archive, daily backup, daily accessibility, 5-year backup retention | Retention rules SCREENING_CASE and WATCHLIST_ENTRY (5 / 5); archive and purge follow the BIBS retention decision (Q39) | CHANGE |
-| Anonymisation | None | None | FIT |
-| Security | Maker-checker, immutable audit (SNSRP-109, 204, 902) | Role-based access, four-eyes rules, insert-only audit (FR-SS-001, 019, 023, 091) | FIT |
-| Regulatory | RA 9160 AMLA, BSP Circular 1182 (2023), BSP CL-2023-030, BSP M-2025-017, IC CL 2019-65 | Controls above; adverse-media screening not in scope (SQ20) | FIT |
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.22-25)" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Users | Compliance Officer 2 / 2; Checker 1 / 1; Investigator 287 / 287 (risk tags, uploads) and 120 / 120 (case review); Operations Lead 1 / 1; Unit Head 8 / 8; CO BU escalation and STR 2 / 2; AML Committee 5 / 5; reports 3 / 3; Auditor 2 / 2; System Admin 3 / 1 | Under 300 named users, within the BIBS sizing. 287 "concurrent" investigators is read as the named population (SQ19) |
+| Volumes | Configuration and approvals 10 a month; list intake and matching 10 to 300 a day; cases, reviews, uploads, approvals, escalations 1 to 15 a week; STR 1 to 5 a week; reports 10 a month; audit reports 20 a year; 20% growth a year | Delta screening per list change; full re-screen monthly in the batch window |
+| Response time | 3 to 5 seconds per screen; not applicable to system jobs | Online p95 under 3 seconds; matching, ingestion and extraction run asynchronously |
+| Peak | End of month and year-end; 08:00-17:00 daily | Jobs run from 01:00, outside the peak |
+| Devices | Same speed on mobile and desktop | Responsive screens |
+| Availability | 99.9%; use 08:00-18:00 Monday to Friday; downtime at most 45 minutes a month, planned only; maintenance 00:00-04:00; BCP threshold under 3 days | Same deployment as the rest of BIBS; the service-hours variants are consolidated in one BIBS-wide NFR set (XQ08) |
+| Retention | Transaction records, KYC and supporting documents - 5 years online, 5 years archive, daily backup, daily accessibility, 5-year backup retention | Retention rules SCREENING_CASE and WATCHLIST_ENTRY (5 / 5); archive and purge follow the BIBS retention decision (Q39) |
+| Anonymisation | None | None |
+| Security | Maker-checker, immutable audit (SNSRP-109, 204, 902) | Role-based access, four-eyes rules, insert-only audit (FR-SS-001, 019, 023, 091) |
+| Regulatory | RA 9160 AMLA, BSP Circular 1182 (2023), BSP CL-2023-030, BSP M-2025-017, IC CL 2019-65 | Controls above; adverse-media screening not in scope (SQ20) |
 
 # Configuration items
 
@@ -2245,46 +2245,46 @@ BRD-10 also answers questions raised on other BRDs, in part: Q18 (tags trigger r
 
 Every BRD-10 requirement is met by at least one FR. The screen column names the main entry point.
 
-<!-- table: widths=2.4,1.6,4.2,5.4,2.8 caption="BRD ID to FR and screen" status=Fit size=8 -->
-| BRD ID | Page | FR | Screen | Fit |
-|---|---|---|---|---|
-| SNSRP-101 | p.10 | FR-SS-010, FR-SS-011 | Configuration Versions (Matching Criteria) | NEW |
-| SNSRP-102 | p.10 | FR-SS-010, FR-SS-012 | Configuration Versions (Risk Rules) | CHANGE |
-| SNSRP-103 | p.10 | FR-SS-010, FR-SS-013 | Configuration Versions (Approval Matrix) | CHANGE |
-| SNSRP-104 | p.10-11 | FR-SS-010, FR-SS-016 | Templates | NEW |
-| SNSRP-105 | p.11 | FR-SS-010, FR-SS-017 | Templates (STR); STR Layout | NEW |
-| SNSRP-106 | p.11 | FR-SS-010, FR-SS-014 | Configuration Versions (Assignment Matrix) | CHANGE |
-| SNSRP-107 | p.11-12 | FR-SS-018 | Lists of Values (SCR_DISPOSITION) | CONFIGURE |
-| SNSRP-108 | p.12 | FR-SS-010, FR-SS-015, FR-SS-044 | Configuration Versions (SLA Matrix) | CHANGE |
-| SNSRP-109 | p.12 | FR-SS-019 | My Approvals; Configuration Versions | CHANGE |
-| SNSRP-201 | p.12 | FR-SS-020, FR-SS-082 | List Sources and Runs | NEW |
-| SNSRP-202 | p.13 | FR-SS-021 | List Sources and Runs; Reports | NEW |
-| SNSRP-203 | p.13 | FR-SS-022, FR-SS-001 | Watchlist | NEW |
-| SNSRP-204 | p.13 | FR-SS-023 | My Approvals; Watchlist | CHANGE |
-| SNSRP-301 | p.14 | FR-SS-031, FR-SS-032 | Matches | NEW |
-| SNSRP-302 | p.14 | FR-SS-033 | Client page (Screening tab) | CHANGE |
-| SNSRP-303 | p.14 | FR-SS-034, FR-SS-030 | Cases | NEW |
-| SNSRP-304 | p.14 | FR-SS-035, FR-SS-032 | Case; Matches | CHANGE |
-| SNSRP-401 | p.15 | FR-SS-040 | Case (workflow panel, Timeline) | CHANGE |
-| SNSRP-402 | p.15-16 | FR-SS-041, FR-SS-045 | Cases; Case; Screening Home | CHANGE |
-| SNSRP-403 | p.16 | FR-SS-042, FR-SS-001 | Cases (search) | CHANGE |
-| SNSRP-404 | p.16 | FR-SS-043 | Case (Re-assign) | CHANGE |
-| SNSRP-405 | p.17 | FR-SS-044, FR-SS-045 | Screening Home; Cases | CHANGE |
-| SNSRP-501 | p.17 | FR-SS-050 | Case (Review) | NEW |
-| SNSRP-502 | p.17 | FR-SS-051 | Case (workflow panel) | CHANGE |
-| SNSRP-601 | p.17 | FR-SS-052 | Case (Documents) | CHANGE |
-| SNSRP-602 | p.14-15 | FR-SS-030 | Screening Home (runs); client page | NEW |
-| SNSRP-701 | p.17 | FR-SS-060 | Case (validation messages) | NEW |
-| SNSRP-702 | p.18 | FR-SS-061, FR-SS-062 | Cases (For Approval); Case | CHANGE |
-| SNSRP-703 | p.18 | FR-SS-063, FR-SS-013, FR-SS-062 | Cases (Compliance Review); Case | CHANGE |
-| SNSRP-704 | p.18-19 | FR-SS-064 | Cases (Committee); Case (Decisions) | NEW |
-| SNSRP-705 | p.19 | FR-SS-070 | Case (STR) | NEW |
-| SNSRP-706 | p.19-20 | FR-SS-071, FR-SS-072 | STR | NEW |
-| SNSRP-801 | p.20 | FR-SS-080 | Notifications | CONFIGURE |
-| SNSRP-802 | p.20 | FR-SS-081 | Notifications | CHANGE |
-| SNSRP-901 | p.20 | FR-SS-090 | Reports | CHANGE |
-| SNSRP-902 | p.21 | FR-SS-091 | Case (Timeline); Audit Trail | FIT |
-| SNSRP-903 | p.21 | FR-SS-092 | Reports (SCR-AUDIT-LOG) | CHANGE |
+<!-- table: widths=2.4,1.6,4.2,5.4 caption="BRD ID to FR and screen" size=8 -->
+| BRD ID | Page | FR | Screen |
+|---|---|---|---|
+| SNSRP-101 | p.10 | FR-SS-010, FR-SS-011 | Configuration Versions (Matching Criteria) |
+| SNSRP-102 | p.10 | FR-SS-010, FR-SS-012 | Configuration Versions (Risk Rules) |
+| SNSRP-103 | p.10 | FR-SS-010, FR-SS-013 | Configuration Versions (Approval Matrix) |
+| SNSRP-104 | p.10-11 | FR-SS-010, FR-SS-016 | Templates |
+| SNSRP-105 | p.11 | FR-SS-010, FR-SS-017 | Templates (STR); STR Layout |
+| SNSRP-106 | p.11 | FR-SS-010, FR-SS-014 | Configuration Versions (Assignment Matrix) |
+| SNSRP-107 | p.11-12 | FR-SS-018 | Lists of Values (SCR_DISPOSITION) |
+| SNSRP-108 | p.12 | FR-SS-010, FR-SS-015, FR-SS-044 | Configuration Versions (SLA Matrix) |
+| SNSRP-109 | p.12 | FR-SS-019 | My Approvals; Configuration Versions |
+| SNSRP-201 | p.12 | FR-SS-020, FR-SS-082 | List Sources and Runs |
+| SNSRP-202 | p.13 | FR-SS-021 | List Sources and Runs; Reports |
+| SNSRP-203 | p.13 | FR-SS-022, FR-SS-001 | Watchlist |
+| SNSRP-204 | p.13 | FR-SS-023 | My Approvals; Watchlist |
+| SNSRP-301 | p.14 | FR-SS-031, FR-SS-032 | Matches |
+| SNSRP-302 | p.14 | FR-SS-033 | Client page (Screening tab) |
+| SNSRP-303 | p.14 | FR-SS-034, FR-SS-030 | Cases |
+| SNSRP-304 | p.14 | FR-SS-035, FR-SS-032 | Case; Matches |
+| SNSRP-401 | p.15 | FR-SS-040 | Case (workflow panel, Timeline) |
+| SNSRP-402 | p.15-16 | FR-SS-041, FR-SS-045 | Cases; Case; Screening Home |
+| SNSRP-403 | p.16 | FR-SS-042, FR-SS-001 | Cases (search) |
+| SNSRP-404 | p.16 | FR-SS-043 | Case (Re-assign) |
+| SNSRP-405 | p.17 | FR-SS-044, FR-SS-045 | Screening Home; Cases |
+| SNSRP-501 | p.17 | FR-SS-050 | Case (Review) |
+| SNSRP-502 | p.17 | FR-SS-051 | Case (workflow panel) |
+| SNSRP-601 | p.17 | FR-SS-052 | Case (Documents) |
+| SNSRP-602 | p.14-15 | FR-SS-030 | Screening Home (runs); client page |
+| SNSRP-701 | p.17 | FR-SS-060 | Case (validation messages) |
+| SNSRP-702 | p.18 | FR-SS-061, FR-SS-062 | Cases (For Approval); Case |
+| SNSRP-703 | p.18 | FR-SS-063, FR-SS-013, FR-SS-062 | Cases (Compliance Review); Case |
+| SNSRP-704 | p.18-19 | FR-SS-064 | Cases (Committee); Case (Decisions) |
+| SNSRP-705 | p.19 | FR-SS-070 | Case (STR) |
+| SNSRP-706 | p.19-20 | FR-SS-071, FR-SS-072 | STR |
+| SNSRP-801 | p.20 | FR-SS-080 | Notifications |
+| SNSRP-802 | p.20 | FR-SS-081 | Notifications |
+| SNSRP-901 | p.20 | FR-SS-090 | Reports |
+| SNSRP-902 | p.21 | FR-SS-091 | Case (Timeline); Audit Trail |
+| SNSRP-903 | p.21 | FR-SS-092 | Reports (SCR-AUDIT-LOG) |
 
 The BRD's process sections add three items without a requirement ID, also covered: the high-risk client list (p.8, FR-SS-045), notifications on newly added sanctioned names (p.8, FR-SS-082) and the manual AMLC filing (p.8, FR-SS-072). The non-functional requirements of pp.22-25 are in section 8.
 

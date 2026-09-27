@@ -2330,22 +2330,22 @@ Figure 6 shows the interfaces of Collections. Collections reads the Operations i
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.6,5.4,2.6 caption="Non-functional requirements (BRD p.51-58)" size=8.5 -->
-| Topic | BRD value | BIBS target and approach | Status |
-|---|---|---|---|
-| Authentication | SSO with Windows credentials; masked password; friendly errors; all attempts logged; lock-out after 3 attempts (NFR 1-2) | Platform log-in of BRD-1; lock-out at 3 for all users (D5); SSO parked (Q42) | PARTIAL |
-| Password rules | 8 / 12 characters, complexity, history 8, minimum age 1 day, change every 90 days (NFR 2) | Platform password policy of BRD-1 | FIT |
-| Access control | RBAC, custom roles, user maintenance; no multiple roles; IDOR protection (NFR 3) | RBAC and user administration exist; several roles per user allowed (D5) | CHANGE |
-| Audit logging | Log-in / log-out, admin and configuration changes, record access and updates; timestamp, user, source IP, resource; exportable (NFR 4) | Platform audit plus the Collections change log with source IP (FR-CL-003, 004) | FIT |
-| UI / UX | BDOI UI; copy / paste; smart search; record lock "<Username> is editing" (NFR 9) | BDO UX guidelines; search on every list; edit lock (FR-CL-005) | FIT |
-| Session | Idle timeout 15 minutes set by the administrator; one session per device (NFR 10) | Timeout parameter exists; single session per device open (UQ09 / XQ11) | PARTIAL |
-| Batch security | Restricted execution; audit of origin, time and trigger (NFR 12) | ManagedJob run history with trigger and user; manual runs need CLX_SETUP | FIT |
-| Operating hours and locations | 06:00-22:00 Monday to Friday and month-end weekends; head office and six provincial offices (NFR 17) | Web access from every BDOI location; jobs run after 22:00 | FIT |
-| Users and volumes | 130 users, 56 concurrent; 1,200 dispositions, applications and handler updates a day (NFR 15.01-15.05) | Worklist on indexed accounts; server-side paging | FIT |
-| Response time | Screens under 5 seconds; daily report under 3 minutes; weekly under 10; monthly under 15 (NFR 15) | Online p95 under 3 seconds; files generated off-peak in the background | FIT |
-| Exports | Caveat p.93: exports may slow the system | Background exports, row cap, separate permission (FR-CL-084) | FIT |
-| Availability and recovery | RTO 4 hours, RPO 4 hours; DR server (NFR 18) | Same deployment as BRD-1 and BRD-2; one BIBS-wide NFR set is being agreed (XQ08, CQ25) | OPEN |
-| Retention | 5 years online, 15 years archive; backup every 4 hours, kept 5 years (NFR 16) | Retention framework of BRD-1; records never deleted in Collections | FIT |
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.51-58)" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Authentication | SSO with Windows credentials; masked password; friendly errors; all attempts logged; lock-out after 3 attempts (NFR 1-2) | Platform log-in of BRD-1; lock-out at 3 for all users (D5); SSO parked (Q42) |
+| Password rules | 8 / 12 characters, complexity, history 8, minimum age 1 day, change every 90 days (NFR 2) | Platform password policy of BRD-1 |
+| Access control | RBAC, custom roles, user maintenance; no multiple roles; IDOR protection (NFR 3) | RBAC and user administration exist; several roles per user allowed (D5) |
+| Audit logging | Log-in / log-out, admin and configuration changes, record access and updates; timestamp, user, source IP, resource; exportable (NFR 4) | Platform audit plus the Collections change log with source IP (FR-CL-003, 004) |
+| UI / UX | BDOI UI; copy / paste; smart search; record lock "<Username> is editing" (NFR 9) | BDO UX guidelines; search on every list; edit lock (FR-CL-005) |
+| Session | Idle timeout 15 minutes set by the administrator; one session per device (NFR 10) | Timeout parameter exists; single session per device open (UQ09 / XQ11) |
+| Batch security | Restricted execution; audit of origin, time and trigger (NFR 12) | ManagedJob run history with trigger and user; manual runs need CLX_SETUP |
+| Operating hours and locations | 06:00-22:00 Monday to Friday and month-end weekends; head office and six provincial offices (NFR 17) | Web access from every BDOI location; jobs run after 22:00 |
+| Users and volumes | 130 users, 56 concurrent; 1,200 dispositions, applications and handler updates a day (NFR 15.01-15.05) | Worklist on indexed accounts; server-side paging |
+| Response time | Screens under 5 seconds; daily report under 3 minutes; weekly under 10; monthly under 15 (NFR 15) | Online p95 under 3 seconds; files generated off-peak in the background |
+| Exports | Caveat p.93: exports may slow the system | Background exports, row cap, separate permission (FR-CL-084) |
+| Availability and recovery | RTO 4 hours, RPO 4 hours; DR server (NFR 18) | Same deployment as BRD-1 and BRD-2; one BIBS-wide NFR set is being agreed (XQ08, CQ25) |
+| Retention | 5 years online, 15 years archive; backup every 4 hours, kept 5 years (NFR 16) | Retention framework of BRD-1; records never deleted in Collections |
 
 # Configuration items owned by the business and the System Administrator
 

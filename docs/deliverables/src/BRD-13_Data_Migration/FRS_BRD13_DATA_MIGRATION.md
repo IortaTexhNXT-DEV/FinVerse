@@ -2068,16 +2068,16 @@ Figure 4 shows the interfaces of the migration module. It writes into BIBS only 
 
 The BRD refers every usage table to "the consolidated NFR requirements for BDO Insure Core Modernization project" (p.13-14), which is not in the pack (DMQ29). The values below are proposals.
 
-<!-- table: widths=3,5.4,5.6,2.6 caption="Non-functional requirements" size=8.5 -->
-| Topic | BRD value | BIBS target and approach | Status |
-|---|---|---|---|
-| Volumes | Not given | Loaders sized for 1,000,000 client rows and 500,000 open-item rows; planning bounds from the umbrella BRD (clients 2020 to present, p.43; 21,200 bookings and 25,800 renewal accounts a month, p.44-45) | OPEN |
-| Cutover window | Not given | 48 hours over a weekend from the last legacy EOD to go / no-go; BIBS open 08:00 on the first business day; at the year-end boundary (recommended 3 January 2028), with FY2027 true-ups until about April 2028 | OPEN |
-| Load performance | Not given | At least 50,000 rows an hour per partition, 4 partitions; reconciliation of an object within 1 hour; full production load within 20 hours, proven in the dress rehearsal | NEW |
-| Staging security | Hosting appendix | Masked data outside production; staging and files purged within 5 days of sign-off; access only for migration roles and from the Philippines; encryption at rest and in transit | NEW |
-| Audit | Not given | Every intake, validation, load, rerun, rollback, reconciliation, sign-off and archive access is audited | NEW |
-| Retention | Consolidated NFR; umbrella p.45 (5 years online, 15 years archive) | Archive and access log by retention rule; migration evidence kept as project records (proposed 10 years) | OPEN |
-| Availability and recovery | Consolidated NFR | Same as BIBS; database snapshot before each production load gate | FIT |
+<!-- table: widths=3,5.4,5.6 caption="Non-functional requirements" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Volumes | Not given | Loaders sized for 1,000,000 client rows and 500,000 open-item rows; planning bounds from the umbrella BRD (clients 2020 to present, p.43; 21,200 bookings and 25,800 renewal accounts a month, p.44-45) |
+| Cutover window | Not given | 48 hours over a weekend from the last legacy EOD to go / no-go; BIBS open 08:00 on the first business day; at the year-end boundary (recommended 3 January 2028), with FY2027 true-ups until about April 2028 |
+| Load performance | Not given | At least 50,000 rows an hour per partition, 4 partitions; reconciliation of an object within 1 hour; full production load within 20 hours, proven in the dress rehearsal |
+| Staging security | Hosting appendix | Masked data outside production; staging and files purged within 5 days of sign-off; access only for migration roles and from the Philippines; encryption at rest and in transit |
+| Audit | Not given | Every intake, validation, load, rerun, rollback, reconciliation, sign-off and archive access is audited |
+| Retention | Consolidated NFR; umbrella p.45 (5 years online, 15 years archive) | Archive and access log by retention rule; migration evidence kept as project records (proposed 10 years) |
+| Availability and recovery | Consolidated NFR | Same as BIBS; database snapshot before each production load gate |
 
 # Configuration items
 

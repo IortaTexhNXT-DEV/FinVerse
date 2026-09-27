@@ -2667,19 +2667,19 @@ Figure 6 shows the interfaces of Renewal. Renewal reads the expiring population 
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.6,5.4,2.6 caption="Non-functional requirements (BRD p.186-188)" size=8.5 -->
-| Topic | BRD value | BIBS target and approach | Status |
-|---|---|---|---|
-| Users | Marketing TL 75 (23 concurrent); AO / Account Broker 319 (50); Processing TL 50 (15) for lists, 9 (3) for assignment and upload; Processing Officer / Broker 73 (22); reports and RA 485 (145) | Within the BRD-1 sizing of 145 concurrent users; Renewal adds load, not users | FIT |
-| Volumes | 25,800 transactions a month per process, growth 20% a year | About 26,000 candidates a month; indexes on company, stage, expiry, assignee and bucket; no partitioning for 5 years | CONFIGURE |
-| Response time | 10 seconds online; 20 seconds for reports and RA generation | Grid served in chunks; RA generation and batch sending as jobs with progress; reports within 20 seconds at 30,000 rows | CONFIGURE |
-| Peak | Month-end; 08:00-10:00 and 15:00-17:00 daily | Extraction, re-evaluation and letter jobs run at night | FIT |
-| Devices | Same performance on mobile and desktop | Responsive screens | FIT |
-| Availability | Use 07:00-22:00 Monday to Saturday; availability, downtime and maintenance "follow existing QPS set up" | BRD-1 window; QPS is out of scope, so BDOI gives the values (RQ28, XQ08) | OPEN |
-| Recovery | "Follow existing QPS set up" | Platform backup and recovery; one BIBS-wide NFR set is being agreed (XQ08) | OPEN |
-| Retention | "Follow existing QPS set up" | BRD-1 retention framework with record type RENEWAL_CANDIDATE; values to confirm (RQ28) | OPEN |
-| Security | Encrypted, password-protected RA and insurer files; role-based access; approved domains and TLS | Protected e-mails; permissions and data scope; recipient policy port (RQ16) | CHANGE |
-| Audit | Every action logged with user, time and source | Append-only history and audit (FR-RN-004) | FIT |
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.186-188)" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Users | Marketing TL 75 (23 concurrent); AO / Account Broker 319 (50); Processing TL 50 (15) for lists, 9 (3) for assignment and upload; Processing Officer / Broker 73 (22); reports and RA 485 (145) | Within the BRD-1 sizing of 145 concurrent users; Renewal adds load, not users |
+| Volumes | 25,800 transactions a month per process, growth 20% a year | About 26,000 candidates a month; indexes on company, stage, expiry, assignee and bucket; no partitioning for 5 years |
+| Response time | 10 seconds online; 20 seconds for reports and RA generation | Grid served in chunks; RA generation and batch sending as jobs with progress; reports within 20 seconds at 30,000 rows |
+| Peak | Month-end; 08:00-10:00 and 15:00-17:00 daily | Extraction, re-evaluation and letter jobs run at night |
+| Devices | Same performance on mobile and desktop | Responsive screens |
+| Availability | Use 07:00-22:00 Monday to Saturday; availability, downtime and maintenance "follow existing QPS set up" | BRD-1 window; QPS is out of scope, so BDOI gives the values (RQ28, XQ08) |
+| Recovery | "Follow existing QPS set up" | Platform backup and recovery; one BIBS-wide NFR set is being agreed (XQ08) |
+| Retention | "Follow existing QPS set up" | BRD-1 retention framework with record type RENEWAL_CANDIDATE; values to confirm (RQ28) |
+| Security | Encrypted, password-protected RA and insurer files; role-based access; approved domains and TLS | Protected e-mails; permissions and data scope; recipient policy port (RQ16) |
+| Audit | Every action logged with user, time and source | Append-only history and audit (FR-RN-004) |
 
 # Configuration items owned by the Business and System Administrators
 

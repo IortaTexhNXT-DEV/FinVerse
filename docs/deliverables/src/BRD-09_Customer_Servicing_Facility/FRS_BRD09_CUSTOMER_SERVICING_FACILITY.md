@@ -877,20 +877,20 @@ Figure 3 shows the interfaces. The CSF depends on the BIBS modules through their
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.6,5.4,2.6 caption="Non-functional requirements (BRD p.13-14)" size=8.5 -->
-| Topic | BRD value | BIBS target and approach | Status |
-|---|---|---|---|
-| Users | 24 concurrent agents, supervisors and personnel; 16 document users; 8 report users (leads / heads) | Small load within the BRD-1 sizing | FIT |
-| Volumes | 144,400 transactions a year for access, retrieval and search (about 600 a working day); 113,800 document transactions; 1% growth | Indexed search keys; paged results | FIT |
-| Response time | Under 3 seconds for retrieval, updates and search; 5 seconds for documents and reports | Each Servicing View tab loads on its own; search on indexed keys; no report on the agent's path | CONFIGURE |
-| Peak | First quarter; 10:00-12:00 and 14:00-16:00 | No batch work in these windows | FIT |
-| Availability | 99.9%; used 06:00-22:00; maintenance weekdays and Saturdays 21:00-05:00 | The maintenance window overlaps usage 21:00-22:00 (CSQ12) | CONFIGURE |
-| Recovery | RTO 4 hours; RPO 4 hours | Met by log archiving (FR-CSF-043) | FIT |
-| Backup | Every 15 minutes (BRCSF-011 / 11.001); every 4 hours in the retention table | Log archiving every 15 minutes plus daily base backups (CSQ11) | CONFIGURE |
-| Retention | Client and account data, contact updates, audit trail, attachments - 5 years online, 15 years archive; backups kept 5 years | Retention rule CSF_CONTACT_CHANGE; platform rules for the other records | CHANGE |
-| Anonymisation | Not required | None | FIT |
-| Devices | Same performance on mobile and desktop | Responsive screens | FIT |
-| Usability and security | User-friendly, intuitive; secure access (p.13) | BDO UX guidelines (R6); role-based access (FR-CSF-002) | FIT |
+<!-- table: widths=3,5.6,5.4 caption="Non-functional requirements (BRD p.13-14)" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Users | 24 concurrent agents, supervisors and personnel; 16 document users; 8 report users (leads / heads) | Small load within the BRD-1 sizing |
+| Volumes | 144,400 transactions a year for access, retrieval and search (about 600 a working day); 113,800 document transactions; 1% growth | Indexed search keys; paged results |
+| Response time | Under 3 seconds for retrieval, updates and search; 5 seconds for documents and reports | Each Servicing View tab loads on its own; search on indexed keys; no report on the agent's path |
+| Peak | First quarter; 10:00-12:00 and 14:00-16:00 | No batch work in these windows |
+| Availability | 99.9%; used 06:00-22:00; maintenance weekdays and Saturdays 21:00-05:00 | The maintenance window overlaps usage 21:00-22:00 (CSQ12) |
+| Recovery | RTO 4 hours; RPO 4 hours | Met by log archiving (FR-CSF-043) |
+| Backup | Every 15 minutes (BRCSF-011 / 11.001); every 4 hours in the retention table | Log archiving every 15 minutes plus daily base backups (CSQ11) |
+| Retention | Client and account data, contact updates, audit trail, attachments - 5 years online, 15 years archive; backups kept 5 years | Retention rule CSF_CONTACT_CHANGE; platform rules for the other records |
+| Anonymisation | Not required | None |
+| Devices | Same performance on mobile and desktop | Responsive screens |
+| Usability and security | User-friendly, intuitive; secure access (p.13) | BDO UX guidelines (R6); role-based access (FR-CSF-002) |
 
 # Configuration items
 

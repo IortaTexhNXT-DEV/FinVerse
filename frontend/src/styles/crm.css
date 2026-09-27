@@ -2,28 +2,7 @@
  * Clients (crm) and Broking Administration (nbadmin) screens. Colours come from tokens.css only.
  */
 
-/* Client tags and special instructions banner (BRNB.091) */
-.instructions-banner {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--brand-gold-600);
-  border-left: 4px solid var(--brand-gold);
-  border-radius: var(--radius-md);
-  background: var(--brand-gold-050);
-  color: var(--color-text);
-}
-
-.instructions-banner-tags,
-.instructions-banner-item {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--space-2);
-  font-size: 13px;
-}
-
+/* Client tags (managed on the client record; shown as standard tags in record headers) */
 .client-tag {
   display: inline-flex;
   align-items: center;

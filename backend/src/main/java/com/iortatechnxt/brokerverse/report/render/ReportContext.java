@@ -29,7 +29,7 @@ public record ReportContext(
    * Context with the default print options.
    *
    * @param companyName company printed at the top
-   * @param generatedBy user id
+   * @param generatedBy display name of the user who ran the report
    * @param generatedAt run time
    * @param footerText footer text
    */

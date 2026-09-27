@@ -9,7 +9,7 @@
 --                     MANUAL or EXCLUDE)
 --     BRIDSP-23/32    lead days per segment, insurer acceptance days
 --     BRIDSP-24       notification events and alerts
---     BRIDSP-31       accounting event SBM_HANDLING_FEE (posted by cashiering, V767)
+--     BRIDSP-31       accounting event SBM_HANDLING_FEE (posted by cashiering, V769)
 --   Design: docs/architecture/SUBMITTED_POLICIES_DESIGN.md sections 5, 6, 7 and 8. The grants
 --   follow the matrix of FRS section 3.3 until SP SQ15 / OQ48 are answered; every default value
 --   is a placeholder until SP SQ07-SQ09, SQ11-SQ13 are answered.

@@ -36,8 +36,12 @@ public class AccountStatusReport implements ReportDefinition {
 
   private static final String SQL =
       "select a.arn, a.client_name as client, a.product_code as product,"
-          + " a.account_officer as officer, s.sort_order, s.name as stage,"
-          + " c.stage_entered_at as since, c.due_at as due, c.assignee,"
+          + " "
+          + NbReportSupport.userName("a.account_officer")
+          + " as officer, s.sort_order, s.name as stage,"
+          + " c.stage_entered_at as since, c.due_at as due, "
+          + NbReportSupport.userName("c.assignee")
+          + " as assignee,"
           + " round(cast(extract(epoch from (cast(:now as timestamptz) - c.stage_entered_at))"
           + " / 86400 as numeric), 1) as age,"
           + " (not s.terminal and s.owner_permission is not null and c.due_at < :now) as breached,"

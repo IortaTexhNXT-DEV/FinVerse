@@ -20,6 +20,7 @@ import type { JournalFormValues } from './journalForm';
 import { isBlankLine, lineProblems, totals } from './journalMath';
 import { useJournalSave } from './useJournalSave';
 import type { SaveMode } from './useJournalSave';
+import { Notice } from '@/components/ui/Notice';
 
 function SubmitConfirmation({
   open,
@@ -131,16 +132,14 @@ function JournalForm({
         }
       />
       {savedDraft !== undefined && save.error !== null && (
-        <div className="alert warning" role="status">
+        <Notice tone="warning">
           Draft {savedDraft.batchNo} was saved but not submitted. Correct the voucher and submit
           again: this updates the same draft.
-        </div>
+        </Notice>
       )}
       <ErrorAlert error={save.error} />
       {checked && hasProblems && (
-        <div className="alert danger" role="alert">
-          Correct the highlighted lines before saving.
-        </div>
+        <Notice tone="error">Correct the highlighted lines before saving.</Notice>
       )}
       <SubmitConfirmation
         open={confirming}

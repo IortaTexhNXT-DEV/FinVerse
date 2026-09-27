@@ -38,6 +38,9 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.parser.PdfTextExtractor;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
@@ -115,7 +118,7 @@ class ProposalIT {
   }
 
   @Test
-  void aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts() {
+  void aPrfGoesThroughTsuInsurersComparativeTableProposalSlipAndAccounts() throws IOException {
     Long client = clients.requireByCode(company(), "CL-2026-900003").getId();
     ProposalRequest p =
         as.run("ao", () -> proposals.create(company(), engineering(client, "INS-MGIC")));
@@ -220,6 +223,14 @@ class ProposalIT {
     assertThat(queries.get(id).isTermsClosed()).isTrue();
     assertThat(documentsBuilder.comparativeXlsx(queries.get(id), responses.responses(id)).content())
         .isNotEmpty();
+    // Amounts, rates (four decimals), status words and the recommended flag are not split across
+    // lines.
+    try (PdfReader reader =
+        new PdfReader(
+            documentsBuilder.comparativePdf(queries.get(id), responses.responses(id)).content())) {
+      assertThat(new PdfTextExtractor(reader).getTextFromPage(1))
+          .contains("120,000.00", "110,000.00", "0.40", "0.30", "received", "Recommended");
+    }
 
     ProposalRequest ps = as.run("tsu", () -> proposalSlips.submit(id, null, null));
     assertThat(ps.getPsNo()).matches("PS-\\d{4}-\\d{6}");

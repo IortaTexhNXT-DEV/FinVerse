@@ -50,6 +50,7 @@ class PersonaMenusIT {
               "/user-access/group-profiles", "/api/v1/nbadmin/access-requests?groupProfiles=true"),
           Map.entry("/user-access/bulk", "/api/v1/nbadmin/access-batches"),
           Map.entry("/user-access/matrix", "/api/v1/nbadmin/access-matrix"),
+          Map.entry("/user-access/sod-rules", "/api/v1/nbadmin/sod-rules"),
           Map.entry("/user-access/reports", "/api/v1/reports"),
           Map.entry("/claims-handling", "/api/v1/broker-claims/home?companyId={c}"),
           Map.entry("/claims-handling/worklist", "/api/v1/broker-claims/worklist?companyId={c}"),
@@ -68,6 +69,21 @@ class PersonaMenusIT {
           Map.entry("/eb/pending-items", "/api/v1/eb/pending-items?companyId={c}"),
           Map.entry("/eb/soa", "/api/v1/eb/soa?companyId={c}"),
           Map.entry("/eb/setup", "/api/v1/eb/setup/threshold-rules?companyId={c}"),
+          Map.entry("/migration", "/api/v1/migration/home?companyId={c}"),
+          Map.entry("/migration/objects", "/api/v1/migration/objects"),
+          Map.entry("/migration/maps", "/api/v1/migration/maps"),
+          Map.entry("/migration/layouts", "/api/v1/migration/layouts"),
+          Map.entry("/migration/extracts", "/api/v1/migration/extracts?companyId={c}"),
+          Map.entry("/migration/batches", "/api/v1/migration/batches?companyId={c}"),
+          Map.entry("/migration/matching", "/api/v1/migration/matches"),
+          Map.entry("/migration/reconciliation", "/api/v1/migration/batches?companyId={c}"),
+          Map.entry("/migration/trueups", "/api/v1/migration/trueups?companyId={c}"),
+          Map.entry("/migration/cutover", "/api/v1/migration/cutover/plans?companyId={c}"),
+          Map.entry("/migration/runoff", "/api/v1/migration/decommission?companyId={c}"),
+          Map.entry("/migration/signoff", "/api/v1/migration/signoffs/matrix?companyId={c}"),
+          Map.entry("/legacy-inquiry", "/api/v1/legacy-inquiry/settings"),
+          Map.entry(
+              "/legacy-inquiry/access-log", "/api/v1/legacy-inquiry/access-log?companyId={c}"),
           Map.entry("/renewal", "/api/v1/renewal/home?companyId={c}"),
           Map.entry("/renewal/expiry", "/api/v1/renewal/candidates?companyId={c}&tab=EXTRACTED"),
           Map.entry("/renewal/mine", "/api/v1/renewal/candidates?companyId={c}&mine=true"),
@@ -111,7 +127,7 @@ class PersonaMenusIT {
   @Test
   void everyRoleHoldsExactlyThePermissionsTheMenuIsBuiltFrom() throws Exception {
     Map<String, Persona> personas = PersonaMenus.load();
-    assertThat(personas).hasSize(36);
+    assertThat(personas).hasSize(45);
     for (Persona p : personas.values()) {
       assertThat(p.inScope(granted(p.role()))).as(p.role()).isEqualTo(p.permissions());
       JsonNode me = api.read(api.doGet(p.seedUser(), "/api/v1/auth/me"));

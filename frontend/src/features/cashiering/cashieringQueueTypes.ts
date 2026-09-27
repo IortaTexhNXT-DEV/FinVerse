@@ -1,3 +1,4 @@
+import type { RecordOriginFields } from '@/api/types';
 import type { CwtPath, PdcStatus, PickupStatus, ReceiptKind } from './cashieringTypes';
 
 /** Types of the Cashiering queues and setup (unapplied, checks, printing, BIR 2307, series). */
@@ -43,6 +44,24 @@ export interface UnappliedItem {
   remarks?: string;
   createdAt: string;
   current?: Disposition;
+  /** Unapplied payment carried from legacy at cut-over (origin MIGRATED, BRD-13). */
+  sourceSystem?: string;
+  legacyRef?: string;
+  migrationBatch?: string;
+  ledgerContext?: 'NEW' | 'LEGACY';
+  legacyArNo?: string;
+  legacyArDate?: string;
+  matchRefs?: string;
+}
+
+/** The origin fields of an item for the LEGACY badge. */
+export function unappliedOrigin(u: UnappliedItem): RecordOriginFields {
+  return {
+    origin: u.origin === 'MIGRATED' ? 'MIGRATED' : 'BIBS',
+    sourceSystem: u.sourceSystem,
+    legacyRef: u.legacyRef,
+    migrationBatch: u.migrationBatch,
+  };
 }
 
 export interface DispositionType {
@@ -196,7 +215,7 @@ export interface CwtTagBody {
   remarks?: string;
 }
 
-export interface Series {
+export interface Series extends RecordOriginFields {
   id: number;
   branchId: number;
   kind: ReceiptKind;

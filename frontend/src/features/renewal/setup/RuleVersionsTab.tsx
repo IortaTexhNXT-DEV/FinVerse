@@ -15,6 +15,7 @@ import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 /** An editable column of a rule. */
 export interface RuleField<R> {
@@ -202,7 +203,8 @@ export function RuleVersionsTab<R>({
     enabled: companyId > 0,
   });
   const step = useMutation({
-    mutationFn: ({ id, name }: { id: number; name: string }) => api.decide(companyId, id, name),
+    mutationFn: ({ id, name, remarks }: { id: number; name: string; remarks?: string }) =>
+      api.decide(companyId, id, name, remarks),
     onSuccess: async (v) => {
       toast.success(`Version ${String(v.versionNo)} ${v.status.toLowerCase()}`);
       await queryClient.invalidateQueries({ queryKey: ['renewal', 'setup'] });
@@ -267,19 +269,31 @@ export function RuleVersionsTab<R>({
                     )}
                     {v.status === 'SUBMITTED' && (
                       <>
-                        <Button
+                        <ConfirmButton
                           size="sm"
-                          onClick={() => step.mutate({ id: v.id, name: 'ACTIVATE' })}
+                          confirm={{
+                            title: `Activate Version ${String(v.versionNo)}`,
+                            effect: 'The version replaces the active one from its effective date.',
+                          }}
+                          onConfirm={() => step.mutateAsync({ id: v.id, name: 'ACTIVATE' })}
                         >
                           Activate
-                        </Button>
-                        <Button
+                        </ConfirmButton>
+                        <ConfirmButton
                           size="sm"
                           variant="ghost"
-                          onClick={() => step.mutate({ id: v.id, name: 'REJECT' })}
+                          confirm={{
+                            title: `Reject Version ${String(v.versionNo)}`,
+                            effect: 'The version is rejected and returns to its maker.',
+                            destructive: true,
+                            reason: 'required',
+                          }}
+                          onConfirm={(reason) =>
+                            step.mutateAsync({ id: v.id, name: 'REJECT', remarks: reason })
+                          }
                         >
                           Reject
-                        </Button>
+                        </ConfirmButton>
                       </>
                     )}
                   </span>

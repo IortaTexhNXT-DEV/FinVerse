@@ -34,6 +34,8 @@ public final class PdfBrandFooter extends PdfPageEventHelper {
   private final PdfTemplate total;
   private final BaseFont font;
 
+  private int lastPage;
+
   /**
    * Creates the footer.
    *
@@ -84,7 +86,8 @@ public final class PdfBrandFooter extends PdfPageEventHelper {
   @Override
   public void onEndPage(PdfWriter writer, Document document) {
     PdfContentByte cb = writer.getDirectContent();
-    String text = prefix + "Page " + writer.getPageNumber() + " of ";
+    lastPage = writer.getPageNumber();
+    String text = prefix + "Page " + lastPage + " of ";
     float x = document.right() - font.getWidthPoint(text, FONT_SIZE) - TEMPLATE_WIDTH;
     cb.beginText();
     cb.setFontAndSize(font, FONT_SIZE);
@@ -118,7 +121,9 @@ public final class PdfBrandFooter extends PdfPageEventHelper {
     total.setFontAndSize(font, FONT_SIZE);
     total.setColorFill(Color.GRAY);
     total.setTextMatrix(0, 0);
-    total.showText(String.valueOf(writer.getPageNumber()));
+    // The writer's page number is one ahead once the document closes; the total is the last page
+    // footed, so a one-page document reads "Page 1 of 1".
+    total.showText(String.valueOf(Math.max(1, lastPage)));
     total.endText();
   }
 }

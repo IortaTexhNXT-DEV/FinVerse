@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.collections.worklist.service.WorklistFilter;
 import com.iortatechnxt.brokerverse.collections.worklist.service.WorklistFilter.Ranges;
 import com.iortatechnxt.brokerverse.collections.worklist.service.WorklistFilter.Scope;
 import com.iortatechnxt.brokerverse.collections.worklist.service.WorklistFilter.Work;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import java.math.BigDecimal;
 import java.util.List;
 
@@ -31,6 +32,7 @@ import java.util.List;
  * @param promise promise flag
  * @param escalated escalated only / not escalated
  * @param client client
+ * @param origin BIBS or MIGRATED (Data Migration origin filter), null for both
  */
 public record WorklistQuery(
     String q,
@@ -51,7 +53,8 @@ public record WorklistQuery(
     Integer agingTo,
     String promise,
     Boolean escalated,
-    String client) {
+    String client,
+    RecordOrigin.Origin origin) {
 
   /** Defensive copy. */
   public WorklistQuery {
@@ -69,7 +72,7 @@ public record WorklistQuery(
     return new WorklistFilter(
         q,
         statuses,
-        new Scope(segment, salesUnit, unitHead, ao, client),
+        new Scope(segment, salesUnit, unitHead, ao, client, origin),
         new Work(
             Boolean.TRUE.equals(mine) ? username : handler,
             unassigned,

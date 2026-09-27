@@ -23,6 +23,7 @@ import { escalationsApi } from './api';
 import { LEVEL_LABELS } from './labels';
 import { displayNameOf } from '@/api/users';
 import { LovLabel } from '@/components/broking/LovLabel';
+import { Notice } from '@/components/ui/Notice';
 
 const ENTITY = 'CollectionEscalation';
 const BUSINESS_ACTIONS = new Set(['escalate_further', 'resolve', 'resubmit']);
@@ -140,7 +141,11 @@ export default function EscalationDetailPage() {
             ))
         }
       />
-      {e.resolution !== undefined && <div className="alert success">Resolved: {e.resolution}</div>}
+      {e.resolution !== undefined && (
+        <Notice tone="success" title="Resolved">
+          {e.resolution}
+        </Notice>
+      )}
       <Card title={`Escalated Invoices (${e.items.length})`}>
         <DataTable
           caption="Escalated invoices"

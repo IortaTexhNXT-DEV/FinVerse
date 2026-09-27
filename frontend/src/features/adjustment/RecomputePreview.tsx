@@ -5,6 +5,7 @@ import { formatAmount, humanize } from '@/utils/format';
 import type { Recompute } from './api';
 import { ChangesTable, RecomputeNotes, SharesTable } from './RequestParts';
 import type { RequestForm } from './requestForm';
+import { Notice } from '@/components/ui/Notice';
 
 interface PreviewProps {
   recompute: Recompute;
@@ -23,7 +24,7 @@ function Justifications({
     return null;
   }
   return (
-    <div className="alert warning" role="alert">
+    <Notice tone="warning" role="alert">
       <div className="stack">
         {recompute.duplicates.length > 0 && (
           <Field
@@ -60,7 +61,7 @@ function Justifications({
           </Field>
         )}
       </div>
-    </div>
+    </Notice>
   );
 }
 

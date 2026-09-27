@@ -12,6 +12,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { humanize, today } from '@/utils/format';
 import { applicationSummary, receiptActions } from './receivablesMath';
 import { DateInput } from '@/components/ui/DateInput';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 type Dialog = 'reject' | 'cancel' | 'bounce' | null;
 
@@ -63,14 +64,15 @@ export function ReceiptActions({ receipt }: Readonly<{ receipt: Receipt }>) {
   return (
     <>
       {allowed.approve && (
-        <Button
+        <ConfirmButton
           variant="accent"
           icon={<CheckCircle2 size={16} />}
           busy={action.isPending}
-          onClick={() => action.mutate(() => receivablesApi.approveReceipt(r.id))}
+          confirm={{ title: 'Approve Receipt', effect: 'The receipt is approved and posted.' }}
+          onConfirm={() => action.mutateAsync(() => receivablesApi.approveReceipt(r.id))}
         >
           Approve
-        </Button>
+        </ConfirmButton>
       )}
       {allowed.reject && (
         <Button variant="danger" icon={<XCircle size={16} />} onClick={() => setDialog('reject')}>
@@ -78,14 +80,18 @@ export function ReceiptActions({ receipt }: Readonly<{ receipt: Receipt }>) {
         </Button>
       )}
       {allowed.apply && (
-        <Button
+        <ConfirmButton
           variant="secondary"
           icon={<CornerDownRight size={16} />}
           busy={apply.isPending}
-          onClick={() => apply.mutate()}
+          confirm={{
+            title: 'Apply On-account (FIFO)',
+            effect: 'The on-account amount is applied to the oldest open items first.',
+          }}
+          onConfirm={() => apply.mutateAsync()}
         >
           Apply On-account (FIFO)
-        </Button>
+        </ConfirmButton>
       )}
       {allowed.cancel && (
         <Button variant="secondary" icon={<Undo2 size={16} />} onClick={() => setDialog('cancel')}>

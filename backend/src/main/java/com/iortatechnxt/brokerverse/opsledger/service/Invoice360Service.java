@@ -5,6 +5,8 @@ import com.iortatechnxt.brokerverse.booking.service.BookingQueryService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceAdjustmentTotal;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceMovement;
+import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceOriginSnapshot;
+import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceOriginSnapshotRepository;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceStatusChange;
 import com.iortatechnxt.brokerverse.opsledger.service.port.InvoiceRelatedItems;
 import com.iortatechnxt.brokerverse.opsledger.service.port.InvoiceRelatedItems.RelatedItem;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +31,7 @@ public class Invoice360Service {
   private final InvoiceLedgerQueryService ledger;
   private final BookingQueryService bookings;
   private final List<InvoiceRelatedItems> related;
+  private final OpsInvoiceOriginSnapshotRepository snapshots;
 
   /**
    * Creates the service.
@@ -35,34 +39,49 @@ public class Invoice360Service {
    * @param ledger ledger reads
    * @param bookings booked invoices
    * @param related the modules' related records
+   * @param snapshots origin snapshots of legacy invoices
    */
   public Invoice360Service(
       InvoiceLedgerQueryService ledger,
       BookingQueryService bookings,
-      List<InvoiceRelatedItems> related) {
+      List<InvoiceRelatedItems> related,
+      OpsInvoiceOriginSnapshotRepository snapshots) {
     this.ledger = ledger;
     this.bookings = bookings;
     this.related = related;
+    this.snapshots = snapshots;
   }
 
   /**
-   * The 360 view of an invoice.
+   * The 360 view of an invoice. A legacy invoice has no booking in BIBS: its booking references are
+   * empty and the view carries the legacy snapshot instead (DATA_MIGRATION_DESIGN 14.1).
    *
    * @param invoiceNo invoice number
    * @return view
    */
   public Invoice360 view(String invoiceNo) {
     OpsInvoice invoice = ledger.require(invoiceNo);
-    BookedInvoice booked = bookings.byNo(invoiceNo);
+    OpsInvoiceOriginSnapshot snapshot = null;
+    BookingRefs refs;
+    if (invoice.getRecordOrigin().isMigrated()) {
+      snapshot = snapshots.findByInvoiceId(invoice.getId()).orElse(null);
+      Optional.ofNullable(snapshot).ifPresent(OpsInvoiceOriginSnapshot::loadLines);
+      refs = new BookingRefs(null, null, List.of());
+    } else {
+      BookedInvoice booked = bookings.byNo(invoiceNo);
+      refs =
+          new BookingRefs(booked.getId(), booked.getServiceInvoiceNo(), booked.getJournalBatches());
+    }
     String original =
         invoice.getParentInvoiceNo() == null ? invoiceNo : invoice.getParentInvoiceNo();
     return new Invoice360(
         invoice,
-        new BookingRefs(booked.getId(), booked.getServiceInvoiceNo(), booked.getJournalBatches()),
+        refs,
         ledger.movements(invoiceNo),
         ledger.history(invoiceNo),
         ledger.adjustmentTotal(original).orElse(null),
-        relatedItems(invoiceNo));
+        relatedItems(invoiceNo),
+        snapshot);
   }
 
   private Map<Section, List<RelatedItem>> relatedItems(String invoiceNo) {
@@ -100,6 +119,7 @@ public class Invoice360Service {
    * @param history status, flag and lock history
    * @param adjustments cumulative adjustments of the original invoice, null when none
    * @param related records of the Operations modules by section
+   * @param origin frozen original values of a legacy invoice, null for BIBS invoices
    */
   public record Invoice360(
       OpsInvoice invoice,
@@ -107,5 +127,6 @@ public class Invoice360Service {
       List<OpsInvoiceMovement> movements,
       List<OpsInvoiceStatusChange> history,
       OpsInvoiceAdjustmentTotal adjustments,
-      Map<Section, List<RelatedItem>> related) {}
+      Map<Section, List<RelatedItem>> related,
+      OpsInvoiceOriginSnapshot origin) {}
 }

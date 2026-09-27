@@ -228,6 +228,8 @@ export interface Account {
   renewalOfRef?: string;
   /** How the account was created. */
   origin: AccountOrigin;
+  /** Legacy header of an account imported from a legacy system. */
+  legacy?: AccountLegacyHeader;
 }
 
 /** Business type of an account (shared work item BT0). */
@@ -235,7 +237,25 @@ export type BusinessType = 'NEW_BUSINESS' | 'RENEWAL';
 
 /** How an account was created (shared work item BT0). */
 export type AccountOrigin =
-  'QUOTATION' | 'PROPOSAL' | 'DIRECT' | 'SUBMITTED_POLICY' | 'EMPLOYEE_BENEFITS' | 'RENEWAL';
+  | 'QUOTATION'
+  | 'PROPOSAL'
+  | 'DIRECT'
+  | 'SUBMITTED_POLICY'
+  | 'EMPLOYEE_BENEFITS'
+  | 'RENEWAL'
+  | 'MIGRATED';
+
+/** Legacy header of an account imported from a legacy system (BRD-13). */
+export interface AccountLegacyHeader {
+  sourceSystem: string;
+  legacyRef: string;
+  policyNo: string;
+  coverNo: string;
+  legacyPackageCode?: string;
+  legacyPackageVersion?: number;
+  legacyStatus?: string;
+  migrationBatch: string;
+}
 
 export interface AccountSummary {
   id: number;
@@ -259,6 +279,10 @@ export interface AccountSummary {
   accountOfficer?: string;
   createdAt: string;
   businessType: BusinessType;
+  origin?: AccountOrigin;
+  sourceSystem?: string;
+  legacyRef?: string;
+  migrationBatch?: string;
 }
 
 export interface DuplicateFinding {
@@ -298,6 +322,8 @@ export interface AccountCriteria {
   periodFrom?: string;
   periodTo?: string;
   businessType?: string;
+  /** BIBS or MIGRATED accounts; blank for both (BRD-13). */
+  origin?: string;
 }
 
 /** Workflow entity type of accounts (NB_ACCOUNT work cases, attachments, e-mails). */

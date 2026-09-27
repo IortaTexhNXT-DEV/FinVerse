@@ -19,13 +19,13 @@ control:
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Solution Architect
     approver: ""
-    change: Internal draft from the BRD-5 baseline and the build design
+    change: Internal draft from the BRD-5 baseline
   - version: "1.0"
     date: 25 Sep 2026
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Comptrollership Head (pending)
-    change: First issue for BDOI review; aligned with the as-built Disbursement (A1-DSB), Payment Requests and ACSL (A1-PRQ) modules and the remittance and booking changes (A1-OPSX)
+    change: First issue for BDOI review; aligned with the Disbursement, Payment Requests and ACSL screens and the remittance and booking changes
 distribution:
   - {name: "Head, Comptrollership", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Disbursement Section (Processors, Team Leaders, Approvers)", role: Business owner, organisation: BDOI, purpose: Review of the Disbursement FRs}
@@ -34,7 +34,7 @@ distribution:
   - {name: "Human Resources", role: Business user, organisation: BDOI, purpose: Review of the cash-advance approval}
   - {name: "Operations (Cashiering, Remittance)", role: Business user, organisation: BDOI, purpose: "Review of the refund validation, remittance and deduction FRs"}
   - {name: Business Project Services, role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Build, test and UAT preparation"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, test and UAT preparation"}
 ---
 
 # Introduction
@@ -45,7 +45,7 @@ This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker Sy
 
 BDOI uses this document to confirm that the system behaves as the business expects. The project team uses it to test and to prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
 
-Disbursement, Payment Requests and ACSL are built. Where the delivered behaviour differs from the BRD text, the FR describes the delivered behaviour and records the difference in a note; section 1.7 lists all differences in one table. The remittance and booking changes of the wave A1-OPSX (CPC2, the early-incentive service invoice, remittance deductions, restoring a remittance batch after a DV cancellation, the root invoice in booking and the invoice family) are built; the parts that wait for BDOI data are marked as parked in the FR.
+The FRs describe the proposed behaviour of the Disbursement, Payment Requests and ACSL screens. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, the FR says so in a note and chapter 12 lists each such point for confirmation. The volume also covers the remittance and booking changes (CPC2, the early-incentive service invoice, remittance deductions, restoring a remittance batch after a DV cancellation, the root invoice in booking and the invoice family); the parts that wait for BDOI data name the open question in the FR.
 
 ## Scope
 
@@ -81,18 +81,17 @@ The accounting events of BRD-5 and their seed entries, the chart and the posting
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | Accounting, Disbursement and ACSL BRD (main BRD), pages 40-153; signed scan pp.154-267 | v1.0, 23-Jul-2025; approved Jul to Oct 2025 | `docs/source-documents/Accounting, Disbursement, and Accounting Controls and Subsidiary Ledger BRD.zip` |
-| R2 | Addendum 1, pages 28-39 (signed copy pp.16-27) | v1.0, 18-Dec-2025; signed 13-Jan-2026 | same file |
-| R3 | Addendum 2 (Workshop), pages 1-15 (scanned) | v1.0, 10-Apr-2026; signed 8 to 15-Apr-2026 | same file |
-| R4 | BDOI Accounting, Disbursement and ACSL (BRD-5) requirements baseline and fit/gap | current | `docs/requirements/BDOI_ACCT_BRD_SPEC.md` |
-| R5 | Accounting, Disbursement and ACSL build design, including section 17 and the as-built notes A1-GL, A1-PRQ, A1-DSB, A1-FRBS, A1-OPSX | current | `docs/architecture/ACCOUNTING_DISBURSEMENT_DESIGN.md` |
-| R6 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R7 | BRD-5 FRS Volume 1 (FRBS and Accounting) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/BRD-05_Accounting_Disbursement_ACSL/BIBS_FRS_BRD-05_Accounting_Disbursement_ACSL_Vol1_v1.0.docx` |
-| R8 | BRD-2 Operations FRS (remittance, cashiering, commission) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/BRD-02_Operations/BIBS_FRS_BRD-02_Operations_v1.0.docx` |
-| R9 | BRD-4 Collections FRS (collector requests to Cashiering) | v1.0 | `docs/deliverables/out/Drop-1_Transactional/BRD-04_Collections/BIBS_FRS_BRD-04_Collections_v1.0.docx` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | Accounting, Disbursement and ACSL BRD (main BRD), pages 40-153; signed scan pp.154-267 | v1.0, 23-Jul-2025; approved Jul to Oct 2025 |
+| R2 | Addendum 1, pages 28-39 (signed copy pp.16-27) | v1.0, 18-Dec-2025; signed 13-Jan-2026 |
+| R3 | Addendum 2 (Workshop), pages 1-15 (scanned) | v1.0, 10-Apr-2026; signed 8 to 15-Apr-2026 |
+| R4 | BDOI Accounting, Disbursement and ACSL (BRD-5) requirements baseline | current |
+| R6 | Cross-BRD decisions and answered questions | current |
+| R7 | BRD-5 FRS Volume 1 (FRBS and Accounting) | v1.0 |
+| R8 | BRD-2 Operations FRS (remittance, cashiering, commission) | v1.0 |
+| R9 | BRD-4 Collections FRS (collector requests to Cashiering) | v1.0 |
 
 Page references ("p.69") are pages of the BRD-5 PDF; "Add.1" is Addendum 1 (pp.28-39) and "Add.2" the Workshop Addendum (pp.1-15). The BRD numbers the Disbursement access rows "BRD 1.1.0-1.1.3"; this FRS writes them DIS 1.1.0-1.1.3. Duplicate numbers renamed by Addendum 1 are used in their new form (DIS 2.17.4, DIS 2.24.2, ACSL 2.5.5); the second row printed "DIS 3.30.1" (headcount report) is written DIS 3.30.2.
 
@@ -131,51 +130,14 @@ UPP: Unapplied payment
 
 ## How to read the functional requirements
 
-Each FR in section 4 has the same parts as in Volume 1: a header table (BRD trace with page, actor, priority, fit class of the baseline R4, screens, API), description, preconditions, main flow, alternate and exception flows, business rules (*Configurable* or *Fixed*), validations with the message and its code ("-" for a screen or platform check), screens and fields, notifications, audit and numbered acceptance criteria. Text in angle brackets (`<DV>`) is replaced by the value. Every BRD-5 row carries the priority **Must have**. API paths start with `/api/v1`; "..." in a header table stands for the module path given in the section introduction.
+Each FR in section 4 has the same parts as in Volume 1: a header table (BRD trace with page, actor, priority, screens), description, preconditions, main flow, alternate and exception flows, business rules (*Configurable* or *Fixed*), validations with the message and its code ("-" for a screen or platform check), screens and fields, notifications, audit and numbered acceptance criteria. Text in angle brackets (`<DV>`) is replaced by the value. Every BRD-5 row carries the priority **Must have**.
 
-Where a built function waits for BDOI data, the Fit column adds "parked" with the question it waits for (for example AQ24); the FR describes the delivered behaviour until the answer.
+Where a function waits for BDOI data, its rules name the question it waits for (for example AQ24); the FR describes the proposed default until the answer.
 
 > [!NOTE]
-> Bank channel layouts, form layouts, the payee migration file, the real accounting entries and several lists are BDOI data not given yet (AQ02, AQ09-AQ19, AQ21-AQ25). BIBS holds them as configuration or draft templates, so an answer does not need a new build.
+> Bank channel layouts, form layouts, the payee migration file, the real accounting entries and several lists are BDOI data not given yet (AQ02, AQ09-AQ19, AQ21-AQ25). BIBS holds them as configuration or draft templates, so an answer does not need a change to the system.
 
-<!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R4)" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Worked with the platform before BRD-5 |
-| CONFIGURE | Needed set-up only |
-| CHANGE | Extended an existing capability |
-| NEW | A capability that did not exist before BRD-5 |
-| OUT | Out of scope per the BRD |
 
-## Differences between the built behaviour and the BRD
-
-<!-- table: widths=2.2,5.4,6.8,2.2 caption="Recorded differences (built behaviour against the BRD)" size=8.5 -->
-| BRD ID | BRD says | BIBS does | Ref. |
-|---|---|---|---|
-| DIS 3.25.0 | Auto-reject a request whose payee is not maintained and notify the requester | By default the request waits as No Payee, a payee request is raised and the alert DISB_PAYEE_NO_MATCH is sent; it resumes when the payee is authorised. DISB_NO_PAYEE_ACTION = RETURN returns it at once as the BRD says | AQ11, AQ12 |
-| DIS 2.2.4 | Delete payee details | Only a draft payee never used is deleted; any other payee is deactivated with authorisation | AQ11 |
-| DIS 2.7.6, 3.27.0 | Proforma entry editable | Lines are editable until approval; edited lines are marked Edited and shown to the approver | AQ13 |
-| DIS 2.8.1, 2.16.2 | Check statuses; checks printed at EOD | A check takes the next leaf of the paying account's cheque book when printed; the layout is a draft template until AQ14 | AQ14 |
-| DIS 2.16.1 | DCTF with header and details | Header and 89-character details as Appendix B; no trailer or totals until AQ09 | AQ09 |
-| DIS 2.22.0, 3.26.4, 3.26.7 | Upload bank files (deposited checks, credited accounts, BOB approvals) | The uploads take a minimal CSV (DV or check number, amount, date) until the bank layouts are given | AQ09 |
-| DIS 2.20.0 | Cancel an approved DV and regularise the source data | The DV journal is reversed and the request goes back to its source; for a remittance DV, Remittance reverses the batch postings, gives the deductions back and returns the batch to review; it is sent again under a new cycle | AQ15 |
-| DIS 2.17.x | Funding through BOB with a verifier and two approvers | Built as a BIBS workflow with four eyes; the BOB transaction itself is done in BOB and its reference recorded | AQ10 |
-| DIS 2.10.x | OR / AR tagging on DVs | Every approved DV counts as unregularised until tagged; which DVs need an OR / AR back is open | AQ17 |
-| DIS 2.11.x | CWT tagging | The tag records the certificate on the DV; the insurer certificates on commission are kept in one register in Tax (Certificates Received) | AQ16 |
-| DIS 3.27.2, ACSL 2.16.0 | One invoice number for related transactions | Endorsements and cancellations keep their own BIR invoice number and carry the root invoice number; booking sets the root invoice number and Invoice 360 shows the family | AQ29 |
-| DIS 3.29.2 | CPC2 per remittance, deducted and posted as income | Built from the TSU CPC2 criteria (rate on the basic premium remitted, output VAT); base, VAT treatment, fixed-amount and rule criteria wait for BDOI | AQ24, OQ39, PQ04 |
-| DIS 3.29.1 | Service invoice of the early incentive issued automatically with 2% withholding | Built once per batch; the accounting of the insurer's 2% withholding is parked and the incentive is still deducted in full from the remittance | AQ25 |
-| DIS 3.29.0 | CPC2 report | Not built; the CPC2 amounts are on the remittance batch and its schedule | Gap G4 |
-| MKT 1.7.0 | Unapplied payment report for Marketing | Marketing runs the Cashiering reports (OPS_REPORT_VIEW); no Marketing report with a segment filter | AQ18 |
-| MKT 1.12.0, 1.13.0 | Upload .txt files; preview documents side by side | .txt is not an accepted attachment type; files open one at a time in the viewer | - |
-| MKT 1.10.0 | Populate the details of the forms (list empty) | The fields of Appendix D are used; all accounts of one refund request belong to one client | AQ18 |
-| MKT 1.19.0, 1.16.3 | Cancellation of a disbursed check routed to Disbursement | After approval the request is handed to the Disbursement approvers (hand-off DV_CANCELLATION); the approver cancels the DV, which closes the hand-off | AQ15 |
-| MKT 2.25.0 | CA / SA on the client record | Recorded on approval without duplicates; the BDO account number is checked as 10 to 16 digits until AQ19 | AQ19 |
-| Appendix D | Cash-advance liquidation form | Built (liquidation, return, post) although its scope is to be confirmed | AQ18 |
-| ACSL 2.4.0 | Upload SOA files that trigger reconciliation | The SOA file is read in one request (up to ACSL_SOA_MAX_ROWS rows) and reconciled once loaded; layouts per insurer are configuration | AQ21 |
-| ACSL 2.14.3, 2.14.4 | Aging and schedule reports per account family | Not built as ACSL reports; the premium receivable schedules with ageing are delivered as account schedules (Volume 1) | Gap G3 |
-| ACSL 2.9.2 | Remittance deduction on insurer confirmation | Built in Remittance; the deduction stays Confirmed while batches consume it and is Applied when every batch that used it has the insurer OR; sources and spanning batches wait for BDOI | AQ23 |
-| ACSL 2.13.2 | GL-SL reconciliation also at period end | Nightly and on demand; the period-end check is not built | - |
 
 # Business context and process overview
 
@@ -304,9 +266,7 @@ title: Access Disbursement, Payment Requests and ACSL with a user profile
 brd: [DIS 1.1.0 (p.68), DIS 1.1.1 (p.69), DIS 1.1.2 (p.69), DIS 1.1.3 (p.69), MKT 1.1.0 (p.105), MKT 1.1.1 (p.105), MKT 1.1.2 (p.105), MKT 1.1.3 (p.105), ACSL 1.1.0 (p.114), ACSL 1.1.1 (p.115), ACSL 1.1.2 (p.115), ACSL 1.1.3 (p.115)]
 actor: Disbursement, Marketing and ACSL users
 priority: Must have
-fit: "FIT (1.1.0, 1.1.1), CONFIGURE (1.1.2, 1.1.3)"
 screens: Login; menu group Finance (Disbursement, Refund & Cash Advance Requests, ACSL)
-api: POST /api/v1/auth/login
 description: Users reach BIBS from any BDO-issued device and log in with their own profile; the menu shows only the screens their roles allow. BIBS warns after 15 minutes of inactivity (SESSION_IDLE_WARNING_MINUTES) and 30 minutes before the forced log-out (SESSION_EXPIRY_WARNING_MINUTES). The rules are those of Volume 1, FR-AC-001 and FR-AC-002.
 preconditions:
   - The user has an active account with a Disbursement, Payment Request or ACSL role.
@@ -317,7 +277,7 @@ main_flow:
 rules:
   - [R1, "Log-in, lock-out (3 attempts) and session rules of BRD-1.", Configurable, Session parameters]
 validations:
-  - [User ID or password wrong, Invalid user ID or password, "-"]
+  - [User ID or password wrong, Invalid user name or password, AUTHENTICATION_FAILED]
 notifications:
   - "On-screen warnings only."
 audit:
@@ -330,7 +290,7 @@ acceptance:
 
 ### Payee maintenance
 
-API paths of this section are under `/api/v1/disbursement` unless stated.
+
 
 ```fr
 id: FR-DS-010
@@ -338,9 +298,7 @@ title: Maintain payees with authorisation
 brd: [DIS 2.2.0 (p.69), DIS 2.2.3 (p.70), DIS 2.2.6 (p.71), DIS 2.2.7 (p.71)]
 actor: Disbursement Team Leader (maintain); Disbursement Approver (authorise)
 priority: Must have
-fit: NEW
 screens: Payees (tabs Active, For Authorisation, Drafts, Inactive, Payee Requests); Payee
-api: "GET/POST .../payees; PUT .../payees/{id}; POST .../payees/{id}/submit, /authorize, /deactivate, /reactivate; .../payees/{id}/accounts"
 description:
   - Disbursement keeps a payee master - payee code, class, name, address, e-mail, TIN, default and allowed modes of payment, currency, default cost centre and remarks, with one or more bank accounts (bank, branch, account number, account name, currency, mode, primary, active). Taxes (TIN, ATC, VAT) come from the party tax profile.
   - A new payee is saved as a draft and submitted; the Approver authorises it and it becomes ACTIVE. A change to an active payee, a deactivation and a reactivation are authorised the same way. Account numbers are masked in lists unless the user holds DISB_PAYEE_VIEW_FULL.
@@ -390,9 +348,7 @@ title: Classify payees and choose the modes of payment
 brd: [DIS 2.2.2 (p.70), DIS 2.2.5 (p.70)]
 actor: Disbursement Team Leader
 priority: Must have
-fit: "CHANGE (2.2.2), NEW (2.2.5)"
 screens: Payee
-api: .../payees
 description: Each payee has a class - Supplier, Insurer, Employee, Client, Government agency or Others - and the modes of payment it may be paid by - Credit to Account, Debit BDOIR Main Account (ATD), Manager's Check or Demand Draft, Credit Ticket, Telegraphic Transfer, Online Banking and Check. The class drives the automatic classification of requests (FR-DS-021); the modes limit the DV (FR-DS-033).
 preconditions:
   - "The user maintains the payee (FR-DS-010)."
@@ -417,9 +373,7 @@ title: Receive payee maintenance requests
 brd: [DIS 2.2.1 (p.69)]
 actor: Disbursement Team Leader
 priority: Must have
-fit: NEW
 screens: Payees (Payee Requests)
-api: "GET .../payee-requests; POST .../payee-requests/{id}/close"
 description: Payee requests come from refund requests (payee data of the RRF), from Disbursement itself, and from system requests whose payee was not found (NO_MATCH, FR-DS-022). Each shows its source, the payee data given and its status. The TL creates or completes the payee from the request; when the payee is authorised the request is DONE and a request waiting for that payee resumes.
 preconditions:
   - "The user has DISB_PAYEE_MAINTAIN."
@@ -447,9 +401,7 @@ title: Delete or deactivate payees
 brd: [DIS 2.2.4 (p.70)]
 actor: Disbursement Team Leader; Approver
 priority: Must have
-fit: NEW
 screens: Payee (Delete, Request Deactivation)
-api: "DELETE .../payees/{id}; POST .../payees/{id}/deactivate, /reactivate"
 description: A draft payee that was never used can be deleted. A payee that is active or has been used is deactivated instead; the deactivation is authorised by the Approver and the payee can be reactivated the same way. Inactive payees are not offered on new DVs.
 preconditions:
   - "The user has DISB_PAYEE_MAINTAIN."
@@ -477,9 +429,7 @@ title: View all payees and migrate the existing payees
 brd: [DIS 2.2.8 (p.71; Add.1 p.31-32; Add.2 p.11-12)]
 actor: Disbursement users; Disbursement Team Leader (migration)
 priority: Must have
-fit: NEW
 screens: Payees; Disbursement Uploads (Payee Migration); Disbursement Reports (Payee report)
-api: ".../payees?status=; bulk handler DISB_PAYEE_MIGRATION; report DSB-PAYEE"
 description: The Payees screen is the consolidated list of maintained payees - name, address, account number (masked unless permitted), mode of payment, disbursement type - active and inactive by tab. The payees of the current system are loaded once by the migration upload (payee code, name, class, address, e-mail, TIN, currency, allowed and default modes, bank, account number); each row is validated and the reconciliation lists loaded and refused rows. Payee data flows to the DV at processing, and every maintenance is logged.
 preconditions:
   - "The user has DISB_VIEW (list); DISB_UPLOAD (migration)."
@@ -509,14 +459,12 @@ title: Receive system-triggered payment requests
 brd: [DIS 2.6.0 (p.75), DIS 2.6.2 (p.76), DIS 3.25.0 (p.95)]
 actor: System; Disbursement Processor
 priority: Must have
-fit: "NEW (2.6.0, 2.6.2), CHANGE (3.25.0)"
 screens: Disbursement Workbench (System Requests, No Payee)
-api: "Operations port DisbursementGateway; GET .../requests; POST .../requests/{id}/voucher, /return"
 description:
   - BIBS modules ask for payments through the Operations disbursement gateway - remittance batches, cashiering refunds and 2307 releases, commission pass-ons, Payment Requests refunds and cash advances, service-fee payouts. Each request (DSR-yyyy-n) carries the RFP number, payee, disbursement type, amount, currency, attachments, the root invoice and the accounting references to settle.
   - When the payee is maintained, BIBS creates the DV at once (FR-DS-030). Refund and remittance requests go straight to the Approver (DISB_AUTO_APPROVER_ROUTING); others start In Process for the Processor.
   - When the payee is not maintained, the request waits under No Payee with a NO_MATCH payee request and the alert DISB_PAYEE_NO_MATCH, and resumes when the payee is authorised. With DISB_NO_PAYEE_ACTION = RETURN it is returned to its source at once.
-  - Every DV stage and payment is reported back to the source module (DisbursementStatusChanged).
+  - Every DV stage and payment is reported back to the source module.
 preconditions:
   - "The source module is configured to use the gateway."
 main_flow:
@@ -527,7 +475,7 @@ alternate_flows:
   - Duplicate. A second request with the same source reference is refused.
   - No payee. The request waits or is returned (parameter).
 rules:
-  - [R1, "Types built straight to the approver - REFUND, REMITTANCE.", Configurable, Parameter DISB_AUTO_APPROVER_ROUTING]
+  - [R1, "Types routed straight to the approver - REFUND, REMITTANCE.", Configurable, Parameter DISB_AUTO_APPROVER_ROUTING]
   - [R2, "No-payee behaviour HOLD (default) or RETURN.", Configurable, Parameter DISB_NO_PAYEE_ACTION]
   - [R3, "A request has a positive amount.", Fixed, "-"]
 validations:
@@ -545,7 +493,7 @@ acceptance:
 ```
 
 > [!NOTE] Difference from the BRD
-> DIS 3.25.0 asks to auto-reject requests without a maintained payee. The delivered default keeps them waiting so the payee can be added without the source re-sending; the parameter DISB_NO_PAYEE_ACTION = RETURN gives the BRD behaviour (AQ11, AQ12).
+> DIS 3.25.0 asks to auto-reject requests without a maintained payee. The proposed default keeps them waiting so the payee can be added without the source re-sending; the parameter DISB_NO_PAYEE_ACTION = RETURN gives the BRD behaviour (AQ11, AQ12).
 
 ```fr
 id: FR-DS-021
@@ -553,9 +501,7 @@ title: Classify requests by disbursement type
 brd: [DIS 3.25.1 (p.96)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Disbursement Workbench; DV
-api: "-"
 description: Each request carries a disbursement type from its source or payee class - Remittance, Refund, Payment to supplier, Payment to government agencies, Payment to other bank units, Employee-related, Cash advance, Service fee, Incentive pass-on, BIR 2307 release, Other, and Re-issue of a stale check. The type drives the accounting rule of the DV, the reports and the end-of-day files.
 preconditions:
   - "A request is received."
@@ -578,9 +524,7 @@ title: Match the payee and report requests without payee
 brd: [DIS 3.25.2 (p.96)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Disbursement Workbench (No Payee); Disbursement Reports
-api: Report DSB-PAYEE-NOMATCH
 description: BIBS matches the payee of a request to the payee master by party code first, then by name when only one payee has that name. Requests without a match are listed in the report of unmatched payees and wait under No Payee (FR-DS-020).
 preconditions:
   - "A request is received."
@@ -604,9 +548,7 @@ title: Encode requests received by e-mail
 brd: [DIS 2.6.1 (p.76)]
 actor: Disbursement Processor
 priority: Must have
-fit: NEW
 screens: Encode Payment Request
-api: "POST .../requests (encode)"
 description: The Processor encodes a request received by e-mail - disbursement type, payee (the payee's details fill in from the master), currency, amount, purpose, RFP number, root invoice, expense account and cost centre - and attaches the documents. The request becomes a DV through the template (FR-DS-030) and flows to the checker.
 preconditions:
   - "The user has DISB_PROCESS; the payee is maintained."
@@ -643,9 +585,7 @@ title: Upload requests and view the fall-out
 brd: [DIS 2.5.0 (p.75), DIS 2.5.1 (p.75)]
 actor: Disbursement Processor / Team Leader (DISB_UPLOAD)
 priority: Must have
-fit: "CHANGE (2.5.0), FIT (2.5.1)"
 screens: Disbursement Uploads (Payment Requests)
-api: Bulk handler DISB_REQUESTS
 description: The user uploads an XLSX, ODS or CSV file of requests - RFP no., disbursement type, amount, currency, payee code and name, purpose, root invoice, expense account, cost centre. Each row is validated; valid rows become requests with their DVs in the processing list; the fall-out lists every failed row with its reason.
 preconditions:
   - "The user has DISB_UPLOAD."
@@ -671,9 +611,7 @@ title: Work the Disbursement Workbench
 brd: [DIS 2.4.0 (p.73), DIS 2.4.1 (p.73), DIS 2.4.2 (p.74), DIS 2.4.3 (p.74), DIS 2.4.4 (p.74), DIS 2.7.1 (p.77), DIS 2.7.2 (p.78), DIS 2.7.3 (p.78)]
 actor: Disbursement users
 priority: Must have
-fit: "NEW; FIT (2.4.4); CHANGE (2.4.2, 2.7.2)"
 screens: Disbursement Workbench; Disbursement Voucher (tabs Details, Entry, Instrument, OR / AR and CWT, Documents, E-mails)
-api: "GET .../summary; GET .../requests; GET .../vouchers?stage=&receivedFrom=&receivedTo="
 description:
   - The workbench lists the requests and DVs by tab - System Requests, No Payee, In Process, For Review, For Approval, Approved, Cancelled / Rejected - with filters on the date received, and filter and sort on every column. Opening a DV shows its request, payee details from the master (name, currency, mode, taxes for suppliers), the attached documents (view and download), the entry, the instrument and the history.
   - A DV being worked by one user is claimed by that user; others see it read only.
@@ -706,9 +644,7 @@ title: Create the disbursement voucher
 brd: [DIS 2.7.5 (p.79), DIS 2.7.4 (p.78)]
 actor: System; Disbursement Processor
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (Details)
-api: "POST .../requests/{id}/voucher; PUT .../vouchers/{id}/terms"
 description: BIBS creates the DV for a request automatically (system requests) or from the template of an encoded request, numbers it DV-yyyy-n and attaches it to the request. The Processor completes the terms - mode of payment, paying bank account, payee account, withholding tax (EWT), purpose, value date, cost centre and expense account. Missing or wrong fields are flagged and the DV cannot be submitted until they are corrected.
 preconditions:
   - "The request has a maintained payee."
@@ -746,14 +682,12 @@ acceptance:
 
 ```fr
 id: FR-DS-031
-title: Build and edit the proforma entry
+title: Create and edit the proforma entry
 brd: [DIS 2.7.6 (p.80)]
 actor: System; Disbursement Processor
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (Entry)
-api: "GET/PUT .../vouchers/{id}/proforma; POST .../vouchers/{id}/proforma/reset"
-description: BIBS builds the proforma entry of the DV from the accounting rule of its type (Volume 1, section 5.5). The Processor may edit the lines - account, side, party, cost centre, amount - before approval; each edited line is marked Edited and the Approver sees that the entry was changed. Each line is checked for posting eligibility and the entry must balance. "Rebuild from rule" discards the edits.
+description: BIBS creates the proforma entry of the DV from the accounting rule of its type (Volume 1, section 5.5). The Processor may edit the lines - account, side, party, cost centre, amount - before approval; each edited line is marked Edited and the Approver sees that the entry was changed. Each line is checked for posting eligibility and the entry must balance. "Rebuild from rule" discards the edits.
 preconditions:
   - "The DV is In Process or returned."
 main_flow:
@@ -761,7 +695,7 @@ main_flow:
   - The Processor edits a line and saves.
   - BIBS validates the lines and the balance.
 alternate_flows:
-  - Reset. The Processor rebuilds the entry from the rule.
+  - Reset. The Processor creates the entry again from the rule.
 rules:
   - [R1, "Lines start from the rule; edits are marked and shown to the Approver.", Fixed, "-"]
   - [R2, "Which lines may be edited and whether an edited entry needs extra approval is open (AQ13).", Fixed, "-"]
@@ -790,10 +724,8 @@ title: Allocate expenses by cost centre
 brd: [DIS 2.7.10 (p.82), DIS 3.30.0 (Add.2 p.9)]
 actor: Disbursement Processor
 priority: Must have
-fit: CHANGE
 screens: Disbursement Voucher (Entry - Apply Allocation)
-api: POST .../vouchers/{id}/allocation
-description: For supplier and employee expenses, the Processor attaches an allocation - lines of account, cost centre and amount - that builds the expense lines of the proforma. The payee's default cost centre fills lines without one; the cost-centre rules of Volume 1 (FR-AC-054) apply at posting. The allocation is visible in review and logged.
+description: For supplier and employee expenses, the Processor attaches an allocation - lines of account, cost centre and amount - that makes up the expense lines of the proforma. The payee's default cost centre fills lines without one; the cost-centre rules of Volume 1 (FR-AC-054) apply at posting. The allocation is visible in review and logged.
 preconditions:
   - "The DV is In Process."
 main_flow:
@@ -822,9 +754,7 @@ title: Process the payment by one of the seven modes
 brd: [DIS 2.7.0 (p.77)]
 actor: Disbursement Processor
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (Instrument)
-api: ".../vouchers/{id}/instrument/print, /document, /release, /email, /debited, /received"
 description: After approval each DV has one instrument of its mode - Check (printed from the paying account's cheque book), ATD, Credit to Account (extracted in the DCTF), Manager's Check / Demand Draft, Credit Ticket, Telegraphic Transfer or Online Banking. The instrument follows the life cycle of its mode (section 5.2); its number is the check number or a number of the mode's series.
 preconditions:
   - "The DV is approved."
@@ -852,9 +782,7 @@ title: Process an Authority to Debit
 brd: [DIS 2.7.7 (p.81)]
 actor: Disbursement Processor
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (Instrument - Print, E-mail, Debited)
-api: ".../vouchers/{id}/instrument/print, /email, /debited"
 description: For ATD, BIBS generates the ATD from the template DSB_ATD (status Printed), the Processor e-mails it to the processing branch with the debit instruction and the requester in copy (status Emailed), and records the branch's confirmation (status Debited).
 preconditions:
   - "The DV is approved with mode ATD; the branch e-mail is in BRANCH_EMAIL."
@@ -880,9 +808,7 @@ title: Process Manager's Checks, Demand Drafts, Credit Tickets and Telegraphic T
 brd: [DIS 2.7.8 (p.81), DIS 2.7.9 (p.82)]
 actor: Disbursement Processor
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (Instrument)
-api: ".../vouchers/{id}/instrument/print, /received, /release, /debited"
 description: For MC / DD, BIBS generates the form (template DSB_MC_DD) for sign-off and transaction at the branch (Printed); the Processor records the issued MC / DD received from the branch (Received) and its release to the payee (Released). For Credit Ticket and TT, BIBS generates the form (DSB_CREDIT_TICKET, DSB_TT) for sign-off (Printed) and the Processor records the branch's validation (Debited).
 preconditions:
   - "The DV is approved with the mode."
@@ -910,9 +836,7 @@ title: Submit the DV for review
 brd: [DIS 2.7.11 (p.82)]
 actor: Disbursement Processor
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (Submit)
-api: POST .../vouchers/{id}/submit
 description: The Processor submits a complete DV; it moves to For Review (workflow DISB_VOUCHER) with the confirmation of its totals.
 preconditions:
   - "The DV is In Process and complete."
@@ -937,9 +861,7 @@ title: Maintain the employee and cost-centre master and report the headcount
 brd: [DIS 3.30.1 (Add.2 p.9-10), DIS 3.30.2 (Add.2 p.10-11)]
 actor: Comptrollership administrator (EMPLOYEE_MAINTAIN)
 priority: Must have
-fit: NEW
 screens: Setup > Employees; Report Centre (Headcount per Cost Centre)
-api: "GET/POST/PUT /api/v1/organization/employees; report ORG-HEADCOUNT-CC"
 description: The employee master holds the employee number (unique), name, position, unit and branch, cost centre, hiring and separation dates and status. It gives the default cost centre of employee payees and the headcount per cost centre report, filtered by date and unit and exported to Excel and PDF.
 preconditions:
   - "The user has EMPLOYEE_MAINTAIN."
@@ -977,9 +899,7 @@ title: Review, return and submit DVs for approval
 brd: [DIS 2.13.0 (p.87), DIS 2.14.0 (p.88), DIS 2.15.0 (p.88)]
 actor: Disbursement Team Leader (DISB_REVIEW); Approver (return)
 priority: Must have
-fit: NEW
 screens: Disbursement Workbench (For Review); Disbursement Voucher
-api: "POST .../vouchers/{id}/submit-for-approval, /{id}/route; return from the workflow panel"
 description: The TL reviews the DVs For Review - details, entry (edited lines marked), documents - and submits them for approval, or returns them to the Processor with a reason from the list and special instructions. The Approver may also return a DV.
 preconditions:
   - "The DV is For Review; the TL is not its processor."
@@ -1007,9 +927,7 @@ title: Approve and post one or several DVs
 brd: [DIS 2.19.0 (p.91)]
 actor: Disbursement Approver (DISB_APPROVE)
 priority: Must have
-fit: NEW
 screens: Disbursement Workbench (For Approval - bulk); Disbursement Voucher (Approve)
-api: "POST .../vouchers/{id}/approve; POST .../vouchers/approve (bulk)"
 description: The Approver approves a single DV or selects several. Approval posts the DV entry - through the accounting rule, or the edited lines as given - creates the instrument, and reports the new status to the source (DV assigned). Each DV of a bulk approval is posted in its own transaction with a result per DV. A posting failure keeps the DV For Approval with posting status FAILED and the error.
 preconditions:
   - "The DV is For Approval; the Approver is neither its processor nor its checker."
@@ -1026,7 +944,7 @@ validations:
   - [Posting failed, "DV <no> could not be posted: <reason>", DV_POSTING_FAILED]
   - [Entry empty, "DV <no> has no entry", DV_ENTRY_EMPTY]
 notifications:
-  - "The source module is notified (DisbursementStatusChanged)."
+  - "The source module is notified of the status."
 audit:
   - "Approval, remarks, the journal number and the posting status are on the DV."
 acceptance:
@@ -1040,9 +958,7 @@ title: Reject a DV
 brd: [DIS 2.21.0 (p.92)]
 actor: Disbursement Approver
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (Reject)
-api: "POST .../vouchers/{id}/reject"
 description: The Approver rejects a DV For Approval with a reason and remarks. The DV is REJECTED (final) and the request is returned to its source, which is notified.
 preconditions:
   - "The DV is For Approval."
@@ -1067,9 +983,7 @@ title: Cancel a DV In Process or For review
 brd: [DIS 2.9.0 (p.85), DIS 2.18.0 (p.91)]
 actor: Disbursement Processor (In Process); Team Leader (For review)
 priority: Must have
-fit: NEW
 screens: Disbursement Workbench (search); Disbursement Voucher (Cancel)
-api: "POST .../vouchers/{id}/cancel"
 description: On request of the source unit, a DV In Process (Processor) or For review (TL) is cancelled with a reason from DISB_CANCEL_REASON and remarks. The user finds the DV by payee, client, amount or reference. The DV is CANCELLED and the request goes back to its source.
 preconditions:
   - "The DV is In Process or For Review."
@@ -1095,9 +1009,7 @@ title: Cancel an approved DV and regularise the accounting
 brd: [DIS 2.20.0 (p.92)]
 actor: Disbursement Approver
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (Cancel approved DV)
-api: "POST .../vouchers/{id}/cancel (approved DV)"
 description: On request, the Approver cancels an approved DV with a reason. BIBS reverses the DV journal (DV:<no>:CANCEL; posting status REVERSED, or REVERSAL_FAILED with the error), cancels the instrument when it is not final, returns the request to its source and publishes CANCELLED. The source restores its records - Payment Requests reopens the refund; for a remittance DV, Remittance reverses the batch postings with the opposite sign (remittance, incentive, CPC2 and each deduction, which gets its amount back), puts the invoices back in review with the remittance lock, records the cancelled DV and returns the batch to Review in process for its next send cycle (re-approval sends a new request under <batch>/R<n>). When another team has locked one of the invoices since, the batch is left as it is and the remittance processors are notified. Open check-cancellation hand-offs that name the DV are closed.
 preconditions:
   - "The DV is APPROVED; its instrument is not final (negotiated, credited, debited)."
@@ -1126,9 +1038,7 @@ title: Regularise the accounting of every DV and list what is not regularised
 brd: [DIS 3.27.0 (p.99; Add.1 p.31)]
 actor: System; Disbursement users
 priority: Must have
-fit: NEW
 screens: Disbursement Workbench (Unregularised); Disbursement Reports
-api: Report DSB-UNREGULARIZED
 description: Every DV state change with an accounting effect posts in the same flow - approval, cancellation, negotiated and stale checks, re-issue. Lines stay editable only while the DV is not posted (Addendum 1). The report and the workbench list the DVs not regularised - posting FAILED or REVERSAL_FAILED, and approved DVs without their OR / AR tag.
 preconditions:
   - "None."
@@ -1157,9 +1067,7 @@ title: Tag instrument statuses
 brd: [DIS 2.8.0 (p.83), DIS 2.8.1 (p.83), DIS 2.8.2 (p.84), DIS 2.8.3 (p.84), DIS 2.8.4 (p.85)]
 actor: Disbursement Processor
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (Instrument)
-api: ".../vouchers/{id}/instrument/release, /email, /debited, /received"
 description: The Processor tags the statuses that need a person - a check Released when the payee receives it (release date, received by); an ATD Emailed and Debited after the branch confirms; a Credit Ticket or TT Debited after the branch confirms; an MC / DD Received from the branch and Released to the payee.
 preconditions:
   - "The DV is approved and the instrument is in the previous status."
@@ -1187,9 +1095,7 @@ title: Edit an instrument status with approval
 brd: [DIS 2.8.5 (p.85)]
 actor: Disbursement Processor (request); Team Leader (DISB_STATUS_APPROVE)
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (Instrument - Request Status Edit); status edits list
-api: ".../vouchers/{id}/instrument/status-edits; .../status-edits/{id}/approve"
 description: When a status was tagged wrongly, the Processor requests another status of the same mode with a reason. The TL approves it (the status changes) or rejects it. The requester never approves their own edit.
 preconditions:
   - "No other edit of the instrument is pending."
@@ -1223,9 +1129,7 @@ title: Tag statuses automatically
 brd: [DIS 3.26.0 (p.96), DIS 3.26.3 (p.97), DIS 3.26.5 (p.98), DIS 3.26.6 (p.98), DIS 3.26.7 (p.99)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (Instrument - status history)
-api: "Instrument service; bulk handler DISB_BOB_APPROVED"
 description: BIBS sets statuses without a person where it can - an ATD, Credit Ticket, TT or MC / DD is Printed when its form is generated; an online-banking payment is Approved when the DV is approved and Debited when the BOB approval report is uploaded (by voucher reference and amount); a credit to account is Extracted at end of day and Credited by the upload of FR-DS-053; checks are Negotiated or Stale (FR-DS-053, FR-DS-054).
 preconditions:
   - "The DV is approved."
@@ -1252,9 +1156,7 @@ title: Upload deposited-checks and credited-accounts files
 brd: [DIS 2.22.0 (p.93), DIS 3.26.1 (p.97), DIS 3.26.4 (p.98)]
 actor: Disbursement Processor / Team Leader (DISB_UPLOAD)
 priority: Must have
-fit: NEW
 screens: Disbursement Uploads (Negotiated Checks, Credited Accounts, BOB Approvals)
-api: "Bulk handlers DISB_CHECKS_NEGOTIATED, DISB_CTA_CREDITED, DISB_BOB_APPROVED"
 description: The user uploads the bank's files - deposited checks (check no., amount, date deposited), credited accounts (reference, amount, account no.) and BOB approvals (voucher reference, amount, BOB reference). Each row is matched to its instrument; a negotiated check is tagged Negotiated and posts its clearing entry (FR-DS-055); a credited account is tagged Credited.
 preconditions:
   - "The user has DISB_UPLOAD."
@@ -1282,9 +1184,7 @@ title: Stale checks after 180 days and re-issue them
 brd: [DIS 3.26.2 (p.97)]
 actor: System (job DISB_CHECK_STALE); Disbursement Processor (re-issue)
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (Instrument - Re-issue); Disbursement Reports
-api: "Job DISB_CHECK_STALE; POST .../vouchers/{id}/instrument/reissue"
 description: Every day at 00:20 the job tags Stale every check still Printed or Released DISB_STALE_DAYS (180) days after its print date, posts the stale entry to Miscellaneous Liability - stale checks (FR-DS-055) and raises DISB_CHECK_STALE. A stale check can be re-issued - a STALE_REISSUE request creates a new DV for the payee.
 preconditions:
   - "The check is Printed or Released."
@@ -1311,9 +1211,7 @@ title: Post the entries of negotiated and stale checks
 brd: [DIS 3.27.1 (p.100)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (Instrument, Entry)
-api: "Events DISB_CHECK_NEGOTIATED, DISB_CHECK_STALE"
 description: With DISB_CHECK_CLEARING = ON, an approved check DV credits checks outstanding (account 2241). When the check is negotiated BIBS posts checks outstanding against the bank; when it is stale, checks outstanding against Miscellaneous Liability - stale checks of the payee. A re-issue posts the stale liability against the paying account. The entries flow to FRBS through the ledger.
 preconditions:
   - "The check is negotiated or stale."
@@ -1338,9 +1236,7 @@ title: Tag the Official Receipt or Acknowledgement Receipt
 brd: [DIS 2.10.0 (p.86), DIS 2.10.1 (p.86), DIS 2.10.2 (p.86)]
 actor: Disbursement Processor (DISB_TAG)
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (OR / AR and CWT)
-api: POST .../vouchers/{id}/tags/receipt
 description: When the payee's OR or AR arrives, the Processor finds the DV and tags the OR / AR number, its date, the date received, the amount and remarks. For remittance DVs the insurer OR uploaded in Remittance (BRD-2) is shown and does not need to be keyed again. A tagged DV leaves the unregularised list.
 preconditions:
   - "The DV is approved."
@@ -1373,9 +1269,7 @@ title: Tag creditable withholding tax received or released
 brd: [DIS 2.11.0 (p.86), DIS 2.11.1 (p.86), DIS 2.11.2 (p.87)]
 actor: Disbursement Processor (DISB_TAG)
 priority: Must have
-fit: NEW
 screens: Disbursement Voucher (OR / AR and CWT); Tax & Statutory > Certificates Received
-api: "POST .../vouchers/{id}/tags/cwt; /api/v1/tax/received-certificates"
 description: The Processor tags the CWT of a DV - Received for the certificates an insurer issues on commission and incentives, Released for the BIR 2307 BDOI gives a supplier - with the certificate number, period covered, date received or released and amount. Insurer certificates are recorded in one register (Certificates Received), which posts TAX_CWT_CERT_RECEIVED (AR-BIR on commission or incentives to AR-BIR on hand) and feeds the SAWT and the CWT report.
 preconditions:
   - "The DV is approved (tag); the user has DISB_TAG or TAX_MANAGE (register)."
@@ -1411,9 +1305,7 @@ title: Generate BIR Form 2307 for suppliers
 brd: [DIS 2.12.0 (p.87)]
 actor: Disbursement Processor; Tax users
 priority: Must have
-fit: FIT
 screens: Tax & Statutory > BIR Form 2307
-api: /api/v1/tax/2307
 description: BIBS fills BIR Form 2307 per payee and quarter from the withholding on the payments and saves it as PDF, one or in batch.
 preconditions:
   - "Withholding was recorded on payments of the quarter."
@@ -1441,9 +1333,7 @@ title: Run the end of day of Disbursement
 brd: [DIS 2.16.0 (p.88), DIS 2.16.3 (p.89), DIS 2.16.4 (p.89), DIS 2.16.5 (p.89)]
 actor: Disbursement Team Leader / Approver (DISB_EOD)
 priority: Must have
-fit: NEW
 screens: Disbursement End of Day (Run End of Day, Runs, outputs)
-api: "POST .../eod/runs; GET .../eod/outputs/{id}"
 description: For a business date, the end of day freezes the approved DVs and produces the outputs - the DCTF credit file (FR-DS-061), the check print batch (FR-DS-062), the ATD, MC / DD, Credit Ticket and TT forms, the vouchers and the end-of-day reports (FR-DS-081). Each output is downloadable from the run (EOD-yyyy-n).
 preconditions:
   - "The user has DISB_EOD; the date has no run."
@@ -1469,9 +1359,7 @@ title: Produce the Direct Credit Transaction File
 brd: [DIS 2.16.1 (p.88)]
 actor: System (end of day); Disbursement Team Leader
 priority: Must have
-fit: CHANGE
 screens: Disbursement End of Day (DCTF output)
-api: "EOD output DCTF; notification format DCTF"
 description: The end of day writes the DCTF of the credit-to-account DVs - a header with the date (MMddyyyy) and the file name, and one 89-character detail per payment - 12-digit account number, 30-character payee name, 12 blanks, 20-character system reference, amount 000000000000.00, upper case (Appendix B, p.147). Each included payment becomes Extracted. The user forwards the file to TPD for ACA processing.
 preconditions:
   - "Credit-to-account DVs are approved for the date."
@@ -1495,9 +1383,7 @@ title: Print checks and vouchers
 brd: [DIS 2.16.2 (p.88), DIS 2.16.6 (p.89)]
 actor: Disbursement Processor / Team Leader
 priority: Must have
-fit: CHANGE
 screens: Disbursement End of Day (check batch, vouchers); Disbursement Voucher (Document)
-api: ".../eod/outputs/{id}; GET .../vouchers/{id}/document"
 description: The end of day produces the check print batch - each check takes the next leaf of the paying account's cheque book and uses the template DSB_CHECK - and the vouchers (DSB_VOUCHER). Vouchers print one at a time or in batch with the print options of the report platform.
 preconditions:
   - "Check DVs are approved; the paying account has an active cheque book."
@@ -1522,9 +1408,7 @@ title: E-mail the payment confirmations and the remittance schedule
 brd: [DIS 2.7.12 (p.83)]
 actor: System; Disbursement Team Leader
 priority: Must have
-fit: CHANGE
 screens: Disbursement End of Day (Confirm); Disbursement Voucher (E-mails)
-api: "POST .../eod/runs/{id}/confirm; job DISB_EOD_CONFIRMATION"
 description: After the end of day, BIBS e-mails to each payee of the day the payment advice (template DSB_PAYMENT_ADVICE). The confirmations of a run are sent once; the e-mails are logged on the DVs.
 preconditions:
   - "The run is completed and not confirmed."
@@ -1533,7 +1417,7 @@ main_flow:
   - BIBS sends the advices and marks the run CONFIRMED.
 rules:
   - [R1, "One confirmation per run.", Fixed, "-"]
-  - [R2, "Attaching the remittance schedule to the insurer's advice is parked.", Fixed, "-"]
+  - [R2, "The remittance schedule is not attached to the insurer's advice (chapter 12, CLR-DS-15).", Fixed, "-"]
 validations:
   - [Already sent, "The confirmations of <run> were already sent", EOD_CONFIRMED]
 notifications:
@@ -1550,9 +1434,7 @@ title: Fund the main BDOIR account with a verifier and two approvers
 brd: [DIS 2.17.0 (p.90), DIS 2.17.1 (p.90), DIS 2.17.2 (p.90), DIS 2.17.3 (p.90), DIS 2.17.4 (p.90; Add.1 p.33)]
 actor: Disbursement Team Leader (maker, verifier); Disbursement Approvers
 priority: Must have
-fit: "NEW; OUT (2.17.1)"
 screens: Account Funding; Funding Request
-api: "POST .../funding, /{id}/submit, /{id}/verify, /{id}/approve; decline, return and cancel from the workflow panel"
 description: A TL creates a funding request (FND-yyyy-n) - source and target BDOIR accounts, amount, purpose - and submits it. Another TL verifies it, and two approvers approve it in turn; either approver can decline it with remarks, and each step can return it to the maker. When the second approval is given, BIBS posts the transfer (DISB_FUND_TRANSFER). The transfer itself is done in BDO Business Online Banking; its reference is recorded on the request. The log-in to BOB is outside BIBS.
 preconditions:
   - "The maker has DISB_FUNDING_REQUEST."
@@ -1595,9 +1477,7 @@ title: Maintain the check series
 brd: [DIS 2.23.0 (p.93), DIS 2.23.1 (p.93), DIS 2.23.2 (p.93)]
 actor: Disbursement Approver (MASTER_MAINTAIN)
 priority: Must have
-fit: "FIT (2.23.0, 2.23.1), CHANGE (2.23.2)"
 screens: Bank Accounts and Checks (cheque books)
-api: "POST .../banks/{id}/cheque-books; PUT .../cheque-books/{id}"
 description: Each paying account has cheque books with first, last and next check numbers and a status. The Approver adds the beginning series and may correct its range only before the first check is printed; the correction keeps the previous range.
 preconditions:
   - "The user has MASTER_MAINTAIN."
@@ -1627,9 +1507,7 @@ title: Maintain the BDOIR bank accounts and their status
 brd: [DIS 2.24.0 (p.93), DIS 2.24.1 (p.93), DIS 2.24.2 (p.94; Add.1 p.33)]
 actor: Disbursement Approver
 priority: Must have
-fit: "FIT (2.24.0, 2.24.1), CHANGE (2.24.2)"
 screens: Bank Accounts and Checks
-api: ".../banks; POST .../banks/{id}/status, /authorize"
 description: The Approver maintains the BDOIR bank accounts (GL account, currency, branch, notification format) and tags them active or inactive; a status change waits for authorisation. Inactive accounts are not offered on new DVs.
 preconditions:
   - "The user has MASTER_MAINTAIN."
@@ -1656,9 +1534,7 @@ title: Run Disbursement reports on demand
 brd: [DIS 2.3.0 (p.71), DIS 2.3.1 (p.72), DIS 2.3.2 (p.72), DIS 2.3.3 (p.72), DIS 2.3.4 (p.72), DIS 2.3.5 (p.72), DIS 2.3.6 (p.73), DIS 2.3.7 (p.73), DIS 2.3.8 (p.73), DIS 2.3.9 (p.73)]
 actor: Disbursement users (DISB_REPORT_VIEW / EXPORT)
 priority: Must have
-fit: "NEW (2.3.0); FIT (2.3.1-2.3.8); CHANGE (2.3.9)"
 screens: Disbursement Reports; Report Centre
-api: "Reports with DSB codes (section 6.1)"
 description: The Disbursement reports (section 6.1) run at any time for a date or period; the user views the details, copies them, exports to XLSX, ODS or PDF, saves the file, previews and prints with print options (paper, orientation, fit to width), as in Volume 1, FR-AC-020 to FR-AC-023.
 preconditions:
   - "The user has DISB_REPORT_VIEW."
@@ -1683,9 +1559,7 @@ title: Generate the end-of-day reports
 brd: [DIS 3.28.0 (p.100), DIS 3.28.2 (p.101)]
 actor: System (end of day)
 priority: Must have
-fit: NEW
 screens: Disbursement End of Day (outputs); Disbursement Reports
-api: "Reports DSB-EOD-REMIT, DSB-EOD-REFUND, DSB-EOD-SUMMARY, DSB-EOD-SUPPLIER, DSB-EOD-EMPLOYEE, DSB-EOD-OTHER; job DISB_EOD_REPORTS"
 description: The end of day generates for the date the Remittance, Refund, Summary, Payment to supplier, Employee-related and Other disbursement reports (Appendix B fields) with the DCTF, and archives them with the run.
 preconditions:
   - "The end of day of the date has run."
@@ -1709,9 +1583,7 @@ title: Run the real-time Disbursement reports
 brd: [DIS 3.28.3 (p.101)]
 actor: Disbursement users
 priority: Must have
-fit: NEW
 screens: Disbursement Reports
-api: "Reports DSB-MASTERLIST, DSB-UNRELEASED-CHECKS, DSB-CWT-COMMISSION, DSB-ATD, DSB-ML-STALE, DSB-CASH-FLOW"
 description: For any date range - the masterlist of all disbursements; unreleased checks aged current-30 to 151-180 days with subtotals; CWT / BIR 2307 on commission (AR-BIR on commission and on incentives against the certificates, per payee and insurer, with variances); Authority to Debit; Miscellaneous Liability stale checks aged to 181 days and over; and the cash flow (amount per savings account, checks, ATD and CTA in process and for crediting, inter-office).
 preconditions:
   - "The user has DISB_REPORT_VIEW."
@@ -1734,9 +1606,7 @@ title: Report payees and upload fall-outs
 brd: [DIS 3.28.1 (p.100), DIS 3.28.4 (p.102)]
 actor: Disbursement users
 priority: Must have
-fit: "NEW (3.28.1), CHANGE (3.28.4)"
 screens: Disbursement Reports
-api: "Reports DSB-PAYEE, DSB-UPLOAD-FALLOUT, DSB-PAYEE-NOMATCH"
 description: The payee report lists the payees with name, address, account number (masked unless permitted), mode of payment, disbursement type and source. The fall-out report lists, for a period, every refused row of the request uploads with its reason.
 preconditions:
   - "The user has DISB_REPORT_VIEW."
@@ -1761,9 +1631,7 @@ title: Compute CPC2 incentives per remittance
 brd: [DIS 3.29.2 (Add.2 p.8-9)]
 actor: System (remittance extraction and approval)
 priority: Must have
-fit: "CHANGE; built, CPC2 base and criteria parked (AQ24, OQ39, PQ04)"
 screens: Remittance batch (CPC2 column and totals, Settlement tab); remittance payment request and schedule
-api: "Event OPS_REMIT_CPC2; GET /api/v1/remittance/batches/{id} (line cpc2Code, cpc2Rate, cpc2, cpc2Vat)"
 description:
   - When a remittance batch is extracted, BIBS looks up for each line the active incentive criteria of code CPC2 maintained by TSU on the products matrix (BRD-3 PMADD07-08) - risk code, segment and insurer, effective on the booking date, with a rate and an optional minimum gross premium. For a qualifying line it computes CPC2 as the rate on the basic premium remitted, with output VAT at the invoice's commission VAT ratio, per remittance and not cumulative.
   - CPC2 and its VAT are deducted from the amount payable to the insurer and shown apart from commission on the line, the batch totals, the payment request and the schedule. On approval BIBS posts OPS_REMIT_CPC2 per batch (reference RMB:<batch>:CPC2; amounts GROSS, CPC2_INCOME, OUTPUT_VAT) to CPC2 incentive income. Each line keeps the criterion code and rate for audit.
@@ -1793,9 +1661,7 @@ title: Issue the service invoice of the early incentive automatically
 brd: [DIS 3.29.1 (Add.2 p.7-8)]
 actor: System (remittance approval, booking)
 priority: Must have
-fit: "CHANGE; built, accounting of the 2% withholding parked (AQ25)"
 screens: Remittance batch (Settlement tab - SI); Service invoices; Service invoice types (trigger ON_INCENTIVE)
-api: "Booking service invoice type EARLY_INCENTIVE (trigger ON_INCENTIVE)"
 description: When a remittance batch with an early incentive is approved, BIBS issues once per batch a booking service invoice of type EARLY_INCENTIVE to the insurer - incentive, its VAT and withholding tax at EARLY_INCENTIVE_WTAX_RATE (2%) of the incentive, summed per line - and links it on the batch. The incentive OR carries the same withholding per line and names the service invoice. A manual issue of a service invoice type with trigger ON_INCENTIVE is refused.
 preconditions:
   - "The batch has a qualified early incentive (BRD-2)."
@@ -1806,7 +1672,7 @@ main_flow:
 rules:
   - [R1, "Withholding tax rate 2%.", Configurable, Parameter EARLY_INCENTIVE_WTAX_RATE]
   - [R2, "One early-incentive service invoice per batch; a re-sent batch does not issue a second one.", Fixed, "-"]
-  - [R3, "The entry of the insurer's 2% withholding (Dr 1611 / Cr 2211) is parked (AQ25); the incentive is still deducted in full from the remittance.", Fixed, "-"]
+  - [R3, "The entry of the insurer's 2% withholding (Dr 1611 / Cr 2211) waits for AQ25; until then the incentive is deducted in full from the remittance.", Fixed, "-"]
 validations:
   - [Manual issue of an automatic type, "Service invoices of type <type> are issued automatically with the early remittance incentive", SERVICE_INVOICE_AUTOMATIC_ONLY]
 notifications:
@@ -1824,23 +1690,25 @@ title: Report CPC2 incentives
 brd: [DIS 3.29.0 (Add.2 p.7)]
 actor: Disbursement users
 priority: Must have
-fit: "NEW; not built (Gap G4)"
-screens: "-"
-api: "Report DSB-CPC2-INCENTIVE (not built)"
-description: The BRD asks for a CPC2 report by user, product and role with the calculation breakdown, consistent with the accounting, exportable and logged. The report is not built. The CPC2 of each line (code, rate, amount, VAT) is on the remittance batch, its payment request and schedule, and the income is in the ledger (FR-DS-090).
+screens: Disbursement Reports (CPC2 report)
+description: Disbursement users run the CPC2 report for a period. It lists, per remittance batch line, the user, product and role, the CPC2 code and rate, the basic premium remitted, the CPC2 amount and its VAT, with totals that agree with the CPC2 income posted in the ledger (FR-DS-090). The report exports to Excel and PDF and every run is logged. Its layout is confirmed with the CPC2 definition (AQ24).
 preconditions:
-  - "-"
+  - "The user holds the Disbursement report permission."
 main_flow:
-  - Not built.
+  - The user opens Disbursement Reports, chooses the CPC2 report and enters the period.
+  - BIBS lists the CPC2 lines of the remittance batches approved in the period, with the breakdown and totals.
+  - The user exports the report to Excel or PDF.
 rules:
-  - [R1, "Layout to be agreed with the CPC2 definition (AQ24).", Fixed, "-"]
-validations: []
+  - [R1, "Layout to be agreed with the CPC2 definition (AQ24).", Configurable, Report layout]
+  - [R2, "The totals agree with the CPC2 income posted for the period.", Fixed, "-"]
+validations:
+  - [Mandatory parameter missing, "Parameter <name> is required", MISSING_PARAMETER]
 notifications:
   - "None."
 audit:
-  - "-"
+  - "Every run and export is archived."
 acceptance:
-  - "Gap G4: to be accepted when built."
+  - The CPC2 report of September lists every CPC2 line of the September batches and its total equals the CPC2 income posted in September.
 ```
 
 ```fr
@@ -1849,9 +1717,7 @@ title: Link related transactions to one invoice number
 brd: [DIS 3.27.2 (p.100)]
 actor: System; Operations, Disbursement and ACSL users
 priority: Must have
-fit: CHANGE
 screens: Invoice Search; Invoice 360 (Invoice Family tab); booking invoice (Root Invoice chip); ACSL Case; Disbursement Voucher
-api: "GET /api/v1/ops/invoices/{no}/family; GET /api/v1/ops/invoices"
 description: Booking sets the root invoice number of each invoice - the invoice itself for an original booking, the original booking for an endorsement or cancellation - and the ledger carries it. The Invoice 360 Invoice Family tab lists all invoices of the root with the family totals; remittance payment requests carry the root invoice when the batch has one family. BIR invoice numbers stay unique; the root links them.
 preconditions:
   - "None."
@@ -1874,7 +1740,7 @@ acceptance:
 
 ## Payment Requests (Marketing)
 
-API paths of this section are under `/api/v1/payment-requests` unless stated. Access (MKT 1.1.0-1.1.3) is FR-DS-001.
+ Access (MKT 1.1.0-1.1.3) is FR-DS-001.
 
 ```fr
 id: FR-PQ-001
@@ -1882,9 +1748,7 @@ title: Receive refund and cash-advance requests in Requests Home
 brd: [MKT 1.2.0 (p.105), MKT 1.3.0 (p.106), MKT 1.4.0 (p.106), MKT 1.5.0 (p.106), MKT 1.6.0 (p.106)]
 actor: Marketing Processor, Reviewer and Approver; HR
 priority: Must have
-fit: "NEW; FIT (1.6.0)"
 screens: Requests Home (tabs by stage with counts); Request
-api: "GET .../requests; GET .../requests/counts; GET .../requests/{id}"
 description: Marketing AOs raise refund requests to clients (RRF-yyyy-n) and employees raise cash-advance requests (RFP-yyyy-n) in BIBS. Requests Home lists them by stage with counts, searches by request number, payee, reference or DV number, and filters by kind and date. The user selects one request, or several for a bulk endorse or approve with a result per request. The request page shows the header, the accounts (RRF lines), the documents, the validations, the Disbursement status and the history.
 preconditions:
   - "The user has PRQ_VIEW."
@@ -1914,10 +1778,8 @@ title: Access the unapplied payment reports
 brd: [MKT 1.7.0 (p.106), MKT 1.7.1 (p.106), MKT 1.7.2 (p.107), MKT 1.7.3 (p.107)]
 actor: Marketing Processor, Reviewer and Approver
 priority: Must have
-fit: "CHANGE (1.7.0), FIT (1.7.1-1.7.3)"
 screens: Report Centre (Operations reports)
-api: "Report Centre; e.g. CSH-MINBAL-EXCESS"
-description: The Marketing roles hold OPS_REPORT_VIEW and run the Operations reports of Cashiering on unapplied payments for a date range, download them as XLSX, save the file and print it (Volume 1, FR-AC-020 to FR-AC-023). A report of unapplied payments restricted to the Marketing user's segment is not built; its layout waits for AQ18.
+description: The Marketing roles hold OPS_REPORT_VIEW and run the Operations reports of Cashiering on unapplied payments for a date range, download them as XLSX, save the file and print it (Volume 1, FR-AC-020 to FR-AC-023). A report of unapplied payments restricted to the Marketing user's segment is not proposed; its layout waits for AQ18 (chapter 12, CLR-PQ-01).
 preconditions:
   - "The user holds OPS_REPORT_VIEW."
 main_flow:
@@ -1936,7 +1798,7 @@ acceptance:
 ```
 
 > [!NOTE] Difference from the BRD
-> MKT 1.7.0 expects an unapplied-payment report for Marketing. Marketing uses the Cashiering reports without a segment filter; a Marketing-specific report is not built (AQ18).
+> MKT 1.7.0 expects an unapplied-payment report for Marketing. Marketing uses the Cashiering reports without a segment filter; a Marketing-specific report is added if BDOI gives its layout (AQ18).
 
 ```fr
 id: FR-PQ-003
@@ -1944,9 +1806,7 @@ title: Fill in the Refund Request Form
 brd: [MKT 1.10.0 (p.107; Appendix D)]
 actor: Marketing Processor (AO)
 priority: Must have
-fit: "NEW; built, form fields and approvers parked (AQ18)"
 screens: New Refund Request; Request (Refund)
-api: "POST .../requests/refunds; PUT .../requests/{id}/refund; GET .../requests/{id}/form"
 description:
   - The AO fills in the RRF - segment, reference, requesting unit, purpose, currency, mode of payment (Credit to account, Check, ATD, Inter-office, Manager's check, Demand draft), the client's account number and name for credit to account, and one line per account (1 to 50) - AR no., client code, assured name, invoice no., amount, refund reason, branch / unit, categories A and B, account name.
   - All lines of a request belong to one client. The payee is the client. The RRF prints as PDF from the template of Appendix D.
@@ -1998,9 +1858,7 @@ title: Fill in the Request for Payment of a cash advance
 brd: [MKT 1.10.0 (p.107; Appendix D)]
 actor: Employee / Marketing Processor
 priority: Must have
-fit: "NEW; built, form fields and approvers parked (AQ18)"
 screens: New Cash Advance; Request (Cash advance)
-api: "POST .../requests/cash-advances; PUT .../requests/{id}/cash-advance"
 description: The employee fills in the RFP - segment, reference, requesting unit, RFP type (Cash advance, Petty cash, Others), purpose, currency, employee number and name, mode of payment, account number and name, and amount. The payee is the employee. The RFP prints as PDF from the template of Appendix D.
 preconditions:
   - "The user has PRQ_CREATE."
@@ -2034,9 +1892,7 @@ title: Assign, re-assign and return requests
 brd: [MKT 1.8.0 (p.107), MKT 1.9.0 (p.107)]
 actor: Marketing Reviewer (PRQ_ASSIGN); any handler (return)
 priority: Must have
-fit: "NEW (1.8.0), CHANGE (1.9.0)"
 screens: Request (Assign, Return)
-api: "POST .../requests/{id}/assign; return from the workflow panel"
 description: The reviewer assigns a refund request to a preparer, or re-assigns it; the request moves to Preparing and appears in the preparer's work. Any handler can return a request to the previous handler with a reason and remarks (preparer, reviewer or requester, depending on the stage - section 5.6).
 preconditions:
   - "The request is in a stage where the action is allowed."
@@ -2068,9 +1924,7 @@ title: Validate the refund of a cancelled policy with ACSL and Cashiering
 brd: [MKT 1.11.0 (p.108), ACSL 2.5.5 (p.117; Add.1 p.34)]
 actor: Marketing Processor; ACSL Processor; Cashier
 priority: Must have
-fit: NEW
 screens: Request (Validations); ACSL Cases; Cashiering tasks
-api: "POST .../requests/{id}/submit (for validation); GET .../requests/{id}/validations; POST .../requests/{id}/validations/{validationId}/result"
 description:
   - When a refund line has the reason Cancelled policy, the preparer sends the request for validation. BIBS opens, per line, a validation for ACSL - a case of type Account analysis request that checks the cancelled premium and whether the insurer returned the remitted premium - and one for Cashiering - a task RVL-yyyy-n that confirms the payment was reinstated to unapplied and gives the new AR number.
   - When all validations are confirmed the request goes For review; when one is rejected it returns to the preparer. When a validating module is not installed the validation is handed over and its result is entered by hand.
@@ -2104,9 +1958,7 @@ title: Upload and view supporting documents
 brd: [MKT 1.12.0 (p.108), MKT 1.13.0 (p.108), MKT 2.22.0 (p.111)]
 actor: Marketing users
 priority: Must have
-fit: "FIT (1.12.0), CHANGE (1.13.0, 2.22.0)"
 screens: Request (Documents)
-api: "/api/v1/attachments (entity PAYMENT_REQUEST)"
 description: Users attach supporting documents to the request with a document type; they select one or several, view them, download one file or a ZIP of the selected files, and save them. The documents are linked to the request and their references travel with the payment request to Disbursement, where the DV shows them.
 preconditions:
   - "The user has ATTACHMENT_MANAGE."
@@ -2134,9 +1986,7 @@ title: Submit, review and endorse requests
 brd: [MKT 1.14.0 (p.109), MKT 1.15.0 (p.109)]
 actor: Marketing Processor (submit); Reviewer (endorse)
 priority: Must have
-fit: NEW
 screens: Request (Submit, Endorse); Requests Home (bulk endorse)
-api: "POST .../requests/{id}/submit; POST .../requests/{id}/endorse"
 description: The preparer submits the request for review. The reviewer checks it and endorses it to the approver, or returns it to the preparer. The reviewer is never the user who raised or last moved the request.
 preconditions:
   - "The request is Draft or Preparing (submit); For review (endorse)."
@@ -2163,9 +2013,7 @@ title: Approve or decline refunds, cash advances and check cancellations
 brd: [MKT 1.16.0 (p.109), MKT 1.16.1 (p.109), MKT 1.16.2 (p.109), MKT 1.16.3 (p.109)]
 actor: Marketing Approver; HR (cash advances)
 priority: Must have
-fit: NEW
 screens: Request (Approve, Return); Requests Home (bulk approve)
-api: "POST .../requests/{id}/approve; return and cancel from the workflow panel"
 description: The approver approves a request with remarks, or returns it to the reviewer with a reason; a request is declined by returning or cancelling it with a reason. A refund goes to Disbursement on approval. A cash advance goes to HR, whose approval sends it to Disbursement; HR can return it to the Marketing approver. An approved check cancellation is sent to the Disbursement approvers (FR-PQ-011).
 preconditions:
   - "The request is For approval (HR approval for HR)."
@@ -2194,9 +2042,7 @@ title: Cancel a request before approval
 brd: [MKT 1.17.0 (p.110)]
 actor: Requester, preparer or reviewer
 priority: Must have
-fit: NEW
 screens: Request (Cancel)
-api: Cancel from the workflow panel
 description: Before approval a request can be cancelled with a reason (VOID_REASON) and remarks - by the requester in Draft, by the preparer or reviewer in Preparing and For review. Cancelling releases the AR numbers of its lines. A check cancellation is withdrawn the same way.
 preconditions:
   - "The request is not yet approved."
@@ -2220,9 +2066,7 @@ title: Request the cancellation of a disbursed check
 brd: [MKT 1.19.0 (p.110)]
 actor: Marketing Processor; Reviewer; Approver
 priority: Must have
-fit: "NEW; built, hand-off to Disbursement parked (AQ15)"
 screens: Cancel a Check; Request (Check cancellation)
-api: "POST .../requests/check-cancellations"
 description: For a refund or cash advance paid by check, manager's check or demand draft, the user raises a check-cancellation request (CCR-yyyy-n) with the paid request, the check number, a reason and remarks. It is reviewed and approved like the other requests and then sent to the Disbursement approvers as the hand-off DV_CANCELLATION; the approver cancels the DV (FR-DS-044), which closes the hand-off. One live cancellation per paid request.
 preconditions:
   - "The target request is disbursed by check with a DV."
@@ -2257,9 +2101,7 @@ title: Track the status of requests and extract them
 brd: [MKT 1.18.0 (p.110), MKT 1.18.1 (p.110), MKT 2.26.0 (p.112)]
 actor: Marketing users
 priority: Must have
-fit: NEW
 screens: Requests Home; Request (History, Disbursement); Report Centre
-api: "Reports PRQ-STATUS, PRQ-REGISTER"
 description: Each request shows its stage, its trail and, once sent, the DV number and Disbursement status. For a date range, the status report lists requests with their current stage and the register lists all requests with their details; both export to XLSX or ODS and print.
 preconditions:
   - "The user has PRQ_VIEW."
@@ -2283,9 +2125,7 @@ title: Receive the disbursement confirmation
 brd: [MKT 1.20.0 (p.111)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Request (Disbursement tab)
-api: "Event DisbursementStatusChanged"
 description: Disbursement reports every DV status back. When the refund or cash advance is paid the request becomes Disbursed and the requester is notified. When Disbursement returns, rejects or cancels it, the request goes back to the preparer (refund) or requester (cash advance) and can be resent under a new reference (RRF.../n).
 preconditions:
   - "The request was sent to Disbursement."
@@ -2309,9 +2149,7 @@ title: Prevent duplicate refunds by AR number
 brd: [MKT 2.23.0 (p.111)]
 actor: System
 priority: Must have
-fit: NEW
 screens: New Refund Request
-api: "-"
 description: An AR number can be on one live request only. The same AR twice on a request, or an AR already on another live request, is refused. Cancelling a request frees its ARs.
 preconditions:
   - "None."
@@ -2337,9 +2175,7 @@ title: Send approved requests to Disbursement and to HR
 brd: [MKT 2.24.0 (p.111)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Request (Disbursement tab)
-api: "Operations port DisbursementGateway"
 description: On final approval a refund is sent to Disbursement as a payment request of type Refund; a cash advance goes to HR first and is sent on HR approval as type Cash advance. The payment request carries the request number, payee, amount, mode, account and documents. The Disbursement flow of FR-DS-020 follows.
 preconditions:
   - "The request is approved (and HR-approved for a cash advance)."
@@ -2363,9 +2199,7 @@ title: Record the client's payout account on approval
 brd: [MKT 2.25.0 (p.112; Add.1 p.34-35), MKT 2.25.1 (p.112)]
 actor: System
 priority: Must have
-fit: "CHANGE; built, account-number format parked (AQ19)"
 screens: Client (Payout accounts); New Refund Request (payout fields)
-api: "GET .../payout-accounts"
 description: On approval of a refund, BIBS adds the client's payout details to the client record - for credit to account the payee name and BDO account number, for check the payee name. The same details are not recorded twice. The form offers the recorded accounts of the client.
 preconditions:
   - "The refund is approved."
@@ -2391,9 +2225,7 @@ title: Liquidate a cash advance
 brd: [MKT 1.10.0 (Appendix D)]
 actor: Employee; Checker (Marketing / Comptrollership); Comptrollership administrator (accounts)
 priority: Must have
-fit: "NEW; built, scope and accounts parked (AQ18, AQ02)"
 screens: Request (Liquidation); Liquidation Accounts
-api: "PUT .../requests/{id}/liquidation; POST .../liquidation/submit, /return, /post; GET/PUT .../liquidation-accounts"
 description: After a cash advance is disbursed the employee records the liquidation - job level, cost centre, remarks and up to 60 fieldwork days with the date, particulars and expenses (per diem, representation, transport, lodging, others). The checker returns it or posts it (event PRQ_CA_LIQUIDATION) - the expenses by category against the advance, with the excess returned (cash returned) or the shortage payable to the employee. The account of each expense role is set on the Liquidation Accounts screen.
 preconditions:
   - "The cash advance is Disbursed."
@@ -2431,7 +2263,7 @@ acceptance:
 
 ## ACSL
 
-API paths of this section are under `/api/v1/acsl` unless stated. Access (ACSL 1.1.0-1.1.3) is FR-DS-001.
+ Access (ACSL 1.1.0-1.1.3) is FR-DS-001.
 
 ### Input files and reports
 
@@ -2441,9 +2273,7 @@ title: Generate the input files and run ACSL reports on demand
 brd: [ACSL 2.2.0 (p.115), ACSL 2.3.0 (p.115), ACSL 2.3.1 (p.116), ACSL 2.3.2 (p.116), ACSL 2.3.3 (p.116), ACSL 2.3.4 (p.116), ACSL 2.3.5 (p.116), ACSL 2.3.6 (p.116), ACSL 2.14.2 (p.123)]
 actor: ACSL users (ACSL_REPORT_VIEW / EXPORT)
 priority: Must have
-fit: "CHANGE (2.2.0, 2.3.2, 2.3.4-2.3.6); FIT (2.3.0, 2.3.1, 2.3.3); NEW (2.14.2)"
 screens: Report Centre (category ACSL)
-api: "Reports ACSL-BOOKED-FIN-DETAILS, ACSL-SOA-RECON, ACSL-SOA-UPLOAD-LOG, ACSL-GL-SL-RECON"
 description: ACSL runs its reports at any time without IT - the list of all booked accounts with their financial details for a period and GL account (the input file of the investigations, named "List of all booked accounts_<GL account name>_<period>"), the SOA reconciliation, the SOA upload log and the GL-SL reconciliation. The user views the list, selects one or several reports, views the details, and downloads, prints and saves them singly or as a batch (Volume 1, FR-AC-020 to FR-AC-023).
 preconditions:
   - "The user has ACSL_REPORT_VIEW."
@@ -2470,9 +2300,7 @@ title: Upload insurer statements of account
 brd: [ACSL 2.2.1 (p.115), ACSL 2.4.0 (p.117; Add.1 p.33-34)]
 actor: ACSL Processor (ACSL_UPLOAD)
 priority: Must have
-fit: "CHANGE (2.2.1), NEW (2.4.0); built, insurer layouts parked (AQ21)"
 screens: Insurer SOA Reconciliation (Upload SOA; uploads list; upload log)
-api: "POST .../soa-uploads; GET .../soa-uploads/{id}/log; GET .../soa-layouts"
 description:
   - The processor uploads the SOA of an insurer for a covered period (CSV, XLSX, ODS or TXT, up to 10 MB and 20,000 rows). BIBS reads it with the insurer's layout, or the standard layout (Invoice No, Policy No, Assured, Inception Date, Expiry Date, Gross Premium, Balance, Payments), numbers the upload SOA-yyyy-n and reconciles it (FR-AS-003).
   - The upload log proves each row was loaded - rows read, loaded and failed, with the reason per failed row (report ACSL-SOA-UPLOAD-LOG). The same file cannot be uploaded twice for an insurer.
@@ -2513,9 +2341,7 @@ title: Reconcile the SOA against the booked transactions by invoice number
 brd: [ACSL 2.13.0 (p.120), ACSL 2.13.1 (p.121), ACSL 2.14.0 (p.121), ACSL 2.14.1 (p.122)]
 actor: System; ACSL Processor
 priority: Must have
-fit: NEW
 screens: Insurer SOA Reconciliation (upload - Results, Reconcile Again, Report)
-api: "GET .../soa-uploads/{id}/results; POST .../soa-uploads/{id}/reconcile; GET .../soa-uploads/{id}/report"
 description: For each SOA line BIBS finds the invoice in the ledger and reports its status - Outstanding, For remittance, Remitted (batch and date), Cancelled (with the cancellation reference), Direct billed (indicator), with the 2307 amount, the SOA balance and the variances of premium and outstanding balance. Lines without invoice in BIBS are Not found. The reconciliation report is named "<insurer>_<from>_<to>" and exports to XLSX, ODS or PDF. The processor can reconcile again after the ledger changes.
 preconditions:
   - "The upload is loaded."
@@ -2543,9 +2369,7 @@ title: Reconcile GL and SL balances by GL code
 brd: [ACSL 2.13.2 (p.121)]
 actor: System (job ACSL_GL_SL_RECON); ACSL users
 priority: Must have
-fit: "CHANGE; built, control accounts parked (OQ07)"
 screens: GL-SL Reconciliation (runs, rows, control accounts)
-api: "POST .../gl-sl/runs; GET .../gl-sl/runs/{id}/rows; GET/PUT .../gl-sl/controls; report ACSL-GL-SL-RECON"
 description: For each control account set up, BIBS compares the GL balance with its sub-ledger - the party ledger of the Operations components, or the open items of given document types - and shows the difference. The job runs every day at 20:00 and users run it on demand; a difference raises ACSL_GLSL_DIFFERENCE.
 preconditions:
   - "Control accounts are set up (account, source, components or document types, currency)."
@@ -2572,7 +2396,7 @@ acceptance:
 ```
 
 > [!NOTE] Difference from the BRD
-> ACSL 2.13.2 includes the period-end check. The reconciliation runs nightly and on demand; a check that stops the period close on a GL-SL difference is not built.
+> ACSL 2.13.2 includes the period-end check. The reconciliation runs nightly and on demand; a check that stops the period close on a GL-SL difference is not proposed (chapter 12, CLR-AS-04).
 
 ```fr
 id: FR-AS-005
@@ -2580,23 +2404,24 @@ title: Produce aging and schedule reports per account family
 brd: [ACSL 2.14.3 (p.124), ACSL 2.14.4 (p.125)]
 actor: ACSL users
 priority: Must have
-fit: "CHANGE (2.14.3), NEW (2.14.4); not built (Gap G3)"
-screens: Report Centre
-api: "ACSL aging and schedule reports (not built)"
-description: The BRD asks for aging reports by posting date and schedules for the covered period of AR insurer's refund, AP refund from insurer, commission receivable, payable to insurance company and premium receivable, in PHP and USD, with the GL balance and the SL-GL difference. These ACSL reports are not built; they need eight ageing slots in the ledger ageing (OQ43). Until then the account schedules of Volume 1 (SCH-PR with ageing, and the other schedules) and FR-AS-004 cover the balances and the difference.
+screens: Report Centre (category ACSL)
+description: ACSL users run the aging report by posting date and the schedule for the covered period of each account family - AR insurer's refund, AP refund from insurer, commission receivable, payable to insurance company and premium receivable - in PHP and USD. Each report ages the open items per party in the agreed ageing slots and shows the GL balance and the SL-GL difference, which agrees with the GL-SL reconciliation (FR-AS-004). The ageing slots and layouts are confirmed by BDOI (OQ43).
 preconditions:
-  - "-"
+  - "The user holds the ACSL report permission."
 main_flow:
-  - Not built.
+  - The user opens the Report Centre, category ACSL, chooses the account family and enters the period and currency.
+  - BIBS lists the open items per party in the ageing slots, with the totals, the GL balance and the SL-GL difference.
+  - The user exports the report to Excel or PDF.
 rules:
-  - [R1, "Ageing slots and layouts to be confirmed (OQ43).", Configurable, Ageing slots]
-validations: []
+  - [R1, "Ageing slots and layouts to be confirmed (OQ43); eight slots are proposed.", Configurable, Ageing slots]
+validations:
+  - [Mandatory parameter missing, "Parameter <name> is required", MISSING_PARAMETER]
 notifications:
   - "None."
 audit:
-  - "-"
+  - "Every run and export is archived."
 acceptance:
-  - "Gap G3: to be accepted when built."
+  - The premium receivable aging report of September ages the open items per party, and its SL-GL difference equals that of the GL-SL reconciliation for the same date.
 ```
 
 ### Investigation and cases
@@ -2607,9 +2432,7 @@ title: Investigate accounts and receive account analysis requests
 brd: [ACSL 2.5.0 (p.117), ACSL 2.5.5 (p.117; Add.1 p.34), ACSL 2.5.1 (p.117), ACSL 2.5.2 (p.118), ACSL 2.5.3 (p.118)]
 actor: ACSL Processor; ACSL Team Leader (assign)
 priority: Must have
-fit: "CHANGE; FIT (2.5.2); NEW (2.5.5)"
 screens: ACSL Cases (tabs by stage); ACSL Case; Invoice Search; Invoice 360 (Invoice Family)
-api: "GET/POST .../cases; POST .../cases/{id}/assign; PUT .../cases/{id}/findings; GET .../invoices/{invoiceNo}/cases; GET /api/v1/ops/invoices?assured=&inceptionFrom=&inceptionTo=&ao=; GET /api/v1/ops/invoices/{no}/family"
 description:
   - ACSL works in cases (ACS-yyyy-n) of type Investigation, Account analysis request, Correction entry, AR refund payment application or Sub-ledger payment reversal. Cases come from ACSL users, from other units, and from Payment Requests (validation of a refund of a cancelled policy, FR-PQ-006).
   - The TL assigns a case; the processor searches the transaction in Invoice Search by invoice number, policy number, assured name, inception date range or account officer, selects it and sees it with all related transactions of the invoice family (regular booking, endorsements, cancellations, adjustments) and their collections, remittances and cases. The processor records the findings.
@@ -2648,9 +2471,7 @@ title: Give the result of the investigation to the requester
 brd: [ACSL 2.5.4 (p.118)]
 actor: ACSL Processor
 priority: Must have
-fit: NEW
 screens: ACSL Case (Provide Result)
-api: "POST .../cases/{id}/result"
 description: The processor gives the result - Confirmed, Rejected or No action - with remarks. The case is RESULT_PROVIDED and the requester (user or module) receives it; a Payment Requests validation moves its request (FR-PQ-006).
 preconditions:
   - "The case is INVESTIGATING."
@@ -2674,9 +2495,7 @@ title: Apply AR refunds and request sub-ledger payment reversals
 brd: [ACSL 2.6.0 (p.118), ACSL 2.6.1 (p.118)]
 actor: ACSL Processor (ACSL_APPLY); Cashier (approval)
 priority: Must have
-fit: CHANGE
 screens: ACSL Case (Request Payment Reversal); Cashiering (payment reversals)
-api: "POST .../cases/{id}/payment-reversal; Operations port PaymentReversalRequester"
 description: From a case, the processor requests the reversal of a payment application in the sub-ledger - receipt number, amount and reason - to apply an AR refund or correct an application. Cashiering records it (PRV-yyyy-n), a second cashiering user approves it, the applications are reversed and the money goes back to unapplied (Dr receivable / Cr unapplied); the result returns to the case.
 preconditions:
   - "The case has its invoice; the receipt is applied to it."
@@ -2708,9 +2527,7 @@ title: Coordinate short or over payments with the Account Officer
 brd: [ACSL 2.6.2 (p.119)]
 actor: ACSL Processor
 priority: Must have
-fit: CHANGE
 screens: ACSL Case (Message the AO)
-api: "POST .../cases/{id}/message-ao"
 description: For a short or over payment, the processor sends a message from the case to the Account Officer of the invoice; the AO receives it as a notification and the message is kept on the case.
 preconditions:
   - "The case's invoice has an Account Officer."
@@ -2739,9 +2556,7 @@ title: Assign and re-assign correction entries
 brd: [ACSL 2.7.0 (p.119), ACSL 2.8.0 (p.119)]
 actor: ACSL Team Leader (ACSL_ASSIGN)
 priority: Must have
-fit: CHANGE
 screens: Correction Entries (To assign); Correction
-api: "POST .../corrections/{id}/assign"
 description: A correction (COR-yyyy-n) is raised from a case (raise correction) or directly. The TL assigns it to a preparer, and can re-assign it while it is a draft; it moves to Draft in the preparer's work.
 preconditions:
   - "The correction is To assign or Draft."
@@ -2769,12 +2584,10 @@ title: Prepare a correction entry and route it for review
 brd: [ACSL 2.9.0 (p.119), ACSL 2.9.1 (Add.2 p.12-13)]
 actor: ACSL Processor
 priority: Must have
-fit: "CHANGE; built, the journal link corrects_batch_id parked (AQ22)"
 screens: Correction (Lines, Propose from journal, Submit)
-api: "POST .../corrections/{id}/propose; PUT .../corrections/{id}/lines; GET .../corrections/{id}/original-lines; POST .../corrections/{id}/submit"
 description:
   - The preparer enters the kind (Posting to a wrong GL account, Wrong amount, Reclassification, Other), the invoice, the original journal and the description, then the lines - account, side, amount, party for control accounts, invoice and ledger component, cost centre, business line and narration (up to 200 lines).
-  - For a wrong GL account, "Propose" reads the original journal line and builds the reversal of that line and the re-post to the right account (and party or component), both linked to the original invoice and batch. The original and the correction stay visible in the invoice family. The preparer submits a balanced correction for review.
+  - For a wrong GL account, "Propose" reads the original journal line and prepares the reversal of that line and the re-post to the right account (and party or component), both linked to the original invoice and batch. The original and the correction stay visible in the invoice family. The preparer submits a balanced correction for review.
 preconditions:
   - "The correction is Draft and assigned to the user."
 main_flow:
@@ -2817,9 +2630,7 @@ title: Review and endorse the correction
 brd: [ACSL 2.10.0 (p.119)]
 actor: ACSL Team Leader (ACSL_REVIEW)
 priority: Must have
-fit: CHANGE
 screens: Correction (Endorse, Return)
-api: "POST .../corrections/{id}/endorse; return from the workflow panel"
 description: The reviewer checks the correction and endorses it for approval with a comment, or returns it to the preparer with a reason. The reviewer is not the preparer.
 preconditions:
   - "The correction is For review."
@@ -2843,9 +2654,7 @@ title: Approve, decline or return the correction with a comment
 brd: [ACSL 2.11.0 (p.120), ACSL 2.11.1 (p.120), ACSL 2.11.2 (p.120), ACSL 2.12.0 (p.120), ACSL 2.12.1 (p.120), ACSL 2.12.2 (p.120)]
 actor: ACSL Head (ACSL_APPROVE)
 priority: Must have
-fit: "FIT (2.11.0-2.11.2, 2.12.1, 2.12.2), CHANGE (2.12.0)"
 screens: Correction (Approve, Return)
-api: "POST .../corrections/{id}/approve; return from the workflow panel"
 description: The Head approves the correction with a comment (it posts, FR-AS-024), or returns it to the preparer with a reason and comment; a declined correction is returned and then cancelled by the preparer. Comments are saved in the trail.
 preconditions:
   - "The correction is For approval."
@@ -2876,9 +2685,7 @@ title: Post corrections automatically on approval
 brd: [ACSL 2.15.0 (p.125)]
 actor: System
 priority: Must have
-fit: FIT
 screens: Correction (Journal); Journal
-api: "-"
 description: On approval BIBS posts a system journal ACS:<no> in the journal type of the corrected batch, records and matches the open items of the lines with a party, and moves the invoice components of the Operations ledger. The journal number is shown on the correction.
 preconditions:
   - "The correction is approved."
@@ -2903,9 +2710,7 @@ title: Deduct from the remittance on insurer confirmation
 brd: [ACSL 2.9.2 (Add.2 p.13)]
 actor: ACSL Processor (ACSL_PROCESS); ACSL Team Leader (REMIT_DEDUCTION_CONFIRM); System (remittance approval)
 priority: Must have
-fit: "CHANGE; built, deduction sources and spanning batches parked (AQ23)"
 screens: Remittance Deductions (work list); Remittance Deduction (record, batches, insurer confirmation documents); Remittance batch (Settlement tab)
-api: "/api/v1/remittance/deductions (create, PUT /{id}, /{id}/submit, /{id}/confirm, /{id}/applications, by-batch/{batchId}, pending); cancel and return from the workflow panel"
 description:
   - When an insurer confirms, with supporting documents, that an amount may be deducted from BDOI's remittance, the processor records the deduction (RDN-yyyy-n) - insurer, currency, source (AR insurer's refund, Over-remittance to the insurer, Other amount confirmed by the insurer), source reference, invoice, amount, the insurer's confirmation reference and date, remarks - attaches the documents and submits it. Another user confirms it.
   - When the next remittance batch of that insurer and currency is approved, BIBS consumes the confirmed deductions oldest first, capped at the amount payable (net due less the incentives), posts each part as OPS_REMIT_DEDUCTION (reference RMB:<batch>:<deduction no>) and records the application. The payment request is for the amount due after deductions; when the deductions take everything the batch is settled without a payment request. A deduction stays Confirmed while batches consume it (remaining amount shown) and becomes Applied when every batch that used it has received the insurer OR; a cancelled DV gives the amount back (FR-DS-044).
@@ -2954,9 +2759,7 @@ title: Track related transactions per invoice and insurer
 brd: [ACSL 2.16.0 (p.126; Add.1 p.34)]
 actor: ACSL users
 priority: Must have
-fit: CHANGE
 screens: Invoice 360 (Invoice Family); ACSL Case
-api: "GET /api/v1/ops/invoices/{no}/family; GET .../invoices/{invoiceNo}/cases"
 description: As FR-DS-093, ACSL sees for an invoice and its insurer the whole family - original, endorsements, cancellations, adjustments, collections, remittances, corrections and cases - through the root invoice number.
 preconditions:
   - "None."
@@ -3068,78 +2871,78 @@ The events and seed entries are listed in Volume 1, section 5.5 (rows 1-19). The
 
 ## Reports
 
-<!-- table: widths=4.4,5,5.4,1.8 caption="Reports of Volume 2" status=Status size=8.5 -->
-| Code | Name | BRD | Status |
-|---|---|---|---|
-| DSB-MASTERLIST | Masterlist of Disbursements | DIS 2.3.1, 3.28.3 | Built |
-| DSB-UNRELEASED-CHECKS | Unreleased Checks (aged to 180 days) | DIS 2.3.2, 3.28.3 | Built |
-| DSB-CWT-COMMISSION | CWT / BIR 2307 on Commission | DIS 2.3.3, 3.28.3 | Built |
-| DSB-ATD | Authority to Debit | DIS 2.3.4, 3.28.3 | Built |
-| DSB-ML-STALE | Miscellaneous Liability - Stale Checks | DIS 2.3.5, 3.28.3 | Built |
-| DSB-CASH-FLOW | Disbursement Cash Flow | DIS 2.3.6, 3.28.3 | Built |
-| DSB-PAYEE | Payee Report | DIS 2.3.7, 3.28.1 | Built |
-| DSB-UPLOAD-FALLOUT | Request Upload Fall-out | DIS 2.3.8, 3.28.4 | Built |
-| DSB-PAYEE-NOMATCH | Payees Not Matched | DIS 3.25.2 | Built |
-| DSB-UNREGULARIZED | Unregularised Transactions | DIS 2.3.9, 3.27.0 | Built |
-| DSB-EOD-REMIT, -REFUND, -SUPPLIER, -EMPLOYEE, -OTHER, -SUMMARY | End-of-day reports | DIS 3.28.0, 3.28.2 | Built |
-| DSB-CPC2-INCENTIVE | CPC2 incentive report | DIS 3.29.0 | Not built (G4) |
-| PRQ-STATUS | Request status | MKT 1.18.0 | Built |
-| PRQ-REGISTER | Request register | MKT 1.18.1 | Built |
-| ACSL-BOOKED-FIN-DETAILS | List of all booked accounts with financial details | ACSL 2.2.0, 2.14.2 | Built |
-| ACSL-SOA-RECON | SOA reconciliation | ACSL 2.14.1 | Built |
-| ACSL-SOA-UPLOAD-LOG | SOA upload log | ACSL 2.4.0 | Built |
-| ACSL-GL-SL-RECON | GL-SL reconciliation | ACSL 2.13.2 | Built |
-| ACSL aging and schedule reports | Five account families, PHP and USD | ACSL 2.14.3, 2.14.4 | Not built (G3) |
+<!-- table: widths=4.4,5,5.4 caption="Reports of Volume 2" size=8.5 -->
+| Code | Name | BRD |
+|---|---|---|
+| DSB-MASTERLIST | Masterlist of Disbursements | DIS 2.3.1, 3.28.3 |
+| DSB-UNRELEASED-CHECKS | Unreleased Checks (aged to 180 days) | DIS 2.3.2, 3.28.3 |
+| DSB-CWT-COMMISSION | CWT / BIR 2307 on Commission | DIS 2.3.3, 3.28.3 |
+| DSB-ATD | Authority to Debit | DIS 2.3.4, 3.28.3 |
+| DSB-ML-STALE | Miscellaneous Liability - Stale Checks | DIS 2.3.5, 3.28.3 |
+| DSB-CASH-FLOW | Disbursement Cash Flow | DIS 2.3.6, 3.28.3 |
+| DSB-PAYEE | Payee Report | DIS 2.3.7, 3.28.1 |
+| DSB-UPLOAD-FALLOUT | Request Upload Fall-out | DIS 2.3.8, 3.28.4 |
+| DSB-PAYEE-NOMATCH | Payees Not Matched | DIS 3.25.2 |
+| DSB-UNREGULARIZED | Unregularised Transactions | DIS 2.3.9, 3.27.0 |
+| DSB-EOD-REMIT, -REFUND, -SUPPLIER, -EMPLOYEE, -OTHER, -SUMMARY | End-of-day reports | DIS 3.28.0, 3.28.2 |
+| DSB-CPC2-INCENTIVE | CPC2 incentive report | DIS 3.29.0 |
+| PRQ-STATUS | Request status | MKT 1.18.0 |
+| PRQ-REGISTER | Request register | MKT 1.18.1 |
+| ACSL-BOOKED-FIN-DETAILS | List of all booked accounts with financial details | ACSL 2.2.0, 2.14.2 |
+| ACSL-SOA-RECON | SOA reconciliation | ACSL 2.14.1 |
+| ACSL-SOA-UPLOAD-LOG | SOA upload log | ACSL 2.4.0 |
+| ACSL-GL-SL-RECON | GL-SL reconciliation | ACSL 2.13.2 |
+| ACSL aging and schedule reports | Five account families, PHP and USD | ACSL 2.14.3, 2.14.4 |
 
 Reports run in the Report Centre with the options of Volume 1 (view, export to XLSX, ODS or PDF, print, archive, batches).
 
 ## Documents
 
-<!-- table: widths=4.4,6.6,5.6 caption="Documents produced" size=8.5 -->
-| Template | Document | Status |
-|---|---|---|
-| DSB_VOUCHER | Disbursement voucher | Draft layout (AQ14) |
-| DSB_CHECK | Check | Draft layout per bank (AQ14) |
-| DSB_ATD, DSB_ATD_EMAIL | Authority to Debit and its e-mail to the branch | Draft layout (AQ14) |
-| DSB_MC_DD, DSB_CREDIT_TICKET, DSB_TT | Bank forms | Draft layouts (AQ14) |
-| DSB_PAYMENT_ADVICE | Payment advice e-mailed to the payee | Built |
-| DCTF | Direct Credit Transaction File (text) | Header and details (AQ09) |
-| PRQ_RRF, PRQ_RFP, PRQ_LIQUIDATION | Refund Request Form, Request for Payment, cash-advance liquidation (Appendix D) | Draft layouts (AQ18) |
-| BIR Form 2307 | Certificate of creditable tax withheld | Built |
-| EARLY_INCENTIVE service invoice | Service invoice of the early incentive (booking) | Built |
+<!-- table: widths=4.4,6.6 caption="Documents produced" size=8.5 -->
+| Template | Document |
+|---|---|
+| DSB_VOUCHER | Disbursement voucher |
+| DSB_CHECK | Check |
+| DSB_ATD, DSB_ATD_EMAIL | Authority to Debit and its e-mail to the branch |
+| DSB_MC_DD, DSB_CREDIT_TICKET, DSB_TT | Bank forms |
+| DSB_PAYMENT_ADVICE | Payment advice e-mailed to the payee |
+| DCTF | Direct Credit Transaction File (text) |
+| PRQ_RRF, PRQ_RFP, PRQ_LIQUIDATION | Refund Request Form, Request for Payment, cash-advance liquidation (Appendix D) |
+| BIR Form 2307 | Certificate of creditable tax withheld |
+| EARLY_INCENTIVE service invoice | Service invoice of the early incentive (booking) |
 
 # Interfaces and integration
 
 ![Interfaces of Disbursement, Payment Requests and ACSL (dashed = external)](figures/brd05_v2_integration.dot){width=13}
 
-<!-- table: widths=3.8,2,7.2,2.4,2 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.8,2,7.2,2.4,2 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| Operations disbursement gateway | In / Out | Payment requests of remittance, cashiering, commission, FRBS and Payment Requests; DV status back (DisbursementStatusChanged) | DIS 2.6.0, 3.25.0; MKT 1.20.0 | BUILT |
-| Refund validation | Out / In | ACSL case and Cashiering task per cancelled-policy line; results back | MKT 1.11.0; ACSL 2.5.5 | BUILT |
-| Payment reversal | Out / In | ACSL request to Cashiering (PRV-); result back | ACSL 2.6.1 | BUILT |
-| DV cancellation hand-off | Out | Approved check cancellation to the Disbursement approvers (DV_CANCELLATION) | MKT 1.19.0 | BUILT, PARKED (AQ15) |
-| General ledger | Out | DV, check, funding, correction, liquidation, CPC2 and deduction postings | DIS 2.19.0; ACSL 2.15.0 | BUILT |
-| TPD (ACA) | Out | DCTF text file downloaded and sent by the user | DIS 2.16.1 | BUILT (file) |
-| Bank branches | Out / In | ATD e-mail and bank forms; confirmations recorded by the user | DIS 2.7.7-2.7.9 | BUILT (manual) |
-| Bank files | In | Deposited checks, credited accounts, BOB approvals (CSV uploads) | DIS 2.22.0, 3.26.x | BUILT, PARKED (AQ09) |
+| Operations disbursement gateway | In / Out | Payment requests of remittance, cashiering, commission, FRBS and Payment Requests; DV status back | DIS 2.6.0, 3.25.0; MKT 1.20.0 | IN SCOPE |
+| Refund validation | Out / In | ACSL case and Cashiering task per cancelled-policy line; results back | MKT 1.11.0; ACSL 2.5.5 | IN SCOPE |
+| Payment reversal | Out / In | ACSL request to Cashiering (PRV-); result back | ACSL 2.6.1 | IN SCOPE |
+| DV cancellation hand-off | Out | Approved check cancellation to the Disbursement approvers (DV_CANCELLATION); part on hold until BDOI answers AQ15 | MKT 1.19.0 | IN SCOPE |
+| General ledger | Out | DV, check, funding, correction, liquidation, CPC2 and deduction postings | DIS 2.19.0; ACSL 2.15.0 | IN SCOPE |
+| TPD (ACA) | Out | DCTF text file downloaded and sent by the user | DIS 2.16.1 | IN SCOPE |
+| Bank branches | Out / In | ATD e-mail and bank forms; confirmations recorded by the user | DIS 2.7.7-2.7.9 | IN SCOPE |
+| Bank files | In | Deposited checks, credited accounts, BOB approvals (CSV uploads); part on hold until BDOI answers AQ09 | DIS 2.22.0, 3.26.x | IN SCOPE |
 | BDO Business Online Banking | Out | Funding and online payments done in BOB; reference recorded | DIS 2.17.1 | OUT |
-| Insurer SOA | In | SOA file upload per insurer and period | ACSL 2.2.1, 2.4.0 | BUILT, PARKED (AQ21) |
-| E-mail | Out | Payment advice, ATD, notifications | DIS 2.7.12 | BUILT |
+| Insurer SOA | In | SOA file upload per insurer and period; part on hold until BDOI answers AQ21 | ACSL 2.2.1, 2.4.0 | IN SCOPE |
+| E-mail | Out | Payment advice, ATD, notifications | DIS 2.7.12 | IN SCOPE |
 
 # Non-functional requirements
 
-<!-- table: widths=3,5.8,5.4,2.4 caption="Non-functional requirements (BRD p.133-139; Add.1 p.37)" size=8.5 -->
-| Topic | BRD value | BIBS target and approach | Status |
-|---|---|---|---|
-| Users | Disbursement 8; ACSL 6; Marketing 394 named, 40 concurrent | Within the BRD-1 sizing (145 concurrent) | FIT |
-| Volumes | Remittance DVs 198 a year (+20%), refunds 246, supplier payments 293, government 9, other bank units 31, employee-related 56, CWT tagging 50; corrections 400; Marketing RFP / refund 302 | Small; no special tuning | FIT |
-| Response time | Screen load 5-10 s, refresh 5 s, field display 2 s, save 5 s (2 s for some Disbursement and ACSL saves); reports 10-20 s first load; upload or download 3 s per file | Online p95 under 3 s; end of day, reports and SOA reconciliation run as jobs or batches | FIT |
-| Peaks | Month end and year end; 08:00-12:00 Disbursement; 10:00-15:00 ACSL and Marketing | End of day after the peak; GL-SL reconciliation at 20:00; stale-check job at 00:20 | FIT |
-| Devices | Same performance on mobile and desktop | Responsive screens | FIT |
-| Availability (Add.1) | 100%; 07:00-18:00 Monday to Saturday; downtime under 24 hours; maintenance 19:00-07:00; BCP under 3 days | Same deployment as BRD-1; 100% is not a measurable SLA; one BIBS-wide NFR set is being agreed (AQ27) | OPEN |
-| Retention (Add.1) | Reports and vouchers 5 years online, 5 years archive; daily backup kept 5 years | Retention rules of BRD-1 with a document class for vouchers and generated reports | FIT |
-| Security and audit | Authorised users; maker-checker | Role-based access; four-eyes rules of section 3.3; masked account numbers; audit of every change | FIT |
+<!-- table: widths=3,5.8,5.4 caption="Non-functional requirements (BRD p.133-139; Add.1 p.37)" size=8.5 -->
+| Topic | BRD value | BIBS target and approach |
+|---|---|---|
+| Users | Disbursement 8; ACSL 6; Marketing 394 named, 40 concurrent | Within the BRD-1 sizing (145 concurrent) |
+| Volumes | Remittance DVs 198 a year (+20%), refunds 246, supplier payments 293, government 9, other bank units 31, employee-related 56, CWT tagging 50; corrections 400; Marketing RFP / refund 302 | Small; no special tuning |
+| Response time | Screen load 5-10 s, refresh 5 s, field display 2 s, save 5 s (2 s for some Disbursement and ACSL saves); reports 10-20 s first load; upload or download 3 s per file | Online p95 under 3 s; end of day, reports and SOA reconciliation run as jobs or batches |
+| Peaks | Month end and year end; 08:00-12:00 Disbursement; 10:00-15:00 ACSL and Marketing | End of day after the peak; GL-SL reconciliation at 20:00; stale-check job at 00:20 |
+| Devices | Same performance on mobile and desktop | Responsive screens |
+| Availability (Add.1) | 100%; 07:00-18:00 Monday to Saturday; downtime under 24 hours; maintenance 19:00-07:00; BCP under 3 days | Same deployment as BRD-1; 100% is not a measurable SLA; one BIBS-wide NFR set is being agreed (AQ27) |
+| Retention (Add.1) | Reports and vouchers 5 years online, 5 years archive; daily backup kept 5 years | Retention rules of BRD-1 with a document class for vouchers and generated reports |
+| Security and audit | Authorised users; maker-checker | Role-based access; four-eyes rules of section 3.3; masked account numbers; audit of every change |
 
 # Configuration items owned by the business and the System Administrator
 
@@ -3170,7 +2973,7 @@ Reports run in the Report Centre with the options of Volume 1 (view, export to X
 ## Lists of values
 
 <!-- table: widths=5,11.6 caption="Lists of values of Volume 2" size=8.5 -->
-| List | Values delivered |
+| List | Values provided |
 |---|---|
 | PAYEE_CLASS | Supplier, Insurer, Employee, Client, Government agency, Others |
 | DISBURSEMENT_TYPE | Remittance; Refund; Payment to supplier; Payment to government agencies; Payment to other bank units; Employee-related request; Cash advance; Service fee; Incentive pass-on; BIR 2307 release; Other disbursement requests; Re-issue of a stale check |
@@ -3239,10 +3042,10 @@ Reports run in the Report Centre with the options of Volume 1 (view, export to X
 | D-DS-03 | BDOI gives the payee migration file | FR-DS-014 (AQ11) |
 | D-DS-04 | BDOI gives the real accounting entries of each disbursement type | FR-DS-041, 055 (AQ02) |
 | D-DS-05 | BDOI confirms the CPC2 base, VAT and criteria, and the accounting of the insurer's 2% on early incentives | FR-DS-090, 091 (AQ24, AQ25) |
-| D-DS-06 | The CPC2 report is built | FR-DS-092 (Gap G4) |
+| D-DS-06 | BDOI confirms the CPC2 report layout | FR-DS-092 (AQ24) |
 | D-PQ-01 | BDOI gives the mandatory RRF / RFP fields, approval chains and the HR approver | FR-PQ-003, 004, 009 (AQ18) |
 | D-AS-01 | BDOI gives the insurer SOA layouts | FR-AS-002 (AQ21) |
-| D-AS-02 | The ledger ageing supports eight slots for the ACSL aging and schedule reports | FR-AS-005 (Gap G3, OQ43) |
+| D-AS-02 | BDOI confirms the ageing slots of the ACSL aging and schedule reports | FR-AS-005 (OQ43) |
 
 ## Open questions
 
@@ -3275,234 +3078,266 @@ AQ29 is applied as proposed (new numbers linked to a root invoice) until BDOI de
 
 # Traceability
 
-Every Volume 2 requirement is met by at least one FR. The Build column gives the delivery state: **Built**; **Built, parked** (built; configuration or content waits for BDOI, see the FR); **Not built** with its gap (G3 ACSL aging and schedule reports, G4 CPC2 report); **Out** (outside BIBS per the BRD baseline).
+Every Volume 2 requirement is met by at least one FR, except the login to BDO Business Online Banking (DIS 2.17.1), which is outside BIBS. The test cases are listed by test condition (TC-DS-nnn.n, TC-PQ-nnn.n, TC-AS-nnn.n); the test plan workbook lists each case.
 
 ## Disbursement (DIS)
 
-<!-- table: widths=2.2,2.6,2.6,4.4,4.6,2 caption="DIS requirement IDs to FR, screen and build status" size=7.5 -->
-| BRD ID | Page | FR | Screen | API | Build |
-|---|---|---|---|---|---|
-| DIS 1.1.0 | p.68 | FR-DS-001 | Login | POST /auth/login | Built |
-| DIS 1.1.1 | p.69 | FR-DS-001 | Login | POST /auth/login | Built |
-| DIS 1.1.2 | p.69 | FR-DS-001 | Login | POST /auth/login | Built |
-| DIS 1.1.3 | p.69 | FR-DS-001 | Login | POST /auth/login | Built |
-| DIS 2.2.0 | p.69 | FR-DS-010 | Payees | GET/POST .../payees | Built |
-| DIS 2.2.1 | p.69 | FR-DS-012 | Payees | GET .../payee-requests | Built |
-| DIS 2.2.2 | p.70 | FR-DS-011 | Payee | .../payees | Built |
-| DIS 2.2.3 | p.70 | FR-DS-010 | Payees | GET/POST .../payees | Built |
-| DIS 2.2.4 | p.70 | FR-DS-013 | Payee | DELETE .../payees/{id} | Built |
-| DIS 2.2.5 | p.70 | FR-DS-011 | Payee | .../payees | Built |
-| DIS 2.2.6 | p.71 | FR-DS-010 | Payees | GET/POST .../payees | Built |
-| DIS 2.2.7 | p.71 | FR-DS-010 | Payees | GET/POST .../payees | Built |
-| DIS 2.2.8 | p.71; Add.1 p.31-32; Add.2 p.11-12 | FR-DS-014 | Payees | .../payees?status= | Built, parked |
-| DIS 2.3.0 | p.71 | FR-DS-080 | Disbursement Reports | Reports with DSB codes | Built |
-| DIS 2.3.1 | p.72 | FR-DS-080 | Disbursement Reports | Reports with DSB codes | Built |
-| DIS 2.3.2 | p.72 | FR-DS-080 | Disbursement Reports | Reports with DSB codes | Built |
-| DIS 2.3.3 | p.72 | FR-DS-080 | Disbursement Reports | Reports with DSB codes | Built |
-| DIS 2.3.4 | p.72 | FR-DS-080 | Disbursement Reports | Reports with DSB codes | Built |
-| DIS 2.3.5 | p.72 | FR-DS-080 | Disbursement Reports | Reports with DSB codes | Built |
-| DIS 2.3.6 | p.73 | FR-DS-080 | Disbursement Reports | Reports with DSB codes | Built |
-| DIS 2.3.7 | p.73 | FR-DS-080 | Disbursement Reports | Reports with DSB codes | Built |
-| DIS 2.3.8 | p.73 | FR-DS-080 | Disbursement Reports | Reports with DSB codes | Built |
-| DIS 2.3.9 | p.73 | FR-DS-080 | Disbursement Reports | Reports with DSB codes | Built |
-| DIS 3.28.0 | p.100 | FR-DS-081 | Disbursement End of Day | Reports DSB-EOD-REMIT, DSB-EOD-REFUND | Built |
-| DIS 3.28.1 | p.100 | FR-DS-083 | Disbursement Reports | Reports DSB-PAYEE, DSB-UPLOAD-FALLOUT | Built |
-| DIS 3.28.2 | p.101 | FR-DS-081 | Disbursement End of Day | Reports DSB-EOD-REMIT, DSB-EOD-REFUND | Built |
-| DIS 3.28.3 | p.101 | FR-DS-082 | Disbursement Reports | Reports DSB-MASTERLIST | Built |
-| DIS 3.28.4 | p.102 | FR-DS-083 | Disbursement Reports | Reports DSB-PAYEE, DSB-UPLOAD-FALLOUT | Built |
-| DIS 3.29.0 | Add.2 p.7 | FR-DS-092 | - | Report DSB-CPC2-INCENTIVE | Not built (G4) |
-| DIS 3.30.2 | Add.2 p.10-11 | FR-DS-037 | Setup > Employees | GET/POST/PUT /organization/employees | Built |
-| DIS 2.4.0 | p.73 | FR-DS-025 | Disbursement Workbench | GET .../summary | Built |
-| DIS 2.4.1 | p.73 | FR-DS-025 | Disbursement Workbench | GET .../summary | Built |
-| DIS 2.4.2 | p.74 | FR-DS-025 | Disbursement Workbench | GET .../summary | Built |
-| DIS 2.4.3 | p.74 | FR-DS-025 | Disbursement Workbench | GET .../summary | Built |
-| DIS 2.4.4 | p.74 | FR-DS-025 | Disbursement Workbench | GET .../summary | Built |
-| DIS 2.5.0 | p.75 | FR-DS-024 | Disbursement Uploads | Bulk handler DISB_REQUESTS | Built |
-| DIS 2.5.1 | p.75 | FR-DS-024 | Disbursement Uploads | Bulk handler DISB_REQUESTS | Built |
-| DIS 2.6.0 | p.75 | FR-DS-020 | Disbursement Workbench | Operations port DisbursementGateway | Built |
-| DIS 2.6.1 | p.76 | FR-DS-023 | Encode Payment Request | POST .../requests | Built |
-| DIS 2.6.2 | p.76 | FR-DS-020 | Disbursement Workbench | Operations port DisbursementGateway | Built |
-| DIS 3.25.0 | p.95 | FR-DS-020 | Disbursement Workbench | Operations port DisbursementGateway | Built |
-| DIS 3.25.1 | p.96 | FR-DS-021 | Disbursement Workbench | - | Built |
-| DIS 3.25.2 | p.96 | FR-DS-022 | Disbursement Workbench | Report DSB-PAYEE-NOMATCH | Built |
-| DIS 2.7.0 | p.77 | FR-DS-033 | Disbursement Voucher | .../vouchers/{id}/instrument/print | Built |
-| DIS 2.7.1 | p.77 | FR-DS-025 | Disbursement Workbench | GET .../summary | Built |
-| DIS 2.7.2 | p.78 | FR-DS-025 | Disbursement Workbench | GET .../summary | Built |
-| DIS 2.7.3 | p.78 | FR-DS-025 | Disbursement Workbench | GET .../summary | Built |
-| DIS 2.7.4 | p.78 | FR-DS-030 | Disbursement Voucher | POST .../requests/{id}/voucher | Built |
-| DIS 2.7.5 | p.79 | FR-DS-030 | Disbursement Voucher | POST .../requests/{id}/voucher | Built |
-| DIS 2.7.6 | p.80 | FR-DS-031 | Disbursement Voucher | GET/PUT .../vouchers/{id}/proforma | Built |
-| DIS 2.7.7 | p.81 | FR-DS-034 | Disbursement Voucher | .../vouchers/{id}/instrument/print, /email | Built |
-| DIS 2.7.8 | p.81 | FR-DS-035 | Disbursement Voucher | .../vouchers/{id}/instrument/print | Built, parked |
-| DIS 2.7.9 | p.82 | FR-DS-035 | Disbursement Voucher | .../vouchers/{id}/instrument/print | Built, parked |
-| DIS 2.7.10 | p.82 | FR-DS-032 | Disbursement Voucher | POST .../vouchers/{id}/allocation | Built |
-| DIS 2.7.11 | p.82 | FR-DS-036 | Disbursement Voucher | POST .../vouchers/{id}/submit | Built |
-| DIS 2.7.12 | p.83 | FR-DS-063 | Disbursement End of Day | POST .../eod/runs/{id}/confirm | Built |
-| DIS 3.30.0 | Add.2 p.9 | FR-DS-032 | Disbursement Voucher | POST .../vouchers/{id}/allocation | Built |
-| DIS 3.30.1 | Add.2 p.9-10 | FR-DS-037 | Setup > Employees | GET/POST/PUT /organization/employees | Built |
-| DIS 2.8.0 | p.83 | FR-DS-050 | Disbursement Voucher | .../vouchers/{id}/instrument/release | Built |
-| DIS 2.8.1 | p.83 | FR-DS-050 | Disbursement Voucher | .../vouchers/{id}/instrument/release | Built |
-| DIS 2.8.2 | p.84 | FR-DS-050 | Disbursement Voucher | .../vouchers/{id}/instrument/release | Built |
-| DIS 2.8.3 | p.84 | FR-DS-050 | Disbursement Voucher | .../vouchers/{id}/instrument/release | Built |
-| DIS 2.8.4 | p.85 | FR-DS-050 | Disbursement Voucher | .../vouchers/{id}/instrument/release | Built |
-| DIS 2.8.5 | p.85 | FR-DS-051 | Disbursement Voucher | .../vouchers/{id}/instrument/status-edits | Built |
-| DIS 2.9.0 | p.85 | FR-DS-043 | Disbursement Workbench | POST .../vouchers/{id}/cancel | Built |
-| DIS 2.22.0 | p.93 | FR-DS-053 | Disbursement Uploads | Bulk handlers DISB_CHECKS_NEGOTIATED | Built, parked |
-| DIS 3.26.0 | p.96 | FR-DS-052 | Disbursement Voucher | Instrument service | Built |
-| DIS 3.26.1 | p.97 | FR-DS-053 | Disbursement Uploads | Bulk handlers DISB_CHECKS_NEGOTIATED | Built |
-| DIS 3.26.2 | p.97 | FR-DS-054 | Disbursement Voucher | Job DISB_CHECK_STALE | Built |
-| DIS 3.26.3 | p.97 | FR-DS-052 | Disbursement Voucher | Instrument service | Built |
-| DIS 3.26.4 | p.98 | FR-DS-053 | Disbursement Uploads | Bulk handlers DISB_CHECKS_NEGOTIATED | Built, parked |
-| DIS 3.26.5 | p.98 | FR-DS-052 | Disbursement Voucher | Instrument service | Built |
-| DIS 3.26.6 | p.98 | FR-DS-052 | Disbursement Voucher | Instrument service | Built |
-| DIS 3.26.7 | p.99 | FR-DS-052 | Disbursement Voucher | Instrument service | Built, parked |
-| DIS 2.10.0 | p.86 | FR-DS-056 | Disbursement Voucher | POST .../vouchers/{id}/tags/receipt | Built |
-| DIS 2.10.1 | p.86 | FR-DS-056 | Disbursement Voucher | POST .../vouchers/{id}/tags/receipt | Built |
-| DIS 2.10.2 | p.86 | FR-DS-056 | Disbursement Voucher | POST .../vouchers/{id}/tags/receipt | Built |
-| DIS 2.11.0 | p.86 | FR-DS-057 | Disbursement Voucher | POST .../vouchers/{id}/tags/cwt | Built |
-| DIS 2.11.1 | p.86 | FR-DS-057 | Disbursement Voucher | POST .../vouchers/{id}/tags/cwt | Built |
-| DIS 2.11.2 | p.87 | FR-DS-057 | Disbursement Voucher | POST .../vouchers/{id}/tags/cwt | Built |
-| DIS 2.12.0 | p.87 | FR-DS-058 | Tax & Statutory > BIR Form 2307 | /tax/2307 | Built |
-| DIS 2.13.0 | p.87 | FR-DS-040 | Disbursement Workbench | POST .../vouchers/{id}/submit-for-approval | Built |
-| DIS 2.14.0 | p.88 | FR-DS-040 | Disbursement Workbench | POST .../vouchers/{id}/submit-for-approval | Built |
-| DIS 2.15.0 | p.88 | FR-DS-040 | Disbursement Workbench | POST .../vouchers/{id}/submit-for-approval | Built |
-| DIS 2.16.0 | p.88 | FR-DS-060 | Disbursement End of Day | POST .../eod/runs | Built |
-| DIS 2.16.1 | p.88 | FR-DS-061 | Disbursement End of Day | EOD output DCTF | Built, parked |
-| DIS 2.16.2 | p.88 | FR-DS-062 | Disbursement End of Day | .../eod/outputs/{id} | Built, parked |
-| DIS 2.16.3 | p.89 | FR-DS-060 | Disbursement End of Day | POST .../eod/runs | Built |
-| DIS 2.16.4 | p.89 | FR-DS-060 | Disbursement End of Day | POST .../eod/runs | Built |
-| DIS 2.16.5 | p.89 | FR-DS-060 | Disbursement End of Day | POST .../eod/runs | Built |
-| DIS 2.16.6 | p.89 | FR-DS-062 | Disbursement End of Day | .../eod/outputs/{id} | Built, parked |
-| DIS 2.17.0 | p.90 | FR-DS-064 | Account Funding | POST .../funding, /{id}/submit | Built |
-| DIS 2.17.1 | p.90 | FR-DS-064 | Account Funding | POST .../funding, /{id}/submit | Out (external) |
-| DIS 2.17.2 | p.90 | FR-DS-064 | Account Funding | POST .../funding, /{id}/submit | Built |
-| DIS 2.17.3 | p.90 | FR-DS-064 | Account Funding | POST .../funding, /{id}/submit | Built |
-| DIS 2.17.4 | p.90; Add.1 p.33 | FR-DS-064 | Account Funding | POST .../funding, /{id}/submit | Built |
-| DIS 2.18.0 | p.91 | FR-DS-043 | Disbursement Workbench | POST .../vouchers/{id}/cancel | Built |
-| DIS 2.19.0 | p.91 | FR-DS-041 | Disbursement Workbench | POST .../vouchers/{id}/approve | Built |
-| DIS 2.20.0 | p.92 | FR-DS-044 | Disbursement Voucher | POST .../vouchers/{id}/cancel | Built |
-| DIS 2.21.0 | p.92 | FR-DS-042 | Disbursement Voucher | POST .../vouchers/{id}/reject | Built |
-| DIS 2.23.0 | p.93 | FR-DS-070 | Bank Accounts and Checks | POST .../banks/{id}/cheque-books | Built |
-| DIS 2.23.1 | p.93 | FR-DS-070 | Bank Accounts and Checks | POST .../banks/{id}/cheque-books | Built |
-| DIS 2.23.2 | p.93 | FR-DS-070 | Bank Accounts and Checks | POST .../banks/{id}/cheque-books | Built |
-| DIS 2.24.0 | p.93 | FR-DS-071 | Bank Accounts and Checks | .../banks | Built |
-| DIS 2.24.1 | p.93 | FR-DS-071 | Bank Accounts and Checks | .../banks | Built |
-| DIS 2.24.2 | p.94; Add.1 p.33 | FR-DS-071 | Bank Accounts and Checks | .../banks | Built |
-| DIS 3.27.0 | p.99; Add.1 p.31 | FR-DS-045 | Disbursement Workbench | Report DSB-UNREGULARIZED | Built |
-| DIS 3.27.1 | p.100 | FR-DS-055 | Disbursement Voucher | Events DISB_CHECK_NEGOTIATED | Built, parked |
-| DIS 3.27.2 | p.100 | FR-DS-093 | Invoice Search | GET /ops/invoices/{no}/family | Built |
-| DIS 3.29.1 | Add.2 p.7-8 | FR-DS-091 | Remittance batch | Booking service invoice type EARLY_INCENTIVE | Built, parked |
-| DIS 3.29.2 | Add.2 p.8-9 | FR-DS-090 | Remittance batch | Event OPS_REMIT_CPC2 | Built, parked |
+<!-- table: widths=2.2,2.6,2.6,4.4,5.2 caption="DIS requirement IDs to FR, screen and test cases" size=7.5 -->
+| BRD ID | Page | FR | Screen | Test cases |
+|---|---|---|---|---|
+| DIS 1.1.0 | p.68 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| DIS 1.1.1 | p.69 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| DIS 1.1.2 | p.69 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| DIS 1.1.3 | p.69 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| DIS 2.2.0 | p.69 | FR-DS-010 | Payees | TC-DS-010.1, 010.2, 010.3, 010.4 (9 cases) |
+| DIS 2.2.1 | p.69 | FR-DS-012 | Payees | TC-DS-012.1, 012.2 (2 cases) |
+| DIS 2.2.2 | p.70 | FR-DS-011 | Payee | TC-DS-011.1, 011.2 (2 cases) |
+| DIS 2.2.3 | p.70 | FR-DS-010 | Payees | TC-DS-010.1, 010.2, 010.3, 010.4 (9 cases) |
+| DIS 2.2.4 | p.70 | FR-DS-013 | Payee | TC-DS-013.1, 013.2 (3 cases) |
+| DIS 2.2.5 | p.70 | FR-DS-011 | Payee | TC-DS-011.1, 011.2 (2 cases) |
+| DIS 2.2.6 | p.71 | FR-DS-010 | Payees | TC-DS-010.1, 010.2, 010.3, 010.4 (9 cases) |
+| DIS 2.2.7 | p.71 | FR-DS-010 | Payees | TC-DS-010.1, 010.2, 010.3, 010.4 (9 cases) |
+| DIS 2.2.8 | p.71; Add.1 p.31-32; Add.2 p.11-12 | FR-DS-014 | Payees | TC-DS-014.1, 014.2 (3 cases) |
+| DIS 2.3.0 | p.71 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.1 | p.72 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.2 | p.72 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.3 | p.72 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.4 | p.72 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.5 | p.72 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.6 | p.73 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.7 | p.73 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.8 | p.73 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 2.3.9 | p.73 | FR-DS-080 | Disbursement Reports | TC-DS-080.1, 080.2 (3 cases) |
+| DIS 3.28.0 | p.100 | FR-DS-081 | Disbursement End of Day | TC-DS-081.1, 081.2 (2 cases) |
+| DIS 3.28.1 | p.100 | FR-DS-083 | Disbursement Reports | TC-DS-083.1 (2 cases) |
+| DIS 3.28.2 | p.101 | FR-DS-081 | Disbursement End of Day | TC-DS-081.1, 081.2 (2 cases) |
+| DIS 3.28.3 | p.101 | FR-DS-082 | Disbursement Reports | TC-DS-082.1, 082.2 (4 cases) |
+| DIS 3.28.4 | p.102 | FR-DS-083 | Disbursement Reports | TC-DS-083.1 (2 cases) |
+| DIS 3.29.0 | Add.2 p.7 | FR-DS-092 | - | TC-DS-092.1, 092.2 (2 cases) |
+| DIS 3.30.2 | Add.2 p.10-11 | FR-DS-037 | Setup > Employees | TC-DS-037.1, 037.2 (6 cases) |
+| DIS 2.4.0 | p.73 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.4.1 | p.73 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.4.2 | p.74 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.4.3 | p.74 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.4.4 | p.74 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.5.0 | p.75 | FR-DS-024 | Disbursement Uploads | TC-DS-024.1, 024.2 (3 cases) |
+| DIS 2.5.1 | p.75 | FR-DS-024 | Disbursement Uploads | TC-DS-024.1, 024.2 (3 cases) |
+| DIS 2.6.0 | p.75 | FR-DS-020 | Disbursement Workbench | TC-DS-020.1, 020.2, 020.3 (5 cases) |
+| DIS 2.6.1 | p.76 | FR-DS-023 | Encode Payment Request | TC-DS-023.1, 023.2 (3 cases) |
+| DIS 2.6.2 | p.76 | FR-DS-020 | Disbursement Workbench | TC-DS-020.1, 020.2, 020.3 (5 cases) |
+| DIS 3.25.0 | p.95 | FR-DS-020 | Disbursement Workbench | TC-DS-020.1, 020.2, 020.3 (5 cases) |
+| DIS 3.25.1 | p.96 | FR-DS-021 | Disbursement Workbench | TC-DS-021.1, 021.2 (2 cases) |
+| DIS 3.25.2 | p.96 | FR-DS-022 | Disbursement Workbench | TC-DS-022.1, 022.2 (3 cases) |
+| DIS 2.7.0 | p.77 | FR-DS-033 | Disbursement Voucher | TC-DS-033.1, 033.2 (4 cases) |
+| DIS 2.7.1 | p.77 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.7.2 | p.78 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.7.3 | p.78 | FR-DS-025 | Disbursement Workbench | TC-DS-025.1, 025.2, 025.3 (3 cases) |
+| DIS 2.7.4 | p.78 | FR-DS-030 | Disbursement Voucher | TC-DS-030.1, 030.2, 030.3 (6 cases) |
+| DIS 2.7.5 | p.79 | FR-DS-030 | Disbursement Voucher | TC-DS-030.1, 030.2, 030.3 (6 cases) |
+| DIS 2.7.6 | p.80 | FR-DS-031 | Disbursement Voucher | TC-DS-031.1, 031.2 (4 cases) |
+| DIS 2.7.7 | p.81 | FR-DS-034 | Disbursement Voucher | TC-DS-034.1, 034.2 (2 cases) |
+| DIS 2.7.8 | p.81 | FR-DS-035 | Disbursement Voucher | TC-DS-035.1, 035.2 (2 cases) |
+| DIS 2.7.9 | p.82 | FR-DS-035 | Disbursement Voucher | TC-DS-035.1, 035.2 (2 cases) |
+| DIS 2.7.10 | p.82 | FR-DS-032 | Disbursement Voucher | TC-DS-032.1 (2 cases) |
+| DIS 2.7.11 | p.82 | FR-DS-036 | Disbursement Voucher | TC-DS-036.1, 036.2 (2 cases) |
+| DIS 2.7.12 | p.83 | FR-DS-063 | Disbursement End of Day | TC-DS-063.1, 063.2 (2 cases) |
+| DIS 3.30.0 | Add.2 p.9 | FR-DS-032 | Disbursement Voucher | TC-DS-032.1 (2 cases) |
+| DIS 3.30.1 | Add.2 p.9-10 | FR-DS-037 | Setup > Employees | TC-DS-037.1, 037.2 (6 cases) |
+| DIS 2.8.0 | p.83 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
+| DIS 2.8.1 | p.83 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
+| DIS 2.8.2 | p.84 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
+| DIS 2.8.3 | p.84 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
+| DIS 2.8.4 | p.85 | FR-DS-050 | Disbursement Voucher | TC-DS-050.1, 050.2 (2 cases) |
+| DIS 2.8.5 | p.85 | FR-DS-051 | Disbursement Voucher | TC-DS-051.1, 051.2 (6 cases) |
+| DIS 2.9.0 | p.85 | FR-DS-043 | Disbursement Workbench | TC-DS-043.1, 043.2 (3 cases) |
+| DIS 2.22.0 | p.93 | FR-DS-053 | Disbursement Uploads | TC-DS-053.1, 053.2 (4 cases) |
+| DIS 3.26.0 | p.96 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
+| DIS 3.26.1 | p.97 | FR-DS-053 | Disbursement Uploads | TC-DS-053.1, 053.2 (4 cases) |
+| DIS 3.26.2 | p.97 | FR-DS-054 | Disbursement Voucher | TC-DS-054.1, 054.2 (3 cases) |
+| DIS 3.26.3 | p.97 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
+| DIS 3.26.4 | p.98 | FR-DS-053 | Disbursement Uploads | TC-DS-053.1, 053.2 (4 cases) |
+| DIS 3.26.5 | p.98 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
+| DIS 3.26.6 | p.98 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
+| DIS 3.26.7 | p.99 | FR-DS-052 | Disbursement Voucher | TC-DS-052.1, 052.2 (3 cases) |
+| DIS 2.10.0 | p.86 | FR-DS-056 | Disbursement Voucher | TC-DS-056.1, 056.2 (3 cases) |
+| DIS 2.10.1 | p.86 | FR-DS-056 | Disbursement Voucher | TC-DS-056.1, 056.2 (3 cases) |
+| DIS 2.10.2 | p.86 | FR-DS-056 | Disbursement Voucher | TC-DS-056.1, 056.2 (3 cases) |
+| DIS 2.11.0 | p.86 | FR-DS-057 | Disbursement Voucher | TC-DS-057.1, 057.2 (6 cases) |
+| DIS 2.11.1 | p.86 | FR-DS-057 | Disbursement Voucher | TC-DS-057.1, 057.2 (6 cases) |
+| DIS 2.11.2 | p.87 | FR-DS-057 | Disbursement Voucher | TC-DS-057.1, 057.2 (6 cases) |
+| DIS 2.12.0 | p.87 | FR-DS-058 | Tax & Statutory > BIR Form 2307 | TC-DS-058.1, 058.2 (3 cases) |
+| DIS 2.13.0 | p.87 | FR-DS-040 | Disbursement Workbench | TC-DS-040.1, 040.2 (4 cases) |
+| DIS 2.14.0 | p.88 | FR-DS-040 | Disbursement Workbench | TC-DS-040.1, 040.2 (4 cases) |
+| DIS 2.15.0 | p.88 | FR-DS-040 | Disbursement Workbench | TC-DS-040.1, 040.2 (4 cases) |
+| DIS 2.16.0 | p.88 | FR-DS-060 | Disbursement End of Day | TC-DS-060.1, 060.2 (2 cases) |
+| DIS 2.16.1 | p.88 | FR-DS-061 | Disbursement End of Day | TC-DS-061.1, 061.2 (2 cases) |
+| DIS 2.16.2 | p.88 | FR-DS-062 | Disbursement End of Day | TC-DS-062.1, 062.2 (2 cases) |
+| DIS 2.16.3 | p.89 | FR-DS-060 | Disbursement End of Day | TC-DS-060.1, 060.2 (2 cases) |
+| DIS 2.16.4 | p.89 | FR-DS-060 | Disbursement End of Day | TC-DS-060.1, 060.2 (2 cases) |
+| DIS 2.16.5 | p.89 | FR-DS-060 | Disbursement End of Day | TC-DS-060.1, 060.2 (2 cases) |
+| DIS 2.16.6 | p.89 | FR-DS-062 | Disbursement End of Day | TC-DS-062.1, 062.2 (2 cases) |
+| DIS 2.17.0 | p.90 | FR-DS-064 | Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
+| DIS 2.17.1 | p.90 | FR-DS-064 | Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
+| DIS 2.17.2 | p.90 | FR-DS-064 | Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
+| DIS 2.17.3 | p.90 | FR-DS-064 | Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
+| DIS 2.17.4 | p.90; Add.1 p.33 | FR-DS-064 | Account Funding | TC-DS-064.1, 064.2, 064.3 (7 cases) |
+| DIS 2.18.0 | p.91 | FR-DS-043 | Disbursement Workbench | TC-DS-043.1, 043.2 (3 cases) |
+| DIS 2.19.0 | p.91 | FR-DS-041 | Disbursement Workbench | TC-DS-041.1, 041.2, 041.3 (5 cases) |
+| DIS 2.20.0 | p.92 | FR-DS-044 | Disbursement Voucher | TC-DS-044.1, 044.2, 044.3 (4 cases) |
+| DIS 2.21.0 | p.92 | FR-DS-042 | Disbursement Voucher | TC-DS-042.1, 042.2 (2 cases) |
+| DIS 2.23.0 | p.93 | FR-DS-070 | Bank Accounts and Checks | TC-DS-070.1, 070.2 (4 cases) |
+| DIS 2.23.1 | p.93 | FR-DS-070 | Bank Accounts and Checks | TC-DS-070.1, 070.2 (4 cases) |
+| DIS 2.23.2 | p.93 | FR-DS-070 | Bank Accounts and Checks | TC-DS-070.1, 070.2 (4 cases) |
+| DIS 2.24.0 | p.93 | FR-DS-071 | Bank Accounts and Checks | TC-DS-071.1, 071.2 (2 cases) |
+| DIS 2.24.1 | p.93 | FR-DS-071 | Bank Accounts and Checks | TC-DS-071.1, 071.2 (2 cases) |
+| DIS 2.24.2 | p.94; Add.1 p.33 | FR-DS-071 | Bank Accounts and Checks | TC-DS-071.1, 071.2 (2 cases) |
+| DIS 3.27.0 | p.99; Add.1 p.31 | FR-DS-045 | Disbursement Workbench | TC-DS-045.1, 045.2 (2 cases) |
+| DIS 3.27.1 | p.100 | FR-DS-055 | Disbursement Voucher | TC-DS-055.1, 055.2 (3 cases) |
+| DIS 3.27.2 | p.100 | FR-DS-093 | Invoice Search | TC-DS-093.1, 093.2 (2 cases) |
+| DIS 3.29.1 | Add.2 p.7-8 | FR-DS-091 | Remittance batch | TC-DS-091.1, 091.2 (3 cases) |
+| DIS 3.29.2 | Add.2 p.8-9 | FR-DS-090 | Remittance batch | TC-DS-090.1, 090.2, 090.3 (3 cases) |
 
 ## Payment Requests (MKT)
 
-<!-- table: widths=2.2,2.6,2.6,4.4,4.6,2 caption="MKT requirement IDs to FR, screen and build status" size=7.5 -->
-| BRD ID | Page | FR | Screen | API | Build |
-|---|---|---|---|---|---|
-| MKT 1.1.0 | p.105 | FR-DS-001 | Login | POST /auth/login | Built |
-| MKT 1.1.1 | p.105 | FR-DS-001 | Login | POST /auth/login | Built |
-| MKT 1.1.2 | p.105 | FR-DS-001 | Login | POST /auth/login | Built |
-| MKT 1.1.3 | p.105 | FR-DS-001 | Login | POST /auth/login | Built |
-| MKT 1.2.0 | p.105 | FR-PQ-001 | Requests Home | GET .../requests | Built |
-| MKT 1.3.0 | p.106 | FR-PQ-001 | Requests Home | GET .../requests | Built |
-| MKT 1.4.0 | p.106 | FR-PQ-001 | Requests Home | GET .../requests | Built |
-| MKT 1.5.0 | p.106 | FR-PQ-001 | Requests Home | GET .../requests | Built |
-| MKT 1.6.0 | p.106 | FR-PQ-001 | Requests Home | GET .../requests | Built |
-| MKT 1.7.0 | p.106 | FR-PQ-002 | Report Centre | Report Centre | Built, parked |
-| MKT 1.7.1 | p.106 | FR-PQ-002 | Report Centre | Report Centre | Built |
-| MKT 1.7.2 | p.107 | FR-PQ-002 | Report Centre | Report Centre | Built |
-| MKT 1.7.3 | p.107 | FR-PQ-002 | Report Centre | Report Centre | Built |
-| MKT 1.8.0 | p.107 | FR-PQ-005 | Request | POST .../requests/{id}/assign | Built |
-| MKT 1.9.0 | p.107 | FR-PQ-005 | Request | POST .../requests/{id}/assign | Built |
-| MKT 1.10.0 | p.107 | FR-PQ-003, FR-PQ-004, FR-PQ-017 | New Refund Request; New Cash Advance; Request | POST .../requests/refunds; POST .../requests/cash-advances; PUT .../requests/{id}/liquidation | Built, parked |
-| MKT 1.11.0 | p.108 | FR-PQ-006 | Request | POST .../requests/{id}/submit | Built |
-| MKT 1.12.0 | p.108 | FR-PQ-007 | Request | /attachments | Built |
-| MKT 1.13.0 | p.108 | FR-PQ-007 | Request | /attachments | Built |
-| MKT 1.14.0 | p.109 | FR-PQ-008 | Request | POST .../requests/{id}/submit | Built |
-| MKT 1.15.0 | p.109 | FR-PQ-008 | Request | POST .../requests/{id}/submit | Built |
-| MKT 1.16.0 | p.109 | FR-PQ-009 | Request | POST .../requests/{id}/approve | Built |
-| MKT 1.16.1 | p.109 | FR-PQ-009 | Request | POST .../requests/{id}/approve | Built |
-| MKT 1.16.2 | p.109 | FR-PQ-009 | Request | POST .../requests/{id}/approve | Built |
-| MKT 1.16.3 | p.109 | FR-PQ-009 | Request | POST .../requests/{id}/approve | Built, parked |
-| MKT 1.17.0 | p.110 | FR-PQ-010 | Request | Cancel from the workflow panel | Built |
-| MKT 1.18.0 | p.110 | FR-PQ-012 | Requests Home | Reports PRQ-STATUS, PRQ-REGISTER | Built |
-| MKT 1.18.1 | p.110 | FR-PQ-012 | Requests Home | Reports PRQ-STATUS, PRQ-REGISTER | Built |
-| MKT 1.19.0 | p.110 | FR-PQ-011 | Cancel a Check | POST .../requests/check-cancellations | Built, parked |
-| MKT 1.20.0 | p.111 | FR-PQ-013 | Request | Event DisbursementStatusChanged | Built |
-| MKT 2.22.0 | p.111 | FR-PQ-007 | Request | /attachments | Built |
-| MKT 2.23.0 | p.111 | FR-PQ-014 | New Refund Request | - | Built |
-| MKT 2.24.0 | p.111 | FR-PQ-015 | Request | Operations port DisbursementGateway | Built |
-| MKT 2.25.0 | p.112; Add.1 p.34-35 | FR-PQ-016 | Client | GET .../payout-accounts | Built, parked |
-| MKT 2.25.1 | p.112 | FR-PQ-016 | Client | GET .../payout-accounts | Built, parked |
-| MKT 2.26.0 | p.112 | FR-PQ-012 | Requests Home | Reports PRQ-STATUS, PRQ-REGISTER | Built |
+<!-- table: widths=2.2,2.6,2.6,4.4,5.2 caption="MKT requirement IDs to FR, screen and test cases" size=7.5 -->
+| BRD ID | Page | FR | Screen | Test cases |
+|---|---|---|---|---|
+| MKT 1.1.0 | p.105 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.1.1 | p.105 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.1.2 | p.105 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.1.3 | p.105 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.2.0 | p.105 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.3.0 | p.106 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.4.0 | p.106 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.5.0 | p.106 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.6.0 | p.106 | FR-PQ-001 | Requests Home | TC-PQ-001.1, 001.2, 001.3 (4 cases) |
+| MKT 1.7.0 | p.106 | FR-PQ-002 | Report Centre | TC-PQ-002.1, 002.2 (2 cases) |
+| MKT 1.7.1 | p.106 | FR-PQ-002 | Report Centre | TC-PQ-002.1, 002.2 (2 cases) |
+| MKT 1.7.2 | p.107 | FR-PQ-002 | Report Centre | TC-PQ-002.1, 002.2 (2 cases) |
+| MKT 1.7.3 | p.107 | FR-PQ-002 | Report Centre | TC-PQ-002.1, 002.2 (2 cases) |
+| MKT 1.8.0 | p.107 | FR-PQ-005 | Request | TC-PQ-005.1, 005.2 (4 cases) |
+| MKT 1.9.0 | p.107 | FR-PQ-005 | Request | TC-PQ-005.1, 005.2 (4 cases) |
+| MKT 1.10.0 | p.107 | FR-PQ-003, FR-PQ-004, FR-PQ-017 | New Refund Request; New Cash Advance; Request | TC-PQ-003.1, 003.2, 003.3, 004.1, 004.2, 017.1, 017.2, 017.3 (22 cases) |
+| MKT 1.11.0 | p.108 | FR-PQ-006 | Request | TC-PQ-006.1, 006.2, 006.3 (4 cases) |
+| MKT 1.12.0 | p.108 | FR-PQ-007 | Request | TC-PQ-007.1, 007.2 (2 cases) |
+| MKT 1.13.0 | p.108 | FR-PQ-007 | Request | TC-PQ-007.1, 007.2 (2 cases) |
+| MKT 1.14.0 | p.109 | FR-PQ-008 | Request | TC-PQ-008.1, 008.2, 008.3 (4 cases) |
+| MKT 1.15.0 | p.109 | FR-PQ-008 | Request | TC-PQ-008.1, 008.2, 008.3 (4 cases) |
+| MKT 1.16.0 | p.109 | FR-PQ-009 | Request | TC-PQ-009.1, 009.2, 009.3 (5 cases) |
+| MKT 1.16.1 | p.109 | FR-PQ-009 | Request | TC-PQ-009.1, 009.2, 009.3 (5 cases) |
+| MKT 1.16.2 | p.109 | FR-PQ-009 | Request | TC-PQ-009.1, 009.2, 009.3 (5 cases) |
+| MKT 1.16.3 | p.109 | FR-PQ-009 | Request | TC-PQ-009.1, 009.2, 009.3 (5 cases) |
+| MKT 1.17.0 | p.110 | FR-PQ-010 | Request | TC-PQ-010.1, 010.2 (3 cases) |
+| MKT 1.18.0 | p.110 | FR-PQ-012 | Requests Home | TC-PQ-012.1, 012.2 (3 cases) |
+| MKT 1.18.1 | p.110 | FR-PQ-012 | Requests Home | TC-PQ-012.1, 012.2 (3 cases) |
+| MKT 1.19.0 | p.110 | FR-PQ-011 | Cancel a Check | TC-PQ-011.1, 011.2 (5 cases) |
+| MKT 1.20.0 | p.111 | FR-PQ-013 | Request | TC-PQ-013.1, 013.2 (3 cases) |
+| MKT 2.22.0 | p.111 | FR-PQ-007 | Request | TC-PQ-007.1, 007.2 (2 cases) |
+| MKT 2.23.0 | p.111 | FR-PQ-014 | New Refund Request | TC-PQ-014.1, 014.2 (3 cases) |
+| MKT 2.24.0 | p.111 | FR-PQ-015 | Request | TC-PQ-015.1, 015.2 (2 cases) |
+| MKT 2.25.0 | p.112; Add.1 p.34-35 | FR-PQ-016 | Client | TC-PQ-016.1, 016.2 (3 cases) |
+| MKT 2.25.1 | p.112 | FR-PQ-016 | Client | TC-PQ-016.1, 016.2 (3 cases) |
+| MKT 2.26.0 | p.112 | FR-PQ-012 | Requests Home | TC-PQ-012.1, 012.2 (3 cases) |
 
 ## ACSL
 
-<!-- table: widths=2.2,2.6,2.6,4.4,4.6,2 caption="ACSL requirement IDs to FR, screen and build status" size=7.5 -->
-| BRD ID | Page | FR | Screen | API | Build |
-|---|---|---|---|---|---|
-| ACSL 1.1.0 | p.114 | FR-DS-001 | Login | POST /auth/login | Built |
-| ACSL 1.1.1 | p.115 | FR-DS-001 | Login | POST /auth/login | Built |
-| ACSL 1.1.2 | p.115 | FR-DS-001 | Login | POST /auth/login | Built |
-| ACSL 1.1.3 | p.115 | FR-DS-001 | Login | POST /auth/login | Built |
-| ACSL 2.2.0 | p.115 | FR-AS-001 | Report Centre | Reports ACSL-BOOKED-FIN-DETAILS | Built |
-| ACSL 2.2.1 | p.115 | FR-AS-002 | Insurer SOA Reconciliation | POST .../soa-uploads | Built, parked |
-| ACSL 2.3.0 | p.115 | FR-AS-001 | Report Centre | Reports ACSL-BOOKED-FIN-DETAILS | Built |
-| ACSL 2.3.1 | p.116 | FR-AS-001 | Report Centre | Reports ACSL-BOOKED-FIN-DETAILS | Built |
-| ACSL 2.3.2 | p.116 | FR-AS-001 | Report Centre | Reports ACSL-BOOKED-FIN-DETAILS | Built |
-| ACSL 2.3.3 | p.116 | FR-AS-001 | Report Centre | Reports ACSL-BOOKED-FIN-DETAILS | Built |
-| ACSL 2.3.4 | p.116 | FR-AS-001 | Report Centre | Reports ACSL-BOOKED-FIN-DETAILS | Built |
-| ACSL 2.3.5 | p.116 | FR-AS-001 | Report Centre | Reports ACSL-BOOKED-FIN-DETAILS | Built |
-| ACSL 2.3.6 | p.116 | FR-AS-001 | Report Centre | Reports ACSL-BOOKED-FIN-DETAILS | Built |
-| ACSL 2.4.0 | p.117; Add.1 p.33-34 | FR-AS-002 | Insurer SOA Reconciliation | POST .../soa-uploads | Built, parked |
-| ACSL 2.13.0 | p.120 | FR-AS-003 | Insurer SOA Reconciliation | GET .../soa-uploads/{id}/results | Built |
-| ACSL 2.13.1 | p.121 | FR-AS-003 | Insurer SOA Reconciliation | GET .../soa-uploads/{id}/results | Built |
-| ACSL 2.13.2 | p.121 | FR-AS-004 | GL-SL Reconciliation | POST .../gl-sl/runs | Built, parked |
-| ACSL 2.14.0 | p.121 | FR-AS-003 | Insurer SOA Reconciliation | GET .../soa-uploads/{id}/results | Built |
-| ACSL 2.14.1 | p.122 | FR-AS-003 | Insurer SOA Reconciliation | GET .../soa-uploads/{id}/results | Built |
-| ACSL 2.14.2 | p.123 | FR-AS-001 | Report Centre | Reports ACSL-BOOKED-FIN-DETAILS | Built |
-| ACSL 2.14.3 | p.124 | FR-AS-005 | Report Centre | ACSL aging and schedule reports | Not built (G3) |
-| ACSL 2.14.4 | p.125 | FR-AS-005 | Report Centre | ACSL aging and schedule reports | Not built (G3) |
-| ACSL 2.5.0 | p.117 | FR-AS-010 | ACSL Cases | GET/POST .../cases | Built |
-| ACSL 2.5.5 | p.117; Add.1 p.34 | FR-PQ-006, FR-AS-010 | Request; ACSL Cases | POST .../requests/{id}/submit; GET/POST .../cases | Built |
-| ACSL 2.5.1 | p.117 | FR-AS-010 | ACSL Cases | GET/POST .../cases | Built |
-| ACSL 2.5.2 | p.118 | FR-AS-010 | ACSL Cases | GET/POST .../cases | Built |
-| ACSL 2.5.3 | p.118 | FR-AS-010 | ACSL Cases | GET/POST .../cases | Built |
-| ACSL 2.5.4 | p.118 | FR-AS-011 | ACSL Case | POST .../cases/{id}/result | Built |
-| ACSL 2.6.0 | p.118 | FR-AS-012 | ACSL Case | POST .../cases/{id}/payment-reversal | Built |
-| ACSL 2.6.1 | p.118 | FR-AS-012 | ACSL Case | POST .../cases/{id}/payment-reversal | Built |
-| ACSL 2.6.2 | p.119 | FR-AS-013 | ACSL Case | POST .../cases/{id}/message-ao | Built |
-| ACSL 2.7.0 | p.119 | FR-AS-020 | Correction Entries | POST .../corrections/{id}/assign | Built |
-| ACSL 2.8.0 | p.119 | FR-AS-020 | Correction Entries | POST .../corrections/{id}/assign | Built |
-| ACSL 2.9.0 | p.119 | FR-AS-021 | Correction | POST .../corrections/{id}/propose | Built |
-| ACSL 2.9.1 | Add.2 p.12-13 | FR-AS-021 | Correction | POST .../corrections/{id}/propose | Built, parked |
-| ACSL 2.9.2 | Add.2 p.13 | FR-AS-025 | Remittance Deductions | /remittance/deductions | Built, parked |
-| ACSL 2.10.0 | p.119 | FR-AS-022 | Correction | POST .../corrections/{id}/endorse | Built |
-| ACSL 2.11.0 | p.120 | FR-AS-023 | Correction | POST .../corrections/{id}/approve | Built |
-| ACSL 2.11.1 | p.120 | FR-AS-023 | Correction | POST .../corrections/{id}/approve | Built |
-| ACSL 2.11.2 | p.120 | FR-AS-023 | Correction | POST .../corrections/{id}/approve | Built |
-| ACSL 2.12.0 | p.120 | FR-AS-023 | Correction | POST .../corrections/{id}/approve | Built |
-| ACSL 2.12.1 | p.120 | FR-AS-023 | Correction | POST .../corrections/{id}/approve | Built |
-| ACSL 2.12.2 | p.120 | FR-AS-023 | Correction | POST .../corrections/{id}/approve | Built |
-| ACSL 2.15.0 | p.125 | FR-AS-024 | Correction | - | Built |
-| ACSL 2.16.0 | p.126; Add.1 p.34 | FR-AS-026 | Invoice 360 | GET /ops/invoices/{no}/family | Built |
+<!-- table: widths=2.2,2.6,2.6,4.4,5.2 caption="ACSL requirement IDs to FR, screen and test cases" size=7.5 -->
+| BRD ID | Page | FR | Screen | Test cases |
+|---|---|---|---|---|
+| ACSL 1.1.0 | p.114 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| ACSL 1.1.1 | p.115 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| ACSL 1.1.2 | p.115 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| ACSL 1.1.3 | p.115 | FR-DS-001 | Login | TC-DS-001.1, 001.2, 001.3 (4 cases) |
+| ACSL 2.2.0 | p.115 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.2.1 | p.115 | FR-AS-002 | Insurer SOA Reconciliation | TC-AS-002.1, 002.2, 002.3 (7 cases) |
+| ACSL 2.3.0 | p.115 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.3.1 | p.116 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.3.2 | p.116 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.3.3 | p.116 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.3.4 | p.116 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.3.5 | p.116 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.3.6 | p.116 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.4.0 | p.117; Add.1 p.33-34 | FR-AS-002 | Insurer SOA Reconciliation | TC-AS-002.1, 002.2, 002.3 (7 cases) |
+| ACSL 2.13.0 | p.120 | FR-AS-003 | Insurer SOA Reconciliation | TC-AS-003.1, 003.2, 003.3 (3 cases) |
+| ACSL 2.13.1 | p.121 | FR-AS-003 | Insurer SOA Reconciliation | TC-AS-003.1, 003.2, 003.3 (3 cases) |
+| ACSL 2.13.2 | p.121 | FR-AS-004 | GL-SL Reconciliation | TC-AS-004.1, 004.2 (2 cases) |
+| ACSL 2.14.0 | p.121 | FR-AS-003 | Insurer SOA Reconciliation | TC-AS-003.1, 003.2, 003.3 (3 cases) |
+| ACSL 2.14.1 | p.122 | FR-AS-003 | Insurer SOA Reconciliation | TC-AS-003.1, 003.2, 003.3 (3 cases) |
+| ACSL 2.14.2 | p.123 | FR-AS-001 | Report Centre | TC-AS-001.1, 001.2 (3 cases) |
+| ACSL 2.14.3 | p.124 | FR-AS-005 | Report Centre | TC-AS-005.1, 005.2 (2 cases) |
+| ACSL 2.14.4 | p.125 | FR-AS-005 | Report Centre | TC-AS-005.1, 005.2 (2 cases) |
+| ACSL 2.5.0 | p.117 | FR-AS-010 | ACSL Cases | TC-AS-010.1, 010.2, 010.3 (5 cases) |
+| ACSL 2.5.5 | p.117; Add.1 p.34 | FR-PQ-006, FR-AS-010 | Request; ACSL Cases | TC-PQ-006.1, 006.2, 006.3, TC-AS-010.1, TC-AS-010.2, TC-AS-010.3 (9 cases) |
+| ACSL 2.5.1 | p.117 | FR-AS-010 | ACSL Cases | TC-AS-010.1, 010.2, 010.3 (5 cases) |
+| ACSL 2.5.2 | p.118 | FR-AS-010 | ACSL Cases | TC-AS-010.1, 010.2, 010.3 (5 cases) |
+| ACSL 2.5.3 | p.118 | FR-AS-010 | ACSL Cases | TC-AS-010.1, 010.2, 010.3 (5 cases) |
+| ACSL 2.5.4 | p.118 | FR-AS-011 | ACSL Case | TC-AS-011.1, 011.2 (2 cases) |
+| ACSL 2.6.0 | p.118 | FR-AS-012 | ACSL Case | TC-AS-012.1, 012.2 (3 cases) |
+| ACSL 2.6.1 | p.118 | FR-AS-012 | ACSL Case | TC-AS-012.1, 012.2 (3 cases) |
+| ACSL 2.6.2 | p.119 | FR-AS-013 | ACSL Case | TC-AS-013.1, 013.2 (2 cases) |
+| ACSL 2.7.0 | p.119 | FR-AS-020 | Correction Entries | TC-AS-020.1, 020.2 (2 cases) |
+| ACSL 2.8.0 | p.119 | FR-AS-020 | Correction Entries | TC-AS-020.1, 020.2 (2 cases) |
+| ACSL 2.9.0 | p.119 | FR-AS-021 | Correction | TC-AS-021.1, 021.2, 021.3, 021.4 (11 cases) |
+| ACSL 2.9.1 | Add.2 p.12-13 | FR-AS-021 | Correction | TC-AS-021.1, 021.2, 021.3, 021.4 (11 cases) |
+| ACSL 2.9.2 | Add.2 p.13 | FR-AS-025 | Remittance Deductions | TC-AS-025.1, 025.2, 025.3 (7 cases) |
+| ACSL 2.10.0 | p.119 | FR-AS-022 | Correction | TC-AS-022.1, 022.2 (3 cases) |
+| ACSL 2.11.0 | p.120 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
+| ACSL 2.11.1 | p.120 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
+| ACSL 2.11.2 | p.120 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
+| ACSL 2.12.0 | p.120 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
+| ACSL 2.12.1 | p.120 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
+| ACSL 2.12.2 | p.120 | FR-AS-023 | Correction | TC-AS-023.1, 023.2 (3 cases) |
+| ACSL 2.15.0 | p.125 | FR-AS-024 | Correction | TC-AS-024.1, 024.2 (3 cases) |
+| ACSL 2.16.0 | p.126; Add.1 p.34 | FR-AS-026 | Invoice 360 | TC-AS-026.1, 026.2 (2 cases) |
 
-API paths start with `/api/v1`; "..." stands for the module path of the FR.
 
 ## Coverage summary
 
-<!-- table: widths=5,1.9,1.9,1.9,2.2,1.9,1.9 caption="Coverage summary of Volume 2" size=8.5 -->
-| Group | BRD IDs | Covered | Built | Built, parked | Not built | Out |
-|---|---|---|---|---|---|---|
-| Disbursement (DIS) | 111 | 111 | 97 | 12 | 1 | 1 |
-| Payment Requests (MKT) | 36 | 36 | 30 | 6 | 0 | 0 |
-| ACSL | 45 | 45 | 38 | 5 | 2 | 0 |
-| **Total** | **192** | **192** | **165** | **23** | **3** | **1** |
+<!-- table: widths=5,1.9,1.9,1.9 caption="Coverage summary of Volume 2" size=8.5 -->
+| Group | BRD IDs | Covered | Out |
+|---|---|---|---|
+| Disbursement (DIS) | 111 | 111 | 1 |
+| Payment Requests (MKT) | 36 | 36 | 0 |
+| ACSL | 45 | 45 | 0 |
+| **Total** | **192** | **192** | **1** |
 
+
+# Proposed business rules and clarifications for confirmation
+
+The table lists each point where the proposed screen or rule differs from the BRD text, fills a gap the BRD leaves open, or needs a decision of BDOI. None of them removes a BRD requirement; most are settled by an answer of BDOI that is applied as configuration. BDOI records its decision with the sign-off of this volume (chapter 13); a decision that changes a screen, field, rule or message is applied in the next version of the FRS.
+
+<!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
+| Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
+|---|---|---|---|---|
+| CLR-DS-01 | Request without a maintained payee (DIS 3.25.0; FR-DS-020) | By default the request waits as No Payee, a payee request is raised and the alert DISB_PAYEE_NO_MATCH is sent; it resumes when the payee is authorised. DISB_NO_PAYEE_ACTION = RETURN returns it at once, as the BRD says. | Waiting avoids the source sending the request again (AQ11, AQ12). | Choose HOLD or RETURN (AQ11, AQ12). |
+| CLR-DS-02 | Delete payee details (DIS 2.2.4; FR-DS-013) | Only a draft payee never used is deleted; any other payee is deactivated with authorisation. | A payee used on a voucher must stay for audit (AQ11). | Confirm deactivation in place of deletion. |
+| CLR-DS-03 | Editable proforma entry (DIS 2.7.6, 3.27.0; FR-DS-031) | Lines are editable until approval; edited lines are marked Edited and shown to the approver. | The BRD does not say who may edit and until when (AQ13). | Confirm the edit until approval (AQ13). |
+| CLR-DS-04 | Check leaves and layout (DIS 2.8.1, 2.16.2; FR-DS-050) | A check takes the next leaf of the paying account's cheque book when printed; the layout is a draft template until BDOI gives it. | The check layout is not given (AQ14). | Give the check layout (AQ14). |
+| CLR-DS-05 | DCTF file (DIS 2.16.1; FR-DS-061) | Header and 89-character details as Appendix B; no trailer or totals until BDOI gives them. | The trailer is not specified (AQ09). | Give the trailer and totals (AQ09). |
+| CLR-DS-06 | Bank file uploads (DIS 2.22.0, 3.26.4, 3.26.7; FR-DS-053) | The uploads take a minimal CSV (DV or check number, amount, date) until the bank layouts are given. | The bank layouts are not given (AQ09). | Give the bank layouts (AQ09). |
+| CLR-DS-07 | Cancel an approved DV (DIS 2.20.0; FR-DS-044) | The DV journal is reversed and the request goes back to its source; for a remittance DV, Remittance reverses the batch postings, gives the deductions back and returns the batch to review; it is sent again under a new cycle. | The BRD asks to regularise the source data without the steps (AQ15). | Confirm the regularisation (AQ15). |
+| CLR-DS-08 | Account funding (DIS 2.17.x; FR-DS-064) | A BIBS workflow with four eyes; the BOB transaction itself is done in BOB and its reference recorded. | BOB is outside BIBS (AQ10). | Confirm the funding workflow (AQ10). |
+| CLR-DS-09 | OR / AR tagging (DIS 2.10.x; FR-DS-056) | Every approved DV counts as unregularised until tagged. | Which DVs need an OR / AR back is open (AQ17). | Name the DV types that need an OR / AR (AQ17). |
+| CLR-DS-10 | CWT tagging (DIS 2.11.x; FR-DS-057) | The tag records the certificate on the DV; the insurer certificates on commission are kept in one register in Tax (Certificates Received). | One register avoids keeping the same certificate twice (AQ16). | Confirm the register (AQ16). |
+| CLR-DS-11 | One invoice number for related transactions (DIS 3.27.2, ACSL 2.16.0; FR-DS-093) | Endorsements and cancellations keep their own BIR invoice number and carry the root invoice number; booking sets the root invoice number and Invoice 360 shows the family. | Each BIR invoice needs its own number (AQ29). | Confirm the root invoice number (AQ29). |
+| CLR-DS-12 | CPC2 incentive (DIS 3.29.2; FR-DS-090) | CPC2 is computed from the TSU CPC2 criteria (rate on the basic premium remitted, output VAT), deducted from the remittance and posted as income. | The base, VAT treatment, fixed-amount and rule criteria are open (AQ24, OQ39, PQ04). | Confirm the base, VAT and criteria (AQ24, OQ39, PQ04). |
+| CLR-DS-13 | Early-incentive service invoice (DIS 3.29.1; FR-DS-091) | One service invoice per batch with 2% withholding; until AQ25 is answered the incentive is deducted in full from the remittance and the insurer's 2% is not posted. | The accounting of the insurer's 2% withholding is open (AQ25). | Give the accounting of the 2% withholding (AQ25). |
+| CLR-DS-14 | CPC2 report (DIS 3.29.0; FR-DS-092) | A CPC2 report in Disbursement Reports lists the CPC2 lines of a period with the breakdown and totals that agree with the ledger. | The layout depends on the CPC2 definition (AQ24). | Give the CPC2 report layout (AQ24). |
+| CLR-DS-15 | Insurer's payment advice (FR-DS-063) | The payment advice of the day is e-mailed to each payee; the remittance schedule is not attached to the insurer's advice. | The BRD does not ask for the schedule with the advice; the insurer receives it from Remittance. | Confirm, or ask for the schedule to be attached. |
+| CLR-PQ-01 | Unapplied payment report for Marketing (MKT 1.7.0; FR-PQ-002) | Marketing runs the Cashiering reports (OPS_REPORT_VIEW) without a segment filter. | A Marketing report per segment needs a layout (AQ18). | Confirm the Cashiering reports, or give the layout of a Marketing report (AQ18). |
+| CLR-PQ-02 | Attachments (MKT 1.12.0, 1.13.0; FR-PQ-007) | .txt is not an accepted attachment type; files open one at a time in the viewer. | The accepted types are those of the document store for all BIBS modules. | Confirm the attachment types and the viewer. |
+| CLR-PQ-03 | Details of the forms (MKT 1.10.0; FR-PQ-003, 004, 017) | The fields of Appendix D are used; all accounts of one refund request belong to one client. | The BRD list of fields is empty (AQ18). | Give the mandatory fields (AQ18). |
+| CLR-PQ-04 | Cancellation of a disbursed check (MKT 1.19.0, 1.16.3; FR-PQ-011) | After approval the request is handed to the Disbursement approvers (hand-off DV_CANCELLATION); the approver cancels the DV, which closes the hand-off. | The BRD routes the request to Disbursement without the step (AQ15). | Confirm the hand-off (AQ15). |
+| CLR-PQ-05 | CA / SA on the client record (MKT 2.25.0; FR-PQ-016) | Recorded on approval without duplicates; the BDO account number is checked as 10 to 16 digits. | The account number format is not given (AQ19). | Give the account number format (AQ19). |
+| CLR-PQ-06 | Cash-advance liquidation (Appendix D; FR-PQ-017) | Liquidation, return of the excess and posting of the expenses are proposed as in FR-PQ-017. | The scope of the liquidation form is to be confirmed (AQ18). | Confirm the scope of the liquidation (AQ18). |
+| CLR-AS-01 | SOA files (ACSL 2.4.0; FR-AS-002) | The SOA file is read in one request (up to ACSL_SOA_MAX_ROWS rows) and reconciled once loaded; layouts per insurer are configuration. | The insurer SOA layouts are not given (AQ21). | Give the SOA layouts (AQ21). |
+| CLR-AS-02 | Remittance deduction (ACSL 2.9.2; FR-AS-025) | The deduction stays Confirmed while batches consume it and is Applied when every batch that used it has the insurer OR. | The sources of deductions and deductions spanning batches are open (AQ23). | Give the sources and confirm the spanning rule (AQ23). |
+| CLR-AS-03 | Aging and schedule reports (ACSL 2.14.3, 2.14.4; FR-AS-005) | The ACSL aging and schedule reports age the open items per party in eight slots, in PHP and USD, with the GL balance and the SL-GL difference. | The ageing slots and layouts are not given (OQ43). | Confirm the slots and layouts (OQ43). |
+| CLR-AS-04 | GL-SL reconciliation at period end (ACSL 2.13.2; FR-AS-004) | The reconciliation runs nightly and on demand; a difference raises an alert but does not stop the period close. | The BRD includes a period-end check without saying whether it stops the close. | Confirm the alert, or ask for the close to be stopped. |
 
 # Sign-off
 
-By signing, BDOI confirms that this volume describes the Disbursement, Payment Request and ACSL functions it expects in BIBS, accepts the recorded differences in section 1.7 and the assumptions in section 10.1. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request. Volume 1 is signed separately by the Accounting and administration owners.
+By signing, BDOI confirms that this volume describes the Disbursement, Payment Request and ACSL functions it expects in BIBS, accepts the assumptions in section 10.1 and records its decisions on the items of chapter 12. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request. Volume 1 is signed separately by the Accounting and administration owners.
 
 ```signoff
 rows:

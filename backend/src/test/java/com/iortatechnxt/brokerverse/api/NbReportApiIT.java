@@ -133,7 +133,7 @@ class NbReportApiIT {
             .getContentAsString(StandardCharsets.UTF_8);
     assertThat(xml)
         .contains("<report code=\"NB-ACC-STATUS\"")
-        .contains("<generatedBy>ao</generatedBy>")
+        .contains("<generatedBy>Aileen Account Officer</generatedBy>")
         .contains("BDO Insurance and Reinsurance Brokers, Inc.");
   }
 

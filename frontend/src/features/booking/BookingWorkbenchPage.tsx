@@ -28,6 +28,8 @@ import { WorkbenchTable } from './WorkbenchTable';
 import { WorkbenchToolbar } from './WorkbenchToolbar';
 import type { WorkbenchDialog } from './WorkbenchToolbar';
 import './booking.css';
+import { Notice } from '@/components/ui/Notice';
+import { Tag } from '@/components/ui/Tag';
 
 const TILES: readonly { tab: WorkbenchTab; label: string; count: keyof WorkbenchCounts }[] = [
   { tab: 'READY', label: 'Ready to Book', count: 'readyToBook' },
@@ -91,22 +93,37 @@ function HandedBanner({
   onDismiss: () => void;
 }>) {
   return (
-    <div className="alert booking-handed">
-      <span>
-        {String(arns.length)} account(s) sent from placement for booking: {arns.join(', ')}. They
-        are selected on this page when listed.
-      </span>
-      <div className="row">
-        {canProcess && (
-          <Button variant="secondary" icon={<ListPlus size={16} />} busy={busy} onClick={onEnqueue}>
-            Add All to Batch
+    <Notice
+      tone="info"
+      title={`${String(arns.length)} account(s) sent from placement for booking`}
+      actions={
+        <>
+          {canProcess && (
+            <Button
+              variant="secondary"
+              size="sm"
+              icon={<ListPlus size={16} />}
+              busy={busy}
+              onClick={onEnqueue}
+            >
+              Add All to Batch
+            </Button>
+          )}
+          <Button variant="ghost" size="sm" onClick={onDismiss}>
+            Dismiss
           </Button>
-        )}
-        <Button variant="ghost" onClick={onDismiss}>
-          Dismiss
-        </Button>
-      </div>
-    </div>
+        </>
+      }
+    >
+      They are selected in the list below when listed.
+      <span className="tag-list booking-handed-arns">
+        {arns.map((arn) => (
+          <Tag key={arn} tone="neutral">
+            {arn}
+          </Tag>
+        ))}
+      </span>
+    </Notice>
   );
 }
 

@@ -21,6 +21,7 @@ import { LiquidationTab } from './LiquidationTab';
 import { RequestActions } from './RequestActions';
 import { KIND_LABELS } from './requestForm';
 import { DetailsTab, DisbursementTab, ValidationTab } from './RequestTabs';
+import { Notice } from '@/components/ui/Notice';
 
 type TabId = 'details' | 'validation' | 'disbursement' | 'liquidation' | 'documents';
 
@@ -185,11 +186,11 @@ export default function RequestDetailPage() {
         facts={facts(r)}
       />
       {r.trail.returnReason && editable && (
-        <div className="alert warning" role="status">
-          Returned: {humanize(r.trail.returnReason)}
+        <Notice tone="warning" title="Returned">
+          {humanize(r.trail.returnReason)}
           {r.trail.returnComment ? ` – ${r.trail.returnComment}` : ''}. Change the request and
           submit it again, or cancel it.
-        </div>
+        </Notice>
       )}
       <WorkflowPanel
         entityType={REQUEST_ENTITY}

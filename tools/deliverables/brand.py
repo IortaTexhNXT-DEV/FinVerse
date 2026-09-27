@@ -59,9 +59,9 @@ STATUS_COLOURS: dict[str, tuple[str, str]] = {
     "DONE": (SUCCESS_BG, SUCCESS),
     "CLOSED": (SUCCESS_BG, SUCCESS),
     "ANSWERED": (SUCCESS_BG, SUCCESS),
-    "BUILT": (SUCCESS_BG, SUCCESS),
     "CONFIGURE": (BG_BLUE, HEADER_BLUE),
     "RECOMMENDED": (BG_BLUE, HEADER_BLUE),
+    "IN SCOPE": (BG_BLUE, HEADER_BLUE),
     "CHANGE": (AMBER_BG, AMBER),
     "PARTIAL": (AMBER_BG, AMBER),
     "IN PROGRESS": (AMBER_BG, AMBER),
@@ -73,6 +73,7 @@ STATUS_COLOURS: dict[str, tuple[str, str]] = {
     "BLOCKED": (DANGER_BG, DANGER),
     "OUT": (DIRTY_WHITE, MUTED),
     "PARKED": (DIRTY_WHITE, MUTED),
+    "ON HOLD": (DIRTY_WHITE, MUTED),
     "N/A": (DIRTY_WHITE, MUTED),
 }
 
@@ -116,20 +117,20 @@ DROPS: dict[str, dict[str, str]] = {
     "Drop 0": {
         "folder": "Drop-0_Setup_and_Data_Migration",
         "title": "Drop 0 - Setup and Data Migration",
-        "dates": "Setup with the Drop 1 requirements (Sep - Nov 2026) and build wave 1; migration requirements and "
-                 "mapping Sep - Nov 2026, build Nov 2026 - Mar 2027, SIT Apr - Jul 2027, UAT Aug - Oct 2027, full "
+        "dates": "Setup with the Drop 1 requirements (Sep - Nov 2026); migration requirements and "
+                 "mapping Sep - Nov 2026, development Nov 2026 - Mar 2027, SIT Apr - Jul 2027, UAT Aug - Oct 2027, full "
                  "migration and cut-over Nov 2027 - Jan 2028",
     },
     "Drop 1": {
         "folder": "Drop-1_Transactional",
         "title": "Drop 1 - Transactional (upstream and downstream)",
-        "dates": "Requirements Sep - Nov 2026, build Nov 2026 - Feb 2027, SIT Jan - Jul 2027, UAT (end to end) "
+        "dates": "Requirements Sep - Nov 2026, development Nov 2026 - Feb 2027, SIT Jan - Jul 2027, UAT (end to end) "
                  "Aug - Dec 2027",
     },
     "Drop 2": {
         "folder": "Drop-2_Independent",
         "title": "Drop 2 - Independent",
-        "dates": "Requirements Dec 2026 - Feb 2027, build Mar - Apr 2027, SIT Jul - Sep 2027, UAT Oct - Nov 2027",
+        "dates": "Requirements Dec 2026 - Feb 2027, development Mar - Apr 2027, SIT Jul - Sep 2027, UAT Oct - Nov 2027",
     },
     "Programme": {
         "folder": "Programme",

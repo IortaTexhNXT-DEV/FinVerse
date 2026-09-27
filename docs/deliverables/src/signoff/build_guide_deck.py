@@ -1,7 +1,7 @@
 """Builds the Sign-off Pack Guide deck of a BRD business sign-off release set (PowerPoint, BDO theme).
 
 The same deck is produced for every BRD set: the content comes from the pack of the BRD
-(docs/deliverables/src/<BRD-nn_Name>/pack/pack.yaml and guide.yaml) and from the system as built through the pack
+(docs/deliverables/src/<BRD-nn_Name>/pack/pack.yaml and guide.yaml) and from the application through the pack
 (personas, menus, cross-BRD contract, screenshots). Every slide carries speaker notes.
 
     python docs/deliverables/src/signoff/build_guide_deck.py BRD-01
@@ -262,15 +262,16 @@ def build(brd: str) -> Path:
 
     # 2. Purpose
     deck.content("Purpose of the pack and what sign-off means", [
-        f"The pack shows {module} as built in BIBS, screen by screen, so each business unit confirms what it will get",
-        (1, f"Content: {counts}, from the system as built"),
+        f"The pack shows the proposed {module} of BIBS, screen by screen, so each business unit confirms what it will "
+        "get",
+        (1, f"Content: {counts}"),
         (1, "Every screen with numbered fields, the navigation per persona, three end-to-end walkthroughs"),
         "Signing freezes the content, the screens and the navigation of the module",
         (1, "After sign-off a change goes through the Change Management Register with its mandays"),
         (1, "Configuration values marked default (SLA hours, thresholds, list entries, templates) stay open"),
         "The screenshots use fictitious seed data only, in the BDO theme",
     ])
-    deck.notes(["Stress that the pack describes the system as built on the status date, not a design.",
+    deck.notes(["Stress that the pack shows the screens, fields, rules and messages the business is asked to confirm.",
                 "Signing means: this is what we get; the look, feel, fields, rules, messages and navigation are frozen.",
                 "Data on the screenshots is seed data of the SIT environment; names and numbers are fictitious."])
 
@@ -325,7 +326,8 @@ def build(brd: str) -> Path:
         deck.notes("The process runs from client onboarding and KYC, through the quotation or the PRF, the account, "
                    "payment and placement, issuance and booking, to the hand-off to Operations and Accounting.")
     personas = []
-    for role, rows_ in pack.menus().items():
+    menus = pack.menus()
+    for role, rows_ in ((r, menus[r]) for r in pack.personas):  # the module personas; the others are in the FRS
         own = [r for r in rows_ if r["own"]]
         sections = []
         for r in own:
@@ -336,7 +338,9 @@ def build(brd: str) -> Path:
     deck.table(f"{module} at a glance: personas and menus", ["Persona", "SIT user", "Screens", "Menu sections"],
                personas, widths=[3.0, 1.3, 1.1, 7.2], size=10)
     deck.notes("Each persona sees only the menu entries of its role; the full menu of each persona is in FRS chapter "
-               "12 and on the Menu by persona sheet of the workbook.")
+               "12 and on the Menu by persona sheet of the workbook."
+               + (f" The menus of {len(pack.menu_roles) - len(pack.personas)} more personas of the other BRDs are "
+                  "there too, one table and one sheet each." if len(pack.menu_roles) > len(pack.personas) else ""))
     deck.gallery(f"{module} at a glance: key screens",
                  [(shots / f"{k['image']}.png", k["caption"]) for k in g["key_screens"]])
     deck.notes("Screenshots of the SIT environment with seed data; every screen of the module is in FRS chapter 13.")
@@ -368,10 +372,10 @@ def build(brd: str) -> Path:
     deck.columns("Entry and exit criteria, definition of done",
                  [("Entry", g["entry"]), ("Exit", g["exit"]), ("Done", g["done"])], size=12)
     deck.notes("The sign-off meeting starts when the exit criteria are met; the set is done when the certificate is "
-               "signed and the build is frozen.")
+               "signed and the content of the set is frozen.")
 
     # 17. Handover
-    deck.content("Handover to development: build readiness checklist",
+    deck.content("After sign-off: readiness checklist",
                  [f"☐  {x}" for x in g["handover"]] + [(1, g["handover_note"])], size=16)
     deck.notes(g["handover_note"])
 
@@ -384,8 +388,7 @@ def build(brd: str) -> Path:
         "Delivered as a new version of the set (v2.1, v2.2...) with the changed pages signed again (delta sign-off)",
         "Configuration values marked default change in BIBS without a change request",
     ])
-    deck.notes("Nothing in a signed set changes without a request in the register. The as-built refresh at the end of "
-               "the build re-issues the set with the system as delivered.")
+    deck.notes("Nothing in a signed set changes without a request in the register.")
 
     # 19. Governance
     deck.table("Governance, contacts and next steps", ["Role", "Who", "Does"],

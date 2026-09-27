@@ -1,21 +1,12 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { BadgePercent } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { productCatalogApi } from '@/api/productCatalog';
 import type { Quotation } from '@/api/quotations';
-import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
-import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { Link } from 'react-router-dom';
-import {
-  exceptionStatus,
-  exceptionSubject,
-  rateExceptionPath,
-} from '@/features/catalog/rateException';
 import { DateInput } from '@/components/ui/DateInput';
 
 interface ExceptionForm {
@@ -132,60 +123,5 @@ export function RateExceptionDialog({
         )}
       </Field>
     </Modal>
-  );
-}
-
-/**
- * The package rate scheme of a quotation (BRPM.007): the version that priced it, a warning when an
- * item rate differs from the scheme rate, the rate exceptions requested for it and the action to
- * request one.
- */
-export function RateSchemePanel({ quotation }: Readonly<{ quotation: Quotation }>) {
-  const { can } = useAuth();
-  const [open, setOpen] = useState(false);
-  const exceptions = useQuery({
-    queryKey: ['rate-exceptions', quotation.quotationNo],
-    queryFn: () => productCatalogApi.rateExceptions(quotation.quotationNo),
-    enabled: quotation.content.schemeVersion !== undefined,
-  });
-  if (!quotation.content.schemeVersion) {
-    return null;
-  }
-  const deviation = quotation.content.schemeDeviation === true;
-  const mayRequest = deviation && quotation.status === 'DRAFT' && can('QUOTE_MAINTAIN');
-  const requested = exceptions.data ?? [];
-  if (!deviation && requested.length === 0) {
-    return null;
-  }
-  return (
-    <div className={deviation ? 'alert warning' : 'alert success'} role="status">
-      <div className="row">
-        <span>
-          Priced on package version {quotation.content.schemeVersion}.
-          {deviation &&
-            ' An item rate differs from the scheme rate: submission needs an approved rate exception.'}
-        </span>
-        {mayRequest && (
-          <Button
-            size="sm"
-            variant="secondary"
-            icon={<BadgePercent size={14} />}
-            onClick={() => setOpen(true)}
-          >
-            Request Rate Exception
-          </Button>
-        )}
-      </div>
-      {requested.map((e) => (
-        <div className="row" key={e.referenceNo}>
-          <Link to={rateExceptionPath(e.referenceNo)}>
-            <strong>{e.referenceNo}</strong>
-          </Link>
-          <span>{exceptionSubject(e)}</span>
-          <StatusBadge status={exceptionStatus(e)} />
-        </div>
-      ))}
-      {open && <RateExceptionDialog quotation={quotation} onClose={() => setOpen(false)} />}
-    </div>
   );
 }

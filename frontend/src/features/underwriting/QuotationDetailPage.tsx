@@ -8,10 +8,11 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDate, humanize } from '@/utils/format';
+import { formatDate, formatPeriod, humanize } from '@/utils/format';
 import { QuotationActions } from './QuotationActions';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
+import { Notice } from '@/components/ui/Notice';
 
 function Terms({ quotation: q }: Readonly<{ quotation: Quotation }>) {
   const facts: [string, string][] = [
@@ -25,7 +26,7 @@ function Terms({ quotation: q }: Readonly<{ quotation: Quotation }>) {
     ],
     ['Issued', formatDate(q.issueDate)],
     ['Valid until', `${formatDate(q.expiryDate)} (${String(q.validityDays)} days)`],
-    ['Proposed period', `${formatDate(q.periodFrom)} – ${formatDate(q.periodTo)}`],
+    ['Proposed period', formatPeriod(q.periodFrom, q.periodTo)],
     ['Our share', `${String(q.sharePct)}%`],
     ['Brokerage', `${String(q.commissionRate)}%`],
     ['Prepared by', displayNameOf(q.createdBy)],
@@ -42,9 +43,9 @@ function Terms({ quotation: q }: Readonly<{ quotation: Quotation }>) {
         ))}
       </dl>
       {q.decisionReason !== undefined && (
-        <div className="alert warning" style={{ marginTop: 12 }}>
-          Rejected: {q.decisionReason}
-        </div>
+        <Notice tone="warning" title="Rejected">
+          {q.decisionReason}
+        </Notice>
       )}
       {q.convertedPolicyId !== undefined && (
         <p style={{ marginBottom: 0 }}>

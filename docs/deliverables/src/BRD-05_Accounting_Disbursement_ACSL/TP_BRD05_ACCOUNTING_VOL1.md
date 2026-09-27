@@ -20,7 +20,7 @@ control:
     author: iorta TechNXT QA
     reviewer: iorta TechNXT Business Analysis
     approver: ""
-    change: Internal draft from FRS BRD-5 Volume 1 v1.0 and the as-built code
+    change: Internal draft from FRS BRD-5 Volume 1 v1.0
   - version: "1.0"
     date: 25 Sep 2026
     author: iorta TechNXT QA
@@ -34,7 +34,7 @@ distribution:
   - {name: "Access approvers", role: Business tester, organisation: BDOI, purpose: Decisions on administration requests}
   - {name: "Disbursement, Remittance", role: Business tester, organisation: BDOI, purpose: "Service-fee payouts, broking cut-off"}
   - {name: Business Project Services, role: UAT coordinator, organisation: BDO Unibank ESG, purpose: UAT planning and traceability}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "System test, defect fixing, UAT support"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "System test, issue resolution, UAT support"}
 ---
 
 # Introduction
@@ -43,7 +43,7 @@ distribution:
 
 This document summarises the test plan for Volume 1 of BRD-5 in BIBS (BDOI Broker System, on iNXT BrokerVerse): the accounting of the Financial Reporting and Budget Section (FRBS) and the business and system administration (BASAU). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-05_Accounting_Disbursement_ACSL_Vol1_v1.0.xlsx`, which the testers use during execution.
 
-BRD-5 is specified in two FRS volumes, and it has one test plan per volume. Volume 2 (Disbursement, Payment Requests and ACSL) has its own plan, `BIBS_TestPlan_BRD-05_Accounting_Disbursement_ACSL_Vol2_v1.0.xlsx`. Every case of this plan traces to a functional requirement (FR) of FRS BRD-5 Volume 1 v1.0 and to the BRD requirement IDs (FRBS n.n.n, BASAU n.n.n, Appendix A) that the FR meets. BRD-5 is built, so the expected results quote the messages and codes that BIBS returns, and each case names the automated test that already covers it, where one exists.
+BRD-5 is specified in two FRS volumes, and it has one test plan per volume. Volume 2 (Disbursement, Payment Requests and ACSL) has its own plan, `BIBS_TestPlan_BRD-05_Accounting_Disbursement_ACSL_Vol2_v1.0.xlsx`. Every case of this plan traces to a functional requirement (FR) of FRS BRD-5 Volume 1 v1.0 and to the BRD requirement IDs (FRBS n.n.n, BASAU n.n.n, Appendix A) that the FR meets. The expected results quote the messages, with their codes, as BIBS shows them.
 
 ## Scope
 
@@ -76,10 +76,9 @@ The roles-and-access sheet checks each accounting and administration action agai
 | Ref. | Document | Version |
 |---|---|---|
 | R1 | Functional Requirements Specification BRD-5 Volume 1 (`BIBS_FRS_BRD-05_Accounting_Disbursement_ACSL_Vol1_v1.0.docx`) and its cover note | 1.0, 25 Sep 2026 |
-| R2 | BRD-5 Accounting, Disbursement and ACSL with Addenda 1 and 2 (`docs/source-documents/`) | as signed |
+| R2 | BRD-5 Accounting, Disbursement and ACSL with Addenda 1 and 2 | as signed |
 | R3 | Test plan workbook BRD-5 Volume 1 (`BIBS_TestPlan_BRD-05_Accounting_Disbursement_ACSL_Vol1_v1.0.xlsx`) | 1.0 |
 | R4 | Test plan BRD-5 Volume 2 (`BIBS_TestPlan_BRD-05_Accounting_Disbursement_ACSL_Vol2_v1.0.xlsx`) | 1.0 |
-| R5 | Accounting and Disbursement build design (`docs/architecture/ACCOUNTING_DISBURSEMENT_DESIGN.md`) | current |
 | R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |
 
 # Test approach
@@ -89,17 +88,15 @@ The roles-and-access sheet checks each accounting and administration action agai
 <!-- table: widths=3.2,6.2,3.6,3.6 caption="Test levels" -->
 | Level | What is tested | Who | When |
 |---|---|---|---|
-| Unit and integration (automated) | Journal controls, chart rules, closing, revaluation, reconciliation, service fee, schedules, BIR outputs and permissions of each FR, against a PostgreSQL database; frontend form checks | iorta TechNXT developers | Every change, in CI (`mvn verify`, `npm run verify`) |
 | System test | Every case of the workbook, screen by screen, with the seed data | iorta TechNXT QA | Before UAT, on the SIT environment |
 | Persona end-to-end | The nine scenarios run from start to finish by the persona that owns each step | iorta TechNXT QA with the BDOI department testers | After the system test passes |
 | User acceptance test (UAT) | The scenarios and the High-priority cases, run by BDOI testers on masked production-like data | BDOI FRBS and administration testers | After the entry criteria of section 3 are met |
 
-Automated tests do not replace the system test. They show that a rule holds after every change; the system test shows that the screens, messages, reports and files are what the user expects. A case that names an automated test is still run on the screen at least once per cycle.
 
 ## How the cases were derived
 
 - Each FR's acceptance criteria, business rules, validations, alternate flows and field rules became one or more **test conditions** (sheet Test Conditions). A condition states what must be true, for example "A journal is never posted by its submitter nor above the poster's limit".
-- Each condition has at least one **test case** (sheet Test Cases) with the persona, the screen (menu path), the preconditions and data set, numbered steps and the expected result. Where BIBS shows a message, the expected result quotes it exactly with its code, as returned by the build.
+- Each condition has at least one **test case** (sheet Test Cases) with the persona, the screen (menu path), the preconditions and data set, numbered steps and the expected result. Where BIBS shows a message, the expected result quotes it exactly with its code, as the system shows it.
 - Every FR has at least one **positive** case (the action succeeds) and one **negative** case (BIBS refuses the action). Boundary cases test the values at and next to a limit (the back-dated window, the poster's authorisation limit, the numbering width, the reverse-on date).
 - **Scenarios** (sheet Scenarios) group the cases into business threads by persona, so a tester can follow the month end from the broking cut-off to the GL close in one sitting.
 - The **roles-and-access** sheet lists, for each action, the roles that must be allowed and the roles that must be refused. It is run with one user per role.
@@ -117,7 +114,7 @@ Automated tests do not replace the system test. They show that a rule holds afte
 
 ## Reading the workbook
 
-The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Test Data, Roles and Access and FRS Findings. Case IDs carry their condition: TC-AC-036.3-01 is the first case of condition 3 of FR-AC-036. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Defect ID.
+The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Test Data, Roles and Access. Case IDs carry their condition: TC-AC-036.3-01 is the first case of condition 3 of FR-AC-036. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Issue ID.
 
 Month-end and year-end cases depend on the date. The test lead sets the SIT clock or runs the jobs (GL_PERIOD_CLOSE, BROKING_BOOKS_CLOSE, JOURNAL_AUTO_REVERSAL, the alert job) on demand from Scheduled Jobs, as the preconditions describe.
 
@@ -128,8 +125,8 @@ Month-end and year-end cases depend on the date. The test lead sets the SIT cloc
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | The build is deployed on SIT with the seed profile (seeds V900 to V999 and the seed runners of Operations, Disbursement and FRBS); CI is green on the deployed commit; the periods of the current year are open; this plan is reviewed by the iorta TechNXT project manager. |
-| Persona end-to-end | All High-priority system test cases are run; no open Critical defect; the Disbursement steps of the service-fee scenario pass in the Volume 2 plan. |
+| System test | BIBS is deployed on SIT with the seed data; the periods of the current year are open; this plan is reviewed by the iorta TechNXT project manager. |
+| Persona end-to-end | All High-priority system test cases are run; no open Critical issue; the Disbursement steps of the service-fee scenario pass in the Volume 2 plan. |
 | UAT | FRS BRD-5 Volume 1 v1.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; BDOI's chart and rules are loaded, or BDOI accepts the seed chart for UAT (AQ01, AQ02). |
 
 ## Exit criteria
@@ -137,11 +134,11 @@ Month-end and year-end cases depend on the date. The test lead sets the SIT cloc
 <!-- table: widths=2.4,11 caption="Exit criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | 100 % of cases run; 100 % of High-priority cases passed; no open Critical or High defect; open Medium and Low defects have an agreed fix date. |
+| System test | 100 % of cases run; 100 % of High-priority cases passed; no open Critical or High issue; open Medium and Low issues have an agreed fix date. |
 | Persona end-to-end | All nine scenarios passed end to end; the trial balance is balanced after the month-end and year-end scenarios. |
-| UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High defect; open defects listed with an agreed plan in the UAT sign-off; the sign-off of section 10 is signed. |
+| UAT | All scenarios and High-priority cases passed or accepted by the BDOI process owner; no open Critical or High issue; open issues listed with an agreed plan in the UAT sign-off; the sign-off of section 9 is signed. |
 
-**Suspension.** Testing of a scenario stops when a Critical defect blocks it, when a period is closed by mistake and cannot be reopened, when the environment is down for more than half a day, or when the seed or UAT data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
+**Suspension.** Testing of a scenario stops when a Critical issue blocks it, when a period is closed by mistake and cannot be reopened, when the environment is down for more than half a day, or when the seed or UAT data is corrupted. It resumes after the fix is deployed and the blocked cases are re-run from their first step.
 
 # Environments and test data
 
@@ -150,7 +147,6 @@ Month-end and year-end cases depend on the date. The test lead sets the SIT cloc
 <!-- table: widths=2.6,6.4,5.4 caption="Test environments" -->
 | Environment | Use | Data |
 |---|---|---|
-| CI | Automated unit and integration tests on every change | Created by each test; PostgreSQL in a container |
 | SIT | System test and persona end-to-end runs by iorta TechNXT QA | Seed profile migrations and runners (chart, rules, bookings, Operations, Disbursement, FRBS); SIT clock adjustable by the test lead |
 | UAT | Acceptance by BDOI testers | Masked copy of production-like balances plus the seed data; no real client, supplier or employee names, TINs, bank account numbers or e-mail addresses |
 
@@ -169,22 +165,22 @@ Month-end cases close periods of the SIT company. The test lead runs them on a c
 <!-- table: widths=4,5.4,5 caption="Test roles" -->
 | Role | Organisation | Responsibilities |
 |---|---|---|
-| Test lead | iorta TechNXT QA | Owns this plan and the workbook; prepares environments, data and the SIT clock; runs the daily defect triage; reports progress |
-| System testers | iorta TechNXT QA | Run the system test and the persona end-to-end scenarios; raise defects with evidence |
-| Developers | iorta TechNXT | Keep the automated tests green; fix defects; support triage |
-| BDOI department testers | BDOI FRBS, Business and System Administration | Run the UAT scenarios of their department; confirm the expected results match the business and accounting rules; raise defects |
-| BDOI process owner | BDOI Comptrollership Head | Decides on disputed expected results and accepted defects; signs off UAT |
+| Test lead | iorta TechNXT QA | Owns this plan and the workbook; prepares environments, data and the SIT clock; runs the daily issue triage; reports progress |
+| System testers | iorta TechNXT QA | Run the system test and the persona end-to-end scenarios; raise issues with evidence |
+| Developers | iorta TechNXT | Resolve issues; support triage |
+| BDOI department testers | BDOI FRBS, Business and System Administration | Run the UAT scenarios of their department; confirm the expected results match the business and accounting rules; raise issues |
+| BDOI process owner | BDOI Comptrollership Head | Decides on disputed expected results and accepted issues; signs off UAT |
 | UAT coordinator | Business Project Services, BDO Unibank ESG | Plans the UAT sessions; checks traceability to the BRD |
 
 The GL Officers test the entries, reconciliation, service fee and reports (SC-AC-03, 04, 06, 07, 08); the GL Team Lead and Section Head the chart, rates, closing and approvals (SC-AC-02, 05); the Business and System Administrators and the access approvers the administration requests (SC-AC-01, 09). The personas and SIT/UAT users are:
 
 <!-- tp:personas -->
 
-# Defect management
+# Issue management
 
 ## Severity
 
-<!-- table: widths=2.2,8.4,5 caption="Defect severity" -->
+<!-- table: widths=2.2,8.4,5 caption="Issue severity" -->
 | Severity | Definition | Example in Accounting |
 |---|---|---|
 | Critical | A main flow cannot be completed, the ledger is wrong or unbalanced, or a security rule is broken | An unbalanced journal posts; a submitter posts the own journal; a closed period accepts a posting |
@@ -194,10 +190,10 @@ The GL Officers test the entries, reconciliation, service fee and reports (SC-AC
 
 ## Triage and fixing
 
-- Testers raise a defect for each failed case, with the case ID, steps, actual result, screenshot and the journal, run, period or request number.
-- The test lead triages new defects daily with the development lead and, during UAT, the BDOI process owner. Triage confirms the severity, links duplicates and decides whether the FRS or the build is wrong. A disputed expected result goes to the BDOI process owner; an FRS change goes to the FRS owner (see section 9).
+- Testers raise an issue for each failed case, with the case ID, steps, actual result, screenshot and the journal, run, period or request number.
+- The test lead triages new issues daily with the development lead and, during UAT, the BDOI process owner. Triage confirms the severity, links duplicates and decides whether the FRS or the system needs the correction. A disputed expected result goes to the BDOI process owner; an FRS change goes to the FRS owner, who records it in the clarifications chapter of the FRS.
 - Target fix times on the test environments: Critical within 1 working day, High within 3 working days, Medium within the cycle, Low by agreement.
-- A fixed defect is retested with its case and the cases of the same condition; the automated tests of the FR must also pass.
+- A resolved issue is retested with its case and the cases of the same condition.
 
 # Coverage summary
 
@@ -205,7 +201,7 @@ The GL Officers test the entries, reconciliation, service fee and reports (SC-AC
 
 <!-- tp:counts -->
 
-Every FR has at least one positive and one negative case, and every BRD reference is covered. The builder of the workbook checks this each time the plan is built and refuses to produce a plan with a gap.
+Every FR has at least one positive and one negative case, and every BRD reference is covered. The coverage is checked each time the workbook is issued, and a plan with a gap is not issued.
 
 ## Coverage by FR
 
@@ -227,29 +223,17 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 
 <!-- pagebreak -->
 
-## Automated tests referenced
-
-Cases with an automation reference are covered by these existing tests, which run in CI on every change:
-
-<!-- tp:automation -->
-
 # Risks
 
 <!-- table: widths=5.4,2,7.2 caption="Test risks and mitigations" -->
 | Risk | Impact | Mitigation |
 |---|---|---|
-| BDOI's chart, posting rules and report layouts are not loaded before UAT (AQ01, AQ02, AQ05) | High | The cases run on the seed chart; the report and posting cases are re-run on BDOI's data once loaded, without a new build |
+| BDOI's chart, posting rules and report layouts are not loaded before UAT (AQ01, AQ02, AQ05) | High | The cases run on the seed chart; the report and posting cases are re-run on BDOI's data once loaded, without a change to the system |
 | Closing a period or a fiscal year on SIT cannot be undone | High | Month-end and year-end cases run on a copy of the seed company or after a reload of the seed profile |
 | Date-driven cases (close schedule, cut-off at 23:00, reverse-on date, year-end deadline) need the clock | Medium | The test lead sets the SIT clock and runs the jobs on demand |
-| The service-fee payout depends on Disbursement (Volume 2) | Medium | The payout steps are run by the Disbursement testers as preconditions; a defect there is triaged with the Volume 2 plan |
+| The service-fee payout depends on Disbursement (Volume 2) | Medium | The payout steps are run by the Disbursement testers as preconditions; an issue there is triaged with the Volume 2 plan |
 | BDOI answers to open questions change expected results (role matrix AQ28, service-fee rates AQ20, cost-centre rules AQ26, negative-balance accounts AQ30) | Medium | The values are configuration; the affected cases name the rule or parameter and are re-run after the change |
 | BDOI testers are not available in the UAT window | High | Agree named testers per department and dates in the UAT plan (deliverable 30) before UAT starts |
-
-# FRS findings
-
-Writing the cases showed the points below, where the FRS is ambiguous, cannot be tested as written, or differs from the build. The cases use the built behaviour; the FRS owner decides the correction for FRS v1.1.
-
-<!-- tp:findings -->
 
 <!-- pagebreak -->
 

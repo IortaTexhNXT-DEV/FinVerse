@@ -14,6 +14,7 @@ import { formatDateTime, humanize, statusPhrase } from '@/utils/format';
 import { cashieringApi } from './cashieringApi';
 import type { ReceiptAction } from './cashieringApi';
 import { UserName } from '@/components/ui/UserName';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const OPEN_STAGES = ['REQUESTED', 'FOR_APPROVAL'];
 
@@ -76,9 +77,16 @@ export function ReceiptActionsTab({ companyId }: Readonly<{ companyId: number }>
             Open Receipt
           </Button>
           {a.stage === 'FOR_APPROVAL' && can('CASH_APPROVE') && (
-            <Button size="sm" onClick={() => act.mutate(() => cashieringApi.approveAction(a.id))}>
+            <ConfirmButton
+              size="sm"
+              confirm={{
+                title: 'Approve Receipt Action',
+                effect: 'The requested action is applied to the receipt.',
+              }}
+              onConfirm={() => act.mutateAsync(() => cashieringApi.approveAction(a.id))}
+            >
               Approve
-            </Button>
+            </ConfirmButton>
           )}
           {a.stage === 'REQUESTED' && (
             <Button

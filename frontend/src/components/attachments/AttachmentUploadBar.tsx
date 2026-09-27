@@ -6,6 +6,7 @@ import type { UploadOptions } from '@/api/attachments';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Button } from '@/components/ui/Button';
 import { formatBytes, screenFiles } from '@/utils/files';
+import { Notice } from '@/components/ui/Notice';
 
 const DEFAULT_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg', 'xlsx', 'csv', 'docx'];
 const DEFAULT_MAX_BYTES = 10 * 1024 * 1024;
@@ -155,9 +156,9 @@ export function AttachmentUploadBar({
         </span>
       </div>
       {problem !== undefined && (
-        <div className="alert warning" role="alert">
+        <Notice tone="warning" role="alert">
           {problem}
-        </div>
+        </Notice>
       )}
     </>
   );

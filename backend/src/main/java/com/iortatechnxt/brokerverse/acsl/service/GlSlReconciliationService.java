@@ -131,7 +131,11 @@ public class GlSlReconciliationService {
               queries.openItems(run.getCompanyId(), setting.documentTypeList(), run.getAsOf());
           case OPS_LEDGER ->
               queries.opsLedger(
-                  run.getCompanyId(), setting.componentList(), setting.getCurrency(), account);
+                  run.getCompanyId(),
+                  setting.componentList(),
+                  setting.getCurrency(),
+                  setting.getLedgerContext(),
+                  account);
           default -> queries.partyLedger(run.getCompanyId(), account.id(), run.getAsOf());
         };
     return new GlSlRecon(run.getId(), account.code(), account.name(), source, gl, sl);

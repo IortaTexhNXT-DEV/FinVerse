@@ -1,9 +1,7 @@
 # Test plan BRD-9 Customer Servicing Facility - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-09_Customer_Servicing_Facility/brd09_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# BRD-9 is designed, not built: the expected results quote the message text of the FRS and the build
-# design (docs/architecture/CUSTOMER_SERVICING_DESIGN.md) without codes, and no case names an automated
-# test. Screen paths follow section 10 of the build design (section Customer Service Facility).
+# The expected results quote the message text of the FRS; screen paths follow the CSF screens of the FRS.
 
 meta:
   brd: BRD-09
@@ -13,7 +11,7 @@ meta:
   summary: TP_BRD09_CUSTOMER_SERVICING_FACILITY.md
   version: "1.0"
   date: 25 September 2026
-  built: false
+  verify_messages: false
 
 personas:
   CSF_AGENT: {name: BDO Insure Contact Center Agent, short: Agent}
@@ -45,17 +43,17 @@ screens:
   NOTIF: Notifications (bell icon in the page header)
   MAIL: Test mailbox of the recipient
   DB: Database restore environment (infrastructure console)
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-CSF-01
     name: Test users per role
-    content: One user per role - agent1 and agent2 (CSF_AGENT), sup1 (CSF_SUPERVISOR), mgmt1 (CSF_MANAGEMENT), the System Administrator, ao (MKT_AO, no CSF role). The build design plans the SIT/UAT users csfagent, csfagent2, csfsup and csfmgmt for the same roles.
-    source: Created by the test lead through User Access requests on SIT; planned seed V1940 of the build design
+    content: One user per role - agent1 and agent2 (CSF_AGENT), sup1 (CSF_SUPERVISOR), mgmt1 (CSF_MANAGEMENT), the System Administrator, ao (MKT_AO, no CSF role). The seed data adds the SIT/UAT users csfagent, csfagent2, csfsup and csfmgmt for the same roles.
+    source: Created by the test lead through User Access requests on SIT, or the seed users
   - id: TD-CSF-02
     name: Client with CBG and non-CBG accounts
     content: Masked client "UAT CSF Client One" with a CBG Motor account booked and in force (policy number, PN number, receipts paid) and a non-CBG Property account awaiting payment; registered e-mail and mobile point to the test mailbox and test phone.
-    source: Prepared by the test lead on SIT from masked seed clients (V981) and accounts keyed in the BRD-1 screens
+    source: Prepared by the test lead on SIT from masked seed clients and accounts keyed in the BRD-1 screens
   - id: TD-CSF-03
     name: Accounts in each CSF status
     content: "Accounts of one client in stage DRAFT, SUBMITTED, AWAITING_PAYMENT, BOOKED with premium outstanding, BOOKED and paid in force, CANCELLED, and BOOKED with the policy period ended."
@@ -81,9 +79,9 @@ data:
     content: A quotation PDF, a claims report (CLAIM_REPORT) of a claim of TD-CSF-02, an invoice document, and a document of a type that the access classes do not open to the CSF roles.
     source: Attached on SIT by the test lead through the owning modules
   - id: TD-CSF-09
-    name: Parameters as delivered
+    name: Parameters as configured
     content: "LOGIN_MAX_FAILED_ATTEMPTS 3; CSF_SEARCH_MIN_CHARS 3; CSF_SEARCH_MAX_RESULTS 50; CSF_PAYMENT_HISTORY_MONTHS 12; CSF_VERIFY_MIN_MATCHES 2; CSF_VERIFICATION_VALID_MINUTES 30; CSF_VERIFY_MAX_FAILS 3; CSF_LEGACY_SYNC_ENABLED false."
-    source: Configuration delivered with the build (FRS section 9.1)
+    source: Configuration of the SIT environment (FRS section 9.1)
   - id: TD-CSF-10
     name: Test mailboxes
     content: Registered e-mail of each test client and the other address used by the supervisor point to test mailboxes of the test lead; no real client address.
@@ -190,7 +188,7 @@ frs:
         steps:
           - Log in as ao.
           - Open the side menu.
-          - Type the address /csf in the browser.
+          - Open the address of the Customer Service Facility directly in the browser.
         expected: The menu has no Customer Service Facility section; the direct address shows the no-access page and no client data loads.
       - c: 5
         type: Positive
@@ -209,7 +207,7 @@ frs:
     data: [TD-CSF-01, TD-CSF-02]
     conditions:
       - Each CSF role sees only the screens and actions its permissions allow.
-      - A direct call without the permission is refused and the refusal is logged.
+      - A direct request without the permission is refused and the refusal is logged.
       - CSF role grants change only through an approved User Access request.
     cases:
       - c: 1
@@ -234,22 +232,22 @@ frs:
         type: Security-access
         persona: CSF_AGENT
         screen: API
-        title: Agent calls the resend to another address directly
+        title: Agent sends a resend to another address directly
         steps:
-          - Log in as agent1 and take the token.
+          - Sign in as agent1.
           - Call the resend of an RA of TD-CSF-06 with a recipient other than the registered e-mail.
           - Log in as the System Administrator and open Administration > Audit Trail.
-        expected: The call returns HTTP 403 and nothing is sent. The audit trail shows the refused call with user, endpoint and time.
+        expected: The request is refused and nothing is sent. The audit trail shows the refused request with the user and time.
         msg: [You are not permitted to perform this action]
         data: [TD-CSF-06]
       - c: 2
         type: Security-access
         screen: API
-        title: Management calls the contact update directly
+        title: Management sends a contact update directly
         steps:
-          - Log in as mgmt1 and take the token.
+          - Sign in as mgmt1.
           - Call the contact update of TD-CSF-02 with a new mobile number.
-        expected: The call returns HTTP 403; the client's mobile number is unchanged.
+        expected: The request is refused; the client's mobile number is unchanged.
         msg: [You are not permitted to perform this action]
       - c: 3
         type: Workflow
@@ -403,7 +401,7 @@ frs:
       - c: 2
         type: Negative
         title: A source module does not answer
-        pre: The test lead stops the invoice ledger service on SIT for the test (or blocks its query endpoint).
+        pre: The test lead makes the invoice ledger unavailable on SIT for the test.
         steps:
           - Open the Payments tab.
           - Open the Accounts and Documents tabs.
@@ -422,7 +420,7 @@ frs:
         title: The agent has no link to the full client page
         steps:
           - As agent1, open the Servicing View of TD-CSF-02 and look for Open client page.
-          - Type the client page address /crm/clients/{id}.
+          - Type the address of the full client page of the client.
         expected: The link is not shown; the direct address shows the no-access page.
       - c: 5
         type: Positive
@@ -442,7 +440,7 @@ frs:
     conditions:
       - An account awaiting payment shows the CSF status Awaiting next to the BIBS stage AWAITING_PAYMENT.
       - Draft and submitted accounts show Pending; a booked account with premium outstanding shows Booked; a booked account in force shows Open; a cancelled account or an ended policy period shows Closed.
-      - A change to the mapping list changes the displayed status without a new build, and the change is audited.
+      - A change to the mapping list changes the displayed status without a change to the system, and the change is audited.
       - Only the list maintainers can change the mapping.
     cases:
       - c: 1
@@ -472,7 +470,7 @@ frs:
           - Open Broking Setup > Lists of Values, CSF_STATUS_MAP; change the row of RETURNED_TO_MARKETING from Pending to Awaiting; have a second user approve it.
           - As agent1, reopen the Accounts tab of an account in RETURNED_TO_MARKETING.
           - Open Administration > Audit Trail for the list.
-        expected: The account shows Awaiting without a new build; the audit trail shows the row change with old and new value and the user.
+        expected: The account shows Awaiting without a change to the system; the audit trail shows the row change with old and new value and the user.
       - c: 4
         type: Security-access
         screen: LOV
@@ -651,7 +649,7 @@ frs:
         title: Contact change without a verification
         pre: No verification of UAT CSF Client Two today.
         steps:
-          - Call the contact update of UAT CSF Client Two with a new mobile number using agent1's token.
+          - Call the contact update of UAT CSF Client Two with a new mobile number signed in as agent1.
         expected: The change is refused and nothing is saved.
         msg: [Verify the caller before changing the contact details]
       - c: 3
@@ -749,17 +747,17 @@ frs:
         persona: SYSADMIN
         screen: JOBS
         title: Sync enabled against the test interface sends the queued rows
-        pre: A test stub of the QPS / EBIX interface is available on SIT (only after BDOI specifies it, CSQ01); CSF_LEGACY_SYNC_ENABLED set to true.
+        pre: A test interface of QPS / EBIX is available on SIT (only after BDOI specifies it, CSQ01); CSF_LEGACY_SYNC_ENABLED set to true.
         steps:
           - Make a contact change as agent1.
           - Run CSF_LEGACY_SYNC; open the Contact History.
-        expected: The change moves from Queued to Sent for QPS and EBIX; the stub received the payload.
+        expected: The change moves from Queued to Sent for QPS and EBIX; the test interface received the change.
       - c: 3
         type: Negative
         persona: SYSADMIN
         screen: NOTIF
         title: A failed sending is retried, set FAILED and alerted
-        pre: As the case before; the stub is stopped.
+        pre: As the case before; the test interface is stopped.
         steps:
           - Make a contact change; run CSF_LEGACY_SYNC until the retries are used up.
           - Open the bell and the Contact History.
@@ -861,7 +859,7 @@ frs:
     data: [TD-CSF-06, TD-CSF-10]
     conditions:
       - The agent resends the confirmed e-policy to the registered e-mail; it arrives protected with the password separately and appears in the e-policy dispatch report and the activity log.
-      - An account without a confirmed e-policy offers no resend, and a direct call is refused.
+      - An account without a confirmed e-policy offers no resend, and a direct request is refused.
       - The agent resends without holding EPOLICY_SEND and cannot use the Issuance send screen.
     cases:
       - c: 1
@@ -880,10 +878,10 @@ frs:
       - c: 2
         type: Negative
         screen: API
-        title: Direct resend call for an account without a confirmed e-policy
+        title: Direct resend request for an account without a confirmed e-policy
         steps:
-          - Call the e-policy resend of that account with agent1's token.
-        expected: The call is refused and nothing is sent.
+          - Call the e-policy resend of that account signed in as agent1.
+        expected: The request is refused and nothing is sent.
         msg: [The account has no confirmed e-policy]
       - c: 3
         type: Security-access
@@ -980,8 +978,8 @@ frs:
         title: Management cannot upload
         steps:
           - As mgmt1 open the Documents tab of TD-CSF-02.
-          - Call the attachment upload for the client with mgmt1's token.
-        expected: No Upload button; the call returns HTTP 403.
+          - Call the attachment upload for the client signed in as mgmt1.
+        expected: No Upload button; the request is refused.
         msg: [You are not permitted to perform this action]
 
   FR-CSF-033:
@@ -1020,8 +1018,8 @@ frs:
         title: A restricted document type is not listed
         steps:
           - Look for the restricted document of TD-CSF-08 on the Documents tab.
-          - Call the attachment download of that document with agent1's token.
-        expected: The document is not listed; the call returns HTTP 403.
+          - Call the attachment download of that document signed in as agent1.
+        expected: The document is not listed; the request is refused.
         msg: [You are not permitted to perform this action]
       - c: 4
         type: Negative
@@ -1068,8 +1066,8 @@ frs:
         title: Audit rows cannot be changed or deleted
         steps:
           - As the System Administrator open an audit row; look for edit and delete actions.
-          - Try an update and a delete of the row through the API.
-        expected: No edit or delete action is offered; the API has no update or delete of audit rows and the calls are refused.
+          - Try an update and a delete of the row by a direct request.
+        expected: No edit or delete action is offered; audit rows cannot be updated or deleted and direct requests are refused.
 
   FR-CSF-041:
     scenario: SC-CSF-07
@@ -1110,8 +1108,8 @@ frs:
         title: The agent cannot run the audit trail or the CSF reports
         steps:
           - As agent1 open Reports and Administration.
-          - Call the run of CSF-CONTACT-CHANGES with agent1's token.
-        expected: The Customer Service category and the Audit Trail are not offered; the call returns HTTP 403.
+          - Call the run of CSF-CONTACT-CHANGES signed in as agent1.
+        expected: The Customer Service category and the Audit Trail are not offered; the request is refused.
         msg: [You are not permitted to perform this action]
       - c: 5
         type: Positive
@@ -1156,8 +1154,8 @@ frs:
         title: No setting switches the activity log off
         steps:
           - Search System Parameters and Scheduled Jobs for a CSF activity log setting.
-          - Try an update and a delete of an activity row through the API.
-        expected: No parameter or job disables the log; the API offers no update or delete and the calls are refused.
+          - Try an update and a delete of an activity row by a direct request.
+        expected: No parameter or job disables the log; no update or delete is offered and direct requests are refused.
       - c: 4
         type: Negative
         title: End date before start date
@@ -1170,8 +1168,8 @@ frs:
         persona: CSF_AGENT
         title: The agent cannot run the Agent Activity report
         steps:
-          - As agent1 call the run of CSF-ACTIVITY.
-        expected: The call returns HTTP 403.
+          - As agent1 send a direct request to run CSF-ACTIVITY.
+        expected: The request is refused.
         msg: [You are not permitted to perform this action]
 
   FR-CSF-043:
@@ -1188,9 +1186,9 @@ frs:
         type: Positive
         title: Archive interval and base backup schedule
         steps:
-          - Read the database setting archive_timeout and the backup schedule.
+          - Read the archive interval of the database and the backup schedule.
           - List the archived log segments of the last two hours.
-        expected: archive_timeout is 15 minutes or less; at least one segment is archived in every 15-minute window; the daily base backup runs outside 10:00-12:00 and 14:00-16:00.
+        expected: The archive interval is 15 minutes or less; at least one segment is archived in every 15-minute window; the daily base backup runs outside 10:00-12:00 and 14:00-16:00.
       - c: 2
         type: Positive
         title: Restore to a point less than 15 minutes before the test
@@ -1221,85 +1219,53 @@ access:
     allow: [CSF_AGENT, CSF_SUPERVISOR, CSF_MANAGEMENT]
     deny: [SYSADMIN, MKT_AO]
     allowed: The Customer Search is the landing page and clients open in the Servicing View.
-    denied: Customer Service Facility is not in the menu; /csf shows the no-access page.
+    denied: Customer Service Facility is not in the menu; its address shows the no-access page.
   - action: Verify the caller and change contact details
     screen: UPDATE
     permission: CSF_CONTACT_UPDATE
     allow: [CSF_AGENT, CSF_SUPERVISOR]
     deny: [CSF_MANAGEMENT, SYSADMIN]
-    denied: Update Contact is not shown; the contact update call returns HTTP 403.
+    denied: Update Contact is not shown; a direct contact update request is refused.
   - action: Resend the RA or e-policy to the registered e-mail
     screen: RESEND
     permission: CSF_RESEND
     allow: [CSF_AGENT, CSF_SUPERVISOR]
     deny: [CSF_MANAGEMENT]
-    denied: Resend is not shown; the resend call returns HTTP 403.
+    denied: Resend is not shown; a direct resend request is refused.
   - action: Resend to another address with a reason
     screen: RESEND
     permission: CSF_RESEND_OTHER
     allow: [CSF_SUPERVISOR]
     deny: [CSF_AGENT, CSF_MANAGEMENT]
     allowed: The recipient field is editable and the reason is asked.
-    denied: The recipient is read only; a call with another recipient returns HTTP 403.
+    denied: The recipient is read only; a direct request with another recipient is refused.
   - action: Upload documents from the Servicing View
     screen: DOCS
     permission: CSF_DOCUMENT_UPLOAD
     allow: [CSF_AGENT, CSF_SUPERVISOR]
     deny: [CSF_MANAGEMENT]
-    denied: Upload is not shown; the upload call returns HTTP 403.
+    denied: Upload is not shown; a direct upload request is refused.
   - action: Open and download documents
     screen: DOCS
     permission: ATTACHMENT_VIEW
     allow: [CSF_AGENT, CSF_SUPERVISOR]
     deny: [CSF_MANAGEMENT]
-    denied: Documents cannot be opened or downloaded; the download call returns HTTP 403.
+    denied: Documents cannot be opened or downloaded; a direct download request is refused.
   - action: Run the Contact Changes and Agent Activity reports
     screen: REPORTS
     permission: CSF_REPORT_VIEW
     allow: [CSF_SUPERVISOR, CSF_MANAGEMENT]
     deny: [CSF_AGENT, SYSADMIN]
-    denied: The Customer Service category is not listed; the run call returns HTTP 403.
+    denied: The Customer Service category is not listed; a direct run request is refused.
   - action: Run the Audit Trail report (CTL-AUDIT)
     screen: AUDIT
     permission: AUDIT_VIEW
     allow: [CSF_MANAGEMENT, SYSADMIN]
     deny: [CSF_AGENT, CSF_SUPERVISOR]
-    denied: Audit Trail is not in the menu; the run call returns HTTP 403.
+    denied: Audit Trail is not in the menu; a direct run request is refused.
   - action: Maintain users and roles
     screen: USERS
     permission: USER_MANAGE, ROLE_MANAGE
     allow: [SYSADMIN]
     deny: [CSF_AGENT, CSF_SUPERVISOR, CSF_MANAGEMENT]
-    denied: Administration > Users is not in the menu; the call returns HTTP 403.
-
-findings:
-  - fr: FR-CSF-001
-    issue: The FRS messages "Invalid user ID or password" and "Your account is locked. Contact the System Administrator" differ from the platform log-in that BRD-9 reuses (fit FIT), which shows "Invalid user name or password" and "Account is locked. Contact your administrator." Acceptance criterion 3 repeats FR-CSF-002.
-    proposal: Quote the platform texts in FRS v1.1, as FRS BRD-11 FR-UA-001 does; the cases use the platform texts. Keep criterion 3 in FR-CSF-002 only.
-  - fr: FR-CSF-010
-    issue: 'The response target "within 3 seconds (p.13)" gives no load: number of clients and accounts, concurrent agents. The FRS does not say whether a name search matches the start of the name, any word, or ignores accents and case.'
-    proposal: 'State the measurement load (24 concurrent users, the year-5 volume of section 8) and the name-matching rule; the cases time searches in the peak window on SIT data.'
-  - fr: FR-CSF-012
-    issue: The mapping list CSF_STATUS_MAP has no rule for an account stage that no row matches, or for two rows that match the same account. A cancelled account with premium outstanding could match Booked and Closed.
-    proposal: State that the first row by order wins and that an unmatched stage shows a fixed value (for example "Other") with an alert to the list owner.
-  - fr: FR-CSF-020
-    issue: 'The checks are Yes / No, so a check the agent did not ask cannot be recorded; "Record the result of the verification checks" does not say whether all four or only one must be answered. Whether a verification is also needed before a resend is open (CSQ03), and it is not stated whether a PASSED verification belongs to the agent or to any agent of the client.'
-    proposal: Add a value "Not asked", state how many checks must be answered, and tie the verification to the agent and client. The cases assume all four are answered and the verification is per agent.
-  - fr: FR-CSF-021
-    issue: '"Add" contact details depends on CSQ15 and cannot be tested; "Philippine mobile format" is not defined (09xxxxxxxxx, +639xxxxxxxxx or both); the phone rule "digits and separators" has no length.'
-    proposal: Define the accepted mobile and phone formats with examples and remove "add" until CSQ15 is answered; the cases use 12345 as an invalid mobile only.
-  - fr: FR-CSF-022
-    issue: Acceptance covers only the disabled sync. The sending, the number and interval of retries and the FAILED state cannot be tested until the interface is specified (CSQ01).
-    proposal: Give the retry count and interval as parameters; TC-CSF-022.3-01 and 3-02 stay Blocked until a test stub of the interface exists.
-  - fr: FR-CSF-030
-    issue: The RA password convention (CSQ06) is open, so the cases can check only that the file needs a password and that the password arrives separately, not its value.
-    proposal: Add the password rule to FR-CSF-030 when CSQ06 is answered; the cases are then extended with the expected password.
-  - fr: FR-CSF-032
-    issue: 'The maximum file size (CSQ08) is not given, so the "too large" boundary cannot be set; the 5-second upload target has no file size.'
-    proposal: State the size limit and the file size for the 5-second target; until then the test uses the platform limit and a 2 MB file.
-  - fr: FR-CSF-033
-    issue: The permissions matrix gives CSF_MANAGEMENT the Servicing View (CSF_VIEW) but not ATTACHMENT_VIEW. The FRS does not say whether management sees the Documents, Renewal Advice and E-policies tabs as a list without download, or not at all.
-    proposal: State the behaviour for management in section 3.3; the access checks assume the lists are shown and opening a document is refused.
-  - fr: FR-CSF-043
-    issue: The requirement is an infrastructure control and has no screen; the BRD's 4-hour RPO and backup (retention table) conflict with the 15-minute backup (CSQ11).
-    proposal: Keep FR-CSF-043 for the infrastructure team's evidence (restore test log) and record the CSQ11 answer; the cases are run by the infrastructure team and witnessed by QA.
+    denied: Administration > Users is not in the menu; the request is refused.

@@ -12,7 +12,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { formatDateTime, formatPeriod } from '@/utils/format';
 import { AssignDialog, TransferDialog } from '../common/ActionDialogs';
 import { CandidateList } from '../common/CandidateList';
 import { ExtractDialog } from '../common/MoreDialogs';
@@ -42,10 +42,7 @@ function RunsCard() {
           {
             key: 'range',
             header: 'Expiry range',
-            render: (r) =>
-              r.expiryFrom
-                ? `${formatDate(r.expiryFrom)} – ${formatDate(r.expiryTo)}`
-                : 'Daily run',
+            render: (r) => (r.expiryFrom ? formatPeriod(r.expiryFrom, r.expiryTo) : 'Daily run'),
           },
           { key: 'by', header: 'By', render: (r) => <UserName login={r.requestedBy} /> },
           { key: 'read', header: 'Read', kind: 'amount', render: (r) => r.counts.read },

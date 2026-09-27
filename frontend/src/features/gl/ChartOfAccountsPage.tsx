@@ -18,6 +18,7 @@ import { AccountForm } from './AccountForm';
 import { blankAccount, toRequest } from './accountModel';
 import { useGlLookups } from './useLookups';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const INDENT: Record<string, number> = { GROUP: 0, MAIN: 1, SUB: 2, MICRO: 3 };
 
@@ -148,30 +149,50 @@ export default function ChartOfAccountsPage() {
                   onKeyDown={(e) => e.stopPropagation()}
                 >
                   {awaitsOtherChecker(a, user?.username) && can('MASTER_AUTHORIZE') && (
-                    <Button
+                    <ConfirmButton
                       size="sm"
                       variant="secondary"
                       icon={<ShieldCheck size={14} />}
-                      onClick={() => act.mutate(() => glApi.authorizeAccount(a.id))}
+                      confirm={{
+                        title: `Authorize Account ${a.code}`,
+                        record: a.name,
+                        effect: 'The account becomes active and can be posted to.',
+                      }}
+                      onConfirm={() => act.mutateAsync(() => glApi.authorizeAccount(a.id))}
                     >
                       Authorize
-                    </Button>
+                    </ConfirmButton>
                   )}
                   {a.recordStatus === 'ACTIVE' && can('MASTER_AUTHORIZE') && (
-                    <Button
+                    <ConfirmButton
                       size="sm"
                       variant="ghost"
                       icon={<Snowflake size={14} />}
-                      onClick={() =>
-                        act.mutate(() =>
+                      confirm={
+                        a.frozen
+                          ? {
+                              title: `Unfreeze Account ${a.code}`,
+                              record: a.name,
+                              effect: 'Postings to the account are allowed again.',
+                            }
+                          : {
+                              title: `Freeze Account ${a.code}`,
+                              record: a.name,
+                              effect: 'Postings to the account are refused until it is unfrozen.',
+                              reason: 'required',
+                              destructive: true,
+                            }
+                      }
+                      onConfirm={(reason) =>
+                        act.mutateAsync(() =>
                           a.frozen
                             ? glApi.unfreezeAccount(a.id)
-                            : glApi.freezeAccount(a.id, 'Frozen by finance'),
+                            : glApi.freezeAccount(a.id, reason),
                         )
                       }
                     >
                       {a.frozen ? 'Unfreeze' : 'Freeze'}
-                    </Button>
+                    </ConfirmButton>
                   )}
                 </div>
               ),

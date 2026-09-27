@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.opsledger.service;
 
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.opsledger.domain.InvoiceFlag;
 import com.iortatechnxt.brokerverse.opsledger.domain.PaymentStatus;
 import com.iortatechnxt.brokerverse.opsledger.domain.RemittanceStatus;
@@ -23,6 +24,7 @@ import java.time.LocalDate;
  * @param inceptionFrom period starting on or after
  * @param inceptionTo period starting on or before
  * @param aoUsername account officer
+ * @param origin BIBS or MIGRATED (Data Migration origin filter), null for both
  */
 public record LedgerSearch(
     Long companyId,
@@ -39,7 +41,63 @@ public record LedgerSearch(
     String assured,
     LocalDate inceptionFrom,
     LocalDate inceptionTo,
-    String aoUsername) {
+    String aoUsername,
+    RecordOrigin.Origin origin) {
+
+  /**
+   * Criteria without the origin filter (earlier contract).
+   *
+   * @param companyId company (mandatory)
+   * @param text part of the invoice no., ARN, policy no., client code or assured name
+   * @param insurerCode lead insurer
+   * @param clientCode client
+   * @param paymentStatus payment status
+   * @param remittanceStatus remittance status
+   * @param flag flag that must be set
+   * @param locked true for locked invoices only, false for unlocked only
+   * @param directPayment true for direct payment invoices only, false to exclude them
+   * @param from booked on or after
+   * @param to booked on or before
+   * @param assured part of the assured name
+   * @param inceptionFrom period starting on or after
+   * @param inceptionTo period starting on or before
+   * @param aoUsername account officer
+   */
+  @SuppressWarnings("java:S107") // search criteria
+  public LedgerSearch(
+      Long companyId,
+      String text,
+      String insurerCode,
+      String clientCode,
+      PaymentStatus paymentStatus,
+      RemittanceStatus remittanceStatus,
+      InvoiceFlag flag,
+      Boolean locked,
+      Boolean directPayment,
+      LocalDate from,
+      LocalDate to,
+      String assured,
+      LocalDate inceptionFrom,
+      LocalDate inceptionTo,
+      String aoUsername) {
+    this(
+        companyId,
+        text,
+        insurerCode,
+        clientCode,
+        paymentStatus,
+        remittanceStatus,
+        flag,
+        locked,
+        directPayment,
+        from,
+        to,
+        assured,
+        inceptionFrom,
+        inceptionTo,
+        aoUsername,
+        null);
+  }
 
   /**
    * Criteria without the assured, inception and account officer filters (earlier contract).
@@ -81,6 +139,7 @@ public record LedgerSearch(
         directPayment,
         from,
         to,
+        null,
         null,
         null,
         null,

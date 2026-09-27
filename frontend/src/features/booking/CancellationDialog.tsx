@@ -13,6 +13,7 @@ import { formatAmount, today } from '@/utils/format';
 import { cancellationErrors, cancellationRequest, isValid, labelOf } from './bookingForm';
 import type { CancellationForm } from './bookingForm';
 import { DateInput } from '@/components/ui/DateInput';
+import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
 
 const KINDS: CancellationKind[] = ['FLAT', 'FLAT_RETAIN_DST', 'PARTIAL'];
 const BASES: PeriodBasis[] = ['PRO_RATA', 'SHORT_PERIOD'];
@@ -168,11 +169,15 @@ export function CancellationDialog({
         </Field>
         <ErrorAlert error={preview.error} />
         {returned && (
-          <div className="alert info" role="status">
-            Return premium <strong>{formatAmount(returned.premium.total)}</strong>, commission{' '}
-            <strong>{formatAmount(returned.commission.commission)}</strong> (policy year{' '}
-            {preview.data?.policyYear}).
-          </div>
+          <DefinitionGrid
+            label="Returned amounts"
+            columns={2}
+            items={[
+              { label: 'Return premium', value: formatAmount(returned.premium.total) },
+              { label: 'Commission', value: formatAmount(returned.commission.commission) },
+              { label: 'Policy year', value: preview.data?.policyYear },
+            ]}
+          />
         )}
       </div>
     </Modal>

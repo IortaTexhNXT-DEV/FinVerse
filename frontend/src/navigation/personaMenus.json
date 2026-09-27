@@ -3,10 +3,10 @@
   "suites": [
     {
       "id": "BRD-10/11",
-      "description": "Sanction Screening and User Access Maintenance (V1050, V1060, V1062, V1063)",
+      "description": "Sanction Screening and User Access Maintenance (V1050, V1060, V1062, V1063, V1065, V1130)",
       "sections": ["screening", "screening-setup", "user-access"],
       "sharedGroups": ["home", "client-policy", "reports"],
-      "sharedModules": ["help"],
+      "sharedModules": ["help", "admin"],
       "roles": {
         "COMPLIANCE_OFFICER": {
           "seedUser": "compoff",
@@ -158,6 +158,24 @@
           "seedUser": "secapprover",
           "permissions": ["UAM_SECOND_APPROVE", "UAM_VIEW"],
           "screens": ["/user-access/requests", "/user-access/group-profiles"]
+        },
+        "INFOSEC_OFFICER": {
+          "seedUser": "infosec",
+          "permissions": [
+            "AUDIT_VIEW",
+            "FILE_QUARANTINE_VIEW",
+            "REPORT_VIEW",
+            "SECURITY_PARAMETER_APPROVE",
+            "UAM_REPORT_VIEW",
+            "UAM_SOD_AUTHORIZE"
+          ],
+          "screens": [
+            "/user-access/requests",
+            "/user-access/group-profiles",
+            "/user-access/matrix",
+            "/user-access/sod-rules",
+            "/user-access/reports"
+          ]
         }
       }
     },
@@ -568,6 +586,153 @@
           "permissionScope": "RNW_",
           "permissions": ["RNW_FOLLOWUP", "RNW_VIEW"],
           "screens": ["/renewal", "/renewal/expiry", "/renewal/followups"]
+        }
+      }
+    },
+    {
+      "id": "BRD-13",
+      "description": "Data Migration and Legacy Inquiry (V1080-V1085; SIT/UAT users V1980)",
+      "sections": ["migration", "legacy-inquiry"],
+      "sharedGroups": ["home", "reports"],
+      "sharedModules": ["help"],
+      "roles": {
+        "DATA_MIGRATION_LEAD": {
+          "seedUser": "miglead",
+          "permissions": [
+            "ATTACHMENT_VIEW",
+            "MIG_CUTOVER_MANAGE",
+            "MIG_LOAD_APPROVE",
+            "MIG_OBJECT_MANAGE",
+            "MIG_ROLLBACK_REQUEST",
+            "MIG_SIGNOFF",
+            "MIG_VIEW",
+            "REPORT_VIEW"
+          ],
+          "screens": [
+            "/migration",
+            "/migration/objects",
+            "/migration/maps",
+            "/migration/layouts",
+            "/migration/batches",
+            "/migration/reconciliation",
+            "/migration/trueups",
+            "/migration/cutover",
+            "/migration/runoff",
+            "/migration/signoff"
+          ]
+        },
+        "DATA_STEWARD": {
+          "seedUser": "migsteward",
+          "permissions": [
+            "MIG_DQ_RESOLVE",
+            "MIG_MAPPING_EDIT",
+            "MIG_MATCH_DECIDE",
+            "MIG_VIEW",
+            "REPORT_VIEW"
+          ],
+          "screens": [
+            "/migration",
+            "/migration/objects",
+            "/migration/maps",
+            "/migration/layouts",
+            "/migration/batches",
+            "/migration/matching",
+            "/migration/reconciliation",
+            "/migration/trueups",
+            "/migration/cutover",
+            "/migration/runoff",
+            "/migration/signoff"
+          ]
+        },
+        "DATA_OWNER": {
+          "seedUser": "migowner",
+          "permissions": [
+            "ATTACHMENT_VIEW",
+            "MIG_DECISION_APPROVE",
+            "MIG_DQ_WAIVE",
+            "MIG_MAPPING_APPROVE",
+            "MIG_SIGNOFF",
+            "MIG_VIEW",
+            "REPORT_VIEW"
+          ],
+          "screens": [
+            "/migration",
+            "/migration/objects",
+            "/migration/maps",
+            "/migration/layouts",
+            "/migration/batches",
+            "/migration/reconciliation",
+            "/migration/trueups",
+            "/migration/cutover",
+            "/migration/runoff",
+            "/migration/signoff"
+          ]
+        },
+        "MIGRATION_OPERATOR": {
+          "seedUser": "migops",
+          "permissions": ["MIG_INTAKE", "MIG_LOAD_RUN", "MIG_VIEW", "REPORT_VIEW"],
+          "screens": [
+            "/migration",
+            "/migration/objects",
+            "/migration/maps",
+            "/migration/layouts",
+            "/migration/extracts",
+            "/migration/batches",
+            "/migration/reconciliation",
+            "/migration/trueups",
+            "/migration/cutover",
+            "/migration/runoff",
+            "/migration/signoff"
+          ]
+        },
+        "MIGRATION_RECON_APPROVER": {
+          "seedUser": "migrecon",
+          "permissions": [
+            "ATTACHMENT_VIEW",
+            "MIG_RECON_SIGNOFF",
+            "MIG_ROLLBACK_APPROVE",
+            "MIG_TRUEUP_APPROVE",
+            "MIG_VIEW",
+            "REPORT_VIEW"
+          ],
+          "screens": [
+            "/migration",
+            "/migration/objects",
+            "/migration/maps",
+            "/migration/layouts",
+            "/migration/batches",
+            "/migration/reconciliation",
+            "/migration/trueups",
+            "/migration/cutover",
+            "/migration/runoff",
+            "/migration/signoff"
+          ]
+        },
+        "MIGRATION_GONOGO": {
+          "seedUser": "miggonogo",
+          "permissions": ["MIG_GONOGO_DECIDE", "MIG_VIEW", "REPORT_VIEW"],
+          "screens": [
+            "/migration",
+            "/migration/objects",
+            "/migration/maps",
+            "/migration/layouts",
+            "/migration/batches",
+            "/migration/reconciliation",
+            "/migration/trueups",
+            "/migration/cutover",
+            "/migration/runoff",
+            "/migration/signoff"
+          ]
+        },
+        "LEGACY_INQUIRY": {
+          "seedUser": "legacyaudit",
+          "permissions": ["ATTACHMENT_VIEW", "LEGACY_INQUIRY_EXPORT", "LEGACY_INQUIRY_VIEW"],
+          "screens": ["/legacy-inquiry"]
+        },
+        "LEGACY_ACCESS_REVIEWER": {
+          "seedUser": "legacyrev",
+          "permissions": ["LEGACY_ACCESS_LOG_VIEW", "REPORT_VIEW"],
+          "screens": ["/legacy-inquiry/access-log"]
         }
       }
     },

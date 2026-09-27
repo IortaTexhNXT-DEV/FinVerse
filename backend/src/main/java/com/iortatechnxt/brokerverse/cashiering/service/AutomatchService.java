@@ -27,6 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
  * Automatic matching of unapplied payments (CSHID.008 item 3, {@code PAYMENT_AUTOMATCH}): payments
  * that found no booked invoice at acceptance are matched again with their references; when the
  * invoice is booked now, the unapplied balance is applied and a fully used item is closed.
+ * Unapplied payments carried from legacy are matched with their legacy references, against legacy
+ * and new invoices alike.
  */
 @Service
 @Transactional
@@ -80,7 +82,8 @@ public class AutomatchService {
         items
             .findByStageAndOriginInOrderByIdAsc(
                 Unapplied.STAGE_INITIAL,
-                EnumSet.of(UnappliedOrigin.NO_MATCH, UnappliedOrigin.PREBOOKED))
+                EnumSet.of(
+                    UnappliedOrigin.NO_MATCH, UnappliedOrigin.PREBOOKED, UnappliedOrigin.MIGRATED))
             .stream()
             .map(Unapplied::getId)
             .toList();
@@ -94,12 +97,11 @@ public class AutomatchService {
   }
 
   private boolean rematch(Unapplied item, LocalDate date) {
-    Optional<Payment> payment =
-        item.getPaymentId() == null ? Optional.empty() : payments.findById(item.getPaymentId());
-    if (payment.isEmpty() || item.getBalance().signum() <= 0) {
+    List<String> refs = referencesOf(item);
+    if (refs.isEmpty() || item.getBalance().signum() <= 0) {
       return false;
     }
-    Match match = matcher.match(item.getCompanyId(), references(payment.get()));
+    Match match = matcher.match(item.getCompanyId(), refs);
     if (match.kind() != Kind.BOOKED) {
       return false;
     }
@@ -128,6 +130,18 @@ public class AutomatchService {
         AuditAction.UPDATE,
         "Automatch applied " + applied + " to " + match.reference());
     return true;
+  }
+
+  /**
+   * The references of an item: those of its payment, or for an unapplied payment carried from
+   * legacy its invoice, cover, PN and bank references (DATA_MIGRATION_DESIGN 14.4 B).
+   */
+  private List<String> referencesOf(Unapplied item) {
+    if (item.getPaymentId() == null) {
+      return item.getLegacy().references();
+    }
+    Optional<Payment> payment = payments.findById(item.getPaymentId());
+    return payment.map(AutomatchService::references).orElse(List.of());
   }
 
   private static List<String> references(Payment payment) {

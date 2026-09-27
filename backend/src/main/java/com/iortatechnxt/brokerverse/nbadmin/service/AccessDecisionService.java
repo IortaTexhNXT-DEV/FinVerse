@@ -44,6 +44,7 @@ public class AccessDecisionService {
   private final AlertService alerts;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final AccessRequestDescriber describer;
 
   /**
    * Creates the service.
@@ -69,7 +70,9 @@ public class AccessDecisionService {
       AccessSettings settings,
       AlertService alerts,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      AccessRequestDescriber describer) {
+    this.describer = describer;
     this.requests = requests;
     this.validator = validator;
     this.risks = risks;
@@ -119,10 +122,10 @@ public class AccessDecisionService {
               r.getRequestNo(),
               "Access request "
                   + r.getRequestNo()
-                  + " "
-                  + r.riskFlags()
-                  + ": "
-                  + AccessRequestService.describe(r),
+                  + " ("
+                  + AccessRequestNotifier.riskLabels(r)
+                  + "): "
+                  + describer.describe(r),
               null,
               PRIVILEGED_CHANGE + ":" + r.getRequestNo()));
       notifier.toSecondApprove(r);
@@ -189,7 +192,7 @@ public class AccessDecisionService {
     if (r.getEffectiveFrom() != null && r.getEffectiveFrom().isAfter(BusinessClock.today(clock))) {
       r.approve(AccessRequestStatus.SCHEDULED, approver, clock.instant(), note);
       history.record(r, action, from, note);
-      notifier.decided(r, "approved, applies on " + r.getEffectiveFrom());
+      notifier.decided(r, AccessRequestNotifier.appliesOn(r.getEffectiveFrom()));
       return new Decision(r, null);
     }
     r.approve(AccessRequestStatus.APPROVED, approver, clock.instant(), note);

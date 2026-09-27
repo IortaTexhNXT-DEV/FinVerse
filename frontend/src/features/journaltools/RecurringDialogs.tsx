@@ -14,15 +14,16 @@ import { RecurringTemplateForm } from './RecurringTemplateForm';
 import { templateProblems, toTemplateInput } from './recurringModel';
 import type { TemplateForm } from './recurringModel';
 import { DateInput } from '@/components/ui/DateInput';
+import { Notice } from '@/components/ui/Notice';
 
 function RunResult({ result }: Readonly<{ result: GenerationResult }>) {
   const tone = result.errors.length === 0 ? 'success' : 'warning';
   return (
     <div className="stack">
-      <div className={`alert ${tone}`} role="status">
+      <Notice tone={tone}>
         {result.journals.length} journal(s) generated
         {result.errors.length > 0 && `, ${result.errors.length} failed`}.
-      </div>
+      </Notice>
       <ul>
         {result.journals.map((j) => (
           <li key={j.batchId}>
@@ -83,7 +84,7 @@ export function TemplateDialog({
       }
     >
       <ErrorAlert error={save.error} />
-      {problems.length > 0 && <div className="alert warning">{problems.join(' ')}</div>}
+      {problems.length > 0 && <Notice tone="warning">{problems.join(' ')}</Notice>}
       {form !== null && <RecurringTemplateForm value={form} onChange={onChange} />}
     </Modal>
   );

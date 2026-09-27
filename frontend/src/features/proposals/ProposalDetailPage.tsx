@@ -15,7 +15,7 @@ import { PROPOSAL_ENTITY, proposalsApi } from '@/api/proposals';
 import type { Proposal, ProposalStatus } from '@/api/proposals';
 import { useAuth } from '@/auth/authContext';
 import { Attachments } from '@/components/attachments/Attachments';
-import { InstructionsBanner } from '@/components/broking/InstructionsBanner';
+import { ClientTagFlags, InstructionsBanner } from '@/components/broking/InstructionsBanner';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { SentMessages } from '@/components/broking/SentMessages';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
@@ -26,7 +26,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { RecordSummary } from '@/components/broking/RecordSummary';
 import type { Fact } from '@/components/broking/RecordSummary';
-import { formatAmount, formatDate } from '@/utils/format';
+import { formatAmount, formatPeriod } from '@/utils/format';
 import { ProposalActions } from './ProposalActions';
 import {
   ComparativeTab,
@@ -66,7 +66,7 @@ function facts(p: Proposal): Fact[] {
     {
       icon: CalendarRange,
       label: 'Period',
-      value: `${formatDate(p.periodFrom)} – ${formatDate(p.periodTo)}`,
+      value: formatPeriod(p.periodFrom, p.periodTo),
     },
     {
       icon: Wallet,
@@ -169,11 +169,14 @@ export default function ProposalDetailPage() {
           </>
         }
         flags={
-          p.tsuReason && (
-            <span className="tag" title={p.tsuReason}>
-              <ShieldCheck size={12} aria-hidden="true" /> TSU
-            </span>
-          )
+          <>
+            {p.tsuReason && (
+              <span className="tag" title={p.tsuReason}>
+                <ShieldCheck size={12} aria-hidden="true" /> TSU
+              </span>
+            )}
+            <ClientTagFlags clientId={p.clientId} />
+          </>
         }
         facts={facts(p)}
       />

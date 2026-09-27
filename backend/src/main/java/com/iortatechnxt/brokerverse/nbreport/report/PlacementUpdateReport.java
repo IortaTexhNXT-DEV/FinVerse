@@ -36,7 +36,9 @@ public class PlacementUpdateReport implements ReportDefinition {
           + " c.stage_entered_at as since, a.placement_slip_ref as slip, a.placed_at as placed,"
           + " a.hold_cover_status as hold_cover, a.hold_cover_ref as hold_ref,"
           + " a.policy_issue_date as issued, r.reason_code as returned, r.remarks,"
-          + " a.account_officer as officer"
+          + " "
+          + NbReportSupport.userName("a.account_officer")
+          + " as officer"
           + " from acc_account a"
           + " join wf_case c on c.entity_type = 'Account' and c.entity_id = cast(a.id as varchar)"
           + " join wf_stage s on s.workflow_code = c.workflow_code and s.stage_code = c.stage_code"

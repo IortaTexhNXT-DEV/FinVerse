@@ -16,6 +16,7 @@ import { RemarksDialog } from './RemarksDialog';
 import { aliasesText, entryErrors, parseAliases, requestOf } from './watchlistLogic';
 import { displayNameOf } from '@/api/users';
 import { DateInput } from '@/components/ui/DateInput';
+import { Notice } from '@/components/ui/Notice';
 
 type TextKey = 'primaryName' | 'firstName' | 'lastName' | 'nationality' | 'idNumbers';
 type DateKey = 'birthDate' | 'listedOn' | 'delistedOn';
@@ -297,7 +298,7 @@ function EntryView({ detail, sources, onOpenChange, onClose }: Readonly<ViewProp
       }
     >
       <div className="stack">
-        {pending && <div className="alert warning">A change of this entry waits for approval.</div>}
+        {pending && <Notice tone="warning">A change of this entry waits for approval.</Notice>}
         <EntryFacts detail={detail} />
         <HistoryTable rows={detail.history} loading={false} onOpen={onOpenChange} />
       </div>

@@ -6,7 +6,7 @@ import { docRenditionsApi, sha256Hex } from '@/api/docRenditions';
 import { ToastContext } from '@/components/ui/toastContext';
 import { WordCopyOffer } from './WordCopyOffer';
 
-const toast = { success: vi.fn(), error: vi.fn() };
+const toast = { success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn() };
 
 function wrap(children: ReactNode) {
   const queries = new QueryClient({ defaultOptions: { queries: { retry: false } } });

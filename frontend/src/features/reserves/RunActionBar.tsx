@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { runActions } from './reserveMath';
 import { statusPhrase } from '@/utils/format';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 type ReasonAction = 'reject' | 'cancel';
 
@@ -80,14 +81,18 @@ export function RunActionBar({ run }: Readonly<{ run: ValuationRun }>) {
           </Button>
         )}
         {actions.approve && (
-          <Button
+          <ConfirmButton
             variant="accent"
             icon={<CheckCircle2 size={16} />}
             disabled={busy}
-            onClick={() => step.mutate('approve')}
+            confirm={{
+              title: 'Approve Valuation Run',
+              effect: 'The run is approved and its journals can be posted.',
+            }}
+            onConfirm={() => step.mutateAsync('approve')}
           >
             Approve
-          </Button>
+          </ConfirmButton>
         )}
         {actions.reject && (
           <Button
@@ -100,14 +105,18 @@ export function RunActionBar({ run }: Readonly<{ run: ValuationRun }>) {
           </Button>
         )}
         {actions.post && (
-          <Button
+          <ConfirmButton
             variant="accent"
             icon={<Upload size={16} />}
             disabled={busy}
-            onClick={() => step.mutate('post')}
+            confirm={{
+              title: 'Post Journals',
+              effect: 'The reserve journals of the run are posted to the general ledger.',
+            }}
+            onConfirm={() => step.mutateAsync('post')}
           >
             Post Journals
-          </Button>
+          </ConfirmButton>
         )}
         {actions.cancel && (
           <Button

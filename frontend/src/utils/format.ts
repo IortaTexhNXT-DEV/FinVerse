@@ -174,8 +174,19 @@ export function formatDuration(fromIso: string, toIso: string | null | undefined
   return `${String(days)}d ${String(hours % 24)}h`;
 }
 
-export function today(): string {
-  return new Date().toISOString().slice(0, 10);
+const businessDateFormat = new Intl.DateTimeFormat('en-CA', {
+  timeZone: DISPLAY_TIME_ZONE,
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+});
+
+/**
+ * The business date (ISO yyyy-MM-dd) in Philippine time, whatever the zone of the browser: from
+ * 00:00 to 07:59 in Manila the UTC date is still the day before.
+ */
+export function today(now: Date = new Date()): string {
+  return businessDateFormat.format(now);
 }
 
 export function humanize(code: string): string {
@@ -249,5 +260,17 @@ export function statusPhrase(code: string | null | undefined): string {
       const w = word.toUpperCase();
       return ACRONYMS.has(w) ? w : w.toLowerCase();
     })
+    .join(' ');
+}
+
+/**
+ * The action of a dialog title as a phrase: Title Case words in lower case, acronyms and names
+ * such as ManCom or TSU kept ("Submit Requirements for ManCom Sign-off" becomes "submit
+ * requirements for ManCom sign-off").
+ */
+export function actionPhrase(title: string): string {
+  return title
+    .split(' ')
+    .map((w) => (/^[A-Z][a-z]+(?:-[A-Za-z]+)*$/.test(w) ? w.toLowerCase() : w))
     .join(' ');
 }

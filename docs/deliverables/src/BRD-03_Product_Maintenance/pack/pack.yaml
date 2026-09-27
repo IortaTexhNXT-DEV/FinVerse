@@ -59,6 +59,7 @@ section_brd:
   placement: BRD-1
   issuance: BRD-1
   booking: BRD-1
+  renewal: BRD-6
   prodrecon: BRD-2
   adjustment: BRD-2
   catalog: BRD-3

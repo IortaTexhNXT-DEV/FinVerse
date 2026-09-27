@@ -13,7 +13,7 @@ digraph eb_integration {
   subgraph cluster_bibs {
     label="BIBS"; labeljust=l; fontcolor="@HEADER_BLUE"; fontsize=13;
     style=filled; fillcolor="@BG_BLUE"; color="@BG_BLUE";
-    ptl [label="Partner portal\n(separate realm,\n/api/portal)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE", height=1.1];
+    ptl [label="Partner portal\n(separate sign-in\nfor external users)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE", height=1.1];
     eb  [label="Employee Benefits\n(eb)", fillcolor="@HEADER_BLUE", fontcolor="@WHITE", height=1.1];
     { rank=same; ptl; eb; }
   }

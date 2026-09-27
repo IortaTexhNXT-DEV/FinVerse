@@ -329,34 +329,7 @@ dl.form-grid dd {
   background: var(--color-border-strong);
 }
 
-/* ---------- Workflow status panel -------------------------------------------------------- */
-.status-strip {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, max-content));
-  gap: var(--space-2) var(--space-6);
-  margin: 0;
-  flex: 1;
-}
-
-.status-strip dt {
-  font-size: 12px;
-  color: var(--color-text-muted);
-  margin-bottom: 2px;
-}
-
-.status-strip dd {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--color-heading);
-  font-weight: 600;
-}
-
-.status-strip .workflow-stage-name {
-  font-size: 16px;
-}
-
+/* ---------- Workflow history ------------------------------------------------------------ */
 .history-table {
   margin-top: var(--space-4);
   border: 1px solid var(--color-border);
@@ -804,12 +777,7 @@ dl.form-grid dd {
   margin: 2px 0;
 }
 
-/* ---------- Error banner reference and retry --------------------------------------------- */
-.alert-reference {
-  font-size: 12px;
-  margin-top: var(--space-1);
-}
-
+/* ---------- Error notice retry ----------------------------------------------------------- */
 .alert .btn {
   margin-top: var(--space-2);
 }

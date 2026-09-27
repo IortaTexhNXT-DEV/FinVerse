@@ -13,13 +13,14 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, humanize } from '@/utils/format';
+import { formatDate, formatPeriod, humanize } from '@/utils/format';
 import { DebitNote } from './DebitNote';
 import { EndorsementDialog } from './EndorsementDialog';
 import { EndorsementHistory } from './EndorsementHistory';
 import { businessLabel } from './policyForm';
 import { WorkflowActions } from './WorkflowActions';
 import { displayNameOf } from '@/api/users';
+import { Notice } from '@/components/ui/Notice';
 
 function Terms({ policy: p }: Readonly<{ policy: Policy }>) {
   const facts: [string, string][] = [
@@ -31,7 +32,7 @@ function Terms({ policy: p }: Readonly<{ policy: Policy }>) {
         ? 'Direct'
         : `${humanize(p.sourceType)}: ${p.intermediaryName}`,
     ],
-    ['Period', `${formatDate(p.periodFrom)} – ${formatDate(p.periodTo)}`],
+    ['Period', formatPeriod(p.periodFrom, p.periodTo)],
     ['Issue date', formatDate(p.issueDate)],
     ['UW year', String(p.uwYear)],
     ['Currency', p.currency],
@@ -52,9 +53,9 @@ function Terms({ policy: p }: Readonly<{ policy: Policy }>) {
         ))}
       </dl>
       {p.document.rejectionReason !== undefined && (
-        <div className="alert warning" style={{ marginTop: 12 }}>
-          Returned by the checker: {p.document.rejectionReason}
-        </div>
+        <Notice tone="warning" title="Returned by the checker">
+          {p.document.rejectionReason}
+        </Notice>
       )}
     </Card>
   );

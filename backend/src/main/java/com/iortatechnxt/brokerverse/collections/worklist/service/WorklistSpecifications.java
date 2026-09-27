@@ -55,6 +55,9 @@ final class WorklistSpecifications {
     eq(where, cb, c.get("unitHeadUsername"), s.unitHead());
     eq(where, cb, c.get("aoUsername"), s.aoUsername());
     eq(where, cb, root.get(PARTIES).get("clientCode"), s.clientCode());
+    if (s.origin() != null) {
+      where.add(cb.equal(root.get("recordOrigin").get("origin"), s.origin()));
+    }
   }
 
   private static void work(

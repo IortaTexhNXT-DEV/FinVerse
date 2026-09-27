@@ -181,7 +181,7 @@ public class MinimalBalanceService {
             ApplicationService.context(invoice, date, "Minimal balance reversal"),
             CashieringPosting.MINIMAL_BALANCE,
             ref,
-            amounts);
+            invoice.getLegacy().ledgerContext().route(amounts));
     ledger.post(
         new MovementRequest(
             invoice.getInvoiceNo(),

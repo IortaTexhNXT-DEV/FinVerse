@@ -121,5 +121,20 @@ export const COMMISSION_HELP: HelpSection = {
         'Invoices booked on an estimated premium, shown as estimated on the production register and commission reports until the final premium is known.',
       workflow: ['Flag Invoice marks an invoice estimated; Clear Estimate removes the flag.'],
     },
+    {
+      name: 'DP PR Legacy Reversal',
+      path: '/commission/dppr-batches',
+      summary:
+        'Legacy invoices carried over from the old systems that the client paid directly to the insurer. A batch reverses their open premium receivable and the amount due to the insurer on the legacy control accounts.',
+      workflow: [
+        'New Batch: give the reason, then add the legacy invoices tagged "DP PR for reversal" by Collections or any legacy invoice with open premium.',
+        'Submit the batch; the Commission team lead approves or returns it.',
+        'On approval each invoice posts on its own; an invoice whose balance changed is refused and the others still post.',
+      ],
+      controls: [
+        'The requester never approves their own batch.',
+        'Only legacy invoices can be added, each on one batch at a time.',
+      ],
+    },
   ],
 };

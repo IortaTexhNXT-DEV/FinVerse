@@ -252,6 +252,11 @@ brokerverse:
     # false = simulated delivery (outbox and send log only). See docs/operations/CONFIGURATION.md.
     enabled: ${BROKERVERSE_MAIL_ENABLED:false}
     dispatch-on-commit: ${BROKERVERSE_MAIL_DISPATCH_ON_COMMIT:true}
+  # ---- Data Migration (BRD-13), docs/architecture/DATA_MIGRATION_DESIGN.md sections 5.3 and 20 ----
+  migration:
+    # Key of the keyed masking of personal data in non-production extracts (HMAC-SHA256), from the
+    # secrets store; the intake refuses extracts outside production while it is empty.
+    masking-key: ${BROKERVERSE_MIGRATION_MASKING_KEY:}
   jobs:
     # Spring cron (sec min hour day month weekday), UTC; "-" disables the schedule.
     recurring-journals-cron: ${BROKERVERSE_JOB_RECURRING_CRON:0 0 1 * * *}
@@ -360,6 +365,8 @@ brokerverse:
     uam-effective-changes-cron: ${BROKERVERSE_JOB_UAM_EFFECTIVE_CHANGES_CRON:0 5 16 * * *}
     # LOCAL sign-in: notifies users whose password expires within 7 days (UAM-NFR-36), 06:00 PHT.
     password-expiry-notice-cron: ${BROKERVERSE_JOB_PASSWORD_EXPIRY_NOTICE_CRON:0 0 22 * * *}
+    # UAM_DORMANT_USERS: deactivates the users without a sign-in for UAM_DORMANT_DAYS, 00:15 PHT (V1065).
+    uam-dormant-users-cron: ${BROKERVERSE_JOB_UAM_DORMANT_USERS_CRON:0 15 16 * * *}
     # ---- Claims Handling (BRD-7), docs/architecture/CLAIMS_BROKING_DESIGN.md section 9.1 (PHT = UTC+8) ----
     # Re-check of the premium of open, unauthorised claims (BRCLM.001), 05:30 PHT.
     bcl-premium-recheck-cron: ${BROKERVERSE_JOB_BCL_PREMIUM_RECHECK_CRON:0 30 21 * * *}
@@ -367,6 +374,19 @@ brokerverse:
     bcl-follow-up-due-cron: ${BROKERVERSE_JOB_BCL_FOLLOW_UP_DUE_CRON:0 0 22 * * *}
     # BCL_CLAIM_PAST_DUE for outstanding claims older than BCL_PAST_DUE_DAYS (p.43), 06:00 PHT.
     bcl-ageing-alerts-cron: ${BROKERVERSE_JOB_BCL_AGEING_ALERTS_CRON:0 0 22 * * *}
+    # ---- Data Migration (BRD-13), docs/architecture/DATA_MIGRATION_DESIGN.md section 20 (PHT = UTC+8) ----
+    # Validation, load and reconciliation of batches run on demand from the console; no schedule by default.
+    mig-validate-cron: ${BROKERVERSE_JOB_MIG_VALIDATE_CRON:-}
+    mig-load-cron: ${BROKERVERSE_JOB_MIG_LOAD_CRON:-}
+    mig-reconcile-cron: ${BROKERVERSE_JOB_MIG_RECONCILE_CRON:-}
+    # Purge of staged payloads and intake files beyond MIG_STAGING_RETENTION_DAYS, 02:00 PHT.
+    mig-staging-purge-cron: ${BROKERVERSE_JOB_MIG_STAGING_PURGE_CRON:0 0 18 * * *}
+    # Intake of files waiting in the extract inbox; manual until an inbox is connected.
+    mig-intake-scan-cron: ${BROKERVERSE_JOB_MIG_INTAKE_SCAN_CRON:-}
+    # Run-off snapshot of the legacy in-force headers, 01:30 PHT on the 1st.
+    mig-runoff-snapshot-cron: ${BROKERVERSE_JOB_MIG_RUNOFF_SNAPSHOT_CRON:0 30 17 1 * *}
+    # Monthly legacy access-log digest to the reviewers, 08:00 PHT on the 1st.
+    mig-access-log-digest-cron: ${BROKERVERSE_JOB_MIG_ACCESS_LOG_DIGEST_CRON:0 0 0 1 * *}
     # ---- Employee Benefits (BRD-8), docs/architecture/EMPLOYEE_BENEFITS_DESIGN.md section 8.1 (PHT = UTC+8) ----
     # Opens renewal cycles EB_RA_LEAD_DAYS before expiry, sends the RA and the reminders (BRID-001/002), 06:00 PHT.
     eb-renewal-advice-cron: ${BROKERVERSE_JOB_EB_RENEWAL_ADVICE_CRON:0 0 22 * * *}
@@ -455,6 +475,9 @@ brokerverse:
   security:
     # Local value for seed stacks only; set BROKERVERSE_JWT_SECRET in every shared environment.
     jwt-secret: ${BROKERVERSE_JWT_SECRET:seed-profile-local-signing-key-0123456789abcdef}
+  migration:
+    # Local value for seed stacks only; set BROKERVERSE_MIGRATION_MASKING_KEY in every shared environment.
+    masking-key: ${BROKERVERSE_MIGRATION_MASKING_KEY:seed-profile-local-masking-key-0123456789}
 
 ---
 # Local transports for development, automated tests and seed stacks (INF0): plaintext PostgreSQL,

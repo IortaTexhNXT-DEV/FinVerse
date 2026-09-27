@@ -1,5 +1,5 @@
 import { api, toQuery } from '@/api/client';
-import type { PageResponse } from '@/api/types';
+import type { PageResponse, RecordOriginKind } from '@/api/types';
 import type {
   IntakeResult,
   OrBody,
@@ -83,8 +83,14 @@ export const cashieringApi = {
     post<Prebooked>(`/prebooked/${id}/release`, { reason }),
   runMatching: () => post<Counts>('/matching/run'),
 
-  unapplied: (companyId: number, tab: UnappliedTab, q: string, page = 0) =>
-    get<PageResponse<UnappliedItem>>(`/unapplied${toQuery({ companyId, tab, q, page })}`),
+  unapplied: (
+    companyId: number,
+    tab: UnappliedTab,
+    q: string,
+    page = 0,
+    origin?: RecordOriginKind,
+  ) =>
+    get<PageResponse<UnappliedItem>>(`/unapplied${toQuery({ companyId, tab, q, origin, page })}`),
   unappliedItem: (id: number) => get<UnappliedItem>(`/unapplied/${id}`),
   dispositions: (id: number) => get<Disposition[]>(`/unapplied/${id}/dispositions`),
   dispositionTypes: () => get<DispositionType[]>('/disposition-types'),
@@ -139,7 +145,8 @@ export const cashieringApi = {
   routeCwt: (id: number) => post<CwtBatch>(`/cwt/batches/${id}/route`),
   releaseCwt: (id: number) => post<CwtBatch>(`/cwt/batches/${id}/release`),
 
-  series: (companyId: number) => get<Series[]>(`/series${toQuery({ companyId })}`),
+  series: (companyId: number, origin?: RecordOriginKind) =>
+    get<Series[]>(`/series${toQuery({ companyId, origin })}`),
   createSeries: (body: SeriesBody) => post<Series>('/series', body),
   updateSeries: (id: number, atpNo: string | undefined, toNo: number, warnAt: number) =>
     api.put<Series>(`${BASE}/series/${id}`, { atpNo, toNo, warnAt }),

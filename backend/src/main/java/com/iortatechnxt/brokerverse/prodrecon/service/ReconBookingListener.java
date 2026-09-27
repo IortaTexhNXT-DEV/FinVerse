@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.prodrecon.service;
 
+import com.iortatechnxt.brokerverse.opsledger.domain.FeedSource;
 import com.iortatechnxt.brokerverse.opsledger.service.OpsLedgerEvents.OpsInvoiceBooked;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,12 +37,16 @@ public class ReconBookingListener {
   }
 
   /**
-   * Pairs waiting insurer production with a new invoice.
+   * Pairs waiting insurer production with a new invoice; migrated legacy invoices are not paired
+   * (legacy production was reconciled in legacy).
    *
    * @param event invoice copied into the ledger
    */
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void on(OpsInvoiceBooked event) {
+    if (event.source() == FeedSource.MIGRATION) {
+      return;
+    }
     try {
       Integer paired =
           tx.execute(

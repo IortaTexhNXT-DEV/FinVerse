@@ -13,10 +13,10 @@ digraph wf_special {
   REJECTED [label="REJECTED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
   RETURNED [label="RETURNED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
 
-  REQUESTED -> FOR_APPROVAL [label=" validate (system)"];
-  FOR_APPROVAL -> IN_PROCESS_REMITTANCE [label=" approve\n(SPECIAL batch)"];
-  FOR_APPROVAL -> REJECTED [label=" reject", style=dotted];
-  IN_PROCESS_REMITTANCE -> PUSHED_TO_DISBURSEMENT [label=" pushed"];
-  IN_PROCESS_REMITTANCE -> RETURNED [label=" returned", style=dotted];
+  REQUESTED -> FOR_APPROVAL [label=" Validated (system)"];
+  FOR_APPROVAL -> IN_PROCESS_REMITTANCE [label=" Approve special remittance\n(SPECIAL batch)"];
+  FOR_APPROVAL -> REJECTED [label=" Reject special remittance", style=dotted];
+  IN_PROCESS_REMITTANCE -> PUSHED_TO_DISBURSEMENT [label=" Pushed to Disbursement"];
+  IN_PROCESS_REMITTANCE -> RETURNED [label=" Batch returned", style=dotted];
   { rank=same; PUSHED_TO_DISBURSEMENT; RETURNED; }
 }

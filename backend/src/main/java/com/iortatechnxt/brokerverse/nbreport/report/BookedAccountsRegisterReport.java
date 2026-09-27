@@ -35,7 +35,9 @@ public class BookedAccountsRegisterReport implements ReportDefinition {
           + " i.dst + i.premium_tax_vat + i.lgt + i.fst + i.other_charges as charges,"
           + " i.basic_premium + i.dst + i.premium_tax_vat + i.lgt + i.fst + i.other_charges"
           + " as gross, i.commission, i.vat_on_commission as vat, i.cost_center,"
-          + " i.account_officer as officer, i.incentive_eligible as incentive,"
+          + " "
+          + NbReportSupport.userName("i.account_officer")
+          + " as officer, i.incentive_eligible as incentive,"
           + " i.direct_payment as direct, i.business_type"
           + " from bkg_invoice i left join cat_insurer n on n.company_id = i.company_id"
           + " and n.party_code = i.insurer_code"

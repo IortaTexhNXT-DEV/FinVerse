@@ -65,9 +65,9 @@ public class AdjustmentEvents {
             invoice.getClassification().productLine(),
             invoice.getClassification().costCenter(),
             spec.narration(),
-            spec.amounts(),
+            invoice.getLegacy().ledgerContext().route(spec.amounts()),
             Map.of(),
-            spec.componentParties());
+            invoice.getLegacy().ledgerContext().routeParties(spec.componentParties()));
     return publisher.publish(rates.price(event));
   }
 

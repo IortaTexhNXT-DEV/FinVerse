@@ -11,6 +11,7 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate } from '@/utils/format';
+import { Notice } from '@/components/ui/Notice';
 
 /** Records currently eligible under a rule (drill-down). */
 export function EligibleDialog({
@@ -28,10 +29,10 @@ export function EligibleDialog({
       <div className="stack">
         <ErrorAlert error={eligible.error} />
         {data && !data.providerAvailable && (
-          <div className="alert warning">
+          <Notice tone="warning">
             The {rule.recordType.toLowerCase()} module does not report retention candidates yet; the
             records will be counted once it does.
-          </div>
+          </Notice>
         )}
         {data && (
           <p className="muted" style={{ margin: 0 }}>

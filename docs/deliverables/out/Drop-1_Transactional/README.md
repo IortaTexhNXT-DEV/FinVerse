@@ -1,22 +1,19 @@
 # Drop 1 - Transactional (upstream and downstream): deliverables index
 
 BIBS client pack for BDO Insurance and Reinsurance Brokers (BDOI), grouped by BDOI drop (answer A5 of 26-Sep-2026).
-Written by `python tools/deliverables/drop_index.py` from the files of this folder and the drop map in
-`tools/deliverables/brand.py`; do not edit by hand.
 
 | | |
 |---|---|
-| BDOI dates | Requirements Sep - Nov 2026, build Nov 2026 - Feb 2027, SIT Jan - Jul 2027, UAT (end to end) Aug - Dec 2027 |
+| BDOI dates | Requirements Sep - Nov 2026, development Nov 2026 - Feb 2027, SIT Jan - Jul 2027, UAT (end to end) Aug - Dec 2027 |
 | Scope (BDOI drop plan) | Upstream (product inherent): 1.U1 Client Onboarding, 1.U2 Quotation or Proposal, 1.U3 Account Creation and Maintenance, 1.U4 Submitted Policy, 1.U5 Renewal, 1.U6 Placement and ePolicy, 1.U7 Booking, 1.U8 Accounting / GL, 1.U9 Reports. Downstream (product agnostic): 1.D1 Disbursement, 1.D2 Cashiering, 1.D3 Remittance (with the reinsurance transactions), 1.D4 Adjustment / Cancellation, 1.D5 Accounting / GL, 1.D6 Reports (BIR / regulatory), 1.D7 Collection of Commission Receivables (Direct Payment). |
-| Status | Status as of 26-Sep-2026; final refresh at build completion (deliverables README, "Document status and the final as-built refresh") |
+| Status | Status as of 26-Sep-2026; the documents are refreshed before UAT |
 
 ## Documents in this drop
 
 One folder per BRD release set (`BRD-nn_<Name>/`): every file of the BRD (Start Here, guide deck, FRS, sign-off
 workbook, test plan and summary, migration documents and templates), released and signed off together; in an
 issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, "Release and
-sign-off per BRD"). The sources of a BRD are in one folder, `docs/deliverables/src/BRD-nn_<Name>/`, and
-`tools/deliverables/check_pack.py` refuses duplicated files and older versions left next to newer ones.
+sign-off per BRD"). Each document is kept once, in its latest version.
 
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|

@@ -1,11 +1,8 @@
 # Test plan BRD-8 Employee Benefits - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-08_Employee_Benefits/brd08_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# Employee Benefits and the partner portal are designed and not built: messages are the FRS texts (no
-# codes), screen paths are those of the build design (docs/architecture/EMPLOYEE_BENEFITS_DESIGN.md) and
-# there is no automation reference. Where a check reuses a platform message that exists today (attachment
-# rules, client duplicate, workflow reason), the case quotes the text BIBS shows and a finding records the
-# FRS difference.
+# Messages are the FRS texts; where a check reuses a platform message (attachment rules, client duplicate,
+# workflow reason), the case quotes the text BIBS shows.
 
 meta:
   brd: BRD-08
@@ -15,7 +12,7 @@ meta:
   summary: TP_BRD08_EMPLOYEE_BENEFITS.md
   version: "1.0"
   date: 25 September 2026
-  built: false
+  verify_messages: false
 
 personas:
   EB_AO: {name: Marketing AO (Employee Benefits), short: EB AO}
@@ -73,7 +70,7 @@ screens:
   PMEMBERS: Partner portal > Members (client HR)
   PUPLOADS: Partner portal > Uploads (client HR)
   PCOMP: Partner portal > Comparative (client HR)
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-EB-01
@@ -128,7 +125,7 @@ scenarios:
     pre: A renewal cycle of EBP-2026-000010 that remarkets; insurers TD-EB-05.
   - id: SC-EB-05
     persona: EB_AO
-    title: Proposals to placement. Insurers submit proposals; the AO validates them, builds the comparative; the signatory and Management approve; the client comments, asks for revisions and confirms; the AO triggers placement.
+    title: Proposals to placement. Insurers submit proposals; the AO validates them and prepares the comparative; the signatory and Management approve; the client comments, asks for revisions and confirms; the AO triggers placement.
     pre: Proposals TD-EB-07; threshold rules TD-EB-06.
   - id: SC-EB-06
     persona: EB_PROCESSOR
@@ -147,8 +144,8 @@ frs:
     data: [TD-EB-01]
     conditions:
       - Each EB screen, action and report requires its permission; menus show only what the user's roles allow.
-      - A direct call without the permission is refused (HTTP 403) and logged.
-      - Insurer and client HR users never reach the core BIBS screens or API.
+      - A direct request without the permission is refused and logged.
+      - Insurer and client HR users never reach the core BIBS screens or services.
     cases:
       - c: 1
         type: Security-access
@@ -175,18 +172,18 @@ frs:
         brd: [BRID-023]
         title: User without EB_REPORT_VIEW cannot run EB reports
         steps:
-          - As a Renewal AO (no EB role) open Reports; call the EB-PRODUCTION run endpoint.
-        expected: The Employee Benefits category is not listed; the call returns HTTP 403 and is logged with user, endpoint and time.
+          - As a Renewal AO (no EB role) open Reports; send a direct request to run EB-PRODUCTION.
+        expected: The Employee Benefits category is not listed; the request is refused and is logged with the user and time.
         msg: [You are not permitted to perform this action]
       - c: 3
         type: Security-access
         persona: INSURER_USER
         screen: API
         brd: [BRID-005]
-        title: Portal token refused by the core API
+        title: Portal sign-in refused by the core BIBS services
         steps:
-          - With ins.a's portal token call GET /api/v1/accounts.
-        expected: The call is refused; no data is returned.
+          - Signed in as ins.a on the portal, send a direct request to list the BIBS accounts.
+        expected: The request is refused; no data is returned.
 
   FR-EB-002:
     scenario: SC-EB-01
@@ -212,7 +209,7 @@ frs:
         title: Utilization report hidden from Collection
         steps:
           - As eb.coll open the Documents tab of EBP-2026-000010.
-        expected: The utilization report (Marketing only) is not listed; a direct download call is refused and logged.
+        expected: The utilization report (Marketing only) is not listed; a direct download request is refused and logged.
       - c: 1
         type: Negative
         screen: DOCS
@@ -258,8 +255,8 @@ frs:
         screen: API
         title: History and versions cannot be changed
         steps:
-          - Look for edit on the History tab and on version 1; call PUT on version 1.
-        expected: No edit exists; the call is refused.
+          - Look for edit on the History tab and on version 1; send a direct request to change version 1.
+        expected: No edit exists; a direct request is refused.
 
   FR-EB-004:
     scenario: SC-EB-01
@@ -299,7 +296,7 @@ frs:
     data: [TD-EB-02]
     conditions:
       - A portal user signs in with e-mail, password and, when on, an e-mail one-time code, and sees only the tasks of the bound insurer or client.
-      - The core API refuses portal tokens; a record of another party answers not found and is logged.
+      - The core BIBS services refuse portal sign-ins; a record of another party answers not found and is logged.
       - Three failed sign-ins lock the portal user and raise PORTAL_LOGIN_LOCKED; a wrong code is refused.
       - An idle portal session ends after PORTAL_SESSION_MINUTES.
     cases:
@@ -316,7 +313,7 @@ frs:
         brd: [BRID-005.01]
         title: Record of another insurer
         steps:
-          - As ins.b call the portal endpoint of an INS-A request.
+          - As ins.b send a direct portal request of an INS-A request.
         expected: The answer is not found; the attempt is logged.
       - c: 3
         type: Boundary
@@ -482,7 +479,7 @@ frs:
         brd: [BRID-005.03]
         title: Validate a proposal
         steps:
-          - Open the INS-B proposal upload; Validate; open the comparative build list.
+          - Open the INS-B proposal upload; Validate; open the list of proposals available for the comparative.
         expected: The file becomes an attachment of the request; the proposal counts in the comparative.
       - c: 3
         type: Negative
@@ -777,8 +774,8 @@ frs:
         type: Negative
         title: Not available on a new-business cycle
         steps:
-          - Open the new-business cycle of Gamma Test Ltd.; call the send endpoint.
-        expected: The action is not offered; the call is refused.
+          - Open the new-business cycle of Gamma Test Ltd.; send a direct send request.
+        expected: The action is not offered; a direct request is refused.
         msg: [The indicative proposal applies to renewals only]
       - c: 2
         type: Negative
@@ -1007,7 +1004,7 @@ frs:
         title: Insurer with a rejected franchise
         steps:
           - Try to select an insurer whose franchise was rejected.
-        expected: The insurer cannot be selected; the API call is refused.
+        expected: The insurer cannot be selected; the direct request is refused.
         msg: ["Insurer {INS-D} has no approved franchise for this cycle"]
       - c: 2
         type: Negative
@@ -1055,7 +1052,7 @@ frs:
         brd: [BRID-010]
         title: Submitted proposal not in the comparative
         steps:
-          - Build the comparative while the INS-A proposal is still SUBMITTED.
+          - Click Build Comparative while the INS-A proposal is still SUBMITTED.
         expected: INS-A is not a column of the comparative.
       - c: 2
         type: Negative
@@ -1087,7 +1084,7 @@ frs:
     screen: COMPARATIVE
     data: [TD-EB-07]
     conditions:
-      - The comparative is built from the validated proposals with one column per insurer, coverage per TOR item, premiums, exclusions and capability factors, and stored as a snapshot version.
+      - The comparative is prepared from the validated proposals with one column per insurer, coverage per TOR item, premiums, exclusions and capability factors, and stored as a snapshot version.
       - A recommendation per line is required before sign-off; open requests are listed and must be closed or waited for.
       - The signatory is never the maker; the signed comparative exports to PDF and Excel with the same content.
     cases:
@@ -1101,7 +1098,7 @@ frs:
         type: Negative
         title: Requests still open
         steps:
-          - Build the comparative while one insurer request is open.
+          - Click Build Comparative while one insurer request is open.
         expected: BIBS lists the open request.
         msg: ["{1} insurer requests are still open. Close them or wait for the proposals"]
       - c: 2
@@ -1134,7 +1131,7 @@ frs:
     conditions:
       - When the recommended proposal meets a threshold rule, the cycle waits in THRESHOLD_APPROVAL, the approvers are notified and placement is blocked until approval.
       - The AO of the cycle never approves the threshold.
-      - Rules are maintained with maker-checker and apply after authorisation without a new build; an amount must be greater than zero.
+      - Rules are maintained with maker-checker and apply after authorisation, without a change to the system; an amount must be greater than zero.
     cases:
       - c: 1
         type: Workflow
@@ -1215,7 +1212,7 @@ frs:
         title: Comparative not yet approved
         steps:
           - Call Present to Client on a comparative in FOR_SIGNOFF.
-        expected: The action is not offered; the call is refused.
+        expected: The action is not offered; a direct request is refused.
 
   FR-EB-044:
     scenario: SC-EB-05
@@ -1715,8 +1712,8 @@ frs:
         brd: [BRID-022]
         title: Portal user cannot open EB Home
         steps:
-          - As ins.a call the EB Home endpoint.
-        expected: The call is refused.
+          - As ins.a send a direct EB Home request.
+        expected: The request is refused.
 
 access:
   - action: Maker actions of the cycle (RA, BOR, franchise, TOR, proposals, comparative, confirmation, placement trigger)
@@ -1724,7 +1721,7 @@ access:
     permission: EB_MARKET
     allow: [EB_AO]
     deny: [EB_TL, EB_PROCESSOR, EB_COLLECTION, AUDITOR]
-    denied: The maker buttons are not shown; the calls return HTTP 403.
+    denied: The maker buttons are not shown; direct requests are refused.
   - action: Sign off a comparative
     screen: COMPARATIVE
     permission: EB_COMPARATIVE_APPROVE
@@ -1760,7 +1757,7 @@ access:
     permission: EB_REPORT_VIEW
     allow: [EB_AO, EB_TL, EB_COLLECTION, AUDITOR]
     deny: [NON_EB_USER, INSURER_USER]
-    denied: The Employee Benefits category is not listed; the run call returns HTTP 403.
+    denied: The Employee Benefits category is not listed; a direct run request is refused.
   - action: Request portal users
     screen: ACCREQ
     permission: PORTAL_USER_REQUEST
@@ -1797,32 +1794,3 @@ access:
     allow: [CLIENT_HR]
     deny: [INSURER_USER]
     denied: The client pages are not offered to an insurer user.
-
-findings:
-  - fr: FR-EB-012
-    issue: 'The FRS texts of the platform attachment codes differ from what BIBS shows - ATTACHMENT_TYPE_NOT_ALLOWED "The file type is not allowed" (built "Only these file types are allowed - <list>"), ATTACHMENT_TOO_LARGE "The file is larger than the allowed size" (built "The file exceeds the maximum size of <n> MB"), ATTACHMENT_INFECTED "The file failed the virus check" (built "The file was rejected by the malware scan - <detail>"). The same applies to FR-EB-002, 023, 030 and 031.'
-    proposal: Quote the platform texts in FRS v1.1; the cases use them.
-  - fr: FR-EB-020
-    issue: 'The FRS gives CLIENT_DUPLICATE "A client with the same identifiers already exists" and CLIENT_NAME_REQUIRED "Enter the client name"; the client service shows "This client already exists - <client>" and "Enter the <field>".'
-    proposal: Quote the built texts.
-  - fr: FR-EB-004
-    issue: 'EMAIL_ADDRESS_INVALID is given as "Enter a valid e-mail address"; the platform returns "Invalid e-mail address - <address>".'
-    proposal: Quote the platform text.
-  - fr: FR-EB-060
-    issue: 'FR-EB-060 and 061 pair INVALID_REPORT_PARAMETERS with "The end date must be on or after the start date"; the report engine builds "<to> must not be before <from>" from the parameter labels.'
-    proposal: Quote the engine pattern.
-  - fr: FR-EB-010
-    issue: 'Acceptance criterion 3 of FR-EB-010 says "The fourth failed sign-in locks the portal user" while rule R3 says lockout after 3 failed sign-ins (PORTAL_MAX_FAILED_LOGINS = 3). The cases lock at the third failure.'
-    proposal: Align the acceptance criterion with R3 ("the third failed sign-in locks the portal user, and the fourth is refused").
-  - fr: FR-EB-022
-    issue: The RA lead time is 135 days (TAT annex) against the BRD example of 180 days (EBQ02), and who sets the renewal flag is open (EBQ03); the RA timing cases depend on both.
-    proposal: Answer EBQ02 and EBQ03 before UAT.
-  - fr: FR-EB-031
-    issue: The BOR is required for new business and remarketing renewals, while the BRD negative scenario says a BOR uploaded for a renewal is invalid (EBQ05). A renewal that stays with the incumbent has no BOR case.
-    proposal: Answer EBQ05; add a case for a renewal without remarketing once decided.
-  - fr: FR-EB-042
-    issue: The threshold values, measure and approver levels are seed values (EBQ11); the FRS does not say whether "meets" means at or above the amount.
-    proposal: State "at or above" and give the BDOI values; the cases use the seed values.
-  - fr: FR-EB-062
-    issue: 'The TAT annex gives ranges ("1-5 working days"); the FRS parameters hold one value, and the start and stop events are open (EBQ21), so a breach cannot be tested except against the upper value.'
-    proposal: Confirm that the upper value of each range is the target and name the start and stop events.

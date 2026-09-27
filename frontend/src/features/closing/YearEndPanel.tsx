@@ -19,6 +19,8 @@ import { PeriodSelectors } from './PeriodSelectors';
 import type { usePeriodPicker } from './usePeriodPicker';
 import { UserName } from '@/components/ui/UserName';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { Notice } from '@/components/ui/Notice';
+import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
 
 /** Income and expense balances the closing journal will transfer to retained earnings. */
 function ClosingPreview({ companyId, yearId }: Readonly<{ companyId: number; yearId: number }>) {
@@ -77,16 +79,23 @@ function CloseRecord({
   const verified = record.verified === true;
   return (
     <div className="stack">
-      <div className="alert success">
-        FY {record.yearCode} closed by <UserName login={record.closedBy} /> on{' '}
-        {formatDateTime(record.closedAt)}: net result {formatAmount(record.netResult)} transferred
-        to {record.retainedEarningsAccount} (journals {record.closingBatches}).
-      </div>
-      <div className={verified ? 'alert info' : 'alert warning'} role="status">
-        Post-close verification: {verificationText(record)}
-        {onVerify !== undefined && (
-          <>
-            {' '}
+      <Card title={`FY ${record.yearCode} Close`}>
+        <DefinitionGrid
+          columns={2}
+          items={[
+            { label: 'Closed by', value: <UserName login={record.closedBy} /> },
+            { label: 'Closed on', value: formatDateTime(record.closedAt) },
+            { label: 'Net result', value: formatAmount(record.netResult) },
+            { label: 'Transferred to', value: record.retainedEarningsAccount },
+            { label: 'Closing journals', value: record.closingBatches },
+          ]}
+        />
+      </Card>
+      <Notice
+        tone={verified ? 'success' : 'warning'}
+        title="Post-close verification"
+        actions={
+          onVerify !== undefined && (
             <Button
               size="sm"
               variant="secondary"
@@ -96,9 +105,11 @@ function CloseRecord({
             >
               Verify Again
             </Button>
-          </>
-        )}
-      </div>
+          )
+        }
+      >
+        {verificationText(record)}
+      </Notice>
     </div>
   );
 }

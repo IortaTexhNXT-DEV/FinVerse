@@ -55,6 +55,11 @@ PLAYWRIGHT_MODULE=/opt/node22/lib/node_modules/playwright CHROMIUM=/opt/pw-brows
 node tools/screenshots/capture_pack.cjs brd01 [slug-regex]
 ```
 
+Recipes exist for `brd01`, `brd03` and `brd11` (`packs/brdNN.cjs`). The BRD-11 recipe also signs in users that are
+not seed personas (the user enrolled in walkthrough A, a user whose password the administrator set), locks a seed
+subject user through failed sign-ins, and moves the browser clock (Playwright `page.clock`) to show the inactivity
+warning; its walkthroughs run in order (A before B, C and D).
+
 The script needs `psql` (read-only queries that find the records), LibreOffice and `pdftoppm` (document pages) and
 Python with Pillow (PNG optimisation). It lists the shots it could not take and exits with code 1; the page at the
 moment of a failure is saved as `capture-pack-failed-<slug>-<user>.png` in the temporary folder.

@@ -11,7 +11,9 @@ function wrap(children: ReactNode) {
   const queries = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return (
     <QueryClientProvider client={queries}>
-      <ToastContext.Provider value={{ success: vi.fn(), error: vi.fn() }}>
+      <ToastContext.Provider
+        value={{ success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn() }}
+      >
         {children}
       </ToastContext.Provider>
     </QueryClientProvider>

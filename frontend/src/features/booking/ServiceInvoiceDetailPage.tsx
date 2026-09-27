@@ -28,6 +28,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDate } from '@/utils/format';
 import { SummaryFact } from './BookingParts';
 import { UserName } from '@/components/ui/UserName';
+import { Notice } from '@/components/ui/Notice';
 
 function CreditDialog({ si, onClose }: Readonly<{ si: ServiceInvoice; onClose: () => void }>) {
   const toast = useToast();
@@ -164,7 +165,11 @@ function Facts({ si: s }: Readonly<{ si: ServiceInvoice }>) {
             {s.creditOf ?? '-'}
           </SummaryFact>
         </div>
-        {s.dispatchError && <div className="alert warning">E-mail: {s.dispatchError}</div>}
+        {s.dispatchError && (
+          <Notice tone="warning" title="E-mail">
+            {s.dispatchError}
+          </Notice>
+        )}
       </div>
     </Card>
   );

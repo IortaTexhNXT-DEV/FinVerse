@@ -13,6 +13,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { EligibleDialog, RuleDialog } from './RetentionDialogs';
+import { Notice } from '@/components/ui/Notice';
 
 function eligibleText(r: RetentionRule): string {
   if (!r.providerAvailable || r.lastEligibleCount === undefined) {
@@ -63,9 +64,9 @@ export default function RetentionPage() {
           )
         }
       />
-      <div className="alert" role="note">
+      <Notice tone="info" role="note">
         Eligible records are counted and listed here; this screen never deletes data.
-      </div>
+      </Notice>
       <ErrorAlert error={rules.error ?? run.error} />
       <Card flush>
         <DataTable<RetentionRule>

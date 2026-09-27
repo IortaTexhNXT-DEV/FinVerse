@@ -27,6 +27,8 @@ import { frbsModule } from '@/features/frbs/module';
 import { glModule } from '@/features/gl/module';
 import { helpModule } from '@/features/help/module';
 import { issuanceModule } from '@/features/issuance/module';
+import { legacyInquiryModule } from '@/features/legacy-inquiry/module';
+import { migrationModule } from '@/features/migration/module';
 import { userAccessModule } from '@/features/nbadmin/userAccessModule';
 import { nbDashboardModule, nbReportsModule } from '@/features/nbreports/module';
 import { operationsModule } from '@/features/operations/module';
@@ -127,6 +129,12 @@ export const NAV_GROUPS: NavGroup[] = [
       reinsuranceModule,
       reservesModule,
     ],
+  },
+  // Data Migration (BRD-13), DATA_MIGRATION_DESIGN section 22.
+  {
+    id: 'migration',
+    title: 'Data Migration',
+    modules: [migrationModule, legacyInquiryModule],
   },
   { id: 'reports', title: 'Reports', modules: [nbReportsModule, reportsModule] },
   {

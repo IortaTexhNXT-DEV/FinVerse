@@ -101,7 +101,7 @@ class OdsXmlReportRendererTest {
       String page = new PdfTextExtractor(reader).getTextFromPage(1);
       assertThat(page)
           .contains("Report ID: NB-X")
-          .contains("User ID: tester")
+          .contains("Run By: tester")
           .contains("Run Date: 24-Sep-2026 09:00")
           .contains("Filters: From : 2026-09-01");
     }

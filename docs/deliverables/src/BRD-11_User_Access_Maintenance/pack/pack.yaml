@@ -1,0 +1,196 @@
+# BRD-11 User Access Maintenance – Business Sign-off Pack, release set v2.0 (Drop 0, Setup and Data Migration).
+# Built by docs/deliverables/src/signoff/signoff_pack.py (workbook, checks) and read by the FRS source through
+# ```pack blocks (tools/deliverables/bdoi_docx.py). Schema: docs/deliverables/src/signoff/README.md.
+meta:
+  brd: BRD-11
+  brd_label: BRD-11
+  name: User Access Maintenance
+  code: UA
+  version: "2.0"
+  date: 27 September 2026
+  status_as_of: 27-Sep-2026
+  release_set: BRD-11 User Access Maintenance – Business Sign-off Pack
+  frs: FRS_BRD11_USER_ACCESS_MAINTENANCE.md
+  test_plan: brd11_cases.yaml
+  screens_dir: screens
+  screenshot_dir: ../screenshots
+
+# The User Access Maintenance personas: role code, name, SIT/UAT user of the seed profile.
+personas:
+  UAM_REQUESTOR: {name: Requestor, user: requestor}
+  UAM_APPROVER: {name: Approver, user: uamapprover}
+  UAM_SECOND_APPROVER: {name: Second Approver, user: secapprover}
+  BUSINESS_ADMIN: {name: Business Administrator, user: badmin}
+  SYSADMIN: {name: System Administrator, user: admin}
+  AUDITOR: {name: Auditor, user: auditor}
+  INFOSEC_OFFICER: {name: Information Security Officer, user: infosec}
+  NB_APPROVER: {name: New Business Approver (keeps the access approval right), user: approver}
+
+# The other personas whose sidebar the set shows: every persona of the persona suites of the menu check
+# (menu_suites). Signing BRD-11 signs the role matrix, so each persona's menu is a table of the FRS and a sheet of
+# the workbook. The check refuses a suite persona without a menu here, another seed user, or a sidebar that differs
+# from the suite.
+menu_suites: frontend/src/navigation/personaMenus.json
+menu_sheets: per_persona
+menu_personas:
+  MKT_AO: {name: Marketing Account Officer, user: ao}
+  MKT_TL: {name: Marketing Team Leader / Head (approver), user: mkttl}
+  PROCESSING_TL: {name: Processing Team Leader, user: proctl}
+  PROCESSOR: {name: Processing, user: proc}
+  LAMD: {name: LAMD (loan status validation), user: lamd}
+  CONTACT_CENTER: {name: Contact Center (renewal follow-up), user: contactc}
+  COMPLIANCE_OFFICER: {name: Compliance Officer, user: compoff}
+  COMPLIANCE_CHECKER: {name: Compliance Officer (Checker), user: compchk}
+  UNIT_COMPLIANCE_COORD: {name: Unit Compliance Coordinator, user: ucc}
+  SCR_INVESTIGATOR: {name: Screening Investigator, user: investigator}
+  SCR_APPROVER: {name: Screening Approver / Unit Head, user: scrapprover}
+  AML_COMMITTEE: {name: AML Committee Member, user: amlcom1}
+  EB_AO: {name: Marketing Account Officer (Employee Benefits), user: ebao}
+  EB_TL: {name: Marketing Team Lead / Unit Head (Employee Benefits), user: ebtl}
+  EB_MANAGEMENT: {name: BDOI Management (Employee Benefits threshold approver), user: ebmgmt}
+  EB_PROCESSOR: {name: Processing (Employee Benefits), user: ebproc}
+  EB_PROC_SUPERVISOR: {name: Processing Supervisor (Employee Benefits), user: ebprocsup}
+  EB_COLLECTION: {name: Collection (Employee Benefits), user: ebcoll}
+  CLM_OFFICER: {name: Claims Officer / Claims Assistant, user: clmofficer}
+  CLM_TL: {name: Claims Team Lead, user: clmtl}
+  CLM_TH: {name: Claims Team Head, user: clmth}
+  CLM_UH: {name: Claims Unit Head, user: clmuh}
+  CLM_RISK: {name: Claims / Risk Analyst, user: clmrisk}
+
+# Packs of other BRDs whose screens a walkthrough step may show (My Approvals and Lists of Values of New Business).
+foreign_packs: [../../BRD-01_New_Business/pack/pack.yaml]
+
+# Signatories of the sign-off certificate: role, organisation, what the signatory confirms.
+signatories:
+  - ["Product Owner, Marketing Business System", BDOI, "Business owner: the whole set"]
+  - ["Process Owner, User Access Maintenance (Business Administration)", BDOI, "Requests, approvals, group-profile requests, bulk requests, reports and the configuration inputs"]
+  - ["Head, BDOI Information Security", BDOI, "Information Security: the role matrix, the menus by persona, the separation-of-duties rules, the second approval of privileged changes, password and session rules, the audit log"]
+  - ["Head, BDOI IT", BDOI, "BDOI IT: sign-in and identity integration assumptions (EIAM on Entra ID, UIDM-ISC identity governance; integrations owned by BDOI IT), System Administrator functions"]
+  - ["Program Manager, Business Project Services", BDO Unibank ESG, "Traceability to the BRD"]
+  - [Project Manager, iorta TechNXT, "Delivery of the set as signed"]
+
+# Sidebar sections that belong to this BRD (navigation/modules.ts module ids) and the BRD of every other section,
+# used to mark each menu entry of a persona.
+own_sections: [user-access]
+section_brd:
+  dashboard: Platform
+  nb-dashboard: BRD-1
+  workspace: BRD-1
+  crm: BRD-1
+  screening: BRD-10
+  quotations: BRD-1
+  accounts: BRD-1
+  proposals: BRD-1
+  eb: BRD-8
+  placement: BRD-1
+  issuance: BRD-1
+  booking: BRD-1
+  renewal: BRD-6
+  prodrecon: BRD-2
+  adjustment: BRD-2
+  catalog: BRD-3
+  bulk: BRD-1
+  operations: BRD-2
+  collections: BRD-4
+  cashiering: BRD-2
+  remittance: BRD-2
+  commission: BRD-2 / BRD-4
+  disbursement: BRD-5
+  payrequest: BRD-5
+  acsl: BRD-5
+  frbs: BRD-5
+  gl: BRD-5
+  receivables: BRD-5
+  payables: BRD-5
+  assets: BRD-5
+  planning: BRD-5
+  tax: BRD-5
+  accounting-engine: BRD-5
+  brokerclaims: BRD-7
+  underwriting: Platform
+  claims: Platform
+  reinsurance: Platform
+  reserves: Platform
+  nb-reports: BRD-1
+  reports: Platform
+  broking-setup: BRD-1
+  screening-setup: BRD-10
+  setup: Platform
+  user-access: BRD-11
+  admin: Platform / BRD-11
+  help: Platform
+
+# Screen-flow figure: the links between the screens (list → record → action → next screen).
+flow:
+  - [SCR-UA-01, SCR-UA-02, "Forgot password?"]
+  - [SCR-UA-02, SCR-UA-01, Back to Login]
+  - [SCR-UA-01, SCR-UA-03, password set by an administrator or expired]
+  - [SCR-UA-03, SCR-UA-05, Change Password]
+  - [SCR-UA-01, SCR-UA-05, Login]
+  - [SCR-UA-05, SCR-UA-04, idle or session end]
+  - [SCR-UA-06, SCR-UA-07, New Request]
+  - [SCR-UA-06, SCR-UA-08, open]
+  - [SCR-UA-07, SCR-UA-08, Save Draft or Submit]
+  - [SCR-UA-08, SCR-UA-07, Edit Request]
+  - [SCR-UA-11, SCR-UA-12, New Group Profile Request]
+  - [SCR-UA-11, SCR-UA-08, open]
+  - [SCR-UA-12, SCR-UA-08, Save Draft or Submit]
+  - [SCR-UA-09, SCR-UA-10, open]
+  - [SCR-UA-10, SCR-UA-08, a line]
+  - [SCR-UA-15, SCR-UA-07, Raise Request or a row]
+  - [SCR-UA-16, SCR-UA-08, a request to implement]
+  - [SCR-UA-14, SCR-UA-17, a report]
+  - [SCR-UA-13, SCR-UA-16, the same grants]
+
+# Elements shared by many screens, described once.
+common:
+  - name: Page header
+    text: >-
+      Every page shows its section (User Access, Administration or Account) and title, a one-line description and its
+      actions on the right. A record page has a back arrow to its list.
+  - name: Work lists
+    text: >-
+      Lists show tabs, a search box with its Search button, a Filters button where the list has advanced filters, and
+      the paged table ("Showing 1 to n of N results"). A row opens its record. Dates show as dd-MMM-yyyy and times as
+      dd-MMM-yyyy HH:mm in Philippine time. Users are shown by their names, not their user IDs.
+  - name: Record summary and reference chips
+    text: >-
+      A request opens with its reference (AR-yyyy-nnnnnn for a request, BLK-yyyy-nnnnnn for a bulk batch), its status
+      pill, its risk flags (Privilege Increase, Outside Hours) and the key facts: requested by and when, approver,
+      effective date and decision. A reference chip copies the reference.
+  - name: Decisions with a reason
+    text: >-
+      Approve, Return, Reject, Cancel and Implement open a dialog that names the request and its change. Return,
+      Reject and Cancel need a text (remarks, reason); an approval comment is optional. The text is kept in the history
+      of the request and sent with the notice.
+  - name: Separation of duties
+    text: >-
+      Nothing changes access until a second person approves. The requester and the user the request is about never
+      decide it; a request goes to the approver chosen by the requester; a second approval is given by someone other
+      than the first approver; a group-profile request is implemented by a System Administrator who did not raise it.
+      The screens offer a decision only to the users who may take it, and the server refuses it for anyone else.
+  - name: Status pills and tags
+    text: >-
+      Request statuses (Draft, Pending, Pending Second, Returned, Scheduled, Approved, For Implementation,
+      Implemented, Rejected, Cancelled) and user statuses (Active, Online, Disabled, Locked) are pills of one size and
+      colour per state group; a pill never wraps. Risk flags are tags next to the request title.
+  - name: Dates
+    text: >-
+      Dates are entered with the date picker and shown as dd-MMM-yyyy (for example 27-Sep-2026). An effective date
+      cannot be before today; blank means the change applies on approval.
+  - name: Notifications and help
+    text: >-
+      The bell in the header shows the unread count and opens the notifications panel, grouped by day; each notice
+      opens its request. Mark Read, Mark All Read and View All are offered. The Help button of each page explains the
+      screen.
+  - name: Session guard
+    text: >-
+      On every screen, after 15 minutes without activity a dialog warns that the user will be signed out and counts
+      down; Stay Signed In keeps the session and Sign Out Now ends it. After 30 minutes without activity the user is
+      signed out. Activity in any browser tab keeps every tab signed in. Separately, the session ends at a fixed time
+      after sign-in, whatever the activity, and a dialog warns 30 minutes before.
+  - name: Messages
+    text: >-
+      Field errors appear under the field in red with the field outlined. A refusal by a business rule shows the
+      business message and a reference for support (the message code and a request number). Success is confirmed by a
+      short message at the bottom right of the page.

@@ -14,6 +14,11 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { displayNameOf } from '@/api/users';
+import { CellStack } from '@/components/ui/CellStack';
+import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
+import { Notice } from '@/components/ui/Notice';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { UserName } from '@/components/ui/UserName';
 
 type Tab = 'parameters' | 'configuration';
 
@@ -62,21 +67,133 @@ function ConfigurationTable() {
   );
 }
 
+/** A value as shown: a dash when blank. */
+function shown(value: string | null | undefined): string {
+  return value === undefined || value === null || value === '' ? '—' : value;
+}
+
+/** The change of a parameter that waits for approval, in words. */
+function pendingText(p: SystemParameter): string {
+  if (p.pendingValue === undefined || p.pendingValue === null) {
+    return '';
+  }
+  return `Waiting for approval: ${shown(p.pendingValue)}, asked by ${displayNameOf(p.pendingBy)}`;
+}
+
+function PendingDialog({
+  parameter,
+  mayApprove,
+  onClose,
+}: Readonly<{ parameter: SystemParameter; mayApprove: boolean; onClose: () => void }>) {
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  const [reason, setReason] = useState('');
+  const [tried, setTried] = useState(false);
+  const reasonMissing = mayApprove && reason.trim() === '';
+  const decide = useMutation({
+    mutationFn: (approve: boolean) =>
+      approve
+        ? systemApi.approveParameter(parameter.key)
+        : systemApi.rejectParameter(parameter.key, reason.trim() || undefined),
+    onSuccess: async (p, approve) => {
+      onClose();
+      await queryClient.invalidateQueries({ queryKey: ['system'] });
+      await queryClient.invalidateQueries({ queryKey: ['session-policy'] });
+      toast.success(approve ? `${p.description}: change approved` : 'Change rejected');
+    },
+  });
+  return (
+    <Modal
+      open
+      title="Security Setting to Approve"
+      onClose={onClose}
+      footer={
+        <>
+          <Button
+            variant={mayApprove ? 'danger' : 'secondary'}
+            busy={decide.isPending}
+            onClick={() => {
+              setTried(true);
+              if (!reasonMissing) {
+                decide.mutate(false);
+              }
+            }}
+          >
+            {mayApprove ? 'Reject' : 'Withdraw'}
+          </Button>
+          {mayApprove && (
+            <Button variant="accent" busy={decide.isPending} onClick={() => decide.mutate(true)}>
+              Approve
+            </Button>
+          )}
+        </>
+      }
+    >
+      <div className="stack">
+        <ErrorAlert error={decide.error} title="Cannot decide the change" />
+        <p>{parameter.description}</p>
+        <DefinitionGrid
+          label="Change to approve"
+          items={[
+            { label: 'Parameter', value: parameter.key },
+            { label: 'Current value', value: parameter.value },
+            { label: 'New value', value: parameter.pendingValue },
+            { label: 'Asked by', value: <UserName login={parameter.pendingBy} /> },
+            { label: 'Asked on', value: formatDateTime(parameter.pendingAt) },
+          ]}
+        />
+        {!mayApprove && (
+          <Notice tone="info">Another user with the approval right approves the change.</Notice>
+        )}
+        <Field
+          label={mayApprove ? 'Reason (needed to reject)' : 'Reason'}
+          error={tried && reasonMissing ? 'Enter the reason for the rejection' : undefined}
+        >
+          {(id) => (
+            <textarea
+              id={id}
+              className="textarea"
+              rows={2}
+              maxLength={200}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+            />
+          )}
+        </Field>
+      </div>
+    </Modal>
+  );
+}
+
 /**
  * System parameters: editable business parameters (validated by type, audited) and a read-only
- * view of the non-secret runtime configuration.
+ * view of the non-secret runtime configuration. A change of a security parameter waits until
+ * another user approves it (SECURITY_PARAMETER_APPROVE).
  */
 export default function SystemParametersPage() {
-  const { can } = useAuth();
+  const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Tab>('parameters');
   const [editing, setEditing] = useState<SystemParameter | null>(null);
+  const [deciding, setDeciding] = useState<SystemParameter | null>(null);
   const parameters = useQuery({
     queryKey: ['system', 'parameters'],
     queryFn: systemApi.parameters,
   });
   const canEdit = can('SYSTEM_PARAMETER_MANAGE');
+  const canApprove = can('SECURITY_PARAMETER_APPROVE');
+  const mine = (p: SystemParameter) =>
+    user !== null && (p.pendingBy ?? '').toLowerCase() === user.username.toLowerCase();
+  const open = (p: SystemParameter) => {
+    if (pendingText(p) !== '') {
+      if ((canApprove && !mine(p)) || (canEdit && mine(p))) {
+        setDeciding(p);
+      }
+    } else if (canEdit) {
+      setEditing(p);
+    }
+  };
 
   const save = useMutation({
     mutationFn: (p: SystemParameter) => systemApi.updateParameter(p.key, p.value),
@@ -84,7 +201,11 @@ export default function SystemParametersPage() {
       setEditing(null);
       await queryClient.invalidateQueries({ queryKey: ['system'] });
       await queryClient.invalidateQueries({ queryKey: ['session-policy'] });
-      toast.success(`${p.key} updated`);
+      toast.success(
+        pendingText(p) === ''
+          ? `${p.description}: updated`
+          : `${p.description}: change sent for approval`,
+      );
     },
   });
 
@@ -104,19 +225,44 @@ export default function SystemParametersPage() {
             loading={parameters.isLoading}
             rows={parameters.data ?? []}
             rowKey={(p) => p.key}
-            onRowClick={canEdit ? (p) => setEditing(p) : undefined}
+            onRowClick={canEdit || canApprove ? open : undefined}
             columns={[
               { key: 'c', header: 'Category', render: (p) => humanize(p.category) },
               { key: 'k', header: 'Parameter', render: (p) => <strong>{p.key}</strong> },
-              { key: 'v', header: 'Value', render: (p) => p.value || '—' },
+              {
+                key: 'v',
+                header: 'Value',
+                render: (p) => (
+                  <CellStack
+                    main={p.value}
+                    sub={pendingText(p) && `New value: ${shown(p.pendingValue)}`}
+                  />
+                ),
+              },
+              {
+                key: 's',
+                header: 'Status',
+                kind: 'status',
+                render: (p) =>
+                  pendingText(p) ? (
+                    <StatusBadge status="PENDING_APPROVAL" />
+                  ) : (
+                    <StatusBadge status="ACTIVE" label="In Force" />
+                  ),
+              },
               { key: 'd', header: 'Description', render: (p) => p.description },
               {
                 key: 'u',
                 header: 'Last Changed',
                 render: (p) =>
-                  p.updatedBy === undefined
-                    ? ''
-                    : `${displayNameOf(p.updatedBy)}, ${formatDateTime(p.updatedAt)}`,
+                  p.updatedBy === undefined ? (
+                    ''
+                  ) : (
+                    <CellStack
+                      main={<UserName login={p.updatedBy} />}
+                      sub={formatDateTime(p.updatedAt)}
+                    />
+                  ),
               },
             ]}
           />
@@ -136,10 +282,15 @@ export default function SystemParametersPage() {
           </Button>
         }
       >
-        <ErrorAlert error={save.error} />
+        <ErrorAlert error={save.error} title="Cannot save the parameter" />
         {editing !== null && (
           <div className="stack">
             <p className="muted">{editing.description}</p>
+            {editing.secondApproval && (
+              <Notice tone="info" title="Security setting">
+                The change applies once another user approves it.
+              </Notice>
+            )}
             <Field label="Value" hint={hintFor(editing)}>
               {(id) => (
                 <input
@@ -154,6 +305,13 @@ export default function SystemParametersPage() {
           </div>
         )}
       </Modal>
+      {deciding !== null && (
+        <PendingDialog
+          parameter={deciding}
+          mayApprove={canApprove && !mine(deciding)}
+          onClose={() => setDeciding(null)}
+        />
+      )}
     </div>
   );
 }

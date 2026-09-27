@@ -1,5 +1,6 @@
 import { api, toQuery } from './client';
-import type { PageResponse } from './types';
+import type { InvoiceOriginFields, LegacySnapshot } from './operationsLegacy';
+import type { PageResponse, RecordOriginKind } from './types';
 
 /**
  * Operations foundation (opsledger, BRD-2): invoice ledger and 360, Operations home, Disbursement
@@ -73,7 +74,7 @@ export interface InvoiceFlags {
   lockedAt?: string;
 }
 
-export interface OpsInvoiceSummary {
+export interface OpsInvoiceSummary extends InvoiceOriginFields {
   invoiceNo: string;
   arn: string;
   kind: string;
@@ -106,7 +107,7 @@ export interface InvoiceComponentRow {
   balance: number;
 }
 
-export interface OpsInvoice {
+export interface OpsInvoice extends InvoiceOriginFields {
   keys: {
     invoiceNo: string;
     arn: string;
@@ -141,7 +142,7 @@ export interface OpsInvoice {
   paymentStatus: PaymentStatus;
   remittanceStatus: RemittanceStatus;
   flags: InvoiceFlags;
-  feedSource: 'EVENT' | 'REPLAY';
+  feedSource: 'EVENT' | 'REPLAY' | 'MIGRATION';
   components: InvoiceComponentRow[];
   shares: { insurerCode: string; sharePct: number; lead: boolean }[];
 }
@@ -201,6 +202,8 @@ export interface Invoice360 {
     overAdjusted: boolean;
   };
   related: Partial<Record<RelatedSection, RelatedItem[]>>;
+  /** Frozen original values of a legacy invoice (BRD-13). */
+  legacy?: LegacySnapshot;
 }
 
 export interface WorkCount {
@@ -233,6 +236,8 @@ export interface InvoiceSearch {
   inceptionTo?: string;
   /** Account officer. */
   ao?: string;
+  /** BIBS or migrated legacy invoices (BRD-13). */
+  origin?: RecordOriginKind;
 }
 
 export interface Disbursement {

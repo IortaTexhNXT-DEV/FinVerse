@@ -22,6 +22,7 @@ import {
   totalPremium,
 } from './proposalForm';
 import type { AnswerRow, FactorRow, PlanRow, ProposalForm } from './proposalForm';
+import { Notice } from '@/components/ui/Notice';
 
 type Setter = (patch: Partial<ProposalForm>) => void;
 
@@ -297,12 +298,12 @@ export function ProposalDialog({
           </Field>
         </div>
         <h3 className="eb-subtitle">Plans and Premiums</h3>
-        {errors.plans && <div className="alert danger">{errors.plans}</div>}
+        {errors.plans && <Notice tone="error">{errors.plans}</Notice>}
         <PlansTable form={form} set={set} />
         <h3 className="eb-subtitle">Answers to the Terms of Reference</h3>
         <AnswersTable form={form} items={items} set={set} />
         <h3 className="eb-subtitle">Capability</h3>
-        {errors.factors && <div className="alert danger">{errors.factors}</div>}
+        {errors.factors && <Notice tone="error">{errors.factors}</Notice>}
         <FactorsList form={form} set={set} />
         <div className="form-grid">
           <Field label="Terms">

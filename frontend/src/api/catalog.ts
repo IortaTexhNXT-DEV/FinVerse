@@ -1,9 +1,8 @@
 import { api, toQuery } from './client';
 import type { ProductLifecycle, VersionStatus } from './productCatalog';
-import type { RecordStatus } from './types';
+import type { RecordStatus, RecordOriginFields } from './types';
 
 /** Product catalog, insurer panel, rate tables, sales organisation and rating (catalog module). */
-
 export type RiskItemKind = 'VEHICLE' | 'PROPERTY_LOCATION' | 'PERSON' | 'GENERIC';
 export type RatingMethod = 'PROPERTY' | 'MOTOR' | 'GENERIC';
 export type PaymentGate = 'PAID' | 'CLIENT_CONFIRMATION';
@@ -102,7 +101,7 @@ export interface ProductInput {
   tsuInvolvement?: TsuInvolvement;
 }
 
-export interface Product extends ProductInput, Authorizable {
+export interface Product extends ProductInput, Authorizable, RecordOriginFields {
   /** ACTIVE, EXPIRED or RETIRED (BRPM.006); current package version (BRPM.007). */
   lifecycleStatus?: ProductLifecycle;
   currentVersionNo?: number;
@@ -188,7 +187,7 @@ export interface InsurerInput {
   phone?: string;
 }
 
-export interface Insurer extends Authorizable {
+export interface Insurer extends Authorizable, RecordOriginFields {
   companyId: number;
   partyCode: string;
   name: string;

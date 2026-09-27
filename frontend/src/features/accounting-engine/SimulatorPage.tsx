@@ -15,6 +15,7 @@ import { useDefaultBranchId, useWorkspace } from '@/context/workspaceContext';
 import { today } from '@/utils/format';
 import { components, optionalHeader, roles, toAmounts, unbalancedWarning } from './ruleModel';
 import { useAccountingLookups } from './useAccountingLookups';
+import { Notice } from '@/components/ui/Notice';
 
 /**
  * Rule simulator: enter sample amounts for an event and preview the journal lines the engine would
@@ -141,11 +142,7 @@ export default function SimulatorPage() {
         </Card>
       </div>
       <ErrorAlert error={run.error} />
-      {warning !== undefined && (
-        <div className="alert danger" role="alert">
-          {warning}
-        </div>
-      )}
+      {warning !== undefined && <Notice tone="error">{warning}</Notice>}
       {run.data !== undefined && (
         <Card
           flush

@@ -16,10 +16,10 @@ digraph core_journey {
 
   uam  [label="User Access\nBRD-11", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
   pm   [label="20 Product Maintenance\nBRD-3", fillcolor="@DIRTY_WHITE"];
-  eb   [label="19 Employee Benefits\nBRD-8 (designed)", fillcolor="@AMBER_BG", color="@YELLOW"];
-  rn   [label="6 Renewal\nBRD-6 (designed)", fillcolor="@AMBER_BG", color="@YELLOW"];
-  clm  [label="14 Claims\nBRD-7 (being built)", fillcolor="@AMBER_BG", color="@YELLOW"];
-  csf  [label="16 Customer Service Facility\nBRD-9 (designed)", fillcolor="@AMBER_BG", color="@YELLOW"];
+  eb   [label="19 Employee Benefits\nBRD-8"];
+  rn   [label="6 Renewal\nBRD-6"];
+  clm  [label="14 Claims\nBRD-7"];
+  csf  [label="16 Customer Service Facility\nBRD-9"];
   ri   [label="15 Reinsurance\nPhase 2 - BRD received", fillcolor="@WHITE", color="@MUTED", style="rounded,dashed"];
 
   plat [label="Platform services: 17 Data Management (LOV, insurer, MIS fields, change log),\n21 Report Generation, role dashboards, notifications, audit",

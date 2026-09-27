@@ -5,7 +5,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
+import { formatAmount, formatDate, formatDateTime, formatPeriod, humanize } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { Account } from './api';
 import { TIMELINE_KINDS } from './collectionsLogic';
@@ -260,7 +260,7 @@ export function PolicyTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
             {[
               ['Policy', `${p.policyNo ?? '—'} (year ${p.policyYear})`],
               ['Product / Risk', [p.productLine, p.riskCode].filter(Boolean).join(' / ') || '—'],
-              ['Period', `${formatDate(p.inceptionDate)} – ${formatDate(p.expiryDate)}`],
+              ['Period', formatPeriod(p.inceptionDate, p.expiryDate)],
               ['Booked', formatDate(p.bookingDate)],
               ['Receipt Date (first AR)', formatDate(p.firstReceiptDate) || '—'],
             ].map(([label, value]) => (

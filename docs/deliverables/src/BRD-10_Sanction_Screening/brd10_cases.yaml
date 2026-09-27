@@ -1,9 +1,8 @@
 # Test plan BRD-10 Sanction Screening and Risk Profiling - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-10_Sanction_Screening/brd10_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# BRD-10 is designed, not built: the expected results quote the message text of the FRS and the build
-# design (docs/architecture/SANCTION_SCREENING_DESIGN.md) without codes, and no case names an automated
-# test. Screen paths follow section 11 of the build design. All list names used in the tests are
+# The expected results quote the message text of the FRS; screen paths follow the screening screens of the
+# FRS. All list names used in the tests are
 # invented; no real listed person or entity is used.
 
 meta:
@@ -14,7 +13,7 @@ meta:
   summary: TP_BRD10_SANCTION_SCREENING.md
   version: "1.0"
   date: 25 September 2026
-  built: false
+  verify_messages: false
 
 personas:
   COMPLIANCE_OFFICER: {name: Compliance Officer (maker), short: Comp. Off.}
@@ -59,21 +58,21 @@ screens:
   NOTIF: Notifications (bell icon in the page header)
   MAIL: Test mailbox of the recipient
   DB: Database console of the test environment (database administrator)
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-SS-01
     name: Test users per role
     content: compoff (COMPLIANCE_OFFICER), compchk (COMPLIANCE_CHECKER), ucc (UNIT_COMPLIANCE_COORD), investigator and investigator2 of two teams (SCR_INVESTIGATOR), scrapprover (SCR_APPROVER, Unit Head of the Corbank unit), amlcom1 to amlcom5 (AML_COMMITTEE), opslead (OPS_LEAD), auditor, admin, badmin (BUSINESS_ADMIN), ao (MKT_AO). A combined test user holding SCR_INVESTIGATE and SCR_CASE_APPROVE for the four-eyes cases.
-    source: Planned seed V1950 (compoff, compchk, ucc, investigator, scrapprover, amlcom1, amlcom2); the others created by the test lead through User Access requests
+    source: Seed data (compoff, compchk, ucc, investigator, scrapprover, amlcom1, amlcom2); the others created by the test lead through User Access requests
   - id: TD-SS-02
     name: Active configuration versions
     content: One ACTIVE version of every type - matching criteria (EXACT, PHONETIC, FUZZY 0.85, case threshold 0.90 for SANCTION individuals), three risk categories (HIGH_SANCTION rating HIGH with tag WATCHLIST_REVIEW, PEP with tag PEP and EDD, STANDARD), approval routes with a Corbank route, assignment matrix with a Retail PEP scenario, SLA matrix, validation rules requiring the KYC form, KYC / transaction / EDD / STR templates and an STR layout; one PENDING draft made by compoff.
-    source: Planned seed V1950 of the build design
+    source: Seed data
   - id: TD-SS-03
     name: Watchlist with invented names
     content: Sources AML_ADVISORY (sanction, file), NLDS_PEP (PEP, file) and INTERNAL (manual); 25 invented entries, among them "Juan de la Cruz" (individual, sanction) and "Maria Santos Reyes" (PEP).
-    source: Planned seed V1951; invented names only
+    source: Seed data; invented names only
   - id: TD-SS-04
     name: List files
     content: AML_ADVISORY CSV with 3 new and 1 changed entry; a CSV with 2 bad lines (one without name, one with birth date 31-02-1970); an unreadable (truncated) CSV; the same valid file again; a PDF file for the AML_ADVISORY source; an NLDS_PEP file adding 5 entries.
@@ -81,11 +80,11 @@ data:
   - id: TD-SS-05
     name: Masked clients
     content: Prospect "Juan Dela Cruz" (individual, Retail unit); client "ABC Trading" (entity, Corbank unit) with a booked account; client with a PEP profile and a booked account (Retail unit); client without an active policy; inactive client; a client whose account officer is investigator2.
-    source: Masked seed clients (V981) plus clients keyed in by the test lead on SIT
+    source: Masked seed clients plus clients keyed in by the test lead on SIT
   - id: TD-SS-06
     name: Cases in every stage
     content: Cases in NEW, INVESTIGATION, RETURNED, UNIT_HEAD_APPROVAL, COMPLIANCE_REVIEW, AML_COMMITTEE (one vote pending), STR_PREPARATION and CLOSED; one STR APPROVED and one EXTRACTED.
-    source: Planned seed V1952 of the build design
+    source: Seed data
   - id: TD-SS-07
     name: Case documents
     content: KYC form PDF for "ABC Trading" received 12-May-2026; ID copy (JPG); source-of-funds letter (PDF); an .exe file.
@@ -93,15 +92,15 @@ data:
   - id: TD-SS-08
     name: Committee settings
     content: SCR_COMMITTEE_RULE MAJORITY, SCR_COMMITTEE_SIZE 5, five committee users amlcom1 to amlcom5.
-    source: Parameters as delivered; users of TD-SS-01
+    source: Parameters as configured; users of TD-SS-01
   - id: TD-SS-09
     name: STR data
     content: Case in STR_PREPARATION for "ABC Trading" with two receipts and one invoice; test STR reason codes UAT01 and UAT02 added to SCR_STR_REASON by the test lead; an STR approved by the committee this month and one approved last month.
     source: Case of TD-SS-06; reason codes keyed in Lists of Values until BDOI supplies the AMLC codes (SQ09)
   - id: TD-SS-10
-    name: Parameters and jobs as delivered
+    name: Parameters and jobs at their defaults
     content: "SCR_SCREENING_SCOPE PROSPECT, CONFIRMED; SCR_FULL_RESCREEN_DAY 1; SCR_BLOCK_ON_OPEN_MATCH false; SCR_COMMITTEE_RULE MAJORITY; SCR_COMMITTEE_SIZE 5; SCR_INGEST_ALERT_RECIPIENTS = test mailbox; jobs SCR_WATCHLIST_INGEST 01:00, SCR_PERIODIC_SCREENING 01:30, SCR_SLA_MONITOR hourly, SCR_INGEST_ERROR_DIGEST 07:00 Monday to Friday."
-    source: Configuration delivered with the build (FRS section 9.1); recipients set by the test lead
+    source: Configuration of the SIT environment (FRS section 9.1); recipients set by the test lead
 
 scenarios:
   - id: SC-SS-01
@@ -146,7 +145,7 @@ frs:
     conditions:
       - An Investigator sees Screening Home, Cases and Matches and does not see Compliance Setup.
       - A Compliance Checker can approve a configuration version and cannot edit it.
-      - A screen or call without the permission is refused, and a refused call is logged.
+      - A screen or direct request without the permission is refused, and a refused request is logged.
       - An Investigator sees the cases of the own team only; committee members act only on cases in the AML_COMMITTEE stage.
       - A user acts on a case only while it is assigned to him or her.
     cases:
@@ -162,7 +161,7 @@ frs:
         screen: CONFIG
         title: Investigator opens Compliance Setup by its address
         steps:
-          - As investigator type the address /screening-setup/config.
+          - As investigator open the address of Compliance Setup directly in the browser.
         expected: The page shows the no-access message and no configuration is loaded.
       - c: 2
         type: Security-access
@@ -179,11 +178,11 @@ frs:
         type: Security-access
         persona: SCR_INVESTIGATOR
         screen: API
-        title: Direct committee decision call without SCR_COMMITTEE
+        title: Direct committee decision request without SCR_COMMITTEE
         steps:
-          - As investigator call Record Decision on a case in AML_COMMITTEE.
+          - As investigator send a direct request to record a committee decision on a case in AML_COMMITTEE.
           - As auditor open Administration > Audit Trail.
-        expected: The call returns HTTP 403 and no vote is recorded. The refused call is logged with user, endpoint and time.
+        expected: The request is refused and no vote is recorded. The refused request is logged with the user and time.
         msg: [You are not permitted to perform this action]
       - c: 4
         type: Security-access
@@ -206,7 +205,7 @@ frs:
         screen: API
         title: Action on a case assigned to another user
         steps:
-          - As the combined test user (SCR_INVESTIGATE) call Submit on a case in INVESTIGATION assigned to investigator.
+          - As the combined test user (SCR_INVESTIGATE) send a direct request to submit a case in INVESTIGATION assigned to investigator.
         expected: The action is refused and the case does not move.
         msg: ["Case {SCR-2026-000010} is assigned to {investigator}"]
 
@@ -700,7 +699,7 @@ frs:
         screen: API
         title: Disposition of another stage refused
         steps:
-          - As investigator submit a case in INVESTIGATION with disposition CONCUR through the API.
+          - As investigator submit a case in INVESTIGATION with disposition CONCUR by a direct request.
         expected: The submission is refused; the case stays in INVESTIGATION.
         msg: ["The action {submit} is not allowed in stage {INVESTIGATION}"]
       - c: 2
@@ -1293,8 +1292,8 @@ frs:
         type: Negative
         title: Investigator edits a submitted case
         steps:
-          - Submit a case; reopen it; try Save Draft on the Review tab through the API.
-        expected: The case is read only; the call is refused.
+          - Submit a case; reopen it; try Save Draft on the Review tab by a direct request.
+        expected: The case is read only; a direct request is refused.
         msg: ["Case {SCR-2026-000012} is no longer assigned to you"]
       - c: 2
         type: Positive
@@ -1309,9 +1308,9 @@ frs:
         screen: API
         title: Transition not in the workflow
         steps:
-          - Call prepare_str on a case in UNIT_HEAD_APPROVAL.
+          - Send a direct request for the action Prepare STR on a case in UNIT_HEAD_APPROVAL.
         expected: Refused; the case stays.
-        msg: ["The action {prepare_str} is not allowed in stage {UNIT_HEAD_APPROVAL}"]
+        msg: ["The action {Prepare STR} is not allowed in stage {UNIT_HEAD_APPROVAL}"]
       - c: 4
         type: Workflow
         persona: COMPLIANCE_OFFICER
@@ -1650,7 +1649,7 @@ frs:
         title: No delete on a submitted case
         steps:
           - Open the Documents tab of a submitted case.
-        expected: No Delete action; the call to delete an attachment of the case is refused.
+        expected: No Delete action; a direct request to delete an attachment of the case is refused.
 
   FR-SS-060:
     scenario: SC-SS-06
@@ -2113,8 +2112,8 @@ frs:
         persona: SCR_INVESTIGATOR
         title: Investigator cannot run the reports
         steps:
-          - As investigator open Reports; call the run of SCR-CASE-STATUS.
-        expected: The Compliance category is not listed; the call returns HTTP 403.
+          - As investigator open Reports; send a direct request to run SCR-CASE-STATUS.
+        expected: The Compliance category is not listed; the request is refused.
         msg: [You are not permitted to perform this action]
       - c: 3
         type: Negative
@@ -2144,8 +2143,8 @@ frs:
         type: Security-access
         title: No edit or delete of audit rows
         steps:
-          - Open an audit row and a timeline event; look for edit and delete; call delete through the API.
-        expected: No action offered; the API offers no update or delete and the call is refused.
+          - Open an audit row and a timeline event; look for edit and delete; send a direct request to delete them.
+        expected: No action offered; no update or delete is offered and direct requests are refused.
       - c: 3
         type: Negative
         screen: DB
@@ -2181,8 +2180,8 @@ frs:
         persona: UNIT_COMPLIANCE_COORD
         title: UCC cannot run the audit log report
         steps:
-          - As ucc call the run of SCR-AUDIT-LOG.
-        expected: HTTP 403.
+          - As ucc send a direct request to run SCR-AUDIT-LOG.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action]
       - c: 3
         type: Negative
@@ -2198,31 +2197,31 @@ access:
     permission: SCR_VIEW
     allow: [COMPLIANCE_OFFICER, COMPLIANCE_CHECKER, UNIT_COMPLIANCE_COORD, SCR_INVESTIGATOR, SCR_APPROVER, AML_COMMITTEE, OPS_LEAD, AUDITOR, SYSADMIN]
     deny: [MKT_AO]
-    denied: Sanction Screening is not in the menu; /screening shows the no-access page.
+    denied: Sanction Screening is not in the menu; its address shows the no-access page.
   - action: Draft and submit configuration versions
     screen: CONFIG
     permission: SCR_CONFIG_MAINTAIN
     allow: [COMPLIANCE_OFFICER]
     deny: [COMPLIANCE_CHECKER, UNIT_COMPLIANCE_COORD, SCR_INVESTIGATOR, SYSADMIN]
-    denied: New Draft and Submit for Approval are not shown; the call returns HTTP 403.
+    denied: New Draft and Submit for Approval are not shown; the request is refused.
   - action: Approve or reject configuration versions
     screen: CONFIG
     permission: SCR_CONFIG_APPROVE
     allow: [COMPLIANCE_CHECKER]
     deny: [COMPLIANCE_OFFICER, SCR_APPROVER]
-    denied: Approve and Reject are not shown; the call returns HTTP 403.
+    denied: Approve and Reject are not shown; the request is refused.
   - action: Maintain list entries and upload list files
     screen: WATCHLIST
     permission: SCR_LIST_MAINTAIN
     allow: [COMPLIANCE_OFFICER]
     deny: [COMPLIANCE_CHECKER, SCR_INVESTIGATOR, UNIT_COMPLIANCE_COORD]
-    denied: Add Entry and Upload List File are not shown; the call returns HTTP 403.
+    denied: Add Entry and Upload List File are not shown; the request is refused.
   - action: Approve or reject list changes
     screen: APPROVALS
     permission: SCR_LIST_APPROVE
     allow: [COMPLIANCE_CHECKER]
     deny: [COMPLIANCE_OFFICER, AUDITOR]
-    denied: The list change is not offered in My Approvals; the call returns HTTP 403.
+    denied: The list change is not offered in My Approvals; the request is refused.
   - action: Work the investigation stage
     screen: REVIEW
     permission: SCR_INVESTIGATE
@@ -2240,72 +2239,40 @@ access:
     permission: SCR_CASE_ASSIGN
     allow: [COMPLIANCE_OFFICER, UNIT_COMPLIANCE_COORD, SCR_APPROVER]
     deny: [SCR_INVESTIGATOR, AML_COMMITTEE]
-    denied: Re-assign is not shown; the call returns HTTP 403.
+    denied: Re-assign is not shown; the request is refused.
   - action: Approve or disapprove as Unit Head
     screen: CASE
     permission: SCR_CASE_APPROVE
     allow: [SCR_APPROVER]
     deny: [SCR_INVESTIGATOR, COMPLIANCE_OFFICER]
-    denied: Approve and Disapprove are not shown; the call returns HTTP 403.
+    denied: Approve and Disapprove are not shown; the request is refused.
   - action: Review BU escalations and prepare the STR
     screen: CASE
     permission: SCR_COMPLIANCE_REVIEW
     allow: [COMPLIANCE_OFFICER]
     deny: [UNIT_COMPLIANCE_COORD, SCR_APPROVER, AML_COMMITTEE]
-    denied: The outcome list and the STR tab actions are not shown; the call returns HTTP 403.
+    denied: The outcome list and the STR tab actions are not shown; the request is refused.
   - action: Record an AML Committee decision
     screen: DECISIONS
     permission: SCR_COMMITTEE
     allow: [AML_COMMITTEE]
     deny: [COMPLIANCE_OFFICER, SCR_APPROVER, SCR_INVESTIGATOR]
-    denied: Record Decision is not shown; the call returns HTTP 403.
+    denied: Record Decision is not shown; the request is refused.
   - action: Extract STRs and record the filing reference
     screen: STR
     permission: SCR_STR_EXTRACT
     allow: [COMPLIANCE_OFFICER]
     deny: [UNIT_COMPLIANCE_COORD, AUDITOR]
-    denied: Extract Approved STRs and Record Filing are not shown; the call returns HTTP 403.
+    denied: Extract Approved STRs and Record Filing are not shown; the request is refused.
   - action: Run the compliance reports
     screen: REPORTS
     permission: SCR_REPORT_VIEW
     allow: [COMPLIANCE_OFFICER, COMPLIANCE_CHECKER, UNIT_COMPLIANCE_COORD, OPS_LEAD, AUDITOR]
     deny: [SCR_INVESTIGATOR, SCR_APPROVER, AML_COMMITTEE]
-    denied: The Compliance category is not listed; the run call returns HTTP 403.
+    denied: The Compliance category is not listed; a direct run request is refused.
   - action: Run the screening audit log report
     screen: REPORTS
     permission: SCR_AUDIT_VIEW
     allow: [COMPLIANCE_OFFICER, AUDITOR]
     deny: [UNIT_COMPLIANCE_COORD, OPS_LEAD, SYSADMIN]
-    denied: SCR-AUDIT-LOG is not listed; the run call returns HTTP 403.
-
-findings:
-  - fr: FR-SS-001
-    issue: 'The FRS gives the no-access text as "You do not have access to this page". The platform screen shows "You do not have access to this screen. Contact your administrator if you need it." (frontend/src/auth/RequireAuth.tsx), as found for BRD-3.'
-    proposal: Quote the platform text in FRS v1.1; the cases check the no-access page without quoting it.
-  - fr: FR-SS-031
-    issue: 'Acceptance criterion 1 says "Juan Dela Cruz" matches "Juan de la Cruz" by the phonetic rule, but the normalisation of R4 (case, punctuation, word order) may already give an exact or fuzzy match first. The FRS does not say which algorithm is recorded when several meet their thresholds, or the expected score.'
-    proposal: State the order of the algorithms and which one is recorded; give the expected algorithm and a score range for the acceptance example.
-  - fr: FR-SS-034
-    issue: The FRS says only clients with an active policy need a KYC review or EDD and others get a MONITOR case, but it does not say whether a NAME_MATCH or ACCOUNT_APPLICATION case of a client without an active policy also becomes MONITOR.
-    proposal: State the case type per trigger for clients without an active policy; the cases assume only HIGH_RISK, PEP and EDD become MONITOR.
-  - fr: FR-SS-043
-    issue: The FR names the Investigator as an actor of re-assignment, but the role matrix does not grant SCR_CASE_ASSIGN to the Investigator (SQ13).
-    proposal: Align the actor line with the matrix after SQ13; the access checks deny re-assignment to the Investigator.
-  - fr: FR-SS-052
-    issue: 'The naming example "KYC_REVIEW_ABC Trading_20260512_<type>_1" keeps a space and would keep other characters of the client name that file systems or the AMLC may refuse. The document-type code in the name is not fixed.'
-    proposal: State how the client name is cleaned (spaces, punctuation, length) and which document-type value is used; the case checks the example as written.
-  - fr: FR-SS-064
-    issue: 'The FRS does not say whether MAJORITY means a majority of SCR_COMMITTEE_SIZE or of the members who hold AML_COMMITTEE, or what happens when fewer members than the size hold the role or a member is absent.'
-    proposal: Define the quorum and the behaviour with fewer members; the cases use five members.
-  - fr: FR-SS-070
-    issue: At least one reason code is mandatory on the STR, but the list SCR_STR_REASON is delivered empty until BDOI supplies the AMLC codes (SQ09). An STR cannot be completed in UAT as delivered.
-    proposal: Deliver placeholder reason codes for testing or make the field optional until SQ09; the cases use test codes UAT01 and UAT02 added by the test lead.
-  - fr: FR-SS-071
-    issue: 'Acceptance criterion 1 "the committee-approved STRs of that month" does not say whether the month is the committee decision date, the STR creation date or the date the STR was marked ready.'
-    proposal: Name the date the period filters on; the cases assume the committee decision date.
-  - fr: FR-SS-018
-    issue: The acceptance criterion quotes delivered values (CONCUR, NOT_CONCUR) that are placeholders until BDOI confirms the dispositions (SQ06); the test changes when the list changes.
-    proposal: Keep the criterion in terms of "the dispositions whose parent is the stage" and move the values to section 9.2.
-  - fr: FR-SS-091
-    issue: Acceptance criterion 2 (a database update of a timeline row is refused) needs database access that testers do not have, and the 5-year archive retention may be shorter than AMLA requires (SQ18).
-    proposal: Record the database check as evidence from the database administrator; confirm the retention period under SQ18.
+    denied: SCR-AUDIT-LOG is not listed; a direct run request is refused.

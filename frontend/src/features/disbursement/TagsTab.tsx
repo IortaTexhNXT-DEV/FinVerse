@@ -11,7 +11,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, humanize, today } from '@/utils/format';
+import { formatDate, formatPeriod, humanize, today } from '@/utils/format';
 import { disbursementApi } from './api';
 import type { Tag, Voucher } from './api';
 import { DialogFooter } from './VoucherDialogs';
@@ -27,9 +27,7 @@ const COLUMNS: Column<Tag>[] = [
     key: 'period',
     header: 'Date / Period',
     render: (t) =>
-      t.kind === 'CWT'
-        ? `${formatDate(t.periodFrom)} - ${formatDate(t.periodTo)}`
-        : formatDate(t.docDate),
+      t.kind === 'CWT' ? formatPeriod(t.periodFrom, t.periodTo) : formatDate(t.docDate),
   },
   {
     key: 'on',

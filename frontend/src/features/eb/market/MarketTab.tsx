@@ -22,6 +22,7 @@ import { InsurerChecks } from '../common/InsurerChecks';
 import { useCycleList } from '../common/useCycleList';
 import { useEbMutation } from '../common/useEbMutation';
 import { TorCard } from './TorCard';
+import { Notice } from '@/components/ui/Notice';
 
 /** Send Requests: the released TOR goes to each selected insurer for its proposal. */
 function SendDialog({ cycleId, onClose }: Readonly<{ cycleId: number; onClose: () => void }>) {
@@ -52,7 +53,7 @@ function SendDialog({ cycleId, onClose }: Readonly<{ cycleId: number; onClose: (
           the franchise of the cycle can be sent a request.
         </p>
         {submitted && codes.length === 0 && (
-          <div className="alert danger">Select at least one insurer</div>
+          <Notice tone="error">Select at least one insurer</Notice>
         )}
         <InsurerChecks value={codes} onChange={setCodes} />
       </div>
@@ -108,7 +109,7 @@ function RevisionDialog({
       <div className="stack">
         <ErrorAlert error={request.error} />
         {submitted && !valid && (
-          <div className="alert danger">Enter at least one change and select the insurers</div>
+          <Notice tone="error">Enter at least one change and select the insurers</Notice>
         )}
         <Field label="Description">
           {(id) => (

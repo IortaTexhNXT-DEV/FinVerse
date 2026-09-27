@@ -27,7 +27,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
-import { formatDate } from '@/utils/format';
+import { formatPeriod } from '@/utils/format';
 import { AdvisoriesTab } from './AdvisoriesTab';
 import { ComparativeTab } from './ComparativeTab';
 import { NegotiationTab } from './NegotiationTab';
@@ -79,7 +79,7 @@ function facts(p: PackageRequest): Fact[] {
     {
       icon: CalendarRange,
       label: 'Package term',
-      value: `${formatDate(terms.dates.packageStartDate)} – ${formatDate(terms.dates.packageEndDate)}`,
+      value: formatPeriod(terms.dates.packageStartDate, terms.dates.packageEndDate),
     },
     {
       icon: Building2,

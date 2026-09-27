@@ -18,6 +18,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime, today } from '@/utils/format';
 import { defaultChoice, quarterOf } from './taxPeriods';
 import { displayNameOf } from '@/api/users';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 /** BIR Form 2307: batch generation per quarter, the certificate register and PDF downloads. */
 export default function Certificates2307Page() {
@@ -191,9 +192,19 @@ export default function Certificates2307Page() {
                     PDF
                   </Button>
                   {c.status === 'ISSUED' && can('TAX_MANAGE') && (
-                    <Button size="sm" variant="ghost" onClick={() => cancel.mutate(c.id)}>
+                    <ConfirmButton
+                      size="sm"
+                      variant="ghost"
+                      confirm={{
+                        title: 'Cancel Certificate',
+                        effect: 'The issued certificate is cancelled.',
+                        confirmLabel: 'Cancel Certificate',
+                        destructive: true,
+                      }}
+                      onConfirm={() => cancel.mutateAsync(c.id)}
+                    >
                       Cancel
-                    </Button>
+                    </ConfirmButton>
                   )}
                 </div>
               ),

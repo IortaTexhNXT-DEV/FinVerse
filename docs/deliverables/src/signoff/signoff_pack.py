@@ -54,10 +54,13 @@ FIELD_COLS = ["section", "label", "type", "format", "mandatory", "source", "defa
 ACTION_COLS = ["button", "who", "when", "what", "status", "notification"]
 REVIEW_VALUES = ["Accept", "Change requested", "Comment"]
 SIGNOFF_VALUES = ["Approved", "Approved with comments", "Not approved"]
-COMMENT_TYPES = ["Clarification", "Defect", "Change request"]
+COMMENT_TYPES = ["Clarification", "Correction", "Change request"]
 COMMENT_STATUS = ["Open", "Answered", "Closed"]
 IMPERATIVE = re.compile(r"^(Enter|Select|Choose|Give|Attach|Upload|Add|Complete|Describe|Record|Compute|Use|Explain|"
                         r"Name|Keep|Confirm|Close|Correct|Check|Save|Submit|Write|Reduce|Leave|Ask)\b")
+# Platform messages that only a call outside the screens can raise (a wrong address or a malformed request); they are
+# not part of the business catalogue.
+TECHNICAL_MESSAGE = re.compile(r"\bendpoint\b|\bJSON\b|\brequest body\b", re.I)
 BANNED = re.compile(r"\b(" + codecs.decode("qrzb|qhzzl|snxr|fnzcyr qngn|cebgbglcr|cbp|fnaqobk|yberz vcfhz|gbqb|svkzr", "rot13") + r")\b", re.I)
 
 
@@ -124,6 +127,12 @@ class Pack:
         # of a Product Maintenance walkthrough): paths relative to this pack.yaml.
         self.foreign_paths = [(self.dir / f).resolve() for f in raw.get("foreign_packs") or []]
         self.signatories: list[list[str]] = raw.get("signatories") or []
+        # Menus of more roles than the personas of the pack (User Access: every persona of the persona suites of
+        # the menu check, frontend/src/navigation/personaMenus.json), {ROLE: {name, user}}; optional.
+        self.menu_personas: dict[str, dict[str, Any]] = raw.get("menu_personas") or {}
+        self.menu_suites: str | None = raw.get("menu_suites")
+        # "per_persona": the workbook also has one menu sheet per persona (besides Menu by persona).
+        self.menu_sheets: str = raw.get("menu_sheets") or ""
 
     @cached_property
     def foreign(self) -> dict[str, Screen]:
@@ -167,6 +176,8 @@ class Pack:
         return hit[2] if hit else None
 
     def personas_of(self, scr: Screen) -> list[str]:
+        if scr.get("everyone"):
+            return list(self.personas)
         sd = self.screen_def(scr.route)
         if sd is None:
             return []
@@ -176,6 +187,8 @@ class Pack:
         sd = self.screen_def(scr.route)
         if scr.get("public"):
             return "none, before sign-in"
+        if scr.get("everyone"):
+            return "none, every signed-in user"
         if sd is None:
             return "-"
         if not sd.opened_by:
@@ -183,6 +196,9 @@ class Pack:
         return " or ".join(sd.opened_by)
 
     def menu_path(self, scr: Screen) -> str:
+        if scr.get("menu"):
+            # A screen without a route of its own (a dialog over any screen, a page shown after sign-in).
+            return str(scr.get("menu"))
         hit = self.routes.get(scr.route)
         if hit is None:
             return scr.route
@@ -194,14 +210,46 @@ class Pack:
         return f"{base} › {sd.label}" if base else sd.label
 
     def persona_label(self, role: str) -> str:
-        p = self.personas.get(role, {})
+        p = self.personas.get(role) or self.menu_personas.get(role) or {}
         return p.get("name", role)
+
+    @property
+    def menu_roles(self) -> dict[str, dict[str, Any]]:
+        """The roles whose sidebar the pack shows: its personas, then the extra menu personas."""
+        return {**self.personas, **{r: p for r, p in self.menu_personas.items() if r not in self.personas}}
+
+    @cached_property
+    def suites(self) -> list[dict[str, Any]]:
+        """The persona suites of the menu check (menu_suites of pack.yaml), [] when the pack names none."""
+        if not self.menu_suites:
+            return []
+        return json.loads((REPO / self.menu_suites).read_text(encoding="utf-8"))["suites"]
+
+    def suite_check(self, role: str) -> str:
+        """How the sidebar of a role compares with the persona suites that list it ('' when none lists it)."""
+        notes = []
+        menu = {sc.path: s.id for g in code_facts.menu_for(self.grants.get(role, set()), self.groups)
+                for s in g.sections for sc in s.screens}
+        for suite in self.suites:
+            for key, spec in suite["roles"].items():
+                if key.split(":")[-1] != role:
+                    continue
+                expected = set(spec["screens"])
+                shown = {p for p, sec in menu.items() if sec in suite["sections"]}
+                screens = "screen" if len(expected) == 1 else f"{len(expected)} screens"
+                if spec.get("permissionScope") is None and expected == shown:
+                    notes.append(f"{suite['id']}: the {screens} of its sections, no more, no less")
+                elif expected <= shown:
+                    notes.append(f"{suite['id']}: the {screens} of its sections")
+                else:
+                    notes.append(f"{suite['id']}: MISMATCH, missing {sorted(expected - shown)}")
+        return "; ".join(notes)
 
     # ------------------------------------------------------------------ menus
 
     def menus(self) -> dict[str, list[dict[str, str]]]:
         out: dict[str, list[dict[str, str]]] = {}
-        for role in self.personas:
+        for role in self.menu_roles:
             rows = []
             for g in code_facts.menu_for(self.grants.get(role, set()), self.groups):
                 for s in g.sections:
@@ -305,9 +353,12 @@ class Pack:
                          "<Column> '<value>' is not a valid <number, date (yyyy-mm-dd), Y/N value>"):
                 add("Upload row", "-", text, "Validation", f"{wizard}: every upload type", "BulkRowValidator")
         for m in code_facts.platform_messages():
+            if TECHNICAL_MESSAGE.search(m.text):
+                continue  # raised only when a screen is bypassed; never shown by a business screen
             add("Server", m.code, m.text, "Error", "Every screen (Common screen elements)", m.where)
         root = REPO / "frontend" / "src"
-        for u in code_facts.frontend_messages(cfg.get("frontend_dirs") or []):
+        for u in code_facts.frontend_messages(cfg.get("frontend_dirs") or [],
+                                              extended=cfg.get("ui_patterns") == "extended"):
             add("Screen", "-", u.text, u.kind, self._place(Path(u.file).stem.split(".")[0]),
                 str(Path(u.file).relative_to("frontend/src")) if u.file.startswith("frontend/src") else u.file)
         order = {w: i for i, (_, w) in enumerate(self.msg_cfg.get("places") or [])}
@@ -339,7 +390,7 @@ class Pack:
                 role, scr, action, sees, result, slug = step
                 target = self.step_screen(scr)
                 out.append({"slug": slug, "screen": scr, "route": target.route if target else "",
-                            "caption": f"{w['id']}: {action}", "user": self.personas.get(role, {}).get("user"),
+                            "caption": f"{w['id']}: {action}", "user": self.menu_roles.get(role, {}).get("user"),
                             "state": "walkthrough", "walkthrough": w["id"]})
         for d in self.documents:
             out.append({"slug": d["shot"], "screen": "-", "route": "", "caption": d["name"], "state": "document"})
@@ -379,7 +430,7 @@ class Pack:
         aliases = set(self.test_plan.screens) if self.test_plan else set()
         for s in self.screens:
             for r in [s.route] + list(s.get("also") or []):
-                if r not in self.routes and not s.get("public"):
+                if r not in self.routes and not s.get("public") and not s.get("everyone"):
                     problems.append(f"{s.id}: route {r} is not a screen of navigation/modules.ts")
             if not self.personas_of(s) and not s.get("public"):
                 problems.append(f"{s.id}: no persona of the pack may open {s.route}")
@@ -409,12 +460,30 @@ class Pack:
                     problems.append(f"flow: unknown screen {x}")
         for w in self.walkthroughs:
             for st in w["steps"]:
-                if st[0] not in self.personas:
+                if st[0] not in self.menu_roles:
                     problems.append(f"{w['id']}: persona {st[0]}")
                 if self.step_screen(st[1]) is None:
                     problems.append(f"{w['id']}: screen {st[1]} is not a screen of this pack or of its foreign packs")
         for u in getattr(code_facts.role_grants, "unread", []):
             problems.append(f"grant statement not read: {u}")
+        problems += self._suite_problems()
+        return problems
+
+    def _suite_problems(self) -> list[str]:
+        """Every persona of the menu suites has its menu in the pack, with its seed user, and sees its screens."""
+        problems = []
+        roles = self.menu_roles
+        for suite in self.suites:
+            for key, spec in suite["roles"].items():
+                role = key.split(":")[-1]
+                if role not in roles:
+                    problems.append(f"menu suite {suite['id']}: persona {role} has no menu in the pack")
+                    continue
+                if roles[role].get("user") != spec.get("seedUser"):
+                    problems.append(f"menu suite {suite['id']}: {role} user {roles[role].get('user')} is not the "
+                                    f"seed user {spec.get('seedUser')}")
+                if "MISMATCH" in self.suite_check(role):
+                    problems.append(f"menu suite {suite['id']}: {self.suite_check(role)}")
         return problems
 
     @staticmethod
@@ -478,9 +547,11 @@ def r_screen_index(doc: Any, pack: Pack, **_: Any) -> None:
 def r_menus(doc: Any, pack: Pack, **_: Any) -> None:
     menus = pack.menus()
     for role, rows in menus.items():
-        p = pack.personas[role]
+        p = pack.menu_roles[role]
         doc.heading(f"{p['name']} ({role})", level=3)
         own = sum(1 for r in rows if r["own"])
+        checked = pack.suite_check(role)
+        del checked
         doc.paragraph(f"SIT/UAT user {p.get('user', '-')}. {len(rows)} menu entries, {own} of them {pack.module} "
                       "screens; the other entries belong to the BRD shown.")
         grouped: dict[tuple[str, str], list[dict[str, str]]] = {}
@@ -650,7 +721,7 @@ def r_counts(doc: Any, pack: Pack, **_: Any) -> None:
             ["Messages (server, screen and upload row)", len(pack.messages)],
             ["Notifications and e-mails", len(pack.notifications)], ["Upload types", len(pack.uploads)],
             ["Generated documents", len(pack.documents)], ["Walkthroughs", len(pack.walkthroughs)],
-            ["Interface contract lines", len(pack.contract)], ["Personas with their menus", len(pack.personas)]]
+            ["Interface contract lines", len(pack.contract)], ["Personas with their menus", len(pack.menu_roles)]]
     doc.table(["Content of the set", "Count"], rows, widths=[10, 3], caption="The set in numbers", size=9)
 
 
@@ -732,8 +803,8 @@ def build_workbook(pack: Pack) -> Path:
                  ("Change requested", "The row must change: describe the change in BU comment"),
                  ("Comment", "A remark that does not change the row")]
     wb.cover_notes = [
-        f"Status as of {m['status_as_of']}. The rows are generated from the FRS v{m['version']} sources and the "
-        "system as built; they match the FRS screen specifications row for row.",
+        f"Issued on {m['status_as_of']}. The rows are generated from FRS v{m['version']} and match its screen "
+        "specifications row for row.",
         "Fill in the BU review columns only. After sign-off the screens, fields, navigation and messages are "
         "frozen; later changes go through the Change Management Register.",
     ]
@@ -836,7 +907,7 @@ def build_workbook(pack: Pack) -> Path:
         Column("id", "Rule ID", 12, "Rule identifier in this workbook"),
         Column("screen", "Screen ID", 12, "Screen where the rule applies"),
         Column("title", "Screen", 22, "Screen name"),
-        Column("rule", "Business rule", 70, "The rule as built"),
+        Column("rule", "Business rule", 70, "The proposed business rule"),
         Column("frs", "FRs", 20, "Functional requirements that state the rule"),
     ] + review_columns(), rule_rows, description="The business rules stated on the screens")
     date_sheets.append(ws)
@@ -850,8 +921,7 @@ def build_workbook(pack: Pack) -> Path:
         Column("kind", "Type", 13, "Validation, Error, Warning, Confirmation or Information",
                values=["Validation", "Error", "Warning", "Confirmation", "Information"]),
         Column("fix", "What the user does", 44, "The correction or next step"),
-        Column("source", "Source", 30, "Where the message is defined (for the project team)"),
-    ] + review_columns(), pack.messages, description="Every validation, error, warning and confirmation message")
+    ] + review_columns(), [{k: v for k, v in x.items() if k != "source"} for x in pack.messages], description="Every validation, error, warning and confirmation message")
     date_sheets.append(ws)
 
     wb.sheet("Notifications", [
@@ -875,8 +945,20 @@ def build_workbook(pack: Pack) -> Path:
         Column("screen", "Screen", 26, "Menu entry"),
         Column("brd", "BRD", 12, "BRD that owns the screen"),
         Column("own", nm, 12, "Yes for a screen of this set"),
-        Column("path", "Route", 30, "Address of the screen"),
-    ], menu_rows, description=f"What each {nm} persona sees in the sidebar (from the role grants)")
+    ], [{k: v for k, v in r.items() if k != "path"} for r in menu_rows], description=f"What each {nm} persona sees in the sidebar (from the role grants)")
+    if pack.menu_sheets == "per_persona":
+        for role, rows in pack.menus().items():
+            checked = pack.suite_check(role)
+            ws = wb.sheet(f"Menu {role}"[:31], [
+                Column("group", "Group", 20, "Sidebar group"),
+                Column("section", "Section", 26, "Sidebar section"),
+                Column("screen", "Screen", 30, "Menu entry"),
+                Column("brd", "BRD", 14, "BRD that owns the screen"),
+            ] + review_columns(), [{k: v for k, v in r.items() if k != "path"} for r in rows],
+                description=(f"{pack.persona_label(role)} ({role}), SIT/UAT user {pack.menu_roles[role].get('user', '-')}"
+                             f": {len(rows)} menu entries")[:250])
+            del checked
+            date_sheets.append(ws)
 
     upload_rows = []
     for t in pack.uploads:
@@ -915,12 +997,12 @@ def build_workbook(pack: Pack) -> Path:
         Column("raised_by", "Raised by", 22, "Name and unit of the reviewer"),
         Column("date", "Date", 13, "Date raised", kind="date"),
         Column("where", "Page / screen", 24, "FRS page or section, screen ID or workbook row"),
-        Column("type", "Type", 16, "Clarification, Defect or Change request", values=COMMENT_TYPES),
-        Column("comment", "Comment", 50, "The question, the defect or the change asked for"),
+        Column("type", "Type", 16, "Clarification, Correction or Change request", values=COMMENT_TYPES),
+        Column("comment", "Comment", 50, "The question, the correction or the change asked for"),
         Column("response", "Response", 50, "Answer of the project team; for a change request, its register number"),
         Column("status", "Status", 12, "Open, Answered or Closed", values=COMMENT_STATUS),
         Column("closed_on", "Closed on", 13, "Date closed", kind="date"),
-    ], comment_rows, description="Questions, defects and change requests raised during the review, with the answer")
+    ], comment_rows, description="Questions, corrections and change requests raised during the review, with the answer")
     date_sheets.append(ws)
 
     sessions = [(str(x.get("duration", "")), x["name"]) for x in pack.guide.get("steps", [])
@@ -945,7 +1027,7 @@ def build_workbook(pack: Pack) -> Path:
         Column("change", "Change", 70, "What changed; for a revision, the comment IDs answered"),
         Column("rows", "Rows changed", 24, "Sheets and rows changed"),
     ], [{"version": str(m["version"]), "date": str(m["date"]), "author": f"{brand.VENDOR} project team",
-         "change": "First issue of the business sign-off pack, built from the system as built", "rows": "All"}],
+         "change": "First issue of the business sign-off pack, from the FRS of the same version", "rows": "All"}],
         description="Versions of this release set (a revision after review is v2.1; after sign-off, a change request)",
         freeze_first_column=False)
 
@@ -1011,7 +1093,7 @@ def main(argv: list[str] | None = None) -> int:
     print(report(pack))
     if args.manifest:
         manifest = {"brd": pack.meta["brd"], "out": str(pack.dir / pack.meta.get("screenshot_dir", "screenshots")),
-                    "personas": pack.personas, "shots": pack.shots()}
+                    "personas": pack.menu_roles, "shots": pack.shots()}
         Path(args.manifest).write_text(json.dumps(manifest, indent=2), encoding="utf-8")
         print(f"manifest: {args.manifest}")
     if args.check or args.manifest:

@@ -6,7 +6,9 @@ import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessBatchResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessBatchSubmitRequest;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessRequestResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.DecisionRequest;
+import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessBatchService;
+import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestDescriber;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
@@ -33,13 +35,16 @@ public class AccessBatchController {
   private static final String DECIDE = "hasAnyAuthority('ACCESS_APPROVE', 'UAM_SECOND_APPROVE')";
 
   private final AccessBatchService batches;
+  private final AccessRequestDescriber describer;
 
   /**
    * Creates the controller.
    *
    * @param batches bulk batches
+   * @param describer descriptions of the requests
    */
-  public AccessBatchController(AccessBatchService batches) {
+  public AccessBatchController(AccessBatchService batches, AccessRequestDescriber describer) {
+    this.describer = describer;
     this.batches = batches;
   }
 
@@ -78,7 +83,7 @@ public class AccessBatchController {
   @GetMapping("/{id}/lines")
   @PreAuthorize(AccessRequestController.VIEW)
   public List<AccessRequestResponse> lines(@PathVariable Long id) {
-    return batches.lines(id).stream().map(AccessRequestResponse::from).toList();
+    return batches.lines(id).stream().map(this::view).toList();
   }
 
   /**
@@ -149,5 +154,9 @@ public class AccessBatchController {
   public AccessBatchResponse cancel(
       @PathVariable Long id, @Valid @RequestBody DecisionRequest body) {
     return AccessBatchResponse.from(batches.cancel(id, body.comment()));
+  }
+
+  private AccessRequestResponse view(AccessRequest r) {
+    return AccessRequestResponse.from(r, describer.describe(r));
   }
 }

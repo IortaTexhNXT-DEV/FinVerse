@@ -20,7 +20,7 @@ documents:
 # Reading order per role (FRS chapter numbers of v2.0).
 reading:
   - role: Business owner (Product Owner, Head of MBS)
-    order: "00 Start Here; 01 Guide deck; FRS chapters 1-3 (context and personas), 14 (walkthroughs) and 20 (sign-off); workbook Sign-off certificate"
+    order: "00 Start Here; 01 Guide deck; FRS chapters 1-3 (context and personas), 14 (walkthroughs), 20 (sign-off) and 21 (proposed rules for confirmation); workbook Sign-off certificate"
   - role: Business users (Marketing, TSU, Processing)
     order: "FRS chapter 12 (navigation) and the screens of your area in chapter 13; walkthroughs in chapter 14; messages in chapter 15; workbook Screen standards, Screen catalogue, Field register, Business rules and Messages"
   - role: Finance (Comptrollership)
@@ -37,7 +37,7 @@ steps:
   - step: 1
     name: Pack issued
     who: "R: iorta TechNXT Project Manager; A: iorta TechNXT delivery lead; I: all reviewers"
-    inputs: "FRS v2.0, workbook, test plan, guide and deck built from the system as built"
+    inputs: "FRS v2.0, workbook, test plan, guide and deck"
     outputs: "Release set v2.0 in the BRD-01 folder; invitations to the sessions"
     duration: "Day 0 (Mon 28-Sep-2026)"
   - step: 2
@@ -56,12 +56,12 @@ steps:
     name: Comments consolidated and a Q&A session
     who: "R: iorta TechNXT Project Manager and Business Analysis; A: BDOI Product Owner; C: reviewers"
     inputs: "Returned workbooks"
-    outputs: "One consolidated comments log, each item typed (clarification, defect, change request) and answered; Q&A minutes"
+    outputs: "One consolidated comments log, each item typed (clarification, correction, change request) and answered; Q&A minutes"
     duration: "3 working days, Q&A on Wed 21-Oct-2026"
   - step: 5
     name: One revision cycle (v2.1)
     who: "R: iorta TechNXT Business Analysis; A: iorta TechNXT delivery lead; C: reviewers who raised the items"
-    inputs: "Agreed clarifications and defects"
+    inputs: "Agreed clarifications and corrections"
     outputs: "Release set v2.1 with the changed rows marked; change requests raised for the rest"
     duration: "2 working days, v2.1 on Fri 23-Oct-2026; check by the reviewers until Wed 28-Oct-2026"
   - step: 6
@@ -71,10 +71,10 @@ steps:
     outputs: "Signed sign-off certificate; minutes; open items accepted as assumptions or change requests"
     duration: "Fri 30-Oct-2026"
   - step: 7
-    name: Handover to development or build freeze
+    name: Content freeze
     who: "R: iorta TechNXT delivery lead; A: BDOI Product Owner; I: BDOI IT, other BRD owners"
     inputs: "Signed set; change requests with mandays"
-    outputs: "Build frozen as signed; approved deltas scheduled in the Change Management Register"
+    outputs: "Content frozen as signed; approved deltas scheduled in the Change Management Register"
     duration: "From Mon 2-Nov-2026"
   - step: 8
     name: Traceability into SIT and UAT
@@ -113,16 +113,16 @@ caveats:
     example: "BRD-3 adds a mandatory field to a product: the account field rules change; the affected screen specification pages are re-issued and signed as a delta."
   - topic: Integrations pending BDOI IT specifications
     text: "HLS, CLPC transport, insurer SFTP or API, directory sign-in and the mail relay depend on specifications from BDOI IT."
-    handling: "Built with a manual or file-based step now; the interface is a change request once the specification arrives."
+    handling: "A manual or file-based step until the specification arrives; the interface is then a change request."
     example: "CLPC billing is a download and an upload today; an automatic transfer is added when the CLPC layout and transport are agreed."
   - topic: Open questions and assumptions
-    text: "Open questions of FRS section 10.3 (product matrix, approval chain, document layouts, TSU thresholds and others) are built on the assumptions of section 10.1."
+    text: "Open questions of FRS section 10.3 (product matrix, approval chain, document layouts, TSU thresholds and others) follow the assumptions of section 10.1; chapter 21 lists the proposed rules for confirmation."
     handling: "Answered as configuration where possible (lists, parameters, templates); otherwise a change request; the assumption stands until then."
     example: "The approval chain is one approval stage; a two-level chain for large premiums, once BDOI states the limits, is a change request."
 
 # Entry and exit criteria of the sign-off, and the definition of done.
 entry:
-  - "The set is built from the system as built and every screenshot is taken on the SIT environment with seed data."
+  - "Every screenshot of the set is taken on the SIT environment with seed data."
   - "Reviewers have their SIT users and the walkthrough sessions are held."
   - "The test plan is traced to the FRS and to the screens."
 exit:
@@ -132,7 +132,7 @@ exit:
   - "The sign-off certificate signed by the business owner and by Finance, Compliance and BDOI IT for their parts."
 done:
   - "Signed certificate filed with the set; version history updated."
-  - "Build frozen as signed; deltas listed in the Change Management Register with mandays."
+  - "Content frozen as signed; deltas listed in the Change Management Register with mandays."
   - "Test plan agreed for SIT and UAT."
 
 # Handover to development / build readiness checklist.
@@ -142,7 +142,7 @@ handover:
   - "Configuration inputs from the business: lists of values, parameters, document templates, products, users and roles"
   - "Agreed test plan"
   - "Migration mapping of the New Business objects signed (BRD-13)"
-handover_note: "New Business is already built: handover means the build is frozen as signed and the approved deltas are scheduled."
+handover_note: "After sign-off the content is frozen as signed and the approved deltas are scheduled."
 
 # Governance and contacts.
 governance:

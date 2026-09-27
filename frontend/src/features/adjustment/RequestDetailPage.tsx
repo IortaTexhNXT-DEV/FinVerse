@@ -36,6 +36,7 @@ import { RequestFlags, RequestStatus } from './RequestParts';
 import { AccountingTab, DetailsTab, HistoryTab, PolicyTab, RecomputeTab } from './RequestTabs';
 import { useRequestLabels } from './useRequestLabels';
 import { UserName } from '@/components/ui/UserName';
+import { Notice } from '@/components/ui/Notice';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -176,11 +177,11 @@ function RequestSummary({ request: r }: Readonly<{ request: EndorsementRequest }
         facts={facts(r, labels.type(r.terms.endorsementType))}
       />
       {r.stage === 'RETURNED' && (
-        <div className="alert warning" role="status">
-          Returned: {labels.returnReason(r.control.returnReason ?? 'OTHERS')}
+        <Notice tone="warning" title="Returned">
+          {labels.returnReason(r.control.returnReason ?? 'OTHERS')}
           {r.control.returnComment ? ` – ${r.control.returnComment}` : ''}. Change the request and
           resubmit it, or cancel it.
-        </div>
+        </Notice>
       )}
     </>
   );

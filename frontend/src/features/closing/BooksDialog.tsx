@@ -8,6 +8,7 @@ import { PeriodSelectors } from './PeriodSelectors';
 import { closeControlsApi } from './closeControlsApi';
 import type { BooksCutoff } from './closeControlsApi';
 import type { usePeriodPicker } from './usePeriodPicker';
+import { Notice } from '@/components/ui/Notice';
 
 type Mode = 'close' | 'reopen';
 
@@ -27,14 +28,18 @@ interface Props {
 function PendingNotice({ items }: Readonly<{ items: string[] }>) {
   const nothing = items.length === 0;
   return (
-    <div className={nothing ? 'alert info' : 'alert warning'} role="status">
-      {nothing
-        ? 'Nothing is reported pending in the broking modules for this period.'
-        : `Pending at cut-off: ${items.join('; ')}`}
-      <br />
+    <Notice
+      tone={nothing ? 'info' : 'warning'}
+      title={
+        nothing
+          ? 'Nothing is reported pending in the broking modules for this period'
+          : 'Pending at cut-off'
+      }
+      items={items}
+    >
       From now on, postings of booking, Operations, cashiering, remittance and disbursement into
       this period are refused; the GL stays open for FRBS adjustments.
-    </div>
+    </Notice>
   );
 }
 

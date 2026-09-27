@@ -20,6 +20,7 @@ import { cashieringApi } from './cashieringApi';
 import type { CwtBatch, CwtTag } from './cashieringApi';
 import { CwtTagDialog } from './CwtTagDialog';
 import { displayNameOf } from '@/api/users';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const TABS = [
   { id: 'tagged', label: 'Tagged by Marketing' },
@@ -240,15 +241,21 @@ export default function Cwt2307Page() {
               Select the validated certificates of one insurer to post the 2307 report.
             </span>
             <div className="worklist-actions">
-              <Button
+              <ConfirmButton
                 disabled={selection.keys.length === 0}
                 busy={act.isPending}
-                onClick={() =>
-                  act.mutate(() => cashieringApi.validateCwt(companyId, selection.keys.map(Number)))
+                confirm={{
+                  title: `Validate and Post ${String(selection.keys.length)} Certificate(s)`,
+                  effect: 'The selected certificates are validated and the 2307 report is posted.',
+                }}
+                onConfirm={() =>
+                  act.mutateAsync(() =>
+                    cashieringApi.validateCwt(companyId, selection.keys.map(Number)),
+                  )
                 }
               >
                 Validate and Post Report
-              </Button>
+              </ConfirmButton>
             </div>
           </div>
         )}

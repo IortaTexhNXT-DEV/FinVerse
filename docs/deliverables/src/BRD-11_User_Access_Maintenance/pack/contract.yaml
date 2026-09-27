@@ -1,0 +1,100 @@
+# Cross-BRD dependencies and interface contract of BRD-11 User Access Maintenance.
+# direction: Out = another BRD or system takes it from User Access Maintenance; In = User Access Maintenance takes it.
+# Columns: id | party | direction | what | when / how | owner of the data | UA screens | FR
+change_rule: >-
+  User Access Maintenance is the source of the users, group profiles and permissions that every BIBS module checks,
+  and of the menus each persona sees. A later change in any BRD that adds a permission, a persona or a screen, or that
+  changes who may approve, is delivered as a group-profile request under this signed set (configuration, no change
+  request) when the permission exists; a new permission, a new separation-of-duties rule, a new request type, or a
+  change to the sign-in and identity integration is raised as a change request against this signed set in the Change
+  Management Register, assessed with its mandays and approved by the owners of both BRDs and by BDOI Information
+  Security; the affected pages of this set are then re-issued and signed as a delta.
+contract:
+  - id: IC-01
+    party: Every BIBS module (BRD-1 to BRD-13 and the platform)
+    direction: Out
+    what: The signed-in user, the active group profiles and the effective permissions; the sidebar of each persona; the inactivity and session rules
+    how: Every screen, button and server call checks the user's permissions at run time; a deactivated group profile grants nothing at once; a deactivated or locked user's sessions end at once
+    owner: Business Administration (requests), approvers and Information Security (decisions), System Administrator (implementation)
+    screens: Login; every screen (menus by persona)
+    frs: [FR-UA-001, FR-UA-002, FR-UA-050, FR-UA-051]
+  - id: IC-02
+    party: BRD-1 New Business
+    direction: Out / In
+    what: "Out: the approval right of access requests kept by the New Business Approver; the access requests listed in My Approvals. In: My Approvals (the shared approval list), Lists of Values (business unit groups, user levels, deactivation reasons) and Data Retention (retention rule of cancelled and rejected access requests)"
+    how: An access request waiting for a user appears in that user's My Approvals and opens the request; the lists are maintained on Lists of Values under maker-checker
+    owner: Business Administration
+    screens: My Approvals; Access Request record; New Request (lists)
+    frs: [FR-UA-030, FR-UA-011, FR-UA-013]
+  - id: IC-03
+    party: BRD-3 Product Maintenance
+    direction: Out
+    what: The role-permission change requests of Product Maintenance (Modify group profile) and the User Access Matrix by area and action class
+    how: A change to a Product Maintenance profile is a group-profile request, approved in order and implemented by the System Administrator (UAM_ROLE_APPLY_ON_APPROVAL = false)
+    owner: Business Administration; System Administrator
+    screens: New Group Profile Request; Roles & Permissions; User Access Matrix
+    frs: [FR-UA-041, FR-UA-045, FR-UA-051]
+  - id: IC-04
+    party: BRD-10 Sanction Screening
+    direction: Out
+    what: The Compliance roles (Compliance Officer, Checker, Unit Compliance Coordinator, Screening Investigator, Screening Approver, AML Committee) and their menus, checked by the persona menu test of the suite BRD-10/11
+    how: Users receive these profiles through access requests; the menus are those of FRS chapter 12
+    owner: Compliance (profile content); Business Administration (requests)
+    screens: Menu by persona; New Request
+    frs: [FR-UA-050, FR-UA-051]
+  - id: IC-05
+    party: BRD-2 Operations, BRD-4 Collections, BRD-5 Accounting, BRD-6 Renewal, BRD-7 Claims, BRD-8 Employee Benefits, BRD-12 Submitted Policies
+    direction: Out
+    what: The group profiles of their personas and the menus they give; the persona suites of Renewal, Claims and Employee Benefits are checked by the persona menu test
+    how: A new persona or permission of these BRDs is added by a group-profile request once the permission exists in BIBS
+    owner: The business owner of each BRD (profile content); Business Administration (requests)
+    screens: Menu by persona; New Group Profile Request
+    frs: [FR-UA-040, FR-UA-041, FR-UA-051]
+  - id: IC-06
+    party: BRD-8 Employee Benefits (partner portal)
+    direction: Out
+    what: External (portal) users of insurers and client HR, provisioned through access requests of user type External
+    how: "Dormant. BDOI's drop plan has Employee Benefits without a portal, so no portal is installed and every external request is refused (External (portal) users are not available: the portal is not installed)"
+    owner: Employee Benefits owner (if a portal is ever added)
+    screens: New Request (User Type)
+    frs: [FR-UA-011, FR-UA-013, FR-UA-014]
+  - id: IC-07
+    party: BRD-13 Data Migration
+    direction: In
+    what: The users and group profiles of go-live. Users are out of the migration scope (DMQ30); they are loaded with the bulk request from the users and roles template of this set, and the migration team's own profiles are given through access requests
+    how: Bulk Request files are checked row by row and decided by an approver like single requests; the role-to-permission matrix of this set is implemented before the first mock
+    owner: Business Administration; migration working group
+    screens: Bulk Request; Bulk Request Batch
+    frs: [FR-UA-019]
+  - id: IC-08
+    party: EIAM (BDO Enterprise Identity Access Management on Microsoft Entra ID), owned by BDOI IT
+    direction: In
+    what: The target sign-in of BDO users with OpenID Connect; BIBS keeps the roles, permissions, the inactivity sign-out and the session log
+    how: In this set BIBS signs users in locally (AUTH_MODE = LOCAL); the Entra ID sign-in is added when BDOI IT gives the tenant, the application registration, the claims and the session rules (IQ04). Until then, BIBS password, lock-out and expiry rules apply
+    owner: BDOI IT
+    screens: Login; My Profile
+    frs: [FR-UA-003]
+  - id: IC-09
+    party: UIDM-ISC (BDO identity governance), owned by BDOI IT
+    direction: In / Out
+    what: Joiner, mover and leaver provisioning and access certification
+    how: In this set every access change is a BIBS request under four eyes; the options for BDOI (the governance tool provisions users while group-profile changes stay BIBS requests, the tool provisions users and profiles, or aggregation only) are open (IQ05). The reports of this set give the user and profile lists for certification
+    owner: BDOI IT; BDOI Information Security
+    screens: User Access Reports; Access Requests
+    frs: [FR-UA-010, FR-UA-060, FR-UA-062]
+  - id: IC-10
+    party: Messaging (e-mail relay of the BIBS environment)
+    direction: Out
+    what: The access-changed e-mails, the password reset links, the password expiry notices and the batch failure e-mails
+    how: Queued and sent by the platform; every e-mail is listed in Outbound Messages
+    owner: BDOI IT (relay); System Administrator (recipients of batch failures)
+    screens: Forgot Password; My Profile
+    frs: [FR-UA-005, FR-UA-070, FR-UA-071]
+  - id: IC-11
+    party: Audit trail and reports (platform)
+    direction: Out
+    what: Sign-ins, failed sign-ins, sign-outs, parameter changes and every access change with its from and to values, request number, done by and approved by
+    how: Insert-only records; read by the User Access Audit Log and the Audit Trail
+    owner: System Administrator; Auditor; Information Security
+    screens: User access reports
+    frs: [FR-UA-063, FR-UA-064]

@@ -12,12 +12,12 @@ digraph clm_phases {
   TEMP_CLOSED [label=<<b>TEMP_CLOSED</b><br/><font point-size="13">statuses 17-18</font>>, fillcolor="@AMBER_BG"];
   CLOSED      [label=<<b>CLOSED</b><br/><font point-size="13">closing settlement type</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
 
-  NEW -> IN_PROGRESS [label="  progress"];
-  IN_PROGRESS -> TEMP_CLOSED [label="temp_close  "];
-  TEMP_CLOSED -> IN_PROGRESS [label="  resume", style=dashed];
-  IN_PROGRESS -> CLOSED [label="  close"];
-  TEMP_CLOSED -> CLOSED [label="close"];
-  CLOSED -> IN_PROGRESS [label="  reopen", style=dashed];
+  NEW -> IN_PROGRESS [label="  Set an in-progress status"];
+  IN_PROGRESS -> TEMP_CLOSED [label="Close temporarily  "];
+  TEMP_CLOSED -> IN_PROGRESS [label="  Resume the claim", style=dashed];
+  IN_PROGRESS -> CLOSED [label="  Close with a settlement type"];
+  TEMP_CLOSED -> CLOSED [label="Close with a settlement type"];
+  CLOSED -> IN_PROGRESS [label="  Reopen the claim", style=dashed];
 
   { rank=same; TEMP_CLOSED; CLOSED; }
 }

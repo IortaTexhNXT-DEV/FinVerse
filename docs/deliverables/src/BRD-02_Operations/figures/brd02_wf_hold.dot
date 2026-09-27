@@ -21,9 +21,9 @@ digraph wf_hold {
   DRAFT -> CANCELLED [label=" cancel", style=dotted];
   ACTIVE -> EXTENSION_FOR_APPROVAL [label=" extend"];
   EXTENSION_FOR_APPROVAL -> ACTIVE [label=" approve / reject\nextension", style=dashed, constraint=false];
-  ACTIVE -> CANCEL_FOR_APPROVAL [label=" request_cancel"];
-  CANCEL_FOR_APPROVAL -> RELEASED [label=" approve_cancel"];
-  CANCEL_FOR_APPROVAL -> ACTIVE [label=" reject_cancel", style=dashed, constraint=false];
+  ACTIVE -> CANCEL_FOR_APPROVAL [label=" request cancellation"];
+  CANCEL_FOR_APPROVAL -> RELEASED [label=" approve cancellation"];
+  CANCEL_FOR_APPROVAL -> ACTIVE [label=" reject cancellation", style=dashed, constraint=false];
   ACTIVE -> RELEASED [label=" release, expire\n(HOLD_EXPIRY)"];
   { rank=same; EXTENSION_FOR_APPROVAL; CANCEL_FOR_APPROVAL; }
   { rank=same; DRAFT; CANCELLED; }

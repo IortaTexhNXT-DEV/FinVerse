@@ -11,10 +11,10 @@ digraph wf_recon {
   RECONCILING [label="RECONCILING\nRecon handler (RECON_PROCESS)"];
   CLOSED [label="CLOSED", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
 
-  EXTRACTED -> SENT_TO_INSURER [label=" send"];
-  SENT_TO_INSURER -> SENT_TO_INSURER [label=" resend", style=dashed];
-  SENT_TO_INSURER -> RECONCILING [label=" feedback_uploaded"];
-  EXTRACTED -> RECONCILING [label=" feedback_uploaded", style=dashed];
-  RECONCILING -> RECONCILING [label=" feedback_uploaded,\nresend", style=dashed];
-  RECONCILING -> CLOSED [label=" close / for_closure"];
+  EXTRACTED -> SENT_TO_INSURER [label=" Send to Insurer"];
+  SENT_TO_INSURER -> SENT_TO_INSURER [label=" Resend to Insurer", style=dashed];
+  SENT_TO_INSURER -> RECONCILING [label=" Insurer feedback uploaded"];
+  EXTRACTED -> RECONCILING [label=" Insurer feedback uploaded", style=dashed];
+  RECONCILING -> RECONCILING [label=" Insurer feedback uploaded,\nResend to Insurer", style=dashed];
+  RECONCILING -> CLOSED [label=" Close Cycle / Every item matched or for closure"];
 }

@@ -1,7 +1,7 @@
 import type { PolicyCover } from '@/api/claims';
 import { Card } from '@/components/ui/Card';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDate } from '@/utils/format';
+import { formatPeriod } from '@/utils/format';
 
 function shareLabel(cover: PolicyCover): string {
   if (cover.coinsurerCode === undefined) {
@@ -17,7 +17,7 @@ export function PolicyCoverCard({ cover }: Readonly<{ cover: PolicyCover }>) {
     ['Product', `${cover.productCode} – ${cover.productName}`],
     ['Policyholder', `${cover.customerCode} – ${cover.customerName}`],
     ['Insured', cover.insuredName],
-    ['Period', `${formatDate(cover.periodFrom)} – ${formatDate(cover.periodTo)}`],
+    ['Period', formatPeriod(cover.periodFrom, cover.periodTo)],
     ['Currency', cover.currency],
     ['Our share', shareLabel(cover)],
   ];

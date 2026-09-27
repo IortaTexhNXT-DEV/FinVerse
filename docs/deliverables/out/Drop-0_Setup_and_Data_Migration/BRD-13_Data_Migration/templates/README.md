@@ -2,7 +2,7 @@
 
 Version 1.2, 26 September 2026. BDO Insurance and Reinsurance Brokers, Inc. (BDOI) - BIBS. Prepared by iorta TechNXT. Confidential - BDOI.
 
-One CSV template per extract layout. Each file holds only the header row: the field names exactly as in the layout sheet of the BDOI Data Requirements Workbook (`../BIBS_Migration_BRD-13_Data_Requirements_Workbook_v1.2.xlsx`), which gives the type, length, mandatory flag, allowed values, format, example, BIBS target and validation rule of every field.
+One CSV template per extract layout. Each file holds only the header row: the field names exactly as in the layout sheet of the BDOI Data Requirements Workbook (`../BIBS_Migration_BRD-13_Data_Requirements_Workbook_v1.2.xlsx`), which gives the type, length, mandatory flag, allowed values, format, example and validation rule of every field.
 
 How to use a template:
 
@@ -52,4 +52,4 @@ Objects without a template:
 - P04 Submitted-policy masterlists: Conditional. Loaded through the Submitted Policies migration handler (SBM_MIGRATION) if BDOI confirms (SP SQ16, DMQ30); layout issued with that module.
 - P05 Employee Benefits programmes: Conditional. Loaded through EB_PROGRAMME_LOAD if BDOI confirms (DMQ30); layout issued with the EB module.
 - F05 DP billing in process and DP commission receivable: Carry forward. Carried inside F01 (dp_flag and the COMMISSION components of direct-payment invoices); no separate file.
-- F07 Open claims: Conditional. Loaded through the Claims migration (BCL_CLAIM_MIGRATION, V1025 held) if BDOI decides (CLQ14, DMQ30); closed claims are archived.
+- F07 Open claims: Conditional. Loaded through the Claims migration if BDOI decides (CLQ14, DMQ30); closed claims are archived.

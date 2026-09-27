@@ -550,7 +550,7 @@ The module is built in the package `submitted` and the screens `frontend/src/fea
 
 | Version | Content |
 |---|---|
-| V767 (cashiering) | Disposition action INCOME, type HANDLING_FEE with its event, OR type and VAT rate, `csh_disposition.or_no` |
+| V769 (cashiering; V766-V768 are Data Migration's) | Disposition action INCOME, type HANDLING_FEE with its event, OR type and VAT rate, `csh_disposition.or_no` |
 | V1008 (collections) | Collector request action RECOGNIZE_INCOME with its income type |
 | V851 (placement) | Hold cover status REASSIGNED with its reason |
 | V861 (issuance) | Extraction pattern kind (EPOLICY, SUBMITTED_POLICY), the submitted-policy fields and their default patterns |

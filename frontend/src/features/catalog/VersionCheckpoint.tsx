@@ -12,6 +12,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime } from '@/utils/format';
 import { VALIDATION_CHECKLIST } from './versionForm';
 import { UserName } from '@/components/ui/UserName';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 /** The checklist confirmed at validation, from its JSON. */
 function confirmedItems(json: string | undefined): string[] {
@@ -94,15 +95,19 @@ export function VersionCheckpoint({ detail }: Readonly<{ detail: VersionDetail }
           <Button variant="secondary" icon={<Undo2 size={16} />} onClick={() => setReturning(true)}>
             Return to MBS
           </Button>
-          <Button
+          <ConfirmButton
             variant="accent"
             icon={<BadgeCheck size={16} />}
             disabled={!complete}
             busy={validate.isPending}
-            onClick={() => validate.mutate()}
+            confirm={{
+              title: 'Validate and Release',
+              effect: 'The package version is validated and released for use.',
+            }}
+            onConfirm={() => validate.mutateAsync()}
           >
             Validate and Release
-          </Button>
+          </ConfirmButton>
         </div>
       }
     >

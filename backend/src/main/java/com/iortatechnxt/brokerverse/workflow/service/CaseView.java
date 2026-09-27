@@ -15,10 +15,12 @@ import java.util.Map;
  * @param actions actions available to the current user
  * @param history status history, oldest first
  * @param stageNames names of all stages of the workflow by code (history display)
+ * @param stages every stage of the workflow in its defined order (stepper display)
  */
 public record CaseView(
     WorkCase workCase,
     WorkflowStage stage,
     List<WorkflowTransition> actions,
     List<WorkCaseHistory> history,
-    Map<String, String> stageNames) {}
+    Map<String, String> stageNames,
+    List<WorkflowStage> stages) {}

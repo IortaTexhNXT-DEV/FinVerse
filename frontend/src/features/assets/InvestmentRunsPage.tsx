@@ -4,7 +4,6 @@ import { investmentsApi } from '@/api/investments';
 import type { InvestmentRun, RunLine, RunType } from '@/api/investments';
 import { useAuth } from '@/auth/authContext';
 import { Amount } from '@/components/ui/Amount';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -19,6 +18,7 @@ import { TextInput } from './FormControls';
 import { summarize } from './runSummary';
 import { useAssetLookups } from './useAssetLookups';
 import { UserName } from '@/components/ui/UserName';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const TABS = [
   { id: 'ACCRUAL', label: 'Interest accrual' },
@@ -71,14 +71,18 @@ export default function InvestmentRunsPage() {
         description="Month-end investment income: one journal per holding, valued at the period end."
         actions={
           can('PERIOD_END_RUN') && (
-            <Button
+            <ConfirmButton
               variant="accent"
               busy={post.isPending}
               disabled={!summary.postable}
-              onClick={() => post.mutate()}
+              confirm={{
+                title: `Post ${type === 'ACCRUAL' ? 'Accrual' : 'Amortization'}`,
+                effect: 'One journal per holding is posted for the period end.',
+              }}
+              onConfirm={() => post.mutateAsync()}
             >
-              Post {type === 'ACCRUAL' ? 'accrual' : 'amortization'}
-            </Button>
+              {`Post ${type === 'ACCRUAL' ? 'Accrual' : 'Amortization'}`}
+            </ConfirmButton>
           )
         }
       />

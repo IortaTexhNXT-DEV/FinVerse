@@ -32,10 +32,11 @@ import { RiskItemsStep } from './RiskItemsStep';
 import { useAutosave } from './useAutosave';
 import { ClientStep, ContactStep, PeriodStep, ProductStep } from './WizardSteps';
 import type { StepProps } from './WizardSteps';
+import { Notice } from '@/components/ui/Notice';
 
 function DuplicateFallout({ arns }: Readonly<{ arns: string[] }>) {
   return (
-    <div className="alert danger" role="alert">
+    <Notice tone="error">
       These risks are already on {arns.length === 1 ? 'account' : 'accounts'}{' '}
       {arns.map((arn) => (
         <Link key={arn} to={`/accounts/by-arn/${arn}`} style={{ marginRight: 'var(--space-2)' }}>
@@ -43,7 +44,7 @@ function DuplicateFallout({ arns }: Readonly<{ arns: string[] }>) {
         </Link>
       ))}
       — open the existing account instead of creating a new one.
-    </div>
+    </Notice>
   );
 }
 
@@ -140,9 +141,9 @@ function Feedback({ error, problems }: Readonly<{ error: unknown; problems: stri
     <>
       {dupes.length > 0 ? <DuplicateFallout arns={dupes} /> : <ErrorAlert error={error} />}
       {problems.length > 0 && (
-        <div className="alert warning" role="alert">
+        <Notice tone="warning" role="alert">
           {problems.join(' ')}
-        </div>
+        </Notice>
       )}
     </>
   );

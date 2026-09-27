@@ -42,6 +42,7 @@ export interface AccessRequestDetails {
   portalRole?: string;
   effectiveFrom?: string;
   batchId?: number;
+  authorizationLimit?: number | null;
 }
 
 export interface ApproverStep {
@@ -121,6 +122,7 @@ export interface AccessRequestInput {
   partyCode?: string;
   portalRole?: string;
   effectiveFrom?: string;
+  authorizationLimit?: number;
   approvers?: string[];
 }
 
@@ -163,6 +165,10 @@ export interface AccessSettings {
   anyApprover: boolean;
   roleApplyOnApproval: boolean;
   userIdPattern: string;
+  /** The user ID format in words, for example "a letter followed by nine digits". */
+  userIdFormatText: string;
+  /** Requests for external (portal) users are switched on (UAM_EXTERNAL_USERS). */
+  externalUsers: boolean;
 }
 
 export type AccessBatchStatus =
@@ -202,6 +208,7 @@ export interface UserAccess {
   businessUnitCode?: string;
   userLevel?: string;
   locked: boolean;
+  authorizationLimit?: number | null;
 }
 
 export interface RoleInfo {
@@ -280,6 +287,30 @@ export interface RetentionEligible {
   }[];
 }
 
+/** A pair of group profiles one user may not hold together (separation of duties). */
+export interface SodRule {
+  id: number;
+  ruleCode: string;
+  profileA: string;
+  profileAName: string;
+  profileB: string;
+  profileBName: string;
+  description: string;
+  status: 'PENDING_AUTHORIZATION' | 'ACTIVE' | 'INACTIVE';
+  pendingAction: 'CREATE' | 'DEACTIVATE' | 'NONE';
+  maker: string;
+  authorizedBy?: string;
+  authorizedAt?: string;
+  createdAt: string;
+}
+
+export interface SodRuleInput {
+  profileA: string;
+  profileB: string;
+  description: string;
+}
+
+const SOD = '/nbadmin/sod-rules';
 const REQUESTS = '/nbadmin/access-requests';
 const BATCHES = '/nbadmin/access-batches';
 const one = (id: number) => `${REQUESTS}/${String(id)}`;
@@ -335,4 +366,10 @@ export const nbadminApi = {
   retentionEligible: (id: number) =>
     api.get<RetentionEligible>(`/nbadmin/retention/rules/${String(id)}/eligible?limit=200`),
   runRetentionReview: () => api.post<RetentionRule[]>('/nbadmin/retention/review'),
+  sodRules: () => api.get<SodRule[]>(SOD),
+  createSodRule: (body: SodRuleInput) => api.post<SodRule>(SOD, body),
+  deactivateSodRule: (id: number) => api.post<SodRule>(`${SOD}/${String(id)}/deactivate`),
+  authorizeSodRule: (id: number) => api.post<SodRule>(`${SOD}/${String(id)}/authorize`),
+  rejectSodRule: (id: number, reason: string) =>
+    api.post<SodRule>(`${SOD}/${String(id)}/reject`, { reason }),
 };

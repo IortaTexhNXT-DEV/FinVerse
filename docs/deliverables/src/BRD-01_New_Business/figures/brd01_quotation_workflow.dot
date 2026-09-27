@@ -14,15 +14,15 @@ digraph nb_quotation {
   NOT_PROCEEDED  [label="NOT_PROCEEDED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
   VOIDED         [label="VOIDED", fillcolor="@DIRTY_WHITE", color="@MUTED"];
 
-  DRAFT -> FOR_REVIEW [label=" submit"];
-  FOR_REVIEW -> APPROVED [label=" approve"];
-  FOR_REVIEW -> DRAFT [label=" return (reason)", style=dashed, constraint=false];
-  APPROVED -> SENT_TO_CLIENT [label=" send (protected)"];
-  SENT_TO_CLIENT -> ACCEPTED [label=" accept"];
-  ACCEPTED -> CONVERTED [label=" create_accounts"];
-  SENT_TO_CLIENT -> NOT_PROCEEDED [label=" decline", style=dotted];
-  APPROVED -> DRAFT [label=" revise\n (version n+1)", style=dashed, constraint=false];
-  FOR_REVIEW -> VOIDED [label=" void (reason)", style=dotted];
+  DRAFT -> FOR_REVIEW [label=" Submit for review"];
+  FOR_REVIEW -> APPROVED [label=" Approve"];
+  FOR_REVIEW -> DRAFT [label=" Return to maker (reason)", style=dashed, constraint=false];
+  APPROVED -> SENT_TO_CLIENT [label=" Send to client (protected)"];
+  SENT_TO_CLIENT -> ACCEPTED [label=" Record acceptance"];
+  ACCEPTED -> CONVERTED [label=" Create accounts"];
+  SENT_TO_CLIENT -> NOT_PROCEEDED [label=" Client declined", style=dotted];
+  APPROVED -> DRAFT [label=" Revise (new version)\n (version n+1)", style=dashed, constraint=false];
+  FOR_REVIEW -> VOIDED [label=" Void (reason)", style=dotted];
 
   { rank=same; FOR_REVIEW; VOIDED; }
   { rank=same; ACCEPTED; NOT_PROCEEDED; }

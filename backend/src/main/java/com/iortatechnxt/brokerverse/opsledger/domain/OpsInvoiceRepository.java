@@ -54,6 +54,15 @@ public interface OpsInvoiceRepository
   boolean existsByInvoiceNo(String invoiceNo);
 
   /**
+   * Legacy invoices by their number in the source system (Data Migration, DATA_MIGRATION_DESIGN
+   * 14.1); one per source system at most.
+   *
+   * @param legacyInvoiceNo legacy invoice number
+   * @return invoices, oldest first
+   */
+  List<OpsInvoice> findByLegacyLegacyInvoiceNoOrderByIdAsc(String legacyInvoiceNo);
+
+  /**
    * Invoices of an account, oldest first.
    *
    * @param arn Account Reference Number

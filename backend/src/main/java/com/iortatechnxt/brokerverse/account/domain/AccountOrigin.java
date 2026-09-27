@@ -16,7 +16,9 @@ public enum AccountOrigin {
   /** Placement of an Employee Benefits cycle (BRID-017). */
   EMPLOYEE_BENEFITS,
   /** Renewal module (BRRN.033). */
-  RENEWAL;
+  RENEWAL,
+  /** In-force legacy policy imported by the data migration (BRD-13, object P01). */
+  MIGRATED;
 
   /**
    * The origin kind of quotation / PRF references: quotation, PRF or direct.

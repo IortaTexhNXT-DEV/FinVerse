@@ -20,6 +20,7 @@ import {
   TotalsTable,
 } from './RunTables';
 import { displayNameOf } from '@/api/users';
+import { Notice } from '@/components/ui/Notice';
 
 const TABS = [
   { id: 'summary', label: 'By line of business' },
@@ -62,7 +63,11 @@ function RunStatusCard({ run }: Readonly<{ run: ValuationRun }>) {
         <StatusBadge status={run.status} />
         <span className="muted">{trail(run)}</span>
       </div>
-      {run.rejectionReason && <p className="alert warning">Rejected: {run.rejectionReason}</p>}
+      {run.rejectionReason && (
+        <Notice tone="warning" title="Rejected">
+          {run.rejectionReason}
+        </Notice>
+      )}
       {run.remarks && <p className="muted">{run.remarks}</p>}
     </Card>
   );

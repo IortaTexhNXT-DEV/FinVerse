@@ -10,37 +10,44 @@ doc_code: FRS
 brd: BRD-11
 name: User Access Maintenance
 doc_id: BIBS-FRS-BRD-11
-version: "1.1"
-date: 26 September 2026
-status: Issued for BDOI review
+version: "2.0"
+date: 27 September 2026
+status: Issued for BDOI business sign-off
 header_title: FRS BRD-11 User Access Maintenance
-output: FRS/BIBS_FRS_BRD-11_User_Access_Maintenance_v1.1.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Solution Architect
     approver: ""
-    change: Internal draft from the BRD-11 baseline, the build design and the built access functions
+    change: Internal draft from the BRD-11 baseline
   - version: "1.0"
     date: 25 Sep 2026
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
-    change: First issue for BDOI review; built access functions as the baseline, BRD changes specified from the design; aligned with the cross-BRD decisions
+    change: First issue for BDOI review; aligned with the cross-BRD decisions
   - version: "1.1"
     date: 26 Sep 2026
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Solution Architect
     approver: BDOI Product Owner (pending)
     change: "BDOI Drop 0 integrations of 26-Sep-2026: sign-in through EIAM (Microsoft Entra ID, OpenID Connect) as the target of FR-UA-003; UIDM-ISC (IGA) provisioning against the BIBS request rule, options for BDOI (IQ04, IQ05; register DCR-229, DCR-230); portal users of decision D7 dormant (EB without portal, IQ22)"
+  - version: "2.0"
+    date: 27 Sep 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business owner, Information Security and BDOI IT (sign-off)
+    change: "Business sign-off pack: the messages and codes of the screens in every FR, the access functions of section 2.3, proposed business rules and clarifications for confirmation (chapter 22), the menu of every persona, screen specifications with screenshots, walkthroughs, messages, notifications, reports as documents, the bulk upload, configuration inputs the business provides, cross-BRD contract, sign-off and change control (chapters 12-21). Issued 27-Sep-2026. FR, BRD and test IDs kept"
 distribution:
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Business Administrators (process owner)", role: Business owner, organisation: BDOI, purpose: Review of all FRs}
   - {name: "Unit Heads, Combank and Corbank Marketing / Corporate Processing", role: Approver, organisation: BDOI, purpose: Review of the request and approval steps}
+  - {name: "BDOI Information Security", role: Signatory, organisation: BDOI, purpose: "Review and sign-off of the role matrix, the menus by persona and the separation-of-duties rules"}
+  - {name: "BDOI IT", role: Signatory, organisation: BDOI, purpose: "Review and sign-off of the sign-in and identity integration assumptions (EIAM, UIDM-ISC) and the System Administrator functions"}
   - {name: "ITIO-SRE and ITSD-AMS", role: System administration, organisation: BDO Unibank, purpose: "Review of the System Administrator functions, sign-in and logs"}
   - {name: "ES-BPDS, Business Project Services", role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Build, test and UAT preparation"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, test and UAT preparation"}
 ---
 
 # Introduction
@@ -49,9 +56,9 @@ distribution:
 
 This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker System, on iNXT BrokerVerse) meets the User Access Maintenance business requirements of BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It turns each BRD requirement into functional requirements with actors, flows, rules, validations, screens, fields, notifications, audit and acceptance criteria.
 
-BDOI uses this document to confirm that user access will be managed as the business expects. The project team uses it to build, test and prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
+BDOI uses this document to confirm that user access will be managed as the business expects. The project team uses it to deliver, test and prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
 
-Part of user access is already built in BIBS: users, roles, permissions, sign-in with lock-out, the session policy, access requests under four eyes and the User Access Matrix (built for BRD-1 and BRD-3). This document describes those functions as the **baseline** (section 2.3) and specifies the BRD-11 changes on top of them from the build design (R3). Where a function is built, the FR quotes the screen names, messages and codes of the build. Where it is new, the message code is assigned at build and the FR gives the message text only.
+User access in BIBS covers users, group profiles (roles) and permissions, sign-in with lock-out, the session policy, access requests under four eyes and the User Access Matrix; section 2.3 summarises each access function. The FRs quote the screen names, messages and codes that the users see. Where the proposed rule or screen differs from the BRD, or needs a decision of BDOI, chapter 22 lists it for confirmation. Chapters 12 to 21 are the business view of the system for the sign-off: the menu of every persona, the screens with their fields and messages, the walkthroughs, the reports, the configuration inputs and the interface contract.
 
 ## Scope
 
@@ -72,20 +79,19 @@ The BRD was written in April 2025 for the Quotation and Pre-processing System (Q
 - Infrastructure items the BRD answers with "Follow existing QPS set up" (servers, network, DR, environments, support). They follow the BIBS deployment standards (section 8).
 - Data and user migration: "N/A" in the BRD (p.12). Existing users can be loaded with the bulk request (FR-UA-019).
 - Automatic joiner and leaver feeds from HR. The BRD does not ask for them; bulk requests cover mass changes.
-- The final EUA, LDAP / Active Directory, single sign-on and external ACL connections. BIBS builds the seam and keeps local sign-in until BDO supplies the interfaces (UQ04, UQ14; decision D6 of R4).
+- The final EUA, LDAP / Active Directory, single sign-on and external ACL connections. BIBS keeps local sign-in until BDO supplies the interfaces (UQ04, UQ14; decision D6 of R4).
 
 ## References
 
-<!-- table: widths=1.2,7.4,3.6,5.4 caption="Reference documents" -->
-| Ref. | Document | Version / date | Location |
-|---|---|---|---|
-| R1 | Business Requirements Document - QPS User Access Maintenance Module, 39 pages (pp.1-19 text; pp.20-38 the signed scanned copy; p.39 e-mail sign-off) | v1, 15-Apr-2025; signed April-May 2025 | `docs/source-documents/User Access Maintenance.pdf` |
-| R2 | BDOI User Access Maintenance (BRD-11) requirements baseline and fit/gap | current | `docs/requirements/BDOI_UAM_BRD_SPEC.md` |
-| R3 | User Access Maintenance build design | current (proposal for review) | `docs/architecture/USER_ACCESS_DESIGN.md` |
-| R4 | Cross-BRD decisions and answered questions | current | `docs/requirements/BDOI_CROSS_BRD_DECISIONS.md` |
-| R5 | Built access functions: users, roles and sign-in (`security`); access requests, User Access Matrix, retention (`nbadmin`); screens | as built | `backend/.../security`, `backend/.../nbadmin`, `frontend/src/features/nbadmin`, `frontend/src/features/admin` |
-| R6 | FRS BRD-3 Product Maintenance (role-permission change requests, PMADD05) | v1.0 | `docs/deliverables/out/Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.pdf` |
-| R7 | BDO UX guidelines (brand, screen patterns) | current | `docs/design/BDO_UX_GUIDELINES.md` |
+<!-- table: widths=1.2,11.4,3.6 caption="Reference documents" -->
+| Ref. | Document | Version / date |
+|---|---|---|
+| R1 | Business Requirements Document - QPS User Access Maintenance Module, 39 pages (pp.1-19 text; pp.20-38 the signed scanned copy; p.39 e-mail sign-off) | v1, 15-Apr-2025; signed April-May 2025 |
+| R2 | BDOI User Access Maintenance (BRD-11) requirements baseline | current |
+| R4 | Cross-BRD decisions and answered questions | current |
+| R6 | FRS BRD-3 Product Maintenance (role-permission change requests, PMADD05) | v2.0 |
+| R7 | BDO UX guidelines (brand, screen patterns) | current |
+| R8 | BRD-1 New Business business sign-off set (My Approvals, Lists of Values, Data Retention) | v2.0 |
 
 Page references in this document ("p.8") are pages of the BRD PDF (R1). The BRD has no NFR IDs; the NFR rows carry the analyst's IDs UAM-NFR-01 to UAM-NFR-41 of R2.
 
@@ -96,6 +102,7 @@ Access request: A request to create, change, deactivate or reactivate a user, or
 Approver: The user who reviews and approves, rejects or returns access requests (BRD section B)
 BRD: Business Requirements Document
 Business Administrator: The BDOI user who defines and manages group profiles and raises group-profile requests (BRD section C)
+EIAM: BDO Enterprise Identity Access Management on Microsoft Entra ID, the target sign-in of BDO users named by BDOI for Drop 0 (owned by BDOI IT)
 EUA: BDO end-user authentication service that validates the Windows ID and password (NFR p.14)
 FR: Functional requirement of this document (FR-UA-nnn)
 Group profile: A set of permissions assigned to a group of users (BRD p.4); a role in BIBS
@@ -106,7 +113,9 @@ Requestor: The user who submits user access requests (BRD section A)
 SSO: Single sign-on
 System Administrator: The IT user who implements group profiles and maintains users and roles (BRD section D)
 UAM-NFR-nn: ID given by the analyst to a non-functional requirement of the BRD (R2 section 7)
+Seed data: The fictitious data of the SIT environment (users, requests, profiles) used in the screenshots and walkthroughs
 UAT: User acceptance testing
+UIDM-ISC: BDO's identity governance and administration (IGA) tool, named by BDOI for Drop 0 for joiner, mover and leaver provisioning (owned by BDOI IT)
 UQnn: Open question on BRD-11 raised by the project team (section 10.3)
 User Access: The permissions and privileges granted to a user (BRD p.4)
 User Access Matrix: The screen and export that show which roles hold which permissions, by permission and by action class
@@ -117,21 +126,14 @@ Windows ID: The user's BDO network log-on name, used for EUA authentication
 
 Each FR in section 4 has the same parts:
 
-- A header table with the **BRD trace** (requirement ID and page), the **actor**, the **priority** ("Must have" for the rows the BRD marks "Mandatory: Yes"; rows without a flag are noted), the **fit** class of the baseline (R2), and the **screens** and **API** that implement it. API paths marked "(designed)" are added by the build of BRD-11; the others exist today.
-- **Description**, **preconditions**, **main flow** and **alternate and exception flows**. Where BIBS already has the function, the description starts with the baseline and then states the change.
+- A header table with the **BRD trace** (requirement ID and page), the **actor**, the **priority** ("Must have" for the rows the BRD marks "Mandatory: Yes"; rows without a flag are noted) and the **screens** where the user performs it.
+- **Description**, **preconditions**, **main flow** and **alternate and exception flows**. The description states the proposed behaviour of the function.
 - **Business rules**. *Configurable* rules are maintained by the System Administrator in BIBS (parameter or list of values, section 9). *Fixed* rules are part of the system and change only through a change request.
-- **Validations and messages**: the check, the message the user sees and its code. Codes quoted exist in the built system. For a check added by BRD-11 the code column shows "To be assigned at build". A "-" marks a screen check (for example a blank mandatory field), which has no business code.
+- **Validations and messages**: the check, the message the user sees and its code. A "-" marks a screen check (for example a blank mandatory field), which has no business code. Chapter 15 lists every message, as the screens show it.
 - **Screens and fields**, **notifications**, **audit** and numbered **acceptance criteria**, which are the basis of the BRD-11 test plan.
 
 The BRD lists 160 requirement lines, many of them sub-steps of one function ("create request", "add remarks", "save remarks"). The FRs group them by function; section 11 lists every line with its FR.
 
-<!-- table: widths=2.6,14 caption="Fit classes (from the requirements baseline, R2)" status=Class -->
-| Class | Meaning |
-|---|---|
-| FIT | Works today in BIBS |
-| CONFIGURE | Needs set-up only (roles, parameters, lists) |
-| CHANGE | Extends a built function |
-| NEW | A function that does not exist in BIBS before BRD-11 |
 
 The 160 requirement lines split into 67 FIT, 4 CONFIGURE, 61 CHANGE and 28 NEW; the 41 NFR rows into 13 FIT, 8 CONFIGURE, 12 CHANGE and 8 NEW (R2, section 3).
 
@@ -170,20 +172,20 @@ The BRD shows two processes (p.6). The table lists the steps and Figure 1 shows 
 
 <!-- pagebreak -->
 
-## Baseline: access functions built today
+## Access functions
 
-The table lists what BIBS does today and what BRD-11 changes. The FRs refer to it as "the baseline".
+The table summarises each access function of BIBS: the screen, the permission and the proposed behaviour. The Access Requests and User Access Matrix screens are in the User Access section of the menu.
 
-<!-- table: widths=3.4,6.6,6.6 caption="Built access functions and the BRD-11 change" size=8.5 -->
-| Function | Built today (screen, permission) | BRD-11 change |
+<!-- table: widths=3.4,6.6,6.6 caption="Access functions of BIBS" size=8.5 -->
+| Function | Screen, permission and main behaviour | Further proposed behaviour |
 |---|---|---|
-| Sign-in and lock-out | Login screen; user name and password; the account locks after LOGIN_MAX_FAILED_ATTEMPTS = 3 failed attempts until an administrator unlocks it; every success and failure is in the audit trail | Directory authentication with the Windows ID (parked seam); log-out and session log |
-| Session policy | Inactivity warning after SESSION_IDLE_WARNING_MINUTES = 15; sign-out after SESSION_TIMEOUT_MINUTES = 30 of inactivity; warning SESSION_EXPIRY_WARNING_MINUTES = 30 before the fixed token expiry | None; confirmed by the BRD (Q42) |
-| Users | Administration > Users (USER_MANAGE): user name, full name, e-mail, roles, authorisation limit, last login, status; unlock and reset password | Windows ID, business unit group, user level, status incl. online; direct edits limited to requests |
-| Roles | Administration > Roles & Permissions (ROLE_MANAGE): create a role, name it, tick permissions | Active flag, description, privilege level; changes only by implementing an approved group-profile request |
-| Access requests | Broking Setup > Access Requests (ACCESS_REQUEST to raise, ACCESS_APPROVE to decide): types Create user, Change roles, Disable user, Enable user, Change role permissions; submitted directly; status PENDING, APPROVED, REJECTED; the approver cannot be the requester; approval applies the change at once and shows a temporary password once | Drafts, return, correction, cancellation, chosen approver(s), new types (modify user, group-profile create / deactivate / reactivate), effective date, bulk, second approval, history, implementation step |
-| Notifications | All holders of ACCESS_APPROVE on submission; the requester on the decision | The chosen approver only; returned, cancelled, second approval, implementation; the affected user |
-| User Access Matrix | Broking Setup > User Access Matrix: roles by permission and by area / action class, Excel export | Every permission gets an area, so the group-profile report shows a module for every task |
+| Sign-in and lock-out | Login screen; user name and password; the account locks after LOGIN_MAX_FAILED_ATTEMPTS = 3 failed attempts until an administrator unlocks it; every success and failure is in the audit trail | Directory authentication with the Windows ID when BDO supplies the interface; log-out and session log |
+| Session policy | Inactivity warning after SESSION_IDLE_WARNING_MINUTES = 15; sign-out after SESSION_TIMEOUT_MINUTES = 30 of inactivity; warning SESSION_EXPIRY_WARNING_MINUTES = 30 before the fixed session expiry | Confirmed by the BRD (Q42) |
+| Users | Administration > Users (USER_MANAGE): user name, full name, e-mail, roles, authorisation limit, last login, status; unlock and reset password | Windows ID, business unit group, user level, status incl. online; changes through requests |
+| Roles | Administration > Roles & Permissions (ROLE_MANAGE): create a role, name it, tick permissions | Active flag, description, privilege level; changes by implementing an approved group-profile request |
+| Access requests | User Access > Access Requests (ACCESS_REQUEST to raise, ACCESS_APPROVE to decide): types Create user, Change roles, Disable user, Enable user, Change role permissions; the approver cannot be the requester; approval applies the change and shows a temporary password once | Drafts, return, correction, cancellation, chosen approver(s), new types (modify user, group-profile create / deactivate / reactivate), effective date, bulk, second approval, history, implementation step |
+| Notifications | The chosen approver on submission; the requester on the decision | Returned, cancelled, second approval, implementation; the affected user |
+| User Access Matrix | User Access > User Access Matrix: roles by permission and by area / action class, Excel export | Every permission gets an area, so the group-profile report shows a module for every task |
 | Password | My Profile > Change password: at least 10 characters with upper and lower case, digit and symbol; administrator reset | Password history, maximum and minimum age, forced change after reset, self-service reset |
 | Audit | Insert-only audit trail; Administration > Audit Trail report (CTL-AUDIT) with summary text | Structured, insert-only access-change log with from / to values; four reports |
 
@@ -191,22 +193,23 @@ The table lists what BIBS does today and what BRD-11 changes. The FRs refer to i
 
 ## Personas
 
-<!-- table: widths=3,4.6,6.8,3.2 caption="Personas and BIBS roles (design R3, section 6.2)" -->
+<!-- table: widths=3,4.6,6.8,3.2 caption="Personas and BIBS roles" -->
 | Persona | BIBS role | Responsibilities in User Access Maintenance | BRD |
 |---|---|---|---|
-| Requestor | UAM_REQUESTOR (new) | Raises user access requests: enrol, modify, deactivate, reactivate, bulk; corrects and cancels them; views own requests | Section A (1.001-1.009) |
-| Approver | UAM_APPROVER (new); NB_APPROVER keeps its approval right | Reviews and approves, rejects or returns requests assigned to him or her | Section B (2.001-2.002) |
-| Second approver | UAM_SECOND_APPROVER (new) | Reviews privileged or out-of-hours changes after the first approval | NFR 11 (p.17) |
-| Business Administrator | BUSINESS_ADMIN (exists) | Raises group-profile requests; generates the reports; supports users | Section C (3.001-3.003) |
-| System Administrator | SYSADMIN (exists) | Implements approved group-profile requests; defines the UAM group profiles and their functions; unlocks users and resets passwords; audit logs | Section D (4.001-4.003) |
-| Auditor | AUDITOR (exists) | Views requests and runs the reports and the audit log | NFR 6 (p.17) |
+| Requestor | UAM_REQUESTOR | Raises user access requests: enrol, modify, deactivate, reactivate, bulk; corrects and cancels them; views own requests | Section A (1.001-1.009) |
+| Approver | UAM_APPROVER; NB_APPROVER keeps its approval right | Reviews and approves, rejects or returns requests assigned to him or her | Section B (2.001-2.002) |
+| Second approver | UAM_SECOND_APPROVER | Reviews privileged or out-of-hours changes after the first approval | NFR 11 (p.17) |
+| Business Administrator | BUSINESS_ADMIN | Raises group-profile requests; generates the reports; maintains the separation-of-duties rules; uploads bulk requests; supports users | Section C (3.001-3.003) |
+| System Administrator | SYSADMIN | Implements approved group-profile requests; defines the UAM group profiles and their functions; unlocks users and resets passwords; audit logs | Section D (4.001-4.003) |
+| Auditor | AUDITOR | Views requests and runs the reports and the audit log | NFR 6 (p.17) |
+| Information Security Officer | INFOSEC_OFFICER | Views the access requests, the group-profile requests and the User Access Matrix, and the audit trail; runs the user access reports; authorises the separation-of-duties rules; approves the changes of the security settings | NFR 11 (p.17) |
 | System | - | Validates, grants the access, applies dated changes, logs, notifies | p.6 |
 
 The BRD's stakeholders also list ITIO-SRE (System and Database Administrators), ITIO-ES (Storage Administrator) and ITSD-AMS (application support) (p.7). They support the platform and have no functional role in BIBS beyond the System Administrator. Who the 14 Requestors and 8 Approvers are is UQ01.
 
 ## Permissions
 
-BRD 4.002.2 asks that each function can be assigned to any group profile. BIBS gives each function its own permission (area USER_ACCESS). ACCESS_REQUEST stays as the umbrella permission of the roles that hold it today, so existing roles keep working.
+BRD 4.002.2 asks that each function can be assigned to any group profile. BIBS gives each function its own permission (area USER_ACCESS). ACCESS_REQUEST is the umbrella permission of the request functions for the roles that hold it.
 
 <!-- table: widths=4.4,2.8,7.4,2.4 caption="User Access Maintenance permissions (area USER_ACCESS)" -->
 | Permission | Action class | Allows | BRD |
@@ -218,33 +221,40 @@ BRD 4.002.2 asks that each function can be assigned to any group profile. BIBS g
 | UAM_CORRECT | AMEND | Apply correction to a returned request | 4.002.2.5 |
 | UAM_CANCEL | AMEND | Cancel a request | 4.002.2.6 |
 | UAM_VIEW | VIEW | View requests (own; all with ACCESS_APPROVE, USER_MANAGE or AUDIT_VIEW) | 4.002.2.7 |
-| ACCESS_APPROVE (exists) | APPROVE | Review and approve requests | 4.002.2.8 |
+| ACCESS_APPROVE | APPROVE | Review and approve requests | 4.002.2.8 |
 | UAM_GROUP_REQUEST | CREATE | Submit group-profile requests | 4.002.2.9 |
 | UAM_REPORT_VIEW | VIEW | Generate the user access reports | 4.002.2.10 |
 | UAM_SECOND_APPROVE | APPROVE | Second approval of privileged or out-of-hours changes | NFR 11 |
-| ACCESS_REQUEST (exists) | CREATE | Umbrella of the request functions for the roles that hold it today | - |
-| USER_MANAGE, ROLE_MANAGE (exist) | AMEND | Users and Roles screens; implementation of group-profile requests | 4.002.1 |
+| UAM_SOD_MAINTAIN | AMEND | Add and deactivate separation-of-duties rules | NFR 11 |
+| UAM_SOD_AUTHORIZE | APPROVE | Authorise the separation-of-duties rules | NFR 11 |
+| SECURITY_PARAMETER_APPROVE (area ADMINISTRATION) | APPROVE | Approve a change of a security setting | NFR 11 |
+| ACCESS_REQUEST | CREATE | Umbrella of the request functions | - |
+| USER_MANAGE, ROLE_MANAGE | AMEND | Users and Roles screens; implementation of group-profile requests | 4.002.1 |
 
 ## Permissions matrix
 
-<!-- table: widths=4.4,1.8,1.8,1.8,1.8,1.8,1.8,1.8 caption="Role-to-action matrix for User Access Maintenance (proposal until UQ01 / OQ48)" size=8 -->
-| Permission | Requestor | Approver | Second approver | Business Admin | System Admin | NB Approver | Auditor |
-|---|---|---|---|---|---|---|---|
-| UAM_ENROLL | Y | | | | | | |
-| UAM_MODIFY | Y | | | | | | |
-| UAM_DEACTIVATE | Y | | | | | | |
-| UAM_REACTIVATE | Y | | | | | | |
-| UAM_CORRECT | Y | | | Y | | | |
-| UAM_CANCEL | Y | | | Y | | | |
-| UAM_VIEW | Y | Y | Y | Y | Y | | Y |
-| ACCESS_APPROVE | | Y | | | | Y | |
-| UAM_SECOND_APPROVE | | | Y | | | | |
-| UAM_GROUP_REQUEST | | | | Y | | | |
-| UAM_REPORT_VIEW | | Y | | Y | Y | | Y |
-| ACCESS_REQUEST | | | | Y | Y | | |
-| USER_MANAGE, ROLE_MANAGE | | | | | Y | | |
+<!-- table: widths=4.4,1.6,1.6,1.6,1.6,1.6,1.6,1.6,1.6 caption="Role-to-action matrix for User Access Maintenance (proposal until UQ01 / OQ48)" size=8 -->
+| Permission | Requestor | Approver | Second approver | Business Admin | System Admin | NB Approver | Auditor | InfoSec Officer |
+|---|---|---|---|---|---|---|---|---|
+| UAM_ENROLL | Y | | | | | | | |
+| UAM_MODIFY | Y | | | | | | | |
+| UAM_DEACTIVATE | Y | | | | | | | |
+| UAM_REACTIVATE | Y | | | | | | | |
+| UAM_CORRECT | Y | | | Y | | | | |
+| UAM_CANCEL | Y | | | Y | | | | |
+| UAM_VIEW | Y | Y | Y | Y | Y | | Y | |
+| ACCESS_APPROVE | | Y | | | | Y | | |
+| UAM_SECOND_APPROVE | | | Y | | | | | |
+| UAM_GROUP_REQUEST | | | | Y | | | | |
+| UAM_REPORT_VIEW | | Y | | Y | Y | | Y | Y |
+| ACCESS_REQUEST | | | | Y | Y | | | |
+| USER_MANAGE, ROLE_MANAGE | | | | | Y | | | |
+| BULK_PROCESS (bulk upload) | Y | | | Y | Y | | | |
+| UAM_SOD_MAINTAIN | | | | Y | | | | |
+| UAM_SOD_AUTHORIZE | | | | | | | | Y |
+| SECURITY_PARAMETER_APPROVE | | | | | | | | Y |
 
-Segregation of duties is enforced by the system, whatever the roles grant: the requester and the user the request is about never decide it, the second approver differs from the first, and the implementer of a group-profile request is not its requester.
+Segregation of duties is enforced by the system, whatever the roles grant: the requester and the user the request is about never decide it, the second approver differs from the first, and the implementer of a group-profile request is not its requester. On top of this, the separation-of-duties rules name the pairs of group profiles one user may not hold together; every request and bulk line is checked against them (FR-UA-053).
 
 # Functional requirements
 
@@ -256,12 +266,10 @@ title: Log in with a persona profile from a BDO-issued device
 brd: [BRD 1.001.1 (p.8), BRD 1.001.1.1 (p.8), BRD 2.001.1 (p.8), BRD 2.001.1.1 (p.8), BRD 3.001.1 (p.9), BRD 3.001.1.1 (p.9), BRD 4.001.1 (p.9), BRD 4.001.1.1 (p.9), UAM-NFR-18 (p.14), UAM-NFR-19 (p.14)]
 actor: Requestor, Approver, Business Administrator, System Administrator
 priority: "Must have (4.001.x has no flag in the BRD)"
-fit: "FIT; CONFIGURE for the Requestor and Approver profiles (1.001.1.1, 2.001.1.1)"
 screens: Login; home page with the menu of the user's roles
-api: POST /api/v1/auth/login
 description:
-  - Baseline. Users sign in to BIBS in a browser with their user ID and password. BIBS checks the credentials and the account status, counts failed attempts and locks the account after LOGIN_MAX_FAILED_ATTEMPTS failed attempts (3, for every BIBS user). Every successful and failed attempt is written to the audit trail. The menu shows only the screens of the user's roles.
-  - Change. The Requestor and Approver profiles are delivered as the roles UAM_REQUESTOR and UAM_APPROVER. Access only from BDO-issued devices is enforced by the BDO network and endpoint policy, not by BIBS.
+  - "Users sign in to BIBS in a browser with their user ID and password. BIBS checks the credentials and the account status, counts failed attempts and locks the account after LOGIN_MAX_FAILED_ATTEMPTS failed attempts (3, for every BIBS user). Every successful and failed attempt is written to the audit trail. The menu shows only the screens of the user's roles."
+  - "The Requestor and Approver profiles are the roles UAM_REQUESTOR and UAM_APPROVER. Access only from BDO-issued devices is enforced by the BDO network and device policy, not by BIBS."
 preconditions:
   - "The user has an enabled BIBS account with at least one role."
 main_flow:
@@ -271,13 +279,15 @@ main_flow:
 alternate_flows:
   - Wrong credentials. BIBS refuses the log-in and counts the failed attempt.
   - Third failed attempt. The account locks; the System Administrator unlocks it (Administration > Users, Unlock) or reactivates it through a request.
+  - Deactivated account. BIBS refuses the log-in with its own message; the attempt does not count towards the lock-out and is written to the audit trail.
   - Directory mode (FR-UA-003). The password is checked by EUA instead of BIBS.
 rules:
   - [R1, "Lock-out after LOGIN_MAX_FAILED_ATTEMPTS consecutive failures (3); applies to all users (CQ23 answered by this BRD).", Configurable, Parameter LOGIN_MAX_FAILED_ATTEMPTS]
   - [R2, "A user may hold several roles; the menu is the union of their screens (NFR 1.c-d).", Fixed, "-"]
 validations:
-  - [User ID or password wrong, Invalid user name or password, "-"]
-  - [Account locked, Account is locked. Contact your administrator., "-"]
+  - [User ID or password wrong, Invalid user name or password, AUTHENTICATION_FAILED]
+  - [Account locked, Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
+  - [Account deactivated, Your account is deactivated. Contact your administrator., AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:
@@ -285,6 +295,7 @@ audit:
 acceptance:
   - A user with the Requestor profile logs in and sees the User Access screens of the Requestor only.
   - The third wrong password locks the account and the fourth attempt is refused with "Account is locked".
+  - A deactivated user is refused with "Your account is deactivated" and the count of failed attempts does not change.
   - The audit trail lists the failed and successful attempts.
 ```
 
@@ -294,11 +305,9 @@ title: Warn before the inactivity and system log-out
 brd: [BRD 1.001.1.2 (p.8), BRD 1.001.1.3 (p.8), BRD 2.001.1.2 (p.8), BRD 2.001.1.3 (p.8), BRD 3.001.1.2 (p.9), BRD 3.001.1.3 (p.9), BRD 4.001.1.2 (p.9), BRD 4.001.1.3 (p.9), UAM-NFR-34 (p.17)]
 actor: All users
 priority: "Must have (4.001.x has no flag in the BRD)"
-fit: FIT
 screens: Every screen (session guard dialog)
-api: GET /api/v1/system/session-policy
 description:
-  - Baseline, confirmed by the BRD. After 15 minutes without activity BIBS shows a warning; after 30 minutes without activity it signs the user out. Activity in any browser tab keeps all tabs signed in. Separately, BIBS warns 30 minutes before the fixed end of the sign-in token ("For your security the system signs you out in n minute(s)...").
+  - After 15 minutes without activity BIBS shows a warning; after 30 minutes without activity it signs the user out. Activity in any browser tab keeps all tabs signed in. Separately, BIBS warns 30 minutes before the fixed end of the session ("For your security the system signs you out in n minute(s)...").
   - The BRD reads "warning prior to system triggered log out (30 minutes)" and "inactivity warning (after 15 minutes)" (p.8, p.17). The inactivity sign-out at 30 minutes with the warning at 15 minutes meets both (Q42 answered, R4).
 preconditions:
   - "The user is signed in."
@@ -310,7 +319,7 @@ alternate_flows:
 rules:
   - [R1, "Inactivity warning after SESSION_IDLE_WARNING_MINUTES (15).", Configurable, Parameter SESSION_IDLE_WARNING_MINUTES]
   - [R2, "Inactivity sign-out after SESSION_TIMEOUT_MINUTES (30).", Configurable, Parameter SESSION_TIMEOUT_MINUTES]
-  - [R3, "Warning SESSION_EXPIRY_WARNING_MINUTES (30) before the fixed token expiry.", Configurable, Parameter SESSION_EXPIRY_WARNING_MINUTES]
+  - [R3, "Warning SESSION_EXPIRY_WARNING_MINUTES (30) before the fixed session expiry.", Configurable, Parameter SESSION_EXPIRY_WARNING_MINUTES]
 validations: []
 notifications:
   - "On-screen warnings only."
@@ -327,12 +336,10 @@ title: Authenticate with the Windows ID against BDO EUA
 brd: [UAM-NFR-11 (p.13), UAM-NFR-17 (p.14), UAM-NFR-33 (p.17)]
 actor: All users; System
 priority: Must have
-fit: NEW (seam; adapter parked until UQ04)
 screens: Login
-api: POST /api/v1/auth/login (unchanged contract); directory authenticator port
 description:
   - The BRD asks that the user ID is interfaced with EUA using the Windows ID. BIBS passes the user ID and the entered password; EUA returns whether the log-on succeeded and, on failure, an error message that BIBS shows (p.14). LDAP or Active Directory authentication and single sign-on or LDAP integration are also required (p.13, p.17).
-  - BIBS authenticates through a directory port. Parameter AUTH_MODE selects LOCAL (password held in BIBS, today) or DIRECTORY (password checked by EUA; the user is found by the Windows ID). The lock-out, audit and session behaviour are the same in both modes, and BIBS never stores the password in DIRECTORY mode.
+  - Parameter AUTH_MODE selects LOCAL (password held in BIBS) or DIRECTORY (password checked by EUA; the user is found by the Windows ID). The lock-out, audit and session behaviour are the same in both modes, and BIBS never stores the password in DIRECTORY mode.
   - The EUA protocol, host and messages are not in the BRD (UQ04). BIBS keeps LOCAL mode until BDO supplies them; switching is then configuration (decision D6, R4).
   - "Target named by BDOI on 26-Sep-2026: sign-in goes through EIAM, BDO's Enterprise Identity Access Management on Microsoft Entra ID, with OpenID Connect. The login page redirects to Entra ID; BIBS validates the returned identity, finds the user by the Windows ID or the user principal name and signs him in with his BIBS roles (AUTH_MODE = OIDC). Password, lock-out and multi-factor rules then belong to Entra ID; the BIBS inactivity warning and log-out stay. A local break-glass administrator keeps LOCAL sign-in, audited. Claims, tenant and session life are open with BDOI IT (IQ04)."
 preconditions:
@@ -347,10 +354,10 @@ alternate_flows:
   - EUA not reachable. BIBS refuses the log-in with a service message; a local break-glass administrator, if BDO allows one, signs in locally (UQ04).
 rules:
   - [R1, "Authentication mode LOCAL or DIRECTORY.", Configurable, Parameter AUTH_MODE]
-  - [R2, "Authorisation (roles and permissions) stays in BIBS in both modes; an external ACL is a parked seam (UQ14).", Fixed, "-"]
+  - [R2, "Authorisation (roles and permissions) stays in BIBS in both modes; an external ACL is on hold (UQ14).", Fixed, "-"]
 validations:
-  - [EUA refuses the log-on, The message returned by EUA, "-"]
-  - [Windows ID not linked to a user, Invalid user name or password, "-"]
+  - [The directory refuses the log-on, The message returned by the directory, AUTHENTICATION_FAILED]
+  - [Windows ID not linked to a user, Invalid user name or password, AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:
@@ -366,12 +373,9 @@ title: Log out and keep a session log
 brd: [UAM-NFR-35 (p.17), UAM-NFR-15 (p.14)]
 actor: All users; System Administrator
 priority: Must have
-fit: CHANGE
 screens: User menu (Log Out); Administration > Users (status Online)
-api: POST /api/v1/auth/logout (designed)
 description:
-  - Baseline. Log-in and failed log-in are audited. Log-out is not recorded - the web client discards the token.
-  - Change. **Log Out** ends the session in BIBS and records LOGOUT in the audit trail. Every session is kept in a session log - user, start, last activity, end and end reason (log-out, inactivity, token expiry, ended by an administrator, account locked). The user list shows a user as Online while a session is open (UQ13).
+  - "Log-in and failed log-in are audited. **Log Out** ends the session in BIBS and records LOGOUT in the audit trail. Every session is kept in a session log - user, start, last activity, end and end reason (log-out, inactivity, session expiry, ended by an administrator, account locked). The user list shows a user as Online while a session is open (UQ13)."
 preconditions:
   - "The user is signed in."
 main_flow:
@@ -398,12 +402,10 @@ title: Enforce the password policy and self-service reset
 brd: [UAM-NFR-31 (p.17), UAM-NFR-36 (p.17), UAM-NFR-37 (p.17)]
 actor: All users (local accounts); System Administrator
 priority: Must have
-fit: "FIT (UAM-NFR-31); CHANGE (UAM-NFR-36); NEW (UAM-NFR-37)"
 screens: My Profile (Change password, Details); Login (Forgot password?); Administration > Users (Reset password)
-api: POST /api/v1/auth/change-password; POST /api/v1/admin/users/{id}/reset-password; password-reset flow (designed)
 description:
-  - Baseline. Users change their own password on My Profile; the password has at least 10 characters with upper and lower case letters, a digit and a symbol. The System Administrator resets a password and BIBS shows a temporary password once.
-  - Change. BIBS also refuses the last PASSWORD_HISTORY_COUNT passwords, requires a change after PASSWORD_MAX_AGE_DAYS, refuses a second change within PASSWORD_MIN_AGE_DAYS and forces a change at the first log-in after a reset. **Forgot password?** e-mails a single-use link valid for 30 minutes. Users update their own e-mail and mobile number on My Profile (UQ17).
+  - "Users change their own password on My Profile; the password has at least 10 characters with upper and lower case letters, a digit and a symbol. The System Administrator resets a password and BIBS shows a temporary password once."
+  - "BIBS refuses the last PASSWORD_HISTORY_COUNT passwords, requires a change after PASSWORD_MAX_AGE_DAYS, refuses a second change within PASSWORD_MIN_AGE_DAYS and forces a change at the first log-in after a reset. **Forgot password?** e-mails a single-use link valid for 30 minutes. Users update their own e-mail and mobile number on My Profile (UQ17)."
   - These rules apply to LOCAL accounts. With EUA the password belongs to BDO (UQ08).
 preconditions:
   - "AUTH_MODE = LOCAL."
@@ -419,9 +421,9 @@ rules:
   - [R3, "Reset links are single-use and expire after 30 minutes.", Fixed, "-"]
 validations:
   - [Current password wrong, Current password is incorrect, INVALID_PASSWORD]
-  - [New password too weak, must contain upper and lower case letters and a digit and a symbol, VALIDATION_FAILED]
-  - [Password used before, You used this password recently. Choose another one, To be assigned at build]
-  - [Changed too soon, You changed your password less than a day ago, To be assigned at build]
+  - [New password too weak, "Still needed: At least 10 characters; An upper-case letter; A lower-case letter; A digit; A symbol (on the screen, as the user types)", "-"]
+  - [Password used before, You used this password recently. Choose another one, PASSWORD_REUSED]
+  - [Changed too soon, You changed your password less than a day ago, PASSWORD_CHANGED_TOO_SOON]
 notifications:
   - "PASSWORD_EXPIRY_NOTICE to users whose password expires within 7 days (job, 06:00 daily)."
 audit:
@@ -432,6 +434,38 @@ acceptance:
   - The reset link works once and not after 30 minutes.
 ```
 
+```fr
+id: FR-UA-006
+title: Deactivate dormant users
+brd: [UAM-NFR-06 (p.12), UAM-NFR-09 (p.13)]
+actor: System (daily job); Requestor (told of the result)
+priority: Should have
+screens: Access Requests (the requests of the job); Notifications
+description:
+  - "Every night BIBS deactivates the users who have not signed in for UAM_DORMANT_DAYS days (90), counted from the last sign-in, or from the creation or the last reactivation when later. UAM_DORMANT_NOTICE_DAYS days before (7) the user is told to sign in. Each deactivation is a Deactivate user request with the reason \"No sign-in for the dormancy period\", approved and applied by the system, so it has the request history, the change log and the notice to the user like any other request. The holders of the System Administrator profile are never deactivated this way."
+preconditions:
+  - "UAM_DORMANT_DAYS is more than 0."
+main_flow:
+  - The job finds the active users without a sign-in for the dormancy period.
+  - For each, BIBS raises, approves and applies a Deactivate user request as the system.
+  - BIBS tells the user, and tells the holders of the request right which users were deactivated.
+alternate_flows:
+  - Notice day. A user whose deactivation date is UAM_DORMANT_NOTICE_DAYS days away is told to sign in, in the app and by e-mail.
+  - A deactivated user who needs access again is reactivated by a request (FR-UA-014).
+rules:
+  - [R1, "Dormancy period 90 days; 0 switches the job off.", Configurable, Parameter UAM_DORMANT_DAYS]
+  - [R2, "Notice 7 days before; 0 sends no notice.", Configurable, Parameter UAM_DORMANT_NOTICE_DAYS]
+  - [R3, "The System Administrator profile is never deactivated by the job, so the administration stays reachable.", Fixed, "-"]
+validations: []
+notifications:
+  - "UAM_DORMANT_WARNING to the user on the notice day (in the app and by e-mail); UAM_ACCESS_CHANGED to the deactivated user; UAM_DORMANT_DEACTIVATED to the holders of the request right."
+audit:
+  - "The request of the job, its history and the change log DISABLE_USER, done by SYSTEM."
+acceptance:
+  - A user without a sign-in for 91 days is deactivated by the job with a request whose reason is "No sign-in for the dormancy period".
+  - A user whose deactivation date is 7 days away receives the notice and stays active.
+```
+
 ## User access requests (Requestor)
 
 ```fr
@@ -440,12 +474,9 @@ title: Draft, edit, cancel and submit an access request
 brd: [BRD 1.002.1.1 (p.8), BRD 1.002.1.1.4-1.002.1.1.5 (p.8), BRD 1.002.1.2-1.002.1.4 (p.8), BRD 1.003.1.1 (p.8), BRD 1.003.1.1.5-1.003.1.1.6 (p.8), BRD 1.003.1.2-1.003.1.4 (p.8), BRD 1.004.1.1 (p.8), BRD 1.004.1.1.2-1.004.1.1.3 (p.8), BRD 1.004.1.2-1.004.1.4 (p.8), BRD 1.005.1 (p.8), BRD 1.005.1.1.1-1.005.1.1.2 (p.8), BRD 1.005.1.2-1.005.1.4 (p.8)]
 actor: Requestor
 priority: "Must have (the 'add / save remarks' lines have no flag in the BRD)"
-fit: "CHANGE (create, edit, cancel, save remarks); FIT (submit, add remarks)"
 screens: User Access > Access Requests; New Request; Edit Request
-api: POST /api/v1/nbadmin/access-requests (draft=true, designed); PUT .../access-requests/{id} (designed); POST .../access-requests/{id}/submit (designed)
 description:
-  - Baseline. The Business Administrator clicks **New Request** on Access Requests, fills the New Access Request dialog (request, user name, full name, e-mail, home branch, roles, justification) and submits it at once. The request gets a number AR-yyyy-nnnnnn and status PENDING. There is no draft.
-  - Change. Every request type (enrol, modify, deactivate, reactivate, and the group-profile types of section 4.4) can be saved as a DRAFT. Only its creator sees and edits a draft. The creator cancels a draft (CANCELLED, kept, never deleted) or submits it. Remarks - justification, reason for deactivation or reactivation - are saved with the draft, and every remark is also kept in the request history.
+  - "The Requestor clicks **New Request** on Access Requests and fills the request. Every request type (enrol, modify, deactivate, reactivate, and the group-profile types of section 4.4) can be saved as a DRAFT. Only its creator sees and edits a draft. The creator cancels a draft (CANCELLED, kept, never deleted) or submits it. Remarks - justification, reason for deactivation or reactivation - are saved with the draft, and every remark is also kept in the request history. A request gets the number AR-yyyy-nnnnnn."
   - On submission BIBS runs the full checks - the user exists or not, group profiles active, user ID format, approver eligible, one open request per user - evaluates the risk rules (FR-UA-034) and moves the request to PENDING.
 preconditions:
   - "The user holds the permission of the request type (UAM_ENROLL, UAM_MODIFY, UAM_DEACTIVATE, UAM_REACTIVATE or UAM_GROUP_REQUEST) or ACCESS_REQUEST."
@@ -466,10 +497,10 @@ rules:
   - [R4, "Remarks (justification) are mandatory on submission, up to 1000 characters.", Fixed, "-"]
   - [R5, "Requests are never deleted; a cancelled request stays visible with its reason.", Fixed, "-"]
 validations:
-  - [Justification blank, Enter the justification, "-"]
+  - [Justification blank, Enter the justification, ACCESS_JUSTIFICATION]
   - [Another request for the user is pending, A request for user <user> is already waiting for approval, ACCESS_REQUEST_PENDING]
-  - [Edit of a draft by another user, Only the creator can edit this draft, To be assigned at build]
-  - [Cancel without reason, Enter the reason for the cancellation, "-"]
+  - [Edit of a draft by another user, "Only the creator can edit request <request no>", ACCESS_NOT_REQUESTER]
+  - [Cancel without reason, Enter the reason for the cancellation, ACCESS_CANCEL_REASON]
 fields_screen: New Request (common part)
 fields:
   - [Request type, List, "Yes", "Enrol new user, Modify user, Deactivate user, Reactivate user", Fixed after first save]
@@ -492,12 +523,9 @@ title: Enrol a new user
 brd: [BRD 1.002.1 (p.8), BRD 1.002.1.1.1 (p.8), BRD 1.002.1.1.2 (p.8), UAM-NFR-13 (p.13)]
 actor: Requestor
 priority: Must have
-fit: "FIT (1.002.1, 1.002.1.1.2); CHANGE (1.002.1.1.1)"
 screens: New Request (type Enrol new user)
-api: POST /api/v1/nbadmin/access-requests (type CREATE_USER)
 description:
-  - Baseline. A Create user request carries the user name, full name, e-mail, home branch and roles. On approval BIBS creates the user and shows a temporary password once to the approver.
-  - Change. The request also carries the Windows ID, the business unit group, the user level and an optional effective date (NFR p.13-14). The user ID follows the BDOI format (at least 10 alphanumeric characters, format a999999999, parameter USER_ID_PATTERN). Only active group profiles are offered.
+  - "A Create user request carries the user name, full name, e-mail, home branch and group profiles, and also the Windows ID, the business unit group, the user level, the authorisation limit and an optional effective date (NFR p.13-14). The user ID follows the BDOI format (a letter followed by nine digits, parameter USER_ID_PATTERN, shown to the requester in words from USER_ID_FORMAT_TEXT). Only active group profiles are offered. On approval BIBS creates the user and shows a temporary password once to the approver."
 preconditions:
   - "The user has UAM_ENROLL (or ACCESS_REQUEST)."
 main_flow:
@@ -512,13 +540,14 @@ rules:
   - [R3, "At least one active group profile.", Fixed, "-"]
 validations:
   - [User ID with wrong characters or length, "The user name has 3 to 50 letters, digits, dots, dashes or underscores", ACCESS_USERNAME]
-  - [User ID not in the BDOI format, "The user ID must follow the format <pattern>", To be assigned at build]
+  - [User ID not in the BDOI format, "The user ID must be <user ID format in words>", ACCESS_USER_ID_FORMAT]
   - [User already exists, User <user> already exists, ACCESS_USER_EXISTS]
   - [Full name blank, Enter the full name of the new user, ACCESS_FULL_NAME]
   - [No group profile, Select at least one role, ACCESS_ROLES]
   - [Unknown group profile, "Unknown role(s): <codes>", ACCESS_UNKNOWN_ROLE]
-  - [Inactive group profile, "Group profile <code> is not active", To be assigned at build]
-  - [Windows ID already used, "Windows ID <id> belongs to another user", To be assigned at build]
+  - [Inactive group profile, "Group profile <name> is not active", ACCESS_ROLE_INACTIVE]
+  - [Profiles one user may not hold together, "One user may not hold both <profile> and <profile> (separation-of-duties rule <rule>)", ACCESS_SOD_CONFLICT]
+  - [Windows ID already used, "Windows ID <id> belongs to another user", ACCESS_WINDOWS_ID_IN_USE]
 fields_screen: New Request (Enrol new user)
 fields:
   - [User ID, Text, "Yes", "-", "USER_ID_PATTERN; unique"]
@@ -528,7 +557,8 @@ fields:
   - [Home branch, List, "No", Branches, "-"]
   - [Business unit group, List, "No", LOV UAM_BUSINESS_UNIT, Values from BDOI (UQ05)]
   - [User level, List, "No", LOV UAM_USER_LEVEL, Values from BDOI (UQ05)]
-  - [Group profiles, Multi-select, "Yes", Active roles, At least one]
+  - [Group profiles, Multi-select, "Yes", Active roles, "At least one; no pair of an active separation-of-duties rule (FR-UA-053)"]
+  - [Authorisation limit, Amount, "No", "-", "Zero or more, 2 decimals; blank = no limit"]
 notifications:
   - "As FR-UA-010; on application the new user receives the access notice (FR-UA-070)."
 audit:
@@ -545,12 +575,9 @@ title: Modify an existing user
 brd: [BRD 1.003.1 (p.8), BRD 1.003.1.1.1 (p.8), BRD 1.003.1.1.2 (p.8), BRD 1.003.1.1.3 (p.8)]
 actor: Requestor
 priority: "Must have (1.003.1.1.2 has no flag in the BRD)"
-fit: "CHANGE (1.003.1, 1.003.1.1.2); FIT (1.003.1.1.1, 1.003.1.1.3)"
 screens: New Request (type Modify user)
-api: POST /api/v1/nbadmin/access-requests (type MODIFY_USER, designed); GET /api/v1/nbadmin/users
 description:
-  - Baseline. A Change roles request replaces the roles of an existing user. The user's name, e-mail and branch change only by a direct edit of the System Administrator on the Users screen.
-  - Change. A Modify user request changes the user data (full name, e-mail, home branch, business unit group, user level, Windows ID) and / or the group profiles in one request. The Requestor searches the user by user ID, Windows ID or name; the form shows the current values next to the new ones. Change roles stays available for compatibility.
+  - "A Modify user request changes the user data (full name, e-mail, home branch, business unit group, user level, Windows ID, authorisation limit) and / or the group profiles in one request. The Requestor searches the user by user ID, Windows ID or name; the form shows the current values next to the new ones. A Change roles request, which replaces the group profiles only, stays available."
 preconditions:
   - "The user has UAM_MODIFY (or ACCESS_REQUEST)."
 main_flow:
@@ -563,12 +590,12 @@ rules:
   - [R2, "A user never requests a change of his or her own roles.", Fixed, "-"]
 validations:
   - [User not found, User <user> does not exist, ACCESS_UNKNOWN_USER]
-  - [Nothing changed, The request does not change the user, To be assigned at build]
+  - [Nothing changed, The request does not change the user, ACCESS_NOTHING_CHANGED]
   - [Own roles, You cannot change your own roles, SELF_ROLE_CHANGE]
 fields_screen: New Request (Modify user)
 fields:
   - [User, Look-up, "Yes", "Users (user ID, Windows ID, name)", Existing user]
-  - [Current / new values, Pairs, "No", "Full name, e-mail, home branch, business unit group, user level, Windows ID", At least one change]
+  - [Current / new values, Pairs, "No", "Full name, e-mail, home branch, business unit group, user level, Windows ID, authorisation limit", At least one change]
   - [Group profiles, Multi-select, "No", Active roles, "-"]
 notifications:
   - "As FR-UA-010; the affected user is notified on application (FR-UA-070)."
@@ -585,12 +612,9 @@ title: Deactivate a user
 brd: [BRD 1.004.1 (p.8), BRD 1.004.1.1.1 (p.8)]
 actor: Requestor
 priority: Must have
-fit: FIT
 screens: New Request (type Deactivate user)
-api: POST /api/v1/nbadmin/access-requests (type DISABLE_USER)
 description:
-  - Baseline. A Disable user request disables the account on approval; the user can no longer sign in.
-  - Change. Only enabled users are offered. An optional reason code (list UAM_DEACTIVATION_REASON) is kept with the remarks, and an effective date allows a future deactivation, for example on the last working day.
+  - "A Disable user request disables the account on approval; the user can no longer sign in. Only enabled users are offered. An optional reason code (list UAM_DEACTIVATION_REASON) is kept with the remarks, and an effective date allows a future deactivation, for example on the last working day."
 preconditions:
   - "The user has UAM_DEACTIVATE (or ACCESS_REQUEST)."
 main_flow:
@@ -599,10 +623,10 @@ main_flow:
   - The Requestor completes the common part and submits.
 rules:
   - [R1, "A deactivated user keeps the group profiles so a reactivation restores them.", Fixed, "-"]
-  - [R2, "Reasons - Resigned, Transferred, Long leave, Security, Others (to confirm).", Configurable, LOV UAM_DEACTIVATION_REASON]
+  - [R2, "Reasons - Resigned, Transferred, Long leave, Security, Others (to confirm with BDOI); No sign-in for the dormancy period is used by the dormant-user job (FR-UA-006).", Configurable, LOV UAM_DEACTIVATION_REASON]
 validations:
   - [User not found, User <user> does not exist, ACCESS_UNKNOWN_USER]
-  - [User already disabled, "User <user> is already deactivated", To be assigned at build]
+  - [User already disabled, "User <user> is already deactivated", ACCESS_USER_ALREADY_INACTIVE]
 fields_screen: New Request (Deactivate user)
 fields:
   - [User, Look-up, "Yes", Enabled users, "-"]
@@ -623,12 +647,9 @@ title: Reactivate a user
 brd: [BRD 1.005 (p.8), BRD 1.005.1.1 (p.8)]
 actor: Requestor
 priority: Must have
-fit: FIT
 screens: New Request (type Reactivate user)
-api: POST /api/v1/nbadmin/access-requests (type ENABLE_USER)
 description:
-  - Baseline. An Enable user request enables a disabled account on approval.
-  - Change. Only disabled or locked users are offered. The request can also unlock a locked account. The BRD numbers this function one level up (BRD 1.005 and 1.005.1.1 for the sub-steps); the traceability keeps the printed IDs.
+  - "An Enable user request enables a disabled account on approval. Only disabled or locked users are offered, and the request can also unlock a locked account. The BRD numbers this function one level up (BRD 1.005 and 1.005.1.1 for the sub-steps); the traceability keeps the printed IDs."
 preconditions:
   - "The user has UAM_REACTIVATE (or ACCESS_REQUEST)."
 main_flow:
@@ -639,7 +660,7 @@ rules:
   - [R1, "The user's group profiles are restored as they were; changed profiles need a Modify user request.", Fixed, "-"]
 validations:
   - [User not found, User <user> does not exist, ACCESS_UNKNOWN_USER]
-  - [User already active, "User <user> is already active", To be assigned at build]
+  - [User already active, "User <user> is already active", ACCESS_USER_ALREADY_ACTIVE]
 fields_screen: New Request (Reactivate user)
 fields:
   - [User, Look-up, "Yes", Disabled or locked users, "-"]
@@ -659,12 +680,9 @@ title: Choose the approver
 brd: [BRD 1.002.1.1.3 (p.8), BRD 1.003.1.1.4 (p.8), BRD 1.004.1.1.4 (p.8), BRD 1.005.1.1.3 (p.8)]
 actor: Requestor
 priority: Must have
-fit: NEW
 screens: New Request (Approver)
-api: GET /api/v1/nbadmin/approvers?type= (designed)
 description:
-  - Baseline. A submitted request is notified to every holder of ACCESS_APPROVE, and any of them can decide it.
-  - Change. The Requestor selects the approver from a drop-down of eligible approvers - enabled holders of ACCESS_APPROVE, excluding the requester and the user the request is about. The notice goes to that approver, and the request appears in that approver's My Approvals and "Assigned to me". Other approvers see it only when UAM_ANY_APPROVER is true.
+  - "The Requestor selects the approver from a drop-down of eligible approvers - enabled holders of ACCESS_APPROVE, excluding the requester and the user the request is about. The notice goes to that approver, and the request appears in that approver's My Approvals and \"Assigned to me\". Other approvers see it only when UAM_ANY_APPROVER is true."
 preconditions:
   - "A request is being drafted (FR-UA-010)."
 main_flow:
@@ -677,8 +695,8 @@ rules:
   - [R1, "The requester and the subject user are never eligible.", Fixed, "-"]
   - [R2, "Who may be chosen (any holder of the approval right, or the approver of the requester's unit) is UQ02.", Configurable, Parameter UAM_ANY_APPROVER]
 validations:
-  - [Approver not selected, Select the approver, "-"]
-  - [Approver not eligible, "<user> cannot approve this request", To be assigned at build]
+  - [Approver not selected, Select the approver, ACCESS_APPROVER_REQUIRED]
+  - [Approver not eligible, "<user> cannot approve this request", ACCESS_APPROVER_NOT_ELIGIBLE]
 notifications:
   - "UAM_REQUEST_TO_APPROVE to the chosen approver."
 audit:
@@ -694,12 +712,9 @@ title: Apply correction on a returned request
 brd: [BRD 1.006.1 (p.8), BRD 1.006.1.1 (p.8), BRD 1.006.1.2 (p.8), BRD 1.006.1.3 (p.8), BRD 1.006.1.4 (p.8), BRD 1.006.1.5 (p.8)]
 actor: Requestor (UAM_CORRECT)
 priority: Must have
-fit: CHANGE
 screens: Access Requests (My Requests); Edit Request
-api: PUT /api/v1/nbadmin/access-requests/{id}; POST .../{id}/submit (designed)
 description:
-  - Baseline. There is no return - the approver can only approve or reject.
-  - Change. A request returned by the approver (FR-UA-033) is RETURNED. The Requestor receives a notification with the return remarks, edits the data, adds a correction remark and re-submits it to the same approver or a newly chosen one. The history keeps every round.
+  - "A request returned by the approver (FR-UA-033) is RETURNED. The Requestor receives a notification with the return remarks, edits the data, adds a correction remark and re-submits it to the same approver or a newly chosen one. The history keeps every round."
 preconditions:
   - "The request is RETURNED; the user is its creator and has UAM_CORRECT (or ACCESS_REQUEST)."
 main_flow:
@@ -712,7 +727,7 @@ alternate_flows:
 rules:
   - [R1, "A correction remark is mandatory on re-submission.", Fixed, "-"]
 validations:
-  - [Correction remark blank, Enter the correction remarks, "-"]
+  - [Correction remark blank, Enter the correction remarks, ACCESS_CORRECTION_REMARKS]
 notifications:
   - "UAM_REQUEST_RETURNED to the requester; UAM_REQUEST_TO_APPROVE to the approver on re-submission."
 audit:
@@ -728,12 +743,9 @@ title: Cancel a submitted request
 brd: [BRD 1.007.1 (p.8), BRD 1.007.1.1 (p.8), BRD 1.007.1.2 (p.8), BRD 1.007.1.3 (p.8), BRD 1.007.1.4 (p.8)]
 actor: Requestor (UAM_CANCEL)
 priority: Must have
-fit: "CHANGE; FIT (1.007.1.1 search)"
 screens: Access Requests (My Requests)
-api: POST /api/v1/nbadmin/access-requests/{id}/cancel (designed)
 description:
-  - Baseline. Requests are searched by status, type and text (user, role or request number). A pending request cannot be withdrawn.
-  - Change. The Requestor searches the request - also by requester, approver and date range - and cancels a PENDING or RETURNED request with a mandatory reason. The request becomes CANCELLED, leaves the approver's My Approvals and the approver is notified. An approved request with a future effective date (SCHEDULED) can be cancelled before its date (UQ06).
+  - "The Requestor searches the request by status, type, text (user, group profile or request number), requester, approver and date range, and cancels a PENDING or RETURNED request with a mandatory reason. The request becomes CANCELLED, leaves the approver's My Approvals and the approver is notified. An approved request with a future effective date (SCHEDULED) can be cancelled before its date (UQ06)."
 preconditions:
   - "The request is PENDING, PENDING_SECOND, RETURNED or SCHEDULED; the user is its creator and has UAM_CANCEL (or ACCESS_REQUEST)."
 main_flow:
@@ -743,8 +755,8 @@ main_flow:
 rules:
   - [R1, "A cancelled request is kept with its reason; it cannot be re-opened.", Fixed, "-"]
 validations:
-  - [Reason blank, Enter the reason for the cancellation, "-"]
-  - [Request already decided, "Request <no.> is already <status>", To be assigned at build]
+  - [Reason blank, Enter the reason for the cancellation, ACCESS_CANCEL_REASON]
+  - [Request already decided, "Request <request no> is already <status>", ACCESS_REQUEST_DECIDED]
 notifications:
   - "UAM_REQUEST_CANCELLED to the approver."
 audit:
@@ -760,12 +772,9 @@ title: View submitted requests and their status
 brd: [BRD 1.008.1 (p.8), BRD 1.008.1.1 (p.8), BRD 1.008.1.2 (p.8), BRD 1.008.1.3 (p.8), BRD 1.008.1.4 (p.8)]
 actor: Requestor (UAM_VIEW)
 priority: "Must have (1.008.1 has no flag in the BRD)"
-fit: FIT
 screens: Access Requests (My Requests); request detail (History)
-api: GET /api/v1/nbadmin/access-requests; GET .../access-requests/{id}; GET .../{id}/history (designed)
 description:
-  - Baseline. The Access Requests screen lists requests with number, type, change, requested by, requested on, status and decided by, with filters by status, type and text; a row opens the request detail. The requester is notified when the request is approved or rejected.
-  - Change. A Requestor sees his or her own requests on the tab My Requests; holders of ACCESS_APPROVE, USER_MANAGE or AUDIT_VIEW see all. The detail adds a History tab with every event and remark, and the new statuses.
+  - "The Access Requests screen lists requests with number, type, change, requested by, requested on, status and decided by, with filters by status, type and text; a row opens the request detail with a History tab of every event and remark. A Requestor sees his or her own requests on the tab My Requests; holders of ACCESS_APPROVE, USER_MANAGE or AUDIT_VIEW see all. The requester is notified of each decision."
 preconditions:
   - "The user has UAM_VIEW (or ACCESS_REQUEST / ACCESS_APPROVE)."
 main_flow:
@@ -799,14 +808,12 @@ title: Submit a bulk request
 brd: [BRD 1.009.1 (p.8), BRD 1.009.1.1 (p.8), BRD 1.009.1.2 (p.8), BRD 1.009.1.3 (p.8), BRD 1.009.1.4 (p.8), BRD 1.009.1.5 (p.8), BRD 1.009.1.6 (p.8), UAM-NFR-38 (p.17)]
 actor: Requestor
 priority: "Must have (1.009.1 has no flag in the BRD)"
-fit: NEW
 screens: User Access > Bulk Request
-api: POST /api/v1/nbadmin/access-requests/bulk (multipart, designed); bulk handler UAM_ACCESS_REQUEST
 description:
   - The Requestor downloads the template, fills one row per user - action (enrol, modify, deactivate, reactivate), user ID, Windows ID, name, e-mail, branch, business unit group, user level, group profiles, effective date, remarks - and attaches it. BIBS validates every row and shows a validation report before the batch is created.
   - A valid file creates a draft batch with one line request per row. The Requestor adds the batch remarks, edits the draft (replaces the file or removes lines), cancels it or submits it to the chosen approver. On approval every line is applied in its own transaction; failures are listed and the other lines stand.
 preconditions:
-  - "The user has UAM_ENROLL or UAM_MODIFY (and the permissions of the actions in the file)."
+  - "The user has UAM_ENROLL or UAM_MODIFY (and the permissions of the actions in the file), and the bulk upload right BULK_PROCESS. BULK_PROCESS is granted to the Requestor, the Business Administrator and the System Administrator."
 main_flow:
   - The Requestor opens Bulk Request and downloads the template.
   - The Requestor attaches the completed file.
@@ -820,8 +827,8 @@ rules:
   - [R1, "Each row is checked as a single request (FR-UA-011 to FR-UA-014).", Fixed, "-"]
   - [R2, "The batch is decided as a whole; line-by-line decisions, maximum rows and mixed actions are UQ10.", Configurable, Bulk settings (UQ10)]
 validations:
-  - [Row with an unknown action, "Row <n>: action <value> is not valid", To be assigned at build]
-  - [Row fails a request check, "Row <n>: <message of the check>", To be assigned at build]
+  - [Row with an unknown action, "Action <action> is not valid", ACCESS_BULK_ACTION]
+  - [Row fails a request check, "The message of the check of a single request (for example User <user> already exists)", "Code of the check"]
   - [File type not allowed, The file type is not allowed, "-"]
 fields_screen: Bulk Request
 fields:
@@ -843,9 +850,7 @@ title: Apply changes on an effective date
 brd: [UAM-NFR-14 (p.13)]
 actor: Requestor; System
 priority: Must have
-fit: NEW
 screens: New Request (Effective date); Access Requests (status SCHEDULED)
-api: Job UAM_EFFECTIVE_CHANGES (00:05 daily)
 description: A request may carry an effective date. When it is approved before that date, the request becomes SCHEDULED and the daily job applies it on the date, after checking it again. A blank date means the change applies on approval. A scheduled request can be cancelled before its date (FR-UA-017).
 preconditions:
   - "The request has an effective date later than the approval date."
@@ -857,9 +862,9 @@ alternate_flows:
   - The re-check fails (for example the user was deactivated meanwhile). The request stays SCHEDULED and alert UAM_SCHEDULED_APPLY_FAILED is raised to the System Administrator.
 rules:
   - [R1, "Effective date is today or later.", Fixed, "-"]
-  - [R2, "An end date for temporary access is not built (UQ06).", Fixed, "-"]
+  - [R2, "Temporary access with an end date follows BDOI's answer to UQ06 (chapter 22, CLR-UA-13).", Fixed, "-"]
 validations:
-  - [Effective date in the past, The effective date cannot be before today, "-"]
+  - [Effective date in the past, The effective date cannot be before today, ACCESS_EFFECTIVE_DATE]
 notifications:
   - "UAM_ACCESS_CHANGED to the affected user on application."
 audit:
@@ -877,12 +882,9 @@ title: Receive, list and open requests for approval
 brd: [BRD 2.002.1 (p.8), BRD 2.002.2 (p.8), BRD 2.002.2.1 (p.8), BRD 2.002.3 (p.8), BRD 2.002.4 (p.8)]
 actor: Approver (ACCESS_APPROVE)
 priority: Must have
-fit: "FIT (2.002.2, 2.002.3, 2.002.4); CHANGE (2.002.1, 2.002.2.1)"
 screens: My Approvals; Access Requests (tab Assigned to Me); request detail
-api: GET /api/v1/nbadmin/access-requests; GET .../access-requests/{id}
 description:
-  - Baseline. Pending requests appear in My Approvals for every holder of ACCESS_APPROVE (never the requester's own) and on the Access Requests screen with status PENDING. A row opens the request detail with the requested change.
-  - Change. The approver receives a notification for each request assigned to him or her and filters the list with **Assigned to me**. The detail shows the current values next to the requested ones (user data and group profiles), the members affected (group profiles) and the history.
+  - "Pending requests appear in My Approvals of the chosen approver (never the requester's own) and on the Access Requests screen with status PENDING. The approver receives a notification for each request assigned to him or her and filters the list with **Assigned to me**. The detail shows the current values next to the requested ones (user data and group profiles), the members affected (group profiles) and the history."
 preconditions:
   - "The user has ACCESS_APPROVE."
 main_flow:
@@ -907,12 +909,9 @@ title: Approve a request and grant the access
 brd: [BRD 2.002.5 (p.8); p.6 "System to grant the access"]
 actor: Approver; System
 priority: Must have
-fit: FIT
 screens: Request detail (Approve and Apply)
-api: POST /api/v1/nbadmin/access-requests/{id}/approve
 description:
-  - Baseline. **Approve and Apply** applies the change at once - creates the user, replaces the roles, disables or enables the user, or changes the role permissions - records the decision and notifies the requester. For a new user BIBS shows a temporary password once; it is never stored in clear. The approver can never be the requester.
-  - Change. The subject user can never approve either. After approval, a request with a risk flag goes to the second approver (FR-UA-034); a request with a future effective date becomes SCHEDULED (FR-UA-020); a group-profile request goes to the next approver or to the System Administrator (FR-UA-044, FR-UA-045). Every applied attribute is logged with from and to values (FR-UA-064), and the affected user is notified.
+  - "**Approve and Apply** records the decision and applies the change - creates the user, changes the user data or group profiles, disables or enables the user - and notifies the requester. For a new user BIBS shows a temporary password once; it is never stored in clear. Neither the requester nor the subject user can approve. After approval, a request with a risk flag goes to the second approver (FR-UA-034); a request with a future effective date becomes SCHEDULED (FR-UA-020); a group-profile request goes to the next approver or to the System Administrator (FR-UA-044, FR-UA-045). Every applied attribute is logged with from and to values (FR-UA-064), and the affected user is notified."
 preconditions:
   - "The request is PENDING and assigned to the user (or UAM_ANY_APPROVER); the user has ACCESS_APPROVE and is neither the requester nor the subject user."
 main_flow:
@@ -924,9 +923,10 @@ rules:
   - [R1, "Four eyes - the requester and the subject user never decide.", Fixed, "-"]
   - [R2, "The temporary password of a new user is shown once to the approver (LOCAL mode).", Fixed, "-"]
   - [R3, "The applied change is checked again at approval (the user or role may have changed since submission).", Fixed, "-"]
+  - [R4, "An enrolment is approved on its own, from its page: Approve Selected on Access Requests cannot select it and My Approvals refuses it, so its temporary password is always shown to the approver.", Fixed, "-"]
 validations:
   - [Approver is the requester, A request cannot be decided by the user who submitted it, ACCESS_FOUR_EYES]
-  - [Approver is the subject user, You cannot decide a request about your own access, To be assigned at build]
+  - [Approver is the subject user, You cannot decide a request about your own access, ACCESS_SUBJECT_DECIDES]
 notifications:
   - "UAM_REQUEST_DECIDED to the requester; UAM_ACCESS_CHANGED to the affected user."
 audit:
@@ -942,10 +942,8 @@ title: Reject a request
 brd: [BRD 2.002.6 (p.8), BRD 2.002.6.1 (p.8), BRD 2.002.6.2 (p.9)]
 actor: Approver
 priority: "Must have (2.002.6.1-6.2 have no flag in the BRD)"
-fit: FIT
 screens: Request detail (Reject)
-api: POST /api/v1/nbadmin/access-requests/{id}/reject
-description: Baseline, unchanged. The approver enters the rejection reason in Comment ("Mandatory to reject; sent to the requester") and clicks **Reject**. BIBS records the decision, notifies the requester and changes nothing. The reason is also written to the request history.
+description: The approver enters the rejection reason in Comment ("Mandatory to reject; sent to the requester") and clicks **Reject**. BIBS records the decision, notifies the requester and changes nothing. The reason is also written to the request history.
 preconditions:
   - "As FR-UA-031."
 main_flow:
@@ -971,12 +969,9 @@ title: Return a request to the Requestor
 brd: [BRD 2.002.7 (p.9), BRD 2.002.7.1 (p.9)]
 actor: Approver
 priority: Must have
-fit: CHANGE
 screens: Request detail (Return)
-api: POST /api/v1/nbadmin/access-requests/{id}/return (designed)
 description:
-  - Baseline. There is no return.
-  - Change. The approver clicks **Return**, enters the remarks (reason for return) and saves. The request becomes RETURNED, the remarks are saved in the history and the requester is notified to correct it (FR-UA-016). The BRD uses ID 2.002.7.1 twice, for "add remarks" and "save remarks".
+  - "The approver clicks **Return**, enters the remarks (reason for return) and saves. The request becomes RETURNED, the remarks are saved in the history and the requester is notified to correct it (FR-UA-016). The BRD uses ID 2.002.7.1 twice, for \"add remarks\" and \"save remarks\"."
 preconditions:
   - "As FR-UA-031; also PENDING_SECOND for the second approver."
 main_flow:
@@ -985,7 +980,7 @@ main_flow:
 rules:
   - [R1, "Return remarks are mandatory.", Fixed, "-"]
 validations:
-  - [Remarks blank, Enter the reason for the return, "-"]
+  - [Remarks blank, Enter the remarks for the requester, ACCESS_RETURN_REASON]
 notifications:
   - "UAM_REQUEST_RETURNED to the requester."
 audit:
@@ -1000,9 +995,7 @@ title: Escalate privileged and out-of-hours changes for a second approval
 brd: [UAM-NFR-40 (p.17)]
 actor: System; Second approver (UAM_SECOND_APPROVE)
 priority: Must have
-fit: NEW
 screens: My Approvals; Access Requests (tab Second Approval)
-api: POST /api/v1/nbadmin/access-requests/{id}/second-approve (designed); alert UAM_PRIVILEGED_CHANGE
 description:
   - The BRD asks that changes to user privileges are monitored, evaluated and escalated for additional review, for example modifications outside working hours or from low to high privilege (p.17).
   - Each group profile has a privilege level (LOW, STANDARD, HIGH, ADMIN). On submission and on approval, BIBS flags a request that raises a user to a HIGH or ADMIN profile (PRIVILEGE_INCREASE) or that is submitted or approved outside UAM_WORKING_HOURS (OUTSIDE_HOURS). A flagged request needs a second approval by a holder of UAM_SECOND_APPROVE other than the first approver, and raises alert UAM_PRIVILEGED_CHANGE.
@@ -1019,7 +1012,7 @@ rules:
   - [R2, "Working hours 08:00-18:00 Monday to Friday (to confirm, UQ07).", Configurable, Parameter UAM_WORKING_HOURS]
   - [R3, "The second approver differs from the first approver, the requester and the subject user.", Fixed, "-"]
 validations:
-  - [Second approver is the first approver, The second approval is given by another approver, To be assigned at build]
+  - [Second approver is the first approver, The second approval is given by another approver, ACCESS_SECOND_SAME_APPROVER]
 notifications:
   - "UAM_SECOND_APPROVAL to the holders of UAM_SECOND_APPROVE; alert UAM_PRIVILEGED_CHANGE."
 audit:
@@ -1037,12 +1030,9 @@ title: Request a new group profile
 brd: [BRD 3.002.1 (p.9), BRD 3.002.1.1 (p.9), BRD 3.002.1.3 (p.9), BRD 3.002.1.4 (p.9), BRD 3.002.1.5 (p.9), BRD 3.002.1.6 (p.9), BRD 3.002.1.7 (p.9)]
 actor: Business Administrator (UAM_GROUP_REQUEST)
 priority: "Must have (3.002.1.6-1.7 have no flag in the BRD)"
-fit: "CHANGE (3.002.1, 3.002.1.1, 1.3, 1.4, 1.7); FIT (3.002.1.5, 1.6)"
 screens: User Access > Group Profile Requests (New); permission picker by area and action
-api: POST /api/v1/nbadmin/access-requests (type CREATE_ROLE, designed)
 description:
-  - Baseline. The System Administrator creates roles directly on Roles & Permissions. Only a change of the permissions of an existing role goes through a request (Change role permissions, BRD-3 PMADD05, R6).
-  - Change. The Business Administrator requests a new group profile - code, name, description, privilege level and the permissions, picked by area and action class. The request follows the lifecycle of FR-UA-010 (draft, edit, cancel, submit, remarks) and the approvers of FR-UA-044. After the last approval it waits for the System Administrator (FR-UA-045).
+  - "The Business Administrator requests a new group profile - code, name, description, privilege level and the permissions, picked by area and action class. The request follows the lifecycle of FR-UA-010 (draft, edit, cancel, submit, remarks) and the approvers of FR-UA-044. After the last approval it waits for the System Administrator (FR-UA-045)."
 preconditions:
   - "The user has UAM_GROUP_REQUEST."
 main_flow:
@@ -1054,7 +1044,7 @@ rules:
   - [R2, "At least one permission.", Fixed, "-"]
 validations:
   - [Code already used, "Role <code> already exists", DUPLICATE]
-  - [No permission, Select at least one permission, To be assigned at build]
+  - [No permission, Select at least one permission, ACCESS_NO_PERMISSION]
   - [Unknown permission, "Unknown permission(s): <codes>", ACCESS_UNKNOWN_PERMISSION]
   - [Too many permissions in one request, Split the change into several requests, ACCESS_PERMISSION_LIST_TOO_LONG]
 fields_screen: Group Profile Request (Create)
@@ -1081,12 +1071,9 @@ title: Request a change to a group profile
 brd: [BRD 3.002.2 (p.9), BRD 3.002.2.1 (p.9), BRD 3.002.2.2 (p.9), BRD 3.002.2.4 (p.9), BRD 3.002.2.5 (p.9), BRD 3.002.2.6 (p.9), BRD 3.002.2.7 (p.9), BRD 3.002.2.8 (p.9)]
 actor: Business Administrator
 priority: "Must have (3.002.2.2, 2.7, 2.8 have no flag in the BRD)"
-fit: "FIT (3.002.2, 2.2, 2.6, 2.7); CHANGE (3.002.2.1, 2.4, 2.5, 2.8)"
 screens: Group Profile Requests (Modify); Change role permissions fields
-api: POST /api/v1/nbadmin/access-requests (type MODIFY_ROLE_PERMISSIONS)
 description:
-  - Baseline. A Change role permissions request names the role, the permissions to add and to remove and the justification; on approval the difference is applied to the role as it is at approval, so concurrent changes are not lost (R6, FR-PM-003).
-  - Change. The Business Administrator searches the profile from the drop-down and may also change its name, description and privilege level. The request gets drafts and approvers in order, and after approval waits for the System Administrator (FR-UA-045) unless UAM_ROLE_APPLY_ON_APPROVAL is true (UQ03).
+  - "A Change group profile request names the profile, the permissions to add and to remove, any change of its name, description and privilege level, and the justification. The request has drafts and approvers in order, and after approval waits for the System Administrator (FR-UA-045), unless UAM_ROLE_APPLY_ON_APPROVAL is true (UQ03). The difference is applied to the profile as it is at implementation, so concurrent changes are not lost."
 preconditions:
   - "The user has UAM_GROUP_REQUEST (or ACCESS_REQUEST)."
 main_flow:
@@ -1119,8 +1106,8 @@ acceptance:
   - A request that adds and removes the same permission is refused with ACCESS_PERMISSION_CONFLICT.
 ```
 
-> [!NOTE] Built behaviour differs from the BRD
-> Today an approved Change role permissions request is applied by the system at approval (BRD-3 PMADD05). The BRD-11 diagram (p.6) has the System Administrator implement group-profile changes. The build adds the implementation step with UAM_ROLE_APPLY_ON_APPROVAL = false, which also changes the Product Maintenance behaviour; BDOI confirms under UQ03 (PQ17 answered, R4).
+> [!DECISION] For confirmation (chapter 22, CLR-UA-12)
+> The BRD-11 diagram (p.6) has the System Administrator implement group-profile changes after approval. BIBS applies an approved change of role permissions at the implementation step (UAM_ROLE_APPLY_ON_APPROVAL = false), for every module, including Product Maintenance (BRD-3 PMADD05); BDOI confirms under UQ03 (PQ17 answered, R4).
 
 ```fr
 id: FR-UA-042
@@ -1128,12 +1115,9 @@ title: Request the deactivation of a group profile
 brd: [BRD 3.002.3 (p.9), BRD 3.002.3.1 (p.9), BRD 3.002.3.2 (p.9), BRD 3.002.3.4 (p.9), BRD 3.002.3.5 (p.9), BRD 3.002.3.6 (p.9), BRD 3.002.3.7 (p.9), BRD 3.002.3.8 (p.9)]
 actor: Business Administrator
 priority: "Must have (3.002.3.2, 3.7, 3.8 have no flag in the BRD)"
-fit: "NEW; FIT (3.002.3.2, 3.7); CHANGE (3.002.3.8)"
 screens: Group Profile Requests (Deactivate)
-api: POST /api/v1/nbadmin/access-requests (type DEACTIVATE_ROLE, designed)
 description:
-  - Baseline. Roles have no active flag; a role can only be emptied of permissions.
-  - Change. The Business Administrator requests the deactivation of an active profile. The request lists the members of the profile. When implemented, the profile is inactive - it grants nothing, is not offered on requests and keeps its permissions for a reactivation. Whether a profile with active members may be deactivated, or members must be moved first, is UQ16.
+  - "The Business Administrator requests the deactivation of an active profile. The request lists the members of the profile. When implemented, the profile is inactive - it grants nothing, is not offered on requests and keeps its permissions for a reactivation. Whether a profile with active members may be deactivated, or members must be moved first, is UQ16."
 preconditions:
   - "The user has UAM_GROUP_REQUEST."
 main_flow:
@@ -1144,8 +1128,8 @@ rules:
   - [R1, "An inactive profile grants no permission to its members.", Fixed, "-"]
   - [R2, "SYSADMIN cannot be deactivated.", Fixed, "-"]
 validations:
-  - [Profile already inactive, "Group profile <code> is already inactive", To be assigned at build]
-  - [Profile has members (if UQ16 says block), "Move the <n> members of <code> before deactivating it", To be assigned at build]
+  - [Profile already inactive, "Group profile <code> is already inactive", ACCESS_ROLE_ALREADY_INACTIVE]
+  - [System Administrator profile, Group profile SYSADMIN cannot be deactivated, ACCESS_ROLE_PROTECTED]
 notifications:
   - "As FR-UA-040; members are notified on implementation (UAM_ACCESS_CHANGED)."
 audit:
@@ -1161,9 +1145,7 @@ title: Request the reactivation of a group profile
 brd: [BRD 3.002.4 (p.9), BRD 3.002.4.1 (p.9), BRD 3.002.4.2 (p.9), BRD 3.002.4.4 (p.9), BRD 3.002.4.5 (p.9), BRD 3.002.4.6 (p.9), BRD 3.002.4.7 (p.9), BRD 3.002.4.8 (p.9)]
 actor: Business Administrator
 priority: "Must have (3.002.4.2, 4.7, 4.8 have no flag in the BRD)"
-fit: "NEW; FIT (3.002.4.2, 4.7); CHANGE (3.002.4.8)"
 screens: Group Profile Requests (Reactivate)
-api: POST /api/v1/nbadmin/access-requests (type REACTIVATE_ROLE, designed)
 description: The Business Administrator requests the reactivation of an inactive profile, searched from the drop-down of inactive profiles. When implemented, the profile is active again with its last permissions, and its members regain them.
 preconditions:
   - "The user has UAM_GROUP_REQUEST."
@@ -1173,7 +1155,7 @@ main_flow:
 rules:
   - [R1, "The profile is restored with the permissions it had at deactivation.", Fixed, "-"]
 validations:
-  - [Profile already active, "Group profile <code> is already active", To be assigned at build]
+  - [Profile already active, "Group profile <code> is already active", ACCESS_ROLE_ALREADY_ACTIVE]
 notifications:
   - "As FR-UA-040."
 audit:
@@ -1188,9 +1170,7 @@ title: Route group-profile requests to approvers in order
 brd: [BRD 3.002.1.2 (p.9), BRD 3.002.2.3 (p.9), BRD 3.002.3.3 (p.9), BRD 3.002.4.3 (p.9)]
 actor: Business Administrator; Approvers
 priority: "Not flagged in the BRD"
-fit: NEW
 screens: Group Profile Requests (Approvers); My Approvals
-api: Request approvers (sequence, approver, decision, remarks, time)
 description: The BRD lets the Business Administrator select "approver/s" from the drop-down. The request holds one or more approvers in order. Each approver decides in turn; the request moves to the next approver on approval. All must approve. Any approver can reject or return it. User requests have one approver (FR-UA-015).
 preconditions:
   - "A group-profile request is being drafted."
@@ -1205,8 +1185,8 @@ rules:
   - [R1, "Approvers in sequence and all required (default until UQ02).", Fixed, "-"]
   - [R2, "An approver appears once; the requester is never an approver.", Fixed, "-"]
 validations:
-  - [No approver, Add at least one approver, "-"]
-  - [Same approver twice, "<user> is already an approver of this request", To be assigned at build]
+  - [No approver, Add at least one approver, ACCESS_APPROVER_REQUIRED]
+  - [Same approver twice, "<user> is already an approver of this request", ACCESS_APPROVER_TWICE]
 notifications:
   - "UAM_REQUEST_TO_APPROVE to each approver in turn."
 audit:
@@ -1222,12 +1202,9 @@ title: Implement an approved group-profile request
 brd: [p.6 "System Administrator to create / modify group profile"; BRD 4.002.1 (p.9)]
 actor: System Administrator (ROLE_MANAGE)
 priority: Must have
-fit: CHANGE
 screens: Access Requests (tab For Implementation); Administration > Roles & Permissions (Implement Request)
-api: POST /api/v1/nbadmin/access-requests/{id}/implement (designed)
 description:
-  - Baseline. The System Administrator creates and edits roles freely on Roles & Permissions.
-  - Change. Direct role maintenance is limited to implementing approved requests. The For Implementation tab lists approved group-profile requests; **Implement Request** opens the Roles screen with the approved change, and saving it applies the change and sets the request to IMPLEMENTED. Direct role edits are refused unless the audited emergency parameter UAM_DIRECT_ROLE_EDIT is true, which raises alert UAM_DIRECT_ROLE_EDIT.
+  - "The System Administrator maintains group profiles only by implementing approved requests. The For Implementation tab lists approved group-profile requests; **Implement Request** opens the Roles screen with the approved change, and saving it applies the change and sets the request to IMPLEMENTED. Direct profile edits are refused unless the audited emergency parameter UAM_DIRECT_ROLE_EDIT is true, which raises alert UAM_DIRECT_ROLE_EDIT."
 preconditions:
   - "The request is FOR_IMPLEMENTATION; the user has ROLE_MANAGE and is not the requester."
 main_flow:
@@ -1240,8 +1217,8 @@ rules:
   - [R1, "The implementer is never the requester.", Fixed, "-"]
   - [R2, "Emergency direct edit off by default.", Configurable, Parameter UAM_DIRECT_ROLE_EDIT]
 validations:
-  - [Direct role edit without a request, A group profile is changed only by implementing an approved request, To be assigned at build]
-  - [Implementer is the requester, A request is implemented by someone other than its requester, To be assigned at build]
+  - [Direct role edit without a request, Roles are changed through an approved group-profile request; implement the request instead, ROLE_EDIT_BY_REQUEST]
+  - [Implementer is the requester, A request is implemented by someone other than its requester, ACCESS_IMPLEMENTER_IS_REQUESTER]
 notifications:
   - "UAM_FOR_IMPLEMENTATION to the System Administrators; UAM_REQUEST_DECIDED to the requester on implementation."
 audit:
@@ -1259,17 +1236,15 @@ title: Define the group profiles of the access personas
 brd: [BRD 4.002.1 (p.9), BRD 4.002.1.1 (p.9), BRD 4.002.1.2 (p.9), BRD 4.002.1.3 (p.9)]
 actor: System Administrator
 priority: Must have
-fit: "FIT (4.002.1, 4.002.1.3); CONFIGURE (4.002.1.1, 4.002.1.2)"
 screens: Administration > Roles & Permissions
-api: GET /api/v1/admin/roles
-description: The build delivers the group profiles of the BRD personas - UAM_REQUESTOR (Requestor), UAM_APPROVER (Approver) and UAM_SECOND_APPROVER - and grants the new permissions to BUSINESS_ADMIN (Business Administrator, exists) and SYSADMIN (exists), as in section 3.3. Later changes to these profiles are group-profile requests (FR-UA-040 to FR-UA-045).
+description: BIBS provides the group profiles of the BRD personas - UAM_REQUESTOR (Requestor), UAM_APPROVER (Approver) and UAM_SECOND_APPROVER - and grants the user access permissions to BUSINESS_ADMIN (Business Administrator) and SYSADMIN, as in section 3.3. Later changes to these profiles are group-profile requests (FR-UA-040 to FR-UA-045).
 preconditions:
-  - "None (delivered with the build)."
+  - "None (provided with the system)."
 main_flow:
   - The System Administrator opens Roles & Permissions.
   - BIBS lists the delivered profiles with their permissions.
 rules:
-  - [R1, "Roles holding ACCESS_REQUEST today also receive the new request permissions, so existing users keep their functions.", Fixed, "-"]
+  - [R1, "Roles holding ACCESS_REQUEST also receive the type-specific request permissions, so their users keep their functions.", Fixed, "-"]
 validations: []
 notifications:
   - "None."
@@ -1285,12 +1260,9 @@ title: Assign functions to a group profile
 brd: [BRD 4.002.2 (p.9), BRD 4.002.2.1 to 4.002.2.7 (p.9-10), BRD 4.002.2.8 (p.10), BRD 4.002.2.9 (p.10), BRD 4.002.2.10 (p.10), UAM-NFR-32 (p.17)]
 actor: System Administrator (through approved group-profile requests)
 priority: Must have
-fit: "FIT (4.002.2, 4.002.2.8); CHANGE (4.002.2.1-2.7, 2.9, 2.10)"
 screens: Roles & Permissions; User Access Matrix
-api: Permissions of section 3.2; GET /api/v1/nbadmin/access-matrix, /by-action
 description:
-  - Baseline. Every BIBS screen, button and API call requires a permission; roles are bundles of permissions; the User Access Matrix shows them by permission and by area / action class and exports to Excel.
-  - Change. Each access-maintenance function of BRD 4.002.2 has its own permission (section 3.2), so it can be assigned to any profile. Every permission of BIBS gets an area and action class, so the matrix and the group-profile report show a module for every task. The request endpoints accept the type-specific permission or ACCESS_REQUEST.
+  - "Every BIBS screen, button and action requires a permission; group profiles are bundles of permissions; the User Access Matrix shows them by permission and by area / action class and exports to Excel. Each access-maintenance function of BRD 4.002.2 has its own permission (section 3.2), so it can be assigned to any profile, and every permission has an area and action class, so the matrix and the group-profile report show a module for every task. A request is accepted with the type-specific permission or with ACCESS_REQUEST."
 preconditions:
   - "An approved group-profile request (FR-UA-045)."
 main_flow:
@@ -1315,12 +1287,9 @@ title: Maintain user data and the user ID format
 brd: [UAM-NFR-09 (p.13), UAM-NFR-13 (p.13), UAM-NFR-15 (p.14), UAM-NFR-16 (p.14)]
 actor: System Administrator; Requestor (through requests)
 priority: Must have
-fit: "FIT (UAM-NFR-09); CHANGE (UAM-NFR-13, 15, 16)"
 screens: Administration > Users; Lists of Values (UAM_BUSINESS_UNIT, UAM_USER_LEVEL)
-api: GET /api/v1/admin/users; PUT /api/v1/admin/users/{id} (implementation and emergency only)
 description:
-  - Baseline. Users are listed with user name, full name, roles, authorisation limit, last login and status; the System Administrator unlocks accounts and resets passwords. A user can hold several roles and a role many users; accounts are disabled and re-enabled.
-  - Change. The user record adds the Windows ID, business unit group and user level; the status shown is Active, Disabled, Locked or Online. User IDs follow USER_ID_PATTERN. Creating and editing users directly is replaced by "Raise request" for everyone except the System Administrator in an emergency (UAM_DIRECT_ROLE_EDIT). Unlock and password reset stay direct administrator actions and are logged.
+  - "Users are listed with user name, user ID, Windows ID, full name, business unit group, user level, group profiles, authorisation limit, last login and status (Active, Disabled, Locked or Online). A user can hold several group profiles and a profile many users. User IDs follow USER_ID_PATTERN. Users are created and changed through requests (\"Raise request\"); only the System Administrator edits directly, in an emergency (UAM_DIRECT_ROLE_EDIT). Unlock and password reset are direct administrator actions and are logged."
 preconditions:
   - "The user has USER_MANAGE."
 main_flow:
@@ -1349,17 +1318,88 @@ acceptance:
   - An unlock is listed in the audit log report with the administrator.
 ```
 
+```fr
+id: FR-UA-053
+title: Keep profiles that one user may not hold apart (separation of duties)
+brd: [UAM-NFR-40 (p.17), UAM-NFR-06 (p.12)]
+actor: Business Administrator (maker); Information Security Officer (checker)
+priority: Must have
+screens: User Access > Separation of Duties; My Approvals
+description:
+  - "BIBS keeps the requester, the approver and the implementer of a request apart. The Business Administrator also records the pairs of group profiles that one user may not hold together, with the reason. Each new rule and each deactivation waits for the authorisation of Information Security (maker-checker). Every user request and every line of a bulk request that would give a user both profiles of an active rule is refused, on submission and again at approval."
+preconditions:
+  - "The maker has UAM_SOD_MAINTAIN; the checker has UAM_SOD_AUTHORIZE."
+main_flow:
+  - The Business Administrator opens Separation of Duties, chooses **New Rule**, selects the two group profiles and enters the reason.
+  - BIBS saves the rule as pending and tells the Information Security Officers.
+  - The Information Security Officer authorises the rule from the screen or My Approvals; the rule is active at once.
+alternate_flows:
+  - Rejection. The rule is closed and never applies.
+  - Deactivation. The Business Administrator asks for it; the rule stays active until Information Security authorises the deactivation.
+rules:
+  - [R1, "The maker of a rule or of its deactivation never authorises it.", Fixed, "-"]
+  - [R2, "One rule per pair of profiles; the order of the two profiles does not matter.", Fixed, "-"]
+  - [R3, "The rules are checked on single requests, bulk lines and again at approval; existing users are not changed by a new rule and are found with the reports.", Fixed, "-"]
+validations:
+  - [Same profile twice, Choose two different group profiles, SOD_SAME_PROFILE]
+  - [Rule exists, A rule for these two group profiles already exists, SOD_RULE_EXISTS]
+  - [Maker authorises, A record cannot be authorized by the user who maintained it, MAKER_CHECKER_VIOLATION]
+  - [Request breaks a rule, "One user may not hold both <profile> and <profile> (separation-of-duties rule <rule>)", ACCESS_SOD_CONFLICT]
+fields_screen: Separation of Duties (New Rule)
+fields:
+  - [Group profile, List, "Yes", Active group profiles, "-"]
+  - [May not be held with, List, "Yes", Active group profiles, Different from the first]
+  - [Reason, Long text, "Yes", "-", Up to 500 characters]
+notifications:
+  - "UAM_SOD_TO_AUTHORIZE to the holders of UAM_SOD_AUTHORIZE for each new rule and each deactivation."
+audit:
+  - "Creation, deactivation request, authorisation and rejection of each rule in the audit trail."
+acceptance:
+  - A rule on the Requestor and Approver profiles, once authorised, refuses a request that gives one user both, with the names of the two profiles.
+  - The Business Administrator who created the rule cannot authorise it.
+```
+
+```fr
+id: FR-UA-054
+title: Second approval of the security settings
+brd: [UAM-NFR-40 (p.17), UAM-NFR-16 (p.14)]
+actor: System Administrator (maker); Information Security Officer (checker)
+priority: Must have
+screens: Administration > System Parameters; My Approvals
+description:
+  - "A change of a security setting (category Security - sign-in, lock-out, password, session and access settings, including the emergency direct edit of profiles UAM_DIRECT_ROLE_EDIT) is kept as pending and applies only when a holder of SECURITY_PARAMETER_APPROVE other than the requester approves it. The other parameters change at once, with an audit of the old and new value."
+preconditions:
+  - "The maker has SYSTEM_PARAMETER_MANAGE; the checker has SECURITY_PARAMETER_APPROVE."
+main_flow:
+  - The System Administrator opens System Parameters, changes a security setting and saves.
+  - BIBS keeps the new value as waiting for approval, shows it under the current value and tells the approvers.
+  - The Information Security Officer opens the setting from System Parameters or My Approvals and approves; the value applies at once.
+alternate_flows:
+  - Rejection. The approver rejects, or the requester withdraws the change; the current value stays.
+rules:
+  - [R1, "One pending change per setting; the requester never approves it.", Fixed, "-"]
+  - [R2, "The settings of the Security category need the second approval.", Fixed, "-"]
+validations:
+  - [Change already pending, "A change of <setting> already waits for approval; approve or reject it first", PARAMETER_CHANGE_PENDING]
+  - [Requester approves, A change cannot be approved by the user who asked for it, MAKER_CHECKER_VIOLATION]
+notifications:
+  - "UAM_PARAMETER_TO_APPROVE to the holders of SECURITY_PARAMETER_APPROVE."
+audit:
+  - "The request, the approval with the requester and the change with the old and new value, or the rejection, in the audit trail."
+acceptance:
+  - A change of LOGIN_MAX_FAILED_ATTEMPTS by the System Administrator applies only after the Information Security Officer approves it.
+  - Opening the emergency direct edit (UAM_DIRECT_ROLE_EDIT = true) needs the same approval.
+```
+
 ## Reports and logs
 
 ```fr
 id: FR-UA-060
 title: User Access Report
 brd: [BRD 3.003.1 (p.9), BRD 3.003.1.1 (p.9), BRD 3.003.1.1 (2nd) (p.9), BRD 3.003.1.2 to 3.003.1.6 (p.9), UAM-NFR-10 (p.13), UAM-NFR-41 (p.18)]
-actor: Business Administrator; System Administrator; Auditor (UAM_REPORT_VIEW)
+actor: Approver; Business Administrator; System Administrator; Information Security Officer; Auditor (UAM_REPORT_VIEW)
 priority: Must have
-fit: "NEW (3.003.1.1); CHANGE (3.003.1, 1.5, 1.6); FIT (the other columns)"
 screens: User Access > User Access Reports; Reports (category Control & Audit)
-api: Report code UAM-USER-ACCESS
 description: The report lists users with their group profiles and who created, modified, deactivated or reactivated them, as of a date (sample A, p.18). The "created by" column shows the approver and the request number from the change log, not the session that applied the change. Layout in section 6.
 preconditions:
   - "The user has UAM_REPORT_VIEW."
@@ -1370,7 +1410,7 @@ main_flow:
 rules:
   - [R1, "As-of date shows the access held at the end of that date, from the change log (meaning to confirm, UQ11).", Fixed, "-"]
 validations:
-  - [As-of date in the future, The as-of date cannot be in the future, "-"]
+  - [As-of date in the future, The as-of date cannot be in the future, AS_OF_IN_FUTURE]
 notifications:
   - "None."
 audit:
@@ -1386,9 +1426,7 @@ title: User Group Profile Report
 brd: [BRD 3.003.2 (p.9), BRD 3.003.2.1 to 3.003.2.6 (p.9), UAM-NFR-41 (p.18)]
 actor: Business Administrator; System Administrator; Auditor
 priority: Must have
-fit: "CHANGE (3.003.2, 2.2, 2.6); FIT (the other columns)"
 screens: User Access Reports
-api: Report code UAM-GROUP-PROFILE
 description: The report lists each group profile with the modules and tasks it can access - module = permission area, task = permission and action class - marked With Access or No Access (sample B, p.18), and the profile's created, modified, deactivated and reactivated dates and actors.
 preconditions:
   - "The user has UAM_REPORT_VIEW."
@@ -1412,12 +1450,9 @@ title: Group Profile Membership list
 brd: [BRD 3.003.3 (p.9), BRD 3.003.3.1 (p.9), BRD 3.003.3.1.1 (p.9), BRD 3.003.3.1.2 (p.9), UAM-NFR-10 (p.13)]
 actor: Business Administrator; System Administrator; Auditor
 priority: Must have
-fit: "NEW (3.003.3, 3.1); FIT (3.003.3.1.1, 3.1.2)"
 screens: User Access Reports
-api: Report code UAM-GROUP-MEMBERS
 description:
-  - Baseline. The User Access Matrix shows only the number of enabled users per role.
-  - Change. The report lists the members of each profile - user name and user ID, added by and date, modified by and date - grouped by profile (sample C, p.18, titled "User Group Profile Report" in the BRD).
+  - "The report lists the members of each profile - user name and user ID, added by and date, modified by and date - grouped by profile (sample C, p.18, titled \"User Group Profile Report\" in the BRD). The User Access Matrix also shows the number of enabled users per profile."
 preconditions:
   - "The user has UAM_REPORT_VIEW."
 main_flow:
@@ -1439,12 +1474,9 @@ title: User Access Audit Log
 brd: [BRD 4.003.1 (p.10), UAM-NFR-35 (p.17), UAM-NFR-41 (p.18)]
 actor: System Administrator; Business Administrator; Auditor
 priority: Must have
-fit: CHANGE
 screens: User Access Reports; Administration > Audit Trail (CTL-AUDIT, exists)
-api: Report code UAM-AUDIT-LOG
 description:
-  - Baseline. The Audit Trail report (CTL-AUDIT) lists audit entries by date range, user and entity type, with summary text, and exports to PDF, Excel and CSV.
-  - Change. The User Access Audit Log lists, for a date range, each access activity - date, activity, from, to, done by, approved by, request number (sample D, p.18) - from the access-change log and the request history. Log-ins, failed log-ins and log-outs can be included. CTL-AUDIT stays.
+  - "The User Access Audit Log lists, for a date range, each access activity - date, activity, from, to, done by, approved by, request number (sample D, p.18) - from the access-change log and the request history. Log-ins, failed log-ins and log-outs can be included. The general Audit Trail report (CTL-AUDIT) lists audit entries by date range, user and entity type, and exports to PDF, Excel and CSV."
 preconditions:
   - "The user has UAM_REPORT_VIEW (or AUDIT_VIEW)."
 main_flow:
@@ -1453,7 +1485,7 @@ main_flow:
 rules:
   - [R1, "Activities - request created, approved, rejected, returned, cancelled, implemented; user created, modified, deactivated, reactivated, unlocked; password reset; group profile created, changed, deactivated, reactivated; log-in, failed log-in, log-out.", Fixed, "-"]
 validations:
-  - [Date to before date from, The end date must be on or after the start date, "-"]
+  - [Date to before date from, The end date must be on or after the start date, DATE_RANGE_REVERSED]
 notifications:
   - "None."
 audit:
@@ -1469,10 +1501,8 @@ title: Keep a structured, insert-only access-change log
 brd: [BRD 4.003.1 (p.10), UAM-NFR-09 (p.13), UAM-NFR-22 (p.14)]
 actor: System
 priority: Must have
-fit: "FIT (UAM-NFR-22); CHANGE (structured log)"
 screens: Reports of section 6; request History tab
-api: Access-change log (insert-only)
-description: Baseline - every change is in the insert-only audit trail as summary text. Change - every applied change also writes one row per attribute into the access-change log (time, user or profile, activity, attribute, from value, to value, request number, done by, approved by) in the same transaction as the change. No user can change or delete it. The reports read it.
+description: Every change is in the insert-only audit trail as summary text, and every applied change also writes one row per attribute into the access-change log (time, user or profile, activity, attribute, from value, to value, request number, done by, approved by) in the same transaction as the change. No user can change or delete it. The reports read it.
 preconditions:
   - "None."
 main_flow:
@@ -1499,12 +1529,9 @@ title: Notify requesters, approvers and affected users
 brd: [BRD 1.006.1.1 (p.8), BRD 1.008.1.4 (p.8), BRD 2.002.1 (p.8), UAM-NFR-39 (p.17)]
 actor: System
 priority: Must have
-fit: CHANGE
 screens: Notifications (bell); e-mail
-api: Notification events UAM_REQUEST_TO_APPROVE, UAM_REQUEST_RETURNED, UAM_REQUEST_CANCELLED, UAM_REQUEST_DECIDED, UAM_ACCESS_CHANGED, UAM_SECOND_APPROVAL, UAM_FOR_IMPLEMENTATION
 description:
-  - Baseline. On submission every holder of ACCESS_APPROVE receives "Access request <no.> to approve"; on the decision the requester receives "Access request <no.> approved / rejected", each with a link to the request.
-  - Change. The notice goes to the chosen approver only. The requester is also notified of a return and of the application of a scheduled change; the approver of a cancellation; the second approvers and the System Administrators of the requests waiting for them; and the affected user (in the app and by e-mail) when his or her access changes (NFR 10, p.17).
+  - "The notice of a submitted request goes to the chosen approver; the decision goes to the requester, each with a link to the request. The requester is also notified of a return and of the application of a scheduled change; the approver of a cancellation; the second approvers and the System Administrators of the requests waiting for them; the affected user (in the app and by e-mail) when his or her access changes, and each member of a group profile that is deactivated or reactivated (NFR 10, p.17); the users of the dormant-user deactivation (FR-UA-006); the authorisers of the separation-of-duties rules (FR-UA-053) and the approvers of the security settings (FR-UA-054)."
 preconditions:
   - "None."
 main_flow:
@@ -1528,12 +1555,9 @@ title: E-mail designated users on failed batch runs
 brd: [UAM-NFR-24 (p.15), UAM-NFR-25 (p.15)]
 actor: System; System Administrator (recipient)
 priority: Must have
-fit: CHANGE
 screens: Administration > Jobs (run history); e-mail
-api: Alert JOB_FAILURE; parameter JOB_FAILURE_RECIPIENTS
 description:
-  - Baseline. Batch jobs are scheduled, run on demand from the screen, monitored and re-run; each run is logged with success or failure, and a failed run raises the in-app alert JOB_FAILURE.
-  - Change. A failed run is also e-mailed to the designated users in parameter JOB_FAILURE_RECIPIENTS, with the job, time and error.
+  - "Batch jobs are scheduled, run on demand from the screen, monitored and re-run; each run is logged with success or failure. A failed run raises the in-app alert JOB_FAILURE and is e-mailed to the designated users in parameter JOB_FAILURE_RECIPIENTS, with the job, time and error."
 preconditions:
   - "A batch run fails."
 main_flow:
@@ -1555,7 +1579,7 @@ acceptance:
 
 ## User access requests
 
-Figure 2 shows the statuses of a user access request. The grey box (PENDING) and the end statuses APPROVED and REJECTED exist today; the others are added by BRD-11.
+Figure 2 shows the statuses of a user access request. On the screens the statuses are shown as Draft, Pending, Pending Second, Returned, Scheduled, Approved, Rejected, Cancelled, For Implementation and Implemented.
 
 ![Status of a user access request (BRD 1.002-1.009, 2.002)](figures/brd11_request_states.dot){width=17}
 
@@ -1668,77 +1692,77 @@ Parameters: Date From / To; User; Activity; include log-ins and log-outs (yes / 
 
 # Interfaces and integration
 
-Figure 4 shows the interfaces. Every BIBS module reads the effective permissions of the signed-in user; the directory, SSO and external ACL are parked seams.
+Figure 4 shows the interfaces. Every BIBS module reads the effective permissions of the signed-in user; the directory, SSO and external ACL are on hold until BDO specifies them.
 
-![Interfaces of User Access Maintenance (dashed = parked)](figures/brd11_integration.dot){width=16}
+![Interfaces of User Access Maintenance (dashed = on hold)](figures/brd11_integration.dot){width=16}
 
-<!-- table: widths=3.8,1.8,7.6,2.8,2.2 caption="Interfaces" status=Status size=8.5 -->
-| Interface | Direction | Content and trigger | BRD | Status |
+<!-- table: widths=3.8,1.8,7.6,2.8,2.2 caption="Interfaces" status=Scope size=8.5 -->
+| Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| EIAM (Microsoft Entra ID), Drop 0 | Out / In | OpenID Connect sign-in: redirect to Entra ID, ID token returned and mapped to the BIBS user by Windows ID or user principal name; log-out ends the Entra session. Target of FR-UA-003 (IQ04) | NFR p.13-14, p.17 | NEW |
+| EIAM (Microsoft Entra ID), Drop 0 | Out / In | OpenID Connect sign-in: redirect to Entra ID, ID token returned and mapped to the BIBS user by Windows ID or user principal name; log-out ends the Entra session. Target of FR-UA-003 (IQ04) | NFR p.13-14, p.17 | IN SCOPE |
 | UIDM-ISC (identity governance), Drop 0 | In / Out | Joiner, mover and leaver provisioning and access certification. Options: the IGA provisions user accounts while role changes stay BIBS requests (proposal), the IGA provisions users and roles, or aggregation only (IQ05, DCR-229) | 1.001-1.009 (request rule, p.6) | OPEN |
-| BDO EUA with Windows ID | Out / In | User ID and password passed at log-in; success or failure with message returned | NFR p.14 | PARKED |
-| LDAP / Active Directory | Out / In | Bind authentication, same port | NFR 1.h (p.13) | PARKED |
-| SSO (SAML / OIDC) | In | Identity-provider assertion exchanged for a BIBS session | Other BU NFR 4 (p.17) | PARKED |
-| External ACL | In | Authorisation by an external access-control list | NFR 1.i (p.13) | PARKED |
-| All BIBS modules | Out | Effective permissions of the user (menus, buttons, API checks) | 4.002.2 | BUILT |
+| BDO EUA with Windows ID | Out / In | User ID and password passed at log-in; success or failure with message returned | NFR p.14 | ON HOLD |
+| LDAP / Active Directory | Out / In | Bind authentication, same port | NFR 1.h (p.13) | ON HOLD |
+| SSO (SAML / OIDC) | In | Identity-provider assertion exchanged for a BIBS session | Other BU NFR 4 (p.17) | ON HOLD |
+| External ACL | In | Authorisation by an external access-control list | NFR 1.i (p.13) | ON HOLD |
+| All BIBS modules | Out | Effective permissions of the user (menus, buttons, API checks) | 4.002.2 | IN SCOPE |
 | Portal users (BRD-8 Employee Benefits) | Out | External user requests provisioned on approval (decision D7). Dormant: BDOI drops the EB portal (drop plan item 2.4, IQ22); EXTERNAL requests stay refused | D7 (R4) | OUT |
-| Notifications and e-mail | Out | Request, access-change and batch-failure notices | 1.006.1.1, 1.008.1.4, 2.002.1; NFR 10 | BUILT |
-| Bulk upload | In | Template file of access requests | 1.009 | DESIGNED |
-| Remote log server / syslog | Out | Application and error logs | NFR p.14 | PARKED |
+| Notifications and e-mail | Out | Request, access-change and batch-failure notices | 1.006.1.1, 1.008.1.4, 2.002.1; NFR 10 | IN SCOPE |
+| Bulk upload | In | Template file of access requests (Bulk Request) | 1.009 | IN SCOPE |
+| Remote log server / syslog | Out | Application and error logs | NFR p.14 | ON HOLD |
 
-> [!PARKED] Parked seams
-> The EUA, LDAP / AD and SSO interfaces are required by the BRD but their protocol, host and messages are not given (UQ04). BIBS captures the Windows ID now and authenticates through a port with a LOCAL default, so connecting EUA is a configuration of a new adapter, with no change to users, roles or requests (decision D6, R4).
+> [!PARKED] Interfaces on hold
+> The EUA, LDAP / AD and SSO interfaces are required by the BRD but their protocol, host and messages are not given (UQ04). BIBS captures the Windows ID on every user and keeps local sign-in, so connecting the directory changes no user, group profile or request (decision D6, R4).
 
 # Non-functional requirements
 
 The BRD's NFR section has no IDs; R2 numbers the rows UAM-NFR-01 to UAM-NFR-41. Most infrastructure rows are answered "Follow existing QPS set up" in the BRD; BIBS follows its own deployment standards for them. Rows that describe functions are specified as FRs in section 4 and cross-referenced here.
 
 <!-- NFR:START -->
-<!-- table: widths=2.1,2.8,4.9,4.0,1.5,2.3 caption="Non-functional requirements (BRD p.11-18)" status=Fit size=7.5 -->
-| ID | Topic | BRD requirement | BIBS approach | FR | Fit |
-|---|---|---|---|---|---|
-| UAM-NFR-01 | Capacity and performance | Requestor 14 users / 5 concurrent (enrol, modify, deactivate, reactivate, view: 10 tpm each; bulk 3 tpm); Approver 8 / 3 (10 tpm); BU Admin 4 / 2 (group profile 2 tpm); System Admin 1 / 1 (10 tpm, group profile 2 tpm); reports BU / System Admin 5 / 3 (10 tpm). Response 10 s, reports 20 s (p.11) | Within the BIBS sizing (145 concurrent users); online p95 under 3 seconds, reports under 20 seconds | - | FIT |
-| UAM-NFR-02 | Projected volume | 10 transactions per month (average); login / logout, start-up and event reports 14 users / 5 concurrent, 10 per month, 5% growth, 10 s, 0% error; audit log report 5 / 3, 10 per month, 20% growth, 20 s, 0% error (p.11) | No specific sizing needed | - | FIT |
-| UAM-NFR-03 | Data retention (databases, logs) | Follow QPS retention policy (p.11) | Retention rules per record type; access requests, change log and session log kept at least as long as the audit trail; QPS values UQ12 | - | CONFIGURE |
-| UAM-NFR-04 | Scalability, availability, reliability, DR, audit and data management, portability, interoperability, maintainability, environments, migration, support | "Follow existing QPS set up" for every item (vertical / horizontal scaling, operating hours, maintenance windows, HA, uptime, RPO / RTO, backup, DR server, delivery models, web / file / microservice integration, API gateway, ETL, core banking, monitoring, load balancer, environments Dev to DR, data and user migration, QA, training, 24/7 support) (p.11-12) | BIBS deployment standards, the same for every BRD; existing users loaded with the bulk request (FR-UA-019) | - | CONFIGURE |
-| UAM-NFR-05 | Accessibility and channels | Accessibility options for impaired vision or colour blindness; website and mobile website: "Follow existing QPS set up" (p.12) | BDO UX contrast rules; responsive screens for desktop and mobile browsers | - | FIT |
-| UAM-NFR-06 | Regulatory and compliance | MORB (BSP), Circular 808 of 2013, AMLA 2001, Data Privacy Act 2012 (p.12) | Four eyes on every access change, least privilege, insert-only audit, retention | - | FIT |
-| UAM-NFR-07 | Hardware, software, file locations, embedded IDs | Server / workstation specifications; binaries and logs in standard locations; embedded application user IDs named e_appshortname_description (e.g. p_appname_sftp) (p.12-13) | Container deployment; service accounts named by the BDO convention (for example p_bibs_db) | - | CONFIGURE |
-| UAM-NFR-08 | Network | No impact on branch / ATM operations, no change to network design; ports, devices, bandwidth, latency, interfaces (p.13) | HTTPS only; hosts and ports are configuration | - | CONFIGURE |
-| UAM-NFR-09 | User and role management 1.a-f | Online modules to view, add, modify, delete master data incl. users and roles; access via roles; more than one user per role; **a user can have more than one role**; accounts can be disabled and re-enabled; maintenance recorded in the application log (p.13) | Users, roles and permissions; several roles per user and users per role; enable / disable; every change audited (CQ23 answered) | FR-UA-052, 064 | FIT |
-| UAM-NFR-10 | User and role management 1.g | Query or report showing the roles assigned to users; exportable (p.13) | Reports UAM-USER-ACCESS and UAM-GROUP-MEMBERS, exportable | FR-UA-060, 062 | CHANGE |
-| UAM-NFR-11 | User and role management 1.h | Supports LDAP or Active Directory authentication (p.13) | Directory authentication port; adapter parked until BDO gives the interface (Q42, UQ04) | FR-UA-003 | NEW |
-| UAM-NFR-12 | User and role management 1.i | Can support authorisation of users by interfacing with an external ACL (p.13) | Seam only; parked (UQ14) | - | NEW |
-| UAM-NFR-13 | User and role management 1.j | User ID of at least ten (10) alphanumeric characters, supports the format a999999999 (p.13) | Parameter USER_ID_PATTERN checked on requests (default a999999999 format, UQ05) | FR-UA-011, 052 | CHANGE |
-| UAM-NFR-14 | User and role management 1.k | Ability to specify an effective date for user and role changes (p.13) | Effective date on requests; daily job applies scheduled changes (UQ06) | FR-UA-020 | NEW |
-| UAM-NFR-15 | User ID maintenance fields | Windows ID, user name, user status (active, disabled, locked out, online, etc.), Business Unit Group, User Level (p.14) | Windows ID, business unit group, user level; status Active, Disabled, Locked, Online (UQ05, UQ13) | FR-UA-052, 004 | CHANGE |
-| UAM-NFR-16 | System Administrator capabilities | Access rights per group per role; user administrator maintenance; group administration; maintain reference tables; workflow set-up; screen update and maintenance (p.14) | Access rights per profile, user and group administration and reference tables exist; approver rules are parameters; screens change by release | FR-UA-052 | CHANGE |
-| UAM-NFR-17 | Authentication through EUA | Interface the user ID with EUA using the Windows ID to authenticate access if the user exists in the BDO network, with password validation: the system passes the user ID and password; EUA returns whether the logon succeeded; on failure the error message is forwarded (p.14) | Windows ID sign-in through EUA when AUTH_MODE = DIRECTORY; EUA message shown; lock-out and audit unchanged (UQ04) | FR-UA-003 | NEW |
-| UAM-NFR-18 | Login logging | Log all valid and invalid attempts (p.14) | Every valid and invalid log-in is audited | FR-UA-001 | FIT |
-| UAM-NFR-19 | Lockout | Users are locked out after 3 invalid attempts (p.14) | LOGIN_MAX_FAILED_ATTEMPTS = 3 for every BIBS user | FR-UA-001 | FIT |
-| UAM-NFR-20 | Reference / master data management | Online view / add / modify / delete; referential integrity and validation; logical deletion; changes logged; role-based access (p.14) | Lists of Values with maker-checker, effective dates and deactivation instead of delete; audited | - | FIT |
-| UAM-NFR-21 | Error logging | Error log with description, time, user ID, module ID, command / SQL; enable / disable; location; rotation; size parameters; native syslog; one line per entry; verbosity and message-type selection; transmit to a remote server (p.14) | One-line structured logs with user and module; levels changeable at run time; shipping to the BDO log server by the platform | - | CONFIGURE |
-| UAM-NFR-22 | Transaction logging and audit trail | Transaction log with type, time, user ID, module ID; enable / disable; location; transmit; all user activities logged through the audit trail and retrievable by the administrator; allow automatic save option (p.14) | Insert-only audit trail and the Audit Trail screen; meaning of 'automatic save option' is UQ15 | FR-UA-064 | FIT |
-| UAM-NFR-23 | Logs retention and archiving | Retention / archival / purging / backup for application, database, audit, infrastructure logs, historical data, snapshots, video, documents: "Follow existing QPS set up" (p.14) | As UAM-NFR-03 (UQ12) | - | CONFIGURE |
-| UAM-NFR-24 | Batch processing a-l | Schedule, invoke manually, monitor, re-run, graceful terminate, UI without command line, publish status, single instance, restart at the interruption point, no privileged access, multi-core, parallel independent jobs (p.15) | Job scheduler with run history, run on demand, re-run, failure alert; restart by idempotent keys; status in monitoring | FR-UA-071 | CHANGE |
-| UAM-NFR-25 | Batch failure e-mail | Monitor batch runs, log success and failure; forward an e-mail notification to designated users on failed batch runs (stated twice) (p.15) | Failed runs e-mailed to JOB_FAILURE_RECIPIENTS | FR-UA-071 | CHANGE |
-| UAM-NFR-26 | System monitoring; network configuration; DR | Monitor and start / stop application processes without command line; DNS aliases; configurable ports; no hosts file; standard ports; Netbackup / Bacula, clustering, offsite replication, active-active, disk estimates (p.15) | Platform monitoring, container orchestration, environment-based configuration | - | CONFIGURE |
-| UAM-NFR-27 | Data purging and archiving | Automated archiving and purging of transactional data, logs, reports, temporary files; schedule; restricted access; configurable rules (p.15-16) | Retention rules and the monthly retention review; physical archive and purge follow the BIBS retention decision (Q39, UQ12) | - | CHANGE |
-| UAM-NFR-28 | Server and workstation software | Documented install / deploy / update; deploy from repository; runs as a service; multiple instances; dynamic configuration reload; least privilege; browser only on workstations; no proprietary office software; not tied to third-party versions (p.16) | Deployed from the repository; stateless multiple instances; least-privileged database user; browser-only workstations | - | FIT |
-| UAM-NFR-29 | System documentation | Functional design, technical design, user manual, installation guide, release notes, instruction guide on how to manage users and extract the users list and group profile list; troubleshooting guide; training; capacity planning; performance benchmarks (p.16-17) | User-administration guide in the in-app Help Center and the administration guide (UQ18) | - | CHANGE |
-| UAM-NFR-30 | System development, testing and production support | Access to resources outside the BDO network, off-site / on-site development, performance testing; maintenance access (p.17) | Engagement terms | - | CONFIGURE |
-| UAM-NFR-31 | Other BU NFR 1 | Password management (reset, change) (p.17) | Administrator reset and own change exist | FR-UA-005 | FIT |
-| UAM-NFR-32 | Other BU NFR 2-3 | Role-based access control (define roles, assign permissions, map users to roles); permission management (p.17) | Roles, permissions, user-role mapping, Roles screen and User Access Matrix exist | FR-UA-051 | FIT |
-| UAM-NFR-33 | Other BU NFR 4 | Integration with Single Sign-On (SSO) or LDAP (p.17) | Same directory port; SSO adapter parked (UQ04) | FR-UA-003 | NEW |
-| UAM-NFR-34 | Other BU NFR 5 | Session management: inactivity warning after 15 minutes; warning prior to system-triggered log out after 30 minutes (p.17) | Session policy parameters and the web session guard | FR-UA-002 | FIT |
-| UAM-NFR-35 | Other BU NFR 6 | Audit logging: track changes in user roles and permissions; log user login / log out; audit log reports (p.17) | Role and permission changes in the structured change log; log-out and session log added; audit log report | FR-UA-004, 063 | CHANGE |
-| UAM-NFR-36 | Other BU NFR 7 | Enforce strong password policies (p.17) | Complexity and length exist; history, maximum and minimum age and forced change added (UQ08) | FR-UA-005 | CHANGE |
-| UAM-NFR-37 | Other BU NFR 8 | Self-service and admin tools: self-service password reset; user-friendly screens to manage access; a defined user can update profile information (p.17) | Self-service reset by e-mailed single-use link (local accounts); own e-mail and mobile update (UQ08, UQ17) | FR-UA-005 | NEW |
-| UAM-NFR-38 | Other BU NFR 9 | Bulk uploads or batch updates of user profiles (p.17) | Bulk request (UQ10) | FR-UA-019 | NEW |
-| UAM-NFR-39 | Other BU NFR 10 | Notification for access changes (p.17) | Affected user notified in the app and by e-mail when the change is applied | FR-UA-070 | CHANGE |
-| UAM-NFR-40 | Other BU NFR 11 | Configurable workflow for access requests and approvals; changes to user privileges systematically monitored, evaluated and, if necessary, escalated for additional review (e.g. modifications outside working hours, low to high privilege) (p.17) | Privilege level per profile; privilege increase or out-of-hours change needs a second approval and raises an alert (UQ07) | FR-UA-034 | NEW |
-| UAM-NFR-41 | Report requirements (section 7) | Samples A User Access Report, B User Group Profile Report, C Group Profile membership (titled "User Group Profile Report"), D User Access Audit Log (date, activity, from, to, done by); generated by, date coverage, date and time generated (p.18) | Four reports with generated by, coverage and time generated in the header | FR-UA-060 to 063 | CHANGE |
+<!-- table: widths=2.1,2.8,4.9,4.0,1.5 caption="Non-functional requirements (BRD p.11-18)" size=7.5 -->
+| ID | Topic | BRD requirement | BIBS approach | FR |
+|---|---|---|---|---|
+| UAM-NFR-01 | Capacity and performance | Requestor 14 users / 5 concurrent (enrol, modify, deactivate, reactivate, view: 10 tpm each; bulk 3 tpm); Approver 8 / 3 (10 tpm); BU Admin 4 / 2 (group profile 2 tpm); System Admin 1 / 1 (10 tpm, group profile 2 tpm); reports BU / System Admin 5 / 3 (10 tpm). Response 10 s, reports 20 s (p.11) | Within the BIBS sizing (145 concurrent users); online p95 under 3 seconds, reports under 20 seconds | - |
+| UAM-NFR-02 | Projected volume | 10 transactions per month (average); login / logout, start-up and event reports 14 users / 5 concurrent, 10 per month, 5% growth, 10 s, 0% error; audit log report 5 / 3, 10 per month, 20% growth, 20 s, 0% error (p.11) | No specific sizing needed | - |
+| UAM-NFR-03 | Data retention (databases, logs) | Follow QPS retention policy (p.11) | Retention rules per record type; access requests, change log and session log kept at least as long as the audit trail; QPS values UQ12 | - |
+| UAM-NFR-04 | Scalability, availability, reliability, DR, audit and data management, portability, interoperability, maintainability, environments, migration, support | "Follow existing QPS set up" for every item (vertical / horizontal scaling, operating hours, maintenance windows, HA, uptime, RPO / RTO, backup, DR server, delivery models, web / file / microservice integration, API gateway, ETL, core banking, monitoring, load balancer, environments Dev to DR, data and user migration, QA, training, 24/7 support) (p.11-12) | BIBS deployment standards, the same for every BRD; existing users loaded with the bulk request (FR-UA-019) | - |
+| UAM-NFR-05 | Accessibility and channels | Accessibility options for impaired vision or colour blindness; website and mobile website: "Follow existing QPS set up" (p.12) | BDO UX contrast rules; responsive screens for desktop and mobile browsers | - |
+| UAM-NFR-06 | Regulatory and compliance | MORB (BSP), Circular 808 of 2013, AMLA 2001, Data Privacy Act 2012 (p.12) | Four eyes on every access change, least privilege, separation-of-duties rules, deactivation of dormant users, insert-only audit, retention | FR-UA-006, 053 |
+| UAM-NFR-07 | Hardware, software, file locations, embedded IDs | Server / workstation specifications; binaries and logs in standard locations; embedded application user IDs named e_appshortname_description (e.g. p_appname_sftp) (p.12-13) | Container deployment; service accounts named by the BDO convention (for example p_bibs_db) | - |
+| UAM-NFR-08 | Network | No impact on branch / ATM operations, no change to network design; ports, devices, bandwidth, latency, interfaces (p.13) | HTTPS only; hosts and ports are configuration | - |
+| UAM-NFR-09 | User and role management 1.a-f | Online modules to view, add, modify, delete master data incl. users and roles; access via roles; more than one user per role; **a user can have more than one role**; accounts can be disabled and re-enabled; maintenance recorded in the application log (p.13) | Users, roles and permissions; several roles per user and users per role; enable / disable, also of dormant users by a job; every change audited (CQ23 answered) | FR-UA-006, 052, 064 |
+| UAM-NFR-10 | User and role management 1.g | Query or report showing the roles assigned to users; exportable (p.13) | Reports UAM-USER-ACCESS and UAM-GROUP-MEMBERS, exportable | FR-UA-060, 062 |
+| UAM-NFR-11 | User and role management 1.h | Supports LDAP or Active Directory authentication (p.13) | Directory authentication added when BDO gives the interface (Q42, UQ04) | FR-UA-003 |
+| UAM-NFR-12 | User and role management 1.i | Can support authorisation of users by interfacing with an external ACL (p.13) | On hold until BDOI answers UQ14 | - |
+| UAM-NFR-13 | User and role management 1.j | User ID of at least ten (10) alphanumeric characters, supports the format a999999999 (p.13) | Parameter USER_ID_PATTERN checked on requests (default a999999999 format, UQ05) | FR-UA-011, 052 |
+| UAM-NFR-14 | User and role management 1.k | Ability to specify an effective date for user and role changes (p.13) | Effective date on requests; daily job applies scheduled changes (UQ06) | FR-UA-020 |
+| UAM-NFR-15 | User ID maintenance fields | Windows ID, user name, user status (active, disabled, locked out, online, etc.), Business Unit Group, User Level (p.14) | Windows ID, business unit group, user level; status Active, Disabled, Locked, Online (UQ05, UQ13) | FR-UA-052, 004 |
+| UAM-NFR-16 | System Administrator capabilities | Access rights per group per role; user administrator maintenance; group administration; maintain reference tables; workflow set-up; screen update and maintenance (p.14) | Access rights per profile, user and group administration and reference tables exist; approver rules are parameters, and a change of a security setting needs a second approval; screens change by release | FR-UA-052, 054 |
+| UAM-NFR-17 | Authentication through EUA | Interface the user ID with EUA using the Windows ID to authenticate access if the user exists in the BDO network, with password validation: the system passes the user ID and password; EUA returns whether the logon succeeded; on failure the error message is forwarded (p.14) | Windows ID sign-in through EUA when AUTH_MODE = DIRECTORY; EUA message shown; lock-out and audit unchanged (UQ04) | FR-UA-003 |
+| UAM-NFR-18 | Login logging | Log all valid and invalid attempts (p.14) | Every valid and invalid log-in is audited | FR-UA-001 |
+| UAM-NFR-19 | Lockout | Users are locked out after 3 invalid attempts (p.14) | LOGIN_MAX_FAILED_ATTEMPTS = 3 for every BIBS user | FR-UA-001 |
+| UAM-NFR-20 | Reference / master data management | Online view / add / modify / delete; referential integrity and validation; logical deletion; changes logged; role-based access (p.14) | Lists of Values with maker-checker, effective dates and deactivation instead of delete; audited | - |
+| UAM-NFR-21 | Error logging | Error log with description, time, user ID, module ID, command / SQL; enable / disable; location; rotation; size parameters; native syslog; one line per entry; verbosity and message-type selection; transmit to a remote server (p.14) | One-line structured logs with user and module; levels changeable at run time; shipping to the BDO log server by the platform | - |
+| UAM-NFR-22 | Transaction logging and audit trail | Transaction log with type, time, user ID, module ID; enable / disable; location; transmit; all user activities logged through the audit trail and retrievable by the administrator; allow automatic save option (p.14) | Insert-only audit trail and the Audit Trail screen; meaning of 'automatic save option' is UQ15 | FR-UA-064 |
+| UAM-NFR-23 | Logs retention and archiving | Retention / archival / purging / backup for application, database, audit, infrastructure logs, historical data, snapshots, video, documents: "Follow existing QPS set up" (p.14) | As UAM-NFR-03 (UQ12) | - |
+| UAM-NFR-24 | Batch processing a-l | Schedule, invoke manually, monitor, re-run, graceful terminate, UI without command line, publish status, single instance, restart at the interruption point, no privileged access, multi-core, parallel independent jobs (p.15) | Job scheduler with run history, run on demand, re-run, failure alert; restart without duplicates; status in monitoring | FR-UA-071 |
+| UAM-NFR-25 | Batch failure e-mail | Monitor batch runs, log success and failure; forward an e-mail notification to designated users on failed batch runs (stated twice) (p.15) | Failed runs e-mailed to JOB_FAILURE_RECIPIENTS | FR-UA-071 |
+| UAM-NFR-26 | System monitoring; network configuration; DR | Monitor and start / stop application processes without command line; DNS aliases; configurable ports; no hosts file; standard ports; Netbackup / Bacula, clustering, offsite replication, active-active, disk estimates (p.15) | Platform monitoring, container orchestration, environment-based configuration | - |
+| UAM-NFR-27 | Data purging and archiving | Automated archiving and purging of transactional data, logs, reports, temporary files; schedule; restricted access; configurable rules (p.15-16) | Retention rules and the monthly retention review; physical archive and purge follow the BIBS retention decision (Q39, UQ12) | - |
+| UAM-NFR-28 | Server and workstation software | Documented install / deploy / update; deploy from repository; runs as a service; multiple instances; dynamic configuration reload; least privilege; browser only on workstations; no proprietary office software; not tied to third-party versions (p.16) | Deployed from the repository; stateless multiple instances; least-privileged database user; browser-only workstations | - |
+| UAM-NFR-29 | System documentation | Functional design, technical design, user manual, installation guide, release notes, instruction guide on how to manage users and extract the users list and group profile list; troubleshooting guide; training; capacity planning; performance benchmarks (p.16-17) | User-administration guide in the in-app Help Center and the administration guide (UQ18) | - |
+| UAM-NFR-30 | System development, testing and production support | Access to resources outside the BDO network, off-site / on-site development, performance testing; maintenance access (p.17) | Engagement terms | - |
+| UAM-NFR-31 | Other BU NFR 1 | Password management (reset, change) (p.17) | Administrator reset and own change exist | FR-UA-005 |
+| UAM-NFR-32 | Other BU NFR 2-3 | Role-based access control (define roles, assign permissions, map users to roles); permission management (p.17) | Roles, permissions, user-role mapping, Roles screen and User Access Matrix exist | FR-UA-051 |
+| UAM-NFR-33 | Other BU NFR 4 | Integration with Single Sign-On (SSO) or LDAP (p.17) | Same directory authentication; SSO added when BDO gives the interface (UQ04) | FR-UA-003 |
+| UAM-NFR-34 | Other BU NFR 5 | Session management: inactivity warning after 15 minutes; warning prior to system-triggered log out after 30 minutes (p.17) | Session policy parameters and the web session guard | FR-UA-002 |
+| UAM-NFR-35 | Other BU NFR 6 | Audit logging: track changes in user roles and permissions; log user login / log out; audit log reports (p.17) | Role and permission changes in the structured change log; log-out and session log added; audit log report | FR-UA-004, 063 |
+| UAM-NFR-36 | Other BU NFR 7 | Enforce strong password policies (p.17) | Complexity and length exist; history, maximum and minimum age and forced change added (UQ08) | FR-UA-005 |
+| UAM-NFR-37 | Other BU NFR 8 | Self-service and admin tools: self-service password reset; user-friendly screens to manage access; a defined user can update profile information (p.17) | Self-service reset by e-mailed single-use link (local accounts); own e-mail and mobile update (UQ08, UQ17) | FR-UA-005 |
+| UAM-NFR-38 | Other BU NFR 9 | Bulk uploads or batch updates of user profiles (p.17) | Bulk request (UQ10) | FR-UA-019 |
+| UAM-NFR-39 | Other BU NFR 10 | Notification for access changes (p.17) | Affected user notified in the app and by e-mail when the change is applied | FR-UA-070 |
+| UAM-NFR-40 | Other BU NFR 11 | Configurable workflow for access requests and approvals; changes to user privileges systematically monitored, evaluated and, if necessary, escalated for additional review (e.g. modifications outside working hours, low to high privilege) (p.17) | Privilege level per profile; privilege increase or out-of-hours change needs a second approval and raises an alert (UQ07); separation-of-duties rules refuse combinations of profiles; security settings change under a second approval | FR-UA-034, 053, 054 |
+| UAM-NFR-41 | Report requirements (section 7) | Samples A User Access Report, B User Group Profile Report, C Group Profile membership (titled "User Group Profile Report"), D User Access Audit Log (date, activity, from, to, done by); generated by, date coverage, date and time generated (p.18) | Four reports with generated by, coverage and time generated in the header | FR-UA-060 to 063 |
 <!-- NFR:END -->
 
 # Configuration items
@@ -1764,8 +1788,15 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | UAM_DIRECT_ROLE_EDIT | false | Emergency direct role edit (audited, alerted) |
 | UAM_ROLE_APPLY_ON_APPROVAL | false | Group-profile requests applied on approval instead of implemented (UQ03) |
 | JOB_FAILURE_RECIPIENTS | empty | E-mail recipients of failed batch runs |
+| USER_ID_FORMAT_TEXT | a letter followed by nine digits, for example a013000196 | The user ID format in words, shown to the requester with the format check |
+| UAM_EXTERNAL_USERS | false | Requests for external (portal) users; false while no portal is installed |
+| UAM_DORMANT_DAYS | 90 | Days without a sign-in after which the job deactivates a user; 0 = never (FR-UA-006) |
+| UAM_DORMANT_NOTICE_DAYS | 7 | Days before the deactivation on which the user is told to sign in; 0 = no notice |
 | Job UAM_EFFECTIVE_CHANGES | 00:05 daily | Applies scheduled requests |
+| Job UAM_DORMANT_USERS | 00:15 daily | Deactivates the dormant users and sends the notices (FR-UA-006) |
 | Job PASSWORD_EXPIRY_NOTICE | 06:00 daily | Notifies users whose password expires within 7 days (LOCAL mode) |
+
+Every parameter of this table belongs to the Security category: a change waits for the approval of Information Security (FR-UA-054).
 
 ## Lists of values
 
@@ -1774,7 +1805,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 |---|---|
 | UAM_BUSINESS_UNIT | Empty until BDOI supplies the business unit groups (UQ05) |
 | UAM_USER_LEVEL | Empty until BDOI supplies the user levels (UQ05) |
-| UAM_DEACTIVATION_REASON | Resigned; Transferred; Long leave; Security; Others (to confirm) |
+| UAM_DEACTIVATION_REASON | Resigned; Transferred; Long leave; Security; Others (to confirm with BDOI); No sign-in for the dormancy period (dormant-user job) |
 | Group profile privilege level | Low; Standard; High; Admin |
 
 # Assumptions, dependencies and open questions
@@ -1834,186 +1865,483 @@ The items below are changed in BIBS without a release. Changes to parameters and
 
 BRD-11 answers questions raised on other BRDs: Q42 (directory sign-in required; inactivity sign-out at 30 minutes with a 15-minute warning), CQ23 (lock-out at 3 for all users; several roles per user) and PQ17 (group-profile changes are approved and then implemented by the System Administrator) (R4, decisions D5 and D6).
 
+
 # Traceability
 
 Every BRD-11 requirement line is met by at least one FR. The BRD prints 160 lines; IDs 2.002.7.1 and 3.003.1.1 appear twice and the second occurrence is marked "(2nd)". "Flag" repeats the BRD's Pilot Phase / Mandatory columns ("-" = not flagged). The NFR rows are traced in section 8.
 
 <!-- TRACE:START -->
-<!-- table: widths=2.7,1.1,6.9,1.2,3.1,2 caption="BRD requirement line to FR (160 lines)" status=Fit size=7.5 -->
-| BRD ID | Page | Activity and requirement | Flag | FR | Fit |
+<!-- table: widths=2.7,1.1,6.9,1.2,3.1,5.2 caption="BRD requirement line to FR (160 lines) and test cases" size=7.5 -->
+| BRD ID | Page | Activity and requirement | Flag | FR | Test cases |
 |---|---|---|---|---|---|
-| BRD 1.001.1 | p.8 | Log in as a Requestor - Access the application using any BDO-issued device | Yes | FR-UA-001 | FIT |
-| BRD 1.001.1.1 | p.8 | Log in as a Requestor - Log in with a Requestor user profile | Yes | FR-UA-001 | CONFIGURE |
-| BRD 1.001.1.2 | p.8 | Log in as a Requestor - Receive the inactivity warning (15 minutes) | Yes | FR-UA-002 | FIT |
-| BRD 1.001.1.3 | p.8 | Log in as a Requestor - Receive a warning prior to the system-triggered log out (30 minutes) | Yes | FR-UA-002 | FIT |
-| BRD 1.002.1 | p.8 | Enroll New User - Submit a new User Access request | Yes | FR-UA-011 | FIT |
-| BRD 1.002.1.1 | p.8 | Enroll New User - 1. Create request | Yes | FR-UA-010, FR-UA-011 | CHANGE |
-| BRD 1.002.1.1.1 | p.8 | Enroll New User - 1.1 Input new user data | Yes | FR-UA-011 | CHANGE |
-| BRD 1.002.1.1.2 | p.8 | Enroll New User - 1.2 Select User Access Group profile | Yes | FR-UA-011 | FIT |
-| BRD 1.002.1.1.3 | p.8 | Enroll New User - 1.3 Select approver from the drop-down | Yes | FR-UA-015 | NEW |
-| BRD 1.002.1.1.4 | p.8 | Enroll New User - 1.4 Add remarks (i.e. justification, etc.) | - | FR-UA-010 | FIT |
-| BRD 1.002.1.1.5 | p.8 | Enroll New User - 1.5 Save remarks | - | FR-UA-010 | CHANGE |
-| BRD 1.002.1.2 | p.8 | Enroll New User - 2. Edit drafted request | Yes | FR-UA-010 | CHANGE |
-| BRD 1.002.1.3 | p.8 | Enroll New User - 3. Cancel drafted request | Yes | FR-UA-010 | CHANGE |
-| BRD 1.002.1.4 | p.8 | Enroll New User - 4. Submit request | Yes | FR-UA-010 | FIT |
-| BRD 1.003.1 | p.8 | Modify Existing User - Submit a modify User Access / permission request | Yes | FR-UA-012 | CHANGE |
-| BRD 1.003.1.1 | p.8 | Modify Existing User - 1. Create request | Yes | FR-UA-010, FR-UA-012 | CHANGE |
-| BRD 1.003.1.1.1 | p.8 | Modify Existing User - 1.1 Search existing user | Yes | FR-UA-012 | FIT |
-| BRD 1.003.1.1.2 | p.8 | Modify Existing User - 1.2 Edit / update selected user data | - | FR-UA-012 | CHANGE |
-| BRD 1.003.1.1.3 | p.8 | Modify Existing User - 1.3 Select User Access Group profile | Yes | FR-UA-012 | FIT |
-| BRD 1.003.1.1.4 | p.8 | Modify Existing User - 1.4 Select approver from the drop-down | Yes | FR-UA-015 | NEW |
-| BRD 1.003.1.1.5 | p.8 | Modify Existing User - 1.5 Add remarks (i.e. justification, etc.) | - | FR-UA-010 | FIT |
-| BRD 1.003.1.1.6 | p.8 | Modify Existing User - 1.6 Save remarks | - | FR-UA-010 | CHANGE |
-| BRD 1.003.1.2 | p.8 | Modify Existing User - 2. Edit drafted request | Yes | FR-UA-010 | CHANGE |
-| BRD 1.003.1.3 | p.8 | Modify Existing User - 3. Cancel drafted request | Yes | FR-UA-010 | CHANGE |
-| BRD 1.003.1.4 | p.8 | Modify Existing User - 4. Submit request | Yes | FR-UA-010 | FIT |
-| BRD 1.004.1 | p.8 | Deactivate User - Submit a User Access deactivation request | Yes | FR-UA-013 | FIT |
-| BRD 1.004.1.1 | p.8 | Deactivate User - 1. Create a request | Yes | FR-UA-010, FR-UA-013 | CHANGE |
-| BRD 1.004.1.1.1 | p.8 | Deactivate User - 1.1 Search an existing user | Yes | FR-UA-013 | FIT |
-| BRD 1.004.1.1.2 | p.8 | Deactivate User - 1.2 Add remarks (i.e. reason for deactivation) | - | FR-UA-010, FR-UA-013 | FIT |
-| BRD 1.004.1.1.3 | p.8 | Deactivate User - 1.3 Save remarks | Yes | FR-UA-010, FR-UA-013 | CHANGE |
-| BRD 1.004.1.1.4 | p.8 | Deactivate User - 1.4 Select approver from the drop-down | Yes | FR-UA-015 | NEW |
-| BRD 1.004.1.2 | p.8 | Deactivate User - 2. Edit drafted request | Yes | FR-UA-010 | CHANGE |
-| BRD 1.004.1.3 | p.8 | Deactivate User - 3. Cancel drafted request | Yes | FR-UA-010 | CHANGE |
-| BRD 1.004.1.4 | p.8 | Deactivate User - 4. Submit request | Yes | FR-UA-010 | FIT |
-| BRD 1.005 | p.8 | Reactivate User - Submit a User Access reactivation request | Yes | FR-UA-014 | FIT |
-| BRD 1.005.1 | p.8 | Reactivate User - 1. Create a request | Yes | FR-UA-010, FR-UA-014 | CHANGE |
-| BRD 1.005.1.1 | p.8 | Reactivate User - 1.1 Search an existing user | Yes | FR-UA-014 | FIT |
-| BRD 1.005.1.1.1 | p.8 | Reactivate User - 1.2 Add remarks (i.e. reason for reactivation) | - | FR-UA-010, FR-UA-014 | FIT |
-| BRD 1.005.1.1.2 | p.8 | Reactivate User - 1.3 Save remarks | Yes | FR-UA-010, FR-UA-014 | CHANGE |
-| BRD 1.005.1.1.3 | p.8 | Reactivate User - 1.4 Select approver from the drop-down | Yes | FR-UA-015 | NEW |
-| BRD 1.005.1.2 | p.8 | Reactivate User - 2. Edit a drafted request | Yes | FR-UA-010 | CHANGE |
-| BRD 1.005.1.3 | p.8 | Reactivate User - 3. Cancel a drafted request | Yes | FR-UA-010 | CHANGE |
-| BRD 1.005.1.4 | p.8 | Reactivate User - 4. Submit a request | Yes | FR-UA-010 | FIT |
-| BRD 1.006.1 | p.8 | Apply Correction - Apply correction on returned requests | Yes | FR-UA-016 | CHANGE |
-| BRD 1.006.1.1 | p.8 | Apply Correction - 1. Receive notification on the returned request | Yes | FR-UA-016, FR-UA-070 | CHANGE |
-| BRD 1.006.1.2 | p.8 | Apply Correction - 2. Edit data on the returned request | Yes | FR-UA-016 | CHANGE |
-| BRD 1.006.1.3 | p.8 | Apply Correction - 3. Add remarks | Yes | FR-UA-016 | CHANGE |
-| BRD 1.006.1.4 | p.8 | Apply Correction - 4. Save remarks | Yes | FR-UA-016 | CHANGE |
-| BRD 1.006.1.5 | p.8 | Apply Correction - 5. Re-submit request | Yes | FR-UA-016 | CHANGE |
-| BRD 1.007.1 | p.8 | Cancel a Request - Cancel a submitted request for approval | Yes | FR-UA-017 | CHANGE |
-| BRD 1.007.1.1 | p.8 | Cancel a Request - 1. Search request | Yes | FR-UA-017 | FIT |
-| BRD 1.007.1.2 | p.8 | Cancel a Request - 2. Add remarks (i.e. reason for cancellation, etc.) | Yes | FR-UA-017 | CHANGE |
-| BRD 1.007.1.3 | p.8 | Cancel a Request - 3. Save remarks | Yes | FR-UA-017 | CHANGE |
-| BRD 1.007.1.4 | p.8 | Cancel a Request - 4. Cancel submitted request | Yes | FR-UA-017 | CHANGE |
-| BRD 1.008.1 | p.8 | View Request/s - View the submitted request/s | - | FR-UA-018 | FIT |
-| BRD 1.008.1.1 | p.8 | View Request/s - 1. View the list of the submitted request/s | Yes | FR-UA-018 | FIT |
-| BRD 1.008.1.2 | p.8 | View Request/s - 2. View the status of the submitted request/s | Yes | FR-UA-018 | FIT |
-| BRD 1.008.1.3 | p.8 | View Request/s - 3. View the details of the submitted request/s | Yes | FR-UA-018 | FIT |
-| BRD 1.008.1.4 | p.8 | View Request/s - 4. Receive notification on the approved / rejected request | Yes | FR-UA-018, FR-UA-070 | FIT |
-| BRD 1.009.1 | p.8 | Bulk Request - Submit request for bulk creation / modification / deactivation / reactivation | - | FR-UA-019 | NEW |
-| BRD 1.009.1.1 | p.8 | Bulk Request - 1. Attach a file for bulk processing | Yes | FR-UA-019 | NEW |
-| BRD 1.009.1.2 | p.8 | Bulk Request - 2. Add remarks | Yes | FR-UA-019 | NEW |
-| BRD 1.009.1.3 | p.8 | Bulk Request - 3. Save remarks | Yes | FR-UA-019 | NEW |
-| BRD 1.009.1.4 | p.8 | Bulk Request - 4. Edit a drafted request | Yes | FR-UA-019 | NEW |
-| BRD 1.009.1.5 | p.8 | Bulk Request - 5. Cancel a drafted request | Yes | FR-UA-019 | NEW |
-| BRD 1.009.1.6 | p.8 | Bulk Request - 6. Submit a request | Yes | FR-UA-019 | NEW |
-| BRD 2.001.1 | p.8 | Log in as an Approver - Access the application using any BDO-issued device | Yes | FR-UA-001 | FIT |
-| BRD 2.001.1.1 | p.8 | Log in as an Approver - Log in with an Approver user profile | Yes | FR-UA-001 | CONFIGURE |
-| BRD 2.001.1.2 | p.8 | Log in as an Approver - Receive the inactivity warning (15 minutes) | Yes | FR-UA-002 | FIT |
-| BRD 2.001.1.3 | p.8 | Log in as an Approver - Receive a warning prior to the system-triggered log out (30 minutes) | Yes | FR-UA-002 | FIT |
-| BRD 2.002.1 | p.8 | Review and Approve Request/s - a. Receive notification on the request for approval | Yes | FR-UA-030, FR-UA-015, FR-UA-070 | CHANGE |
-| BRD 2.002.2 | p.8 | Review and Approve Request/s - b. View the list of requests for approval | Yes | FR-UA-030 | FIT |
-| BRD 2.002.2.1 | p.8 | Review and Approve Request/s - 1. Filter the list assigned to me | Yes | FR-UA-030 | CHANGE |
-| BRD 2.002.3 | p.8 | Review and Approve Request/s - c. Select request | Yes | FR-UA-030 | FIT |
-| BRD 2.002.4 | p.8 | Review and Approve Request/s - d. View request details | Yes | FR-UA-030 | FIT |
-| BRD 2.002.5 | p.8 | Review and Approve Request/s - e. Approve request | Yes | FR-UA-031 | FIT |
-| BRD 2.002.6 | p.8 | Review and Approve Request/s - f. Reject request | Yes | FR-UA-032 | FIT |
-| BRD 2.002.6.1 | p.8 | Review and Approve Request/s - 1. Add remarks (i.e. rejection reason, etc.) | - | FR-UA-032 | FIT |
-| BRD 2.002.6.2 | p.9 | Review and Approve Request/s - 2. Save remarks | - | FR-UA-032 | FIT |
-| BRD 2.002.7 | p.9 | Review and Approve Request/s - g. Return request to Requestor | Yes | FR-UA-033 | CHANGE |
-| BRD 2.002.7.1 | p.9 | Review and Approve Request/s - 1. Add remarks (i.e. reason for return, etc.) | Yes | FR-UA-033 | CHANGE |
-| BRD 2.002.7.1 (2nd) | p.9 | Review and Approve Request/s - 2. Save remarks | Yes | FR-UA-033 | CHANGE |
-| BRD 3.001.1 | p.9 | Log in as a Business Administrator - Access the application using any BDO-issued device | Yes | FR-UA-001 | FIT |
-| BRD 3.001.1.1 | p.9 | Log in as a Business Administrator - Log in with a Business Administrator user profile | Yes | FR-UA-001 | FIT |
-| BRD 3.001.1.2 | p.9 | Log in as a Business Administrator - Receive the inactivity warning (15 minutes) | Yes | FR-UA-002 | FIT |
-| BRD 3.001.1.3 | p.9 | Log in as a Business Administrator - Receive a warning prior to the system-triggered log out (30 minutes) | Yes | FR-UA-002 | FIT |
-| BRD 3.002.1 | p.9 | Submit a User Access Group Profile Request - a. Submit a new User Access Group Profiles request | Yes | FR-UA-040 | CHANGE |
-| BRD 3.002.1.1 | p.9 | Submit a User Access Group Profile Request - 1. Create a request | Yes | FR-UA-040 | CHANGE |
-| BRD 3.002.1.2 | p.9 | Submit a User Access Group Profile Request - 2. Select approver/s from the drop-down | - | FR-UA-044 | NEW |
-| BRD 3.002.1.3 | p.9 | Submit a User Access Group Profile Request - 3. Edit a drafted request | Yes | FR-UA-040 | CHANGE |
-| BRD 3.002.1.4 | p.9 | Submit a User Access Group Profile Request - 4. Cancel a drafted request | Yes | FR-UA-040 | CHANGE |
-| BRD 3.002.1.5 | p.9 | Submit a User Access Group Profile Request - 5. Submit a request | Yes | FR-UA-040 | FIT |
-| BRD 3.002.1.6 | p.9 | Submit a User Access Group Profile Request - 6. Add remarks | - | FR-UA-040 | FIT |
-| BRD 3.002.1.7 | p.9 | Submit a User Access Group Profile Request - 7. Save remarks | - | FR-UA-040 | CHANGE |
-| BRD 3.002.2 | p.9 | Submit a User Access Group Profile Request - b. Submit a modify User Access Group Profiles request | Yes | FR-UA-041 | FIT |
-| BRD 3.002.2.1 | p.9 | Submit a User Access Group Profile Request - 1. Create a request | Yes | FR-UA-041 | CHANGE |
-| BRD 3.002.2.2 | p.9 | Submit a User Access Group Profile Request - 2. Search existing group profile from the drop-down | - | FR-UA-041 | FIT |
-| BRD 3.002.2.3 | p.9 | Submit a User Access Group Profile Request - 3. Select approver/s from the drop-down | - | FR-UA-044 | NEW |
-| BRD 3.002.2.4 | p.9 | Submit a User Access Group Profile Request - 4. Edit a drafted request | Yes | FR-UA-041 | CHANGE |
-| BRD 3.002.2.5 | p.9 | Submit a User Access Group Profile Request - 5. Cancel a drafted request | Yes | FR-UA-041 | CHANGE |
-| BRD 3.002.2.6 | p.9 | Submit a User Access Group Profile Request - 6. Submit a request | Yes | FR-UA-041 | FIT |
-| BRD 3.002.2.7 | p.9 | Submit a User Access Group Profile Request - 7. Add remarks | - | FR-UA-041 | FIT |
-| BRD 3.002.2.8 | p.9 | Submit a User Access Group Profile Request - 8. Save remarks | - | FR-UA-041 | CHANGE |
-| BRD 3.002.3 | p.9 | Submit a User Access Group Profile Request - c. Submit a User Access Group Profiles deactivation request | Yes | FR-UA-042 | NEW |
-| BRD 3.002.3.1 | p.9 | Submit a User Access Group Profile Request - 1. Create a request | Yes | FR-UA-042 | NEW |
-| BRD 3.002.3.2 | p.9 | Submit a User Access Group Profile Request - 2. Search existing group profile from the drop-down | - | FR-UA-042 | FIT |
-| BRD 3.002.3.3 | p.9 | Submit a User Access Group Profile Request - 3. Select approver/s from the drop-down | - | FR-UA-044 | NEW |
-| BRD 3.002.3.4 | p.9 | Submit a User Access Group Profile Request - 4. Edit a drafted request | Yes | FR-UA-042 | NEW |
-| BRD 3.002.3.5 | p.9 | Submit a User Access Group Profile Request - 5. Cancel a drafted request | Yes | FR-UA-042 | NEW |
-| BRD 3.002.3.6 | p.9 | Submit a User Access Group Profile Request - 6. Submit a request | Yes | FR-UA-042 | NEW |
-| BRD 3.002.3.7 | p.9 | Submit a User Access Group Profile Request - 7. Add remarks | - | FR-UA-042 | FIT |
-| BRD 3.002.3.8 | p.9 | Submit a User Access Group Profile Request - 8. Save remarks | - | FR-UA-042 | CHANGE |
-| BRD 3.002.4 | p.9 | Submit a User Access Group Profile Request - d. Submit a User Access Group Profiles reactivation request | Yes | FR-UA-043 | NEW |
-| BRD 3.002.4.1 | p.9 | Submit a User Access Group Profile Request - 1. Create a request | Yes | FR-UA-043 | NEW |
-| BRD 3.002.4.2 | p.9 | Submit a User Access Group Profile Request - 2. Search existing group profile from the drop-down | - | FR-UA-043 | FIT |
-| BRD 3.002.4.3 | p.9 | Submit a User Access Group Profile Request - 3. Select approver/s from the drop-down | - | FR-UA-044 | NEW |
-| BRD 3.002.4.4 | p.9 | Submit a User Access Group Profile Request - 4. Edit a drafted request | Yes | FR-UA-043 | NEW |
-| BRD 3.002.4.5 | p.9 | Submit a User Access Group Profile Request - 5. Cancel a drafted request | Yes | FR-UA-043 | NEW |
-| BRD 3.002.4.6 | p.9 | Submit a User Access Group Profile Request - 6. Submit a request | Yes | FR-UA-043 | NEW |
-| BRD 3.002.4.7 | p.9 | Submit a User Access Group Profile Request - 7. Add remarks | - | FR-UA-043 | FIT |
-| BRD 3.002.4.8 | p.9 | Submit a User Access Group Profile Request - 8. Save remarks | - | FR-UA-043 | CHANGE |
-| BRD 3.003.1 | p.9 | Generate Reports - a. Generate customized report | Yes | FR-UA-060 | CHANGE |
-| BRD 3.003.1.1 | p.9 | Generate Reports - 1. User Access Report | Yes | FR-UA-060 | NEW |
-| BRD 3.003.1.1 (2nd) | p.9 | Generate Reports - 1.1 User name | Yes | FR-UA-060 | FIT |
-| BRD 3.003.1.2 | p.9 | Generate Reports - 1.2 Group profile | Yes | FR-UA-060 | FIT |
-| BRD 3.003.1.3 | p.9 | Generate Reports - 1.3 Date created | Yes | FR-UA-060 | FIT |
-| BRD 3.003.1.4 | p.9 | Generate Reports - 1.4 Date modified | Yes | FR-UA-060 | FIT |
-| BRD 3.003.1.5 | p.9 | Generate Reports - 1.5 Created by | Yes | FR-UA-060 | CHANGE |
-| BRD 3.003.1.6 | p.9 | Generate Reports - 1.6 Added / Modified / deactivated / reactivated by | Yes | FR-UA-060 | CHANGE |
-| BRD 3.003.2 | p.9 | Generate Reports - 2. User Group Profile Report | Yes | FR-UA-061 | CHANGE |
-| BRD 3.003.2.1 | p.9 | Generate Reports - 2.1 Group profile name | Yes | FR-UA-061 | FIT |
-| BRD 3.003.2.2 | p.9 | Generate Reports - 2.2 Modules accessed under each group profile | Yes | FR-UA-061 | CHANGE |
-| BRD 3.003.2.3 | p.9 | Generate Reports - 2.3 Date created | Yes | FR-UA-061 | FIT |
-| BRD 3.003.2.4 | p.9 | Generate Reports - 2.4 Date modified | Yes | FR-UA-061 | FIT |
-| BRD 3.003.2.5 | p.9 | Generate Reports - 2.5 Created by | Yes | FR-UA-061 | FIT |
-| BRD 3.003.2.6 | p.9 | Generate Reports - 2.6 Added / Modified / deactivated / reactivated by | Yes | FR-UA-061 | CHANGE |
-| BRD 3.003.3 | p.9 | Generate Reports - 3. Group Profile Membership list | Yes | FR-UA-062 | NEW |
-| BRD 3.003.3.1 | p.9 | Generate Reports - 1. List of members under each profile | Yes | FR-UA-062 | NEW |
-| BRD 3.003.3.1.1 | p.9 | Generate Reports - 1.1 Group profile | Yes | FR-UA-062 | FIT |
-| BRD 3.003.3.1.2 | p.9 | Generate Reports - 1.2 User name | Yes | FR-UA-062 | FIT |
-| BRD 4.001.1 | p.9 | Log in as a System Administrator - Access the application using any BDO-issued device | - | FR-UA-001 | FIT |
-| BRD 4.001.1.1 | p.9 | Log in as a System Administrator - Log in with a System Administrator user profile | - | FR-UA-001 | FIT |
-| BRD 4.001.1.2 | p.9 | Log in as a System Administrator - Receive the inactivity warning (15 minutes) | - | FR-UA-002 | FIT |
-| BRD 4.001.1.3 | p.9 | Log in as a System Administrator - Receive a warning prior to the system-triggered log out (30 minutes) | - | FR-UA-002 | FIT |
-| BRD 4.002.1 | p.9 | Manage Users of the System - a. Define user profile / role | Yes | FR-UA-050, FR-UA-045 | FIT |
-| BRD 4.002.1.1 | p.9 | Manage Users of the System - 1. Create user profile / role for Requestor | Yes | FR-UA-050 | CONFIGURE |
-| BRD 4.002.1.2 | p.9 | Manage Users of the System - 2. Create user profile / role for Approver | Yes | FR-UA-050 | CONFIGURE |
-| BRD 4.002.1.3 | p.9 | Manage Users of the System - 3. Create user profile / role for Business Administrator | Yes | FR-UA-050 | FIT |
-| BRD 4.002.2 | p.9 | Manage Users of the System - b. Define specific functionality or capability for a specific user profile / role | Yes | FR-UA-051 | FIT |
-| BRD 4.002.2.1 | p.9 | Manage Users of the System - 1. Assign Enroll New User to a specific user profile / role | Yes | FR-UA-051 | CHANGE |
-| BRD 4.002.2.2 | p.9 | Manage Users of the System - 2. Assign Modify Existing User function to a specific user profile / role | Yes | FR-UA-051 | CHANGE |
-| BRD 4.002.2.3 | p.9 | Manage Users of the System - 3. Assign Deactivate User function to a specific user profile / role | Yes | FR-UA-051 | CHANGE |
-| BRD 4.002.2.4 | p.9 | Manage Users of the System - 4. Assign Reactivate User function to a specific user profile / role | Yes | FR-UA-051 | CHANGE |
-| BRD 4.002.2.5 | p.9 | Manage Users of the System - 5. Assign Apply Correction function to a specific user profile / role | Yes | FR-UA-051 | CHANGE |
-| BRD 4.002.2.6 | p.9 | Manage Users of the System - 6. Assign Cancel a Request function to a specific user profile / role | Yes | FR-UA-051 | CHANGE |
-| BRD 4.002.2.7 | p.10 | Manage Users of the System - 7. Assign View Request/s function to a specific user profile / role | Yes | FR-UA-051 | CHANGE |
-| BRD 4.002.2.8 | p.10 | Manage Users of the System - 8. Assign Review and Approve Request/s function to a specific user profile / role | Yes | FR-UA-051 | FIT |
-| BRD 4.002.2.9 | p.10 | Manage Users of the System - 9. Assign Submit a User Access Group Profiles Request function to a specific user profile / role | Yes | FR-UA-051 | CHANGE |
-| BRD 4.002.2.10 | p.10 | Manage Users of the System - 10. [Assign] Generate Reports Request function to a specific user profile / role | Yes | FR-UA-051 | CHANGE |
-| BRD 4.003.1 | p.10 | Generate Logs - a. Generate audit logs for compliance and audit purposes as needed | Yes | FR-UA-063, FR-UA-064 | CHANGE |
+| BRD 1.001.1 | p.8 | Log in as a Requestor - Access the application using any BDO-issued device | Yes | FR-UA-001 | TC-UA-001.1, 001.2, 001.3, 001.4, 001.5 (7 cases) |
+| BRD 1.001.1.1 | p.8 | Log in as a Requestor - Log in with a Requestor user profile | Yes | FR-UA-001 | TC-UA-001.1, 001.2, 001.3, 001.4, 001.5 (7 cases) |
+| BRD 1.001.1.2 | p.8 | Log in as a Requestor - Receive the inactivity warning (15 minutes) | Yes | FR-UA-002 | TC-UA-002.1, 002.2, 002.3, 002.4 (5 cases) |
+| BRD 1.001.1.3 | p.8 | Log in as a Requestor - Receive a warning prior to the system-triggered log out (30 minutes) | Yes | FR-UA-002 | TC-UA-002.1, 002.2, 002.3, 002.4 (5 cases) |
+| BRD 1.002.1 | p.8 | Enroll New User - Submit a new User Access request | Yes | FR-UA-011 | TC-UA-011.1, 011.2, 011.3, 011.4 (9 cases) |
+| BRD 1.002.1.1 | p.8 | Enroll New User - 1. Create request | Yes | FR-UA-010, FR-UA-011 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.002.1.1.1 | p.8 | Enroll New User - 1.1 Input new user data | Yes | FR-UA-011 | TC-UA-011.1, 011.2, 011.3, 011.4 (9 cases) |
+| BRD 1.002.1.1.2 | p.8 | Enroll New User - 1.2 Select User Access Group profile | Yes | FR-UA-011 | TC-UA-011.1, 011.2, 011.3, 011.4 (9 cases) |
+| BRD 1.002.1.1.3 | p.8 | Enroll New User - 1.3 Select approver from the drop-down | Yes | FR-UA-015 | TC-UA-015.1, 015.2, 015.3 (4 cases) |
+| BRD 1.002.1.1.4 | p.8 | Enroll New User - 1.4 Add remarks (i.e. justification, etc.) | - | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.002.1.1.5 | p.8 | Enroll New User - 1.5 Save remarks | - | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.002.1.2 | p.8 | Enroll New User - 2. Edit drafted request | Yes | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.002.1.3 | p.8 | Enroll New User - 3. Cancel drafted request | Yes | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.002.1.4 | p.8 | Enroll New User - 4. Submit request | Yes | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.003.1 | p.8 | Modify Existing User - Submit a modify User Access / permission request | Yes | FR-UA-012 | TC-UA-012.1, 012.2, 012.3 (5 cases) |
+| BRD 1.003.1.1 | p.8 | Modify Existing User - 1. Create request | Yes | FR-UA-010, FR-UA-012 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.003.1.1.1 | p.8 | Modify Existing User - 1.1 Search existing user | Yes | FR-UA-012 | TC-UA-012.1, 012.2, 012.3 (5 cases) |
+| BRD 1.003.1.1.2 | p.8 | Modify Existing User - 1.2 Edit / update selected user data | - | FR-UA-012 | TC-UA-012.1, 012.2, 012.3 (5 cases) |
+| BRD 1.003.1.1.3 | p.8 | Modify Existing User - 1.3 Select User Access Group profile | Yes | FR-UA-012 | TC-UA-012.1, 012.2, 012.3 (5 cases) |
+| BRD 1.003.1.1.4 | p.8 | Modify Existing User - 1.4 Select approver from the drop-down | Yes | FR-UA-015 | TC-UA-015.1, 015.2, 015.3 (4 cases) |
+| BRD 1.003.1.1.5 | p.8 | Modify Existing User - 1.5 Add remarks (i.e. justification, etc.) | - | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.003.1.1.6 | p.8 | Modify Existing User - 1.6 Save remarks | - | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.003.1.2 | p.8 | Modify Existing User - 2. Edit drafted request | Yes | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.003.1.3 | p.8 | Modify Existing User - 3. Cancel drafted request | Yes | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.003.1.4 | p.8 | Modify Existing User - 4. Submit request | Yes | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.004.1 | p.8 | Deactivate User - Submit a User Access deactivation request | Yes | FR-UA-013 | TC-UA-013.1, 013.2, 013.3 (4 cases) |
+| BRD 1.004.1.1 | p.8 | Deactivate User - 1. Create a request | Yes | FR-UA-010, FR-UA-013 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.004.1.1.1 | p.8 | Deactivate User - 1.1 Search an existing user | Yes | FR-UA-013 | TC-UA-013.1, 013.2, 013.3 (4 cases) |
+| BRD 1.004.1.1.2 | p.8 | Deactivate User - 1.2 Add remarks (i.e. reason for deactivation) | - | FR-UA-010, FR-UA-013 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5, 013.1, 013.2, 013.3 (12 cases) |
+| BRD 1.004.1.1.3 | p.8 | Deactivate User - 1.3 Save remarks | Yes | FR-UA-010, FR-UA-013 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5, 013.1, 013.2, 013.3 (12 cases) |
+| BRD 1.004.1.1.4 | p.8 | Deactivate User - 1.4 Select approver from the drop-down | Yes | FR-UA-015 | TC-UA-015.1, 015.2, 015.3 (4 cases) |
+| BRD 1.004.1.2 | p.8 | Deactivate User - 2. Edit drafted request | Yes | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.004.1.3 | p.8 | Deactivate User - 3. Cancel drafted request | Yes | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.004.1.4 | p.8 | Deactivate User - 4. Submit request | Yes | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.005 | p.8 | Reactivate User - Submit a User Access reactivation request | Yes | FR-UA-014 | TC-UA-014.1, 014.2 (3 cases) |
+| BRD 1.005.1 | p.8 | Reactivate User - 1. Create a request | Yes | FR-UA-010, FR-UA-014 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.005.1.1 | p.8 | Reactivate User - 1.1 Search an existing user | Yes | FR-UA-014 | TC-UA-014.1, 014.2 (3 cases) |
+| BRD 1.005.1.1.1 | p.8 | Reactivate User - 1.2 Add remarks (i.e. reason for reactivation) | - | FR-UA-010, FR-UA-014 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5, 014.1, 014.2 (11 cases) |
+| BRD 1.005.1.1.2 | p.8 | Reactivate User - 1.3 Save remarks | Yes | FR-UA-010, FR-UA-014 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5, 014.1, 014.2 (11 cases) |
+| BRD 1.005.1.1.3 | p.8 | Reactivate User - 1.4 Select approver from the drop-down | Yes | FR-UA-015 | TC-UA-015.1, 015.2, 015.3 (4 cases) |
+| BRD 1.005.1.2 | p.8 | Reactivate User - 2. Edit a drafted request | Yes | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.005.1.3 | p.8 | Reactivate User - 3. Cancel a drafted request | Yes | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.005.1.4 | p.8 | Reactivate User - 4. Submit a request | Yes | FR-UA-010 | TC-UA-010.1, 010.2, 010.3, 010.4, 010.5 (8 cases) |
+| BRD 1.006.1 | p.8 | Apply Correction - Apply correction on returned requests | Yes | FR-UA-016 | TC-UA-016.1, 016.2, 016.3 (4 cases) |
+| BRD 1.006.1.1 | p.8 | Apply Correction - 1. Receive notification on the returned request | Yes | FR-UA-016, FR-UA-070 | TC-UA-016.1, 016.2, 016.3, 070.1, 070.2, 070.3 (7 cases) |
+| BRD 1.006.1.2 | p.8 | Apply Correction - 2. Edit data on the returned request | Yes | FR-UA-016 | TC-UA-016.1, 016.2, 016.3 (4 cases) |
+| BRD 1.006.1.3 | p.8 | Apply Correction - 3. Add remarks | Yes | FR-UA-016 | TC-UA-016.1, 016.2, 016.3 (4 cases) |
+| BRD 1.006.1.4 | p.8 | Apply Correction - 4. Save remarks | Yes | FR-UA-016 | TC-UA-016.1, 016.2, 016.3 (4 cases) |
+| BRD 1.006.1.5 | p.8 | Apply Correction - 5. Re-submit request | Yes | FR-UA-016 | TC-UA-016.1, 016.2, 016.3 (4 cases) |
+| BRD 1.007.1 | p.8 | Cancel a Request - Cancel a submitted request for approval | Yes | FR-UA-017 | TC-UA-017.1, 017.2, 017.3, 017.4 (5 cases) |
+| BRD 1.007.1.1 | p.8 | Cancel a Request - 1. Search request | Yes | FR-UA-017 | TC-UA-017.1, 017.2, 017.3, 017.4 (5 cases) |
+| BRD 1.007.1.2 | p.8 | Cancel a Request - 2. Add remarks (i.e. reason for cancellation, etc.) | Yes | FR-UA-017 | TC-UA-017.1, 017.2, 017.3, 017.4 (5 cases) |
+| BRD 1.007.1.3 | p.8 | Cancel a Request - 3. Save remarks | Yes | FR-UA-017 | TC-UA-017.1, 017.2, 017.3, 017.4 (5 cases) |
+| BRD 1.007.1.4 | p.8 | Cancel a Request - 4. Cancel submitted request | Yes | FR-UA-017 | TC-UA-017.1, 017.2, 017.3, 017.4 (5 cases) |
+| BRD 1.008.1 | p.8 | View Request/s - View the submitted request/s | - | FR-UA-018 | TC-UA-018.1, 018.2, 018.3 (5 cases) |
+| BRD 1.008.1.1 | p.8 | View Request/s - 1. View the list of the submitted request/s | Yes | FR-UA-018 | TC-UA-018.1, 018.2, 018.3 (5 cases) |
+| BRD 1.008.1.2 | p.8 | View Request/s - 2. View the status of the submitted request/s | Yes | FR-UA-018 | TC-UA-018.1, 018.2, 018.3 (5 cases) |
+| BRD 1.008.1.3 | p.8 | View Request/s - 3. View the details of the submitted request/s | Yes | FR-UA-018 | TC-UA-018.1, 018.2, 018.3 (5 cases) |
+| BRD 1.008.1.4 | p.8 | View Request/s - 4. Receive notification on the approved / rejected request | Yes | FR-UA-018, FR-UA-070 | TC-UA-018.1, 018.2, 018.3, 070.1, 070.2, 070.3 (8 cases) |
+| BRD 1.009.1 | p.8 | Bulk Request - Submit request for bulk creation / modification / deactivation / reactivation | - | FR-UA-019 | TC-UA-019.1, 019.2, 019.3, 019.4 (5 cases) |
+| BRD 1.009.1.1 | p.8 | Bulk Request - 1. Attach a file for bulk processing | Yes | FR-UA-019 | TC-UA-019.1, 019.2, 019.3, 019.4 (5 cases) |
+| BRD 1.009.1.2 | p.8 | Bulk Request - 2. Add remarks | Yes | FR-UA-019 | TC-UA-019.1, 019.2, 019.3, 019.4 (5 cases) |
+| BRD 1.009.1.3 | p.8 | Bulk Request - 3. Save remarks | Yes | FR-UA-019 | TC-UA-019.1, 019.2, 019.3, 019.4 (5 cases) |
+| BRD 1.009.1.4 | p.8 | Bulk Request - 4. Edit a drafted request | Yes | FR-UA-019 | TC-UA-019.1, 019.2, 019.3, 019.4 (5 cases) |
+| BRD 1.009.1.5 | p.8 | Bulk Request - 5. Cancel a drafted request | Yes | FR-UA-019 | TC-UA-019.1, 019.2, 019.3, 019.4 (5 cases) |
+| BRD 1.009.1.6 | p.8 | Bulk Request - 6. Submit a request | Yes | FR-UA-019 | TC-UA-019.1, 019.2, 019.3, 019.4 (5 cases) |
+| BRD 2.001.1 | p.8 | Log in as an Approver - Access the application using any BDO-issued device | Yes | FR-UA-001 | TC-UA-001.1, 001.2, 001.3, 001.4, 001.5 (7 cases) |
+| BRD 2.001.1.1 | p.8 | Log in as an Approver - Log in with an Approver user profile | Yes | FR-UA-001 | TC-UA-001.1, 001.2, 001.3, 001.4, 001.5 (7 cases) |
+| BRD 2.001.1.2 | p.8 | Log in as an Approver - Receive the inactivity warning (15 minutes) | Yes | FR-UA-002 | TC-UA-002.1, 002.2, 002.3, 002.4 (5 cases) |
+| BRD 2.001.1.3 | p.8 | Log in as an Approver - Receive a warning prior to the system-triggered log out (30 minutes) | Yes | FR-UA-002 | TC-UA-002.1, 002.2, 002.3, 002.4 (5 cases) |
+| BRD 2.002.1 | p.8 | Review and Approve Request/s - a. Receive notification on the request for approval | Yes | FR-UA-030, FR-UA-015, FR-UA-070 | TC-UA-030.1, 030.2, 030.3, 070.1, 070.2, 070.3 (6 cases) |
+| BRD 2.002.2 | p.8 | Review and Approve Request/s - b. View the list of requests for approval | Yes | FR-UA-030 | TC-UA-030.1, 030.2, 030.3 (3 cases) |
+| BRD 2.002.2.1 | p.8 | Review and Approve Request/s - 1. Filter the list assigned to me | Yes | FR-UA-030 | TC-UA-030.1, 030.2, 030.3 (3 cases) |
+| BRD 2.002.3 | p.8 | Review and Approve Request/s - c. Select request | Yes | FR-UA-030 | TC-UA-030.1, 030.2, 030.3 (3 cases) |
+| BRD 2.002.4 | p.8 | Review and Approve Request/s - d. View request details | Yes | FR-UA-030 | TC-UA-030.1, 030.2, 030.3 (3 cases) |
+| BRD 2.002.5 | p.8 | Review and Approve Request/s - e. Approve request | Yes | FR-UA-031 | TC-UA-031.1, 031.2, 031.3 (4 cases) |
+| BRD 2.002.6 | p.8 | Review and Approve Request/s - f. Reject request | Yes | FR-UA-032 | TC-UA-032.1, 032.2 (3 cases) |
+| BRD 2.002.6.1 | p.8 | Review and Approve Request/s - 1. Add remarks (i.e. rejection reason, etc.) | - | FR-UA-032 | TC-UA-032.1, 032.2 (3 cases) |
+| BRD 2.002.6.2 | p.9 | Review and Approve Request/s - 2. Save remarks | - | FR-UA-032 | TC-UA-032.1, 032.2 (3 cases) |
+| BRD 2.002.7 | p.9 | Review and Approve Request/s - g. Return request to Requestor | Yes | FR-UA-033 | TC-UA-033.1, 033.2 (2 cases) |
+| BRD 2.002.7.1 | p.9 | Review and Approve Request/s - 1. Add remarks (i.e. reason for return, etc.) | Yes | FR-UA-033 | TC-UA-033.1, 033.2 (2 cases) |
+| BRD 2.002.7.1 (2nd) | p.9 | Review and Approve Request/s - 2. Save remarks | Yes | FR-UA-033 | TC-UA-033.1, 033.2 (2 cases) |
+| BRD 3.001.1 | p.9 | Log in as a Business Administrator - Access the application using any BDO-issued device | Yes | FR-UA-001 | TC-UA-001.1, 001.2, 001.3, 001.4, 001.5 (7 cases) |
+| BRD 3.001.1.1 | p.9 | Log in as a Business Administrator - Log in with a Business Administrator user profile | Yes | FR-UA-001 | TC-UA-001.1, 001.2, 001.3, 001.4, 001.5 (7 cases) |
+| BRD 3.001.1.2 | p.9 | Log in as a Business Administrator - Receive the inactivity warning (15 minutes) | Yes | FR-UA-002 | TC-UA-002.1, 002.2, 002.3, 002.4 (5 cases) |
+| BRD 3.001.1.3 | p.9 | Log in as a Business Administrator - Receive a warning prior to the system-triggered log out (30 minutes) | Yes | FR-UA-002 | TC-UA-002.1, 002.2, 002.3, 002.4 (5 cases) |
+| BRD 3.002.1 | p.9 | Submit a User Access Group Profile Request - a. Submit a new User Access Group Profiles request | Yes | FR-UA-040 | TC-UA-040.1, 040.2, 040.3 (6 cases) |
+| BRD 3.002.1.1 | p.9 | Submit a User Access Group Profile Request - 1. Create a request | Yes | FR-UA-040 | TC-UA-040.1, 040.2, 040.3 (6 cases) |
+| BRD 3.002.1.2 | p.9 | Submit a User Access Group Profile Request - 2. Select approver/s from the drop-down | - | FR-UA-044 | TC-UA-044.1, 044.2, 044.3 (5 cases) |
+| BRD 3.002.1.3 | p.9 | Submit a User Access Group Profile Request - 3. Edit a drafted request | Yes | FR-UA-040 | TC-UA-040.1, 040.2, 040.3 (6 cases) |
+| BRD 3.002.1.4 | p.9 | Submit a User Access Group Profile Request - 4. Cancel a drafted request | Yes | FR-UA-040 | TC-UA-040.1, 040.2, 040.3 (6 cases) |
+| BRD 3.002.1.5 | p.9 | Submit a User Access Group Profile Request - 5. Submit a request | Yes | FR-UA-040 | TC-UA-040.1, 040.2, 040.3 (6 cases) |
+| BRD 3.002.1.6 | p.9 | Submit a User Access Group Profile Request - 6. Add remarks | - | FR-UA-040 | TC-UA-040.1, 040.2, 040.3 (6 cases) |
+| BRD 3.002.1.7 | p.9 | Submit a User Access Group Profile Request - 7. Save remarks | - | FR-UA-040 | TC-UA-040.1, 040.2, 040.3 (6 cases) |
+| BRD 3.002.2 | p.9 | Submit a User Access Group Profile Request - b. Submit a modify User Access Group Profiles request | Yes | FR-UA-041 | TC-UA-041.1, 041.2, 041.3 (6 cases) |
+| BRD 3.002.2.1 | p.9 | Submit a User Access Group Profile Request - 1. Create a request | Yes | FR-UA-041 | TC-UA-041.1, 041.2, 041.3 (6 cases) |
+| BRD 3.002.2.2 | p.9 | Submit a User Access Group Profile Request - 2. Search existing group profile from the drop-down | - | FR-UA-041 | TC-UA-041.1, 041.2, 041.3 (6 cases) |
+| BRD 3.002.2.3 | p.9 | Submit a User Access Group Profile Request - 3. Select approver/s from the drop-down | - | FR-UA-044 | TC-UA-044.1, 044.2, 044.3 (5 cases) |
+| BRD 3.002.2.4 | p.9 | Submit a User Access Group Profile Request - 4. Edit a drafted request | Yes | FR-UA-041 | TC-UA-041.1, 041.2, 041.3 (6 cases) |
+| BRD 3.002.2.5 | p.9 | Submit a User Access Group Profile Request - 5. Cancel a drafted request | Yes | FR-UA-041 | TC-UA-041.1, 041.2, 041.3 (6 cases) |
+| BRD 3.002.2.6 | p.9 | Submit a User Access Group Profile Request - 6. Submit a request | Yes | FR-UA-041 | TC-UA-041.1, 041.2, 041.3 (6 cases) |
+| BRD 3.002.2.7 | p.9 | Submit a User Access Group Profile Request - 7. Add remarks | - | FR-UA-041 | TC-UA-041.1, 041.2, 041.3 (6 cases) |
+| BRD 3.002.2.8 | p.9 | Submit a User Access Group Profile Request - 8. Save remarks | - | FR-UA-041 | TC-UA-041.1, 041.2, 041.3 (6 cases) |
+| BRD 3.002.3 | p.9 | Submit a User Access Group Profile Request - c. Submit a User Access Group Profiles deactivation request | Yes | FR-UA-042 | TC-UA-042.1, 042.2, 042.3 (4 cases) |
+| BRD 3.002.3.1 | p.9 | Submit a User Access Group Profile Request - 1. Create a request | Yes | FR-UA-042 | TC-UA-042.1, 042.2, 042.3 (4 cases) |
+| BRD 3.002.3.2 | p.9 | Submit a User Access Group Profile Request - 2. Search existing group profile from the drop-down | - | FR-UA-042 | TC-UA-042.1, 042.2, 042.3 (4 cases) |
+| BRD 3.002.3.3 | p.9 | Submit a User Access Group Profile Request - 3. Select approver/s from the drop-down | - | FR-UA-044 | TC-UA-044.1, 044.2, 044.3 (5 cases) |
+| BRD 3.002.3.4 | p.9 | Submit a User Access Group Profile Request - 4. Edit a drafted request | Yes | FR-UA-042 | TC-UA-042.1, 042.2, 042.3 (4 cases) |
+| BRD 3.002.3.5 | p.9 | Submit a User Access Group Profile Request - 5. Cancel a drafted request | Yes | FR-UA-042 | TC-UA-042.1, 042.2, 042.3 (4 cases) |
+| BRD 3.002.3.6 | p.9 | Submit a User Access Group Profile Request - 6. Submit a request | Yes | FR-UA-042 | TC-UA-042.1, 042.2, 042.3 (4 cases) |
+| BRD 3.002.3.7 | p.9 | Submit a User Access Group Profile Request - 7. Add remarks | - | FR-UA-042 | TC-UA-042.1, 042.2, 042.3 (4 cases) |
+| BRD 3.002.3.8 | p.9 | Submit a User Access Group Profile Request - 8. Save remarks | - | FR-UA-042 | TC-UA-042.1, 042.2, 042.3 (4 cases) |
+| BRD 3.002.4 | p.9 | Submit a User Access Group Profile Request - d. Submit a User Access Group Profiles reactivation request | Yes | FR-UA-043 | TC-UA-043.1, 043.2 (2 cases) |
+| BRD 3.002.4.1 | p.9 | Submit a User Access Group Profile Request - 1. Create a request | Yes | FR-UA-043 | TC-UA-043.1, 043.2 (2 cases) |
+| BRD 3.002.4.2 | p.9 | Submit a User Access Group Profile Request - 2. Search existing group profile from the drop-down | - | FR-UA-043 | TC-UA-043.1, 043.2 (2 cases) |
+| BRD 3.002.4.3 | p.9 | Submit a User Access Group Profile Request - 3. Select approver/s from the drop-down | - | FR-UA-044 | TC-UA-044.1, 044.2, 044.3 (5 cases) |
+| BRD 3.002.4.4 | p.9 | Submit a User Access Group Profile Request - 4. Edit a drafted request | Yes | FR-UA-043 | TC-UA-043.1, 043.2 (2 cases) |
+| BRD 3.002.4.5 | p.9 | Submit a User Access Group Profile Request - 5. Cancel a drafted request | Yes | FR-UA-043 | TC-UA-043.1, 043.2 (2 cases) |
+| BRD 3.002.4.6 | p.9 | Submit a User Access Group Profile Request - 6. Submit a request | Yes | FR-UA-043 | TC-UA-043.1, 043.2 (2 cases) |
+| BRD 3.002.4.7 | p.9 | Submit a User Access Group Profile Request - 7. Add remarks | - | FR-UA-043 | TC-UA-043.1, 043.2 (2 cases) |
+| BRD 3.002.4.8 | p.9 | Submit a User Access Group Profile Request - 8. Save remarks | - | FR-UA-043 | TC-UA-043.1, 043.2 (2 cases) |
+| BRD 3.003.1 | p.9 | Generate Reports - a. Generate customized report | Yes | FR-UA-060 | TC-UA-060.1, 060.2, 060.3 (5 cases) |
+| BRD 3.003.1.1 | p.9 | Generate Reports - 1. User Access Report | Yes | FR-UA-060 | TC-UA-060.1, 060.2, 060.3 (5 cases) |
+| BRD 3.003.1.1 (2nd) | p.9 | Generate Reports - 1.1 User name | Yes | FR-UA-060 | TC-UA-060.1, 060.2, 060.3 (5 cases) |
+| BRD 3.003.1.2 | p.9 | Generate Reports - 1.2 Group profile | Yes | FR-UA-060 | TC-UA-060.1, 060.2, 060.3 (5 cases) |
+| BRD 3.003.1.3 | p.9 | Generate Reports - 1.3 Date created | Yes | FR-UA-060 | TC-UA-060.1, 060.2, 060.3 (5 cases) |
+| BRD 3.003.1.4 | p.9 | Generate Reports - 1.4 Date modified | Yes | FR-UA-060 | TC-UA-060.1, 060.2, 060.3 (5 cases) |
+| BRD 3.003.1.5 | p.9 | Generate Reports - 1.5 Created by | Yes | FR-UA-060 | TC-UA-060.1, 060.2, 060.3 (5 cases) |
+| BRD 3.003.1.6 | p.9 | Generate Reports - 1.6 Added / Modified / deactivated / reactivated by | Yes | FR-UA-060 | TC-UA-060.1, 060.2, 060.3 (5 cases) |
+| BRD 3.003.2 | p.9 | Generate Reports - 2. User Group Profile Report | Yes | FR-UA-061 | TC-UA-061.1, 061.2 (2 cases) |
+| BRD 3.003.2.1 | p.9 | Generate Reports - 2.1 Group profile name | Yes | FR-UA-061 | TC-UA-061.1, 061.2 (2 cases) |
+| BRD 3.003.2.2 | p.9 | Generate Reports - 2.2 Modules accessed under each group profile | Yes | FR-UA-061 | TC-UA-061.1, 061.2 (2 cases) |
+| BRD 3.003.2.3 | p.9 | Generate Reports - 2.3 Date created | Yes | FR-UA-061 | TC-UA-061.1, 061.2 (2 cases) |
+| BRD 3.003.2.4 | p.9 | Generate Reports - 2.4 Date modified | Yes | FR-UA-061 | TC-UA-061.1, 061.2 (2 cases) |
+| BRD 3.003.2.5 | p.9 | Generate Reports - 2.5 Created by | Yes | FR-UA-061 | TC-UA-061.1, 061.2 (2 cases) |
+| BRD 3.003.2.6 | p.9 | Generate Reports - 2.6 Added / Modified / deactivated / reactivated by | Yes | FR-UA-061 | TC-UA-061.1, 061.2 (2 cases) |
+| BRD 3.003.3 | p.9 | Generate Reports - 3. Group Profile Membership list | Yes | FR-UA-062 | TC-UA-062.1, 062.2 (2 cases) |
+| BRD 3.003.3.1 | p.9 | Generate Reports - 1. List of members under each profile | Yes | FR-UA-062 | TC-UA-062.1, 062.2 (2 cases) |
+| BRD 3.003.3.1.1 | p.9 | Generate Reports - 1.1 Group profile | Yes | FR-UA-062 | TC-UA-062.1, 062.2 (2 cases) |
+| BRD 3.003.3.1.2 | p.9 | Generate Reports - 1.2 User name | Yes | FR-UA-062 | TC-UA-062.1, 062.2 (2 cases) |
+| BRD 4.001.1 | p.9 | Log in as a System Administrator - Access the application using any BDO-issued device | - | FR-UA-001 | TC-UA-001.1, 001.2, 001.3, 001.4, 001.5 (7 cases) |
+| BRD 4.001.1.1 | p.9 | Log in as a System Administrator - Log in with a System Administrator user profile | - | FR-UA-001 | TC-UA-001.1, 001.2, 001.3, 001.4, 001.5 (7 cases) |
+| BRD 4.001.1.2 | p.9 | Log in as a System Administrator - Receive the inactivity warning (15 minutes) | - | FR-UA-002 | TC-UA-002.1, 002.2, 002.3, 002.4 (5 cases) |
+| BRD 4.001.1.3 | p.9 | Log in as a System Administrator - Receive a warning prior to the system-triggered log out (30 minutes) | - | FR-UA-002 | TC-UA-002.1, 002.2, 002.3, 002.4 (5 cases) |
+| BRD 4.002.1 | p.9 | Manage Users of the System - a. Define user profile / role | Yes | FR-UA-050, FR-UA-045 | TC-UA-045.1, 045.2, 045.3, 050.1, 050.2, 050.3 (7 cases) |
+| BRD 4.002.1.1 | p.9 | Manage Users of the System - 1. Create user profile / role for Requestor | Yes | FR-UA-050 | TC-UA-050.1, 050.2, 050.3 (3 cases) |
+| BRD 4.002.1.2 | p.9 | Manage Users of the System - 2. Create user profile / role for Approver | Yes | FR-UA-050 | TC-UA-050.1, 050.2, 050.3 (3 cases) |
+| BRD 4.002.1.3 | p.9 | Manage Users of the System - 3. Create user profile / role for Business Administrator | Yes | FR-UA-050 | TC-UA-050.1, 050.2, 050.3 (3 cases) |
+| BRD 4.002.2 | p.9 | Manage Users of the System - b. Define specific functionality or capability for a specific user profile / role | Yes | FR-UA-051 | TC-UA-051.1, 051.2, 051.3 (3 cases) |
+| BRD 4.002.2.1 | p.9 | Manage Users of the System - 1. Assign Enroll New User to a specific user profile / role | Yes | FR-UA-051 | TC-UA-051.1, 051.2, 051.3 (3 cases) |
+| BRD 4.002.2.2 | p.9 | Manage Users of the System - 2. Assign Modify Existing User function to a specific user profile / role | Yes | FR-UA-051 | TC-UA-051.1, 051.2, 051.3 (3 cases) |
+| BRD 4.002.2.3 | p.9 | Manage Users of the System - 3. Assign Deactivate User function to a specific user profile / role | Yes | FR-UA-051 | TC-UA-051.1, 051.2, 051.3 (3 cases) |
+| BRD 4.002.2.4 | p.9 | Manage Users of the System - 4. Assign Reactivate User function to a specific user profile / role | Yes | FR-UA-051 | TC-UA-051.1, 051.2, 051.3 (3 cases) |
+| BRD 4.002.2.5 | p.9 | Manage Users of the System - 5. Assign Apply Correction function to a specific user profile / role | Yes | FR-UA-051 | TC-UA-051.1, 051.2, 051.3 (3 cases) |
+| BRD 4.002.2.6 | p.9 | Manage Users of the System - 6. Assign Cancel a Request function to a specific user profile / role | Yes | FR-UA-051 | TC-UA-051.1, 051.2, 051.3 (3 cases) |
+| BRD 4.002.2.7 | p.10 | Manage Users of the System - 7. Assign View Request/s function to a specific user profile / role | Yes | FR-UA-051 | TC-UA-051.1, 051.2, 051.3 (3 cases) |
+| BRD 4.002.2.8 | p.10 | Manage Users of the System - 8. Assign Review and Approve Request/s function to a specific user profile / role | Yes | FR-UA-051 | TC-UA-051.1, 051.2, 051.3 (3 cases) |
+| BRD 4.002.2.9 | p.10 | Manage Users of the System - 9. Assign Submit a User Access Group Profiles Request function to a specific user profile / role | Yes | FR-UA-051 | TC-UA-051.1, 051.2, 051.3 (3 cases) |
+| BRD 4.002.2.10 | p.10 | Manage Users of the System - 10. [Assign] Generate Reports Request function to a specific user profile / role | Yes | FR-UA-051 | TC-UA-051.1, 051.2, 051.3 (3 cases) |
+| BRD 4.003.1 | p.10 | Generate Logs - a. Generate audit logs for compliance and audit purposes as needed | Yes | FR-UA-063, FR-UA-064 | TC-UA-063.1, 063.2, 063.3, 064.1, 064.2 (6 cases) |
 <!-- TRACE:END -->
 
-# Sign-off
+<!-- landscape -->
 
-By signing, BDOI confirms that this FRS describes the User Access Maintenance functions it expects in BIBS, and accepts the assumptions in section 10.1. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
+# Navigation
+
+This chapter shows how each user reaches the screens, and what every persona of BIBS sees. Signing BRD-11 signs the role matrix: the sidebar shows a screen only when one of the user's active group profiles holds its permission (section 3.2), so each persona sees a different menu. The tables follow the proposed role grants.
+
+## Screens of User Access Maintenance
+
+The 18 screens specified in chapter 13, with the menu path and the roles that can open them. A screen without its own menu entry (a record, a form, a dialog) is reached from the screen before it; its path ends with that screen.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: screen-index
+```
+
+## Screen flow
+
+How the screens link: from a list to its record, from a record action to the next screen, from the sign-in to the forced password change, and from the Users and Roles screens to the requests. The walkthroughs of chapter 14 follow these links with real steps.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: flow
+```
+
+<!-- portrait -->
+
+## Menu by persona
+
+For each persona, the SIT and UAT user of the seed data and the sidebar that user sees, section by section. The first eight tables are the personas of User Access Maintenance; the others are the personas of the persona suites of the other BRDs. The BRD column shows which BRD owns a section. The workbook of this set has the same table as one sheet per persona, with the review columns. The Auditor's and the System Administrator's menus are wide by design (read access for audit; administration).
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: menus
+```
+
+## Common screen elements
+
+Elements that behave the same on every User Access Maintenance screen are described once here and not repeated in the screen specifications.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: common
+```
+
+<!-- landscape -->
+
+# Screen specifications
+
+One specification per screen, grouped by area. Each gives:
+
+- **Purpose**, **who can open it** (personas and the permission), **navigation** (menu path and the other ways in) and the related **FRs**;
+- **screenshots** of the SIT environment with seed data; the numbered markers on the first screenshot match the **No.** column of the field table;
+- the **field table**: section of the screen, label as shown, type, length or format, mandatory (Y, N or the condition), source list or master, default, the statuses in which the field can be changed, the validation and the message shown when it fails, word for word;
+- the **actions table**: button, who sees it, when it is enabled, what happens, the resulting status and the notification sent;
+- the **business rules** of the screen with their FRs, the **expected outcome** and the **test cases** of the test plan that run on the screen.
+
+A message in angle brackets (`<request no>`) is completed by the system with the value shown. "The approval right" is the permission ACCESS_APPROVE; the other rights are named in section 3.2.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: screens
+```
+
+<!-- portrait -->
+
+# End-to-end walkthroughs
+
+Four walkthroughs follow user access through the screens, persona by persona, with what the user does, what the user sees and the result of each step. They use seed data only and run in order. They are the script of the SIT review sessions of the Start Here guide.
+
+## WT-A A new user from the enrolment request to the first sign-in with the menus of the persona
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-A
+```
+
+## WT-B A change and a revocation under four eyes, and a group-profile change approved in order and implemented
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-B
+```
+
+## WT-C Refused cases and the messages the user sees
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-C
+```
+
+## WT-D The evidence of access, and the insurer roles hidden from BDOI
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-D
+```
+
+<!-- landscape -->
+
+# Messages catalogue
+
+Every message a User Access Maintenance user can see, grouped by the screen or dialog that shows it, with its code, its type and what the user does. The texts are quoted exactly as the screens show them.
+
+- **Validation**: shown on the screen while the user fills in a field or before the form is sent.
+- **Error**: the system refused the action; nothing was saved. The code is shown under the message as the Reference.
+- **Warning**: the action is possible, but the user should check something first.
+- **Confirmation** and **Information**: the outcome of an action, or a hint on the screen.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: messages
+```
+
+# Notifications catalogue
+
+The in-app notifications, e-mails and alerts that User Access Maintenance sends: what triggers each, who receives it and what it contains. The temporary password of a new user is never sent by e-mail; it is shown once to the approver.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: notifications
+```
+
+<!-- portrait -->
+
+# Document outputs
+
+User Access Maintenance produces no letter. Its documents are the five user access reports, downloaded from the report runner as PDF, Excel or CSV with the BDO Insure header (report name, generated by, the date coverage and the date and time generated, BRD p.18), and the Excel export of the User Access Matrix. For each: the layout, the formats, the screen that produces it, where every field comes from and the first page as generated from seed data.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: documents
+```
+
+# Upload screens
+
+User Access Maintenance has one bulk upload: the Bulk Request (SCR-UA-09), which turns a file of user requests into a batch decided by an approver (FR-UA-019). The file is uploaded in the upload wizard of the Bulk Request screen: download the template, fill in one row per user, upload the file, review the check of every row (the rows in error are listed with their message and can be downloaded as an error file), correct and upload again, then save the valid rows as the draft lines of a batch. The batch is submitted from Bulk Request Batch (SCR-UA-10). The upload needs the bulk upload right besides the enrolment right (section 10.4).
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: uploads
+```
+
+The users of go-live are loaded with this upload, from the template CI-01 of chapter 19 (users are out of the scope of the data migration, DMQ30).
+
+<!-- landscape -->
+
+# Configuration inputs the business provides
+
+User Access Maintenance is a setup object of Drop 0: before any other BRD is tested with its real users, BDOI provides the users and their group profiles, the role-to-permission matrix, the approvers and the approval limits, the separation-of-duties rules, the password, session and sign-in values, and the lists of values. The users are loaded with the bulk request; the matrix is implemented by group-profile requests; the parameters are set on System Parameters. Each input has a template in the workbook of configuration input templates of this set, with one fictitious example row.
+
+```pack
+plugin: ../signoff/config_inputs.py
+source: pack/config_inputs.yaml
+render: summary
+```
+
+```pack
+plugin: ../signoff/config_inputs.py
+source: pack/config_inputs.yaml
+render: templates
+```
+
+# Cross-BRD dependencies and interface contract
+
+User Access Maintenance is the source of the users, group profiles and permissions that every BIBS module checks, and of the menus of every persona; it takes lists and the approval list from New Business, and it has two identity integrations owned by BDOI IT. The contract below lists each exchange: the BRD or system, the direction, what is exchanged, when and how, and who owns the data. Chapter 7 describes the interfaces with the external systems.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: contract
+```
+
+<!-- portrait -->
+
+# Sign-off and change control
+
+## What is signed
+
+The business sign-off covers the release set BRD-11 User Access Maintenance v2.0:
+
+<!-- table: widths=6,11.6 caption="Documents of the release set" -->
+| Document | Content |
+|---|---|
+| Start Here guide | The map of the set, who reads what, the steps and the dates |
+| Sign-off Pack Guide deck | Purpose, approach, the module at a glance, caveats, entry and exit criteria, change control |
+| This FRS v2.0 | Requirements (chapters 1-11), the business view of the system (chapters 12-21) and the proposed rules for confirmation (chapter 22) |
+| Sign-off workbook v2.0 | The screens, fields, actions, rules, messages, notifications, contract and the menu of every persona of this FRS, one row each, with the BU review columns |
+| Test plan v2.0 | The test cases traced to the FRs and to the screens of chapter 13 |
+| Configuration input templates | The templates of chapter 19 |
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: counts
+```
+
+## How the review is recorded
+
+Each unit records its review in the sign-off workbook: Accept, Change requested or Comment on each row of the screen catalogue, field register, business rules, messages and the menu sheets of its personas, with the comment, the reviewer and the date. The project team answers every Change requested row before sign-off: either the row is corrected in the next version of the set, or the change is raised as a change request (below) and the row is signed as specified.
+
+## What each signatory confirms
+
+<!-- table: widths=5.2,12.4 caption="Signatories and what they sign" -->
+| Signatory | Confirms |
+|---|---|
+| Business owner (Product Owner, Marketing Business System) | The whole set: functions, screens, navigation, messages and the configuration inputs |
+| Process owner, User Access Maintenance (Business Administration) | The requests, approvals, group-profile requests, bulk requests and reports, and the templates CI-01, CI-03 and CI-06 |
+| BDOI Information Security | The role matrix (the menu of every persona, chapter 12, and template CI-02), the separation-of-duties rules (chapter 13 and template CI-04), the second approval of privileged changes, the emergency path, the password, lock-out and session values (template CI-05) and the audit log |
+| BDOI IT | The sign-in and identity integration assumptions: local sign-in with the directory port until EIAM on Entra ID is specified, and every access change as a BIBS request until the UIDM-ISC option is chosen (chapter 7, contract lines IC-08 and IC-09; these integrations are owned by BDOI IT); the System Administrator functions |
+
+## What signing freezes
+
+Signing this release set freezes, for User Access Maintenance:
+
+- the screens and their navigation (chapters 12 and 13), the fields with their order, labels, types, mandatory rules, lists and validations;
+- the actions with their conditions and resulting statuses, the separation-of-duties rules and the other business rules;
+- the messages (chapter 15), the notifications (chapter 16) and the reports (chapter 17);
+- the upload template (chapter 18), the configuration input templates (chapter 19) and the interface contract with the other BRDs (chapter 20).
+
+The content of the configuration is not frozen: the group profiles and their permissions, the users, the approvers, the list values and the parameters (password, session, working hours) are maintained in the system through requests and audited changes, without a change request. The menu of a persona therefore follows its group profiles: a change to a profile made by an implemented group-profile request is not a change to this signed set, and the menu tables are refreshed in its next version.
+
+## Change after sign-off
+
+A change to anything frozen is raised in the Change Management Register. The request states the screen, field, rule or message concerned, the reason and the business priority. The project team assesses it with its mandays, including its effect on the other BRDs through the interface contract of chapter 20, and the owners of every BRD it touches approve it; a change to a separation-of-duties rule or to the sign-in is also approved by BDOI Information Security. An approved change is delivered as a new version of this release set (v2.1, v2.2 and so on), and the changed rows are reviewed again.
+
+## Proposed rules for confirmation
+
+Chapter 22 lists the proposed business rules and screen behaviour that differ from the BRD or need a decision of BDOI. BDOI Information Security and BDOI IT record their decisions on the items they own with the review; a decision that changes a screen, field, rule or message is applied in the next version of this set.
+
+<!-- pagebreak -->
+
+## Signatures
+
+By signing, BDOI confirms that this FRS and the sign-off workbook describe the User Access Maintenance functions, screens, menus and messages it expects in BIBS, accepts the assumptions in section 10.1 and records its decisions on the items of chapter 22. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
 
 ```signoff
 rows:
   - {name: "", role: "Product Owner, Marketing Business System", organisation: BDOI}
-  - {name: "", role: "Process Owner, User Access Maintenance", organisation: BDOI}
-  - {name: "", role: "Unit Head, Combank / Corbank Marketing and Corporate Processing", organisation: BDOI}
-  - {name: "", role: "Head, Comptrollership", organisation: BDOI}
-  - {name: "", role: "Program Manager, ES-BPS", organisation: BDO Unibank ESG}
+  - {name: "", role: "Process Owner, User Access Maintenance (Business Administration)", organisation: BDOI}
+  - {name: "", role: "Head, BDOI Information Security", organisation: BDOI}
+  - {name: "", role: "Head, BDOI IT", organisation: BDOI}
+  - {name: "", role: "Program Manager, Business Project Services", organisation: BDO Unibank ESG}
   - {name: "", role: Project Manager, organisation: iorta TechNXT}
 ```
+
+<!-- pagebreak -->
+
+# Proposed business rules and clarifications for confirmation
+
+The table lists each point where the proposed screen or rule differs from the BRD text, or where BIBS needs a decision of BDOI, BDOI Information Security or BDOI IT to complete the rule. Each item names the proposed behaviour, the reason and the decision requested. The decisions are recorded with the review of this set (section 21.6); a decision that changes a screen, field, rule or message is applied in the next version of the set, and an answer that only sets a value (a list, a parameter) is applied as configuration.
+
+<!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
+| Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
+|---|---|---|---|---|
+| CLR-UA-01 | Directory sign-in (UAM-NFR-11, 17, 33; FR-UA-003) | Local sign-in (AUTH_MODE = LOCAL) with the Windows ID captured on every user. The directory mode is switched on when the interface is supplied. BDOI named EIAM on Microsoft Entra ID as the target (Drop 0). | The tenant, claims and session rules of EIAM are not yet given (IQ04, UQ04). | BDOI IT to specify the EIAM sign-in: tenant, claims and session life (IQ04). |
+| CLR-UA-02 | External access-control list (UAM-NFR-12; FR-UA-003) | Roles and permissions are kept in BIBS; there is no authorisation through an external access-control list. | The external ACL is not specified (UQ14). | Confirm that authorisation stays in BIBS, or specify the external ACL (UQ14). |
+| CLR-UA-03 | Provisioning from UIDM-ISC (p.6 request rule; Drop 0; FR-UA-010) | Every access change is a BIBS request under four eyes. The reports give the user and profile lists for access certification. | BDOI named UIDM-ISC for joiner, mover and leaver provisioning; the option is open (IQ05). | BDOI IT to choose the UIDM-ISC option: accounts only, accounts and roles, or aggregation only (IQ05). |
+| CLR-UA-04 | External (portal) users (decision D7; FR-UA-011, 013, 014) | The user type External is not offered while no portal is installed (UAM_EXTERNAL_USERS = false), and a request of that type is refused. Setting the parameter to true, with the second approval of Information Security, offers it again. | BDOI drops the EB portal (drop plan item 2.4, IQ22). | Confirm that external users stay switched off. |
+| CLR-UA-05 | Business unit group and user level (1.002.1.1.1, UAM-NFR-15; FR-UA-011, 052) | Both are captured on the user; their lists stay empty until BDOI gives the values, and a value is not checked against a list until then. | The values are not in the BRD (UQ05). | Give the business unit groups and user levels (UQ05). |
+| CLR-UA-06 | Effective date of an enrolment (UAM-NFR-14; FR-UA-020) | A scheduled enrolment creates the user on its date with a password that is never shown; the System Administrator resets it and the user changes it at the first sign-in. | The temporary password is shown only once, to the approver of an immediate enrolment. | Confirm the handling of scheduled enrolments. |
+| CLR-UA-07 | Deactivation of a group profile with members (3.002.3; FR-UA-042) | A profile with members can be deactivated; the members lose its screens when the request is implemented, are listed on the request and are each told (in the app and by e-mail). | The BRD does not say whether members must be moved first (UQ16). | Decide whether members must be moved before a deactivation (UQ16). |
+| CLR-UA-08 | Dormant accounts (information security practice; FR-UA-006) | A daily deactivation of users with no sign-in for 90 days, with a notice 7 days before; the System Administrator profile is exempt. | The period and the notice are proposals; Information Security has not given its values. | Information Security to confirm the dormancy period and the notice (template CI-05). |
+| CLR-UA-09 | One session per device (UAM-NFR-35; FR-UA-004) | The session log records every session; one session per device is not enforced. | The rule is not specified (UQ09). | Decide whether one session per device must be enforced (UQ09). |
+| CLR-UA-10 | Module and task names in the reports (3.003; FR-UA-060, 061) | The User Group Profile Report shows the module as the permission area and the task as the permission name. The report parameters Group Profile and Module are offered as lists. | The module and task names of sample B are not defined (UQ11). | Confirm the module and task names (UQ11). |
+| CLR-UA-11 | User Access Matrix for requesters (4.002.2.7; FR-UA-051) | The Requestor and the Second Approver do not open the User Access Matrix; the matrix serves the request, approval, role management and audit rights. | The BRD's view function does not name the matrix. | Decide whether requesters should read the User Access Matrix. |
+| CLR-UA-12 | Group-profile changes applied at implementation (UQ03; FR-UA-041, 045) | An approved change of group-profile permissions is applied when the System Administrator implements it, for every module, including Product Maintenance (BRD-3 PMADD05). | The BRD-11 diagram (p.6) has the System Administrator implement group-profile changes (PQ17 answered). | Confirm the implementation step for every module (UQ03). |
+| CLR-UA-13 | Temporary access with an end date (UQ06; FR-UA-017, 020) | Access is given until it is removed by a request; there is no end date on a group profile of a user. | Temporary access is not specified in the BRD (UQ06). | Decide whether temporary access with an end date is needed (UQ06). |
+| CLR-UA-14 | Out-of-hours flag on public holidays (NFR 11; FR-UA-034) | A request submitted or approved outside UAM_WORKING_HOURS is flagged for second approval; the flag is evaluated at submission and again at approval. Public holidays are not treated as out of hours. | The working hours have no holiday calendar. | Decide whether public holidays count as out of hours. |
+| CLR-UA-15 | Users who already hold both profiles of a new rule (FR-UA-053) | A new separation-of-duties rule is checked on later requests; users who already hold both profiles are not changed and are found with the User Access Report. | Existing access is changed only through requests. | Information Security to confirm that it reviews the report after each new rule and raises the requests. |
+| CLR-UA-16 | Bulk requests (1.009; FR-UA-019) | A bulk request is decided as a whole. | The maximum number of rows, line-by-line decisions and mixed actions are not given (UQ10). | Give the bulk settings (UQ10). |
+| CLR-UA-17 | Access from BDO-issued devices only (1.001.1; FR-UA-001) | Access only from BDO-issued devices is enforced by the BDO network and device policy, not by BIBS. | BIBS cannot see the device a browser runs on. | BDOI IT to confirm the network and device policy that enforces it. |
+
+# Appendix: Screen standards
+
+The User Access Maintenance screens follow the screen standards agreed with BDOI on 26-Sep-2026. They are listed here so that the business units can check the screenshots against them; they are not repeated in each screen specification.
+
+<!-- table: widths=4.2,13.4 caption="Screen standards of BIBS" -->
+| Area | Standard |
+|---|---|
+| Record pages | Back arrow and breadcrumb, title, then the record header with the reference chips, status pill, flags and key facts. Page actions on the right in one order: secondary, primary, and the destructive action last and apart. |
+| Status pills | One size and one colour per state group, never wrapped; labels over 18 characters end with an ellipsis and show the full label in the tooltip. |
+| Tables | Header row in BDO blue that stays in view; text left, amounts right with two decimals and thousand separators, dates centred in one format; one value per cell with at most one muted line; a dash for an empty value; "Showing x to y of n results" with page numbers. |
+| Dates and numbers | One date picker; dates entered and shown as dd-MMM-yyyy, times as dd-MMM-yyyy HH:mm (Philippine time); amounts with two decimals. |
+| Wording | Business wording only: no internal requirement or question references and no internal codes on screens, in messages or in documents; list values shown by their label; users shown by their names; short placeholders; format hints only, other guidance in the tooltip of the label. |
+| Forms | Labels above the fields, fields of one height on one line, required fields marked, the error under the field, and the actions at the top right of the form page or at the bottom right of a dialog (Cancel, then the main action). |
+| Uploads | Template download, drop zone with the accepted types and size; the check of every row before anything is saved; the rows in error with their message and an error file. |
+| Messages | Field errors under the field; a business refusal with its message and a support reference; a short confirmation after success. |
+| Confirmations | A dialog naming the record and the effect; a text where the process needs one (return, rejection, cancellation); destructive actions confirmed with the red button. |
+| Four eyes | Nothing changes access until a second person approves; the screens offer a decision only to the users who may take it. |
+| Notifications | The bell opens the panel grouped by day, with Mark Read, Mark All Read and View All; the Notifications page lists every notice with filters. |
+
+The project team checks each screen against these standards before UAT and records the result in the screen readiness checklist. A screen found not to follow a standard during the review is recorded as Change requested in the sign-off workbook and corrected before UAT without a change request.

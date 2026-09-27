@@ -34,7 +34,7 @@ function wrap(children: ReactNode) {
     passwordChange: null,
     passwordChanged: () => undefined,
   };
-  const toast = { success: vi.fn(), error: vi.fn() };
+  const toast = { success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn() };
   return (
     <QueryClientProvider client={queries}>
       <AuthContext.Provider value={auth}>

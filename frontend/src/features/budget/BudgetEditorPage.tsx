@@ -17,6 +17,7 @@ import type { GridRow } from './BudgetGrid';
 import { BudgetTools } from './BudgetTools';
 import { MONTHS, sum } from './budgetMath';
 import { SpreadModal } from './SpreadModal';
+import { Notice } from '@/components/ui/Notice';
 
 let nextKey = 1;
 
@@ -144,7 +145,9 @@ export default function BudgetEditorPage() {
       />
       <ErrorAlert error={budget.error ?? save.error ?? submit.error} />
       {current?.rejectionReason && (
-        <div className="alert warning">Rejected: {current.rejectionReason}</div>
+        <Notice tone="warning" title="Rejected">
+          {current.rejectionReason}
+        </Notice>
       )}
       <Card
         title={`Budget lines · annual total ${formatAmount(sum(grid.flatMap((r) => r.months)))}`}

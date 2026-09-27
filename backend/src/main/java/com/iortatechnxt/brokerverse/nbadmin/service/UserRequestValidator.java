@@ -1,19 +1,25 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
+import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedUserData;
+import com.iortatechnxt.brokerverse.nbadmin.domain.SodRule;
+import com.iortatechnxt.brokerverse.nbadmin.domain.SodRuleRepository;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
  * Full checks of a request about an internal user on submission and again at approval (BRD
  * 1.002-1.005; FR-UA-011 to FR-UA-014): the user ID format for a new user (USER_ID_PATTERN), the
  * user exists or not, is enabled or not, the group profiles exist and are active, the Windows ID is
- * free, a modification changes something, and nobody requests a change of their own roles.
+ * free, a modification changes something, nobody requests a change of their own roles, and the
+ * group profiles break no active separation-of-duties rule (V1065).
  */
 @Component
 @Transactional(readOnly = true)
@@ -36,6 +43,7 @@ public class UserRequestValidator {
   private final RoleRepository roles;
   private final AccessSettings settings;
   private final CurrentUser currentUser;
+  private final SodRuleRepository sodRules;
 
   /**
    * Creates the validator.
@@ -44,12 +52,15 @@ public class UserRequestValidator {
    * @param roles roles
    * @param settings parameters (user ID format)
    * @param currentUser current user (the requester)
+   * @param sodRules separation-of-duties rules
    */
   public UserRequestValidator(
       AppUserRepository users,
       RoleRepository roles,
       AccessSettings settings,
-      CurrentUser currentUser) {
+      CurrentUser currentUser,
+      SodRuleRepository sodRules) {
+    this.sodRules = sodRules;
     this.users = users;
     this.roles = roles;
     this.settings = settings;
@@ -117,7 +128,7 @@ public class UserRequestValidator {
     String pattern = settings.userIdPattern();
     if (!pattern.isBlank() && !matches(pattern, username)) {
       throw new BusinessRuleException(
-          "ACCESS_USER_ID_FORMAT", "The user ID must follow the format " + pattern);
+          "ACCESS_USER_ID_FORMAT", "The user ID must be " + settings.userIdFormatText());
     }
     if (c.fullName() == null || c.fullName().isBlank()) {
       throw new BusinessRuleException("ACCESS_FULL_NAME", "Enter the full name of the new user");
@@ -155,9 +166,43 @@ public class UserRequestValidator {
         .ifPresent(
             r -> {
               throw new BusinessRuleException(
-                  "ACCESS_ROLE_INACTIVE", "Group profile " + r.getCode() + " is not active");
+                  "ACCESS_ROLE_INACTIVE", "Group profile " + r.getName() + " is not active");
             });
-    return new TreeSet<>(c.roleCodes());
+    Set<String> codes = new TreeSet<>(c.roleCodes());
+    requireNoSodConflict(codes, found);
+    return codes;
+  }
+
+  /**
+   * Refuses group profiles that one user may not hold together (an active separation-of-duties
+   * rule).
+   *
+   * @param codes group profiles the user would hold
+   * @param found the group profiles, for their names
+   */
+  private void requireNoSodConflict(Set<String> codes, List<Role> found) {
+    if (codes.size() < 2) {
+      return;
+    }
+    Map<String, String> names =
+        found.stream().collect(Collectors.toMap(Role::getCode, Role::getName, (a, b) -> a));
+    Function<String, String> name = code -> names.getOrDefault(code, code);
+    for (SodRule rule : sodRules.findByRecordStatus(RecordStatus.ACTIVE)) {
+      if (rule.forbids(codes)) {
+        String profile = name.apply(rule.getProfileA());
+        String otherProfile = name.apply(rule.getProfileB());
+        String ruleCode = rule.getRuleCode();
+        throw new BusinessRuleException(
+            "ACCESS_SOD_CONFLICT",
+            "One user may not hold both "
+                + profile
+                + " and "
+                + otherProfile
+                + " (separation-of-duties rule "
+                + ruleCode
+                + ")");
+      }
+    }
   }
 
   private void requireFreeWindowsId(RequestedUserData data, AppUser user) {

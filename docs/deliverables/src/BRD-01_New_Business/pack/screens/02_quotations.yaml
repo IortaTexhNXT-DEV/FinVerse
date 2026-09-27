@@ -45,7 +45,7 @@ screens:
     route: /quotations/new
     also: [/quotations/:id/edit]
     purpose: >-
-      A five-step wizard that builds a package quotation for a client or prospect: client, product and terms, risk
+      A five-step wizard that prepares a package quotation for a client or prospect: client, product and terms, risk
       items with their risk groups, the premium computed live with the rates in force, and a review before submission
       for approval. A change after submission opens the next version.
     entry:
@@ -60,7 +60,7 @@ screens:
       - {state: error, user: ao, fill: quotation_no_items, click: "^next$", caption: "Message when the user leaves Risk Items without an item"}
     fields:
       - "1. Client | Client or prospect | Look-up | Type 2 or more characters of a code or name; shows the status | Y | Client master (prospects allowed) | From the client page or request, when opened from there | Draft (fixed once saved) | A client or prospect is chosen | Select the client or prospect"
-      - "1. Client | Market segment | Drop-down | - | N | List of values MARKET_SEGMENT | The client's segment | Draft | The product must be offered to the segment | Product <code> is not offered to segment <segment>"
+      - "1. Client | Market segment | Drop-down | - | Y at submission | List of values MARKET_SEGMENT | The client's segment | Draft | The product must be offered to the segment; required to submit | Product <code> is not offered to segment <segment> / Choose the market segment on the Client step before you submit the quotation"
       - "1. Client | Source channel | Drop-down | - | N | List of values SOURCE_CHANNEL | E-mail, or the request's channel | Draft | - | -"
       - "2. Product & Terms | Product | Drop-down | Code – name; (non-package) marked | Y | Active products of the segment (BRD-3 catalogue) | Blank, or the request's product | Draft (fixed once saved) | The product cannot change after the first save | Select the product / The product of a quotation cannot change"
       - "2. Product & Terms | Insurer | Drop-down | - | N | Active insurers (Insurer master) | To be advised | Draft | - | -"

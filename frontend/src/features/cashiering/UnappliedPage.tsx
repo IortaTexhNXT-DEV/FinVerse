@@ -11,15 +11,19 @@ import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { EmptyState } from '@/components/ui/EmptyState';
+import { OriginBadge } from '@/components/ui/OriginBadge';
+import { OriginFilter } from '@/components/ui/OriginFilter';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
+import type { RecordOriginKind } from '@/api/types';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, humanize } from '@/utils/format';
 import { cashieringApi } from './cashieringApi';
 import type { BulkResult, UnappliedItem, UnappliedTab } from './cashieringApi';
+import { unappliedOrigin } from './cashieringQueueTypes';
 
 const TABS: readonly { id: UnappliedTab; label: string }[] = [
   { id: 'UNAPPLIED', label: 'Unapplied' },
@@ -37,8 +41,10 @@ const COLUMNS: Column<UnappliedItem>[] = [
     header: 'Reference',
     render: (u) => (
       <>
-        <strong>{u.reference}</strong>
-        <span className="cell-sub">{humanize(u.origin)}</span>
+        <strong>{u.reference}</strong> <OriginBadge record={unappliedOrigin(u)} />
+        <span className="cell-sub">
+          {u.legacyArNo ? `${humanize(u.origin)} · legacy AR ${u.legacyArNo}` : humanize(u.origin)}
+        </span>
       </>
     ),
   },
@@ -119,7 +125,8 @@ function BulkButton({
 /**
  * Unapplied Payments workbench (CSHID.024/025): payments that could not be applied, by stage.
  * The cashier assigns a disposition (apply, refund, reclass, transfer), submits it, and the
- * approver processes it; selected items are submitted or approved in bulk.
+ * approver processes it; selected items are submitted or approved in bulk. Unapplied payments
+ * carried from legacy at cut-over carry a LEGACY badge and the Origin filter separates them.
  */
 export default function UnappliedPage() {
   const companyId = useCompanyId();
@@ -128,11 +135,12 @@ export default function UnappliedPage() {
   const selection = useRowSelection();
   const [tab, setTab] = useState<UnappliedTab>('UNAPPLIED');
   const [q, setQ] = useState('');
+  const [origin, setOrigin] = useState<RecordOriginKind>();
   const [page, setPage] = useState(0);
   const [results, setResults] = useState<BulkResult>();
   const list = useQuery({
-    queryKey: ['cashiering', 'unapplied', companyId, tab, q, page],
-    queryFn: () => cashieringApi.unapplied(companyId, tab, q, page),
+    queryKey: ['cashiering', 'unapplied', companyId, tab, q, origin, page],
+    queryFn: () => cashieringApi.unapplied(companyId, tab, q, page, origin),
     enabled: companyId > 0,
   });
   const bulk = useMutation({
@@ -172,6 +180,13 @@ export default function UnappliedPage() {
             setPage(0);
           }}
         >
+          <OriginFilter
+            value={origin}
+            onChange={(o) => {
+              setOrigin(o);
+              setPage(0);
+            }}
+          />
           <BulkButton
             tab={tab}
             count={selection.keys.length}

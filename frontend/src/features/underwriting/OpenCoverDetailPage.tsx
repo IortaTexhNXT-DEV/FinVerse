@@ -15,7 +15,7 @@ import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDate, today } from '@/utils/format';
+import { formatAmount, formatDate, formatPeriod, today } from '@/utils/format';
 import { DateField, NumberField, TextField } from './FormFields';
 import { round2 } from './premiumMath';
 import { RiskEditor } from './RiskEditor';
@@ -38,7 +38,7 @@ function Summary({ cover, certificates }: Readonly<{ cover: OpenCover; certifica
       <Kpi
         label="Client"
         value={cover.customerName}
-        hint={`${formatDate(cover.periodFrom)} – ${formatDate(cover.periodTo)}`}
+        hint={formatPeriod(cover.periodFrom, cover.periodTo)}
       />
       <Kpi
         label="Limit per shipment"

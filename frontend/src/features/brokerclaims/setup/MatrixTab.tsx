@@ -13,6 +13,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { claimsSetupApi } from './api';
 import type { MatrixRow } from './api';
 import { UserName } from '@/components/ui/UserName';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 function AddRowDialog({
   busy,
@@ -179,22 +180,33 @@ export function MatrixTab() {
             render: (r) => (
               <span className="tag-list">
                 {r.status === 'PENDING_AUTHORIZATION' && r.maker?.toLowerCase() !== me && (
-                  <Button
+                  <ConfirmButton
                     size="sm"
                     variant="ghost"
-                    onClick={() => action.mutate(() => claimsSetupApi.authorizeRow(r.id))}
+                    confirm={{
+                      title: 'Authorize Matrix Row',
+                      record: r.statusLabel,
+                      effect: 'The row takes effect in the claims authority matrix.',
+                    }}
+                    onConfirm={() => action.mutateAsync(() => claimsSetupApi.authorizeRow(r.id))}
                   >
                     Authorize
-                  </Button>
+                  </ConfirmButton>
                 )}
                 {r.status !== 'INACTIVE' && (
-                  <Button
+                  <ConfirmButton
                     size="sm"
                     variant="ghost"
-                    onClick={() => action.mutate(() => claimsSetupApi.deactivateRow(r.id))}
+                    confirm={{
+                      title: 'Deactivate Matrix Row',
+                      record: r.statusLabel,
+                      effect: 'The row no longer applies in the claims authority matrix.',
+                      destructive: true,
+                    }}
+                    onConfirm={() => action.mutateAsync(() => claimsSetupApi.deactivateRow(r.id))}
                   >
                     Deactivate
-                  </Button>
+                  </ConfirmButton>
                 )}
               </span>
             ),

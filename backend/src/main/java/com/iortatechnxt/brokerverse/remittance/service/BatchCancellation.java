@@ -173,7 +173,8 @@ public class BatchCancellation {
                 today,
                 ref,
                 invoice,
-                RemittancePostings.lineAmounts(line.getAmounts(), -1),
+                RemittancePostings.lineAmounts(
+                    line.getAmounts(), -1, invoice.getLegacy().ledgerContext()),
                 "Cancelled DV - remittance " + line.getInvoiceNo() + " " + batch.getBatchNo()));
     RemittanceAmounts a = line.getAmounts();
     Map<LedgerComponent, BigDecimal> moved = new EnumMap<>(LedgerComponent.class);

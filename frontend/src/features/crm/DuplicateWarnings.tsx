@@ -4,6 +4,10 @@ import { Link } from 'react-router-dom';
 import { clientsApi } from '@/api/clients';
 import type { DuplicateMatch, DuplicateQuery } from '@/api/clients';
 import { DUPLICATE_KEY_LABELS } from './clientForm';
+import { Notice } from '@/components/ui/Notice';
+import { DataTable } from '@/components/ui/DataTable';
+import type { Column } from '@/components/ui/DataTable';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 
 /** A value that follows its input after a pause in typing. */
 function useDebounced(value: string, delayMs: number): string {
@@ -15,15 +19,43 @@ function useDebounced(value: string, delayMs: number): string {
   return settled;
 }
 
-function MatchLine({ match }: Readonly<{ match: DuplicateMatch }>) {
+const MATCH_COLUMNS: Column<DuplicateMatch>[] = [
+  {
+    key: 'code',
+    header: 'Client Code',
+    kind: 'code',
+    render: (m) => (
+      <Link to={`/crm/clients/${String(m.clientId)}`} target="_blank">
+        {m.code}
+      </Link>
+    ),
+  },
+  { key: 'name', header: 'Name', render: (m) => m.displayName },
+  {
+    key: 'status',
+    header: 'Status',
+    kind: 'status',
+    render: (m) => <StatusBadge status={m.status} />,
+  },
+  {
+    key: 'same',
+    header: 'Same',
+    render: (m) => m.keys.map((k) => DUPLICATE_KEY_LABELS[k] ?? k).join(', '),
+  },
+];
+
+/** The matching clients as a table. */
+function MatchTable({
+  matches,
+  caption,
+}: Readonly<{ matches: DuplicateMatch[]; caption: string }>) {
   return (
-    <li>
-      <Link to={`/crm/clients/${String(match.clientId)}`} target="_blank">
-        {match.code}
-      </Link>{' '}
-      {match.displayName} ({match.status.toLowerCase()}) — same{' '}
-      {match.keys.map((k) => DUPLICATE_KEY_LABELS[k] ?? k).join(', ')}
-    </li>
+    <DataTable
+      caption={caption}
+      columns={MATCH_COLUMNS}
+      rows={matches}
+      rowKey={(m) => m.clientId}
+    />
   );
 }
 
@@ -54,25 +86,20 @@ export function DuplicateWarnings({
   return (
     <div className="stack" aria-live="polite">
       {blocked && (
-        <div className="alert danger" role="alert">
-          <strong>This client already exists.</strong> Open the existing record instead of creating
-          a duplicate:
-          <ul className="duplicate-list">
-            {hard.map((m) => (
-              <MatchLine key={m.clientId} match={m} />
-            ))}
-          </ul>
-        </div>
+        <>
+          <Notice tone="error" title="This client already exists">
+            Open the existing record instead of creating a duplicate.
+          </Notice>
+          <MatchTable matches={hard} caption="Existing clients" />
+        </>
       )}
       {soft.length > 0 && (
-        <div className="alert warning" role="status">
-          <strong>Possible duplicates.</strong> Check that these are different clients:
-          <ul className="duplicate-list">
-            {soft.map((m) => (
-              <MatchLine key={m.clientId} match={m} />
-            ))}
-          </ul>
-        </div>
+        <>
+          <Notice tone="warning" title="Possible duplicates">
+            Check that these are different clients.
+          </Notice>
+          <MatchTable matches={soft} caption="Possible duplicates" />
+        </>
       )}
     </div>
   );

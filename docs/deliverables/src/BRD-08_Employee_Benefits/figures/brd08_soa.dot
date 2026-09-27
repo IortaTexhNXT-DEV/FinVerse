@@ -10,8 +10,8 @@ digraph eb_soa {
   REJECTED  [label="REJECTED\n(reason)", fillcolor="@AMBER_BG"];
   RELEASED  [label="RELEASED\nclient HR, Collection", fillcolor="@SUCCESS_BG", color="@SUCCESS"];
 
-  RECEIVED -> VALIDATED [label="  validate"];
-  RECEIVED -> REJECTED [label="  reject"];
-  VALIDATED -> RELEASED [label="  release"];
+  RECEIVED -> VALIDATED [label="  Validate"];
+  RECEIVED -> REJECTED [label="  Reject"];
+  VALIDATED -> RELEASED [label="  Release"];
   { rank=same; VALIDATED; REJECTED; }
 }

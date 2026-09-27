@@ -16,6 +16,7 @@ import { RuleHeaderFields } from './RuleHeaderFields';
 import { RuleLinesEditor } from './RuleLinesEditor';
 import { components, newRule, roles, toRuleInput, validateRule } from './ruleModel';
 import { useAccountingLookups } from './useAccountingLookups';
+import { Notice } from '@/components/ui/Notice';
 
 interface EditorProps {
   existing: Rule | undefined;
@@ -83,13 +84,7 @@ function RuleEditor({ existing, initial }: Readonly<EditorProps>) {
       />
       <ErrorAlert error={save.error} />
       {errors.length > 0 && (
-        <div className="alert danger" role="alert">
-          <ul>
-            {errors.map((e) => (
-              <li key={e}>{e}</li>
-            ))}
-          </ul>
-        </div>
+        <Notice tone="error" title="Correct the rule before saving" items={errors} />
       )}
       <Card title="Rule and conditions">
         <RuleHeaderFields

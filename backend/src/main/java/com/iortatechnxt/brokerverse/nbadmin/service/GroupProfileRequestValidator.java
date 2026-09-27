@@ -107,7 +107,7 @@ public class GroupProfileRequestValidator {
       requireDeactivatable(role);
     } else if (role.isActive()) {
       throw new BusinessRuleException(
-          "ACCESS_ROLE_ALREADY_ACTIVE", PROFILE + code + " is already active");
+          "ACCESS_ROLE_ALREADY_ACTIVE", PROFILE + role.getName() + " is already active");
     }
     return AccessRequestContent.groupProfile(
         c.type(), new RolePermissionChange(code, Set.of(), Set.of()), null, c.justification());
@@ -116,11 +116,11 @@ public class GroupProfileRequestValidator {
   private static void requireDeactivatable(Role role) {
     if (SYSADMIN.equals(role.getCode())) {
       throw new BusinessRuleException(
-          "ACCESS_ROLE_PROTECTED", PROFILE + SYSADMIN + " cannot be deactivated");
+          "ACCESS_ROLE_PROTECTED", PROFILE + role.getName() + " cannot be deactivated");
     }
     if (!role.isActive()) {
       throw new BusinessRuleException(
-          "ACCESS_ROLE_ALREADY_INACTIVE", PROFILE + role.getCode() + " is already inactive");
+          "ACCESS_ROLE_ALREADY_INACTIVE", PROFILE + role.getName() + " is already inactive");
     }
   }
 

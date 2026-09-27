@@ -4,11 +4,13 @@ import { Link, useParams } from 'react-router-dom';
 import { clientsApi } from '@/api/clients';
 import type { ClientDetail } from '@/api/clients';
 import { useAuth } from '@/auth/authContext';
-import { InstructionsBanner } from '@/components/broking/InstructionsBanner';
+import { ClientTagFlags, InstructionsBanner } from '@/components/broking/InstructionsBanner';
+import { Notice } from '@/components/ui/Notice';
 import { RecordHeader } from '@/components/broking/RecordHeader';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { OriginBadge } from '@/components/ui/OriginBadge';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { useTabParam } from '@/components/ui/useTabParam';
@@ -54,6 +56,18 @@ function profileFields(c: ClientDetail): unknown[] {
   return c.clientType === 'CORPORATE' ? common : [...common, c.birthDate, c.profile.nationality];
 }
 
+/** Source system, legacy client code and migration batch of a migrated client (BRD-13). */
+function legacyFacts(c: ClientDetail) {
+  if (c.origin !== 'MIGRATED') {
+    return [];
+  }
+  return [
+    { label: 'Migrated From', value: c.sourceSystem },
+    { label: 'Legacy Client Code', value: c.legacyRef },
+    { label: 'Migration Batch', value: c.migrationBatch },
+  ];
+}
+
 function Header({ client: c }: Readonly<{ client: ClientDetail }>) {
   const fields = profileFields(c);
   const filled = fields.filter((v) => v !== undefined && v !== null && v !== '').length;
@@ -68,14 +82,14 @@ function Header({ client: c }: Readonly<{ client: ClientDetail }>) {
       status={c.status}
       statuses={[{ label: 'KYC', status: c.kyc.status }]}
       flags={
-        !c.infoComplete || c.bankClient ? (
-          <>
-            {!c.infoComplete && (
-              <Tag title={`Missing: ${c.missingFields.join(', ')}`}>Information Incomplete</Tag>
-            )}
-            {c.bankClient && <Tag tone="info">BDO Bank Client</Tag>}
-          </>
-        ) : undefined
+        <>
+          <OriginBadge record={c} />
+          {!c.infoComplete && (
+            <Tag title={`Missing: ${c.missingFields.join(', ')}`}>Information Incomplete</Tag>
+          )}
+          {c.bankClient && <Tag tone="info">BDO Bank Client</Tag>}
+          <ClientTagFlags clientId={c.id} />
+        </>
       }
       completeness={{ filled, total: fields.length }}
       facts={[
@@ -88,6 +102,7 @@ function Header({ client: c }: Readonly<{ client: ClientDetail }>) {
         { label: 'E-mail', value: c.email },
         { label: 'TIN', value: c.tin },
         { label: 'Next KYC Review', value: formatDate(c.kyc.reviewDue) },
+        ...legacyFacts(c),
         { label: 'Created By', value: <UserName login={c.lifecycle.createdBy} /> },
         { label: 'Created', value: formatDate(c.lifecycle.createdAt) },
       ]}
@@ -164,9 +179,9 @@ export default function ClientDetailPage() {
       />
       <Header client={c} />
       {!c.infoComplete && c.kyc.status === 'NOT_STARTED' && (
-        <div className="alert warning" role="status">
+        <Notice tone="warning" title="Information incomplete">
           Complete {c.missingFields.join(', ')} before submitting the KYC.
-        </div>
+        </Notice>
       )}
       <InstructionsBanner clientId={c.id} />
       <WorkflowPanel

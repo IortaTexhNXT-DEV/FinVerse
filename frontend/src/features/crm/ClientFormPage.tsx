@@ -23,6 +23,7 @@ import {
 } from './clientForm';
 import type { ClientForm } from './clientForm';
 import { useUnsavedChangesGuard } from '@/components/ui/useUnsavedChangesGuard';
+import { FormErrorSummary } from '@/components/ui/FormErrorSummary';
 
 function Saved({ client, onAnother }: Readonly<{ client: ClientDetail; onAnother: () => void }>) {
   const navigate = useNavigate();
@@ -119,6 +120,7 @@ function ClientEditor({ existing }: Readonly<{ existing?: ClientDetail }>) {
         description="Only the client type and name are needed to save a prospect."
       />
       <ErrorAlert error={save.error} />
+      <FormErrorSummary errors={errors} />
       <form
         className="stack"
         noValidate
@@ -139,11 +141,6 @@ function ClientEditor({ existing }: Readonly<{ existing?: ClientDetail }>) {
         />
         <ContactSection form={form} errors={errors} set={set} />
         <SegmentSection form={form} errors={errors} set={set} />
-        {submitted && Object.keys(errors).length > 0 && (
-          <div className="alert warning" role="alert">
-            Correct the highlighted fields before saving.
-          </div>
-        )}
         <div className="form-actions">
           <Button variant="secondary" onClick={() => void navigate(-1)}>
             Cancel

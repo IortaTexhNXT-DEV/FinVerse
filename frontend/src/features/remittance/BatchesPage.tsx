@@ -6,7 +6,6 @@ import { useAuth } from '@/auth/authContext';
 import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { selectionColumn, useRowSelection } from '@/components/broking/rowSelection';
 import { Amount } from '@/components/ui/Amount';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
@@ -25,6 +24,7 @@ import { TypeChip } from './RemittanceParts';
 import { BATCH_TABS, batchTabOf, stagesOf, TYPE_LABELS } from './remittanceLabels';
 import type { BatchTab } from './remittanceLabels';
 import './remittance.css';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const COLUMNS: Column<BatchSummary>[] = [
   {
@@ -203,14 +203,22 @@ export default function BatchesPage() {
             filters={{ open: filtersOpen, onToggle: () => setFiltersOpen(!filtersOpen) }}
           >
             {bulkAction !== undefined && (
-              <Button
+              <ConfirmButton
                 icon={bulkAction === 'approve' ? <CheckCheck size={16} /> : <Send size={16} />}
                 disabled={ids.length === 0}
                 busy={bulk.isPending}
-                onClick={() => bulk.mutate({ ids, approve: bulkAction === 'approve' })}
+                confirm={{
+                  title:
+                    bulkAction === 'approve'
+                      ? `Approve ${String(ids.length)} Batch(es)`
+                      : `Submit ${String(ids.length)} Batch(es)`,
+                  effect:
+                    'Each selected batch is processed on its own; a batch that cannot be processed is reported.',
+                }}
+                onConfirm={() => bulk.mutateAsync({ ids, approve: bulkAction === 'approve' })}
               >
                 {bulkAction === 'approve' ? 'Approve Selected' : 'Submit Selected'}
-              </Button>
+              </ConfirmButton>
             )}
           </WorklistToolbar>
           {filtersOpen && (

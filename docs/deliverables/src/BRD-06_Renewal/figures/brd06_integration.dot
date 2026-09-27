@@ -7,7 +7,7 @@ digraph rn_integration {
 
   ledger [label="Operations ledger\nexpiring invoices, balances"];
   acct   [label="Account (BRD-1)\nexpiring policy data"];
-  sbm    [label="Submitted Policies (BRD-12)\nRenewalHandOff"];
+  sbm    [label="Submitted Policies (BRD-12)\nrenewal hand-off"];
   claims [label="Claims (BRD-7)\nclaims summary"];
   adj    [label="Adjustment\nopen endorsements"];
   crm    [label="Client master\nKYC due date"];

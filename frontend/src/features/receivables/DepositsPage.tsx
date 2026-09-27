@@ -17,6 +17,7 @@ import { formatDate, humanize, today } from '@/utils/format';
 import { round2 } from './receivablesMath';
 import { bankOptions, useReceivablesLookups } from './useReceivablesLookups';
 import { DateInput } from '@/components/ui/DateInput';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 /**
  * Cheques and cash received but not yet banked, grouped on deposit (pay-in) slips per bank account;
@@ -182,21 +183,33 @@ export default function DepositsPage() {
                 maker &&
                 s.status === 'PREPARED' && (
                   <div className="row">
-                    <Button
+                    <ConfirmButton
                       size="sm"
-                      onClick={() =>
-                        slipAction.mutate(() => receivablesApi.confirmSlip(s.id, today()))
+                      confirm={{
+                        title: 'Confirm Deposit',
+                        effect: 'The deposit slip is confirmed as deposited today.',
+                      }}
+                      onConfirm={() =>
+                        slipAction.mutateAsync(() => receivablesApi.confirmSlip(s.id, today()))
                       }
                     >
                       Confirm Deposit
-                    </Button>
-                    <Button
+                    </ConfirmButton>
+                    <ConfirmButton
                       size="sm"
                       variant="ghost"
-                      onClick={() => slipAction.mutate(() => receivablesApi.cancelSlip(s.id))}
+                      confirm={{
+                        title: 'Cancel Deposit Slip',
+                        effect: 'The deposit slip is cancelled.',
+                        confirmLabel: 'Cancel Slip',
+                        destructive: true,
+                      }}
+                      onConfirm={() =>
+                        slipAction.mutateAsync(() => receivablesApi.cancelSlip(s.id))
+                      }
                     >
                       Cancel
-                    </Button>
+                    </ConfirmButton>
                   </div>
                 ),
             },

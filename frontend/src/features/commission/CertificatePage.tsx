@@ -18,7 +18,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount, formatDate, formatDateTime } from '@/utils/format';
+import { formatAmount, formatDateTime, formatPeriod } from '@/utils/format';
 import { CertificateDialog } from './CertificateDialog';
 import { CERTIFICATE_ENTITY, commissionApi } from './commissionApi';
 import type { Certificate, OrLink } from './commissionApi';
@@ -63,7 +63,7 @@ function Summary({ cert: c }: Readonly<{ cert: Certificate }>) {
         {
           icon: CalendarRange,
           label: 'Period',
-          value: `${formatDate(c.certificate.periodFrom)} – ${formatDate(c.certificate.periodTo)}`,
+          value: formatPeriod(c.certificate.periodFrom, c.certificate.periodTo),
         },
         { icon: Coins, label: 'Tax Withheld', value: formatAmount(c.certificate.taxWithheld) },
         {

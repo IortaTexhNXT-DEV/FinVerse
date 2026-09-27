@@ -7,6 +7,7 @@ import { mayOpen } from '@/navigation/access';
 import { MODULES } from '@/navigation/modules';
 import { searchHelp } from './helpContent';
 import type { HelpScreen, HelpSection } from './helpContent';
+import { Notice } from '@/components/ui/Notice';
 
 function ScreenHelp({ screen }: Readonly<{ screen: HelpScreen }>) {
   return (
@@ -85,7 +86,7 @@ export default function HelpPage() {
           </>
         }
       />
-      {sections.length === 0 && <div className="alert info">No help topic matches “{term}”.</div>}
+      {sections.length === 0 && <Notice tone="info">No help topic matches “{term}”.</Notice>}
       {sections.map((section) => (
         <Card key={section.id} title={section.module}>
           <div className="stack">

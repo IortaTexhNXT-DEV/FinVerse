@@ -31,6 +31,7 @@
   --color-danger-bg: #fdecea;
   --color-warning: #8a5a00;
   --color-warning-bg: #fff4d6;
+  --color-warning-accent: #e0a100; /* amber accent bar and icon of warnings */
   --color-info: #0072d8;
   --color-info-bg: #e5f5ff;
 

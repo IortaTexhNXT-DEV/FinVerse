@@ -24,7 +24,7 @@ digraph al_deployment {
       fe [label=<<b>brokerverse-frontend</b><br/><font point-size="9">2-4 pods (nginx)</font>>, fillcolor="@BG_BLUE"];
       be [label=<<b>brokerverse-backend</b><br/><font point-size="9">3-6 pods, HPA, PDB min 2;<br/>jobs run once per schedule<br/>(Redis job lock)</font>>, fillcolor="@BG_BLUE"];
       agents [label=<<b>Cluster agents</b><br/><font point-size="9">monitoring agent, EDR agent,<br/>metrics server</font>>, fillcolor="@DIRTY_WHITE"];
-      fe -> be [label="/api"];
+      fe -> be [label="API"];
     }
     subgraph cluster_db {
       label=<<b>Private data subnets</b>>; fontsize=10; style="rounded,dashed"; color="@MUTED"; margin=6;
@@ -33,7 +33,7 @@ digraph al_deployment {
       msk [label=<<b>Amazon MSK</b><br/><font point-size="9">3 brokers in 3 AZs,<br/>SASL/SCRAM, TLS</font>>, fillcolor="@SUCCESS_BG", color="@SUCCESS"];
     }
     subgraph cluster_reg {
-      label=<<b>Regional services (VPC endpoints)</b>>; fontsize=10; style="rounded,dashed"; color="@MUTED"; margin=6;
+      label=<<b>Regional services (VPC gateways)</b>>; fontsize=10; style="rounded,dashed"; color="@MUTED"; margin=6;
       s3 [label=<<b>Amazon S3</b><br/><font point-size="9">bibs-documents (versioned, lifecycle),<br/>bibs-migration-intake (5-day purge),<br/>logs; SSE-KMS</font>>, fillcolor="@AMBER_BG"];
       sec [label=<<b>Secrets Manager, KMS</b><br/><font point-size="9">DB, Redis, MSK secrets;<br/>customer-managed keys</font>>, fillcolor="@DIRTY_WHITE"];
       mon [label=<<b>Monitoring and logs</b><br/><font point-size="9">CloudWatch and the BDO APM<br/>(Dynatrace or Prometheus, IQ30)</font>>, fillcolor="@DIRTY_WHITE"];
@@ -44,7 +44,7 @@ digraph al_deployment {
     label=<<b>DR (region to confirm)</b>>; fontsize=12; fontcolor="@HEADER_BLUE"; style="rounded,dashed"; color="@DANGER"; margin=10;
     dr_rds [label=<<b>RDS read replica</b><br/><font point-size="9">async, RPO &lt;= 15 min</font>>, fillcolor="@WHITE"];
     dr_s3 [label=<<b>S3 replica</b><br/><font point-size="9">cross-region replication</font>>, fillcolor="@WHITE"];
-    dr_eks [label=<<b>EKS standby</b><br/><font point-size="9">0 pods until failover;<br/>Redis, MSK rebuilt; RTO 4 h</font>>, fillcolor="@WHITE"];
+    dr_eks [label=<<b>EKS standby</b><br/><font point-size="9">0 pods until failover;<br/>Redis, MSK re-created; RTO 4 h</font>>, fillcolor="@WHITE"];
   }
 
   users -> r53 [label="HTTPS"];

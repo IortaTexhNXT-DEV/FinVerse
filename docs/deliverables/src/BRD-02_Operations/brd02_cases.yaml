@@ -13,7 +13,7 @@ meta:
   summary: TP_BRD02_OPERATIONS.md
   version: "1.0"
   date: 25 September 2026
-  built: true
+  verify_messages: true
 
 personas:
   CASHIER: {name: Cashier (Head Office), user: cashier, short: Cashier}
@@ -97,37 +97,37 @@ screens:
   PARAMS: Administration > System Parameters
   JOBS: Administration > Scheduled Jobs
   NOTIF: Notifications (bell icon in the page header)
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-OP-01
     name: SIT/UAT users and roles
     content: cashier (CASHIER, Head Office), cashbr (CASHIER, Cebu branch), cashtl (CASHIER_TL), remit (REMIT_PROCESSOR), remittl (REMIT_TL), recon (RECON_HANDLER), adjust (ADJUSTMENT), adjtl (ADJUSTMENT_TL), commrec (COMMREC_HANDLER), commtl (COMMREC_TL), mktcoll (MKT_COLLECTION), mkttl (MKT_TL), comptrol (COMPTROLLERSHIP), disb (DISBURSEMENT), admin (SYSADMIN), auditor (AUDITOR). The SIT/UAT password is issued by the test lead.
-    source: Seeds V990 (Operations users), V980 (adjust, mkttl), V900 (admin, auditor); grants V760
+    source: Seed data (Operations users, adjustment and Marketing team lead, administrator and auditor, with their grants)
   - id: TD-OP-02
     name: Booked seed invoices
     content: ARN-2026-940001 (Motor; booking and endorsement invoices paid in full; booking invoice remitted with the insurer OR), ARN-2026-940002 (Property; requests at every adjustment stage; gross premium differs in the insurer register), ARN-2026-940003 (direct payment), ARN-2026-940004 (CGL; partly paid; hold request waiting; flat cancellation ready for posting)
-    source: Booking seed data (V988 and BookingSeedData), copied into the invoice ledger by the booking feed
+    source: Booking seed data, copied into the invoice ledger by the booking feed
   - id: TD-OP-03
     name: Cashiering storyline
     content: Receipt series AR-HO, AR-CEB and OR-HO (authorised); a payment without match with a refund disposition for approval; an excess; a pre-booked payment; a post-dated check in the warehouse; a Head Office service fee OR; a receipt cancellation for approval; a BIR 2307 tag; two check pick-up requests from Collection
-    source: Seed V991 and CashieringSeedData
+    source: Seed data (cashiering)
   - id: TD-OP-04
     name: Remittance storyline
     content: A remitted batch of ARN-2026-940001 with its insurer OR; a batch in review with the endorsement invoice; a hold request of ARN-2026-940004 waiting for approval; a special remittance request; incentive rule INS-MGIC Property CBG 2 % within 30 days of inception
-    source: Seed V992 and RemittanceSeedData
+    source: Seed data (remittance)
   - id: TD-OP-05
     name: Production reconciliation storyline
     content: September 2026 register of INS-MGIC extracted, sent and answered; cycle RECONCILING with a gross premium discrepancy on ARN-2026-940002 and one insurer policy never booked; monthly schedules on the 5th; seed lists of company concerned and dispositions
-    source: Seed V993 and ProdReconSeedData
+    source: Seed data (production reconciliation)
   - id: TD-OP-06
     name: Adjustment storyline
     content: On ARN-2026-940002 a descriptive change in draft, an assured change for validation, a cover extension returned for documents and a premium rate increase for approval; a flat cancellation of ARN-2026-940004 for posting; an internal adjustment of ARN-2026-940001 posted
-    source: Seed V994 and AdjustmentSeedData
+    source: Seed data (adjustments)
   - id: TD-OP-07
     name: Commission storyline
     content: DP list HO_DP_20260930 with ARN-2026-940003 confirmed and billed to INS-MGIC (awaiting answer, 10 working days); incentive schemes No Touch, Top Up and Motor Mania inactive without tiers
-    source: Seed V995 and CommissionSeedData
+    source: Seed data (commission)
   - id: TD-OP-08
     name: Operations files
     content: Bills Payment file (20 rows, 2 with unknown invoices); Direct Credit fixed-width file; PDC upload; insurer OR schedule of the remitted batch; insurer production feedback in the register layout; DP lists named HO_DP_20260930.xlsx, CEB_DP_20260930.xlsx and "dp list.xlsx"; insurer DP answer file; minimal balance file with balances of 50.00 and 150.00; endorsement batch request file; hold and special remittance feed files
@@ -135,7 +135,7 @@ data:
   - id: TD-OP-09
     name: USD receipt and BOOK rates
     content: A USD invoice of a seed client and the BOOK rate of the receipt date (2 decimals)
-    source: Seed V990 (BOOK rates from the seed SPOT rates)
+    source: Seed data (BOOK rates from the seed SPOT rates)
   - id: TD-OP-10
     name: Disbursement queue requests
     content: Payment requests created by the remittance approval, the refund disposition and the 2307 batch of the storylines
@@ -195,7 +195,6 @@ frs:
         steps:
           - Log in as cashier; open the menu.
         expected: The Operations and Cashiering sections are shown; Remittance, Adjustment and Commission Receivables are not.
-        auto: OperationsFoundationApiIT#theHomeShowsOnlyTheUsersSections
       - c: 2
         type: Negative
         title: Wrong password
@@ -203,7 +202,6 @@ frs:
           - Log in as remit with a wrong password.
         expected: Refused; no session.
         msg: [Invalid user name or password, AUTHENTICATION_FAILED]
-        auto: ApiSmokeIT#loginReturnsTokenAndWrongPasswordIsRejected
       - c: 2
         type: Boundary
         neg: true
@@ -213,7 +211,6 @@ frs:
           - Enter a wrong password 3 times for recon; then the correct one.
         expected: The account is locked at the third failure; the System Administrator unlocks it in Administration > Users.
         msg: [Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
-        auto: LoginLockoutTest#theAccountLocksAtTheConfiguredThreshold
 
   FR-OP-002:
     scenario: SC-OP-01
@@ -222,7 +219,7 @@ frs:
     data: [TD-OP-01]
     conditions:
       - Each role sees only its screens (for example the Remittance Processor does not see Cashiering Setup or the Disbursement queue).
-      - A call to an approval endpoint without the approval permission is refused and logged.
+      - A direct approval request without the approval permission is refused and logged.
       - A Marketing Collection user sees the holds, special remittance and 2307 tagging screens but cannot approve a hold.
     cases:
       - c: 1
@@ -230,18 +227,16 @@ frs:
         neg: false
         title: Remittance processor's menu
         steps:
-          - Log in as remit; open the menu; type /cashiering/setup and /operations/disbursements.
+          - Log in as remit; open the menu; open the addresses of Cashiering Setup and Disbursement Queue directly in the browser.
         expected: Remittance screens are listed; Cashiering Setup and the Disbursement Queue are not, and the direct links show the no-access page.
-        auto: OperationsFoundationApiIT#usersWithoutTheRightPermissionAreRefused
       - c: 2
         type: Security-access
         screen: API
         title: Batch approval without REMIT_APPROVE
         steps:
-          - As remit call POST /api/v1/remittance/batches/{id}/approve on a batch for approval.
-        expected: HTTP 403; the refusal is in the audit trail.
+          - As remit send a direct request to approve a batch for approval.
+        expected: The request is refused; the refusal is in the audit trail.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
-        auto: RemittanceApiIT#usersWithoutTheRightPermissionAreRefused
       - c: 3
         type: Security-access
         persona: MKT_COLLECTION
@@ -249,9 +244,8 @@ frs:
         title: Marketing Collection cannot approve a hold
         steps:
           - As mktcoll open Remittance Holds, Special Remittance and BIR 2307; open the waiting hold of ARN-2026-940004.
-        expected: The three screens open; Approve hold is not offered and the API call returns HTTP 403.
+        expected: The three screens open; Approve hold is not offered and the direct request is refused.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
-        auto: RemittanceApiIT#holdsAreRequestedAndDecidedThroughTheApi
 
   FR-OP-003:
     scenario: SC-OP-01
@@ -269,7 +263,6 @@ frs:
         steps:
           - Log in as cashier; open Operations Home.
         expected: The Cashiering card with its tiles is shown; there is no Remittance card.
-        auto: OperationsFoundationApiIT#theHomeShowsOnlyTheUsersSections
       - c: 2
         type: Positive
         persona: REMIT_TL
@@ -277,7 +270,6 @@ frs:
         steps:
           - As remittl click the tile Batches for Approval.
         expected: Remittance Batches opens filtered on For approval.
-        auto: RemittanceOperationsIT#theOperationsHomeAndApprovalInboxShowRemittanceWork
       - c: 3
         type: Negative
         persona: COMPTROLLERSHIP
@@ -303,7 +295,6 @@ frs:
         steps:
           - Invoice Search on its ARN; open Invoice 360.
         expected: The components equal the booking; payment status UNPAID and remittance status WITH_OUTSTANDING_BALANCE.
-        auto: InvoiceLedgerIT#aBookedInvoiceIsCopiedWithItsComponentsAfterCommit
       - c: 2
         type: Positive
         screen: INV360
@@ -311,7 +302,6 @@ frs:
         steps:
           - Open Invoice 360 of ARN-2026-940001, Movements; then of ARN-2026-940003.
         expected: 940001 shows APPLIED movements with AR number, date and amount per component; 940003 shows the DP chip and payment status NOT_APPLICABLE.
-        auto: InvoiceLedgerIT#paymentsMoveBalancesAndStatusesOnceAndAreHistorised; InvoiceLedgerIT#aDirectPaymentInvoiceHasNothingToCollectOrRemit
       - c: 3
         type: Positive
         persona: SYSADMIN
@@ -320,17 +310,15 @@ frs:
         steps:
           - Interfaces; replay invoice of ARN-2026-940001; compare Invoice 360 before and after.
         expected: The run ends with no new movement; the invoice is unchanged.
-        auto: InvoiceLedgerIT#missingInvoicesAreReplayedFromBookingAsALoggedRun; OperationsFoundationApiIT#anInvoiceIsSearchedViewedAndReplayed
       - c: 3
         type: Negative
         persona: SYSADMIN
         screen: API
         title: Replay without scope
         steps:
-          - Call POST /api/v1/ops/invoices/replay with no invoice, ARN or company.
+          - Send a direct request to replay invoices with no invoice, ARN or company.
         expected: Refused.
         msg: ["Give an invoice number, an ARN or a company to replay", REPLAY_SCOPE]
-        auto: OperationsFoundationApiIT#anInvoiceIsSearchedViewedAndReplayed
 
   FR-OP-005:
     scenario: SC-OP-01
@@ -348,7 +336,6 @@ frs:
         steps:
           - Search ARN-2026-940001; open the booking invoice.
         expected: The booking and endorsement invoices are listed; Invoice 360 shows the AR, the remittance batch and the insurer OR.
-        auto: OperationsFoundationApiIT#anInvoiceIsSearchedViewedAndReplayed
       - c: 2
         type: Positive
         title: Invoice on hold
@@ -362,7 +349,6 @@ frs:
         steps:
           - Search "pacific harbor".
         expected: The invoices of Pacific Harbor Logistics Inc. are listed.
-        auto: invoiceSearch.test.ts
       - c: 3
         type: Negative
         title: Nothing found
@@ -387,7 +373,6 @@ frs:
           - New Request on the endorsement invoice of ARN-2026-940001 (in a batch for review).
         expected: Refused.
         msg: ["Invoice <no> is locked by REMITTANCE (<reason>)", INVOICE_LOCKED]
-        auto: AdjustmentRequestIT#anInvoiceInTheRemittanceQueueCannotBeAdjusted
       - c: 2
         type: Positive
         persona: CASHIER
@@ -396,7 +381,6 @@ frs:
         steps:
           - Receive a payment on the invoice of ARN-2026-940004 (open cancellation request, locked by ADJUSTMENT).
         expected: The payment is applied; the lock stays.
-        auto: InvoiceLedgerIT#aLockBlocksOtherModulesExceptPaymentsAndFlagsAreLogged
       - c: 3
         type: Workflow
         persona: REMIT_PROCESSOR
@@ -405,7 +389,6 @@ frs:
         steps:
           - Exclude the endorsement invoice from its batch with a reason; raise the endorsement request again.
         expected: The lock is gone and the request is accepted.
-        auto: RemittanceIT#excludedInvoicesAreGivenBackAndCanBeRestoredBeforeSubmission
 
   FR-OP-007:
     scenario: SC-OP-01
@@ -422,7 +405,6 @@ frs:
         steps:
           - Open Invoice 360 of the co-insured invoice.
         expected: Both insurers with 60 % and 40 % and their amounts.
-        auto: BookingServiceIT#coInsuranceSplitsJournalsOpenItemsAndServiceInvoicesByShare
       - c: 2
         type: Positive
         screen: REQ
@@ -430,7 +412,6 @@ frs:
         steps:
           - Raise a premium decrease of 1,000.00 on it; open Recompute.
         expected: The insurer breakdown shows -600.00 and -400.00.
-        auto: OpsLedgerDomainTest#sharesSplitAmountsWithTheRemainderOnTheLastInsurer
       - c: 2
         type: Boundary
         neg: false
@@ -439,7 +420,6 @@ frs:
         steps:
           - Raise a decrease of 1,000.01.
         expected: The breakdown is -600.01 / -400.00 or -600.00 / -400.01 with the remainder on the last insurer, and totals 1,000.01.
-        auto: OpsLedgerDomainTest#sharesSplitAmountsWithTheRemainderOnTheLastInsurer
       - c: 1
         type: Negative
         screen: REQ
@@ -464,7 +444,6 @@ frs:
         steps:
           - Payment Uploads, Bills Payment; upload a 10-row file with one unknown invoice; commit.
         expected: 10 ARs; 9 applied and 1 unapplied (no match) with its reason in the run summary.
-        auto: PaymentUploadIT#aBillsPaymentFileIsMatchedRowByRowAndCannotBeUploadedTwice
       - c: 2
         type: Report-output
         screen: REPORTS
@@ -472,7 +451,6 @@ frs:
         steps:
           - Run CSH-BATCH-RUN for the upload.
         expected: Counts of successful, unsuccessful, applied, unapplied and failed records equal the run summary.
-        auto: CashieringReportsIT#everyCashieringReportRunsAndExportsInEveryFormat
       - c: 3
         type: Negative
         title: Same file again
@@ -480,7 +458,6 @@ frs:
           - Upload the same file.
         expected: Refused.
         msg: [This file was already uploaded, BULK_DUPLICATE_FILE]
-        auto: PaymentUploadIT#aBillsPaymentFileIsMatchedRowByRowAndCannotBeUploadedTwice
       - c: 3
         type: Positive
         persona: SYSADMIN
@@ -489,7 +466,6 @@ frs:
         steps:
           - Interfaces; open a run with a failed record; correct and reprocess it.
         expected: Only that record is processed; the others keep their result.
-        auto: BulkExtensionsIT#aFixedWidthFileIsCategorisedReprocessedAndNeverUploadedTwice
 
   FR-OP-009:
     scenario: SC-OP-01
@@ -504,8 +480,8 @@ frs:
         type: Security-access
         title: Auditor views but cannot download
         steps:
-          - As auditor run CSH-APPLIED-PREM; look for download and print; call the export endpoint.
-        expected: The report shows on screen; no download or print button; the export call returns HTTP 403.
+          - As auditor run CSH-APPLIED-PREM; look for download and print; send a direct export request.
+        expected: The report shows on screen; no download or print button; a direct export request is refused.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
       - c: 2
         type: Report-output
@@ -514,7 +490,6 @@ frs:
         steps:
           - As cashier run CSH-APPLIED-PREM and download Excel; open the Report Archive.
         expected: The Excel file has the rows of the screen; the archive lists the run with parameters and creator.
-        auto: CashieringReportsIT#everyCashieringReportRunsAndExportsInEveryFormat; reportRuns.test.ts
 
   FR-OP-010:
     scenario: SC-OP-02
@@ -534,7 +509,6 @@ frs:
         steps:
           - As cashbr receive a payment; note the AR number; receive another.
         expected: The ARs take consecutive numbers of the AR-CEB series.
-        auto: SeriesPrintPickupIT#aSmallSeriesIsAuthorizedWithFourEyesWarnsAndRunsOut
       - c: 2
         type: Negative
         title: OR series for a branch
@@ -542,7 +516,6 @@ frs:
           - New series, kind OR, branch Cebu; save.
         expected: Refused.
         msg: ["Official receipt series belong to Head Office only (CSHID.006)", OR_HEAD_OFFICE_ONLY]
-        auto: SeriesPrintPickupIT#aSmallSeriesIsAuthorizedWithFourEyesWarnsAndRunsOut
       - c: 2
         type: Negative
         title: Last number below the first
@@ -557,7 +530,6 @@ frs:
           - As cashtl create a series and authorise it.
         expected: Refused; another TL must authorise it.
         msg: [A record cannot be authorized by the user who maintained it, MAKER_CHECKER_VIOLATION]
-        auto: SeriesPrintPickupIT#aSmallSeriesIsAuthorizedWithFourEyesWarnsAndRunsOut
       - c: 3
         type: Boundary
         neg: true
@@ -569,7 +541,6 @@ frs:
           - Receive three payments.
         expected: The first two get numbers; the third is refused.
         msg: ["No authorized {AR} series with numbers left for this branch (CSHID.015)", RECEIPT_SERIES_DEPLETED]
-        auto: ApplicationPlannerTest#seriesNumbersArePaddedAndRunOut
 
   FR-OP-011:
     scenario: SC-OP-02
@@ -587,7 +558,6 @@ frs:
         steps:
           - Receive Payment; AR class OTC; invoice of a booked seed account; amount = outstanding; mode cash; preview; post.
         expected: An AR with the next number; the payment is applied; the invoice is PAID.
-        auto: PaymentApplicationIT#aFullPaymentIsReceiptedMatchedAppliedByComponentAndPosted; CashieringApiIT#aPaymentIsPreviewedReceivedPrintedAndCancelledThroughTheApi
       - c: 2
         type: Positive
         data: [TD-OP-09]
@@ -595,7 +565,6 @@ frs:
         steps:
           - Receive USD 100.00 on the USD invoice; preview.
         expected: The preview shows the BOOK rate of the day with 2 decimals and the peso amount; the journal posts at that rate.
-        auto: FlowInAndPortsIT#bookRatesAreTwoDecimalRatesOfTheCurrencyMaster
       - c: 2
         type: Upload-download
         screen: RECEIPT
@@ -603,7 +572,6 @@ frs:
         steps:
           - Open the AR; download the PDF.
         expected: The PDF shows the AR number, payor, amount, date and invoice.
-        auto: CashieringApiIT#aPaymentIsPreviewedReceivedPrintedAndCancelledThroughTheApi
       - c: 3
         type: Negative
         title: Amount zero
@@ -633,7 +601,6 @@ frs:
         steps:
           - Issue Official Receipt; type Service Fee; gross 11,200.00; VAT 1,200.00; post; open the Journal tab.
         expected: OR-HO number; the journal credits service fee income 10,000.00 and output VAT 1,200.00.
-        auto: SeriesPrintPickupIT#anOrIsHeadOfficeOnlyAndReceiptsAreFoundPrintedAndCertified
       - c: 2
         type: Negative
         persona: CASHIER_BR
@@ -642,13 +609,12 @@ frs:
           - As cashbr issue an OR.
         expected: Refused.
         msg: [Official receipts are issued by Head Office only (CSHID.006), OR_HEAD_OFFICE_ONLY]
-        auto: SeriesPrintPickupIT#anOrIsHeadOfficeOnlyAndReceiptsAreFoundPrintedAndCertified
       - c: 2
         type: Negative
         screen: API
         title: OR without a line
         steps:
-          - Call POST .../receipts/or with no line.
+          - Send a direct request to issue an OR with no line.
         expected: Refused.
         msg: [An official receipt needs a line, OR_WITHOUT_LINES]
 
@@ -669,7 +635,6 @@ frs:
           - Open an applied AR; Cancel; reason group GENERAL, reason Double issuance; Submit for Approval.
           - As cashtl click Approve and Post.
         expected: The AR is CANCELLED; the invoice is outstanding again; the reversal journal nets the original to zero.
-        auto: ReceiptLifecycleIT#aCancelledReceiptReversesItsApplicationsAndIsReinstatedInPart
       - c: 2
         type: Negative
         persona: CASHIER_TL
@@ -679,7 +644,6 @@ frs:
           - As cashtl approve it.
         expected: Refused.
         msg: ["The requester cannot approve <transaction>", MAKER_CHECKER_VIOLATION]
-        auto: ReceiptLifecycleIT#aCancelledReceiptReversesItsApplicationsAndIsReinstatedInPart
       - c: 3
         type: Negative
         title: Others without text
@@ -687,7 +651,6 @@ frs:
           - Cancel with reason Others and no remarks.
         expected: Refused.
         msg: ["Specify the reason when 'Others' is selected", RECEIPT_REASON_TEXT_REQUIRED]
-        auto: ReceiptLifecycleIT#aCancelledReceiptReversesItsApplicationsAndIsReinstatedInPart
       - c: 3
         type: Negative
         title: Second request on the same receipt
@@ -695,7 +658,6 @@ frs:
           - Request a cancellation on the receipt whose cancellation waits for approval.
         expected: Refused.
         msg: ["Receipt <no> already has a request waiting for approval", RECEIPT_ACTION_PENDING]
-        auto: ReceiptLifecycleIT#aCancelledReceiptReversesItsApplicationsAndIsReinstatedInPart
 
   FR-OP-014:
     scenario: SC-OP-02
@@ -713,7 +675,6 @@ frs:
         steps:
           - On a cancelled AR of 10,000.00 click Reinstate; partial 5,000.00; premium reason Misapplication; invoice, AO, Unit Head, TL; submit; as cashtl approve.
         expected: 5,000.00 is applied to the encoded invoice; the posting OPS_RECEIPT_REINSTATE is balanced.
-        auto: ReceiptLifecycleIT#aCancelledReceiptReversesItsApplicationsAndIsReinstatedInPart
       - c: 2
         type: Negative
         title: Premium reason without the Unit Head
@@ -721,7 +682,6 @@ frs:
           - Reinstate with a premium reason and no Unit Head.
         expected: Refused and the field is named.
         msg: ["Enter the <fields> (CSHID.005)", REINSTATEMENT_FIELDS_REQUIRED]
-        auto: ReceiptLifecycleIT#aPremiumReinstatementNeedsItsEncodedFields
       - c: 3
         type: Negative
         screen: API
@@ -755,7 +715,6 @@ frs:
         steps:
           - Upload the Bills Payment file of TD-OP-08; commit.
         expected: 20 ARs; 18 applied, 2 unapplied with reason no match.
-        auto: PaymentUploadIT#aBillsPaymentFileIsMatchedRowByRowAndCannotBeUploadedTwice
       - c: 2
         type: Negative
         title: Duplicate file
@@ -763,7 +722,6 @@ frs:
           - Upload the same file again.
         expected: Refused.
         msg: [This file was already uploaded, BULK_DUPLICATE_FILE]
-        auto: PaymentUploadIT#aBillsPaymentFileIsMatchedRowByRowAndCannotBeUploadedTwice
       - c: 3
         type: Positive
         persona: CASHIER_TL
@@ -772,7 +730,6 @@ frs:
         steps:
           - Cashiering Setup; set PAY_DIRECT_CREDIT to FIXED_WIDTH with its fields; save; as cashier upload the Direct Credit file.
         expected: The file is read with the new layout without a release.
-        auto: PaymentUploadIT#aFixedWidthLayoutFromTheLayoutTableIsUsedForDirectCredit
       - c: 3
         type: Negative
         persona: CASHIER_TL
@@ -782,7 +739,6 @@ frs:
           - Enter a field "Invoice-1-10"; save.
         expected: Refused.
         msg: ["Write each field as Header:start:length, not '<part>'", PAYMENT_LAYOUT_FIELDS]
-        auto: PaymentUploadIT#aFixedWidthLayoutFromTheLayoutTableIsUsedForDirectCredit
 
   FR-OP-016:
     scenario: SC-OP-02
@@ -802,7 +758,6 @@ frs:
         steps:
           - Add a PDC maturing today; run PDC_MATURITY (or Mature Now).
         expected: The check shows APPLIED with its AR number.
-        auto: PaymentUploadIT#pdcsAreWarehousedAndMatureIntoPayments
       - c: 2
         type: Negative
         title: Same check twice
@@ -824,7 +779,6 @@ frs:
         steps:
           - Run the PDC Warehousing report.
         expected: AR date, AR number, maturity, client, amount, bank, branch, check number and segment of each warehoused check.
-        auto: CashieringReportsIT#everyCashieringReportRunsAndExportsInEveryFormat
 
   FR-OP-017:
     scenario: SC-OP-02
@@ -842,7 +796,6 @@ frs:
         steps:
           - Check Pick-up; select today; Print.
         expected: Two ARs with consecutive numbers in one PDF.
-        auto: SeriesPrintPickupIT#checksForPickUpAreQueuedAndTheirArsPrintedWhenDue
       - c: 1
         type: Negative
         title: Request due next week
@@ -850,7 +803,6 @@ frs:
           - Select only a request due next week; Print.
         expected: Refused.
         msg: [None of the selected requests is due for printing, PICKUP_NOTHING_DUE]
-        auto: SeriesPrintPickupIT#checksForPickUpAreQueuedAndTheirArsPrintedWhenDue
       - c: 2
         type: Negative
         title: Reference queued twice
@@ -858,7 +810,6 @@ frs:
           - Import the same collection reference again.
         expected: Refused.
         msg: ["Collection reference <ref> is already queued", PICKUP_DUPLICATE]
-        auto: SeriesPrintPickupIT#checksForPickUpAreQueuedAndTheirArsPrintedWhenDue
 
   FR-OP-018:
     scenario: SC-OP-02
@@ -876,14 +827,12 @@ frs:
         steps:
           - Receive 10,000.00 quoting the invoice; post.
         expected: APPLIED in full.
-        auto: PaymentApplicationIT#aFullPaymentIsReceiptedMatchedAppliedByComponentAndPosted
       - c: 1
         type: Boundary
         title: CWT client capped at 98 %
         steps:
           - Receive 10,000.00 for a 2 % CWT client's invoice of 10,000.00.
         expected: 9,800.00 applied; 200.00 unapplied waiting for the BIR 2307.
-        auto: PaymentApplicationIT#aTwoPercentCwtAccountIsAppliedUpToNinetyEightPercent
       - c: 2
         type: Workflow
         screen: PREBOOKED
@@ -891,7 +840,6 @@ frs:
         steps:
           - Receive a payment quoting the ARN of an issued, unbooked account; book the account; open Pre-booked Payments.
         expected: The payment is PREBOOKED, then APPLIED when the invoice is booked.
-        auto: PrebookedAndPortsIT#aPaymentBeforeBookingConfirmsTheGateAndIsAppliedWhenTheAccountIsBooked
       - c: 3
         type: Negative
         title: Payment quoting a cancelled invoice
@@ -922,7 +870,6 @@ frs:
         steps:
           - Receive 1,500.00 on an invoice with DST 1,000.00, VAT 1,200.00 and basic 10,000.00; open the Applications tab.
         expected: 1,000.00 to DST, 500.00 to VAT; nothing to basic.
-        auto: ApplicationPlannerTest#paymentsFollowTheHierarchyDstVatLgtOtherBasic; PaymentApplicationIT#aSmallPaymentGoesToDstFirstAndLeavesTheInvoicePartiallyPaid
       - c: 2
         type: Positive
         screen: RECEIPT
@@ -930,14 +877,12 @@ frs:
         steps:
           - Open the Journal tab of the receipt.
         expected: The OPS_PAYMENT_APPLY entry is balanced.
-        auto: PaymentApplicationIT#aFullPaymentIsReceiptedMatchedAppliedByComponentAndPosted
       - c: 2
         type: Negative
         title: Excess over the premium receivable
         steps:
           - Receive 12,500.00 on an invoice of 12,200.00.
         expected: 12,200.00 applied; 300.00 unapplied with origin EXCESS.
-        auto: ApplicationPlannerTest#anOverpaymentLeavesAnExcessAndTheDtipIsNeverApplied
 
   FR-OP-020:
     scenario: SC-OP-02
@@ -953,7 +898,6 @@ frs:
         steps:
           - AR class AR Insurance; payor INS-MGIC; amount 5,000.00; post; open the Journal.
         expected: Dr bank / Cr AR Insurer; no invoice changes.
-        auto: PaymentApplicationIT#aNonPremiumInsurerPaymentPostsToArInsuranceAndNeedsThePayor
       - c: 2
         type: Negative
         title: AR Insurance without insurer
@@ -961,7 +905,6 @@ frs:
           - AR class AR Insurance with no insurer code; post.
         expected: Refused.
         msg: ["A non-premium AR needs the paying insurer's code", AR_INSURANCE_PAYOR_REQUIRED]
-        auto: PaymentApplicationIT#aNonPremiumInsurerPaymentPostsToArInsuranceAndNeedsThePayor
 
   FR-OP-021:
     scenario: SC-OP-02
@@ -978,7 +921,6 @@ frs:
         steps:
           - Commission ORs; upload three payment lines of INS-MGIC with the same certificate; Issue.
         expected: One OR with three lines.
-        auto: PaymentUploadIT#commissionPaymentsAreConsolidatedIntoOneOrPerInsurerCertificateAndPayment
       - c: 1
         type: Positive
         persona: REMIT_TL
@@ -987,7 +929,6 @@ frs:
         steps:
           - Open the remitted seed batch of ARN-2026-940001.
         expected: The batch shows one commission OR number issued by Cashiering.
-        auto: RemittanceIT#anApprovedBatchIsPostedRemittedAndPushedToDisbursement
       - c: 2
         type: Negative
         title: Different payees in one group
@@ -1020,14 +961,12 @@ frs:
         steps:
           - Open the excess item; Assign Disposition, type Apply to other invoice, amount 500.00, target invoice of the client; Process Disposition.
         expected: 500.00 of the target invoice is cleared in hierarchy order; the item is Completed.
-        auto: UnappliedDispositionIT#applyingToAnotherInvoiceNeedsNoApprovalAndCanBeReversed
       - c: 2
         type: Workflow
         title: Refund approved and paid
         steps:
           - Open the seed item with the refund for approval; as cashtl click Approve; as disb pay it in the Disbursement Queue.
         expected: The item is In process after approval and Completed when Disbursement pays.
-        auto: UnappliedDispositionIT#aRefundNeedsApprovalAndGoesToDisbursement
       - c: 2
         type: Negative
         persona: CASHIER_TL
@@ -1052,7 +991,6 @@ frs:
           - Reclass half of an item's balance.
         expected: Refused.
         msg: ["A reclass or transfer moves the whole balance <balance>", DISPOSITION_WHOLE_BALANCE]
-        auto: UnappliedDispositionIT#aReclassMovesTheWholeBalanceToAnotherClientAndReopensTheItem
       - c: 3
         type: Positive
         title: Tabs by stage
@@ -1075,7 +1013,6 @@ frs:
         steps:
           - Run Sweep Now twice; open Invoice 360.
         expected: One reversal of 5.00; the second run changes nothing.
-        auto: MinimalBalanceIT#smallPremiumBalancesAreReversedOnceAndSmallExcessGoesToOverages
       - c: 1
         type: Negative
         title: Balance equal to the DST is kept
@@ -1083,7 +1020,6 @@ frs:
         steps:
           - Run Sweep Now.
         expected: The balance is not reversed.
-        auto: MinimalBalanceIT#aSmallInvoiceStillFullyUnpaidIsNotReversed
       - c: 2
         type: Positive
         title: Small excess to AP overages
@@ -1091,7 +1027,6 @@ frs:
         steps:
           - Run Sweep Now; open the item.
         expected: The item is closed with Move to AP Overages.
-        auto: MinimalBalanceIT#smallPremiumBalancesAreReversedOnceAndSmallExcessGoesToOverages
 
   FR-OP-024:
     scenario: SC-OP-03
@@ -1115,7 +1050,6 @@ frs:
         steps:
           - Open the AR cancelled in TC-OP-013.1-01; History tab.
         expected: Creation, cancellation request and approval with users and times.
-        auto: ReceiptLifecycleIT#aCancelledReceiptReversesItsApplicationsAndIsReinstatedInPart
       - c: 2
         type: Negative
         persona: AUDITOR
@@ -1124,7 +1058,6 @@ frs:
         steps:
           - Look for edit or delete on the receipt's audit rows.
         expected: None is offered; the database refuses changes.
-        auto: AuditTrailImmutabilityIT#updateDeleteAndTruncateAreRejected
 
   FR-OP-025:
     scenario: SC-OP-03
@@ -1141,7 +1074,6 @@ frs:
         steps:
           - Batch Print; kind AR; this month; Print.
         expected: One PDF with every AR of the selection.
-        auto: SeriesPrintPickupIT#anOrIsHeadOfficeOnlyAndReceiptsAreFoundPrintedAndCertified
       - c: 2
         type: Negative
         title: Retry without failures
@@ -1149,13 +1081,12 @@ frs:
           - Click Retry on a batch without failures.
         expected: Refused.
         msg: ["<batch> has no failures", PRINT_NOTHING_FAILED]
-        auto: SeriesPrintPickupIT#anOrIsHeadOfficeOnlyAndReceiptsAreFoundPrintedAndCertified
       - c: 2
         type: Negative
         screen: API
         title: Empty selection
         steps:
-          - Call POST .../print-batches with no receipt.
+          - Send a direct request to create a print batch with no receipt.
         expected: Refused.
         msg: [Select between 1 and 500 receipts to print, PRINT_SELECTION]
 
@@ -1175,7 +1106,6 @@ frs:
         steps:
           - Receive the CWT copy of two tags of INS-MGIC; validate them in a batch.
         expected: Dr PR2307 / Cr PR posted; the 2 % PR of both invoices is zero.
-        auto: Cwt2307IT#aCertificateIsValidatedReclassifiedRoutedAndReleased
       - c: 2
         type: Negative
         title: Tags of two insurers in one batch
@@ -1190,14 +1120,12 @@ frs:
           - Validate a tag whose copy was not received.
         expected: Refused.
         msg: ["The CWT copy of <ref> was not received", CWT_COPY_MISSING]
-        auto: Cwt2307IT#aCertificateIsValidatedReclassifiedRoutedAndReleased
       - c: 3
         type: Workflow
         title: Settle in cash
         steps:
           - On a cash-path tag click Settle in Cash.
         expected: An AR for the 2 % is issued and the tag is SETTLED_CASH.
-        auto: Cwt2307IT#theCashPathIssuesAnArForTheTwoPercent
 
   FR-OP-027:
     scenario: SC-OP-02
@@ -1214,7 +1142,6 @@ frs:
         steps:
           - Open the Journal tab of the AR cancelled in TC-OP-013.1-01.
         expected: Issue, apply and cancellation journals are balanced; their sum per account is zero.
-        auto: ReceiptLifecycleIT#aCancelledReceiptReversesItsApplicationsAndIsReinstatedInPart
       - c: 2
         type: Positive
         title: USD AR at the BOOK rate
@@ -1247,14 +1174,12 @@ frs:
         steps:
           - Run CSH-APPLIED-PREM for this month; export PDF and Excel.
         expected: AR no., date, amount paid, invoice, payor, risk code, count and total; both files match the screen.
-        auto: CashieringReportsIT#everyCashieringReportRunsAndExportsInEveryFormat
       - c: 2
         type: Report-output
         title: Cancelled AR report
         steps:
           - Run CSH-CANCELLED-AR.
         expected: The AR cancelled in TC-OP-013.1-01 with its reason.
-        auto: CashieringReportsIT#everyCashieringReportRunsAndExportsInEveryFormat
       - c: 2
         type: Security-access
         persona: DISBURSEMENT
@@ -1262,7 +1187,7 @@ frs:
         title: Report export without OPS_REPORT_EXPORT
         steps:
           - As disb export CSH-APPLIED-PREM.
-        expected: HTTP 403.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-OP-030:
@@ -1284,7 +1209,6 @@ frs:
         steps:
           - Run REMITTANCE_EXTRACTION; open Extraction, the run's tags; open Remittance Batches.
         expected: The invoice is EXTRACTED into batch RMB-INS-MGIC-2026-n and its lock shows REMITTANCE.
-        auto: RemittanceIT#theScheduledExtractionTagsInvoicesAndBatchesTheEligibleOnes
       - c: 1
         type: Negative
         title: Invoice on hold not extracted
@@ -1292,7 +1216,6 @@ frs:
         steps:
           - Run the extraction; open the tag of ARN-2026-940004.
         expected: UNEXTRACTED_DUE with reason ON_HOLD.
-        auto: RemittanceHoldsAndSpecialsIT#anApprovedHoldKeepsTheInvoiceOutOfExtractionUntilItExpires
       - c: 2
         type: Negative
         title: Manual extraction for the wrong insurer
@@ -1300,7 +1223,6 @@ frs:
           - Manual run; insurer INS-LAC; invoice of INS-MGIC.
         expected: Refused.
         msg: ["Invoice <no> is not an invoice of {INS-LAC}", REMIT_INVOICE_INSURER]
-        auto: RemittanceIT#aManualInvoiceExtractionRefusesInvoicesThatCannotBeRemitted
       - c: 2
         type: Negative
         title: Manual extraction of an unpaid invoice
@@ -1308,14 +1230,12 @@ frs:
           - Manual run on an unpaid invoice.
         expected: Refused with the reason.
         msg: ["Invoice <no> cannot be remitted now: <reasons>", SPECIAL_REMIT_NOT_ELIGIBLE]
-        auto: RemittanceIT#aManualInvoiceExtractionRefusesInvoicesThatCannotBeRemitted
       - c: 3
         type: Workflow
         title: End-of-day request extracted once
         steps:
           - Queue an eligible invoice for the end of day; run the evening extraction twice.
         expected: The invoice is extracted by the first run only.
-        auto: RemittanceOperationsIT#endOfDayRequestsAreProcessedByTheScheduledExtraction
 
   FR-OP-031:
     scenario: SC-OP-04
@@ -1334,7 +1254,6 @@ frs:
         steps:
           - Pay an invoice by check with value date two banking days ago; run the extraction.
         expected: UNEXTRACTED_DUE with CHECK_HOLDING; on the third banking day it is extracted.
-        auto: RemittanceIT#theScheduledExtractionTagsInvoicesAndBatchesTheEligibleOnes; RemittanceRulesTest#paidInvoicesAreExtractedUnlessSomethingBlocksThem
       - c: 2
         type: Report-output
         screen: REPORTS
@@ -1343,7 +1262,6 @@ frs:
         steps:
           - Run the extraction; run REM-PAIDAR-OVER-DTIP.
         expected: The invoice is excluded and listed with invoice, insurer, paid AR and DTIP.
-        auto: RemittanceRulesTest#paidArAboveTheDtipIsExcludedOrCappedAsParameterised
       - c: 2
         type: Positive
         persona: SYSADMIN
@@ -1352,7 +1270,6 @@ frs:
         steps:
           - Set REMIT_PAIDAR_OVER_DTIP_MODE to CAP; run the extraction.
         expected: The invoice is extracted for 10,000.00; the difference is recorded.
-        auto: RemittanceRulesTest#paidArAboveTheDtipIsExcludedOrCappedAsParameterised
       - c: 3
         type: Negative
         screen: INV360
@@ -1361,7 +1278,6 @@ frs:
         steps:
           - Run the extraction; open Invoice 360.
         expected: The invoice is in no batch and shows WRITTEN_OFF.
-        auto: RemittanceRulesTest#paidInvoicesAreExtractedUnlessSomethingBlocksThem
       - c: 3
         type: Positive
         screen: NOTIF
@@ -1369,7 +1285,6 @@ frs:
         steps:
           - Submit a negative adjustment on an invoice in a batch; as remit open the bell.
         expected: A notification names the invoice and the batch.
-        auto: RemittanceOperationsIT#aNegativeAdjustmentIsNotifiedToTheRemittanceTeam
 
   FR-OP-032:
     scenario: SC-OP-04
@@ -1386,21 +1301,19 @@ frs:
         screen: API
         title: Amounts of a line cannot be edited
         steps:
-          - Look for edit on a line; call a PUT on the line amount.
-        expected: No edit on screen; no endpoint changes the amount (HTTP 404 or 405).
-        auto: RemittanceIT#excludedInvoicesAreGivenBackAndCanBeRestoredBeforeSubmission
+          - Look for edit on a line; send a direct request to change the line amount.
+        expected: No edit on screen; a direct request cannot change the amount.
       - c: 2
         type: Workflow
         title: Exclude and restore a line
         steps:
           - Open the batch in review; exclude a line with reason and comment; check totals and Invoice 360; restore it.
         expected: After exclusion the totals drop and the invoice is unlocked; after restore the line is back in the totals and locked.
-        auto: RemittanceIT#excludedInvoicesAreGivenBackAndCanBeRestoredBeforeSubmission
       - c: 2
         type: Negative
         title: Exclude a line twice
         steps:
-          - Exclude the already excluded line again (API).
+          - Exclude the already excluded line again (direct request).
         expected: Refused.
         msg: ["Invoice <no> is already excluded", REMIT_LINE_ALREADY_EXCLUDED]
       - c: 3
@@ -1434,7 +1347,6 @@ frs:
         steps:
           - Click Return batch with a reason; run the extraction again.
         expected: The batch is RETURNED; its invoices are tagged RETURNED and extracted again by the next run.
-        auto: RemittanceIT#aReturnedBatchGivesItsInvoicesBackTaggedReturned
       - c: 2
         type: Negative
         title: Return without a reason
@@ -1449,7 +1361,6 @@ frs:
         steps:
           - As remittl assign the batch to another processor.
         expected: The new processor sees it in the queue.
-        auto: RemittanceIT#aBatchIsReassignedToAnotherProcessor
 
   FR-OP-034:
     scenario: SC-OP-04
@@ -1466,14 +1377,12 @@ frs:
         steps:
           - Open the remitted seed batch; Documents; download the schedule.
         expected: One line per invoice with the columns; the totals equal the batch totals.
-        auto: RemittanceOperationsIT#theScheduleAndPaymentRequestAreStoredAndTheScheduleIsSentOnce
       - c: 2
         type: Report-output
         title: Payment request document
         steps:
           - Download the payment request twice.
         expected: Payable amount, insurer and approver; both downloads are identical.
-        auto: RemittanceOperationsIT#theScheduleAndPaymentRequestAreStoredAndTheScheduleIsSentOnce
       - c: 1
         type: Negative
         title: Schedule of a batch in review
@@ -1505,7 +1414,6 @@ frs:
         steps:
           - As remittl approve the submitted batch.
         expected: The batch is APPROVED - with Disbursement; one balanced journal per line; one payment request in the Disbursement Queue; the commission OR number is shown.
-        auto: RemittanceIT#anApprovedBatchIsPostedRemittedAndPushedToDisbursement
       - c: 3
         type: Negative
         title: Line invalid at approval
@@ -1531,7 +1439,6 @@ frs:
         steps:
           - As disb acknowledge the request of the approved batch and enter DV 2026-000123 for the full amount.
         expected: The batch is Fully remitted - awaiting insurer OR; its invoices are FULLY_REMITTED and unlocked.
-        auto: OperationsFoundationApiIT#theDisbursementQueueIsWorkedThroughTheApi
       - c: 2
         type: Negative
         persona: DISBURSEMENT
@@ -1547,7 +1454,6 @@ frs:
         steps:
           - Switch off e-mail for OPS_DISBURSEMENT_STATUS; have a DV assigned.
         expected: No e-mail; the in-app notice appears.
-        auto: OperationsFoundationApiIT#notificationPreferencesAreKeptPerUser
 
   FR-OP-037:
     scenario: SC-OP-04
@@ -1564,7 +1470,6 @@ frs:
         steps:
           - Upload the OR schedule for the batch remitted in TC-OP-036.1-01.
         expected: The batch is Insurer OR received; each line shows its OR number.
-        auto: RemittanceOperationsIT#theInsurerOrScheduleUpdatesLinesAndReportsExceptions
       - c: 1
         type: Report-output
         screen: REPORTS
@@ -1572,7 +1477,6 @@ frs:
         steps:
           - Upload an OR 100.00 below the paid AR for one line; run REM-OR-EXCEPTION.
         expected: The line is AMOUNT_MISMATCH and listed.
-        auto: RemittanceOperationsIT#theInsurerOrScheduleUpdatesLinesAndReportsExceptions
       - c: 2
         type: Negative
         title: Row without OR number
@@ -1605,7 +1509,6 @@ frs:
         steps:
           - Run the extraction; open its batch.
         expected: Remittance type WITH_INCENTIVES; incentive 2 % of the basic premium deducted from the payable.
-        auto: RemittanceOperationsIT#aWithIncentivesBatchDeductsTheEarlyRemittanceIncentive
       - c: 1
         type: Boundary
         screen: BATCH
@@ -1613,7 +1516,6 @@ frs:
         steps:
           - Same invoice remitted 40 days after inception.
         expected: Normal batch; no incentive.
-        auto: RemittanceRulesTest#incentiveRulesMatchInsurerLineSegmentPeriodAndWindow
       - c: 2
         type: Negative
         title: Rule ending before it starts
@@ -1621,7 +1523,6 @@ frs:
           - New rule effective from 01-Nov-2026 to 31-Oct-2026.
         expected: Refused.
         msg: [The rule cannot end before it starts, INCENTIVE_RULE_PERIOD]
-        auto: RemittanceApiIT#incentiveRulesAreMaintainedThroughTheApi
 
   FR-OP-039:
     scenario: SC-OP-04
@@ -1650,10 +1551,9 @@ frs:
         screen: API
         title: Search without REMIT_PROCESS
         steps:
-          - As cashier call GET /api/v1/remittance/dtip.
-        expected: HTTP 403.
+          - As cashier send a direct request to open the DTIP search.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
-        auto: RemittanceApiIT#usersWithoutTheRightPermissionAreRefused
 
   FR-OP-040:
     scenario: SC-OP-04
@@ -1670,7 +1570,6 @@ frs:
         steps:
           - Open the seed request for approval; click Approve special remittance; approve its batch.
         expected: A SPECIAL batch with the invoice; the request is Pushed to Disbursement; mktcoll is notified with the request number.
-        auto: RemittanceHoldsAndSpecialsIT#aSpecialRemittanceIsValidatedApprovedAndPushedThroughItsOwnBatch
       - c: 2
         type: Negative
         title: Requester approves
@@ -1685,7 +1584,6 @@ frs:
         steps:
           - Reject a request with a reason.
         expected: The request is REJECTED; the invoice is unchanged.
-        auto: RemittanceHoldsAndSpecialsIT#aRejectedOrReturnedSpecialRemittanceEnds
 
   FR-OP-041:
     scenario: SC-OP-04
@@ -1702,14 +1600,12 @@ frs:
         steps:
           - Run REM-TRACKER for this month.
         expected: One row per batch with the columns; the remitted seed batch is listed.
-        auto: RemittanceOperationsIT#everyRemittanceReportRunsAndExports
       - c: 2
         type: Report-output
         title: DTIP detail with ageing
         steps:
           - Run REM-DTIP-DETAIL.
         expected: Outstanding DTIP per invoice with the ageing columns.
-        auto: RemittanceOperationsIT#everyRemittanceReportRunsAndExports
       - c: 2
         type: Security-access
         persona: MKT_COLLECTION
@@ -1717,7 +1613,7 @@ frs:
         title: Export without OPS_REPORT_EXPORT
         steps:
           - As mktcoll export REM-TRACKER.
-        expected: HTTP 403.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-OP-050:
@@ -1737,7 +1633,6 @@ frs:
         steps:
           - New Request; invoice of a paid seed account; type flat cancellation; reason Unit sold; effective date within cover; description; Submit for validation.
         expected: The request is For validation; Invoice 360 shows PENDING_NEG_ADJ and the ADJUSTMENT lock.
-        auto: AdjustmentApiIT#aRequestIsRaisedAndMovedOverHttp; AdjustmentRequestIT#anOpenRequestLocksTheInvoiceAgainstRemittanceUntilItEnds
       - c: 2
         type: Negative
         title: Cancellation with another open financial request
@@ -1745,14 +1640,12 @@ frs:
           - Raise a TSI change on ARN-2026-940002; then a partial cancellation on the same invoice.
         expected: The cancellation is refused.
         msg: ["Request <no> (<type>) is still open on <invoice>: a cancellation cannot be combined with another financial change", ADJ_INCOMPATIBLE_REQUEST]
-        auto: AdjustmentRequestIT#aDuplicateNeedsAJustificationAndACancellationExcludesOtherChanges
       - c: 3
         type: Positive
         title: Non-financial change of the assured
         steps:
           - New Request; type non-financial (assured information); description; no amounts; submit.
         expected: The request is saved without amounts.
-        auto: AdjustmentRequestIT#aNonFinancialEndorsementIsRecordedByBookingWithoutApproval
       - c: 3
         type: Positive
         title: Three invoices, three requests
@@ -1766,7 +1659,6 @@ frs:
           - Type non-financial with a premium change.
         expected: Refused.
         msg: ["A non-financial endorsement carries no request type, sum insured or amount change", ADJ_NON_FINANCIAL_WITH_AMOUNTS]
-        auto: AdjustmentRequestIT#invalidRequestsAreRefusedWithTheirReason
       - c: 4
         type: Negative
         title: Effective date outside the cover
@@ -1774,7 +1666,6 @@ frs:
           - Effective date after the expiry.
         expected: Refused.
         msg: ["The effective date must be within the cover <inception> to <expiry>", ADJ_EFFECTIVE_DATE_OUTSIDE_TERM]
-        auto: AdjustmentRequestIT#invalidRequestsAreRefusedWithTheirReason
       - c: 4
         type: Negative
         title: Cancellation without reason
@@ -1782,7 +1673,6 @@ frs:
           - Flat cancellation without a reason.
         expected: Refused.
         msg: [Select the reason for cancellation, ADJ_CANCELLATION_REASON_REQUIRED]
-        auto: AdjustmentRequestIT#invalidRequestsAreRefusedWithTheirReason
 
   FR-OP-051:
     scenario: SC-OP-06
@@ -1800,14 +1690,12 @@ frs:
           - Raise a flat cancellation on ARN-2026-940004 with reason Unit sold (the seed one is open).
         expected: Refused.
         msg: ["Possible duplicate of <requests> (same invoice, request type, reason and endorsement reference): give the justification to proceed", ADJ_DUPLICATE_REQUEST]
-        auto: AdjustmentRequestIT#aDuplicateNeedsAJustificationAndACancellationExcludesOtherChanges
       - c: 2
         type: Positive
         title: Duplicate with justification
         steps:
           - Enter the justification; save.
         expected: The request is saved with the justification.
-        auto: AdjustmentRequestIT#aDuplicateNeedsAJustificationAndACancellationExcludesOtherChanges
 
   FR-OP-052:
     scenario: SC-OP-06
@@ -1824,7 +1712,6 @@ frs:
         steps:
           - Open the returned cover extension of ARN-2026-940002; Documents; upload a PDF as Other supporting document; open it.
         expected: The file is listed with type, size and user and opens.
-        auto: AttachmentIT#uploadListDownloadAndDeleteWithChecksumAndAudit
       - c: 2
         type: Negative
         title: Executable refused
@@ -1832,7 +1719,6 @@ frs:
           - Upload a .exe file.
         expected: Refused.
         msg: ["Only these file types are allowed: <list>", ATTACHMENT_TYPE_NOT_ALLOWED]
-        auto: AttachmentIT#httpUploadAndDownload
 
   FR-OP-053:
     scenario: SC-OP-06
@@ -1853,7 +1739,6 @@ frs:
           - As adjtl click Approve.
         expected: Refused.
         msg: [A request is approved by someone who did not raise or validate it, ADJ_FOUR_EYES]
-        auto: AdjustmentRequestIT#approvalIsFourEyesAndAReturnCarriesItsReason
       - c: 1
         type: Workflow
         persona: ADJUSTMENT_TL
@@ -1861,13 +1746,12 @@ frs:
         steps:
           - Open the premium rate increase of ARN-2026-940002 (for approval); Approve.
         expected: The request is For posting.
-        auto: AdjustmentRequestIT#approvalIsFourEyesAndAReturnCarriesItsReason
       - c: 2
         type: Negative
         screen: API
         title: Extension with premium validated for posting
         steps:
-          - Call validate_for_posting on a cover extension with additional premium.
+          - Send a direct request for the action Validate for posting on a cover extension with additional premium.
         expected: Refused; it must go through approval.
         msg: ["<request> is <stage>, not <expected>", ADJ_WRONG_STAGE]
       - c: 3
@@ -1877,7 +1761,6 @@ frs:
         steps:
           - In Posting Batches select the flat cancellation of ARN-2026-940004; Return with reason Incomplete documents.
         expected: The request is Returned to requester with the reason; mktcoll sees it; it is not posted.
-        auto: AdjustmentApiIT#batchesAndReturnsOverHttp
       - c: 3
         type: Negative
         title: Return without reason
@@ -1902,21 +1785,18 @@ frs:
         steps:
           - Raise a TSI decrease on the co-insured invoice; open Recompute.
         expected: Premium and commission change per insurer in 60 / 40.
-        auto: AdjustmentDomainTest#theRequestTypeDecidesTheComputation
       - c: 2
         type: Positive
         title: Commission change only
         steps:
           - Raise and post a commission rate increase without premium change.
         expected: A service invoice is issued at posting.
-        auto: AdjustmentRequestIT#aCommissionChangeAloneIssuesAServiceInvoice
       - c: 3
         type: Positive
         title: Flat cancellation equals the booking
         steps:
           - Open Recompute of the flat cancellation of ARN-2026-940004.
         expected: Every component equals the negative of the booked amounts.
-        auto: AdjustmentPostingIT#aFlatCancellationReturnsEverythingAndFlagsTheInvoice
       - c: 1
         type: Negative
         title: Insurer without commission configuration
@@ -1940,14 +1820,12 @@ frs:
           - Raise a TSI increase above the package limit; click Validate for approval.
         expected: Refused.
         msg: ["The TSI increase exceeds the package limit: link the quotation prepared by Marketing first (ADJID.008)", ADJ_QUOTATION_REQUIRED]
-        auto: AdjustmentRequestIT#aTsiIncreaseAboveThePackageLimitNeedsAQuotation
       - c: 1
         type: Workflow
         title: Link the quotation and validate
         steps:
           - Enter the quotation number; link; validate.
         expected: The request moves to For approval with the quotation number.
-        auto: AdjustmentRequestIT#aTsiIncreaseAboveThePackageLimitNeedsAQuotation
       - c: 2
         type: Negative
         title: Link on a request within the limit
@@ -1971,7 +1849,6 @@ frs:
         steps:
           - Select three requests for posting and one whose invoice is locked; Post batch.
         expected: Three are POSTED; the fourth stays For posting with the lock message.
-        auto: AdjustmentPostingIT#aBatchPostsWhatQualifiesAndReportsTheFailures
       - c: 2
         type: Report-output
         screen: REPORTS
@@ -1979,7 +1856,6 @@ frs:
         steps:
           - Run the Validation List for today.
         expected: The GL lines of the three requests, equal to their journals.
-        auto: AdjustmentFilesAndReportsIT#theReportsRunAndExportAndTheDailyJobArchivesTheDay
       - c: 2
         type: Negative
         title: Post with nothing selected
@@ -2003,14 +1879,12 @@ frs:
         steps:
           - Post a flat cancellation of a fully paid invoice of 10,000.00 not yet remitted; open Unapplied Payments.
         expected: An unapplied item of 10,000.00 exists for the client.
-        auto: AdjustmentReapplierIT#aPaidInvoiceCancelledFlatHasItsPaymentsReappliedAndTheExcessRecorded; AdjustmentPostingIT#aDecreaseOfAPaidInvoiceIsReappliedByCashieringAndPosted
       - c: 2
         type: Workflow
         title: Cancel a remitted invoice
         steps:
           - Post a flat cancellation of the remitted booking invoice of ARN-2026-940001; open Invoice 360.
         expected: AR Insurer equals the remitted DTIP; PENDING_NEG_ADJ stays.
-        auto: AdjustmentPostingIT#aDecreaseAlreadyRemittedSetsUpTheArInsurer
       - c: 1
         type: Negative
         title: Re-application unavailable
@@ -2019,7 +1893,6 @@ frs:
           - Post a decrease on a paid invoice.
         expected: The request waits in Posted - payments to re-apply.
         msg: ["Payments can only be re-applied once Cashiering is available; the request stays awaiting re-application", PAYMENT_REAPPLIER_UNAVAILABLE]
-        auto: FlowInAndPortsIT#reapplicationIsRefusedOnlyWhenTheInvoiceHasPayments
 
   FR-OP-058:
     scenario: SC-OP-06
@@ -2037,7 +1910,6 @@ frs:
           - Raise a second premium increase that takes the total adjustments to 101 % of the original premium; submit.
         expected: Refused without justification; accepted with it.
         msg: ["Cumulative adjustments of <amount> exceed the baseline of {100}% of the original premium <amount>", ADJ_OVER_BASELINE]
-        auto: AdjustmentRequestIT#aTsiIncreaseAboveThePackageLimitNeedsAQuotation
       - c: 1
         type: Positive
         title: Within the baseline
@@ -2067,7 +1939,6 @@ frs:
         steps:
           - Upload the minimal balance file with a balance of 50.00; commit; run a manual extraction on that invoice.
         expected: The balance is written off (report ADJ-MINBAL-FILE); Remittance refuses the invoice as WRITTEN_OFF.
-        auto: AdjustmentFilesAndReportsIT#theMinimalBalanceFileWritesOffDebitsAndCreditsCreditsWithinTheRange
       - c: 2
         type: Boundary
         neg: true
@@ -2099,7 +1970,6 @@ frs:
         steps:
           - Open the flat cancellation of ARN-2026-940004; download Endorsement Slip twice.
         expected: The slip shows the Annex V fields and a number ES-2026-n; both downloads carry the same number.
-        auto: AdjustmentRequestIT#slipsTileAndInvoiceItemsShowTheRequest
       - c: 2
         type: Negative
         title: Slip of an internal adjustment
@@ -2107,7 +1977,6 @@ frs:
           - Open the internal adjustment of ARN-2026-940001; Endorsement Slip.
         expected: Refused.
         msg: ["Internal adjustments have no endorsement slip (ADJID.015)", ADJ_NO_SLIP_FOR_INTERNAL]
-        auto: AdjustmentRequestIT#anInternalAdjustmentHasNoEndorsementSlip
       - c: 2
         type: Negative
         title: Validation slip before validation
@@ -2115,7 +1984,6 @@ frs:
           - Open the draft request of ARN-2026-940002; Validation Slip.
         expected: Refused.
         msg: ["<request> has not passed validation yet", ADJ_NOT_VALIDATED]
-        auto: AdjustmentRequestIT#slipsTileAndInvoiceItemsShowTheRequest
 
   FR-OP-061:
     scenario: SC-OP-06
@@ -2139,31 +2007,27 @@ frs:
         steps:
           - Search ARN-2026-940002.
         expected: The four seed requests are listed; the link opens Invoice 360.
-        auto: AdjustmentApiIT#readEndpointsRespond
       - c: 3
         type: Positive
         title: Search by policy number
         steps:
           - Search the insurer policy number of a booked invoice with a request.
         expected: The request is listed with its Policy No. / ARN, Invoice / Placement Slip, insurer and product names and the business type label.
-        auto: AdjustmentPolicyLinkIT#theWorkbenchListAndTheRequestShowThePolicyOverHttp
       - c: 3
         type: Positive
         title: Policy transactions with journals
         steps:
           - Open a posted flat cancellation; tab Policy Transactions; expand the cancellation row.
         expected: The original booking, then the cancellation (Financial – Change of Cover, Flat Cancellation) with the negative premium and tax change, gross premium 0.00 after it and status Posted; its journals list balanced lines and open the journal page.
-        auto: AdjustmentPolicyLinkIT#aPostedCancellationShowsInThePolicyHistoryWithItsJournals
       - c: 2
         type: Security-access
         persona: CASHIER
         screen: API
         title: Workbench without ADJ permissions
         steps:
-          - As cashier call GET /api/v1/adjustment/requests.
-        expected: HTTP 403.
+          - As cashier send a direct request to open the adjustment requests.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
-        auto: AdjustmentApiIT#permissionsAreEnforced
 
   FR-OP-062:
     scenario: SC-OP-06
@@ -2180,7 +2044,6 @@ frs:
         steps:
           - Run the Validation List for today; compare with the journals of today's posted requests.
         expected: Same GL lines and totals.
-        auto: AdjustmentFilesAndReportsIT#theReportsRunAndExportAndTheDailyJobArchivesTheDay
       - c: 2
         type: Positive
         persona: SYSTEM
@@ -2189,7 +2052,6 @@ frs:
         steps:
           - Run job ADJ_DAILY_REPORT; open the Report Archive.
         expected: The day's report is archived with its date.
-        auto: AdjustmentFilesAndReportsIT#theReportsRunAndExportAndTheDailyJobArchivesTheDay
       - c: 2
         type: Negative
         persona: SYSTEM
@@ -2217,7 +2079,6 @@ frs:
         steps:
           - Keep the seed schedule of INS-MGIC on day 5; run PRODUCTION_EXTRACT for 5 and 6 October (clock moved).
         expected: No extract on 5 October; the extract is made on 6 October.
-        auto: ProdReconIT#schedulesExtractOnTheirDayAndRollToWorkingDays; InsurerRowParserTest#schedulesRunOnTheirDayAndMovePastEachRun
       - c: 2
         type: Negative
         title: Schedule without insurer
@@ -2225,7 +2086,6 @@ frs:
           - New schedule without insurer; save.
         expected: Refused.
         msg: [Choose the company and the insurer of the schedule, RECON_SCHEDULE_INSURER]
-        auto: ProdReconApiIT#schedulesAreMaintained
 
   FR-OP-071:
     scenario: SC-OP-07
@@ -2242,7 +2102,6 @@ frs:
         steps:
           - New Extract; INS-MGIC; September 2026; open its lines; run PRC-EXTRACT-LOG.
         expected: Only accounts booked in September; the file name, date, time and row count equal the log.
-        auto: ProdReconIT#aRegisterIsExtractedSentUploadedAndMatched
       - c: 2
         type: Negative
         title: Period ending before it starts
@@ -2301,7 +2160,6 @@ frs:
         steps:
           - Open a new extract; Send to Insurer to the test mailbox of INS-MGIC.
         expected: Two e-mails (protected register with cover letter, then password); the extract shows the sent date and time.
-        auto: ProdReconIT#aRegisterIsExtractedSentUploadedAndMatched
       - c: 2
         type: Negative
         title: Insurer without e-mail
@@ -2316,10 +2174,9 @@ frs:
         screen: API
         title: Send without RECON_SEND
         steps:
-          - As cashier call POST .../extracts/{id}/send.
-        expected: HTTP 403.
+          - As cashier send a direct request to send an extract.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
-        auto: ProdReconApiIT#usersWithoutReconciliationRightsAreRefused
 
   FR-OP-074:
     scenario: SC-OP-07
@@ -2336,7 +2193,6 @@ frs:
         steps:
           - Upload the feedback file of TD-OP-08 for the new cycle.
         expected: The cycle is Reconciling; lines are matched and insurer-only lines listed separately.
-        auto: ProdReconIT#aRegisterIsExtractedSentUploadedAndMatched
       - c: 2
         type: Negative
         title: Same file again
@@ -2344,7 +2200,6 @@ frs:
           - Upload the same file.
         expected: Refused; the attempt is listed.
         msg: ["Upload refused: <earlier upload>", RECON_UPLOAD_DUPLICATE]
-        auto: ProdReconIT#aRegisterIsExtractedSentUploadedAndMatched
       - c: 2
         type: Negative
         title: Column missing
@@ -2352,7 +2207,6 @@ frs:
           - Upload a file without the Invoice No. column.
         expected: Refused and the column is named.
         msg: ["The file is not in the production register layout: column '<column>' missing", RECON_FILE_LAYOUT]
-        auto: ProdReconIT#aFileOutsideTheLayoutFailsItsRun
       - c: 2
         type: Negative
         title: Row without keys
@@ -2360,7 +2214,6 @@ frs:
           - Upload a file with a row that has neither invoice nor policy number.
         expected: The row is refused.
         msg: ["Row <n> has neither invoice nor policy number", RECON_ROW_INCOMPLETE]
-        auto: InsurerRowParserTest#refusesIncompleteOrUnreadableRows
 
   FR-OP-075:
     scenario: SC-OP-07
@@ -2378,20 +2231,18 @@ frs:
         steps:
           - Upload feedback where one line's gross premium differs by 0.80 and another by 1.20.
         expected: The first is MATCHED; the second MATCHED_WITH_DISCREPANCY listing gross premium.
-        auto: ReconMatcherTest#differencesWithinTheToleranceAreMatched; ReconMatcherTest#fieldsBeyondTheToleranceAreListed
       - c: 2
         type: Positive
         title: Account not returned by the insurer
         steps:
           - Open the BDOI only bucket.
         expected: The booked account missing from the feedback is BDOI_ONLY.
-        auto: ProdReconIT#cyclesAreAutomatchedValidatedCountedAndClosed
       - c: 3
         type: Negative
         screen: API
         title: Automatch a closed cycle
         steps:
-          - Close a cycle; call automatch on it.
+          - Close a cycle; send a direct request to run the automatch on it.
         expected: Refused.
         msg: ["Cycle <no> is closed", RECON_CYCLE_CLOSED]
 
@@ -2410,14 +2261,12 @@ frs:
         steps:
           - Upload feedback with a policy of an issued, unbooked account.
         expected: The line is UNMATCHED_PREBOOKED with its ARN.
-        auto: ProdReconIT#preBookedProductionIsMatchedWhenTheAccountIsBooked
       - c: 2
         type: Workflow
         title: Booking closes the line
         steps:
           - Book the account; reopen Unbooked Accounts.
         expected: The line is BOOKED and leaves the open list.
-        auto: ProdReconIT#preBookedProductionIsMatchedWhenTheAccountIsBooked
       - c: 2
         type: Negative
         title: Policy never booked stays open
@@ -2440,7 +2289,6 @@ frs:
         steps:
           - Filter the items by an AO; select five; set disposition For closure; run PRC-DISPOSITION.
         expected: Only that AO's items; each of the five shows the disposition, also on the report.
-        auto: ProdReconIT#feedbackDispositionAndManualPairing
       - c: 2
         type: Negative
         title: Pair two BDOI-only items
@@ -2461,7 +2309,6 @@ frs:
         steps:
           - Pair the BDOI-only item with the insurer-only line of the same policy.
         expected: The pair shows as matched manually.
-        auto: ProdReconIT#feedbackDispositionAndManualPairing
 
   FR-OP-078:
     scenario: SC-OP-07
@@ -2484,7 +2331,6 @@ frs:
         steps:
           - Open Early Incentive of an INS-LAC cycle.
         expected: NO_RULE; report PRC-EARLY-INCENTIVE shows the same.
-        auto: ProdReconIT#everyReconciliationReportRunsAndExports
 
   FR-OP-079:
     scenario: SC-OP-07
@@ -2501,7 +2347,6 @@ frs:
         steps:
           - Set For closure on every open item of the seed cycle.
         expected: The cycle is CLOSED; History lists extract, send, upload and closure with users and times.
-        auto: ProdReconIT#cyclesAreAutomatchedValidatedCountedAndClosed
       - c: 2
         type: Negative
         title: Feedback on a closed cycle
@@ -2509,7 +2354,6 @@ frs:
           - Record feedback on an item of the closed cycle.
         expected: Refused.
         msg: ["Cycle <no> is closed", RECON_CYCLE_CLOSED]
-        auto: ProdReconApiIT#aCycleIsWorkedThroughTheApi
 
   FR-OP-080:
     scenario: SC-OP-07
@@ -2526,14 +2370,12 @@ frs:
         steps:
           - Run PRC-SUMMARY for the seed cycle; compare with the cycle tiles.
         expected: Same counts and amounts per bucket.
-        auto: ProdReconIT#everyReconciliationReportRunsAndExports
       - c: 2
         type: Report-output
         title: Register with remarks
         steps:
           - Run PRC-REGISTER with insurer feedback.
         expected: The insurer remarks per account.
-        auto: ProdReconIT#everyReconciliationReportRunsAndExports
       - c: 2
         type: Security-access
         persona: DISBURSEMENT
@@ -2541,7 +2383,7 @@ frs:
         title: Export without rights
         steps:
           - As disb export PRC-SUMMARY.
-        expected: HTTP 403.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-OP-090:
@@ -2559,7 +2401,6 @@ frs:
         steps:
           - Upload CEB_DP_20260930.xlsx.
         expected: The list appears in the tracker for branch CEB with its rows.
-        auto: DpListHandlerTest#theFileNameGivesTheBranchAndTheDate; CommissionIT#dpListsAreValidatedAndSanitised
       - c: 2
         type: Negative
         title: Name outside the convention
@@ -2567,7 +2408,6 @@ frs:
           - Upload "dp list.xlsx".
         expected: Refused.
         msg: ["Name the DP list <Branch>_DP_<yyyyMMdd> (e.g. HO_DP_20260930.xlsx): <file>", DP_LIST_NAME]
-        auto: DpListHandlerTest#aFileBreakingTheConventionIsRefused
       - c: 2
         type: Negative
         title: Same list twice
@@ -2591,21 +2431,18 @@ frs:
         steps:
           - Upload a list with an ordinary invoice; open DP Accounts, Invalid.
         expected: The account is INVALID and shows the failed rule.
-        auto: CommissionIT#dpListsAreValidatedAndSanitised
       - c: 1
         type: Negative
         title: Same invoice on two lists
         steps:
           - Upload a branch list with the invoice of ARN-2026-940003.
         expected: The second is DUPLICATE.
-        auto: CommissionIT#dpListsAreValidatedAndSanitised
       - c: 2
         type: Workflow
         title: Confirm a valid account
         steps:
           - Confirm a valid, fully paid DP account.
         expected: The account moves to DP for billing.
-        auto: CommissionApiIT#aDpListIsBilledAnsweredAndCollectedThroughTheApi
       - c: 2
         type: Negative
         title: Confirm an account already billed
@@ -2629,7 +2466,6 @@ frs:
         steps:
           - Confirm DP accounts of INS-MGIC and INS-LAC; Prepare Billing; send each.
         expected: Two billings; each sent billing shows its due date 10 working days later.
-        auto: CommissionIT#aBillingIsAnsweredCollectedAndThePremiumReceivableReversed
       - c: 2
         type: Negative
         title: Nothing to bill
@@ -2668,7 +2504,6 @@ frs:
         steps:
           - Record REJECTED with a reason; open Hand-offs and Extracts.
         expected: The account is in the COLLECTION_DP_RETURNED extract.
-        auto: CommissionIT#rejectedAccountsReturnToCollectionAndBillingsCanBeCancelled
       - c: 2
         type: Positive
         persona: SYSTEM
@@ -2678,7 +2513,6 @@ frs:
         steps:
           - Run DP_FEEDBACK_SLA; open DP Billings and the bell.
         expected: The billing shows overdue; the alert is raised once.
-        auto: CommissionIT#aBillingIsAnsweredCollectedAndThePremiumReceivableReversed
       - c: 3
         type: Negative
         screen: DPRESP
@@ -2687,7 +2521,6 @@ frs:
           - Upload an answer file with decision "MAYBE".
         expected: The row is refused.
         msg: ["Decision '<value>' is neither APPROVED nor REJECTED", DP_RESPONSE_DECISION]
-        auto: DpListHandlerTest#insurerDecisionsAreRead
 
   FR-OP-094:
     scenario: SC-OP-08
@@ -2704,12 +2537,11 @@ frs:
         steps:
           - Record APPROVED for the seed billing; Collect with bank account 1111 and today's date.
         expected: The billing is Commission collected then Closed - PR reversed; the OR number is shown; each account has DP_REVERSAL.
-        auto: CommissionIT#aBillingIsAnsweredCollectedAndThePremiumReceivableReversed; CommissionApiIT#aDpListIsBilledAnsweredAndCollectedThroughTheApi
       - c: 2
         type: Negative
         title: Reverse an account not tagged DP
         steps:
-          - Reverse the PR of an ordinary invoice (API).
+          - Reverse the PR of an ordinary invoice (direct request).
         expected: Refused and the invoice is named.
         msg: ["Invoice <no> is not tagged direct payment by Marketing: its premium receivable cannot be reversed (MKTID.012)", DP_TAG_INVALID]
       - c: 2
@@ -2726,7 +2558,6 @@ frs:
         steps:
           - Reinstate a reversed account with a reason; reverse it again.
         expected: Both actions are recorded and the account ends reversed.
-        auto: CommissionApiIT#aDpListIsBilledAnsweredAndCollectedThroughTheApi
 
   FR-OP-095:
     scenario: SC-OP-08
@@ -2743,7 +2574,6 @@ frs:
         steps:
           - Add tiers 10,000 / 500 and 50,000 / 1,000 to Motor Mania; activate; compute a run with policies of 60,000.00 and 9,000.00 basic premium.
         expected: 1,000.00 for the first; nothing for the second.
-        auto: IncentiveEngineTest#motorManiaPaysTheFixedAmountOfTheHighestMinimumMet; CommissionIT#incentivesAreComputedPostedAndPassedOn
       - c: 2
         type: Negative
         screen: RUNS
@@ -2751,7 +2581,6 @@ frs:
         steps:
           - Include a cancelled invoice in the run period.
         expected: The invoice is excluded and listed with the reason.
-        auto: IncentiveEngineTest#theHighestTargetReachedAppliesToEveryEligibleInvoice
       - c: 2
         type: Negative
         screen: RUNS
@@ -2790,7 +2619,6 @@ frs:
         steps:
           - Submit a certificate tagged to the commission OR; as comptrol reject with a reason; as commrec resubmit; as comptrol acknowledge.
         expected: The history shows each step; the certificate ends acknowledged.
-        auto: CommissionIT#certificatesAreSubmittedRejectedResubmittedAndAcknowledged
       - c: 2
         type: Negative
         persona: COMPTROLLERSHIP
@@ -2815,7 +2643,6 @@ frs:
         steps:
           - Estimated Items; invoice of ARN-2026-940002; reason; save; run CMR-PRODUCTION-YEARLY.
         expected: The invoice shows as estimated in the report and in the next production register.
-        auto: CommissionIT#invoicesAreFlaggedEstimated
       - c: 2
         type: Report-output
         screen: REPORTS
@@ -2823,7 +2650,6 @@ frs:
         steps:
           - Run CMR-PRODUCTION-YEARLY for 2026.
         expected: Every branch and insurer with production is listed.
-        auto: CommissionIT#everyCommissionReportRunsAndExports
       - c: 1
         type: Negative
         title: Unknown invoice
@@ -2846,7 +2672,6 @@ frs:
         steps:
           - Run the CMR report for this month.
         expected: ARN-2026-940003 in the direct payment group and ARN-2026-940001 in the regular group, each with net commission.
-        auto: CommissionIT#everyCommissionReportRunsAndExports
       - c: 2
         type: Security-access
         persona: MKT_COLLECTION
@@ -2854,9 +2679,8 @@ frs:
         title: Export without rights
         steps:
           - As mktcoll export the CMR report.
-        expected: HTTP 403.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
-        auto: CommissionApiIT#usersWithoutCommissionRightsAreRefused
 
   FR-OP-110:
     scenario: SC-OP-05
@@ -2873,7 +2697,6 @@ frs:
         steps:
           - Open the remitted seed batch; Send via Email to the insurer's test mailbox.
         expected: The schedule is e-mailed protected; the batch records the send.
-        auto: RemittanceOperationsIT#theScheduleAndPaymentRequestAreStoredAndTheScheduleIsSentOnce
       - c: 1
         type: Negative
         title: Second send
@@ -2881,7 +2704,6 @@ frs:
           - Send the schedule again.
         expected: Refused.
         msg: ["The schedule of <batch> was already sent", REMIT_SCHEDULE_ALREADY_SENT]
-        auto: RemittanceOperationsIT#theScheduleAndPaymentRequestAreStoredAndTheScheduleIsSentOnce
       - c: 2
         type: Negative
         title: Batch in review
@@ -2909,7 +2731,6 @@ frs:
         steps:
           - As mkttl open the waiting hold of ARN-2026-940004; Approve hold; as remit run the extraction.
         expected: The hold is On hold with number HLD-2026-n; the invoice is UNEXTRACTED_DUE with ON_HOLD.
-        auto: RemittanceHoldsAndSpecialsIT#anApprovedHoldKeepsTheInvoiceOutOfExtractionUntilItExpires
       - c: 2
         type: Negative
         persona: MKT_TL
@@ -2919,7 +2740,6 @@ frs:
           - As mkttl approve it.
         expected: Refused.
         msg: ["Hold <no> must be approved by another user", HOLD_FOUR_EYES]
-        auto: RemittanceApiIT#holdsAreRequestedAndDecidedThroughTheApi
       - c: 3
         type: Workflow
         persona: SYSTEM
@@ -2929,7 +2749,6 @@ frs:
         steps:
           - Run HOLD_EXPIRY; run the extraction.
         expected: The hold is Released (Hold expired); the invoice is extracted.
-        auto: RemittanceHoldsAndSpecialsIT#anApprovedHoldKeepsTheInvoiceOutOfExtractionUntilItExpires
       - c: 4
         type: Negative
         title: Second hold on the same invoice
@@ -2975,7 +2794,6 @@ frs:
         steps:
           - Request a special remittance on a paid and cleared invoice with a condition.
         expected: The request is For approval with the note "Validated - paid AR ... applied and cleared".
-        auto: RemittanceApiIT#specialRemittancesAreRequestedAndDecidedThroughTheApi
       - c: 2
         type: Negative
         title: Second request on the invoice
@@ -2999,7 +2817,6 @@ frs:
         steps:
           - Tag 2307; invoice with 2 % CWT outstanding; path certificate; number, period, amount; save; as cashier search the reference.
         expected: Reference CWT-2026-n; Cashiering finds the tag.
-        auto: PaymentUploadIT#marketingTagsBir2307InBulk
       - c: 2
         type: Negative
         title: Second tag in process
@@ -3007,7 +2824,6 @@ frs:
           - Tag the same invoice again.
         expected: Refused.
         msg: ["Invoice <no> already has a 2307 tag in process", CWT_ALREADY_TAGGED]
-        auto: Cwt2307IT#aCertificateIsValidatedReclassifiedRoutedAndReleased
       - c: 2
         type: Negative
         title: Certificate path without number
@@ -3031,7 +2847,6 @@ frs:
         steps:
           - As mktcoll open a partial cancellation request; Endorsement Slip.
         expected: The slip prints with the same ES number the Adjustment processor sees.
-        auto: AdjustmentRequestIT#slipsTileAndInvoiceItemsShowTheRequest
       - c: 2
         type: Negative
         title: Internal adjustment
@@ -3039,7 +2854,6 @@ frs:
           - Endorsement Slip of the internal adjustment of ARN-2026-940001.
         expected: Refused.
         msg: ["Internal adjustments have no endorsement slip (ADJID.015)", ADJ_NO_SLIP_FOR_INTERNAL]
-        auto: AdjustmentRequestIT#anInternalAdjustmentHasNoEndorsementSlip
 
   FR-OP-120:
     scenario: SC-OP-09
@@ -3056,7 +2870,6 @@ frs:
         steps:
           - Acknowledge a remittance request; enter the DV number; mark paid.
         expected: The batch invoices are FULLY_REMITTED.
-        auto: OperationsFoundationApiIT#theDisbursementQueueIsWorkedThroughTheApi
       - c: 2
         type: Negative
         title: Return a paid request
@@ -3064,15 +2877,14 @@ frs:
           - Return the paid request.
         expected: Refused.
         msg: ["Payment request <no> is <status> and cannot be <action>", DISBURSEMENT_STATUS]
-        auto: FlowInAndPortsIT#paymentRequestsGoThroughTheDisbursementQueue
       - c: 2
         type: Security-access
         persona: REMIT_PROCESSOR
         screen: API
         title: Queue without DISB_PROCESS
         steps:
-          - As remit call POST /api/v1/ops/disbursements/{id}/dv.
-        expected: HTTP 403.
+          - As remit send a direct request to create a DV for a disbursement request.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-OP-121:
@@ -3090,7 +2902,6 @@ frs:
         steps:
           - Route the validated 2307 batch; pay it in the queue; Release.
         expected: Dr DTIP / Cr PR2307 is posted per tag.
-        auto: Cwt2307IT#aCertificateIsValidatedReclassifiedRoutedAndReleased
       - c: 2
         type: Negative
         title: Release twice
@@ -3116,14 +2927,12 @@ frs:
         steps:
           - Approve a batch (TC-OP-035.2-01); open the Disbursement Queue.
         expected: One request for the payable with the batch reference.
-        auto: FlowInAndPortsIT#paymentRequestsGoThroughTheDisbursementQueue
       - c: 2
         type: Upload-download
         title: Extract downloadable
         steps:
           - Hand-offs and Extracts; open the COLLECTION_DP_RETURNED extract; download.
-        expected: The file downloads from the extract repository.
-        auto: OperationsFoundationApiIT#extractsAreDownloadedAndHandoffsClosed
+        expected: The file downloads from the list of extracts.
       - c: 2
         type: Negative
         title: Close a closed hand-off
@@ -3131,7 +2940,6 @@ frs:
           - Close a hand-off twice.
         expected: Refused.
         msg: [The hand-off is already closed, HANDOFF_CLOSED]
-        auto: FlowInAndPortsIT#receiptsAndUnappliedItemsAreHandedOverUntilCashieringIsActive
 
   FR-OP-131:
     scenario: SC-OP-09
@@ -3148,14 +2956,12 @@ frs:
         steps:
           - Upload the hold feed file (COLLECTION_HOLD) with one invalid row; open the run and the alerts.
         expected: The run shows one failed record with its message; alert OPS_FLOW_IN_FAILED is raised.
-        auto: FlowInAndPortsIT#aRunKeepsGoingPastFailedRecordsAndSkipsDuplicates
       - c: 2
         type: Negative
         title: Same file again
         steps:
           - Upload the same hold file.
         expected: No new record is accepted.
-        auto: FlowInAndPortsIT#aRunKeepsGoingPastFailedRecordsAndSkipsDuplicates
       - c: 2
         type: Negative
         title: Upload to an inactive feed
@@ -3163,7 +2969,6 @@ frs:
           - Deactivate feed COLLECTION_HOLD; upload.
         expected: Refused.
         msg: ["Feed <code> is inactive", FLOW_IN_FEED_INACTIVE]
-        auto: FlowInAndPortsIT#feedsAreConfigurableAndInactiveOrUnhandledFeedsAreRefused
 
   FR-OP-132:
     scenario: SC-OP-09
@@ -3180,14 +2985,12 @@ frs:
         steps:
           - Receive a payment quoting the ARN of an account awaiting payment; open Account Placement of the ARN.
         expected: The gate is passed with evidence CASHIERING PRE:<id>.
-        auto: PrebookedAndPortsIT#aPaymentBeforeBookingConfirmsTheGateAndIsAppliedWhenTheAccountIsBooked
       - c: 2
         type: Negative
         title: Second confirmation of the same payment
         steps:
           - Run the payment confirmation sweep twice.
         expected: The gate is confirmed once; the second run adds nothing.
-        auto: PaymentGateIT#aConfirmedPaymentOpensTheGateOncePerSourceReference
 
 access:
   - action: View Operations screens and Invoice 360
@@ -3195,144 +2998,112 @@ access:
     permission: OPS_VIEW
     allow: [CASHIER, REMIT_PROCESSOR, RECON_HANDLER, ADJUSTMENT, COMMREC_HANDLER, MKT_COLLECTION, DISBURSEMENT, AUDITOR]
     deny: []
-    denied: The Operations sections are not in the menu; the API returns HTTP 403 (ACCESS_DENIED).
-    auto: OperationsFoundationApiIT#anInvoiceIsSearchedViewedAndReplayed; OperationsFoundationApiIT#usersWithoutTheRightPermissionAreRefused
+    denied: The Operations sections are not in the menu; direct requests are refused.
   - action: Issue, cancel and apply receipts
     screen: RECEIVE
     permission: CASH_RECEIPT, CASH_CANCEL, CASH_APPLY
     allow: [CASHIER, CASHIER_TL]
     deny: [REMIT_PROCESSOR, MKT_COLLECTION, AUDITOR]
-    denied: Receive Payment is not in the menu; POST /api/v1/cashiering/receipts returns HTTP 403.
+    denied: Receive Payment is not in the menu; a direct request is refused.
   - action: Approve receipt cancellations and dispositions
     screen: RECEIPT
     permission: CASH_APPROVE, CASH_DISPOSITION_APPROVE
     allow: [CASHIER_TL]
     deny: [CASHIER, AUDITOR]
-    denied: Approve is not shown; the call returns HTTP 403.
+    denied: Approve is not shown; the request is refused.
   - action: Maintain receipt series
     screen: SERIES
     permission: CASH_SERIES_MANAGE
     allow: [CASHIER_TL]
     deny: [CASHIER]
-    denied: Receipt Series is read-only; saving returns HTTP 403.
+    denied: Receipt Series is read-only; saving is refused.
   - action: Extract and process remittance batches
     screen: EXTRACTION
     permission: REMIT_EXTRACT, REMIT_PROCESS
     allow: [REMIT_PROCESSOR, REMIT_TL]
     deny: [CASHIER, MKT_COLLECTION, AUDITOR]
-    denied: Extraction is not in the menu; POST /api/v1/remittance/extractions returns HTTP 403.
+    denied: Extraction is not in the menu; a direct request is refused.
   - action: Approve remittance batches and special remittances
     screen: BATCH
     permission: REMIT_APPROVE, SPECIAL_REMIT_APPROVE
     allow: [REMIT_TL]
     deny: [REMIT_PROCESSOR, MKT_TL]
-    denied: Approve is not shown; the call returns HTTP 403.
+    denied: Approve is not shown; the request is refused.
   - action: Request holds and special remittances
     screen: HOLDS
     permission: HOLD_REQUEST, SPECIAL_REMIT_REQUEST
     allow: [MKT_COLLECTION, MKT_TL]
     deny: [REMIT_PROCESSOR, CASHIER]
-    denied: New hold request is not shown; the call returns HTTP 403.
-    auto: RemittanceApiIT#holdsAreRequestedAndDecidedThroughTheApi
+    denied: New hold request is not shown; the request is refused.
   - action: Approve holds
     screen: HOLD
     permission: HOLD_APPROVE
     allow: [MKT_TL]
     deny: [MKT_COLLECTION, REMIT_TL]
-    denied: Approve hold is not shown; the call returns HTTP 403.
-    auto: RemittanceApiIT#holdsAreRequestedAndDecidedThroughTheApi
+    denied: Approve hold is not shown; the request is refused.
   - action: Tag BIR 2307 certificates
     screen: CWT
     permission: CWT_TAG
     allow: [MKT_COLLECTION, MKT_TL]
     deny: [REMIT_PROCESSOR, AUDITOR]
-    denied: Tag 2307 is not shown; the call returns HTTP 403.
+    denied: Tag 2307 is not shown; the request is refused.
   - action: Work production reconciliation cycles and send registers
     screen: CYCLES
     permission: RECON_PROCESS, RECON_SEND
     allow: [RECON_HANDLER]
     deny: [CASHIER, COMMREC_HANDLER, AUDITOR]
-    denied: The actions are not shown; the API returns HTTP 403.
-    auto: ProdReconApiIT#usersWithoutReconciliationRightsAreRefused
+    denied: The actions are not shown; direct requests are refused.
   - action: Request adjustments
     screen: NEWREQ
     permission: ADJ_REQUEST
     allow: [MKT_COLLECTION, MKT_TL]
     deny: [CASHIER, AUDITOR]
-    denied: New Request is not in the menu; the call returns HTTP 403.
+    denied: New Request is not in the menu; the request is refused.
   - action: Process and post adjustments
     screen: REQ
     permission: ADJ_PROCESS, ADJ_POST
     allow: [ADJUSTMENT, ADJUSTMENT_TL]
     deny: [MKT_COLLECTION, REMIT_PROCESSOR]
-    denied: The processing actions are not shown; the call returns HTTP 403.
+    denied: The processing actions are not shown; the request is refused.
   - action: Approve adjustments
     screen: REQ
     permission: ADJ_APPROVE
     allow: [ADJUSTMENT_TL]
     deny: [ADJUSTMENT]
-    denied: Approve is not shown; the call returns HTTP 403.
+    denied: Approve is not shown; the request is refused.
   - action: Process direct payment lists and billings
     screen: DPLISTS
     permission: COMMREC_PROCESS
     allow: [COMMREC_HANDLER, COMMREC_TL]
     deny: [MKT_COLLECTION, RECON_HANDLER]
-    denied: The Commission Receivables actions are not shown; the API returns HTTP 403.
-    auto: CommissionApiIT#usersWithoutCommissionRightsAreRefused
+    denied: The Commission Receivables actions are not shown; direct requests are refused.
   - action: Maintain incentive schemes
     screen: SCHEMES
     permission: INCENTIVE_MANAGE
     allow: [COMMREC_TL]
     deny: [COMMREC_HANDLER]
-    denied: Incentive Schemes is read-only; saving returns HTTP 403.
+    denied: Incentive Schemes is read-only; saving is refused.
   - action: Acknowledge BIR certificates
     screen: CERTS
     permission: BIR_CERT_ACK
     allow: [COMPTROLLERSHIP]
     deny: [COMMREC_HANDLER]
-    denied: Acknowledge and Reject are not shown; the call returns HTTP 403.
+    denied: Acknowledge and Reject are not shown; the request is refused.
   - action: Work the Disbursement Queue
     screen: DISBQ
     permission: DISB_PROCESS
     allow: [DISBURSEMENT]
     deny: [REMIT_TL, COMMREC_TL]
-    denied: The queue actions are not shown; the call returns HTTP 403.
+    denied: The queue actions are not shown; the request is refused.
   - action: Administer interface feeds
     screen: INTERFACES
     permission: FLOWIN_MANAGE
     allow: [SYSADMIN]
     deny: [CASHIER, REMIT_TL]
-    denied: Interfaces is not in the menu; the call returns HTTP 403.
-    auto: FlowInAndPortsIT#feedsAreConfigurableAndInactiveOrUnhandledFeedsAreRefused
+    denied: Interfaces is not in the menu; the request is refused.
   - action: Export Operations reports
     screen: REPORTS
     permission: OPS_REPORT_EXPORT
     allow: [CASHIER, REMIT_PROCESSOR, RECON_HANDLER, ADJUSTMENT, COMMREC_HANDLER]
     deny: [MKT_COLLECTION, DISBURSEMENT, AUDITOR]
-    denied: The report opens on screen; Export returns HTTP 403 (ACCESS_DENIED).
-
-findings:
-  - fr: FR-OP-001
-    issue: 'The FRS messages "Invalid user ID or password" and "Your account is locked. Contact the System Administrator" (code "-") differ from the build: "Invalid user name or password" and "Account is locked. Contact your administrator.", both with code AUTHENTICATION_FAILED (HTTP 401).'
-    proposal: Quote the built messages and code in FRS v1.1; the cases use the built wording.
-  - fr: FR-OP-002
-    issue: 'The FRS says a direct link without permission returns "You do not have access to this page"; the build shows "You do not have access to this screen. Contact your administrator if you need it."'
-    proposal: Quote the built text in FRS v1.1.
-  - fr: FR-OP-070
-    issue: 'The FRS and the help text call the team "Production Reconciliation", but the menu section is labelled "Product Reconciliation" (frontend navigation). Testers and users will look for the wrong label.'
-    proposal: Align the menu label with the FRS ("Production Reconciliation") or change the FRS; the cases use the built menu label.
-  - fr: FR-OP-002
-    issue: The role-permission matrix is provisional until BDOI confirms it (OQ48); the Roles and Access sheet tests the grants of the build (migration V760), not a signed-off matrix.
-    proposal: Re-baseline the Roles and Access sheet when OQ48 is answered.
-  - fr: FR-OP-074
-    issue: Automatic pick-up of insurer feedback from a mailbox or SFTP is parked; only the manual upload can be tested in this release.
-    proposal: Mark the automatic pick-up as out of scope in FRS v1.1 and add its acceptance criteria when the channel is agreed.
-  - fr: FR-OP-075
-    issue: The match keys and the automatch frequency wait for OQ30; the cases test the delivered default keys and the manual automatch only.
-    proposal: Add the confirmed keys and schedule to the acceptance criteria when OQ30 is answered.
-  - fr: FR-OP-095
-    issue: The incentive schemes have no tiers until BDOI gives the targets and amounts (OQ39); the tier cases use tester-entered values.
-    proposal: Replace the test tiers with the BDOI values when OQ39 is answered and re-run TC-OP-095.1-01.
-  - fr: FR-OP-120
-    issue: The Disbursement system is not known (OQ02); the in-app queue is the default and returns are re-sent manually. The hand-off to an external system cannot be tested.
-    proposal: Add interface cases when OQ02 names the Disbursement system.
+    denied: The report opens on screen; Export is refused.

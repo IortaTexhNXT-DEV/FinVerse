@@ -104,7 +104,9 @@ public class ServiceInvoiceDocument {
                     AMOUNT_COLUMN),
                 new Text(text.title(), text.text())),
             List.of("Prepared by", "Approved by"),
-            text.versionLabel() + (si.getRemarks() == null ? "" : " - " + si.getRemarks()));
+            // The standard business footer: the template version only (the booking reference is in
+            // the Booked invoice field, not in the small print).
+            text.versionLabel());
     byte[] pdf = composer.pdf(spec);
     Long stored =
         storedFiles

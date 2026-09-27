@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import com.iortatechnxt.brokerverse.workflow.domain.WorkCase;
+import com.iortatechnxt.brokerverse.workflow.domain.WorkflowStage;
 import com.iortatechnxt.brokerverse.workflow.service.QueueCount;
 import com.iortatechnxt.brokerverse.workflow.service.QueueQuery;
 import com.iortatechnxt.brokerverse.workflow.service.StartCase;
@@ -135,6 +136,7 @@ class WorkflowServiceIT {
 
     var view = as.run("proc", () -> views.view(TYPE, c.getEntityId()).orElseThrow());
     assertThat(view.stage().getStageCode()).isEqualTo("AWAITING_PAYMENT");
+    assertThat(view.stages()).extracting(WorkflowStage::getStageCode).contains("AWAITING_PAYMENT");
     assertThat(view.history())
         .extracting("action")
         .containsExactly("start", "submit", "return", "resubmit", "validate");
@@ -238,5 +240,9 @@ class WorkflowServiceIT {
     workflow.describe(TYPE, c.getEntityId(), "ARN-RENAMED", "Renamed");
     assertThat(views.get(c.getId()).getReference()).isEqualTo("ARN-RENAMED");
     assertThat(definitions.stageNames("NB_QUOTATION")).containsKeys("DRAFT", "CONVERTED");
+    assertThat(definitions.stages("NB_QUOTATION"))
+        .extracting(WorkflowStage::getStageCode)
+        .startsWith("DRAFT", "FOR_REVIEW")
+        .contains("VOIDED");
   }
 }

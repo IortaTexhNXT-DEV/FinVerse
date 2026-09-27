@@ -18,6 +18,7 @@ import { formatDate, formatDateTime, today } from '@/utils/format';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { displayNameOf } from '@/api/users';
 import { DateInput } from '@/components/ui/DateInput';
+import { Notice } from '@/components/ui/Notice';
 
 /**
  * Document templates (BRNB.004): the texts merged into quotations, slips, insurance advice and
@@ -257,10 +258,10 @@ function NewVersionDialog({
 /** Placeholders an uploaded Word draft dropped or added, compared with the latest version. */
 function PlaceholderCheck({ draft }: Readonly<{ draft: TemplateDraft }>) {
   if (draft.missingPlaceholders.length === 0 && draft.addedPlaceholders.length === 0) {
-    return <div className="alert success">Loaded from Word: the placeholders are unchanged.</div>;
+    return <Notice tone="success">Loaded from Word: the placeholders are unchanged.</Notice>;
   }
   return (
-    <div className="alert warning">
+    <Notice tone="warning">
       {draft.missingPlaceholders.length > 0 && (
         <div>
           No longer in the text: {draft.missingPlaceholders.map((p) => `{{${p}}}`).join(', ')}
@@ -272,6 +273,6 @@ function PlaceholderCheck({ draft }: Readonly<{ draft: TemplateDraft }>) {
           {draft.addedPlaceholders.map((p) => `{{${p}}}`).join(', ')}
         </div>
       )}
-    </div>
+    </Notice>
   );
 }

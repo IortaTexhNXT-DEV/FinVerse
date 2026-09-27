@@ -19,6 +19,7 @@ import { ReportTable } from './ReportTable';
 import { DEFAULT_PRINT, filterPairs, reportOptionsApi } from './reportOptions';
 import type { ColumnFilters, PrintOptions } from './reportOptions';
 import { initialValue, parameterErrors } from './reportParams';
+import { Notice } from '@/components/ui/Notice';
 
 /** The download buttons: Excel and PDF, Word for documents and schedules (client requirement 16). */
 function ReportDownloads({
@@ -122,7 +123,7 @@ export default function ReportRunnerPage() {
         section={`Reports · ${entry.categoryLabel}`}
         backTo={entry.category === 'NEW_BUSINESS' ? '/nb/reports' : '/reports'}
         title={entry.title}
-        description={`${entry.code} — ${entry.description}`}
+        description={entry.description}
       />
       <Card
         title="Parameters"
@@ -188,11 +189,9 @@ export default function ReportRunnerPage() {
             filters={filters}
             onFilterChange={(column, text) => setFilters((f) => ({ ...f, [column]: text }))}
           />
-          {run.data.notes.map((n) => (
-            <div key={n} className="alert report-note">
-              {n}
-            </div>
-          ))}
+          {run.data.notes.length > 0 && (
+            <Notice tone="info" className="report-note" items={run.data.notes} />
+          )}
         </Card>
       )}
     </div>

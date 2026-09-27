@@ -1,6 +1,8 @@
 import { render, screen, within } from '@testing-library/react';
 import { formatDays, formatPeriod } from '@/utils/format';
 import { DataTable } from './DataTable';
+import { DetailList } from '@/features/catalog/DetailList';
+import { DefinitionGrid } from './DefinitionGrid';
 import { PeriodCell } from './PeriodCell';
 import { periodColumn } from './periodColumn';
 
@@ -93,5 +95,27 @@ describe('period and day texts', () => {
     expect(formatDays(1)).toBe('1 day');
     expect(formatDays(12)).toBe('12 days');
     expect(formatDays(undefined)).toBe('');
+  });
+});
+
+describe('empty period in key-value blocks', () => {
+  it('shows the muted dash, never a lone "to", when the period has no dates', () => {
+    expect(formatPeriod(undefined, undefined)).toBe('');
+    render(
+      <>
+        <DetailList
+          rows={[
+            ['Period', formatPeriod(undefined, undefined)],
+            ['Submitted', undefined],
+            ['Approved', '—'],
+          ]}
+        />
+        <DefinitionGrid items={[{ label: 'Cover', value: 'to' }]} />
+      </>,
+    );
+    const dashes = screen.getAllByText('—');
+    expect(dashes).toHaveLength(4);
+    dashes.forEach((dash) => expect(dash).toHaveClass('muted'));
+    expect(screen.queryByText(/^to$/)).toBeNull();
   });
 });

@@ -3,7 +3,6 @@ import {
   CalendarClock,
   Check,
   CornerUpLeft,
-  KeyRound,
   Pencil,
   ShieldAlert,
   UserRound,
@@ -28,10 +27,15 @@ import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { requestActions } from './accessActions';
 import type { RequestAction } from './accessActions';
 import { isGroupProfile, REQUEST_TYPE_LABELS } from './accessRequest';
+import { accessRequestMoves, accessRequestStages } from './accessStages';
+import { StageStepper } from '@/components/broking/StageStepper';
+import { stageSteps } from '@/components/broking/stageSteps';
+import { riskFlagLabel } from './riskFlags';
 import { RequestApprovers, RequestDetails, RequestHistory } from './AccessRequestTabs';
 import { ReasonDialog } from './ReasonDialog';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
+import { Notice } from '@/components/ui/Notice';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -121,7 +125,9 @@ function decisionText(r: AccessRequest): string {
 }
 
 function Summary({ request: r }: Readonly<{ request: AccessRequest }>) {
-  const who = isGroupProfile(r.type) ? r.roleCode : r.username;
+  const roles = useQuery({ queryKey: ['nbadmin', 'roles'], queryFn: nbadminApi.roles });
+  const profile = roles.data?.find((x) => x.code === r.roleCode)?.name ?? r.roleCode;
+  const who = isGroupProfile(r.type) ? profile : r.username;
   return (
     <RecordSummary
       title={`${REQUEST_TYPE_LABELS[r.type]} · ${who ?? ''}`}
@@ -133,7 +139,7 @@ function Summary({ request: r }: Readonly<{ request: AccessRequest }>) {
       }
       flags={r.lifecycle.riskFlags.map((f) => (
         <span key={f} className="tag">
-          <ShieldAlert size={12} aria-hidden="true" /> {humanize(f)}
+          <ShieldAlert size={12} aria-hidden="true" /> {riskFlagLabel(f)}
         </span>
       ))}
       facts={[
@@ -168,14 +174,10 @@ function Password({ decision }: Readonly<{ decision: AccessDecision }>) {
     return null;
   }
   return (
-    <div className="alert success" role="status">
-      <p>
-        <KeyRound size={16} aria-hidden="true" /> User <strong>{decision.request.username}</strong>{' '}
-        was created. Give this temporary password to the user through a secure channel; it is shown
-        only now.
-      </p>
+    <Notice tone="success" title={`User ${decision.request.username} created`}>
+      Give this temporary password to the user through a secure channel; it is shown only now.
       <code className="secret-value">{decision.temporaryPassword}</code>
-    </div>
+    </Notice>
   );
 }
 
@@ -187,16 +189,76 @@ function Banners({
     <>
       {decision && <Password decision={decision} />}
       {r.status === 'RETURNED' && r.decisionComment && (
-        <div className="alert warning" role="status">
-          Returned by <UserName login={r.decidedBy} />: {r.decisionComment}
-        </div>
+        <Notice
+          tone="warning"
+          title={
+            <>
+              Returned by <UserName login={r.decidedBy} />
+            </>
+          }
+        >
+          {r.decisionComment}
+        </Notice>
       )}
       {r.lifecycle.cancelReason && (
-        <div className="alert" role="status">
-          Cancelled by <UserName login={r.lifecycle.cancelledBy} />: {r.lifecycle.cancelReason}
-        </div>
+        <Notice
+          tone="info"
+          title={
+            <>
+              Cancelled by <UserName login={r.lifecycle.cancelledBy} />
+            </>
+          }
+        >
+          {r.lifecycle.cancelReason}
+        </Notice>
       )}
     </>
+  );
+}
+
+/** The workflow header of the request: stage stepper, current stage and approver, actions. */
+function RequestWorkflow({
+  request: r,
+  actions,
+  onAction,
+}: Readonly<{
+  request: AccessRequest;
+  actions: RequestAction[];
+  onAction: (a: RequestAction) => void;
+}>) {
+  const steps = stageSteps(accessRequestStages(r), r.status, accessRequestMoves(r));
+  const current = steps.find((s) => s.state !== 'done' && s.state !== 'upcoming');
+  return (
+    <section className="workflow-panel" aria-label="Workflow status">
+      <StageStepper steps={steps} />
+      <div className="workflow-head">
+        <dl className="workflow-meta-row">
+          <div>
+            <dt>Current Stage</dt>
+            <dd className="workflow-stage-name">{current?.name ?? humanize(r.status)}</dd>
+          </div>
+          <div>
+            <dt>Submitted</dt>
+            <dd className="nowrap">
+              {r.lifecycle.submittedAt ? (
+                formatDateTime(r.lifecycle.submittedAt)
+              ) : (
+                <span className="muted">—</span>
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt>Assigned To</dt>
+            <dd>
+              <UserName login={r.lifecycle.assignedApprover} />
+            </dd>
+          </div>
+        </dl>
+        <div className="workflow-actions">
+          <ActionButtons actions={actions} onAction={onAction} />
+        </div>
+      </div>
+    </section>
   );
 }
 
@@ -212,6 +274,7 @@ function ActionButtons({
         return (
           <Button
             key={a}
+            size="sm"
             variant={primary ? 'primary' : 'secondary'}
             icon={<Icon size={16} />}
             onClick={() => onAction(a)}
@@ -267,10 +330,10 @@ function RequestView({ request: r }: Readonly<{ request: AccessRequest }>) {
         backTo={isGroupProfile(r.type) ? '/user-access/group-profiles' : '/user-access/requests'}
         title={r.requestNo}
         description={r.summary}
-        actions={<ActionButtons actions={actions} onAction={onAction} />}
       />
       <Banners request={r} decision={decision} />
       <Summary request={r} />
+      <RequestWorkflow request={r} actions={actions} onAction={onAction} />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'details' && <RequestDetails request={r} />}
       {tab === 'approvers' && <RequestApprovers request={r} />}

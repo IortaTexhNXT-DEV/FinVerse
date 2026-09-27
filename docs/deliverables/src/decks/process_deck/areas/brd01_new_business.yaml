@@ -7,8 +7,8 @@ num: 1
 title: New Business
 brd: BRD-1
 scope: Client onboarding to booking (Fire, Motor, Other Lines, Non-Package)
-status: BUILT
-status_text: Built; FRS v1.0 issued for review
+status: FRS ISSUED
+status_text: FRS v1.0 issued for review
 department: Marketing, TSU and Processing
 roles:
   - Marketing AO, TL / TH / UH (Retail, Commercial, Corporate, Institutional)
@@ -30,7 +30,7 @@ chevrons: [Request, Onboarding, Quotation / PRF, Account, Payment, Placement, Is
 notes:
   glance: >-
     New Business is the spine of BIBS: every other area reads the client, the account (ARN) and the booked invoice
-    that it creates. It is built, and FRS BRD-1 v1.0 describes the delivered screens. The volumes come from the usage
+    that it creates. FRS BRD-1 v1.0 describes the screens. The volumes come from the usage
     tables of the BRD (p.210-212) and the retention values from the workshop addendum (p.82), which prevail over
     "follow QPS" (assumption A-NB-08).
   pains: The numbered markers on the As-Is swimlane refer to these points. The page numbers are PDF pages of the BRD-1 pack.
@@ -39,13 +39,13 @@ notes:
     across all segments, one workflow, reports) but no turnaround targets, so the measures are the NFR values and
     the controls added.
   gaps: >-
-    High items first. The parked interfaces are built as seams: a port, a staging table or a manual upload, so adding
-    the transport later needs no workflow change (FRS section 7).
+    High items first. Until an interface is specified, a manual upload is used, so adding the transfer later needs no
+    workflow change (FRS section 7).
 asis:
   caption: 'Request to booking today (BRD-1 p.133-134, p.47)'
   notes: >-
     Today most New Business work is manual. Requests arrive by e-mail; HLS requests are keyed in. Quotations are
-    prepared in QPS or Excel; non-package risks go to TSU by e-mail and the comparative is built in Excel. Clients
+    prepared in QPS or Excel; non-package risks go to TSU by e-mail and the comparative is prepared in Excel. Clients
     are created without a standard onboarding step. Accounts are tracked in spreadsheets, so duplicates are found
     late. CBG Fire billing and payment matching are manual. Placement files, hold covers and e-policies go by e-mail
     without a log. Booking, GL entries and invoices are separate steps, and status reports are compiled by hand
@@ -85,7 +85,7 @@ asis:
 pains:
   - {n: 1, title: Requests arrive by e-mail and are keyed in, text: 'HLS requests are re-keyed; bulk processing exists for CBG Home only.', ref: 'BRD-1 p.133; BRNB.023, 041'}
   - {n: 2, title: Quotations prepared in QPS or Excel, text: 'Rating and versions live outside one workflow; approvals by e-mail.', ref: 'BRD-1 p.133; FRS 2.1 row 2'}
-  - {n: 3, title: Non-package placement by e-mail, text: 'TSU receives risks by e-mail and builds the comparative table in Excel.', ref: 'Other Lines addendum p.47'}
+  - {n: 3, title: Non-package placement by e-mail, text: 'TSU receives risks by e-mail and prepares the comparative table in Excel.', ref: 'Other Lines addendum p.47'}
   - {n: 4, title: No standard client onboarding, text: 'Clients are created without a KYC verification step.', ref: 'Workshop addendum p.3-5; BRNB.090'}
   - {n: 5, title: Accounts in spreadsheets, text: 'No single account number; duplicates are found late.', ref: 'BRD-1 p.133; BRNB.032, 051'}
   - {n: 6, title: CBG Fire billing and payment matching by hand, text: 'The CLPC billing file and payment reports are handled manually.', ref: 'BRD-1 p.133; BRNB.067, 068'}
@@ -102,7 +102,7 @@ tobe:
     the CLPC billing file and matches payment reports. Processing sends placement slips and hold cover requests with a
     send log, matches the e-policy and sends it protected. Booking posts the invoice, the GL entry and the service
     invoice in one transaction; batch booking runs at 20:00. Dashboards read the workflow history.
-    The HLS interface, the mailbox reader and insurer SFTP / API are parked seams (Q11, Q12, Q06).
+    The HLS interface, the mailbox reader and insurer SFTP / API are on hold (Q11, Q12, Q06).
   cols: 7
   lanes:
     - {id: cli, label: 'Client, bank units (HLS, CLPC)', kind: external}
@@ -117,7 +117,7 @@ tobe:
     - {id: b3, lane: mkt, col: 2, text: 'Prospect; KYC checked by 2nd user'}
     - {id: b4, lane: bibs, col: 2, text: Duplicate check and screening, kind: auto}
     - {id: b5, lane: mkt, col: 3, text: Quotation rated and approved}
-    - {id: b6, lane: tsu, col: 3, text: 'PRF: slips out, comparative built'}
+    - {id: b6, lane: tsu, col: 3, text: 'PRF: slips out, comparative compiled'}
     - {id: b7, lane: bibs, col: 4, text: Quotation / slip sent protected, kind: doc}
     - {id: b8, lane: mkt, col: 4, text: Account with ARN submitted}
     - {id: b9, lane: bibs, col: 5, text: CLPC billing file; payments matched, kind: auto}
@@ -157,7 +157,7 @@ gaps:
   - {sev: High, gap: Motor OD / Theft base 81% or 90% of TSI, impact: Motor premium differs by 9 points of TSI, owner: Marketing / TSU, decision: When each base applies, ref: DCR-006}
   - {sev: High, gap: CLPC payments and endorsements specified twice, impact: Two payment intakes and two endorsement paths, owner: 'NB and Operations', decision: Confirm Cashiering as the single payment intake and Adjustment for endorsements, ref: DCR-027}
   - {sev: High, gap: Sanctions match blocks or warns, impact: Business placed with a possible sanctioned party, owner: Compliance, decision: Block or warn on quotation to booking, ref: DCR-112}
-  - {sev: Parked, gap: 'HLS, mailbox, insurer SFTP / API, OCR', impact: Uploads and manual capture remain, owner: BDO IT and insurers, decision: Interface specifications, ref: 'Q11, Q12, Q06, Q24'}
+  - {sev: On hold, gap: 'HLS, mailbox, insurer SFTP / API, OCR', impact: Uploads and manual capture remain, owner: BDO IT and insurers, decision: Interface specifications, ref: 'Q11, Q12, Q06, Q24'}
 best:
   - {practice: Straight-through processing with exception queues, status: PARTLY, bibs: 'Bulk uploads with row checks, batch booking, work queues per stage.', bdoi: 'Give the product matrix and minimum fields per line (Q01, Q02) so clean cases pass untouched.'}
   - {practice: KYC at onboarding and a single client view, status: BIBS, bibs: 'Prospect to confirmed client with four-eyes KYC; one client record for every module.', bdoi: 'Confirm the BDO KYC standard fields, CIF and duplicate keys (Q16, Q17).'}

@@ -3,6 +3,8 @@ import { createContext, useContext } from 'react';
 export interface ToastApi {
   success: (text: string) => void;
   error: (text: string) => void;
+  warning: (text: string) => void;
+  info: (text: string) => void;
 }
 
 export const ToastContext = createContext<ToastApi | null>(null);

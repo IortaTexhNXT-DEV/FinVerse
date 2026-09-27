@@ -26,6 +26,8 @@ export interface WorklistFilters {
   amountTo?: string;
   promise?: string;
   client?: string;
+  /** BIBS or MIGRATED (legacy invoices migrated at cut-over). */
+  origin?: string;
   mine?: boolean;
   unassigned?: boolean;
   escalated?: boolean;

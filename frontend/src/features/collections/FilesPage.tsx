@@ -16,7 +16,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime, today } from '@/utils/format';
+import { formatDateTime, formatPeriod, today } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { ScheduledFile } from './api';
 import { reportTitle } from './collectionsLogic';
@@ -140,7 +140,7 @@ export default function FilesPage() {
     {
       key: 'p',
       header: 'Period',
-      render: (f) => `${f.periodKey} (${formatDate(f.periodFrom)} – ${formatDate(f.periodTo)})`,
+      render: (f) => `${f.periodKey} (${formatPeriod(f.periodFrom, f.periodTo)})`,
     },
     { key: 'n', header: 'Rows', numeric: true, render: (f) => f.rowCount },
     {

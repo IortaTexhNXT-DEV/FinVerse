@@ -23,6 +23,7 @@ import {
   toReceiptInput,
 } from './receiptForm';
 import { useReceivablesLookups } from './useReceivablesLookups';
+import { Notice } from '@/components/ui/Notice';
 
 interface AllocationCardProps {
   pdc: boolean;
@@ -41,11 +42,7 @@ function AllocationCard(props: Readonly<AllocationCardProps>) {
       title={pdc ? 'Debit note covered by the cheque' : 'Apply to debit notes'}
       actions={<span className="muted">Total {allocationTotal(allocations).toFixed(2)}</span>}
     >
-      {errors.length > 0 && (
-        <div className="alert danger" role="alert">
-          {errors.join('; ')}
-        </div>
-      )}
+      {errors.length > 0 && <Notice tone="error">{errors.join('; ')}</Notice>}
       <AllocationTable
         items={props.items}
         amount={props.amount}

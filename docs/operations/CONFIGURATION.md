@@ -64,6 +64,7 @@ are for local development only.
 | `BROKERVERSE_JOB_SCR_SLA_MONITOR_CRON` | no | `0 0 * * * *` | Spring cron (UTC) of `SCR_SLA_MONITOR` (screening, SNSRP-405/802; hourly: case SLA reminders, breach flags (`SCR_SLA_BREACH`), escalation notices and missing-document reminders). Property `brokerverse.jobs.scr-sla-monitor-cron`. |
 | `BROKERVERSE_JOB_SCR_INGEST_ERROR_DIGEST_CRON` | no | `0 0 23 * * SUN-THU` | Spring cron (UTC) of `SCR_INGEST_ERROR_DIGEST` (screening, SNSRP-202; 07:00 PHT Monday to Friday: e-mails the failed watchlist records to `SCR_INGEST_ALERT_RECIPIENTS`). Property `brokerverse.jobs.scr-ingest-error-digest-cron`. |
 | `BROKERVERSE_JOB_UAM_EFFECTIVE_CHANGES_CRON` | no | `0 5 16 * * *` | Spring cron (UTC) of `UAM_EFFECTIVE_CHANGES` (nbadmin, UAM-NFR-14; 00:05 PHT: applies the SCHEDULED access requests whose effective date is today or earlier; a failure raises `UAM_SCHEDULED_APPLY_FAILED`). Property `brokerverse.jobs.uam-effective-changes-cron`. |
+| `BROKERVERSE_JOB_UAM_DORMANT_USERS_CRON` | no | `0 15 16 * * *` | Spring cron (UTC) of `UAM_DORMANT_USERS` (nbadmin, V1065; 00:15 PHT: deactivates the users without a sign-in for `UAM_DORMANT_DAYS` days by a system Deactivate user request, tells them `UAM_DORMANT_NOTICE_DAYS` days before; `UAM_DORMANT_DAYS` = 0 switches it off; the holders of SYSADMIN are exempt). Property `brokerverse.jobs.uam-dormant-users-cron`. |
 | `BROKERVERSE_JOB_PASSWORD_EXPIRY_NOTICE_CRON` | no | `0 0 22 * * *` | Spring cron (UTC) of `PASSWORD_EXPIRY_NOTICE` (nbadmin, UAM-NFR-36; 06:00 PHT, `AUTH_MODE` LOCAL only: notifies the users whose password expires within 7 days of `PASSWORD_MAX_AGE_DAYS`, in the app and by e-mail, event `PASSWORD_EXPIRY_NOTICE`). Property `brokerverse.jobs.password-expiry-notice-cron`. |
 | `BROKERVERSE_JOB_BCL_PREMIUM_RECHECK_CRON` | no | `0 30 21 * * *` | Spring cron (UTC) of `BCL_PREMIUM_RECHECK` (brokerclaims, BRCLM.001; 05:30 PHT: re-runs the premium check of open claims without an authorization code against the invoice ledger, as a safety net for missed `InvoiceMovementPosted` events; raises or resolves `BCL_UNPAID_PREMIUM_CLAIM`). Property `brokerverse.jobs.bcl-premium-recheck-cron`. |
 | `BROKERVERSE_JOB_BCL_FOLLOW_UP_DUE_CRON` | no | `0 0 22 * * *` | Spring cron (UTC) of `BCL_FOLLOW_UP_DUE` (brokerclaims, BRCLM.019/022/034; 06:00 PHT: notifies the handlers of claims whose next follow-up date or diary due date is today (`BCL_FOLLOW_UP_DUE`) and raises `BCL_FOLLOW_UP_OVERDUE` for past dates). Property `brokerverse.jobs.bcl-follow-up-due-cron`. |
@@ -71,6 +72,11 @@ are for local development only.
 | `BROKERVERSE_JOB_EB_RENEWAL_ADVICE_CRON` | no | `0 0 22 * * *` | Spring cron (UTC) of `EB_RENEWAL_ADVICE` (eb, BRID-001/002; 06:00 PHT: opens the RENEWAL cycles of the ACTIVE programmes flagged for renewal whose lines expire within `EB_RA_LEAD_DAYS`, sends the password-protected renewal advice (password in a second e-mail) to the HR contacts that receive it, stores it as `RENEWAL_ADVICE` linked to the programme, the client and the expiring accounts, raises `EB_RA_NOT_SENT` for programmes that cannot receive it, then sends one reminder per run for each `EB_RA_REMINDER_DAYS` day reached while no feedback is recorded). Each programme and reminder runs in its own transaction. Built by wave E1-C (`eb.renewal.service.RenewalAdviceJob`). Property `brokerverse.jobs.eb-renewal-advice-cron`. |
 | `BROKERVERSE_JOB_EB_ITEM_FOLLOWUP_CRON` | no | `0 0 23 * * *` | Spring cron (UTC) of `EB_ITEM_FOLLOWUP` (eb, BRID-030; 07:00 PHT: for each pending tracked item past due, the n-th follow-up e-mail (template `EB_ITEM_FOLLOWUP`) `n x EB_FOLLOWUP_DAYS` working days (head office calendar) after the due date to the item's recipients, else the insurer's placement mailboxes, the client's HR contacts or the AO; after `EB_FOLLOWUP_MAX` follow-ups the alert `EB_ITEM_OVERDUE` and the notice `EB_ITEM_ESCALATED` to the AO, once per item). Built by wave E1-C (`eb.tracked.service.ItemFollowUpJob`). Property `brokerverse.jobs.eb-item-followup-cron`. |
 | `BROKERVERSE_JOB_EB_FRANCHISE_EXPIRY_CRON` | no | `0 30 22 * * *` | Spring cron (UTC) of `EB_FRANCHISE_EXPIRY` (eb, franchise; 06:30 PHT: a franchise request still without the insurer's decision `EB_FRANCHISE_GRACE_DAYS` working days (head office calendar) after its due date is expired and the AO is told; the daily alert check raises `EB_FRANCHISE_OVERDUE` from the due date on). Each request runs in its own transaction. Built by wave E1-B (`eb.franchise.service.FranchiseExpiryJob`). Property `brokerverse.jobs.eb-franchise-expiry-cron`. |
+| `BROKERVERSE_JOB_MIG_INTAKE_SCAN_CRON` | no | `-` (manual) | Spring cron (UTC) of `MIG_INTAKE_SCAN` (Data Migration BRD-13): takes the extracts waiting in the extract inbox through the intake checks. The default inbox is the console upload, which has nothing to collect; the SFTP drop adapter is parked (DATA_MIGRATION_DESIGN section 23). Property `brokerverse.jobs.mig-intake-scan-cron`. |
+| `BROKERVERSE_JOB_MIG_VALIDATE_CRON`, `..._MIG_LOAD_CRON`, `..._MIG_RECONCILE_CRON` | no | `-` (manual) | Spring crons (UTC) of `MIG_VALIDATE`, `MIG_LOAD` and `MIG_RECONCILE`: validation, load and reconciliation of the planned batches. They run on demand from the migration console; a schedule is set only for unattended mock runs. Properties `brokerverse.jobs.mig-validate-cron`, `mig-load-cron`, `mig-reconcile-cron`. |
+| `BROKERVERSE_JOB_MIG_STAGING_PURGE_CRON` | no | `0 0 18 * * *` | Spring cron (UTC) of `MIG_STAGING_PURGE` (02:00 PHT): purges the staged payloads and intake files of the batches past `MIG_STAGING_RETENTION_DAYS`; the counts and totals are kept. Property `brokerverse.jobs.mig-staging-purge-cron`. |
+| `BROKERVERSE_JOB_MIG_RUNOFF_SNAPSHOT_CRON` | no | `0 30 17 1 * *` | Spring cron (UTC) of `MIG_RUNOFF_SNAPSHOT` (01:30 PHT on the 1st): counts the legacy in-force policy headers by expiry month and source system - renewed, not renewed, lapsed, still open - for the Run-off screen and report `MIG-RUNOFF`. Property `brokerverse.jobs.mig-runoff-snapshot-cron`. |
+| `BROKERVERSE_JOB_MIG_ACCESS_LOG_DIGEST_CRON` | no | `0 0 0 1 * *` | Spring cron (UTC) of `MIG_ACCESS_LOG_DIGEST` (08:00 PHT on the 1st): sends the holders of `LEGACY_ACCESS_LOG_VIEW` the digest of the previous month's accesses to the legacy archive per user and action. Property `brokerverse.jobs.mig-access-log-digest-cron`. |
 | `BROKERVERSE_JOB_RENEWAL_EXTRACTION_CRON` | no | `0 0 17 * * *` | Spring cron (UTC) of `RNW_EXTRACTION` (renewal, BRRN.030; 01:00 PHT: extracts the accounts and migrated policies expiring at the business date plus `RNW_EXTRACTION_LEAD_DAYS`, once per term, and runs their checks; raises `RNW_EXTRACTION_FAILED` on failure). Built by wave R1-A (`renewal.extraction.service.ExtractionJob`). Property `brokerverse.jobs.renewal-extraction-cron`. |
 | `BROKERVERSE_JOB_RENEWAL_REEVALUATE_CRON` | no | `0 30 17 * * *` | Spring cron (UTC) of `RNW_REEVALUATE` (renewal, BRRN.023; 01:30 PHT: runs the checks again for the open renewals changed since the last run or expiring within 30 days). Built by wave R1-A (`renewal.rules.service.ReevaluateJob`). Property `brokerverse.jobs.renewal-reevaluate-cron`. |
 | `BROKERVERSE_JOB_RENEWAL_NRNS_LETTERS_CRON` | no | `0 0 22 * * *` | Spring cron (UTC) of `RNW_NRNS_LETTERS` (renewal, BRRN.025/037; 06:00 PHT: flags the renewals with no response after the Renewal Advice, sends the NRNS reminder and offers the second notice). Built by wave R1-D (`renewal.letter.service.NrnsLettersJob`). Property `brokerverse.jobs.renewal-nrns-letters-cron`. |
@@ -95,6 +101,40 @@ are for local development only.
 | `MAIL_USERNAME` / `MAIL_PASSWORD` | when the server requires it (always in production with mail enabled and `MAIL_SMTP_AUTH`) | — | SMTP credentials (secret: supply from the vault, never in files). |
 | `MAIL_SMTP_AUTH` / `MAIL_SMTP_STARTTLS` | no | `true` / `true` | SMTP authentication and STARTTLS. |
 | `BROKERVERSE_BACKEND_HOST` (frontend container) | yes | `backend` | Host name of the backend service for the `/api` proxy. |
+
+## Data Migration parameters (BRD-13)
+
+Business parameters (`sys_parameter`, category `DATA_MIGRATION`, maintained in Administration > Parameters) of the
+migration console, the legacy context and the Legacy Inquiry ([`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md)
+section 20). The seed data sets the opening value date inside the open seed year; production keeps the defaults below
+until BDOI confirms them.
+
+| Parameter | Default | Purpose |
+|---|---|---|
+| `MIG_ENVIRONMENT_CLASS` | `NON_PRODUCTION` | `PRODUCTION` switches masking off; any other value masks names, IDs and contacts at intake. |
+| `MIG_CUTOVER_DATE` | `2028-01-03` | Go-live date T of the production plan. |
+| `MIG_OPENING_VALUE_DATE` | `2028-01-01` | Value date of the opening entries of legacy invoices and unapplied payments and of the provisional trial balance. |
+| `MIG_YEAR_END_OPTION` | `A` | Year-end option (section 17.7): `A` opens the provisional trial balance with the FY2027 result in retained earnings and posts the FY2027 true-ups; `B` opens the profit and loss accounts by account and refuses true-ups. Option A awaits Comptrollership's confirmation. |
+| `MIG_STAGING_RETENTION_DAYS` | `5` | Days a signed-off batch keeps its staged payloads before `MIG_STAGING_PURGE`. |
+| `MIG_CHUNK_SIZE`, `MIG_PARTITIONS` | `500`, `4` | Rows per load transaction and parallel partitions of a load. |
+| `MIG_AMOUNT_TOLERANCE` | `0.00` | Largest amount difference a reconciliation line accepts. |
+| `MIG_MAX_ERROR_RATE_MASTER`, `MIG_MAX_ERROR_RATE_FINANCIAL` | `0.5`, `0` | Largest share of failing or waived rows with which a master or a financial batch may be loaded. |
+| `MIG_CLIENT_MATCH_AUTO`, `MIG_CLIENT_MATCH_REVIEW` | `90`, `60` | Client match scores for an automatic merge and for the Data Steward review queue. |
+| `MIG_INVOICE_NO_COLLISION_PREFIX` | `true` | Prefix the source system to a legacy invoice number found in two systems. |
+| `MIG_LEGACY_INVOICE_NO_PATTERN` | `^I\d{8}$` | Legacy invoice numbers the payment matcher recognises. |
+| `MIG_UPP_ISSUE_AR` | `false` | Issue a BIBS acknowledgement receipt for each migrated unapplied payment. |
+| `MIG_GOLIVE_RENEWAL_TO`, `MIG_RENEWAL_URGENT_TO` | `2028-05-31`, `2028-01-31` | Window of the go-live renewal extraction and of the urgent January renewals. |
+| `MIG_LAST_LEGACY_BUSINESS_DAY`, `MIG_FREEZE_AT`, `MIG_RESUBMIT_DEADLINE` | `2027-12-29`, `2027-12-31 22:00`, `2028-01-02 12:00` | Cut-over calendar of the RA-sent file and its resubmissions. |
+| `MIG_RA_MAX_LEAD_DAYS` | `140` | Oldest renewal advice date accepted in the RA-sent file. |
+| `MIG_LEGACY_ACCESS_REASON_REQUIRED` | `true` | The Legacy Inquiry asks a reason once per session and logs it with every access. |
+| `MIG_ARCHIVE_EXPORT_MAX_ROWS` | `1000` | Largest Excel export of the legacy archive. |
+| `MIG_ACCESS_EXPORT_ALERT_ROWS` | `5000` | Archive records one user may export in a day before the alert `MIG_LEGACY_ACCESS_UNUSUAL`. |
+| `MIG_LEGACY_LINK_EBIX`, `MIG_LEGACY_LINK_QPS` | blank | Addresses of the read-only legacy applications shown on the Legacy Inquiry. |
+
+Legacy documents of the archive (object H02) are read through the port `LegacyDocumentSource`; until the transfer
+folder is connected (DMQ24) they are staged in the console (`POST /api/v1/migration/archive/documents/{system}`,
+permission `MIG_INTAKE`) under the short-lived record class `MIGRATION_EXTRACT`, and the archive keeps its own copy as
+an attachment `LEGACY_DOCUMENT`.
 
 ## Redis 7 and Apache Kafka (platform cache and events)
 

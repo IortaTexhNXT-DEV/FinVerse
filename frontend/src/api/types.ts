@@ -80,3 +80,14 @@ export interface Branch {
   maker?: string;
   authorizedBy?: string;
 }
+
+/** Where a record comes from: created in BIBS or migrated from a legacy system (BRD-13). */
+export type RecordOriginKind = 'BIBS' | 'MIGRATED';
+
+/** Origin fields of a record that may be migrated (flat on the list and record DTOs). */
+export interface RecordOriginFields {
+  origin?: RecordOriginKind;
+  sourceSystem?: string;
+  legacyRef?: string;
+  migrationBatch?: string;
+}

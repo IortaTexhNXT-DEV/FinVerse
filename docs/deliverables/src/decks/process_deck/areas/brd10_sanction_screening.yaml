@@ -7,8 +7,8 @@ num: 10
 title: Sanction Screening
 brd: BRD-10
 scope: 'Sanction and PEP screening, risk profiling, case review, escalation, STR'
-status: DESIGNED
-status_text: Designed, not yet built; FRS v1.0 issued for review
+status: FRS ISSUED
+status_text: FRS v1.0 issued for review
 department: Compliance (Chief Compliance Officer)
 roles:
   - Compliance Officer and Compliance Checker
@@ -31,7 +31,7 @@ notes:
     BDOI screens clients by hand today. The BRD asks for one in-system workflow with configurable criteria and
     matrices, a list updated on a schedule, automated matching, risk tagging and case creation, review templates, routing
     to approvers, escalation to Compliance and the AML Committee, STR preparation and extraction, and immutable audit
-    logs. The benefits on p.4-5 are the only quantified targets in the twelve BRDs. The module is designed.
+    logs. The benefits on p.4-5 are the only quantified targets in the twelve BRDs.
   pains: 'The nine points are the current-process rows of FRS BRD-10 section 2.1, read from the image pages of the BRD (p.6-7).'
   after: 'The measures are BDOI''s own benefit targets (p.4-5).'
   gaps: >-
@@ -140,7 +140,7 @@ gaps:
   - {sev: Medium, gap: AML Committee decision rule, impact: When a case is final, owner: Compliance, decision: 'Any member, majority, all, or a quorum', ref: 'DCR-108'}
   - {sev: Medium, gap: Adverse media and EDD template, impact: Scope of the review, owner: Compliance, decision: 'Adverse media in scope? EDD fields', ref: 'DCR-111'}
   - {sev: Medium, gap: 287 concurrent investigators, impact: Load target and role design, owner: Compliance, decision: 'Who the investigators are; real concurrency', ref: 'DCR-110'}
-  - {sev: Parked, gap: AMLC portal filing, impact: Filing stays manual, owner: Compliance, decision: Keep manual filing with the extract, ref: 'SNSRP-706'}
+  - {sev: On hold, gap: AMLC portal filing, impact: Filing stays manual, owner: Compliance, decision: Keep manual filing with the extract, ref: 'SNSRP-706'}
 best:
   - {practice: Screening on every trigger, status: BIBS, bibs: 'New client, identity change, account application, list change and a monthly full re-screen.', bdoi: 'Confirm the screening scope and batch window.'}
   - {practice: Maker-checker on rules and lists, status: BIBS, bibs: 'Criteria, matrices and manual list entries are approved by the Compliance Checker.', bdoi: 'Name the checker and a back-up.'}

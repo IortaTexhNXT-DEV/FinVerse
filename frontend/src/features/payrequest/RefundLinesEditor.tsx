@@ -7,6 +7,7 @@ import { formatAmount } from '@/utils/format';
 import { emptyLine, linesTotal } from './requestForm';
 import type { FieldErrors, LineDraft } from './requestForm';
 import './payrequest.css';
+import { Notice } from '@/components/ui/Notice';
 
 interface RefundLinesEditorProps {
   lines: LineDraft[];
@@ -74,16 +75,8 @@ export function RefundLinesEditor({ lines, errors, onChange }: Readonly<RefundLi
   const first = lines[0];
   return (
     <div className="stack">
-      {errors.lines && (
-        <div className="alert danger" role="alert">
-          {errors.lines}
-        </div>
-      )}
-      {lookupError && (
-        <div className="alert warning" role="status">
-          {lookupError}
-        </div>
-      )}
+      {errors.lines && <Notice tone="error">{errors.lines}</Notice>}
+      {lookupError && <Notice tone="warning">{lookupError}</Notice>}
       <div className="table-wrap prq-lines">
         <table className="table">
           <caption className="visually-hidden">Accounts to refund</caption>

@@ -279,7 +279,7 @@ page previews). Files are named `BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>`,
 
 | Where | What |
 |---|---|
-| `docs/deliverables/src/BRD-nn_<Name>/` (`brand.src_dir`) | Everything of the BRD: the FRS markdown (`FRS_*.md`), the test plan (`brdnn_cases.yaml`, `TP_*.md`), the figures (`figures/`), the business sign-off pack (`pack/`: pack, screens, messages, notifications, contract, documents, walkthroughs and guide YAML), the pack screenshots (`screenshots/`), the Start Here source and, for BRD-13, the migration sources (`migration/`) |
+| `docs/deliverables/src/BRD-nn_<Name>/` (`brand.src_dir`) | Everything of the BRD: the FRS markdown (`FRS_*.md`), the test plan (`brdnn_cases.yaml`, `TP_*.md`), the figures (`figures/`), the business sign-off pack (`pack/`: pack, screens, messages, notifications, contract, documents, walkthroughs and guide YAML), the pack screenshots (`screenshots/`), the Start Here source and, for BRD-13, the Data Migration Handbook (`HANDBOOK_BRD13_DATA_MIGRATION.md`) in place of the FRS, with the migration catalogue and cut-over plan in `pack/` and their builder `build_dm_pack.py` |
 | `docs/deliverables/src/{signoff,testplans}/` | The shared builders of the sign-off packs, guide decks and test plans (no BRD data) |
 | `docs/deliverables/src/{alignment,change,decks,registers}/` | Programme-level sources |
 | `docs/deliverables/out/<drop folder>/BRD-nn_<Name>/` | Every client file of the BRD, migration documents and templates included |
@@ -301,7 +301,7 @@ that lists every document with its BRD, version and the BDOI dates of the drop.
 
 | Drop folder | BRDs (primary drop) | BDOI dates | Index |
 |---|---|---|---|
-| `out/Drop-0_Setup_and_Data_Migration/` | BRD-3 Product Maintenance, BRD-11 User Access Maintenance, BRD-13 Data Migration (FRS, test plan, migration pack and templates) | Setup with the Drop 1 requirements; migration requirements Sep - Nov 2026, build Nov 2026 - Mar 2027, SIT Apr - Jul 2027, UAT Aug - Oct 2027, cut-over Nov 2027 - Jan 2028 | [README](out/Drop-0_Setup_and_Data_Migration/README.md) |
+| `out/Drop-0_Setup_and_Data_Migration/` | BRD-3 Product Maintenance, BRD-11 User Access Maintenance, BRD-13 Data Migration (business sign-off set: Start Here, guide deck, Data Migration Handbook, Migration Workbook, test plan) | Setup with the Drop 1 requirements; migration requirements Sep - Nov 2026, build Nov 2026 - Mar 2027, SIT Apr - Jul 2027, UAT Aug - Oct 2027, cut-over Nov 2027 - Jan 2028 | [README](out/Drop-0_Setup_and_Data_Migration/README.md) |
 | `out/Drop-1_Transactional/` | BRD-1, BRD-2, BRD-4, BRD-5 (three documents), BRD-6, BRD-9, BRD-10 (proposed), BRD-12 | Requirements Sep - Nov 2026, build Nov 2026 - Feb 2027, SIT Jan - Jul 2027, UAT Aug - Dec 2027 | [README](out/Drop-1_Transactional/README.md) |
 | `out/Drop-2_Independent/` | BRD-7 Claims, BRD-8 Employee Benefits | Requirements Dec 2026 - Feb 2027, build Mar - Apr 2027, SIT Jul - Sep 2027, UAT Oct - Nov 2027 | [README](out/Drop-2_Independent/README.md) |
 | `out/Programme/` | BRD-00: umbrella FRS, register, process deck, alignment pack and IER diagrams; UAT readiness | Performance and penetration test Nov - Dec 2027, ORR / PRR Dec 2027 - Jan 2028, go-live January 2028 | [README](out/Programme/README.md) |

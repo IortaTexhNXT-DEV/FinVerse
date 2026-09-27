@@ -2,7 +2,7 @@
 
 Status: **analysis; nothing in this document is built.** Requirements baseline and fit/gap:
 [`BDOI_CORE_BRD_SPEC.md`](../requirements/BDOI_CORE_BRD_SPEC.md) (rows CORE-nn.mm, XC-nn, questions CRQnn). Client
-document: `docs/deliverables/src/frs/FRS_BRD00_CORE_REPLACEMENT.md` (FR-CR-nnn).
+document: `docs/deliverables/src/BRD-00_Core_Replacement/FRS_BRD00_CORE_REPLACEMENT.md` (FR-CR-nnn).
 
 ## 1. Summary
 
@@ -228,7 +228,7 @@ Applied on 26 September 2026 in the consolidation with the Data Migration analys
 | `docs/requirements/BDOI_CSF_BRD_SPEC.md` §10 | Reference CRQ04 next to CSF-EM10 |
 | `docs/requirements/BDOI_CLM_BRD_SPEC.md` §11 | Reference CRQ03 next to CLQ10 |
 | `docs/requirements/BDOI_RN_BRD_SPEC.md` | Note the letter name conflict NRL / NFR (CRQ14) |
-| `docs/deliverables/src/frs/FRS_BRD07_CLAIMS.md` | Renumber FR-CL-nnn to a unique prefix (for example FR-CM-nnn); 28 IDs collide with BRD-4 |
+| `docs/deliverables/src/BRD-07_Claims/FRS_BRD07_CLAIMS.md` | Renumber FR-CL-nnn to a unique prefix (for example FR-CM-nnn); 28 IDs collide with BRD-4 |
 | `docs/deliverables/src/registers/discrepancy_register.yaml` | Add BRD-00 (Core Replacement) to `brds` and `owners`; add the new items (DCR-163 onward); add a BRD-00 value to the NFR themes (users, response time, retention, backup frequency and retention); add CRQ questions |
 | `docs/deliverables/src/registers/build_discrepancy_register.py` | Add `("BRD-00", "BDOI_CORE_BRD_SPEC.md", "## 13. New open questions (Core Replacement)", "")` to `QUESTION_SOURCES` |
 | `docs/deliverables/README.md` | Item 1: 15 FRS files (BRD-00 umbrella added); item 28: test at 429 concurrent sessions; item 29: link the umbrella's client-migration volumes |

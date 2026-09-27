@@ -2,7 +2,7 @@
 
 Client: BDO Insurance and Reinsurance Brokers, Inc. (BDOI), Philippines. Platform: iNXT BrokerVerse (BIBS - BDOI Broker System).
 
-Status: **for BDOI concurrence; no build started.** The source is a **draft (v0.01)** that is not signed (p.15-16). Build design: [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md). FRS: `docs/deliverables/src/frs/FRS_BRD13_DATA_MIGRATION.md` (v1.2). Updated 26-Sep-2026 for the BDOI programme timeline, the early-renewal concept paper (superseded the same day by a single go-live in January 2028) and BDOI's answers to DMQ36-DMQ39 (section 10).
+Status: **for BDOI concurrence; no build started.** The source is a **draft (v0.01)** that is not signed (p.15-16). Build design: [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md). FRS: `docs/deliverables/src/BRD-13_Data_Migration/FRS_BRD13_DATA_MIGRATION.md` (v1.2). Updated 26-Sep-2026 for the BDOI programme timeline, the early-renewal concept paper (superseded the same day by a single go-live in January 2028) and BDOI's answers to DMQ36-DMQ39 (section 10).
 
 File references in this document are relative to `backend/src/main/java/com/iortatechnxt/brokerverse/` (Java), `backend/src/main/resources/db/migration/` (SQL) and `frontend/src/` (screens), unless a full path is given.
 

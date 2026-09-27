@@ -35,7 +35,7 @@ so each document can be regenerated after every build.
 | 14 | Persona-based menus: each user sees only their screens | verified in the platform | B | permissions audit and tests |
 | 15 | Notifications and workflows per role | test evidence | B | workflow and notification tests |
 | 16 | Configuration over code: rules, validations and definitions maintained from front-end masters by the System Administrator | gap list and fixes | B | code review of hard-coded rules |
-| 1, 3 | BRD-1 New Business business sign-off pack (release set v2.0) | Drop 1 | 00 Start Here, 01 Sign-off Pack Guide deck, 02 FRS v2.0 with 46 screen specifications, 03 sign-off workbook, 04 and 05 test plan in `out/Drop-1_Transactional/BRD-01_New_Business/`; source `src/signoff/brd01/`; 144 screenshots and document pages captured with seed data in `src/frs/figures/brd01/` |
+| 1, 3 | BRD-1 New Business business sign-off pack (release set v2.0) | Drop 1 | 00 Start Here, 01 Sign-off Pack Guide deck, 02 FRS v2.0 with 46 screen specifications, 03 sign-off workbook, 04 and 05 test plan in `out/Drop-1_Transactional/BRD-01_New_Business/`; source `src/signoff/brd01/`; 144 screenshots and document pages captured with seed data in `src/BRD-01_New_Business/screenshots/` |
 | 17 | Reports in Excel and PDF; document schedules in Word and PDF | platform change and tests | B | report and docgen modules. Built: `DocxReportRenderer` (layout of the PDF, print options honoured) and DOCX in the API, batches, archive and scheduled files; Word on documents and schedules (`ReportMetadata.asDocument`: GL-SCHEDULE, GL-BVA, FRBS-MANCOM-MARKET, RI-SOA, FIN-AP-VOUCHER); every composed business document downloadable as Word (`doc_rendition`, Word copy offer after each PDF download); templates to and from Word; BDO Insure logo, Header Blue tables, "Confidential" footer and page x of y on PDF, Word and Excel |
 | 18 | Screen-by-screen and field-by-field alignment review | findings and fixes | B | screenshots and review |
 | 19 | API catalogue | Excel + OpenAPI file | B | OpenAPI specification |
@@ -53,7 +53,7 @@ so each document can be regenerated after every build.
 | 26 | Security and data-protection controls mapping (hosting appendix, masking of non-production data, access, audit; EIAM and UIDM-ISC, S3 encryption with BDOI keys, Object Lock and legal hold from item 42 and [`DOCUMENT_STORAGE_DECISION.md`](../architecture/DOCUMENT_STORAGE_DECISION.md)) | Word + Excel | A + B |
 | 27 | Code quality report (static analysis, coverage, dependency and licence scan) | Excel | B |
 | 28 | Performance and volume test plan and results (against the NFRs of each BRD; the peak case is 429 concurrent sessions, the sum of the user rows of the Core Replacement umbrella BRD p.42, until BDOI answers DCR-166 / CRQ21; the environments and Kubernetes sizing follow the IER workbook as corrected in item 42, section 6.4, and the test runs on Pre-Prod in Nov - Dec 2027) | Word + Excel | B |
-| 29 | Data migration approach (legacy EBIX, ISYS, QPS and Excel sources, reconciliation). Sources: the BRD-13 spec [`BDOI_DM_BRD_SPEC.md`](../requirements/BDOI_DM_BRD_SPEC.md), the design [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md), the FRS [`FRS_BRD13_DATA_MIGRATION.md`](src/frs/FRS_BRD13_DATA_MIGRATION.md) and the migration document set in [`src/migration/`](src/migration/); the umbrella BRD's client-migration volumes (BRD-00 p.43) | Word | A |
+| 29 | Data migration approach (legacy EBIX, ISYS, QPS and Excel sources, reconciliation). Sources: the BRD-13 spec [`BDOI_DM_BRD_SPEC.md`](../requirements/BDOI_DM_BRD_SPEC.md), the design [`DATA_MIGRATION_DESIGN.md`](../architecture/DATA_MIGRATION_DESIGN.md), the FRS [`FRS_BRD13_DATA_MIGRATION.md`](src/BRD-13_Data_Migration/FRS_BRD13_DATA_MIGRATION.md) and the migration document set in [`src/migration/`](src/migration/); the umbrella BRD's client-migration volumes (BRD-00 p.43) | Word | A |
 | 30 | UAT plan and sign-off forms per BRD | Word | B |
 | 31 | Release notes and open-questions log for BDOI | Word + Excel | B |
 
@@ -103,11 +103,11 @@ carry a two-digit prefix so that they sort in reading order (`brand.SIGNOFF_SETS
 
 | No. | Document | Content | Built by |
 |---|---|---|---|
-| 00 | Start Here (Word, 2-3 pages) | Guide to the set: the map of the files, the reading order per role, the steps up to closure with the dates, the SIT sessions, change control | `src/signoff/START_HERE_<BRD>.md` (map, reading order and steps from `<brd>/guide.yaml`) |
-| 01 | Sign-off Pack Guide (PowerPoint) | Purpose and what signing means; the pack at a glance; where to start per role; the approach and the steps with RACI, inputs, outputs and durations; how to fill in the workbook; the module at a glance (process flow, personas and menus, key screens); key rules; cross-module map; caveats with worked examples; entry and exit criteria and definition of done; handover checklist; change control; governance and next steps. Speaker notes on every slide | `src/signoff/build_guide_deck.py <brd>` from `<brd>/guide.yaml` and the pack |
-| 02 | FRS v2.0 (Word) | The requirements of v1.x unchanged, plus: navigation (menu by persona, screen-flow diagram); one specification per screen (purpose, who opens it, navigation, screenshots with numbered callouts, field table, actions table, business rules, expected outcome, FR and test links); end-to-end walkthroughs; messages catalogue; notifications; generated documents; upload templates; cross-BRD interface contract; sign-off and change control; screen standards appendix | `src/frs/` with ```pack blocks read from `src/signoff/<brd>/` |
-| 03 | Sign-off workbook (Excel) | Screen standards, screen catalogue, field register, actions, business rules, messages, notifications, menu by persona, upload templates and cross-BRD contract with the BU review columns (Accept / Change requested / Comment, comment, reviewer, date); comments log (clarification, defect, change request, with the response and status); meeting minutes; version history; sign-off certificate (business owner, Finance, Compliance and BDOI IT for their parts) | `src/signoff/signoff_pack.py` |
-| 04, 05 | Test plan v2.0 (Excel) and its summary (Word) | The cases of v1.x re-traced to FRS v2.0 and its screens, plus screen cases (one per screen) and message cases | `src/testplans/build_test_plan.py` |
+| 00 | Start Here (Word, 2-3 pages) | Guide to the set: the map of the files, the reading order per role, the steps up to closure with the dates, the SIT sessions, change control | `src/<BRD folder>/START_HERE_<BRD>.md` (map, reading order and steps from `pack/guide.yaml`) |
+| 01 | Sign-off Pack Guide (PowerPoint) | Purpose and what signing means; the pack at a glance; where to start per role; the approach and the steps with RACI, inputs, outputs and durations; how to fill in the workbook; the module at a glance (process flow, personas and menus, key screens); key rules; cross-module map; caveats with worked examples; entry and exit criteria and definition of done; handover checklist; change control; governance and next steps. Speaker notes on every slide | `src/signoff/build_guide_deck.py BRD-nn` from `pack/guide.yaml` and the pack |
+| 02 | FRS v2.0 (Word) | The requirements of v1.x unchanged, plus: navigation (menu by persona, screen-flow diagram); one specification per screen (purpose, who opens it, navigation, screenshots with numbered callouts, field table, actions table, business rules, expected outcome, FR and test links); end-to-end walkthroughs; messages catalogue; notifications; generated documents; upload templates; cross-BRD interface contract; sign-off and change control; screen standards appendix | `src/<BRD folder>/FRS_*.md` with ```pack blocks read from `pack/` |
+| 03 | Sign-off workbook (Excel) | Screen standards, screen catalogue, field register, actions, business rules, messages, notifications, menu by persona, upload templates and cross-BRD contract with the BU review columns (Accept / Change requested / Comment, comment, reviewer, date); comments log (clarification, defect, change request, with the response and status); meeting minutes; version history; sign-off certificate (business owner, Finance, Compliance and BDOI IT for their parts) | `src/signoff/signoff_pack.py BRD-nn` |
+| 04, 05 | Test plan v2.0 (Excel) and its summary (Word) | The cases of v1.x re-traced to FRS v2.0 and its screens, plus screen cases (one per screen) and message cases | `src/testplans/build_test_plan.py` with `src/<BRD folder>/brdnn_cases.yaml` and `TP_*.md` |
 
 **Steps from issue to closure** (the same for every set; the dates of a set are in its Start Here guide):
 
@@ -271,9 +271,24 @@ defect remains. The readiness statement is then issued for BDOI to approve the m
 ## Toolkit and status
 
 Toolkit: [`tools/deliverables/`](../../tools/deliverables/README.md) (Word, Excel and PowerPoint builders, PDF and
-page previews). Sources: `docs/deliverables/src/`; outputs: one release-set folder per BRD,
-`docs/deliverables/out/<drop folder>/BRD-nn_<Name>/`, and programme-level items by kind under `out/Programme/<kind>/`;
-files are named `BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>`.
+page previews). Files are named `BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>`, with the reading-order prefix 00_ to
+05_ in an issued business sign-off set.
+
+**One place per BRD.** Each BRD has one source folder and one output folder, and nothing is copied between places:
+
+| Where | What |
+|---|---|
+| `docs/deliverables/src/BRD-nn_<Name>/` (`brand.src_dir`) | Everything of the BRD: the FRS markdown (`FRS_*.md`), the test plan (`brdnn_cases.yaml`, `TP_*.md`), the figures (`figures/`), the business sign-off pack (`pack/`: pack, screens, messages, notifications, contract, documents, walkthroughs and guide YAML), the pack screenshots (`screenshots/`), the Start Here source and, for BRD-13, the migration sources (`migration/`) |
+| `docs/deliverables/src/{signoff,testplans}/` | The shared builders of the sign-off packs, guide decks and test plans (no BRD data) |
+| `docs/deliverables/src/{alignment,change,decks,registers}/` | Programme-level sources |
+| `docs/deliverables/out/<drop folder>/BRD-nn_<Name>/` | Every client file of the BRD, migration documents and templates included |
+| `docs/deliverables/out/Programme/<kind>/` | Programme-level items |
+| `docs/design/screenshots/` | The app-wide screen catalogue (`tools/screenshots/capture.cjs`); the pack screenshots are only in the BRD source folder |
+
+`python tools/deliverables/check_pack.py` fails on a file duplicated by content (SHA-256) in `docs/deliverables` or
+`docs/design/screenshots`, an older version of a document next to a newer one in `out/`, an issued release set without
+one of its standard files 00 to 05 (a warning for the BRDs whose set is not yet issued) and a restricted word in a
+source or a generated file. Run it before every commit of the pack.
 
 ### Deliverables by drop
 

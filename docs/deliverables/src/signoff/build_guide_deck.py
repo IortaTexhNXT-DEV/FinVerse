@@ -1,10 +1,10 @@
 """Builds the Sign-off Pack Guide deck of a BRD business sign-off release set (PowerPoint, BDO theme).
 
 The same deck is produced for every BRD set: the content comes from the pack of the BRD
-(docs/deliverables/src/signoff/<brd>/pack.yaml and guide.yaml) and from the system as built through the pack
+(docs/deliverables/src/<BRD-nn_Name>/pack/pack.yaml and guide.yaml) and from the system as built through the pack
 (personas, menus, cross-BRD contract, screenshots). Every slide carries speaker notes.
 
-    python docs/deliverables/src/signoff/build_guide_deck.py brd01
+    python docs/deliverables/src/signoff/build_guide_deck.py BRD-01
 """
 
 from __future__ import annotations
@@ -240,15 +240,15 @@ def contract_map(pack: signoff_pack.Pack, out_dir: Path) -> Path:
 # ------------------------------------------------------------------ deck
 
 
-def build(brd_dir: str) -> Path:
-    pack = signoff_pack.Pack(HERE / brd_dir / "pack.yaml")
+def build(brd: str) -> Path:
+    pack = signoff_pack.Pack(brand.src_dir(brand.brd_of_code(brd)) / "pack" / "pack.yaml")
     g = pack.guide
     m = pack.meta
     gm = g["meta"]
     module = m["name"]
     label = m["brd_label"]
     shots = (pack.dir / m.get("screenshot_dir", "screenshots")).resolve()
-    figs = HERE / brd_dir / "figures"
+    figs = pack.brd_dir / "figures"
     deck = GuideDeck(f"{gm['deck_title']} {label} {module}", version=str(m["version"]), date=str(m["date"]),
                      subtitle=f"{label} {module} business sign-off pack, release set v{m['version']}")
     counts = (f"{len(pack.screens)} screens, {sum(len(s.fields) for s in pack.screens)} fields, "
@@ -318,7 +318,7 @@ def build(brd_dir: str) -> Path:
                "project team; the Sign-off certificate is signed at the end.")
 
     # 9-11. Module at a glance
-    process = ROOT / "docs" / "deliverables" / "src" / "frs" / "figures" / f"{m['brd'].lower().replace('-', '')}_process_flow.png"
+    process = figs / f"{m['brd'].lower().replace('-', '')}_process_flow.png"
     if process.exists():
         deck.image(f"{module} at a glance: process flow", process, f"{label} process from the client to the booked "
                    "invoice")
@@ -401,7 +401,7 @@ def build(brd_dir: str) -> Path:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("brd", help="folder of the pack, e.g. brd01")
+    ap.add_argument("brd", help="BRD of the pack, e.g. BRD-01")
     args = ap.parse_args(argv)
     print(f"pptx: {build(args.brd)}")
     return 0

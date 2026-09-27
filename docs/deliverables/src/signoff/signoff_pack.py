@@ -1,10 +1,10 @@
 """Business sign-off pack of a BRD: screen specifications, field register, messages, notifications, menus by
 persona, cross-BRD contract, walkthroughs and the sign-off workbook (client deliverable: one release set per BRD).
 
-Usage
-  python docs/deliverables/src/signoff/signoff_pack.py docs/deliverables/src/signoff/brd01/pack.yaml
-  python docs/deliverables/src/signoff/signoff_pack.py brd01/pack.yaml --check        # checks only
-  python docs/deliverables/src/signoff/signoff_pack.py brd01/pack.yaml --manifest     # screenshot manifest (JSON)
+Usage (the pack of a BRD is docs/deliverables/src/<BRD-nn_Name>/pack/pack.yaml, brand.src_dir)
+  python docs/deliverables/src/signoff/signoff_pack.py BRD-01
+  python docs/deliverables/src/signoff/signoff_pack.py BRD-01 --check                 # checks only
+  python docs/deliverables/src/signoff/signoff_pack.py BRD-01 --manifest m.json       # screenshot manifest (JSON)
 
 What it reads
   * <brd>/pack.yaml             metadata, personas, sections of the BRD, screen-flow links, common screen elements;
@@ -14,7 +14,7 @@ What it reads
   * <brd>/notifications.yaml, contract.yaml, documents.yaml, walkthroughs.yaml;
   * the code itself through tools/deliverables/code_facts.py: sidebar menus, role grants, messages, upload templates,
     so the personas, menu paths and message texts are never typed by hand;
-  * the test plan YAML of the BRD (docs/deliverables/src/testplans), for the test cases of each screen.
+  * the test plan YAML of the BRD (in the BRD source folder), for the test cases of each screen.
 
 What it writes
   * BIBS_Signoff_BRD-nn_<Name>_v<version>.xlsx in the BRD's release folder (brand.out_dir): How to review, Screen
@@ -87,6 +87,7 @@ class Pack:
     def __init__(self, path: str | Path):
         self.path = Path(path).resolve()
         self.dir = self.path.parent
+        self.brd_dir = self.dir.parent  # the BRD source folder (brand.src_dir): FRS, test plan, figures
         raw = yaml.safe_load(self.path.read_text(encoding="utf-8"))
         self.meta: dict[str, Any] = raw["meta"]
         self.personas: dict[str, dict[str, Any]] = raw.get("personas") or {}
@@ -199,7 +200,7 @@ class Pack:
         sys.path.insert(0, str(REPO / "docs" / "deliverables" / "src" / "testplans"))
         import build_test_plan  # noqa: E402
 
-        return build_test_plan.load(REPO / "docs" / "deliverables" / "src" / "testplans" / tp)
+        return build_test_plan.load(self.brd_dir / tp)
 
     def tests_of(self, scr: Screen) -> list[str]:
         plan = self.test_plan
@@ -343,7 +344,7 @@ class Pack:
 
     def check(self) -> list[str]:
         problems = list(self.problems)
-        frs_text = (REPO / "docs" / "deliverables" / "src" / "frs" / self.meta["frs"]).read_text(encoding="utf-8")
+        frs_text = (self.brd_dir / self.meta["frs"]).read_text(encoding="utf-8")
         fr_ids = set(re.findall(r"^id: (FR-[A-Z]+-\d+)", frs_text, re.M))
         ids = [s.id for s in self.screens]
         if len(ids) != len(set(ids)):
@@ -483,7 +484,7 @@ def flow_dot(pack: Pack) -> Path:
     for a, b, label in pack.flow:
         lines.append(f'  "{a}" -> "{b}" [label="{label}"];')
     lines.append("}")
-    target = REPO / "docs" / "deliverables" / "src" / "frs" / "figures" / f"{pack.meta['brd'].lower().replace('-', '')}_screen_flow.dot"
+    target = pack.brd_dir / "figures" / f"{pack.meta['brd'].lower().replace('-', '')}_screen_flow.dot"
     text = "\n".join(lines) + "\n"
     if not target.exists() or target.read_text(encoding="utf-8") != text:
         target.write_text(text, encoding="utf-8")
@@ -967,13 +968,13 @@ def report(pack: Pack) -> str:
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="Build the business sign-off workbook of a BRD from its pack")
-    ap.add_argument("pack", help="pack.yaml of the BRD (e.g. brd01/pack.yaml)")
+    ap.add_argument("pack", help="BRD of the pack (e.g. BRD-01) or the path of its pack.yaml")
     ap.add_argument("--check", action="store_true", help="check the pack against the code and the FRS only")
     ap.add_argument("--manifest", metavar="JSON", help="write the screenshot manifest for capture_pack.cjs")
     args = ap.parse_args(argv)
     path = Path(args.pack)
     if not path.exists():
-        path = HERE / args.pack
+        path = brand.src_dir(brand.brd_of_code(args.pack)) / "pack" / "pack.yaml"
     pack = Pack(path)
     problems = pack.check()
     for p in problems:

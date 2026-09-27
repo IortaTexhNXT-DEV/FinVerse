@@ -7,7 +7,7 @@ Guide of User Access Maintenance in iNXT BrokerVerse: access requests for users 
 18 record what each wave built); the requirements and their as-built status per BRD ID are in
 [`docs/requirements/BDOI_UAM_BRD_SPEC.md`](../requirements/BDOI_UAM_BRD_SPEC.md); the functional
 specification is
-[`FRS_BRD11_USER_ACCESS_MAINTENANCE.md`](../deliverables/src/frs/FRS_BRD11_USER_ACCESS_MAINTENANCE.md).
+[`FRS_BRD11_USER_ACCESS_MAINTENANCE.md`](../deliverables/src/BRD-11_User_Access_Maintenance/FRS_BRD11_USER_ACCESS_MAINTENANCE.md).
 
 ## 1. Purpose
 

@@ -5,7 +5,7 @@ group personal accident (GPA) programmes for corporate clients. The build design
 [`docs/architecture/EMPLOYEE_BENEFITS_DESIGN.md`](../architecture/EMPLOYEE_BENEFITS_DESIGN.md); section 16 records what
 each wave built. The requirements are in [`docs/requirements/BDOI_EB_BRD_SPEC.md`](../requirements/BDOI_EB_BRD_SPEC.md)
 (BRID-001 to 030) and the functional specification in
-[`FRS_BRD08_EMPLOYEE_BENEFITS.md`](../deliverables/src/frs/FRS_BRD08_EMPLOYEE_BENEFITS.md) (FR-EB-001 to 062).
+[`FRS_BRD08_EMPLOYEE_BENEFITS.md`](../deliverables/src/BRD-08_Employee_Benefits/FRS_BRD08_EMPLOYEE_BENEFITS.md) (FR-EB-001 to 062).
 
 Employee Benefits is in BDOI **Drop 2** as "Employee Benefits (no portal feature)": insurers and client HR send their
 files by e-mail or an agreed channel, and the EB users upload them with the source INSURER or CLIENT. There is no partner

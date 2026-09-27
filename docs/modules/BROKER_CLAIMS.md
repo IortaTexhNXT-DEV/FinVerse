@@ -8,7 +8,7 @@ and closure, follow-up and diary, and the Claims Handling reports. The build des
 sections 17 to 19 record what each wave built, and section 14 gives the CL2 integration wave. The
 requirements and their as-built status per BRCLM ID are in
 [`docs/requirements/BDOI_CLM_BRD_SPEC.md`](../requirements/BDOI_CLM_BRD_SPEC.md). The functional
-specification is [`FRS_BRD07_CLAIMS.md`](../deliverables/src/frs/FRS_BRD07_CLAIMS.md), with
+specification is [`FRS_BRD07_CLAIMS.md`](../deliverables/src/BRD-07_Claims/FRS_BRD07_CLAIMS.md), with
 requirements FR-CM-001 to FR-CM-066.
 
 The insurer-side Claims module (`claims`, `docs/modules/CLAIMS.md`) is a different module. It

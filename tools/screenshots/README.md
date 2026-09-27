@@ -35,16 +35,16 @@ The script exits with code 1 and lists the screens it could not capture, for exa
 
 ## Business sign-off pack screenshots
 
-`capture_pack.cjs` captures the screenshots of a BRD sign-off pack (`docs/deliverables/src/signoff/<brd>/`): every
+`capture_pack.cjs` captures the screenshots of a BRD sign-off pack (`docs/deliverables/src/<BRD-nn_Name>/pack/`): every
 screen state of the pack (list, empty form, filled form, validation error, record per status, approval, dialog),
 the steps of the end-to-end walkthroughs, the upload error-file flow and the first page of each generated document.
 The shots come from the pack itself (`signoff_pack.py --manifest`), so the FRS, the sign-off workbook and the images
 name the same screens and fields. Numbered callout badges are drawn in an overlay on the page before the capture;
 each badge number is the No. of the field in the screen's field table. The images are saved as optimised PNG in
-the pack's screenshot folder (`meta.screenshot_dir`, for BRD-01 `docs/deliverables/src/frs/figures/brd01`).
+the pack's screenshot folder (`meta.screenshot_dir`, for BRD-01 `docs/deliverables/src/BRD-01_New_Business/screenshots`).
 
 How each state is reached (the record to open for a status, the values typed, the files uploaded, the walkthrough
-steps and the document downloads) is in the recipe of the BRD, `packs/<brd>.cjs`. The walkthroughs create records,
+steps and the document downloads) is in the recipe of the BRD, `packs/brdNN.cjs`. The walkthroughs create records,
 so capture on a fresh seed database, after readiness is UP:
 
 ```

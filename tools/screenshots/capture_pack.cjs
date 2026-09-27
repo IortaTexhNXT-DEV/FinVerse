@@ -6,7 +6,7 @@
 //
 // Usage (from the project root, seed profile running, see tools/screenshots/README.md):
 //   SEED_PASSWORD=... BASE=http://localhost:5173 API=http://localhost:8080 PGDATABASE=brokerverse \
-//   node tools/screenshots/capture_pack.cjs brd01 [slug-regex]
+//   node tools/screenshots/capture_pack.cjs brd01 [slug-regex]      (brd01 or BRD-01)
 //
 // The per-BRD recipe (tools/screenshots/packs/<brd>.cjs) says how to reach each state: which record to open for a
 // status, what to type into a form, which rows to select, which files to upload, how to perform the walkthrough
@@ -34,7 +34,7 @@ if (!PASSWORD) {
   console.error('Set SEED_PASSWORD to the password of the SIT/UAT users of the seed profile.');
   process.exit(2);
 }
-const [brd, only] = process.argv.slice(2);
+const [brd, only] = process.argv.slice(2);  // brd01 or BRD-01; the recipe is packs/brdNN.cjs
 if (!brd) {
   console.error('Usage: node tools/screenshots/capture_pack.cjs <brd folder, e.g. brd01> [slug-regex]');
   process.exit(2);
@@ -43,7 +43,14 @@ if (!brd) {
 // ------------------------------------------------------------------ manifest
 
 function loadManifest() {
-  const pack = path.join(ROOT, 'docs/deliverables/src/signoff', brd, 'pack.yaml');
+  // The pack of the BRD lives in its source folder: docs/deliverables/src/<BRD-nn_Name>/pack/pack.yaml.
+  const code = `BRD-${brd.replace(/\D/g, '').slice(0, 2)}`;
+  const src = path.join(ROOT, 'docs/deliverables/src');
+  const folder = fs.readdirSync(src).find((d) => d.startsWith(`${code}_`));
+  if (!folder) {
+    throw new Error(`no source folder for ${code} in ${src}`);
+  }
+  const pack = path.join(src, folder, 'pack', 'pack.yaml');
   const file = path.join(os.tmpdir(), `capture-pack-${brd}-${process.pid}.json`);
   try {
     execFileSync(PYTHON, [path.join(ROOT, 'docs/deliverables/src/signoff/signoff_pack.py'), pack, '--manifest', file],
@@ -362,7 +369,7 @@ function optimise(file) {
 
 (async () => {
   const manifest = loadManifest();
-  const recipe = require(path.join(__dirname, 'packs', `${brd}.cjs`));
+  const recipe = require(path.join(__dirname, 'packs', `brd${brd.replace(/\D/g, '').slice(0, 2)}.cjs`));
   const OUT = path.resolve(manifest.out);
   fs.mkdirSync(OUT, { recursive: true });
   await waitUntilReady();

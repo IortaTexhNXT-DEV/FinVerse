@@ -1,12 +1,12 @@
 """Builds the test plan of one BRD (client deliverable 3): an Excel master and a Word summary.
 
 Usage
-  python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/testplans/brd03_cases.yaml
+  python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-03_Product_Maintenance/brd03_cases.yaml
   python docs/deliverables/src/testplans/build_test_plan.py brd03_cases.yaml --check      # checks only
   python docs/deliverables/src/testplans/build_test_plan.py brd03_cases.yaml --no-pdf     # skip TOC pages
   python docs/deliverables/src/testplans/build_test_plan.py brd03_cases.yaml --previews   # page PNGs
 
-Inputs (this folder and docs/deliverables/src/frs)
+Inputs (the source folder of the BRD, docs/deliverables/src/<BRD-nn_Name>/, brand.src_dir)
   * brdnn_cases.yaml    the test data of the BRD (schema below);
   * TP_BRDnn_<NAME>.md  the Word summary, in the bdoi_docx source format, with placeholders that
                         this script fills from the YAML (list below);
@@ -24,11 +24,11 @@ meta:
   brd: BRD-03                      # BRD code
   name: Product Maintenance        # used in the output file names
   code: PM                         # ID prefix: TC-PM-020.1, SC-PM-01, TD-PM-01, AC-PM-01
-  frs: FRS_BRD03_PRODUCT_MAINTENANCE.md    # file under src/frs, or a list of files (volumes)
+  frs: FRS_BRD03_PRODUCT_MAINTENANCE.md    # file in the BRD source folder, or a list of files (volumes)
   summary: TP_BRD03_PRODUCT_MAINTENANCE.md # Word summary source in this folder
   version: "1.0"
   date: 25 September 2026
-  signoff: ../signoff/brd01/pack.yaml   # optional: the business sign-off pack of the BRD (src/signoff). Adds
+  signoff: pack/pack.yaml   # optional: the business sign-off pack of the BRD (pack/ of the folder). Adds
                                    # one Screen case per screen (TC-<code>-SCR-nn) and one Message case per
                                    # screen or dialog of the messages catalogue (TC-<code>-MSG-nn), a Screen ID
                                    # on every case (from the test aliases of the screens), the Screens sheet and
@@ -112,7 +112,6 @@ import brand  # noqa: E402
 from bdoi_docx import BdoiDocument, load_source, meta_from, render_body  # noqa: E402
 from bdoi_xlsx import BdoiWorkbook, Column  # noqa: E402
 
-FRS_DIR = REPO / "docs" / "deliverables" / "src" / "frs"
 
 TYPES = ["Positive", "Negative", "Boundary", "Security-access", "Workflow", "Report-output", "Upload-download",
          "Screen", "Message"]
@@ -213,10 +212,10 @@ def _id_key(b: str) -> tuple:
     return (0, m.group(1), int(m.group(2)), m.group(3)) if m else (1, b, 0, "")
 
 
-def read_frs(files: list[str]) -> "OrderedDict[str, Fr]":
+def read_frs(files: list[str], base: Path) -> "OrderedDict[str, Fr]":
     frs: OrderedDict[str, Fr] = OrderedDict()
     for name in files:
-        text = (FRS_DIR / name).read_text(encoding="utf-8")
+        text = (base / name).read_text(encoding="utf-8")
         for block in re.findall(r"```(?:fr|requirement)\n(.*?)```", text, re.S):
             fr = yaml.safe_load(block)
             refs = fr.get("brd") or []
@@ -252,7 +251,7 @@ def load(path: Path) -> Plan:
     raw = yaml.safe_load(path.read_text(encoding="utf-8"))
     meta = raw["meta"]
     files = meta["frs"] if isinstance(meta["frs"], list) else [meta["frs"]]
-    plan = Plan(meta=meta, path=path, frs=read_frs(files), personas=raw.get("personas") or {},
+    plan = Plan(meta=meta, path=path, frs=read_frs(files, path.parent), personas=raw.get("personas") or {},
                 screens=raw.get("screens") or {}, data=raw.get("data") or [], scenarios=raw.get("scenarios") or [])
     plan.access = raw.get("access") or []
     plan.findings = raw.get("findings") or []
@@ -390,7 +389,7 @@ def _add_signoff_cases(plan: Plan) -> None:
     sys.path.insert(0, str(REPO / "docs" / "deliverables" / "src" / "signoff"))
     import signoff_pack  # noqa: E402
 
-    pack = signoff_pack.Pack(HERE / plan.meta["signoff"])
+    pack = signoff_pack.Pack(plan.path.parent / plan.meta["signoff"])
     plan.signoff = pack
     code = plan.meta["code"]
     by_path: dict[str, str] = {}
@@ -969,9 +968,9 @@ def expand(plan: Plan, lines: list[str]) -> list[str]:
 
 
 def build_docx(plan: Plan, pdf: bool, keep_pdf: bool) -> tuple[Path, Path | None]:
-    src = HERE / plan.meta["summary"]
+    src = plan.path.parent / plan.meta["summary"]
     front, lines = load_source(src)
-    doc = BdoiDocument(meta_from(front), h1_page_break=bool(front.get("h1_page_break", True)), base_dir=HERE)
+    doc = BdoiDocument(meta_from(front), h1_page_break=bool(front.get("h1_page_break", True)), base_dir=plan.path.parent)
     doc.cover()
     doc.front_matter()
     render_body(doc, expand(plan, lines))
@@ -1002,8 +1001,8 @@ def main(argv: list[str] | None = None) -> int:
     failed = False
     for y in args.yaml:
         path = Path(y)
-        if not path.exists():
-            path = HERE / y
+        if not path.exists():  # a file name such as brd03_cases.yaml: in the source folder of its BRD
+            path = brand.src_dir(brand.brd_of_code(Path(y).name)) / Path(y).name
         plan = load(path)
         for w in plan.warnings:
             print(f"{path.name}: warning: {w}")
@@ -1015,7 +1014,7 @@ def main(argv: list[str] | None = None) -> int:
             continue
         if args.check:
             continue
-        front, _ = load_source(HERE / plan.meta["summary"])
+        front, _ = load_source(plan.path.parent / plan.meta["summary"])
         print(f"xlsx: {build_xlsx(plan, list(front.get('control') or []))}")
         keep = args.keep_pdf or args.previews
         docx_path, pdf_path = build_docx(plan, pdf=not args.no_pdf, keep_pdf=keep)

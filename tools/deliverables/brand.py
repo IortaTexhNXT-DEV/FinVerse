@@ -203,6 +203,22 @@ def brd_folder(brd: str) -> str:
     return f"{brd}_{safe}" if safe else brd
 
 
+def src_dir(brd: str) -> Path:
+    """Source folder of a BRD: docs/deliverables/src/<BRD-nn_Name>/, holding its FRS and test plan sources, the
+    FRS figures (figures/), the business sign-off pack data (pack/), the pack screenshots (screenshots/), the Start
+    Here guide and, for BRD-13, the migration sources (migration/). Shared builders and programme-level sources
+    (alignment, change, decks, registers, signoff and testplans builders) keep their own folders."""
+    if brd == "BRD-00":
+        return SRC_DIR / "BRD-00_Core_Replacement"
+    return SRC_DIR / brd_folder(brd)
+
+
+def brd_of_code(code: str) -> str:
+    """BRD-nn of a short code such as brd01 or BRD01 (or BRD-01 itself)."""
+    digits = "".join(ch for ch in code if ch.isdigit())[:2]
+    return f"BRD-{digits}"
+
+
 def out_dir(brd: str, kind: str) -> Path:
     """Output folder of a document of a BRD.
 

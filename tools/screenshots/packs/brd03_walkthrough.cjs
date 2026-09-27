@@ -63,7 +63,7 @@ const steps = {
     await kind.selectOption({ label: (await kind.locator('option').allTextContents()).find((o) => /^Clause$/i.test(o.trim())) });
     await d.getByLabel(/^Product line/).selectOption({ label: 'Motor' });
     await d.getByLabel(/^Title/).fill('Accredited repair shops for fleets');
-    await d.getByLabel(/^Effective from/).fill(new Date().toISOString().slice(0, 10));
+    await d.getByLabel(/^Effective from/).fill(new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10)); // Philippine date
     await d.getByLabel(/^Wording/).fill('Repairs of insured fleet vehicles are made at the accredited repair shops of the insurer (seed data).');
     await d.getByRole('button', { name: /save for authorization/i }).click();
     await settle(page, 1200);
@@ -89,7 +89,7 @@ const steps = {
       ['Requested rate %', '1.2'], ['Minimum premium', '5000'], ['Commission %', '15'], ['Package TSI limit', '5000000'],
     ]);
     // Effective today, so that New Business can quote the package on the day it is released (steps 21-24).
-    const start = new Date();
+    const start = new Date(Date.now() + 8 * 3600 * 1000); // Philippine date: the system's today
     const end = new Date(start);
     end.setFullYear(end.getFullYear() + 1);
     const iso = (d) => d.toISOString().slice(0, 10);
@@ -197,6 +197,13 @@ const steps = {
   },
   'wt-a-16': async (ctx) => {
     const page = await go(ctx, 'mbs', `/catalog/products/${RISK_CODE}/versions/1`);
+    // The version starts on the Philippine today (a capture that runs across midnight UTC keeps it valid).
+    const today = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+    const from = page.getByLabel(/^Effective From/).first();
+    if (await from.isEditable().catch(() => false)) {
+      await from.fill(today);
+      await page.getByLabel(/^Package Start/).first().fill(today).catch(() => {});
+    }
     await tab(page, 'Insurer Terms');
     const clauses = page.getByLabel(/^Clauses of INS-MGIC on OD_THEFT/);
     if (await clauses.count()) {
@@ -320,7 +327,7 @@ const steps = {
     let id = ctx.sql("select id from pm_request where title = 'Bancassurance Motor Programme' order by id desc limit 1")[0]?.[0];
     if (!id) {
       const company = Number(ctx.one("select id from org_company where code = 'FVI'"));
-      const end = new Date();
+      const end = new Date(Date.now() + 8 * 3600 * 1000);
       end.setFullYear(end.getFullYear() + 1);
       const p = await ctx.api('mkttl', 'POST', REQUESTS, {
         companyId: company, type: 'NEW', scope: 'GENERIC', title: 'Bancassurance Motor Programme', lineCode: 'MOTOR',
@@ -342,7 +349,7 @@ const steps = {
     let id = ctx.sql(`select id from pm_request where title = '${title}' order by id desc limit 1`)[0]?.[0];
     if (!id) {
       const company = Number(ctx.one("select id from org_company where code = 'FVI'"));
-      const end = new Date();
+      const end = new Date(Date.now() + 8 * 3600 * 1000);
       end.setFullYear(end.getFullYear() + 1);
       const p = await ctx.api('tsu', 'POST', REQUESTS, {
         companyId: company, type: 'NEW', scope: 'GENERIC', title, lineCode: 'PROPERTY', coverTypeCode: 'FIRE_LIGHTNING',

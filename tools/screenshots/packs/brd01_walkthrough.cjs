@@ -323,7 +323,7 @@ const steps = {
     const report = csv(`clpc-payment-report-${arn}.csv`, [
       ['PN No.', 'Loan Application No.', 'Borrower', 'Status', 'Amount', 'Payment Date'],
       [pnNo(ctx), loanNo(ctx), `${person(ctx).last}, ${person(ctx).first}`, 'PAID',
-        ctx.one(`select gross_premium from acc_account where arn = '${arn}'`), new Date().toISOString().slice(0, 10)],
+        ctx.one(`select gross_premium from acc_account where arn = '${arn}'`), new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10)],
     ]);
     await button(page.locator('table tbody tr').filter({ hasText: batch }).first(), 'Upload Report').click();
     await page.waitForTimeout(700);

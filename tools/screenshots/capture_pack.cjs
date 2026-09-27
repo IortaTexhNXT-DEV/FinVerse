@@ -366,8 +366,8 @@ async function drawCallouts(page, callouts) {
       }
       used.add(el);
       const r = el.getBoundingClientRect();
-      // Beside a label (left of its first letter); inside the top-left corner of a column header or tab.
-      const inside = el.matches('th, [role=columnheader], [role=tab], button, input, textarea');
+      // Inside the corner of a column header, tab or input; left of a label, link or button, so its text stays whole.
+      const inside = el.matches('th, [role=columnheader], [role=tab], input, textarea');
       let x = r.left + window.scrollX + (inside ? 2 : -29);
       let y = r.top + window.scrollY + (inside ? -10 : Math.min(r.height, 26) / 2 - 13);
       // Keep badges of neighbouring fields apart.
@@ -463,6 +463,11 @@ async function cropOf(page, shot, recipe) {
     } else if (rule === 'dialog') {
       throw new Error('crop dialog: no dialog open');
     }
+  }
+  if (boxes.length === 0 && rule === 'auto') {
+    // The sign-in pages: the form card, without the picture beside it.
+    boxes = await visibleBoxes(page.locator('.login-card'));
+    kind = boxes.length ? 'region' : kind;
   }
   if (boxes.length === 0 && rule !== 'auto' && rule !== 'main' && rule !== 'dialog') {
     boxes = await visibleBoxes(page.locator(rule));

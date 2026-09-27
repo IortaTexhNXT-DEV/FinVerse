@@ -20,7 +20,7 @@ const requestByTitle = (ctx, title) => ctx.sql(`select id from pm_request where 
 
 /** Terms of the requests the recipe prepares (fictitious values). */
 function terms(insurers) {
-  const start = new Date();
+  const start = new Date(Date.now() + 8 * 3600 * 1000); // Philippine date
   start.setDate(start.getDate() + 45);
   const end = new Date(start);
   end.setFullYear(end.getFullYear() + 1);

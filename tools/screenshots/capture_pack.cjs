@@ -530,6 +530,10 @@ async function cropOf(page, shot, recipe) {
   const manifest = loadManifest();
   const recipe = require(path.join(__dirname, 'packs', `brd${brd.replace(/\D/g, '').slice(0, 2)}.cjs`));
   const OUT = path.resolve(manifest.out);
+  // Images are written and old ones removed only inside the checkout that holds this script.
+  if (path.relative(ROOT, OUT).startsWith('..') || path.isAbsolute(path.relative(ROOT, OUT))) {
+    throw new Error(`screenshot folder ${OUT} is outside ${ROOT}`);
+  }
   fs.mkdirSync(OUT, { recursive: true });
   await waitUntilReady();
   const browser = await chromium.launch(process.env.CHROMIUM ? { executablePath: process.env.CHROMIUM } : {});

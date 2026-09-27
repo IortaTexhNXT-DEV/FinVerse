@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Business names of records in user messages ("Auto-booking rule not found: 7"): a class-style name
@@ -13,10 +11,6 @@ import java.util.regex.Pattern;
  * words, with the agreed names of the short forms; a name already in words is kept as it is.
  */
 public final class ResourceNames {
-
-  private static final Pattern CLASS_STYLE = Pattern.compile("[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]*)+");
-  private static final Pattern CODE_STYLE = Pattern.compile("[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)+");
-  private static final Pattern PART = Pattern.compile("[A-Z][a-z0-9]*");
 
   /** Records whose name in words is not the plain reading of their class name. */
   private static final Map<String, String> NAMES =
@@ -88,20 +82,56 @@ public final class ResourceNames {
       return known;
     }
     List<String> parts = new ArrayList<>();
-    if (CODE_STYLE.matcher(token).matches()) {
+    if (codeStyle(token)) {
       for (String part : token.split("_")) {
         String lower = part.toLowerCase(Locale.ROOT);
         parts.add(Character.toUpperCase(lower.charAt(0)) + lower.substring(1));
       }
-    } else if (CLASS_STYLE.matcher(token).matches()) {
-      Matcher m = PART.matcher(token);
-      while (m.find()) {
-        parts.add(m.group());
+    } else if (classStyle(token)) {
+      int start = 0;
+      for (int i = 1; i < token.length(); i++) {
+        if (Character.isUpperCase(token.charAt(i))) {
+          parts.add(token.substring(start, i));
+          start = i;
+        }
       }
+      parts.add(token.substring(start));
     } else {
       return token;
     }
     return String.join(
         " ", parts.stream().map(p -> WORDS.getOrDefault(p, p.toLowerCase(Locale.ROOT))).toList());
+  }
+
+  /** AutoBookRule: letters and digits, a capital first, lower case letters and further capitals. */
+  private static boolean classStyle(String token) {
+    if (token.length() < 2 || !Character.isUpperCase(token.charAt(0))) {
+      return false;
+    }
+    int capitals = 0;
+    boolean lower = false;
+    for (int i = 0; i < token.length(); i++) {
+      char c = token.charAt(i);
+      if (!Character.isLetterOrDigit(c) || c > 'z') {
+        return false;
+      }
+      capitals += Character.isUpperCase(c) ? 1 : 0;
+      lower |= Character.isLowerCase(c);
+    }
+    return lower && capitals > 1 && !Character.isUpperCase(token.charAt(1));
+  }
+
+  /** EB_MEMBER: capitals and digits in parts joined by underscores. */
+  private static boolean codeStyle(String token) {
+    if (!token.contains("_") || token.startsWith("_") || token.endsWith("_")) {
+      return false;
+    }
+    for (int i = 0; i < token.length(); i++) {
+      char c = token.charAt(i);
+      if (!(c == '_' || c >= 'A' && c <= 'Z' || c >= '0' && c <= '9')) {
+        return false;
+      }
+    }
+    return !token.contains("__") && Character.isLetter(token.charAt(0));
   }
 }

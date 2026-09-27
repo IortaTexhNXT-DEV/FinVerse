@@ -1776,29 +1776,29 @@ Figure 2 shows the workflow PM_PACKAGE_REQUEST. Solid arrows are the main path, 
 <!-- table: widths=3.5,3.6,3.5,3.6,3.4 caption="Transitions of PM_PACKAGE_REQUEST" size=8 -->
 | From | Action | To | Permission | Reason list |
 |---|---|---|---|---|
-| DRAFT | Submit | FOR_MKT_APPROVAL | PKG_REQUEST | - |
-| FOR_MKT_APPROVAL | Approve | FOR_TSU_REVIEW | PKG_REQUEST_APPROVE | - |
+| DRAFT | Submit for approval | FOR_MKT_APPROVAL | PKG_REQUEST | - |
+| FOR_MKT_APPROVAL | Approve and send to TSU | FOR_TSU_REVIEW | PKG_REQUEST_APPROVE | - |
 | FOR_TSU_REVIEW | Recommend for approval | FOR_TSU_APPROVAL | PKG_TSU_RECOMMEND | - |
-| FOR_TSU_APPROVAL | Approve | NEGOTIATION | PKG_TSU_APPROVE | - |
+| FOR_TSU_APPROVAL | Approve for negotiation | NEGOTIATION | PKG_TSU_APPROVE | - |
 | FOR_TSU_APPROVAL | Approve without negotiation | FOR_MANCOM | PKG_TSU_APPROVE | - |
-| FOR_MKT_APPROVAL, FOR_TSU_REVIEW, FOR_TSU_APPROVAL | Return | DRAFT | stage owner | RETURN_REASON |
+| FOR_MKT_APPROVAL, FOR_TSU_REVIEW, FOR_TSU_APPROVAL | Return to requester | DRAFT | stage owner | RETURN_REASON |
 | DRAFT to FOR_TSU_APPROVAL | Void | VOIDED | requester or stage owner | VOID_REASON |
-| NEGOTIATION | Revise QS | NEGOTIATION | PKG_NEGOTIATE | - |
+| NEGOTIATION | Revise quotation slip (new round) | NEGOTIATION | PKG_NEGOTIATE | - |
 | NEGOTIATION | Terms final | TERMS_REVIEW | PKG_NEGOTIATE | - |
 | NEGOTIATION | Not proceeded | NOT_PROCEEDED | PKG_NEGOTIATE, PKG_TSU_APPROVE | PKG_NOT_PROCEEDED_REASON |
-| TERMS_REVIEW | Release to Marketing | FOR_MKT_REVIEW | PKG_TSU_APPROVE | - |
-| TERMS_REVIEW | Proceed to requirements | REQUIREMENTS_PREP | PKG_TSU_APPROVE | - |
+| TERMS_REVIEW | Release terms to Marketing | FOR_MKT_REVIEW | PKG_TSU_APPROVE | - |
+| TERMS_REVIEW | Proceed to requirements (generic package) | REQUIREMENTS_PREP | PKG_TSU_APPROVE | - |
 | FOR_MKT_REVIEW | Accept terms | REQUIREMENTS_PREP | PKG_REQUEST | - |
 | FOR_MKT_REVIEW | Request changes | NEGOTIATION | PKG_REQUEST | RETURN_REASON |
 | FOR_MKT_REVIEW | Not proceeded | NOT_PROCEEDED | PKG_REQUEST | PKG_NOT_PROCEEDED_REASON |
-| REQUIREMENTS_PREP | Submit requirements | FOR_MANCOM | PKG_NEGOTIATE | - |
-| FOR_MANCOM | Sign off | WITH_MBS | PKG_MANCOM_SIGNOFF | - |
-| FOR_MANCOM | Return | REQUIREMENTS_PREP | PKG_MANCOM_SIGNOFF | RETURN_REASON |
-| WITH_MBS | Set up | FOR_VALIDATION | PRODUCT_MAINTAIN | - |
-| WITH_MBS | Retire | RETIRED | PRODUCT_MAINTAIN | - |
-| WITH_MBS | Return incomplete | REQUIREMENTS_PREP | PRODUCT_MAINTAIN | RETURN_REASON |
-| FOR_VALIDATION | Version released (automatic, on validation) | RELEASED | PRODUCT_VALIDATE | - |
-| FOR_VALIDATION | Version returned (automatic, on return by the validator) | WITH_MBS | PRODUCT_VALIDATE | - |
+| REQUIREMENTS_PREP | Submit requirements for ManCom sign-off | FOR_MANCOM | PKG_NEGOTIATE | - |
+| FOR_MANCOM | Sign off and send to MBS | WITH_MBS | PKG_MANCOM_SIGNOFF | - |
+| FOR_MANCOM | Return to TSU | REQUIREMENTS_PREP | PKG_MANCOM_SIGNOFF | RETURN_REASON |
+| WITH_MBS | Set up package version | FOR_VALIDATION | PRODUCT_MAINTAIN | - |
+| WITH_MBS | Retire package | RETIRED | PRODUCT_MAINTAIN | - |
+| WITH_MBS | Return incomplete requirements to TSU | REQUIREMENTS_PREP | PRODUCT_MAINTAIN | RETURN_REASON |
+| FOR_VALIDATION | Package version released (automatic) | RELEASED | PRODUCT_VALIDATE | - |
+| FOR_VALIDATION | Package version returned to MBS (automatic) | WITH_MBS | PRODUCT_VALIDATE | - |
 
 ## Package version states
 

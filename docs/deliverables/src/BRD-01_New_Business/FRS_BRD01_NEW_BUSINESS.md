@@ -3739,10 +3739,10 @@ The four New Business workflows are data (stages and transitions, migrations V75
 <!-- table: widths=3.3,4.6,1.6,7.1 caption="NB_CLIENT stages" size=8.5 -->
 | Stage | Owner (permission) | SLA hours | Actions |
 |---|---|---|---|
-| PROSPECT | Marketing AO (CLIENT_MAINTAIN) | 72 | submit_kyc; deactivate |
-| KYC_REVIEW | Verifier (CLIENT_APPROVE) | 24 | verify_kyc; return (RETURN_REASON); deactivate |
-| KYC_VERIFIED | Marketing (CLIENT_MAINTAIN) | 24 | confirm (CLIENT_MAINTAIN or CLIENT_APPROVE); deactivate |
-| CONFIRMED | - | - | review_kyc (CLIENT_APPROVE, periodic review); deactivate |
+| PROSPECT | Marketing AO (CLIENT_MAINTAIN) | 72 | Submit KYC for verification; Deactivate |
+| KYC_REVIEW | Verifier (CLIENT_APPROVE) | 24 | Verify KYC; Return to Account Officer (RETURN_REASON); Deactivate |
+| KYC_VERIFIED | Marketing (CLIENT_MAINTAIN) | 24 | Confirm client (CLIENT_MAINTAIN or CLIENT_APPROVE); Deactivate |
+| CONFIRMED | - | - | Record periodic KYC review (CLIENT_APPROVE, periodic review); Deactivate |
 | INACTIVE | - | terminal | - |
 
 ## Package quotation (NB_QUOTATION)
@@ -3752,11 +3752,11 @@ The four New Business workflows are data (stages and transitions, migrations V75
 <!-- table: widths=3.3,4.6,1.6,7.1 caption="NB_QUOTATION stages" size=8.5 -->
 | Stage | Owner (permission) | SLA hours | Actions |
 |---|---|---|---|
-| DRAFT | Marketing AO (QUOTE_MAINTAIN) | 24 | submit; void (VOID_REASON) |
-| FOR_REVIEW | Approver (QUOTE_APPROVE) | 8 | approve; return (RETURN_REASON); void |
-| APPROVED | Marketing (QUOTE_MAINTAIN) | 24 | send; revise (to DRAFT, new version) |
-| SENT_TO_CLIENT | Marketing (QUOTE_MAINTAIN) | 168 | accept; decline; revise |
-| ACCEPTED | Marketing (QUOTE_MAINTAIN) | 24 | create_accounts |
+| DRAFT | Marketing AO (QUOTE_MAINTAIN) | 24 | Submit for review; Void (VOID_REASON) |
+| FOR_REVIEW | Approver (QUOTE_APPROVE) | 8 | Approve; Return to maker (RETURN_REASON); Void |
+| APPROVED | Marketing (QUOTE_MAINTAIN) | 24 | Send to client; Revise (new version) (to DRAFT, new version) |
+| SENT_TO_CLIENT | Marketing (QUOTE_MAINTAIN) | 168 | Record acceptance; Client declined; Revise (new version) |
+| ACCEPTED | Marketing (QUOTE_MAINTAIN) | 24 | Create accounts |
 | CONVERTED, NOT_PROCEEDED, VOIDED | - | terminal | - |
 
 ## Non-package proposal (NB_PROPOSAL)
@@ -3768,17 +3768,17 @@ The four New Business workflows are data (stages and transitions, migrations V75
 <!-- table: widths=3.4,4.6,1.6,7 caption="NB_PROPOSAL stages" size=8.5 -->
 | Stage | Owner (permission) | SLA hours | Actions |
 |---|---|---|---|
-| DRAFT | Marketing AO (PROPOSAL_REQUEST) | 24 | submit; void |
-| FOR_MKT_APPROVAL | Marketing TL / TH / UH (PROPOSAL_APPROVE) | 8 | approve; return; void |
-| WITH_TSU | TSU (TSU_PROCESS) | 8 | prepare_qs; return; void |
-| QS_PREPARATION | TSU (TSU_PROCESS) | 24 | submit_qs |
-| QS_FOR_APPROVAL | TSU approver (TSU_APPROVE) | 8 | approve_qs; return |
-| QS_SENT | TSU (TSU_PROCESS) | 72 | terms_complete |
-| TERMS_RECEIVED | TSU (TSU_PROCESS) | 24 | submit_ps |
-| PS_FOR_APPROVAL | TSU approver (TSU_APPROVE) | 8 | approve_ps; return |
-| PS_RELEASED | Marketing (PROPOSAL_REQUEST) | 24 | send_to_client |
-| SENT_TO_CLIENT | Marketing (PROPOSAL_REQUEST) | 168 | accept; decline |
-| ACCEPTED | Marketing (PROPOSAL_REQUEST) | 24 | create_accounts |
+| DRAFT | Marketing AO (PROPOSAL_REQUEST) | 24 | Submit for approval; Void |
+| FOR_MKT_APPROVAL | Marketing TL / TH / UH (PROPOSAL_APPROVE) | 8 | Approve and send to TSU; Return to Account Officer; Void |
+| WITH_TSU | TSU (TSU_PROCESS) | 8 | Accept and prepare quotation slip; Return to Marketing; Void |
+| QS_PREPARATION | TSU (TSU_PROCESS) | 24 | Submit quotation slip |
+| QS_FOR_APPROVAL | TSU approver (TSU_APPROVE) | 8 | Approve and send to insurers; Return for correction |
+| QS_SENT | TSU (TSU_PROCESS) | 72 | Insurer terms complete |
+| TERMS_RECEIVED | TSU (TSU_PROCESS) | 24 | Submit proposal slip |
+| PS_FOR_APPROVAL | TSU approver (TSU_APPROVE) | 8 | Approve and release to Marketing; Return for correction |
+| PS_RELEASED | Marketing (PROPOSAL_REQUEST) | 24 | Send to client |
+| SENT_TO_CLIENT | Marketing (PROPOSAL_REQUEST) | 168 | Record acceptance; Client declined |
+| ACCEPTED | Marketing (PROPOSAL_REQUEST) | 24 | Create accounts |
 | CONVERTED, NOT_PROCEEDED, VOIDED | - | terminal | - |
 
 ## Account (NB_ACCOUNT)
@@ -3788,16 +3788,16 @@ The four New Business workflows are data (stages and transitions, migrations V75
 <!-- table: widths=4.8,4.3,1.4,6.1 caption="NB_ACCOUNT stages" size=8.5 -->
 | Stage | Owner (permission) | SLA hours | Actions |
 |---|---|---|---|
-| DRAFT | Marketing (ACCOUNT_MAINTAIN) | 24 | submit; void |
-| SUBMITTED | Processing (ACCOUNT_PROCESS) | 8 | validate; direct_booking; return; void |
-| RETURNED_TO_MARKETING | Marketing (ACCOUNT_MAINTAIN) | 24 | resubmit; void |
-| AWAITING_PAYMENT | Processing (BILLING_MANAGE) | 72 | payment_confirmed (gate); return |
-| READY_FOR_PLACEMENT | Processing (PLACEMENT_MANAGE) | 8 | place; direct_booking; return; cancel_placement |
-| PLACED | Processing (EPOLICY_MANAGE) | 72 | policy_received; insurer_return; cancel_placement |
-| RETURNED_BY_INSURER | Processing (PLACEMENT_MANAGE) | 8 | resubmit; return; cancel_placement |
-| PLACEMENT_CANCELLED | - | - | reactivate (ACCOUNT_MAINTAIN or PLACEMENT_MANAGE) |
-| POLICY_ISSUED | Processing (BOOKING_PROCESS) | 24 | book |
-| BOOKED | - | - | cancel (BOOKING_ADJUST, CANCELLATION_REASON); endorsements |
+| DRAFT | Marketing (ACCOUNT_MAINTAIN) | 24 | Submit to Processing; Void |
+| SUBMITTED | Processing (ACCOUNT_PROCESS) | 8 | Validate; Direct booking (policy already issued); Return to Marketing; Void |
+| RETURNED_TO_MARKETING | Marketing (ACCOUNT_MAINTAIN) | 24 | Resubmit to Processing; Void |
+| AWAITING_PAYMENT | Processing (BILLING_MANAGE) | 72 | Confirm payment / client confirmation (gate); Return to Marketing |
+| READY_FOR_PLACEMENT | Processing (PLACEMENT_MANAGE) | 8 | Send placement to insurer; Direct booking (policy already issued); Return to Marketing; Cancel placement |
+| PLACED | Processing (EPOLICY_MANAGE) | 72 | E-policy received; Returned by insurer; Cancel placement |
+| RETURNED_BY_INSURER | Processing (PLACEMENT_MANAGE) | 8 | Resubmit for placement; Return to Marketing; Cancel placement |
+| PLACEMENT_CANCELLED | - | - | Reactivate (ACCOUNT_MAINTAIN or PLACEMENT_MANAGE) |
+| POLICY_ISSUED | Processing (BOOKING_PROCESS) | 24 | Book |
+| BOOKED | - | - | Cancel booking (BOOKING_ADJUST, CANCELLATION_REASON); endorsements |
 | CANCELLED, VOIDED | - | terminal | - |
 
 ## SLA, escalation and status reporting

@@ -12,7 +12,6 @@ version: "2.0"
 date: 27 September 2026
 status: Issued for BDOI business sign-off
 header_title: FRS BRD-3 Product Maintenance
-output: FRS/BIBS_FRS_BRD-03_Product_Maintenance_v2.0.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026

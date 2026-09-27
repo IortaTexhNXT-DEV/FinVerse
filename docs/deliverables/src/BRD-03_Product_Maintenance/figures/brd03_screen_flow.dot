@@ -1,0 +1,54 @@
+digraph flow {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.2, ranksep=0.35, bgcolor="white", newrank=true, compound=true];
+  node [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", fontname="Arial", fontsize=10, fontcolor="@NEAR_BLACK", margin="0.12,0.06"];
+  edge [color="@CTA_BLUE", fontname="Arial", fontsize=8, fontcolor="@MUTED", arrowsize=0.6];
+  subgraph "cluster_Package requests" { label="Package requests"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-PM-01" [label="Product Maintenance Home\nSCR-PM-01"];
+    "SCR-PM-02" [label="Package Requests\nSCR-PM-02"];
+    "SCR-PM-03" [label="New Package Request and Edit Package Request\nSCR-PM-03"];
+    "SCR-PM-04" [label="Package Request record\nSCR-PM-04"];
+    "SCR-PM-05" [label="Package Request record: Negotiation tab\nSCR-PM-05"];
+    "SCR-PM-06" [label="Package Request record: Comparative tab\nSCR-PM-06"];
+    "SCR-PM-07" [label="Package Request record: Requirements & Sign-off tab\nSCR-PM-07"];
+    "SCR-PM-08" [label="Package Request record: Set-up and Advisories tabs\nSCR-PM-08"];
+    "SCR-PM-09" [label="TSU Workbench\nSCR-PM-09"];
+    "SCR-PM-10" [label="Package Expiry\nSCR-PM-10"];
+  }
+  subgraph "cluster_Products and package versions" { label="Products and package versions"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-PM-11" [label="Products\nSCR-PM-11"];
+    "SCR-PM-12" [label="Product record\nSCR-PM-12"];
+    "SCR-PM-13" [label="Package Version\nSCR-PM-13"];
+    "SCR-PM-14" [label="Validation Queue\nSCR-PM-14"];
+    "SCR-PM-15" [label="Coverages & Clauses\nSCR-PM-15"];
+    "SCR-PM-16" [label="Incentive Criteria\nSCR-PM-16"];
+  }
+  subgraph "cluster_Insurers, rates and pricing" { label="Insurers, rates and pricing"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-PM-17" [label="Insurers\nSCR-PM-17"];
+    "SCR-PM-18" [label="Insurer record\nSCR-PM-18"];
+    "SCR-PM-21" [label="Premium Calculator\nSCR-PM-21"];
+    "SCR-PM-22" [label="Quotation: package rate scheme and rate exception\nSCR-PM-22"];
+  }
+  "SCR-PM-01" -> "SCR-PM-02" [label="stage tile"];
+  "SCR-PM-01" -> "SCR-PM-10" [label="Packages ending soon"];
+  "SCR-PM-02" -> "SCR-PM-03" [label="New Package Request"];
+  "SCR-PM-03" -> "SCR-PM-04" [label="Submit for Approval"];
+  "SCR-PM-02" -> "SCR-PM-04" [label="open"];
+  "SCR-PM-09" -> "SCR-PM-04" [label="open"];
+  "SCR-PM-04" -> "SCR-PM-03" [label="Edit"];
+  "SCR-PM-04" -> "SCR-PM-05" [label="Approve for negotiation"];
+  "SCR-PM-05" -> "SCR-PM-06" [label="Terms final"];
+  "SCR-PM-06" -> "SCR-PM-07" [label="Proceed to requirements"];
+  "SCR-PM-07" -> "SCR-PM-08" [label="Sign off and send to MBS"];
+  "SCR-PM-08" -> "SCR-PM-13" [label="Open Version Editor"];
+  "SCR-PM-14" -> "SCR-PM-13" [label="open"];
+  "SCR-PM-13" -> "SCR-PM-08" [label="Validate and Release"];
+  "SCR-PM-11" -> "SCR-PM-12" [label="open"];
+  "SCR-PM-12" -> "SCR-PM-13" [label="New Version"];
+  "SCR-PM-15" -> "SCR-PM-13" [label="coverages and clauses"];
+  "SCR-PM-10" -> "SCR-PM-04" [label="Generate Renewal Request"];
+  "SCR-PM-17" -> "SCR-PM-18" [label="open"];
+  "SCR-PM-18" -> "SCR-PM-13" [label="panel insurer"];
+  "SCR-PM-13" -> "SCR-PM-21" [label="released version"];
+  "SCR-PM-21" -> "SCR-PM-22" [label="priced on the version"];
+  "SCR-PM-16" -> "SCR-PM-12" [label="products matrix"];
+}

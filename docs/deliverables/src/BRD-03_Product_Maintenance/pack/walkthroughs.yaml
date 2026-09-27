@@ -11,7 +11,7 @@ walkthroughs:
       off by ManCom. MBS sets up version 1 with its rate scheme, coverages, panel insurers and clauses; the TSU Head
       validates and releases it, the Business Administrator adds the insurer's commission rate for the new product and
       the New Business Approver authorises it. TSU sends the advisory. Marketing then prices the package and quotes it;
-      a quotation with a different item rate needs a rate exception, which the New Business Approver approves. The
+      a quotation with a different item rate needs a rate exception, which waits for the New Business Approver in My Approvals. The
       package documents use the templates of the Document Templates screen (New Business set, SCR-NB-44).
     data: "Seed data: new request Motor Fleet Plus (fictitious), line MOTOR, cover type Comprehensive, insurers INS-MGIC and INS-LAC, new risk code MTR30, client Garcia (seed client)"
     steps:
@@ -24,7 +24,7 @@ walkthroughs:
       - [TSU, SCR-PM-05, "Opens the Negotiation tab, adds a note to the insurers and clicks Submit for Approval", "Toast: PQS-yyyy-nnnnnn submitted for approval; round 1 shows For approval", Slip for approval, wt-a-07]
       - [TSU_TL, SCR-PM-05, "Clicks Approve and Send on round 1", "Toast: PQS-yyyy-nnnnnn sent to 2 insurer(s); both responses show Pending; the E-mails tab lists the slip and password e-mails", Slip sent, wt-a-08]
       - [TSU, SCR-PM-05, "Clicks Key In for each insurer, enters the outcome, rate, minimum premium and deductibles, attaches the insurer's reply and clicks Save Terms", "Toast: Terms of <insurer> saved; the responses show Approved with changes and Counter-proposal with their rates", Responses recorded, wt-a-09]
-      - [TSU, SCR-PM-05, "Clicks Terms final, ticks INS-MGIC as Panel and clicks Make Terms Final", "The stage becomes Negotiated terms review; the chosen insurer shows in the header", Terms final, wt-a-10]
+      - [TSU, SCR-PM-05, "Clicks Terms final, ticks the offer of Mabuhay General Insurance Corp. and clicks Make Terms Final", "The stage becomes Negotiated terms review; the chosen insurer shows in the header", Terms final, wt-a-10]
       - [TSU, SCR-PM-06, "Opens the Comparative tab", "The round 1 comparison with the Lowest rate tag and the current audit master in Stored outputs", Comparative master stored, wt-a-11]
       - [TSU_HEAD, SCR-PM-04, "Clicks Proceed to requirements (generic package)", "The stage becomes Requirements preparation", Requirements preparation, wt-a-12]
       - [TSU, SCR-PM-07, "Enters the computation basis, clicks Save Requirements, downloads the Package Slip, uploads the signed slip on the Documents tab as Package slip (signed), and clicks Submit requirements for ManCom sign-off", "The checklist reads The requirements pack is complete.; the stage becomes For ManCom sign-off", For ManCom sign-off, wt-a-13]
@@ -37,8 +37,8 @@ walkthroughs:
       - [TSU, SCR-PM-08, "Opens the Advisories tab of the released request, checks that both supporting documents are Attached and clicks Send Advisory", "Toast: Advisory sent; the advisory shows Sent with the date; Marketing users receive the notice", Advisory sent, wt-a-20]
       - [MKT_AO, SCR-PM-21, "Opens Premium Calculator, chooses MTR30 and INS-MGIC, enters a vehicle value and clicks Calculate", "Priced on package version 1 (effective <date>, scheme rate 1.2%) with every charge and the commission", Priced on version 1, wt-a-21]
       - [MKT_AO, SCR-PM-22, "Creates a New Business quotation of MTR30 for the seed client with an item rate of 1.10%, opens it and clicks Request Rate Exception with the reason", "The rate scheme panel shows the exception pending approval", Exception requested, wt-a-22]
-      - [NB_APPROVER, SCR-NB-39, "Opens My Approvals, finds the rate exception of the quotation and approves it", "The exception leaves the list of items waiting for approval", Exception approved, wt-a-23]
-      - [MKT_AO, SCR-PM-22, "Opens the quotation again", "The rate scheme panel lists the exception Active; the quotation can be submitted for review", Quotation ready for review, wt-a-24]
+      - [NB_APPROVER, SCR-NB-39, "Opens My Approvals and finds the rate exception of the quotation", "The rate-scheme exception waiting for approval, with its reference and the requester. Its row opens Products, which has no approval action for exceptions yet (open defect); in SIT the exception is approved by the approver through the authorisation service", Exception waiting for approval, wt-a-23]
+      - [MKT_AO, SCR-PM-22, "Opens the quotation again after the approval", "The rate scheme panel lists the exception Active; the quotation can be submitted for review", Quotation ready for review, wt-a-24]
     downstream:
       - "New Business (BRD-1): New Quotation and New Account offer MTR30 to the segments of the package; the quotation, the account and the booked invoice keep version 1 and the approved exception."
       - "Booking and Operations: the booked invoice stores version 1 and the incentive criteria it matches; endorsements re-rate on version 1."

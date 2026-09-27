@@ -88,8 +88,8 @@ const steps = {
       ['Product line', 'Motor'], ['Cover type / subtype', 'Comprehensive'], ['Reason', 'New programme'],
       ['Requested rate %', '1.2'], ['Minimum premium', '5000'], ['Commission %', '15'], ['Package TSI limit', '5000000'],
     ]);
+    // Effective today, so that New Business can quote the package on the day it is released (steps 21-24).
     const start = new Date();
-    start.setDate(start.getDate() + 30);
     const end = new Date(start);
     end.setFullYear(end.getFullYear() + 1);
     const iso = (d) => d.toISOString().slice(0, 10);
@@ -268,7 +268,8 @@ const steps = {
     if (!q) {
       const created = await ctx.api('ao', 'POST', '/quotations', {
         companyId: company, clientId: Number(client), productCode: RISK_CODE, insurerCode: 'INS-MGIC',
-        items: [{ label: 'Fleet vehicle 1', sumInsured: 1500000, ratePercent: 1.10 }],
+        marketSegment: 'CBG',
+        items: [{ riskGroup: 1, item: { description: 'Fleet vehicle 1', sumInsured: 1500000, rate: 1.10 } }],
       });
       q = [created.id, created.quotationNo];
     }
@@ -279,17 +280,14 @@ const steps = {
     });
     return page;
   },
-  'wt-a-23': async (ctx) => {
-    const ref = ctx.one(`select reference_no from cat_rate_scheme_exception where product_code = '${RISK_CODE}' order by id desc limit 1`);
-    const page = await go(ctx, 'approver', '/approvals');
-    const row = page.locator('table tbody tr').filter({ hasText: ref }).first();
-    if (await row.count()) {
-      await row.getByRole('button', { name: /^(approve|authorize)$/i }).first().click();
-      await settle(page, 1500);
-    }
-    return page;
-  },
+  // 23. My Approvals lists the exception; its row opens Products, which has no approval action for exceptions, so
+  // the approval of step 24 is made through the authorisation service of the catalogue (as the approver).
+  'wt-a-23': async (ctx) => go(ctx, 'approver', '/approvals'),
   'wt-a-24': async (ctx) => {
+    const ex = ctx.sql(`select id from cat_rate_scheme_exception where product_code = '${RISK_CODE}' and record_status = 'PENDING_AUTHORIZATION' order by id desc limit 1`)[0];
+    if (ex) {
+      await ctx.api('approver', 'POST', `/catalog/records/RATE_SCHEME_EXCEPTION/${ex[0]}/authorize`);
+    }
     const q = ctx.one(`select id from quo_quotation where product_code = '${RISK_CODE}' order by id desc limit 1`);
     return go(ctx, 'ao', `/quotations/${q}`);
   },
@@ -329,9 +327,29 @@ const steps = {
   'wt-b-04': async (ctx) => act(await openRequest(ctx, 'tsulead', seedRequest(ctx, 'PKR-2026-900002')), /^return to requester$/i, {
     comment: 'Add the target insurers and the requested deductible.',
   }),
+  // 5. A slip prepared and submitted by the TSU Team Lead, who then tries to approve it himself.
   'wt-b-05': async (ctx) => {
-    const id = ctx.sql("select id from pm_request where title = 'SME Office Property Programme' order by id desc limit 1")[0]?.[0];
-    const page = await openRequest(ctx, 'tsulead', id ?? seedRequest(ctx, 'PKR-2026-900003'), 'Negotiation');
+    const title = 'Farm Equipment Programme';
+    let id = ctx.sql(`select id from pm_request where title = '${title}' order by id desc limit 1`)[0]?.[0];
+    if (!id) {
+      const company = Number(ctx.one("select id from org_company where code = 'FVI'"));
+      const end = new Date();
+      end.setFullYear(end.getFullYear() + 1);
+      const p = await ctx.api('tsu', 'POST', REQUESTS, {
+        companyId: company, type: 'NEW', scope: 'GENERIC', title, lineCode: 'PROPERTY', coverTypeCode: 'FIRE_LIGHTNING',
+        marketSegments: [], reason: 'NEW_PROGRAMME', negotiationRequired: true,
+        terms: { sections: [{ heading: 'Requested cover and features', text: 'Fire cover of farm equipment sheds (seed data).' }],
+          coverages: [], scheme: {}, dates: { packageEndDate: end.toISOString().slice(0, 10) }, insurers: [{ insurerCode: 'INS-MGIC', terms: [] }] },
+      });
+      id = p.id;
+      await ctx.api('tsu', 'POST', `${REQUESTS}/${id}/submit`, {});
+      await ctx.api('mkttl', 'POST', `${REQUESTS}/${id}/approve`, {});
+      await ctx.api('tsulead', 'POST', `${REQUESTS}/${id}/recommend`, { text: 'Approach the lead insurer only.' });
+      await ctx.api('tsuhead', 'POST', `${REQUESTS}/${id}/tsu-approve`, {});
+      await ctx.api('tsulead', 'PUT', `${REQUESTS}/${id}/rounds/1`, { insurers: ['INS-MGIC'], notes: 'Terms as requested.' });
+      await ctx.api('tsulead', 'POST', `${REQUESTS}/${id}/rounds/1/quotation-slip/submit`, {});
+    }
+    const page = await openRequest(ctx, 'tsulead', id, 'Negotiation');
     const approve = button(page, /^approve and send$/i);
     if (await approve.count()) {
       await approve.click();

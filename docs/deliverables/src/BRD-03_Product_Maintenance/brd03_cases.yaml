@@ -1824,7 +1824,7 @@ frs:
         steps:
           - On the RETIRE request click Set up package version (API).
         expected: Refused.
-        msg: [A RETIRE request retires the package instead, PKG_REQUEST_TYPE_MISMATCH]
+        msg: [A retirement request retires the package; it has no version to set up, PKG_REQUEST_TYPE_MISMATCH]
         auto: PackageRequestProcessIT#aRetireRequestRetiresThePackageWithAnAdvisoryDraft
       - c: 1
         type: Negative

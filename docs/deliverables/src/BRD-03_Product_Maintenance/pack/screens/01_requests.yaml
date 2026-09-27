@@ -276,7 +276,7 @@ screens:
       - Package Request record › Comparative tab
     shots:
       - {state: tab, user: tsu, open: negotiation, tab: Comparative, caption: "Comparative tab with the round 2 comparison and the stored outputs"}
-      - {state: client_view, user: tsu, open: negotiation, tab: Comparative, click: "^generate client view$", caption: "Generate Client View dialog"}
+      - {state: client_view, user: tsu, open: negotiation_master, tab: Comparative, click: "^generate client view$", caption: "Generate Client View dialog"}
     fields:
       - "Round n comparison | Insurer | Column | Insurer name, with the Lowest rate tag | - | Latest round | - | Read only | - | No insurer terms to compare yet"
       - "Round n comparison | Outcome / Rate % / Minimum / Coverages / Deductibles / Conditions | Column | As keyed in | - | Insurer responses | - | Read only | - | -"

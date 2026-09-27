@@ -189,8 +189,8 @@ screens:
       - Quotations › a row (New Business)
       - New Quotation › Submit for Review refused with the rate scheme message
     shots:
-      - {state: deviation, user: ao, open: quotation_deviation, caption: "Rate scheme panel: an item rate differs from the scheme rate"}
       - {state: exception, user: ao, open: quotation_deviation, click: "^request rate exception$", caption: "Request Rate Exception dialog"}
+      - {state: deviation, user: ao, open: quotation_deviation, caption: "Rate scheme panel: an item rate differs from the scheme rate; the approved exception is listed"}
     fields:
       - "Rate scheme panel | [Version line] | Banner | Priced on package version n; An item rate differs from the scheme rate: submission needs an approved rate exception | - | Quotation pricing | - | Read only | Warning while an item rate differs | Package <product code> is priced on the current rate scheme: <what> needs an approved rate exception"
       - "Rate scheme panel | [Exceptions] | Rows | Exception reference, rate n% until dd-MMM-yyyy, status pill | - | Rate exceptions of the quotation | - | Read only | - | -"
@@ -199,7 +199,7 @@ screens:
       - "Request Rate Exception | Reason | Text | Free text | Y | - | Blank | Draft quotation | Not blank | Explain why the scheme rate cannot be used"
     actions:
       - "Request Rate Exception | Marketing (QUOTE_MAINTAIN) | Draft quotation of a package with an item rate that differs | Opens the dialog; Request Exception records the exception for this quotation, pending approval | Exception pending authorisation | -"
-      - "[Decision in My Approvals] | Business Administrator, New Business Approver (PRODUCT_AUTHORIZE), not the requester | Exception pending | Approves (authorises) or rejects (deactivates) the exception | Active or Inactive | -"
+      - "[Decision in My Approvals] | Business Administrator, New Business Approver (PRODUCT_AUTHORIZE), not the requester | Exception pending | My Approvals lists the exception; its row opens Products, which has no approval action for exceptions yet (open defect), so the approval (authorise) or rejection (deactivate) is made through the catalogue authorisation service | Active or Inactive | -"
     rules:
       - "Only package rate schemes need an exception; an exception names the rate or the version it approves and the transaction (quotation number or ARN) (FR-PM-051)."
       - "Submission of the quotation (and of the account) is refused until an approved exception covers the differing rate or version (FR-PM-051)."

@@ -45,7 +45,7 @@ fixes:
   PKG_FOUR_EYES: Ask another user with the approval permission to take the action; the maker, submitter or recommender cannot.
   PKG_REQUEST_NOT_EDITABLE: No change is possible in this stage; ask the owner of the stage to return the request if it must change.
   PKG_TYPE_FIXED: Void the request and create a new one of the right type.
-  PKG_REQUEST_TYPE_MISMATCH: Use Retire package for a Retire request and Set up package version for every other type.
+  PKG_REQUEST_TYPE_MISMATCH: Use Retire package for a retirement request and Set up package version for every other type.
   PKG_SCOPE_CLIENT: Use Release terms to Marketing; the terms of a client-specific package go to Marketing first.
   PKG_SCOPE_GENERIC: Use Proceed to requirements (generic package).
   # Negotiation

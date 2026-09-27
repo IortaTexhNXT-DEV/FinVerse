@@ -113,6 +113,14 @@ const opens = {
   for_tsu_approval: async (ctx) => `/product-maintenance/requests/${await prepared(ctx, 'Condominium Unit Owners Programme', 'FOR_TSU_APPROVAL')}`,
   requirements_prep: async (ctx) => `/product-maintenance/requests/${await prepared(ctx, 'SME Office Property Programme', 'REQUIREMENTS_PREP')}`,
   negotiation: (ctx) => `/product-maintenance/requests/${requestId(ctx, 'PKR-2026-900003')}`,
+  // The same request with a current comparative master, so that a client view can be generated.
+  negotiation_master: async (ctx) => {
+    const id = requestId(ctx, 'PKR-2026-900003');
+    if (ctx.sql(`select 1 from pm_comparative_output where request_id = ${id} and kind = 'MASTER' and is_current`).length === 0) {
+      await ctx.api('tsu', 'POST', `/product-maintenance/requests/${id}/comparatives/master`);
+    }
+    return `/product-maintenance/requests/${id}`;
+  },
   for_mancom: (ctx) => `/product-maintenance/requests/${requestId(ctx, 'PKR-2026-900004')}`,
   with_mbs: (ctx) => `/product-maintenance/requests/${requestId(ctx, 'PKR-2026-900005')}`,
   released: (ctx) => `/product-maintenance/requests/${requestId(ctx, 'PKR-2026-900006')}`,
@@ -131,9 +139,10 @@ const opens = {
   released_version: () => '/catalog/products/MTR12/versions/1',
   first_insurer: (ctx) => `/catalog/insurers/${ctx.one("select id from cat_insurer where party_code = 'INS-MGIC' order by id limit 1")}`,
   quotation_deviation: (ctx) => {
-    const row = ctx.sql("select id from quo_quotation where rate_override_ref is null and product_code in (select code from cat_product where packaged) and status = 'DRAFT' order by id desc limit 1")[0];
+    // The quotation of walkthrough A (package MTR30 with an item rate other than the scheme rate).
+    const row = ctx.sql("select id from quo_quotation where product_code = 'MTR30' and status = 'DRAFT' order by id desc limit 1")[0];
     if (!row) {
-      throw new Error('run walkthrough A step 22 first: no draft package quotation with a differing item rate');
+      throw new Error('run walkthrough A up to step 22 first: no draft quotation of MTR30');
     }
     return `/quotations/${row[0]}`;
   },

@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/auth/authContext';
 import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
+import { InsurerName, ProductName } from '@/components/broking/LovLabel';
 import { Card } from '@/components/ui/Card';
+import { CellStack } from '@/components/ui/CellStack';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -12,10 +14,10 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, humanize } from '@/utils/format';
+import { formatDate, formatDays } from '@/utils/format';
 import { adjustmentApi } from './api';
 import type { RequestSummary, StageCounts } from './api';
-import { RequestFlags, RequestStatus } from './RequestParts';
+import { RequestFlags, RequestStatus, RequestTypeCell } from './RequestParts';
 import { STAGE_TABS, tabOf } from './requestForm';
 import type { StageTab } from './requestForm';
 
@@ -23,37 +25,58 @@ const COLUMNS: Column<RequestSummary>[] = [
   {
     key: 'no',
     header: 'Request No.',
+    kind: 'code',
     render: (r) => (
-      <>
-        <strong>{r.requestNo}</strong>
-        <div className="muted">{formatDate(r.createdAt)}</div>
-      </>
+      <CellStack main={<strong>{r.requestNo}</strong>} sub={formatDate(r.createdAt)} />
     ),
   },
   {
+    key: 'policy',
+    header: 'Policy No. / ARN',
+    kind: 'code',
+    render: (r) => <CellStack main={r.policy?.policyNo} sub={r.arn} />,
+  },
+  {
     key: 'invoice',
-    header: 'Invoice / ARN',
+    header: 'Invoice / Placement Slip',
+    kind: 'code',
+    render: (r) => <CellStack main={r.invoiceNo} sub={r.policy?.slipNo} />,
+  },
+  {
+    key: 'assured',
+    header: 'Assured',
+    render: (r) => <CellStack main={r.assuredName} sub={r.policy?.clientCode} />,
+  },
+  {
+    key: 'insurer',
+    header: 'Insurer / Product',
     render: (r) => (
-      <>
-        {r.invoiceNo}
-        <div className="muted">{r.arn}</div>
-      </>
+      <CellStack
+        main={<InsurerName code={r.insurerCode} />}
+        sub={r.policy?.productCode ? <ProductName code={r.policy.productCode} /> : undefined}
+      />
     ),
   },
-  { key: 'assured', header: 'Assured', render: (r) => r.assuredName },
   {
     key: 'type',
     header: 'Type',
     render: (r) => (
-      <>
-        {humanize(r.endorsementType)}
-        {r.requestType && <div className="muted">{humanize(r.requestType)}</div>}
-      </>
+      <RequestTypeCell endorsementType={r.endorsementType} requestType={r.requestType} />
     ),
   },
-  { key: 'effective', header: 'Effective', render: (r) => formatDate(r.effectiveDate) },
-  { key: 'aging', header: 'Aging', numeric: true, render: (r) => `${String(r.agingDays)} d` },
-  { key: 'status', header: 'Status', render: (r) => <RequestStatus stage={r.stage} /> },
+  {
+    key: 'effective',
+    header: 'Effective',
+    kind: 'date',
+    render: (r) => formatDate(r.effectiveDate),
+  },
+  { key: 'aging', header: 'Aging', kind: 'amount', render: (r) => formatDays(r.agingDays) },
+  {
+    key: 'status',
+    header: 'Status',
+    kind: 'status',
+    render: (r) => <RequestStatus stage={r.stage} />,
+  },
   {
     key: 'flags',
     header: 'Flags',
@@ -76,7 +99,9 @@ function tabsWithCounts(counts: StageCounts | undefined) {
 
 /**
  * Adjustment Workbench (ADJID.001-025): endorsement and cancellation requests by stage with their
- * aging, searchable by request, invoice, ARN, policy, assured or endorsement reference.
+ * aging, each with the policy it is against (insurer policy number, ARN, invoice, placement slip,
+ * insurer and product), searchable by request, policy, ARN, invoice, client, insurer, product,
+ * placement slip or endorsement reference.
  */
 export default function AdjustmentHomePage() {
   const companyId = useCompanyId();
@@ -133,7 +158,7 @@ export default function AdjustmentHomePage() {
           <Tabs<StageTab> tabs={tabsWithCounts(counts.data)} active={tab} onChange={changeTab} />
         </div>
         <WorklistToolbar
-          placeholder="Search Request No."
+          placeholder="Search request, policy, ARN, invoice or client"
           onSearch={(q) => {
             setText(q);
             setPage(0);

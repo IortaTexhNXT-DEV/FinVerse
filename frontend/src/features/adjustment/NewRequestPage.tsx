@@ -10,13 +10,14 @@ import { useToast } from '@/components/ui/toastContext';
 import { adjustmentApi } from './api';
 import type { EndorsementRequest, Recompute, RequestInput } from './api';
 import { InvoicePicker } from './InvoicePicker';
+import { PolicyDetails } from './PolicyDetails';
 import { RecomputePreview } from './RecomputePreview';
 import { RequestFormFields } from './RequestFormFields';
 import { EMPTY_FORM, formErrors, formOf, isValid, toInput } from './requestForm';
 import type { RequestForm } from './requestForm';
 import './adjustment.css';
 
-const STEPS = ['Invoices', 'Request', 'Recompute & Submit'] as const;
+const STEPS = ['Policy', 'Request', 'Recompute & Submit'] as const;
 
 function Steps({ current }: Readonly<{ current: number }>) {
   return (
@@ -169,10 +170,11 @@ function Wizard({ existing, initialInvoices }: Readonly<WizardProps>) {
       <Steps current={step} />
       <ErrorAlert error={save.error ?? preview.error} />
       {step === 0 && (
-        <Card title="Booked Invoices">
+        <Card title="Policy / Booked Invoice">
           <InvoicePicker selected={invoices} onChange={setInvoices} />
         </Card>
       )}
+      {step > 0 && <PolicyDetails invoiceNos={invoices} title="Policy" />}
       {step === 1 && (
         <Card title={`Request on ${invoices.join(', ')}`}>
           <RequestFormFields form={form} errors={touched ? errors : {}} onChange={setForm} />
@@ -223,7 +225,7 @@ export default function NewRequestPage() {
         section="Client & Policy · Adjustment"
         backTo={editing ? `/adjustment/requests/${id}` : '/adjustment'}
         title={title}
-        description="Raise an endorsement or cancellation on booked invoices."
+        description="Choose the policy, then raise the endorsement or cancellation."
       />
       <ErrorAlert error={existing.error} />
       {editing && existing.data === undefined ? (

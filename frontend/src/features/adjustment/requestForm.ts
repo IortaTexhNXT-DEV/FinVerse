@@ -6,6 +6,7 @@ import type {
   RequestInput,
   RequestStage,
 } from './api';
+import { humanize, titleCase } from '@/utils/format';
 
 /** Pure logic of the adjustment screens: stage labels and tones, the request form and its checks. */
 
@@ -62,6 +63,57 @@ const COMPONENTS: Record<string, string> = {
 
 export function componentLabel(code: string): string {
   return COMPONENTS[code] ?? code;
+}
+
+/**
+ * Business labels of the endorsement types (class, then the change), used while the list of values
+ * loads or when a value has no label of its own; the list of values is the reference.
+ */
+export const TYPE_LABELS: Readonly<Record<string, string>> = {
+  FIN_TSI: 'Financial – Change of Sum Insured',
+  FIN_ITEMS: 'Financial – Change of Insured Items',
+  FIN_COMMISSION_RATE: 'Financial – Change of Commission Rate',
+  FIN_PREMIUM_RATE: 'Financial – Change of Premium Rate',
+  FIN_EXTENSION: 'Financial – Extension of Cover',
+  FIN_CHANGE_COVER: 'Financial – Change of Cover',
+  FIN_CHARGES: 'Financial – Adjustment in Charges',
+  FIN_MINIMAL_BALANCE: 'Financial – Minimal Balance',
+  NF_DESCRIPTIVE: 'Non-financial – Descriptive Change',
+  NF_PERIOD_CHANGE: 'Non-financial – Change of Period',
+  NF_PERIOD_EXTENSION: 'Non-financial – Extension of Period',
+  NF_COVER_EXTENSION: 'Non-financial – Cover Extension',
+  NF_ASSURED_INFO: 'Non-financial – Assured Information',
+  INT_ADJUSTMENT: 'Internal Adjustment',
+};
+
+const CLASS_PREFIX: Readonly<Record<RequestClass, string>> = {
+  FINANCIAL: 'Financial',
+  NON_FINANCIAL: 'Non-financial',
+  INTERNAL: 'Internal',
+};
+
+/**
+ * The label of an endorsement type: the list-of-values label when it is loaded (`lovLabel`, which
+ * falls back to the humanized code), else the business label, else the class and the humanized
+ * rest of the code ("Financial – New Type"); never the mangled code ("Fin Change Cover").
+ */
+export function endorsementTypeLabel(code: string, lovLabel?: string): string {
+  if (code === '') {
+    return '';
+  }
+  if (lovLabel !== undefined && lovLabel !== '' && lovLabel !== humanize(code)) {
+    return lovLabel;
+  }
+  const known = TYPE_LABELS[code];
+  if (known !== undefined) {
+    return known;
+  }
+  const requestClass = classOfType(code);
+  if (requestClass === undefined) {
+    return humanize(code);
+  }
+  const rest = code.slice(code.indexOf('_') + 1);
+  return `${CLASS_PREFIX[requestClass]} – ${titleCase(humanize(rest))}`;
 }
 
 /** Class of an endorsement type code (FIN_ / NF_ / INT_, ADJID.002/004). */

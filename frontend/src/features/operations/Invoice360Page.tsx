@@ -6,15 +6,18 @@ import { opsApi } from '@/api/operations';
 import type { Invoice360 } from '@/api/operations';
 import { useAuth } from '@/auth/authContext';
 import { Attachments } from '@/components/attachments/Attachments';
+import { InsurerName } from '@/components/broking/LovLabel';
 import { RecordSummary } from '@/components/broking/RecordSummary';
 import type { Fact } from '@/components/broking/RecordSummary';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
+import { PolicyTransactions } from '@/components/broking/PolicyTransactions';
+import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
-import { formatAmount, formatDate, humanize } from '@/utils/format';
+import { formatAmount, formatDate, formatPeriod, humanize } from '@/utils/format';
 import { ComponentsTab, HistoryTab, MovementsTab, RelatedSectionTab } from './Invoice360Tabs';
 import { InvoiceFamilyTab } from './InvoiceFamilyTab';
 import { RELATED_TABS, flagChips, invoiceTabs } from './opsLabels';
@@ -31,6 +34,12 @@ function TabBody({ tab, view }: Readonly<{ tab: Invoice360TabId; view: Invoice36
       return <MovementsTab movements={view.movements} />;
     case 'family':
       return <InvoiceFamilyTab invoiceNo={view.invoice.keys.invoiceNo} />;
+    case 'transactions':
+      return (
+        <Card title="Policy Transactions" flush>
+          <PolicyTransactions invoiceNo={view.invoice.keys.invoiceNo} />
+        </Card>
+      );
     case 'history':
       return <HistoryTab history={view.history} />;
     case 'documents':
@@ -62,12 +71,21 @@ function facts(view: Invoice360): Fact[] {
     {
       icon: Building2,
       label: 'Insurer(s)',
-      value: i.shares.map((s) => `${s.insurerCode} ${formatAmount(s.sharePct)}%`).join(', '),
+      value: (
+        <>
+          {i.shares.map((s, n) => (
+            <span key={s.insurerCode}>
+              {n > 0 && ', '}
+              <InsurerName code={s.insurerCode} /> {formatAmount(s.sharePct)}%
+            </span>
+          ))}
+        </>
+      ),
     },
     {
       icon: CalendarRange,
       label: 'Period',
-      value: `${formatDate(i.classification.inceptionDate)} – ${formatDate(i.classification.expiryDate)}`,
+      value: formatPeriod(i.classification.inceptionDate, i.classification.expiryDate),
     },
     {
       icon: Wallet,
@@ -103,6 +121,9 @@ function Summary({ view }: Readonly<{ view: Invoice360 }>) {
         <>
           <ReferenceChip label="Invoice" value={i.keys.invoiceNo} />
           <ReferenceChip label="ARN" value={i.keys.arn} />
+          {i.keys.policyNo !== undefined && (
+            <ReferenceChip label="Policy No." value={i.keys.policyNo} />
+          )}
           {i.keys.endorsementNo !== undefined && (
             <ReferenceChip label="Endorsement" value={i.keys.endorsementNo} />
           )}

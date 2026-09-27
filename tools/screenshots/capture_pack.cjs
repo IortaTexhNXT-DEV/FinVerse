@@ -403,7 +403,16 @@ function optimise(file) {
         console.log('captured', shot.slug);
         continue;
       }
-      if (shot.state === 'walkthrough') {
+      if (recipe.custom && recipe.custom[shot.slug]) {
+        // A state reached by several actions (an upload flow); returns the page, or null when it wrote the image.
+        page = await recipe.custom[shot.slug](ctx, shot, file);
+        if (page === null) {
+          optimise(file);
+          report.push(`${shot.slug}: rendered file`);
+          console.log('captured', shot.slug);
+          continue;
+        }
+      } else if (shot.state === 'walkthrough') {
         const step = recipe.walkthrough[shot.slug];
         if (!step) {
           throw new Error('no walkthrough step in the recipe');

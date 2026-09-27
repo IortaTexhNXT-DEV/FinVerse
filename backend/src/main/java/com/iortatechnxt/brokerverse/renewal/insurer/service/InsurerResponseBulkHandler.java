@@ -8,10 +8,10 @@ import com.iortatechnxt.brokerverse.renewal.domain.InsurerResponse;
 import com.iortatechnxt.brokerverse.renewal.domain.InsurerResponseCode;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidateRepository;
+import com.iortatechnxt.brokerverse.renewal.service.UploadValues;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import org.springframework.stereotype.Component;
 
@@ -118,7 +118,7 @@ public class InsurerResponseBulkHandler implements BulkImportHandler {
             content(row, code),
             new RenewalInsurerResponseService.Source(
                 "UPLOAD", context.jobNo(), row.rowNo(), row.text(POLICY)),
-            action != null && REMARKET.equals(action.strip().toUpperCase(Locale.ROOT)));
+            UploadValues.names(action, REMARKET, null));
     return c.getRenewalRef() + (r.isLatestValid() ? "" : " (not applied)");
   }
 
@@ -145,12 +145,11 @@ public class InsurerResponseBulkHandler implements BulkImportHandler {
     if (value == null) {
       return null;
     }
-    String text = value.strip().toUpperCase(Locale.ROOT).replace(' ', '_');
-    if ("APPROVE".equals(text) || "RENEW".equals(text)) {
+    if (UploadValues.names(value, "APPROVE", null) || UploadValues.names(value, "RENEW", null)) {
       return InsurerResponseCode.RENEW_AS_IS;
     }
     for (InsurerResponseCode c : InsurerResponseCode.values()) {
-      if (c.name().equals(text)) {
+      if (UploadValues.names(value, c.name(), null)) {
         return c;
       }
     }

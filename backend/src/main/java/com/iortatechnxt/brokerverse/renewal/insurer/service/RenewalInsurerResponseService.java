@@ -25,6 +25,7 @@ import com.iortatechnxt.brokerverse.renewal.service.RenewalNotices;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalRecords;
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -129,20 +130,23 @@ public class RenewalInsurerResponseService {
     if (content.response() == null) {
       return List.of("Select the response");
     }
-    boolean revised =
-        content.revisedPremium() != null
-            || content.revisedSumInsured() != null
-            || content.revisedRate() != null;
-    if (content.response() == InsurerResponseCode.REVISE && !revised) {
-      return List.of("Enter the revised premium, sum insured or rate");
+    List<String> problems = new ArrayList<>();
+    if (content.response() == InsurerResponseCode.REVISE && !revised(content)) {
+      problems.add("Enter the revised premium, sum insured or rate");
     }
     if (negative(content.revisedPremium()) || negative(content.revisedSumInsured())) {
-      return List.of("Revised amounts cannot be negative");
+      problems.add("Revised amounts cannot be negative");
     }
     if (content.receivedOn() != null && content.receivedOn().isAfter(BusinessClock.today(clock))) {
-      return List.of("The received date cannot be in the future");
+      problems.add("The received date cannot be in the future");
     }
-    return List.of();
+    return problems;
+  }
+
+  private static boolean revised(InsurerResponse.Content content) {
+    return content.revisedPremium() != null
+        || content.revisedSumInsured() != null
+        || content.revisedRate() != null;
   }
 
   /**
@@ -160,18 +164,7 @@ public class RenewalInsurerResponseService {
     if (!problems.isEmpty()) {
       throw new BusinessRuleException("RNW_RESPONSE_INVALID", problems.get(0));
     }
-    InsurerResponse.Content dated =
-        content.receivedOn() != null
-            ? content
-            : new InsurerResponse.Content(
-                content.response(),
-                content.insurerRef(),
-                content.revisedPremium(),
-                content.revisedSumInsured(),
-                content.revisedRate(),
-                content.terms(),
-                BusinessClock.today(clock),
-                content.remarks());
+    InsurerResponse.Content dated = dated(content);
     Optional<InsurerBatch> batch = batches.openBatchOf(c);
     MatchOutcome match = match(c, source.policyNo());
     boolean late =
@@ -195,6 +188,27 @@ public class RenewalInsurerResponseService {
       apply(c, saved, remarket);
     }
     reevaluation.reevaluate(c, CheckTrigger.UPLOAD);
+    report(c, saved, source, valid);
+    return saved;
+  }
+
+  private InsurerResponse.Content dated(InsurerResponse.Content content) {
+    return content.receivedOn() != null
+        ? content
+        : new InsurerResponse.Content(
+            content.response(),
+            content.insurerRef(),
+            content.revisedPremium(),
+            content.revisedSumInsured(),
+            content.revisedRate(),
+            content.terms(),
+            BusinessClock.today(clock),
+            content.remarks());
+  }
+
+  private void report(RenewalCandidate c, InsurerResponse saved, Source source, boolean valid) {
+    MatchOutcome match = saved.getMatchOutcome();
+    boolean late = saved.isLate();
     audit.record(
         RenewalCodes.ENTITY,
         c.getRenewalRef(),
@@ -214,7 +228,6 @@ public class RenewalInsurerResponseService {
         new RenewalNotices.Text(
             c.getRenewalRef() + ": insurer response " + label(saved.getResponse()),
             valid ? "Applied to the renewal" : "Not applied: check the Insurer tab"));
-    return saved;
   }
 
   /**

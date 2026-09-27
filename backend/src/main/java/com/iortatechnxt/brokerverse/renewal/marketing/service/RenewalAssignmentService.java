@@ -137,20 +137,8 @@ public class RenewalAssignmentService {
   }
 
   private void assignOne(RenewalCandidate c, AppUser officer, String reason) {
-    RenewalRecords.requireStage(c, RenewalStage.UNASSIGNED, RenewalStage.FOR_DISPOSITION);
-    RenewalRecords.requireUnlocked(c);
-    var product = c.getSnapshot().product();
-    if (product != null && parameters.loanDriven(product.segment(), product.lineCode())) {
-      throw new BusinessRuleException(
-          "RNW_ASSIGN_STP", "Renewal " + c.getRenewalRef() + " follows the loan-driven path");
-    }
+    requireAssignable(c, officer);
     String ao = officer.getUsername();
-    if (c.getOwnerUnit() != null
-        && !scope.unitsOf(c.getCompanyId(), ao).contains(c.getOwnerUnit())) {
-      throw new BusinessRuleException(
-          "RNW_ASSIGN_UNIT",
-          officer.getFullName() + " is not an officer of unit " + c.getOwnerUnit());
-    }
     String previous = c.getAssignedAo();
     if (ao.equals(previous)) {
       throw new BusinessRuleException(
@@ -178,6 +166,21 @@ public class RenewalAssignmentService {
                 + c.getSnapshot().clientName()
                 + ", expiring "
                 + c.getExpiryDate()));
+  }
+
+  private void requireAssignable(RenewalCandidate c, AppUser officer) {
+    RenewalRecords.requireStage(c, RenewalStage.UNASSIGNED, RenewalStage.FOR_DISPOSITION);
+    RenewalRecords.requireUnlocked(c);
+    var product = c.getSnapshot().product();
+    if (product != null && parameters.loanDriven(product.segment(), product.lineCode())) {
+      throw new BusinessRuleException(
+          "RNW_ASSIGN_STP", "Renewal " + c.getRenewalRef() + " follows the loan-driven path");
+    }
+    String unit = c.getOwnerUnit();
+    if (unit != null && !scope.unitsOf(c.getCompanyId(), officer.getUsername()).contains(unit)) {
+      throw new BusinessRuleException(
+          "RNW_ASSIGN_UNIT", officer.getFullName() + " is not an officer of unit " + unit);
+    }
   }
 
   private AppUser requireOfficer(String ao) {

@@ -12,6 +12,8 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotPremium;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotProduct;
 import com.iortatechnxt.brokerverse.renewal.domain.CheckTrigger;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalStage;
@@ -37,6 +39,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class RenewalAccountService {
 
   private static final String PHP = "PHP";
+  private static final SnapshotProduct NO_PRODUCT =
+      new SnapshotProduct(null, null, null, null, null, null);
+  private static final SnapshotPremium NO_PREMIUM =
+      new SnapshotPremium(null, null, null, null, null, null);
 
   private final RenewalRecords records;
   private final AccountService accounts;
@@ -163,11 +169,11 @@ public class RenewalAccountService {
   private static AccountDraft legacyDraft(RenewalCandidate c) {
     CandidateSnapshot s = c.getSnapshot();
     Long clientId = s.client() == null ? null : s.client().clientId();
-    String product =
-        c.getResolvedProductCode() != null
-            ? c.getResolvedProductCode()
-            : s.product() == null ? null : s.product().productCode();
-    if (clientId == null || product == null) {
+    SnapshotProduct product = s.product() == null ? NO_PRODUCT : s.product();
+    SnapshotPremium premium = s.premium() == null ? NO_PREMIUM : s.premium();
+    String productCode =
+        c.getResolvedProductCode() != null ? c.getResolvedProductCode() : product.productCode();
+    if (clientId == null || productCode == null) {
       throw new BusinessRuleException(
           "RNW_ACCOUNT_DATA",
           "Renewal "
@@ -177,8 +183,8 @@ public class RenewalAccountService {
     LocalDate from = s.expiryDate();
     return new AccountDraft(
         clientId,
-        product,
-        s.product() == null ? null : s.product().segment(),
+        productCode,
+        product.segment(),
         null,
         s.insurerCode(),
         null,
@@ -186,13 +192,13 @@ public class RenewalAccountService {
         from.plusYears(1),
         false,
         1,
-        s.premium() == null || s.premium().currency() == null ? PHP : s.premium().currency(),
+        premium.currency() == null ? PHP : premium.currency(),
         PaymentArrangement.VIA_BDOI,
         null,
         null,
         List.of(),
         null,
-        s.premium() == null ? null : s.premium().commissionRate(),
+        premium.commissionRate(),
         null);
   }
 

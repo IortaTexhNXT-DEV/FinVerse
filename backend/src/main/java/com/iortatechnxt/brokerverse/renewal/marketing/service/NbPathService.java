@@ -122,30 +122,38 @@ public class NbPathService {
         c.getResolvedProductCode() != null
             ? c.getResolvedProductCode()
             : s.product() == null ? null : s.product().productCode();
-    if (c.getExpiringArn() != null) {
-      AccountDraft d = accounts.draftOf(c.getExpiringArn());
-      LocalDate from = d.periodTo();
-      Period term = Period.between(d.periodFrom(), d.periodTo());
-      return new Terms(
-          d.clientId(),
-          product != null ? product : d.productCode(),
-          d.marketSegment(),
-          d.sourceChannel(),
-          d.currency(),
-          d.insurerCode(),
-          d.insurerBranch(),
-          from,
-          from.plus(term),
-          d.paymentArrangement() == PaymentArrangement.DIRECT_TO_INSURER,
-          d.items());
-    }
+    return c.getExpiringArn() != null
+        ? accountTerms(c.getExpiringArn(), product)
+        : legacyTerms(s, product);
+  }
+
+  private Terms accountTerms(String arn, String product) {
+    AccountDraft d = accounts.draftOf(arn);
+    LocalDate from = d.periodTo();
+    Period term = Period.between(d.periodFrom(), d.periodTo());
+    return new Terms(
+        d.clientId(),
+        product != null ? product : d.productCode(),
+        d.marketSegment(),
+        d.sourceChannel(),
+        d.currency(),
+        d.insurerCode(),
+        d.insurerBranch(),
+        from,
+        from.plus(term),
+        d.paymentArrangement() == PaymentArrangement.DIRECT_TO_INSURER,
+        d.items());
+  }
+
+  private static Terms legacyTerms(CandidateSnapshot s, String product) {
     LocalDate from = s.expiryDate();
+    String currency = s.premium() == null ? null : s.premium().currency();
     return new Terms(
         s.client() == null ? null : s.client().clientId(),
         product,
         s.product() == null ? null : s.product().segment(),
-        s.product() == null ? null : s.product().businessOrigin(),
-        s.premium() == null || s.premium().currency() == null ? PHP : s.premium().currency(),
+        null,
+        currency == null ? PHP : currency,
         s.insurerCode(),
         null,
         from,

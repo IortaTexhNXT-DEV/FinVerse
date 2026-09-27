@@ -9,6 +9,9 @@ import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfileRepository;
 import com.iortatechnxt.brokerverse.renewal.check.service.OutstandingPremiumCheck;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotPremium;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotProduct;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotSales;
 import com.iortatechnxt.brokerverse.renewal.domain.CheckResult;
 import com.iortatechnxt.brokerverse.renewal.domain.CheckResultRepository;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
@@ -60,6 +63,12 @@ public class InsurerExtract {
           "Sum Insured (per cover)",
           "Packaged / Non-Packaged");
 
+  private static final SnapshotPremium NO_PREMIUM =
+      new SnapshotPremium(null, null, null, null, null, null);
+  private static final SnapshotProduct NO_PRODUCT =
+      new SnapshotProduct(null, null, null, null, null, null);
+  private static final SnapshotSales NO_SALES =
+      new SnapshotSales(null, null, null, null, null, null);
   private static final String YES = "Yes";
   private static final String NO = "No";
   private static final String SEP = "; ";
@@ -100,43 +109,55 @@ public class InsurerExtract {
    */
   public List<String> row(RenewalCandidate c) {
     CandidateSnapshot s = c.getSnapshot();
-    var premium = s.premium();
-    var product = s.product();
-    var sales = s.sales();
+    SnapshotPremium premium = s.premium() == null ? NO_PREMIUM : s.premium();
+    SnapshotProduct product = s.product() == null ? NO_PRODUCT : s.product();
+    SnapshotSales sales = s.sales() == null ? NO_SALES : s.sales();
     List<RiskItemData> items = items(c);
     return Arrays.asList(
         insurerName(c.getCompanyId(), s.insurerCode()),
         c.getExpiringInvoiceNo(),
-        s.client() == null ? s.clientName() : first(s.client().assuredName(), s.clientName()),
-        product == null ? null : product.productCode(),
+        assured(s),
+        product.productCode(),
         text(s.inceptionDate()),
         text(s.expiryDate()),
-        premium == null ? null : text(premium.totalSumInsured()),
-        premium == null ? null : text(premium.grossPremium()),
-        premium == null ? null : text(premium.commissionRate()),
+        text(premium.totalSumInsured()),
+        text(premium.grossPremium()),
+        text(premium.commissionRate()),
         unpaid(c),
-        s.mortgage() != null && s.mortgage().mortgaged() ? YES : NO,
+        mortgaged(s),
         join(items.stream().map(RiskItemData::rate).toList()),
         s.policyNo(),
-        product == null ? null : product.productName(),
+        product.productName(),
         encoder(c),
-        sales == null ? null : name(sales.unitHead()),
-        product == null ? null : product.businessOrigin(),
-        product == null ? null : product.accountType(),
-        sales == null ? null : sales.regionCode(),
-        sales == null ? null : sales.departmentCode(),
-        sales == null ? null : sales.branchCode(),
-        sales == null ? null : name(sales.accountOfficer()),
+        name(sales.unitHead()),
+        product.businessOrigin(),
+        product.accountType(),
+        sales.regionCode(),
+        sales.departmentCode(),
+        sales.branchCode(),
+        name(sales.accountOfficer()),
         c.getDisposition().remarks(),
         join(items.stream().map(RiskItemData::biLimit).toList()),
-        items.stream()
-            .map(RiskItemData::vehicle)
-            .filter(v -> v != null && v.seatingCapacity() != null)
-            .map(v -> v.seatingCapacity().toString())
-            .collect(Collectors.joining(SEP)),
+        seats(items),
         null,
         join(items.stream().map(RiskItemData::sumInsured).toList()),
         s.packaged() ? "Packaged" : "Non-Packaged");
+  }
+
+  private static String seats(List<RiskItemData> items) {
+    return items.stream()
+        .map(RiskItemData::vehicle)
+        .filter(v -> v != null && v.seatingCapacity() != null)
+        .map(v -> v.seatingCapacity().toString())
+        .collect(Collectors.joining(SEP));
+  }
+
+  private static String mortgaged(CandidateSnapshot s) {
+    return s.mortgage() != null && s.mortgage().mortgaged() ? YES : NO;
+  }
+
+  private static String assured(CandidateSnapshot s) {
+    return s.client() == null ? s.clientName() : first(s.client().assuredName(), s.clientName());
   }
 
   private List<RiskItemData> items(RenewalCandidate c) {

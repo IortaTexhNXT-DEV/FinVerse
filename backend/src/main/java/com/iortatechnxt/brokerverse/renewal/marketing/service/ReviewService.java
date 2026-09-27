@@ -131,15 +131,8 @@ public class ReviewService {
     return batch.run(refs, ref -> postOne(records.get(companyId, ref)));
   }
 
-  private void postOne(RenewalCandidate c) {
-    RenewalRecords.requireStage(c, RenewalStage.FOR_TL_REVIEW);
-    RenewalDisposition code = c.getDisposition().code();
-    if (code == null) {
-      throw new BusinessRuleException(
-          "RNW_DISPOSITION_REQUIRED", "Renewal " + c.getRenewalRef() + " has no disposition");
-    }
-    boolean renews = code == RenewalDisposition.FOR_RENEWAL || code.isNewBusinessPath();
-    List<CheckResult> failing = renews ? blocking.failing(c) : List.of();
+  private void requireNoBlockingCheck(RenewalCandidate c) {
+    List<CheckResult> failing = blocking.failing(c);
     if (!failing.isEmpty()) {
       throw new BusinessRuleException(
           "RNW_BLOCKING_CHECK",
@@ -150,6 +143,18 @@ public class ReviewService {
                   .map(r -> CheckNames.of(r.getCheckCode()))
                   .collect(Collectors.joining(", "))
               + " failed");
+    }
+  }
+
+  private void postOne(RenewalCandidate c) {
+    RenewalRecords.requireStage(c, RenewalStage.FOR_TL_REVIEW);
+    RenewalDisposition code = c.getDisposition().code();
+    if (code == null) {
+      throw new BusinessRuleException(
+          "RNW_DISPOSITION_REQUIRED", "Renewal " + c.getRenewalRef() + " has no disposition");
+    }
+    if (code == RenewalDisposition.FOR_RENEWAL || code.isNewBusinessPath()) {
+      requireNoBlockingCheck(c);
     }
     String note = "Posted: " + code.label();
     switch (code) {

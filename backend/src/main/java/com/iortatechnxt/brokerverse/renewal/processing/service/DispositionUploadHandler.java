@@ -20,12 +20,12 @@ import com.iortatechnxt.brokerverse.renewal.service.RenewalCodes;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalDispositions;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalFlow;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalParameters;
+import com.iortatechnxt.brokerverse.renewal.service.UploadValues;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import org.springframework.stereotype.Component;
@@ -193,22 +193,22 @@ public class DispositionUploadHandler implements BulkImportHandler {
       return List.of();
     }
     String reason = reason(row.text(REASON));
+    String error = null;
     if (reason == null) {
-      return List.of("Select the reason for Not for Renewal");
+      error = "Select the reason for Not for Renewal";
+    } else if (RenewalCodes.REASON_TRANSFER.equals(reason)) {
+      error = "Transfers to another unit are requested on the record, not by upload";
+    } else if (parameters.invoiceNoReason(reason)) {
+      error = invoiceError(row.text(NEW_INVOICE));
     }
-    if (RenewalCodes.REASON_TRANSFER.equals(reason)) {
-      return List.of("Transfers to another unit are requested on the record, not by upload");
-    }
-    if (!parameters.invoiceNoReason(reason)) {
-      return List.of();
-    }
-    String invoice = row.text(NEW_INVOICE);
+    return error == null ? List.of() : List.of(error);
+  }
+
+  private String invoiceError(String invoice) {
     if (invoice == null) {
-      return List.of("Enter the new invoice number");
+      return "Enter the new invoice number";
     }
-    return invoices.existsByInvoiceNo(invoice)
-        ? List.of()
-        : List.of("Invoice " + invoice + " does not exist");
+    return invoices.existsByInvoiceNo(invoice) ? null : "Invoice " + invoice + " does not exist";
   }
 
   private Optional<RenewalCandidate> candidate(BulkRow row, BulkContext context) {
@@ -222,10 +222,8 @@ public class DispositionUploadHandler implements BulkImportHandler {
     if (value == null) {
       return null;
     }
-    String text = value.strip().toUpperCase(Locale.ROOT);
     for (RenewalDisposition d : RenewalDisposition.values()) {
-      if (d.name().equals(text.replace(' ', '_'))
-          || d.label().toUpperCase(Locale.ROOT).equals(text)) {
+      if (UploadValues.names(value, d.name(), d.label())) {
         return d;
       }
     }
@@ -237,11 +235,10 @@ public class DispositionUploadHandler implements BulkImportHandler {
     if (value == null) {
       return null;
     }
-    String text = value.strip().toUpperCase(Locale.ROOT);
     return lovs
         .activeValues(RenewalCodes.LOV_NONRENEWAL_REASON, BusinessClock.today(clock))
         .stream()
-        .filter(v -> v.getCode().equals(text) || v.getLabel().toUpperCase(Locale.ROOT).equals(text))
+        .filter(v -> UploadValues.names(value, v.getCode(), v.getLabel()))
         .map(LovValue::getCode)
         .findFirst()
         .orElse(null);

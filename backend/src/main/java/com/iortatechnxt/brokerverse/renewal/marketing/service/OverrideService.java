@@ -119,7 +119,7 @@ public class OverrideService {
   }
 
   private void apply(RenewalCandidate c, Request request, RenewalOverride.Reason reason) {
-    RenewalRecords.requireStage(c, openStages(c));
+    RenewalRecords.requireStage(c, openStages());
     switch (request.kind()) {
       case OUTSTANDING_BALANCE ->
           checkOverride(c, OverrideKind.OUTSTANDING_BALANCE, OutstandingPremiumCheck.CODE, reason);
@@ -240,7 +240,7 @@ public class OverrideService {
                 r -> r.getCheckCode().equals(checkCode) && r.getOutcome() == CheckOutcome.FAIL);
   }
 
-  private static RenewalStage[] openStages(RenewalCandidate c) {
+  private static RenewalStage[] openStages() {
     return java.util.Arrays.stream(RenewalStage.values())
         .filter(RenewalStage::isOpen)
         .toArray(RenewalStage[]::new);

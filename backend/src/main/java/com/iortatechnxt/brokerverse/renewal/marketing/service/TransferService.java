@@ -37,6 +37,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class TransferService {
 
+  private static final String TRANSFER_TO = "Transfer to ";
+
   private final RenewalRecords records;
   private final RenewalTransferRepository transfers;
   private final RemarkService remarks;
@@ -112,17 +114,7 @@ public class TransferService {
    * @return the request
    */
   public RenewalTransfer request(RenewalCandidate c, Request request) {
-    RenewalRecords.requireStage(c, RenewalStage.UNASSIGNED, RenewalStage.FOR_DISPOSITION);
-    RenewalRecords.requireUnlocked(c);
-    String toUnit = request.toUnit() == null ? "" : request.toUnit().strip();
-    if (toUnit.isEmpty()) {
-      throw new BusinessRuleException("RNW_TRANSFER_UNIT", "Select the receiving unit");
-    }
-    if (toUnit.equals(c.getOwnerUnit())) {
-      throw new BusinessRuleException(
-          "RNW_TRANSFER_SAME_UNIT", "The receiving unit must be another unit");
-    }
-    requireUnit(c.getCompanyId(), toUnit);
+    String toUnit = requireTransferable(c, request.toUnit());
     String text = RemarkService.requireText(request.remarks(), "Enter the remarks");
     if (request.reasonCode() != null && !request.reasonCode().isBlank()) {
       lovs.requireValid(
@@ -136,8 +128,8 @@ public class TransferService {
     }
     RenewalTransfer transfer =
         transfers.save(new RenewalTransfer(c, toUnit, blankToNull(request.reasonCode()), text));
-    flow.act(c, "transfer_request", TransitionNote.comment("Transfer to " + toUnit + ": " + text));
-    remarks.add(c, "Transfer to " + toUnit + " requested: " + text);
+    flow.act(c, "transfer_request", TransitionNote.comment(TRANSFER_TO + toUnit + ": " + text));
+    remarks.add(c, TRANSFER_TO + toUnit + " requested: " + text);
     audit.record(
         RenewalCodes.ENTITY,
         c.getRenewalRef(),
@@ -183,7 +175,7 @@ public class TransferService {
         RenewalCodes.ENTITY,
         c.getRenewalRef(),
         accept ? AuditAction.AUTHORIZE : AuditAction.REJECT,
-        "Transfer to " + t.getToUnit() + (accept ? " accepted" : " declined"));
+        TRANSFER_TO + t.getToUnit() + (accept ? " accepted" : " declined"));
     notices.users(
         List.of(t.getCreatedBy()),
         RenewalCodes.EVENT_TRANSFER_DECIDED,
@@ -210,7 +202,7 @@ public class TransferService {
     }
     RenewalCandidate c = records.byId(t.getCandidateId());
     t.decide(TransferStatus.CANCELLED, currentUser.username(), null, now());
-    sendBack(c, t, "Transfer to " + t.getToUnit() + " cancelled");
+    sendBack(c, t, TRANSFER_TO + t.getToUnit() + " cancelled");
     return t;
   }
 
@@ -243,6 +235,21 @@ public class TransferService {
         .distinct()
         .sorted((a, b) -> Long.compare(b.getId(), a.getId()))
         .toList();
+  }
+
+  private String requireTransferable(RenewalCandidate c, String unit) {
+    RenewalRecords.requireStage(c, RenewalStage.UNASSIGNED, RenewalStage.FOR_DISPOSITION);
+    RenewalRecords.requireUnlocked(c);
+    String toUnit = unit == null ? "" : unit.strip();
+    if (toUnit.isEmpty()) {
+      throw new BusinessRuleException("RNW_TRANSFER_UNIT", "Select the receiving unit");
+    }
+    if (toUnit.equals(c.getOwnerUnit())) {
+      throw new BusinessRuleException(
+          "RNW_TRANSFER_SAME_UNIT", "The receiving unit must be another unit");
+    }
+    requireUnit(c.getCompanyId(), toUnit);
+    return toUnit;
   }
 
   private Set<String> units(Long companyId) {

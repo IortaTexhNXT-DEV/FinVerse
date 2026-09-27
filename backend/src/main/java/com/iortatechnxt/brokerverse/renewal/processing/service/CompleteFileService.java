@@ -88,27 +88,9 @@ public class CompleteFileService {
    */
   public UploadScope apply(Long companyId, Long jobId, UploadScope.Range range) {
     BulkJob job = bulk.job(jobId);
-    if (!Objects.equals(job.getCompanyId(), companyId)
-        || !DispositionUploadHandler.CODE.equals(job.getHandlerCode())) {
-      throw new BusinessRuleException(
-          "RNW_SCOPE_JOB", "Upload " + job.getJobNo() + " is not a dispositioned file");
-    }
-    if (job.getStatus() != BulkJobStatus.COMPLETED) {
-      throw new BusinessRuleException(
-          "RNW_SCOPE_JOB", "Upload " + job.getJobNo() + " is not committed yet");
-    }
-    if (range.from() == null
-        || range.to() == null
-        || range.unit() == null
-        || range.unit().isBlank()) {
-      throw new BusinessRuleException(
-          "RNW_SCOPE_RANGE", "Enter the expiry range and the unit of the complete file");
-    }
-    if (scopes.findByJobNo(job.getJobNo()).isPresent()) {
-      throw new BusinessRuleException(
-          "RNW_SCOPE_APPLIED", "The scope of upload " + job.getJobNo() + " is already applied");
-    }
+    requireApplicable(companyId, job, range);
     Set<String> inFile = referencesOf(job);
+
     List<RenewalCandidate> missing =
         candidates.findByCompanyIdAndOwnerUnitAndStageIn(companyId, range.unit(), TAGGABLE).stream()
             .filter(c -> !c.getExpiryDate().isBefore(range.from()))
@@ -147,6 +129,32 @@ public class CompleteFileService {
             + missing.size()
             + " renewal(s) tagged Not for Renewal");
     return scope;
+  }
+
+  private void requireApplicable(Long companyId, BulkJob job, UploadScope.Range range) {
+    if (!Objects.equals(job.getCompanyId(), companyId)
+        || !DispositionUploadHandler.CODE.equals(job.getHandlerCode())) {
+      throw new BusinessRuleException(
+          "RNW_SCOPE_JOB", "Upload " + job.getJobNo() + " is not a dispositioned file");
+    }
+    if (job.getStatus() != BulkJobStatus.COMPLETED) {
+      throw new BusinessRuleException(
+          "RNW_SCOPE_JOB", "Upload " + job.getJobNo() + " is not committed yet");
+    }
+    requireRange(range);
+    if (scopes.findByJobNo(job.getJobNo()).isPresent()) {
+      throw new BusinessRuleException(
+          "RNW_SCOPE_APPLIED", "The scope of upload " + job.getJobNo() + " is already applied");
+    }
+  }
+
+  private static void requireRange(UploadScope.Range range) {
+    boolean dates =
+        range.from() != null && range.to() != null && !range.to().isBefore(range.from());
+    if (!dates || range.unit() == null || range.unit().isBlank()) {
+      throw new BusinessRuleException(
+          "RNW_SCOPE_RANGE", "Enter the expiry range and the unit of the complete file");
+    }
   }
 
   private Set<String> referencesOf(BulkJob job) {

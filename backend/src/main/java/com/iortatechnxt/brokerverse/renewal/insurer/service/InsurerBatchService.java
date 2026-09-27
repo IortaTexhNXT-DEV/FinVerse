@@ -196,21 +196,13 @@ public class InsurerBatchService {
    * @return the batch
    */
   public InsurerBatch create(Long companyId, String insurerCode, LocalDate from, LocalDate to) {
-    if (insurerCode == null || insurerCode.isBlank()) {
-      throw new BusinessRuleException("RNW_BATCH_INSURER", "Select the insurer");
-    }
-    if (from == null || to == null || to.isBefore(from)) {
-      throw new BusinessRuleException("RNW_RANGE_INVALID", "Enter a valid start and end date");
-    }
+    requireSelection(insurerCode, from, to);
     InsurerProfile insurer = insurer(companyId, insurerCode);
     List<RenewalCandidate> selected =
         candidates
             .findByCompanyIdAndStageIn(companyId, List.of(RenewalStage.IN_PROCESSING))
             .stream()
-            .filter(c -> c.getDisposition().code() == RenewalDisposition.FOR_RENEWAL)
-            .filter(c -> insurerCode.equals(c.getSnapshot().insurerCode()))
-            .filter(c -> !c.getExpiryDate().isBefore(from) && !c.getExpiryDate().isAfter(to))
-            .filter(c -> !inOpenBatch(c))
+            .filter(c -> eligible(c, insurerCode, from, to))
             .toList();
     if (selected.isEmpty()) {
       throw new BusinessRuleException(
@@ -325,6 +317,23 @@ public class InsurerBatchService {
         .filter(Objects::nonNull)
         .filter(b -> OPEN.contains(b.getStatus()))
         .findFirst();
+  }
+
+  private static void requireSelection(String insurerCode, LocalDate from, LocalDate to) {
+    if (insurerCode == null || insurerCode.isBlank()) {
+      throw new BusinessRuleException("RNW_BATCH_INSURER", "Select the insurer");
+    }
+    if (from == null || to == null || to.isBefore(from)) {
+      throw new BusinessRuleException("RNW_RANGE_INVALID", "Enter a valid start and end date");
+    }
+  }
+
+  private boolean eligible(RenewalCandidate c, String insurerCode, LocalDate from, LocalDate to) {
+    boolean inRange = !c.getExpiryDate().isBefore(from) && !c.getExpiryDate().isAfter(to);
+    return c.getDisposition().code() == RenewalDisposition.FOR_RENEWAL
+        && insurerCode.equals(c.getSnapshot().insurerCode())
+        && inRange
+        && !inOpenBatch(c);
   }
 
   private boolean inOpenBatch(RenewalCandidate c) {

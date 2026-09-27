@@ -570,6 +570,166 @@
           "screens": ["/renewal", "/renewal/expiry", "/renewal/followups"]
         }
       }
+    },
+    {
+      "id": "BRD-12",
+      "description": "Submitted Policies (V1070 roles and grants; V1970 seed users)",
+      "sections": ["submitted"],
+      "sharedGroups": ["home", "client-policy", "reports"],
+      "sharedModules": ["help"],
+      "roles": {
+        "SBM_HANDLER": {
+          "seedUser": "sbmhandler",
+          "permissions": [
+            "ATTACHMENT_MANAGE",
+            "ATTACHMENT_VIEW",
+            "BULK_PROCESS",
+            "IAAF_PREPARE",
+            "REPORT_VIEW",
+            "SBM_EXPORT",
+            "SBM_INTAKE",
+            "SBM_MAINTAIN",
+            "SBM_REPORT_EXPORT",
+            "SBM_REPORT_VIEW",
+            "SBM_VIEW",
+            "TOR_PREPARE",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/submitted",
+            "/submitted/masterlist",
+            "/submitted/intake",
+            "/submitted/extractions",
+            "/submitted/runs",
+            "/submitted/reviews",
+            "/submitted/tors",
+            "/submitted/renewals"
+          ]
+        },
+        "SBM_CHECKER": {
+          "seedUser": "sbmchecker",
+          "permissions": [
+            "ATTACHMENT_VIEW",
+            "IAAF_APPROVE",
+            "REPORT_VIEW",
+            "SBM_REPORT_VIEW",
+            "SBM_VIEW",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/submitted",
+            "/submitted/masterlist",
+            "/submitted/runs",
+            "/submitted/reviews",
+            "/submitted/tors",
+            "/submitted/renewals"
+          ]
+        },
+        "SBM_SANITATION": {
+          "seedUser": "sanitation",
+          "permissions": [
+            "ATTACHMENT_MANAGE",
+            "ATTACHMENT_VIEW",
+            "BULK_PROCESS",
+            "REPORT_VIEW",
+            "SBM_EXPORT",
+            "SBM_INTAKE",
+            "SBM_LETTER_SEND",
+            "SBM_MAINTAIN",
+            "SBM_PROCESS",
+            "SBM_REPORT_EXPORT",
+            "SBM_REPORT_VIEW",
+            "SBM_VIEW",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/submitted",
+            "/submitted/masterlist",
+            "/submitted/intake",
+            "/submitted/extractions",
+            "/submitted/runs",
+            "/submitted/reviews",
+            "/submitted/tors",
+            "/submitted/renewals",
+            "/submitted/letters"
+          ]
+        },
+        "SBM_TL": {
+          "seedUser": "sbmtl",
+          "permissions": [
+            "ATTACHMENT_MANAGE",
+            "ATTACHMENT_VIEW",
+            "BULK_PROCESS",
+            "IAAF_APPROVE",
+            "IAAF_PREPARE",
+            "REPORT_VIEW",
+            "SBM_EXPORT",
+            "SBM_HANDLING_FEE",
+            "SBM_INTAKE",
+            "SBM_LETTER_SEND",
+            "SBM_MAINTAIN",
+            "SBM_MIGRATE",
+            "SBM_PROCESS",
+            "SBM_REPORT_EXPORT",
+            "SBM_REPORT_VIEW",
+            "SBM_RULE_MAINTAIN",
+            "SBM_VIEW",
+            "TOR_PREPARE",
+            "WORK_ASSIGN",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/submitted",
+            "/submitted/masterlist",
+            "/submitted/intake",
+            "/submitted/extractions",
+            "/submitted/runs",
+            "/submitted/reviews",
+            "/submitted/tors",
+            "/submitted/renewals",
+            "/submitted/letters",
+            "/submitted/fees",
+            "/submitted/no-touch",
+            "/submitted/setup"
+          ]
+        },
+        "SBM_POLICY_REVIEWER": {
+          "seedUser": "polreview",
+          "permissions": [
+            "ATTACHMENT_MANAGE",
+            "ATTACHMENT_VIEW",
+            "IAAF_PREPARE",
+            "REPORT_VIEW",
+            "SBM_MAINTAIN",
+            "SBM_REPORT_VIEW",
+            "SBM_VIEW",
+            "WORK_VIEW"
+          ],
+          "screens": [
+            "/submitted",
+            "/submitted/masterlist",
+            "/submitted/extractions",
+            "/submitted/runs",
+            "/submitted/reviews",
+            "/submitted/tors",
+            "/submitted/renewals"
+          ]
+        },
+        "SBM_UPP_HANDLER": {
+          "seedUser": "upphandler",
+          "permissions": ["SBM_HANDLING_FEE", "SBM_VIEW"],
+          "screens": [
+            "/submitted",
+            "/submitted/masterlist",
+            "/submitted/runs",
+            "/submitted/reviews",
+            "/submitted/tors",
+            "/submitted/renewals",
+            "/submitted/fees",
+            "/submitted/no-touch"
+          ]
+        }
+      }
     }
   ]
 }

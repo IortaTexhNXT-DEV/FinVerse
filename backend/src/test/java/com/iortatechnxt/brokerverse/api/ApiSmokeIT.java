@@ -402,6 +402,42 @@ class ApiSmokeIT {
         .andExpect(status().isOk());
   }
 
+  /** The list reads of Submitted Policies (BRD-12), each as the persona whose screen makes it. */
+  @ParameterizedTest
+  @CsvSource({
+    "sbmtl, /api/v1/submitted/home?companyId={c}",
+    "sbmtl, /api/v1/submitted/policies?companyId={c}",
+    "sbmtl, /api/v1/submitted/policies?companyId={c}&tab=FALLOUT&segment=CBG_MOTOR&q=PN",
+    "sbmtl, /api/v1/submitted/policies/counts?companyId={c}",
+    "ao, /api/v1/submitted/policies?companyId={c}&tab=FOR_RENEWAL",
+    "sbmtl, /api/v1/submitted/intake-runs?companyId={c}",
+    "sbmhandler, /api/v1/submitted/extractions?companyId={c}",
+    "sanitation, /api/v1/submitted/runs?companyId={c}",
+    "sbmchecker, /api/v1/submitted/iaaf?companyId={c}&status=FOR_APPROVAL",
+    "tsu, /api/v1/submitted/tors?companyId={c}&status=FOR_APPROVAL,APPROVED",
+    "sbmtl, /api/v1/submitted/renewals?companyId={c}",
+    "sanitation, /api/v1/submitted/letters?companyId={c}&status=FAILED",
+    "sanitation, /api/v1/submitted/print-batches?companyId={c}",
+    "upphandler, /api/v1/submitted/handling-fees?companyId={c}&status=BILLED",
+    "upphandler, /api/v1/submitted/handling-fees/ambiguous?companyId={c}",
+    "upphandler, /api/v1/submitted/no-touch?companyId={c}",
+    "sbmtl, /api/v1/submitted/users?permission=SBM_MAINTAIN",
+    "sbmtl, /api/v1/submitted/setup/rule-sets?companyId={c}",
+    "sbmtl, /api/v1/submitted/setup/limits?companyId={c}",
+    "sbmtl, /api/v1/submitted/setup/insurers?companyId={c}",
+    "sbmtl, /api/v1/submitted/setup/letters?companyId={c}",
+    "sbmtl, /api/v1/submitted/setup/matrix?companyId={c}",
+    "sbmtl, /api/v1/submitted/setup/sources",
+    "sbmtl, /api/v1/submitted/setup/status-map",
+    "sbmtl, /api/v1/submitted/setup/scopes?companyId={c}",
+  })
+  void submittedPoliciesListsRespondOk(String user, String url) throws Exception {
+    mvc.perform(
+            get(url.replace("{c}", data.company().getId().toString()))
+                .with(user(users.loadUserByUsername(user))))
+        .andExpect(status().isOk());
+  }
+
   @ParameterizedTest
   @ValueSource(
       strings = {

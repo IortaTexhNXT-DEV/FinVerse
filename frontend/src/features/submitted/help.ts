@@ -50,7 +50,9 @@ export const SUBMITTED_HELP: HelpSection = {
         'Choose the source, download its template, upload the file, check the validation and commit.',
         'A committed intake starts a processing run of the new records.',
       ],
-      controls: ['A policy already in the masterlist is updated, never duplicated (PN or policy number).'],
+      controls: [
+        'A policy already in the masterlist is updated, never duplicated (PN or policy number).',
+      ],
     },
     {
       name: 'Extraction Review',
@@ -66,7 +68,8 @@ export const SUBMITTED_HELP: HelpSection = {
     {
       name: 'Processing Runs',
       path: '/submitted/runs',
-      summary: 'The processing runs with their counts and the result of every step for each record.',
+      summary:
+        'The processing runs with their counts and the result of every step for each record.',
       workflow: ['Open a run to see its results; the Fallout filter shows the records to fix.'],
       controls: ['The rules applied are the active rule sets approved in Setup.'],
     },
@@ -88,7 +91,8 @@ export const SUBMITTED_HELP: HelpSection = {
     {
       name: 'Terms of Reference',
       path: '/submitted/tors',
-      summary: 'TOR of the policies above the insurer limits, from draft to release to the Account Officer.',
+      summary:
+        'TOR of the policies above the insurer limits, from draft to release to the Account Officer.',
       workflow: [
         'Generate a TOR from a record flagged Insurer Approval, with the proposed terms and the Account Officer.',
         'Submit it; the approvers Approve or Return it; the Account Officer downloads the signed TOR.',
@@ -110,7 +114,10 @@ export const SUBMITTED_HELP: HelpSection = {
       name: 'Letters & Print Batches',
       path: '/submitted/letters',
       summary: 'Letters of the letter rules by status and the print batches for the mail house.',
-      workflow: ['Send Again a refused letter once the address is corrected.', 'Download the merged PDF and the control list of a print batch.'],
+      workflow: [
+        'Send Again a refused letter once the address is corrected.',
+        'Download the merged PDF and the control list of a print batch.',
+      ],
       controls: ['Every letter keeps the template version it was written with.'],
     },
     {
@@ -122,7 +129,9 @@ export const SUBMITTED_HELP: HelpSection = {
         'Upload the billing file, then Tag Now or wait for the tagger.',
         'A payment matching several fees is tagged by hand.',
       ],
-      controls: ['A tagged payment is recognised as income by Cashiering, which issues the official receipt.'],
+      controls: [
+        'A tagged payment is recognised as income by Cashiering, which issues the official receipt.',
+      ],
     },
     {
       name: 'No Touch Billing',
@@ -139,7 +148,9 @@ export const SUBMITTED_HELP: HelpSection = {
       path: '/submitted/setup',
       summary:
         'Rule sets of the processing steps, insurer limits, insurer assignment, letter rules, the approval matrix, the source register, the legacy status map and the user scopes.',
-      workflow: ['Changes wait for a checker; a rule set is submitted and approved before it applies.'],
+      workflow: [
+        'Changes wait for a checker; a rule set is submitted and approved before it applies.',
+      ],
       controls: ['The maker cannot approve a change.'],
     },
   ],

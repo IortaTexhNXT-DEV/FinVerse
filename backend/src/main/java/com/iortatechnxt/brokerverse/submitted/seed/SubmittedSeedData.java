@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmAssured;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmBusinessType;
+import com.iortatechnxt.brokerverse.submitted.domain.SbmDocStatus;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmHandlingFee;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmHistorySource;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmIaaf;
@@ -288,7 +289,10 @@ public class SubmittedSeedData implements ApplicationRunner {
         SbmIaaf iaaf = as("polreview", () -> work.iaafs().generate(id, Map.of()));
         as("polreview", () -> work.iaafs().submit(iaaf.getId()));
         if (i == 0) {
-          as("sbmchecker", () -> work.iaafs().approve(iaaf.getId()));
+          SbmIaaf first = as("sbmchecker", () -> work.iaafs().approve(iaaf.getId()));
+          if (first.getStatus() == SbmDocStatus.FOR_APPROVAL) {
+            as("mkttl", () -> work.iaafs().approve(iaaf.getId()));
+          }
         }
       }
     }

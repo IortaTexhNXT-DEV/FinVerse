@@ -10,6 +10,7 @@ import { cashieringModule } from '@/features/cashiering/module';
 import { catalogModule } from '@/features/catalog/module';
 import { bookingModule } from '@/features/booking/module';
 import { renewalModule } from '@/features/renewal/module';
+import { submittedModule } from '@/features/submitted/module';
 import { bulkModule } from '@/features/bulk/module';
 import { assetsModule } from '@/features/assets/module';
 import { claimsModule } from '@/features/claims/module';
@@ -78,6 +79,8 @@ export const NAV_GROUPS: NavGroup[] = [
       bookingModule,
       // Renewal (BRD-6) after Booking, RENEWAL_DESIGN section 12.
       renewalModule,
+      // Submitted Policies (BRD-12) after Renewal, SUBMITTED_POLICIES_DESIGN section 12.
+      submittedModule,
       // Operations (BRD-2), UX design placement: Production Reconciliation and Adjustment here.
       prodreconModule,
       adjustmentModule,

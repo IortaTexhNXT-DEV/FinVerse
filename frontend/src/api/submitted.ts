@@ -1,41 +1,44 @@
 import { api, toQuery } from './client';
 import type { PageResponse } from './types';
 import type {
+  ExtractionView,
+  HistoryRow,
+  LimitCheckView,
+  MasterlistFilters,
+  MasterlistTab,
+  PolicyData,
+  PolicyDetail,
+  PolicyRow,
+  ResultView,
+  RuleSetView,
+  RunView,
+  Tracking,
+} from './submittedTypes';
+import type {
   AmbiguousView,
   Controlled,
-  ExtractionView,
   FeeView,
-  HistoryRow,
   HomeCounts,
   IaafView,
   InsurerRule,
   IntakeRunView,
   LetterRule,
   LetterView,
-  LimitCheckView,
   LimitRule,
-  MasterlistFilters,
-  MasterlistTab,
   MatrixRow,
   NoTouchBatch,
   NoTouchLine,
-  PolicyData,
-  PolicyDetail,
-  PolicyRow,
   PrintBatchView,
   RenewalRow,
-  ResultView,
   ReviewView,
-  RuleSetView,
-  RunView,
   ScopeView,
   SourceView,
   StatusMapView,
   TorView,
-  Tracking,
-} from './submittedTypes';
+} from './submittedWorkTypes';
 
 export type * from './submittedTypes';
+export type * from './submittedWorkTypes';
 
 /**
  * Submitted Policies API (BRD-12; docs/architecture/SUBMITTED_POLICIES_DESIGN.md sections 7 and
@@ -187,6 +190,11 @@ export const submittedApi = {
     api.get<Controlled<LetterRule>[]>(`${B}/setup/letters${co(companyId)}`),
   matrix: (companyId: number) =>
     api.get<Controlled<MatrixRow>[]>(`${B}/setup/matrix${co(companyId)}`),
+  saveSetup: (
+    kind: 'limits' | 'insurers' | 'letters' | 'matrix',
+    companyId: number,
+    body: unknown,
+  ) => api.post<{ id: number }>(`${B}/setup/${kind}${co(companyId)}`, body),
   setupDecision: (kind: string, id: number, decision: 'authorize' | 'deactivate') =>
     api.post<{ id: number }>(`${B}/setup/${kind}/${String(id)}/${decision}`),
   sources: () => api.get<SourceView[]>(`${B}/setup/sources`),

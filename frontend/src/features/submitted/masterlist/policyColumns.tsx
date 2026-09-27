@@ -38,7 +38,12 @@ export const policyColumns: Column<PolicyRow>[] = [
     render: (p) => <LovLabel type={SBM_LOV.bucket} code={p.bucket} />,
   },
   { key: 'flags', header: 'Flags', render: (p) => <FlagChips flags={p.flags} /> },
-  { key: 'status', header: 'Status', kind: 'status', render: (p) => <StatusBadge status={p.status} /> },
+  {
+    key: 'status',
+    header: 'Status',
+    kind: 'status',
+    render: (p) => <StatusBadge status={p.status} />,
+  },
   {
     key: 'handler',
     header: 'Handler',

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { submittedApi } from '@/api/submitted';
+import type { HomeCounts } from '@/api/submitted';
 import { WorkTiles } from '@/components/broking/WorkTiles';
 import type { WorkTile } from '@/components/broking/WorkTiles';
 import { Card } from '@/components/ui/Card';
@@ -8,6 +9,31 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
 import { MASTERLIST_TABS, SUBMITTED_SECTION } from '../common/submittedCodes';
+
+const WORK: { key: keyof HomeCounts; label: string; to: string; alert?: boolean }[] = [
+  { key: 'iaafForApproval', label: 'IAAF for Approval', to: '/submitted/reviews?tab=FOR_APPROVAL' },
+  { key: 'iaafApproved', label: 'IAAF to Send', to: '/submitted/reviews?tab=APPROVED' },
+  { key: 'torForApproval', label: 'TOR for Approval', to: '/submitted/tors' },
+  {
+    key: 'renewalsPending',
+    label: 'Hand-offs Pending',
+    to: '/submitted/renewals?tab=PENDING',
+    alert: true,
+  },
+  { key: 'lettersFailed', label: 'Letters Refused', to: '/submitted/letters', alert: true },
+  { key: 'feesBilled', label: 'Fees to Tag', to: '/submitted/fees' },
+  { key: 'feesTagged', label: 'Fees to Apply', to: '/submitted/fees?tab=TAGGED' },
+];
+
+function workTiles(counts: HomeCounts | undefined, open: (to: string) => void): WorkTile[] {
+  return WORK.map((w) => ({
+    key: w.key,
+    label: w.label,
+    value: counts?.[w.key] ?? 0,
+    alert: w.alert,
+    onClick: () => open(w.to),
+  }));
+}
 
 /**
  * Submitted Policies Home (design section 12): the masterlist by tab and the work waiting in the
@@ -31,55 +57,9 @@ export default function SubmittedHomePage() {
     label: t.label,
     value: counts.data?.[t.id] ?? 0,
     alert: t.id === 'FALLOUT' || t.id === 'MANUAL_DISPOSITION',
-    onClick: () => navigate(`/submitted/masterlist?tab=${t.id}`),
+    onClick: () => void navigate(`/submitted/masterlist?tab=${t.id}`),
   }));
-  const h = home.data;
-  const work: WorkTile[] = [
-    {
-      key: 'iaaf',
-      label: 'IAAF for Approval',
-      value: h?.iaafForApproval ?? 0,
-      onClick: () => navigate('/submitted/reviews?tab=FOR_APPROVAL'),
-    },
-    {
-      key: 'iaafApproved',
-      label: 'IAAF to Send',
-      value: h?.iaafApproved ?? 0,
-      onClick: () => navigate('/submitted/reviews?tab=APPROVED'),
-    },
-    {
-      key: 'tor',
-      label: 'TOR for Approval',
-      value: h?.torForApproval ?? 0,
-      onClick: () => navigate('/submitted/tors'),
-    },
-    {
-      key: 'pending',
-      label: 'Hand-offs Pending',
-      value: h?.renewalsPending ?? 0,
-      alert: true,
-      onClick: () => navigate('/submitted/renewals'),
-    },
-    {
-      key: 'letters',
-      label: 'Letters Refused',
-      value: h?.lettersFailed ?? 0,
-      alert: true,
-      onClick: () => navigate('/submitted/letters'),
-    },
-    {
-      key: 'billed',
-      label: 'Fees to Tag',
-      value: h?.feesBilled ?? 0,
-      onClick: () => navigate('/submitted/fees'),
-    },
-    {
-      key: 'tagged',
-      label: 'Fees to Apply',
-      value: h?.feesTagged ?? 0,
-      onClick: () => navigate('/submitted/fees?tab=TAGGED'),
-    },
-  ];
+  const work = workTiles(home.data, (to) => void navigate(to));
   return (
     <div className="stack">
       <PageHeader

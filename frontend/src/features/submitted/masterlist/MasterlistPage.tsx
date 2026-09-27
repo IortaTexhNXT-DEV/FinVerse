@@ -23,10 +23,7 @@ import { SBM_LOV, MASTERLIST_TABS, SUBMITTED_SECTION } from '../common/submitted
 import { UserSelect } from '../common/UserSelect';
 import { policyColumns } from './policyColumns';
 
-function AssignDialog({
-  ids,
-  onClose,
-}: Readonly<{ ids: number[]; onClose: () => void }>) {
+function AssignDialog({ ids, onClose }: Readonly<{ ids: number[]; onClose: () => void }>) {
   const companyId = useCompanyId();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -56,7 +53,7 @@ function AssignDialog({
       }
     >
       <ErrorAlert error={assign.error} />
-      <p>{ids.length} records selected.</p>
+      <p>{ids.length === 1 ? '1 record selected.' : `${String(ids.length)} records selected.`}</p>
       <Field label="Handler" required>
         {(id) => (
           <UserSelect id={id} permission="SBM_MAINTAIN" value={handler} onChange={setHandler} />
@@ -167,7 +164,12 @@ export default function MasterlistPage() {
           rowKey={(p) => p.id}
           emptyMessage="No submitted policies in this tab"
           columns={[
-            selectionColumn(rows, (p) => String(p.id), selection, (p) => p.sbmNo),
+            selectionColumn(
+              rows,
+              (p) => String(p.id),
+              selection,
+              (p) => p.sbmNo,
+            ),
             ...policyColumns,
           ]}
           footer={<PageFooter data={list.data} noun="policies" onPage={setPage} />}

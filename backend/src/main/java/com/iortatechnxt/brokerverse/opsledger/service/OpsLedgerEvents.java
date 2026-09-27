@@ -215,6 +215,8 @@ public final class OpsLedgerEvents {
    * @param status ACCEPTED, REJECTED or APPLIED
    * @param cashieringRef disposition reference in cashiering
    * @param message reason or remarks, may be null
+   * @param documentNo official receipt issued by the disposition (income recognised, BRIDSP-31),
+   *     null otherwise
    */
   public record UnappliedDispositionChanged(
       Long companyId,
@@ -223,7 +225,8 @@ public final class OpsLedgerEvents {
       String sourceRef,
       String status,
       String cashieringRef,
-      String message) {}
+      String message,
+      String documentNo) {}
 
   /**
    * A validator answered a refund validation opened through {@code RefundValidationSource} (MKT

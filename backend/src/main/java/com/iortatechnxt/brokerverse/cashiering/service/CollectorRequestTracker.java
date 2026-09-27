@@ -69,9 +69,10 @@ public class CollectorRequestTracker {
                       + " executed"
                       + (d.getDisbursementRequestNo() == null
                           ? ""
-                          : " (refund request " + d.getDisbursementRequestNo() + ")");
+                          : " (refund request " + d.getDisbursementRequestNo() + ")")
+                      + (d.getOrNo() == null ? "" : " (official receipt " + d.getOrNo() + ")");
               r.applied(clock.instant(), note);
-              publish(item, r, APPLIED, note);
+              publish(item, r, APPLIED, note, d.getOrNo());
             });
   }
 
@@ -102,6 +103,11 @@ public class CollectorRequestTracker {
    * @param message reason or remarks
    */
   void publish(Unapplied item, CollectorRequest r, String status, String message) {
+    publish(item, r, status, message, null);
+  }
+
+  private void publish(
+      Unapplied item, CollectorRequest r, String status, String message, String documentNo) {
     events.publishEvent(
         new UnappliedDispositionChanged(
             r.getCompanyId(),
@@ -110,6 +116,7 @@ public class CollectorRequestTracker {
             r.getSourceRef(),
             status,
             r.getRequestNo(),
-            message));
+            message,
+            documentNo));
   }
 }

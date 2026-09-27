@@ -266,6 +266,38 @@ public class HoldCoverService {
   }
 
   /**
+   * Re-assigns the insurer while a hold cover request is open (BRIDSP-32; Submitted Policies,
+   * SUBMITTED_POLICIES_DESIGN section 3.5): the open request is closed as REASSIGNED, the insurer
+   * of the account changes and a new hold cover request goes to the new insurer. Both stay in the
+   * hold cover history of the account.
+   *
+   * @param arn account in placement
+   * @param newInsurerCode new insurer (different from the current one)
+   * @param reasonCode reason of the re-assignment (list of values of the caller)
+   * @return the new hold cover
+   */
+  public HoldCover reassign(String arn, String newInsurerCode, String reasonCode) {
+    HoldCover open =
+        current(arn)
+            .filter(HoldCover::isOpen)
+            .orElseThrow(
+                () ->
+                    new BusinessRuleException(
+                        "HOLD_COVER_NONE", "Account " + arn + " has no open hold cover request"));
+    if (reasonCode == null || reasonCode.isBlank()) {
+      throw new BusinessRuleException("REASSIGN_REASON_REQUIRED", "Select the reason");
+    }
+    lifecycle.changeInsurer(arn, newInsurerCode, reasonCode);
+    open.reassign(reasonCode.strip());
+    audit.record(
+        ENTITY,
+        arn,
+        AuditAction.UPDATE,
+        "Hold cover request to " + open.getInsurerCode() + " closed: insurer re-assigned");
+    return request(arn, new HoldCoverRequest(null, List.of()));
+  }
+
+  /**
    * Expiry monitor (job HOLD_COVER_EXPIRY): alerts the holders of PLACEMENT_MANAGE once for each
    * open hold cover expiring within the alert lead time, and expires those past their expiry date
    * while the policy is still awaited.

@@ -19,7 +19,9 @@ import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
 import java.time.LocalDate;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,16 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class AccountLifecycleService {
+
+  private static final Set<AccountStatus> INSURER_CHANGEABLE =
+      EnumSet.of(
+          AccountStatus.DRAFT,
+          AccountStatus.SUBMITTED,
+          AccountStatus.RETURNED_TO_MARKETING,
+          AccountStatus.AWAITING_PAYMENT,
+          AccountStatus.READY_FOR_PLACEMENT,
+          AccountStatus.PLACED,
+          AccountStatus.RETURNED_BY_INSURER);
 
   private final AccountRepository accounts;
   private final ProductCatalogService catalog;
@@ -185,6 +197,44 @@ public class AccountLifecycleService {
     Account account = require(arn);
     account.recordHoldCover(status, insurerRef, date);
     record(account, "Hold cover " + status + (insurerRef == null ? "" : " ref " + insurerRef));
+    return account;
+  }
+
+  /**
+   * Changes the insurer of an account being placed (BRIDSP-32, insurer re-assigned while its hold
+   * cover request is open). Refused once the policy is issued or the account is closed.
+   *
+   * @param arn account
+   * @param insurerCode new insurer
+   * @param reason reason (list of values of the caller)
+   * @return the account
+   */
+  public Account changeInsurer(String arn, String insurerCode, String reason) {
+    Account account = require(arn);
+    if (insurerCode == null || insurerCode.isBlank()) {
+      throw new BusinessRuleException("INSURER_REQUIRED", "Select the new insurer");
+    }
+    if (insurerCode.strip().equals(account.getInsurerCode())) {
+      throw new BusinessRuleException(
+          "INSURER_UNCHANGED", "Select an insurer other than the current one");
+    }
+    if (!INSURER_CHANGEABLE.contains(account.getStatus())) {
+      throw new BusinessRuleException(
+          "INSURER_CHANGE_NOT_ALLOWED",
+          "The insurer of account "
+              + arn
+              + " cannot be changed when it is "
+              + DisplayFormat.words(account.getStatus()));
+    }
+    String previous = account.getInsurerCode();
+    account.changeInsurer(insurerCode.strip());
+    record(
+        account,
+        "Insurer changed from "
+            + previous
+            + " to "
+            + account.getInsurerCode()
+            + (reason == null ? "" : " (" + reason + ")"));
     return account;
   }
 

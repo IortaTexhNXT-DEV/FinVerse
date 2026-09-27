@@ -413,7 +413,39 @@ public enum Permission {
   // Renewal templates (25)
   RNW_TEMPLATE_MAINTAIN,
   // Package version of a migrated policy whose legacy package is not mapped (DMQ36)
-  RNW_PACKAGE_REMAP;
+  RNW_PACKAGE_REMAP,
+
+  // Submitted Policies (BDOI BRD-12). See docs/architecture/SUBMITTED_POLICIES_DESIGN.md section
+  // 6.1 and V1070. The data scope (segments, own records of an AO) is applied by SbmScopeService
+  // on top of these permissions (BRIDSP-28).
+  // Masterlist, records, home (BRIDSP-04, 28)
+  SBM_VIEW,
+  // Manual entry and edit, renewal tag, handler, remarks, documents, confirm extraction (02, 03, 29)
+  SBM_MAINTAIN,
+  // Source uploads, intake runs, LAMD snapshot (01, 13)
+  SBM_INTAKE,
+  // Processing runs, fallout, manual disposition, renewal hand-off, insurer re-assignment (09, 32)
+  SBM_PROCESS,
+  // Rule sets, limit, insurer and letter rules, approval matrices: maker and checker (08)
+  SBM_RULE_MAINTAIN,
+  SBM_RULE_APPROVE,
+  // Policy reviews and IAAF; IAAF approval levels (05-07)
+  IAAF_PREPARE,
+  IAAF_APPROVE,
+  // Terms of Reference; TSU approval levels (16-19)
+  TOR_PREPARE,
+  TOR_APPROVE,
+  // Letters that are not renewal letters and their print batches (22)
+  SBM_LETTER_SEND,
+  // Handling-fee records, tagger results, manual tag (31)
+  SBM_HANDLING_FEE,
+  // Migration of the Excel masterlists (33)
+  SBM_MIGRATE,
+  // Masterlist extract (28)
+  SBM_EXPORT,
+  // Submitted Policies reports: view, export and archive (20, 21, 30)
+  SBM_REPORT_VIEW,
+  SBM_REPORT_EXPORT;
 
   // The portal permissions of design 6.1 (PORTAL_USER_REQUEST, PORTAL_USER_APPROVE, PORTAL_ADMIN)
   // are parked with the partner portal (BDOI Drop 2 "Employee Benefits (No Portal Feature)"):

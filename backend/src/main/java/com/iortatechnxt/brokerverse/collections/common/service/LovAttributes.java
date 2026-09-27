@@ -45,7 +45,7 @@ public class LovAttributes {
 
   private static final Pattern ROLE_LIST = Pattern.compile("^[A-Z0-9_]{1,40}(,[A-Z0-9_]{1,40})*$");
   private static final Set<String> CASHIERING_ACTIONS =
-      Set.of("APPLY_TO_INVOICE", "REFUND", "RECLASS", "TRANSFER", "NONE");
+      Set.of("APPLY_TO_INVOICE", "REFUND", "RECLASS", "TRANSFER", "RECOGNIZE_INCOME", "NONE");
   private static final String ENTITY = "CollectionsLovAttribute";
 
   private final LovAttributeRepository attributes;

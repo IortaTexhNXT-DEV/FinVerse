@@ -396,6 +396,18 @@ public class Account extends BaseEntity {
   }
 
   /**
+   * Changes the insurer while the account is being placed (insurer re-assigned when the first
+   * insurer does not accept the hold cover, BRIDSP-32); the insurer branch is cleared so the
+   * default branch of the new insurer is addressed.
+   *
+   * @param newInsurerCode new insurer
+   */
+  public void changeInsurer(String newInsurerCode) {
+    this.insurerCode = newInsurerCode;
+    this.insurerBranch = null;
+  }
+
+  /**
    * Records the policy numbers (one per policy year, BRNB.112) and the issue date.
    *
    * @param numbers policy numbers

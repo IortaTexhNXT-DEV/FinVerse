@@ -92,6 +92,9 @@ public interface UnappliedDirectory {
    * @param salesUnit marketing unit, may be null
    * @param cashieringTab Cashiering tab of the item
    * @param dispositionStatus status of the Cashiering disposition, may be null
+   * @param channel payment channel (OTC, CLPC, BILLS_PAYMENT, ...), may be null for a receipt
+   *     without a payment file; a CLPC payment carries the PN number and an OTC payment the
+   *     location reference in {@code reference} (BRIDSP-31)
    */
   record UnappliedView(
       String unappliedRef,
@@ -111,7 +114,8 @@ public interface UnappliedDirectory {
       String matchedInvoiceNo,
       String salesUnit,
       String cashieringTab,
-      String dispositionStatus) {}
+      String dispositionStatus,
+      String channel) {}
 
   /**
    * One event of an item's history (BRCLXN.040).

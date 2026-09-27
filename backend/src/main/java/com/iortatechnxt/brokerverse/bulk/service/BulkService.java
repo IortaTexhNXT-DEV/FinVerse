@@ -241,17 +241,20 @@ public class BulkService {
     }
     int ok = committed;
     int ko = failed;
-    return tx.execute(
-        s -> {
-          BulkJob j = requireOpen(jobId);
-          j.completed(ok, ko, clock.instant());
-          audit.record(
-              ENTITY,
-              j.getJobNo(),
-              AuditAction.UPDATE,
-              "Committed " + ok + " row(s), " + ko + " failed");
-          return j;
-        });
+    BulkJob done =
+        tx.execute(
+            s -> {
+              BulkJob j = requireOpen(jobId);
+              j.completed(ok, ko, clock.instant());
+              audit.record(
+                  ENTITY,
+                  j.getJobNo(),
+                  AuditAction.UPDATE,
+                  "Committed " + ok + " row(s), " + ko + " failed");
+              return j;
+            });
+    tx.executeWithoutResult(s -> handler.afterCommit(context, ok, ko));
+    return done;
   }
 
   /**
@@ -287,17 +290,20 @@ public class BulkService {
     }
     int ok = recovered;
     int ko = failed;
-    return tx.execute(
-        s -> {
-          BulkJob j = job(jobId);
-          j.reprocessed(ok, ko);
-          audit.record(
-              ENTITY,
-              j.getJobNo(),
-              AuditAction.UPDATE,
-              "Reprocessed failed rows: " + ok + " committed, " + ko + " still failed");
-          return j;
-        });
+    BulkJob done =
+        tx.execute(
+            s -> {
+              BulkJob j = job(jobId);
+              j.reprocessed(ok, ko);
+              audit.record(
+                  ENTITY,
+                  j.getJobNo(),
+                  AuditAction.UPDATE,
+                  "Reprocessed failed rows: " + ok + " committed, " + ko + " still failed");
+              return j;
+            });
+    tx.executeWithoutResult(s -> handler.afterCommit(context, ok, ko));
+    return done;
   }
 
   /**

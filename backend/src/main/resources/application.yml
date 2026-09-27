@@ -387,6 +387,19 @@ brokerverse:
     renewal-letter-batch-cron: ${BROKERVERSE_JOB_RENEWAL_LETTER_BATCH_CRON:0 5 * * * *}
     # Go-live take-over of the migrated policies expiring up to MIG_GOLIVE_RENEWAL_TO (DMQ37): run once from the cut-over runbook.
     renewal-golive-extraction-cron: ${BROKERVERSE_JOB_RENEWAL_GOLIVE_EXTRACTION_CRON:-}
+    # ---- Submitted Policies (BRD-12), docs/architecture/SUBMITTED_POLICIES_DESIGN.md section 8 (PHT = UTC+8) ----
+    # Pulls the source files through SubmittedSourceFeed (BRIDSP-01); manual until a feed is connected.
+    sbm-intake-pull-cron: ${BROKERVERSE_JOB_SBM_INTAKE_PULL_CRON:-}
+    # Processing run of the received, validated and changed masterlist records (BRIDSP-09), 21:30 PHT.
+    sbm-processing-cron: ${BROKERVERSE_JOB_SBM_PROCESSING_CRON:0 30 13 * * *}
+    # Renewal hand-off of the For Renewal records within the lead days of their segment (BRIDSP-23), 22:00 PHT.
+    sbm-expiry-scan-cron: ${BROKERVERSE_JOB_SBM_EXPIRY_SCAN_CRON:0 0 14 * * *}
+    # Letters due by the letter rules and their print batches (BRIDSP-22), 06:30 PHT.
+    sbm-letter-dispatch-cron: ${BROKERVERSE_JOB_SBM_LETTER_DISPATCH_CRON:0 30 22 * * *}
+    # Insurer not accepted within SBM_INSURER_ACCEPT_DAYS; hold covers of unbooked renewal accounts (BRIDSP-24/32), 07:00 PHT.
+    sbm-hold-cover-watch-cron: ${BROKERVERSE_JOB_SBM_HOLD_COVER_WATCH_CRON:0 0 23 * * *}
+    # Tags the unapplied payments of billed handling fees (BRIDSP-31), every 30 minutes.
+    sbm-handling-fee-tagger-cron: ${BROKERVERSE_JOB_SBM_HANDLING_FEE_TAGGER_CRON:0 */30 * * * *}
 
 management:
   health:

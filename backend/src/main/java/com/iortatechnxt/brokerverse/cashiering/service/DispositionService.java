@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -177,6 +178,50 @@ public class DispositionService {
         item.getReference(),
         AuditAction.UPDATE,
         "Disposition " + typeCode);
+    return d;
+  }
+
+  /**
+   * Assigns a disposition and processes it at once as a system action, for a type that needs no
+   * approval (income recognised on the request of another module, BRIDSP-31).
+   *
+   * @param unappliedId item
+   * @param typeCode disposition type
+   * @param details amount and remarks
+   * @param onAssigned called with the saved disposition before it is processed (links the request
+   *     that asked for it)
+   * @return the processed disposition
+   */
+  public Disposition processBySystem(
+      Long unappliedId,
+      String typeCode,
+      DispositionDetails details,
+      Consumer<Disposition> onAssigned) {
+    Unapplied item = item(unappliedId);
+    requireStage(item, Unapplied.STAGE_INITIAL);
+    DispositionTypeRule rule = rule(typeCode);
+    if (rule.isRequiresApproval()) {
+      throw new BusinessRuleException(
+          "DISPOSITION_NEEDS_APPROVAL",
+          rule.getDescription() + " needs the team leader's approval and is not processed at once");
+    }
+    executor.validate(item, rule, details);
+    Disposition d = dispositions.save(new Disposition(item.getId(), rule, details));
+    String key = item.getId().toString();
+    workflow.systemTransition(
+        UnappliedService.ENTITY,
+        key,
+        "assign_disposition",
+        TransitionNote.comment(rule.getTypeCode()));
+    onAssigned.accept(d);
+    executor.execute(item, d);
+    workflow.systemTransition(UnappliedService.ENTITY, key, "complete", TransitionNote.NONE);
+    reopenIfBalanceLeft(item);
+    audit.record(
+        UnappliedService.ENTITY,
+        item.getReference(),
+        AuditAction.POST,
+        "Disposition " + typeCode + " processed on request");
     return d;
   }
 

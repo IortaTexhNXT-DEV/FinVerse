@@ -29,6 +29,7 @@ import com.iortatechnxt.brokerverse.submitted.processing.service.SbmProcessingSe
 import com.iortatechnxt.brokerverse.submitted.renewal.service.HandOffService;
 import com.iortatechnxt.brokerverse.submitted.review.service.IaafService;
 import com.iortatechnxt.brokerverse.submitted.review.service.TorService;
+import com.iortatechnxt.brokerverse.submitted.seed.SubmittedSeedRows.SeedRow;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -67,6 +68,15 @@ public class SubmittedSeedData implements ApplicationRunner {
   private static final String SOURCE_FIRE = "HLS_INSURANCE";
   private static final String SOURCE_CORPORATE = "IBG_LEASING_DOC";
   private static final String SOURCE_RETAIL = "SPI";
+  private static final String PN_PREFIX = "PN-";
+  private static final int MOBILE_BASE = 1_000_000;
+  private static final int MOBILE_SPAN = 8_999_999;
+  private static final int POLICY_SPAN = 99_999;
+  private static final int VEHICLE_AGE = 3;
+  private static final BigDecimal PREMIUM_RATE = new BigDecimal("0.015");
+  private static final int FEES = 3;
+  private static final int NO_TOUCH_DAYS = 40;
+  private static final int FEE_AGE_DAYS = 5;
 
   private final CompanyRepository companies;
   private final SbmPolicyRepository policies;
@@ -134,8 +144,8 @@ public class SubmittedSeedData implements ApplicationRunner {
     Long companyId = company.getId();
     LocalDate today = BusinessClock.today(clock);
     List<SbmPolicy> loaded = new ArrayList<>();
-    for (String[] row : SubmittedSeedRows.ROWS) {
-      step("intake of " + row[0], () -> loaded.add(intake(companyId, row, today)));
+    for (SeedRow row : SubmittedSeedRows.ROWS) {
+      step("intake of " + row.assured(), () -> loaded.add(intake(companyId, row, today)));
     }
     step("assignment", () -> assign(companyId, loaded));
     step(
@@ -161,56 +171,56 @@ public class SubmittedSeedData implements ApplicationRunner {
                 "upphandler",
                 () ->
                     work.noTouch()
-                        .export(companyId, "INS-MGIC", YearMonth.from(today.plusDays(40)))));
+                        .export(companyId, "INS-MGIC", YearMonth.from(today.plusDays(NO_TOUCH_DAYS)))));
     LOG.info("Submitted Policies seed data: {} policies loaded", loaded.size());
   }
 
-  private SbmPolicy intake(Long companyId, String[] r, LocalDate today) {
-    String segment = r[1];
+  private SbmPolicy intake(Long companyId, SeedRow r, LocalDate today) {
+    String segment = r.segment();
     boolean motor = "CBG_MOTOR".equals(segment);
-    LocalDate expiry = today.plusDays(Integer.parseInt(r[5]));
+    LocalDate expiry = today.plusDays(Integer.parseInt(r.days()));
     SbmPolicyData data =
         new SbmPolicyData(
             segment,
-            SbmBusinessType.valueOf(r[2]),
-            r[0].isEmpty()
+            SbmBusinessType.valueOf(r.businessType()),
+            r.pn().isEmpty()
                 ? SbmLoan.NONE
-                : new SbmLoan(r[0], null, "CIF-" + r[0].substring(3), null, null, null, null, r[3]),
+                : new SbmLoan(r.pn(), null, "CIF-" + r.pn().substring(PN_PREFIX.length()), null, null, null, null, r.assured()),
             new SbmAssured(
-                r[3],
-                "Seed address of " + r[3] + ", Makati City",
+                r.assured(),
+                "Seed address of " + r.assured() + ", Makati City",
                 null,
-                "0917" + (1_000_000 + Math.floorMod(r[3].hashCode(), 8_999_999)),
-                r[3].toLowerCase(java.util.Locale.ROOT).replace(' ', '.') + "@example.ph",
+                "0917" + (MOBILE_BASE + Math.floorMod(r.assured().hashCode(), MOBILE_SPAN)),
+                r.assured().toLowerCase(java.util.Locale.ROOT).replace(' ', '.') + "@example.ph",
                 "Branch.counterpart@bank-seed.ph"),
             new SbmTerms(
-                r[4],
+                r.insurer(),
                 "POL-"
-                    + (r[0].isEmpty()
-                        ? "C" + Math.floorMod(r[3].hashCode(), 99_999)
-                        : r[0].substring(3)),
+                    + (r.pn().isEmpty()
+                        ? "C" + Math.floorMod(r.assured().hashCode(), POLICY_SPAN)
+                        : r.pn().substring(PN_PREFIX.length())),
                 expiry.minusYears(1),
                 expiry,
                 null,
-                new BigDecimal(r[6]),
-                new BigDecimal(r[6])
-                    .multiply(new BigDecimal("0.015"))
+                new BigDecimal(r.sumInsured()),
+                new BigDecimal(r.sumInsured())
+                    .multiply(PREMIUM_RATE)
                     .setScale(2, java.math.RoundingMode.HALF_UP),
                 "PHP"),
             motor
                 ? new SbmRisk(
-                    r[7],
-                    "SN" + r[8],
-                    "MN" + r[8],
+                    r.unit(),
+                    "SN" + r.plate(),
+                    "MN" + r.plate(),
                     "White",
-                    r[8],
-                    r[9],
-                    today.getYear() - 3,
+                    r.plate(),
+                    r.kind(),
+                    today.getYear() - VEHICLE_AGE,
                     null,
                     null,
                     "BDO Unibank")
-                : new SbmRisk(null, null, null, null, null, null, null, r[7], r[9], "BDO Unibank"),
-            new SbmMarks("FFY".equals(r[10]), "EMP".equals(r[10]), "NT".equals(r[10])));
+                : new SbmRisk(null, null, null, null, null, null, null, r.unit(), r.kind(), "BDO Unibank"),
+            new SbmMarks("FFY".equals(r.mark()), "EMP".equals(r.mark()), "NT".equals(r.mark())));
     String source = source(segment);
     return masterlist
         .upsert(
@@ -331,7 +341,7 @@ public class SubmittedSeedData implements ApplicationRunner {
   private void fees(Long companyId, List<SbmPolicy> loaded, LocalDate today) {
     loaded.stream()
         .filter(p -> "CBG_MOTOR".equals(p.getSegment()) && p.getLoan().pnNo() != null)
-        .limit(3)
+        .limit(FEES)
         .forEach(
             p ->
                 as(
@@ -346,7 +356,7 @@ public class SubmittedSeedData implements ApplicationRunner {
                                     null,
                                     new BigDecimal("1120.00"),
                                     "PHP",
-                                    today.minusDays(5)),
+                                    today.minusDays(FEE_AGE_DAYS)),
                                 null)));
   }
 

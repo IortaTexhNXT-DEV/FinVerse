@@ -79,7 +79,21 @@ class PersonaMenusIT {
           Map.entry("/renewal/letters", "/api/v1/renewal/candidates?companyId={c}&tab=RA_READY"),
           Map.entry("/renewal/followups", "/api/v1/renewal/candidates?companyId={c}&tab=RA_SENT"),
           Map.entry("/renewal/lamd", "/api/v1/renewal/lamd-reports?companyId={c}"),
-          Map.entry("/renewal/setup", "/api/v1/renewal/setup/package-map?companyId={c}"));
+          Map.entry("/renewal/setup", "/api/v1/renewal/setup/package-map?companyId={c}"),
+          Map.entry("/submitted", "/api/v1/submitted/home?companyId={c}"),
+          Map.entry("/submitted/masterlist", "/api/v1/submitted/policies?companyId={c}"),
+          Map.entry("/submitted/intake", "/api/v1/submitted/intake-runs?companyId={c}"),
+          Map.entry("/submitted/extractions", "/api/v1/submitted/extractions?companyId={c}"),
+          Map.entry("/submitted/runs", "/api/v1/submitted/runs?companyId={c}"),
+          Map.entry(
+              "/submitted/reviews", "/api/v1/submitted/iaaf?companyId={c}&status=FOR_APPROVAL"),
+          Map.entry("/submitted/tors", "/api/v1/submitted/tors?companyId={c}&status=FOR_APPROVAL"),
+          Map.entry("/submitted/renewals", "/api/v1/submitted/renewals?companyId={c}"),
+          Map.entry("/submitted/letters", "/api/v1/submitted/letters?companyId={c}&status=FAILED"),
+          Map.entry(
+              "/submitted/fees", "/api/v1/submitted/handling-fees?companyId={c}&status=BILLED"),
+          Map.entry("/submitted/no-touch", "/api/v1/submitted/no-touch?companyId={c}"),
+          Map.entry("/submitted/setup", "/api/v1/submitted/setup/rule-sets?companyId={c}"));
 
   @Autowired private Api api;
   @Autowired private JdbcTemplate jdbc;
@@ -97,7 +111,7 @@ class PersonaMenusIT {
   @Test
   void everyRoleHoldsExactlyThePermissionsTheMenuIsBuiltFrom() throws Exception {
     Map<String, Persona> personas = PersonaMenus.load();
-    assertThat(personas).hasSize(30);
+    assertThat(personas).hasSize(36);
     for (Persona p : personas.values()) {
       assertThat(p.inScope(granted(p.role()))).as(p.role()).isEqualTo(p.permissions());
       JsonNode me = api.read(api.doGet(p.seedUser(), "/api/v1/auth/me"));

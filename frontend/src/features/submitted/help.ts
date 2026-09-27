@@ -31,7 +31,6 @@ export const SUBMITTED_HELP: HelpSection = {
     },
     {
       name: 'Submitted Policy',
-      path: '/submitted/policies/:id',
       summary:
         'The record with its stage, flags and key facts, and the tabs Details, Rule Results, Review & IAAF, TOR, Renewal, Letters and History.',
       workflow: [

@@ -10,9 +10,9 @@ import java.util.List;
 final class SubmittedSeedRows {
 
   /** Seed rows. */
-  static final List<String[]> ROWS =
+  static final List<SeedRow> ROWS =
       List.of(
-          row(
+          new SeedRow(
               "PN-MTR-26001",
               "CBG_MOTOR",
               "NB",
@@ -24,7 +24,7 @@ final class SubmittedSeedRows {
               "NDA 1201",
               "Sedan",
               ""),
-          row(
+          new SeedRow(
               "PN-MTR-26002",
               "CBG_MOTOR",
               "NB",
@@ -36,7 +36,7 @@ final class SubmittedSeedRows {
               "NDB 2202",
               "Sedan",
               ""),
-          row(
+          new SeedRow(
               "PN-MTR-26003",
               "CBG_MOTOR",
               "RB",
@@ -48,7 +48,7 @@ final class SubmittedSeedRows {
               "NDC 3303",
               "Sedan",
               ""),
-          row(
+          new SeedRow(
               "PN-MTR-26004",
               "CBG_MOTOR",
               "NB",
@@ -60,7 +60,7 @@ final class SubmittedSeedRows {
               "NDD 4404",
               "MPV",
               ""),
-          row(
+          new SeedRow(
               "PN-MTR-26005",
               "CBG_MOTOR",
               "NB",
@@ -72,7 +72,7 @@ final class SubmittedSeedRows {
               "NDE 5505",
               "SUV",
               ""),
-          row(
+          new SeedRow(
               "PN-MTR-26006",
               "CBG_MOTOR",
               "NB",
@@ -84,7 +84,7 @@ final class SubmittedSeedRows {
               "NDF 6606",
               "Truck",
               ""),
-          row(
+          new SeedRow(
               "PN-MTR-26007",
               "CBG_MOTOR",
               "NB",
@@ -96,7 +96,7 @@ final class SubmittedSeedRows {
               "NDG 7707",
               "Sedan",
               "FFY"),
-          row(
+          new SeedRow(
               "PN-MTR-26008",
               "CBG_MOTOR",
               "NB",
@@ -108,7 +108,7 @@ final class SubmittedSeedRows {
               "NDH 8808",
               "SUV",
               "NT"),
-          row(
+          new SeedRow(
               "PN-MTR-26009",
               "CBG_MOTOR",
               "NB",
@@ -120,7 +120,7 @@ final class SubmittedSeedRows {
               "NDI 9909",
               "SUV",
               "NT"),
-          row(
+          new SeedRow(
               "PN-MTR-26010",
               "CBG_MOTOR",
               "RB",
@@ -132,7 +132,7 @@ final class SubmittedSeedRows {
               "NDJ 1010",
               "Sedan",
               "EMP"),
-          row(
+          new SeedRow(
               "PN-MTR-26011",
               "CBG_MOTOR",
               "NB",
@@ -144,7 +144,7 @@ final class SubmittedSeedRows {
               "NDK 1111",
               "SUV",
               ""),
-          row(
+          new SeedRow(
               "PN-FIR-26001",
               "CBG_FIRE",
               "NB",
@@ -156,7 +156,7 @@ final class SubmittedSeedRows {
               "",
               "Residential",
               ""),
-          row(
+          new SeedRow(
               "PN-FIR-26002",
               "CBG_FIRE",
               "NB",
@@ -168,7 +168,7 @@ final class SubmittedSeedRows {
               "",
               "Residential",
               ""),
-          row(
+          new SeedRow(
               "PN-FIR-26003",
               "CBG_FIRE",
               "RB",
@@ -180,7 +180,7 @@ final class SubmittedSeedRows {
               "",
               "Commercial",
               ""),
-          row(
+          new SeedRow(
               "PN-FIR-26004",
               "CBG_FIRE",
               "NB",
@@ -192,7 +192,7 @@ final class SubmittedSeedRows {
               "",
               "Residential",
               ""),
-          row(
+          new SeedRow(
               "PN-FIR-26005",
               "CBG_FIRE",
               "NB",
@@ -204,7 +204,7 @@ final class SubmittedSeedRows {
               "",
               "Residential",
               ""),
-          row(
+          new SeedRow(
               "",
               "NONCBG_CORPORATE",
               "NB",
@@ -216,7 +216,7 @@ final class SubmittedSeedRows {
               "",
               "Warehouse",
               ""),
-          row(
+          new SeedRow(
               "",
               "NONCBG_CORPORATE",
               "NB",
@@ -228,7 +228,7 @@ final class SubmittedSeedRows {
               "",
               "Industrial",
               ""),
-          row(
+          new SeedRow(
               "",
               "NONCBG_CORPORATE",
               "RB",
@@ -240,7 +240,7 @@ final class SubmittedSeedRows {
               "",
               "Industrial",
               ""),
-          row(
+          new SeedRow(
               "",
               "NONCBG_RETAIL",
               "NB",
@@ -252,7 +252,7 @@ final class SubmittedSeedRows {
               "",
               "Residential",
               ""),
-          row(
+          new SeedRow(
               "",
               "NONCBG_RETAIL",
               "NB",
@@ -267,8 +267,32 @@ final class SubmittedSeedRows {
 
   private SubmittedSeedRows() {}
 
+  /**
+   * A seed policy.
+   *
+   * @param pn PN number, empty when the source has none
+   * @param segment segment
+   * @param businessType NB or RB
+   * @param assured assured
+   * @param insurer insurer
+   * @param days days to expiry
+   * @param sumInsured sum insured
+   * @param unit unit or location
+   * @param plate plate number (motor)
+   * @param kind vehicle type or occupancy
+   * @param mark FFY, EMP or NT
+   */
   @SuppressWarnings("java:S107") // one seed row
-  private static String[] row(String... values) {
-    return values;
-  }
+  record SeedRow(
+      String pn,
+      String segment,
+      String businessType,
+      String assured,
+      String insurer,
+      String days,
+      String sumInsured,
+      String unit,
+      String plate,
+      String kind,
+      String mark) {}
 }

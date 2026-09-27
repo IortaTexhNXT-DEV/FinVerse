@@ -26,7 +26,14 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { requestActions } from './accessActions';
 import type { RequestAction } from './accessActions';
-import { isGroupProfile, REQUEST_TYPE_LABELS } from './accessRequest';
+import {
+  accessRequestMoves,
+  accessRequestStages,
+  isGroupProfile,
+  REQUEST_TYPE_LABELS,
+} from './accessRequest';
+import { StageStepper } from '@/components/broking/StageStepper';
+import { stageSteps } from '@/components/broking/stageSteps';
 import { RequestApprovers, RequestDetails, RequestHistory } from './AccessRequestTabs';
 import { ReasonDialog } from './ReasonDialog';
 import { UserName } from '@/components/ui/UserName';
@@ -210,6 +217,52 @@ function Banners({
   );
 }
 
+/** The workflow header of the request: stage stepper, current stage and approver, actions. */
+function RequestWorkflow({
+  request: r,
+  actions,
+  onAction,
+}: Readonly<{
+  request: AccessRequest;
+  actions: RequestAction[];
+  onAction: (a: RequestAction) => void;
+}>) {
+  const steps = stageSteps(accessRequestStages(r), r.status, accessRequestMoves(r));
+  const current = steps.find((s) => s.state !== 'done' && s.state !== 'upcoming');
+  return (
+    <section className="workflow-panel" aria-label="Workflow status">
+      <StageStepper steps={steps} />
+      <div className="workflow-head">
+        <dl className="workflow-meta-row">
+          <div>
+            <dt>Current Stage</dt>
+            <dd className="workflow-stage-name">{current?.name ?? humanize(r.status)}</dd>
+          </div>
+          <div>
+            <dt>Submitted</dt>
+            <dd className="nowrap">
+              {r.lifecycle.submittedAt ? (
+                formatDateTime(r.lifecycle.submittedAt)
+              ) : (
+                <span className="muted">—</span>
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt>Assigned To</dt>
+            <dd>
+              <UserName login={r.lifecycle.assignedApprover} />
+            </dd>
+          </div>
+        </dl>
+        <div className="workflow-actions">
+          <ActionButtons actions={actions} onAction={onAction} />
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ActionButtons({
   actions,
   onAction,
@@ -222,6 +275,7 @@ function ActionButtons({
         return (
           <Button
             key={a}
+            size="sm"
             variant={primary ? 'primary' : 'secondary'}
             icon={<Icon size={16} />}
             onClick={() => onAction(a)}
@@ -277,10 +331,10 @@ function RequestView({ request: r }: Readonly<{ request: AccessRequest }>) {
         backTo={isGroupProfile(r.type) ? '/user-access/group-profiles' : '/user-access/requests'}
         title={r.requestNo}
         description={r.summary}
-        actions={<ActionButtons actions={actions} onAction={onAction} />}
       />
       <Banners request={r} decision={decision} />
       <Summary request={r} />
+      <RequestWorkflow request={r} actions={actions} onAction={onAction} />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'details' && <RequestDetails request={r} />}
       {tab === 'approvers' && <RequestApprovers request={r} />}

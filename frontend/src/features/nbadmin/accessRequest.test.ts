@@ -1,5 +1,8 @@
 import type { AccessRequest, RoleInfo, UserAccess } from '@/api/nbadmin';
+import { stageSteps } from '@/components/broking/stageSteps';
 import {
+  accessRequestMoves,
+  accessRequestStages,
   EMPTY_ACCESS_REQUEST,
   fromAccessRequest,
   isCancellable,
@@ -255,5 +258,32 @@ describe('access request mapping', () => {
     expect(back.approvers).toEqual(['uamapprover']);
     expect(isEditable('RETURNED')).toBe(true);
     expect(isCancellable('APPROVED')).toBe(false);
+  });
+});
+
+describe('access request stepper', () => {
+  const lifecycle = { approvers: [], riskFlags: [], secondApprovalRequired: true };
+  const steps = (r: Parameters<typeof accessRequestStages>[0]) =>
+    stageSteps(accessRequestStages(r), r.status, accessRequestMoves(r)).map(
+      (s) => `${s.code}:${s.state}`,
+    );
+
+  it('builds the user request path with the second approval when needed', () => {
+    expect(steps({ type: 'CREATE_USER', status: 'PENDING_SECOND', lifecycle })).toEqual([
+      'DRAFT:done',
+      'PENDING:done',
+      'PENDING_SECOND:current',
+      'APPROVED:upcoming',
+    ]);
+  });
+
+  it('shows a rejected request as ended after the approval', () => {
+    expect(
+      steps({
+        type: 'CREATE_USER',
+        status: 'REJECTED',
+        lifecycle: { ...lifecycle, secondApprovalRequired: false, submittedAt: '2026-09-27' },
+      }),
+    ).toEqual(['DRAFT:done', 'PENDING:done', 'REJECTED:ended']);
   });
 });

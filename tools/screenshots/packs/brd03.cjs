@@ -216,7 +216,11 @@ const callouts = {
   },
 };
 
+// Shots kept as the whole window (menu and header give the navigation context); every other shot is cropped to
+// its dialog or content area (capture_pack.cjs, cropOf).
+const crops = { 'scr-pm-01-01-view': 'full' };
+
 module.exports = {
-  opens, fills, selects: {}, uploads: {}, after: {}, custom: {}, walkthrough: walkthrough.steps, documents: docs, callouts,
+  crops, opens, fills, selects: {}, uploads: {}, after: {}, custom: {}, walkthrough: walkthrough.steps, documents: docs, callouts,
   prepare: walkthrough.prepare, render,
 };

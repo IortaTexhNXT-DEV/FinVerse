@@ -12,6 +12,13 @@
 // status, what to type into a form, which rows to select, which files to upload, how to perform the walkthrough
 // steps and how to render the generated documents. The images are written as optimised PNG to the pack's
 // screenshot folder (meta.screenshot_dir of pack.yaml).
+//
+// Sharpness: every page is rendered at device scale factor 2 (SCALE), so the PNG holds two image pixels per
+// screen pixel and prints sharp. Each shot is cropped to the region that matters (crop rules below), so it can be
+// printed large: an open dialog, the content area without the menu, or the element the recipe names
+// (recipe.crops[slug]: a Playwright selector, 'main', 'dialog' or 'full' for the whole window when the menu and
+// header give the reader the navigation context). The crop kind is written into the PNG ("bibs-crop"), so the
+// Word builder can put full-window shots on landscape pages.
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -25,9 +32,11 @@ const BASE = process.env.BASE || 'http://localhost:5173';
 const API = process.env.API || 'http://localhost:8080';
 const PASSWORD = process.env.SEED_PASSWORD;
 const PYTHON = process.env.PYTHON || 'python3';
-const WIDTH = 1600;
-const HEIGHT = 1000;
+const WIDTH = Number(process.env.WIDTH || 1440);
+const HEIGHT = Number(process.env.HEIGHT || 900);
+const SCALE = Number(process.env.SCALE || 2);
 const MAX_HEIGHT = Number(process.env.MAX_HEIGHT || 2000);
+const MARGIN = 12;  // CSS pixels of page kept around a cropped region
 const READY_TIMEOUT_MS = 20 * 60 * 1000;
 
 if (!PASSWORD) {
@@ -134,8 +143,13 @@ async function settle(page, ms = 800) {
   await page.waitForTimeout(ms);
 }
 
+/** A browser context at the capture size and scale (recipes use it for users that are not seed personas). */
+function newContext(browser, options = {}) {
+  return browser.newContext({ viewport: { width: WIDTH, height: HEIGHT }, deviceScaleFactor: SCALE, ...options });
+}
+
 async function signIn(browser, user) {
-  const context = await browser.newContext({ viewport: { width: WIDTH, height: HEIGHT } });
+  const context = await newContext(browser);
   const page = await context.newPage();
   page.setDefaultTimeout(20000);
   await page.goto(`${BASE}/login`);
@@ -332,18 +346,20 @@ async function drawCallouts(page, callouts) {
       const r = el.getBoundingClientRect();
       // Beside a label (left of its first letter); inside the top-left corner of a column header or tab.
       const inside = el.matches('th, [role=columnheader], [role=tab], button, input, textarea');
-      let x = r.left + window.scrollX + (inside ? 2 : -23);
-      let y = r.top + window.scrollY + (inside ? -8 : Math.min(r.height, 24) / 2 - 10);
+      let x = r.left + window.scrollX + (inside ? 2 : -29);
+      let y = r.top + window.scrollY + (inside ? -10 : Math.min(r.height, 26) / 2 - 13);
       // Keep badges of neighbouring fields apart.
-      while (taken.some(([a, b]) => Math.abs(a - x) < 22 && Math.abs(b - y) < 22)) {
-        x += 24;
+      while (taken.some(([a, b]) => Math.abs(a - x) < 28 && Math.abs(b - y) < 28)) {
+        x += 30;
       }
       taken.push([x, y]);
       const badge = document.createElement('div');
       badge.textContent = String(no);
-      badge.style.cssText = `position:absolute;left:${Math.max(2, x)}px;top:${Math.max(2, y)}px;min-width:20px;` +
-        'height:20px;padding:0 4px;box-sizing:border-box;border-radius:10px;background:#004EA8;color:#fff;' +
-        'font:700 11px/16px Arial,sans-serif;text-align:center;border:2px solid #FDB913;' +
+      // Large enough to read on a printed page: 26 px, bold 15 px digits, Header Blue with the Yellow ring.
+      badge.setAttribute('data-callout-badge', '');
+      badge.style.cssText = `position:absolute;left:${Math.max(2, x)}px;top:${Math.max(2, y)}px;min-width:26px;` +
+        'height:26px;padding:0 5px;box-sizing:border-box;border-radius:13px;background:#004EA8;color:#fff;' +
+        'font:700 15px/22px Arial,sans-serif;text-align:center;border:2px solid #FDB913;' +
         'box-shadow:0 1px 3px rgba(0,0,0,.35);';
       layer.appendChild(badge);
     }
@@ -370,16 +386,122 @@ async function fitViewport(page, tall) {
   await page.waitForTimeout(300);
 }
 
-function optimise(file) {
+/**
+ * Stores the PNG compactly without visible loss: a screen of flat colours keeps a 256-colour palette (no dither);
+ * a photo-like image (the sign-in background, a rendered page with pictures) stays full colour. The crop kind is
+ * written as the PNG text "bibs-crop".
+ */
+function optimise(file, crop = '') {
   const script = [
     'import sys',
-    'from PIL import Image',
-    'p = sys.argv[1]',
+    'from PIL import Image, PngImagePlugin',
+    'p, crop = sys.argv[1], sys.argv[2]',
     'im = Image.open(p).convert("RGB")',
-    'q = im.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)',
-    'q.save(p, optimize=True)',
+    'info = PngImagePlugin.PngInfo()',
+    'if crop:',
+    '    info.add_text("bibs-crop", crop)',
+    'photo = im.getcolors(maxcolors=60000) is None',
+    'out = im if photo else im.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE)',
+    'out.save(p, optimize=True, pnginfo=info)',
   ].join('\n');
-  execFileSync(PYTHON, ['-c', script, file]);
+  execFileSync(PYTHON, ['-c', script, file, crop]);
+}
+
+// ------------------------------------------------------------------ crop
+
+/**
+ * The region of the page to keep, in CSS pixels, and its kind. Rules, first match wins:
+ * recipe.crops[slug] (or `crop` of the shot in the pack), then an open dialog, then the content area (main).
+ * A named region is widened to the callout badges and the last message (toast) that belong to it.
+ */
+async function cropOf(page, shot, recipe) {
+  const rule = (recipe.crops && recipe.crops[shot.slug]) || shot.crop || 'auto';
+  if (rule === 'full') {
+    return { kind: 'full', clip: null };
+  }
+  let kind = rule;
+  let boxes = [];
+  const visibleBoxes = async (locator) => {
+    const out = [];
+    for (const el of await locator.all()) {
+      if (await el.isVisible().catch(() => false)) {
+        const b = await el.boundingBox();
+        if (b && b.width > 4 && b.height > 4) {
+          out.push(b);
+        }
+      }
+    }
+    return out;
+  };
+  if (rule === 'auto' || rule === 'dialog') {
+    const dialogs = await visibleBoxes(page.locator('dialog[open], [role=dialog]'));
+    if (dialogs.length) {
+      kind = 'dialog';
+      boxes = [dialogs[dialogs.length - 1]];
+    } else if (rule === 'dialog') {
+      throw new Error('crop dialog: no dialog open');
+    }
+  }
+  if (boxes.length === 0 && rule !== 'auto' && rule !== 'main' && rule !== 'dialog') {
+    boxes = await visibleBoxes(page.locator(rule));
+    if (boxes.length === 0) {
+      throw new Error(`crop ${rule}: no such element on the page`);
+    }
+    kind = 'region';
+  }
+  if (boxes.length === 0) {
+    // The content area without the menu and the header, trimmed to what is drawn in it.
+    kind = 'main';
+    const box = await page.evaluate(() => {
+      const main = document.querySelector('main.app-main, main');
+      if (!main) {
+        return null;
+      }
+      const m = main.getBoundingClientRect();
+      let right = m.left + 1;
+      let bottom = m.top + 1;
+      for (const el of main.querySelectorAll('*')) {
+        const r = el.getBoundingClientRect();
+        if (r.width < 1 || r.height < 1 || getComputedStyle(el).visibility === 'hidden') {
+          continue;
+        }
+        right = Math.max(right, Math.min(r.right, m.right));
+        bottom = Math.max(bottom, r.bottom);
+      }
+      return { x: m.left, y: m.top, width: right - m.left, height: bottom - m.top };
+    });
+    boxes = box ? [box] : [];
+  }
+  if (boxes.length === 0) {
+    return { kind: 'full', clip: null };
+  }
+  let [x0, y0, x1, y1] = [Infinity, Infinity, -Infinity, -Infinity];
+  const add = (b) => {
+    x0 = Math.min(x0, b.x); y0 = Math.min(y0, b.y);
+    x1 = Math.max(x1, b.x + b.width); y1 = Math.max(y1, b.y + b.height);
+  };
+  boxes.forEach(add);
+  // Badges drawn for this region (a badge sits just left of its label) and the message just shown.
+  const near = (b) => b.x + b.width >= x0 - 60 && b.x <= x1 + 60 && b.y + b.height >= y0 - 60 && b.y <= y1 + 60;
+  for (const b of await visibleBoxes(page.locator('[data-callout-badge]'))) {
+    if (kind === 'main' || near(b)) {
+      add(b);
+    }
+  }
+  for (const b of await visibleBoxes(page.locator('.toast-region .toast'))) {
+    if (kind === 'main') {
+      add(b);
+    }
+  }
+  const view = page.viewportSize();
+  const x = Math.max(0, Math.floor(x0 - MARGIN));
+  const y = Math.max(0, Math.floor(y0 - MARGIN));
+  const clip = {
+    x, y,
+    width: Math.min(view.width, Math.ceil(x1 + MARGIN)) - x,
+    height: Math.min(view.height, Math.ceil(y1 + MARGIN)) - y,
+  };
+  return { kind, clip };
 }
 
 // ------------------------------------------------------------------ main
@@ -402,7 +524,7 @@ function optimise(file) {
     return page;
   };
   const ctx = { BASE, API, ROOT, sql, one, api, settle, openFirstRecord, clickButton, openTab, fillField, runSteps,
-    pageOf, browser, OUT, state: {} };
+    pageOf, browser, OUT, state: {}, WIDTH, HEIGHT, SCALE, newContext: (options) => newContext(browser, options) };
   // Callouts of a screen go on every image of that screen where the field is visible.
   const calloutsOf = {};
   manifest.shots.forEach((s) => {
@@ -429,7 +551,7 @@ function optimise(file) {
       let page;
       if (shot.state === 'document') {
         await recipe.documents[shot.slug](ctx, file);
-        optimise(file);
+        optimise(file, 'document');
         report.push(`${shot.slug}: document`);
         console.log('captured', shot.slug);
         continue;
@@ -438,7 +560,7 @@ function optimise(file) {
         // A state reached by several actions (an upload flow); returns the page, or null when it wrote the image.
         page = await recipe.custom[shot.slug](ctx, shot, file);
         if (page === null) {
-          optimise(file);
+          optimise(file, 'document');
           report.push(`${shot.slug}: rendered file`);
           console.log('captured', shot.slug);
           continue;
@@ -465,12 +587,14 @@ function optimise(file) {
       });
       await fitViewport(page, shot.tall);
       const missing = shot.state === 'walkthrough' ? [] : await drawCallouts(page, calloutsOf[shot.screen]);
-      await page.screenshot({ path: file });
+      const { kind, clip } = await cropOf(page, shot, recipe);
+      await page.screenshot(clip ? { path: file, clip } : { path: file });
       await clearCallouts(page);
-      optimise(file);
+      optimise(file, kind);
       const placed = shot.state === 'walkthrough' ? 0 : (calloutsOf[shot.screen] || []).length - missing.length;
-      report.push(`${shot.slug}: ${new URL(page.url()).pathname}, ${placed} callouts`);
-      console.log('captured', shot.slug, new URL(page.url()).pathname, `${placed} callouts`);
+      const size = clip ? `${Math.round(clip.width)}x${Math.round(clip.height)}` : 'window';
+      report.push(`${shot.slug}: ${new URL(page.url()).pathname}, ${kind} ${size}, ${placed} callouts`);
+      console.log('captured', shot.slug, new URL(page.url()).pathname, kind, size, `${placed} callouts`);
     } catch (e) {
       // The page as it was when the shot failed, for the person running the capture (not kept in the pack).
       for (const [user, p] of pages.entries()) {

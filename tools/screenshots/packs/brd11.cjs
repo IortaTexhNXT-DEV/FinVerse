@@ -33,7 +33,7 @@ async function apiLogin(ctx, username, password) {
 
 /** A browser page of its own, signed in as `user` with `password` (users that are not seed personas). */
 async function freshPage(ctx, user, password, clock = false) {
-  const context = await ctx.browser.newContext({ viewport: { width: 1600, height: 1000 } });
+  const context = await ctx.newContext();
   const page = await context.newPage();
   page.setDefaultTimeout(20000);
   if (clock) {
@@ -219,7 +219,11 @@ const documents = {
   'doc-access-matrix': (ctx, out) => download(ctx, 'auditor', '/nbadmin/access-matrix/export', out, 'xlsx'),
 };
 
+// Shots kept as the whole window (the sign-in pages have no menu and are always whole; the home page shows the
+// menu of the persona); every other shot is cropped to its dialog or content area (capture_pack.cjs, cropOf).
+const crops = { 'scr-ua-05-01-view': 'full' };
+
 module.exports = {
-  opens, fills, selects: {}, uploads: {}, after: {}, custom, walkthrough: walkthrough.steps, documents,
+  crops, opens, fills, selects: {}, uploads: {}, after: {}, custom, walkthrough: walkthrough.steps, documents,
   prepare: walkthrough.prepare, render,
 };

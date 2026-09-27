@@ -214,5 +214,9 @@ const selects = {
 // Extra steps after the standard ones, by slug.
 const after = {};
 
-module.exports = { opens, fills, selects, after, custom: walkthrough.bulk, walkthrough: walkthrough.steps, documents: documents.shots,
+// Shots kept as the whole window (menu and header give the navigation context); every other shot is cropped to
+// its dialog or content area (capture_pack.cjs, cropOf).
+const crops = { 'scr-nb-01-01-list': 'full' };
+
+module.exports = { opens, fills, selects, after, crops, custom: walkthrough.bulk, walkthrough: walkthrough.steps, documents: documents.shots,
   prepare: walkthrough.prepare };

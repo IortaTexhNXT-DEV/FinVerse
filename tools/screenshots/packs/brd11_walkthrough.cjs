@@ -41,7 +41,7 @@ async function openRequest(ctx, user, id, tabName) {
 
 /** A page of its own for a user that is not a seed persona (the new user of walkthrough A). */
 async function ownPage(ctx, user, password) {
-  const context = await ctx.browser.newContext({ viewport: { width: 1600, height: 1000 } });
+  const context = await ctx.newContext();
   const page = await context.newPage();
   page.setDefaultTimeout(20000);
   await page.goto(`${ctx.BASE}/login`);

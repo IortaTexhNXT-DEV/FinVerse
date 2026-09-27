@@ -19,13 +19,13 @@ control:
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Solution Architect
     approver: ""
-    change: Internal draft from the BRD-2 baseline and the build design
+    change: Internal draft from the BRD-2 baseline
   - version: "1.0"
     date: 25 Sep 2026
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Operations Head (pending)
-    change: First issue for BDOI review; aligned with the as-built Operations modules and the cross-BRD decisions
+    change: First issue for BDOI review; aligned with the Operations screens and the cross-BRD decisions
   - version: "1.1"
     date: 26 Sep 2026
     author: iorta TechNXT Business Analysis
@@ -41,7 +41,7 @@ distribution:
   - {name: "Retail, Corporate and Commercial Marketing", role: Business user, organisation: BDOI, purpose: Review of the Marketing Collection items}
   - {name: Comptrollership, role: Business user, organisation: BDOI, purpose: "Review of accounting events, BIR certificates and reports"}
   - {name: Business Project Services, role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Build, test and UAT preparation"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, test and UAT preparation"}
 ---
 
 # Introduction
@@ -50,7 +50,7 @@ distribution:
 
 This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker System, on iNXT BrokerVerse) meets the Operations business requirements of BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It turns each BRD requirement into functional requirements with actors, flows, rules, validations, screens, fields, notifications, audit and acceptance criteria.
 
-BDOI uses this document to confirm that the system behaves as the business expects. The project team uses it to test and prepare user acceptance testing (UAT). The Operations modules are built, so this FRS describes the behaviour of the delivered screens and services. Where the built behaviour differs from the BRD text, the FR describes the built behaviour and records the difference in a note with its reference (section 1.6 lists them). Every FR cites the BRD requirement it meets and the BRD page.
+BDOI uses this document to confirm that the system behaves as the business expects. The project team uses it to test and prepare user acceptance testing (UAT). The FRs describe the proposed behaviour of the Operations screens. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, the FR says so in a note and chapter 12 lists each such point for confirmation. Every FR cites the BRD requirement it meets and the BRD page.
 
 ## Scope
 
@@ -71,7 +71,7 @@ Operations takes over every invoice booked in New Business (BRD-1) and follows i
 
 **Out of scope for this phase:**
 
-- The Collection system, the Disbursement system and the Accounting (GL mapping) specification. BRD-4 Collections and BRD-5 Accounting, Disbursement and Accounting Controls answer these questions and design the replacements; Operations keeps the seams described in section 7 (OQ01, OQ02, OQ07).
+- The Collection system, the Disbursement system and the Accounting (GL mapping) specification. BRD-4 Collections and BRD-5 Accounting, Disbursement and Accounting Controls answer these questions; until they are in place Operations uses the uploads and the Disbursement queue described in section 7 (OQ01, OQ02, OQ07).
 - External transports (SFTP, APIs, shared drive folders) to insurers, BDO bank channels and the Marketing and Claims systems. Files are uploaded and sent by e-mail in this phase (OQ17, OQ22, OQ29).
 - The payout of incentives to branches. Operations computes and posts them and hands the pass-on to Disbursement (CMRID.006, OQ39).
 
@@ -145,38 +145,6 @@ Each FR in section 4 has the same parts:
 > Values marked "default" (holding days, tolerances, SLA hours, list entries) are placeholders that BDOI confirms through the open questions in section 10.3. They are configuration, so a changed answer does not need a change to the system.
 
 
-## Differences between the built behaviour and the BRD
-
-The table lists where the delivered behaviour differs from the BRD text or fills a gap the BRD leaves open. Each difference is also a note in its FR. None of them removes a BRD requirement; most wait for an answer from BDOI and are configuration.
-
-<!-- table: widths=2.2,5.6,6.6,2.4 caption="Recorded differences (built behaviour against the BRD)" size=8.5 -->
-| BRD ID | BRD says | BIBS does | Ref. |
-|---|---|---|---|
-| BRQID.003 | Users customise or filter the Operations sections | Sections are filtered by role; personal pin or hide of sections is not built | FR-OP-003 |
-| RMTID.040 | Lock while the invoice is "still with Comptrollership" | Remittance and Adjustment locks are built; no Comptrollership lock until BDOI names the activity | OQ28 |
-| PRCID.009 | Receive and upload the insurer report automatically | The handler uploads the file; mailbox / SFTP pick-up is a parked seam | OQ29 |
-| MKTID.001 | Marketing initiates the request to send the schedule | The Remittance processor sends the approved schedule from the batch, once | OQ22 |
-| RMTID.002 | Main BRD: edit the extracted file online and push it with or without edits | The addendum governs: rows are excluded and restored with a reason; financial fields cannot be edited | Addendum p.4 |
-| CSHID.001-005 | Cancellation and reinstatement without a stated approver | A cancellation or reinstatement is a request approved by a Cashiering TL / TH (four eyes) before it posts | OQ06 |
-| CSHID.007 | One OR per remittance batch, or per payment unless consolidated | Remittance approval issues one commission OR per batch; the Collection upload issues one OR per insurer, certificate and payment | OQ49 |
-| CSHID.008 | Files "encrypted and cannot be edited"; Trade, CLPC and Direct Credit run by IT (FS04) | Operations users upload the files; each file is stored read-only with its SHA-256 and a duplicate file is refused; layouts are configurable | OQ03, OQ04 |
-| CSHID.016 / ADJID.026 | PR <= 10.00 reversed; file 10.00-100.00 written off (10.00 in both) | The sweep skips an invoice already written off by the file, so a balance is never reversed twice | OQ11 |
-| RMTID.005 | Trigger extraction at end of day "if payment application is searched" | A user queues the searched invoice for the evening extraction run | OQ18 |
-| RMTID.014 | Expected result: remit the DTIP balance; acceptance criteria: flag and exclude | Excluded by default (`EXCLUDE`); `CAP` remits the DTIP balance only | OQ19 |
-| RMTID.016 | Compare insurer OR amount with paid PR | Exact comparison per invoice; no tolerance until BDOI gives one | OQ22 |
-| RMTID.017 | Checks at least 3 banking days old and cleared | Counted in banking days from the last applied value date on the branch calendar; the cleared status comes from the payment application | OQ20 |
-| RMTID.019 | Eight statuses that mix payment and remittance states | The invoice keeps a payment status and a remittance status; the batch has its own workflow stages | OQ21 |
-| MKTID.009 | Claims condition validated | The claims condition is confirmed through the Claims feed when it is connected; until then the request carries a note | OQ46 |
-| PRCID.002 | Only the Remarks column is editable | Remarks and Incentive columns and 200 blank rows are editable, so the insurer can add unbooked production | PRCID.022 |
-| PRCID.014 / 021 | Filter by BDOI location | The items filter by AO, sales unit, segment and product line; the location filter is on the reports only | R4 |
-| PRCID.030 | Four statuses | A fifth status BDOI_ONLY marks booked accounts the insurer did not return | R6 5.1 |
-| Annex IV #5 | Sum Insured on the production register | The column is left out: the invoice ledger does not hold the sum insured | R6 5.7 |
-| ADJID.001 | Multiple accounts in one transaction | One request per invoice; the wizard and the upload raise several requests at once | R6 4.1 |
-| ADJID.003 | Marketing updates the account through a non-financial endorsement | Booking records the non-financial endorsement with its description; the account data are not changed | OQ32 |
-| ADJID.008 | Prompt the AO to prepare a quotation | A hand-off to Marketing; the quotation number is linked on the request by reference | R6 4.1 |
-| MKTID.012 | Auto-reverse the DP premium receivable | The ledger reversal is always recorded; its GL entry is off (`DP_PR_REVERSAL_POSTING`) because booking posts no PR for DP invoices | OQ07 |
-| CMRID.005 / 006 | No Touch, Top Up and Motor Mania incentives | The scheme engine is built; the schemes stay inactive without tiers until BDOI gives targets and amounts | OQ39 |
-| BRQID.004, CSHID.009, MKTID.010 / 013, CMRID.001, DBMID.001, RMTID.034 | Integration with Collection and Disbursement | Built as ports with uploads and an in-app Disbursement queue; BRD-4 and BRD-5 now design the replacements | OQ01, OQ02, OQ45 |
 
 # Business context and process overview
 
@@ -286,7 +254,7 @@ Segregation of duties is enforced by the system, whatever the role grants: a rec
 
 ## Permissions matrix
 
-The table below is the role-to-permission matrix provided with the system (migration V760; "Y" = granted). Every Operations role also has WORK_VIEW, REPORT_VIEW, ATTACHMENT_VIEW, CLIENT_VIEW and ACCOUNT_VIEW. Handler and team leader roles have BULK_PROCESS and ATTACHMENT_MANAGE; team leaders have WORK_ASSIGN.
+The table below is the proposed role-to-permission matrix ("Y" = granted). Every Operations role also has WORK_VIEW, REPORT_VIEW, ATTACHMENT_VIEW, CLIENT_VIEW and ACCOUNT_VIEW. Handler and team leader roles have BULK_PROCESS and ATTACHMENT_MANAGE; team leaders have WORK_ASSIGN.
 
 <!-- landscape -->
 
@@ -326,7 +294,7 @@ brd: [BRQID.001 (p.16)]
 actor: Operations users
 priority: Must have
 screens: Login
-description: Operations users log in with their BIBS user ID and password. Operations uses the platform log-in built for BRD-1; it adds no screen of its own.
+description: Operations users log in with their BIBS user ID and password. Operations uses the BIBS log-in of BRD-1; it adds no screen of its own.
 preconditions:
   - The user has an active BIBS account with at least one Operations role (section 3).
 main_flow:
@@ -422,7 +390,7 @@ acceptance:
 ```
 
 > [!NOTE] Difference from the BRD
-> BRQID.003 AC3 asks that users can customise or filter the sections. BIBS filters the sections by role; a personal pin or hide of sections is not built. The request can be raised as a change if BDOI needs it.
+> BRQID.003 AC3 asks that users can customise or filter the sections. BIBS filters the sections by role; a personal pin or hide of sections is not proposed (chapter 12, CLR-OP-01).
 
 ```fr
 id: FR-OP-004
@@ -557,7 +525,7 @@ validations: []
 notifications:
   - "None."
 audit:
-  - The change per insurer is kept on the request (adj_request_share).
+  - The change per insurer is kept on the request.
 acceptance:
   - A 60/40 co-insured invoice shows both insurers on Invoice 360.
   - A premium decrease of 1,000.00 on it is split 600.00 / 400.00 on the request's insurer breakdown.
@@ -1011,7 +979,7 @@ acceptance:
 ```
 
 > [!NOTE] Superseded source
-> The source of pick-up requests is the Collection system (OQ01, OQ13). BRD-4 Collections turns it into an in-app Collections disposition; the Cashiering queue and **Print ARs** stay as built.
+> The source of pick-up requests is the Collection system (OQ01, OQ13). BRD-4 Collections turns it into an in-app Collections disposition; the Cashiering queue and **Print ARs** stay as described here.
 
 ```fr
 id: FR-OP-018
@@ -1352,7 +1320,7 @@ acceptance:
 ```
 
 > [!NOTE] Superseded source
-> The Marketing tagging is replaced in BRD-4 by the Collections disposition "PR 2307 for reversal" (OQ45); the Disbursement step moves to the Disbursement module of BRD-5 (OQ02). The Cashiering validation, report and postings stay as built.
+> The Marketing tagging is replaced in BRD-4 by the Collections disposition "PR 2307 for reversal" (OQ45); the Disbursement step moves to the Disbursement module of BRD-5 (OQ02). The Cashiering validation, report and postings stay as described here.
 
 ```fr
 id: FR-OP-027
@@ -1465,7 +1433,7 @@ acceptance:
 ```
 
 > [!NOTE] Difference from the BRD
-> RMTID.005 asks to "trigger extraction at the end of day if payment application is searched" (OQ18). BIBS lets the processor queue the searched invoice for the evening run. RMTID.001 asks to save extracts on a shared drive with a folder per type; BIBS stores them in the in-system extract repository behind the FileDropPort seam (OQ17).
+> RMTID.005 asks to "trigger extraction at the end of day if payment application is searched" (OQ18). BIBS lets the processor queue the searched invoice for the evening run. RMTID.001 asks to save extracts on a shared drive with a folder per type; BIBS stores them in the list of extracts, from which the user downloads them; a copy to a shared drive is added when BDOI specifies it (OQ17).
 
 ```fr
 id: FR-OP-031
@@ -1529,7 +1497,7 @@ alternate_flows:
   - Restore. The processor restores an excluded line; BIBS locks the invoice again.
   - The invoice can no longer be restored (taken by another batch, changed status). BIBS refuses the restore.
 rules:
-  - [R1, "Exclusion only; no endpoint changes amounts.", Fixed, "-"]
+  - [R1, "Exclusion only; amounts cannot be changed.", Fixed, "-"]
   - [R2, "Exclusion reasons from the list.", Configurable, LOV REMIT_EXCLUSION_REASON]
   - [R3, "Exclusion and restore only while the batch can change.", Fixed, "-"]
 validations:
@@ -2078,7 +2046,7 @@ main_flow:
   - Marketing prepares the quotation; the user enters the **Quotation No.** on the request.
   - The processor validates the request.
 rules:
-  - [R1, "Limit from the catalogue product (max_sum_insured); insurer capacity per product to be confirmed (OQ33).", Configurable, Catalogue]
+  - [R1, "Limit from the maximum sum insured of the catalogue product; insurer capacity per product to be confirmed (OQ33).", Configurable, Catalogue]
 validations:
   - [Validation before the quotation, "The TSI increase exceeds the package limit: link the quotation prepared by Marketing first (ADJID.008)", ADJ_QUOTATION_REQUIRED]
   - [Link without number, Enter the quotation number, ADJ_QUOTATION_REF_REQUIRED]
@@ -2315,7 +2283,7 @@ acceptance:
 
 Production Reconciliation sends each insurer a register of the accounts BDOI booked with it, takes in the insurer's answer, matches both sides and follows every difference to closure. The work is organised in cycles: one open cycle per insurer and production month (workflow OPS_RECON, section 5).
 
-BDOI places Production Reconciliation in **Drop 2** (drop plan of 26-Sep-2026): it is built with Operations and is tested and signed off in the Drop 2 SIT and UAT. The deliverables index of Drop 2 points to this chapter.
+BDOI places Production Reconciliation in **Drop 2** (drop plan of 26-Sep-2026): it is specified with Operations and is tested and signed off in the Drop 2 SIT and UAT. The deliverables index of Drop 2 points to this chapter.
 
 ```fr
 id: FR-OP-070
@@ -2397,7 +2365,7 @@ description:
 preconditions:
   - An extract exists.
 main_flow:
-  - BIBS builds the workbook from the extract lines.
+  - BIBS creates the workbook from the extract lines.
   - BIBS names it and stores it in the extract repository.
 rules:
   - [R1, "File name pattern, default <INSURER>_PRODREG_<yyyyMM>_<seq>.", Configurable, Parameter PRODRECON_FILE_PATTERN]
@@ -2469,7 +2437,7 @@ alternate_flows:
   - Duplicate file. Refused; the attempt is recorded.
   - Layout wrong. Refused with the missing column.
 rules:
-  - [R1, "Upload by the handler; automatic pick-up from mailbox or SFTP is parked (InsurerFileInbox).", Fixed, "-"]
+  - [R1, "Upload by the handler; automatic pick-up from a mailbox or SFTP is added when BDOI specifies the insurer channels (OQ29).", Fixed, "-"]
   - [R2, "Duplicate by file content (SHA-256).", Fixed, "-"]
 validations:
   - [Duplicate file, "Upload refused: <earlier upload>", RECON_UPLOAD_DUPLICATE]
@@ -2489,7 +2457,7 @@ acceptance:
 ```
 
 > [!NOTE] Difference from the BRD
-> PRCID.009 asks to receive and upload the insurer report automatically. Insurer channels are not specified (OQ29); the handler uploads the file, and the InsurerFileInbox seam takes a mailbox or SFTP later without a change to the matching.
+> PRCID.009 asks to receive and upload the insurer report automatically. Insurer channels are not specified (OQ29); the handler uploads the file; a mailbox or SFTP pick-up is added later without a change to the matching (chapter 12, CLR-OP-03).
 
 ```fr
 id: FR-OP-075
@@ -2628,7 +2596,7 @@ brd: [PRCID.029 (p.85)]
 actor: Recon Handler
 priority: Must have
 screens: Reconciliation Cycles; Reconciliation Cycle (workflow panel, History)
-description: The cycle keeps its counts per bucket and its history (timestamps, actions, users). It closes by itself (for_closure) when every item is matched or marked for closure; otherwise the handler closes it with a comment.
+description: The cycle keeps its counts per bucket and its history (timestamps, actions, users). It closes by itself when every item is matched or marked for closure; otherwise the handler closes it with a comment.
 preconditions:
   - The cycle is RECONCILING.
 main_flow:
@@ -2712,7 +2680,7 @@ acceptance:
 ```
 
 > [!NOTE] Superseded source
-> CMRID.001 names shared folders of Head Office and branches. BRD-4 Collections replaces the DP list by the Collections disposition "DP PR for reversal" (OQ38); the upload stays as built until then.
+> CMRID.001 names shared folders of Head Office and branches. BRD-4 Collections replaces the DP list by the Collections disposition "DP PR for reversal" (OQ38); the upload stays until then.
 
 ```fr
 id: FR-OP-091
@@ -3013,7 +2981,7 @@ acceptance:
 
 ## Marketing Collection items
 
-The MKTID requirements are activities of Marketing (Marketing Collection HO and branches, Marketing TL / UH) that feed Operations. BRD-4 Collections confirmed that MKTID.001-009 and MKTID.011 stay in Operations as built; the 2307 and DP tagging (MKTID.010, 012, 013) move to the Collections dispositions (OQ45).
+The MKTID requirements are activities of Marketing (Marketing Collection HO and branches, Marketing TL / UH) that feed Operations. BRD-4 Collections confirmed that MKTID.001-009 and MKTID.011 stay in Operations as described here; the 2307 and DP tagging (MKTID.010, 012, 013) move to the Collections dispositions (OQ45).
 
 <!-- table: widths=2.4,7,4,3.2 caption="Marketing items and where they are specified" size=8.5 -->
 | BRD ID | Activity | FR | Status after BRD-4 |
@@ -3289,16 +3257,16 @@ actor: System
 priority: Must have
 screens: Interfaces; Hand-offs and Extracts
 description:
-  - "Operations exchanges data with the systems it depends on through ports with a default adapter: CollectionFeed (check pick-up, 2307 tags, commission payments, holds, special remittances, DP lists, returned DP accounts, refunds), DisbursementGateway (payment requests and statuses), InsurerFileInbox (insurer files), FileDropPort (shared drive), MarketingFeed and ClaimsFeed. The defaults are manual uploads, the in-app Disbursement queue and the in-system extract repository; no integration is simulated. Section 7 lists each interface and its status."
+  - "Operations exchanges data with the systems it depends on: the Collection feeds (check pick-up, 2307 tags, commission payments, holds, special remittances, DP lists, returned DP accounts, refunds), the Disbursement requests and statuses, the insurer files, the shared drive, and the Marketing and Claims feeds. Until each system is specified, the exchange is a manual upload, the in-app Disbursement queue or the list of extracts. Section 7 lists each interface and its scope."
   - Work that a default adapter cannot complete alone (an OR or an unapplied item requested while Cashiering is not installed, a quotation for a TSI increase) becomes an open hand-off for the responsible team on Hand-offs and Extracts; the team closes it with what was done.
 preconditions:
   - "None."
 main_flow:
   - A module calls a port.
-  - The adapter sends or receives the data (upload, queue, repository).
+  - BIBS sends or receives the data (upload, queue, list of extracts).
   - Failures are recorded and alerted (FR-OP-131).
 rules:
-  - [R1, "Transports are adapters; a new transport does not change the modules.", Fixed, "-"]
+  - [R1, "A new transfer to another system does not change the Operations screens.", Fixed, "-"]
 validations:
   - [Hand-off already closed, The hand-off is already closed, HANDOFF_CLOSED]
 notifications:
@@ -3307,7 +3275,7 @@ audit:
   - Every exchange is a flow-in run with its records, or a queue entry.
 acceptance:
   - A remittance approval creates a request in the Disbursement queue.
-  - An extract for the shared drive is stored in the extract repository and downloadable.
+  - An extract for the shared drive is stored in the list of extracts and downloadable.
 ```
 
 > [!NOTE] Superseded by BRD-4 and BRD-5
@@ -3467,7 +3435,7 @@ In the figures, solid arrows are the main path, dashed arrows are returns and op
 
 ## Accounting events
 
-Every Operations posting is a business event; Comptrollership configures the GL rule of each event (maker-checker), and no GL account is chosen in code (OQ07). The entries below are the defaults of the build design with the seed chart of accounts. All events carry the party, cost centre and business line, and are priced at the BOOK rate when not in pesos.
+Every Operations posting is a business event; Comptrollership configures the GL rule of each event (maker-checker), and no GL account is chosen in code (OQ07). The entries below are the proposed defaults with the seed chart of accounts. All events carry the party, cost centre and business line, and are priced at the BOOK rate when not in pesos.
 
 <!-- table: widths=5.6,3.8,7.2 caption="Operations accounting events and default entries" size=8 -->
 | Event | Transaction | Default entry |
@@ -3602,7 +3570,7 @@ All Operations reports are in the report category Operations, need OPS_REPORT_VI
 
 Figure 12 shows the interfaces of Operations. The modules exchange data only through the invoice ledger, its events and its ports; each external system is behind a port whose default adapter is an upload, the in-app Disbursement queue or the extract repository.
 
-![Interfaces of Operations (dashed = parked or replaced by a later BRD)](figures/brd02_integration.dot)
+![Interfaces of Operations (dashed = on hold or replaced by a later BRD)](figures/brd02_integration.dot)
 
 <!-- table: widths=4.4,1.8,5.6,2.6,2.6 caption="Interfaces and flow-in feeds" status=Scope size=8 -->
 | Interface / feed | Direction | Content and trigger | BRD | Scope |
@@ -3624,11 +3592,11 @@ Figure 12 shows the interfaces of Operations. The modules exchange data only thr
 | COLLECTION_DP_LIST | In (upload) | DP lists of HO and branches | CMRID.001 | SUPERSEDED |
 | COLLECTION_DP_RETURNED, COLLECTION_REFUND | Out | Rejected DP accounts; refunds | CMRID.009; CSHID.024 | IN SCOPE |
 | DISBURSEMENT_REQUEST / _STATUS | Out / In | Payment requests; DV and status (in-app queue) | RMTID.034; DBMID.001 | SUPERSEDED |
-| Shared drive (FileDropPort) | Out | Extract files | RMTID.001; PRCID.005 | ON HOLD |
+| Shared drive | Out | Extract files | RMTID.001; PRCID.005 | ON HOLD |
 | OBPCS, Old BOB, PMS, TFS (BDOI channels, Drop 0) | In (upload) | Bills payment, SOA funds-transfer, PDC and Trade payment files on the handlers PAY_BILLS, PAY_DIRECT_CREDIT, PAY_PDC, PAY_TRADE | CSHID.008 | IN SCOPE |
-| MarketingFeed, ClaimsFeed | In | Marketing data; claims for special remittance | BRQID.004; MKTID.009 | ON HOLD |
+| Marketing and Claims feeds | In | Marketing data; claims for special remittance | BRQID.004; MKTID.009 | ON HOLD |
 
-SUPERSEDED means built as a seam in Operations, with the replacement designed in BRD-4 Collections or BRD-5 Accounting and Disbursement (R4). PARKED means the transport waits for BDOI's specification (OQ17, OQ45, OQ46).
+SUPERSEDED means an upload or queue in Operations that BRD-4 Collections or BRD-5 Accounting and Disbursement replaces. ON HOLD means the transfer waits for BDOI's specification (OQ17, OQ45, OQ46).
 
 > [!PARKED] Parked transports
 > Insurer SFTP / portal channels, BDO bank file transports (FS01 / FS04) and the shared drive are not specified in the BRD (OQ03, OQ17, OQ22, OQ29). Adding a transport is a new adapter of the existing port, with no change to the modules.
@@ -3703,7 +3671,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 <!-- table: widths=5,3.4,8.2 caption="Operations jobs (times in PHT)" size=8.5 -->
 | Job | Default | Purpose |
 |---|---|---|
-| OPS_INVOICE_FEED_REPLAY | Manual | Rebuild or replay the invoice ledger from booking |
+| OPS_INVOICE_FEED_REPLAY | Manual | Replay the invoice ledger from booking |
 | PREBOOKED_REMATCH | Every 2 hours | Apply pre-booked payments of accounts now booked |
 | PAYMENT_AUTOMATCH | Hourly | Match unapplied payments again |
 | PDC_MATURITY | 08:30 (00:30 UTC) | Turn matured PDCs into payments |
@@ -3817,7 +3785,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 
 # Traceability
 
-Every BRD-2 requirement ID (169) is met by at least one FR. The page is the page of the BRD-2 PDF ("add." = Addendum 1). The build status comes from the requirements traceability (R4): BUILT = built and tested; SEAM = built and tested, with a value, layout or integration BDOI has not given kept as a seam; SUPERSEDED = built as a seam, with the replacement designed in BRD-4 or BRD-5.
+Every BRD-2 requirement ID (169) is met by at least one FR. The page is the page of the BRD-2 PDF ("add." = Addendum 1). The test cases are listed by test condition (TC-OP-nnn.n); the test plan workbook lists each case.
 
 ## General requirements (BRQID)
 
@@ -4032,24 +4000,58 @@ Every BRD-2 requirement ID (169) is met by at least one FR. The page is the page
 
 ## Coverage summary
 
-<!-- table: widths=4,2,2,2.4,2 caption="BRD-2 requirement IDs covered" -->
-| Family | IDs | SEAM | SUPERSEDED | Covered |
-|---|---|---|---|---|
-| BRQID | 6 | 1 | 1 | 6 |
-| CSHID | 27 | 18 | 1 | 27 |
-| DBMID | 1 | 0 | 1 | 1 |
-| RMTID | 40 | 21 | 1 | 40 |
-| MKTID | 13 | 7 | 3 | 13 |
-| PRCID | 39 | 24 | 0 | 39 |
-| ADJID | 28 | 8 | 0 | 28 |
-| CMRID | 15 | 7 | 1 | 15 |
-| **Total** | **169** | **86** | **8** | **169** |
+<!-- table: widths=4,2,2 caption="BRD-2 requirement IDs covered" -->
+| Family | IDs | Covered |
+|---|---|---|
+| BRQID | 6 | 6 |
+| CSHID | 27 | 27 |
+| DBMID | 1 | 1 |
+| RMTID | 40 | 40 |
+| MKTID | 13 | 13 |
+| PRCID | 39 | 39 |
+| ADJID | 28 | 28 |
+| CMRID | 15 | 15 |
+| **Total** | **169** | **169** |
 
 The non-functional requirements of the BRD annex (p.115-120) are traced in section 8.
 
+# Proposed business rules and clarifications for confirmation
+
+The table lists each point where the proposed screen or rule differs from the BRD text, fills a gap the BRD leaves open, or needs a decision of BDOI. None of them removes a BRD requirement; most are settled by an answer of BDOI that is applied as configuration. BDOI records its decision with the sign-off of this FRS (chapter 13); a decision that changes a screen, field, rule or message is applied in the next version of the FRS.
+
+<!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
+| Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
+|---|---|---|---|---|
+| CLR-OP-01 | Operations sections (BRQID.003; FR-OP-003) | The Operations sections are filtered by role; a personal pin or hide of sections is not proposed. | The role filter shows each user only the sections of the user's work. | Confirm the role filter, or ask for personal pin and hide. |
+| CLR-OP-02 | Lock while with Comptrollership (RMTID.040; FR-OP-006) | Remittance and Adjustment lock the invoice while they work on it; a Comptrollership lock is added when BDOI names the activity. | The Comptrollership activity that should lock the invoice is not named (OQ28). | Name the Comptrollership activity (OQ28). |
+| CLR-OP-03 | Insurer production report (PRCID.009; FR-OP-074) | The handler uploads the insurer file; a mailbox or SFTP pick-up is added when the insurer channels are specified. | The insurer channels are not specified (OQ29). | Specify the insurer channels (OQ29), or confirm the upload. |
+| CLR-OP-04 | Schedule to Marketing (MKTID.001; FR-OP-110) | The Remittance processor sends the approved schedule from the batch, once. | The BRD has Marketing initiate the request (OQ22). | Confirm that the processor sends the schedule. |
+| CLR-OP-05 | Edit of the extracted file (RMTID.002; FR-OP-032) | Rows of the extract are excluded and restored with a reason; financial fields cannot be edited. | The addendum (p.4) governs over the main BRD, which allowed online edits. | Confirm exclusion in place of edits. |
+| CLR-OP-06 | Receipt cancellation and reinstatement (CSHID.001-005; FR-OP-014) | A cancellation or reinstatement is a request approved by a Cashiering TL / TH (four eyes) before it posts. | The BRD does not name an approver (OQ06). | Confirm the Cashiering TL / TH approval (OQ06). |
+| CLR-OP-07 | Commission OR per batch (CSHID.007; FR-OP-021) | Remittance approval issues one commission OR per batch; the Collection upload issues one OR per insurer, certificate and payment. | The BRD allows one OR per batch or per payment (OQ49). | Confirm the OR per batch and per payment (OQ49). |
+| CLR-OP-08 | Payment files (CSHID.008; FR-OP-015) | Operations users upload the bank files; each file is stored read-only with its fingerprint, a duplicate file is refused, and the layouts are configurable. | The BRD has IT run the Trade, CLPC and Direct Credit files on FS04 (OQ03, OQ04). | Confirm the upload by Operations users (OQ03, OQ04). |
+| CLR-OP-09 | Minimal balances (CSHID.016, ADJID.026; FR-OP-023, 059) | The daily sweep skips an invoice already written off by the minimal balance file, so a balance is never reversed twice. | The BRD reverses up to 10.00 and writes off 10.00-100.00 from a file, with 10.00 in both (OQ11). | Confirm the boundary of 10.00 (OQ11). |
+| CLR-OP-10 | End-of-day extraction (RMTID.005; FR-OP-030) | A user queues the searched invoice for the evening extraction run. | The BRD text "if payment application is searched" is open to reading (OQ18). | Confirm the queue for the evening run (OQ18). |
+| CLR-OP-11 | DTIP balance (RMTID.014; FR-OP-031) | A DTIP balance is excluded from the remittance by default (EXCLUDE); the option CAP remits the DTIP balance only. | The BRD's expected result and acceptance criteria differ (OQ19). | Choose EXCLUDE or CAP (OQ19). |
+| CLR-OP-12 | Insurer OR comparison (RMTID.016; FR-OP-037) | The insurer OR amount is compared exactly with the paid PR per invoice. | No tolerance is given (OQ22). | Give the tolerance, or confirm the exact comparison (OQ22). |
+| CLR-OP-13 | Cleared checks (RMTID.017; FR-OP-031) | Checks are counted in banking days from the last applied value date on the branch calendar; the cleared status comes from the payment application. | The BRD asks for checks at least 3 banking days old and cleared (OQ20). | Confirm the counting (OQ20). |
+| CLR-OP-14 | Invoice statuses (RMTID.019; FR-OP-033, 035) | The invoice keeps a payment status and a remittance status; the batch has its own workflow stages. | The BRD's eight statuses mix payment and remittance states (OQ21). | Confirm the two statuses (OQ21). |
+| CLR-OP-15 | Claims condition of a special remittance (MKTID.009; FR-OP-112) | The claims condition is confirmed through the Claims feed when it is connected; until then the request carries a note. | The Claims feed is not yet specified (OQ46). | Specify the Claims feed (OQ46). |
+| CLR-OP-16 | Insurer register columns (PRCID.002; FR-OP-072) | The Remarks and Incentive columns and 200 blank rows are editable, so the insurer can add unbooked production. | PRCID.022 asks the insurer to report unbooked production in the same file. | Confirm the editable columns. |
+| CLR-OP-17 | Location filter (PRCID.014, 021; FR-OP-077) | Reconciliation items filter by AO, sales unit, segment and product line; the location filter is on the reports. | The invoice ledger groups items by sales organisation. | Confirm the filters. |
+| CLR-OP-18 | Reconciliation statuses (PRCID.030; FR-OP-075) | A fifth status BDOI_ONLY marks booked accounts that the insurer did not return. | The BRD's four statuses do not cover accounts missing from the insurer's file. | Confirm the fifth status. |
+| CLR-OP-19 | Sum insured on the register (Annex IV #5; FR-OP-072) | The production register has no Sum Insured column. | The invoice ledger does not hold the sum insured. | Confirm the register without the sum insured, or ask for it from the account. |
+| CLR-OP-20 | Several accounts in one request (ADJID.001; FR-OP-050) | One request per invoice; the wizard and the upload raise several requests at once. | Each invoice has its own approval and posting. | Confirm one request per invoice. |
+| CLR-OP-21 | Non-financial endorsement (ADJID.003; FR-OP-050) | Booking records the non-financial endorsement with its description; the account data are not changed. | The account data belong to New Business (OQ32). | Confirm (OQ32). |
+| CLR-OP-22 | Quotation for a TSI increase (ADJID.008; FR-OP-055) | A hand-off to Marketing; the quotation number is linked on the request by reference. | The quotation is prepared in New Business. | Confirm the hand-off to Marketing. |
+| CLR-OP-23 | DP premium receivable reversal (MKTID.012; FR-OP-094) | The ledger reversal is always recorded; its GL entry is off (DP_PR_REVERSAL_POSTING) because booking posts no PR for DP invoices. | Booking of a DP invoice has no premium receivable to reverse (OQ07). | Confirm the ledger-only reversal (OQ07). |
+| CLR-OP-24 | Incentive schemes (CMRID.005, 006; FR-OP-095) | No Touch, Top Up and Motor Mania are set up as schemes; they stay inactive without tiers until BDOI gives the targets and amounts. | The targets and amounts are not given (OQ39). | Give the targets and amounts (OQ39). |
+| CLR-OP-25 | Collection and Disbursement systems (BRQID.004, CSHID.009, MKTID.010, 013, CMRID.001, DBMID.001, RMTID.034; FR-OP-130, 120) | Uploads for the Collection data and an in-app Disbursement queue, until BRD-4 Collections and BRD-5 Disbursement replace them. | The Collection and Disbursement systems are replaced by BIBS modules (OQ01, OQ02, OQ45). | Confirm the uploads and the queue until then. |
+| CLR-OP-26 | Match keys and automatch frequency (PRCID.024-027; FR-OP-075) | Lines are matched on the keys of RECON_MATCH_KEYS in order (by default the invoice number, then the policy number); the automatch runs on every upload and when the handler clicks Match Again. | The keys and the frequency are not given (OQ30). | Give the match keys and the automatch frequency (OQ30). |
+
 # Sign-off
 
-By signing, BDOI confirms that this FRS describes the Operations functions it expects in BIBS, and accepts the assumptions in section 10.1 and the differences recorded in section 1.6. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
+By signing, BDOI confirms that this FRS describes the Operations functions it expects in BIBS, accepts the assumptions in section 10.1 and records its decisions on the items of chapter 12. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
 
 ```signoff
 rows:

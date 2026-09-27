@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.adjustment.domain.EndorsementRequest;
 import com.iortatechnxt.brokerverse.adjustment.domain.PostingOutcome;
 import com.iortatechnxt.brokerverse.adjustment.domain.ProcessingTrail;
 import com.iortatechnxt.brokerverse.adjustment.domain.RequestTerms;
+import com.iortatechnxt.brokerverse.adjustment.service.PolicyLinks.PolicyLink;
 import com.iortatechnxt.brokerverse.adjustment.service.RequestAging;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -20,6 +21,8 @@ import java.util.List;
  * @param requestClass class
  * @param computation computation
  * @param invoice invoice and account
+ * @param policy the policy and placement the request is against (policy number as the ledger holds
+ *     it now)
  * @param terms what is asked
  * @param amounts amounts entered
  * @param control approval, sign, overrides, quotation link and return
@@ -39,6 +42,7 @@ public record RequestResponse(
     String requestClass,
     String computation,
     InvoiceView invoice,
+    PolicyLink policy,
     RequestTerms terms,
     AmountInput amounts,
     ControlView control,
@@ -63,9 +67,10 @@ public record RequestResponse(
    *
    * @param r request
    * @param now current time (aging)
+   * @param policy policy and placement of the request
    * @return response
    */
-  public static RequestResponse from(EndorsementRequest r, Instant now) {
+  public static RequestResponse from(EndorsementRequest r, Instant now, PolicyLink policy) {
     var s = r.getSubject();
     return new RequestResponse(
         r.getId(),
@@ -84,6 +89,7 @@ public record RequestResponse(
             s.segment(),
             s.aoUsername(),
             s.productLine()),
+        policy,
         r.getTerms(),
         r.getAmounts(),
         new ControlView(

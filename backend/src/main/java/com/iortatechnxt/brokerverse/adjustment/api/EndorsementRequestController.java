@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.adjustment.api.dto.RecomputeResponse;
 import com.iortatechnxt.brokerverse.adjustment.api.dto.RequestInput;
 import com.iortatechnxt.brokerverse.adjustment.api.dto.RequestResponse;
 import com.iortatechnxt.brokerverse.adjustment.api.dto.RequestSummaryResponse;
+import com.iortatechnxt.brokerverse.adjustment.domain.EndorsementRequest;
 import com.iortatechnxt.brokerverse.adjustment.domain.EndorsementRequest.Content;
 import com.iortatechnxt.brokerverse.adjustment.domain.RequestStage;
 import com.iortatechnxt.brokerverse.adjustment.service.AdjustmentDocuments;
@@ -12,6 +13,8 @@ import com.iortatechnxt.brokerverse.adjustment.service.AdjustmentQueryService;
 import com.iortatechnxt.brokerverse.adjustment.service.AdjustmentQueryService.GlLine;
 import com.iortatechnxt.brokerverse.adjustment.service.EndorsementRequestService;
 import com.iortatechnxt.brokerverse.adjustment.service.EndorsementRequestService.Preview;
+import com.iortatechnxt.brokerverse.adjustment.service.PolicyLinks;
+import com.iortatechnxt.brokerverse.adjustment.service.PolicyLinks.PolicyLink;
 import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
@@ -19,6 +22,7 @@ import jakarta.validation.Valid;
 import java.time.Clock;
 import java.util.List;
 import java.util.Map;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -46,6 +50,7 @@ public class EndorsementRequestController {
   private final EndorsementRequestService requests;
   private final AdjustmentQueryService queries;
   private final AdjustmentDocuments documents;
+  private final PolicyLinks links;
   private final Clock clock;
 
   /**
@@ -54,16 +59,19 @@ public class EndorsementRequestController {
    * @param requests raise, change and preview
    * @param queries reads
    * @param documents slips
+   * @param links policy and placement of the requests
    * @param clock clock (aging)
    */
   public EndorsementRequestController(
       EndorsementRequestService requests,
       AdjustmentQueryService queries,
       AdjustmentDocuments documents,
+      PolicyLinks links,
       Clock clock) {
     this.requests = requests;
     this.queries = queries;
     this.documents = documents;
+    this.links = links;
     this.clock = clock;
   }
 
@@ -72,7 +80,8 @@ public class EndorsementRequestController {
    *
    * @param companyId company
    * @param stage stage, empty for all
-   * @param q request, invoice, ARN, policy, assured or endorsement reference
+   * @param q request, invoice, ARN, policy, client, insurer, product, placement slip or endorsement
+   *     reference
    * @param page page
    * @param size size
    * @return requests, newest first
@@ -91,8 +100,10 @@ public class EndorsementRequestController {
             Math.min(Math.max(size, 1), AdjustmentAccess.MAX_PAGE),
             Sort.by(Sort.Direction.DESC, "id"));
     var now = clock.instant();
+    Page<EndorsementRequest> found = queries.search(companyId, stage, q, pageable);
+    Map<Long, PolicyLink> policies = links.forRequests(found.getContent());
     return PageResponse.of(
-        queries.search(companyId, stage, q, pageable), r -> RequestSummaryResponse.from(r, now));
+        found, r -> RequestSummaryResponse.from(r, now, policies.get(r.getId())));
   }
 
   /**
@@ -116,7 +127,20 @@ public class EndorsementRequestController {
   @GetMapping("/requests/{id}")
   @PreAuthorize(AdjustmentAccess.VIEW)
   public RequestResponse get(@PathVariable Long id) {
-    return RequestResponse.from(queries.get(id), clock.instant());
+    EndorsementRequest request = queries.get(id);
+    return RequestResponse.from(request, clock.instant(), links.forRequest(request));
+  }
+
+  /**
+   * The policy and placement of a booked invoice, shown before a request is raised on it.
+   *
+   * @param invoiceNo invoice
+   * @return policy link
+   */
+  @GetMapping("/policies/{invoiceNo}")
+  @PreAuthorize(AdjustmentAccess.VIEW)
+  public PolicyLink policy(@PathVariable String invoiceNo) {
+    return links.forInvoice(invoiceNo);
   }
 
   /**
@@ -153,8 +177,10 @@ public class EndorsementRequestController {
   @PreAuthorize(AdjustmentAccess.VIEW)
   public List<RequestSummaryResponse> forInvoice(@PathVariable String invoiceNo) {
     var now = clock.instant();
-    return queries.forInvoice(invoiceNo).stream()
-        .map(r -> RequestSummaryResponse.from(r, now))
+    List<EndorsementRequest> found = queries.forInvoice(invoiceNo);
+    Map<Long, PolicyLink> policies = links.forRequests(found);
+    return found.stream()
+        .map(r -> RequestSummaryResponse.from(r, now, policies.get(r.getId())))
         .toList();
   }
 

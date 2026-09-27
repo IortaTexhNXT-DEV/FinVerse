@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.adjustment.api.dto;
 
 import com.iortatechnxt.brokerverse.adjustment.domain.EndorsementRequest;
+import com.iortatechnxt.brokerverse.adjustment.service.PolicyLinks.PolicyLink;
 import com.iortatechnxt.brokerverse.adjustment.service.RequestAging;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -27,6 +28,7 @@ import java.time.LocalDate;
  * @param createdBy requester
  * @param createdAt raised at
  * @param agingDays days from submission (or creation) to completion (or today)
+ * @param policy the policy and placement the request is against
  */
 public record RequestSummaryResponse(
     Long id,
@@ -47,16 +49,18 @@ public record RequestSummaryResponse(
     String batchNo,
     String createdBy,
     Instant createdAt,
-    long agingDays) {
+    long agingDays,
+    PolicyLink policy) {
 
   /**
    * Maps a request.
    *
    * @param r request
    * @param now current time (aging)
+   * @param policy policy and placement of the request
    * @return summary
    */
-  public static RequestSummaryResponse from(EndorsementRequest r, Instant now) {
+  public static RequestSummaryResponse from(EndorsementRequest r, Instant now, PolicyLink policy) {
     return new RequestSummaryResponse(
         r.getId(),
         r.getRequestNo(),
@@ -76,6 +80,7 @@ public record RequestSummaryResponse(
         r.outcome().batchNo(),
         r.getCreatedBy(),
         r.getCreatedAt(),
-        RequestAging.days(r, now));
+        RequestAging.days(r, now),
+        policy);
   }
 }

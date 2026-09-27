@@ -14,8 +14,11 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -79,6 +82,21 @@ public class InvoiceLedgerQueryService {
    */
   public Optional<OpsInvoice> find(String invoiceNo) {
     return invoices.findByInvoiceNo(invoiceNo);
+  }
+
+  /**
+   * Invoices by number, without their collections (links shown in lists).
+   *
+   * @param invoiceNos invoice numbers
+   * @return invoice per number, for the numbers in the ledger
+   */
+  public Map<String, OpsInvoice> byNumbers(Collection<String> invoiceNos) {
+    Map<String, OpsInvoice> found = new HashMap<>();
+    if (invoiceNos.isEmpty()) {
+      return found;
+    }
+    invoices.findByInvoiceNoIn(invoiceNos).forEach(i -> found.put(i.getInvoiceNo(), i));
+    return found;
   }
 
   /**

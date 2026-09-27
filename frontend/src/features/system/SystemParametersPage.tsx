@@ -14,6 +14,11 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { displayNameOf } from '@/api/users';
+import { CellStack } from '@/components/ui/CellStack';
+import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
+import { Notice } from '@/components/ui/Notice';
+import { StatusBadge } from '@/components/ui/StatusBadge';
+import { UserName } from '@/components/ui/UserName';
 
 type Tab = 'parameters' | 'configuration';
 
@@ -113,20 +118,20 @@ function PendingDialog({
       }
     >
       <div className="stack">
-        <ErrorAlert error={decide.error} />
+        <ErrorAlert error={decide.error} title="Cannot decide the change" />
         <p>{parameter.description}</p>
-        <dl className="detail-list">
-          <dt>Current value</dt>
-          <dd>{shown(parameter.value)}</dd>
-          <dt>New value</dt>
-          <dd>{shown(parameter.pendingValue)}</dd>
-          <dt>Asked by</dt>
-          <dd>
-            {displayNameOf(parameter.pendingBy)}, {formatDateTime(parameter.pendingAt)}
-          </dd>
-        </dl>
+        <DefinitionGrid
+          label="Change to approve"
+          items={[
+            { label: 'Parameter', value: parameter.key },
+            { label: 'Current value', value: parameter.value },
+            { label: 'New value', value: parameter.pendingValue },
+            { label: 'Asked by', value: <UserName login={parameter.pendingBy} /> },
+            { label: 'Asked on', value: formatDateTime(parameter.pendingAt) },
+          ]}
+        />
         {!mayApprove && (
-          <p className="muted">Another user with the approval right approves the change.</p>
+          <Notice tone="info">Another user with the approval right approves the change.</Notice>
         )}
       </div>
     </Modal>
@@ -201,20 +206,36 @@ export default function SystemParametersPage() {
                 key: 'v',
                 header: 'Value',
                 render: (p) => (
-                  <>
-                    {p.value || '—'}
-                    {pendingText(p) && <span className="cell-sub">{pendingText(p)}</span>}
-                  </>
+                  <CellStack
+                    main={p.value}
+                    sub={pendingText(p) && `New value: ${shown(p.pendingValue)}`}
+                  />
                 ),
+              },
+              {
+                key: 's',
+                header: 'Status',
+                kind: 'status',
+                render: (p) =>
+                  pendingText(p) ? (
+                    <StatusBadge status="PENDING_APPROVAL" />
+                  ) : (
+                    <StatusBadge status="ACTIVE" label="In Force" />
+                  ),
               },
               { key: 'd', header: 'Description', render: (p) => p.description },
               {
                 key: 'u',
                 header: 'Last Changed',
                 render: (p) =>
-                  p.updatedBy === undefined
-                    ? ''
-                    : `${displayNameOf(p.updatedBy)}, ${formatDateTime(p.updatedAt)}`,
+                  p.updatedBy === undefined ? (
+                    ''
+                  ) : (
+                    <CellStack
+                      main={<UserName login={p.updatedBy} />}
+                      sub={formatDateTime(p.updatedAt)}
+                    />
+                  ),
               },
             ]}
           />
@@ -234,14 +255,14 @@ export default function SystemParametersPage() {
           </Button>
         }
       >
-        <ErrorAlert error={save.error} />
+        <ErrorAlert error={save.error} title="Cannot save the parameter" />
         {editing !== null && (
           <div className="stack">
             <p className="muted">{editing.description}</p>
             {editing.secondApproval && (
-              <div className="alert info" role="status">
-                A security setting: the change applies once another user approves it.
-              </div>
+              <Notice tone="info" title="Security setting">
+                The change applies once another user approves it.
+              </Notice>
             )}
             <Field label="Value" hint={hintFor(editing)}>
               {(id) => (

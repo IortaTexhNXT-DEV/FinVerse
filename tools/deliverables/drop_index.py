@@ -70,7 +70,8 @@ KINDS = {
     "TestPlan": "Test plan",
     "Signoff": "Sign-off workbook (Excel)",
     "ReleaseNote": "Release note",
-    "Migration": "Migration pack",
+    "Handbook": "Data Migration Handbook",
+    "Workbook": "Migration Workbook (Excel)",
     "Registers": "Register",
     "Register": "Register",
     "Decks": "Deck",
@@ -80,7 +81,7 @@ KINDS = {
     "Change_Register": "Change register",
 }
 # Order of the kinds inside a release set.
-KIND_ORDER = ["StartHere", "GuideDeck", "ReleaseNote", "FRS", "Signoff", "TestPlan", "Migration"]
+KIND_ORDER = ["StartHere", "GuideDeck", "ReleaseNote", "FRS", "Handbook", "Signoff", "Workbook", "TestPlan"]
 NAME_RE = re.compile(r"(?:\d\d_)?BIBS_(?P<type>[A-Za-z_]+?)_(?P<brd>BRD-\d\d)_(?P<name>.+?)_v(?P<ver>\d+\.\d+)\.(?P<ext>\w+)$")
 
 
@@ -128,14 +129,8 @@ def write_index(key: str) -> Path:
             if not is_listed(f, root):
                 continue
             rel = f.relative_to(root).as_posix()
-            if "/templates/" in f"/{rel}" and f.name != "README.md":
-                continue  # the templates folder is listed once through its README
             doc, brd, label, ver = describe(f, kind)
-            if f.name == "README.md" and "templates" in rel:
-                doc, label = "Migration extract templates (CSV headers and control file)", "Templates"
-                brd = "BRD-13"
-                rel = rel.rsplit("/", 1)[0] + "/"
-            elif f.suffix == ".png":
+            if f.suffix == ".png":
                 label, brd = "IER diagram (PNG)", "BRD-00"
             rows.append((doc, brd, label, ver, rel))
     rows.sort(key=brd_sort)
@@ -154,7 +149,8 @@ def write_index(key: str) -> Path:
         "## Documents in this drop",
         "",
         "One folder per BRD release set (`BRD-nn_<Name>/`): every file of the BRD (Start Here, guide deck, FRS, sign-off",
-        "workbook, test plan and summary, migration documents and templates), released and signed off together; in an",
+        "workbook, test plan and summary; for BRD-13 the Data Migration Handbook and the Migration Workbook), released",
+        "and signed off together; in an",
         "issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, \"Release and",
         "sign-off per BRD\"). Each document is kept once, in its latest version.",
         "",

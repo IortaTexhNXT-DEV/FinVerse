@@ -243,7 +243,7 @@ def out_path(brd: str, kind: str, filename: str) -> Path:
 # Business sign-off release sets issued so far: BRD -> version of the set. The documents of such a set carry a
 # two-digit prefix so that they sort in reading order in the BRD folder (deliverables README, "Release and sign-off
 # per BRD").
-SIGNOFF_SETS = {"BRD-01": "2.0", "BRD-03": "2.0", "BRD-11": "2.0"}
+SIGNOFF_SETS = {"BRD-01": "2.0", "BRD-03": "2.0", "BRD-11": "2.0", "BRD-13": "2.0"}
 READING_ORDER = {"StartHere": "00", "GuideDeck": "01", "FRS": "02", "Signoff": "03", "TestPlan": "04",
                  "TestPlanSummary": "05"}
 # Further documents of a set that only some BRDs have (not required by check_pack): the configuration input templates

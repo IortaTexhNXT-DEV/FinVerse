@@ -60,6 +60,7 @@ const legacyInvoice = (ctx) => need(ctx,
 
 const opens = {
   object_c01: () => '/migration/objects?object=C01',
+  layout_f01c: () => '/migration/layouts',
   map_insurer: (ctx) => `/migration/maps?set=${encodeURIComponent(need(ctx,
     "select code from mig_code_map_set where code like 'INSURER%' order by length(code), code limit 1", 'insurer code map'))}`,
   // A map set with a draft version (the Add Entry button is on drafts only).
@@ -69,7 +70,7 @@ const opens = {
   batch_validated: (ctx) => `/migration/batches/${need(ctx,
     "select batch_no from mig_batch where status = 'VALIDATED' order by (invalid_count > 0) desc, id limit 1", 'validated batch')}`,
   batch_accepted: (ctx) => `/migration/batches/${need(ctx,
-    "select batch_no from mig_batch where status = 'SIGNED_OFF' order by id limit 1", 'accepted batch')}`,
+    "select batch_no from mig_batch where status = 'SIGNED_OFF' order by (object_code = 'F01') desc, id limit 1", 'accepted batch')}`,
   pair_first: () => '/migration/matching',
   recon_batch: (ctx) => `/migration/reconciliation?batch=${need(ctx,
     "select b.batch_no from mig_batch b join mig_recon_run r on r.batch_id = b.id order by (b.object_code = 'F01') desc, b.id limit 1",
@@ -94,11 +95,11 @@ const custom = {
     const columns = ctx.sql(
       "select c.name from mig_layout_column c join mig_layout l on l.id = c.layout_id where l.code = 'C01' and l.status = 'FROZEN' order by c.seq",
     ).map((r) => r[0]);
-    const day = today().replace(/-/g, '');
+    const asOf = '2028-01-03';
     const nn = String(Number(ctx.one('select count(*) from mig_extract')) % 90 + 10);
-    const name = `C01_QPS_${day}_${nn}.csv`;
+    const name = `C01_QPS_${asOf.replace(/-/g, '')}_${nn}.csv`;
     const data = csv(name, [columns, columns.map(() => ''), columns.map(() => '')]);
-    const head = ['C01', 'C01', 'QPS', name, `${today()} 18:00:00`, `${today()} 19:00:00`, 'bdoi.it.extract'];
+    const head = ['C01', 'C01', 'QPS', name, `${asOf} 18:00:00`, `${asOf} 19:00:00`, 'bdoi.it.extract'];
     const control = csv(`${name.replace('.csv', '')}.ctl.csv`, [
       ['object', 'layout', 'source_system', 'data_file', 'as_of', 'extracted_at', 'extracted_by', 'measure',
         'column_name', 'currency', 'filter', 'value'],
@@ -139,7 +140,14 @@ const custom = {
     const page = await ctx.pageOf('miggonogo');
     await page.goto(ctx.BASE + opens.plan_mock(ctx, shot));
     await ctx.settle(page);
-    await page.getByRole('heading', { name: /^go \/ no-go criteria$/i }).first().scrollIntoViewIfNeeded();
+    // The runbook table of the plan is shown on scr-dm-12-01; this shot keeps the criteria and decisions in view.
+    await page.evaluate(() => {
+      const h = [...document.querySelectorAll('main h3')].find((e) => e.textContent.trim() === 'Runbook');
+      if (h && h.nextElementSibling) {
+        h.nextElementSibling.style.display = 'none';
+        h.style.display = 'none';
+      }
+    });
     await page.waitForTimeout(400);
     return page;
   },
@@ -187,6 +195,12 @@ const after = {
     await page.locator('main table tbody tr').first().click();
     await ctx.settle(page, 800);
   },
+  // The clients list searched for the migrated client of the seed data, marked LEGACY.
+  'scr-dm-16-01-clients': async (page, ctx) => {
+    const last = ctx.one("select last_name from crm_client where origin = 'MIGRATED' order by id limit 1");
+    await page.getByPlaceholder(/search client name/i).fill(last);
+    await click(page, /^search$/i, ctx);
+  },
   'scr-dm-16-02-unapplied': async (page, ctx) => {
     await ctx.fillField(page, 'Origin', 'Migrated').catch(() => {});
     await ctx.settle(page, 600);
@@ -195,13 +209,77 @@ const after = {
 
 // ------------------------------------------------------------------ the legacy batches
 
+/** A C01 extract of three clients uploaded through the intake with its control file (row count, distinct
+ * clients, SHA-256), planned as a batch and validated: one valid client, one with a birth date and a market segment
+ * that fail their rules, and one with the name and city of the first but another birth date (a pair to review). */
+async function validatedClientBatch(ctx, company) {
+  const crypto = require('crypto');
+  // A delta after the seed extracts of 31-Dec-2027 (the as-of dates of an object only move forward).
+  const asOf = '2028-01-02';
+  const name = `C01_EBIX_${asOf.replace(/-/g, '')}_01.csv`;
+  // The columns of the layout in force, in order; the values not given stay empty.
+  const header = ctx.sql("select c.name from mig_layout_column c join mig_layout l on l.id = c.layout_id "
+    + "where l.code = 'C01' and l.status = 'FROZEN' order by c.seq").map((r) => r[0]);
+  const client = (v) => header.map((h) => v[h] ?? '');
+  const base = { client_type: 'I', kyc_status: 'COMPLETE', client_status: 'A' };
+  const rows = [
+    client({ ...base, legacy_client_no: 'E970002', last_name: 'Dela Cruz', first_name: 'Ramon', birth_date: '1985-02-11', tin: '214-556-871-000', city: 'Pasig',
+      market_segment: 'CBG', email: 'ramon.delacruz@brokerverse-seed.ph', created_date: '2021-06-01', last_updated: '2027-11-15 10:00:00' }),
+    client({ ...base, legacy_client_no: 'E970003', last_name: 'Santos', first_name: 'Lorna', birth_date: '1979-13-40',
+      market_segment: 'OLD-RET', email: 'lorna.santos@brokerverse-seed.ph', created_date: '2020-02-01', last_updated: '2027-11-20 11:00:00' }),
+    client({ ...base, legacy_client_no: 'E970004', last_name: 'Dela Cruz', first_name: 'Ramon', birth_date: '1985-12-02', city: 'Pasig',
+      market_segment: 'CBG', email: 'rdelacruz@brokerverse-seed.ph', created_date: '2020-08-01', last_updated: '2027-12-01 09:00:00' }),
+  ];
+  const data = csv(name, [header, ...rows]);
+  const content = fs.readFileSync(data);
+  const head = ['C01', 'C01', 'EBIX', name, `${asOf} 18:00:00`, `${asOf} 19:00:00`, 'bdoi.it.extract'];
+  const control = csv(name.replace('.csv', '.ctl.csv'), [
+    ['object', 'layout', 'source_system', 'data_file', 'as_of', 'extracted_at', 'extracted_by', 'measure',
+      'column_name', 'currency', 'filter', 'value'],
+    [...head, 'ROW_COUNT', '', '', '', String(rows.length)],
+    [...head, 'HASH_TOTAL', '', '', '', String(rows.length)],
+    [...head, 'SHA256', '', '', '', crypto.createHash('sha256').update(content).digest('hex')],
+  ]);
+  const form = new FormData();
+  form.append('file', new Blob([content]), name);
+  form.append('control', new Blob([fs.readFileSync(control)]), path.basename(control));
+  const extract = await ctx.api('migops', 'POST', `/migration/extracts?companyId=${company}&objectCode=C01&mode=DELTA`, form);
+  const batch = await ctx.api('migops', 'POST', `/migration/batches?companyId=${company}`,
+    { objectCode: 'C01', extractNos: [extract.extractNo] });
+  await ctx.api('migops', 'POST', `/migration/batches/${batch.batchNo}/validate`, {});
+  return batch.batchNo;
+}
+
+/** Seed states of the migration console that the storyline of the seed data does not reach: a draft version of the
+ * insurer code map, a validated client batch with failing rows and a pair to review, and one reconciliation line of
+ * the unapplied payments with a difference to explain (a break on the seed run, for the Explain Break dialog). */
+async function prepareConsole(ctx, company) {
+  if (ctx.sql("select 1 from mig_code_map_version where status = 'DRAFT'").length === 0) {
+    await ctx.api('migsteward', 'POST', `/migration/maps/INSURER/versions?companyId=${company}`,
+      { copyApproved: true, comment: 'Insurer codes of the QPS extract (seed data)' });
+  }
+  if (ctx.sql("select 1 from mig_batch where status = 'VALIDATED'").length === 0) {
+    await validatedClientBatch(ctx, company);
+  }
+  if (ctx.sql("select 1 from mig_recon_line where status = 'BREAK'").length === 0) {
+    ctx.sql("update mig_recon_line set status = 'BREAK', target_value = source_value - 150.00, difference = 150.00 "
+      + "where id = (select l.id from mig_recon_line l join mig_recon_run r on r.id = l.run_id join mig_batch b "
+      + "on b.id = r.batch_id where b.object_code = 'F02' and l.level = 'L5' and l.source_value > 150 order by l.id desc limit 1)");
+  }
+}
+
 /** Draft and pending batches of Cashiering and Commission, created through the services when the seed has none. */
 async function prepare(ctx) {
   const company = companyId(ctx);
+  await prepareConsole(ctx, company);
   const existing = (query) => ctx.sql(query)[0]?.[0];
   const incomeDraft = existing("select batch_no from csh_legacy_batch where kind = 'INCOME_RECLASS' and status = 'DRAFT' and line_count > 0 order by id limit 1");
-  const candidates = async () => ctx.api('cashier', 'GET',
-    `/cashiering/legacy-batches/candidates?companyId=${company}&minAgeDays=730&origin=MIGRATED`);
+  // Migrated unapplied payments first; when automatch has applied them all, any unapplied payment of the seed data.
+  const candidates = async () => {
+    const url = `/cashiering/legacy-batches/candidates?companyId=${company}&minAgeDays=0`;
+    const migrated = await ctx.api('cashier', 'GET', `${url}&origin=MIGRATED`);
+    return migrated.length > 1 ? migrated : [...migrated, ...(await ctx.api('cashier', 'GET', url))];
+  };
   const incomeBatch = async (lines) => {
     const b = await ctx.api('cashier', 'POST', `/cashiering/legacy-batches?companyId=${company}`, {
       kind: 'INCOME_RECLASS', reason: 'Unclaimed legacy payments after follow-up (seed data)', currency: 'PHP',
@@ -238,4 +316,10 @@ async function prepare(ctx) {
   })).batchNo;
 }
 
-module.exports = { opens, fills: {}, selects: {}, uploads: {}, after, custom, walkthrough: {}, documents: {}, prepare };
+// The region of a shot when it is not the whole content area.
+const crops = {
+  // The invoice header and the Legacy Invoice card.
+  'scr-dm-17-01-legacy': 'main h1, main section.card:has(> header:has-text("Legacy Invoice"))',
+};
+
+module.exports = { opens, fills: {}, selects: {}, uploads: {}, after, custom, crops, walkthrough: {}, documents: {}, prepare };

@@ -192,15 +192,17 @@ const docs = {
 // ------------------------------------------------------------------ callout scopes
 
 // Where the callout of a field goes when the same text is on several parts of the page (capture_pack.cjs): the rate
-// scheme panel of the quotation, the Request Rate Exception dialog (its "Valid until", not the quotation's), the
-// exception record and its Approve and Reject confirmations. A field outside its scope gets no badge in that state.
-const panel = { within: '.alert[role=status]', title: 'Priced on package version' };
+// scheme notice and the exceptions table of the quotation's Rate Exceptions card (stable data-callout names), the
+// Request Rate Exception dialog (its "Valid until", not the quotation's), the exception record and its Approve and
+// Reject confirmations. A field outside its scope gets no badge in that state.
+const notice = { within: '[data-callout="rate-exceptions-notice"]' };
+const exceptions = { within: '[data-callout="rate-exceptions-table"]' };
 const requestDialog = { within: 'dialog[open]', title: 'Request Rate Exception' };
 const record = { within: 'main', title: 'Product Maintenance · Rate Exception' };
 const callouts = {
   'SCR-PM-22': {
-    1: { ...panel, target: 'span' },
-    2: { ...panel, target: 'a[href*="/catalog/rate-exceptions/"]' },
+    1: { ...notice, target: '.notice-text' },
+    2: { ...exceptions, target: 'a[href*="/catalog/rate-exceptions/"]' },
     3: requestDialog,
     4: requestDialog,
     5: requestDialog,

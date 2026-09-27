@@ -16,7 +16,7 @@ contract:
     what: Package versions with their rate scheme, rate exceptions approved for a transaction, rates and taxes, short-period table, motor limits
     how: Read at every premium computation (Appendix A); a quotation or account priced on an old version is re-priced or needs an approved rate exception
     owner: MBS; the approver of the rate exception
-    screens: New Quotation, Quotation record (rate scheme panel), New Account, New Endorsement
+    screens: New Quotation, Quotation record (Rate Exceptions card), New Account, New Endorsement
     frs: [FR-NB-062, FR-NB-041]
   - id: IC-03
     party: BRD-3 Product Maintenance

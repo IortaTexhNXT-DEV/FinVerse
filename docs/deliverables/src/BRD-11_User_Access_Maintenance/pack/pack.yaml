@@ -157,7 +157,11 @@ common:
     text: >-
       A request opens with its reference (AR-yyyy-nnnnnn for a request, BLK-yyyy-nnnnnn for a bulk batch), its status
       pill, its risk flags (Privilege Increase, Outside Hours) and the key facts: requested by and when, approver,
-      effective date and decision. A reference chip copies the reference.
+      effective date and decision. A reference chip copies the reference. Under the header a stepper shows the stages
+      of the request: Draft, Pending approval, Second approval (where one is needed), then Approved, or For
+      implementation and Implemented for a group profile; Scheduled while an approved change waits for its effective
+      date; a returned request in amber, a rejected or cancelled one in red. Under the stepper one row gives Current
+      Stage, Since and Assigned To (the approver's name).
   - name: Decisions with a reason
     text: >-
       Approve, Return, Reject, Cancel and Implement open a dialog that names the request and its change. Return,
@@ -191,6 +195,9 @@ common:
       after sign-in, whatever the activity, and a dialog warns 30 minutes before.
   - name: Messages
     text: >-
-      Field errors appear under the field in red with the field outlined. A refusal by a business rule shows the
-      business message and a reference for support (the message code and a request number). Success is confirmed by a
-      short message at the bottom right of the page.
+      Every message follows one notice standard: a white notice with a thin bar and an icon in the colour of its kind
+      (red error, amber warning, blue information, green success), a bold short title, then the business message with
+      one bullet per missing item. Field errors appear under the field with the field outlined, and a long form lists
+      its errors in a notice at the top with a link to the first field. A refusal by a business rule shows the business
+      message only, without codes or references; only an unexpected system error offers Retry and a reference for
+      support behind Details. Success is confirmed by a short message in the same standard.

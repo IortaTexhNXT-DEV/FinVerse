@@ -143,7 +143,7 @@ screens:
     parent: /product-maintenance/requests
     purpose: >-
       One package request: its number, stage and flags, the key facts (type, client or programme, line and product,
-      scheme rate, package term, insurers), the workflow status strip with the actions of the stage, and the tabs
+      scheme rate, package term, insurers), the workflow header (stage stepper, then Current Stage, Since, Due and Assigned To) with the actions of the stage, and the tabs
       Details, Requested Terms, Negotiation, Comparative, Requirements & Sign-off, Set-up, Advisories, Documents,
       E-mails and History. This section specifies the header, the stage actions and the tabs Details, Requested Terms,
       Documents, E-mails and History; the other tabs have their own sections (SCR-PM-05 to SCR-PM-08).
@@ -167,7 +167,7 @@ screens:
       - "Header | Scheme rate | Fact | Rate % of the proposed terms, else of the requested terms | - | Terms | - | Read only | - | -"
       - "Header | Package term | Fact | Package start – package end | - | Terms | - | Read only | - | -"
       - "Header | Target insurers / Chosen insurers | Fact | Insurer codes; the chosen insurers once the terms are final | - | Terms | - | Read only | - | -"
-      - "Workflow | [Status strip] | Panel | Stage, In Stage Since, Due, Assigned To | - | Workflow | - | Read only | Due in red when overdue | -"
+      - "Workflow | [Stage stepper and meta row] | Panel | The stages of the request in order, the current one highlighted; Current Stage, Since, Due, Assigned To | - | Workflow | - | Read only | Overdue pill after the due time | -"
       - "Details › Request | Type / Scope / Client / Line / cover type / Market segments / Reason / Negotiation / TSU recommendation | Detail | As entered on the form; Negotiation: Insurers approached or No negotiation | - | Package request | - | Read only | - | -"
       - "Details › Approvals and steps | Submitted / Marketing approval / TSU recommendation / TSU Head approval / Terms final / Requirements to ManCom / MBS set-up / Released | Detail | User · dd-MMM-yyyy HH:mm, or a dash | - | Request milestones | - | Read only | - | -"
       - "Requested Terms | [Sections, coverages, rate scheme, dates and insurers] | Read-only view | Sections; Coverage, Included, Limit, Deductible; Rate / minimum premium; Commission / TSI limit; Computation basis; Effective from; Package term; Insurer, Role, Share %, Rate %, Minimum | - | Requested terms | - | Read only | - | -"

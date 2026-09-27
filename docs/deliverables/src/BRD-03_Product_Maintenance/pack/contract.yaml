@@ -22,7 +22,7 @@ contract:
     what: The package version in force (rate scheme, minimum premium, commission, TSI limit, panel insurers with their own rates) for new business pricing; the version number is stored on the quotation, the account and the booked invoice
     how: Every premium computation of a quotation or account prices a package on the version in force on the transaction date; submission is refused for a superseded version or a differing item rate without an approved rate exception
     owner: MBS (set-up), TSU Head or Business Administrator (validation)
-    screens: Package Version, Premium Calculator, Quotation rate scheme panel
+    screens: Package Version, Premium Calculator, Quotation Rate Exceptions card
     frs: [FR-PM-051, FR-PM-043]
   - id: IC-03
     party: BRD-1 New Business
@@ -30,7 +30,7 @@ contract:
     what: Rate exceptions approved for one transaction (quotation number or ARN)
     how: Requested on the quotation, decided in My Approvals by PRODUCT_AUTHORIZE, stored on the quotation and passed to the accounts created from it
     owner: The approver of the exception
-    screens: Quotation rate scheme panel
+    screens: Quotation Rate Exceptions card
     frs: [FR-PM-051]
   - id: IC-04
     party: BRD-1 New Business

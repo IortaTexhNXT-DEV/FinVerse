@@ -1049,8 +1049,10 @@ class BdoiDocument:
     def requirement(self, fr: dict[str, Any]) -> None:
         """A functional requirement in the house pattern (see README "Functional requirement block").
 
-        Keys: id, title, brd (list), actor, priority, fit, screens, api, description, preconditions,
-        main_flow, alternate_flows, rules, validations, fields, notifications, audit, acceptance.
+        Keys: id, title, brd (list), actor, priority, screens, description, preconditions, main_flow,
+        alternate_flows, rules, validations, fields, notifications, audit, acceptance. A client document presents
+        the proposed system only (BDOI instruction of 27-Sep-2026), so the header shows no fit class, API or other
+        build reference; the keys "fit" and "api" are refused by --check.
         """
         self.heading(f"{fr['id']} {fr['title']}", level=3, numbered=False)
         brd_refs = fr.get("brd", [])
@@ -1060,12 +1062,9 @@ class BdoiDocument:
             ("BRD trace", ", ".join(str(ref) for ref in brd_refs)),
             ("Actor", fr.get("actor", "")),
             ("Priority", fr.get("priority", "Must have")),
-            ("Fit", fr.get("fit", "")),
         ]
         if fr.get("screens"):
             pairs.append(("Screens", fr["screens"]))
-        if fr.get("api"):
-            pairs.append(("API", fr["api"]))
         self.key_values(pairs, columns=2, label_width=2.2)
         if fr.get("description"):
             self.label("Description")
@@ -1643,7 +1642,8 @@ def lint_source(src: str | Path) -> list[str]:
       cell, or a cell is missing);
     * a one-line flow list ``key: [a, b]`` whose items contain a comma inside parentheses or text
       (YAML splits it into several items);
-    * missing mandatory keys (id, title, brd, actor, description, main_flow, acceptance).
+    * missing mandatory keys (id, title, brd, actor, description, main_flow, acceptance);
+    * the build references "fit" and "api", which a client FR does not carry.
     """
     src = Path(src)
     text = src.read_text(encoding="utf-8")
@@ -1662,6 +1662,9 @@ def lint_source(src: str | Path) -> list[str]:
         for key in ("id", "title", "brd", "actor", "description", "main_flow", "acceptance"):
             if not fr.get(key):
                 problems.append(f"{rid}: missing '{key}'")
+        for key in ("fit", "api"):
+            if key in fr:
+                problems.append(f"{rid}: '{key}' is a build reference and is not part of a client FR")
         brd_refs = fr.get("brd")
         for ref in brd_refs if isinstance(brd_refs, list) else []:
             if not isinstance(ref, str):

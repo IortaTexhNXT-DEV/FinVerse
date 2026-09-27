@@ -15,7 +15,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { DetailList } from '@/features/catalog/DetailList';
-import { formatDate, formatDateTime, humanize, versionLabel } from '@/utils/format';
+import { formatDate, formatDateTime, formatPeriod, humanize, versionLabel } from '@/utils/format';
 import { PremiumCard } from './PremiumBreakdown';
 import { displayNameOf } from '@/api/users';
 import { LovLabel, ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
@@ -46,7 +46,7 @@ export function DetailsTab({ quotation: q }: Readonly<{ quotation: Quotation }>)
                 'To be advised'
               ),
             ],
-            ['Period', `${formatDate(c.periodFrom)} to ${formatDate(c.periodTo)}`],
+            ['Period', formatPeriod(c.periodFrom, c.periodTo)],
             ['Valid until', formatDate(c.validUntil)],
             ['Premium payment', c.directPayment ? 'Directly to the insurer' : 'Via BDOI'],
             ['Remarks', c.remarks],
@@ -61,18 +61,16 @@ export function DetailsTab({ quotation: q }: Readonly<{ quotation: Quotation }>)
             ['Created', `${displayNameOf(q.createdBy)} ${formatDateTime(q.createdAt)}`],
             [
               'Submitted',
-              q.submittedBy
-                ? `${displayNameOf(q.submittedBy)} ${formatDateTime(q.submittedAt)}`
-                : '—',
+              q.submittedBy && `${displayNameOf(q.submittedBy)} ${formatDateTime(q.submittedAt)}`,
             ],
             [
               'Approved',
-              q.approvedBy ? `${displayNameOf(q.approvedBy)} ${formatDateTime(q.approvedAt)}` : '—',
+              q.approvedBy && `${displayNameOf(q.approvedBy)} ${formatDateTime(q.approvedAt)}`,
             ],
-            ['Sent to client', formatDateTime(q.sentAt) || '—'],
-            ['Accepted', formatDateTime(q.acceptedAt) || '—'],
-            ['Accepted risk groups', q.acceptedGroups.join(', ') || '—'],
-            ['Accounts', q.accountArns.join(', ') || '—'],
+            ['Sent to client', formatDateTime(q.sentAt)],
+            ['Accepted', formatDateTime(q.acceptedAt)],
+            ['Accepted risk groups', q.acceptedGroups.join(', ')],
+            ['Accounts', q.accountArns.join(', ')],
           ]}
         />
       </Card>

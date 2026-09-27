@@ -24,6 +24,7 @@ import { FormDialog } from './FormDialog';
 import type { DialogField } from './FormDialog';
 import { OriginalLinesCard } from './OriginalLinesCard';
 import { UserName } from '@/components/ui/UserName';
+import { Notice } from '@/components/ui/Notice';
 
 function fieldsOf(action: CorrectionAction): DialogField[] {
   return action === 'assign'
@@ -149,15 +150,15 @@ export default function CorrectionDetailPage() {
         facts={facts(c)}
       />
       {c.returnComment && c.stage === 'DRAFT' && (
-        <div className="alert warning" role="status">
-          Returned: {c.returnComment}
-        </div>
+        <Notice tone="warning" title="Returned">
+          {c.returnComment}
+        </Notice>
       )}
       {c.stage === 'POSTED' && (
-        <div className="alert success" role="status">
+        <Notice tone="success" title="Posted">
           Posted as {c.journalBatchNo ?? '—'} with {String(c.openItems)} open item(s) and{' '}
           {String(c.ledgerMovements)} ledger movement(s).
-        </div>
+        </Notice>
       )}
       <WorkflowPanel
         entityType={CORRECTION_ENTITY}

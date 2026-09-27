@@ -19,6 +19,7 @@ import { formatBytes } from '@/utils/files';
 import { checkUploadFile, invalidRows, previewCsv, summarize } from './uploadHelpers';
 import type { CsvPreview } from './uploadHelpers';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { Notice } from '@/components/ui/Notice';
 
 type Mode = 'VALIDATE' | 'IMPORT';
 
@@ -26,9 +27,9 @@ function PreviewTable({ preview }: Readonly<{ preview: CsvPreview }>) {
   return (
     <Card title={`Preview – first ${preview.rows.length} of ${preview.totalRows} rows`} flush>
       {preview.missingColumns.length > 0 && (
-        <div className="alert warning" role="alert">
+        <Notice tone="warning" role="alert">
           Missing required column(s): {preview.missingColumns.join(', ')}
-        </div>
+        </Notice>
       )}
       <div className="table-wrap">
         <table className="table">
@@ -59,14 +60,16 @@ function ResultTables({ result }: Readonly<{ result: UploadResult }>) {
   const tone = s.rejected === 0 ? 'success' : 'warning';
   return (
     <>
-      <div className={`alert ${tone}`} role="status">
-        <strong>
-          {result.committed
-            ? `${s.created} of ${s.vouchers} voucher(s) created as drafts (upload ${result.uploadReference ?? ''}).`
-            : `${s.valid} of ${s.vouchers} voucher(s) are valid. Nothing has been created yet.`}
-        </strong>{' '}
+      <Notice
+        tone={tone}
+        title={
+          result.committed
+            ? `${s.created} of ${s.vouchers} voucher(s) created as drafts (upload ${result.uploadReference ?? ''})`
+            : `${s.valid} of ${s.vouchers} voucher(s) are valid. Nothing has been created yet`
+        }
+      >
         {s.rejected > 0 && `${s.rejected} voucher(s) rejected; ${s.rowErrors} row(s) with errors.`}
-      </div>
+      </Notice>
       <Card title="Vouchers" flush>
         <DataTable<VoucherResult>
           rows={result.vouchers}
@@ -188,9 +191,9 @@ export default function JournalUploadPage() {
             </span>
           )}
           {problem !== undefined && (
-            <div className="alert warning" role="alert">
+            <Notice tone="warning" role="alert">
               {problem}
-            </div>
+            </Notice>
           )}
           <div className="row">
             <Button

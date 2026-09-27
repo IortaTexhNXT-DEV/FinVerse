@@ -23,6 +23,7 @@ import type { ListFilters } from './JournalFiltersCard';
 import { glPlatformApi } from './glPlatformApi';
 import type { BulkPostOutcome, FrbsJournal } from './glPlatformApi';
 import { UserName } from '@/components/ui/UserName';
+import { Notice } from '@/components/ui/Notice';
 
 type Dialog = 'assign' | 'post' | null;
 
@@ -126,16 +127,15 @@ export default function JournalsPage() {
       />
       <ErrorAlert error={query.error} />
       {outcomes.length > 0 && (
-        <div className="alert warning" role="status">
-          Not posted:
-          <ul>
-            {outcomes.map((o) => (
-              <li key={o.id}>
-                Journal {o.id}: {o.message}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <Notice
+          tone="warning"
+          title="Not posted"
+          items={outcomes.map((o) => (
+            <span key={o.id}>
+              Journal {o.id}: {o.message}
+            </span>
+          ))}
+        />
       )}
       <Card flush>
         <DataTable<FrbsJournal>

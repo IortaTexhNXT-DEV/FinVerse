@@ -79,6 +79,8 @@ This page is binding for every BrokerVerse screen. Components read the design to
 | Status pill | One per record in the Status column. Outlined and tinted, radius 8: green = Clean / Approved, yellow = Review / Pending, red = Exception / Rejected, blue = in-process (e.g. "Account for Placement"), grey = draft or inactive. One size everywhere: 24 px high, 12 px bold, centred, 112–184 px wide; in a table cell every pill of the column takes the column width. Labels up to 21 characters are shown in full ("Returned to Marketing"); only longer labels use the agreed short form with the full label in the tooltip (section 8.2); a pill never wraps |
 | Tabs | Boxed tabs; the active tab is white with a 4 px yellow top bar and CTA Blue text, inactive tabs have a light blue gradient |
 | Empty state | Table-and-magnifier illustration with "No items to display" (`EmptyState`) |
+| Notice | White surface, thin border, 4 px left accent bar in the semantic colour with its icon: error red, warning amber, info blue, success green. Bold short title, the business message, one bullet per item. Short messages only (section 8.6) |
+| Stage stepper | Horizontal steps from the workflow's defined stages: passed stages checked, the current stage highlighted, stages ahead grey; returned in amber, closed off the normal path in red (section 8.5) |
 | Modal | Title with a close ✕, body, and a footer with Cancel (secondary) and the action (primary) on the right |
 | Icons | BDO outline icons in CTA Blue at 16 / 24 / 32 / 48 dp with the same stroke weight. The Lucide outline set is used as the equivalent |
 
@@ -124,7 +126,7 @@ Use these instead of building a screen-specific variant.
 | Record flags (FFY, Direct Payment, Information Incomplete, TSU) | `<span className="tag">` inside `.tag-list`, never a status pill |
 | Empty list | `EmptyState` (the `DataTable` default message is "No items to display") |
 | Buttons | one filled primary (`accent`) per area; secondary actions outlined; destructive actions (`danger`) outlined red; labels in Title Case |
-| Workflow status and history | `components/broking/WorkflowPanel` (status strip: Stage, In Stage Since, Due, Assigned To; actions on the right) and `HistoryTable` (the history as a table) |
+| Workflow header and history | `components/broking/WorkflowPanel`: the stage stepper (`StageStepper`, steps from `stageSteps` over the workflow's defined stages) and one meta row (Current Stage, Since, Due with the overdue pill, Assigned To; actions on the right); `HistoryTable` for the history. Records outside the workflow engine (access requests) use `StageStepper` with their own stage list (`accessStages`) |
 | Key-value detail blocks | `components/ui/DefinitionGrid` (aligned label / value rows, dash for empty, "Not provided" collapse); existing `.detail-list` blocks share the look |
 | Record page header | `components/broking/RecordHeader` (name, reference chips, status and labelled statuses, flags, completeness, key facts) |
 | Table cell with a secondary line | `components/ui/CellStack` (`EmptyCell` for the muted dash) |
@@ -138,7 +140,11 @@ Use these instead of building a screen-specific variant.
 | Confirmation of a destructive action | `components/ui/ConfirmDialog`; workflow actions use `ActionDialog` (record and effect named, danger button for cancel / void / reverse / deactivate / delete / reject) |
 | Unsaved changes | `useUnsavedChangesGuard(dirty)` |
 | Active filters | `components/ui/FilterChips`; `WorklistToolbar` keeps the search in the URL (`?q=`) |
-| Errors | `components/ui/ErrorAlert` (business message, field list linked to the fields, reference = error code and correlation id, Retry) |
+| Messages (error, warning, info, success) | `components/ui/Notice` (tone, title, message, items, actions; support reference behind Details) |
+| Errors | `components/ui/ErrorAlert` on `Notice`: bold title (a dialog passes "Cannot …"), the business message with one bullet per missing item, field list linked to the fields; the support reference behind Details and Retry only for network and server failures (`errorView`) |
+| Error summary of a long form | `components/ui/FormErrorSummary` (one error notice listing the fields; errors stay inline under the fields) |
+| Toasts | `useToast` `success` / `error` / `warning` / `info` in the notice colours with their icon |
+| Client tags (e.g. "BDO employee") | `ClientTagFlags` in the record header's flag list; special instructions as one info `Notice` (`InstructionsBanner`) |
 | 403 and 404 | `components/ui/StatusPage` |
 | Notifications | `NotificationBell` panel and the `/notifications` page |
 
@@ -148,7 +154,7 @@ Use these instead of building a screen-specific variant.
 
 - **Histories are tables.** Workflow and status histories use `HistoryTable`: Stage (status pill), From Stage, Action, By (display name and role), Date and Time, Remarks, Duration in Stage. Header Blue header row, zebra rows, right-aligned dates in one format, newest first with a sort toggle on the date column.
 - The same applies to audit trails and change logs (from and to values in their own columns), e-mail and notification logs, status histories, remarks and comment lists and activity feeds: a table when rows repeat.
-- **No "Since … by …" lines.** The current stage is a labelled status strip (`WorkflowPanel`): Stage, In Stage Since, Due, Assigned To.
+- **No "Since … by …" lines.** The current stage is shown by the workflow header (`WorkflowPanel`, section 8.5): the stage stepper and one meta row with Current Stage, Since, Due and Assigned To.
 - **Key-value blocks** use `DefinitionGrid` or `.detail-list`: one label width (168 px), ruled rows, a muted dash for an empty value. Full-width sections use two label / value pairs per row (four columns).
 
 ### 8.2 Status pills and tags
@@ -166,7 +172,7 @@ Use these instead of building a screen-specific variant.
 - Nothing breaks inside a value: dates, timestamps, amounts (`.num`) and codes stay on one line whatever the column width; only text wraps, between words.
 - Codes and logins never stand alone in a list: products by name with the code as the second line (`ProductName`), insurers by name (`InsurerName`), officers by display name (`UserName`), list values by label (`LovLabel`), statuses by their full label (section 8.2).
 - Aging and other day counts read in days: "0 days", "1 day", "12 days" (`formatDays`), never "0 d".
-- Every cell has one primary value and at most one muted secondary line under it (`CellStack`). Empty values are a single muted dash; a state such as "Not Matched" is a neutral pill, never prose ("None yet").
+- Every cell has one primary value and at most one muted secondary line under it (`CellStack`). Empty values are a single muted dash; a state such as "Not Matched" is a neutral pill, never prose ("None yet"). Key-value blocks follow the same convention: an empty value, a typed dash or a period without dates (never a lone "to") is the muted dash.
 - Users are shown by display name, never by login id (`UserName`).
 - Sortable headers (`sortKey` with `sort` / `onSort`) where the API sorts; the pagination bar shows "Showing x to y of n results", numbered pages and, where the API takes a page size, Rows per Page.
 - Loading shows skeleton rows; an empty list shows the illustration with the message and, where there is one, the next action. Row hover and the selected row are highlighted; clickable rows open with Enter. Totals rows use the gold-ruled totals style (`footer`).
@@ -174,15 +180,68 @@ Use these instead of building a screen-specific variant.
 ### 8.4 Record pages
 
 - One header layout: back arrow and breadcrumb, title, then `RecordHeader` (name, reference chips, status pill and labelled statuses such as KYC, flag tags, completeness indicator, key facts in four columns). The page actions are on the right in one order: secondary, primary, then the destructive action separated and last (enforced by the page header styles).
-- An alert banner only for a blocking issue (e.g. "Complete Birth Date, TIN before submitting the KYC").
-- The workflow is the status strip and the history table (section 8.1), never a free-text card.
+- A notice only for a blocking issue or a short message (e.g. "Information incomplete: complete Birth Date, TIN before submitting the KYC"), in the notice standard (section 8.6).
+- The workflow is the workflow header (section 8.5) and the history table (section 8.1), never a free-text card or a coloured strip.
+- Client tags such as "BDO employee" are standard tags in the record header's flag list, never a highlighted strip.
 - Detail sections are cards in one grid (`.detail-grid`) with aligned label / value rows; a section with nothing filled shows "Not provided", a mostly empty one shows its filled fields with "Show All Fields".
 - Tabs are boxed with optional counts (`Tabs` `count`) and move with the arrow keys, Home and End.
 - LOV labels, never codes; Title Case labels.
 
-### 8.5 Forms, filter bars and uploads
+### 8.5 Workflow header and stage stepper (client feedback, 27-Sep-2026)
 
-- Labels above the fields on one baseline, inputs of equal height on one baseline, fields on the 12-column grid (`.form-grid`), required markers, inline errors under the field, and the action bar at the bottom right (`.form-actions`: Cancel, then the primary action).
+Every record with a workflow (client onboarding, quotation, proposal request, account, placement,
+issuance, booking, package request, adjustment, renewal, EB cycle, disbursement voucher, payment
+request, collections, screening case, access request and the others) shows one workflow header,
+right under the record header:
+
+- **Stepper.** A horizontal stepper built from the workflow's defined stages in their order (the
+  case response carries them): passed stages with a check on CTA Blue, the current stage highlighted
+  with a halo, stages ahead grey with their number. The normal path ends at the workflow's first
+  normal end stage. Side stages are shown only while the record is in them, placed after the stage
+  it came from: returned or on hold in amber, rejected, cancelled, voided, declined or not proceeded
+  in red (the path ends there); a record sent back to an earlier stage shows that stage in amber. A
+  record at its normal end shows it in green.
+- **Meta row.** Under a thin rule: Current Stage (the stage name), Since (date and time), Due (date
+  and time with the Overdue pill, hidden at a final stage) and Assigned To (display name), with the
+  action buttons aligned right.
+- **Narrow widths.** Only the first and last stages, the current stage and its neighbours stay; the
+  others collapse into a dashed "…" step and only the current stage keeps its label.
+- No coloured left border, no pill labelled "Stage" and no "In Stage Since" strip.
+
+### 8.6 Notices: error, warning, info and success
+
+One notice standard for every message (`Notice`, `ErrorAlert`, toasts):
+
+- White surface, 1 px border, a 4 px left accent bar and the icon in the semantic colour: error red
+  (`--color-danger`), warning amber (`--color-warning-accent`), info blue (`--color-info`), success
+  green (`--color-success`). No tinted, pastel or pink fills.
+- A bold short title ("Cannot submit for ManCom sign-off"), then the business message, with one
+  bullet per item when several things are missing ("Complete the requirements: a; b" becomes the
+  lead and two bullets).
+- No technical codes, exception names, HTTP codes or identifiers in the visible text. Business-rule
+  refusals and validation failures show no reference at all. Only unexpected system errors
+  (network, server) show "Reference for support" behind a Details toggle, with Retry.
+- Field errors stay inline under their fields; a long form adds the error summary at the top
+  (`FormErrorSummary`).
+- Toasts use the same colours and icons on a white surface.
+- A subtle one-line info notice (`Notice` `className="subtle"`) may explain a table above it
+  ("Submission needs an approved rate exception").
+
+### 8.7 No records in highlight boxes
+
+Notices carry short messages only. Records, lists of records and key data never sit in a coloured
+box:
+
+- records go in a record table in a titled card, with the action in the card header (e.g. the
+  quotation's Rate Exceptions card: Exception No., Requested Rate, Scheme Rate, Difference, Valid
+  Until, Requested By and on, Decided By and on, Status);
+- key data goes in a definition grid (`DefinitionGrid`, `DetailList`);
+- a notice may introduce the table ("These risk items are already insured on other accounts") but
+  the rows are in the table.
+
+### 8.8 Forms, filter bars and uploads
+
+- Labels above the fields on one baseline, inputs of equal height on one baseline, fields on the 12-column grid (`.form-grid`), required markers, inline errors under the field with the error summary at the top of long forms (`FormErrorSummary`), and the action bar at the bottom right (`.form-actions`: Cancel, then the primary action).
 - Filter, parameter and search bars share one layout (`.filter-bar`, `.form-grid`): no hints pushing fields out of line; the action button aligned to the input line at the right end.
 - Uploads use `FileDropZone` (drag and drop plus Browse, the accepted types and maximum size as one hint, the files listed with size and a remove icon, a progress bar). The upload button sits in the action bar; disabled buttons use the theme's disabled style.
 
@@ -202,10 +261,10 @@ Use these instead of building a screen-specific variant.
 |---|---|---|
 | Notifications | The bell opens a panel grouped by day (Today, Yesterday, date); each item has an icon, title, one-line summary, record reference chip and relative time; unread items are highlighted with Mark Read; Mark All Read; View All opens `/notifications` with filters kept in the URL | `NotificationBell`, `NotificationsPage`, `notificationLogic` |
 | Field errors | Inline under the field in the error colour, field outlined | `Field` `error`, `aria-invalid` |
-| Form errors | Banner at the top listing the errors, each linked to its field | `ErrorAlert` |
-| Business rule refusals | Business message plus a reference for support (error code and correlation id); no stack trace, raw JSON or HTTP code | `ErrorAlert`, `ApiError`, server `GlobalExceptionHandler` (`correlationId`) |
-| Success | Toast | `useToast` |
-| Network and server errors | Friendly banner with Retry | `ErrorAlert onRetry` |
+| Form errors | Error notice at the top listing the errors, each linked to its field | `ErrorAlert`, `FormErrorSummary` |
+| Business rule refusals | Error notice with a bold title and the business message (bullets for missing items); no code, reference, stack trace, raw JSON or HTTP code | `ErrorAlert`, `errorView`, `ApiError` |
+| Success, warning, info | Toast in the notice colours with its icon | `useToast` |
+| Network and server errors | Friendly error notice with Retry; the support reference behind Details | `ErrorAlert onRetry`, server `GlobalExceptionHandler` (`correlationId`, `reference`) |
 | Session expiry | Warning before the time-out; signing in again returns to the same page | `SessionTimeoutGuard`, `RequireAuth` (remembers the page) |
 | 403 and 404 | Themed page with Go Back and Back to Homepage | `StatusPage` |
 | Uploads | Validate before commit, summary (rows read, valid, rejected) and a preview of the rows; Download Error File (the template layout with an Error column and the offending cells highlighted); the rule stated on screen (valid rows are processed, rejected rows are returned in the error file); Upload Corrected File keeps the link to the previous upload; duplicate files refused with the earlier upload named; progress; Download Template next to the upload | `BulkUploadWizard`, `FileDropZone`, `/bulk/jobs/{id}/error-file` |

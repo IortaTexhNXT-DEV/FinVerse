@@ -1,11 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
-import { CheckCircle2, CircleAlert } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { accountsApi } from '@/api/accounts';
 import { useLovLabel } from '@/components/broking/useLabels';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { humanize } from '@/utils/format';
 import { checkLines } from './accountChecks';
+import { Notice } from '@/components/ui/Notice';
+import { DataTable } from '@/components/ui/DataTable';
 
 /**
  * Readiness of an account (BRNB.013/016): missing data and documents, duplicates with the
@@ -29,32 +30,37 @@ export function AccountCheckPanel({ accountId }: Readonly<{ accountId: number }>
   return (
     <div className="stack">
       {c.readyToSubmit ? (
-        <div className="alert success" role="status">
-          <CheckCircle2 size={16} aria-hidden="true" /> Complete: the account can be submitted.
-        </div>
+        <Notice tone="success" title="Complete">
+          The account can be submitted.
+        </Notice>
       ) : (
-        <div className="alert warning" role="alert">
-          <CircleAlert size={16} aria-hidden="true" /> Not ready to submit:
-          <ul>
-            {lines.map((l) => (
-              <li key={l}>{l}</li>
-            ))}
-          </ul>
-        </div>
+        <Notice tone="warning" role="alert" title="Not ready to submit" items={lines} />
       )}
       {c.duplicates.length > 0 && (
-        <div className="alert danger" role="alert">
-          Duplicate risks:
-          <ul>
-            {c.duplicates.map((d) => (
-              <li key={`${d.itemNo}-${d.field}`}>
-                Item {d.itemNo} {humanize(d.field)} {d.value} is on{' '}
-                <Link to={`/accounts/by-arn/${d.existingArn}`}>{d.existingArn}</Link> (
-                {d.existingProduct})
-              </li>
-            ))}
-          </ul>
-        </div>
+        <>
+          <Notice tone="error" title="Duplicate risks">
+            These risk items are already insured on other accounts.
+          </Notice>
+          <DataTable
+            caption="Duplicate risks"
+            rows={c.duplicates}
+            rowKey={(d) => `${d.itemNo}-${d.field}`}
+            columns={[
+              { key: 'item', header: 'Item', kind: 'amount', render: (d) => d.itemNo },
+              { key: 'field', header: 'Field', render: (d) => humanize(d.field) },
+              { key: 'value', header: 'Value', render: (d) => d.value },
+              {
+                key: 'arn',
+                header: 'Existing Account',
+                kind: 'code',
+                render: (d) => (
+                  <Link to={`/accounts/by-arn/${d.existingArn}`}>{d.existingArn}</Link>
+                ),
+              },
+              { key: 'product', header: 'Product', render: (d) => d.existingProduct },
+            ]}
+          />
+        </>
       )}
       {c.tsuRequired && (
         <p className="muted">

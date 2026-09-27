@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.workflow.api.dto;
 
 import com.iortatechnxt.brokerverse.workflow.domain.WorkCaseHistory;
+import com.iortatechnxt.brokerverse.workflow.domain.WorkflowStage;
 import com.iortatechnxt.brokerverse.workflow.domain.WorkflowTransition;
 import com.iortatechnxt.brokerverse.workflow.service.CaseView;
 import java.time.Instant;
@@ -14,13 +15,15 @@ import java.util.List;
  * @param slaHours stage SLA
  * @param actions actions available to the current user
  * @param history status history, oldest first
+ * @param stages every stage of the workflow in its defined order (the stepper of the record)
  */
 public record CaseResponse(
     WorkItemResponse item,
     boolean stageTerminal,
     Integer slaHours,
     List<ActionInfo> actions,
-    List<HistoryEntry> history) {
+    List<HistoryEntry> history,
+    List<StageInfo> stages) {
 
   /**
    * Maps a case view.
@@ -38,7 +41,23 @@ public record CaseResponse(
         view.actions().stream().map(t -> ActionInfo.from(t, names.get(t.getToStage()))).toList(),
         view.history().stream()
             .map(h -> HistoryEntry.from(h, names.get(h.getFromStage()), names.get(h.getToStage())))
-            .toList());
+            .toList(),
+        view.stages().stream().map(StageInfo::from).toList());
+  }
+
+  /**
+   * A stage of the workflow.
+   *
+   * @param code stage code
+   * @param name stage name
+   * @param initial whether cases start in it
+   * @param terminal whether it is final
+   */
+  public record StageInfo(String code, String name, boolean initial, boolean terminal) {
+
+    static StageInfo from(WorkflowStage s) {
+      return new StageInfo(s.getStageCode(), s.getName(), s.isInitial(), s.isTerminal());
+    }
   }
 
   /**

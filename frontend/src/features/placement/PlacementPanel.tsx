@@ -6,7 +6,7 @@ import type { InsurerReturn } from '@/api/placement';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime, formatPeriod, humanize } from '@/utils/format';
 import { placementLink } from './placementLogic';
 
 function returnText(r: InsurerReturn): string {
@@ -65,7 +65,7 @@ export function PlacementPanel({ arn }: Readonly<{ arn: string }>) {
         <dt>Hold cover</dt>
         <dd>
           {hold
-            ? `${humanize(hold.status)}, ${formatDate(hold.startDate)} to ${formatDate(hold.expiryDate)}`
+            ? `${humanize(hold.status)}, ${formatPeriod(hold.startDate, hold.expiryDate)}`
             : '—'}
         </dd>
         <dt>Insurer return</dt>

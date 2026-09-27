@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/Card';
 import { DetailList } from '@/features/catalog/DetailList';
 import { formatAmount } from '@/utils/format';
 import { premiumRows } from './premium';
+import { Notice } from '@/components/ui/Notice';
 
 /** A premium breakdown card, or the reason why it cannot be computed yet. */
 export function PremiumCard({
@@ -68,10 +69,10 @@ export function LivePremium({ input }: Readonly<{ input: QuotationInput }>) {
   return (
     <>
       {data?.tsuRequired === true && (
-        <div className="alert warning" role="status">
+        <Notice tone="warning">
           TSU routing applies: {data.tsuReason}. Consider a Proposal Request (PRF) for TSU to price
           the risk with the insurers.
-        </div>
+        </Notice>
       )}
       {data === undefined ? (
         <Card title="Premium">

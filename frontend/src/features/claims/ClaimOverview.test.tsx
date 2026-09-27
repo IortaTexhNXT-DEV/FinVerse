@@ -59,7 +59,8 @@ describe('claim overview', () => {
     render(<ClaimOverview claim={claim} />);
     expect(screen.getByText('1,234.50')).toBeInTheDocument();
     expect(screen.getByText('60% (leader with CO-0001)')).toBeInTheDocument();
-    expect(screen.getByText('Rejected: Excluded peril')).toBeInTheDocument();
+    expect(screen.getByText('Rejected')).toHaveClass('notice-title');
+    expect(screen.getByText('Excluded peril')).toBeInTheDocument();
     expect(screen.getByText('Adjusters Inc.')).toBeInTheDocument();
     expect(screen.getByText('Whole policy')).toBeInTheDocument();
   });

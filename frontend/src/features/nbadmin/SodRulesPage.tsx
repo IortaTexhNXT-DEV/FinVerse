@@ -16,6 +16,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { UserName } from '@/components/ui/UserName';
 import { formatDateTime } from '@/utils/format';
 import { EMPTY_SOD_RULE, pendingText, ruleErrors } from './sodRules';
+import { CellStack } from '@/components/ui/CellStack';
 
 function NewRuleDialog({ onClose }: Readonly<{ onClose: () => void }>) {
   const toast = useToast();
@@ -78,7 +79,10 @@ function NewRuleDialog({ onClose }: Readonly<{ onClose: () => void }>) {
       }
     >
       <div className="stack">
-        <ErrorAlert error={create.error ?? roles.error} />
+        <ErrorAlert
+          error={create.error ?? roles.error}
+          title="Cannot send the rule for authorisation"
+        />
         <div className="form-grid">
           {profile('profileA', 'Group Profile')}
           {profile('profileB', 'May Not Be Held With')}
@@ -192,7 +196,8 @@ export default function SodRulesPage() {
           )
         }
       />
-      <ErrorAlert error={rules.error ?? act.error} />
+      <ErrorAlert error={rules.error} />
+      <ErrorAlert error={act.error} title="Cannot change the rule" />
       <Card flush>
         <DataTable<SodRule>
           caption="Separation-of-duties rules"
@@ -201,22 +206,16 @@ export default function SodRulesPage() {
           rowKey={(r) => r.id}
           emptyMessage="No separation-of-duties rule yet."
           columns={[
-            {
-              key: 'c',
-              header: 'Rule',
-              render: (r) => <strong className="mono">{r.ruleCode}</strong>,
-            },
+            { key: 'c', header: 'Rule', kind: 'code', render: (r) => r.ruleCode },
             { key: 'a', header: 'Group Profile', render: (r) => r.profileAName },
             { key: 'b', header: 'May Not Be Held With', render: (r) => r.profileBName },
             { key: 'd', header: 'Reason', render: (r) => r.description },
             {
               key: 's',
               header: 'Status',
+              kind: 'status',
               render: (r) => (
-                <>
-                  <StatusBadge status={r.status} />
-                  {pendingText(r) && <span className="cell-sub">{pendingText(r)}</span>}
-                </>
+                <CellStack main={<StatusBadge status={r.status} />} sub={pendingText(r)} />
               ),
             },
             { key: 'm', header: 'Maker', render: (r) => <UserName login={r.maker} /> },
@@ -225,10 +224,10 @@ export default function SodRulesPage() {
               header: 'Authorised',
               render: (r) =>
                 r.authorizedBy ? (
-                  <>
-                    <UserName login={r.authorizedBy} />
-                    <span className="cell-sub">{formatDateTime(r.authorizedAt)}</span>
-                  </>
+                  <CellStack
+                    main={<UserName login={r.authorizedBy} />}
+                    sub={formatDateTime(r.authorizedAt)}
+                  />
                 ) : (
                   ''
                 ),

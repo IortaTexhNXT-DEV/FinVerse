@@ -19,7 +19,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDate, humanize } from '@/utils/format';
+import { formatAmount, formatDate, formatPeriod, humanize } from '@/utils/format';
 import { RUN_ENTITY, frbsApi } from './api';
 import type { ServiceFeeInvoice, ServiceFeeLine, ServiceFeeRun } from './api';
 import { LiquidateDialog, ReleaseDialog } from './LineDialogs';
@@ -309,10 +309,10 @@ export default function ServiceFeeRunPage() {
         backTo="/frbs/service-fee"
         section="Finance · Accounting Reports"
         title={r.runNo}
-        description={`Service fee of the invoices fully paid from ${formatDate(r.periodFrom)} to ${formatDate(r.periodTo)}`}
+        description={`Service fee of the invoices fully paid from ${formatPeriod(r.periodFrom, r.periodTo)}`}
       />
       <RecordSummary
-        title={`Service Fee ${formatDate(r.periodFrom)} – ${formatDate(r.periodTo)}`}
+        title={`Service Fee ${formatPeriod(r.periodFrom, r.periodTo)}`}
         chips={
           <>
             <ReferenceChip label="Run" value={r.runNo} />

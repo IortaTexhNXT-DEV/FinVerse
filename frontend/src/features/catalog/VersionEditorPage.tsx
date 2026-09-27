@@ -22,6 +22,7 @@ import { VersionTermsSection } from './VersionTermsSection';
 import { formOf, toInput, validateVersionForm } from './versionForm';
 import type { VersionForm } from './versionForm';
 import { UserName } from '@/components/ui/UserName';
+import { Notice } from '@/components/ui/Notice';
 
 const TABS = [
   { id: 'scheme', label: 'Rate Scheme & Dates' },
@@ -120,7 +121,9 @@ function Editor({ detail }: Readonly<{ detail: VersionDetail }>) {
       )}
       <ErrorAlert error={save.error ?? submit.error} />
       {detail.returnedReason && s.status === 'DRAFT' && (
-        <div className="alert warning">Returned by the validator: {detail.returnedReason}</div>
+        <Notice tone="warning" title="Returned by the validator">
+          {detail.returnedReason}
+        </Notice>
       )}
       <VersionCheckpoint detail={detail} />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />

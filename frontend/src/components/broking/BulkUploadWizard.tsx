@@ -15,6 +15,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { Notice } from '@/components/ui/Notice';
 
 interface BulkUploadWizardProps {
   handler: string;
@@ -177,9 +178,9 @@ function UploadCard(p: Readonly<UploadCardProps>) {
     <Card title="2. Upload">
       <div className="stack">
         {p.previous !== null && (
-          <div className="alert" role="status">
+          <Notice tone="info">
             Upload the corrected error file of {p.previous.jobNo} ({p.previous.fileName}).
-          </div>
+          </Notice>
         )}
         {p.parameterFields}
         <Field

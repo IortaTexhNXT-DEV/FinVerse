@@ -20,7 +20,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { AccountClaimsPanel } from '@/features/brokerclaims/account/AccountClaimsPanel';
 import { PolicyPanel } from '@/features/issuance/PolicyPanel';
 import { PlacementPanel } from '@/features/placement/PlacementPanel';
-import { formatAmount, formatDate } from '@/utils/format';
+import { formatAmount, formatPeriod } from '@/utils/format';
 import { AccountActions } from './AccountActions';
 import { AccountCheckPanel } from './AccountCheckPanel';
 import { DetailsPanel, HistoryPanel, ItemsPanel } from './AccountPanels';
@@ -68,7 +68,7 @@ function accountFacts(a: Account): Fact[] {
     {
       icon: CalendarRange,
       label: 'Period',
-      value: `${formatDate(a.periodFrom)} – ${formatDate(a.periodTo)}`,
+      value: formatPeriod(a.periodFrom, a.periodTo),
     },
     {
       icon: Wallet,

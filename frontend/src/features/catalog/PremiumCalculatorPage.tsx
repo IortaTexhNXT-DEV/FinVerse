@@ -13,6 +13,7 @@ import { SelectInput, TextInput } from '@/features/assets/FormControls';
 import { calcProblems, EMPTY_ITEM, newCalcForm, toRatingInput } from './calculatorForm';
 import type { CalcForm, CalcItem } from './calculatorForm';
 import { CalculatorResult } from './CalculatorResult';
+import { Notice } from '@/components/ui/Notice';
 
 const BASES = [
   { value: 'ANNUAL', label: 'Annual' },
@@ -262,9 +263,9 @@ export default function PremiumCalculatorPage() {
           ))}
         </div>
         {problems.length > 0 && (
-          <div className="alert warning" role="alert">
+          <Notice tone="warning" role="alert">
             {problems.join(' ')}
-          </div>
+          </Notice>
         )}
         <ErrorAlert error={quote.error} />
         <div className="row">

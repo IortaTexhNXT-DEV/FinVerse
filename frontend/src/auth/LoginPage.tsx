@@ -7,6 +7,7 @@ import { Field } from '@/components/ui/Field';
 import { BRAND } from '@/branding';
 import { useAuth } from './authContext';
 import { SignInFrame } from './SignInFrame';
+import { Notice } from '@/components/ui/Notice';
 
 type Mode = 'signin' | 'forgot' | 'sent';
 
@@ -106,9 +107,9 @@ export default function LoginPage() {
         }}
       >
         {mode === 'sent' && (
-          <div className="alert success" role="status">
+          <Notice tone="success">
             If the user ID has an e-mail address, a reset link is on its way. Check your mailbox.
-          </div>
+          </Notice>
         )}
         <ErrorAlert error={error} />
         <Field label="User ID">

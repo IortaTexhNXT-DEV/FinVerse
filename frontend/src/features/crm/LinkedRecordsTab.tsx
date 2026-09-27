@@ -7,6 +7,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate } from '@/utils/format';
+import { Notice } from '@/components/ui/Notice';
 
 /**
  * Linked Records (BRNB.099): accounts, quotations, proposals and other records of the client, and
@@ -23,19 +24,18 @@ export function LinkedRecordsTab({ clientId }: Readonly<{ clientId: number }>) {
     <div className="stack">
       <ErrorAlert error={view.error} />
       {warnings.length > 0 && (
-        <div className="alert warning" role="status">
-          <strong>Linkage and data gaps</strong>
-          <ul className="warning-list">
-            {warnings.map((w) => (
-              <li key={w.code}>{w.message}</li>
-            ))}
-          </ul>
-        </div>
+        <Notice
+          tone="warning"
+          title="Linkage and data gaps"
+          items={warnings.map((w) => (
+            <span key={w.code}>{w.message}</span>
+          ))}
+        />
       )}
       {view.data !== undefined && warnings.length === 0 && (
-        <div className="alert success" role="status">
+        <Notice tone="success">
           No missing linkage: the client, its sub-ledger party and its data are complete.
-        </div>
+        </Notice>
       )}
       <Card title="Records of the client" flush>
         <DataTable<ClientRecord>

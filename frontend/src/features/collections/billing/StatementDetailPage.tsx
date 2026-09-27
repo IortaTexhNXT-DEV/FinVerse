@@ -24,6 +24,7 @@ import type { SendStatement, Statement, StatementLine } from './api';
 import { billingApi } from './api';
 import { cycleText, statementEmail } from './labels';
 import { displayNameOf } from '@/api/users';
+import { Notice } from '@/components/ui/Notice';
 
 const ENTITY = 'BillingStatement';
 
@@ -186,7 +187,9 @@ export default function StatementDetailPage() {
       <ErrorAlert error={download.error} />
       <Summary s={s} />
       {s.cancelReason !== undefined && (
-        <div className="alert warning">Cancelled: {s.cancelReason}</div>
+        <Notice tone="warning" title="Cancelled">
+          {s.cancelReason}
+        </Notice>
       )}
       <Card title="Installments Billed">
         <DataTable

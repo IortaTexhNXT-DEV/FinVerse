@@ -22,6 +22,7 @@ import { ReasonDialog, RecordLoading } from './Parts';
 import { usePlanActions } from './usePlanActions';
 import { usePromiseSave } from './usePromiseSave';
 import { displayNameOf } from '@/api/users';
+import { Notice } from '@/components/ui/Notice';
 
 function Summary({ plan }: Readonly<{ plan: Plan }>) {
   return (
@@ -136,7 +137,9 @@ export default function PlanDetailPage() {
       <ErrorAlert error={refresh.error ?? bill.error} />
       <Summary plan={p} />
       {p.cancelReason !== undefined && (
-        <div className="alert warning">Cancelled: {p.cancelReason}</div>
+        <Notice tone="warning" title="Cancelled">
+          {p.cancelReason}
+        </Notice>
       )}
       <PlanTabsCard
         plan={p}

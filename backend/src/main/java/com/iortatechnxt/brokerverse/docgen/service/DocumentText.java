@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.docgen.service;
 import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -18,6 +19,12 @@ public final class DocumentText {
   /** A template code with its version, e.g. "PLACEMENT_SLIP v1" (never shown to users as such). */
   private static final Pattern TEMPLATE_TAG =
       Pattern.compile("\\b[A-Z][A-Z0-9_]{2,60} v(\\d{1,4})\\b");
+
+  /** A bare template version ("Version 1") of the small print. */
+  private static final Pattern BARE_VERSION = Pattern.compile("(?i)version \\d{1,4}");
+
+  /** A document's own version named in the small print ("Quotation version 1"). */
+  private static final Pattern NAMED_VERSION = Pattern.compile("(?i)\\S+ version \\d{1,4}");
 
   private DocumentText() {}
 
@@ -35,8 +42,9 @@ public final class DocumentText {
   /**
    * The business footer printed on every page before "Page x of y": the document title, the company
    * and the document's small print, where a template tag ("PLACEMENT_SLIP v1") is written as its
-   * version ("Version 1"). The "Confidential" classification is added in front by the footer
-   * itself.
+   * version ("Version 1"). When the small print also names the document's own version ("Quotation
+   * version 1"), the bare template version is left out so the footer never repeats a version. The
+   * "Confidential" classification is added in front by the footer itself.
    *
    * @param spec document
    * @return footer text
@@ -47,12 +55,25 @@ public final class DocumentText {
     parts.add(spec.companyName());
     String note =
         spec.footer() == null ? "" : TEMPLATE_TAG.matcher(spec.footer()).replaceAll("Version $1");
-    if (!note.isBlank()) {
-      parts.add(note.strip());
-    }
+    parts.addAll(smallPrint(note));
     return parts.stream()
         .filter(p -> p != null && !p.isBlank())
         .collect(Collectors.joining(FOOTER_SEPARATOR));
+  }
+
+  /**
+   * The parts of the small print ("Version 1 | Quotation version 1"), without a bare version when
+   * another part names the document's version, and without repeated parts.
+   */
+  private static List<String> smallPrint(String note) {
+    List<String> parts =
+        Arrays.stream(note.split("\\|"))
+            .map(String::strip)
+            .filter(p -> !p.isBlank())
+            .distinct()
+            .toList();
+    boolean named = parts.stream().anyMatch(p -> NAMED_VERSION.matcher(p).matches());
+    return parts.stream().filter(p -> !(named && BARE_VERSION.matcher(p).matches())).toList();
   }
 
   /**

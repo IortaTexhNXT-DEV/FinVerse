@@ -48,7 +48,7 @@ describe('confirmation dialog', () => {
 });
 
 describe('error banner', () => {
-  it('shows the business message with the error code and the correlation id', () => {
+  it('shows a business-rule refusal as its business message, without code or reference', () => {
     render(
       <ErrorAlert
         error={
@@ -61,14 +61,14 @@ describe('error banner', () => {
       />,
     );
     expect(screen.getByRole('alert')).toHaveTextContent('The voucher is already posted.');
-    expect(screen.getByText('Reference: VOUCHER_POSTED · c0ffee')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).not.toHaveTextContent(/VOUCHER_POSTED|c0ffee|Reference/);
     expect(screen.queryByText(/422/)).not.toBeInTheDocument();
   });
 
   it('offers Retry for a network failure, in business language', async () => {
     const onRetry = vi.fn();
     render(<ErrorAlert error={new ApiError(NETWORK_STATUS, {})} onRetry={onRetry} />);
-    expect(screen.getByRole('alert')).toHaveTextContent('The system could not be reached.');
+    expect(screen.getByRole('alert')).toHaveTextContent('The system could not be reached');
     await userEvent.click(screen.getByRole('button', { name: 'Retry' }));
     expect(onRetry).toHaveBeenCalled();
   });

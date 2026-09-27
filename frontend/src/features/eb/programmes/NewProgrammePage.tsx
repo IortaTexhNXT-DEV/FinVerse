@@ -27,6 +27,7 @@ import {
   validateProgramme,
 } from './programmeForm';
 import type { ContactForm, LineForm, ProgrammeForm } from './programmeForm';
+import { Notice } from '@/components/ui/Notice';
 
 /**
  * New Programme (BRID-006, 022.01; FR-EB-021): the client (prospect or confirmed), the programme
@@ -156,7 +157,7 @@ export default function NewProgrammePage() {
         }
       >
         <div className="stack">
-          {errors.lines && <div className="alert danger">{errors.lines}</div>}
+          {errors.lines && <Notice tone="error">{errors.lines}</Notice>}
           {form.lines.map((line, i) => (
             <fieldset key={`line-${String(i)}`} className="eb-group">
               <legend>
@@ -194,7 +195,7 @@ export default function NewProgrammePage() {
         }
       >
         <div className="stack">
-          {errors.contacts && <div className="alert danger">{errors.contacts}</div>}
+          {errors.contacts && <Notice tone="error">{errors.contacts}</Notice>}
           {form.contacts.map((contact, i) => (
             <fieldset key={`contact-${String(i)}`} className="eb-group">
               <legend>

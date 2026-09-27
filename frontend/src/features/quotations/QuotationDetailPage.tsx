@@ -19,7 +19,7 @@ import { quotationsApi, QUOTATION_ENTITY } from '@/api/quotations';
 import type { Quotation } from '@/api/quotations';
 import { useAuth } from '@/auth/authContext';
 import { Attachments } from '@/components/attachments/Attachments';
-import { InstructionsBanner } from '@/components/broking/InstructionsBanner';
+import { ClientTagFlags, InstructionsBanner } from '@/components/broking/InstructionsBanner';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { SentMessages } from '@/components/broking/SentMessages';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
@@ -29,9 +29,9 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
-import { formatAmount, formatDate } from '@/utils/format';
+import { formatAmount, formatDate, formatPeriod } from '@/utils/format';
 import { QuotationActions } from './QuotationActions';
-import { RateSchemePanel } from './RateExceptionDialog';
+import { RateExceptionsCard } from './RateExceptionsCard';
 import { DetailsTab, HistoryTab, ItemsTab, VersionsTab } from './QuotationTabs';
 import { RecordSummary } from '@/components/broking/RecordSummary';
 import type { Fact } from '@/components/broking/RecordSummary';
@@ -65,7 +65,7 @@ function facts(q: Quotation): Fact[] {
     {
       icon: CalendarRange,
       label: 'Period',
-      value: `${formatDate(c.periodFrom)} – ${formatDate(c.periodTo)}`,
+      value: formatPeriod(c.periodFrom, c.periodTo),
     },
     { icon: CalendarClock, label: 'Valid until', value: formatDate(c.validUntil) },
     {
@@ -242,21 +242,19 @@ export default function QuotationDetailPage() {
           </>
         }
         flags={
-          (q.content.directPayment || q.tsuRequired) && (
-            <>
-              {q.content.directPayment && <span className="tag">Direct Payment</span>}
-              {q.tsuRequired && (
-                <span className="tag" title={q.tsuReason}>
-                  <ShieldCheck size={12} aria-hidden="true" /> TSU Rule Applies
-                </span>
-              )}
-            </>
-          )
+          <>
+            {q.content.directPayment && <span className="tag">Direct Payment</span>}
+            {q.tsuRequired && (
+              <span className="tag" title={q.tsuReason}>
+                <ShieldCheck size={12} aria-hidden="true" /> TSU Rule Applies
+              </span>
+            )}
+            <ClientTagFlags clientId={q.clientId} />
+          </>
         }
         facts={facts(q)}
       />
       <InstructionsBanner clientId={q.clientId} />
-      <RateSchemePanel quotation={q} />
       <WorkflowPanel
         entityType={QUOTATION_ENTITY}
         entityId={q.id}
@@ -264,6 +262,7 @@ export default function QuotationDetailPage() {
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['quotation', id] })}
         renderBusinessActions={(actions) => <QuotationActions quotation={q} actions={actions} />}
       />
+      <RateExceptionsCard quotation={q} />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       <TabBody tab={tab} quotation={q} version={shown} />
     </div>

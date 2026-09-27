@@ -9,7 +9,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount, formatDate, humanize } from '@/utils/format';
+import { formatAmount, formatPeriod, humanize } from '@/utils/format';
 import { CLAIMS_SECTION } from '../ClaimsPlaceholder';
 import type { CoverDetail } from './api';
 import { coverApi } from './api';
@@ -42,7 +42,7 @@ function CoverSummary({ cover }: Readonly<{ cover: CoverDetail }>) {
         {
           icon: CalendarRange,
           label: 'Period',
-          value: `${formatDate(h.periodFrom)} – ${formatDate(h.periodTo)} (${cover.termYears} year(s))`,
+          value: `${formatPeriod(h.periodFrom, h.periodTo)} (${cover.termYears} year(s))`,
         },
         {
           icon: Wallet,

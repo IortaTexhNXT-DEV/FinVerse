@@ -5,6 +5,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PasswordChangeForm } from '@/features/profile/PasswordChangeForm';
 import { formatDateTime } from '@/utils/format';
 import { SignInFrame } from './SignInFrame';
+import { Notice } from '@/components/ui/Notice';
 
 /**
  * The page of a "Forgot password?" link (UAM-NFR-37; FR-UA-005): the link is checked first, then
@@ -25,12 +26,10 @@ export default function ResetPasswordPage() {
 
   let content;
   if (token === '') {
-    content = <div className="alert warning">This page needs the link from your e-mail.</div>;
+    content = <Notice tone="warning">This page needs the link from your e-mail.</Notice>;
   } else if (reset.isSuccess) {
     content = (
-      <div className="alert success" role="status">
-        Your password was changed. Sign in with the new password.
-      </div>
+      <Notice tone="success">Your password was changed. Sign in with the new password.</Notice>
     );
   } else if (link.isError) {
     content = <ErrorAlert error={link.error} />;

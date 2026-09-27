@@ -14,7 +14,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { formatDate, formatDateTime, formatPeriod } from '@/utils/format';
 import { hasVariance, SOA_TABS } from './acsl';
 import type { SoaTab } from './acsl';
 import { acslApi } from './api';
@@ -234,7 +234,7 @@ export default function SoaUploadDetailPage() {
         backTo="/acsl/soa"
         section="Finance · ACSL"
         title={u.uploadNo}
-        description={`${u.insurerCode} statement ${formatDate(u.periodFrom)} – ${formatDate(u.periodTo)} (${u.fileName})`}
+        description={`${u.insurerCode} statement ${formatPeriod(u.periodFrom, u.periodTo)} (${u.fileName})`}
         actions={
           <>
             {can('ACSL_REPORT_EXPORT') && (

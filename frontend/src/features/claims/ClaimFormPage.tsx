@@ -15,6 +15,7 @@ import type { ClaimForm } from './claimForm';
 import { PolicyCoverCard } from './PolicyCoverCard';
 import { LossDetailsCard, PartiesCard } from './ClaimFormSections';
 import { useClaimLookups } from './useClaimLookups';
+import { Notice } from '@/components/ui/Notice';
 
 interface Lookup {
   policyNo: string;
@@ -116,9 +117,9 @@ export default function ClaimFormPage() {
       <LossDetailsCard form={form} policy={policy} onChange={set} />
       <PartiesCard form={form} lookups={lookups} onChange={set} />
       {showErrors && errors.length > 0 && (
-        <div className="alert warning" role="alert">
+        <Notice tone="warning" role="alert">
           {errors.join(' · ')}
-        </div>
+        </Notice>
       )}
       <ErrorAlert error={register.error} />
     </div>

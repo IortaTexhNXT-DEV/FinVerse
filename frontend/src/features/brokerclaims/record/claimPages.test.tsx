@@ -45,7 +45,9 @@ function wrap(children: ReactNode, path = '/', permissions: ReadonlySet<string> 
       <QueryClientProvider client={queries}>
         <AuthContext.Provider value={auth}>
           <WorkspaceContext.Provider value={workspace}>
-            <ToastContext.Provider value={{ success: vi.fn(), error: vi.fn() }}>
+            <ToastContext.Provider
+              value={{ success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn() }}
+            >
               <Routes>
                 <Route path="/claims-handling/:id" element={children} />
                 <Route path="*" element={children} />

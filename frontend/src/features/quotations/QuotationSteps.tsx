@@ -10,6 +10,7 @@ import { RiskItemsStep } from '@/features/accounts/RiskItemsStep';
 import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormControls';
 import { alignGroups, withGroup, yearAfter } from './quotationForm';
 import type { QuotationForm } from './quotationForm';
+import { Notice } from '@/components/ui/Notice';
 
 export interface QuotationStepProps {
   form: QuotationForm;
@@ -203,9 +204,9 @@ export function ItemsStep({
   return (
     <div className="stack">
       {errors.items && (
-        <div className="alert warning" role="alert">
+        <Notice tone="warning" role="alert">
           {errors.items}
-        </div>
+        </Notice>
       )}
       <RiskItemsStep
         kind={detail?.riskItemKind ?? 'GENERIC'}

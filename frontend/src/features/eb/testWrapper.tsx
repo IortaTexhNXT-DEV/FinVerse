@@ -37,7 +37,12 @@ export function ebWrapper(
     setCompanyId: () => undefined,
     setBranchId: () => undefined,
   };
-  const toast = { success: () => undefined, error: () => undefined };
+  const toast = {
+    success: () => undefined,
+    error: () => undefined,
+    warning: () => undefined,
+    info: () => undefined,
+  };
   return function Wrapper(children: ReactNode) {
     return (
       <MemoryRouter initialEntries={[route]}>

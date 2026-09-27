@@ -27,6 +27,7 @@ import { EbLov } from '../common/EbLabels';
 import { EB_LOV } from '../common/ebCodes';
 import { InsurerChecks } from '../common/InsurerChecks';
 import { useEbMutation } from '../common/useEbMutation';
+import { Notice } from '@/components/ui/Notice';
 
 /** Request Franchise: the franchise form goes to each selected insurer. */
 function RequestDialog({ cycleId, onClose }: Readonly<{ cycleId: number; onClose: () => void }>) {
@@ -56,7 +57,7 @@ function RequestDialog({ cycleId, onClose }: Readonly<{ cycleId: number; onClose
           The franchise form and the validated Broker on Record go by e-mail to each insurer.
         </p>
         {submitted && codes.length === 0 && (
-          <div className="alert danger">Select at least one insurer</div>
+          <Notice tone="error">Select at least one insurer</Notice>
         )}
         <InsurerChecks value={codes} onChange={setCodes} />
       </div>

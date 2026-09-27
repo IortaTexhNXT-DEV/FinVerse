@@ -4,7 +4,8 @@ import { Link, useParams } from 'react-router-dom';
 import { clientsApi } from '@/api/clients';
 import type { ClientDetail } from '@/api/clients';
 import { useAuth } from '@/auth/authContext';
-import { InstructionsBanner } from '@/components/broking/InstructionsBanner';
+import { ClientTagFlags, InstructionsBanner } from '@/components/broking/InstructionsBanner';
+import { Notice } from '@/components/ui/Notice';
 import { RecordHeader } from '@/components/broking/RecordHeader';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
@@ -68,14 +69,13 @@ function Header({ client: c }: Readonly<{ client: ClientDetail }>) {
       status={c.status}
       statuses={[{ label: 'KYC', status: c.kyc.status }]}
       flags={
-        !c.infoComplete || c.bankClient ? (
-          <>
-            {!c.infoComplete && (
-              <Tag title={`Missing: ${c.missingFields.join(', ')}`}>Information Incomplete</Tag>
-            )}
-            {c.bankClient && <Tag tone="info">BDO Bank Client</Tag>}
-          </>
-        ) : undefined
+        <>
+          {!c.infoComplete && (
+            <Tag title={`Missing: ${c.missingFields.join(', ')}`}>Information Incomplete</Tag>
+          )}
+          {c.bankClient && <Tag tone="info">BDO Bank Client</Tag>}
+          <ClientTagFlags clientId={c.id} />
+        </>
       }
       completeness={{ filled, total: fields.length }}
       facts={[
@@ -164,9 +164,9 @@ export default function ClientDetailPage() {
       />
       <Header client={c} />
       {!c.infoComplete && c.kyc.status === 'NOT_STARTED' && (
-        <div className="alert warning" role="status">
+        <Notice tone="warning" title="Information incomplete">
           Complete {c.missingFields.join(', ')} before submitting the KYC.
-        </div>
+        </Notice>
       )}
       <InstructionsBanner clientId={c.id} />
       <WorkflowPanel

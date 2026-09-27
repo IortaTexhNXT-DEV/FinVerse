@@ -14,6 +14,7 @@ import { ContactDetailsCard } from './ContactDetailsCard';
 import { PasswordChangeForm } from './PasswordChangeForm';
 import { policyHint } from './passwordRules';
 import { SessionsTable } from './SessionsTable';
+import { Notice } from '@/components/ui/Notice';
 
 const SESSIONS_PAGE = 10;
 
@@ -31,10 +32,10 @@ function ChangePassword({ status }: Readonly<{ status: PasswordStatus | undefine
   if (status?.authMode === 'DIRECTORY') {
     return (
       <Card title="Password">
-        <div className="alert">
+        <Notice tone="info">
           You sign in with your BDO network password. Change it through the BDO directory, not in
           BrokerVerse.
-        </div>
+        </Notice>
       </Card>
     );
   }

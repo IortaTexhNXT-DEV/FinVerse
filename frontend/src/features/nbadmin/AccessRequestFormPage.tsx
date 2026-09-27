@@ -29,6 +29,8 @@ import { GroupProfileFields } from './GroupProfileFields';
 import { UserRequestFields } from './UserRequestFields';
 import { DateInput } from '@/components/ui/DateInput';
 import { UserName } from '@/components/ui/UserName';
+import { Notice } from '@/components/ui/Notice';
+import { FormErrorSummary } from '@/components/ui/FormErrorSummary';
 
 type Mode = 'draft' | 'submit';
 
@@ -261,10 +263,18 @@ function RequestEditor({ id, initial, saved, users, settings }: Readonly<EditorP
         }
       />
       <ErrorAlert error={save.error} />
+      <FormErrorSummary errors={errors} />
       {returned && saved.decisionComment && (
-        <div className="alert warning" role="status">
-          Returned by <UserName login={saved.decidedBy} />: {saved.decisionComment}
-        </div>
+        <Notice
+          tone="warning"
+          title={
+            <>
+              Returned by <UserName login={saved.decidedBy} />
+            </>
+          }
+        >
+          {saved.decisionComment}
+        </Notice>
       )}
       <Card>
         <div className="stack">

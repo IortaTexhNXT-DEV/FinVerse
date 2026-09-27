@@ -18,6 +18,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
+import { Notice } from '@/components/ui/Notice';
 import { PermissionName } from '@/components/ui/PermissionName';
 import { permissionLabel, permissionLabels } from '@/utils/permissionLabel';
 
@@ -176,10 +177,10 @@ export default function RolesPage() {
         description="Group profiles and the permissions they grant."
       />
       {direct && (
-        <div className="alert warning" role="status">
+        <Notice tone="warning">
           Emergency path UAM_DIRECT_ROLE_EDIT is open: every direct edit is audited and raises the
           alert UAM_DIRECT_ROLE_EDIT.
-        </div>
+        </Notice>
       )}
       {can('ROLE_MANAGE') && <ToImplement />}
       <ErrorAlert error={save.error} />

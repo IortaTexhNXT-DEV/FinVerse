@@ -34,7 +34,7 @@ describe('billing labels', () => {
     expect(mail.subject).toBe('Statement of Account SOA-2026-000001 – Juan Dela Cruz');
     expect(mail.body).toContain('ARN-2026-000001');
     expect(mail.body).toContain('PHP 22,268.75');
-    expect(cycleText(SOA)).toContain('–');
+    expect(cycleText(SOA)).toBe('01-Sep-2026 to 31-Aug-2027');
   });
 
   it('checks the billing run period', () => {

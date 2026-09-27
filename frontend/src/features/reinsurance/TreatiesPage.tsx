@@ -18,6 +18,7 @@ import { blankTreaty, capacityLabel, toForm, toRequest, treatyProblems } from '.
 import type { TreatyForm } from './treatyForm';
 import { useRiLookups } from './useRiLookups';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { Notice } from '@/components/ui/Notice';
 
 /** Treaty programme per class and underwriting year (maker-checker master data). */
 export default function TreatiesPage() {
@@ -126,11 +127,11 @@ export default function TreatiesPage() {
       >
         <ErrorAlert error={save.error} />
         {problems.length > 0 && (
-          <div className="alert warning" role="status">
+          <Notice tone="warning">
             {problems.map((p) => (
               <div key={p}>{p}</div>
             ))}
-          </div>
+          </Notice>
         )}
         {form !== null && (
           <TreatyEditor

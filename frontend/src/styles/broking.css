@@ -50,50 +50,233 @@
   color: var(--brand-blue);
 }
 
-/* Workflow panel */
+/* Workflow header: stage stepper, then the meta row with the actions on the right */
 .workflow-panel {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
-  border-left: 4px solid var(--brand-gold);
   border-radius: var(--radius-md);
-  padding: var(--space-4);
+  padding: var(--space-4) var(--space-5);
   box-shadow: var(--shadow-sm);
 }
 
 .workflow-head {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-3);
+  gap: var(--space-3) var(--space-5);
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
+  padding-top: var(--space-3);
+  margin-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
 }
 
-.workflow-stage {
+.workflow-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  margin: 0;
+  flex: 1 1 auto;
+}
+
+.workflow-meta-row dt {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+}
+
+.workflow-meta-row dd {
+  margin: 0;
   display: flex;
   align-items: center;
   gap: var(--space-2);
+  color: var(--color-heading);
+  font-weight: 600;
+  min-height: 24px;
 }
 
 .workflow-stage-name {
-  font-family: var(--font-heading);
-  font-size: 18px;
-  font-weight: 700;
   color: var(--brand-navy);
-}
-
-.workflow-meta {
-  margin-top: var(--space-1);
-  font-size: 13px;
 }
 
 .workflow-overdue {
   color: var(--color-danger);
-  font-weight: 600;
 }
 
 .workflow-actions {
+  display: flex;
   flex-wrap: wrap;
+  gap: var(--space-2);
   justify-content: flex-end;
+  align-items: center;
+  margin-left: auto;
+}
+
+/* Stage stepper: passed stages checked, the current stage highlighted, stages ahead grey */
+.stage-stepper-wrap {
+  container-type: inline-size;
+}
+
+.stage-stepper {
+  --step-line: var(--color-border-strong);
+  display: flex;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.stage-step {
+  position: relative;
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  text-align: center;
+  --marker-bg: var(--color-surface);
+  --marker-border: var(--color-border-strong);
+  --marker-fg: var(--color-placeholder);
+}
+
+/* connectors: each step draws the line on its left half and on its right half */
+.stage-step::before,
+.stage-step::after {
+  content: '';
+  position: absolute;
+  top: 13px;
+  height: 2px;
+  background: var(--step-line);
+}
+
+.stage-step::before {
+  left: 0;
+  right: calc(50% + 18px);
+}
+
+.stage-step::after {
+  left: calc(50% + 18px);
+  right: 0;
+}
+
+.stage-step:first-child::before,
+.stage-step:last-child::after {
+  display: none;
+}
+
+.stage-step.is-done::before,
+.stage-step.is-done::after,
+.stage-step.is-current::before,
+.stage-step.is-returned::before,
+.stage-step.is-ended::before,
+.stage-step.is-complete::before {
+  background: var(--brand-blue);
+}
+
+.stage-marker {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--marker-border);
+  background: var(--marker-bg);
+  color: var(--marker-fg);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.stage-label {
+  max-width: 132px;
+  padding: 0 var(--space-1);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--color-text-muted);
+  overflow-wrap: anywhere;
+}
+
+.stage-step.is-done {
+  --marker-bg: var(--brand-blue);
+  --marker-border: var(--brand-blue);
+  --marker-fg: var(--color-surface);
+}
+
+.stage-step.is-done .stage-label {
+  color: var(--color-text);
+}
+
+.stage-step.is-current,
+.stage-step.is-returned,
+.stage-step.is-ended,
+.stage-step.is-complete {
+  --marker-bg: var(--color-surface);
+  --marker-border: var(--brand-blue);
+  --marker-fg: var(--brand-blue);
+}
+
+.stage-step.is-current .stage-marker,
+.stage-step.is-returned .stage-marker,
+.stage-step.is-ended .stage-marker {
+  box-shadow: 0 0 0 4px var(--brand-blue-050);
+}
+
+.stage-step.is-current .stage-label,
+.stage-step.is-returned .stage-label,
+.stage-step.is-ended .stage-label,
+.stage-step.is-complete .stage-label {
+  color: var(--color-heading);
+  font-weight: 700;
+}
+
+.stage-step.is-returned {
+  --marker-border: var(--color-warning-accent);
+  --marker-fg: var(--color-warning);
+}
+
+.stage-step.is-returned .stage-marker {
+  box-shadow: 0 0 0 4px var(--color-warning-bg);
+}
+
+.stage-step.is-ended {
+  --marker-border: var(--color-danger);
+  --marker-fg: var(--color-danger);
+}
+
+.stage-step.is-ended .stage-marker {
+  box-shadow: 0 0 0 4px var(--color-danger-bg);
+}
+
+.stage-step.is-complete {
+  --marker-bg: var(--color-success);
+  --marker-border: var(--color-success);
+  --marker-fg: var(--color-surface);
+}
+
+/* The collapsed run of stages: only shown on narrow widths */
+.stage-gap {
+  display: none;
+  flex: 0 0 40px;
+}
+
+.stage-gap .stage-marker {
+  border-style: dashed;
+  color: var(--color-text-muted);
+}
+
+@container (max-width: 760px) {
+  .stage-step.is-far {
+    display: none;
+  }
+
+  .stage-gap {
+    display: flex;
+  }
+
+  .stage-step:not([aria-current]) .stage-label {
+    display: none;
+  }
 }
 
 /* Clickable KPI and stage tiles (My Work) */

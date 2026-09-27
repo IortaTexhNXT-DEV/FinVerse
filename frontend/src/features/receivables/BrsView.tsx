@@ -12,6 +12,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDate } from '@/utils/format';
 import { computeBrs } from './receivablesMath';
+import { Notice } from '@/components/ui/Notice';
 
 interface BrsViewProps {
   companyId: number;
@@ -160,9 +161,7 @@ export function BrsView({ companyId, bank, asOf }: Readonly<BrsViewProps>) {
         />
       </div>
       {!data.hasStatement && (
-        <div className="alert warning" role="status">
-          No bank statement has been imported up to this date.
-        </div>
+        <Notice tone="warning">No bank statement has been imported up to this date.</Notice>
       )}
       <BookItems
         title="1. Book debits not accounted by bank (deposits in transit)"

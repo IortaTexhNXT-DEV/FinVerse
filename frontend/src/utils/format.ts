@@ -262,3 +262,15 @@ export function statusPhrase(code: string | null | undefined): string {
     })
     .join(' ');
 }
+
+/**
+ * The action of a dialog title as a phrase: Title Case words in lower case, acronyms and names
+ * such as ManCom or TSU kept ("Submit Requirements for ManCom Sign-off" becomes "submit
+ * requirements for ManCom sign-off").
+ */
+export function actionPhrase(title: string): string {
+  return title
+    .split(' ')
+    .map((w) => (/^[A-Z][a-z]+(?:-[A-Za-z]+)*$/.test(w) ? w.toLowerCase() : w))
+    .join(' ');
+}

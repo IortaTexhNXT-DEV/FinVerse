@@ -103,7 +103,7 @@ def brd_sort(row: tuple[str, str, str, str, str]) -> tuple:
     m = NAME_RE.match(row[4].rsplit("/", 1)[-1])
     kind = m["type"] if m else "~"
     order = KIND_ORDER.index(kind) if kind in KIND_ORDER else len(KIND_ORDER)
-    return (row[1], order, row[0], row[2], row[3])
+    return (row[1], order, row[4].rsplit("/", 1)[-1], row[0], row[2], row[3])
 
 
 def is_listed(path: Path, root: Path) -> bool:

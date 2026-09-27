@@ -35,7 +35,7 @@ so each document can be regenerated after every build.
 | 14 | Persona-based menus: each user sees only their screens | verified in the platform | B | permissions audit and tests |
 | 15 | Notifications and workflows per role | test evidence | B | workflow and notification tests |
 | 16 | Configuration over code: rules, validations and definitions maintained from front-end masters by the System Administrator | gap list and fixes | B | code review of hard-coded rules |
-| 1, 3 | BRD-1 New Business business sign-off pack (release set v2.0) | Drop 1 | FRS v2.0 with screen specifications, sign-off workbook v2.0, test plan v2.0 and release note in `out/Drop-1_Transactional/BRD-01_New_Business/`; source `src/signoff/brd01/`. Screenshots are captured on the SIT environment before issue |
+| 1, 3 | BRD-1 New Business business sign-off pack (release set v2.0) | Drop 1 | 00 Start Here, 01 Sign-off Pack Guide deck, 02 FRS v2.0 with 46 screen specifications, 03 sign-off workbook, 04 and 05 test plan in `out/Drop-1_Transactional/BRD-01_New_Business/`; source `src/signoff/brd01/`; 144 screenshots and document pages captured with seed data in `src/frs/figures/brd01/` |
 | 17 | Reports in Excel and PDF; document schedules in Word and PDF | platform change and tests | B | report and docgen modules. Built: `DocxReportRenderer` (layout of the PDF, print options honoured) and DOCX in the API, batches, archive and scheduled files; Word on documents and schedules (`ReportMetadata.asDocument`: GL-SCHEDULE, GL-BVA, FRBS-MANCOM-MARKET, RI-SOA, FIN-AP-VOUCHER); every composed business document downloadable as Word (`doc_rendition`, Word copy offer after each PDF download); templates to and from Word; BDO Insure logo, Header Blue tables, "Confidential" footer and page x of y on PDF, Word and Excel |
 | 18 | Screen-by-screen and field-by-field alignment review | findings and fixes | B | screenshots and review |
 | 19 | API catalogue | Excel + OpenAPI file | B | OpenAPI specification |
@@ -98,19 +98,40 @@ so each document can be regenerated after every build.
 ## Release and sign-off per BRD
 
 Each BRD is released to BDOI as one **release set** and signed off as one unit by its business unit. The release set
-lives in one folder, `out/<drop folder>/BRD-nn_<Name>/`, and holds the same documents for every BRD:
+lives in one folder, `out/<drop folder>/BRD-nn_<Name>/`, and holds the same documents for every BRD. The file names
+carry a two-digit prefix so that they sort in reading order (`brand.SIGNOFF_SETS`, `brand.READING_ORDER`):
 
-| Document | Content | Built by |
-|---|---|---|
-| Release note (Word, 2-3 pages) | What the set contains, how to review it, the SIT review sessions, the dates for comments and sign-off, change control after sign-off | `src/signoff/RELEASE_NOTE_<BRD>.md` |
-| FRS v2.0 (Word) | The requirements of v1.x unchanged, plus: navigation (menu by persona, screen-flow diagram); one specification per screen (purpose, who opens it, navigation, screenshots with numbered callouts, field table, actions table, business rules, expected outcome, FR and test links); end-to-end walkthroughs; messages catalogue; notifications; generated documents; upload templates; cross-BRD interface contract; sign-off and change control | `src/frs/` with ```pack blocks read from `src/signoff/<brd>/` |
-| Sign-off workbook (Excel) | Screen catalogue, field register, actions, business rules, messages, notifications, menu by persona, upload templates, cross-BRD contract and the sign-off sheet, with the BU review columns (Accept / Change requested / Comment, comment, reviewer, date) | `src/signoff/signoff_pack.py` |
-| Test plan v2.0 (Excel and Word summary) | The cases of v1.x re-traced to FRS v2.0 and its screens, plus screen cases (one per screen) and message cases | `src/testplans/build_test_plan.py` |
+| No. | Document | Content | Built by |
+|---|---|---|---|
+| 00 | Start Here (Word, 2-3 pages) | Guide to the set: the map of the files, the reading order per role, the steps up to closure with the dates, the SIT sessions, change control | `src/signoff/START_HERE_<BRD>.md` (map, reading order and steps from `<brd>/guide.yaml`) |
+| 01 | Sign-off Pack Guide (PowerPoint) | Purpose and what signing means; the pack at a glance; where to start per role; the approach and the steps with RACI, inputs, outputs and durations; how to fill in the workbook; the module at a glance (process flow, personas and menus, key screens); key rules; cross-module map; caveats with worked examples; entry and exit criteria and definition of done; handover checklist; change control; governance and next steps. Speaker notes on every slide | `src/signoff/build_guide_deck.py <brd>` from `<brd>/guide.yaml` and the pack |
+| 02 | FRS v2.0 (Word) | The requirements of v1.x unchanged, plus: navigation (menu by persona, screen-flow diagram); one specification per screen (purpose, who opens it, navigation, screenshots with numbered callouts, field table, actions table, business rules, expected outcome, FR and test links); end-to-end walkthroughs; messages catalogue; notifications; generated documents; upload templates; cross-BRD interface contract; sign-off and change control; screen standards appendix | `src/frs/` with ```pack blocks read from `src/signoff/<brd>/` |
+| 03 | Sign-off workbook (Excel) | Screen standards, screen catalogue, field register, actions, business rules, messages, notifications, menu by persona, upload templates and cross-BRD contract with the BU review columns (Accept / Change requested / Comment, comment, reviewer, date); comments log (clarification, defect, change request, with the response and status); meeting minutes; version history; sign-off certificate (business owner, Finance, Compliance and BDOI IT for their parts) | `src/signoff/signoff_pack.py` |
+| 04, 05 | Test plan v2.0 (Excel) and its summary (Word) | The cases of v1.x re-traced to FRS v2.0 and its screens, plus screen cases (one per screen) and message cases | `src/testplans/build_test_plan.py` |
+
+**Steps from issue to closure** (the same for every set; the dates of a set are in its Start Here guide):
+
+| Step | What happens | Who (R / A) | Output | Indicative duration |
+|---|---|---|---|---|
+| 1 | Pack issued | iorta TechNXT PM / delivery lead | Release set in the BRD folder; invitations | Day 0 |
+| 2 | Kick-off (guide deck) and screen walkthrough on SIT | iorta TechNXT BA / BDOI business owner | Screens shown live; first questions in the comments log; minutes | 1 week of sessions |
+| 3 | Review with the workbook (Accept / Change requested / Comment) | Business users / unit heads | Every row reviewed; comments log entries | 10 working days |
+| 4 | Comments consolidated and a Q&A session | iorta TechNXT PM and BA / business owner | Consolidated comments log, each item typed and answered; Q&A minutes | 3 working days |
+| 5 | One revision cycle (v2.1) | iorta TechNXT BA / delivery lead | Changed rows marked; change requests for the rest | 2 working days plus the reviewers' check |
+| 6 | Sign-off meeting and signature | iorta TechNXT PM / business owner | Signed sign-off certificate; open items accepted as assumptions or change requests | 1 meeting |
+| 7 | Handover to development or build freeze | iorta TechNXT delivery lead / business owner | Build readiness checklist met; for a built module, build frozen and deltas scheduled | At sign-off |
+| 8 | Traceability into SIT and UAT | iorta TechNXT test lead / business owner | SIT and UAT results traced to the signed rows | SIT and UAT windows |
+
+**Handling what comes up after issue.** An in-scope clarification is answered in the comments log without changing the
+signed text; anything new is a change request with its mandays in the Change Management Register; a change in another
+BRD or an interface that touches the cross-BRD contract is a delta sign-off of the affected pages only. Open questions
+stay built on their stated assumptions until answered.
 
 The screen, field, action, message and menu rows are generated from the system as built (menus and role grants,
 server and screen messages, upload templates) through `tools/deliverables/code_facts.py`, and a check refuses a screen
 label, button, route, FR or test link that the code or the FRS does not have. Screenshots are taken on the SIT
-environment with seed data by `tools/screenshots/capture_pack.cjs` from the manifest of the set.
+environment with seed data by `tools/screenshots/capture_pack.cjs` from the manifest of the set (recipe per BRD in
+`tools/screenshots/packs/`).
 
 **Proposed release order.** One BRD at a time, so each business unit reviews a complete set: New Business first as the
 pattern for the others, then the BRDs it depends on and the ones that depend on it.
@@ -128,7 +149,7 @@ pattern for the others, then the BRDs it depends on and the ones that depend on 
 messages, notifications and interface contract as specified. A later change is raised in the Change Management Register
 (`out/Programme/Change_Management/`), assessed for its effect on the other BRDs through the cross-BRD contract of the
 set, approved by the owners of every BRD it touches, and delivered as a new version of the release set (v2.1, v2.2...)
-with its own release note. Nothing in a signed set changes without such a request.
+with its own Start Here guide; only the changed pages are signed again. Nothing in a signed set changes without such a request.
 
 **The as-built status rule stays.** The sets describe the system as built on their "Status as of" date. Where the build
 differs from the BRD, the FRS says so in "Built behaviour that differs from the BRD" and the difference is resolved

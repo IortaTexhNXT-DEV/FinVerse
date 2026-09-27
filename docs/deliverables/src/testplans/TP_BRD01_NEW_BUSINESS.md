@@ -47,7 +47,7 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-1 New Business in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-01_New_Business_v1.0.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-1 New Business in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx`, which the testers use during execution.
 
 Every case traces to a functional requirement (FR) of FRS BRD-1 v1.0 and to the BRD requirement IDs (BRNB.nnn) and BRD sections that the FR meets. New Business is built, so the expected results quote the messages and codes that BIBS returns, and each case names the automated test that already covers it, where one exists.
 
@@ -84,9 +84,9 @@ The roles-and-access sheet checks each New Business action against the roles tha
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-1 New Business (`BIBS_FRS_BRD-01_New_Business_v1.0.docx`) | 1.0, 25 Sep 2026 |
+| R1 | Functional Requirements Specification BRD-1 New Business (`02_BIBS_FRS_BRD-01_New_Business_v2.0.docx`) | 2.0, 27 Sep 2026 |
 | R2 | New Business BRD pack (`docs/source-documents/New Business (NB) BRD.pdf`) | Addendum signed Apr-2026; Other Lines Dec-2025; Fire and Motor V06162025 |
-| R3 | Test plan workbook BRD-1 (`BIBS_TestPlan_BRD-01_New_Business_v1.0.xlsx`) | 1.0 |
+| R3 | Test plan workbook BRD-1 (`04_BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx`) | 2.0 |
 | R4 | New Business requirements traceability (`docs/requirements/BDOI_NB_TRACEABILITY.md`) | current |
 | R5 | Test plan BRD-3 Product Maintenance (catalogue, versions, incentive criteria) | 1.0 |
 | R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |

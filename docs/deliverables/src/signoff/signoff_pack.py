@@ -54,6 +54,8 @@ FIELD_COLS = ["section", "label", "type", "format", "mandatory", "source", "defa
 ACTION_COLS = ["button", "who", "when", "what", "status", "notification"]
 REVIEW_VALUES = ["Accept", "Change requested", "Comment"]
 SIGNOFF_VALUES = ["Approved", "Approved with comments", "Not approved"]
+COMMENT_TYPES = ["Clarification", "Defect", "Change request"]
+COMMENT_STATUS = ["Open", "Answered", "Closed"]
 IMPERATIVE = re.compile(r"^(Enter|Select|Choose|Give|Attach|Upload|Add|Complete|Describe|Record|Compute|Use|Explain|"
                         r"Name|Keep|Confirm|Close|Correct|Check|Save|Submit|Write|Reduce|Leave|Ask)\b")
 BANNED = re.compile(r"\b(" + codecs.decode("qrzb|qhzzl|snxr|fnzcyr qngn|cebgbglcr|cbp|fnaqobk|yberz vcfhz|gbqb|svkzr", "rot13") + r")\b", re.I)
@@ -710,7 +712,7 @@ def build_workbook(pack: Pack) -> Path:
 
     howto = [
         ("1", "Read the FRS chapter Screen specifications with the screenshots, or walk through the screens on the SIT "
-              "environment during the review sessions of the release note."),
+              "environment during the review sessions of the Start Here guide."),
         ("2", "On the sheets Screen standards, Screen catalogue, Field register, Business rules and Messages, set BU "
               "review to Accept, "
               "Change requested or Comment for each row you review, and write the change in BU comment."),
@@ -719,9 +721,11 @@ def build_workbook(pack: Pack) -> Path:
                "pills, dates and amounts, uploads with the error file, messages, notifications); review them once."),
         ("5", "Menu by persona shows what each role sees in the sidebar; Cross-BRD contract lists what New Business "
               "takes from and hands to the other BRDs."),
-        ("6", "Return the workbook to the iorta TechNXT project team by the date of the release note. Every "
-              "Change requested row is answered in the sign-off tracker before sign-off."),
-        ("7", "On the Sign-off sheet, each signatory records the decision and the date. Signing freezes the content, "
+        ("6", "Return the workbook to the iorta TechNXT project team by the date of the Start Here guide. Every "
+              "Change requested row is answered in the Comments log before sign-off."),
+        ("7", "Questions and change requests go to the Comments log; the project team answers each one there. On "
+              "the Sign-off certificate sheet, each signatory records the decision and the date. Signing freezes the "
+              "content, "
               "screens and navigation of this set; the screenshots use fictitious seed data."),
     ]
     wb.sheet("How to review", [Column("step", "Step", 8, "Step number"), Column("text", "How to review", 110, "Instruction")],
@@ -876,21 +880,71 @@ def build_workbook(pack: Pack) -> Path:
     ], [{**c, "frs": ", ".join(c.get("frs") or [])} for c in pack.contract],
         description="What New Business takes from and hands to the other BRDs and systems; a change is a change request")
 
+    comment_rows = [{"id": f"C-{i:03d}"} for i in range(1, 51)]
+    ws = wb.sheet("Comments log", [
+        Column("id", "ID", 9, "Comment identifier"),
+        Column("raised_by", "Raised by", 22, "Name and unit of the reviewer"),
+        Column("date", "Date", 13, "Date raised", kind="date"),
+        Column("where", "Page / screen", 24, "FRS page or section, screen ID or workbook row"),
+        Column("type", "Type", 16, "Clarification, Defect or Change request", values=COMMENT_TYPES),
+        Column("comment", "Comment", 50, "The question, the defect or the change asked for"),
+        Column("response", "Response", 50, "Answer of the project team; for a change request, its register number"),
+        Column("status", "Status", 12, "Open, Answered or Closed", values=COMMENT_STATUS),
+        Column("closed_on", "Closed on", 13, "Date closed", kind="date"),
+    ], comment_rows, description="Questions, defects and change requests raised during the review, with the answer")
+    date_sheets.append(ws)
+
+    sessions = [(str(x.get("duration", "")), x["name"]) for x in pack.guide.get("steps", [])
+                if x.get("step") in (2, 4, 6)]
+    ws = wb.sheet("Meeting minutes", [
+        Column("date", "Date", 13, "Date of the session", kind="date"),
+        Column("session", "Session", 32, "Walkthrough, Q&A or sign-off meeting"),
+        Column("planned", "Planned", 26, "Planned date and length"),
+        Column("attendees", "Attendees", 36, "Names and units"),
+        Column("discussion", "Discussion", 50, "Points discussed"),
+        Column("decisions", "Decisions", 40, "Decisions taken"),
+        Column("actions", "Actions", 40, "Actions, with the comment IDs"),
+        Column("owner", "Owner", 18, "Owner of the actions"),
+        Column("due", "Due date", 13, "Due date of the actions", kind="date"),
+    ], [{"session": n, "planned": d} for d, n in sessions], description="Minutes of the review sessions")
+    date_sheets.append(ws)
+
+    ws = wb.sheet("Version history", [
+        Column("version", "Version", 10, "Version of the release set"),
+        Column("date", "Date", 14, "Date of issue"),
+        Column("author", "Author", 24, "Prepared by"),
+        Column("change", "Change", 70, "What changed; for a revision, the comment IDs answered"),
+        Column("rows", "Rows changed", 24, "Sheets and rows changed"),
+    ], [{"version": str(m["version"]), "date": str(m["date"]), "author": f"{brand.VENDOR} project team",
+         "change": "First issue of the business sign-off pack, built from the system as built", "rows": "All"}],
+        description="Versions of this release set (a revision after review is v2.1; after sign-off, a change request)",
+        freeze_first_column=False)
+
     signatories = [
-        ("Product Owner", "BDOI"), ("Head, Marketing Business Services and System Support", "BDOI"),
-        ("Unit Head, Processing", "BDOI"), ("Head, Retail Marketing", "BDOI"),
-        ("Unit Head, Combank and Corbank", "BDOI"), ("Head, Technical Support Unit", "BDOI"),
-        ("Head, Comptrollership", "BDOI"), ("Program Manager, Business Project Services", "BDO Unibank ESG"),
-        ("Project Manager", brand.VENDOR)]
-    ws = wb.sheet("Sign-off", [
+        ("Product Owner", "BDOI", "Business owner: the whole set"),
+        ("Head, Marketing Business Services and System Support", "BDOI", "Business owner of New Business"),
+        ("Unit Head, Processing", "BDOI", "Payment, placement, issuance and booking screens"),
+        ("Head, Retail Marketing", "BDOI", "Client, quotation and account screens"),
+        ("Unit Head, Combank and Corbank", "BDOI", "Client, quotation, PRF and account screens"),
+        ("Head, Technical Support Unit", "BDOI", "PRF, slips and insurer responses"),
+        ("Head, Comptrollership", "BDOI", "Finance: booking entries, service invoices, accounting hand-off"),
+        ("Compliance Officer", "BDOI", "Compliance: KYC, screening hand-off, retention"),
+        ("Head, BDOI IT", "BDOI", "BDOI IT: interfaces, user access and menus"),
+        ("Program Manager, Business Project Services", "BDO Unibank ESG", "Traceability to the BRD"),
+        ("Project Manager", brand.VENDOR, "Delivery of the set as signed")]
+    ws = wb.sheet("Sign-off certificate", [
         Column("role", "Role", 40, "Signatory role"),
-        Column("org", "Organisation", 20, "Organisation"),
-        Column("name", "Name", 28, "Name of the signatory"),
+        Column("org", "Organisation", 18, "Organisation"),
+        Column("scope", "Signs for", 40, "Part of the set the signatory confirms"),
+        Column("name", "Name", 26, "Name of the signatory"),
         Column("decision", "Decision", 22, "Approved, Approved with comments or Not approved", values=SIGNOFF_VALUES),
-        Column("comments", "Comments", 40, "Conditions of the approval"),
+        Column("comments", "Comments", 36, "Conditions of the approval"),
+        Column("signature", "Signature", 20, "Signature"),
         Column("date", "Date", 14, "Date of the decision", kind="date"),
-    ], [{"role": r, "org": o} for r, o in signatories],
-        description=f"Sign-off of the {m['release_set']} v{m['version']}", freeze_first_column=False)
+    ], [{"role": r, "org": o, "scope": sc} for r, o, sc in signatories],
+        description=(f"By signing, the signatories confirm the {m['release_set']} v{m['version']}: its content, screens and "
+                     "navigation are frozen; the screenshots use fictitious seed data; later changes go through the "
+                     "Change Management Register"), freeze_first_column=False)
     date_sheets.append(ws)
     for sheet in date_sheets:
         for cell in sheet[4]:

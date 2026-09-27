@@ -4500,7 +4500,7 @@ render: screens
 
 # End-to-end walkthroughs
 
-Three walkthroughs follow a case through the screens, persona by persona, with what the user does, what the user sees and the result of each step. They use seed data only. They are the script of the SIT review sessions of the release note.
+Three walkthroughs follow a case through the screens, persona by persona, with what the user does, what the user sees and the result of each step. They use seed data only. They are the script of the SIT review sessions of the Start Here guide.
 
 ## WT-A Retail package policy from a new client to booking
 
@@ -4601,10 +4601,11 @@ The business sign-off covers the release set BRD-01 New Business v2.0:
 <!-- table: widths=6,11.6 caption="Documents of the release set" -->
 | Document | Content |
 |---|---|
-| This FRS v2.0 | Requirements (chapters 1-11) and the business view of the system (chapters 12-19) |
-| Sign-off workbook v2.0 | The screens, fields, actions, rules, messages, notifications, menus, upload templates and contract of this FRS, one row each, with the BU review columns |
-| Test plan v2.0 | The test cases traced to the FRs and to the screens of chapter 13 |
-| Release note | How to review, the review sessions and the dates |
+| 00 Start Here | The map of the pack, the reading order per role, the steps up to closure and the dates |
+| 01 Sign-off Pack Guide (deck) | Purpose, approach and steps with who does what, the module at a glance, caveats, entry and exit criteria, handover and change control |
+| 02 This FRS v2.0 | Requirements (chapters 1-11), the business view of the system (chapters 12-19), sign-off (chapter 20) and the screen standards (appendix) |
+| 03 Sign-off workbook v2.0 | The screen standards, screens, fields, actions, rules, messages, notifications, menus, upload templates and contract of this FRS, one row each, with the BU review columns; the comments log, meeting minutes, version history and sign-off certificate |
+| 04 and 05 Test plan v2.0 and its summary | The test cases traced to the FRs and to the screens of chapter 13 |
 
 ```pack
 plugin: ../signoff/signoff_pack.py
@@ -4614,7 +4615,7 @@ render: counts
 
 ## How the review is recorded
 
-Each business unit records its review in the sign-off workbook: Accept, Change requested or Comment on each row of the screen catalogue, field register, business rules and messages, with the comment, the reviewer and the date. The project team answers every Change requested row in the sign-off tracker before sign-off: either the row is corrected in the next version of the set, or the change is raised as a change request (below) and the row is signed as built.
+Each business unit records its review in the sign-off workbook: Accept, Change requested or Comment on each row of the screen standards, screen catalogue, field register, business rules and messages, with the comment, the reviewer and the date. Questions, defects and change requests go to the comments log of the workbook, where the project team answers them. The project team answers every Change requested row in the comments log before sign-off: either the row is corrected in the next version of the set, or the change is raised as a change request (below) and the row is signed as built.
 
 ## What signing freezes
 
@@ -4629,7 +4630,7 @@ Configuration values marked "default" (SLA hours, thresholds, list entries, temp
 
 ## Change after sign-off
 
-A change to anything frozen is raised in the Change Management Register. The request states the screen, field, rule or message concerned, the reason and the business priority. The project team assesses it, including its effect on the other BRDs through the interface contract of chapter 19, and the owners of every BRD it touches approve it. An approved change is delivered as a new version of this release set (v2.1, v2.2 and so on) with its own release note, and the changed rows are reviewed again.
+A change to anything frozen is raised in the Change Management Register. The request states the screen, field, rule or message concerned, the reason and the business priority. The project team assesses it, including its effect on the other BRDs through the interface contract of chapter 19, and the owners of every BRD it touches approve it. An approved change is delivered as a new version of this release set (v2.1, v2.2 and so on) with its own Start Here guide, and only the changed pages and rows are reviewed and signed again (delta sign-off).
 
 ## As-built status
 

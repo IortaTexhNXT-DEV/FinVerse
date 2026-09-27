@@ -18,14 +18,12 @@ per BRD").
 
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
-| New Business | BRD-01 | Release note | 2.0 | [`BRD-01_New_Business/BIBS_ReleaseNote_BRD-01_New_Business_v2.0.docx`](BRD-01_New_Business/BIBS_ReleaseNote_BRD-01_New_Business_v2.0.docx) |
-| New Business | BRD-01 | FRS | 1.0 | [`BRD-01_New_Business/BIBS_FRS_BRD-01_New_Business_v1.0.docx`](BRD-01_New_Business/BIBS_FRS_BRD-01_New_Business_v1.0.docx) |
-| New Business | BRD-01 | FRS | 2.0 | [`BRD-01_New_Business/BIBS_FRS_BRD-01_New_Business_v2.0.docx`](BRD-01_New_Business/BIBS_FRS_BRD-01_New_Business_v2.0.docx) |
-| New Business | BRD-01 | Sign-off workbook (Excel) | 2.0 | [`BRD-01_New_Business/BIBS_Signoff_BRD-01_New_Business_v2.0.xlsx`](BRD-01_New_Business/BIBS_Signoff_BRD-01_New_Business_v2.0.xlsx) |
-| New Business | BRD-01 | Test plan summary (Word) | 1.0 | [`BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_Summary_v1.0.docx`](BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_Summary_v1.0.docx) |
-| New Business | BRD-01 | Test plan summary (Word) | 2.0 | [`BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_Summary_v2.0.docx`](BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_Summary_v2.0.docx) |
-| New Business | BRD-01 | Test plan workbook (Excel) | 1.0 | [`BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_v1.0.xlsx`](BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_v1.0.xlsx) |
-| New Business | BRD-01 | Test plan workbook (Excel) | 2.0 | [`BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx`](BRD-01_New_Business/BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx) |
+| New Business | BRD-01 | Start here guide | 2.0 | [`BRD-01_New_Business/00_BIBS_StartHere_BRD-01_New_Business_v2.0.docx`](BRD-01_New_Business/00_BIBS_StartHere_BRD-01_New_Business_v2.0.docx) |
+| New Business | BRD-01 | Sign-off pack guide deck | 2.0 | [`BRD-01_New_Business/01_BIBS_GuideDeck_BRD-01_New_Business_v2.0.pptx`](BRD-01_New_Business/01_BIBS_GuideDeck_BRD-01_New_Business_v2.0.pptx) |
+| New Business | BRD-01 | FRS | 2.0 | [`BRD-01_New_Business/02_BIBS_FRS_BRD-01_New_Business_v2.0.docx`](BRD-01_New_Business/02_BIBS_FRS_BRD-01_New_Business_v2.0.docx) |
+| New Business | BRD-01 | Sign-off workbook (Excel) | 2.0 | [`BRD-01_New_Business/03_BIBS_Signoff_BRD-01_New_Business_v2.0.xlsx`](BRD-01_New_Business/03_BIBS_Signoff_BRD-01_New_Business_v2.0.xlsx) |
+| New Business | BRD-01 | Test plan workbook (Excel) | 2.0 | [`BRD-01_New_Business/04_BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx`](BRD-01_New_Business/04_BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx) |
+| New Business | BRD-01 | Test plan summary (Word) | 2.0 | [`BRD-01_New_Business/05_BIBS_TestPlan_BRD-01_New_Business_Summary_v2.0.docx`](BRD-01_New_Business/05_BIBS_TestPlan_BRD-01_New_Business_Summary_v2.0.docx) |
 | Operations | BRD-02 | FRS | 1.1 | [`BRD-02_Operations/BIBS_FRS_BRD-02_Operations_v1.1.docx`](BRD-02_Operations/BIBS_FRS_BRD-02_Operations_v1.1.docx) |
 | Operations | BRD-02 | Test plan summary (Word) | 1.0 | [`BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_Summary_v1.0.docx`](BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_Summary_v1.0.docx) |
 | Operations | BRD-02 | Test plan workbook (Excel) | 1.0 | [`BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx`](BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx) |

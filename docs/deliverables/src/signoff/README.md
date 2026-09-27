@@ -7,7 +7,9 @@ BRD").
 | File | Content |
 |---|---|
 | `signoff_pack.py` | Loads a pack, checks it against the code and the FRS, renders the FRS chapters (```pack blocks) and builds the sign-off workbook |
-| `RELEASE_NOTE_<BRD>.md` | Release note of the set (Word source) |
+| `START_HERE_<BRD>.md` | 00 Start Here: guide to the set (Word source; map, reading order and steps from `guide.yaml`) |
+| `build_guide_deck.py` | 01 Sign-off Pack Guide deck of a BRD (PowerPoint, speaker notes on every slide), from `<brd>/guide.yaml` and the pack |
+| `<brd>/guide.yaml` | Content of the guide deck and of Start Here: documents, reading order, steps with RACI and durations, key screens and rules, caveats with examples, entry and exit criteria, handover, governance |
 | `<brd>/pack.yaml` | Metadata, personas and their SIT users, sections of the BRD, the screen-flow links, common screen elements |
 | `<brd>/screens/*.yaml` | One file per process area; one entry per screen |
 | `<brd>/messages.yaml` | Where each message appears and the fix; the texts are read from the code |
@@ -22,7 +24,8 @@ python docs/deliverables/src/signoff/signoff_pack.py brd01/pack.yaml            
 python docs/deliverables/src/signoff/signoff_pack.py brd01/pack.yaml --manifest m.json  # screenshot manifest
 python tools/deliverables/bdoi_docx.py docs/deliverables/src/frs/FRS_BRD01_NEW_BUSINESS.md  # FRS v2.0
 python docs/deliverables/src/testplans/build_test_plan.py brd01_cases.yaml               # test plan v2.0
-python tools/deliverables/bdoi_docx.py docs/deliverables/src/signoff/RELEASE_NOTE_BRD01.md   # release note
+python tools/deliverables/bdoi_docx.py docs/deliverables/src/signoff/START_HERE_BRD01.md   # 00 Start Here
+python docs/deliverables/src/signoff/build_guide_deck.py brd01                             # 01 guide deck (after the workbook)
 python tools/deliverables/drop_index.py
 ```
 

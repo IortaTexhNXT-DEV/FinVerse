@@ -54,7 +54,7 @@ contract:
     party: BRD-2 Operations
     direction: Out
     what: Every booked invoice (booking, endorsement, cancellation) with its premium components, commission, DTIP, insurer shares and parties
-    how: Copied to the Operations invoice ledger when the booking is committed (event InvoiceBooked); a copy that fails is listed in Operations › Interfaces for replay
+    how: Copied to the Operations invoice ledger when the booking is committed; a copy that fails is listed in Operations › Interfaces for replay
     owner: Processing (booking); Operations after hand-off
     screens: Booking Workbench, Pre-booking Confirmation, Booked Invoice, New Endorsement
     frs: [FR-NB-110, FR-NB-115, FR-NB-116]

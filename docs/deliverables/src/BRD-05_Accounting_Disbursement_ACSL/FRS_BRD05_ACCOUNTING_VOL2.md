@@ -464,7 +464,7 @@ description:
   - BIBS modules ask for payments through the Operations disbursement gateway - remittance batches, cashiering refunds and 2307 releases, commission pass-ons, Payment Requests refunds and cash advances, service-fee payouts. Each request (DSR-yyyy-n) carries the RFP number, payee, disbursement type, amount, currency, attachments, the root invoice and the accounting references to settle.
   - When the payee is maintained, BIBS creates the DV at once (FR-DS-030). Refund and remittance requests go straight to the Approver (DISB_AUTO_APPROVER_ROUTING); others start In Process for the Processor.
   - When the payee is not maintained, the request waits under No Payee with a NO_MATCH payee request and the alert DISB_PAYEE_NO_MATCH, and resumes when the payee is authorised. With DISB_NO_PAYEE_ACTION = RETURN it is returned to its source at once.
-  - Every DV stage and payment is reported back to the source module (DisbursementStatusChanged).
+  - Every DV stage and payment is reported back to the source module.
 preconditions:
   - "The source module is configured to use the gateway."
 main_flow:
@@ -944,7 +944,7 @@ validations:
   - [Posting failed, "DV <no> could not be posted: <reason>", DV_POSTING_FAILED]
   - [Entry empty, "DV <no> has no entry", DV_ENTRY_EMPTY]
 notifications:
-  - "The source module is notified (DisbursementStatusChanged)."
+  - "The source module is notified of the status."
 audit:
   - "Approval, remarks, the journal number and the posting status are on the DV."
 acceptance:
@@ -2918,7 +2918,7 @@ Reports run in the Report Centre with the options of Volume 1 (view, export to X
 <!-- table: widths=3.8,2,7.2,2.4,2 caption="Interfaces" status=Scope size=8.5 -->
 | Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| Operations disbursement gateway | In / Out | Payment requests of remittance, cashiering, commission, FRBS and Payment Requests; DV status back (DisbursementStatusChanged) | DIS 2.6.0, 3.25.0; MKT 1.20.0 | IN SCOPE |
+| Operations disbursement gateway | In / Out | Payment requests of remittance, cashiering, commission, FRBS and Payment Requests; DV status back | DIS 2.6.0, 3.25.0; MKT 1.20.0 | IN SCOPE |
 | Refund validation | Out / In | ACSL case and Cashiering task per cancelled-policy line; results back | MKT 1.11.0; ACSL 2.5.5 | IN SCOPE |
 | Payment reversal | Out / In | ACSL request to Cashiering (PRV-); result back | ACSL 2.6.1 | IN SCOPE |
 | DV cancellation hand-off | Out | Approved check cancellation to the Disbursement approvers (DV_CANCELLATION); part on hold until BDOI answers AQ15 | MKT 1.19.0 | IN SCOPE |

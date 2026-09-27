@@ -3877,7 +3877,7 @@ Figure 6 shows the interfaces of New Business. The broking modules talk to each 
 | E-mail outbox | Out | Protected quotations, slips, hold cover requests, advices, e-policies, service invoices; send log | BRNB.008, 013, 035, 071 | IN SCOPE |
 | Insurers | Out / In | Slips and requests by e-mail; replies keyed in; SFTP / API channels | BRNB.008, 071 | IN SCOPE |
 | CLPC | Out / In | Billing file download and payment report upload; SFTP transfer | BRNB.067 | IN SCOPE |
-| Operations (BRD-2) | Out / In | Booked invoices (InvoiceBooked), pre-booked look-up; cashier receipts as payment confirmations | BRNB.027, 068 | IN SCOPE |
+| Operations (BRD-2) | Out / In | Booked invoices, pre-booked look-up; cashier receipts as payment confirmations | BRNB.027, 068 | IN SCOPE |
 | Product Maintenance (BRD-3) | In | Products, package versions, rate exceptions, incentive criteria | BRNB.001, 107 | IN SCOPE |
 | Accounting engine | Out | BROKER_BOOKING events, journals, open items, cost center dimension | BRNB.027, 108 | IN SCOPE |
 | Other BDOI systems | Out | NB data feed (QPS / EBIX contact updates per BRD-9) | BRNB.015 | ON HOLD |

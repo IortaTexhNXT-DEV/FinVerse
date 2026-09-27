@@ -102,11 +102,11 @@ data:
   - id: TD-CL-07
     name: Plans, promises and escalations
     content: Three-year PAR01 account of client CL-2026-000005 (1-Sep-2026 to 1-Sep-2029) with an annual policy-year plan and an SOA per billing cycle; quarterly plan on ARN-2026-940002 with the first installment overdue; promise kept on ARN-2026-940004; broken promise on the three-year account escalated to mkttl
-    source: Seed runner CollectionsPlansSeedData with SeedMultiYearAccount
+    source: Seed data (plans, promises and the three-year account)
   - id: TD-CL-08
     name: Unapplied payments
     content: Payments received without a match - Grace Villanueva (application requested by upphandler, applied by Cashiering), Juan Dela Cruz (Coordinate further), Mega Traders Inc. (refund requested by clxhandler), Liza Manalo (no disposition)
-    source: Seed runners UnappliedSeedPayments, UnappliedSeedData and CollectorRequestSeedData
+    source: Seed data (unapplied payments and collector requests)
   - id: TD-CL-09
     name: Invoice booked for the test
     content: A new Motor policy booked by proc on the test day for a CBG client with a total premium of PHP 25,000.00, no payment

@@ -9,14 +9,14 @@ brd: BRD-01
 name: New Business
 doc_id: BIBS-RN-BRD-01
 version: "2.0"
-date: 26 September 2026
+date: 27 September 2026
 status: Issued for BDOI business sign-off
 header_title: Release Note BRD-1 New Business
 output: ReleaseNote/BIBS_ReleaseNote_BRD-01_New_Business_v2.0.docx
 h1_page_break: false
 control:
   - version: "2.0"
-    date: 26 Sep 2026
+    date: 27 Sep 2026
     author: iorta TechNXT Project Manager
     reviewer: iorta TechNXT Business Analysis
     approver: ""
@@ -34,13 +34,13 @@ distribution:
 
 # What this release contains
 
-This release note accompanies the business sign-off pack of BRD-1 New Business, release set v2.0. The set shows the New Business functions of BIBS as built on 26-Sep-2026, screen by screen, so that each business unit can confirm them and sign them off. All documents are in the release-set folder BRD-01_New_Business of Drop 1.
+This release note accompanies the business sign-off pack of BRD-1 New Business, release set v2.0. The set shows the New Business functions of BIBS as built on 27-Sep-2026, screen by screen, so that each business unit can confirm them and sign them off. All documents are in the release-set folder BRD-01_New_Business of Drop 1.
 
 <!-- table: widths=5.2,2,10.4 caption="Documents of the release set" -->
 | Document | Version | Content |
 |---|---|---|
-| BIBS_FRS_BRD-01_New_Business_v2.0.docx | 2.0 | The functional requirements of v1.0 unchanged (chapters 1-11), plus navigation by persona and the screen flow (12), 46 screen specifications with screenshots, field and action tables, rules and outcome (13), three end-to-end walkthroughs (14), the messages catalogue (15), notifications (16), generated documents (17), upload templates (18), the cross-BRD interface contract (19), and sign-off and change control (20) |
-| BIBS_Signoff_BRD-01_New_Business_v2.0.xlsx | 2.0 | The same content as rows for review: screen catalogue, field register, actions, business rules, messages, notifications, menu by persona, upload templates, cross-BRD contract and the sign-off sheet |
+| BIBS_FRS_BRD-01_New_Business_v2.0.docx | 2.0 | The functional requirements of v1.0 unchanged (chapters 1-11), plus navigation by persona and the screen flow (12), 46 screen specifications with screenshots, field and action tables, rules and outcome (13), three end-to-end walkthroughs (14), the messages catalogue (15), notifications (16), generated documents (17), upload templates (18), the cross-BRD interface contract (19), and sign-off and change control (20), with the screen standards in the appendix |
+| BIBS_Signoff_BRD-01_New_Business_v2.0.xlsx | 2.0 | The same content as rows for review: screen standards, screen catalogue, field register, actions, business rules, messages, notifications, menu by persona, upload templates, cross-BRD contract and the sign-off sheet |
 | BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx and Summary | 2.0 | The test cases of v1.0 re-traced to the screens, plus one screen case per screen and one message case per screen or dialog |
 | This release note | 2.0 | How to review, the review sessions, the dates and change control |
 

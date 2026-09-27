@@ -169,6 +169,7 @@ screens:
     shots:
       - {state: list, user: ao, caption: "Quotation Requests, To Quote tab"}
       - {state: capture, user: ao, click: "^capture request$", caption: "Capture Quotation Request dialog"}
+      - {state: close, user: ao, click: "^close$", caption: "Close dialog with the required Reason for Closing"}
     fields:
       - "Tabs | To Quote / Quoted / Closed | Tab | - | - | Fixed | To Quote | - | - | -"
       - "Search | Search Request No. | Text | Request No., prospect or cover | N | - | Blank | - | Contains search | -"
@@ -188,11 +189,12 @@ screens:
       - "Capture dialog | Market segment | Drop-down | - | N | List of values MARKET_SEGMENT | Blank | New | - | -"
       - "Capture dialog | Requested cover | Text area | Up to 2,000 characters | Y | - | Blank | New | Not blank | Describe the requested cover"
       - "Capture dialog | Request e-mail | File | .eml, .msg or PDF | N | - | - | New | Stored as document type Request e-mail | -"
+      - "Close dialog | Reason for Closing | Text area | Free text | Y | - | Blank | New | Not blank | Close Request stays unavailable until the reason is entered"
     actions:
       - "Capture Request | QUOTE_MAINTAIN | Always | Opens the capture dialog; Save Request numbers the request | New | -"
       - "Create Prospect | QUOTE_MAINTAIN | New request without a client | Creates a prospect from the request's details | New (with a prospect) | -"
       - "Create Quotation | QUOTE_MAINTAIN | New request with a client or prospect | Opens the New Quotation wizard with the client, product, segment and channel of the request | Quoted once the quotation is saved | -"
-      - "Close | QUOTE_MAINTAIN | New request | Asks for a comment used as the close reason | Closed | -"
+      - "Close | QUOTE_MAINTAIN | New request | Opens the Close dialog; the Reason for Closing is required and Close Request closes the request with it | Closed | -"
       - "Open Quotation | Every user of the screen | Quoted request | Opens the quotation | - | -"
     rules:
       - "Requests from HLS and other source systems arrive in the same inbox through the upload of the extract; the direct interface waits for the interface specification (FR-NB-040)."

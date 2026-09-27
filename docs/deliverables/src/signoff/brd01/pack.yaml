@@ -7,8 +7,8 @@ meta:
   name: New Business
   code: NB
   version: "2.0"
-  date: 26 September 2026
-  status_as_of: 26-Sep-2026
+  date: 27 September 2026
+  status_as_of: 27-Sep-2026
   release_set: BRD-01 New Business – Business Sign-off Pack
   frs: FRS_BRD01_NEW_BUSINESS.md
   test_plan: brd01_cases.yaml
@@ -133,12 +133,26 @@ common:
     text: >-
       A record opens with its reference (Quotation No., PRF No., ARN, invoice), its status badge and the key facts. A
       reference chip copies the reference and an ARN chip opens the account.
-  - name: Workflow panel
+  - name: Workflow status strip and history
     text: >-
-      Shows the stage, since when, the due time of the stage (SLA, overdue in red) and the assignee, with the actions
-      the user may take now. Actions that need a reason (return, void, cancel) open a dialog with the mandatory reason
-      from its list of values and an optional comment; the comment is kept in the history and sent with the
-      notification. "Workflow notice" in the action tables means the in-app notice NT-01.
+      The current stage is shown as a status strip: Stage (status pill and stage name), In Stage Since, Due (the SLA
+      due time, Overdue in red) and Assigned To, with the actions the user may take now on the right. Under it the
+      history table lists every step, newest first: Stage, From Stage, Action, By (name and role), Date and Time,
+      Remarks and Duration in Stage; the date column can be sorted. Actions that need a reason (return, void, cancel)
+      open a dialog with the mandatory reason from its list of values and an optional comment; the comment is kept in
+      the history and sent with the notification. "Workflow notice" in the action tables means the in-app notice NT-01.
+  - name: Status pills and tags
+    text: >-
+      Statuses are pills of one size and colour per state group; a pill never wraps. Long statuses use the agreed short
+      forms with the full label in the tooltip, for example Returned to Mktg (Returned to Marketing), Insurer Returned
+      (Returned by Insurer) and For Placement (Ready for Placement); other labels longer than 18 characters end with an
+      ellipsis and keep the tooltip. Flags such as FFY, Direct Payment and Information Incomplete are tags in the record
+      header or in their own column.
+  - name: Dates, amounts and names
+    text: >-
+      Dates are entered with one date picker and shown as dd-MMM-yyyy (for example 27-Sep-2026); times as dd-MMM-yyyy
+      HH:mm in Philippine time. Amounts show two decimals and thousand separators, with the currency in the column
+      header or before the amount. Lists of values show their labels, and users are shown by their names.
   - name: Documents panel
     text: >-
       Lists the documents of the record (File, Type, Description, Size, Uploaded by, Uploaded, SHA-256), with the
@@ -152,8 +166,23 @@ common:
       separate e-mail. The e-mail is queued and its outcome is shown on the record's E-mails tab and in Outbound Messages.
   - name: Notifications and help
     text: >-
-      The bell in the header shows the in-app notices with their unread count; a notice opens its record. The Help
-      button of each page explains the screen.
+      The bell in the header shows the unread count and opens the notifications panel, grouped by day (Today,
+      Yesterday, then the date); each notice shows its title, a one-line summary, the record reference and the time, and
+      opens its record. Mark Read, Mark All Read and View All are offered; View All opens the Notifications page with
+      its filters. The Help button of each page explains the screen.
+  - name: Uploads
+    text: >-
+      Files are added in a drop zone (drag and drop or Browse) that states the accepted types and the maximum size and
+      lists the chosen files with their size. Bulk uploads validate every row before anything is saved and show Rows
+      Read, Valid and Rejected with the rows; valid rows are processed, and the rejected rows are returned in the error
+      file (Download Error File: the template layout with an Error column and the wrong cells highlighted). Upload
+      Corrected File sends the corrected rows as a new upload linked to the first one. A file already uploaded is
+      refused.
+  - name: Messages
+    text: >-
+      Field errors appear under the field in red with the field outlined; a banner at the top lists the errors of a
+      form. A refusal by a business rule shows the business message and a reference for support (the message code and
+      a request number). Success is confirmed by a short message at the bottom right of the page.
   - name: Bulk action results
     text: >-
       An action run on several selected rows processes each record on its own and lists the outcome of each (done or

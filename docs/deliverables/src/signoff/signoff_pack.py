@@ -684,19 +684,31 @@ def build_workbook(pack: Pack) -> Path:
     howto = [
         ("1", "Read the FRS chapter Screen specifications with the screenshots, or walk through the screens on the SIT "
               "environment during the review sessions of the release note."),
-        ("2", "On the sheets Screen catalogue, Field register, Business rules and Messages, set BU review to Accept, "
+        ("2", "On the sheets Screen standards, Screen catalogue, Field register, Business rules and Messages, set BU "
+              "review to Accept, "
               "Change requested or Comment for each row you review, and write the change in BU comment."),
         ("3", "Put your name in Reviewer and the date in Review date. Leave the other columns unchanged."),
-        ("4", "Menu by persona shows what each role sees in the sidebar; Cross-BRD contract lists what New Business "
+        ("4", "Screen standards lists the elements shared by every screen (status strip and history table, status "
+               "pills, dates and amounts, uploads with the error file, messages, notifications); review them once."),
+        ("5", "Menu by persona shows what each role sees in the sidebar; Cross-BRD contract lists what New Business "
               "takes from and hands to the other BRDs."),
-        ("5", "Return the workbook to the iorta TechNXT project team by the date of the release note. Every "
+        ("6", "Return the workbook to the iorta TechNXT project team by the date of the release note. Every "
               "Change requested row is answered in the sign-off tracker before sign-off."),
-        ("6", "On the Sign-off sheet, each signatory records the decision and the date. Signing freezes the content, "
+        ("7", "On the Sign-off sheet, each signatory records the decision and the date. Signing freezes the content, "
               "screens and navigation of this set; the screenshots use fictitious seed data."),
     ]
     wb.sheet("How to review", [Column("step", "Step", 8, "Step number"), Column("text", "How to review", 110, "Instruction")],
              [{"step": a, "text": b} for a, b in howto], description="How the business unit reviews this workbook",
              freeze_first_column=False)
+
+    ws = wb.sheet("Screen standards", [
+        Column("no", "No.", 6, "Row number", kind="number"),
+        Column("name", "Element", 30, "Element shared by the New Business screens"),
+        Column("text", "What the user sees and does", 100, "Behaviour of the element on every screen"),
+    ] + review_columns(), [{"no": i, **c} for i, c in enumerate(pack.common, start=1)],
+        description="Elements and standards shared by every screen (status strip and history, pills, dates, uploads, "
+                    "messages, notifications); described once, not repeated per screen")
+    date_sheets.append(ws)
 
     screen_rows = []
     for s in pack.screens:

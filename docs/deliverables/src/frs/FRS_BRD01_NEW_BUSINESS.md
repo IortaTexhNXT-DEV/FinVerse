@@ -9,7 +9,7 @@ brd: BRD-01
 name: New Business
 doc_id: BIBS-FRS-BRD-01
 version: "2.0"
-date: 26 September 2026
+date: 27 September 2026
 status: Issued for BDOI business sign-off
 header_title: FRS BRD-1 New Business
 output: FRS/BIBS_FRS_BRD-01_New_Business_v2.0.docx
@@ -27,11 +27,11 @@ control:
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review; aligned with the as-built screens, codes and the cross-BRD decisions
   - version: "2.0"
-    date: 26 Sep 2026
+    date: 27 Sep 2026
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Project Manager
     approver: BDOI business units (sign-off)
-    change: "Business sign-off pack: navigation by persona, screen specifications with screenshots, walkthroughs, messages, notifications, document outputs, upload templates, cross-BRD contract, sign-off and change control (chapters 12-20). Status as of 26-Sep-2026. Chapters 1-11 unchanged; FR, BRD and test IDs kept"
+    change: "Business sign-off pack: navigation by persona, screen specifications with screenshots, walkthroughs, messages, notifications, document outputs, upload templates, cross-BRD contract, sign-off and change control (chapters 12-20). Status as of 27-Sep-2026. Chapters 1-11 unchanged; FR, BRD and test IDs kept"
 distribution:
   - {name: "Product Owner, BDOI", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: Marketing Business Services and System Support (MBS), role: Business owner, organisation: BDOI, purpose: Review of all FRs}
@@ -51,7 +51,7 @@ This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker Sy
 
 New Business is built. Every FR therefore describes the behaviour of the delivered system, with the error codes, messages, lists of values, parameters, permissions and screen names of the build. Where the built behaviour differs from the BRD, the FR says so in a note and section 10.4 lists every difference.
 
-Version 2.0 is the business sign-off version. Chapters 1 to 11 keep the requirements of version 1.0 with their IDs. Chapters 12 to 19 show the system as the users see it: the menu of each persona, one specification per screen with its fields, actions, rules and messages, three end-to-end walkthroughs, every message and notification, the generated documents, the upload templates and what New Business exchanges with the other BRDs. Chapter 20 states what signing freezes and how a later change is made. The same rows are in the sign-off workbook, where each business unit records its review. Status as of 26-Sep-2026.
+Version 2.0 is the business sign-off version. Chapters 1 to 11 keep the requirements of version 1.0 with their IDs. Chapters 12 to 19 show the system as the users see it: the menu of each persona, one specification per screen with its fields, actions, rules and messages, three end-to-end walkthroughs, every message and notification, the generated documents, the upload templates and what New Business exchanges with the other BRDs. Chapter 20 states what signing freezes and how a later change is made. The same rows are in the sign-off workbook, where each business unit records its review. Status as of 27-Sep-2026.
 
 BDOI uses this document to confirm that the system behaves as the business expects. The project team uses it to test and to prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
 
@@ -4634,7 +4634,7 @@ A change to anything frozen is raised in the Change Management Register. The req
 
 ## As-built status
 
-This FRS describes the system as built on 26-Sep-2026. Where the build differs from the BRD, section 10.4 says so; such a difference is settled through the register or a change request, not by changing the text. At the end of the build, the final as-built refresh re-issues this set with the system as delivered.
+This FRS describes the system as built on 27-Sep-2026; the screenshots were taken on the SIT environment on that date. Where the build differs from the BRD, section 10.4 says so; such a difference is settled through the register or a change request, not by changing the text. At the end of the build, the final as-built refresh re-issues this set with the system as delivered.
 
 <!-- pagebreak -->
 
@@ -4654,3 +4654,27 @@ rows:
   - {name: "", role: "Program Manager, Business Project Services", organisation: BDO Unibank ESG}
   - {name: "", role: Project Manager, organisation: iorta TechNXT}
 ```
+
+<!-- pagebreak -->
+
+# Appendix: Screen standards
+
+The New Business screens are built to the screen standards agreed with BDOI on 26-Sep-2026. They are listed here so that the business units can check the screenshots against them; they are not repeated in each screen specification.
+
+<!-- table: widths=4.2,13.4 caption="Screen standards of BIBS" -->
+| Area | Standard |
+|---|---|
+| Record pages | Back arrow and breadcrumb, title, then the record header with the name, reference chips, status pill, flags and key facts. Page actions on the right in one order: secondary, primary, and the destructive action last and apart. |
+| Workflow | The current stage is a status strip (Stage, In Stage Since, Due, Assigned To); the history is a table (Stage, From Stage, Action, By, Date and Time, Remarks, Duration in Stage), newest first. |
+| Status pills | One size and one colour per state group, never wrapped. Agreed short forms with the full label in the tooltip: Returned to Mktg, Insurer Returned, For Placement, Pending Auth., Plcmt Cancelled and the others of the standard; other labels over 18 characters end with an ellipsis. |
+| Tables | Header row in BDO blue that stays in view; text left, amounts right with two decimals and thousand separators, dates centred in one format; one value per cell with at most one muted line; a dash for an empty value; "Showing x to y of n results" with page numbers. |
+| Dates and numbers | One date picker; dates entered and shown as dd-MMM-yyyy, times as dd-MMM-yyyy HH:mm (Philippine time); amounts with two decimals; the currency in the header or before the amount. |
+| Wording | Business wording only: no internal requirement or question references on screens, in messages or in report headers; list values shown by their label; users shown by their names; short placeholders; format hints only, other guidance in the tooltip of the label. |
+| Forms | Labels above the fields, fields of one height on one line, required fields marked, the error under the field, and the actions at the bottom right (Cancel, then the main action). |
+| Uploads | Drop zone with the accepted types and size; validation before anything is saved; Rows Read, Valid and Rejected with the rows; Download Error File and Upload Corrected File; a file uploaded before is refused. |
+| Messages | Field errors under the field; a banner listing the errors of a form; a business refusal with its message and a support reference; a short confirmation after success. |
+| Confirmations | A dialog naming the record and the effect; a reason where the process needs one (for example the Reason for Closing of a quotation request); destructive actions confirmed with the red button. |
+| Notifications | The bell opens the panel grouped by day, with Mark Read, Mark All Read and View All; the Notifications page lists every notice with filters. |
+
+The project team checks each screen against these standards before UAT and records the result in the UX readiness checklist (UX_READINESS_CHECKLIST.md). A screen found not to follow a standard during the review is recorded as Change requested in the sign-off workbook and corrected before UAT without a change request.
+

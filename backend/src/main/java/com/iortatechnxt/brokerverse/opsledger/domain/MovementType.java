@@ -30,7 +30,15 @@ public enum MovementType {
    * ACSL correction entry posted on the invoice (ACSL 2.9.1, 2.16.0): a signed change of a
    * component recorded through {@code InvoiceCorrectionSink}; the original movements stay.
    */
-  CORRECTION(Bucket.ADJUSTED);
+  CORRECTION(Bucket.ADJUSTED),
+  /** Legacy adjustments kept on the invoice, and the year-end true-ups after go-live. */
+  LEGACY_ADJUSTED(Bucket.ADJUSTED),
+  /** Paid in legacy before the cut-over (premium receivable components, PR2307). */
+  LEGACY_PAID(Bucket.APPLIED),
+  /** Settled with the insurer in legacy before the cut-over (DTIP, commission, VAT, WTAX). */
+  LEGACY_REMITTED(Bucket.REMITTED),
+  /** Written off or DP-reversed in legacy, and year-end write-offs after go-live. */
+  LEGACY_WRITTEN_OFF(Bucket.WRITTEN_OFF);
 
   private final Bucket bucket;
 

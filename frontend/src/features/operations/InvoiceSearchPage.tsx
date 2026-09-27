@@ -11,6 +11,8 @@ import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
+import { OriginBadge } from '@/components/ui/OriginBadge';
+import { OriginFilter } from '@/components/ui/OriginFilter';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -36,8 +38,12 @@ const COLUMNS: Column<OpsInvoiceSummary>[] = [
     header: 'Invoice No.',
     render: (i) => (
       <>
-        <strong>{i.invoiceNo}</strong>
-        <div className="ops-muted">{i.arn}</div>
+        <strong>{i.invoiceNo}</strong> <OriginBadge record={i} />
+        <div className="ops-muted">
+          {i.legacyInvoiceNo && i.legacyInvoiceNo !== i.invoiceNo
+            ? `${i.arn} · legacy ${i.legacyInvoiceNo}`
+            : i.arn}
+        </div>
       </>
     ),
   },
@@ -132,7 +138,8 @@ function Filters({
 /**
  * Invoice search of the Operations ledger (RMTID.026, ADJID.024, DIS 3.27.2): every booked invoice
  * and endorsement with its outstanding premium, payment and remittance status and flags, filtered by
- * insurer, assured, account officer, booking and inception dates; open one for its invoice 360.
+ * insurer, assured, account officer, booking and inception dates and origin (open legacy invoices
+ * migrated at cut-over carry a LEGACY badge); open one for its invoice 360.
  */
 export default function InvoiceSearchPage() {
   const companyId = useCompanyId();
@@ -189,6 +196,10 @@ export default function InvoiceSearchPage() {
             <Button type="submit" icon={<Search size={14} />}>
               Search
             </Button>
+            <OriginFilter
+              value={search.origin}
+              onChange={(origin) => apply({ ...search, origin })}
+            />
             <Button
               variant="ghost"
               icon={<Filter size={14} />}

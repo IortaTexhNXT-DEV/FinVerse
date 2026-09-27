@@ -2,8 +2,8 @@
 -- iNXT BrokerVerse - V1981 Seed data of Data Migration (BRD-13, wave DM0): SIT/UAT set-up.
 -- SEED DATA ONLY - never load in production.
 --   Owners:     migowner is the business owner and migsteward the Data Steward of every object.
---   Decisions:  the objects of Mock 1 (reference data, clients, policy headers, the RA-sent file)
---               decided by migowner on the proposal of miglead (gate G1 signed).
+--   Decisions:  the objects of Mock 1 (reference data, clients, policy headers, the RA-sent file,
+--               open legacy invoices) decided by migowner on the proposal of miglead (gate G1 signed).
 --   Code maps:  approved first versions of the market segment and civil status lists (with a
 --               legacy value created in BIBS), and of the product, line, status, user, sales unit,
 --               branch and insurer maps used by the client and policy header extracts.
@@ -27,7 +27,7 @@ select c.id, 'MGD-2026-9000' || lpad(o.seq::text, 2, '0'), d.code, d.proposed_cl
        d.rationale, 'DECIDED', 'miglead', now() - interval '20 day', 'migowner', now() - interval '18 day',
        now() - interval '20 day', 'miglead'
 from (values ('R01', 1), ('R02', 2), ('R03', 3), ('R04', 4), ('R05', 5), ('R06', 6), ('R07', 7),
-             ('R08', 8), ('R11', 9), ('C01', 10), ('C03', 11), ('P01', 12), ('P03', 13))
+             ('R08', 8), ('R11', 9), ('C01', 10), ('C03', 11), ('P01', 12), ('P03', 13), ('F01', 14))
      as o(code, seq)
 join mig_data_object d on d.code = o.code
 cross join org_company c
@@ -55,7 +55,7 @@ select s.code, 1, 'APPROVED', 'First mapping of the legacy values', 'migsteward'
 from mig_code_map_set s
 where (s.code in ('LOV:MARKET_SEGMENT', 'LOV:CIVIL_STATUS')
        or s.code in (select c.map_set from mig_layout_column c join mig_layout l on l.id = c.layout_id
-                     where l.object_code in ('C01', 'C03', 'P01', 'P03') and c.map_set is not null))
+                     where l.object_code in ('C01', 'C03', 'P01', 'P03', 'F01') and c.map_set is not null))
   and not exists (select 1 from mig_code_map_version v where v.set_code = s.code);
 
 insert into mig_code_map_entry (version_id, source_system, legacy_code, legacy_description, action, target_code,
@@ -93,7 +93,9 @@ from (values ('LOV:MARKET_SEGMENT', 'QPS',  'CBG',  'Consumer Banking',   'MAP',
              ('USER', 'EBIX', 'AO01', 'Account officer 01', 'MAP', 'ao', null),
              ('SALES_UNIT', 'EBIX', 'U01', 'Metro unit 1', 'MAP', 'T-CBG1', null),
              ('BRANCH', 'EBIX', 'MKT', 'Makati', 'MAP', 'HO', null),
-             ('INSURER', 'EBIX', 'MGIC', 'Mabuhay General', 'MAP', 'INS-MGIC', null))
+             ('INSURER', 'EBIX', 'MGIC', 'Mabuhay General', 'MAP', 'INS-MGIC', null),
+             ('COST_CENTER', 'EBIX', 'OPS', 'Operations', 'MAP', 'FIN', null),
+             ('COST_CENTER', 'QPS', 'OPS', 'Operations', 'MAP', 'FIN', null))
      as e(set_code, source_system, legacy_code, legacy_description, action, target_code, remarks)
 join mig_code_map_version v on v.set_code = e.set_code and v.version_no = 1
 where not exists (select 1 from mig_code_map_entry x where x.version_id = v.id and x.legacy_code = e.legacy_code

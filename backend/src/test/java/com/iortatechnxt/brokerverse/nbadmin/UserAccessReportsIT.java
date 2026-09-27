@@ -184,6 +184,11 @@ class UserAccessReportsIT {
     assertThat(tasks)
         .isNotEmpty()
         .allSatisfy(r -> assertThat(r.get("access")).isIn("With Access", "No Access"));
+    // Tasks are named in words, never by permission code.
+    assertThat(tasks)
+        .extracting(r -> String.valueOf(r.get("task")))
+        .contains("Client view (View)")
+        .noneMatch(t -> t.matches(".*\\b[A-Z]+_[A-Z_]+\\b.*"));
     assertThat(details(run(GroupProfileReport.CODE, Map.of("groupProfile", MKT_TL))))
         .anySatisfy(r -> assertThat(r.get("access")).isEqualTo("With Access"));
     assertThat(details(run(AccessRequestsReport.CODE, Map.of("from", "2020-01-01", "to", today()))))

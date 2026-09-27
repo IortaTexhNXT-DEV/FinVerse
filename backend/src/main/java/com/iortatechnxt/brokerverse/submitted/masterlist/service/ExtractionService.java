@@ -44,7 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
  * nothing is written to the masterlist until the user confirms the values, corrected where needed.
  * A rejection keeps the document with the reason.
  */
-@Service
+@Service("sbmExtractionService")
 @Transactional
 public class ExtractionService {
 

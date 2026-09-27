@@ -31,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
  * Extraction Review (FRS FR-SP-002): upload of a policy document for a record or a new record, the
  * proposals waiting for confirmation, and confirm or reject.
  */
-@RestController
+@RestController("sbmExtractionController")
 @RequestMapping("/api/v1/submitted/extractions")
 public class ExtractionController {
 

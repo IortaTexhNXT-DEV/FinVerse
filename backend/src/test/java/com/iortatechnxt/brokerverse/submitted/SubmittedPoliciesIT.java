@@ -58,8 +58,8 @@ import org.springframework.data.domain.PageRequest;
 /**
  * Submitted Policies (BRD-12): intake into the masterlist, a processing run with its step results
  * and fallout, the handler's exclusion, the review with the IAAF approved and sent, a TOR of a
- * policy above the insurer limits, the renewal hand-off taken by Renewal (wave R3), a handling
- * fee billed, the setup maker and checker, the reports, the retention and the review alerts.
+ * policy above the insurer limits, the renewal hand-off taken by Renewal (wave R3), a handling fee
+ * billed, the setup maker and checker, the reports, the retention and the review alerts.
  */
 @IntegrationTest
 class SubmittedPoliciesIT {
@@ -104,7 +104,8 @@ class SubmittedPoliciesIT {
                 new BigDecimal(sumInsured),
                 new BigDecimal("15000.00"),
                 "PHP"),
-            new SbmRisk(null, null, null, null, null, null, null, "Makati City", "Residential", null),
+            new SbmRisk(
+                null, null, null, null, null, null, null, "Makati City", "Residential", null),
             SbmMarks.NONE);
     return as.run(
         TL,
@@ -185,7 +186,10 @@ class SubmittedPoliciesIT {
             iaafs.review(
                 p.getId(),
                 new SbmIaafReview.Content(
-                    LocalDate.now(), SbmIaafReview.WITH_FINDINGS, List.of("MORTGAGEE_CLAUSE_MISSING"), "")));
+                    LocalDate.now(),
+                    SbmIaafReview.WITH_FINDINGS,
+                    List.of("MORTGAGEE_CLAUSE_MISSING"),
+                    "")));
     assertThatThrownBy(() -> as.run("polreview", () -> iaafs.generate(p.getId(), Map.of())))
         .isInstanceOf(BusinessRuleException.class);
     as.run(
@@ -193,7 +197,8 @@ class SubmittedPoliciesIT {
         () ->
             iaafs.review(
                 p.getId(),
-                new SbmIaafReview.Content(LocalDate.now(), SbmIaafReview.ADEQUATE, List.of(), "OK")));
+                new SbmIaafReview.Content(
+                    LocalDate.now(), SbmIaafReview.ADEQUATE, List.of(), "OK")));
     SbmIaaf i = as.run("polreview", () -> iaafs.generate(p.getId(), Map.of()));
     as.run("polreview", () -> iaafs.submit(i.getId()));
     assertThatThrownBy(() -> as.run("polreview", () -> iaafs.approve(i.getId())))
@@ -210,7 +215,8 @@ class SubmittedPoliciesIT {
     SbmPolicy p = processed(intake("NONCBG_CORPORATE", pn("PN-T"), "INS-MPI", "150000000"));
     assertThat(p.isInsurerApprovalRequired()).isTrue();
     assertThat(as.run(TL, () -> tors.breaches(p.getId()))).isNotBlank();
-    SbmTor t = as.run(TL, () -> tors.generate(p.getId(), "Co-insurance with a second insurer", "ao"));
+    SbmTor t =
+        as.run(TL, () -> tors.generate(p.getId(), "Co-insurance with a second insurer", "ao"));
     as.run(TL, () -> tors.submit(t.getId()));
     SbmTor approved = as.run("tsu", () -> tors.approve(t.getId()));
     assertThat(approved.getStatus()).isEqualTo(SbmDocStatus.APPROVED);
@@ -237,7 +243,9 @@ class SubmittedPoliciesIT {
     assertThat(
             as.run(
                     "upphandler",
-                    () -> fees.list(company(), List.of(SbmHandlingFee.BILLED), PageRequest.of(0, 500)))
+                    () ->
+                        fees.list(
+                            company(), List.of(SbmHandlingFee.BILLED), PageRequest.of(0, 500)))
                 .getContent())
         .extracting(SbmHandlingFee::getFeeNo)
         .contains(f.getFeeNo());
@@ -255,7 +263,14 @@ class SubmittedPoliciesIT {
                     company(),
                     null,
                     new SbmLimitRule.Limits(
-                        "INS-VMI", "NONCBG_RETAIL", null, new BigDecimal("2000000"), null, null, null, "IT")));
+                        "INS-VMI",
+                        "NONCBG_RETAIL",
+                        null,
+                        new BigDecimal("2000000"),
+                        null,
+                        null,
+                        null,
+                        "IT")));
     assertThat(r.getRecordStatus()).isNotEqualTo(RecordStatus.ACTIVE);
     assertThatThrownBy(() -> as.run(TL, () -> setup.authorize("LIMIT", r.getId())))
         .isInstanceOf(RuntimeException.class);
@@ -293,11 +308,7 @@ class SubmittedPoliciesIT {
       ReportResult result = as.run(TL, () -> reports.run(code, params));
       assertThat(result.code()).isEqualTo(code);
     }
-    assertThat(
-            as.run(
-                TL,
-                () -> reports.run("SBM-MASTERLIST", params).rows()))
-        .isNotEmpty();
+    assertThat(as.run(TL, () -> reports.run("SBM-MASTERLIST", params).rows())).isNotEmpty();
     assertThat(
             retention.countEligible(
                 new RetentionCriteria(Set.of("EXCLUDED", "CLOSED"), LocalDate.of(2099, 1, 1))))

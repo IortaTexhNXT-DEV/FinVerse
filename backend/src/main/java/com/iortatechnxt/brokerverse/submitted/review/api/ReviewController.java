@@ -59,6 +59,7 @@ public class ReviewController {
   private static final String APPROVE_IAAF = "hasAuthority('IAAF_APPROVE')";
   private static final String PREPARE_TOR = "hasAuthority('TOR_PREPARE')";
   private static final String APPROVE_TOR = "hasAuthority('TOR_APPROVE')";
+  private static final String VIEW_TOR = "hasAnyAuthority('SBM_VIEW','TOR_APPROVE')";
 
   private final IaafService iaafService;
   private final TorService torService;
@@ -312,7 +313,7 @@ public class ReviewController {
    * @return TORs
    */
   @GetMapping("/tors")
-  @PreAuthorize(MasterlistController.VIEW)
+  @PreAuthorize(VIEW_TOR)
   @Transactional(readOnly = true)
   public PageResponse<TorView> tors(
       @RequestParam Long companyId, @RequestParam List<SbmDocStatus> status, Pageable pageable) {
@@ -327,7 +328,7 @@ public class ReviewController {
    * @return TOR
    */
   @GetMapping("/tors/{id}")
-  @PreAuthorize(MasterlistController.VIEW)
+  @PreAuthorize(VIEW_TOR)
   @Transactional(readOnly = true)
   public TorView tor(@PathVariable Long id) {
     return view(torService.get(id));
@@ -409,7 +410,7 @@ public class ReviewController {
    * @return the file or a redirect to its link
    */
   @GetMapping("/tors/{id}/pdf")
-  @PreAuthorize(MasterlistController.VIEW)
+  @PreAuthorize(VIEW_TOR)
   @Transactional
   public ResponseEntity<byte[]> torPdf(@PathVariable Long id, HttpServletRequest request) {
     return downloads.respond(torService.download(id), request);

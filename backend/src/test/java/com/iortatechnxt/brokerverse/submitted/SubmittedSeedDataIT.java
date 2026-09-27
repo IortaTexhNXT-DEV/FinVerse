@@ -64,7 +64,9 @@ class SubmittedSeedDataIT {
         .contains(SbmDocStatus.APPROVED, SbmDocStatus.FOR_APPROVAL);
     assertThat(tors.count()).isPositive();
     assertThat(renewals.count()).isPositive();
-    assertThat(fees.findAll()).extracting(SbmHandlingFee::getStatus).contains(SbmHandlingFee.BILLED);
+    assertThat(fees.findAll())
+        .extracting(SbmHandlingFee::getStatus)
+        .contains(SbmHandlingFee.BILLED);
 
     long before = policies.count();
     loader.run(new DefaultApplicationArguments());

@@ -40,7 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
  * signed and attached as a PDF of type TOR at the last approval, and released when the assigned
  * Account Officer opens or downloads it (the default meaning of Released, SP SQ08).
  */
-@Service
+@Service("sbmTorService")
 @Transactional
 public class TorService {
 

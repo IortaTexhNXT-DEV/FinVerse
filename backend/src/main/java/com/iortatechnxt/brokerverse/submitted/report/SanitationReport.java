@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
  * Sanitation Report ({@value #CODE}): records checked by the sanitation step per outcome and reason
  * (certification of the sanitation).
  */
-@Component
+@Component("sbmSanitationReport")
 public class SanitationReport extends SbmSqlReport {
 
   /** Report code. */

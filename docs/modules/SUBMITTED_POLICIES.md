@@ -42,7 +42,7 @@ Module guide of `submitted` (package `com.iortatechnxt.brokerverse.submitted`, s
 | Account Officer | `MKT_AO` | `ao`, `ao2` | Own records, TOR preparation, Renew with BDOI |
 | Marketing Team Leader | `MKT_TL` | `mkttl` | IAAF approval (second level), rule approval |
 | TSU | `TSU` | `tsu` | TOR approval |
-| Rule administrator | `SBM_RULE_ADMIN` | `badmin` | Rule maintenance |
+| Rule administrator | `SBM_RULE_ADMIN` | (no seed user) | Rule maintenance |
 
 A user sees the records of the segments of their scope (Setup, User Scopes); the roles of `SBM_OWN_RECORDS_ROLES`
 (Account Officers) see only their own records.

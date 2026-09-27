@@ -156,7 +156,7 @@ public class SubmittedPolicyRenewalHandOff implements RenewalHandOff {
                 terms.manual())));
     renewal.flow().start(c);
     renewal.engine().run(c, CheckTrigger.EXTRACTION);
-    renewal.initiation().initiateOne(c);
+    renewal.initiation().initiateOne(c, true);
     audit.record(
         RenewalCodes.ENTITY,
         c.getRenewalRef(),

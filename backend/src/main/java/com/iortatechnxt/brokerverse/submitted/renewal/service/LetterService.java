@@ -60,7 +60,7 @@ import org.springframework.transaction.annotation.Transactional;
  * client or the bank counterpart, or generated for the day's print batch for the mail house. A
  * letter that cannot be sent is FAILED with alert {@code SBM_LETTER_FAILED} and can be sent again.
  */
-@Service
+@Service("sbmLetterService")
 @Transactional
 public class LetterService {
 

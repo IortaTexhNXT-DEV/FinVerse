@@ -561,7 +561,7 @@ The module is built in the package `submitted` and the screens `frontend/src/fea
 | V1074 | Hand-offs, insurer and letter rules, letters, print batches; parameter `SBM_MANUAL_RENEWAL_SEGMENTS` |
 | V1075 | Handling fees, No Touch batches and lines; service invoice type `SERVICE_FEE_NO_TOUCH` |
 | V1076 | Retention rule `SUBMITTED_POLICY` (booked, not renewed, excluded and closed records; 5 years, then review) |
-| V1970 | Seed users `sbmhandler`, `firehandler`, `sbmchecker`, `sanitation`, `sbmtl`, `polreview`, `upphandler` (and `SBM_RULE_ADMIN` for `badmin`), user scopes, GL accounts 4115 and 1236 with the rules of the two events, active rule sets, insurer limits, insurer assignment and letter rules, the approval matrix, the LAMD snapshot |
+| V1970 | Seed users `sbmhandler`, `firehandler`, `sbmchecker`, `sanitation`, `sbmtl`, `polreview`, `upphandler`, user scopes, GL accounts 4115 and 1236 with the rules of the two events, active rule sets, insurer limits, insurer assignment and letter rules, the approval matrix, the LAMD snapshot |
 | V1971-V1979 | Not used: the seed records are created by `SubmittedSeedData` through the services |
 
 ### 17.3 Jobs, uploads, alerts and reports

@@ -35,7 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Submitted Policies setup (FR-SP-080 to 084): limit, insurer and letter rules and the approval
  * matrix (maker and checker), the source register, the legacy status map and the user scopes.
  */
-@RestController
+@RestController("sbmSetupController")
 @RequestMapping("/api/v1/submitted/setup")
 public class SetupController {
 

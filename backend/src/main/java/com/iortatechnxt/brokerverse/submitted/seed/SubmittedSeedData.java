@@ -47,6 +47,8 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 /**
@@ -83,6 +85,7 @@ public class SubmittedSeedData implements ApplicationRunner {
   private final MasterlistService masterlist;
   private final SbmProcessingService processing;
   private final Work work;
+  private final UserDetailsService users;
   private final Clock clock;
 
   /**
@@ -113,6 +116,7 @@ public class SubmittedSeedData implements ApplicationRunner {
    * @param handOff renewal hand-off
    * @param fees handling fees
    * @param noTouch No Touch billing
+   * @param users user details (authorities of the seed users)
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // the services the seed goes through
@@ -126,12 +130,14 @@ public class SubmittedSeedData implements ApplicationRunner {
       HandOffService handOff,
       HandlingFeeService fees,
       NoTouchService noTouch,
+      UserDetailsService users,
       Clock clock) {
     this.companies = companies;
     this.policies = policies;
     this.masterlist = masterlist;
     this.processing = processing;
     this.work = new Work(iaafs, tors, handOff, fees, noTouch);
+    this.users = users;
     this.clock = clock;
   }
 
@@ -171,7 +177,8 @@ public class SubmittedSeedData implements ApplicationRunner {
                 "upphandler",
                 () ->
                     work.noTouch()
-                        .export(companyId, "INS-MGIC", YearMonth.from(today.plusDays(NO_TOUCH_DAYS)))));
+                        .export(
+                            companyId, "INS-MGIC", YearMonth.from(today.plusDays(NO_TOUCH_DAYS)))));
     LOG.info("Submitted Policies seed data: {} policies loaded", loaded.size());
   }
 
@@ -185,7 +192,15 @@ public class SubmittedSeedData implements ApplicationRunner {
             SbmBusinessType.valueOf(r.businessType()),
             r.pn().isEmpty()
                 ? SbmLoan.NONE
-                : new SbmLoan(r.pn(), null, "CIF-" + r.pn().substring(PN_PREFIX.length()), null, null, null, null, r.assured()),
+                : new SbmLoan(
+                    r.pn(),
+                    null,
+                    "CIF-" + r.pn().substring(PN_PREFIX.length()),
+                    null,
+                    null,
+                    null,
+                    null,
+                    r.assured()),
             new SbmAssured(
                 r.assured(),
                 "Seed address of " + r.assured() + ", Makati City",
@@ -219,7 +234,8 @@ public class SubmittedSeedData implements ApplicationRunner {
                     null,
                     null,
                     "BDO Unibank")
-                : new SbmRisk(null, null, null, null, null, null, null, r.unit(), r.kind(), "BDO Unibank"),
+                : new SbmRisk(
+                    null, null, null, null, null, null, null, r.unit(), r.kind(), "BDO Unibank"),
             new SbmMarks("FFY".equals(r.mark()), "EMP".equals(r.mark()), "NT".equals(r.mark())));
     String source = source(segment);
     return masterlist
@@ -368,10 +384,12 @@ public class SubmittedSeedData implements ApplicationRunner {
     }
   }
 
-  private static <T> T as(String user, Supplier<T> action) {
+  private <T> T as(String user, Supplier<T> action) {
+    UserDetails details = users.loadUserByUsername(user);
     SecurityContext previous = SecurityContextHolder.getContext();
     SecurityContext context = SecurityContextHolder.createEmptyContext();
-    context.setAuthentication(new UsernamePasswordAuthenticationToken(user, null, List.of()));
+    context.setAuthentication(
+        new UsernamePasswordAuthenticationToken(details, null, details.getAuthorities()));
     SecurityContextHolder.setContext(context);
     try {
       return action.get();

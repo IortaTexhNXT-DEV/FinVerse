@@ -36,7 +36,7 @@ select u.id, r.id
 from sec_user u
 join (values ('sbmhandler', 'SBM_HANDLER'), ('firehandler', 'SBM_HANDLER'), ('sbmchecker', 'SBM_CHECKER'),
              ('sanitation', 'SBM_SANITATION'), ('sbmtl', 'SBM_TL'), ('polreview', 'SBM_POLICY_REVIEWER'),
-             ('upphandler', 'SBM_UPP_HANDLER'), ('badmin', 'SBM_RULE_ADMIN'))
+             ('upphandler', 'SBM_UPP_HANDLER'))
      as g(username, role_code) on g.username = u.username
 join sec_role r on r.code = g.role_code
 where not exists (select 1 from sec_user_role x where x.user_id = u.id and x.role_id = r.id);
@@ -158,21 +158,21 @@ join org_company c on c.id = s.company_id and c.code = 'FVI'
 where not exists (select 1 from sbm_rule x where x.rule_set_id = s.id and x.priority = r.priority);
 
 insert into sbm_rule_condition (rule_id, seq, field, operator, value)
-select x.id, 1, r.field, r.operator, r.value
+select x.id, 0, r.field, r.operator, r.value
 from sbm_seed_rule r
 join sbm_rule_set s on s.code = r.set_code and s.version_no = 1
 join org_company c on c.id = s.company_id and c.code = 'FVI'
 join sbm_rule x on x.rule_set_id = s.id and x.priority = r.priority
-where not exists (select 1 from sbm_rule_condition y where y.rule_id = x.id and y.seq = 1);
+where not exists (select 1 from sbm_rule_condition y where y.rule_id = x.id and y.seq = 0);
 
 insert into sbm_rule_condition (rule_id, seq, field, operator, value)
-select x.id, 2, r.field2, r.operator2, r.value2
+select x.id, 1, r.field2, r.operator2, r.value2
 from sbm_seed_rule r
 join sbm_rule_set s on s.code = r.set_code and s.version_no = 1
 join org_company c on c.id = s.company_id and c.code = 'FVI'
 join sbm_rule x on x.rule_set_id = s.id and x.priority = r.priority
 where r.field2 is not null
-  and not exists (select 1 from sbm_rule_condition y where y.rule_id = x.id and y.seq = 2);
+  and not exists (select 1 from sbm_rule_condition y where y.rule_id = x.id and y.seq = 1);
 
 -- ---------- Insurer limits, insurer assignment and letters ------------------------------------------
 insert into sbm_limit_rule (company_id, insurer_code, segment, line, max_sum_insured, max_vehicle_age,
@@ -224,7 +224,7 @@ insert into sbm_approval_matrix (company_id, document, segment, tsi_from, tsi_to
 select c.id, m.doc, null, m.tsi_from, m.tsi_to, m.level, m.permission, m.approver, m.title, 'ACTIVE', 'mkttl',
        now(), now(), 'badmin'
 from org_company c, (values
-    ('IAAF', 0.00, null, 1, 'IAAF_APPROVE', 'sbmchecker', 'Submitted Policies Checker'),
+    ('IAAF', 0.00, null::numeric, 1, 'IAAF_APPROVE', 'sbmchecker', 'Submitted Policies Checker'),
     ('IAAF', 20000000.00, null, 2, 'IAAF_APPROVE', 'mkttl', 'Head, Marketing'),
     ('TOR', 0.00, null, 1, 'TOR_APPROVE', 'tsu', 'Technical Services Head')
 ) as m(doc, tsi_from, tsi_to, level, permission, approver, title)

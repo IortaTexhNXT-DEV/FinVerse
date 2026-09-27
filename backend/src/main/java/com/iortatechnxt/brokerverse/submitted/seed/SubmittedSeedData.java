@@ -61,7 +61,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Profile("seed")
-@Order(140)
+@Order(150)
 public class SubmittedSeedData implements ApplicationRunner {
 
   private static final Logger LOG = LoggerFactory.getLogger(SubmittedSeedData.class);

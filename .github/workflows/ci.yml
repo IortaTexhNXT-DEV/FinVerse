@@ -68,6 +68,16 @@ jobs:
         with:
           projectBaseDir: frontend
 
+  documents:
+    name: Client documents – pack check (duplicates, versions, wording)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python tools/deliverables/check_pack.py
+
   images:
     name: Docker images
     needs: [backend, frontend]

@@ -2123,15 +2123,16 @@ frs:
     screen: ADJWB
     data: [TD-OP-06]
     conditions:
-      - A request submitted 3 days ago shows ageing 3; the History tab shows before and after values.
+      - A request submitted 3 days ago shows ageing 3 days; the History tab shows before and after values.
       - Searching an ARN lists its requests and opens Invoice 360.
+      - Searching a policy number lists its requests; the Policy Transactions list the booking and the cancellation with their journals.
     cases:
       - c: 1
         type: Positive
         title: Ageing and history
         steps:
           - Open the workbench; find a request submitted 3 days ago (date moved in SIT); open its History.
-        expected: Ageing 3; the History shows each change with before and after values.
+        expected: Aging 3 days; the History shows each change with before and after values.
       - c: 2
         type: Positive
         title: Requests of an ARN
@@ -2139,6 +2140,20 @@ frs:
           - Search ARN-2026-940002.
         expected: The four seed requests are listed; the link opens Invoice 360.
         auto: AdjustmentApiIT#readEndpointsRespond
+      - c: 3
+        type: Positive
+        title: Search by policy number
+        steps:
+          - Search the insurer policy number of a booked invoice with a request.
+        expected: The request is listed with its Policy No. / ARN, Invoice / Placement Slip, insurer and product names and the business type label.
+        auto: AdjustmentPolicyLinkIT#theWorkbenchListAndTheRequestShowThePolicyOverHttp
+      - c: 3
+        type: Positive
+        title: Policy transactions with journals
+        steps:
+          - Open a posted flat cancellation; tab Policy Transactions; expand the cancellation row.
+        expected: The original booking, then the cancellation (Financial – Change of Cover, Flat Cancellation) with the negative premium and tax change, gross premium 0.00 after it and status Posted; its journals list balanced lines and open the journal page.
+        auto: AdjustmentPolicyLinkIT#aPostedCancellationShowsInThePolicyHistoryWithItsJournals
       - c: 2
         type: Security-access
         persona: CASHIER

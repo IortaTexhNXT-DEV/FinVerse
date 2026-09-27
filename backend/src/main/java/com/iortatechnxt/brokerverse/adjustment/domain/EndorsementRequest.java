@@ -163,6 +163,28 @@ public class EndorsementRequest extends BaseEntity {
   }
 
   /**
+   * Keeps the policy number in line with the ledger (the insurer's policy number is often issued
+   * after the request is raised).
+   *
+   * @param policyNo policy number of the invoice now, ignored when blank or unchanged
+   */
+  public void linkPolicy(String policyNo) {
+    if (policyNo != null && !policyNo.isBlank() && !policyNo.equals(subject.policyNo())) {
+      this.subject = subject.withPolicyNo(policyNo);
+    }
+  }
+
+  /**
+   * Adds GL journals posted for the request after its posting (e.g. the re-application of the
+   * invoice's payments), so every journal of the request is kept with it.
+   *
+   * @param journalBatches journal batches
+   */
+  public void recordJournals(List<String> journalBatches) {
+    journalBatches.stream().filter(b -> b != null && !journals.contains(b)).forEach(journals::add);
+  }
+
+  /**
    * Records the justifications of a duplicate or an over-adjustment (ADJID.023/028).
    *
    * @param duplicate why a duplicate request proceeds, may be null

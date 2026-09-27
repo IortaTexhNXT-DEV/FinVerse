@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { bookingApi } from '@/api/booking';
@@ -200,7 +201,8 @@ export function ScheduleTab({ invoice }: Readonly<{ invoice: BookedInvoice }>) {
           {
             key: 'period',
             header: 'Period',
-            render: (i) => `${formatDate(i.inceptionDate)} – ${formatDate(i.expiryDate)}`,
+            kind: 'period',
+            render: (i) => <PeriodCell from={i.inceptionDate} to={i.expiryDate} />,
           },
           {
             key: 'gross',

@@ -1,8 +1,11 @@
 import { AlertTriangle, Info } from 'lucide-react';
+import { InsurerName } from '@/components/broking/LovLabel';
 import { Amount } from '@/components/ui/Amount';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
+import { CellStack } from '@/components/ui/CellStack';
 import { formatAmount } from '@/utils/format';
+import { useRequestLabels } from './useRequestLabels';
 import type { ChangeView, Recompute, RequestStage, ShareView } from './api';
 import { componentLabel, stageLabel, stageTone } from './requestForm';
 import './adjustment.css';
@@ -10,6 +13,15 @@ import './adjustment.css';
 /** Outlined status pill of a request stage (BDO: yellow review, blue in process, green done). */
 export function RequestStatus({ stage }: Readonly<{ stage: RequestStage }>) {
   return <span className={`badge ${stageTone(stage)}`}>{stageLabel(stage)}</span>;
+}
+
+/** The type of a request as the business reads it, with the request type on a second line. */
+export function RequestTypeCell({
+  endorsementType,
+  requestType,
+}: Readonly<{ endorsementType: string; requestType?: string }>) {
+  const labels = useRequestLabels();
+  return <CellStack main={labels.type(endorsementType)} sub={labels.requestType(requestType)} />;
 }
 
 /** Record flags of a request as gold chips, apart from the status pill. */
@@ -69,7 +81,7 @@ const SHARE_COLUMNS: Column<ShareView>[] = [
     header: 'Insurer',
     render: (s) => (
       <>
-        {s.insurerCode} {s.lead && <span className="tag">Lead</span>}
+        <InsurerName code={s.insurerCode} /> {s.lead && <span className="tag">Lead</span>}
       </>
     ),
   },

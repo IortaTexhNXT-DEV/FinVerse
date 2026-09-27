@@ -51,6 +51,25 @@ export interface RequestInput {
   baselineOverride?: string;
 }
 
+/** The policy and placement a request is against (policy number as the ledger holds it now). */
+export interface PolicyLink {
+  invoiceNo: string;
+  arn: string;
+  accountId?: number;
+  policyNo?: string;
+  clientCode: string;
+  assuredName: string;
+  insurerCode: string;
+  productCode?: string;
+  productName?: string;
+  productLine?: string;
+  periodFrom?: string;
+  periodTo?: string;
+  slipNo?: string;
+  currency: string;
+  grossPremium?: number;
+}
+
 export interface RequestSummary {
   id: number;
   requestNo: string;
@@ -71,6 +90,7 @@ export interface RequestSummary {
   createdBy: string;
   createdAt: string;
   agingDays: number;
+  policy?: PolicyLink;
 }
 
 export interface ChangeView {
@@ -122,6 +142,7 @@ export interface EndorsementRequest {
     aoUsername?: string;
     productLine?: string;
   };
+  policy?: PolicyLink;
   terms: RequestTerms;
   amounts: AmountsInput;
   control: {
@@ -247,6 +268,9 @@ export const adjustmentApi = {
   get: (id: number) => api.get<EndorsementRequest>(`${BASE}/requests/${String(id)}`),
   recompute: (id: number) => api.get<Recompute>(`${BASE}/requests/${String(id)}/recompute`),
   journal: (id: number) => api.get<GlLine[]>(`${BASE}/requests/${String(id)}/journal`),
+  /** The policy and placement of a booked invoice, before a request is raised on it. */
+  policy: (invoiceNo: string) =>
+    api.get<PolicyLink>(`${BASE}/policies/${encodeURIComponent(invoiceNo)}`),
   forInvoice: (invoiceNo: string) =>
     api.get<RequestSummary[]>(`${BASE}/invoices/${encodeURIComponent(invoiceNo)}/requests`),
   preview: (input: RequestInput) => api.post<Recompute>(`${BASE}/requests/preview`, input),

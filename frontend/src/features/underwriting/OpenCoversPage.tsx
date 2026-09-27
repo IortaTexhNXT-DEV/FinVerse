@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -15,7 +16,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useDefaultBranchId } from '@/context/workspaceContext';
-import { formatDate, today } from '@/utils/format';
+import { today } from '@/utils/format';
 import { DateField, NumberField, SelectField, TextField } from './FormFields';
 import { oneYearFrom } from './premiumMath';
 import { useUwLookups } from './useUwLookups';
@@ -103,7 +104,8 @@ export default function OpenCoversPage() {
             {
               key: 'per',
               header: 'Period',
-              render: (c) => `${formatDate(c.periodFrom)} – ${formatDate(c.periodTo)}`,
+              kind: 'period',
+              render: (c) => <PeriodCell from={c.periodFrom} to={c.periodTo} />,
             },
             { key: 'ccy', header: 'Ccy', render: (c) => c.currency },
             {

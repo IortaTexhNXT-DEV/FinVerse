@@ -60,10 +60,12 @@
   --sidebar-width: 272px;
   /* Status pills and flag chips: one size everywhere */
   --badge-min-width: 112px;
-  --badge-max-width: 176px;
+  --badge-max-width: 184px;
   --tag-min-width: 88px;
   /* Fixed width of code and reference columns (ARN, CL, PAY… numbers) */
   --code-col-width: 168px;
+  /* Period column: "to 20-Oct-2027" on one line (PeriodCell) */
+  --period-col-width: 132px;
   /* Tables scroll inside their card so the header row stays visible */
   --table-max-height: 70vh;
   /* Label column of definition grids */

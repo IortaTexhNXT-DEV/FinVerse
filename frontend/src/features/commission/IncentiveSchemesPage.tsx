@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -11,7 +12,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, humanize } from '@/utils/format';
+import { humanize } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { Scheme, SchemeTerms } from './commissionApi';
 import { describeTier } from './commissionLogic';
@@ -43,7 +44,8 @@ const COLUMNS: Column<Scheme>[] = [
   {
     key: 'effective',
     header: 'Effective',
-    render: (s) => `${formatDate(s.terms.effectiveFrom)} – ${formatDate(s.terms.effectiveTo)}`,
+    kind: 'period',
+    render: (s) => <PeriodCell from={s.terms.effectiveFrom} to={s.terms.effectiveTo} />,
   },
   {
     key: 'status',

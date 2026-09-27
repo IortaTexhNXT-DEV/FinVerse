@@ -30,6 +30,14 @@ public interface EndorsementRequestRepository extends JpaRepository<EndorsementR
   List<EndorsementRequest> findBySubjectInvoiceNoOrderByIdDesc(String invoiceNo);
 
   /**
+   * Requests raised on some invoices (the invoices of a policy), oldest first.
+   *
+   * @param invoiceNos invoice numbers
+   * @return requests
+   */
+  List<EndorsementRequest> findBySubjectInvoiceNoInOrderByIdAsc(Collection<String> invoiceNos);
+
+  /**
    * The request whose posting booked an endorsement or return invoice.
    *
    * @param invoiceNo invoice booked by the posting
@@ -65,8 +73,9 @@ public interface EndorsementRequestRepository extends JpaRepository<EndorsementR
   long countByCompanyIdAndStage(Long companyId, RequestStage stage);
 
   /**
-   * Searches requests: stage, and text on request number, invoice, ARN, policy, assured or
-   * endorsement reference.
+   * Searches requests: stage, and text on request number, invoice, ARN, insurer policy number (as
+   * kept on the request or as the ledger holds it now), client code or name, insurer, product,
+   * placement slip or endorsement reference.
    *
    * @param companyId company
    * @param stage stage, null for all
@@ -83,8 +92,16 @@ public interface EndorsementRequestRepository extends JpaRepository<EndorsementR
              or lower(r.subject.invoiceNo) like :text
              or lower(r.subject.arn) like :text
              or lower(coalesce(r.subject.policyNo, '')) like :text
+             or lower(r.subject.clientCode) like :text
              or lower(r.subject.assuredName) like :text
-             or lower(coalesce(r.terms.endorsementRef, '')) like :text)
+             or lower(r.subject.insurerCode) like :text
+             or lower(coalesce(r.subject.productCode, '')) like :text
+             or lower(coalesce(r.terms.endorsementRef, '')) like :text
+             or exists (select 1 from OpsInvoice i
+                        where i.invoiceNo = r.subject.invoiceNo
+                          and lower(coalesce(i.policyNo, '')) like :text)
+             or exists (select 1 from PlacementSlip s join s.accounts a
+                        where a.arn = r.subject.arn and lower(s.slipNo) like :text))
       """)
   Page<EndorsementRequest> search(
       @Param("companyId") Long companyId,

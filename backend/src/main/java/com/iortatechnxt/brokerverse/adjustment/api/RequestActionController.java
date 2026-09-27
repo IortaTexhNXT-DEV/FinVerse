@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.adjustment.domain.PostingBatch;
 import com.iortatechnxt.brokerverse.adjustment.service.AdjustmentPostingService;
 import com.iortatechnxt.brokerverse.adjustment.service.AdjustmentQueryService;
 import com.iortatechnxt.brokerverse.adjustment.service.EndorsementRequestService;
+import com.iortatechnxt.brokerverse.adjustment.service.PolicyLinks;
 import com.iortatechnxt.brokerverse.adjustment.service.PostingBatchService;
 import com.iortatechnxt.brokerverse.adjustment.service.RequestWorkflowService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
@@ -36,6 +37,7 @@ public class RequestActionController {
   private final AdjustmentPostingService posting;
   private final PostingBatchService batches;
   private final AdjustmentQueryService queries;
+  private final PolicyLinks links;
   private final Clock clock;
 
   /**
@@ -46,6 +48,7 @@ public class RequestActionController {
    * @param posting re-application
    * @param batches posting
    * @param queries reads
+   * @param links policy and placement of the request
    * @param clock clock (aging)
    */
   public RequestActionController(
@@ -54,12 +57,14 @@ public class RequestActionController {
       AdjustmentPostingService posting,
       PostingBatchService batches,
       AdjustmentQueryService queries,
+      PolicyLinks links,
       Clock clock) {
     this.workflow = workflow;
     this.requests = requests;
     this.posting = posting;
     this.batches = batches;
     this.queries = queries;
+    this.links = links;
     this.clock = clock;
   }
 
@@ -167,6 +172,7 @@ public class RequestActionController {
   }
 
   private RequestResponse view(Long id) {
-    return RequestResponse.from(queries.get(id), clock.instant());
+    EndorsementRequest request = queries.get(id);
+    return RequestResponse.from(request, clock.instant(), links.forRequest(request));
   }
 }

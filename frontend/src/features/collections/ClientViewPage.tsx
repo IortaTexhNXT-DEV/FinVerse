@@ -6,7 +6,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount, formatDate } from '@/utils/format';
+import { formatAmount, formatDate, formatDays } from '@/utils/format';
 import { collectionsApi } from './api';
 import './collections.css';
 
@@ -59,7 +59,7 @@ export default function ClientViewPage() {
               render: (i) => [i.arn, i.policyNo].filter(Boolean).join(' · '),
             },
             { key: 'b', header: 'Booked', render: (i) => formatDate(i.bookingDate) },
-            { key: 'g', header: 'Aging', render: (i) => `${i.agingDays} d` },
+            { key: 'g', header: 'Aging', render: (i) => formatDays(i.agingDays) },
             {
               key: 'n',
               header: 'Outstanding',

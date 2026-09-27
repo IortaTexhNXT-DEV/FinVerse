@@ -1,3 +1,4 @@
+import { CellStack } from '@/components/ui/CellStack';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { UserRoundCog, X } from 'lucide-react';
 import { useState } from 'react';
@@ -16,7 +17,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
+import { formatDate, formatDays } from '@/utils/format';
 import { CLAIMS_SECTION } from '../ClaimsPlaceholder';
 import { claimsHomeApi } from '../home/api';
 import type { WorklistQuery, WorklistRow, WorklistTab } from '../home/api';
@@ -48,8 +49,13 @@ const COLUMNS: Column<WorklistRow>[] = [
   { key: 'loss', header: 'Date of Loss', render: (r) => formatDate(r.dates.lossDate) },
   {
     key: 'age',
-    header: 'Age (Stage / Overall)',
-    render: (r) => `${r.dates.ageThisStage} d / ${r.dates.ageOverall} d`,
+    header: 'Aging (Stage / Overall)',
+    render: (r) => (
+      <CellStack
+        main={formatDays(r.dates.ageThisStage)}
+        sub={`${formatDays(r.dates.ageOverall)} overall`}
+      />
+    ),
   },
   {
     key: 'follow',

@@ -86,6 +86,7 @@ describe('operations labels', () => {
       'components',
       'movements',
       'family',
+      'transactions',
       'receipts',
       'remittances',
       'adjustments',

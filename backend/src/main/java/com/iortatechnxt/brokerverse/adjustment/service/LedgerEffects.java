@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceComponent;
+import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceMovement;
 import com.iortatechnxt.brokerverse.opsledger.service.InsurerShareAllocator;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerService;
@@ -190,6 +191,30 @@ public class LedgerEffects {
       }
       throw e;
     }
+  }
+
+  /**
+   * GL journals of the re-application of the invoice's payments for a request (ADJID.009/017): the
+   * reversals and the new applications cashiering posted under the request's reference, so they are
+   * kept with the request like its posting journals.
+   *
+   * @param request request
+   * @return journal batches, in posting order
+   */
+  public List<String> reapplicationJournals(EndorsementRequest request) {
+    String tag = Adjustments.MODULE + ":" + Adjustments.sourceRef(request.getRequestNo());
+    return queries.movements(request.getSubject().invoiceNo()).stream()
+        .filter(m -> m.getJournalBatchNo() != null)
+        .filter(m -> isReapplication(m, tag))
+        .map(OpsInvoiceMovement::getJournalBatchNo)
+        .distinct()
+        .toList();
+  }
+
+  /** A reversal (":RA:" reference) or new application (remarks) of a request's re-application. */
+  private static boolean isReapplication(OpsInvoiceMovement m, String tag) {
+    String remarks = m.getRemarks() == null ? "" : m.getRemarks();
+    return m.getSourceRef().endsWith(":RA:" + tag) || remarks.endsWith(" " + tag);
   }
 
   /**

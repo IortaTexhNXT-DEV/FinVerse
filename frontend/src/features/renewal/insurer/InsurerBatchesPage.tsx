@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Download, Plus, Send, Upload } from 'lucide-react';
 import { useState } from 'react';
@@ -243,7 +244,8 @@ export default function InsurerBatchesPage() {
             {
               key: 'range',
               header: 'Expiry range',
-              render: (b) => `${formatDate(b.expiryFrom)} – ${formatDate(b.expiryTo)}`,
+              kind: 'period',
+              render: (b) => <PeriodCell from={b.expiryFrom} to={b.expiryTo} />,
             },
             { key: 'lines', header: 'Renewals', kind: 'amount', render: (b) => b.lineCount },
             {

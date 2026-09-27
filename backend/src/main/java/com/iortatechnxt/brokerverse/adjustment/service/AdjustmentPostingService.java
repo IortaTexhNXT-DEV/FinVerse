@@ -157,6 +157,7 @@ public class AdjustmentPostingService {
         settled.pending() ? "post_pending" : "post",
         TransitionNote.comment(batchNo));
     request.posted(settled.outcome(), journals, currentUser.username(), clock.instant());
+    request.linkPolicy(queries.require(request.getSubject().invoiceNo()).getPolicyNo());
     notifier.requester(request, settled.pending() ? "posted - payments to re-apply" : "posted");
     audit.record(
         Adjustments.ENTITY, request.getRequestNo(), AuditAction.POST, summary(request, settled));
@@ -188,6 +189,7 @@ public class AdjustmentPostingService {
       guard.release(request);
       Optional<ReapplyResult> reapplied = effects.reapply(request);
       pending = reapplied.isEmpty();
+      journals.addAll(effects.reapplicationJournals(request));
       PostingOutcome posted = settled;
       settled = reapplied.map(r -> withExcess(posted, r)).orElse(posted);
     }
@@ -238,6 +240,7 @@ public class AdjustmentPostingService {
     }
     workflow.transition(Adjustments.ENTITY, String.valueOf(id), "reapply", TransitionNote.NONE);
     request.reapplied(withExcess(request.outcome(), result), clock.instant());
+    request.recordJournals(effects.reapplicationJournals(request));
     notifier.requester(request, "completed: payments re-applied");
     audit.record(
         Adjustments.ENTITY,

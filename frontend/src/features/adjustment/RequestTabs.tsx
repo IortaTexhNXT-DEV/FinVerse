@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Fragment } from 'react';
+import type { ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { workflowApi } from '@/api/workflow';
 import { HistoryTable } from '@/components/broking/HistoryTable';
@@ -9,7 +10,10 @@ import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
-import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
+import { formatAmount, formatDate, formatDateTime, formatDays, formatPeriod } from '@/utils/format';
+import { InsurerName, ProductName } from '@/components/broking/LovLabel';
+import { ReferenceChip } from '@/components/broking/ReferenceChip';
+import { useRequestLabels } from './useRequestLabels';
 import { adjustmentApi, REQUEST_ENTITY } from './api';
 import type { EndorsementRequest, GlLine } from './api';
 import { RecomputePreview } from './RecomputePreview';
@@ -35,10 +39,11 @@ const amountText = (value: number | undefined) =>
 
 /** The request as entered and as processed (ADJID.020-022). */
 export function DetailsTab({ request: r }: Readonly<{ request: EndorsementRequest }>) {
+  const labels = useRequestLabels();
   return (
     <div className="grid-2">
       <Card title="Request">
-        <Facts rows={requestRows(r)} />
+        <Facts rows={requestRows(r, labels)} />
       </Card>
       <Card title="Processing">
         <Facts rows={processingRows(r)} />
@@ -47,21 +52,23 @@ export function DetailsTab({ request: r }: Readonly<{ request: EndorsementReques
   );
 }
 
-const optionalLabel = (code: string | undefined) =>
-  code === undefined ? undefined : humanize(code);
+type Labels = ReturnType<typeof useRequestLabels>;
 
-function requestRows(r: EndorsementRequest): Row[] {
+const BASIS_LABELS: Record<string, string> = {
+  PRO_RATA: 'Pro-rata',
+  SHORT_PERIOD: 'Short Period',
+};
+
+function requestRows(r: EndorsementRequest, labels: Labels): Row[] {
   const t = r.terms;
   const period =
-    t.newPeriodFrom === undefined
-      ? undefined
-      : `${formatDate(t.newPeriodFrom)} – ${formatDate(t.newPeriodTo)}`;
+    t.newPeriodFrom === undefined ? undefined : formatPeriod(t.newPeriodFrom, t.newPeriodTo);
   return [
-    ['Endorsement Type', humanize(t.endorsementType)],
-    ['Request Type', optionalLabel(t.requestType)],
-    ['Reason', optionalLabel(t.reasonCode)],
+    ['Endorsement Type', labels.type(t.endorsementType)],
+    ['Request Type', labels.requestType(t.requestType)],
+    ['Reason', labels.reason(t.reasonCode)],
     ['Effective Date', formatDate(t.effectiveDate)],
-    ['Refund Basis', humanize(t.refundBasis)],
+    ['Refund Basis', BASIS_LABELS[t.refundBasis] ?? t.refundBasis],
     ['Sum Insured Change', amountText(t.sumInsuredChange)],
     ['Insurer Endorsement Ref.', t.endorsementRef],
     ['New Period', period],
@@ -86,9 +93,54 @@ function processingRows(r: EndorsementRequest): Row[] {
     ['Approved', done(t.approvedBy, t.approvedAt)],
     ['Posted', done(t.postedBy, t.postedAt)],
     ['Completed', t.completedAt === undefined ? undefined : formatDateTime(t.completedAt)],
-    ['Aging', `${String(r.agingDays)} day(s)`],
+    ['Aging', formatDays(r.agingDays)],
     ['Endorsement Slip', r.control.slipNo],
   ];
+}
+
+/**
+ * The policy and placement the request is against (ADJID.001/020): insurer policy number, ARN,
+ * invoice, placement slip, client, insurer, product and cover, with links to the account and the
+ * invoice.
+ */
+export function PolicyTab({ request: r }: Readonly<{ request: EndorsementRequest }>) {
+  const p = r.policy;
+  const gross =
+    p?.grossPremium === undefined ? undefined : `${p.currency} ${formatAmount(p.grossPremium)}`;
+  const rows: [string, ReactNode][] = [
+    [
+      'Policy No.',
+      p?.policyNo ?? r.invoice.policyNo ?? <span className="muted">Not yet issued</span>,
+    ],
+    ['ARN', <ReferenceChip key="arn" value={r.invoice.arn} />],
+    [
+      'Invoice',
+      <Link key="inv" to={`/operations/invoices/${encodeURIComponent(r.invoice.invoiceNo)}`}>
+        {r.invoice.invoiceNo}
+      </Link>,
+    ],
+    ['Placement Slip', p?.slipNo],
+    ['Client', `${r.invoice.assuredName} (${r.invoice.clientCode})`],
+    ['Insurer', <InsurerName key="ins" code={r.invoice.insurerCode} />],
+    ['Product', <ProductName key="prd" code={p?.productCode} />],
+    ['Period of Cover', formatPeriod(p?.periodFrom, p?.periodTo)],
+    ['Gross Premium', gross],
+  ];
+  return (
+    <Card title="Policy and Placement">
+      <dl className="detail-list">
+        {rows.map(([label, value]) => (
+          <Fragment key={label}>
+            <dt>{label}</dt>
+            <dd>{value === undefined || value === '' ? '—' : value}</dd>
+          </Fragment>
+        ))}
+      </dl>
+      {p?.accountId !== undefined && (
+        <Link to={`/accounts/${String(p.accountId)}`}>Open account {r.invoice.arn}</Link>
+      )}
+    </Card>
+  );
 }
 
 /** Live recompute of an open request, or the recompute recorded when it was posted. */
@@ -109,7 +161,7 @@ export function RecomputeTab({ request }: Readonly<{ request: EndorsementRequest
 }
 
 const GL_COLUMNS: Column<GlLine>[] = [
-  { key: 'batch', header: 'Journal', render: (l) => l.batchNo },
+  { key: 'batch', header: 'Journal', kind: 'code', render: (l) => l.batchNo },
   {
     key: 'account',
     header: 'GL Account',
@@ -120,7 +172,7 @@ const GL_COLUMNS: Column<GlLine>[] = [
       </>
     ),
   },
-  { key: 'party', header: 'Party', render: (l) => l.partyCode ?? '—' },
+  { key: 'party', header: 'Party', kind: 'code', render: (l) => l.partyCode ?? '' },
   {
     key: 'debit',
     header: 'Debit',

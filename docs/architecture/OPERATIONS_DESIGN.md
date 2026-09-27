@@ -115,7 +115,7 @@ V800-V889 NB modules, V900-V999 seed (NB seed V980-V989). Flyway runs with `out-
 | V764-V769 | `cashiering` | `V764__cashiering.sql` |
 | V770-V774 | `remittance` | `V770__remittance.sql` |
 | V775-V779 | `prodrecon` | `V775__prodrecon.sql` |
-| V780-V784 | `adjustment` | `V780__adjustment.sql` |
+| V780-V784 | `adjustment` | `V780__adjustment.sql`; `V781__adjustment_policy_link.sql` (policy link and endorsement type labels, section 4.5.1); V782-V784 free |
 | V785-V789 | `commission` | `V785__commission.sql` |
 | V990-V995 | seed: users and rules (V990), then one per module (V991-V995) | after NB seed V980-V989 |
 
@@ -254,6 +254,51 @@ A legacy invoice is created by the new `opsledger.service.LegacyInvoiceIntake`, 
 - `adj_request_share`: insurer, share %, premium, commission and refund deltas.
 - `adj_posting_batch`: validation batch no. `VB-<yyyy>`, lines, returned lines with reasons, posted_at.
 - `adj_min_balance_upload`: file, lines, action, result (ADJID.026).
+
+#### 4.5.1 Policy link and policy transaction history (as built)
+
+Client feedback of 27-Sep-2026: users must see which policy every adjustment or endorsement is against, and the
+history of the policy with its accounting.
+
+- **Link.** Request → invoice (`invoice_no`) → account (`account_id`, ARN) → placement slip → insurer policy
+  number. V781 adds `adj_request.account_id` and `product_code` (copied when the request is raised: the account id
+  from the ledger, the product from the account), backfills them and the policy number from `ops_invoice` (and from
+  `acc_account` where that table exists), and indexes `policy_no`, `client_code` and `account_id`. `policy_no` is no
+  longer frozen: the posting refreshes it from the ledger (`EndorsementRequest.linkPolicy`), because the insurer's
+  policy number is often issued after the request is raised.
+- **`adjustment.service.PolicyLinks`** builds the `PolicyLink` of a request or of a booked invoice: policy number as
+  the ledger holds it now, ARN, account id, invoice, client, insurer, product code and name (catalog), product line,
+  period of cover, gross premium and the placement slip (newest non-superseded slip of the ARN for the insurer, from
+  `plc_slip_account`). The work list response (`RequestSummaryResponse.policy`), the request
+  (`RequestResponse.policy`) and `GET /api/v1/adjustment/policies/{invoiceNo}` (New Request form, before saving)
+  carry it; a work list page is resolved in one ledger query.
+- **Search.** `EndorsementRequestRepository.search` matches the request no., invoice, ARN, policy no. (kept on the
+  request, or the ledger's current one through `ops_invoice`), client code and name, insurer, product, placement
+  slip (`plc_slip` / `plc_slip_account`) and insurer endorsement reference.
+- **Endorsement type labels.** V781 relabels `ENDORSEMENT_TYPE` to the business labels "Financial – Change of Cover",
+  "Non-financial – Cover Extension", "Internal Adjustment" and so on (only where a label still holds the delivered
+  text). Screens read the list of values, with the same labels as a fallback while it loads.
+- **Journals of a request.** Every journal a posting writes is kept in `adj_request_journal`, now including the
+  journals of the re-application of the invoice's payments (reversals and new applications posted by cashiering under
+  the request's reference, `LedgerEffects.reapplicationJournals`), whether the payments are re-applied in the posting
+  or later (Re-apply Payments).
+- **Policy transaction history** (`opsledger.service.PolicyTransactionService`, endpoints
+  `GET /api/v1/ops/invoices/{invoiceNo}/transactions` and `GET /api/v1/ops/accounts/{arn}/transactions`, OPS_VIEW).
+  No second ledger: it reads the invoice family of `ops_invoice` (root first), the booked invoices (components,
+  commission and booking journals), the `BOOKED` and `WRITE_OFF` movements, the transactions of the other modules
+  through the port `opsledger.service.port.PolicyTransactionSource` (adjustment implements it with
+  `AdjustmentPolicyTransactions`) and the journal batches of the accounting engine (`JournalBatchRepository`). Rows,
+  in date order with the original booking first:
+  - the original booking and every endorsement, return and cancellation invoice; an invoice booked by a request shows
+    the request's type label, request type, number and stage on the same row;
+  - requests without an invoice of their own (internal adjustments, commission changes, non-financial endorsements,
+    write-off requests), and open requests (not posted: no position);
+  - the refund to the client of a posted decrease or cancellation that moved paid premium to an unapplied item, with
+    the journals of the re-application;
+  - write-offs of the minimal balance file not raised through a request.
+  Each row carries the date, the effective date, the type label, the premium, taxes and charges, gross and commission
+  change, the position after it (running totals of the posted rows), the status and the journals (number, id, value
+  date, status, narration, totals and lines: account, debit, credit, party).
 
 ### 4.6 `commission`
 
@@ -645,11 +690,21 @@ with saved quick filters, empty and loading states, and toasts.
     field diff with the tolerance highlighted. Company-concerned and disposition dropdowns are edited inline.
   - **Uploads** history with attempts.
   - **Schedules**.
-- **Adjustments**:
-  - **New request** wizard: select invoices (multi), pick the type (the form adapts), recompute preview per
-    insurer with before / after columns and the service-invoice impact, attachments, duplicate warning with an
-    override reason.
-  - **Request page** with slip and validation slip.
+- **Adjustments** (as built):
+  - **Adjustment Workbench**: stage tabs, search by request, policy, ARN, invoice or client (also insurer, product,
+    placement slip and endorsement reference); columns Request No. (raised date), Policy No. / ARN, Invoice /
+    Placement Slip, Assured (client code), Insurer / Product (names), Type (business label and request type),
+    Effective, Aging ("n days"), Status, Flags.
+  - **New request** wizard: step 1 **Policy** (booked invoices with the policy no., ARN, assured and insurer, searched
+    by policy, ARN, invoice or client; the policy details of each chosen invoice - policy no., ARN, invoice,
+    placement slip, client, insurer, product, period of cover, gross premium - shown before anything is saved), then
+    the request (the form adapts to the type) and the recompute preview per insurer with before / after columns and
+    the service-invoice impact, duplicate warning with an override reason. The policy details stay on top of the
+    later steps.
+  - **Request page** with slip and validation slip; header chips Policy No., ARN and Invoice; facts Policy No.,
+    Invoice, Insurer / Product, Period / Effective, Type, Requested By, Aging, Placement Slip / Batch; tabs Details,
+    Policy (policy and placement with links to the account and the invoice), Recompute, Accounting, **Policy
+    Transactions**, Documents, History.
   - **Posting batches** (review, return, post).
   - **Minimal balance file**.
 - **Commission Receivables**:
@@ -663,6 +718,10 @@ with saved quick filters, empty and loading states, and toasts.
   - a component table with booked / applied / remitted / adjusted / balance;
   - status chips: payment, remittance, hold, lock, DP, written-off;
   - a movement timeline, receipts, batches and adjustments;
+  - (as built) a **Policy Transactions** tab: the shared `PolicyTransactions` component (section 4.5.1) with the
+    original booking, endorsements, cancellations, adjustments and refunds, each row expandable to its GL journals
+    and lines with a link to the journal page (JOURNAL_VIEW). The same component is on the endorsement request page
+    and on the account page (tab Policy Transactions, OPS_VIEW, by ARN);
   - (BRD-13) no longer requires a booked invoice: for origin LEGACY `Invoice360Service.view` does not call
     `bookings.byNo`, the booking references are empty, and a legacy block shows the source system, legacy number,
     legacy reference, migration batch and the frozen snapshot; lists and the header show a LEGACY badge.

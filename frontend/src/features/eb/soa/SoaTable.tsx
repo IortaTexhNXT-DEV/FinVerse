@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { attachmentsApi } from '@/api/attachments';
@@ -220,7 +221,8 @@ function columns(showProgramme: boolean): Column<Soa>[] {
     {
       key: 'period',
       header: 'Period',
-      render: (s) => `${formatDate(s.periodFrom)} – ${formatDate(s.periodTo)}`,
+      kind: 'period',
+      render: (s) => <PeriodCell from={s.periodFrom} to={s.periodTo} />,
     },
     { key: 'amount', header: 'Amount', kind: 'amount', render: (s) => <Amount value={s.amount} /> },
     { key: 'received', header: 'Received', kind: 'date', render: (s) => formatDate(s.receivedOn) },

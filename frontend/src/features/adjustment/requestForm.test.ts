@@ -4,6 +4,7 @@ import {
   EMPTY_FORM,
   classOfType,
   componentLabel,
+  endorsementTypeLabel,
   formErrors,
   formOf,
   isValid,
@@ -113,5 +114,29 @@ describe('adjustment request form', () => {
     expect(form.refundBasis).toBe('SHORT_PERIOD');
     expect(form.duplicateOverride).toBe('ok');
     expect(form.reasonCode).toBe('');
+  });
+});
+
+describe('endorsement type labels', () => {
+  it('shows the business label of the list of values once it is loaded', () => {
+    expect(endorsementTypeLabel('FIN_CHANGE_COVER', 'Financial – Change of Cover')).toBe(
+      'Financial – Change of Cover',
+    );
+  });
+
+  it('never shows the mangled code while the list loads', () => {
+    expect(endorsementTypeLabel('FIN_CHANGE_COVER', 'Fin Change Cover')).toBe(
+      'Financial – Change of Cover',
+    );
+    expect(endorsementTypeLabel('NF_COVER_EXTENSION')).toBe('Non-financial – Cover Extension');
+    expect(endorsementTypeLabel('INT_ADJUSTMENT')).toBe('Internal Adjustment');
+    expect(endorsementTypeLabel('NF_ASSURED_INFO')).toBe('Non-financial – Assured Information');
+    expect(endorsementTypeLabel('FIN_PREMIUM_RATE')).toBe('Financial – Change of Premium Rate');
+    expect(endorsementTypeLabel('NF_DESCRIPTIVE')).toBe('Non-financial – Descriptive Change');
+  });
+
+  it('names a new type of a known class by its class', () => {
+    expect(endorsementTypeLabel('FIN_NEW_TYPE')).toBe('Financial – New Type');
+    expect(endorsementTypeLabel('')).toBe('');
   });
 });

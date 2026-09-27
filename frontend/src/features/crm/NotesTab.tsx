@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, X } from 'lucide-react';
 import { useState } from 'react';
@@ -17,7 +18,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, formatDateTime, humanize, today } from '@/utils/format';
+import { formatDateTime, humanize, today } from '@/utils/format';
 import { InstructionDialog } from './InstructionDialog';
 import { inForce } from './instructionRules';
 import { UserName } from '@/components/ui/UserName';
@@ -165,8 +166,8 @@ export function NotesTab({ client }: Readonly<{ client: ClientDetail }>) {
             {
               key: 'dates',
               header: 'Effective',
-              render: (i) =>
-                `${formatDate(i.effectiveFrom)} – ${i.effectiveTo ? formatDate(i.effectiveTo) : 'open'}`,
+              kind: 'period',
+              render: (i) => <PeriodCell from={i.effectiveFrom} to={i.effectiveTo} />,
             },
             {
               key: 'state',

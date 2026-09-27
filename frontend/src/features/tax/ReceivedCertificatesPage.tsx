@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FilePlus2 } from 'lucide-react';
 import { useState } from 'react';
@@ -54,7 +55,8 @@ function columns(
     {
       key: 'period',
       header: 'Period Covered',
-      render: (c) => `${formatDate(c.periodFrom)} – ${formatDate(c.periodTo)}`,
+      kind: 'period',
+      render: (c) => <PeriodCell from={c.periodFrom} to={c.periodTo} />,
     },
     {
       key: 'income',

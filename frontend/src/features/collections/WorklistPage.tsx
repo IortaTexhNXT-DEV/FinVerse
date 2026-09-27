@@ -19,7 +19,7 @@ import { Tag } from '@/components/ui/Tag';
 import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatAmount, formatDate, humanize } from '@/utils/format';
+import { formatAmount, formatDate, formatDays, humanize } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { CollectionItem, DispositionInput, EffortInput, ReassignInput } from './api';
 import { WORKLIST_TABS, filtersFromSearch, tabFromSearch, worklistQuery } from './collectionsLogic';
@@ -80,7 +80,11 @@ const COLUMNS: Column<CollectionItem>[] = [
     render: (i) => [i.segment, i.salesUnit].filter(Boolean).join(' / '),
   },
   { key: 'booked', header: 'Booked', render: (i) => formatDate(i.bookingDate) },
-  { key: 'aging', header: 'Aging', render: (i) => `${i.agingDays} d · ${i.agingBracket ?? ''}` },
+  {
+    key: 'aging',
+    header: 'Aging',
+    render: (i) => <CellStack main={formatDays(i.agingDays)} sub={i.agingBracket} />,
+  },
   {
     key: 'net',
     header: 'Outstanding',

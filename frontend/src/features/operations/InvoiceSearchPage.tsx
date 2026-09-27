@@ -1,3 +1,4 @@
+import { InsurerName } from '@/components/broking/LovLabel';
 import { useQuery } from '@tanstack/react-query';
 import { Filter, Search } from 'lucide-react';
 import { useState } from 'react';
@@ -52,7 +53,7 @@ const COLUMNS: Column<OpsInvoiceSummary>[] = [
       </>
     ),
   },
-  { key: 'insurer', header: 'Insurer', render: (i) => i.insurerCode },
+  { key: 'insurer', header: 'Insurer', render: (i) => <InsurerName code={i.insurerCode} /> },
   {
     key: 'date',
     header: 'Booked / Inception',

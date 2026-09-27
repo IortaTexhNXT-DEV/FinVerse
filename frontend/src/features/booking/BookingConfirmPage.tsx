@@ -1,3 +1,4 @@
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BadgeCheck, Building2, CalendarRange, Landmark, UserRound } from 'lucide-react';
 import { useState } from 'react';
@@ -108,7 +109,8 @@ function YearsTable({ invoices }: Readonly<{ invoices: InvoiceDraft[] }>) {
         {
           key: 'period',
           header: 'Period',
-          render: (i) => `${formatDate(i.inceptionDate)} – ${formatDate(i.expiryDate)}`,
+          kind: 'period',
+          render: (i) => <PeriodCell from={i.inceptionDate} to={i.expiryDate} />,
         },
         {
           key: 'gross',

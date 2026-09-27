@@ -10,6 +10,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.List;
+import java.util.stream.IntStream;
 
 /**
  * One approver of an access request, in order (BRD 1.002.1.1.3 "select approver", BRD 3.002.x
@@ -45,6 +47,12 @@ public class AccessRequestApprover extends BaseEntity {
     this.request = request;
     this.sequence = sequence;
     this.approver = approver;
+  }
+
+  static List<AccessRequestApprover> inOrder(AccessRequest request, List<String> approvers) {
+    return IntStream.range(0, approvers.size())
+        .mapToObj(i -> new AccessRequestApprover(request, i + 1, approvers.get(i)))
+        .toList();
   }
 
   void decide(AccessApproverDecision outcome, String comment, Instant when) {

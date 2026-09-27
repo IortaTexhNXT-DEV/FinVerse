@@ -186,7 +186,7 @@ export function RequestDetails({ request: r }: Readonly<{ request: AccessRequest
 
 const APPROVER_COLUMNS: Column<ApproverStep>[] = [
   { key: 's', header: 'Order', numeric: true, render: (a) => a.sequence },
-  { key: 'a', header: 'Approver', render: (a) => a.approver },
+  { key: 'a', header: 'Approver', render: (a) => <UserName login={a.approver} /> },
   { key: 'd', header: 'Decision', render: (a) => <StatusBadge status={a.decision} /> },
   { key: 'r', header: 'Remarks', render: (a) => a.remarks ?? '' },
   { key: 't', header: 'Decided', render: (a) => formatDateTime(a.decidedAt) },

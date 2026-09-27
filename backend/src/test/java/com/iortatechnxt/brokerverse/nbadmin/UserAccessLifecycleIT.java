@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.NotificationRepository;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestAction;
+import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestApprover;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestEvent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
@@ -81,6 +82,44 @@ class UserAccessLifecycleIT {
         as.run(REQUESTOR, () -> requests.create(enrol(name), false, List.of(APPROVER)));
     as.run(APPROVER, () -> requests.approve(r.getId(), null));
     return users.getByUsername(name);
+  }
+
+  @Test
+  void aDraftKeepsItsChosenApproverWhenEditedAndIsSubmittedToIt() {
+    String name = AccessRequestIT.username();
+    AccessRequest draft =
+        as.run(REQUESTOR, () -> requests.create(enrol(name), true, List.of(APPROVER)));
+    assertThat(draft.getStatus()).isEqualTo(AccessRequestStatus.DRAFT);
+    assertThat(draft.getAssignedApprover()).isNull();
+    assertThat(inboxOf(APPROVER)).doesNotContain(draft.getRequestNo());
+    assertThatThrownBy(() -> as.run(APPROVER, () -> requests.view(draft.getId())))
+        .isInstanceOf(AccessDeniedException.class);
+
+    // Edit without approvers (older screens): the saved approver stays.
+    as.run(REQUESTOR, () -> requests.edit(draft.getId(), enrol(name)));
+    assertThat(approversOf(draft.getId())).containsExactly(APPROVER);
+    // Edit with the approver shown on the form: kept as chosen.
+    as.run(
+        REQUESTOR,
+        () ->
+            requests.edit(
+                draft.getId(),
+                enrol(name).withJustification("Joined Marketing, Makati"),
+                List.of(" " + APPROVER + " ", APPROVER)));
+    assertThat(approversOf(draft.getId())).containsExactly(APPROVER);
+
+    List<String> kept = approversOf(draft.getId());
+    AccessRequest pending =
+        as.run(REQUESTOR, () -> requests.submit(draft.getId(), kept, "Please"));
+    assertThat(pending.getStatus()).isEqualTo(AccessRequestStatus.PENDING);
+    assertThat(pending.getAssignedApprover()).isEqualTo(APPROVER);
+    assertThat(pending.getJustification()).isEqualTo("Joined Marketing, Makati");
+  }
+
+  private List<String> approversOf(Long id) {
+    return as.run(REQUESTOR, () -> requests.view(id)).getApprovers().stream()
+        .map(AccessRequestApprover::getApprover)
+        .toList();
   }
 
   @Test

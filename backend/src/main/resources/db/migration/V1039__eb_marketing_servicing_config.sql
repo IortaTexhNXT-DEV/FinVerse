@@ -79,3 +79,14 @@ create index ix_eb_franchise_programme on eb_franchise_request (programme_id, st
 create index ix_eb_insurer_request_cycle on eb_insurer_request (cycle_id, status);
 create index ix_eb_confirmation_cycle on eb_client_confirmation (cycle_id, status);
 create index ix_eb_soa_programme on eb_soa (programme_id, status);
+
+-- The accounts of each programme (current accounts of its lines and accounts placed by its
+-- cycles), read by the EB reports to join the booked invoices.
+create view eb_programme_arn_v as
+select l.programme_id, l.current_arn as arn, l.benefit_line
+from eb_programme_line l
+where l.current_arn is not null
+union
+select c.programme_id, ca.arn, null
+from eb_cycle_account ca
+join eb_cycle c on c.id = ca.cycle_id;

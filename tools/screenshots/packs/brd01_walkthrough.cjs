@@ -152,6 +152,16 @@ async function uploadDocument(page, type, file, uploadButton) {
   await settle(page, 1200);
 }
 
+/** Attaches a file in the documents panel of a record (document type, then the file). */
+async function attachDocument(page, type, file) {
+  const panel = page.locator('main');
+  const select = panel.locator('select').filter({ has: page.locator('option', { hasText: 'Document type (optional)' }) }).first();
+  const options = await select.locator('option').allTextContents();
+  await select.selectOption({ label: options.find((o) => new RegExp(type, 'i').test(o)) });
+  await panel.locator('input[type=file]').last().setInputFiles(file);
+  await settle(page, 1500);
+}
+
 // ------------------------------------------------------------------ walkthrough A
 
 const PEOPLE = [
@@ -551,6 +561,131 @@ const steps = {
       },
     });
     await act(page, /^Create accounts?$/i, { reason: false });
+    return page;
+  },
+  // ---------------------------------------------------------------- walkthrough C
+  // 1. Submit KYC refused: the mandatory KYC documents are missing.
+  'wt-c-01': async (ctx) => {
+    const id = ctx.one("select id from crm_client where prospect_code = 'PR-2026-000011'");
+    const page = await go(ctx, 'ao', `/crm/clients/${id}?tab=kyc`);
+    await act(page, 'Submit KYC', { reason: false });
+    return page;
+  },
+  // 2. KYC returned to the Account Officer by the verifier.
+  'wt-c-02': async (ctx) => {
+    const id = ctx.one("select id from crm_client where onboarding_stage = 'KYC_REVIEW' order by id limit 1");
+    const page = await go(ctx, 'mkttl', `/crm/clients/${id}`);
+    await act(page, /^Return To Account Officer$/i, { comment: 'The valid ID has expired; upload a current government ID.' });
+    return page;
+  },
+  // 3. Four-eyes rule: the maker of a quotation cannot approve it.
+  'wt-c-03': async (ctx) => {
+    let id = ctx.sql("select id from quo_quotation where created_by = 'mkttl' and status = 'FOR_REVIEW' order by id desc limit 1")[0]?.[0];
+    let page;
+    if (!id) {
+      page = await go(ctx, 'mkttl', '/quotations/new');
+      await ctx.runSteps(page, [
+        async (pg) => {
+          await pg.getByLabel(/^Client or prospect/).fill('Garcia');
+          await pg.locator('.client-option').first().click();
+          await pg.waitForTimeout(500);
+        },
+        ['Market segment', 'CBG'], ['Source channel', 'Walk-in'],
+      ]);
+      await button(page, 'Next').click();
+      await settle(page, 600);
+      await ctx.runSteps(page, [['Product', '^PAR01'], ['Insurer', 'Mabuhay'], ['Insurer branch (LGT)', 'Makati']]);
+      await button(page, 'Next').click();
+      await settle(page, 600);
+      await button(page, /add location/i).click();
+      await ctx.runSteps(page, [['Address', '31 Narra Street, Barangay Kapitolyo'], ['City', 'Pasig City'],
+        ['Occupancy', 'Dwelling'], ['Construction class', 'Class 1'], addInsuredItem('Building', '2500000')]);
+      await button(page, 'Next').click();
+      await settle(page, 600);
+      await button(page, 'Next').click();
+      await settle(page, 600);
+      await act(page, 'Submit for Review', { reason: false });
+      id = ctx.one("select id from quo_quotation where created_by = 'mkttl' order by id desc limit 1");
+    }
+    page = await go(ctx, 'mkttl', `/quotations/${id}`);
+    await act(page, 'Approve', { reason: false });
+    return page;
+  },
+  // 4. Quotation returned to its maker with the reason.
+  'wt-c-04': async (ctx) => {
+    const id = ctx.one("select id from quo_quotation where quotation_no = 'QT-2026-900002'");
+    const page = await go(ctx, 'mkttl', `/quotations/${id}`);
+    await act(page, /^Return to Maker$/i, { reason: 'rate or terms', comment: 'Apply the rate of the CBG property tariff and resubmit.' });
+    await tab(page, 'History');
+    return page;
+  },
+  // 5. Validate refused: the client of the account is not confirmed.
+  'wt-c-05': async (ctx) => {
+    const arn = 'ARN-2026-900008';
+    const id = ctx.one(`select id from acc_account where arn = '${arn}'`);
+    if (ctx.one(`select status from acc_account where arn = '${arn}'`) === 'DRAFT') {
+      const ao = await go(ctx, 'ao', `/accounts/${id}`);
+      await tab(ao, 'Documents');
+      await attachDocument(ao, '^Valid ID', pdf('valid-id-villanueva.pdf', 'Valid ID (passport)',
+        ['Holder: Ana Cruz Villanueva', 'Seed data for the SIT environment']));
+      await act(ao, 'Submit to Processing', { reason: false });
+    }
+    const page = await go(ctx, 'proc', `/accounts/${id}`);
+    await act(page, 'Validate', { reason: false });
+    return page;
+  },
+  // 6. Account returned to Marketing with the reason.
+  'wt-c-06': async (ctx) => {
+    const id = ctx.one("select id from acc_account where arn = 'ARN-2026-900008'");
+    const page = await go(ctx, 'proc', `/accounts/${id}`);
+    await act(page, /^Return to Marketing$/i, { reason: 'missing supporting', comment: 'Attach the signed application form and confirm the client first.' });
+    return page;
+  },
+  // 7. The Account Officer finds the account on Returned to Me, attaches the document and resubmits.
+  'wt-c-07': async (ctx) => {
+    const list = await go(ctx, 'ao', '/accounts');
+    await tab(list, 'Returned to Me');
+    const id = ctx.one("select id from acc_account where arn = 'ARN-2026-900008'");
+    if (ctx.one(`select status from acc_account where id = ${id}`) === 'RETURNED_TO_MARKETING') {
+      const page = await go(ctx, 'ao', `/accounts/${id}`);
+      await tab(page, 'Documents');
+      await attachDocument(page, '^Others$', pdf('application-form-villanueva.pdf',
+        'Signed application form', ['Applicant: Ana Cruz Villanueva', 'Personal accident cover', 'Seed data for the SIT environment']));
+      await act(page, /^(Resubmit to Processing|Submit to Processing)$/i, { reason: false });
+      return page;
+    }
+    return list;
+  },
+  // 8. Insurer return recorded on a placed account.
+  'wt-c-08': async (ctx) => {
+    const arn = 'ARN-2026-910001';
+    const page = await go(ctx, 'proc', `/placement/accounts/${arn}`);
+    await act(page, /^Record Insurer Return$/i, { reason: 'additional', comment: 'The insurer asks for the updated fire safety certificate.' });
+    await tab(page, 'Insurer Returns');
+    return page;
+  },
+  // 9. Account resubmitted for placement; the slip regenerated and resent.
+  'wt-c-09': async (ctx) => {
+    const arn = 'ARN-2026-910001';
+    const page = await go(ctx, 'proc', `/placement/accounts/${arn}`);
+    if (await button(page, /^Resubmit for Placement$/i).isVisible().catch(() => false)) {
+      await act(page, /^Resubmit for Placement$/i, { reason: false });
+    }
+    if (await button(page, /^Generate Placement Slip$/i).isVisible().catch(() => false)) {
+      await act(page, /^Generate Placement Slip$/i, { reason: false, confirm: /^Generate/i });
+    }
+    await tab(page, 'Placement Slips');
+    const generated = page.locator('main table tbody tr').filter({ hasText: 'Generated' }).first();
+    if (await button(generated, 'Send').isVisible().catch(() => false)) {
+      await button(generated, 'Send').click();
+      await page.waitForTimeout(800);
+      const dialog = page.locator('dialog.modal[open]').last();
+      if (await dialog.isVisible().catch(() => false)) {
+        await dialog.getByRole('button', { name: /^Send/ }).last().click();
+      }
+      await settle(page, 1500);
+      await tab(page, 'Placement Slips');
+    }
     return page;
   },
 };

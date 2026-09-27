@@ -366,6 +366,8 @@ class BdoiDocument:
         self._first_body_heading = True
         self._cover_end: Any = None
         self._volume_marks: list[Any] = []
+        self._home_landscape = False
+        self._turned = False
         self._setup_page(self.doc.sections[0])
         self._setup_styles()
         self._header_footer(self.doc.sections[0])
@@ -540,6 +542,8 @@ class BdoiDocument:
     def new_section(self, landscape: bool = False) -> None:
         """Starts a new page section (portrait or landscape) with its own header and footer. When the current
         section is still empty (two orientation changes in a row), it is turned instead, so no blank page is left."""
+        self._home_landscape = landscape
+        self._turned = False
         body = self.doc.element.body
         if len(body) > 1 and body[-2].tag == qn("w:p") and not body[-2].xpath("./w:r") \
                 and body[-2].find(qn("w:pPr") + "/" + qn("w:sectPr")) is not None:
@@ -698,6 +702,8 @@ class BdoiDocument:
         """Heading 1-3 (numbered 1 / 1.1 / 1.1.1 unless numbered=False) or 4 (a label)."""
         # A new chapter starts on a new page. "Page break before" on the heading itself never leaves
         # an empty page when the previous page is exactly full (a break paragraph would).
+        if self._turned and level <= 2:
+            self._turn(self._home_landscape)
         break_before = level == 1 and (self.h1_page_break or self._first_body_heading)
         if level == 1:
             self._first_body_heading = False
@@ -972,12 +978,28 @@ class BdoiDocument:
             target = Path(path)
             if not target.is_absolute():
                 target = (self.base_dir / target).resolve()
-        # A full-window shot (menu and header kept for the navigation context) goes on a landscape page at the
-        # full text width; the portrait layout resumes after its caption and legend.
+        # The page orientation that prints the screenshot largest: a full-window shot (menu and header kept for
+        # the navigation context) always goes on a landscape page; any other shot turns the page when the other
+        # orientation prints it at least a third wider (a tall record on a portrait page, a wide screen on a
+        # landscape one), with the image nearly filling the page. A portrait chapter stays turned until its next
+        # heading; a landscape chapter (the screen specifications, with their wide tables) turns back at once.
         turned = False
-        if target is not None and target.exists() and image_crop(target) == "full" and not self.landscape:
-            self.new_section(landscape=True)
-            turned = True
+        if target is not None and target.exists() and width_cm is None:
+            try:
+                from PIL import Image
+
+                with Image.open(target) as im:
+                    ratio = im.size[1] / im.size[0]
+            except Exception:  # pragma: no cover
+                ratio = 0.6
+            full = image_crop(target) == "full"
+            here = min(self.text_width_cm, max_height_ratio * self.text_height_cm / ratio)
+            ow, oh = self._text_size(not self.landscape)
+            there = min(ow, TURNED_HEIGHT_RATIO * oh / ratio)
+            if (full and not self.landscape) or (not full and there > 1.33 * here):
+                self._turn(not self.landscape)
+                turned = True
+                max_height_ratio = TURNED_HEIGHT_RATIO
         width = width_cm or self.text_width_cm
         if target is not None and target.exists():
             try:
@@ -1019,8 +1041,21 @@ class BdoiDocument:
         self.caption("Figure", caption)
         if legend:
             self.callout_legend(legend)
-        if turned:
-            self.new_section(landscape=False)
+        if turned and self._home_landscape:
+            self._turn(True)
+
+    def _text_size(self, landscape: bool) -> tuple[float, float]:
+        """Text width and height (cm) of a page of the given orientation."""
+        if landscape:
+            return PAGE_H_CM - 2 * MARGIN_LR_CM, PAGE_W_CM - 2 * MARGIN_TB_CM - 0.3
+        return PAGE_W_CM - 2 * MARGIN_LR_CM, PAGE_H_CM - 2 * MARGIN_TB_CM - 0.3
+
+    def _turn(self, landscape: bool) -> None:
+        """Turns the page for a screenshot; the chapter's own orientation is kept in _home_landscape."""
+        home = self._home_landscape
+        self.new_section(landscape=landscape)
+        self._home_landscape = home
+        self._turned = landscape != home
 
     def callout_legend(self, items: Sequence[tuple[Any, str]], columns: int = 3) -> Table:
         """The legend of the numbered callouts of a screenshot: badge number and field, in columns."""
@@ -1346,6 +1381,8 @@ PRINT_DPI = 170
 # Screenshots are captured at twice the screen resolution; they are embedded at up to this many pixels per inch
 # of printed width, so the smallest screen text stays sharp on paper. They are never enlarged.
 SCREENSHOT_DPI = 250
+# Height share of the text area a screenshot may take on a page turned for it (caption and legend follow).
+TURNED_HEIGHT_RATIO = 0.8
 
 
 def image_crop(path: Path) -> str:

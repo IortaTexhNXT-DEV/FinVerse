@@ -41,6 +41,33 @@ export const EB_HELP: HelpSection = {
       ],
     },
     {
+      name: 'Marketing a Programme',
+      summary:
+        'The programme tabs Franchise, TOR & Requests, Proposals, Comparative, Confirmation and Submissions carry a cycle from the market to placement.',
+      workflow: [
+        "Franchise: Request Franchise sends the franchise form and the validated Broker on Record to the selected insurers; record each decision with the insurer's reply, then Advise Client. A request without a decision is expired after its due date and the grace days.",
+        "TOR & Requests: write the terms of reference, release them, then Send Requests to the insurers; Mark Declined closes a request the insurer will not quote. Request Revision relays the client's changes for revised proposals.",
+        'Proposals: Record Proposal with the plans and premiums, the answers to the terms of reference, the capability ratings and the proposal document; validate or reject each one. Only validated proposals are compared.',
+        'Comparative: Build Comparative puts the validated proposals side by side per benefit line with the lowest premium recommended; mark the recommendation, submit it for sign-off, and present it to the client once approved.',
+        "Confirmation: Record Confirmation with the client's e-mail or signed document and the chosen proposal of each line, then Trigger Placement: one account per line is created with the chosen insurer, the documents are attached and each account is submitted for placement.",
+        'Submissions: Submit to Insurer sends the documents of a process; the required documents of the process are checked first.',
+      ],
+      controls: [
+        "The team lead signs off the comparative; the AO who prepared it cannot. Above a value threshold of EB Setup the comparative also needs BDOI Management's approval, and placement waits for it.",
+        'Placement needs the required documents of the process on file, and an insurer that is not accredited needs its accreditation approval.',
+      ],
+    },
+    {
+      name: 'Members and Billing',
+      summary:
+        'The programme tabs Members, Member Changes and Billing & SOA hold the roster of each policy year, the changes of members and the insurer statements of account.',
+      workflow: [
+        "Members: Upload Master List stages the client's census for a policy year with the differences from the accepted roster; the AO accepts or rejects it.",
+        'Member Changes: Capture Member Change records additions, deletions and plan or data changes checked against the accepted roster.',
+        "Billing & SOA: the invoices booked on the programme with their payment status; Receive SOA registers an insurer's statement of account with the invoices it bills.",
+      ],
+    },
+    {
       name: 'New Programme',
       path: '/eb/programmes/new',
       summary:
@@ -54,7 +81,12 @@ export const EB_HELP: HelpSection = {
       name: 'Member Changes',
       path: '/eb/member-changes',
       summary:
-        'Additions, deletions and plan or data changes of members: captured, relayed to the insurer, billed, validated by Processing and closed.',
+        'Additions, deletions and plan or data changes of members across the programmes: captured, relayed to the insurer, billed, validated by Processing and closed. Open a change for its lines, billing and endorsement request.',
+      workflow: [
+        "Relay to Insurer sends the change to the insurer with the client's request.",
+        "Record Billing enters the insurer's billing; a direct billing comes with its file. Processing validates the billing; a change that affects the premium then raises an endorsement request on the account.",
+        'Close and Apply updates the roster; new members get their HMO card as a pending item.',
+      ],
       controls: [
         'Documents carry their process (endorsement, adjustment) and are visible by department: billing documents to Marketing, Processing and Collection.',
       ],
@@ -77,14 +109,24 @@ export const EB_HELP: HelpSection = {
       path: '/eb/soa',
       summary:
         'Insurer statements of account: received, validated by Processing, released to the client and Collection, linked to the booked invoices with their payment status.',
-      controls: ['Open to Processing and Collection.'],
+      workflow: [
+        "SOAs are received on the programme's Billing & SOA tab. Processing validates or rejects each one with a reason, then releases it to the client and Collection.",
+        'The payment status of the linked invoices follows the collections booked on them.',
+      ],
+      controls: [
+        'Open to Processing and Collection.',
+        'The same insurer SOA number or the same file is refused a second time. An SOA not validated in time raises an alert.',
+      ],
     },
     {
       name: 'EB Setup',
       path: '/eb/setup',
       summary:
-        'Value threshold rules that send a comparative to BDOI Management, the required documents per process and benefit line, and the EB parameters (renewal advice lead time, reminders, turn-around times).',
-      controls: ['Each change waits for another user to authorize it.'],
+        'Value threshold rules that send a comparative to BDOI Management (above an amount of total sum insured or annual premium) and the required documents per process and benefit line, mandatory or optional.',
+      controls: [
+        'Each change waits for another user to authorize it; records are deactivated, never deleted.',
+        'The EB parameters (renewal advice lead time, reminders, turn-around times, franchise grace days) are maintained in System Parameters.',
+      ],
     },
   ],
 };

@@ -10,7 +10,6 @@ import { RecordHeader } from '@/components/broking/RecordHeader';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
 import { Button } from '@/components/ui/Button';
-import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
@@ -23,29 +22,12 @@ import { EB_SECTION } from '../EbPlaceholder';
 import { BenefitLines, EbLov } from '../common/EbLabels';
 import { EB_LOV, ebLabel } from '../common/ebCodes';
 import '../eb.css';
-import { PendingItemsTable } from '../pending/PendingItemsTable';
-import { BorTab } from './BorTab';
-import { CycleTab } from './CycleTab';
-import { DocumentsTab } from './DocumentsTab';
-import { ContactsTab, LinesTab } from './LinesContactsTabs';
-import { AccountsTab, HistoryTab } from './RecordsTabs';
 import { ProgrammeActionDialogs } from './ProgrammeActionDialogs';
 import type { ProgrammeDialog } from './ProgrammeActionDialogs';
 import { nextExpiry, STEP_ACTIONS } from './programmeView';
-
-type TabId =
-  'cycle' | 'lines' | 'contacts' | 'documents' | 'bor' | 'accounts' | 'pending' | 'history';
-
-const TABS: readonly { id: TabId; label: string }[] = [
-  { id: 'cycle', label: 'Cycle' },
-  { id: 'lines', label: 'Lines' },
-  { id: 'contacts', label: 'Contacts' },
-  { id: 'documents', label: 'Documents' },
-  { id: 'bor', label: 'BOR' },
-  { id: 'accounts', label: 'Accounts' },
-  { id: 'pending', label: 'Pending Items' },
-  { id: 'history', label: 'History' },
-];
+import { TabContent } from './ProgrammeTabs';
+import { PROGRAMME_TABS } from './programmeTabList';
+import type { TabId } from './programmeTabList';
 
 function Header({ p }: Readonly<{ p: ProgrammeView }>) {
   const current = p.cycles.find((c) => c.id === p.currentCycleId);
@@ -84,31 +66,6 @@ function Header({ p }: Readonly<{ p: ProgrammeView }>) {
   );
 }
 
-function TabContent({ tab, p }: Readonly<{ tab: TabId; p: ProgrammeView }>) {
-  switch (tab) {
-    case 'lines':
-      return <LinesTab programme={p} />;
-    case 'contacts':
-      return <ContactsTab programme={p} />;
-    case 'documents':
-      return <DocumentsTab programme={p} />;
-    case 'bor':
-      return <BorTab programme={p} />;
-    case 'accounts':
-      return <AccountsTab programmeId={p.id} />;
-    case 'pending':
-      return (
-        <Card title="Pending Items">
-          <PendingItemsTable filters={{ programmeId: p.id }} showProgramme={false} />
-        </Card>
-      );
-    case 'history':
-      return <HistoryTab programmeId={p.id} />;
-    default:
-      return <CycleTab programme={p} />;
-  }
-}
-
 /** The business actions of the current cycle offered in the workflow panel. */
 function CycleActions({
   actions,
@@ -144,16 +101,17 @@ function CycleActions({
 }
 
 /**
- * Programme page (design 10.1; FR-EB-021 to 031, 046, 057): the record header, the workflow of
- * the current cycle with its requirement steps, and the tabs Cycle, Lines, Contacts, Documents,
- * BOR, Accounts, Pending Items and History.
+ * Programme page (design 10.1): the record header, the workflow of the current cycle with its
+ * requirement steps, and the tabs of the programme from its cycle and Broker on Record through
+ * franchise, TOR and requests, proposals, comparative, confirmation and submissions to the accounts,
+ * members, member changes, billing and SOAs, pending items and history.
  */
 export default function ProgrammePage() {
   const id = Number(useParams().id);
   const { can } = useAuth();
   const queryClient = useQueryClient();
   const [tab, setTab] = useTabParam<TabId>(
-    TABS.map((t) => t.id),
+    PROGRAMME_TABS.map((t) => t.id),
     'cycle',
   );
   const [dialog, setDialog] = useState<ProgrammeDialog>();
@@ -232,8 +190,8 @@ export default function ProgrammePage() {
           }
         />
       )}
-      <Tabs tabs={TABS} active={tab} onChange={setTab} />
-      <TabContent tab={tab} p={p} />
+      <Tabs tabs={PROGRAMME_TABS} active={tab} onChange={setTab} />
+      <TabContent tab={tab} programme={p} />
       {dialog !== undefined && (
         <ProgrammeActionDialogs programme={p} dialog={dialog} onClose={close} />
       )}

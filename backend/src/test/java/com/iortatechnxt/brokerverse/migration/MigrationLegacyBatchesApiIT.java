@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iortatechnxt.brokerverse.adjustment.service.WriteOffService;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.report.render.ExportFormat;
@@ -43,6 +44,7 @@ class MigrationLegacyBatchesApiIT {
   @Autowired private JdbcTemplate jdbc;
   @Autowired private ReportService reports;
   @Autowired private AsUser as;
+  @Autowired private WriteOffService writeOffs;
 
   private MigrationTestSupport mig;
   private LegacyInvoiceFixtures fx;
@@ -231,6 +233,19 @@ class MigrationLegacyBatchesApiIT {
     assertThat(fx.balance(invoiceNo, "BASIC")).isEqualByComparingTo("0");
     assertThat(fx.balance(invoiceNo, "DTIP")).isEqualByComparingTo("4000.00");
     assertThat(accounts("DPPR:" + no + ":")).contains("LGC-DTIP", "1215.01");
+  }
+
+  @Test
+  void aLegacyWriteOffPostsOnTheLegacyControlsAndShowsInTheHistory() throws Exception {
+    String t = LegacyInvoiceFixtures.token();
+    fx.client(t);
+    String invoiceNo = legacyInvoice(t, 9);
+    as.run("adjust", () -> writeOffs.writeOff(invoiceNo, "MB-" + t, false));
+    assertThat(fx.balance(invoiceNo, "BASIC")).isEqualByComparingTo("0");
+    assertThat(accounts("WO:" + invoiceNo)).contains("1215.01").doesNotContain("1210.01");
+    JsonNode rows =
+        mig.get("proc", "/api/v1/ops/invoices/" + invoiceNo + "/transactions").get("rows");
+    assertThat(rows.findValuesAsText("typeLabel")).contains("Write-off of Minimal Balance");
   }
 
   @Test

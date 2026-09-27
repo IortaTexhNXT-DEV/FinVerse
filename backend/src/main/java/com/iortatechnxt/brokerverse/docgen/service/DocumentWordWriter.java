@@ -13,6 +13,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableCell;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
@@ -87,8 +88,8 @@ final class DocumentWordWriter {
 
   private static void table(BrandedDocx docx, Table t) {
     heading(docx, t.heading());
-    double[] weights = new double[t.headers().size()];
-    Arrays.fill(weights, 1);
+    float[] columns = t.columnWeights();
+    double[] weights = IntStream.range(0, columns.length).mapToDouble(i -> columns[i]).toArray();
     XWPFTable table = docx.table(weights, true, NATURAL);
     BrandedDocx.headingRow(table, t.headers());
     for (List<String> values : t.rows()) {

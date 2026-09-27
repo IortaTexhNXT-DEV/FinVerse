@@ -10,6 +10,8 @@ import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.booking.BookingFixtures;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import com.lowagie.text.pdf.PdfReader;
+import com.lowagie.text.pdf.parser.PdfTextExtractor;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -105,9 +107,23 @@ class BookingApiIT {
                 .andExpect(status().isOk()));
     long siId = sis.get(0).get("id").asLong();
     api.doGet("proc", "/api/v1/booking/service-invoices/" + siId).andExpect(status().isOk());
-    api.download("proc", "/api/v1/booking/service-invoices/" + siId + "/pdf")
-        .andExpect(status().isOk())
-        .andExpect(content().contentType(MediaType.APPLICATION_PDF));
+    byte[] siPdf =
+        api.download("proc", "/api/v1/booking/service-invoices/" + siId + "/pdf")
+            .andExpect(status().isOk())
+            .andExpect(content().contentType(MediaType.APPLICATION_PDF))
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+    // The standard business footer (document, company, template version) on a one-page document.
+    try (PdfReader reader = new PdfReader(siPdf)) {
+      assertThat(reader.getNumberOfPages()).isEqualTo(1);
+      // The page total is drawn after the footer text: "... Version <n>" then the total "1".
+      assertThat(new PdfTextExtractor(reader).getTextFromPage(1).strip())
+          .contains("Service Invoice  |  ")
+          .contains("Page 1 of ")
+          .matches("(?s).*Version \\d+1")
+          .doesNotContain("BOOKING " + invoiceNo);
+    }
     api.doPost("proc", "/api/v1/booking/service-invoices/" + siId + "/resend", null)
         .andExpect(status().isOk());
     api.doPost(

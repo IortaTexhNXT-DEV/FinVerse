@@ -63,6 +63,9 @@ public class ProposalDocuments {
           "Valid until",
           "Remarks",
           "Recommended");
+  // Amounts, rates, status words and the recommended flag keep to one line; free text wraps.
+  private static final List<Float> COMPARISON_WIDTHS =
+      List.of(1.5f, 1.3f, 1.5f, 1.1f, 1.5f, 1.9f, 1.2f, 1.6f, 2.1f);
 
   private final DocumentComposer composer;
   private final DocTemplateService templates;
@@ -149,7 +152,8 @@ public class ProposalDocuments {
                         "Insurer terms",
                         COMPARISON,
                         table.rows().stream().map(ProposalDocuments::cells).toList(),
-                        AMOUNT_COLUMNS)),
+                        AMOUNT_COLUMNS,
+                        COMPARISON_WIDTHS)),
                 List.of("Prepared by"),
                 "Compiled from " + responses.size() + " insurer response(s)"));
     return new MessageFile(p.getPrfNo() + "_comparative.pdf", PDF, pdf);

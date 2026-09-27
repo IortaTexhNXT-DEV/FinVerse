@@ -78,16 +78,51 @@ public record DocumentSpec(
    * @param headers column headers
    * @param rows rows (already formatted text)
    * @param rightAligned indexes of columns aligned right (amounts)
+   * @param widths relative column widths, one per header (a long text column wider); empty = equal
    */
   public record Table(
-      String heading, List<String> headers, List<List<String>> rows, List<Integer> rightAligned)
+      String heading,
+      List<String> headers,
+      List<List<String>> rows,
+      List<Integer> rightAligned,
+      List<Float> widths)
       implements Section {
 
-    /** Defensive copies. */
+    /** Defensive copies; widths must match the headers when given. */
     public Table {
       headers = List.copyOf(headers);
       rows = rows.stream().map(List::copyOf).toList();
       rightAligned = rightAligned == null ? List.of() : List.copyOf(rightAligned);
+      widths = widths == null ? List.of() : List.copyOf(widths);
+      if (!widths.isEmpty() && widths.size() != headers.size()) {
+        throw new IllegalArgumentException("One width per column: " + headers.size());
+      }
+    }
+
+    /**
+     * A table with columns of equal width.
+     *
+     * @param heading heading, may be null
+     * @param headers column headers
+     * @param rows rows (already formatted text)
+     * @param rightAligned indexes of columns aligned right (amounts)
+     */
+    public Table(
+        String heading, List<String> headers, List<List<String>> rows, List<Integer> rightAligned) {
+      this(heading, headers, rows, rightAligned, List.of());
+    }
+
+    /**
+     * The relative widths of the columns (equal when none were given).
+     *
+     * @return one weight per column
+     */
+    public float[] columnWeights() {
+      float[] w = new float[headers.size()];
+      for (int i = 0; i < w.length; i++) {
+        w[i] = widths.isEmpty() ? 1f : widths.get(i);
+      }
+      return w;
     }
   }
 

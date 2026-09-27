@@ -76,21 +76,21 @@ screens:
   APPROVALS: My Approvals (home section)
   ALERTS: Alerts (home section and bell icon in the page header)
   JOBS: Setup & Administration > Administration > Scheduled Jobs
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-DPA-01
     name: SIT/UAT users and roles
     content: disb (DISBURSEMENT), disbtl and disbtl2 (DISB_TL), disbappr and disbappr2 (DISB_APPROVER), mktao (PRQ_PROCESSOR), mktrev (PRQ_REVIEWER), mktappr (PRQ_APPROVER), hrappr (HR_APPROVER), acsl (ACSL_PROCESSOR), acsltl (ACSL_TL), acslhead (ACSL_HEAD), cashier and cashtl (CASHIER, CASHIER_TL), remittl (REMIT_TL), glofficer (FRBS_PROCESSOR), fmanager (FIN_ADMIN), badmin (BUSINESS_ADMIN), comptrol, admin, auditor. The SIT/UAT password is issued by the test lead.
-    source: Seeds V999 (BRD-5 users), V990, V980, V900; grants V890
+    source: Seed data (BRD-5, Operations, broking, administrator and auditor users, with their grants)
   - id: TD-DPA-02
     name: Disbursement masters
     content: Payees of an insurer, a client and a supplier maintained by disbtl and authorised by disbappr; BDOIR bank accounts with their cheque books; parameters DISB_STALE_DAYS 180, DISB_CHECK_SERIES_WARNING 20, DISB_AUTO_APPROVER_ROUTING REFUND and REMITTANCE, DISB_NO_PAYEE_ACTION HOLD, DISB_CHECK_CLEARING ON (account 2241)
-    source: Migrations V891-V893 and the seed runner DisbursementSeedData
+    source: Disbursement masters as configured for the SIT environment, and the Disbursement seed data
   - id: TD-DPA-03
     name: Disbursement storyline
     content: A remittance DV approved and paid by check (printed and released), a client refund by credit to account approved, a supplier payment by check approved and a second one left In Process, the end of day of the load date with its DCTF, check batch and reports, the deposited-checks file that tags a check Negotiated, a funding through maker, verifier and two approvers
-    source: Seed runner DisbursementSeedData (after the Operations runners)
+    source: Seed data (Disbursement storyline, after the Operations seed data)
   - id: TD-DPA-04
     name: Upload files
     content: Request upload of 20 rows with 3 unknown payees; payee migration file of 100 payees with 2 invalid rows; deposited-checks file (check no., amount, date); credited-accounts file; BOB approvals file; one row with a wrong amount in each
@@ -102,15 +102,15 @@ data:
   - id: TD-DPA-06
     name: ACSL data
     content: An insurer SOA file of 1,200 rows with 3 rows without invoice number in the standard layout; GL-SL control accounts set up for premium receivable; a remittance deduction of INS-LAC (AR insurer's refund) recorded by acsl and waiting for acsltl
-    source: SOA file prepared by the test lead; controls of V896-V897; seed runner DeductionSeedData
+    source: SOA file prepared by the test lead; GL-SL controls as configured for the SIT environment; seed remittance deductions
   - id: TD-DPA-07
     name: Remittance and incentives
     content: Remittance batches of the Operations seed; CPC2 incentive criterion (code CPC2, RATE basis) on packaged Motor lines; early-remittance incentive rules; EARLY_INCENTIVE_WTAX_RATE 2 %
-    source: Seeds V992, V996 and migration V772
+    source: Seed data (remittance, package versions and incentive criteria)
   - id: TD-DPA-08
     name: Employee master and liquidation accounts
     content: Seed employees with number, unit, branch and cost centre; the expense-role accounts of PRQ_CA_LIQUIDATION
-    source: Seed V999 and the Liquidation Accounts screen
+    source: Seed data and the Liquidation Accounts screen
 
 scenarios:
   - id: SC-DPA-01
@@ -177,7 +177,7 @@ frs:
         persona: PRQ_PROCESSOR
         title: Marketing processor sees only the request screens
         steps:
-          - Log in as mktao and open the group Finance; type /disbursement.
+          - Log in as mktao and open the group Finance; open the address of the Disbursement screen directly in the browser.
         expected: Requests Home, New Refund Request, New Cash Advance and Cancel a Check are shown; the Disbursement link is refused ("You do not have access to this screen. Contact your administrator if you need it.").
       - c: 2
         type: Negative
@@ -249,8 +249,8 @@ frs:
         screen: API
         title: Payee without code
         steps:
-          - POST a payee without payee code.
-        expected: The call is refused.
+          - Send a direct request to create a payee without a payee code.
+        expected: The request is refused.
         msg: [Company and payee code are required, PAYEE_CODE]
       - c: 3
         type: Negative
@@ -626,7 +626,7 @@ frs:
         screen: API
         title: Change terms of an approved DV
         steps:
-          - PUT .../vouchers/{id}/terms on an APPROVED DV.
+          - Send a direct request to change the terms of an APPROVED DV.
         expected: The change is refused.
         msg: ["DV {no} is {APPROVED} and can no longer be changed", DV_NOT_EDITABLE]
 
@@ -635,7 +635,7 @@ frs:
     persona: DISBURSEMENT
     screen: DVENTRY
     conditions:
-      - The proforma entry is built from the rule; edited lines are marked Edited and shown to the approver; Rebuild from rule discards the edits.
+      - The proforma entry is generated from the rule; edited lines are marked Edited and shown to the approver; Rebuild from rule discards the edits.
       - An entry without lines or unbalanced cannot be saved.
     cases:
       - c: 1
@@ -663,8 +663,8 @@ frs:
         screen: API
         title: Entry without lines
         steps:
-          - PUT .../vouchers/{id}/proforma with no line.
-        expected: The call is refused.
+          - Send a direct request to save the proforma entry with no line.
+        expected: The request is refused.
         msg: [The proforma entry has no line, DV_ENTRY_EMPTY]
 
   FR-DS-032:
@@ -672,7 +672,7 @@ frs:
     persona: DISBURSEMENT
     screen: DVENTRY
     conditions:
-      - An allocation of account, cost centre and amount builds the expense lines; it must add up to the gross.
+      - An allocation of account, cost centre and amount creates the expense lines; it must add up to the gross.
     cases:
       - c: 1
         type: Positive
@@ -707,16 +707,16 @@ frs:
         screen: API
         title: Print before approval
         steps:
-          - POST .../instrument/print on a DV For Review.
-        expected: The call is refused.
+          - Send a direct request to print the instrument of a DV For Review.
+        expected: The request is refused.
         msg: [The DV has no instrument until it is approved, DV_NOT_APPROVED]
       - c: 2
         type: Negative
         screen: API
         title: Negotiated check released again
         steps:
-          - POST .../instrument/release on a NEGOTIATED check.
-        expected: The call is refused.
+          - Send a direct request to release a NEGOTIATED check.
+        expected: The request is refused.
         msg: ["{Check} {000124} is {NEGOTIATED} and cannot become {RELEASED}", INSTRUMENT_STATUS]
       - c: 2
         type: Negative
@@ -745,8 +745,8 @@ frs:
         screen: API
         title: E-mail a check
         steps:
-          - POST .../instrument/email on a check DV.
-        expected: The call is refused.
+          - Send a direct request to e-mail the instrument of a check DV.
+        expected: The request is refused.
         msg: [Only an authority to debit is e-mailed, DISB_NOT_ATD]
 
   FR-DS-035:
@@ -840,8 +840,8 @@ frs:
         screen: API
         title: Branch of another company
         steps:
-          - POST an employee with a branch of another company.
-        expected: The call is refused.
+          - Send a direct request to create an employee with a branch of another company.
+        expected: The request is refused.
         msg: [The branch belongs to another company, BRANCH_OF_OTHER_COMPANY]
 
   FR-DS-040:
@@ -919,8 +919,8 @@ frs:
         screen: API
         title: Approve a DV In Process
         steps:
-          - POST .../vouchers/{id}/approve on a DV In Process.
-        expected: The call is refused.
+          - Send a direct request to approve a DV In Process.
+        expected: The request is refused.
         msg: ["DV {no} is {IN_PROCESS}", DV_NOT_FOR_APPROVAL]
       - c: 3
         type: Negative
@@ -981,8 +981,8 @@ frs:
         screen: API
         title: Cancel the request of a live voucher
         steps:
-          - Cancel the request of a DV In Process through the request endpoint.
-        expected: The call is refused.
+          - Cancel the request of a DV In Process by a direct request.
+        expected: The request is refused.
         msg: ["Cancel or reject the voucher of {request}", DISB_REQUEST_IN_VOUCHER]
 
   FR-DS-044:
@@ -1067,8 +1067,8 @@ frs:
         type: Negative
         title: Mark a check Debited
         steps:
-          - POST .../instrument/debited on a check.
-        expected: The call is refused.
+          - Send a direct request to mark a check Debited.
+        expected: The request is refused.
         msg: ["{Check} {no} is {PRINTED} and cannot become {DEBITED}", INSTRUMENT_STATUS]
 
   FR-DS-051:
@@ -1223,8 +1223,8 @@ frs:
         persona: DISBURSEMENT
         title: Re-issue a check that is not stale
         steps:
-          - POST .../instrument/reissue on a RELEASED check.
-        expected: The call is refused.
+          - Send a direct request to re-issue a RELEASED check.
+        expected: The request is refused.
         msg: [Only a stale check is re-issued, CHECK_NOT_STALE]
 
   FR-DS-055:
@@ -1816,7 +1816,7 @@ frs:
         persona: DISBURSEMENT
         title: Disbursement processor does not see Requests Home
         steps:
-          - Log in as disb; type /payment-requests.
+          - Log in as disb; open the address of the Payment Requests screen directly in the browser.
         expected: The screen is refused ("You do not have access to this screen. Contact your administrator if you need it.").
 
   FR-PQ-002:
@@ -1899,15 +1899,15 @@ frs:
         screen: API
         title: Currency of two letters
         steps:
-          - POST a refund with currency PH.
-        expected: The call is refused.
+          - Send a direct request to create a refund with currency PH.
+        expected: The request is refused.
         msg: [Currency must be a 3-letter code, PRQ_CURRENCY_INVALID]
       - c: 3
         type: Negative
         screen: API
         title: Edit a request For Approval
         steps:
-          - PUT .../requests/{id}/refund on a request For Approval.
+          - Send a direct request to change a refund request For Approval.
         expected: The change is refused.
         msg: ["{RRF-2026-12} is {FOR_APPROVAL} for this action", PRQ_WRONG_STAGE]
 
@@ -1981,8 +1981,8 @@ frs:
         screen: API
         title: Assign a request For Review
         steps:
-          - POST .../requests/{id}/assign on a request For Review.
-        expected: The call is refused.
+          - Send a direct request to assign a request For Review.
+        expected: The request is refused.
         msg: ["{RRF-2026-12} is {FOR_REVIEW} for this action", PRQ_WRONG_STAGE]
 
   FR-PQ-006:
@@ -2025,8 +2025,8 @@ frs:
         screen: API
         title: Result given twice
         steps:
-          - POST the result of a validation already CONFIRMED.
-        expected: The call is refused.
+          - Send a direct request to record the result of a validation already CONFIRMED.
+        expected: The request is refused.
         msg: ["This validation was already {CONFIRMED}", PRQ_VALIDATION_DONE]
 
   FR-PQ-007:
@@ -2092,8 +2092,8 @@ frs:
         screen: API
         title: Endorse a request in Draft
         steps:
-          - POST .../requests/{id}/endorse on a Draft request.
-        expected: The call is refused.
+          - Send a direct request to endorse a Draft request.
+        expected: The request is refused.
         msg: ["{RRF-2026-12} is {DRAFT} for this action", PRQ_WRONG_STAGE]
 
   FR-PQ-009:
@@ -2141,8 +2141,8 @@ frs:
         screen: API
         title: HR approves a refund
         steps:
-          - As hrappr, POST .../requests/{id}/approve on a refund For Approval.
-        expected: HTTP 403; the refund stays For Approval.
+          - As hrappr, send a direct request to approve a refund For Approval.
+        expected: The request is refused; the refund stays For Approval.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-PQ-010:
@@ -2173,7 +2173,7 @@ frs:
         title: Cancel a request sent to Disbursement
         steps:
           - Cancel a request SENT_TO_DISBURSEMENT from the workflow panel.
-        expected: No Cancel action exists in that stage; the call is refused.
+        expected: No Cancel action exists in that stage; a direct request is refused.
 
   FR-PQ-011:
     scenario: SC-DPA-08
@@ -2216,8 +2216,8 @@ frs:
         screen: API
         title: Target that is not a refund or cash advance
         steps:
-          - POST a CCR naming a CCR number as target.
-        expected: The call is refused.
+          - Send a direct request to create a CCR naming a CCR number as target.
+        expected: The request is refused.
         msg: ["Request {CCR-2026-3} is not a refund or cash advance", PRQ_TARGET_UNKNOWN]
 
   FR-PQ-012:
@@ -2358,8 +2358,8 @@ frs:
         screen: API
         title: Payout details missing
         steps:
-          - POST a payout account without mode.
-        expected: The call is refused.
+          - Send a direct request to create a payout account without a mode.
+        expected: The request is refused.
         msg: [Give the payout mode and the account or check payee name, PAYOUT_INCOMPLETE]
 
   FR-PQ-017:
@@ -2444,7 +2444,7 @@ frs:
         screen: API
         title: Change a posted liquidation
         steps:
-          - PUT .../requests/{id}/liquidation on a POSTED liquidation.
+          - Send a direct request to change a POSTED liquidation.
         expected: The change is refused.
         msg: ["{LIQ-2026-2} is {POSTED}", PRQ_LIQUIDATION_LOCKED]
 
@@ -2546,7 +2546,7 @@ frs:
     conditions:
       - Each SOA line is matched by invoice number and reported Outstanding, For remittance, Remitted, Cancelled or Direct billed, with the variances.
       - A line without invoice in BIBS is Not found.
-      - The reconciliation report is named insurer_from_to and the processor can reconcile again.
+      - The reconciliation report file is named <insurer>_<from>_<to> and the processor can reconcile again.
     cases:
       - c: 1
         type: Positive
@@ -2649,8 +2649,8 @@ frs:
         screen: API
         title: Findings on a case not assigned
         steps:
-          - PUT .../cases/{id}/findings on a RECEIVED case.
-        expected: The call is refused.
+          - Send a direct request to record findings on a RECEIVED case.
+        expected: The request is refused.
         msg: ["{ACS-2026-3} is {RECEIVED}, not {INVESTIGATING}", ACSL_WRONG_STAGE]
       - c: 3
         type: Workflow
@@ -2678,8 +2678,8 @@ frs:
         screen: API
         title: Unknown outcome
         steps:
-          - POST .../cases/{id}/result with outcome MAYBE.
-        expected: The call is refused.
+          - Send a direct request to record the result of a case with outcome MAYBE.
+        expected: The request is refused.
         msg: ["Give the result: confirmed, rejected or no action", ACSL_OUTCOME_INVALID]
 
   FR-AS-012:
@@ -2756,8 +2756,8 @@ frs:
         screen: API
         title: Assign a correction For Review
         steps:
-          - POST .../corrections/{id}/assign on a correction For Review.
-        expected: The call is refused.
+          - Send a direct request to assign a correction For Review.
+        expected: The request is refused.
         msg: ["{COR-2026-5} is {FOR_REVIEW}, not {DRAFT}", ACSL_WRONG_STAGE]
 
   FR-AS-021:
@@ -2765,7 +2765,7 @@ frs:
     persona: ACSL_PROCESSOR
     screen: CORR
     conditions:
-      - For a wrong GL account, Propose builds the reversal of the original line and the re-post to the right account, both linked to the invoice.
+      - For a wrong GL account, Propose creates the reversal of the original line and the re-post to the right account, both linked to the invoice.
       - A balanced correction of at least two lines is submitted for review.
       - Lines are validated (account, side, amount, heading, party, component, line count, journal line).
       - A draft is cancelled with a reason.
@@ -2830,8 +2830,8 @@ frs:
         screen: API
         title: 201 lines
         steps:
-          - PUT .../corrections/{id}/lines with 201 lines.
-        expected: The call is refused; 200 lines are accepted.
+          - Send a direct request to save a correction with 201 lines.
+        expected: The request is refused; 200 lines are accepted.
         msg: [A correction has at most 200 lines, ACSL_TOO_MANY_LINES]
       - c: 3
         type: Negative
@@ -2991,7 +2991,7 @@ frs:
         screen: API
         title: Change a submitted deduction
         steps:
-          - PUT .../deductions/{id} on a deduction For Confirmation.
+          - Send a direct request to change a deduction For Confirmation.
         expected: The change is refused.
         msg: ["Deduction {RDN-2026-2} can only change as a draft", REMIT_DEDUCTION_STAGE]
       - c: 3
@@ -3030,7 +3030,7 @@ access:
     permission: DISB_PROCESS
     allow: [DISBURSEMENT, DISB_TL]
     deny: [DISB_APPROVER, COMPTROLLERSHIP, AUDITOR]
-    denied: Encode Payment Request is not in the menu; the DV is read only; POST /requests returns HTTP 403.
+    denied: Encode Payment Request is not in the menu; the DV is read only; a direct request is refused.
   - action: Upload requests, payees and bank files
     screen: UPL
     permission: DISB_UPLOAD
@@ -3048,13 +3048,13 @@ access:
     permission: DISB_APPROVE
     allow: [DISB_APPROVER]
     deny: [DISBURSEMENT, DISB_TL]
-    denied: Approve, Reject and Cancel approved DV are not shown; POST /vouchers/{id}/approve returns HTTP 403.
+    denied: Approve, Reject and Cancel approved DV are not shown; a direct request is refused.
   - action: Maintain payees
     screen: PAYEE
     permission: DISB_PAYEE_MAINTAIN
     allow: [DISB_TL]
     deny: [DISBURSEMENT, DISB_APPROVER]
-    denied: New Payee is not shown; POST /payees returns HTTP 403.
+    denied: New Payee is not shown; a direct request is refused.
   - action: Authorise payees
     screen: PAYEES
     permission: DISB_PAYEE_AUTHORIZE
@@ -3096,7 +3096,7 @@ access:
     permission: PRQ_CREATE
     allow: [PRQ_PROCESSOR, PRQ_REVIEWER]
     deny: [PRQ_APPROVER, HR_APPROVER, DISBURSEMENT]
-    denied: New Refund Request and New Cash Advance are not in the menu; POST /requests/refunds returns HTTP 403.
+    denied: New Refund Request and New Cash Advance are not in the menu; a direct request is refused.
   - action: Assign and endorse requests
     screen: REQ
     permission: PRQ_ASSIGN, PRQ_REVIEW
@@ -3108,7 +3108,7 @@ access:
     permission: PRQ_APPROVE
     allow: [PRQ_APPROVER]
     deny: [PRQ_PROCESSOR, PRQ_REVIEWER, HR_APPROVER]
-    denied: Approve and send is not shown; POST /requests/{id}/approve returns HTTP 403.
+    denied: Approve and send is not shown; a direct request is refused.
   - action: Approve cash advances (HR)
     screen: REQ
     permission: PRQ_HR_APPROVE
@@ -3132,7 +3132,7 @@ access:
     permission: ACSL_APPROVE
     allow: [ACSL_HEAD]
     deny: [ACSL_TL, ACSL_PROCESSOR]
-    denied: Approve and post is not shown; POST /corrections/{id}/approve returns HTTP 403.
+    denied: Approve and post is not shown; a direct request is refused.
   - action: Confirm a remittance deduction
     screen: DED
     permission: REMIT_DEDUCTION_CONFIRM
@@ -3151,4 +3151,4 @@ access:
     permission: EMPLOYEE_MAINTAIN
     allow: [FIN_ADMIN]
     deny: [DISB_TL, COMPTROLLERSHIP]
-    denied: New Employee is not shown; POST /organization/employees returns HTTP 403.
+    denied: New Employee is not shown; a direct request is refused.

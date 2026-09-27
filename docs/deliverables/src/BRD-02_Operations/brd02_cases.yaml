@@ -97,37 +97,37 @@ screens:
   PARAMS: Administration > System Parameters
   JOBS: Administration > Scheduled Jobs
   NOTIF: Notifications (bell icon in the page header)
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-OP-01
     name: SIT/UAT users and roles
     content: cashier (CASHIER, Head Office), cashbr (CASHIER, Cebu branch), cashtl (CASHIER_TL), remit (REMIT_PROCESSOR), remittl (REMIT_TL), recon (RECON_HANDLER), adjust (ADJUSTMENT), adjtl (ADJUSTMENT_TL), commrec (COMMREC_HANDLER), commtl (COMMREC_TL), mktcoll (MKT_COLLECTION), mkttl (MKT_TL), comptrol (COMPTROLLERSHIP), disb (DISBURSEMENT), admin (SYSADMIN), auditor (AUDITOR). The SIT/UAT password is issued by the test lead.
-    source: Seeds V990 (Operations users), V980 (adjust, mkttl), V900 (admin, auditor); grants V760
+    source: Seed data (Operations users, adjustment and Marketing team lead, administrator and auditor, with their grants)
   - id: TD-OP-02
     name: Booked seed invoices
     content: ARN-2026-940001 (Motor; booking and endorsement invoices paid in full; booking invoice remitted with the insurer OR), ARN-2026-940002 (Property; requests at every adjustment stage; gross premium differs in the insurer register), ARN-2026-940003 (direct payment), ARN-2026-940004 (CGL; partly paid; hold request waiting; flat cancellation ready for posting)
-    source: Booking seed data (V988 and BookingSeedData), copied into the invoice ledger by the booking feed
+    source: Booking seed data, copied into the invoice ledger by the booking feed
   - id: TD-OP-03
     name: Cashiering storyline
     content: Receipt series AR-HO, AR-CEB and OR-HO (authorised); a payment without match with a refund disposition for approval; an excess; a pre-booked payment; a post-dated check in the warehouse; a Head Office service fee OR; a receipt cancellation for approval; a BIR 2307 tag; two check pick-up requests from Collection
-    source: Seed V991 and CashieringSeedData
+    source: Seed data (cashiering)
   - id: TD-OP-04
     name: Remittance storyline
     content: A remitted batch of ARN-2026-940001 with its insurer OR; a batch in review with the endorsement invoice; a hold request of ARN-2026-940004 waiting for approval; a special remittance request; incentive rule INS-MGIC Property CBG 2 % within 30 days of inception
-    source: Seed V992 and RemittanceSeedData
+    source: Seed data (remittance)
   - id: TD-OP-05
     name: Production reconciliation storyline
     content: September 2026 register of INS-MGIC extracted, sent and answered; cycle RECONCILING with a gross premium discrepancy on ARN-2026-940002 and one insurer policy never booked; monthly schedules on the 5th; seed lists of company concerned and dispositions
-    source: Seed V993 and ProdReconSeedData
+    source: Seed data (production reconciliation)
   - id: TD-OP-06
     name: Adjustment storyline
     content: On ARN-2026-940002 a descriptive change in draft, an assured change for validation, a cover extension returned for documents and a premium rate increase for approval; a flat cancellation of ARN-2026-940004 for posting; an internal adjustment of ARN-2026-940001 posted
-    source: Seed V994 and AdjustmentSeedData
+    source: Seed data (adjustments)
   - id: TD-OP-07
     name: Commission storyline
     content: DP list HO_DP_20260930 with ARN-2026-940003 confirmed and billed to INS-MGIC (awaiting answer, 10 working days); incentive schemes No Touch, Top Up and Motor Mania inactive without tiers
-    source: Seed V995 and CommissionSeedData
+    source: Seed data (commission)
   - id: TD-OP-08
     name: Operations files
     content: Bills Payment file (20 rows, 2 with unknown invoices); Direct Credit fixed-width file; PDC upload; insurer OR schedule of the remitted batch; insurer production feedback in the register layout; DP lists named HO_DP_20260930.xlsx, CEB_DP_20260930.xlsx and "dp list.xlsx"; insurer DP answer file; minimal balance file with balances of 50.00 and 150.00; endorsement batch request file; hold and special remittance feed files
@@ -135,7 +135,7 @@ data:
   - id: TD-OP-09
     name: USD receipt and BOOK rates
     content: A USD invoice of a seed client and the BOOK rate of the receipt date (2 decimals)
-    source: Seed V990 (BOOK rates from the seed SPOT rates)
+    source: Seed data (BOOK rates from the seed SPOT rates)
   - id: TD-OP-10
     name: Disbursement queue requests
     content: Payment requests created by the remittance approval, the refund disposition and the 2307 batch of the storylines
@@ -219,7 +219,7 @@ frs:
     data: [TD-OP-01]
     conditions:
       - Each role sees only its screens (for example the Remittance Processor does not see Cashiering Setup or the Disbursement queue).
-      - A call to an approval endpoint without the approval permission is refused and logged.
+      - A direct approval request without the approval permission is refused and logged.
       - A Marketing Collection user sees the holds, special remittance and 2307 tagging screens but cannot approve a hold.
     cases:
       - c: 1
@@ -227,15 +227,15 @@ frs:
         neg: false
         title: Remittance processor's menu
         steps:
-          - Log in as remit; open the menu; type /cashiering/setup and /operations/disbursements.
+          - Log in as remit; open the menu; open the addresses of Cashiering Setup and Disbursement Queue directly in the browser.
         expected: Remittance screens are listed; Cashiering Setup and the Disbursement Queue are not, and the direct links show the no-access page.
       - c: 2
         type: Security-access
         screen: API
         title: Batch approval without REMIT_APPROVE
         steps:
-          - As remit call POST /api/v1/remittance/batches/{id}/approve on a batch for approval.
-        expected: HTTP 403; the refusal is in the audit trail.
+          - As remit send a direct request to approve a batch for approval.
+        expected: The request is refused; the refusal is in the audit trail.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
       - c: 3
         type: Security-access
@@ -244,7 +244,7 @@ frs:
         title: Marketing Collection cannot approve a hold
         steps:
           - As mktcoll open Remittance Holds, Special Remittance and BIR 2307; open the waiting hold of ARN-2026-940004.
-        expected: The three screens open; Approve hold is not offered and the API call returns HTTP 403.
+        expected: The three screens open; Approve hold is not offered and the direct request is refused.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-OP-003:
@@ -316,7 +316,7 @@ frs:
         screen: API
         title: Replay without scope
         steps:
-          - Call POST /api/v1/ops/invoices/replay with no invoice, ARN or company.
+          - Send a direct request to replay invoices with no invoice, ARN or company.
         expected: Refused.
         msg: ["Give an invoice number, an ARN or a company to replay", REPLAY_SCOPE]
 
@@ -480,8 +480,8 @@ frs:
         type: Security-access
         title: Auditor views but cannot download
         steps:
-          - As auditor run CSH-APPLIED-PREM; look for download and print; call the export endpoint.
-        expected: The report shows on screen; no download or print button; the export call returns HTTP 403.
+          - As auditor run CSH-APPLIED-PREM; look for download and print; send a direct export request.
+        expected: The report shows on screen; no download or print button; a direct export request is refused.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
       - c: 2
         type: Report-output
@@ -614,7 +614,7 @@ frs:
         screen: API
         title: OR without a line
         steps:
-          - Call POST .../receipts/or with no line.
+          - Send a direct request to issue an OR with no line.
         expected: Refused.
         msg: [An official receipt needs a line, OR_WITHOUT_LINES]
 
@@ -1086,7 +1086,7 @@ frs:
         screen: API
         title: Empty selection
         steps:
-          - Call POST .../print-batches with no receipt.
+          - Send a direct request to create a print batch with no receipt.
         expected: Refused.
         msg: [Select between 1 and 500 receipts to print, PRINT_SELECTION]
 
@@ -1187,7 +1187,7 @@ frs:
         title: Report export without OPS_REPORT_EXPORT
         steps:
           - As disb export CSH-APPLIED-PREM.
-        expected: HTTP 403.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-OP-030:
@@ -1301,8 +1301,8 @@ frs:
         screen: API
         title: Amounts of a line cannot be edited
         steps:
-          - Look for edit on a line; call a PUT on the line amount.
-        expected: No edit on screen; no endpoint changes the amount (HTTP 404 or 405).
+          - Look for edit on a line; send a direct request to change the line amount.
+        expected: No edit on screen; a direct request cannot change the amount.
       - c: 2
         type: Workflow
         title: Exclude and restore a line
@@ -1313,7 +1313,7 @@ frs:
         type: Negative
         title: Exclude a line twice
         steps:
-          - Exclude the already excluded line again (API).
+          - Exclude the already excluded line again (direct request).
         expected: Refused.
         msg: ["Invoice <no> is already excluded", REMIT_LINE_ALREADY_EXCLUDED]
       - c: 3
@@ -1551,8 +1551,8 @@ frs:
         screen: API
         title: Search without REMIT_PROCESS
         steps:
-          - As cashier call GET /api/v1/remittance/dtip.
-        expected: HTTP 403.
+          - As cashier send a direct request to open the DTIP search.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-OP-040:
@@ -1613,7 +1613,7 @@ frs:
         title: Export without OPS_REPORT_EXPORT
         steps:
           - As mktcoll export REM-TRACKER.
-        expected: HTTP 403.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-OP-050:
@@ -1751,7 +1751,7 @@ frs:
         screen: API
         title: Extension with premium validated for posting
         steps:
-          - Call validate_for_posting on a cover extension with additional premium.
+          - Send a direct request for the action Validate for posting on a cover extension with additional premium.
         expected: Refused; it must go through approval.
         msg: ["<request> is <stage>, not <expected>", ADJ_WRONG_STAGE]
       - c: 3
@@ -2025,8 +2025,8 @@ frs:
         screen: API
         title: Workbench without ADJ permissions
         steps:
-          - As cashier call GET /api/v1/adjustment/requests.
-        expected: HTTP 403.
+          - As cashier send a direct request to open the adjustment requests.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-OP-062:
@@ -2174,8 +2174,8 @@ frs:
         screen: API
         title: Send without RECON_SEND
         steps:
-          - As cashier call POST .../extracts/{id}/send.
-        expected: HTTP 403.
+          - As cashier send a direct request to send an extract.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-OP-074:
@@ -2242,7 +2242,7 @@ frs:
         screen: API
         title: Automatch a closed cycle
         steps:
-          - Close a cycle; call automatch on it.
+          - Close a cycle; send a direct request to run the automatch on it.
         expected: Refused.
         msg: ["Cycle <no> is closed", RECON_CYCLE_CLOSED]
 
@@ -2383,7 +2383,7 @@ frs:
         title: Export without rights
         steps:
           - As disb export PRC-SUMMARY.
-        expected: HTTP 403.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-OP-090:
@@ -2541,7 +2541,7 @@ frs:
         type: Negative
         title: Reverse an account not tagged DP
         steps:
-          - Reverse the PR of an ordinary invoice (API).
+          - Reverse the PR of an ordinary invoice (direct request).
         expected: Refused and the invoice is named.
         msg: ["Invoice <no> is not tagged direct payment by Marketing: its premium receivable cannot be reversed (MKTID.012)", DP_TAG_INVALID]
       - c: 2
@@ -2679,7 +2679,7 @@ frs:
         title: Export without rights
         steps:
           - As mktcoll export the CMR report.
-        expected: HTTP 403.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-OP-110:
@@ -2883,8 +2883,8 @@ frs:
         screen: API
         title: Queue without DISB_PROCESS
         steps:
-          - As remit call POST /api/v1/ops/disbursements/{id}/dv.
-        expected: HTTP 403.
+          - As remit send a direct request to create a DV for a disbursement request.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-OP-121:
@@ -2932,7 +2932,7 @@ frs:
         title: Extract downloadable
         steps:
           - Hand-offs and Extracts; open the COLLECTION_DP_RETURNED extract; download.
-        expected: The file downloads from the extract repository.
+        expected: The file downloads from the list of extracts.
       - c: 2
         type: Negative
         title: Close a closed hand-off
@@ -2998,112 +2998,112 @@ access:
     permission: OPS_VIEW
     allow: [CASHIER, REMIT_PROCESSOR, RECON_HANDLER, ADJUSTMENT, COMMREC_HANDLER, MKT_COLLECTION, DISBURSEMENT, AUDITOR]
     deny: []
-    denied: The Operations sections are not in the menu; the API returns HTTP 403 (ACCESS_DENIED).
+    denied: The Operations sections are not in the menu; direct requests are refused.
   - action: Issue, cancel and apply receipts
     screen: RECEIVE
     permission: CASH_RECEIPT, CASH_CANCEL, CASH_APPLY
     allow: [CASHIER, CASHIER_TL]
     deny: [REMIT_PROCESSOR, MKT_COLLECTION, AUDITOR]
-    denied: Receive Payment is not in the menu; POST /api/v1/cashiering/receipts returns HTTP 403.
+    denied: Receive Payment is not in the menu; a direct request is refused.
   - action: Approve receipt cancellations and dispositions
     screen: RECEIPT
     permission: CASH_APPROVE, CASH_DISPOSITION_APPROVE
     allow: [CASHIER_TL]
     deny: [CASHIER, AUDITOR]
-    denied: Approve is not shown; the call returns HTTP 403.
+    denied: Approve is not shown; the request is refused.
   - action: Maintain receipt series
     screen: SERIES
     permission: CASH_SERIES_MANAGE
     allow: [CASHIER_TL]
     deny: [CASHIER]
-    denied: Receipt Series is read-only; saving returns HTTP 403.
+    denied: Receipt Series is read-only; saving is refused.
   - action: Extract and process remittance batches
     screen: EXTRACTION
     permission: REMIT_EXTRACT, REMIT_PROCESS
     allow: [REMIT_PROCESSOR, REMIT_TL]
     deny: [CASHIER, MKT_COLLECTION, AUDITOR]
-    denied: Extraction is not in the menu; POST /api/v1/remittance/extractions returns HTTP 403.
+    denied: Extraction is not in the menu; a direct request is refused.
   - action: Approve remittance batches and special remittances
     screen: BATCH
     permission: REMIT_APPROVE, SPECIAL_REMIT_APPROVE
     allow: [REMIT_TL]
     deny: [REMIT_PROCESSOR, MKT_TL]
-    denied: Approve is not shown; the call returns HTTP 403.
+    denied: Approve is not shown; the request is refused.
   - action: Request holds and special remittances
     screen: HOLDS
     permission: HOLD_REQUEST, SPECIAL_REMIT_REQUEST
     allow: [MKT_COLLECTION, MKT_TL]
     deny: [REMIT_PROCESSOR, CASHIER]
-    denied: New hold request is not shown; the call returns HTTP 403.
+    denied: New hold request is not shown; the request is refused.
   - action: Approve holds
     screen: HOLD
     permission: HOLD_APPROVE
     allow: [MKT_TL]
     deny: [MKT_COLLECTION, REMIT_TL]
-    denied: Approve hold is not shown; the call returns HTTP 403.
+    denied: Approve hold is not shown; the request is refused.
   - action: Tag BIR 2307 certificates
     screen: CWT
     permission: CWT_TAG
     allow: [MKT_COLLECTION, MKT_TL]
     deny: [REMIT_PROCESSOR, AUDITOR]
-    denied: Tag 2307 is not shown; the call returns HTTP 403.
+    denied: Tag 2307 is not shown; the request is refused.
   - action: Work production reconciliation cycles and send registers
     screen: CYCLES
     permission: RECON_PROCESS, RECON_SEND
     allow: [RECON_HANDLER]
     deny: [CASHIER, COMMREC_HANDLER, AUDITOR]
-    denied: The actions are not shown; the API returns HTTP 403.
+    denied: The actions are not shown; direct requests are refused.
   - action: Request adjustments
     screen: NEWREQ
     permission: ADJ_REQUEST
     allow: [MKT_COLLECTION, MKT_TL]
     deny: [CASHIER, AUDITOR]
-    denied: New Request is not in the menu; the call returns HTTP 403.
+    denied: New Request is not in the menu; the request is refused.
   - action: Process and post adjustments
     screen: REQ
     permission: ADJ_PROCESS, ADJ_POST
     allow: [ADJUSTMENT, ADJUSTMENT_TL]
     deny: [MKT_COLLECTION, REMIT_PROCESSOR]
-    denied: The processing actions are not shown; the call returns HTTP 403.
+    denied: The processing actions are not shown; the request is refused.
   - action: Approve adjustments
     screen: REQ
     permission: ADJ_APPROVE
     allow: [ADJUSTMENT_TL]
     deny: [ADJUSTMENT]
-    denied: Approve is not shown; the call returns HTTP 403.
+    denied: Approve is not shown; the request is refused.
   - action: Process direct payment lists and billings
     screen: DPLISTS
     permission: COMMREC_PROCESS
     allow: [COMMREC_HANDLER, COMMREC_TL]
     deny: [MKT_COLLECTION, RECON_HANDLER]
-    denied: The Commission Receivables actions are not shown; the API returns HTTP 403.
+    denied: The Commission Receivables actions are not shown; direct requests are refused.
   - action: Maintain incentive schemes
     screen: SCHEMES
     permission: INCENTIVE_MANAGE
     allow: [COMMREC_TL]
     deny: [COMMREC_HANDLER]
-    denied: Incentive Schemes is read-only; saving returns HTTP 403.
+    denied: Incentive Schemes is read-only; saving is refused.
   - action: Acknowledge BIR certificates
     screen: CERTS
     permission: BIR_CERT_ACK
     allow: [COMPTROLLERSHIP]
     deny: [COMMREC_HANDLER]
-    denied: Acknowledge and Reject are not shown; the call returns HTTP 403.
+    denied: Acknowledge and Reject are not shown; the request is refused.
   - action: Work the Disbursement Queue
     screen: DISBQ
     permission: DISB_PROCESS
     allow: [DISBURSEMENT]
     deny: [REMIT_TL, COMMREC_TL]
-    denied: The queue actions are not shown; the call returns HTTP 403.
+    denied: The queue actions are not shown; the request is refused.
   - action: Administer interface feeds
     screen: INTERFACES
     permission: FLOWIN_MANAGE
     allow: [SYSADMIN]
     deny: [CASHIER, REMIT_TL]
-    denied: Interfaces is not in the menu; the call returns HTTP 403.
+    denied: Interfaces is not in the menu; the request is refused.
   - action: Export Operations reports
     screen: REPORTS
     permission: OPS_REPORT_EXPORT
     allow: [CASHIER, REMIT_PROCESSOR, RECON_HANDLER, ADJUSTMENT, COMMREC_HANDLER]
     deny: [MKT_COLLECTION, DISBURSEMENT, AUDITOR]
-    denied: The report opens on screen; Export returns HTTP 403 (ACCESS_DENIED).
+    denied: The report opens on screen; Export is refused.

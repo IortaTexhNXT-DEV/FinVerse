@@ -68,7 +68,7 @@ screens:
   QUOTE: Quotation / Proposal > Quotation or PRF page (BRD-1)
   BOOKING: Booking > Booking Workbench (BRD-1)
   SUBPOL: Submitted Policies > Masterlist (BRD-12)
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-RN-01
@@ -86,7 +86,7 @@ data:
   - id: TD-RN-04
     name: Candidates with blocking conditions
     content: "RNW-2026-000201 open claim on the expiring ARN; RNW-2026-000202 open endorsement request END-2026-000450; RNW-2026-000203 outstanding premium PHP 12,500; RNW-2026-000204 client KYC review due in 20 days; RNW-2026-000205 risk code XR99 (set up as non-renewable in the test); one HMO policy (line HMO)"
-    source: Prepared on SIT (claim in Claims or the claims stub, endorsement request in Operations, unpaid invoice left open)
+    source: Prepared on SIT (claim in Claims or a prepared open-claims list, endorsement request in Operations, unpaid invoice left open)
   - id: TD-RN-05
     name: LAMD report files
     content: "Paid-off report with PN-2026-7001 (matches) and PN-2026-9999 (no match); RMU report with PN-2026-7002; a row without PN; a PN shared by two candidates; a .exe file renamed to test the type check"
@@ -126,7 +126,7 @@ data:
   - id: TD-RN-14
     name: Letter templates
     content: RNW_RA_FIRST version 1 (active) and version 2 (draft with a changed footer); RNW_RA_SECOND, RNW_NAL, RNW_NFR, RNW_NRNS_REMINDER, RNW_NON_ACCEPTANCE drafts
-    source: Draft layouts delivered with the build until BDOI provides its own (RQ26)
+    source: Draft layouts provided with the system until BDOI provides its own (RQ26)
 
   - id: TD-RN-15
     name: Migrated policies of the go-live window and the RA tracker
@@ -168,7 +168,7 @@ scenarios:
     pre: Posted For Renewal accounts in FOR_PROCESSING; files TD-RN-06.
   - id: SC-RN-08
     persona: PROCESSING_TL
-    title: Insurer round-trip. Processing builds the extract per insurer, sends it protected and applies the insurer's response file.
+    title: Insurer round-trip. Processing prepares the extract per insurer, sends it protected and applies the insurer's response file.
     pre: IN_PROCESSING accounts of INS-A, INS-B and INS-C; response file TD-RN-07.
   - id: SC-RN-09
     persona: MKT_AO
@@ -327,7 +327,7 @@ frs:
     data: [TD-RN-01, TD-RN-02]
     conditions:
       - Menus and buttons show only the screens and actions the user's roles allow.
-      - A direct link or API call without the permission is refused and logged.
+      - A direct link or direct request without the permission is refused and logged.
       - Lists, records, reports and exports are limited to the user's data scope by the server.
       - The LAMD role uploads LAMD reports and views match results, and never generates, sends or disposes.
       - LAMD and Contact Center users see a projection without premium columns.
@@ -352,11 +352,11 @@ frs:
       - c: 2
         type: Security-access
         screen: API
-        title: API call to post an account without RNW_REVIEW
+        title: direct request to post an account without RNW_REVIEW
         steps:
-          - With rn.ao1's token call POST /api/v1/renewal/candidates/post for an account in FOR_TL_REVIEW.
+          - Signed in as rn.ao1, send a direct request to post an account in FOR_TL_REVIEW.
           - As rn.sysadmin open the Audit Trail.
-        expected: The call returns HTTP 403 and the account stays in FOR_TL_REVIEW; the audit trail lists the refused call with user, endpoint and time.
+        expected: The request is refused and the account stays in FOR_TL_REVIEW; the audit trail lists the refused request with the user and time.
         msg: [You are not permitted to perform this action]
       - c: 3
         type: Security-access
@@ -397,8 +397,8 @@ frs:
         title: LAMD user cannot generate or send an RA
         steps:
           - As rn.lamd look for Letters in the menu.
-          - Call POST /api/v1/renewal/letters/ra with rn.lamd's token.
-        expected: Letters is not in the menu and the record page shows no disposition or letter action; the call returns HTTP 403 and is logged.
+          - Send a direct request to generate an RA, signed in as rn.lamd.
+        expected: Letters is not in the menu and the record page shows no disposition or letter action; the request is refused and is logged.
         msg: [You are not permitted to perform this action]
       - c: 5
         type: Security-access
@@ -479,7 +479,7 @@ frs:
       - The History tab lists every action on a candidate with user or source and time, from extraction to booking.
       - Extraction and initiation are recorded as two events with their own users and times.
       - System actions carry the job or rule that made them (matrix version and rule id).
-      - History and audit rows cannot be edited or deleted by any screen or API.
+      - History and audit rows cannot be edited or deleted by any screen or direct request.
     cases:
       - c: 1
         type: Positive
@@ -517,8 +517,8 @@ frs:
         title: History rows cannot be changed
         steps:
           - Look for an edit or delete action on the History tab.
-          - Call PUT and DELETE on /api/v1/renewal/candidates/{ref}/history with rn.mkttl1's token.
-        expected: No edit or delete action exists; both calls are refused and the rows are unchanged.
+          - Send direct requests to change and to delete a history row of a candidate, signed in as rn.mkttl1.
+        expected: No edit or delete action exists; both requests are refused and the rows are unchanged.
 
   FR-RN-010:
     scenario: SC-RN-02
@@ -839,8 +839,8 @@ frs:
         screen: PROCWL
         title: Processing Officer cannot export
         steps:
-          - As rn.po1 look for Export on the list; call GET /api/v1/reports/RNW-EXPIRY-LIST/export.
-        expected: Export is not shown; the call returns HTTP 403.
+          - As rn.po1 look for Export on the list; send a direct request to export RNW-EXPIRY-LIST.
+        expected: Export is not shown; the request is refused.
 
   FR-RN-015:
     scenario: SC-RN-02
@@ -883,8 +883,8 @@ frs:
         screen: API
         title: Initiate an already initiated candidate
         steps:
-          - Call POST /api/v1/renewal/candidates/initiate for a candidate in UNASSIGNED.
-        expected: The call is refused and the candidate is unchanged.
+          - Send a direct request to initiate a candidate in UNASSIGNED.
+        expected: The request is refused and the candidate is unchanged.
         msg: ["Renewal {RNW-2026-000105} is already initiated"]
 
   FR-RN-016:
@@ -1067,7 +1067,7 @@ frs:
       - c: 1
         type: Positive
         title: Open claim gives Review
-        pre: Claims is connected or its stub returns one open claim for RNW-2026-000201.
+        pre: Claims is connected, or a prepared open-claims list returns one open claim for RNW-2026-000201.
         steps:
           - Open RNW-2026-000201, tab Checks & Bucket.
         expected: CLAIMS is FAIL_REVIEW and the Classification pill is Review, never Clean; the tab names the check that set it.
@@ -1091,7 +1091,7 @@ frs:
         title: Override to Clean with a failed check
         steps:
           - On RNW-2026-000201 (claim open) click Override Bucket; choose Clean.
-        expected: Clean is not offered while a check fails; the API call with Clean is refused and the bucket stays Review.
+        expected: Clean is not offered while a check fails; the direct request with Clean is refused and the bucket stays Review.
         msg: ["Renewal {RNW-2026-000201} has failed checks and cannot be Clean"]
       - c: 4
         type: Negative
@@ -1440,7 +1440,7 @@ frs:
         title: Unmapped and ambiguous packages go to Exception
         steps:
           - Open the candidates with legacy packages FIRE-OLD v1 and MOTOR-CLG v1.
-        expected: PACKAGE_REMAP is FAIL for both, with the detail "not in the code map" and "several package versions"; the bucket is Exception.
+        expected: PACKAGE_REMAP is FAIL for both, with the detail "not in the package map" and "several package versions"; the bucket is Exception.
       - c: 3
         type: Workflow
         title: Package chosen and approved
@@ -1505,8 +1505,8 @@ frs:
         title: Assign to an officer of another unit
         steps:
           - Check the Account Officer list for rn.ao3 (Corporate Marketing 2).
-          - Call POST /api/v1/renewal/candidates/assign with rn.ao3.
-        expected: rn.ao3 is not in the list; the call is refused and the accounts stay Unassigned.
+          - Send a direct request to assign accounts to rn.ao3.
+        expected: rn.ao3 is not in the list; a direct request is refused and the accounts stay Unassigned.
         msg: ["{rn.ao3} is not an officer of your unit"]
       - c: 3
         type: Workflow
@@ -1573,7 +1573,7 @@ frs:
         title: Transfer to the same unit
         steps:
           - Transfer an account and try to select Retail Marketing 1 (the account's unit).
-        expected: The own unit is not offered; the API call with it is refused.
+        expected: The own unit is not offered; the direct request with it is refused.
         msg: [The receiving unit must be another unit]
       - c: 2
         type: Negative
@@ -1586,7 +1586,7 @@ frs:
         type: Negative
         title: Second transfer on the same account
         steps:
-          - Submit a transfer on an account that is already Transfer pending (API or a second tab).
+          - Submit a transfer on an account that is already Transfer pending (a direct request or a second tab).
         expected: The second request is refused.
         msg: ["Renewal {RNW-2026-000115} already has a transfer request"]
       - c: 3
@@ -1651,8 +1651,8 @@ frs:
         persona: MKT_TL
         title: TL of another unit cannot decide
         steps:
-          - As rn.mkttl1 (sending unit) open the request in Outgoing; call the accept endpoint.
-        expected: Accept and Decline are not shown; the call returns HTTP 403.
+          - As rn.mkttl1 (sending unit) open the request in Outgoing; send a direct accept request.
+        expected: Accept and Decline are not shown; the request is refused.
         msg: [You are not permitted to perform this action]
       - c: 4
         type: Negative
@@ -1660,7 +1660,7 @@ frs:
         title: Request already decided
         steps:
           - Call accept on a request that rn.mkttl2 already declined.
-        expected: The call is refused; the account is unchanged.
+        expected: The request is refused; the account is unchanged.
         msg: ["The transfer of {RNW-2026-000116} is already decided"]
 
   FR-RN-040:
@@ -1926,7 +1926,7 @@ frs:
         title: Disposition refused on a locked account
         steps:
           - Open an account in RA Generated; change the disposition.
-        expected: The Disposition panel is read only; the API call is refused.
+        expected: The Disposition panel is read only; the direct request is refused.
         msg: ["Renewal {RNW-2026-000130} is locked since the Renewal Advice was generated"]
 
   FR-RN-044:
@@ -1971,8 +1971,8 @@ frs:
         type: Negative
         title: A saved remark cannot be edited
         steps:
-          - Look for Edit on a saved remark; call PUT on it by API.
-        expected: No edit action exists; the call is refused.
+          - Look for Edit on a saved remark; send a direct request to change it.
+        expected: No edit action exists; a direct request is refused.
 
   FR-RN-045:
     scenario: SC-RN-05
@@ -2298,8 +2298,8 @@ frs:
         brd: [BRD 1.011.1]
         title: AO cannot override
         steps:
-          - As rn.ao1 open RNW-2026-000203; call POST /api/v1/renewal/candidates/override.
-        expected: Override is not shown; the call returns HTTP 403.
+          - As rn.ao1 open RNW-2026-000203; send a direct request to override the bucket.
+        expected: Override is not shown; the request is refused.
         msg: [You are not permitted to perform this action]
 
   FR-RN-060:
@@ -2602,9 +2602,9 @@ frs:
         type: Report-output
         persona: PROCESSOR
         brd: [BRD 4.007.1, 4.007.1.1-4.007.1.4, 4.007.1.4.1-4.007.1.4.28]
-        title: Processing Officer builds the batch of INS-B
+        title: Processing Officer prepares the batch of INS-B
         steps:
-          - As rn.po1 build a batch for INS-B and March.
+          - As rn.po1 prepare a batch for INS-B and March.
         expected: The 28 columns are shown for the INS-B accounts assigned in scope.
       - c: 2
         type: Upload-download
@@ -2634,7 +2634,7 @@ frs:
         brd: [BRD 3.009.1]
         title: Insurer without renewal or placement e-mail
         steps:
-          - Build and send a batch for INS-C.
+          - Prepare and send a batch for INS-C.
         expected: The send is refused.
         msg: ["{INS-C} has no e-mail address for renewals"]
       - c: 4
@@ -2642,7 +2642,7 @@ frs:
         brd: [BRD 3.009.1]
         title: Range with no For Renewal account
         steps:
-          - Build a batch for INS-A and a month without accounts.
+          - Prepare a batch for INS-A and a month without accounts.
         expected: No batch is created.
         msg: ["No For Renewal account of {INS-A} expires in the range"]
       - c: 4
@@ -2650,7 +2650,7 @@ frs:
         brd: [BRD 4.007.1]
         title: Account already in an open batch
         steps:
-          - Build a second batch for INS-A and March.
+          - Prepare a second batch for INS-A and March.
         expected: The accounts of the open batch are not included again.
       - c: 5
         type: Negative
@@ -2795,7 +2795,7 @@ frs:
         title: Disposition disabled after the RA
         steps:
           - Open an account of TC-RN-080.1-01; try to change the disposition or edit remarks of the disposition.
-        expected: The panel is locked; a padlock is shown; the API call is refused.
+        expected: The panel is locked; a padlock is shown; the direct request is refused.
         msg: ["Renewal {RNW-2026-000130} is locked since the Renewal Advice was generated"]
       - c: 3
         type: Boundary
@@ -2851,8 +2851,8 @@ frs:
         brd: [BRRN.010]
         title: User without RNW_RA_GENERATE cannot generate
         steps:
-          - As rn.cc look for Generate RA; call POST /api/v1/renewal/letters/ra.
-        expected: The action is not shown; the call returns HTTP 403.
+          - As rn.cc look for Generate RA; send a direct request to generate an RA.
+        expected: The action is not shown; the request is refused.
         msg: [You are not permitted to perform this action]
 
   FR-RN-081:
@@ -2964,7 +2964,7 @@ frs:
         screen: API
         title: NAL refused for an account with an RA
         steps:
-          - Call POST /api/v1/renewal/letters/nal for an account in RA Sent.
+          - Send a direct request to generate a NAL for an account in RA Sent.
         expected: No NAL is generated; the account is not in the NAL tab.
         msg: ["Renewal {RNW-2026-000130} already has a {Renewal Advice} and cannot receive a NAL"]
 
@@ -3392,7 +3392,7 @@ frs:
         title: User without RNW_REPORT_VIEW
         steps:
           - As rn.lamd open Reports, category Renewal.
-        expected: The Renewal reports are not listed; the run call returns HTTP 403.
+        expected: The Renewal reports are not listed; a direct run request is refused.
 
   FR-RN-110:
     scenario: SC-RN-12
@@ -3513,13 +3513,13 @@ access:
     permission: RNW_PACKAGE_REMAP
     allow: [PROCESSING_TL, PROCESSOR]
     deny: [MKT_AO, MKT_TL, LAMD]
-    denied: The Package panel is read only; POST .../package returns HTTP 403.
+    denied: The Package panel is read only; a direct request is refused.
   - action: Generate the expiry list and initiate candidates
     screen: EXPIRY
     permission: RNW_EXTRACT
     allow: [MKT_TL, PROCESSING_TL]
     deny: [MKT_AO, PROCESSOR, LAMD]
-    denied: Generate Expiry List and Initiate are not shown; the API call returns HTTP 403.
+    denied: Generate Expiry List and Initiate are not shown; the direct request is refused.
   - action: Assign, re-assign and receive transfers
     screen: EXPIRY
     permission: RNW_ASSIGN
@@ -3531,19 +3531,19 @@ access:
     permission: RNW_DISPOSE
     allow: [MKT_AO, MKT_TL]
     deny: [PROCESSOR, CONTACT_CENTER, LAMD]
-    denied: The Disposition panel is read only; POST .../disposition returns HTTP 403.
+    denied: The Disposition panel is read only; a direct request is refused.
   - action: Review, return and post
     screen: TLREVIEW
     permission: RNW_REVIEW
     allow: [MKT_TL]
     deny: [MKT_AO, PROCESSING_TL]
-    denied: TL Review is not in the menu; POST .../post returns HTTP 403.
+    denied: TL Review is not in the menu; a direct request is refused.
   - action: Controlled overrides (outstanding balance, bucket, disposition, insurer mismatch, RA unlock)
     screen: RECORD
     permission: RNW_OVERRIDE
     allow: [MKT_TL]
     deny: [MKT_AO, PROCESSING_TL, PROCESSOR]
-    denied: Override is not shown; POST .../override returns HTTP 403.
+    denied: Override is not shown; a direct request is refused.
   - action: Assign accounts to Processing Officers
     screen: PROCWL
     permission: RNW_PROCESS_ASSIGN
@@ -3561,19 +3561,19 @@ access:
     permission: RNW_UPLOAD
     allow: [PROCESSING_TL, PROCESSOR]
     deny: [MKT_TL, MKT_AO]
-    denied: Upload Dispositioned File is not shown; the bulk upload call returns HTTP 403.
-  - action: Build, send and apply insurer batches
+    denied: Upload Dispositioned File is not shown; a direct bulk upload request is refused.
+  - action: Prepare, send and apply insurer batches
     screen: BATCHES
     permission: RNW_INSURER
     allow: [PROCESSING_TL, PROCESSOR]
     deny: [MKT_TL, MKT_AO]
-    denied: Insurer Batches is not in the menu; POST /insurer-batches returns HTTP 403.
+    denied: Insurer Batches is not in the menu; a direct request is refused.
   - action: Generate and send RAs, NALs and NFRs
     screen: LETTERS
     permission: RNW_RA_GENERATE, RNW_RA_SEND
     allow: [MKT_TL, MKT_AO, PROCESSING_TL, PROCESSOR]
     deny: [LAMD, CONTACT_CENTER, BUSINESS_ADMIN]
-    denied: Letters is not in the menu; POST /letters/ra and /letters/send return HTTP 403.
+    denied: Letters is not in the menu; direct requests are refused.
   - action: Record client acceptance
     screen: RECORD
     permission: RNW_ACCEPT
@@ -3585,25 +3585,25 @@ access:
     permission: RNW_FOLLOWUP
     allow: [CONTACT_CENTER]
     deny: [MKT_AO, LAMD]
-    denied: Follow-ups is not in the menu; POST .../followups returns HTTP 403.
+    denied: Follow-ups is not in the menu; a direct request is refused.
   - action: Upload LAMD reports and view match results
     screen: LAMDR
     permission: RNW_LAMD_UPLOAD, RNW_VALIDATE
     allow: [LAMD]
     deny: [MKT_TL, PROCESSING_TL, CONTACT_CENTER]
-    denied: LAMD Reports is not in the menu; the upload call returns HTTP 403.
+    denied: LAMD Reports is not in the menu; a direct upload request is refused.
   - action: Run renewal reports
     screen: REPORTS
     permission: RNW_REPORT_VIEW
     allow: [MKT_TL, MKT_AO, PROCESSING_TL, PROCESSOR, BUSINESS_ADMIN]
     deny: [LAMD, CONTACT_CENTER, SYSADMIN]
-    denied: The Renewal category is not listed; the run call returns HTTP 403.
+    denied: The Renewal category is not listed; a direct run request is refused.
   - action: Export lists and reports
     screen: EXPIRY
     permission: RNW_EXPORT
     allow: [MKT_TL, MKT_AO, PROCESSING_TL]
     deny: [PROCESSOR, CONTACT_CENTER]
-    denied: Export is not shown; the export call returns HTTP 403.
+    denied: Export is not shown; a direct export request is refused.
   - action: Maintain checks, bucket rules, matrix and non-renewable risk codes
     screen: SETUP
     permission: RNW_SETUP

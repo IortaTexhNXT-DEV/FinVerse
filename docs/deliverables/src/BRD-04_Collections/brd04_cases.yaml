@@ -72,33 +72,33 @@ screens:
   REPORTS: Reports > Report Centre (category Collections)
   ALERTS: Alerts (home section and bell icon in the page header)
   INV360: Operations > Invoice 360
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-CL-01
     name: SIT/UAT users and roles
     content: ao (MKT_AO), mkttl (MKT_TL), mkthandler (MKT_HANDLER), clxhandler and mktcoll (MKT_COLLECTION), clxtl (CLX_TL), clxuh (MKT_SECTION_HEAD), upphandler (UNAPPLIED_HANDLER), proc (PROCESSOR), cashier and cashtl (CASHIER, CASHIER_TL), commrec and commtl (Commission), disb (DISBURSEMENT), comptrol (COMPTROLLERSHIP), badmin (BUSINESS_ADMIN), admin (SYSADMIN), auditor (AUDITOR). The SIT/UAT password is issued by the test lead.
-    source: Seeds V980, V990, V1900 (Collections users) and the UnappliedSeedData runner (upphandler); grants V1000
+    source: Seed data (broking, Operations and Collections users, and the unapplied-payment handler upphandler, with their grants)
   - id: TD-CL-02
     name: Seed worklist
-    content: The unpaid seed invoices listed by the refresh of clxtl and assigned by the V1900 rules (segment CBG to clxhandler, team T-CORP1 to mkthandler, all others to mktcoll); an effort, dispositions of every kind (Coordinate further, DP PR for reversal, PR 2307 for reversal, For check pick-up, one superseded) and one temporary reassignment recorded
-    source: Seed runner CollectionsSeedData on the seed bookings (V988 and the Operations runners)
+    content: The unpaid seed invoices listed by the refresh of clxtl and assigned by the seed assignment rules (segment CBG to clxhandler, team T-CORP1 to mkthandler, all others to mktcoll); an effort, dispositions of every kind (Coordinate further, DP PR for reversal, PR 2307 for reversal, For check pick-up, one superseded) and one temporary reassignment recorded
+    source: Seed data (Collections worklist, on the seed bookings of New Business and Operations)
   - id: TD-CL-03
     name: Collections parameters as delivered
     content: CLX_MIN_BALANCE_THRESHOLD 10.00; CLX_AGING_BASIS BOOKING; CLX_AGING_BRACKETS 0-30,31-45,46-60,61-90,91-120,121+; CLX_EDIT_LOCK_MINUTES 15 (1-240); CLX_PROMISE_GRACE_DAYS 0 (0-30); CLX_EXPORT_MAX_ROWS 50,000 (100-1,000,000); CLX_INVOICE_NO_PATTERN ^(I\d{8}|BI-.+)$; LOGIN_MAX_FAILED_ATTEMPTS 3
-    source: Migration V1000 (Collections foundation) and V790
+    source: Collections parameters as configured for the SIT environment
   - id: TD-CL-04
     name: Sales units and Unit Heads
     content: T-CBG1 headed by mkttl; CBG-NCR, CORP-NCR and VIS headed by clxuh
-    source: Seed V1900 (on the sales organisation of V819)
+    source: Seed data (on the seed sales organisation)
   - id: TD-CL-05
     name: Disposition lists
     content: CLX_PR_DISPOSITION (DP PR for reversal, PR 2307 for reversal, For check pick-up, Cancel account, Coordinate further, Request bank AO assistance, No / missing policy number reserved to PROCESSOR, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD, DP returned by insurer); CLX_UPP_DISPOSITION (For application to invoice, For refund, For reclass, For transfer to other unit, Coordinate further); CLX_EFFORT_CODE
-    source: Migration V1000 (lists and Disposition Rules attributes)
+    source: Lists and Disposition Rules attributes as configured for the SIT environment
   - id: TD-CL-06
     name: Escalation rules
     content: CLX-BROKEN-PROMISE (to mkttl), CLX-AGING-45 (TL), CLX-INCEPTION-60 (UH), CLX-INSTALLMENT-15 (TL), all ACTIVE; CLX-AMOUNT-1M pending authorisation, maker badmin
-    source: Seed V1901
+    source: Seed data
   - id: TD-CL-07
     name: Plans, promises and escalations
     content: Three-year PAR01 account of client CL-2026-000005 (1-Sep-2026 to 1-Sep-2029) with an annual policy-year plan and an SOA per billing cycle; quarterly plan on ARN-2026-940002 with the first installment overdue; promise kept on ARN-2026-940004; broken promise on the three-year account escalated to mkttl
@@ -128,7 +128,7 @@ scenarios:
   - id: SC-CL-03
     persona: CLX_TL
     title: Assignment and reassignment. New accounts are assigned by rule; the team lead moves accounts permanently or until an end date.
-    pre: Assignment rules of V1900; worklist TD-CL-02.
+    pre: Seed assignment rules; worklist TD-CL-02.
   - id: SC-CL-04
     persona: MKT_COLLECTION
     title: Follow-up and hand-offs. The handler logs efforts, records dispositions alone or in bulk and hands accounts to Cashiering and Commission.
@@ -162,7 +162,7 @@ frs:
     data: [TD-CL-01]
     conditions:
       - A read-only role opens the PR Worklist but has no work action.
-      - The Collections set-up and assignment screens are not offered to roles without CLX_SETUP or CLX_ASSIGN, and a call without the permission is refused.
+      - The Collections set-up and assignment screens are not offered to roles without CLX_SETUP or CLX_ASSIGN, and a direct request without the permission is refused.
       - The User Access Matrix lists the CLX_* permissions in the area COLLECTIONS with their action classes.
       - The account locks after LOGIN_MAX_FAILED_ATTEMPTS consecutive wrong passwords.
     cases:
@@ -179,17 +179,17 @@ frs:
         type: Security-access
         persona: DISBURSEMENT
         screen: API
-        title: Disbursement user cannot record a disposition through the API
+        title: Disbursement user cannot record a disposition by a direct request
         steps:
-          - With the token of disb, POST a disposition "Coordinate further" for an open account to /api/v1/collections/dispositions.
-        expected: HTTP 403; no disposition is recorded.
+          - Signed in as disb, send a direct request to record the disposition "Coordinate further" for an open account.
+        expected: The request is refused; no disposition is recorded.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
       - c: 2
         type: Security-access
         title: Marketing AO does not see Collections Setup or Assignments
         steps:
           - Log in as ao and open the side menu, section Collections.
-          - Type the address /collections/setup in the browser.
+          - Open the address of the Collections Setup screen directly in the browser.
         expected: Collections Setup and Assignments are not in the menu. The direct link shows "You do not have access to this screen. Contact your administrator if you need it."
       - c: 2
         type: Security-access
@@ -265,7 +265,7 @@ frs:
         screen: API
         title: The recorder cannot be sent in the request
         steps:
-          - With the token of clxhandler, POST an effort to /api/v1/collections/efforts with an extra field recordedBy = mkttl.
+          - Signed in as clxhandler, send a direct request to log an effort with the recorder set to mkttl.
           - Open the account's Dispositions & Efforts tab.
         expected: The effort is saved with clxhandler as the recorder; the field sent in the request is ignored.
 
@@ -278,7 +278,7 @@ frs:
       - A field change writes one audit row with From, To, user, time and source IP.
       - A change on Collections Setup writes an audit row with the old and new value.
       - A bulk change writes rows for every account with the shared bulk reference.
-      - No screen or API edits or deletes an audit row.
+      - No screen or direct request edits or deletes an audit row.
     cases:
       - c: 1
         type: Positive
@@ -314,8 +314,8 @@ frs:
         title: Audit rows cannot be changed or deleted
         steps:
           - Open the History tab of an account and look for edit or delete actions.
-          - With the token of admin, send PUT and DELETE to /api/v1/collections/items/{invoiceNo}/history.
-        expected: The tab has no edit or delete action; both calls are refused (HTTP 405 or 404) and the rows are unchanged.
+          - Signed in as admin, send direct requests to change and to delete a row of the account history.
+        expected: The tab has no edit or delete action; both requests are refused and the rows are unchanged.
 
   FR-CL-004:
     scenario: SC-CL-01
@@ -354,7 +354,7 @@ frs:
         title: Collection Handler cannot open the audit log
         steps:
           - Log in as clxhandler and open the Report Centre, category Collections.
-        expected: Collections Audit Log is not listed; running CLX-AUDIT-LOG through the API returns HTTP 403.
+        expected: Collections Audit Log is not listed; running CLX-AUDIT-LOG by a direct request is refused.
 
   FR-CL-005:
     scenario: SC-CL-01
@@ -541,7 +541,7 @@ frs:
         screen: API
         title: A parameter of another module cannot be changed here
         steps:
-          - With the token of clxuh, PUT /api/v1/collections/setup/parameters/LOGIN_MAX_FAILED_ATTEMPTS with value 5.
+          - Signed in as clxuh, send a direct request to set the parameter LOGIN_MAX_FAILED_ATTEMPTS to 5 from Collections Setup.
         expected: The change is refused and the parameter keeps its value.
         msg: ["{LOGIN_MAX_FAILED_ATTEMPTS} is not a Collections parameter", CLX_PARAMETER_NOT_COLLECTIONS]
       - c: 4
@@ -550,7 +550,7 @@ frs:
         title: Collection Handler does not see Collections Setup
         steps:
           - Log in as clxhandler and open the section Collections.
-        expected: Collections Setup is not in the menu; PUT .../setup/parameters returns HTTP 403.
+        expected: Collections Setup is not in the menu; a direct request is refused.
 
   FR-CL-013:
     scenario: SC-CL-02
@@ -633,7 +633,7 @@ frs:
       - c: 2
         type: Positive
         title: Unit Head of a unit without a head comes from its department
-        pre: A sales unit without head_username under a department headed by clxuh.
+        pre: A sales unit without a Unit Head under a department headed by clxuh.
         steps:
           - Open an account of that unit.
         expected: The Unit Head shown is clxuh.
@@ -733,8 +733,8 @@ frs:
         screen: API
         title: Whole refresh needs CLX_SETUP
         steps:
-          - With the token of ao, POST /api/v1/collections/refresh.
-        expected: HTTP 403; no run is started.
+          - Signed in as ao, send a direct request to refresh the whole worklist.
+        expected: The request is refused; no run is started.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-CL-018:
@@ -767,8 +767,8 @@ frs:
         screen: API
         title: No delete of a disposition
         steps:
-          - With the token of clxhandler, send DELETE to /api/v1/collections/items/{invoiceNo}/dispositions.
-        expected: The call is refused (HTTP 405 or 404) and the disposition stays.
+          - Signed in as clxhandler, send a direct request to delete a disposition of an account.
+        expected: The request is refused and the disposition stays.
 
   FR-CL-020:
     scenario: SC-CL-03
@@ -827,8 +827,8 @@ frs:
         persona: MKT_AO
         title: Marketing AO cannot maintain rules
         steps:
-          - Log in as ao and type /collections/assignments.
-        expected: The screen is refused ("You do not have access to this screen. Contact your administrator if you need it."); POST .../assignment-rules returns HTTP 403.
+          - Log in as ao and open the address of the Assignments screen directly in the browser.
+        expected: The screen is refused ("You do not have access to this screen. Contact your administrator if you need it."); a direct request is refused.
 
   FR-CL-021:
     scenario: SC-CL-03
@@ -897,8 +897,8 @@ frs:
         screen: API
         title: Kind missing
         steps:
-          - POST /api/v1/collections/reassignments with accounts, reason and handler but no kind.
-        expected: The call is refused with HTTP 422.
+          - Send a direct request to reassign accounts with accounts, reason and handler but no kind.
+        expected: The request is refused.
         msg: [A reassignment is PERMANENT or TEMPORARY, CLX_REASSIGN_KIND]
 
   FR-CL-030:
@@ -930,7 +930,7 @@ frs:
         steps:
           - Open Record Disposition on an account.
           - POST the disposition with code of the ended value.
-        expected: The value is not offered; the call is refused. Restore the end date afterwards.
+        expected: The value is not offered; a direct request is refused. Restore the end date afterwards.
         msg: ["{BANK_AO_ASSISTANCE} is not a value of {CLX_PR_DISPOSITION}", CLX_LOV_VALUE_UNKNOWN]
       - c: 3
         type: Positive
@@ -953,8 +953,8 @@ frs:
         screen: API
         title: Unknown attribute of a value
         steps:
-          - PUT /api/v1/collections/setup/lov-attributes with attribute colour on CLX_PR_DISPOSITION.
-        expected: The call is refused.
+          - Send a direct request to set the attribute colour on a value of CLX_PR_DISPOSITION.
+        expected: The request is refused.
         msg: ["{colour} is not an attribute of {CLX_PR_DISPOSITION}", CLX_LOV_ATTRIBUTE_UNKNOWN]
       - c: 4
         type: Security-access
@@ -1006,7 +1006,7 @@ frs:
         screen: API
         title: 501 accounts in one action
         steps:
-          - POST /api/v1/collections/dispositions with 501 invoice numbers.
+          - Send a direct request to record one disposition for 501 invoice numbers.
         expected: Nothing is recorded.
         msg: [Select at most 500 accounts at once, CLX_TOO_MANY_ACCOUNTS]
       - c: 3
@@ -1031,7 +1031,7 @@ frs:
         title: No account selected
         steps:
           - POST a disposition with an empty invoice list.
-        expected: The call is refused.
+        expected: The request is refused.
         msg: [Select at least one account, CLX_NO_ACCOUNT]
       - c: 4
         type: Negative
@@ -1169,7 +1169,7 @@ frs:
         screen: API
         title: Category D is refused
         steps:
-          - PUT /api/v1/collections/items/{invoiceNo}/details with category D.
+          - Send a direct request to set the category of an account to D.
         expected: The update is refused.
         msg: ["The tagging category is A, B or C", CLX_CATEGORY]
       - c: 3
@@ -1354,7 +1354,7 @@ frs:
         title: Cancel an active plan and cancel it again
         steps:
           - Open the generated plan of this FR, click Cancel with a reason.
-          - Try to cancel the same plan again through POST .../plans/{id}/cancel.
+          - Send a direct request to cancel the same plan again.
         expected: The first cancel sets the plan CANCELLED; the second is refused.
         msg: ["Plan {no} is {CANCELLED} and cannot be cancelled", CLX_PLAN_NOT_ACTIVE]
       - c: 1
@@ -1363,7 +1363,7 @@ frs:
         title: Marketing AO cannot create a plan
         steps:
           - Log in as ao and open Installment Plans.
-        expected: New Installment Plan is not shown; POST .../plans/generated returns HTTP 403 (CLX_BILLING).
+        expected: New Installment Plan is not shown; a direct request is refused (CLX_BILLING).
 
   FR-CL-041:
     scenario: SC-CL-05
@@ -1403,8 +1403,8 @@ frs:
         screen: API
         title: Statement for a cycle the plan does not have
         steps:
-          - POST /api/v1/collections/billing/statements for the generated plan with cycle 9.
-        expected: The call is refused.
+          - Send a direct request to generate a statement for the generated plan with cycle 9.
+        expected: The request is refused.
         msg: ["Plan {no} has no billing cycle {9}", CLX_CYCLE_UNKNOWN]
 
   FR-CL-042:
@@ -1555,8 +1555,8 @@ frs:
         type: Negative
         title: No edit on the Timeline
         steps:
-          - Look for edit or delete actions on the Timeline; send DELETE to .../items/{invoiceNo}/timeline.
-        expected: No action is offered; the call is refused and the entries stay.
+          - Look for edit or delete actions on the Timeline; send a direct request to delete a Timeline entry.
+        expected: No action is offered; a direct request is refused and the entries stay.
 
   FR-CL-050:
     scenario: SC-CL-06
@@ -1631,8 +1631,8 @@ frs:
         screen: API
         title: Rule without a code
         steps:
-          - POST /api/v1/collections/escalation-rules without code.
-        expected: The call is refused.
+          - Send a direct request to save an escalation rule without a code.
+        expected: The request is refused.
         msg: [Enter the company and the rule code, CLX_RULE_CODE]
       - c: 5
         type: Workflow
@@ -1677,7 +1677,7 @@ frs:
         title: Collected account closes its escalation
         steps:
           - Ask the cashier to pay the invoice of an open escalation in full; run CLX_ESCALATION.
-        expected: The escalation is RESOLVED by auto_close ("Closed - account collected").
+        expected: The escalation is RESOLVED by the automatic close ("Closed - account collected").
       - c: 4
         type: Negative
         screen: ALERTS
@@ -1692,7 +1692,7 @@ frs:
     persona: MKT_COLLECTION
     screen: ESC
     conditions:
-      - Selected invoices are escalated by account (ARN), one MANUAL escalation per account, whatever their automated status.
+      - Selected invoices are escalated by account (ARN), one MANUAL escalation per account, whatever their automatic status.
       - The target level is required and a designated user must hold CLX_ESCALATION_HANDLE.
       - An invoice with nothing to collect is refused while the others are escalated.
       - A user without CLX_ESCALATE does not see Escalate Accounts.
@@ -1736,7 +1736,7 @@ frs:
         title: Cashier does not see Escalate Accounts
         steps:
           - Log in as cashier and open Escalations.
-        expected: Escalate Accounts is not shown; POST .../bulk/escalate returns HTTP 403.
+        expected: Escalate Accounts is not shown; a direct request is refused.
 
   FR-CL-053:
     scenario: SC-CL-06
@@ -1769,7 +1769,7 @@ frs:
         steps:
           - On a WITH_TL escalation click Escalate to the unit / section head without a reason.
         expected: The action is refused.
-        msg: ["Select a reason for '{escalate_further}'", WORKFLOW_REASON_REQUIRED]
+        msg: ["Select a reason for '{Escalate further}'", WORKFLOW_REASON_REQUIRED]
       - c: 3
         type: Workflow
         title: Return to the handler and resubmit
@@ -1782,8 +1782,8 @@ frs:
         screen: API
         title: Unknown action
         steps:
-          - POST .../escalations/{id}/actions/close.
-        expected: The call is refused.
+          - Send a direct request for the action Close on an escalation (not an action of the escalation workflow).
+        expected: The request is refused.
         msg: ["'{close}' is not an escalation action", CLX_ESCALATION_ACTION]
       - c: 4
         type: Security-access
@@ -1791,7 +1791,7 @@ frs:
         title: AO cannot acknowledge
         steps:
           - Log in as ao and open an escalation WITH_TL.
-        expected: No workflow action is offered; POST .../actions/acknowledge returns HTTP 403.
+        expected: No workflow action is offered; a direct request is refused.
 
   FR-CL-060:
     scenario: SC-CL-07
@@ -1875,7 +1875,7 @@ frs:
         type: Negative
         title: Send a cancelled statement
         steps:
-          - Open the cancelled SOA and POST .../billing/statements/{id}/send.
+          - Open the cancelled SOA and send a direct request to send it.
         expected: The send is refused.
         msg: ["Statement {SOA} is cancelled", CLX_SOA_CANCELLED]
 
@@ -1990,7 +1990,7 @@ frs:
         pre: The test lead ends "For transfer to other unit" yesterday.
         steps:
           - Open Record Disposition on a payment; POST the disposition FOR_TRANSFER.
-        expected: The value is not offered and the call is refused. Restore the value afterwards.
+        expected: The value is not offered and a direct request is refused. Restore the value afterwards.
         msg: ["{FOR_TRANSFER} is not a value of {CLX_UPP_DISPOSITION}", CLX_LOV_VALUE_UNKNOWN]
       - c: 2
         type: Positive
@@ -2007,7 +2007,7 @@ frs:
         steps:
           - Set the Cashiering action of "Coordinate further" to PAY.
         expected: The rule is not saved.
-        msg: ["'{PAY}' is not a valid {cashiering_action}", CLX_LOV_ATTRIBUTE_VALUE]
+        msg: ["'{PAY}' is not a valid {Cashiering action}", CLX_LOV_ATTRIBUTE_VALUE]
 
   FR-CL-073:
     scenario: SC-CL-08
@@ -2048,7 +2048,7 @@ frs:
         title: Cashier cannot record a collector disposition
         steps:
           - Log in as cashier and open Unapplied Payments.
-        expected: Record Disposition is not shown; POST .../unapplied/{ref}/dispositions returns HTTP 403.
+        expected: Record Disposition is not shown; a direct request is refused.
 
   FR-CL-074:
     scenario: SC-CL-08
@@ -2100,8 +2100,8 @@ frs:
         screen: CASHREQ
         title: Accept a request already decided
         steps:
-          - Accept the request rejected above through POST /api/v1/cashiering/collector-requests/{id}/accept.
-        expected: The call is refused.
+          - Send a direct request to accept the request rejected above.
+        expected: The request is refused.
         msg: ["{request} is already {REJECTED}", COLLECTOR_REQUEST_DECIDED]
       - c: 4
         type: Negative
@@ -2128,7 +2128,7 @@ frs:
         title: No invoice number
         steps:
           - Record "For application to invoice" on Liza Manalo's payment without invoice number.
-        expected: The form asks for the invoice number; the server refuses the call.
+        expected: The form asks for the invoice number; the system refuses a direct request.
         msg: [Enter the invoice number to apply the payment to, CLX_INVOICE_REQUIRED]
       - c: 2
         type: Boundary
@@ -2172,8 +2172,8 @@ frs:
         screen: API
         title: No delete of a collector disposition
         steps:
-          - Send DELETE to .../unapplied/{ref}/dispositions.
-        expected: The call is refused and the disposition stays.
+          - Send a direct request to delete a collector disposition of an unapplied payment.
+        expected: The request is refused and the disposition stays.
 
   FR-CL-077:
     scenario: SC-CL-08
@@ -2211,8 +2211,8 @@ frs:
         screen: API
         title: The file cannot be written without CLX_SETUP or CLX_EXPORT
         steps:
-          - With the token of upphandler, POST /api/v1/collections/unapplied/application-file.
-        expected: HTTP 403; no file is written.
+          - Signed in as upphandler, send a direct request to write the application file.
+        expected: The request is refused; no file is written.
 
   FR-CL-080:
     scenario: SC-CL-09
@@ -2345,7 +2345,7 @@ frs:
         title: User without CLX_EXPORT cannot download
         steps:
           - Log in as upphandler, open Collections Files and click a file.
-        expected: The files are listed; the download is refused (HTTP 403).
+        expected: The files are listed; the download is refused.
 
   FR-CL-085:
     scenario: SC-CL-09
@@ -2432,7 +2432,7 @@ frs:
       - c: 1
         type: Positive
         title: Commission and incentive as two receivables (run after CQ01)
-        pre: Draft requirement BRCLXN.061, not built (CQ01). Run this case once BDOI confirms the draft and the function is delivered.
+        pre: Draft requirement BRCLXN.061 (CQ01). Run this case once BDOI confirms the draft.
         steps:
           - Book an invoice with commission and an eligible incentive; open the receivables of the invoice.
         expected: Two receivables with different accounts - commission receivable and incentive receivable (Other Income).
@@ -2455,7 +2455,7 @@ frs:
       - c: 1
         type: Positive
         title: Invoice paid within the campaign window (run after CQ01)
-        pre: Draft requirement BRCLXN.062, not built (CQ01).
+        pre: Draft requirement BRCLXN.062 (CQ01).
         steps:
           - Run the campaign for a period with an invoice paid within X days of booking.
         expected: The invoice is billed on a system-generated service invoice with the withholding tax and the campaign code.
@@ -2477,7 +2477,7 @@ frs:
       - c: 1
         type: Positive
         title: Refund from a negative endorsement (run after CQ01)
-        pre: Draft requirement BRCLXN.063, not built (CQ01).
+        pre: Draft requirement BRCLXN.063 (CQ01).
         steps:
           - Book a negative endorsement on an invoice whose commission is collected.
         expected: A commission refund linked to the original commission and the endorsement is created.
@@ -2499,7 +2499,7 @@ frs:
       - c: 1
         type: Positive
         title: 40 % paid directly (run after CQ01)
-        pre: Draft requirement BRCLXN.064, not built (CQ01); formula to confirm (CQ19).
+        pre: Draft requirement BRCLXN.064 (CQ01); formula to confirm (CQ19).
         steps:
           - Premium 100,000.00 with 40,000.00 paid directly and confirmed; open the CR receivable.
         expected: The collectible commission is 40 % of the commission.
@@ -2523,7 +2523,7 @@ access:
     permission: CLX_WORK
     allow: [MKT_AO, MKT_TL, MKT_HANDLER, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD, PROCESSOR]
     deny: [UNAPPLIED_HANDLER, CASHIER, DISBURSEMENT, COMPTROLLERSHIP, AUDITOR]
-    denied: Record Disposition and Log Effort are not shown; POST /dispositions returns HTTP 403 (ACCESS_DENIED).
+    denied: Record Disposition and Log Effort are not shown; a direct request is refused.
   - action: Update several accounts at once
     screen: WL
     permission: CLX_BULK_UPDATE
@@ -2535,43 +2535,43 @@ access:
     permission: CLX_ESCALATE
     allow: [MKT_AO, MKT_TL, MKT_HANDLER, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD]
     deny: [UNAPPLIED_HANDLER, PROCESSOR, CASHIER]
-    denied: Escalate Accounts is not shown; POST /bulk/escalate returns HTTP 403.
+    denied: Escalate Accounts is not shown; a direct request is refused.
   - action: Act on an escalation
     screen: ESCD
     permission: CLX_ESCALATION_HANDLE
     allow: [MKT_TL, CLX_TL, MKT_SECTION_HEAD]
     deny: [MKT_AO, MKT_COLLECTION, MKT_HANDLER]
-    denied: Acknowledge, Escalate further, Return and Resolve are not shown; the action call returns HTTP 403.
+    denied: Acknowledge, Escalate further, Return and Resolve are not shown; a direct action request is refused.
   - action: Maintain assignment rules and reassign
     screen: ASSIGN
     permission: CLX_ASSIGN
     allow: [MKT_TL, CLX_TL, MKT_SECTION_HEAD]
     deny: [MKT_AO, MKT_COLLECTION, MKT_HANDLER]
-    denied: Assignments is not in the menu; POST /reassignments returns HTTP 403.
+    denied: Assignments is not in the menu; a direct request is refused.
   - action: Dispose of unapplied payments and request applications
     screen: UPP
     permission: CLX_UNAPPLIED_WORK
     allow: [MKT_AO, MKT_COLLECTION, CLX_TL, UNAPPLIED_HANDLER]
     deny: [PROCESSOR, CASHIER, DISBURSEMENT]
-    denied: Record Disposition is not shown on Unapplied Payments; the call returns HTTP 403.
+    denied: Record Disposition is not shown on Unapplied Payments; the request is refused.
   - action: Create installment plans and billing statements
     screen: PLANS
     permission: CLX_BILLING
     allow: [MKT_TL, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD]
     deny: [MKT_AO, MKT_HANDLER, UNAPPLIED_HANDLER]
-    denied: New Installment Plan and Billing Run are not shown; the calls return HTTP 403.
+    denied: New Installment Plan and Billing Run are not shown; direct requests are refused.
   - action: Collections Setup and escalation rules
     screen: SETUP
     permission: CLX_SETUP
     allow: [MKT_SECTION_HEAD, BUSINESS_ADMIN, SYSADMIN]
     deny: [MKT_TL, MKT_COLLECTION, CLX_TL, CASHIER]
-    denied: Collections Setup is not in the menu; PUT /setup/parameters returns HTTP 403.
+    denied: Collections Setup is not in the menu; a direct request is refused.
   - action: Download files and exports
     screen: FILES
     permission: CLX_EXPORT
     allow: [MKT_AO, MKT_COLLECTION, CLX_TL, CASHIER, DISBURSEMENT]
     deny: [UNAPPLIED_HANDLER, PROCESSOR, COMPTROLLERSHIP]
-    denied: The files are listed but the download returns HTTP 403.
+    denied: The files are listed but the download is refused.
   - action: Run the Collections reports
     screen: REPORTS
     permission: CLX_REPORT_VIEW
@@ -2583,10 +2583,10 @@ access:
     permission: CLX_AUDIT_VIEW
     allow: [MKT_SECTION_HEAD, BUSINESS_ADMIN, SYSADMIN, AUDITOR]
     deny: [MKT_COLLECTION, CLX_TL, CASHIER]
-    denied: Collections Audit Log is not listed; the run call returns HTTP 403.
+    denied: Collections Audit Log is not listed; a direct run request is refused.
   - action: Record the reserved disposition "No / missing policy number"
     screen: WL
-    permission: CLX_WORK and the Disposition Rule allowed_roles
+    permission: CLX_WORK and the allowed roles of the Disposition Rule
     allow: [PROCESSOR, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD]
     deny: [MKT_AO, MKT_HANDLER, MKT_TL]
     denied: The disposition is refused with CLX_DISPOSITION_NOT_ALLOWED.
@@ -2595,4 +2595,4 @@ access:
     permission: Cashiering collector request permission
     allow: [CASHIER]
     deny: [UNAPPLIED_HANDLER, MKT_COLLECTION]
-    denied: Incoming Requests is not in the menu; POST /cashiering/collector-requests/{id}/accept returns HTTP 403.
+    denied: Incoming Requests is not in the menu; a direct request is refused.

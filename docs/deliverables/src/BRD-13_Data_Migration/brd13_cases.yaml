@@ -80,17 +80,17 @@ screens:
   DISBQ: Disbursement > Payment requests
   TRUEUPS: Data Migration > True-ups
   RESUB: Data Migration > Batches > (batch) Resubmissions tab
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-DM-01
     name: Test users per migration role
-    content: miglead (DATA_MIGRATION_LEAD), migsteward (DATA_STEWARD), migowner and migowner2 (DATA_OWNER), migops (MIGRATION_OPERATOR), migrecon (MIGRATION_RECON_APPROVER), miggonogo (MIGRATION_GONOGO), legacyaudit (LEGACY_INQUIRY), legacyrev (LEGACY_ACCESS_REVIEWER), topmgmt (TOP_MANAGEMENT_APPROVER), plus the built Operations users (cashier, cashiertl, commrectl, remit, adjuster, adjtl, reconhandler, ao).
-    source: Planned seed data V1980 of the build design; existing Operations SIT/UAT users
+    content: miglead (DATA_MIGRATION_LEAD), migsteward (DATA_STEWARD), migowner and migowner2 (DATA_OWNER), migops (MIGRATION_OPERATOR), migrecon (MIGRATION_RECON_APPROVER), miggonogo (MIGRATION_GONOGO), legacyaudit (LEGACY_INQUIRY), legacyrev (LEGACY_ACCESS_REVIEWER), topmgmt (TOP_MANAGEMENT_APPROVER), plus the Operations users (cashier, cashiertl, commrectl, remit, adjuster, adjtl, reconhandler, ao).
+    source: Seed data; existing Operations SIT/UAT users
   - id: TD-DM-02
     name: Reference extracts
     content: R01 (MARKET_SEGMENT with 12 values, one unmapped code OLD-RET and one CREATE value WALKIN), R04 and R04B (insurers and branches, one unmapped code), R05 (products), R06 (the PACKAGE map, 120 entries) mapping PKG-MC-PRIV v3 to MC-PRIVATE-STD v1 up to a sum insured of 2,000,000.00 and to MC-PRIVATE-HV v1 above, and PKG-HOME-01 v2 without a BIBS package (REJECT), R08 (GL account map), R11 (receipt series).
-    source: Masked test extracts in backend/src/main/resources/db/seed/migration/ (build wave DM3) prepared by the test lead in the workbook layouts
+    source: Masked test extracts prepared by the test lead in the workbook layouts
   - id: TD-DM-03
     name: Client extracts
     content: C01 and C02 from QPS (600 clients) and EBIX (400 clients) with 40 exact duplicates on TIN, 15 pairs with similar names and the same birth date, 5 clients already in BIBS, 3 rows without birth date; a client delta file of the next day with 10 new and 5 changed clients.
@@ -121,12 +121,12 @@ data:
     source: Masked extracts prepared by the test lead
   - id: TD-DM-09
     name: Configuration for the tests
-    content: "Parameters as delivered - MIG_ENVIRONMENT_CLASS NON_PRODUCTION, MIG_STAGING_RETENTION_DAYS 5, MIG_CHUNK_SIZE 500, MIG_PARTITIONS 4, MIG_AMOUNT_TOLERANCE 0.00, MIG_MAX_ERROR_RATE_MASTER 0.5, MIG_MAX_ERROR_RATE_FINANCIAL 0, MIG_CLIENT_MATCH_AUTO 90, MIG_CLIENT_MATCH_REVIEW 60, MIG_ARCHIVE_EXPORT_MAX_ROWS 1000, MIG_ACCESS_EXPORT_ALERT_ROWS 5000, MIG_OPENING_VALUE_DATE 1 January 2028, MIG_GOLIVE_RENEWAL_TO 31 May 2028, MIG_RENEWAL_URGENT_TO 31 January 2028, MIG_RESUBMIT_DEADLINE T-1 12:00; legacy control accounts, Migration Clearing and LG_ rule lines set up on the test chart."
-    source: Configuration delivered with the build (FRS section 9); seed data V1982
+    content: "Parameters as configured - MIG_ENVIRONMENT_CLASS NON_PRODUCTION, MIG_STAGING_RETENTION_DAYS 5, MIG_CHUNK_SIZE 500, MIG_PARTITIONS 4, MIG_AMOUNT_TOLERANCE 0.00, MIG_MAX_ERROR_RATE_MASTER 0.5, MIG_MAX_ERROR_RATE_FINANCIAL 0, MIG_CLIENT_MATCH_AUTO 90, MIG_CLIENT_MATCH_REVIEW 60, MIG_ARCHIVE_EXPORT_MAX_ROWS 1000, MIG_ACCESS_EXPORT_ALERT_ROWS 5000, MIG_OPENING_VALUE_DATE 1 January 2028, MIG_GOLIVE_RENEWAL_TO 31 May 2028, MIG_RENEWAL_URGENT_TO 31 January 2028, MIG_RESUBMIT_DEADLINE T-1 12:00; legacy control accounts, Migration Clearing and LG_ rule lines set up on the test chart."
+    source: Configuration of the SIT environment (FRS section 9); seed data
   - id: TD-DM-10
     name: New BIBS invoices and payments
     content: BIBS invoice BI-2028-000150 with 2,000.00 open; a Direct Credit payment file with one row carrying EBIX reference I00123457 and one row for a BIBS invoice; an approved client payout account.
-    source: Built Operations seed data; payment file prepared by the test lead
+    source: Operations seed data; payment file prepared by the test lead
 
 scenarios:
   - id: SC-DM-01
@@ -338,7 +338,7 @@ frs:
         title: Checksum and header mismatch
         steps:
           - Upload a file edited after the control file was made; then a file with column open_balance renamed.
-        expected: "Both REJECTED. The second check shows \"The file columns do not match layout version 1: missing open_balance, extra open_bal\"."
+        expected: "Both REJECTED. The second check shows \"The file columns do not match layout version 1: missing open_balance, extra OpenBal\"."
         msg: ["The file does not match the checksum in the control file"]
       - c: 2
         type: Negative
@@ -1647,7 +1647,7 @@ frs:
         title: Report refused without permission
         steps:
           - As cashier open the report.
-        expected: Not in the report list; the call returns HTTP 403.
+        expected: Not in the report list; the request is refused.
 
   FR-DM-110:
     scenario: SC-DM-07
@@ -1703,8 +1703,8 @@ frs:
         screen: API
         title: Log cannot be changed
         steps:
-          - Try to update and delete a log entry through the API as an administrator.
-        expected: No edit or delete action exists; both calls are refused.
+          - Try to update and delete a log entry by a direct request as an administrator.
+        expected: No edit or delete action exists; both requests are refused.
       - c: 3
         type: Security-access
         persona: AUDIT
@@ -2011,89 +2011,89 @@ access:
     permission: MIG_VIEW
     allow: [DML, STEWARD, OWNER, OPERATOR, RECON, GONOGO]
     deny: [CASHIER, MKT_AO, AUDIT]
-    denied: Data Migration is not in the menu; GET /api/v1/migration/objects returns HTTP 403.
+    denied: Data Migration is not in the menu; a direct request is refused.
   - action: Maintain objects and submit decisions
     screen: OBJ
     permission: MIG_OBJECT_MANAGE
     allow: [DML]
     deny: [STEWARD, OWNER, OPERATOR]
-    denied: New Object and Submit Decision are not shown; the call returns HTTP 403.
+    denied: New Object and Submit Decision are not shown; the request is refused.
   - action: Approve decisions and map versions
     screen: APPROVALS
     permission: MIG_DECISION_APPROVE / MIG_MAPPING_APPROVE
     allow: [OWNER]
     deny: [DML, STEWARD, OPERATOR]
-    denied: The item is not offered in My Approvals; the call returns HTTP 403.
+    denied: The item is not offered in My Approvals; the request is refused.
   - action: Edit code maps and resolve issues
     screen: MAPS
     permission: MIG_MAPPING_EDIT / MIG_DQ_RESOLVE
     allow: [STEWARD]
     deny: [OPERATOR, RECON]
-    denied: The maps are read only; the call returns HTTP 403.
+    denied: The maps are read only; the request is refused.
   - action: Upload extracts and run loads
     screen: EXTRACTS
     permission: MIG_INTAKE / MIG_LOAD_RUN
     allow: [OPERATOR]
     deny: [STEWARD, OWNER, RECON]
-    denied: Upload and Load are not shown; the call returns HTTP 403.
+    denied: Upload and Load are not shown; the request is refused.
   - action: Approve a load
     screen: BATCH
     permission: MIG_LOAD_APPROVE
     allow: [DML]
     deny: [OPERATOR, STEWARD]
-    denied: Approve Load is not shown; the call returns HTTP 403.
+    denied: Approve Load is not shown; the request is refused.
   - action: Sign a reconciliation and approve rollbacks
     screen: RECONC
     permission: MIG_RECON_SIGNOFF / MIG_ROLLBACK_APPROVE
     allow: [RECON]
     deny: [DML, OPERATOR, STEWARD]
-    denied: Sign and Approve are not shown; the call returns HTTP 403.
+    denied: Sign and Approve are not shown; the request is refused.
   - action: Decide go / no-go
     screen: GONOGO
     permission: MIG_GONOGO_DECIDE
     allow: [GONOGO]
     deny: [DML, RECON]
-    denied: GO and NO-GO are not shown; the call returns HTTP 403.
+    denied: GO and NO-GO are not shown; the request is refused.
   - action: Search the legacy archive
     screen: INQUIRY
     permission: LEGACY_INQUIRY_VIEW
     allow: [AUDIT]
     deny: [CASHIER, OPERATOR]
-    denied: Legacy Inquiry is not in the menu; the call returns HTTP 403.
+    denied: Legacy Inquiry is not in the menu; the request is refused.
   - action: Review the legacy access log
     screen: ACCLOG
     permission: LEGACY_ACCESS_LOG_VIEW
     allow: [ACCESS_REV]
     deny: [AUDIT, DML]
-    denied: Access Log is not shown; the call returns HTTP 403.
+    denied: Access Log is not shown; the request is refused.
   - action: Approve UPP reclassification to income (second level)
     screen: APPROVALS
     permission: CASH_UPP_INCOME_APPROVE
     allow: [TOPMGMT]
     deny: [CASHIER, CASHIER_TL]
-    denied: The batch is not offered at the top-management stage; the call returns HTTP 403.
+    denied: The batch is not offered at the top-management stage; the request is refused.
   - action: Approve DPPR and PR2307 legacy reversal batches
     screen: APPROVALS
     permission: LEGACY_REVERSAL_APPROVE
     allow: [CASHIER_TL, COMMREC_TL]
     deny: [CASHIER, ACCT]
-    denied: Approve is not shown; the call returns HTTP 403.
+    denied: Approve is not shown; the request is refused.
 
   - action: Prepare a FY2027 true-up
     screen: TRUEUPS
     permission: MIG_TRUEUP_PREPARE
     allow: [GL_LEAD]
     deny: [OPERATOR, DML]
-    denied: Submit is not shown; the call returns HTTP 403.
+    denied: Submit is not shown; the request is refused.
   - action: Approve a FY2027 true-up
     screen: APPROVALS
     permission: MIG_TRUEUP_APPROVE
     allow: [RECON]
     deny: [GL_LEAD, DML]
-    denied: The true-up is not offered in My Approvals; the call returns HTTP 403.
+    denied: The true-up is not offered in My Approvals; the request is refused.
   - action: Approve a resubmission of corrected P03 rows
     screen: RESUB
     permission: MIG_RESUBMIT_APPROVE
     allow: [RNW_CHECKER]
     deny: [RNW_MAKER, OPERATOR]
-    denied: Approve is not shown; the call returns HTTP 403.
+    denied: Approve is not shown; the request is refused.

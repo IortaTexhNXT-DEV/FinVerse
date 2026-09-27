@@ -57,7 +57,7 @@ screens:
   AUDIT: Administration > Audit Trail
   NOTIF: Notifications (bell icon in the page header)
   MAILBOX: Test mailbox of the insurer (SIT mail relay)
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-CM-01
@@ -196,7 +196,7 @@ frs:
     screen: CLAIM
     data: [TD-CM-01, TD-CM-05]
     conditions:
-      - Each Claims action is offered only to the roles holding its permission; a direct call without it is refused (HTTP 403) and logged.
+      - Each Claims action is offered only to the roles holding its permission; a direct request without it is refused and logged.
       - Marketing roles get the Claims reports only, never claim maintenance.
       - A claim of another company is answered as not found.
       - Grants change only through an approved User Access request.
@@ -208,8 +208,8 @@ frs:
         title: Claims Officer does not see Close
         steps:
           - Open BCL-2026-000102; look for Set Settlement and Close.
-          - Call the close endpoint with cl.officer1's token.
-        expected: The actions are not shown; the call returns HTTP 403 and is logged with user, endpoint and time.
+          - Send a direct request to close the claim, signed in as cl.officer1.
+        expected: The actions are not shown; the request is refused and is logged with the user and time.
         msg: [You are not permitted to perform this action]
       - c: 1
         priority: High
@@ -227,8 +227,8 @@ frs:
         brd: [BRCLM.006, BRCLM.011, BRCLM.015, BRCLM.018, BRCLM.019, BRCLM.021, BRCLM.024]
         title: Officer cannot override claimant, amend reserve or override follow-up
         steps:
-          - As cl.officer1 call the claimant override, reserve amendment and follow-up override endpoints.
-        expected: Each call returns HTTP 403; the claim is unchanged.
+          - As cl.officer1 send direct requests for the claimant override, the reserve amendment and the follow-up override.
+        expected: Each direct request is refused; the claim is unchanged.
         msg: [You are not permitted to perform this action]
       - c: 2
         priority: High
@@ -247,8 +247,8 @@ frs:
         brd: [BRCLM.002]
         title: Claim of another company
         steps:
-          - Call GET on a claim id of the second test company with cl.officer1's token.
-        expected: The call answers not found and reveals no data.
+          - Send a direct request to open a claim of the second test company, signed in as cl.officer1.
+        expected: The request answers not found and reveals no data.
       - c: 4
         priority: High
         type: Workflow
@@ -290,8 +290,8 @@ frs:
         brd: [NFR 4.01-4.03]
         title: History cannot be changed
         steps:
-          - Look for edit or delete on the History tab; call PUT and DELETE on a history row.
-        expected: No action exists; the calls are refused.
+          - Look for edit or delete on the History tab; send direct requests to change and to delete a history row.
+        expected: No action exists; direct requests are refused.
 
   FR-CM-010:
     scenario: SC-CM-02
@@ -522,7 +522,7 @@ frs:
         brd: [BRCLM.007]
         title: Policy number cannot be edited on the claim
         steps:
-          - Look for an edit action on the policy number; call the claim update with another policy number.
+          - Look for an edit action on the policy number; send a direct request to update the claim with another policy number.
         expected: The field is read only; the value is not changed.
       - c: 3
         priority: High
@@ -630,8 +630,8 @@ frs:
         brd: [BRCLM.001]
         title: Code refused while premium is unpaid
         steps:
-          - Look at Generate Authorization Code; call the endpoint.
-        expected: The button is disabled; the call is refused.
+          - Look at Generate Authorization Code; send the request directly.
+        expected: The button is disabled; a direct request is refused.
         msg: ["The premium of {ARN-2026-000602} {2026} is not fully paid. The authorization code cannot be generated"]
       - c: 2
         priority: High
@@ -699,7 +699,7 @@ frs:
         screen: API
         title: Location of another account
         steps:
-          - Call the link endpoint with a location item of ARN-2026-000501.
+          - Send a direct request to link a location item of ARN-2026-000501.
         expected: The link is refused.
         msg: ["Location {L-000501-1} is not on the cover {ARN-2026-000602}"]
       - c: 2
@@ -1030,8 +1030,8 @@ frs:
         brd: [BRCLM.018]
         title: Officer cannot assign an adjuster
         steps:
-          - As cl.officer1 open the claim; call the endpoint.
-        expected: The action is not shown; the call returns HTTP 403.
+          - As cl.officer1 open the claim; send the request directly.
+        expected: The action is not shown; the request is refused.
         msg: [You are not permitted to perform this action]
 
   FR-CM-032:
@@ -1182,7 +1182,7 @@ frs:
     data: [TD-CM-06]
     conditions:
       - Change Status lists only the statuses the matrix allows for one of the user's roles and the user's unit.
-      - A status outside the matrix is refused even when called directly.
+      - A status outside the matrix is refused even when requested directly.
       - A matrix row takes effect only after another user authorises it.
       - A user not in the claims handler register cannot change a status.
     cases:
@@ -1199,10 +1199,10 @@ frs:
         type: Security-access
         screen: API
         brd: [BRCLM.013]
-        title: Direct call with a status outside the matrix
+        title: Direct request with a status outside the matrix
         steps:
-          - With cl.officer1's token set status 6 on BCL-2026-000101.
-        expected: The call is refused; the status is unchanged.
+          - Signed in as cl.officer1, set status 6 on BCL-2026-000101.
+        expected: The request is refused; the status is unchanged.
         msg: ["You are not allowed to set the status {For Insurer's Issuance of Check}"]
       - c: 3
         priority: High
@@ -1258,7 +1258,7 @@ frs:
         title: Change on a closed claim
         steps:
           - Call Change Status on BCL-2026-000105.
-        expected: The action is not offered; the call is refused.
+        expected: The action is not offered; a direct request is refused.
         msg: ["Claim {BCL-2026-000105} is closed. Reopen it before changing the status"]
       - c: 3
         priority: High
@@ -1285,7 +1285,7 @@ frs:
     data: [TD-CM-06]
     conditions:
       - The settlement type list offers the 10 BRD values with outcome, closes-the-claim and requires-amount attributes.
-      - An attribute change takes effect after authorisation without a new build.
+      - An attribute change takes effect after authorisation, without a change to the system.
       - A type without an outcome is refused.
     cases:
       - c: 1
@@ -2013,8 +2013,8 @@ frs:
         persona: CLM_OFFICER
         title: Officer without BCL_DATA_EXTRACT
         steps:
-          - As cl.officer1 look for the extract; call the run endpoint.
-        expected: The report is not listed; the call returns HTTP 403.
+          - As cl.officer1 look for the extract; send a direct run request.
+        expected: The report is not listed; the request is refused.
         msg: [You are not permitted to perform this action]
 
   FR-CM-065:
@@ -2037,8 +2037,8 @@ frs:
         type: Security-access
         title: AO cannot download
         steps:
-          - Look for Export; call the export endpoint.
-        expected: Export is not shown; the call is refused.
+          - Look for Export; send a direct export request.
+        expected: Export is not shown; a direct request is refused.
         msg: [You are not permitted to perform this action]
       - c: 2
         type: Upload-download
@@ -2052,8 +2052,8 @@ frs:
         screen: API
         title: AO cannot open a claim record
         steps:
-          - Type the address of a claim record; call GET on the claim.
-        expected: The no-access page is shown; the call returns HTTP 403.
+          - Type the address of a claim record; send a direct request to open the claim.
+        expected: The no-access page is shown; the request is refused.
 
   FR-CM-066:
     scenario: SC-CM-07
@@ -2100,7 +2100,7 @@ access:
     permission: BCL_RECORD
     allow: [CLM_OFFICER, CLM_TL, CLM_TH]
     deny: [CLM_UH, CLM_RISK, MKT_AO]
-    denied: Record Claim is not in the menu; the create call returns HTTP 403.
+    denied: Record Claim is not in the menu; a direct create request is refused.
   - action: Generate the claims authorization code
     screen: CLAIM
     permission: BCL_AUTHORIZE
@@ -2178,7 +2178,7 @@ access:
     permission: BCL_REPORT_EXPORT
     allow: [CLM_TL, CLM_UH, MKT_TL]
     deny: [MKT_AO, AUDITOR, SYSADMIN]
-    denied: Export is not shown; the export call returns HTTP 403.
+    denied: Export is not shown; a direct export request is refused.
   - action: Run the Claims Data Extract
     screen: REPORTS
     permission: BCL_DATA_EXTRACT

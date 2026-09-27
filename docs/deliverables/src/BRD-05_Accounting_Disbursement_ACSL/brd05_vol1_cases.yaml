@@ -66,25 +66,25 @@ screens:
   JOBS: Setup & Administration > Administration > Scheduled Jobs
   APPROVALS: My Approvals (home section)
   ALERTS: Alerts (home section and bell icon in the page header)
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-AC-01
     name: SIT/UAT users and roles
     content: glofficer (FRBS_PROCESSOR), gltl (FRBS_TL), glhead (FRBS_HEAD), badmin (BUSINESS_ADMIN), admin (SYSADMIN), approver (NB_APPROVER, holds ACCESS_APPROVE), comptrol (COMPTROLLERSHIP), auditor (AUDITOR), disb (DISBURSEMENT), remittl (REMIT_TL). The SIT/UAT password is issued by the test lead.
-    source: Seeds V999 (BRD-5 users), V980, V990, V900; grants V890 and V899
+    source: Seed data (BRD-5, broking, Operations, administrator and auditor users, with their grants)
   - id: TD-AC-02
     name: Seed chart and posting rules
     content: Seed chart of company FVI (placeholder for BDOI's chart, AQ01) with 1210 premium receivable, 2211 due to insurer, 2241 checks outstanding, 2250 service fee payable, 4130 incentive income, 4131 CPC2 income, 5614 service fee expense (cost centre required); seed accounting rules of the BRD-5 events
-    source: Seeds V900, V901 and V999
+    source: Seed data (chart of accounts and posting rules)
   - id: TD-AC-03
     name: Currencies and rates
     content: Base currency PHP; USD active with BOOK and CLOSING rates; parameter OPS_BOOK_RATE_SOURCE as delivered
-    source: Seed V900 and the currency master
+    source: Seed data and the currency master
   - id: TD-AC-04
     name: Chart upload sample file
-    content: coa_upload_sample.xlsx with 8 parent and child accounts, among them 1913.01 with short code PRUSDBP (WARN negative-balance policy); a copy with one row whose parent is missing
-    source: docs/samples/coa_upload_sample.xlsx (the copy is prepared by the test lead)
+    content: The chart upload example file with 8 parent and child accounts, among them 1913.01 with short code PRUSDBP (WARN negative-balance policy); a copy with one row whose parent is missing
+    source: Example file of the Chart Upload screen (the copy is prepared by the test lead)
   - id: TD-AC-05
     name: Journals keyed in the test
     content: A MANUAL journal of 1,000.00 debit and credit on two postable accounts; an ACCRUAL of 5,000.00 dated the month end with reverse-on the first day of the next month; an unbalanced journal (1,000.00 / 900.00)
@@ -92,15 +92,15 @@ data:
   - id: TD-AC-06
     name: Service fee rules and seed run
     content: Rules CBG 2.5 % (segments CBG, RETAIL) and IBG 1 % (COMBANK, CORBANK, INSTITUTIONAL); cost-centre rule of account 5614; a run of the invoices fully paid this month computed by glofficer and approved by gltl, its lines sent to Disbursement
-    source: Migration V898 and seed runner FrbsSeedData
+    source: Service fee rules and a seed run as configured for the SIT environment
   - id: TD-AC-07
     name: Bank statement layout and file
     content: The statement layout of a seed bank account; a CSV bank file with check 000123 for 15,000.00 dated two days after the book payment of check 000123, and a deposit in transit left unmatched
-    source: Receivables seed (ReceivablesSeedData) and a file prepared by the test lead
+    source: Seed data (receivables) and a file prepared by the test lead
   - id: TD-AC-08
     name: Lists of values and access requests
     content: REFUND_REASON and the other lists of FRS section 9.3; a pending access request raised by badmin
-    source: Migrations of the lists (V750, V890 onwards); requests keyed in by the tester
+    source: Lists of values as configured for the SIT environment; requests keyed in by the tester
 
 scenarios:
   - id: SC-AC-01
@@ -163,7 +163,7 @@ frs:
         title: GL Officer does not see Chart Upload or GL Close & Cut-Off
         steps:
           - As glofficer, open General Ledger and Planning & Closing in the menu.
-          - Type the address /planning/gl-close.
+          - Open the address of the GL Close & Cut-Off screen directly in the browser.
         expected: Chart Upload and GL Close & Cut-Off are not in the menu; the direct link shows "You do not have access to this screen. Contact your administrator if you need it."
       - c: 2
         type: Negative
@@ -265,7 +265,7 @@ frs:
         title: GL Officer cannot enter the rate
         steps:
           - Log in as glofficer and open Currencies & Rates.
-        expected: The revaluation card has no entry action; POST /api/v1/currencies/revaluation-rates returns HTTP 403.
+        expected: The revaluation card has no entry action; a direct request is refused.
 
   FR-AC-011:
     scenario: SC-AC-02
@@ -343,7 +343,7 @@ frs:
         type: Upload-download
         title: Sample file of 8 accounts
         steps:
-          - Download the template; upload coa_upload_sample.xlsx; commit.
+          - Download the template; upload the chart upload example file; commit the valid rows.
         expected: 8 valid rows, 0 invalid; after commit the 8 accounts are PENDING_AUTHORIZATION; 1913.01 has short code PRUSDBP.
       - c: 2
         type: Negative
@@ -513,7 +513,7 @@ frs:
         title: Report outside the user's permissions
         steps:
           - Log in as disb and open the Report Centre.
-        expected: The General Ledger reports are not listed; running one through the API returns HTTP 403.
+        expected: The General Ledger reports are not listed; running one by a direct request is refused.
 
   FR-AC-021:
     scenario: SC-AC-03
@@ -577,8 +577,8 @@ frs:
         screen: API
         title: Another user's batch
         steps:
-          - As gltl, GET /api/v1/reports/batches/{id} of glofficer's batch.
-        expected: HTTP 403; the batch does not appear in gltl's list.
+          - As gltl, send a direct request to open glofficer's report batch.
+        expected: The request is refused; the batch does not appear in gltl's list.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-AC-023:
@@ -729,7 +729,7 @@ frs:
         screen: API
         title: SYSTEM journal entered by hand
         steps:
-          - POST /api/v1/journals with journal type SYSTEM.
+          - Send a direct request to create a journal of type SYSTEM.
         expected: The journal is refused.
         msg: ["Only MANUAL, ADJUSTMENT or ACCRUAL journals can be entered manually", INVALID_JOURNAL_TYPE]
       - c: 3
@@ -916,8 +916,8 @@ frs:
         screen: API
         title: Post a journal that is already posted
         steps:
-          - POST /api/v1/journals/{id}/approve on a POSTED journal.
-        expected: The call is refused.
+          - Send a direct request to post a journal that is already POSTED.
+        expected: The request is refused.
         msg: ["Cannot {approve} journal {JV-2026-00012} in status {POSTED}", INVALID_JOURNAL_STATUS]
 
   FR-AC-037:
@@ -939,8 +939,8 @@ frs:
         screen: JOURNAL
         title: Posted journal has no Edit action
         steps:
-          - Open a posted journal; PUT /api/v1/journals/{id} with a changed line.
-        expected: No Edit action is shown; the call is refused.
+          - Open a posted journal; send a direct request to change a line.
+        expected: No Edit action is shown; a direct request is refused.
         msg: ["Cannot {edit} journal {JV-2026-00012} in status {POSTED}", INVALID_JOURNAL_STATUS]
       - c: 2
         type: Workflow
@@ -1003,7 +1003,7 @@ frs:
         screen: API
         title: Period already closed
         steps:
-          - POST /api/v1/closing/close-now for a CLOSED period.
+          - Send a direct request to close a CLOSED period now.
         expected: The close is refused.
         msg: ["{August 2026} is {CLOSED}", PERIOD_NOT_CLOSABLE]
       - c: 1
@@ -1011,8 +1011,8 @@ frs:
         persona: FRBS_PROCESSOR
         title: GL Officer cannot schedule the close
         steps:
-          - As glofficer, type /planning/gl-close.
-        expected: The screen is refused; POST .../close-schedules returns HTTP 403.
+          - As glofficer, open the address of the GL Close & Cut-Off screen directly in the browser.
+        expected: The screen is refused; a direct request is refused.
 
   FR-AC-041:
     scenario: SC-AC-05
@@ -1139,8 +1139,8 @@ frs:
         screen: API
         title: Period of another company
         steps:
-          - POST the revaluation with the period id of another company.
-        expected: The call is refused.
+          - Send a direct request to save the revaluation with the period of another company.
+        expected: The request is refused.
         msg: [Period belongs to another company, PERIOD_OTHER_COMPANY]
 
   FR-AC-050:
@@ -1312,8 +1312,8 @@ frs:
         screen: API
         title: Submit an approved run
         steps:
-          - POST .../runs/{id}/submit on an APPROVED run.
-        expected: The call is refused.
+          - Send a direct request to submit an APPROVED run.
+        expected: The request is refused.
         msg: ["Run {no} is {APPROVED} and cannot be {submitted}", SERVICE_FEE_STAGE]
 
   FR-AC-053:
@@ -1464,7 +1464,7 @@ frs:
         persona: DISBURSEMENT
         title: No Report Pack without FRBS_REPORT_VIEW
         steps:
-          - Log in as disb; type /frbs.
+          - Log in as disb; open the address of the FRBS Report Pack directly in the browser.
         expected: The screen is refused.
 
   FR-AC-061:
@@ -1624,7 +1624,7 @@ frs:
         title: No BIR outputs without TAX_VIEW
         steps:
           - Log in as comptrol and open Tax & Statutory.
-        expected: BIR Forms & Books is not offered; the report call returns HTTP 403.
+        expected: BIR Forms & Books is not offered; a direct report request is refused.
 
   FR-AC-070:
     scenario: SC-AC-09
@@ -1662,8 +1662,8 @@ frs:
         screen: API
         title: System list
         steps:
-          - POST a value to a list maintained by the system.
-        expected: The call is refused.
+          - Send a direct request to add a value to a list maintained by the system.
+        expected: The request is refused.
         msg: ["The list {type} is maintained by the system", LOV_NOT_MAINTAINABLE]
       - c: 4
         type: Security-access
@@ -1809,8 +1809,8 @@ frs:
         screen: API
         title: Approve a decided request
         steps:
-          - POST .../access-requests/{id}/approve on an APPROVED request.
-        expected: The call is refused.
+          - Send a direct request to approve an APPROVED access request.
+        expected: The request is refused.
         msg: ["Request {no} is already {APPROVED}", ACCESS_REQUEST_DECIDED]
       - c: 4
         type: Negative
@@ -1826,37 +1826,37 @@ access:
     permission: JOURNAL_CREATE
     allow: [FRBS_PROCESSOR, FRBS_TL]
     deny: [FRBS_HEAD, COMPTROLLERSHIP, AUDITOR]
-    denied: New Journal is not in the menu; POST /api/v1/journals returns HTTP 403.
+    denied: New Journal is not in the menu; a direct request is refused.
   - action: Assign journals to a poster
     screen: JOURNALS
     permission: JOURNAL_ASSIGN
     allow: [FRBS_TL, FRBS_HEAD]
     deny: [FRBS_PROCESSOR]
-    denied: Assign is not shown; POST /journals/assign returns HTTP 403.
+    denied: Assign is not shown; a direct request is refused.
   - action: Post or return journals
     screen: JOURNAL
     permission: JOURNAL_AUTHORIZE
     allow: [FRBS_TL, FRBS_HEAD]
     deny: [FRBS_PROCESSOR, COMPTROLLERSHIP]
-    denied: Post and Return to Maker are not shown; POST /journals/{id}/approve returns HTTP 403.
+    denied: Post and Return to Maker are not shown; a direct request is refused.
   - action: Reverse a posted journal
     screen: JOURNAL
     permission: JOURNAL_REVERSE
     allow: [FRBS_HEAD]
     deny: [FRBS_TL, FRBS_PROCESSOR]
-    denied: Reverse is not shown; POST /journals/{id}/reverse returns HTTP 403.
+    denied: Reverse is not shown; a direct request is refused.
   - action: Enter the monthly revaluation rate
     screen: RATES
     permission: REVALUATION_RATE_MAINTAIN
     allow: [FRBS_HEAD]
     deny: [FRBS_TL, FRBS_PROCESSOR]
-    denied: The revaluation card has no entry; POST /currencies/revaluation-rates returns HTTP 403.
+    denied: The revaluation card has no entry; a direct request is refused.
   - action: Upload the chart of accounts
     screen: COAUP
     permission: COA_UPLOAD
     allow: [FRBS_TL]
     deny: [FRBS_PROCESSOR, FRBS_HEAD]
-    denied: Chart Upload is not in the menu; POST /coa/uploads returns HTTP 403.
+    denied: Chart Upload is not in the menu; a direct request is refused.
   - action: Authorise chart accounts and masters
     screen: APPROVALS
     permission: MASTER_AUTHORIZE
@@ -1868,7 +1868,7 @@ access:
     permission: GL_CLOSE_SCHEDULE
     allow: [FRBS_TL, FRBS_HEAD]
     deny: [FRBS_PROCESSOR, COMPTROLLERSHIP]
-    denied: GL Close & Cut-Off is not in the menu; POST /closing/close-schedules returns HTTP 403.
+    denied: GL Close & Cut-Off is not in the menu; a direct request is refused.
   - action: Run FX revaluation and year-end
     screen: FXREV
     permission: PERIOD_END_RUN
@@ -1880,19 +1880,19 @@ access:
     permission: FRBS_REPORT_VIEW
     allow: [FRBS_PROCESSOR, FRBS_TL, FRBS_HEAD, COMPTROLLERSHIP, AUDITOR]
     deny: [DISBURSEMENT, BUSINESS_ADMIN]
-    denied: Report Pack is not in the menu; GET /frbs/report-pack returns HTTP 403.
+    denied: Report Pack is not in the menu; a direct request is refused.
   - action: Compute and submit service-fee runs; tag lines
     screen: SFRUNS
     permission: SERVICE_FEE_MANAGE, SERVICE_FEE_TAG
     allow: [FRBS_PROCESSOR, FRBS_TL]
     deny: [FRBS_HEAD, COMPTROLLERSHIP]
-    denied: Service Fee Runs is not in the menu; POST /frbs/service-fee/runs returns HTTP 403.
+    denied: Service Fee Runs is not in the menu; a direct request is refused.
   - action: Approve service-fee runs and maintain rates
     screen: SFRATES
     permission: SERVICE_FEE_APPROVE
     allow: [FRBS_TL, FRBS_HEAD]
     deny: [FRBS_PROCESSOR]
-    denied: Approve and Service Fee Rates are not shown; the calls return HTTP 403.
+    denied: Approve and Service Fee Rates are not shown; direct requests are refused.
   - action: BIR forms, books and alphalists
     screen: TAXFORMS
     permission: TAX_VIEW
@@ -1904,16 +1904,16 @@ access:
     permission: LOV_MANAGE
     allow: [BUSINESS_ADMIN]
     deny: [FRBS_TL, SYSADMIN, AUDITOR]
-    denied: Add and Edit are not shown on Lists of Values; POST /lov/{type}/values returns HTTP 403.
+    denied: Add and Edit are not shown on Lists of Values; a direct request is refused.
   - action: Raise user and role requests
     screen: ACCREQ
     permission: ACCESS_REQUEST
     allow: [BUSINESS_ADMIN, SYSADMIN]
     deny: [FRBS_HEAD, AUDITOR]
-    denied: New Request is not shown; POST /nbadmin/access-requests returns HTTP 403.
+    denied: New Request is not shown; a direct request is refused.
   - action: Approve, decline or return user and role requests
     screen: APPROVALS
     permission: ACCESS_APPROVE
     allow: [ACCESS_APPROVER]
     deny: [BUSINESS_ADMIN, SYSADMIN, FRBS_HEAD]
-    denied: The access requests are not offered in My Approvals; the approve call returns HTTP 403.
+    denied: The access requests are not offered in My Approvals; a direct approve request is refused.

@@ -50,21 +50,21 @@ screens:
   NOTIF: Notifications (bell icon in the page header)
   MAIL: Test mailbox of the recipient
   DB: Database console of the test environment (database administrator)
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-UA-01
     name: Test users per role
     content: requestor (UAM_REQUESTOR), uamapprover (UAM_APPROVER), secapprover (UAM_SECOND_APPROVER), badmin (BUSINESS_ADMIN), admin (SYSADMIN), approver (NB_APPROVER), auditor (AUDITOR), infosec (INFOSEC_OFFICER), ao (MKT_AO); subject users a013000101 to a013000104 (MKT_AO); requestor2, uamapprover2 and admin2 created by the test lead through requests; a disabled user and a locked user prepared by the test lead. The SIT/UAT password is issued by the test lead.
-    source: Seeds V1960 (user access users and subject users), V980 (broking users), V900 (admin, auditor), V1109 (infosec); the others created by the test lead
+    source: Seed data (user access users and subject users, broking users, administrator, auditor and Information Security); the others created by the test lead
   - id: TD-UA-02
     name: Requests in every status
     content: AR-2026-900001 draft (requestor); AR-2026-900002 pending for uamapprover (modify a013000101); AR-2026-900003 returned with remarks; AR-2026-900004 cancelled; AR-2026-900005 scheduled (deactivation of a013000103, 30 days ahead); AR-2026-900006 approved and applied (enrolment of a013000101); AR-2026-900007 group-profile creation PROCESSING_TL2 for implementation; AR-2026-900008 privileged change waiting for the second approval; batch BLK-2026-900001 of three lines pending for uamapprover.
-    source: Seed V1960
+    source: Seed data
   - id: TD-UA-03
     name: Group profiles
     content: UAM_REQUESTOR, UAM_APPROVER, UAM_SECOND_APPROVER (Standard); Marketing Team Lead (MKT_TL) and Processing Team Lead (Standard); SYSADMIN (Admin); a High profile UAT_HIGH; an inactive profile UAT_INACTIVE; profile Marketing Account Officer.
-    source: Delivered roles (V1060) and profiles created by the test lead through group-profile requests
+    source: Delivered roles and profiles created by the test lead through group-profile requests
   - id: TD-UA-04
     name: New user data
     content: User ID a013000196 (valid format), full name "UAT User One", e-mail on the test domain, home branch, Windows ID UATWIN01; invalid IDs "ab" (too short), "a01300019X" (wrong format), an existing user ID; a Windows ID already used.
@@ -76,11 +76,11 @@ data:
   - id: TD-UA-06
     name: Parameters and jobs as delivered
     content: "LOGIN_MAX_FAILED_ATTEMPTS 3; SESSION_IDLE_WARNING_MINUTES 15; SESSION_TIMEOUT_MINUTES 30; SESSION_EXPIRY_WARNING_MINUTES 30; AUTH_MODE LOCAL; USER_ID_PATTERN ^[a-zA-Z][0-9]{9}$; PASSWORD_HISTORY_COUNT 8; PASSWORD_MAX_AGE_DAYS 90; PASSWORD_MIN_AGE_DAYS 1; UAM_WORKING_HOURS 08:00-18:00 MON-FRI; UAM_ANY_APPROVER false; UAM_DIRECT_ROLE_EDIT false; UAM_ROLE_APPLY_ON_APPROVAL false; JOB_FAILURE_RECIPIENTS = test mailbox; jobs UAM_EFFECTIVE_CHANGES 00:05 and PASSWORD_EXPIRY_NOTICE 06:00."
-    source: Configuration delivered with the build (FRS section 9.1); recipients set by the test lead
+    source: Configuration of the SIT environment (FRS section 9.1); recipients set by the test lead
   - id: TD-UA-07
-    name: Directory test stub
+    name: Test directory
     content: A test directory that answers for the Windows IDs of the test users, with one refusal message; available only when BDO supplies the EUA interface (UQ04).
-    source: Test stub prepared by the project team from the EUA specification (not yet available)
+    source: Test directory prepared by the project team from the EUA specification (when BDO supplies it)
   - id: TD-UA-08
     name: Test mailboxes
     content: E-mail addresses of the test users point to test mailboxes of the test lead.
@@ -193,7 +193,7 @@ frs:
       - After 15 minutes without activity the inactivity warning appears; continuing closes it and restarts the timer.
       - After 30 minutes without activity the user is signed out and the session ends with reason idle timeout.
       - Activity in any browser tab keeps all tabs signed in.
-      - The user is warned 30 minutes before the fixed token expiry.
+      - The user is warned 30 minutes before the fixed session expiry.
     cases:
       - c: 1
         type: Boundary
@@ -224,10 +224,10 @@ frs:
         expected: Tab 1 is still signed in and shows no sign-out.
       - c: 4
         type: Positive
-        title: Warning before the fixed token expiry
-        pre: The test lead shortens the token lifetime on the test environment so the expiry is within 30 minutes.
+        title: Warning before the fixed session expiry
+        pre: The test lead shortens the session lifetime on the test environment so the expiry is within 30 minutes.
         steps:
-          - Keep working until 30 minutes before the token expiry.
+          - Keep working until 30 minutes before the session expiry.
         expected: The warning "For your security the system signs you out in n minute(s)" is shown while the user is active.
 
   FR-UA-003:
@@ -244,9 +244,9 @@ frs:
       - c: 1
         type: Positive
         title: Windows ID sign-in in DIRECTORY mode
-        pre: AUTH_MODE = DIRECTORY; the directory stub of TD-UA-07 answers.
+        pre: AUTH_MODE = DIRECTORY; the test directory of TD-UA-07 answers.
         steps:
-          - Enter the Windows ID of requestor and the stub password.
+          - Enter the Windows ID of requestor and the test directory password.
           - As the database administrator check the password column of requestor.
         expected: The home page opens with the Requestor menu; no password is stored for requestor.
       - c: 2
@@ -259,14 +259,14 @@ frs:
         type: Negative
         title: Windows ID without a BIBS user
         steps:
-          - Enter a Windows ID that the stub knows but no BIBS user carries.
+          - Enter a Windows ID that the test directory knows but no BIBS user carries.
         expected: The log-in is refused.
         msg: [Invalid user name or password]
       - c: 3
         type: Negative
         title: Directory not reachable
         steps:
-          - Stop the stub; log in.
+          - Stop the test directory; log in.
         expected: The log-in is refused with a service message.
       - c: 4
         type: Positive
@@ -283,7 +283,7 @@ frs:
     conditions:
       - Log Out ends the session in BIBS and the log-out is recorded with user and time.
       - The Users screen shows a signed-in user as Online.
-      - A token of an ended session is refused.
+      - A request made with the sign-in of an ended session is refused.
     cases:
       - c: 1
         type: Positive
@@ -304,11 +304,11 @@ frs:
         expected: requestor shows the status Online.
       - c: 3
         type: Negative
-        screen: API
+        screen: Sign-in of an ended session
         title: Token of an ended session
         steps:
-          - Take the token of requestor; log out; call an API with the old token.
-        expected: The call is refused with HTTP 401.
+          - Keep the sign-in of requestor; log out; send a direct request with the old sign-in.
+        expected: The request is refused.
 
   FR-UA-005:
     scenario: SC-UA-01
@@ -465,7 +465,7 @@ frs:
         screen: API
         title: Another Requestor cannot open the draft
         steps:
-          - As requestor2 open the address of requestor's draft; call the edit.
+          - As requestor2 open the address of requestor's draft; send a direct request to edit it.
         expected: The draft is not listed for requestor2; the edit is refused.
         msg: ["Only the creator can {edit} request {AR-2026-900001}", ACCESS_NOT_REQUESTER]
       - c: 3
@@ -566,9 +566,9 @@ frs:
       - c: 3
         type: Negative
         screen: API
-        title: Inactive profile sent through the API
+        title: Inactive profile sent by a direct request
         steps:
-          - Submit an enrolment with profile UAT_INACTIVE through the API.
+          - Submit an enrolment with profile UAT_INACTIVE by a direct request.
         expected: Refused.
         msg: ["Group profile {UAT_INACTIVE} is not active"]
       - c: 4
@@ -614,7 +614,7 @@ frs:
         screen: API
         title: Unknown user
         steps:
-          - Submit a Modify user request for user "nosuchuser" through the API.
+          - Submit a Modify user request for user "nosuchuser" by a direct request.
         expected: Refused.
         msg: ["User {nosuchuser} does not exist"]
       - c: 3
@@ -660,9 +660,9 @@ frs:
       - c: 3
         type: Negative
         screen: API
-        title: Already deactivated user through the API
+        title: Already deactivated user by a direct request
         steps:
-          - Submit a deactivation of the disabled user through the API.
+          - Submit a deactivation of the disabled user by a direct request.
         expected: Refused.
         msg: ["User {uatdisabled} is already deactivated"]
 
@@ -693,7 +693,7 @@ frs:
         screen: API
         title: Active user
         steps:
-          - Submit a reactivation of requestor through the API.
+          - Submit a reactivation of requestor by a direct request.
         expected: Refused.
         msg: ["User {requestor} is already active"]
 
@@ -732,7 +732,7 @@ frs:
       - c: 3
         type: Negative
         screen: API
-        title: Subject user as approver through the API
+        title: Subject user as approver by a direct request
         steps:
           - Submit a Modify user request for uamapprover with approver uamapprover.
         expected: Refused.
@@ -773,8 +773,8 @@ frs:
         screen: API
         title: Correction by another user
         steps:
-          - As uamapprover call the re-submit of the returned request.
-        expected: Refused with HTTP 403.
+          - As uamapprover send a direct request to re-submit the returned request.
+        expected: Refused.
         msg: [You are not permitted to perform this action]
 
   FR-UA-017:
@@ -1178,7 +1178,7 @@ frs:
         screen: API
         title: Unknown permission
         steps:
-          - Submit a create request with permission UAT_NO_SUCH through the API.
+          - Submit a create request with permission UAT_NO_SUCH by a direct request.
         expected: Refused.
         msg: ["Unknown permission(s): {UAT_NO_SUCH}"]
       - c: 3
@@ -1273,7 +1273,7 @@ frs:
         type: Negative
         title: Profile already inactive
         steps:
-          - Submit a deactivation of UAT_INACTIVE through the API.
+          - Submit a deactivation of UAT_INACTIVE by a direct request.
         expected: Refused.
         msg: ["Group profile {UAT_INACTIVE} is already inactive"]
       - c: 3
@@ -1281,7 +1281,7 @@ frs:
         title: SYSADMIN cannot be deactivated
         steps:
           - Choose Deactivate; look for SYSADMIN.
-        expected: SYSADMIN is not offered and a call is refused.
+        expected: SYSADMIN is not offered and a direct request is refused.
 
   FR-UA-043:
     scenario: SC-UA-05
@@ -1303,7 +1303,7 @@ frs:
         type: Negative
         title: Active profile
         steps:
-          - Submit a reactivation of Marketing Team Lead through the API.
+          - Submit a reactivation of Marketing Team Lead by a direct request.
         expected: Refused.
         msg: ["Group profile {MKT_TL} is already active"]
 
@@ -1427,8 +1427,8 @@ frs:
         persona: UAM_REQUESTOR
         title: Requestor has no approval right
         steps:
-          - As requestor open My Approvals; call the approval of a pending request.
-        expected: No access request is offered; the call returns HTTP 403.
+          - As requestor open My Approvals; send a direct request to approve a pending request.
+        expected: No access request is offered; the request is refused.
         msg: [You are not permitted to perform this action]
 
   FR-UA-051:
@@ -1438,7 +1438,7 @@ frs:
     data: [TD-UA-03]
     conditions:
       - A function added to a profile through an implemented request is granted to all members.
-      - A profile without UAM_CANCEL does not show Cancel Request, and a direct call is refused.
+      - A profile without UAM_CANCEL does not show Cancel Request, and a direct request is refused.
       - The User Access Matrix shows UAM_ENROLL under area USER_ACCESS, action CREATE; every permission has an area.
     cases:
       - c: 1
@@ -1455,8 +1455,8 @@ frs:
         screen: API
         title: Cancel without UAM_CANCEL
         steps:
-          - As uamapprover (no UAM_CANCEL) open an own request; call Cancel.
-        expected: Cancel Request is not shown; the call is refused.
+          - As uamapprover (no UAM_CANCEL) open an own request; send a direct request to cancel it.
+        expected: Cancel Request is not shown; a direct request is refused.
         msg: [You are not permitted to perform this action]
       - c: 3
         type: Report-output
@@ -1526,7 +1526,7 @@ frs:
         type: Security-access
         title: The maker authorises
         steps:
-          - As badmin try to authorise the rule just created (API call).
+          - As badmin try to authorise the rule just created (direct request).
         expected: Refused; the Authorise button is not shown to the maker.
         msg: [A record cannot be authorized by the user who maintained it]
       - c: 2
@@ -1573,7 +1573,7 @@ frs:
         type: Security-access
         title: The requester approves
         steps:
-          - As admin call the approval of the own change (API).
+          - As admin send a direct request to approve the own change.
         expected: Refused.
         msg: [A change cannot be approved by the user who asked for it]
       - c: 2
@@ -1639,7 +1639,7 @@ frs:
         title: Requestor cannot run the reports
         steps:
           - As requestor open User Access Reports.
-        expected: The screen is not in the menu; the run returns HTTP 403.
+        expected: The screen is not in the menu; the run is refused.
 
   FR-UA-061:
     scenario: SC-UA-07
@@ -1817,76 +1817,76 @@ access:
     permission: UAM_ENROLL, UAM_MODIFY, UAM_DEACTIVATE, UAM_REACTIVATE
     allow: [UAM_REQUESTOR]
     deny: [UAM_APPROVER, UAM_SECOND_APPROVER, AUDITOR, MKT_AO]
-    denied: New Request is not shown; the call returns HTTP 403.
+    denied: New Request is not shown; the request is refused.
   - action: Correct a returned request
     screen: REQ
     permission: UAM_CORRECT
     allow: [UAM_REQUESTOR, BUSINESS_ADMIN]
     deny: [UAM_APPROVER, AUDITOR]
-    denied: Re-submit is not shown; the call returns HTTP 403.
+    denied: Re-submit is not shown; the request is refused.
   - action: Cancel a request
     screen: REQS
     permission: UAM_CANCEL
     allow: [UAM_REQUESTOR, BUSINESS_ADMIN]
     deny: [UAM_APPROVER, AUDITOR]
-    denied: Cancel Request is not shown; the call returns HTTP 403.
+    denied: Cancel Request is not shown; the request is refused.
   - action: View access requests
     screen: REQS
     permission: UAM_VIEW
     allow: [UAM_REQUESTOR, UAM_APPROVER, UAM_SECOND_APPROVER, BUSINESS_ADMIN, SYSADMIN, AUDITOR]
     deny: [MKT_AO]
-    denied: User Access is not in the menu; the list call returns HTTP 403.
+    denied: User Access is not in the menu; a direct list request is refused.
   - action: Approve, reject or return requests
     screen: APPROVALS
     permission: ACCESS_APPROVE
     allow: [UAM_APPROVER, NB_APPROVER]
     deny: [UAM_REQUESTOR, BUSINESS_ADMIN, AUDITOR]
-    denied: The requests are not offered in My Approvals; the call returns HTTP 403.
+    denied: The requests are not offered in My Approvals; the request is refused.
   - action: Give the second approval
     screen: APPROVALS
     permission: UAM_SECOND_APPROVE
     allow: [UAM_SECOND_APPROVER]
     deny: [UAM_APPROVER, BUSINESS_ADMIN]
-    denied: The Second Approval tab is not shown; the call returns HTTP 403.
+    denied: The Second Approval tab is not shown; the request is refused.
   - action: Submit group-profile requests
     screen: GP
     permission: UAM_GROUP_REQUEST
     allow: [BUSINESS_ADMIN]
     deny: [UAM_REQUESTOR, UAM_APPROVER, SYSADMIN]
-    denied: Group Profile Requests is not in the menu; the call returns HTTP 403.
+    denied: Group Profile Requests is not in the menu; the request is refused.
   - action: Implement approved group-profile requests
     screen: ROLES
     permission: ROLE_MANAGE
     allow: [SYSADMIN]
     deny: [BUSINESS_ADMIN, UAM_APPROVER]
-    denied: The For Implementation tab and Implement Request are not shown; the call returns HTTP 403.
+    denied: The For Implementation tab and Implement Request are not shown; the request is refused.
   - action: Generate the user access reports
     screen: UAREP
     permission: UAM_REPORT_VIEW
     allow: [UAM_APPROVER, BUSINESS_ADMIN, SYSADMIN, INFOSEC_OFFICER, AUDITOR]
     deny: [UAM_REQUESTOR, UAM_SECOND_APPROVER, MKT_AO]
-    denied: User Access Reports is not in the menu; the run call returns HTTP 403.
+    denied: User Access Reports is not in the menu; a direct run request is refused.
   - action: Maintain the separation-of-duties rules
     screen: SOD
     permission: UAM_SOD_MAINTAIN
     allow: [BUSINESS_ADMIN]
     deny: [UAM_REQUESTOR, INFOSEC_OFFICER, SYSADMIN]
-    denied: New Rule and Deactivate are not shown; the call returns HTTP 403.
+    denied: New Rule and Deactivate are not shown; the request is refused.
   - action: Authorise the separation-of-duties rules
     screen: SOD
     permission: UAM_SOD_AUTHORIZE
     allow: [INFOSEC_OFFICER]
     deny: [BUSINESS_ADMIN, SYSADMIN, UAM_APPROVER]
-    denied: Authorise and Reject are not shown; the call returns HTTP 403.
+    denied: Authorise and Reject are not shown; the request is refused.
   - action: Approve a change of a security setting
     screen: PARAMS
     permission: SECURITY_PARAMETER_APPROVE
     allow: [INFOSEC_OFFICER]
     deny: [SYSADMIN, BUSINESS_ADMIN, AUDITOR]
-    denied: Approve is not offered; the call returns HTTP 403.
+    denied: Approve is not offered; the request is refused.
   - action: Unlock users and reset passwords
     screen: USERS
     permission: USER_MANAGE
     allow: [SYSADMIN]
     deny: [BUSINESS_ADMIN, UAM_REQUESTOR]
-    denied: Administration > Users is not in the menu; the call returns HTTP 403.
+    denied: Administration > Users is not in the menu; the request is refused.

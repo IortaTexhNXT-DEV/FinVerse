@@ -71,57 +71,57 @@ screens:
   TEMPLATES: Broking Setup > Document Templates
   MESSAGES: Broking Setup > Outbound Messages
   BOOKING: Booking > Booking Workbench > Booked Invoice
-  API: API call with the user's token (tester tool, for example Postman)
+  API: Direct request outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-PM-01
     name: SIT/UAT users and roles
     content: ao and ao2 (MKT_AO), mkttl (MKT_TL), tsu (TSU), tsulead (TSU and TSU_TL), tsuhead (TSU_HEAD), mbs and mbs2 (MBS), mancom (MANCOM), badmin (BUSINESS_ADMIN), approver (NB_APPROVER), admin (SYSADMIN), auditor (AUDITOR). The SIT/UAT password is issued by the test lead.
-    source: Seeds V980 (broking users), V998 (Product Maintenance users), V900 (admin, auditor); roles and grants V755
+    source: Seed data (broking users, Product Maintenance users, administrator and auditor, with their roles and grants)
   - id: TD-PM-02
     name: Draft NEW generic request
     content: PKR-2026-900001 SME Motor Fleet Programme, NEW, generic, line MOTOR, cover type COMPREHENSIVE, target insurers INS-MGIC, INS-LAC, INS-MPI, stage DRAFT, maker ao
-    source: Seed V997
+    source: Seed data
   - id: TD-PM-03
     name: AMEND request in TSU review
     content: PKR-2026-900002 AMEND MTR10 (lower deductible), generic, submitted by ao, approved by mkttl, stage FOR_TSU_REVIEW
-    source: Seed V997
+    source: Seed data
   - id: TD-PM-04
     name: Client-specific request in negotiation
     content: PKR-2026-900003 NEW client-specific property package for Pacific Harbor Logistics Inc. (CL-2026-000003), submitted by ao2, stage NEGOTIATION, round 1 closed (approved with changes, counter-proposal, decline), round 2 sent
-    source: Seed V997
+    source: Seed data
   - id: TD-PM-05
     name: UPDATE request at ManCom
     content: PKR-2026-900004 UPDATE MTR12 (roadside assistance), requirements submitted by tsu, stage FOR_MANCOM
-    source: Seed V997
+    source: Seed data
   - id: TD-PM-06
     name: RENEW request with MBS
     content: PKR-2026-900005 RENEW MTR15 on unchanged terms, no negotiation, signed off, stage WITH_MBS
-    source: Seed V997
+    source: Seed data
   - id: TD-PM-07
     name: Released AMEND request
     content: PKR-2026-900006 AMEND PAR08 home fire programme, RELEASED as version 2, advisory sent
-    source: Seed V997
+    source: Seed data
   - id: TD-PM-08
     name: Draft package version
     content: MTR12 version 2 DRAFT made by mbs, rate 1.25 %, minimum premium PHP 5,500, commission 15 %, two panel insurers, effective in 30 days
-    source: Seed V996
+    source: Seed data
   - id: TD-PM-09
     name: Active incentive criterion
     content: CPC2 (seed), type CAMPAIGN, value basis RATE 1.00, on Motor and Property packages, ACTIVE
-    source: Seed V996
+    source: Seed data
   - id: TD-PM-10
     name: Package ending in 45 days
     content: PAR25 version 1, package end date = load date + 45 days, no open renewal request
-    source: Seed V996
+    source: Seed data
   - id: TD-PM-11
     name: Catalogue and insurer panel
     content: Lines MOTOR, PROPERTY, LIABILITY; cover types COMPREHENSIVE, ALL_RISK, CGL; packages MTR10, MTR12, MTR15, PAR08, PAR25; insurers INS-MGIC, INS-LAC, INS-VMI, INS-MPI with placement e-mail addresses; client CL-2026-000003
-    source: Seeds V981 (clients), V982 (catalogue), V996 (versions)
+    source: Seed data (clients, catalogue and versions)
   - id: TD-PM-12
     name: New CGL request keyed in the test
     content: NEW, generic, title "UAT CGL Programme <date>", line LIABILITY, cover type CGL, reason New programme for a market segment, coverage CGL_BI included, package end 31-Dec-2027, target insurers INS-MGIC and INS-LAC
-    source: Keyed in by the tester (same values as ProductMaintenanceApiIT)
+    source: Keyed in by the tester
   - id: TD-PM-13
     name: Documents to upload
     content: Signed package slip (PDF, 1 page, under 5 MB); insurer reply letter (PDF); signed ManCom sheet (PDF); one file of a type the platform refuses (.exe renamed as .pdf is not used; use a .exe file)
@@ -129,7 +129,7 @@ data:
   - id: TD-PM-14
     name: Masked quotation data
     content: A client with KYC complete and a Motor item (vehicle value PHP 1,500,000) for quotations on MTR12 and MTR10
-    source: Seeds V981 and V984; for UAT a masked copy of production-like data
+    source: Seed data (clients and quotations); for UAT a masked copy of production-like data
 
 scenarios:
   - id: SC-PM-01
@@ -235,7 +235,7 @@ frs:
     data: [TD-PM-01]
     conditions:
       - The menu shows only the screens the user's roles allow.
-      - A direct link or API call without the permission is refused and logged.
+      - A direct link or direct request without the permission is refused and logged.
       - A four-eyes rule refuses the action even when the role holds the permission.
       - The User Access Matrix shows the areas each role may view, create, amend and approve and exports both views to Excel.
     cases:
@@ -252,17 +252,17 @@ frs:
         title: Direct link to the Validation Queue without PRODUCT_VALIDATE
         steps:
           - Log in as ao.
-          - Type the address /catalog/validation in the browser.
+          - Open the address of the Validation Queue directly in the browser.
         expected: The page shows "You do not have access to this screen. Contact your administrator if you need it." No queue data is loaded.
       - c: 2
         type: Security-access
         screen: API
-        title: Approval API called by a user without the approval permission
+        title: Approval requested directly by a user without the approval permission
         steps:
-          - Log in as ao and take the token.
-          - Call POST /api/v1/product-maintenance/requests/{id}/approve for a request in FOR_MKT_APPROVAL.
+          - Sign in as ao.
+          - Send a direct request to approve a request in FOR_MKT_APPROVAL.
           - Log in as auditor and open Administration > Audit Trail.
-        expected: The call returns HTTP 403 and the request does not move. The refused call is logged with user, endpoint and time.
+        expected: The request is refused and the request does not move. The refused request is logged with the user and time.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
       - c: 3
         type: Negative
@@ -292,7 +292,7 @@ frs:
         screen: MATRIX
         title: A Marketing AO cannot open the User Access Matrix
         steps:
-          - Log in as ao and type the address /broking-setup/access-matrix.
+          - Log in as ao and open the address of the User Access Matrix directly in the browser.
         expected: The screen is not in the menu and the direct link shows the no-access page.
 
   FR-PM-003:
@@ -396,9 +396,9 @@ frs:
         title: A user without Product Maintenance permissions cannot open the documents
         pre: A user holding only a non-broking role (for example a GL user of the finance seed) exists.
         steps:
-          - Log in as that user and open /product-maintenance/requests/{id} of TD-PM-04.
-          - Call GET .../requests/{id}/form.pdf with the user's token.
-        expected: The page shows the no-access message; the download returns HTTP 403.
+          - Log in as that user and open the address of the request page of TD-PM-04 directly in the browser.
+          - Send a direct request to download the request form PDF.
+        expected: The page shows the no-access message; the download is refused.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-PM-005:
@@ -409,7 +409,7 @@ frs:
     conditions:
       - The History tab of a released request lists every step from submission to release with user and time.
       - A changed insurer response keeps its earlier values in the response history.
-      - No screen or API edits or deletes audit rows.
+      - No screen or direct request edits or deletes audit rows.
     cases:
       - c: 1
         type: Positive
@@ -497,7 +497,7 @@ frs:
         title: The maker cannot authorise the own coverage
         steps:
           - As mbs, open My Approvals and try to authorise UAT_ROADSIDE (before badmin does).
-        expected: The record is not offered to its maker; a direct call to authorise is refused.
+        expected: The record is not offered to its maker; a direct request to authorise is refused.
         msg: [A record cannot be authorized by the user who maintained it, MAKER_CHECKER_VIOLATION]
       - c: 4
         type: Negative
@@ -805,7 +805,7 @@ frs:
         screen: API
         title: The type of a saved request cannot change
         steps:
-          - Call PUT .../requests/{id} on the saved draft of TC-PM-020.1-01 with type AMEND.
+          - Send a direct request to change the type of the saved draft of TC-PM-020.1-01 to AMEND.
         expected: The update is refused; the type stays NEW. On the screen the Request type field is read-only after the first save.
         msg: [The type of a request cannot change, PKG_TYPE_FIXED]
       - c: 5
@@ -834,8 +834,8 @@ frs:
         pre: ao submitted the request of TC-PM-020.1-01.
         steps:
           - As ao, open the request.
-          - Call POST .../requests/{id}/approve with ao's token.
-        expected: No approve button is shown to ao; the API call is refused with HTTP 403 and the request stays in FOR_MKT_APPROVAL.
+          - Send a direct request to approve the request, signed in as ao.
+        expected: No approve button is shown to ao; the direct request is refused and the request stays in FOR_MKT_APPROVAL.
       - c: 2
         type: Workflow
         title: Marketing TL approves and sends to TSU
@@ -864,7 +864,7 @@ frs:
         title: Another user cannot edit the returned draft
         pre: The request of TC-PM-021.3-01 is back in DRAFT.
         steps:
-          - As mbs call PUT .../requests/{id} with the same body.
+          - As mbs send a direct request to save the request with the same content.
         expected: The update is refused.
         msg: [Request PKR-2026-nnnnnn cannot be changed while DRAFT, PKG_REQUEST_NOT_EDITABLE]
 
@@ -953,8 +953,8 @@ frs:
         title: Approve for negotiation is not offered on a request without negotiation
         pre: A Renew package request with Negotiation required unticked, recommended.
         steps:
-          - As tsuhead open the request and look at the actions; call the workflow action approve through the API.
-        expected: Only Approve without negotiation and Return to requester are offered; the API call ends in FOR_MANCOM, not in NEGOTIATION.
+          - As tsuhead open the request and look at the actions; send a direct request for the workflow action Approve.
+        expected: Only Approve without negotiation and Return to requester are offered; the direct request ends in FOR_MANCOM, not in NEGOTIATION.
         neg: true
 
   FR-PM-024:
@@ -1008,8 +1008,8 @@ frs:
         screen: API
         title: A user without PRODUCT_VIEW or PKG_REPORT_VIEW cannot list requests
         steps:
-          - Call GET /api/v1/product-maintenance/requests?companyId=... with the token of a user without either permission.
-        expected: HTTP 403; the menu of that user has no Product Maintenance section.
+          - Send a direct request to list the package requests, signed in as a user without either permission.
+        expected: The request is refused; the menu of that user has no Product Maintenance section.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-PM-030:
@@ -1051,7 +1051,7 @@ frs:
         title: Resend on a closed round is refused
         pre: Round 1 is closed by a revision (round 2 open).
         steps:
-          - Open round 1 and call resend for INS-LAC.
+          - Open round 1 and resend the quotation slip to INS-LAC.
         expected: The resend is refused.
         msg: ["Only the slip of an open, sent round can be resent", QS_NOT_RESENDABLE]
       - c: 4
@@ -1260,10 +1260,10 @@ frs:
         type: Security-access
         persona: MKT_AO
         screen: API
-        title: Marketing cannot compile a master through the API
+        title: Marketing cannot compile a master by a direct request
         steps:
-          - Call POST .../requests/{id}/comparatives/master with ao2's token.
-        expected: HTTP 403; no new output.
+          - Send a direct request to compile the master comparative, signed in as ao2.
+        expected: The request is refused; no new output.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
       - c: 4
         type: Negative
@@ -1316,7 +1316,7 @@ frs:
         data: [TD-PM-12]
         title: Client view before a master exists
         steps:
-          - On a request with a sent round and no master, call POST .../comparatives with a title and fields.
+          - On a request with a sent round and no master, send a direct request to compile a client comparative with a title and fields.
         expected: Nothing is generated.
         msg: [Compile the comparative master first, COMPARATIVE_NO_MASTER]
 
@@ -1335,7 +1335,7 @@ frs:
         title: Skip review on a client-specific package
         pre: PKR-2026-900003 after Terms final (TERMS_REVIEW).
         steps:
-          - As tsuhead call the action Proceed to requirements (generic package) through the API.
+          - As tsuhead send a direct request for the action Proceed to requirements (generic package).
         expected: Refused; on screen the action is not offered for a client-specific package.
         msg: [Marketing reviews the terms of a client-specific package, PKG_SCOPE_CLIENT]
       - c: 1
@@ -1421,7 +1421,7 @@ frs:
         title: Requirements edited outside REQUIREMENTS_PREP
         data: [TD-PM-05]
         steps:
-          - On PKR-2026-900004 (FOR_MANCOM) call PUT .../requirements.
+          - On PKR-2026-900004 (FOR_MANCOM) send a direct request to change the requirements.
         expected: Refused.
         msg: [The requirements are prepared after the terms are accepted, PKG_NOT_IN_REQUIREMENTS]
 
@@ -1449,9 +1449,9 @@ frs:
         screen: API
         title: The request cannot go to MBS without the sign-off
         steps:
-          - As tsu call POST .../requests/{id}/signoff on PKR-2026-900004.
-          - As mbs call POST .../requests/{id}/setup on the same request before sign-off.
-        expected: Both calls are refused with HTTP 403; the request stays in FOR_MANCOM.
+          - As tsu send a direct request to sign off PKR-2026-900004.
+          - As mbs send a direct request to set up the package version of the same request before sign-off.
+        expected: Both direct requests are refused; the request stays in FOR_MANCOM.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
       - c: 2
         type: Negative
@@ -1501,7 +1501,7 @@ frs:
         data: [TD-PM-05]
         title: Set-up before sign-off
         steps:
-          - As mbs call POST .../requests/{id}/setup on PKR-2026-900004 (FOR_MANCOM).
+          - As mbs send a direct request to set up the package version of PKR-2026-900004 (FOR_MANCOM).
         expected: Refused; the request stays in FOR_MANCOM.
         msg: [MBS receives signed-off requirements only (BRPM.015), PKG_NOT_WITH_MBS]
       - c: 2
@@ -1566,8 +1566,8 @@ frs:
         title: MBS cannot validate the version it made
         steps:
           - As mbs submit MTR12 v2 for validation.
-          - As mbs call POST /api/v1/catalog/products/MTR12/versions/2/validate.
-        expected: HTTP 403 (mbs does not hold PRODUCT_VALIDATE); the version stays FOR_VALIDATION.
+          - As mbs send a direct request to validate version 2 of MTR12.
+        expected: The request is refused (mbs does not hold PRODUCT_VALIDATE); the version stays FOR_VALIDATION.
       - c: 1
         type: Negative
         persona: BUSINESS_ADMIN
@@ -1694,8 +1694,8 @@ frs:
         screen: API
         title: Marketing cannot send an advisory
         steps:
-          - Call POST /api/v1/product-maintenance/advisories/{aid}/send with ao's token.
-        expected: HTTP 403.
+          - Send a direct request to send an advisory, signed in as ao.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-PM-045:
@@ -1719,7 +1719,7 @@ frs:
         type: Negative
         title: Set up a version on a retirement request
         steps:
-          - On the retirement request click Set up package version (API).
+          - On the retirement request click Set up package version (direct request).
         expected: Refused.
         msg: [A retirement request retires the package; it has no version to set up, PKG_REQUEST_TYPE_MISMATCH]
       - c: 1
@@ -1727,7 +1727,7 @@ frs:
         data: [TD-PM-06]
         title: Retire on a renewal request
         steps:
-          - On PKR-2026-900005 call POST .../requests/{id}/retire.
+          - On PKR-2026-900005 send a direct request to retire the package.
         expected: Refused.
         msg: [Only a request to retire the package can retire it, PKG_REQUEST_TYPE_MISMATCH]
       - c: 2
@@ -1738,7 +1738,7 @@ frs:
         title: Quotation on a retired product
         steps:
           - New Quotation on MTR32.
-        expected: The product is not offered; a direct rating call is refused.
+        expected: The product is not offered; a direct rating request is refused.
         msg: [Product MTR32 is RETIRED and cannot be sold, PRODUCT_NOT_SELLABLE]
       - c: 3
         type: Positive
@@ -1794,8 +1794,8 @@ frs:
         screen: API
         title: A user without PRODUCT_MAINTAIN cannot create a version
         steps:
-          - As tsuhead call POST /api/v1/catalog/products/MTR12/versions.
-        expected: HTTP 403.
+          - As tsuhead send a direct request to create a version of MTR12.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-PM-051:
@@ -1927,8 +1927,8 @@ frs:
         screen: API
         title: Marketing AO cannot list expired packages
         steps:
-          - As ao open Products (no Expired filter shown); call GET /api/v1/catalog/products?lifecycle=EXPIRED.
-        expected: The filter is not offered; the call returns HTTP 403.
+          - As ao open Products (no Expired filter shown); send a direct request to list the expired products.
+        expected: The filter is not offered; the request is refused.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-PM-060:
@@ -1982,8 +1982,8 @@ frs:
         screen: API
         title: Marketing AO cannot open Package Expiry
         steps:
-          - As ao call GET /api/v1/product-maintenance/expiry.
-        expected: HTTP 403; the screen is not in ao's menu.
+          - As ao send a direct request to open Package Expiry.
+        expected: The request is refused; the screen is not in ao's menu.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-PM-061:
@@ -2013,7 +2013,7 @@ frs:
         type: Negative
         title: Generate with no package selected
         steps:
-          - Untick all; click Generate Renewal Request (API call with an empty list).
+          - Untick all; click Generate Renewal Request (direct request with an empty list).
         expected: Refused.
         msg: [Select the packages to renew, PKG_RENEWAL_NONE]
       - c: 1
@@ -2066,8 +2066,8 @@ frs:
         screen: API
         title: A user without view permission cannot read the counts
         steps:
-          - Call GET /api/v1/product-maintenance/counts with the token of a user without PRODUCT_VIEW and PKG_REPORT_VIEW.
-        expected: HTTP 403.
+          - Send a direct request to read the Product Maintenance counts, signed in as a user without PRODUCT_VIEW and PKG_REPORT_VIEW.
+        expected: A direct request is refused with "You are not permitted to perform this action".
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
   FR-PM-071:
@@ -2103,8 +2103,8 @@ frs:
         persona: MKT_AO
         title: Marketing AO cannot run the package reports
         steps:
-          - As ao open Reports; look for the three reports; call the run endpoint of PM-PKG-STATUS.
-        expected: The reports are not listed; the call returns HTTP 403.
+          - As ao open Reports; look for the three reports; send a direct run request of PM-PKG-STATUS.
+        expected: The reports are not listed; the request is refused.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
       - c: 3
         type: Negative
@@ -2144,7 +2144,7 @@ frs:
         title: Release logged by the product master feed
         steps:
           - Release a version (TC-PM-043.2-01); open the application log or Integration Events for the feed entry.
-        expected: One entry with product, version and effective date; no external transport is called (PQ16).
+        expected: One entry with product, version and effective date; nothing is sent to an external system (PQ16).
       - c: 1
         type: Negative
         persona: MKT_AO
@@ -2159,7 +2159,7 @@ frs:
     screen: REQ
     data: [TD-PM-05, TD-PM-02]
     conditions:
-      - A request cannot move past a stage without its checks and approvals, even through the API.
+      - A request cannot move past a stage without its checks and approvals, even by a direct request.
       - A request past its stage SLA raises an SLA alert to the stage owners.
       - Only the transitions of the workflow are possible.
     cases:
@@ -2167,9 +2167,9 @@ frs:
         type: Negative
         persona: MBS
         screen: API
-        title: MBS set-up without the ManCom sign-off through the API
+        title: MBS set-up without the ManCom sign-off by a direct request
         steps:
-          - As mbs call POST .../requests/{id}/setup on PKR-2026-900004 (FOR_MANCOM).
+          - As mbs send a direct request to set up the package version of PKR-2026-900004 (FOR_MANCOM).
         expected: Refused; the request stays in FOR_MANCOM.
         msg: [MBS receives signed-off requirements only (BRPM.015), PKG_NOT_WITH_MBS]
       - c: 1
@@ -2177,7 +2177,7 @@ frs:
         screen: API
         title: A user without the stage permission cannot move the case
         steps:
-          - As tsu call the workflow action approve on a request in FOR_MKT_APPROVAL.
+          - As tsu send a direct request for the workflow action Approve on a request in FOR_MKT_APPROVAL.
         expected: Refused.
         msg: ["You are not allowed to 'Approve and send to TSU'", WORKFLOW_ACTION_NOT_PERMITTED]
       - c: 2
@@ -2193,9 +2193,9 @@ frs:
         screen: API
         title: Action not allowed in the stage
         steps:
-          - Call the workflow action terms_final on PKR-2026-900001 (DRAFT).
+          - Send a direct request for the workflow action Terms final on PKR-2026-900001 (DRAFT).
         expected: Refused.
-        msg: ["'terms_final' is not allowed while PKR-2026-900001 is in stage {Draft request}", WORKFLOW_TRANSITION_NOT_ALLOWED]
+        msg: ["'{Terms final}' is not allowed while PKR-2026-900001 is in stage {Draft request}", WORKFLOW_TRANSITION_NOT_ALLOWED]
       - c: 2
         type: Positive
         persona: SYSADMIN
@@ -2229,7 +2229,7 @@ frs:
         title: The maker cannot authorise the criterion
         steps:
           - As mbs open My Approvals.
-        expected: UAT1 is not offered to mbs; a direct authorise call is refused.
+        expected: UAT1 is not offered to mbs; a direct authorise request is refused.
         msg: [A record cannot be authorized by the user who maintained it, MAKER_CHECKER_VIOLATION]
       - c: 2
         type: Negative
@@ -2277,7 +2277,7 @@ frs:
         type: Negative
         title: Direct edit of an active criterion
         steps:
-          - Call PUT /api/v1/catalog/incentive-criteria/{id} on the active CPC2.
+          - Send a direct request to change the active CPC2 criterion.
         expected: Refused.
         msg: [An active criterion is changed by amending it (successor), INCENTIVE_ACTIVE_LOCKED]
       - c: 3
@@ -2341,85 +2341,85 @@ access:
     allow: [MKT_AO, MKT_TL, TSU]
     deny: [MBS, MANCOM, AUDITOR]
     allowed: New Package Request is shown; the draft is saved and submitted.
-    denied: New Package Request is not shown; POST /requests returns HTTP 403 (ACCESS_DENIED).
+    denied: New Package Request is not shown; a direct request is refused.
   - action: Approve a package request (Marketing)
     screen: REQ
     permission: PKG_REQUEST_APPROVE
     allow: [MKT_TL]
     deny: [MKT_AO, TSU, TSU_HEAD]
-    denied: Approve and send to TSU is not shown; the API call returns HTTP 403.
+    denied: Approve and send to TSU is not shown; the direct request is refused.
   - action: Recommend a request (TSU TL)
     screen: TSUWB
     permission: PKG_TSU_RECOMMEND
     allow: [TSU_TL]
     deny: [TSU, TSU_HEAD, MKT_TL]
-    denied: Recommend for approval is not shown; the API call returns HTTP 403.
+    denied: Recommend for approval is not shown; the direct request is refused.
   - action: Approve a request (TSU Head)
     screen: TSUWB
     permission: PKG_TSU_APPROVE
     allow: [TSU_HEAD]
     deny: [TSU, TSU_TL, MKT_TL]
-    denied: Approve for negotiation is not shown; the API call returns HTTP 403.
+    denied: Approve for negotiation is not shown; the direct request is refused.
   - action: Prepare quotation slips and key in responses
     screen: NEG
     permission: PKG_NEGOTIATE
     allow: [TSU, TSU_TL]
     deny: [MKT_AO, MKT_TL, MBS]
-    denied: The Negotiation tab is read only; round and response calls return HTTP 403.
+    denied: The Negotiation tab is read only; direct round and response requests are refused.
   - action: Approve a quotation slip
     screen: NEG
     permission: PKG_QS_APPROVE
     allow: [TSU_TL]
     deny: [TSU, TSU_HEAD]
-    denied: Approve and send is not shown; the API call returns HTTP 403.
+    denied: Approve and send is not shown; the direct request is refused.
   - action: ManCom sign-off
     screen: REQM
     permission: PKG_MANCOM_SIGNOFF
     allow: [MANCOM]
     deny: [TSU, TSU_HEAD, MBS]
-    denied: Sign off and send to MBS is not shown; POST /signoff returns HTTP 403.
+    denied: Sign off and send to MBS is not shown; a direct request is refused.
   - action: Set up or retire a package (MBS)
     screen: SETUP
     permission: PRODUCT_MAINTAIN
     allow: [MBS]
     deny: [TSU, TSU_HEAD, BUSINESS_ADMIN]
-    denied: Set up package version is not shown; POST /setup returns HTTP 403.
+    denied: Set up package version is not shown; a direct request is refused.
   - action: Validate and release a package version
     screen: VALQ
     permission: PRODUCT_VALIDATE
     allow: [TSU_HEAD, BUSINESS_ADMIN]
     deny: [MBS, MKT_AO, TSU]
-    denied: Validation Queue is not in the menu; POST /validate returns HTTP 403.
+    denied: Validation Queue is not in the menu; a direct request is refused.
   - action: Send a package advisory
     screen: ADV
     permission: PKG_ADVISORY
     allow: [TSU, TSU_TL]
     deny: [MKT_AO, MBS]
-    denied: Send is not shown; POST /advisories/{aid}/send returns HTTP 403.
+    denied: Send is not shown; a direct request is refused.
   - action: Open Package Expiry and generate renewal requests
     screen: EXPIRY
     permission: PKG_NEGOTIATE, PRODUCT_MAINTAIN or PKG_REPORT_VIEW
     allow: [TSU, MBS, TSU_HEAD]
     deny: [MKT_AO]
-    denied: Package Expiry is not in the menu; GET /expiry returns HTTP 403.
+    denied: Package Expiry is not in the menu; a direct request is refused.
   - action: View expired and retired packages
     screen: PRODUCTS
     permission: PRODUCT_ARCHIVE_VIEW
     allow: [MBS, TSU_HEAD, BUSINESS_ADMIN, AUDITOR]
     deny: [MKT_AO, TSU]
-    denied: The Expired and Retired filters are not shown; ?lifecycle=EXPIRED returns HTTP 403.
+    denied: The Expired and Retired filters are not shown; a direct request for them is refused.
   - action: Maintain coverages, clauses and field rules
     screen: COVCL
     permission: PRODUCT_MAINTAIN
     allow: [MBS]
     deny: [MKT_AO, TSU_HEAD]
-    denied: New buttons are not shown; POST /catalog/coverages returns HTTP 403.
+    denied: New buttons are not shown; a direct request is refused.
   - action: Authorise product masters, criteria and rate exceptions
     screen: APPROVALS
     permission: PRODUCT_AUTHORIZE
     allow: [BUSINESS_ADMIN, NB_APPROVER]
     deny: [MBS, TSU_HEAD]
-    denied: The records are not offered in My Approvals; the authorise call returns HTTP 403.
+    denied: The records are not offered in My Approvals; a direct authorise request is refused.
   - action: Maintain incentive criteria
     screen: INCENT
     permission: INCENTIVE_CRITERIA_MAINTAIN
@@ -2431,4 +2431,4 @@ access:
     permission: PKG_REPORT_VIEW
     allow: [MKT_TL, TSU_HEAD, MBS, AUDITOR]
     deny: [MKT_AO, TSU]
-    denied: The three reports are not listed; the run call returns HTTP 403.
+    denied: The three reports are not listed; a direct run request is refused.

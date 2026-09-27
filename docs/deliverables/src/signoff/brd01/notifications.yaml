@@ -87,7 +87,7 @@ notifications:
     channel: E-mail
     trigger: Send via Email on an approved quotation, or the batch send of approved quotations (one e-mail per client)
     recipient: The client (address on file, changeable in the dialog) and any Cc
-    template: "Subject: Insurance quotation <Proposal No.> – <product>. Body: Dear <client>, Please find attached our quotation <Proposal No.> (ARN <ARN>), valid until <date>. The documents are password protected; the password follows in a separate e-mail. To proceed, reply to this e-mail confirming your acceptance. BDO Insurance and Reinsurance Brokers, Inc."
+    template: "Subject: Insurance quotation <Quotation No.> – <product>. Body: Dear <client>, Please find attached our quotation <Quotation No.> (ARN <ARN>), valid until <date>. The documents are password protected; the password follows in a separate e-mail. To proceed, reply to this e-mail confirming your acceptance. BDO Insurance and Reinsurance Brokers, Inc."
     content: The quotation letter (PDF) and schedule (Excel) of the current version, password protected
     screen: Quotation record, Quotations
     frs: [FR-NB-044, FR-NB-013]

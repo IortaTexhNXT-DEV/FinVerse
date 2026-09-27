@@ -15,9 +15,9 @@ screens:
       - {state: tsu, user: tsu, path: "/proposals", tab: "With TSU", caption: "With TSU tab as seen by the TSU officer"}
     fields:
       - "Tabs | Drafts / For Approval / With TSU / With Client / Accepted / Not Proceeded | Tab | - | - | Fixed | Drafts | - | With TSU lists every TSU stage; With Client lists released and sent proposals | -"
-      - "Search | Search Proposal No. | Text | PRF reference, ARN or client | N | - | Blank | - | Contains search | -"
+      - "Search | Search PRF No., ARN or client | Text | PRF No., ARN or client | N | - | Blank | - | Contains search | -"
       - "Search | Only My PRFs | Check box | - | N | - | Not ticked | - | PRFs created by the user | -"
-      - "List | Proposal No. | Column | PRF-yyyy-nnnnnn and the creation date | - | Numbering (PROPOSAL_NUMBER_PREFIX) | - | Read only | - | -"
+      - "List | PRF No. | Column | PRF-yyyy-nnnnnn and the creation date | - | Numbering (PROPOSAL_NUMBER_PREFIX) | - | Read only | - | -"
       - "List | ARN | Column | ARN-yyyy-nnnnnn | - | Numbering | - | Read only | - | -"
       - "List | Client | Column | Name and code | - | Client master | - | Read only | - | -"
       - "List | Product | Column | Product code | - | Product catalogue | - | Read only | - | -"

@@ -6,7 +6,7 @@ screens:
     route: /quotations
     purpose: >-
       The work list of package quotations from draft to acceptance, with status tabs, quick filters and a search by
-      Proposal No., ARN or client. Approved quotations are selected here and sent in one batch, one e-mail per client.
+      Quotation No., ARN or client. Approved quotations are selected here and sent in one batch, one e-mail per client.
     entry:
       - Client record › Quotation tab
       - The quotation links of My Work and the NB Dashboard
@@ -16,10 +16,10 @@ screens:
     fields:
       - "Quick filters | My Drafts / For Review / Sent / Accepted / Expiring | Toggle buttons | - | - | Fixed | None | - | Each selects a tab; My Drafts shows the user's own drafts; Expiring shows approved and sent quotations whose validity ends within QUOTATION_EXPIRING_DAYS (7) | -"
       - "Tabs | Drafts / For Review / Sent to Client / Accepted / Not Proceeded | Tab | - | - | Fixed | Drafts | - | For Review also lists approved quotations; Accepted also lists converted ones; Not Proceeded also lists voided ones | -"
-      - "Search | Search Proposal No. | Text | Proposal No., ARN or client | N | - | Blank | - | Contains search | -"
+      - "Search | Search Quotation No., ARN or client | Text | Quotation No., ARN or client | N | - | Blank | - | Contains search | -"
       - "Filters | Only My Drafts / Expiring within 7 days | Check box | - | N | - | Not ticked | - | Same as the quick filters | -"
       - "List | Select | Check box | One per row, plus select all | N | - | Not ticked | Shown to QUOTE_MAINTAIN | Only approved quotations are sent in the batch | -"
-      - "List | Proposal No. | Column | QT-yyyy-nnnnnn with its version (v1, v2...) | - | Numbering | - | Read only | - | -"
+      - "List | Quotation No. | Column | QT-yyyy-nnnnnn with its version (v1, v2...) | - | Numbering | - | Read only | - | -"
       - "List | ARN | Column | ARN-yyyy-nnnnnn, copy chip | - | Numbering | - | Read only | - | -"
       - "List | Client | Column | Name and code | - | Client master | - | Read only | - | -"
       - "List | Product | Column | Product code | - | Product catalogue (BRD-3) | - | Read only | - | -"
@@ -85,7 +85,7 @@ screens:
       - "4. Premium | TSU routing notice | Banner | - | - | TSU routing rules | - | Read only | Shown when a TSU rule applies | TSU routing applies: <reason>. Consider a Proposal Request (PRF) for TSU to price the risk with the insurers."
       - "5. Review | Summary | Display | Client, product, insurer, period, valid until, risk items, accounts (risk groups), direct payment | - | - | - | Read only | - | -"
     actions:
-      - "Save Draft | QUOTE_MAINTAIN | Client and product chosen | Saves the draft; the first save gives the Proposal No. (QT-yyyy-nnnnnn) and the ARN | Draft | -"
+      - "Save Draft | QUOTE_MAINTAIN | Client and product chosen | Saves the draft; the first save gives the Quotation No. (QT-yyyy-nnnnnn) and the ARN | Draft | -"
       - "Next / Back | Every user of the screen | Always | Moves between steps; Next checks the step first | - | -"
       - "Submit for Review | QUOTE_MAINTAIN | Step 5, client and product chosen | Saves, checks items, premium and validity, freezes the version and sends it for approval | For review | Workflow notice"
     rules:
@@ -103,7 +103,7 @@ screens:
     route: /quotations/:id
     parent: /quotations
     purpose: >-
-      One quotation with its Proposal No., ARN, status and version selector, the client's instructions, the rate
+      One quotation with its Quotation No., ARN, status and version selector, the client's instructions, the rate
       scheme panel, the workflow panel with the business actions, and tabs for details, items and premium, versions and
       their differences, documents, e-mails and history.
     entry:
@@ -120,7 +120,7 @@ screens:
       - "Summary | Client, Product, Insurer, Period, Valid until, Gross premium | Display | - | - | Quotation | - | Read only | - | -"
       - "Summary | Direct Payment / TSU Rule Applies tags | Tag | - | - | Quotation | - | Read only | - | -"
       - "Rate scheme panel | Priced on package version n | Banner | Shown when an item rate differs from the scheme rate or a rate exception exists | - | Package versions (BRD-3) | - | Read only | Submission needs an approved rate exception when a rate differs | The quotation is priced on version <n> of <product>; version <m> is current: save the quotation again to re-price it"
-      - "Details tab | Quotation | Display | Proposal No., ARN, client, client e-mail, product, segment, channel, insurer and branch, period, valid until, premium payment, remarks | - | Quotation | - | Read only | - | -"
+      - "Details tab | Quotation | Display | Quotation No., ARN, client, client e-mail, product, segment, channel, insurer and branch, period, valid until, premium payment, remarks | - | Quotation | - | Read only | - | -"
       - "Details tab | Control | Display | Intake template, version (open or submitted), created, submitted, approved, sent, accepted, accepted risk groups, accounts | - | Quotation | - | Read only | - | -"
       - "Items & Premium tab | Risk items | Table | #, Risk Group, Risk, Sum Insured, Rate %, Premium | - | Quotation version | - | Read only | - | -"
       - "Items & Premium tab | Premium | Display | Appendix A breakdown | - | Premium computation | - | Read only | - | -"
@@ -129,7 +129,7 @@ screens:
       - "Documents tab | Documents | Documents panel | See Common screen elements | - | Documents | - | See Common screen elements | - | -"
       - "E-mails tab | E-mails | Table | Sent and queued e-mails of the quotation with their outcome | - | Outbound messages | - | Read only | - | -"
       - "History tab | History | Timeline | Stage, action, user, time, reason and comment | - | Workflow history | - | Read only | - | -"
-      - "Send via Email dialog | To, Cc, Subject, Message | Text | Separate several addresses with commas | To, Subject and Message Y | Client e-mail; standard subject and text | Client e-mail, Insurance quotation <Proposal No.> – <product>, standard text | Approved | At least one valid address | Enter at least one recipient / Invalid e-mail address: <address>"
+      - "Send via Email dialog | To, Cc, Subject, Message | Text | Separate several addresses with commas | To, Subject and Message Y | Client e-mail; standard subject and text | Client e-mail, Insurance quotation <Quotation No.> – <product>, standard text | Approved | At least one valid address | Enter at least one recipient / Invalid e-mail address: <address>"
       - "Send via Email dialog | Password hint for the recipient | Text | Free text | N | - | Blank | Approved | - | -"
       - "Record Acceptance dialog | Client's acceptance e-mail | File | .eml, .msg or PDF | Cond.: unless already attached | - | - | Sent to client | The acceptance e-mail is attached before acceptance is recorded | Attach the client's acceptance e-mail (document type Client acceptance e-mail) first"
       - "Record Acceptance dialog | Risk groups accepted | Check boxes | One per risk group; shown with 2 or more groups | Y (at least one) | Quotation risk groups | All groups | Sent to client | Only the offered groups | The quotation offers risk groups <groups> only"

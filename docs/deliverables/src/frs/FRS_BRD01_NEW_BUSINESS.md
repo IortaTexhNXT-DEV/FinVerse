@@ -1408,7 +1408,7 @@ screens: "New Quotation (wizard); Quotation page"
 api: "POST /api/v1/quotations; POST /api/v1/quotations/preview; PUT /api/v1/quotations/{id}"
 description:
   - "The AO creates a quotation (for example IDF, FFYMI) in a wizard - client or prospect, product, risk items, premium, review. A client or prospect code is enough (BRNB.029); a quotation of a prospect with incomplete information is flagged. BIBS rates the risk with the Appendix A formulas (FR-NB-062) and shows the live premium breakdown."
-  - "On first save the quotation gets its number (QT-yyyy-nnnnnn, shown as Proposal No.), its ARN (BRNB.102), version 1 and its work case (DRAFT). The TSU routing result is shown (FR-NB-005). For a package product, the quotation uses the package version in force (BRD-3); a non-standard item rate is asked through **Request Rate Exception** (BRD-3 FRS FR-PM-051)."
+  - "On first save the quotation gets its number (QT-yyyy-nnnnnn, shown as Quotation No.), its ARN (BRNB.102), version 1 and its work case (DRAFT). The TSU routing result is shown (FR-NB-005). For a package product, the quotation uses the package version in force (BRD-3); a non-standard item rate is asked through **Request Rate Exception** (BRD-3 FRS FR-PM-051)."
   - "Items carry a risk group; each accepted risk group later becomes one account (FR-NB-045)."
 preconditions:
   - "The user has QUOTE_MAINTAIN; the client or prospect is active."
@@ -4104,7 +4104,7 @@ The items below are changed in BIBS without a release. Changes to parameters, li
 <!-- table: widths=5.8,4.4,6.4 caption="New Business parameters" size=8.5 -->
 | Parameter | Default | Meaning |
 |---|---|---|
-| QUOTATION_NUMBER_PREFIX | QT | Prefix of quotation numbers (<prefix>-yyyy-nnnnnn, shown as Proposal No.) |
+| QUOTATION_NUMBER_PREFIX | QT | Prefix of quotation numbers (<prefix>-yyyy-nnnnnn, shown as Quotation No.) |
 | QUOTATION_REQUEST_PREFIX | REQ | Prefix of quotation request numbers |
 | QUOTATION_VALIDITY_DAYS | 30 | Default validity of a quotation |
 | QUOTATION_EXPIRING_DAYS | 7 | Window of the Expiring filter |

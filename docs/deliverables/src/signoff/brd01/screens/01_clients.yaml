@@ -128,7 +128,7 @@ screens:
       - {state: approval, user: mkttl, open: kyc_review, caption: "Client in KYC review as seen by the verifier (Verify KYC offered)"}
     fields:
       - "Header | Prospect / Client | Reference | PR-yyyy-nnnnnn; CL-yyyy-nnnnnn once confirmed | - | Numbering | Generated | Read only | - | -"
-      - "Header | Status and KYC badges | Status | Prospect, Confirmed, Inactive; KYC Not started, Pending, Verified, Expired | - | Onboarding | - | Read only | - | -"
+      - "Header | [Status and KYC badges] | Status | Prospect, Confirmed, Inactive; KYC Not started, Pending, Verified, Expired | - | Onboarding | - | Read only | - | -"
       - "Header | Information Incomplete tag | Tag | Lists the missing minimum fields | - | Parameters CLIENT_MIN_FIELDS_* | - | Read only | - | Client information incomplete: <fields>. Complete it before submitting the KYC."
       - "Header | Instructions banner | Banner | Tags and special instructions in force | - | Tags & Instructions tab | - | Read only | - | -"
       - "Workflow panel | Stage, since, due, assignee | Panel | Stage name, entry date and time, SLA due time, assignee | - | Workflow NB_CLIENT | - | Read only | - | -"
@@ -144,7 +144,7 @@ screens:
       - "Tags & Instructions tab | Effective from | Date (dialog) | dd-MMM-yyyy | Y | - | Today | Prospect, confirmed | - | Enter the first day"
       - "Tags & Instructions tab | Effective to | Date (dialog) | dd-MMM-yyyy; blank = until further notice | N | - | Blank | Prospect, confirmed | Not before Effective from | The end date must not be before the start date"
       - "Tags & Instructions tab | Change history | Table | When, User, Item, Change, From → to | - | Note history | - | Read only | - | -"
-      - "Quotation tab | [Quotations of the client] | Table | Proposal No., status, product, premium | - | Quotations | - | Read only | - | -"
+      - "Quotation tab | [Quotations of the client] | Table | Quotation No., status, product, premium | - | Quotations | - | Read only | - | -"
       - "Confirmed Proposals tab | [Accepted proposal requests] | Table | PRF, status, product | - | Proposal requests | - | Read only | - | -"
       - "Linked Records tab | Linkage and data gaps | Warning list | Missing sub-ledger party, inactive party, incomplete data, expired KYC | - | Client 360 check | - | Read only | - | Confirmed client without a sub-ledger party code"
       - "Linked Records tab | Records of the client | Table | Record, Reference, Description, Status, Date | - | Quotations, proposals, accounts | - | Read only | - | -"

@@ -324,7 +324,7 @@ class Pack:
         parts = []
         for p in (REPO / "frontend" / "src").rglob("*.ts*"):
             if not re.search(r"\.(test|spec)\.tsx?$", p.name):
-                parts.append(p.read_text(encoding="utf-8", errors="ignore"))
+                parts.append(code_facts._strip_comments(p.read_text(encoding="utf-8", errors="ignore")))
         for wf in code_facts.workflows().values():
             parts += [str(x.get("name") or "") for x in wf["stages"]]
             parts += [str(x.get("label") or "") for x in wf["transitions"]]

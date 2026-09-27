@@ -261,7 +261,7 @@ fixes:
   "Duplicate risks: <list>": Remove the duplicate risk item, or open the account that already covers it.
   "Not ready to submit: <list>": Complete the items listed, then submit.
   "These risks are already on account <list> — open the existing account instead of creating a new one.": Open the existing account instead of creating a new one.
-  "Rejected by <reviewed by>: <reject reason>": Ask the insurer for a corrected e-policy and upload it again.
+  "Rejected by <user>: <reject reason>": Ask the insurer for a corrected e-policy and upload it again.
   "The policy numbers must be different.": Enter different policy numbers for the two policies.
   "A negative endorsement reduces the sum insured (enter a minus)": Enter the sum insured change with a minus sign.
   "A positive endorsement increases the sum insured": Enter the sum insured change as a positive amount.

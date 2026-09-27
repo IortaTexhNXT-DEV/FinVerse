@@ -18,15 +18,15 @@ screens:
     fields:
       - "Tiles | Awaiting Payment / Ready for Placement / Placed / Returned by Insurer / Hold Cover Expiring | Tile | Counts; the last two are alerts | - | Accounts | - | - | A tile opens its tab | -"
       - "Tabs | For Placement & Booking / Booked Account / Awaiting Payment / Returned by Insurer / Hold Cover Expiring / Cancelled Placement | Tab | - | - | Fixed | For Placement & Booking | - | - | -"
-      - "Search | Search Proposal No. | Text | ARN or client | N | - | Blank | - | Contains search | -"
+      - "Search | Search Reference No. | Text | ARN or client | N | - | Blank | - | Contains search | -"
       - "List | Select | Check box | One per row, plus select all | N | - | Not ticked | - | A bulk action is enabled only when every selected row is eligible | -"
       - "List | Name / Client Code | Column | Client name (opens the account placement) and code | - | Client master | - | Read only | - | -"
-      - "List | Proposal No. | Column | The account's ARN and its current slip | - | Account, placement slip | - | Read only | - | -"
+      - "List | ARN | Column | The account's ARN and its current slip | - | Account, placement slip | - | Read only | - | -"
       - "List | Status | Column | Stage badge; hold cover status and expiry | - | Workflow NB_ACCOUNT, hold cover | - | Read only | - | -"
       - "List | Product Line | Column | Line, product and insurer | - | Product catalogue | - | Read only | - | -"
       - "List | Department | Column | Sales department | - | Sales organisation | - | Read only | - | -"
       - "List | Gross Premium | Column | Amount | - | Premium computation | - | Read only | - | -"
-      - "Generate Placement Slips dialog | Placement prerequisites | Table | Proposal No., Insurer, Prerequisites: valid, or the unmet prerequisites | - | Placement prerequisites | - | Read only | Payment gate open, documents complete, TSU cleared, insurer and branch reachable by e-mail | Placement prerequisites not met - <problems>"
+      - "Generate Placement Slips dialog | Placement prerequisites | Table | ARN, Insurer, Prerequisites: valid, or the unmet prerequisites | - | Placement prerequisites | - | Read only | Payment gate open, documents complete, TSU cleared, insurer and branch reachable by e-mail | Placement prerequisites not met - <problems>"
     actions:
       - "CLPC Billing | BILLING_MANAGE | Always | Opens CLPC Billing | - | -"
       - "For Placement | PLACEMENT_MANAGE | Selected accounts all ready for placement | Opens Generate Placement Slips; Generate Slips creates one slip per insurer branch as PDF and Excel | Unchanged until the slip is sent | -"

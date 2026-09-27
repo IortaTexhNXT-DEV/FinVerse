@@ -13,7 +13,7 @@ meta:
   frs: FRS_BRD01_NEW_BUSINESS.md
   test_plan: brd01_cases.yaml
   screens_dir: screens
-  screenshot_dir: screenshots
+  screenshot_dir: ../../frs/figures/brd01
 
 # The New Business personas: role code, name, SIT/UAT user of the seed profile.
 personas:
@@ -131,7 +131,7 @@ common:
       dd-MMM-yyyy HH:mm in Philippine time.
   - name: Record summary and reference chips
     text: >-
-      A record opens with its reference (Proposal No., PRF, ARN, invoice), its status badge and the key facts. A
+      A record opens with its reference (Quotation No., PRF No., ARN, invoice), its status badge and the key facts. A
       reference chip copies the reference and an ARN chip opens the account.
   - name: Workflow panel
     text: >-

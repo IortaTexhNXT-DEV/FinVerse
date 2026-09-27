@@ -1,0 +1,206 @@
+// How capture_pack.cjs reaches each screen state of the BRD-01 New Business sign-off pack on the seed profile:
+// the record to open for a status (seed database), what is typed into the forms (fictitious seed values), the
+// rows selected, the files uploaded, the walkthrough steps and the generated documents.
+const walkthrough = require('./brd01_walkthrough.cjs');
+const documents = require('./brd01_documents.cjs');
+
+// ------------------------------------------------------------------ helpers
+
+/** Picks the first match of a client look-up (type part of the code or name, then click the match). */
+function pickClient(label, text) {
+  return async (page) => {
+    const input = page.getByLabel(new RegExp(`^${label}`)).first();
+    await input.fill(text);
+    const option = page.locator('.client-option').filter({ hasText: text }).first();
+    await option.waitFor({ timeout: 15000 });
+    await option.click();
+    await page.waitForTimeout(600);
+  };
+}
+
+function click(name) {
+  return async (page) => {
+    await page.getByRole('button', { name: new RegExp(name, 'i') }).first().click();
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForTimeout(900);
+  };
+}
+
+/** Ticks the check box of the first table row whose text matches. */
+function tickRow(text) {
+  return async (page) => {
+    const row = page.locator('table tbody tr').filter({ hasText: new RegExp(text) }).first();
+    await row.waitFor({ timeout: 15000 });
+    await row.locator('input[type=checkbox]').first().check();
+    await page.waitForTimeout(400);
+  };
+}
+
+const NEXT = click('^next$');
+
+// ------------------------------------------------------------------ forms
+
+const newClient = [
+  ['Client type', 'Individual'],
+  ['Last name', 'Bautista'],
+  ['First name', 'Carmela'],
+  ['Middle name', 'Reyes'],
+  ['Birth date', '14-Mar-1988'],
+  ['Nationality', 'Filipino'],
+  ['Civil status', 'Married'],
+  ['Occupation', 'Architect'],
+  ['TIN', '417-238-906-000'],
+  ['ID type', 'Passport'],
+  ['ID number', 'P4172389A'],
+  ['E-mail', 'carmela.bautista@seed-client.ph'],
+  ['Mobile', '09175550417'],
+  ['Street address', '12 Mabini Street, Barangay San Antonio'],
+  ['City / municipality', 'Pasig City'],
+  ['Province', 'Metro Manila'],
+  ['Postal code', '1605'],
+  ['Market segment', 'CBG'],
+  ['The client banks with BDO', true],
+  ['BDO CIF number', '0041723890'],
+  ['Source of funds', 'Salary'],
+];
+
+const quotationTerms = [
+  pickClient('Client or prospect', 'Garcia'),
+  NEXT,
+  ['Product', '^PAR01'],
+  ['Insurer', 'Mabuhay'],
+];
+
+const quotationItems = [
+  ...quotationTerms,
+  NEXT,
+  click('add location'),
+  ['Address', '45 Kalayaan Avenue, Barangay Pinyahan'],
+  ['City', 'Quezon City'],
+  ['Province', 'Metro Manila'],
+  ['Occupancy', 'Dwelling'],
+  ['Construction class', 'Class 1'],
+  ['Description', 'Two-storey concrete residence'],
+  ['Sum insured', '4500000'],
+];
+
+const accountClient = [pickClient('Client', 'Garcia'), NEXT];
+const accountProduct = [
+  ['Market segment', 'CBG'],
+  ['Product', '^PAR01'],
+  ['Source channel', 'Walk-in'],
+  ['Insurer', 'Mabuhay'],
+  ['Insurer branch', 'Makati'],
+];
+
+const fills = {
+  new_client: newClient,
+  new_client_invalid: [
+    ['Last name', 'Bautista'],
+    ['First name', 'Carmela'],
+    ['TIN', '41723'],
+    ['E-mail', 'carmela.bautista'],
+    ['Mobile', '0917555'],
+  ],
+  new_client_duplicate: (ctx) => [
+    ['Last name', 'Santos'],
+    ['First name', 'Maria Clara'],
+    ['TIN', ctx.one("select tin from crm_client where last_name = 'Santos' and tin is not null order by id limit 1")],
+    async (page) => page.waitForTimeout(2500),
+  ],
+  quotation_terms: quotationTerms,
+  quotation_items: [...quotationItems, async (page) => page.waitForTimeout(1500)],
+  quotation_no_items: [...quotationTerms, NEXT],
+  prf_form: [
+    pickClient('Client or prospect', 'Pacific Harbor'),
+    ['Product line and risk code', '^CAR00'],
+    ['Market segment', 'Commercial'],
+    ['Period from', '01-Nov-2026'],
+    ['Period to', '01-Nov-2027'],
+    async (page) => {
+      const details = page.getByLabel(/^Details/);
+      const texts = [
+        'Construction of a four-storey warehouse and office building, Laguna Technopark, Biñan City.',
+        'Warehouse and office; contractor Pacific Harbor Logistics Inc. with its sub-contractors.',
+        'No claims in the last five years.',
+        "Contractor's all risks for the contract works of PHP 85,000,000 and third party liability of PHP 5,000,000.",
+      ];
+      for (let i = 0; i < texts.length && i < (await details.count()); i += 1) {
+        await details.nth(i).fill(texts[i]);
+      }
+    },
+    ['Luzon Assurance Co.', true],
+    ['Mabuhay General Insurance Corp.', true],
+    ['Visayas Mutual Insurance', true],
+  ],
+  account_period: [
+    ...accountClient,
+    ...accountProduct,
+    NEXT,
+    ['Mortgagee bank', 'BDO Home Loans'],
+    ['Loan application no.', 'HL-2026-0417'],
+    ['PN numbers', 'PN-0417-2026'],
+  ],
+  account_duplicate: (ctx) => {
+    const code = ctx.one("select client_code from acc_account where arn = 'ARN-2026-940007'");
+    return [
+      pickClient('Client', code),
+      NEXT,
+      ['Market segment', 'CBG'],
+      ['Product', '^PAR01'],
+      ['Source channel', 'Walk-in'],
+      ['Insurer', 'Mabuhay'],
+      NEXT,
+      NEXT,
+      async (page) => page.waitForTimeout(1500),
+    ];
+  },
+  epolicy_bulk: [],
+};
+
+// ------------------------------------------------------------------ records by status
+
+const opens = {
+  kyc_review: (ctx) => `/crm/clients/${ctx.one("select id from crm_client where onboarding_stage = 'KYC_REVIEW' order by id limit 1")}`,
+  approved: (ctx) => `/quotations/${ctx.one("select id from quo_quotation where status = 'APPROVED' order by id limit 1")}`,
+  with_tsu: (ctx) => `/proposals/${ctx.one("select id from npk_proposal where status = 'WITH_TSU' order by id limit 1")}`,
+  terms_received: (ctx) => `/proposals/${ctx.one("select id from npk_proposal where status = 'TERMS_RECEIVED' order by id limit 1")}`,
+  draft_account: (ctx) => `/accounts/${ctx.one("select id from acc_account where status = 'DRAFT' and product_code like 'PAR%' order by id limit 1")}/edit`,
+  submitted_account: (ctx) => `/accounts/${ctx.one("select id from acc_account where status = 'SUBMITTED' and product_code like 'PAR%' order by id limit 1")}`,
+  awaiting_payment_other_lines: (ctx) => `/placement/accounts/${ctx.one("select arn from acc_account where status = 'AWAITING_PAYMENT' order by id desc limit 1")}`,
+  placed_with_hold_cover: (ctx) => `/placement/accounts/${ctx.one("select arn from acc_account where hold_cover_status is not null order by id limit 1")}`,
+  'open_slip:generated': () => '/placement/slips',
+  'open_report:review': (ctx) => `/placement/billing/reports/${ctx.one("select id from plc_payment_report where status = 'REVIEW' order by id limit 1")}`,
+  'open_epolicy:review': (ctx) => `/issuance/epolicies/${ctx.one("select id from iss_epolicy where status = 'REVIEW' order by id limit 1")}`,
+  'open_booking:first_ready': (ctx) => `/booking/book/${ctx.one("select arn from acc_account a where status = 'POLICY_ISSUED' and not exists (select 1 from bkg_queue q where q.arn = a.arn) order by id desc limit 1")}`,
+  'open_invoice:first': (ctx) => `/booking/invoices/${ctx.one("select id from bkg_invoice where status = 'BOOKED' order by id limit 1")}`,
+  'open_endorsement:booked_account': (ctx) => `/booking/endorsements/new?arn=${ctx.one("select arn from acc_account where status = 'BOOKED' order by id limit 1")}`,
+};
+
+// ------------------------------------------------------------------ selections and uploads
+
+const selects = {
+  ready_for_placement: tickRow('ARN-2026-9000(07|10)'),
+  first_advice: tickRow('.'),
+  first_ready: tickRow('ARN-'),
+};
+
+const uploads = {
+  client_create_file: async (page, ctx) => {
+    const file = await walkthrough.bulkClientFile(ctx, false);
+    await page.locator('input[type=file]').first().setInputFiles(file);
+    await page.waitForTimeout(800);
+    await page.getByRole('button', { name: /upload|validate|next/i }).last().click().catch(() => {});
+    await page.waitForTimeout(3000);
+  },
+};
+
+// Extra steps after the standard ones, by slug.
+const after = {
+  'scr-nb-20-02-send': async (page) => {
+    await page.locator('table tbody tr').first().click().catch(() => {});
+  },
+};
+
+module.exports = { opens, fills, selects, uploads, after, walkthrough: walkthrough.steps, documents: documents.shots,
+  prepare: walkthrough.prepare };

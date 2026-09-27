@@ -18,10 +18,10 @@ screens:
       - "Tiles | Ready to Book / Queued for Batch / Booked Today / Failed | Tile | Counts; Failed is an alert | - | Booking queue | - | - | A tile opens its tab | -"
       - "Tabs | Ready to Book / Queued for Batch / Booked Account / Failed | Tab | - | - | Fixed | Ready to Book | - | - | -"
       - "Handed-over banner | [Accounts sent from placement] | Banner | The ARNs sent by the Placement Workbench | - | Placement Workbench | - | - | - | <n> account(s) sent from placement for booking: <ARNs>. They are selected on this page when listed."
-      - "Search | Search Proposal No. | Text | ARN or client | N | - | Blank | - | Contains search | -"
+      - "Search | Search Reference No. | Text | ARN or client | N | - | Blank | - | Contains search | -"
       - "Filters | Product line | Drop-down | All product lines, or one | N | Product lines (BRD-3) | All product lines | - | - | -"
       - "List | Select | Check box | - | N | - | Not ticked (handed-over accounts ticked) | - | - | -"
-      - "List | Name / Client Code, Proposal No. (ARN), Invoice No., Status, Product Line, Department, Booking Date | Column | - | - | Accounts, booking queue | - | Read only | - | -"
+      - "List | Name / Client Code, ARN, Invoice No., Status, Product Line, Department, Booking Date | Column | - | - | Accounts, booking queue | - | Read only | - | -"
       - "Book Now / Confirm Batch dialog | Booking date | Date | dd-MMM-yyyy, not in the future | Y | - | Today | - | Its accounting period must be open; not in the future | The booking date <date> is in the future"
       - "Edit queued dialog | Booking date | Date | dd-MMM-yyyy; blank = the batch date | N | - | Blank | Queued | Not in the future | The booking date <date> is in the future"
       - "Edit queued dialog | Cost center | Text | Blank = the account's cost center | N | Sales organisation cost centers | Blank | Queued | - | -"
@@ -56,7 +56,7 @@ screens:
     shots:
       - {state: record, user: proc, open_booking: first_ready, caption: "Pre-booking Confirmation with the invoice and the journal preview"}
     fields:
-      - "Summary | Proposal No. (ARN), Client, Insurer, Period, Product, Status | Display | - | - | Account | - | Read only | - | -"
+      - "Summary | ARN, Client, Insurer, Period, Product, Status | Display | - | - | Account | - | Read only | - | -"
       - "Booking options | Booking date | Date | dd-MMM-yyyy, not in the future | Y | - | Today | Policy issued | Its accounting period must be open | Enter a booking date that is not in the future"
       - "Booking options | Cost center | Text | Up to 20 characters, upper case; blank = the account's cost center | Cond.: when the account has none | Sales organisation | Blank | Policy issued | A cost center is needed for every booking | Enter the cost center of account <ARN> (BRNB.108)"
       - "Booking options | Insurer billing no. | Text | Up to 60 characters | Cond.: Employee Benefits lines (HMO, GLI, GPA) | - | Blank | Policy issued | Unique per insurer | Enter the insurer billing number / Billing number <no> of <insurer> is already on invoice <invoice>"
@@ -194,7 +194,7 @@ screens:
     fields:
       - "List | Run No., Started by, Business Date, Started, Booked, Failed, Status | Column | - | - | Batch runs | - | Read only | - | -"
       - "Run | Accounts, Booked, Failed, Finished | Figure | - | - | Batch run | - | Read only | - | -"
-      - "Run | Results | Table | Proposal No. (ARN), Result, Invoice No., Reason | - | Batch run | - | Read only | - | -"
+      - "Run | Results | Table | ARN, Result, Invoice No., Reason | - | Batch run | - | Read only | - | -"
     actions:
       - "Open a row | Every user of the screen | Always | Opens the run with its results | - | -"
     rules:

@@ -15,10 +15,10 @@ screens:
       - {state: review, user: proc, tab: "Policy Received – Review Extraction", caption: "Policy Received – Review Extraction tab"}
     fields:
       - "Tiles and tabs | Placed – Awaiting Policy / Policy Received – Review Extraction / Ready to Dispatch / IA to Generate | Tile and tab | Counts | - | Accounts and e-policies | Placed – Awaiting Policy | - | A tile opens its tab | -"
-      - "Search | Search Proposal No. | Text | ARN or client | N | - | Blank | - | Contains search | -"
+      - "Search | Search Reference No. | Text | ARN or client | N | - | Blank | - | Contains search | -"
       - "List | Select | Check box | Shown on Ready to Dispatch and IA to Generate | N | - | Not ticked | - | - | -"
       - "List | Name / Client Code | Column | Client name (opens the account placement) and code | - | Client master | - | Read only | - | -"
-      - "List | Proposal No. | Column | The account's ARN | - | Account | - | Read only | - | -"
+      - "List | ARN | Column | The account's ARN | - | Account | - | Read only | - | -"
       - "List | Status | Column | Account stage or e-policy status | - | Workflow NB_ACCOUNT, e-policy | - | Read only | - | -"
       - "List | Product Line | Column | Line, product and insurer | - | Product catalogue | - | Read only | - | -"
       - "List | Policy No. | Column | Policy number(s) | - | Account | - | Read only | - | -"
@@ -113,7 +113,7 @@ screens:
       - "Search | Search IA No., ARN or client | Text | - | N | - | Blank | - | Contains search | -"
       - "List | Select | Check box | - | N | - | Not ticked | - | 1 to 50 advices per send | Select between 1 and 50 Insurance Advices"
       - "List | IA No. | Column | IA-yyyy-nnnnnn | - | Numbering | - | Read only | - | -"
-      - "List | Insured / Proposal No. | Column | Client name and ARN | - | Account | - | Read only | - | -"
+      - "List | Insured / ARN | Column | Client name and ARN | - | Account | - | Read only | - | -"
       - "List | Mortgagee | Column | Mortgagee bank | - | List of values MORTGAGEE_BANK | - | Read only | - | -"
       - "List | Policy No. | Column | Policy number or 'to follow' | - | Account | - | Read only | - | -"
       - "List | Generated | Column | Trigger and time | - | Insurance Advice | - | Read only | - | -"
@@ -145,10 +145,10 @@ screens:
       - {state: report, user: epol, tab: "Dispatch Report", caption: "Dispatch Report tab"}
     fields:
       - "Tabs | Ready to Dispatch / Dispatch Report | Tab | - | - | Fixed | Ready to Dispatch | - | - | -"
-      - "Ready to Dispatch | Name / Client Code, Proposal No., Policy No., E-policy | Column | - | - | Confirmed e-policies not yet sent | - | Read only | - | -"
+      - "Ready to Dispatch | Name / Client Code, ARN, Policy No., E-policy | Column | - | - | Confirmed e-policies not yet sent | - | Read only | - | -"
       - "Send dialog | To, Cc, Subject, Message | Text | As on Send via Email | To, Subject and Message Y | The account contact e-mail and the EPOLICY_EMAIL template | Proposed by the system | Confirmed e-policy | A recipient is known or entered | Account <ARN> has no contact e-mail: enter the recipient"
       - "Send dialog | Password hint | Text | Up to 300 characters | N | Parameter EPOLICY_PASSWORD_HINT | The configured hint | Confirmed e-policy | - | -"
-      - "Dispatch Report | Queued, Proposal No., To, Subject, Outcome, Delivered | Column | Outcome Queued, Sent or Failed with the error | - | Outbound messages | - | Read only | - | -"
+      - "Dispatch Report | Queued, Reference No., To, Subject, Outcome, Delivered | Column | Outcome Queued, Sent or Failed with the error | - | Outbound messages | - | Read only | - | -"
     actions:
       - "Send (row) | EPOLICY_SEND | Ready to Dispatch | Opens the send dialog for the e-policy | Unchanged (e-policy Dispatched) | E-mail to the client and the password e-mail"
       - "Send Selected | EPOLICY_SEND | At least one e-policy selected | Asks for an optional hint and sends each e-policy; the outcome of each is listed | Unchanged | E-mail to each client and the password e-mail"

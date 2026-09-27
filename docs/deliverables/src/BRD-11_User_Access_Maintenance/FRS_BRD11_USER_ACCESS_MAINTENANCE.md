@@ -20,13 +20,13 @@ control:
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Solution Architect
     approver: ""
-    change: Internal draft from the BRD-11 baseline, the build design and the built access functions
+    change: Internal draft from the BRD-11 baseline
   - version: "1.0"
     date: 25 Sep 2026
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Product Owner (pending)
-    change: First issue for BDOI review; built access functions as the baseline, BRD changes specified from the design; aligned with the cross-BRD decisions
+    change: First issue for BDOI review; aligned with the cross-BRD decisions
   - version: "1.1"
     date: 26 Sep 2026
     author: iorta TechNXT Business Analysis
@@ -38,7 +38,7 @@ control:
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Project Manager
     approver: BDOI business owner, Information Security and BDOI IT (sign-off)
-    change: "Business sign-off pack: the functions described as built (built codes and messages in every FR, section 2.3 as built), built behaviour that differs from the BRD (section 10.4), the menu of every persona, screen specifications with screenshots, walkthroughs, messages, notifications, reports as documents, the bulk upload, configuration inputs the business provides, cross-BRD contract, sign-off and change control (chapters 12-21). Status as of 27-Sep-2026. FR, BRD and test IDs kept"
+    change: "Business sign-off pack: the messages and codes of the screens in every FR, the access functions of section 2.3, proposed business rules and clarifications for confirmation (chapter 22), the menu of every persona, screen specifications with screenshots, walkthroughs, messages, notifications, reports as documents, the bulk upload, configuration inputs the business provides, cross-BRD contract, sign-off and change control (chapters 12-21). Issued 27-Sep-2026. FR, BRD and test IDs kept"
 distribution:
   - {name: "Product Owner, Marketing Business System", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Business Administrators (process owner)", role: Business owner, organisation: BDOI, purpose: Review of all FRs}
@@ -47,7 +47,7 @@ distribution:
   - {name: "BDOI IT", role: Signatory, organisation: BDOI, purpose: "Review and sign-off of the sign-in and identity integration assumptions (EIAM, UIDM-ISC) and the System Administrator functions"}
   - {name: "ITIO-SRE and ITSD-AMS", role: System administration, organisation: BDO Unibank, purpose: "Review of the System Administrator functions, sign-in and logs"}
   - {name: "ES-BPDS, Business Project Services", role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
-  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Build, test and UAT preparation"}
+  - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, test and UAT preparation"}
 ---
 
 # Introduction
@@ -56,9 +56,9 @@ distribution:
 
 This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker System, on iNXT BrokerVerse) meets the User Access Maintenance business requirements of BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It turns each BRD requirement into functional requirements with actors, flows, rules, validations, screens, fields, notifications, audit and acceptance criteria.
 
-BDOI uses this document to confirm that user access will be managed as the business expects. The project team uses it to build, test and prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
+BDOI uses this document to confirm that user access will be managed as the business expects. The project team uses it to deliver, test and prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
 
-User access was first built for BRD-1 and BRD-3 (users, roles, permissions, sign-in with lock-out, the session policy, access requests under four eyes and the User Access Matrix); section 2.3 describes that **baseline** and the BRD-11 change to each function. The BRD-11 changes are built: version 2.0 of this document describes the system as built on 27-Sep-2026 and quotes the screen names, messages and codes of the build. Where the build differs from the BRD, or a requirement is not yet built, section 10.4 says so. Chapters 12 to 21 are the business view of the system for the sign-off: the menu of every persona, the screens with their fields and messages, the walkthroughs, the reports, the configuration inputs and the interface contract.
+User access in BIBS covers users, group profiles (roles) and permissions, sign-in with lock-out, the session policy, access requests under four eyes and the User Access Matrix; section 2.3 summarises each access function. The FRs quote the screen names, messages and codes that the users see. Where the proposed rule or screen differs from the BRD, or needs a decision of BDOI, chapter 22 lists it for confirmation. Chapters 12 to 21 are the business view of the system for the sign-off: the menu of every persona, the screens with their fields and messages, the walkthroughs, the reports, the configuration inputs and the interface contract.
 
 ## Scope
 
@@ -79,7 +79,7 @@ The BRD was written in April 2025 for the Quotation and Pre-processing System (Q
 - Infrastructure items the BRD answers with "Follow existing QPS set up" (servers, network, DR, environments, support). They follow the BIBS deployment standards (section 8).
 - Data and user migration: "N/A" in the BRD (p.12). Existing users can be loaded with the bulk request (FR-UA-019).
 - Automatic joiner and leaver feeds from HR. The BRD does not ask for them; bulk requests cover mass changes.
-- The final EUA, LDAP / Active Directory, single sign-on and external ACL connections. BIBS builds the seam and keeps local sign-in until BDO supplies the interfaces (UQ04, UQ14; decision D6 of R4).
+- The final EUA, LDAP / Active Directory, single sign-on and external ACL connections. BIBS keeps local sign-in until BDO supplies the interfaces (UQ04, UQ14; decision D6 of R4).
 
 ## References
 
@@ -113,7 +113,6 @@ Requestor: The user who submits user access requests (BRD section A)
 SSO: Single sign-on
 System Administrator: The IT user who implements group profiles and maintains users and roles (BRD section D)
 UAM-NFR-nn: ID given by the analyst to a non-functional requirement of the BRD (R2 section 7)
-Persona suite: The personas of a BRD with the menu screens each must see, checked automatically against the menu and the role grants of the build (R9)
 Seed data: The fictitious data of the SIT environment (users, requests, profiles) used in the screenshots and walkthroughs
 UAT: User acceptance testing
 UIDM-ISC: BDO's identity governance and administration (IGA) tool, named by BDOI for Drop 0 for joiner, mover and leaver provisioning (owned by BDOI IT)
@@ -128,9 +127,9 @@ Windows ID: The user's BDO network log-on name, used for EUA authentication
 Each FR in section 4 has the same parts:
 
 - A header table with the **BRD trace** (requirement ID and page), the **actor**, the **priority** ("Must have" for the rows the BRD marks "Mandatory: Yes"; rows without a flag are noted) and the **screens** where the user performs it.
-- **Description**, **preconditions**, **main flow** and **alternate and exception flows**. Where BIBS already has the function, the description starts with the baseline and then states the change.
+- **Description**, **preconditions**, **main flow** and **alternate and exception flows**. The description states the proposed behaviour of the function.
 - **Business rules**. *Configurable* rules are maintained by the System Administrator in BIBS (parameter or list of values, section 9). *Fixed* rules are part of the system and change only through a change request.
-- **Validations and messages**: the check, the message the user sees and its code, as built. A "-" marks a screen check (for example a blank mandatory field), which has no business code. Chapter 15 lists every message of the build, read from the code.
+- **Validations and messages**: the check, the message the user sees and its code. A "-" marks a screen check (for example a blank mandatory field), which has no business code. Chapter 15 lists every message, as the screens show it.
 - **Screens and fields**, **notifications**, **audit** and numbered **acceptance criteria**, which are the basis of the BRD-11 test plan.
 
 The BRD lists 160 requirement lines, many of them sub-steps of one function ("create request", "add remarks", "save remarks"). The FRs group them by function; section 11 lists every line with its FR.
@@ -173,20 +172,20 @@ The BRD shows two processes (p.6). The table lists the steps and Figure 1 shows 
 
 <!-- pagebreak -->
 
-## Baseline: access functions built today
+## Access functions
 
-The table lists what BIBS did before BRD-11 and what BRD-11 changed. The FRs refer to it as "the baseline". Every change of the right-hand column is built as of 27-Sep-2026, except the points of section 10.4. The Access Requests and User Access Matrix screens moved from Broking Setup to the User Access section; the old addresses open the new screens.
+The table summarises each access function of BIBS: the screen, the permission and the proposed behaviour. The Access Requests and User Access Matrix screens are in the User Access section of the menu.
 
-<!-- table: widths=3.4,6.6,6.6 caption="Built access functions and the BRD-11 change" size=8.5 -->
-| Function | Built today (screen, permission) | BRD-11 change |
+<!-- table: widths=3.4,6.6,6.6 caption="Access functions of BIBS" size=8.5 -->
+| Function | Screen, permission and main behaviour | Further proposed behaviour |
 |---|---|---|
-| Sign-in and lock-out | Login screen; user name and password; the account locks after LOGIN_MAX_FAILED_ATTEMPTS = 3 failed attempts until an administrator unlocks it; every success and failure is in the audit trail | Directory authentication with the Windows ID (parked seam); log-out and session log |
-| Session policy | Inactivity warning after SESSION_IDLE_WARNING_MINUTES = 15; sign-out after SESSION_TIMEOUT_MINUTES = 30 of inactivity; warning SESSION_EXPIRY_WARNING_MINUTES = 30 before the fixed token expiry | None; confirmed by the BRD (Q42) |
-| Users | Administration > Users (USER_MANAGE): user name, full name, e-mail, roles, authorisation limit, last login, status; unlock and reset password | Windows ID, business unit group, user level, status incl. online; direct edits limited to requests |
-| Roles | Administration > Roles & Permissions (ROLE_MANAGE): create a role, name it, tick permissions | Active flag, description, privilege level; changes only by implementing an approved group-profile request |
-| Access requests | Broking Setup > Access Requests (ACCESS_REQUEST to raise, ACCESS_APPROVE to decide): types Create user, Change roles, Disable user, Enable user, Change role permissions; submitted directly; status PENDING, APPROVED, REJECTED; the approver cannot be the requester; approval applies the change at once and shows a temporary password once | Drafts, return, correction, cancellation, chosen approver(s), new types (modify user, group-profile create / deactivate / reactivate), effective date, bulk, second approval, history, implementation step |
-| Notifications | All holders of ACCESS_APPROVE on submission; the requester on the decision | The chosen approver only; returned, cancelled, second approval, implementation; the affected user |
-| User Access Matrix | Broking Setup > User Access Matrix: roles by permission and by area / action class, Excel export | Every permission gets an area, so the group-profile report shows a module for every task |
+| Sign-in and lock-out | Login screen; user name and password; the account locks after LOGIN_MAX_FAILED_ATTEMPTS = 3 failed attempts until an administrator unlocks it; every success and failure is in the audit trail | Directory authentication with the Windows ID when BDO supplies the interface; log-out and session log |
+| Session policy | Inactivity warning after SESSION_IDLE_WARNING_MINUTES = 15; sign-out after SESSION_TIMEOUT_MINUTES = 30 of inactivity; warning SESSION_EXPIRY_WARNING_MINUTES = 30 before the fixed session expiry | Confirmed by the BRD (Q42) |
+| Users | Administration > Users (USER_MANAGE): user name, full name, e-mail, roles, authorisation limit, last login, status; unlock and reset password | Windows ID, business unit group, user level, status incl. online; changes through requests |
+| Roles | Administration > Roles & Permissions (ROLE_MANAGE): create a role, name it, tick permissions | Active flag, description, privilege level; changes by implementing an approved group-profile request |
+| Access requests | User Access > Access Requests (ACCESS_REQUEST to raise, ACCESS_APPROVE to decide): types Create user, Change roles, Disable user, Enable user, Change role permissions; the approver cannot be the requester; approval applies the change and shows a temporary password once | Drafts, return, correction, cancellation, chosen approver(s), new types (modify user, group-profile create / deactivate / reactivate), effective date, bulk, second approval, history, implementation step |
+| Notifications | The chosen approver on submission; the requester on the decision | Returned, cancelled, second approval, implementation; the affected user |
+| User Access Matrix | User Access > User Access Matrix: roles by permission and by area / action class, Excel export | Every permission gets an area, so the group-profile report shows a module for every task |
 | Password | My Profile > Change password: at least 10 characters with upper and lower case, digit and symbol; administrator reset | Password history, maximum and minimum age, forced change after reset, self-service reset |
 | Audit | Insert-only audit trail; Administration > Audit Trail report (CTL-AUDIT) with summary text | Structured, insert-only access-change log with from / to values; four reports |
 
@@ -194,23 +193,23 @@ The table lists what BIBS did before BRD-11 and what BRD-11 changed. The FRs ref
 
 ## Personas
 
-<!-- table: widths=3,4.6,6.8,3.2 caption="Personas and BIBS roles (design R3, section 6.2)" -->
+<!-- table: widths=3,4.6,6.8,3.2 caption="Personas and BIBS roles" -->
 | Persona | BIBS role | Responsibilities in User Access Maintenance | BRD |
 |---|---|---|---|
-| Requestor | UAM_REQUESTOR (new) | Raises user access requests: enrol, modify, deactivate, reactivate, bulk; corrects and cancels them; views own requests | Section A (1.001-1.009) |
-| Approver | UAM_APPROVER (new); NB_APPROVER keeps its approval right | Reviews and approves, rejects or returns requests assigned to him or her | Section B (2.001-2.002) |
-| Second approver | UAM_SECOND_APPROVER (new) | Reviews privileged or out-of-hours changes after the first approval | NFR 11 (p.17) |
-| Business Administrator | BUSINESS_ADMIN (exists) | Raises group-profile requests; generates the reports; maintains the separation-of-duties rules; uploads bulk requests; supports users | Section C (3.001-3.003) |
-| System Administrator | SYSADMIN (exists) | Implements approved group-profile requests; defines the UAM group profiles and their functions; unlocks users and resets passwords; audit logs | Section D (4.001-4.003) |
-| Auditor | AUDITOR (exists) | Views requests and runs the reports and the audit log | NFR 6 (p.17) |
-| Information Security Officer | INFOSEC_OFFICER (exists, document storage set) | Views the access requests, the group-profile requests and the User Access Matrix, and the audit trail; runs the user access reports; authorises the separation-of-duties rules; approves the changes of the security settings | NFR 11 (p.17) |
+| Requestor | UAM_REQUESTOR | Raises user access requests: enrol, modify, deactivate, reactivate, bulk; corrects and cancels them; views own requests | Section A (1.001-1.009) |
+| Approver | UAM_APPROVER; NB_APPROVER keeps its approval right | Reviews and approves, rejects or returns requests assigned to him or her | Section B (2.001-2.002) |
+| Second approver | UAM_SECOND_APPROVER | Reviews privileged or out-of-hours changes after the first approval | NFR 11 (p.17) |
+| Business Administrator | BUSINESS_ADMIN | Raises group-profile requests; generates the reports; maintains the separation-of-duties rules; uploads bulk requests; supports users | Section C (3.001-3.003) |
+| System Administrator | SYSADMIN | Implements approved group-profile requests; defines the UAM group profiles and their functions; unlocks users and resets passwords; audit logs | Section D (4.001-4.003) |
+| Auditor | AUDITOR | Views requests and runs the reports and the audit log | NFR 6 (p.17) |
+| Information Security Officer | INFOSEC_OFFICER | Views the access requests, the group-profile requests and the User Access Matrix, and the audit trail; runs the user access reports; authorises the separation-of-duties rules; approves the changes of the security settings | NFR 11 (p.17) |
 | System | - | Validates, grants the access, applies dated changes, logs, notifies | p.6 |
 
 The BRD's stakeholders also list ITIO-SRE (System and Database Administrators), ITIO-ES (Storage Administrator) and ITSD-AMS (application support) (p.7). They support the platform and have no functional role in BIBS beyond the System Administrator. Who the 14 Requestors and 8 Approvers are is UQ01.
 
 ## Permissions
 
-BRD 4.002.2 asks that each function can be assigned to any group profile. BIBS gives each function its own permission (area USER_ACCESS). ACCESS_REQUEST stays as the umbrella permission of the roles that hold it today, so existing roles keep working.
+BRD 4.002.2 asks that each function can be assigned to any group profile. BIBS gives each function its own permission (area USER_ACCESS). ACCESS_REQUEST is the umbrella permission of the request functions for the roles that hold it.
 
 <!-- table: widths=4.4,2.8,7.4,2.4 caption="User Access Maintenance permissions (area USER_ACCESS)" -->
 | Permission | Action class | Allows | BRD |
@@ -222,15 +221,15 @@ BRD 4.002.2 asks that each function can be assigned to any group profile. BIBS g
 | UAM_CORRECT | AMEND | Apply correction to a returned request | 4.002.2.5 |
 | UAM_CANCEL | AMEND | Cancel a request | 4.002.2.6 |
 | UAM_VIEW | VIEW | View requests (own; all with ACCESS_APPROVE, USER_MANAGE or AUDIT_VIEW) | 4.002.2.7 |
-| ACCESS_APPROVE (exists) | APPROVE | Review and approve requests | 4.002.2.8 |
+| ACCESS_APPROVE | APPROVE | Review and approve requests | 4.002.2.8 |
 | UAM_GROUP_REQUEST | CREATE | Submit group-profile requests | 4.002.2.9 |
 | UAM_REPORT_VIEW | VIEW | Generate the user access reports | 4.002.2.10 |
 | UAM_SECOND_APPROVE | APPROVE | Second approval of privileged or out-of-hours changes | NFR 11 |
 | UAM_SOD_MAINTAIN | AMEND | Add and deactivate separation-of-duties rules | NFR 11 |
 | UAM_SOD_AUTHORIZE | APPROVE | Authorise the separation-of-duties rules | NFR 11 |
 | SECURITY_PARAMETER_APPROVE (area ADMINISTRATION) | APPROVE | Approve a change of a security setting | NFR 11 |
-| ACCESS_REQUEST (exists) | CREATE | Umbrella of the request functions for the roles that hold it today | - |
-| USER_MANAGE, ROLE_MANAGE (exist) | AMEND | Users and Roles screens; implementation of group-profile requests | 4.002.1 |
+| ACCESS_REQUEST | CREATE | Umbrella of the request functions | - |
+| USER_MANAGE, ROLE_MANAGE | AMEND | Users and Roles screens; implementation of group-profile requests | 4.002.1 |
 
 ## Permissions matrix
 
@@ -308,7 +307,7 @@ actor: All users
 priority: "Must have (4.001.x has no flag in the BRD)"
 screens: Every screen (session guard dialog)
 description:
-  - Baseline, confirmed by the BRD. After 15 minutes without activity BIBS shows a warning; after 30 minutes without activity it signs the user out. Activity in any browser tab keeps all tabs signed in. Separately, BIBS warns 30 minutes before the fixed end of the sign-in token ("For your security the system signs you out in n minute(s)...").
+  - After 15 minutes without activity BIBS shows a warning; after 30 minutes without activity it signs the user out. Activity in any browser tab keeps all tabs signed in. Separately, BIBS warns 30 minutes before the fixed end of the session ("For your security the system signs you out in n minute(s)...").
   - The BRD reads "warning prior to system triggered log out (30 minutes)" and "inactivity warning (after 15 minutes)" (p.8, p.17). The inactivity sign-out at 30 minutes with the warning at 15 minutes meets both (Q42 answered, R4).
 preconditions:
   - "The user is signed in."
@@ -320,7 +319,7 @@ alternate_flows:
 rules:
   - [R1, "Inactivity warning after SESSION_IDLE_WARNING_MINUTES (15).", Configurable, Parameter SESSION_IDLE_WARNING_MINUTES]
   - [R2, "Inactivity sign-out after SESSION_TIMEOUT_MINUTES (30).", Configurable, Parameter SESSION_TIMEOUT_MINUTES]
-  - [R3, "Warning SESSION_EXPIRY_WARNING_MINUTES (30) before the fixed token expiry.", Configurable, Parameter SESSION_EXPIRY_WARNING_MINUTES]
+  - [R3, "Warning SESSION_EXPIRY_WARNING_MINUTES (30) before the fixed session expiry.", Configurable, Parameter SESSION_EXPIRY_WARNING_MINUTES]
 validations: []
 notifications:
   - "On-screen warnings only."
@@ -340,7 +339,7 @@ priority: Must have
 screens: Login
 description:
   - The BRD asks that the user ID is interfaced with EUA using the Windows ID. BIBS passes the user ID and the entered password; EUA returns whether the log-on succeeded and, on failure, an error message that BIBS shows (p.14). LDAP or Active Directory authentication and single sign-on or LDAP integration are also required (p.13, p.17).
-  - BIBS authenticates through a directory port. Parameter AUTH_MODE selects LOCAL (password held in BIBS, today) or DIRECTORY (password checked by EUA; the user is found by the Windows ID). The lock-out, audit and session behaviour are the same in both modes, and BIBS never stores the password in DIRECTORY mode.
+  - Parameter AUTH_MODE selects LOCAL (password held in BIBS) or DIRECTORY (password checked by EUA; the user is found by the Windows ID). The lock-out, audit and session behaviour are the same in both modes, and BIBS never stores the password in DIRECTORY mode.
   - The EUA protocol, host and messages are not in the BRD (UQ04). BIBS keeps LOCAL mode until BDO supplies them; switching is then configuration (decision D6, R4).
   - "Target named by BDOI on 26-Sep-2026: sign-in goes through EIAM, BDO's Enterprise Identity Access Management on Microsoft Entra ID, with OpenID Connect. The login page redirects to Entra ID; BIBS validates the returned identity, finds the user by the Windows ID or the user principal name and signs him in with his BIBS roles (AUTH_MODE = OIDC). Password, lock-out and multi-factor rules then belong to Entra ID; the BIBS inactivity warning and log-out stay. A local break-glass administrator keeps LOCAL sign-in, audited. Claims, tenant and session life are open with BDOI IT (IQ04)."
 preconditions:
@@ -814,7 +813,7 @@ description:
   - The Requestor downloads the template, fills one row per user - action (enrol, modify, deactivate, reactivate), user ID, Windows ID, name, e-mail, branch, business unit group, user level, group profiles, effective date, remarks - and attaches it. BIBS validates every row and shows a validation report before the batch is created.
   - A valid file creates a draft batch with one line request per row. The Requestor adds the batch remarks, edits the draft (replaces the file or removes lines), cancels it or submits it to the chosen approver. On approval every line is applied in its own transaction; failures are listed and the other lines stand.
 preconditions:
-  - "The user has UAM_ENROLL or UAM_MODIFY (and the permissions of the actions in the file), and the bulk upload right BULK_PROCESS. The build grants BULK_PROCESS to the Requestor, the Business Administrator and the System Administrator."
+  - "The user has UAM_ENROLL or UAM_MODIFY (and the permissions of the actions in the file), and the bulk upload right BULK_PROCESS. BULK_PROCESS is granted to the Requestor, the Business Administrator and the System Administrator."
 main_flow:
   - The Requestor opens Bulk Request and downloads the template.
   - The Requestor attaches the completed file.
@@ -863,7 +862,7 @@ alternate_flows:
   - The re-check fails (for example the user was deactivated meanwhile). The request stays SCHEDULED and alert UAM_SCHEDULED_APPLY_FAILED is raised to the System Administrator.
 rules:
   - [R1, "Effective date is today or later.", Fixed, "-"]
-  - [R2, "An end date for temporary access is not built (UQ06).", Fixed, "-"]
+  - [R2, "Temporary access with an end date follows BDOI's answer to UQ06 (chapter 22, CLR-UA-13).", Fixed, "-"]
 validations:
   - [Effective date in the past, The effective date cannot be before today, ACCESS_EFFECTIVE_DATE]
 notifications:
@@ -944,7 +943,7 @@ brd: [BRD 2.002.6 (p.8), BRD 2.002.6.1 (p.8), BRD 2.002.6.2 (p.9)]
 actor: Approver
 priority: "Must have (2.002.6.1-6.2 have no flag in the BRD)"
 screens: Request detail (Reject)
-description: Baseline, unchanged. The approver enters the rejection reason in Comment ("Mandatory to reject; sent to the requester") and clicks **Reject**. BIBS records the decision, notifies the requester and changes nothing. The reason is also written to the request history.
+description: The approver enters the rejection reason in Comment ("Mandatory to reject; sent to the requester") and clicks **Reject**. BIBS records the decision, notifies the requester and changes nothing. The reason is also written to the request history.
 preconditions:
   - "As FR-UA-031."
 main_flow:
@@ -1107,8 +1106,8 @@ acceptance:
   - A request that adds and removes the same permission is refused with ACCESS_PERMISSION_CONFLICT.
 ```
 
-> [!NOTE] Built behaviour differs from the BRD
-> Today an approved Change role permissions request is applied by the system at approval (BRD-3 PMADD05). The BRD-11 diagram (p.6) has the System Administrator implement group-profile changes. The build adds the implementation step with UAM_ROLE_APPLY_ON_APPROVAL = false, which also changes the Product Maintenance behaviour; BDOI confirms under UQ03 (PQ17 answered, R4).
+> [!DECISION] For confirmation (chapter 22, CLR-UA-12)
+> The BRD-11 diagram (p.6) has the System Administrator implement group-profile changes after approval. BIBS applies an approved change of role permissions at the implementation step (UAM_ROLE_APPLY_ON_APPROVAL = false), for every module, including Product Maintenance (BRD-3 PMADD05); BDOI confirms under UQ03 (PQ17 answered, R4).
 
 ```fr
 id: FR-UA-042
@@ -1238,14 +1237,14 @@ brd: [BRD 4.002.1 (p.9), BRD 4.002.1.1 (p.9), BRD 4.002.1.2 (p.9), BRD 4.002.1.3
 actor: System Administrator
 priority: Must have
 screens: Administration > Roles & Permissions
-description: The build delivers the group profiles of the BRD personas - UAM_REQUESTOR (Requestor), UAM_APPROVER (Approver) and UAM_SECOND_APPROVER - and grants the new permissions to BUSINESS_ADMIN (Business Administrator, exists) and SYSADMIN (exists), as in section 3.3. Later changes to these profiles are group-profile requests (FR-UA-040 to FR-UA-045).
+description: BIBS provides the group profiles of the BRD personas - UAM_REQUESTOR (Requestor), UAM_APPROVER (Approver) and UAM_SECOND_APPROVER - and grants the user access permissions to BUSINESS_ADMIN (Business Administrator) and SYSADMIN, as in section 3.3. Later changes to these profiles are group-profile requests (FR-UA-040 to FR-UA-045).
 preconditions:
   - "None (provided with the system)."
 main_flow:
   - The System Administrator opens Roles & Permissions.
   - BIBS lists the delivered profiles with their permissions.
 rules:
-  - [R1, "Roles holding ACCESS_REQUEST today also receive the new request permissions, so existing users keep their functions.", Fixed, "-"]
+  - [R1, "Roles holding ACCESS_REQUEST also receive the type-specific request permissions, so their users keep their functions.", Fixed, "-"]
 validations: []
 notifications:
   - "None."
@@ -1503,7 +1502,7 @@ brd: [BRD 4.003.1 (p.10), UAM-NFR-09 (p.13), UAM-NFR-22 (p.14)]
 actor: System
 priority: Must have
 screens: Reports of section 6; request History tab
-description: Baseline - every change is in the insert-only audit trail as summary text. Change - every applied change also writes one row per attribute into the access-change log (time, user or profile, activity, attribute, from value, to value, request number, done by, approved by) in the same transaction as the change. No user can change or delete it. The reports read it.
+description: Every change is in the insert-only audit trail as summary text, and every applied change also writes one row per attribute into the access-change log (time, user or profile, activity, attribute, from value, to value, request number, done by, approved by) in the same transaction as the change. No user can change or delete it. The reports read it.
 preconditions:
   - "None."
 main_flow:
@@ -1580,7 +1579,7 @@ acceptance:
 
 ## User access requests
 
-Figure 2 shows the statuses of a user access request. The grey box (PENDING) and the end statuses APPROVED and REJECTED existed before BRD-11; the others were added by BRD-11 and are built. On the screens the statuses are shown as Draft, Pending, Pending Second, Returned, Scheduled, Approved, Rejected, Cancelled, For Implementation and Implemented.
+Figure 2 shows the statuses of a user access request. On the screens the statuses are shown as Draft, Pending, Pending Second, Returned, Scheduled, Approved, Rejected, Cancelled, For Implementation and Implemented.
 
 ![Status of a user access request (BRD 1.002-1.009, 2.002)](figures/brd11_request_states.dot){width=17}
 
@@ -1712,8 +1711,8 @@ Figure 4 shows the interfaces. Every BIBS module reads the effective permissions
 | Bulk upload | In | Template file of access requests (Bulk Request) | 1.009 | IN SCOPE |
 | Remote log server / syslog | Out | Application and error logs | NFR p.14 | ON HOLD |
 
-> [!PARKED] Parked seams
-> The EUA, LDAP / AD and SSO interfaces are required by the BRD but their protocol, host and messages are not given (UQ04). BIBS captures the Windows ID now and authenticates through a port with a LOCAL default, so connecting EUA is a configuration of a new adapter, with no change to users, roles or requests (decision D6, R4).
+> [!PARKED] Interfaces on hold
+> The EUA, LDAP / AD and SSO interfaces are required by the BRD but their protocol, host and messages are not given (UQ04). BIBS captures the Windows ID on every user and keeps local sign-in, so connecting the directory changes no user, group profile or request (decision D6, R4).
 
 # Non-functional requirements
 
@@ -1866,24 +1865,6 @@ Every parameter of this table belongs to the Security category: a change waits f
 
 BRD-11 answers questions raised on other BRDs: Q42 (directory sign-in required; inactivity sign-out at 30 minutes with a 15-minute warning), CQ23 (lock-out at 3 for all users; several roles per user) and PQ17 (group-profile changes are approved and then implemented by the System Administrator) (R4, decisions D5 and D6).
 
-## Built behaviour that differs from the BRD
-
-The table lists every point where the delivered system does what the BRD asks in a different way, or not yet, and the points BDOI Information Security and BDOI IT should decide at sign-off. Each is settled through the register, a configuration change or a change request, not by changing the text.
-
-<!-- table: widths=2.8,5.6,6.8,1.4 caption="Differences between the BRD and the built behaviour" size=8 -->
-| BRD ID | BRD asks | BIBS does | FR |
-|---|---|---|---|
-| UAM-NFR-11, 17, 33 | Sign-in with the Windows ID through BDO EUA, LDAP / AD or SSO | Local sign-in (AUTH_MODE = LOCAL) with the directory port and the Windows ID captured on every user. The directory mode refuses every sign-in until its adapter exists. BDOI named EIAM on Microsoft Entra ID as the target (Drop 0); its tenant, claims and session rules are open with BDOI IT (IQ04) | 003 |
-| UAM-NFR-12 | Authorisation through an external access-control list | Not built; roles and permissions stay in BIBS (UQ14) | 003 |
-| p.6 (request rule); Drop 0 | Access requested and approved in BIBS; BDOI named UIDM-ISC for provisioning | Every change is a BIBS request under four eyes; no provisioning from UIDM-ISC. The reports give the user and profile lists for certification. The options are open with BDOI IT (IQ05) | 010 |
-| Decision D7 | External (portal) users provisioned through requests | Switched off while no portal is installed (parameter UAM_EXTERNAL_USERS = false): the New Request screen does not offer the user type, and a request of user type External is refused on submission. Setting the parameter to true, with the second approval of Information Security, brings the user type back once a portal exists | 011, 013, 014 |
-| 1.002.1.1.1; UAM-NFR-15 | Business unit group and user level | Captured on the user; the lists are empty until BDOI gives the values (UQ05), and a value is not checked against its list | 011, 052 |
-| UAM-NFR-14 | Effective date of an enrolment | A scheduled enrolment creates the user on its date with a password that is never shown; the System Administrator resets it and the user changes it at the first sign-in | 020 |
-| 3.002.3 (UQ16) | Deactivation of a group profile | Allowed while the profile has members; the members lose its screens when the request is implemented, are listed on the request and are each told (in the app and by e-mail). Whether members must be moved first is UQ16 | 042 |
-| - (information security practice) | Dormant accounts | Built as a daily job with a notice (FR-UA-006). The dormancy period (90 days) and the notice (7 days) are proposals for BDOI Information Security; the System Administrator profile is exempt | 006 |
-| UAM-NFR-35 (UQ09) | Session management | The session log records every session; one session per device is not enforced | 004 |
-| 3.003 (UQ11) | Module and task names of sample B | The User Group Profile Report shows the module as the permission area and the task as the permission code; the report parameters Group Profile and Module take codes | 061 |
-| 4.002.2.7 | View requests function | The Requestor and the Second Approver do not open the User Access Matrix (the matrix answers only the request, approval, role management and audit rights); BDOI decides whether requesters should read it | 051 |
 
 # Traceability
 
@@ -2059,7 +2040,7 @@ Every BRD-11 requirement line is met by at least one FR. The BRD prints 160 line
 
 # Navigation
 
-This chapter shows how each user reaches the screens, and what every persona of BIBS sees. Signing BRD-11 signs the role matrix: the sidebar shows a screen only when one of the user's active group profiles holds its permission (section 3.2), so each persona sees a different menu. The tables are generated from the menu definition and the role grants of the build, not typed. For the personas of the persona suites of the build (Sanction Screening and User Access, Renewal, Claims, Employee Benefits), an automatic check confirms that the persona sees the screens of its sections, no more and no less (R9); the note under each table says so.
+This chapter shows how each user reaches the screens, and what every persona of BIBS sees. Signing BRD-11 signs the role matrix: the sidebar shows a screen only when one of the user's active group profiles holds its permission (section 3.2), so each persona sees a different menu. The tables follow the proposed role grants.
 
 ## Screens of User Access Maintenance
 
@@ -2169,7 +2150,7 @@ id: WT-D
 
 # Messages catalogue
 
-Every message a User Access Maintenance user can see, grouped by the screen or dialog that shows it, with its code, its type and what the user does. The texts are read from the build; a message is never retyped here.
+Every message a User Access Maintenance user can see, grouped by the screen or dialog that shows it, with its code, its type and what the user does. The texts are quoted exactly as the screens show them.
 
 - **Validation**: shown on the screen while the user fills in a field or before the form is sent.
 - **Error**: the system refused the action; nothing was saved. The code is shown under the message as the Reference.
@@ -2257,7 +2238,7 @@ The business sign-off covers the release set BRD-11 User Access Maintenance v2.0
 |---|---|
 | Start Here guide | The map of the set, who reads what, the steps and the dates |
 | Sign-off Pack Guide deck | Purpose, approach, the module at a glance, caveats, entry and exit criteria, change control |
-| This FRS v2.0 | Requirements (chapters 1-11) and the business view of the system (chapters 12-21) |
+| This FRS v2.0 | Requirements (chapters 1-11), the business view of the system (chapters 12-21) and the proposed rules for confirmation (chapter 22) |
 | Sign-off workbook v2.0 | The screens, fields, actions, rules, messages, notifications, contract and the menu of every persona of this FRS, one row each, with the BU review columns |
 | Test plan v2.0 | The test cases traced to the FRs and to the screens of chapter 13 |
 | Configuration input templates | The templates of chapter 19 |
@@ -2270,7 +2251,7 @@ render: counts
 
 ## How the review is recorded
 
-Each unit records its review in the sign-off workbook: Accept, Change requested or Comment on each row of the screen catalogue, field register, business rules, messages and the menu sheets of its personas, with the comment, the reviewer and the date. The project team answers every Change requested row before sign-off: either the row is corrected in the next version of the set, or the change is raised as a change request (below) and the row is signed as built.
+Each unit records its review in the sign-off workbook: Accept, Change requested or Comment on each row of the screen catalogue, field register, business rules, messages and the menu sheets of its personas, with the comment, the reviewer and the date. The project team answers every Change requested row before sign-off: either the row is corrected in the next version of the set, or the change is raised as a change request (below) and the row is signed as specified.
 
 ## What each signatory confirms
 
@@ -2280,7 +2261,7 @@ Each unit records its review in the sign-off workbook: Accept, Change requested 
 | Business owner (Product Owner, Marketing Business System) | The whole set: functions, screens, navigation, messages and the configuration inputs |
 | Process owner, User Access Maintenance (Business Administration) | The requests, approvals, group-profile requests, bulk requests and reports, and the templates CI-01, CI-03 and CI-06 |
 | BDOI Information Security | The role matrix (the menu of every persona, chapter 12, and template CI-02), the separation-of-duties rules (chapter 13 and template CI-04), the second approval of privileged changes, the emergency path, the password, lock-out and session values (template CI-05) and the audit log |
-| BDOI IT | The sign-in and identity integration assumptions: local sign-in with the directory port until EIAM on Entra ID is specified, and every access change as a BIBS request until the UIDM-ISC option is chosen (chapter 7, contract lines IC-08 and IC-09; these integrations are owned by BDOI IT and are seams only in this set); the System Administrator functions |
+| BDOI IT | The sign-in and identity integration assumptions: local sign-in with the directory port until EIAM on Entra ID is specified, and every access change as a BIBS request until the UIDM-ISC option is chosen (chapter 7, contract lines IC-08 and IC-09; these integrations are owned by BDOI IT); the System Administrator functions |
 
 ## What signing freezes
 
@@ -2297,15 +2278,15 @@ The content of the configuration is not frozen: the group profiles and their per
 
 A change to anything frozen is raised in the Change Management Register. The request states the screen, field, rule or message concerned, the reason and the business priority. The project team assesses it with its mandays, including its effect on the other BRDs through the interface contract of chapter 20, and the owners of every BRD it touches approve it; a change to a separation-of-duties rule or to the sign-in is also approved by BDOI Information Security. An approved change is delivered as a new version of this release set (v2.1, v2.2 and so on), and the changed rows are reviewed again.
 
-## As-built status
+## Proposed rules for confirmation
 
-This FRS describes the system as built on 27-Sep-2026; the screenshots were taken on the SIT environment. Where the build differs from the BRD, section 10.4 says so; such a difference is settled through the register, a configuration change or a change request, not by changing the text. At the end of the build, the final as-built refresh re-issues this set with the system as delivered.
+Chapter 22 lists the proposed business rules and screen behaviour that differ from the BRD or need a decision of BDOI. BDOI Information Security and BDOI IT record their decisions on the items they own with the review; a decision that changes a screen, field, rule or message is applied in the next version of this set.
 
 <!-- pagebreak -->
 
 ## Signatures
 
-By signing, BDOI confirms that this FRS and the sign-off workbook describe the User Access Maintenance functions, screens, menus and messages it expects in BIBS, accepts the assumptions in section 10.1 and notes the differences in section 10.4. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
+By signing, BDOI confirms that this FRS and the sign-off workbook describe the User Access Maintenance functions, screens, menus and messages it expects in BIBS, accepts the assumptions in section 10.1 and records its decisions on the items of chapter 22. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
 
 ```signoff
 rows:
@@ -2319,9 +2300,34 @@ rows:
 
 <!-- pagebreak -->
 
+# Proposed business rules and clarifications for confirmation
+
+The table lists each point where the proposed screen or rule differs from the BRD text, or where BIBS needs a decision of BDOI, BDOI Information Security or BDOI IT to complete the rule. Each item names the proposed behaviour, the reason and the decision requested. The decisions are recorded with the review of this set (section 21.6); a decision that changes a screen, field, rule or message is applied in the next version of the set, and an answer that only sets a value (a list, a parameter) is applied as configuration.
+
+<!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
+| Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
+|---|---|---|---|---|
+| CLR-UA-01 | Directory sign-in (UAM-NFR-11, 17, 33; FR-UA-003) | Local sign-in (AUTH_MODE = LOCAL) with the Windows ID captured on every user. The directory mode is switched on when the interface is supplied. BDOI named EIAM on Microsoft Entra ID as the target (Drop 0). | The tenant, claims and session rules of EIAM are not yet given (IQ04, UQ04). | BDOI IT to specify the EIAM sign-in: tenant, claims and session life (IQ04). |
+| CLR-UA-02 | External access-control list (UAM-NFR-12; FR-UA-003) | Roles and permissions are kept in BIBS; there is no authorisation through an external access-control list. | The external ACL is not specified (UQ14). | Confirm that authorisation stays in BIBS, or specify the external ACL (UQ14). |
+| CLR-UA-03 | Provisioning from UIDM-ISC (p.6 request rule; Drop 0; FR-UA-010) | Every access change is a BIBS request under four eyes. The reports give the user and profile lists for access certification. | BDOI named UIDM-ISC for joiner, mover and leaver provisioning; the option is open (IQ05). | BDOI IT to choose the UIDM-ISC option: accounts only, accounts and roles, or aggregation only (IQ05). |
+| CLR-UA-04 | External (portal) users (decision D7; FR-UA-011, 013, 014) | The user type External is not offered while no portal is installed (UAM_EXTERNAL_USERS = false), and a request of that type is refused. Setting the parameter to true, with the second approval of Information Security, offers it again. | BDOI drops the EB portal (drop plan item 2.4, IQ22). | Confirm that external users stay switched off. |
+| CLR-UA-05 | Business unit group and user level (1.002.1.1.1, UAM-NFR-15; FR-UA-011, 052) | Both are captured on the user; their lists stay empty until BDOI gives the values, and a value is not checked against a list until then. | The values are not in the BRD (UQ05). | Give the business unit groups and user levels (UQ05). |
+| CLR-UA-06 | Effective date of an enrolment (UAM-NFR-14; FR-UA-020) | A scheduled enrolment creates the user on its date with a password that is never shown; the System Administrator resets it and the user changes it at the first sign-in. | The temporary password is shown only once, to the approver of an immediate enrolment. | Confirm the handling of scheduled enrolments. |
+| CLR-UA-07 | Deactivation of a group profile with members (3.002.3; FR-UA-042) | A profile with members can be deactivated; the members lose its screens when the request is implemented, are listed on the request and are each told (in the app and by e-mail). | The BRD does not say whether members must be moved first (UQ16). | Decide whether members must be moved before a deactivation (UQ16). |
+| CLR-UA-08 | Dormant accounts (information security practice; FR-UA-006) | A daily deactivation of users with no sign-in for 90 days, with a notice 7 days before; the System Administrator profile is exempt. | The period and the notice are proposals; Information Security has not given its values. | Information Security to confirm the dormancy period and the notice (template CI-05). |
+| CLR-UA-09 | One session per device (UAM-NFR-35; FR-UA-004) | The session log records every session; one session per device is not enforced. | The rule is not specified (UQ09). | Decide whether one session per device must be enforced (UQ09). |
+| CLR-UA-10 | Module and task names in the reports (3.003; FR-UA-060, 061) | The User Group Profile Report shows the module as the permission area and the task as the permission name. The report parameters Group Profile and Module are offered as lists. | The module and task names of sample B are not defined (UQ11). | Confirm the module and task names (UQ11). |
+| CLR-UA-11 | User Access Matrix for requesters (4.002.2.7; FR-UA-051) | The Requestor and the Second Approver do not open the User Access Matrix; the matrix serves the request, approval, role management and audit rights. | The BRD's view function does not name the matrix. | Decide whether requesters should read the User Access Matrix. |
+| CLR-UA-12 | Group-profile changes applied at implementation (UQ03; FR-UA-041, 045) | An approved change of group-profile permissions is applied when the System Administrator implements it, for every module, including Product Maintenance (BRD-3 PMADD05). | The BRD-11 diagram (p.6) has the System Administrator implement group-profile changes (PQ17 answered). | Confirm the implementation step for every module (UQ03). |
+| CLR-UA-13 | Temporary access with an end date (UQ06; FR-UA-017, 020) | Access is given until it is removed by a request; there is no end date on a group profile of a user. | Temporary access is not specified in the BRD (UQ06). | Decide whether temporary access with an end date is needed (UQ06). |
+| CLR-UA-14 | Out-of-hours flag on public holidays (NFR 11; FR-UA-034) | A request submitted or approved outside UAM_WORKING_HOURS is flagged for second approval; the flag is evaluated at submission and again at approval. Public holidays are not treated as out of hours. | The working hours have no holiday calendar. | Decide whether public holidays count as out of hours. |
+| CLR-UA-15 | Users who already hold both profiles of a new rule (FR-UA-053) | A new separation-of-duties rule is checked on later requests; users who already hold both profiles are not changed and are found with the User Access Report. | Existing access is changed only through requests. | Information Security to confirm that it reviews the report after each new rule and raises the requests. |
+| CLR-UA-16 | Bulk requests (1.009; FR-UA-019) | A bulk request is decided as a whole. | The maximum number of rows, line-by-line decisions and mixed actions are not given (UQ10). | Give the bulk settings (UQ10). |
+| CLR-UA-17 | Access from BDO-issued devices only (1.001.1; FR-UA-001) | Access only from BDO-issued devices is enforced by the BDO network and device policy, not by BIBS. | BIBS cannot see the device a browser runs on. | BDOI IT to confirm the network and device policy that enforces it. |
+
 # Appendix: Screen standards
 
-The User Access Maintenance screens are built to the screen standards agreed with BDOI on 26-Sep-2026. They are listed here so that the business units can check the screenshots against them; they are not repeated in each screen specification.
+The User Access Maintenance screens follow the screen standards agreed with BDOI on 26-Sep-2026. They are listed here so that the business units can check the screenshots against them; they are not repeated in each screen specification.
 
 <!-- table: widths=4.2,13.4 caption="Screen standards of BIBS" -->
 | Area | Standard |
@@ -2338,16 +2344,4 @@ The User Access Maintenance screens are built to the screen standards agreed wit
 | Four eyes | Nothing changes access until a second person approves; the screens offer a decision only to the users who may take it. |
 | Notifications | The bell opens the panel grouped by day, with Mark Read, Mark All Read and View All; the Notifications page lists every notice with filters. |
 
-The project team checks each screen against these standards before UAT and records the result in the UX readiness checklist. A screen found not to follow a standard during the review is recorded as Change requested in the sign-off workbook and corrected before UAT without a change request. The preparation of this set found points against the Wording and Dates standards. Those in the first rows were corrected in this release and are shown corrected in the screenshots; the last two remain, to be corrected before UAT:
-
-<!-- table: widths=5.2,10.2,2.2 caption="Points found against the screen standards" size=8.5 -->
-| Where | Point | Status |
-|---|---|---|
-| New Group Profile Request, Roles & Permissions, User Access Matrix | Permissions were shown by their codes; they are now shown by name, with the code in small print below, and the matrix columns by profile name | Corrected |
-| New Request (user ID check) | The format check showed the pattern of the parameter; it now gives the format in words (The user ID must be a letter followed by nine digits, for example a013000196) | Corrected |
-| System Parameters; deactivation reasons | Internal requirement references in the descriptions and "(to confirm)" in the reason labels were removed | Corrected |
-| User Access Reports and the report runner | The report codes are no longer shown under the reports nor in the runner description | Corrected |
-| Notices and alerts of the access requests | The risk flags are shown as words (privilege increase, outside working hours) and the dates as dd-MMM-yyyy | Corrected |
-| Every date picker | The earliest date and the date "today" were the UTC date; they are now the business date in Philippine time, on every screen | Corrected |
-| Report runner | The parameters Group Profile (code) and Module (area code) take codes, and the back arrow of a report returns to the Report Centre, not to User Access Reports | Open |
-| Roles & Permissions (emergency path open) | The warning names the parameter and the alert by their codes | Open |
+The project team checks each screen against these standards before UAT and records the result in the screen readiness checklist. A screen found not to follow a standard during the review is recorded as Change requested in the sign-off workbook and corrected before UAT without a change request.

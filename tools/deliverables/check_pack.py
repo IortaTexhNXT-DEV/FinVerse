@@ -52,17 +52,17 @@ BUILD_STATUS: list[tuple[str, re.Pattern]] = [(label, re.compile(pat, re.I)) for
     # "Rebuild from rule" and "Build Comparative" are button labels of the screens.
     ("build", r"\b(?:re)?builds?\b(?!-up)(?! from (?:the )?rule)(?<!\bBuild(?= Comparative))(?! Comparative\b)"),
     ("build wave or step", r"\b(?:build|delivery)[- ](?:wave|step|phase)s?\b|\bwaves? [0-9]\b"),
-    ("internal design document", r"\b(?:build|technical|solution|module) designs?\b|(?-i:\b[A-Z_]+_DESIGN\b)"),
+    ("internal design document", r"\b(?:build|solution|module) designs?\b|(?-i:\b[A-Z_]+_DESIGN\b)"),
     ("work in progress", r"\bwork[- ]in[- ]progress\b|\bWIP\b"),
     ("defect or known issue", r"\bdefects?\b|\bknown (?:issues?|gaps?|limitations?)\b|\bbugs?\b"),
-    ("automated test", r"\b(?:automated|automation|unit|integration|end-to-end|e2e|regression) tests?\b|"
-                       r"\btest automation\b|\bautomated by\b|\bautomated\b|\bjunit\b|\bplaywright\b|"
+    ("automated test", r"\b(?:automated|automation|unit|end-to-end|e2e) tests?\b|"
+                       r"\btest automation\b|\bautomated by\b|\bautomation references?\b|\bjunit\b|\bplaywright\b|"
                        r"\bselenium\b|\bcypress\b|\bvitest\b|\bmockito\b"),
     ("test class name", r"(?-i:\b[A-Z][a-z0-9]+(?:[A-Z][a-z0-9]+)*(?:Test|Tests|IT|Spec)\b)"),
     ("code or file path", r"\b[\w.-]+\.(?:java|kt|tsx?|jsx?|py|sql|md|ya?ml|properties|xml|json|dot|sh)\b|"
                           r"(?:^|[\s(`'\"])(?:\.{0,2}/)?(?:src|docs|tools|backend|frontend|deploy|main|test)/[\w./-]+"),
     ("source code", r"\b(?:source code|code ?base|in the code|from the code|the code (?:reads|returns|checks))\b|"
-                    r"\b(?:source|code|git) repository\b|\brepository\b|\b(?:deployed|git) commits?\b|\bcommit (?:hash|id)\b|"
+                    r"\b(?:source|code|git) repository\b|\brepository URLs?\b|\b(?:deployed|git) commits?\b|\bcommit (?:hash|id)\b|"
                     r"\bpull requests?\b"),
     ("API path", r"/api/|\b(?:GET|POST|PUT|PATCH|DELETE) (?:\.\.\.)?/|(?:^|[\s(])(?:\.\.\.)?/[a-z][\w-]*(?:/[\w{}.-]+)+|\{(?:id|ref|aid|code|n|invoiceNo|sessionId)\}|\bendpoints?\b|\bHTTP [1-5][0-9]{2}\b|\bREST API\b"),
     ("Flyway version", r"\bflyway\b|(?-i:\bV[0-9]{3,4}(?:__\w+)?\b)"),

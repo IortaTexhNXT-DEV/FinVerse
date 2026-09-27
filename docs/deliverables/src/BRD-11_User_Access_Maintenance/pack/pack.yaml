@@ -56,6 +56,14 @@ menu_personas:
   CLM_TH: {name: Claims Team Head, user: clmth}
   CLM_UH: {name: Claims Unit Head, user: clmuh}
   CLM_RISK: {name: Claims / Risk Analyst, user: clmrisk}
+  DATA_MIGRATION_LEAD: {name: Data Migration Lead, user: miglead}
+  DATA_STEWARD: {name: Data Steward, user: migsteward}
+  DATA_OWNER: {name: Data Owner, user: migowner}
+  MIGRATION_OPERATOR: {name: Migration Operator, user: migops}
+  MIGRATION_RECON_APPROVER: {name: Migration Reconciliation Approver, user: migrecon}
+  MIGRATION_GONOGO: {name: Go-Live Board (migration go / no-go), user: miggonogo}
+  LEGACY_INQUIRY: {name: Legacy Inquiry (auditor), user: legacyaudit}
+  LEGACY_ACCESS_REVIEWER: {name: Legacy Access Reviewer, user: legacyrev}
 
 # Packs of other BRDs whose screens a walkthrough step may show (My Approvals and Lists of Values of New Business).
 foreign_packs: [../../BRD-01_New_Business/pack/pack.yaml]
@@ -114,6 +122,8 @@ section_brd:
   nb-reports: BRD-1
   reports: Platform
   broking-setup: BRD-1
+  migration: BRD-13
+  legacy-inquiry: BRD-13
   screening-setup: BRD-10
   setup: Platform
   user-access: BRD-11

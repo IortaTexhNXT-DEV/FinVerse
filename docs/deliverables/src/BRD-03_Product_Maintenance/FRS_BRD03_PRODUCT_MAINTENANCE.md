@@ -388,7 +388,7 @@ alternate_flows:
   - Delivery failure. The e-mail shows the failed status in the E-mails tab; the user resends it.
 rules:
   - [R1, "Every Product Maintenance document e-mailed outside BIBS is protected; protection cannot be switched off per e-mail.", Fixed, "-"]
-  - [R2, "The password convention is the one BDOI confirms under Q07; until then BIBS generates a password per e-mail.", Configurable, Messaging settings (on hold, Q07 / PQ21)]
+  - [R2, "The password convention is the one BDOI confirms under Q07; until then BIBS generates a password per e-mail.", Configurable, "Messaging settings (on hold, Q07 / PQ21)"]
 validations:
   - [User without permission opens a document, You are not permitted to perform this action, ACCESS_DENIED]
 notifications:

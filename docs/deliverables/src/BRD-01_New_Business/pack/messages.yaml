@@ -294,3 +294,8 @@ fixes:
   "Between 1 and 50 years": Enter a number of years from 1 to 50.
   "The <record type> module does not report retention candidates yet; the records will be counted once it does.": No action; the rule is kept and counts the records once the module reports them.
   "<quotation no> is <>, not sent to the client": Remove the row, or send the quotation to the client before recording its acceptance.
+  "The saved parameter variant is deleted.": Confirm to delete the saved variant, or cancel to keep it.
+  ACCOUNT_LEGACY_IMPORTED: No action; the legacy policy is already an account in BIBS. Open that account instead.
+  ACCOUNT_NOT_MIGRATED: Open the account in BIBS as a new-business account; only accounts brought over from the legacy system can be handled as migrated.
+  CLIENT_NOT_MIGRATED: Treat the client as a BIBS client; only clients brought over from the legacy system can be handled as migrated.
+  CLIENT_ORIGIN_REQUIRED: Give the source system and the legacy client code of the migrated client, or report it to the data migration team.

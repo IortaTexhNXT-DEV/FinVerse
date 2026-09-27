@@ -13,6 +13,7 @@ repository.
 | `render.py` | PDF conversion with LibreOffice and page PNG previews / contact sheets |
 | `code_facts.py` | Facts read from the code for the documents: sidebar menus and screens (`frontend_menu`, `menu_for`, `menu_path`), role grants replayed from the migrations (`role_grants`), workflow stages and actions (`workflows`), server messages (`backend_messages`, `platform_messages`), screen messages (`frontend_messages`), upload templates (`bulk_templates`). `python tools/deliverables/code_facts.py --self-check`; `--menu ROLE`, `--messages PKG...`, `--ui DIR...` print them |
 | `drop_index.py` | Writes the index `README.md` of every drop folder |
+| `check_pack.py` | Fails on duplicated files (by content), older versions next to newer ones in `out/`, an issued sign-off set without its files 00-05, and restricted words; run before committing the pack |
 
 ## Set-up
 
@@ -29,11 +30,11 @@ its `.dot` source.
 
 ```bash
 # lint the YAML blocks, then build the .docx (the editable master) and page previews
-python tools/deliverables/bdoi_docx.py --check docs/deliverables/src/frs/FRS_BRD03_PRODUCT_MAINTENANCE.md
-python tools/deliverables/bdoi_docx.py docs/deliverables/src/frs/FRS_BRD03_PRODUCT_MAINTENANCE.md --previews
+python tools/deliverables/bdoi_docx.py --check docs/deliverables/src/BRD-03_Product_Maintenance/FRS_BRD03_PRODUCT_MAINTENANCE.md
+python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-03_Product_Maintenance/FRS_BRD03_PRODUCT_MAINTENANCE.md --previews
 
 # at issue only: also keep the PDF next to the .docx
-python tools/deliverables/bdoi_docx.py docs/deliverables/src/frs/FRS_BRD03_PRODUCT_MAINTENANCE.md --keep-pdf
+python tools/deliverables/bdoi_docx.py docs/deliverables/src/BRD-03_Product_Maintenance/FRS_BRD03_PRODUCT_MAINTENANCE.md --keep-pdf
 
 # any Office file: PDF plus previews
 python tools/deliverables/render.py docs/deliverables/out/Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx --previews
@@ -51,7 +52,7 @@ header tables, empty pages and figure legibility.
 
 ## Conventions for every client document
 
-- **Sources** live in `docs/deliverables/src/<kind>/` (for example `src/frs/FRS_BRD03_PRODUCT_MAINTENANCE.md`),
+- **Sources** live in `docs/deliverables/src/<kind>/` (for example `src/BRD-03_Product_Maintenance/FRS_BRD03_PRODUCT_MAINTENANCE.md`),
   figures in `src/<kind>/figures/`.
 - **Outputs** go to one release-set folder per BRD, `docs/deliverables/out/<drop folder>/BRD-nn_<Name>/`, grouped by
   BDOI drop (answer A5 of 26-Sep-2026): `Drop-0_Setup_and_Data_Migration/`, `Drop-1_Transactional/`,

@@ -23,6 +23,10 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.TestData;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
+import com.lowagie.text.Document;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfWriter;
+import java.io.ByteArrayOutputStream;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
@@ -199,6 +203,22 @@ public class EbFixtures {
               workflow.systemTransition(
                   EbCodes.ENTITY_CYCLE, cycle.getId().toString(), action, TransitionNote.NONE));
     }
+  }
+
+  /**
+   * A valid one-page PDF (e-mails protect their attachments, which needs a readable PDF).
+   *
+   * @param name file name
+   * @return file
+   */
+  public static UploadedFile realPdf(String name) {
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    Document doc = new Document();
+    PdfWriter.getInstance(doc, out);
+    doc.open();
+    doc.add(new Paragraph(name + " " + token()));
+    doc.close();
+    return new UploadedFile(name, out.toByteArray());
   }
 
   /**

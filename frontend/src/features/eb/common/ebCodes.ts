@@ -8,6 +8,10 @@ export const EB_LOV = {
   lostReason: 'EB_LOST_REASON',
   itemType: 'EB_TRACKED_ITEM_TYPE',
   documentType: 'DOCUMENT_TYPE',
+  capabilityFactor: 'EB_CAPABILITY_FACTOR',
+  franchiseReject: 'EB_FRANCHISE_REJECT_REASON',
+  soaReject: 'EB_SOA_REJECT_REASON',
+  civilStatus: 'CIVIL_STATUS',
 } as const;
 
 /** Labels of the fixed EB codes (not lists of values). */
@@ -31,6 +35,21 @@ const LABELS: Record<string, string> = {
   BDOI: 'BDOI',
   RENEWAL_ADVICE: 'Renewal advice',
   PLACEMENT_REQUEST: 'Placement request',
+  SIGNED_DOCUMENT: 'Signed document',
+  INCUMBENT_INDICATIVE: 'Incumbent indicative',
+  PROPOSAL: 'Proposal',
+  REVISED: 'Revised proposal',
+  TSI: 'Total sum insured',
+  ANNUAL_PREMIUM: 'Annual premium',
+  ADD: 'Addition',
+  DELETE: 'Deletion',
+  CHANGE_PLAN: 'Change of plan',
+  CHANGE_DATA: 'Change of data',
+  NB_PLACEMENT: 'New business placement',
+  RENEWAL_PLACEMENT: 'Renewal placement',
+  ENDORSEMENT: 'Endorsement',
+  ADJUSTMENT: 'Adjustment',
+  FRANCHISE: 'Franchise',
 };
 
 /** The label of a fixed EB code. */

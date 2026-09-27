@@ -1280,8 +1280,9 @@ def print_image(path: Path, width_cm: float, dpi: int = PRINT_DPI) -> Path:
             figure_like = colours is not None
             suffix = ".png" if figure_like else ".jpg"
             out = out_dir / f"{path.stem}_{target_px}{suffix}"
-            if out.exists() and out.stat().st_mtime >= path.stat().st_mtime:
-                return out
+            for done in (out, out.with_suffix(".jpg")):
+                if done.exists() and done.stat().st_mtime >= path.stat().st_mtime:
+                    return done
             if w <= target_px and path.stat().st_size < 250_000:
                 return path
             out_dir.mkdir(exist_ok=True)
@@ -1289,7 +1290,12 @@ def print_image(path: Path, width_cm: float, dpi: int = PRINT_DPI) -> Path:
             if w > target_px:
                 img = img.resize((target_px, round(h * target_px / w)), Image.LANCZOS)
             if figure_like:
-                img.save(out, optimize=True)
+                # Scaling brings back intermediate colours: a palette of 256 keeps screenshots and figures small.
+                img.quantize(colors=256, method=Image.Quantize.MEDIANCUT, dither=Image.Dither.NONE).save(out, optimize=True)
+                if out.stat().st_size > 250_000:  # a photo-like page (sign-in background) prints better as JPEG
+                    out.unlink()
+                    out = out.with_suffix(".jpg")
+                    img.save(out, quality=84, optimize=True, progressive=True)
             else:
                 img.save(out, quality=84, optimize=True, progressive=True)
             return out

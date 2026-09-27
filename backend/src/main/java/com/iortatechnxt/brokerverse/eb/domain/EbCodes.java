@@ -112,6 +112,162 @@ public final class EbCodes {
   /** Front-end route of a programme page (link of notices, cases and alerts). */
   public static final String PROGRAMME_LINK = "/eb/programmes/";
 
+  /** Entity type of a proposal (audit, attachments). */
+  public static final String ENTITY_PROPOSAL = "EbProposal";
+
+  /** Entity type of a comparative (audit, attachments, approvals). */
+  public static final String ENTITY_COMPARATIVE = "EbComparative";
+
+  /** Entity type of an insurer request (audit). */
+  public static final String ENTITY_REQUEST = "EbInsurerRequest";
+
+  /** Entity type of a TOR version (audit). */
+  public static final String ENTITY_TOR = "EbTor";
+
+  /** Entity type of a submission (audit). */
+  public static final String ENTITY_SUBMISSION = "EbSubmission";
+
+  /** Entity type of a roster version (audit). */
+  public static final String ENTITY_ROSTER = "EbRoster";
+
+  /** Entity type of a threshold rule (audit, approvals). */
+  public static final String ENTITY_THRESHOLD_RULE = "EbThresholdRule";
+
+  /** Entity type of a required document (audit, approvals). */
+  public static final String ENTITY_REQUIRED_DOCUMENT = "EbRequiredDocument";
+
+  /** List of values of the capability factors. */
+  public static final String LOV_CAPABILITY_FACTOR = "EB_CAPABILITY_FACTOR";
+
+  /** List of values of the franchise rejection reasons. */
+  public static final String LOV_FRANCHISE_REJECT_REASON = "EB_FRANCHISE_REJECT_REASON";
+
+  /** List of values of the SOA rejection reasons. */
+  public static final String LOV_SOA_REJECT_REASON = "EB_SOA_REJECT_REASON";
+
+  /** List of values of the civil status (members). */
+  public static final String LOV_CIVIL_STATUS = "CIVIL_STATUS";
+
+  /** Template of the Terms of Reference (V1030). */
+  public static final String TEMPLATE_TOR = "EB_TOR";
+
+  /** Template of the request for proposal e-mail (V1030). */
+  public static final String TEMPLATE_RFP_COVER = "EB_RFP_COVER";
+
+  /** Template of the franchise request e-mail (V1030). */
+  public static final String TEMPLATE_FRANCHISE_REQUEST = "EB_FRANCHISE_REQUEST";
+
+  /** Template of the franchise outcome advice (V1030). */
+  public static final String TEMPLATE_FRANCHISE_ADVICE = "EB_FRANCHISE_ADVICE";
+
+  /** Template of the comparative sent to the client (V1030). */
+  public static final String TEMPLATE_COMPARATIVE = "EB_COMPARATIVE";
+
+  /** Template of the revision relayed to an insurer (V1030). */
+  public static final String TEMPLATE_REVISION_RELAY = "EB_REVISION_RELAY";
+
+  /** Template of the member change relayed to the insurer (V1039). */
+  public static final String TEMPLATE_MEMBER_CHANGE_RELAY = "EB_MEMBER_CHANGE_RELAY";
+
+  /** Template of a submission of documents to an insurer (V1039). */
+  public static final String TEMPLATE_SUBMISSION_COVER = "EB_SUBMISSION_COVER";
+
+  /** Template of the SOA released to the client (V1039). */
+  public static final String TEMPLATE_SOA_RELEASE = "EB_SOA_RELEASE";
+
+  /** Alert: franchise decision overdue (V1030). */
+  public static final String ALERT_FRANCHISE_OVERDUE = "EB_FRANCHISE_OVERDUE";
+
+  /** Alert: franchise outcome not advised to the client in time (V1039). */
+  public static final String ALERT_FRANCHISE_ADVICE_LATE = "EB_FRANCHISE_ADVICE_LATE";
+
+  /** Alert: insurer request past due (V1030). */
+  public static final String ALERT_PROPOSAL_OVERDUE = "EB_PROPOSAL_OVERDUE";
+
+  /** Alert: comparative late after the last proposal (V1030). */
+  public static final String ALERT_COMPARATIVE_LATE = "EB_COMPARATIVE_LATE";
+
+  /** Alert: SOA not validated in time (V1030). */
+  public static final String ALERT_SOA_VALIDATION_LATE = "EB_SOA_VALIDATION_LATE";
+
+  /** Notification event: franchise decided (V1030). */
+  public static final String EVENT_FRANCHISE_DECIDED = "EB_FRANCHISE_DECIDED";
+
+  /** Notification event: proposal to validate (V1030). */
+  public static final String EVENT_PROPOSAL_RECEIVED = "EB_PROPOSAL_RECEIVED";
+
+  /** Notification event: comparative to sign off (V1030). */
+  public static final String EVENT_COMPARATIVE_SIGNOFF = "EB_COMPARATIVE_SIGNOFF";
+
+  /** Notification event: comparative signed off, approved or returned (V1039). */
+  public static final String EVENT_COMPARATIVE_DECIDED = "EB_COMPARATIVE_DECIDED";
+
+  /** Notification event: threshold approval waiting (V1030). */
+  public static final String EVENT_THRESHOLD_APPROVAL = "EB_THRESHOLD_APPROVAL";
+
+  /** Notification event: client confirmation recorded (V1030). */
+  public static final String EVENT_CLIENT_CONFIRMED = "EB_CLIENT_CONFIRMED";
+
+  /** Notification event: member change billed (V1030). */
+  public static final String EVENT_MEMBER_CHANGE_BILLED = "EB_MEMBER_CHANGE_BILLED";
+
+  /** Notification event: SOA released (V1030). */
+  public static final String EVENT_SOA_RELEASED = "EB_SOA_RELEASED";
+
+  /** Notification event: invoice of an SOA paid (V1030). */
+  public static final String EVENT_INVOICE_PAID = "EB_INVOICE_PAID";
+
+  /** Notification event: master list staged for review (V1039). */
+  public static final String EVENT_ROSTER_STAGED = "EB_ROSTER_STAGED";
+
+  /** Notification event: documents submitted to an insurer (V1039). */
+  public static final String EVENT_SUBMISSION_SENT = "EB_SUBMISSION_SENT";
+
+  /** Outbox purpose of the franchise requests and advices. */
+  public static final String PURPOSE_FRANCHISE = "EB_FRANCHISE";
+
+  /** Outbox purpose of the requests for proposal and revisions. */
+  public static final String PURPOSE_RFP = "EB_RFP";
+
+  /** Outbox purpose of the comparative sent to the client. */
+  public static final String PURPOSE_COMPARATIVE = "EB_COMPARATIVE";
+
+  /** Outbox purpose of the submissions to insurers. */
+  public static final String PURPOSE_SUBMISSION = "EB_SUBMISSION";
+
+  /** Outbox purpose of the member changes relayed. */
+  public static final String PURPOSE_MEMBER_CHANGE = "EB_MEMBER_CHANGE";
+
+  /** Outbox purpose of the SOA released to the client. */
+  public static final String PURPOSE_SOA = "EB_SOA";
+
+  /** Front-end route of a comparative page. */
+  public static final String COMPARATIVE_LINK = "/eb/comparatives/";
+
+  /** Front-end route of a member change. */
+  public static final String MEMBER_CHANGE_LINK = "/eb/member-changes?change=";
+
+  /** Front-end route of an SOA. */
+  public static final String SOA_LINK = "/eb/soa?soa=";
+
+  /** Permission of the EB Marketing users. */
+  public static final String PERMISSION_MARKET = "EB_MARKET";
+
+  /** Permission of the EB Processing users. */
+  public static final String PERMISSION_PROCESS = "EB_PROCESS";
+
+  /** Permission of the EB Collection users. */
+  public static final String PERMISSION_COLLECT = "EB_COLLECT";
+
+  /** Permission of the comparative signatories. */
+  public static final String PERMISSION_COMPARATIVE_APPROVE = "EB_COMPARATIVE_APPROVE";
+
+  /** Default permission of the threshold approvers. */
+  public static final String PERMISSION_THRESHOLD_APPROVE = "EB_THRESHOLD_APPROVE";
+
+  /** Permission of the EB set-up. */
+  public static final String PERMISSION_SETUP = "EB_SETUP";
+
   private EbCodes() {}
 
   /**

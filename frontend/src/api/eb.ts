@@ -66,7 +66,11 @@ export type {
 
 const BASE = '/eb';
 
-function filesForm(fields: Record<string, string | undefined>, files: File[], field = 'files') {
+export function filesForm(
+  fields: Record<string, string | undefined>,
+  files: File[],
+  field = 'files',
+) {
   const form = new FormData();
   Object.entries(fields).forEach(([key, value]) => {
     if (value !== undefined && value !== '') {

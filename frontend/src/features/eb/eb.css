@@ -26,3 +26,43 @@
   display: grid;
   gap: var(--space-2);
 }
+
+/* Editable rows of the TOR, proposal plans and answers. */
+.eb-edit-table td {
+  padding: var(--space-1) var(--space-2);
+  vertical-align: top;
+}
+
+.eb-edit-table .input,
+.eb-edit-table .select {
+  min-width: 96px;
+}
+
+.eb-subtitle {
+  margin: var(--space-2) 0 0;
+  font-size: 1rem;
+  color: var(--color-heading);
+}
+
+/* The comparative matrix: one column per proposal, the recommendation highlighted. */
+.eb-matrix th[scope='row'] {
+  min-width: 180px;
+  text-align: left;
+}
+
+.eb-matrix td {
+  vertical-align: top;
+}
+
+.eb-recommended {
+  background: var(--color-success-bg);
+}
+
+.eb-deviation {
+  background: var(--color-warning-bg);
+}
+
+.eb-comment {
+  border-left: 3px solid var(--color-border-strong);
+  padding-left: var(--space-3);
+}

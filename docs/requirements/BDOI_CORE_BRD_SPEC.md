@@ -5,7 +5,7 @@ Client: BDO Insurance and Reinsurance Brokers, Inc. (BDOI), Philippines. Platfor
 Status: **analysis of the umbrella BRD against the twelve BRDs, the Data Migration BRD, the ReInsurance BRD
 (phase 2) and the code as built.** The impact on the build is in
 [`CORE_REPLACEMENT_IMPACT.md`](../architecture/CORE_REPLACEMENT_IMPACT.md); the client document is the umbrella FRS
-(`docs/deliverables/src/frs/FRS_BRD00_CORE_REPLACEMENT.md`, built as
+(`docs/deliverables/src/BRD-00_Core_Replacement/FRS_BRD00_CORE_REPLACEMENT.md`, built as
 `BIBS_FRS_BRD-00_Core_Replacement_v1.0.docx`).
 
 ## 1. Source document

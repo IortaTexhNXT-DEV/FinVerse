@@ -157,7 +157,8 @@ class EbFoundationIT {
     assertThat(
             jdbc.queryForObject(
                 "select count(*) from doc_template where code like 'EB\\_%'", Long.class))
-        .isEqualTo(10L);
+        .as("ten templates of V1030 and three of V1039")
+        .isEqualTo(13L);
     assertThat(
             jdbc.queryForObject(
                 "select param_value from sys_parameter where param_key = 'BOOKING_BILLING_NO_LINES'",

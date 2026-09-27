@@ -14,11 +14,10 @@ import type { FeatureModule } from '@/navigation/types';
 
 /**
  * Employee Benefits (BRD-8, BRID-001-030; docs/architecture/EMPLOYEE_BENEFITS_DESIGN.md section
- * 10.1): EB programmes and cycles up to placement, member servicing and SOAs. Registered by the
- * foundation (E0) in Client & Policy after Non-Package Management with every internal route of the
- * design; each route points at the page of the wave that builds it (E1-B: programmes, programme,
- * comparative, set-up; E1-C: member changes, pending items, SOA). A wave replaces its page files
- * and keeps the routes. BDOI Drop 2 has no partner portal: no portal screen or route is declared.
+ * 10.1): EB programmes and cycles up to placement, member servicing and SOAs, in Client & Policy
+ * after Non-Package Management: programmes and the programme page, the comparative, member changes,
+ * pending items, the SOA register and EB Setup. BDOI Drop 2 has no partner portal: no portal
+ * screen or route is declared.
  * EB reports are in the Report Centre under Employee Benefits.
  */
 export const ebModule: FeatureModule = {

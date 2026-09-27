@@ -154,3 +154,81 @@ best:
   - {practice: Self-service, status: BEYOND, lever: Fewer calls, what: 'Clients get RA, e-policy, SOA and payment status online or by chatbot.', rec: 'Phase after go-live; start with document download.'}
   - {practice: Knowledge base and scripts, status: BEYOND, lever: Consistent answers, what: 'Answers and call scripts per concern type, kept by the contact centre.', rec: 'Move CC Nav content into the case tool.'}
   - {practice: First-contact resolution metrics, status: BEYOND, lever: Service quality, what: 'First-contact resolution, TAT met and satisfaction per unit.', rec: 'Report from case data.'}
+
+# Floor-walk edition (reverse KT v3.0): overrides for build_floorwalk_deck.py; floor walk and BDOI flows only.
+fw:
+  num: 10
+  variants_place: wants
+  variants_note: 'BDOI''s case-management To-Be flow of 15-Jul-2026: how the business wants the contact centre to work.'
+  figures:
+    - ['2 centres', 'BDO Insure contact centre and BDO CCC handle cases (Case To-Be)']
+    - ['2 paths', 'search: CBG accounts by invoice or PN, non-CBG by name (CSF flow)']
+    - ['7 steps', 'in BDOI''s case-management To-Be of 15-Jul-2026']
+    - ['TAT', 'per referred case, which BDOI wants visible (Case To-Be)']
+  sources:
+    - 'Customer Servicing Facility process flow'
+    - 'BDOI Case Management To-Be process flow, 15-Jul-2026'
+    - 'New Business and Renewal flows (e-policy after a fall-out)'
+  session:
+    when: 'Process flows shared by BDOI; the contact centre was not in the September floor-walk slots'
+    pocs: 'Contact Center Management (BDO Insure)'
+  notes:
+    glance: >-
+      The BDO Insure contact centre answers clients by phone, e-mail and digital channels: searching accounts,
+      answering inquiries, updating contact details, resending documents and referring what it cannot close to the
+      Marketing unit that manages the account. Every contact is logged by hand in CLS. BDOI has drawn its own
+      case-management To-Be (15-Jul-2026), shown after the pain points.
+    pains: 'The seven points are on the Customer Servicing swimlane.'
+    wants: 'For each pain point: what BDOI''s case-management To-Be asks for.'
+  asis:
+    caption: 'Contact-centre servicing today (CSF process flow; Case Management flow; NB flow)'
+    notes: >-
+      The client contacts the BDO Insure contact centre. The agent identifies the client and the concern, searches CBG
+      accounts by invoice number, PN or name and non-CBG accounts by name only, and answers general inquiries from CC
+      Nav. For an account concern the agent checks the client's identity (PID). Contact changes are updated and pushed
+      to the QPS and EBIX databases. Every concern is typed into CLS; concerns that cannot be closed are referred to
+      the fulfilment unit by e-mail and a CLS prompt, without a TAT view, and cases returned as erroneous are re-logged
+      by BDO CCC. After an e-policy fall-out the contact centre also sends the e-policy to the client.
+    cols: 7
+    lanes:
+      - {id: cal, label: Caller (client), kind: external}
+      - {id: agt, label: Contact centre agent}
+      - {id: ful, label: 'Fulfilment unit (Marketing)'}
+      - {id: ccc, label: BDO CCC}
+      - {id: sys, label: 'CC Nav, CLS, Front-End', kind: system}
+    steps:
+      - {id: s1, lane: cal, col: 1, text: 'Calls, e-mails or messages', kind: external}
+      - {id: s2, lane: agt, col: 1, text: Identifies client and concern}
+      - {id: s3, lane: sys, col: 2, text: 'Search: CBG by invoice or PN; others by name', kind: legacy, pain: [1]}
+      - {id: s4, lane: agt, col: 3, text: 'PID; answers from CC Nav', pain: [2]}
+      - {id: s5, lane: sys, col: 3, text: 'Contact update pushed to QPS, EBIX', kind: legacy, pain: [3]}
+      - {id: s6, lane: agt, col: 4, text: Every concern typed into CLS, pain: [4]}
+      - {id: s7, lane: ful, col: 5, text: 'Referral by e-mail; no TAT view', pain: [5]}
+      - {id: s8, lane: ful, col: 6, text: 'Resolves, or returns the case'}
+      - {id: s9, lane: ccc, col: 7, text: Re-logs valid returns, pain: [6]}
+      - {id: s10, lane: agt, col: 7, text: 'Sends e-policies after fall-outs', pain: [7]}
+    edges:
+      - [s1, s2]
+      - [s2, s3]
+      - [s3, s4]
+      - [s4, s5]
+      - [s4, s6]
+      - [s6, s7, dashed, e-mail]
+      - [s7, s8]
+      - [s8, s9, dashed, return]
+  pains:
+    - {n: 1, title: Two search paths, text: 'CBG accounts by invoice or PN; non-CBG accounts by name only.', ref: 'CSF flow'}
+    - {n: 2, title: PID and answers by hand, text: 'Identity checked by questions; answers looked up in CC Nav.', ref: 'Case Management flow'}
+    - {n: 3, title: Updates pushed to legacy, text: 'Contact changes written to the QPS and EBIX databases.', ref: 'CSF flow'}
+    - {n: 4, title: Every concern keyed into CLS, text: 'Agents type every contact into CLS, even resolved ones.', ref: 'Case Management flow'}
+    - {n: 5, title: Referrals by e-mail, text: 'Fulfilment units are told by e-mail; no view of TAT.', ref: 'Case Management flow'}
+    - {n: 6, title: Returned cases re-logged, text: 'Erroneous cases go back and BDO CCC logs them again.', ref: 'Case Management flow'}
+    - {n: 7, title: Contact centre sends fall-outs, text: 'E-policies fixed by Marketing are sent by the contact centre.', ref: 'NB flow'}
+  wants:
+    - {n: 1, bibs: 'One search across every account, CBG and non-CBG', measure: 'One view'}
+    - {n: 2, bibs: 'PID as a step of the case; answers at hand', measure: 'PID step'}
+    - {n: 3, bibs: 'Contact changes made once in one client record', measure: 'One client'}
+    - {n: 4, bibs: 'Case form filled with the client''s details automatically', measure: 'Case management'}
+    - {n: 5, bibs: 'Cases routed automatically to the Marketing unit of the account; TAT visible', measure: 'Routing and TAT'}
+    - {n: 6, bibs: 'Return loop in the case, without re-logging', measure: 'Case history'}
+    - {n: 7, bibs: 'One e-policy sender (see chapter 1)', measure: 'One sender'}

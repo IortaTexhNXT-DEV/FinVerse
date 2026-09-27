@@ -255,3 +255,40 @@ best:
   - {practice: Automated tax certificates, status: PARTLY, lever: Compliance, what: '2307 for every payee and a register of certificates received, reconciled to SAWT.', rec: 'Extend 2307 generation to all payees.'}
   - {practice: BIR e-invoicing readiness, status: CONFIRM, lever: Compliance, what: 'CAS-registered books and electronic invoicing (EIS) when it applies.', rec: 'Confirm applicability with Tax and plan the format.'}
   - {practice: Multi-dimensional chart of accounts, status: PARTLY, lever: Profitability view, what: 'Branch, profit centre, cost centre, product, insurer and segment on every entry.', rec: 'Map the 8 branches and centres before go-live.'}
+
+# Floor-walk edition (reverse KT v3.0): overrides for build_floorwalk_deck.py; floor walk and BDOI flows only.
+fw:
+  num: 8
+  title: Comptrollership
+  short: Comptrollership
+  sources:
+    - 'Process flows: Disbursement (in the system, online banking, outside the system, government), Refund Request (five segments), FRBS GL, ACSL'
+    - 'BDOI Day 1 overview p.26-27'
+    - 'Floor-walk notes DS-01 to DS-05, TX-01 to TX-05, RC-01, RC-02, FN-01, RP-01, OI-01 to OI-03'
+  pains_refs:
+    1: 'Refund Request flow'
+    6: 'DS-04; Disbursement flow'
+    7: 'Disbursement flow'
+    11: 'FRBS flow'
+  notes:
+    glance: >-
+      Comptrollership turns every business event into accounting and pays everyone BDOI owes: insurers, clients,
+      suppliers, employees and the government. Disbursement runs four routes with three levels of signed approval;
+      FRBS keeps the chart of accounts, reviews the reports IT prepares, reconciles, posts manual journals and closes
+      the books; ACSL keeps the sub-ledger clean. Refund requests start in Marketing with five approval chains.
+    pains: 'Points 1 to 8 are on the Disbursement and Refund swimlane, 9 to 12 on the GL and ACSL swimlane.'
+    wants: 'For each pain point: what the business users asked for, and the lever we suggest.'
+  variants_note: 'From the Refund Request and Disbursement process flows confirmed by the process owners.'
+  wants:
+    - {n: 1, bibs: 'One refund request with routing by segment and fewer signatures', measure: 'Workflow'}
+    - {n: 2, bibs: 'Every disbursement request in one intake, none on paper', measure: 'One queue'}
+    - {n: 3, bibs: 'Payee details kept once for every payment type', measure: 'One payee master'}
+    - {n: 4, bibs: 'Maker-checker kept, with approval limits instead of wet signatures (DS-01)', measure: 'DOA matrix'}
+    - {n: 5, bibs: 'Credit files and checks produced without QPS and WinSCP', measure: 'Host-to-host'}
+    - {n: 6, bibs: 'Mode of payment captured in the system (DS-04)', measure: 'Mode recorded'}
+    - {n: 7, bibs: 'Entry Debit Cash in Bank / Credit Insurance Company, posted at approval (DS-05)', measure: 'Entries at source'}
+    - {n: 8, bibs: 'Tax and contribution due dates tracked; filing and payment confirmed', measure: 'Calendar'}
+    - {n: 9, bibs: 'Business units run reports themselves (RP-01)', measure: 'Self-service'}
+    - {n: 10, bibs: 'Bank and insurer reconciliation account-wise, automated (RC-01, RC-02)', measure: 'Auto matching'}
+    - {n: 11, bibs: 'Close run by Comptrollership, not IT', measure: 'Scheduled close'}
+    - {n: 12, bibs: 'Abnormal balances flagged by rule', measure: 'Exception queue'}

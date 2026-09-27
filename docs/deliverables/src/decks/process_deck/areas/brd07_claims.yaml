@@ -165,3 +165,74 @@ best:
   - {practice: Repair network integration, status: BEYOND, lever: Shorter repair time, what: 'LOA and repair status exchanged with accredited shops and dealers.', rec: 'After go-live with the main dealers.'}
   - {practice: Document checklist with chasing, status: NOT_IN_BRD, lever: Complete files first time, what: 'Checklist per claim type and automatic reminders to the client.', rec: 'Define the checklists with the Claims team.'}
   - {practice: Claims analytics for renewals, status: PARTLY, lever: Better terms, what: 'Loss ratio and claims-prone locations feed renewals and risk advice.', rec: 'Share loss experience with Renewal and TSU.'}
+
+# Floor-walk edition (reverse KT v3.0): overrides for build_floorwalk_deck.py; floor walk and BDOI flows only.
+fw:
+  num: 9
+  figures:
+    - ['2 paths', 'Motor and Non-Motor claims (Claims flow)']
+    - ['LOA / cash', 'Motor settlement: letter of authority to a repair shop, or cash']
+    - ['Adjuster', 'appointed for Non-Motor losses when needed']
+    - ['Outside', 'the system: claims handled manually today (CL-01)']
+  sources:
+    - 'Claims process flow (Motor and Non-Motor swimlanes)'
+    - 'BDOI Day 1 overview p.8 and p.14'
+    - 'Floor-walk note CL-01'
+  notes:
+    glance: >-
+      BDOI supports the client from the notice of loss to settlement, as the client's advocate with the insurer. Motor
+      claims end with a letter of authority to a repair shop or dealer, or a cash offer; Non-Motor claims go through the
+      claims reporting form, the formal loss advice, an adjuster's inspection and an offer that the client accepts or
+      contests. Claims are handled outside any system today (CL-01).
+    pains: 'The six points are on the Claims swimlane.'
+    wants: 'For each pain point: what the business needs, and the lever we suggest.'
+  asis:
+    caption: 'Claims today (Claims process flow, Motor and Non-Motor; Day 1 p.14; CL-01)'
+    notes: >-
+      The client, the AO or the branch sends the notice of loss; Claims prepares the preliminary loss advice (Motor) or
+      the claims reporting form (Non-Motor) and chases the documents until complete, then sends them with the loss
+      advice to the insurer by e-mail. The insurer assesses the loss, with an adjuster's inspection when needed, and
+      makes an offer, or for Motor issues a letter of authority to the preferred repair shop or dealer. Claims reviews
+      the offer and sends it to the insured, who signs or contests; a contested offer goes back for re-evaluation.
+      Repairs are monitored offline, and the claim is tagged settled or closed. None of it is in a system.
+    cols: 7
+    lanes:
+      - {id: cli, label: 'Client, AO, branch', kind: external}
+      - {id: clm, label: Claim Handler}
+      - {id: ins, label: 'Insurer, adjuster', kind: external}
+      - {id: rep, label: 'Assured, repair shop', kind: external}
+      - {id: sys, label: 'E-mail, Excel, paper', kind: system}
+    steps:
+      - {id: c1, lane: cli, col: 1, text: 'Notice of loss by e-mail or call', kind: external}
+      - {id: c2, lane: clm, col: 1, text: 'PLA or claims form prepared by hand', pain: [1]}
+      - {id: c3, lane: clm, col: 2, text: 'Documents chased until complete', pain: [2]}
+      - {id: c4, lane: clm, col: 3, text: 'Loss advice and documents by e-mail', pain: [3]}
+      - {id: c5, lane: ins, col: 4, text: 'Assessment; adjuster inspection', kind: external}
+      - {id: c6, lane: ins, col: 5, text: 'Offer, or LOA to repair shop', kind: external}
+      - {id: c7, lane: clm, col: 5, text: 'Offer reviewed; accept or contest loop', pain: [4]}
+      - {id: c8, lane: rep, col: 6, text: 'Signs; repair monitored offline', kind: external, pain: [5]}
+      - {id: c9, lane: clm, col: 7, text: Claim tagged settled or closed}
+      - {id: c10, lane: sys, col: 3, text: 'Status kept outside any system', kind: legacy, pain: [6]}
+    edges:
+      - [c1, c2, dashed, e-mail]
+      - [c2, c3]
+      - [c3, c4]
+      - [c4, c5, dashed, e-mail]
+      - [c5, c6]
+      - [c6, c7, dashed]
+      - [c7, c8, dashed]
+      - [c8, c9]
+  pains:
+    - {n: 1, title: Notice and forms by hand, text: 'Notice by e-mail or call; PLA or claims form prepared manually.', ref: 'Claims flow'}
+    - {n: 2, title: Documents chased by hand, text: 'No checklist; the handler follows up until the file is complete.', ref: 'Claims flow'}
+    - {n: 3, title: Loss advice by e-mail, text: 'Loss advice and documents e-mailed to each insurer.', ref: 'Claims flow'}
+    - {n: 4, title: Offer and contest by e-mail, text: 'Offers reviewed, sent, accepted or contested outside a system.', ref: 'Claims flow'}
+    - {n: 5, title: Repairs monitored offline, text: 'After the LOA, repair progress is followed by phone and e-mail.', ref: 'Claims flow'}
+    - {n: 6, title: Claims outside the system, text: 'Claims are handled manually; status and history kept offline.', ref: 'CL-01'}
+  wants:
+    - {n: 1, bibs: 'The claim linked to its policy from the first notice (Day 1 p.8)', measure: 'Claim on the policy'}
+    - {n: 2, bibs: 'Required documents and status values per claim type (Day 1 p.8)', measure: 'Checklist'}
+    - {n: 3, bibs: 'Loss advice generated and sent from the claim, with a record', measure: 'Send log'}
+    - {n: 4, bibs: 'Who can update, review or approve, recorded on the claim (Day 1 p.8)', measure: 'Roles'}
+    - {n: 5, bibs: 'Repair milestones followed to completion', measure: 'Milestones'}
+    - {n: 6, bibs: 'Claims handled in the system, with customer communication recorded (CL-01; Day 1 p.8)', measure: 'One record'}

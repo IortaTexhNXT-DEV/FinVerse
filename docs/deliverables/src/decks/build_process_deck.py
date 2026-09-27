@@ -528,16 +528,18 @@ class ProcessDeck(BdoiDeck):
         notes += [f"{p['n']}. {p['title']}: {p['text']} ({p['ref']})" for p in pains]
         self.notes(notes)
 
-    def before_after(self, a: dict) -> None:
+    def before_after(self, a: dict, rows_key: str = "after", suffix: str = "how the BRD answers",
+                     heads: tuple = ("Pain point today", "To-Be in the BRD", "Benefit")) -> None:
+        """Pain point -> answer -> benefit rows ({n, bibs, measure}), seven a slide."""
         pains = {p["n"]: p for p in a["pains"]}
-        pages = chunks(a["after"], 7)
+        pages = chunks(a[rows_key], 7)
         for pi, rows in enumerate(pages):
-            s = self.page(paged(f"{a['num']}. {_short(a)}: how the BRD answers", pi, len(pages)))
+            s = self.page(paged(f"{a['num']}. {_short(a)}: {suffix}", pi, len(pages)))
             head_y = TOP - Inches(0.02)
             xb, wb = MARGIN + Inches(0.5), Inches(3.7)
             xa, wa = xb + wb + Inches(0.45), Inches(5.2)
             xm, wm = xa + wa + Inches(0.12), CONTENT_W - (xa + wa + Inches(0.12) - MARGIN)
-            for x, w, t in ((xb, wb, "Pain point today"), (xa, wa, "To-Be in the BRD"), (xm, wm, "Benefit")):
+            for x, w, t in zip((xb, xa, xm), (wb, wa, wm), heads):
                 self._text(s, x, head_y, w, Inches(0.3), t, size=12, bold=True, colour=brand.HEADER_BLUE)
             rh = Inches(5.0) / 7
             for i, r in enumerate(rows):
@@ -553,9 +555,9 @@ class ProcessDeck(BdoiDeck):
                           anchor=MSO_ANCHOR.MIDDLE, space=0)
                 self.para(s, xm, y, wm, bh, [[(r.get("measure") or "-", True, brand.SUCCESS)]], size=11,
                           anchor=MSO_ANCHOR.MIDDLE, space=0)
-        notes = [a.get("notes", {}).get("after", "")]
+        notes = [a.get("notes", {}).get(rows_key, "")]
         notes += [f"{r['n']}. {pains[r['n']]['title']} -> {r['bibs']}"
-                  + (f" Benefit: {r['measure']}." if r.get("measure") else "") for r in a["after"]]
+                  + (f" {heads[2]}: {r['measure']}." if r.get("measure") else "") for r in a[rows_key]]
         self.notes(notes)
 
     def missed(self, a: dict | None, title: str | None = None, rows_in: list | None = None, notes: str = "",
@@ -581,7 +583,8 @@ class ProcessDeck(BdoiDeck):
               f"{g['rec']} ({g['ref']})" for g in rows_in]
         self.notes(n)
 
-    def best_practice(self, a: dict) -> None:
+    def best_practice(self, a: dict, chips: bool = True) -> None:
+        """Practice cards; ``chips`` shows how far the BRD covers each (off in the floor-walk edition)."""
         items = a["best"]
         pages = chunks(items, 6)
         for pi, part in enumerate(pages):
@@ -598,11 +601,13 @@ class ProcessDeck(BdoiDeck):
                 self.box(s, x, y, cw, Inches(0.62), brand.HEADER_BLUE, radius=False)
                 self.para(s, x + Inches(0.08), y, cw - Inches(0.16), Inches(0.62),
                           [[(b["practice"], True, brand.WHITE)]], size=13, anchor=MSO_ANCHOR.MIDDLE, space=0)
-                label, fill, font = COVERAGE[b["status"]]
-                self.chip(s, x + Inches(0.1), y + Inches(0.7), label, fill, font, w=Inches(1.75), h=Inches(0.28),
-                          size=11)
+                lx = x + Inches(0.1)
+                if chips:
+                    label, fill, font = COVERAGE[b["status"]]
+                    self.chip(s, lx, y + Inches(0.7), label, fill, font, w=Inches(1.75), h=Inches(0.28), size=11)
+                    lx = x + Inches(1.95)
                 if b.get("lever"):
-                    self.para(s, x + Inches(1.95), y + Inches(0.68), cw - Inches(2.05), Inches(0.32),
+                    self.para(s, lx, y + Inches(0.68), x + cw - lx - Inches(0.1), Inches(0.32),
                               [[(b["lever"], True, brand.CTA_BLUE)]], size=11, anchor=MSO_ANCHOR.MIDDLE, space=0)
                 self.para(s, x + Inches(0.08), y + Inches(1.02), cw - Inches(0.16), ch - Inches(1.05),
                           [[("Industry practice: ", True, brand.HEADER_BLUE), (b["what"], False, brand.TEXT)],
@@ -610,7 +615,8 @@ class ProcessDeck(BdoiDeck):
                           space=4)
         notes = [a.get("notes", {}).get("best", "Practices of insurance brokers that fit BDOI, beyond what the BRD "
                                                  "asks; the chip shows how far the BRD already covers each one.")]
-        notes += [f"{b['practice']} [{COVERAGE[b['status']][0]}]. {b['what']} For BDOI: {b['rec']}" for b in items]
+        notes += [f"{b['practice']}" + (f" [{COVERAGE[b['status']][0]}]" if chips else "")
+                  + f". {b['what']} For BDOI: {b['rec']}" for b in items]
         self.notes(notes)
 
     def table_slide(self, title: str, t: dict, fill_col: int | None = None, fill_map: dict | None = None,
@@ -693,8 +699,9 @@ class ProcessDeck(BdoiDeck):
         px = MARGIN + Inches(8.3)
         pw = CONTENT_W - Inches(8.3)
         ph = (BOTTOM - TOP - Inches(0.28)) / 2
-        self.card(s, px, TOP, pw, ph, "To-Be in the BRD", r["brd"], head_h=Inches(0.45))
-        self.card(s, px, TOP + ph + Inches(0.18), pw, ph, "Our recommendation", r["rec"], head_h=Inches(0.45),
+        self.card(s, px, TOP, pw, ph, r.get("brd_title", "To-Be in the BRD"), r["brd"], head_h=Inches(0.45))
+        self.card(s, px, TOP + ph + Inches(0.18), pw, ph, r.get("rec_title", "Our recommendation"), r["rec"],
+                  head_h=Inches(0.45),
                   head_fill=brand.CTA_BLUE)
         self.notes(r.get("notes", ""))
 

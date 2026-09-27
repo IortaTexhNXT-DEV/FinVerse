@@ -149,3 +149,103 @@ best:
   - {practice: Digital member cards, status: BEYOND, lever: Member experience, what: 'HMO and life cards issued digitally to members.', rec: 'With the HMOs after go-live.'}
   - {practice: Privacy by design, status: NOT_IN_BRD, lever: Compliance, what: 'Masking, need-to-know access and retention for member data.', rec: 'Agree the rules with the DPO (DCR-094).'}
   - {practice: Provider scorecard, status: BEYOND, lever: Better advice, what: 'Insurer and HMO service levels, network and claims turnaround scored in the comparative.', rec: 'Add capability scores to the comparative.'}
+
+# Floor-walk edition (reverse KT v3.0): overrides for build_floorwalk_deck.py; floor walk and BDOI flows only.
+fw:
+  num: 4
+  variants_place: wants
+  roles:
+    - 'EB Marketing AO, TL and UH'
+    - 'BDOI Management (approval above the internal threshold); ISACOM (non-accredited provider)'
+    - 'EB Processing and Collection'
+    - 'Client HR (master list, utilization, broker of record)'
+    - 'Insurers and HMOs (proposals, claims validation)'
+  figures:
+    - ['50,000+', 'members handled today (EB-01)']
+    - ['BOR', 'broker of record kept for corporate renewal (EB-03)']
+    - ['2 portals', 'for insurers and client HR in BDOI''s EB flow']
+    - ['Provider', 'validates EB claims; BDOI captures them (EB-02)']
+  sources:
+    - 'Employee Benefits process flow shared by BDOI (new business and renewal)'
+    - 'Floor-walk notes EB-01 to EB-03'
+  notes:
+    glance: >-
+      Employee Benefits places group life, HMO and accident programmes for corporate clients. It works like non-life
+      business with more parties: client HR sends the master list, BDOI obtains the broker of record and the insurers'
+      franchise, sends the terms of reference, compares the proposals and presents a recommendation; after the client
+      confirms, Processing receives the employee details and places the programme. More than 50,000 members today.
+    pains: 'The six points are on the EB swimlane.'
+    wants: 'For each pain point: what the business needs; the next slide is BDOI''s own EB flow.'
+  asis:
+    caption: 'Employee Benefits today (EB floor walk 23-Sep; EB-01 to EB-03; EB process flow)'
+    notes: >-
+      Marketing receives the master list from the client (headcount only at quote stage) and the broker of record,
+      sends them to the insurers and negotiates; proposals come back by e-mail and the comparative is prepared by
+      hand. After the client confirms, Processing gets the employee details and places the programme; member lists
+      of more than 50,000 members travel as files. Above-threshold awards and awards to a non-accredited provider
+      need management or ISACOM approval. EB claims are validated by the provider and BDOI captures the details.
+    cols: 7
+    lanes:
+      - {id: hr, label: Client HR, kind: external}
+      - {id: mao, label: EB Marketing AO}
+      - {id: ins, label: 'Insurers, HMOs', kind: external}
+      - {id: prc, label: 'EB Processing, Collection'}
+      - {id: sys, label: 'Excel, e-mail, EBIX', kind: system}
+    steps:
+      - {id: e1, lane: hr, col: 1, text: 'Master list (headcount); BOR', kind: external}
+      - {id: e2, lane: mao, col: 1, text: 'List and BOR sent to insurers', pain: [1]}
+      - {id: e3, lane: ins, col: 2, text: 'Franchise; proposals by e-mail', kind: external, pain: [2]}
+      - {id: e4, lane: mao, col: 3, text: 'Negotiation; comparative by hand', pain: [3]}
+      - {id: e5, lane: sys, col: 3, text: 'Management / ISACOM approval outside', kind: legacy, pain: [6]}
+      - {id: e6, lane: hr, col: 4, text: Client confirms, kind: external}
+      - {id: e7, lane: prc, col: 5, text: 'Employee details; placement', pain: [4]}
+      - {id: e8, lane: sys, col: 5, text: '50K+ members in Excel files', kind: legacy, pain: [4]}
+      - {id: e9, lane: prc, col: 6, text: 'Booked and billed'}
+      - {id: e10, lane: ins, col: 7, text: Provider validates claims, kind: external}
+      - {id: e11, lane: mao, col: 7, text: Claim details captured, pain: [5]}
+    edges:
+      - [e1, e2, dashed, e-mail]
+      - [e2, e3, dashed, e-mail]
+      - [e3, e4, dashed]
+      - [e4, e5]
+      - [e4, e6, dashed]
+      - [e6, e7]
+      - [e7, e8]
+      - [e7, e9]
+      - [e10, e11, dashed]
+  pains:
+    - {n: 1, title: Master lists and BOR by e-mail, text: 'Headcount lists and the broker of record travel by e-mail.', ref: 'EB-01, EB-03'}
+    - {n: 2, title: Proposals by e-mail, text: 'Insurers and HMOs send proposals and revisions by e-mail.', ref: 'EB-01; EB flow'}
+    - {n: 3, title: Comparative by hand, text: 'Premiums, benefits and provider capabilities compared manually.', ref: 'EB flow'}
+    - {n: 4, title: 50K+ members in files, text: 'Employee details for placement handled as spreadsheets.', ref: 'EB-01'}
+    - {n: 5, title: Claims captured from providers, text: 'Provider validates; BDOI re-captures the details.', ref: 'EB-02'}
+    - {n: 6, title: Approvals outside the system, text: 'Above-threshold and ISACOM approvals handled offline.', ref: 'EB flow'}
+  wants:
+    - {n: 1, bibs: 'Master list, utilization and BOR uploaded once and kept per programme', measure: 'Upload'}
+    - {n: 2, bibs: 'Insurers upload proposals themselves (insurer portal in BDOI''s flow)', measure: 'Insurer portal'}
+    - {n: 3, bibs: 'Comparative generated on premiums, benefits and capabilities', measure: 'Generated comparative'}
+    - {n: 4, bibs: 'The system handles 50K+ members (EB-01)', measure: 'Volume'}
+    - {n: 5, bibs: 'Provider claims captured per programme', measure: 'Claims capture'}
+    - {n: 6, bibs: 'Approval triggered by the internal threshold; ISACOM when needed', measure: 'Workflow'}
+  variants:
+    title: BDOI's EB flow, step by step
+    headers: [Step, What happens, Who]
+    widths: [2.2, 7.6, 2.6]
+    per_page: 8
+    rows:
+      - ['1 Renewal advice', 'System sends the renewal advice before expiry', 'System']
+      - ['2 Requirements', 'Request the BOR; secure the master list, utilization and indicative proposal; uploaded', 'EB Marketing, client HR']
+      - ['3 Franchise', 'BOR sent to the insurers for franchise approval', 'EB Marketing, insurers']
+      - ['4 TOR', 'TOR from the existing benefits and options; released with the master list and utilization to insurers with franchise', 'EB Marketing']
+      - ['5 Proposals', 'Indicative renewal from the incumbent; client feedback; insurers update proposals on client changes', 'Insurers, client']
+      - ['6 Comparative', 'Comparative on premiums, benefits and capabilities (stability, clinics, hospitals, technology); approval above the threshold; ISACOM for a non-accredited provider', 'EB Marketing, management']
+      - ['7 Placement', 'Placement after client confirmation; hand-off to Processing and Collections', 'EB Processing']
+      - ['8 Reports and portals', 'New business, renewal and placement reports; insurer and client portals', 'All']
+    notes: 'The EB process flow BDOI shared. It describes how BDOI wants EB to run, so it is the business aspiration for this chapter.'
+  best:
+    - {practice: HR self-service census, lever: Clean member data, what: 'Client HR uploads the census; the system checks duplicates, eligibility and changes.', rec: 'Start with an upload template and checks; portal later.'}
+    - {practice: Automatic member endorsements, lever: Accurate billing, what: 'Additions and deletions billed pro rata and reconciled to the insurer invoice.', rec: 'Start with the largest programmes.'}
+    - {practice: Utilization analytics, lever: Better renewals, what: 'Claims and utilization per programme drive the renewal negotiation.', rec: 'Capture provider claims (EB-02).'}
+    - {practice: Digital member cards, lever: Member experience, what: 'HMO and life cards issued digitally to members.', rec: 'With the HMOs after go-live.'}
+    - {practice: Privacy by design, lever: Compliance, what: 'Masking, need-to-know access and retention for member data.', rec: 'Agree the rules with the Data Protection Officer.'}
+    - {practice: Provider scorecard, lever: Better advice, what: 'Insurer and HMO service levels, network and claims turnaround scored in the comparative.', rec: 'Add capability scores to the comparative.'}

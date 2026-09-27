@@ -264,3 +264,38 @@ best:
   - {practice: Digital acceptance and payment link, status: BEYOND, lever: Shorter cycle, what: 'Client accepts the proposal online with e-signature and pays by link.', rec: 'After go-live, with the e-signature decision (CP-01).'}
   - {practice: Straight-through bank business, status: PARTLY, lever: Volume at low cost, what: 'Bank loan files (HLS, LAD) become quotations and accounts in bulk without re-keying.', rec: 'Specify the HLS, CLAS and CTS feeds.'}
   - {practice: Marine declarations portal, status: BEYOND, lever: Trade growth, what: 'Declarations by portal or API with e-certificates and QR verification.', rec: 'Specify open covers first (TR-01).'}
+
+# Floor-walk edition (reverse KT v3.0): overrides for the deck built by build_floorwalk_deck.py. Sources are the
+# floor walk, the floor-walk notes and the process flows BDOI shared; no BRD content.
+fw:
+  num: 1
+  figures:
+    - ['30 days', 'quote validity for every product, retail and corporate (NB-03)']
+    - ['7 / 3 days', 'SLA for complex / normal corporate risks (NB-07)']
+    - ['500M', 'value above which a risk survey is required (NB-05)']
+    - ['5 tools', 'for one deal: Excel templates, Broker, ISYS, QPS, EBIX (NB flow)']
+  sources:
+    - 'New Business process flow (CBG Motor, CBG Fire, Non-CBG Corporate, Non-CBG Retail, Branches)'
+    - 'BDOI Day 1 overview p.11 and p.18'
+    - 'Floor-walk notes NB-01 to NB-15, DC-01, TR-01, TR-02'
+  notes:
+    glance: >-
+      New Business turns a customer need into an issued, booked and delivered policy, and every other area reads the
+      client, the account and the invoice it creates. The journey differs by segment and by product type: package
+      products follow fixed terms, non-package risks go through TSU. On the floor one deal crossed five tools: Excel
+      templates, Broker, ISYS, QPS and EBIX, with an IT migration between ISYS and QPS.
+    pains: 'Points 1 to 5 are on the request-to-account swimlane, 6 to 12 on the placement-to-booking swimlane.'
+    wants: 'For each pain point: what the business users asked for, and the lever we suggest.'
+  wants:
+    - {n: 1, bibs: 'Bank lists and e-mailed requests captured once, in bulk where the bank sends a list', measure: 'Bulk intake'}
+    - {n: 2, bibs: 'Quotations produced from one rated template, versioned and approved before sending', measure: 'Rating rules'}
+    - {n: 3, bibs: '30-day validity and the 7 / 3-day SLA tracked on every quote (NB-03, NB-07)', measure: 'SLA clocks'}
+    - {n: 4, bibs: 'Decide whether KYC and AMLA move into the system (NB-04)', measure: 'To confirm'}
+    - {n: 5, bibs: 'One client and one account created once, used by placement, booking and renewal', measure: 'Key once'}
+    - {n: 6, bibs: 'One way of sending placement slips to every insurer, with a record of what was sent', measure: 'Insurer standard'}
+    - {n: 7, bibs: 'Returns and hold covers tracked with the placement, documents stored with the account', measure: 'Document store'}
+    - {n: 8, bibs: 'E-policy fall-outs visible in one queue with an owner, no text files', measure: 'Exception queue'}
+    - {n: 9, bibs: 'One team sends every e-policy', measure: 'One sender'}
+    - {n: 10, bibs: 'Booking by role, not by who has access to which system', measure: 'Access by role'}
+    - {n: 11, bibs: 'CLPC billing file produced and the paid list matched automatically', measure: 'Auto matching'}
+    - {n: 12, bibs: 'Pipeline for Retail and Corporate, by source, without Excel (NB-11)', measure: 'Live dashboard'}

@@ -183,3 +183,35 @@ best:
   - {practice: Experience-based renewal pricing, status: PARTLY, lever: Better terms, what: 'Claims and payment history feed the renewal terms and insurer choice.', rec: 'Show loss experience at sanitation (DCR-150).'}
   - {practice: Retention analytics, status: PARTLY, lever: Persistency, what: 'Lapse-risk scores, persistency and lost-business reasons per segment.', rec: 'Track reasons for non-renewal in the disposition list.'}
   - {practice: Early renewal window, status: BEYOND, lever: Fewer last-minute cases, what: 'Terms agreed with insurers before the RMEL so RAs go out on day one.', rec: 'Negotiate renewal terms per package yearly with TSU.'}
+
+# Floor-walk edition (reverse KT v3.0): overrides for build_floorwalk_deck.py; floor walk and BDOI flows only.
+fw:
+  num: 2
+  figures:
+    - ['-140 days', 'the expiring list (RMEL) is extracted from EBIX (Renewal flow)']
+    - ['-70 days', 'first renewal notice to the client']
+    - ['-40 / -45', 'days: final notice for CBG / Non-CBG']
+    - ['3 paths', 'CBG automated RMEL, Non-CBG, non-package and exceptions']
+  sources:
+    - 'Renewal process flow (CBG automated RMEL; Non-CBG; non-package and exceptions)'
+    - 'BDOI Day 1 overview p.14'
+    - 'Floor-walk notes RN-01, RN-02, PM-04, DC-01'
+  notes:
+    glance: >-
+      Renewal starts 140 days before expiry with the RMEL extract from EBIX. Handlers and Marketing decide whether and
+      how each account renews in Excel, BDOI sends the renewal advice on its own template, accepted accounts go to the
+      insurers and the renewal is booked like new business. Review and disposition in Excel was called a major pain
+      point (RN-01).
+    pains: 'The ten points are on the Renewal swimlane.'
+    wants: 'For each pain point: what the business users asked for, and the lever we suggest.'
+  wants:
+    - {n: 1, bibs: 'Expiring list available to the business without an IT extract', measure: 'Scheduled list'}
+    - {n: 2, bibs: 'Work assigned straight to the handler or AO, not passed through four hands', measure: 'Assignment rules'}
+    - {n: 3, bibs: 'Sanitation checks and premium computed by rule', measure: 'Rules'}
+    - {n: 4, bibs: 'Review and disposition out of Excel (RN-01)', measure: 'Online disposition'}
+    - {n: 5, bibs: 'No upload step, so no failed rows to re-work', measure: 'No file upload'}
+    - {n: 6, bibs: 'Renewal advice from the BDOI template (DC-01), by e-mail and print, per client preference', measure: 'Batch RA'}
+    - {n: 7, bibs: 'Acceptance carries the account straight to placement', measure: 'Key once'}
+    - {n: 8, bibs: 'Insurer lists produced per insurer, not built in Excel', measure: 'Insurer standard'}
+    - {n: 9, bibs: 'Pro-forma accounting entries for renewals (RN-02)', measure: 'Pro-forma'}
+    - {n: 10, bibs: 'Same e-policy exception queue as New Business', measure: 'Exception queue'}

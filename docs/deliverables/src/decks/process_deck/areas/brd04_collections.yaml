@@ -166,3 +166,45 @@ best:
   - {practice: Collection KPIs, status: PARTLY, lever: Visibility, what: 'Days sales outstanding, collection effectiveness, promises kept, roll rates; prioritise by likelihood to pay.', rec: 'Build a Collections dashboard on the worklist.'}
   - {practice: Client self-service statement, status: PARTLY, lever: Fewer calls, what: 'Clients see their statement and payment history online or through the contact centre.', rec: 'Start with the SOA through the contact centre (BRCLXN.058).'}
   - {practice: Promise-to-pay discipline, status: IN_BRD, lever: Accountability, what: 'Promises per instalment with reminders and broken-promise escalation.', rec: 'Agree the escalation days per segment.'}
+
+# Floor-walk edition (reverse KT v3.0): overrides for build_floorwalk_deck.py; floor walk and BDOI flows only.
+fw:
+  num: 7
+  figures:
+    - ['10-15 days', 'first collection follow-up after booking (Day 1 p.19)']
+    - ['60 days', 'to secure the client''s payment commitment (Day 1 p.19)']
+    - ['ICS', 'tracks premium and commission collection today (CO-02)']
+    - ['3 routes', 'deposit, bills payment, direct payment to the insurer']
+  sources:
+    - 'Marketing Collections process flow (current end-to-end manual flow)'
+    - 'BDOI Day 1 overview p.19'
+    - 'Floor-walk notes CO-01 to CO-03'
+  asis_caption: 'Premium receivable follow-up today (Marketing Collections process flow; Day 1 p.19; CO-01 to CO-03)'
+  pains_refs:
+    1: 'Collections flow'
+    2: 'Collections flow; Day 1 p.19'
+    3: 'Collections flow; Day 1 p.19'
+    4: 'Collections flow'
+    5: 'Collections flow'
+    6: 'Collections flow'
+    7: 'Collections flow'
+    8: 'Collections flow'
+  notes:
+    glance: >-
+      Collections follows every unpaid premium from booking until the payment is confirmed and handed to Cashiering.
+      The Marketing AO owns the client and records the payment instruction in the Marketing Diary; the Collection
+      Handler follows up, secures a commitment and checks the credit term; the AO asks the insurer for a credit term
+      extension when needed. ICS tracks premium and commission collection today.
+    pains: 'Points 1 to 10 are on the Collections swimlane.'
+    wants: 'For each pain point: what the business users asked for, and the lever we suggest.'
+  wants:
+    - {n: 1, bibs: 'One worklist with the Marketing Diary in view', measure: 'One record'}
+    - {n: 2, bibs: 'The 10-15 and 60-day rules applied by the system, with reminders', measure: 'Rules'}
+    - {n: 3, bibs: 'CTE requested and answered on the account, not by e-mail', measure: 'CTE record'}
+    - {n: 4, bibs: 'Dispositions and categories kept with their history', measure: 'History'}
+    - {n: 5, bibs: 'Payment status visible whatever the payment route', measure: 'One view'}
+    - {n: 6, bibs: '2307 tagging handed over in the system', measure: 'No e-mail'}
+    - {n: 7, bibs: 'Direct-payment report ready on the first working day', measure: 'Scheduled'}
+    - {n: 8, bibs: 'Cheque pick-ups requested from the account', measure: 'Tracked requests'}
+    - {n: 9, bibs: 'Correct outstanding per customer; status closes and ageing stops on payment (CO-01, CO-02)', measure: 'Accurate ageing'}
+    - {n: 10, bibs: 'A written credit policy (CO-03, BDOI to confirm)', measure: 'To decide'}

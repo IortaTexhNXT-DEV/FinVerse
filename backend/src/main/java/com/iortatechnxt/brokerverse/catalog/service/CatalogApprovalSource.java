@@ -72,7 +72,7 @@ public class CatalogApprovalSource implements PendingApprovalSource {
    */
   static String link(CatalogKind kind, CatalogRecord record) {
     return record instanceof RateOverride exception
-        ? RateSchemeExceptionService.LINK + exception.getReferenceNo()
+        ? RateExceptionDecisions.LINK + exception.getReferenceNo()
         : kind.link();
   }
 }

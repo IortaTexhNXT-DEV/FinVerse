@@ -1,7 +1,7 @@
 package com.iortatechnxt.brokerverse.catalog.api.dto;
 
 import com.iortatechnxt.brokerverse.catalog.domain.RateOverride;
-import com.iortatechnxt.brokerverse.catalog.service.RateSchemeExceptionService;
+import com.iortatechnxt.brokerverse.catalog.service.RateExceptionDecisions;
 import com.iortatechnxt.brokerverse.catalog.service.RatingQuery.Purpose;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import jakarta.validation.constraints.DecimalMax;
@@ -142,7 +142,7 @@ public final class RateExceptionDtos {
      * @param d detail
      * @return response
      */
-    public static ExceptionDetail from(RateSchemeExceptionService.Detail d) {
+    public static ExceptionDetail from(RateExceptionDecisions.Detail d) {
       return new ExceptionDetail(
           ExceptionResponse.from(d.exception()),
           d.productName(),

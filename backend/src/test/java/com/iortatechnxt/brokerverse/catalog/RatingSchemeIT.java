@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.RateOverride;
 import com.iortatechnxt.brokerverse.catalog.service.CatalogApprovalSource;
 import com.iortatechnxt.brokerverse.catalog.service.CatalogKind;
 import com.iortatechnxt.brokerverse.catalog.service.CatalogRecords;
+import com.iortatechnxt.brokerverse.catalog.service.RateExceptionDecisions;
 import com.iortatechnxt.brokerverse.catalog.service.RateSchemeExceptionService;
 import com.iortatechnxt.brokerverse.catalog.service.RatingQuery;
 import com.iortatechnxt.brokerverse.catalog.service.RatingQuery.Purpose;
@@ -60,6 +61,7 @@ class RatingSchemeIT {
   @Autowired private PackageSetupService setup;
   @Autowired private RatingService rating;
   @Autowired private RateSchemeExceptionService exceptions;
+  @Autowired private RateExceptionDecisions decisions;
   @Autowired private CatalogRecords records;
   @Autowired private CatalogApprovalSource approvals;
   @Autowired private NotificationRepository notifications;
@@ -150,24 +152,24 @@ class RatingSchemeIT {
         .filteredOn(a -> reference.equals(a.reference()))
         .singleElement()
         .satisfies(a -> assertThat(a.link()).isEqualTo("/catalog/rate-exceptions/" + reference));
-    RateSchemeExceptionService.Detail detail = exceptions.detail(reference);
+    RateExceptionDecisions.Detail detail = decisions.detail(reference);
     assertThat(detail.currentVersionNo()).isEqualTo(2);
     assertThat(detail.schemeRate()).isEqualByComparingTo(NEW_RATE);
     assertThat(detail.productName()).isNotBlank();
 
-    assertThatThrownBy(() -> as.run("ao", () -> exceptions.approve(reference, null)))
+    assertThatThrownBy(() -> as.run("ao", () -> decisions.approve(reference, null)))
         .isInstanceOf(AccessDeniedException.class);
-    assertThatThrownBy(() -> as.run("approver", () -> exceptions.reject(reference, " ")))
+    assertThatThrownBy(() -> as.run("approver", () -> decisions.reject(reference, " ")))
         .extracting("code")
         .isEqualTo("RATE_EXCEPTION_REASON_REQUIRED");
     RateOverride approved =
-        as.run("approver", () -> exceptions.approve(reference, "Loss-free fleet"));
+        as.run("approver", () -> decisions.approve(reference, "Loss-free fleet"));
     assertThat(approved.getRecordStatus()).isEqualTo(RecordStatus.ACTIVE);
     assertThat(approved.getDecidedBy()).isEqualTo("approver");
     assertThat(approved.getDecisionComment()).isEqualTo("Loss-free fleet");
     assertThat(approved.getDecidedAt()).isNotNull();
     assertThat(exceptions.latestApproved(ref, code)).isEqualTo(reference);
-    assertThatThrownBy(() -> as.run("approver", () -> exceptions.reject(reference, "late")))
+    assertThatThrownBy(() -> as.run("approver", () -> decisions.reject(reference, "late")))
         .extracting("code")
         .isEqualTo("RECORD_NOT_PENDING");
     assertThat(notifications.findAll())
@@ -194,10 +196,10 @@ class RatingSchemeIT {
                     new RateOverride.Request(
                         code, null, 1, null, ref, "Keep last year's version", null)));
     String reference = requested.getReferenceNo();
-    assertThatThrownBy(() -> as.run("ao", () -> exceptions.reject(reference, "own request")))
+    assertThatThrownBy(() -> as.run("ao", () -> decisions.reject(reference, "own request")))
         .isInstanceOf(AccessDeniedException.class);
     RateOverride rejected =
-        as.run("approver", () -> exceptions.reject(reference, "Version 2 applies to new business"));
+        as.run("approver", () -> decisions.reject(reference, "Version 2 applies to new business"));
     assertThat(rejected.getRecordStatus()).isEqualTo(RecordStatus.INACTIVE);
     assertThat(rejected.getDecisionComment()).isEqualTo("Version 2 applies to new business");
     assertThat(exceptions.latestApproved(ref, code)).isNull();
@@ -207,7 +209,7 @@ class RatingSchemeIT {
     assertThatThrownBy(() -> rating.rate(old))
         .extracting("code")
         .isEqualTo("RATE_SCHEME_NOT_CURRENT");
-    assertThatThrownBy(() -> as.run("approver", () -> exceptions.approve(reference, null)))
+    assertThatThrownBy(() -> as.run("approver", () -> decisions.approve(reference, null)))
         .extracting("code")
         .isEqualTo("RECORD_NOT_PENDING");
 
@@ -219,11 +221,11 @@ class RatingSchemeIT {
                     new RateOverride.Request(
                         code, null, 1, null, ref, "Requested by an approver", null)));
     assertThatThrownBy(
-            () -> as.run("approver", () -> exceptions.approve(own.getReferenceNo(), "mine")))
+            () -> as.run("approver", () -> decisions.approve(own.getReferenceNo(), "mine")))
         .extracting("code")
         .isEqualTo("MAKER_CHECKER_VIOLATION");
     assertThatThrownBy(
-            () -> as.run("approver", () -> exceptions.reject(own.getReferenceNo(), "mine")))
+            () -> as.run("approver", () -> decisions.reject(own.getReferenceNo(), "mine")))
         .extracting("code")
         .isEqualTo("MAKER_CHECKER_VIOLATION");
   }

@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.catalog.api.dto.RateExceptionDtos.Decision;
 import com.iortatechnxt.brokerverse.catalog.api.dto.RateExceptionDtos.ExceptionDetail;
 import com.iortatechnxt.brokerverse.catalog.api.dto.RateExceptionDtos.ExceptionRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.RateExceptionDtos.ExceptionResponse;
+import com.iortatechnxt.brokerverse.catalog.service.RateExceptionDecisions;
 import com.iortatechnxt.brokerverse.catalog.service.RateSchemeExceptionService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -28,14 +29,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class RateSchemeExceptionController {
 
   private final RateSchemeExceptionService exceptions;
+  private final RateExceptionDecisions decisions;
 
   /**
    * Creates the controller.
    *
    * @param exceptions rate-scheme exceptions
+   * @param decisions approval and rejection of an exception
    */
-  public RateSchemeExceptionController(RateSchemeExceptionService exceptions) {
+  public RateSchemeExceptionController(
+      RateSchemeExceptionService exceptions, RateExceptionDecisions decisions) {
     this.exceptions = exceptions;
+    this.decisions = decisions;
   }
 
   /**
@@ -72,7 +77,7 @@ public class RateSchemeExceptionController {
   @GetMapping("/{reference}")
   @PreAuthorize(CatalogAccess.READ)
   public ExceptionDetail get(@PathVariable String reference) {
-    return ExceptionDetail.from(exceptions.detail(reference));
+    return ExceptionDetail.from(decisions.detail(reference));
   }
 
   /**
@@ -87,7 +92,7 @@ public class RateSchemeExceptionController {
   public ExceptionResponse approve(
       @PathVariable String reference, @Valid @RequestBody(required = false) Decision decision) {
     return ExceptionResponse.from(
-        exceptions.approve(reference, decision == null ? null : decision.comment()));
+        decisions.approve(reference, decision == null ? null : decision.comment()));
   }
 
   /**
@@ -101,6 +106,6 @@ public class RateSchemeExceptionController {
   @PreAuthorize(CatalogAccess.DECIDE_EXCEPTION)
   public ExceptionResponse reject(
       @PathVariable String reference, @Valid @RequestBody Decision decision) {
-    return ExceptionResponse.from(exceptions.reject(reference, decision.comment()));
+    return ExceptionResponse.from(decisions.reject(reference, decision.comment()));
   }
 }

@@ -19,7 +19,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDate, formatPeriod, humanize } from '@/utils/format';
+import { formatAmount, formatDate, formatPeriod, formatRate, humanize } from '@/utils/format';
 import { RUN_ENTITY, frbsApi } from './api';
 import type { ServiceFeeInvoice, ServiceFeeLine, ServiceFeeRun } from './api';
 import { LiquidateDialog, ReleaseDialog } from './LineDialogs';
@@ -86,7 +86,7 @@ function lineColumns(
       numeric: true,
       render: (l) => <Amount value={l.amounts.base} />,
     },
-    { key: 'rate', header: 'Rate', numeric: true, render: (l) => `${String(l.amounts.rate)}%` },
+    { key: 'rate', header: 'Rate', numeric: true, render: (l) => `${formatRate(l.amounts.rate)}%` },
     {
       key: 'fee',
       header: 'Service Fee',

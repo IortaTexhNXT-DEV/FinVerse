@@ -14,7 +14,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { today } from '@/utils/format';
+import { formatRate, today } from '@/utils/format';
 import { AuthorizeButton, SelectField, TextField } from './MasterControls';
 import { TaxFormsPanel } from './TaxFormsPanel';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
@@ -112,7 +112,7 @@ function TaxCodesPanel() {
             { key: 'n', header: 'Name', render: (c) => c.name },
             { key: 't', header: 'Type', render: (c) => c.taxType },
             { key: 'p', header: 'Payee', render: (c) => c.payeeClass ?? '' },
-            { key: 'r', header: 'Rate %', numeric: true, render: (c) => c.rate },
+            { key: 'r', header: 'Rate %', numeric: true, render: (c) => formatRate(c.rate) },
             { key: 'g', header: 'GL', render: (c) => c.glAccountCode },
             { key: 's', header: 'Status', render: (c) => <StatusBadge status={c.recordStatus} /> },
             {

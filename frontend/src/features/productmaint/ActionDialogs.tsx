@@ -10,6 +10,7 @@ import { Modal } from '@/components/ui/Modal';
 import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormControls';
 import { InsurerChoices } from '@/features/proposals/ProposalFormParts';
 import { INSURER_ROLES, offered } from './packageRequest';
+import { formatRate } from '@/utils/format';
 
 interface DialogProps {
   request: PackageRequest;
@@ -209,7 +210,7 @@ export function TermsFinalDialog({ request, onClose, onDone }: Readonly<DialogPr
               checked={r.insurerCode in choices}
               onChange={() => toggle(r.insurerCode)}
             />
-            {r.insurerName} · {r.rate ?? '—'}%
+            {r.insurerName} · {formatRate(r.rate, '—')}%
           </label>
           {r.insurerCode in choices && (
             <>

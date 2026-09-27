@@ -18,7 +18,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useAuth } from '@/auth/authContext';
 import { DetailList } from '@/features/catalog/DetailList';
-import { formatDate, formatDateTime, humanize, versionLabel } from '@/utils/format';
+import { formatDate, formatDateTime, formatRate, humanize, versionLabel } from '@/utils/format';
 import { DocumentChecklist, InsurerChoices } from './ProposalFormParts';
 import { SLIP_EDIT_STAGES, slipSent } from './proposalList';
 import { displayNameOf } from '@/api/users';
@@ -190,7 +190,7 @@ const COMPARE_COLUMNS = [
       </span>
     ),
   },
-  { key: 'r', header: 'Rate %', numeric: true, render: (r: ComparativeRow) => r.rate ?? '' },
+  { key: 'r', header: 'Rate %', numeric: true, render: (r: ComparativeRow) => formatRate(r.rate) },
   { key: 'd', header: 'Deductibles', render: (r: ComparativeRow) => r.deductibles ?? '' },
   { key: 'c', header: 'Conditions', render: (r: ComparativeRow) => r.conditions ?? '' },
   { key: 'v', header: 'Valid Until', render: (r: ComparativeRow) => formatDate(r.validUntil) },

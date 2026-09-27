@@ -15,7 +15,14 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { DetailList } from '@/features/catalog/DetailList';
-import { formatDate, formatDateTime, formatPeriod, humanize, versionLabel } from '@/utils/format';
+import {
+  formatDate,
+  formatDateTime,
+  formatPeriod,
+  formatRate,
+  humanize,
+  versionLabel,
+} from '@/utils/format';
 import { PremiumCard } from './PremiumBreakdown';
 import { displayNameOf } from '@/api/users';
 import { LovLabel, ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
@@ -92,7 +99,7 @@ const ITEM_COLUMNS = [
     key: 'r',
     header: 'Rate %',
     numeric: true,
-    render: (i: QuotationItemView) => i.ratePercent ?? '',
+    render: (i: QuotationItemView) => formatRate(i.ratePercent),
   },
   {
     key: 'p',

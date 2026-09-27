@@ -1,7 +1,7 @@
 import type { ReserveLine, ReserveMovement, ReserveTotal, TakafulItem } from '@/api/reserves';
 import { Amount } from '@/components/ui/Amount';
 import { DataTable } from '@/components/ui/DataTable';
-import { formatDate, humanize } from '@/utils/format';
+import { formatDate, formatRate, humanize } from '@/utils/format';
 import { reserveLabel, summarizeLines } from './reserveMath';
 import type { LineSummary } from './reserveMath';
 
@@ -62,7 +62,7 @@ export function LinesTable({ lines }: Readonly<{ lines: ReserveLine[] }>) {
         { key: 's', header: 'Channel', render: (l) => humanize(l.sourceType) },
         { key: 'm', header: 'Method', render: (l) => (l.method ? humanize(l.method) : '') },
         { key: 'x', header: 'Base', numeric: true, render: (l) => <Amount value={l.base} /> },
-        { key: 'r', header: 'Rate %', numeric: true, render: (l) => l.rate ?? '' },
+        { key: 'r', header: 'Rate %', numeric: true, render: (l) => formatRate(l.rate) },
         { key: 'g', header: GROSS, numeric: true, render: (l) => <Amount value={l.gross} /> },
         { key: 'i', header: RI_SHARE, numeric: true, render: (l) => <Amount value={l.ri} /> },
         { key: 'n', header: NET, numeric: true, render: (l) => <Amount value={l.net} /> },

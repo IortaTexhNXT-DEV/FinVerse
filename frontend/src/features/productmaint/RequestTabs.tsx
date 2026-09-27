@@ -12,7 +12,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDateTime } from '@/utils/format';
+import { formatDateTime, formatRate } from '@/utils/format';
 import { CoverTypeLabel, LineLabel, LovLabel, LovLabels } from '@/components/broking/LovLabel';
 import { typeLabel } from './packageRequest';
 import { UserName } from '@/components/ui/UserName';
@@ -122,7 +122,7 @@ const HISTORY_COLUMNS: Column<ResponseHistory>[] = [
   { key: 'by', header: 'By', render: (h) => <UserName login={h.changedBy} /> },
   { key: 'rev', header: 'Rev.', numeric: true, render: (h) => h.revision },
   { key: 'outcome', header: 'Outcome', render: (h) => <StatusBadge full status={h.outcome} /> },
-  { key: 'rate', header: 'Rate %', numeric: true, render: (h) => h.rate ?? '—' },
+  { key: 'rate', header: 'Rate %', numeric: true, render: (h) => formatRate(h.rate, '—') },
   { key: 'remarks', header: 'Remarks', render: (h) => h.remarks ?? '—' },
 ];
 

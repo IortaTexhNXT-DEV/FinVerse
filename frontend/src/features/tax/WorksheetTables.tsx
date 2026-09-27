@@ -3,7 +3,7 @@ import type { LedgerControl, TaxDocument, Worksheet, WorksheetLine } from '@/api
 import { Amount } from '@/components/ui/Amount';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
-import { formatDate } from '@/utils/format';
+import { formatDate, formatRate } from '@/utils/format';
 import { sourceLink } from './taxDisplay';
 
 const EMPTY: Worksheet = {
@@ -118,7 +118,7 @@ export function WorksheetTables({
               numeric: true,
               render: (d) => <Amount value={d.taxAmount} />,
             },
-            { key: 'r', header: 'Rate %', numeric: true, render: (d) => d.rate },
+            { key: 'r', header: 'Rate %', numeric: true, render: (d) => formatRate(d.rate) },
           ]}
         />
       </Card>

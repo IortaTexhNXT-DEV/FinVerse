@@ -850,7 +850,7 @@ audit:
 acceptance:
   - The recommender cannot give the TSU Head approval.
   - After approval of a NEW request, round 1 exists with the target insurers.
-  - A RETIRE request goes to FOR_MANCOM without a negotiation round.
+  - A retirement request goes to ManCom sign-off without a negotiation round.
 ```
 
 ```fr
@@ -875,7 +875,7 @@ alternate_flows:
   - A TL selects several requests and assigns them to an officer.
 rules:
   - [R1, "Stage owners are notified on stage entry.", Fixed, "-"]
-  - [R2, "\"Deletion\" of a product is a RETIRE request; nothing is physically deleted.", Fixed, "-"]
+  - [R2, "\"Deletion\" of a product is a retirement request; nothing is physically deleted.", Fixed, "-"]
 validations: []
 fields_screen: Package Requests (filters)
 fields:
@@ -1406,18 +1406,18 @@ priority: Must have
 fit: CHANGE
 screens: New Package Request (type RETIRE); Package Request page (Set-up tab)
 api: POST .../requests/{id}/retire
-description: A package is removed from sale through a RETIRE request, which follows the approvals and ManCom sign-off without negotiation. At the MBS step, MBS retires the product instead of setting up a version. The product and all its versions stay readable; nothing is deleted. Active incentive criteria on the product are flagged for review.
+description: A package is removed from sale through a retirement request (request type Retire package), which follows the approvals and ManCom sign-off without negotiation. At the MBS step, MBS retires the product instead of setting up a version. The product and all its versions stay readable; nothing is deleted. Active incentive criteria on the product are flagged for review.
 preconditions:
-  - "A RETIRE request is in WITH_MBS."
+  - "A retirement request is at the stage With MBS for set-up."
 main_flow:
   - MBS clicks **Retire Package**.
   - BIBS sets the product to RETIRED, closes the request as RETIRED and drafts the retirement advisory.
 rules:
-  - [R1, "Only a RETIRE request retires a package; other types cannot.", Fixed, "-"]
+  - [R1, "Only a retirement request retires a package; other types cannot.", Fixed, "-"]
   - [R2, "A retired product cannot be sold to new business.", Fixed, "-"]
 validations:
-  - [Retire on another request type, Only a RETIRE request retires the package, PKG_REQUEST_TYPE_MISMATCH]
-  - [Set-up on a RETIRE request, A RETIRE request retires the package instead, PKG_REQUEST_TYPE_MISMATCH]
+  - [Retire on another request type, Only a request to retire the package can retire it, PKG_REQUEST_TYPE_MISMATCH]
+  - [Set-up on a retirement request, A retirement request retires the package; it has no version to set up, PKG_REQUEST_TYPE_MISMATCH]
   - [Quotation on a retired product, "Product <code> is RETIRED and cannot be sold", PRODUCT_NOT_SELLABLE]
 notifications:
   - "Retirement advisory; incentive review alert INCENTIVE_PRODUCT_INACTIVE to the incentive maintainers."
@@ -1578,7 +1578,7 @@ main_flow:
 rules:
   - [R1, "First alert 60 days before the end date (default).", Configurable, Parameter PACKAGE_EXPIRY_NOTICE_DAYS]
   - [R2, "Reminders at 30 and 7 days (default).", Configurable, Parameter PACKAGE_EXPIRY_REMINDER_DAYS]
-  - [R3, "Automatic drafting of RENEW requests off by default.", Configurable, Parameter PACKAGE_RENEWAL_AUTODRAFT]
+  - [R3, "Automatic drafting of renewal requests off by default.", Configurable, Parameter PACKAGE_RENEWAL_AUTODRAFT]
   - [R4, "Job time 01:00 PHT.", Configurable, Job schedule (System Administrator)]
 validations: []
 fields_screen: Package Expiry
@@ -1603,7 +1603,7 @@ priority: Must have
 fit: NEW
 screens: Package Expiry (bulk Generate Renewal Request); Package Request page
 api: POST /api/v1/product-maintenance/expiry/renewal-requests
-description: The TSU Officer selects expiring packages and clicks **Generate Renewal Request**. BIBS drafts one RENEW request per package, pre-filled from the current version, with the next term's dates (start = old end + 1 day, same length). The request follows the normal workflow; negotiation is optional. MBS accepts or returns the renewal documentation at the WITH_MBS step, and the renewal advisory is FR-PM-044.
+description: The TSU Officer selects expiring packages and clicks **Generate Renewal Request**. BIBS drafts one renewal request (Renew package) per package, pre-filled from the current version, with the next term's dates (start = old end + 1 day, same length). The request follows the normal workflow; negotiation is optional. MBS accepts or returns the renewal documentation at the With MBS for set-up step, and the renewal advisory is FR-PM-044.
 preconditions:
   - "The packages are released and have no open RENEW or REACTIVATE request."
 main_flow:
@@ -2038,7 +2038,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | PKG_QS_REPLY_DAYS | 5 | Days insurers have to reply to a QS (1-60) |
 | PACKAGE_EXPIRY_NOTICE_DAYS | 60 | Days before the package end date of the first expiry alert (1-365) |
 | PACKAGE_EXPIRY_REMINDER_DAYS | 30,7 | Days of the further expiry reminders |
-| PACKAGE_RENEWAL_AUTODRAFT | false | The expiry monitor drafts RENEW requests at the notice period |
+| PACKAGE_RENEWAL_AUTODRAFT | false | The expiry monitor drafts renewal requests at the notice period |
 | PKG_ADVISORY_GROUPS | MARKETING, TSU, MBS, OPERATIONS | Default recipient groups of an advisory |
 | PKG_SLA_MKT_APPROVAL | 24 | SLA hours of the Marketing approval |
 | PKG_SLA_TSU_REVIEW | 24 | SLA hours of the TSU TL review |

@@ -640,9 +640,8 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
                  ("Fail", "The actual result differs; an issue ID is recorded"),
                  ("Blocked", "The case cannot run (environment, data or an open issue elsewhere)"),
                  ("N/A", "Not applicable in this cycle, with the reason in Actual result")]
-    frs = ", ".join(m["frs"]) if isinstance(m["frs"], list) else m["frs"]
     wb.cover_notes = [
-        f"Source: FRS {brd_label} ({frs}). {t['frs']} FRs, {t['brd_ids']} BRD IDs, {t['conditions']} test "
+        f"Source: FRS {brd_label} {m['name']}. {t['frs']} FRs, {t['brd_ids']} BRD IDs, {t['conditions']} test "
         f"conditions, {t['scenarios']} scenarios, {t['cases']} test cases ({t['positive']} positive, "
         f"{t['negative']} negative).",
         "Status starts as Not run. Testers fill Status, Actual result, Tester, Date and Issue ID during execution.",

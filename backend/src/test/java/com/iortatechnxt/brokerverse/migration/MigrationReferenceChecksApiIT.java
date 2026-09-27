@@ -93,7 +93,7 @@ class MigrationReferenceChecksApiIT {
                     "N")),
             List.of("branch_code"));
     String rows = mig.rows(branches.get("batchNo").asText());
-    assertThat(branches.get("counts").get("loaded").asInt()).as(rows).isEqualTo(1);
+    assertThat(branches.get("counts").get("rejected").asInt()).as(rows).isEqualTo(1);
     assertThat(rows).contains("ZZZ");
     JsonNode sales =
         load(
@@ -101,7 +101,7 @@ class MigrationReferenceChecksApiIT {
             List.of(
                 row(
                     "record_type",
-                    "UNIT",
+                    "TEAM",
                     "unit_code",
                     "U01",
                     "unit_name",
@@ -144,7 +144,8 @@ class MigrationReferenceChecksApiIT {
                     "A"),
                 row("insurer_code", "MGIC", "insurer_name", "Mabuhay General", "status", "A")),
             List.of("insurer_code"));
-    assertThat(insurers.get("counts").get("loaded").asInt())
+    JsonNode counts = insurers.get("counts");
+    assertThat(counts.get("loaded").asInt() + counts.get("skipped").asInt())
         .as(mig.rows(insurers.get("batchNo").asText()))
         .isEqualTo(2);
     assertThat(

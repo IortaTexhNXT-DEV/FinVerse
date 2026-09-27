@@ -158,8 +158,15 @@ public class MigrationStoryline {
     MigBatch planned = as.as(OPERATOR, () -> services.plans().plan(companyId, object, extracts));
     String batchNo = planned.getBatchNo();
     as.as(OPERATOR, () -> services.validation().validate(batchNo));
-    as.as(STEWARD, () -> services.signoffs().signValidation(batchNo, true, "Seed rows valid"));
-    as.as(LEAD, () -> services.signoffs().approveLoad(batchNo, "Seed load"));
+    try {
+      as.as(STEWARD, () -> services.signoffs().signValidation(batchNo, true, "Seed rows valid"));
+      as.as(LEAD, () -> services.signoffs().approveLoad(batchNo, "Seed load"));
+    } catch (BusinessRuleException e) {
+      throw new BusinessRuleException(
+          "MIG_SEED_INVALID",
+          object + " " + batchNo + ": " + e.getMessage() + " " + issues(batchNo),
+          e);
+    }
     as.as(OPERATOR, () -> services.runner().load(batchNo));
     MigReconRun run = as.as(RECON, () -> services.recon().reconcile(batchNo));
     if (run.getBreakCount() > 0) {
@@ -172,6 +179,16 @@ public class MigrationStoryline {
         LEAD,
         () -> services.signoffs().signAcceptance(batchNo, "DATA_MIGRATION_LEAD", true, "Accepted"));
     return batchNo;
+  }
+
+  private String issues(String batchNo) {
+    return String.join(
+        "; ",
+        jdbc.queryForList(
+            "select i.rule_code || ' ' || coalesce(i.field, '') || ' ' || i.message from mig_issue i"
+                + " join mig_batch b on b.id = i.batch_id where b.batch_no = ? and i.severity = 'ERROR'",
+            String.class,
+            batchNo));
   }
 
   /** The seed rows laid out in the columns of the layout in force. */

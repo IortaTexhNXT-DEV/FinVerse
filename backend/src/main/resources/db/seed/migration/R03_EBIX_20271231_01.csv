@@ -1,3 +1,3 @@
 record_type,unit_code,unit_name,ao_user_id,ao_code,ao_name,branch_code,active_flag
-UNIT,U01,Metro unit 1,,,,MKT,Y
+TEAM,U01,Metro unit 1,,,,MKT,Y
 AO,U01,,AO01,AO01,Account officer 01,MKT,Y

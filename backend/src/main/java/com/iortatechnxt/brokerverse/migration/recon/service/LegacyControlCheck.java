@@ -17,9 +17,9 @@ import org.springframework.stereotype.Component;
  * Level L5 of the open legacy invoices (object F01; DATA_MIGRATION_DESIGN 12 and 14.2): per legacy
  * control account and currency, the GL balance equals the open detail of the legacy invoices in the
  * Operations ledger - premium receivable by component (1215.01-.06), PR 2307 (1216), due to
- * insurers (LGC-DTIP) and commission receivable net of withholding tax (LGC-COMM). The account
- * codes are those of the seed chart; production uses the codes assigned by Comptrollership through
- * the same rules.
+ * insurers (LGC-DTIP) and commission receivable (LGC-COMM; the migrated invoices net of withholding
+ * tax, their BIBS endorsements gross as booked). The account codes are those of the seed chart;
+ * production uses the codes assigned by Comptrollership through the same rules.
  */
 @Component
 public class LegacyControlCheck implements ReconCheck {
@@ -40,8 +40,8 @@ public class LegacyControlCheck implements ReconCheck {
           new Control("LGC-COMM", 1, List.of("COMMISSION", "COMMISSION_VAT", "WTAX")));
 
   private static final String DETAIL =
-      "select i.currency, coalesce(sum(case when c.component = 'WTAX' then -c.balance"
-          + " else c.balance end), 0) as amount"
+      "select i.currency, coalesce(sum(case when c.component <> 'WTAX' then c.balance"
+          + " when i.origin = 'MIGRATED' then -c.balance else 0 end), 0) as amount"
           + " from ops_invoice i join ops_invoice_component c on c.invoice_id = i.id"
           + " where i.company_id = ? and i.ledger_context = 'LEGACY' and c.component in (?, ?, ?)"
           + " group by i.currency";

@@ -283,7 +283,7 @@ class MigrationClientsHeadersApiIT {
     band.put("qualifier", "SI_BAND");
     band.put("qualifier_value", "0.00-2000000.00");
     band.put("action", "MAP");
-    band.put("bibs_package_version", "CAR01 v1");
+    band.put("bibs_package_version", "MTR12 v1");
     Map<String, String> reject = new HashMap<>(band);
     reject.put("qualifier_value", "2000000.01-");
     reject.put("action", "REJECT");
@@ -304,7 +304,7 @@ class MigrationClientsHeadersApiIT {
                 + " where legacy_package_code = ? order by action",
             "PK" + t);
     assertThat(rows).hasSize(2);
-    assertThat(rows.get(0).get("product_code")).isEqualTo("CAR01");
+    assertThat(rows.get(0).get("product_code")).isEqualTo("MTR12");
     assertThat(rows.get(0).get("product_version_no")).isEqualTo(1);
     assertThat(rows.get(0).get("si_to")).isNotNull();
     assertThat(rows.get(1).get("action")).isEqualTo("REJECT");

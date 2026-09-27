@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.migration.load.service.MigrationLoader;
 import com.iortatechnxt.brokerverse.migration.mapping.service.CodeMapLoader;
 import com.iortatechnxt.brokerverse.organization.domain.Branch;
 import com.iortatechnxt.brokerverse.organization.domain.BranchRepository;
+import java.util.Optional;
 import java.util.Set;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,15 +21,15 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Loaders of the reference objects BIBS keeps as they are and only checks (DATA_MIGRATION_DESIGN
  * section 2): branches (R02) and the sales organisation (R03). Each legacy branch, unit and account
- * officer must map through its approved code map to a record that exists in BIBS; the
- * cross-reference then points to it, and nothing is created, so a rollback has nothing to undo.
+ * officer must map through its approved code map (the account officer through the layout's USER
+ * map) to a record that exists in BIBS; the cross-reference then points to it, and nothing is
+ * created, so a rollback has nothing to undo.
  */
 @Configuration(proxyBeanMethods = false)
 public class ReferenceCheckLoaders {
 
   private static final String BRANCH_MAP = "BRANCH";
   private static final String UNIT_MAP = "SALES_UNIT";
-  private static final String USER_MAP = "USER";
 
   /**
    * R02 branches: each legacy branch maps to a BIBS branch.
@@ -70,7 +71,7 @@ public class ReferenceCheckLoaders {
       public LoadOutcome load(LoadUnit unit, LoadContext ctx) {
         boolean officer = "AO".equals(Values.code(unit.value("record_type")));
         if (officer) {
-          String user = target(maps, USER_MAP, unit, Values.code(unit.value("ao_user_id")));
+          String user = Values.text(unit.value("ao_user_id"));
           SalesOfficer found =
               sales.officers(ctx.companyId()).stream()
                   .filter(o -> o.getUsername().equals(user))
@@ -108,6 +109,11 @@ public class ReferenceCheckLoaders {
     @Override
     public String objectCode() {
       return object;
+    }
+
+    @Override
+    public Optional<LoadOutcome> update(LoadUnit unit, KeyXref entry, LoadContext ctx) {
+      return Optional.of(load(unit, ctx));
     }
 
     @Override

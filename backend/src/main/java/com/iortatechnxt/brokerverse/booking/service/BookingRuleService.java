@@ -32,6 +32,7 @@ public class BookingRuleService {
 
   /** Name of an auto-booking rule in messages. */
   private static final String AUTO_BOOK_NAME = "Auto-booking rule";
+
   private static final String INCENTIVE = "IncentiveRule";
 
   private final AutoBookRuleRepository autoBook;

@@ -288,8 +288,7 @@ class RatingSchemeIT {
         as.run("ao", () -> quotations.create(fx.company(), draft(clientId, code, null)));
     Quotation undated =
         as.run(
-            "ao",
-            () -> quotations.create(fx.company(), draft(clientId, code, null, null, null)));
+            "ao", () -> quotations.create(fx.company(), draft(clientId, code, null, null, null)));
     Quotation d = quotationQueries.get(dated.getId());
     assertThat(quotationQueries.coverPeriod(d, quotationQueries.content(d)))
         .isEqualTo("01-Nov-2026 to 01-Nov-2027");
@@ -374,15 +373,7 @@ class RatingSchemeIT {
         "EMAIL",
         null,
         null,
-        new Terms(
-            "INS-MGIC",
-            "MKT",
-            from,
-            to,
-            null,
-            false,
-            null,
-            "Scheme test"),
+        new Terms("INS-MGIC", "MKT", from, to, null, false, null, "Scheme test"),
         List.of(new DraftItem(1, vehicle)));
   }
 }

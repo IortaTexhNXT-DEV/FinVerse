@@ -109,8 +109,7 @@ class UserAccessLifecycleIT {
     assertThat(approversOf(draft.getId())).containsExactly(APPROVER);
 
     List<String> kept = approversOf(draft.getId());
-    AccessRequest pending =
-        as.run(REQUESTOR, () -> requests.submit(draft.getId(), kept, "Please"));
+    AccessRequest pending = as.run(REQUESTOR, () -> requests.submit(draft.getId(), kept, "Please"));
     assertThat(pending.getStatus()).isEqualTo(AccessRequestStatus.PENDING);
     assertThat(pending.getAssignedApprover()).isEqualTo(APPROVER);
     assertThat(pending.getJustification()).isEqualTo("Joined Marketing, Makati");

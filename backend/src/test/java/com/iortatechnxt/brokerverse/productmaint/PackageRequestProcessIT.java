@@ -333,12 +333,13 @@ class PackageRequestProcessIT {
     assertThat(released.getStatus()).isEqualTo(RequestStage.RELEASED);
     assertThat(released.getReleasedAt()).isNotNull();
     // Remarks written by the system name users by display name; stages keep their full names.
-    CaseView view = views.view(PackageRequests.ENTITY, String.valueOf(id)).orElseThrow();
-    assertThat(view.history())
+    CaseView caseView = views.view(PackageRequests.ENTITY, String.valueOf(id)).orElseThrow();
+    assertThat(caseView.history())
         .filteredOn(h -> "version_released".equals(h.getAction()))
         .extracting(WorkCaseHistory::getComment)
         .containsExactly("Version " + version + " validated by Bea Business Admin");
-    assertThat(view.stageNames()).containsEntry("REQUIREMENTS_PREP", "Requirements preparation");
+    assertThat(caseView.stageNames())
+        .containsEntry("REQUIREMENTS_PREP", "Requirements preparation");
     assertThat(
             jdbc.queryForList(
                 "select summary from audit_log where entity_type = ? and entity_id = ?",

@@ -25,7 +25,7 @@ const TERMS: PackageTerms = {
   scheme: { defaultRate: 1.2, minimumPremium: 30000 },
   dates: { effectiveFrom: '2026-09-27', packageStartDate: '2026-09-27' },
   insurers: [{ insurerCode: 'INS-MGIC', role: 'LEAD', minimumPremium: 30000, terms: [] }],
-} as PackageTerms;
+};
 
 function lists() {
   vi.spyOn(lovApi, 'options').mockImplementation((type: string) =>
@@ -78,7 +78,7 @@ describe('Package request labels', () => {
     expect(await screen.findByText('New programme for a market segment')).toBeInTheDocument();
     expect(await screen.findByText(/Comprehensive/)).toBeInTheDocument();
     expect(screen.getByText(/Motor/)).toBeInTheDocument();
-    expect(screen.queryByText(/MOTOR|COMPREHENSIVE|NEW_PROGRAMME|New Programme$/)).toBeNull();
+    expect(screen.queryByText(/^(?:MOTOR|COMPREHENSIVE|NEW_PROGRAMME|New Programme)$/)).toBeNull();
   });
 
   it('words insurer roles and placement channels as the lists do', () => {

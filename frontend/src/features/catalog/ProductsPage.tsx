@@ -21,7 +21,7 @@ import { ProductEditorModal } from './ProductEditorModal';
 import { newProductForm } from './productForm';
 import type { ProductForm } from './productForm';
 import { RecordActions } from './RecordActions';
-import { LovLabels } from '@/components/broking/LovLabel';
+import { LineLabel, LovLabels } from '@/components/broking/LovLabel';
 
 const TABS = [
   { id: 'products', label: 'Products' },
@@ -156,7 +156,7 @@ function ProductList() {
         columns={[
           { key: 'c', header: 'Code', render: (p) => <strong>{p.code}</strong> },
           { key: 'n', header: 'Name', render: (p) => p.name },
-          { key: 'l', header: 'Line', render: (p) => p.lineCode },
+          { key: 'l', header: 'Line', render: (p) => <LineLabel code={p.lineCode} /> },
           { key: 'p', header: 'Package', render: (p) => (p.packaged ? 'Yes' : '') },
           {
             key: 'v',

@@ -203,7 +203,7 @@ export default function Invoice360Page() {
       />
       <Summary view={v} />
       {v.legacy !== undefined && <LegacyInvoiceBlock legacy={v.legacy} />}
-      {v.invoice.keys.accountId !== undefined && (
+      {v.accountWorkflow && v.invoice.keys.accountId !== undefined && (
         <WorkflowPanel
           entityType="Account"
           entityId={v.invoice.keys.accountId}

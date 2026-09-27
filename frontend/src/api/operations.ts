@@ -204,6 +204,8 @@ export interface Invoice360 {
   related: Partial<Record<RelatedSection, RelatedItem[]>>;
   /** Frozen original values of a legacy invoice (BRD-13). */
   legacy?: LegacySnapshot;
+  /** Whether the invoice's account has a work item; an account imported from legacy has none. */
+  accountWorkflow: boolean;
 }
 
 export interface WorkCount {

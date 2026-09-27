@@ -2,7 +2,10 @@ package com.iortatechnxt.brokerverse.quotation.service;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.Account.Origin;
+import com.iortatechnxt.brokerverse.account.domain.AccountClassification;
 import com.iortatechnxt.brokerverse.account.domain.AccountData.Mortgage;
+import com.iortatechnxt.brokerverse.account.domain.AccountOrigin;
+import com.iortatechnxt.brokerverse.account.domain.BusinessType;
 import com.iortatechnxt.brokerverse.account.domain.PaymentArrangement;
 import com.iortatechnxt.brokerverse.account.service.AccountDraft;
 import com.iortatechnxt.brokerverse.account.service.AccountService;
@@ -183,7 +186,8 @@ public class QuotationAcceptanceService {
                       q.getCompanyId(), product, content, group, q.getRateOverrideRef()),
                   q.getCreatedBy(),
                   content.schemeVersion(),
-                  q.getRateOverrideRef()));
+                  q.getRateOverrideRef(),
+                  classification(q.getRenewalOfRef(), AccountOrigin.QUOTATION)));
       arns.add(account.getArn());
     }
     q.linkAccounts(arns);
@@ -199,6 +203,16 @@ public class QuotationAcceptanceService {
         AuditAction.UPDATE,
         "Accounts created: " + String.join(", ", arns));
     return q;
+  }
+
+  /**
+   * New business, or a RENEWAL of the expiring policy for a quotation of the Renewal New Business
+   * path (BRRN.033, shared work item BT0).
+   */
+  static AccountClassification classification(String renewalOf, AccountOrigin origin) {
+    return renewalOf == null
+        ? null
+        : new AccountClassification(BusinessType.RENEWAL, renewalOf, origin);
   }
 
   private static AccountDraft draft(Quotation q, QuotationContent c, int group) {

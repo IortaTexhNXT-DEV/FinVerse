@@ -333,4 +333,27 @@ public record ReportMetadata(
         Permission.EB_REPORT_VIEW,
         true);
   }
+
+  /**
+   * A Renewal report (RENEWAL_DESIGN section 11): viewed with {@code RNW_REPORT_VIEW}, exported
+   * with {@code RNW_EXPORT} (BRD function 9), archived.
+   *
+   * @param code report code (e.g. {@code RNW-STATUS})
+   * @param title title
+   * @param description one line purpose
+   * @param parameters parameters
+   * @return metadata in the Renewal category
+   */
+  public static ReportMetadata renewal(
+      String code, String title, String description, List<ParameterSpec> parameters) {
+    return new ReportMetadata(
+        code,
+        title,
+        ReportCategory.RENEWAL,
+        description,
+        parameters,
+        Permission.RNW_REPORT_VIEW,
+        Permission.RNW_EXPORT,
+        true);
+  }
 }

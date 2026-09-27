@@ -22,7 +22,8 @@ public enum ReportCategory {
   FRBS("BDOI Report Pack"),
   COMPLIANCE("Compliance"),
   CLAIMS_HANDLING("Claims Handling"),
-  EMPLOYEE_BENEFITS("Employee Benefits");
+  EMPLOYEE_BENEFITS("Employee Benefits"),
+  RENEWAL("Renewal");
 
   private final String label;
 

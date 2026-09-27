@@ -165,6 +165,38 @@ public class QuotationService {
   }
 
   /**
+   * Creates the quotation of a renewal with financial or structural changes (Renewal New Business
+   * path, BRRN.033; Renewal design section 13): an ordinary quotation linked to the renewal
+   * reference, whose accounts are created as RENEWAL of the expiring policy. One quotation per
+   * renewal.
+   *
+   * @param companyId company
+   * @param draft quotation data (pre-filled from the expiring account)
+   * @param renewalRef renewal reference of the candidate
+   * @param renewalOf what the renewal renews (expiring ARN or legacy reference)
+   * @return the quotation
+   */
+  public Quotation createForRenewal(
+      Long companyId, QuotationDraft draft, String renewalRef, String renewalOf) {
+    quotations
+        .findByRenewalRef(renewalRef)
+        .ifPresent(
+            q -> {
+              throw new BusinessRuleException(
+                  "QUOTATION_RENEWAL_EXISTS",
+                  "Renewal " + renewalRef + " already has quotation " + q.getQuotationNo());
+            });
+    Quotation quotation = create(companyId, draft);
+    quotation.linkRenewal(renewalRef, renewalOf);
+    audit.record(
+        ENTITY,
+        quotation.getQuotationNo(),
+        AuditAction.UPDATE,
+        QUOTATION + "for the renewal " + renewalRef + " of " + renewalOf);
+    return quotation;
+  }
+
+  /**
    * Prices a draft without saving it (live premium of the wizard); the client is not needed.
    *
    * @param companyId company

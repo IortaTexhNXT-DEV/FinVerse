@@ -158,6 +158,16 @@ public final class ReportParameters {
   }
 
   /**
+   * Returns an include / exclude list of codes ({@link ParameterType#CODE_SET}).
+   *
+   * @param name parameter
+   * @return the selection; {@link CodeSet#ALL} when absent
+   */
+  public CodeSet codeSet(String name) {
+    return optionalText(name).map(CodeSet::parse).orElse(CodeSet.ALL);
+  }
+
+  /**
    * Returns a boolean flag (false when absent).
    *
    * @param name parameter

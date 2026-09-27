@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.nonpackage.domain.RiskDetails;
 import jakarta.persistence.criteria.Predicate;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import org.hibernate.Hibernate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,6 +59,18 @@ public class ProposalQueryService {
    */
   public RiskDetails details(ProposalRequest p) {
     return codec.of(p);
+  }
+
+  /**
+   * The PRF of a renewal on the New Business path (Renewal status tracking, BRRN.033).
+   *
+   * @param renewalRef renewal reference
+   * @return the PRF, empty when the renewal has none
+   */
+  public Optional<ProposalRequest> getByRenewalRef(String renewalRef) {
+    Optional<ProposalRequest> p = proposals.findByRenewalRef(renewalRef);
+    p.ifPresent(x -> Hibernate.initialize(x.getAccountArns()));
+    return p;
   }
 
   /**

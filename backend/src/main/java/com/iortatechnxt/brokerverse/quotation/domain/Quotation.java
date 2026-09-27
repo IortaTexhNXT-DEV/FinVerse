@@ -115,6 +115,12 @@ public class Quotation extends BaseEntity {
   @Column(name = "rate_override_ref", length = 30)
   private String rateOverrideRef;
 
+  @Column(name = "renewal_ref", length = 30)
+  private String renewalRef;
+
+  @Column(name = "renewal_of_ref", length = 40)
+  private String renewalOfRef;
+
   @Column(name = "tsu_required", nullable = false)
   private boolean tsuRequired;
 
@@ -470,5 +476,25 @@ public class Quotation extends BaseEntity {
 
   public List<String> getAccountArns() {
     return accountArns;
+  }
+
+  /**
+   * Links the record to the renewal it serves (Renewal New Business path, BRRN.033): its accounts
+   * are created as RENEWAL of the expiring policy (shared work item BT0).
+   *
+   * @param renewalRef renewal reference of the candidate
+   * @param renewalOf what the renewal renews (expiring ARN or legacy reference)
+   */
+  public void linkRenewal(String renewalRef, String renewalOf) {
+    this.renewalRef = renewalRef;
+    this.renewalOfRef = renewalOf;
+  }
+
+  public String getRenewalRef() {
+    return renewalRef;
+  }
+
+  public String getRenewalOfRef() {
+    return renewalOfRef;
   }
 }

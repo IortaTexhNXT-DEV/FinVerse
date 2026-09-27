@@ -9,5 +9,7 @@ public enum QueueSource {
   /** Placement's "For Booking" bulk action. */
   PLACEMENT,
   /** The booking upload. */
-  UPLOAD
+  UPLOAD,
+  /** Renewal: an accepted renewal account whose policy was issued (BRRN.040). */
+  RENEWAL
 }

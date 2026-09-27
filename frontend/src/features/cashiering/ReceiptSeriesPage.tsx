@@ -17,6 +17,7 @@ import { cashieringApi } from './cashieringApi';
 import type { ReceiptKind, Series, SeriesBody } from './cashieringApi';
 import { seriesUsedPercent } from './cashieringLogic';
 import './cashiering.css';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 function Gauge({ s }: Readonly<{ s: Series }>) {
   const used = seriesUsedPercent(s);
@@ -220,18 +221,30 @@ export default function ReceiptSeriesPage() {
       render: (s) => (
         <div className="row">
           {s.recordStatus === 'PENDING_AUTHORIZATION' && (can('MASTER_AUTHORIZE') || manage) && (
-            <Button size="sm" onClick={() => act.mutate(() => cashieringApi.authorizeSeries(s.id))}>
+            <ConfirmButton
+              size="sm"
+              confirm={{
+                title: 'Authorize Receipt Series',
+                effect: 'The series becomes active for issuing receipts.',
+              }}
+              onConfirm={() => act.mutateAsync(() => cashieringApi.authorizeSeries(s.id))}
+            >
               Authorize
-            </Button>
+            </ConfirmButton>
           )}
           {s.recordStatus === 'ACTIVE' && manage && (
-            <Button
+            <ConfirmButton
               size="sm"
               variant="ghost"
-              onClick={() => act.mutate(() => cashieringApi.deactivateSeries(s.id))}
+              confirm={{
+                title: 'Deactivate Receipt Series',
+                effect: 'No more receipts can be issued from this series.',
+                destructive: true,
+              }}
+              onConfirm={() => act.mutateAsync(() => cashieringApi.deactivateSeries(s.id))}
             >
               Deactivate
-            </Button>
+            </ConfirmButton>
           )}
         </div>
       ),

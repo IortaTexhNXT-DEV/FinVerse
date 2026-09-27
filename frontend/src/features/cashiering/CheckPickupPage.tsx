@@ -21,6 +21,7 @@ import { TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { Pickup, PickupStatus, PrintBatch } from './cashieringApi';
 import './cashiering.css';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const TABS: readonly { id: PickupStatus; label: string }[] = [
   { id: 'FOR_PICKUP', label: 'For Pick-up' },
@@ -101,13 +102,19 @@ export default function CheckPickupPage() {
       render: (p) =>
         p.status === 'FOR_PICKUP' &&
         receipt && (
-          <Button
+          <ConfirmButton
             size="sm"
             variant="ghost"
-            onClick={() => act.mutate(() => cashieringApi.cancelPickup(p.id))}
+            confirm={{
+              title: 'Cancel Check Pickup',
+              effect: 'The pickup is cancelled and the check stays with the cashier.',
+              confirmLabel: 'Cancel Pickup',
+              destructive: true,
+            }}
+            onConfirm={() => act.mutateAsync(() => cashieringApi.cancelPickup(p.id))}
           >
             Cancel
-          </Button>
+          </ConfirmButton>
         ),
     },
   ];

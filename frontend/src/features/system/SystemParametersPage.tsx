@@ -87,11 +87,14 @@ function PendingDialog({
 }: Readonly<{ parameter: SystemParameter; mayApprove: boolean; onClose: () => void }>) {
   const toast = useToast();
   const queryClient = useQueryClient();
+  const [reason, setReason] = useState('');
+  const [tried, setTried] = useState(false);
+  const reasonMissing = mayApprove && reason.trim() === '';
   const decide = useMutation({
     mutationFn: (approve: boolean) =>
       approve
         ? systemApi.approveParameter(parameter.key)
-        : systemApi.rejectParameter(parameter.key),
+        : systemApi.rejectParameter(parameter.key, reason.trim() || undefined),
     onSuccess: async (p, approve) => {
       onClose();
       await queryClient.invalidateQueries({ queryKey: ['system'] });
@@ -106,7 +109,16 @@ function PendingDialog({
       onClose={onClose}
       footer={
         <>
-          <Button variant="secondary" busy={decide.isPending} onClick={() => decide.mutate(false)}>
+          <Button
+            variant={mayApprove ? 'danger' : 'secondary'}
+            busy={decide.isPending}
+            onClick={() => {
+              setTried(true);
+              if (!reasonMissing) {
+                decide.mutate(false);
+              }
+            }}
+          >
             {mayApprove ? 'Reject' : 'Withdraw'}
           </Button>
           {mayApprove && (
@@ -133,6 +145,21 @@ function PendingDialog({
         {!mayApprove && (
           <Notice tone="info">Another user with the approval right approves the change.</Notice>
         )}
+        <Field
+          label={mayApprove ? 'Reason (needed to reject)' : 'Reason'}
+          error={tried && reasonMissing ? 'Enter the reason for the rejection' : undefined}
+        >
+          {(id) => (
+            <textarea
+              id={id}
+              className="textarea"
+              rows={2}
+              maxLength={200}
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+            />
+          )}
+        </Field>
       </div>
     </Modal>
   );

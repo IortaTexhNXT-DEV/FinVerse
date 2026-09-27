@@ -14,6 +14,7 @@ import { disbursementApi } from './api';
 import type { PaymentRequest } from './api';
 import { requestActions } from './labels';
 import './disbursement.css';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 type RequestDialogMode = 'details' | 'return';
 
@@ -88,13 +89,17 @@ export function RequestDialog({
             </Button>
           )}
           {actions.includes('release') && (
-            <Button
+            <ConfirmButton
               icon={<Unlock size={16} />}
               busy={release.isPending}
-              onClick={() => release.mutate()}
+              confirm={{
+                title: 'Release Documents',
+                effect: 'The documents are released to the payee.',
+              }}
+              onConfirm={() => release.mutateAsync()}
             >
               Release Documents
-            </Button>
+            </ConfirmButton>
           )}
           {actions.includes('voucher') && (
             <Button

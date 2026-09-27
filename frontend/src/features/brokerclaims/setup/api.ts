@@ -72,8 +72,10 @@ export const claimsSetupApi = {
     ),
   authorizeAttributes: (list: string, code: string) =>
     api.post<ValueAttributes>(`${SETUP}/attributes/${list}/${encodeURIComponent(code)}/authorize`),
-  rejectAttributes: (list: string, code: string) =>
-    api.post<ValueAttributes>(`${SETUP}/attributes/${list}/${encodeURIComponent(code)}/reject`),
+  rejectAttributes: (list: string, code: string, reason?: string) =>
+    api.post<ValueAttributes>(`${SETUP}/attributes/${list}/${encodeURIComponent(code)}/reject`, {
+      reason,
+    }),
   matrix: () => api.get<MatrixRow[]>(`${SETUP}/matrix`),
   roles: () => api.get<ClaimsRole[]>(`${SETUP}/matrix/roles`),
   addRow: (statusCode: string, roleCode: string, unitCode: string) =>

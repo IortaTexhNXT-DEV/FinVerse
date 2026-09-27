@@ -6,6 +6,7 @@ import type { SodRule, SodRuleInput } from '@/api/nbadmin';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
@@ -122,16 +123,18 @@ export default function SodRulesPage() {
     mutationFn: ({
       rule,
       action,
+      reason,
     }: {
       rule: SodRule;
       action: 'deactivate' | 'authorize' | 'reject';
+      reason?: string;
     }) => {
       if (action === 'deactivate') {
         return nbadminApi.deactivateSodRule(rule.id);
       }
       return action === 'authorize'
         ? nbadminApi.authorizeSodRule(rule.id)
-        : nbadminApi.rejectSodRule(rule.id);
+        : nbadminApi.rejectSodRule(rule.id, reason ?? '');
     },
     onSuccess: async (rule, { action }) => {
       const done = {
@@ -147,37 +150,58 @@ export default function SodRulesPage() {
     user !== null && r.maker.toLowerCase() === user.username.toLowerCase();
   const actions = (r: SodRule) => {
     const pending = r.pendingAction !== 'NONE' && r.status !== 'INACTIVE';
+    const pair = `${r.profileAName} and ${r.profileBName}`;
     if (pending && authorise && !mine(r)) {
+      const change = pendingText(r) || 'The change';
       return (
         <div className="row">
-          <Button
+          <ConfirmButton
             size="sm"
             icon={<Check size={14} />}
-            onClick={() => act.mutate({ rule: r, action: 'authorize' })}
+            confirm={{
+              title: `Authorise Rule ${r.ruleCode}`,
+              record: pair,
+              effect: `${change} takes effect: requests and bulk lines are checked against the active rules.`,
+            }}
+            onConfirm={() => act.mutateAsync({ rule: r, action: 'authorize' })}
           >
             Authorise
-          </Button>
-          <Button
+          </ConfirmButton>
+          <ConfirmButton
             size="sm"
             variant="secondary"
             icon={<X size={14} />}
-            onClick={() => act.mutate({ rule: r, action: 'reject' })}
+            confirm={{
+              title: `Reject Rule ${r.ruleCode}`,
+              record: pair,
+              effect: 'The pending change is rejected and the rule stays as it was.',
+              reason: 'required',
+              destructive: true,
+            }}
+            onConfirm={(reason) => act.mutateAsync({ rule: r, action: 'reject', reason })}
           >
             Reject
-          </Button>
+          </ConfirmButton>
         </div>
       );
     }
     if (!pending && r.status === 'ACTIVE' && maintain) {
       return (
-        <Button
+        <ConfirmButton
           size="sm"
           variant="secondary"
           icon={<Ban size={14} />}
-          onClick={() => act.mutate({ rule: r, action: 'deactivate' })}
+          confirm={{
+            title: `Deactivate Rule ${r.ruleCode}`,
+            record: pair,
+            effect:
+              'The deactivation is sent to Information Security; the rule stays active until it is authorised.',
+            destructive: true,
+          }}
+          onConfirm={() => act.mutateAsync({ rule: r, action: 'deactivate' })}
         >
           Deactivate
-        </Button>
+        </ConfirmButton>
       );
     }
     return null;

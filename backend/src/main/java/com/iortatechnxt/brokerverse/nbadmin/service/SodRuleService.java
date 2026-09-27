@@ -151,15 +151,23 @@ public class SodRuleService {
   }
 
   /**
-   * Rejects the pending creation or deactivation of a rule (not by its maker).
+   * Rejects the pending creation or deactivation of a rule (not by its maker), with its reason.
    *
    * @param id rule
+   * @param reason why the change is rejected (mandatory, kept in the audit trail)
    * @return the rule
    */
-  public SodRule reject(Long id) {
+  public SodRule reject(Long id, String reason) {
+    if (reason == null || reason.isBlank()) {
+      throw new BusinessRuleException("REASON_REQUIRED", "Give the reason for the rejection");
+    }
     SodRule rule = get(id);
     rule.rejectPending(currentUser.username(), rule.getMaker());
-    audit.record(ENTITY, rule.getRuleCode(), AuditAction.REJECT, text("Rejected", rule));
+    audit.record(
+        ENTITY,
+        rule.getRuleCode(),
+        AuditAction.REJECT,
+        text("Rejected", rule) + ". Reason: " + reason.strip());
     return rule;
   }
 

@@ -18,6 +18,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime, statusPhrase } from '@/utils/format';
 import { displayNameOf } from '@/api/users';
+import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 type Action = 'submit' | 'approve' | 'reject';
 
@@ -68,10 +69,17 @@ export default function BudgetsPage() {
     },
   });
   const act = useMutation({
-    mutationFn: ({ budget, action }: { budget: Budget; action: Action }) => {
+    mutationFn: ({
+      budget,
+      action,
+      reason,
+    }: {
+      budget: Budget;
+      action: Action;
+      reason?: string;
+    }) => {
       if (action === 'reject') {
-        const reason = globalThis.prompt(`Reason for rejecting version ${budget.versionNo}`) ?? '';
-        return budgetApi.reject(budget.id, reason);
+        return budgetApi.reject(budget.id, reason ?? '');
       }
       return budgetApi[action](budget.id);
     },
@@ -103,22 +111,32 @@ export default function BudgetsPage() {
       )}
       {b.status === 'SUBMITTED' && (
         <>
-          <Button
+          <ConfirmButton
             size="sm"
             variant="secondary"
             icon={<CheckCircle2 size={14} />}
-            onClick={() => act.mutate({ budget: b, action: 'approve' })}
+            confirm={{
+              title: `Approve Budget Version ${String(b.versionNo)}`,
+              effect: 'The version becomes the approved budget.',
+            }}
+            onConfirm={() => act.mutateAsync({ budget: b, action: 'approve' })}
           >
             Approve
-          </Button>
-          <Button
+          </ConfirmButton>
+          <ConfirmButton
             size="sm"
             variant="ghost"
             icon={<XCircle size={14} />}
-            onClick={() => act.mutate({ budget: b, action: 'reject' })}
+            confirm={{
+              title: `Reject Budget Version ${String(b.versionNo)}`,
+              effect: 'The version returns to its maker with the reason.',
+              destructive: true,
+              reason: 'required',
+            }}
+            onConfirm={(reason) => act.mutateAsync({ budget: b, action: 'reject', reason })}
           >
             Reject
-          </Button>
+          </ConfirmButton>
         </>
       )}
     </div>

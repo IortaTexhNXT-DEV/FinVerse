@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.api;
 
+import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.SodRuleRequest;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.SodRuleResponse;
 import com.iortatechnxt.brokerverse.nbadmin.domain.SodRule;
@@ -99,8 +100,8 @@ public class SodRuleController {
    */
   @PostMapping("/{id}/reject")
   @PreAuthorize(AUTHORIZE)
-  public SodRuleResponse reject(@PathVariable Long id) {
-    return view(rules.reject(id));
+  public SodRuleResponse reject(@PathVariable Long id, @Valid @RequestBody ReasonRequest request) {
+    return view(rules.reject(id, request.reason()));
   }
 
   private SodRuleResponse view(SodRule r) {

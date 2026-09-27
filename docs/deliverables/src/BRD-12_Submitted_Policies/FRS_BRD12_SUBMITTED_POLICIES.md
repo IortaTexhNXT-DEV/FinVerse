@@ -273,9 +273,7 @@ title: Receive submitted policy details from the approved sources
 brd: [BRIDSP-01 (p.8)]
 actor: System; Submitted Handler, Sanitation Handler (SBM_INTAKE)
 priority: Must have
-fit: CHANGE
 screens: Upload & Intake (source uploads, intake runs)
-api: Bulk handlers SBM_LFS_INSURANCE, SBM_HLS_INSURANCE, SBM_CIU, SBM_SPI, SBM_LOAN_BOOKING, SBM_LAMD, SBM_IA_MASTERLIST
 description:
   - BIBS keeps a register of the approved sources (LFS insurance report, HLS daily insurance report, CIU report, SPI list, LAMD report, Loan Booking Report, IA masterlist, IBG / Leasing documents, manual entry, migration) with segment, format and upload template. Each source file is uploaded with its own template, validated row by row and recorded as an intake run.
   - Each valid row creates or updates one masterlist record on the natural key (segment, business type, PN or policy number, expiry date). New records get the number SBM-yyyy-nnnnnn and status RECEIVED. A file already uploaded (same content) is refused.
@@ -319,9 +317,7 @@ title: Extract policy details from documents and save them after confirmation
 brd: [BRIDSP-02 (p.8)]
 actor: System; Submitted Handler, Policy Reviewer (SBM_MAINTAIN)
 priority: Must have
-fit: CHANGE
 screens: Extraction Review (proposal side by side with the record)
-api: POST /api/v1/submitted/extractions; POST .../{id}/confirm | reject
 description:
   - The user uploads a policy document (policy copy, scanned or PDF) to a new or existing record. BIBS extracts the fields - assured, PN, policy number, insurer, period, sum insured, premium, vehicle or property details - and shows each proposed value with its confidence next to an editable field.
   - Nothing is saved to the masterlist before the user confirms. On **Confirm** the fields are written and the record becomes VALIDATED; on **Reject** the file is kept with a reason and the user enters the data by hand.
@@ -362,9 +358,7 @@ title: Create or update a policy manually and tag its renewal opportunity
 brd: [BRIDSP-03 (p.8)]
 actor: Marketing user (Submitted Handler, Policy Reviewer, Marketing AO; SBM_MAINTAIN)
 priority: Must have
-fit: NEW
 screens: Masterlist (New Policy); Policy record (Edit, Tag Renewable / Non-Renewable)
-api: POST /api/v1/submitted/policies; PUT .../{id}; POST .../{id}/renewal-tag
 description:
   - A Marketing user creates a policy record by hand when data is incomplete or cannot be extracted, or updates an existing one. Mandatory fields depend on the segment.
   - The user tags a record Renewable or Non-Renewable with a reason. The tag is saved with user and time, shown as a flag chip on the record and available in filters and reports. A manual tag overrides the rule result; the processing run records the rule result but keeps the manual tag.
@@ -410,9 +404,7 @@ title: Migrate the existing Excel masterlists
 brd: [BRIDSP-33 (p.12)]
 actor: System; Team Lead (SBM_MIGRATE)
 priority: Must have
-fit: CHANGE
 screens: Upload & Intake (Migration); Reports (SBM-MIGRATION-ERRORS)
-api: Bulk handler SBM_MIGRATION
 description:
   - The existing masterlists in Excel (NB Motor, RB Motor, Fire, Non-CBG) are read with a column mapping per legacy layout. Valid records are migrated completely, keep their original submission status (mapped to a BIBS status and bucket), submission date and reference ID, and are flagged Migrated. Invalid, incomplete or failed records are captured in an error log with reason codes.
   - The migration can be run again; it is idempotent on the legacy reference.
@@ -450,9 +442,7 @@ title: Keep one Submitted Masterlist
 brd: [BRIDSP-04 (p.9)]
 actor: System; all Submitted Policies users
 priority: Must have
-fit: NEW
 screens: Masterlist (tabs All, For Validation, Classified, For Renewal, Manual Disposition, Non-Renewal, Fallout); Policy record
-api: GET /api/v1/submitted/policies; GET .../{id}
 description:
   - All submitted policy details are held in one masterlist, one record per submitted or inforced policy, segment and business type - with loan data, risk details, insurer and policy, classification, bucket, renewal tag, handler, conversion status and the linked renewal ARN and booked invoice. When a record is saved or updated, the masterlist shows the latest data.
   - The Policy record page has the summary card with flag chips (Renewable, FFY, No Touch, Migrated, Insurer approval) and the tabs Details, Loan & Matching, Rule Results, Review & IAAF, TOR, Renewal, Letters, Documents and History.
@@ -479,9 +469,7 @@ title: View and extract the masterlist by role
 brd: [BRIDSP-28 (p.12)]
 actor: User (SBM_VIEW, SBM_EXPORT)
 priority: Must have
-fit: CHANGE
 screens: Masterlist (Export); Reports (SBM-MASTERLIST)
-api: GET /api/v1/reports/SBM-MASTERLIST/export?format=
 description:
   - Viewing and downloading the masterlist follow role-based access. Viewing needs SBM_VIEW and extracting needs SBM_EXPORT. Every record, list, report and extract is limited to the user's scope - the segments of the user, and for Marketing AOs only their own records.
   - The extract is the report SBM-MASTERLIST with the fields of Report List row 151 per segment, including migrated records, in XLSX, CSV or PDF, archived.
@@ -512,9 +500,7 @@ title: Monitor handler, conversion status and remarks
 brd: [BRIDSP-29 (p.12)]
 actor: Marketing user (SBM_MAINTAIN)
 priority: Must have
-fit: NEW
 screens: Masterlist (Assign Handler; quick filter Changed since); Policy record (History)
-api: PUT /api/v1/submitted/policies/{id} (handler, conversion status, remarks)
 description:
   - The user updates the handler, the conversion status and the remarks of a record, one by one or in bulk (Assign Handler). The masterlist shows the latest values; the History tab shows every change per field; a "Changed since" quick filter lists the records changed after a date.
 preconditions:
@@ -548,9 +534,7 @@ title: Define sanitation, matching, classification and disposition criteria
 brd: [BRIDSP-08 (p.9)]
 actor: Marketing user as rule administrator (SBM_RULE_MAINTAIN); approver (SBM_RULE_APPROVE)
 priority: Must have
-fit: NEW
 screens: Submitted Policies Setup (Rule Sets)
-api: /api/v1/submitted/setup/rule-sets
 description:
   - The criteria of each processing step are rule sets - per step (Sanitation, Matching, Classification, Disposition), segment and business type - with versions and effective dates. A rule has a priority, conditions (field, operator, value), an outcome (bucket, tag, classification, RA template, flag), a reason code and a stop flag.
   - A new or changed rule set is approved by someone other than its maker before it applies. Every run result stores the rule id and rule-set version, so the rules are applied consistently and explained.
@@ -592,9 +576,7 @@ title: Run processing automatically after intake
 brd: [BRIDSP-09 (p.9)]
 actor: System (SbmProcessingService, job SBM_PROCESSING); Sanitation Handler (SBM_PROCESS)
 priority: Must have
-fit: NEW
 screens: Processing Runs (list, run detail); Masterlist (Run Processing)
-api: POST /api/v1/submitted/runs; job SBM_PROCESSING
 description:
   - When documents or files are uploaded and confirmed, BIBS runs the processing steps in order - sanitation, matching against LAMD, classification, disposition and limits - and triggers the workflow of each record by its result (renewal hand-off, manual disposition queue, non-renewal, policy review, TOR). Account tagging is applied as the criteria define.
   - A run also starts from the daily job at 21:30 PHT and on demand. Each run (SBR-yyyy-nnnnnn) records one result per record and step.
@@ -625,9 +607,7 @@ title: Report fallout after processing
 brd: [BRIDSP-10 (p.9)]
 actor: System; Sanitation Handler
 priority: Must have
-fit: CHANGE
 screens: Processing Runs (Fallout tab); Masterlist (Fallout tab); Reports (SBM-DOC-FALLOUT, SBM-PROCESS-FALLOUT)
-api: Reports SBM-DOC-FALLOUT, SBM-PROCESS-FALLOUT
 description:
   - When document processing or a run ends with errors or exceptions, BIBS produces the fallout - intake and extraction failures (SBM-DOC-FALLOUT) and the records that no rule could place or that failed a step (SBM-PROCESS-FALLOUT), each with its reason code. The fallout of each run is archived and the handler resolves it on the record (correct and re-run, dispose by hand, or exclude).
 preconditions:
@@ -655,9 +635,7 @@ title: Classify policies as Inforced or Submitted
 brd: [BRIDSP-11 (p.9)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Policy record (Loan & Matching, Rule Results); Reports (SBM-CLASSIFICATION)
-api: Classification step
 description:
   - When the policy details are evaluated, the classification step sets the record Submitted when its PN matches an active LAMD loan and BDOI did not place the policy, and Inforced otherwise, so the right renewal and disposition rules apply. The definition is rule data and is to be confirmed (SP SQ04).
 preconditions:
@@ -681,9 +659,7 @@ title: Group Submitted policies into qualification buckets
 brd: [BRIDSP-12 (p.9)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Masterlist (bucket tabs and filter); Policy record
-api: Disposition step
 description:
   - Submitted policies (PN matched against LAMD) are grouped into For Renewal, For Manual Disposition, Non-Renewal, No Touch, FFY, BDO / SM Group Employee Accounts or RMU. Entering a bucket triggers the next workflow - renewal hand-off at the lead days, the manual disposition queue, or exclusion with a fallout entry.
 preconditions:
@@ -713,9 +689,7 @@ title: Choose the RA template from the LAMD loan
 brd: [BRIDSP-13 (p.10)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Upload & Intake (LAMD snapshot); Policy record (Loan & Matching)
-api: Bulk handler SBM_LAMD; disposition step
 description:
   - The LAMD snapshot holds per PN the loan status, the amortised flag and the maturity date. For an active loan that is not amortised, the disposition rules mark the record ready for the Generic RA or the FFY RA template, and the next workflow is triggered. The chosen template travels with the renewal hand-off; the RA itself is generated by the Renewal module.
 preconditions:
@@ -741,9 +715,7 @@ title: Assign policies to non-renewal buckets
 brd: [BRIDSP-14 (p.10)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Masterlist (Non-Renewal tab); Reports (SBM-NON-RENEWAL)
-api: Disposition step; report SBM-NON-RENEWAL
 description:
   - Policies that meet the non-renewal criteria (Free First Year, SM Group Employee, No Touch, CARI, Bonds, RMU and the other exclusions of Report List row 156) are tagged Non-Renewal, excluded from renewal and recorded in the non-renewal report with the exclusion reason. A manual tag can override the result (FR-SP-003).
 preconditions:
@@ -772,9 +744,7 @@ title: Group Inforced policies and create RAs and proposals
 brd: [BRIDSP-15 (p.10)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Masterlist; Policy record (Renewal tab)
-api: Disposition step; RenewalHandOff
 description:
   - Inforced policies (PN not matched to LAMD) are grouped into Fully Paid Loan, OPM, BDOFC or Sold. For an eligible inforced policy, the RA and the renewal proposal are generated - by the Renewal module after the hand-off (decision D2), with the RA template of its bucket and the proposal template SBM_RENEWAL_PROPOSAL.
 preconditions:
@@ -803,9 +773,7 @@ brd:
   - BRIDSP-06 (p.9)
 actor: Marketing user (Policy Reviewer, Submitted Handler; IAAF_PREPARE)
 priority: Must have
-fit: NEW
 screens: Policy Reviews / IAAF (review queue, IAAF page); Policy record (Review & IAAF tab)
-api: POST /api/v1/submitted/policies/{id}/reviews; POST .../iaaf
 description:
   - Non-CBG Corporate and Branch records and CBG Fire records with documents enter the review queue. The reviewer records each review - review number, date, adequacy (Adequate or With findings), findings and remarks. With findings, the reviewer e-mails the bank counterpart from the record and a new review follows. The IAAF shows the review history and the review count.
   - When the policy is adequate, the reviewer generates the IAAF (IAAF-yyyy-nnnnnn). Only one IAAF exists per policy; it can be linked to related policies (for example the previous term or the same borrower) by their reference numbers.
@@ -847,9 +815,7 @@ title: Route the IAAF for approval and signature
 brd: [BRIDSP-07 (p.9)]
 actor: System; approvers (IAAF_APPROVE)
 priority: Must have
-fit: CHANGE
 screens: My Approvals; IAAF page (approvals); Submitted Policies Setup (Approval Matrix)
-api: Workflow SBM_IAAF; POST /api/v1/submitted/iaaf/{id}/approve | return
 description:
   - The IAAF Approval Matrix gives, for the document IAAF, the segment and the sum-insured band, the approval levels and the permission or named signatory of each level. When the IAAF is submitted, BIBS routes it to the first level; each approval moves it to the next level until the last one.
   - At the last approval BIBS stamps the signatures (name, position, time and hash of each approver), renders the PDF and sets the IAAF APPROVED. **Send to bank counterpart** e-mails it and sets ISSUED. The record then either waits for expiry as a conversion opportunity or receives a reminder letter (p.7).
@@ -887,9 +853,7 @@ title: Detect accounts exceeding acceptance or coverage limits
 brd: [BRIDSP-16 (p.10)]
 actor: System
 priority: Must have
-fit: CHANGE
 screens: Policy record (Rule Results, flag Insurer approval); Submitted Policies Setup (Limit Rules)
-api: Limits step
 description:
   - The limits step compares each record with the limit rules - per insurer and line or product, the maximum sum insured, the maximum vehicle age and other attribute limits - and with the package limit of the catalogue. A breach flags the record "Insurer approval required", records the breached limit and creates a TOR task for the handling Marketing user.
 preconditions:
@@ -914,9 +878,7 @@ title: Generate the Terms of Reference
 brd: [BRIDSP-17 (p.10)]
 actor: Marketing user (TOR_PREPARE)
 priority: Must have
-fit: NEW
 screens: TOR (list, TOR page); Policy record (TOR tab)
-api: POST /api/v1/submitted/tors
 description:
   - For an account that exceeds the limits, the Marketing user generates a TOR (TOR-yyyy-nnnnnn) from template SBM_TOR. It lists the breached limits and the proposed terms. The TOR is created for the account (masterlist record or renewal ARN).
 preconditions:
@@ -949,9 +911,7 @@ title: Route the TOR for approval per the TSU Approval Matrix
 brd: [BRIDSP-18 (p.10)]
 actor: System; TSU (TOR_APPROVE)
 priority: Must have
-fit: CHANGE
 screens: My Approvals; TOR page; Submitted Policies Setup (Approval Matrix)
-api: Workflow SBM_TOR
 description:
   - The submitted TOR is routed by the TSU Approval Matrix (document TOR, segment and sum-insured band) to the approvers of each level for signature. The last approval attaches the signed PDF and sets APPROVED.
 preconditions:
@@ -981,9 +941,7 @@ title: Hand the approved TOR over to the Account Officer
 brd: [BRIDSP-19 (p.10)]
 actor: Account Officer
 priority: Must have
-fit: CHANGE
 screens: Notifications; TOR page (Download)
-api: GET /api/v1/submitted/tors/{id}.pdf
 description:
   - When the TOR is approved, BIBS stores the signed PDF as an attachment of type TOR and notifies the assigned AO, who views or downloads it to proceed with the renewal and the insurer. The TOR becomes RELEASED when the AO opens or downloads it.
 preconditions:
@@ -1010,9 +968,7 @@ title: Detect expiring policies and hand them to Renewal
 brd: [BRIDSP-23 (p.11)]
 actor: System (job SBM_EXPIRY_SCAN); Marketing AO (Renew with BDOI)
 priority: Must have
-fit: NEW
 screens: Renewal Work List (For Renewal, Hand-off Pending); Masterlist (Renew with BDOI)
-api: Job SBM_EXPIRY_SCAN; port RenewalHandOff
 description:
   - Every day the expiry scan selects For Renewal records whose expiry falls within the lead days of their segment (for example CBG Fire 150 days, CBG Motor 120 days), assigns the insurer with the insurer rules (by vehicle type for CBG Motor; different from the expiring insurer for CBG Fire), and hands each record to the Renewal module through the port RenewalHandOff with the policy and risk data, the RA template and the assigned insurer. The record moves to RENEWAL_IN_PROGRESS.
   - From the hand-off on, the Renewal module owns the renewal - renewal account, 30-day hold cover request and letters (decision D2; FRS BRD-6 FR-RN-090). For Non-CBG Retail, the AO starts the renewal by hand with **Renew with BDOI**, which calls the same port.
@@ -1046,9 +1002,7 @@ title: List the policies subject for renewal
 brd: [BRIDSP-25 (p.11)]
 actor: Marketing user
 priority: Must have
-fit: NEW
 screens: Renewal Work List (tabs For Renewal, Hand-off Pending, Hold Cover Pending, Insurer Not Accepted, Converted, Not Renewed); Reports (SBM-RENEWABLE)
-api: GET /api/v1/submitted/renewals; report SBM-RENEWABLE
 description:
   - When the renewal cycle starts, the Marketing user sees the complete list of renewable policies, by expiry month, bucket, AO and insurer, for call-out and placement. The user assigns or re-assigns the AO in bulk, exports the list (SBM-RENEWABLE) and opens the Renewal record of a handed-over policy for its letters and progress.
 preconditions:
@@ -1074,9 +1028,7 @@ title: Send letters and proposals when the criteria are met
 brd: [BRIDSP-22 (p.11)]
 actor: System (job SBM_LETTER_DISPATCH; Renewal letter engine)
 priority: Must have
-fit: CHANGE
 screens: Letters & Print Batches; Policy record (Letters tab)
-api: Job SBM_LETTER_DISPATCH; letter rules
 description:
   - When policy evaluation meets the sending criteria of a letter rule (letter type, segment, bucket, days relative to expiry, channel), the letter is generated and sent automatically, by e-mail, through the bank counterpart, or printed in a batch for the mail house (COG).
   - Renewal letters of handed-over policies - RA (generic or FFY), NRNS, NAL, SFU and renewal reminders - are generated by the Renewal module's letter engine, one RA per client (decision D2); the RA is sent 90 days before expiry. Submitted Policies sends the letters that are not renewal letters, namely the policy-review reminder to the client c/o the bank counterpart, and the renewal notice and renewal proposal until their owner is confirmed (XQ03). Printed renewal letters use this module's mail-house port.
@@ -1110,9 +1062,7 @@ title: Re-assign the insurer while a hold cover request is open
 brd: [BRIDSP-32 (p.12)]
 actor: Marketing user (SBM_PROCESS)
 priority: Must have
-fit: CHANGE
 screens: Renewal Work List (Insurer Not Accepted; Re-assign Insurer)
-api: POST /api/v1/submitted/renewals/{id}/reassign-insurer (HoldCoverService.reassign)
 description:
   - When the insurer has not accepted the hold cover within the acceptance days (3-5 days in the BRD), the watch job alerts the handler to follow up or re-assign. The user updates the assigned insurer even with a hold cover request open. BIBS closes the open request as Reassigned, updates the insurer of the renewal account, sends a new hold cover request to the new insurer and keeps both in the history.
 preconditions:
@@ -1146,9 +1096,7 @@ title: Process placement of the renewal account
 brd: [BRIDSP-26 (p.11)]
 actor: Placement user (BRD-1 placement roles)
 priority: Must have
-fit: CHANGE
 screens: BRD-1 Placement screens; Renewal Work List (Converted)
-api: BRD-1 placement (payment gate, slip generation and sending)
 description:
   - When the client confirms the renewal with BDOI, the renewal account created by the Renewal module follows the BRD-1 path - payment gate, placement slip, protected send to the insurer - and the placement file is transmitted to the insurer. The masterlist conversion status follows the account (Process Placement, Placed).
 preconditions:
@@ -1173,9 +1121,7 @@ title: Show the booked status in the masterlist
 brd: [BRIDSP-27 (p.11)]
 actor: Booking user (BRD-1 booking roles); System
 priority: Must have
-fit: CHANGE
 screens: BRD-1 Booking; Masterlist; Policy record (Renewal tab)
-api: InvoiceBooked event (business type RENEWAL)
 description:
   - When the renewal account is booked, the booking carries business type RENEWAL and the origin Submitted Policy (shared change BT0, decision D1). The listener of this module sets the masterlist record BOOKED with the invoice number and booking date. A renewal that never books is closed Not Renewed with the reason read from the Renewal module.
 preconditions:
@@ -1205,9 +1151,7 @@ title: Tag handling-fee payments in the Unapplied Payment List
 brd: [BRIDSP-31 (p.12)]
 actor: System (job SBM_HANDLING_FEE_TAGGER); UPP handler (SBM_HANDLING_FEE)
 priority: Must have
-fit: CHANGE
 screens: Handling Fees (records, tagger results, unmatched items); Collections unapplied view
-api: Job SBM_HANDLING_FEE_TAGGER; UnappliedDispositionRequests (RECOGNIZE_INCOME)
 description:
   - Handling-fee records exist for the CBG Motor submitted accounts that BDOI bills, with PN, location reference, amount and billing date. Every 30 minutes the tagger reads the open unapplied payments and matches CLPC payments on the PN and OTC payments on the location reference against billed records.
   - A match tags the payment Handling Fee - BIBS sends a disposition request (action RECOGNIZE_INCOME, income type HANDLING_FEE) to Cashiering, which applies it and issues the OR; the record becomes TAGGED then APPLIED, and the payment is available for reporting, audit and application. Unmatched or ambiguous payments stay for the UPP handler, who can apply the Handling Fee disposition by hand.
@@ -1249,9 +1193,7 @@ brd:
   - BRIDSP-30 (p.12)
 actor: Marketing user (SBM_REPORT_VIEW)
 priority: Must have
-fit: NEW
 screens: Reports (category Submitted Policies); Submitted Policies home
-api: Report service, codes of section 6.1
 description:
   - The Marketing user generates the reports of section 6.1 to monitor sanitation, disposition, classification and the other results - including the fallout reports for exceptions. BRIDSP-30 repeats BRIDSP-20 word for word; both are met by this FR.
   - The Submitted Policies home shows tiles (received today, awaiting validation, fallout of the last run, for renewal this month, IAAF and TOR pending, insurer not accepted, hold cover unbooked, handling fees tagged today); each tile opens its filtered list.
@@ -1279,9 +1221,7 @@ title: View, download and print reports in several formats
 brd: [BRIDSP-21 (p.10)]
 actor: System; report users (SBM_REPORT_EXPORT)
 priority: Must have
-fit: FIT
 screens: Reports (Export, Print)
-api: GET /api/v1/reports/{code}/export?format=PDF|XLSX|ODS|CSV|XML
 description:
   - Every report is rendered in the chosen format - Excel, PDF, ODS, CSV or XML - with print preview, saved variants and an archive of the exported files. This is the report framework built for BRD-1.
 preconditions:
@@ -1306,9 +1246,7 @@ title: Send notifications and alerts for key events
 brd: [BRIDSP-24 (p.11)]
 actor: System
 priority: Must have
-fit: CHANGE
 screens: Notifications (bell); notification preferences; alerts
-api: Notification events and alert codes of section 5.6
 description:
   - BIBS evaluates the notification rules and thresholds on each lifecycle event and notifies the users concerned in the app and, per their preferences, by e-mail. The events are those of BRIDSP-24 (section 5.6) - new submission or manual validation, pending IAAF or TOR, bucket moves, exceptions and fallout, nearing expiry and renewal start, TOR hand-over, placement file ready or sent, and the alert for hold covers of unbooked accounts.
   - Client-facing items (RA, SFU, NAL, renewal notices, proposals, reminders, NRNS) are the letters of FR-SP-062 and of the Renewal module.

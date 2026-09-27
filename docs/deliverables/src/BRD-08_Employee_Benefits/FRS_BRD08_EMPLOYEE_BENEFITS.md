@@ -258,9 +258,7 @@ title: Restrict documents and reports to authorised users
 brd: [BRID-023 (p.30-31), BRID-005 (p.10-11)]
 actor: System
 priority: Must have
-fit: FIT
 screens: All EB screens; Reports; Documents tabs
-api: Every endpoint checks its permission
 description:
   - Only authorised users view, download, print or access EB documents and reports. Each EB screen, action and report requires one of the permissions of section 3.2; menus show only what the user's roles allow. Document lists and downloads also apply the department access classes of FR-EB-002.
   - Insurer and client HR users never reach the core BIBS screens or API (FR-EB-010).
@@ -292,9 +290,7 @@ title: Link every document to its transaction and restrict it by department
 brd: [BRID-025 (Add. p.11; p.32)]
 actor: Marketing AO; System
 priority: Must have
-fit: CHANGE
 screens: Programme page (Documents tab); Member Changes; SOA Register
-api: Attachment service /api/v1/attachments (extended with access classes)
 description:
   - Every document uploaded or generated in EB is linked to the client, the programme or policy, and the transaction (cycle, member change, SOA), and carries a process tag - new business placement, renewal placement, endorsement, adjustment, franchise or proposal. An EB upload without its tag and transaction is refused.
   - Each document type has an access class listing the departments that may see it - Marketing, Processing, Collection (section 6.2). Lists and downloads show only the documents of the user's classes. Collection users open billing documents, SOAs, endorsement files and collection supporting documents directly.
@@ -335,9 +331,7 @@ title: Log key actions and keep the history of proposals and documents
 brd: [BRID-024 (p.31)]
 actor: System; users with EB_VIEW (read)
 priority: Must have
-fit: CHANGE
 screens: Programme page (History tab); Proposal and comparative pages (Versions)
-api: Audit service (existing); history to be assigned at build
 description:
   - BIBS logs every key action with time, user and reference - RA sent, feedback received, proposals submitted and validated, documents uploaded and released, approvals, client confirmation, placement trigger and every portal action.
   - TOR, BOR, proposals, comparatives and member rosters are versioned. A submitted version is never changed; a change creates version n+1. Users review the version history and the differences between two versions of a proposal or TOR.
@@ -368,9 +362,7 @@ title: Protect documents sent outside BDOI
 brd: [BRID-007 (p.12-13)]
 actor: Marketing AO; System
 priority: Must have
-fit: CHANGE
 screens: Send dialogs of the Programme page (TOR, RA, comparative, franchise, revision)
-api: Messaging outbox (existing, extended with DOCX protection)
 description: TOR, master lists, utilization reports, RAs, comparatives and other EB files leave BDOI encrypted and password protected, one or several files at a time. The password is a standard assigned value or a system-generated one following a defined syntax, and is always sent in a separate message. PDF, XLSX and DOCX files are protected; a file type that cannot be protected (CSV, images) is refused for outbound sending.
 preconditions:
   - "A document is selected for sending."
@@ -403,9 +395,7 @@ title: Give insurers and client HR users a separate, secure portal
 brd: [BRID-005 (p.10-11), BRID-005.01 (Add. p.7-8), BRID-005.02 (Add. p.8-9), BRID-014 (p.20-22)]
 actor: Insurer user; client HR user; System
 priority: Must have
-fit: NEW
 screens: Portal sign-in; Portal home; Accept invitation
-api: Portal realm /api/portal (to be assigned at build)
 description:
   - Insurers and client HR users interact with BDOI only through the partner portal, never the core system. The portal has its own sign-in and its own API; a portal token is refused by the core API and a core token by the portal. Each portal user is bound to one party - one insurer or one client - and every portal query is filtered on that party, so a user cannot see or reach another party's records.
   - The portal can run as a separate deployment in the internet zone. Its hosting, BDO Information Security approval and the multi-factor method are confirmed under EBQ13.
@@ -450,9 +440,7 @@ title: Provision portal users through User Access requests
 brd: [BRID-005 (p.10-11), BRID-014 (p.20-22)]
 actor: Marketing AO (requester, PORTAL_USER_REQUEST); approver (PORTAL_USER_APPROVE); Business Administrator (PORTAL_ADMIN)
 priority: Must have
-fit: NEW
 screens: User Access Requests (user type External); Portal Users (Setup & Administration)
-api: User Access request service (BRD-11); to be assigned at build
 description:
   - Portal users are created, disabled and enabled only through User Access Maintenance requests of user type External (decision D7). The AO raises the request with the person's name and e-mail, the party kind (insurer or client), the party code and the portal role. A chosen approver other than the requester decides it, with the draft, return and history steps of User Access Maintenance.
   - On approval BIBS creates the portal user as INVITED and e-mails an invitation link, valid for 72 hours (default). The user sets the password through the link; no password is ever sent by e-mail. The Business Administrator locks and unlocks portal users and reviews the portal sign-in and download logs.
@@ -502,9 +490,7 @@ title: Stage portal uploads and link them automatically
 brd: [BRID-005.01 (Add. p.7-8), BRID-014 (p.20-22)]
 actor: Insurer user; client HR user; System
 priority: Must have
-fit: NEW
 screens: Portal task pages (upload)
-api: Portal realm /api/portal (to be assigned at build)
 description:
   - Insurers upload proposals, policy forms and billing documents; client HR users upload master lists, utilization reports, member changes and feedback. Every upload is made against a task (an insurer request, a franchise request, a member change, an SOA request, a programme), so BIBS links it automatically to the right client, policy, member change or transaction.
   - Uploads are staged. They are virus scanned and checked for type, size and content, and take effect only when an internal user validates them (FR-EB-013). The portal user sees a confirmation or an error at once.
@@ -548,9 +534,7 @@ title: Review, validate or reject portal uploads
 brd: [BRID-005.03 (Add. p.9-10), BRID-005.01 (Add. p.7-8)]
 actor: Marketing AO (proposals, franchise, client documents); Processing (policy forms); Collection (billing)
 priority: Must have
-fit: NEW
 screens: Portal Uploads (review queue); EB Home (tile Portal uploads to review)
-api: To be assigned at build
 description: Staged uploads appear in the Portal Uploads queue of the department that owns their target type. The reviewer opens the file, checks the mapping, and validates or rejects it with a reason. Before validation the reviewer can re-map an upload to another target of the same party. On validation the file becomes an attachment of the target (and, for a master list or proposal form, business data); on rejection the portal user is told why.
 preconditions:
   - "The user has the review permission of the target type (EB_MARKET, EB_PROCESS or EB_COLLECT)."
@@ -583,9 +567,7 @@ title: Insurer task inbox and structured proposal form
 brd: [BRID-005.02 (Add. p.8-9), BRID-005 (p.10-11)]
 actor: Insurer user
 priority: Must have
-fit: NEW
 screens: Portal home (tasks); Requests for Proposal; Franchise Requests; Member Changes; SOA and Policy Forms
-api: Portal realm /api/portal (to be assigned at build)
 description:
   - The insurer's portal home lists its open tasks - requests for proposal to answer, franchise requests to decide, member changes to bill, SOAs and policy forms to send - with due dates.
   - A request for proposal shows the TOR and the documents to download, and a structured proposal form generated from the TOR items - per benefit line and plan, the insurer's offered value for each item, a deviation flag and remark, the premium per plan, the annual premium and TSI, exclusions and capability factors (company stability, clinic providers, hospital network, technology). Attachments go with the same submission.
@@ -633,9 +615,7 @@ title: Client HR portal
 brd: [BRID-014 (p.20-22), BRID-011 (p.18)]
 actor: Client HR user
 priority: Must have
-fit: NEW
 screens: Portal - Programmes; Members; Uploads; Comparative; Renewal Advice and Documents
-api: Portal realm /api/portal (to be assigned at build)
 description:
   - The client HR user sees only its own company - programme and policy summary, contacts, the member roster (read), the renewal advices and the documents released to the client. The user uploads master lists, utilization reports, member changes and feedback (staged, FR-EB-012), and views, comments on and, where allowed, confirms the comparative (FR-EB-043, 046).
   - Master lists uploaded in Excel are mapped automatically to the roster fields by a template with column mapping and row validation; the result is a staged roster version that the AO accepts (FR-EB-054). Every download is logged.
@@ -671,9 +651,7 @@ title: Capture and tag new clients as prospect or client
 brd: [BRID-006 (p.11-12)]
 actor: Marketing AO
 priority: Must have
-fit: FIT
 screens: Client pages (CRM); New Programme (New Client)
-api: Client service (existing)
 description: New EB clients are captured in the BIBS client master with the required fields and tagged as prospect or confirmed client by the onboarding workflow of BRD-1. Search filters by the tag. The duplicate check stops a second record of the same client. The EB programme is opened from the client page.
 preconditions:
   - "The AO has CLIENT_MAINTAIN."
@@ -704,9 +682,7 @@ title: Open an EB programme and its cycles with the business type
 brd: [BRID-022.01 (Add. p.10-11), BRID-006 (p.11-12)]
 actor: Marketing AO (EB_MARKET)
 priority: Must have
-fit: CHANGE
 screens: New Programme; Programmes; Programme page
-api: To be assigned at build
 description:
   - A programme groups the client's benefit lines (HMO, GLI, GPA), the team (BDO, SM, Voluntary, Solicited, New Business), the funding (employer or voluntary), the HR contacts and the renewal flag. Each line holds the incumbent insurer, the current policy and ARN, the period and the headcount.
   - One cycle per policy year carries the business type, NEW_BUSINESS or RENEWAL. The type is required and travels to the accounts created from the cycle (shared work item BT0), so every report can be filtered by it.
@@ -750,9 +726,7 @@ title: Send the renewal advice automatically before expiry
 brd: [BRID-001 (p.7)]
 actor: System; Marketing AO
 priority: Must have
-fit: NEW
 screens: EB Home (tile RA due); Programmes (tab Renewal Due; bulk Send RA); Programme page
-api: Job EB_RENEWAL_ADVICE; to be assigned at build
 description:
   - A daily job opens a renewal cycle for each programme flagged for renewal whose line expires in the lead time, composes the RA from the template with the key programme details, and sends it to the programme's HR contacts that receive RAs. Reminders follow at set days while no feedback is recorded; each carries a feedback request with a link to the client portal.
   - The RA is stored as document type RENEWAL_ADVICE linked to the programme, the current ARN and the client, so the contact centre can view and resend it (decision D3). No RA goes to new, cancelled or ineligible programmes. The AO can also send the RA manually from the Programmes list.
@@ -789,9 +763,7 @@ title: Collect and record client feedback
 brd: [BRID-002 (p.8)]
 actor: Marketing AO; client HR user
 priority: Must have
-fit: NEW
 screens: Programme page (Cycle tab, Record Feedback); Portal - Uploads
-api: To be assigned at build
 description: The AO records the client's feedback on the renewal cycle as text, attachments (PDF, Word, image) or both, with the channel (AO, portal, e-mail) and the date received. The client HR user can give the same feedback in the portal. BIBS links the feedback to the client and the cycle and confirms the entry. The first feedback moves the cycle from RA_SENT to REQUIREMENTS and stops the RA reminders.
 preconditions:
   - "The cycle is open."
@@ -825,9 +797,7 @@ title: Send the incumbent's indicative renewal proposal
 brd: [BRID-003 (p.8-9)]
 actor: Marketing AO; incumbent insurer
 priority: Must have
-fit: NEW
 screens: Programme page (Proposals tab, Indicative Proposal)
-api: To be assigned at build
 description: For programmes flagged for renewal, the AO records the incumbent's indicative proposal (the latest incumbent rates and coverage) or the incumbent submits it in the portal. BIBS generates the letter with the policy number, coverage, incumbent rates, expiry and renewal instructions, and sends it protected to the client's HR contacts. The action is refused for new-business cycles and programmes not flagged for renewal.
 preconditions:
   - The cycle is a renewal cycle of a programme flagged for renewal.
@@ -858,9 +828,7 @@ title: Upload TOR, master list and utilization report
 brd: [BRID-007 (p.12-13)]
 actor: Marketing AO; client HR user; incumbent insurer
 priority: Must have
-fit: CHANGE
 screens: Programme page (Documents tab); Portal uploads
-api: To be assigned at build
 description:
   - The TOR, master list (named), unnamed master list, utilization report and other EB documents are uploaded single or in bulk (Word, Excel, PDF), registered with the cycle, type, process tag, version and source, and linked to the client, policy and renewal transaction. A new upload of the same type creates version n+1 and supersedes the previous one.
   - The incumbent insurer is notified through a portal task, with e-mail, to upload the unnamed master list.
@@ -896,9 +864,7 @@ title: Upload and validate the signed Broker on Record
 brd: [BRID-008 (p.14-15)]
 actor: Marketing AO
 priority: Must have
-fit: NEW
 screens: Programme page (BOR tab)
-api: To be assigned at build
 description:
   - The AO uploads the client's signed BOR (PDF or Word). BIBS shows its status - Pending, Uploaded, Validated or Rejected. The validator confirms a checklist - signed by an authorised signatory, not blank, client name matches - and sets the validity dates. An invalid BOR is rejected and re-uploaded as a new version; the latest validated version is the active one.
   - Insurer requests and franchise requests of a new-business cycle, or of a renewal cycle that remarkets, are blocked until a validated BOR exists.
@@ -939,9 +905,7 @@ title: Request franchise from insurers and record their decision
 brd: [BRID-026 (Add. p.12-13), BRID-027 (p.32-33)]
 actor: Marketing AO; insurer user
 priority: Must have
-fit: NEW
 screens: Programme page (Franchise tab); Portal - Franchise Requests
-api: To be assigned at build
 description:
   - For each target insurer the AO submits a franchise request with the BOR and the required documents. The insurer approves or rejects it in the portal with a reason; where the insurer answers by e-mail, the AO records the outcome with the e-mail as evidence. Only insurers with an approved franchise receive the TOR (FR-EB-035).
   - The insurer has 5 working days to decide (TAT annex). A request not decided after the TAT and a grace period expires and raises an alert to the AO.
@@ -983,9 +947,7 @@ title: Advise the client of the franchise outcome
 brd: [BRID-029 (p.33-34)]
 actor: Marketing AO
 priority: Must have
-fit: NEW
 screens: Programme page (Franchise tab, Advise Client)
-api: To be assigned at build
 description: After an insurer decides a franchise request, the AO advises the client of the approval or rejection by e-mail and portal notice, from the template. The advice is due within the agreed working days from the decision; an overdue advice raises an alert.
 preconditions:
   - "The franchise request is APPROVED or REJECTED."
@@ -1010,9 +972,7 @@ title: Submit the required documents to insurers per process
 brd: [BRID-026 (Add. p.12-13)]
 actor: Marketing AO
 priority: Must have
-fit: CHANGE
 screens: Programme page (Submissions); Member Changes; EB Setup (Required Documents)
-api: To be assigned at build
 description:
   - The AO submits the documents an insurer needs for new-business placement, renewal placement, adjustment or endorsement (financial and non-financial), franchise request and proposal - BOR, TOR, master list, utilization, indicative proposal, placement and adjustment requirements. A checklist per process type and benefit line lists the mandatory documents; BIBS refuses the submission while one is missing.
   - The submission goes to the insurer's portal and by protected e-mail, is logged and linked to the client, policy and transaction, and Processing and Collection are notified and can view it. Insurers see only the submissions addressed to them.
@@ -1048,9 +1008,7 @@ title: Prepare the TOR and distribute it to insurers
 brd: [BRID-009 (p.15-16), BRID-004 (p.9-10), BRID-007 (p.12-13)]
 actor: Marketing AO
 priority: Must have
-fit: CHANGE
 screens: Programme page (TOR tab; Insurer Requests tab)
-api: To be assigned at build
 description:
   - The AO prepares the TOR as structured items per benefit line and plan (item, description, requirement) and releases it. The AO then selects the insurers - only insurers with an approved franchise for the cycle - and distributes the TOR, the unnamed master list and the utilization report. BIBS creates one insurer request per insurer with the TOR version, documents and due date, as a portal task and a protected e-mail.
   - For a renewal, remarketing to other insurers uses the same request, and is possible only for programmes flagged for renewal (BRID-004).
@@ -1087,9 +1045,7 @@ title: Record and validate insurer proposals
 brd: [BRID-005.02 (Add. p.8-9), BRID-005.03 (Add. p.9-10), BRID-010 (p.16-17)]
 actor: Marketing AO
 priority: Must have
-fit: NEW
 screens: Programme page (Proposals tab); Proposal page
-api: To be assigned at build
 description: Proposals come from the portal form (FR-EB-014) or are entered by the AO from an e-mailed proposal. Each proposal is SUBMITTED until the AO validates it; only validated proposals enter the comparative. The AO may reject a proposal with a reason, and the insurer can then submit a new version. The incumbent's indicative proposal counts as a proposal of kind INCUMBENT_INDICATIVE.
 preconditions:
   - "The cycle is in PROPOSALS, INCUMBENT_TERMS or REVISION."
@@ -1120,9 +1076,7 @@ title: Build and sign off the comparative analysis
 brd: [BRID-010 (p.16-17)]
 actor: System; Marketing AO; authorised signatory (EB_COMPARATIVE_APPROVE)
 priority: Must have
-fit: CHANGE
 screens: Comparative page; Programme page (Comparative tab)
-api: To be assigned at build
 description:
   - BIBS builds the comparative from all validated proposals of the cycle - coverage per TOR item, premium rates and premium per plan, exclusions, terms, additional benefits, and capability factors such as company stability, clinic providers, hospitals and technology. It is a structured table linked to the client, the cycle and the proposals, stored as a snapshot version.
   - The comparative is due 3 working days after the last proposal (default). BIBS warns when requests are still open; the AO closes them explicitly or waits. The AO marks the recommended proposal per line and submits the comparative for sign-off by an authorised signatory other than the maker. It can be viewed, exported (PDF, Excel) and printed.
@@ -1159,9 +1113,7 @@ title: Trigger approval when a value threshold is met
 brd: [BRID-016 (p.23)]
 actor: System; BDOI Management (EB_THRESHOLD_APPROVE)
 priority: Must have
-fit: CHANGE
 screens: EB Setup (Threshold Rules); My Approvals; Comparative page
-api: To be assigned at build
 description: Threshold rules define, per benefit line or all lines, a measure (TSI or annual premium), an amount and currency, the approver permission and level, and effective dates. BIBS evaluates them on the recommended proposal when the comparative is signed off, and again on client confirmation. When a rule is met, the cycle waits in THRESHOLD_APPROVAL; approvers are notified and see the item in My Approvals, and placement is blocked until approval. Administrators maintain the rules with maker-checker.
 preconditions:
   - "A comparative is signed off or the client confirms."
@@ -1202,9 +1154,7 @@ title: Present the comparative to the client
 brd: [BRID-011 (p.18)]
 actor: Marketing AO; client HR user
 priority: Must have
-fit: NEW
 screens: Comparative page (Present to Client); Portal - Comparative
-api: To be assigned at build
 description: The AO presents the approved comparative - table, summary and a downloadable PDF - to the client. BIBS publishes it on the client portal and sends it by protected e-mail, and notifies the HR contacts. The client HR user reads it in the portal and gives feedback or asks for clarification in a comment thread on the same page; the AO is notified and replies in the thread.
 preconditions:
   - "The cycle is READY_TO_PRESENT."
@@ -1231,9 +1181,7 @@ title: Capture client changes and relay them to insurers
 brd: [BRID-012 (p.19-20)]
 actor: Marketing AO; client HR user
 priority: Must have
-fit: NEW
 screens: Programme page (Revisions); Portal tasks
-api: To be assigned at build
 description: The AO captures the client's changes, additions or amendments as items (a TOR item or free text with the requested change) with documents, and selects the insurers to relay them to. BIBS relays the revision as a portal task and e-mail per insurer, tracks each insurer's status (open, answered) and confirms the relay. An empty revision is refused. The cycle moves to REVISION.
 preconditions:
   - "The cycle is WITH_CLIENT."
@@ -1261,9 +1209,7 @@ title: Insurers update their proposals against a revision
 brd: [BRID-015 (p.22-23)]
 actor: Insurer user
 priority: Must have
-fit: NEW
 screens: Portal - Requests for Proposal (revision); Proposal page (Versions)
-api: Portal realm /api/portal (to be assigned at build)
 description: The insurer opens the revision task, which shows the requested items. The revised proposal is a new version that references the revision and must answer every requested item. BIBS notifies the AO, keeps the version history and shows the differences from the previous version. The target becomes answered.
 preconditions:
   - The insurer has an open revision target.
@@ -1290,9 +1236,7 @@ title: Record the client's confirmation and trigger placement
 brd: [BRID-017 (p.24), BRID-019 (p.25-26)]
 actor: Marketing AO; client HR user; System
 priority: Must have
-fit: CHANGE
 screens: Programme page (Confirm; Trigger Placement); Portal - Comparative (Confirm)
-api: To be assigned at build
 description:
   - The client's confirmation of the chosen proposal is recorded with its channel - in the system (portal), by e-mail or as a signed document; evidence is mandatory except for a portal confirmation. BIBS re-evaluates the threshold rules.
   - "**Trigger Placement** creates one draft account per benefit line of the chosen proposal (EB product of the line, insurer, premium, business type), links the placement documents (confirmation, proposal, TOR, master list, BOR) to each account, submits it to Processing and notifies Processing and the insurer. It is blocked while a threshold approval, a required placement document or, for a non-accredited provider, the ISACOM approval is missing (EBQ24)."
@@ -1339,9 +1283,7 @@ title: Assign, reassign and return work with remarks
 brd: [BRID-018 (p.25)]
 actor: Processing; Processing Supervisor; TL (WORK_ASSIGN)
 priority: Must have
-fit: FIT
 screens: My Work queues; workflow panels of the EB and account records
-api: Workflow service (existing)
 description: Authorised users assign, reassign and return EB work items (accounts in placement, member changes, SOAs, portal uploads) with remarks; returns carry a reason and feedback that the maker sees. The Processing Supervisor approval applies only where BDOI defines such a step (EBQ23).
 preconditions:
   - "The user holds WORK_ASSIGN (assign) or owns the stage (return)."
@@ -1367,9 +1309,7 @@ title: Track policy issuance after placement
 brd: [BRID-019 (p.25-26), BRID-005.01 (Add. p.7-8)]
 actor: Processing; insurer user
 priority: Must have
-fit: CHANGE
 screens: Account page (BRD-1); Programme page (Cycle tab); Pending Items
-api: Existing placement and issuance services
 description: After the trigger, Processing completes placement and issuance on the BRD-1 screens with the EB documents already linked to each account. Insurers upload the policy form or contract through the portal; once Processing validates it (FR-EB-013) it is attached as the account's e-policy. The cycle shows the account stages so the AO sees progress, and the contract is a tracked item until received (FR-EB-057).
 preconditions:
   - "The account was created by the placement trigger."
@@ -1395,9 +1335,7 @@ title: Book the account with an insurer billing number duplicate check
 brd: [BRID-020 (p.26-27)]
 actor: Processing
 priority: Must have
-fit: CHANGE
 screens: Book Account (BRD-1); Booking upload
-api: Booking service (existing, extended)
 description: For EB products the insurer's billing number is mandatory at booking, on screen and in the booking upload. The combination company, insurer and billing number is unique; a duplicate blocks the booking and notifies the user. Success and duplicate outcomes are notified; the booking audit records the user, time and billing number.
 preconditions:
   - "The account is ready to book."
@@ -1430,9 +1368,7 @@ title: Receive, validate and release the SOA and track payment
 brd: [BRID-021 (p.27-28)]
 actor: Insurer user; Processing; Collection
 priority: Must have
-fit: CHANGE
 screens: SOA Register; Portal - SOA and Policy Forms; Programme page (Billing & SOA)
-api: To be assigned at build
 description:
   - The insurer's SOA (PDF or Excel) is received through the portal or uploaded by the AO. BIBS refuses a duplicate SOA (same insurer and SOA number, or the same file) and a corrupted file. Processing validates it (within 3 working days by default) and releases it to the client HR user and to Collection; a rejected SOA carries a reason.
   - The SOA is linked to the booked invoices. The payment status shown is the invoice ledger's; when an invoice becomes paid, BIBS notifies the AO and Collection with the document links.
@@ -1475,9 +1411,7 @@ title: Maintain the member roster from the master list
 brd: [BRID-013 (p.20), BRID-014 (p.20-22)]
 actor: Marketing AO; client HR user
 priority: Must have
-fit: NEW
 screens: Programme page (Members tab); Bulk Upload (EB_MASTERLIST)
-api: To be assigned at build
 description: The roster holds, per programme and policy year, each member - employee number, name, birth date, gender, civil status, plan, dependants, effective and end dates, status. It is loaded from the master list through the template (column mapping, row validation) as a staged version. The AO reviews the staged version (headcount, additions and removals against the current one) and accepts or rejects it; an accepted version replaces the roster. The roster holds no health data (EBQ15).
 preconditions:
   - "The programme has a policy year."
@@ -1506,9 +1440,7 @@ title: Capture member changes and relay them to the insurer
 brd: [BRID-013 (p.20), BRID-025 (Add. p.11)]
 actor: Marketing AO; client HR user; insurer user; Processing
 priority: Must have
-fit: NEW
 screens: Member Changes; Portal - Member Changes; Bulk Upload (EB_MEMBER_CHANGE)
-api: To be assigned at build
 description:
   - Member changes (new hires, deletions, plan changes, data changes) are entered on screen or uploaded by the AO or the client HR user, validated against the roster and linked to the programme and policy. BIBS relays them to the insurer as a portal task and e-mail. The insurer confirms and bills; Processing validates; the change closes.
   - A change with a premium effect raises an endorsement request in Operations (BRD-2), which re-rates and posts it. Under the parameter "no payment, no booking on adjustment" the request is raised only after the billing is paid (EBQ16).
@@ -1552,9 +1484,7 @@ title: Upload insurer direct billing for member changes
 brd: [BRID-025 (Add. p.11)]
 actor: Marketing AO; insurer user
 priority: Must have
-fit: CHANGE
 screens: Member Changes (Billing); Portal - Member Changes
-api: To be assigned at build
 description: The AO uploads the insurer's direct billing documents for member changes (or the insurer uploads them in the portal). Each document is linked to the member change, the endorsement type, the client and the policy, with the Marketing, Processing and Collection access classes (FR-EB-002). The change is flagged as direct-billed. Processing validates completeness; Collection opens the billing directly.
 preconditions:
   - "The member change is RELAYED."
@@ -1581,9 +1511,7 @@ title: Monitor contracts, HMO cards and billing with automatic follow-ups
 brd: [BRID-030 (p.34-35)]
 actor: System; Marketing AO; Processing
 priority: Must have
-fit: NEW
 screens: Pending Items; Programme page (Pending Items tab); EB Home
-api: Job EB_ITEM_FOLLOWUP; to be assigned at build
 description:
   - BIBS creates a tracked item automatically for each expected deliverable - the contract after placement, the HMO card for each added member, a card replacement on request, the billing for each member change - with the responsible party (insurer, client or BDOI), status (pending, received, released, closed) and due date. Tags update automatically when the related upload is validated or the item is updated.
   - A daily job sends follow-up e-mails for items past due and escalates after a set number of follow-ups. Users view and filter pending items by programme, member, type, party and age.
@@ -1617,9 +1545,7 @@ title: EB reports
 brd: [BRID-022 (p.28-30)]
 actor: Marketing, Processing, Collection, Management (EB_REPORT_VIEW)
 priority: Must have
-fit: NEW
 screens: Reports (category Employee Benefits)
-api: Report service /api/v1/reports; codes EB-PRODUCTION, EB-RENEWAL, EB-PLACEMENT, EB-PENDING-ITEMS, EB-FRANCHISE
 description:
   - Reports are generated on request or on a schedule - Production (premium and commission by team, AO, line, insurer and business type), Renewal (programmes due with expiry, RA sent date, status, proposals, comparative result, client changes, BOR, TOR and remarketing actions), Placement (confirmation, insurer selected, coverage, commission, counter-proposals and revisions, final terms, document uploads and confirmation dates), Pending Items and Franchise.
   - Parameters include activity, team, AO, client, benefit line, insurer, business type and date range. Reports read live data, can be viewed, downloaded, printed and shared by e-mail from the report runner, and saved as variants.
@@ -1648,9 +1574,7 @@ title: New Business report, business type filter and Word export
 brd: [BRID-022.01 (Add. p.10-11)]
 actor: Marketing, Management (EB_REPORT_VIEW)
 priority: Must have
-fit: CHANGE
 screens: Reports (EB-NEW-BUSINESS; NB-BOOKED-REG, NB-PRODUCTION, NB-PLC-UPDATE)
-api: Report service /api/v1/reports; code EB-NEW-BUSINESS
 description: The New Business report lists the new client accounts and policies of a period with client, line or product, effective date, insurer selected, premium, commission, AO, business type, date and status. The business type is required on every account (FR-EB-021, shared work item BT0) and is a filter on the EB reports and on the BRD-1 booked register, production and placement update reports. Every report exports to PDF, Excel, CSV and Word, within the user's authorisation.
 preconditions:
   - The user has EB_REPORT_VIEW.
@@ -1676,9 +1600,7 @@ title: TAT monitoring, EB home and alerts
 brd: [BRID-022 (p.28-30), "TAT annex (p.42)"]
 actor: Marketing, Processing, Collection, Management
 priority: Must have
-fit: NEW
 screens: EB Home; Reports (EB-TAT)
-api: Report service /api/v1/reports; code EB-TAT
 description:
   - Each service records the received and released time stamps of the activities of the TAT annex (section 5.6). The TAT report shows, per activity, team or AO, the days taken and the breaches of the target. Alerts warn the owners of overdue franchise decisions, proposals, comparatives, SOA validations and tracked items.
   - EB Home shows tiles for RA due, awaiting feedback, franchise pending, proposals outstanding, comparatives to sign off, threshold approvals, with client, member changes open, pending items overdue and portal uploads to review; each opens its list.

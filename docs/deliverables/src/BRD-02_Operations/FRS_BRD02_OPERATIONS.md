@@ -336,9 +336,7 @@ title: Log in to BIBS
 brd: [BRQID.001 (p.16)]
 actor: Operations users
 priority: Must have
-fit: FIT
 screens: Login
-api: POST /api/v1/auth/login
 description: Operations users log in with their BIBS user ID and password. Operations uses the platform log-in built for BRD-1; it adds no screen of its own.
 preconditions:
   - The user has an active BIBS account with at least one Operations role (section 3).
@@ -372,9 +370,7 @@ title: Restrict each action to authorised roles
 brd: [BRQID.002 (p.16)]
 actor: System
 priority: Must have
-fit: FIT
 screens: All Operations screens
-api: Every endpoint checks its permission
 description:
   - Every Operations screen, button and API call requires a permission (section 3.2). Menus show only the screens that the user's roles allow; buttons for actions the user may not perform are hidden.
   - The Cashiering, Remittance and Commission Receivables screens are in the Finance group of the menu; Adjustment and Product Reconciliation are in Client & Policy; the Operations home, invoice search, Invoice 360, Disbursement queue, hand-offs, interfaces and report archive are in the Operations group.
@@ -408,9 +404,7 @@ title: Present the Operations home by role
 brd: [BRQID.003 (p.17)]
 actor: Operations users
 priority: Must have
-fit: CHANGE
 screens: Operations Home; Cashiering, Remittance, Adjustment, Reconciliation and Commission workbenches
-api: GET /api/v1/ops/home
 description:
   - After log-in the Operations Home shows one card per team section the user works in (Cashiering, Remittance, Production Reconciliation, Adjustment, Commission Receivables, Disbursement, Interfaces). Each card shows live work tiles with counts and opens the team's workbench. Sections that the user's roles do not cover are not shown.
   - The home also has an invoice search box and a list of links to the applications Operations works with, maintained in the list OPS_EXTERNAL_LINK.
@@ -447,9 +441,7 @@ title: Keep the invoice ledger of every booked invoice
 brd: [RMTID.038 (p.68-69), MKTID.011 (p.75)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Invoice Search; Invoice 360 (Movements); Interfaces (replay)
-api: GET /api/v1/ops/invoices; GET .../invoices/{no}/movements; POST .../invoices/replay
 description:
   - Each invoice booked in New Business, each endorsement invoice and each return invoice is copied into the Operations invoice ledger after the booking commits. The ledger line holds the ARN, invoice, policy, PN numbers, client, assured and payor, lead insurer and insurer shares, currency, booking, inception and expiry dates, risk code, product line, segment, AO and unit, the direct payment and 2% CWT flags, and the amounts per component.
   - "Components: premium receivable (PR) by BASIC, DST, PREMIUM_TAX_VAT, LGT, FST and OTHER; DTIP; COMMISSION; COMMISSION_VAT; WTAX; PR2307. The balance of a component is booked + adjusted - applied + reversed - remitted - written off."
@@ -490,9 +482,7 @@ title: View an invoice in Invoice 360
 brd: [RMTID.026 (p.63), RMTID.032 (p.66), ADJID.024 (p.100)]
 actor: All Operations users (OPS_VIEW)
 priority: Must have
-fit: NEW
 screens: Invoice Search; Invoice 360
-api: GET /api/v1/ops/invoices; GET .../invoices/{no}; GET .../invoices/{no}/family; GET .../invoices/{no}/history; GET .../accounts/{arn}/invoices
 description:
   - Invoice Search finds invoices by invoice number, ARN, policy, client or assured, with filters on insurer and booking dates. The search is partial and not case-sensitive and suggests matches while the user types an ARN.
   - "Invoice 360 shows the header with reference chips (ARN, invoice, endorsement) and the status pills: payment status, remittance status, hold, lock, direct payment, written off, pending negative adjustment. Below it: the component table (booked, applied, remitted, adjusted, balance), the movement timeline, the family of the invoice (original, endorsements, return invoices) and one tab per team: Receipts, Remittances, Adjustments, Reconciliation, Commission; then Documents and History."
@@ -524,9 +514,7 @@ title: Lock invoices while a team works on them
 brd: [RMTID.040 (p.69-70)]
 actor: System; Remittance, Adjustment
 priority: Must have
-fit: NEW
 screens: Invoice 360 (lock pill); Remittance Batch; Adjustment request page
-api: Ledger service (internal)
 description:
   - A module locks an invoice while it works on it, with the owner module and a reason. Remittance locks each invoice in a batch until the DV number is received or the line is excluded or returned; Adjustment locks the invoice while a request is open. Other modules may still apply payments to a locked invoice; any other action is refused with INVOICE_LOCKED.
   - Status chips on every Operations screen show the lock, "In Remittance", "Pending Adjustment" and hold, so the other teams see why an invoice cannot be changed.
@@ -564,9 +552,7 @@ title: Split invoice amounts by insurer share (co-insurance)
 brd: [ADJID.027 (p.102-103)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Invoice 360 (header, shares); Adjustment request page (Recompute)
-api: GET /api/v1/ops/invoices/{no}; GET /api/v1/adjustment/requests/{id}/recompute
 description:
   - A co-insured invoice stays one invoice with its insurer shares (insurer, share percent, lead). Payment is allocated in Cashiering on the invoice; adjustments are split by the configured shares and logged per insurer (FR-OP-054).
 preconditions:
@@ -597,9 +583,7 @@ title: Continue batch jobs past failed records and report the run
 brd: [BRQID.006 (p.19-20)]
 actor: System; users who upload files
 priority: Must have
-fit: CHANGE
 screens: Bulk Upload wizard (run summary); Payment Uploads; Interfaces (runs, records); Report CSH-BATCH-RUN
-api: /api/v1/bulk; /api/v1/ops/flow-in/runs, .../runs/{id}/records
 description:
   - Every upload and scheduled job processes each record in its own transaction. A failed record is stored with its error and the run continues. At the end the run shows counts per outcome and lets the user download the report and reprocess the failed rows.
   - Payment files report the categories applied, unapplied, pre-booked, excess and failed; other handlers report their own outcomes (for example WRITE_OFF / CREDIT for the minimal balance file).
@@ -633,9 +617,7 @@ title: Generate, view and export Operations reports
 brd: [CSHID.017 (p.38), CSHID.018 (p.38)]
 actor: Operations users
 priority: Must have
-fit: "FIT (CSHID.017), CHANGE (CSHID.018)"
 screens: Reports (Report Centre); Report Archive
-api: /api/v1/reports
 description:
   - Operations reports are in the report category Operations. A user with OPS_REPORT_VIEW generates a report with its parameters and views it on screen with its metadata (name, parameters, date, creator). Downloading (PDF, XLSX, CSV) and printing need OPS_REPORT_EXPORT.
   - Every run of an archived report is kept in the Report Archive with its parameters, creator, time and file.
@@ -671,9 +653,7 @@ title: Maintain AR and OR series per branch
 brd: [CSHID.006 (p.28-29), CSHID.015 (p.37)]
 actor: Cashiering TL / TH (maintain); System (numbering)
 priority: Must have
-fit: "CHANGE (CSHID.006), NEW (CSHID.015)"
 screens: Receipt Series
-api: GET / POST .../series; PUT .../series/{id}; POST .../series/{id}/authorize, /deactivate
 description:
   - A receipt series is kept per kind (AR or OR) and branch, with prefix, first and last number, BIR ATP number and the warning level. ARs are numbered from the series of the branch of the transaction; ORs only from Head Office series. A number is taken when the receipt is posted, under a row lock, so two receipts never get the same number.
   - Before each receipt BIBS checks that the series has numbers left; a depleted series stops the transaction. When the remaining numbers reach the warning level, BIBS raises the alert RECEIPT_SERIES_LOW. The Receipt Series screen shows a remaining-count gauge.
@@ -721,9 +701,7 @@ title: Receive a payment and issue an Acknowledgement Receipt
 brd: [CSHID.001 (p.23-24)]
 actor: Cashier
 priority: Must have
-fit: CHANGE
 screens: Receive Payment; Receipts; Receipt page
-api: POST .../payments/preview; POST .../payments; POST .../receipts/ar; GET .../receipts/{id}/pdf
 description:
   - The cashier records a premium payment (Bills Payment, OTC, Trade, CLPC, PDC, Direct Credit) or a non-premium payment (refund, other expenses, AR Insurance). BIBS issues an AR numbered from the branch series, in the currency received, converted at the BOOK rate.
   - "The Receive Payment screen has two panes: on the left the payor and the ARN, invoice, policy or PN look-up and the tender; on the right a live preview of the match and of the application by component (DST, VAT, LGT, FST, other, basic), the 98% badge for 2% CWT clients, the excess that will stay unapplied and the BOOK rate."
@@ -774,9 +752,7 @@ title: Issue an Official Receipt for BDOI income
 brd: [CSHID.002 (p.24-25)]
 actor: Cashier (Head Office)
 priority: Must have
-fit: CHANGE
 screens: Receipts (Issue Official Receipt); Receipt page
-api: POST .../receipts/or
 description:
   - Head Office issues ORs for Service Fee Income (risk management fee, consultancy fee), Insurance Profit Share, Commissions (with VAT and withholding tax), Incentives and Others (discount). An OR has lines with gross amount, VAT and withholding tax, and the 2307 certificate reference when tax is withheld. Posting OPS_OR_ISSUE credits the income account of the OR type and output VAT.
   - Commission ORs for remittance batches and direct payment collections are issued by the system (FR-OP-021, FR-OP-035, FR-OP-094).
@@ -822,9 +798,7 @@ title: Cancel an AR or OR
 brd: [CSHID.001 (p.23-24), CSHID.002 (p.24-25), CSHID.003 (p.25-26), CSHID.012 (p.35)]
 actor: Cashier (request); Cashiering TL / TH (approve)
 priority: Must have
-fit: CHANGE
 screens: Receipt page (Cancel); Receipts (Cancellations and Reinstatements tab)
-api: POST .../receipts/{id}/cancel; GET .../receipt-actions; POST .../receipt-actions/{id}/approve, /resubmit
 description:
   - The cashier requests the cancellation of an AR or OR with a reason from the list RECEIPT_CANCEL_REASON. The request gets its own transaction number CAN-yyyy-n and goes to a Cashiering TL / TH for approval (workflow OPS_RECEIPT_ACTION, section 5).
   - On approval BIBS reverses every active application of the receipt (the invoices return to outstanding), re-posts the receipt events with negative amounts at the original BOOK rate, closes the unapplied balance of the receipt and marks it CANCELLED.
@@ -874,9 +848,7 @@ title: Reinstate a cancelled receipt
 brd: [CSHID.001 (p.23-24), CSHID.004 (p.26-27), CSHID.005 (p.27-28), CSHID.013 (p.35-36)]
 actor: Cashier (request); Cashiering TL / TH (approve)
 priority: "Must have (CSHID.013: not stated in the BRD)"
-fit: NEW
 screens: Receipt page (Reinstate)
-api: POST .../receipts/{id}/reinstate; POST .../receipt-actions/{id}/approve
 description:
   - A cancelled receipt is reinstated in full or in part as a separate transaction RIN-yyyy-n, with a reason from REINSTATEMENT_REASON and the encoded fields of the reason group. On approval BIBS restores the receipt (status REINSTATED), posts OPS_RECEIPT_REINSTATE for the reinstated amount, applies it to the encoded invoice and keeps the rest unapplied.
   - "Premium reinstatement fields: invoice number, AR number, assured / payor, amount reinstated, Account Officer, Unit Head, Team Leader. Direct payment reinstatement fields: invoice number, OR number, assured / payor, amount reinstated. The fields default from the original receipt."
@@ -924,9 +896,7 @@ title: Upload payment files for batch processing
 brd: [CSHID.008 (p.29-32)]
 actor: Cashier
 priority: Must have
-fit: CHANGE
 screens: Payment Uploads (Bulk Upload wizard, run summary); Cashiering Setup (layouts)
-api: /api/v1/bulk (handlers PAY_BILLS, PAY_TRADE, PAY_CLPC, PAY_DIRECT_CREDIT, PAY_PDC); GET / PUT .../layouts/{code}
 description:
   - "The cashier uploads the payment files of the channels: Bills Payment (TXT FS01 from IT-DCO), Trade (TXT from CIB), CLPC (Excel), Direct Credit (TXT FS01/04) and the PDC list (Excel). Each row becomes a payment with its AR, is matched and applied (FR-OP-018), and the run summary shows applied, unapplied, pre-booked, excess and failed rows (FR-OP-008)."
   - "BDOI named the channel systems on 26-Sep-2026 (Drop 0 integrations): Bills Payment is the OBPCS file (Online Bills Payment Consolidation System); Direct Credit carries the Old BOB funds-transfer collections of statements of account (or a layout of its own); the PDC list comes from PMS (PDC Management System); Trade payments come from TFS (Trade Finance System) by manual upload. The purpose of AFTS (Automatic Fund Transfer System) is not yet explained (IQ10). Outgoing payments through CMS / New BOB belong to Disbursement (BRD-5)."
@@ -974,9 +944,7 @@ title: Warehouse post-dated checks
 brd: [CSHID.008 (p.29-32)]
 actor: Cashier; System (maturity job)
 priority: Must have
-fit: CHANGE
 screens: PDC Warehouse
-api: GET / POST .../pdc; POST .../pdc/{id}/release; POST .../pdc/mature; bulk PAY_PDC
 description:
   - Post-dated checks are warehoused by screen or by the PDC list upload, each with a system number PDCW-yyyy-n, the client, invoice or ARN, check number, bank and branch, maturity date, amount and market segment. The job PDC_MATURITY (daily 08:30 PHT) turns each matured check into a payment with its AR, matched and applied like any payment.
   - Before maturity a check leaves the warehouse as returned, replaced or pulled out, with a reason. The warehouse is viewed by maturity month.
@@ -1021,9 +989,7 @@ title: Queue checks for pick-up and print their ARs
 brd: [CSHID.009 (p.32-33)]
 actor: Cashier; Collection (source)
 priority: Must have
-fit: NEW
 screens: Check Pick-up
-api: GET / POST .../pickups; POST .../pickups/import, /pickups/print; POST .../pickups/{id}/cancel; feed COLLECTION_CHECK_PICKUP
 description:
   - Checks tagged "for check pick-up" by Collection are queued in Cashiering. They arrive through the flow-in feed COLLECTION_CHECK_PICKUP (upload now) or are entered by hand. The cashier filters the queue by pick-up date; only requests due for printing are shown. **Print ARs** issues and prints the ARs of the selected checks in one batch, each with its own AR number.
 preconditions:
@@ -1064,9 +1030,7 @@ title: Match payments at acceptance and handle pre-booked payments
 brd: [CSHID.020 (p.40-41)]
 actor: System; Cashier (pre-booked queue)
 priority: Must have
-fit: CHANGE
 screens: Receive Payment (preview); Pre-booked Payments; Payment Uploads (run summary)
-api: POST .../payments/preview; POST .../payments; GET .../prebooked; POST .../prebooked/{id}/rematch, /release; POST .../matching/run
 description:
   - "Every payment except a warehoused PDC is matched at acceptance on the ARN, invoice, policy or PN number. The outcome is one category: APPLIED (booked invoice with outstanding PR; applied up to 100%, or 98% for 2% CWT clients); PREBOOKED (account found but not booked yet); UNAPPLIED_NO_MATCH (no account found); EXCESS (payment above the outstanding amount; the excess stays unapplied); CANCELLED_REFERENCE (invoice or slip cancelled)."
   - A pre-booked payment issues its AR and waits as an unapplied item of origin PREBOOKED. It is applied when the invoice is booked (ledger event) or by the job PREBOOKED_REMATCH (every 2 hours); processed items leave the pre-booked queue. Items that wait too long raise PREBOOKED_AGEING.
@@ -1104,9 +1068,7 @@ title: Apply payments by premium component hierarchy
 brd: [CSHID.022 (p.42)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Receive Payment (preview); Receipt page (Applications, Journal)
-api: POST .../payments/preview; POST .../payments
 description:
   - "BIBS applies each payment to the premium receivable of the invoice component by component in the order: DST, premium tax / VAT, LGT, FST, other charges, basic premium. It never applies to DTIP. Each application posts OPS_PAYMENT_APPLY (Dr unapplied collections / Cr PR by component) and, when commission is realised on collection, the realised commission and VAT; it records an APPLIED movement APP:<id> on the ledger."
 preconditions:
@@ -1140,9 +1102,7 @@ title: Receive non-premium payments of insurers (AR Insurance)
 brd: [CSHID.021 (p.41)]
 actor: Cashier
 priority: "Must have (not stated for this ID in the BRD)"
-fit: NEW
 screens: Receive Payment (AR class AR Insurance); Receipts
-api: POST .../receipts/ar (class AR_INSURANCE)
 description: A payment from an insurer that is not premium (refund of remitted premium, other expenses, AR Insurance) is received with the AR class of the non-premium group and the paying insurer. BIBS posts OPS_AR_INSURANCE_RECEIPT (Dr bank / Cr AR Insurer of the insurer) the same business day and does not route it to client premium or to remittance.
 preconditions:
   - The user has CASH_RECEIPT.
@@ -1169,9 +1129,7 @@ title: Issue commission ORs from commission payment details
 brd: [CSHID.007 (p.29)]
 actor: Cashier; System
 priority: Must have
-fit: NEW
 screens: Commission ORs; Interfaces (feed COLLECTION_COMMISSION_PAYMENT)
-api: GET .../commission-payments; POST .../commission-payments/issue; bulk COMMISSION_PAYMENT
 description:
   - Commission payment details uploaded from Collection (bulk COMMISSION_PAYMENT or feed COLLECTION_COMMISSION_PAYMENT) are staged as lines. **Issue ORs** issues one OR per insurer, certificate and payment; lines of one group that name different payees are rejected. The OR is a cash receipt that credits the commission receivable and makes the deferred VAT due (OPS_OR_ISSUE).
   - When a remittance batch is approved, Remittance issues one commission OR per batch, with one line per invoice (FR-OP-035). Direct payment collections issue their OR the same way (FR-OP-094).
@@ -1207,9 +1165,7 @@ title: Manage unapplied payments and their dispositions
 brd: [CSHID.024 (p.42-43), CSHID.025 (p.43-44)]
 actor: Cashier (assign, submit); Cashiering TL (approve)
 priority: Must have
-fit: NEW
 screens: Unapplied Payments (tabs Unapplied, Monitoring, For Approval, For Reversal, Done); Unapplied Payment page
-api: GET .../unapplied; GET .../unapplied/{id}; POST / PUT .../unapplied/{id}/disposition; POST .../unapplied/{id}/submit, /approve, /withdraw, /reversal, /reversal/approve; POST .../unapplied/bulk/submit, /bulk/approve
 description:
   - Every unapplied balance is an item UNP-yyyy-n with its origin (no match, excess, cancelled reference, adjustment, cancellation, DP reinstatement, remittance return, re-application, pre-booked, other), amount, balance, currency, client and unit. The workbench tabs follow the stage of workflow OPS_DISPOSITION.
   - "The cashier assigns a disposition type from DISPOSITION_TYPE: Apply to other invoice; DST payment application; Refund; Reclass; Transfer to other marketing unit; Others. Each type has an action (APPLY, DST_APPLY, REFUND, RECLASS, TRANSFER, MANUAL) and says whether it needs approval."
@@ -1267,9 +1223,7 @@ title: Reverse minimal balances automatically
 brd: [CSHID.016 (p.37-38)]
 actor: System (job MINIMAL_BALANCE_SWEEP); Cashiering TL (run now)
 priority: Must have
-fit: NEW
 screens: Cashiering Setup (Minimal Balance, Run Sweep Now); Reports CSH-MINBAL-PREMIUM, CSH-MINBAL-EXCESS
-api: GET .../minimal-balance/rules; POST .../minimal-balance/sweep
 description:
   - "The sweep (daily 04:00 PHT, or **Run Sweep Now**) applies the rules of the minimal balance table: premium receivable balances of PHP 10.00 or less are reversed (OPS_MINIMAL_BALANCE_REVERSAL, ledger MIN_BAL), unless the balance equals the client's 2% CWT, the DST charged or the whole premium; excess and unapplied payments of PHP 10.00 or less go to AP overages (OPS_EXCESS_TO_OVERAGES)."
   - Each invoice component is reversed once; an invoice already written off is skipped.
@@ -1304,9 +1258,7 @@ title: Search receipts and keep the receipt audit trail
 brd: [CSHID.010 (p.33-34), CSHID.011 (p.34-35)]
 actor: Cashier; Auditor
 priority: Must have
-fit: "CHANGE (CSHID.010), FIT (CSHID.011)"
 screens: Receipts (search); Receipt page (History)
-api: GET .../receipts; GET .../receipts/{id}
 description:
   - Receipts are searched by AR number, OR number, client number, invoice number, payor, assured, amount, date of issuance, policy number and insurer name, singly or combined, with kind and status filters. Names match partially; results are paged. Each search is logged with user, criteria and time.
   - Every action on a receipt (create, print, cancel, reinstate, apply, approve) records the AR / OR number, username, time, action and module in the immutable audit trail; the receipt's History tab shows it.
@@ -1335,9 +1287,7 @@ title: Print ARs and ORs in batch
 brd: [CSHID.019 (p.39-40)]
 actor: Cashier
 priority: "Not stated in the BRD"
-fit: NEW
 screens: Batch Print
-api: GET / POST .../print-batches; GET .../print-batches/{id}; POST .../print-batches/{id}/retry; GET .../print-batches/{id}/file
 description:
   - The cashier selects receipts by filter (kind, date range, insurer, BDOI location) or from a list, previews the list and prints them as one merged PDF (batch PRB-yyyy-n). A copy of each receipt is kept. The batch shows progress and lists failures, which the cashier retries or skips.
 preconditions:
@@ -1373,9 +1323,7 @@ title: Process BIR 2307 reversals
 brd: [CSHID.026 (p.44), CSHID.027 (p.44-45)]
 actor: Marketing Collection (tag); Cashier (validate, route); Disbursement (release)
 priority: Must have
-fit: NEW
 screens: BIR 2307 (tags, batches)
-api: GET / POST .../cwt; GET .../cwt/expected; POST .../cwt/{id}/receive, /checklist, /settle-cash; GET / POST .../cwt/batches; POST .../cwt/batches/{id}/route, /release
 description:
   - Marketing tags the 2307 of an invoice with the reference CWT-yyyy-n (FR-OP-113). Cashiering receives the tag and ticks the CWT-copy checklist. For the certificate path, the cashier validates a selection of tags of one insurer into a batch CWB-yyyy-n; BIBS generates the BIR 2307 transaction report and posts OPS_CWT_RECLASS (Dr PR2307 / Cr PR by component), which zeroes the PR.
   - The batch is routed to Disbursement directly, not through Remittance (type CWT2307). When Disbursement pays it, the batch is released to the insurer and BIBS posts OPS_CWT_DTIP_OFFSET (Dr DTIP / Cr PR2307).
@@ -1423,9 +1371,7 @@ title: Post the accounting entries of Cashiering
 brd: [CSHID.012 (p.35), CSHID.013 (p.35-36), CSHID.014 (p.36)]
 actor: System
 priority: "Must have (CSHID.013: not stated in the BRD)"
-fit: "CHANGE (CSHID.012, 014), NEW (CSHID.013)"
 screens: Receipt page (Journal)
-api: Accounting engine (business events)
 description:
   - "Each Cashiering transaction is a business event whose GL rule is configured by Comptrollership: OPS_AR_RECEIPT (AR issued), OPS_AR_INSURANCE_RECEIPT, OPS_OR_ISSUE, OPS_PAYMENT_APPLY, OPS_RECEIPT_REINSTATE, OPS_CWT_RECLASS, OPS_CWT_DTIP_OFFSET, OPS_EXCESS_TO_OVERAGES, OPS_MINIMAL_BALANCE_REVERSAL, OPS_UNAPPLIED_REFUND, OPS_UNAPPLIED_RECLASS. Section 5.3 lists the default entries."
   - A cancellation re-posts the original events with negative amounts; a reinstatement posts OPS_RECEIPT_REINSTATE and a new application. Amounts in foreign currency are converted to pesos at the Comptrollership BOOK rate with 2 decimals.
@@ -1455,9 +1401,7 @@ title: Generate the Cashiering reports
 brd: [CSHID.023 (p.42 and p.125-127)]
 actor: Cashier; Cashiering TL; Comptrollership
 priority: Must have
-fit: NEW
 screens: Reports (category Operations)
-api: /api/v1/reports (CSH-*)
 description: BIBS provides the 21 Cashiering reports of Annex II plus the outstanding AR report, the batch run report and the BIR 2307 transaction report (24 reports, section 6.1). Reports whose fields the Annex does not give carry a draft layout note until BDOI confirms them (OQ42); ageing buckets are to be confirmed (OQ43).
 preconditions:
   - The user has OPS_REPORT_VIEW.
@@ -1489,9 +1433,7 @@ title: Extract remittances by schedule, insurer or invoice
 brd: [RMTID.001 (p.49), RMTID.003 (p.50-51), RMTID.004 (p.51-52), RMTID.005 (p.52), RMTID.007 (p.52-53), RMTID.008 (p.53)]
 actor: System (job REMITTANCE_EXTRACTION); Remittance Processor
 priority: Must have
-fit: "NEW (RMTID.001, 004, 005, 007), CHANGE (RMTID.003), CONFIGURE (RMTID.008)"
 screens: Extraction; DTIP Status; Remittance Batches
-api: GET / POST .../runs; GET .../runs/{id}; GET .../runs/{id}/tags; GET / POST .../eod-requests
 description:
   - "An extraction run REX-yyyy-n examines the invoices of an insurer whose remittance status is UNPROCESSED, WITH_OUTSTANDING_BALANCE or PARTIALLY_REMITTED. It is started by the scheduled job (daily off-peak, 20:00 PHT by default), manually for an insurer and remittance type, or for one invoice number. Each insurer is processed in its own transaction."
   - "Every invoice examined gets a tag: EXTRACTED; UNEXTRACTED_DUE (with its blocking reasons, FR-OP-031); UNEXTRACTED_NOT_DUE; RETURNED (extracted then returned by a user)."
@@ -1542,9 +1484,7 @@ title: Apply the remittance eligibility rules
 brd: [RMTID.006 (p.52), RMTID.014 (p.56-57), RMTID.015 (p.57), RMTID.017 (p.58-59), RMTID.018 (p.59), RMTID.020 (p.60-61), RMTID.022 (p.61-62), RMTID.028 (p.64), RMTID.031 (p.65-66), RMTID.035 (p.67)]
 actor: System
 priority: Must have
-fit: "NEW (RMTID.006, 014, 015, 020, 022, 028, 031, 035), CHANGE (RMTID.017, 018)"
 screens: Extraction (run tags); DTIP Status; Report REM-PAIDAR-OVER-DTIP; Report REM-EXCLUDED
-api: GET .../runs/{id}/tags; GET .../dtip
 description:
   - "Paid AR is the net applied PR of the invoice from applied and posted payments only (cash, check and every channel). The amount to remit is paid AR less the DTIP already remitted."
   - "An invoice is not extracted, and its tag lists the reason, when: ON_HOLD (hold flag); PENDING_NEG_ADJ (a negative adjustment request is pending); WRITTEN_OFF; CHECK_HOLDING (a payment is younger than 3 banking days or not cleared); PAID_AR_OVER_DTIP (paid AR above the DTIP balance); NOT_POSTED; OTHERS (another team holds the lock). Cancelled, direct payment and return invoices are skipped."
@@ -1584,9 +1524,7 @@ title: Review a batch and exclude records (addendum)
 brd: [RMTID.002 (p.50 and addendum p.4-5), RMTID.024 (p.62-63), RMTID.027 (p.64)]
 actor: Remittance Processor
 priority: Must have
-fit: "NEW (RMTID.002, 024), CHANGE (RMTID.027)"
 screens: Remittance Batches (queues by stage); Remittance Batch (totals, lines, exclusions, preview)
-api: GET .../batches; GET .../batches/{id}; GET .../batches/{id}/preview; POST .../batches/{id}/exclude, /restore
 description:
   - The Remittance Batches screen lists the batches by stage (queues) with insurer, type, processor, counts and totals; it filters by insurer and type and supports bulk submit and approve.
   - "The batch page shows a read-only totals strip (paid AR, commission, VAT, WTAX, DTIP, incentive, net due, payable), the lines, the exclusions panel, the workflow panel and the documents. Financial values cannot be edited (addendum)."
@@ -1635,9 +1573,7 @@ title: Process a batch - assign, submit, hold and return
 brd: [RMTID.009 (p.53-54), RMTID.010 (p.54), RMTID.019 (p.59-60), RMTID.029 (p.64-65)]
 actor: Remittance Processor; Remittance TL
 priority: Must have
-fit: "CHANGE (RMTID.009, 010, 029), NEW (RMTID.019)"
 screens: Remittance Batch (workflow panel); Remittance Batches
-api: POST .../batches/{id}/submit, /return, /assign
 description:
   - Each batch is a case of workflow OPS_REMITTANCE (section 5), starting at REVIEW_IN_PROCESS with its processor. The TL re-assigns it to another processor.
   - "**Submit for approval** checks every included line again: still locked by Remittance, and not cancelled, on hold, written off or flagged PENDING_NEG_ADJ, and the batch not empty. A batch can be put on hold with a reason and released, or returned with a reason; a return unlocks the lines and tags them RETURNED so a later run can take them again."
@@ -1680,9 +1616,7 @@ title: Produce the remittance schedule and payment request
 brd: [RMTID.011 (p.54-55)]
 actor: Remittance Processor
 priority: Must have
-fit: CHANGE
 screens: Remittance Batch (Documents)
-api: GET .../batches/{id}/documents/{kind}
 description: The remittance schedule (PDF and XLSX) and the payment request (PDF) are generated from the templates REMITTANCE_SCHEDULE and REMITTANCE_PAYMENT_REQUEST and stored on the batch. They show the batch number, insurer, remittance type and the payment details per invoice; the layouts follow Annex III (Normal, Special, With Incentives).
 preconditions:
   - The batch is submitted or approved.
@@ -1708,9 +1642,7 @@ title: Approve a batch, post the remittance and request payment
 brd: [RMTID.010 (p.54), RMTID.019 (p.59-60)]
 actor: Remittance TL
 priority: Must have
-fit: CHANGE
 screens: Remittance Batch (workflow panel)
-api: POST .../batches/{id}/approve
 description:
   - "The TL approves the submitted batch (**Approve and push to Disbursement**). In the approval transaction BIBS: re-checks every line; posts OPS_REMITTANCE per line (Dr DTIP, Dr CWT / Cr commission receivable, Cr due to insurer for disbursement); records REMITTED movements on DTIP, commission, VAT and WTAX and sets the invoices APPROVED; for a With Incentives batch posts OPS_REMIT_INCENTIVE; sends a payment request of type REMITTANCE for the payable to Disbursement; and issues the commission OR (and the incentive OR) through Cashiering."
   - "Commission, VAT and WTAX are realised pro rata on the cumulative DTIP remitted; the remittance that clears the DTIP takes the remaining balances. Net due = paid AR + WTAX - commission - VAT; payable = net due - incentive with VAT."
@@ -1745,9 +1677,7 @@ title: Follow Disbursement and track remittance status
 brd: [RMTID.034 (p.67), RMTID.036 (p.67-68)]
 actor: System; Remittance Processor
 priority: Must have
-fit: CHANGE
 screens: Remittance Batch (workflow panel, history); Invoice 360 (Remittances); Disbursement Queue
-api: GET .../batches/{id}; GET /api/v1/ops/invoices/{no}; /api/v1/ops/disbursements
 description:
   - When Disbursement assigns the DV number, BIBS makes each invoice FULLY_REMITTED (no DTIP left) or PARTIALLY_REMITTED, releases the lock and moves the batch to FULLY_REMITTED or PARTIALLY_REMITTED. When Disbursement returns the request, the processors are notified.
   - The stage timeline of the batch and of the invoice shows every stage from extraction to disbursement with time stamps; users set their notification preferences per event (in-app, e-mail) on Notification Settings.
@@ -1776,9 +1706,7 @@ title: Upload the insurer OR schedule and report exceptions
 brd: [RMTID.012 (p.55-56), RMTID.013 (p.56), RMTID.016 (p.57-58)]
 actor: Remittance Processor
 priority: "Must have (RMTID.016: not stated in the BRD)"
-fit: "NEW (RMTID.012, 013), CHANGE (RMTID.016)"
 screens: Insurer OR Upload (upload, history); Report REM-OR-EXCEPTION
-api: POST .../insurer-or/upload; GET .../insurer-or/runs; GET .../insurer-or/runs/{id}; feed INSURER_REMIT_OR
 description:
   - The insurer returns the remittance schedule with its OR number, date and amount per client invoice. The processor uploads it (columns batchNo, invoiceNo, orNo, orDate, orAmount); the upload runs through the feed INSURER_REMIT_OR, one record per invoice.
   - Each valid row sets the insurer OR on the batch line and the invoice. The line is MATCHED when the OR amount equals the paid AR, AMOUNT_MISMATCH otherwise. The batch reaches OR_RECEIVED when every included line has an OR.
@@ -1819,9 +1747,7 @@ title: Apply the early remittance incentive
 brd: [RMTID.023 (p.62)]
 actor: Remittance TL (rules); System
 priority: Must have
-fit: NEW
 screens: Incentive Rules; Remittance Batch (incentive amounts)
-api: GET / POST .../incentive-rules; PUT .../incentive-rules/{id}
 description:
   - "An incentive rule holds the insurer, product line (blank = all), segment (blank = all), rate as a percent of basic premium, window in days and the start of the window (inception or booking), with effective dates. An invoice remitted within the window goes into a With Incentives batch; its incentive = rate x basic premium share, with VAT at the invoice's VAT to commission ratio. On approval BIBS posts OPS_REMIT_INCENTIVE (Dr due for disbursement / Cr incentive income, output VAT) and issues the incentive OR."
   - The same rules are read by Production Reconciliation to validate early incentives (FR-OP-078).
@@ -1863,9 +1789,7 @@ title: Search remittance accounts and payment details
 brd: [RMTID.025 (p.63)]
 actor: Remittance Processor
 priority: Must have
-fit: NEW
 screens: DTIP Status; Remittance Batches
-api: GET .../dtip; GET .../accounts; GET .../batches
 description: DTIP Status shows the DTIP position of each invoice with its remittance status and the last extraction tag and reasons. It searches by invoice number, remittance batch number, endorsement reference, policy number and assured name, partially and without regard to case or format, and filters by insurer and remittance status. From a result the user opens Invoice 360 (FR-OP-005).
 preconditions:
   - The user has REMIT_PROCESS.
@@ -1895,9 +1819,7 @@ title: Process special remittance requests in Remittance
 brd: [RMTID.030 (p.65), RMTID.033 (p.66-67)]
 actor: Remittance TL; Remittance Processor
 priority: Must have
-fit: "NEW (RMTID.030), CONFIGURE (RMTID.033)"
 screens: Special Remittance; Special Remittance Request
-api: GET .../special; GET .../special/{id}; POST .../special/{id}/approve, /reject; feed COLLECTION_SPECIAL_REMIT
 description:
   - Special remittance requests raised by Marketing (FR-OP-112) or received from Collection through the feed COLLECTION_SPECIAL_REMIT are listed with their condition, invoice, status and history. The TL approves or rejects them. Approval creates a SPECIAL batch at once, without a processor, so that another user approves the batch; the request follows the batch to PUSHED_TO_DISBURSEMENT or RETURNED.
   - Every status change is notified to the requester with the request number and new status.
@@ -1930,9 +1852,7 @@ title: Generate the Remittance reports
 brd: [RMTID.039 (p.69 and p.127-129)]
 actor: Remittance Processor; Remittance TL
 priority: Must have
-fit: NEW
 screens: Reports (category Operations)
-api: /api/v1/reports (REM-*)
 description: BIBS provides the 8 Remittance reports of Annex III and four more (REM-PAIDAR-OVER-DTIP, REM-OR-EXCEPTION, REM-EXCLUDED, REM-HOLD), section 6.2. Layouts the Annex does not detail are drafts (OQ42).
 preconditions:
   - The user has OPS_REPORT_VIEW.
@@ -1960,9 +1880,7 @@ title: Raise an endorsement or cancellation request
 brd: [ADJID.001 (p.89), ADJID.002 (p.89-90), ADJID.003 (p.90), ADJID.004 (p.90-91), ADJID.020 (p.98)]
 actor: Marketing Collection / TL (ADJ_REQUEST); Adjustment Processor (ADJ_PROCESS)
 priority: Must have
-fit: "CHANGE (ADJID.001, 003), NEW (ADJID.002, 004), FIT (ADJID.020)"
 screens: New Request (wizard); Change Request; Endorsement Request page
-api: POST .../requests/preview; POST .../requests; PUT .../requests/{id}; POST .../requests/{id}/submit
 description:
   - "The New Request wizard has three steps: choose the policy first - one or more booked invoices (up to 50; one request ENR-yyyy-n is raised per invoice), listed with the insurer policy number, ARN, assured and insurer and searched by policy, ARN, invoice or client; enter the request (the form adapts to the type); review the recompute (FR-OP-054) and save or submit. As soon as an invoice is chosen, and before anything is saved, BIBS shows its policy details: policy number, ARN, invoice, placement slip, client, insurer, product, period of cover and gross premium; they stay on top of the later steps. The ARN, invoice, policy, client, insurer, segment, AO, account and product are copied from the ledger and the account, so every request is linked to its policy and placement."
   - "Endorsement types are shown with their business labels (class, then the change): for example Financial – Change of Cover, Financial – Change of Premium Rate, Non-financial – Cover Extension, Non-financial – Assured Information, Internal Adjustment. Codes are never shown."
@@ -2037,9 +1955,7 @@ title: Detect duplicate endorsement requests
 brd: [ADJID.023 (p.99)]
 actor: System; requester
 priority: Must have
-fit: NEW
 screens: New Request (duplicate warning)
-api: POST .../requests
 description: A request is a possible duplicate when another request that is not cancelled has the same invoice, request type, reason and endorsement reference. BIBS warns and names the earlier requests; the user cancels or proceeds with a justification, which is kept on the request and in the audit trail.
 preconditions:
   - "None."
@@ -2065,9 +1981,7 @@ title: Attach supporting documents to endorsement requests
 brd: [ADJID.025 (p.100)]
 actor: Requester; Adjustment Processor
 priority: Must have
-fit: FIT
 screens: Endorsement Request page (Documents)
-api: /api/v1/attachments (entity EndorsementRequest)
 description: Supporting documents are attached to the request with a document type from ENDORSEMENT_DOC_TYPE. The platform checks file type, size and integrity (checksum) and allows several files.
 preconditions:
   - The user has ATTACHMENT_MANAGE.
@@ -2092,9 +2006,7 @@ title: Validate, approve or return endorsement requests
 brd: [ADJID.005 (p.91-92), ADJID.007 (p.92), ADJID.010 (p.94)]
 actor: Adjustment Processor (validate, return); Adjustment TL (approve)
 priority: Must have
-fit: "NEW (ADJID.005, 010), CHANGE (ADJID.007)"
 screens: Adjustment Workbench (tabs per stage); Endorsement Request page (workflow panel); Posting Batches
-api: POST .../requests/{id}/validate, /approve, /resubmit; POST .../batches/return
 description:
   - Requests follow workflow OPS_ENDORSEMENT (section 5). The processor validates a submitted request for approval or, when it has no financial effect, directly for posting. The TL approves it. Extension of cover with additional premium (FIN_EXTENSION) always needs approval.
   - A request can be returned from validation, approval or the posting batch with a reason from ADJ_RETURN_REASON; returned requests are excluded from posting, flagged and the requester is notified. Posted requests cannot be returned. The requester corrects and resubmits, or cancels.
@@ -2134,9 +2046,7 @@ title: Recompute premium, commission and refund per insurer (addendum)
 brd: [ADJID.014 (p.95-96 and addendum p.5)]
 actor: System
 priority: Must have
-fit: CHANGE
 screens: New Request (Recompute step); Endorsement Request page (Recompute)
-api: POST .../requests/preview; GET .../requests/{id}/recompute
 description:
   - BIBS recomputes the premium, commission, refund premium and sum insured by request type. Cancellations use booking's own posting preview, so the preview equals the posting. A TSI change is rated once per insurer share with the catalogue calculator in endorsement mode (remaining term pro-rata or short-period, each insurer at its commission rate, the lead with its branch LGT). Other types take the entered component changes (commission derived from the invoice rate when blank).
   - The before and after values per component and the change per insurer are stored on the request at every save, submission, validation and posting, so the original values are never overwritten.
@@ -2169,9 +2079,7 @@ title: Handle a TSI increase above the package limit
 brd: [ADJID.008 (p.92-93)]
 actor: System; Marketing AO (quotation)
 priority: Must have
-fit: NEW
 screens: New Request; Endorsement Request page (Quotation No.)
-api: POST .../requests/{id}/quotation
 description: A TSI increase is checked against the package TSI limit of the product in the catalogue. When the increase takes the account above the limit, submission opens a hand-off QUOTATION_REQUIRED for Marketing (QUOTE_MAINTAIN) to prepare a quotation, and validation waits until the quotation number is linked on the request. The added insurer and the co-insurance shares follow the quotation; non-package shares are recomputed on the endorsed sum insured and remaining period (FR-OP-054).
 preconditions:
   - The request is a TSI increase.
@@ -2204,9 +2112,7 @@ title: Post requests singly or in batches
 brd: [ADJID.006 (p.92), ADJID.011 (p.94)]
 actor: Adjustment Processor (ADJ_POST)
 priority: Must have
-fit: CHANGE
 screens: Posting Batches; Batch Request Upload; Endorsement Request page (Accounting)
-api: POST .../batches; GET .../batches; GET .../batches/{no}; POST .../requests/{id}/post; GET .../requests/{id}/journal; bulk ADJ_BATCH
 description:
   - The processor selects requests FOR_POSTING and posts them as a validation batch VB-yyyy-n; each request is posted in its own transaction and a failure does not stop the others. The batch result shows posted, payments to re-apply and failed requests. Requests can also be uploaded in a batch file (ADJ_BATCH); re-uploading the same request number does not create duplicates.
   - "Posting: financial endorsements and cancellations are posted through booking's endorsement posting with source ADJ:<request> (endorsement invoice EN-yyyy-n or return invoice, journal and open items; the default entries per type are Comptrollership rules); non-financial endorsements are recorded by booking without GL; internal requests without financial effect post nothing. A decrease or cancellation records ADJUSTED movements on the original invoice; cancellations set the CANCELLED flag."
@@ -2240,9 +2146,7 @@ title: Set up excess payments, re-apply payments and AR Insurer
 brd: [ADJID.009 (p.93-94), ADJID.012 (p.94-95), ADJID.013 (p.95)]
 actor: System; Adjustment Processor
 priority: Must have
-fit: NEW
 screens: Endorsement Request page; Adjustment Workbench (Payments to Re-apply); Unapplied Payments
-api: POST .../requests/{id}/post, /reapply
 description:
   - After a decrease or cancellation of a paid invoice, BIBS releases the lock and asks Cashiering to re-apply the payments against the reduced premium. Cashiering reverses the applications above the new premium and applies the money again in hierarchy order; the excess becomes one unapplied item (origin REAPPLY) for disposition by Marketing and Cashiering (apply to another invoice or refund, FR-OP-022). Realised commission is reversed with the applications.
   - When the invoice was already remitted and its DTIP becomes negative, BIBS sets up the amount (at most the remitted DTIP) as AR Insurer per insurer share (OPS_AR_INSURER_SETUP) and keeps PENDING_NEG_ADJ so that Remittance offsets or excludes the invoice.
@@ -2276,9 +2180,7 @@ title: Control over-adjustment
 brd: [ADJID.028 (p.103)]
 actor: System; requester
 priority: "Not stated in the BRD"
-fit: NEW
 screens: New Request (baseline justification); Invoice 360 (adjustment totals)
-api: POST .../requests/{id}/submit
 description: BIBS keeps the cumulative adjustments of each original invoice against its original premium, DTIP and commission. When a request would take the cumulative adjustments above the baseline percent of the original premium, or below zero, submission needs a justification and raises the alert ADJ_OVER_BASELINE. Previous adjustments are shown before the request is submitted; duplicates are blocked by FR-OP-051.
 preconditions:
   - "None."
@@ -2305,9 +2207,7 @@ title: Write off minimal balances from a file
 brd: [ADJID.026 (p.101-102)]
 actor: Adjustment Processor (ADJ_POST)
 priority: Must have
-fit: NEW
 screens: Minimal Balance File; Report ADJ-MINBAL-FILE
-api: bulk MINIMAL_BALANCE_FILE; GET .../write-offs
 description: The processor uploads a file of invoices with minimal balances (columns Invoice No and Balance). A row is processed when the invoice exists, its PR balance equals the file, lies within 10.00-100.00, was not written off and no other module locks it. A debit balance is written off and a credit balance credited (outcomes WRITE_OFF / CREDIT) with the event OPS_WRITE_OFF, a WRITE_OFF movement and the WRITTEN_OFF flag, once per invoice. The run lists the rows not processed with their reason; ADJ-MINBAL-FILE summarises the file.
 preconditions:
   - The user has ADJ_POST.
@@ -2339,9 +2239,7 @@ title: Generate the endorsement slip and the validation slip
 brd: [ADJID.015 (p.96), ADJID.018 (p.97-98)]
 actor: Marketing; Adjustment Processor
 priority: Must have
-fit: NEW
 screens: Endorsement Request page (Endorsement Slip, Validation Slip)
-api: GET .../requests/{id}/endorsement-slip; GET .../requests/{id}/validation-slip
 description:
   - "The endorsement slip (template ENDORSEMENT_SLIP) is a PDF with the Annex V fields: date, insurer and co-insurers, endorsement request number, invoice number, request type, reason for cancellation, effective date, additional instructions, assured, risk code and description, policy number, period of cover, Marketing AO, market segment, total sum insured and its change, premium rate, payment status (outstanding, fully or partially paid with amount, date and remaining AR), remittance status, approved by. It is numbered once ES-yyyy-n and is not produced for internal adjustments."
   - The validation slip (template VALIDATION_SLIP) summarises a validated request with the validation status, before / after, insurer breakdown and GL entries; it is not produced before validation.
@@ -2370,9 +2268,7 @@ title: Search requests by policy, view the policy transaction history and ageing
 brd: [ADJID.021 (p.98-99), ADJID.022 (p.99), ADJID.024 (p.100)]
 actor: Adjustment users; Marketing
 priority: Must have
-fit: CHANGE
 screens: Adjustment Workbench; Endorsement Request page (Policy, Policy Transactions, History); Invoice Search and Invoice 360 (Adjustments, Policy Transactions); Account page (Policy Transactions)
-api: GET .../requests; GET .../requests/{id}; GET .../policies/{invoiceNo}; GET .../invoices/{no}/requests; GET /api/v1/ops/invoices/{no}; GET /api/v1/ops/invoices/{no}/transactions; GET /api/v1/ops/accounts/{arn}/transactions
 description:
   - "Every request shows the policy it is against: the insurer policy number (as the ledger holds it now, since it is often issued after the request is raised), the ARN, the invoice, the insurer, the product and the placement slip. The chain is request, invoice, account (ARN), placement slip, policy number."
   - "The Adjustment Workbench lists requests by stage tab with counts. Its columns are Request No. (with the date raised), Policy No. / ARN, Invoice / Placement Slip, Assured (with the client code), Insurer / Product (names, never codes), Type (business label, with the request type), Effective, Aging, Status and Flags. One search box finds a request by request, policy, ARN, invoice or client (also by insurer, product, placement slip or insurer endorsement reference). Aging reads in days (\"0 days\", \"1 day\", \"12 days\"), from submission (or creation) to completion in Philippine days, as on the other workbenches."
@@ -2404,9 +2300,7 @@ title: Generate the Adjustment reports
 brd: [ADJID.016 (p.96), ADJID.017 (p.97), ADJID.019 (p.98)]
 actor: Adjustment users; Comptrollership
 priority: Must have
-fit: NEW
 screens: Reports (category Operations)
-api: /api/v1/reports (ADJ-*); job ADJ_DAILY_REPORT
 description:
   - "ADJ-DAILY: Adjustment and Daily Endorsement Report of the requests raised or posted in the period, by type and user. The job ADJ_DAILY_REPORT (18:00 PHT) exports it as Excel for the business date, archives it and notifies the holders of ADJ_APPROVE."
   - "ADJ-VALIDATION-LIST: posted requests with one row per GL line - type of cancellation / adjustment, invoice, endorsement reference and request number, segment, requesting AO, policy, assured, insurer, GL code, debit / credit, reason, validation date, validation batch number."
@@ -2440,9 +2334,7 @@ title: Schedule the automatic extraction of the production register
 brd: [PRCID.001 (p.79)]
 actor: Recon Handler (schedules); System (job PRODUCTION_EXTRACT)
 priority: Must have
-fit: CHANGE
 screens: Extract Schedules
-api: GET / POST .../schedules; PUT .../schedules/{id}
 description: Each insurer has a schedule with its frequency (monthly on a day of the month, or weekly on a weekday), whether the register is sent automatically, and the recipients. The job PRODUCTION_EXTRACT (daily 09:00 PHT) extracts the booked accounts of every insurer due that day. A run date that falls on a holiday moves to the next working day of the head office calendar.
 preconditions:
   - The user has RECON_PROCESS to maintain schedules.
@@ -2475,9 +2367,7 @@ title: Extract the production register manually and view it
 brd: [PRCID.005 (p.80), PRCID.011 (p.81), PRCID.012 (p.82), PRCID.013 (p.82), PRCID.020 (p.83), PRCID.034 (p.86)]
 actor: Recon Handler
 priority: Must have
-fit: NEW
 screens: Production Extracts (New Extract); Reconciliation Cycle (Registers Sent); Report PRC-EXTRACT-LOG
-api: POST / GET .../extracts; GET .../extracts/{id}/lines; GET .../extracts/{id}/file; GET .../cycles/{id}/extracts
 description:
   - The handler extracts the register of an insurer for a booking period (PRX-yyyy-n). Each line records the ledger facts of the booked account, the last payment and the estimated flag; an account not on an earlier register of the cycle counts as new. The extract shows its file name, location in the extract repository (folder PRODRECON/<insurer>), date and time, creator and row count.
   - Extracts and uploaded insurer lines are viewed per cycle, filtered by production month and insurer. PRC-EXTRACT-LOG reports the item count and extraction time of each extract.
@@ -2511,9 +2401,7 @@ title: Produce the register file in the agreed layout
 brd: [PRCID.002 (p.79), PRCID.004 (p.79-80), PRCID.006 (p.80), PRCID.007 (p.80)]
 actor: System
 priority: Must have
-fit: "CHANGE (PRCID.002), CONFIGURE (PRCID.004, 006), FIT (PRCID.007)"
 screens: Production Extracts (download)
-api: GET .../extracts/{id}/file
 description:
   - "The register is an XLSX workbook in the Production Register layout of Annex IV #5: month of production, insurer, invoice number, booking, inception and expiry dates, policy number, endorsement number, PN number, assured name, insurance code, risk type, basic premium, gross commission, A/R client, gross premium, booked VAT, amount paid, date paid, OR number, adjustment type, remittance status."
   - The sheet is protected; only the Remarks and Incentive columns and 200 blank rows are editable by the insurer. The file is named by the naming pattern and protected by a password when it is e-mailed (FR-OP-073).
@@ -2545,9 +2433,7 @@ title: Send the register to the insurer with a cover letter
 brd: [PRCID.003 (p.79), PRCID.008 (p.81)]
 actor: Recon Handler (RECON_SEND)
 priority: Must have
-fit: "CONFIGURE (PRCID.003), FIT (PRCID.008)"
 screens: Production Extracts (Send); Reconciliation Cycle (workflow panel)
-api: POST .../extracts/{id}/send
 description: The handler sends the register by e-mail with the cover letter template PRODRECON_COVER_LETTER (insurer name, extract number, booking period, production month, row count, instructions to return the remarks). The attachment is password protected and the password is sent in a separate e-mail. When no recipient is given, the insurer's placement e-mail from the catalogue is used. BIBS stores the sent time and recipients on the extract and moves the cycle to SENT_TO_INSURER.
 preconditions:
   - The user has RECON_SEND; the cycle is EXTRACTED, SENT_TO_INSURER or RECONCILING.
@@ -2580,9 +2466,7 @@ title: Upload the insurer production report
 brd: [PRCID.009 (p.81), PRCID.010 (p.81), PRCID.022 (p.83-84), PRCID.031 (p.85-86), PRCID.032 (p.86)]
 actor: Recon Handler
 priority: Must have
-fit: "CHANGE (PRCID.009, 010, 032), NEW (PRCID.022), FIT (PRCID.031)"
 screens: Insurer Feedback (upload, attempts); Interfaces (feed INSURER_PRODUCTION)
-api: POST / GET .../uploads; feed INSURER_PRODUCTION
 description:
   - The handler uploads the insurer's production report or matched file (the returned register). BIBS validates the layout and each row and matches the file at once (FR-OP-075). Lines of accounts that were not in the original extract are kept apart as insurer-only lines (unbooked, FR-OP-076).
   - A file with the same content as an earlier upload is refused (DUPLICATE_BLOCKED) and raises RECON_UPLOAD_DUPLICATE. Every attempt is recorded with its number, user, time, row counts and status (successful / unsuccessful).
@@ -2624,9 +2508,7 @@ title: Match booked and insurer lines within tolerance
 brd: [PRCID.024 (p.84), PRCID.025 (p.84), PRCID.026 (p.84), PRCID.027 (p.84-85), PRCID.030 (p.85)]
 actor: System; Recon Handler (re-match)
 priority: Must have
-fit: NEW
 screens: Reconciliation Cycle (Items by bucket, side-by-side comparison)
-api: POST .../cycles/{id}/automatch; GET .../cycles/{id}/items; GET .../settings; job RECON_AUTOMATCH
 description:
   - "BIBS pairs each insurer line with a booked line using the keys of RECON_MATCH_KEYS in order (default invoice number, then policy number). It then compares the fields: policy, reference / invoice and PN numbers and the policy period must be equal; the assured name is compared ignoring case and spacing; commission, basic premium and gross premium match when they differ by 1.00 or less, whichever side is higher."
   - "Status of each item: MATCHED; MATCHED_WITH_DISCREPANCY (the differing fields are listed); BDOI_ONLY (booked, not returned by the insurer); UNMATCHED_PREBOOKED; UNMATCHED_NO_BOOKING. Each status is a bucket tab with its count; a discrepancy row expands to a side-by-side comparison with the tolerance highlighted."
@@ -2662,9 +2544,7 @@ title: Follow unbooked and pre-booked insurer production
 brd: [PRCID.019 (p.83), PRCID.023 (p.84), PRCID.033 (p.86)]
 actor: System; Recon Handler
 priority: Must have
-fit: NEW
 screens: Unbooked Accounts; Report PRC-UNBOOKED
-api: GET .../unbooked
 description: For each insurer-only line BIBS searches New Business for a pre-booked account (ARN) with the same reference. The line becomes UNMATCHED_PREBOOKED when one is found and UNMATCHED_NO_BOOKING otherwise. The Unbooked Accounts repository lists the unmatched and duplicate lines with their unbooked status (OPEN, PREBOOKED, BOOKED, CLOSED), feedback and disposition, and is searchable and filterable. PRC-UNBOOKED lists the unbooked accounts and their status.
 preconditions:
   - "None."
@@ -2689,9 +2569,7 @@ title: Review items, record feedback and pair manually
 brd: [PRCID.014 (p.82), PRCID.015 (p.82), PRCID.016 (p.82), PRCID.021 (p.83)]
 actor: Recon Handler
 priority: Must have
-fit: "NEW (PRCID.014, 015, 021), CONFIGURE (PRCID.016)"
 screens: Reconciliation Cycle (Items, filters, review dialog, bulk disposition)
-api: GET .../cycles/{id}/items; PUT .../items/{id}/feedback; POST .../items/feedback; POST .../items/{id}/pair, /split
 description:
   - The items filter by status bucket, text, AO / AB, sales unit, market segment and product line (booked and pre-booked). The handler records on an item the company concerned (list with Others), an instruction or notation, the insurer feedback, the Marketing feedback, the disposition and the for-closure mark, singly or in bulk.
   - A BDOI-only item can be paired manually with an insurer-only item of the same cycle, and a wrong pairing can be split back into its two sides.
@@ -2735,9 +2613,7 @@ title: Validate early remittance incentives claimed by insurers
 brd: [PRCID.028 (p.85)]
 actor: Recon Handler
 priority: Must have
-fit: NEW
 screens: Reconciliation Cycle (Early Incentive); Report PRC-EARLY-INCENTIVE
-api: GET .../cycles/{id}/early-incentive
 description: For each booked account of the cycle, BIBS checks the remittance date against the insurer's incentive rate and window kept by Remittance (FR-OP-038). The account is ELIGIBLE when remitted within the window (30 days from inception for CLG / CBG motor and fire at 2% in the BRD example), NOT_ELIGIBLE when remitted late, and NO_RULE when no rule covers it.
 preconditions:
   - The cycle has booked accounts.
@@ -2762,9 +2638,7 @@ title: Close a cycle and view its history
 brd: [PRCID.029 (p.85)]
 actor: Recon Handler
 priority: Must have
-fit: FIT
 screens: Reconciliation Cycles; Reconciliation Cycle (workflow panel, History)
-api: GET .../cycles; GET .../cycles/{id}; POST .../cycles/{id}/close
 description: The cycle keeps its counts per bucket and its history (timestamps, actions, users). It closes by itself (for_closure) when every item is matched or marked for closure; otherwise the handler closes it with a comment.
 preconditions:
   - The cycle is RECONCILING.
@@ -2790,9 +2664,7 @@ title: Generate the Production Reconciliation reports
 brd: [PRCID.017 (p.82-83), PRCID.018 (p.83), PRCID.035 (p.86), PRCID.036 (p.86-87), PRCID.037 (p.87), PRCID.038 (p.87), PRCID.039 (p.87)]
 actor: Recon Handler; TL / TH
 priority: Must have
-fit: NEW
 screens: Reports (category Operations)
-api: /api/v1/reports (PRC-*)
 description: "BIBS provides PRC-REGISTER (variants: plain, with insurer feedback, with Marketing feedback, with both), PRC-SUMMARY (matched, matched with discrepancies and unmatched items and amounts per insurer), PRC-UNMATCHED-LOC (per location), PRC-UNMATCHED-AO (per Marketing AO / AB, booked and pre-booked), PRC-UNMATCHED-FEEDBACK (unmatched accounts with feedback and disposition) and PRC-DISPOSITION (summary per disposition), in the layouts of Annex IV (section 6.4)."
 preconditions:
   - The user has OPS_REPORT_VIEW.
@@ -2819,9 +2691,7 @@ title: Take in the DP lists of Head Office and branches
 brd: [CMRID.001 (p.106)]
 actor: Commission Handler
 priority: Must have
-fit: NEW
 screens: DP Lists (upload, pull, branch submissions)
-api: GET / POST .../dp/lists; POST .../dp/lists/pull; GET .../dp/submissions; feed COLLECTION_DP_LIST
 description: Marketing Collection of Head Office and each branch submits its DP list. The handler uploads it, or pulls the lists waiting in the Collection feed. The file name must follow <Branch>_DP_<yyyyMMdd>; a file with the same content is refused. The branch submission tracker shows per branch and period which lists arrived. The lists are consolidated with de-duplication by invoice and become the basis of billing.
 preconditions:
   - The user has COMMREC_PROCESS.
@@ -2861,9 +2731,7 @@ title: Validate, sanitise and tag DP accounts
 brd: [CMRID.002 (p.106-107), CMRID.007 (p.109), CMRID.008 (p.109-110), CMRID.013 (p.112)]
 actor: System; Commission Handler
 priority: Must have
-fit: NEW
 screens: DP Accounts (tabs by tag, account detail with rule results)
-api: GET .../dp/items; GET .../dp/items/counts; POST .../dp/items/confirm, /exclude, /{id}/revalidate
 description:
   - "Each DP account is checked against the invoice ledger: invoice booked; tagged direct payment; not cancelled or written off; booked with the listed insurer; listed premium equal to the booked gross premium within 1.00; no pending negative adjustment; commission still open; policy number present. The result of every rule is kept on the account. The sanitation result is VALID, DUPLICATE, INVALID or INCOMPLETE."
   - "BIBS computes the commission receivable of each account (commission, VAT, withholding tax, net) from the ledger. Valid accounts are tagged DP for confirmation; after the handler confirms that the client paid the insurer in full they become DP for billing. Tags: DP_FOR_CONFIRMATION, DP_FOR_BILLING, BILLED, APPROVED, REJECTED, COLLECTED, PR_REVERSED, EXCLUDED."
@@ -2898,9 +2766,7 @@ title: Bill the insurer for DP commission
 brd: [CMRID.009 (p.110-111), CMRID.012 (p.111-112)]
 actor: Commission Handler
 priority: Must have
-fit: "NEW (CMRID.009), CHANGE (CMRID.012)"
 screens: DP Accounts (Prepare Billing); DP Billings; DP Billing (Send)
-api: POST / GET .../dp/billings; GET .../dp/billings/{id}; GET .../dp/billings/{id}/items, /file; POST .../dp/billings/{id}/send, /cancel
 description: "The handler prepares billings from the accounts for billing: one billing CRB-yyyy-n per insurer, assigned to the handler (workflow OPS_DP_BILLING, section 5). The billing workbook lists the accounts with premium, commission, VAT, withholding tax and net. **Send Billing to Insurer** e-mails it as a password-protected file with the password in a separate e-mail, logs the request and sets the answer due date 10 working days later on the head office calendar."
 preconditions:
   - The user has COMMREC_PROCESS; accounts are DP for billing.
@@ -2938,9 +2804,7 @@ title: Record insurer answers and flag late feedback
 brd: [CMRID.008 (p.109-110), CMRID.009 (p.110-111), CMRID.011 (p.111)]
 actor: Commission Handler; System (job DP_FEEDBACK_SLA)
 priority: Must have
-fit: "NEW (CMRID.008, 009), CHANGE (CMRID.011)"
 screens: Insurer Responses (answers upload); DP Billing (answers); DP Billings (SLA)
-api: POST .../dp/billings/{id}/answers; POST .../dp/responses; feed INSURER_DP_RESPONSE; job DP_FEEDBACK_SLA
 description:
   - The insurer approves or rejects each account. Answers are entered on the billing or uploaded (columns Billing No., Invoice No., Decision, Reason, Comment). A rejection needs a reason from DP_FEEDBACK_REASON. Approved accounts go to collection; rejected accounts are returned to the Collection team through the COLLECTION_DP_RETURNED extract with the time and reason. A billing whose accounts were all rejected moves to RETURNED_TO_COLLECTION.
   - The job DP_FEEDBACK_SLA (daily) raises DP_FEEDBACK_OVERDUE for billings without an answer after the due date; the billing list shows the SLA countdown.
@@ -2976,9 +2840,7 @@ title: Collect DP commission and reverse the premium receivable
 brd: [CMRID.010 (p.111), MKTID.012 (p.75-76)]
 actor: Commission Handler; System
 priority: Must have
-fit: NEW
 screens: DP Billing (Collect); DP Accounts (Reverse, Reinstate)
-api: POST .../dp/billings/{id}/collect; POST .../dp/items/{id}/reverse, /reinstate
 description:
   - "When the insurer pays the commission of an approved billing, the handler records the collection with the bank account, collection date and BIR certificate number. BIBS posts OPS_DP_COMMISSION_COLLECT (cash and CWT against the commission receivable; realisation of commission and output VAT), requests the commission OR from Cashiering and, for each approved account, records the DP_REVERSAL of the premium receivable and DTIP and the APPLIED commission. The billing moves to COLLECTED and then CLOSED."
   - The reversal is made only for accounts tagged direct payment by Marketing (MKTID.011) and confirmed collected; an account that fails the tag check blocks and is notified.
@@ -3023,9 +2885,7 @@ title: Compute and post incentives
 brd: [CMRID.003 (p.107), CMRID.005 (p.108-109), CMRID.006 (p.109)]
 actor: Commission TL (INCENTIVE_MANAGE, COMMREC_APPROVE)
 priority: Must have
-fit: NEW
 screens: Incentive Schemes (tier editor); Incentive Runs (compute, lines, post, cancel)
-api: GET / POST .../incentives/schemes; GET / PUT .../incentives/schemes/{id}; GET / POST .../incentives/runs; POST .../incentives/runs/{id}/post, /cancel
 description:
   - "A scheme has a type (No Touch, Top Up, Motor Mania, Other), a calculation (TARGET_TIERED or FIXED_PER_POLICY), a period (for example June to December, quarterly, yearly), beneficiary (BDOI or branch), insurer, segments, product lines, effective dates and tiers. Target tiers hold a production target, rate and multiplier; fixed tiers hold a minimum basic premium and a fixed amount per policy."
   - A run INR-yyyy-n computes a scheme on a booking period. TARGET_TIERED applies the rate of the highest target reached times the multiplier to every eligible invoice; FIXED_PER_POLICY pays each policy the amount of the highest minimum premium it meets (Motor Mania). Negative amounts and erroneous bookings (cancelled or written off) are excluded when the exclusion rule is active and raise INCENTIVE_EXCLUSION.
@@ -3074,9 +2934,7 @@ title: Submit BIR certificates to Comptrollership
 brd: [CMRID.015 (p.113), CMRID.010 (p.111)]
 actor: Commission Handler (submit); Comptrollership (acknowledge)
 priority: Must have
-fit: NEW
 screens: BIR Certificates; BIR Certificate (workflow panel, ORs, scanned copy)
-api: GET / POST .../certificates; GET / PUT .../certificates/{id}; GET .../certificates/receipts; POST .../certificates/{id}/acknowledge, /reject
 description: The handler records a withholding tax certificate received from an insurer (BIR form, certificate number, period, tax withheld, scanned copy) and tags it to the ORs issued by the Cashier that it covers. The submission BCS-yyyy-n goes to Comptrollership (workflow OPS_BIR_CERT, section 5), which acknowledges it or rejects it with a reason; a rejected submission is corrected and resubmitted. Submission and acknowledgment dates are kept.
 preconditions:
   - The user has BIR_CERT_SUBMIT.
@@ -3118,9 +2976,7 @@ title: Track estimated items and yearly production
 brd: [RMTID.037 (p.68), CMRID.014 (p.112-113)]
 actor: Commission Handler
 priority: Must have
-fit: NEW
 screens: Estimated Items; Report CMR-PRODUCTION-YEARLY
-api: GET / POST .../estimated; /api/v1/reports (CMR-PRODUCTION-YEARLY)
 description: The handler flags invoices as estimated items with a reason, or clears the flag; the ledger's ESTIMATED flag shows separately with its label on the production register and the yearly production report. CMR-PRODUCTION-YEARLY consolidates production per branch and insurer for the year, with total production, estimated items and performance against targets.
 preconditions:
   - The user has COMMREC_PROCESS.
@@ -3149,9 +3005,7 @@ title: Report commission receivables
 brd: [CMRID.004 (p.108)]
 actor: Commission Handler; TL
 priority: Must have
-fit: NEW
 screens: Reports (category Operations)
-api: /api/v1/reports (CMR-*)
 description: CMR-COMMISSION-RECEIVABLE shows commission booked, collected and outstanding per insurer, separating DP / direct bill from regular commissions, with partial remittances and net commission. The other Commission reports are CMR-DP-STATUS, CMR-INCENTIVE, CMR-FEEDBACK-SLA and CMR-BIR-CERT (section 6.5).
 preconditions:
   - The user has OPS_REPORT_VIEW.
@@ -3189,9 +3043,7 @@ title: Send the remittance schedule to the insurer
 brd: [MKTID.001 (p.70-71)]
 actor: Remittance Processor on the request of Marketing
 priority: Must have
-fit: CHANGE
 screens: Remittance Batch (Send via Email)
-api: POST /api/v1/remittance/batches/{id}/send-schedule
 description: Once a batch is approved, the remittance schedule with the client details (client, amount, dates) is e-mailed to the insurer as a password-protected Excel file, with the password in a separate e-mail. The send is confirmed on the batch and allowed once per batch.
 preconditions:
   - The batch is approved; the user has REMIT_PROCESS.
@@ -3225,9 +3077,7 @@ title: Request, approve, extend, cancel and release remittance holds
 brd: [MKTID.002 (p.71), MKTID.003 (p.71-72), MKTID.004 (p.72), MKTID.005 (p.72-73), MKTID.006 (p.73), MKTID.007 (p.73-74), RMTID.021 (p.61)]
 actor: Marketing Collection (request); Marketing TL / UH (approve); System (expiry)
 priority: Must have
-fit: "NEW (MKTID.002, 003, 005, RMTID.021), CHANGE (MKTID.004, 006), CONFIGURE (MKTID.007)"
 screens: Remittance Holds; Remittance Hold (workflow panel)
-api: GET / POST /api/v1/remittance/holds; GET / PUT .../holds/{id}; POST .../holds/{id}/submit, /cancel, /decision, /extend, /extension-decision, /request-cancel, /cancel-decision, /release, /assign; POST .../holds/upload; feed COLLECTION_HOLD; job HOLD_EXPIRY
 description:
   - Marketing raises a hold request HLD-yyyy-n on an invoice with a reason, hold-until date and remarks, singly or by file (invoiceNo, reasonCode, holdUntil, remarks). One live request per invoice. Submission makes the invoice REQUESTED_FOR_HOLD; approval by another user sets the HOLD flag, which excludes the invoice from extraction (FR-OP-031). The approver assigns the hold to an active remittance processor, who is notified.
   - An active hold is extended (new hold-until date, with approval), cancelled (with approval) or released by Marketing; release makes the invoice eligible again. The job HOLD_EXPIRY (daily 08:15 PHT) releases holds whose date has passed and notifies holds that reach their date the next day. Holds from Collection arrive through the feed COLLECTION_HOLD.
@@ -3279,9 +3129,7 @@ title: Request a special remittance
 brd: [MKTID.009 (p.74)]
 actor: Marketing Collection; Marketing TL
 priority: Must have
-fit: NEW
 screens: Special Remittance (New request, upload)
-api: POST /api/v1/remittance/special; POST .../special/upload; feed COLLECTION_SPECIAL_REMIT
 description: Marketing requests a special remittance SPR-yyyy-n for an invoice with a condition (Claims, Renewal, Installment due, Immediate OR issuance) and remarks, singly or by file (invoiceNo, conditionCode, remarks). BIBS validates the request on creation - the invoice is UNPROCESSED or PARTIALLY_REMITTED with paid AR applied, the checks are cleared (holding period) and it is not on hold - and sends it for approval. Once approved, the request is processed in Remittance (FR-OP-040).
 preconditions:
   - The user has SPECIAL_REMIT_REQUEST.
@@ -3317,9 +3165,7 @@ title: Tag BIR 2307 reversals and reinstatement requests
 brd: [MKTID.010 (p.74-75), MKTID.013 (p.46)]
 actor: Marketing Collection (CWT_TAG)
 priority: Must have
-fit: NEW
 screens: BIR 2307 (Tag 2307); bulk CWT_TAGS
-api: POST /api/v1/cashiering/cwt; bulk CWT_TAGS; feed COLLECTION_CWT2307
 description: Marketing tags the 2307 of an invoice with a reference CWT-yyyy-n generated at tagging, the path (certificate or cash), the certificate number and period and the amount, singly or by file. The tag flows to Cashiering by its reference (FR-OP-026). Marketing also submits reinstatement requests with the reason and payment details (FR-OP-014); when the premium was already remitted, the case goes to Adjustment with the insurer's written confirmation of refund as a mandatory attachment.
 preconditions:
   - The user has CWT_TAG; the invoice has a 2% CWT portion outstanding.
@@ -3359,9 +3205,7 @@ title: Generate the endorsement slip for Marketing
 brd: [MKTID.008 (p.114)]
 actor: Marketing Collection / TL (ADJ_REQUEST)
 priority: Must have
-fit: NEW
 screens: Endorsement Request page (Endorsement Slip)
-api: GET /api/v1/adjustment/requests/{id}/endorsement-slip
 description: Marketing generates the endorsement slip of its external endorsement requests with the function of FR-OP-060 (same fields, same number ES-yyyy-n). No slip is produced for internal adjustments.
 preconditions:
   - The request is external.
@@ -3388,9 +3232,7 @@ title: Work payment requests in the Disbursement queue
 brd: [DBMID.001 (p.46), RMTID.034 (p.67)]
 actor: Disbursement (DISB_PROCESS)
 priority: Must have
-fit: NEW
 screens: Disbursement Queue
-api: GET .../; GET .../{id}; POST .../{id}/acknowledge, /dv, /paid, /return, /cancel
 description:
   - "Payment requests DSQ-yyyy-n of type REMITTANCE (remittance batches), REFUND (unapplied refunds), CWT2307 (2307 batches) and PASS_ON (incentive pass-on) arrive with their payee, amount, source and documents. Disbursement acknowledges a request, enters the DV number, marks it paid, or returns it with a reason. Each status (SENT, ACKNOWLEDGED, DV_ASSIGNED, PAID, RETURNED, CANCELLED) is sent back to the source module (event DisbursementStatusChanged): Remittance updates the invoices (FR-OP-036), Cashiering completes the refund or releases the 2307 batch."
 preconditions:
@@ -3426,9 +3268,7 @@ title: Release BIR 2307 certificates to insurers
 brd: [DBMID.001 (p.46)]
 actor: Disbursement
 priority: Must have
-fit: NEW
 screens: Disbursement Queue; BIR 2307 (batches)
-api: POST /api/v1/cashiering/cwt/batches/{id}/route, /release
 description: Disbursement receives the BIR 2307 transaction report and the certificates sorted per insurer as a CWT2307 request. When it is paid, the batch is released to the insurer (**Release to Insurer**) and BIBS posts Dr DTIP / Cr PR2307, which reverses the DTIP of the 2% and completes the zeroing of the PR (FR-OP-026).
 preconditions:
   - The 2307 batch is WITH_DISBURSEMENT.
@@ -3458,9 +3298,7 @@ title: Integrate with other systems through ports
 brd: [BRQID.004 (p.18)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Interfaces; Hand-offs and Extracts
-api: /api/v1/ops/flow-in; /api/v1/ops/extracts; /api/v1/ops/handoffs
 description:
   - "Operations exchanges data with the systems it depends on through ports with a default adapter: CollectionFeed (check pick-up, 2307 tags, commission payments, holds, special remittances, DP lists, returned DP accounts, refunds), DisbursementGateway (payment requests and statuses), InsurerFileInbox (insurer files), FileDropPort (shared drive), MarketingFeed and ClaimsFeed. The defaults are manual uploads, the in-app Disbursement queue and the in-system extract repository; no integration is simulated. Section 7 lists each interface and its status."
   - Work that a default adapter cannot complete alone (an OR or an unapplied item requested while Cashiering is not installed, a quotation for a TSI increase) becomes an open hand-off for the responsible team on Hand-offs and Extracts; the team closes it with what was done.
@@ -3492,9 +3330,7 @@ title: Fetch data through flow-in feeds with runs, logs and alerts
 brd: [BRQID.005 (p.18)]
 actor: System Administrator (FLOWIN_MANAGE); System
 priority: Must have
-fit: NEW
 screens: Interfaces (feeds, runs, records, upload)
-api: GET .../flow-in/feeds; PUT .../flow-in/feeds/{code}; POST .../flow-in/feeds/{code}/upload; GET .../flow-in/runs; GET .../flow-in/runs/{id}/records
 description:
   - Each feed (section 7) has a partner system, direction, transport, schedule and active flag. Each run FIR-yyyy-n records the trigger, start and end, records read, accepted and failed, status and errors. Each record is accepted once by its idempotency key and payload hash, so a file uploaded twice creates no duplicates. A failed run or failed records raise the alert OPS_FLOW_IN_FAILED.
   - The administrator activates a feed, sets its schedule and uploads files for feeds with a handler, and reads the runs and records.
@@ -3531,9 +3367,7 @@ title: Confirm payments to the New Business payment gate
 brd: [CSHID.020 (p.40-41)]
 actor: System
 priority: Must have
-fit: CHANGE
 screens: New Business placement (payment gate); Pre-booked Payments
-api: placement PaymentConfirmationSource (source CASHIERING)
 description: Cashiering is the single payment intake. The placement payment sweep of New Business reads the Cashiering applications (APP:<id>) and the payments waiting in the pre-booked queue (PRE:<id>) of each account, so a payment received before booking opens the payment gate. Cashiering does not call placement.
 preconditions:
   - "None."

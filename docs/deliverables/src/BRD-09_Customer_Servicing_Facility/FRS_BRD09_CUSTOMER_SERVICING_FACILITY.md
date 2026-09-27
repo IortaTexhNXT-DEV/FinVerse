@@ -232,9 +232,7 @@ title: Log in with user ID and password
 brd: [BRCSF-001 (p.6), BRCSF-001 / 1.001 (p.6-7), BRCSF-001 / 1.002 (p.7)]
 actor: Contact Center Agent; System
 priority: Must have
-fit: FIT
 screens: Login; Customer Search (landing page)
-api: POST /api/v1/auth/login (existing)
 description: Agents log in with their BIBS user ID and password on the platform log-in. BIBS validates the credentials and grants access to the CSF screens of the user's roles; the Customer Search opens as the landing page. Wrong credentials are refused. Directory sign-in (Windows ID) is built as a parked port for all BIBS users; local sign-in stays until BDO supplies the interface (decision D6).
 preconditions:
   - The user has an active BIBS account with a CSF role.
@@ -267,9 +265,7 @@ title: Restrict CSF actions to authorised roles
 brd: [BRCSF-001 (p.6), "Current process limitations (p.4)"]
 actor: System; System Administrator
 priority: Must have
-fit: FIT
 screens: All CSF screens
-api: Every endpoint checks its permission
 description: Only authorised personnel reach the CSF. Every CSF screen, button and call needs one of the permissions of section 3.2, so updating contacts, resending to another address, uploading documents and running reports are separate rights (p.4). Menus show only what the user's roles allow. Role grants change through User Access Maintenance requests (BRD-11).
 preconditions:
   - "The user is logged in."
@@ -300,9 +296,7 @@ title: Search a client by name, client ID, account, PN or application number
 brd: [BRCSF-003 (p.7-8), BRCSF-003 / 3.001 (p.8), "E-mail topic 4 (p.17)"]
 actor: Contact Center Agent (CSF_VIEW)
 priority: Must have
-fit: CHANGE
 screens: Customer Search
-api: To be assigned at build
 description:
   - The agent selects the key type and enters the value. Name searches the client master; client ID searches the client code, prospect code and government ID number; account number searches the ARN (with or without its suffix), the policy number and the legacy account number of migrated accounts; PN number searches the account PN numbers; application number searches the loan application numbers of the placement billing items.
   - Results are grouped by client, each with its matching accounts. When exactly one client matches, its Servicing View opens directly. When none matches, BIBS says so clearly (e-mail topic 4).
@@ -344,9 +338,7 @@ title: View current client information and accounts
 brd: [BRCSF-002 (p.7), BRCSF-008 (p.10)]
 actor: Contact Center Agent (CSF_VIEW)
 priority: Must have
-fit: "CHANGE (BRCSF-002), FIT (BRCSF-008)"
 screens: Servicing View (summary card; tabs Accounts, Payments, Renewal Advice, E-policies, Documents, Contact History)
-api: To be assigned at build
 description:
   - The Servicing View shows the client's current information - code, name, status, flags and contact details - and every account of the client with its CSF status, BIBS stage, policy number, period and balance. All segments are visible, CBG and non-CBG. The data are read from the owning BIBS modules when the view opens; nothing is copied.
   - Each tab loads on its own so that every tab answers within 3 seconds. Users with CLIENT_VIEW open the full client page with one click.
@@ -378,9 +370,7 @@ title: Show the status of each account
 brd: [BRCSF-005 / 5.001 (p.8), CSF-EM07 (p.17)]
 actor: Contact Center Agent
 priority: Must have
-fit: CHANGE
 screens: Servicing View (Accounts tab)
-api: To be assigned at build
 description: Each account shows the latest CSF status - Pending, Awaiting, Booked, Open or Closed - next to its BIBS stage. BIBS computes the status from the account stage, the invoice payment status and the policy period through a maintainable mapping, so the definitions agreed by Marketing, Processing and Operations can be applied without a new build (e-mail open item 3).
 preconditions:
   - "None."
@@ -407,9 +397,7 @@ title: View the payment history
 brd: [BRCSF-005 (p.8), "E-mail topic 6 (p.17)"]
 actor: Contact Center Agent
 priority: Must have
-fit: CHANGE
 screens: Servicing View (Payments tab)
-api: To be assigned at build
 description: The Payments tab shows the client's payments of the last 12 months (default) - receipt number, date, mode and amount, the invoices each payment was applied to, and the current balance and payment status of each invoice - newest first. The agent filters by account and clicks **Show older** to extend the window. The data come from the invoice ledger and Cashiering.
 preconditions:
   - "None."
@@ -438,9 +426,7 @@ title: Verify the caller before a change
 brd: [BRCSF-004 (p.8), "E-mail topic 5 (p.17)"]
 actor: Contact Center Agent (CSF_CONTACT_UPDATE)
 priority: Must have
-fit: CHANGE
 screens: Update Contact dialog (step 1, verification)
-api: To be assigned at build
 description: Before an update the agent verifies the caller's identity with a checklist - address, contact number, e-mail, insured property details - recording for each check whether it matched, and the channel (hotline, e-mail, website). The verification passes when enough checks match and stays valid for a set time. Repeated failed verifications of the same client on one day raise an alert.
 preconditions:
   - "The agent has the client's Servicing View open."
@@ -480,9 +466,7 @@ title: View, add or update client contact details
 brd: [BRCSF-004 (p.8), BRCSF-002 (p.7), BRCSF-010 (p.11)]
 actor: Contact Center Agent (CSF_CONTACT_UPDATE)
 priority: Must have
-fit: CHANGE
 screens: Update Contact dialog (step 2); Servicing View (Contact History tab)
-api: To be assigned at build
 description:
   - After a passed verification the agent changes the contact details only - e-mail, mobile, phone and address lines - with a reason. BIBS validates the values with the client master rules, saves them once in the BIBS client master, so every BIBS module sees them at once, and records the change with the old and new values, the verification, the agent and the reason (CSF-yyyy-nnnnnn).
   - Other fields (name, civil status, ID) are refused and routed to the fulfilment unit. "Add" contact details means additional e-mails or mobiles with a primary flag if BDOI confirms it (CSQ15).
@@ -529,9 +513,7 @@ title: Queue contact changes for QPS and EBIX while they coexist
 brd: [BRCSF-002 (p.7), "Executive summary and envisioned process (p.3, p.5)"]
 actor: System
 priority: Must have
-fit: CHANGE
 screens: Servicing View (Contact History, sync status); CSF Contact Changes report
-api: Port ContactSyncGateway (to be implemented at build)
 description: The BRD asks that contact updates be sent back to the data sources (QPS and EBIX, p.3). In BIBS the client master is updated at once; the write-back to QPS and EBIX, which matters only while they coexist, goes through an outbox. Until BDOI specifies the interface, each change is stored with the status "not configured" and nothing is sent. When the interface exists, a job sends queued changes every 15 minutes, retries failures and raises an alert.
 preconditions:
   - "A contact change was applied."
@@ -563,9 +545,7 @@ title: View, download and resend the renewal advice
 brd: [BRCSF-006 (p.9), BRCSF-006 / 6.001 (p.9), "E-mail topic 8 (p.17)"]
 actor: Contact Center Agent (CSF_RESEND); Supervisor (CSF_RESEND_OTHER)
 priority: Must have
-fit: NEW
 screens: Servicing View (Renewal Advice tab); Resend dialog
-api: To be assigned at build
 description:
   - The Renewal Advice tab lists the RAs of the client and its accounts - every attachment of document type RENEWAL_ADVICE, whether produced by the Renewal module, Employee Benefits or the submitted policies renewal (decision D3). The agent views and downloads an RA and resends it.
   - The resend goes to the client's registered e-mail. The RA file is password protected and the password is sent in a separate e-mail. A supervisor may send to another address with a reason. The resend is logged.
@@ -607,9 +587,7 @@ title: Resend the e-policy
 brd: [CSF-EM09 (p.17)]
 actor: Contact Center Agent (CSF_RESEND)
 priority: Must have
-fit: CHANGE
 screens: Servicing View (E-policies tab); Resend dialog
-api: Existing e-policy dispatch service, called under CSF_RESEND
 description: The E-policies tab lists the confirmed e-policies of the client's accounts. The agent resends one to the registered e-mail. BIBS calls the e-policy dispatch service of Issuance, which encrypts the file and sends the password separately, as for the original dispatch. The resend appears in the dispatch report and in the CSF activity log.
 preconditions:
   - The account has a confirmed e-policy.
@@ -637,9 +615,7 @@ title: Attach or upload documents
 brd: [BRCSF-007 (p.9), BRCSF-007 / 7.001 (p.9-10)]
 actor: Contact Center Agent (CSF_DOCUMENT_UPLOAD)
 priority: Must have
-fit: "CHANGE (BRCSF-007), FIT (7.001)"
 screens: Servicing View (Documents tab, Upload)
-api: Attachment service /api/v1/attachments (existing, file types added)
 description: The agent uploads documents to the client or to one of its accounts - text files (DOC, DOCX, TXT, RTF), spreadsheets (XLS, XLSX, ODS, CSV), images (PNG, JPG, HEIF / HEIC, GIF, BMP, TIFF, WEBP) and PDF - with a document type. BIBS prompts for the file, checks its type and content, stores it and confirms; the document is then accessible in the Documents tab.
 preconditions:
   - "The agent has the Servicing View open."
@@ -680,9 +656,7 @@ title: View, retrieve or download policy-related documents
 brd: [BRCSF-009 (p.10), BRCSF-009 / 9.001 (p.10)]
 actor: Contact Center Agent
 priority: Must have
-fit: CHANGE
 screens: Servicing View (Documents tab)
-api: Attachment service /api/v1/attachments (existing)
 description:
   - The Documents tab lists every document linked to the client, its accounts, quotations, placement records and invoices, grouped by type - quotations, renewal advices, e-policies, claims reports (document type CLAIM_REPORT from the Claims module, decision D3) and others. The agent previews a document, downloads it, or downloads a selection as a ZIP file.
   - The attachment access classes decide which document types the CSF roles can list and open (XQ04, CSQ07). Each download is logged.
@@ -716,9 +690,7 @@ title: Record changes to client information as an audit trail
 brd: [BRCSF-010 (p.11)]
 actor: System
 priority: Must have
-fit: FIT
 screens: Servicing View (Contact History); Audit Trail (Administration)
-api: Audit service (existing)
 description: Every change to client information is recorded with the entity, field, old and new values, user, time and source. CSF contact changes also carry the verification reference and the reason. Audit rows are append-only.
 preconditions:
   - "None."
@@ -744,9 +716,7 @@ title: Print or save the audit trail and the CSF reports
 brd: [BRCSF-011 (p.11), BRCSF-011 / 11.002 (p.12)]
 actor: Contact Center Management (AUDIT_VIEW, CSF_REPORT_VIEW)
 priority: Must have
-fit: FIT
 screens: Administration, Audit Trail (CTL-AUDIT); Reports (category Customer Service)
-api: Report service /api/v1/reports; codes CTL-AUDIT, CSF-CONTACT-CHANGES
 description: Management accesses the audit trail filtered on client records, and the Contact Changes report (client, field, old and new value, verification result, agent, reason, legacy sync status). They select print or save in Excel or PDF and confirm; BIBS produces the file.
 preconditions:
   - "The user has AUDIT_VIEW or CSF_REPORT_VIEW."
@@ -774,9 +744,7 @@ title: Log agent activity for leads and heads
 brd: ["Usage requirements - report generation by Leads / Heads (p.13)", BRCSF-010 (p.11)]
 actor: System; Supervisor, Management (CSF_REPORT_VIEW)
 priority: Must have
-fit: NEW
 screens: Reports (CSF-ACTIVITY)
-api: Report service /api/v1/reports; code CSF-ACTIVITY
 description: BIBS logs every agent action in the CSF - searches (with the criteria), Servicing Views opened, downloads, RA and e-policy resends, uploads and contact changes. The Agent Activity report shows counts per agent and day and the detail, for supervision and for the leads' and heads' reports.
 preconditions:
   - "None."
@@ -801,9 +769,7 @@ title: Back up the data every 15 minutes
 brd: [BRCSF-011 / 11.001 (p.11)]
 actor: Infrastructure (System)
 priority: Must have
-fit: CONFIGURE
 screens: None
-api: None (database infrastructure)
 description: The BIBS database is backed up continuously - write-ahead log archiving at most every 15 minutes to the designated secure storage, plus daily base backups. Each backup is time stamped, complete and restorable, and is tested monthly by a restore. Archiving runs without degrading the online response times. The requirement applies to the whole BIBS database, not only to CSF data.
 preconditions:
   - "None."

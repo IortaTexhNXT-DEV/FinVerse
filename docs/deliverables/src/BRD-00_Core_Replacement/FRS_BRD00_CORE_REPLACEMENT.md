@@ -229,9 +229,7 @@ title: Show each persona only its menus and screens
 brd: [BR-002 (p.13), BR-181 (p.23), BR-182 (p.23), "p.4 benefit 4a"]
 actor: Every user
 priority: Must have
-fit: FIT
 screens: Sidebar menu (groups Home, Client & Policy, Operations, Finance, Claims & Insurance, Reports, Setup & Administration)
-api: Every endpoint checks its permission (@PreAuthorize)
 description:
   - The sidebar is built from the modules of BIBS. Each screen names the permission that opens it; a user sees only the screens that the permissions of his roles allow, in seven groups in a fixed order.
   - A user may hold several roles (decision D5); the menu is the union of the roles.
@@ -267,9 +265,7 @@ title: Open a role home page with the figures of the user's roles
 brd: ["p.5 envisioned 2a and 4c", BR-125 (p.20), BR-152 (p.21), BR-160 (p.22), BR-203 (p.25)]
 actor: Every business user; System Administrator (set-up)
 priority: Must have
-fit: CHANGE
 screens: Role Home (/); Role Home Set-up (Setup & Administration)
-api: GET /api/v1/dashboard/role-home; PUT /api/v1/dashboard/role-home/config/{role}
 description:
   - After sign-in the user lands on a role home page made of widgets. Each widget shows a count, amount or short list from the user's own work (for example "PRFs to review", "Unapplied payments older than 30 days", "Claims without follow-up in 14 days") and refreshes on opening and every 5 minutes (default).
   - The widgets of a role are maintained by the System Administrator. A user with several roles sees the widgets of all his roles once.
@@ -312,9 +308,7 @@ title: Open the details behind a dashboard figure
 brd: [BR-125 (p.20), BR-152 (p.21), BR-160 (p.22)]
 actor: Every business user
 priority: Must have
-fit: CHANGE
 screens: Role Home; the work list or report of the widget
-api: Widget link (route with filters)
 description:
   - Each widget carries the route and filters of the list or report that produced its figure. Clicking it opens that list already filtered, so the figure and the list agree.
 preconditions:
@@ -345,9 +339,7 @@ title: Notify users of status changes, approvals and pending work
 brd: ["p.5 envisioned 5a", BR-083 (p.17), BR-111 (p.19), BR-206 (p.25)]
 actor: System; every user
 priority: Must have
-fit: FIT
 screens: Notification bell; My Work; Notification preferences (profile)
-api: GET /api/v1/notifications; messaging outbox
 description:
   - Workflow steps, approvals, returns, SLA breaches and job failures create in-system notifications for the users or roles concerned; selected events are also e-mailed through the outbox (for example remittance schedules and confirmations, BR-083).
   - Users choose in their profile which notifications they also receive by e-mail, within the events their roles allow.
@@ -381,9 +373,7 @@ title: Keep a complete audit trail of actions and transactions
 brd: ["p.4 benefit 2c", BR-124 (p.20), BR-129 (p.20), BR-151 (p.21), BR-207 (p.25)]
 actor: System; Business Administrator (view)
 priority: Must have
-fit: FIT
 screens: Audit Trail (Setup & Administration); History tabs of the records
-api: GET /api/v1/audit
 description:
   - Every create, update, approval, rejection, posting, reversal, export, log-in and log-out is recorded with user, time, record and a summary. Records show their history on a History tab; the Audit Trail screen searches all of it and exports it.
 preconditions:
@@ -414,9 +404,7 @@ title: Log every change to master data with old and new values
 brd: [BR-170 (p.22), "Capability 17 bullet 1 (p.11)"]
 actor: System; Business Administrator, auditors (view)
 priority: Must have
-fit: CHANGE
 screens: Master Data Change Log (Setup & Administration)
-api: GET /api/v1/admin/master-changes; report ADM-MASTER-CHANGES
 description:
   - For registered master data (users and roles, products and versions, insurers and branches, commission rates, LOVs, chart of accounts, payees, parameters, role home and MIS field set-up), BIBS records each changed field with its old value, new value, user, time and the approval reference when the change was approved.
   - The log complements the audit trail (FR-CR-030), which records the action but not the field values.
@@ -457,9 +445,7 @@ title: Generate standard reports and export or print them in several formats
 brd: [BR-054 (p.15), BR-078 (p.17), BR-084 (p.17), "Capability 21 bullets 1-2 (p.12)"]
 actor: Every user with a report permission
 priority: Must have
-fit: FIT
 screens: Reports (catalogue); report runner
-api: GET /api/v1/reports; POST /api/v1/reports/{code}/run; POST /api/v1/reports/{code}/export
 description:
   - The report catalogue lists the reports the user's roles allow, grouped by category. The user enters the parameters, runs the report on screen and exports it to Excel (XLSX), PDF, CSV, ODS, XML or, for documents and schedules, Word. Printing shows a preview with the report name, user, time and filters.
   - Regulatory outputs are reports of the same catalogue, namely the BIR books (general journal, purchase, sales, cash receipts and cash disbursements journals), BIR forms and 2307 registers, Insurance Commission schedules.
@@ -492,9 +478,7 @@ title: Save tailored report parameters and filters as variants
 brd: [BR-053 (p.15), "Capability 21 bullet 3 (p.12)", "Capabilities 2 and 4, bullet 'Generate and customise report' (p.6-7)"]
 actor: Every user with a report permission
 priority: Must have
-fit: FIT
 screens: Report runner (Variants)
-api: GET/POST/DELETE /api/v1/nb/reports/variants
 description:
   - A user saves the current parameters and filters of a report under a name, as a private variant or shared with the users of the report. Variants are available on every report of the catalogue.
 preconditions:
@@ -523,9 +507,7 @@ title: Customise a report's fields, grouping, summaries and chart
 brd: [BR-053 (p.15), "Capability 21 bullet 4 (p.12)"]
 actor: Every user with a report permission
 priority: Must have
-fit: CHANGE
 screens: Report runner (Layout panel)
-api: Variant layout (extension of the variant API)
 description:
   - On the report runner the user chooses the columns to show and their order, one or two grouping fields (including the MIS fields of FR-CR-062), subtotals and counts per group, and one bar or line chart over a grouped amount or count. The layout is saved in the variant and applied to the screen and to Excel and PDF exports.
   - The layout changes the presentation only; it never adds data the report definition does not provide, so permissions and data scope stay those of the report.
@@ -558,9 +540,7 @@ title: Schedule reports and distribute them
 brd: [BR-054 (p.15), "Capability 21 bullet 5 (p.12)"]
 actor: Every user with a report permission (own schedules); System Administrator (all)
 priority: Must have
-fit: CHANGE
 screens: Report runner (Schedule); My Subscriptions (Reports)
-api: GET/POST/PUT/DELETE /api/v1/reports/subscriptions
 description:
   - A user schedules a report variant daily, weekly (chosen days) or monthly (chosen day or last working day) at a chosen time (Philippine time), in one or more formats, for himself and for other BIBS users or e-mail addresses allowed by the recipient policy.
   - A scheduled job runs the report with the owner's permissions, stores the file in the report archive and e-mails it (password protected when the report is marked confidential).
@@ -606,9 +586,7 @@ title: Generate business documents from maintained templates
 brd: [BR-020 (p.13), BR-036 (p.14), BR-039 (p.14), BR-060 (p.16), BR-116 (p.19), BR-205 (p.25)]
 actor: Business users; System Administrator (templates)
 priority: Must have
-fit: FIT
 screens: Templates (Broking Setup); document downloads on each record
-api: Document template service; downloads per module
 description:
   - Quotations, proposal and placement slips, Insurance Advices, service invoices, receipts, remittance schedules, slips, letters and SOAs are generated from versioned templates with merge fields. Each document is downloadable as PDF and, where it is a document or schedule, as Word; it carries the BDO Insure logo and footer.
   - Documents that leave BDOI are password protected, with the password sent separately (FR-CR-071).
@@ -640,9 +618,7 @@ title: Maintain lists of values with effectivity and approval
 brd: [BR-004 (p.13), BR-172 (p.22), "Capability 17 bullet 3 (p.11)", "MILB volume (p.45)"]
 actor: Authorised user (maker); approver
 priority: Must have
-fit: FIT
 screens: Lists of Values (Broking Setup)
-api: /api/v1/lov
 description:
   - Authorised users add, change, deactivate and reactivate the values of maintainable lists (claim status, settlement types, adjusters, catastrophe codes, product types, payment types, disposition types and the others of the function BRDs) with an effectivity date. Changes take effect after approval. Deactivated values stay on existing records but cannot be selected.
 preconditions:
@@ -671,9 +647,7 @@ title: Maintain insurer records in one place
 brd: [BR-171 (p.22), "Capability 17 bullet 2 (p.11)", "MILB volume (p.45)"]
 actor: Authorised user (maker, by tab owner); approver
 priority: Must have
-fit: CHANGE
 screens: Insurer page (Catalog > Insurers), tabs Profile, Branches and LGT, Contacts, Products and Packages, Commission Rates, Payment Terms and Remittance, Risk Participation, Accounts
-api: /api/v1/catalog/insurers/{code} and sub-resources
 description:
   - One page shows everything BIBS holds about an insurer. Profile, branches with LGT rates, commission rates and the placement channel exist today; the page adds contacts, payment terms and the remittance schedule per remittance type, default risk participation (co-insurance shares) if BDOI confirms it (CRQ08), and a read-only view of the products and packages the insurer is on and of its GL and sub-ledger accounts.
   - Changes follow the catalog maker-checker and are logged field by field (FR-CR-031).
@@ -714,9 +688,7 @@ title: Define the MIS fields used for reports, dashboards and filters
 brd: [BR-173 (p.23), BR-174 (p.23), "Capability 17 bullet 4 (p.11)"]
 actor: System Administrator (maintain); every report user (use)
 priority: Must have
-fit: NEW
 screens: MIS Fields (Broking Setup); report runner filters and Layout panel
-api: /api/v1/admin/mis-fields
 description:
   - A catalogue names each MIS field per core entity (user, product, insurer, claim, policy / account, transaction) with its business label, data type, list of values and the data it reads. It is delivered with the fields of BR-173 (product type, risk code, market segment, booking date, policy number, insurer, branch, account officer, status, transaction type, chart of account) and the MIS columns of the Report List (region, area, unit head, department, business origin).
   - Reports, dashboard widgets and exports offer the active MIS fields of their entity for filtering, grouping and export, with the same labels everywhere.
@@ -754,9 +726,7 @@ title: Maintain products through Product Maintenance
 brd: ["Capability 17 bullet 5 (p.11)", "Capability 20 (p.12)", BR-199 to BR-208 (p.24-25)]
 actor: MBS, TSU, Marketing
 priority: Must have
-fit: FIT
 screens: Catalog; Package Requests (Product Maintenance)
-api: /api/v1/catalog; /api/v1/product-maintenance
 description:
   - Product and package maintenance is specified by FRS BRD-3 (FR-PM-001 to FR-PM-081). The umbrella adds no requirement; its capability 20 bullets are traced in section 10.
 preconditions:
@@ -785,9 +755,7 @@ title: Sign in, reset passwords and manage user access by request
 brd: [BR-000 (p.13), BR-001 (p.13), BR-002 (p.13), BR-003 (p.13), "p.5 envisioned 3b"]
 actor: Every user; System Administrator; UAM requestor and approver
 priority: Must have
-fit: FIT
 screens: Login; Reset password; User Access requests
-api: POST /api/v1/auth/login; password reset link; /api/v1/nbadmin/access-requests
 description:
   - Users sign in with user ID and password (directory sign-in is a parked port until BDO supplies the interface, decision D6). A user who forgot the password receives a reset link. Users are internal or external (portal) and hold one or more roles.
   - User accounts are created, changed, disabled and re-enabled only through User Access requests approved as in FRS BRD-11; the user ID itself is not changed.
@@ -816,9 +784,7 @@ title: Protect documents that leave BDOI
 brd: ["Capability 4 bullet 22 (p.7)", BR-205 (p.25), "Capability 20 bullet 7 (p.12)"]
 actor: System
 priority: Must have
-fit: FIT
 screens: Send e-mail dialogs of the records
-api: messaging outbox
 description:
   - Documents e-mailed outside BDOI (quotation and placement slips, e-policies, Insurance Advices, TOR and master lists, reports marked confidential) are encrypted with a password. The password is either the standard assigned password or a system-generated one, and it is sent in a separate e-mail.
 preconditions:
@@ -848,9 +814,7 @@ title: Move work and data to the next process by configured workflow
 brd: [BR-051 (p.15), BR-101 (p.18), BR-177 (p.23), BR-182 (p.23)]
 actor: System; System Administrator (configuration)
 priority: Must have
-fit: CONFIGURE
 screens: My Work; workflow panels of the records
-api: Workflow service; integration events
 description:
   - Each business record moves through stages defined as data (stages, transitions, roles, SLA). A completed step places the record in the next queue and notifies it; other modules receive business events (for example invoice booked, receipt issued, client changed) through the event outbox.
   - Files for other BDOI systems are handed to ports; their transport is configured when BDOI names the systems (Q08, PQ16).
@@ -879,9 +843,7 @@ title: Deliver the day's service invoices to each insurer in one batch
 brd: ["Invoice Batch Printing volumes (p.43)", BR-043 (p.15)]
 actor: System; Processing and Comptrollership (view)
 priority: Must have
-fit: CHANGE
 screens: Insurer Invoice Batches (Client & Policy > Booking)
-api: /api/v1/booking/insurer-batches
 description:
   - Today each service invoice is e-mailed to the insurer. A daily job (after booking closes, default 20:00) also builds for each insurer one batch of that day's service invoices (merged PDF, or ZIP with a manifest), stores it and delivers it through the insurer's configured channel. The SFTP channel is added when BDOI supplies the endpoints (CRQ18). A delivery report lists each batch, invoice count, amount, channel and result.
 preconditions:
@@ -912,9 +874,7 @@ title: Receive migrated clients and legacy client batches during coexistence
 brd: ["Client Migration volumes (p.43)", "Daily synchronisation from source (p.42-43)"]
 actor: System; Data Migration lead
 priority: Must have
-fit: NEW
 screens: Bulk uploads (CLIENT_CREATE); client modification report
-api: Bulk upload; legacy client feed port
 description:
   - Clients migrated from the legacy systems load through the bulk client upload with the duplicate check, as the Data Migration BRD specifies (BRID 2.1). If BDOI runs the legacy and BIBS in coexistence, the midday and end-of-day client batches of the umbrella (p.43) load new and changed legacy clients through a feed port, and a daily client modification report lists what changed.
   - The scope, period ("2020 to present") and source systems are decided with the Data Migration BRD (CRQ19).
@@ -944,9 +904,7 @@ title: Process in bulk and individually with concurrent users
 brd: ["p.4 benefit 1c", BR-063 (p.16)]
 actor: Every user; System
 priority: Must have
-fit: FIT
 screens: Bulk uploads; batch job monitor
-api: /api/v1/bulk
 description:
   - Every transaction that the BRDs ask to run in bulk (clients, accounts, quotations, bookings, payments, dispositions, adjustments) has an upload template and a batch job; failed rows are reported and can be corrected and re-submitted while the rest proceeds. The same functions exist for single records.
   - Jobs hold a lock so that the same job never runs twice at the same time.
@@ -977,9 +935,7 @@ title: Show the Invoice Master List across workflows
 brd: [BR-175 (p.23)]
 actor: Operations, Comptrollership, Marketing (view)
 priority: Must have
-fit: CHANGE
 screens: Operations > Invoice Ledger, view "Invoice Master List"
-api: /api/v1/ops/invoices
 description:
   - The invoice ledger of Operations becomes the Invoice Master List named by BR-175. It shows reference number, invoice number, cover number, version number, client code, status, assured's name, product line, inception and expiry dates, department, insurer, Marketing and Processing assignees, placement status, approval dates, cancellation status and a link to the audit trail. Cover number, version number, assignees, placement status and approval dates are added to today's columns.
 preconditions:
@@ -1007,9 +963,7 @@ title: Select currency on accounts and report in several currencies
 brd: [BR-027 (p.14), BR-088 (p.18)]
 actor: Marketing, Processing, Finance
 priority: Must have
-fit: FIT
 screens: Account; reports with a currency parameter
-api: Account and report APIs
 description:
   - Accounts carry a currency (default PHP). Premium is computed in the account currency; accounting converts at the book rate and revalues open USD items at month end (FRS BRD-5). Reports show the transaction currency and the peso equivalent where the BRDs ask for both.
 preconditions:
@@ -1036,9 +990,7 @@ title: Apply the BDO brand, design system and user journeys on every screen
 brd: [BR-178 (p.23), BR-179 (p.23), BR-180 (p.23), BR-181 (p.23)]
 actor: Every user
 priority: Must have
-fit: CHANGE
 screens: All screens and documents
-api: "-"
 description:
   - Screens use the BDO Insure colours (Header Blue, CTA Blue, Yellow), logo and typography of the UX guidelines; documents, reports and exports carry the logo, blue table headers and the "Confidential" footer. A screen-by-screen alignment pass against the BDOI UX design (deliverable 18) is made before FRS v1.1.
   - BDO's prescribed icons and illustrations are used when BDOI supplies them (CRQ17). The persona journeys are shown with the end-to-end persona deck (deliverable 7).
@@ -1067,9 +1019,7 @@ title: Issue the SOA and the insurer's service invoice at booking
 brd: [BR-039 (p.14), BR-043 (p.15)]
 actor: Processing
 priority: Must have
-fit: CHANGE
 screens: Booking; Service Invoices; Billing Statements (Collections)
-api: Booking and billing APIs
 description:
   - At booking BIBS issues the service invoice to each insurer share (FRS BRD-1). The umbrella also asks for an SOA generated with the placement report and Insurance Advice, and issued with the service invoice at booking. The client SOA exists today as the Collections billing statement per billing cycle. Which SOA is meant, and whether it must be produced at booking, is open (CRQ12); once answered, the booking step triggers that SOA from its template.
 preconditions:

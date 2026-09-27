@@ -284,9 +284,7 @@ title: Restrict screening functions to authorised roles
 brd: [SNSRP-101 (p.10), SNSRP-203 (p.13), SNSRP-403 (p.16)]
 actor: System
 priority: Must have
-fit: CHANGE
 screens: All Sanction Screening and Compliance Setup screens; User Access Matrix
-api: Permission checks on every screening service (area SCREENING)
 description:
   - The BRD grants each action to a persona ("given I have configuration permissions", "compliance maker permissions", "access permissions to view cases"). Every screening screen, button and service call requires one of the permissions of section 3.2. Menus show only the screens the user's roles allow, and buttons for actions the user may not perform are hidden.
   - Case data is scoped by role. An Investigator sees the cases assigned to him or her and to his or her team. The UCC, Compliance Officer, Auditor and AML Committee members see all cases; committee members act only on cases in the AML_COMMITTEE stage.
@@ -324,9 +322,7 @@ title: Maintain versioned screening configuration
 brd: [SNSRP-101 (p.10), SNSRP-102 (p.10), SNSRP-103 (p.10), SNSRP-104 (p.10-11), SNSRP-105 (p.11), SNSRP-106 (p.11), SNSRP-108 (p.12)]
 actor: Compliance Officer (maker)
 priority: Must have
-fit: NEW
 screens: Compliance Setup > Configuration Versions (one tab per type)
-api: Configuration version service (design R3, section 4.1)
 description:
   - Every screening rule set is a configuration version of one type - MATCH_CRITERIA, RISK_RULES, APPROVAL_MATRIX, ASSIGNMENT_MATRIX, SLA_MATRIX, VALIDATION_RULES, TEMPLATE and STR_LAYOUT. A version holds its rules, an effective date and a status (DRAFT, PENDING, ACTIVE, SUPERSEDED, REJECTED, section 5.3).
   - The Compliance Officer changes a rule set by creating a draft from the active version, editing it and submitting it. BIBS keeps the user, time and the before / after difference against the active version (the "versioned with user, timestamp, and before/after values" of SNSRP-101 and 108). An active version is never edited.
@@ -376,9 +372,7 @@ title: Configure name-matching criteria
 brd: [SNSRP-101 (p.10)]
 actor: Compliance Officer (maker); Compliance Checker
 priority: Must have
-fit: NEW
 screens: Configuration Versions (tab Matching Criteria)
-api: Configuration type MATCH_CRITERIA
 description:
   - The matching criteria control screening quality. For each list type (SANCTION, PEP, INTERNAL, ADVERSE_MEDIA) and subject type (individual or entity) the Compliance Officer sets the algorithms used - exact, phonetic (Double Metaphone) and fuzzy (Jaro-Winkler) - their thresholds, the fields compared and the minimum score that opens a case.
   - The BRD gives no values. The build delivers seed thresholds; Compliance enters the production values before go-live (SQ02).
@@ -421,9 +415,7 @@ title: Define risk-profile categories and tagging rules
 brd: [SNSRP-102 (p.10)]
 actor: Compliance Officer (maker); Compliance Checker
 priority: Must have
-fit: CHANGE
 screens: Configuration Versions (tab Risk Rules)
-api: Configuration type RISK_RULES
 description:
   - Risk categories replace the memo on risk-profile categories (p.6). A category has a code, name and tier, the client risk rating it sets (list KYC_RISK_RATING - LOW, STANDARD, HIGH - of the client master), the client tags it adds (PEP, WATCHLIST_REVIEW), the case type it opens and whether it requires EDD.
   - Risk rules assign a category. A rule tests one attribute - match list type, match status, PEP, nationality, occupation, source of funds, client type or market segment - with an operator and values. Rules are evaluated by priority; the first rule that matches decides the category (FR-SS-033).
@@ -470,9 +462,7 @@ title: Maintain the approval and escalation matrix
 brd: [SNSRP-103 (p.10), SNSRP-703 (p.18)]
 actor: Compliance Officer (maker); Compliance Checker
 priority: Must have
-fit: CHANGE
 screens: Configuration Versions (tab Approval Matrix)
-api: Configuration type APPROVAL_MATRIX; case router
 description:
   - The approval matrix decides where a submitted case goes. A route has a from-stage, conditions (case type, risk category, marketing unit, disposition), a to-stage and the approver - the Unit Head of the client's marketing unit, a role or a named user - with an order.
   - Routes from COMPLIANCE_REVIEW form the escalation matrix of SNSRP-703 (for example to the AML Committee, to STR preparation or to closure).
@@ -517,9 +507,7 @@ title: Configure the case assignment matrix
 brd: [SNSRP-106 (p.11)]
 actor: Compliance Officer (maker); Compliance Checker
 priority: Must have
-fit: CHANGE
 screens: Configuration Versions (tab Assignment Matrix)
-api: Configuration type ASSIGNMENT_MATRIX
 description:
   - The assignment matrix routes a new case to a team or a user by scenario. A scenario combines case type, trigger, risk category, marketing unit and client type. The target is a team role, with ROUND_ROBIN or LEAST_OPEN balancing, or a named user.
   - The matrix is applied only when a case is created. A new matrix does not move cases that are already assigned (SNSRP-106 AC2).
@@ -560,9 +548,7 @@ title: Configure the SLA matrix per case stage
 brd: [SNSRP-108 (p.12)]
 actor: Compliance Officer (maker); Compliance Checker
 priority: Must have
-fit: CHANGE
 screens: Configuration Versions (tab SLA Matrix)
-api: Configuration type SLA_MATRIX; job SCR_SLA_MONITOR
 description:
   - The SLA matrix sets, per case stage, case type and risk category, the SLA hours, the reminder lead time, the escalation target role and whether hours are calendar or working hours. It overrides the default stage hours of the workflow (section 5.1).
   - When a case enters a stage, BIBS sets its due time from the matrix active on that date. The SLA monitor (FR-SS-044) sends reminders, flags breaches and escalates.
@@ -602,9 +588,7 @@ title: Maintain review templates
 brd: [SNSRP-104 (p.10-11)]
 actor: Compliance Officer (maker); Compliance Checker
 priority: Must have
-fit: NEW
 screens: Compliance Setup > Templates
-api: Configuration type TEMPLATE (template types KYC_REVIEW, TRANSACTION_REVIEW, EDD)
 description:
   - Review templates give every reviewer the same format. A template has a code, a type (KYC review, transaction review, EDD), sections and fields. Each field has a label, data type (text, long text, number, amount, date, list, check box, attachment), mandatory flag, list type, help text and order.
   - The Compliance Officer designs the fields on the template designer and previews the form. A new template version is approved like any configuration and applies to reviews started after its effective date; a review in progress keeps the version it started with (SNSRP-104 AC2).
@@ -648,9 +632,7 @@ title: Maintain STR templates and the extraction layout
 brd: [SNSRP-105 (p.11)]
 actor: Compliance Officer (maker); Compliance Checker
 priority: Must have
-fit: NEW
 screens: Compliance Setup > Templates (STR); Configuration Versions (tab STR Layout)
-api: Configuration types TEMPLATE (type STR) and STR_LAYOUT
 description:
   - The STR template holds the fields of the STR form and, for each field, the case data that prefills it (client, case review, account and invoice data). The STR layout defines the extraction file - format (CSV, fixed width, XLSX or XML), delimiter, encoding and the columns with their order, header, length, padding and code mapping.
   - Both are versioned. An update applies to new STRs only and does not change STRs already submitted (SNSRP-105 AC2).
@@ -689,9 +671,7 @@ title: Configure dispositions per case stage
 brd: [SNSRP-107 (p.11-12)]
 actor: Compliance Officer; Business Administrator (Lists of Values)
 priority: Must have
-fit: CONFIGURE
 screens: Lists of Values (type SCR_DISPOSITION)
-api: LOV SCR_DISPOSITION (parent code = case stage)
 description:
   - Dispositions are values of the list SCR_DISPOSITION, each with the case stage as its parent. The case screen offers only the dispositions of the current stage, so a user cannot pick an option that does not belong to the stage.
   - The list uses the existing Lists of Values screen, with maker-checker and effective dates. The delivered values are placeholders until BDOI confirms them (SQ06).
@@ -727,9 +707,7 @@ title: Approve or reject a configuration version
 brd: [SNSRP-109 (p.12)]
 actor: Compliance Officer (Checker)
 priority: Must have
-fit: CHANGE
 screens: My Approvals; Configuration Versions (Pending)
-api: Configuration version service (approve, reject); approval inbox source
 description: The checker reviews a pending version with its changes and approves or rejects it. Approval makes the version ACTIVE from its effective date and supersedes the previous version on that date. Rejection records the reason and leaves the active version in force. The maker cannot approve his or her own version.
 preconditions:
   - "The version is PENDING; the user has SCR_CONFIG_APPROVE and is not its maker."
@@ -765,9 +743,7 @@ title: Receive the sanctions and PEP lists on schedule
 brd: [SNSRP-201 (p.12)]
 actor: System; Compliance Officer (upload)
 priority: Must have
-fit: NEW
 screens: Compliance Setup > List Sources and Runs
-api: Job SCR_WATCHLIST_INGEST; bulk handler SCR_WATCHLIST; port WatchlistFeed
 description:
   - Each list source has a code, name, list type (SANCTION, PEP, INTERNAL, ADVERSE_MEDIA), transport (file, API, manual), schedule and file layout. The delivered sources are AML_ADVISORY (sanctions, file), NLDS_PEP (PEP, file) and INTERNAL (manual).
   - The ingestion job reads each active source on its schedule; the Compliance Officer can also upload a file with **Upload List File**. Each run adds new entries, updates changed entries and delists removed ones, and writes a run log - source, trigger, records received, added, updated, delisted and failed, status and reason for failure (SNSRP-201 AC).
@@ -817,9 +793,7 @@ title: Report records that failed ingestion
 brd: [SNSRP-202 (p.13)]
 actor: System; Compliance Officer (recipient)
 priority: Must have
-fit: NEW
 screens: List Sources and Runs (run detail); Reports (SCR-INGEST-ERRORS)
-api: Job SCR_INGEST_ERROR_DIGEST; alert SCR_INGEST_FAILED
 description: Every record that fails ingestion is kept with its source, run, line, raw record and reason. On the agreed schedule (default 07:00 Monday to Friday) BIBS e-mails the list of failed records since the last digest, with where they came from, to the recipients in parameter SCR_INGEST_ALERT_RECIPIENTS. The same list is the report SCR-INGEST-ERRORS. A FAILED or PARTIAL run also raises the in-app alert SCR_INGEST_FAILED.
 preconditions:
   - "At least one run with failed records since the last digest."
@@ -849,9 +823,7 @@ title: Add or change sanctioned-name and PEP records manually
 brd: [SNSRP-203 (p.13)]
 actor: Compliance Officer (maker)
 priority: Must have
-fit: NEW
 screens: Compliance Setup > Watchlist
-api: Watchlist entry and change (maker-checker)
 description:
   - Compliance captures regulatory updates, internal findings or urgent risk actions by adding, changing or deactivating a list entry. An entry holds the source, list type, entity type, primary name, first and last name, aliases, birth date, nationality, ID numbers, listing and delisting dates and remarks.
   - A manual change is saved as a change record in PENDING with the before and after values, the maker and the remarks. It does not affect screening until the checker approves it (FR-SS-023).
@@ -900,9 +872,7 @@ title: Approve or reject list changes
 brd: [SNSRP-204 (p.13)]
 actor: Compliance Officer (Checker)
 priority: Must have
-fit: CHANGE
 screens: My Approvals; Watchlist (Pending Changes)
-api: Watchlist change approval; delta screening
 description: The checker sees the full entry, the before and after values and the maker's remarks. Approval applies the change - the entry becomes ACTIVE (or INACTIVE for a deactivation) with its effective date - and starts delta screening of the entry. Rejection leaves the entry unchanged and logs the checker's remarks. The checker's user ID and time are recorded in both cases.
 preconditions:
   - "The change is PENDING; the user has SCR_LIST_APPROVE and is not its maker."
@@ -936,9 +906,7 @@ title: Trigger client matching
 brd: [SNSRP-602 (p.14-15), SNSRP-303 (p.14)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Screening Home (last runs); client page (Screening tab)
-api: Events client registered, client identity changed, account submitted; job SCR_PERIODIC_SCREENING
 description:
   - Matching starts without user action. When a client is created, BIBS screens the new client only, with the active matching criteria and the active list. When a client's identity data changes or the client applies for an account, BIBS screens that client. When the batch window starts, BIBS screens every eligible client in scope against the entries changed since the last run, and once a month against the full list.
   - Eligible clients are those whose status is in parameter SCR_SCREENING_SCOPE (default prospects and confirmed clients); inactive clients are excluded (SNSRP-602 AC2).
@@ -975,9 +943,7 @@ title: Match client names against the list
 brd: [SNSRP-301 (p.14)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Matches; Case (Matches tab); client page (Screening tab)
-api: Matching engine (name normaliser, name keys, scorer)
 description:
   - BIBS normalises the client's name and the entry's names and aliases, finds candidate pairs through blocking keys (name tokens and phonetic keys) and scores each pair with the algorithms of the active criteria. When a pair meets the criteria, BIBS records a match - client, entry and entry version, score, algorithm, matched fields and status POTENTIAL.
   - Birth date, nationality and ID numbers, where held on both sides and selected in the criteria, raise or lower the score. A pair suppressed as a false positive for the same entry version is skipped (FR-SS-035).
@@ -1017,9 +983,7 @@ title: Review potential matches
 brd: [SNSRP-301 (p.14), SNSRP-304 (p.14)]
 actor: Investigator; Compliance Officer
 priority: Must have
-fit: NEW
 screens: Matches
-api: Match decision (open case, false positive)
 description: Potential matches below the case threshold are listed on the Matches screen with their score and matched fields. The Investigator opens a case for a match, or marks it a false positive with justification and evidence (FR-SS-035). This keeps weak matches on common names from opening cases while leaving them visible.
 preconditions:
   - "The user has SCR_INVESTIGATE."
@@ -1048,9 +1012,7 @@ title: Tag the client risk profile automatically
 brd: [SNSRP-302 (p.14)]
 actor: System
 priority: Must have
-fit: CHANGE
 screens: Client page (Screening tab, risk-profile history); client banner
-api: Risk rule evaluator; client risk service of the client master
 description:
   - After each match or run, BIBS evaluates the active risk rules for the client. When a rule qualifies, BIBS sets the client's risk rating and adds the category's tags (PEP, WATCHLIST_REVIEW) in the client master, with the source "screening", the rule and the match as reference.
   - The client master then re-schedules the KYC review when the rating goes up (BRD-1 KYC review cycle). The client banner shows the tags, as today; it warns and does not block (SQ07).
@@ -1086,9 +1048,7 @@ title: Create cases automatically
 brd: [SNSRP-303 (p.14)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Cases; Case
-api: Case service (open); port ActivePolicyQuery
 description:
   - A case opens when a client is tagged High-risk or PEP, when a match reaches the case threshold, and when a client applies for an account and screening requires a review. The case gets a number SCR-yyyy-nnnnnn, the client, trigger, case type, risk category, active-policy flag, marketing unit and Unit Head, and is assigned by the assignment matrix (FR-SS-014).
   - Only clients with an active policy require a KYC review or EDD. For a client without an active policy, the case type is MONITOR and the UCC and the Investigator are notified (SNSRP-303 AC2).
@@ -1125,9 +1085,7 @@ title: Update the risk-profile tag manually with justification
 brd: [SNSRP-304 (p.14)]
 actor: Investigator
 priority: Must have
-fit: CHANGE
 screens: Case (action Update Risk Tag); Matches (Mark False Positive)
-api: Client risk service (source MANUAL)
 description:
   - For a validated false positive, the Investigator updates the client's risk rating and tags, enters a justification and attaches at least one evidence document. The change takes effect at once in the client master and is written to the risk-profile history with source MANUAL.
   - The match becomes FALSE_POSITIVE and the client is not matched again against that entry until the entry changes (suppression by entry version; SQ12).
@@ -1171,9 +1129,7 @@ title: Control the case lifecycle
 brd: [SNSRP-401 (p.15)]
 actor: System
 priority: Must have
-fit: CHANGE
 screens: Case (workflow panel, Timeline tab)
-api: Workflow SCR_CASE
 description:
   - Cases follow the workflow SCR_CASE (section 5). When a user submits, the case moves to the next stage of the workflow and the previous assignee's edit rights end. Every transition is written to the case timeline with user, time, disposition, reason and remarks.
   - Edit rights come only from the stage owner permission and the assignment, so a case is read-only to everyone else.
@@ -1204,9 +1160,7 @@ title: View the list of cases and open a case
 brd: [SNSRP-402 (p.15-16)]
 actor: Investigator; UCC; Compliance Officer
 priority: Must have
-fit: CHANGE
 screens: Cases; Case
-api: GET /api/v1/screening/cases
 description:
   - The Cases screen lists the cases the user may see, with tabs My Cases, Team, For Approval, Committee, STR and Closed. Filters are date created, marketing unit, Unit Head, case type, risk category, stage, disposition, assignee and SLA state. The list follows the filters and can be exported to Excel.
   - A row opens the case page - summary (case number, client, status, risk flags, SLA badge) and the tabs Matches, Review, Documents, Decisions, STR and Timeline.
@@ -1245,9 +1199,7 @@ title: Search cases
 brd: [SNSRP-403 (p.16)]
 actor: Investigator; UCC; Compliance Officer
 priority: Must have
-fit: CHANGE
 screens: Cases (search toolbar)
-api: GET /api/v1/screening/cases (search parameters)
 description: A user with view rights searches by case number, client name or code, status, date range or assigned user, sees the matching cases, refines the criteria and opens a case from the results.
 preconditions:
   - "The user has SCR_VIEW."
@@ -1274,9 +1226,7 @@ title: Re-assign a case or approval
 brd: [SNSRP-404 (p.16)]
 actor: Investigator, UCC, Compliance Officer or Approver with SCR_CASE_ASSIGN
 priority: Must have
-fit: CHANGE
 screens: Case (action Re-assign); Cases (bulk re-assign)
-api: Workflow assignment with reason
 description:
   - A case in a review or approval stage can be re-assigned for workload, absence or conflict of interest. Only eligible users - holders of the stage permission, enabled, and not the client's own account officer - can be selected. Ownership changes without changing the submitted data or the status history.
   - The reason, previous and new assignee, user and time are written to the timeline and the audit log. Only the new assignee can act on the case afterwards.
@@ -1316,9 +1266,7 @@ title: Monitor SLA per stage, remind and escalate
 brd: [SNSRP-405 (p.17), SNSRP-108 (p.12)]
 actor: System
 priority: Must have
-fit: CHANGE
 screens: Screening Home (SLA tiles); Cases (SLA badge)
-api: Job SCR_SLA_MONITOR (hourly); alert SCR_SLA_BREACH
 description:
   - Every hour BIBS checks the due time of each open case. At the due time minus the reminder lead hours it sends a reminder to the assignee. When the SLA is breached it flags the case, sends an escalation notice to the role of the SLA matrix and raises alert SCR_SLA_BREACH.
   - The SLA badge shows on lists and on the case - on time, due soon (inside the reminder lead) and breached.
@@ -1347,9 +1295,7 @@ title: Screening home and high-risk client list
 brd: [SNSRP-402 (p.15-16), SNSRP-405 (p.17); p.8 capability 4 and report "Extract list of High-risk Clients"]
 actor: Compliance Officer; UCC; Operations Lead; Investigator
 priority: Must have
-fit: CHANGE
 screens: Screening Home; High-risk Clients
-api: Report SCR-HIGH-RISK-CLIENTS
 description:
   - Screening Home shows tiles - open cases per stage, SLA due today and breached, potential matches not yet cased and the status of the last list run. Each tile opens its filtered list.
   - High-risk Clients lists the clients with a high-risk category, PEP or watchlist tag, with rating, tags, open case and marketing unit, and exports the list (capability 4, "view / extract the list of high-risk clients' details and cases created").
@@ -1378,9 +1324,7 @@ title: Complete the guided review template
 brd: [SNSRP-501 (p.17)]
 actor: Investigator
 priority: Must have
-fit: NEW
 screens: Case (Review tab)
-api: Case review and answers
 description:
   - The Review tab renders the template of the case type (KYC review, transaction review or EDD) in the version active when the review started. Mandatory fields are marked. The Investigator can save a draft at any time.
   - On submission, an incomplete review is refused and each missing or invalid field is flagged next to the field.
@@ -1413,9 +1357,7 @@ title: Select a disposition and submit the case
 brd: [SNSRP-502 (p.17)]
 actor: Investigator
 priority: Must have
-fit: CHANGE
 screens: Case (workflow panel)
-api: Workflow SCR_CASE action submit
 description: With all required fields complete, the Investigator selects a disposition from the list of the stage (FR-SS-018), writes the recommendation and clicks **Submit**. BIBS validates the case (FR-SS-060), routes it by the approval matrix (FR-SS-013) and makes it read-only to the Investigator.
 preconditions:
   - "The review is complete; the case is assigned to the user."
@@ -1452,9 +1394,7 @@ title: Upload KYC and supporting documents
 brd: [SNSRP-601 (p.17)]
 actor: Investigator
 priority: Must have
-fit: CHANGE
 screens: Case (Documents tab)
-api: Attachments of entity type ScreeningCase; naming pattern SCREENING
 description:
   - The Investigator uploads KYC and other supporting documents with their metadata - form type, document type, date received and source. BIBS stores the file with a checksum, shows it on the case timeline and names it by the BRD convention "<Form Type>_<Client Name>_<Date Received>_<Document Type>_<sequence number>".
   - KYC-type documents are also registered on the client's KYC documents, so the client master shows them.
@@ -1497,9 +1437,7 @@ title: Validate dispositioned cases before approval
 brd: [SNSRP-701 (p.17)]
 actor: System
 priority: Must have
-fit: NEW
 screens: Case (validation messages; Timeline)
-api: Configuration type VALIDATION_RULES; case validator
 description:
   - When a dispositioned case is submitted, BIBS checks it against the active validation rules of its stage and type - template complete, required document types present, disposition allowed at the stage, recommendation present, STR flag consistent with the disposition. A blocking rule stops the submission; a non-blocking rule gives a warning.
   - Every validation result, passed or failed, is written to the timeline (VALIDATED or VALIDATION_FAILED with the messages).
@@ -1539,9 +1477,7 @@ title: Approve or disapprove the recommendation (Unit Head)
 brd: [SNSRP-702 (p.18)]
 actor: Approver (Unit Head)
 priority: Must have
-fit: CHANGE
 screens: Cases (For Approval); Case; My Approvals
-api: Workflow SCR_CASE actions approve, disapprove
 description: The Approver reviews the case, the review, the documents and the recommendation. **Approve** (disposition CONCUR) moves the case to the next step of the approval matrix. **Disapprove** (NOT_CONCUR) needs a rationale; the case returns to the Investigator as RETURNED, and the Investigator can correct and resubmit it (FR-SS-062).
 preconditions:
   - "The case is in UNIT_HEAD_APPROVAL and assigned to the user; the user has SCR_CASE_APPROVE and is not the Investigator."
@@ -1577,9 +1513,7 @@ title: Correct and resubmit a returned case
 brd: [SNSRP-702 (p.18), SNSRP-703 (p.18)]
 actor: Investigator
 priority: Must have
-fit: CHANGE
 screens: Cases (My Cases); Case
-api: Workflow SCR_CASE action resubmit
 description: A returned case shows the return reason and remarks. The Investigator corrects the review, documents or recommendation and resubmits. The case goes back to the stage that returned it - UNIT_HEAD_APPROVAL or COMPLIANCE_REVIEW - after the validation of FR-SS-060.
 preconditions:
   - "The case is RETURNED and assigned to the user."
@@ -1605,9 +1539,7 @@ title: Review BU escalations (Compliance)
 brd: [SNSRP-703 (p.18)]
 actor: Compliance Officer
 priority: Must have
-fit: CHANGE
 screens: Cases (Compliance Review); Case
-api: Workflow SCR_CASE actions escalate_committee, prepare_str, close, return_for_rework
 description: The Compliance Officer reviews an escalated case and records an outcome from the COMPLIANCE_REVIEW dispositions - close with no action, escalate to the AML Committee, for STR, or return. The case routes by the escalation matrix (FR-SS-013). If items need correction, the Compliance Officer adds remarks and returns the case to the Investigator; the status becomes RETURNED with the reasons captured.
 preconditions:
   - "The case is in COMPLIANCE_REVIEW; the user has SCR_COMPLIANCE_REVIEW."
@@ -1638,9 +1570,7 @@ title: Record the AML Committee decision
 brd: [SNSRP-704 (p.18-19)]
 actor: AML Committee Member
 priority: Must have
-fit: NEW
 screens: Cases (Committee); Case (Decisions tab)
-api: Committee vote; workflow SCR_CASE system action finalise
 description:
   - A committee member views the complete case - details, investigation findings, documents and prior comments - and records a decision online - approve STR, no STR, or return - with remarks.
   - When the decision is final under the committee rule, BIBS routes the case - to STR_PREPARATION (approve STR), CLOSED (no STR) or COMPLIANCE_REVIEW (return) - and updates its status. The rule is parameter SCR_COMMITTEE_RULE - ANY, MAJORITY or ALL of SCR_COMMITTEE_SIZE members (default MAJORITY of 5; SQ15).
@@ -1682,9 +1612,7 @@ title: Prepare the STR from case data
 brd: [SNSRP-705 (p.19)]
 actor: Compliance Officer
 priority: Must have
-fit: NEW
 screens: Case (STR tab); STR
-api: STR service (prefill, completeness)
 description:
   - For a case that requires an STR, opening the STR tab creates the STR with number, template version and status DRAFT. BIBS prefills the subject party from the client, the narrative from the case review and recommendation, the transactions from the client's accounts, invoices and receipts, and lists the case documents as attachments. Every field stays editable.
   - The completeness check lists the gaps against the STR template. When it passes, **Mark Ready** moves the case to STR_EXTRACTION and the STR to FOR_APPROVAL; the STR becomes APPROVED when it belongs to a case whose committee decision was APPROVE_STR.
@@ -1727,9 +1655,7 @@ title: Extract committee-approved STRs in the AMLC format
 brd: [SNSRP-706 (p.19-20)]
 actor: Compliance Officer
 priority: Must have
-fit: NEW
 screens: STR (Extract Approved STRs)
-api: STR extraction; port StrFileSink (default report archive)
 description:
   - The Compliance Officer starts the extraction for a period. BIBS selects only the STRs approved by the AML Committee and not yet extracted, builds the file with the active STR layout (FR-SS-017) and saves it to the designated location. The extraction is recorded (batch, period, count, file, user, time) and the STRs become EXTRACTED.
   - Until BDOI names the designated folder (SQ16), the file is saved in the BIBS report archive and downloaded from the STR screen. A shared-folder or SFTP destination is a later adapter with no change to this function.
@@ -1769,9 +1695,7 @@ title: Record the AMLC filing reference
 brd: [SNSRP-706 (p.19-20); p.8 "File STR to AMLC - Via Portal"]
 actor: Compliance Officer
 priority: Must have
-fit: NEW
 screens: STR register; Case (STR tab)
-api: STR service (filed)
 description: Filing on the AMLC portal stays manual (p.8). After filing, the Compliance Officer records the AMLC reference and the filing date on the STR. The STR becomes FILED and the case closes (action filed).
 preconditions:
   - "The STR is EXTRACTED; the user has SCR_STR_EXTRACT."
@@ -1800,9 +1724,7 @@ title: Notify users of new and assigned cases
 brd: [SNSRP-801 (p.20)]
 actor: System (recipients - Investigator, UCC, Compliance Officer, Approver)
 priority: Must have
-fit: CONFIGURE
 screens: Notifications (bell); e-mail
-api: Notification events SCR_CASE_ASSIGNED, SCR_CASE_FOR_APPROVAL, SCR_CASE_RETURNED, SCR_COMMITTEE_REVIEW
 description: When a case is created or assigned, the assignee receives a notification that opens the case directly (link to the case page). Approvers, returned-case owners and committee members receive the matching events. Each notification event is logged with recipient, type, date and time.
 preconditions:
   - "None."
@@ -1828,9 +1750,7 @@ title: Send SLA and missing-document reminders
 brd: [SNSRP-802 (p.20)]
 actor: System (recipients - UCC, Investigator)
 priority: Must have
-fit: CHANGE
 screens: Notifications; Case (Timeline)
-api: Job SCR_SLA_MONITOR; event SCR_DOCUMENT_REMINDER
 description: With each SLA check (FR-SS-044), BIBS also runs the document rules of FR-SS-060 in advisory mode. When required documents are missing and the case is inside its reminder lead or past its SLA, BIBS sends a reminder listing the missing documents to the assignee and the UCC.
 preconditions:
   - "The case is open and a document rule applies to it."
@@ -1855,9 +1775,7 @@ title: Notify Compliance of newly added sanctioned names
 brd: [p.8 "Notifications received - notifications on newly added sanctioned names"; SNSRP-201 (p.12)]
 actor: System (recipients - Compliance Officers)
 priority: Must have
-fit: CHANGE
 screens: Notifications; List Sources and Runs
-api: Ingestion run completion
 description: The to-be process lists "notifications on newly added sanctioned names" among the notifications to be received (p.8). When a run or an approved manual change adds entries, BIBS notifies the Compliance Officers with the source, the number of entries added and a link to the run.
 preconditions:
   - "A run or approved change added at least one entry."
@@ -1883,9 +1801,7 @@ title: Operational and compliance reports
 brd: [SNSRP-901 (p.20); p.6-8 reports produced]
 actor: Compliance Officer; UCC; Operations Lead; Auditor
 priority: Must have
-fit: CHANGE
 screens: Reports (category Compliance)
-api: Report codes SCR-HIGH-RISK-CLIENTS, SCR-CASE-STATUS, SCR-SLA-BREACHES, SCR-SANCTIONED-NAMES, SCR-PEP-CLIENTS, SCR-INGEST-ERRORS, SCR-STR-REGISTER
 description: Seven reports cover high-risk clients, case status, SLA breaches, sanctioned names, PEP clients, ingestion errors and the STR register (layouts in section 6). The common filters are date, marketing unit / Unit Head, disposition and case status. Every report exports to CSV, XLSX and PDF.
 preconditions:
   - "The user has SCR_REPORT_VIEW."
@@ -1913,9 +1829,7 @@ title: Keep an immutable audit log
 brd: [SNSRP-902 (p.21)]
 actor: System
 priority: Must have
-fit: FIT
 screens: Case (Timeline); Audit Trail
-api: Audit trail service; insert-only case timeline, configuration differences and list changes
 description: Every system and user action writes an audit entry that no user can alter or delete. The platform audit log is insert-only in the database. Screening adds structured, insert-only records - the case timeline, the configuration version differences and the list change records - which keep the before and after values. Records are retained 5 years online and 5 years in archive (p.25).
 preconditions:
   - "None."
@@ -1941,9 +1855,7 @@ title: Audit log report
 brd: [SNSRP-903 (p.21); p.8 "Audit Reports"]
 actor: Compliance Officer; Auditor
 priority: Must have
-fit: CHANGE
 screens: Reports (SCR-AUDIT-LOG)
-api: Report code SCR-AUDIT-LOG
 description: The audit log report lists screening, configuration, list and case events with date, event, case or entry, from and to values, user and remarks. It has the case filters - date, marketing unit / Unit Head, disposition, status - and a user filter, updates when the filters change, and exports to CSV, XLSX and PDF.
 preconditions:
   - "The user has SCR_AUDIT_VIEW."

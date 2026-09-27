@@ -277,9 +277,7 @@ title: Log in with a persona profile from a BDO-issued device
 brd: [BRD 1.001.1 (p.8), BRD 1.001.1.1 (p.8), BRD 2.001.1 (p.8), BRD 2.001.1.1 (p.8), BRD 3.001.1 (p.9), BRD 3.001.1.1 (p.9), BRD 4.001.1 (p.9), BRD 4.001.1.1 (p.9), UAM-NFR-18 (p.14), UAM-NFR-19 (p.14)]
 actor: Requestor, Approver, Business Administrator, System Administrator
 priority: "Must have (4.001.x has no flag in the BRD)"
-fit: "FIT; CONFIGURE for the Requestor and Approver profiles (1.001.1.1, 2.001.1.1)"
 screens: Login; home page with the menu of the user's roles
-api: POST /api/v1/auth/login
 description:
   - Baseline. Users sign in to BIBS in a browser with their user ID and password. BIBS checks the credentials and the account status, counts failed attempts and locks the account after LOGIN_MAX_FAILED_ATTEMPTS failed attempts (3, for every BIBS user). Every successful and failed attempt is written to the audit trail. The menu shows only the screens of the user's roles.
   - Change. The Requestor and Approver profiles are delivered as the roles UAM_REQUESTOR and UAM_APPROVER. Access only from BDO-issued devices is enforced by the BDO network and endpoint policy, not by BIBS.
@@ -318,9 +316,7 @@ title: Warn before the inactivity and system log-out
 brd: [BRD 1.001.1.2 (p.8), BRD 1.001.1.3 (p.8), BRD 2.001.1.2 (p.8), BRD 2.001.1.3 (p.8), BRD 3.001.1.2 (p.9), BRD 3.001.1.3 (p.9), BRD 4.001.1.2 (p.9), BRD 4.001.1.3 (p.9), UAM-NFR-34 (p.17)]
 actor: All users
 priority: "Must have (4.001.x has no flag in the BRD)"
-fit: FIT
 screens: Every screen (session guard dialog)
-api: GET /api/v1/system/session-policy
 description:
   - Baseline, confirmed by the BRD. After 15 minutes without activity BIBS shows a warning; after 30 minutes without activity it signs the user out. Activity in any browser tab keeps all tabs signed in. Separately, BIBS warns 30 minutes before the fixed end of the sign-in token ("For your security the system signs you out in n minute(s)...").
   - The BRD reads "warning prior to system triggered log out (30 minutes)" and "inactivity warning (after 15 minutes)" (p.8, p.17). The inactivity sign-out at 30 minutes with the warning at 15 minutes meets both (Q42 answered, R4).
@@ -351,9 +347,7 @@ title: Authenticate with the Windows ID against BDO EUA
 brd: [UAM-NFR-11 (p.13), UAM-NFR-17 (p.14), UAM-NFR-33 (p.17)]
 actor: All users; System
 priority: Must have
-fit: NEW (seam; adapter parked until UQ04)
 screens: Login
-api: POST /api/v1/auth/login (unchanged contract); directory authenticator port
 description:
   - The BRD asks that the user ID is interfaced with EUA using the Windows ID. BIBS passes the user ID and the entered password; EUA returns whether the log-on succeeded and, on failure, an error message that BIBS shows (p.14). LDAP or Active Directory authentication and single sign-on or LDAP integration are also required (p.13, p.17).
   - BIBS authenticates through a directory port. Parameter AUTH_MODE selects LOCAL (password held in BIBS, today) or DIRECTORY (password checked by EUA; the user is found by the Windows ID). The lock-out, audit and session behaviour are the same in both modes, and BIBS never stores the password in DIRECTORY mode.
@@ -390,9 +384,7 @@ title: Log out and keep a session log
 brd: [UAM-NFR-35 (p.17), UAM-NFR-15 (p.14)]
 actor: All users; System Administrator
 priority: Must have
-fit: CHANGE
 screens: User menu (Log Out); Administration > Users (status Online)
-api: POST /api/v1/auth/logout; GET /api/v1/auth/sessions; GET /api/v1/admin/sessions; POST /api/v1/admin/sessions/{sessionId}/end
 description:
   - Baseline. Log-in and failed log-in are audited. Log-out is not recorded - the web client discards the token.
   - Change. **Log Out** ends the session in BIBS and records LOGOUT in the audit trail. Every session is kept in a session log - user, start, last activity, end and end reason (log-out, inactivity, token expiry, ended by an administrator, account locked). The user list shows a user as Online while a session is open (UQ13).
@@ -422,9 +414,7 @@ title: Enforce the password policy and self-service reset
 brd: [UAM-NFR-31 (p.17), UAM-NFR-36 (p.17), UAM-NFR-37 (p.17)]
 actor: All users (local accounts); System Administrator
 priority: Must have
-fit: "FIT (UAM-NFR-31); CHANGE (UAM-NFR-36); NEW (UAM-NFR-37)"
 screens: My Profile (Change password, Details); Login (Forgot password?); Administration > Users (Reset password)
-api: POST /api/v1/auth/change-password; POST /api/v1/admin/users/{id}/reset-password; POST /api/v1/auth/password-reset/request, /check, /confirm; GET /api/v1/auth/password-status
 description:
   - Baseline. Users change their own password on My Profile; the password has at least 10 characters with upper and lower case letters, a digit and a symbol. The System Administrator resets a password and BIBS shows a temporary password once.
   - Change. BIBS also refuses the last PASSWORD_HISTORY_COUNT passwords, requires a change after PASSWORD_MAX_AGE_DAYS, refuses a second change within PASSWORD_MIN_AGE_DAYS and forces a change at the first log-in after a reset. **Forgot password?** e-mails a single-use link valid for 30 minutes. Users update their own e-mail and mobile number on My Profile (UQ17).
@@ -462,9 +452,7 @@ title: Deactivate dormant users
 brd: [UAM-NFR-06 (p.12), UAM-NFR-09 (p.13)]
 actor: System (daily job); Requestor (told of the result)
 priority: Should have
-fit: NEW
 screens: Access Requests (the requests of the job); Notifications
-api: Job UAM_DORMANT_USERS (daily, 00:15)
 description:
   - Baseline. A user who stops signing in keeps an active account until someone raises a deactivation request.
   - Change. Every night a job deactivates the users who have not signed in for UAM_DORMANT_DAYS days (90), counted from the last sign-in, or from the creation or the last reactivation when later. UAM_DORMANT_NOTICE_DAYS days before (7) the user is told to sign in. Each deactivation is a Deactivate user request with the reason "No sign-in for the dormancy period", approved and applied by the system, so it has the request history, the change log and the notice to the user like any other request. The holders of the System Administrator profile are never deactivated by the job.
@@ -499,9 +487,7 @@ title: Draft, edit, cancel and submit an access request
 brd: [BRD 1.002.1.1 (p.8), BRD 1.002.1.1.4-1.002.1.1.5 (p.8), BRD 1.002.1.2-1.002.1.4 (p.8), BRD 1.003.1.1 (p.8), BRD 1.003.1.1.5-1.003.1.1.6 (p.8), BRD 1.003.1.2-1.003.1.4 (p.8), BRD 1.004.1.1 (p.8), BRD 1.004.1.1.2-1.004.1.1.3 (p.8), BRD 1.004.1.2-1.004.1.4 (p.8), BRD 1.005.1 (p.8), BRD 1.005.1.1.1-1.005.1.1.2 (p.8), BRD 1.005.1.2-1.005.1.4 (p.8)]
 actor: Requestor
 priority: "Must have (the 'add / save remarks' lines have no flag in the BRD)"
-fit: "CHANGE (create, edit, cancel, save remarks); FIT (submit, add remarks)"
 screens: User Access > Access Requests; New Request; Edit Request
-api: POST /api/v1/nbadmin/access-requests?draft=true; PUT .../access-requests/{id}; POST .../access-requests/{id}/submit
 description:
   - Baseline. The Business Administrator clicks **New Request** on Access Requests, fills the New Access Request dialog (request, user name, full name, e-mail, home branch, roles, justification) and submits it at once. The request gets a number AR-yyyy-nnnnnn and status PENDING. There is no draft.
   - Change. Every request type (enrol, modify, deactivate, reactivate, and the group-profile types of section 4.4) can be saved as a DRAFT. Only its creator sees and edits a draft. The creator cancels a draft (CANCELLED, kept, never deleted) or submits it. Remarks - justification, reason for deactivation or reactivation - are saved with the draft, and every remark is also kept in the request history.
@@ -551,9 +537,7 @@ title: Enrol a new user
 brd: [BRD 1.002.1 (p.8), BRD 1.002.1.1.1 (p.8), BRD 1.002.1.1.2 (p.8), UAM-NFR-13 (p.13)]
 actor: Requestor
 priority: Must have
-fit: "FIT (1.002.1, 1.002.1.1.2); CHANGE (1.002.1.1.1)"
 screens: New Request (type Enrol new user)
-api: POST /api/v1/nbadmin/access-requests (type CREATE_USER)
 description:
   - Baseline. A Create user request carries the user name, full name, e-mail, home branch and roles. On approval BIBS creates the user and shows a temporary password once to the approver.
   - Change. The request also carries the Windows ID, the business unit group, the user level, the authorisation limit and an optional effective date (NFR p.13-14). The user ID follows the BDOI format (a letter followed by nine digits, parameter USER_ID_PATTERN, shown to the requester in words from USER_ID_FORMAT_TEXT). Only active group profiles are offered.
@@ -606,9 +590,7 @@ title: Modify an existing user
 brd: [BRD 1.003.1 (p.8), BRD 1.003.1.1.1 (p.8), BRD 1.003.1.1.2 (p.8), BRD 1.003.1.1.3 (p.8)]
 actor: Requestor
 priority: "Must have (1.003.1.1.2 has no flag in the BRD)"
-fit: "CHANGE (1.003.1, 1.003.1.1.2); FIT (1.003.1.1.1, 1.003.1.1.3)"
 screens: New Request (type Modify user)
-api: POST /api/v1/nbadmin/access-requests (type MODIFY_USER); GET /api/v1/nbadmin/users
 description:
   - Baseline. A Change roles request replaces the roles of an existing user. The user's name, e-mail and branch change only by a direct edit of the System Administrator on the Users screen.
   - Change. A Modify user request changes the user data (full name, e-mail, home branch, business unit group, user level, Windows ID, authorisation limit) and / or the group profiles in one request. The Requestor searches the user by user ID, Windows ID or name; the form shows the current values next to the new ones. Change roles stays available for compatibility.
@@ -646,9 +628,7 @@ title: Deactivate a user
 brd: [BRD 1.004.1 (p.8), BRD 1.004.1.1.1 (p.8)]
 actor: Requestor
 priority: Must have
-fit: FIT
 screens: New Request (type Deactivate user)
-api: POST /api/v1/nbadmin/access-requests (type DISABLE_USER)
 description:
   - Baseline. A Disable user request disables the account on approval; the user can no longer sign in.
   - Change. Only enabled users are offered. An optional reason code (list UAM_DEACTIVATION_REASON) is kept with the remarks, and an effective date allows a future deactivation, for example on the last working day.
@@ -684,9 +664,7 @@ title: Reactivate a user
 brd: [BRD 1.005 (p.8), BRD 1.005.1.1 (p.8)]
 actor: Requestor
 priority: Must have
-fit: FIT
 screens: New Request (type Reactivate user)
-api: POST /api/v1/nbadmin/access-requests (type ENABLE_USER)
 description:
   - Baseline. An Enable user request enables a disabled account on approval.
   - Change. Only disabled or locked users are offered. The request can also unlock a locked account. The BRD numbers this function one level up (BRD 1.005 and 1.005.1.1 for the sub-steps); the traceability keeps the printed IDs.
@@ -720,9 +698,7 @@ title: Choose the approver
 brd: [BRD 1.002.1.1.3 (p.8), BRD 1.003.1.1.4 (p.8), BRD 1.004.1.1.4 (p.8), BRD 1.005.1.1.3 (p.8)]
 actor: Requestor
 priority: Must have
-fit: NEW
 screens: New Request (Approver)
-api: GET /api/v1/nbadmin/approvers?userType=&subject=
 description:
   - Baseline. A submitted request is notified to every holder of ACCESS_APPROVE, and any of them can decide it.
   - Change. The Requestor selects the approver from a drop-down of eligible approvers - enabled holders of ACCESS_APPROVE, excluding the requester and the user the request is about. The notice goes to that approver, and the request appears in that approver's My Approvals and "Assigned to me". Other approvers see it only when UAM_ANY_APPROVER is true.
@@ -755,9 +731,7 @@ title: Apply correction on a returned request
 brd: [BRD 1.006.1 (p.8), BRD 1.006.1.1 (p.8), BRD 1.006.1.2 (p.8), BRD 1.006.1.3 (p.8), BRD 1.006.1.4 (p.8), BRD 1.006.1.5 (p.8)]
 actor: Requestor (UAM_CORRECT)
 priority: Must have
-fit: CHANGE
 screens: Access Requests (My Requests); Edit Request
-api: PUT /api/v1/nbadmin/access-requests/{id}; POST .../{id}/submit
 description:
   - Baseline. There is no return - the approver can only approve or reject.
   - Change. A request returned by the approver (FR-UA-033) is RETURNED. The Requestor receives a notification with the return remarks, edits the data, adds a correction remark and re-submits it to the same approver or a newly chosen one. The history keeps every round.
@@ -789,9 +763,7 @@ title: Cancel a submitted request
 brd: [BRD 1.007.1 (p.8), BRD 1.007.1.1 (p.8), BRD 1.007.1.2 (p.8), BRD 1.007.1.3 (p.8), BRD 1.007.1.4 (p.8)]
 actor: Requestor (UAM_CANCEL)
 priority: Must have
-fit: "CHANGE; FIT (1.007.1.1 search)"
 screens: Access Requests (My Requests)
-api: POST /api/v1/nbadmin/access-requests/{id}/cancel
 description:
   - Baseline. Requests are searched by status, type and text (user, role or request number). A pending request cannot be withdrawn.
   - Change. The Requestor searches the request - also by requester, approver and date range - and cancels a PENDING or RETURNED request with a mandatory reason. The request becomes CANCELLED, leaves the approver's My Approvals and the approver is notified. An approved request with a future effective date (SCHEDULED) can be cancelled before its date (UQ06).
@@ -821,9 +793,7 @@ title: View submitted requests and their status
 brd: [BRD 1.008.1 (p.8), BRD 1.008.1.1 (p.8), BRD 1.008.1.2 (p.8), BRD 1.008.1.3 (p.8), BRD 1.008.1.4 (p.8)]
 actor: Requestor (UAM_VIEW)
 priority: "Must have (1.008.1 has no flag in the BRD)"
-fit: FIT
 screens: Access Requests (My Requests); request detail (History)
-api: GET /api/v1/nbadmin/access-requests; GET .../access-requests/{id}; GET .../{id}/history
 description:
   - Baseline. The Access Requests screen lists requests with number, type, change, requested by, requested on, status and decided by, with filters by status, type and text; a row opens the request detail. The requester is notified when the request is approved or rejected.
   - Change. A Requestor sees his or her own requests on the tab My Requests; holders of ACCESS_APPROVE, USER_MANAGE or AUDIT_VIEW see all. The detail adds a History tab with every event and remark, and the new statuses.
@@ -860,9 +830,7 @@ title: Submit a bulk request
 brd: [BRD 1.009.1 (p.8), BRD 1.009.1.1 (p.8), BRD 1.009.1.2 (p.8), BRD 1.009.1.3 (p.8), BRD 1.009.1.4 (p.8), BRD 1.009.1.5 (p.8), BRD 1.009.1.6 (p.8), UAM-NFR-38 (p.17)]
 actor: Requestor
 priority: "Must have (1.009.1 has no flag in the BRD)"
-fit: NEW
 screens: User Access > Bulk Request
-api: POST /api/v1/bulk/jobs (handler UAM_ACCESS_REQUEST); GET /api/v1/nbadmin/access-batches; POST .../access-batches/{id}/submit, approve, return, reject, cancel
 description:
   - The Requestor downloads the template, fills one row per user - action (enrol, modify, deactivate, reactivate), user ID, Windows ID, name, e-mail, branch, business unit group, user level, group profiles, effective date, remarks - and attaches it. BIBS validates every row and shows a validation report before the batch is created.
   - A valid file creates a draft batch with one line request per row. The Requestor adds the batch remarks, edits the draft (replaces the file or removes lines), cancels it or submits it to the chosen approver. On approval every line is applied in its own transaction; failures are listed and the other lines stand.
@@ -904,9 +872,7 @@ title: Apply changes on an effective date
 brd: [UAM-NFR-14 (p.13)]
 actor: Requestor; System
 priority: Must have
-fit: NEW
 screens: New Request (Effective date); Access Requests (status SCHEDULED)
-api: Job UAM_EFFECTIVE_CHANGES (00:05 daily)
 description: A request may carry an effective date. When it is approved before that date, the request becomes SCHEDULED and the daily job applies it on the date, after checking it again. A blank date means the change applies on approval. A scheduled request can be cancelled before its date (FR-UA-017).
 preconditions:
   - "The request has an effective date later than the approval date."
@@ -938,9 +904,7 @@ title: Receive, list and open requests for approval
 brd: [BRD 2.002.1 (p.8), BRD 2.002.2 (p.8), BRD 2.002.2.1 (p.8), BRD 2.002.3 (p.8), BRD 2.002.4 (p.8)]
 actor: Approver (ACCESS_APPROVE)
 priority: Must have
-fit: "FIT (2.002.2, 2.002.3, 2.002.4); CHANGE (2.002.1, 2.002.2.1)"
 screens: My Approvals; Access Requests (tab Assigned to Me); request detail
-api: GET /api/v1/nbadmin/access-requests; GET .../access-requests/{id}
 description:
   - Baseline. Pending requests appear in My Approvals for every holder of ACCESS_APPROVE (never the requester's own) and on the Access Requests screen with status PENDING. A row opens the request detail with the requested change.
   - Change. The approver receives a notification for each request assigned to him or her and filters the list with **Assigned to me**. The detail shows the current values next to the requested ones (user data and group profiles), the members affected (group profiles) and the history.
@@ -968,9 +932,7 @@ title: Approve a request and grant the access
 brd: [BRD 2.002.5 (p.8); p.6 "System to grant the access"]
 actor: Approver; System
 priority: Must have
-fit: FIT
 screens: Request detail (Approve and Apply)
-api: POST /api/v1/nbadmin/access-requests/{id}/approve
 description:
   - Baseline. **Approve and Apply** applies the change at once - creates the user, replaces the roles, disables or enables the user, or changes the role permissions - records the decision and notifies the requester. For a new user BIBS shows a temporary password once; it is never stored in clear. The approver can never be the requester.
   - Change. The subject user can never approve either. After approval, a request with a risk flag goes to the second approver (FR-UA-034); a request with a future effective date becomes SCHEDULED (FR-UA-020); a group-profile request goes to the next approver or to the System Administrator (FR-UA-044, FR-UA-045). Every applied attribute is logged with from and to values (FR-UA-064), and the affected user is notified.
@@ -1004,9 +966,7 @@ title: Reject a request
 brd: [BRD 2.002.6 (p.8), BRD 2.002.6.1 (p.8), BRD 2.002.6.2 (p.9)]
 actor: Approver
 priority: "Must have (2.002.6.1-6.2 have no flag in the BRD)"
-fit: FIT
 screens: Request detail (Reject)
-api: POST /api/v1/nbadmin/access-requests/{id}/reject
 description: Baseline, unchanged. The approver enters the rejection reason in Comment ("Mandatory to reject; sent to the requester") and clicks **Reject**. BIBS records the decision, notifies the requester and changes nothing. The reason is also written to the request history.
 preconditions:
   - "As FR-UA-031."
@@ -1033,9 +993,7 @@ title: Return a request to the Requestor
 brd: [BRD 2.002.7 (p.9), BRD 2.002.7.1 (p.9)]
 actor: Approver
 priority: Must have
-fit: CHANGE
 screens: Request detail (Return)
-api: POST /api/v1/nbadmin/access-requests/{id}/return
 description:
   - Baseline. There is no return.
   - Change. The approver clicks **Return**, enters the remarks (reason for return) and saves. The request becomes RETURNED, the remarks are saved in the history and the requester is notified to correct it (FR-UA-016). The BRD uses ID 2.002.7.1 twice, for "add remarks" and "save remarks".
@@ -1062,9 +1020,7 @@ title: Escalate privileged and out-of-hours changes for a second approval
 brd: [UAM-NFR-40 (p.17)]
 actor: System; Second approver (UAM_SECOND_APPROVE)
 priority: Must have
-fit: NEW
 screens: My Approvals; Access Requests (tab Second Approval)
-api: POST /api/v1/nbadmin/access-requests/{id}/second-approve; alert UAM_PRIVILEGED_CHANGE
 description:
   - The BRD asks that changes to user privileges are monitored, evaluated and escalated for additional review, for example modifications outside working hours or from low to high privilege (p.17).
   - Each group profile has a privilege level (LOW, STANDARD, HIGH, ADMIN). On submission and on approval, BIBS flags a request that raises a user to a HIGH or ADMIN profile (PRIVILEGE_INCREASE) or that is submitted or approved outside UAM_WORKING_HOURS (OUTSIDE_HOURS). A flagged request needs a second approval by a holder of UAM_SECOND_APPROVE other than the first approver, and raises alert UAM_PRIVILEGED_CHANGE.
@@ -1099,9 +1055,7 @@ title: Request a new group profile
 brd: [BRD 3.002.1 (p.9), BRD 3.002.1.1 (p.9), BRD 3.002.1.3 (p.9), BRD 3.002.1.4 (p.9), BRD 3.002.1.5 (p.9), BRD 3.002.1.6 (p.9), BRD 3.002.1.7 (p.9)]
 actor: Business Administrator (UAM_GROUP_REQUEST)
 priority: "Must have (3.002.1.6-1.7 have no flag in the BRD)"
-fit: "CHANGE (3.002.1, 3.002.1.1, 1.3, 1.4, 1.7); FIT (3.002.1.5, 1.6)"
 screens: User Access > Group Profile Requests (New); permission picker by area and action
-api: POST /api/v1/nbadmin/access-requests (type CREATE_ROLE)
 description:
   - Baseline. The System Administrator creates roles directly on Roles & Permissions. Only a change of the permissions of an existing role goes through a request (Change role permissions, BRD-3 PMADD05, R6).
   - Change. The Business Administrator requests a new group profile - code, name, description, privilege level and the permissions, picked by area and action class. The request follows the lifecycle of FR-UA-010 (draft, edit, cancel, submit, remarks) and the approvers of FR-UA-044. After the last approval it waits for the System Administrator (FR-UA-045).
@@ -1143,9 +1097,7 @@ title: Request a change to a group profile
 brd: [BRD 3.002.2 (p.9), BRD 3.002.2.1 (p.9), BRD 3.002.2.2 (p.9), BRD 3.002.2.4 (p.9), BRD 3.002.2.5 (p.9), BRD 3.002.2.6 (p.9), BRD 3.002.2.7 (p.9), BRD 3.002.2.8 (p.9)]
 actor: Business Administrator
 priority: "Must have (3.002.2.2, 2.7, 2.8 have no flag in the BRD)"
-fit: "FIT (3.002.2, 2.2, 2.6, 2.7); CHANGE (3.002.2.1, 2.4, 2.5, 2.8)"
 screens: Group Profile Requests (Modify); Change role permissions fields
-api: POST /api/v1/nbadmin/access-requests (type MODIFY_ROLE_PERMISSIONS)
 description:
   - Baseline. A Change role permissions request names the role, the permissions to add and to remove and the justification; on approval the difference is applied to the role as it is at approval, so concurrent changes are not lost (R6, FR-PM-003).
   - Change. The Business Administrator searches the profile from the drop-down and may also change its name, description and privilege level. The request gets drafts and approvers in order, and after approval waits for the System Administrator (FR-UA-045) unless UAM_ROLE_APPLY_ON_APPROVAL is true (UQ03).
@@ -1190,9 +1142,7 @@ title: Request the deactivation of a group profile
 brd: [BRD 3.002.3 (p.9), BRD 3.002.3.1 (p.9), BRD 3.002.3.2 (p.9), BRD 3.002.3.4 (p.9), BRD 3.002.3.5 (p.9), BRD 3.002.3.6 (p.9), BRD 3.002.3.7 (p.9), BRD 3.002.3.8 (p.9)]
 actor: Business Administrator
 priority: "Must have (3.002.3.2, 3.7, 3.8 have no flag in the BRD)"
-fit: "NEW; FIT (3.002.3.2, 3.7); CHANGE (3.002.3.8)"
 screens: Group Profile Requests (Deactivate)
-api: POST /api/v1/nbadmin/access-requests (type DEACTIVATE_ROLE)
 description:
   - Baseline. Roles have no active flag; a role can only be emptied of permissions.
   - Change. The Business Administrator requests the deactivation of an active profile. The request lists the members of the profile. When implemented, the profile is inactive - it grants nothing, is not offered on requests and keeps its permissions for a reactivation. Whether a profile with active members may be deactivated, or members must be moved first, is UQ16.
@@ -1223,9 +1173,7 @@ title: Request the reactivation of a group profile
 brd: [BRD 3.002.4 (p.9), BRD 3.002.4.1 (p.9), BRD 3.002.4.2 (p.9), BRD 3.002.4.4 (p.9), BRD 3.002.4.5 (p.9), BRD 3.002.4.6 (p.9), BRD 3.002.4.7 (p.9), BRD 3.002.4.8 (p.9)]
 actor: Business Administrator
 priority: "Must have (3.002.4.2, 4.7, 4.8 have no flag in the BRD)"
-fit: "NEW; FIT (3.002.4.2, 4.7); CHANGE (3.002.4.8)"
 screens: Group Profile Requests (Reactivate)
-api: POST /api/v1/nbadmin/access-requests (type REACTIVATE_ROLE)
 description: The Business Administrator requests the reactivation of an inactive profile, searched from the drop-down of inactive profiles. When implemented, the profile is active again with its last permissions, and its members regain them.
 preconditions:
   - "The user has UAM_GROUP_REQUEST."
@@ -1250,9 +1198,7 @@ title: Route group-profile requests to approvers in order
 brd: [BRD 3.002.1.2 (p.9), BRD 3.002.2.3 (p.9), BRD 3.002.3.3 (p.9), BRD 3.002.4.3 (p.9)]
 actor: Business Administrator; Approvers
 priority: "Not flagged in the BRD"
-fit: NEW
 screens: Group Profile Requests (Approvers); My Approvals
-api: Request approvers (sequence, approver, decision, remarks, time)
 description: The BRD lets the Business Administrator select "approver/s" from the drop-down. The request holds one or more approvers in order. Each approver decides in turn; the request moves to the next approver on approval. All must approve. Any approver can reject or return it. User requests have one approver (FR-UA-015).
 preconditions:
   - "A group-profile request is being drafted."
@@ -1284,9 +1230,7 @@ title: Implement an approved group-profile request
 brd: [p.6 "System Administrator to create / modify group profile"; BRD 4.002.1 (p.9)]
 actor: System Administrator (ROLE_MANAGE)
 priority: Must have
-fit: CHANGE
 screens: Access Requests (tab For Implementation); Administration > Roles & Permissions (Implement Request)
-api: POST /api/v1/nbadmin/access-requests/{id}/implement
 description:
   - Baseline. The System Administrator creates and edits roles freely on Roles & Permissions.
   - Change. Direct role maintenance is limited to implementing approved requests. The For Implementation tab lists approved group-profile requests; **Implement Request** opens the Roles screen with the approved change, and saving it applies the change and sets the request to IMPLEMENTED. Direct role edits are refused unless the audited emergency parameter UAM_DIRECT_ROLE_EDIT is true, which raises alert UAM_DIRECT_ROLE_EDIT.
@@ -1321,9 +1265,7 @@ title: Define the group profiles of the access personas
 brd: [BRD 4.002.1 (p.9), BRD 4.002.1.1 (p.9), BRD 4.002.1.2 (p.9), BRD 4.002.1.3 (p.9)]
 actor: System Administrator
 priority: Must have
-fit: "FIT (4.002.1, 4.002.1.3); CONFIGURE (4.002.1.1, 4.002.1.2)"
 screens: Administration > Roles & Permissions
-api: GET /api/v1/admin/roles
 description: The build delivers the group profiles of the BRD personas - UAM_REQUESTOR (Requestor), UAM_APPROVER (Approver) and UAM_SECOND_APPROVER - and grants the new permissions to BUSINESS_ADMIN (Business Administrator, exists) and SYSADMIN (exists), as in section 3.3. Later changes to these profiles are group-profile requests (FR-UA-040 to FR-UA-045).
 preconditions:
   - "None (delivered with the build)."
@@ -1347,9 +1289,7 @@ title: Assign functions to a group profile
 brd: [BRD 4.002.2 (p.9), BRD 4.002.2.1 to 4.002.2.7 (p.9-10), BRD 4.002.2.8 (p.10), BRD 4.002.2.9 (p.10), BRD 4.002.2.10 (p.10), UAM-NFR-32 (p.17)]
 actor: System Administrator (through approved group-profile requests)
 priority: Must have
-fit: "FIT (4.002.2, 4.002.2.8); CHANGE (4.002.2.1-2.7, 2.9, 2.10)"
 screens: Roles & Permissions; User Access Matrix
-api: Permissions of section 3.2; GET /api/v1/nbadmin/access-matrix, /by-action
 description:
   - Baseline. Every BIBS screen, button and API call requires a permission; roles are bundles of permissions; the User Access Matrix shows them by permission and by area / action class and exports to Excel.
   - Change. Each access-maintenance function of BRD 4.002.2 has its own permission (section 3.2), so it can be assigned to any profile. Every permission of BIBS gets an area and action class, so the matrix and the group-profile report show a module for every task. The request endpoints accept the type-specific permission or ACCESS_REQUEST.
@@ -1377,9 +1317,7 @@ title: Maintain user data and the user ID format
 brd: [UAM-NFR-09 (p.13), UAM-NFR-13 (p.13), UAM-NFR-15 (p.14), UAM-NFR-16 (p.14)]
 actor: System Administrator; Requestor (through requests)
 priority: Must have
-fit: "FIT (UAM-NFR-09); CHANGE (UAM-NFR-13, 15, 16)"
 screens: Administration > Users; Lists of Values (UAM_BUSINESS_UNIT, UAM_USER_LEVEL)
-api: GET /api/v1/admin/users; PUT /api/v1/admin/users/{id} (implementation and emergency only)
 description:
   - Baseline. Users are listed with user name, full name, roles, authorisation limit, last login and status; the System Administrator unlocks accounts and resets passwords. A user can hold several roles and a role many users; accounts are disabled and re-enabled.
   - Change. The user record adds the Windows ID, business unit group and user level; the status shown is Active, Disabled, Locked or Online. User IDs follow USER_ID_PATTERN. Creating and editing users directly is replaced by "Raise request" for everyone except the System Administrator in an emergency (UAM_DIRECT_ROLE_EDIT). Unlock and password reset stay direct administrator actions and are logged.
@@ -1417,9 +1355,7 @@ title: Keep profiles that one user may not hold apart (separation of duties)
 brd: [UAM-NFR-40 (p.17), UAM-NFR-06 (p.12)]
 actor: Business Administrator (maker); Information Security Officer (checker)
 priority: Must have
-fit: NEW
 screens: User Access > Separation of Duties; My Approvals
-api: GET, POST /api/v1/nbadmin/sod-rules; POST /api/v1/nbadmin/sod-rules/{id}/deactivate, /authorize, /reject
 description:
   - Baseline. BIBS keeps the requester, the approver and the implementer of a request apart, but any group profiles can be combined on one user.
   - Change. The Business Administrator records the pairs of group profiles that one user may not hold together, with the reason. Each new rule and each deactivation waits for the authorisation of Information Security (maker-checker). Every user request and every line of a bulk request that would give a user both profiles of an active rule is refused, on submission and again at approval.
@@ -1461,9 +1397,7 @@ title: Second approval of the security settings
 brd: [UAM-NFR-40 (p.17), UAM-NFR-16 (p.14)]
 actor: System Administrator (maker); Information Security Officer (checker)
 priority: Must have
-fit: NEW
 screens: Administration > System Parameters; My Approvals
-api: PUT /api/v1/system/parameters/{key}; POST /api/v1/system/parameters/{key}/approve, /reject
 description:
   - Baseline. The System Administrator changes a business parameter at once, with an audit of the old and new value.
   - Change. A change of a security setting (category Security - sign-in, lock-out, password, session and access settings, including the emergency direct edit of roles UAM_DIRECT_ROLE_EDIT) is kept as pending and applies only when a holder of SECURITY_PARAMETER_APPROVE other than the requester approves it. The other parameters still change at once.
@@ -1498,9 +1432,7 @@ title: User Access Report
 brd: [BRD 3.003.1 (p.9), BRD 3.003.1.1 (p.9), BRD 3.003.1.1 (2nd) (p.9), BRD 3.003.1.2 to 3.003.1.6 (p.9), UAM-NFR-10 (p.13), UAM-NFR-41 (p.18)]
 actor: Approver; Business Administrator; System Administrator; Information Security Officer; Auditor (UAM_REPORT_VIEW)
 priority: Must have
-fit: "NEW (3.003.1.1); CHANGE (3.003.1, 1.5, 1.6); FIT (the other columns)"
 screens: User Access > User Access Reports; Reports (category Control & Audit)
-api: Report code UAM-USER-ACCESS
 description: The report lists users with their group profiles and who created, modified, deactivated or reactivated them, as of a date (sample A, p.18). The "created by" column shows the approver and the request number from the change log, not the session that applied the change. Layout in section 6.
 preconditions:
   - "The user has UAM_REPORT_VIEW."
@@ -1527,9 +1459,7 @@ title: User Group Profile Report
 brd: [BRD 3.003.2 (p.9), BRD 3.003.2.1 to 3.003.2.6 (p.9), UAM-NFR-41 (p.18)]
 actor: Business Administrator; System Administrator; Auditor
 priority: Must have
-fit: "CHANGE (3.003.2, 2.2, 2.6); FIT (the other columns)"
 screens: User Access Reports
-api: Report code UAM-GROUP-PROFILE
 description: The report lists each group profile with the modules and tasks it can access - module = permission area, task = permission and action class - marked With Access or No Access (sample B, p.18), and the profile's created, modified, deactivated and reactivated dates and actors.
 preconditions:
   - "The user has UAM_REPORT_VIEW."
@@ -1553,9 +1483,7 @@ title: Group Profile Membership list
 brd: [BRD 3.003.3 (p.9), BRD 3.003.3.1 (p.9), BRD 3.003.3.1.1 (p.9), BRD 3.003.3.1.2 (p.9), UAM-NFR-10 (p.13)]
 actor: Business Administrator; System Administrator; Auditor
 priority: Must have
-fit: "NEW (3.003.3, 3.1); FIT (3.003.3.1.1, 3.1.2)"
 screens: User Access Reports
-api: Report code UAM-GROUP-MEMBERS
 description:
   - Baseline. The User Access Matrix shows only the number of enabled users per role.
   - Change. The report lists the members of each profile - user name and user ID, added by and date, modified by and date - grouped by profile (sample C, p.18, titled "User Group Profile Report" in the BRD).
@@ -1580,9 +1508,7 @@ title: User Access Audit Log
 brd: [BRD 4.003.1 (p.10), UAM-NFR-35 (p.17), UAM-NFR-41 (p.18)]
 actor: System Administrator; Business Administrator; Auditor
 priority: Must have
-fit: CHANGE
 screens: User Access Reports; Administration > Audit Trail (CTL-AUDIT, exists)
-api: Report code UAM-AUDIT-LOG
 description:
   - Baseline. The Audit Trail report (CTL-AUDIT) lists audit entries by date range, user and entity type, with summary text, and exports to PDF, Excel and CSV.
   - Change. The User Access Audit Log lists, for a date range, each access activity - date, activity, from, to, done by, approved by, request number (sample D, p.18) - from the access-change log and the request history. Log-ins, failed log-ins and log-outs can be included. CTL-AUDIT stays.
@@ -1610,9 +1536,7 @@ title: Keep a structured, insert-only access-change log
 brd: [BRD 4.003.1 (p.10), UAM-NFR-09 (p.13), UAM-NFR-22 (p.14)]
 actor: System
 priority: Must have
-fit: "FIT (UAM-NFR-22); CHANGE (structured log)"
 screens: Reports of section 6; request History tab
-api: Access-change log (insert-only)
 description: Baseline - every change is in the insert-only audit trail as summary text. Change - every applied change also writes one row per attribute into the access-change log (time, user or profile, activity, attribute, from value, to value, request number, done by, approved by) in the same transaction as the change. No user can change or delete it. The reports read it.
 preconditions:
   - "None."
@@ -1640,9 +1564,7 @@ title: Notify requesters, approvers and affected users
 brd: [BRD 1.006.1.1 (p.8), BRD 1.008.1.4 (p.8), BRD 2.002.1 (p.8), UAM-NFR-39 (p.17)]
 actor: System
 priority: Must have
-fit: CHANGE
 screens: Notifications (bell); e-mail
-api: Notification events UAM_REQUEST_TO_APPROVE, UAM_REQUEST_RETURNED, UAM_REQUEST_CANCELLED, UAM_REQUEST_DECIDED, UAM_ACCESS_CHANGED, UAM_SECOND_APPROVAL, UAM_FOR_IMPLEMENTATION, UAM_DORMANT_WARNING, UAM_DORMANT_DEACTIVATED, UAM_SOD_TO_AUTHORIZE, UAM_PARAMETER_TO_APPROVE
 description:
   - Baseline. On submission every holder of ACCESS_APPROVE receives "Access request <no.> to approve"; on the decision the requester receives "Access request <no.> approved / rejected", each with a link to the request.
   - Change. The notice goes to the chosen approver only. The requester is also notified of a return and of the application of a scheduled change; the approver of a cancellation; the second approvers and the System Administrators of the requests waiting for them; the affected user (in the app and by e-mail) when his or her access changes, and each member of a group profile that is deactivated or reactivated (NFR 10, p.17); the users of the dormant-user job (FR-UA-006); the authorisers of the separation-of-duties rules (FR-UA-053) and the approvers of the security settings (FR-UA-054).
@@ -1669,9 +1591,7 @@ title: E-mail designated users on failed batch runs
 brd: [UAM-NFR-24 (p.15), UAM-NFR-25 (p.15)]
 actor: System; System Administrator (recipient)
 priority: Must have
-fit: CHANGE
 screens: Administration > Jobs (run history); e-mail
-api: Alert JOB_FAILURE; parameter JOB_FAILURE_RECIPIENTS
 description:
   - Baseline. Batch jobs are scheduled, run on demand from the screen, monitored and re-run; each run is logged with success or failure, and a failed run raises the in-app alert JOB_FAILURE.
   - Change. A failed run is also e-mailed to the designated users in parameter JOB_FAILURE_RECIPIENTS, with the job, time and error.

@@ -315,9 +315,7 @@ brd:
   - BRD 1.002.1, 2.002.1, 3.002.1, 4.002.1, 5.002.1 (p.44, 79, 109, 148, 179)
 actor: All Renewal personas
 priority: Must have
-fit: FIT
 screens: Login; session warning dialog; any Renewal screen in a second tab
-api: POST /api/v1/auth/login; GET /api/v1/system/session-policy
 description:
   - Users of every Renewal persona log in on any BDO-issued device with their BIBS user ID and the profile of their persona. Renewal uses the platform log-in, session policy and multi-tab behaviour built for BRD-1; it adds no screen of its own.
   - BIBS warns the user after 15 minutes of inactivity and 30 minutes before the system-triggered log-out, as the BRD asks for each persona.
@@ -356,9 +354,7 @@ brd:
   - BRD p.43 key capability (Team Leaders view only their team's accounts)
 actor: System
 priority: Must have
-fit: CHANGE
 screens: All Renewal screens; User Access Matrix
-api: Every endpoint checks its permission and the data scope
 description:
   - Every Renewal screen, button and API call requires a permission (section 3.2). Menus show only the screens that the user's roles allow; buttons for actions the user may not perform are hidden.
   - Every list, record, report and export is limited to the user's data scope. A Marketing TL sees the candidates of his sales units, an AO those assigned to him, Processing the processing stages. LAMD and Contact Center users see a projection without premium columns.
@@ -398,9 +394,7 @@ brd:
   - BRD 5.004.1 (p.180)
 actor: System Administrator; Business Administrator (requester); access approver
 priority: Must have
-fit: CONFIGURE
 screens: Access Requests; User Access Matrix; Roles
-api: POST /api/v1/nbadmin/access-requests (types ASSIGN_ROLE, MODIFY_ROLE_PERMISSIONS)
 description:
   - The profiles Marketing TL, Marketing AO / Admin, Processing TL, Processing Officer and Business Administrator exist as BIBS roles (MKT_TL, MKT_AO, PROCESSING_TL, PROCESSOR, BUSINESS_ADMIN). The workshop adds LAMD and CONTACT_CENTER.
   - Each of the 25 BRD functions maps to a permission (section 3.2). The System Administrator assigns functions to a profile through an approved role-permission change request, and the Business Administrator assigns profiles to users through an access request (BRD 5.004.1). Both are the User Access Maintenance flow of BRD-11.
@@ -439,9 +433,7 @@ brd:
   - BRRN.040 (p.14-15)
 actor: System; any user with RNW_VIEW (read)
 priority: Must have
-fit: FIT
 screens: Record page (History tab); Renewal Reports (RNW-DECISIONS, RNW-SANITATION)
-api: Audit service; GET /api/v1/renewal/candidates/{ref}/history
 description:
   - The workshop addendum asks, requirement by requirement, that every action is logged with the user, the time and the data source. BIBS records extraction, initiation, reference matching, every check run and bucket change, every disposition (user, matrix or upload), override, transfer, return, post, letter generation and sending, insurer response, LAMD match and acceptance.
   - The History tab of a record shows the workflow history, the disposition rows and the audit rows in time order. Extraction and initiation are different events, so the audit tells them apart (BRRN.021 AC3).
@@ -475,9 +467,7 @@ brd:
   - BRRN.005 (p.24-25), restating BRD 1.003.4.1.2, 3.003.4.2 (p.50, 114)
 actor: System (job RNW_EXTRACTION)
 priority: Must have
-fit: NEW
 screens: Renewal Home (extraction runs); Expiry List
-api: Job RNW_EXTRACTION; GET /api/v1/renewal/extraction-runs
 description:
   - Every day BIBS extracts as renewal candidates the booked root invoices (policy years) whose policy expiry date equals the business date plus the lead days (default 140 days; a value per segment may override it). Extraction is expiry-based, not maturity-based (BRRN.030 AC1).
   - Each candidate gets a renewal reference and keeps the expiring invoice number, ARN, policy number and a snapshot of the listing fields. Expired and expiring accounts that are not yet renewed stay listed until the candidate closes, so the list has no omissions and no duplicates (BRRN.005).
@@ -517,9 +507,7 @@ brd:
   - BRD 3.003.4, 3.003.4.1 (p.111)
 actor: Marketing TL; Processing TL
 priority: Must have
-fit: NEW
 screens: Expiry List (Generate Expiry List dialog)
-api: GET /api/v1/renewal/candidates?expiryFrom=&expiryTo=
 description:
   - The TL opens the Expiry List and clicks **Generate Expiry List**. He selects a start and end date (month, day, year) and BIBS shows the expiring accounts in that range. Changing the range refreshes the list at once.
   - When the range goes beyond what the job has already extracted, BIBS extracts the missing dates on demand. This is recorded as an extraction, not as an initiation (BRRN.021).
@@ -559,9 +547,7 @@ brd:
   - BRRN.003 (p.23), restating BRD 1.003.3, 1.003.3.1-1.003.3.1.13, 3.003.3, 3.003.3.1-3.003.3.13 (p.45-47, 109-111)
 actor: Marketing TL; Processing TL
 priority: Must have
-fit: CHANGE
 screens: Expiry List (Filters panel)
-api: GET /api/v1/renewal/candidates (filter parameters as include / exclude lists)
 description:
   - The Filters panel offers Unit Head, Business Origin, Account Type, Region, Area, Invoicing Branch, Risk Code, Market Segment, Department Name and Account Officer, plus Bucket, Disposition and Stage. Each criterion supports single, multiple, "all except" and all selections, with a search in the drop-down.
   - "**Apply** filters the list at once; **Cancel** closes the panel without change; **Clear** restores all. The selected values stay visible above the grid and in the page address, so a filtered list can be shared."
@@ -600,9 +586,7 @@ brd:
   - BRRN.006 (p.25), restating BRD 1.003.4.1.3, 1.003.4.1.4, 3.003.4.3, 3.003.4.4, 3.006.1.5, 4.003.1.5 (p.50, 114-115, 119, 149-150)
 actor: Marketing TL; Processing TL; Processing Officer
 priority: Must have
-fit: CHANGE
 screens: Expiry List (tabs Unassigned Disposition, For Renewal, For Quotation, For Proposal, Not for Renewal, Lost Business, Exceptions, All)
-api: GET /api/v1/renewal/candidates (keyset chunks)
 description:
   - The list shows every candidate of the range in **one scrollable view**, without pages, with a row count. The columns are those of BRD 1.003.4.1.1 (section 6.2), plus the Classification pill (Clean / Review / Exception) and the flag chips (Returned, Transferred, Endorsed, Claims, Outstanding, KYC due, NRNS). The Processing list has the first 21 columns (3.003.4.1) and not the claims and outstanding-premium columns.
   - Columns can be resized and reordered, and the layout is kept per user. Each column has a filter (text, list, date or amount). A keyword search across all columns filters and highlights the matches, like Ctrl+F.
@@ -649,9 +633,7 @@ brd:
   - BRRN.008 (p.26), restating BRD 1.003.7.1, 1.003.7.2, 3.003.7.1, 3.003.7.2 (p.51, 115)
 actor: Marketing TL; Processing TL
 priority: Must have
-fit: CHANGE
 screens: Expiry List (Export, Print)
-api: GET /api/v1/reports/RNW-EXPIRY-LIST/export?format=XLSX|PDF
 description:
   - The user downloads the list as .xlsx with the columns and filters of the current view, saves it, and prints it. The export is the report RNW-EXPIRY-LIST run with the grid's filter state, so the file equals the displayed list.
   - Print opens a PDF preview (landscape, A4 or Legal) that matches the printout; the browser print dialog sets margins and scaling.
@@ -682,9 +664,7 @@ brd:
   - BRRN.021 (p.4)
 actor: Authorised user (Marketing TL, Processing TL with RNW_EXTRACT)
 priority: Must have
-fit: NEW
 screens: Expiry List (Initiate); record page
-api: POST /api/v1/renewal/candidates/initiate
 description:
   - Extracted accounts are displayed, but renewal processing starts only when an authorised user initiates them. Segments flagged for bulk initiation (for example CLG) are initiated in bulk from the list; the others (for example Non-Mortgage) one by one.
   - Initiation records the user and time and moves the candidate to EVALUATING, where BIBS applies the bucket and the decision matrix (FR-RN-022, FR-RN-023). Candidates handed over by Submitted Policies are initiated by the hand-off itself (FR-RN-090).
@@ -719,9 +699,7 @@ brd:
   - BRRN.030 (p.8-9)
 actor: Processing TL (runs the go-live extraction from the cut-over runbook); Renewal processing team
 priority: Must have
-fit: NEW
 screens: Renewal Home (extraction runs); Expiry List (Urgent pill); Processing Worklist (Upload RA already sent)
-api: Job RNW_GOLIVE_EXTRACTION; bulk template RNW_RA_ALREADY_SENT
 description:
   - "At go-live BIBS takes over every renewal that expires from go-live to 31 May 2028. BDOI decided on 26-Sep-2026 that these renewals are processed in BIBS after go-live and that no renewal in progress is carried from the legacy systems (BRD-13 question DMQ37)."
   - "Once, right after the migration load is signed off, the go-live extraction creates a candidate for every migrated in-force policy expiring in that window. The candidates are ordered by expiry date. Those expiring in January 2028 carry the flag Urgent, which the Expiry List shows as a pill and every worklist sorts first."
@@ -771,9 +749,7 @@ brd:
   - BRRN.022 (p.4)
 actor: System (check engine); Renewal processor (view)
 priority: Must have
-fit: NEW
 screens: Record page (Checks & Bucket tab); Renewal Reports (RNW-SANITATION)
-api: GET /api/v1/renewal/candidates/{ref}/checks
 description:
   - After extraction, after every upload and on every relevant event, BIBS runs the checks of section 5.3 on the candidate - reference match, PN present, risk code renewable, LAMD status, claims, pending endorsement, outstanding premium, financial impact, insurer response match, mandatory fields, product renewable, insurer usable, duplicate candidate and KYC due. Eligibility no longer depends on manual pre-cleaning of the list.
   - Each check writes a result PASS, WARN, FAIL, INFO or NOT_APPLICABLE with its detail. The Checks & Bucket tab shows the latest results, and the RNW-SANITATION report lists them for any range.
@@ -808,9 +784,7 @@ brd:
   - BRD 1.003.4.1.1.2 (p.47)
 actor: System; Renewal user
 priority: Must have
-fit: NEW
 screens: Expiry List; record page; every upload
-api: Number series RNW-yyyy; check REFERENCE_MATCH
 description:
   - BIBS issues a renewal reference RNW-yyyy-nnnnnn at extraction and stores it with the expiring ARN and invoice number. The reference is mandatory on every upload (dispositioned file, insurer response, acceptance list) and is the primary key that links a renewal record to its expiring policy; the expiring invoice number is the alternate key.
   - The check REFERENCE_MATCH records the outcome per record (MATCHED, MISSING, INVALID, AMBIGUOUS). A record without a valid reference goes to exception handling and is never dropped.
@@ -844,9 +818,7 @@ brd:
   - BRRN.023 (p.4-6)
 actor: System; authorised user (override)
 priority: Must have
-fit: NEW
 screens: Expiry List (Classification pill, Exceptions tab, Bucket filter); record page (Checks & Bucket tab, Override Bucket)
-api: POST /api/v1/renewal/candidates/{ref}/bucket-override
 description:
   - After each check run BIBS computes the bucket from the active bucket rule set. By default any check that fails with severity FAIL_EXCEPTION gives Exception; any FAIL_REVIEW or WARN gives Review; otherwise Clean. Records move between buckets when conditions change.
   - Users filter and export by bucket. A bucket is changed by hand only through a controlled override with mandatory remarks, and an override can never make a record with a failed check Clean (BRRN.023 negative scenario).
@@ -886,9 +858,7 @@ brd:
   - BRRN.034 (p.11)
 actor: System; Business Administrator (matrix); authorised user (override)
 priority: Must have
-fit: NEW
 screens: Renewal Setup (Decision Matrix); record page (disposition proposal); Renewal Reports (RNW-DECISIONS)
-api: /api/v1/renewal/setup/decision-matrices; POST /api/v1/renewal/candidates/{ref}/disposition-override
 description:
   - After initiation BIBS evaluates the active decision matrix on Clean and Review candidates. The first rule by priority gives a proposed disposition and an automation flag. A Clean candidate whose rule says AUTO receives a system disposition (source MATRIX) and proceeds without user action; otherwise the proposal is shown to the AO as the default.
   - Matrix rules refer to segment, line, product, mortgaged flag, bucket, claims, endorsements, payment status and days to expiry; outcomes are disposition options (BRRN.034 AC1-2). Candidates with claims, endorsements, a missing or invalid PN or unresolved payment go to manual review (BRRN.031 AC2).
@@ -941,9 +911,7 @@ brd:
   - BRRN.009 (p.26-27), restating BRD 1.003.7.3, 1.003.7.3.1 (p.51)
 actor: System; Business Administrator (codes)
 priority: Must have
-fit: NEW
 screens: Renewal Setup (Non-renewable Risk Codes); Letters (NFR tab)
-api: /api/v1/renewal/setup/non-renewable-risk-codes
 description:
   - The Business Administrator maintains the risk codes that are not renewable, with line, reason and effective dates. Each change is authorised by a checker.
   - The check RISK_CODE_RENEWABLE tags a candidate on such a code Not for Renewal with reason "Non-renewable Accounts" and source SYSTEM, excludes it from the assignment list, and queues a Not for Renewal Letter (NFR) to the client. The delivery outcome is read from the e-mail log.
@@ -986,9 +954,7 @@ brd:
   - BRRN.024 (p.6)
 actor: LAMD user (upload); System (matching)
 priority: Must have
-fit: NEW
 screens: LAMD Reports (upload, match results, routing)
-api: Bulk handler RNW_LAMD_REPORT; GET /api/v1/renewal/lamd-reports
 description:
   - The LAMD user uploads the paid-off and RMU loan reports. BIBS matches each line to the expiring candidates by PN, the primary matching key, and applies the routing. A paid-off loan tags the account Not for Renewal with reason "Loan fully paid"; an RMU loan tags it Not for Renewal with reason "RMU" or transfers it to the Corporate RMU unit.
   - For CBG Motor and Fire, PN matching is mandatory. A CBG candidate without a PN fails PN_PRESENT, and matched Clean candidates follow the straight-through path to the RA or the NFR without AO assignment (BRRN.039).
@@ -1032,9 +998,7 @@ brd:
   - BRRN.028 (p.7-8)
 actor: System; any list user
 priority: Must have
-fit: CHANGE
 screens: Expiry List (flag chip KYC due); record page; Renewal Reports
-api: Check KYC_DUE
 description:
   - BIBS flags candidates whose client is due or upcoming for KYC review, using the client's KYC review date and the KYC due window. The flag shows as a chip in the lists and a column in the reports, with the date it was first identified. It is for visibility and reporting only and never blocks, stops or reroutes the renewal.
 preconditions:
@@ -1064,9 +1028,7 @@ brd:
   - BRD 1.008.1.4 (p.56)
 actor: System
 priority: Must have
-fit: CHANGE
 screens: Record page (Checks & Bucket, Account History); TL Review
-api: Check ENDORSEMENT_PENDING
 description:
   - Endorsements booked before or during the renewal update the expiring policy (the mother policy). The renewal account is built from the policy as of the last posted endorsement, so the renewal computation reflects the latest policy state.
   - While an endorsement request on the expiring invoice family is neither posted nor cancelled, the check ENDORSEMENT_PENDING fails and the renewal cannot be posted, have its RA generated or be accepted. BIBS records the link between each endorsement and the candidate.
@@ -1097,9 +1059,7 @@ brd:
   - BRRN.020 (p.4)
 actor: System (check PACKAGE_REMAP); Renewal processing team (Processing TL, Processing Officer)
 priority: Must have
-fit: NEW
 screens: Record page (Checks & Bucket, Package panel); Expiry List (bucket Exception)
-api: Check PACKAGE_REMAP; POST /api/v1/renewal/candidates/{ref}/package
 description:
   - "A migrated policy carries its legacy package code. BDOI decided on 26-Sep-2026 that legacy packages are remapped to the BIBS packages at sanitation, not at the data migration (BRD-13 question DMQ36). The migration only loads the legacy package code and the package code map."
   - "For each candidate of source Legacy the check PACKAGE_REMAP looks the legacy package up in the code map. When the map gives one active BIBS package version, the check passes and the candidate takes that version. When the package is not in the map, is retired, or maps to several versions, the check fails and the candidate goes to the Exception bucket."
@@ -1140,9 +1100,7 @@ brd:
   - BRD 1.005.2 (p.54)
 actor: Marketing TL
 priority: Must have
-fit: CHANGE
 screens: Expiry List (tab Unassigned Disposition; Assign Disposition, Re-assign Officer)
-api: POST /api/v1/renewal/candidates/assign; POST /api/v1/renewal/candidates/reassign
 description:
   - The TL selects accounts of the Unassigned Disposition tab (single, multiple, all except, all), searches the AO by name or ID or picks him from the list of his unit's officers, tags the accounts to the AO and pushes them. The accounts move to the AO's list (stage FOR_DISPOSITION).
   - The TL re-assigns accounts to another AO with **Re-assign Officer** until the RA locks the account. Assignment applies to non-CBG accounts only; CBG accounts follow the LAMD-driven path (BRRN.039).
@@ -1186,9 +1144,7 @@ brd:
   - BRD 2.004.4.8 (p.83)
 actor: Marketing TL; Marketing AO (request)
 priority: Must have
-fit: NEW
 screens: Expiry List and My Dispositions (Transfer); Transfers (Outgoing)
-api: POST /api/v1/renewal/transfers
 description:
   - The TL or the AO selects an account, views it, chooses the receiving Marketing unit, writes remarks and submits the transfer request. The account moves to TRANSFER_PENDING and leaves the sender's list; the receiving unit's TLs are notified.
   - The non-renewal reason "Transfer to Another Marketing Unit" (2.004.4.8) opens the same transfer.
@@ -1229,9 +1185,7 @@ brd:
   - BRD 1.007.1, 1.007.2, 1.007.3, 1.007.3.1, 1.007.4, 1.007.4.1, 1.007.4.2, 1.007.5 (p.55-56)
 actor: Marketing TL (receiving unit)
 priority: Must have
-fit: NEW
 screens: Transfers (Incoming)
-api: POST /api/v1/renewal/transfers/{id}/accept | decline
 description:
   - The receiving TL is notified of the request and sees the transferred accounts flagged "Transferred". He accepts the account, which is added to his unit's assignment list (UNASSIGNED), or declines it with remarks, which returns it to the sending unit at its previous stage.
 preconditions:
@@ -1273,9 +1227,7 @@ brd:
   - BRRN.017 (p.31), restating BRD 2.003.1.6 without the QPS / EBIX references (p.80)
 actor: Marketing AO
 priority: Must have
-fit: CHANGE
 screens: My Dispositions (quick filters Returned to me, Due in 30 days, NRNS)
-api: GET /api/v1/renewal/candidates?assignee=me
 description:
   - My Dispositions lists every account ever assigned to the AO in one scrollable view, whatever its status (active, expiring, expired, previous years). Filters are optional; the default is all statuses and years.
   - Policy fields are read from the current account and invoice, not copied, so endorsements and updates on the mother policy show at once.
@@ -1314,9 +1266,7 @@ brd:
   - BRD 1.004.1.3-1.004.1.5.2, 2.003.2, 2.003.3, 2.003.3.1, 2.003.3.2, 3.006.2, 3.006.3, 3.006.3.1, 3.006.3.2, 4.003.2, 4.003.3, 4.003.3.1, 4.003.3.2 (p.52-53, 80, 119-120, 150)
 actor: Marketing TL / AO; Processing TL / Officer
 priority: Must have
-fit: NEW
 screens: Record page /renewal/candidates/{ref} (tabs Details, Checks & Bucket, Account History, Computations, Insurer, Letters, Documents, Remarks & Follow-ups, History)
-api: GET /api/v1/renewal/candidates/{ref}; GET .../details.pdf | details.xlsx
 description:
   - The record page shows the summary card (renewal reference, Classification pill, disposition, flag chips) and every renewal field of the account, read live from the expiring account and invoice, so any update is reflected.
   - The user downloads the account details as PDF or Excel, saves them, and prints them with a preview and print settings.
@@ -1345,9 +1295,7 @@ brd:
   - BRRN.027 (p.7)
 actor: Renewal user (Marketing, Processing)
 priority: Must have
-fit: CHANGE
 screens: Record page (Account History tab)
-api: GET /api/v1/renewal/candidates/{ref}/account-history; GET .../account-history.pdf
 description:
   - The Account History tab shows, read-only, the prior policies and renewals of the account (the chain of ARNs), the endorsements, the payment history and the claims. It is sourced from the mother policy in BIBS, not from the extraction file. The user extracts or prints it as the role allows.
   - The final disposition is refused until the user has opened the history (BRRN.027 AC4); BIBS records who opened it and when.
@@ -1383,9 +1331,7 @@ brd:
   - BRD 2.004.5, 2.004.5.1, 2.004.5.2, 2.004.5.3 (p.83-84)
 actor: Marketing AO
 priority: Must have
-fit: NEW
 screens: Record page (Disposition panel); My Dispositions
-api: POST /api/v1/renewal/candidates/{ref}/disposition; POST .../push
 description:
   - The AO selects the account, views its current renewal details and gives the disposition - For Renewal, Not for Renewal, For Quotation, For Proposal or Lost Business. The decision-matrix proposal, if any, is the default.
   - Not for Renewal needs a reason from the list of ten (RMU, With submitted policy, Loan fully paid, Direct to Insurer, Total Loss Claim, Unit Sold, Canceled Policy, Transfer to Another Marketing Unit, Non-renewable Accounts, Booked to New Invoice). "Transfer to Another Marketing Unit" opens the transfer (FR-RN-031); "Booked to New Invoice" asks for the new invoice number.
@@ -1438,9 +1384,7 @@ brd:
   - BRD 2.006.1.5, 2.006.1.5.1, 2.006.1.5.2, 2.006.1.6 (p.86-87)
 actor: Marketing AO; Marketing TL; Processing
 priority: Must have
-fit: NEW
 screens: Record page (Remarks & Follow-ups tab); Disposition panel
-api: POST /api/v1/renewal/candidates/{ref}/remarks
 description:
   - The user adds remarks of up to 200 characters. BIBS stamps each remark with the date, time and user ID and the stage, saves it and shows it on the Remarks tab and in the listing column "Remarks of Acct Officer".
 preconditions:
@@ -1471,9 +1415,7 @@ brd:
   - BRD 2.006.1, 2.006.1.1, 2.006.1.1.1, 2.006.1.1.2, 2.006.1.3, 2.006.1.4, 2.006.1.5.3 (p.85-87)
 actor: Marketing AO
 priority: Must have
-fit: NEW
 screens: My Dispositions (Dispositioned view)
-api: GET /api/v1/renewal/candidates?assignee=me&disposed=true
 description:
   - The AO lists his dispositioned accounts with their renewal status. Accounts with endorsements and with claims carry the flag chips Endorsed and Claims; the latest endorsement effective on the mother policy is shown. A padlock marks accounts that are closed or locked. The AO selects and views any of them.
 preconditions:
@@ -1501,9 +1443,7 @@ brd:
   - BRD 2.007.1, 2.007.2, 2.007.3, 2.007.4, 2.007.4.2-2.007.4.7, 2.007.5 (p.87-89)
 actor: Marketing AO
 priority: Must have
-fit: CHANGE
 screens: My Dispositions (quick filter Returned to me); record page
-api: POST /api/v1/renewal/candidates/{ref}/disposition; POST .../push
 description:
   - The AO is notified when the TL or Processing returns an account. Returned accounts carry a red Returned flag. The AO reads the return remarks, searches, selects and edits the account, adds remarks, saves or cancels, and pushes it back to the TL.
 preconditions:
@@ -1535,9 +1475,7 @@ brd:
   - BRD 3.004.5 (p.117)
 actor: Marketing AO; Processing TL
 priority: Must have
-fit: NEW
 screens: Record page (Re-open Disposition)
-api: POST /api/v1/renewal/candidates/{ref}/reopen
 description:
   - When a client decides to renew after the account was tagged Not for Renewal (by the AO, by the system or by the upload of 3.004.4), the AO or the Processing TL re-opens it and gives a new disposition. The new disposition row supersedes the old one. If an NFR was already sent, the history keeps it and the record shows the chip "NFR sent".
 preconditions:
@@ -1568,9 +1506,7 @@ brd:
   - BRRN.038 (p.14)
 actor: Marketing AO; System
 priority: Must have
-fit: CHANGE
 screens: Record page (Start NB Path); Quotation; Proposal (PRF)
-api: POST /api/v1/renewal/candidates/{ref}/nb-path
 description:
   - A renewal takes the New Business path when the disposition is For Quotation or For Proposal, or when the financial-impact check finds a change in premium, sum insured, rate or charges beyond the tolerance (BRRN.038). The account is tagged "For Proposal / New Business Path" and the audit trail records the reason of the conversion.
   - "**Start NB Path** creates a package quotation or a non-package PRF pre-filled from the expiring account and linked by the renewal reference. The accounts it produces have business type RENEWAL and point to the expiring ARN (shared change BT0, decision D1). The candidate follows the quotation or PRF and closes RENEWED on booking or LOST on decline."
@@ -1610,9 +1546,7 @@ brd:
   - BRD 1.008.3, 1.008.3.1-1.008.3.4 (p.57-58)
 actor: Marketing TL (non-CBG)
 priority: Must have
-fit: NEW
 screens: TL Review (Review in progress list; Return, Post)
-api: POST /api/v1/renewal/candidates/return; POST /api/v1/renewal/candidates/post
 description:
   - The TL sees every dispositioned account of the unit in one scrollable view with status "Review in progress" until it is posted. Endorsements are reflected on the mother policy (FR-RN-027).
   - The TL returns accounts (single, multiple, all except, all) to the assigned AO with a reason and remarks; BIBS sets status Returned and the red flag. Or the TL posts them after reviewing the details; each posted account moves on by its disposition.
@@ -1653,9 +1587,7 @@ brd:
   - BRRN.023 AC5 (p.5), BRRN.031 AC4 (p.10), BRRN.035 negative scenario 2d (p.12)
 actor: Marketing TL (RNW_OVERRIDE)
 priority: Must have
-fit: NEW
 screens: TL Review (Override Outstanding Balance); record page (Override)
-api: POST /api/v1/renewal/candidates/override
 description:
   - The check OUTSTANDING_PREMIUM flags an account whose expiring invoice family has an open premium balance above the threshold, and routes it to Review. The TL sees the flag, selects one or several flagged accounts and overrides it with mandatory remarks; the block clears for those accounts. This is the renewal override that BRD-1 deferred (OOS-1).
   - The same controlled override clears a bucket, a system disposition or an insurer-response mismatch, and cancels an RA to unlock an account. There is no approver step; every override is explicit, needs remarks and is logged.
@@ -1698,9 +1630,7 @@ brd:
   - BRD 3.004.4 (p.116)
 actor: Processing TL; Processing Officer
 priority: Must have
-fit: CHANGE
 screens: Processing Worklist (Upload Dispositioned File); bulk upload wizard RNW_DISPOSITION_UPLOAD
-api: Bulk handler RNW_DISPOSITION_UPLOAD
 description:
   - When dispositioning is done outside the system, Processing selects one or more dispositioned files and uploads them. BIBS validates each row (renewal reference mandatory; disposition, reason, remarks and updated fields), updates the valid accounts in bulk, pushes them to the processing list and shows a confirmation with the errors per row.
   - When the user declares the file complete for an expiry range and unit, the candidates of that range and unit missing from the file are tagged Not for Renewal with reason "Non-renewable Accounts" by the system and kept out of processing (3.004.4). The tag can be reviewed and re-opened (FR-RN-047).
@@ -1744,9 +1674,7 @@ brd:
   - BRD 3.005.1, 3.005.1.1, 3.005.1.1.1, 3.005.1.1.2, 3.005.1.2, 3.005.1.2.1, 3.005.1.2.2, 3.005.1.3, 3.005.1.4, 3.005.1.5, 3.005.1.6 (p.117-118)
 actor: Processing TL
 priority: Must have
-fit: CHANGE
 screens: Processing Worklist (Assign PO, Assign to Me)
-api: POST /api/v1/renewal/processing/assign
 description:
   - The Processing TL selects accounts of the For Processing tab (single, multiple, all except, all), searches the Processing Officer by name or ID or assigns them to himself, and pushes them. He also re-assigns accounts to another PO.
 preconditions:
@@ -1779,9 +1707,7 @@ brd:
   - BRD 4.003.1, 4.003.1.3, 4.003.1.4 (p.149)
 actor: Processing TL; Processing Officer
 priority: Must have
-fit: CHANGE
 screens: Processing Worklist (tabs For Processing, In Processing, With Insurer, Insurer Responded, Returned)
-api: GET /api/v1/renewal/candidates?stage=...&assignedPo=
 description:
   - The Processing Worklist shows the accounts of the processing stages in one scrollable view with filter and sort on every column, the search of FR-RN-013 and the tabs by stage. An officer sees his own accounts; the TL sees the unit's.
 preconditions:
@@ -1809,9 +1735,7 @@ brd:
   - BRD 4.005.1, 4.005.2, 4.005.3, 4.005.3.1-4.005.3.4 (p.151-152)
 actor: Processing TL; Processing Officer
 priority: Must have
-fit: CHANGE
 screens: Record page (Renewal Account); Account (BRD-1 draft edit)
-api: PUT /api/v1/accounts/{arn} (draft of business type RENEWAL)
 description:
   - When a For Renewal candidate reaches FOR_PROCESSING, BIBS creates the renewal account as a draft BRD-1 account of business type RENEWAL, with the same client, product, items, insurer, PN and mortgage, and contact as the expiring account, the next period (start = old end + 1 day, same term), and a link to the expiring ARN. A renew-as-is keeps the package version of the expiring account.
   - Processing updates the data of the renewal account. Mandatory fields are prompted and the push is refused while any are missing. Editing is disabled once placement is completed.
@@ -1850,9 +1774,7 @@ brd:
   - BRRN.038 (p.14)
 actor: Processing TL; Processing Officer; System
 priority: Must have
-fit: CHANGE
 screens: Record page (Computations tab)
-api: GET /api/v1/renewal/candidates/{ref}/computations
 description:
   - The Computations tab shows every calculated field of the renewal account (premium breakdown by component, taxes, commission, total), rated with purpose RENEWAL, next to the expiring invoice (premium, sum insured, rate, commission and charges) with the difference.
   - The check FINANCIAL_IMPACT compares them. A difference beyond the tolerance fails the check, routes the account to Review and, by the matrix, to the NB path (FR-RN-048); the acceptance of the client must then be recorded with its method.
@@ -1882,9 +1804,7 @@ brd:
   - BRD 4.006.2, 4.006.2.1-4.006.2.7 (p.152-153)
 actor: Processing TL; Processing Officer
 priority: Must have
-fit: CHANGE
 screens: Processing Worklist; record page (Return to Marketing)
-api: POST /api/v1/renewal/candidates/return-to-marketing
 description:
   - Processing returns accounts (single, multiple, all except, all) to the assigned Marketing AO (stage FOR_DISPOSITION) or to the Marketing TL (FOR_TL_REVIEW) with a reason and remarks. BIBS flags them Returned and pushes them.
 preconditions:
@@ -1922,9 +1842,7 @@ brd:
   - BRD 3.009.2-3.009.5.1, 4.007.2-4.007.5.1 (p.126-127, 158-159)
 actor: Processing TL; Processing Officer
 priority: Must have
-fit: NEW
 screens: Insurer Batches (build, preview, download, send)
-api: POST /api/v1/renewal/insurer-batches; GET .../{no}.xlsx; POST .../{no}/send
 description:
   - Processing selects the expiry range and the insurer from a searchable list. BIBS builds a batch (RIB-yyyy) of the For Renewal accounts of that insurer with the 28 columns of BRD 3.009.1.4 (section 6.4) and shows them in one scrollable view.
   - The user downloads the extract as .xlsx, saves and prints it with preview and settings, and sends it to the insurer's renewal (or placement) mailbox, encrypted and password-protected; the password goes in a separate e-mail.
@@ -1968,9 +1886,7 @@ brd:
   - BRRN.035 (p.11-12)
 actor: Processing TL; Processing Officer; System
 priority: Must have
-fit: NEW
 screens: Insurer Batches (Upload Response, Match Review); record page (Insurer tab)
-api: Bulk handler RNW_INSURER_RESPONSE
 description:
   - Processing uploads the insurer's dispositioned file and views it. Each row carries the renewal reference and the expiring policy number, the response (Renew As Is / Approve, Revise, Reject), the insurer reference and, for Revise, the revised premium, sum insured, rate or terms. The response is captured once and is the single source of truth of the renewal's progress.
   - A matched Renew As Is advances the account to RA_READY without re-keying and without changing terms, price or structure. Revise returns it to processing and runs the financial-impact check. Reject tags it Not for Renewal (reason insurer declined) or sends it back to Marketing to re-market.
@@ -2020,9 +1936,7 @@ brd:
   - BRD 2.004.9 (p.84)
 actor: Marketing TL / AO; Processing TL / Officer (RNW_RA_GENERATE)
 priority: Must have
-fit: NEW
 screens: Letters (tabs RA Ready, RA Generated, RA Sent; Generate, Preview, Download ZIP)
-api: POST /api/v1/renewal/letters/ra (job RNW_LETTER_BATCH); GET /api/v1/renewal/letters/{no}.pdf
 description:
   - Authorised users select RA Ready accounts (single, multiple, all except, all) and generate the RA as **First Notice** or **Second Notice** from the latest approved template. The RA contains the policy details, the renewal terms, the premium and the BDOI contacts. Generation runs as a job with progress.
   - Generation locks the account on the Marketing side, so disposition and editing are disabled (2.004.9). Only an RA cancellation by a user with RNW_OVERRIDE unlocks it.
@@ -2069,9 +1983,7 @@ brd:
   - BRRN.010 (p.27-28), restating BRD 1.010.6, 1.010.7, 2.009.6, 2.009.7, 2.009.7.1, 3.011.6, 3.011.7, 3.011.7.1, 4.09.6, 4.09.7 (p.77-78, 107-108, 147-148, 178-179)
 actor: Marketing TL / AO; Processing TL / Officer (RNW_RA_SEND)
 priority: Must have
-fit: NEW
 screens: Letters (tab RA Generated; Send in Batch, Extract Details)
-api: POST /api/v1/renewal/letters/send (job RNW_LETTER_BATCH)
 description:
   - The user extracts the details needed for sending (report RNW-RA-DISPATCH) and sends the generated RAs in batch. Each client receives one e-mail with the RA as an encrypted, password-protected PDF, and the password in a separate e-mail. The account status becomes RA Sent / Awaiting Response.
   - Every action, including failures, is logged with the user, the time and the accounts.
@@ -2107,9 +2019,7 @@ brd:
   - BRRN.001 (p.22)
 actor: Marketing / Processing user (RNW_RA_GENERATE, RNW_RA_SEND)
 priority: Must have
-fit: NEW
 screens: Letters (NAL tab)
-api: POST /api/v1/renewal/letters/nal
 description:
   - For expiring policies that need neither an RA nor an NFR, the user selects one or several eligible accounts and generates the No Advice Letter (NAL) from its template. BIBS sends it to the client's registered e-mail, stores it, updates the account status to NAL Sent and shows a confirmation.
 preconditions:
@@ -2140,9 +2050,7 @@ brd:
   - BRRN.037 (p.13)
 actor: System (job RNW_NRNS_LETTERS, RNW_EXPIRY_SWEEP)
 priority: Must have
-fit: NEW
 screens: Letters (NRNS tab); Expiry List (NRNS chip)
-api: Jobs RNW_NRNS_LETTERS, RNW_EXPIRY_SWEEP
 description:
   - BIBS classifies as NRNS (No Renew / No Submit) the accounts that are not yet submitted at the checkpoint (no disposition, or For Renewal without RA acceptance). At the checkpoint (90 days before expiry by default) the daily job generates a reminder letter; policies already submitted or in progress are excluded.
   - At the non-acceptance point (expiry by default) BIBS sends the non-acceptance letter, closes the candidate as EXPIRED_UNRENEWED and notifies the owners.
@@ -2175,9 +2083,7 @@ brd:
   - BRRN.038 AC3 (p.14)
 actor: Marketing / Processing user (RNW_ACCEPT); System
 priority: Must have
-fit: CHANGE
 screens: Record page (Record Acceptance); bulk upload RNW_ACCEPTANCE
-api: POST /api/v1/renewal/candidates/{ref}/acceptance
 description:
   - The user records the client's acceptance of the RA with its method - e-mail (attachment RA_ACCEPTANCE), signed RA (attachment SIGNED_RA) or payment (the payment gate's evidence) - and the evidence. BIBS marks the renewal Accepted.
   - When there is no unresolved exception and the payment rules are satisfied, BIBS moves the renewal account through the account workflow without resubmission (system fast track), places it (slip generated and sent when automatic placement is on) and, on policy issuance, queues it for booking. The booked invoice carries business type RENEWAL and the candidate closes RENEWED. Standard placement, booking and issuance SLAs apply.
@@ -2224,9 +2130,7 @@ brd:
   - BRRN.026 (p.6-7)
 actor: Contact Center user
 priority: Must have
-fit: CHANGE
 screens: Follow-ups (list); record page (Remarks & Follow-ups, Documents)
-api: POST /api/v1/renewal/candidates/{ref}/followups; attachments
 description:
   - Contact Center users view the renewal lists in a read-only projection and record follow-ups on an account - channel, outcome, remarks and next action date - to show the renewal status. They upload documents received from the client. Every change is logged with user and time; access is role-restricted.
 preconditions:
@@ -2266,9 +2170,7 @@ brd:
   - BRRN.021 (p.4), BRRN.010 (p.27-28)
 actor: System (RenewalHandOff); Marketing AO (Non-CBG Retail)
 priority: Must have
-fit: NEW
 screens: Record page (source Submitted Policy); Letters
-api: Port RenewalHandOff (implemented by Renewal)
 description:
   - Renewal owns the renewal of submitted policies from the hand-off on (decision D2). When the Submitted Policies expiry scan or the "Renew with BDOI" action hands a masterlist record over, Renewal creates a candidate with source SUBMITTED_POLICY and the SBM number, initiates it at once (the scan is the explicit initiation), runs the checks and the matrix, creates the renewal account (business type RENEWAL, renewal-of reference = SBM number, the assigned insurer), requests the 30-day hold cover and queues the letters - RA (generic or FFY template), reminder, SFU for mortgaged accounts, NRNS and NAL - in the one renewal letter engine. Print letters go through the Submitted Policies mail-house port.
   - Renewal answers the port's status query (open, or closed as renewed, not renewed, lost or expired unrenewed, with the reason) so the masterlist can close records whose renewal never books.
@@ -2307,9 +2209,7 @@ brd:
   - BRD 3.010.7 (p.145)
 actor: Marketing TL; Processing TL; all Renewal users
 priority: Must have
-fit: NEW
 screens: Renewal Home
-api: GET /api/v1/renewal/home
 description:
   - The Renewal Home shows tiles by stage and bucket, accounts expiring in 30, 60, 90 and 140 days, renewals at risk, exceptions, insurer batches overdue and letters failed. The Marketing TL sees the accounts assigned per AO and the Processing TL per Processing Officer (open, overdue against expiry, returned), with the ageing to expiry. Each tile opens its filtered list, which can be exported.
 preconditions:
@@ -2337,9 +2237,7 @@ brd:
   - BRD 1.009.1-1.009.6, 2.008.1-2.008.6, 3.010.1-3.010.6, 4.008.1-4.008.6 with their sub-IDs (p.58-75, 89-106, 128-145, 159-177)
 actor: All report users (RNW_REPORT_VIEW)
 priority: Must have
-fit: NEW
 screens: Renewal Reports (RNW-STATUS)
-api: Report RNW-STATUS; GET /api/v1/reports/RNW-STATUS/export?format=
 description:
   - The user selects and changes the expiry date range and the twenty criteria of section 6.1, each with single, multiple, all except and all selection and search in the drop-down. The report shows the overall renewal status per invoice, all rows in one scrollable view, with 37 columns for Marketing and 40 for Processing (section 6.3), and a summary of 34 counters (section 6.5).
   - The report exports to .xlsx and .pdf, is saved, printed with preview and settings, and can be saved as a variant. Data is limited to the user's scope; the report is generated within 20 seconds.
@@ -2372,9 +2270,7 @@ brd:
   - BRRN.036 (p.12-13)
 actor: User (Marketing TL, Unit Head); System (escalation)
 priority: Must have
-fit: NEW
 screens: Renewal Reports (RNW-LISTING); Renewal Home (At risk tile)
-api: Report RNW-LISTING; alert RNW_RENEWAL_AT_RISK
 description:
   - Users generate renewal listings by unit and segment (for example UH, IBG, Leasing), by expiry window (current month, prior month, future or chosen months) and by status (Renewed, Unrenewed, Expired). The listings are live, viewed on screen and extracted, with the ageing to expiry.
   - For IBG and Leasing the listing supports escalation. Accounts not disposed or not accepted within the escalation days before expiry raise the alert RNW_RENEWAL_AT_RISK to the unit head and appear flagged as at risk.
@@ -2405,9 +2301,7 @@ brd:
   - BRRN.001, 010, 025, 037 (p.6, 13, 22, 27-28)
 actor: Report users (RNW_REPORT_VIEW)
 priority: Must have
-fit: NEW
 screens: Renewal Reports
-api: Reports RNW-SANITATION, RNW-DECISIONS, RNW-LAMD-MATCH, RNW-INSURER-EXTRACT, RNW-RA-DISPATCH, RNW-WORKLOAD
 description:
   - Beside the status report and listings, the Renewal report category holds the check results and bucket changes (RNW-SANITATION), the dispositions with matrix rule and version and the overrides with rationale (RNW-DECISIONS), the LAMD match and routing (RNW-LAMD-MATCH), the 28-column extract per insurer (RNW-INSURER-EXTRACT), the letter log with delivery status (RNW-RA-DISPATCH) and the accounts per AO and PO by stage (RNW-WORKLOAD). Section 6.1 lists them.
 preconditions:
@@ -2436,9 +2330,7 @@ brd:
   - BRD 6.002.2.23 (p.185)
 actor: Business Administrator (LOV_MANAGE)
 priority: Must have
-fit: CONFIGURE
 screens: Lists of Values (Broking Setup)
-api: /api/v1/lov
 description:
   - The Business Administrator views, adds, edits and ends the values of the renewal lists (section 9.2) with an effective date; a change takes effect on its date. "Delete" end-dates a value, since records that used it must stay readable. Each change is authorised by a checker.
 preconditions:
@@ -2475,9 +2367,7 @@ brd:
   - BRD 6.002.2.25 (p.185)
 actor: Business Administrator (RNW_TEMPLATE_MAINTAIN)
 priority: Must have
-fit: CONFIGURE
 screens: Document Templates
-api: /api/v1/docgen/templates
 description:
   - The Business Administrator updates the RA template and the other renewal templates (section 6.6). A new template version is used for every document generated after its activation; documents already generated keep their version.
 preconditions:
@@ -2504,9 +2394,7 @@ brd:
   - BRRN.023 (p.4-6), BRRN.030 (p.8-9), BRRN.034 (p.11), BRRN.009 (p.26-27)
 actor: Business Administrator (RNW_SETUP); checker (MASTER_AUTHORIZE)
 priority: Must have
-fit: NEW
 screens: Renewal Setup (Check Settings, Bucket Rules, Decision Matrix, Non-renewable Risk Codes, Parameters)
-api: /api/v1/renewal/setup/**
 description:
   - The Renewal Setup screen holds the business rules that govern the renewal without IT - the severity and parameters of each check, the bucket rule sets, the decision matrix, the non-renewable risk codes and the renewal parameters (lead days, thresholds, notice days). Rule sets and matrices are versioned drafts until a checker activates them; parameters are changed through the platform parameter screen.
 preconditions:

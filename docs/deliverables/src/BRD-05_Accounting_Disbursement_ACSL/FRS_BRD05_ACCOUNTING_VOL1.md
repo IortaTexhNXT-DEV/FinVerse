@@ -277,9 +277,7 @@ title: Access Accounting and administration with a user profile
 brd: [FRBS 1.1.0 (p.50), FRBS 1.1.1 (p.50), BASAU 1.1.0 (p.127), BASAU 1.1.1 (p.127)]
 actor: FRBS users; Business and System Administrators
 priority: Must have
-fit: FIT
 screens: Login; Home; menu groups Finance, Planning and Closing, Setup and Administration
-api: POST /api/v1/auth/login
 description:
   - Users reach BIBS from any BDO-issued device with a browser; the screens are responsive. Each user logs in with their own profile, and the menu shows only the screens their roles allow (section 3).
 preconditions:
@@ -311,9 +309,7 @@ title: Warn before the idle time-out and before the forced log-out
 brd: [FRBS 1.1.2 (p.50), FRBS 1.1.3 (p.50), BASAU 1.1.2 (p.128), BASAU 1.1.3 (p.128)]
 actor: System
 priority: Must have
-fit: CONFIGURE
 screens: All screens (session dialog)
-api: "-"
 description: After 15 minutes without activity BIBS shows an inactivity warning; the user continues or is logged out. 30 minutes before the end of the session BIBS warns that the system will log the user out. Both times are parameters.
 preconditions:
   - "The user is logged in."
@@ -342,9 +338,7 @@ title: Enter the monthly revaluation rate
 brd: [FRBS 2.2.0 (p.51), FRBS 3.6.0 (p.65)]
 actor: GL Team Head / Section Head
 priority: Must have
-fit: FIT
 screens: Setup > Currencies & Rates (card Monthly revaluation rates)
-api: "GET/POST /api/v1/currencies/revaluation-rates; POST .../revaluation-rates/{yyyy-MM}/copy-to-book"
 description:
   - The Section Head enters, once a month, the revaluation rate of each foreign currency for the month end. BIBS keeps it as the CLOSING rate of that date; the FX revaluation (FR-AC-043) uses it.
   - When OPS_BOOK_RATE_SOURCE is CLOSING_PREV_MONTH, the job BOOK_RATE_FROM_CLOSING copies the rates of the month that ends as the BOOK rates of the next month, never overwriting a BOOK rate already entered. "Copy to BOOK" does it on demand.
@@ -385,9 +379,7 @@ title: Set up, view and edit the chart of accounts
 brd: [FRBS 2.3.0 (p.51), FRBS 2.3.4 (p.53), FRBS 2.3.5 (p.53), FRBS 3.6.0 (p.65)]
 actor: GL Team Lead (maintain); GL Team Head (authorise)
 priority: Must have
-fit: FIT
 screens: General Ledger > Chart of Accounts
-api: "GET/POST /api/v1/coa/accounts; PUT .../accounts/{id}; authorisation through My Approvals"
 description: FRBS keeps the chart of accounts in BIBS - levels (group, main, sub, micro), class, category, parent, postable flag, control account and sub-ledger type, currencies, cost-centre requirement, revaluation flag, negative-balance policy, short code, branch and role restrictions, freeze and close. New and changed accounts are maker-checker. Users view the details of any account.
 preconditions:
   - "The maker has MASTER_MAINTAIN; the authoriser MASTER_AUTHORIZE."
@@ -430,9 +422,7 @@ title: Upload the chart of accounts
 brd: [FRBS 2.3.1 (p.51)]
 actor: GL Team Lead (COA_UPLOAD); GL Team Head (authorise)
 priority: Must have
-fit: CHANGE
 screens: General Ledger > Chart Upload (Upload Chart, Upload History)
-api: "/api/v1/coa/uploads (template, upload, rows, commit, cancel, report)"
 description: FRBS uploads an XLSX, CSV or ODS file of parent and child accounts. BIBS validates every row (parent, class, level, category, postable, control, sub-ledger type, currency, flags), shows the valid and invalid rows, and on commit creates the accounts pending authorisation, parents before children. A parent may be an existing account or an earlier row of the file. The error report lists every refused row with its reason.
 preconditions:
   - "The user has COA_UPLOAD."
@@ -470,9 +460,7 @@ title: Generate account numbers and roll child accounts up to their parent
 brd: [FRBS 2.3.2 (p.52)]
 actor: GL Team Lead; System
 priority: Must have
-fit: CHANGE
 screens: General Ledger > Chart of Accounts (Numbering Schemes)
-api: "GET/PUT /api/v1/coa/numbering; GET /api/v1/coa/accounts/next-code"
 description: FRBS defines a numbering scheme per parent account (separator none, "." or "-", and a width of 1 to 6 digits). When an account is created or uploaded with a blank code, BIBS gives it the next free number under its parent; numbers already used under the prefix are never reused. Every child is linked to its parent, and the statements and schedules roll child balances up to the parent.
 preconditions:
   - "The user has MASTER_MAINTAIN."
@@ -510,9 +498,7 @@ title: Search accounts by name, short code or number
 brd: [FRBS 2.3.3 (p.52)]
 actor: FRBS users
 priority: Must have
-fit: CHANGE
 screens: Chart of Accounts (search); journal lines (account entry)
-api: "GET /api/v1/coa/accounts?q=; GET /api/v1/coa/accounts/lookup?key="
 description: Each account may have a short code, unique per company regardless of case. The chart search finds accounts by code, name or short code, and a journal line accepts the short code in place of the account code (FR-AC-032).
 preconditions:
   - "The user has JOURNAL_VIEW or MASTER_VIEW."
@@ -541,9 +527,7 @@ title: Select, run, view and copy reports on demand
 brd: [FRBS 2.4.0 (p.53), FRBS 2.4.1 (p.53), FRBS 2.4.2 (p.53), FRBS 2.4.3 (p.54), FRBS 2.4.6 (p.54), FRBS 2.4.8 (p.55), FRBS 2.4.10 (p.55)]
 actor: FRBS users
 priority: Must have
-fit: FIT
 screens: Report Centre; Report; Accounting Reports > Report Pack
-api: "GET /api/v1/reports; POST /api/v1/reports/{code}/run; GET .../export?format="
 description: FRBS users run any report they are allowed to see at any time, without IT. They choose the report from the catalogue by category, enter its parameters (date range or as-of date, company, branch), view the result on screen, preview the PDF and export to XLSX, ODS, PDF or CSV. The on-screen table can be selected and copied into Excel or Word.
 preconditions:
   - "The user has the view permission of the report (for example FRBS_REPORT_VIEW)."
@@ -577,9 +561,7 @@ title: Filter every column of a report
 brd: [FRBS 2.4.4 (p.54)]
 actor: FRBS users
 priority: Must have
-fit: CHANGE
 screens: Report (column filter row)
-api: "GET .../export?filter=column:text"
 description: The report viewer has a filter row under the column headings. The user filters the loaded rows by any column; an export applies the same filters to the detail rows and notes them on the file.
 preconditions:
   - "A report result is on screen."
@@ -604,9 +586,7 @@ title: Download or print several reports at once
 brd: [FRBS 2.4.5 (p.54), FRBS 2.4.7 (p.54)]
 actor: FRBS users
 priority: Must have
-fit: CHANGE
 screens: Report Centre > Report Batch
-api: "POST /api/v1/reports/batches; GET /api/v1/reports/batches, /{id}, /{id}/file"
 description: A report batch runs several reports with shared parameters and returns one ZIP of files in a chosen format, or one merged PDF for printing. Each report checks its own permission; a report that fails is listed and the others are delivered (status COMPLETED, PARTIAL or FAILED). Only the creator sees a batch.
 preconditions:
   - "The user may run each report of the batch."
@@ -635,9 +615,7 @@ title: Set the print options of a report
 brd: [FRBS 2.4.9 (p.55)]
 actor: FRBS users
 priority: Must have
-fit: CHANGE
 screens: Report (Export dialog); Report Batch
-api: "GET .../export?format=PDF&paper=&orientation=&fitToWidth="
 description: Before printing, the user chooses the paper size, the orientation and whether to fit the columns to the page width. The header and footer repeat on every page.
 preconditions:
   - "A report result is on screen."
@@ -668,9 +646,7 @@ title: Post every financial transaction to the GL and the sub-ledger
 brd: [FRBS 2.5.0 (p.55), FRBS 3.1.0 (p.62)]
 actor: System
 priority: Must have
-fit: FIT
 screens: Journals; Account Inquiry; Party Statement; Accounting Engine (event log)
-api: Accounting engine (business events)
 description: Every BIBS module that has a financial effect publishes a business event (booking, receipt, remittance, adjustment, commission, disbursement, service fee, correction). The accounting engine builds the journal lines from the rules maintained by Comptrollership, posts them in the same transaction, and records or matches the open items of the parties in the sub-ledger. GL accounts are never chosen in code.
 preconditions:
   - "An active accounting rule exists for the event type."
@@ -703,9 +679,7 @@ title: Assign manual entries for posting and work the assigned list
 brd: [FRBS 2.5.1 (p.56), FRBS 2.5.2 (p.56), FRBS 2.5.3 (p.56)]
 actor: GL Team Lead / Head (assign); poster
 priority: Must have
-fit: "CHANGE (2.5.1), FIT (2.5.2, 2.5.3)"
 screens: General Ledger > Journals (Assign, Assigned to me); Journal
-api: "POST /api/v1/journals/assign; GET /api/v1/journals/assignees; GET /api/v1/journals?assignedTo="
 description: A TL or Head assigns submitted journals to a poster, or re-assigns them. Each poster filters Journals on "Assigned to me", selects an entry and views its lines, dimensions, attachments and history before posting.
 preconditions:
   - "The assigner has JOURNAL_ASSIGN; the assignee holds JOURNAL_AUTHORIZE."
@@ -736,9 +710,7 @@ title: Prepare manual entries
 brd: [FRBS 2.8.0 (p.59), FRBS 2.8.1 (p.60), FRBS 2.8.2 (p.60), FRBS 2.8.5 (p.61)]
 actor: GL Officer; GL Team Lead
 priority: Must have
-fit: "FIT (2.8.0, 2.8.2, 2.8.5), CHANGE (2.8.1)"
 screens: General Ledger > New Journal; Edit Journal
-api: "POST /api/v1/journals; PUT .../{id}; POST .../{id}/submit; journal upload /api/v1/journals/upload"
 description: The GL Officer prepares a MANUAL, ADJUSTMENT or ACCRUAL journal - journal type, value date, reference, narration, optional "reverse on" date, and lines with the account (by code or short code; the name fills in), debit or credit, description, cost centre and other dimensions. The journal is saved as a draft and submitted for review and posting. Journals can also be uploaded from a file or generated from recurring templates.
 preconditions:
   - "The user has JOURNAL_CREATE; the value date is in an open period."
@@ -784,9 +756,7 @@ title: Reverse accruals automatically on their reversal date
 brd: [FRBS 2.8.1 (p.60)]
 actor: System
 priority: Must have
-fit: CHANGE
 screens: Journals (REVERSAL journals); Scheduled Jobs
-api: Job JOURNAL_AUTO_REVERSAL
 description: Every day at 00:05 Manila the job JOURNAL_AUTO_REVERSAL posts, for each posted manual journal whose "reverse on" date has come, a REVERSAL system journal that mirrors it, linked to the original. Each reversal posts in its own transaction.
 preconditions:
   - "A posted manual journal has a reverse-on date of today or earlier and is not reversed."
@@ -817,9 +787,7 @@ title: Validate entries and refuse errors
 brd: [FRBS 2.5.4 (p.56), FRBS 2.5.5 (p.57), FRBS 2.8.4 (p.61), FRBS 3.6.0b (p.66)]
 actor: System
 priority: Must have
-fit: "CHANGE (2.5.4, 2.8.4, 3.6.0b), FIT (2.5.5)"
 screens: New Journal; Journal; confirmation dialog
-api: "POST .../journals/{id}/submit, /approve; GET .../journals/{id}/warnings"
 description: BIBS validates every manual journal on submission and again on posting. It refuses a journal that has no debit or no credit line, is not balanced, posts to a non-postable, frozen or closed account, uses a currency or branch the account does not allow, is dated outside the permitted window, or would leave a BLOCK account with a negative balance. WARN accounts give a warning that the user sees before confirming. All errors are listed together.
 preconditions:
   - "A journal is submitted or approved."
@@ -854,9 +822,7 @@ title: Confirm the transaction details before sending them on
 brd: [FRBS 2.5.10 (p.58), FRBS 2.8.3 (p.60)]
 actor: GL Officer; poster
 priority: Must have
-fit: CHANGE
 screens: Confirm posting dialog (Journals)
-api: "-"
 description: Before a journal is submitted or posted, BIBS shows a confirmation dialog with the totals, the number of lines, the dates and any warnings. The user confirms or goes back.
 preconditions:
   - "The user clicks Submit or Post."
@@ -882,9 +848,7 @@ title: Post or return entries, one or several at a time, with remarks
 brd: [FRBS 2.5.6 (p.57), FRBS 2.5.7 (p.57), FRBS 2.5.8 (p.57), FRBS 2.5.9 (p.57)]
 actor: GL Team Lead / Head (JOURNAL_AUTHORIZE)
 priority: Must have
-fit: "CHANGE (2.5.6), FIT (2.5.7-2.5.9)"
 screens: Journals (bulk posting); Journal (Post, Return to Maker); My Approvals
-api: "POST /api/v1/journals/{id}/approve, /{id}/reject; POST /api/v1/journals/bulk-approve"
 description: The poster posts a single journal or selects several and posts them together. Each journal is validated and posted in its own transaction with every control; the result lists the successes and the refusals. The poster returns a journal to its maker with remarks ("Return to Maker"); the maker corrects and resubmits it.
 preconditions:
   - "The user has JOURNAL_AUTHORIZE and did not submit the journal."
@@ -920,9 +884,7 @@ title: Edit accounting entries
 brd: [FRBS 2.9.0 (p.61)]
 actor: GL Officer (maker)
 priority: Must have
-fit: FIT
 screens: Edit Journal; Journal (Reverse)
-api: "PUT /api/v1/journals/{id}; POST .../{id}/reverse"
 description: Draft and returned journals are edited by their maker. A posted journal is never edited; it is corrected by reversal and a new entry, or through an ACSL correction entry (Volume 2, FR-AS-021).
 preconditions:
   - "The journal is DRAFT or REJECTED (edit); POSTED (reverse, JOURNAL_REVERSE)."
@@ -952,9 +914,7 @@ title: Schedule and run the month-end close of the GL books
 brd: [FRBS 2.6.0 (p.58; Add.1 p.35), FRBS 2.6.1 (p.58)]
 actor: GL Team Lead / Head (GL_CLOSE_SCHEDULE); System
 priority: Must have
-fit: CHANGE
 screens: Planning & Closing > GL Close & Cut-Off (Month-End Close)
-api: "GET/POST /api/v1/closing/close-schedules; GET .../close-schedules/proposal; POST .../close-schedules/{id}/cancel; POST /api/v1/closing/close-now"
 description:
   - FRBS schedules the close of the previous month's GL books on a date and time of its choice in the current month (Addendum 1). BIBS proposes the 2nd banking day of the month at 17:00 Manila, skipping company holidays. Every 15 minutes the job GL_PERIOD_CLOSE runs the closes that are due - the period-end checklist, then the period close. A refused close is recorded on the schedule with the blocking items and raises GL_CLOSE_FAILED. FRBS can also close at once.
   - With CLOSE_ONLY_PREVIOUS_MONTH on, only the month before the close date may be closed.
@@ -996,9 +956,7 @@ title: Close the year and verify that the nominal accounts are zero
 brd: [FRBS 2.7.0 (p.59), FRBS 2.7.1 (p.59)]
 actor: GL Team Lead
 priority: Must have
-fit: "FIT (2.7.0), CHANGE (2.7.1)"
 screens: Planning & Closing > Period-End & Year-End (Year-End panel)
-api: "GET /api/v1/closing/year-end/checklist, /preview; POST .../year-end/close, .../year-end/verify"
 description: The TL closes the fiscal year by 15 April of the next year. The year-end close zeroes the income and expense accounts into retained earnings and opens the next year. BIBS then verifies the close - the nominal balance as of the year end and the trial-balance difference must both be zero - and stores and shows the result. The alert YEAR_END_CLOSE_DUE is raised 15 days before the deadline while the year is open.
 preconditions:
   - "Every period of the year is closed; the user has PERIOD_END_RUN."
@@ -1031,9 +989,7 @@ title: Close the broking books automatically at month end
 brd: [FRBS 3.4.0 (p.64), FRBS 3.4.1 (p.65)]
 actor: System; GL Team Lead (reopen)
 priority: Must have
-fit: CHANGE
 screens: Planning & Closing > GL Close & Cut-Off (Broking Books Cut-Off)
-api: "GET /api/v1/closing/broking-books, /broking-books/pending; POST .../broking-books/close, /broking-books/reopen"
 description:
   - On the last day of each month at 23:00 Manila the job BROKING_BOOKS_CLOSE closes the broking books of the month. From then on the accounting engine refuses events of the broking source modules (booking, Operations, cashiering, remittance, adjustment, commission, disbursement) dated in that month, without any change to those modules. The GL itself stays open for FRBS adjustments until the GL close (FR-AC-040).
   - The screen shows the status of the cut-off and the pending broking items. A TL can close at once or reopen the books with a reason.
@@ -1073,9 +1029,7 @@ title: Revalue USD balances at the revaluation rate
 brd: [FRBS 3.5.0 (p.65)]
 actor: GL Team Lead (PERIOD_END_RUN)
 priority: Must have
-fit: CONFIGURE
 screens: Planning & Closing > FX Revaluation
-api: "GET /api/v1/closing/fx-revaluations/preview; POST /api/v1/closing/fx-revaluations"
 description: At month end the TL previews and runs the FX revaluation. BIBS revalues the balances of the accounts flagged "revaluation required" (USD receivables, payables, cash and bank) per account, branch and currency at the CLOSING rate of FR-AC-010, posts the difference to the unrealised FX gain or loss, and reverses it automatically on the first day of the next period. Open items are revalued for information. The register report GL-FXREV lists the revaluation.
 preconditions:
   - "The CLOSING rate of the month end exists."
@@ -1105,9 +1059,7 @@ title: Upload bank files and reconcile automatically
 brd: [FRBS 3.3.0 (p.63), FRBS 3.3.1 (p.63), FRBS 3.3.2 (p.64)]
 actor: GL Officer; System
 priority: Must have
-fit: "FIT (3.3.0), CHANGE (3.3.1, 3.3.2)"
 screens: Receivables > Bank Statements; Bank Reconciliation; Setup > Bank Statement Layouts
-api: "POST /api/v1/receivables/bank-rec/statements/file; GET/POST .../bank-rec/layouts; POST .../bank-rec/auto-match; .../matches; .../reconciliations/{id}/finalize"
 description:
   - FRBS keeps a statement layout per bank account (the columns of the bank's file). The GL Officer uploads the bank's cash-in-bank file (XLSX, ODS or CSV); BIBS maps it to the standard statement, imports it and runs the automatic matching at once.
   - The first matching pass pairs a book entry and a bank line that carry the same check number (in the reference or narration) and the same amount, on any date. The other rules then match the remaining lines on amount within a date window. The officer reviews the matches, matches or unmatches by hand, and finalises the reconciliation.
@@ -1147,9 +1099,7 @@ title: Report the unmatched transactions
 brd: [FRBS 3.3.3 (p.64)]
 actor: GL Officer
 priority: Must have
-fit: FIT
 screens: Report Centre; Bank Reconciliation
-api: "Reports FIN-BRS-UNREC-BOOK, FIN-BRS-UNREC-BANK, FIN-BRS-STMT"
 description: The reports list the book entries not matched to the bank, the bank lines not matched to the books, and the bank reconciliation statement (balance per bank, per books, reconciling items). They export to Excel and PDF.
 preconditions:
   - "A statement is imported."
@@ -1174,9 +1124,7 @@ title: Compute, approve and pay the service fee
 brd: [FRBS 2.10.0 (p.61); Appendix A VI (p.144)]
 actor: GL Officer (compute, submit); GL Team Lead / Head (approve)
 priority: Must have
-fit: NEW
 screens: Accounting Reports > Service Fee Runs; Service Fee Run; Service Fee Rates
-api: "GET/POST /api/v1/frbs/service-fee/runs; .../runs/{id}/recompute, /submit, /approve; GET/POST .../rules, .../recipients"
 description:
   - The service fee is the referrers' share of the commission that BDOI has fully collected - 2.5% or 1% of the commission net of the insurer's withholding tax, per market segment (p.144). FRBS computes a run for a period - BIBS takes the invoices whose payment status became paid in the period, are not cancelled, carry commission and are in no live run, and applies the rule of their segment in force on the day paid. It groups them into one line per service-fee segment, sales unit and currency. The payee of a line is the unit's recipient, else the unit; the cost centre is the recipient's, else the unit's, else the invoice's, else the cost-centre rules.
   - The run is submitted and approved by another user. Approval posts the accrual (FRBS_SERVICE_FEE_ACCRUE, expense against service fee payable) per line and sends each payout to Disbursement as a request of type SERVICE_FEE (Volume 2, FR-DS-020).
@@ -1229,9 +1177,7 @@ title: Record the liquidation report and tag released or liquidated
 brd: [FRBS 2.10.1 (p.62), FRBS 2.10.2 (p.62)]
 actor: GL Officer (SERVICE_FEE_TAG); System
 priority: Must have
-fit: NEW
 screens: Service Fee Run (lines - Release, Liquidate)
-api: "POST .../frbs/service-fee/runs/{id}/lines/{n}/release, /liquidate (multipart)"
 description: When Disbursement pays a line (status PAID), BIBS tags it RELEASED on that date. The officer can also tag a line released with the credit date. When the unit sends its liquidation report, the officer uploads it on the line and tags the line LIQUIDATED with the liquidation date. The run moves to RELEASED when every paid line is released and to LIQUIDATED when every line is liquidated.
 preconditions:
   - "The run is approved."
@@ -1269,9 +1215,7 @@ title: Derive and enforce the cost centre of every entry
 brd: [FRBS 3.1.1 (Add.2 p.5-6)]
 actor: Comptrollership (rules); System
 priority: Must have
-fit: CHANGE
 screens: Setup > Cost-Centre Rules; Accounting Engine (event log); Alerts
-api: "GET/POST /api/v1/accounting/cost-center-rules; PUT .../{id}"
 description: Accounts can require a cost centre. Comptrollership maintains cost-centre rules - source module, event type, sales unit, account officer - that give the cost centre of an entry. Before posting, the accounting engine fills a missing cost centre on a cost-centre-required line from the first matching rule. When none matches, the event is recorded FAILED with COST_CENTER_MISSING in the event register and the alert is raised, so the exception is logged and can be re-processed after the rule is added. Manual journals must carry the cost centre themselves.
 preconditions:
   - "The user has ACCOUNTING_RULE_MANAGE or MASTER_MAINTAIN (rules)."
@@ -1308,9 +1252,7 @@ title: Account for early incentives as Other Income
 brd: [FRBS 3.1.2 (Add.2 p.6)]
 actor: Comptrollership (rules); System
 priority: Must have
-fit: CONFIGURE
 screens: Accounting rules; Chart of Accounts
-api: Event OPS_REMIT_INCENTIVE (component INCENTIVE_INCOME)
 description: The early-remittance incentive posts through its own event component, separate from commission and premium, to the incentive income account (seed 4130), so the commission accounts are not touched. Comptrollership maps the component to an Other Income account of the BDOI chart. The source remittance batch is kept on the entry. CPC2 incentives use their own account (seed 4131, Volume 2 FR-DS-090).
 preconditions:
   - "The Other Income account exists in the chart."
@@ -1340,9 +1282,7 @@ title: Generate the FRBS report pack
 brd: [FRBS 3.2.0 (p.63); Appendix A (p.142-144)]
 actor: FRBS users (FRBS_REPORT_VIEW / EXPORT)
 priority: Must have
-fit: CHANGE
 screens: Accounting Reports > Report Pack
-api: GET /api/v1/frbs/report-pack
 description:
   - The Report Pack screen lists the reports of Appendix A by group - I End of Day, II GARD (bank format), III Subsidiaries Accounting, IV Schedules and Aging, V Performance / Mancom, VI Service Fee, VII Government - with 58 entries delivered (section 6.2). Each entry opens its report runner and exports at once to Excel or PDF; the reports also run in report batches (FR-AC-022).
   - End-of-day reports are the statement of condition, income statement, trial balance, journal entries (day book) and subsidiary ledger; the cash receipts and cash disbursements books are day-book variants and BIR books (FR-AC-063).
@@ -1373,9 +1313,7 @@ title: Run and maintain configurable account schedules
 brd: [FRBS 3.2.0 (p.63); Appendix A II-IV (p.142-143)]
 actor: GL team (run); GL Team Lead (MASTER_MAINTAIN, definitions)
 priority: Must have
-fit: CHANGE
 screens: Accounting Reports > Account Schedules (run, commentary, definitions editor)
-api: "GET/POST/PUT /api/v1/finreport/schedules; PUT .../{code}/comments; report GL-SCHEDULE"
 description:
   - Most Appendix A schedules are definitions of one engine, the report GL-SCHEDULE. A definition selects the postable accounts by code prefix or report group, groups the posted ledger by account, party, party and document, cost centre, branch or business line, in base currency or in one currency, and shows the chosen figures - opening, debits, credits, movement, closing, a comparative (previous month or year), the variance and variance %. Optional ageing spreads the balance over up to eight buckets, first in first out. An optional commentary column prints the month's comment per row.
   - 28 definitions are delivered (GARD-*, SUBS-*, SCH-*), all marked TO_CONFIRM. FRBS adds or changes definitions without a release and writes the monthly commentary.
@@ -1426,9 +1364,7 @@ title: Produce the Mancom, production, GAP, cash-flow and expense reports
 brd: [FRBS 3.2.0 (p.63); Appendix A IV-V (p.143-144)]
 actor: FRBS users
 priority: Must have
-fit: NEW
 screens: Accounting Reports > Report Pack (groups IV, V, VI)
-api: "Reports FRBS-MANCOM-MARKET, FRBS-BRANCH-PRODUCTION, FRBS-BRANCH-PRODUCTION-SUM, FRBS-EXPENSE-GROUPING, FRBS-GAP, FRBS-CASH-FLOW, FRBS-SUSTAINABILITY-PROD, FRBS-SERVICE-FEE, FRBS-SERVICE-FEE-DETAIL"
 description:
   - The reports that need broking data are built in the FRBS module - the market performance summary (premium and commission per segment and location, month, year to date, previous year to date, growth), branch production (detailed and summary), expenses per cost centre and account, the GAP report (open sub-ledger receivables and payables by time to maturity, gap and cumulative gap), the cash-flow report (opening cash and bank, receipts and payments per journal type, closing) and the service-fee summary and detail.
 preconditions:
@@ -1454,9 +1390,7 @@ title: Produce the BIR returns, alphalists, SAWT and books of accounts
 brd: [FRBS 3.2.0 (p.63); Appendix A VII (p.144)]
 actor: FRBS users (TAX_VIEW)
 priority: Must have
-fit: "FIT (2550-Q, 0619-E, 1601-EQ, QAP), NEW / CHANGE (others)"
 screens: Tax & Statutory > BIR Forms & Books; Tax Returns; Certificates Received
-api: "Reports TAX-VAT-2550Q, TAX-EWT-1601EQ, TAX-QAP, TAX-MAP, TAX-1604E, TAX-SAWT, TAX-0619F, TAX-1603, TAX-1702Q, TAX-1702, TAX-BOOK-GJ / PJ / SJ / CRB / CDB / SL, IC-BROKER-ASBO"
 description:
   - FRBS chooses a period and opens or exports each output - the VAT return 2550-Q with the relief lists, 1601-EQ and the quarterly, monthly and annual alphalists (QAP, MAP, 1604-E) from the withholding-tax worksheet, the SAWT from the register of certificates received (Volume 2, FR-DS-057), the 0619-F, 1603, 1702-Q (year to date) and 1702 worksheets from ledger movements of account prefixes and rates from parameters, the BIR books of accounts (general, purchase and sales journals, cash receipts and disbursements books, general ledger per account class with the balance forward) and the Insurance Commission Broker's Annual Statement of Business Operations.
 preconditions:
@@ -1489,9 +1423,7 @@ title: Maintain lists of values with approval
 brd: [BASAU 2.2.0 (p.128), BASAU 2.2.1 (p.128), BASAU 2.2.2 (p.128), BASAU 2.2.3 (p.128), BASAU 2.2.4 (p.128), BASAU 2.2.5 (p.129)]
 actor: Business Administrator (LOV_MANAGE); approver (MASTER_AUTHORIZE)
 priority: Must have
-fit: FIT
 screens: Administration > Lists of Values; My Approvals
-api: "GET /api/v1/lov/types, /lov/{type}/values; POST/PUT .../values; approval through My Approvals"
 description: The Business Administrator views every list of values, adds values, edits them and deactivates them by an effective-to date. Each value has an effective-from and effective-to date. Additions and changes wait for approval by another user and apply from their effective date. The lists of BRD-5 are in section 9.3.
 preconditions:
   - "The user has LOV_MANAGE; the list is maintainable."
@@ -1527,9 +1459,7 @@ title: Manage users and role profiles through approved requests
 brd: [BASAU 2.3.0 (p.129), BASAU 2.3.1 (p.129), BASAU 2.3.2 (p.129), BASAU 2.3.3 (p.129), BASAU 2.4.0 (p.130), BASAU 2.4.2 (p.130)]
 actor: System Administrator / Business Administrator (ACCESS_REQUEST); approver (ACCESS_APPROVE)
 priority: Must have
-fit: "FIT; CHANGE (2.3.2)"
 screens: Administration > Access Requests; Users; Roles & Permissions; User Access Matrix
-api: "GET/POST /api/v1/nbadmin/access-requests (CREATE_USER, MODIFY_ROLES, DISABLE_USER, MODIFY_ROLE_PERMISSIONS)"
 description: User management follows the access matrix and goes through requests - create a user with roles, change the roles of a user (the group profiles), disable a user, and change the permissions of a role. The administrator raises the request with its justification; an approver who is not the requester decides it; BIBS applies it. The request list shows every request with its status. Roles act as the group profiles; a user may hold several roles.
 preconditions:
   - "The requester has ACCESS_REQUEST."
@@ -1570,9 +1500,7 @@ title: Approve, decline or return administration requests
 brd: [BASAU 2.4.1 (p.130), BASAU 2.5.0 (p.130), BASAU 2.5.1 (p.131), BASAU 2.5.2 (p.131), BASAU 2.5.3 (p.131), BASAU 2.6.0 (p.131), BASAU 2.6.1 (p.131), BASAU 2.6.2 (p.131), BASAU 2.6.3 (p.132)]
 actor: Approver (ACCESS_APPROVE, MASTER_AUTHORIZE)
 priority: Must have
-fit: "FIT; CHANGE (2.4.1, 2.5.3, 2.6.0, 2.6.1)"
 screens: My Approvals; Access Requests
-api: "POST /api/v1/nbadmin/access-requests/{id}/approve, /reject, /return, /resubmit; POST /api/v1/approvals/bulk-approve; GET /api/v1/approvals/inbox, /counts"
 description: The approver sees the pending LOV and user-management requests in My Approvals with a count, and is notified of new ones. The approver approves or declines a request with remarks, or returns it to the requester with remarks; the requester corrects and resubmits it. Several requests can be approved at once through the bulk approval API - each is decided on its own; a new-user request is approved on its own because its temporary password is shown once.
 preconditions:
   - "The approver is not the requester."

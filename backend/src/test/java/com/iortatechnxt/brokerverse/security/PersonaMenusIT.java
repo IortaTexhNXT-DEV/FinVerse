@@ -67,7 +67,19 @@ class PersonaMenusIT {
           Map.entry("/eb/member-changes", "/api/v1/eb/member-changes?companyId={c}"),
           Map.entry("/eb/pending-items", "/api/v1/eb/pending-items?companyId={c}"),
           Map.entry("/eb/soa", "/api/v1/eb/soa?companyId={c}"),
-          Map.entry("/eb/setup", "/api/v1/eb/setup/threshold-rules?companyId={c}"));
+          Map.entry("/eb/setup", "/api/v1/eb/setup/threshold-rules?companyId={c}"),
+          Map.entry("/renewal", "/api/v1/renewal/home?companyId={c}"),
+          Map.entry("/renewal/expiry", "/api/v1/renewal/candidates?companyId={c}&tab=EXTRACTED"),
+          Map.entry("/renewal/mine", "/api/v1/renewal/candidates?companyId={c}&mine=true"),
+          Map.entry("/renewal/review", "/api/v1/renewal/candidates?companyId={c}&tab=REVIEW"),
+          Map.entry("/renewal/transfers", "/api/v1/renewal/transfers/incoming?companyId={c}"),
+          Map.entry(
+              "/renewal/processing", "/api/v1/renewal/candidates?companyId={c}&tab=FOR_PROCESSING"),
+          Map.entry("/renewal/insurer", "/api/v1/renewal/insurer-batches?companyId={c}"),
+          Map.entry("/renewal/letters", "/api/v1/renewal/candidates?companyId={c}&tab=RA_READY"),
+          Map.entry("/renewal/followups", "/api/v1/renewal/candidates?companyId={c}&tab=RA_SENT"),
+          Map.entry("/renewal/lamd", "/api/v1/renewal/lamd-reports?companyId={c}"),
+          Map.entry("/renewal/setup", "/api/v1/renewal/setup/package-map?companyId={c}"));
 
   @Autowired private Api api;
   @Autowired private JdbcTemplate jdbc;
@@ -85,7 +97,7 @@ class PersonaMenusIT {
   @Test
   void everyRoleHoldsExactlyThePermissionsTheMenuIsBuiltFrom() throws Exception {
     Map<String, Persona> personas = PersonaMenus.load();
-    assertThat(personas).hasSize(23);
+    assertThat(personas).hasSize(31);
     for (Persona p : personas.values()) {
       assertThat(p.inScope(granted(p.role()))).as(p.role()).isEqualTo(p.permissions());
       JsonNode me = api.read(api.doGet(p.seedUser(), "/api/v1/auth/me"));

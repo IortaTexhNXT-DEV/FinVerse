@@ -441,6 +441,142 @@
           ]
         }
       }
+    },
+    {
+      "id": "BRD-6",
+      "description": "Renewal (V1010): the Renewal screens of Marketing, the Renewal processing team, Business Admin, LAMD, the Contact Center and Audit; each role is listed for its RNW_ permissions (its other grants belong to other suites)",
+      "sections": ["renewal"],
+      "sharedGroups": ["home", "client-policy", "reports"],
+      "sharedModules": ["help"],
+      "roles": {
+        "RNW:MKT_TL": {
+          "role": "MKT_TL",
+          "seedUser": "mkttl",
+          "permissionScope": "RNW_",
+          "permissions": [
+            "RNW_ACCEPT",
+            "RNW_ASSIGN",
+            "RNW_DISPOSE",
+            "RNW_EXPORT",
+            "RNW_EXTRACT",
+            "RNW_OVERRIDE",
+            "RNW_RA_GENERATE",
+            "RNW_RA_SEND",
+            "RNW_REPORT_VIEW",
+            "RNW_REVIEW",
+            "RNW_VIEW"
+          ],
+          "screens": [
+            "/renewal",
+            "/renewal/expiry",
+            "/renewal/mine",
+            "/renewal/review",
+            "/renewal/transfers",
+            "/renewal/letters"
+          ]
+        },
+        "RNW:MKT_AO": {
+          "role": "MKT_AO",
+          "seedUser": "ao",
+          "permissionScope": "RNW_",
+          "permissions": [
+            "RNW_ACCEPT",
+            "RNW_ASSIGN",
+            "RNW_DISPOSE",
+            "RNW_EXPORT",
+            "RNW_RA_GENERATE",
+            "RNW_RA_SEND",
+            "RNW_REPORT_VIEW",
+            "RNW_VIEW"
+          ],
+          "screens": [
+            "/renewal",
+            "/renewal/expiry",
+            "/renewal/mine",
+            "/renewal/transfers",
+            "/renewal/letters"
+          ]
+        },
+        "RNW:PROCESSING_TL": {
+          "role": "PROCESSING_TL",
+          "seedUser": "proctl",
+          "permissionScope": "RNW_",
+          "permissions": [
+            "RNW_ACCEPT",
+            "RNW_EXPORT",
+            "RNW_EXTRACT",
+            "RNW_INSURER",
+            "RNW_PACKAGE_REMAP",
+            "RNW_PROCESS",
+            "RNW_PROCESS_ASSIGN",
+            "RNW_RA_GENERATE",
+            "RNW_RA_SEND",
+            "RNW_REPORT_VIEW",
+            "RNW_UPLOAD",
+            "RNW_VIEW"
+          ],
+          "screens": [
+            "/renewal",
+            "/renewal/expiry",
+            "/renewal/processing",
+            "/renewal/insurer",
+            "/renewal/letters",
+            "/renewal/setup"
+          ]
+        },
+        "RNW:PROCESSOR": {
+          "role": "PROCESSOR",
+          "seedUser": "proc",
+          "permissionScope": "RNW_",
+          "permissions": [
+            "RNW_ACCEPT",
+            "RNW_INSURER",
+            "RNW_PACKAGE_REMAP",
+            "RNW_PROCESS",
+            "RNW_RA_GENERATE",
+            "RNW_RA_SEND",
+            "RNW_REPORT_VIEW",
+            "RNW_UPLOAD",
+            "RNW_VIEW"
+          ],
+          "screens": [
+            "/renewal",
+            "/renewal/expiry",
+            "/renewal/processing",
+            "/renewal/insurer",
+            "/renewal/letters",
+            "/renewal/setup"
+          ]
+        },
+        "RNW:BUSINESS_ADMIN": {
+          "role": "BUSINESS_ADMIN",
+          "seedUser": "badmin",
+          "permissionScope": "RNW_",
+          "permissions": ["RNW_REPORT_VIEW", "RNW_SETUP", "RNW_TEMPLATE_MAINTAIN", "RNW_VIEW"],
+          "screens": ["/renewal", "/renewal/expiry", "/renewal/setup"]
+        },
+        "RNW:LAMD": {
+          "role": "LAMD",
+          "seedUser": "lamd",
+          "permissionScope": "RNW_",
+          "permissions": ["RNW_LAMD_UPLOAD", "RNW_VALIDATE", "RNW_VIEW"],
+          "screens": ["/renewal", "/renewal/expiry", "/renewal/lamd"]
+        },
+        "RNW:CONTACT_CENTER": {
+          "role": "CONTACT_CENTER",
+          "seedUser": "contactc",
+          "permissionScope": "RNW_",
+          "permissions": ["RNW_FOLLOWUP", "RNW_VIEW"],
+          "screens": ["/renewal", "/renewal/expiry", "/renewal/followups"]
+        },
+        "RNW:AUDITOR": {
+          "role": "AUDITOR",
+          "seedUser": "auditor",
+          "permissionScope": "RNW_",
+          "permissions": ["RNW_REPORT_VIEW", "RNW_VIEW"],
+          "screens": ["/renewal", "/renewal/expiry"]
+        }
+      }
     }
   ]
 }

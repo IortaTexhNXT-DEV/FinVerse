@@ -1,0 +1,148 @@
+import type { CandidateDetail } from '@/api/renewal';
+import { Amount } from '@/components/ui/Amount';
+import { Card } from '@/components/ui/Card';
+import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
+import { UserName } from '@/components/ui/UserName';
+import { formatDate, formatDateTime } from '@/utils/format';
+import { dispositionLabel } from '../common/renewalCodes';
+
+type Props = Readonly<{ detail: CandidateDetail }>;
+
+function PolicyCard({ detail }: Props) {
+  const { row, lifecycle } = detail;
+  const p = row.policy;
+  const pkg = lifecycle.legacyPackage;
+  return (
+    <Card title="Expiring account">
+      <DefinitionGrid
+        collapseEmpty
+        items={[
+          { label: 'Source', value: p.source === 'LEGACY' ? 'Migrated policy' : 'Booked account' },
+          { label: 'ARN', value: p.expiringArn },
+          { label: 'Invoice', value: p.expiringInvoiceNo },
+          { label: 'Policy No.', value: p.policyNo },
+          { label: 'Cover No.', value: p.coverNo },
+          { label: 'Product', value: [p.productCode, p.productName].filter(Boolean).join(' – ') },
+          { label: 'Line', value: p.lineCode },
+          { label: 'Insurance Company', value: p.insurerCode },
+          { label: 'Inception', value: formatDate(p.inception) },
+          { label: 'Expiry', value: formatDate(row.expiry) },
+          { label: 'PN No.', value: p.pnNos },
+          { label: 'Mortgaged', value: p.mortgaged ? `Yes – ${p.mortgageeBank ?? ''}` : 'No' },
+          {
+            label: 'Legacy package',
+            value: pkg.legacyCode
+              ? `${pkg.legacyCode} ${pkg.legacyVersion ?? ''} → ${pkg.productCode ?? 'not mapped'}`
+              : null,
+          },
+        ]}
+      />
+    </Card>
+  );
+}
+
+function officer(login: string | null) {
+  return login ? <UserName login={login} /> : null;
+}
+
+function PartiesCard({ detail }: Props) {
+  const q = detail.row.parties;
+  return (
+    <Card title="Client and officers">
+      <DefinitionGrid
+        collapseEmpty
+        items={[
+          { label: 'Client', value: `${q.clientCode ?? ''} ${q.clientName}` },
+          { label: 'Assured', value: q.assuredName },
+          { label: 'Segment', value: q.segment },
+          { label: 'Business Origin', value: q.businessOrigin },
+          { label: 'Account Type', value: q.accountType },
+          {
+            label: 'Branch / Region',
+            value: [q.branchCode, q.regionCode].filter(Boolean).join(' / '),
+          },
+          { label: 'Department', value: q.departmentCode },
+          { label: 'Owner Unit', value: q.ownerUnit },
+          { label: 'Unit Head', value: officer(q.unitHead) },
+          { label: 'Account Officer', value: officer(q.assignedAo) },
+          { label: 'Processing Officer', value: officer(q.assignedPo) },
+        ]}
+      />
+    </Card>
+  );
+}
+
+function AmountsCard({ detail }: Props) {
+  const m = detail.row.money;
+  return (
+    <Card title="Amounts">
+      <DefinitionGrid
+        collapseEmpty
+        items={[
+          { label: 'Currency', value: m.currency },
+          { label: 'Basic Premium', value: <Amount value={m.basicPremium} /> },
+          { label: 'Gross Premium', value: <Amount value={m.grossPremium} /> },
+          { label: 'Sum Insured', value: <Amount value={m.sumInsured} /> },
+          { label: 'Premium Rate', value: m.premiumRate },
+          { label: 'Commission Rate', value: m.commissionRate },
+          {
+            label: 'Outstanding',
+            value: m.outstanding === null ? null : <Amount value={m.outstanding} />,
+          },
+          { label: 'Claims', value: m.claimStatus },
+        ]}
+      />
+    </Card>
+  );
+}
+
+function proposalText(p: CandidateDetail['lifecycle']['proposal']): string | null {
+  if (!p.disposition) return null;
+  const how = p.automation === 'AUTO' ? 'automatic' : 'proposal';
+  return `${dispositionLabel(p.disposition)} (${how}, version ${String(p.matrixVersion ?? '')})`;
+}
+
+function RenewalCard({ detail }: Props) {
+  const { row, lifecycle } = detail;
+  const links = lifecycle.links;
+  return (
+    <Card title="Renewal">
+      <DefinitionGrid
+        collapseEmpty
+        items={[
+          { label: 'Disposition', value: dispositionLabel(row.disposition) },
+          { label: 'Reason', value: row.reason },
+          { label: 'Proposed by the matrix', value: proposalText(lifecycle.proposal) },
+          { label: 'Renewal ARN', value: links.renewalArn },
+          { label: 'Quotation', value: links.quotationRef },
+          { label: 'Proposal', value: links.proposalRef },
+          { label: 'Renewed Invoice', value: links.renewedInvoiceNo },
+          {
+            label: 'Initiated',
+            value: lifecycle.initiatedAt
+              ? `${formatDateTime(lifecycle.initiatedAt)} by ${lifecycle.initiatedBy ?? ''}`
+              : null,
+          },
+          {
+            label: 'Closed',
+            value: links.closedAt
+              ? `${formatDateTime(links.closedAt)} (${links.closedAs ?? ''})`
+              : null,
+          },
+        ]}
+      />
+    </Card>
+  );
+}
+
+/** Details: the expiring account, the parties, the amounts and the renewal. */
+export function DetailsTab({ detail }: Props) {
+  return (
+    <div className="rnw-grid">
+      <PolicyCard detail={detail} />
+      <PartiesCard detail={detail} />
+      <AmountsCard detail={detail} />
+      <RenewalCard detail={detail} />
+    </div>
+  );
+}

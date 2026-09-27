@@ -6,8 +6,9 @@
 --   Requirements: docs/requirements/BDOI_DM_BRD_SPEC.md (BRID 1.1a-12.1)
 --   Design: docs/architecture/DATA_MIGRATION_DESIGN.md sections 13, 18, 19 and 20. The permissions
 --   are the enum security.domain.Permission; the role proposal waits for BDOI (DMQ16).
---   The permissions CASH_UPP_INCOME_* and LEGACY_REVERSAL_* are granted by the owners' migrations
---   V766 (cashiering) and V786 (commission).
+--   CASH_UPP_INCOME_APPROVE is granted here to top management (role created here); the other
+--   CASH_UPP_INCOME_* and LEGACY_REVERSAL_* grants are in the owners' migrations (V768
+--   cashiering, V787 commission).
 --   Runs after V750 (LOV), V751 (workflow), V755 (sec_permission_action), V760 (Operations roles)
 --   and V762 (notification events); references platform tables only.
 -- =====================================================================================
@@ -53,6 +54,8 @@ join (values
     ('LEGACY_ACCESS_REVIEWER', 'LEGACY_ACCESS_LOG_VIEW'), ('LEGACY_ACCESS_REVIEWER', 'REPORT_VIEW'),
     -- Comptrollership GL lead prepares the FY2027 true-ups (design 17.7)
     ('COMPTROLLERSHIP', 'MIG_VIEW'), ('COMPTROLLERSHIP', 'MIG_TRUEUP_PREPARE'),
+    -- Top management approves the reclassification of old unapplied payments to income (BRID 5.5)
+    ('TOP_MANAGEMENT_APPROVER', 'CASH_UPP_INCOME_APPROVE'),
     -- Platform administrator and auditor: read access to the console
     ('SYSADMIN', 'MIG_VIEW'), ('AUDITOR', 'MIG_VIEW')
 ) as g(role_code, permission) on g.role_code = r.code

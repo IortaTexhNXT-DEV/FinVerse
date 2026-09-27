@@ -160,9 +160,25 @@ public class CwtPostings {
    * @return journal batch
    */
   public String reclass(CwtTag tag) {
-    OpsInvoice invoice = invoice(tag);
+    return reclass(
+        invoice(tag),
+        tag.getAmount(),
+        CWT + tag.getReference(),
+        "BIR 2307 reclass " + tag.getReference());
+  }
+
+  /**
+   * Reclassifies an amount of the premium receivable of an invoice to PR 2307.
+   *
+   * @param invoice invoice (collections loaded)
+   * @param amount amount
+   * @param ref source reference
+   * @param narration narration
+   * @return journal batch
+   */
+  public String reclass(OpsInvoice invoice, BigDecimal amount, String ref, String narration) {
     Map<LedgerComponent, BigDecimal> taken = new EnumMap<>(LedgerComponent.class);
-    BigDecimal left = tag.getAmount();
+    BigDecimal left = amount;
     List<LedgerComponent> order = new ArrayList<>(LedgerComponent.applicationHierarchy());
     Collections.reverse(order);
     for (LedgerComponent c : order) {
@@ -175,22 +191,20 @@ public class CwtPostings {
     if (left.signum() > 0) {
       throw new BusinessRuleException(
           "CWT_AMOUNT_MISMATCH",
-          tag.getReference() + ": the invoice has less premium outstanding than the 2307 amount");
+          ref + ": the invoice has less premium outstanding than the 2307 amount");
     }
     Map<String, BigDecimal> amounts = new LinkedHashMap<>();
-    amounts.put("PR2307", tag.getAmount());
+    amounts.put("PR2307", amount);
     amounts.putAll(CashieringPosting.prAmounts(taken, false));
-    String ref = CWT + tag.getReference();
     String batch =
         posting.publish(
-            ApplicationService.context(
-                invoice, BusinessClock.today(clock), "BIR 2307 reclass " + tag.getReference()),
+            ApplicationService.context(invoice, BusinessClock.today(clock), narration),
             CashieringPosting.CWT_RECLASS,
             ref,
-            amounts);
+            invoice.getLegacy().ledgerContext().route(amounts));
     Map<LedgerComponent, BigDecimal> movement = new EnumMap<>(LedgerComponent.class);
     taken.forEach((c, v) -> movement.put(c, v.negate()));
-    movement.put(LedgerComponent.PR2307, tag.getAmount());
+    movement.put(LedgerComponent.PR2307, amount);
     record(invoice, MovementType.CWT_RECLASS, ref, movement, batch);
     return batch;
   }
@@ -225,25 +239,43 @@ public class CwtPostings {
   }
 
   /**
-   * Settles PR2307 against the premium due to the insurer (DBMID.001).
+   * Releases the 2307 certificate to the insurer (DBMID.001): PR2307 offset against DTIP.
    *
    * @param tag tag
    * @return journal batch
    */
   public String dtipOffset(CwtTag tag) {
-    OpsInvoice invoice = invoice(tag);
-    String ref = CWT + tag.getReference() + ":DTIP";
+    return dtipOffset(
+        invoice(tag),
+        tag.getAmount(),
+        CWT + tag.getReference() + ":DTIP",
+        "BIR 2307 released " + tag.getReference());
+  }
+
+  /**
+   * Offsets an amount of PR 2307 of an invoice against its due to insurer.
+   *
+   * @param invoice invoice
+   * @param amount amount
+   * @param ref source reference
+   * @param narration narration
+   * @return journal batch
+   */
+  public String dtipOffset(OpsInvoice invoice, BigDecimal amount, String ref, String narration) {
     String batch =
         posting.publish(
-            ApplicationService.context(
-                invoice, BusinessClock.today(clock), "BIR 2307 released " + tag.getReference()),
+            ApplicationService.context(invoice, BusinessClock.today(clock), narration),
             CashieringPosting.CWT_DTIP_OFFSET,
             ref,
-            Map.of("DTIP", tag.getAmount(), "PR2307", tag.getAmount()),
-            Map.of("DTIP", tag.getInsurerCode(), "PR2307", tag.getClientCode()));
+            invoice.getLegacy().ledgerContext().route(Map.of("DTIP", amount, "PR2307", amount)),
+            invoice
+                .getLegacy()
+                .ledgerContext()
+                .routeParties(
+                    Map.of("DTIP", invoice.getInsurerCode(), "PR2307", invoice.getClientCode())));
     Map<LedgerComponent, BigDecimal> movement = new EnumMap<>(LedgerComponent.class);
-    movement.put(LedgerComponent.DTIP, tag.getAmount());
-    movement.put(LedgerComponent.PR2307, tag.getAmount());
+    movement.put(LedgerComponent.DTIP, amount);
+    movement.put(LedgerComponent.PR2307, amount);
     record(invoice, MovementType.REMITTED, ref, movement, batch);
     return batch;
   }

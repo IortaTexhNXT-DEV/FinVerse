@@ -10,7 +10,9 @@
 --               of the year-end adjustment MIG_LEGACY_POSITION_TRUEUP, balanced on LGC-CLR, and the
 --               legacy lines (LG_ components) added to the seed rules of the Operations events:
 --               payment application, unapplied refund and reclass, remittance, and the booking of
---               the endorsements of legacy invoices (BROKER_BOOKING, V873).
+--               the endorsements of legacy invoices (BROKER_BOOKING, V873), the 2307 reclass and offset,
+--               minimal balances, write-offs, commission changes and direct payment events; the seed
+--               rule of OPS_UNAPPLIED_TO_INCOME (other income 4190).
 --   Parameter:  the opening value date of the rehearsals, inside the open seed year (production
 --               keeps 1-Jan-2028).
 -- =====================================================================================
@@ -60,7 +62,8 @@ from org_company c
 cross join (values
     ('MIG_LEGACY_INVOICE_OPENING', 'Legacy invoice opening on the legacy control accounts (seed)'),
     ('MIG_UPP_OPENING', 'Legacy unapplied payment opening (seed)'),
-    ('MIG_LEGACY_POSITION_TRUEUP', 'Year-end adjustment of a legacy open item (seed)')
+    ('MIG_LEGACY_POSITION_TRUEUP', 'Year-end adjustment of a legacy open item (seed)'),
+    ('OPS_UNAPPLIED_TO_INCOME', 'Unapplied payment to other income (seed)')
 ) as e(code, name)
 where c.code = 'FVI'
   and not exists (select 1 from acc_rule r where r.company_id = c.id and r.event_type = e.code);
@@ -149,7 +152,54 @@ join (values
   ('BROKER_BOOKING', 109, 'CREDIT', '2222', 'LG_UNREALIZED_COMMISSION', false, 'Legacy unrealized commission'),
   ('BROKER_BOOKING', 110, 'CREDIT', '2223', 'LG_DEFERRED_OUTPUT_VAT', false, 'Legacy deferred output VAT'),
   ('BROKER_BOOKING', 111, 'CREDIT', '4101', 'LG_COMMISSION_INCOME', false, 'Commission income'),
-  ('BROKER_BOOKING', 112, 'CREDIT', '2504', 'LG_OUTPUT_VAT', false, 'Output VAT on commission')
+  ('BROKER_BOOKING', 112, 'CREDIT', '2504', 'LG_OUTPUT_VAT', false, 'Output VAT on commission'),
+  ('OPS_UNAPPLIED_TO_INCOME', 1, 'DEBIT', '2205', 'AMOUNT', true, 'Unapplied collections taken to income'),
+  ('OPS_UNAPPLIED_TO_INCOME', 2, 'CREDIT', '4190', 'AMOUNT', false, 'Other income - unclaimed collections'),
+  ('OPS_UNAPPLIED_TO_INCOME', 3, 'DEBIT', '2206', 'LG_AMOUNT', true, 'Legacy unapplied collections taken to income'),
+  ('OPS_UNAPPLIED_TO_INCOME', 4, 'CREDIT', '4190', 'LG_AMOUNT', false, 'Other income - unclaimed collections'),
+  ('OPS_CWT_RECLASS', 101, 'DEBIT', '1216', 'LG_PR2307', true, 'Legacy PR 2307'),
+  ('OPS_CWT_RECLASS', 102, 'CREDIT', '1215.01', 'LG_PR_BASIC', true, 'Legacy premium receivable - basic premium'),
+  ('OPS_CWT_RECLASS', 103, 'CREDIT', '1215.02', 'LG_PR_DST', true, 'Legacy premium receivable - DST'),
+  ('OPS_CWT_RECLASS', 104, 'CREDIT', '1215.03', 'LG_PR_PTX_VAT', true, 'Legacy premium receivable - premium tax / VAT'),
+  ('OPS_CWT_RECLASS', 105, 'CREDIT', '1215.04', 'LG_PR_LGT', true, 'Legacy premium receivable - LGT'),
+  ('OPS_CWT_RECLASS', 106, 'CREDIT', '1215.05', 'LG_PR_FST', true, 'Legacy premium receivable - fire service tax'),
+  ('OPS_CWT_RECLASS', 107, 'CREDIT', '1215.06', 'LG_PR_OTHER', true, 'Legacy premium receivable - other charges'),
+  ('OPS_CWT_DTIP_OFFSET', 101, 'DEBIT', 'LGC-DTIP', 'LG_DTIP', true, 'Legacy due to insurer settled by 2307'),
+  ('OPS_CWT_DTIP_OFFSET', 102, 'CREDIT', '1216', 'LG_PR2307', true, 'Legacy PR 2307 settled'),
+  ('OPS_MINIMAL_BALANCE_REVERSAL', 101, 'CREDIT', '1215.01', 'LG_PR_BASIC', true, 'Legacy premium receivable - basic premium'),
+  ('OPS_MINIMAL_BALANCE_REVERSAL', 102, 'CREDIT', '1215.02', 'LG_PR_DST', true, 'Legacy premium receivable - DST'),
+  ('OPS_MINIMAL_BALANCE_REVERSAL', 103, 'CREDIT', '1215.03', 'LG_PR_PTX_VAT', true, 'Legacy premium receivable - premium tax / VAT'),
+  ('OPS_MINIMAL_BALANCE_REVERSAL', 104, 'CREDIT', '1215.04', 'LG_PR_LGT', true, 'Legacy premium receivable - LGT'),
+  ('OPS_MINIMAL_BALANCE_REVERSAL', 105, 'CREDIT', '1215.05', 'LG_PR_FST', true, 'Legacy premium receivable - fire service tax'),
+  ('OPS_MINIMAL_BALANCE_REVERSAL', 106, 'CREDIT', '1215.06', 'LG_PR_OTHER', true, 'Legacy premium receivable - other charges'),
+  ('OPS_WRITE_OFF', 101, 'CREDIT', '1215.01', 'LG_PR_BASIC', true, 'Legacy premium receivable - basic premium'),
+  ('OPS_WRITE_OFF', 102, 'CREDIT', '1215.02', 'LG_PR_DST', true, 'Legacy premium receivable - DST'),
+  ('OPS_WRITE_OFF', 103, 'CREDIT', '1215.03', 'LG_PR_PTX_VAT', true, 'Legacy premium receivable - premium tax / VAT'),
+  ('OPS_WRITE_OFF', 104, 'CREDIT', '1215.04', 'LG_PR_LGT', true, 'Legacy premium receivable - LGT'),
+  ('OPS_WRITE_OFF', 105, 'CREDIT', '1215.05', 'LG_PR_FST', true, 'Legacy premium receivable - fire service tax'),
+  ('OPS_WRITE_OFF', 106, 'CREDIT', '1215.06', 'LG_PR_OTHER', true, 'Legacy premium receivable - other charges'),
+  ('OPS_ADJ_COMMISSION', 101, 'DEBIT', 'LGC-COMM', 'LG_COMMISSION_RECEIVABLE', true, 'Legacy commission receivable (with VAT)'),
+  ('OPS_ADJ_COMMISSION', 102, 'CREDIT', '2222', 'LG_UNREALIZED_COMMISSION', false, 'Legacy unrealized commission'),
+  ('OPS_ADJ_COMMISSION', 103, 'CREDIT', '2223', 'LG_DEFERRED_OUTPUT_VAT', false, 'Legacy deferred output VAT'),
+  ('OPS_DP_PR_REVERSAL', 101, 'DEBIT', 'LGC-DTIP', 'LG_DTIP', true, 'Legacy due to insurer - paid directly by the client'),
+  ('OPS_DP_PR_REVERSAL', 102, 'CREDIT', '1215.01', 'LG_PR_BASIC', true, 'Legacy premium receivable - basic premium'),
+  ('OPS_DP_PR_REVERSAL', 103, 'CREDIT', '1215.02', 'LG_PR_DST', true, 'Legacy premium receivable - DST'),
+  ('OPS_DP_PR_REVERSAL', 104, 'CREDIT', '1215.03', 'LG_PR_PTX_VAT', true, 'Legacy premium receivable - premium tax / VAT'),
+  ('OPS_DP_PR_REVERSAL', 105, 'CREDIT', '1215.04', 'LG_PR_LGT', true, 'Legacy premium receivable - LGT'),
+  ('OPS_DP_PR_REVERSAL', 106, 'CREDIT', '1215.05', 'LG_PR_FST', true, 'Legacy premium receivable - fire service tax'),
+  ('OPS_DP_PR_REVERSAL', 107, 'CREDIT', '1215.06', 'LG_PR_OTHER', true, 'Legacy premium receivable - other charges'),
+  ('OPS_DP_REINSTATE', 101, 'DEBIT', 'LGC-DTIP', 'LG_DTIP', true, 'Legacy due to insurer - paid directly by the client'),
+  ('OPS_DP_REINSTATE', 102, 'CREDIT', '1215.01', 'LG_PR_BASIC', true, 'Legacy premium receivable - basic premium'),
+  ('OPS_DP_REINSTATE', 103, 'CREDIT', '1215.02', 'LG_PR_DST', true, 'Legacy premium receivable - DST'),
+  ('OPS_DP_REINSTATE', 104, 'CREDIT', '1215.03', 'LG_PR_PTX_VAT', true, 'Legacy premium receivable - premium tax / VAT'),
+  ('OPS_DP_REINSTATE', 105, 'CREDIT', '1215.04', 'LG_PR_LGT', true, 'Legacy premium receivable - LGT'),
+  ('OPS_DP_REINSTATE', 106, 'CREDIT', '1215.05', 'LG_PR_FST', true, 'Legacy premium receivable - fire service tax'),
+  ('OPS_DP_REINSTATE', 107, 'CREDIT', '1215.06', 'LG_PR_OTHER', true, 'Legacy premium receivable - other charges'),
+  ('OPS_DP_COMMISSION_COLLECT', 101, 'CREDIT', 'LGC-COMM', 'LG_COMMISSION_RECEIVABLE', true, 'Legacy commission receivable (with VAT)'),
+  ('OPS_DP_COMMISSION_COLLECT', 102, 'DEBIT', '2222', 'LG_REALIZED_COMMISSION', false, 'Legacy unrealized commission realized'),
+  ('OPS_DP_COMMISSION_COLLECT', 103, 'CREDIT', '4101', 'LG_REALIZED_COMMISSION', false, 'Commission income'),
+  ('OPS_DP_COMMISSION_COLLECT', 104, 'DEBIT', '2223', 'LG_REALIZED_VAT', false, 'Legacy deferred output VAT due'),
+  ('OPS_DP_COMMISSION_COLLECT', 105, 'CREDIT', '2504', 'LG_REALIZED_VAT', false, 'Output VAT on commission')
 ) as l(event_type, n, side, acc, comp, party, narr) on l.event_type = r.event_type
 join org_company c on c.id = r.company_id and c.code = 'FVI'
 where not exists (select 1 from acc_rule_line x where x.rule_id = r.id and x.line_no = l.n);

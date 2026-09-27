@@ -121,26 +121,24 @@ public class RenewalAlertCheck implements AlertCheck {
   }
 
   private void ageing(RenewalCandidate c, LocalDate asOf, List<AlertSignal> signals) {
-    if (c.getBucket() != Bucket.EXCEPTION) {
-      return;
+    if (c.getBucket() == Bucket.EXCEPTION) {
+      LocalDate since =
+          buckets.findByCandidateIdOrderByIdDesc(c.getId()).stream()
+              .filter(h -> h.getToBucket() == Bucket.EXCEPTION)
+              .map(BucketHistory::getCreatedAt)
+              .map(BusinessClock::dateOf)
+              .findFirst()
+              .orElse(asOf);
+      if (!since.plusDays(parameters.exceptionAgeingDays()).isAfter(asOf)) {
+        signals.add(
+            new AlertSignal(
+                RenewalCodes.ALERT_EXCEPTION_AGEING,
+                facts(
+                    c,
+                    "Renewal " + c.getRenewalRef() + " is in the Exception bucket since " + since,
+                    RenewalCodes.ALERT_EXCEPTION_AGEING + ":" + c.getRenewalRef() + ":" + since)));
+      }
     }
-    LocalDate since =
-        buckets.findByCandidateIdOrderByIdDesc(c.getId()).stream()
-            .filter(h -> h.getToBucket() == Bucket.EXCEPTION)
-            .map(BucketHistory::getCreatedAt)
-            .map(BusinessClock::dateOf)
-            .findFirst()
-            .orElse(asOf);
-    if (since.plusDays(parameters.exceptionAgeingDays()).isAfter(asOf)) {
-      return;
-    }
-    signals.add(
-        new AlertSignal(
-            RenewalCodes.ALERT_EXCEPTION_AGEING,
-            facts(
-                c,
-                "Renewal " + c.getRenewalRef() + " is in the Exception bucket since " + since,
-                RenewalCodes.ALERT_EXCEPTION_AGEING + ":" + c.getRenewalRef() + ":" + since)));
   }
 
   private static AlertFacts facts(RenewalCandidate c, String message, String key) {

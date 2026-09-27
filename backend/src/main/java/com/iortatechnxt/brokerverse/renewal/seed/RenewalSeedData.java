@@ -54,6 +54,86 @@ public class RenewalSeedData implements ApplicationRunner {
   private static final String PO = "proc";
   private static final String PROC_TL = "proctl";
   private static final String MGIC = "INS-MGIC";
+  private static final int UNMAPPED = 1;
+  private static final int REVIEW = 3;
+  private static final int TRANSFER = 4;
+  private static final BigDecimal SUM_INSURED = new BigDecimal("1500000.00");
+  private static final BigDecimal PREMIUM = new BigDecimal("18500.00");
+
+  /** Migrated policies of the go-live window (legacy package, risk code, segment, client). */
+  private static final List<Legacy> LEGACY =
+      List.of(
+          new Legacy(
+              "QPS-FI-0100001",
+              "QPS-MOTOR-A",
+              "MTR12",
+              "MOTOR",
+              "CBG",
+              "CL-2026-000001",
+              "2027-11-15",
+              "PN-SEED-0001",
+              false),
+          new Legacy(
+              "QPS-FI-0100002",
+              "QPS-HOME-B",
+              "PAR01",
+              "PROPERTY",
+              "RETAIL",
+              "CL-2026-000002",
+              "2027-12-01",
+              null,
+              false),
+          new Legacy(
+              "QPS-FI-0100003",
+              "QPS-HOME-OLD",
+              "PAR01",
+              "PROPERTY",
+              "CBG",
+              "CL-2026-000005",
+              "2028-01-20",
+              "PN-SEED-0003",
+              true),
+          new Legacy(
+              "EBIX-CG-0100004",
+              null,
+              "CGL01",
+              "LIABILITY",
+              "CORBANK",
+              "CL-2026-000003",
+              "2027-12-15",
+              null,
+              false),
+          new Legacy(
+              "EBIX-CG-0100005",
+              null,
+              "CGL01",
+              "LIABILITY",
+              "CORBANK",
+              "CL-2026-000004",
+              "2027-12-20",
+              null,
+              false),
+          new Legacy(
+              "EBIX-EN-0100006",
+              null,
+              "CAR07",
+              "ENGINEERING",
+              "CORBANK",
+              "CL-2026-000004",
+              "2027-11-30",
+              null,
+              false),
+          new Legacy(
+              "QPS-FI-0100007",
+              null,
+              "MTR10",
+              "MOTOR",
+              "RETAIL",
+              "CL-2026-000002",
+              "2028-01-10",
+              null,
+              true));
+
   private static final java.util.Map<String, String> CLIENTS =
       java.util.Map.of(
           "CL-2026-000001", "Maria Clara Santos",
@@ -159,133 +239,56 @@ public class RenewalSeedData implements ApplicationRunner {
   }
 
   private List<String> legacy(Long co) {
-    Object[][] rows = {
-      {
-        "QPS-FI-0100001",
-        "QPS-MOTOR-A",
-        "MTR12",
-        "MOTOR",
-        "CBG",
-        "CL-2026-000001",
-        "2027-11-15",
-        "PN-SEED-0001",
-        false
-      },
-      {
-        "QPS-FI-0100002",
-        "QPS-HOME-B",
-        "PAR01",
-        "PROPERTY",
-        "RETAIL",
-        "CL-2026-000002",
-        "2027-12-01",
-        null,
-        false
-      },
-      {
-        "QPS-FI-0100003",
-        "QPS-HOME-OLD",
-        "PAR01",
-        "PROPERTY",
-        "CBG",
-        "CL-2026-000005",
-        "2028-01-20",
-        "PN-SEED-0003",
-        true
-      },
-      {
-        "EBIX-CG-0100004",
-        null,
-        "CGL01",
-        "LIABILITY",
-        "CORBANK",
-        "CL-2026-000003",
-        "2027-12-15",
-        null,
-        false
-      },
-      {
-        "EBIX-CG-0100005",
-        null,
-        "CGL01",
-        "LIABILITY",
-        "CORBANK",
-        "CL-2026-000004",
-        "2027-12-20",
-        null,
-        false
-      },
-      {
-        "EBIX-EN-0100006",
-        null,
-        "CAR07",
-        "ENGINEERING",
-        "CORBANK",
-        "CL-2026-000004",
-        "2027-11-30",
-        null,
-        false
-      },
-      {
-        "QPS-FI-0100007",
-        null,
-        "MTR10",
-        "MOTOR",
-        "RETAIL",
-        "CL-2026-000002",
-        "2028-01-10",
-        null,
-        true
-      }
-    };
     List<String> refs = new java.util.ArrayList<>();
-    for (Object[] r : rows) {
-      LocalDate expiry = LocalDate.parse((String) r[6]);
-      LegacyHeader header =
-          new LegacyHeader(
-              (String) r[0],
-              ((String) r[0]).startsWith("QPS") ? "QPS" : "EBIX",
-              null,
-              new LegacyPolicy(
-                  "FI-" + r[0],
-                  null,
-                  (String) r[2],
-                  (String) r[3],
-                  (String) r[1],
-                  null,
-                  expiry.minusYears(1),
-                  expiry,
-                  new BigDecimal("1500000.00"),
-                  new BigDecimal("18500.00"),
-                  "PHP",
-                  (String) r[7]),
-              new LegacyParties(
-                  (String) r[5],
-                  CLIENTS.get((String) r[5]),
-                  CLIENTS.get((String) r[5]),
-                  MGIC,
-                  AO,
-                  "T-CBG1",
-                  (String) r[4],
-                  null),
-              (Boolean) r[8],
-              null);
+    for (Legacy r : LEGACY) {
       try {
         refs.add(
             users
-                .as(PROC_TL, () -> extraction.createLegacy(co, header, null, false))
+                .as(PROC_TL, () -> extraction.createLegacy(co, header(r), null, false))
                 .getRenewalRef());
       } catch (RuntimeException e) {
-        LOG.warn("Seed legacy policy {} skipped: {}", r[0], e.getMessage());
+        LOG.warn("Seed legacy policy {} skipped: {}", r.ref(), e.getMessage());
         refs.add(null);
       }
     }
     return refs;
   }
 
+  private static LegacyHeader header(Legacy r) {
+    LocalDate expiry = LocalDate.parse(r.expiry());
+    return new LegacyHeader(
+        r.ref(),
+        r.ref().startsWith("QPS") ? "QPS" : "EBIX",
+        null,
+        new LegacyPolicy(
+            "FI-" + r.ref(),
+            null,
+            r.product(),
+            r.line(),
+            r.legacyPackage(),
+            null,
+            expiry.minusYears(1),
+            expiry,
+            SUM_INSURED,
+            PREMIUM,
+            "PHP",
+            r.pn()),
+        new LegacyParties(
+            r.client(),
+            CLIENTS.get(r.client()),
+            CLIENTS.get(r.client()),
+            MGIC,
+            AO,
+            "T-CBG1",
+            r.segment(),
+            null),
+        r.urgent(),
+        null);
+  }
+
   private void marketing(Long co, List<String> legacy) {
-    String review = legacy.get(3);
-    String transfer = legacy.get(4);
+    String review = legacy.get(REVIEW);
+    String transfer = legacy.get(TRANSFER);
     step("assign", () -> users.run(TL, () -> assignments.assign(co, List.of(review), AO, null)));
     step("history", () -> users.run(AO, () -> history.open(co, review)));
     step(
@@ -369,4 +372,16 @@ public class RenewalSeedData implements ApplicationRunner {
       LOG.warn("Renewal seed step {} skipped: {}", what, e.getMessage());
     }
   }
+
+  /** A migrated policy of the seed. */
+  private record Legacy(
+      String ref,
+      String legacyPackage,
+      String product,
+      String line,
+      String segment,
+      String client,
+      String expiry,
+      String pn,
+      boolean urgent) {}
 }

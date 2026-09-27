@@ -26,6 +26,7 @@ public class RenewalListingReport implements ReportDefinition {
   public static final String CODE = "RNW-LISTING";
 
   private static final int WINDOW = 30;
+  private static final int WINDOWS = 3;
 
   private static final String SQL =
       "select c.owner_unit, c.renewal_ref, c.client_name, c.segment, c.product_code, c.stage,"
@@ -103,7 +104,7 @@ public class RenewalListingReport implements ReportDefinition {
       return "Expired";
     }
     long bucket = days / WINDOW;
-    return bucket >= 3
+    return bucket >= WINDOWS
         ? "Over 90 days"
         : bucket * WINDOW + " to " + (bucket * WINDOW + WINDOW) + " days";
   }

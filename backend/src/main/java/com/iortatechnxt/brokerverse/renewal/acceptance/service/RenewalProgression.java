@@ -139,13 +139,15 @@ public class RenewalProgression {
    * @param accountId account
    */
   public void place(Long accountId) {
-    if (!parameters.autoPlacement()) {
-      return;
-    }
-    Optional<RenewalCandidate> c = renewalOf(accountId, RenewalStage.FOR_PLACEMENT_BOOKING);
-    if (c.isEmpty()) {
-      return;
-    }
+    Optional<RenewalCandidate> c =
+        parameters.autoPlacement()
+            ? renewalOf(accountId, RenewalStage.FOR_PLACEMENT_BOOKING)
+            : Optional.empty();
+    c.ifPresent(candidate -> generateSlips(accountId, candidate));
+  }
+
+  private void generateSlips(Long accountId, RenewalCandidate candidate) {
+    Optional<RenewalCandidate> c = Optional.of(candidate);
     Account account = accounts.findById(accountId).orElseThrow();
     List<PlacementSlip> generated =
         slips.generate(account.getCompanyId(), List.of(account.getArn()));

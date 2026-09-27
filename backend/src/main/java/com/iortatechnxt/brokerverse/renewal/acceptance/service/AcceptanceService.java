@@ -149,22 +149,25 @@ public class AcceptanceService {
     if (input.method() == null) {
       throw new BusinessRuleException("RNW_ACCEPTANCE_METHOD", "Select the acceptance method");
     }
-    boolean referenced = blank(input.reference()) != null;
-    boolean fileNeeded =
-        input.method() == AcceptanceMethod.SIGNED_RA
-            || input.method() == AcceptanceMethod.EMAIL && !referenced;
-    if (input.method() == AcceptanceMethod.PAYMENT && !referenced) {
-      throw new BusinessRuleException(
-          "RNW_ACCEPTANCE_EVIDENCE", "Enter the reference of the payment");
-    }
-    if (fileNeeded && input.attachmentId() == null) {
-      throw new BusinessRuleException(
-          "RNW_ACCEPTANCE_EVIDENCE", "Attach the client's e-mail or the signed Renewal Advice");
+    String missing = missingEvidence(input);
+    if (missing != null) {
+      throw new BusinessRuleException("RNW_ACCEPTANCE_EVIDENCE", missing);
     }
     if (input.attachmentId() != null && !attached(c, input.attachmentId())) {
       throw new BusinessRuleException(
           "RNW_ACCEPTANCE_EVIDENCE", "The evidence is not a document of this renewal");
     }
+  }
+
+  private static String missingEvidence(Input input) {
+    boolean referenced = blank(input.reference()) != null;
+    if (input.method() == AcceptanceMethod.PAYMENT) {
+      return referenced ? null : "Enter the reference of the payment";
+    }
+    boolean fileNeeded = input.method() == AcceptanceMethod.SIGNED_RA || !referenced;
+    return fileNeeded && input.attachmentId() == null
+        ? "Attach the client's e-mail or the signed Renewal Advice"
+        : null;
   }
 
   private boolean attached(RenewalCandidate c, Long attachmentId) {

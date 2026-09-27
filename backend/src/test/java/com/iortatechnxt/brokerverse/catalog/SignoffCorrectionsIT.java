@@ -37,6 +37,22 @@ class SignoffCorrectionsIT {
   }
 
   @Test
+  void seedHistoryRemarksNameUsersByDisplayName() {
+    assertThat(
+            jdbc.queryForObject(
+                "select h.comment from wf_case_history h join wf_case c on c.id = h.case_id"
+                    + " where c.reference = 'PKR-2026-900006' and h.action = 'version_released'",
+                String.class))
+        .isEqualTo("Version 2 validated by Bea Business Admin");
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from wf_case_history h join sec_user u"
+                    + " on h.comment like '% by ' || u.username where h.automatic",
+                Integer.class))
+        .isZero();
+  }
+
+  @Test
   void seedClientsAreDistinctAndHaveRealisticAddresses() {
     assertThat(
             jdbc.queryForList(

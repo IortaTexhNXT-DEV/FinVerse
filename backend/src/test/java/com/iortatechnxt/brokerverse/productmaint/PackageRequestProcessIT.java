@@ -43,8 +43,11 @@ import com.iortatechnxt.brokerverse.productmaint.service.TermsService.InsurerCho
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
+import com.iortatechnxt.brokerverse.workflow.domain.WorkCaseHistory;
+import com.iortatechnxt.brokerverse.workflow.service.CaseView;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
+import com.iortatechnxt.brokerverse.workflow.service.WorkflowViewService;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
@@ -55,6 +58,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * The package request process end to end on the catalog contracts (BRPM.008-016, PMADD03/04/06):
@@ -82,6 +86,8 @@ class PackageRequestProcessIT {
   @Autowired private ClientService clients;
   @Autowired private MessageService messages;
   @Autowired private WorkflowService workflow;
+  @Autowired private WorkflowViewService views;
+  @Autowired private JdbcTemplate jdbc;
   @Autowired private ApplicationEventPublisher events;
   @Autowired private TestData data;
   @Autowired private AsUser as;
@@ -326,6 +332,21 @@ class PackageRequestProcessIT {
     PackageRequest released = reader.get(id);
     assertThat(released.getStatus()).isEqualTo(RequestStage.RELEASED);
     assertThat(released.getReleasedAt()).isNotNull();
+    // Remarks written by the system name users by display name; stages keep their full names.
+    CaseView view = views.view(PackageRequests.ENTITY, String.valueOf(id)).orElseThrow();
+    assertThat(view.history())
+        .filteredOn(h -> "version_released".equals(h.getAction()))
+        .extracting(WorkCaseHistory::getComment)
+        .containsExactly("Version " + version + " validated by Bea Business Admin");
+    assertThat(view.stageNames()).containsEntry("REQUIREMENTS_PREP", "Requirements preparation");
+    assertThat(
+            jdbc.queryForList(
+                "select summary from audit_log where entity_type = ? and entity_id = ?",
+                String.class,
+                PackageRequests.ENTITY,
+                released.getRequestNo()))
+        .anyMatch(t -> t.startsWith("ManCom sign-off ") && t.endsWith(" by Manuel ManCom Member"))
+        .noneMatch(t -> t.endsWith(" by mancom"));
 
     List<Advisory> drafted = advisories.ofRequest(id);
     assertThat(drafted).hasSize(1);

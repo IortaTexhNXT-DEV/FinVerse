@@ -23,6 +23,7 @@ import com.iortatechnxt.brokerverse.placement.domain.PaymentReportLine;
 import com.iortatechnxt.brokerverse.placement.domain.PaymentReportLine.MatchedAccount;
 import com.iortatechnxt.brokerverse.placement.domain.PaymentReportRepository;
 import com.iortatechnxt.brokerverse.placement.domain.ReportedPayment;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.time.Clock;
 import java.util.Arrays;
 import java.util.List;
@@ -58,6 +59,7 @@ public class PaymentReportService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final UserDirectory directory;
 
   /**
    * Creates the service.
@@ -71,6 +73,7 @@ public class PaymentReportService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param directory user directory (display names in texts)
    */
   public PaymentReportService(
       PaymentReportRepository reports,
@@ -81,7 +84,8 @@ public class PaymentReportService {
       DocumentNumberService numbers,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      UserDirectory directory) {
     this.reports = reports;
     this.batches = batches;
     this.queries = queries;
@@ -91,6 +95,7 @@ public class PaymentReportService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.directory = directory;
   }
 
   /**
@@ -242,7 +247,8 @@ public class PaymentReportService {
           arn + " is " + DisplayFormat.words(account.getStatus()) + ", not awaiting payment");
     }
     line.matchManually(
-        new MatchedAccount(account.getId(), account.getArn()), currentUser.username());
+        new MatchedAccount(account.getId(), account.getArn()),
+        directory.displayName(currentUser.username()));
     audit.record(
         ENTITY,
         report.getReportNo(),

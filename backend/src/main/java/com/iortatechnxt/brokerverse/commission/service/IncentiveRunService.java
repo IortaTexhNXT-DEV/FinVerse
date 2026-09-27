@@ -24,6 +24,7 @@ import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.opsledger.service.LedgerSearch;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -68,6 +69,7 @@ public class IncentiveRunService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final UserDirectory directory;
 
   /**
    * Creates the service.
@@ -82,6 +84,7 @@ public class IncentiveRunService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param directory user directory (display names in texts)
    */
   @SuppressWarnings("java:S107") // constructor injection
   public IncentiveRunService(
@@ -94,7 +97,8 @@ public class IncentiveRunService {
       DocumentNumberService numbers,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      UserDirectory directory) {
     this.schemes = schemes;
     this.runs = runs;
     this.lines = lines;
@@ -105,6 +109,7 @@ public class IncentiveRunService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.directory = directory;
   }
 
   /**
@@ -257,7 +262,10 @@ public class IncentiveRunService {
     IncentiveRun run = require(id);
     run.cancel();
     audit.record(
-        ENTITY, run.getRunNo(), AuditAction.UPDATE, "Cancelled by " + currentUser.username());
+        ENTITY,
+        run.getRunNo(),
+        AuditAction.UPDATE,
+        "Cancelled by " + directory.displayName(currentUser.username()));
     return run;
   }
 

@@ -106,7 +106,10 @@ public class PayRequestWorkflowService {
             .orElseThrow(() -> new ResourceNotFoundException(PayRequests.ENTITY, id));
     assignments.assign(caseId, preparer, users.usersWithPermission("PRQ_CREATE"));
     audit.record(
-        PayRequests.ENTITY, request.getRequestNo(), AuditAction.UPDATE, "Assigned to " + preparer);
+        PayRequests.ENTITY,
+        request.getRequestNo(),
+        AuditAction.UPDATE,
+        "Assigned to " + users.displayName(preparer));
     return request;
   }
 

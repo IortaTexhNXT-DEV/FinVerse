@@ -205,7 +205,11 @@ public class CaseService {
             .map(v -> v.workCase().getId())
             .orElseThrow(() -> new ResourceNotFoundException(Acsl.CASE_ENTITY, id));
     assignments.assign(caseId, username, users.usersWithPermission("ACSL_PROCESS"));
-    audit.record(Acsl.CASE_ENTITY, c.getCaseNo(), AuditAction.UPDATE, "Assigned to " + username);
+    audit.record(
+        Acsl.CASE_ENTITY,
+        c.getCaseNo(),
+        AuditAction.UPDATE,
+        "Assigned to " + users.displayName(username));
     return c;
   }
 

@@ -120,7 +120,9 @@ public class EscalationNotices {
     Notice notice =
         new Notice(
             escalation.getEscalationNo() + ": " + escalation.getAssuredName() + " escalated",
-            (manual ? "Escalated by " + currentUser.username() : "Rule " + escalation.getRuleCode())
+            (manual
+                    ? "Escalated by " + users.displayName(currentUser.username())
+                    : "Rule " + escalation.getRuleCode())
                 + " - "
                 + escalation.getCurrency()
                 + " "

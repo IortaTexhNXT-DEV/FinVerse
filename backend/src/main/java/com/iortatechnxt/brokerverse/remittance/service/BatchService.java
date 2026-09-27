@@ -282,7 +282,11 @@ public class BatchService {
         .view(ENTITY, id.toString())
         .ifPresent(v -> assignments.assign(v.workCase().getId(), username, processors));
     batch.assignProcessor(username);
-    audit.record(ENTITY, batch.getBatchNo(), AuditAction.UPDATE, "Assigned to " + username);
+    audit.record(
+        ENTITY,
+        batch.getBatchNo(),
+        AuditAction.UPDATE,
+        "Assigned to " + users.displayName(username));
     return batch;
   }
 

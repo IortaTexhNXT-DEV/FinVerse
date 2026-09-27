@@ -317,19 +317,7 @@ public class RuleSetService {
   }
 
   private void validate(SbmRuleSet s, SbmRule.Content c, Long ruleId) {
-    if (c.conditions().isEmpty()) {
-      throw new BusinessRuleException("SBM_RULE_NO_CONDITION", "Add at least one condition");
-    }
-    for (SbmRuleCondition cond : c.conditions()) {
-      if (!SbmFacts.NAMES.contains(cond.field())) {
-        throw new BusinessRuleException(
-            "SBM_RULE_FIELD_UNKNOWN", "Field " + cond.field() + " cannot be used in a rule");
-      }
-      if (!SbmRuleEngine.OPERATORS.contains(cond.operator())) {
-        throw new BusinessRuleException(
-            "SBM_RULE_OPERATOR_UNKNOWN", "Operator " + cond.operator() + " is not an operator");
-      }
-    }
+    validateConditions(c.conditions());
     if (c.outcome() == null || c.outcome().isEmpty()) {
       throw new BusinessRuleException("SBM_RULE_NO_OUTCOME", "Select the outcome of the rule");
     }
@@ -347,6 +335,22 @@ public class RuleSetService {
       throw new BusinessRuleException(
           "SBM_RULE_PRIORITY_TAKEN",
           "Priority " + c.priority() + " is already used in this version");
+    }
+  }
+
+  private static void validateConditions(List<SbmRuleCondition> conditions) {
+    if (conditions.isEmpty()) {
+      throw new BusinessRuleException("SBM_RULE_NO_CONDITION", "Add at least one condition");
+    }
+    for (SbmRuleCondition cond : conditions) {
+      if (!SbmFacts.NAMES.contains(cond.field())) {
+        throw new BusinessRuleException(
+            "SBM_RULE_FIELD_UNKNOWN", "Field " + cond.field() + " cannot be used in a rule");
+      }
+      if (!SbmRuleEngine.OPERATORS.contains(cond.operator())) {
+        throw new BusinessRuleException(
+            "SBM_RULE_OPERATOR_UNKNOWN", "Operator " + cond.operator() + " is not an operator");
+      }
     }
   }
 

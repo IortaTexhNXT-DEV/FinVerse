@@ -40,6 +40,7 @@ import org.springframework.transaction.annotation.Transactional;
  * renewal tag, the tracking fields and the handlers' actions (dispose, exclude, reinstate, close).
  * Every change writes the field history and the audit trail.
  */
+@SuppressWarnings("PMD.GodClass") // the record operations of the masterlist behind one scope check
 @Service
 @Transactional
 public class MasterlistService {
@@ -262,13 +263,7 @@ public class MasterlistService {
       throw new BusinessRuleException("SBM_TAG_INVALID", "Select Renewable or Non-Renewable");
     }
     String clean = reason == null || reason.isBlank() ? null : reason.strip();
-    if (SubmittedCodes.NON_RENEWABLE.equals(tag)) {
-      if (clean == null) {
-        throw new BusinessRuleException(
-            "SBM_TAG_REASON_REQUIRED", "Select the reason for Non-Renewable");
-      }
-      lovs.requireValid(SubmittedCodes.LOV_NON_RENEWAL, clean, BusinessClock.today(clock));
-    }
+    requireReason(tag, clean);
     Map<String, String> before = history.snapshot(p);
     p.tagManually(tag, clean, currentUser.username(), clock.instant());
     history.record(p, before, SbmHistorySource.MANUAL, null);
@@ -278,6 +273,17 @@ public class MasterlistService {
         AuditAction.UPDATE,
         "Tagged " + (SubmittedCodes.RENEWABLE.equals(tag) ? "Renewable" : "Non-Renewable"));
     return p;
+  }
+
+  private void requireReason(String tag, String reason) {
+    if (!SubmittedCodes.NON_RENEWABLE.equals(tag)) {
+      return;
+    }
+    if (reason == null) {
+      throw new BusinessRuleException(
+          "SBM_TAG_REASON_REQUIRED", "Select the reason for Non-Renewable");
+    }
+    lovs.requireValid(SubmittedCodes.LOV_NON_RENEWAL, reason, BusinessClock.today(clock));
   }
 
   /**

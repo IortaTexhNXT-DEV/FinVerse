@@ -54,6 +54,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class NoTouchService {
 
+  private static final List<Integer> AMOUNT_COLUMNS = List.of(3, 4, 5);
+
   /** Service invoice type. */
   public static final String SI_TYPE = "SERVICE_FEE_NO_TOUCH";
 
@@ -286,7 +288,7 @@ public class NoTouchService {
                                     DisplayFormat.amount(l.getVat()),
                                     DisplayFormat.amount(l.getWtax())))
                         .toList(),
-                    List.of(3, 4, 5))),
+                    AMOUNT_COLUMNS)),
             List.of(),
             text.versionTag()));
   }

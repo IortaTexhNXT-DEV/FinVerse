@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.submitted.intake.service;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.submitted.intake.service.SourceIntakeHandler.SourceSpec;
 import com.iortatechnxt.brokerverse.submitted.masterlist.service.MasterlistService;
+import com.iortatechnxt.brokerverse.submitted.service.SubmittedCodes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,7 +28,11 @@ public class SourceIntakeHandlers {
       MasterlistService masterlist, IntakeRunService runs, LovService lovs) {
     return new SourceIntakeHandler(
         new SourceSpec(
-            "LFS_INSURANCE", "SBM_LFS_INSURANCE", "LFS insurance report", "CBG_MOTOR", null),
+            "LFS_INSURANCE",
+            "SBM_LFS_INSURANCE",
+            "LFS insurance report",
+            SubmittedCodes.CBG_MOTOR,
+            null),
         masterlist,
         runs,
         lovs);
@@ -64,7 +69,10 @@ public class SourceIntakeHandlers {
   public SourceIntakeHandler sbmCiuHandler(
       MasterlistService masterlist, IntakeRunService runs, LovService lovs) {
     return new SourceIntakeHandler(
-        new SourceSpec("CIU", "SBM_CIU", "CIU report", "CBG_MOTOR", null), masterlist, runs, lovs);
+        new SourceSpec("CIU", "SBM_CIU", "CIU report", SubmittedCodes.CBG_MOTOR, null),
+        masterlist,
+        runs,
+        lovs);
   }
 
   /**
@@ -98,7 +106,11 @@ public class SourceIntakeHandlers {
       MasterlistService masterlist, IntakeRunService runs, LovService lovs) {
     return new SourceIntakeHandler(
         new SourceSpec(
-            "LOAN_BOOKING", "SBM_LOAN_BOOKING", "Loan Booking Report", "CBG_MOTOR", null),
+            "LOAN_BOOKING",
+            "SBM_LOAN_BOOKING",
+            "Loan Booking Report",
+            SubmittedCodes.CBG_MOTOR,
+            null),
         masterlist,
         runs,
         lovs);
@@ -116,7 +128,8 @@ public class SourceIntakeHandlers {
   public SourceIntakeHandler sbmIaMasterlistHandler(
       MasterlistService masterlist, IntakeRunService runs, LovService lovs) {
     return new SourceIntakeHandler(
-        new SourceSpec("IA_MASTERLIST", "SBM_IA_MASTERLIST", "IA masterlist", "CBG_MOTOR", null),
+        new SourceSpec(
+            "IA_MASTERLIST", "SBM_IA_MASTERLIST", "IA masterlist", SubmittedCodes.CBG_MOTOR, null),
         masterlist,
         runs,
         lovs);

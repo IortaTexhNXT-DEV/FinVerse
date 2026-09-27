@@ -45,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class SbmProcessingService {
 
+  private static final String RUN_ENTITY = "SubmittedRun";
+
   private final SbmRunRepository runs;
   private final SbmPolicyRepository policies;
   private final SbmRuleSetRepository ruleSets;
@@ -125,7 +127,7 @@ public class SbmProcessingService {
                 request.trigger(),
                 request.scope(),
                 clock.instant()));
-    audit.record("SubmittedRun", run.getRunNo(), AuditAction.RUN, request.scope());
+    audit.record(RUN_ENTITY, run.getRunNo(), AuditAction.RUN, request.scope());
     return run;
   }
 
@@ -174,7 +176,7 @@ public class SbmProcessingService {
               "Processing run " + run.getRunNo() + ": " + run.getFallout() + " in fallout",
               "Open the run to resolve the fallout.",
               "/submitted/runs/" + run.getId(),
-              "SubmittedRun",
+              RUN_ENTITY,
               run.getRunNo()),
           SubmittedCodes.EVT_FALLOUT);
       alerts.raise(
@@ -182,7 +184,7 @@ public class SbmProcessingService {
           new AlertFacts(
               run.getCompanyId(),
               null,
-              "SubmittedRun",
+              RUN_ENTITY,
               run.getRunNo(),
               run.getFallout() + " submitted policies in fallout after run " + run.getRunNo(),
               BigDecimal.valueOf(run.getFallout()),
@@ -265,7 +267,7 @@ public class SbmProcessingService {
             count + " of your submitted policies changed bucket",
             "Processing run " + run.getRunNo(),
             "/submitted/masterlist",
-            "SubmittedRun",
+            RUN_ENTITY,
             run.getRunNo()),
         SubmittedCodes.EVT_BUCKET_CHANGED);
   }

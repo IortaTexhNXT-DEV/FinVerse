@@ -13,6 +13,7 @@ import java.time.YearMonth;
 import java.util.List;
 
 /** Records of the handling fee and No Touch billing API (FR-SP-070 to 075). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class FeeDtos {
 
   private FeeDtos() {}

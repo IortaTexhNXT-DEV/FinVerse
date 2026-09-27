@@ -21,6 +21,9 @@ import java.time.YearMonth;
  * account and its booking. Field changes are written to {@link SbmPolicyHistory} by the services
  * ({@link SbmPolicyFields}).
  */
+@SuppressWarnings(
+    "PMD.CyclomaticComplexity") // aggregate of the masterlist record: data, outcome, tracking,
+// renewal
 @Entity
 @Table(name = "sbm_policy")
 public class SbmPolicy extends BaseEntity {

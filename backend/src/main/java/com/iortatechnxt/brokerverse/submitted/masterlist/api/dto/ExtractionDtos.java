@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.Map;
 
 /** Records of the Extraction Review API (FRS FR-SP-002). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class ExtractionDtos {
 
   private ExtractionDtos() {}

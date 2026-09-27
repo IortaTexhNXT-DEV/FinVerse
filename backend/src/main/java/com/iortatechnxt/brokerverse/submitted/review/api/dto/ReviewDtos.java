@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Records of the review, IAAF and TOR API (FRS FR-SP-040, 041, 051-053). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class ReviewDtos {
 
   private ReviewDtos() {}

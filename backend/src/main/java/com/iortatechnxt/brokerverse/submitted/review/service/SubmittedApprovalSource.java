@@ -83,6 +83,12 @@ public class SubmittedApprovalSource implements PendingApprovalSource {
       document(viewer, DocumentApprovals.TOR, t, t.getPolicyId(), "Terms of Reference")
           .ifPresent(out::add);
     }
+    ruleSets(viewer, out);
+    masters(viewer, out);
+    return out;
+  }
+
+  private void ruleSets(ApprovalViewer viewer, List<PendingApproval> out) {
     if (viewer.can(APPROVE)) {
       for (SbmRuleSet s :
           ruleSets.findByStatusInOrderByIdAsc(List.of(SbmRuleSetStatus.SUBMITTED))) {
@@ -102,6 +108,9 @@ public class SubmittedApprovalSource implements PendingApprovalSource {
         }
       }
     }
+  }
+
+  private void masters(ApprovalViewer viewer, List<PendingApproval> out) {
     Scope scope = new Scope(MODULE, APPROVE);
     out.addAll(
         masters.pending(
@@ -137,7 +146,6 @@ public class SubmittedApprovalSource implements PendingApprovalSource {
                     r.getDocument() + " level " + r.getLevel(),
                     r.getSignatoryTitle(),
                     r.getCompanyId())));
-    return out;
   }
 
   private Optional<PendingApproval> document(

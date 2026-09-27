@@ -41,6 +41,7 @@ public class ExtractionPattern extends BaseEntity {
   private boolean active;
 
   @Column(nullable = false, length = 20)
+  @SuppressWarnings("PMD.ImmutableField") // mapped by JPA
   private String kind = KIND_EPOLICY;
 
   protected ExtractionPattern() {}

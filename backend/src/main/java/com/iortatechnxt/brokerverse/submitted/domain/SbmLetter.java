@@ -15,6 +15,8 @@ import java.time.Instant;
 @Table(name = "sbm_letter")
 public class SbmLetter extends BaseEntity {
 
+  private static final int TEXT = 500;
+
   /** Queued. */
   public static final String QUEUED = "QUEUED";
 
@@ -146,7 +148,7 @@ public class SbmLetter extends BaseEntity {
    */
   public void failed(String why) {
     this.status = FAILED;
-    this.error = why != null && why.length() > 500 ? why.substring(0, 500) : why;
+    this.error = why != null && why.length() > TEXT ? why.substring(0, TEXT) : why;
   }
 
   public Long getCompanyId() {

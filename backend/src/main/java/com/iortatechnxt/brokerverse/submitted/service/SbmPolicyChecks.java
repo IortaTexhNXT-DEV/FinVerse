@@ -39,6 +39,21 @@ public final class SbmPolicyChecks {
    */
   public static List<String> problems(SbmPolicyData d, List<String> mandatory) {
     List<String> out = new ArrayList<>();
+    header(d, out);
+    if (d.assured() == null || d.terms() == null) {
+      return out;
+    }
+    mandatoryFields(d, mandatory, out);
+    segmentFields(d, out);
+    amounts(d, out);
+    period(d, out);
+    if (blank(d.loan().pnNo()) && blank(d.terms().policyNo())) {
+      out.add("Enter the PN number or the policy number");
+    }
+    return out.stream().distinct().toList();
+  }
+
+  private static void header(SbmPolicyData d, List<String> out) {
     if (d.segment() == null || d.segment().isBlank()) {
       out.add("Segment is required");
     }
@@ -47,27 +62,23 @@ public final class SbmPolicyChecks {
     }
     require(out, "Assured", d.assured() == null ? null : d.assured().assuredName());
     require(out, "Expiry", d.terms() == null ? null : d.terms().expiryDate());
-    if (d.assured() == null || d.terms() == null) {
-      return out;
-    }
+  }
+
+  private static void mandatoryFields(SbmPolicyData d, List<String> mandatory, List<String> out) {
     for (String name : mandatory) {
       Field f = FIELDS.get(name);
       if (f != null && !"Assured".equals(f.label()) && !"Expiry".equals(f.label())) {
         require(out, f.label(), f.value().apply(d));
       }
     }
-    segmentFields(d, out);
-    amounts(d, out);
+  }
+
+  private static void period(SbmPolicyData d, List<String> out) {
     if (d.terms().inceptionDate() != null
         && d.terms().expiryDate() != null
         && !d.terms().expiryDate().isAfter(d.terms().inceptionDate())) {
       out.add("The expiry date must be after the inception date");
     }
-    boolean noKey = blank(d.loan().pnNo()) && blank(d.terms().policyNo());
-    if (noKey) {
-      out.add("Enter the PN number or the policy number");
-    }
-    return out.stream().distinct().toList();
   }
 
   private static void segmentFields(SbmPolicyData d, List<String> out) {

@@ -16,6 +16,8 @@ import jakarta.persistence.Table;
 @Table(name = "sbm_run_result")
 public class SbmRunResult extends BaseEntity {
 
+  private static final int TEXT = 500;
+
   /** Outcome of a step. */
   public enum Outcome {
     /** The step passed without a bucket. */
@@ -85,7 +87,7 @@ public class SbmRunResult extends BaseEntity {
     this.ruleSetCode = decision.ruleSetCode();
     this.ruleSetVersion = decision.ruleSetVersion();
     String m = decision.message();
-    this.message = m != null && m.length() > 500 ? m.substring(0, 500) : m;
+    this.message = m != null && m.length() > TEXT ? m.substring(0, TEXT) : m;
   }
 
   public Long getRunId() {

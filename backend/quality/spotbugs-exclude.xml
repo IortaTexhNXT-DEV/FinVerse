@@ -87,4 +87,14 @@
     <Class name="com.iortatechnxt.brokerverse.storage.service.FileContentMigrationService"/>
     <Bug pattern="SQL_INJECTION_SPRING_JDBC"/>
   </Match>
+  <!--
+    IMPROPER_UNICODE (FindSecBugs) in Submitted Policies: the case mappings (Locale.ROOT) only
+    normalise the ASCII codes of the bank's files and of the rule values (segments, statuses, business
+    types, vehicle types) before they are compared with list-of-values codes; no security decision
+    depends on them.
+  -->
+  <Match>
+    <Package name="~com\.iortatechnxt\.brokerverse\.submitted\..*"/>
+    <Bug pattern="IMPROPER_UNICODE"/>
+  </Match>
 </FindBugsFilter>

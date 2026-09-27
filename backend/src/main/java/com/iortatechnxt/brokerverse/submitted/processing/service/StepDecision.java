@@ -35,34 +35,50 @@ public record StepDecision(
    * @return decision
    */
   public static StepDecision evaluate(List<SbmRule> rules, Map<String, Object> facts) {
-    SbmRule first = null;
-    String bucket = null;
-    String tag = null;
-    String classification = null;
-    String template = null;
-    String flag = null;
-    String reason = null;
+    Merged m = new Merged();
     for (SbmRule r : rules) {
-      if (!SbmRuleEngine.matches(r, facts)) {
-        continue;
-      }
-      SbmRuleOutcome o = r.getOutcome();
-      first = first == null ? r : first;
-      bucket = bucket == null ? o.bucket() : bucket;
-      tag = tag == null ? o.tag() : tag;
-      classification = classification == null ? o.classification() : classification;
-      template = template == null ? o.raTemplate() : template;
-      flag = flag == null ? o.flag() : flag;
-      reason = reason == null ? r.getReasonCode() : reason;
-      if (r.isStop()) {
-        break;
+      if (SbmRuleEngine.matches(r, facts)) {
+        m.add(r);
+        if (r.isStop()) {
+          break;
+        }
       }
     }
-    return new StepDecision(
-        first != null,
-        new SbmRuleOutcome(bucket, tag, classification, template, flag),
-        reason,
-        first);
+    return m.decision();
+  }
+
+  /** The outcome of the matching rules: each part from the first rule that gives it. */
+  private static final class Merged {
+    private SbmRule first;
+    private String bucket;
+    private String tag;
+    private String classification;
+    private String template;
+    private String flag;
+    private String reason;
+
+    void add(SbmRule r) {
+      SbmRuleOutcome o = r.getOutcome();
+      first = first == null ? r : first;
+      bucket = firstOf(bucket, o.bucket());
+      tag = firstOf(tag, o.tag());
+      classification = firstOf(classification, o.classification());
+      template = firstOf(template, o.raTemplate());
+      flag = firstOf(flag, o.flag());
+      reason = firstOf(reason, r.getReasonCode());
+    }
+
+    StepDecision decision() {
+      return new StepDecision(
+          first != null,
+          new SbmRuleOutcome(bucket, tag, classification, template, flag),
+          reason,
+          first);
+    }
+
+    private static String firstOf(String kept, String next) {
+      return kept == null ? next : kept;
+    }
   }
 
   /**

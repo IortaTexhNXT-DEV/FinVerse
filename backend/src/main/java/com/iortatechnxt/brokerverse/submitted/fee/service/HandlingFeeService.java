@@ -38,6 +38,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class HandlingFeeService {
 
+  private static final int SOURCE_PREFIX = 3;
+
   /** Requesting module on the disposition request. */
   public static final String SOURCE = "SUBMITTED";
 
@@ -235,7 +237,7 @@ public class HandlingFeeService {
         || !event.sourceRef().startsWith("HF:")) {
       return;
     }
-    fees.findByFeeNo(event.sourceRef().substring(3))
+    fees.findByFeeNo(event.sourceRef().substring(SOURCE_PREFIX))
         .ifPresent(
             fee -> {
               fee.ticket(event.cashieringRef(), event.message());

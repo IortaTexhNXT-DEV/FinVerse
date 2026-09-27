@@ -49,6 +49,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RenewalFollowService {
 
+  private static final String RENEWAL = "Renewal";
+
   private static final String CONVERSION_PLACED = "PLACED";
   private static final String CONVERSION_RENEWED = "RENEWED";
 
@@ -141,8 +143,7 @@ public class RenewalFollowService {
                   && p.getStatus() == SbmPolicyStatus.RENEWAL_IN_PROGRESS) {
                 flow.system(p, "placed", "Placement slip sent (" + arn + ")");
                 p.convert(CONVERSION_PLACED);
-                history.note(
-                    p, "Renewal", "Placed with the insurer", SbmHistorySource.RENEWAL, arn);
+                history.note(p, RENEWAL, "Placed with the insurer", SbmHistorySource.RENEWAL, arn);
                 notifyHandler(
                     p, "Renewal of " + p.getSbmNo() + " sent to the insurer", "SBM_PLACEMENT_SENT");
               }
@@ -170,11 +171,7 @@ public class RenewalFollowService {
               flow.system(p, "booked", "Invoice " + invoiceNo);
               renewals.findByPolicyId(p.getId()).ifPresent(r -> r.close(CONVERSION_RENEWED, null));
               history.note(
-                  p,
-                  "Renewal",
-                  "Booked, invoice " + invoiceNo,
-                  SbmHistorySource.BOOKING,
-                  invoiceNo);
+                  p, RENEWAL, "Booked, invoice " + invoiceNo, SbmHistorySource.BOOKING, invoiceNo);
               audit.record(
                   SubmittedCodes.ENTITY,
                   p.getSbmNo(),
@@ -245,18 +242,19 @@ public class RenewalFollowService {
           default -> "DECLINED";
         };
     r.close(outcome, s.reason());
-    if (p.getStatus() == SbmPolicyStatus.RENEWAL_IN_PROGRESS
-        || p.getStatus() == SbmPolicyStatus.PLACED) {
-      flow.system(p, "not_renewed", s.reason() == null ? "Not renewed" : s.reason());
-      p.convert("UNRENEWED");
-      history.note(
-          p,
-          "Renewal",
-          "Not renewed: " + (s.reason() == null ? "" : s.reason()),
-          SbmHistorySource.RENEWAL,
-          s.renewalRef());
-    }
+    notRenewed(p, s);
     return true;
+  }
+
+  private void notRenewed(SbmPolicy p, HandOffStatus s) {
+    if (p.getStatus() != SbmPolicyStatus.RENEWAL_IN_PROGRESS
+        && p.getStatus() != SbmPolicyStatus.PLACED) {
+      return;
+    }
+    String reason = s.reason() == null ? "" : s.reason();
+    flow.system(p, "not_renewed", reason.isEmpty() ? "Not renewed" : reason);
+    p.convert("UNRENEWED");
+    history.note(p, RENEWAL, "Not renewed: " + reason, SbmHistorySource.RENEWAL, s.renewalRef());
   }
 
   private boolean holdCover(SbmPolicy p, SbmRenewal r, LocalDate today) {
@@ -348,7 +346,7 @@ public class RenewalFollowService {
     holdCovers.reassign(r.getArn(), insurerCode, reasonCode);
     r.reassigned(insurerCode);
     history.note(
-        p, "Renewal", "Insurer re-assigned to " + insurerCode, SbmHistorySource.MANUAL, r.getArn());
+        p, RENEWAL, "Insurer re-assigned to " + insurerCode, SbmHistorySource.MANUAL, r.getArn());
     audit.record(
         SubmittedCodes.ENTITY,
         p.getSbmNo(),

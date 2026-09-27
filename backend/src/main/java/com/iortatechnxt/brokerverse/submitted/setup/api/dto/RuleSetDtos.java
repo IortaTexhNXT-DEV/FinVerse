@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /** Records of the rule set API (FRS FR-SP-020). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class RuleSetDtos {
 
   private RuleSetDtos() {}

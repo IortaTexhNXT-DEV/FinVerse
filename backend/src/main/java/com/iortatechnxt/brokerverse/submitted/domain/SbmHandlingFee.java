@@ -19,6 +19,8 @@ import java.time.LocalDate;
 @Table(name = "sbm_handling_fee")
 public class SbmHandlingFee extends BaseEntity {
 
+  private static final int TEXT = 500;
+
   /** Billed, waiting for payment. */
   public static final String BILLED = "BILLED";
 
@@ -138,7 +140,7 @@ public class SbmHandlingFee extends BaseEntity {
   public void ticket(String ref, String message) {
     this.ticketRef = ref;
     this.ticketMessage =
-        message != null && message.length() > 500 ? message.substring(0, 500) : message;
+        message != null && message.length() > TEXT ? message.substring(0, TEXT) : message;
   }
 
   /**

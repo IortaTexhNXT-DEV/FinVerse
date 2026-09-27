@@ -45,6 +45,7 @@ public class SbmRule extends BaseEntity {
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "sbm_rule_condition", joinColumns = @JoinColumn(name = "rule_id"))
   @OrderColumn(name = "seq")
+  @SuppressWarnings("PMD.ImmutableField") // mapped by JPA
   private List<SbmRuleCondition> conditions = new ArrayList<>();
 
   protected SbmRule() {}

@@ -228,9 +228,11 @@ public class SetupService {
     if (!DOCUMENTS.contains(row.document())) {
       throw new BusinessRuleException("SBM_MATRIX_DOCUMENT", "Select IAAF or TOR");
     }
-    try {
-      Permission.valueOf(row.permission());
-    } catch (IllegalArgumentException | NullPointerException e) {
+    boolean known =
+        row.permission() != null
+            && java.util.Arrays.stream(Permission.values())
+                .anyMatch(p -> p.name().equals(row.permission()));
+    if (!known) {
       throw new BusinessRuleException(
           "SBM_MATRIX_PERMISSION", "Select the permission of the approvers");
     }

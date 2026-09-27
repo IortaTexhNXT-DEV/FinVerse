@@ -64,9 +64,11 @@ public record ActiveRules(Map<Long, SbmRuleSet> sets, List<SbmRule> rules) {
   }
 
   private static boolean fits(SbmRuleSet set, SbmStep step, SbmPolicy p) {
-    return set != null
-        && set.getStep() == step
-        && (set.getSegment() == null || set.getSegment().equals(p.getSegment()))
+    if (set == null || set.getStep() != step) {
+      return false;
+    }
+    boolean segmentFits = set.getSegment() == null || set.getSegment().equals(p.getSegment());
+    return segmentFits
         && (set.getBusinessType() == null
             || set.getBusinessType().equals(p.getBusinessType().name()));
   }

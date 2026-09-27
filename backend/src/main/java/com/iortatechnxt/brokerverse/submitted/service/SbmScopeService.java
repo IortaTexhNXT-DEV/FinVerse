@@ -116,6 +116,8 @@ public class SbmScopeService {
    */
   public record Scope(List<String> segments, boolean ownOnly, String username) {
 
+    private static final int SQL_CAPACITY = 128;
+
     /** Everything (background jobs). */
     public static final Scope ALL = new Scope(List.of(), false, null);
 
@@ -169,7 +171,7 @@ public class SbmScopeService {
      * @return condition starting with " and", empty for everything
      */
     public String sql() {
-      StringBuilder sb = new StringBuilder();
+      StringBuilder sb = new StringBuilder(SQL_CAPACITY);
       if (!segments.isEmpty()) {
         sb.append(" and p.segment in (:scopeSegments)");
       }

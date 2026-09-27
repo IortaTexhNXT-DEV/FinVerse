@@ -201,6 +201,7 @@ public class SubmittedPolicyRenewalHandOff implements RenewalHandOff {
         null);
   }
 
+  @SuppressWarnings("PMD.CyclomaticComplexity") // one state per way a renewal closes
   private static HandOffStatus statusOf(RenewalCandidate c) {
     boolean closed = c.getStage() == RenewalStage.CLOSED || c.getStage() == RenewalStage.RENEWED;
     State state = State.OPEN;

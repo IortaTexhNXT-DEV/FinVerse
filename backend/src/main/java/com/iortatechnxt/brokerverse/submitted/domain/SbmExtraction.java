@@ -84,6 +84,7 @@ public class SbmExtraction extends BaseEntity {
   @ElementCollection(fetch = FetchType.EAGER)
   @CollectionTable(name = "sbm_extraction_field", joinColumns = @JoinColumn(name = "extraction_id"))
   @MapKeyColumn(name = "field", length = 30)
+  @SuppressWarnings("PMD.ImmutableField") // mapped by JPA
   private Map<String, SbmExtractedValue> fields = new LinkedHashMap<>();
 
   protected SbmExtraction() {}

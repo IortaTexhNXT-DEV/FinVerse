@@ -30,6 +30,7 @@ import com.iortatechnxt.brokerverse.submitted.renewal.service.HandOffService;
 import com.iortatechnxt.brokerverse.submitted.review.service.IaafService;
 import com.iortatechnxt.brokerverse.submitted.review.service.TorService;
 import com.iortatechnxt.brokerverse.submitted.seed.SubmittedSeedRows.SeedRow;
+import com.iortatechnxt.brokerverse.submitted.service.SubmittedCodes;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -71,6 +72,7 @@ public class SubmittedSeedData implements ApplicationRunner {
   private static final String SOURCE_CORPORATE = "IBG_LEASING_DOC";
   private static final String SOURCE_RETAIL = "SPI";
   private static final String PN_PREFIX = "PN-";
+  private static final String MOTOR_HANDLER = "sbmhandler";
   private static final int MOBILE_BASE = 1_000_000;
   private static final int MOBILE_SPAN = 8_999_999;
   private static final int POLICY_SPAN = 99_999;
@@ -184,58 +186,15 @@ public class SubmittedSeedData implements ApplicationRunner {
 
   private SbmPolicy intake(Long companyId, SeedRow r, LocalDate today) {
     String segment = r.segment();
-    boolean motor = "CBG_MOTOR".equals(segment);
     LocalDate expiry = today.plusDays(Integer.parseInt(r.days()));
     SbmPolicyData data =
         new SbmPolicyData(
             segment,
             SbmBusinessType.valueOf(r.businessType()),
-            r.pn().isEmpty()
-                ? SbmLoan.NONE
-                : new SbmLoan(
-                    r.pn(),
-                    null,
-                    "CIF-" + r.pn().substring(PN_PREFIX.length()),
-                    null,
-                    null,
-                    null,
-                    null,
-                    r.assured()),
-            new SbmAssured(
-                r.assured(),
-                "Seed address of " + r.assured() + ", Makati City",
-                null,
-                "0917" + (MOBILE_BASE + Math.floorMod(r.assured().hashCode(), MOBILE_SPAN)),
-                r.assured().toLowerCase(java.util.Locale.ROOT).replace(' ', '.') + "@example.ph",
-                "Branch.counterpart@bank-seed.ph"),
-            new SbmTerms(
-                r.insurer(),
-                "POL-"
-                    + (r.pn().isEmpty()
-                        ? "C" + Math.floorMod(r.assured().hashCode(), POLICY_SPAN)
-                        : r.pn().substring(PN_PREFIX.length())),
-                expiry.minusYears(1),
-                expiry,
-                null,
-                new BigDecimal(r.sumInsured()),
-                new BigDecimal(r.sumInsured())
-                    .multiply(PREMIUM_RATE)
-                    .setScale(2, java.math.RoundingMode.HALF_UP),
-                "PHP"),
-            motor
-                ? new SbmRisk(
-                    r.unit(),
-                    "SN" + r.plate(),
-                    "MN" + r.plate(),
-                    "White",
-                    r.plate(),
-                    r.kind(),
-                    today.getYear() - VEHICLE_AGE,
-                    null,
-                    null,
-                    "BDO Unibank")
-                : new SbmRisk(
-                    null, null, null, null, null, null, null, r.unit(), r.kind(), "BDO Unibank"),
+            loan(r),
+            assured(r),
+            terms(r, expiry),
+            risk(r, today),
             new SbmMarks("FFY".equals(r.mark()), "EMP".equals(r.mark()), "NT".equals(r.mark())));
     String source = source(segment);
     return masterlist
@@ -252,9 +211,68 @@ public class SubmittedSeedData implements ApplicationRunner {
         .policy();
   }
 
+  private static SbmLoan loan(SeedRow r) {
+    return r.pn().isEmpty()
+        ? SbmLoan.NONE
+        : new SbmLoan(
+            r.pn(),
+            null,
+            "CIF-" + r.pn().substring(PN_PREFIX.length()),
+            null,
+            null,
+            null,
+            null,
+            r.assured());
+  }
+
+  private static SbmAssured assured(SeedRow r) {
+    return new SbmAssured(
+        r.assured(),
+        "Seed address of " + r.assured() + ", Makati City",
+        null,
+        "0917" + (MOBILE_BASE + Math.floorMod(r.assured().hashCode(), MOBILE_SPAN)),
+        r.assured().toLowerCase(java.util.Locale.ROOT).replace(' ', '.') + "@example.ph",
+        "Branch.counterpart@bank-seed.ph");
+  }
+
+  private static SbmTerms terms(SeedRow r, LocalDate expiry) {
+    String policyNo =
+        r.pn().isEmpty()
+            ? "C" + Math.floorMod(r.assured().hashCode(), POLICY_SPAN)
+            : r.pn().substring(PN_PREFIX.length());
+    BigDecimal sumInsured = new BigDecimal(r.sumInsured());
+    return new SbmTerms(
+        r.insurer(),
+        "POL-" + policyNo,
+        expiry.minusYears(1),
+        expiry,
+        null,
+        sumInsured,
+        sumInsured.multiply(PREMIUM_RATE).setScale(2, java.math.RoundingMode.HALF_UP),
+        "PHP");
+  }
+
+  private static SbmRisk risk(SeedRow r, LocalDate today) {
+    if (!SubmittedCodes.CBG_MOTOR.equals(r.segment())) {
+      return new SbmRisk(
+          null, null, null, null, null, null, null, r.unit(), r.kind(), "BDO Unibank");
+    }
+    return new SbmRisk(
+        r.unit(),
+        "SN" + r.plate(),
+        "MN" + r.plate(),
+        "White",
+        r.plate(),
+        r.kind(),
+        today.getYear() - VEHICLE_AGE,
+        null,
+        null,
+        "BDO Unibank");
+  }
+
   private static String source(String segment) {
     return switch (segment) {
-      case "CBG_MOTOR" -> SOURCE_MOTOR;
+      case SubmittedCodes.CBG_MOTOR -> SOURCE_MOTOR;
       case "CBG_FIRE" -> SOURCE_FIRE;
       case "NONCBG_CORPORATE" -> SOURCE_CORPORATE;
       default -> SOURCE_RETAIL;
@@ -265,7 +283,7 @@ public class SubmittedSeedData implements ApplicationRunner {
     as(
         "sbmtl",
         () -> {
-          for (String handler : List.of("sbmhandler", "firehandler", "sbmtl")) {
+          for (String handler : List.of(MOTOR_HANDLER, "firehandler", "sbmtl")) {
             List<Long> ids =
                 loaded.stream()
                     .filter(p -> handler.equals(handlerOf(p.getSegment())))
@@ -274,7 +292,7 @@ public class SubmittedSeedData implements ApplicationRunner {
             masterlist.assign(companyId, ids, handler);
           }
           for (SbmPolicy p : loaded) {
-            if ("CBG_MOTOR".equals(p.getSegment())) {
+            if (SubmittedCodes.CBG_MOTOR.equals(p.getSegment())) {
               String ao = p.getId() % 2 == 0 ? "ao" : "ao2";
               masterlist.track(
                   p.getId(), new SbmTracking(handlerOf(p.getSegment()), ao, null, null, null));
@@ -286,7 +304,7 @@ public class SubmittedSeedData implements ApplicationRunner {
 
   private static String handlerOf(String segment) {
     return switch (segment) {
-      case "CBG_MOTOR" -> "sbmhandler";
+      case SubmittedCodes.CBG_MOTOR -> MOTOR_HANDLER;
       case "CBG_FIRE" -> "firehandler";
       default -> "sbmtl";
     };
@@ -296,30 +314,38 @@ public class SubmittedSeedData implements ApplicationRunner {
     List<SbmPolicy> corporate =
         loaded.stream().filter(p -> "NONCBG_CORPORATE".equals(p.getSegment())).toList();
     for (int i = 0; i < corporate.size(); i++) {
-      Long id = corporate.get(i).getId();
-      boolean findings = i % 2 == 1;
-      as(
-          "polreview",
-          () ->
-              work.iaafs()
-                  .review(
-                      id,
-                      new SbmIaafReview.Content(
-                          today.minusDays(1),
-                          findings ? SbmIaafReview.WITH_FINDINGS : SbmIaafReview.ADEQUATE,
-                          findings ? List.of("MORTGAGEE_CLAUSE_MISSING") : List.of(),
-                          findings
-                              ? "The mortgagee clause in favour of the bank is missing"
-                              : "Cover adequate for the loan")));
-      if (!findings) {
-        SbmIaaf iaaf = as("polreview", () -> work.iaafs().generate(id, Map.of()));
-        as("polreview", () -> work.iaafs().submit(iaaf.getId()));
-        if (i == 0) {
-          SbmIaaf first = as("sbmchecker", () -> work.iaafs().approve(iaaf.getId()));
-          if (first.getStatus() == SbmDocStatus.FOR_APPROVAL) {
-            as("mkttl", () -> work.iaafs().approve(iaaf.getId()));
-          }
-        }
+      review(corporate.get(i).getId(), i, today);
+    }
+  }
+
+  /**
+   * The first corporate record gets an IAAF approved, the second findings, the third an IAAF
+   * waiting.
+   */
+  private void review(Long id, int index, LocalDate today) {
+    boolean findings = index % 2 != 0;
+    as(
+        "polreview",
+        () ->
+            work.iaafs()
+                .review(
+                    id,
+                    new SbmIaafReview.Content(
+                        today.minusDays(1),
+                        findings ? SbmIaafReview.WITH_FINDINGS : SbmIaafReview.ADEQUATE,
+                        findings ? List.of("MORTGAGEE_CLAUSE_MISSING") : List.of(),
+                        findings
+                            ? "The mortgagee clause in favour of the bank is missing"
+                            : "Cover adequate for the loan")));
+    if (findings) {
+      return;
+    }
+    SbmIaaf iaaf = as("polreview", () -> work.iaafs().generate(id, Map.of()));
+    as("polreview", () -> work.iaafs().submit(iaaf.getId()));
+    if (index == 0) {
+      SbmIaaf first = as("sbmchecker", () -> work.iaafs().approve(iaaf.getId()));
+      if (first.getStatus() == SbmDocStatus.FOR_APPROVAL) {
+        as("mkttl", () -> work.iaafs().approve(iaaf.getId()));
       }
     }
   }
@@ -333,7 +359,7 @@ public class SubmittedSeedData implements ApplicationRunner {
             p -> {
               var t =
                   as(
-                      "sbmhandler",
+                      MOTOR_HANDLER,
                       () ->
                           work.tors()
                               .generate(
@@ -341,7 +367,7 @@ public class SubmittedSeedData implements ApplicationRunner {
                                   "Accept the sum insured above the motor limit with a 20% "
                                       + "deductible and the anti-theft device warranty",
                                   "ao"));
-              as("sbmhandler", () -> work.tors().submit(t.getId()));
+              as(MOTOR_HANDLER, () -> work.tors().submit(t.getId()));
             });
   }
 
@@ -356,7 +382,7 @@ public class SubmittedSeedData implements ApplicationRunner {
 
   private void fees(Long companyId, List<SbmPolicy> loaded, LocalDate today) {
     loaded.stream()
-        .filter(p -> "CBG_MOTOR".equals(p.getSegment()) && p.getLoan().pnNo() != null)
+        .filter(p -> SubmittedCodes.CBG_MOTOR.equals(p.getSegment()) && p.getLoan().pnNo() != null)
         .limit(FEES)
         .forEach(
             p ->

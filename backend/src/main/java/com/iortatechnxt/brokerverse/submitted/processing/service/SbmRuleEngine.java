@@ -46,11 +46,17 @@ public final class SbmRuleEngine {
     return switch (c.operator()) {
       case "EMPTY" -> empty;
       case "NOT_EMPTY" -> !empty;
+      case "EQ", "NE", "IN", "NOT_IN" -> text(c, actual, empty);
+      default -> compare(c.operator(), actual, c.value());
+    };
+  }
+
+  private static boolean text(SbmRuleCondition c, String actual, boolean empty) {
+    return switch (c.operator()) {
       case "EQ" -> !empty && same(actual, c.value());
       case "NE" -> empty || !same(actual, c.value());
       case "IN" -> !empty && list(c.value()).stream().anyMatch(v -> same(actual, v));
-      case "NOT_IN" -> empty || list(c.value()).stream().noneMatch(v -> same(actual, v));
-      default -> compare(c.operator(), actual, c.value());
+      default -> empty || list(c.value()).stream().noneMatch(v -> same(actual, v));
     };
   }
 

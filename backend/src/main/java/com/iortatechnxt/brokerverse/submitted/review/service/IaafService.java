@@ -49,6 +49,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class IaafService {
 
+  private static final String DASH = " - ";
+  private static final java.util.Set<String> ADEQUACIES =
+      java.util.Set.of(SbmIaafReview.ADEQUATE, SbmIaafReview.WITH_FINDINGS);
+  private static final String IAAF_TOPIC = "IAAF";
+
   private static final String ENTITY = "SubmittedIaaf";
   private static final Set<String> RELATIONS = Set.of("PREVIOUS_TERM", "SAME_BORROWER", "OTHER");
 
@@ -148,23 +153,25 @@ public class IaafService {
   }
 
   private void validate(SbmIaafReview.Content c) {
-    if (c.adequacy() == null
-        || !SbmIaafReview.ADEQUATE.equals(c.adequacy())
-            && !SbmIaafReview.WITH_FINDINGS.equals(c.adequacy())) {
+    if (!ADEQUACIES.contains(String.valueOf(c.adequacy()))) {
       throw new BusinessRuleException("SBM_ADEQUACY_REQUIRED", "Select the adequacy");
     }
-    if (c.reviewDate() == null) {
-      throw new BusinessRuleException("SBM_REVIEW_DATE_REQUIRED", "Review date is required");
-    }
-    if (c.reviewDate().isAfter(BusinessClock.today(clock))) {
-      throw new BusinessRuleException(
-          "SBM_REVIEW_DATE_FUTURE", "The review date cannot be in the future");
-    }
+    requireDate(c.reviewDate());
     if (SbmIaafReview.WITH_FINDINGS.equals(c.adequacy()) && c.findings().isEmpty()) {
       throw new BusinessRuleException("SBM_FINDINGS_REQUIRED", "Select the findings");
     }
     LocalDate today = BusinessClock.today(clock);
     c.findings().forEach(f -> lovs.requireValid(SubmittedCodes.LOV_FINDING, f, today));
+  }
+
+  private void requireDate(LocalDate date) {
+    if (date == null) {
+      throw new BusinessRuleException("SBM_REVIEW_DATE_REQUIRED", "Review date is required");
+    }
+    if (date.isAfter(BusinessClock.today(clock))) {
+      throw new BusinessRuleException(
+          "SBM_REVIEW_DATE_FUTURE", "The review date cannot be in the future");
+    }
   }
 
   private void sendFindings(SbmPolicy p, SbmIaafReview r) {
@@ -182,7 +189,7 @@ public class IaafService {
             "SBM_REVIEW_FINDINGS",
             List.of(to),
             List.of(),
-            "Policy review findings - " + p.getAssured().assuredName() + " - " + p.getSbmNo(),
+            "Policy review findings - " + p.getAssured().assuredName() + DASH + p.getSbmNo(),
             "The review of the policy "
                 + nz(p.getTerms().policyNo())
                 + " of "
@@ -235,7 +242,11 @@ public class IaafService {
         p.getAssured().assuredName(),
         DocumentApprovals.linkOf(DocumentApprovals.IAAF, i));
     history.note(
-        p, "IAAF", "IAAF " + i.getIaafNo() + " generated", SbmHistorySource.MANUAL, i.getIaafNo());
+        p,
+        IAAF_TOPIC,
+        "IAAF " + i.getIaafNo() + " generated",
+        SbmHistorySource.MANUAL,
+        i.getIaafNo());
     audit.record(ENTITY, i.getIaafNo(), AuditAction.CREATE, "IAAF of " + p.getSbmNo());
     return i;
   }
@@ -286,7 +297,11 @@ public class IaafService {
       i.signedPdf(pdf.attachmentId());
       i.rendered(pdf.versionNo());
       history.note(
-          p, "IAAF", "IAAF " + i.getIaafNo() + " approved", SbmHistorySource.MANUAL, i.getIaafNo());
+          p,
+          IAAF_TOPIC,
+          "IAAF " + i.getIaafNo() + " approved",
+          SbmHistorySource.MANUAL,
+          i.getIaafNo());
     }
     audit.record(
         ENTITY, i.getIaafNo(), AuditAction.AUTHORIZE, last ? "Approved" : "Level approved");
@@ -331,7 +346,7 @@ public class IaafService {
             List.of(),
             "Insurance Adequacy Assessment Form "
                 + i.getIaafNo()
-                + " - "
+                + DASH
                 + p.getAssured().assuredName(),
             "Please find attached the Insurance Adequacy Assessment Form of the policy "
                 + nz(p.getTerms().policyNo())
@@ -345,7 +360,7 @@ public class IaafService {
     approvals.move(DocumentApprovals.IAAF, i, "issue", TransitionNote.NONE);
     history.note(
         p,
-        "IAAF",
+        IAAF_TOPIC,
         "IAAF " + i.getIaafNo() + " sent to the bank counterpart",
         SbmHistorySource.MANUAL,
         i.getIaafNo());
@@ -443,7 +458,7 @@ public class IaafService {
                     + DisplayFormat.words(r.getAdequacy())
                     + (r.findingList().isEmpty()
                         ? ""
-                        : " - "
+                        : DASH
                             + r.findingList().stream()
                                 .map(f -> lovs.label(SubmittedCodes.LOV_FINDING, f))
                                 .collect(Collectors.joining(", "))))
@@ -455,7 +470,7 @@ public class IaafService {
   }
 
   private static String subject(SbmPolicy p) {
-    return p.getAssured().assuredName() + " - " + p.getSbmNo();
+    return p.getAssured().assuredName() + DASH + p.getSbmNo();
   }
 
   private static String nz(String value) {

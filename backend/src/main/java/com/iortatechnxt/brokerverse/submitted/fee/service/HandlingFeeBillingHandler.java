@@ -20,6 +20,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class HandlingFeeBillingHandler implements BulkImportHandler {
 
+  private static final String AMOUNT = "Amount";
+
   /** Handler code. */
   public static final String CODE = "SBM_HANDLING_FEE_BILLING";
 
@@ -62,7 +64,7 @@ public class HandlingFeeBillingHandler implements BulkImportHandler {
         BulkColumn.optional(SBM_NO, "Masterlist number of the policy, if known", "SBM-2026-000012"),
         BulkColumn.optional(PN, "PN number carried by CLPC payments", "PN-2026-000123"),
         BulkColumn.optional(LOCATION, "Location reference carried by OTC payments", "LOC-000451"),
-        new BulkColumn("Amount", "Handling fee billed", true, Type.NUMBER, "1500.00"),
+        new BulkColumn(AMOUNT, "Handling fee billed", true, Type.NUMBER, "1500.00"),
         new BulkColumn("Billing Date", "Billing date", true, Type.DATE, "2026-09-01"));
   }
 
@@ -78,7 +80,7 @@ public class HandlingFeeBillingHandler implements BulkImportHandler {
     if (row.text(PN) == null && row.text(LOCATION) == null) {
       errors.add("Enter the PN number or the location reference");
     }
-    if (row.number("Amount") != null && row.number("Amount").signum() <= 0) {
+    if (row.number(AMOUNT) != null && row.number(AMOUNT).signum() <= 0) {
       errors.add("The amount must be above zero");
     }
     String sbmNo = row.text(SBM_NO);
@@ -104,7 +106,7 @@ public class HandlingFeeBillingHandler implements BulkImportHandler {
                 policyId,
                 row.text(PN),
                 row.text(LOCATION),
-                row.number("Amount"),
+                row.number(AMOUNT),
                 "PHP",
                 row.date("Billing Date")),
             context.jobNo())

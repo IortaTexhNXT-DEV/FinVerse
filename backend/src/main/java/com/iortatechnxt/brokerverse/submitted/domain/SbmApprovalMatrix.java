@@ -85,10 +85,8 @@ public class SbmApprovalMatrix extends AuthorizableEntity {
    * @return true when it applies
    */
   public boolean applies(String doc, String seg, BigDecimal tsi) {
-    return document.equals(doc)
-        && (segment == null || segment.equals(seg))
-        && tsi.compareTo(tsiFrom) >= 0
-        && (tsiTo == null || tsi.compareTo(tsiTo) <= 0);
+    boolean inBand = tsi.compareTo(tsiFrom) >= 0 && (tsiTo == null || tsi.compareTo(tsiTo) <= 0);
+    return document.equals(doc) && (segment == null || segment.equals(seg)) && inBand;
   }
 
   public Long getCompanyId() {

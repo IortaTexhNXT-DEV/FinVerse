@@ -16,6 +16,8 @@ import java.time.Instant;
 @Table(name = "sbm_run")
 public class SbmRun extends BaseEntity {
 
+  private static final int SCOPE = 250;
+
   /** What started a run. */
   public enum Trigger {
     /** An intake run committed. */
@@ -78,7 +80,7 @@ public class SbmRun extends BaseEntity {
     this.companyId = companyId;
     this.runNo = runNo;
     this.trigger = trigger;
-    this.scope = scope.length() > 250 ? scope.substring(0, 250) : scope;
+    this.scope = scope.length() > SCOPE ? scope.substring(0, SCOPE) : scope;
     this.startedAt = startedAt;
   }
 

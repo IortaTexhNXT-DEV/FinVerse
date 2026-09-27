@@ -15,6 +15,8 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Turns the proposed values of an extraction into the data the Extraction Review screen shows for
@@ -22,6 +24,8 @@ import java.util.Map;
  * read as a date or an amount are left out for the user to enter.
  */
 public final class ProposalMapper {
+
+  private static final Logger LOG = LoggerFactory.getLogger(ProposalMapper.class);
 
   private static final List<DateTimeFormatter> DATES =
       List.of(
@@ -106,7 +110,7 @@ public final class ProposalMapper {
       try {
         return LocalDate.parse(v, format);
       } catch (DateTimeParseException e) {
-        // try the next format
+        LOG.trace("{} is not in the format {}", v, format);
       }
     }
     return fallback;

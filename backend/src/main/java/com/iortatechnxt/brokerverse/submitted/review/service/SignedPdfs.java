@@ -32,6 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(propagation = Propagation.MANDATORY)
 public class SignedPdfs {
 
+  private static final int HASH_SHOWN = 16;
+
   private final DocTemplateService templates;
   private final DocumentComposer composer;
   private final AttachmentService attachments;
@@ -83,7 +85,7 @@ public class SignedPdfs {
                             s.getSignerName(),
                             s.getPosition(),
                             DisplayFormat.dateTime(s.getSignedAt()),
-                            s.getHash().substring(0, 16)))
+                            s.getHash().substring(0, HASH_SHOWN)))
                 .toList(),
             List.of()));
     byte[] pdf =

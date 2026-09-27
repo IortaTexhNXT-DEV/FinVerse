@@ -7,6 +7,7 @@ import java.util.List;
  * business type, assured, insurer, days to expiry, sum insured, unit or location, plate (motor),
  * vehicle type or occupancy, and the mark (FFY, EMP for a group employee, NT for No Touch).
  */
+@SuppressWarnings("PMD.AvoidDuplicateLiterals") // seed table: the codes repeat per row
 final class SubmittedSeedRows {
 
   /** Seed rows. */

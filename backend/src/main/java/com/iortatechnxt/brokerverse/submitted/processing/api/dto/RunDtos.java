@@ -8,6 +8,7 @@ import java.time.Instant;
 import java.util.List;
 
 /** Records of the processing run API (FRS FR-SP-021, 022, 050). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class RunDtos {
 
   private RunDtos() {}

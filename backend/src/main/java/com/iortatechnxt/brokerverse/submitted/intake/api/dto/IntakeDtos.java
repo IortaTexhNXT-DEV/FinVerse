@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.submitted.domain.SbmIntakeRun;
 import java.time.Instant;
 
 /** Records of the intake API (FR-SP-001 to 006). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class IntakeDtos {
 
   private IntakeDtos() {}

@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.util.List;
 
 /** Records of the Submitted Policies setup API (FR-SP-080 to 084). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class SetupDtos {
 
   private SetupDtos() {}

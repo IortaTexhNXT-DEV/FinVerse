@@ -10,6 +10,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 
 /** Records of the renewal work list, letters and print batches API (FR-SP-060 to 066). */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class RenewalDtos {
 
   private RenewalDtos() {}

@@ -35,6 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
  * receipt, {@link IncomeDispositions}) or others (released). A reversal undoes it; a refund is
  * reversed only once Disbursement returned it.
  */
+@SuppressWarnings(
+    "PMD.GodClass") // one executor per disposition action, including the income action
 @Component
 @Transactional(propagation = Propagation.MANDATORY)
 public class DispositionExecutor {
@@ -156,6 +158,7 @@ public class DispositionExecutor {
    * @param item unapplied item
    * @param d completed disposition
    */
+  @SuppressWarnings("PMD.CyclomaticComplexity") // one reversal per disposition action
   public void reverse(Unapplied item, Disposition d) {
     String ref = PREFIX + d.getId() + ":REV";
     switch (d.getAction()) {

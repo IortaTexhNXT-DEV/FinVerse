@@ -267,7 +267,13 @@ class _TsIndex:
             raise KeyError(f"module {name} not found under frontend/src/features")
         text, p = d
         mid = re.search(r"\bid:\s*'([^']+)'", text).group(1)
-        title = re.search(r"\bsection:\s*'([^']+)'", text).group(1)
+        literal = re.search(r"\bsection:\s*'([^']+)'", text)
+        if literal:
+            title = literal.group(1)
+        else:  # a named constant (section: CSF_SECTION), exported by a file of the feature
+            name_ref = re.search(r"\bsection:\s*(\w+)", text).group(1)
+            title = next(m.group(1) for t in self.files.values()
+                         if (m := re.search(rf"\bconst {name_ref}\s*=\s*'([^']+)'", t)))
         m = re.search(r"\bscreens:\s*\[", text)
         arr = text[m.end() - 1:matching(text, m.end() - 1) + 1]
         return Section(mid, title, self.screens(arr, p))

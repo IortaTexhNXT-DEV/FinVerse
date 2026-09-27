@@ -210,6 +210,22 @@ class RatingSchemeIT {
     assertThatThrownBy(() -> as.run("approver", () -> exceptions.approve(reference, null)))
         .extracting("code")
         .isEqualTo("RECORD_NOT_PENDING");
+
+    RateOverride own =
+        as.run(
+            "approver",
+            () ->
+                exceptions.request(
+                    new RateOverride.Request(
+                        code, null, 1, null, ref, "Requested by an approver", null)));
+    assertThatThrownBy(
+            () -> as.run("approver", () -> exceptions.approve(own.getReferenceNo(), "mine")))
+        .extracting("code")
+        .isEqualTo("MAKER_CHECKER_VIOLATION");
+    assertThatThrownBy(
+            () -> as.run("approver", () -> exceptions.reject(own.getReferenceNo(), "mine")))
+        .extracting("code")
+        .isEqualTo("MAKER_CHECKER_VIOLATION");
   }
 
   @Test

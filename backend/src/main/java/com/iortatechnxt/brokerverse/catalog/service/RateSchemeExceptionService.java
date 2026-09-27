@@ -148,7 +148,13 @@ public class RateSchemeExceptionService {
    * @return the approved exception
    */
   public RateOverride approve(String reference, String comment) {
+    requireDecider();
     RateOverride e = require(reference);
+    if (CurrentUser.sameUser(e.getMaker(), deciding.currentUser().username())) {
+      throw new BusinessRuleException(
+          "MAKER_CHECKER_VIOLATION",
+          "A rate exception is decided by someone other than its requester");
+    }
     deciding.records().authorize(CatalogKind.RATE_SCHEME_EXCEPTION, e.getId());
     e.recordDecision(deciding.currentUser().username(), clock.instant(), blankToNull(comment));
     notifyRequester(e, "approved", comment);
@@ -164,9 +170,7 @@ public class RateSchemeExceptionService {
    * @return the rejected exception
    */
   public RateOverride reject(String reference, String reason) {
-    if (!deciding.currentUser().hasAuthority(AUTHORIZE_PERMISSION)) {
-      throw new AccessDeniedException("Not allowed to decide rate exceptions");
-    }
+    requireDecider();
     if (reason == null || reason.isBlank()) {
       throw new BusinessRuleException(
           "RATE_EXCEPTION_REASON_REQUIRED", "Enter the reason for the rejection");
@@ -180,6 +184,12 @@ public class RateSchemeExceptionService {
         "Rejected: " + reason.strip());
     notifyRequester(e, "rejected", reason);
     return e;
+  }
+
+  private void requireDecider() {
+    if (!deciding.currentUser().hasAuthority(AUTHORIZE_PERMISSION)) {
+      throw new AccessDeniedException("Not allowed to decide rate exceptions");
+    }
   }
 
   private void notifyRequester(RateOverride e, String decision, String comment) {

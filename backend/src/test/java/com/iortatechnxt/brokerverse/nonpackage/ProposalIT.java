@@ -229,7 +229,7 @@ class ProposalIT {
         new PdfReader(
             documentsBuilder.comparativePdf(queries.get(id), responses.responses(id)).content())) {
       assertThat(new PdfTextExtractor(reader).getTextFromPage(1))
-          .contains("120,000.00", "110,000.00", "0.4000", "0.3000", "received", "Recommended");
+          .contains("120,000.00", "110,000.00", "0.40", "0.30", "received", "Recommended");
     }
 
     ProposalRequest ps = as.run("tsu", () -> proposalSlips.submit(id, null, null));

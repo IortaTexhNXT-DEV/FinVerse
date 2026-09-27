@@ -106,9 +106,9 @@ public final class DisplayFormat {
   }
 
   /**
-   * A rate in percent as the FRS states rates: four decimals (0.42500000 becomes 0.4250, 2 becomes
-   * 2.0000), the same precision as the rate is keyed on the screens; the column header carries the
-   * percent sign ("Rate %").
+   * A rate in percent as users read it: at least two and at most four decimals (0.42500000 becomes
+   * 0.425, 1.1 becomes 1.10, 0.123456 becomes 0.1235), the precision rates are keyed on the
+   * screens; the column header or the caller adds the percent sign.
    *
    * @param rate rate in percent, may be null
    * @return text without the percent sign, empty when null
@@ -117,7 +117,8 @@ public final class DisplayFormat {
     if (rate == null) {
       return "";
     }
-    return rate.setScale(RATE_DECIMALS, RoundingMode.HALF_UP).toPlainString();
+    BigDecimal rounded = rate.setScale(RATE_DECIMALS, RoundingMode.HALF_UP).stripTrailingZeros();
+    return rounded.setScale(Math.max(2, rounded.scale()), RoundingMode.UNNECESSARY).toPlainString();
   }
 
   /**

@@ -33,11 +33,11 @@ class DisplayFormatTest {
   }
 
   @Test
-  void writesRatesWithFourDecimals() {
-    assertThat(DisplayFormat.rate(new BigDecimal("0.42500000"))).isEqualTo("0.4250");
-    assertThat(DisplayFormat.rate(new BigDecimal("2"))).isEqualTo("2.0000");
-    assertThat(DisplayFormat.rate(new BigDecimal("100"))).isEqualTo("100.0000");
-    assertThat(DisplayFormat.rate(new BigDecimal("1.30000000"))).isEqualTo("1.3000");
+  void writesRatesWithTwoToFourDecimals() {
+    assertThat(DisplayFormat.rate(new BigDecimal("0.42500000"))).isEqualTo("0.425");
+    assertThat(DisplayFormat.rate(new BigDecimal("2"))).isEqualTo("2.00");
+    assertThat(DisplayFormat.rate(new BigDecimal("100"))).isEqualTo("100.00");
+    assertThat(DisplayFormat.rate(new BigDecimal("1.30000000"))).isEqualTo("1.30");
     assertThat(DisplayFormat.rate(new BigDecimal("0.123456"))).isEqualTo("0.1235");
     assertThat(DisplayFormat.rate(null)).isEmpty();
   }

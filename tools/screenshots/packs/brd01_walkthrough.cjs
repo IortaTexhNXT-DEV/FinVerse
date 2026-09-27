@@ -95,6 +95,24 @@ function button(scope, name) {
  * Clicks an action and completes its dialog when one opens: the reason (first value, or the one asked), the
  * comment, then the dialog's confirm button (same name, or the last button of the dialog).
  */
+/**
+ * Clicks a workflow action button and, when the screen asks for a confirmation (the confirmation standard: every
+ * approve, submit, release and the like opens a dialog naming the record and the effect), confirms it with the
+ * dialog's button of the same name or its main button.
+ */
+async function press(page, name) {
+  await button(page, name).click();
+  await page.waitForTimeout(700);
+  const dialog = page.locator('dialog.modal[open]').last();
+  if (await dialog.isVisible().catch(() => false)) {
+    const same = dialog.getByRole('button', { name });
+    const confirm = (await same.count()) > 0 ? same.last() : dialog.locator('.modal-footer button, footer button').last();
+    await confirm.click();
+  }
+  await settle(page, 1200);
+  return page;
+}
+
 async function act(page, name, opts = {}) {
   const target = button(page, name);
   try {
@@ -323,7 +341,7 @@ const steps = {
     const report = csv(`clpc-payment-report-${arn}.csv`, [
       ['PN No.', 'Loan Application No.', 'Borrower', 'Status', 'Amount', 'Payment Date'],
       [pnNo(ctx), loanNo(ctx), `${person(ctx).last}, ${person(ctx).first}`, 'PAID',
-        ctx.one(`select gross_premium from acc_account where arn = '${arn}'`), new Date().toISOString().slice(0, 10)],
+        ctx.one(`select gross_premium from acc_account where arn = '${arn}'`), new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10)],
     ]);
     await button(page.locator('table tbody tr').filter({ hasText: batch }).first(), 'Upload Report').click();
     await page.waitForTimeout(700);
@@ -777,7 +795,7 @@ const bulk = {
   'scr-nb-36-04-errorfile': async (ctx, shot, file) => {
     const { render } = require('./brd01_documents.cjs');
     const data = await ctx.api('ao', 'GET', `/bulk/jobs/${ctx.state.bulkJob}/error-file`);
-    render(data, 'xlsx', file, 110, ['Client Type', 'Last Name', 'First Name', 'Birth Date', 'TIN', 'Error']);
+    render(data, 'xlsx', file, undefined, ['Client Type', 'Last Name', 'First Name', 'Birth Date', 'TIN', 'Error']);
     return null;
   },
   // The corrected rows uploaded through Upload Corrected File, validated and processed.
@@ -794,4 +812,4 @@ const bulk = {
 
 async function prepare() {}
 
-module.exports = { steps, bulk, prepare, addItem, bulkClientFile, pdf, csv, act, tab, go, button, settle, uploadDocument, TMP };
+module.exports = { steps, bulk, prepare, addItem, bulkClientFile, pdf, csv, act, press, tab, go, button, settle, uploadDocument, TMP };

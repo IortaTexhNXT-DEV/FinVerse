@@ -185,7 +185,7 @@ screens:
       priced it and warns when an item rate differs from the scheme rate. The Account Officer then requests a rate
       exception. The approver opens the exception record from My Approvals, compares the requested rate with the
       scheme in force and approves it with a comment or rejects it with a reason; the requester is notified and the
-      quotation is submitted with the approved exception. Only the rate scheme panel, the Request Rate Exception
+      quotation is submitted with the approved exception. Only the Rate Exceptions card, the Request Rate Exception
       dialog and the exception record are specified here; the rest of the quotation record is specified in the New
       Business set (SCR-NB-07).
     entry:
@@ -195,12 +195,12 @@ screens:
       - Notification of the decision › the exception record
     shots:
       - {state: exception, user: ao, open: quotation_deviation, click: "^request rate exception$", caption: "Request Rate Exception dialog"}
-      - {state: deviation, user: ao, open: quotation_deviation, caption: "Rate scheme panel: an item rate differs from the scheme rate; the approved exception is listed"}
+      - {state: deviation, user: ao, open: quotation_deviation, caption: "Rate Exceptions card: an item rate differs from the scheme rate; each exception is a row of the table"}
       - {state: record, user: approver, open: rate_exception_pending, caption: "Rate exception record opened from My Approvals: the requested rate against the scheme in force, with Approve and Reject"}
       - {state: reject, user: approver, open: rate_exception_pending, click: "^reject$", caption: "Reject Rate Exception: the reason is required"}
     fields:
-      - "Rate scheme panel | [Version line] | Banner | Priced on package version n; An item rate differs from the scheme rate: submission needs an approved rate exception | - | Quotation pricing | - | Read only | Warning while an item rate differs | Package <product code> is priced on the current rate scheme: <what> needs an approved rate exception"
-      - "Rate scheme panel | [Exceptions] | Rows | Exception reference (opens the exception record), Rate n% until dd-MMM-yyyy, status pill Pending Auth., Approved or Rejected | - | Rate exceptions of the quotation | - | Read only | - | -"
+      - "Rate Exceptions card | [Pricing notice] | Notice | Priced on package version n. An item rate differs from the scheme rate, so submission needs an approved rate exception | - | Quotation pricing | - | Read only | Shown while an item rate differs | Package <product code> is priced on the current rate scheme: <what> needs an approved rate exception"
+      - "Rate Exceptions card | [Rate exceptions table] | Table | One row per exception: Exception No. (opens the exception record), Requested Rate (%), Scheme Rate (%), Difference (%) in percentage points with its sign, Valid Until, Requested By and on, Decided By and on, Status (Pending Authorization, Approved or Rejected) | - | Rate exceptions of the quotation | - | Read only | - | -"
       - "Request Rate Exception | Item rate % | Number | 0 to 100 | Y | - | The rate of the first item | Draft quotation | 0 to 100 | Enter the item rate between 0 and 100"
       - "Request Rate Exception | Valid until | Date | dd-MMM-yyyy | N | - | The quotation's valid-until date | Draft quotation | Not in the past | The validity date cannot be in the past"
       - "Request Rate Exception | Reason | Text | Free text | Y | - | Blank | Draft quotation | Not blank | Explain why the scheme rate cannot be used"
@@ -214,7 +214,7 @@ screens:
       - "Approve Rate Exception | Comment | Text | Free text, up to 1,000 characters | N | - | Blank | Pending exception | - | -"
       - "Reject Rate Exception | Reason for the rejection | Text | Free text, up to 1,000 characters | Y | - | Blank | Pending exception | Not blank | Enter the reason for the rejection"
     actions:
-      - "Request Rate Exception | Marketing (QUOTE_MAINTAIN) | Draft quotation of a package with an item rate that differs | Opens the dialog; Request Exception records the exception for this quotation, pending approval | Pending Auth. | My Approvals of the approvers"
+      - "Request Rate Exception | Marketing (QUOTE_MAINTAIN) | Draft quotation of a package with an item rate that differs | Opens the dialog; Request Exception records the exception for this quotation, pending approval | Pending Authorization | My Approvals of the approvers"
       - "[Open from My Approvals] | Business Administrator, New Business Approver (PRODUCT_AUTHORIZE) | Exception pending | The rate exception row of My Approvals opens the exception record | - | -"
       - "Approve | Business Administrator, New Business Approver (PRODUCT_AUTHORIZE), not the requester | Exception pending | Opens the confirmation with an optional comment; Approve approves the exception, which prices the quotation from then on | Approved | Notification to the requester"
       - "Reject | Business Administrator, New Business Approver (PRODUCT_AUTHORIZE), not the requester | Exception pending | Opens the confirmation; the reason is required; Reject rejects the exception, which can no longer be used | Rejected | Notification to the requester with the reason"

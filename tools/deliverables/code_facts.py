@@ -22,6 +22,7 @@ No build is needed: the sources are parsed as text. The parsers cover the patter
 from __future__ import annotations
 
 import re
+from functools import lru_cache
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -435,7 +436,9 @@ def role_grants(include_seed: bool = True) -> dict[str, set[str]]:
             if not low.startswith("insert into sec_role_permission"):
                 unread.append(f"{f.name}: {s[:120]}")
                 continue
-            pairs = re.search(r"\(values (.*?)\) as g\(role_code, permission\)", s)
+            # (role, permission) pairs: "(values ...) as g(role_code, permission)" or "join (values ...) as
+            # x(role_code, permission) on x.role_code = r.code".
+            pairs = re.search(r"\(values (.*?)\)\s*as \w+\(role_code, permission\)", s, re.S)
             if pairs:
                 for r, p in re.findall(r"\('([A-Z][A-Z0-9_]*)',\s*'([A-Z][A-Z0-9_]*)'\)", pairs.group(1)):
                     roles.setdefault(r, set()).add(p)
@@ -493,6 +496,44 @@ def _sql_tuples(values: str) -> list[list[str | None]]:
                 cells.append(cell)
         rows.append(cells)
     return rows
+
+
+@lru_cache(maxsize=1)
+def _resource_name_maps() -> tuple[dict[str, str], dict[str, str]]:
+    """NAMES and WORDS of the server's ResourceNames (record names in not found and already exists messages)."""
+    path = next((REPO / "backend" / "src" / "main" / "java").rglob("ResourceNames.java"), None)
+    if path is None:
+        return {}, {}
+    text = path.read_text(encoding="utf-8")
+    maps = []
+    for name in ("NAMES", "WORDS"):
+        m = re.search(rf"{name}\s*=\s*Map\.ofEntries\((.*?)\);", text, re.S)
+        maps.append(dict(re.findall(r'Map\.entry\("([^"]*)",\s*"([^"]*)"\)', m.group(1))) if m else {})
+    return maps[0], maps[1]
+
+
+def resource_name(resource: str) -> str:
+    """A record name as the user reads it, the same rule as the server's ResourceNames.of: a class-style name
+    (AutoBookRule) or a code (EB_MEMBER) in words, with the agreed names; a name in words is kept."""
+    names, words = _resource_name_maps()
+    if not resource or not resource.strip():
+        return "Record"
+
+    def word(token: str) -> str:
+        if token in names:
+            return names[token]
+        if "_" in token and "__" not in token and token[0].isalpha() and not token.endswith("_") \
+                and re.fullmatch(r"[A-Z0-9_]+", token):
+            parts = [x.lower().capitalize() for x in token.split("_")]
+        elif (len(token) > 1 and token[0].isupper() and re.fullmatch(r"[A-Za-z0-9]+", token)
+              and any(c.islower() for c in token) and sum(c.isupper() for c in token) > 1 and not token[1].isupper()):
+            parts = re.findall(r"[A-Z][^A-Z]*", token)
+        else:
+            return token
+        return " ".join(words.get(x, x.lower()) for x in parts)
+
+    text = " ".join(word(t) for t in resource.strip().split(" "))
+    return text[:1].upper() + text[1:]
 
 
 def workflows(codes: Iterable[str] | None = None) -> dict[str, dict[str, list[dict[str, Any]]]]:
@@ -696,12 +737,12 @@ def backend_messages(packages: Iterable[str]) -> list[Message]:
                         pairs = [(c, t) for c in codes for t in texts]
                     label = {"FieldValidationException": "Field check", "Warning": "Warning"}.get(kind, "Business rule")
                 elif kind == "ResourceNotFoundException" and args:
-                    what = java_text(args[0], consts, p.stem)
+                    what = resource_name(java_text(args[0], consts, p.stem))
                     key = _placeholder(args[1], consts)[1:-1] if len(args) > 1 else "key"
                     pairs = [("NOT_FOUND", f"{what} not found: <{key}>")]
                     label = "Not found"
                 elif kind == "DuplicateResourceException" and args:
-                    pairs = [("DUPLICATE", f"{java_text(args[0], consts, p.stem)} already exists: <key>")]
+                    pairs = [("DUPLICATE", f"{resource_name(java_text(args[0], consts, p.stem))} already exists: <key>")]
                     label = "Duplicate"
                 elif kind in ("BadCredentialsException", "LockedException", "DisabledException") and len(args) == 1:
                     # Refused sign-ins: the platform handler answers AUTHENTICATION_FAILED with the text.

@@ -649,11 +649,12 @@ def r_messages(doc: Any, pack: Pack, **_: Any) -> None:
         counts[m["kind"]] = counts.get(m["kind"], 0) + 1
     doc.paragraph(f"{len(pack.messages)} messages: " + ", ".join(f"{v} {k.lower()}" for k, v in sorted(counts.items()))
                   + ". The text is quoted exactly as the system shows it; <name> marks a value filled in by the "
-                    "system. Server messages also show their code as the Reference under the message.")
+                    "system. The user sees the message only, in the notice standard of the screen standards appendix; the "
+                    "code identifies the message for the project team and support and is not shown on the screen.")
     for where, rows in by_where.items():
         doc.heading(where, level=2, toc=False)
         table = [[m["id"], m["code"], m["text"], m["kind"], m["fix"]] for m in rows]
-        doc.table(["ID", "Code (Reference)", "Message", "Type", "What the user does"], table,
+        doc.table(["ID", "Code (not shown)", "Message", "Type", "What the user does"], table,
                   widths=[1.9, 3.8, 7.2, 1.7, 5.0], size=7, keep_rows=False)
 
 
@@ -817,7 +818,7 @@ def build_workbook(pack: Pack) -> Path:
               "review to Accept, "
               "Change requested or Comment for each row you review, and write the change in BU comment."),
         ("3", "Put your name in Reviewer and the date in Review date. Leave the other columns unchanged."),
-        ("4", "Screen standards lists the elements shared by every screen (status strip and history table, status "
+        ("4", "Screen standards lists the elements shared by every screen (workflow stepper and history table, status "
                "pills, dates and amounts, uploads with the error file, messages, notifications); review them once."),
         ("5", "Menu by persona shows what each role sees in the sidebar; Cross-BRD contract lists what " + nm + " "
               "takes from and hands to the other BRDs."),
@@ -837,7 +838,7 @@ def build_workbook(pack: Pack) -> Path:
         Column("name", "Element", 30, f"Element shared by the {nm} screens"),
         Column("text", "What the user sees and does", 100, "Behaviour of the element on every screen"),
     ] + review_columns(), [{"no": i, **c} for i, c in enumerate(pack.common, start=1)],
-        description="Elements and standards shared by every screen (status strip and history, pills, dates, uploads, "
+        description="Elements and standards shared by every screen (workflow stepper and history, pills, dates, uploads, "
                     "messages, notifications); described once, not repeated per screen")
     date_sheets.append(ws)
 
@@ -916,7 +917,7 @@ def build_workbook(pack: Pack) -> Path:
         Column("id", "Message ID", 13, "Message identifier in this set"),
         Column("where", "Where it appears", 34, "Screen or dialog that shows it"),
         Column("layer", "Shown by", 11, "Screen (checked as you type), Server (checked on save or action) or Upload row"),
-        Column("code", "Code (Reference)", 26, "Code shown as the Reference under a server message"),
+        Column("code", "Code (not shown)", 26, "Identifies the message for the project team and support; not shown on the screen"),
         Column("text", "Message", 60, "Exact text; <name> is filled in by the system"),
         Column("kind", "Type", 13, "Validation, Error, Warning, Confirmation or Information",
                values=["Validation", "Error", "Warning", "Confirmation", "Information"]),

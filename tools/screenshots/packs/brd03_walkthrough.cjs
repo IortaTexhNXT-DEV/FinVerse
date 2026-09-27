@@ -1,7 +1,7 @@
 // End-to-end walkthroughs of BRD-03 Product Maintenance, performed live on the seed profile by capture_pack.cjs (see
 // walkthroughs.yaml of the pack). Each step signs in as the persona of the step, does what the step says on the
 // screen and returns the page to capture. The records created carry fictitious seed values only.
-const { pdf, act, tab, go, button, settle } = require('./brd01_walkthrough.cjs');
+const { pdf, act, press, tab, go, button, settle } = require('./brd01_walkthrough.cjs');
 
 const TITLE = 'Motor Fleet Plus';
 const RISK_CODE = 'MTR30';
@@ -63,7 +63,7 @@ const steps = {
     await kind.selectOption({ label: (await kind.locator('option').allTextContents()).find((o) => /^Clause$/i.test(o.trim())) });
     await d.getByLabel(/^Product line/).selectOption({ label: 'Motor' });
     await d.getByLabel(/^Title/).fill('Accredited repair shops for fleets');
-    await d.getByLabel(/^Effective from/).fill(new Date().toISOString().slice(0, 10));
+    await d.getByLabel(/^Effective from/).fill(new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10)); // Philippine date
     await d.getByLabel(/^Wording/).fill('Repairs of insured fleet vehicles are made at the accredited repair shops of the insurer (seed data).');
     await d.getByRole('button', { name: /save for authorization/i }).click();
     await settle(page, 1200);
@@ -89,7 +89,7 @@ const steps = {
       ['Requested rate %', '1.2'], ['Minimum premium', '5000'], ['Commission %', '15'], ['Package TSI limit', '5000000'],
     ]);
     // Effective today, so that New Business can quote the package on the day it is released (steps 21-24).
-    const start = new Date();
+    const start = new Date(Date.now() + 8 * 3600 * 1000); // Philippine date: the system's today
     const end = new Date(start);
     end.setFullYear(end.getFullYear() + 1);
     const iso = (d) => d.toISOString().slice(0, 10);
@@ -103,7 +103,7 @@ const steps = {
     for (const insurer of ['Mabuhay General Insurance Corp.', 'Luzon Assurance Co.']) {
       await page.getByLabel(insurer).check();
     }
-    await button(page, /^submit for approval$/i).click();
+    await press(page, /^submit for approval$/i);
     await settle(page, 2000);
     return page;
   },
@@ -121,13 +121,13 @@ const steps = {
   'wt-a-07': async (ctx) => {
     const page = await openRequest(ctx, 'tsu', requestA(ctx), 'Negotiation');
     await page.getByLabel(/^Notes to the insurers/).fill('Please quote the fleet programme as requested (seed data).');
-    await button(page, /^submit for approval$/i).click();
+    await press(page, /^submit for approval$/i);
     await settle(page, 1500);
     return page;
   },
   'wt-a-08': async (ctx) => {
     const page = await openRequest(ctx, 'tsulead', requestA(ctx), 'Negotiation');
-    await button(page, /^approve and send$/i).click();
+    await press(page, /^approve and send$/i);
     await settle(page, 2500);
     return page;
   },
@@ -197,6 +197,13 @@ const steps = {
   },
   'wt-a-16': async (ctx) => {
     const page = await go(ctx, 'mbs', `/catalog/products/${RISK_CODE}/versions/1`);
+    // The version starts on the Philippine today (a capture that runs across midnight UTC keeps it valid).
+    const today = new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
+    const from = page.getByLabel(/^Effective From/).first();
+    if (await from.isEditable().catch(() => false)) {
+      await from.fill(today);
+      await page.getByLabel(/^Package Start/).first().fill(today).catch(() => {});
+    }
     await tab(page, 'Insurer Terms');
     const clauses = page.getByLabel(/^Clauses of INS-MGIC on OD_THEFT/);
     if (await clauses.count()) {
@@ -206,7 +213,7 @@ const steps = {
         await clauses.selectOption({ label: pick });
       }
     }
-    await button(page, /^submit for validation$/i).click();
+    await press(page, /^submit for validation$/i);
     await settle(page, 1500);
     return page;
   },
@@ -215,7 +222,7 @@ const steps = {
     for (const box of await page.locator('main input[type=checkbox]').all()) {
       await box.check().catch(() => {});
     }
-    await button(page, /^validate and release$/i).click();
+    await press(page, /^validate and release$/i);
     await settle(page, 2000);
     return page;
   },
@@ -312,7 +319,7 @@ const steps = {
     const page = await go(ctx, 'ao', `${REQUESTS}/new`);
     await ctx.runSteps(page, [['Package / programme name', 'Travel Assist Programme'], ['Product line', 'Motor'],
       ['Cover type / subtype', 'Comprehensive'], ['Reason', 'Market competitiveness']]);
-    await button(page, /^submit for approval$/i).click();
+    await press(page, /^submit for approval$/i);
     await settle(page, 1500);
     return page;
   },
@@ -320,7 +327,7 @@ const steps = {
     let id = ctx.sql("select id from pm_request where title = 'Bancassurance Motor Programme' order by id desc limit 1")[0]?.[0];
     if (!id) {
       const company = Number(ctx.one("select id from org_company where code = 'FVI'"));
-      const end = new Date();
+      const end = new Date(Date.now() + 8 * 3600 * 1000);
       end.setFullYear(end.getFullYear() + 1);
       const p = await ctx.api('mkttl', 'POST', REQUESTS, {
         companyId: company, type: 'NEW', scope: 'GENERIC', title: 'Bancassurance Motor Programme', lineCode: 'MOTOR',
@@ -342,7 +349,7 @@ const steps = {
     let id = ctx.sql(`select id from pm_request where title = '${title}' order by id desc limit 1`)[0]?.[0];
     if (!id) {
       const company = Number(ctx.one("select id from org_company where code = 'FVI'"));
-      const end = new Date();
+      const end = new Date(Date.now() + 8 * 3600 * 1000);
       end.setFullYear(end.getFullYear() + 1);
       const p = await ctx.api('tsu', 'POST', REQUESTS, {
         companyId: company, type: 'NEW', scope: 'GENERIC', title, lineCode: 'PROPERTY', coverTypeCode: 'FIRE_LIGHTNING',
@@ -392,7 +399,7 @@ const steps = {
     const page = await go(ctx, 'mbs', '/catalog/products/MTR12/versions/2');
     await page.getByLabel(/^Minimum Premium/).fill('');
     await page.getByLabel(/^Effective From/).fill('2020-01-01');
-    await button(page, /^submit for validation$/i).click();
+    await press(page, /^submit for validation$/i);
     await settle(page, 800);
     return page;
   },

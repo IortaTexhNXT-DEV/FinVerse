@@ -2,7 +2,7 @@
 // (see walkthroughs.yaml of the pack). Each step signs in as the persona of the step, does what the step says on the
 // screen and returns the page to capture. The walkthroughs run in order: B changes and deactivates the user enrolled
 // in A. The records created carry fictitious seed values only; the SIT/UAT password comes from SEED_PASSWORD.
-const { act, tab, go, button, settle } = require('./brd01_walkthrough.cjs');
+const { act, press, tab, go, button, settle } = require('./brd01_walkthrough.cjs');
 
 const REQUESTS = '/user-access/requests';
 const NEW_USER = 'a013000196';
@@ -14,7 +14,13 @@ const requestOf = (ctx, where) => ctx.sql(`select id from nba_access_request whe
 const seedRequest = (ctx, no) => ctx.one(`select id from nba_access_request where request_no = '${no}'`);
 
 async function fill(page, label, value) {
-  const field = page.getByLabel(new RegExp(`^${label}`)).first();
+  // A text value goes to the drop-down or text field of the label, not to a check box of the same name (the
+  // group profile "Approver" next to the Approver drop-down).
+  const matches = page.getByLabel(new RegExp(`^${label}`));
+  let field = matches.first();
+  if (typeof value !== 'boolean' && (await matches.count()) > 1) {
+    field = matches.and(page.locator('select, input:not([type=checkbox]), textarea')).first();
+  }
   const tag = await field.evaluate((e) => e.tagName.toLowerCase());
   if (tag === 'select') {
     const options = await field.locator('option').allTextContents();
@@ -41,7 +47,7 @@ async function openRequest(ctx, user, id, tabName) {
 
 /** A page of its own for a user that is not a seed persona (the new user of walkthrough A). */
 async function ownPage(ctx, user, password) {
-  const context = await ctx.browser.newContext({ viewport: { width: 1600, height: 1000 } });
+  const context = await ctx.newContext();
   const page = await context.newPage();
   page.setDefaultTimeout(20000);
   await page.goto(`${ctx.BASE}/login`);
@@ -89,7 +95,9 @@ const steps = {
     if (ctx.one(`select status from nba_access_request where id = ${id}`) === 'DRAFT') {
       await button(page, /^edit request$/i).click();
       await settle(page);
-      await button(page, /^submit$/i).click();
+      // The approver is chosen when the request is submitted (a draft does not keep it).
+      await fill(page, 'Approver', 'Ulysses');
+      await press(page, /^submit$/i);
       await settle(page, 1500);
     }
     return page;
@@ -135,7 +143,7 @@ const steps = {
     await page.getByLabel(/^Marketing Team Leader/).check();
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'Covers as team leader during the leave of the unit head (seed data)');
-    await button(page, /^submit$/i).click();
+    await press(page, /^submit$/i);
     await settle(page, 1500);
     return page;
   },
@@ -162,12 +170,13 @@ const steps = {
     await fill(page, 'Profile Code', PROFILE);
     await fill(page, 'Name', 'Renewal enquiry');
     await fill(page, 'Description', 'Read-only enquiry of clients and reports for the contact centre (seed data)');
-    await page.getByLabel('CLIENT_VIEW', { exact: true }).check();
-    await page.getByLabel('REPORT_VIEW', { exact: true }).check();
+    // Each permission shows its name; its check box is found by the permission code (id perm-CODE).
+    await page.locator('#perm-CLIENT_VIEW').check();
+    await page.locator('#perm-REPORT_VIEW').check();
     await fill(page, 'Approvers in Order', 'Ulysses');
     await fill(page, 'Approvers in Order', '\\(approver\\)');
     await fill(page, 'Remarks \\(Justification\\)', 'Enquiry profile for the renewal follow-up (seed data)');
-    await button(page, /^submit$/i).click();
+    await press(page, /^submit$/i);
     await settle(page, 1500);
     await tab(page, 'Approvers');
     return page;
@@ -207,7 +216,7 @@ const steps = {
     await fill(page, 'Reason', 'Resigned');
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'Resigned effective today (seed data)');
-    await button(page, /^submit$/i).click();
+    await press(page, /^submit$/i);
     await settle(page, 1500);
     return page;
   },
@@ -230,7 +239,7 @@ const steps = {
   'wt-c-01': async (ctx) => {
     const page = await go(ctx, 'requestor', `${REQUESTS}/new`);
     await fill(page, 'User ID', 'ab');
-    await button(page, /^submit$/i).click();
+    await press(page, /^submit$/i);
     await settle(page, 600);
     return page;
   },
@@ -241,7 +250,7 @@ const steps = {
     await page.getByLabel('Marketing Account Officer', { exact: true }).check();
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'New hire (seed data)');
-    await button(page, /^submit$/i).click();
+    await press(page, /^submit$/i);
     await settle(page, 800);
     return page;
   },
@@ -250,7 +259,7 @@ const steps = {
     await fill(page, 'Full Name', 'SIT Enrolled User Reyes');
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'Name corrected (seed data)');
-    await button(page, /^submit$/i).click();
+    await press(page, /^submit$/i);
     await settle(page, 1200);
     return page;
   },
@@ -259,7 +268,7 @@ const steps = {
     await page.getByLabel('Marketing Account Officer', { exact: true }).check();
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'Also raises Marketing requests (seed data)');
-    await button(page, /^submit$/i).click();
+    await press(page, /^submit$/i);
     await settle(page, 1200);
     return page;
   },
@@ -271,7 +280,7 @@ const steps = {
     await page.getByLabel('User Access Approver', { exact: true }).check();
     await fill(page, 'Approver', 'Ulysses');
     await fill(page, 'Remarks \\(Justification\\)', 'Raises and approves access requests (seed data)');
-    await button(page, /^submit$/i).click();
+    await press(page, /^submit$/i);
     await settle(page, 1200);
     return page;
   },

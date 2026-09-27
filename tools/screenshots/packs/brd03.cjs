@@ -20,7 +20,7 @@ const requestByTitle = (ctx, title) => ctx.sql(`select id from pm_request where 
 
 /** Terms of the requests the recipe prepares (fictitious values). */
 function terms(insurers) {
-  const start = new Date();
+  const start = new Date(Date.now() + 8 * 3600 * 1000); // Philippine date
   start.setDate(start.getDate() + 45);
   const end = new Date(start);
   end.setFullYear(end.getFullYear() + 1);
@@ -122,7 +122,9 @@ const opens = {
     return `/product-maintenance/requests/${id}`;
   },
   for_mancom: (ctx) => `/product-maintenance/requests/${requestId(ctx, 'PKR-2026-900004')}`,
-  with_mbs: (ctx) => `/product-maintenance/requests/${requestId(ctx, 'PKR-2026-900005')}`,
+  // The seed request with MBS, or any request at that stage (walkthrough B returns the seed request to TSU, so the
+  // screens run before walkthrough B: brd03 '^wt-a', then '^(scr|doc)-', then '^wt-b').
+  with_mbs: (ctx) => `/product-maintenance/requests/${ctx.sql("select id from pm_request where status = 'WITH_MBS' order by request_no desc limit 1")[0]?.[0] ?? requestId(ctx, 'PKR-2026-900005')}`,
   released: (ctx) => `/product-maintenance/requests/${requestId(ctx, 'PKR-2026-900006')}`,
   packaged_product: () => '/catalog/products/MTR12',
   released_product: () => '/catalog/products/PAR25',
@@ -218,7 +220,18 @@ const callouts = {
   },
 };
 
+// Shots kept as the whole window (menu and header give the navigation context); every other shot is cropped to
+// its dialog or content area (capture_pack.cjs, cropOf).
+const exceptionsCard = '[data-callout="rate-exceptions"]';
+const crops = {
+  'scr-pm-01-01-view': 'full',
+  // The quotation steps of walkthrough A show the Rate Exceptions card with its rows.
+  'wt-a-22': exceptionsCard,
+  'wt-a-24': exceptionsCard,
+  'scr-pm-22-02-deviation': exceptionsCard,
+};
+
 module.exports = {
-  opens, fills, selects: {}, uploads: {}, after: {}, custom: {}, walkthrough: walkthrough.steps, documents: docs, callouts,
+  crops, opens, fills, selects: {}, uploads: {}, after: {}, custom: {}, walkthrough: walkthrough.steps, documents: docs, callouts,
   prepare: walkthrough.prepare, render,
 };

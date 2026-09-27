@@ -20,7 +20,7 @@ Requirements baseline: [`BDOI_EB_BRD_SPEC.md`](../requirements/BDOI_EB_BRD_SPEC.
 
 | Module | Purpose | BRD IDs | Depends on | Flyway (seed) |
 |---|---|---|---|---|
-| `eb` (new, package `com.iortatechnxt.brokerverse.eb`, tables `eb_*`) | EB programmes and cycles, RA and reminders, feedback, document register, BOR, franchise, TOR, insurer requests, proposals and revisions, comparative and approvals, value thresholds, client confirmation and placement trigger, submissions, member roster and member changes, tracked items, SOA intake, EB reports and jobs | BRID-001-004, 007-010, 012, 013, 016, 017, 019, 021, 022, 024, 026, 027, 029, 030 | crm, catalog, account, booking (read), opsledger (read, events), adjustment (endorsement intake), issuance (e-policy receipt), workflow, approval, messaging, docgen, attachment, bulk, report, lov, alert, system, nbadmin (retention port) | V1030, V1031, V1033-V1036 (V1930-V1932) |
+| `eb` (new, package `com.iortatechnxt.brokerverse.eb`, tables `eb_*`) | EB programmes and cycles, RA and reminders, feedback, document register, BOR, franchise, TOR, insurer requests, proposals and revisions, comparative and approvals, value thresholds, client confirmation and placement trigger, submissions, member roster and member changes, tracked items, SOA intake, EB reports and jobs | BRID-001-004, 007-010, 012, 013, 016, 017, 019, 021, 022, 024, 026, 027, 029, 030 | crm, catalog, account, booking (read), opsledger (read, events), adjustment (endorsement intake), issuance (e-policy receipt), workflow, approval, messaging, docgen, attachment, bulk, report, lov, alert, system, nbadmin (retention port) | V1030, V1031, V1033-V1039 (V1930-V1933) |
 | `account` (built) | Business type on the account: the shared work item **BT0** (`V822__account_business_type.sql`, account range), also used by Renewal and Submitted Policies; EB creates no column of its own | BRID-022.01 | unchanged | V822 (BT0) |
 | `booking` (built) | Business type from the account (part of BT0); + insurer billing number with duplicate block (EB) | BRID-020, 022.01 | unchanged | V822 (BT0, code only); V1031 (billing number) |
 | `attachment` (platform) | + document access classes; + process tag on links | BRID-025 | unchanged | V1031 |
@@ -43,7 +43,7 @@ EB declares none. It implements the platform ports `crm.service.ClientRecordsPro
 
 ## 3. Flyway allocation
 
-Allocated to Employee Benefits in the Developer Guide: **schema V1030-V1039, seed V1930-V1939.** Seven schema versions are used; V1037-V1039 stay free for follow-ups. One block is enough.
+Allocated to Employee Benefits in the Developer Guide: **schema V1030-V1039, seed V1930-V1939.** Every schema version is used (V1032 stays reserved for the portal, section 16.1); a further change needs a new allocation. Seeds use V1930-V1933.
 
 | Version | Owner (wave) | Content |
 |---|---|---|
@@ -54,8 +54,11 @@ Allocated to Employee Benefits in the Developer Guide: **schema V1030-V1039, see
 | `V1034__eb_renewal_advice_feedback_bor.sql` | E1-B | `eb_renewal_advice`, `eb_feedback`, `eb_bor` (as built, section 16.6). The marketing tables of the proposal (`eb_franchise_request`, `eb_tor`, `eb_tor_item`, `eb_insurer_request`, `eb_proposal` and its lines, items and factors, `eb_revision_*`, `eb_comparative`, `eb_comparative_signoff`, `eb_comment`, `eb_threshold_rule`, `eb_client_confirmation`, `eb_confirmation_line`, `eb_submission`, `eb_submission_document`, `eb_required_document`) take a free version (V1037-V1039) with their wave |
 | `V1035__eb_tracked_items.sql` | E1-C | `eb_tracked_item` (as built). The roster, member, member change and SOA tables of the proposal (`eb_roster_version`, `eb_member`, `eb_member_change`, `eb_member_change_line`, `eb_soa`) take a free version with their wave |
 | `V1036__eb_reports_support.sql` | E1-C | Indexes and the read view `eb_tat_v` over `eb_activity_log` for `EB-TAT`; retention rule `EB_PROGRAMME` (`EB_MEMBER` follows with the roster); notification event `EB_BOR_DECIDED` |
-| `V1037`-`V1039` | - | Kept free for the marketing and servicing tables still to build |
+| `V1037__eb_marketing.sql` | E1-B / E2 | The marketing tables (as built, section 16.8): `eb_threshold_rule`, `eb_required_document`, `eb_franchise_request`, `eb_tor`, `eb_tor_item`, `eb_insurer_request`, `eb_revision_request`, `eb_revision_item`, `eb_revision_target`, `eb_proposal`, `eb_proposal_line`, `eb_proposal_item`, `eb_proposal_factor`, `eb_comparative`, `eb_comparative_line`, `eb_comparative_signoff`, `eb_comment`, `eb_client_confirmation`, `eb_confirmation_line`, `eb_submission`, `eb_submission_document` |
+| `V1038__eb_servicing.sql` | E1-C / E2 | `eb_roster_version`, `eb_member`, `eb_member_change`, `eb_member_change_line`, `eb_soa`, `eb_soa_invoice`; `eb_submission.member_change_id`; `eb_tracked_item.member_id` and `member_change_id` become references |
+| `V1039__eb_marketing_servicing_config.sql` | E1-B / E1-C / E2 | Parameter `EB_FRANCHISE_GRACE_DAYS`, alert `EB_FRANCHISE_ADVICE_LATE`, notification events `EB_COMPARATIVE_DECIDED`, `EB_ROSTER_STAGED`, `EB_SUBMISSION_SENT`, templates `EB_MEMBER_CHANGE_RELAY`, `EB_SUBMISSION_COVER`, `EB_SOA_RELEASE`, report indexes and the view `eb_programme_arn_v` |
 | `db/seed/V1930__seed_eb_reference.sql` | E1-B | SIT/UAT users of the EB roles (section 6.4). EB product lines and products (HMO, GLI, GPA), HMO providers as panel insurers, threshold rules and required documents follow with the product set-up (EBQ01) |
+| `db/seed/V1933__seed_eb_catalog.sql` | E2 | EB product lines HMO, GLI, GPA and products `EBHMO01`, `EBGLI01`, `EBGPA01` (client-confirmation gate, commission 10 / 15 / 20 %), HMO providers `HMO-MHC` (accredited) and `HMO-KHP` (accreditation lapsed) as panel insurers with their commission rates, the threshold rules TSI 500M and annual premium 20M and the required documents per process (section 16.8); product set-up pending EBQ01 |
 | `db/seed/V1931__seed_eb_cycles.sql` | E1-B | Six programmes of the V981 corporate clients and prospects: renewal advice sent and awaiting feedback, renewal due, new business in requirements, new business lost, feedback received, a programme not flagged for renewal (section 16.6) |
 | `db/seed/V1932__seed_eb_servicing.sql` | E1-C | Tracked items: an HMO card past due with one follow-up, a pending billing, a received card replacement. Rosters, member changes and SOAs follow with their wave |
 
@@ -661,3 +664,130 @@ Screenshots: `eb-home`, `eb-programmes`, `eb-programme-record`, `eb-new-programm
 - FR-EB-057: `EB_ITEM_RECEIVED_DATE`, `EB_ITEM_NOT_RECEIVED`, `EB_ITEM_NOT_PENDING`, `EB_ITEM_CLOSED`,
   `EB_ITEM_DUE_REQUIRED`, `EB_ITEM_SUBJECT_REQUIRED`, `EB_ITEM_RESPONSIBLE_REQUIRED`, `EB_ITEM_DATE_FUTURE`. HMO card
   and billing items are opened by the users until the member and member change steps create them.
+
+### 16.8 E1-B, E1-C and E2: marketing, servicing and the EB reports
+
+The rest of the internal cycle and servicing, without the portal: franchise, terms of reference (TOR) and insurer
+requests, proposals and revisions, the comparative with its sign-off and value-threshold approval, the client's
+confirmation with Trigger Placement, submissions to insurers, the member roster, member changes, the SOA register, the
+EB set-up and the seven EB reports.
+
+**Migrations.** `V1037__eb_marketing.sql`: the set-up masters `eb_threshold_rule` (benefit line or every line, measure
+TSI or ANNUAL_PREMIUM, amount, currency, approver permission, level, effective dates; maker-checker) and
+`eb_required_document` (process, benefit line or every line, document type, mandatory; unique per process, line and
+type); `eb_franchise_request` (EBF number, insurer, status DRAFT, SUBMITTED, APPROVED, REJECTED, EXPIRED, ADVISED, due
+date, decision with date, reason, remarks and evidence, advice due and sent; one live request per cycle and insurer);
+`eb_tor` and `eb_tor_item` (versions DRAFT, RELEASED, SUPERSEDED; items per benefit line and plan); `eb_insurer_request`
+(EBR number, TOR version, due date, OPEN, RESPONDED, DECLINED, CLOSED); `eb_revision_request`, `eb_revision_item`,
+`eb_revision_target`; `eb_proposal` (EBPR number, kind INCUMBENT_INDICATIVE, PROPOSAL or REVISED, version, status
+SUBMITTED, VALIDATED, REJECTED, SUPERSEDED, received and valid dates, stored document) with `eb_proposal_line` (plan,
+members, rate, annual premium, sum insured), `eb_proposal_item` (answer to a TOR item, deviation) and
+`eb_proposal_factor` (capability factor of list `EB_CAPABILITY_FACTOR`, rating 1-5); `eb_comparative` (EBCA number,
+version, status DRAFT, FOR_APPROVAL, THRESHOLD_APPROVAL, APPROVED, PRESENTED, SUPERSEDED, the matrix kept as a JSON
+snapshot, summary, threshold rules met) with `eb_comparative_line` (recommended proposal per benefit line),
+`eb_comparative_signoff` (role SIGNOFF or THRESHOLD, decision, remarks) and `eb_comment` (INTERNAL or CLIENT);
+`eb_client_confirmation` (channel EMAIL or SIGNED_DOCUMENT, date, evidence, ACTIVE or VOIDED) with
+`eb_confirmation_line` (chosen proposal per programme line, premium, sum insured, account ARN once placed);
+`eb_submission` and `eb_submission_document`. `V1038__eb_servicing.sql`: `eb_roster_version` (policy year, version,
+bulk job reference, STAGED, ACCEPTED, REJECTED, SUPERSEDED, headcount; one ACCEPTED version per programme and year),
+`eb_member` (employee number, name, birth date, gender, civil status, plan, dependants, effective dates, ACTIVE or
+DELETED; no health data, EBQ15), `eb_member_change` (EBMC number, line, policy year, source AO or CLIENT, financial,
+status CAPTURED, RELAYED, BILLED, VALIDATED, CLOSED, CANCELLED, billing date, reference, amount and direct flag,
+endorsement request) and `eb_member_change_line` (ADD, DELETE, CHANGE_PLAN, CHANGE_DATA), `eb_soa` (EBS number, insurer
+SOA number, period, amount, stored file and its SHA-256, RECEIVED, VALIDATED, RELEASED, REJECTED; the insurer's SOA
+number and the file hash are unique outside REJECTED) and `eb_soa_invoice`; the member change of a submission, and the
+member and member change of a tracked item become references. `V1039__eb_marketing_servicing_config.sql`: see section 3.
+
+**Services** (by sub-package):
+
+| Package | Class | Does |
+|---|---|---|
+| `eb.franchise` | `FranchiseService`, `FranchiseMail`, `FranchiseExpiryJob` | Request (cycle FRANCHISE or remarketing, validated BOR, one live request per insurer `EB_FRANCHISE_EXISTS`; e-mail with the BOR and the FRANCHISE documents to the insurer's placement mailboxes; due `EB_FRANCHISE_TAT_DAYS` working days); decide (evidence required `EB_FRANCHISE_EVIDENCE_REQUIRED`, reason from `EB_FRANCHISE_REJECT_REASON` when declined, date not in the future); advise the client (due `EB_FRANCHISE_ADVICE_DAYS`); job `EB_FRANCHISE_EXPIRY` expires a request without a decision `EB_FRANCHISE_GRACE_DAYS` working days after its due date |
+| `eb.market` | `TorService` | TOR items (`EB_TOR_ITEM_LINE`, `EB_TOR_ITEM_TEXT`), release as a PDF stored as `EB_TOR`; a change after release is a new version and open requests are re-sent |
+| | `InsurerRequestService`, `RequestMail` | Requests to insurers with an approved franchise (`EB_FRANCHISE_NOT_APPROVED`), released TOR required (`EB_TOR_NOT_RELEASED`), due `EB_PROPOSAL_REPLY_DAYS`; the first requests move FRANCHISE to PROPOSALS (`release_tor`); close or decline a request |
+| | `EbProposalService`, `EbProposalRules`, `ProposalInput` | Record (document required, plans with premium, answers only to items of the released TOR, factors rated once from 1 to 5; kind REVISED when it answers an open revision, PROPOSAL on an open request, INCUMBENT_INDICATIVE from an incumbent insurer without a request, else `EB_PROPOSAL_NOT_REQUESTED`; the insurer's earlier proposal is superseded), validate, reject |
+| | `RevisionService` | Revision request with the changes and the insurers that proposed (`EB_REVISION_EMPTY`, `EB_REVISION_NO_PROPOSAL`); a revised proposal must answer each changed item (`EB_REVISION_ITEM_UNANSWERED`) |
+| `eb.comparative` | `EbComparativeService`, `ComparativeMatrix` | Build (validated proposals, no open request `EB_REQUESTS_OPEN`; lowest premium per line recommended; earlier draft superseded; due `EB_COMPARATIVE_DAYS`), recommend (`EB_RECOMMENDATION_INVALID`), submit, comments |
+| | `ComparativeApproval`, `ThresholdEvaluator`, `ComparativeApprovalSource` | Sign-off by an `EB_COMPARATIVE_APPROVE` holder who is not the maker (`EB_SIGNOFF_MAKER`); the threshold rules are evaluated on the recommended proposals and a rule met sends the cycle to THRESHOLD_APPROVAL for a holder of the rule's permission who is neither the maker nor the programme's AO (`EB_THRESHOLD_OWN`); return to the AO with a reason; My Approvals items |
+| | `ComparativePresenter`, `ComparativeExport` | Present to the client (PDF stored as `EB_COMPARATIVE`, cycle WITH_CLIENT); export PDF or Excel |
+| `eb.confirmation` | `ConfirmationService`, `ConfirmationInput` | Record the confirmation (presented comparative `EB_COMPARATIVE_NOT_PRESENTED`, channel, evidence, one validated proposal per active line `EB_CONFIRMATION_CHOICE`); the threshold rules are evaluated again on the chosen proposals (`reconfirm_threshold` to THRESHOLD_APPROVAL, else CONFIRMED); void before placement (`EB_CONFIRMATION_PLACED`) |
+| | `PlacementTrigger`, `PlacementDrafts` | Trigger Placement (below) |
+| `eb.submission` | `SubmissionService` | Checklist of the required documents of the process and lines with the documents on file; submit (mandatory documents present, documents of the record `EB_SUBMISSION_DOCUMENT`) by protected e-mail `EB_SUBMISSION_COVER`; acknowledgement date |
+| `eb.setup` | `EbSetupService`, `SetupApprovalSource` | Threshold rules and required documents with maker-checker (authorize by another `EB_SETUP` user, deactivate); pending changes in My Approvals |
+| `eb.member` | `RosterService`, `MasterListBulkHandler` | Bulk upload `EB_MASTERLIST` (parameters `programmeId`, `policyYear`) stages a roster version; differences, accept (earlier accepted version superseded), reject |
+| | `MemberChangeService`, `MemberChangeRules`, `MemberChangeEffects`, `MemberChangeMail`, `MemberChangeQuery` | Capture (checked against the accepted roster: `EB_MEMBER_EXISTS`, `EB_MEMBER_UNKNOWN`, `EB_MEMBER_DATA`, `EB_MEMBER_PLAN`, `EB_MEMBER_EFFECTIVE_PERIOD`), relay by e-mail `EB_MEMBER_CHANGE_RELAY` with a billing tracked item due in the member-change TAT, bill (direct billing with its file), validate (Processing; a financial change raises an endorsement request on the booked invoice of the line's account), close (applied to the roster; an HMO_CARD item per member added on an HMO line) |
+| `eb.soa` | `EbSoaService`, `SoaRelease`, `SoaInvoices`, `SoaPaymentListener`, `SoaQuery` | Receive (`EB_SOA_DUPLICATE`, `EB_SOA_DUPLICATE_FILE`, period, amount), validate with the invoices billed (Processing), reject with a reason of `EB_SOA_REJECT_REASON`, release to the HR contacts (`EB_SOA_RELEASE`) and Collection; `EB_INVOICE_PAID` when every invoice of the SOA reads PAID |
+| `eb.service` | `EbParties`, `EbMailer`, `EbTemplates`, `RequiredDocumentCheck`, `EbCaseMirror`, `EbAlertCheck`, `EbSearch` | Insurer mailboxes and contacts, protected mail with the outbox link, template merge and PDF, required-document check, the work case of franchise, member change and SOA kept in step with the record, the daily alerts `EB_FRANCHISE_OVERDUE`, `EB_FRANCHISE_ADVICE_LATE`, `EB_PROPOSAL_OVERDUE`, `EB_COMPARATIVE_LATE`, `EB_SOA_VALIDATION_LATE` |
+
+**Trigger Placement (FR-EB-046).** On a CONFIRMED cycle with its active confirmation: refused while a threshold approval
+is pending (`EB_THRESHOLD_PENDING`), while a mandatory document of NB_PLACEMENT or RENEWAL_PLACEMENT is missing, or when
+a chosen insurer is not accredited on the business date and has no accreditation approval on file
+(`EB_ISACOM_REQUIRED`). `PlacementDrafts` turns each confirmed line into a `LinePlacement` from the chosen proposal
+(product of the line, insurer, period, premium, sum insured); `EbPlacementService.trigger` creates the accounts (section
+16.6); the confirmation, proposals, TOR, BOR and required documents are linked to each account and every account is
+submitted to Processing (`AccountService.submit`). The seed products `EBHMO01`, `EBGLI01`, `EBGPA01` (V1933) let the
+accounts pass the submission checks end to end.
+
+**API** (`/api/v1/eb`, company in `companyId`; multipart requests carry the record as a JSON field `proposal`,
+`confirmation` or `change` with the files):
+
+| Method and path | Permission | Does |
+|---|---|---|
+| `GET /programmes/{id}/franchise`, `POST /cycles/{id}/franchise`, `POST /franchise/{id}/decision` (multipart), `POST /franchise/{id}/advise` | EB_VIEW; EB_MARKET | Franchise |
+| `GET`, `PUT /cycles/{id}/tor`, `POST /cycles/{id}/tor/release` | EB_VIEW; EB_MARKET | TOR |
+| `GET`, `POST /cycles/{id}/requests`, `POST /requests/{id}/close` | EB_VIEW; EB_MARKET | Insurer requests |
+| `GET`, `POST /cycles/{id}/proposals` (multipart), `POST /proposals/{id}/validate`, `/reject` | EB_VIEW; EB_MARKET | Proposals |
+| `GET`, `POST /cycles/{id}/revisions` | EB_VIEW; EB_MARKET | Revisions |
+| `GET /programmes/{id}/comparatives`, `POST /cycles/{id}/comparatives`, `GET /comparatives/{id}`, `PUT /comparatives/{id}/recommendation`, `POST /comparatives/{id}/submit`, `/present` | EB_VIEW; EB_MARKET | Comparative |
+| `POST /comparatives/{id}/sign-off` | EB_COMPARATIVE_APPROVE | Sign-off |
+| `POST /comparatives/{id}/threshold-approve` | the rule's permission (checked by the service) | Threshold approval |
+| `POST /comparatives/{id}/return` | EB_COMPARATIVE_APPROVE or EB_THRESHOLD_APPROVE | Return to the AO |
+| `POST /comparatives/{id}/comments`, `GET /comparatives/{id}/export?format=pdf|xlsx` | EB_VIEW | Comments, export |
+| `GET /cycles/{id}/confirmations`, `POST /cycles/{id}/confirmation` (multipart), `POST /cycles/{id}/confirmation/void`, `POST /cycles/{id}/trigger-placement` | EB_VIEW; EB_MARKET | Confirmation and placement |
+| `GET /programmes/{id}/submissions`, `GET /submissions/checklist`, `POST /submissions`, `POST /submissions/{id}/acknowledge` | EB_VIEW; EB_MARKET or EB_PROCESS | Submissions |
+| `GET`, `POST /setup/threshold-rules`, `PUT /setup/threshold-rules/{id}`, `POST /setup/threshold-rules/{id}/authorize|deactivate`, the same under `/setup/required-documents` | EB_VIEW; EB_SETUP | EB Setup |
+| `GET /programmes/{id}/roster`, `GET /roster/{id}/members`, `/differences`, `POST /roster/{id}/accept`, `/reject` | EB_VIEW; EB_MARKET | Roster |
+| `GET /member-changes?status=OPEN|<status>&programmeId=&q=`, `GET /member-changes/{id}`, `POST /programmes/{id}/member-changes` (multipart), `POST /member-changes/{id}/relay`, `/bill` (multipart), `/validate`, `/close` | EB_VIEW; capture and relay EB_MARKET; bill and close EB_MARKET or EB_PROCESS; validate EB_PROCESS | Member changes |
+| `GET /soa`, `GET /soa/{id}`, `GET /programmes/{id}/invoices`, `POST /programmes/{id}/soa` (multipart), `POST /soa/{id}/validate`, `/reject`, `/release` | EB_VIEW; receive EB_MARKET or EB_PROCESS; the rest EB_PROCESS | SOA register |
+
+`GET /home` also counts `memberChangesOpen` and `soaToValidate`.
+
+**Reports** (`eb.report`, category Employee Benefits, permission `EB_REPORT_VIEW`; common parameters period, team, AO,
+client, benefit line, insurer and business type; PDF, Excel and Word): `EB-PRODUCTION`, `EB-RENEWAL`, `EB-PLACEMENT`,
+`EB-NEW-BUSINESS`, `EB-TAT` (working days per activity with the breach flag), `EB-PENDING-ITEMS`, `EB-FRANCHISE`.
+
+**Screens.** The programme page gains the tabs Franchise (Request Franchise, Record Decision, Advise Client), TOR &
+Requests (edit and release the TOR, Send Requests, Mark Declined, Request Revision), Proposals (Record Proposal,
+validate, reject, download), Comparative (list, Build Comparative), Confirmation (Record Confirmation with the
+recommendation by default, Void Confirmation, **Trigger Placement**), Submissions (Submit to Insurer with the checklist,
+acknowledgement), Members (Upload Master List through the bulk wizard, differences, accept, reject, members), Member
+Changes (Capture Member Change) and Billing & SOA (invoices, Receive SOA). The Comparative page shows the premium matrix
+with the lowest premium and the recommendation, the terms and capability matrix with the deviations, the approvals and
+the comments, with Submit for Sign-off, Sign Off, Approve Above Threshold, Return to AO, Present to Client and the PDF and
+Excel exports. Member Changes (work list, change dialog with relay, billing, validation, close and Submit to Insurer),
+SOA Register (filters, SOA dialog with validate, reject, release) and EB Setup (threshold rules and required documents
+with maker-checker) replace the E0 placeholders. EB Home gains the tile "SOAs to validate". Screenshots: the programme
+tabs, `eb-member-changes`, `eb-soa-register` and `eb-setup` (a `tab` field in `screens.cjs` opens a record tab).
+
+**Persona suite.** `personaMenus.json` gains the suite BRD-8: EB_AO, EB_TL, EB_MANAGEMENT, EB_COLLECTION with their full
+grants; EB_PROCESSOR, EB_PROC_SUPERVISOR and BUSINESS_ADMIN within the scope `EB_` (they hold other areas' grants),
+checked by `navigation/personaMenus.test.ts` and `PersonaMenusIT`.
+
+**Tests.** `EbMarketingIT`, `EbServicingIT`, `EbReportsIT`, `EbMonitoringIT`, `api/EbMarketApiIT` (the HTTP flow to
+accounts SUBMITTED on `EBHMO01`), the EB rows of `ApiSmokeIT`, `PersonaMenusIT`; unit tests `EbMarketingDomainTest`,
+`ThresholdEvaluatorTest`, `SoaPaymentListenerTest`, `MemberChangeEffectsTest`; frontend `market/marketTabs.test.tsx`,
+`confirmation/confirmation.test.tsx`, `members/members.test.tsx`, `soa/soaSetup.test.tsx`.
+
+**Not built here.** A seed storyline of a cycle in PROPOSALS with its comparative, a roster, a member change and an SOA
+(the seed stops at V1933: the screens of these steps are empty on a fresh seed until a user runs the flow); a second
+`EB_SETUP` seed user (a set-up change made by `badmin` waits for another EB_SETUP user).
+
+### 16.9 Open questions (as built)
+
+| Question | Asked | What is built until BDOI answers |
+|---|---|---|
+| EBQ01 | Full list of benefit lines; HMO providers as panel insurers; commission rates per provider and line | Lines HMO, GLI, GPA; products `EBHMO01`, `EBGLI01`, `EBGPA01`; HMO providers seeded as insurer parties with commission rates (V1933); production set-up through Product Maintenance |
+| EBQ02 | RA lead time (180 or 135 days), reminder frequency and number, recipients | `EB_RA_LEAD_DAYS` 135, `EB_RA_REMINDER_DAYS` 120, 105, 90; HR contacts flagged "receives RA" |
+| EBQ05 | Is a BOR needed for renewals (when remarketing, never, always)? | BOR gate on new business and on remarketing only; franchise requests need a validated BOR |
+| EBQ06 | Is an AO attestation of the BOR signature acceptable, or an e-signature? BOR validity period | Validator checklist (signed, not blank, client name) with the validity dates; no e-signature check |
+| EBQ20 | Statuses and thresholds of contracts, HMO cards and billing; recipients of the follow-ups | Tracked item types and statuses of V1030; follow-ups `EB_FOLLOWUP_DAYS` 5 and `EB_FOLLOWUP_MAX` 3 to the item's recipients, else the insurer mailboxes, client contacts or AO; contract items at placement, billing items at relay, HMO card items at member change close |

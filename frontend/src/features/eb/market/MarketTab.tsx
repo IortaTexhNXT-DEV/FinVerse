@@ -48,8 +48,8 @@ function SendDialog({ cycleId, onClose }: Readonly<{ cycleId: number; onClose: (
       <div className="stack">
         <ErrorAlert error={send.error} />
         <p className="muted">
-          The released terms of reference and the census go by e-mail to each insurer. Insurers
-          under franchise need an approved franchise first.
+          The released terms of reference go by e-mail to each insurer. Only insurers that
+          approved the franchise of the cycle can be sent a request.
         </p>
         {submitted && codes.length === 0 && (
           <div className="alert danger">Select at least one insurer</div>

@@ -46,7 +46,7 @@ export const EB_HELP: HelpSection = {
         'The programme tabs Franchise, TOR & Requests, Proposals, Comparative, Confirmation and Submissions carry a cycle from the market to placement.',
       workflow: [
         "Franchise: Request Franchise sends the franchise form and the validated Broker on Record to the selected insurers; record each decision with the insurer's reply, then Advise Client. A request without a decision is expired after its due date and the grace days.",
-        "TOR & Requests: write the terms of reference, release them, then Send Requests to the insurers; Mark Declined closes a request the insurer will not quote. Request Revision relays the client's changes for revised proposals.",
+        "TOR & Requests: write the terms of reference, release them, then Send Requests to the insurers that approved the franchise; Mark Declined closes a request the insurer will not quote. Request Revision relays the client's changes for revised proposals.",
         'Proposals: Record Proposal with the plans and premiums, the answers to the terms of reference, the capability ratings and the proposal document; validate or reject each one. Only validated proposals are compared.',
         'Comparative: Build Comparative puts the validated proposals side by side per benefit line with the lowest premium recommended; mark the recommendation, submit it for sign-off, and present it to the client once approved.',
         "Confirmation: Record Confirmation with the client's e-mail or signed document and the chosen proposal of each line, then Trigger Placement: one account per line is created with the chosen insurer, the documents are attached and each account is submitted for placement.",

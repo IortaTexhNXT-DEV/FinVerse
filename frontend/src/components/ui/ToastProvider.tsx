@@ -2,6 +2,7 @@ import { CircleAlert, CircleCheck, Info, TriangleAlert } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useCallback, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+import { plainMessage } from './errorView';
 import type { NoticeTone } from './Notice';
 import { ToastContext } from './toastContext';
 
@@ -22,14 +23,16 @@ let nextId = 1;
 
 /**
  * Transient notifications (announced to screen readers through a live region), in the semantic
- * colours of the notice standard: a white toast with the accent bar and icon of its tone.
+ * colours of the notice standard: a white toast with the accent bar and icon of its tone. Technical
+ * codes and identifiers are removed from the text, as in error notices.
  */
 export function ToastProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [messages, setMessages] = useState<ToastMessage[]>([]);
 
   const push = useCallback((text: string, tone: NoticeTone) => {
     const id = nextId++;
-    setMessages((m) => [...m, { id, text, tone }]);
+    const shown = plainMessage(text) || text;
+    setMessages((m) => [...m, { id, text: shown, tone }]);
     setTimeout(() => {
       setMessages((m) => m.filter((x) => x.id !== id));
     }, DISMISS_AFTER_MS);

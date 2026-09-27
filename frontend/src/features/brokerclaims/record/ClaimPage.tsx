@@ -23,6 +23,7 @@ import { CLAIM_ENTITY, claimApi } from './api';
 import { ClaimActions } from './ClaimActions';
 import { ClaimSummary } from './ClaimSummary';
 import { DetailsTab } from './DetailsTab';
+import { Notice } from '@/components/ui/Notice';
 
 type TabId = 'details' | 'locations' | 'insurers' | 'reserve' | 'diary' | 'documents' | 'history';
 
@@ -43,7 +44,7 @@ function PremiumNotes({ claim }: Readonly<{ claim: Claim }>) {
     <>
       {claim.flags.unpaidPremium && <PremiumPanel premium={p.live} />}
       {claim.flags.awaitingPremiumRemittance && p.unremittedInvoices.length > 0 && (
-        <div className="alert warning">
+        <Notice tone="warning" title="Waiting for the premium remittance">
           The claim waits for the premium remittance. Request the special remittance of{' '}
           {p.unremittedInvoices.map((invoiceNo, i) => (
             <span key={invoiceNo}>
@@ -56,7 +57,7 @@ function PremiumNotes({ claim }: Readonly<{ claim: Claim }>) {
             </span>
           ))}
           .
-        </div>
+        </Notice>
       )}
     </>
   );

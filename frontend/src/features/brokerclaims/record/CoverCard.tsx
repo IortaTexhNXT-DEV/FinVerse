@@ -7,17 +7,20 @@ import { formatAmount, formatPeriod, humanize } from '@/utils/format';
 import type { ClaimDraft, PremiumCheck, UnpaidInvoice } from '../cover/api';
 import { PREMIUM_LABELS } from './recordLogic';
 import { displayNameOf } from '@/api/users';
+import { Notice } from '@/components/ui/Notice';
 
 /** The premium check of a cover with the invoices not fully paid (BRCLM.001). */
 export function PremiumPanel({ premium }: Readonly<{ premium: PremiumCheck }>) {
   return (
     <div className="stack">
-      <div className={premium.blocking ? 'alert warning' : 'alert success'} role="status">
-        <strong>Premium: {PREMIUM_LABELS[premium.status]}.</strong>{' '}
+      <Notice
+        tone={premium.blocking ? 'warning' : 'success'}
+        title={`Premium: ${PREMIUM_LABELS[premium.status]}`}
+      >
         {premium.blocking
           ? 'The claim can be recorded; the authorization code stays disabled until the premium is paid.'
           : 'The premium check does not block the authorization code.'}
-      </div>
+      </Notice>
       {premium.unpaid.length > 0 && (
         <DataTable<UnpaidInvoice>
           caption="Invoices not fully paid"

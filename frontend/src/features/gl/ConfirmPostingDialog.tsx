@@ -1,8 +1,8 @@
-import { AlertTriangle } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Modal } from '@/components/ui/Modal';
+import { Notice } from '@/components/ui/Notice';
 
 /** One fact shown in the confirmation (label and value). */
 export interface ConfirmFact {
@@ -58,14 +58,7 @@ export function ConfirmPostingDialog(p: Readonly<Props>) {
           ))}
         </dl>
         {warnings.length > 0 && (
-          <div className="alert warning" role="status">
-            <AlertTriangle size={16} aria-hidden="true" /> Please check before you continue:
-            <ul>
-              {warnings.map((w) => (
-                <li key={w}>{w}</li>
-              ))}
-            </ul>
-          </div>
+          <Notice tone="warning" title="Please check before you continue" items={warnings} />
         )}
       </div>
     </Modal>

@@ -17,6 +17,7 @@ import { ConfirmPolicyCard } from './ConfirmPolicyCard';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
 import { matchText } from './issuanceLogic';
+import { Notice } from '@/components/ui/Notice';
 
 interface Row {
   field: string;
@@ -134,34 +135,33 @@ export default function ExtractionReviewPage() {
       />
       <ErrorAlert error={download.error} />
       {r.epolicy.extractionNote !== undefined && (
-        <div className="alert" role="status">
-          Extraction: {r.epolicy.extractionNote}
-        </div>
+        <Notice tone="info" title="Extraction">
+          {r.epolicy.extractionNote}
+        </Notice>
       )}
       {r.differences.length > 0 && (
-        <div className="alert warning" role="alert">
-          <strong>Check before confirming</strong>
-          <ul className="field-errors">
-            {r.differences.map((d) => (
-              <li key={d}>{d}</li>
-            ))}
-          </ul>
-        </div>
+        <Notice tone="warning" role="alert" title="Check before confirming" items={r.differences} />
       )}
       <Comparison review={r} />
       {open && can('EPOLICY_MANAGE') && <ConfirmPolicyCard key={r.epolicy.id} review={r} />}
       {r.epolicy.status === 'CONFIRMED' && (
-        <div className="alert success" role="status">
-          Policy {r.epolicy.policyNumbers.join(', ')} confirmed by{' '}
-          <UserName login={r.epolicy.reviewedBy} /> on {formatDateTime(r.epolicy.reviewedAt)}; the
-          account is {humanize(r.account.status).toLowerCase()}.
-        </div>
+        <Notice tone="success" title={`Policy ${r.epolicy.policyNumbers.join(', ')} confirmed`}>
+          By <UserName login={r.epolicy.reviewedBy} /> on {formatDateTime(r.epolicy.reviewedAt)};
+          the account is {humanize(r.account.status).toLowerCase()}.
+        </Notice>
       )}
       {r.epolicy.status === 'REJECTED' && (
-        <div className="alert danger" role="status">
-          Rejected by <UserName login={r.epolicy.reviewedBy} />:{' '}
+        <Notice
+          tone="error"
+          role="status"
+          title={
+            <>
+              Rejected by <UserName login={r.epolicy.reviewedBy} />
+            </>
+          }
+        >
           {humanize(r.epolicy.rejectReason ?? '')}
-        </div>
+        </Notice>
       )}
     </div>
   );

@@ -4,6 +4,8 @@ import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { Kpi } from '@/components/ui/Kpi';
 import { formatAmount, formatDate, humanize } from '@/utils/format';
+import { Notice } from '@/components/ui/Notice';
+import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
 
 type Line = readonly [string, number | undefined, string?];
 
@@ -49,17 +51,29 @@ export function CalculatorResult({ result }: Readonly<{ result: RatingResult }>)
   return (
     <div className="stack">
       {result.schemeVersion && (
-        <div
-          className={
-            result.nonCurrent || result.schemeDeviation ? 'alert warning' : 'alert success'
-          }
-        >
-          Priced on package version {result.schemeVersion} (effective{' '}
-          {formatDate(result.schemeEffectiveFrom)}, scheme rate {result.schemeRate ?? '–'}%)
-          {result.nonCurrent && ' – not the current version: for information only.'}
-          {result.schemeDeviation &&
-            ' – an item rate differs from the scheme rate: a quotation needs an approved rate exception.'}
-        </div>
+        <Card title="Rate Scheme">
+          <DefinitionGrid
+            columns={2}
+            items={[
+              { label: 'Package version', value: String(result.schemeVersion) },
+              { label: 'Effective from', value: formatDate(result.schemeEffectiveFrom) },
+              {
+                label: 'Scheme rate (%)',
+                value: result.schemeRate === undefined ? '' : String(result.schemeRate),
+              },
+            ]}
+          />
+        </Card>
+      )}
+      {result.schemeVersion && result.nonCurrent && (
+        <Notice tone="warning" title="Not the current package version">
+          This pricing is for information only.
+        </Notice>
+      )}
+      {result.schemeVersion && result.schemeDeviation && (
+        <Notice tone="warning" title="Rate exception needed">
+          An item rate differs from the scheme rate: a quotation needs an approved rate exception.
+        </Notice>
       )}
       <div className="grid-4">
         <Kpi label="Sum insured" value={formatAmount(b.sumInsured)} />

@@ -3,7 +3,6 @@ import {
   CalendarClock,
   Check,
   CornerUpLeft,
-  KeyRound,
   Pencil,
   ShieldAlert,
   UserRound,
@@ -32,6 +31,7 @@ import { RequestApprovers, RequestDetails, RequestHistory } from './AccessReques
 import { ReasonDialog } from './ReasonDialog';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
+import { Notice } from '@/components/ui/Notice';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -168,14 +168,10 @@ function Password({ decision }: Readonly<{ decision: AccessDecision }>) {
     return null;
   }
   return (
-    <div className="alert success" role="status">
-      <p>
-        <KeyRound size={16} aria-hidden="true" /> User <strong>{decision.request.username}</strong>{' '}
-        was created. Give this temporary password to the user through a secure channel; it is shown
-        only now.
-      </p>
+    <Notice tone="success" title={`User ${decision.request.username} created`}>
+      Give this temporary password to the user through a secure channel; it is shown only now.
       <code className="secret-value">{decision.temporaryPassword}</code>
-    </div>
+    </Notice>
   );
 }
 
@@ -187,14 +183,28 @@ function Banners({
     <>
       {decision && <Password decision={decision} />}
       {r.status === 'RETURNED' && r.decisionComment && (
-        <div className="alert warning" role="status">
-          Returned by <UserName login={r.decidedBy} />: {r.decisionComment}
-        </div>
+        <Notice
+          tone="warning"
+          title={
+            <>
+              Returned by <UserName login={r.decidedBy} />
+            </>
+          }
+        >
+          {r.decisionComment}
+        </Notice>
       )}
       {r.lifecycle.cancelReason && (
-        <div className="alert" role="status">
-          Cancelled by <UserName login={r.lifecycle.cancelledBy} />: {r.lifecycle.cancelReason}
-        </div>
+        <Notice
+          tone="info"
+          title={
+            <>
+              Cancelled by <UserName login={r.lifecycle.cancelledBy} />
+            </>
+          }
+        >
+          {r.lifecycle.cancelReason}
+        </Notice>
       )}
     </>
   );

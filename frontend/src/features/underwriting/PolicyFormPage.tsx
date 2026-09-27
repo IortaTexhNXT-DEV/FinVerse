@@ -16,6 +16,7 @@ import { fromPolicy, newPolicy, normalize, validatePolicy } from './policyForm';
 import { PremiumSummary } from './PremiumSummary';
 import { RiskEditor } from './RiskEditor';
 import { useUwLookups } from './useUwLookups';
+import { Notice } from '@/components/ui/Notice';
 
 interface EditorProps {
   id: number | undefined;
@@ -80,11 +81,11 @@ function PolicyEditor({ id, title, initial }: Readonly<EditorProps>) {
         }
       />
       {errors.length > 0 && (
-        <div className="alert danger" role="alert">
+        <Notice tone="error">
           {errors.map((e) => (
             <div key={e}>{e}</div>
           ))}
-        </div>
+        </Notice>
       )}
       <ErrorAlert error={save.error ?? preview.error} />
       <Card title="Policy terms">

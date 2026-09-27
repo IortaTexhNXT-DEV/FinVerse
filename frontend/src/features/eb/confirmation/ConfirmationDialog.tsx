@@ -12,6 +12,7 @@ import { DialogFooter } from '../common/DialogFooter';
 import { orNone } from '../common/formValues';
 import { useEbMutation } from '../common/useEbMutation';
 import { confirmationErrors, premiumOn } from './confirmationLogic';
+import { Notice } from '@/components/ui/Notice';
 
 /**
  * Record Confirmation: how and when the client confirmed, the chosen proposal of each active line
@@ -103,7 +104,7 @@ export function ConfirmationDialog({
             )}
           </Field>
         </div>
-        {errors.choices && <div className="alert danger">{errors.choices}</div>}
+        {errors.choices && <Notice tone="error">{errors.choices}</Notice>}
         {lines.map((l) => (
           <Field key={l.lineNo} label={`Line ${String(l.lineNo)} – ${l.benefitLine}`} required>
             {(id) => (

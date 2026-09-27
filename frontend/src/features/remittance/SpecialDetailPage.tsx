@@ -19,6 +19,7 @@ import type { Special } from './api';
 import { joinParts } from './remittanceLabels';
 import './remittance.css';
 import { displayNameOf } from '@/api/users';
+import { Notice } from '@/components/ui/Notice';
 
 const ENTITY = 'SpecialRemittance';
 
@@ -108,7 +109,11 @@ export default function SpecialDetailPage() {
         ])}
       />
       <Summary special={s} />
-      {s.rejectedReason !== undefined && <div className="alert">Rejected: {s.rejectedReason}</div>}
+      {s.rejectedReason !== undefined && (
+        <Notice tone="info" title="Rejected">
+          {s.rejectedReason}
+        </Notice>
+      )}
       <WorkflowPanel
         entityType={ENTITY}
         entityId={id}

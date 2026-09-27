@@ -21,6 +21,7 @@ import { EB_LOV } from '../common/ebCodes';
 import { orNone } from '../common/formValues';
 import { useCycleList } from '../common/useCycleList';
 import { useEbMutation } from '../common/useEbMutation';
+import { Notice } from '@/components/ui/Notice';
 
 const BLANK: TorItemInput = { benefitLine: '', planCode: '', description: '', requirement: '' };
 
@@ -70,7 +71,7 @@ function EditDialog({
       <div className="stack">
         <ErrorAlert error={save.error} />
         {submitted && !complete && (
-          <div className="alert danger">Each row needs its benefit line, item and requirement</div>
+          <Notice tone="error">Each row needs its benefit line, item and requirement</Notice>
         )}
         <table className="table eb-edit-table">
           <thead>

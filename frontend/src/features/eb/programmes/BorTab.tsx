@@ -24,6 +24,7 @@ import { formatDateTime, formatPeriod } from '@/utils/format';
 import { DialogFooter } from '../common/DialogFooter';
 import { useEbMutation } from '../common/useEbMutation';
 import { checklistErrors } from './borChecklist';
+import { Notice } from '@/components/ui/Notice';
 
 /** Validate BOR: the validator's checklist and the validity dates. */
 function ValidateDialog({ bor, onClose }: Readonly<{ bor: BorVersion; onClose: () => void }>) {
@@ -68,7 +69,7 @@ function ValidateDialog({ bor, onClose }: Readonly<{ bor: BorVersion; onClose: (
     >
       <div className="stack">
         <ErrorAlert error={validate.error} />
-        {errors.checklist && <div className="alert danger">{errors.checklist}</div>}
+        {errors.checklist && <Notice tone="error">{errors.checklist}</Notice>}
         <div className="eb-checklist">
           {check('signedBySignatory', 'Signed by an authorised signatory')}
           {check('notBlank', 'Not blank')}

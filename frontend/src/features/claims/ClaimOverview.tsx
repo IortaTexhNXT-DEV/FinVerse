@@ -5,6 +5,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { Kpi } from '@/components/ui/Kpi';
 import { formatDate, humanize } from '@/utils/format';
 import { displayNameOf } from '@/api/users';
+import { Notice } from '@/components/ui/Notice';
 
 function share(c: Claim): string {
   if (c.coinsurerCode === undefined) {
@@ -54,9 +55,9 @@ export function ClaimOverview({ claim: c }: Readonly<{ claim: Claim }>) {
           ))}
         </dl>
         {c.statusReason !== undefined && (
-          <div className="alert warning" style={{ marginTop: 12 }}>
-            {humanize(c.status)}: {c.statusReason}
-          </div>
+          <Notice tone="warning" title={humanize(c.status)}>
+            {c.statusReason}
+          </Notice>
         )}
       </Card>
       <Card title="Involved parties" flush>

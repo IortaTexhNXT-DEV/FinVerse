@@ -15,6 +15,7 @@ import { EB_LOV } from '../common/ebCodes';
 import { useEbMutation } from '../common/useEbMutation';
 import { ACTIONS, BLANK_ROW, changeErrors, fieldsOf, toChangeInput } from './memberChangeForm';
 import type { ChangeForm, ChangeRow } from './memberChangeForm';
+import { Notice } from '@/components/ui/Notice';
 
 const TEXT_FIELDS: readonly { key: keyof ChangeRow; label: string; kind: 'personal' | 'plan' }[] = [
   { key: 'lastName', label: 'Last Name', kind: 'personal' },
@@ -248,7 +249,7 @@ export function MemberChangeDialog({
             />
           )}
         </Field>
-        {errors.rows && <div className="alert danger">{errors.rows}</div>}
+        {errors.rows && <Notice tone="error">{errors.rows}</Notice>}
         {form.rows.map((r, i) => (
           <RowFields
             key={i}

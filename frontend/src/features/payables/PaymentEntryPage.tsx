@@ -18,6 +18,7 @@ import { checkSelection } from './payablesMath';
 import type { Selection } from './payablesMath';
 import { PAYEE_TYPES, usePayablesLookups } from './usePayablesLookups';
 import { DateInput } from '@/components/ui/DateInput';
+import { Notice } from '@/components/ui/Notice';
 
 const MODES: PaymentMode[] = ['CHEQUE', 'BANK_TRANSFER', 'PDC'];
 const CATEGORIES: ('' | PaymentCategory)[] = [
@@ -255,11 +256,9 @@ export default function PaymentEntryPage() {
           ]}
         />
       </Card>
-      {check.errors.map((e) => (
-        <div key={e} className="alert danger" role="alert">
-          {e}
-        </div>
-      ))}
+      {check.errors.length > 0 && (
+        <Notice tone="error" title="Correct the payment before saving" items={check.errors} />
+      )}
       <div className="row">
         <Kpi label="Payment amount" accent value={<Amount value={check.total} />} />
         <div className="spacer" />

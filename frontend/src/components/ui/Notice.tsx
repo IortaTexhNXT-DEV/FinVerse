@@ -31,6 +31,8 @@ interface NoticeProps {
   actions?: ReactNode;
   /** Accessible name when the notice has no title. */
   label?: string;
+  /** Live-region role; an error is announced as an alert, others as a status by default. */
+  role?: 'alert' | 'status' | 'note';
   className?: string;
 }
 
@@ -78,6 +80,7 @@ export function Notice({
   reference,
   actions,
   label,
+  role,
   className,
 }: Readonly<NoticeProps>) {
   const Icon = ICONS[tone];
@@ -85,7 +88,7 @@ export function Notice({
   return (
     <div
       className={['notice', `notice-${tone}`, className].filter(Boolean).join(' ')}
-      role={tone === 'error' ? 'alert' : 'status'}
+      role={role ?? (tone === 'error' ? 'alert' : 'status')}
       aria-label={label}
     >
       <Icon className="notice-icon" size={18} aria-hidden="true" />

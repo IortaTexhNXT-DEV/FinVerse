@@ -16,6 +16,7 @@ import { EB_LOV } from '../common/ebCodes';
 import { orNone } from '../common/formValues';
 import { useEbMutation } from '../common/useEbMutation';
 import { docInput, ruleErrors, ruleInput } from './setupLogic';
+import { Notice } from '@/components/ui/Notice';
 
 /**
  * Add or edit a value threshold rule: above the amount of total sum insured or annual premium, a
@@ -170,7 +171,7 @@ export function RequiredDocumentDialog({
       <div className="stack">
         <ErrorAlert error={save.error} />
         {submitted && !valid && (
-          <div className="alert danger">Select the process and the document type</div>
+          <Notice tone="error">Select the process and the document type</Notice>
         )}
         <div className="form-grid">
           <Field label="Process" required>

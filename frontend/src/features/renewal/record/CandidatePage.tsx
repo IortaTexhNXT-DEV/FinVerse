@@ -25,6 +25,7 @@ import { DetailsTab } from './DetailsTab';
 import { AccountHistoryTab, HistoryTab, NotesTab } from './HistoryTabs';
 import { ChecksTab, ComputationsTab, InsurerTab, LettersTab } from './RecordTabs';
 import '../renewal.css';
+import { Notice } from '@/components/ui/Notice';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -162,9 +163,7 @@ export default function CandidatePage() {
         facts={facts(d)}
       />
       {d.blocking.length > 0 && (
-        <div className="alert warning" role="status">
-          Blocking checks: {d.blocking.join('; ')}
-        </div>
+        <Notice tone="warning" title="Blocking checks" items={d.blocking} />
       )}
       <WorkflowPanel
         entityType={ENTITY}

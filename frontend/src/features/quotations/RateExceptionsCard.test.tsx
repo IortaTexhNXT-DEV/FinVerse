@@ -86,7 +86,7 @@ describe('rate exceptions card', () => {
       'Status',
     ]);
     const rows = screen.getAllByRole('row').slice(1);
-    const approved = within(rows[1] as HTMLElement);
+    const approved = within(rows[1]!);
     expect(approved.getByText('1.10')).toBeInTheDocument();
     expect(await approved.findByText('1.35')).toBeInTheDocument();
     expect(approved.getByText('−0.25')).toBeInTheDocument();
@@ -94,7 +94,7 @@ describe('rate exceptions card', () => {
     expect(approved.getByText('Aileen Account Officer')).toBeInTheDocument();
     expect(approved.getByText('Nora NB Approver')).toBeInTheDocument();
     expect(approved.getByText('Approved')).toHaveClass('badge', 'success');
-    const pending = within(rows[0] as HTMLElement);
+    const pending = within(rows[0]!);
     expect(pending.getByText('Pending Authorization')).toHaveClass('badge', 'warning');
   });
 
@@ -106,7 +106,7 @@ describe('rate exceptions card', () => {
     expect(notice).toHaveTextContent('submission needs an approved rate exception');
     const header = screen.getByRole('heading', { name: 'Rate Exceptions' }).closest('header');
     expect(
-      within(header as HTMLElement).getByRole('button', { name: 'Request Rate Exception' }),
+      within(header!).getByRole('button', { name: 'Request Rate Exception' }),
     ).toBeInTheDocument();
   });
 

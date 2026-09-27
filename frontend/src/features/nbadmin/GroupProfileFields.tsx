@@ -6,6 +6,7 @@ import { humanize } from '@/utils/format';
 import { PRIVILEGE_LEVELS } from './accessRequest';
 import type { AccessRequestErrors, AccessRequestForm } from './accessRequest';
 import { PermissionPicker, RolePermissionFields } from './RolePermissionFields';
+import { Notice } from '@/components/ui/Notice';
 
 interface FieldsProps {
   form: AccessRequestForm;
@@ -107,11 +108,11 @@ function Activation({ form, set, errors }: Readonly<FieldsProps>) {
         )}
       </Field>
       {deactivate && form.roleCode !== '' && (
-        <div className="alert warning" role="status">
+        <Notice tone="warning">
           {members.length === 0
             ? 'The profile has no members.'
             : `Members who lose the profile's screens: ${members.map((m) => m.username).join(', ')}`}
-        </div>
+        </Notice>
       )}
     </>
   );

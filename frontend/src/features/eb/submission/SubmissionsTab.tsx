@@ -24,6 +24,7 @@ import { EB_LOV } from '../common/ebCodes';
 import { InsurerSelect } from '../common/EbSelects';
 import { useEbMutation } from '../common/useEbMutation';
 import { SubmissionChecklist } from './SubmissionChecklist';
+import { Notice } from '@/components/ui/Notice';
 
 /** Process types submitted from a member change rather than a cycle. */
 const CHANGE_PROCESSES = new Set(['ENDORSEMENT', 'ADJUSTMENT']);
@@ -82,9 +83,7 @@ export function SubmitDialog({
       <div className="stack">
         <ErrorAlert error={submit.error} />
         {submitted && !valid && (
-          <div className="alert danger">
-            Select the process, the insurer and the documents to submit
-          </div>
+          <Notice tone="error">Select the process, the insurer and the documents to submit</Notice>
         )}
         <div className="form-grid">
           <Field label="Process" required>

@@ -42,6 +42,7 @@ import { DecisionsTab, MatchesTab, TimelineTab } from './CaseTabs';
 import { DocumentsTab } from './DocumentsTab';
 import { ReviewTab } from './ReviewTab';
 import { UserName } from '@/components/ui/UserName';
+import { Notice } from '@/components/ui/Notice';
 
 type TabId = 'matches' | 'review' | 'documents' | 'decisions' | 'str' | 'timeline';
 
@@ -168,7 +169,7 @@ export default function CasePage() {
     setDialog(undefined);
     const next = outcome?.screeningCase.row.stage ?? d.row.stage;
     toast.success(`${d.row.caseNo}: ${stageLabel(next)}`);
-    outcome?.warnings.forEach((w) => toast.error(`Warning: ${w}`));
+    outcome?.warnings.forEach((w) => toast.warning(w));
     void refresh();
   };
   return (
@@ -212,9 +213,9 @@ export default function CasePage() {
       />
       <Summary detail={d} />
       {d.breached && (
-        <div className="alert warning" role="status">
+        <Notice tone="warning" title="SLA breached">
           The SLA of this stage is breached; escalated to {d.escalatedTo ?? 'Compliance'}.
-        </div>
+        </Notice>
       )}
       <WorkflowPanel
         entityType="ScreeningCase"

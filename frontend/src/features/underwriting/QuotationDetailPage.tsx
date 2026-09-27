@@ -12,6 +12,7 @@ import { formatDate, formatPeriod, humanize } from '@/utils/format';
 import { QuotationActions } from './QuotationActions';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
+import { Notice } from '@/components/ui/Notice';
 
 function Terms({ quotation: q }: Readonly<{ quotation: Quotation }>) {
   const facts: [string, string][] = [
@@ -42,9 +43,9 @@ function Terms({ quotation: q }: Readonly<{ quotation: Quotation }>) {
         ))}
       </dl>
       {q.decisionReason !== undefined && (
-        <div className="alert warning" style={{ marginTop: 12 }}>
-          Rejected: {q.decisionReason}
-        </div>
+        <Notice tone="warning" title="Rejected">
+          {q.decisionReason}
+        </Notice>
       )}
       {q.convertedPolicyId !== undefined && (
         <p style={{ marginBottom: 0 }}>

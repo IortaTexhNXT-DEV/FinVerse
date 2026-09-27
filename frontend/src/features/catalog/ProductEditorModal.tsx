@@ -11,6 +11,7 @@ import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormContr
 import { enumOptions } from '@/features/assets/options';
 import { productProblems, toProductInput, toggleSegment } from './productForm';
 import type { ProductForm } from './productForm';
+import { Notice } from '@/components/ui/Notice';
 
 const GATES = enumOptions(['PAID', 'CLIENT_CONFIRMATION']);
 const TSU = enumOptions(['BY_RULES', 'ALWAYS', 'NEVER']);
@@ -85,9 +86,9 @@ export function ProductEditorModal({ initial, onClose }: Readonly<Props>) {
     >
       <ErrorAlert error={save.error} />
       {problems.length > 0 && (
-        <div className="alert warning" role="alert">
+        <Notice tone="warning" role="alert">
           {problems.join(' ')}
-        </div>
+        </Notice>
       )}
       <div className="form-grid">
         <TextInput

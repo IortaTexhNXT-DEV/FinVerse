@@ -7,6 +7,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useWorkspace } from '@/context/workspaceContext';
 import { formatAmount, formatDate } from '@/utils/format';
 import { UserName } from '@/components/ui/UserName';
+import { Notice } from '@/components/ui/Notice';
 
 function reversalText(r: FxRun): string {
   if (r.reversalBatchNo) {
@@ -26,9 +27,7 @@ export function FxPreviewView({
   return (
     <>
       {missing.length > 0 && (
-        <div className="alert danger">
-          No CLOSING rate for {missing.join(', ')}: posting is blocked.
-        </div>
+        <Notice tone="error">No CLOSING rate for {missing.join(', ')}: posting is blocked.</Notice>
       )}
       {preview && (
         <div className="grid-4">

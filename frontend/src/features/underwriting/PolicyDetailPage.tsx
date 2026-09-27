@@ -20,6 +20,7 @@ import { EndorsementHistory } from './EndorsementHistory';
 import { businessLabel } from './policyForm';
 import { WorkflowActions } from './WorkflowActions';
 import { displayNameOf } from '@/api/users';
+import { Notice } from '@/components/ui/Notice';
 
 function Terms({ policy: p }: Readonly<{ policy: Policy }>) {
   const facts: [string, string][] = [
@@ -52,9 +53,9 @@ function Terms({ policy: p }: Readonly<{ policy: Policy }>) {
         ))}
       </dl>
       {p.document.rejectionReason !== undefined && (
-        <div className="alert warning" style={{ marginTop: 12 }}>
-          Returned by the checker: {p.document.rejectionReason}
-        </div>
+        <Notice tone="warning" title="Returned by the checker">
+          {p.document.rejectionReason}
+        </Notice>
       )}
     </Card>
   );

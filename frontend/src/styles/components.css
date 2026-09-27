@@ -1190,3 +1190,7 @@
 .nowrap {
   white-space: nowrap;
 }
+
+.notice .tag-list {
+  margin-top: var(--space-1);
+}

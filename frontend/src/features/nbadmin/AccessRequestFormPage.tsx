@@ -29,6 +29,7 @@ import { GroupProfileFields } from './GroupProfileFields';
 import { UserRequestFields } from './UserRequestFields';
 import { DateInput } from '@/components/ui/DateInput';
 import { UserName } from '@/components/ui/UserName';
+import { Notice } from '@/components/ui/Notice';
 
 type Mode = 'draft' | 'submit';
 
@@ -257,9 +258,9 @@ function RequestEditor({ id, initial, saved, users, userIdPattern }: Readonly<Ed
       />
       <ErrorAlert error={save.error} />
       {returned && saved.decisionComment && (
-        <div className="alert warning" role="status">
+        <Notice tone="warning">
           Returned by <UserName login={saved.decidedBy} />: {saved.decisionComment}
-        </div>
+        </Notice>
       )}
       <Card>
         <div className="stack">

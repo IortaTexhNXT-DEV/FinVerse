@@ -17,6 +17,7 @@ import { DateField } from '@/features/underwriting/FormFields';
 import { formatAmount, formatDate, humanize, today } from '@/utils/format';
 import { PolicyCessionsCard } from './PolicyCessionsCard';
 import { previewTotals } from './allocation';
+import { Notice } from '@/components/ui/Notice';
 
 /** RI allocation run (preview, then post) and the per-policy cession view. */
 export default function AllocationPage() {
@@ -86,11 +87,11 @@ export default function AllocationPage() {
           </div>
         )}
         {result !== null && result.messages.length > 0 && (
-          <div className="alert warning" role="status">
+          <Notice tone="warning">
             {result.messages.map((m) => (
               <div key={m}>{m}</div>
             ))}
-          </div>
+          </Notice>
         )}
       </Card>
       {rows !== null && (

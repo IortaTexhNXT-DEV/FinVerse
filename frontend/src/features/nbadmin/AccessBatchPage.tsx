@@ -14,11 +14,12 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime } from '@/utils/format';
+import { formatDateTime, humanize } from '@/utils/format';
 import { REQUEST_TYPE_LABELS } from './accessRequest';
 import { ApproverPicker } from './ApproverPicker';
 import { ReasonDialog } from './ReasonDialog';
 import { displayNameOf } from '@/api/users';
+import { Notice } from '@/components/ui/Notice';
 
 type BatchAction = 'submit' | 'approve' | 'return' | 'reject' | 'cancel';
 
@@ -76,16 +77,26 @@ function isDecision(r: AccessBatch | AccessBatchDecision): r is AccessBatchDecis
 
 function Outcome({ decision }: Readonly<{ decision: AccessBatchDecision }>) {
   return (
-    <div className="alert success" role="status">
-      <p>Each line was approved on its own; new users receive the temporary password shown once:</p>
-      <ul>
-        {decision.lines.map((l) => (
-          <li key={l.requestNo ?? l.username}>
-            {l.requestNo} {l.username}: {l.error ?? l.status}
-            {l.temporaryPassword && <code className="secret-value">{l.temporaryPassword}</code>}
-          </li>
-        ))}
-      </ul>
+    <div className="stack">
+      <Notice tone="success" title="Batch approved">
+        Each line was approved on its own; new users receive the temporary password shown once.
+      </Notice>
+      <DataTable
+        caption="Outcome of the batch lines"
+        rows={decision.lines}
+        rowKey={(l) => l.requestNo ?? l.username ?? ''}
+        columns={[
+          { key: 'no', header: 'Request No.', kind: 'code', render: (l) => l.requestNo },
+          { key: 'user', header: 'User', render: (l) => l.username },
+          { key: 'outcome', header: 'Outcome', render: (l) => l.error ?? humanize(l.status ?? '') },
+          {
+            key: 'password',
+            header: 'Temporary Password',
+            render: (l) =>
+              l.temporaryPassword && <code className="secret-value">{l.temporaryPassword}</code>,
+          },
+        ]}
+      />
     </div>
   );
 }

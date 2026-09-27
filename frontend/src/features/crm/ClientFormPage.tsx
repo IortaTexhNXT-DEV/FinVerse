@@ -23,6 +23,7 @@ import {
 } from './clientForm';
 import type { ClientForm } from './clientForm';
 import { useUnsavedChangesGuard } from '@/components/ui/useUnsavedChangesGuard';
+import { Notice } from '@/components/ui/Notice';
 
 function Saved({ client, onAnother }: Readonly<{ client: ClientDetail; onAnother: () => void }>) {
   const navigate = useNavigate();
@@ -140,9 +141,9 @@ function ClientEditor({ existing }: Readonly<{ existing?: ClientDetail }>) {
         <ContactSection form={form} errors={errors} set={set} />
         <SegmentSection form={form} errors={errors} set={set} />
         {submitted && Object.keys(errors).length > 0 && (
-          <div className="alert warning" role="alert">
+          <Notice tone="warning" role="alert">
             Correct the highlighted fields before saving.
-          </div>
+          </Notice>
         )}
         <div className="form-actions">
           <Button variant="secondary" onClick={() => void navigate(-1)}>

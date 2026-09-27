@@ -1,5 +1,6 @@
 import type { Checklist, CheckItem } from '@/api/closing';
 import { DataTable } from '@/components/ui/DataTable';
+import { Notice } from '@/components/ui/Notice';
 
 /** Pass / fail badge of a checklist control (non-blocking failures show as a warning). */
 export function CheckBadge({ item }: Readonly<{ item: CheckItem }>) {
@@ -31,9 +32,7 @@ export function ChecklistView({
   return (
     <div className="stack">
       {checklist && (
-        <div className={`alert ${checklist.ready ? 'success' : 'warning'}`} role="status">
-          {readiness(checklist)}
-        </div>
+        <Notice tone={checklist.ready ? 'success' : 'warning'}>{readiness(checklist)}</Notice>
       )}
       <DataTable<CheckItem>
         loading={loading}

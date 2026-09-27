@@ -1365,7 +1365,7 @@ priority: Must have
 fit: NEW
 screens: Package Request page (Advisories tab)
 api: GET .../requests/{id}/advisories; PUT /advisories/{aid}; POST /advisories/{aid}/send
-description: On release BIBS drafts the advisory automatically, of type PACKAGE_READY for NEW and REACTIVATE, RENEWAL for RENEW, PACKAGE_UPDATED otherwise, and RETIREMENT for a retired package. The user checks the recipients, subject and text and sends it. Sending is blocked until the supporting documents are on the request. Recipients receive an in-app notification, and e-mail addresses given on the advisory receive the protected advisory PDF.
+description: On release BIBS drafts the advisory automatically, a new package advisory for a new or reactivated package, a renewal advisory for a renewal, a package update advisory otherwise, and a retirement advisory for a retired package. The user checks the recipients, subject and text and sends it. Sending is blocked until the supporting documents are on the request. Recipients receive an in-app notification, and e-mail addresses given on the advisory receive the protected advisory PDF.
 preconditions:
   - "An advisory draft exists; the user has PKG_ADVISORY."
 main_flow:
@@ -1481,8 +1481,8 @@ brd: [BRPM.007 (p.17-18)]
 actor: System; Marketing (quotation user); Business Administrator (exception approval)
 priority: Must have
 fit: CHANGE
-screens: Quotation (rate scheme panel, Request Rate Exception); Premium Calculator; My Approvals
-api: POST /api/v1/catalog/rating/quote; POST /api/v1/catalog/rate-scheme-exceptions
+screens: Quotation (rate scheme panel, Request Rate Exception); rate exception record; Premium Calculator; My Approvals
+api: POST /api/v1/catalog/rating/quote; POST /api/v1/catalog/rate-scheme-exceptions; GET /api/v1/catalog/rate-scheme-exceptions/{reference}; POST .../{reference}/approve and /reject
 description:
   - A new-business quotation or account on a package is priced on the version in force on the transaction date, whatever the period start, so an outdated rate cannot be selected. The version number is stored on the quotation, the account and the invoice.
   - An item rate different from the scheme (or panel insurer) rate, or the use of a version that is not current, needs an approved rate-scheme exception. Without it, submission is refused. Renewals and endorsements use the version of the original account (BRD-6 and BRD-1 contracts).
@@ -1493,7 +1493,7 @@ main_flow:
   - The user submits the quotation; BIBS checks the scheme.
   - The quotation, the accounts created from it and the invoice carry the version number.
 alternate_flows:
-  - Non-current rate. The user clicks **Request Rate Exception** with the reason; a PRODUCT_AUTHORIZE holder decides it in My Approvals. With the approved exception the quotation is submitted and the exception reference is stored.
+  - Non-current rate. The user clicks **Request Rate Exception** with the reason. The approver (PRODUCT_AUTHORIZE, not the requester) opens the exception record from My Approvals, compares the requested rate or version with the scheme in force, and clicks **Approve** (optional comment) or **Reject** (reason required). The requester is notified of the decision. With the approved exception the quotation is submitted and the exception reference is stored.
   - Version changed while the quotation was a draft. Submission is refused; the user reprices on the current version.
 rules:
   - [R1, "New business uses the version in force on the transaction date.", Fixed, "-"]
@@ -1501,21 +1501,28 @@ rules:
   - [R3, "Exceptions expire after 30 days (default).", Fixed, "-"]
   - [R4, "Packages migrated as version 1 keep manual item rates until BDOI answers PQ10.", Configurable, Version flag manual rate allowed (PQ10)]
   - [R5, "Statutory rates (DST, VAT, premium tax, LGT) keep their own effective dates (PQ10).", Fixed, "-"]
+  - [R6, "An exception is approved or rejected by a holder of the approval permission other than its requester; a rejection needs its reason, and the decision stays on the exception.", Fixed, "-"]
 validations:
   - [Deviating rate without exception, "Package <code> is priced on the current rate scheme: rate <n>% needs an approved rate exception", RATE_SCHEME_NOT_CURRENT]
+  - [Rejection without a reason, Enter the reason for the rejection, RATE_EXCEPTION_REASON_REQUIRED]
+  - [Decision by the requester, A rate exception is decided by someone other than its requester, MAKER_CHECKER_VIOLATION]
+  - [Exception already decided, Rate exception <reference> is already decided, RECORD_NOT_PENDING]
   - [Product expired or retired, "Product <code> is <status> and cannot be sold", PRODUCT_NOT_SELLABLE]
   - [No version in force, "Package <code> has no released version in force on <date>", PRODUCT_NOT_SELLABLE]
-fields_screen: Request Rate Exception
+fields_screen: Request Rate Exception; Approve and Reject on the exception record
 fields:
   - [Requested rate or version, Number, "Yes", "-", Different from the current scheme]
   - [Reason, Text, "Yes", "-", "-"]
+  - [Approval comment, Text, "No", "-", "Up to 1,000 characters"]
+  - [Rejection reason, Text, "Yes", "-", "Up to 1,000 characters"]
 notifications:
   - "Authorisers of rate exceptions in My Approvals; requester on decision."
 audit:
-  - "Exception request and decision; the version used by each transaction."
+  - "Exception request and decision (approver, date and time, comment or reason); the version used by each transaction."
 acceptance:
   - A quotation with a period start before the new version's effective date is priced on the new version.
   - Submission with a manual rate different from the scheme is refused without an approved exception and accepted with one.
+  - The approver approves or rejects the exception on its record opened from My Approvals; the requester cannot decide it and a rejection needs its reason.
   - The quotation, account and invoice show the version number that priced them.
 ```
 

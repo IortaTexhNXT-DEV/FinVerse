@@ -280,14 +280,23 @@ const steps = {
     });
     return page;
   },
-  // 23. My Approvals lists the exception; its row opens Products, which has no approval action for exceptions, so
-  // the approval of step 24 is made through the authorisation service of the catalogue (as the approver).
-  'wt-a-23': async (ctx) => go(ctx, 'approver', '/approvals'),
-  'wt-a-24': async (ctx) => {
-    const ex = ctx.sql(`select id from cat_rate_scheme_exception where product_code = '${RISK_CODE}' and record_status = 'PENDING_AUTHORIZATION' order by id desc limit 1`)[0];
-    if (ex) {
-      await ctx.api('approver', 'POST', `/catalog/records/RATE_SCHEME_EXCEPTION/${ex[0]}/authorize`);
+  // 23. The approver opens the exception from My Approvals and approves it on its record.
+  'wt-a-23': async (ctx) => {
+    const page = await go(ctx, 'approver', '/approvals');
+    const ex = ctx.sql(`select reference_no from cat_rate_scheme_exception where product_code = '${RISK_CODE}' and record_status = 'PENDING_AUTHORIZATION' order by id limit 1`)[0];
+    if (!ex) {
+      const done = ctx.one(`select reference_no from cat_rate_scheme_exception where product_code = '${RISK_CODE}' order by id limit 1`);
+      return go(ctx, 'approver', `/catalog/rate-exceptions/${done}`);
     }
+    await page.locator('table tbody tr', { hasText: ex[0] }).first().click();
+    await settle(page, 1200);
+    await act(page, /^approve$/i, {
+      confirm: /^approve$/i,
+      comment: 'Loss-free fleet of 30 vehicles; approved for this quotation only (seed data).',
+    });
+    return page;
+  },
+  'wt-a-24': async (ctx) => {
     const q = ctx.one(`select id from quo_quotation where product_code = '${RISK_CODE}' order by id desc limit 1`);
     return go(ctx, 'ao', `/quotations/${q}`);
   },

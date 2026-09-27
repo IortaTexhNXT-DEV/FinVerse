@@ -277,7 +277,24 @@ async function drawCallouts(page, callouts) {
       clean.split(' (')[0] && out.push(clean.split(' (')[0]);
       return [...new Set(out.map(norm).filter((v) => v.length > 1))];
     };
-    const find = (label, type) => {
+    // A callout the recipe scopes (packs/brdNN.cjs `callouts`) is looked for only inside the visible elements that
+    // match `within` (and contain the `title` text); `target` names the element itself (a panel line, a link). When
+    // no such element is on the page the field is not in this state and gets no badge.
+    const scoped = (scope) => [...document.querySelectorAll(scope.within)]
+      .filter((el) => visible(el) && !el.closest('[data-callout-layer]')
+        && (!scope.title || (el.innerText || '').includes(scope.title)));
+    const findScoped = (label, type, scope) => {
+      const roots = scoped(scope);
+      if (roots.length === 0) {
+        return null;
+      }
+      if (scope.target) {
+        return roots.map((r) => [...r.querySelectorAll(scope.target)].find((el) => visible(el) && !used.has(el)))
+          .find(Boolean) ?? null;
+      }
+      return find(label, type, (el) => roots.some((r) => r.contains(el)));
+    };
+    const find = (label, type, inside = () => true) => {
       const t = (type || '').toLowerCase();
       const pref = Object.entries(byType).find(([k]) => t.includes(k));
       // A column label goes on the table header; any other field never lands on a column header, so a filter and
@@ -287,7 +304,7 @@ async function drawCallouts(page, callouts) {
       for (const v of variants(label)) {
         for (const sel of selectors) {
           for (const el of document.querySelectorAll(sel)) {
-            if (used.has(el) || inChrome(el) || !visible(el)) {
+            if (used.has(el) || inChrome(el) || !visible(el) || !inside(el)) {
               continue;
             }
             const text = ['span', 'div', 'p', 'td', 'a', 'strong', 'dd'].includes(sel) ? ownText(el) : norm(el.innerText);
@@ -298,15 +315,15 @@ async function drawCallouts(page, callouts) {
         }
         // A search box or field known by its placeholder.
         for (const el of document.querySelectorAll('input[placeholder], textarea[placeholder]')) {
-          if (!used.has(el) && visible(el) && norm(el.getAttribute('placeholder')) === v) {
+          if (!used.has(el) && visible(el) && inside(el) && norm(el.getAttribute('placeholder')) === v) {
             return el;
           }
         }
       }
       return null;
     };
-    for (const [no, label, type] of items) {
-      const el = find(label, type);
+    for (const [no, label, type, scope] of items) {
+      const el = scope ? findScoped(label, type, scope) : find(label, type);
       if (!el) {
         missing.push(no);
         continue;
@@ -390,7 +407,9 @@ function optimise(file) {
   const calloutsOf = {};
   manifest.shots.forEach((s) => {
     if (s.callouts && s.callouts.length) {
-      calloutsOf[s.screen] = s.callouts;
+      // The recipe may scope a field to the dialog, panel or page where it is (recipe.callouts[screen][no]).
+      const scopes = (recipe.callouts && recipe.callouts[s.screen]) || {};
+      calloutsOf[s.screen] = s.callouts.map(([no, label, type]) => [no, label, type, scopes[no]]);
     }
   });
   const shots = manifest.shots.filter((s) => !only || new RegExp(only).test(s.slug));

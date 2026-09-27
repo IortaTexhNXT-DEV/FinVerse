@@ -2,10 +2,10 @@ package com.iortatechnxt.brokerverse.cashiering.domain;
 
 import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.ReceiptKind;
 import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
-import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
-import jakarta.persistence.Embedded;
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

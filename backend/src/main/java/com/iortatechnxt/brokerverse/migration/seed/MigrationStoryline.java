@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -27,13 +29,13 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
- * The SIT/UAT storyline of the data migration (DATA_MIGRATION_DESIGN sections 24 and 25, wave
- * DM3): the seed extracts of {@code db/seed/migration/} go through the real pipeline in load order
- * - intake with a control file, batch, validation (G3, Data Steward), load approval (G4, Data
+ * The SIT/UAT storyline of the data migration (DATA_MIGRATION_DESIGN sections 24 and 25, wave DM3):
+ * the seed extracts of {@code db/seed/migration/} go through the real pipeline in load order -
+ * intake with a control file, batch, validation (G3, Data Steward), load approval (G4, Data
  * Migration Lead), load, reconciliation (G5) and acceptance (G6, business owner and lead) - each
  * step as the SIT/UAT user who does it. Reference data, a client, a policy header, an open legacy
- * invoice, a legacy unapplied payment and an archive record result, exactly as in a mock run.
- * Used by the seed runner and by the end-to-end test.
+ * invoice, a legacy unapplied payment and an archive record result, exactly as in a mock run. Used
+ * by the seed runner and by the end-to-end test.
  */
 public class MigrationStoryline {
 
@@ -115,7 +117,9 @@ public class MigrationStoryline {
       as.as(
           OWNER,
           () ->
-              services.signoffs().signMapping(companyId, step.object(), true, "Seed maps reviewed"));
+              services
+                  .signoffs()
+                  .signMapping(companyId, step.object(), true, "Seed maps reviewed"));
       List<String> extracts = new ArrayList<>();
       for (String file : step.files()) {
         extracts.add(receive(companyId, step.object(), file));
@@ -163,13 +167,10 @@ public class MigrationStoryline {
           "MIG_SEED_BREAKS", "Seed batch " + batchNo + " has reconciliation breaks");
     }
     as.as(RECON, () -> services.signoffs().signReconciliation(batchNo, true, "Reconciled"));
-    as.as(
-        OWNER,
-        () -> services.signoffs().signAcceptance(batchNo, "DATA_OWNER", true, "Accepted"));
+    as.as(OWNER, () -> services.signoffs().signAcceptance(batchNo, "DATA_OWNER", true, "Accepted"));
     as.as(
         LEAD,
-        () ->
-            services.signoffs().signAcceptance(batchNo, "DATA_MIGRATION_LEAD", true, "Accepted"));
+        () -> services.signoffs().signAcceptance(batchNo, "DATA_MIGRATION_LEAD", true, "Accepted"));
     return batchNo;
   }
 
@@ -208,7 +209,11 @@ public class MigrationStoryline {
             layout);
     List<String> columns = columns(layout);
     List<String> lines =
-        new String(content, StandardCharsets.UTF_8).lines().skip(1).filter(x -> !x.isBlank()).toList();
+        new String(content, StandardCharsets.UTF_8)
+            .lines()
+            .skip(1)
+            .filter(x -> !x.isBlank())
+            .toList();
     Set<String> distinct = new HashSet<>();
     List<String> hash = List.of(((String) l.get("cols")).split(","));
     for (String line : lines) {
@@ -218,16 +223,34 @@ public class MigrationStoryline {
     }
     int hashTotal = "ROW_COUNT".equals(l.get("hash_rule")) ? lines.size() : distinct.size();
     String[] parts = file.split("_");
-    String day =
-        parts[2].substring(0, 4) + "-" + parts[2].substring(4, 6) + "-" + parts[2].substring(6, 8);
+    String day = LocalDate.parse(parts[2], DateTimeFormatter.BASIC_ISO_DATE).toString();
     String head =
-        object + "," + layout + "," + parts[1] + "," + file + "," + day + " 18:00:00," + day
+        object
+            + ","
+            + layout
+            + ","
+            + parts[1]
+            + ","
+            + file
+            + ","
+            + day
+            + " 18:00:00,"
+            + day
             + " 19:00:00,seed,";
     return ("object,layout,source_system,data_file,as_of,extracted_at,extracted_by,"
             + "measure,column_name,currency,filter,value\n"
-            + head + "ROW_COUNT,,,," + lines.size() + "\n"
-            + head + "HASH_TOTAL,,,," + hashTotal + "\n"
-            + head + "SHA256,,,," + Sha256.hex(content) + "\n")
+            + head
+            + "ROW_COUNT,,,,"
+            + lines.size()
+            + "\n"
+            + head
+            + "HASH_TOTAL,,,,"
+            + hashTotal
+            + "\n"
+            + head
+            + "SHA256,,,,"
+            + Sha256.hex(content)
+            + "\n")
         .getBytes(StandardCharsets.UTF_8);
   }
 

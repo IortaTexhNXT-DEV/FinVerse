@@ -214,8 +214,8 @@ public class DecommissionService {
   private void measure(Long companyId, List<DecommissionItem> all) {
     Map<String, Boolean> met =
         Map.of(
-            "NO_LEGACY_INVOICE", count(OPEN_INVOICES, companyId) == 0,
-            "NO_LEGACY_UPP", count(OPEN_UPP, companyId) == 0,
+            "NO_LEGACY_INVOICE", zero(jdbc.queryForObject(OPEN_INVOICES, Integer.class, companyId)),
+            "NO_LEGACY_UPP", zero(jdbc.queryForObject(OPEN_UPP, Integer.class, companyId)),
             "LEGACY_ACCOUNTS_ZERO", legacyBalance(companyId).signum() == 0);
     for (DecommissionItem item : all) {
       boolean measured =
@@ -231,9 +231,8 @@ public class DecommissionService {
     }
   }
 
-  private int count(String sql, Long companyId) {
-    Integer n = jdbc.queryForObject(sql, Integer.class, companyId);
-    return n == null ? 0 : n;
+  private static boolean zero(Integer n) {
+    return n == null || n == 0;
   }
 
   private BigDecimal legacyBalance(Long companyId) {

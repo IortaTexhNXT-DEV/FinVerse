@@ -21,8 +21,8 @@ import org.springframework.stereotype.Component;
 /**
  * Loader of the receipt series in use at the freeze (object R11; DATA_MIGRATION_DESIGN section 2):
  * each AR or OR series is created through {@link ReceiptSeriesService} pending authorisation, with
- * its BIR authority to print and range, continues from the next number the legacy system would
- * have issued, and carries origin MIGRATED. A rolled-back batch deactivates the series.
+ * its BIR authority to print and range, continues from the next number the legacy system would have
+ * issued, and carries origin MIGRATED. A rolled-back batch deactivates the series.
  */
 @Component
 public class ReceiptSeriesLoader implements MigrationLoader {

@@ -71,26 +71,8 @@ public class InsurerLoaders {
           InsurerProfile existing = insurers.requireInsurer(ctx.companyId(), r.target());
           return LoadOutcome.of("Insurer", existing.getId(), existing.getPartyCode(), null);
         }
-        Map<String, String> v = unit.values();
         InsurerProfile created =
-            insurers.create(
-                ctx.companyId(),
-                r.target(),
-                new PartyContact(
-                    Values.text(v.get("tin")),
-                    Values.text(v.get("address")),
-                    Values.text(v.get("placement_email")),
-                    null),
-                new InsurerDetails(
-                    Values.text(v.get("insurer_name")),
-                    Values.text(v.get("short_name")),
-                    Values.text(v.get("accreditation_no")),
-                    Values.date(v.get("accredited_until")).orElse(null),
-                    PlacementChannel.EMAIL,
-                    Values.items(v.get("placement_email")),
-                    Values.decimal(v.get("default_credit_days"))
-                        .map(BigDecimal::intValue)
-                        .orElse(DEFAULT_CREDIT_DAYS)));
+            insurers.create(ctx.companyId(), r.target(), contact(unit), details(unit));
         created.markMigrated(RecordOrigin.migrated(unit.sourceSystem(), legacy, ctx.batchNo()));
         return LoadOutcome.of("Insurer", created.getId(), created.getPartyCode(), null);
       }
@@ -110,6 +92,29 @@ public class InsurerLoaders {
         return true;
       }
     };
+  }
+
+  private static PartyContact contact(LoadUnit unit) {
+    Map<String, String> v = unit.values();
+    return new PartyContact(
+        Values.text(v.get("tin")),
+        Values.text(v.get("address")),
+        Values.text(v.get("placement_email")),
+        null);
+  }
+
+  private static InsurerDetails details(LoadUnit unit) {
+    Map<String, String> v = unit.values();
+    return new InsurerDetails(
+        Values.text(v.get("insurer_name")),
+        Values.text(v.get("short_name")),
+        Values.text(v.get("accreditation_no")),
+        Values.date(v.get("accredited_until")).orElse(null),
+        PlacementChannel.EMAIL,
+        Values.items(v.get("placement_email")),
+        Values.decimal(v.get("default_credit_days"))
+            .map(BigDecimal::intValue)
+            .orElse(DEFAULT_CREDIT_DAYS));
   }
 
   /**

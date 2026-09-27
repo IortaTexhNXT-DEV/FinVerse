@@ -10,6 +10,8 @@ import com.iortatechnxt.brokerverse.migration.archive.domain.ArchiveRecord;
 import com.iortatechnxt.brokerverse.migration.archive.domain.ArchiveRecordRepository;
 import com.iortatechnxt.brokerverse.migration.archive.service.port.LegacyDocumentSource;
 import com.iortatechnxt.brokerverse.migration.common.service.MigrationCodes;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.Locale;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -115,7 +117,11 @@ public class ArchiveService {
               + document.sizeBytes());
     }
     String sha = Sha256.hex(content);
-    if (!sha.equals(document.sha256().toLowerCase(Locale.ROOT))) {
+    boolean same =
+        MessageDigest.isEqual(
+            sha.getBytes(StandardCharsets.US_ASCII),
+            document.sha256().toLowerCase(Locale.ROOT).getBytes(StandardCharsets.US_ASCII));
+    if (!same) {
       throw new BusinessRuleException(
           "MIG_DOCUMENT_CHECKSUM",
           "The SHA-256 of file " + document.fileName() + " does not match the index");

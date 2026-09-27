@@ -73,10 +73,24 @@ class MigrationReferenceChecksApiIT {
         load(
             "R02",
             List.of(
-                row("branch_code", "MKT", "branch_name", "Makati", "invoicing_branch_flag", "Y",
-                    "active_flag", "Y"),
-                row("branch_code", "ZZZ", "branch_name", "Closed", "invoicing_branch_flag", "N",
-                    "active_flag", "N")),
+                row(
+                    "branch_code",
+                    "MKT",
+                    "branch_name",
+                    "Makati",
+                    "invoicing_branch_flag",
+                    "Y",
+                    "active_flag",
+                    "Y"),
+                row(
+                    "branch_code",
+                    "ZZZ",
+                    "branch_name",
+                    "Closed",
+                    "invoicing_branch_flag",
+                    "N",
+                    "active_flag",
+                    "N")),
             List.of("branch_code"));
     String rows = mig.rows(branches.get("batchNo").asText());
     assertThat(branches.get("counts").get("loaded").asInt()).as(rows).isEqualTo(1);
@@ -85,10 +99,28 @@ class MigrationReferenceChecksApiIT {
         load(
             "R03",
             List.of(
-                row("record_type", "UNIT", "unit_code", "U01", "unit_name", "Metro 1",
-                    "active_flag", "Y"),
-                row("record_type", "AO", "unit_code", "U01", "ao_user_id", "AO01", "ao_code",
-                    "AO01", "ao_name", "Officer", "active_flag", "Y")),
+                row(
+                    "record_type",
+                    "UNIT",
+                    "unit_code",
+                    "U01",
+                    "unit_name",
+                    "Metro 1",
+                    "active_flag",
+                    "Y"),
+                row(
+                    "record_type",
+                    "AO",
+                    "unit_code",
+                    "U01",
+                    "ao_user_id",
+                    "AO01",
+                    "ao_code",
+                    "AO01",
+                    "ao_name",
+                    "Officer",
+                    "active_flag",
+                    "Y")),
             List.of("record_type", "unit_code", "ao_user_id"));
     assertThat(sales.get("counts").get("loaded").asInt())
         .as(mig.rows(sales.get("batchNo").asText()))
@@ -101,8 +133,15 @@ class MigrationReferenceChecksApiIT {
         load(
             "R04",
             List.of(
-                row("insurer_code", "NWG", "insurer_name", "New World General", "tin",
-                    "123-456-789-000", "status", "A"),
+                row(
+                    "insurer_code",
+                    "NWG",
+                    "insurer_name",
+                    "New World General",
+                    "tin",
+                    "123-456-789-000",
+                    "status",
+                    "A"),
                 row("insurer_code", "MGIC", "insurer_name", "Mabuhay General", "status", "A")),
             List.of("insurer_code"));
     assertThat(insurers.get("counts").get("loaded").asInt())
@@ -116,14 +155,23 @@ class MigrationReferenceChecksApiIT {
         .isEqualTo("MIGRATED");
     JsonNode migrated =
         mig.get("ao", "/api/v1/catalog/insurers?companyId=" + company + "&origin=MIGRATED");
-    assertThat(migrated.findValuesAsText("partyCode")).contains("INS-NWG").doesNotContain("INS-MGIC");
+    assertThat(migrated.findValuesAsText("partyCode"))
+        .contains("INS-NWG")
+        .doesNotContain("INS-MGIC");
 
     JsonNode rates =
         load(
             "R07",
             List.of(
-                row("insurer_code", "MGIC", "risk_code", "CAR-A", "rate_pct", "17.5",
-                    "effective_from", "2027-01-01")),
+                row(
+                    "insurer_code",
+                    "MGIC",
+                    "risk_code",
+                    "CAR-A",
+                    "rate_pct",
+                    "17.5",
+                    "effective_from",
+                    "2027-01-01")),
             List.of("insurer_code", "risk_code", "effective_from"));
     assertThat(rates.get("counts").get("loaded").asInt())
         .as(mig.rows(rates.get("batchNo").asText()))
@@ -139,8 +187,22 @@ class MigrationReferenceChecksApiIT {
         load(
             "R11",
             List.of(
-                row("branch_code", "MKT", "kind", "AR", "atp_no", "ATP-2027-01", "prefix",
-                    "LAR-", "from_no", "1", "to_no", "9999", "last_used_no", "500", "next_no",
+                row(
+                    "branch_code",
+                    "MKT",
+                    "kind",
+                    "AR",
+                    "atp_no",
+                    "ATP-2027-01",
+                    "prefix",
+                    "LAR-",
+                    "from_no",
+                    "1",
+                    "to_no",
+                    "9999",
+                    "last_used_no",
+                    "500",
+                    "next_no",
                     "501")),
             List.of("branch_code", "kind", "prefix"));
     String batchNo = series.get("batchNo").asText();

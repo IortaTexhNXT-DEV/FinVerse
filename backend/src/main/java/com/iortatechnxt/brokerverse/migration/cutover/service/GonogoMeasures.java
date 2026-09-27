@@ -72,11 +72,17 @@ public class GonogoMeasures {
       case "DAY1_ACCEPTED" -> day1(companyId);
       case "COUNTS" -> zero(breaks(companyId, "L1", null), "count break(s)");
       case "FINANCIAL_REJECTS" ->
-          zero(count(REJECTS, companyId), "rejected row(s) in the financial batches");
+          zero(
+              n(jdbc.queryForObject(REJECTS, Integer.class, companyId)),
+              "rejected row(s) in the financial batches");
       case "AMOUNTS" -> zero(breaks(companyId, "L2", FINANCIAL), "amount break(s)");
-      case "CLEARING" -> zero(count(CLEARING, companyId), "branch and currency(ies) not at zero");
+      case "CLEARING" ->
+          zero(
+              n(jdbc.queryForObject(CLEARING, Integer.class, companyId)),
+              "branch and currency(ies) not at zero");
       case "LEGACY_CONTROL" -> zero(breaks(companyId, "L5", "F01,F02"), "control account break(s)");
-      case "CLIENT_QUEUE" -> zero(count(QUEUE, companyId), "client pair(s) to review");
+      case "CLIENT_QUEUE" ->
+          zero(n(jdbc.queryForObject(QUEUE, Integer.class, companyId)), "client pair(s) to review");
       default -> new Result("Not measured", false);
     };
   }
@@ -97,9 +103,8 @@ public class GonogoMeasures {
     return n == null ? 0 : n;
   }
 
-  private int count(String sql, Long companyId) {
-    Integer n = jdbc.queryForObject(sql, Integer.class, companyId);
-    return n == null ? 0 : n;
+  private static int n(Integer value) {
+    return value == null ? 0 : value;
   }
 
   private static Result zero(int n, String what) {

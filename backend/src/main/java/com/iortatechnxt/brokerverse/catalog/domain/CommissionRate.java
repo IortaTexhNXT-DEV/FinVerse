@@ -1,8 +1,8 @@
 package com.iortatechnxt.brokerverse.catalog.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;

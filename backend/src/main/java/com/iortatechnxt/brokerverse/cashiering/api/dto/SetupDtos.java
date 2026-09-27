@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.cashiering.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.ReceiptKind;
 import com.iortatechnxt.brokerverse.cashiering.domain.CommissionLine;
 import com.iortatechnxt.brokerverse.cashiering.domain.MinimalBalanceRule;
@@ -7,7 +8,6 @@ import com.iortatechnxt.brokerverse.cashiering.domain.PaymentFileLayout;
 import com.iortatechnxt.brokerverse.cashiering.domain.PrintBatch;
 import com.iortatechnxt.brokerverse.cashiering.domain.ReceiptSeries;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

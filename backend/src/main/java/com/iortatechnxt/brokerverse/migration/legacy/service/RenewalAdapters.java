@@ -15,8 +15,8 @@ import org.springframework.context.annotation.Configuration;
 /**
  * Data Migration plugged into Renewal (DATA_MIGRATION_DESIGN 15.1 and 15.2): the migrated policy
  * headers and the renewal advices already sent serve Renewal's {@link LegacyPolicySource} (in place
- * of its "not connected" default; the Renewal upload stays the fallback), and the PACKAGE map loaded
- * by object R06 is handed to Renewal's package map, where the sanitation check {@code
+ * of its "not connected" default; the Renewal upload stays the fallback), and the PACKAGE map
+ * loaded by object R06 is handed to Renewal's package map, where the sanitation check {@code
  * PACKAGE_REMAP} reads it (source MIGRATION, pending authorisation by the Product Owner).
  */
 @Configuration(proxyBeanMethods = false)
@@ -82,12 +82,16 @@ public class RenewalAdapters {
     };
   }
 
-  private static boolean same(
-      PackageMapEntry e, PackageMapRow.PackageMapEntry m) {
-    return e.getLegacyPackageCode().equals(m.legacyPackageCode())
-        && Objects.equals(e.getLegacyPackageVersion(), String.valueOf(m.legacyPackageVersion()))
-        && Objects.equals(e.getRiskCode(), m.riskCode())
-        && Objects.equals(e.getInsurerCode(), m.insurerCode())
+  private static boolean same(PackageMapEntry e, PackageMapRow.PackageMapEntry m) {
+    boolean keys =
+        e.getLegacyPackageCode().equals(m.legacyPackageCode())
+            && Objects.equals(
+                e.getLegacyPackageVersion(), String.valueOf(m.legacyPackageVersion()));
+    boolean qualifiers =
+        Objects.equals(e.getRiskCode(), m.riskCode())
+            && Objects.equals(e.getInsurerCode(), m.insurerCode());
+    return keys
+        && qualifiers
         && compare(e.getSiFrom(), m.siFrom())
         && compare(e.getSiTo(), m.siTo());
   }

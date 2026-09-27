@@ -1,10 +1,10 @@
 package com.iortatechnxt.brokerverse.catalog.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.domain.PlacementChannel;
-import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
+import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import java.time.LocalDate;
 import java.util.List;
 

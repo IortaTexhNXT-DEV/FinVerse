@@ -1,6 +1,5 @@
 package com.iortatechnxt.brokerverse.catalog.api;
 
-import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import com.iortatechnxt.brokerverse.catalog.api.dto.BranchRequest;
 import com.iortatechnxt.brokerverse.catalog.api.dto.BranchResponse;
 import com.iortatechnxt.brokerverse.catalog.api.dto.CommissionRequest;
@@ -11,6 +10,7 @@ import com.iortatechnxt.brokerverse.catalog.api.dto.InsurerResponse;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.catalog.service.RateTableService;
+import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -54,8 +54,7 @@ public class InsurerController {
   @GetMapping
   @PreAuthorize(CatalogAccess.READ)
   public List<InsurerResponse> list(
-      @RequestParam Long companyId,
-      @RequestParam(required = false) RecordOrigin.Origin origin) {
+      @RequestParam Long companyId, @RequestParam(required = false) RecordOrigin.Origin origin) {
     return insurers.insurers(companyId).stream()
         .filter(i -> origin == null || i.getRecordOrigin().origin() == origin)
         .map(InsurerResponse::from)

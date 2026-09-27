@@ -76,7 +76,7 @@ The roles-and-access sheet checks each New Business action against the roles tha
 - Maintenance of package products, versions and incentive criteria: BRD-3 test plan. This plan uses the catalogue as a given.
 - Renewal of accounts (BRD-6), post-issuance adjustments beyond the endorsements of BRNB.061 / 081 (BRD-2) and collection of premium (BRD-4).
 - Computation and payout of incentives (Q33). The cases stop at the incentive indicator on the invoice.
-- External feeds to BDOI systems (Q08), the CIF interface (Q16), SFTP and API placement channels (Q06) and BIR CAS transmission: the cases check only that the parked seams behave as the FRS states.
+- External feeds to BDOI systems (Q08), the CIF interface (Q16), SFTP and API placement channels (Q06) and BIR CAS transmission: the cases check only the manual steps and messages that the FRS states for them.
 - Performance and volume testing (deliverable 28).
 
 ## References

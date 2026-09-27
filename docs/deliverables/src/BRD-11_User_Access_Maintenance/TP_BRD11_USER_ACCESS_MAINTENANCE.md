@@ -73,7 +73,7 @@ The roles-and-access sheet checks each access-maintenance function against the r
 
 - Access only from BDO-issued devices; it is enforced by the BDO network and device policy, not by BIBS.
 - The EUA protocol itself (UQ04). The directory cases run against a test directory once BDO supplies the interface.
-- An external access-control list and single session per device (UQ09, UQ14), which are parked seams.
+- An external access-control list and single session per device (UQ09, UQ14), which are on hold.
 - Temporary access with an end date, until BDOI answers UQ06.
 - Portal users of Employee Benefits (user type External); they belong to the BRD-8 Employee Benefits test plan.
 - The infrastructure rows of the BRD NFRs answered "Follow existing QPS set up"; they are covered by the BIBS deployment and security controls (deliverables 25 and 26).

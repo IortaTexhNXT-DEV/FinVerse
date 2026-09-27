@@ -354,7 +354,7 @@ alternate_flows:
   - EUA not reachable. BIBS refuses the log-in with a service message; a local break-glass administrator, if BDO allows one, signs in locally (UQ04).
 rules:
   - [R1, "Authentication mode LOCAL or DIRECTORY.", Configurable, Parameter AUTH_MODE]
-  - [R2, "Authorisation (roles and permissions) stays in BIBS in both modes; an external ACL is a parked seam (UQ14).", Fixed, "-"]
+  - [R2, "Authorisation (roles and permissions) stays in BIBS in both modes; an external ACL is on hold (UQ14).", Fixed, "-"]
 validations:
   - [The directory refuses the log-on, The message returned by the directory, AUTHENTICATION_FAILED]
   - [Windows ID not linked to a user, Invalid user name or password, AUTHENTICATION_FAILED]
@@ -1692,7 +1692,7 @@ Parameters: Date From / To; User; Activity; include log-ins and log-outs (yes / 
 
 # Interfaces and integration
 
-Figure 4 shows the interfaces. Every BIBS module reads the effective permissions of the signed-in user; the directory, SSO and external ACL are parked seams.
+Figure 4 shows the interfaces. Every BIBS module reads the effective permissions of the signed-in user; the directory, SSO and external ACL are on hold until BDO specifies them.
 
 ![Interfaces of User Access Maintenance (dashed = parked)](figures/brd11_integration.dot){width=16}
 
@@ -1733,7 +1733,7 @@ The BRD's NFR section has no IDs; R2 numbers the rows UAM-NFR-01 to UAM-NFR-41. 
 | UAM-NFR-09 | User and role management 1.a-f | Online modules to view, add, modify, delete master data incl. users and roles; access via roles; more than one user per role; **a user can have more than one role**; accounts can be disabled and re-enabled; maintenance recorded in the application log (p.13) | Users, roles and permissions; several roles per user and users per role; enable / disable, also of dormant users by a job; every change audited (CQ23 answered) | FR-UA-006, 052, 064 |
 | UAM-NFR-10 | User and role management 1.g | Query or report showing the roles assigned to users; exportable (p.13) | Reports UAM-USER-ACCESS and UAM-GROUP-MEMBERS, exportable | FR-UA-060, 062 |
 | UAM-NFR-11 | User and role management 1.h | Supports LDAP or Active Directory authentication (p.13) | Directory authentication port; adapter parked until BDO gives the interface (Q42, UQ04) | FR-UA-003 |
-| UAM-NFR-12 | User and role management 1.i | Can support authorisation of users by interfacing with an external ACL (p.13) | Seam only; parked (UQ14) | - |
+| UAM-NFR-12 | User and role management 1.i | Can support authorisation of users by interfacing with an external ACL (p.13) | On hold until BDOI answers UQ14 | - |
 | UAM-NFR-13 | User and role management 1.j | User ID of at least ten (10) alphanumeric characters, supports the format a999999999 (p.13) | Parameter USER_ID_PATTERN checked on requests (default a999999999 format, UQ05) | FR-UA-011, 052 |
 | UAM-NFR-14 | User and role management 1.k | Ability to specify an effective date for user and role changes (p.13) | Effective date on requests; daily job applies scheduled changes (UQ06) | FR-UA-020 |
 | UAM-NFR-15 | User ID maintenance fields | Windows ID, user name, user status (active, disabled, locked out, online, etc.), Business Unit Group, User Level (p.14) | Windows ID, business unit group, user level; status Active, Disabled, Locked, Online (UQ05, UQ13) | FR-UA-052, 004 |

@@ -37,7 +37,7 @@ import { RequirementsTab } from './RequirementsTab';
 import { DetailsTab, HistoryTab, SetupTab } from './RequestTabs';
 import { TermsView } from './TermsView';
 import '@/styles/quotation.css';
-import { InsurerNames } from '@/components/broking/LovLabel';
+import { InsurerNames, LineLabel } from '@/components/broking/LovLabel';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -54,10 +54,15 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]['id'];
 
-function productLabel(p: PackageRequest): string {
+function ProductLabel({ request: p }: Readonly<{ request: PackageRequest }>) {
   const product = p.productCode ?? 'new package';
   const version = p.resultingVersionNo === undefined ? '' : ` v${p.resultingVersionNo}`;
-  return `${p.lineCode} · ${product}${version}`;
+  return (
+    <>
+      <LineLabel code={p.lineCode} /> · {product}
+      {version}
+    </>
+  );
 }
 
 function facts(p: PackageRequest): Fact[] {
@@ -65,7 +70,7 @@ function facts(p: PackageRequest): Fact[] {
   return [
     { icon: Tag, label: 'Request type', value: typeLabel(p.requestType) },
     { icon: UserRound, label: 'Client / programme', value: p.clientName ?? 'Generic programme' },
-    { icon: Layers, label: 'Line / product', value: productLabel(p) },
+    { icon: Layers, label: 'Line / product', value: <ProductLabel request={p} /> },
     {
       icon: Percent,
       label: 'Scheme rate',
@@ -104,7 +109,13 @@ function TabBody({ tab, request }: Readonly<{ tab: TabId; request: PackageReques
     case 'details':
       return <DetailsTab request={request} />;
     case 'terms':
-      return <TermsView terms={request.requestedTerms} title="Requested terms" />;
+      return (
+        <TermsView
+          terms={request.requestedTerms}
+          title="Requested terms"
+          lineCode={request.lineCode}
+        />
+      );
     case 'negotiation':
       return <NegotiationTab request={request} />;
     case 'comparative':

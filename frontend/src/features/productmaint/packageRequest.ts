@@ -81,6 +81,18 @@ export function typeLabel(type: RequestType): string {
   return REQUEST_TYPES.find((t) => t.value === type)?.label ?? type;
 }
 
+/** Roles of an insurer in a package, as the FRS lists them (FR-PM-014 R1, FR-PM-033). */
+export const INSURER_ROLES: { value: string; label: string }[] = [
+  { value: 'PANEL', label: 'Panel' },
+  { value: 'LEAD', label: 'Lead' },
+  { value: 'PARTICIPANT', label: 'Participant' },
+];
+
+/** The label of an insurer role; a line without a role is a panel insurer. */
+export function insurerRoleLabel(role: string | undefined): string {
+  return INSURER_ROLES.find((r) => r.value === (role ?? 'PANEL'))?.label ?? 'Panel';
+}
+
 /** Whether a request type may skip the insurer negotiation (the flag is shown on the form). */
 export function negotiationOptional(type: RequestType): boolean {
   return type === 'RENEW' || type === 'UPDATE' || type === 'REACTIVATE';

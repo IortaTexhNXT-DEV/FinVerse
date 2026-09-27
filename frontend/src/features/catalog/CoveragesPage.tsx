@@ -13,9 +13,10 @@ import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
-import { formatDate, humanize } from '@/utils/format';
+import { formatDate } from '@/utils/format';
 import { ClauseEditorModal, CoverageEditorModal } from './CoverageModals';
 import { RecordActions } from './RecordActions';
+import { LineLabel, LovLabel } from '@/components/broking/LovLabel';
 
 const TABS = [
   { id: 'coverages', label: 'Coverages & Perils' },
@@ -63,10 +64,14 @@ function Coverages({ onEdit }: Readonly<{ onEdit: (c: Coverage) => void }>) {
         onRowClick={onEdit}
         emptyMessage="No coverage is set up for this line."
         columns={[
-          { key: 'l', header: 'Line', render: (c) => c.lineCode },
+          { key: 'l', header: 'Line', render: (c) => <LineLabel code={c.lineCode} /> },
           { key: 'c', header: 'Code', render: (c) => <strong>{c.code}</strong> },
           { key: 'n', header: 'Name', render: (c) => c.name },
-          { key: 'k', header: 'Kind', render: (c) => humanize(c.kind) },
+          {
+            key: 'k',
+            header: 'Kind',
+            render: (c) => <LovLabel type="COVERAGE_KIND" code={c.kind} />,
+          },
           { key: 'b', header: 'Basic', render: (c) => (c.basic ? 'Yes' : '') },
           { key: 's', header: 'Status', render: (c) => <StatusBadge status={c.recordStatus} /> },
           {
@@ -104,9 +109,17 @@ function Clauses({ onEdit }: Readonly<{ onEdit: (c: Clause) => void }>) {
         emptyMessage="The clause library is empty."
         columns={[
           { key: 'c', header: 'Code', render: (c) => <strong>{c.code}</strong> },
-          { key: 'k', header: 'Kind', render: (c) => humanize(c.kind) },
+          {
+            key: 'k',
+            header: 'Kind',
+            render: (c) => <LovLabel type="CLAUSE_KIND" code={c.kind} />,
+          },
           { key: 't', header: 'Title', render: (c) => c.title },
-          { key: 'l', header: 'Line', render: (c) => c.lineCode ?? 'All lines' },
+          {
+            key: 'l',
+            header: 'Line',
+            render: (c) => (c.lineCode ? <LineLabel code={c.lineCode} /> : 'All lines'),
+          },
           { key: 'f', header: 'Effective', render: (c) => formatDate(c.effectiveFrom) },
           { key: 'e', header: 'Until', render: (c) => formatDate(c.effectiveTo) },
           { key: 's', header: 'Status', render: (c) => <StatusBadge status={c.recordStatus} /> },

@@ -1,4 +1,10 @@
-import { useInsurerName, useLineName, useLovLabel } from './useLabels';
+import {
+  useCoverTypeName,
+  useCoverageName,
+  useInsurerName,
+  useLineName,
+  useLovLabel,
+} from './useLabels';
 
 interface LovLabelProps {
   /** List of values the code belongs to (e.g. SOURCE_CHANNEL). */
@@ -61,4 +67,26 @@ export function InsurerNames({
 }: Readonly<{ codes: readonly string[]; empty?: string }>) {
   const name = useInsurerName();
   return <>{codes.length > 0 ? codes.map((c) => name(c)).join(', ') : empty}</>;
+}
+
+/** The name of a cover type of a line (e.g. "Comprehensive"), never its code. */
+export function CoverTypeLabel({
+  line,
+  code,
+  empty = '—',
+}: Readonly<{ line?: string | null; code: string | null | undefined; empty?: string }>) {
+  const name = useCoverTypeName();
+  if (!code) {
+    return <span className="muted">{empty}</span>;
+  }
+  return <>{name(line, code)}</>;
+}
+
+/** The name of a coverage or peril of a line (e.g. "Fire and Lightning"), never its code. */
+export function CoverageName({
+  line,
+  code,
+}: Readonly<{ line: string | null | undefined; code: string }>) {
+  const name = useCoverageName(line);
+  return <>{name(code)}</>;
 }

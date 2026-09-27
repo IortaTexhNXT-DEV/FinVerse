@@ -7,9 +7,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormControls';
-import { splitEmails } from './insurerForm';
-
-const CHANNELS = [{ value: 'EMAIL', label: 'E-mail' }];
+import { PLACEMENT_CHANNELS as CHANNELS, splitEmails } from './insurerForm';
 
 type InsurerForm = Omit<InsurerInput, 'defaultCreditDays' | 'placementEmails'> & {
   defaultCreditDays?: number;

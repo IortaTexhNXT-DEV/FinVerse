@@ -21,6 +21,7 @@ import { ProductEditorModal } from './ProductEditorModal';
 import { newProductForm } from './productForm';
 import type { ProductForm } from './productForm';
 import { RecordActions } from './RecordActions';
+import { LovLabels } from '@/components/broking/LovLabel';
 
 const TABS = [
   { id: 'products', label: 'Products' },
@@ -170,7 +171,7 @@ function ProductList() {
           {
             key: 's',
             header: 'Segments',
-            render: (p) => (p.marketSegments.length ? p.marketSegments.join(', ') : 'All'),
+            render: (p) => <LovLabels type="MARKET_SEGMENT" codes={p.marketSegments} empty="All" />,
           },
           { key: 'r', header: 'Rate %', numeric: true, render: (p) => p.defaultRate ?? '' },
           {

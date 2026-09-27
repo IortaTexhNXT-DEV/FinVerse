@@ -6,6 +6,7 @@ import { formatDate } from '@/utils/format';
 import { typeLabel } from './packageRequest';
 import { StageAge } from './StageAge';
 import { UserName } from '@/components/ui/UserName';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 function productOf(r: RequestListItem): string {
   if (r.productCode === undefined) {
@@ -49,7 +50,7 @@ export const REQUEST_COLUMNS: Column<RequestListItem>[] = [
       </>
     ),
   },
-  { key: 'line', header: 'Line', render: (r) => r.lineCode },
+  { key: 'line', header: 'Line', render: (r) => <LineLabel code={r.lineCode} /> },
   {
     key: 'product',
     header: 'Product',

@@ -10,12 +10,15 @@ import { Modal } from '@/components/ui/Modal';
 import { NumberInput, TextInput } from '@/features/assets/FormControls';
 import { offered } from './packageRequest';
 import { FileDropZone } from '@/components/ui/FileDropZone';
+import { useCoverageName } from '@/components/broking/useLabels';
 
 interface ResponseDialogProps {
   requestId: number;
   response: InsurerResponse;
   /** Requested coverages, the starting point of a first response. */
   requested: CoverageTerm[];
+  /** Line of the request: the deductible fields are named after its coverages. */
+  lineCode: string;
   onClose: () => void;
   onSaved: () => void;
 }
@@ -29,9 +32,11 @@ export function ResponseDialog({
   requestId,
   response,
   requested,
+  lineCode,
   onClose,
   onSaved,
 }: Readonly<ResponseDialogProps>) {
+  const coverageName = useCoverageName(lineCode);
   const [form, setForm] = useState<ResponseInput>({
     outcome: response.outcome === 'PENDING' ? '' : response.outcome,
     rate: response.rate,
@@ -112,7 +117,7 @@ export function ResponseDialog({
             {form.coverages.map((c, index) => (
               <TextInput
                 key={c.coverageCode}
-                label={`${c.coverageCode} deductible`}
+                label={`${coverageName(c.coverageCode)} deductible`}
                 value={c.deductibleText}
                 onChange={(deductibleText) =>
                   set({

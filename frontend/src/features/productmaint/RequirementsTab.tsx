@@ -168,7 +168,11 @@ export function RequirementsTab({ request }: Readonly<{ request: PackageRequest 
         </p>
       </Card>
       {editable && <RequirementsEditor key={request.milestones.termsFinalAt} request={request} />}
-      <TermsView terms={request.proposedTerms ?? request.requestedTerms} title="Proposed terms" />
+      <TermsView
+        terms={request.proposedTerms ?? request.requestedTerms}
+        title="Proposed terms"
+        lineCode={request.lineCode}
+      />
       <Card title="ManCom decisions" flush>
         <DataTable<Signoff>
           rows={status.data?.signoffs ?? []}

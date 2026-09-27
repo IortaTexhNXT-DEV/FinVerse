@@ -12,7 +12,8 @@ import { DataTable } from '@/components/ui/DataTable';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
+import { CoverTypeLabel, LineLabel, LovLabel, LovLabels } from '@/components/broking/LovLabel';
 import { typeLabel } from './packageRequest';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
@@ -36,13 +37,16 @@ export function DetailsTab({ request: p }: Readonly<{ request: PackageRequest }>
           <dd>{p.clientName === undefined ? '—' : `${p.clientCode ?? ''} – ${p.clientName}`}</dd>
           <dt>Line / cover type</dt>
           <dd>
-            {p.lineCode} / {p.coverTypeCode === undefined ? '—' : humanize(p.coverTypeCode)}
+            <LineLabel code={p.lineCode} /> /{' '}
+            <CoverTypeLabel line={p.lineCode} code={p.coverTypeCode} />
           </dd>
           <dt>Market segments</dt>
-          <dd>{p.marketSegments.join(', ') || '—'}</dd>
+          <dd>
+            <LovLabels type="MARKET_SEGMENT" codes={p.marketSegments} />
+          </dd>
           <dt>Reason</dt>
           <dd>
-            {humanize(p.reason)}
+            <LovLabel type="PKG_REQUEST_REASON" code={p.reason} />
             {p.reasonNote && ` – ${p.reasonNote}`}
           </dd>
           <dt>Negotiation</dt>
@@ -88,7 +92,10 @@ export function SetupTab({ request: p }: Readonly<{ request: PackageRequest }>) 
     <Card title="Catalog version">
       <dl className="detail-list">
         <dt>Product</dt>
-        <dd className="mono">{p.productCode}</dd>
+        <dd>
+          <span className="mono">{p.productCode}</span>
+          {` – ${p.title}`}
+        </dd>
         <dt>Version</dt>
         <dd>{p.resultingVersionNo}</dd>
         <dt>Request stage</dt>

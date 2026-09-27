@@ -121,16 +121,7 @@ public class AuthService {
           username, ENTITY, username, AuditAction.LOGIN_FAILED, "Unknown user" + suffix(mode));
       throw new BadCredentialsException(LocalPasswordAuthenticator.INVALID);
     }
-    if (user.isLocked()) {
-      audit.recordIndependently(
-          username, ENTITY, username, AuditAction.LOGIN_FAILED, "Account locked");
-      throw new LockedException("Account is locked. Contact your administrator.");
-    }
-    if (!user.isEnabled()) {
-      audit.recordIndependently(
-          username, ENTITY, username, AuditAction.LOGIN_FAILED, "Account deactivated");
-      throw new DisabledException(DEACTIVATED);
-    }
+    refuseLockedOrDeactivated(user, username);
     DirectoryResult result =
         authenticators.authenticate(
             mode,
@@ -201,6 +192,23 @@ public class AuthService {
           case EXPIRED -> "Logged out at the end of the session";
           default -> "Logged out";
         });
+  }
+
+  /**
+   * Refuses a locked or deactivated account before the password is checked; the attempt is audited
+   * and not counted towards the lockout.
+   */
+  private void refuseLockedOrDeactivated(AppUser user, String username) {
+    if (user.isLocked()) {
+      audit.recordIndependently(
+          username, ENTITY, username, AuditAction.LOGIN_FAILED, "Account locked");
+      throw new LockedException("Account is locked. Contact your administrator.");
+    }
+    if (!user.isEnabled()) {
+      audit.recordIndependently(
+          username, ENTITY, username, AuditAction.LOGIN_FAILED, "Account deactivated");
+      throw new DisabledException(DEACTIVATED);
+    }
   }
 
   private Optional<AppUser> findUser(AuthMode mode, String userId) {

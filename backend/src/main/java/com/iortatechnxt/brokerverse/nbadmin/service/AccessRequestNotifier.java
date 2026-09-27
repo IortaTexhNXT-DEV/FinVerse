@@ -175,15 +175,12 @@ public class AccessRequestNotifier {
     AccessRequestType type = r.getRequestType();
     if (type == AccessRequestType.DEACTIVATE_ROLE || type == AccessRequestType.REACTIVATE_ROLE) {
       profileMembersChanged(r, users.findEnabledUsernamesWithRole(r.getRoleCode()));
-      return;
+    } else if (r.getUsername() != null && r.getUserType() != AccessUserType.EXTERNAL) {
+      tellUser(
+          r.getUsername(),
+          "Your access changed: " + describer.describe(r) + " (request " + r.getRequestNo() + ").",
+          r);
     }
-    if (r.getUsername() == null || r.getUserType() == AccessUserType.EXTERNAL) {
-      return;
-    }
-    tellUser(
-        r.getUsername(),
-        "Your access changed: " + describer.describe(r) + " (request " + r.getRequestNo() + ").",
-        r);
   }
 
   /**

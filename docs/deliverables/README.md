@@ -36,6 +36,7 @@ so each document can be regenerated after every build.
 | 15 | Notifications and workflows per role | test evidence | B | workflow and notification tests |
 | 16 | Configuration over code: rules, validations and definitions maintained from front-end masters by the System Administrator | gap list and fixes | B | code review of hard-coded rules |
 | 1, 3 | BRD-1 New Business business sign-off pack (release set v2.0) | Drop 1 | 00 Start Here, 01 Sign-off Pack Guide deck, 02 FRS v2.0 with 46 screen specifications, 03 sign-off workbook, 04 and 05 test plan in `out/Drop-1_Transactional/BRD-01_New_Business/`; source `src/signoff/brd01/`; 144 screenshots and document pages captured with seed data in `src/BRD-01_New_Business/screenshots/` |
+| 1, 3 | BRD-3 Product Maintenance business sign-off pack (release set v2.0) | Drop 0 | 00 Start Here, 01 Sign-off Pack Guide deck, 02 FRS v2.0 with 22 screen specifications, 03 sign-off workbook, 04 and 05 test plan, 06 configuration input templates in `out/Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/`; source `src/BRD-03_Product_Maintenance/pack/`; 93 screenshots and document pages captured with seed data in `src/BRD-03_Product_Maintenance/screenshots/` |
 | 17 | Reports in Excel and PDF; document schedules in Word and PDF | platform change and tests | B | report and docgen modules. Built: `DocxReportRenderer` (layout of the PDF, print options honoured) and DOCX in the API, batches, archive and scheduled files; Word on documents and schedules (`ReportMetadata.asDocument`: GL-SCHEDULE, GL-BVA, FRBS-MANCOM-MARKET, RI-SOA, FIN-AP-VOUCHER); every composed business document downloadable as Word (`doc_rendition`, Word copy offer after each PDF download); templates to and from Word; BDO Insure logo, Header Blue tables, "Confidential" footer and page x of y on PDF, Word and Excel |
 | 18 | Screen-by-screen and field-by-field alignment review | findings and fixes | B | screenshots and review |
 | 19 | API catalogue | Excel + OpenAPI file | B | OpenAPI specification |
@@ -272,7 +273,7 @@ defect remains. The readiness statement is then issued for BDOI to approve the m
 
 Toolkit: [`tools/deliverables/`](../../tools/deliverables/README.md) (Word, Excel and PowerPoint builders, PDF and
 page previews). Files are named `BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>`, with the reading-order prefix 00_ to
-05_ in an issued business sign-off set.
+05_ in an issued business sign-off set (06_ for its configuration input templates, where the BRD has them).
 
 **One place per BRD.** Each BRD has one source folder and one output folder, and nothing is copied between places:
 

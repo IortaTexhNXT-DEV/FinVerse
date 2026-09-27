@@ -120,6 +120,29 @@ class Pack:
         self.walkthroughs = self._load("walkthroughs.yaml").get("walkthroughs", [])
         self.msg_cfg = self._load("messages.yaml")
         self.guide = self._load("guide.yaml")
+        # Packs of other BRDs whose screens a walkthrough step may show (for example the New Business quotation
+        # of a Product Maintenance walkthrough): paths relative to this pack.yaml.
+        self.foreign_paths = [(self.dir / f).resolve() for f in raw.get("foreign_packs") or []]
+        self.signatories: list[list[str]] = raw.get("signatories") or []
+
+    @cached_property
+    def foreign(self) -> dict[str, Screen]:
+        """Screens of the foreign packs by id (never of this pack)."""
+        out: dict[str, Screen] = {}
+        for path in self.foreign_paths:
+            other = _pack(path)
+            for s in other.screens:
+                out.setdefault(s.id, s)
+        return out
+
+    def step_screen(self, screen_id: str) -> Screen | None:
+        """The screen of a walkthrough step: of this pack, or of a foreign pack."""
+        return self.by_id.get(screen_id) or self.foreign.get(screen_id)
+
+    @property
+    def module(self) -> str:
+        """Name of the module of the pack (for example New Business, Product Maintenance)."""
+        return str(self.meta["name"])
 
     def _load(self, name: str) -> dict[str, Any]:
         p = self.dir / name
@@ -271,13 +294,16 @@ class Pack:
             if m.cls in exclude or not re.fullmatch(r"[A-Z][A-Z0-9_]*", m.code):
                 continue
             add("Server", m.code, m.text, kinds.get(m.kind, "Error"), self._place(m.cls), m.where)
-        for t in code_facts.bulk_templates(cfg.get("bulk_handlers") or []):
+        templates = code_facts.bulk_templates(cfg.get("bulk_handlers") or [])
+        wizard = cfg.get("bulk_screen") or "Bulk upload wizard (SCR-NB-36)"
+        for t in templates:
             for text in t.row_messages:
-                add("Upload row", "-", text, "Validation", f"Bulk upload wizard (SCR-NB-36): {t.title}",
-                    Path(t.file).stem)
-        for text in ("<Column> is mandatory", "<Column> '<value>' is not a valid <number, date (yyyy-mm-dd), Y/N value>"):
-            add("Upload row", "-", text, "Validation", "Bulk upload wizard (SCR-NB-36): every upload type",
-                "BulkRowValidator")
+                add("Upload row", "-", text, "Validation", f"{wizard}: {t.title}", Path(t.file).stem)
+        if templates:
+            # The column checks of every upload type, only for a pack that has upload types.
+            for text in ("<Column> is mandatory",
+                         "<Column> '<value>' is not a valid <number, date (yyyy-mm-dd), Y/N value>"):
+                add("Upload row", "-", text, "Validation", f"{wizard}: every upload type", "BulkRowValidator")
         for m in code_facts.platform_messages():
             add("Server", m.code, m.text, "Error", "Every screen (Common screen elements)", m.where)
         root = REPO / "frontend" / "src"
@@ -311,7 +337,8 @@ class Pack:
         for w in self.walkthroughs:
             for step in w["steps"]:
                 role, scr, action, sees, result, slug = step
-                out.append({"slug": slug, "screen": scr, "route": self.by_id[scr].route if scr in self.by_id else "",
+                target = self.step_screen(scr)
+                out.append({"slug": slug, "screen": scr, "route": target.route if target else "",
                             "caption": f"{w['id']}: {action}", "user": self.personas.get(role, {}).get("user"),
                             "state": "walkthrough", "walkthrough": w["id"]})
         for d in self.documents:
@@ -384,8 +411,8 @@ class Pack:
             for st in w["steps"]:
                 if st[0] not in self.personas:
                     problems.append(f"{w['id']}: persona {st[0]}")
-                if st[1] not in self.by_id:
-                    problems.append(f"{w['id']}: screen {st[1]}")
+                if self.step_screen(st[1]) is None:
+                    problems.append(f"{w['id']}: screen {st[1]} is not a screen of this pack or of its foreign packs")
         for u in getattr(code_facts.role_grants, "unread", []):
             problems.append(f"grant statement not read: {u}")
         return problems
@@ -445,7 +472,7 @@ def r_screen_index(doc: Any, pack: Pack, **_: Any) -> None:
     for s in pack.screens:
         rows.append([s.id, s.title, pack.menu_path(s), ", ".join(pack.personas_of(s))])
     doc.table(["ID", "Screen", "Menu path", "Personas (role codes)"], rows, widths=[1.9, 3.6, 6.4, 5.7],
-              caption="New Business screens", size=7.5)
+              caption=f"{pack.module} screens", size=7.5)
 
 
 def r_menus(doc: Any, pack: Pack, **_: Any) -> None:
@@ -454,7 +481,7 @@ def r_menus(doc: Any, pack: Pack, **_: Any) -> None:
         p = pack.personas[role]
         doc.heading(f"{p['name']} ({role})", level=3)
         own = sum(1 for r in rows if r["own"])
-        doc.paragraph(f"SIT/UAT user {p.get('user', '-')}. {len(rows)} menu entries, {own} of them New Business "
+        doc.paragraph(f"SIT/UAT user {p.get('user', '-')}. {len(rows)} menu entries, {own} of them {pack.module} "
                       "screens; the other entries belong to the BRD shown.")
         grouped: dict[tuple[str, str], list[dict[str, str]]] = {}
         for r in rows:
@@ -492,7 +519,7 @@ def flow_dot(pack: Pack) -> Path:
 
 
 def r_flow(doc: Any, pack: Pack, **_: Any) -> None:
-    doc.figure(flow_dot(pack), "Screen flow of New Business: how the screens link (list, record, action, next screen)")
+    doc.figure(flow_dot(pack), f"Screen flow of {pack.module}: how the screens link (list, record, action, next screen)")
 
 
 def r_common(doc: Any, pack: Pack, **_: Any) -> None:
@@ -563,7 +590,7 @@ def r_notifications(doc: Any, pack: Pack, **_: Any) -> None:
     rows = [[n["id"], n["channel"], n["trigger"], n["recipient"], n["template"], ", ".join(n.get("frs") or [])]
             for n in pack.notifications]
     doc.table(["ID", "Channel", "Trigger", "Recipient", "Template and content", "FR"], rows,
-              widths=[1.2, 1.6, 5.2, 4.2, 9.0, 2.0], caption="Notifications and e-mails of New Business", size=7,
+              widths=[1.2, 1.6, 5.2, 4.2, 9.0, 2.0], caption=f"Notifications and e-mails of {pack.module}", size=7,
               keep_rows=False)
 
 
@@ -596,7 +623,7 @@ def r_contract(doc: Any, pack: Pack, **_: Any) -> None:
     rows = [[c["id"], c["party"], c["direction"], c["what"], c["how"], c["owner"], ", ".join(c.get("frs") or [])]
             for c in pack.contract]
     doc.table(["ID", "BRD or system", "Direction", "What", "When and how", "Owner of the data", "FR"], rows,
-              widths=[1.1, 2.6, 1.4, 5.6, 6.2, 3.2, 2.6], caption="Interface contract of New Business", size=7,
+              widths=[1.1, 2.6, 1.4, 5.6, 6.2, 3.2, 2.6], caption=f"Interface contract of {pack.module}", size=7,
               keep_rows=False)
     doc.callout(" ".join(pack.change_rule.split()), kind="decision", title="Change against this signed set")
 
@@ -606,7 +633,7 @@ def r_walkthrough(doc: Any, pack: Pack, id: str, **_: Any) -> None:  # noqa: A00
     doc.paragraph(" ".join(w["summary"].split()))
     doc.paragraph(f"*{w['data']}*", size=9)
     for n, (role, scr, action, sees, result, slug) in enumerate(w["steps"], start=1):
-        screen = pack.by_id[scr]
+        screen = pack.step_screen(scr)
         doc.label(f"Step {n}. {pack.persona_label(role)} – {screen.title} ({scr})")
         doc.key_values([("Does", action), ("Sees", sees), ("Result", result)], columns=1, label_width=2.2)
         doc.screenshot(pack.shot_file(slug), f"{w['id']} step {n}: {screen.title}", max_height_ratio=0.42)
@@ -697,6 +724,7 @@ def build_workbook(pack: Pack) -> Path:
     from openpyxl.utils import get_column_letter
 
     m = pack.meta
+    nm = pack.module
     wb = BdoiWorkbook(f"Sign-off Workbook {m['brd_label']} {m['name']}", doc_type="Business sign-off workbook",
                       brd=m["brd"], version=str(m["version"]), date=str(m["date"]),
                       subtitle=f"{m['release_set']} – screens, fields, rules, messages and menus for BU review")
@@ -720,7 +748,7 @@ def build_workbook(pack: Pack) -> Path:
         ("3", "Put your name in Reviewer and the date in Review date. Leave the other columns unchanged."),
         ("4", "Screen standards lists the elements shared by every screen (status strip and history table, status "
                "pills, dates and amounts, uploads with the error file, messages, notifications); review them once."),
-        ("5", "Menu by persona shows what each role sees in the sidebar; Cross-BRD contract lists what New Business "
+        ("5", "Menu by persona shows what each role sees in the sidebar; Cross-BRD contract lists what " + nm + " "
               "takes from and hands to the other BRDs."),
         ("6", "Return the workbook to the iorta TechNXT project team by the date of the Start Here guide. Every "
               "Change requested row is answered in the Comments log before sign-off."),
@@ -735,7 +763,7 @@ def build_workbook(pack: Pack) -> Path:
 
     ws = wb.sheet("Screen standards", [
         Column("no", "No.", 6, "Row number", kind="number"),
-        Column("name", "Element", 30, "Element shared by the New Business screens"),
+        Column("name", "Element", 30, f"Element shared by the {nm} screens"),
         Column("text", "What the user sees and does", 100, "Behaviour of the element on every screen"),
     ] + review_columns(), [{"no": i, **c} for i, c in enumerate(pack.common, start=1)],
         description="Elements and standards shared by every screen (status strip and history, pills, dates, uploads, "
@@ -767,7 +795,7 @@ def build_workbook(pack: Pack) -> Path:
         Column("shots", "Screenshots", 36, "Screenshots of the screen in the FRS"),
         Column("fields", "Fields", 8, "Number of fields and columns", kind="number"),
         Column("actions", "Actions", 8, "Number of actions", kind="number"),
-    ] + review_columns(), screen_rows, description="One row per New Business screen")
+    ] + review_columns(), screen_rows, description=f"One row per {nm} screen")
     date_sheets.append(ws)
 
     field_rows = []
@@ -846,9 +874,9 @@ def build_workbook(pack: Pack) -> Path:
         Column("section", "Section", 24, "Sidebar section"),
         Column("screen", "Screen", 26, "Menu entry"),
         Column("brd", "BRD", 12, "BRD that owns the screen"),
-        Column("own", "New Business", 12, "Yes for a screen of this set"),
+        Column("own", nm, 12, "Yes for a screen of this set"),
         Column("path", "Route", 30, "Address of the screen"),
-    ], menu_rows, description="What each New Business persona sees in the sidebar (from the role grants)")
+    ], menu_rows, description=f"What each {nm} persona sees in the sidebar (from the role grants)")
 
     upload_rows = []
     for t in pack.uploads:
@@ -867,19 +895,19 @@ def build_workbook(pack: Pack) -> Path:
         Column("ctype", "Type", 10, "Text, Number, Date, Yes/No"),
         Column("description", "Content", 50, "What to enter"),
         Column("example", "Example", 22, "Example value (fictitious)"),
-    ], upload_rows, description="Columns of every New Business upload template")
+    ], upload_rows, description=f"Columns of every {nm} upload template")
 
     wb.sheet("Cross-BRD contract", [
         Column("id", "ID", 8, "Contract line"),
         Column("party", "BRD or system", 26, "Other BRD or external system"),
-        Column("direction", "Direction", 10, "In: taken by New Business; Out: handed over"),
+        Column("direction", "Direction", 10, f"In: taken by {nm}; Out: handed over"),
         Column("what", "What", 50, "Data or function exchanged"),
         Column("how", "When and how", 50, "Trigger and mechanism"),
         Column("owner", "Owner of the data", 26, "Who maintains it"),
-        Column("screens", "Screens", 30, "New Business screens concerned"),
+        Column("screens", "Screens", 30, f"{nm} screens concerned"),
         Column("frs", "FRs", 20, "Functional requirements"),
     ], [{**c, "frs": ", ".join(c.get("frs") or [])} for c in pack.contract],
-        description="What New Business takes from and hands to the other BRDs and systems; a change is a change request")
+        description=f"What {nm} takes from and hands to the other BRDs and systems; a change is a change request")
 
     comment_rows = [{"id": f"C-{i:03d}"} for i in range(1, 51)]
     ws = wb.sheet("Comments log", [
@@ -921,7 +949,8 @@ def build_workbook(pack: Pack) -> Path:
         description="Versions of this release set (a revision after review is v2.1; after sign-off, a change request)",
         freeze_first_column=False)
 
-    signatories = [
+    # Signatories of the pack (pack.yaml "signatories": [role, organisation, signs for]); New Business by default.
+    signatories = [tuple(x) for x in pack.signatories] or [
         ("Product Owner", "BDOI", "Business owner: the whole set"),
         ("Head, Marketing Business Services and System Support", "BDOI", "Business owner of New Business"),
         ("Unit Head, Processing", "BDOI", "Payment, placement, issuance and booking screens"),

@@ -20,9 +20,13 @@ sign-off per BRD"). The sources of a BRD are in one folder, `docs/deliverables/s
 
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
-| Product Maintenance | BRD-03 | FRS | 1.0 | [`BRD-03_Product_Maintenance/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx`](BRD-03_Product_Maintenance/BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx) |
-| Product Maintenance | BRD-03 | Test plan summary (Word) | 1.0 | [`BRD-03_Product_Maintenance/BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v1.0.docx`](BRD-03_Product_Maintenance/BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v1.0.docx) |
-| Product Maintenance | BRD-03 | Test plan workbook (Excel) | 1.0 | [`BRD-03_Product_Maintenance/BIBS_TestPlan_BRD-03_Product_Maintenance_v1.0.xlsx`](BRD-03_Product_Maintenance/BIBS_TestPlan_BRD-03_Product_Maintenance_v1.0.xlsx) |
+| Product Maintenance | BRD-03 | Start here guide | 2.0 | [`BRD-03_Product_Maintenance/00_BIBS_StartHere_BRD-03_Product_Maintenance_v2.0.docx`](BRD-03_Product_Maintenance/00_BIBS_StartHere_BRD-03_Product_Maintenance_v2.0.docx) |
+| Product Maintenance | BRD-03 | Sign-off pack guide deck | 2.0 | [`BRD-03_Product_Maintenance/01_BIBS_GuideDeck_BRD-03_Product_Maintenance_v2.0.pptx`](BRD-03_Product_Maintenance/01_BIBS_GuideDeck_BRD-03_Product_Maintenance_v2.0.pptx) |
+| Product Maintenance | BRD-03 | FRS | 2.0 | [`BRD-03_Product_Maintenance/02_BIBS_FRS_BRD-03_Product_Maintenance_v2.0.docx`](BRD-03_Product_Maintenance/02_BIBS_FRS_BRD-03_Product_Maintenance_v2.0.docx) |
+| Product Maintenance | BRD-03 | Sign-off workbook (Excel) | 2.0 | [`BRD-03_Product_Maintenance/03_BIBS_Signoff_BRD-03_Product_Maintenance_v2.0.xlsx`](BRD-03_Product_Maintenance/03_BIBS_Signoff_BRD-03_Product_Maintenance_v2.0.xlsx) |
+| Product Maintenance | BRD-03 | Test plan workbook (Excel) | 2.0 | [`BRD-03_Product_Maintenance/04_BIBS_TestPlan_BRD-03_Product_Maintenance_v2.0.xlsx`](BRD-03_Product_Maintenance/04_BIBS_TestPlan_BRD-03_Product_Maintenance_v2.0.xlsx) |
+| Product Maintenance | BRD-03 | Test plan summary (Word) | 2.0 | [`BRD-03_Product_Maintenance/05_BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v2.0.docx`](BRD-03_Product_Maintenance/05_BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v2.0.docx) |
+| Configuration Inputs | BRD-03 | Templates | 2.0 | [`BRD-03_Product_Maintenance/06_BIBS_Templates_BRD-03_Configuration_Inputs_v2.0.xlsx`](BRD-03_Product_Maintenance/06_BIBS_Templates_BRD-03_Configuration_Inputs_v2.0.xlsx) |
 | User Access Maintenance | BRD-11 | FRS | 1.1 | [`BRD-11_User_Access_Maintenance/BIBS_FRS_BRD-11_User_Access_Maintenance_v1.1.docx`](BRD-11_User_Access_Maintenance/BIBS_FRS_BRD-11_User_Access_Maintenance_v1.1.docx) |
 | User Access Maintenance | BRD-11 | Test plan summary (Word) | 1.0 | [`BRD-11_User_Access_Maintenance/BIBS_TestPlan_BRD-11_User_Access_Maintenance_Summary_v1.0.docx`](BRD-11_User_Access_Maintenance/BIBS_TestPlan_BRD-11_User_Access_Maintenance_Summary_v1.0.docx) |
 | User Access Maintenance | BRD-11 | Test plan workbook (Excel) | 1.0 | [`BRD-11_User_Access_Maintenance/BIBS_TestPlan_BRD-11_User_Access_Maintenance_v1.0.xlsx`](BRD-11_User_Access_Maintenance/BIBS_TestPlan_BRD-11_User_Access_Maintenance_v1.0.xlsx) |

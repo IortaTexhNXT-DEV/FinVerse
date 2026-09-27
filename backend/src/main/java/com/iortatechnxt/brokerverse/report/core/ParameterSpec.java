@@ -64,6 +64,20 @@ public record ParameterSpec(
   }
 
   /**
+   * Optional include / exclude list of codes (Renewal filter criteria, BRD x.009.2): single,
+   * multiple, "all except" and all selections. The options are served by the {@link CodeSetSource}
+   * of the given source key.
+   *
+   * @param name name
+   * @param label label
+   * @param source key of the {@link CodeSetSource} that lists the codes
+   * @return spec
+   */
+  public static ParameterSpec codeSet(String name, String label, String source) {
+    return new ParameterSpec(name, label, ParameterType.CODE_SET, false, List.of(source), null);
+  }
+
+  /**
    * Returns a copy with a default value.
    *
    * @param value default

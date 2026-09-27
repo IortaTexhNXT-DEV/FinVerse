@@ -3,6 +3,8 @@ import { mayOpen } from './access';
 import { MODULES, NAV_GROUPS } from './modules';
 
 interface Persona {
+  /** The role code when the key is not the role (a role listed in several suites). */
+  role?: string;
   seedUser: string;
   /** Only the permissions with this prefix are listed (a role of another business area). */
   permissionScope?: string;
@@ -43,7 +45,7 @@ function sectionScreens(suite: Suite) {
 
 /**
  * Client requirement 14: each role of Sanction Screening (BRD-10), User Access (BRD-11), Claims
- * Handling (BRD-7) and Employee Benefits (BRD-8) sees exactly its intended screens. The grants and the screens are the shared
+ * Handling (BRD-7), Employee Benefits (BRD-8) and Renewal (BRD-6) sees exactly its intended screens. The grants and the screens are the shared
  * fixture personaMenus.json, which the backend checks against the database.
  */
 describe.each(SUITES.map((s) => [s.id, s] as const))('persona menus of %s', (_id, suite) => {
@@ -90,10 +92,17 @@ describe.each(SUITES.map((s) => [s.id, s] as const))('persona menus of %s', (_id
 });
 
 describe('persona menus across suites', () => {
-  it('lists every role once, 23 roles in all', () => {
+  it('lists every persona once, 30 in all', () => {
     const codes = SUITES.flatMap((s) => Object.keys(s.roles));
     expect(new Set(codes).size).toBe(codes.length);
-    expect(codes).toHaveLength(23);
+    expect(codes).toHaveLength(30);
+  });
+
+  it('lists a role in a suite once', () => {
+    for (const suite of SUITES) {
+      const roles = Object.entries(suite.roles).map(([key, p]) => p.role ?? key);
+      expect(new Set(roles).size).toBe(roles.length);
+    }
   });
 
   it('keeps the insurer-side Claims module away from every listed role', () => {

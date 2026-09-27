@@ -279,3 +279,12 @@ fixes:
   "Client code <code> does not exist": Correct the client code, or leave it blank to create a new client.
   "The booking date <date> is in the future": Enter today's or an earlier booking date.
   "The row matches several clients: <details>": Enter the client code of the intended client in the row.
+  "The draft is not saved yet: click Save Draft to check it before submission.": Click Save Draft, correct what the check lists, then submit.
+  "The draft was not saved: correct what the message above describes, then save the draft again.": Correct the fields named in the message and save the draft again.
+  "The draft was not saved: its risks are already on the account shown above. Change the risk items, or open the existing account instead.": Change the risk items, or open the existing account instead of creating a new one.
+  "The booking date cannot be in the future": Enter today's or an earlier booking date.
+  "Must not be before the first valid date": Enter a last valid date on or after the first valid date.
+  "Between 0 and 50 years": Enter a number of years from 0 to 50.
+  "Between 1 and 50 years": Enter a number of years from 1 to 50.
+  "The <record type> module does not report retention candidates yet; the records will be counted once it does.": No action; the rule is kept and counts the records once the module reports them.
+  "<quotation no> is <>, not sent to the client": Remove the row, or send the quotation to the client before recording its acceptance.

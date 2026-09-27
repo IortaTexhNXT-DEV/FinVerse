@@ -136,6 +136,37 @@ public class ProposalService {
   }
 
   /**
+   * Creates the PRF of a renewal with financial or structural changes (Renewal New Business path,
+   * BRRN.033; Renewal design section 13): an ordinary PRF linked to the renewal reference, whose
+   * accounts are created as RENEWAL of the expiring policy. One PRF per renewal.
+   *
+   * @param companyId company
+   * @param draft PRF data (pre-filled from the expiring account)
+   * @param renewalRef renewal reference of the candidate
+   * @param renewalOf what the renewal renews (expiring ARN or legacy reference)
+   * @return the PRF
+   */
+  public ProposalRequest createForRenewal(
+      Long companyId, ProposalDraft draft, String renewalRef, String renewalOf) {
+    proposals
+        .findByRenewalRef(renewalRef)
+        .ifPresent(
+            p -> {
+              throw new BusinessRuleException(
+                  "PROPOSAL_RENEWAL_EXISTS",
+                  "Renewal " + renewalRef + " already has proposal request " + p.getPrfNo());
+            });
+    ProposalRequest proposal = create(companyId, draft);
+    proposal.linkRenewal(renewalRef, renewalOf);
+    audit.record(
+        ENTITY,
+        proposal.getPrfNo(),
+        AuditAction.UPDATE,
+        "PRF for the renewal " + renewalRef + " of " + renewalOf);
+    return proposal;
+  }
+
+  /**
    * Changes a PRF: Marketing while it is a draft, TSU while it is in the TSU queue (BRNB.007).
    *
    * @param id PRF

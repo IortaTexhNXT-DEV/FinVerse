@@ -11,5 +11,11 @@ public enum ParameterType {
   BRANCH,
   ACCOUNT,
   CURRENCY,
-  BUSINESS_LINE
+  BUSINESS_LINE,
+  /**
+   * An include or exclude list of codes ("only" or "all except", BRD x.009.2): the value is a comma
+   * separated list, prefixed with {@code !} for "all except"; the options come from the {@link
+   * CodeSetSource} named in {@link ParameterSpec#options()}.
+   */
+  CODE_SET
 }

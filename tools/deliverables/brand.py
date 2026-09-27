@@ -241,14 +241,17 @@ def out_path(brd: str, kind: str, filename: str) -> Path:
 # Business sign-off release sets issued so far: BRD -> version of the set. The documents of such a set carry a
 # two-digit prefix so that they sort in reading order in the BRD folder (deliverables README, "Release and sign-off
 # per BRD").
-SIGNOFF_SETS = {"BRD-01": "2.0"}
+SIGNOFF_SETS = {"BRD-01": "2.0", "BRD-03": "2.0"}
 READING_ORDER = {"StartHere": "00", "GuideDeck": "01", "FRS": "02", "Signoff": "03", "TestPlan": "04",
                  "TestPlanSummary": "05"}
+# Further documents of a set that only some BRDs have (not required by check_pack): the configuration input templates
+# of a setup BRD (BRD-3 Product Maintenance).
+READING_ORDER_EXTRA = {"Templates": "06"}
 
 
 def output_name(doc_type: str, brd: str, name: str, version: str, ext: str) -> str:
     """File name of a client-pack document: BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>, with the reading-order
-    prefix (00_ to 05_) for the documents of a business sign-off release set.
+    prefix (00_ to 06_) for the documents of a business sign-off release set.
 
     >>> output_name("FRS", "BRD-03", "Product Maintenance", "1.0", "docx")
     'BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx'
@@ -258,6 +261,7 @@ def output_name(doc_type: str, brd: str, name: str, version: str, ext: str) -> s
     safe = "_".join(part for part in name.replace("&", "and").replace("/", " ").split() if part)
     key = doc_type + ("Summary" if safe.endswith("_Summary") else "")
     prefix = ""
-    if SIGNOFF_SETS.get(brd) == str(version) and key in READING_ORDER:
-        prefix = READING_ORDER[key] + "_"
+    order = {**READING_ORDER, **READING_ORDER_EXTRA}
+    if SIGNOFF_SETS.get(brd) == str(version) and key in order:
+        prefix = order[key] + "_"
     return f"{prefix}BIBS_{doc_type}_{brd}_{safe}_v{version}.{ext.lstrip('.')}"

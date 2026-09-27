@@ -83,20 +83,9 @@ public class PackageChoiceService {
   public PackageChoice propose(
       Long companyId, String renewalRef, String productCode, Integer versionNo, String reason) {
     RenewalCandidate c = records.get(companyId, renewalRef);
-    if (c.getSource() != CandidateSource.LEGACY || c.getSnapshot().legacyPackageCode() == null) {
-      throw new BusinessRuleException(
-          "RNW_PACKAGE_NOT_MIGRATED", "Only a migrated packaged policy needs a package choice");
-    }
-    if (!c.getStage().isOpen()) {
-      throw new BusinessRuleException("RNW_PACKAGE_CLOSED", "The renewal is closed");
-    }
+    requireChoosable(c);
     if (reason == null || reason.isBlank()) {
       throw new BusinessRuleException("RNW_PACKAGE_REASON", "Enter the reason of the choice");
-    }
-    if (choices.findByCandidateIdOrderByIdDesc(c.getId()).stream()
-        .anyMatch(p -> p.getStatus() == ApprovalStatus.PENDING)) {
-      throw new BusinessRuleException(
-          "RNW_PACKAGE_PENDING", "A package choice is already waiting for approval");
     }
     List<String> problems = map.targetProblems(productCode, versionNo);
     if (!problems.isEmpty()) {
@@ -110,6 +99,21 @@ public class PackageChoiceService {
         AuditAction.SUBMIT,
         "Package " + productCode + " version " + versionNo + " chosen for " + c.getRenewalRef());
     return choice;
+  }
+
+  private void requireChoosable(RenewalCandidate c) {
+    if (c.getSource() != CandidateSource.LEGACY || c.getSnapshot().legacyPackageCode() == null) {
+      throw new BusinessRuleException(
+          "RNW_PACKAGE_NOT_MIGRATED", "Only a migrated packaged policy needs a package choice");
+    }
+    if (!c.getStage().isOpen()) {
+      throw new BusinessRuleException("RNW_PACKAGE_CLOSED", "The renewal is closed");
+    }
+    if (choices.findByCandidateIdOrderByIdDesc(c.getId()).stream()
+        .anyMatch(p -> p.getStatus() == ApprovalStatus.PENDING)) {
+      throw new BusinessRuleException(
+          "RNW_PACKAGE_PENDING", "A package choice is already waiting for approval");
+    }
   }
 
   /**
@@ -134,19 +138,25 @@ public class PackageChoiceService {
       c.resolvePackage(choice.getProductCode(), choice.getProductVersionNo());
       reevaluation.reevaluate(c, CheckTrigger.MANUAL);
     }
+    record(c, choice, approve, text, remarks);
+    return choice;
+  }
+
+  private void record(
+      RenewalCandidate c, PackageChoice choice, boolean approve, String text, String remarks) {
+    String decision = approve ? "approved" : "rejected";
     audit.record(
         RenewalCodes.ENTITY,
         c.getId(),
         approve ? AuditAction.AUTHORIZE : AuditAction.REJECT,
-        text + (approve ? " approved" : " rejected") + " for " + c.getRenewalRef());
+        text + " " + decision + " for " + c.getRenewalRef());
     notices.users(
         List.of(choice.getCreatedBy()),
         RenewalCodes.EVENT_PACKAGE_DECIDED,
         c,
         new RenewalNotices.Text(
-            c.getRenewalRef() + ": package choice " + (approve ? "approved" : "rejected"),
+            c.getRenewalRef() + ": package choice " + decision,
             text + (approve ? " applies to the renewal" : " was rejected: " + remarks)));
-    return choice;
   }
 
   /**

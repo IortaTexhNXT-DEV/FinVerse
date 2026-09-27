@@ -97,7 +97,7 @@ public class RenewalCandidate extends BaseEntity {
   @Column(name = "history_viewed", nullable = false)
   private boolean historyViewed;
 
-  @Embedded private CandidateFlags flags = new CandidateFlags();
+  @Embedded private final CandidateFlags flags = new CandidateFlags();
 
   @Enumerated(EnumType.STRING)
   @Column(name = "ra_notice", nullable = false, length = 10)

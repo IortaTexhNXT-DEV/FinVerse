@@ -124,12 +124,16 @@ public class PackageMapEntry extends AuthorizableEntity {
   }
 
   private boolean inBand(BigDecimal sumInsured) {
-    if (siFrom == null && siTo == null) {
-      return true;
-    }
-    return sumInsured != null
-        && (siFrom == null || sumInsured.compareTo(siFrom) >= 0)
-        && (siTo == null || sumInsured.compareTo(siTo) <= 0);
+    boolean unbounded = siFrom == null && siTo == null;
+    return unbounded || sumInsured != null && aboveFrom(sumInsured) && belowTo(sumInsured);
+  }
+
+  private boolean aboveFrom(BigDecimal sumInsured) {
+    return siFrom == null || sumInsured.compareTo(siFrom) >= 0;
+  }
+
+  private boolean belowTo(BigDecimal sumInsured) {
+    return siTo == null || sumInsured.compareTo(siTo) <= 0;
   }
 
   /**

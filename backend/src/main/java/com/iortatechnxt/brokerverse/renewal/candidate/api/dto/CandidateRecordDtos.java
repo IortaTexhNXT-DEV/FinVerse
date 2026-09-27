@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.List;
 
 /** Responses of the tabs of the renewal record page. */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class CandidateRecordDtos {
 
   private CandidateRecordDtos() {}

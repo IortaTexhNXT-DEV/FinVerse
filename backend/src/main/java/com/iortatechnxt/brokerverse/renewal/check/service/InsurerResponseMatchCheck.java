@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.renewal.check.service;
 
 import com.iortatechnxt.brokerverse.renewal.domain.InsurerResponse;
 import com.iortatechnxt.brokerverse.renewal.domain.MatchOutcome;
+import java.util.Locale;
 import org.springframework.stereotype.Component;
 
 /**
@@ -27,6 +28,16 @@ public class InsurerResponseMatchCheck implements RenewalCheck {
     if (latest == null) {
       return Verdict.notApplicable("No insurer response yet");
     }
+    Verdict problem = problem(latest);
+    return problem != null
+        ? problem
+        : Verdict.pass(
+            "Insurer response "
+                + latest.getResponse().name().replace('_', ' ').toLowerCase(Locale.ROOT)
+                + " matched");
+  }
+
+  private static Verdict problem(InsurerResponse latest) {
     if (latest.getMatchOutcome() != MatchOutcome.MATCHED) {
       return Verdict.fail(
           "The insurer response does not match the renewal", latest.getMatchOutcome().name());
@@ -34,9 +45,8 @@ public class InsurerResponseMatchCheck implements RenewalCheck {
     if (latest.isConflicting()) {
       return Verdict.fail("The insurer sent conflicting responses", "CONFLICTING");
     }
-    if (latest.isLate()) {
-      return Verdict.fail("The insurer response came after the reply date", "LATE");
-    }
-    return Verdict.pass("Insurer response " + latest.getResponse().name() + " matched");
+    return latest.isLate()
+        ? Verdict.fail("The insurer response came after the reply date", "LATE")
+        : null;
   }
 }

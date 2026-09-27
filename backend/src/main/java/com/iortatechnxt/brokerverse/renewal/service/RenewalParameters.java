@@ -370,8 +370,7 @@ public class RenewalParameters {
   }
 
   private boolean listed(String key, String value) {
-    return value != null
-        && parameters.items(key).stream().anyMatch(v -> v.equalsIgnoreCase(value.strip()));
+    return value != null && parameters.items(key).stream().anyMatch(v -> v.equals(value.strip()));
   }
 
   private BigDecimal decimal(String key) {

@@ -36,6 +36,10 @@ public class ReferenceMatchCheck implements RenewalCheck {
           ? Verdict.fail("The renewal has no reference of its policy", "MISSING")
           : Verdict.pass("Matched to policy " + c.getSourceRef());
     }
+    return ledgerMatch(context, c);
+  }
+
+  private static Verdict ledgerMatch(CheckContext context, RenewalCandidate c) {
     OpsInvoice root =
         context.family().stream()
             .filter(i -> i.getInvoiceNo().equals(c.getExpiringInvoiceNo()))

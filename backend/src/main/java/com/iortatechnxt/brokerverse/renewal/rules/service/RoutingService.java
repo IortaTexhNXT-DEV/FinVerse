@@ -87,35 +87,41 @@ public class RoutingService {
   public void route(RenewalCandidate candidate, Evaluation evaluation) {
     if (evaluation.systemTag().isPresent()) {
       applyTag(candidate, evaluation.systemTag().get(), "route_letter");
-      return;
+    } else if (loanDriven(candidate)) {
+      straightThrough(candidate);
+    } else {
+      DispositionProposal proposal =
+          matrix.propose(candidate, evaluation, BusinessClock.today(clock));
+      candidate.propose(proposal);
+      if (proposal.isAuto() && candidate.getBucket() == Bucket.CLEAN) {
+        automatic(candidate, proposal);
+      } else {
+        flow.system(candidate, ROUTE_UNASSIGNED, "For disposition by Marketing");
+      }
     }
+  }
+
+  private boolean loanDriven(RenewalCandidate candidate) {
     CandidateSnapshot s = candidate.getSnapshot();
     String segment = s.product() == null ? null : s.product().segment();
     String line = s.product() == null ? null : s.product().lineCode();
-    if (parameters.loanDriven(segment, line)) {
-      candidate.getFlags().setStp(true);
-      candidate.takePath(RenewalPath.STP);
-      dispositions.record(
-          candidate,
-          new CurrentDisposition(
-              RenewalDisposition.FOR_RENEWAL,
-              null,
-              DispositionSource.SYSTEM_CHECK,
-              "Loan-driven straight-through renewal",
-              null),
-          null,
-          null);
-      flow.system(candidate, "route_processing", "Straight-through renewal of a loan account");
-      return;
-    }
-    DispositionProposal proposal =
-        matrix.propose(candidate, evaluation, BusinessClock.today(clock));
-    candidate.propose(proposal);
-    if (proposal.isAuto() && candidate.getBucket() == Bucket.CLEAN) {
-      automatic(candidate, proposal);
-    } else {
-      flow.system(candidate, ROUTE_UNASSIGNED, "For disposition by Marketing");
-    }
+    return parameters.loanDriven(segment, line);
+  }
+
+  private void straightThrough(RenewalCandidate candidate) {
+    candidate.getFlags().setStp(true);
+    candidate.takePath(RenewalPath.STP);
+    dispositions.record(
+        candidate,
+        new CurrentDisposition(
+            RenewalDisposition.FOR_RENEWAL,
+            null,
+            DispositionSource.SYSTEM_CHECK,
+            "Loan-driven straight-through renewal",
+            null),
+        null,
+        null);
+    flow.system(candidate, "route_processing", "Straight-through renewal of a loan account");
   }
 
   private void automatic(RenewalCandidate candidate, DispositionProposal proposal) {

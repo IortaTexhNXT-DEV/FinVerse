@@ -18,7 +18,9 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,7 +79,7 @@ public class RuleVersionService {
   @Transactional(readOnly = true)
   public List<BucketRuleSet> bucketRuleSets(Long companyId) {
     List<BucketRuleSet> sets = ruleSets.findByCompanyIdOrderByVersionNoDesc(companyId);
-    sets.forEach(s -> s.getRules().size());
+    sets.forEach(s -> Hibernate.initialize(s.getRules()));
     return sets;
   }
 
@@ -144,7 +146,7 @@ public class RuleVersionService {
   @Transactional(readOnly = true)
   public List<DecisionMatrix> matrices(Long companyId) {
     List<DecisionMatrix> list = matrices.findByCompanyIdOrderByVersionNoDesc(companyId);
-    list.forEach(m -> m.getRules().size());
+    list.forEach(m -> Hibernate.initialize(m.getRules()));
     return list;
   }
 
@@ -206,21 +208,23 @@ public class RuleVersionService {
   private static void retireBeforeActivation(
       VersionedRules version, Step step, List<? extends VersionedRules> active) {
     if (step == Step.ACTIVATE && version.getStatus() == RuleSetStatus.SUBMITTED) {
-      active.stream().filter(a -> a != version).forEach(VersionedRules::retire);
+      active.stream()
+          .filter(a -> !a.getId().equals(version.getId()))
+          .forEach(VersionedRules::retire);
     }
   }
 
   private void apply(VersionedRules version, Step step, String remarks) {
     String user = currentUser.username();
-    switch (step) {
-      case SUBMIT -> version.submit(user, clock.instant());
-      case ACTIVATE -> version.activate(user, clock.instant());
-      case REJECT -> {
-        if (remarks == null || remarks.isBlank()) {
-          throw new BusinessRuleException("RNW_RULES_REJECT_REMARKS", "Enter the reason");
-        }
-        version.reject(user, remarks.strip(), clock.instant());
+    if (step == Step.SUBMIT) {
+      version.submit(user, clock.instant());
+    } else if (step == Step.ACTIVATE) {
+      version.activate(user, clock.instant());
+    } else {
+      if (remarks == null || remarks.isBlank()) {
+        throw new BusinessRuleException("RNW_RULES_REJECT_REMARKS", "Enter the reason");
       }
+      version.reject(user, remarks.strip(), clock.instant());
     }
   }
 
@@ -233,7 +237,7 @@ public class RuleVersionService {
   }
 
   private static String describe(VersionedRules v) {
-    return "version " + v.getVersionNo() + " " + v.getStatus().name().toLowerCase();
+    return "version " + v.getVersionNo() + " " + v.getStatus().name().toLowerCase(Locale.ROOT);
   }
 
   private LocalDate effective(Header header) {

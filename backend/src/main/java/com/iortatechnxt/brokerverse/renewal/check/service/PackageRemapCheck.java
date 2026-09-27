@@ -31,6 +31,8 @@ public class PackageRemapCheck implements RenewalCheck {
   private static final Set<ProductVersionStatus> USABLE =
       EnumSet.of(ProductVersionStatus.RELEASED, ProductVersionStatus.SUPERSEDED);
 
+  private static final String LEGACY_PACKAGE = "Legacy package ";
+
   private final PackageMapEntryRepository map;
   private final ProductVersionRepository versions;
 
@@ -54,51 +56,66 @@ public class PackageRemapCheck implements RenewalCheck {
   public Verdict evaluate(CheckContext context) {
     RenewalCandidate c = context.candidate();
     CandidateSnapshot s = c.getSnapshot();
-    if (c.getSource() != CandidateSource.LEGACY) {
-      return Verdict.notApplicable("The policy is booked in BIBS");
-    }
-    if (s.legacyPackageCode() == null) {
-      return Verdict.notApplicable("The migrated policy is not packaged");
+    if (c.getSource() != CandidateSource.LEGACY || s.legacyPackageCode() == null) {
+      return Verdict.notApplicable(
+          c.getSource() != CandidateSource.LEGACY
+              ? "The policy is booked in BIBS"
+              : "The migrated policy is not packaged");
     }
     if (c.getResolvedProductCode() != null) {
       return Verdict.pass(
           "Package " + c.getResolvedProductCode() + " version " + c.getResolvedVersionNo());
     }
+    return resolve(c, s);
+  }
+
+  private Verdict resolve(RenewalCandidate c, CandidateSnapshot s) {
     List<PackageMapEntry> matches =
         map.findByCompanyIdAndLegacyPackageCode(c.getCompanyId(), s.legacyPackageCode()).stream()
             .filter(e -> e.appliesTo(s.legacyPackageVersion(), risk(s), s.insurerCode(), si(s)))
             .toList();
     String legacy = legacyLabel(s);
-    if (matches.isEmpty()) {
-      return Verdict.fail("Legacy package " + legacy + " is not in the package map", "UNMAPPED");
-    }
-    if (matches.stream().anyMatch(PackageMapEntry::isReject)) {
-      return Verdict.fail("Legacy package " + legacy + " has no BIBS package", "REJECT");
-    }
     List<String> targets =
         matches.stream()
+            .filter(e -> !e.isReject())
             .map(e -> e.getProductCode() + " v" + e.getProductVersionNo())
             .distinct()
             .toList();
-    if (targets.size() > 1) {
-      return Verdict.fail(
-          "Legacy package " + legacy + " maps to several versions: " + String.join(", ", targets),
-          "AMBIGUOUS");
+    Verdict failure = failure(matches, targets, legacy);
+    if (failure != null) {
+      return failure;
     }
     PackageMapEntry entry = matches.get(0);
-    boolean usable =
-        versions
-            .findByProductCodeAndVersionNo(entry.getProductCode(), entry.getProductVersionNo())
-            .map(ProductVersion::getStatus)
-            .filter(USABLE::contains)
-            .isPresent();
-    if (!usable) {
+    if (!usable(entry)) {
       return Verdict.fail(
           "Package " + targets.get(0) + " of legacy package " + legacy + " is not active",
           "RETIRED");
     }
     c.resolvePackage(entry.getProductCode(), entry.getProductVersionNo());
-    return Verdict.pass("Legacy package " + legacy + " renews on package " + targets.get(0));
+    return Verdict.pass(LEGACY_PACKAGE + legacy + " renews on package " + targets.get(0));
+  }
+
+  private static Verdict failure(
+      List<PackageMapEntry> matches, List<String> targets, String legacy) {
+    if (matches.isEmpty()) {
+      return Verdict.fail(LEGACY_PACKAGE + legacy + " is not in the package map", "UNMAPPED");
+    }
+    if (matches.stream().anyMatch(PackageMapEntry::isReject)) {
+      return Verdict.fail(LEGACY_PACKAGE + legacy + " has no BIBS package", "REJECT");
+    }
+    return targets.size() > 1
+        ? Verdict.fail(
+            LEGACY_PACKAGE + legacy + " maps to several versions: " + String.join(", ", targets),
+            "AMBIGUOUS")
+        : null;
+  }
+
+  private boolean usable(PackageMapEntry entry) {
+    return versions
+        .findByProductCodeAndVersionNo(entry.getProductCode(), entry.getProductVersionNo())
+        .map(ProductVersion::getStatus)
+        .filter(USABLE::contains)
+        .isPresent();
   }
 
   private static String legacyLabel(CandidateSnapshot s) {

@@ -203,10 +203,14 @@ public class RenewalSetupService {
     }
     return new NonRenewableRiskCode.Data(
         data.riskCode().strip(),
-        data.lineCode() == null || data.lineCode().isBlank() ? null : data.lineCode().strip(),
+        blankToNull(data.lineCode()),
         data.reason().strip(),
         data.effectiveFrom(),
         data.effectiveTo());
+  }
+
+  private static String blankToNull(String value) {
+    return value == null || value.isBlank() ? null : value.strip();
   }
 
   private static String describe(NonRenewableRiskCode code) {

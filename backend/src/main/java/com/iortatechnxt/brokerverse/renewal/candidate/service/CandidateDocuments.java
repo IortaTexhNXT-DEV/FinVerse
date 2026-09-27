@@ -10,6 +10,9 @@ import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.renewal.check.service.CheckNames;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotPremium;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotProduct;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotSales;
 import com.iortatechnxt.brokerverse.renewal.domain.CheckResult;
 import com.iortatechnxt.brokerverse.renewal.domain.Disposition;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
@@ -57,6 +60,13 @@ public class CandidateDocuments {
           "Currency",
           "Gross premium",
           "Sum insured");
+
+  private static final SnapshotProduct NO_PRODUCT =
+      new SnapshotProduct(null, null, null, null, null, null);
+  private static final SnapshotSales NO_SALES =
+      new SnapshotSales(null, null, null, null, null, null);
+  private static final SnapshotPremium NO_PREMIUM =
+      new SnapshotPremium(null, null, null, null, null, null);
 
   private final CandidateQueryService queries;
   private final DocumentComposer composer;
@@ -148,9 +158,9 @@ public class CandidateDocuments {
 
   private static List<Object> exportRow(RenewalCandidate c, boolean hide) {
     CandidateSnapshot s = c.getSnapshot();
-    var product = s.product();
-    var sales = s.sales();
-    var premium = hide ? null : s.premium();
+    SnapshotProduct product = s.product() == null ? NO_PRODUCT : s.product();
+    SnapshotSales sales = s.sales() == null ? NO_SALES : s.sales();
+    SnapshotPremium premium = hide || s.premium() == null ? NO_PREMIUM : s.premium();
     return Arrays.asList(
         c.getRenewalRef(),
         c.getStage().label(),
@@ -160,19 +170,19 @@ public class CandidateDocuments {
         c.getExpiringArn(),
         s.policyNo(),
         s.clientName(),
-        product == null ? null : product.productCode(),
-        product == null ? null : product.lineCode(),
+        product.productCode(),
+        product.lineCode(),
         s.insurerCode(),
-        product == null ? null : product.segment(),
-        sales == null ? null : sales.branchCode(),
+        product.segment(),
+        sales.branchCode(),
         c.getOwnerUnit(),
-        sales == null ? null : sales.accountOfficer(),
+        sales.accountOfficer(),
         c.getAssignedAo(),
         c.getAssignedPo(),
         c.getExpiryDate(),
-        premium == null ? null : premium.currency(),
-        premium == null ? null : premium.grossPremium(),
-        premium == null ? null : premium.totalSumInsured());
+        premium.currency(),
+        premium.grossPremium(),
+        premium.totalSumInsured());
   }
 
   private static List<String> checkRow(CheckResult r) {

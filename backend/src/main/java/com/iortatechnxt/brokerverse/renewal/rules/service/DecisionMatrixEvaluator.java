@@ -85,36 +85,50 @@ public class DecisionMatrixEvaluator {
 
   private Facts facts(RenewalCandidate c, Evaluation evaluation, LocalDate today) {
     CandidateSnapshot s = c.getSnapshot();
+    var product = s.product();
+    return new Facts(
+        product == null ? null : product.segment(),
+        product == null ? null : product.lineCode(),
+        product == null ? null : product.productCode(),
+        s.mortgage() != null && s.mortgage().mortgaged(),
+        c.getBucket(),
+        claimsCondition(evaluation),
+        endorsementCondition(c),
+        paymentCondition(c),
+        c.daysToExpiry(today));
+  }
+
+  private static String claimsCondition(Evaluation evaluation) {
     Finding claims = evaluation.finding(ClaimsCheck.CODE).orElse(null);
-    String claimsCondition = NONE;
-    if (claims != null && claims.failed()) {
-      claimsCondition = "OPEN";
-    } else if (claims != null && claims.detail() != null) {
-      claimsCondition = "PAID";
+    if (claims == null) {
+      return NONE;
     }
-    String endorsement = NONE;
+    if (claims.failed()) {
+      return "OPEN";
+    }
+    return claims.detail() != null ? "PAID" : NONE;
+  }
+
+  private String endorsementCondition(RenewalCandidate c) {
     if (c.getFlags().isEndorsementPending()) {
-      endorsement = "PENDING";
-    } else if (!endorsements.findByCandidateIdOrderByIdAsc(c.getId()).isEmpty()) {
-      endorsement = "POSTED_IN_TERM";
+      return "PENDING";
     }
+    return endorsements.findByCandidateIdOrderByIdAsc(c.getId()).isEmpty()
+        ? NONE
+        : "POSTED_IN_TERM";
+  }
+
+  private String paymentCondition(RenewalCandidate c) {
     boolean direct =
         c.getExpiringArn() != null
             && accounts
                 .findByArn(c.getExpiringArn())
                 .map(a -> a.getPaymentArrangement() == PaymentArrangement.DIRECT_TO_INSURER)
                 .orElse(false);
-    String payment = c.getFlags().isOutstanding() ? "OUTSTANDING" : "PAID";
-    return new Facts(
-        s.product() == null ? null : s.product().segment(),
-        s.product() == null ? null : s.product().lineCode(),
-        s.product() == null ? null : s.product().productCode(),
-        s.mortgage() != null && s.mortgage().mortgaged(),
-        c.getBucket(),
-        claimsCondition,
-        endorsement,
-        direct ? "DP" : payment,
-        c.daysToExpiry(today));
+    if (direct) {
+      return "DP";
+    }
+    return c.getFlags().isOutstanding() ? "OUTSTANDING" : "PAID";
   }
 
   private static boolean matches(Criteria r, Facts f) {

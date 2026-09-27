@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal.extraction.service;
 
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSource;
 import com.iortatechnxt.brokerverse.renewal.domain.ExtractionRun;
 import com.iortatechnxt.brokerverse.renewal.domain.ExtractionTrigger;
@@ -114,7 +115,8 @@ public class GoLiveService {
       return done;
     } catch (RuntimeException e) {
       extraction.fail(run.getId(), e.getMessage());
-      throw e;
+      throw new BusinessRuleException(
+          "RNW_GOLIVE_FAILED", "The go-live take-over failed: " + e.getMessage(), e);
     }
   }
 

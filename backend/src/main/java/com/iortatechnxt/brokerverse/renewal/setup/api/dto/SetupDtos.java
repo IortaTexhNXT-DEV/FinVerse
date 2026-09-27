@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /** Responses of Renewal Setup and of the package choices. */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class SetupDtos {
 
   private SetupDtos() {}

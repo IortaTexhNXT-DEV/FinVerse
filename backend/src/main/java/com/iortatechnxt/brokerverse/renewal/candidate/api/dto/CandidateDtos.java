@@ -2,13 +2,23 @@ package com.iortatechnxt.brokerverse.renewal.candidate.api.dto;
 
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateFlags;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotClient;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotProduct;
+import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotSales;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 
 /** Responses of the renewal lists and record page. */
+@SuppressWarnings("PMD.MissingStaticMethodInNonInstantiatableClass") // namespace of records
 public final class CandidateDtos {
+
+  private static final SnapshotClient NO_CLIENT = new SnapshotClient(null, null, null, null, null);
+  private static final SnapshotProduct NO_PRODUCT =
+      new SnapshotProduct(null, null, null, null, null, null);
+  private static final SnapshotSales NO_SALES =
+      new SnapshotSales(null, null, null, null, null, null);
 
   private CandidateDtos() {}
 
@@ -169,24 +179,24 @@ public final class CandidateDtos {
 
     static PartyColumns of(RenewalCandidate c) {
       CandidateSnapshot s = c.getSnapshot();
-      var client = s.client();
-      var product = s.product();
-      var sales = s.sales();
+      SnapshotClient client = s.client() == null ? NO_CLIENT : s.client();
+      SnapshotProduct product = s.product() == null ? NO_PRODUCT : s.product();
+      SnapshotSales sales = s.sales() == null ? NO_SALES : s.sales();
       return new PartyColumns(
-          client == null ? null : client.clientId(),
-          client == null ? null : client.clientCode(),
+          client.clientId(),
+          client.clientCode(),
           s.clientName(),
-          client == null ? null : client.assuredName(),
-          product == null ? null : product.segment(),
-          product == null ? null : product.businessOrigin(),
-          product == null ? null : product.accountType(),
-          sales == null ? null : sales.branchCode(),
-          sales == null ? null : sales.regionCode(),
-          sales == null ? null : sales.departmentCode(),
-          sales == null ? null : sales.salesUnit(),
+          client.assuredName(),
+          product.segment(),
+          product.businessOrigin(),
+          product.accountType(),
+          sales.branchCode(),
+          sales.regionCode(),
+          sales.departmentCode(),
+          sales.salesUnit(),
           c.getOwnerUnit(),
-          sales == null ? null : sales.unitHead(),
-          sales == null ? null : sales.accountOfficer(),
+          sales.unitHead(),
+          sales.accountOfficer(),
           c.getAssignedAo(),
           c.getAssignedPo());
     }

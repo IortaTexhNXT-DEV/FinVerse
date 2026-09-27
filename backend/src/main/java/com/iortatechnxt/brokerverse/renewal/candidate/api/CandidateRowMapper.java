@@ -34,6 +34,9 @@ public class CandidateRowMapper {
   private static final List<String> MONEY_CHECKS =
       List.of(OutstandingPremiumCheck.CODE, ClaimsCheck.CODE);
 
+  private static final SnapshotPremium NO_PREMIUM =
+      new SnapshotPremium(null, null, null, null, null, null);
+
   private final CheckResultRepository results;
   private final Clock clock;
 
@@ -101,7 +104,7 @@ public class CandidateRowMapper {
   }
 
   private static MoneyColumns money(RenewalCandidate c, Map<String, CheckResult> checks) {
-    SnapshotPremium p = c.getSnapshot().premium();
+    SnapshotPremium p = c.getSnapshot().premium() == null ? NO_PREMIUM : c.getSnapshot().premium();
     CheckResult outstanding = checks.get(OutstandingPremiumCheck.CODE);
     CheckResult claims = checks.get(ClaimsCheck.CODE);
     Integer claimCount = null;
@@ -112,12 +115,12 @@ public class CandidateRowMapper {
       claimCount = m != null && m.find() ? Integer.valueOf(m.group(1)) : null;
     }
     return new MoneyColumns(
-        p == null ? null : p.currency(),
-        p == null ? null : p.basicPremium(),
-        p == null ? null : p.grossPremium(),
-        p == null ? null : p.totalSumInsured(),
-        p == null ? null : p.premiumRate(),
-        p == null ? null : p.commissionRate(),
+        p.currency(),
+        p.basicPremium(),
+        p.grossPremium(),
+        p.totalSumInsured(),
+        p.premiumRate(),
+        p.commissionRate(),
         outstanding(outstanding),
         claimCount,
         claimStatus);

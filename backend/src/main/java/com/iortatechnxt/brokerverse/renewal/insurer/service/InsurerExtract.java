@@ -184,6 +184,7 @@ public class InsurerExtract {
     return results.findByRunIdOrderByIdAsc(c.getLastCheckRunId()).stream()
         .filter(r -> OutstandingPremiumCheck.CODE.equals(r.getCheckCode()))
         .map(CheckResult::getDetail)
+        .filter(java.util.Objects::nonNull)
         .findFirst()
         .orElse("0.00");
   }

@@ -1394,7 +1394,7 @@ screens: Extraction; DTIP Status; Remittance Batches
 description:
   - "An extraction run REX-yyyy-n examines the invoices of an insurer whose remittance status is UNPROCESSED, WITH_OUTSTANDING_BALANCE or PARTIALLY_REMITTED. It is started by the scheduled job (daily off-peak, 20:00 PHT by default), manually for an insurer and remittance type, or for one invoice number. Each insurer is processed in its own transaction."
   - "Every invoice examined gets a tag: EXTRACTED; UNEXTRACTED_DUE (with its blocking reasons, FR-OP-031); UNEXTRACTED_NOT_DUE; RETURNED (extracted then returned by a user)."
-  - "Extracted invoices are grouped into batches RMB-<insurer>-yyyy-n per insurer and remittance type (WITH_INCENTIVES, NORMAL_PHP, NORMAL_USD, SPECIAL), assigned to a processor and opened at stage REVIEW_IN_PROCESS (FR-OP-033). Each invoice in a batch is locked by REMITTANCE. The extract file is stored in the extract repository, named by REMIT_FILE_PATTERN."
+  - "Extracted invoices are grouped into batches RMB-<insurer>-yyyy-n per insurer and remittance type (WITH_INCENTIVES, NORMAL_PHP, NORMAL_USD, SPECIAL), assigned to a processor and opened at stage REVIEW_IN_PROCESS (FR-OP-033). Each invoice in a batch is locked by REMITTANCE. The extract file is stored in the list of extracts, named by REMIT_FILE_PATTERN."
   - A processor searching an invoice during the day can queue it for the end-of-day run (RMTID.005); the evening run extracts the queued invoices once.
 preconditions:
   - The user has REMIT_EXTRACT for a manual run.
@@ -2326,7 +2326,7 @@ actor: Recon Handler
 priority: Must have
 screens: Production Extracts (New Extract); Reconciliation Cycle (Registers Sent); Report PRC-EXTRACT-LOG
 description:
-  - The handler extracts the register of an insurer for a booking period (PRX-yyyy-n). Each line records the ledger facts of the booked account, the last payment and the estimated flag; an account not on an earlier register of the cycle counts as new. The extract shows its file name, location in the extract repository (folder PRODRECON/<insurer>), date and time, creator and row count.
+  - The handler extracts the register of an insurer for a booking period (PRX-yyyy-n). Each line records the ledger facts of the booked account, the last payment and the estimated flag; an account not on an earlier register of the cycle counts as new. The extract shows its file name, location in the list of extracts (folder PRODRECON/<insurer>), date and time, creator and row count.
   - Extracts and uploaded insurer lines are viewed per cycle, filtered by production month and insurer. PRC-EXTRACT-LOG reports the item count and extraction time of each extract.
 preconditions:
   - The user has RECON_PROCESS.
@@ -2366,7 +2366,7 @@ preconditions:
   - An extract exists.
 main_flow:
   - BIBS creates the workbook from the extract lines.
-  - BIBS names it and stores it in the extract repository.
+  - BIBS names it and stores it in the list of extracts.
 rules:
   - [R1, "File name pattern, default <INSURER>_PRODREG_<yyyyMM>_<seq>.", Configurable, Parameter PRODRECON_FILE_PATTERN]
   - [R2, "Template per insurer when needed (OQ29).", Configurable, Document templates]
@@ -2502,7 +2502,7 @@ brd: [PRCID.019 (p.83), PRCID.023 (p.84), PRCID.033 (p.86)]
 actor: System; Recon Handler
 priority: Must have
 screens: Unbooked Accounts; Report PRC-UNBOOKED
-description: For each insurer-only line BIBS searches New Business for a pre-booked account (ARN) with the same reference. The line becomes UNMATCHED_PREBOOKED when one is found and UNMATCHED_NO_BOOKING otherwise. The Unbooked Accounts repository lists the unmatched and duplicate lines with their unbooked status (OPEN, PREBOOKED, BOOKED, CLOSED), feedback and disposition, and is searchable and filterable. PRC-UNBOOKED lists the unbooked accounts and their status.
+description: For each insurer-only line BIBS searches New Business for a pre-booked account (ARN) with the same reference. The line becomes UNMATCHED_PREBOOKED when one is found and UNMATCHED_NO_BOOKING otherwise. The Unbooked Accounts list shows the unmatched and duplicate lines with their unbooked status (OPEN, PREBOOKED, BOOKED, CLOSED), feedback and disposition, and is searchable and filterable. PRC-UNBOOKED lists the unbooked accounts and their status.
 preconditions:
   - "None."
 main_flow:
@@ -3191,7 +3191,7 @@ actor: Disbursement (DISB_PROCESS)
 priority: Must have
 screens: Disbursement Queue
 description:
-  - "Payment requests DSQ-yyyy-n of type REMITTANCE (remittance batches), REFUND (unapplied refunds), CWT2307 (2307 batches) and PASS_ON (incentive pass-on) arrive with their payee, amount, source and documents. Disbursement acknowledges a request, enters the DV number, marks it paid, or returns it with a reason. Each status (SENT, ACKNOWLEDGED, DV_ASSIGNED, PAID, RETURNED, CANCELLED) is sent back to the source module (event DisbursementStatusChanged): Remittance updates the invoices (FR-OP-036), Cashiering completes the refund or releases the 2307 batch."
+  - "Payment requests DSQ-yyyy-n of type REMITTANCE (remittance batches), REFUND (unapplied refunds), CWT2307 (2307 batches) and PASS_ON (incentive pass-on) arrive with their payee, amount, source and documents. Disbursement acknowledges a request, enters the DV number, marks it paid, or returns it with a reason. Each status (SENT, ACKNOWLEDGED, DV_ASSIGNED, PAID, RETURNED, CANCELLED) is sent back to the source module (Disbursement status event): Remittance updates the invoices (FR-OP-036), Cashiering completes the refund or releases the 2307 batch."
 preconditions:
   - The user has DISB_PROCESS.
 main_flow:
@@ -3258,11 +3258,11 @@ priority: Must have
 screens: Interfaces; Hand-offs and Extracts
 description:
   - "Operations exchanges data with the systems it depends on: the Collection feeds (check pick-up, 2307 tags, commission payments, holds, special remittances, DP lists, returned DP accounts, refunds), the Disbursement requests and statuses, the insurer files, the shared drive, and the Marketing and Claims feeds. Until each system is specified, the exchange is a manual upload, the in-app Disbursement queue or the list of extracts. Section 7 lists each interface and its scope."
-  - Work that a default adapter cannot complete alone (an OR or an unapplied item requested while Cashiering is not installed, a quotation for a TSI increase) becomes an open hand-off for the responsible team on Hand-offs and Extracts; the team closes it with what was done.
+  - Work that an upload or the queue cannot complete alone (an OR or an unapplied item requested while Cashiering is not in use, a quotation for a TSI increase) becomes an open hand-off for the responsible team on Hand-offs and Extracts; the team closes it with what was done.
 preconditions:
   - "None."
 main_flow:
-  - A module calls a port.
+  - A module sends or receives an exchange.
   - BIBS sends or receives the data (upload, queue, list of extracts).
   - Failures are recorded and alerted (FR-OP-131).
 rules:
@@ -3279,7 +3279,7 @@ acceptance:
 ```
 
 > [!NOTE] Superseded by BRD-4 and BRD-5
-> BRQID.004 names Collection, Accounting, Disbursement, Marketing and Claims. BRD-4 makes Collections a BIBS module that implements CollectionFeed in-app; BRD-5 keeps the GL in BIBS and implements DisbursementGateway; Claims (BRD-7) implements ClaimsFeed. Marketing remains parked (OQ45).
+> BRQID.004 names Collection, Accounting, Disbursement, Marketing and Claims. BRD-4 makes Collections a BIBS module that provides the Collection data in the system; BRD-5 keeps the GL in BIBS and provides the Disbursement requests and statuses; Claims (BRD-7) provides the claims data. The Marketing feed is on hold (OQ45).
 
 ```fr
 id: FR-OP-131
@@ -3568,7 +3568,7 @@ All Operations reports are in the report category Operations, need OPS_REPORT_VI
 
 # Interfaces and integration
 
-Figure 12 shows the interfaces of Operations. The modules exchange data only through the invoice ledger, its events and its ports; each external system is behind a port whose default adapter is an upload, the in-app Disbursement queue or the extract repository.
+Figure 12 shows the interfaces of Operations. The modules exchange data only through the invoice ledger and its events; until an external system is specified, the exchange with it is an upload, the in-app Disbursement queue or the list of extracts.
 
 ![Interfaces of Operations (dashed = on hold or replaced by a later BRD)](figures/brd02_integration.dot)
 
@@ -3599,7 +3599,7 @@ Figure 12 shows the interfaces of Operations. The modules exchange data only thr
 SUPERSEDED means an upload or queue in Operations that BRD-4 Collections or BRD-5 Accounting and Disbursement replaces. ON HOLD means the transfer waits for BDOI's specification (OQ17, OQ45, OQ46).
 
 > [!PARKED] Parked transports
-> Insurer SFTP / portal channels, BDO bank file transports (FS01 / FS04) and the shared drive are not specified in the BRD (OQ03, OQ17, OQ22, OQ29). Adding a transport is a new adapter of the existing port, with no change to the modules.
+> Insurer SFTP / portal channels, BDO bank file transports (FS01 / FS04) and the shared drive are not specified in the BRD (OQ03, OQ17, OQ22, OQ29). Adding a transfer later changes none of the Operations screens.
 
 # Non-functional requirements
 

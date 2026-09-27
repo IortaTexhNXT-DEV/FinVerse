@@ -68,6 +68,9 @@ places:
 # The fix the user makes. Messages that tell the user what to do ("Enter ...", "Select ...") are their own fix and are
 # not repeated here. Keys are message codes; frontend messages without a code use their text.
 fixes:
+  QUOTATION_RENEWAL_EXISTS: Open the quotation already made for the renewal instead of creating another one.
+  PROPOSAL_RENEWAL_EXISTS: Open the proposal request already made for the renewal instead of creating another one.
+  ACCOUNT_NOT_RENEWAL: Use the renewal fast track only on an account created from a renewal; process this account through the normal steps.
   "The draft is not saved yet: click Save Draft to check it before submission.": Click Save Draft; the completeness check then runs.
   "The draft was not saved: correct what the message above describes, then save the draft again.": Correct the fields named in the message above and click Save Draft again.
   "The draft was not saved: its risks are already on the account shown above. Change the risk items, or open the existing account instead.": Open the existing account shown, or change the risk items.

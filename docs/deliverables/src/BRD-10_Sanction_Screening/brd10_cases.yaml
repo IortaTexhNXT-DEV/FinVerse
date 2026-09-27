@@ -14,7 +14,7 @@ meta:
   summary: TP_BRD10_SANCTION_SCREENING.md
   version: "1.0"
   date: 25 September 2026
-  built: false
+  verify_messages: false
 
 personas:
   COMPLIANCE_OFFICER: {name: Compliance Officer (maker), short: Comp. Off.}
@@ -2277,35 +2277,3 @@ access:
     allow: [COMPLIANCE_OFFICER, AUDITOR]
     deny: [UNIT_COMPLIANCE_COORD, OPS_LEAD, SYSADMIN]
     denied: SCR-AUDIT-LOG is not listed; the run call returns HTTP 403.
-
-findings:
-  - fr: FR-SS-001
-    issue: 'The FRS gives the no-access text as "You do not have access to this page". The platform screen shows "You do not have access to this screen. Contact your administrator if you need it." (frontend/src/auth/RequireAuth.tsx), as found for BRD-3.'
-    proposal: Quote the platform text in FRS v1.1; the cases check the no-access page without quoting it.
-  - fr: FR-SS-031
-    issue: 'Acceptance criterion 1 says "Juan Dela Cruz" matches "Juan de la Cruz" by the phonetic rule, but the normalisation of R4 (case, punctuation, word order) may already give an exact or fuzzy match first. The FRS does not say which algorithm is recorded when several meet their thresholds, or the expected score.'
-    proposal: State the order of the algorithms and which one is recorded; give the expected algorithm and a score range for the acceptance example.
-  - fr: FR-SS-034
-    issue: The FRS says only clients with an active policy need a KYC review or EDD and others get a MONITOR case, but it does not say whether a NAME_MATCH or ACCOUNT_APPLICATION case of a client without an active policy also becomes MONITOR.
-    proposal: State the case type per trigger for clients without an active policy; the cases assume only HIGH_RISK, PEP and EDD become MONITOR.
-  - fr: FR-SS-043
-    issue: The FR names the Investigator as an actor of re-assignment, but the role matrix does not grant SCR_CASE_ASSIGN to the Investigator (SQ13).
-    proposal: Align the actor line with the matrix after SQ13; the access checks deny re-assignment to the Investigator.
-  - fr: FR-SS-052
-    issue: 'The naming example "KYC_REVIEW_ABC Trading_20260512_<type>_1" keeps a space and would keep other characters of the client name that file systems or the AMLC may refuse. The document-type code in the name is not fixed.'
-    proposal: State how the client name is cleaned (spaces, punctuation, length) and which document-type value is used; the case checks the example as written.
-  - fr: FR-SS-064
-    issue: 'The FRS does not say whether MAJORITY means a majority of SCR_COMMITTEE_SIZE or of the members who hold AML_COMMITTEE, or what happens when fewer members than the size hold the role or a member is absent.'
-    proposal: Define the quorum and the behaviour with fewer members; the cases use five members.
-  - fr: FR-SS-070
-    issue: At least one reason code is mandatory on the STR, but the list SCR_STR_REASON is delivered empty until BDOI supplies the AMLC codes (SQ09). An STR cannot be completed in UAT as delivered.
-    proposal: Deliver placeholder reason codes for testing or make the field optional until SQ09; the cases use test codes UAT01 and UAT02 added by the test lead.
-  - fr: FR-SS-071
-    issue: 'Acceptance criterion 1 "the committee-approved STRs of that month" does not say whether the month is the committee decision date, the STR creation date or the date the STR was marked ready.'
-    proposal: Name the date the period filters on; the cases assume the committee decision date.
-  - fr: FR-SS-018
-    issue: The acceptance criterion quotes delivered values (CONCUR, NOT_CONCUR) that are placeholders until BDOI confirms the dispositions (SQ06); the test changes when the list changes.
-    proposal: Keep the criterion in terms of "the dispositions whose parent is the stage" and move the values to section 9.2.
-  - fr: FR-SS-091
-    issue: Acceptance criterion 2 (a database update of a timeline row is refused) needs database access that testers do not have, and the 5-year archive retention may be shorter than AMLA requires (SQ18).
-    proposal: Record the database check as evidence from the database administrator; confirm the retention period under SQ18.

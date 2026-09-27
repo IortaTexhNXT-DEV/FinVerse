@@ -13,7 +13,7 @@ meta:
   summary: TP_BRD09_CUSTOMER_SERVICING_FACILITY.md
   version: "1.0"
   date: 25 September 2026
-  built: false
+  verify_messages: false
 
 personas:
   CSF_AGENT: {name: BDO Insure Contact Center Agent, short: Agent}
@@ -1271,35 +1271,3 @@ access:
     allow: [SYSADMIN]
     deny: [CSF_AGENT, CSF_SUPERVISOR, CSF_MANAGEMENT]
     denied: Administration > Users is not in the menu; the call returns HTTP 403.
-
-findings:
-  - fr: FR-CSF-001
-    issue: The FRS messages "Invalid user ID or password" and "Your account is locked. Contact the System Administrator" differ from the platform log-in that BRD-9 reuses (fit FIT), which shows "Invalid user name or password" and "Account is locked. Contact your administrator." Acceptance criterion 3 repeats FR-CSF-002.
-    proposal: Quote the platform texts in FRS v1.1, as FRS BRD-11 FR-UA-001 does; the cases use the platform texts. Keep criterion 3 in FR-CSF-002 only.
-  - fr: FR-CSF-010
-    issue: 'The response target "within 3 seconds (p.13)" gives no load: number of clients and accounts, concurrent agents. The FRS does not say whether a name search matches the start of the name, any word, or ignores accents and case.'
-    proposal: 'State the measurement load (24 concurrent users, the year-5 volume of section 8) and the name-matching rule; the cases time searches in the peak window on SIT data.'
-  - fr: FR-CSF-012
-    issue: The mapping list CSF_STATUS_MAP has no rule for an account stage that no row matches, or for two rows that match the same account. A cancelled account with premium outstanding could match Booked and Closed.
-    proposal: State that the first row by order wins and that an unmatched stage shows a fixed value (for example "Other") with an alert to the list owner.
-  - fr: FR-CSF-020
-    issue: 'The checks are Yes / No, so a check the agent did not ask cannot be recorded; "Record the result of the verification checks" does not say whether all four or only one must be answered. Whether a verification is also needed before a resend is open (CSQ03), and it is not stated whether a PASSED verification belongs to the agent or to any agent of the client.'
-    proposal: Add a value "Not asked", state how many checks must be answered, and tie the verification to the agent and client. The cases assume all four are answered and the verification is per agent.
-  - fr: FR-CSF-021
-    issue: '"Add" contact details depends on CSQ15 and cannot be tested; "Philippine mobile format" is not defined (09xxxxxxxxx, +639xxxxxxxxx or both); the phone rule "digits and separators" has no length.'
-    proposal: Define the accepted mobile and phone formats with examples and remove "add" until CSQ15 is answered; the cases use 12345 as an invalid mobile only.
-  - fr: FR-CSF-022
-    issue: Acceptance covers only the disabled sync. The sending, the number and interval of retries and the FAILED state cannot be tested until the interface is specified (CSQ01).
-    proposal: Give the retry count and interval as parameters; TC-CSF-022.3-01 and 3-02 stay Blocked until a test stub of the interface exists.
-  - fr: FR-CSF-030
-    issue: The RA password convention (CSQ06) is open, so the cases can check only that the file needs a password and that the password arrives separately, not its value.
-    proposal: Add the password rule to FR-CSF-030 when CSQ06 is answered; the cases are then extended with the expected password.
-  - fr: FR-CSF-032
-    issue: 'The maximum file size (CSQ08) is not given, so the "too large" boundary cannot be set; the 5-second upload target has no file size.'
-    proposal: State the size limit and the file size for the 5-second target; until then the test uses the platform limit and a 2 MB file.
-  - fr: FR-CSF-033
-    issue: The permissions matrix gives CSF_MANAGEMENT the Servicing View (CSF_VIEW) but not ATTACHMENT_VIEW. The FRS does not say whether management sees the Documents, Renewal Advice and E-policies tabs as a list without download, or not at all.
-    proposal: State the behaviour for management in section 3.3; the access checks assume the lists are shown and opening a document is refused.
-  - fr: FR-CSF-043
-    issue: The requirement is an infrastructure control and has no screen; the BRD's 4-hour RPO and backup (retention table) conflict with the 15-minute backup (CSQ11).
-    proposal: Keep FR-CSF-043 for the infrastructure team's evidence (restore test log) and record the CSQ11 answer; the cases are run by the infrastructure team and witnessed by QA.

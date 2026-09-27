@@ -15,7 +15,7 @@ meta:
   summary: TP_BRD13_DATA_MIGRATION.md
   version: "1.2"
   date: 26 September 2026
-  built: false
+  verify_messages: false
 
 personas:
   DML: {name: Data Migration Lead, short: DM Lead}
@@ -2097,11 +2097,3 @@ access:
     allow: [RNW_CHECKER]
     deny: [RNW_MAKER, OPERATOR]
     denied: Approve is not shown; the call returns HTTP 403.
-
-findings:
-  - fr: FR-DM-034
-    issue: The Exception-bucket route and its message belong to the Renewal sanitation check PACKAGE_REMAP, which the Renewal FRS does not yet describe; case TC-DM-034.3 checks the bucket only.
-    proposal: Describe PACKAGE_REMAP (reads the PACKAGE map loaded by R06; unmapped, REJECT or unmatched qualifier to the Exception bucket, worked by the Renewal processing team) with its message in the Renewal FRS, and quote it here in the next issue.
-  - fr: FR-DM-124
-    issue: The URGENT flag, the priority order and the RA already sent are Renewal candidate attributes; the Renewal FRS does not yet list them, so the cases check them on the worklist only.
-    proposal: Add the go-live extraction (window to 31 May 2028, URGENT to 31 January 2028, RA already sent from P03) to the Renewal FRS.

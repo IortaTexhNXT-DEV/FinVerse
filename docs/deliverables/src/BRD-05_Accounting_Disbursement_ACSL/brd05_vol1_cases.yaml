@@ -12,7 +12,7 @@ meta:
   summary: TP_BRD05_ACCOUNTING_VOL1.md
   version: "1.0"
   date: 25 September 2026
-  built: true
+  verify_messages: true
 
 personas:
   FRBS_PROCESSOR: {name: GL Officer (FRBS Processor), user: glofficer, short: GL Officer}
@@ -158,7 +158,6 @@ frs:
           - Open the side menu, group Finance.
           - Repeat on a BDO mobile device (responsive layout).
         expected: The menu shows General Ledger (Journals, New Journal), Accounting Reports (Report Pack, Service Fee Runs) and Tax & Statutory; the screens are usable on both devices.
-        auto: ApiSmokeIT#loginReturnsTokenAndWrongPasswordIsRejected
       - c: 1
         type: Security-access
         title: GL Officer does not see Chart Upload or GL Close & Cut-Off
@@ -166,7 +165,6 @@ frs:
           - As glofficer, open General Ledger and Planning & Closing in the menu.
           - Type the address /planning/gl-close.
         expected: Chart Upload and GL Close & Cut-Off are not in the menu; the direct link shows "You do not have access to this screen. Contact your administrator if you need it."
-        auto: GlPlatformApiIT#permissionsAreEnforced
       - c: 2
         type: Negative
         title: Wrong password is refused
@@ -174,7 +172,6 @@ frs:
           - Enter user ID glofficer and a wrong password.
         expected: The log-in page stays open; no session starts.
         msg: [Invalid user name or password, AUTHENTICATION_FAILED]
-        auto: ApiSmokeIT#loginReturnsTokenAndWrongPasswordIsRejected
       - c: 2
         type: Boundary
         neg: true
@@ -183,7 +180,6 @@ frs:
           - Enter a wrong password three times for gltl; then the right one.
         expected: The account is locked until the System Administrator unlocks it.
         msg: [Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
-        auto: LoginLockoutTest#theAccountLocksAtTheConfiguredThreshold
 
   FR-AC-002:
     scenario: SC-AC-01
@@ -201,14 +197,12 @@ frs:
           - Click Stay Signed In.
         expected: The dialog "Your session is about to expire" counts down the seconds; after Stay Signed In the session goes on.
         msg: [Your session is about to expire, "-"]
-        auto: idleTimer.test.ts#moves from active to warning to expired
       - c: 1
         type: Negative
         title: No answer to the inactivity warning signs the user out
         steps:
           - Let the countdown of the warning run out.
         expected: The user is signed out and the Login page opens; unsaved data is not kept.
-        auto: idleTimer.test.ts#warns, then expires and stops ticking
       - c: 2
         type: Positive
         title: Log-out warning 30 minutes before the end of the session
@@ -217,7 +211,6 @@ frs:
           - Keep working until 30 minutes before the session end.
         expected: The dialog "Your session will end soon" gives the minutes left and the end time; I Understand closes it.
         msg: [Your session will end soon, "-"]
-        auto: sessionExpiry.test.ts#warns the configured minutes before the end and expires at the end
       - c: 2
         type: Positive
         persona: SYSADMIN
@@ -226,7 +219,6 @@ frs:
         steps:
           - Log in as admin and open System Parameters, area SECURITY.
         expected: SESSION_IDLE_WARNING_MINUTES shows 15 and SESSION_EXPIRY_WARNING_MINUTES 30.
-        auto: SystemAdminIT#everyUserGetsAboutAndSessionPolicyButNotAdministration
 
   FR-AC-010:
     scenario: SC-AC-02
@@ -246,14 +238,12 @@ frs:
           - Log in as glhead, open Currencies & Rates, card Monthly revaluation rates.
           - Enter USD 58.1234 for August; save.
         expected: The rate is the CLOSING rate of 31 August.
-        auto: GlPlatformApiIT#revaluationRateIsTheMonthEndClosingRateAndBecomesTheNextBookRate
       - c: 2
         type: Positive
         title: Copy to BOOK makes it the September BOOK rate
         steps:
           - Click Copy to BOOK for August.
         expected: USD 58.1234 is the BOOK rate from 1 September; a BOOK rate already entered for September is kept.
-        auto: GlPlatformApiIT#revaluationRateIsTheMonthEndClosingRateAndBecomesTheNextBookRate
       - c: 3
         type: Negative
         title: Rate zero
@@ -276,7 +266,6 @@ frs:
         steps:
           - Log in as glofficer and open Currencies & Rates.
         expected: The revaluation card has no entry action; POST /api/v1/currencies/revaluation-rates returns HTTP 403.
-        auto: GlPlatformApiIT#permissionsAreEnforced
 
   FR-AC-011:
     scenario: SC-AC-02
@@ -297,7 +286,6 @@ frs:
           - As glofficer, try to use it on a new journal line.
           - As glhead, authorise it in My Approvals; use it again.
         expected: The account is PENDING_AUTHORIZATION and refused on the journal until glhead authorises it; then it is accepted.
-        auto: ChartOfAccountsApiIT#accountLifecycleWithMakerCheckerFreezeAndClose
       - c: 1
         type: Positive
         persona: FRBS_PROCESSOR
@@ -312,7 +300,6 @@ frs:
           - Add an account under 1210 with class LIABILITY.
         expected: The account is refused.
         msg: ["Child account class must match parent {1210}", CLASS_MISMATCH]
-        auto: ChartOfAccountsApiIT#hierarchyRulesAreEnforced
       - c: 2
         type: Negative
         title: Sub account without a parent
@@ -320,7 +307,6 @@ frs:
           - Add a SUB account without parent.
         expected: The account is refused.
         msg: [Sub and Micro GL accounts require a parent account, PARENT_REQUIRED]
-        auto: ChartOfAccountsApiIT#hierarchyRulesAreEnforced
       - c: 2
         type: Negative
         title: Level not allowed under the parent
@@ -335,7 +321,6 @@ frs:
           - Add a child account under a postable account that has postings.
         expected: The account is refused.
         msg: ["Account {code} already has postings and cannot become a heading", PARENT_HAS_POSTINGS]
-        auto: ChartOfAccountsApiIT#accountWithPostingsCannotBecomeHeading
       - c: 4
         type: Security-access
         title: Maker authorises the own account
@@ -343,7 +328,6 @@ frs:
           - As gltl, open the account created above in My Approvals and authorise it.
         expected: The authorisation is refused.
         msg: [A record cannot be authorized by the user who maintained it, MAKER_CHECKER_VIOLATION]
-        auto: ChartOfAccountsApiIT#makerCannotAuthorizeOwnAccount
 
   FR-AC-012:
     scenario: SC-AC-02
@@ -361,7 +345,6 @@ frs:
         steps:
           - Download the template; upload coa_upload_sample.xlsx; commit.
         expected: 8 valid rows, 0 invalid; after commit the 8 accounts are PENDING_AUTHORIZATION; 1913.01 has short code PRUSDBP.
-        auto: GlPlatformApiIT#chartUploadSeedFileLoadsPendingAuthorization
       - c: 2
         type: Negative
         title: Row whose parent is missing
@@ -403,7 +386,6 @@ frs:
           - Upload a .pdf file.
         expected: The upload is refused.
         msg: [Upload a .csv or .xlsx file, "-"]
-        auto: SpreadsheetRowsTest#rejectsUnsupportedUnreadableAndOversizedFiles
 
   FR-AC-013:
     scenario: SC-AC-02
@@ -421,7 +403,6 @@ frs:
           - Set the scheme of 1900 to separator "." and width 2; save.
           - Create two child accounts under 1900 with a blank code.
         expected: The children become 1900.01 and 1900.02.
-        auto: GlPlatformApiIT#numberingProposesTheNextChildCode; CoaNumberingTest#codesArePaddedAndParsedBack
       - c: 2
         type: Report-output
         persona: FRBS_PROCESSOR
@@ -430,7 +411,6 @@ frs:
         steps:
           - Post a journal to 1900.01; run the trial balance.
         expected: The balance of 1900.01 is included in 1900.
-        auto: FinanceReportsIT#mainTrialBalanceBalancesAndRollsUpSubAccounts; AccountHierarchyTest#subAndMicroAccountsRollUpToTheirMainAccount
       - c: 3
         type: Negative
         title: Width 7
@@ -471,7 +451,6 @@ frs:
         steps:
           - Search the chart for "prusdbp".
         expected: 1913.01 is found (search is case-insensitive).
-        auto: GlPlatformApiIT#chartUploadSeedFileLoadsPendingAuthorization
       - c: 1
         type: Positive
         screen: NEWJ
@@ -479,7 +458,6 @@ frs:
         steps:
           - On New Journal, type the short code of an account in the account field.
         expected: The account code and name fill in.
-        auto: JournalFrbsControlsIT#negativeBalanceControlBlocksOrWarnsAndShortCodesResolve
       - c: 2
         type: Negative
         persona: FRBS_TL
@@ -514,7 +492,6 @@ frs:
           - Open the Report Centre, category General Ledger, report Trial Balance; enter company FVI and August; run.
           - Export to XLSX and to ODS.
         expected: The result is shown on screen; both files hold the same rows; the run is in the report archive with the parameters, user and time.
-        auto: FinanceReportsIT#everyFinanceReportRunsAndExportsInAllFormats; ReportArchiveIT#viewOnlyUsersRunButCannotExportAndExportsAreArchivedWithTheirFile
       - c: 2
         type: Positive
         screen: REPORT
@@ -530,7 +507,6 @@ frs:
           - Run the trial balance with the period blank.
         expected: The report does not run.
         msg: ["Parameter {period} is required", MISSING_PARAMETER]
-        auto: ReportParametersTest#requiredParameterSentBlankIsRejectedInsteadOfDefaulted
       - c: 4
         type: Security-access
         persona: DISBURSEMENT
@@ -538,7 +514,6 @@ frs:
         steps:
           - Log in as disb and open the Report Centre.
         expected: The General Ledger reports are not listed; running one through the API returns HTTP 403.
-        auto: ReportArchiveIT#usersWithoutTheReportSeeNoRuns
 
   FR-AC-021:
     scenario: SC-AC-03
@@ -555,14 +530,12 @@ frs:
           - Run the trial balance; type 1210 in the filter of the Account column.
           - Export to XLSX.
         expected: Only the 1210 accounts are shown with their totals; the file holds the same rows and notes the filter.
-        auto: GlPlatformApiIT#exportAppliesPrintOptionsAndColumnFilters; reportOptions.test.ts#keeps the matching detail rows only
       - c: 2
         type: Negative
         title: Filter that matches nothing
         steps:
           - Type ZZZZ in the Account filter.
         expected: No detail row is shown and the totals are zero; clearing the filter restores all rows.
-        auto: reportOptions.test.ts#keeps every row without a filter
 
   FR-AC-022:
     scenario: SC-AC-03
@@ -579,7 +552,6 @@ frs:
         steps:
           - Open Report Batch; select Trial Balance, Income Statement and Statement of Condition; August; format XLSX; run.
         expected: One ZIP with three files; status COMPLETED.
-        auto: GlPlatformApiIT#reportBatchZipsTheReportsAndRecordsFailures
       - c: 1
         type: Report-output
         title: Merged PDF for printing
@@ -592,7 +564,6 @@ frs:
         steps:
           - Add a report of another permission (for example a Disbursement report) to the batch; run.
         expected: Status PARTIAL; the refused report is listed with its reason and the others are delivered.
-        auto: GlPlatformApiIT#reportBatchZipsTheReportsAndRecordsFailures
       - c: 3
         type: Negative
         title: Batch without a report
@@ -624,7 +595,6 @@ frs:
         steps:
           - Run the General Ledger report of August; Export, PDF, paper A4, landscape, fit to width on.
         expected: All columns fit the page width; the header and footer are on every page.
-        auto: GlPlatformApiIT#exportAppliesPrintOptionsAndColumnFilters
       - c: 1
         type: Report-output
         title: Legal portrait without fit
@@ -658,7 +628,6 @@ frs:
           - Approve a remittance batch (remittl).
           - Open Account Inquiry of 2211 and the party statement of the insurer.
         expected: The batch journal is posted; the open items of the insurer are cleared by the amount remitted.
-        auto: RemittanceIT#anApprovedBatchIsPostedRemittedAndPushedToDisbursement
       - c: 2
         type: Negative
         title: Event without a rule is FAILED and re-processed
@@ -675,7 +644,6 @@ frs:
           - Trigger an event whose rule needs an account role the event does not carry (case prepared by the test lead).
         expected: The event is FAILED and logged.
         msg: ["Event {type} must supply an account for role {role}", MISSING_ACCOUNT_ROLE]
-        auto: AccountingEngineIT#missingAccountRoleFailsAndIsLogged
       - c: 2
         type: Negative
         title: Event without amounts
@@ -691,7 +659,6 @@ frs:
         steps:
           - Open the posted journal of the remittance batch.
         expected: There is no Edit action; the correction is a reversal or an ACSL correction.
-        auto: JournalLifecycleIT#reversalRestoresBalancesAndMarksOriginal
 
   FR-AC-031:
     scenario: SC-AC-04
@@ -709,7 +676,6 @@ frs:
           - As glhead, select a journal submitted by glofficer and click Assign, poster gltl.
           - As gltl, filter Journals on Assigned to me and open the journal.
         expected: The journal is listed; its lines, dimensions, attachments and history are shown.
-        auto: JournalFrbsControlsIT#journalsAreAssignedAndPostedInBulk
       - c: 1
         type: Positive
         persona: FRBS_HEAD
@@ -725,7 +691,6 @@ frs:
           - Assign a journal submitted by gltl to gltl.
         expected: The assignment is refused.
         msg: ["{JV-2026-00012} cannot be assigned to the user who submitted it", ASSIGNEE_IS_MAKER]
-        auto: JournalFrbsControlsIT#journalsAreAssignedAndPostedInBulk
       - c: 2
         type: Negative
         title: Assignee who cannot authorise
@@ -752,7 +717,6 @@ frs:
           - New Journal, type ACCRUAL, value date the month end, reverse on the first of next month, two lines of 5,000.00, one by short code; save.
           - Submit and confirm.
         expected: The account name fills in; the journal saves as DRAFT, then is PENDING_APPROVAL.
-        auto: JournalApiIT#rejectCorrectResubmitApproveCopyAndReverse; journalForm.test.ts#leaves out only blank placeholder rows, never lines the user filled in
       - c: 1
         type: Upload-download
         screen: JOURNALS
@@ -760,7 +724,6 @@ frs:
         steps:
           - Use Journal Upload with the template; one valid voucher and one invalid.
         expected: The valid voucher becomes a draft journal; the invalid one is reported with its reason.
-        auto: JournalUploadIT#invalidVouchersAreReportedAndSkippedWhileValidOnesAreCreated
       - c: 2
         type: Negative
         screen: API
@@ -769,7 +732,6 @@ frs:
           - POST /api/v1/journals with journal type SYSTEM.
         expected: The journal is refused.
         msg: ["Only MANUAL, ADJUSTMENT or ACCRUAL journals can be entered manually", INVALID_JOURNAL_TYPE]
-        auto: JournalApiIT#invalidDimensionAndSystemJournalTypeAreRejected
       - c: 3
         type: Security-access
         persona: FRBS_TL
@@ -804,14 +766,12 @@ frs:
           - Post the accrual of TD-AC-05 dated 31 August with reverse-on 1 September.
           - Run JOURNAL_AUTO_REVERSAL on 1 September (Scheduled Jobs, Run now).
         expected: A REVERSAL system journal dated 1 September mirrors the accrual and is linked to it; the accrual is REVERSED.
-        auto: JournalFrbsControlsIT#accrualIsReversedAutomaticallyOnItsReversalDate
       - c: 2
         type: Negative
         title: Job run twice
         steps:
           - Run the job again the same day.
         expected: No second reversal is posted.
-        auto: JournalFrbsControlsIT#accrualIsReversedAutomaticallyOnItsReversalDate
       - c: 2
         type: Negative
         persona: FRBS_HEAD
@@ -839,14 +799,12 @@ frs:
           - Enter the unbalanced journal of TD-AC-05 and submit.
         expected: The submission is refused.
         msg: ["Journal is not balanced: debit {1000.00} vs credit {900.00}", UNBALANCED_JOURNAL]
-        auto: JournalLifecycleIT#unbalancedJournalCannotBeSubmitted; journalMath.test.ts#reports the difference of an unbalanced journal
       - c: 1
         type: Positive
         title: Balanced journal accepted
         steps:
           - Enter the balanced MANUAL journal of TD-AC-05 and submit.
         expected: The journal is PENDING_APPROVAL.
-        auto: journalMath.test.ts#detects a balanced journal
       - c: 2
         type: Negative
         title: Line on a heading and a frozen account
@@ -854,7 +812,6 @@ frs:
           - Enter a journal with one line on a heading account and one on a frozen account; submit.
         expected: The journal is refused and both errors are listed together.
         msg: ["{list of errors}", JOURNAL_INVALID]
-        auto: JournalLifecycleIT#accountControlsAreEnforced
       - c: 2
         type: Boundary
         neg: true
@@ -871,14 +828,12 @@ frs:
           - Credit a BLOCK cash account beyond its balance; submit.
         expected: The journal is refused.
         msg: ["Account {code} would have a negative ({DEBIT}) balance of {amount}", JOURNAL_INVALID]
-        auto: JournalFrbsControlsIT#negativeBalanceControlBlocksOrWarnsAndShortCodesResolve
       - c: 3
         type: Positive
         title: WARN account shows a warning and is confirmed
         steps:
           - Credit 1913.01 (WARN) beyond its balance; submit.
         expected: The confirmation dialog shows the warning; after confirmation the journal is PENDING_APPROVAL.
-        auto: JournalFrbsControlsIT#negativeBalanceControlBlocksOrWarnsAndShortCodesResolve
 
   FR-AC-035:
     scenario: SC-AC-04
@@ -926,7 +881,6 @@ frs:
         steps:
           - Select the ten journals and click Post.
         expected: Nine are POSTED; the result lists the refused one with its reason.
-        auto: JournalFrbsControlsIT#journalsAreAssignedAndPostedInBulk
       - c: 2
         type: Workflow
         title: Return to Maker with remarks
@@ -934,7 +888,6 @@ frs:
           - Open a submitted journal, enter remarks and click Return to Maker.
           - As glofficer, edit it and submit it again.
         expected: The journal is REJECTED with the remarks, editable by glofficer, then PENDING_APPROVAL again.
-        auto: JournalApiIT#rejectCorrectResubmitApproveCopyAndReverse
       - c: 2
         type: Negative
         title: Return without remarks
@@ -949,7 +902,6 @@ frs:
           - As gltl, submit a journal and try to post it.
         expected: The posting is refused.
         msg: [A journal cannot be authorized by the user who submitted it, MAKER_CHECKER_VIOLATION]
-        auto: JournalLifecycleIT#makerCheckerPostsBalancedJournalToLedger; ApprovalInboxIT#submittedJournalReachesCheckersButNotItsMaker
       - c: 3
         type: Boundary
         neg: true
@@ -959,7 +911,6 @@ frs:
           - Post a journal of 100,000.01.
         expected: The posting is refused; 100,000.00 is accepted.
         msg: ["Journal total {100000.01} exceeds your authorization limit {100000.00}", AUTHORIZATION_LIMIT_EXCEEDED]
-        auto: ApprovalInboxIT#journalsAboveTheCheckersLimitAreNotOffered
       - c: 3
         type: Negative
         screen: API
@@ -983,7 +934,6 @@ frs:
         steps:
           - Open the returned journal, change a line amount on both sides, submit.
         expected: The journal is PENDING_APPROVAL with the new amounts.
-        auto: JournalApiIT#rejectCorrectResubmitApproveCopyAndReverse
       - c: 2
         type: Negative
         screen: JOURNAL
@@ -1000,7 +950,6 @@ frs:
         steps:
           - As glhead, click Reverse on a posted journal and give the reason.
         expected: A linked reversal journal is posted and the original is REVERSED.
-        auto: JournalLifecycleIT#reversalRestoresBalancesAndMarksOriginal
 
   FR-AC-040:
     scenario: SC-AC-05
@@ -1019,7 +968,6 @@ frs:
           - Open Month-End Close; accept the proposed date (2nd banking day, 17:00); schedule.
           - At the time (or Run now of GL_PERIOD_CLOSE), open the schedule.
         expected: The schedule is COMPLETED and the period CLOSED.
-        auto: CloseControlsIT#scheduledCloseOfThePreviousMonthRunsThroughTheJob
       - c: 2
         type: Negative
         title: On 1 October August is refused
@@ -1028,7 +976,6 @@ frs:
           - Schedule the close of August; then of September.
         expected: August is refused; September is accepted.
         msg: ["On {2026-10-01} only the period of {September 2026} may be closed, not {August 2026}", CLOSE_ONLY_PREVIOUS_MONTH]
-        auto: closeTimes.test.ts#accepts only the previous month (FRBS 2.6.1); CloseControlsIT#scheduledCloseOfThePreviousMonthRunsThroughTheJob
       - c: 3
         type: Negative
         screen: ALERTS
@@ -1037,7 +984,6 @@ frs:
           - Leave a journal PENDING_APPROVAL in the month; run the scheduled close.
         expected: The schedule is FAILED with the blocking items listed; GL_CLOSE_FAILED is raised.
         msg: ["{blocking items}", GL_CLOSE_CHECKLIST]
-        auto: CloseControlsIT#refusedCloseIsRecordedAndRaisesTheAlert
       - c: 4
         type: Workflow
         title: Withdraw a scheduled close
@@ -1067,7 +1013,6 @@ frs:
         steps:
           - As glofficer, type /planning/gl-close.
         expected: The screen is refused; POST .../close-schedules returns HTTP 403.
-        auto: GlPlatformApiIT#permissionsAreEnforced
 
   FR-AC-041:
     scenario: SC-AC-05
@@ -1084,7 +1029,6 @@ frs:
         steps:
           - With all 2025 periods closed, click Close Year for 2025; then Verify.
         expected: Income and expense accounts are zero; retained earnings holds the result; the verification shows nominal balance 0.00 and trial-balance difference 0.00.
-        auto: YearEndIT#closesProfitAndLossToRetainedEarningsAndOpensNextYear
       - c: 2
         type: Negative
         persona: SYSTEM
@@ -1094,7 +1038,6 @@ frs:
         steps:
           - Run the alert job.
         expected: YEAR_END_CLOSE_DUE is raised for 2025.
-        auto: CloseControlsIT#openPreviousYearRaisesTheYearEndDeadlineAlert
       - c: 3
         type: Negative
         title: Year with open periods
@@ -1136,7 +1079,6 @@ frs:
           - Approve a remittance batch dated 30 September.
         expected: The posting is refused and the batch stays for approval.
         msg: ["The {remittance} books of {September 2026} are closed", BOOKS_CLOSED]
-        auto: CloseControlsIT#closedBrokingBooksRefuseBrokingEventsOnly
       - c: 1
         type: Positive
         persona: FRBS_PROCESSOR
@@ -1145,7 +1087,6 @@ frs:
         steps:
           - Post an ADJUSTMENT journal dated 30 September.
         expected: The journal posts; the GL stays open until the GL close.
-        auto: CloseControlsIT#closedBrokingBooksRefuseBrokingEventsOnly
       - c: 2
         type: Workflow
         persona: FRBS_TL
@@ -1179,14 +1120,12 @@ frs:
           - Preview the revaluation of the month; run it.
           - Run the register report GL-FXREV.
         expected: An unrealised gain of 2,000.00 is posted and reversed on the first day of the next month; the register lists it.
-        auto: FxRevaluationIT#revaluesAtClosingRateOncePerPeriodAndAutoReverses; FxRevaluationIT#registerReportRunsAndExports
       - c: 1
         type: Negative
         title: Run twice for the same period
         steps:
           - Run the revaluation of the same month again.
         expected: No second revaluation is posted.
-        auto: FxRevaluationIT#revaluesAtClosingRateOncePerPeriodAndAutoReverses
       - c: 2
         type: Negative
         title: No CLOSING rate
@@ -1221,7 +1160,6 @@ frs:
         steps:
           - Open Bank Statements, choose the bank account and upload the CSV of TD-AC-07.
         expected: The statement is imported with its lines and the matching runs.
-        auto: StatementFileImportIT#layoutMapsTheFileAndChequeNumberMatchesOutsideTheDateWindow
       - c: 2
         type: Positive
         screen: BANKREC
@@ -1230,7 +1168,6 @@ frs:
           - Open Bank Reconciliation of the statement.
           - Finalise the reconciliation.
         expected: The bank line of check 000123 for 15,000.00 is matched to the book payment of check 000123 though the dates differ; after finalising, the statement shows no unexplained difference.
-        auto: StatementFileImportIT#layoutMapsTheFileAndChequeNumberMatchesOutsideTheDateWindow; BankReconciliationIT#statementIsMatchedReconciledAndFinalized
       - c: 3
         type: Negative
         persona: FRBS_TL
@@ -1256,7 +1193,6 @@ frs:
           - Upload a file whose row 3 has the date 31/02/2026.
         expected: The file is refused and names the row.
         msg: ["Row {3}: invalid date '{31/02/2026}'", INVALID_STATEMENT]
-        auto: BankReconciliationIT#invalidStatementsAreRejected
       - c: 4
         type: Negative
         screen: BANKREC
@@ -1281,7 +1217,6 @@ frs:
         steps:
           - Run FIN-BRS-UNREC-BOOK and FIN-BRS-STMT for the statement date; export to Excel and PDF.
         expected: The deposit in transit is on the unmatched book report and among the reconciling items of the statement.
-        auto: ReceivablesReportsIT#chequeAndBankReportsRunAndExport
       - c: 2
         type: Negative
         title: Matched check not listed
@@ -1307,7 +1242,6 @@ frs:
         steps:
           - Compute a run for the period; open the run.
         expected: The CBG line carries a fee of 245.00 (9,800.00 x 2.5 %).
-        auto: ServiceFeeCalculatorTest#feesAreTheRateOfTheCommissionNetOfWithholdingTax
       - c: 2
         type: Workflow
         persona: FRBS_TL
@@ -1316,7 +1250,6 @@ frs:
         steps:
           - As glofficer submit the run; as gltl approve it.
         expected: The run is APPROVED; one accrual journal (Dr 5614 / Cr 2250) and one Disbursement request of type SERVICE_FEE per line exist.
-        auto: ServiceFeeIT#anApprovedRunIsAccruedPaidReleasedAndLiquidated
       - c: 2
         type: Security-access
         persona: FRBS_TL
@@ -1326,7 +1259,6 @@ frs:
           - As gltl, compute and submit a run; try to approve it.
         expected: The approval is refused.
         msg: [The run is approved by someone other than its preparer, SERVICE_FEE_FOUR_EYES]
-        auto: ServiceFeeIT#theApproverIsNotThePreparerAndAReturnedLineIsSentAgain
       - c: 3
         type: Workflow
         screen: SFRUN
@@ -1334,7 +1266,6 @@ frs:
         steps:
           - Recompute a COMPUTED run after a rule change; then cancel it with a reason.
         expected: The recomputed lines use the new rule; after cancelling, its invoices can be taken by a new run.
-        auto: ServiceFeeIT#aComputedRunIsRecomputedOrCancelledAndFreesItsInvoices
       - c: 3
         type: Workflow
         persona: FRBS_TL
@@ -1344,7 +1275,6 @@ frs:
           - Return a run in FOR_APPROVAL with a reason; resubmit and approve it.
           - Ask Disbursement to return one payout; click Send Again on the line.
         expected: The run is COMPUTED after the return; the returned line is sent again as a new request.
-        auto: ServiceFeeIT#theApproverIsNotThePreparerAndAReturnedLineIsSentAgain
       - c: 4
         type: Negative
         title: Period ending in the future
@@ -1352,7 +1282,6 @@ frs:
           - Compute a run with an end date tomorrow.
         expected: The run is refused.
         msg: [Give a period that ends on or before today and after it starts, SERVICE_FEE_PERIOD]
-        auto: frbs.test.ts#validates the period of a run
       - c: 4
         type: Negative
         title: Nothing to pay
@@ -1369,7 +1298,6 @@ frs:
           - Save a rule for segment CBG with rate 0.
         expected: The rule is refused.
         msg: [The rate is a percentage above 0, SERVICE_FEE_RATE]
-        auto: ServiceFeeIT#rulesAndRecipientsAreMaintained; frbs.test.ts#validates a rate
       - c: 4
         type: Negative
         persona: FRBS_TL
@@ -1406,14 +1334,12 @@ frs:
           - Ask Disbursement to pay a line of the seed run on 5 September.
           - Open the run.
         expected: The line is RELEASED on 5 September.
-        auto: ServiceFeeIT#anApprovedRunIsAccruedPaidReleasedAndLiquidated
       - c: 2
         type: Upload-download
         title: Liquidate with the report
         steps:
           - On a released line click Liquidate, attach the unit's liquidation report (PDF) and date; save.
         expected: The line is LIQUIDATED; when every line is liquidated the run is LIQUIDATED.
-        auto: FrbsApiIT#aLiquidationReportIsUploadedOverHttp; ServiceFeeCalculatorTest#aLineIsSentReleasedAndLiquidatedInOrder
       - c: 3
         type: Negative
         title: Liquidate without the report
@@ -1442,7 +1368,6 @@ frs:
           - Click Liquidate on a line that is still SENT.
         expected: The action is refused.
         msg: ["Line {n} is {SENT} and cannot be {liquidated}", SERVICE_FEE_LINE_STATUS]
-        auto: frbs.test.ts#offers the tags a line allows
 
   FR-AC-054:
     scenario: SC-AC-07
@@ -1462,7 +1387,6 @@ frs:
         steps:
           - Approve a service-fee run; open the accrual journal.
         expected: The 5614 line carries the cost centre of the matching rule.
-        auto: CostCenterRuleIT#missingCostCentreFailsTheEventUntilARuleProvidesIt
       - c: 2
         type: Negative
         persona: SYSTEM
@@ -1474,7 +1398,6 @@ frs:
           - Add the rule again and re-process the event.
         expected: The event is FAILED with COST_CENTER_MISSING and the alert is raised; after re-processing it posts.
         msg: ["{Event FRBS_SERVICE_FEE_ACCRUE, account 5614} needs a cost centre", COST_CENTER_MISSING]
-        auto: CostCenterRuleIT#missingCostCentreFailsTheEventUntilARuleProvidesIt
       - c: 3
         type: Negative
         title: Rule without cost centre
@@ -1482,7 +1405,6 @@ frs:
           - Save a rule with source module and event type but no cost centre.
         expected: The rule is refused.
         msg: [Enter the cost centre of the rule, COST_CENTER_REQUIRED]
-        auto: GlPlatformApiIT#costCentreRulesAndEmployeesAreMaintained
 
   FR-AC-055:
     scenario: SC-AC-07
@@ -1500,7 +1422,6 @@ frs:
           - Approve a remittance batch with an early incentive.
           - Open the journal of the batch.
         expected: The incentive is credited to 4130 (incentive income) with its VAT; commission income is not touched; the batch reference is on the entry.
-        auto: RemittanceOperationsIT#aWithIncentivesBatchDeductsTheEarlyRemittanceIncentive
       - c: 1
         type: Negative
         persona: FRBS_TL
@@ -1532,14 +1453,12 @@ frs:
         steps:
           - Open Report Pack.
         expected: I End of Day, II GARD, III Subsidiaries Accounting, IV Schedules and Aging, V Performance / Mancom, VI Service Fee and VII Government are listed with their reports.
-        auto: FrbsApiIT#everyReportOfThePackExportsToExcelAndPdf; frbs.test.ts#groups the pack, links and exports its entries
       - c: 1
         type: Report-output
         title: GARD Schedule of Operating Expenses
         steps:
           - Open the GARD Schedule of Operating Expenses for August; export to Excel and PDF.
         expected: Both files are produced with the rows shown.
-        auto: FrbsApiIT#everyReportOfThePackExportsToExcelAndPdf
       - c: 2
         type: Security-access
         persona: DISBURSEMENT
@@ -1547,7 +1466,6 @@ frs:
         steps:
           - Log in as disb; type /frbs.
         expected: The screen is refused.
-        auto: FrbsApiIT#permissionsAreEnforced
 
   FR-AC-061:
     scenario: SC-AC-08
@@ -1564,14 +1482,12 @@ frs:
         steps:
           - Run each of the 28 definitions for August and export one to Excel and PDF.
         expected: All run; the files hold the rows shown.
-        auto: AccountScheduleIT#everySeededScheduleRunsAndExportsToExcelAndPdf
       - c: 2
         type: Report-output
         title: Aged premium receivable
         steps:
           - Run SCH-PR with ageing for August.
         expected: Each party's balance is split into its buckets and the buckets add up to the balance.
-        auto: AccountScheduleIT#premiumReceivablesAreAgedPerPartyAndTheBucketsAddUpToTheBalance
       - c: 3
         type: Positive
         persona: FRBS_TL
@@ -1580,7 +1496,6 @@ frs:
           - Create a definition with a prefix selector, grouping by account, figures opening, movement and closing and a commentary column; save.
           - Enter the August comment on one row.
         expected: The schedule runs with the comment printed on its row.
-        auto: AccountScheduleIT#definitionsAndCommentaryAreMaintained
       - c: 3
         type: Negative
         persona: FRBS_TL
@@ -1589,7 +1504,6 @@ frs:
           - Save a definition with no prefix or report group.
         expected: The definition is refused.
         msg: [List at least one account prefix or report group, SCHEDULE_ACCOUNTS]
-        auto: ScheduleMathTest#definitionsAreValidatedAndNormalised; frbs.test.ts#validates a schedule definition
       - c: 3
         type: Negative
         persona: FRBS_TL
@@ -1622,7 +1536,6 @@ frs:
           - Enter a comment on a schedule that has no commentary column.
         expected: The comment is refused.
         msg: ["Schedule {GARD-OPEX} has no commentary column", SCHEDULE_NO_COMMENTARY]
-        auto: ScheduleMathTest#commentsNeedACommentaryScheduleAMonthAndARow
 
   FR-AC-062:
     scenario: SC-AC-08
@@ -1638,7 +1551,6 @@ frs:
         steps:
           - Run FRBS-MANCOM-MARKET for August.
         expected: Premium and commission per segment with month, year to date, previous year to date and growth.
-        auto: FrbsApiIT#everyReportOfThePackExportsToExcelAndPdf
       - c: 1
         type: Report-output
         title: Branch production, expenses and cash flow
@@ -1657,7 +1569,6 @@ frs:
         steps:
           - Run FRBS-GAP with a reversed date range.
         expected: The report does not run; the range is refused.
-        auto: ReportParametersTest#reversedDateAndNumberRangesAreRejected
 
   FR-AC-063:
     scenario: SC-AC-08
@@ -1674,14 +1585,12 @@ frs:
         steps:
           - Open BIR Forms & Books; run TAX-VAT-2550Q, TAX-QAP and TAX-BOOK-GJ for Q3; export to Excel and PDF.
         expected: Each output is produced with the rows of the quarter.
-        auto: BirOutputsIT#everyNewBirOutputIsGeneratedAndExportedToExcelAndPdf
       - c: 2
         type: Report-output
         title: SAWT of Q3
         steps:
           - Run TAX-SAWT for Q3.
         expected: Every insurer certificate recorded in Certificates Received for Q3 is listed.
-        auto: BirOutputsIT#aCertificateIsPostedListedInTheSawtAndCancelled
       - c: 2
         type: Report-output
         title: Cash Disbursements book of August
@@ -1695,7 +1604,6 @@ frs:
           - Run a worksheet with end date before start date.
         expected: The run is refused.
         msg: [Tax period end precedes its start, INVALID_TAX_PERIOD]
-        auto: TaxMathTest#invalidPeriodsAreRejected
       - c: 3
         type: Negative
         title: Form prepared outside BIBS
@@ -1717,7 +1625,6 @@ frs:
         steps:
           - Log in as comptrol and open Tax & Statutory.
         expected: BIR Forms & Books is not offered; the report call returns HTTP 403.
-        auto: TaxApiIT#usersWithoutTaxPermissionsAreRefused
 
   FR-AC-070:
     scenario: SC-AC-09
@@ -1737,14 +1644,12 @@ frs:
           - Add "Duplicate booking" to REFUND_REASON effective today; save.
           - Open New Refund Request (as mktao) before and after glhead approves it in My Approvals.
         expected: The value is offered only after the approval.
-        auto: LovServiceIT#newValueIsUsableOnlyAfterAuthorizationAndWithinEffectivity
       - c: 2
         type: Positive
         title: Value ended yesterday
         steps:
           - Set effective-to yesterday on a value (approved); open a form that uses the list.
         expected: The value is no longer offered; it stays in the list as ended.
-        auto: LovServiceIT#newValueIsUsableOnlyAfterAuthorizationAndWithinEffectivity
       - c: 3
         type: Negative
         title: Effective-to before effective-from
@@ -1752,7 +1657,6 @@ frs:
           - Save a value effective from the 10th to the 1st.
         expected: The value is refused.
         msg: [The effective-to date is before the effective-from date, LOV_EFFECTIVITY_INVALID]
-        auto: LovServiceIT#rejectsDuplicatesInvalidDatesAndOptionalBlank
       - c: 3
         type: Negative
         screen: API
@@ -1770,7 +1674,6 @@ frs:
           - Approve the value badmin added.
         expected: The approval is refused.
         msg: [A record cannot be authorized by the user who maintained it, MAKER_CHECKER_VIOLATION]
-        auto: ApprovalInboxIT#pendingMasterDataIsOfferedToAuthorizersOtherThanTheMaker
 
   FR-AC-071:
     scenario: SC-AC-09
@@ -1790,7 +1693,6 @@ frs:
           - Check glofficer's menu; as approver approve the request; check again.
           - Open the User Access Matrix.
         expected: glofficer gains the TL screens only after the approval; the matrix shows FRBS_TL for glofficer. Remove the role after the case.
-        auto: AccessRequestIT#createdUserIsAppliedOnApprovalWithATemporaryPassword; AccessRequestIT#accessMatrixListsRolesAgainstPermissions
       - c: 2
         type: Negative
         title: User name too short
@@ -1798,7 +1700,6 @@ frs:
           - Raise CREATE_USER with user name "ab".
         expected: The request is refused.
         msg: ["The user name has 3 to 50 letters, digits, dots, dashes or underscores", ACCESS_USERNAME]
-        auto: AccessRequestIT#requestsAreValidatedAndDecidedUnderFourEyes; accessRequest.test.ts#needs the new user data, a group profile, the remarks and the approver to submit
       - c: 2
         type: Negative
         title: User exists
@@ -1834,7 +1735,7 @@ frs:
         steps:
           - Raise MODIFY_ROLE_PERMISSIONS on FRBS_TL adding JOURNAL_ASSIGN, which it holds.
         expected: The request is refused.
-        msg: ["The request does not change the permissions of role {FRBS_TL}", ACCESS_NO_PERMISSION_CHANGE]
+        msg: ["The request does not change the permissions of group profile {FRBS Team Lead}", ACCESS_NO_PERMISSION_CHANGE]
       - c: 3
         type: Negative
         title: Second pending request for the same user
@@ -1842,7 +1743,6 @@ frs:
           - Raise a second MODIFY_ROLES for glofficer while the first is pending.
         expected: The request is refused.
         msg: ["A request for {glofficer} is already waiting for approval", ACCESS_REQUEST_PENDING]
-        auto: AccessRequestIT#requestsAreValidatedAndDecidedUnderFourEyes
 
   FR-AC-072:
     scenario: SC-AC-09
@@ -1861,7 +1761,6 @@ frs:
         steps:
           - Open My Approvals; note the count of access requests; select two role changes and approve them.
         expected: Both are APPROVED with a result each; the count falls by two; the requester is notified.
-        auto: AccessRequestReturnIT#returnedRequestIsResubmittedAndApprovedInBulk
       - c: 1
         type: Negative
         screen: ACCREQ
@@ -1878,7 +1777,6 @@ frs:
           - Return a request with remarks "Add the ticket number".
           - As the requester badmin, resubmit it with a new justification.
         expected: The request is RETURNED with the remarks, then PENDING again.
-        auto: AccessRequestReturnIT#returnedRequestIsResubmittedAndApprovedInBulk
       - c: 2
         type: Negative
         screen: ACCREQ
@@ -1906,7 +1804,6 @@ frs:
           - Approve the request badmin raised.
         expected: The approval is refused.
         msg: [A request cannot be decided by the user who submitted it, ACCESS_FOUR_EYES]
-        auto: AccessRequestIT#requestsAreValidatedAndDecidedUnderFourEyes
       - c: 3
         type: Negative
         screen: API
@@ -1930,7 +1827,6 @@ access:
     allow: [FRBS_PROCESSOR, FRBS_TL]
     deny: [FRBS_HEAD, COMPTROLLERSHIP, AUDITOR]
     denied: New Journal is not in the menu; POST /api/v1/journals returns HTTP 403.
-    auto: GlPlatformApiIT#permissionsAreEnforced
   - action: Assign journals to a poster
     screen: JOURNALS
     permission: JOURNAL_ASSIGN
@@ -1955,14 +1851,12 @@ access:
     allow: [FRBS_HEAD]
     deny: [FRBS_TL, FRBS_PROCESSOR]
     denied: The revaluation card has no entry; POST /currencies/revaluation-rates returns HTTP 403.
-    auto: GlPlatformApiIT#permissionsAreEnforced
   - action: Upload the chart of accounts
     screen: COAUP
     permission: COA_UPLOAD
     allow: [FRBS_TL]
     deny: [FRBS_PROCESSOR, FRBS_HEAD]
     denied: Chart Upload is not in the menu; POST /coa/uploads returns HTTP 403.
-    auto: GlPlatformApiIT#permissionsAreEnforced
   - action: Authorise chart accounts and masters
     screen: APPROVALS
     permission: MASTER_AUTHORIZE
@@ -1975,7 +1869,6 @@ access:
     allow: [FRBS_TL, FRBS_HEAD]
     deny: [FRBS_PROCESSOR, COMPTROLLERSHIP]
     denied: GL Close & Cut-Off is not in the menu; POST /closing/close-schedules returns HTTP 403.
-    auto: GlPlatformApiIT#permissionsAreEnforced
   - action: Run FX revaluation and year-end
     screen: FXREV
     permission: PERIOD_END_RUN
@@ -1988,21 +1881,18 @@ access:
     allow: [FRBS_PROCESSOR, FRBS_TL, FRBS_HEAD, COMPTROLLERSHIP, AUDITOR]
     deny: [DISBURSEMENT, BUSINESS_ADMIN]
     denied: Report Pack is not in the menu; GET /frbs/report-pack returns HTTP 403.
-    auto: FrbsApiIT#permissionsAreEnforced
   - action: Compute and submit service-fee runs; tag lines
     screen: SFRUNS
     permission: SERVICE_FEE_MANAGE, SERVICE_FEE_TAG
     allow: [FRBS_PROCESSOR, FRBS_TL]
     deny: [FRBS_HEAD, COMPTROLLERSHIP]
     denied: Service Fee Runs is not in the menu; POST /frbs/service-fee/runs returns HTTP 403.
-    auto: FrbsApiIT#permissionsAreEnforced
   - action: Approve service-fee runs and maintain rates
     screen: SFRATES
     permission: SERVICE_FEE_APPROVE
     allow: [FRBS_TL, FRBS_HEAD]
     deny: [FRBS_PROCESSOR]
     denied: Approve and Service Fee Rates are not shown; the calls return HTTP 403.
-    auto: FrbsApiIT#permissionsAreEnforced
   - action: BIR forms, books and alphalists
     screen: TAXFORMS
     permission: TAX_VIEW
@@ -2021,43 +1911,9 @@ access:
     allow: [BUSINESS_ADMIN, SYSADMIN]
     deny: [FRBS_HEAD, AUDITOR]
     denied: New Request is not shown; POST /nbadmin/access-requests returns HTTP 403.
-    auto: AccessRequestIT#requestsAreValidatedAndDecidedUnderFourEyes
   - action: Approve, decline or return user and role requests
     screen: APPROVALS
     permission: ACCESS_APPROVE
     allow: [ACCESS_APPROVER]
     deny: [BUSINESS_ADMIN, SYSADMIN, FRBS_HEAD]
     denied: The access requests are not offered in My Approvals; the approve call returns HTTP 403.
-    auto: AccessRequestIT#requestsAreValidatedAndDecidedUnderFourEyes
-
-findings:
-  - fr: FR-AC-001
-    issue: 'The FRS messages "Invalid user ID or password" and "Your account is locked. Contact the System Administrator" (no code) differ from the build ("Invalid user name or password" and "Account is locked. Contact your administrator.", code AUTHENTICATION_FAILED).'
-    proposal: Quote the built messages and the code in FR-AC-001 and Volume 2 FR-DS-001.
-  - fr: FR-AC-034
-    issue: 'The FRS gives "Journal is not balanced - debit <x> vs credit <y>" and "Value date <date> is earlier / later than the permitted <n> back- / forward-dated days"; the build writes "Journal is not balanced: debit ... vs credit ..." and two separate value-date messages ("... is earlier than the permitted <n> back-dated days", "... is later than the permitted <n> forward-dated days"). The number of permitted days is a company setting that the FRS does not name.'
-    proposal: Quote the two value-date messages apart, use the built punctuation and name the company fields (back-dated and forward-dated days) with their delivered values.
-  - fr: FR-AC-042
-    issue: 'The FRS message "The broking books of <period> are closed" is not what the user sees; the build names the source module that is locked ("The remittance books of <period> are closed", code BOOKS_CLOSED).'
-    proposal: Change the message to "The <module> books of <period> are closed" in FR-AC-042.
-  - fr: FR-AC-050
-    issue: 'The row message "Row <n> - invalid date / amount ''<value>''" is two messages in the build ("Row <n>: invalid date ''<value>''" and "Row <n>: invalid amount ''<value>''").'
-    proposal: Give the two messages apart with the built punctuation.
-  - fr: FR-AC-071
-    issue: 'The FRS messages "Unknown role(s) / permission(s) <list>" and "Permission(s) both added and removed - <list>" differ in punctuation from the build ("Unknown role(s): <list>", "Permission(s) both added and removed: <list>"); FR-AC-072 has the same for ACCESS_APPROVE_INDIVIDUALLY.'
-    proposal: Use the built wording so that testers can compare the text exactly.
-  - fr: FR-AC-070
-    issue: The FRS and the persona table give the menu path "Administration > Lists of Values" and "Administration > Access Requests"; in BIBS these screens are under Setup & Administration > Broking Setup (with the User Access Matrix).
-    proposal: Correct the screen paths of FR-AC-070 to FR-AC-072 in FRS v1.1.
-  - fr: FR-AC-023
-    issue: 'The FRS lists the paper sizes A4, Letter and Legal and the orientations portrait and landscape. The build also offers A3 and an automatic orientation (by report width), and an unknown value falls back to A4. Acceptance criterion 1 ("shows all its columns on one page width") gives no limit for very wide reports.'
-    proposal: Add A3, the automatic orientation and the fallback to the FRS, and state the smallest font that fit to width may use.
-  - fr: FR-AC-011
-    issue: 'The permission table of section 3.2 gives action classes for the GL permissions (JOURNAL_CREATE and the other journal permissions, COA_UPLOAD, MASTER_MAINTAIN, MASTER_AUTHORIZE, GL_CLOSE_SCHEDULE), but the build leaves the finance permissions unclassified (V890), so the User Access Matrix by action class does not show them.'
-    proposal: Either classify the finance permissions in the build or state in the FRS that the matrix by action class covers the broking areas only.
-  - fr: FR-AC-054
-    issue: The message of COST_CENTER_MISSING is given only as "<message naming the event and account>"; a tester cannot compare the text.
-    proposal: Quote the message text the event register shows.
-  - fr: FR-AC-062
-    issue: 'Acceptance criterion 2 ("The GAP report totals match the open items of the sub-ledger") does not say which open items (receivables and payables of which accounts, at which date, in which currency) are compared.'
-    proposal: Name the sub-ledger accounts and the date basis of the comparison.

@@ -15,7 +15,7 @@ meta:
   summary: TP_BRD07_CLAIMS.md
   version: "1.0"
   date: 25 September 2026
-  built: false
+  verify_messages: false
 
 personas:
   CLM_OFFICER: {name: Claims Officer / Claims Assistant, short: CLM Off.}
@@ -2197,26 +2197,3 @@ access:
     allow: [CLM_OFFICER, CLM_RISK, AUDITOR, SYSADMIN]
     deny: [MKT_AO, MKT_TL]
     denied: Claims Worklist is not in the menu; a claim address shows the no-access page.
-
-findings:
-  - fr: FR-CM-001
-    issue: 'The FRS messages "Invalid user ID or password" and "Your account is locked. Contact the System Administrator" differ from the platform log-in ("Invalid user name or password"; "Account is locked. Contact your administrator."). The idle timeout of 15 minutes differs from the BIBS session policy (CLQ24).'
-    proposal: Quote the platform texts in FRS v1.1 and close CLQ24; the cases use the platform texts and a 15-minute test setting.
-  - fr: FR-CM-024
-    issue: 'The FRS pairs EMAIL_ADDRESS_INVALID with "Enter a valid e-mail address"; the platform returns "Invalid e-mail address - <address>" for that code.'
-    proposal: Quote the platform text.
-  - fr: FR-CM-060
-    issue: 'FR-CM-060 to 066 pair INVALID_REPORT_PARAMETERS with FRS texts ("The as-of date cannot be in the future", "The end date must be on or after the start date"). The report engine builds its own texts from the parameter labels, for example "<to> must not be before <from>". The future as-of date check does not exist in the engine today.'
-    proposal: Quote the engine texts, and add the as-of date rule to the report definition at build; the range cases use the engine pattern, TC-CM-060.3-01 uses the FRS text.
-  - fr: FR-CM-012
-    issue: 'Acceptance criterion 3 says a Claims Officer without BCL_STATUS_UPDATE cannot correct the date, but the matrix of section 3.3 grants BCL_STATUS_UPDATE to officers (within the matrix). As written every officer can correct the reported date.'
-    proposal: State whether the correction needs its own permission or is limited to TL / TH (CLQ03); the case removes the permission from a test role until then.
-  - fr: FR-CM-045
-    issue: The persona table gives reopen to the Team Head (CLM_TH) and the matrix gives BCL_REOPEN to TH and UH, while R1 says "TH / UH reopen (to confirm, CLQ06)". Temporarily closed claims keep ageing "to confirm" (R2 of FR-CM-053), so the ageing and outstanding cases depend on CLQ06.
-    proposal: Close CLQ06 before UAT.
-  - fr: FR-CM-043
-    issue: Two settlement types ("Settled - LOA Issued - For Schedule of Repair", "... Vehicle Under Repair") have "Closes the claim" to confirm (CLQ05), so their closure behaviour cannot be tested yet.
-    proposal: Answer CLQ05; the cases treat both as not closing.
-  - fr: FR-CM-016
-    issue: The meaning of the claims authorization code and any TL / TH override are open (CLQ01); the FRS tests only that the button is disabled while premium is unpaid.
-    proposal: Answer CLQ01 before UAT and add the override case if one is agreed.

@@ -15,7 +15,7 @@ meta:
   summary: TP_BRD08_EMPLOYEE_BENEFITS.md
   version: "1.0"
   date: 25 September 2026
-  built: false
+  verify_messages: false
 
 personas:
   EB_AO: {name: Marketing AO (Employee Benefits), short: EB AO}
@@ -1797,32 +1797,3 @@ access:
     allow: [CLIENT_HR]
     deny: [INSURER_USER]
     denied: The client pages are not offered to an insurer user.
-
-findings:
-  - fr: FR-EB-012
-    issue: 'The FRS texts of the platform attachment codes differ from what BIBS shows - ATTACHMENT_TYPE_NOT_ALLOWED "The file type is not allowed" (built "Only these file types are allowed - <list>"), ATTACHMENT_TOO_LARGE "The file is larger than the allowed size" (built "The file exceeds the maximum size of <n> MB"), ATTACHMENT_INFECTED "The file failed the virus check" (built "The file was rejected by the malware scan - <detail>"). The same applies to FR-EB-002, 023, 030 and 031.'
-    proposal: Quote the platform texts in FRS v1.1; the cases use them.
-  - fr: FR-EB-020
-    issue: 'The FRS gives CLIENT_DUPLICATE "A client with the same identifiers already exists" and CLIENT_NAME_REQUIRED "Enter the client name"; the client service shows "This client already exists - <client>" and "Enter the <field>".'
-    proposal: Quote the built texts.
-  - fr: FR-EB-004
-    issue: 'EMAIL_ADDRESS_INVALID is given as "Enter a valid e-mail address"; the platform returns "Invalid e-mail address - <address>".'
-    proposal: Quote the platform text.
-  - fr: FR-EB-060
-    issue: 'FR-EB-060 and 061 pair INVALID_REPORT_PARAMETERS with "The end date must be on or after the start date"; the report engine builds "<to> must not be before <from>" from the parameter labels.'
-    proposal: Quote the engine pattern.
-  - fr: FR-EB-010
-    issue: 'Acceptance criterion 3 of FR-EB-010 says "The fourth failed sign-in locks the portal user" while rule R3 says lockout after 3 failed sign-ins (PORTAL_MAX_FAILED_LOGINS = 3). The cases lock at the third failure.'
-    proposal: Align the acceptance criterion with R3 ("the third failed sign-in locks the portal user, and the fourth is refused").
-  - fr: FR-EB-022
-    issue: The RA lead time is 135 days (TAT annex) against the BRD example of 180 days (EBQ02), and who sets the renewal flag is open (EBQ03); the RA timing cases depend on both.
-    proposal: Answer EBQ02 and EBQ03 before UAT.
-  - fr: FR-EB-031
-    issue: The BOR is required for new business and remarketing renewals, while the BRD negative scenario says a BOR uploaded for a renewal is invalid (EBQ05). A renewal that stays with the incumbent has no BOR case.
-    proposal: Answer EBQ05; add a case for a renewal without remarketing once decided.
-  - fr: FR-EB-042
-    issue: The threshold values, measure and approver levels are seed values (EBQ11); the FRS does not say whether "meets" means at or above the amount.
-    proposal: State "at or above" and give the BDOI values; the cases use the seed values.
-  - fr: FR-EB-062
-    issue: 'The TAT annex gives ranges ("1-5 working days"); the FRS parameters hold one value, and the start and stop events are open (EBQ21), so a breach cannot be tested except against the upper value.'
-    proposal: Confirm that the upper value of each range is the target and name the start and stop events.

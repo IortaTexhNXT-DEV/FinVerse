@@ -13,7 +13,7 @@ meta:
   summary: TP_BRD12_SUBMITTED_POLICIES.md
   version: "1.0"
   date: 25 September 2026
-  built: false
+  verify_messages: false
 
 personas:
   SBM_HANDLER: {name: Submitted Handler (CBG), short: SBM Hand.}
@@ -1431,35 +1431,3 @@ access:
     allow: [SBM_HANDLER, SBM_CHECKER, SBM_SANITATION, SBM_TL, SBM_POLICY_REVIEWER]
     deny: [SBM_UPP_HANDLER, MKT_AO, TSU]
     denied: The Submitted Policies category is not listed; the run call returns HTTP 403.
-
-findings:
-  - fr: FR-SP-001
-    issue: 'The natural key includes the expiry date, so a row for the next term of the same policy creates a new record, while acceptance criterion 3 speaks of "a row updating an existing policy". The FRS does not say which fields may change on an update and which make a new record.'
-    proposal: List the fields that update a record and state that a new expiry date makes a new term record linked to the previous one.
-  - fr: FR-SP-030
-    issue: 'The default classification uses "BDOI did not place the policy", which is not a field of the masterlist or LAMD; the definition is open (SP SQ04).'
-    proposal: Name the data element that tells whether BDOI placed the policy; the cases test the PN match only.
-  - fr: FR-SP-031
-    issue: Bucket precedence and the RMU / FFY conflicts are open (SP SQ05) and the conflicting rules are seeded inactive, so a record that is both FFY and RMU cannot be tested.
-    proposal: Answer SP SQ05 and add the precedence to the FRS; a case is added then.
-  - fr: FR-SP-032
-    issue: The rule that chooses the Generic or the FFY RA is to be confirmed (SP SQ06); the cases follow the seed rule.
-    proposal: State the rule in the FRS when SP SQ06 is answered.
-  - fr: FR-SP-040
-    issue: The FRS keeps one IAAF per policy with links, while the BRD's current process lets one IAAF cover several policies (SP SQ07). The bank counterpart may expect one form.
-    proposal: Confirm with BDOI; the cases test one IAAF per policy.
-  - fr: FR-SP-053
-    issue: The meaning of Released is to be confirmed (SP SQ08); the default is the AO's first opening, which a preview by another user could not trigger but a download by the assigned AO does.
-    proposal: Define Released (first opening, first download or explicit acknowledgement) in the FRS.
-  - fr: FR-SP-062
-    issue: The owner of the renewal notice and renewal proposal letters is not confirmed (XQ03); the cases may move to the BRD-6 plan.
-    proposal: Record the owner after XQ03; the cases here test the reminder letter and the print batch.
-  - fr: FR-SP-063
-    issue: The BRD gives an acceptance window of 3-5 days; the FRS default is 5 (SP SQ12). The FRS does not say whether days are calendar or working days.
-    proposal: State calendar or working days; the boundary cases use calendar days.
-  - fr: FR-SP-070
-    issue: Amount, VAT, OR and GL account of the handling fee are to be confirmed (SP SQ13), so the accounting of the applied payment cannot be checked.
-    proposal: Add the accounting entry to the FRS after SP SQ13; the cases check tagging and the OR only.
-  - fr: FR-SP-080
-    issue: BRIDSP-30 repeats BRIDSP-20 word for word; the FRS traces both to one FR, which inflates the BRD ID count.
-    proposal: Ask the BRD owner to confirm that BRIDSP-30 is a duplicate and mark it so in the traceability.

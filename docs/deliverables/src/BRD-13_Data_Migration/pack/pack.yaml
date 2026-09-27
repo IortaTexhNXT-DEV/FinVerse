@@ -1,0 +1,200 @@
+# BRD-13 Data Migration - Business Sign-off Pack, release set v2.0 (Drop 0, Setup and Data Migration).
+# One set for the whole of BRD-13: 00 Start Here, 01 Guide deck, 02 Data Migration Handbook, 03 Migration Workbook,
+# 04 and 05 Test plan. Built by docs/deliverables/src/signoff/signoff_pack.py (screens, messages, menus, guide tables)
+# and by ../build_dm_pack.py (the migration catalogue, the cut-over plan and the Migration Workbook). Schema:
+# docs/deliverables/src/signoff/README.md.
+meta:
+  brd: BRD-13
+  brd_label: BRD-13
+  name: Data Migration
+  code: DM
+  version: "2.0"
+  date: 5 October 2026
+  status_as_of: 05-Oct-2026
+  release_set: BRD-13 Data Migration – Business Sign-off Pack
+  frs: HANDBOOK_BRD13_DATA_MIGRATION.md
+  source_doc: Data Migration Handbook
+  test_plan: brd13_cases.yaml
+  screens_dir: screens
+  screenshot_dir: ../screenshots
+  # The 03 of this set is the Migration Workbook: the migration catalogue first (build_dm_pack.workbook_sheets),
+  # then the screen sheets and the review, minutes, version and certificate sheets of every set.
+  workbook:
+    kind: Workbook
+    name: Data Migration
+    title: Migration Workbook BRD-13 Data Migration
+    doc_type: Migration workbook
+    subtitle: "BRD-13 Data Migration – objects and decisions, load templates, code maps, validation rules, data owners, cut-over plan, reconciliation sign-off and the screens, for BU review"
+    cover_notes:
+      - >-
+        Issued on 05-Oct-2026 with the Data Migration Handbook v2.0. The load template sheets are the layouts of the
+        Migration Console column for column: the console exports the same templates (Layouts and Rules).
+      - >-
+        Fill in the BU review columns and, on the Proposed rules sheet, the BDOI decision. After sign-off the
+        objects, decisions, layouts, screens and rules are frozen; later changes go through the Change Management
+        Register.
+
+# Readable names instead of permission and role codes, on every page of the set.
+codes: labels
+
+# The Data Migration personas: role, name, SIT/UAT user of the seed profile. The business personas at the end use
+# the migrated records and the legacy batches.
+personas:
+  DATA_MIGRATION_LEAD: {name: Data Migration Lead, user: miglead}
+  DATA_STEWARD: {name: Data Steward, user: migsteward}
+  DATA_OWNER: {name: Data owner (business owner of an object), user: migowner}
+  MIGRATION_OPERATOR: {name: Migration Operator, user: migops}
+  MIGRATION_RECON_APPROVER: {name: Reconciliation approver (Head of Comptrollership), user: migrecon}
+  MIGRATION_GONOGO: {name: Go / no-go board, user: miggonogo}
+  COMPTROLLERSHIP: {name: Comptrollership GL lead, user: comptrol}
+  LEGACY_INQUIRY: {name: Audit / Compliance user, user: legacyaudit}
+  LEGACY_ACCESS_REVIEWER: {name: Compliance reviewer of the access log, user: legacyrev}
+  CASHIER: {name: Cashiering user, user: cashier}
+  CASHIER_TL: {name: Cashiering team lead, user: cashtl}
+  TOP_MANAGEMENT_APPROVER: {name: Top management approver, user: topmgmt}
+  COMMREC_HANDLER: {name: Commission user, user: commrec}
+  COMMREC_TL: {name: Commission team lead, user: commtl}
+  MKT_AO: {name: Marketing Account Officer, user: ao}
+
+# Signatories of the sign-off certificate: role, organisation, what the signatory confirms.
+signatories:
+  - ["Program Manager, Business Project Services", BDO Unibank ESG, "Business owner of BRD-13: the whole set, the approach and the cut-over"]
+  - ["Data Migration Lead", BDOI, "Data Migration Lead: the object decisions, the gates G4 and G6, the trial migrations and the cut-over plan"]
+  - ["Head, Comptrollership", BDOI, "Comptrollership: open items, GL opening, legacy accounts, reconciliation and the opening-balance adjustments"]
+  - ["Head, Operations", BDOI, "Data owner: insurers, commission rates, policy headers, open invoices, unapplied payments, collection state, remittance"]
+  - ["Product Owner, Marketing Business System", BDOI, "Data owner: lists of values, products, packages, clients and payout accounts"]
+  - ["Heads, Retail and Corporate Marketing", BDOI, "Data owners: sales organisation and clients"]
+  - ["Head, Renewal processing team", BDOI, "Data owner: the renewal advices already sent and the day-1 renewal queue"]
+  - ["Compliance; Unit Head, Analytics and Risk Management", BDOI, "Data owners: KYC documents, archive, Legacy Inquiry and its access log"]
+  - ["Head, BDOI IT", BDOI, "BDOI IT: extracts, transfer, legacy freeze and read-only access, decommissioning"]
+  - [Project Manager, iorta TechNXT, "Delivery of the set as signed"]
+
+# Sidebar sections of this BRD (navigation/modules.ts module ids) and the BRD of every other section, used to mark
+# each menu entry of a persona.
+own_sections: [migration, legacy-inquiry]
+section_brd:
+  dashboard: Platform
+  nb-dashboard: BRD-1
+  workspace: BRD-1
+  crm: BRD-1
+  screening: BRD-10
+  quotations: BRD-1
+  accounts: BRD-1
+  proposals: BRD-1
+  eb: BRD-8
+  placement: BRD-1
+  issuance: BRD-1
+  booking: BRD-1
+  renewal: BRD-6
+  prodrecon: BRD-2
+  adjustment: BRD-2
+  catalog: BRD-3
+  bulk: BRD-1
+  operations: BRD-2
+  collections: BRD-4
+  cashiering: BRD-2
+  remittance: BRD-2
+  commission: BRD-2 / BRD-4
+  disbursement: BRD-5
+  payrequest: BRD-5
+  acsl: BRD-5
+  frbs: BRD-5
+  gl: BRD-5
+  receivables: BRD-5
+  payables: BRD-5
+  assets: BRD-5
+  planning: BRD-5
+  tax: BRD-5
+  accounting-engine: BRD-5
+  brokerclaims: BRD-7
+  underwriting: Platform
+  claims: Platform
+  reinsurance: Platform
+  reserves: Platform
+  migration: BRD-13
+  legacy-inquiry: BRD-13
+  nb-reports: BRD-1
+  reports: Platform
+  broking-setup: BRD-1
+  screening-setup: BRD-10
+  setup: Platform
+  user-access: BRD-11
+  admin: Platform / BRD-11
+  help: Platform
+
+# Screen-flow figure: the links between the screens (list → record → action → next screen).
+flow:
+  - [SCR-DM-01, SCR-DM-02, Objects tiles]
+  - [SCR-DM-01, SCR-DM-04, Load Templates]
+  - [SCR-DM-01, SCR-DM-05, Upload Extract]
+  - [SCR-DM-01, SCR-DM-06, Batches]
+  - [SCR-DM-02, SCR-DM-03, code maps of the object]
+  - [SCR-DM-04, SCR-DM-05, filled template]
+  - [SCR-DM-05, SCR-DM-06, Plan Batch]
+  - [SCR-DM-06, SCR-DM-07, open]
+  - [SCR-DM-07, SCR-DM-08, client pairs to review]
+  - [SCR-DM-07, SCR-DM-09, Reconcile]
+  - [SCR-DM-09, SCR-DM-10, gates signed]
+  - [SCR-DM-10, SCR-DM-07, latest batch]
+  - [SCR-DM-07, SCR-DM-11, adjustment batch]
+  - [SCR-DM-10, SCR-DM-12, Day-1 objects accepted]
+  - [SCR-DM-12, SCR-DM-13, after go-live]
+  - [SCR-DM-12, SCR-DM-16, migrated records]
+  - [SCR-DM-16, SCR-DM-17, open a legacy invoice]
+  - [SCR-DM-17, SCR-DM-18, old unapplied payments]
+  - [SCR-DM-17, SCR-DM-19, PR 2307 balance]
+  - [SCR-DM-17, SCR-DM-20, paid directly to the insurer]
+  - [SCR-DM-13, SCR-DM-14, archived history]
+  - [SCR-DM-14, SCR-DM-15, every access logged]
+
+# Elements shared by many screens, described once.
+common:
+  - name: Page header and section
+    text: >-
+      Every page shows its section (Data Migration, Legacy Inquiry, Cashiering or Commission) and title, a one-line
+      description and its actions on the right. The migration screens are the Migration Console: one catalogue of
+      objects, layouts, code maps and rules for the programme, and the extracts, batches, reconciliations and plans of
+      the company chosen in the header.
+  - name: Work lists and record panels
+    text: >-
+      Lists show a filter row where the list has filters and a paged table ("Showing 1 to n of N results"). A row
+      opens its record in a panel under the list (object, code map, layout, reconciliation, cut-over plan, legacy
+      record) or on a page of its own (batch, legacy batch). Dates show as dd-MMM-yyyy and times as dd-MMM-yyyy HH:mm
+      in Philippine time; amounts with two decimals and thousand separators.
+  - name: Status pills and the batch steps
+    text: >-
+      Statuses are pills of one colour per state group (Proposed, For decision, Decided; Planned, Validated, Loaded,
+      Loaded with rejects, Reconciled, Accepted, Rolled back; Matched, Break, Explained). A batch shows its steps as a
+      stepper: Planned, Validated, Load approved, Loaded, Reconciled, Accepted, with the steps done marked.
+  - name: Confirmation and reason
+    text: >-
+      Every submit, approve, return, sign, load, rollback, post and decide action opens a confirmation dialog that
+      names the record and the effect of the action. A return, a rejection, a rollback request, a NO-GO and a
+      blocked task need a reason; an approval takes an optional comment. The reason is kept with the record and in
+      the audit trail.
+  - name: Maker-checker and gates
+    text: >-
+      The user who prepares a decision, code map version, load, rollback, opening-balance adjustment, resubmission or
+      legacy batch never approves it: the approve button is not offered to that user and the system refuses it. The
+      operator who ran a batch cannot sign its reconciliation or acceptance, and one person cannot sign two gates of
+      the same batch. Gates G1 to G7 are signed in order.
+  - name: Downloads
+    text: >-
+      Templates, workbooks, rejection files, evidence and reports download as Excel or CSV files. Extract files and
+      staged rows are kept only until the staging purge (5 days after the batch is accepted or rolled back); counts,
+      totals and sign-offs stay.
+  - name: Migrated records in the business screens
+    text: >-
+      A record migrated from a legacy system shows a LEGACY badge next to its number on its list and record, with
+      the source system, legacy reference and migration batch in the tooltip. Lists that hold migrated records have
+      an Origin filter (All origins, BIBS, Migrated). Migrated records raise no notification to clients or insurers.
+  - name: Messages
+    text: >-
+      Field errors appear under the field in red; a banner at the top of a dialog or card lists the refusal of a
+      business rule with its message and a reference for support. Success is confirmed by a short message at the
+      bottom right of the page. Intake, validation and load results are also written to the run log of the batch.
+  - name: Notifications and alerts
+    text: >-
+      The migration raises alerts to the Data Migration Lead and the owners concerned: extract rejected, load
+      failed, unmapped codes, reconciliation break, Migration Clearing not zero, staging purge overdue, unusual
+      access to the legacy archive, and a break of an opening-balance adjustment. The bell in the header opens them.

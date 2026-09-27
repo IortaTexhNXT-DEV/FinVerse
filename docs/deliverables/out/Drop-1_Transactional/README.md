@@ -11,7 +11,8 @@ BIBS client pack for BDO Insurance and Reinsurance Brokers (BDOI), grouped by BD
 ## Documents in this drop
 
 One folder per BRD release set (`BRD-nn_<Name>/`): every file of the BRD (Start Here, guide deck, FRS, sign-off
-workbook, test plan and summary, migration documents and templates), released and signed off together; in an
+workbook, test plan and summary; for BRD-13 the Data Migration Handbook and the Migration Workbook), released
+and signed off together; in an
 issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, "Release and
 sign-off per BRD"). Each document is kept once, in its latest version.
 
@@ -57,7 +58,7 @@ A BRD that spans drops lives in the folder of its primary drop; nothing is copie
 |---|---|---|
 | BRD-03 | Quotation or proposal with packages (item 1.U2) | [`02_BIBS_FRS_BRD-03_Product_Maintenance_v2.0.docx`](../Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/02_BIBS_FRS_BRD-03_Product_Maintenance_v2.0.docx)<br>[`04_BIBS_TestPlan_BRD-03_Product_Maintenance_v2.0.xlsx`](../Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/04_BIBS_TestPlan_BRD-03_Product_Maintenance_v2.0.xlsx)<br>[`05_BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v2.0.docx`](../Drop-0_Setup_and_Data_Migration/BRD-03_Product_Maintenance/05_BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v2.0.docx) |
 | BRD-08 | EB placement and ePolicy, EB upstream reports (items 1.U6, 1.U9) | [`BIBS_FRS_BRD-08_Employee_Benefits_v1.0.docx`](../Drop-2_Independent/BRD-08_Employee_Benefits/BIBS_FRS_BRD-08_Employee_Benefits_v1.0.docx)<br>[`BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.0.docx`](../Drop-2_Independent/BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_Summary_v1.0.docx)<br>[`BIBS_TestPlan_BRD-08_Employee_Benefits_v1.0.xlsx`](../Drop-2_Independent/BRD-08_Employee_Benefits/BIBS_TestPlan_BRD-08_Employee_Benefits_v1.0.xlsx) |
-| BRD-13 | Legacy invoices in cashiering, commission and BIR reports (items 1.U1, 1.D2, 1.D6) | [`BIBS_FRS_BRD-13_Data_Migration_v1.2.docx`](../Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/BIBS_FRS_BRD-13_Data_Migration_v1.2.docx)<br>[`BIBS_TestPlan_BRD-13_Data_Migration_Summary_v1.2.docx`](../Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/BIBS_TestPlan_BRD-13_Data_Migration_Summary_v1.2.docx)<br>[`BIBS_TestPlan_BRD-13_Data_Migration_v1.2.xlsx`](../Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/BIBS_TestPlan_BRD-13_Data_Migration_v1.2.xlsx) |
+| BRD-13 | Legacy invoices in cashiering, commission and BIR reports (items 1.U1, 1.D2, 1.D6) | [`02_BIBS_Handbook_BRD-13_Data_Migration_v2.0.docx`](../Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/02_BIBS_Handbook_BRD-13_Data_Migration_v2.0.docx)<br>[`04_BIBS_TestPlan_BRD-13_Data_Migration_v2.0.xlsx`](../Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/04_BIBS_TestPlan_BRD-13_Data_Migration_v2.0.xlsx)<br>[`05_BIBS_TestPlan_BRD-13_Data_Migration_Summary_v2.0.docx`](../Drop-0_Setup_and_Data_Migration/BRD-13_Data_Migration/05_BIBS_TestPlan_BRD-13_Data_Migration_Summary_v2.0.docx) |
 
 ## Still to write
 

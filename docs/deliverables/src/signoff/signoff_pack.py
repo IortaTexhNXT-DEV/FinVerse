@@ -64,6 +64,23 @@ TECHNICAL_MESSAGE = re.compile(r"\bendpoint\b|\bJSON\b|\brequest body\b", re.I)
 BANNED = re.compile(r"\b(" + codecs.decode("qrzb|qhzzl|snxr|fnzcyr qngn|cebgbglcr|cbp|fnaqobk|yberz vcfhz|gbqb|svkzr", "rot13") + r")\b", re.I)
 
 
+PERMISSION_PREFIXES = {"UAM": "User access", "SCR": "Screening", "RNW": "Renewal", "EB": "Employee benefits",
+                       "BCL": "Claims handling", "PKG": "Package", "MIG": "Data migration", "LOV": "Lists of values",
+                       "NB": "New business"}
+PERMISSION_ACRONYMS = {"TSU", "MBS", "QS", "PRF", "KYC", "AML", "STR", "ACSL", "FRBS", "GL", "AR", "AP", "DV", "PR",
+                       "OR", "SOA", "EOD", "BIR", "VAT", "EWT", "SL", "SOD", "CSF", "ID", "LAMD", "UPP", "DQ"}
+
+
+def permission_label(code: str) -> str:
+    """The readable name of a permission code, by the rule of the screens (frontend/src/utils/permissionLabel.ts):
+    the module prefix in words and the rest in lower case, for example MIG_LOAD_APPROVE "Data migration load
+    approve"."""
+    words = [PERMISSION_PREFIXES.get(part, part) if i == 0 and part in PERMISSION_PREFIXES else
+             part if part in PERMISSION_ACRONYMS else part.lower() for i, part in enumerate(code.split("_"))]
+    text = " ".join(words)
+    return text[:1].upper() + text[1:]
+
+
 def split_row(text: str, cols: list[str], where: str, problems: list[str]) -> dict[str, str]:
     parts = [p.strip() for p in str(text).split(" | ")]
     if len(parts) != len(cols):
@@ -133,6 +150,9 @@ class Pack:
         self.menu_suites: str | None = raw.get("menu_suites")
         # "per_persona": the workbook also has one menu sheet per persona (besides Menu by persona).
         self.menu_sheets: str = raw.get("menu_sheets") or ""
+        # "labels": permissions and roles are shown by their readable names only, never by their codes (the rule
+        # of the screens, frontend/src/utils/permissionLabel.ts); the packs issued before keep the codes.
+        self.codes: str = raw.get("codes") or ""
 
     @cached_property
     def foreign(self) -> dict[str, Screen]:
@@ -183,6 +203,10 @@ class Pack:
             return []
         return [r for r in self.personas if sd.may_open(self.grants.get(r, set()))]
 
+    def permission_name(self, code: str) -> str:
+        """A permission as the pack shows it: its readable name when the pack shows labels, else the code."""
+        return permission_label(code) if self.codes == "labels" else code
+
     def permission_text(self, scr: Screen) -> str:
         sd = self.screen_def(scr.route)
         if scr.get("public"):
@@ -193,7 +217,7 @@ class Pack:
             return "-"
         if not sd.opened_by:
             return "Every signed-in user"
-        return " or ".join(sd.opened_by)
+        return " or ".join(self.permission_name(p) for p in sd.opened_by)
 
     def menu_path(self, scr: Screen) -> str:
         if scr.get("menu"):
@@ -321,6 +345,10 @@ class Pack:
     def messages(self) -> list[dict[str, str]]:
         cfg = self.msg_cfg.get("sources") or {}
         exclude = set(cfg.get("exclude_classes") or [])
+        # Messages that a business screen never shows (a record looked up by its internal key, the seed loader):
+        # left out by code or by a pattern of the text.
+        exclude_codes = set(cfg.get("exclude_codes") or [])
+        exclude_texts = [re.compile(x) for x in cfg.get("exclude_texts") or []]
         rows: list[dict[str, str]] = []
         seen: set[tuple[str, str, str]] = set()
 
@@ -339,7 +367,8 @@ class Pack:
             pkgs = {p.parent.name for p in code_facts.JAVA_ROOT.rglob("*.java") if p.stem in extra}
             backend += [m for m in code_facts.backend_messages(sorted(pkgs)) if m.cls in extra]
         for m in backend:
-            if m.cls in exclude or not re.fullmatch(r"[A-Z][A-Z0-9_]*", m.code):
+            if m.cls in exclude or not re.fullmatch(r"[A-Z][A-Z0-9_]*", m.code) or m.code in exclude_codes \
+                    or any(x.search(m.text) for x in exclude_texts):
                 continue
             add("Server", m.code, m.text, kinds.get(m.kind, "Error"), self._place(m.cls), m.where)
         templates = code_facts.bulk_templates(cfg.get("bulk_handlers") or [])
@@ -540,7 +569,11 @@ def r_screen_index(doc: Any, pack: Pack, **_: Any) -> None:
     rows = []
     for s in pack.screens:
         rows.append([s.id, s.title, pack.menu_path(s), ", ".join(pack.personas_of(s))])
-    doc.table(["ID", "Screen", "Menu path", "Personas (role codes)"], rows, widths=[1.9, 3.6, 6.4, 5.7],
+    if pack.codes == "labels":
+        rows = [[r[0], r[1], r[2], ", ".join(pack.persona_label(x) for x in pack.personas_of(s))]
+                for r, s in zip(rows, pack.screens)]
+    doc.table(["ID", "Screen", "Menu path", "Personas" if pack.codes == "labels" else "Personas (role codes)"], rows,
+              widths=[1.9, 3.6, 6.4, 5.7],
               caption=f"{pack.module} screens", size=7.5)
 
 
@@ -548,7 +581,7 @@ def r_menus(doc: Any, pack: Pack, **_: Any) -> None:
     menus = pack.menus()
     for role, rows in menus.items():
         p = pack.menu_roles[role]
-        doc.heading(f"{p['name']} ({role})", level=3)
+        doc.heading(p["name"] if pack.codes == "labels" else f"{p['name']} ({role})", level=3)
         own = sum(1 for r in rows if r["own"])
         checked = pack.suite_check(role)
         del checked
@@ -791,20 +824,28 @@ def _date_validation(ws: Any, column_letter: str, first: int = 5, last: int = 50
     dv.add(f"{column_letter}{first}:{column_letter}{last}")
 
 
-def build_workbook(pack: Pack) -> Path:
+def build_workbook(pack: Pack, extend: Any = None, out_dir: Path | None = None) -> Path:
+    """The sign-off workbook of a pack. extend(wb, pack, date_sheets) adds the sheets of a module after How to
+    review (BRD-13: the migration catalogue); pack.yaml meta.workbook may name the file kind, name and title of a
+    set whose workbook is not a plain sign-off workbook (BRD-13: 03 Migration Workbook); out_dir replaces the
+    release-set folder (a trial build)."""
     from bdoi_xlsx import BdoiWorkbook, Column
     from openpyxl.utils import get_column_letter
 
     m = pack.meta
     nm = pack.module
-    wb = BdoiWorkbook(f"Sign-off Workbook {m['brd_label']} {m['name']}", doc_type="Business sign-off workbook",
+    wbm = m.get("workbook") or {}
+    doc = m.get("source_doc", "FRS")  # the document the screens and FRs are specified in (BRD-13: the handbook)
+    wb = BdoiWorkbook(wbm.get("title") or f"Sign-off Workbook {m['brd_label']} {m['name']}",
+                      doc_type=wbm.get("doc_type") or "Business sign-off workbook",
                       brd=m["brd"], version=str(m["version"]), date=str(m["date"]),
-                      subtitle=f"{m['release_set']} – screens, fields, rules, messages and menus for BU review")
+                      subtitle=wbm.get("subtitle") or f"{m['release_set']} – screens, fields, rules, messages and menus "
+                                                      "for BU review")
     wb.legend = [("Accept", "The row is correct as specified"),
                  ("Change requested", "The row must change: describe the change in BU comment"),
                  ("Comment", "A remark that does not change the row")]
     wb.cover_notes = [
-        f"Issued on {m['status_as_of']}. The rows are generated from FRS v{m['version']} and match its screen "
+        f"Issued on {m['status_as_of']}. The rows are generated from {doc} v{m['version']} and match its screen "
         "specifications row for row.",
         "Fill in the BU review columns only. After sign-off the screens, fields, navigation and messages are "
         "frozen; later changes go through the Change Management Register.",
@@ -812,8 +853,8 @@ def build_workbook(pack: Pack) -> Path:
     date_sheets = []
 
     howto = [
-        ("1", "Read the FRS chapter Screen specifications with the screenshots, or walk through the screens on the SIT "
-              "environment during the review sessions of the Start Here guide."),
+        ("1", f"Read the {doc} chapter Screen specifications with the screenshots, or walk through the screens on "
+              "the SIT environment during the review sessions of the Start Here guide."),
         ("2", "On the sheets Screen standards, Screen catalogue, Field register, Business rules and Messages, set BU "
               "review to Accept, "
               "Change requested or Comment for each row you review, and write the change in BU comment."),
@@ -829,9 +870,15 @@ def build_workbook(pack: Pack) -> Path:
               "content, "
               "screens and navigation of this set; the screenshots use fictitious seed data."),
     ]
+    if pack.guide.get("howto"):
+        howto = [(str(i), str(x)) for i, x in enumerate(pack.guide["howto"], start=1)]
+    if wbm.get("cover_notes"):
+        wb.cover_notes = [" ".join(str(x).split()) for x in wbm["cover_notes"]]
     wb.sheet("How to review", [Column("step", "Step", 8, "Step number"), Column("text", "How to review", 110, "Instruction")],
              [{"step": a, "text": b} for a, b in howto], description="How the business unit reviews this workbook",
              freeze_first_column=False)
+    if extend is not None:
+        extend(wb, pack, date_sheets)
 
     ws = wb.sheet("Screen standards", [
         Column("no", "No.", 6, "Row number", kind="number"),
@@ -853,7 +900,7 @@ def build_workbook(pack: Pack) -> Path:
             "shots": "\n".join(x.get("caption", "") for x in s.get("shots") or []),
             "fields": len(s.fields), "actions": len(s.actions)})
     ws = wb.sheet("Screen catalogue", [
-        Column("id", "Screen ID", 12, "Screen identifier used in the FRS"),
+        Column("id", "Screen ID", 12, f"Screen identifier used in the {doc}"),
         Column("area", "Area", 22, "Process area"),
         Column("title", "Screen", 26, "Screen name as in the menu or page title"),
         Column("menu", "Menu path", 38, "Where the screen is in the sidebar (› separates the levels)"),
@@ -862,9 +909,9 @@ def build_workbook(pack: Pack) -> Path:
         Column("purpose", "Purpose", 50, "What the screen is for"),
         Column("entry", "Other entry points", 36, "How the user reaches it from other screens"),
         Column("outcome", "Expected outcome", 40, "What is achieved on the screen"),
-        Column("frs", "FRs", 20, "Functional requirements of the FRS"),
+        Column("frs", "FRs", 20, f"Functional requirements of the {doc}"),
         Column("tests", "Test cases", 30, "Test cases of the test plan on this screen"),
-        Column("shots", "Screenshots", 36, "Screenshots of the screen in the FRS"),
+        Column("shots", "Screenshots", 36, f"Screenshots of the screen in the {doc}"),
         Column("fields", "Fields", 8, "Number of fields and columns", kind="number"),
         Column("actions", "Actions", 8, "Number of actions", kind="number"),
     ] + review_columns(), screen_rows, description=f"One row per {nm} screen")
@@ -938,7 +985,7 @@ def build_workbook(pack: Pack) -> Path:
         description="In-app notifications and e-mails")
 
     menu_rows = [r for rows in pack.menus().values() for r in rows]
-    wb.sheet("Menu by persona", [
+    menu_cols = [
         Column("persona", "Persona", 26, "Persona name"),
         Column("role", "Role", 16, "BIBS role code"),
         Column("group", "Group", 18, "Sidebar group"),
@@ -946,7 +993,11 @@ def build_workbook(pack: Pack) -> Path:
         Column("screen", "Screen", 26, "Menu entry"),
         Column("brd", "BRD", 12, "BRD that owns the screen"),
         Column("own", nm, 12, "Yes for a screen of this set"),
-    ], [{k: v for k, v in r.items() if k != "path"} for r in menu_rows], description=f"What each {nm} persona sees in the sidebar (from the role grants)")
+    ]
+    if pack.codes == "labels":
+        menu_cols = [c for c in menu_cols if c.key != "role"]
+    wb.sheet("Menu by persona", menu_cols, [{k: v for k, v in r.items() if k != "path"} for r in menu_rows],
+             description=f"What each {nm} persona sees in the sidebar (from the role grants)")
     if pack.menu_sheets == "per_persona":
         for role, rows in pack.menus().items():
             checked = pack.suite_check(role)
@@ -968,17 +1019,18 @@ def build_workbook(pack: Pack) -> Path:
                                 "header": c["header"], "required": "Y" if c["required"] else "N",
                                 "ctype": c["type"].replace("_", "/").title(), "description": c["description"],
                                 "example": c["example"]})
-    wb.sheet("Upload templates", [
-        Column("type", "Upload type", 28, "Upload type as shown on Bulk Uploads"),
-        Column("code", "Code", 20, "Upload type code"),
-        Column("permission", "Permission", 18, "Permission of the type (with BULK_PROCESS)"),
-        Column("no", "No.", 6, "Column order in the template", kind="number"),
-        Column("header", "Column", 24, "Template header, unchanged"),
-        Column("required", "Mandatory", 10, "Y or N"),
-        Column("ctype", "Type", 10, "Text, Number, Date, Yes/No"),
-        Column("description", "Content", 50, "What to enter"),
-        Column("example", "Example", 22, "Example value (fictitious)"),
-    ], upload_rows, description=f"Columns of every {nm} upload template")
+    if upload_rows or not pack.meta.get("workbook"):
+        wb.sheet("Upload templates", [
+            Column("type", "Upload type", 28, "Upload type as shown on Bulk Uploads"),
+            Column("code", "Code", 20, "Upload type code"),
+            Column("permission", "Permission", 18, "Permission of the type (with BULK_PROCESS)"),
+            Column("no", "No.", 6, "Column order in the template", kind="number"),
+            Column("header", "Column", 24, "Template header, unchanged"),
+            Column("required", "Mandatory", 10, "Y or N"),
+            Column("ctype", "Type", 10, "Text, Number, Date, Yes/No"),
+            Column("description", "Content", 50, "What to enter"),
+            Column("example", "Example", 22, "Example value (fictitious)"),
+        ], upload_rows, description=f"Columns of every {nm} upload template")
 
     wb.sheet("Cross-BRD contract", [
         Column("id", "ID", 8, "Contract line"),
@@ -997,7 +1049,7 @@ def build_workbook(pack: Pack) -> Path:
         Column("id", "ID", 9, "Comment identifier"),
         Column("raised_by", "Raised by", 22, "Name and unit of the reviewer"),
         Column("date", "Date", 13, "Date raised", kind="date"),
-        Column("where", "Page / screen", 24, "FRS page or section, screen ID or workbook row"),
+        Column("where", "Page / screen", 24, f"{doc} page or section, screen ID or workbook row"),
         Column("type", "Type", 16, "Clarification, Correction or Change request", values=COMMENT_TYPES),
         Column("comment", "Comment", 50, "The question, the correction or the change asked for"),
         Column("response", "Response", 50, "Answer of the project team; for a change request, its register number"),
@@ -1028,7 +1080,7 @@ def build_workbook(pack: Pack) -> Path:
         Column("change", "Change", 70, "What changed; for a revision, the comment IDs answered"),
         Column("rows", "Rows changed", 24, "Sheets and rows changed"),
     ], [{"version": str(m["version"]), "date": str(m["date"]), "author": f"{brand.VENDOR} project team",
-         "change": "First issue of the business sign-off pack, from the FRS of the same version", "rows": "All"}],
+         "change": f"First issue of the business sign-off pack, from the {doc} of the same version", "rows": "All"}],
         description="Versions of this release set (a revision after review is v2.1; after sign-off, a change request)",
         freeze_first_column=False)
 
@@ -1063,8 +1115,9 @@ def build_workbook(pack: Pack) -> Path:
         for cell in sheet[4]:
             if cell.value in ("Review date", "Date"):
                 _date_validation(sheet, get_column_letter(cell.column))
-    name = brand.output_name("Signoff", m["brd"], m["name"], str(m["version"]), "xlsx")
-    return wb.save(brand.out_dir(m["brd"], "Signoff") / name)
+    kind = wbm.get("kind") or "Signoff"
+    name = brand.output_name(kind, m["brd"], wbm.get("name") or m["name"], str(m["version"]), "xlsx")
+    return wb.save((out_dir or brand.out_dir(m["brd"], kind)) / name)
 
 
 # ============================================================================ CLI

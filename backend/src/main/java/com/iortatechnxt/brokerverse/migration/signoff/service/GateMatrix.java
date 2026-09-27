@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -124,7 +125,28 @@ public class GateMatrix {
 
     static Cell of(MigSignoff s) {
       return new Cell(
-          s.getDecision().name(), s.getUsername() + " (" + s.getRoleCode() + ")", s.getSignedAt());
+          s.getDecision().name(),
+          s.getUsername() + " (" + roleName(s.getRoleCode()) + ")",
+          s.getSignedAt());
+    }
+
+    /** The signing role as the screens name it ("DATA_OWNER" to "Data owner"). */
+    static String roleName(String roleCode) {
+      if (roleCode == null || roleCode.isBlank()) {
+        return "";
+      }
+      return switch (roleCode) {
+        case "DATA_MIGRATION_LEAD" -> "Data Migration Lead";
+        case "DATA_STEWARD" -> "Data Steward";
+        case "DATA_OWNER" -> "Data owner";
+        case "MIGRATION_OPERATOR" -> "Migration Operator";
+        case "MIGRATION_RECON_APPROVER" -> "Reconciliation approver";
+        case "MIGRATION_GONOGO" -> "Go / no-go board";
+        default -> {
+          String text = roleCode.replace('_', ' ').toLowerCase(Locale.ROOT);
+          yield Character.toUpperCase(text.charAt(0)) + text.substring(1);
+        }
+      };
     }
 
     Cell combine(Cell later) {

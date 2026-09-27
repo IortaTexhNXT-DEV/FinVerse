@@ -1,0 +1,114 @@
+# Cut-over, opening-balance adjustments, run-off and decommissioning (Handbook Parts B and D).
+area: Cut-over, adjustments and run-off
+screens:
+  - id: SCR-DM-11
+    title: Opening-Balance Adjustments
+    route: /migration/trueups
+    purpose: >-
+      The FY2027 closing and audit adjustments of the legacy books after go-live (year-end option A). The
+      Comptrollership GL lead prepares an adjustment on a validated batch of the adjustment journals (object G03) and
+      the legacy trial balance of the same version (object G01); the Head of Comptrollership approves or returns it.
+      The load of the batch posts the opening-balance adjustment journals into the opening period (value date
+      1 January 2028) and adjusts the open legacy items; the adjustment is then reconciled to the legacy trial
+      balances and signed.
+    entry: ["Sidebar › Data Migration › Opening Adjustments"]
+    shots:
+      - {state: list, user: comptrol, caption: Opening-balance adjustments with their batches and status}
+      - {state: prepare, user: comptrol, click: "^prepare adjustment$", caption: Prepare Adjustment dialog}
+    fields:
+      - "List | Adjustment | Column | Reference MIG-TU-n; as-of date under it | - | Adjustments | - | - | - | -"
+      - "List | Batches | Column | Adjustment batch; trial balance batch under it | - | Adjustment | - | - | - | -"
+      - "List | Posted | Column | Journals and items adjusted; date and time | - | Posting | - | - | - | -"
+      - "List | Prepared / Approved / Signed | Column | Names | - | Adjustment | - | - | - | -"
+      - "List | Status | Pill | Prepared, For approval, Approved, Posted, Reconciled, Signed | - | Adjustment | Prepared | - | - | -"
+      - "Prepare Adjustment | Adjustment | Drop-down | 1 after the legacy year-end close, 2 interim, 3 interim, F final after the audited statements | Y | - | 1 | - | Not yet prepared | Opening-balance adjustment <no> already exists"
+      - "Prepare Adjustment | Legacy Trial Balance As Of | Date | dd-MMM-yyyy | Y | - | - | - | - | -"
+      - "Prepare Adjustment | Adjustment Batch | Drop-down | A validated batch of the adjustment journals (G03) | Y | Batches of object G03 | - | - | A batch of the adjustment object | Batch <batch no> is not a batch of object <object>"
+      - "Prepare Adjustment | Legacy Trial Balance Batch | Drop-down | The trial balance of the same version (G01), or None | N | Batches of object G01 | None | - | - | -"
+    actions:
+      - "Prepare Adjustment | Comptrollership GL lead | Year-end option A | Prepares the adjustment on the chosen batches | Prepared | -"
+      - "Submit | Comptrollership GL lead | Prepared | Sends the adjustment to the Head of Comptrollership | For approval | -"
+      - "Approve | Head, Comptrollership | For approval, prepared by another user | Allows the adjustment batch to be loaded; its journals post into the opening period | Approved | -"
+      - "Return | Head, Comptrollership | For approval | Returns the adjustment to the preparer with the reason | Prepared | -"
+      - "Reconcile | Comptrollership GL lead or Head, Comptrollership | Posted or Reconciled | Compares the adjustment with the legacy trial balances and checks that Migration Clearing is zero | Reconciled when every check is met | Alert when a check breaks"
+      - "Sign | Head, Comptrollership | Reconciled | Signs the reconciled adjustment | Signed | -"
+    rules:
+      - "Only journals dated in FY2027, posted in legacy after the freeze and entered in the FY2027 adjustment register are accepted (FR-DM-023)."
+      - "FY2027 profit and loss lines post to retained earnings; lines on legacy control accounts post to Migration Clearing with their open-item detail (FR-DM-023)."
+      - "The preparer never approves; a wrong adjustment is corrected by the next adjustment, never by changing a posted journal (FR-DM-023)."
+      - "An adjustment is signed only when the cut-off, movement, balance, clearing and opening-period checks are met (FR-DM-024)."
+    outcome: Every FY2027 adjustment made in legacy after the freeze is in the BIBS opening balances, approved and reconciled.
+    frs: [FR-DM-022, FR-DM-023, FR-DM-024]
+    tests: [TRUEUPS]
+
+  - id: SCR-DM-12
+    title: Cutover
+    route: /migration/cutover
+    purpose: >-
+      The mock runs, the dress rehearsal and the production cut-over, each a plan with its runbook of tasks planned
+      from the go-live date, the twelve go / no-go criteria and the decisions of the board. Task owners start,
+      complete or block their tasks; the criteria are measured by BIBS or recorded with their evidence; the board
+      decides GO or NO-GO. The runbook downloads as a workbook.
+    entry: ["Migration Home › Next cut-over tasks"]
+    shots:
+      - {state: plans, user: miglead, open: plan_mock, caption: Cut-over plans and the runbook of a mock run}
+      - {state: criteria, user: miggonogo, open: plan_mock, caption: Go / No-Go Criteria and Decisions of a plan}
+      - {state: new, user: miglead, click: "^new plan$", caption: New Cutover Plan dialog}
+    fields:
+      - "Plans | Plan | Column | Name; plan number under it | - | Plans | - | - | - | -"
+      - "Plans | Kind | Column | Mock run with its number, Dress rehearsal, Production cut-over | - | Plan | - | - | - | -"
+      - "Plans | Environment, Go-live, Status | Column | SIT, UAT, PERF or PROD; dd-MMM-yyyy | - | Plan | - | - | - | -"
+      - "New Cutover Plan | Name | Text | Up to 120 characters | Y | - | - | - | Not blank | -"
+      - "New Cutover Plan | Kind | Drop-down | Mock run, Dress rehearsal, Production cut-over | Y | - | Mock run | - | - | -"
+      - "New Cutover Plan | Mock No. | Number | 1 or more | N | - | - | - | For a mock run | -"
+      - "New Cutover Plan | Environment | Text | SIT, UAT, PERF or PROD | Y | - | SIT | - | Not blank | -"
+      - "New Cutover Plan | Go-live Date | Date | dd-MMM-yyyy | Y | - | - | - | - | Give the go-live date of the plan"
+      - "Runbook | No., Task, Owner, After, Planned, Actual, Status | Columns | Phase under the task; object under the owner; reason under the status | - | Runbook tasks | - | - | - | -"
+      - "Go / No-Go Criteria | No., Criterion, Kind, Measured, Result | Columns | Threshold under the criterion; Measured or Recorded; Open, Met, Not met | - | Criteria | - | - | - | -"
+      - "Decisions | Decision, Criteria met, Decided by, At, Comment | Columns | GO or NO-GO | - | Decisions of the board | - | - | - | -"
+    actions:
+      - "New Plan | Data Migration Lead | Always | Creates a plan; its runbook tasks and the twelve criteria are created from the go-live date | Planned | -"
+      - "Runbook | Every migration role | A plan is open | Downloads the runbook workbook of the plan | - | -"
+      - "Measure Criteria | Data Migration Lead or the board | A plan is open | Measures the criteria that BIBS measures (acceptance, counts, financial rejects, amounts, clearing, legacy accounts, client queue) | - | -"
+      - "Start, Done, Block | Data Migration Lead | Task not started, in progress or blocked | Records the actual start or end; a block needs its reason | In progress, Done, Blocked | -"
+      - "Met, Not met | Data Migration Lead | Recorded criterion | Records a criterion that BIBS does not measure, with its evidence | Met or Not met | -"
+      - "GO | Go / no-go board | A plan is open | Records GO; when a criterion is not met the justification is mandatory; on the production plan it signs gate G7 | GO | -"
+      - "NO-GO | Go / no-go board | A plan is open | Records NO-GO with the reason; the cut-over stops and rolls back to the snapshot | NO-GO | -"
+    rules:
+      - "A task starts only when the tasks it depends on are done (FR-DM-120)."
+      - "Criteria measured by BIBS cannot be recorded by hand (FR-DM-121)."
+      - "A GO with criteria not met needs the board's justification; the financial and clearing criteria of the go-live decision are never waived (FR-DM-121)."
+      - "Until the go / no-go decision the rollback restores the snapshot taken before the production load (FR-DM-121)."
+    outcome: The cut-over follows a rehearsed plan and go-live is decided on measured criteria.
+    frs: [FR-DM-120, FR-DM-121]
+    tests: [CUTOVER, GONOGO]
+
+  - id: SCR-DM-13
+    title: Run-off and Decommissioning
+    route: /migration/runoff
+    purpose: >-
+      The monthly run-off of the legacy policies in force at go-live by expiry month and source system (renewed in
+      BIBS, not renewed, lapsed, still open), and the checklists that close each legacy system and, once every
+      legacy item is settled, the legacy context of BIBS.
+    entry: ["Migration Home › Run-off of the legacy policies"]
+    shots:
+      - {state: view, user: miglead, caption: Run-off by expiry month and the decommissioning checklists}
+    fields:
+      - "Run-off | Expiry Month, System | Column | yyyy-MM; EBIX, QPS, ISYS, CMS | - | Run-off snapshot | - | - | - | -"
+      - "Run-off | In Force, Premium in Force | Column | Count; amount | - | Run-off snapshot | - | - | - | -"
+      - "Run-off | Renewed, Not Renewed, Lapsed, Still Open | Column | Counts | - | Run-off snapshot | - | - | - | -"
+      - "Decommissioning Checklists | Legacy System | Drop-down | EBIX, QPS, ISYS, CMS without an open checklist | Y | Legacy systems | EBIX | - | - | The checklist of <system> is already open"
+      - "Decommissioning Checklists | System | Column | System, or Legacy context; the milestone under it | - | Checklist | - | - | - | -"
+      - "Decommissioning Checklists | Criterion | Column | Name; description under it | - | Checklist template | - | - | - | -"
+      - "Decommissioning Checklists | Evidence | Column | Text; who signed and when under it | - | Checklist | - | - | Evidence given | Give the evidence of the criterion"
+      - "Decommissioning Checklists | Status | Pill | Open, Met, Signed, Not applicable | - | Checklist | Open | - | - | -"
+    actions:
+      - "Take Snapshot | Data Migration Lead | Always | Takes the run-off snapshot of today (it is also taken on the first of each month) | - | -"
+      - "Open Checklist | Data Migration Lead | The system has no checklist | Opens the decommissioning checklist of the system | Open | -"
+      - "Met, Sign, Not applicable | Data Migration Lead | Criterion open or met | Records the criterion with its evidence | Met, Signed or Not applicable | -"
+    rules:
+      - "A legacy system is decommissioned only when every criterion of its checklist is signed (FR-DM-123)."
+      - "The legacy context closes when no legacy invoice or unapplied payment is open and the legacy accounts and Migration Clearing are at 0.00 (FR-DM-123)."
+    outcome: The run-off of the legacy policies is visible month by month and each legacy system is closed against a signed checklist.
+    frs: [FR-DM-122, FR-DM-123]
+    tests: [RUNOFF]

@@ -382,6 +382,7 @@ def load(path: Path) -> Plan:
 
 def _add_signoff_cases(plan: Plan) -> None:
     """Screen and message cases from the business sign-off pack of the BRD, and the Screen ID of every case."""
+    doc = plan.meta.get("source_doc", "FRS")  # the document the FRs come from
     sys.path.insert(0, str(REPO / "docs" / "deliverables" / "src" / "signoff"))
     import signoff_pack  # noqa: E402
 
@@ -416,13 +417,13 @@ def _add_signoff_cases(plan: Plan) -> None:
         fields = "; ".join(f"{f['no']} {f['label']} ({f['type']}, mandatory {f['mandatory']})" for f in scr.fields)
         actions = "; ".join(a["button"] for a in scr.actions)
         steps = [f"Sign in as {user(role)}.", f"Open {pack.menu_path(scr)}."]
-        steps += [f"Compare the screen with {scr.id} in the FRS: the fields, their order, labels, types, mandatory "
+        steps += [f"Compare the screen with {scr.id} in the {doc}: the fields, their order, labels, types, mandatory "
                   "markers, defaults and lists."]
         if scr.actions:
             steps.append("Check the buttons offered to the persona and when each is enabled.")
         if any(f["message"] not in ("-", "") for f in scr.fields):
             steps.append("Leave one mandatory field blank or enter an invalid value, and save.")
-        expected = [f"The screen matches {scr.id} {scr.title} of the FRS."]
+        expected = [f"The screen matches {scr.id} {scr.title} of the {doc}."]
         if fields:
             expected.append(f"Fields in this order: {fields}.")
         if actions:
@@ -449,7 +450,7 @@ def _add_signoff_cases(plan: Plan) -> None:
         listed = "\n".join(f"{m['id']}: \"{m['text']}\"" + (f" ({m['code']})" if m["code"] != "-" else "")
                            for m in msgs)
         steps = [f"Sign in as {user(role)}.", f"Open {screen}.",
-                 "For each message listed, create the condition described in the messages catalogue of the FRS "
+                 f"For each message listed, create the condition described in the messages catalogue of the {doc} "
                  "(chapter 15) and run the action."]
         case = Case(id=f"TC-{code}-MSG-{n:02d}", cond="-", fr=fr, brd=brd, scenario="",
                     title=f"Messages of {where}", type="Message", negative=True, persona=role, screen=screen,
@@ -631,6 +632,7 @@ def persona_label(plan: Plan, code: str) -> str:
 
 def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
     m = plan.meta
+    doc = plan.meta.get("source_doc", "FRS")  # the document the FRs come from
     brd_label = f"BRD-{int(m['brd'].split('-')[1])}"
     wb = BdoiWorkbook(f"Test Plan {brd_label} {m['name']}", doc_type="Test plan", brd=m["brd"],
                       version=str(m["version"]), date=str(m["date"]),
@@ -641,7 +643,7 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
                  ("Blocked", "The case cannot run (environment, data or an open issue elsewhere)"),
                  ("N/A", "Not applicable in this cycle, with the reason in Actual result")]
     wb.cover_notes = [
-        f"Source: FRS {brd_label} {m['name']}. {t['frs']} FRs, {t['brd_ids']} BRD IDs, {t['conditions']} test "
+        f"Source: {doc} {brd_label} {m['name']}. {t['frs']} FRs, {t['brd_ids']} BRD IDs, {t['conditions']} test "
         f"conditions, {t['scenarios']} scenarios, {t['cases']} test cases ({t['positive']} positive, "
         f"{t['negative']} negative).",
         "Status starts as Not run. Testers fill Status, Actual result, Tester, Date and Issue ID during execution.",
@@ -660,7 +662,7 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
 
     wb.sheet("Test Conditions", [
         Column("id", "TC ID", 14, "Test condition ID: TC-<FR number>.<n>"),
-        Column("fr", "FR ID", 12, "Functional requirement of the FRS"),
+        Column("fr", "FR ID", 12, f"Functional requirement of the {doc}"),
         Column("brd", "BRD ID(s)", 16, "BRD requirement IDs the FR meets"),
         Column("text", "Test condition", 70, "What must be shown to be true"),
         Column("priority", "Priority", 10, "From the BRD priority of the FR (Must have = High)", values=PRIORITIES),
@@ -692,7 +694,7 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
         Column("type", "Type", 13, "Kind of test", values=TYPES),
         Column("persona", "Persona", 22, "Role code and name (and the SIT/UAT user)"),
         Column("screen", "Screen (menu path)", 26, "Where the tester starts"),
-    ] + ([Column("screen_id", "Screen ID", 12, "Screen of the FRS screen specifications (business sign-off pack)")]
+    ] + ([Column("screen_id", "Screen ID", 12, f"Screen of the {doc} screen specifications (business sign-off pack)")]
          if plan.signoff else []) + [
         Column("pre", "Preconditions and test data", 36, "State before the first step and the named data set"),
         Column("steps", "Steps", 52, "Numbered steps"),
@@ -715,7 +717,7 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
     for r in fr_stats(plan) + brd_stats(plan):
         cov.append({**r, "types": ""})
     wb.sheet("Coverage", [
-        Column("item", "FR / BRD ID", 13, "FR of the FRS, then BRD requirement ID"),
+        Column("item", "FR / BRD ID", 13, f"FR of the {doc}, then BRD requirement ID"),
         Column("kind", "Kind", 8, "FR or BRD ID"),
         Column("title", "Title", 40, "FR title"),
         Column("traces", "Traces", 26, "BRD IDs of the FR, or FRs of the BRD ID"),
@@ -729,7 +731,7 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
 
     if plan.signoff:
         wb.sheet("Screens", [
-            Column("id", "Screen ID", 12, "Screen of the FRS screen specifications"),
+            Column("id", "Screen ID", 12, f"Screen of the {doc} screen specifications"),
             Column("title", "Screen", 28, "Screen name"),
             Column("menu", "Menu path", 40, "Where the screen is"),
             Column("n", "Cases", 8, "Test cases run on the screen", kind="number"),
@@ -737,7 +739,7 @@ def build_xlsx(plan: Plan, control: list[dict[str, Any]]) -> Path:
         ], rows=[{"id": sc.id, "title": sc.title, "menu": plan.signoff.menu_path(sc),
                   "n": len(ids), "cases": ", ".join(ids)}
                  for sc in plan.signoff.screens for ids in [[c.id for c in plan.cases if c.screen_id == sc.id]]],
-            description="Every screen of the FRS with the test cases that run on it")
+            description=f"Every screen of the {doc} with the test cases that run on it")
 
     data_rows = []
     for d in plan.data:

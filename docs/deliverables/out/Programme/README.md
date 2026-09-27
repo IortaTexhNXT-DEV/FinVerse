@@ -11,7 +11,8 @@ BIBS client pack for BDO Insurance and Reinsurance Brokers (BDOI), grouped by BD
 ## Documents in this drop
 
 One folder per BRD release set (`BRD-nn_<Name>/`): every file of the BRD (Start Here, guide deck, FRS, sign-off
-workbook, test plan and summary, migration documents and templates), released and signed off together; in an
+workbook, test plan and summary; for BRD-13 the Data Migration Handbook and the Migration Workbook), released
+and signed off together; in an
 issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, "Release and
 sign-off per BRD"). Each document is kept once, in its latest version.
 

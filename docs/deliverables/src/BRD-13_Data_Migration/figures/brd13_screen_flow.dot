@@ -1,0 +1,57 @@
+digraph flow {
+  graph [rankdir=TB, fontname="Arial", nodesep=0.2, ranksep=0.35, bgcolor="white", newrank=true, compound=true];
+  node [shape=box, style="rounded,filled", fillcolor="@BG_BLUE", color="@HEADER_BLUE", fontname="Arial", fontsize=10, fontcolor="@NEAR_BLACK", margin="0.12,0.06"];
+  edge [color="@CTA_BLUE", fontname="Arial", fontsize=8, fontcolor="@MUTED", arrowsize=0.6];
+  subgraph "cluster_Migration Console" { label="Migration Console"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-DM-01" [label="Migration Home\nSCR-DM-01"];
+    "SCR-DM-02" [label="Data Objects and the decision of an object\nSCR-DM-02"];
+    "SCR-DM-03" [label="Code Maps and the versions of a code map\nSCR-DM-03"];
+    "SCR-DM-04" [label="Layouts and Rules\nSCR-DM-04"];
+    "SCR-DM-05" [label="Extracts\nSCR-DM-05"];
+    "SCR-DM-06" [label="Batches and resubmissions\nSCR-DM-06"];
+    "SCR-DM-07" [label="Batch\nSCR-DM-07"];
+    "SCR-DM-08" [label="Client Matching\nSCR-DM-08"];
+    "SCR-DM-09" [label="Reconciliation\nSCR-DM-09"];
+    "SCR-DM-10" [label="Sign-off\nSCR-DM-10"];
+  }
+  subgraph "cluster_Cut-over, adjustments and run-off" { label="Cut-over, adjustments and run-off"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-DM-11" [label="Opening-Balance Adjustments\nSCR-DM-11"];
+    "SCR-DM-12" [label="Cutover\nSCR-DM-12"];
+    "SCR-DM-13" [label="Run-off and Decommissioning\nSCR-DM-13"];
+  }
+  subgraph "cluster_Legacy Inquiry" { label="Legacy Inquiry"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-DM-14" [label="Legacy Inquiry\nSCR-DM-14"];
+    "SCR-DM-15" [label="Access Log\nSCR-DM-15"];
+  }
+  subgraph "cluster_Migrated data on the business screens" { label="Migrated data on the business screens"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-DM-16" [label="LEGACY badge and Origin filter on the lists\nSCR-DM-16"];
+    "SCR-DM-17" [label="Legacy invoice on Invoice 360\nSCR-DM-17"];
+  }
+  subgraph "cluster_Legacy batches" { label="Legacy batches"; fontname="Arial"; fontsize=10; fontcolor="@HEADER_BLUE"; color="@BORDER"; style="rounded";
+    "SCR-DM-18" [label="Unapplied to Income\nSCR-DM-18"];
+    "SCR-DM-19" [label="Legacy PR 2307 Reversal\nSCR-DM-19"];
+    "SCR-DM-20" [label="DP PR Legacy Reversal\nSCR-DM-20"];
+  }
+  "SCR-DM-01" -> "SCR-DM-02" [label="Objects tiles"];
+  "SCR-DM-01" -> "SCR-DM-04" [label="Load Templates"];
+  "SCR-DM-01" -> "SCR-DM-05" [label="Upload Extract"];
+  "SCR-DM-01" -> "SCR-DM-06" [label="Batches"];
+  "SCR-DM-02" -> "SCR-DM-03" [label="code maps of the object"];
+  "SCR-DM-04" -> "SCR-DM-05" [label="filled template"];
+  "SCR-DM-05" -> "SCR-DM-06" [label="Plan Batch"];
+  "SCR-DM-06" -> "SCR-DM-07" [label="open"];
+  "SCR-DM-07" -> "SCR-DM-08" [label="client pairs to review"];
+  "SCR-DM-07" -> "SCR-DM-09" [label="Reconcile"];
+  "SCR-DM-09" -> "SCR-DM-10" [label="gates signed"];
+  "SCR-DM-10" -> "SCR-DM-07" [label="latest batch"];
+  "SCR-DM-07" -> "SCR-DM-11" [label="adjustment batch"];
+  "SCR-DM-10" -> "SCR-DM-12" [label="Day-1 objects accepted"];
+  "SCR-DM-12" -> "SCR-DM-13" [label="after go-live"];
+  "SCR-DM-12" -> "SCR-DM-16" [label="migrated records"];
+  "SCR-DM-16" -> "SCR-DM-17" [label="open a legacy invoice"];
+  "SCR-DM-17" -> "SCR-DM-18" [label="old unapplied payments"];
+  "SCR-DM-17" -> "SCR-DM-19" [label="PR 2307 balance"];
+  "SCR-DM-17" -> "SCR-DM-20" [label="paid directly to the insurer"];
+  "SCR-DM-13" -> "SCR-DM-14" [label="archived history"];
+  "SCR-DM-14" -> "SCR-DM-15" [label="every access logged"];
+}

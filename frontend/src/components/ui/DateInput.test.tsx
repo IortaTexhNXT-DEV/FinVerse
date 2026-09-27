@@ -56,6 +56,16 @@ describe('DateInput', () => {
     expect(parseDateText('23 sep 2026')).toBe('2026-09-23');
   });
 
+  it('reads "today" as the business date in Philippine time', () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-09-26T22:00:00Z'));
+    try {
+      expect(parseDateText(' Today ')).toBe('2026-09-27');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('has a calendar button', () => {
     render(<Form onDate={vi.fn()} />);
     expect(screen.getByRole('button', { name: 'Choose date' })).toBeInTheDocument();

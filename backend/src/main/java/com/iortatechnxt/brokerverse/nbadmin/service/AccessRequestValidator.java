@@ -33,6 +33,7 @@ public class AccessRequestValidator {
   private final UserRequestValidator users;
   private final GroupProfileRequestValidator groupProfiles;
   private final ExternalUserProvisioner externalUsers;
+  private final AccessSettings settings;
   private final AccessRequestRepository requests;
   private final Clock clock;
 
@@ -42,6 +43,7 @@ public class AccessRequestValidator {
    * @param users internal user checks
    * @param groupProfiles group-profile checks
    * @param externalUsers external (portal) users (port)
+   * @param settings parameters (external users switched on)
    * @param requests requests (one open request per user or role)
    * @param clock clock
    */
@@ -49,8 +51,10 @@ public class AccessRequestValidator {
       UserRequestValidator users,
       GroupProfileRequestValidator groupProfiles,
       ExternalUserProvisioner externalUsers,
+      AccessSettings settings,
       AccessRequestRepository requests,
       Clock clock) {
+    this.settings = settings;
     this.users = users;
     this.groupProfiles = groupProfiles;
     this.externalUsers = externalUsers;
@@ -132,6 +136,11 @@ public class AccessRequestValidator {
   }
 
   private AccessRequestContent external(AccessRequestContent c) {
+    if (!settings.externalUsers()) {
+      throw new BusinessRuleException(
+          ExternalUserProvisioner.NOT_AVAILABLE,
+          "Requests for external (portal) users are switched off: no portal is installed");
+    }
     ExternalParty party = c.external();
     if (!EXTERNAL_TYPES.contains(c.type())) {
       throw new BusinessRuleException(

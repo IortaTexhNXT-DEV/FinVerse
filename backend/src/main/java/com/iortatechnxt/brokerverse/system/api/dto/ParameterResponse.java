@@ -16,6 +16,10 @@ import java.time.Instant;
  * @param maxValue upper bound (numbers)
  * @param updatedBy last modifier
  * @param updatedAt last modification
+ * @param secondApproval whether a change waits for a second approval (security parameters)
+ * @param pendingValue value waiting for approval, null for none
+ * @param pendingBy user who asked for it
+ * @param pendingAt when it was asked for
  */
 public record ParameterResponse(
     String key,
@@ -26,7 +30,11 @@ public record ParameterResponse(
     Integer minValue,
     Integer maxValue,
     String updatedBy,
-    Instant updatedAt) {
+    Instant updatedAt,
+    boolean secondApproval,
+    String pendingValue,
+    String pendingBy,
+    Instant pendingAt) {
 
   /**
    * Maps an entity.
@@ -44,6 +52,10 @@ public record ParameterResponse(
         p.getMinValue(),
         p.getMaxValue(),
         p.getUpdatedBy(),
-        p.getUpdatedAt());
+        p.getUpdatedAt(),
+        p.isSecurity(),
+        p.getPendingValue(),
+        p.getPendingBy(),
+        p.getPendingAt());
   }
 }

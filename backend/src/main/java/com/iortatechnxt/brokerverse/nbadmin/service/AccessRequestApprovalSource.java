@@ -30,16 +30,20 @@ public class AccessRequestApprovalSource implements PendingApprovalSource {
 
   private final AccessRequestService requests;
   private final AccessSettings settings;
+  private final AccessRequestDescriber describer;
 
   /**
    * Creates the source.
    *
    * @param requests access requests
    * @param settings parameters (any approver)
+   * @param describer descriptions of the requests
    */
-  public AccessRequestApprovalSource(AccessRequestService requests, AccessSettings settings) {
+  public AccessRequestApprovalSource(
+      AccessRequestService requests, AccessSettings settings, AccessRequestDescriber describer) {
     this.requests = requests;
     this.settings = settings;
+    this.describer = describer;
   }
 
   @Override
@@ -50,7 +54,7 @@ public class AccessRequestApprovalSource implements PendingApprovalSource {
         .filter(
             r -> viewer.systemView() || !CurrentUser.sameUser(viewer.username(), r.getUsername()))
         .filter(r -> waitsFor(r, viewer, anyApprover))
-        .map(AccessRequestApprovalSource::item)
+        .map(this::item)
         .toList();
   }
 
@@ -70,12 +74,12 @@ public class AccessRequestApprovalSource implements PendingApprovalSource {
     };
   }
 
-  private static PendingApproval item(AccessRequest r) {
+  private PendingApproval item(AccessRequest r) {
     return new PendingApproval(
         MODULE,
         r.getStatus() == AccessRequestStatus.FOR_IMPLEMENTATION ? IMPLEMENT_TYPE : TYPE,
         r.getRequestNo(),
-        AccessRequestService.describe(r),
+        describer.describe(r),
         null,
         null,
         AccessRequestNotifier.requester(r),

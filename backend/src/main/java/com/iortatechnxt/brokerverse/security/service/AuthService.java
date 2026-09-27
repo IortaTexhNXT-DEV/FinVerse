@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
 import java.util.Optional;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
@@ -28,9 +29,9 @@ import org.springframework.transaction.annotation.Transactional;
  * the parameter is missing) lock the account until an administrator unlocks it. Failures are
  * counted on the shared counter ({@link LoginAttemptTracker}) so concurrent attempts on several
  * instances all count; the user record keeps the count. Logout revokes the token ({@link
- * TokenRevocationStore}). Every success, failure and logout is written to the audit trail, and
- * every issued token opens a session in the session log that the logout ends ({@link
- * UserSessionLog}, UAM-NFR-35).
+ * TokenRevocationStore}). A deactivated user is refused with its own message and the attempt is not
+ * counted. Every success, failure and logout is written to the audit trail, and every issued token
+ * opens a session in the session log that the logout ends ({@link UserSessionLog}, UAM-NFR-35).
  *
  * <p>The password is checked by the {@link
  * com.iortatechnxt.brokerverse.security.service.directory.DirectoryAuthenticator} of the sign-in
@@ -44,6 +45,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
   private static final String ENTITY = "AppUser";
+
+  /** Message of a deactivated user; the attempt does not count towards the lockout. */
+  public static final String DEACTIVATED =
+      "Your account is deactivated. Contact your administrator.";
 
   private final DirectoryAuthenticators authenticators;
   private final AppUserRepository users;
@@ -116,11 +121,7 @@ public class AuthService {
           username, ENTITY, username, AuditAction.LOGIN_FAILED, "Unknown user" + suffix(mode));
       throw new BadCredentialsException(LocalPasswordAuthenticator.INVALID);
     }
-    if (user.isLocked()) {
-      audit.recordIndependently(
-          username, ENTITY, username, AuditAction.LOGIN_FAILED, "Account locked");
-      throw new LockedException("Account is locked. Contact your administrator.");
-    }
+    refuseLockedOrDeactivated(user, username);
     DirectoryResult result =
         authenticators.authenticate(
             mode,
@@ -191,6 +192,23 @@ public class AuthService {
           case EXPIRED -> "Logged out at the end of the session";
           default -> "Logged out";
         });
+  }
+
+  /**
+   * Refuses a locked or deactivated account before the password is checked; the attempt is audited
+   * and not counted towards the lockout.
+   */
+  private void refuseLockedOrDeactivated(AppUser user, String username) {
+    if (user.isLocked()) {
+      audit.recordIndependently(
+          username, ENTITY, username, AuditAction.LOGIN_FAILED, "Account locked");
+      throw new LockedException("Account is locked. Contact your administrator.");
+    }
+    if (!user.isEnabled()) {
+      audit.recordIndependently(
+          username, ENTITY, username, AuditAction.LOGIN_FAILED, "Account deactivated");
+      throw new DisabledException(DEACTIVATED);
+    }
   }
 
   private Optional<AppUser> findUser(AuthMode mode, String userId) {

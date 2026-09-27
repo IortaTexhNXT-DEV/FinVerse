@@ -12,9 +12,16 @@ import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
+import { PermissionName } from '@/components/ui/PermissionName';
+import { permissionLabel, permissionLabels } from '@/utils/permissionLabel';
 import { ACTION_LABELS, actionText, areaLabel } from './accessMatrix';
 
 type View = 'permission' | 'action';
+
+/** Whether a name matches the search (the search is kept in the code form, A_B). */
+function matchesName(name: string, needle: string): boolean {
+  return name.toUpperCase().replace(/ /g, '_').includes(needle);
+}
 
 const VIEWS = [
   { id: 'permission', label: 'By Permission' },
@@ -25,8 +32,8 @@ function RoleHeaders({ roles }: Readonly<{ roles: MatrixRole[] }>) {
   return (
     <>
       {roles.map((r) => (
-        <th key={r.code} scope="col" title={r.name}>
-          {r.code}
+        <th key={r.code} scope="col" title={r.code}>
+          {r.name}
           <div className="muted">
             {r.enabledUsers} {r.enabledUsers === 1 ? 'user' : 'users'}
           </div>
@@ -38,7 +45,10 @@ function RoleHeaders({ roles }: Readonly<{ roles: MatrixRole[] }>) {
 
 function PermissionTable({ matrix, needle }: Readonly<{ matrix: AccessMatrix; needle: string }>) {
   const rows = matrix.permissions.filter(
-    (p) => p.permission.includes(needle) || (p.area ?? '').includes(needle),
+    (p) =>
+      p.permission.includes(needle) ||
+      (p.area ?? '').includes(needle) ||
+      matchesName(permissionLabel(p.permission), needle),
   );
   if (rows.length === 0) {
     return <EmptyState message="No permission matches the search." />;
@@ -57,7 +67,9 @@ function PermissionTable({ matrix, needle }: Readonly<{ matrix: AccessMatrix; ne
       <tbody>
         {rows.map((p) => (
           <tr key={p.permission}>
-            <th scope="row">{p.permission}</th>
+            <th scope="row">
+              <PermissionName code={p.permission} />
+            </th>
             <td>{p.area === undefined ? '—' : areaLabel(p.area)}</td>
             <td>{actionText(p.actions) || '—'}</td>
             {matrix.roles.map((r) => (
@@ -76,7 +88,9 @@ function PermissionTable({ matrix, needle }: Readonly<{ matrix: AccessMatrix; ne
 
 function ActionTable({ matrix, needle }: Readonly<{ matrix: AccessActionMatrix; needle: string }>) {
   const rows = matrix.rows.filter(
-    (r) => r.area.includes(needle) || r.permissions.some((p) => p.includes(needle)),
+    (r) =>
+      r.area.includes(needle) ||
+      r.permissions.some((p) => p.includes(needle) || matchesName(permissionLabel(p), needle)),
   );
   if (rows.length === 0) {
     return <EmptyState message="No area or permission matches the search." />;
@@ -94,13 +108,13 @@ function ActionTable({ matrix, needle }: Readonly<{ matrix: AccessActionMatrix; 
       <tbody>
         {rows.map((row) => (
           <tr key={`${row.area}-${row.action}`}>
-            <th scope="row" className="matrix-area" title={row.permissions.join(', ')}>
+            <th scope="row" className="matrix-area" title={permissionLabels(row.permissions)}>
               {areaLabel(row.area)}
             </th>
             <td>{ACTION_LABELS[row.action]}</td>
             {matrix.roles.map((r) => (
               <td key={r.code} className="matrix-cell-permissions">
-                {row.grants[r.code]?.join(', ')}
+                {permissionLabels(row.grants[r.code] ?? [])}
               </td>
             ))}
           </tr>

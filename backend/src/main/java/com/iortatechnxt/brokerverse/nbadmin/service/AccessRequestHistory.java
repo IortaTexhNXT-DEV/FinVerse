@@ -25,6 +25,7 @@ public class AccessRequestHistory {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final AccessRequestDescriber describer;
 
   /**
    * Creates the component.
@@ -33,16 +34,19 @@ public class AccessRequestHistory {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param describer descriptions of the requests
    */
   public AccessRequestHistory(
       AccessRequestEventRepository events,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      AccessRequestDescriber describer) {
     this.events = events;
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.describer = describer;
   }
 
   /**
@@ -68,10 +72,7 @@ public class AccessRequestHistory {
         AccessRequestService.ENTITY,
         r.getRequestNo(),
         action.auditAction(),
-        action.label()
-            + ": "
-            + AccessRequestService.describe(r)
-            + AccessRequestService.note(remarks));
+        action.label() + ": " + describer.describe(r) + AccessRequestService.note(remarks));
   }
 
   /**

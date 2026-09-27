@@ -247,6 +247,9 @@ fixes:
   CLIENT_NOT_PROSPECT: No action; the client is already confirmed or is not in the prospect stage.
   RESPONSE_NOT_RECEIVED: Record the insurer's terms first (response Terms received), then recommend it.
   ACCOUNT_RENEWAL_OF_NOT_RENEWAL: Clear the policy renewed, or set the account type to Renewal.
+  QUOTATION_RENEWAL_EXISTS: Open the quotation already made for the renewal from the renewal record, and continue it instead of starting another.
+  PROPOSAL_RENEWAL_EXISTS: Open the proposal request already made for the renewal from the renewal record, and continue it instead of starting another.
+  ACCOUNT_NOT_RENEWAL: Use the fast track for a renewal account only; process this account through the normal new business steps.
   MALFORMED_REQUEST: Reload the screen and try again; if it persists, report it with the time to the system administrator.
   UPLOAD_TOO_LARGE: Reduce the file (split it or scan at a lower resolution) and upload it again.
   "An individual policyholder must be at least <minimum age> years old": Correct the birth date, or record the client as a corporate or through a guardian.

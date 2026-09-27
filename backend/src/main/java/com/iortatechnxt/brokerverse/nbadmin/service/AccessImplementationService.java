@@ -129,5 +129,6 @@ public class AccessImplementationService implements ApprovedRoleRequests {
     r.implemented(by, clock.instant());
     history.record(r, AccessRequestAction.IMPLEMENT, AccessRequestStatus.FOR_IMPLEMENTATION, null);
     notifier.decided(r, "implemented");
+    notifier.accessChanged(r);
   }
 }

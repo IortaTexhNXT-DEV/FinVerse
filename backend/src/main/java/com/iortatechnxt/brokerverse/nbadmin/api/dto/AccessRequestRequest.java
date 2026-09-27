@@ -8,10 +8,13 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedRole;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedUserData;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RolePermissionChange;
 import com.iortatechnxt.brokerverse.security.domain.PrivilegeLevel;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -45,6 +48,8 @@ import java.util.Set;
  * @param portalRole portal role (INSURER_USER, CLIENT_HR)
  * @param effectiveFrom date the change applies, null for "on approval" (UAM-NFR-14)
  * @param approvers approvers in order (submission; a user request has one)
+ * @param authorizationLimit authorisation limit of the user (enrol, modify), null for none /
+ *     unchanged
  */
 public record AccessRequestRequest(
     @NotNull AccessRequestType type,
@@ -69,7 +74,8 @@ public record AccessRequestRequest(
     @Size(max = 40) String partyCode,
     @Size(max = 40) String portalRole,
     LocalDate effectiveFrom,
-    List<@Size(max = 50) String> approvers) {
+    List<@Size(max = 50) String> approvers,
+    @DecimalMin("0") @Digits(integer = 16, fraction = 2) BigDecimal authorizationLimit) {
 
   /**
    * Request content.
@@ -98,7 +104,8 @@ public record AccessRequestRequest(
                     businessUnitCode,
                     userLevel,
                     reasonCode,
-                    Boolean.TRUE.equals(unlock)))
+                    Boolean.TRUE.equals(unlock),
+                    authorizationLimit))
             .withEffectiveFrom(effectiveFrom);
     return partyKind == null && partyCode == null
         ? user

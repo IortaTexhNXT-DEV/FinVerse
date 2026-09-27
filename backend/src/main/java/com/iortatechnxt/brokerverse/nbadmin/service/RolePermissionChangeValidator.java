@@ -68,7 +68,7 @@ public class RolePermissionChangeValidator {
     if (effective.isEmpty() && data == null) {
       throw new BusinessRuleException(
           "ACCESS_NO_PERMISSION_CHANGE",
-          "The request does not change the permissions of role " + role.getCode());
+          "The request does not change the permissions of group profile " + role.getName());
     }
     requireStorable(added);
     requireStorable(removed);

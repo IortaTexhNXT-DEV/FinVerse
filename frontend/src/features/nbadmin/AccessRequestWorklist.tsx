@@ -143,6 +143,13 @@ function Filters({
   );
 }
 
+/**
+ * A new-user request is approved on its own, from its page: the temporary password of the new
+ * user is shown once, to the approver who applies it (as in My Approvals).
+ */
+export const APPROVE_ON_ITS_OWN =
+  'Open the request to approve it: the temporary password of the new user is shown only once';
+
 const COLUMNS: Column<AccessRequest>[] = [
   { key: 'no', header: 'Request', render: (r) => <strong className="mono">{r.requestNo}</strong> },
   { key: 'type', header: 'Type', render: (r) => REQUEST_TYPE_LABELS[r.type] },
@@ -189,10 +196,12 @@ export function AccessRequestWorklist({
     selection.clear();
     setFilters({ ...filters, ...patch, page: 0 });
   };
+  const rows = requests.data?.content ?? [];
   const decidable = filters.scope === 'ASSIGNED' || filters.scope === 'SECOND';
   const approveSelected = useMutation({
     mutationFn: async (ids: number[]) => {
-      for (const id of ids) {
+      const enrolments = new Set(rows.filter((r) => r.type === 'CREATE_USER').map((r) => r.id));
+      for (const id of ids.filter((i) => !enrolments.has(i))) {
         await (filters.scope === 'SECOND' ? nbadminApi.secondApprove(id) : nbadminApi.approve(id));
       }
       return ids.length;
@@ -203,7 +212,6 @@ export function AccessRequestWorklist({
       await queryClient.invalidateQueries({ queryKey: ['nbadmin'] });
     },
   });
-  const rows = requests.data?.content ?? [];
   const columns = decidable
     ? [
         selectionColumn(
@@ -211,6 +219,7 @@ export function AccessRequestWorklist({
           (r) => String(r.id),
           selection,
           (r) => r.requestNo,
+          (r) => (r.type === 'CREATE_USER' ? APPROVE_ON_ITS_OWN : undefined),
         ),
         ...COLUMNS,
       ]

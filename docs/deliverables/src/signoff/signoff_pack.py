@@ -124,6 +124,12 @@ class Pack:
         # of a Product Maintenance walkthrough): paths relative to this pack.yaml.
         self.foreign_paths = [(self.dir / f).resolve() for f in raw.get("foreign_packs") or []]
         self.signatories: list[list[str]] = raw.get("signatories") or []
+        # Menus of more roles than the personas of the pack (User Access: every persona of the persona suites of
+        # the menu check, frontend/src/navigation/personaMenus.json), {ROLE: {name, user}}; optional.
+        self.menu_personas: dict[str, dict[str, Any]] = raw.get("menu_personas") or {}
+        self.menu_suites: str | None = raw.get("menu_suites")
+        # "per_persona": the workbook also has one menu sheet per persona (besides Menu by persona).
+        self.menu_sheets: str = raw.get("menu_sheets") or ""
 
     @cached_property
     def foreign(self) -> dict[str, Screen]:
@@ -167,6 +173,8 @@ class Pack:
         return hit[2] if hit else None
 
     def personas_of(self, scr: Screen) -> list[str]:
+        if scr.get("everyone"):
+            return list(self.personas)
         sd = self.screen_def(scr.route)
         if sd is None:
             return []
@@ -176,6 +184,8 @@ class Pack:
         sd = self.screen_def(scr.route)
         if scr.get("public"):
             return "none, before sign-in"
+        if scr.get("everyone"):
+            return "none, every signed-in user"
         if sd is None:
             return "-"
         if not sd.opened_by:
@@ -183,6 +193,9 @@ class Pack:
         return " or ".join(sd.opened_by)
 
     def menu_path(self, scr: Screen) -> str:
+        if scr.get("menu"):
+            # A screen without a route of its own (a dialog over any screen, a page shown after sign-in).
+            return str(scr.get("menu"))
         hit = self.routes.get(scr.route)
         if hit is None:
             return scr.route
@@ -194,14 +207,46 @@ class Pack:
         return f"{base} › {sd.label}" if base else sd.label
 
     def persona_label(self, role: str) -> str:
-        p = self.personas.get(role, {})
+        p = self.personas.get(role) or self.menu_personas.get(role) or {}
         return p.get("name", role)
+
+    @property
+    def menu_roles(self) -> dict[str, dict[str, Any]]:
+        """The roles whose sidebar the pack shows: its personas, then the extra menu personas."""
+        return {**self.personas, **{r: p for r, p in self.menu_personas.items() if r not in self.personas}}
+
+    @cached_property
+    def suites(self) -> list[dict[str, Any]]:
+        """The persona suites of the menu check (menu_suites of pack.yaml), [] when the pack names none."""
+        if not self.menu_suites:
+            return []
+        return json.loads((REPO / self.menu_suites).read_text(encoding="utf-8"))["suites"]
+
+    def suite_check(self, role: str) -> str:
+        """How the sidebar of a role compares with the persona suites that list it ('' when none lists it)."""
+        notes = []
+        menu = {sc.path: s.id for g in code_facts.menu_for(self.grants.get(role, set()), self.groups)
+                for s in g.sections for sc in s.screens}
+        for suite in self.suites:
+            for key, spec in suite["roles"].items():
+                if key.split(":")[-1] != role:
+                    continue
+                expected = set(spec["screens"])
+                shown = {p for p, sec in menu.items() if sec in suite["sections"]}
+                screens = "screen" if len(expected) == 1 else f"{len(expected)} screens"
+                if spec.get("permissionScope") is None and expected == shown:
+                    notes.append(f"{suite['id']}: the {screens} of its sections, no more, no less")
+                elif expected <= shown:
+                    notes.append(f"{suite['id']}: the {screens} of its sections")
+                else:
+                    notes.append(f"{suite['id']}: MISMATCH, missing {sorted(expected - shown)}")
+        return "; ".join(notes)
 
     # ------------------------------------------------------------------ menus
 
     def menus(self) -> dict[str, list[dict[str, str]]]:
         out: dict[str, list[dict[str, str]]] = {}
-        for role in self.personas:
+        for role in self.menu_roles:
             rows = []
             for g in code_facts.menu_for(self.grants.get(role, set()), self.groups):
                 for s in g.sections:
@@ -307,7 +352,8 @@ class Pack:
         for m in code_facts.platform_messages():
             add("Server", m.code, m.text, "Error", "Every screen (Common screen elements)", m.where)
         root = REPO / "frontend" / "src"
-        for u in code_facts.frontend_messages(cfg.get("frontend_dirs") or []):
+        for u in code_facts.frontend_messages(cfg.get("frontend_dirs") or [],
+                                              extended=cfg.get("ui_patterns") == "extended"):
             add("Screen", "-", u.text, u.kind, self._place(Path(u.file).stem.split(".")[0]),
                 str(Path(u.file).relative_to("frontend/src")) if u.file.startswith("frontend/src") else u.file)
         order = {w: i for i, (_, w) in enumerate(self.msg_cfg.get("places") or [])}
@@ -339,7 +385,7 @@ class Pack:
                 role, scr, action, sees, result, slug = step
                 target = self.step_screen(scr)
                 out.append({"slug": slug, "screen": scr, "route": target.route if target else "",
-                            "caption": f"{w['id']}: {action}", "user": self.personas.get(role, {}).get("user"),
+                            "caption": f"{w['id']}: {action}", "user": self.menu_roles.get(role, {}).get("user"),
                             "state": "walkthrough", "walkthrough": w["id"]})
         for d in self.documents:
             out.append({"slug": d["shot"], "screen": "-", "route": "", "caption": d["name"], "state": "document"})
@@ -379,7 +425,7 @@ class Pack:
         aliases = set(self.test_plan.screens) if self.test_plan else set()
         for s in self.screens:
             for r in [s.route] + list(s.get("also") or []):
-                if r not in self.routes and not s.get("public"):
+                if r not in self.routes and not s.get("public") and not s.get("everyone"):
                     problems.append(f"{s.id}: route {r} is not a screen of navigation/modules.ts")
             if not self.personas_of(s) and not s.get("public"):
                 problems.append(f"{s.id}: no persona of the pack may open {s.route}")
@@ -409,12 +455,30 @@ class Pack:
                     problems.append(f"flow: unknown screen {x}")
         for w in self.walkthroughs:
             for st in w["steps"]:
-                if st[0] not in self.personas:
+                if st[0] not in self.menu_roles:
                     problems.append(f"{w['id']}: persona {st[0]}")
                 if self.step_screen(st[1]) is None:
                     problems.append(f"{w['id']}: screen {st[1]} is not a screen of this pack or of its foreign packs")
         for u in getattr(code_facts.role_grants, "unread", []):
             problems.append(f"grant statement not read: {u}")
+        problems += self._suite_problems()
+        return problems
+
+    def _suite_problems(self) -> list[str]:
+        """Every persona of the menu suites has its menu in the pack, with its seed user, and sees its screens."""
+        problems = []
+        roles = self.menu_roles
+        for suite in self.suites:
+            for key, spec in suite["roles"].items():
+                role = key.split(":")[-1]
+                if role not in roles:
+                    problems.append(f"menu suite {suite['id']}: persona {role} has no menu in the pack")
+                    continue
+                if roles[role].get("user") != spec.get("seedUser"):
+                    problems.append(f"menu suite {suite['id']}: {role} user {roles[role].get('user')} is not the "
+                                    f"seed user {spec.get('seedUser')}")
+                if "MISMATCH" in self.suite_check(role):
+                    problems.append(f"menu suite {suite['id']}: {self.suite_check(role)}")
         return problems
 
     @staticmethod
@@ -478,11 +542,13 @@ def r_screen_index(doc: Any, pack: Pack, **_: Any) -> None:
 def r_menus(doc: Any, pack: Pack, **_: Any) -> None:
     menus = pack.menus()
     for role, rows in menus.items():
-        p = pack.personas[role]
+        p = pack.menu_roles[role]
         doc.heading(f"{p['name']} ({role})", level=3)
         own = sum(1 for r in rows if r["own"])
+        checked = pack.suite_check(role)
         doc.paragraph(f"SIT/UAT user {p.get('user', '-')}. {len(rows)} menu entries, {own} of them {pack.module} "
-                      "screens; the other entries belong to the BRD shown.")
+                      "screens; the other entries belong to the BRD shown."
+                      + (f" Checked by the persona menu test ({checked})." if checked else ""))
         grouped: dict[tuple[str, str], list[dict[str, str]]] = {}
         for r in rows:
             grouped.setdefault((r["group"], r["section"]), []).append(r)
@@ -650,7 +716,7 @@ def r_counts(doc: Any, pack: Pack, **_: Any) -> None:
             ["Messages (server, screen and upload row)", len(pack.messages)],
             ["Notifications and e-mails", len(pack.notifications)], ["Upload types", len(pack.uploads)],
             ["Generated documents", len(pack.documents)], ["Walkthroughs", len(pack.walkthroughs)],
-            ["Interface contract lines", len(pack.contract)], ["Personas with their menus", len(pack.personas)]]
+            ["Interface contract lines", len(pack.contract)], ["Personas with their menus", len(pack.menu_roles)]]
     doc.table(["Content of the set", "Count"], rows, widths=[10, 3], caption="The set in numbers", size=9)
 
 
@@ -877,6 +943,20 @@ def build_workbook(pack: Pack) -> Path:
         Column("own", nm, 12, "Yes for a screen of this set"),
         Column("path", "Route", 30, "Address of the screen"),
     ], menu_rows, description=f"What each {nm} persona sees in the sidebar (from the role grants)")
+    if pack.menu_sheets == "per_persona":
+        for role, rows in pack.menus().items():
+            checked = pack.suite_check(role)
+            ws = wb.sheet(f"Menu {role}"[:31], [
+                Column("group", "Group", 20, "Sidebar group"),
+                Column("section", "Section", 26, "Sidebar section"),
+                Column("screen", "Screen", 30, "Menu entry"),
+                Column("brd", "BRD", 14, "BRD that owns the screen"),
+                Column("path", "Route", 34, "Address of the screen"),
+            ] + review_columns(), rows,
+                description=(f"{pack.persona_label(role)} ({role}), SIT/UAT user {pack.menu_roles[role].get('user', '-')}"
+                             f": {len(rows)} menu entries" + (f"; checked by the persona menu test ({checked})"
+                                                              if checked else ""))[:250])
+            date_sheets.append(ws)
 
     upload_rows = []
     for t in pack.uploads:
@@ -1011,7 +1091,7 @@ def main(argv: list[str] | None = None) -> int:
     print(report(pack))
     if args.manifest:
         manifest = {"brd": pack.meta["brd"], "out": str(pack.dir / pack.meta.get("screenshot_dir", "screenshots")),
-                    "personas": pack.personas, "shots": pack.shots()}
+                    "personas": pack.menu_roles, "shots": pack.shots()}
         Path(args.manifest).write_text(json.dumps(manifest, indent=2), encoding="utf-8")
         print(f"manifest: {args.manifest}")
     if args.check or args.manifest:

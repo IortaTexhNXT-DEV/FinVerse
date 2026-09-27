@@ -325,7 +325,8 @@ def build(brd: str) -> Path:
         deck.notes("The process runs from client onboarding and KYC, through the quotation or the PRF, the account, "
                    "payment and placement, issuance and booking, to the hand-off to Operations and Accounting.")
     personas = []
-    for role, rows_ in pack.menus().items():
+    menus = pack.menus()
+    for role, rows_ in ((r, menus[r]) for r in pack.personas):  # the module personas; the others are in the FRS
         own = [r for r in rows_ if r["own"]]
         sections = []
         for r in own:
@@ -336,7 +337,9 @@ def build(brd: str) -> Path:
     deck.table(f"{module} at a glance: personas and menus", ["Persona", "SIT user", "Screens", "Menu sections"],
                personas, widths=[3.0, 1.3, 1.1, 7.2], size=10)
     deck.notes("Each persona sees only the menu entries of its role; the full menu of each persona is in FRS chapter "
-               "12 and on the Menu by persona sheet of the workbook.")
+               "12 and on the Menu by persona sheet of the workbook."
+               + (f" The menus of {len(pack.menu_roles) - len(pack.personas)} more personas of the other BRDs are "
+                  "there too, one table and one sheet each." if len(pack.menu_roles) > len(pack.personas) else ""))
     deck.gallery(f"{module} at a glance: key screens",
                  [(shots / f"{k['image']}.png", k["caption"]) for k in g["key_screens"]])
     deck.notes("Screenshots of the SIT environment with seed data; every screen of the module is in FRS chapter 13.")

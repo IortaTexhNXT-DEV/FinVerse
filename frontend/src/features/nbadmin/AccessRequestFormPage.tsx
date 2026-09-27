@@ -3,7 +3,7 @@ import { Save, Send } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { nbadminApi } from '@/api/nbadmin';
-import type { AccessRequest, AccessRequestType, UserAccess } from '@/api/nbadmin';
+import type { AccessRequest, AccessRequestType, AccessSettings, UserAccess } from '@/api/nbadmin';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -36,11 +36,15 @@ function TypeFields({
   form,
   set,
   editing,
+  externalUsers,
 }: Readonly<{
   form: AccessRequestForm;
   set: (p: Partial<AccessRequestForm>) => void;
   editing: boolean;
+  /** UAM_EXTERNAL_USERS: the user type is offered only while a portal exists. */
+  externalUsers: boolean;
 }>) {
+  const userType = allowsExternal(form.type) && (externalUsers || form.userType === 'EXTERNAL');
   const types = isGroupProfile(form.type) ? GROUP_TYPES : USER_TYPES;
   return (
     <div className="form-grid">
@@ -71,7 +75,7 @@ function TypeFields({
           </select>
         )}
       </Field>
-      {allowsExternal(form.type) && (
+      {userType && (
         <Field label="User Type" hint="External: portal users of insurers and clients">
           {(id) => (
             <select
@@ -110,7 +114,7 @@ interface EditorProps {
   initial: AccessRequestForm;
   saved?: AccessRequest;
   users: UserAccess[];
-  userIdPattern?: string;
+  settings?: AccessSettings;
 }
 
 function RemarksCard({
@@ -202,7 +206,7 @@ function EditorActions({
   );
 }
 
-function RequestEditor({ id, initial, saved, users, userIdPattern }: Readonly<EditorProps>) {
+function RequestEditor({ id, initial, saved, users, settings }: Readonly<EditorProps>) {
   const navigate = useNavigate();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -214,7 +218,8 @@ function RequestEditor({ id, initial, saved, users, userIdPattern }: Readonly<Ed
   const context = (mode: Mode | undefined) => ({
     users,
     submit: mode === 'submit',
-    userIdPattern,
+    userIdPattern: settings?.userIdPattern,
+    userIdFormatText: settings?.userIdFormatText,
     today: today(),
   });
   const errors = attempt === undefined ? {} : validateAccessRequest(form, context(attempt));
@@ -263,11 +268,22 @@ function RequestEditor({ id, initial, saved, users, userIdPattern }: Readonly<Ed
       )}
       <Card>
         <div className="stack">
-          <TypeFields form={form} set={set} editing={id !== undefined} />
+          <TypeFields
+            form={form}
+            set={set}
+            editing={id !== undefined}
+            externalUsers={settings?.externalUsers === true}
+          />
           {groupProfile ? (
             <GroupProfileFields form={form} set={set} errors={errors} />
           ) : (
-            <UserRequestFields form={form} set={set} errors={errors} users={users} />
+            <UserRequestFields
+              form={form}
+              set={set}
+              errors={errors}
+              users={users}
+              userIdFormatText={settings?.userIdFormatText}
+            />
           )}
         </div>
       </Card>
@@ -320,7 +336,7 @@ export default function AccessRequestFormPage() {
       initial={initial}
       saved={request.data}
       users={users.data}
-      userIdPattern={settings.data?.userIdPattern}
+      settings={settings.data}
     />
   );
 }

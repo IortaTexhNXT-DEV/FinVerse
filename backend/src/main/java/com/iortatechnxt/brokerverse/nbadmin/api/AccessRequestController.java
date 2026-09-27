@@ -9,8 +9,10 @@ import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessSettingsResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.AccessSubmitRequest;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.ApproverResponse;
 import com.iortatechnxt.brokerverse.nbadmin.api.dto.UserAccessResponse;
+import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessUserType;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessApprovers;
+import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestDescriber;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessSettings;
 import com.iortatechnxt.brokerverse.security.api.dto.RoleResponse;
@@ -56,6 +58,7 @@ public class AccessRequestController {
   private final AccessApprovers approvers;
   private final AccessSettings settings;
   private final UserAdminService userAdmin;
+  private final AccessRequestDescriber describer;
 
   /**
    * Creates the controller.
@@ -64,12 +67,15 @@ public class AccessRequestController {
    * @param approvers eligible approvers
    * @param settings parameters
    * @param userAdmin users and roles
+   * @param describer descriptions of the requests
    */
   public AccessRequestController(
       AccessRequestService requests,
       AccessApprovers approvers,
       AccessSettings settings,
-      UserAdminService userAdmin) {
+      UserAdminService userAdmin,
+      AccessRequestDescriber describer) {
+    this.describer = describer;
     this.requests = requests;
     this.approvers = approvers;
     this.settings = settings;
@@ -89,7 +95,7 @@ public class AccessRequestController {
         requests.search(
             query.search(),
             PageRequest.of(query.pageOrFirst(), PAGE_SIZE, Sort.by(Sort.Direction.DESC, "id"))),
-        AccessRequestResponse::from);
+        this::view);
   }
 
   /**
@@ -101,7 +107,7 @@ public class AccessRequestController {
   @GetMapping("/access-requests/{id}")
   @PreAuthorize(VIEW)
   public AccessRequestResponse get(@PathVariable Long id) {
-    return AccessRequestResponse.from(requests.view(id));
+    return view(requests.view(id));
   }
 
   /**
@@ -132,7 +138,7 @@ public class AccessRequestController {
       @RequestParam(defaultValue = "false") boolean draft) {
     List<String> chosen =
         request.approvers() == null || request.approvers().isEmpty() ? null : request.approvers();
-    return AccessRequestResponse.from(requests.create(request.content(), draft, chosen));
+    return view(requests.create(request.content(), draft, chosen));
   }
 
   /**
@@ -146,7 +152,7 @@ public class AccessRequestController {
   @PreAuthorize(REQUEST)
   public AccessRequestResponse edit(
       @PathVariable Long id, @Valid @RequestBody AccessRequestRequest request) {
-    return AccessRequestResponse.from(requests.edit(id, request.content()));
+    return view(requests.edit(id, request.content()));
   }
 
   /**
@@ -160,7 +166,7 @@ public class AccessRequestController {
   @PreAuthorize(REQUEST)
   public AccessRequestResponse submit(
       @PathVariable Long id, @Valid @RequestBody AccessSubmitRequest body) {
-    return AccessRequestResponse.from(requests.submit(id, body.approvers(), body.remarks()));
+    return view(requests.submit(id, body.approvers(), body.remarks()));
   }
 
   /**
@@ -209,5 +215,9 @@ public class AccessRequestController {
   @PreAuthorize(VIEW)
   public List<RoleResponse> roles() {
     return userAdmin.listRoles().stream().map(RoleResponse::from).toList();
+  }
+
+  private AccessRequestResponse view(AccessRequest r) {
+    return AccessRequestResponse.from(r, describer.describe(r));
   }
 }

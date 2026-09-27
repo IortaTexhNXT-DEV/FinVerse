@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
+import java.util.Locale;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
@@ -57,6 +58,10 @@ public class AccessRequestBulkApprovals implements BulkApprovalAction {
         second
             ? decisions.secondApprove(request.getId(), null).request()
             : decisions.approve(request.getId(), null).request();
-    return "Approved " + decided.getRequestNo() + " (" + decided.getStatus() + ")";
+    return "Approved "
+        + decided.getRequestNo()
+        + " ("
+        + decided.getStatus().name().toLowerCase(Locale.ROOT).replace('_', ' ')
+        + ")";
   }
 }

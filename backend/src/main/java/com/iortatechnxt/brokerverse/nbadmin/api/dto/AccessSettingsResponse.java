@@ -9,12 +9,16 @@ import com.iortatechnxt.brokerverse.nbadmin.service.AccessSettings;
  * @param anyApprover UAM_ANY_APPROVER: any approver may decide
  * @param roleApplyOnApproval UAM_ROLE_APPLY_ON_APPROVAL: group profiles apply at approval
  * @param userIdPattern USER_ID_PATTERN: format of a new user ID
+ * @param userIdFormatText USER_ID_FORMAT_TEXT: the format in words
+ * @param externalUsers UAM_EXTERNAL_USERS: requests for external (portal) users are switched on
  */
 public record AccessSettingsResponse(
     boolean directRoleEdit,
     boolean anyApprover,
     boolean roleApplyOnApproval,
-    String userIdPattern) {
+    String userIdPattern,
+    String userIdFormatText,
+    boolean externalUsers) {
 
   /**
    * Reads the settings.
@@ -24,6 +28,11 @@ public record AccessSettingsResponse(
    */
   public static AccessSettingsResponse from(AccessSettings s) {
     return new AccessSettingsResponse(
-        s.directRoleEdit(), s.anyApprover(), s.roleApplyOnApproval(), s.userIdPattern());
+        s.directRoleEdit(),
+        s.anyApprover(),
+        s.roleApplyOnApproval(),
+        s.userIdPattern(),
+        s.userIdFormatText(),
+        s.externalUsers());
   }
 }

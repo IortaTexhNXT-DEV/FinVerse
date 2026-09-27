@@ -227,7 +227,7 @@ class SubmittedPoliciesIT {
     SbmPolicy p = intake("NONCBG_RETAIL", pn("PN-F"), "INS-LAC", "500000");
     SbmHandlingFee f =
         as.run(
-            "upphandler",
+            "sbmfee",
             () ->
                 fees.bill(
                     company(),
@@ -242,14 +242,14 @@ class SubmittedPoliciesIT {
     assertThat(f.getStatus()).isEqualTo(SbmHandlingFee.BILLED);
     assertThat(
             as.run(
-                    "upphandler",
+                    "sbmfee",
                     () ->
                         fees.list(
                             company(), List.of(SbmHandlingFee.BILLED), PageRequest.of(0, 500)))
                 .getContent())
         .extracting(SbmHandlingFee::getFeeNo)
         .contains(f.getFeeNo());
-    SbmHandlingFee cancelled = as.run("upphandler", () -> fees.cancel(f.getId(), "Billed twice"));
+    SbmHandlingFee cancelled = as.run("sbmfee", () -> fees.cancel(f.getId(), "Billed twice"));
     assertThat(cancelled.getStatus()).isEqualTo(SbmHandlingFee.CANCELLED);
   }
 

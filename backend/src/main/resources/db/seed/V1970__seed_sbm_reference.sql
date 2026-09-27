@@ -3,7 +3,7 @@
 -- password for all users: Brokerverse@2026). SEED DATA ONLY - never load in production.
 --   * Users of the personas (FRS BRD-12 section 3): sbmhandler (Submitted Handler, CBG Motor),
 --     firehandler (Submitted Handler, CBG Fire), sbmchecker (Submitted Checker), sanitation
---     (Sanitation Handler), sbmtl (Team Lead), polreview (Policy Review Officer) and upphandler
+--     (Sanitation Handler), sbmtl (Team Lead), polreview (Policy Review Officer) and sbmfee
 --     (Handling Fee Handler). The Account Officers ao and ao2, the Marketing TL mkttl and the TSU
 --     user tsu are the New Business seed users; badmin receives the rule administration role.
 --   * User scopes: the CBG handlers see their segment; ao and ao2 see their own records.
@@ -27,7 +27,7 @@ from (values ('sbmhandler',  'Susana Motor Handler',        'sbmhandler@brokerve
              ('sanitation',  'Samuel Sanitation Handler',   'sanitation@brokerverse-seed.ph'),
              ('sbmtl',       'Teodora Submitted Team Lead', 'sbmtl@brokerverse-seed.ph'),
              ('polreview',   'Rodrigo Policy Reviewer',     'polreview@brokerverse-seed.ph'),
-             ('upphandler',  'Ursula Unapplied Handler',    'upphandler@brokerverse-seed.ph'))
+             ('sbmfee',  'Ursula Fee Handler',    'sbmfee@brokerverse-seed.ph'))
      as u(username, full_name, email)
 where not exists (select 1 from sec_user x where lower(x.username) = u.username);
 
@@ -36,7 +36,7 @@ select u.id, r.id
 from sec_user u
 join (values ('sbmhandler', 'SBM_HANDLER'), ('firehandler', 'SBM_HANDLER'), ('sbmchecker', 'SBM_CHECKER'),
              ('sanitation', 'SBM_SANITATION'), ('sbmtl', 'SBM_TL'), ('polreview', 'SBM_POLICY_REVIEWER'),
-             ('upphandler', 'SBM_UPP_HANDLER'))
+             ('sbmfee', 'SBM_UPP_HANDLER'))
      as g(username, role_code) on g.username = u.username
 join sec_role r on r.code = g.role_code
 where not exists (select 1 from sec_user_role x where x.user_id = u.id and x.role_id = r.id);

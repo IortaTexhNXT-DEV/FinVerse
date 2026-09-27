@@ -561,7 +561,7 @@ The module is built in the package `submitted` and the screens `frontend/src/fea
 | V1074 | Hand-offs, insurer and letter rules, letters, print batches; parameter `SBM_MANUAL_RENEWAL_SEGMENTS` |
 | V1075 | Handling fees, No Touch batches and lines; service invoice type `SERVICE_FEE_NO_TOUCH` |
 | V1076 | Retention rule `SUBMITTED_POLICY` (booked, not renewed, excluded and closed records; 5 years, then review) |
-| V1970 | Seed users `sbmhandler`, `firehandler`, `sbmchecker`, `sanitation`, `sbmtl`, `polreview`, `upphandler`, user scopes, GL accounts 4115 and 1236 with the rules of the two events, active rule sets, insurer limits, insurer assignment and letter rules, the approval matrix, the LAMD snapshot |
+| V1970 | Seed users `sbmhandler`, `firehandler`, `sbmchecker`, `sanitation`, `sbmtl`, `polreview`, `sbmfee`, user scopes, GL accounts 4115 and 1236 with the rules of the two events, active rule sets, insurer limits, insurer assignment and letter rules, the approval matrix, the LAMD snapshot |
 | V1971-V1979 | Not used: the seed records are created by `SubmittedSeedData` through the services |
 
 ### 17.3 Jobs, uploads, alerts and reports
@@ -598,6 +598,7 @@ Insurer Limits, Insurer Assignment, Letter Rules, Approval Matrix, Sources, User
 | Collections list | Label "Handling fee (auto)" in the collector list | Not built; the request carries the income type | Display only |
 | Limits step | Package limits of the catalog | The limit rules of `sbm_limit_rule` (sum insured, vehicle age, attribute) | The catalog has no package limits of submitted policies |
 | Letter files | Attachments | Stored files (`StoredFileService`, owners `SubmittedLetter`, `SubmittedPrintBatch`); IAAF and TOR PDFs are attachments of the record | Letters are system output; the IAAF and TOR are record documents |
+| Handling fee seed user | `upphandler` (the Collections unapplied handler) also holds `SBM_UPP_HANDLER` | Own seed user `sbmfee` holding only `SBM_UPP_HANDLER` | A persona seed user holds one role; the Collections user keeps its role |
 | Rule upload | `SBM_RULES` upload | Not built: the rule sets are kept in Setup and through the rule-set API | Rules are few and changed with maker and checker |
 | Rule editing on screen | Rule editor | Setup lists the rule sets with their rules, submit, approve and reject; rules are added and changed through the rule-set API | The rule editor is the next increment of Setup |
 | Seed records | V1971-V1972 | `SubmittedSeedData` through the services | The work cases, runs and approvals are created exactly as in production |

@@ -716,7 +716,7 @@
           ]
         },
         "SBM_UPP_HANDLER": {
-          "seedUser": "upphandler",
+          "seedUser": "sbmfee",
           "permissions": ["SBM_HANDLING_FEE", "SBM_VIEW"],
           "screens": [
             "/submitted",

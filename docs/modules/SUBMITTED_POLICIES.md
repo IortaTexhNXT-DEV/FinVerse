@@ -38,7 +38,7 @@ Module guide of `submitted` (package `com.iortatechnxt.brokerverse.submitted`, s
 | Team Lead | `SBM_TL` | `sbmtl` | Everything of the handlers, assignment, rules, handling fees, migration |
 | Submitted Checker | `SBM_CHECKER` | `sbmchecker` | IAAF approval |
 | Policy Review Officer | `SBM_POLICY_REVIEWER` | `polreview` | Reviews and IAAF |
-| Handling Fee Handler | `SBM_UPP_HANDLER` | `upphandler` | Handling fees and No Touch billing |
+| Handling Fee Handler | `SBM_UPP_HANDLER` | `sbmfee` | Handling fees and No Touch billing |
 | Account Officer | `MKT_AO` | `ao`, `ao2` | Own records, TOR preparation, Renew with BDOI |
 | Marketing Team Leader | `MKT_TL` | `mkttl` | IAAF approval (second level), rule approval |
 | TSU | `TSU` | `tsu` | TOR approval |

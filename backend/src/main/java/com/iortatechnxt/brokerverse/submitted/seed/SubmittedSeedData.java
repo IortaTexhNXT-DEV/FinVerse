@@ -174,7 +174,7 @@ public class SubmittedSeedData implements ApplicationRunner {
         "No Touch export",
         () ->
             as(
-                "upphandler",
+                "sbmfee",
                 () ->
                     work.noTouch()
                         .export(
@@ -361,7 +361,7 @@ public class SubmittedSeedData implements ApplicationRunner {
         .forEach(
             p ->
                 as(
-                    "upphandler",
+                    "sbmfee",
                     () ->
                         work.fees()
                             .bill(

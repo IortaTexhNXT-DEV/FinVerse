@@ -131,7 +131,7 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 <!-- table: widths=2.4,11 caption="Entry criteria" -->
 | Level | Criteria |
 |---|---|
-| System test | The Renewal module is deployed on SIT with its jobs (RNW_EXTRACTION, RNW_REEVALUATE, RNW_NRNS_LETTERS, RNW_EXPIRY_SWEEP); the shared change BT0 (business type on the account) is deployed; the data sets of section 4.2 are loaded; the test mailboxes of clients and insurers receive mail; the developers have added the automation references to the workbook. |
+| System test | The Renewal module is deployed on SIT with its jobs (RNW_EXTRACTION, RNW_REEVALUATE, RNW_NRNS_LETTERS, RNW_EXPIRY_SWEEP); the business type RENEWAL (BT0) is available on the account; the data sets of section 4.2 are loaded; the test mailboxes of clients and insurers receive mail. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; notifications and the e-mail relay work on SIT; the Submitted Policies hand-off (BRD-12) is deployed for SC-RN-10. |
 | UAT | FRS BRD-6 v1.1 is signed off or its open comments are agreed; the open questions that change expected results (RQ01, RQ08, RQ10, RQ15, RQ24) are answered or their test values agreed; the system test exit criteria are met; the UAT environment holds masked data; BDOI testers have user IDs with the roles of section 5. |
 

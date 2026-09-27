@@ -1,10 +1,8 @@
 # Test plan BRD-6 Renewal - test data file.
 # Build: python docs/deliverables/src/testplans/build_test_plan.py docs/deliverables/src/BRD-06_Renewal/brd06_cases.yaml
 # Schema: see the header of build_test_plan.py. FR titles, BRD IDs and priorities come from the FRS.
-# Renewal is designed and not built: messages are the FRS texts (no codes), screen paths are those of the
-# build design (docs/architecture/RENEWAL_DESIGN.md) and there is no automation reference. Where a check
-# reuses a platform message that exists today (log-in, bulk upload, account checks), the case quotes the
-# text BIBS shows and a finding records the FRS difference.
+# Messages are the FRS texts; where a check reuses a platform message (log-in, bulk upload, account checks),
+# the case quotes the text BIBS shows.
 
 meta:
   brd: BRD-06
@@ -993,8 +991,8 @@ frs:
         title: Posting the endorsement turns the check PASS
         steps:
           - In Operations post END-2026-000450.
-          - Open RNW-2026-000202, tab Checks & Bucket, after the InvoiceMovementPosted event.
-        expected: A new check run with trigger InvoiceMovementPosted shows ENDORSEMENT_PENDING = PASS; no user action was needed.
+          - Open RNW-2026-000202, tab Checks & Bucket, after the posting.
+        expected: A new check run triggered by the posting shows ENDORSEMENT_PENDING = PASS; no user action was needed.
       - c: 3
         type: Positive
         title: Claims check while Claims is not connected
@@ -3148,11 +3146,11 @@ frs:
       - c: 2
         type: Workflow
         brd: ["25", "26"]
-        title: Pending hand-offs replayed once
-        pre: Hand-offs recorded as PENDING before the adapter was deployed.
+        title: Pending hand-offs taken once
+        pre: Hand-offs recorded as PENDING by Submitted Policies.
         steps:
-          - Run the replay; run it again.
-        expected: Each pending SBM number produces one candidate; the second replay creates nothing.
+          - Take the pending hand-offs; take them again.
+        expected: Each pending SBM number produces one candidate; the second run creates nothing.
       - c: 3
         type: Workflow
         persona: MKT_TL

@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.placement.domain.BillingBatch;
 import com.iortatechnxt.brokerverse.placement.domain.BillingBatchRepository;
 import com.iortatechnxt.brokerverse.placement.domain.BillingBatchStatus;
@@ -201,7 +202,10 @@ public class PaymentReportService {
           MatchStatus.UNMATCHED,
           matched,
           List.of(),
-          account.getArn() + " is " + account.getStatus() + ", not awaiting payment");
+          account.getArn()
+              + " is "
+              + DisplayFormat.words(account.getStatus())
+              + ", not awaiting payment");
     } else if (line.isPaid()) {
       line.match(MatchStatus.MATCHED, matched, List.of(), null);
     } else {
@@ -235,7 +239,7 @@ public class PaymentReportService {
     if (account.getStatus() != AccountStatus.AWAITING_PAYMENT) {
       throw new BusinessRuleException(
           "ACCOUNT_NOT_AWAITING_PAYMENT",
-          arn + " is " + account.getStatus() + ", not awaiting payment");
+          arn + " is " + DisplayFormat.words(account.getStatus()) + ", not awaiting payment");
     }
     line.matchManually(
         new MatchedAccount(account.getId(), account.getArn()), currentUser.username());

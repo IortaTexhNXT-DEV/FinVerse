@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.issuance.domain.Epolicy;
 import com.iortatechnxt.brokerverse.issuance.domain.Epolicy.ReceivedDocument;
 import com.iortatechnxt.brokerverse.issuance.domain.EpolicyRepository;
@@ -128,7 +129,7 @@ public class EpolicyService {
           "Account "
               + account.getArn()
               + " is "
-              + account.getStatus()
+              + DisplayFormat.words(account.getStatus())
               + "; an e-policy is received once placed");
     }
     Attachment stored =
@@ -196,7 +197,10 @@ public class EpolicyService {
     if (!epolicy.isOpen()) {
       throw new BusinessRuleException(
           "EPOLICY_REVIEWED",
-          "The e-policy " + epolicy.getFileName() + " is already " + epolicy.getStatus());
+          "The e-policy "
+              + epolicy.getFileName()
+              + " is already "
+              + DisplayFormat.words(epolicy.getStatus()));
     }
     LocalDate date = issueDate == null ? BusinessClock.today(clock) : issueDate;
     Account account = lifecycle.recordPolicy(epolicy.getArn(), policyNumbers, date);

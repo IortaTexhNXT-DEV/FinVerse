@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.dimension.domain.DimensionType;
 import com.iortatechnxt.brokerverse.dimension.service.DimensionService;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
@@ -224,7 +225,9 @@ public class AccountLifecycleService {
           TransitionNote.comment("Policy " + String.join(", ", numbers)));
     }
     account.recordPolicies(numbers, issueDate);
-    record(account, "Policy " + String.join(", ", numbers) + " issued " + issueDate);
+    record(
+        account,
+        "Policy " + String.join(", ", numbers) + " issued " + DisplayFormat.date(issueDate));
     return account;
   }
 
@@ -248,7 +251,7 @@ public class AccountLifecycleService {
     if (costCenter != null && !costCenter.isBlank()) {
       account.setCostCenter(costCenter);
     }
-    record(account, "Booked " + bookingRef + " on " + date);
+    record(account, "Booked " + bookingRef + " on " + DisplayFormat.date(date));
     return account;
   }
 
@@ -262,9 +265,12 @@ public class AccountLifecycleService {
    */
   public Account recordCancellation(String arn, String reasonCode, LocalDate date) {
     Account account = require(arn);
-    move(account, "cancel", new TransitionNote(reasonCode, "Cancelled on " + date));
+    move(
+        account,
+        "cancel",
+        new TransitionNote(reasonCode, "Cancelled on " + DisplayFormat.date(date)));
     account.recordCancellation(date, reasonCode);
-    record(account, "Cancelled on " + date + " (" + reasonCode + ")");
+    record(account, "Cancelled on " + DisplayFormat.date(date) + " (" + reasonCode + ")");
     return account;
   }
 
@@ -281,7 +287,12 @@ public class AccountLifecycleService {
     if (account.getStatus() != status) {
       throw new BusinessRuleException(
           "ACCOUNT_STATUS_INVALID",
-          "Account " + account.getArn() + " is " + account.getStatus() + ", not " + status);
+          "Account "
+              + account.getArn()
+              + " is "
+              + DisplayFormat.words(account.getStatus())
+              + ", not "
+              + DisplayFormat.words(status));
     }
   }
 

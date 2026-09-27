@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.quotation.service;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage.RecordLink;
 import com.iortatechnxt.brokerverse.messaging.service.MessageService;
@@ -121,7 +122,7 @@ public class QuotationDispatchService {
     List<String> problems = new ArrayList<>();
     for (Quotation q : selected) {
       if (q.getStatus() != QuotationStatus.APPROVED) {
-        problems.add(q.getQuotationNo() + " is " + q.getStatus());
+        problems.add(q.getQuotationNo() + " is " + DisplayFormat.words(q.getStatus()));
       } else if (blank(q.getClientEmail())) {
         problems.add(q.getQuotationNo() + ": client " + q.getClientCode() + " has no e-mail");
       }

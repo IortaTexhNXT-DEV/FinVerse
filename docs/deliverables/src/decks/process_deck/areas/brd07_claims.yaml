@@ -1,40 +1,50 @@
-# BRD-7 Claims: chapter 7 of the business process deck.
-# Sources: "Claims (CLM).PDF" p.23-27 (current process, target facility), p.32-41 (NFR); workshop addendum p.5-7;
-# FRS BRD-7 sections 2, 5, 9; cross-BRD decisions D3, D4, XQ05, XQ10; discrepancy register (DCR-078, 079, 085, 086, 157).
+# Claims (BRD-7): chapter 10 of the business process reverse KT deck (Part E, Claims and Customer Service).
+# Sources: floor walk 22-Sep-2026 (Claims, 44F) and discovery 21-Sep-2026 (floor-walk note CL-01); BDOI Day 1 overview
+# p.8 and p.14; high-level Claims process flow (Motor and Non-Motor swimlanes) confirmed by the Claims team (Feb 2026);
+# BRD-7 p.23-27; workshop addendum p.5-7; discrepancy register (DCR-085, 086).
 id: brd07
 key: clm
-num: 7
+num: 10
 title: Claims
 brd: BRD-7
-scope: 'Claims logging and monitoring, from notice of loss to closure and loss analytics'
-status: DESIGNED
-status_text: Designed, not yet built; FRS v1.0 issued for review
+scope: 'Motor and Non-Motor claims: notice of loss, documents, insurer and adjuster, offer, settlement, closure, loss analytics'
 department: Claims and Risk Management
 roles:
-  - Claims Officer / Claims Assistant (Motor and Non-Motor teams)
-  - Team Lead, Team Head, Unit Head
-  - Claims / Risk user (loss analytics)
-  - Marketing AO and TL (notice, loss information)
-  - Clients, insurers and adjusters (external)
+  - 'Claims Officer / Claim Handler (Motor and Non-Motor teams)'
+  - 'Team Lead, Team Head, Unit Head'
+  - 'Marketing AO and branch (notice of loss)'
+  - 'Assured, CASA / dealer, adjuster'
+  - 'Insurers (evaluation, offer, LOA or cheque)'
 figures:
-  - ['55', 'claims booked a day; 10% growth (p.32-41)']
+  - ['55', 'claims booked a day; growth 10% a year (BRD-7 p.32-41)']
   - ['1,096', 'status and settlement updates a day']
   - ['37', 'Claims users: 28 head office, 9 branches']
-  - ['5 s', 'screens, booking, premium validation']
+  - ['2 paths', 'Motor (LOA to a repair shop, or cash) and Non-Motor (adjuster, offer)']
+session:
+  when: '22-Sep-2026, 5-6 pm, 44F; discovery 21-Sep-2026'
+  pocs: 'Elmar O. Alvarez Jr., Richard Castanares'
 sources:
-  - BRD-7 p.23-27 (current process and target facility)
-  - Workshop addendum p.5-7 (BRCLM.036-043)
-  - FRS BRD-7 v1.0, sections 2 and 5
-chevrons: [Notice, Record, Premium check, Loss advice, Handling, Follow-up, Settlement, Closure]
+  - 'High-level Claims process flow (Motor and Non-Motor swimlanes)'
+  - BDOI Day 1 overview p.8 and p.14
+  - 'BRD-7 p.23-27; BRCLM.001-043'
+chevrons: [Notice, Documents, Loss advice, Evaluation, Offer, Acceptance, Settlement, Closure]
 notes:
   glance: >-
-    BDOI is a broker: the insurer accepts, evaluates and pays a claim; BDOI files and follows the claim for the client.
-    The scope is claims logging and monitoring. Motor and Non-Motor claims use the same record and statuses; they
-    differ in the notice document (PLA or CRF) and the settlement path (LOA or cash offer, adjuster, signed release).
-    Claims is designed; Renewal reads its loss experience through the Claims query service (decision D4).
-  pains: The seven points are the current-process rows of FRS BRD-7 section 2.1, from the BRD (p.23-27).
-  after: 'The usage table gives volumes and response times (p.32-41); no claim turnaround target is given.'
-  gaps: 'The Claims Authorization Code (DCR-085) decides how unpaid premium stops a claim.'
+    BDOI supports the client from the notice of loss to settlement, as the client's advocate with the insurer. Motor
+    claims end with a letter of authority (LOA) to a repair shop or dealer, or with a cash offer; Non-Motor claims go
+    through the claims reporting form, the formal loss advice, an adjuster's inspection and an offer that the client
+    accepts or contests. Claims are handled outside any system today and were called a major pain point (CL-01).
+  heard: Notes of the business overview (21-Sep) and of the Claims floor walk (22-Sep).
+  pains: 'The seven points of the BRD-7 current process (p.23-27); the Claims flow confirms them.'
+  after: 'The benefit column names what the To-Be removes.'
+  missed: 'The offer and contest loop, repair monitoring and a digital notice of loss are not in the BRD.'
+heard:
+  - {ref: CL-01, kind: pain, topic: Claims handling, asis: 'Claims are handled outside the system and manually.', want: 'Major pain point: claims in the system.'}
+  - {ref: 'Day 1 p.8', kind: want, topic: What BDOI needs to see, asis: 'How a claim links to the policy; required documents and status values; who can update, review or approve; how customer communication is recorded.'}
+  - {ref: 'Claims flow', kind: asis, topic: Motor, asis: 'Client, AO or branch sends the notice and PLA; handler completes the documents and sends them to the insurer; insurer issues an LOA to the preferred CASA / dealer or evaluates a cash offer; assured signs; repair monitored offline; claim tagged settled.'}
+  - {ref: 'Claims flow', kind: asis, topic: Non-Motor, asis: 'Claims reporting form (CRF); formal loss advice to the insurer; initial assessment; adjuster inspection when needed; evaluation; offer reviewed and sent to the insured; accept, or contest and re-evaluate; payment; claim closed.'}
+  - {ref: 'Day 1 p.14', kind: asis, topic: Servicing path, asis: 'Receive the claim from the client; submit documents to the insurer; inform the client of settlement or declination.'}
+  - {ref: EB-02, kind: asis, topic: EB claims, asis: 'Employee Benefits claims are validated by the provider; BDOI captures the details (see chapter 4).'}
 asis:
   caption: 'Claims today (BRD-7 p.24-26)'
   notes: >-
@@ -127,17 +137,31 @@ after:
   - {n: 5, bibs: 'Status within the role / unit matrix, adjuster, reserve, follow-up and diary on the claim', measure: '1,096 updates a day'}
   - {n: 6, bibs: 'Temporary and permanent closure; permanent needs a settlement type and a TL / TH', measure: 'Four-eyes closure'}
   - {n: 7, bibs: 'Ageing, outstanding, settled, loss experience and loss ratio reports in BIBS, to Excel', measure: 'No ISYS extract'}
-gaps:
-  - {sev: High, gap: Claims Authorization Code undefined, impact: Valid claims could be blocked, owner: Claims and Risk Management, decision: 'What the code is; which unpaid invoice blocks; TL / TH override', ref: 'DCR-085'}
-  - {sev: High, gap: Settlement type and settlement status, impact: Claim closure and reporting, owner: Claims and Risk Management, decision: 'One list or two; which values close the claim', ref: 'DCR-078'}
-  - {sev: High, gap: 'Does claim money pass through BDOI?', impact: Cashiering and Disbursement flows for settlements, owner: 'Claims, Operations', decision: 'Record the cheque only, or handle the money', ref: 'DCR-086'}
-  - {sev: High, gap: Open and historical claims at go-live, impact: Loss ratio and claims-prone analysis need history, owner: 'Claims, BDO IT', decision: 'Scope and years from EBIX / ISYS', ref: 'DCR-157, CLQ14'}
-  - {sev: Medium, gap: Who closes and reopens, impact: Closure permissions, owner: Claims and Risk Management, decision: Officer or TL / TH for permanent closure, ref: 'DCR-079'}
-  - {sev: Medium, gap: Total-loss indicator, impact: Renewal eligibility after a total loss, owner: 'Claims, Renewal', decision: 'Settlement type, loss nature or a flag', ref: 'XQ10'}
+variants:
+  title: Motor and Non-Motor paths today
+  headers: [Step, Motor, Non-Motor]
+  widths: [2.0, 5.2, 5.2]
+  per_page: 7
+  rows:
+    - [Notice, 'Client, AO or branch sends the notice and a preliminary loss advice (PLA)', 'Client sends the notice; Claims completes the claims reporting form (CRF) with the client']
+    - [Documents, 'Handler coordinates the documents with the client until complete', 'Handler checks completeness; asks the client for missing documents']
+    - [To the insurer, 'Documents and PLA sent to the insurer', 'Formal loss advice (FLA) sent; insurer makes an initial assessment']
+    - [Evaluation, 'Insurer reviews; issues or concerns go back to the handler', 'Adjuster appointed when needed; inspection arranged with BDOI']
+    - [Offer, 'LOA to the preferred CASA / dealer, or a cash offer after evaluation', 'Offer reviewed by Claims and sent to the insured']
+    - [Decision, 'Assured signs the offer; CASA / dealer repairs', 'Accepts, or contests; insurer re-evaluates or keeps its position']
+    - [Close, 'Repair monitored offline; claim tagged settled / closed', 'Signed offer; payment; property damage claim closed']
+  notes: From the Claims process flow (swimlane version), confirmed by the Claims team on 13-Feb-2026.
+missed:
+  - {cov: PARTLY, item: Offer and contest loop, seen: 'Offer reviewed, sent, accepted or contested, re-evaluated.', brd: 'Status values only; no offer record.', rec: 'Offer record with versions, acceptance and contest reason.', ref: 'Claims flow'}
+  - {cov: PARTLY, item: Repair monitoring after the LOA, seen: 'Repair tracked offline until completion.', brd: 'LOA statuses; no repair milestones.', rec: 'Repair milestones and dealer updates until the car is released.', ref: CLQ05}
+  - {cov: PARTLY, item: Document checklist, seen: 'Documents chased until complete.', brd: 'Diary and statuses; no checklist per claim type.', rec: 'Checklist per line and cause of loss with reminders.', ref: CLQ26}
+  - {cov: NOT_IN_BRD, item: Digital notice of loss, seen: 'Notice by e-mail or call; PLA or CRF prepared by hand.', brd: 'Claim record from PLA / CRF data; no client channel.', rec: 'Notice through the contact centre or a web form with photos.', ref: 'CLQ23'}
+  - {cov: CONFIRM, item: Money through BDOI, seen: 'Cheque payable to the assured; cash settlement.', brd: 'Open whether proceeds pass through BDOI.', rec: 'Confirm per line; if yes, route through Disbursement.', ref: DCR-086}
+  - {cov: CONFIRM, item: Authorization code, seen: 'Premium checked before filing.', brd: 'Code disabled while premium unpaid; code undefined.', rec: 'Define the code and who can override.', ref: DCR-085}
 best:
-  - {practice: Premium-paid check before filing, status: BIBS, bibs: 'Invoice ledger read at intake; authorization disabled while unpaid, with reason and history.', bdoi: 'Define the rule and the override (DCR-085).'}
-  - {practice: Claims diary with ageing control, status: BIBS, bibs: 'Next follow-up date, action plan, diary; age overall and per status; Claims home.', bdoi: 'Set follow-up targets per status.'}
-  - {practice: Four-eyes closure, status: BIBS, bibs: 'Permanent closure needs a closing settlement type and a TL or TH; reopen with a reason.', bdoi: 'Confirm who closes (DCR-079).'}
-  - {practice: Loss data for pricing and renewal, status: PARTLY, bibs: 'Loss experience and claims-prone locations; Renewal reads claims (decision D4).', bdoi: 'Migrate claims history (CLQ14).'}
-  - {practice: Confidential claim documents, status: PARTLY, bibs: 'Document access classes per type; claims reports as CLAIM_REPORT (decision D3).', bdoi: 'Approve the confidentiality matrix under the Data Privacy Act (XQ04).'}
-  - {practice: Claims service KPIs, status: ADOPT, bibs: 'Ageing, outstanding and settled reports, 90-days-past-due list.', bdoi: 'Adopt turnaround targets for notice-to-advice and advice-to-settlement.'}
+  - {practice: Digital first notice of loss, status: NOT_IN_BRD, lever: Faster start, what: 'Notice by web, app or contact centre with photos and automatic policy lookup.', rec: 'Start with a contact-centre form that creates the claim.'}
+  - {practice: Client status updates, status: PARTLY, lever: Fewer follow-up calls, what: 'Automatic SMS or e-mail at each status change.', rec: 'Send notices on the key statuses.'}
+  - {practice: Insurer SLA scorecards, status: PARTLY, lever: Better insurer choice, what: 'Days from notice to offer and offer to payment, per insurer and line.', rec: 'Build from the ageing reports.'}
+  - {practice: Repair network integration, status: BEYOND, lever: Shorter repair time, what: 'LOA and repair status exchanged with accredited shops and dealers.', rec: 'After go-live with the main dealers.'}
+  - {practice: Document checklist with chasing, status: NOT_IN_BRD, lever: Complete files first time, what: 'Checklist per claim type and automatic reminders to the client.', rec: 'Define the checklists with the Claims team.'}
+  - {practice: Claims analytics for renewals, status: PARTLY, lever: Better terms, what: 'Loss ratio and claims-prone locations feed renewals and risk advice.', rec: 'Share loss experience with Renewal and TSU.'}

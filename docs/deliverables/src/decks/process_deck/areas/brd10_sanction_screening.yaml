@@ -1,14 +1,12 @@
-# BRD-10 Sanction Screening and Risk Profiling: chapter 10 of the business process deck.
-# Sources: "Sanction Screening and Risk Profiling BRD.pdf" p.4-5 (benefits), p.6-7 (current process, image pages
-# rendered and read), p.8 (to-be), p.22-25 (NFR); FRS BRD-10 sections 2, 5, 9; discrepancy register (DCR-107-112).
+# Sanction Screening (BRD-10): chapter 12 of the business process reverse KT deck (Part F, Control and Enablement).
+# Sources: discovery 25-Sep-2026 (floor-walk note NB-04: KYC and AMLA outside the system); BRD-10 p.4-8, p.22-25;
+# SNSRP-101 to 706; discrepancy register (DCR-109, 111, 112); open questions SQ01-SQ11.
 id: brd10
 key: sanc
-num: 10
+num: 12
 title: Sanction Screening
 brd: BRD-10
-scope: 'Sanction and PEP screening, risk profiling, case review, escalation, STR'
-status: DESIGNED
-status_text: Designed, not yet built; FRS v1.0 issued for review
+scope: 'Sanction and PEP screening, risk profiling, case review, escalation, suspicious transaction reports'
 department: Compliance (Chief Compliance Officer)
 roles:
   - Compliance Officer and Compliance Checker
@@ -17,27 +15,34 @@ roles:
   - AML Committee (5 members)
   - Operations Lead; Auditor
 figures:
-  - ['64 h', 'a month freed for Compliance (p.4-5)']
+  - ['64 h', 'a month freed for Compliance (BRD-10 p.4-5)']
   - ['4 h > 1 h', 'case cycle time, current to target (p.4-5)']
   - ['10 min', 'saved per case on name screening (p.4-5)']
-  - ['300', 'list records a day at most (10 to 300; p.22-25)']
+  - ['300', 'list records a day at most (p.22-25)']
+session:
+  when: 'Not walked in Sep-2026; KYC / AMLA raised in the New Business session of 25-Sep'
+  pocs: 'Compliance (Chief Compliance Officer)'
 sources:
-  - BRD-10 p.6-7 (current process, rendered from images), p.8 (to-be)
-  - SNSRP-101 to 706
-  - FRS BRD-10 v1.0, sections 2 and 5
+  - 'BRD-10 p.6-7 (current process), p.8 (to-be)'
+  - 'SNSRP-101 to 706'
+  - 'Floor-walk note NB-04'
 chevrons: [Configure, List intake, Matching, Risk tagging, Case, Investigation, Approval, STR]
 notes:
   glance: >-
-    BDOI screens clients by hand today. The BRD asks for one in-system workflow with configurable criteria and
-    matrices, a list updated on a schedule, automated matching, risk tagging and case creation, review templates, routing
-    to approvers, escalation to Compliance and the AML Committee, STR preparation and extraction, and immutable audit
-    logs. The benefits on p.4-5 are the only quantified targets in the twelve BRDs. The module is designed.
-  pains: 'The nine points are the current-process rows of FRS BRD-10 section 2.1, read from the image pages of the BRD (p.6-7).'
-  after: 'The measures are BDOI''s own benefit targets (p.4-5).'
-  gaps: >-
-    Whether an open match blocks business (DCR-112) is the key compliance decision; BIBS warns by banner and has the
-    block behind a parameter, off by default. Filing on the AMLC portal stays manual; BIBS extracts the committee-approved
-    STRs in the AMLC format and records the reference.
+    Compliance screens clients against sanction and PEP lists, profiles their risk, reviews possible matches and files
+    suspicious transaction reports with the AMLC. Today names are matched by hand against lists that arrive by e-mail
+    and are kept on SharePoint, and the PEP list is refreshed quarterly through one NLDS user. On the floor, Marketing
+    confirmed that KYC and the AMLA check for every new client happen outside the system (NB-04). BRD-10 is the only
+    BRD with quantified benefits (p.4-5).
+  heard: 'The floor-walk note that touches Compliance, and the current process of BRD-10.'
+  pains: 'The nine points of the BRD-10 current process (p.6-7).'
+  after: 'The benefit column names what the To-Be removes.'
+  missed: 'Block or warn on a match is the decision that shapes New Business and Renewal.'
+heard:
+  - {ref: NB-04, kind: open, topic: 'KYC and AMLA', asis: 'KYC for every new customer (corporate and retail), then the AMLA check; both done outside the system with the insurance declaration form.', want: 'Confirm whether KYC and AMLA come into the system.'}
+  - {ref: 'BRD-10 p.6', kind: pain, topic: Lists, asis: 'Sanctioned names arrive by e-mail advisory and are consolidated on SharePoint; the PEP list is refreshed quarterly through NLDS, which one person can access.'}
+  - {ref: 'BRD-10 p.7', kind: pain, topic: Matching and cases, asis: 'Names matched by hand; risk tag and review template filled by hand; review and approval routed by e-mail; STR prepared by hand and filed on the AMLC portal.'}
+  - {ref: CP-01, kind: open, topic: E-signature, asis: 'E-signature requirement to be checked with Legal and Compliance.', want: 'Decision on e-signature for approvals and documents.'}
 asis:
   caption: 'Name screening and risk profiling today (BRD-10 p.6-7)'
   notes: >-
@@ -134,17 +139,16 @@ after:
   - {n: 7, bibs: 'Case validated and routed by the approval matrix to UH, Compliance and AML Committee', measure: '64 h a month freed'}
   - {n: 8, bibs: 'PEP entries in the watchlist; PEP clients get a case and, where required, an EDD review', measure: 'EDD for PEPs'}
   - {n: 9, bibs: 'STR prefilled from the case; approved STRs extracted in the AMLC format', measure: 'Reference recorded'}
-gaps:
-  - {sev: High, gap: Open match blocks or warns, impact: Business with a possible sanctioned party, owner: Chief Compliance Officer, decision: 'Block or warn on quotation, placement, booking, renewal', ref: 'DCR-112'}
-  - {sev: Medium, gap: PEP source for individual clients, impact: PEP coverage, owner: Compliance, decision: Which list screens individuals, ref: 'DCR-109'}
-  - {sev: Medium, gap: AML Committee decision rule, impact: When a case is final, owner: Compliance, decision: 'Any member, majority, all, or a quorum', ref: 'DCR-108'}
-  - {sev: Medium, gap: Adverse media and EDD template, impact: Scope of the review, owner: Compliance, decision: 'Adverse media in scope? EDD fields', ref: 'DCR-111'}
-  - {sev: Medium, gap: 287 concurrent investigators, impact: Load target and role design, owner: Compliance, decision: 'Who the investigators are; real concurrency', ref: 'DCR-110'}
-  - {sev: Parked, gap: AMLC portal filing, impact: Filing stays manual, owner: Compliance, decision: Keep manual filing with the extract, ref: 'SNSRP-706'}
+missed:
+  - {cov: CONFIRM, item: Block or warn on a match, seen: 'Screening today happens after KYC, outside the system.', brd: 'Screening on client creation and account submission; effect of an open match not decided.', rec: 'Decide block or warn at quotation, placement, booking and renewal.', ref: DCR-112}
+  - {cov: PARTLY, item: Insurance declaration form, seen: 'Collected with KYC outside the system (NB-04).', brd: 'Not in any BRD.', rec: 'Capture the declaration in client onboarding.', ref: NB-04}
+  - {cov: PARTLY, item: PEP source for individuals, seen: 'Quarterly PEP list through NLDS.', brd: 'Source for individuals open.', rec: 'Name the PEP source and refresh frequency.', ref: DCR-109}
+  - {cov: NOT_IN_BRD, item: Adverse media, seen: 'Not screened today.', brd: 'Not required.', rec: 'Consider adverse-media screening for high-risk clients.', ref: DCR-111}
+  - {cov: NOT_IN_BRD, item: Beneficial owners, seen: 'Corporate clients screened by name.', brd: 'Related parties not screened.', rec: 'Screen beneficial owners and authorised signatories.', ref: SQ11}
+  - {cov: CONFIRM, item: Screening of migrated clients, seen: 'Legacy clients screened at different times.', brd: 'Full re-screen after load proposed.', rec: 'Confirm a full re-screen at cut-over.', ref: 'DCR-208; DMQ06'}
 best:
-  - {practice: Screening on every trigger, status: BIBS, bibs: 'New client, identity change, account application, list change and a monthly full re-screen.', bdoi: 'Confirm the screening scope and batch window.'}
-  - {practice: Maker-checker on rules and lists, status: BIBS, bibs: 'Criteria, matrices and manual list entries are approved by the Compliance Checker.', bdoi: 'Name the checker and a back-up.'}
-  - {practice: Risk-based due diligence for PEPs, status: PARTLY, bibs: 'PEP and high-risk cases; EDD case type when the category requires it.', bdoi: 'Give the EDD template and the PEP source (DCR-109, 111).'}
-  - {practice: Clear escalation to the AML Committee, status: BIBS, bibs: 'Approval and escalation matrices route cases to UH, Compliance and the committee.', bdoi: 'Set the committee decision rule (DCR-108).'}
-  - {practice: Timely STR filing with AMLC, status: PARTLY, bibs: 'STR prefilled, completeness check, AMLC-format extract, reference recorded.', bdoi: 'Keep a filing calendar and monitor it on the STR report.'}
-  - {practice: Immutable audit trail, status: BIBS, bibs: 'Every run, match, decision and override logged, insert-only.', bdoi: 'Agree the retention of screening records (DCR-136).'}
+  - {practice: Reuse bank screening, status: CONFIRM, lever: One view of risk, what: 'BDO group CIF and screening results reused for bank-referred clients.', rec: 'Confirm with BDO Compliance (SQ11, Q16).'}
+  - {practice: Tuned fuzzy matching, status: PARTLY, lever: Fewer false alerts, what: 'Commercial watchlists with fuzzy matching tuned on BDOI data.', rec: 'Tune thresholds during SIT.'}
+  - {practice: Adverse-media screening, status: NOT_IN_BRD, lever: Risk coverage, what: 'News and adverse-media checks for high-risk clients.', rec: 'Add for high-risk segments.'}
+  - {practice: Perpetual KYC, status: PARTLY, lever: Always current, what: 'Re-screening on every list update and on client events.', rec: 'Schedule re-screening after each list load.'}
+  - {practice: Beneficial-owner screening, status: NOT_IN_BRD, lever: Compliance, what: 'Owners, directors and signatories screened with the client.', rec: 'Capture related parties at onboarding.'}

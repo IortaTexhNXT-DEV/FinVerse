@@ -1,40 +1,55 @@
-# BRD-3 Product Maintenance (packages): chapter 3 of the business process deck.
-# Sources: "Product Maintenance.pdf" p.12-13 (current and envisioned process), p.33 (NFR); FRS BRD-3 sections 2, 5, 7;
-# discrepancy register (DCR-030, 034, 035, 036, 037, 153); open questions PQ01-PQ21.
+# Product Maintenance and TSU (BRD-3): chapter 5 of the business process reverse KT deck (Part B, Technical).
+# Sources: floor walk 22-Sep-2026 (Product Maintenance, 44F) and discovery 21 and 25-Sep-2026 (floor-walk notes
+# PM-01 to PM-04, NB-06, NB-08); BDOI Day 1 overview p.9; high-level Product Maintenance TSU process flow (09-Jul);
+# BRD-3 p.12-13, p.33; workshop addendum PMADD01-08; discrepancy register (DCR-036, 037).
 id: brd03
 key: pm
-num: 3
-title: Product Maintenance
+num: 5
+title: Product Maintenance and TSU
+short: Product and TSU
 brd: BRD-3
-scope: Package products, from the Package Request Form to release and expiry
-status: BUILT
-status_text: Built; FRS v1.0 issued for review (reference FRS)
-department: Marketing Business Services (MBS) and TSU
+scope: 'Package and non-package products: request, quotation slips, insurer negotiation, comparative, sign-off, set-up, release'
+department: 'Technical Support Unit (TSU) and Marketing Business Services (MBS)'
 roles:
-  - Marketing AO and Marketing TL / TH / UH
-  - TSU Officer, TSU Team Lead, TSU Head
-  - MBS (package set-up)
-  - ManCom (sign-off)
-  - Business Administrator (release)
+  - 'Marketing AO and TL / TH / UH (requesters)'
+  - 'TSU Officer (maker), TSU TL, TSU Head'
+  - 'Reinsurance team (large or special risks)'
+  - 'ManCom (package sign-off); MBS and IT (package set-up)'
+  - 'Insurers (terms)'
 figures:
-  - ['13', 'TSU users, all concurrent; MBS 5 (p.33)']
-  - ['485', 'Marketing users, 145 concurrent (p.33)']
-  - ['< 5 s', 'response for every role (p.33)']
-  - ['99.9%', 'availability; use 07:00-18:30 (p.33)']
+  - ['13', 'TSU users, all concurrent; MBS 5 (BRD-3 p.33)']
+  - ['2 types', 'package (fixed rates and conditions) and non-package (per deal) (PM-02)']
+  - ['~55', 'insurers to negotiate with (OV-01)']
+  - ['5 masters', 'insurers, products, packages, LOVs, MIS fields (Day 1 p.9)']
+session:
+  when: '22-Sep-2026, 1-1:30 pm, 44F; discovery 21 and 25-Sep-2026'
+  pocs: 'Cherry Ann Manalo, Joy Intia'
 sources:
-  - BRD-3 p.12-13 (current and envisioned process)
-  - BRPM.001-022; workshop addendum PMADD01-06
-  - FRS BRD-3 v1.0, sections 2 and 5
-chevrons: [Request, Approval, TSU review, Negotiation, Comparative, ManCom, Set-up, Release]
+  - 'High-level Product Maintenance TSU process flow (package and non-package)'
+  - BDOI Day 1 overview p.9 (data and reference maintenance)
+  - 'BRD-3 p.12-13; BRPM.001-022; PMADD01-08'
+chevrons: [Request, Completeness, Risk review, Quotation slip, Insurers, Comparative, Sign-off, Set-up and release]
 notes:
   glance: >-
-    A package is a pre-arranged programme whose terms, rates and conditions BDOI negotiates with one or more insurers
-    and then offers through Marketing. Product Maintenance feeds the products and package versions that quotations,
-    accounts and booking read. It is built; FRS BRD-3 is the reference FRS for the pack. The BRD states no volumes
-    (the project assumes tens of package requests a month).
-  pains: The eight points are the current-process rows of the BRD (p.12-13).
-  after: No turnaround targets are given in the BRD; the measures are the controls BIBS adds.
-  gaps: The High incentive item is shared with BRD-2, BRD-4 and BRD-5; the criteria are kept once in Product Maintenance.
+    TSU is the technical desk between Marketing and the insurers. Marketing decides whether a customer need is served
+    by a package (fixed rates and conditions that BDOI designs and the insurer follows) or a non-package placement (terms
+    negotiated per deal). TSU checks the request, assesses the risk, prepares the quotation slip, refers large or
+    special risks to Reinsurance, negotiates with insurers, builds the comparative and prepares the proposal and
+    sign-off. Packages are then set up by MBS and IT and released with an advisory. Product maintenance was named a key
+    pain point (PM-01).
+  heard: Notes of the business overview (21-Sep), the Product Maintenance floor walk (22-Sep) and the 25-Sep session.
+  pains: 'The eight points of the BRD-3 current process (p.12-13); the TSU process flow confirms them and adds the reinsurance loop.'
+  after: 'The benefit column names what the To-Be removes.'
+  missed: 'Non-package product maintenance is out of BRD-3; the reinsurance referral has no requirement in phase 1.'
+heard:
+  - {ref: PM-01, kind: want, topic: Package and non-package, asis: 'Marketing decides package or non-package from the customer need; BDOI defines the product and the insurer follows.', want: 'Product maintenance in the system for both package and non-package.'}
+  - {ref: PM-02, kind: rule, topic: Design and rates, asis: 'Marketing gives the requirement; the product team designs and negotiates with the insurer, incl. incentives for packages; commission rate as agreed by Marketing.', want: 'Package = fixed rates and conditions; non-package rates differ per deal.'}
+  - {ref: PM-03, kind: pain, topic: Package set-up, asis: 'Packages are defined and maintained manually, starting from a customer-specific requirement of Marketing.', want: 'Packages defined and maintained in the system.'}
+  - {ref: PM-04, kind: want, topic: Change at renewal, asis: 'At renewal a policy can move from package to non-package or back.', want: 'Allow the switch at renewal.'}
+  - {ref: NB-08, kind: rule, topic: TSU step, asis: 'Non-package: the request goes to TSU before the quotation; once the customer accepts, to Placement.'}
+  - {ref: 'TSU flow', kind: pain, topic: Tracking and evidence, asis: 'Request encoded in an Excel monitoring file; acceptance evidence (signed slip, stamped slip or explicit e-mail) checked by hand; placement status tracker kept by hand; comparative table built manually in Excel.'}
+  - {ref: 'TSU flow', kind: asis, topic: Reinsurance loop, asis: 'Large sum insured, special risks or non-standard cover go to the Reinsurance team; RI comments come back to Marketing, who revises terms or closes the request.'}
+  - {ref: 'TSU flow', kind: pain, topic: Set-up dependency, asis: 'Package creation needs a maintenance request to MBS / IT; screenshots kept as evidence; TSU validates rates and conditions; release advisory to Marketing, Operations and TSU.'}
 asis:
   caption: 'Package set-up today (BRD-3 p.12-13)'
   notes: >-
@@ -128,17 +143,34 @@ after:
   - {n: 6, bibs: 'Documents leave password protected; password in a separate e-mail', measure: 'Every document protected'}
   - {n: 7, bibs: 'Daily job raises expiry alerts and can draft the renewal request', measure: 'No expiry missed'}
   - {n: 8, bibs: 'Every action in the request history and the audit trail', measure: 'Full history per package'}
-gaps:
-  - {sev: High, gap: Incentive criteria without a definition, impact: Incentive income across four BRDs, owner: 'MBS, Comptrollership', decision: 'List the programmes (CPC2 and others) with rate, base, payer', ref: DCR-037}
-  - {sev: High, gap: Password convention for documents, impact: Clients and insurers cannot open files without a known rule, owner: 'MBS, Information Security', decision: Password rule per document type, ref: DCR-153}
-  - {sev: Medium, gap: Role-to-action matrix; ManCom decision rule, impact: Approval routing and persona tests, owner: 'MBS and TSU', decision: 'Approve the matrix; ManCom membership and quorum', ref: DCR-035}
-  - {sev: Medium, gap: Non-package product maintenance, impact: Scope of the module, owner: MBS, decision: Confirm out of scope for this phase, ref: DCR-036}
-  - {sev: Medium, gap: BRQID.008 dropped without a revision entry, impact: Renewals repriced without client evidence, owner: MBS, decision: Confirm BRRN.038 now governs, ref: DCR-030}
-  - {sev: Parked, gap: Product master feed to other BDOI systems, impact: Other systems not updated automatically, owner: BDO IT, decision: 'Which systems receive product changes', ref: PQ16}
+variants:
+  title: the TSU request today, step by step
+  headers: [Step, What TSU does, Check or decision, Tool today]
+  widths: [2.0, 4.6, 3.6, 2.2]
+  per_page: 8
+  rows:
+    - ['1 Request', 'Receives the PRF (package) or TSU request form (non-package) with client, risk, cover, basis of quotation', 'Complete, documents attached, no duplicate; else returned "Incomplete submission"', 'E-mail']
+    - ['2 Log', 'Acknowledges and encodes the request', 'Request tracker', 'Excel monitoring file']
+    - ['3 Risk review', 'Validates cover structure, sum insured and limits, policy terms', 'Needs reinsurance? (large SI, special risk, non-standard cover)', 'E-mail to RI team']
+    - ['4 Quotation slip', 'Prepares the slip with risk details, terms and pricing; TSU TL approves', 'TL approval; revise on return', 'Word / Excel']
+    - ['5 Insurers', 'Sends the slip, follows up, escalates after the SLA; records accepted, declined, conditional', 'Acceptance evidence: signed or stamped slip, explicit e-mail', 'E-mail; status tracker']
+    - ['6 Comparative', 'Compiles premium, cover, conditions, exclusions; asks for more quotes if needed', 'Enough for a recommendation?', 'Excel']
+    - ['7 Proposal', 'Sign-off sheet; ManCom (package) or TL / Head (non-package); proposal slip to Marketing', 'Approved; Marketing sends to the client', 'Paper signatures']
+    - ['8 Set-up and release', 'Maintenance request to MBS / IT; validates rates, conditions, set-up; release advisory', 'Set-up correct?', 'MBS / IT; screenshots']
+  notes: The steps of the Product Maintenance TSU process flow (09-Jul).
+missed:
+  - {cov: PARTLY, item: Non-package product maintenance, seen: 'Both types to be maintained in the system (PM-01).', brd: 'BRD-3 covers packages; non-package "if and when added".', rec: 'Bring non-package product and TOR templates into scope.', ref: 'PM-01; DCR-036'}
+  - {cov: NOT_IN_BRD, item: Reinsurance referral, seen: 'Large or special risks go to the RI team and back.', brd: 'No RI referral in BRD-1 or BRD-3; RI is phase 2.', rec: 'Referral trigger and RI status on the TSU request (see chapter 6).', ref: 'TSU flow; A3'}
+  - {cov: PARTLY, item: Acceptance evidence, seen: 'Signed slip, stamped slip or explicit e-mail.', brd: 'Insurer response recorded; evidence type not gated.', rec: 'Require the evidence document before placement.', ref: 'BRPM.013'}
+  - {cov: PARTLY, item: SLA values, seen: 'Follow-up and escalation after SLA breach.', brd: 'SLA tracking; values open.', rec: 'Set SLA per request type and complexity.', ref: 'PQ08; NB-07'}
+  - {cov: PARTLY, item: Rate formulas without IT, seen: 'Package set-up needs MBS / IT.', brd: 'Scheme versions; new formulas still need IT.', rec: 'Rating rules maintained by the business with approval.', ref: PQ12}
+  - {cov: PARTLY, item: Package switch at renewal, seen: 'Package to non-package or back (PM-04).', brd: 'No explicit rule.', rec: 'Switch rule with product versions.', ref: 'PM-04; PQ11'}
+  - {cov: CONFIRM, item: Excess commission and incentives, seen: 'Incentives negotiated per package.', brd: 'CPC2 undefined.', rec: 'Define incentive types, rates and bases.', ref: 'PM-02; DCR-037'}
+  - {cov: CONFIRM, item: ManCom signature, seen: 'Paper sign-off sheet.', brd: 'Physical signatures.', rec: 'E-sign-off in the workflow (CP-01).', ref: PQ07}
 best:
-  - {practice: Configurable rules owned by the business, status: BIBS, bibs: 'Products, package versions, rates and incentive criteria kept as masters, maintained without IT.', bdoi: 'Name the business owner of each master and its approver.'}
-  - {practice: Maker-checker on product changes, status: BIBS, bibs: 'Marketing approval, TSU Head approval, ManCom sign-off and release validation; never the maker.', bdoi: 'Approve the role-to-action matrix (DCR-035).'}
-  - {practice: One version of the terms, status: BIBS, bibs: 'One comparative master per request and versioned packages; old versions locked.', bdoi: 'Retire Excel comparatives once BIBS is live.'}
-  - {practice: Protected digital documents, status: PARTLY, bibs: 'Slips and advisories password protected, password sent separately, send log.', bdoi: 'Agree the password convention (DCR-153).'}
-  - {practice: Expiry and renewal pipeline, status: BIBS, bibs: 'Daily expiry alerts and a renewal request pre-filled from the current version.', bdoi: 'Set the lead days per package type.'}
-  - {practice: KPI on package turnaround, status: ADOPT, bibs: 'Stage history and SLA per stage (for example 120 hours for negotiation).', bdoi: 'Adopt turnaround targets per stage and review them monthly.'}
+  - {practice: Business-maintained rating rules, status: PARTLY, lever: Speed to market, what: 'Rates, factors and formulas maintained by TSU with approval and versions, without IT.', rec: 'A rules screen with test premiums before release.'}
+  - {practice: Insurer appetite and capacity register, status: NOT_IN_BRD, lever: Better placement, what: 'Per insurer: lines, limits, appetite, accreditation, commission, remittance terms.', rec: 'Build on the insurer records of Day 1 p.9.'}
+  - {practice: Test premiums before release, status: PARTLY, lever: No wrong rates, what: 'Automatic test cases run on every package before it goes live.', rec: 'Turn the validation checkpoint into test cases.'}
+  - {practice: Package performance analytics, status: BEYOND, lever: Better products, what: 'Take-up, loss ratio and retention per package reviewed yearly.', rec: 'Report per package from booking and claims data.'}
+  - {practice: E-sign-off, status: CONFIRM, lever: No paper, what: 'ManCom sign-off and slips signed electronically.', rec: 'With the e-signature decision (CP-01).'}
+  - {practice: One product catalogue, status: PARTLY, lever: One source of truth, what: 'Package and non-package products, TOR and documents in one catalogue used by every module.', rec: 'Extend BRD-3 to non-package (PM-01).'}

@@ -2,7 +2,8 @@
 // so add or move a screen here and every file is renumbered on the next run (old files are deleted).
 // Fields: slug (file name), title, user (SIT/UAT user of the seed profile), path (route), and
 // optional `open` ('first' opens the first record of the list at `path`), `click` (button name regex
-// clicked after loading, e.g. to open a modal or run a report).
+// clicked after loading, e.g. to open a modal or run a report), `tab` (name of a record tab opened
+// after the record).
 module.exports = [
   { slug: 'login', title: 'Sign in', user: null, path: '/login' },
   // Home
@@ -31,8 +32,20 @@ module.exports = [
   { slug: 'eb-home', title: 'EB Home', user: 'ebao', path: '/eb' },
   { slug: 'eb-programmes', title: 'EB Programmes work list', user: 'ebao', path: '/eb/programmes?tab=ALL' },
   { slug: 'eb-programme-record', title: 'EB Programme record', user: 'ebao', path: '/eb/programmes?tab=ALL', open: 'first' },
+  { slug: 'eb-programme-franchise', title: 'EB Programme – Franchise tab', user: 'ebao', path: '/eb/programmes?tab=ALL', open: 'first', tab: 'Franchise' },
+  { slug: 'eb-programme-tor-requests', title: 'EB Programme – TOR & Requests tab', user: 'ebao', path: '/eb/programmes?tab=ALL', open: 'first', tab: 'TOR & Requests' },
+  { slug: 'eb-programme-proposals', title: 'EB Programme – Proposals tab', user: 'ebao', path: '/eb/programmes?tab=ALL', open: 'first', tab: 'Proposals' },
+  { slug: 'eb-programme-comparatives', title: 'EB Programme – Comparatives tab', user: 'ebao', path: '/eb/programmes?tab=ALL', open: 'first', tab: 'Comparative' },
+  { slug: 'eb-programme-confirmation', title: 'EB Programme – Client Confirmation tab', user: 'ebao', path: '/eb/programmes?tab=ALL', open: 'first', tab: 'Confirmation' },
+  { slug: 'eb-programme-submissions', title: 'EB Programme – Submissions tab', user: 'ebao', path: '/eb/programmes?tab=ALL', open: 'first', tab: 'Submissions' },
+  { slug: 'eb-programme-members', title: 'EB Programme – Members and rosters tab', user: 'ebao', path: '/eb/programmes?tab=ALL', open: 'first', tab: 'Members' },
+  { slug: 'eb-programme-member-changes-tab', title: 'EB Programme – Member Changes of the programme tab', user: 'ebao', path: '/eb/programmes?tab=ALL', open: 'first', tab: 'Member Changes' },
+  { slug: 'eb-programme-billing', title: 'EB Programme – Billing & SOA tab', user: 'ebao', path: '/eb/programmes?tab=ALL', open: 'first', tab: 'Billing & SOA' },
   { slug: 'eb-new-programme', title: 'EB New Programme', user: 'ebao', path: '/eb/programmes/new' },
+  { slug: 'eb-member-changes', title: 'EB Member Changes', user: 'ebao', path: '/eb/member-changes' },
   { slug: 'eb-pending-items', title: 'EB Pending Items', user: 'ebao', path: '/eb/pending-items' },
+  { slug: 'eb-soa-register', title: 'EB SOA Register', user: 'ebproc', path: '/eb/soa' },
+  { slug: 'eb-setup', title: 'EB Setup', user: 'badmin', path: '/eb/setup' },
   { slug: 'placement-workbench', title: 'Placement Workbench', user: 'proc', path: '/placement' },
   { slug: 'placement-slips', title: 'Placement Slips', user: 'proc', path: '/placement/slips' },
   { slug: 'clpc-billing', title: 'CLPC Billing', user: 'proc', path: '/placement/billing' },

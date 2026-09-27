@@ -59,6 +59,10 @@ async function capture(page, screen, file) {
   if (screen.open === 'first') {
     await openFirstRecord(page);
   }
+  if (screen.tab) {
+    await page.getByRole('tab', { name: screen.tab, exact: true }).first().click().catch(() => {});
+    await settle(page);
+  }
   if (screen.click) {
     await page.getByRole('button', { name: new RegExp(screen.click, 'i') }).first().click().catch(() => {});
     await settle(page);

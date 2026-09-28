@@ -54,9 +54,20 @@ public class NoTouchReturnHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The Submitted Policies team, from the list returned by the insurer";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Submitted Policies > No Touch Billing, button Upload Insurer Return";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(SBM_NO, "Masterlist number of the exported line", "SBM-2026-000012"),
+        BulkColumn.required(SBM_NO, "Masterlist number of the exported line", "SBM-2026-000012")
+            .allowed("Masterlist number of a line of the No Touch list sent to the insurer"),
         new BulkColumn(
             "Basic Premium",
             "Basic premium validated by the insurer",

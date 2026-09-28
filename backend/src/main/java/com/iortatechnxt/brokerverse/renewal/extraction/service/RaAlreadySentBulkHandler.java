@@ -61,14 +61,25 @@ public class RaAlreadySentBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The renewal team, from its Renewal Advice tracker of the legacy systems";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Renewal > Renewal Setup, tab Go-live, button Upload RAs Already Sent";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
         BulkColumn.required(LEGACY_REF, "Policy reference in the legacy system", "QPS-FI-0012345"),
         new BulkColumn(
             RA_DATE, "Date the Renewal Advice was sent", true, BulkColumn.Type.DATE, "2027-12-10"),
         BulkColumn.optional(RA_REF, "Reference of the Renewal Advice in the tracker", "RA-1207"),
-        BulkColumn.optional(CHANNEL, "E-mail, courier, hand or other", "E-mail"),
-        BulkColumn.optional(RECIPIENT, "Who received it", "client@example.ph"));
+        BulkColumn.optional(CHANNEL, "How the Renewal Advice was sent", "E-mail")
+            .values("E-mail", "Courier", "Hand", "Other"),
+        BulkColumn.optional(RECIPIENT, "Who received it (name or e-mail)", "client@example.ph"));
   }
 
   @Override

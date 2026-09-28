@@ -78,27 +78,40 @@ public class LegacyPoliciesBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The renewal team, from the expiring-policy extracts of the legacy systems";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Renewal > Renewal Setup, tab Go-live, button Upload Migrated Policies";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
         BulkColumn.required(LEGACY_REF, "Policy reference in the legacy system", "QPS-FI-0012345"),
-        BulkColumn.required(SYSTEM, "EBIX or QPS", "QPS"),
+        BulkColumn.required(SYSTEM, "Legacy system of the policy", "QPS").values("EBIX", "QPS"),
         BulkColumn.required(POLICY_NO, "Policy number", "FI-2027-0012345"),
-        BulkColumn.required(CLIENT_CODE, "BIBS client code", "CL-2026-000001"),
+        BulkColumn.required(CLIENT_CODE, "Client code in BIBS", "CL-2026-000001").master("client"),
         BulkColumn.required(CLIENT_NAME, "Client name", "Juan Dela Cruz"),
-        BulkColumn.optional(PRODUCT, "BIBS risk code when known", "PAR01"),
+        BulkColumn.optional(PRODUCT, "Risk code in BIBS when known", "PAR01")
+            .master("product (risk code)"),
         BulkColumn.optional(LINE, "Product line", "PROPERTY"),
         BulkColumn.optional(PACKAGE, "Package code in the legacy system", "QPS-HOME-A"),
         BulkColumn.optional(PACKAGE_VERSION, "Package version in the legacy system", "3"),
-        BulkColumn.required(INSURER, "Insurer code", "INS-MGIC"),
+        BulkColumn.required(INSURER, "Insurer of the policy", "INS-MGIC").master("insurer"),
         new BulkColumn(INCEPTION, "Start of the term", false, BulkColumn.Type.DATE, "2027-03-01"),
         new BulkColumn(EXPIRY, "End of the term", true, BulkColumn.Type.DATE, "2028-03-01"),
         new BulkColumn(
             SUM_INSURED, "Total sum insured", false, BulkColumn.Type.NUMBER, "3500000.00"),
         new BulkColumn(PREMIUM, "Gross premium", false, BulkColumn.Type.NUMBER, "12500.00"),
-        BulkColumn.optional(PN, "PN numbers, comma separated", "PN-778812"),
-        BulkColumn.optional(OFFICER, "Account officer user", "ao"),
-        BulkColumn.optional(UNIT, "Sales team code", "T-CBG1"),
-        BulkColumn.optional(SEGMENT, "Market segment", "CBG"),
+        BulkColumn.optional(PN, "Promissory note numbers of the loan", "PN-778812")
+            .format("Text; several numbers separated by commas"),
+        BulkColumn.optional(OFFICER, "User ID of the account officer", "jdelacruz")
+            .allowed("User ID of an active user"),
+        BulkColumn.optional(UNIT, "Sales team", "T-CBG1").master("sales team"),
+        BulkColumn.optional(SEGMENT, "Market segment", "CBG").lov("MARKET_SEGMENT"),
         BulkColumn.optional(MORTGAGEE, "Mortgagee bank when mortgaged", "BDO Unibank"),
         new BulkColumn(URGENT, "Y to flag the renewal urgent", false, BulkColumn.Type.YES_NO, "N"));
   }

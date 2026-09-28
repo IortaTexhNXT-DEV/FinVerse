@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.coa.domain.AccountLevel;
 import com.iortatechnxt.brokerverse.coa.domain.GlAccountRepository;
 import com.iortatechnxt.brokerverse.coa.domain.NegativeBalancePolicy;
 import com.iortatechnxt.brokerverse.coa.domain.SubLedgerType;
+import com.iortatechnxt.brokerverse.common.excel.GuideColumn.Choice;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -93,26 +94,47 @@ public class CoaUploadHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The GL team lead maintaining the chart of accounts";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "General Ledger > Chart Upload";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.optional(PARENT, "Code of the parent account (blank for a top-level group)", ""),
+        BulkColumn.optional(PARENT, "Code of the parent account; blank for a top-level group", "")
+            .allowed("Code of an existing account or of an account on an earlier row"),
         BulkColumn.optional(
-            ACCOUNT, "Account code; blank = next number of the parent's scheme", "1210.07"),
+            ACCOUNT, "Account code; blank for the next number of the parent's scheme", "1210.07"),
         BulkColumn.required(NAME, "Account name", "Premium Receivable - Motor"),
         BulkColumn.optional(SHORT, "Unique short code used on journal lines", "PRMOTOR"),
-        BulkColumn.required(
-            CLASS, "ASSET, LIABILITY, EQUITY, INCOME, EXPENSE or MEMORANDUM", "ASSET"),
-        BulkColumn.required(LEVEL, "GROUP, MAIN, SUB or MICRO (one tier below the parent)", "SUB"),
-        BulkColumn.optional(CATEGORY, "GL category code", ""),
-        new BulkColumn(CONTROL, "Control account (Y/N)", false, Type.YES_NO, "N"),
-        BulkColumn.optional(SUB_LEDGER, "Controlled sub-ledger (blank = none)", "POLICYHOLDER"),
-        BulkColumn.optional(CURRENCIES, "Allowed currencies, comma separated (blank = all)", "PHP"),
-        new BulkColumn(MANUAL, "Manual journals allowed (Y/N, blank = Y)", false, Type.YES_NO, "Y"),
-        new BulkColumn(COST_CENTRE, "Cost centre mandatory (Y/N)", false, Type.YES_NO, "N"),
-        new BulkColumn(REVALUATION, "Revalued at month end (Y/N)", false, Type.YES_NO, "N"),
+        BulkColumn.required(CLASS, "Class of the account", "ASSET").codes(AccountClass.class),
+        BulkColumn.required(LEVEL, "Level of the account, one tier below the parent", "SUB")
+            .codes(AccountLevel.class),
+        BulkColumn.optional(CATEGORY, "GL category", "").master("GL category"),
+        new BulkColumn(CONTROL, "Control account", false, Type.YES_NO, "N"),
+        BulkColumn.optional(
+                SUB_LEDGER, "Sub-ledger the account controls; blank for none", "POLICYHOLDER")
+            .when("Control is Y")
+            .codes(SubLedgerType.class),
+        BulkColumn.optional(CURRENCIES, "Currencies allowed on the account; blank for all", "PHP")
+            .format("ISO currency codes separated by commas, e.g. PHP,USD"),
+        new BulkColumn(MANUAL, "Manual journals allowed; blank for Y", false, Type.YES_NO, "Y"),
+        new BulkColumn(
+            COST_CENTRE, "Cost centre mandatory on journal lines", false, Type.YES_NO, "N"),
+        new BulkColumn(REVALUATION, "Revalued at month end", false, Type.YES_NO, "N"),
         BulkColumn.optional(REPORT_GROUP, "Financial statement line", "Premium Receivable"),
-        new BulkColumn(OPENED, "Opening date (blank = today)", false, Type.DATE, "2026-01-01"),
-        BulkColumn.optional(NEGATIVE, "ALLOW, WARN or BLOCK (blank = ALLOW)", "WARN"));
+        new BulkColumn(OPENED, "Opening date; blank for today", false, Type.DATE, "2026-01-01"),
+        BulkColumn.optional(NEGATIVE, "What a negative balance does; blank for ALLOW", "WARN")
+            .choices(
+                List.of(
+                    new Choice("ALLOW", "Allowed"),
+                    new Choice("WARN", "Allowed with a warning"),
+                    new Choice("BLOCK", "Blocked"))));
   }
 
   @Override

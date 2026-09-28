@@ -56,13 +56,25 @@ public class CommissionPaymentHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Cashiering officers, from the insurers' commission payment details";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Cashiering > Commission ORs";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required("Insurer code", "Insurer paying the commission", "INS-MGIC"),
+        BulkColumn.required("Insurer code", "Insurer paying the commission", "INS-MGIC")
+            .master("insurer"),
         BulkColumn.required("Payee name", "Payee on the official receipt", "MGIC Insurance"),
         BulkColumn.optional("Certificate ref", "BIR 2307 certificate of the insurer", "2307-0001"),
         BulkColumn.required("Payment ref", "Check or credit reference", "CHK-0001"),
-        BulkColumn.optional("Invoice no", "Invoice of the commission", "BI-2026-000001"),
+        BulkColumn.optional("Invoice no", "Invoice the commission is on", "BI-2026-000001")
+            .master("invoice"),
         new BulkColumn(GROSS, "Basic commission", true, Type.NUMBER, "2379.13"),
         new BulkColumn(VAT, "EVAT on the commission", true, Type.NUMBER, "285.50"),
         new BulkColumn(WTAX, "Withholding tax", true, Type.NUMBER, "237.91"),

@@ -72,18 +72,35 @@ public class InsurerResponseBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The renewal team, from the insurers' renewal responses";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Renewal > Insurer Batches, button Upload Insurer Responses";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(REFERENCE, "Renewal reference", "RNW-2027-000001"),
+        BulkColumn.required(REFERENCE, "Renewal reference", "RNW-2027-000001").master("renewal"),
         BulkColumn.optional(POLICY, "Expiring policy number", "MC-2026-000123"),
-        BulkColumn.required(RESPONSE, "Renew As Is, Revise or Reject", "Renew As Is"),
+        BulkColumn.required(RESPONSE, "Response of the insurer", "Renew As Is")
+            .values("Renew As Is", "Revise", "Reject"),
         BulkColumn.optional(INSURER_REF, "Insurer reference", "REN-55012"),
-        new BulkColumn(PREMIUM, "Revised gross premium", false, BulkColumn.Type.NUMBER, ""),
-        new BulkColumn(SUM_INSURED, "Revised sum insured", false, BulkColumn.Type.NUMBER, ""),
-        new BulkColumn(RATE, "Revised rate in percent", false, BulkColumn.Type.NUMBER, ""),
-        BulkColumn.optional(TERMS, "Revised terms", ""),
+        new BulkColumn(PREMIUM, "Revised gross premium", false, BulkColumn.Type.NUMBER, "")
+            .when("Response is Revise"),
+        new BulkColumn(SUM_INSURED, "Revised sum insured", false, BulkColumn.Type.NUMBER, "")
+            .when("Response is Revise"),
+        new BulkColumn(RATE, "Revised rate in percent", false, BulkColumn.Type.NUMBER, "")
+            .when("Response is Revise"),
+        BulkColumn.optional(TERMS, "Revised terms", "").when("Response is Revise"),
         new BulkColumn(RECEIVED, "Date received", false, BulkColumn.Type.DATE, "2027-08-15"),
-        BulkColumn.optional(REJECT_ACTION, "For Reject: NOT_FOR_RENEWAL (default) or REMARKET", ""),
+        BulkColumn.optional(
+                REJECT_ACTION, "What follows a rejection; blank for Not for renewal", "")
+            .when("Response is Reject")
+            .codes("NOT_FOR_RENEWAL", REMARKET),
         BulkColumn.optional(REMARKS, "Remarks", ""));
   }
 

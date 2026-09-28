@@ -125,6 +125,16 @@ public record BulkColumn(
   }
 
   /**
+   * This column with its allowed values entered as they are shown (value and label alike).
+   *
+   * @param values values
+   * @return column
+   */
+  public BulkColumn values(String... values) {
+    return choices(Arrays.stream(values).map(v -> new Choice(v, v)).toList());
+  }
+
+  /**
    * This column with the constants of an enum as allowed codes, labelled in words.
    *
    * @param type enum

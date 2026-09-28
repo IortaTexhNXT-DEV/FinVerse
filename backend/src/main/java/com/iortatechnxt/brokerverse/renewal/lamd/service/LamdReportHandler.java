@@ -63,6 +63,16 @@ public class LamdReportHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The renewal team, from the LAMD loan report of the bank";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Renewal > LAMD Reports, button Upload LAMD Report";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
         BulkColumn.required(PN, "PN number of the loan", "PN-778812"),

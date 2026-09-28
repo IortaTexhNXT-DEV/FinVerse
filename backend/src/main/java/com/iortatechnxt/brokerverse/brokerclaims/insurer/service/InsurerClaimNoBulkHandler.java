@@ -57,10 +57,17 @@ public class InsurerClaimNoBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Claims officers, from the insurers' claim acknowledgements";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(BulkClaimResolver.CLAIM_NO, "BDOI claim number", "BCL-2026-000001"),
-        BulkColumn.required(BulkClaimResolver.INSURER, "Insurer code", "INS-MGIC"),
+        BulkColumn.required(BulkClaimResolver.CLAIM_NO, "BDOI claim number", "BCL-2026-000001")
+            .master("claim"),
+        BulkColumn.required(BulkClaimResolver.INSURER, "Insurer of the claim", "INS-MGIC")
+            .master("insurer"),
         BulkColumn.required(
             BulkClaimResolver.INSURER_CLAIM_NO, "Insurer's claim number", "MGIC-CL-7781"),
         new BulkColumn(

@@ -86,16 +86,28 @@ public class MasterListBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The client's HR contact or the Employee Benefits account officer";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Employee Benefits > Programmes, the programme's Members tab, button Upload Master List";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(EMPLOYEE_NO, "Employee number, once per list", "E-00123"),
+        BulkColumn.required(EMPLOYEE_NO, "Employee number; once per list", "E-00123"),
         BulkColumn.required(LAST, "Last name", "Reyes"),
         BulkColumn.required(FIRST, "First name", "Ana"),
         new BulkColumn(BIRTH, "Birth date", true, BulkColumn.Type.DATE, "1990-04-15"),
-        BulkColumn.optional(GENDER, "MALE or FEMALE", "FEMALE"),
-        BulkColumn.optional(CIVIL, "Civil status code (list CIVIL_STATUS)", "SINGLE"),
-        BulkColumn.required(PLAN, "Plan code of the benefit", "PLAN-A"),
-        new BulkColumn(DEPENDANTS, "Number of dependants", false, BulkColumn.Type.NUMBER, "1"),
+        BulkColumn.optional(GENDER, "Gender of the employee", "FEMALE").codes("MALE", "FEMALE"),
+        BulkColumn.optional(CIVIL, "Civil status", "SINGLE").lov("CIVIL_STATUS"),
+        BulkColumn.required(PLAN, "Benefit plan of the employee", "PLAN-A")
+            .master("plan of the programme"),
+        new BulkColumn(DEPENDANTS, "Number of dependants", false, BulkColumn.Type.NUMBER, "1")
+            .format("Whole number, e.g. 1"),
         new BulkColumn(
             EFFECTIVE,
             "Coverage start; the policy year start when blank",

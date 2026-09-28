@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.screening.watchlist.service;
 
 import com.iortatechnxt.brokerverse.bulk.service.BulkColumn;
+import com.iortatechnxt.brokerverse.common.excel.GuideColumn.Choice;
 import com.iortatechnxt.brokerverse.screening.config.domain.SubjectType;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.AliasType;
 import com.iortatechnxt.brokerverse.screening.watchlist.domain.EntryValues;
@@ -77,16 +78,25 @@ public record ListRecord(int line, String reference, EntryValues values, String 
   public static List<BulkColumn> columns() {
     return List.of(
         BulkColumn.required(REFERENCE, "Reference of the record in the source list", "UNSC-0001"),
-        BulkColumn.required(ENTITY_TYPE, "INDIVIDUAL or ENTITY", "INDIVIDUAL"),
-        BulkColumn.required(PRIMARY_NAME, "Name as listed", "Dela Cruz, Juan Invented"),
-        BulkColumn.optional(FIRST_NAME, "First name (individuals)", "Juan"),
-        BulkColumn.optional(LAST_NAME, "Last name (individuals)", "Dela Cruz"),
-        BulkColumn.optional(ALIASES, "Aliases separated by semicolons", "Juanito DC; J. D. Cruz"),
-        BulkColumn.optional(BIRTH_DATE, "Birth date yyyy-MM-dd", "1970-02-28"),
+        BulkColumn.required(ENTITY_TYPE, "A listed person or an entity", "INDIVIDUAL")
+            .codes("INDIVIDUAL", "ENTITY"),
+        BulkColumn.required(PRIMARY_NAME, "Name as listed", "Dela Cruz, Juan Listed"),
+        BulkColumn.optional(FIRST_NAME, "First name of a person", "Juan"),
+        BulkColumn.optional(LAST_NAME, "Last name of a person", "Dela Cruz"),
+        BulkColumn.optional(ALIASES, "Other names of the record", "Juanito DC; J. D. Cruz")
+            .format("Text; several names separated by ;"),
+        BulkColumn.optional(BIRTH_DATE, "Birth date of a person", "1970-02-28")
+            .format("Date yyyy-MM-dd, e.g. 1970-02-28, or an Excel date"),
         BulkColumn.optional(NATIONALITY, "Nationality", "Filipino"),
         BulkColumn.optional(ID_NUMBERS, "Identification numbers", "P1234567"),
-        BulkColumn.optional(LISTED_ON, "Listing date yyyy-MM-dd", "2026-01-15"),
-        BulkColumn.optional(LIST_TYPE, "SANCTION, PEP, INTERNAL; blank = the source's", ""),
+        BulkColumn.optional(LISTED_ON, "Date the record was listed", "2026-01-15")
+            .format("Date yyyy-MM-dd, e.g. 2026-01-15, or an Excel date"),
+        BulkColumn.optional(LIST_TYPE, "Kind of list; blank for the source's kind", "")
+            .choices(
+                List.of(
+                    new Choice("SANCTION", "Sanctions list"),
+                    new Choice("PEP", "Politically exposed persons"),
+                    new Choice("INTERNAL", "Internal list"))),
         BulkColumn.optional(REMARKS, "Remarks", "Advisory 2026-01"));
   }
 

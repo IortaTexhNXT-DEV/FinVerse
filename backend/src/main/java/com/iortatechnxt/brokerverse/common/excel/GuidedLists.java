@@ -23,7 +23,7 @@ final class GuidedLists {
   /** Values written out in the Allowed values cell of the band. */
   static final int SHOWN_IN_BAND = 6;
 
-  private static final int FIRST_VALUE_ROW = 3;
+  private static final int FIRST_VALUE_ROW = 4;
   private static final int CODE_WIDTH = 18;
   private static final int LABEL_WIDTH = 42;
   private static final int CHARACTER = 256;
@@ -81,10 +81,14 @@ final class GuidedLists {
     }
     Sheet sheet = wb.createSheet(SHEET);
     Row title = sheet.createRow(0);
-    set(title, 0, "Lists of values – the drop-downs of the template take their codes from here")
-        .setCellStyle(styles.title);
-    Row names = sheet.createRow(1);
-    Row heads = sheet.createRow(2);
+    set(title, 0, "Lists of values").setCellStyle(styles.title);
+    set(
+            sheet.createRow(1),
+            0,
+            "The drop-downs of the template take their codes from here. Enter the code.")
+        .setCellStyle(styles.info);
+    Row names = sheet.createRow(2);
+    Row heads = sheet.createRow(3);
     int block = 0;
     for (Map.Entry<List<Choice>, List<String>> e : lists.entrySet()) {
       int c = block * 2;
@@ -102,6 +106,10 @@ final class GuidedLists {
       block++;
     }
     sheet.createFreezePane(0, FIRST_VALUE_ROW);
+    sheet.getPrintSetup().setLandscape(true);
+    sheet.getPrintSetup().setFitWidth((short) 1);
+    sheet.getPrintSetup().setFitHeight((short) 0);
+    sheet.setFitToPage(true);
   }
 
   private static Row row(Sheet sheet, int r) {

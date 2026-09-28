@@ -349,7 +349,7 @@ public final class GuidedTemplateWriter {
    * @return lines, at least 1
    */
   static int lines(String text, int width) {
-    int perLine = Math.max(1, (int) (width * 1.2));
+    int perLine = Math.max(1, (int) (width * 1.3));
     int lines = 0;
     for (String part : text.split("\n", -1)) {
       lines += Math.max(1, (part.length() + perLine - 1) / perLine);

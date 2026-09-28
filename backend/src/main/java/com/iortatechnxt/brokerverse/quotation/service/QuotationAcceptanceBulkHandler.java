@@ -80,10 +80,22 @@ public class QuotationAcceptanceBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Account officers recording the clients' acceptances";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Quotation / Proposal > Quotations, button Bulk Upload, then Bulk acceptance";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(ARN, "ARN of the quotation", "ARN-2026-000123"),
-        BulkColumn.optional(GROUPS, "Accepted risk groups, e.g. 1;2 (empty = all)", ""),
+        BulkColumn.required(ARN, "ARN of the quotation", "ARN-2026-000123")
+            .allowed("ARN of a quotation sent to the client"),
+        BulkColumn.optional(GROUPS, "Risk groups the client accepts; blank for every group", "")
+            .format("Group numbers separated by ;, e.g. 1;2"),
         BulkColumn.optional(REMARKS, "Remarks recorded with the acceptance", ""));
   }
 

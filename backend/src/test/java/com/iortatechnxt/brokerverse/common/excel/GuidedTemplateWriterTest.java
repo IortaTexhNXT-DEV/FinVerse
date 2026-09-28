@@ -132,7 +132,7 @@ class GuidedTemplateWriterTest {
               .orElseThrow();
       assertThat(status.getValidationConstraint().getValidationType())
           .isEqualTo(ValidationType.LIST);
-      assertThat(status.getValidationConstraint().getFormula1()).isEqualTo("Lists!$A$4:$A$5");
+      assertThat(status.getValidationConstraint().getFormula1()).isEqualTo("Lists!$A$5:$A$6");
       assertThat(status.getRegions().getCellRangeAddress(0).getFirstRow()).isEqualTo(header + 1);
       DataValidation direct =
           checks.stream()
@@ -153,8 +153,8 @@ class GuidedTemplateWriterTest {
       assertThat(sheet.getPaneInformation().getVerticalSplitPosition()).isEqualTo((short) 1);
       assertThat(sheet.getPrintSetup().getLandscape()).isTrue();
       Sheet lists = wb.getSheet("Lists");
-      assertThat(lists.getRow(3).getCell(0).getStringCellValue()).isEqualTo("A");
-      assertThat(lists.getRow(4).getCell(1).getStringCellValue()).isEqualTo("Closed");
+      assertThat(lists.getRow(4).getCell(0).getStringCellValue()).isEqualTo("A");
+      assertThat(lists.getRow(5).getCell(1).getStringCellValue()).isEqualTo("Closed");
     }
   }
 

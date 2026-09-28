@@ -66,6 +66,9 @@ public class QuotationCreateBulkHandler implements BulkImportHandler {
   static final String CONSTRUCTION = "Construction Class";
   static final String PERSON = "Insured Person";
 
+  private static final String MOTOR = "the product is a motor product";
+  private static final String FIRE = "the product is a fire product";
+
   private final QuotationService quotations;
   private final QuotationRules rules;
   private final QuotationProspects prospects;
@@ -114,34 +117,63 @@ public class QuotationCreateBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Account officers and the quotation desk of the New Business team";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Quotation / Proposal > Quotations, button Bulk Upload (Bulk Quotations screen; choose the product first)";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.optional(CLIENT_CODE, "Client or prospect code", "CL-2026-000001"),
-        BulkColumn.optional(CLIENT_NAME, "Prospect name when no code", "Dela Cruz, Juan"),
-        QuotationBulkSupport.day(BIRTH_DATE, "Birth date of a person prospect", false),
+        BulkColumn.optional(CLIENT_CODE, "Client or prospect code", "CL-2026-000001")
+            .when("no Client Name is given")
+            .master("client or prospect"),
+        BulkColumn.optional(
+                CLIENT_NAME,
+                "Name of the prospect to find or create when there is no client code; persons as"
+                    + " 'Last, First'",
+                "Dela Cruz, Juan")
+            .when("no Client Code is given"),
+        QuotationBulkSupport.day(BIRTH_DATE, "Birth date of a person prospect", false)
+            .when("the Client Name is a person"),
         BulkColumn.optional(EMAIL, "E-mail of a new prospect", "juan@example.ph"),
         BulkColumn.optional(MOBILE, "Mobile of a new prospect", "09171234567"),
-        BulkColumn.optional(MARKET, "Market segment (default: on screen)", "CBG"),
+        BulkColumn.optional(MARKET, "Market segment; blank for the segment chosen on screen", "CBG")
+            .lov("MARKET_SEGMENT"),
         QuotationBulkSupport.day(FROM, "Period from", true),
         QuotationBulkSupport.day(TO, "Period to", true),
-        QuotationBulkSupport.day(VALID, "Valid until (default: configured validity)", false),
-        BulkColumn.optional(INSURER, "Insurer party code", ""),
-        BulkColumn.optional(BRANCH, "Insurer branch code (LGT)", ""),
+        QuotationBulkSupport.day(
+            VALID, "Valid until; blank for the configured validity of quotations", false),
+        BulkColumn.optional(INSURER, "Insurer quoted", "").master("insurer"),
+        BulkColumn.optional(BRANCH, "Branch of the insurer (LGT)", "")
+            .master("branch of the insurer"),
         QuotationBulkSupport.flag(DP, "Premium paid directly to the insurer"),
         QuotationBulkSupport.numeric(SI, "Sum insured", true, "850000"),
-        QuotationBulkSupport.numeric(RATE, "Rate in percent (empty = product default)", false, ""),
-        BulkColumn.optional(DESCRIPTION, "Description of the risk (other lines)", ""),
-        BulkColumn.optional(PLATE, "Motor: plate number", "NAB 1234"),
-        BulkColumn.optional(ENGINE, "Motor: engine number", ""),
-        BulkColumn.optional(CHASSIS, "Motor: chassis number", ""),
-        BulkColumn.optional(MAKE, "Motor: make", "Toyota"),
-        BulkColumn.optional(MODEL, "Motor: model", "Vios"),
-        QuotationBulkSupport.numeric(YEAR, "Motor: year model", false, "2025"),
-        BulkColumn.optional(ADDRESS, "Fire: address of risk", ""),
-        BulkColumn.optional(CITY, "Fire: city", ""),
-        BulkColumn.optional(OCCUPANCY, "Fire: occupancy (list OCCUPANCY)", ""),
-        BulkColumn.optional(CONSTRUCTION, "Fire: construction class", ""),
-        BulkColumn.optional(PERSON, "Personal accident: insured person", ""));
+        QuotationBulkSupport.numeric(
+                RATE, "Premium rate in percent; blank for the product's rate", false, "")
+            .format("Number in percent, e.g. 1.3 for 1.3%"),
+        BulkColumn.optional(DESCRIPTION, "Description of the risk (other lines)", "")
+            .when("the product is neither motor, fire nor personal accident"),
+        BulkColumn.optional(PLATE, "Motor: plate number", "NAB 1234").when(MOTOR),
+        BulkColumn.optional(ENGINE, "Motor: engine number", "").when(MOTOR),
+        BulkColumn.optional(CHASSIS, "Motor: chassis number", "").when(MOTOR),
+        BulkColumn.optional(MAKE, "Motor: make", "Toyota").when(MOTOR),
+        BulkColumn.optional(MODEL, "Motor: model", "Vios").when(MOTOR),
+        QuotationBulkSupport.numeric(YEAR, "Motor: year model", false, "2025")
+            .when(MOTOR)
+            .format("Year, 4 digits"),
+        BulkColumn.optional(ADDRESS, "Fire: address of the risk", "").when(FIRE),
+        BulkColumn.optional(CITY, "Fire: city", "").when(FIRE),
+        BulkColumn.optional(OCCUPANCY, "Fire: occupancy", "").when(FIRE).lov("OCCUPANCY"),
+        BulkColumn.optional(CONSTRUCTION, "Fire: construction class", "")
+            .when(FIRE)
+            .lov("CONSTRUCTION_CLASS"),
+        BulkColumn.optional(PERSON, "Personal accident: name of the insured person", "")
+            .when("the product is a personal accident product"));
   }
 
   @Override

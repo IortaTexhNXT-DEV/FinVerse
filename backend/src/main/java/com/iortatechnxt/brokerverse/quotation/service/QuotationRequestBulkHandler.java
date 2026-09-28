@@ -91,16 +91,25 @@ public class QuotationRequestBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The quotation desk, from the request extracts of the channels (e.g. HLS)";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.optional(CHANNEL, "Source channel (list SOURCE_CHANNEL)", "HLS"),
-        BulkColumn.optional(REFERENCE, "Reference in the source system", "HLS-000123"),
-        BulkColumn.optional(CLIENT, "Client or prospect code", ""),
-        BulkColumn.optional(NAME, "Prospect name when no client code", "Reyes, Ana"),
-        BulkColumn.optional(EMAIL, "Prospect e-mail", "ana.reyes@example.ph"),
-        BulkColumn.optional(MOBILE, "Prospect mobile", "09171234567"),
-        BulkColumn.optional(PRODUCT, "Requested product (risk code)", "PAR01"),
-        BulkColumn.optional(SEGMENT, "Market segment", "CBG"),
+        BulkColumn.optional(CHANNEL, "Channel the request came from", "HLS").lov("SOURCE_CHANNEL"),
+        BulkColumn.optional(
+            REFERENCE, "Reference of the request in the source system", "HLS-000123"),
+        BulkColumn.optional(CLIENT, "Client or prospect code", "")
+            .when("no Prospect Name is given")
+            .master("client or prospect"),
+        BulkColumn.optional(NAME, "Prospect name when there is no client code", "Reyes, Ana")
+            .when("no Client Code is given"),
+        BulkColumn.optional(EMAIL, "E-mail of the prospect", "ana.reyes@example.ph"),
+        BulkColumn.optional(MOBILE, "Mobile number of the prospect", "09171234567"),
+        BulkColumn.optional(PRODUCT, "Requested product", "PAR01").master("product (risk code)"),
+        BulkColumn.optional(SEGMENT, "Market segment", "CBG").lov("MARKET_SEGMENT"),
         BulkColumn.required(COVER, "Requested cover", "Fire cover of a house and lot"));
   }
 

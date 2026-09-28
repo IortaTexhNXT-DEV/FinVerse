@@ -104,23 +104,50 @@ public class AccountCreateBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return AccountBulkSupport.FILLED_BY;
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Accounts & Placement > Accounts, button Bulk Upload (Bulk Account Creation screen;"
+        + " choose the product first)";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     List<BulkColumn> columns = new ArrayList<>();
     columns.add(
-        BulkColumn.optional(Headers.CLIENT_CODE, "Client or prospect code", "CL-2026-000012"));
+        BulkColumn.optional(Headers.CLIENT_CODE, "Client or prospect code", "CL-2026-000012")
+            .when("no Client Name is given")
+            .master("client or prospect"));
     columns.add(
-        BulkColumn.optional(Headers.CLIENT_NAME, "Prospect name when no code", "Dela Cruz, Juan"));
+        BulkColumn.optional(
+                Headers.CLIENT_NAME,
+                "Name of the prospect to find or create when there is no client code; individuals"
+                    + " as 'Last, First'",
+                "Dela Cruz, Juan")
+            .when("no Client Code is given"));
     columns.add(
-        AccountBulkSupport.date(Headers.BIRTH_DATE, "Birth date (individual prospect)", false));
-    columns.add(BulkColumn.optional(Headers.SEGMENT, "Market segment (default: on screen)", "CBG"));
+        AccountBulkSupport.date(Headers.BIRTH_DATE, "Birth date of an individual prospect", false)
+            .when("the Client Name is an individual"));
+    columns.add(
+        BulkColumn.optional(
+                Headers.SEGMENT, "Market segment; blank for the segment chosen on screen", "CBG")
+            .lov("MARKET_SEGMENT"));
     columns.add(AccountBulkSupport.date(Headers.PERIOD_FROM, "Period from", true));
     columns.add(AccountBulkSupport.date(Headers.PERIOD_TO, "Period to", true));
     columns.addAll(AccountBulkSupport.itemColumns());
-    columns.add(BulkColumn.optional(Headers.INSURER, "Insurer party code", ""));
-    columns.add(BulkColumn.optional(Headers.BRANCH, "Insurer branch code (LGT)", ""));
-    columns.add(BulkColumn.optional(Headers.MORTGAGEE, "Mortgagee bank (list MORTGAGEE_BANK)", ""));
+    columns.add(
+        BulkColumn.optional(Headers.INSURER, "Insurer of the account", "").master("insurer"));
+    columns.add(
+        BulkColumn.optional(Headers.BRANCH, "Branch of the insurer (LGT)", "")
+            .master("branch of the insurer"));
+    columns.add(BulkColumn.optional(Headers.MORTGAGEE, "Mortgagee bank", "").lov("MORTGAGEE_BANK"));
     columns.add(BulkColumn.optional(Headers.LOAN, "Loan application number", ""));
-    columns.add(BulkColumn.optional(Headers.PN, "PN numbers separated by ;", ""));
+    columns.add(
+        BulkColumn.optional(Headers.PN, "Promissory note numbers of the loan", "")
+            .format("Text; several numbers separated by ;"));
     columns.add(BulkColumn.optional(Headers.QUOTATION, "Quotation reference", ""));
     columns.add(AccountBulkSupport.date(Headers.FFY_START, "Free First Year start", false));
     columns.add(
@@ -132,10 +159,12 @@ public class AccountCreateBulkHandler implements BulkImportHandler {
             "N"));
     columns.add(
         BulkColumn.optional(
-            Headers.BUSINESS_TYPE, "NEW_BUSINESS (default) or RENEWAL", "NEW_BUSINESS"));
+                Headers.BUSINESS_TYPE, "New business (default) or renewal", "NEW_BUSINESS")
+            .codes("NEW_BUSINESS", "RENEWAL"));
     columns.add(
         BulkColumn.optional(
-            Headers.RENEWAL_OF, "Renewal: expiring ARN or policy reference", "ARN-2025-000123"));
+                Headers.RENEWAL_OF, "Expiring ARN or policy reference", "ARN-2025-000123")
+            .when("Business Type is RENEWAL"));
     return columns;
   }
 

@@ -1,6 +1,6 @@
 package com.iortatechnxt.brokerverse.bulk.service;
 
-import java.io.ByteArrayInputStream;
+import com.iortatechnxt.brokerverse.common.office.OfficeFileLimits;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -13,7 +13,6 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /** Reads the first sheet of an Excel workbook into text cells (dates as yyyy-MM-dd). */
 final class XlsxTableReader {
@@ -28,7 +27,7 @@ final class XlsxTableReader {
    * @throws IOException when the file is not a readable workbook
    */
   static List<List<String>> read(byte[] content) throws IOException {
-    try (Workbook wb = new XSSFWorkbook(new ByteArrayInputStream(content))) {
+    try (Workbook wb = OfficeFileLimits.workbook(content)) {
       Sheet sheet = wb.getSheetAt(0);
       DataFormatter formatter = new DataFormatter(Locale.ROOT);
       List<List<String>> table = new ArrayList<>();

@@ -23,9 +23,10 @@
     <Bug pattern="SPRING_ENDPOINT"/>
   </Match>
   <!--
-    CRLF_INJECTION_LOGS: neutralised centrally. The log layout (application.yml
-    logging.pattern.console) replaces CR/LF in every message with '_', so user data can never
-    forge log lines, whichever logger call writes it.
+    CRLF_INJECTION_LOGS: neutralised centrally. The message converter of logback-spring.xml
+    (CrlfSafeMessageConverter, bound to %m / %msg / %message) replaces CR/LF in every message with
+    '_' in every pattern layout, so user data can never forge log lines, whichever logger call
+    writes it and whatever pattern a deployment configures.
   -->
   <Match>
     <Bug pattern="CRLF_INJECTION_LOGS"/>

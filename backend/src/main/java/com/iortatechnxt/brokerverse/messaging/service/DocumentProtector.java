@@ -1,11 +1,11 @@
 package com.iortatechnxt.brokerverse.messaging.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.office.OfficeFileLimits;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfWriter;
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -102,7 +102,7 @@ public class DocumentProtector {
     try (POIFSFileSystem fs = new POIFSFileSystem()) {
       Encryptor encryptor = new EncryptionInfo(EncryptionMode.agile).getEncryptor();
       encryptor.confirmPassword(password);
-      try (OPCPackage opc = OPCPackage.open(new ByteArrayInputStream(file.content()));
+      try (OPCPackage opc = OfficeFileLimits.officePackage(file.content());
           OutputStream os = encryptor.getDataStream(fs)) {
         opc.save(os);
       }

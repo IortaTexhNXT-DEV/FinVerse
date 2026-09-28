@@ -2,8 +2,8 @@ package com.iortatechnxt.brokerverse.bulk.service;
 
 import com.iortatechnxt.brokerverse.bulk.service.ParsedFile.RawRow;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.TextContent;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +60,7 @@ public class BulkFileReader {
       return XlsxTableReader.read(content);
     }
     if (name.endsWith(".csv")) {
-      return CsvParser.parse(new String(content, StandardCharsets.UTF_8));
+      return CsvParser.parse(TextContent.utf8(content));
     }
     if (name.endsWith(".ods")) {
       return OdsTableReader.read(content);

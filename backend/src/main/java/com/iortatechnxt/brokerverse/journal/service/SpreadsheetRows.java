@@ -1,10 +1,10 @@
 package com.iortatechnxt.brokerverse.journal.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
-import java.io.ByteArrayInputStream;
+import com.iortatechnxt.brokerverse.common.office.OfficeFileLimits;
+import com.iortatechnxt.brokerverse.common.util.TextContent;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -14,7 +14,6 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * Reads tabular upload files (CSV per RFC 4180, or the first sheet of an XLSX workbook) into rows
@@ -40,7 +39,7 @@ public final class SpreadsheetRows {
     String name = fileName == null ? "" : fileName.toLowerCase(Locale.ROOT);
     List<List<String>> rows;
     if (name.endsWith(".csv")) {
-      rows = parseCsv(new String(content, StandardCharsets.UTF_8));
+      rows = parseCsv(TextContent.utf8(content));
     } else if (name.endsWith(".xlsx")) {
       rows = parseXlsx(content);
     } else {
@@ -128,7 +127,7 @@ public final class SpreadsheetRows {
    * @return rows of cells (blank rows skipped)
    */
   public static List<List<String>> parseXlsx(byte[] content) {
-    try (Workbook workbook = new XSSFWorkbook(new ByteArrayInputStream(content))) {
+    try (Workbook workbook = OfficeFileLimits.workbook(content)) {
       Sheet sheet = workbook.getSheetAt(0);
       List<List<String>> rows = new ArrayList<>();
       for (Row row : sheet) {

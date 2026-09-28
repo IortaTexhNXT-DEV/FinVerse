@@ -88,8 +88,16 @@ def _statements(table: str, folder: Path = MIGRATIONS):
             yield m.group(1).lower().split()[0], sql[m.end():end if end >= 0 else len(sql)]
 
 
+def _has(row: dict, key: str | tuple[str, ...]) -> bool:
+    return all(k in row for k in ((key,) if isinstance(key, str) else key))
+
+
+def _key(row: dict, key: str | tuple[str, ...]) -> str:
+    return "|".join(str(row[k]) for k in ((key,) if isinstance(key, str) else key))
+
+
 @lru_cache(maxsize=None)
-def rows(table: str, key: str = "code") -> tuple[dict[str, str | None], ...]:
+def rows(table: str, key: str | tuple[str, ...] = "code") -> tuple[dict[str, str | None], ...]:
     """Rows of a reference table, keyed by `key` (a later insert of the same key replaces the row)."""
     found: dict[str, dict[str, str | None]] = {}
     for kind, body in _statements(table):
@@ -119,8 +127,8 @@ def rows(table: str, key: str = "code") -> tuple[dict[str, str | None], ...]:
                             for col, e in zip(cols, exprs):
                                 ref = re.fullmatch(rf"{alias.group(1)}\.(\w+)", e.strip())
                                 row[col] = src.get(ref.group(1).lower()) if ref else _literal(e)
-                            if key in row:
-                                found[str(row[key])] = row
+                            if _has(row, key):
+                                found[_key(row, key)] = row
                             s = re.match(r"\s*,\s*", vals[j + 1:])
                             if not s:
                                 break
@@ -132,16 +140,16 @@ def rows(table: str, key: str = "code") -> tuple[dict[str, str | None], ...]:
                         cells[-1] = re.split(r"\s(?:where|from)\b", cells[-1], maxsplit=1, flags=re.I)[0]
                     if len(cells) == len(cols) and not any(re.search(r"\bfrom\b", c, re.I) for c in cells[:-1]):
                         row = dict(zip(cols, (_literal(c) for c in cells)))
-                        if key in row:
-                            found[str(row[key])] = row
+                        if _has(row, key):
+                            found[_key(row, key)] = row
                 continue
             i = v.end()
             while i < len(rest) and rest[i] == "(":
                 j = matching(rest, i)
                 cells = [_literal(c) for c in split_top(rest[i + 1:j])]
                 row = dict(zip(cols, cells))
-                if key in row:
-                    found[str(row[key])] = row
+                if _has(row, key):
+                    found[_key(row, key)] = row
                 i = j + 1
                 s = re.match(r"\s*,\s*", rest[i:])
                 if not s:
@@ -158,6 +166,8 @@ def rows(table: str, key: str = "code") -> tuple[dict[str, str | None], ...]:
                 if val.startswith("'") or val.lower() in ("true", "false", "null") or re.fullmatch(r"-?\d+(\.\d+)?", val):
                     assigns[col.strip().lower()] = _literal(val)
             where = m.group(2)
+            if not isinstance(key, str):
+                continue  # updates are applied only to tables with a single-column key
             keys = re.findall(rf"\b{key}\s*=\s*'([^']*)'", where)
             ins = re.search(rf"\b{key}\s+in\s*\(([^)]*)\)", where)
             if ins:

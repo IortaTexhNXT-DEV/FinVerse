@@ -175,6 +175,17 @@ public record BulkColumn(
   }
 
   /**
+   * This column with another example value.
+   *
+   * @param value example
+   * @return column
+   */
+  public BulkColumn example(String value) {
+    return new BulkColumn(
+        header, description, required, type, value, condition, choices, lov, allowed, format);
+  }
+
+  /**
    * This column with its allowed values in words.
    *
    * @param text allowed values

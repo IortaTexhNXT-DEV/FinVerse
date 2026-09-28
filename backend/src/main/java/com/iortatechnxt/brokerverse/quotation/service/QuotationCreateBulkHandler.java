@@ -139,6 +139,7 @@ public class QuotationCreateBulkHandler implements BulkImportHandler {
                 "Dela Cruz, Juan")
             .when("no Client Code is given"),
         QuotationBulkSupport.day(BIRTH_DATE, "Birth date of a person prospect", false)
+            .example("1985-06-15")
             .when("the Client Name is a person"),
         BulkColumn.optional(EMAIL, "E-mail of a new prospect", "juan@example.ph"),
         BulkColumn.optional(MOBILE, "Mobile of a new prospect", "09171234567"),

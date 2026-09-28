@@ -130,6 +130,7 @@ public class AccountCreateBulkHandler implements BulkImportHandler {
             .when("no Client Code is given"));
     columns.add(
         AccountBulkSupport.date(Headers.BIRTH_DATE, "Birth date of an individual prospect", false)
+            .example("1985-06-15")
             .when("the Client Name is an individual"));
     columns.add(
         BulkColumn.optional(

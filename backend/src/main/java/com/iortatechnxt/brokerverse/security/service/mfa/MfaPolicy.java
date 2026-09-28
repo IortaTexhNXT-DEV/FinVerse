@@ -100,12 +100,8 @@ public class MfaPolicy {
    * @return true when required
    */
   public boolean required(AppUser user, AuthMode mode, boolean singleSignOn) {
-    if (!cipher.configured()) {
-      if (local) {
-        LOG.warn("Second factor not asked: BROKERVERSE_MFA_ENCRYPTION_KEY is not set (local)");
-        return false;
-      }
-      throw new IllegalStateException("BROKERVERSE_MFA_ENCRYPTION_KEY is not set");
+    if (!keyConfigured()) {
+      return false;
     }
     if (singleSignOn) {
       return sso.requireLocalMfa();
@@ -118,6 +114,21 @@ public class MfaPolicy {
       case OFF -> false;
       case PRIVILEGED -> privileged(user);
     };
+  }
+
+  /**
+   * Whether the key of the secrets is set; without it only a developer's machine goes on (the
+   * second factor is then not asked), any other environment refuses.
+   */
+  private boolean keyConfigured() {
+    if (cipher.configured()) {
+      return true;
+    }
+    if (local) {
+      LOG.warn("Second factor not asked: BROKERVERSE_MFA_ENCRYPTION_KEY is not set (local)");
+      return false;
+    }
+    throw new IllegalStateException("BROKERVERSE_MFA_ENCRYPTION_KEY is not set");
   }
 
   /**

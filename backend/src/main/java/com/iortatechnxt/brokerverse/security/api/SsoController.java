@@ -12,6 +12,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.net.URI;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -34,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/v1/auth/sso")
 public class SsoController {
 
+  private static final Logger LOG = LoggerFactory.getLogger(SsoController.class);
   private static final String ANYONE = "permitAll()";
   private static final int MAX_SAML_RESPONSE = 256 * 1024;
 
@@ -65,6 +68,7 @@ public class SsoController {
     try {
       return new Start(sso.start());
     } catch (SsoException ex) {
+      LOG.warn("Single sign-on not started: {}", ex.getMessage(), ex);
       throw new BusinessRuleException(ex.getCode(), "Single sign-on is not available");
     }
   }

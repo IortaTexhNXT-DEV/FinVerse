@@ -139,9 +139,7 @@ public class SignInSessions {
         sessions
             .findFirstByPreviousRefreshHash(hash)
             .orElseThrow(() -> new BadCredentialsException(SESSION_OVER));
-    if (replaced.getEndedAt() == null
-        && replaced.getRefreshedAt() != null
-        && now.isBefore(replaced.getRefreshedAt().plus(properties.refreshGrace()))) {
+    if (withinGrace(replaced, now)) {
       return issue(usable(replaced, now), null, now);
     }
     if (replaced.end(now, SessionEndReason.TOKEN_REUSED)) {
@@ -153,6 +151,13 @@ public class SignInSessions {
           "Session ended: a replaced refresh token was presented again");
     }
     throw new BadCredentialsException(SESSION_OVER);
+  }
+
+  /** Whether a replaced refresh token is still accepted (another tab renewing at the same time). */
+  private boolean withinGrace(UserSession session, Instant now) {
+    return session.getEndedAt() == null
+        && session.getRefreshedAt() != null
+        && now.isBefore(session.getRefreshedAt().plus(properties.refreshGrace()));
   }
 
   /**

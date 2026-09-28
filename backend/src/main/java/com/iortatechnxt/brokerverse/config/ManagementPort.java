@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.config;
 
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.boot.web.context.WebServerInitializedEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -17,12 +18,12 @@ public class ManagementPort implements ApplicationListener<WebServerInitializedE
 
   private static final String NAMESPACE = "management";
 
-  private volatile int port = -1;
+  private final AtomicInteger port = new AtomicInteger(-1);
 
   @Override
   public void onApplicationEvent(WebServerInitializedEvent event) {
     if (NAMESPACE.equals(event.getApplicationContext().getServerNamespace())) {
-      port = event.getWebServer().getPort();
+      port.set(event.getWebServer().getPort());
     }
   }
 
@@ -33,7 +34,7 @@ public class ManagementPort implements ApplicationListener<WebServerInitializedE
    * @return true on the separate management port
    */
   public boolean receives(HttpServletRequest request) {
-    int listening = port;
+    int listening = port.get();
     return listening > 0 && request.getLocalPort() == listening;
   }
 }

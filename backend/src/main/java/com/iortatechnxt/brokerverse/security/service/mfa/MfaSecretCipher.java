@@ -12,6 +12,8 @@ import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +29,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class MfaSecretCipher {
 
+  private static final Logger LOG = LoggerFactory.getLogger(MfaSecretCipher.class);
   private static final String PREFIX = "v1:";
   private static final String TRANSFORMATION = "AES/GCM/NoPadding";
   private static final int IV_BYTES = 12;
@@ -113,7 +116,7 @@ public class MfaSecretCipher {
         cipher.updateAAD(aad(username));
         return cipher.doFinal(data, IV_BYTES, data.length - IV_BYTES);
       } catch (GeneralSecurityException ex) {
-        // next key
+        LOG.debug("Authenticator secret not readable with this key; trying the next one");
       }
     }
     throw new IllegalStateException("The authenticator secret could not be decrypted");

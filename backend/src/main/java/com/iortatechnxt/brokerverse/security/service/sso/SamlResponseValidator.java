@@ -46,6 +46,7 @@ import org.xml.sax.SAXException;
  *       attribute.
  * </ol>
  */
+@SuppressWarnings("PMD.GodClass") // one validator: every check of the SAML Response in one place
 public class SamlResponseValidator {
 
   /** SAML 2.0 protocol namespace. */
@@ -130,7 +131,9 @@ public class SamlResponseValidator {
     NodeList assertions = document.getElementsByTagNameNS(ASSERTION, "Assertion");
     require(assertions.getLength() == 1, "exactly one Assertion is expected");
     Element assertion = (Element) assertions.item(0);
-    require(assertion.getParentNode() == response, "the Assertion is not a child of the Response");
+    require(
+        response.isSameNode(assertion.getParentNode()),
+        "the Assertion is not a child of the Response");
     require(response.hasAttribute(ID) && assertion.hasAttribute(ID), "an ID is missing");
     response.setIdAttribute(ID, true);
     assertion.setIdAttribute(ID, true);

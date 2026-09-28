@@ -41,6 +41,8 @@ import org.springframework.web.client.RestClientException;
  * not-before with the clock skew, and the nonce of the request.
  */
 @Component
+@SuppressWarnings(
+    "PMD.GodClass") // the relying party: discovery, request, token exchange, ID token checks
 public class OidcClient {
 
   /** Path of the redirect URI under the base address. */

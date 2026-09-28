@@ -51,6 +51,7 @@ import org.springframework.core.env.Profiles;
  * <p>Every problem is listed in one message, so an operator fixes the deployment in one pass. The
  * API documentation (springdoc) is switched off outside local and the {@code dev} profile.
  */
+@SuppressWarnings("PMD.GodClass") // every start-up check in one place, listed in one message
 public final class ProductionSafeguards implements EnvironmentPostProcessor, Ordered {
 
   /** Profile that loads the seed data (db/seed migrations and the seed start-up runners). */

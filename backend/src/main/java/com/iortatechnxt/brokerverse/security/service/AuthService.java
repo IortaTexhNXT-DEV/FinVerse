@@ -119,15 +119,7 @@ public class AuthService {
       noRollbackFor = AuthenticationException.class)
   public SignInResult login(String username, String password, String deviceToken) {
     AuthMode mode = completion.mode();
-    AppUser user = findUser(mode, username).orElse(null);
-    if (user == null) {
-      throw completion.refuse(username, "Unknown user" + suffix(mode));
-    }
-    if (mode.singleSignOn() && !sso.isBreakGlass(user.getUsername())) {
-      throw completion.refuse(
-          username, "Password sign-in refused: the users sign in at the identity provider");
-    }
-    completion.refuseLockedOrDeactivated(user, username);
+    AppUser user = passwordUser(mode, username);
     AuthMode checkedBy = mode == AuthMode.DIRECTORY ? AuthMode.DIRECTORY : AuthMode.LOCAL;
     DirectoryResult result =
         authenticators.authenticate(
@@ -186,6 +178,19 @@ public class AuthService {
           case EXPIRED -> "Logged out at the end of the session";
           default -> "Logged out";
         });
+  }
+
+  /** The user a password sign-in is for, when it may use a password now. */
+  private AppUser passwordUser(AuthMode mode, String username) {
+    AppUser user =
+        findUser(mode, username)
+            .orElseThrow(() -> completion.refuse(username, "Unknown user" + suffix(mode)));
+    if (mode.singleSignOn() && !sso.isBreakGlass(user.getUsername())) {
+      throw completion.refuse(
+          username, "Password sign-in refused: the users sign in at the identity provider");
+    }
+    completion.refuseLockedOrDeactivated(user, username);
+    return user;
   }
 
   private Optional<AppUser> findUser(AuthMode mode, String userId) {

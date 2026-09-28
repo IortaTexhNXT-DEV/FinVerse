@@ -16,6 +16,7 @@ import java.time.Clock;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -40,7 +41,7 @@ public class SamlServiceProvider {
 
   private final SsoProperties properties;
   private final Clock clock;
-  private volatile SamlResponseValidator validator;
+  private final AtomicReference<SamlResponseValidator> validator = new AtomicReference<>();
 
   /**
    * Creates the service provider.
@@ -157,7 +158,7 @@ public class SamlServiceProvider {
   }
 
   private SamlResponseValidator validator() {
-    SamlResponseValidator current = validator;
+    SamlResponseValidator current = validator.get();
     if (current == null) {
       current =
           new SamlResponseValidator(
@@ -167,7 +168,7 @@ public class SamlServiceProvider {
               acsUrl(),
               properties.clockSkew(),
               clock);
-      validator = current;
+      validator.compareAndSet(null, current);
     }
     return current;
   }

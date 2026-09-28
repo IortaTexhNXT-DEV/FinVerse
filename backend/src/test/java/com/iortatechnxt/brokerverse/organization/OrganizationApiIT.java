@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
@@ -23,6 +24,7 @@ class OrganizationApiIT {
   @Autowired private Api api;
   @Autowired private TestData data;
   @Autowired private OrganizationService organization;
+  @Autowired private OrganizationDirectory directory;
 
   private static String code(String prefix) {
     return prefix + ThreadLocalRandom.current().nextInt(1000, 9999);
@@ -106,6 +108,46 @@ class OrganizationApiIT {
         .andExpect(jsonPath("$.recordStatus").value("INACTIVE"));
     api.doGet("auditor", ORG + "/branches?companyId=" + companyId)
         .andExpect(jsonPath("$[0].code").value(br));
+  }
+
+  @Test
+  void theClientProfileIsKeptOnTheCompanyMaster() throws Exception {
+    String co = code("P");
+    var request = company(co);
+    long companyId =
+        api.read(
+                api.doPost("fmanager", ORG + "/companies", request)
+                    .andExpect(jsonPath("$.shortName").value(co))
+                    .andExpect(status().isCreated()))
+            .get("id")
+            .asLong();
+    request.put(
+        "profile",
+        Json.of(
+            "shortName",
+            "Subsidiary",
+            "groupName",
+            "Group",
+            "logoRef",
+            "theme:logo",
+            "headOfficeCode",
+            "MAIN",
+            "defaultBankCode",
+            "BANK-CA"));
+    api.doPut("fmanager", ORG + "/companies/" + companyId, request)
+        .andExpect(jsonPath("$.shortName").value("Subsidiary"))
+        .andExpect(jsonPath("$.groupName").value("Group"))
+        .andExpect(jsonPath("$.headOfficeCode").value("MAIN"))
+        .andExpect(jsonPath("$.defaultBankCode").value("BANK-CA"));
+    var profile = directory.profile(companyId);
+    assertThat(profile.legalName()).isEqualTo("Subsidiary " + co);
+    assertThat(profile.shortName()).isEqualTo("Subsidiary");
+    assertThat(profile.headOfficeCode()).isEqualTo("MAIN");
+    assertThat(organization.headOfficeCode(companyId)).isEqualTo("MAIN");
+
+    var seed = directory.profile(data.company().getId());
+    assertThat(seed.headOfficeCode()).isEqualTo("HO");
+    assertThat(seed.defaultBankCode()).isNotBlank();
   }
 
   @Test

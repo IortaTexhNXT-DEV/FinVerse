@@ -135,7 +135,7 @@ public class HandOffService {
                 clock.instant()));
     offer(p, r);
     if (manual && currentUser.optionalUsername().isPresent()) {
-      flow.act(p, "renew", TransitionNote.comment("Renew with BDOI"));
+      flow.act(p, "renew", TransitionNote.comment("Renewal started by hand"));
     } else {
       flow.system(p, "renew", "Handed to Renewal");
     }

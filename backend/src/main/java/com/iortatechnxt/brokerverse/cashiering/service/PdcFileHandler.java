@@ -64,7 +64,7 @@ public class PdcFileHandler implements BulkImportHandler {
         BulkColumn.required("Payor", "Payor", "Maria Clara Santos"),
         BulkColumn.required("Reference", "Invoice, ARN, policy or PN number", "ARN-2026-940001"),
         BulkColumn.required(CHECK_NO, CHECK_NO, "0012345"),
-        BulkColumn.required(BANK, "Drawee bank", "BDO"),
+        BulkColumn.required(BANK, "Drawee bank", "PNB"),
         BulkColumn.optional("Check branch", "Bank branch", "Makati"),
         new BulkColumn(MATURITY, "Maturity (check) date", true, Type.DATE, "2026-10-15"),
         new BulkColumn(AMOUNT, "Check amount", true, Type.NUMBER, "5000.00"),

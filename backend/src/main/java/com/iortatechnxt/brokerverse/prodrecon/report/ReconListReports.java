@@ -32,7 +32,7 @@ public class ReconListReports {
         ReconReportSupport.metadata(
             "PRC-UNBOOKED",
             "Unbooked Accounts and Status",
-            "Insurer production without a BDOI booking and its resolution"),
+            "Insurer production without a booking of ours and its resolution"),
         "select c.insurer_code as insurer, "
             + MONTH
             + ", i.ins_reference_no as reference, i.ins_policy_no as policy,"

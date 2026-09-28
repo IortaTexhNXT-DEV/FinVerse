@@ -58,7 +58,7 @@ public class BillingService {
           "Originating Unit",
           "Premium",
           "Reference",
-          "BDOI Location",
+          "Location",
           "Amortised");
 
   private final BillingBatchRepository batches;

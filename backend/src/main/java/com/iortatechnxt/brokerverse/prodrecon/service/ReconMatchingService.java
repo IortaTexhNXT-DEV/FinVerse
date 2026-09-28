@@ -232,7 +232,7 @@ public class ReconMatchingService {
         || insurer.getInvoiceNo() != null) {
       throw new BusinessRuleException(
           "RECON_PAIR_INVALID",
-          "Pair a BDOI-only item with an insurer-only item of the same cycle");
+          "Pair a booked-only item with an insurer-only item of the same cycle");
     }
     booked.attachInsurer(
         new InsurerRow(

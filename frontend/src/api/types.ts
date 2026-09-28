@@ -53,11 +53,30 @@ export interface Company {
   backValueDays: number;
   forwardValueDays: number;
   retainedEarningsAccount?: string;
+  /** Client profile: short name in texts and labels. */
+  shortName?: string;
+  /** Client profile: group the company belongs to, used in labels of group concepts. */
+  groupName?: string;
+  /** Client profile: logo printed on documents (theme pack logo or file store reference). */
+  logoRef?: string;
+  /** Client profile: code of the head office in files and for records without a branch. */
+  headOfficeCode?: string;
+  /** Client profile: bank account code proposed by default. */
+  defaultBankCode?: string;
   recordStatus: RecordStatus;
   createdBy: string;
   /** Creator or last maintainer; unchanged by authorization. */
   maker?: string;
   authorizedBy?: string;
+}
+
+/** The client profile part of a company update. */
+export interface ClientProfile {
+  shortName?: string;
+  groupName?: string;
+  logoRef?: string;
+  headOfficeCode?: string;
+  defaultBankCode?: string;
 }
 
 export interface Branch {

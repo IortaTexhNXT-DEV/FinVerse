@@ -99,7 +99,7 @@ public class LegacyPoliciesBulkHandler implements BulkImportHandler {
         BulkColumn.optional(OFFICER, "Account officer user", "ao"),
         BulkColumn.optional(UNIT, "Sales team code", "T-CBG1"),
         BulkColumn.optional(SEGMENT, "Market segment", "CBG"),
-        BulkColumn.optional(MORTGAGEE, "Mortgagee bank when mortgaged", "BDO Unibank"),
+        BulkColumn.optional(MORTGAGEE, "Mortgagee bank when mortgaged", "Philippine National Bank"),
         new BulkColumn(URGENT, "Y to flag the renewal urgent", false, BulkColumn.Type.YES_NO, "N"));
   }
 

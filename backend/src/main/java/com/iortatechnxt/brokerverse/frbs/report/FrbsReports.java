@@ -23,7 +23,7 @@ public class FrbsReports {
   private static final String SEGMENT = "segment";
   private static final String SEGMENT_LABEL = "Segment";
   private static final String UNIT = "sales_unit";
-  private static final String UNIT_LABEL = "Unit / BDO Branch";
+  private static final String UNIT_LABEL = "Unit / Bank Branch";
   private static final String UNIT_NAME = "unit_name";
   private static final String CURRENCY = "currency";
   private static final String CURRENCY_LABEL = "Currency";
@@ -201,7 +201,7 @@ public class FrbsReports {
         new Spec(
             "FRBS-BRANCH-PRODUCTION",
             "Branch Production Report - Detailed",
-            "Booked invoices of the period per BDO branch / unit",
+            "Booked invoices of the period per bank branch / unit",
             Dates.PERIOD,
             "select coalesce(i.sales_unit, '(none)') || ' ' || coalesce(u.name, '') unit,"
                 + " i.booking_date, i.invoice_no, i.policy_no, i.assured_name, i.product_line,"
@@ -243,7 +243,7 @@ public class FrbsReports {
         new Spec(
             "FRBS-BRANCH-PRODUCTION-SUM",
             "Branch Production Report - Summary",
-            "Invoices, premium and commission of the period per BDO branch / unit",
+            "Invoices, premium and commission of the period per bank branch / unit",
             Dates.PERIOD,
             "select coalesce(i.sales_unit, '(none)') sales_unit, coalesce(u.name, '') unit_name,"
                 + " i.currency, count(*) policies, sum(i.gross_premium) premium,"

@@ -4,6 +4,7 @@ import {
   employeeProblems,
   layoutProblems,
   newEmployee,
+  profileRequest,
   ruleCriteria,
   ruleProblems,
 } from './setupForms';
@@ -75,5 +76,28 @@ describe('setup forms of BRD-5', () => {
     expect(
       Object.keys(layoutProblems({ ...layout, bankAccountCode: '', name: '', dateColumn: '' })),
     ).toEqual(expect.arrayContaining(['bankAccountCode', 'name', 'dateColumn']));
+  });
+});
+
+describe('client profile of a company', () => {
+  it('sends the company as it is with the trimmed profile', () => {
+    const company = {
+      id: 1,
+      code: 'CO1',
+      name: 'Company One, Inc.',
+      baseCurrency: 'PHP',
+      fiscalYearStartMonth: 1,
+      backValueDays: 30,
+      forwardValueDays: 5,
+      recordStatus: 'ACTIVE' as const,
+      createdBy: 'maker',
+    };
+    const request = profileRequest(company, {
+      shortName: ' One ',
+      groupName: '',
+      logoRef: undefined,
+    });
+    expect(request).toMatchObject({ code: 'CO1', name: 'Company One, Inc.', baseCurrency: 'PHP' });
+    expect(request.profile).toEqual({ shortName: 'One', groupName: '', logoRef: '' });
   });
 });

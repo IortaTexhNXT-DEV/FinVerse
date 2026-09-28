@@ -75,7 +75,7 @@ public class ClpcBillingReport implements ReportDefinition {
             ReportColumn.text("loan", "Loan Application No."),
             ReportColumn.text("borrower", "Borrower"),
             ReportColumn.text("unit", "Originating Unit"),
-            ReportColumn.text("location", "BDOI Location"),
+            ReportColumn.text("location", "Location"),
             ReportColumn.date("booking_date", "Booking Date"),
             ReportColumn.amount("premium", "Premium"),
             ReportColumn.text("amortised", "Amortised"),

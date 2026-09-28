@@ -163,7 +163,7 @@ public class SubmittedPolicyRenewalHandOff implements RenewalHandOff {
         AuditAction.CREATE,
         "Handed over from submitted policy "
             + request.sbmNo()
-            + (terms.manual() ? " (Renew with BDOI)" : ""));
+            + (terms.manual() ? " (renewal started by hand)" : ""));
     return c;
   }
 

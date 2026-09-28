@@ -63,7 +63,7 @@ public class RenewalReportSupport {
           new String[] {"segment", "Customer Segment", "renewal.segment"},
           new String[] {"origin", "Business Origin", "renewal.origin"},
           new String[] {"officer", "Bank Officer", "renewal.officer"},
-          new String[] {"branch", "BDO Branch", "renewal.branch"},
+          new String[] {"branch", "Bank Branch", "renewal.branch"},
           new String[] {"stage", "Renewal Status", "renewal.stage"});
 
   private final RenewalScope scope;

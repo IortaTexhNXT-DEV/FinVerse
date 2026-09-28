@@ -1,10 +1,10 @@
 import { api, toQuery } from './client';
-import type { Branch, Company } from './types';
+import type { Branch, ClientProfile, Company } from './types';
 
 export const organizationApi = {
   companies: () => api.get<Company[]>('/organization/companies'),
   createCompany: (body: Partial<Company>) => api.post<Company>('/organization/companies', body),
-  updateCompany: (id: number, body: Partial<Company>) =>
+  updateCompany: (id: number, body: Partial<Company> & { profile?: ClientProfile }) =>
     api.put<Company>(`/organization/companies/${id}`, body),
   authorizeCompany: (id: number) => api.post<Company>(`/organization/companies/${id}/authorize`),
   branches: (companyId: number) =>

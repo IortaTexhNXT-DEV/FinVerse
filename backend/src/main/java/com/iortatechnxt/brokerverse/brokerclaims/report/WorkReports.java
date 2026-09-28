@@ -128,7 +128,7 @@ public final class WorkReports {
       return ReportMetadata.claimsHandling(
           INSURER_CLAIMS,
           "Insurer Claim Numbers",
-          "Every insurer claim number under its BDOI claim with share, reserve and settled amount",
+          "Every insurer claim number under its broker claim with share, reserve and settled amount",
           BclReportSql.rangeFilters("reportedFrom", "reportedTo", "Date reported", false));
     }
 
@@ -147,7 +147,7 @@ public final class WorkReports {
               ReportColumn.text("assured_name", "Assured's Name"),
               ReportColumn.text("policy_no", "Policy No."),
               ReportColumn.text("status", "Claim Status"))
-          .groupBy("claim_no", "BDOI Claim")
+          .groupBy("claim_no", "Broker Claim")
           .rows(sql.rows(INSURER_CLAIMS_SQL, BclReportSql.args(p)))
           .presorted()
           .build();

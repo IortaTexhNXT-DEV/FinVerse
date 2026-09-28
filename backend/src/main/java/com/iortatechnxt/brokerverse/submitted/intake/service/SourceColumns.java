@@ -104,9 +104,9 @@ public final class SourceColumns {
         BulkColumn.optional(
             "Property Location", "Location of the property (fire)", "Lot 5, Taguig City"));
     c.add(BulkColumn.optional("Occupancy", "Occupancy (fire)", "Residential"));
-    c.add(BulkColumn.optional("Mortgagee", "Mortgagee", "BDO Unibank, Inc."));
+    c.add(BulkColumn.optional("Mortgagee", "Mortgagee", "Philippine National Bank"));
     c.add(yesNo("FFY", "Y when the auto loan has the Free First Year promotion"));
-    c.add(yesNo("Employee Account", "Y for a BDO or SM Group employee account"));
+    c.add(yesNo("Employee Account", "Y for an employee account of the group"));
     c.add(yesNo("No Touch", "Y for a No Touch account"));
     c.add(BulkColumn.optional(HANDLER, "Login of the handler of the policy", "sbmhandler"));
     return List.copyOf(c);

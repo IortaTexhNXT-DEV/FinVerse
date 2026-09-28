@@ -56,7 +56,7 @@ public class AccountScheduleReport implements ReportDefinition {
     return ReportMetadata.frbs(
             CODE,
             "Account Schedule",
-            "Schedule of the BDOI report pack run from its definition (GARD, subsidiaries, schedules and"
+            "Schedule of the company report pack run from its definition (GARD, subsidiaries, schedules and"
                 + " ageing)",
             List.of(
                 ParameterSpec.required(COMPANY, "Company", ParameterType.COMPANY),

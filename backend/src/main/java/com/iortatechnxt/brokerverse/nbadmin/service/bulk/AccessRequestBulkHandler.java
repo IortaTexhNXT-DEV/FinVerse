@@ -87,7 +87,7 @@ public class AccessRequestBulkHandler implements BulkImportHandler {
         BulkColumn.required(ACTION, "ENROL, MODIFY, DEACTIVATE or REACTIVATE", "ENROL"),
         BulkColumn.required(USER_ID, "User ID (USER_ID_PATTERN for a new user)", "a013000201"),
         BulkColumn.optional(FULL_NAME, "Full name (required to enrol)", "Juan Dela Cruz"),
-        BulkColumn.optional(EMAIL, "E-mail", "juan.delacruz@bdo.com.ph"),
+        BulkColumn.optional(EMAIL, "E-mail", "juan.delacruz@company.com.ph"),
         BulkColumn.optional(WINDOWS_ID, "Windows ID (unique)", "JDELACRUZ"),
         BulkColumn.optional(BRANCH, "Home branch code", "HO"),
         BulkColumn.optional(BUSINESS_UNIT, "Business unit group (list UAM_BUSINESS_UNIT)", ""),

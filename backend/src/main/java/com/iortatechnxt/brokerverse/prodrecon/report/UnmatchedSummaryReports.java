@@ -35,7 +35,7 @@ public class UnmatchedSummaryReports {
         ReconReportSupport.metadata(
             "PRC-UNMATCHED-LOC",
             "Unmatched Accounts per Location",
-            "Unmatched accounts per insurer, disposition and BDOI location"),
+            "Unmatched accounts per insurer, disposition and location"),
         "select c.insurer_code as insurer, "
             + DISPOSITION
             + ", coalesce(b.name, 'Not booked') as location"

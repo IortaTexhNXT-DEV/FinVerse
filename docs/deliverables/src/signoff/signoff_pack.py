@@ -144,6 +144,10 @@ class Pack:
         self.walkthroughs = self._load("walkthroughs.yaml").get("walkthroughs", [])
         self.msg_cfg = self._load("messages.yaml")
         self.guide = self._load("guide.yaml")
+        # UX screen deck of the set (07 deck, 08 register, 09 image package; build_ux_deck.py): the persona texts,
+        # the images taken for the deck only (more screen states, the landing page and menu of each persona, the
+        # shared components), the flows of a pack without walkthroughs and the changes of the issue.
+        self.ux = self._load("ux.yaml")
         self.ownership = self._load("ownership.yaml")
         # Packs of other BRDs whose screens a walkthrough step may show (for example the New Business quotation
         # of a Product Maintenance walkthrough): paths relative to this pack.yaml.
@@ -428,7 +432,38 @@ class Pack:
                             "state": "walkthrough", "walkthrough": w["id"]})
         for d in self.documents:
             out.append({"slug": d["shot"], "screen": "-", "route": "", "caption": d["name"], "state": "document"})
+        return out + self.ux_shots()
+
+    def ux_shots(self) -> list[dict[str, Any]]:
+        """The images taken for the UX screen deck only (ux.yaml), not shown in the FRS: more states of a screen
+        (ux-<screen>-<state>), the landing page and the full menu of each persona (ux-nav-<nn>-landing, -menu) and
+        the crops of the shared components (a state with `component`)."""
+        out = []
+        for st in self.ux.get("states") or []:
+            scr = self.by_id.get(st["screen"])
+            if scr is None:
+                self.problems.append(f"ux.yaml: state {st.get('state')} of an unknown screen {st['screen']}")
+                continue
+            slug = f"ux-{scr.id.lower()}-{st['state']}"
+            out.append({"slug": slug, "screen": scr.id, "route": scr.route, "caption": st.get("caption", scr.title),
+                        "ux": True, **{k: v for k, v in st.items() if k not in ("caption", "screen")}})
+        for n, role in enumerate(self.nav_roles(), start=1):
+            user = self.menu_roles[role].get("user")
+            for state in ("landing", "menu"):
+                out.append({"slug": f"ux-nav-{n:02d}-{state}", "screen": self.nav_id(n), "route": "", "user": user,
+                            "state": state, "role": role, "ux": True, "nocallouts": True,
+                            "crop": "full" if state == "landing" else "nav.app-sidebar",
+                            "caption": f"{self.persona_label(role)}: "
+                                       + ("landing page after sign-in" if state == "landing" else "menu, every group open")})
         return out
+
+    def nav_roles(self) -> list[str]:
+        """The personas whose landing page and menu the UX deck shows: ux.yaml navigation, else the personas."""
+        return list((self.ux.get("navigation") or {}).get("roles") or self.personas)
+
+    def nav_id(self, n: int) -> str:
+        """Screen ID of the landing page and menu of the n-th persona of the UX deck (NAV-<code>-nn)."""
+        return f"NAV-{self.meta['code']}-{n:02d}"
 
     def shot_file(self, slug: str) -> Path:
         return self.dir / self.meta.get("screenshot_dir", "screenshots") / f"{slug}.png"
@@ -456,6 +491,9 @@ class Pack:
 
     def check(self) -> list[str]:
         problems = list(self.problems)
+        before = len(self.problems)
+        self.ux_shots()
+        problems += self.problems[before:]
         frs_text = (self.brd_dir / self.meta["frs"]).read_text(encoding="utf-8")
         fr_ids = set(re.findall(r"^id: (FR-[A-Z]+-\d+)", frs_text, re.M))
         ids = [s.id for s in self.screens]

@@ -40,6 +40,9 @@ import org.springframework.web.multipart.MultipartFile;
 public class EbSoaController {
 
   private static final String VIEW = "hasAuthority('EB_VIEW')";
+
+  /** The SOA register: EB processing and the collection team (EB_COLLECT) read it. */
+  private static final String SOA_VIEW = "hasAnyAuthority('EB_VIEW', 'EB_PROCESS', 'EB_COLLECT')";
   private static final String INTAKE = "hasAnyAuthority('EB_MARKET', 'EB_PROCESS')";
   private static final String PROCESS = "hasAuthority('EB_PROCESS')";
   private static final int MAX_PAGE = 200;
@@ -94,7 +97,7 @@ public class EbSoaController {
    * @return SOAs
    */
   @GetMapping("/soa")
-  @PreAuthorize(VIEW)
+  @PreAuthorize(SOA_VIEW)
   @SuppressWarnings("java:S107") // one parameter per filter
   public PageResponse<SoaResponse> list(
       @RequestParam Long companyId,
@@ -120,7 +123,7 @@ public class EbSoaController {
    * @return SOA
    */
   @GetMapping("/soa/{id}")
-  @PreAuthorize(VIEW)
+  @PreAuthorize(SOA_VIEW)
   public SoaResponse get(@PathVariable Long id, @RequestParam Long companyId) {
     return map(soas.require(companyId, id));
   }

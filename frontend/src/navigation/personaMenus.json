@@ -651,6 +651,7 @@
             "MIG_DECISION_APPROVE",
             "MIG_DQ_WAIVE",
             "MIG_MAPPING_APPROVE",
+            "MIG_RESUBMIT_APPROVE",
             "MIG_SIGNOFF",
             "MIG_VIEW",
             "REPORT_VIEW"

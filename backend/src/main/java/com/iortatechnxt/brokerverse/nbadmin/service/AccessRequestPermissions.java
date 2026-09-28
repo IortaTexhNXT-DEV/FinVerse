@@ -9,8 +9,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * The request functions of the current user (BRD 4.002.2.1-9; USER_ACCESS_DESIGN section 6.1): each
- * request type needs its own permission, or ACCESS_REQUEST (compatibility); an external (portal)
- * user needs PORTAL_USER_REQUEST (decision D7); a correction needs UAM_CORRECT.
+ * request type needs its own permission, or ACCESS_REQUEST (compatibility); a correction needs
+ * UAM_CORRECT. A request for an external user needs the function of its type like any other: the
+ * separate portal request permission of decision D7 comes with the parked partner portal.
  */
 @Component
 public class AccessRequestPermissions {
@@ -62,9 +63,6 @@ public class AccessRequestPermissions {
    * @return permission name
    */
   static String requestPermission(AccessRequestContent c) {
-    if (c.external() != null) {
-      return "PORTAL_USER_REQUEST";
-    }
     return switch (c.type()) {
       case CREATE_USER -> "UAM_ENROLL";
       case MODIFY_ROLES, MODIFY_USER -> "UAM_MODIFY";

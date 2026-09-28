@@ -36,8 +36,19 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/v1/reports")
-@PreAuthorize("hasAuthority('REPORT_VIEW')")
+@PreAuthorize(ReportController.REPORT_ACCESS)
 public class ReportController {
+
+  /**
+   * Access to the report API: the Report Centre (REPORT_VIEW) or the report screen of a module,
+   * opened with that module's report permission. The permission of each report is checked by
+   * {@link ReportService} in every case.
+   */
+  public static final String REPORT_ACCESS =
+      "hasAnyAuthority('REPORT_VIEW', 'OPS_REPORT_VIEW', 'DISB_REPORT_VIEW', 'SCR_REPORT_VIEW',"
+          + " 'UAM_REPORT_VIEW', 'BCL_REPORT_VIEW', 'BCL_DATA_EXTRACT', 'EB_REPORT_VIEW',"
+          + " 'SBM_REPORT_VIEW', 'CSF_REPORT_VIEW', 'CLX_REPORT_VIEW', 'RNW_REPORT_VIEW',"
+          + " 'ACSL_REPORT_VIEW', 'FRBS_REPORT_VIEW')";
 
   private static final int MAX_PAGE_SIZE = 100;
 

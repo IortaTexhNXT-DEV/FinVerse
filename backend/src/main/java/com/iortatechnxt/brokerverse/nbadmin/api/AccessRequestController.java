@@ -50,7 +50,7 @@ public class AccessRequestController {
   /** Any request function (the type-specific permission is checked by the service). */
   static final String REQUEST =
       "hasAnyAuthority('ACCESS_REQUEST', 'UAM_ENROLL', 'UAM_MODIFY', 'UAM_DEACTIVATE',"
-          + " 'UAM_REACTIVATE', 'UAM_GROUP_REQUEST', 'UAM_CORRECT', 'PORTAL_USER_REQUEST')";
+          + " 'UAM_REACTIVATE', 'UAM_GROUP_REQUEST', 'UAM_CORRECT')";
 
   private static final int PAGE_SIZE = 25;
 

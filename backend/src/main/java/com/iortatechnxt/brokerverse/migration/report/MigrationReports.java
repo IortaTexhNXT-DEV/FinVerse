@@ -29,6 +29,9 @@ public class MigrationReports {
   private static final String BATCH_LABEL = "Batch";
   private static final String SOURCE = "source_system";
   private static final String SOURCE_LABEL = "Source";
+  private static final String SUBMITTED_BY = "submitted_by";
+  private static final String DECIDED_BY = "decided_by";
+  private static final String APPROVED_BY = "approved_by";
 
   /**
    * {@code MIG-OBJECT-REGISTER}.
@@ -108,14 +111,14 @@ public class MigrationReports {
             ReportColumn.text("condition_text", "Condition"),
             ReportColumn.text("rationale", "Rationale"),
             ReportColumn.text(STATUS, STATUS_LABEL),
-            ReportColumn.text("submitted_by", "Submitted by"),
+            ReportColumn.text(SUBMITTED_BY, "Submitted by"),
             ReportColumn.text("submitted_at", "Submitted"),
-            ReportColumn.text("decided_by", "Decided by"),
+            ReportColumn.text(DECIDED_BY, "Decided by"),
             ReportColumn.text("decided_at", "Decided"),
             ReportColumn.text("return_reason", "Return reason"))
         .groupBy(OBJECT, OBJECT_LABEL)
         .row(MigReport.relabel("proposed_class", STATUS))
-        .users(names, "submitted_by", "decided_by")
+        .users(names, SUBMITTED_BY, DECIDED_BY)
         .build();
   }
 
@@ -185,13 +188,13 @@ public class MigrationReports {
             ReportColumn.count("version_no", "Version"),
             ReportColumn.text(STATUS, STATUS_LABEL),
             ReportColumn.count("entries", "Entries"),
-            ReportColumn.text("submitted_by", "Submitted by"),
-            ReportColumn.text("approved_by", "Approved by"),
+            ReportColumn.text(SUBMITTED_BY, "Submitted by"),
+            ReportColumn.text(APPROVED_BY, "Approved by"),
             ReportColumn.text("approved_at", "Approved"),
             ReportColumn.text("batches", "Used by batches"))
         .groupBy("set_code", "Code map")
         .row(MigReport.relabel(STATUS))
-        .users(names, "submitted_by", "approved_by")
+        .users(names, SUBMITTED_BY, APPROVED_BY)
         .build();
   }
 
@@ -397,10 +400,10 @@ public class MigrationReports {
             ReportColumn.text("break_reason", "Reason"),
             ReportColumn.text("explanation", "Explanation"),
             ReportColumn.text("explained_by", "Explained by"),
-            ReportColumn.text("approved_by", "Approved by"))
+            ReportColumn.text(APPROVED_BY, "Approved by"))
         .groupBy(BATCH, BATCH_LABEL)
         .row(MigReport.relabel(STATUS, "break_reason"))
-        .users(names, "explained_by", "approved_by")
+        .users(names, "explained_by", APPROVED_BY)
         .build();
   }
 
@@ -437,10 +440,10 @@ public class MigrationReports {
             ReportColumn.text("matched_keys", "Keys matched"),
             ReportColumn.text(DECISION, "Decision"),
             ReportColumn.text("survivor_key", "Survivor"),
-            ReportColumn.text("decided_by", "Decided by"))
+            ReportColumn.text(DECIDED_BY, "Decided by"))
         .groupBy(BATCH, BATCH_LABEL)
         .row(MigReport.relabel(DECISION))
-        .users(names, "decided_by")
+        .users(names, DECIDED_BY)
         .build();
   }
 

@@ -1103,3 +1103,21 @@ dl.form-grid dd {
     display: none;
   }
 }
+
+/* ---------- Parameter / value rows inside a form (IncentiveParamsTable) -------------------- */
+.param-rows {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.param-rows > legend {
+  padding: 0;
+  margin-bottom: var(--space-1);
+  font-size: 14px;
+  color: var(--color-heading);
+}
+
+.param-rows .table td {
+  vertical-align: top;
+}

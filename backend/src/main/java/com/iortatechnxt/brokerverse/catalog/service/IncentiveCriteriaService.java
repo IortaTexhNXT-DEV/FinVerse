@@ -1,7 +1,5 @@
 package com.iortatechnxt.brokerverse.catalog.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.catalog.domain.IncentiveCriteria;
@@ -51,7 +49,7 @@ public class IncentiveCriteriaService implements CatalogRecordHook {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final ApplicationEventPublisher events;
-  private final ObjectMapper json;
+  private final IncentiveRuleParameters parameters;
   private final Clock clock;
 
   /**
@@ -64,7 +62,7 @@ public class IncentiveCriteriaService implements CatalogRecordHook {
    * @param audit audit trail
    * @param currentUser current user
    * @param events event publisher
-   * @param json JSON (rule parameters)
+   * @param parameters rule parameters of the incentive types
    * @param clock clock
    */
   public IncentiveCriteriaService(
@@ -75,7 +73,7 @@ public class IncentiveCriteriaService implements CatalogRecordHook {
       AuditTrailService audit,
       CurrentUser currentUser,
       ApplicationEventPublisher events,
-      ObjectMapper json,
+      IncentiveRuleParameters parameters,
       Clock clock) {
     this.criteria = criteria;
     this.catalog = catalog;
@@ -84,7 +82,7 @@ public class IncentiveCriteriaService implements CatalogRecordHook {
     this.audit = audit;
     this.currentUser = currentUser;
     this.events = events;
-    this.json = json;
+    this.parameters = parameters;
     this.clock = clock;
   }
 
@@ -282,10 +280,7 @@ public class IncentiveCriteriaService implements CatalogRecordHook {
     }
     lovs.requireValid("INCENTIVE_TYPE", details.incentiveType(), BusinessClock.today(clock));
     details.scopes().forEach(scope -> requireActive(companyId, scope));
-    if (details.ruleParams() != null && !isJson(details.ruleParams())) {
-      throw new BusinessRuleException(
-          "INCENTIVE_RULE_PARAMS_INVALID", "The rule parameters must be valid JSON");
-    }
+    parameters.check(details.incentiveType(), details.ruleParams());
   }
 
   private void requireActive(Long companyId, IncentiveScope scope) {
@@ -297,18 +292,6 @@ public class IncentiveCriteriaService implements CatalogRecordHook {
     }
     if (scope.insurerCode() != null && !scope.insurerCode().isBlank()) {
       insurers.requireUsableInsurer(companyId, scope.insurerCode());
-    }
-  }
-
-  private boolean isJson(String text) {
-    if (text.isBlank()) {
-      return true;
-    }
-    try {
-      json.readTree(text);
-      return true;
-    } catch (JsonProcessingException e) {
-      return false;
     }
   }
 

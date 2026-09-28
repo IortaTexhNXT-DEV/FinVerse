@@ -213,6 +213,13 @@ export interface IncentiveInput {
   effectiveTo?: string;
 }
 
+/** A rule parameter an incentive type may carry (e.g. the minimum gross premium). */
+export interface IncentiveRuleParameter {
+  key: string;
+  label: string;
+  valueType: 'AMOUNT' | 'NUMBER' | 'PERCENT' | 'TEXT';
+}
+
 export interface IncentiveCriteria extends Authorizable {
   companyId: number;
   code: string;
@@ -291,6 +298,10 @@ export const productCatalogApi = {
 
   incentives: (companyId: number) =>
     api.get<IncentiveCriteria[]>(`${base}/incentive-criteria${toQuery({ companyId })}`),
+  incentiveParameters: (incentiveType: string) =>
+    api.get<IncentiveRuleParameter[]>(
+      `${base}/incentive-criteria/parameters${toQuery({ incentiveType })}`,
+    ),
   incentiveHistory: (id: number) =>
     api.get<IncentiveCriteria[]>(`${base}/incentive-criteria/${id}/history`),
   createIncentive: (input: IncentiveInput) =>

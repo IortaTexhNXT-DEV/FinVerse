@@ -19,6 +19,7 @@ import {
   toIncentiveInput,
 } from './incentiveForm';
 import type { IncentiveForm } from './incentiveForm';
+import { IncentiveParamsTable } from './IncentiveParamsTable';
 
 const BASES = [
   { value: 'RATE', label: 'Rate (%)' },
@@ -134,9 +135,15 @@ export function IncentiveEditorModal({
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const set = (patch: Partial<IncentiveForm>) => setForm((f) => ({ ...f, ...patch }));
+  const parameters = useQuery({
+    queryKey: ['catalog', 'incentive-parameters', form.incentiveType],
+    queryFn: () => productCatalogApi.incentiveParameters(form.incentiveType),
+    enabled: form.incentiveType !== '',
+  });
+  const definitions = parameters.data ?? [];
   const save = useMutation({
     mutationFn: () => {
-      const input = toIncentiveInput(form, companyId);
+      const input = toIncentiveInput(form, companyId, definitions);
       return initial
         ? productCatalogApi.updateIncentive(initial.id, input)
         : productCatalogApi.createIncentive(input);
@@ -148,7 +155,7 @@ export function IncentiveEditorModal({
     },
   });
   const submit = () => {
-    const found = incentiveErrors(form, amending, initial?.effectiveFrom);
+    const found = incentiveErrors(form, amending, initial?.effectiveFrom, definitions);
     setErrors(found);
     if (Object.keys(found).length === 0) {
       save.mutate();
@@ -240,18 +247,18 @@ export function IncentiveEditorModal({
           onChange={(effectiveTo) => set({ effectiveTo })}
         />
         <TextInput
-          label="Rule parameters (JSON)"
-          hint='e.g. {"minimumPremium": 5000}'
-          value={form.ruleParams}
-          error={errors.ruleParams}
-          onChange={(ruleParams) => set({ ruleParams })}
-        />
-        <TextInput
           label="Description"
           value={form.description}
           onChange={(description) => set({ description })}
         />
       </div>
+      <IncentiveParamsTable
+        rows={form.params}
+        definitions={definitions}
+        errors={errors}
+        typeMissing={form.incentiveType === ''}
+        onChange={(params) => set({ params })}
+      />
       <ProductMatrix
         products={form.products}
         error={errors.products}

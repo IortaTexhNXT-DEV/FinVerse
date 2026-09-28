@@ -1,17 +1,20 @@
 package com.iortatechnxt.brokerverse.journal.service;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import com.iortatechnxt.brokerverse.common.excel.GuideColumn;
+import com.iortatechnxt.brokerverse.common.excel.GuideColumn.Choice;
+import com.iortatechnxt.brokerverse.common.excel.GuideColumn.Kind;
+import com.iortatechnxt.brokerverse.common.excel.GuidedSheet;
+import com.iortatechnxt.brokerverse.common.excel.GuidedTemplate;
+import com.iortatechnxt.brokerverse.common.excel.GuidedTemplateWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-/** Downloadable journal upload templates (CSV and XLSX) with two sample vouchers. */
+/**
+ * Downloadable journal upload templates with two example vouchers: the guided Excel template (the
+ * template users fill in) and the plain CSV layout (header row, for extracts of other systems).
+ */
 public final class JournalUploadTemplate {
 
   private JournalUploadTemplate() {}
@@ -81,31 +84,102 @@ public final class JournalUploadTemplate {
   }
 
   /**
-   * XLSX template.
+   * XLSX template: the guided sheet (title block, column guide above the header, the two example
+   * vouchers marked to overwrite or delete, drop-downs and cell checks).
    *
    * @param valueDate value date of the samples
    * @return workbook bytes
    */
   public static byte[] xlsx(LocalDate valueDate) {
-    try (XSSFWorkbook workbook = new XSSFWorkbook();
-        ByteArrayOutputStream out = new ByteArrayOutputStream()) {
-      Sheet sheet = workbook.createSheet("Journals");
-      write(sheet.createRow(0), UploadLine.ALL_COLUMNS);
-      List<List<String>> rows = sampleRows(valueDate);
-      for (int i = 0; i < rows.size(); i++) {
-        write(sheet.createRow(i + 1), rows.get(i));
-      }
-      workbook.write(out);
-      return out.toByteArray();
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
+    return GuidedTemplateWriter.write(guided(valueDate));
   }
 
-  private static void write(Row row, List<String> values) {
-    for (int c = 0; c < values.size(); c++) {
-      row.createCell(c).setCellValue(values.get(c));
-    }
+  /**
+   * The guided template of the journal upload.
+   *
+   * @param valueDate value date of the samples
+   * @return template
+   */
+  static GuidedTemplate guided(LocalDate valueDate) {
+    GuidedSheet sheet =
+        new GuidedSheet(
+            "Journals",
+            "Journal lines",
+            "One row per journal line; the rows with the same voucher_key form one voucher.",
+            columns(),
+            sampleRows(valueDate));
+    return new GuidedTemplate(
+        "Journal upload",
+        "Creates many manual, adjustment or accrual journals at once as draft journals for"
+            + " approval.",
+        "Accountants of the finance team",
+        "General Ledger > Journal Upload: download this template, fill it in, upload it with"
+            + " Validate (nothing is created), then with Import: every valid voucher becomes a"
+            + " draft journal to submit and approve.",
+        List.of(
+            "At most 5,000 rows and 5 MB per file, for the company chosen on screen.",
+            "Debits equal credits in each voucher and currency; a voucher has at least two lines.",
+            "The voucher columns (branch_code to reference) are read from the first row of the"
+                + " voucher; later rows leave them blank or repeat the same value.",
+            "Dates as dd-MMM-yyyy (e.g. 15-Jan-2026) or as Excel dates; amounts without thousands"
+                + " separators, or as Excel numbers.",
+            "Keep the header texts; the order of the columns does not matter."),
+        List.of(sheet),
+        JournalUploadService.MAX_ROWS);
+  }
+
+  private static List<GuideColumn> columns() {
+    String firstRow = "on the first row of each voucher";
+    return List.of(
+        GuideColumn.of(
+                UploadLine.VOUCHER_KEY,
+                Kind.TEXT,
+                "Any text grouping the lines of one voucher, e.g. V1; used only inside the file")
+            .mandatory(),
+        GuideColumn.of(UploadLine.BRANCH_CODE, Kind.TEXT, "Branch of the voucher")
+            .when(firstRow)
+            .allowed("Code of an existing branch"),
+        GuideColumn.of(UploadLine.JOURNAL_TYPE, Kind.TEXT, "Type of journal; blank for MANUAL")
+            .choices(
+                List.of(
+                    new Choice("MANUAL", "Manual journal"),
+                    new Choice("ADJUSTMENT", "Adjustment"),
+                    new Choice("ACCRUAL", "Accrual"))),
+        GuideColumn.of(UploadLine.VALUE_DATE, Kind.DATE, "Accounting date of the voucher")
+            .when(firstRow),
+        GuideColumn.of(UploadLine.CURRENCY, Kind.TEXT, "Currency of the voucher")
+            .when(firstRow)
+            .format("ISO currency code, 3 letters, e.g. PHP"),
+        GuideColumn.of(UploadLine.NARRATION, Kind.TEXT, "Narration of the voucher")
+            .when(firstRow)
+            .format("Text, at most 500 characters"),
+        GuideColumn.of(UploadLine.REFERENCE, Kind.TEXT, "External reference of the voucher")
+            .format("Text, at most 60 characters"),
+        GuideColumn.of(UploadLine.ACCOUNT_CODE, Kind.TEXT, "GL account of the line")
+            .mandatory()
+            .allowed("Code of an existing postable GL account"),
+        GuideColumn.of(UploadLine.DEBIT, Kind.AMOUNT, "Debit amount of the line")
+            .when("the line is a debit (fill debit or credit, not both)"),
+        GuideColumn.of(UploadLine.CREDIT, Kind.AMOUNT, "Credit amount of the line")
+            .when("the line is a credit (fill debit or credit, not both)"),
+        GuideColumn.of("line_currency", Kind.TEXT, "Currency of the line when it differs")
+            .format("ISO currency code, 3 letters"),
+        GuideColumn.of(
+            "exchange_rate",
+            Kind.NUMBER,
+            "Exchange rate; blank for the spot rate of the value date"),
+        GuideColumn.of("cost_center", Kind.TEXT, "Cost centre of the line")
+            .when("the account requires a cost centre")
+            .allowed("Code of an existing cost centre"),
+        GuideColumn.of("business_line", Kind.TEXT, "Line of business of the line")
+            .allowed("Code of an existing line of business"),
+        GuideColumn.of("party_code", Kind.TEXT, "Sub-ledger party of the line")
+            .when("the account is a control account")
+            .allowed("Code of an existing party"),
+        GuideColumn.of("line_reference", Kind.TEXT, "Reference of the line")
+            .format("Text, at most 60 characters"),
+        GuideColumn.of("line_narration", Kind.TEXT, "Narration of the line")
+            .format("Text, at most 250 characters"));
   }
 
   private static String quote(String value) {

@@ -36,7 +36,7 @@ const WIDTH = Number(process.env.WIDTH || 1440);
 const HEIGHT = Number(process.env.HEIGHT || 900);
 const SCALE = Number(process.env.SCALE || 2);
 const MAX_HEIGHT = Number(process.env.MAX_HEIGHT || 2000);
-const MENU_MAX_HEIGHT = Number(process.env.MENU_MAX_HEIGHT || 4800);  // the full menu of a persona (UX deck)
+const MENU_MAX_HEIGHT = Number(process.env.MENU_MAX_HEIGHT || 12000);  // the full menu of a persona (UX deck)
 const MARGIN = 12;  // CSS pixels of page kept around a cropped region
 const READY_TIMEOUT_MS = 20 * 60 * 1000;
 

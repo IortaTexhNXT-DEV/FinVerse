@@ -197,9 +197,7 @@ export default function SpecialPage() {
       {uploading && (
         <Card
           title="Upload Collection Special Remittance File"
-          actions={
-            <TemplateButton kind="special" />
-          }
+          actions={<TemplateButton kind="special" />}
         >
           <UploadForm
             label="Request file (invoiceNo, conditionCode, remarks)"

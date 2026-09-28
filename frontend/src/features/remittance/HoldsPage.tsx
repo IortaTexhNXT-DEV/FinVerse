@@ -107,10 +107,7 @@ export default function HoldsPage() {
       />
       <ErrorAlert error={rows.error ?? upload.error} />
       {uploading && (
-        <Card
-          title="Upload Collection Hold File"
-          actions={<TemplateButton kind="holds" />}
-        >
+        <Card title="Upload Collection Hold File" actions={<TemplateButton kind="holds" />}>
           <UploadForm
             label="Hold file (invoiceNo, reasonCode, holdUntil, remarks)"
             busy={upload.isPending}

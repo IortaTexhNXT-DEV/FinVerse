@@ -66,9 +66,7 @@ export function BudgetTools({ budget, onUpdated }: Readonly<Props>) {
           <code>account_code,cost_centre,annual</code>. Replaces all lines.
         </p>
         <Field label="Excel or CSV file">
-          {(id) => (
-            <FileDropZone id={id} accept=".xlsx,.csv,text/csv" onChange={onFile} />
-          )}
+          {(id) => <FileDropZone id={id} accept=".xlsx,.csv,text/csv" onChange={onFile} />}
         </Field>
       </Card>
       <Card title="Copy from prior-year actuals">

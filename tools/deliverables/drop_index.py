@@ -45,10 +45,12 @@ TO_WRITE = {
         ("Bill of materials, technical and deployment architecture (items 4, 12)", "BRD-00", "From the programme alignment pack (chapter 6), the IER and the architecture option decision"),
         ("Security and data-protection controls mapping (item 26)", "BRD-00", "EIAM, UIDM-ISC, S3 encryption, masking"),
         ("Interface specifications of the Drop 0 integrations", "-", "After BDOI IT answers the IQ questions"),
+        ("Technical Specification of each Drop 0 sign-off set (BRD-03, BRD-11, BRD-13)", "-", "The technical content kept out of the business sets (interfaces, access set-up, data storage, extract transfer); reviewed by BDOI IT"),
     ],
     "Drop 1": [
         ("UAT plan and sign-off forms, Drop 1 (item 30)", "-", "By 16-Jul-2027; readiness statement by 30-Jul-2027"),
         ("Interface specifications of the Drop 1 channels", "-", "After BDOI IT answers the IQ questions"),
+        ("Technical Specification of each Drop 1 sign-off set", "-", "The technical content kept out of the business sets; reviewed by BDOI IT"),
     ],
     "Drop 2": [
         ("UAT plan and sign-off forms, Drop 2 (item 30)", "-", "Readiness statement by 30-Sep-2027"),
@@ -183,6 +185,24 @@ def write_index(key: str) -> Path:
     ]
     for doc, brd, label, ver, rel in rows:
         lines.append(f"| {doc} | {brd} | {label} | {ver} | [`{rel}`]({rel.replace(' ', '%20')}) |")
+    owned = [b for b in brand.BRD_NAMES if brand.BRD_DROP.get(b) == key and brand.ownership(b)]
+    if owned:
+        lines += [
+            "",
+            "## Who signs what",
+            "",
+            "The sign-off sets hold business content only (screens, fields, list and template columns, validations, rules,",
+            "messages, notifications, documents, walkthroughs, reports); the technical content is in the Technical",
+            "Specification of each set, reviewed by BDOI IT. The signatories are the roles of the BRD approval sheet;",
+            "the matrix per part of the set is in the 00 Start Here and the 01 guide deck of each set.",
+            "",
+            "| Set | Prepared by | Input provided by | Reviewed by | Approved by | Approval sheet |",
+            "|---|---|---|---|---|---|",
+        ]
+        for b in owned:
+            caps = brand.owners_by_capacity(b)
+            cells = ["<br>".join(caps[c]) or "-" for c in brand.OWNER_CAPACITIES]
+            lines.append(f"| {b} {brand.BRD_NAMES[b]} | " + " | ".join(cells) + f" | {brand.ownership(b).get('source', '')} |")
     shared_here = [(b, what) for b, other, what in brand.DROP_SHARED if other == key]
     if shared_here:
         lines += [

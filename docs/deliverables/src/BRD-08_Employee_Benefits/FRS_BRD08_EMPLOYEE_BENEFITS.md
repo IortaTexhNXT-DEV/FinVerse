@@ -55,7 +55,7 @@ The EB desk of Marketing places group benefit programmes (HMO, Group Life Insura
 | Area | In scope | Source |
 |---|---|---|
 | Access, documents and audit | Authorised access to documents and reports, department access classes, protected outbound files, audit and versions | BRID-007, 023, 024, 025 |
-| Partner portal | Separate realm for insurers and client HR, user provisioning through User Access, staged uploads, review and validation, task inbox, structured proposal form, client HR views and uploads | BRID-005, 005.01-005.03, 014 |
+| Partner portal | Separate sign-in for insurers and client HR, user provisioning through User Access, staged uploads, review and validation, task inbox, structured proposal form, client HR views and uploads | BRID-005, 005.01-005.03, 014 |
 | Programme and renewal start | Client capture, programme and cycle, business type, renewal advice, client feedback, incumbent indicative proposal | BRID-001-003, 006, 022.01 |
 | BOR, franchise and TOR | Document register, BOR upload and validation, franchise request and decision, client advice, required documents per process, TOR distribution and remarketing | BRID-004, 007-009, 026, 027, 029 |
 | Proposals and decision | Proposal validation, comparative analysis and sign-off, value threshold approval, presentation to the client, revisions, updated proposals, client confirmation and placement trigger | BRID-010-012, 015-017 |
@@ -65,7 +65,7 @@ The EB desk of Marketing places group benefit programmes (HMO, Group Life Insura
 **Out of scope for this phase:**
 
 - BRID-028, presentation of documents for high-risk accounts. The addendum states that high-risk accounts do not apply to Employee Benefits (Add. p.13).
-- System-to-system insurer APIs, e-signature verification of the BOR, HRIS feeds of master lists and reading insurer mailboxes. Each waits for a question to BDOI (section 7).
+- System-to-system interfaces with insurers, e-signature verification of the BOR, HRIS feeds of master lists and reading insurer mailboxes. Each waits for a question to BDOI (section 7).
 - Renewal of EB programmes by the general Renewal module (BRD-6). EB lines are excluded from the Renewal lists; EB renewals run in this module (decision D3).
 - Booking in EBIX (TAT annex). Booking is done in BIBS (BRID-020).
 
@@ -100,7 +100,7 @@ GPA: Group Personal Accident
 HMO: Health Maintenance Organization
 ISACOM: Approval needed when a policy is awarded to a non-accredited provider (Add. p.4); not defined (EBQ24)
 Master list: The roster of covered employees and dependants (named); the unnamed master list is a census without names
-Portal: The BIBS partner portal; a separate sign-in and API for insurer and client HR users
+Portal: The BIBS partner portal; a separate sign-in and access for insurer and client HR users
 Programme: One client's employee benefits, with its benefit lines, contacts and cycles
 RA: Renewal Advice
 SOA: Statement of Account issued by the insurer
@@ -216,7 +216,7 @@ The addendum notes that approvals are conditional: the client approves proposals
 | PORTAL_USER_APPROVE | Decide User Access requests of user type External |
 | PORTAL_ADMIN | Lock and unlock portal users; portal log-in and download logs |
 
-Portal users are not BIBS users and hold none of these permissions. Their portal role (INSURER_USER or CLIENT_HR) is valid only in the portal realm and is bound to one insurer or one client.
+Portal users are not BIBS users and hold none of these permissions. Their portal role (INSURER_USER or CLIENT_HR) is valid only in the portal and is bound to one insurer or one client.
 
 ## Permissions matrix
 
@@ -329,10 +329,10 @@ preconditions:
   - "None."
 main_flow:
   - A user or portal user performs an action.
-  - BIBS writes the audit entry and, for a versioned item, the new version, in the same transaction.
+  - BIBS writes the audit entry and, for a versioned item, the new version, together with the change; one is never kept without the other.
   - The History tab lists the actions of the programme in time order.
 rules:
-  - [R1, "Audit and version rows are append-only.", Fixed, "-"]
+  - [R1, "Audit and version entries can only be added; no user can change or delete them.", Fixed, "-"]
   - [R2, "Portal actions are recorded under the portal user with the prefix portal and the bound party.", Fixed, "-"]
   - [R3, "Retention 5 years online and 15 years offline (p.37).", Configurable, "Retention rules EB_PROGRAMME, EB_MEMBER"]
 validations: []
@@ -387,7 +387,7 @@ actor: Insurer user; client HR user; System
 priority: Must have
 screens: Portal sign-in; Portal home; Accept invitation
 description:
-  - Insurers and client HR users interact with BDOI only through the partner portal, never the core system. The portal has its own sign-in and its own API; a portal token is refused by the core API and a core token by the portal. Each portal user is bound to one party - one insurer or one client - and every portal query is filtered on that party, so a user cannot see or reach another party's records.
+  - Insurers and client HR users interact with BDOI only through the partner portal, never the core system. The portal has its own sign-in; a portal sign-in gives no access to the core system, and a core sign-in none to the portal. Each portal user is bound to one party - one insurer or one client - and every portal query is filtered on that party, so a user cannot see or reach another party's records.
   - The portal can run as a separate deployment in the internet zone. Its hosting, BDO Information Security approval and the multi-factor method are confirmed under EBQ13.
 preconditions:
   - The portal user was provisioned (FR-EB-011) and has set a password.
@@ -400,7 +400,7 @@ alternate_flows:
   - Record of another party. BIBS answers "not found" and logs the attempt.
   - Idle session. The session ends after the portal timeout.
 rules:
-  - [R1, "Separate realm and token audience; the core API refuses portal tokens.", Fixed, "-"]
+  - [R1, "Separate sign-in; the core system refuses a portal sign-in and the portal a core sign-in.", Fixed, "-"]
   - [R2, "Every portal query is scoped to the bound insurer or client.", Fixed, "-"]
   - [R3, "Lockout after 3 failed sign-ins.", Configurable, Parameter PORTAL_MAX_FAILED_LOGINS]
   - [R4, "Session timeout 15 minutes (default).", Configurable, Parameter PORTAL_SESSION_MINUTES]
@@ -1811,9 +1811,9 @@ Figure 7 shows the interfaces. External parties reach only the portal; the porta
 | Endorsement requests (BRD-2) | Out | Financial member changes | BRID-013 | IN SCOPE |
 | Invoice ledger (BRD-2) | In | Payment status and payment events | BRID-021 | IN SCOPE |
 | Documents | Out | Access classes, process tags, RENEWAL_ADVICE for Renewal and CSF | BRID-025; D3 | IN SCOPE |
-| E-mail outbox | Out | Protected TOR, RA, comparative, advices, follow-ups; separate password | BRID-007 | IN SCOPE |
+| Outgoing e-mail | Out | Protected TOR, RA, comparative, advices, follow-ups; separate password | BRID-007 | IN SCOPE |
 | Reports | Out | EB reports; Word export; business type filter | BRID-022, 022.01 | IN SCOPE |
-| Insurer API | In | System-to-system proposals and billing | BRID-005.01 | ON HOLD |
+| Insurer system-to-system interface | In | System-to-system proposals and billing | BRID-005.01 | ON HOLD |
 | HRIS master lists | In | Payroll feeds of master lists | BRID-014 | ON HOLD |
 | BOR e-signature | In | Verification of the signature | BRID-008 | ON HOLD |
 
@@ -1827,9 +1827,9 @@ Figure 7 shows the interfaces. External parties reach only the portal; the porta
 | Peak | Month-end; 08:30-19:00 | Jobs run at 06:00 and 07:00, before the peak |
 | Availability | 99.99%; used 08:30-19:00; maintenance per bank standard | 99.99% is above every other BRD (99.9%); HA deployment; the portal adds an internet-facing part (EBQ25, XQ08) |
 | Recovery | RTO 4 hours; RPO 24 hours | Platform backup and recovery; one BIBS-wide NFR set is being agreed (XQ08) |
-| Retention | Application, database, audit logs and historical data 5 years online, 15 years offline; backup every 4 hours, kept 7 years; no anonymisation | Retention rules EB_PROGRAMME and EB_MEMBER |
+| Retention | Application, system and audit logs and historical data 5 years online, 15 years offline; backup every 4 hours, kept 7 years; no anonymisation | Retention rules EB_PROGRAMME and EB_MEMBER |
 | Devices | Same speed on mobile and desktop | Responsive screens, portal included |
-| Portal security (derived) | Portal or API with authentication, RBAC, audit, validation before effect (BRID-005, 014) | Separate realm, scoped queries, lockout, one-time code, virus scanning, download log; BDO Information Security approval (EBQ13) |
+| Portal security (derived) | Portal or system-to-system interface with authentication, role-based access, audit, validation before effect (BRID-005, 014) | Separate sign-in, each user sees only the records of its party, lockout, one-time code, virus scanning, download log; BDO Information Security approval (EBQ13) |
 | Data privacy (derived) | Master lists hold personal data; utilization reports are health-related | Treated as sensitive personal information under the Data Privacy Act: access classes, encryption in transit and at rest, download logging, no health data in the roster (EBQ15) |
 
 # Configuration items
@@ -1930,7 +1930,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | EBQ10 | Comparative factors, scoring, due time, signatories | FR-EB-041 | OPEN |
 | EBQ11 | Threshold values, measure and approver levels | FR-EB-042 | OPEN |
 | EBQ12 | Evidence of client confirmation; separate placement approval | FR-EB-043, 046 | OPEN |
-| EBQ13 | Portal hosting, authentication, user administration, API, virus scanner | FR-EB-010-012 | PARTIAL |
+| EBQ13 | Portal hosting, authentication, user administration, system-to-system interface, virus scanner | FR-EB-010-012 | PARTIAL |
 | EBQ14 | What "manage policy" adds for client HR users | FR-EB-015 | OPEN |
 | EBQ15 | Master list fields; roster per member; privacy rules | FR-EB-054 | OPEN |
 | EBQ16 | Movement types; pro-rata; MIS Credit; no payment no booking | FR-EB-055 | OPEN |
@@ -2000,7 +2000,7 @@ The table lists each point where the proposed screen or rule differs from the BR
 | CLR-EB-01 | BOR on renewal (BRID-008; FR-EB-031) | A BOR is required for new business and for renewals that remarket. | The negative scenario of BRID-008 calls a BOR for a renewal invalid, while both flow charts ask for a BOR in the renewal lane (EBQ05). | Confirm when a renewal needs a BOR (EBQ05). |
 | CLR-EB-02 | BOR signature (BRID-008; FR-EB-031) | The validator attests the signature with a checklist; e-signature verification is added if BDOI specifies it. | The BRD asks the system to validate the signature; the verification method is open (EBQ06). | Confirm the attestation, or give the verification method (EBQ06). |
 | CLR-EB-03 | Renewal Advice lead time (BRID-001; FR-EB-022) | The Renewal Advice is sent 135 days before expiry (default from the TAT annex). | The BRD gives 180 days as an example; the TAT annex gives 135 (EBQ02). | Choose the lead time (EBQ02). |
-| CLR-EB-04 | Secure portal or API (BRID-005; FR-EB-010) | Insurers and clients use the secure partner portal; a system-to-system interface is added when an insurer asks for it. | No insurer has asked for a system interface. | Confirm the portal. |
+| CLR-EB-04 | Secure portal or system-to-system interface (BRID-005; FR-EB-010) | Insurers and clients use the secure partner portal; a system-to-system interface is added when an insurer asks for it. | No insurer has asked for a system interface. | Confirm the portal. |
 | CLR-EB-05 | Booking (TAT annex; FR-EB-052) | Booking is done in BIBS. | The TAT annex refers to booking in EBIX, which BIBS replaces. | Confirm booking in BIBS. |
 | CLR-EB-06 | Portal users | Portal users are provisioned through User Access requests of user type External. | The BRD does not say how portal users are created (decision D7). | Confirm the provisioning (decision D7). |
 | CLR-EB-07 | High-risk accounts (BRID-028) | Out of scope; there is no high-risk handling for EB. | The addendum states that high-risk accounts do not apply to Employee Benefits (Add. p.13; EBQ26). | Confirm the exclusion (EBQ26). |

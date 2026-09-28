@@ -53,7 +53,7 @@ Requirements and mapping run from September to November 2026; the migration is p
 
 # The three sign-off sets
 
-Each set is issued as one release set in its own folder of Drop 0 and is signed as one unit by its business owner. Signing a set freezes its screens, fields, rules, messages, notifications and interface contract as specified.
+Each set is issued as one release set in its own folder of Drop 0 and is signed as one unit by the roles of its BRD approval sheet (the Who signs what chapter of its 00 Start Here): iorta TechNXT prepares it, the business units provide the input and review their parts, BDOI IT reviews the interfaces, the user access and the Technical Specification (a separate document), the Program Manager of Business Project Services reviews the traceability and the completeness, and the Product Owner approves the whole set. The sets hold business content only. Signing a set freezes its screens, fields, rules, messages, notifications and interface contract as specified.
 
 ```pack
 plugin: ../../../../tools/deliverables/drop_closure.py

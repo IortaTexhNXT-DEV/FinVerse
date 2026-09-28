@@ -77,14 +77,7 @@ menu_personas:
 # Packs of other BRDs whose screens a walkthrough step may show (My Approvals and Lists of Values of New Business).
 foreign_packs: [../../BRD-01_New_Business/pack/pack.yaml]
 
-# Signatories of the sign-off certificate: role, organisation, what the signatory confirms.
-signatories:
-  - ["Product Owner, Marketing Business System", BDOI, "Business owner: the whole set"]
-  - ["Process Owner, User Access Maintenance (Business Administration)", BDOI, "Requests, approvals, group-profile requests, bulk requests, reports and the configuration inputs"]
-  - ["Head, BDOI Information Security", BDOI, "Information Security: the role matrix, the menus by persona, the separation-of-duties rules, the second approval of privileged changes, password and session rules, the audit log"]
-  - ["Head, BDOI IT", BDOI, "BDOI IT: sign-in and identity integration assumptions (EIAM on Entra ID, UIDM-ISC identity governance; integrations owned by BDOI IT), System Administrator functions"]
-  - ["Program Manager, Business Project Services", BDO Unibank ESG, "Traceability to the BRD"]
-  - [Project Manager, iorta TechNXT, "Delivery of the set as signed"]
+# Signatories of the sign-off certificate and who signs what: ownership.yaml.
 
 # Sidebar sections that belong to this BRD (navigation/modules.ts module ids) and the BRD of every other section,
 # used to mark each menu entry of a persona.

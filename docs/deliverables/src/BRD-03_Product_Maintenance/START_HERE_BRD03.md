@@ -71,6 +71,24 @@ render: guide-steps
 | Thu 5-Nov-2026 | 09:30-12:00 | Set-up, versions and validation, insurers and commission, advisory, pricing and the rate exception (walkthrough A steps 15-24); returns and messages (walkthrough B) | MBS, TSU, Business Administration, Marketing |
 | Fri 6-Nov-2026 | 09:30-11:30 | Catalogue screens, rates and taxes, incentive criteria, package expiry; the configuration input templates and the package map | MBS, Comptrollership, Data Migration working group, BDOI IT |
 
+# Who signs what
+
+The set holds business content only: the screens and fields, the columns of the lists, reports and templates that the user sees or fills in, the validations, business rules, messages, notifications, documents, walkthroughs and reports. The business users sign that content. Technical content (the interfaces between systems, data storage, security set-up) is not part of the set: it is in the Technical Specification, a separate document reviewed by BDOI IT. The roles are those of the approval sheet of the BRD: iorta TechNXT prepares the set, the business units provide the input and review their parts, BDOI IT reviews the interfaces, the user access and the Technical Specification, the Program Manager of Business Project Services reviews the traceability and the completeness, and the Product Owner approves the whole set.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: owners-matrix
+```
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: owners-roles
+```
+
+The signatories sign the Sign-off certificate sheet of the sign-off workbook in the same order: prepared by, input provided by, reviewed by, approved by.
+
 # Configuration inputs
 
 The workbook of configuration input templates lists what the business provides to set up Product Maintenance and to load it at go-live: the product catalogue, coverages and rules, clauses, rate tables, insurers and commission rates, the packages in force, the package map, the document templates, the lists of values and the incentive criteria (FRS chapter 19). The owners start the templates during the review; the final content follows the data migration mocks and is due at the map freeze.

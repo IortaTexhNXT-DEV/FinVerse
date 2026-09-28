@@ -78,7 +78,7 @@ contract:
     party: BRD-5 Accounting, Disbursement and ACSL
     direction: Out
     what: The GL journal of each booking, endorsement and cancellation (event BROKER_BOOKING), the sub-ledger open items, service invoices and the cost center dimension
-    how: Posted in the same transaction as the booking by the accounting rules; the journal preview shows it before posting
+    how: Posted together with the booking by the accounting rules; the journal preview shows it before posting
     owner: Comptrollership (GL accounts and rules)
     screens: Pre-booking Confirmation (journal preview), Booked Invoice (Journal and Open Items tabs), Service Invoices
     frs: [FR-NB-110, FR-NB-117, FR-NB-119]
@@ -126,7 +126,7 @@ contract:
     party: Insurers (external)
     direction: Out / In
     what: Quotation slips, placement slips, hold cover requests and service invoices by e-mail; insurer terms, confirmations and e-policies received by e-mail and keyed in or uploaded
-    how: E-mail to the insurer branch placement address; SFTP or API channels wait for the channel specification; insurers have no access to BIBS
+    how: E-mail to the insurer branch placement address; electronic channels (file transfer or system-to-system) wait for the channel specification; insurers have no access to BIBS
     owner: Insurer master (Business Administrator)
     screens: PRF record, Placement Slips, Account Placement, E-policy Upload, Service Invoices
     frs: [FR-NB-053, FR-NB-081, FR-NB-082, FR-NB-100, FR-NB-117]

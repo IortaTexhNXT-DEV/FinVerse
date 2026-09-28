@@ -390,7 +390,7 @@ validations:
 notifications:
   - "Alert DISB_PAYEE_NO_MATCH for NO_MATCH requests."
 audit:
-  - "The request keeps its source, payload and the payee created."
+  - "The request keeps its source, its content and the payee created."
 acceptance:
   - A remittance request for an insurer without payee creates a NO_MATCH payee request; authorising the payee resumes the request.
 ```
@@ -486,7 +486,7 @@ validations:
 notifications:
   - "Alert DISB_PAYEE_NO_MATCH; the source module is notified of the status."
 audit:
-  - "The request keeps its source, payload and history."
+  - "The request keeps its source, its content and its history."
 acceptance:
   - An approved remittance batch creates a remittance DV directly For Approval.
   - A refund request for a client without payee waits under No Payee and resumes when the payee is authorised.
@@ -3023,7 +3023,7 @@ Reports run in the Report Centre with the options of Volume 1 (view, export to X
 <!-- table: widths=1.8,11,3.8 caption="Assumptions" size=8.5 -->
 | ID | Assumption | Related |
 |---|---|---|
-| A-DS-01 | Bank channels stay manual or file-based; BIBS has no bank API | AQ09 |
+| A-DS-01 | Bank channels stay manual or file-based; BIBS has no system-to-system link to the banks | AQ09 |
 | A-DS-02 | Posting happens at DV approval, not at release | AQ13 |
 | A-DS-03 | A payee used on a DV is never deleted; it is deactivated | AQ11 |
 | A-DS-04 | Endorsements and cancellations keep their own BIR invoice numbers linked to a root invoice | AQ29 |

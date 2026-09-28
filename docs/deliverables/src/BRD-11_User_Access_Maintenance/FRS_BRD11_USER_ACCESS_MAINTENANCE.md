@@ -187,7 +187,7 @@ The table summarises each access function of BIBS: the screen, the permission an
 | Notifications | The chosen approver on submission; the requester on the decision | Returned, cancelled, second approval, implementation; the affected user |
 | User Access Matrix | User Access > User Access Matrix: roles by permission and by area / action class, Excel export | Every permission gets an area, so the group-profile report shows a module for every task |
 | Password | My Profile > Change password: at least 10 characters with upper and lower case, digit and symbol; administrator reset | Password history, maximum and minimum age, forced change after reset, self-service reset |
-| Audit | Insert-only audit trail; Administration > Audit Trail report (CTL-AUDIT) with summary text | Structured, insert-only access-change log with from / to values; four reports |
+| Audit | Audit trail that no user can change; Administration > Audit Trail report (CTL-AUDIT) with summary text | Access-change log with from / to values that no user can change; four reports |
 
 # Personas and roles
 
@@ -205,7 +205,7 @@ The table summarises each access function of BIBS: the screen, the permission an
 | Information Security Officer | INFOSEC_OFFICER | Views the access requests, the group-profile requests and the User Access Matrix, and the audit trail; runs the user access reports; authorises the separation-of-duties rules; approves the changes of the security settings | NFR 11 (p.17) |
 | System | - | Validates, grants the access, applies dated changes, logs, notifies | p.6 |
 
-The BRD's stakeholders also list ITIO-SRE (System and Database Administrators), ITIO-ES (Storage Administrator) and ITSD-AMS (application support) (p.7). They support the platform and have no functional role in BIBS beyond the System Administrator. Who the 14 Requestors and 8 Approvers are is UQ01.
+The BRD's stakeholders also list ITIO-SRE (system administration), ITIO-ES (Storage Administrator) and ITSD-AMS (application support) (p.7). They support the platform and have no functional role in BIBS beyond the System Administrator. Who the 14 Requestors and 8 Approvers are is UQ01.
 
 ## Permissions
 
@@ -382,7 +382,7 @@ main_flow:
   - The user clicks **Log Out**.
   - BIBS ends the session, records LOGOUT and shows the log-in screen.
 alternate_flows:
-  - A token of an ended session is used again. BIBS refuses it.
+  - A page left open after the session ended is used again. BIBS refuses the action and asks the user to log in.
 rules:
   - [R1, "Last activity is updated at most every 5 minutes.", Fixed, "-"]
   - [R2, "Single session per device is not enforced; the session log prepares it (UQ09).", Fixed, "-"]
@@ -1249,7 +1249,7 @@ validations: []
 notifications:
   - "None."
 audit:
-  - "Delivered grants are in the database migration; later changes in the change log."
+  - "The permissions delivered with the profiles are the starting point; every later change is in the change log."
 acceptance:
   - The Requestor, Approver and Business Administrator profiles exist with the permissions of section 3.3.
 ```
@@ -1497,19 +1497,19 @@ acceptance:
 
 ```fr
 id: FR-UA-064
-title: Keep a structured, insert-only access-change log
+title: Keep an access-change log that no user can change
 brd: [BRD 4.003.1 (p.10), UAM-NFR-09 (p.13), UAM-NFR-22 (p.14)]
 actor: System
 priority: Must have
 screens: Reports of section 6; request History tab
-description: Every change is in the insert-only audit trail as summary text, and every applied change also writes one row per attribute into the access-change log (time, user or profile, activity, attribute, from value, to value, request number, done by, approved by) in the same transaction as the change. No user can change or delete it. The reports read it.
+description: Every change is in the audit trail as summary text, and every applied change also records one line per attribute in the access-change log (time, user or profile, activity, attribute, from value, to value, request number, done by, approved by) together with the change, so that a change is never applied without its log lines. No user can change or delete it. The reports read it.
 preconditions:
   - "None."
 main_flow:
   - A change is applied (approval, scheduled application, implementation, unlock, reset).
-  - BIBS writes the change and the log rows in one transaction.
+  - BIBS applies the change and records its log lines together.
 rules:
-  - [R1, "Insert-only; enforced in the database.", Fixed, "-"]
+  - [R1, "Entries can only be added; no user, including the System Administrator, can change or delete them.", Fixed, "-"]
   - [R2, "Kept at least as long as the audit trail; QPS retention values are UQ12.", Configurable, Retention rules]
 validations: []
 notifications:
@@ -1517,7 +1517,7 @@ notifications:
 audit:
   - "This FR is the audit."
 acceptance:
-  - A database update of a log row is refused.
+  - An attempt to change or delete a log entry outside the screens is refused.
   - Each attribute of a modified user has one row with from and to values and the request number.
 ```
 
@@ -1699,13 +1699,13 @@ Figure 4 shows the interfaces. Every BIBS module reads the effective permissions
 <!-- table: widths=3.8,1.8,7.6,2.8,2.2 caption="Interfaces" status=Scope size=8.5 -->
 | Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
-| EIAM (Microsoft Entra ID), Drop 0 | Out / In | OpenID Connect sign-in: redirect to Entra ID, ID token returned and mapped to the BIBS user by Windows ID or user principal name; log-out ends the Entra session. Target of FR-UA-003 (IQ04) | NFR p.13-14, p.17 | IN SCOPE |
+| EIAM (Microsoft Entra ID), Drop 0 | Out / In | Sign-in with the BDO network account through EIAM; the account is matched to the BIBS user by Windows ID or user principal name; log-out also ends the EIAM session. Target of FR-UA-003 (IQ04); the connection is specified in the Technical Specification, reviewed by BDOI IT | NFR p.13-14, p.17 | IN SCOPE |
 | UIDM-ISC (identity governance), Drop 0 | In / Out | Joiner, mover and leaver provisioning and access certification. Options: the IGA provisions user accounts while role changes stay BIBS requests (proposal), the IGA provisions users and roles, or aggregation only (IQ05, DCR-229) | 1.001-1.009 (request rule, p.6) | OPEN |
 | BDO EUA with Windows ID | Out / In | User ID and password passed at log-in; success or failure with message returned | NFR p.14 | ON HOLD |
-| LDAP / Active Directory | Out / In | Bind authentication, same port | NFR 1.h (p.13) | ON HOLD |
-| SSO (SAML / OIDC) | In | Identity-provider assertion exchanged for a BIBS session | Other BU NFR 4 (p.17) | ON HOLD |
+| LDAP / Active Directory | Out / In | User ID and password checked against the BDO directory | NFR 1.h (p.13) | ON HOLD |
+| SSO (SAML / OIDC) | In | The sign-in of the BDO identity provider opens a BIBS session | Other BU NFR 4 (p.17) | ON HOLD |
 | External ACL | In | Authorisation by an external access-control list | NFR 1.i (p.13) | ON HOLD |
-| All BIBS modules | Out | Effective permissions of the user (menus, buttons, API checks) | 4.002.2 | IN SCOPE |
+| All BIBS modules | Out | Effective permissions of the user (menus, buttons and system functions) | 4.002.2 | IN SCOPE |
 | Portal users (BRD-8 Employee Benefits) | Out | External user requests provisioned on approval (decision D7). Dormant: BDOI drops the EB portal (drop plan item 2.4, IQ22); EXTERNAL requests stay refused | D7 (R4) | OUT |
 | Notifications and e-mail | Out | Request, access-change and batch-failure notices | 1.006.1.1, 1.008.1.4, 2.002.1; NFR 10 | IN SCOPE |
 | Bulk upload | In | Template file of access requests (Bulk Request) | 1.009 | IN SCOPE |
@@ -1724,12 +1724,12 @@ The BRD's NFR section has no IDs; R2 numbers the rows UAM-NFR-01 to UAM-NFR-41. 
 |---|---|---|---|---|
 | UAM-NFR-01 | Capacity and performance | Requestor 14 users / 5 concurrent (enrol, modify, deactivate, reactivate, view: 10 tpm each; bulk 3 tpm); Approver 8 / 3 (10 tpm); BU Admin 4 / 2 (group profile 2 tpm); System Admin 1 / 1 (10 tpm, group profile 2 tpm); reports BU / System Admin 5 / 3 (10 tpm). Response 10 s, reports 20 s (p.11) | Within the BIBS sizing (145 concurrent users); online p95 under 3 seconds, reports under 20 seconds | - |
 | UAM-NFR-02 | Projected volume | 10 transactions per month (average); login / logout, start-up and event reports 14 users / 5 concurrent, 10 per month, 5% growth, 10 s, 0% error; audit log report 5 / 3, 10 per month, 20% growth, 20 s, 0% error (p.11) | No specific sizing needed | - |
-| UAM-NFR-03 | Data retention (databases, logs) | Follow QPS retention policy (p.11) | Retention rules per record type; access requests, change log and session log kept at least as long as the audit trail; QPS values UQ12 | - |
-| UAM-NFR-04 | Scalability, availability, reliability, DR, audit and data management, portability, interoperability, maintainability, environments, migration, support | "Follow existing QPS set up" for every item (vertical / horizontal scaling, operating hours, maintenance windows, HA, uptime, RPO / RTO, backup, DR server, delivery models, web / file / microservice integration, API gateway, ETL, core banking, monitoring, load balancer, environments Dev to DR, data and user migration, QA, training, 24/7 support) (p.11-12) | BIBS deployment standards, the same for every BRD; existing users loaded with the bulk request (FR-UA-019) | - |
+| UAM-NFR-03 | Data retention (records, logs) | Follow QPS retention policy (p.11) | Retention rules per record type; access requests, change log and session log kept at least as long as the audit trail; QPS values UQ12 | - |
+| UAM-NFR-04 | Scalability, availability, reliability, DR, audit and data management, portability, interoperability, maintainability, environments, migration, support | "Follow existing QPS set up" for every item (scaling, operating hours, maintenance windows, high availability, uptime, recovery point and time, backup, disaster recovery, delivery models, integration with other systems, core banking, monitoring, environments from development to disaster recovery, data and user migration, QA, training, 24/7 support) (p.11-12) | The same BIBS standards for every BRD, specified in the Technical Specification, reviewed by BDOI IT; existing users loaded with the bulk request (FR-UA-019) | - |
 | UAM-NFR-05 | Accessibility and channels | Accessibility options for impaired vision or colour blindness; website and mobile website: "Follow existing QPS set up" (p.12) | BDO UX contrast rules; responsive screens for desktop and mobile browsers | - |
-| UAM-NFR-06 | Regulatory and compliance | MORB (BSP), Circular 808 of 2013, AMLA 2001, Data Privacy Act 2012 (p.12) | Four eyes on every access change, least privilege, separation-of-duties rules, deactivation of dormant users, insert-only audit, retention | FR-UA-006, 053 |
-| UAM-NFR-07 | Hardware, software, file locations, embedded IDs | Server / workstation specifications; binaries and logs in standard locations; embedded application user IDs named e_appshortname_description (e.g. p_appname_sftp) (p.12-13) | Container deployment; service accounts named by the BDO convention (for example p_bibs_db) | - |
-| UAM-NFR-08 | Network | No impact on branch / ATM operations, no change to network design; ports, devices, bandwidth, latency, interfaces (p.13) | HTTPS only; hosts and ports are configuration | - |
+| UAM-NFR-06 | Regulatory and compliance | MORB (BSP), Circular 808 of 2013, AMLA 2001, Data Privacy Act 2012 (p.12) | Four eyes on every access change, least privilege, separation-of-duties rules, deactivation of dormant users, an audit trail no user can change, retention | FR-UA-006, 053 |
+| UAM-NFR-07 | Hardware, software, file locations, embedded IDs | Server / workstation specifications; binaries and logs in standard locations; embedded application user IDs named e_appshortname_description (e.g. p_appname_sftp) (p.12-13) | Service accounts named by the BDO convention; servers and software as specified in the Technical Specification, reviewed by BDOI IT | - |
+| UAM-NFR-08 | Network | No impact on branch / ATM operations, no change to network design; ports, devices, bandwidth, latency, interfaces (p.13) | Encrypted connections only; no change to the BDO network; hosts and ports as specified in the Technical Specification, reviewed by BDOI IT | - |
 | UAM-NFR-09 | User and role management 1.a-f | Online modules to view, add, modify, delete master data incl. users and roles; access via roles; more than one user per role; **a user can have more than one role**; accounts can be disabled and re-enabled; maintenance recorded in the application log (p.13) | Users, roles and permissions; several roles per user and users per role; enable / disable, also of dormant users by a job; every change audited (CQ23 answered) | FR-UA-006, 052, 064 |
 | UAM-NFR-10 | User and role management 1.g | Query or report showing the roles assigned to users; exportable (p.13) | Reports UAM-USER-ACCESS and UAM-GROUP-MEMBERS, exportable | FR-UA-060, 062 |
 | UAM-NFR-11 | User and role management 1.h | Supports LDAP or Active Directory authentication (p.13) | Directory authentication added when BDO gives the interface (Q42, UQ04) | FR-UA-003 |
@@ -1742,14 +1742,14 @@ The BRD's NFR section has no IDs; R2 numbers the rows UAM-NFR-01 to UAM-NFR-41. 
 | UAM-NFR-18 | Login logging | Log all valid and invalid attempts (p.14) | Every valid and invalid log-in is audited | FR-UA-001 |
 | UAM-NFR-19 | Lockout | Users are locked out after 3 invalid attempts (p.14) | LOGIN_MAX_FAILED_ATTEMPTS = 3 for every BIBS user | FR-UA-001 |
 | UAM-NFR-20 | Reference / master data management | Online view / add / modify / delete; referential integrity and validation; logical deletion; changes logged; role-based access (p.14) | Lists of Values with maker-checker, effective dates and deactivation instead of delete; audited | - |
-| UAM-NFR-21 | Error logging | Error log with description, time, user ID, module ID, command / SQL; enable / disable; location; rotation; size parameters; native syslog; one line per entry; verbosity and message-type selection; transmit to a remote server (p.14) | One-line structured logs with user and module; levels changeable at run time; shipping to the BDO log server by the platform | - |
-| UAM-NFR-22 | Transaction logging and audit trail | Transaction log with type, time, user ID, module ID; enable / disable; location; transmit; all user activities logged through the audit trail and retrievable by the administrator; allow automatic save option (p.14) | Insert-only audit trail and the Audit Trail screen; meaning of 'automatic save option' is UQ15 | FR-UA-064 |
-| UAM-NFR-23 | Logs retention and archiving | Retention / archival / purging / backup for application, database, audit, infrastructure logs, historical data, snapshots, video, documents: "Follow existing QPS set up" (p.14) | As UAM-NFR-03 (UQ12) | - |
+| UAM-NFR-21 | Error logging | Error log that records each failed action with its details: description, time, user ID and module ID; enable / disable; location; rotation; size; one line per entry; level and message-type selection; sent to a remote log server (p.14) | Every error is logged in one line with the user, the module and the failed action; the log details, levels and the transfer to the BDO log server are specified in the Technical Specification, reviewed by BDOI IT | - |
+| UAM-NFR-22 | Transaction logging and audit trail | Transaction log with type, time, user ID, module ID; enable / disable; location; transmit; all user activities logged through the audit trail and retrievable by the administrator; allow automatic save option (p.14) | Audit trail that no user can change and the Audit Trail screen; meaning of 'automatic save option' is UQ15 | FR-UA-064 |
+| UAM-NFR-23 | Logs retention and archiving | Retention / archival / purging / backup for application, system, audit and infrastructure logs, historical data, snapshots, video, documents: "Follow existing QPS set up" (p.14) | As UAM-NFR-03 (UQ12) | - |
 | UAM-NFR-24 | Batch processing a-l | Schedule, invoke manually, monitor, re-run, graceful terminate, UI without command line, publish status, single instance, restart at the interruption point, no privileged access, multi-core, parallel independent jobs (p.15) | Job scheduler with run history, run on demand, re-run, failure alert; restart without duplicates; status in monitoring | FR-UA-071 |
 | UAM-NFR-25 | Batch failure e-mail | Monitor batch runs, log success and failure; forward an e-mail notification to designated users on failed batch runs (stated twice) (p.15) | Failed runs e-mailed to JOB_FAILURE_RECIPIENTS | FR-UA-071 |
-| UAM-NFR-26 | System monitoring; network configuration; DR | Monitor and start / stop application processes without command line; DNS aliases; configurable ports; no hosts file; standard ports; Netbackup / Bacula, clustering, offsite replication, active-active, disk estimates (p.15) | Platform monitoring, container orchestration, environment-based configuration | - |
+| UAM-NFR-26 | System monitoring; network configuration; DR | Monitor and start / stop application processes without command line; DNS aliases; configurable ports; no hosts file; standard ports; Netbackup / Bacula, clustering, offsite replication, active-active, disk estimates (p.15) | Monitoring, start and stop from the platform tools without a command line, as specified in the Technical Specification, reviewed by BDOI IT | - |
 | UAM-NFR-27 | Data purging and archiving | Automated archiving and purging of transactional data, logs, reports, temporary files; schedule; restricted access; configurable rules (p.15-16) | Retention rules and the monthly retention review; physical archive and purge follow the BIBS retention decision (Q39, UQ12) | - |
-| UAM-NFR-28 | Server and workstation software | Documented install / deploy / update; deploy from repository; runs as a service; multiple instances; dynamic configuration reload; least privilege; browser only on workstations; no proprietary office software; not tied to third-party versions (p.16) | Deployed from the repository; stateless multiple instances; least-privileged database user; browser-only workstations | - |
+| UAM-NFR-28 | Server and workstation software | Documented install / deploy / update; deploy from repository; runs as a service; multiple instances; dynamic configuration reload; least privilege; browser only on workstations; no proprietary office software; not tied to third-party versions (p.16) | Installation, deployment, instances and service accounts as specified in the Technical Specification, reviewed by BDOI IT; users need only a browser on their workstations | - |
 | UAM-NFR-29 | System documentation | Functional design, technical design, user manual, installation guide, release notes, instruction guide on how to manage users and extract the users list and group profile list; troubleshooting guide; training; capacity planning; performance benchmarks (p.16-17) | User-administration guide in the in-app Help Center and the administration guide (UQ18) | - |
 | UAM-NFR-30 | System development, testing and production support | Access to resources outside the BDO network, off-site / on-site development, performance testing; maintenance access (p.17) | Engagement terms | - |
 | UAM-NFR-31 | Other BU NFR 1 | Password management (reset, change) (p.17) | Administrator reset and own change exist | FR-UA-005 |
@@ -1777,7 +1777,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | LOGIN_MAX_FAILED_ATTEMPTS (exists) | 3 | Failed attempts before lock-out; all users |
 | SESSION_IDLE_WARNING_MINUTES (exists) | 15 | Inactivity warning |
 | SESSION_TIMEOUT_MINUTES (exists) | 30 | Inactivity sign-out |
-| SESSION_EXPIRY_WARNING_MINUTES (exists) | 30 | Warning before the fixed token expiry |
+| SESSION_EXPIRY_WARNING_MINUTES (exists) | 30 | Warning before the fixed end of the session |
 | AUTH_MODE | LOCAL | LOCAL, DIRECTORY (EUA) or OIDC (EIAM, Entra ID; target, IQ04) |
 | USER_ID_PATTERN | ^[a-zA-Z][0-9]{9}$ | User ID format (to confirm, UQ05) |
 | PASSWORD_HISTORY_COUNT | 8 | Previous passwords refused (UQ08) |

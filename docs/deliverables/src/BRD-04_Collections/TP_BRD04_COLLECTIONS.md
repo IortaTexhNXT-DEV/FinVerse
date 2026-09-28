@@ -108,7 +108,7 @@ The roles-and-access sheet checks each Collections action against the roles that
 | Positive | The normal flow succeeds with valid data |
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit |
-| Security-access | Screens, buttons and API calls are open only to the roles that hold the permission; four-eyes and reserved dispositions |
+| Security-access | Screens, buttons and system functions are open only to the roles that hold the permission; four-eyes and reserved dispositions |
 | Workflow | A status change of an account, hand-off, plan, promise, escalation, statement or collector request |
 | Report-output | Scheduled files, reports, statements of account and exports; content checked against the screen |
 | Upload-download | The Collections Bulk Update upload, file downloads and e-mailed statements |
@@ -117,7 +117,7 @@ The roles-and-access sheet checks each Collections action against the roles that
 
 The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Test Data, Roles and Access. Case IDs carry their condition: TC-CL-031.2-01 is the first case of condition 2 of FR-CL-031. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Issue ID.
 
-Several cases depend on time: the nightly refresh (22:15), the promise check (22:45), the escalation job (23:00), the daily application file (05:00), the weekly files (Friday 22:30) and the monthly files (first working day). The test lead runs these jobs on demand on SIT, or moves the dates in the test database, as the preconditions describe.
+Several cases depend on time: the nightly refresh (22:15), the promise check (22:45), the escalation job (23:00), the daily application file (05:00), the weekly files (Friday 22:30) and the monthly files (first working day). The test lead runs these jobs on demand on SIT, or moves the dates in the test environment, as the preconditions describe.
 
 # Entry and exit criteria
 
@@ -232,7 +232,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 | Risk | Impact | Mitigation |
 |---|---|---|
 | BDOI answers to open questions change expected results (threshold CQ03, disposition values and categories CQ08, escalation defaults CQ14, kept / broken rule CQ16, SOA layout and recipients CQ18) | Medium | The values are configuration; the affected cases name the parameter, list or rule and are re-run after the change without a change to the system |
-| Time-based cases (nightly jobs, promise dates, file availability, lock expiry, SLA) need the clock to pass | Medium | The test lead runs the jobs on demand and moves dates in the test database, as the preconditions describe |
+| Time-based cases (nightly jobs, promise dates, file availability, lock expiry, SLA) need the clock to pass | Medium | The test lead runs the jobs on demand and moves dates in the test environment, as the preconditions describe |
 | Cashiering does not yet pull the PR 2307 hand-offs (FRS 1.6) | Medium | The cases check the pending item and the CLX_OUTBOX_STALE alert; the 2307 reversal itself is tested through Cashiering's upload in BRD-2 |
 | Seed accounts are changed by earlier cases | Medium | Reload the seed profile between cycles; cases that change a seed account or a parameter say so in their preconditions or expected result |
 | BDOI has not yet confirmed the draft addendum rows (BRCLXN.061-064, CQ01) | Low | Their cases are marked "run after CQ01" and excluded from the exit criteria until BDOI confirms the draft |

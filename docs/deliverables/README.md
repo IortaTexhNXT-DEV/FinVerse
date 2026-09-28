@@ -105,11 +105,27 @@ carry a two-digit prefix so that they sort in reading order (`brand.SIGNOFF_SETS
 
 | No. | Document | Content | Built by |
 |---|---|---|---|
-| 00 | Start Here (Word, 2-3 pages) | Guide to the set: the map of the files, the reading order per role, the steps up to closure with the dates, the SIT sessions, change control | `src/<BRD folder>/START_HERE_<BRD>.md` (map, reading order and steps from `pack/guide.yaml`) |
+| 00 | Start Here (Word, 2-3 pages) | Guide to the set: the map of the files, the reading order per role, the steps up to closure with the dates, the SIT sessions, who signs what, change control | `src/<BRD folder>/START_HERE_<BRD>.md` (map, reading order and steps from `pack/guide.yaml`) |
 | 01 | Sign-off Pack Guide (PowerPoint) | Purpose and what signing means; the pack at a glance; where to start per role; the approach and the steps with RACI, inputs, outputs and durations; how to fill in the workbook; the module at a glance (process flow, personas and menus, key screens); key rules; cross-module map; caveats with worked examples; entry and exit criteria and definition of done; handover checklist; change control; governance and next steps. Speaker notes on every slide | `src/signoff/build_guide_deck.py BRD-nn` from `pack/guide.yaml` and the pack |
 | 02 | FRS v2.0 (Word) | The requirements of v1.x unchanged, plus: navigation (menu by persona, screen-flow diagram); one specification per screen (purpose, who opens it, navigation, screenshots with numbered callouts, field table, actions table, business rules, expected outcome, FR and test links); end-to-end walkthroughs; messages catalogue; notifications; generated documents; upload templates; cross-BRD interface contract; sign-off and change control; screen standards appendix | `src/<BRD folder>/FRS_*.md` with ```pack blocks read from `pack/` |
-| 03 | Sign-off workbook (Excel) | Screen standards, screen catalogue, field register, actions, business rules, messages, notifications, menu by persona, upload templates and cross-BRD contract with the BU review columns (Accept / Change requested / Comment, comment, reviewer, date); comments log (clarification, defect, change request, with the response and status); meeting minutes; version history; sign-off certificate (business owner, Finance, Compliance and BDOI IT for their parts) | `src/signoff/signoff_pack.py BRD-nn` |
+| 03 | Sign-off workbook (Excel) | Screen standards, screen catalogue, field register, actions, business rules, messages, notifications, menu by persona, upload templates and cross-BRD contract with the BU review columns (Accept / Change requested / Comment, comment, reviewer, date); comments log (clarification, defect, change request, with the response and status); meeting minutes; version history; sign-off certificate (the roles of the BRD approval sheet: prepared by, input provided by, reviewed by, approved by, and what each confirms) | `src/signoff/signoff_pack.py BRD-nn` |
 | 04, 05 | Test plan v2.0 (Excel) and its summary (Word) | The cases of v1.x re-traced to FRS v2.0 and its screens, plus screen cases (one per screen) and message cases | `src/testplans/build_test_plan.py` with `src/<BRD folder>/brdnn_cases.yaml` and `TP_*.md` |
+
+**Who signs what.** A sign-off set holds business content only: screens, fields, the columns of lists, reports and
+upload templates the user sees or fills in, validations, business rules, messages, notifications, documents,
+walkthroughs and reports. Technical content (APIs and interfaces between systems, data storage and its structure,
+message formats, migration scripts, internal codes) goes into a separate Technical Specification per set, reviewed by
+BDOI IT; `tools/deliverables/check_pack.py` refuses technical terms in the client documents of the sets. The
+signatories are the roles of the BRD's own approval sheet, defined once per set in `pack/ownership.yaml` and read by
+the 00 Start Here, the 01 guide deck (a responsibility matrix per part of the set: prepares, provides input, reviews,
+approves), the sign-off certificate of the 03 workbook, the drop closure summary and the drop indexes:
+
+| Role (BRD approval sheet) | Signs for |
+|---|---|
+| Prepared by: iorta TechNXT project team; the Business Analyst of Business Project Services (BPS), author of the BRD | The set as issued; the BRD requirements as written, departures listed in the proposed rules and clarifications |
+| Input provided by: the BU representatives of the BRD | The screens, fields, rules and messages of their area |
+| Reviewed by: the Program Manager (BPS); BDOI IT (on the sheet of BRD-1 and BRD-2, added to the others) | Traceability and completeness; interfaces, user access and the Technical Specification, not the business screens |
+| Approved by: the Product Owner ("owns the document and approves all of its contents") and the unit heads of the BRD | The whole set; the content of their units |
 
 **Steps from issue to closure** (the same for every set; the dates of a set are in its Start Here guide):
 

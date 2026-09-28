@@ -1,0 +1,34 @@
+# Who signs what in the BRD-1 New Business sign-off set: one definition, read by 00 Start Here, the 01 guide deck, the
+# sign-off certificate of the 03 workbook, the Drop closure summary and the drop index (signoff_pack.py, "ownership").
+# The roles and units are those of the BRD-1 approval sheets; a role the set adds is marked "Added for this set".
+# The set holds business content only; the technical content is in the Technical Specification, reviewed by BDOI IT.
+source: "BRD-1 approval sheets: Fire and Motor BRD ID consolidation p.128-129; Workshop Addendum p.22 (copy p.44)"
+
+# id: short (matrix cells), role, organisation, capacity (as on the approval sheet), confirms, sheet (where the role
+# is on the approval sheet).
+roles:
+  - {id: ITN, short: iorta TechNXT, role: "iorta TechNXT project team: Project Manager, Business Analysis, test lead", org: iorta TechNXT, capacity: Prepared by, confirms: "The set is complete and consistent as issued, traced to the BRD and to the screens; every comment is answered in the comments log", sheet: Added for this set (author of the FRS set)}
+  - {id: BA, short: BA (BPS), role: "Business Analyst, Enterprise Services Group - Business Project Services (BPS)", org: BDO Unibank ESG, capacity: Prepared by, confirms: "The set states the BRD requirements as written; every departure is listed in the proposed rules and clarifications", sheet: "Prepared by (p.128)"}
+  - {id: MBS, short: MBS, role: "Marketing Business Services and System Support (MBS), BU representatives", org: BDOI, capacity: Input provided by, confirms: "The screens, fields, rules and messages of New Business match the business input", sheet: "p.128; reviewer of the Workshop Addendum (p.22)"}
+  - {id: TSU, short: TSU, role: "Technical Support Unit (TSU), BU representatives", org: BDOI, capacity: Input provided by, confirms: "The PRF, quotation slip, insurer terms and proposal slip screens match the business input", sheet: Added for this set (BU input named in the BRD revision log)}
+  - {id: PGM, short: Program Manager (BPS), role: "Program Manager, Enterprise Services Group - Business Project Services (BPS)", org: BDO Unibank ESG, capacity: Reviewed by, confirms: "Traceability of every BRD requirement to the set and completeness of the set", sheet: "Reviewed by (p.22); Approved by (p.129)"}
+  - {id: IT, short: BDOI IT, role: "BDOI Information Technology Group (BDOI IT)", org: BDOI, capacity: Reviewed by, confirms: "Interfaces, user access and menus, and the Technical Specification (a separate document); not the business screens", sheet: "Reviewed by (p.128)"}
+  - {id: CMP, short: Compliance, role: "Compliance Officer", org: BDOI, capacity: Reviewed by, confirms: "KYC, the screening hand-off and record retention", sheet: Added for this set}
+  - {id: PO, short: Product Owner, role: "Product Owner, Marketing Business System", org: BDOI, capacity: Approved by, confirms: "Owns the set and approves all of its contents", sheet: "Approved by (p.129, p.22)"}
+  - {id: PROC, short: UH Processing, role: "Unit Head - Processing", org: BDOI, capacity: Approved by, confirms: "Payment, placement, issuance and booking", sheet: "Approved by (p.22)"}
+  - {id: CC, short: UH Combank and Corbank, role: "Unit Head - Combank and Corbank", org: BDOI, capacity: Approved by, confirms: "Clients, quotations, PRFs and accounts of Combank and Corbank", sheet: "Approved by (p.129, p.22)"}
+  - {id: RM, short: Head Retail Marketing, role: "Head - Retail Marketing", org: BDOI, capacity: Approved by, confirms: "Clients, quotations and accounts of Retail Marketing", sheet: "Approved by (p.129, p.22)"}
+  - {id: IB, short: Head Institutional Banking, role: "Head of Institutional Banking, SM and BDO Accounts", org: BDOI, capacity: Approved by, confirms: "Clients, quotations and accounts of the institutional accounts", sheet: "Approved by (p.129)"}
+  - {id: COMP, short: Head Comptrollership, role: "Head - Comptrollership", org: BDOI, capacity: Approved by, confirms: "Booking entries, service invoices and the hand-off to Accounting", sheet: "Approved by (p.129)"}
+
+# Part of the set -> role ids that prepare it, provide input, review it and approve it (RACI style).
+parts:
+  - {part: "Screens and fields (FRS screen specifications; workbook Screen catalogue, Field register)", prepares: [ITN], input: [MBS, TSU], reviews: [PGM], approves: [PO, PROC, CC, RM, IB]}
+  - {part: "Business rules and validations", prepares: [ITN], input: [MBS, TSU, BA], reviews: [PGM, CMP], approves: [PO, PROC, CC, RM, IB, COMP]}
+  - {part: "Messages and notifications", prepares: [ITN], input: [MBS], reviews: [PGM], approves: [PO]}
+  - {part: "Documents and reports (slips, advices, service invoices, reports)", prepares: [ITN], input: [MBS, TSU], reviews: [PGM], approves: [PO, PROC, COMP]}
+  - {part: "Walkthroughs (end-to-end, screen by screen)", prepares: [ITN], input: [MBS, TSU], reviews: [PGM], approves: [PO]}
+  - {part: "Proposed business rules and clarifications for confirmation", prepares: [ITN], input: [BA, MBS], reviews: [PGM], approves: [PO]}
+  - {part: "Interfaces, user access and menus by persona", prepares: [ITN], input: [MBS], reviews: [IT], approves: [PO]}
+  - {part: "Test plan (04 workbook, 05 summary)", prepares: [ITN], input: [MBS, TSU], reviews: [PGM, IT], approves: [PO]}
+  - {part: "Technical Specification (separate document, not part of the business sign-off)", prepares: [ITN], input: [IT], reviews: [IT], approves: [IT]}

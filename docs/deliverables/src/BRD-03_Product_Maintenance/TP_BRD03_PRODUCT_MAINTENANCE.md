@@ -110,7 +110,7 @@ The roles-and-access sheet checks each Product Maintenance action against the ro
 | Positive | The normal flow succeeds with valid data |
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit |
-| Security-access | Screens, buttons and API calls are open only to the roles that hold the permission; four-eyes rules |
+| Security-access | Screens, buttons and system functions are open only to the roles that hold the permission; four-eyes rules |
 | Workflow | A stage transition, return or closure of PM_PACKAGE_REQUEST or of a package version |
 | Report-output | Reports, comparative outputs and exports; content checked against the screen |
 | Upload-download | Documents uploaded to a request and files downloaded or e-mailed from it |
@@ -239,7 +239,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 | BDOI document layouts and password convention not yet given (Q03, Q07) | Medium | Documents are tested on the draft layouts; the Upload-download and Report-output cases are re-run when the layouts are loaded |
 | Seed data is changed by earlier cases (for example PKR-2026-900004 signed off) | Medium | Reload the seed between cycles; cases that change a seed request are marked in their preconditions |
 | Test mailboxes of insurers not reachable from SIT or UAT | High | Check the relay before the cycle (entry criterion); QS and advisory cases read the E-mails tab when the mailbox is down and are re-run later |
-| Time-based cases (SLA at 80 %, expiry at 60, 30 and 7 days) need the clock to pass | Medium | The test lead moves stage-entry times and end dates in the test database, as the preconditions describe |
+| Time-based cases (SLA at 80 %, expiry at 60, 30 and 7 days) need the clock to pass | Medium | The test lead moves stage-entry times and end dates in the test environment, as the preconditions describe |
 | Four-eyes cases need a user holding two roles | Low | The test lead creates the combined test users listed in the preconditions and removes them after the cycle |
 | BDOI testers are not available in the UAT window | High | Agree named testers per department and dates in the UAT plan (deliverable 30) before UAT starts |
 

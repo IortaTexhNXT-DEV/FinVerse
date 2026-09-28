@@ -97,7 +97,7 @@ screens:
   PARAMS: Administration > System Parameters
   JOBS: Administration > Scheduled Jobs
   NOTIF: Notifications (bell icon in the page header)
-  API: Direct request outside the screens, signed in as the persona (test lead tool)
+  SYS: System function check outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-OP-01
@@ -231,7 +231,7 @@ frs:
         expected: Remittance screens are listed; Cashiering Setup and the Disbursement Queue are not, and the direct links show the no-access page.
       - c: 2
         type: Security-access
-        screen: API
+        screen: SYS
         title: Batch approval without REMIT_APPROVE
         steps:
           - As remit send a direct request to approve a batch for approval.
@@ -313,7 +313,7 @@ frs:
       - c: 3
         type: Negative
         persona: SYSADMIN
-        screen: API
+        screen: SYS
         title: Replay without scope
         steps:
           - Send a direct request to replay invoices with no invoice, ARN or company.
@@ -611,7 +611,7 @@ frs:
         msg: [Official receipts are issued by Head Office only (CSHID.006), OR_HEAD_OFFICE_ONLY]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: OR without a line
         steps:
           - Send a direct request to issue an OR with no line.
@@ -684,7 +684,7 @@ frs:
         msg: ["Enter the <fields> (CSHID.005)", REINSTATEMENT_FIELDS_REQUIRED]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Reinstate an issued receipt
         steps:
           - Call reinstate on an ISSUED AR.
@@ -1057,7 +1057,7 @@ frs:
         title: Audit rows cannot change
         steps:
           - Look for edit or delete on the receipt's audit rows.
-        expected: None is offered; the database refuses changes.
+        expected: None is offered; an attempt to change an entry outside the screens is refused.
 
   FR-OP-025:
     scenario: SC-OP-03
@@ -1083,7 +1083,7 @@ frs:
         msg: ["<batch> has no failures", PRINT_NOTHING_FAILED]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Empty selection
         steps:
           - Send a direct request to create a print batch with no receipt.
@@ -1151,7 +1151,7 @@ frs:
       - c: 1
         type: Negative
         persona: CASHIER
-        screen: API
+        screen: SYS
         title: Journal without a rule is not posted silently
         pre: In SIT the test lead disables the accounting rule of OPS_PAYMENT_APPLY.
         steps:
@@ -1183,7 +1183,7 @@ frs:
       - c: 2
         type: Security-access
         persona: DISBURSEMENT
-        screen: API
+        screen: SYS
         title: Report export without OPS_REPORT_EXPORT
         steps:
           - As disb export CSH-APPLIED-PREM.
@@ -1298,7 +1298,7 @@ frs:
     cases:
       - c: 1
         type: Negative
-        screen: API
+        screen: SYS
         title: Amounts of a line cannot be edited
         steps:
           - Look for edit on a line; send a direct request to change the line amount.
@@ -1548,7 +1548,7 @@ frs:
       - c: 2
         type: Security-access
         persona: CASHIER
-        screen: API
+        screen: SYS
         title: Search without REMIT_PROCESS
         steps:
           - As cashier send a direct request to open the DTIP search.
@@ -1609,7 +1609,7 @@ frs:
       - c: 2
         type: Security-access
         persona: MKT_COLLECTION
-        screen: API
+        screen: SYS
         title: Export without OPS_REPORT_EXPORT
         steps:
           - As mktcoll export REM-TRACKER.
@@ -1748,7 +1748,7 @@ frs:
         expected: The request is For posting.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Extension with premium validated for posting
         steps:
           - Send a direct request for the action Validate for posting on a cover extension with additional premium.
@@ -2022,7 +2022,7 @@ frs:
       - c: 2
         type: Security-access
         persona: CASHIER
-        screen: API
+        screen: SYS
         title: Workbench without ADJ permissions
         steps:
           - As cashier send a direct request to open the adjustment requests.
@@ -2171,7 +2171,7 @@ frs:
       - c: 2
         type: Security-access
         persona: CASHIER
-        screen: API
+        screen: SYS
         title: Send without RECON_SEND
         steps:
           - As cashier send a direct request to send an extract.
@@ -2239,7 +2239,7 @@ frs:
         expected: The booked account missing from the feedback is BDOI_ONLY.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Automatch a closed cycle
         steps:
           - Close a cycle; send a direct request to run the automatch on it.
@@ -2379,7 +2379,7 @@ frs:
       - c: 2
         type: Security-access
         persona: DISBURSEMENT
-        screen: API
+        screen: SYS
         title: Export without rights
         steps:
           - As disb export PRC-SUMMARY.
@@ -2675,7 +2675,7 @@ frs:
       - c: 2
         type: Security-access
         persona: MKT_COLLECTION
-        screen: API
+        screen: SYS
         title: Export without rights
         steps:
           - As mktcoll export the CMR report.
@@ -2880,7 +2880,7 @@ frs:
       - c: 2
         type: Security-access
         persona: REMIT_PROCESSOR
-        screen: API
+        screen: SYS
         title: Queue without DISB_PROCESS
         steps:
           - As remit send a direct request to create a DV for a disbursement request.

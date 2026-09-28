@@ -30,6 +30,17 @@ public class UserDirectoryService {
   }
 
   /**
+   * Lists every directory entry with its role name, ordered by login id (server-side use, e.g.
+   * exports; the API gives the role names according to the caller).
+   *
+   * @return entries
+   */
+  @Transactional(readOnly = true)
+  public List<Entry> entries() {
+    return entries(true, null);
+  }
+
+  /**
    * Lists the directory entries, ordered by login id.
    *
    * @param withRoles whether the role names of every user are given

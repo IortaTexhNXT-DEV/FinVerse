@@ -9,8 +9,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 /**
- * Builds the {@link JwtAuthenticationFilter} of the user security chain from its collaborators
- * (not a filter bean itself, so the servlet container does not register it a second time).
+ * Builds the {@link JwtAuthenticationFilter} of the user security chain from its collaborators (not
+ * a filter bean itself, so the servlet container does not register it a second time).
  */
 @Component
 public class JwtFilterFactory {

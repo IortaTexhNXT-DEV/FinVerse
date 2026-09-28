@@ -159,7 +159,9 @@ public class OidcClient {
               .body(JsonNode.class);
     } catch (RestClientException ex) {
       throw new SsoException(
-          SsoException.PROVIDER_ERROR, "The token endpoint refused the code: " + ex.getMessage(), ex);
+          SsoException.PROVIDER_ERROR,
+          "The token endpoint refused the code: " + ex.getMessage(),
+          ex);
     }
     if (answer == null || !answer.hasNonNull("id_token")) {
       throw new SsoException(SsoException.PROVIDER_ERROR, "The token answer has no ID token");

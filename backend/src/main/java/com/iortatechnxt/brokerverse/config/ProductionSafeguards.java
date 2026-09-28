@@ -242,7 +242,8 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
 
   private static void requireSingleSignOnSecrets(Environment env, List<String> problems) {
     if (!env.getProperty("brokerverse.security.sso.oidc.issuer", "").isBlank()) {
-      require(env, "brokerverse.security.sso.oidc.client-id", "BROKERVERSE_OIDC_CLIENT_ID", problems);
+      require(
+          env, "brokerverse.security.sso.oidc.client-id", "BROKERVERSE_OIDC_CLIENT_ID", problems);
       require(
           env,
           "brokerverse.security.sso.oidc.client-secret",

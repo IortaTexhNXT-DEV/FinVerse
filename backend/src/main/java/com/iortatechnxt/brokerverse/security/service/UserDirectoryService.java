@@ -31,11 +31,16 @@ public class UserDirectoryService {
   /**
    * Lists the directory entries, ordered by login id.
    *
+   * @param withRoles whether the role names of every user are given
+   * @param self login id of the caller, whose own role name is always given
    * @return entries
    */
   @Transactional(readOnly = true)
-  public List<Entry> entries() {
-    return users.findAll(Sort.by("username")).stream().map(UserDirectoryService::entry).toList();
+  public List<Entry> entries(boolean withRoles, String self) {
+    return users.findAll(Sort.by("username")).stream()
+        .map(UserDirectoryService::entry)
+        .map(e -> withRoles || e.username().equalsIgnoreCase(self) ? e : e.withoutRole())
+        .toList();
   }
 
   private static Entry entry(AppUser user) {
@@ -59,5 +64,15 @@ public class UserDirectoryService {
    * @param displayName full name shown on screens
    * @param roleName name of the user's main active role, null when none
    */
-  public record Entry(String username, String displayName, String roleName) {}
+  public record Entry(String username, String displayName, String roleName) {
+
+    /**
+     * The entry without its role name.
+     *
+     * @return entry
+     */
+    public Entry withoutRole() {
+      return new Entry(username, displayName, null);
+    }
+  }
 }

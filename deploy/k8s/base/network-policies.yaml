@@ -47,7 +47,9 @@ spec:
       ports:
         - { protocol: TCP, port: 8443 }
 ---
-# Metrics scraping (Prometheus / CloudWatch agent) from the monitoring namespace.
+# Metrics scraping (Prometheus / CloudWatch agent) from the monitoring namespace, on the management
+# port only (BROKERVERSE_MANAGEMENT_PORT 9090: /actuator/prometheus without a user token). No other
+# source reaches 9090 (default-deny-all), and the load balancer never publishes it.
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -59,7 +61,7 @@ spec:
     - from:
         - namespaceSelector: { matchLabels: { kubernetes.io/metadata.name: monitoring } }
       ports:
-        - { protocol: TCP, port: 8443 }
+        - { protocol: TCP, port: 9090 }
 ---
 # Backend -> RDS PostgreSQL (5432), ElastiCache Redis (6379), MSK SASL/SCRAM (9096) and IAM (9098).
 apiVersion: networking.k8s.io/v1

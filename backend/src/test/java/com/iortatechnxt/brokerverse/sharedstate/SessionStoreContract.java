@@ -74,8 +74,8 @@ abstract class SessionStoreContract {
     podB.reset(user);
     assertThat(podA.recordFailure(user, 0)).isEqualTo(1);
 
-    LoginRateLimiter limiterA = new LoginRateLimiter(counters(), settings);
-    LoginRateLimiter limiterB = new LoginRateLimiter(otherInstanceCounters(), settings);
+    LoginRateLimiter limiterA = new LoginRateLimiter(counters(), null, settings, null);
+    LoginRateLimiter limiterB = new LoginRateLimiter(otherInstanceCounters(), null, settings, null);
     String address = "10.0.0." + UUID.randomUUID().toString().substring(0, 4);
     assertThat(limiterA.tryAcquire(address)).isTrue();
     assertThat(limiterB.tryAcquire(address)).isTrue();

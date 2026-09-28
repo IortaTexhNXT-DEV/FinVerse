@@ -31,6 +31,9 @@ public class MailDispatcher {
 
   private static final int DEFAULT_ATTEMPTS = 3;
 
+  /** Sender on a developer's machine when nothing is configured. */
+  static final String LOCAL_SENDER = "no-reply@localhost";
+
   private final OutboundMessageRepository messages;
   private final OutboundAttachmentRepository attachments;
   private final MailTransport transport;
@@ -39,6 +42,8 @@ public class MailDispatcher {
   private final Clock clock;
   private final boolean dispatchOnCommit;
   private final StoredFileService storedFiles;
+  private final String configuredSender;
+  private final boolean local;
 
   /**
    * Creates the dispatcher.
@@ -54,6 +59,10 @@ public class MailDispatcher {
    * @param kafkaDelivers true when the Kafka consumer delivers queued messages ({@code
    *     brokerverse.kafka.enabled}); the delivery after commit is then skipped
    * @param storedFiles file store (attachments as sent)
+   * @param configuredSender sender of the deployment ({@code brokerverse.mail.from-address}); it
+   *     takes precedence over the parameter {@code MAIL_FROM_ADDRESS}
+   * @param environment kind of environment; only {@code local} falls back to {@value #LOCAL_SENDER}
+   *     when no sender is configured
    */
   public MailDispatcher(
       OutboundMessageRepository messages,
@@ -64,8 +73,12 @@ public class MailDispatcher {
       Clock clock,
       @Value("${brokerverse.mail.dispatch-on-commit:true}") boolean dispatchOnCommit,
       @Value("${brokerverse.kafka.enabled:false}") boolean kafkaDelivers,
-      StoredFileService storedFiles) {
+      StoredFileService storedFiles,
+      @Value("${brokerverse.mail.from-address:}") String configuredSender,
+      @Value("${brokerverse.environment:local}") String environment) {
     this.storedFiles = storedFiles;
+    this.configuredSender = configuredSender == null ? "" : configuredSender.trim();
+    this.local = "local".equalsIgnoreCase(environment == null ? "" : environment.trim());
     this.messages = messages;
     this.attachments = attachments;
     this.transport = transport;
@@ -129,9 +142,16 @@ public class MailDispatcher {
         attachments.findByMessageIdOrderById(message.getId()).stream()
             .map(a -> new MessageFile(a.getFileName(), a.getMimeType(), content(a)))
             .toList();
+    String sender = sender();
+    if (sender.isEmpty()) {
+      message.markAttemptFailed(
+          "No sender address is configured (BROKERVERSE_MAIL_FROM)",
+          parameters.intValue("MAIL_MAX_ATTEMPTS", DEFAULT_ATTEMPTS));
+      return;
+    }
     MailEnvelope envelope =
         new MailEnvelope(
-            parameters.text("MAIL_FROM_ADDRESS", "no-reply@localhost"),
+            sender,
             split(message.getRecipients()),
             split(message.getCc()),
             message.getSubject(),
@@ -144,6 +164,21 @@ public class MailDispatcher {
       message.markAttemptFailed(
           e.getMessage(), parameters.intValue("MAIL_MAX_ATTEMPTS", DEFAULT_ATTEMPTS));
     }
+  }
+
+  /**
+   * The sender: the deployment's address, else the parameter {@code MAIL_FROM_ADDRESS}, else (on a
+   * developer's machine only) {@value #LOCAL_SENDER}; empty when none applies.
+   */
+  private String sender() {
+    if (!configuredSender.isEmpty()) {
+      return configuredSender;
+    }
+    String parameter = parameters.text("MAIL_FROM_ADDRESS", "").trim();
+    if (!parameter.isEmpty()) {
+      return parameter;
+    }
+    return local ? LOCAL_SENDER : "";
   }
 
   /**

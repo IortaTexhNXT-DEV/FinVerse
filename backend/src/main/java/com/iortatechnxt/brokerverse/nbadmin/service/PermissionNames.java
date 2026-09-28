@@ -28,7 +28,7 @@ public final class PermissionNames {
   private static final Set<String> ACRONYMS =
       Set.of(
           "TSU", "MBS", "QS", "PRF", "KYC", "AML", "STR", "ACSL", "FRBS", "GL", "AR", "AP", "DV",
-          "PR", "OR", "SOA", "EOD", "BIR", "VAT", "EWT", "SL", "SOD", "CSF", "ID", "LAMD");
+          "PR", "OR", "SOA", "EOD", "BIR", "VAT", "EWT", "SL", "SOD", "CSF", "ID", "LAMD", "MFA");
 
   private PermissionNames() {}
 

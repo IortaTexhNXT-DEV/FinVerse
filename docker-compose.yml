@@ -70,8 +70,14 @@ services:
       BROKERVERSE_DB_URL: jdbc:postgresql://db:5432/brokerverse
       BROKERVERSE_DB_USER: brokerverse
       BROKERVERSE_DB_PASSWORD: ${BROKERVERSE_DB_PASSWORD:-brokerverse}
+      # Documented local values of this stack only (every shared environment sets its own secrets;
+      # a non-local BROKERVERSE_ENVIRONMENT refuses these development values at start-up).
+      BROKERVERSE_ENVIRONMENT: local
       BROKERVERSE_JWT_SECRET: ${BROKERVERSE_JWT_SECRET:-change-me-local-only-0123456789abcdefghij}
+      BROKERVERSE_MIGRATION_MASKING_KEY: ${BROKERVERSE_MIGRATION_MASKING_KEY:-change-me-local-only-masking-key-0123456789}
+      BROKERVERSE_MFA_ENCRYPTION_KEY: ${BROKERVERSE_MFA_ENCRYPTION_KEY:-bG9jYWwtb25seS1rZXktb2YtdGhlLXNlY29uZC1mYWM=}
       BROKERVERSE_ALLOWED_ORIGINS: http://localhost:8081
+      BROKERVERSE_PASSWORD_RESET_URL: http://localhost:8081/reset-password
       BROKERVERSE_ADMIN_INITIAL_PASSWORD: ${BROKERVERSE_ADMIN_INITIAL_PASSWORD:-}
       BROKERVERSE_REDIS_ENABLED: ${BROKERVERSE_REDIS_ENABLED:-true}
       BROKERVERSE_REDIS_HOST: redis

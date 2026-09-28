@@ -16,6 +16,10 @@ spec:
     rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: /actuator/prometheus
       labels: { app.kubernetes.io/name: bibs-jobs, app.kubernetes.io/component: backend, bibs/tier: backend }
     spec:
       serviceAccountName: bibs-jobs
@@ -35,7 +39,8 @@ spec:
       containers:
         - name: backend
           image: bibs-backend
-          ports: [{ name: https, containerPort: 8443 }]
+          # management: health and Prometheus metrics, reachable from the monitoring namespace only.
+          ports: [{ name: https, containerPort: 8443 }, { name: management, containerPort: 9090 }]
           env:
             - { name: BROKERVERSE_RUNTIME_ROLE, value: jobs }
           envFrom:
@@ -45,15 +50,15 @@ spec:
             requests: { cpu: "1", memory: "3Gi" }
             limits: { cpu: "2", memory: "4Gi" }
           startupProbe:
-            httpGet: { path: /actuator/health/liveness, port: https, scheme: HTTPS }
+            httpGet: { path: /livez, port: https, scheme: HTTPS }
             periodSeconds: 10
             failureThreshold: 30
           readinessProbe:
-            httpGet: { path: /actuator/health/readiness, port: https, scheme: HTTPS }
+            httpGet: { path: /readyz, port: https, scheme: HTTPS }
             periodSeconds: 15
             failureThreshold: 3
           livenessProbe:
-            httpGet: { path: /actuator/health/liveness, port: https, scheme: HTTPS }
+            httpGet: { path: /livez, port: https, scheme: HTTPS }
             periodSeconds: 30
             failureThreshold: 4
           securityContext:

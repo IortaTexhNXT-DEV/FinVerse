@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.security.service;
 
 import com.iortatechnxt.brokerverse.security.domain.SessionEndReason;
+import com.iortatechnxt.brokerverse.security.service.sso.SsoSignIn;
 import com.iortatechnxt.brokerverse.system.service.JobOutcome;
 import com.iortatechnxt.brokerverse.system.service.ManagedJob;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
@@ -29,6 +30,7 @@ public class AuthSessionSweepJob implements ManagedJob {
   private final UserSessionLog sessions;
   private final SystemParameterService parameters;
   private final String cron;
+  private final SsoSignIn sso;
 
   /**
    * Creates the job.
@@ -36,11 +38,14 @@ public class AuthSessionSweepJob implements ManagedJob {
    * @param sessions session log
    * @param parameters business parameters (inactivity sign-out)
    * @param cron schedule
+   * @param sso single sign-on (its expired requests and tickets are removed)
    */
   public AuthSessionSweepJob(
       UserSessionLog sessions,
       SystemParameterService parameters,
-      @Value("${brokerverse.jobs.user-session-sweep-cron:0 */15 * * * *}") String cron) {
+      @Value("${brokerverse.jobs.user-session-sweep-cron:0 */15 * * * *}") String cron,
+      SsoSignIn sso) {
+    this.sso = sso;
     this.sessions = sessions;
     this.parameters = parameters;
     this.cron = cron;
@@ -69,6 +74,7 @@ public class AuthSessionSweepJob implements ManagedJob {
                     SystemParameterService.SESSION_TIMEOUT_MINUTES, DEFAULT_TIMEOUT_MINUTES))
             .plusSeconds(UserSessionLog.TOUCH_INTERVAL_SECONDS);
     Map<SessionEndReason, Long> ended = sessions.sweep(idle);
+    sso.purgeExpired();
     long total = ended.values().stream().mapToLong(Long::longValue).sum();
     String detail =
         ended.isEmpty()

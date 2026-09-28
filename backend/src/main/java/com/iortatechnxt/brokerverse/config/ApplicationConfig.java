@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.config;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.security.service.LoginProtectionProperties;
 import com.iortatechnxt.brokerverse.security.service.SecurityProperties;
+import com.iortatechnxt.brokerverse.security.service.sso.SsoProperties;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
@@ -22,7 +23,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
  */
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
-@EnableConfigurationProperties({SecurityProperties.class, LoginProtectionProperties.class})
+@EnableConfigurationProperties({
+  SecurityProperties.class,
+  LoginProtectionProperties.class,
+  SsoProperties.class
+})
 public class ApplicationConfig {
 
   private static final String BEARER = "bearerAuth";

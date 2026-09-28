@@ -37,6 +37,24 @@ class UserDirectoryIT {
   }
 
   @Test
+  @WithUserDetails("ao")
+  void givesTheRolesOfOtherUsersOnlyToUserAdministrators() throws Exception {
+    mvc.perform(get("/api/v1/users/directory"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[?(@.username == 'ao')].roleName").isNotEmpty())
+        .andExpect(jsonPath("$[?(@.username == 'admin')].displayName").isNotEmpty())
+        .andExpect(jsonPath("$[?(@.username == 'admin')].roleName").isEmpty());
+  }
+
+  @Test
+  @WithUserDetails("admin")
+  void userAdministratorsSeeTheRoleNames() throws Exception {
+    mvc.perform(get("/api/v1/users/directory"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[?(@.username == 'ao')].roleName").isNotEmpty());
+  }
+
+  @Test
   void refusesAnonymousCallers() throws Exception {
     mvc.perform(get("/api/v1/users/directory")).andExpect(status().isUnauthorized());
   }

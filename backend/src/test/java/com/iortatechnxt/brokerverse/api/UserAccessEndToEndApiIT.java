@@ -149,9 +149,10 @@ class UserAccessEndToEndApiIT {
     api.doGet("admin", "/api/v1/admin/sessions?username=" + userId)
         .andExpect(jsonPath("$.content[*].endReason", hasItem("ADMIN_ENDED")));
     bearer(get("/api/v1/auth/me"), token, null).andExpect(status().isUnauthorized());
-    // A deactivated user is told so, and the attempt does not count towards the lock-out.
+    // A deactivated user gets the one sign-in failure message (the audit trail has the reason),
+    // and the attempt does not count towards the lock-out.
     assertThat(login(userId, NEW_PASSWORD, status().isUnauthorized()).get("detail").asText())
-        .isEqualTo("Your account is deactivated. Contact your administrator.");
+        .isEqualTo("Invalid user name or password");
 
     assertTheAuditLog(userId, modifyNo, disableNo);
     assertThat(auditLog(null)).contains(profileNo);

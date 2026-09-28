@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.security.service.SharedCounterStore;
 import com.iortatechnxt.brokerverse.security.service.TokenRevocationStore;
+import com.iortatechnxt.brokerverse.sharedstate.service.JdbcCounters;
 import com.iortatechnxt.brokerverse.sharedstate.service.JdbcSessionStore;
 import com.iortatechnxt.brokerverse.sharedstate.service.SharedStateCleanupJob;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
@@ -30,7 +31,7 @@ class JdbcSessionStoreIT extends SessionStoreContract {
 
   @Override
   SharedCounterStore otherInstanceCounters() {
-    return new JdbcSessionStore(jdbc, clock);
+    return new JdbcSessionStore(jdbc, clock, new JdbcCounters(jdbc, clock));
   }
 
   @Override

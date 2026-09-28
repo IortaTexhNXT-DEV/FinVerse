@@ -41,7 +41,7 @@ export function ReceiptSummaryCard({ receipt }: Readonly<{ receipt: ReceiptDetai
         { icon: CreditCard, label: 'Mode', value: mode },
         {
           icon: Coins,
-          label: 'Currency / BOOK Rate',
+          label: 'Currency / Book Rate',
           value: `${s.currency} · ${receipt.bookRate.toFixed(4)}`,
         },
       ]}

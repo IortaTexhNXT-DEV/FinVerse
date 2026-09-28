@@ -64,7 +64,7 @@ function columns(selected: string[], toggle: (no: string) => void): Column<OpsIn
     {
       key: 'assured',
       header: 'Assured',
-      render: (i) => <CellStack main={i.assuredName} sub={i.clientCode} />,
+      render: (i) => i.assuredName,
     },
     { key: 'insurer', header: 'Insurer', render: (i) => <InsurerName code={i.insurerCode} /> },
     {

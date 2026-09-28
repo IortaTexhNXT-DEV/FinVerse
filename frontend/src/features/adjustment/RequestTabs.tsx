@@ -120,7 +120,7 @@ export function PolicyTab({ request: r }: Readonly<{ request: EndorsementRequest
       </Link>,
     ],
     ['Placement Slip', p?.slipNo],
-    ['Client', `${r.invoice.assuredName} (${r.invoice.clientCode})`],
+    ['Client', r.invoice.assuredName],
     ['Insurer', <InsurerName key="ins" code={r.invoice.insurerCode} />],
     ['Product', <ProductName key="prd" code={p?.productCode} />],
     ['Period of Cover', formatPeriod(p?.periodFrom, p?.periodTo)],

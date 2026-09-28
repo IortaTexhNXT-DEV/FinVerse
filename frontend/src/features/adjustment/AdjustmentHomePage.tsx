@@ -45,7 +45,7 @@ const COLUMNS: Column<RequestSummary>[] = [
   {
     key: 'assured',
     header: 'Assured',
-    render: (r) => <CellStack main={r.assuredName} sub={r.policy?.clientCode} />,
+    render: (r) => r.assuredName,
   },
   {
     key: 'insurer',

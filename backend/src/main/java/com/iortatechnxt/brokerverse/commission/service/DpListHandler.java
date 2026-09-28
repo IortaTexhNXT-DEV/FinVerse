@@ -127,12 +127,10 @@ public class DpListHandler implements FlowInHandler {
       throw new BusinessRuleException(
           "DP_LIST_NAME", "The date in " + fileName + " is not a date (yyyyMMdd)", ex);
     }
-    String raw = m.group(1).strip();
-    boolean headOffice = headOfficeCode != null && headOfficeCode.equalsIgnoreCase(raw);
-    return new Origin(
-        headOffice ? ListSource.HEAD_OFFICE : ListSource.BRANCH,
-        raw.toUpperCase(Locale.ROOT),
-        date);
+    String code = m.group(1).strip().toUpperCase(Locale.ROOT);
+    boolean headOffice =
+        headOfficeCode != null && headOfficeCode.toUpperCase(Locale.ROOT).equals(code);
+    return new Origin(headOffice ? ListSource.HEAD_OFFICE : ListSource.BRANCH, code, date);
   }
 
   private Long companyOf(ParsedFile parsed) {

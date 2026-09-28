@@ -114,4 +114,13 @@
     <Package name="~com\.iortatechnxt\.brokerverse\.submitted\..*"/>
     <Bug pattern="IMPROPER_UNICODE"/>
   </Match>
+  <!--
+    IMPROPER_UNICODE in DpListHandler: the branch code comes from the DP list file name, which the
+    NAME pattern limits to ASCII letters, digits, spaces, dots and hyphens; it is upper-cased only to
+    compare it with the head-office code of the client profile. No security decision depends on it.
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.brokerverse.commission.service.DpListHandler"/>
+    <Bug pattern="IMPROPER_UNICODE"/>
+  </Match>
 </FindBugsFilter>

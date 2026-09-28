@@ -62,7 +62,9 @@ class ClientNeutralityTest {
   /** A TypeScript string or template literal. */
   private static final Pattern TS_STRING =
       Pattern.compile(
-          "'([^'\\\\\\n]*+(?:\\\\.[^'\\\\\\n]*+)*+)'|\"([^\"\\\\\\n]*+(?:\\\\.[^\"\\\\\\n]*+)*+)\"|`([^`\\\\]*+(?:\\\\.[^`\\\\]*+)*+)`");
+          "'([^'\\\\\\n]*+(?:\\\\.[^'\\\\\\n]*+)*+)'"
+              + "|\"([^\"\\\\\\n]*+(?:\\\\.[^\"\\\\\\n]*+)*+)\""
+              + "|`([^`\\\\]*+(?:\\\\.[^`\\\\]*+)*+)`");
 
   /** JSX text between tags, e.g. {@code <th>Name</th>}. */
   private static final Pattern JSX_TEXT = Pattern.compile(">([^<>{}]*[A-Za-z][^<>{}]*)<");

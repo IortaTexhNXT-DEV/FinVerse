@@ -204,6 +204,13 @@ public class InsuranceAdviceService {
                     account.getInsurerCode(),
                     policies),
                 new AdviceDocument(trigger, text.versionTag(), iaNo + ".pdf", sha256(pdf), pdf)));
+    store(account, saved, pdf);
+    audit.record(
+        ENTITY, iaNo, AuditAction.CREATE, "Insurance Advice for " + arn + " (" + trigger + ")");
+    return saved;
+  }
+
+  private void store(Account account, InsuranceAdvice saved, byte[] pdf) {
     saved.storedIn(
         storedFiles
             .storeChecked(
@@ -217,9 +224,6 @@ public class InsuranceAdviceService {
                 PDF,
                 FileOrigin.GENERATED)
             .getId());
-    audit.record(
-        ENTITY, iaNo, AuditAction.CREATE, "Insurance Advice for " + arn + " (" + trigger + ")");
-    return saved;
   }
 
   private String insurerName(Account account) {

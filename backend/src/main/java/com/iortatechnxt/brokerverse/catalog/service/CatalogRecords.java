@@ -109,6 +109,7 @@ public class CatalogRecords {
   public AuthorizableEntity deactivate(CatalogKind kind, Long id) {
     requireAny(kind.maintainers(), "deactivate");
     AuthorizableEntity entity = get(kind, id);
+    hooks.forEach(h -> h.deactivating(kind, entity));
     entity.deactivate();
     audit.record(kind.label(), reference(entity), AuditAction.DEACTIVATE, "Deactivated");
     hooks.forEach(h -> h.deactivated(kind, entity));

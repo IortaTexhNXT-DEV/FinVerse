@@ -8,14 +8,19 @@ import com.iortatechnxt.brokerverse.catalog.domain.SalesOfficerRepository;
 import com.iortatechnxt.brokerverse.catalog.domain.SalesUnit;
 import com.iortatechnxt.brokerverse.catalog.domain.SalesUnit.UnitDetails;
 import com.iortatechnxt.brokerverse.catalog.domain.SalesUnitRepository;
+import com.iortatechnxt.brokerverse.common.domain.AuthorizableEntity;
+import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.dimension.domain.DimensionType;
 import com.iortatechnxt.brokerverse.dimension.service.DimensionService;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
+import java.time.Clock;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -28,7 +33,9 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
-public class SalesOrganisationService {
+public class SalesOrganisationService implements CatalogRecordHook {
+
+  private static final String REASON_REQUIRED = "REASON_REQUIRED";
 
   private final SalesUnitRepository units;
   private final SalesOfficerRepository officers;
@@ -36,6 +43,7 @@ public class SalesOrganisationService {
   private final AppUserRepository users;
   private final AuditTrailService audit;
   private final UserDirectory directory;
+  private final Clock clock;
 
   /**
    * Creates the service.
@@ -46,6 +54,7 @@ public class SalesOrganisationService {
    * @param users users
    * @param audit audit trail
    * @param directory user directory (display names in texts)
+   * @param clock clock (assignment dates)
    */
   public SalesOrganisationService(
       SalesUnitRepository units,
@@ -53,13 +62,15 @@ public class SalesOrganisationService {
       DimensionService dimensions,
       AppUserRepository users,
       AuditTrailService audit,
-      UserDirectory directory) {
+      UserDirectory directory,
+      Clock clock) {
     this.units = units;
     this.officers = officers;
     this.dimensions = dimensions;
     this.users = users;
     this.audit = audit;
     this.directory = directory;
+    this.clock = clock;
   }
 
   /**
@@ -134,10 +145,12 @@ public class SalesOrganisationService {
               && units
                   .findByCompanyIdAndCode(companyId, details.parentCode())
                   .filter(p -> p.getLevel() == parentLevel)
+                  .filter(p -> p.getRecordStatus() != RecordStatus.INACTIVE)
                   .isPresent();
       if (!parentOk) {
         throw new BusinessRuleException(
-            "SALES_PARENT_INVALID", "A " + level + " must belong to a " + parentLevel);
+            "SALES_PARENT_INVALID",
+            "A " + label(level) + " must belong to an active " + label(parentLevel));
       }
     }
     dimensions.validateOptional(companyId, DimensionType.COST_CENTER, details.costCenter());
@@ -155,8 +168,11 @@ public class SalesOrganisationService {
     units
         .findByCompanyIdAndCode(companyId, teamCode)
         .filter(u -> u.getLevel() == SalesLevel.TEAM)
+        .filter(u -> u.getRecordStatus() != RecordStatus.INACTIVE)
         .orElseThrow(
-            () -> new BusinessRuleException("SALES_TEAM_UNKNOWN", "Unknown team " + teamCode));
+            () ->
+                new BusinessRuleException(
+                    "SALES_TEAM_UNKNOWN", "Team " + teamCode + " is unknown or inactive"));
     if (!users.existsByUsernameIgnoreCase(username)) {
       throw new BusinessRuleException("USER_UNKNOWN", "Unknown user " + username);
     }
@@ -164,9 +180,11 @@ public class SalesOrganisationService {
     SalesOfficer officer;
     if (existing.isPresent()) {
       officer = existing.get();
-      officer.moveTo(teamCode);
+      officer.moveTo(teamCode, BusinessClock.today(clock));
     } else {
-      officer = officers.save(new SalesOfficer(companyId, teamCode, username));
+      officer =
+          officers.save(
+              new SalesOfficer(companyId, teamCode, username, BusinessClock.today(clock)));
     }
     audit.record(
         CatalogKind.SALES_OFFICER.label(),
@@ -174,6 +192,155 @@ public class SalesOrganisationService {
         existing.isPresent() ? AuditAction.UPDATE : AuditAction.CREATE,
         officer.catalogDescription());
     return officer;
+  }
+
+  /**
+   * Deactivates a unit with a mandatory reason; refused while it still has active or pending
+   * sub-units or account officers.
+   *
+   * @param id unit
+   * @param reason reason
+   * @return the unit, INACTIVE
+   */
+  public SalesUnit deactivateUnit(Long id, String reason) {
+    String why = requireReason(reason);
+    SalesUnit unit = requireUnit(id);
+    if (unit.getRecordStatus() == RecordStatus.INACTIVE) {
+      throw new BusinessRuleException(
+          "SALES_UNIT_INACTIVE", "Unit " + unit.getCode() + " is already inactive");
+    }
+    checkDeactivation(unit);
+    unit.deactivate(why);
+    audit.record(
+        CatalogKind.SALES_UNIT.label(),
+        unit.getCode(),
+        AuditAction.DEACTIVATE,
+        "Deactivated: " + why);
+    return unit;
+  }
+
+  /**
+   * Reactivates an inactive unit with a mandatory reason; it waits for authorization again. The
+   * parent unit must not be inactive.
+   *
+   * @param id unit
+   * @param reason reason
+   * @return the unit, PENDING_AUTHORIZATION
+   */
+  public SalesUnit reactivateUnit(Long id, String reason) {
+    String why = requireReason(reason);
+    SalesUnit unit = requireUnit(id);
+    if (unit.getRecordStatus() != RecordStatus.INACTIVE) {
+      throw new BusinessRuleException(
+          "SALES_UNIT_NOT_INACTIVE", "Unit " + unit.getCode() + " is not inactive");
+    }
+    boolean parentInactive =
+        unit.getParentCode() != null
+            && units
+                .findByCompanyIdAndCode(unit.getCompanyId(), unit.getParentCode())
+                .filter(p -> p.getRecordStatus() != RecordStatus.INACTIVE)
+                .isEmpty();
+    if (parentInactive) {
+      throw new BusinessRuleException(
+          "SALES_PARENT_INVALID",
+          "Reactivate " + unit.getParentCode() + " before " + unit.getCode());
+    }
+    unit.reactivate(why);
+    audit.record(
+        CatalogKind.SALES_UNIT.label(),
+        unit.getCode(),
+        AuditAction.UPDATE,
+        "Reactivated, pending authorization: " + why);
+    return unit;
+  }
+
+  /**
+   * Removes an account officer from the team with a mandatory reason; new accounts no longer take
+   * the team's units and cost center for this user.
+   *
+   * @param id officer
+   * @param reason reason
+   * @return the officer, INACTIVE
+   */
+  public SalesOfficer removeOfficer(Long id, String reason) {
+    String why = requireReason(reason);
+    SalesOfficer officer =
+        officers
+            .findById(id)
+            .orElseThrow(
+                () -> new ResourceNotFoundException(CatalogKind.SALES_OFFICER.label(), id));
+    if (officer.getRecordStatus() == RecordStatus.INACTIVE) {
+      throw new BusinessRuleException(
+          "SALES_OFFICER_INACTIVE",
+          directory.displayName(officer.getUsername()) + " is already removed from the team");
+    }
+    officer.remove(why);
+    audit.record(
+        CatalogKind.SALES_OFFICER.label(),
+        officer.getUsername(),
+        AuditAction.DEACTIVATE,
+        "Removed from team " + officer.getTeamCode() + ": " + why);
+    return officer;
+  }
+
+  /**
+   * Refuses the deactivation of a unit that still has active or pending sub-units or account
+   * officers (they would be left without a parent).
+   *
+   * @param unit unit
+   */
+  public void checkDeactivation(SalesUnit unit) {
+    long subUnits =
+        units.findByCompanyIdOrderByLevelAscCodeAsc(unit.getCompanyId()).stream()
+            .filter(u -> unit.getCode().equals(u.getParentCode()))
+            .filter(u -> u.getRecordStatus() != RecordStatus.INACTIVE)
+            .count();
+    long teamOfficers =
+        officers.findByCompanyIdOrderByTeamCodeAscUsernameAsc(unit.getCompanyId()).stream()
+            .filter(o -> unit.getCode().equals(o.getTeamCode()))
+            .filter(o -> o.getRecordStatus() != RecordStatus.INACTIVE)
+            .count();
+    if (subUnits > 0 || teamOfficers > 0) {
+      StringBuilder open = new StringBuilder();
+      if (subUnits > 0) {
+        open.append(subUnits).append(subUnits == 1 ? " active sub-unit" : " active sub-units");
+      }
+      if (teamOfficers > 0) {
+        open.append(open.isEmpty() ? "" : " and ")
+            .append(teamOfficers)
+            .append(teamOfficers == 1 ? " account officer" : " account officers");
+      }
+      throw new BusinessRuleException(
+          "SALES_UNIT_IN_USE",
+          unit.getCode()
+              + " still has "
+              + open
+              + ": deactivate or move them before deactivating the unit");
+    }
+  }
+
+  @Override
+  public void deactivating(CatalogKind kind, AuthorizableEntity entity) {
+    if (kind == CatalogKind.SALES_UNIT && entity instanceof SalesUnit unit) {
+      checkDeactivation(unit);
+    }
+  }
+
+  private SalesUnit requireUnit(Long id) {
+    return units
+        .findById(id)
+        .orElseThrow(() -> new ResourceNotFoundException(CatalogKind.SALES_UNIT.label(), id));
+  }
+
+  private static String requireReason(String reason) {
+    if (reason == null || reason.isBlank()) {
+      throw new BusinessRuleException(REASON_REQUIRED, "Enter the reason");
+    }
+    return reason.strip();
+  }
+
+  private static String label(SalesLevel level) {
+    return level.name().toLowerCase(Locale.ROOT);
   }
 
   /**

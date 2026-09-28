@@ -15,6 +15,11 @@ export interface ScreenDef {
    * worksheets, which no BDOI role holds.
    */
   requiresAll?: string[];
+  /**
+   * Product module of the screen (set from its path by `withProductModules`); the screen is not
+   * shown while the module is switched off in the deployment.
+   */
+  productModule?: string;
   component: LazyExoticComponent<ComponentType>;
   /** Detail/edit screens reached from a list are not shown in the menu. */
   hidden?: boolean;

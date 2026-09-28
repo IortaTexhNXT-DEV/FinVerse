@@ -36,17 +36,20 @@ export function RequirePermission({
   permission,
   alsoPermissions,
   requiresAll,
+  productModule,
   fallbackTo,
   children,
 }: Readonly<{
   permission?: string;
   alsoPermissions?: string[];
   requiresAll?: string[];
+  /** Product module of the screen: refused while the module is switched off. */
+  productModule?: string;
   fallbackTo?: string;
   children: ReactNode;
 }>) {
   const { can } = useAuth();
-  if (!mayOpen({ permission, alsoPermissions, requiresAll }, can)) {
+  if (!mayOpen({ permission, alsoPermissions, requiresAll, productModule }, can)) {
     if (fallbackTo !== undefined) {
       return <Navigate to={fallbackTo} replace />;
     }

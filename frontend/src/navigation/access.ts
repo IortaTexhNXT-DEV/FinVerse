@@ -1,13 +1,17 @@
+import { MODULE_OFF } from './productModules';
 import type { ScreenDef } from './types';
 
 /**
- * Whether a user may open a screen: it needs no permission, or the user holds one of them, and
- * the user holds every permission of `requiresAll`.
+ * Whether a user may open a screen: its product module is not switched off, it needs no
+ * permission or the user holds one of them, and the user holds every permission of `requiresAll`.
  */
 export function mayOpen(
-  screen: Pick<ScreenDef, 'permission' | 'alsoPermissions' | 'requiresAll'>,
+  screen: Pick<ScreenDef, 'permission' | 'alsoPermissions' | 'requiresAll' | 'productModule'>,
   can: (permission: string) => boolean,
 ): boolean {
+  if (screen.productModule !== undefined && can(`${MODULE_OFF}${screen.productModule}`)) {
+    return false;
+  }
   if (!(screen.requiresAll ?? []).every(can)) {
     return false;
   }

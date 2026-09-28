@@ -1,4 +1,5 @@
 import {
+  Blocks,
   Cable,
   History,
   Server,
@@ -65,6 +66,14 @@ export const adminModule: FeatureModule = {
       icon: Cable,
       permission: 'SYSTEM_PARAMETER_MANAGE',
       component: lazy(() => import('@/features/system/IntegrationEventsPage')),
+    },
+    {
+      path: '/admin/modules',
+      label: 'Product Modules',
+      icon: Blocks,
+      permission: 'PRODUCT_MODULE_MANAGE',
+      alsoPermissions: ['PRODUCT_MODULE_APPROVE', 'SYSTEM_MONITOR'],
+      component: lazy(() => import('@/features/system/ProductModulesPage')),
     },
     {
       path: '/admin/info',

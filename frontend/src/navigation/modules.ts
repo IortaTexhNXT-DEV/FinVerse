@@ -50,6 +50,7 @@ import { setupModule } from '@/features/setup/module';
 import { taxModule } from '@/features/tax/module';
 import { underwritingModule } from '@/features/underwriting/module';
 import { workspaceModule } from '@/features/workspace/module';
+import { withProductModules } from './productModules';
 import type { FeatureModule, NavGroup } from './types';
 
 /**
@@ -59,7 +60,7 @@ import type { FeatureModule, NavGroup } from './types';
  * generated from the same definitions. Platform screens extend existing sections: My Approvals and
  * Alerts join Overview, recurring journals and journal upload join General Ledger.
  */
-export const NAV_GROUPS: NavGroup[] = [
+export const NAV_GROUPS: NavGroup[] = withProductModules([
   {
     id: 'home',
     modules: [withOverviewScreens(dashboardModule), nbDashboardModule, workspaceModule],
@@ -154,7 +155,7 @@ export const NAV_GROUPS: NavGroup[] = [
       helpModule,
     ],
   },
-];
+]);
 
 /** All modules in menu order (routes, help and access checks use the flat list). */
 export const MODULES: FeatureModule[] = NAV_GROUPS.flatMap((group) => group.modules);

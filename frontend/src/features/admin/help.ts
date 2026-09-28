@@ -71,6 +71,20 @@ export const ADMIN_HELP: HelpSection = {
       controls: ['A failed run raises a JOB_FAILURE alert.'],
     },
     {
+      name: 'Product Modules',
+      path: '/admin/modules',
+      summary:
+        'The modules of the product in use in this deployment (New Business, Operations, Collections, Renewal and the others) and the module profiles, such as the insurance broker profile without the insurer suite.',
+      workflow: [
+        'The System Administrator chooses Switch Off or Switch On in the row menu of a module, or Apply Profile in the row menu of a profile, and gives the reason.',
+        'Another user with the approval right approves or rejects the change from the row menu; the requester may withdraw it.',
+      ],
+      controls: [
+        'A switched-off module has no menu, its screens and reports are not available, its permissions grant nothing and its scheduled jobs do not run; its records are kept.',
+        'A module another module needs cannot be switched off while that module is on.',
+      ],
+    },
+    {
       name: 'Integration Events',
       path: '/admin/integration-events',
       summary:

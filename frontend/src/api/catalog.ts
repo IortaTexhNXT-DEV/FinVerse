@@ -285,11 +285,24 @@ export interface SalesUnit extends Authorizable {
   name: string;
   parentCode?: string;
   costCenter?: string;
+  headUsername?: string;
+  /** Reason of the last deactivation or reactivation. */
+  statusReason?: string;
+  createdBy?: string;
+  createdAt?: string;
+  lastChangedAt?: string;
+  authorizedAt?: string;
 }
 
 export interface SalesOfficer extends Authorizable {
   teamCode: string;
   username: string;
+  /** Date of the current team assignment. */
+  assignedSince?: string;
+  /** Reason of the removal from the team. */
+  statusReason?: string;
+  lastChangedAt?: string;
+  authorizedAt?: string;
 }
 
 export interface SalesOrganisation {
@@ -444,8 +457,18 @@ export const catalogApi = {
       .then((a) => a ?? null),
   createSalesUnit: (input: SalesUnitInput) =>
     api.post<SalesUnit>(`${base}/sales-organisation/units`, input),
+  updateSalesUnit: (id: number, input: SalesUnitInput) =>
+    api.put<SalesUnit>(`${base}/sales-organisation/units/${String(id)}`, input),
   assignOfficer: (input: { companyId: number; teamCode: string; username: string }) =>
     api.post<SalesOfficer>(`${base}/sales-organisation/officers`, input),
+  deactivateSalesUnit: (id: number, reason: string) =>
+    api.post<SalesUnit>(`${base}/sales-organisation/units/${String(id)}/deactivate`, { reason }),
+  reactivateSalesUnit: (id: number, reason: string) =>
+    api.post<SalesUnit>(`${base}/sales-organisation/units/${String(id)}/reactivate`, { reason }),
+  removeSalesOfficer: (id: number, reason: string) =>
+    api.post<SalesOfficer>(`${base}/sales-organisation/officers/${String(id)}/remove`, { reason }),
+  exportSalesOrganisation: (companyId: number) =>
+    api.getFile(`${base}/sales-organisation/export${toQuery({ companyId })}`),
 
   quote: (input: RatingInput) => api.post<RatingResult>(`${base}/rating/quote`, input),
 

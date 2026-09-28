@@ -9,6 +9,8 @@ Errors:
   * an older version of a document next to a newer one in the same folder of out/ (only current documents remain);
   * a BRD folder of an issued sign-off release set (brand.SIGNOFF_SETS) without one of the standard files 00 to 05
     (brand.READING_ORDER); for the other BRDs a missing standard file is only a warning until their set is issued;
+  * a set of brand.UX_SETS without its UX screen documents 07 to 09 (brand.READING_ORDER_UX: deck, register, image
+    package); for the other issued sets they are a warning until the set is re-issued;
   * a drop-level set (brand.DROP_SETS, for example the Drop 0 closure set) without one of its files, or with a file
     that is not one of them in the version of the set;
   * a restricted word in a source of docs/deliverables/src, in a README of out/, or in the text of a generated Word,
@@ -169,6 +171,13 @@ def release_sets() -> tuple[list[str], list[str]]:
         folder = brand.out_dir(brd, "FRS")
         present = {NAME_RE.match(p.name)["order"] for p in folder.glob("*") if NAME_RE.match(p.name)}
         missing = [f"{order} {kind}" for kind, order in brand.READING_ORDER.items() if order not in present]
+        ux_missing = [f"{order} {kind} ({ext})" for (kind, ext), order in brand.READING_ORDER_UX.items()
+                      if order not in present]
+        if brd in brand.SIGNOFF_SETS and ux_missing:
+            if brd in brand.UX_SETS:
+                errors.append(f"{brd} {name}: UX screen document(s) missing in {rel(folder)}: {', '.join(ux_missing)}")
+            else:
+                warnings.append(f"{brd} {name}: UX screen documents 07-09 to come with the next issue of the set")
         if not missing:
             continue
         if brd in brand.SIGNOFF_SETS:
@@ -229,6 +238,25 @@ def office_lines(p: Path) -> list[str]:
     return out
 
 
+def package_lines(p: Path) -> list[str]:
+    """The text of the CSV and text files inside a ZIP of a set (the register of the 09 image package), one entry per
+    line; the images are not read."""
+    out: list[str] = []
+    try:
+        with zipfile.ZipFile(p) as z:
+            for name in z.namelist():
+                if name.lower().endswith((".csv", ".txt")):
+                    out.extend(z.read(name).decode("utf-8-sig", "ignore").splitlines())
+    except zipfile.BadZipFile:
+        return []
+    return out
+
+
+def document_lines(p: Path) -> list[str]:
+    """The visible text of a client document of out/: an Office file, or the text files of a ZIP package."""
+    return package_lines(p) if p.suffix == ".zip" else office_lines(p)
+
+
 def extract_field_names() -> set[str]:
     """The column names of the BRD-13 load templates, the control file and the code map files (read by
     build_dm_pack.py from the layouts of the Migration Console). They are the agreed interface of the files BDOI
@@ -251,10 +279,10 @@ def build_status() -> list[str]:
     out: list[str] = []
     allowed = extract_field_names()
     for p in files(brand.OUT_DIR):
-        if p.suffix not in OFFICE_SUFFIXES:
+        if p.suffix not in OFFICE_SUFFIXES | {".zip"}:
             continue
         hits: dict[str, set[str]] = defaultdict(set)
-        for line in office_lines(p):
+        for line in document_lines(p):
             for label, pattern in BUILD_STATUS:
                 for m in pattern.finditer(line):
                     if label == "internal code" and m.group(0) in allowed:
@@ -316,9 +344,9 @@ def technical_terms() -> tuple[list[str], list[str]]:
         return "; ".join(f"{label}: {', '.join(sorted(words)[:6])}" for label, words in sorted(hits.items()))
 
     for p in files(brand.OUT_DIR):
-        if p.suffix not in OFFICE_SUFFIXES:
+        if p.suffix not in OFFICE_SUFFIXES | {".zip"}:
             continue
-        hits = technical_hits(office_lines(p))
+        hits = technical_hits(document_lines(p))
         if hits:
             msg = f"technical term in {rel(p)} ({detail(hits)})"
             (errors if p.parent.resolve() in set_dirs else warnings).append(msg)
@@ -346,6 +374,8 @@ def restricted_words() -> list[str]:
             text = p.read_text(encoding="utf-8", errors="ignore")
         elif p.suffix in OFFICE_SUFFIXES:
             text = office_text(p)
+        elif p.suffix == ".zip":
+            text = "\n".join(package_lines(p))
         else:
             continue
         hits = sorted({m.group(0).lower() for m in RESTRICTED.finditer(text)})

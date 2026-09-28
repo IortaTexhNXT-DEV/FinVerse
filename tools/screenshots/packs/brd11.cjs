@@ -234,7 +234,17 @@ const documents = {
 // menu of the persona); every other shot is cropped to its dialog or content area (capture_pack.cjs, cropOf).
 const crops = { 'scr-ua-05-01-view': 'full' };
 
+// UX deck: a search of the access requests that finds nothing (the empty state of the list).
+const after = {
+  'ux-scr-ua-06-empty': async (page) => {
+    await page.getByPlaceholder(/^search request no/i).fill('AR-2099-999999');
+    await page.getByRole('button', { name: /^search$/i }).first().click();
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForTimeout(800);
+  },
+};
+
 module.exports = {
-  crops, opens, fills, selects: {}, uploads: {}, after: {}, custom, walkthrough: walkthrough.steps, documents,
+  crops, opens, fills, selects: {}, uploads: {}, after, custom, walkthrough: walkthrough.steps, documents,
   prepare: walkthrough.prepare, render,
 };

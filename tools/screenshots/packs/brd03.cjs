@@ -200,6 +200,14 @@ const after = {
     await page.waitForTimeout(300);
   },
   'scr-pm-20-01-tree': expandAll,
+  // UX deck: a search that finds no request (the empty state of the list) and the whole tree for its component crop.
+  'ux-scr-pm-02-empty': async (page) => {
+    await page.getByPlaceholder(/^search request no/i).fill('PKR-2099-999999');
+    await page.getByRole('button', { name: /^search$/i }).first().click();
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForTimeout(800);
+  },
+  'ux-scr-pm-20-cmp-tree': expandAll,
   'scr-pm-20-02-actions': (page) => rowMenu(page, 'T-CBG1'),
   'scr-pm-20-03-deactivate': async (page) => {
     await rowMenu(page, 'T-CBG1');

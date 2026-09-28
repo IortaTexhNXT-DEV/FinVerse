@@ -43,7 +43,8 @@ class NotificationEventWordingIT {
     List<String> findings =
         texts.stream()
             .filter(
-                t -> SECTION_REFERENCE.matcher(t).find() || BusinessText.FORBIDDEN.matcher(t).find())
+                t ->
+                    SECTION_REFERENCE.matcher(t).find() || BusinessText.FORBIDDEN.matcher(t).find())
             .toList();
     assertThat(texts).isNotEmpty();
     assertThat(findings).isEmpty();

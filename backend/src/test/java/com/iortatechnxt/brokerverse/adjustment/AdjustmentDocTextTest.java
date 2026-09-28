@@ -11,8 +11,8 @@ import java.util.Arrays;
 import org.junit.jupiter.api.Test;
 
 /**
- * The endorsement and validation slips show statuses and premium components by name, as the
- * screens do, never their codes.
+ * The endorsement and validation slips show statuses and premium components by name, as the screens
+ * do, never their codes.
  */
 class AdjustmentDocTextTest {
 

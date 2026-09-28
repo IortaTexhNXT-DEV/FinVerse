@@ -191,6 +191,7 @@ public class UnappliedSeedData implements ApplicationRunner {
             dispositions.dispose(
                 companyId,
                 v.unappliedRef(),
-                new DispositionInput(code, invoiceNo, null, "Asked by Collections for " + v.payor())));
+                new DispositionInput(
+                    code, invoiceNo, null, "Asked by Collections for " + v.payor())));
   }
 }

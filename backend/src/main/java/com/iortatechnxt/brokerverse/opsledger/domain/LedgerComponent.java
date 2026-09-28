@@ -10,30 +10,36 @@ import java.util.List;
  */
 public enum LedgerComponent {
   /** PR - basic premium. */
-  BASIC,
+  BASIC("Basic Premium"),
   /** PR - documentary stamp tax. */
-  DST,
+  DST("Documentary Stamp Tax"),
   /** PR - premium tax or VAT on premium. */
-  PREMIUM_TAX_VAT,
+  PREMIUM_TAX_VAT("Premium Tax / VAT"),
   /** PR - local government tax. */
-  LGT,
+  LGT("Local Government Tax"),
   /** PR - fire service tax. */
-  FST,
+  FST("Fire Service Tax"),
   /** PR - other charges. */
-  OTHER,
+  OTHER("Other Charges"),
   /** Due to insurer (premium payable to the insurer). */
-  DTIP,
+  DTIP("Due to Insurer (Gross)"),
   /** Commission receivable from the insurer. */
-  COMMISSION,
+  COMMISSION("Commission"),
   /** Output VAT on the commission. */
-  COMMISSION_VAT,
+  COMMISSION_VAT("VAT on Commission"),
   /** Withholding tax the insurer withholds on the commission. */
-  WTAX,
+  WTAX("Withholding Tax on Commission"),
   /** PR covered by the client's 2% creditable withholding tax certificate (CSHID.027). */
-  PR2307;
+  PR2307("Premium Receivable - BIR 2307");
 
   private static final List<LedgerComponent> HIERARCHY =
       List.of(DST, PREMIUM_TAX_VAT, LGT, FST, OTHER, BASIC);
+
+  private final String label;
+
+  LedgerComponent(String label) {
+    this.label = label;
+  }
 
   /**
    * The name of the component on screens and documents (the labels of the recompute screen).
@@ -41,19 +47,7 @@ public enum LedgerComponent {
    * @return name, e.g. "Documentary Stamp Tax"
    */
   public String label() {
-    return switch (this) {
-      case BASIC -> "Basic Premium";
-      case DST -> "Documentary Stamp Tax";
-      case PREMIUM_TAX_VAT -> "Premium Tax / VAT";
-      case LGT -> "Local Government Tax";
-      case FST -> "Fire Service Tax";
-      case OTHER -> "Other Charges";
-      case DTIP -> "Due to Insurer (Gross)";
-      case COMMISSION -> "Commission";
-      case COMMISSION_VAT -> "VAT on Commission";
-      case WTAX -> "Withholding Tax on Commission";
-      case PR2307 -> "Premium Receivable - BIR 2307";
-    };
+    return label;
   }
 
   /**

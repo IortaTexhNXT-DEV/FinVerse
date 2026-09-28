@@ -26,6 +26,26 @@ export const TAG_LABELS: Record<ExtractionTag, string> = {
   RETURNED: 'Returned',
 };
 
+/** Why a due invoice was not extracted, in words (the extraction run and DTIP Status). */
+const REASON_LABELS: Record<string, string> = {
+  ON_HOLD: 'On hold',
+  PENDING_NEG_ADJ: 'Pending negative adjustment',
+  WRITTEN_OFF: 'Written off',
+  CHECK_HOLDING: 'Check within the holding period',
+  PAID_AR_OVER_DTIP: 'Paid AR above DTIP',
+  OTHERS: 'Locked by another team',
+};
+
+/** The reasons of an extraction tag ("PENDING_NEG_ADJ,OTHERS") as words, joined by commas. */
+export function reasonsText(reasons: string | null | undefined): string {
+  return (reasons ?? '')
+    .split(',')
+    .map((r) => r.trim())
+    .filter((r) => r !== '')
+    .map((r) => REASON_LABELS[r] ?? r)
+    .join(', ');
+}
+
 export type BatchTab = 'REVIEW' | 'APPROVAL' | 'APPROVED' | 'REMITTED' | 'OR' | 'RETURNED';
 
 /** Work list tabs of the batches (RMTID.027) and the stages behind each. */

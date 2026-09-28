@@ -36,6 +36,27 @@ public enum LedgerComponent {
       List.of(DST, PREMIUM_TAX_VAT, LGT, FST, OTHER, BASIC);
 
   /**
+   * The name of the component on screens and documents (the labels of the recompute screen).
+   *
+   * @return name, e.g. "Documentary Stamp Tax"
+   */
+  public String label() {
+    return switch (this) {
+      case BASIC -> "Basic Premium";
+      case DST -> "Documentary Stamp Tax";
+      case PREMIUM_TAX_VAT -> "Premium Tax / VAT";
+      case LGT -> "Local Government Tax";
+      case FST -> "Fire Service Tax";
+      case OTHER -> "Other Charges";
+      case DTIP -> "Due to Insurer (Gross)";
+      case COMMISSION -> "Commission";
+      case COMMISSION_VAT -> "VAT on Commission";
+      case WTAX -> "Withholding Tax on Commission";
+      case PR2307 -> "Premium Receivable - BIR 2307";
+    };
+  }
+
+  /**
    * Whether the component is part of the client's premium receivable.
    *
    * @return true for the six premium components

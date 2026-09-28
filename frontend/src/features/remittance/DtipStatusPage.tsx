@@ -22,7 +22,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { remittanceApi } from './api';
 import type { AccountHit, DtipRow } from './api';
-import { dtipFlags, joinParts, TAG_LABELS } from './remittanceLabels';
+import { dtipFlags, joinParts, reasonsText, TAG_LABELS } from './remittanceLabels';
 import './remittance.css';
 
 const TABS = [
@@ -80,7 +80,7 @@ function dtipColumns(queue: ((row: DtipRow) => void) | undefined): Column<DtipRo
       header: 'Extraction',
       render: (r) => (
         <CellStack
-          main={r.tag ? joinParts([TAG_LABELS[r.tag], r.reasons], ': ') : ''}
+          main={r.tag ? joinParts([TAG_LABELS[r.tag], reasonsText(r.reasons)], ': ') : ''}
           sub={
             dtipFlags(r).length > 0 && (
               <span className="tag-list">

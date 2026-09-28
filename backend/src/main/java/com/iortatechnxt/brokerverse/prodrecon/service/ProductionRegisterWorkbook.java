@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.prodrecon.service;
 
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.service.DocumentPasswordPolicy;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconExtractLine;
 import java.io.ByteArrayOutputStream;
@@ -113,8 +114,8 @@ public class ProductionRegisterWorkbook {
     v.add(l.getAmountPaid());
     v.add(l.getDatePaid());
     v.add(l.getArNumber());
-    v.add(l.getKind());
-    v.add(l.getRemittanceStatus());
+    v.add(DisplayFormat.label(l.getKind()));
+    v.add(DisplayFormat.label(l.getRemittanceStatus()));
     v.add(null);
     v.add(null);
     return v;

@@ -52,7 +52,7 @@ public class InsurerController {
    * @return insurers
    */
   @GetMapping
-  @PreAuthorize(CatalogAccess.READ)
+  @PreAuthorize(CatalogAccess.INSURER_LIST)
   public List<InsurerResponse> list(
       @RequestParam Long companyId, @RequestParam(required = false) RecordOrigin.Origin origin) {
     return insurers.insurers(companyId).stream()

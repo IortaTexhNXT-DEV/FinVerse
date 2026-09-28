@@ -210,7 +210,7 @@ public class DisbursementSeedData implements ApplicationRunner {
                         List.of(),
                         PHP,
                         null,
-                        "Seed payee"),
+                        "Payee set up by Disbursement"),
                     accounts,
                     PayeeSource.MANUAL));
     users.run(LEADER, () -> payees.submit(p.getId()));

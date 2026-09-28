@@ -165,7 +165,7 @@ public class CollectionsPlansSeedData implements ApplicationRunner {
                     companyId,
                     year1.getArn(),
                     "ANNUAL",
-                    "Seed: annual billing of the three-year property policy"));
+                    "Annual billing of the three-year property policy"));
     for (int cycle = 1; cycle <= CYCLES; cycle++) {
       int seq = cycle;
       BillingStatement soa = users.as(HANDLER, () -> statements.generate(plan.getId(), seq));
@@ -221,7 +221,7 @@ public class CollectionsPlansSeedData implements ApplicationRunner {
                     "QUARTERLY",
                     invoice.getClassification().inceptionDate(),
                     QUARTERS,
-                    "Seed: quarterly installments agreed with the client"));
+                    "Quarterly installments agreed with the client"));
     Installment second = plan.getInstallments().get(1);
     LocalDate today = BusinessClock.today(clock);
     users.run(

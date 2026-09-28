@@ -63,6 +63,24 @@ public final class DisplayFormat {
   }
 
   /**
+   * A status or other code as a label, each word capitalised and acronyms kept: FULLY_REMITTED
+   * becomes "Fully Remitted", QS_SENT "QS Sent".
+   *
+   * @param code enum or code, may be null
+   * @return label, empty when null
+   */
+  public static String label(Object code) {
+    StringBuilder out = new StringBuilder();
+    for (String word : words(code).split(" ")) {
+      if (!out.isEmpty()) {
+        out.append(' ');
+      }
+      out.append(word.isEmpty() ? word : Character.toUpperCase(word.charAt(0)) + word.substring(1));
+    }
+    return out.toString();
+  }
+
+  /**
    * A date as dd-MMM-yyyy.
    *
    * @param date date, may be null

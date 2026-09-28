@@ -122,17 +122,12 @@ export function InvoicePicker({ selected, onChange }: Readonly<InvoicePickerProp
         }}
       />
       {selected.length > 0 && (
-        <div className="adj-selected" aria-label="Invoices chosen">
+        <div className="filter-chips" aria-label="Invoices chosen">
           {selected.map((no) => (
-            <span key={no} className="tag">
-              {no}{' '}
-              <button
-                type="button"
-                className="btn btn-ghost btn-sm"
-                aria-label={`Remove ${no}`}
-                onClick={() => toggle(no)}
-              >
-                <X size={12} aria-hidden="true" />
+            <span key={no} className="filter-chip">
+              {no}
+              <button type="button" aria-label={`Remove ${no}`} onClick={() => toggle(no)}>
+                <X size={14} aria-hidden="true" />
               </button>
             </span>
           ))}

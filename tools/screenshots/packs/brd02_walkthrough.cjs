@@ -71,14 +71,17 @@ async function openRow(page, text) {
 }
 
 /** The date `days` from today as dd-MMM-yyyy (Philippine business dates of the seed stack). */
+const MANILA_OFFSET_MS = 8 * 3600000;
+
 function dateText(days) {
-  const d = new Date(Date.now() + days * 86400000);
+  // The business date is the Philippine date (UTC+8), also in the evening UTC.
+  const d = new Date(Date.now() + MANILA_OFFSET_MS + days * 86400000);
   const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][d.getUTCMonth()];
   return `${String(d.getUTCDate()).padStart(2, '0')}-${m}-${d.getUTCFullYear()}`;
 }
 
 function isoDate(days) {
-  return new Date(Date.now() + days * 86400000).toISOString().slice(0, 10);
+  return new Date(Date.now() + MANILA_OFFSET_MS + days * 86400000).toISOString().slice(0, 10);
 }
 
 

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.adjustment.service;
 
 import static com.iortatechnxt.brokerverse.adjustment.service.DocText.amount;
+import static com.iortatechnxt.brokerverse.adjustment.service.DocText.label;
 import static com.iortatechnxt.brokerverse.adjustment.service.DocText.text;
 
 import com.iortatechnxt.brokerverse.account.domain.Account;
@@ -12,6 +13,7 @@ import com.iortatechnxt.brokerverse.adjustment.domain.RequestTerms;
 import com.iortatechnxt.brokerverse.adjustment.service.AdjustmentQueryService.GlLine;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.catalog.service.CatalogNames;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
@@ -26,7 +28,6 @@ import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Text;
 import com.iortatechnxt.brokerverse.docgen.service.MergedText;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
-import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceShare;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
@@ -57,6 +58,7 @@ public class AdjustmentDocuments {
   private static final List<Integer> AMOUNTS_FROM_2 = List.of(2, 3, 4);
   private static final List<Integer> AMOUNT_COLUMN_4 = List.of(3);
   private static final String PDF = ".pdf";
+  private static final String SEGMENT_LOV = "MARKET_SEGMENT";
 
   private final AdjustmentQueryService queries;
   private final InvoiceLedgerQueryService ledger;
@@ -69,6 +71,7 @@ public class AdjustmentDocuments {
   private final AuditTrailService audit;
   private final Clock clock;
   private final UserDirectory users;
+  private final CatalogNames names;
 
   /**
    * Creates the service.
@@ -83,6 +86,7 @@ public class AdjustmentDocuments {
    * @param lovs labels
    * @param audit audit trail
    * @param users user names
+   * @param names insurer and product line names
    * @param clock clock
    */
   public AdjustmentDocuments(
@@ -96,6 +100,7 @@ public class AdjustmentDocuments {
       LovService lovs,
       AuditTrailService audit,
       UserDirectory users,
+      CatalogNames names,
       Clock clock) {
     this.queries = queries;
     this.ledger = ledger;
@@ -107,6 +112,7 @@ public class AdjustmentDocuments {
     this.lovs = lovs;
     this.audit = audit;
     this.users = users;
+    this.names = names;
     this.clock = clock;
   }
 
@@ -170,7 +176,7 @@ public class AdjustmentDocuments {
                 new Fields("Request", requestFields(r, today)),
                 new Fields("Validation", validationFields(r)),
                 changesTable(r),
-                sharesTable(r),
+                sharesTable(r, names),
                 glTable(queries.journalLines(r))),
             List.of("Validated by", "Approved by"),
             intro.versionTag());
@@ -184,16 +190,16 @@ public class AdjustmentDocuments {
         "arn", r.getSubject().arn(),
         "policyNo", text(r.getSubject().policyNo()),
         "assured", r.getSubject().assuredName(),
-        "effectiveDate", r.getTerms().effectiveDate().toString(),
+        "effectiveDate", DisplayFormat.date(r.getTerms().effectiveDate()),
         "validatedOn", text(DocText.date(r.trail().validatedAt())),
-        "status", r.getStage().name(),
-        "today", today.toString());
+        "status", DisplayFormat.words(r.getStage()),
+        "today", DisplayFormat.date(today));
   }
 
   private List<Field> requestFields(EndorsementRequest r, LocalDate today) {
     RequestTerms t = r.getTerms();
     return List.of(
-        new Field("Date", today.toString()),
+        new Field("Date", DisplayFormat.date(today)),
         new Field("Endorsement Request No.", r.getRequestNo()),
         new Field("Invoice No.", r.getSubject().invoiceNo()),
         new Field("Account Reference No.", r.getSubject().arn()),
@@ -201,7 +207,7 @@ public class AdjustmentDocuments {
         new Field("Request Type", text(lovs.label(RequestRules.REQUEST_TYPE_LOV, t.requestType()))),
         new Field(
             "Reason for Cancellation", text(lovs.label(RequestRules.REASON_LOV, t.reasonCode()))),
-        new Field("Effective Date", t.effectiveDate().toString()),
+        new Field("Effective Date", DisplayFormat.date(t.effectiveDate())),
         new Field("Insurer Endorsement Ref.", text(t.endorsementRef())),
         new Field("Description", t.description()),
         new Field("Additional / Other Instructions", text(t.instructions())));
@@ -211,23 +217,23 @@ public class AdjustmentDocuments {
     String coInsurers =
         invoice.getShares().stream()
             .filter(s -> !s.lead())
-            .map(OpsInvoiceShare::insurerCode)
+            .map(s -> names.insurer(r.getCompanyId(), s.insurerCode()))
             .collect(Collectors.joining(", "));
     BigDecimal change = r.getTerms().sumInsuredChange();
     return List.of(
         new Field("Assured", r.getSubject().assuredName()),
-        new Field("Insurer", r.getSubject().insurerCode()),
+        new Field("Insurer", names.insurer(r.getCompanyId(), r.getSubject().insurerCode())),
         new Field("Co-insurer/s", coInsurers.isEmpty() ? DocText.NONE : coInsurers),
         new Field("Policy No.", text(r.getSubject().policyNo())),
         new Field("Risk Code", text(invoice.getClassification().riskCode())),
-        new Field("Risk Description", text(r.getSubject().productLine())),
+        new Field("Risk Description", text(blankToNull(names.line(r.getSubject().productLine())))),
         new Field(
             "Period of Cover",
             DisplayFormat.period(
                 invoice.getClassification().inceptionDate(),
                 invoice.getClassification().expiryDate())),
         new Field("Marketing AO", text(users.displayName(r.getSubject().aoUsername()))),
-        new Field("Market Segment", text(r.getSubject().segment())),
+        new Field("Market Segment", text(lovs.label(SEGMENT_LOV, r.getSubject().segment()))),
         new Field("Total Sum Insured", amount(account.getTotalSumInsured())),
         new Field("Sum Insured Change", amount(change)),
         new Field("Premium Rate (%)", text(r.getTerms().ratePercent())),
@@ -237,15 +243,15 @@ public class AdjustmentDocuments {
   private static List<Field> paymentFields(OpsInvoice invoice) {
     BigDecimal balance = invoice.premiumBalance();
     return List.of(
-        new Field("Payment Status", invoice.getPaymentStatus().name()),
+        new Field("Payment Status", label(invoice.getPaymentStatus())),
         new Field("Amount Paid", amount(invoice.getGrossPremium().subtract(balance))),
         new Field("Remaining AR", amount(balance)),
-        new Field("Remittance Status", invoice.getRemittanceStatus().name()));
+        new Field("Remittance Status", label(invoice.getRemittanceStatus())));
   }
 
   private List<Field> validationFields(EndorsementRequest r) {
     return List.of(
-        new Field("Status", r.getStage().name()),
+        new Field("Status", label(r.getStage())),
         new Field("Validated by", text(users.displayName(r.trail().validatedBy()))),
         new Field("Validation Date", text(DocText.date(r.trail().validatedAt()))),
         new Field("Approved by", text(users.displayName(r.trail().approvedBy()))),
@@ -263,7 +269,7 @@ public class AdjustmentDocuments {
             .map(
                 (ComponentChange c) ->
                     List.of(
-                        c.component().name(),
+                        c.component().label(),
                         amount(c.before()),
                         amount(c.delta()),
                         amount(c.after())))
@@ -275,13 +281,14 @@ public class AdjustmentDocuments {
         AMOUNTS_FROM_1);
   }
 
-  private static Table sharesTable(EndorsementRequest r) {
+  private static Table sharesTable(EndorsementRequest r, CatalogNames names) {
     List<List<String>> rows =
         r.getShares().stream()
             .map(
                 s ->
                     List.of(
-                        s.insurerCode() + (s.lead() ? " (lead)" : ""),
+                        names.insurer(r.getCompanyId(), s.insurerCode())
+                            + (s.lead() ? " (lead)" : ""),
                         s.sharePct().stripTrailingZeros().toPlainString() + "%",
                         amount(s.premiumDelta()),
                         amount(s.commissionDelta()),
@@ -302,7 +309,7 @@ public class AdjustmentDocuments {
                     List.of(
                         l.batchNo(),
                         l.accountCode() + " " + l.accountName(),
-                        l.side().name(),
+                        label(l.side()),
                         amount(l.amount()),
                         text(l.partyCode())))
             .toList();
@@ -311,6 +318,10 @@ public class AdjustmentDocuments {
         List.of("Journal", "GL Account", "Dr / Cr", "Amount", "Party"),
         rows,
         AMOUNT_COLUMN_4);
+  }
+
+  private static String blankToNull(String value) {
+    return value == null || value.isEmpty() ? null : value;
   }
 
   /**

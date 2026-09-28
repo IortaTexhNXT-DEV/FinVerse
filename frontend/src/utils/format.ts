@@ -138,12 +138,30 @@ const timestampParts = new Intl.DateTimeFormat('en-GB', {
   hourCycle: 'h23',
 });
 
-/** A calendar date (ISO yyyy-MM-dd, or the date part of a timestamp) as dd-MMM-yyyy: 23-Sep-2026. */
+/** A timestamp with its zone (2026-09-28T17:12:00Z, ...+08:00): an instant, not a calendar date. */
+const INSTANT = /T\d{2}:\d{2}(:\d{2}(\.\d+)?)?(Z|[+-]\d{2}:?\d{2})$/;
+
+/** The business date of an instant: its calendar date in the display time zone (yyyy-MM-dd). */
+function businessDateOf(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) {
+    return iso;
+  }
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    timestampParts.formatToParts(date).find((p) => p.type === type)?.value ?? '';
+  return `${part('year')}-${part('month')}-${part('day')}`;
+}
+
+/**
+ * A calendar date (ISO yyyy-MM-dd, or the date of a timestamp) as dd-MMM-yyyy: 23-Sep-2026. A
+ * timestamp with its zone is shown on its business date (Philippine time), as its time is.
+ */
 export function formatDate(iso: string | null | undefined): string {
   if (!iso) {
     return '';
   }
-  const [year, month, day] = iso.slice(0, 10).split('-');
+  const text = INSTANT.test(iso) ? businessDateOf(iso) : iso;
+  const [year, month, day] = text.slice(0, 10).split('-');
   const name = MONTHS[Number(month) - 1];
   if (!year || !day || name === undefined) {
     return iso;

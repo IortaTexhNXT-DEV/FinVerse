@@ -44,6 +44,17 @@ public final class DocText {
   }
 
   /**
+   * A status or other code as a label, each word capitalised: FULLY_REMITTED becomes "Fully
+   * Remitted", NOT_APPLICABLE "Not Applicable".
+   *
+   * @param code enum or code
+   * @return label, the placeholder when null
+   */
+  public static String label(Object code) {
+    return code == null ? NONE : DisplayFormat.label(code);
+  }
+
+  /**
    * The Philippine date of an instant.
    *
    * @param at instant

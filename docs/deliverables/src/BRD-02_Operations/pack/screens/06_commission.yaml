@@ -64,7 +64,7 @@ screens:
       - Commission Workbench › DP Accounts to Confirm and DP Accounts for Billing tiles
     shots:
       - {state: list, user: commrec, tab: "Billed", caption: "DP Accounts, Billed tab"}
-      - {state: account, user: commrec, tab: "PR Reversed", caption: "Account dialog of a direct payment account with its validation rules"}
+      - {state: account, user: commrec, tab: "Billed", caption: "Account dialog of a direct payment account with its validation rules"}
     fields:
       - "Tabs | For Confirmation / For Billing / Billed / Approved / Rejected / Collected / PR Reversed / Excluded | Tab | With the number of accounts | - | Fixed | For Confirmation | - | - | -"
       - "Toolbar | Search Invoice, Policy or Assured | Text | - | N | - | Blank | - | - | -"

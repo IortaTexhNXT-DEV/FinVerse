@@ -9,6 +9,7 @@ import {
   holdFormErrors,
   isExcluded,
   parseEmails,
+  reasonsText,
   stagesOf,
   totalsOf,
 } from './remittanceLabels';
@@ -111,5 +112,12 @@ describe('remittance labels', () => {
       '?companyId=1&stage=A&stage=B&page=0',
     );
     expect(toQuery({ q: undefined })).toBe('');
+  });
+
+  it('words the reasons of a due invoice that was not extracted', () => {
+    expect(reasonsText('PENDING_NEG_ADJ,OTHERS')).toBe(
+      'Pending negative adjustment, Locked by another team',
+    );
+    expect(reasonsText(undefined)).toBe('');
   });
 });

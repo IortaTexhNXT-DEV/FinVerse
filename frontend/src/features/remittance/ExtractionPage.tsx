@@ -20,7 +20,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { ExtractionRun, InvoiceTag, RemittanceType } from './api';
-import { TAG_LABELS, triggerLabel, TYPE_LABELS } from './remittanceLabels';
+import { reasonsText, TAG_LABELS, triggerLabel, TYPE_LABELS } from './remittanceLabels';
 import './remittance.css';
 import { UserName } from '@/components/ui/UserName';
 import { InsurerName } from '@/components/broking/LovLabel';
@@ -38,7 +38,7 @@ const TAG_COLUMNS: Column<InvoiceTag>[] = [
     header: 'Tag / Type',
     render: (t) => <CellStack main={TAG_LABELS[t.tag]} sub={t.type ? TYPE_LABELS[t.type] : ''} />,
   },
-  { key: 'why', header: 'Reasons', render: (t) => t.reasons ?? t.remarks ?? '' },
+  { key: 'why', header: 'Reasons', render: (t) => reasonsText(t.reasons) || (t.remarks ?? '') },
   { key: 'paid', header: 'Paid AR', numeric: true, render: (t) => <Amount value={t.paidAr} /> },
   {
     key: 'rem',

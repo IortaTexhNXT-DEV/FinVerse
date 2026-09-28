@@ -178,7 +178,7 @@ public class AdjustmentSeedData implements ApplicationRunner {
           users.as(PROCESSOR, () -> workflow.validate(r.getId(), null));
           users.as(
               PROCESSOR,
-              () -> batches.post(invoice.getCompanyId(), List.of(r.getId()), "Seed posting"));
+              () -> batches.post(invoice.getCompanyId(), List.of(r.getId()), "Daily posting"));
           return r;
         });
   }

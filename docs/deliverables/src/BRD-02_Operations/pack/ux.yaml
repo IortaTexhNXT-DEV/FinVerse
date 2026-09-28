@@ -1,0 +1,135 @@
+# UX screen documents of the BRD-2 Operations set for the BDOI UX Design team: 07 UX Screen Deck, 08 UX screen
+# register, 09 image package (docs/deliverables/src/signoff/build_ux_deck.py). The screens, fields, actions,
+# walkthroughs and images come from the pack; this file holds what only the UX documents need: who each persona is,
+# the images taken for the deck only (more states of a screen, the landing page and menu of each persona), the
+# changes of the issue and the points for the UX Design team to confirm.
+
+issue:
+  version: "2.0"
+  date: 28 September 2026
+  # First issue of the UX screen documents of the set: every screen is new to the UX Design team.
+  changes: []
+
+# The personas whose landing page and full menu the deck shows (the Operations personas; Processing, whose sidebar
+# the set shows for the booking step of walkthrough A, belongs to the New Business set).
+navigation:
+  roles: [CASHIER, CASHIER_TL, REMIT_PROCESSOR, REMIT_TL, RECON_HANDLER, ADJUSTMENT, ADJUSTMENT_TL, COMMREC_HANDLER,
+          COMMREC_TL, MKT_COLLECTION, MKT_TL, COMPTROLLERSHIP, DISBURSEMENT, ACSL_PROCESSOR, ACSL_TL, SYSADMIN, AUDITOR]
+
+# Who each persona is (what they do comes from the persona table of the FRS unless given here).
+personas:
+  CASHIER: {who: "A cashier of the head office or of a branch who receives the payments of the clients"}
+  CASHIER_TL: {who: "The team leader or head of Cashiering, who approves cancellations, reinstatements and dispositions"}
+  REMIT_PROCESSOR: {who: "A Remittance processor who extracts the paid premiums into batches per insurer"}
+  REMIT_TL: {who: "The team leader or head of Remittance, who approves the batches and the special remittances"}
+  RECON_HANDLER: {who: "A Production Reconciliation handler who sends the registers and reconciles the insurer's production"}
+  ADJUSTMENT: {who: "An Adjustment processor who validates and posts the endorsement requests"}
+  ADJUSTMENT_TL: {who: "The team leader of Adjustment, who approves the endorsement requests"}
+  COMMREC_HANDLER: {who: "A Commission Receivables handler who bills the direct payment commissions to the insurers"}
+  COMMREC_TL: {who: "The team leader or head of Commission Receivables, who posts the incentive runs and keeps the schemes"}
+  MKT_COLLECTION: {who: "A Marketing Collection officer of the head office or of a branch who raises holds, special remittances, BIR 2307 tags and endorsement requests"}
+  MKT_TL: {who: "A Marketing team leader or unit head, who approves the holds of the Marketing officers"}
+  COMPTROLLERSHIP: {who: "A Comptrollership officer who acknowledges the BIR certificates and reads the journals and reports"}
+  DISBURSEMENT: {who: "A Disbursement officer who works the payment requests of the queue until BRD-5 replaces it"}
+  ACSL_PROCESSOR: {who: "An ACSL processor who records the deductions on the remittances (BRD-5)"}
+  ACSL_TL: {who: "The ACSL team leader who confirms the deductions (BRD-5)"}
+  SYSADMIN: {who: "The system administrator of BIBS (BDOI IT operations), who keeps the feeds and the lists"}
+  AUDITOR: {who: "An internal or external auditor with read access to Operations and its reports"}
+
+# The UX state of an image when its name does not say it.
+classify:
+  scr-op-09-03-issue_or: filled
+  scr-op-10-02-cancel: confirmation
+  scr-op-12-01-record: filled
+  scr-op-13-02-accept: confirmation
+  scr-op-16-02-add: filled
+  scr-op-19-02-tag: filled
+  scr-op-21-02-new: filled
+  scr-op-24-02-tags: read-only
+  scr-op-26-02-preview: confirmation
+  scr-op-26-03-closed: read-only
+  scr-op-26-04-documents: read-only
+  scr-op-28-02-new: filled
+  scr-op-30-02-new: filled
+  scr-op-33-02-new: filled
+  scr-op-35-02-new: filled
+  scr-op-36-02-dv: filled
+  scr-op-38-02-request: filled
+  scr-op-38-03-recompute: filled
+  scr-op-39-03-accounting: read-only
+  scr-op-39-04-transactions: read-only
+  scr-op-40-02-posted: read-only
+  scr-op-45-02-review: filled
+  scr-op-46-02-new: filled
+  scr-op-49-02-new: filled
+  scr-op-54-02-answers: filled
+  scr-op-56-02-new: filled
+  scr-op-57-02-compute: filled
+  scr-op-58-02-new: filled
+  scr-op-60-01-flag: filled
+  scr-op-61-03-replay: filled
+  wt-a-01: success
+  wt-a-03: filled
+  wt-a-04: success
+  wt-a-05: success
+  wt-a-06: pending-approval
+  wt-a-07: success
+  wt-a-08: success
+  wt-a-09: success
+  wt-a-10: read-only
+  wt-b-01: filled
+  wt-b-02: filled
+  wt-b-03: pending-approval
+  wt-b-04: pending-approval
+  wt-b-05: success
+  wt-b-06: success
+  wt-b-07: read-only
+  wt-b-08: pending-approval
+  wt-b-09: success
+  wt-c-01: success
+  wt-c-02: success
+  wt-c-03: read-only
+  wt-c-04: filled
+  wt-c-05: success
+  wt-d-01: success
+  wt-d-02: validation-error
+  wt-d-03: pending-approval
+  wt-d-04: success
+  wt-d-05: validation-error
+
+# Images taken for the deck only: states the screen specifications do not show.
+states:
+  - {screen: SCR-OP-02, state: empty, user: cashier, ux: empty, nocallouts: true, caption: "A search that finds no invoice"}
+  - {screen: SCR-OP-03, state: auditor, user: auditor, open_invoice: remitted, ux: read-only, nocallouts: true, caption: "Invoice 360 as the Auditor sees it, without the actions"}
+  - {screen: SCR-OP-36, state: actions, user: disb, ux: default, nocallouts: true, caption: "The row action menu of a payment request, opened from the more button of its row"}
+  - {screen: SCR-OP-63, state: auditor, user: auditor, ux: read-only, nocallouts: true, caption: "Report Centre as the Auditor sees it: the Operations reports on screen"}
+
+# Points for the UX Design team to confirm with BDOI.
+confirm:
+  clarifications: [CLR-OP-24, CLR-OP-28, CLR-OP-33, CLR-OP-34, CLR-OP-35]
+  findings:
+    - screens: [SCR-OP-03, SCR-OP-39]
+      observation: >-
+        The Policy Transactions table (the booking, its endorsements and returns with the premium, taxes, commission
+        and gross premium before and after, and the journals) is wider than the page: it scrolls inside its card with
+        the first columns in view.
+      proposal: >-
+        Keep the table scrolling inside its card with the transaction column fixed, or fold the before and after
+        columns into one Change column and show the details of a transaction in a side panel.
+    - screens: [SCR-OP-26, SCR-OP-45, SCR-OP-54, SCR-OP-59]
+      observation: >-
+        The reference of a remittance batch, a reconciliation cycle and a direct payment billing carries the insurer's
+        short code (RMB-INS-MGIC-2026-000001); the insurer's name is in the record facts and the lists.
+      proposal: >-
+        Confirm the reference with the short code (CLR-OP-28) or ask for a plain sequence number with the insurer's
+        name only in the facts.
+    - screens: [SCR-OP-46, SCR-OP-54]
+      observation: >-
+        The production register and the direct payment billing are workbooks read back by the insurers' own
+        systems: their dates are yyyy-mm-dd and the remittance status and the insurer are codes.
+      proposal: Confirm the layout for the insurers (CLR-OP-34), or give the layout each insurer needs.
+    - screens: [SCR-OP-38]
+      observation: >-
+        Before, Change and After of a recompute are taken on the premium in force of the policy year, so a flat
+        cancellation of a policy with a later endorsement shows the whole policy year going to zero.
+      proposal: Confirm the basis (CLR-OP-35); the Recompute step would otherwise name the invoice the figures are for.

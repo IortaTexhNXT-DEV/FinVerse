@@ -18,6 +18,7 @@ components:
       - "Under a thin rule: Current Stage, Since, Due with the Overdue pill, Assigned To; actions aligned right"
       - "Narrow widths keep the first, last and current stage and its neighbours"
     screens:
+      BRD-02: [SCR-OP-10, SCR-OP-12, SCR-OP-26, SCR-OP-29, SCR-OP-31, SCR-OP-34, SCR-OP-39, SCR-OP-45, SCR-OP-54, SCR-OP-59]
       BRD-03: [SCR-PM-04, SCR-PM-05, SCR-PM-06, SCR-PM-07, SCR-PM-08]
       BRD-11: [SCR-UA-08]
       BRD-13: [SCR-DM-07]
@@ -33,6 +34,7 @@ components:
       - "No codes, references or technical terms; only an unexpected system error offers Retry and a reference behind Details"
       - "Field errors stay under their fields; a long form lists them at the top with a link to each field"
     screens:
+      BRD-02: [SCR-OP-08, SCR-OP-26, SCR-OP-38]
       BRD-03: [SCR-PM-03, SCR-PM-13, SCR-PM-20]
       BRD-11: [SCR-UA-01, SCR-UA-07, SCR-UA-09]
       BRD-13: [SCR-DM-05, SCR-DM-07]
@@ -48,6 +50,7 @@ components:
       - "One value per cell with at most one muted line under it; a dash for an empty value"
       - "Showing x to y of n results with the page numbers; Enter on a row opens it"
     screens:
+      BRD-02: [SCR-OP-02, SCR-OP-09, SCR-OP-11, SCR-OP-25, SCR-OP-37, SCR-OP-44, SCR-OP-53]
       BRD-03: [SCR-PM-02, SCR-PM-09, SCR-PM-10, SCR-PM-11, SCR-PM-14, SCR-PM-17]
       BRD-11: [SCR-UA-06, SCR-UA-11, SCR-UA-15]
       BRD-13: [SCR-DM-02, SCR-DM-05, SCR-DM-06, SCR-DM-18]
@@ -74,6 +77,7 @@ components:
       - "Destructive actions last, in red, after a separator"
       - "Each action that changes the record asks for confirmation"
     screens:
+      BRD-02: [SCR-OP-09, SCR-OP-14, SCR-OP-17, SCR-OP-19, SCR-OP-32, SCR-OP-36, SCR-OP-46, SCR-OP-61]
       BRD-03: [SCR-PM-20]
 
   - name: Confirmation dialog with reason
@@ -87,6 +91,7 @@ components:
       - "Cancel on the left, the action on the right; a destructive action uses the red button"
       - "The reason is kept in the history and sent with the notification"
     screens:
+      BRD-02: [SCR-OP-10, SCR-OP-26, SCR-OP-39]
       BRD-03: [SCR-PM-04, SCR-PM-13, SCR-PM-22]
       BRD-11: [SCR-UA-08, SCR-UA-12]
       BRD-13: [SCR-DM-02, SCR-DM-07, SCR-DM-09]
@@ -102,6 +107,7 @@ components:
       - "The full label up to 21 characters; a longer label has its agreed short form with the full label in the tooltip"
       - "Flags (Generic, Client-specific, Locked, LEGACY) are tags in their own column, never pills"
     screens:
+      BRD-02: [SCR-OP-02, SCR-OP-25, SCR-OP-36, SCR-OP-37]
       BRD-03: [SCR-PM-02, SCR-PM-11, SCR-PM-16]
       BRD-11: [SCR-UA-06, SCR-UA-15]
       BRD-13: [SCR-DM-02, SCR-DM-06]
@@ -116,6 +122,7 @@ components:
       - "An open end reads \"to open\"; in a sentence or a label and value grid the period is one line"
       - "The column is at least 132 px wide"
     screens:
+      BRD-02: [SCR-OP-03, SCR-OP-62]
       BRD-03: [SCR-PM-10, SCR-PM-12]
 
   - name: Form with its validation summary
@@ -129,6 +136,7 @@ components:
       - "The actions at the bottom right: Cancel, then the main action"
       - "Only short format hints under a field; other guidance in the tooltip of the label"
     screens:
+      BRD-02: [SCR-OP-08, SCR-OP-38]
       BRD-03: [SCR-PM-03, SCR-PM-13]
       BRD-11: [SCR-UA-07, SCR-UA-12]
 
@@ -142,6 +150,7 @@ components:
       - "Rows Read, Valid and Rejected with the rows; the rejected rows come back in the error file (the template with an Error column)"
       - "Upload Corrected File keeps the link to the first upload; a file uploaded before is refused"
     screens:
+      BRD-02: [SCR-OP-15, SCR-OP-27, SCR-OP-41, SCR-OP-47, SCR-OP-51]
       BRD-11: [SCR-UA-09, SCR-UA-10]
       BRD-13: [SCR-DM-05]
 
@@ -155,5 +164,6 @@ components:
       - "Outcome facts (result, by, on, figures compared) as facts, never as a sentence"
       - "A dash for an empty value"
     screens:
+      BRD-02: [SCR-OP-03, SCR-OP-10, SCR-OP-26, SCR-OP-39]
       BRD-03: [SCR-PM-13]
       BRD-13: [SCR-DM-07]

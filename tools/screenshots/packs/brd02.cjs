@@ -200,6 +200,17 @@ const selects = {
 };
 
 const after = {
+  // UX deck: a search that finds no invoice (the empty state of the list) and the row action menu of a payment request.
+  'ux-scr-op-02-empty': async (page) => {
+    await page.getByPlaceholder(/^search/i).first().fill('BI-HO-2099-999999');
+    await page.getByRole('button', { name: /^search$/i }).first().click();
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await settle(page, 800);
+  },
+  'ux-scr-op-36-actions': async (page) => {
+    await page.locator('main table tbody tr').first().getByRole('button', { name: /^Actions for/ }).click();
+    await settle(page, 300);
+  },
   'scr-op-03-02-transactions': async (page) => {
     const toggles = page.locator('main section.card', { hasText: 'Policy Transactions' }).locator('button[aria-expanded="false"]');
     if ((await toggles.count()) > 0) {

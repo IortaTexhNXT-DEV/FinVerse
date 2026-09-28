@@ -25,4 +25,5 @@ parts:
   - {part: "Proposed business rules and clarifications for confirmation", prepares: [ITN], input: [BA, OPSI], reviews: [PGM], approves: [PO, OPSH]}
   - {part: "Interfaces, scheduled runs, user access and menus by persona", prepares: [ITN], input: [OPSI], reviews: [IT], approves: [PO]}
   - {part: "Test plan (04 workbook, 05 summary)", prepares: [ITN], input: [OPSI], reviews: [PGM, IT], approves: [PO]}
+  - {part: "UX screen deck, UX screen register and image package (07 to 09, for the BDOI UX Design team; the screens as specified in this set)", prepares: [ITN], input: [OPSI], reviews: [PGM], approves: [PO]}
   - {part: "Technical Specification (separate document, not part of the business sign-off)", prepares: [ITN], input: [IT], reviews: [IT], approves: [IT]}

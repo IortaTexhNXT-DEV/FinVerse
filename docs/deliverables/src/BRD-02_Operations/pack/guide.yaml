@@ -16,6 +16,9 @@ documents:
   - {kind: Signoff, name: Operations, ext: xlsx, what: "Sign-off workbook: one row per screen, field, rule and message with the BU review columns; comments log, meeting minutes, version history, sign-off certificate", readers: "Every reviewer; the business owner signs it", when: "During the review and at sign-off"}
   - {kind: TestPlan, name: Operations, ext: xlsx, what: "Test plan workbook: the test cases traced to the FRs and to the screens, including one screen case and one message case per screen", readers: "Business users who will run UAT; BDOI IT", when: "After the screens; used again in SIT and UAT"}
   - {kind: TestPlan, name: Operations Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Business owner, BDOI IT", when: "Before sign-off"}
+  - {kind: UXDeck, name: Operations, ext: pptx, what: "UX Screen Deck for the BDOI UX Design team: design foundation, navigation and personas, every walkthrough step by step and every screen with all its states", readers: "BDOI UX Design team", when: "From the issue, in parallel with the review; re-issued with each version of the set"}
+  - {kind: UXScreens, name: Operations, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, walkthrough and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
+  - {kind: UXScreens, name: Operations, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG), the component crops and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
 
 # Reading order per role (FRS chapter numbers of v2.0).
 reading:
@@ -35,6 +38,8 @@ reading:
     order: "Accounting events (chapter 5); Disbursement Queue and Remittance Deductions (SCR-OP-33, 34, 36); BIR certificates (SCR-OP-58, 59); cross-BRD contract (chapter 19)"
   - role: BDOI IT
     order: "Interfaces and integration (chapter 7), non-functional requirements (chapter 8), configuration and jobs (chapter 9), Interfaces screen (SCR-OP-61), cross-BRD contract (chapter 19); the Technical Specification, reviewed by BDOI IT"
+  - role: BDOI UX Design team
+    order: "07 UX Screen Deck: design foundation and navigation first, then the personas, walkthroughs and screens of the design work; 08 UX screen register (filter Changed in this issue at each new issue); 09 image package in the design tool"
   - role: iorta TechNXT project team
     order: "All documents; keeps the comments log, the meeting minutes and the version history of the workbook, answers every comment and keeps the traceability to SIT and UAT"
 

@@ -492,10 +492,7 @@ const steps = {
     const stage = ctx.sql(`select stage from csh_receipt_action where receipt_id = ${id} order by id desc limit 1`)[0]?.[0];
     if (stage === 'FOR_APPROVAL') {
       await act(page, 'Approve and Post', { reason: false });
-      await settle(page, 1500);
-      // The receipt page shows the posted cancellation once it is opened again.
-      await page.reload();
-      await settle(page, 1500);
+      await settle(page, 1800);
     }
     return page;
   },

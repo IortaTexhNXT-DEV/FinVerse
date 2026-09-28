@@ -835,7 +835,7 @@ def workbook_sheets(wb: Any, pack: Any, date_sheets: list[Any]) -> None:
            [{"topic": a, "rule": b} for a, b in cat.data.get("file_rules_extra") or []]
     reviewed(wb.sheet("File rules", [Column("topic", "Topic", 20, "Topic of the rule"),
                                      Column("rule", "Rule", 100, "What every extract file follows")] + review(),
-                      rows, description="Rules of every extract and control file: the How to fill sheet of the "
+                      rows, description="Rules of every extract and control file: the delivery rules of the "
                                         "console workbook, then the rules of the migration"))
 
     rows = []

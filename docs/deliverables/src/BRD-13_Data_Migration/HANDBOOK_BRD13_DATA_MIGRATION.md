@@ -344,7 +344,7 @@ source: pack/pack.yaml
 render: dm-layouts
 ```
 
-Four objects have sub-layouts sent as separate files with the same as-of date: R04 and R04B (insurers and their branches), P01 and P01S (policy headers and their insurer shares), F01, F01S and F01C (invoice headers, insurer shares and components), G03 and G03D (adjustment journal lines and their open-item detail). The rules of every file (Migration Workbook sheet File rules; the first rows are the How to fill sheet of the console workbook):
+Four objects have sub-layouts sent as separate files with the same as-of date: R04 and R04B (insurers and their branches), P01 and P01S (policy headers and their insurer shares), F01, F01S and F01C (invoice headers, insurer shares and components), G03 and G03D (adjustment journal lines and their open-item detail). The rules of every file (Migration Workbook sheet File rules; the first rows are the delivery rules the console templates carry):
 
 ```pack
 plugin: build_dm_pack.py
@@ -579,7 +579,7 @@ The transition follows the renewal expiry month (RMEL, BRID 12.1). BDOI answered
 <!-- table: widths=3.2,9.6,3.8 caption="Excel intake of the RA-sent file (DMQ38)" size=8.5 -->
 | Step | What happens | Who |
 |---|---|---|
-| Template | The load template workbook of object P03, exported by the Migration Console (first sheet with the header row, the Columns sheet with the allowed values, the How to fill sheet); the CSV template is also accepted | Migration Console |
+| Template | The load template workbook of object P03, exported by the Migration Console (one guided sheet per layout, uploaded as it is); the CSV template is also accepted | Migration Console |
 | Compilation and check | The maker copies the RA rows of the Retail and Corporate trackers into the template; the checker compares the file with the trackers (counts per tracker, 10 sample rows) and releases it | Renewal processing team - maker, checker |
 | Validation | Header in P01; expiry equal to the header and from go-live to 31 May 2028; RA date not after the last legacy business day (warning when more than 140 days before expiry); cover not already renewed in legacy; one row per expiring term | BIBS |
 | Rejection report | The rejected rows of the P03 batch in Excel (Rejects on the batch) with the row, column, value and message, and columns for the maker's correction and the checker's review | BIBS |

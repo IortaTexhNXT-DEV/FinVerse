@@ -14,7 +14,7 @@ screens:
     shots:
       - {state: home, user: remittl, caption: "Remittance Workbench with the work queues"}
     fields:
-      - "Work Queues | Paid, Not Yet Extracted / Invoices on Hold / Locked Invoices / Batches in Review / Batches for Approval / Awaiting Insurer OR / Holds for Approval / Active Holds / Special Remittances for Approval | Tile | Live count; Needs attention on the queues waiting for action | - | Remittance records and the invoice ledger | - | Read only | A tile opens its list | -"
+      - "Work Queues | [Work tiles: Paid, Not Yet Extracted; Invoices on Hold; Locked Invoices; Batches in Review; Batches for Approval; Awaiting Insurer OR; Holds for Approval; Active Holds; Special Remittances for Approval] | Tile | Live count; Needs attention on the queues waiting for action | - | Remittance records and the invoice ledger | - | Read only | A tile opens its list | -"
     actions:
       - "Search Invoices | Every Remittance user | Always | Opens Invoice Search | - | -"
       - "[A work tile] | Every Remittance user | Always | Opens the list of the queue | - | -"

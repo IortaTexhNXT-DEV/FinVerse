@@ -15,7 +15,7 @@ screens:
     shots:
       - {state: home, user: cashier, caption: "Cashiering Workbench with the work queues of the section"}
     fields:
-      - "Work Queues | Unapplied Payments / Dispositions for Approval / Pre-booked Payments / Cancellations and Reinstatements for Approval / Post-dated Checks in the Warehouse / Check Pick-ups Due / BIR 2307 to Validate / Invoices with Outstanding Premium / Partially Paid Invoices / Hand-offs to Complete | Tile | Live count; Needs attention on the queues waiting for action | - | Cashiering records and the invoice ledger | - | Read only | A tile opens its list | -"
+      - "Work Queues | [Work tiles: Unapplied Payments, Dispositions for Approval, Pre-booked Payments, Cancellations and Reinstatements for Approval, Post-dated Checks in the Warehouse, Check Pick-ups Due, BIR 2307 to Validate, Invoices with Outstanding Premium, Partially Paid Invoices, Hand-offs to Complete] | Tile | Live count; Needs attention on the queues waiting for action | - | Cashiering records and the invoice ledger | - | Read only | A tile opens its list | -"
     actions:
       - "Search Invoices | Every Cashiering user | Always | Opens Invoice Search | - | -"
       - "[A work tile] | Every Cashiering user | Always | Opens the list of the queue | - | -"

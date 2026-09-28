@@ -1,0 +1,220 @@
+# Screen specifications of BRD-2 Operations: Adjustment (endorsement and cancellation requests on booked invoices,
+# linked to their policy, with the recompute per insurer, validation, approval, posting, the Policy Transactions and
+# their accounting entries; batch upload and the minimal balance file).
+area: Adjustment and endorsements
+screens:
+  - id: SCR-OP-37
+    title: Adjustment Workbench
+    route: /adjustment
+    purpose: >-
+      Every endorsement and cancellation request by stage, with the policy it is against: request number, policy
+      number and ARN, invoice and placement slip, assured, insurer and product names, the endorsement type with the
+      request type, the effective date, the aging in days, the status and the flags; one search box finds a request
+      by request, policy, ARN, invoice or client.
+    entry:
+      - Operations Home › Adjustment › Open (tiles For Validation, For Approval, For Posting, Returned, Payments to Re-apply)
+    shots:
+      - {state: list, user: adjust, caption: "Adjustment Workbench with the policy of every request"}
+    fields:
+      - "Tabs | All / Draft / For Validation / For Approval / For Posting / Payments to Re-apply / Returned / Posted | Tab | With the number of requests | - | Fixed | All | - | - | -"
+      - "Toolbar | Search request, policy, ARN, invoice or client | Text | Also insurer, product, placement slip and insurer endorsement reference | N | - | Blank | - | Contains | -"
+      - "List | Request No. | Column | ENR-yyyy-n with the date raised | - | Endorsement requests | - | Read only | - | -"
+      - "List | Policy No. / ARN | Column | The insurer policy number as the ledger holds it now, with the ARN | - | Invoice ledger, account | - | Read only | - | -"
+      - "List | Invoice / Placement Slip | Column | The invoice with the placement slip of the insurer | - | Invoice ledger, placement (BRD-1) | - | Read only | - | -"
+      - "List | Assured | Column | Assured name with the client code | - | Invoice ledger | - | Read only | - | -"
+      - "List | Insurer / Product | Column | Insurer and product names | - | Insurers, products (BRD-3) | - | Read only | - | -"
+      - "List | Type | Column | Business label of the endorsement type with the request type (for example Financial – Change of Cover, Flat Cancellation) | - | List of values endorsement type and request type | - | Read only | - | -"
+      - "List | Effective / Aging / Status / Flags | Column | Aging in days (0 days, 1 day, 12 days); flags Negative Adjustment, Quotation Required, Duplicate Override | - | Endorsement requests | - | Read only | - | No items to display"
+    actions:
+      - "New Request | Marketing Collection, Marketing Team Leader, Adjustment | Always | Opens the New Endorsement Request | - | -"
+      - "Posting Batches | Adjustment | Always | Opens Posting Batches | - | -"
+      - "Batch Upload | Adjustment | Always | Opens Batch Request Upload | - | -"
+      - "Open a row | Every user of the screen | Always | Opens the endorsement request | - | -"
+    rules:
+      - "Every request shows the policy it is against: the chain is request, invoice, account (ARN), placement slip, policy number (FR-OP-061)."
+      - "Aging runs from submission (or creation) to completion in Philippine days (FR-OP-061)."
+      - "Endorsement types show their business labels; codes are never shown (FR-OP-050)."
+    outcome: The team finds any request by its policy and sees what waits at each stage.
+    frs: [FR-OP-050, FR-OP-061]
+    tests: [ADJWB]
+
+  - id: SCR-OP-38
+    title: New Endorsement Request
+    route: /adjustment/new
+    also: [/adjustment/requests/:id/edit]
+    purpose: >-
+      Raises an endorsement or cancellation in three steps: 1. Policy – choose one or more booked invoices by policy,
+      ARN, invoice or client and see their policy details before anything is saved; 2. Request – the endorsement
+      type, request type and the fields the type needs; 3. Recompute & Submit – the before and after per component
+      and per insurer, the duplicate and over-adjustment justifications, then save or submit. The same screen changes
+      a draft or returned request.
+    entry:
+      - Adjustment Workbench › New Request
+      - Endorsement Request › Edit (draft or returned)
+    shots:
+      - {state: policy, user: mktcoll, select: first_policy, caption: "Step 1, Policy: the booked invoice chosen and its policy details"}
+      - {state: request, user: mktcoll, fill: flat_cancellation, caption: "Step 2, Request: a flat cancellation with its reason and effective date"}
+      - {state: recompute, user: mktcoll, fill: flat_cancellation_recompute, caption: "Step 3, Recompute & Submit: before and after and per insurer"}
+      - {state: error, user: mktcoll, fill: request_incomplete, caption: "Step 2 with the field messages of an incomplete request"}
+    fields:
+      - "Steps | Policy / Request / Recompute & Submit | Stepper | - | - | Fixed | Policy | - | - | -"
+      - "Policy / Booked Invoice | Search policy, ARN, invoice or client | Text | - | N | Invoice ledger | Blank | - | - | -"
+      - "Policy / Booked Invoice | Select | Check box | Up to 50 invoices; one request is raised per invoice | Y | - | Not ticked | - | At least one invoice | Select at least one invoice"
+      - "Policy / Booked Invoice | Policy No. / ARN / Invoice No. / Assured / Insurer / Booked / Gross Premium / Payment / Lock | Column | Lock shows the team that holds the invoice | - | Invoice ledger | - | Read only | - | -"
+      - "Policy Details | Policy No. / ARN / Invoice / Placement Slip / Client / Insurer / Product / Period of Cover / Gross Premium | Column | Shown for every chosen invoice and kept on top of the later steps | - | Invoice ledger, account, placement | - | Read only | - | Choose a booked invoice to see its policy"
+      - "Request | Endorsement Type | Drop-down | Business labels: Financial – Change of Sum Insured, Change of Insured Items, Change of Commission Rate, Change of Premium Rate, Extension of Cover, Change of Cover, Adjustment in Charges, Minimal Balance; Non-financial – Descriptive Change, Change of Period, Extension of Period, Cover Extension, Assured Information; Internal Adjustment | Y | List of values endorsement type | Blank | Draft, returned | - | Select the endorsement type"
+      - "Request | Request Type | Drop-down | Flat Cancellation; Flat Cancellation - Retain DST; Partial Cancellation; Increase / Decrease in TSI; Increase / Decrease of Premium Rate; VAT / Premium Tax exempt; Increase / Decrease of taxes; Change of Cover; Extension of Cover; Write-off; Decrease / Increase in Commission; Cancellation Reversal | Cond.: a financial endorsement | List of values endorsement request type | None | Draft, returned | A non-financial endorsement carries none | A financial endorsement needs its request type"
+      - "Request | Reason for Cancellation | Drop-down | - | Cond.: a cancellation | List of values cancellation reason | Blank | Draft, returned | - | Select the reason for cancellation"
+      - "Request | Refund / Premium Basis | Drop-down | Pro-rata, Short Period | Cond.: cancellation or change of sum insured | Fixed list | Pro-rata | Draft, returned | - | -"
+      - "Request | Sum Insured Change / Premium Rate (%) | Number | Increase positive, decrease negative; rate blank = the product rate | Cond.: change of sum insured | - | Blank | Draft, returned | Not zero | Enter the increase (positive) or decrease (negative)"
+      - "Request | Basic Premium / DST / Premium Tax / VAT / LGT / FST / Other Charges / Commission / VAT on Commission | Number | The changes of a financial request priced by amounts | Cond.: at least one | - | Blank | Draft, returned | At least one change | Enter at least one premium, charge or commission change"
+      - "Request | Effective Date | Date | dd-MMM-yyyy, within the cover of the invoice | Y | - | Blank | Draft, returned | Within the cover | Enter the effective date"
+      - "Request | Insurer Endorsement Ref. | Text | Checked for duplicates | N | - | Blank | Draft, returned | - | -"
+      - "Request | New Inception / New Expiry | Date | For a change or extension of period | Cond. | - | Blank | Draft, returned | The new expiry after the new inception | The new expiry must be after the new inception"
+      - "Request | Description / Additional / Other Instructions | Text area | Instructions are printed on the endorsement slip | Y / N | - | Blank | Draft, returned | Description not blank | Describe the change"
+      - "Recompute & Submit | Class / Premium Change / Commission Change / VAT on Commission | Display | Amounts | - | Recompute | - | Read only | - | -"
+      - "Recompute & Submit | Before and After | Table | Component, Before, Change, After | - | Recompute | - | Read only | - | No financial effect"
+      - "Recompute & Submit | Per Insurer | Table | Insurer, Share, Premium / Refund, Commission, VAT; the lead insurer marked | - | Recompute | - | Read only | - | No insurer change"
+      - "Recompute & Submit | [Duplicate justification] | Text area | Shown when a request has the same invoice, request type, reason and endorsement reference | Cond. | - | Blank | Draft, returned | Needed to proceed | Possible duplicate of <request> (same invoice, request type, reason and endorsement reference): give the justification to proceed"
+      - "Recompute & Submit | [Over-adjustment justification] | Text area | Shown when the cumulative adjustments exceed the baseline of the original premium | Cond. | - | Blank | Draft, returned | Needed to submit | -"
+    actions:
+      - "Next / Back | Requester | Step complete | Moves between the steps | - | -"
+      - "Recompute | Requester | Request step complete | Computes the before and after per component and per insurer | - | -"
+      - "Save Draft | Requester | Always | Saves one request per invoice | Draft | -"
+      - "Submit for Validation | Requester | Request complete | Saves and submits one request per invoice; the invoice is locked by Adjustment and a reducing request flags a pending negative adjustment | For validation | Endorsement request status (NT-16); Negative adjustment notice (NT-13)"
+    rules:
+      - "One request per invoice; the wizard and the upload raise several requests at once (FR-OP-050)."
+      - "The ARN, invoice, policy, client, insurer, segment, Account Officer, account and product are copied from the ledger and the account, so every request is linked to its policy and placement (FR-OP-050)."
+      - "The effective date is within the cover of the invoice; a return invoice, a cancelled or written-off invoice and an invoice locked by another team are refused (FR-OP-050)."
+      - "A cancellation cannot be combined with another open financial request on the same invoice (FR-OP-050)."
+      - "A possible duplicate needs a justification, which is kept on the request (FR-OP-051)."
+      - "The recompute is rated once per insurer share and split by the shares of the invoice (FR-OP-054)."
+      - "Cumulative adjustments above the baseline of the original premium, or below zero, need a justification and raise an alert (FR-OP-058)."
+      - "A TSI increase above the package limit needs the quotation of Marketing linked before validation (FR-OP-055)."
+    outcome: The requests are raised against their policy with their financial effect shown before anything is posted.
+    frs: [FR-OP-050, FR-OP-051, FR-OP-054, FR-OP-055, FR-OP-058]
+    tests: [NEWREQ]
+
+  - id: SCR-OP-39
+    title: Endorsement Request
+    route: /adjustment/requests/:id
+    parent: /adjustment
+    purpose: >-
+      One request with the policy it is against (Policy No., ARN and Invoice chips), the key facts, the endorsement
+      workflow with its history and actions, and the tabs Details, Policy, Recompute, Accounting, Policy Transactions,
+      Documents and History; the endorsement slip and the validation slip are produced here.
+    entry:
+      - Adjustment Workbench › open a row
+      - Invoice 360 › Adjustments tab; Policy Transactions › request number
+    shots:
+      - {state: approval, user: adjtl, open_request: for_approval, caption: "Endorsement request for approval: policy chips, facts and the workflow header"}
+      - {state: policy, user: adjtl, open_request: for_approval, tab: "Policy", caption: "Policy tab: the policy and placement with the links to the account and the invoice"}
+      - {state: accounting, user: adjtl, open_request: posted_cancellation, tab: "Accounting", caption: "Accounting tab of a posted cancellation: the GL entries"}
+      - {state: transactions, user: adjtl, open_request: posted_cancellation, tab: "Policy Transactions", caption: "Policy Transactions tab: the booking and the cancellation with their journals"}
+    fields:
+      - "Header | Policy No. / ARN / Invoice | Reference chip | - | - | Endorsement request | - | Read only | - | -"
+      - "Header | [Stage pill] | Status pill | Draft, For Validation, For Approval, For Posting, Payments to Re-apply, Posted, Returned, Cancelled | - | Endorsement request | - | Read only | - | -"
+      - "Header | Policy No. / Invoice / Insurer / Product / Period / Effective / Type / Requested By / Aging / Placement Slip / Batch | Display | Period and effective date on one line | - | Endorsement request, invoice ledger | - | Read only | - | -"
+      - "Workflow | [Endorsement workflow header] | Stepper | Draft request, For validation, For approval, For posting, Posted; Returned to requester and Cancelled when reached | - | Endorsement request | - | Read only | - | -"
+      - "Tabs | Details / Policy / Recompute / Accounting / Policy Transactions / Documents / History | Tab | - | - | Fixed | Details | - | - | -"
+      - "Details | Endorsement Type / Request Type / Reason / Effective Date / Refund Basis / Sum Insured Change / Insurer Endorsement Ref. / New Period / Description / Instructions / Duplicate Justification / Baseline Justification / Quotation | Display | - | - | Endorsement request | - | Read only | - | -"
+      - "Details | Requested By / Submitted / Validated / Approved / Posted / Completed / Aging / Endorsement Slip | Display | Name and time of each step | - | Endorsement request | - | Read only | - | -"
+      - "Policy | ARN / Placement Slip / Client / Insurer / Product / Period of Cover / Gross Premium | Display | Links to the account and the invoice | - | Invoice ledger, account, placement | - | Read only | - | -"
+      - "Recompute | Before and After / Per Insurer | Table | As on the New Endorsement Request | - | Recompute | - | Read only | - | -"
+      - "Accounting | Journal / GL Account / Party / Debit / Credit | Column | Every journal the posting wrote, including the re-application of payments | - | Journals (BRD-5) | - | Read only | - | Nothing posted yet"
+      - "Policy Transactions | Date / Transaction / Reference / Premium Change / Taxes Change / Commission Change / Gross Premium After / Status / Accounting | Column | The row of this request highlighted | - | Policy transaction history | - | Read only | - | -"
+      - "Documents | [Documents panel] | Panel | Supporting Documents of the request | - | Documents | - | Until posted | File type, size and content checks | -"
+      - "Link Quotation dialog | Quotation No. | Text | - | Y | Quotations (BRD-1) | Blank | For validation, quotation required | Not blank | Enter the quotation number"
+    actions:
+      - "Edit | Requester | Draft or returned | Opens the request in the New Endorsement Request | - | -"
+      - "Submit for Validation / Resubmit | Requester | Draft / Returned | Sends the request to Adjustment | For validation | Endorsement request status (NT-16)"
+      - "Validate | Adjustment | For validation | Validates the request: to approval, or straight to posting when it has no financial effect (an extension of cover always needs approval) | For approval or For posting | Endorsement request status (NT-16)"
+      - "Approve | Adjustment Team Leader who did not raise, submit or validate it | For approval | Approves the request | For posting | Endorsement request status (NT-16)"
+      - "Return to Requester | Adjustment, Adjustment Team Leader | For validation, approval or posting | Asks for the reason and returns the request | Returned | Endorsement request status (NT-16)"
+      - "Post | Adjustment | For posting | Posts the request: the endorsement or return invoice, its journal and service invoice, the AR Insurer after remittance, and the re-application of the payments of a paid invoice | Posted, or Payments to Re-apply | Endorsement request status (NT-16)"
+      - "Re-apply Payments | Adjustment | Payments to re-apply | Re-applies the payments of the invoice through Cashiering | Posted | Endorsement request status (NT-16)"
+      - "Link Quotation | Adjustment | Quotation required | Links the quotation prepared by Marketing | Unchanged | -"
+      - "Cancel request | Requester | Draft or returned | Cancels the request; the invoice is released when no other request is open | Cancelled | Endorsement request status (NT-16)"
+      - "Endorsement Slip / Validation Slip | Every user of the screen | Not internal / validated | Downloads the endorsement slip (numbered ES-yyyy-n once) or the validation slip | - | -"
+    rules:
+      - "A request is approved by someone who did not raise, submit or validate it (FR-OP-053)."
+      - "Posting books the endorsement or return invoice through New Business booking; a decrease or cancellation is counted once, on the original invoice (FR-OP-056)."
+      - "After remittance, the remitted DTIP of a cancelled or reduced invoice is set up as AR Insurer per insurer share, and the pending negative adjustment stays for Remittance (FR-OP-057)."
+      - "A paid invoice's payments are re-applied by Cashiering; the excess becomes an unapplied payment for refund (FR-OP-057)."
+      - "Policy Transactions show the original booking and every endorsement, adjustment, cancellation and refund with the position after each and its journals (FR-OP-061)."
+      - "The invoice is locked by Adjustment while a request is open (FR-OP-006)."
+    outcome: The endorsement is validated, approved, posted with its accounting and visible in the policy history.
+    frs: [FR-OP-006, FR-OP-052, FR-OP-053, FR-OP-055, FR-OP-056, FR-OP-057, FR-OP-060, FR-OP-061, FR-OP-114]
+    tests: [REQ]
+
+  - id: SCR-OP-40
+    title: Posting Batches
+    route: /adjustment/batches
+    purpose: >-
+      The requests ready for posting: the selected requests are posted as one batch VB-yyyy-n, each on its own, or
+      returned with a reason; the posted batches list their outcome (posted, payments to re-apply, failed).
+    entry:
+      - Adjustment Workbench › Posting Batches
+    shots:
+      - {state: ready, user: adjust, caption: "Posting Batches, Ready for Posting"}
+      - {state: posted, user: adjust, tab: "Posted Batches", caption: "Posting Batches, Posted Batches with their outcome"}
+    fields:
+      - "Tabs | Ready for Posting / Posted Batches | Tab | - | - | Fixed | Ready for Posting | - | - | -"
+      - "Ready for Posting | Search Request No. | Text | - | N | - | Blank | - | - | -"
+      - "Ready for Posting | Request No. / Invoice No. / Assured / Type / Effective / Flags | Column | With a selection check box | - | Endorsement requests | - | Read only | - | No items to display"
+      - "Posted Batches | Batch No. / Posted / Posted By / Posted / To Re-apply / Failed / Remarks | Column | VB-yyyy-n with the counts | - | Posting batches | - | Read only | - | -"
+      - "Batch result dialog | Posted / Payments to Re-apply / Failed | Tile | Counts | - | Posting batch | - | Read only | - | -"
+      - "Batch result dialog | Request No. / Invoice No. / Outcome | Column | Posted, Payments to Re-apply or Failed with the message | - | Posting batch | - | Read only | - | -"
+      - "Return dialog | Reason / Comment | Drop-down, text | - | Y / N | List of values adjustment return reason | Blank | Ready for posting | - | Select the return reason"
+    actions:
+      - "Post Selected / Post Batch | Adjustment | Rows selected | Asks for confirmation and posts each request on its own as one batch; a failure does not stop the others | Posted, or Payments to Re-apply | Endorsement request status (NT-16)"
+      - "Return Selected | Adjustment | Rows selected | Asks for the reason and returns the requests to their requesters | Returned | Endorsement request status (NT-16)"
+    rules:
+      - "Each request of a batch is posted in its own transaction (FR-OP-056)."
+    outcome: The requests ready for posting are posted together, with the outcome of each.
+    frs: [FR-OP-056]
+    tests: [POSTBATCH]
+
+  - id: SCR-OP-41
+    title: Batch Request Upload
+    route: /adjustment/upload
+    purpose: >-
+      Uploads cancellation and adjustment requests for many invoices at once: one request per row on a booked
+      invoice, validated row by row before anything is created.
+    entry:
+      - Adjustment Workbench › Batch Upload
+    shots:
+      - {state: wizard, user: adjust, caption: "Batch Request Upload: template and upload steps"}
+    fields:
+      - "1. Template | Download Template | Button | The columns of the upload (chapter 18) | - | Upload template | - | - | Headers unchanged | -"
+      - "2. Upload | File | File | XLSX, ODS or CSV | Y | - | - | - | Every row checked first | Possible duplicate of <request>"
+    actions:
+      - "Upload and Validate | Adjustment | File chosen | Validates every row and shows Rows Read, Valid and Rejected | - | -"
+      - "[Process the valid rows] | Adjustment | Rows validated | Raises one request per valid row | Draft or For validation | -"
+    rules:
+      - "The rows follow the rules of a request raised on screen; a possible duplicate needs the justification column (FR-OP-050, FR-OP-051)."
+    outcome: Many requests are raised in one upload.
+    frs: [FR-OP-050, FR-OP-056]
+    tests: [ADJUP]
+
+  - id: SCR-OP-42
+    title: Minimal Balance File
+    route: /adjustment/minimal-balance
+    purpose: >-
+      Writes off or credits premium receivable balances of 10.00 to 100.00 from a file of invoices, and lists the
+      balances processed with their journal.
+    entry:
+      - Adjustment Workbench
+    shots:
+      - {state: page, user: adjust, caption: "Minimal Balance File with the balances written off or credited"}
+    fields:
+      - "1. Template / 2. Upload | [Minimal balance file] | Upload | Invoice No and Balance (chapter 18) | Y | Upload template | - | - | A file already uploaded is refused | -"
+      - "Balances Written Off or Credited | File / Invoice No. / ARN / Client / Balance / Action / Journal / Processed | Column | Write-off or credit | - | Minimal balance write-offs | - | Read only | - | No items to display"
+    actions:
+      - "Upload and Validate | Adjustment | File chosen | Validates and processes the rows: a debit balance written off, a credit balance credited | Written off | -"
+    rules:
+      - "A row is processed when the invoice exists, its premium receivable balance equals the file, lies within 10.00-100.00, was not written off and no other team locks it (FR-OP-059)."
+      - "A written-off invoice is not extracted for remittance and is skipped by the Cashiering sweep (FR-OP-059, FR-OP-023)."
+    outcome: Small balances are cleared with their accounting entry, once per invoice.
+    frs: [FR-OP-059]
+    tests: [MINBAL]

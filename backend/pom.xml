@@ -34,6 +34,18 @@
     <awssdk.version>2.55.6</awssdk.version>
     <surefire.runOrder>alphabetical</surefire.runOrder>
 
+    <!-- Security fixes ahead of the Spring Boot managed versions (dependency gate, CVSS >= 7, and
+         the medium findings with a fix). Remove an override once the parent manages the same or a
+         newer version. -->
+    <tomcat.version>10.1.60</tomcat.version>
+    <netty.version>4.1.138.Final</netty.version>
+    <jackson-bom.version>2.21.7</jackson-bom.version>
+    <postgresql.version>42.7.13</postgresql.version>
+    <commons-lang3.version>3.20.0</commons-lang3.version>
+    <log4j2.version>2.25.5</log4j2.version>
+    <lz4-java.version>1.11.4</lz4-java.version>
+    <bouncycastle.version>1.86</bouncycastle.version>
+
     <!-- Quality tooling versions -->
     <checkstyle-plugin.version>3.6.0</checkstyle-plugin.version>
     <checkstyle.version>10.26.1</checkstyle.version>
@@ -44,6 +56,12 @@
     <spotless.version>2.46.1</spotless.version>
     <google-java-format.version>1.28.0</google-java-format.version>
 
+    <!-- Supply chain: software bill of materials and the dependency vulnerability gate
+         (docs/quality/QUALITY_GATES.md "Dependency and supply-chain checks") -->
+    <cyclonedx-plugin.version>2.9.3</cyclonedx-plugin.version>
+    <dependency-check.version>13.0.0</dependency-check.version>
+    <dependency-check.failBuildOnCVSS>7</dependency-check.failBuildOnCVSS>
+
     <!-- Quality gate thresholds (see docs/quality/QUALITY_GATES.md) -->
     <jacoco.line.minimum>0.80</jacoco.line.minimum>
     <jacoco.branch.minimum>0.65</jacoco.branch.minimum>
@@ -53,6 +71,17 @@
     <sonar.coverage.jacoco.xmlReportPaths>${project.build.directory}/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     <sonar.coverage.exclusions>**/config/**,**/*Application.java,**/dto/**</sonar.coverage.exclusions>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- LZ4 compression of the Kafka client (security fix). -->
+      <dependency>
+        <groupId>at.yawk.lz4</groupId>
+        <artifactId>lz4-java</artifactId>
+        <version>${lz4-java.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <dependencies>
     <!-- Web, persistence, security -->
@@ -72,7 +101,7 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcprov-jdk18on</artifactId>
-      <version>1.81</version>
+      <version>${bouncycastle.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -411,6 +440,32 @@
         </executions>
       </plugin>
 
+      <!-- Software bill of materials (CycloneDX 1.6, JSON and XML) of the runtime dependencies:
+           target/bom.json, published by the pipeline as a build artefact. -->
+      <plugin>
+        <groupId>org.cyclonedx</groupId>
+        <artifactId>cyclonedx-maven-plugin</artifactId>
+        <version>${cyclonedx-plugin.version}</version>
+        <configuration>
+          <projectType>application</projectType>
+          <schemaVersion>1.6</schemaVersion>
+          <outputFormat>all</outputFormat>
+          <outputName>bom</outputName>
+          <includeTestScope>false</includeTestScope>
+          <includeProvidedScope>false</includeProvidedScope>
+          <includeSystemScope>false</includeSystemScope>
+        </configuration>
+        <executions>
+          <execution>
+            <id>sbom</id>
+            <phase>package</phase>
+            <goals>
+              <goal>makeBom</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <!-- Test coverage gate -->
       <plugin>
         <groupId>org.jacoco</groupId>
@@ -466,5 +521,40 @@
         </executions>
       </plugin>
     </plugins>
+    <pluginManagement>
+      <plugins>
+        <!-- Known vulnerabilities (NVD) of the dependencies: the pipeline runs
+             `mvn org.owasp:dependency-check-maven:check` and fails at CVSS 7 or above. A finding is
+             fixed by upgrading the library; a suppression needs a reason and an expiry date
+             (quality/dependency-check-suppressions.xml). NVD_API_KEY comes from the pipeline secrets. -->
+        <plugin>
+          <groupId>org.owasp</groupId>
+          <artifactId>dependency-check-maven</artifactId>
+          <version>${dependency-check.version}</version>
+          <configuration>
+            <failBuildOnCVSS>${dependency-check.failBuildOnCVSS}</failBuildOnCVSS>
+            <suppressionFiles>
+              <suppressionFile>${project.basedir}/quality/dependency-check-suppressions.xml</suppressionFile>
+            </suppressionFiles>
+            <failOnError>true</failOnError>
+            <nvdApiKeyEnvironmentVariable>NVD_API_KEY</nvdApiKeyEnvironmentVariable>
+            <skipTestScope>true</skipTestScope>
+            <skipProvidedScope>true</skipProvidedScope>
+            <skipSystemScope>true</skipSystemScope>
+            <formats>
+              <format>HTML</format>
+              <format>JSON</format>
+              <format>SARIF</format>
+            </formats>
+            <!-- Java dependencies only; the web client has its own gate (npm audit). -->
+            <nodeAnalyzerEnabled>false</nodeAnalyzerEnabled>
+            <nodeAuditAnalyzerEnabled>false</nodeAuditAnalyzerEnabled>
+            <retireJsAnalyzerEnabled>false</retireJsAnalyzerEnabled>
+            <assemblyAnalyzerEnabled>false</assemblyAnalyzerEnabled>
+            <ossindexAnalyzerEnabled>false</ossindexAnalyzerEnabled>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 </project>

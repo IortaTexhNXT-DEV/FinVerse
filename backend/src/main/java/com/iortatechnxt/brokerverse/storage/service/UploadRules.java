@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.storage.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.storage.StorageProperties;
+import com.iortatechnxt.brokerverse.common.util.TextContent;
 import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
@@ -21,7 +22,6 @@ public class UploadRules {
 
   private static final Pattern UNSAFE_NAME_CHARS = Pattern.compile("[\\p{Cntrl}\"\\\\/:*?<>|]");
   private static final int MAX_NAME = 255;
-  private static final int TEXT_PROBE = 4096;
   private static final long MB = 1024L * 1024L;
 
   private static final byte[] PDF = "%PDF-".getBytes(StandardCharsets.US_ASCII);
@@ -194,13 +194,7 @@ public class UploadRules {
 
     boolean matches(byte[] content) {
       if (signature.length == 0) {
-        byte[] probe = Arrays.copyOf(content, Math.min(content.length, TEXT_PROBE));
-        for (byte b : probe) {
-          if (b == 0) {
-            return false;
-          }
-        }
-        return true;
+        return TextContent.isText(content);
       }
       return content.length >= signature.length
           && Arrays.equals(Arrays.copyOf(content, signature.length), signature);

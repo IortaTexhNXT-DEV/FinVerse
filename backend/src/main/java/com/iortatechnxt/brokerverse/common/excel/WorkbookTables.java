@@ -1,6 +1,6 @@
 package com.iortatechnxt.brokerverse.common.excel;
 
-import java.io.ByteArrayInputStream;
+import com.iortatechnxt.brokerverse.common.office.OfficeFileLimits;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -14,7 +14,6 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * Reads the data sheet of an uploaded Excel workbook into text cells (dates as yyyy-MM-dd): the
@@ -35,7 +34,7 @@ public final class WorkbookTables {
    */
   public static List<List<String>> read(byte[] content, Collection<String> expected)
       throws IOException {
-    try (Workbook wb = new XSSFWorkbook(new ByteArrayInputStream(content))) {
+    try (Workbook wb = OfficeFileLimits.workbook(content)) {
       DataFormatter formatter = new DataFormatter(Locale.ROOT);
       Sheet sheet = dataSheet(wb, expected, formatter);
       return rows(sheet, formatter, sheet.getLastRowNum());

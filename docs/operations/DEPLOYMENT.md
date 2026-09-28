@@ -19,10 +19,21 @@ One backend image (`bibs-backend`) runs as three deployments, each with its runt
 
 All pods: HTTPS on 8443, startup / readiness / liveness probes over HTTPS (`/actuator/health/*`, `/healthz`),
 rolling updates with `maxUnavailable: 0`, a `preStop` pause so the load balancer deregisters a pod before it stops.
-Backend pods run as a non-root user with a read-only root file system, no Linux capabilities and the
-`RuntimeDefault` seccomp profile. The backend JVM takes 75 % of the container memory (`JAVA_OPTS`). The frontend
-image runs nginx as root today, so the namespace enforces the `baseline` Pod Security level (and warns on
-`restricted`); an unprivileged nginx base image for the frontend would allow `restricted` for the whole namespace.
+Every pod runs as a non-root user (backend uid/gid 10001, frontend nginx uid/gid 101) with a read-only root file
+system, no Linux capabilities, no privilege escalation and the `RuntimeDefault` seccomp profile; the namespace
+enforces the `restricted` Pod Security level. Writable paths are `emptyDir` volumes: `/tmp` for the backend; the
+rendered configuration (`/etc/nginx/conf.d`), `/var/cache/nginx`, `/var/run` and `/tmp` for nginx. The backend JVM
+takes 75 % of the container memory (`JAVA_OPTS`).
+
+Every container declares CPU, memory and ephemeral-storage requests and limits (the ephemeral-storage limit covers
+the `emptyDir` volumes); the `LimitRange` `bibs-container-defaults` bounds any other container of the namespace. The
+PodDisruptionBudgets use `unhealthyPodEvictionPolicy: AlwaysAllow`, so a pod that is not ready never blocks a node
+drain. The service account token is mounted only on the three backend accounts that use IRSA.
+
+Container images: the frontend runtime image is `nginxinc/nginx-unprivileged` (stable line) listening on 8080
+(plain HTTP, docker compose) and 8443 (TLS, Kubernetes); the backend runs on the Eclipse Temurin 21 JRE. Every base
+image is pinned by digest in the Dockerfiles; the header comment of each Dockerfile says how to refresh a pin. The
+pipeline scans both built images (Trivy) before they are pushed.
 
 ## 2. Manifests (`deploy/k8s`, Kustomize)
 
@@ -95,6 +106,42 @@ other; `bibs-frontend` has no egress besides DNS. Kubelet probes are not affecte
 
 Each backend deployment has its own service account with an IAM role (IRSA); no AWS keys are stored anywhere.
 
+## 4a. Database roles
+
+The schema owner and the application login are separate (least privilege):
+
+| Login / role | Created by | Rights | Used by |
+|---|---|---|---|
+| `bibs_owner` (schema owner, `SPRING_FLYWAY_USER`) | DBA | owner of every table, sequence and function of the schema; `CREATEROLE` only if it is to create the runtime role itself | Flyway at start-up (all DDL, grants) |
+| `brokerverse_runtime` (`BROKERVERSE_DB_RUNTIME_ROLE`, `NOLOGIN`) | migration V1190 (or the DBA beforehand) | `SELECT`, `INSERT`, `UPDATE`, `DELETE` on the tables, `USAGE`/`SELECT` on the sequences, read-only on `flyway_schema_history`; no `CREATE`, `TRUNCATE`, `TRIGGER` or `REFERENCES`, owner of nothing | – (group role) |
+| `bibs_app` (`BROKERVERSE_DB_USER`) | DBA | `LOGIN`, member of `brokerverse_runtime` | the application connection pool |
+
+The runtime login therefore cannot change the schema, truncate a table, disable the immutability triggers of the
+audit and ledger tables (only the owner can) or rewrite the migration history. The default privileges of V1190 give
+the runtime role the same row access on every table a later migration creates. A production start is refused when
+`SPRING_FLYWAY_USER` is missing or equals `BROKERVERSE_DB_USER` (CONFIGURATION.md "Production start-up safeguards").
+
+One-time set-up by the DBA on Amazon RDS (as the master user; passwords from AWS Secrets Manager, never in scripts):
+
+```sql
+CREATE ROLE bibs_owner LOGIN PASSWORD '<from Secrets Manager>';
+CREATE ROLE brokerverse_runtime NOLOGIN;
+CREATE ROLE bibs_app LOGIN PASSWORD '<from Secrets Manager>' IN ROLE brokerverse_runtime;
+CREATE DATABASE brokerverse OWNER bibs_owner;
+\c brokerverse
+ALTER SCHEMA public OWNER TO bibs_owner;
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+```
+
+An existing database whose objects belong to the former application login moves to the owner with
+`REASSIGN OWNED BY <former login> TO bibs_owner;` (run in the database, as the master user) before the release
+that sets `SPRING_FLYWAY_USER`; V1190 then grants the runtime role on the existing objects. Every backend pod runs
+Flyway at start-up (a lock serialises them), so all three deployments carry the owner credentials in
+`bibs-backend-secrets`; the migration connection uses the same TLS settings as the pool.
+
+Development, the automated tests and the docker compose stack use one login (the owner) for both; V1190 still
+creates the runtime role there, and `DatabaseRuntimeRoleIT` proves what the role cannot do.
+
 ## 5. Values BDO IT provides
 
 Set in `overlays/<env>/environment.yaml` and the `bibs-backend-config` patch of the overlay:
@@ -108,6 +155,7 @@ Set in `overlays/<env>/environment.yaml` and the `bibs-backend-config` patch of 
 | AWS Private CA for in-cluster certificates, IAM roles of the three backend service accounts | BDO cloud platform / security teams |
 | Apigee X key set address, token issuer and audience; the scopes per published API | BDO API team |
 | ECR registry and release tags; secrets in AWS Secrets Manager | Release team |
+| Database logins: schema owner and least-privilege application login (section 4a) | DBA |
 
 Every value that is still a `<...>` placeholder must be replaced before the first apply: the base keeps
 documentation-only network ranges (`192.0.2.x`) that match nothing, so a forgotten range blocks traffic instead of

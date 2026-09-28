@@ -29,6 +29,10 @@ import org.springframework.core.env.Profiles;
  *       database URL, user and password; the JWT signing key (at least 32 characters and not a
  *       development value); the SMTP host and credentials when mail delivery is on; the Redis
  *       password when Redis is on; the Kafka SASL protocol and credentials when Kafka is on.
+ *   <li><b>Database roles.</b> A production start is refused unless the migrations run as the
+ *       schema owner ({@code SPRING_FLYWAY_USER} and {@code SPRING_FLYWAY_PASSWORD}) and the
+ *       application connects as a different, least-privilege runtime login ({@code
+ *       BROKERVERSE_DB_USER}); see DEPLOYMENT.md "Database roles".
  *   <li><b>Encryption in transit.</b> A production start is refused when a connection could run in
  *       plaintext: PostgreSQL without {@code sslmode=verify-full} (or {@code verify-ca}), Redis
  *       without TLS, Kafka without {@code SASL_SSL}, the HTTP listener without TLS ({@code
@@ -112,6 +116,7 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
     }
     if (production) {
       requireSecrets(environment, problems);
+      requireSeparateDatabaseRoles(environment, problems);
       requireEncryptionInTransit(environment, problems);
       requireIntegrationTokens(environment, problems);
     }
@@ -159,6 +164,30 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
           "spring.kafka.properties.sasl.jaas.config",
           "BROKERVERSE_KAFKA_SASL_JAAS_CONFIG",
           problems);
+    }
+  }
+
+  private static void requireSeparateDatabaseRoles(Environment env, List<String> problems) {
+    if (enabled(env, "spring.flyway.enabled", true)) {
+      requireMigrationOwner(env, problems);
+    }
+  }
+
+  private static void requireMigrationOwner(Environment env, List<String> problems) {
+    String owner = env.getProperty(MigrationOwnerConnection.OWNER_PROPERTY, "").trim();
+    if (owner.isEmpty()) {
+      problems.add(
+          "SPRING_FLYWAY_USER (schema owner running the migrations) is not set; the application"
+              + " must connect as a least-privilege runtime login");
+    } else {
+      if (String.CASE_INSENSITIVE_ORDER.compare(
+              owner, env.getProperty("spring.datasource.username", "").trim())
+          == 0) {
+        problems.add(
+            "SPRING_FLYWAY_USER and BROKERVERSE_DB_USER name the same login; the application must"
+                + " connect as a least-privilege runtime login, not as the schema owner");
+      }
+      require(env, "spring.flyway.password", "SPRING_FLYWAY_PASSWORD", problems);
     }
   }
 

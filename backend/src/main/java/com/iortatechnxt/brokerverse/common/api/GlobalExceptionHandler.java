@@ -135,6 +135,12 @@ public class GlobalExceptionHandler {
     MethodArgumentTypeMismatchException.class
   })
   public ProblemDetail handleUnreadableRequest(Exception ex) {
+    for (Throwable cause = ex.getCause(); cause != null; cause = cause.getCause()) {
+      if (cause instanceof RequestBodyTooLargeException tooLarge) {
+        return problem(
+            HttpStatus.PAYLOAD_TOO_LARGE, RequestBodyTooLargeException.CODE, tooLarge.getMessage());
+      }
+    }
     String detail =
         switch (ex) {
           case MissingServletRequestParameterException m ->

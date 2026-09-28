@@ -1,7 +1,7 @@
 # Pod network access, deny by default (ARCHITECTURE_OPTION_DECISION.md 5.2). Only these flows are
 # open: load balancer -> bibs-web / bibs-integration / bibs-frontend (8443), monitoring -> backend
 # metrics (8443), backend -> PostgreSQL / Redis / Kafka, backend -> AWS interface endpoints (443),
-# backend -> BDO network through the private route (Apigee X 443, SMTP relay 587), and DNS.
+# backend -> client network through the private route (API gateway 443, SMTP relay 587), and DNS.
 # Pods never call each other. The address ranges below are replaced per environment from the
 # overlay's network-ranges.yaml (components/network-ranges); the 192.0.2.x values of the base are
 # documentation addresses that match nothing, so an overlay that forgets a range stays closed.
@@ -92,12 +92,12 @@ spec:
       ports:
         - { protocol: TCP, port: 443 }
 ---
-# Backend -> BDO systems over the private route: Apigee X (outbound APIs and its key set, 443) and
-# the SMTP relay of CCM (587, STARTTLS).
+# Backend -> client systems over the private route: the API gateway (outbound APIs and its key set,
+# 443) and the client's SMTP relay (587, STARTTLS).
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: backend-to-bdo-network
+  name: backend-to-client-network
 spec:
   podSelector: { matchLabels: { bibs/tier: backend } }
   policyTypes: [Egress]

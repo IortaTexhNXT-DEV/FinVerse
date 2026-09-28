@@ -45,6 +45,13 @@ spring:
     # Migrations are numbered in per-module ranges (see DEVELOPER_GUIDE "Migrations"), so a new
     # migration of one module can have a lower version than one already applied by another.
     out-of-order: true
+    # ---- Database roles (DEPLOYMENT.md "Database roles"): the migrations run as the schema owner
+    # given by SPRING_FLYWAY_USER / SPRING_FLYWAY_PASSWORD (required in production; unset = the
+    # application login, as in development and tests); the application login (BROKERVERSE_DB_USER)
+    # is a member of the runtime role below, which V1190 grants row access only (no DDL, no
+    # TRUNCATE, not the owner). MigrationOwnerConnection applies the TLS settings of the pool.
+    placeholders:
+      runtime_role: ${BROKERVERSE_DB_RUNTIME_ROLE:brokerverse_runtime}
   jackson:
     serialization:
       write-dates-as-timestamps: false
@@ -171,6 +178,13 @@ brokerverse:
       failed-attempt-window: ${BROKERVERSE_LOGIN_FAILURE_WINDOW:P1D}
   attachments:
     max-size: ${BROKERVERSE_ATTACHMENT_MAX_SIZE:10MB}
+    # Where uploaded files are scanned for malware (MalwareScanPolicy): storage (the S3 file store
+    # with GuardDuty Malware Protection; required in production), application (a scanner bean)
+    # or none (development and tests only).
+    malware-scan: ${BROKERVERSE_MALWARE_SCAN:storage}
+  # Largest JSON request body (JsonBodyLimitFilter, 413 above); file uploads have their own limits.
+  http:
+    max-json-body-size: ${BROKERVERSE_MAX_JSON_BODY_SIZE:2MB}
   # ---- Document storage (build step ST0), docs/architecture/DOCUMENT_STORAGE_DECISION.md ----
   storage:
     # s3 (every shared environment; the local store is refused in production) or local (file system).
@@ -460,8 +474,9 @@ logging:
     root: INFO
     com.iortatechnxt.brokerverse: INFO
   pattern:
-    # %replace neutralises CR/LF in messages (log forging protection, see spotbugs-exclude.xml).
-    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%thread] %logger{36} - %replace(%msg){'[\\r\\n]', '_'}%n"
+    # CR/LF in messages are neutralised by the message converter of logback-spring.xml (log forging
+    # protection, see spotbugs-exclude.xml), whatever pattern is set here.
+    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%thread] %logger{36} - %msg%n"
 
 ---
 # Seed profile (local development, SIT, UAT and training): loads the seed data (company, branches,

@@ -9,8 +9,11 @@ are for local development only.
 | `BROKERVERSE_ENVIRONMENT` | yes | `local` (`seed` with the seed profile) | `brokerverse.environment`: `local`, `sit`, `uat`, `training`, `preprod` or `production`. `production` (set by the `prod` profile) turns on the start-up safeguards. |
 | `BROKERVERSE_BUSINESS_ZONE` | no | `Asia/Manila` | `brokerverse.business-zone`: time zone of the business date (`BusinessClock`). "Today", "not in the future" and cut-off checks, accounting periods, report date keywords, job run dates and the report day cuts use the calendar day of this zone; timestamps stay UTC and the job cron expressions are UTC. An unknown zone refuses the start. Change it only with a new deployment, never on a running platform. |
 | `BROKERVERSE_DB_URL` | yes | `jdbc:postgresql://localhost:5432/brokerverse`; none with `prod` | JDBC URL. Leave `sslmode` out: `BROKERVERSE_DB_SSL_MODE` applies (an `sslmode` in the URL takes precedence, and a plaintext one is refused in production). |
-| `BROKERVERSE_DB_USER` | yes | `brokerverse`; none with `prod` | Database user (owner of the schema; Flyway migrates on start). |
+| `BROKERVERSE_DB_USER` | yes | `brokerverse`; none with `prod` | Database login of the application. In production a least-privilege runtime login, member of the runtime role (`BROKERVERSE_DB_RUNTIME_ROLE`), never the schema owner; in development and tests it may be the owner (then Flyway migrates with it). See DEPLOYMENT.md "Database roles". |
 | `BROKERVERSE_DB_PASSWORD` | yes | none (a local value with the `seed` profile only) | Database password (from secret store). |
+| `SPRING_FLYWAY_USER` | yes | – (the application login) | `spring.flyway.user`: owner of the schema objects; Flyway migrates on start with this login. Must differ from `BROKERVERSE_DB_USER` in production. The migration connection uses the same URL and TLS settings (`BROKERVERSE_DB_SSL_MODE`, `BROKERVERSE_DB_SSL_ROOT_CERT`) as the application pool (`MigrationOwnerConnection`). |
+| `SPRING_FLYWAY_PASSWORD` | yes | – | `spring.flyway.password`: password of the schema owner (from secret store). |
+| `BROKERVERSE_DB_RUNTIME_ROLE` | no | `brokerverse_runtime` | Flyway placeholder `runtime_role`: the group role that migration V1190 grants row access to (SELECT, INSERT, UPDATE, DELETE, sequences; no DDL, no TRUNCATE, no triggers, read-only migration history), also for the tables of later migrations (default privileges). V1190 creates it (`NOLOGIN`) when the schema owner may create roles; otherwise the DBA creates it first. Set it before the first start; changing it later needs the grants repeated for the new role. |
 | `BROKERVERSE_DB_POOL_SIZE` | no | `20` | Hikari maximum pool size per instance. |
 | `BROKERVERSE_JWT_SECRET` | yes | none (a local value with the `seed` and test profiles only) | HMAC key for access tokens, ≥ 32 random characters. Rotating it signs everyone out. |
 | `BROKERVERSE_TOKEN_VALIDITY` | no | `PT8H` | Access token lifetime (ISO-8601 duration). |
@@ -260,6 +263,9 @@ every problem in one message, when:
 - the `seed` profile is active in production (seed data never loads in production);
 - `BROKERVERSE_DB_URL`, `BROKERVERSE_DB_USER` or `BROKERVERSE_DB_PASSWORD` is missing (the `prod` profile has no
   defaults for them);
+- `SPRING_FLYWAY_USER` or `SPRING_FLYWAY_PASSWORD` is missing, or `SPRING_FLYWAY_USER` names the same login as
+  `BROKERVERSE_DB_USER` (the application must connect as the least-privilege runtime login, not as the schema owner;
+  not checked when the migrations are switched off with `SPRING_FLYWAY_ENABLED=false`);
 - `BROKERVERSE_JWT_SECRET` is missing, shorter than 32 characters or a development value;
 - mail delivery is on (`BROKERVERSE_MAIL_ENABLED=true`) and `MAIL_HOST`, or with SMTP authentication
   `MAIL_USERNAME` / `MAIL_PASSWORD`, is missing;
@@ -300,6 +306,7 @@ links. All properties are under `brokerverse.storage.*`.
 | `BROKERVERSE_STORAGE_LINK_TTL` | no | `PT5M` | `brokerverse.storage.link-ttl`: fallback for the business parameter `FILE_LINK_TTL_SECONDS` (seeded 300, range 30-3600, *Administration › Parameters*), which sets the validity of presigned links. |
 | `BROKERVERSE_STORAGE_ORPHAN_AGE` | no | `PT24H` | `brokerverse.storage.orphan-age`: objects without a metadata row older than this are deleted by `FILE_ORPHAN_RECONCILIATION`. Announced uploads not confirmed within it are closed. |
 | `BROKERVERSE_STORAGE_DELETED_GRACE` | no | `P30D` | `brokerverse.storage.deleted-grace`: time between the soft delete of a file and the removal of its object by `FILE_RETENTION`. |
+| `BROKERVERSE_MALWARE_SCAN` | yes (`storage`) | `storage` | `brokerverse.attachments.malware-scan`, the explicit malware scan decision of uploaded files, checked at start-up (`MalwareScanPolicy`). `storage`: the file store scans every object (S3 with GuardDuty Malware Protection; a file cannot be downloaded before its result is `NO_THREATS_FOUND`, infected files are quarantined); in production the start is refused unless `BROKERVERSE_STORAGE_PROVIDER=s3`. `application`: an antivirus scanner bean of the deployment scans each file before it is stored; the start is refused when only the built-in no-op scanner is present. `none`: no scan, development and automated tests only; refused in production. A deployed scanner bean scans in every mode, in addition to the storage scan. |
 | `BROKERVERSE_STORAGE_SCAN_TAG` | no | `GuardDutyMalwareScanStatus` | `brokerverse.storage.scan-tag`: object tag with the malware scan result. Only `NO_THREATS_FOUND` is accepted. |
 | `BROKERVERSE_JOB_FILE_SCAN_RESULTS_CRON` | no | `0 */5 * * * *` | Spring cron (UTC) of `FILE_SCAN_RESULTS` (every 5 minutes): reads the scan results of pending files and quarantines infected ones (notification to the uploader and to `FILE_QUARANTINE_VIEW`, alert `FILE_QUARANTINED`). Property `brokerverse.storage.jobs.scan-results-cron`. |
 | `BROKERVERSE_JOB_FILE_ORPHAN_CRON` | no | `0 10 2 * * *` | Spring cron (UTC) of `FILE_ORPHAN_RECONCILIATION` (daily): deletes objects that have had no row for 24 hours and are not under legal hold. Property `brokerverse.storage.jobs.orphan-cron`. |
@@ -308,6 +315,24 @@ links. All properties are under `brokerverse.storage.*`.
 | `BROKERVERSE_STORAGE_DOWNLOAD_MODE` | no | `stream` | How the download endpoints of the modules answer for a stored file (build step ST1): `redirect` sends the browser to the presigned link, so the bytes never pass through BIBS; `stream` reads the file through BIBS with its SHA-256 re-checked. Set `redirect` in an S3 environment only once the buckets allow the web origin (CORS: `GET`, exposed `Content-Disposition` and `Content-Type`) and the web client's `connect-src` lists the bucket hosts. With the local store (`local`) `redirect` works as is. `GET /api/v1/files/{id}/link` always returns the link. Property `brokerverse.storage.downloads.mode`. |
 | `BROKERVERSE_JOB_FILE_BYTEA_MIGRATION_CRON` | no | `-` (manual) | Spring cron (UTC) of `FILE_BYTEA_MIGRATION`, the one-off copy of the files still kept in the database to the file store (build step ST1). Keep it manual and run it from the job monitor until the reconciliation report (`GET /api/v1/files/content-migration`) shows nothing left. Property `brokerverse.storage.content-migration.cron`. |
 | `BROKERVERSE_FILE_BYTEA_MIGRATION_BATCH` | no | `20` | Rows read per query by `FILE_BYTEA_MIGRATION` (1 to 500). Each row is copied and checked in its own transaction. Property `brokerverse.storage.content-migration.batch-size`. |
+
+**Content checks of uploaded files.** Every Office Open XML and OpenDocument file opened from outside (bulk and
+journal uploads, protected e-mail attachments, edited Word templates) is read within fixed decompression limits
+(`OfficeFileLimits`): at most 1,000 parts, 64 MB for one uncompressed part and an expansion of at most 100 times the
+compressed size; a larger file is refused as a possible compressed-file bomb (`FILE_ARCHIVE_LIMIT`). An OpenDocument
+sheet expands to at most 100,000 rows of 1,024 columns. CSV, TXT and EML files must be text throughout (no NUL byte
+and no binary control character anywhere in the file); CSV and TXT files read as data (bulk and journal uploads)
+must also be UTF-8 (`FILE_TEXT_ENCODING`, with a hint to save as "CSV UTF-8") and at most 25 MB.
+
+**Request size.** `BROKERVERSE_MAX_JSON_BODY_SIZE` (`brokerverse.http.max-json-body-size`, default `2MB`) limits a
+JSON request body: a larger declared length is answered with 413 before security and the controllers run, and a
+body without a length stops being read at the limit (413, `REQUEST_TOO_LARGE`). File uploads keep the multipart
+limits above.
+
+**Log forging.** Line breaks in log messages (CR, LF, NEL, Unicode line separators) are replaced by `_` by the
+message converter of `logback-spring.xml` (`%m`, `%msg`, `%message`), so the protection holds for any
+`LOGGING_PATTERN_CONSOLE` and any file appender added to that file; structured JSON logging escapes them by format.
+BIBS logs to the console only (the platform collects container output).
 
 Credentials are never configured. On EKS the pod uses the IAM role of its service account (IRSA) through the AWS
 default credential chain. For the S3 adapter's own test on a developer machine, the standard `AWS_*` variables can

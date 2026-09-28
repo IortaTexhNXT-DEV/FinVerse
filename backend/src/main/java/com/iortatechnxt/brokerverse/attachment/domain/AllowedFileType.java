@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.attachment.domain;
 
+import com.iortatechnxt.brokerverse.common.util.TextContent;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
@@ -55,9 +56,6 @@ public enum AllowedFileType {
   /** WebP image: a RIFF container of form type WEBP (BRCSF-007). */
   WEBP("image/webp", List.of("webp"), "RIFF".getBytes(StandardCharsets.US_ASCII));
 
-  /** Bytes inspected for text detection. */
-  private static final int TEXT_PROBE = 4096;
-
   private final String mimeType;
   private final List<String> extensions;
   private final byte[] signature;
@@ -87,7 +85,8 @@ public enum AllowedFileType {
    * Checks that the content really is of this type.
    *
    * @param content file bytes
-   * @return true when the signature matches (text without NUL bytes for CSV)
+   * @return true when the signature matches (CSV, EML and TXT: text throughout, see {@link
+   *     TextContent#isText})
    */
   public boolean matches(byte[] content) {
     return switch (this) {
@@ -102,13 +101,7 @@ public enum AllowedFileType {
   }
 
   private static boolean isText(byte[] content) {
-    int limit = Math.min(content.length, TEXT_PROBE);
-    for (int i = 0; i < limit; i++) {
-      if (content[i] == 0) {
-        return false;
-      }
-    }
-    return true;
+    return TextContent.isText(content);
   }
 
   private static boolean startsWith(byte[] content, byte[] prefix) {

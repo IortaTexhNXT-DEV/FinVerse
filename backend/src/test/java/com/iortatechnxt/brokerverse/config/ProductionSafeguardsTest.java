@@ -9,7 +9,8 @@ import org.springframework.mock.env.MockEnvironment;
 
 class ProductionSafeguardsTest {
 
-  private static final String KEY = "Zq8v3N0kP1rT7yW2bX5cD9fG4hJ6mL0sQ";
+  /** A value of the required length that is no development marker; not a real key. */
+  private static final String KEY = "k".repeat(40);
 
   private static MockEnvironment completeProduction() {
     return new MockEnvironment()
@@ -17,6 +18,8 @@ class ProductionSafeguardsTest {
         .withProperty("spring.datasource.url", "jdbc:postgresql://db:5432/bibs")
         .withProperty("spring.datasource.username", "bibs")
         .withProperty("spring.datasource.password", "from-the-vault")
+        .withProperty("spring.flyway.user", "bibs_owner")
+        .withProperty("spring.flyway.password", "from-the-vault")
         .withProperty("brokerverse.security.jwt-secret", KEY)
         .withProperty("brokerverse.mail.enabled", "true")
         .withProperty("spring.mail.host", "smtp.bdo.example")
@@ -90,6 +93,29 @@ class ProductionSafeguardsTest {
   }
 
   @Test
+  void theMigrationsMustRunAsASeparateSchemaOwner() {
+    MockEnvironment missing = completeProduction().withProperty("spring.flyway.user", "");
+    MockEnvironment sameLogin = completeProduction().withProperty("spring.flyway.user", " BIBS ");
+    MockEnvironment noPassword = completeProduction().withProperty("spring.flyway.password", "");
+    MockEnvironment noMigrations =
+        completeProduction()
+            .withProperty("spring.flyway.enabled", "false")
+            .withProperty("spring.flyway.user", "");
+
+    assertThat(ProductionSafeguards.problems(missing))
+        .singleElement()
+        .asString()
+        .startsWith("SPRING_FLYWAY_USER (schema owner");
+    assertThat(ProductionSafeguards.problems(sameLogin))
+        .singleElement()
+        .asString()
+        .contains("name the same login");
+    assertThat(ProductionSafeguards.problems(noPassword))
+        .containsExactly("SPRING_FLYWAY_PASSWORD is not set");
+    assertThat(ProductionSafeguards.problems(noMigrations)).isEmpty();
+  }
+
+  @Test
   void aDevelopmentOrShortSigningKeyIsRefused() {
     MockEnvironment dev =
         completeProduction()
@@ -113,6 +139,8 @@ class ProductionSafeguardsTest {
             .withProperty("spring.datasource.url", "jdbc:postgresql://db:5432/bibs")
             .withProperty("spring.datasource.username", "bibs")
             .withProperty("spring.datasource.password", "from-the-vault")
+            .withProperty("spring.flyway.user", "bibs_owner")
+            .withProperty("spring.flyway.password", "from-the-vault")
             .withProperty("brokerverse.security.jwt-secret", KEY)
             .withProperty("brokerverse.redis.enabled", "false")
             .withProperty("brokerverse.kafka.enabled", "false")

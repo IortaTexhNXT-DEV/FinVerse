@@ -4,8 +4,8 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.office.BrandedDocx;
 import com.iortatechnxt.brokerverse.common.office.BrandedDocx.Page;
 import com.iortatechnxt.brokerverse.common.office.BrandedDocx.TextStyle;
+import com.iortatechnxt.brokerverse.common.office.OfficeFileLimits;
 import com.iortatechnxt.brokerverse.docgen.domain.DocTemplate;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +51,7 @@ final class TemplateWordFile {
    */
   static Draft read(byte[] content) {
     List<String> paragraphs = new ArrayList<>();
-    try (XWPFDocument doc = new XWPFDocument(new ByteArrayInputStream(content))) {
+    try (XWPFDocument doc = OfficeFileLimits.wordDocument(content)) {
       for (XWPFParagraph p : doc.getParagraphs()) {
         String text = p.getText().replace("\r", "").strip();
         if (!text.isEmpty()) {

@@ -6,7 +6,7 @@ documents:
     name: Acknowledgement receipt (AR)
     template: (built-in receipt layout)
     format: PDF, one per receipt
-    produced: Receipt record › PDF; Batch Printing for the receipts of a day
+    produced: Receipt record › PDF; Batch Print for the receipts of a day
     protected: "No"
     fields:
       - "Title and reference: Acknowledgement Receipt, AR number from the branch series and date – from the receipt"
@@ -99,6 +99,6 @@ documents:
     protected: Yes when e-mailed (password in a separate e-mail)
     fields:
       - "One row per direct payment account: Billing No., Invoice No., Policy No., Assured Name, Premium, Commission, VAT, Withholding Tax, Net Commission – from the billing"
-      - "Decision, Reason and Comment columns completed by the insurer (Approved or Rejected) and read back on DP Responses"
+      - "Decision, Reason and Comment columns completed by the insurer (Approved or Rejected) and read back on Insurer Responses"
     shot: doc-dp-billing
     frs: [FR-OP-092]

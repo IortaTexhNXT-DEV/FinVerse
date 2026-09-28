@@ -26,7 +26,7 @@ async function reviewBatch(ctx) {
   return ctx.one(open);
 }
 
-/** A special remittance request: the unpaid seed invoice is paid over the counter, then requested for Claims. */
+/** A special remittance request: the unpaid seed invoice is paid over the counter, then requested for immediate OR issuance. */
 async function specialRequest(ctx) {
   const any = 'select id from rem_special_request order by id limit 1';
   if (ctx.sql(any).length === 0) {
@@ -40,8 +40,8 @@ async function specialRequest(ctx) {
       });
     }
     await ctx.api('mktcoll', 'POST', '/remittance/special', {
-      companyId: 1, invoiceNo: inv, conditionCode: 'CLAIMS',
-      remarks: 'Claim filed on the policy; the insurer needs the premium before the claim is settled',
+      companyId: 1, invoiceNo: inv, conditionCode: 'IMMEDIATE_OR',
+      remarks: 'Client needs the insurer official receipt for its loan release this week',
     });
   }
   return ctx.one(any);
@@ -125,6 +125,7 @@ const fills = {
     async (page) => { await fill(page, 'Payment Date', dateText(0)); await settle(page, 2000); },
   ],
   issue_or: [
+    click('^issue official receipt$'),
     async (page) => { await firstOption(dialog(page).getByLabel(/^OR Type/).first()); },
     async (page) => fill(page, 'Payor Name', 'Mabuhay General Insurance Corp.', dialog(page)),
     async (page) => fill(page, 'Gross Amount', '12500', dialog(page)),
@@ -136,6 +137,7 @@ const fills = {
     async (page) => fill(page, 'Remarks', 'Client paid twice; refund of the second payment'),
   ],
   pdc_check: [
+    click('^warehouse check$'),
     async (page) => fill(page, 'Payor Name', 'Pacific Harbor Logistics Inc.', dialog(page)),
     async (page) => fill(page, 'ARN, Invoice, Policy or PN No.', 'ARN-2026-940002', dialog(page)),
     async (page) => fill(page, 'Check No.', '0004127', dialog(page)),
@@ -145,6 +147,7 @@ const fills = {
     async (page) => fill(page, 'Amount', '22268.75', dialog(page)),
   ],
   cwt_tag: [
+    click('^tag 2307$'),
     async (page) => fill(page, 'Invoice No.', 'BI-HO-2026-000001', dialog(page)),
     async (page) => { await firstOption(dialog(page).getByLabel(/^Path/).first()); },
     async (page) => fill(page, 'Amount', '284.52', dialog(page)),
@@ -153,6 +156,7 @@ const fills = {
     async (page) => fill(page, 'Period To', dateText(-1), dialog(page)),
   ],
   new_series: [
+    click('^new series$'),
     async (page) => { await firstOption(dialog(page).getByLabel(/^Kind/).first()); },
     async (page) => { await firstOption(dialog(page).getByLabel(/^Branch/).first()); },
     async (page) => fill(page, 'Prefix', 'AR-HO', dialog(page)),
@@ -162,12 +166,14 @@ const fills = {
     async (page) => fill(page, 'Warn When Remaining At', '250', dialog(page)),
   ],
   hold_request: [
+    click('^new hold request$'),
     async (page) => fill(page, 'Invoice No.', 'I97000011', dialog(page)),
     async (page) => { await firstOption(dialog(page).getByLabel(/^Reason/).first()); },
     async (page) => fill(page, 'Hold Until', dateText(14), dialog(page)),
     async (page) => fill(page, 'Remarks', 'Client disputes the premium; hold until the account officer confirms', dialog(page)),
   ],
   incentive_rule: [
+    click('^new rule$'),
     async (page) => fill(page, 'Insurer Code', 'INS-MGIC', dialog(page)),
     async (page) => fill(page, 'Rate (% of basic premium)', '2.5', dialog(page)),
     async (page) => fill(page, 'Window (days)', '30', dialog(page)),
@@ -214,8 +220,6 @@ const after = {
     }
   },
   'scr-op-36-02-dv': async (page) => {
-    await page.getByRole('tab', { name: /^Acknowledged/ }).first().click().catch(() => {});
-    await settle(page, 800);
     const assign = page.getByRole('button', { name: /^assign dv$/i }).first();
     await assign.click();
     await settle(page, 600);

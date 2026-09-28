@@ -49,7 +49,7 @@ contract:
     what: Payment status, receipts and outstanding balances of every invoice; direct payment accounts and their billing status
     how: Read from the Operations ledger by the collection worklists; changes show at once
     owner: Cashiering, Commission Receivables
-    screens: Invoice 360, DP Items
+    screens: Invoice 360, DP Accounts
     frs: [FR-OP-004, FR-OP-091]
   - id: IC-07
     party: BRD-5 Accounting, Disbursement and ACSL
@@ -111,9 +111,9 @@ contract:
     party: Insurers
     direction: In
     what: Official receipts of remitted premium, production feedback, answers to DP billings, BIR 2307 certificates
-    how: Uploaded by the Operations team from the insurer's files (Insurer OR Upload, Insurer Uploads, DP Responses) or recorded on the record
+    how: Uploaded by the Operations team from the insurer's files (Insurer OR Upload, Insurer Feedback, Insurer Responses) or recorded on the record
     owner: Remittance, Production Reconciliation, Commission Receivables
-    screens: Insurer OR Upload, Insurer Uploads, DP Responses, BIR Certificates
+    screens: Insurer OR Upload, Insurer Feedback, Insurer Responses, BIR Certificates
     frs: [FR-OP-037, FR-OP-074, FR-OP-093, FR-OP-096]
   - id: IC-15
     party: Banks and payment channels

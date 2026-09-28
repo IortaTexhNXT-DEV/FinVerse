@@ -8,11 +8,10 @@ doc_code: FRS
 brd: BRD-02
 name: Operations
 doc_id: BIBS-FRS-BRD-02
-version: "1.1"
-date: 26 September 2026
-status: Issued for BDOI review
+version: "2.0"
+date: 28 September 2026
+status: Issued for BDOI business sign-off
 header_title: FRS BRD-2 Operations
-output: FRS/BIBS_FRS_BRD-02_Operations_v1.1.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026
@@ -32,15 +31,21 @@ control:
     reviewer: iorta TechNXT Solution Architect
     approver: BDOI Product Owner (pending)
     change: "BDOI drop plan and integration names of 26-Sep-2026: payment channels OBPCS, Old BOB, PMS and TFS on the payment-file handlers (FR-OP-015); reinsurance transactions through Remittance in Drop 1, reinsurance module in phase 2 (introduction of the Remittance section); Production Reconciliation tested in Drop 2"
+  - version: "2.0"
+    date: 28 Sep 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Business sign-off pack: navigation by persona, 64 screen specifications with screenshots, four walkthroughs, messages, notifications, document outputs, upload templates and bank payment file layouts, cross-BRD contract, sign-off and change control (chapters 12-20); proposed business rules and clarifications for confirmation extended with the screen presentation items (chapter 21); screen standards (appendix). Issued 28-Sep-2026. Chapters 1-11 unchanged in substance; FR, BRD and test IDs kept"
 distribution:
-  - {name: "Head, Operations Services", role: Approver, organisation: BDOI, purpose: Review and sign-off}
-  - {name: "Cashiering Head Office and Branches", role: Business user, organisation: BDOI, purpose: Review of the Cashiering FRs}
-  - {name: "Financial Transactions and Processing (Remittance)", role: Business user, organisation: BDOI, purpose: Review of the Remittance FRs}
-  - {name: "Transaction Recon / Analysis and MIS", role: Business user, organisation: BDOI, purpose: Review of the Production Reconciliation FRs}
-  - {name: "Commission Collection and Adjustments", role: Business user, organisation: BDOI, purpose: Review of the Adjustment and Commission Receivables FRs}
+  - {name: "Shellah Marie C. Miranda, AVP, Product Owner", role: Approver, organisation: BDOI, purpose: Review and sign-off}
+  - {name: "Jose Melvin M. Jarin, Operations: Financial Transactions and Processing", role: Approver, organisation: BDOI, purpose: Review and sign-off for Operations}
+  - {name: "Shirley Catapang and Perjelyn Joy Gutierrez, Operations: Financial Transactions and Processing", role: Business user, organisation: BDOI, purpose: "Review of the Cashiering, Remittance, Adjustment, Production Reconciliation and Commission Receivables screens and rows"}
+  - {name: "Cashiering, Remittance, Adjustment, Production Reconciliation and Commission Receivables teams", role: Business user, organisation: BDOI, purpose: Review of the screens of their team}
   - {name: "Retail, Corporate and Commercial Marketing", role: Business user, organisation: BDOI, purpose: Review of the Marketing Collection items}
   - {name: Comptrollership, role: Business user, organisation: BDOI, purpose: "Review of accounting events, BIR certificates and reports"}
-  - {name: Business Project Services, role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
+  - {name: Information Technology Group, role: Reviewer, organisation: BDOI, purpose: "Review of interfaces, jobs, access and the Technical Specification"}
+  - {name: "Dan Ace Cauton, Program Manager, and Zean C. Ibay, Business Analyst, ESG - Business Project Services", role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
   - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, test and UAT preparation"}
 ---
 
@@ -50,7 +55,7 @@ distribution:
 
 This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker System, on iNXT BrokerVerse) meets the Operations business requirements of BDO Insurance and Reinsurance Brokers, Inc. (BDOI). It turns each BRD requirement into functional requirements with actors, flows, rules, validations, screens, fields, notifications, audit and acceptance criteria.
 
-BDOI uses this document to confirm that the system behaves as the business expects. The project team uses it to test and prepare user acceptance testing (UAT). The FRs describe the proposed behaviour of the Operations screens. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, the FR says so in a note and chapter 12 lists each such point for confirmation. Every FR cites the BRD requirement it meets and the BRD page.
+BDOI uses this document to confirm that the system behaves as the business expects. The project team uses it to test and prepare user acceptance testing (UAT). The FRs describe the proposed behaviour of the Operations screens. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, the FR says so in a note and chapter 21 lists each such point for confirmation. Every FR cites the BRD requirement it meets and the BRD page. Chapters 12 to 19 give the business view of the system: the navigation, the specification of every screen with its screenshots, the walkthroughs, the messages, notifications, documents, uploads and the contract with the other BRDs; chapter 20 describes the sign-off.
 
 ## Scope
 
@@ -72,7 +77,7 @@ Operations takes over every invoice booked in New Business (BRD-1) and follows i
 **Out of scope for this phase:**
 
 - The Collection system, the Disbursement system and the Accounting (GL mapping) specification. BRD-4 Collections and BRD-5 Accounting, Disbursement and Accounting Controls answer these questions; until they are in place Operations uses the uploads and the Disbursement queue described in section 7 (OQ01, OQ02, OQ07).
-- External transports (SFTP, APIs, shared drive folders) to insurers, BDO bank channels and the Marketing and Claims systems. Files are uploaded and sent by e-mail in this phase (OQ17, OQ22, OQ29).
+- External transports (SFTP, system-to-system links, shared drive folders) to insurers, BDO bank channels and the Marketing and Claims systems. Files are uploaded and sent by e-mail in this phase (OQ17, OQ22, OQ29).
 - The payout of incentives to branches. Operations computes and posts them and hands the pass-on to Disbursement (CMRID.006, OQ39).
 
 ## References
@@ -285,7 +290,7 @@ The table below is the proposed role-to-permission matrix ("Y" = granted). Every
 
 ## Access, invoice ledger and Invoice 360
 
-The foundation module `opsledger` serves every team: access, the Operations home, the invoice ledger and its views, locks, co-insurance shares, batch run reports and report access.
+The Operations foundation serves every team: access, the Operations home, the invoice ledger and its views, locks, co-insurance shares, batch run reports and report access.
 
 ```fr
 id: FR-OP-001
@@ -390,7 +395,7 @@ acceptance:
 ```
 
 > [!NOTE] Difference from the BRD
-> BRQID.003 AC3 asks that users can customise or filter the sections. BIBS filters the sections by role; a personal pin or hide of sections is not proposed (chapter 12, CLR-OP-01).
+> BRQID.003 AC3 asks that users can customise or filter the sections. BIBS filters the sections by role; a personal pin or hide of sections is not proposed (chapter 21, CLR-OP-01).
 
 ```fr
 id: FR-OP-004
@@ -2457,7 +2462,7 @@ acceptance:
 ```
 
 > [!NOTE] Difference from the BRD
-> PRCID.009 asks to receive and upload the insurer report automatically. Insurer channels are not specified (OQ29); the handler uploads the file; a mailbox or SFTP pick-up is added later without a change to the matching (chapter 12, CLR-OP-03).
+> PRCID.009 asks to receive and upload the insurer report automatically. Insurer channels are not specified (OQ29); the handler uploads the file; a mailbox or SFTP pick-up is added later without a change to the matching (chapter 21, CLR-OP-03).
 
 ```fr
 id: FR-OP-075
@@ -3289,7 +3294,7 @@ actor: System Administrator (FLOWIN_MANAGE); System
 priority: Must have
 screens: Interfaces (feeds, runs, records, upload)
 description:
-  - Each feed (section 7) has a partner system, direction, transport, schedule and active flag. Each run FIR-yyyy-n records the trigger, start and end, records read, accepted and failed, status and errors. Each record is accepted once by its idempotency key and payload hash, so a file uploaded twice creates no duplicates. A failed run or failed records raise the alert OPS_FLOW_IN_FAILED.
+  - Each feed (section 7) has a partner system, direction, transport, schedule and active flag. Each run FIR-yyyy-n records the trigger, start and end, records read, accepted and failed, status and errors. Each record is accepted once by its reference and content, so a file uploaded twice creates no duplicates. A failed run or failed records raise the alert Interface run failed.
   - The administrator activates a feed, sets its schedule and uploads files for feeds with a handler, and reads the runs and records.
 preconditions:
   - The user has FLOWIN_MANAGE.
@@ -3299,14 +3304,14 @@ main_flow:
   - BIBS records the run and its records and alerts on failure.
 rules:
   - [R1, "One record per idempotency key.", Fixed, "-"]
-  - [R2, "Schedules per feed (Spring cron, UTC).", Configurable, Interfaces]
+  - [R2, "Schedules per feed (time and frequency, UTC).", Configurable, Interfaces]
 validations:
   - [Feed inactive, "Feed <code> is inactive", FLOW_IN_FEED_INACTIVE]
   - [Feed without handler, "No module processes uploads of feed <code> yet", FLOW_IN_NO_HANDLER]
   - [Record failed, "<message>", FLOW_IN_RECORD_FAILED]
 fields_screen: Interfaces (feed settings)
 fields:
-  - ["Schedule (Spring cron, UTC)", Text, "No", "-", Valid cron]
+  - ["Schedule", Text, "No", "-", Valid schedule (time and frequency, UTC)]
   - [Active, Check box, "Yes", "-", "-"]
   - [File, File, Cond., "-", For an upload]
 notifications:
@@ -3435,7 +3440,7 @@ In the figures, solid arrows are the main path, dashed arrows are returns and op
 
 ## Accounting events
 
-Every Operations posting is a business event; Comptrollership configures the GL rule of each event (maker-checker), and no GL account is chosen in code (OQ07). The entries below are the proposed defaults with the seed chart of accounts. All events carry the party, cost centre and business line, and are priced at the BOOK rate when not in pesos.
+Every Operations posting is a business event; Comptrollership configures the GL rule of each event (maker-checker), and no GL account is fixed in the system (OQ07). The entries below are the proposed defaults with the seed chart of accounts. All events carry the party, cost centre and business line, and are priced at the BOOK rate when not in pesos.
 
 <!-- table: widths=5.6,3.8,7.2 caption="Operations accounting events and default entries" size=8 -->
 | Event | Transaction | Default entry |
@@ -3612,7 +3617,7 @@ SUPERSEDED means an upload or queue in Operations that BRD-4 Collections or BRD-
 | Peak | 15th and 30th (Cashiering, Remittance); 1st-2nd week (Prod Recon); Q4 (Adjustment, Commission); 07:30-18:00 | Remittance extraction at 20:00 PHT and the minimal balance sweep at 04:00 PHT, outside the peak hours; the other jobs in section 9.3 |
 | Availability | 99.9%; use 07:00-18:30 (07:30-18:00 Adjustment / Commission); maintenance per bank standard | Same deployment as BRD-1 (window 07:00-22:00 governs, OQ44) |
 | Recovery | RTO 4 hours, RPO 24 hours | Platform backup and recovery; one BIBS-wide NFR set being agreed (XQ08) |
-| Retention | Application, database, audit logs and history 5 years online, 15 years archive; backup every 4 hours kept 7 years | BRD-1 retention framework with backup retention 7 years |
+| Retention | Application data, audit logs and history 5 years online, 15 years archive; backup every 4 hours kept 7 years | BRD-1 retention framework with backup retention 7 years |
 | Anonymisation | No | None |
 | Devices | Same performance on mobile and desktop | Responsive screens |
 | Security | Authorised users only; protected files | Role-based access, four-eyes rules, protected e-mails (FR-OP-002, 013, 035) |
@@ -3733,7 +3738,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | ID | Question | Affects | Status |
 |---|---|---|---|
 | OQ01 | Systems of BRQID.004 (Collection, Accounting, Disbursement, Marketing, Claims): interface, data, frequency | FR-OP-130 | PARTIAL |
-| OQ02 | Disbursement: payload, DV numbers and statuses | FR-OP-120 | ANSWERED |
+| OQ02 | Disbursement: request content, DV numbers and statuses | FR-OP-120 | ANSWERED |
 | OQ03 / OQ04 | Payment file layouts; file encryption | FR-OP-015 | OPEN |
 | IQ09 / IQ10 / IQ14 | PMS, OBPCS, Old BOB, AFTS and TFS: layouts, direction, frequency and transport (programme alignment) | FR-OP-015 | OPEN |
 | IQ20 | Reinsurance transactions handled by Remittance in Drop 1; the Cashiering and Remittance addenda named in the drop plan (programme alignment) | FR-OP-030 to 041 | OPEN |
@@ -4015,9 +4020,256 @@ Every BRD-2 requirement ID (169) is met by at least one FR. The page is the page
 
 The non-functional requirements of the BRD annex (p.115-120) are traced in section 8.
 
+# Navigation
+
+This chapter shows how each Operations user reaches the screens. The sidebar shows a screen only when the user's role holds its permission (section 3.2), so each persona sees a different menu. The tables follow the proposed role grants.
+
+## Screens of Operations
+
+The 64 screens specified in chapter 13, with the menu path and the roles that can open them. A screen without its own menu entry (a record, a dialog, a report) is reached from the screen before it; its path ends with that screen.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: screen-index
+```
+
+## Screen flow
+
+How the screens link: from a list to its record, from a record action to the next screen, and from one team's work to the next. The walkthroughs of chapter 14 follow these links with real steps.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: flow
+```
+
+<!-- portrait -->
+
+## Menu by persona
+
+For each Operations persona, the SIT and UAT user of the seed data and the sidebar that user sees, section by section. The BRD column shows which BRD owns a section; entries of other BRDs are listed so the business unit sees the whole menu of its users.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: menus
+```
+
+## Common screen elements
+
+Elements that behave the same on every Operations screen are described once here and not repeated in the screen specifications.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: common
+```
+
+<!-- landscape -->
+
+# Screen specifications
+
+One specification per screen, grouped by team: the Operations home and invoice ledger, Cashiering, Remittance, Adjustment, Production Reconciliation, Commission Receivables, and the interfaces and reports. Each gives:
+
+- **Purpose**, **who can open it** (personas and the permission), **navigation** (menu path and the other ways in) and the related **FRs**;
+- **screenshots** of the SIT environment with seed data; the numbered markers on the first screenshot match the **No.** column of the field table;
+- the **field table**: section of the screen, label as shown, type, length or format, mandatory (Y, N or the condition), source list or master, default, the statuses in which the field can be changed, the validation and the message shown when it fails, word for word;
+- the **actions table**: button, who sees it, when it is enabled, what happens, the resulting status and the notification sent;
+- the **business rules** of the screen with their FRs, the **expected outcome** and the **test cases** of the test plan that run on the screen.
+
+A message in angle brackets (`<invoice>`) is completed by the system with the value shown. "Workflow notice" means the in-app notification NT-01 of chapter 16.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: screens
+```
+
+<!-- portrait -->
+
+# End-to-end walkthroughs
+
+Four walkthroughs follow a case through the screens, persona by persona, with what the user does, what the user sees and the result of each step. They use seed data only and run in this order on the SIT environment: walkthrough B cancels the policy that walkthrough A books, pays and remits. They are the script of the SIT review sessions of the Start Here guide.
+
+## WT-A A booked invoice from the client's payment to the insurer's official receipt
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-A
+```
+
+## WT-B Cancellation of a paid and remitted policy, from the request to the refund
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-B
+```
+
+## WT-C Direct payment commission and the reconciliation of the insurer's production
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-C
+```
+
+## WT-D Controls and the messages the user sees
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-D
+```
+
+<!-- landscape -->
+
+# Messages catalogue
+
+Every message an Operations user can see, grouped by the screen or dialog that shows it, with its code, its type and what the user does. The texts are quoted exactly as the screens show them.
+
+- **Validation**: shown on the screen while the user fills in a field or before the form is sent.
+- **Error**: the system refused the action; nothing was saved. The code is shown under the message as the Reference.
+- **Warning**: the action is possible, but the user should check something first.
+- **Confirmation** and **Information**: the outcome of an action, or a hint on the screen.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: messages
+```
+
+# Notifications catalogue
+
+The in-app notifications, alerts and e-mails that Operations sends: what triggers each, who receives it and what it contains. Each user chooses the in-app and e-mail channels of the Operations events on Notification Settings (SCR-OP-06). E-mail attachments to insurers are password protected; the password follows in a separate e-mail.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: notifications
+```
+
+<!-- portrait -->
+
+# Document outputs
+
+The documents Operations generates, with the BDO Insure letterhead, the "Confidential" footer and page numbers on the PDF documents. For each: the template, the format, the screen that produces it, the password protection, where every field comes from and the first page as generated from seed data. The workbooks sent to insurers are shown with a selection of their columns.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: documents
+```
+
+# Upload screens
+
+The bulk uploads of Operations run on the screen of the team that owns them: download the template, upload the filled file, review every row with its message, then process the valid rows. A file uploaded before is refused. Each upload type below has its template columns; the column checks (mandatory, number, date, Y/N) apply to every type, and the row checks listed with each type come on top. The insurer OR, hold, special remittance, DP list, insurer feedback and insurer response files are read on their own screens with the columns given in their screen specifications (chapter 13).
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: uploads
+```
+
+## Bank payment files
+
+Payment Uploads (SCR-OP-15) reads the files of the bank channels. Each channel has its own layout; the columns below are the proposed layouts until BDOI confirms the layouts of the channels (open questions OQ03 and OQ04). Every row is matched to its invoice by the reference column and receipted; a row that does not match becomes an unapplied payment.
+
+<!-- table: widths=3.4,9.6,4.6 caption="Columns of the bank payment files" size=8.5 -->
+| File | Columns (mandatory in bold) | Reference used for the match |
+|---|---|---|
+| Bills Payment File | **Incremental #**, **Invoice #**, **Assured's name**, **Amount**, Late deposit (Y/N), Phone #, Branch code, **Date of payment**, Time of payment | Invoice # (invoice, ARN, policy or PN number) |
+| Trade Payment File | **Transaction date**, Branch name, **Transaction description**, Debit, **Credit**, Running balance, Check no. | The invoice, ARN, policy or PN number in the Transaction description |
+| CLPC Payment File | **Count**, **Date credit**, **Amount**, AR number, Invoice, **Assured**, PN number, Corp. dept, Risk code, Remarks | Invoice (invoice or ARN), then PN number |
+| Direct Credit File | **Transaction date**, BP filename, **Transaction no**, **Paid amount**, Payment type, **Payor**, Account ref no, Assured, EBIX_RefNo, Logged by, Requestor | Account ref no (invoice, ARN, policy or PN number) |
+
+<!-- landscape -->
+
+# Cross-BRD dependencies and interface contract
+
+Operations takes every booked invoice from New Business and Renewal, the requests of Collections and Claims, and the products and insurers of Product Maintenance; it hands its payments, journals, payment requests and deductions to the BRDs downstream. The contract below lists each exchange: the BRD or system, the direction, what is exchanged, when and how, and who owns the data. Section 7 describes the interfaces with the external systems; the technical detail is in the Technical Specification, reviewed by BDOI IT.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: contract
+```
+
+<!-- portrait -->
+
+# Sign-off and change control
+
+## What is signed
+
+The business sign-off covers the release set BRD-02 Operations v2.0:
+
+<!-- table: widths=6,11.6 caption="Documents of the release set" -->
+| Document | Content |
+|---|---|
+| 00 Start Here | The map of the pack, the reading order per role, the steps up to closure and the dates |
+| 01 Sign-off Pack Guide (deck) | Purpose, approach and steps with who does what, the module at a glance, caveats and impacts on other modules, entry and exit criteria, handover and change control |
+| 02 This FRS v2.0 | Requirements (chapters 1-11), the business view of the system (chapters 12-19), sign-off (chapter 20), the proposed rules for confirmation (chapter 21) and the screen standards (appendix) |
+| 03 Sign-off workbook v2.0 | The screen standards, screens, fields, actions, rules, messages, notifications, menus, upload templates and contract of this FRS, one row each, with the BU review columns; the comments log, meeting minutes, version history and sign-off certificate |
+| 04 and 05 Test plan v2.0 and its summary | The test cases traced to the FRs and to the screens of chapter 13 |
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: counts
+```
+
+## How the review is recorded
+
+Each Operations team records its review in the sign-off workbook: Accept, Change requested or Comment on each row of the screen standards, screen catalogue, field register, business rules and messages, with the comment, the reviewer and the date. Questions, corrections and change requests go to the comments log of the workbook, where the project team answers them. The project team answers every Change requested row in the comments log before sign-off: either the row is corrected in the next version of the set, or the change is raised as a change request (below) and the row is signed as specified.
+
+## What signing freezes
+
+Signing this release set freezes, for Operations:
+
+- the screens and their navigation (chapters 12 and 13), the fields with their order, labels, types, mandatory rules, lists and validations;
+- the actions with their conditions and resulting statuses, and the business rules;
+- the messages (chapter 15), the notifications (chapter 16) and the generated documents (chapter 17);
+- the upload templates (chapter 18) and the interface contract with the other BRDs (chapter 19).
+
+Configuration values marked "default" (receipt series, tolerances, thresholds, schedules, list entries, templates, incentive rules and schemes, section 9) are not frozen; the Business Administrator and the System Administrator change them in the system without a change request.
+
+## Change after sign-off
+
+A change to anything frozen is raised in the Change Management Register. The request states the screen, field, rule or message concerned, the reason and the business priority. The project team assesses it, including its effect on the other BRDs through the interface contract of chapter 19 (for example a change of the payment application hierarchy reaches the Collections worklists and the journals of Accounting), and the owners of every BRD it touches approve it. An approved change is delivered as a new version of this release set (v2.1, v2.2 and so on) with its own Start Here guide, and only the changed pages and rows are reviewed and signed again (delta sign-off).
+
+## Proposed rules for confirmation
+
+Chapter 21 lists the proposed business rules and screen behaviour that differ from the BRD or need a decision of BDOI. BDOI records its decision on each item with its review; a decision that changes a screen, field, rule or message is applied in the next version of this set.
+
+<!-- pagebreak -->
+
+## Signatures
+
+By signing, BDOI confirms that this FRS and the sign-off workbook describe the Operations functions, screens and messages it expects in BIBS, accepts the assumptions in section 10.1 and records its decisions on the items of chapter 21. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request. The signatories are those of the approval sheet of the Operations BRD.
+
+```signoff
+rows:
+  - {name: "Shellah Marie C. Miranda", role: "AVP, Product Owner", organisation: BDOI}
+  - {name: "Jose Melvin M. Jarin", role: "Operations: Financial Transactions and Processing", organisation: BDOI}
+  - {name: "Shirley Catapang", role: "Operations: Financial Transactions and Processing (input provider)", organisation: BDOI}
+  - {name: "Perjelyn Joy Gutierrez", role: "Operations: Financial Transactions and Processing (input provider)", organisation: BDOI}
+  - {name: "", role: "Information Technology Group (reviewer)", organisation: BDOI}
+  - {name: "Dan Ace Cauton", role: "Program Manager, ESG - Business Project Services", organisation: BDO Unibank ESG}
+  - {name: "Zean C. Ibay", role: "Business Analyst, ESG - Business Project Services", organisation: BDO Unibank ESG}
+  - {name: "", role: Project Manager, organisation: iorta TechNXT}
+```
+
+<!-- pagebreak -->
+
 # Proposed business rules and clarifications for confirmation
 
-The table lists each point where the proposed screen or rule differs from the BRD text, fills a gap the BRD leaves open, or needs a decision of BDOI. None of them removes a BRD requirement; most are settled by an answer of BDOI that is applied as configuration. BDOI records its decision with the sign-off of this FRS (chapter 13); a decision that changes a screen, field, rule or message is applied in the next version of the FRS.
+The table lists each point where the proposed screen or rule differs from the BRD text, fills a gap the BRD leaves open, or needs a decision of BDOI. None of them removes a BRD requirement; most are settled by an answer of BDOI that is applied as configuration. BDOI records its decision with the review of this set (section 20.5); a decision that changes a screen, field, rule or message is applied in the next version of the set, and an answer that only sets a value (a list, a parameter, a template) is applied as configuration.
 
 <!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
 | Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
@@ -4032,35 +4284,51 @@ The table lists each point where the proposed screen or rule differs from the BR
 | CLR-OP-08 | Payment files (CSHID.008; FR-OP-015) | Operations users upload the bank files; each file is stored read-only with its fingerprint, a duplicate file is refused, and the layouts are configurable. | The BRD has IT run the Trade, CLPC and Direct Credit files on FS04 (OQ03, OQ04). | Confirm the upload by Operations users (OQ03, OQ04). |
 | CLR-OP-09 | Minimal balances (CSHID.016, ADJID.026; FR-OP-023, 059) | The daily sweep skips an invoice already written off by the minimal balance file, so a balance is never reversed twice. | The BRD reverses up to 10.00 and writes off 10.00-100.00 from a file, with 10.00 in both (OQ11). | Confirm the boundary of 10.00 (OQ11). |
 | CLR-OP-10 | End-of-day extraction (RMTID.005; FR-OP-030) | A user queues the searched invoice for the evening extraction run. | The BRD text "if payment application is searched" is open to reading (OQ18). | Confirm the queue for the evening run (OQ18). |
-| CLR-OP-11 | DTIP balance (RMTID.014; FR-OP-031) | A DTIP balance is excluded from the remittance by default (EXCLUDE); the option CAP remits the DTIP balance only. | The BRD's expected result and acceptance criteria differ (OQ19). | Choose EXCLUDE or CAP (OQ19). |
+| CLR-OP-11 | DTIP balance (RMTID.014; FR-OP-031) | A paid AR above the DTIP balance is excluded from the remittance by default (option Exclude); the option Cap remits the DTIP balance only. | The BRD's expected result and acceptance criteria differ (OQ19). | Choose Exclude or Cap (OQ19). |
 | CLR-OP-12 | Insurer OR comparison (RMTID.016; FR-OP-037) | The insurer OR amount is compared exactly with the paid PR per invoice. | No tolerance is given (OQ22). | Give the tolerance, or confirm the exact comparison (OQ22). |
 | CLR-OP-13 | Cleared checks (RMTID.017; FR-OP-031) | Checks are counted in banking days from the last applied value date on the branch calendar; the cleared status comes from the payment application. | The BRD asks for checks at least 3 banking days old and cleared (OQ20). | Confirm the counting (OQ20). |
 | CLR-OP-14 | Invoice statuses (RMTID.019; FR-OP-033, 035) | The invoice keeps a payment status and a remittance status; the batch has its own workflow stages. | The BRD's eight statuses mix payment and remittance states (OQ21). | Confirm the two statuses (OQ21). |
 | CLR-OP-15 | Claims condition of a special remittance (MKTID.009; FR-OP-112) | The claims condition is confirmed through the Claims feed when it is connected; until then the request carries a note. | The Claims feed is not yet specified (OQ46). | Specify the Claims feed (OQ46). |
 | CLR-OP-16 | Insurer register columns (PRCID.002; FR-OP-072) | The Remarks and Incentive columns and 200 blank rows are editable, so the insurer can add unbooked production. | PRCID.022 asks the insurer to report unbooked production in the same file. | Confirm the editable columns. |
 | CLR-OP-17 | Location filter (PRCID.014, 021; FR-OP-077) | Reconciliation items filter by AO, sales unit, segment and product line; the location filter is on the reports. | The invoice ledger groups items by sales organisation. | Confirm the filters. |
-| CLR-OP-18 | Reconciliation statuses (PRCID.030; FR-OP-075) | A fifth status BDOI_ONLY marks booked accounts that the insurer did not return. | The BRD's four statuses do not cover accounts missing from the insurer's file. | Confirm the fifth status. |
+| CLR-OP-18 | Reconciliation statuses (PRCID.030; FR-OP-075) | A fifth status, BDOI Only, marks booked accounts that the insurer did not return. | The BRD's four statuses do not cover accounts missing from the insurer's file. | Confirm the fifth status. |
 | CLR-OP-19 | Sum insured on the register (Annex IV #5; FR-OP-072) | The production register has no Sum Insured column. | The invoice ledger does not hold the sum insured. | Confirm the register without the sum insured, or ask for it from the account. |
 | CLR-OP-20 | Several accounts in one request (ADJID.001; FR-OP-050) | One request per invoice; the wizard and the upload raise several requests at once. | Each invoice has its own approval and posting. | Confirm one request per invoice. |
 | CLR-OP-21 | Non-financial endorsement (ADJID.003; FR-OP-050) | Booking records the non-financial endorsement with its description; the account data are not changed. | The account data belong to New Business (OQ32). | Confirm (OQ32). |
 | CLR-OP-22 | Quotation for a TSI increase (ADJID.008; FR-OP-055) | A hand-off to Marketing; the quotation number is linked on the request by reference. | The quotation is prepared in New Business. | Confirm the hand-off to Marketing. |
-| CLR-OP-23 | DP premium receivable reversal (MKTID.012; FR-OP-094) | The ledger reversal is always recorded; its GL entry is off (DP_PR_REVERSAL_POSTING) because booking posts no PR for DP invoices. | Booking of a DP invoice has no premium receivable to reverse (OQ07). | Confirm the ledger-only reversal (OQ07). |
+| CLR-OP-23 | DP premium receivable reversal (MKTID.012; FR-OP-094) | The ledger reversal is always recorded; its GL entry is switched off by a parameter because booking posts no PR for DP invoices. | Booking of a DP invoice has no premium receivable to reverse (OQ07). | Confirm the ledger-only reversal (OQ07). |
 | CLR-OP-24 | Incentive schemes (CMRID.005, 006; FR-OP-095) | No Touch, Top Up and Motor Mania are set up as schemes; they stay inactive without tiers until BDOI gives the targets and amounts. | The targets and amounts are not given (OQ39). | Give the targets and amounts (OQ39). |
 | CLR-OP-25 | Collection and Disbursement systems (BRQID.004, CSHID.009, MKTID.010, 013, CMRID.001, DBMID.001, RMTID.034; FR-OP-130, 120) | Uploads for the Collection data and an in-app Disbursement queue, until BRD-4 Collections and BRD-5 Disbursement replace them. | The Collection and Disbursement systems are replaced by BIBS modules (OQ01, OQ02, OQ45). | Confirm the uploads and the queue until then. |
-| CLR-OP-26 | Match keys and automatch frequency (PRCID.024-027; FR-OP-075) | Lines are matched on the keys of RECON_MATCH_KEYS in order (by default the invoice number, then the policy number); the automatch runs on every upload and when the handler clicks Match Again. | The keys and the frequency are not given (OQ30). | Give the match keys and the automatch frequency (OQ30). |
+| CLR-OP-26 | Match keys and automatch frequency (PRCID.024-027; FR-OP-075) | Lines are matched on the match keys of the reconciliation parameters in order (by default the invoice number, then the policy number); the automatch runs on every upload and when the handler clicks Match Again. | The keys and the frequency are not given (OQ30). | Give the match keys and the automatch frequency (OQ30). |
+| CLR-OP-27 | Main path of the endorsement stepper (screen standards) | The stepper of an endorsement request shows Posted - Payments to Re-apply as a stage of its path after Posted; a request whose invoice had no payment to re-apply ends at Posted. | Posting a paid invoice hands the payment back to Cashiering for re-application, which is part of the request's life. | Confirm the stage on the main path, or show it only when the request reaches it. |
+| CLR-OP-28 | Insurer in the references (screen standards) | Remittance batches, reconciliation cycles and their titles carry the insurer's short code in the reference (for example RMB-INS-MGIC-2026-000001, PRC-INS-MGIC-202609-000001); the insurer's name shows in the record facts and the documents. | The code in the reference tells the insurer at a glance in lists and file names. | Confirm the short code in the references and record titles, or ask for the name there. |
+| CLR-OP-29 | FFY period (screen standards, period cell) | The FFY Register shows the FFY Start and FFY End in two columns. | The register is sorted and filtered on either date. | Confirm two columns, or ask for the period cell (start and "to" end on two lines). |
+| CLR-OP-30 | Row actions in the queues (screen standards) | Queues whose rows carry the actions of the row's next step (Disbursement Queue: Acknowledge, Assign DV, Mark Paid, Return; reconciliation items: Pair; Production Extracts: Download, Resend; DTIP Status: Queue for End of Day) show them as buttons in the row; lists with more actions use the row action menu. | The queue actions are the daily work of the row. | Confirm buttons in the row for these queues, or ask for the row action menu. |
+| CLR-OP-31 | Column headings of the insurer upload templates (chapter 18) | The insurer OR, hold and special remittance uploads read the column headings of their templates as written (for example batchNo, invoiceNo, orNo, orDate, orAmount); the upload field shows them. | The insurer files are prepared from the template downloaded from the screen. | Confirm the column names, or give the headers BDOI and the insurers use. |
+| CLR-OP-32 | Insurer's decision in the DP billing (DO-08) | The insurer answers each account in the Decision column with APPROVED or REJECTED and gives the reason of a rejection; DP Responses reads these two values. | Two fixed values let the answer be read without interpretation. | Confirm the values, or give the insurers' wording. |
+| CLR-OP-33 | Hold reasons (MKTID.003; FR-OP-111) | The hold reason list has one value, Others, with the comment, until BDOI gives its list. | The list is to be supplied by BDOI (OQ24). | Give the list of hold reasons (OQ24). |
+| CLR-OP-34 | Insurer references in the generated workbooks (DO-07, DO-08) | The production register and the DP billing show the insurer's short code, the dates as yyyy-mm-dd and the remittance status as a code, for the insurer's own systems to read. | The files are read back by the insurers and by BIBS. | Confirm the layout for the insurers, or give the layout each insurer needs. |
 
-# Sign-off
+# Appendix: Screen standards
 
-By signing, BDOI confirms that this FRS describes the Operations functions it expects in BIBS, accepts the assumptions in section 10.1 and records its decisions on the items of chapter 12. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
+The Operations screens follow the screen standards of BIBS. They are the same standards in every FRS and are listed here so that BDOI can agree the look of the screens once and check the screenshots against it; they are not repeated in each screen specification.
 
-```signoff
-rows:
-  - {name: "", role: "Head, Operations Services", organisation: BDOI}
-  - {name: "", role: "Head, Cashiering", organisation: BDOI}
-  - {name: "", role: "Head, Financial Transactions and Processing", organisation: BDOI}
-  - {name: "", role: "Head, Commission Collection and Adjustments", organisation: BDOI}
-  - {name: "", role: "Head, Comptrollership", organisation: BDOI}
-  - {name: "", role: "Head, Retail and Corporate Marketing", organisation: BDOI}
-  - {name: "", role: "Program Manager, Business Project Services", organisation: BDO Unibank ESG}
-  - {name: "", role: Project Manager, organisation: iorta TechNXT}
-```
+<!-- table: widths=4.2,13.4 caption="Screen standards of BIBS" -->
+| Area | Standard |
+|---|---|
+| Record pages | Back arrow and breadcrumb, title, then the record header: name, reference chips, status pill, flags (for example On Hold or Pending Negative Adjustment on an invoice) and the key facts. Page actions on the right in one order: secondary, primary, and the destructive action last and apart. |
+| Workflow header (step bar) | Every record with a workflow shows a stepper under the record header: the stages of the main path in their order, passed stages ticked in blue, the current stage highlighted, the stages ahead in grey with their number. A returned or on-hold stage shows in amber after the stage it came from; a rejected, cancelled or voided record shows that stage in red and the path ends there; the last stage turns green when it is reached. Under the stepper one row gives Current Stage, Since, Due (with the Overdue pill) and Assigned To, with the actions of the stage on the right. The history is a table (Stage, From Stage, Action, By, Date and Time, Remarks, Duration in Stage), newest first. |
+| Messages (notice standard) | One standard for errors, warnings, information and success: a white notice with a thin bar and an icon in the colour of its kind (red, amber, blue, green), a bold short title, then the business message with one bullet per missing item. No codes, internal references or technical terms in what the user reads. Field errors appear under the field; a long form lists its errors at the top with a link to the first field. Only an unexpected system error offers Retry and a reference for support behind Details. Special instructions are one short information notice. |
+| Tables, not highlight boxes | Records and lists of records are rows of a titled table (for example the application of a receipt: Invoice, Component, Amount Applied); key data is a label and value grid. A coloured box carries a short message only, never a record. |
+| Tables | Header row in BDO blue that stays in view; text left, amounts right, dates in one format; one value per cell with at most one muted line under it; a dash for an empty value; "Showing x to y of n results" with page numbers. |
+| Status labels | Statuses are pills of one size and one colour per state group and never wrap. The full label is shown (for example Review in Process, With Outstanding Balance); an agreed short form, with the full label in the tooltip, only for a label longer than 21 characters. |
+| Labels and names | List values are shown by their label, never by their code; products by name with the code as a second line; insurers by name; users by their names, never by their user ID. |
+| Dates, amounts and rates | One date picker; dates entered and shown as dd-MMM-yyyy, times as dd-MMM-yyyy HH:mm (Philippine time). Amounts with two decimals and thousand separators, negatives in brackets, the currency in the column header or before the amount. Rates as percentages with two to four decimals, as keyed. |
+| Period cell | A period (period of cover, FFY, production month range, hold period) is shown in lists on two lines, the start date and "to" the end date, each date kept whole; an open end reads "to open". In a sentence or a label and value grid it is one line: "20-Oct-2026 to 20-Oct-2027". |
+| Forms | Labels above the fields, fields of one height on one line, required fields marked, the error under the field, and the actions in one place (Cancel, then the main action). Format hints only; other guidance is in the tooltip of the label. |
+| Uploads | Download Template next to the upload; a drop zone with the accepted types and maximum size; every row checked before anything is saved; Rows Read, Valid and Rejected with the rows; valid rows are processed and the rejected rows are returned in the error file (the template layout with an Error column and the wrong cells highlighted); Upload Corrected File keeps the link to the first upload; a file uploaded before is refused. |
+| Confirmations and reasons | Every approve, authorise, post, release, cancel, void or deactivate asks for confirmation in a dialog that names the record and the effect. Every reject, return, cancel and void needs a reason (from its list where there is one) before it can be confirmed. Destructive actions are confirmed with the red button. The reason is kept in the history and sent with the notification. |
+| Notifications | The bell shows the unread count and opens the panel grouped by day (Today, Yesterday, then the date), each notice with its title, one-line summary, record reference and time; Mark Read, Mark All Read and View All; the Notifications page lists every notice with filters. |
+| Documents | Generated documents carry the BDO Insure letterhead, the document name and reference, and a business footer with "Confidential" and page x of y. |
+
+The project team checks each screen against these standards before UAT and records the result in the screen readiness checklist. A screen found not to follow a standard during the review is recorded as Change requested in the sign-off workbook and corrected before UAT without a change request. The presentation choices that BDOI is asked to confirm are items of the clarifications chapter.

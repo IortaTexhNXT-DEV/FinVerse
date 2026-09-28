@@ -8,9 +8,9 @@ doc_code: TestPlan
 brd: BRD-02
 name: Operations Summary
 doc_id: BIBS-TP-BRD-02
-version: "1.0"
-date: 25 September 2026
-status: Issued for BDOI review
+version: "2.0"
+date: 28 September 2026
+status: Issued for BDOI business sign-off
 header_title: Test Plan BRD-2 Operations
 h1_page_break: false
 control:
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Operations Head (pending)
     change: First issue for BDOI review, with the Excel workbook of the same version
+  - version: "2.0"
+    date: 28 Sep 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Release set v2.0: cases re-traced to FRS v2.0 and its screen specifications (Screen ID on every case, Screens sheet); one screen case per screen and one message case per screen or dialog of the messages catalogue added. Status as of 28-Sep-2026"
 distribution:
   - {name: "Head, Operations Services", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: Cashiering, role: Business tester, organisation: BDOI, purpose: "Receipts, payment files, application, unapplied items, BIR 2307"}
@@ -42,13 +48,13 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-2 Operations in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI Operations teams what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-2 Operations in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI Operations teams what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-02_Operations_v2.0.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-2 v1.0 and to the BRD requirement IDs (BRQID, CSHID, RMTID, ADJID, PRCID, CMRID, MKTID, DBMID) that the FR meets. The expected results quote the messages, with their codes, as BIBS shows them.
+Every case traces to a functional requirement (FR) of FRS BRD-2 v2.0 and to the BRD requirement IDs (BRQID, CSHID, RMTID, ADJID, PRCID, CMRID, MKTID, DBMID) that the FR meets. The expected results quote the messages, with their codes, as BIBS shows them.
 
 ## Scope
 
-In scope are all 83 FRs of FRS BRD-2 v1.0, grouped as in the FRS:
+In scope are all 83 FRs of FRS BRD-2 v2.0, grouped as in the FRS:
 
 - access and invoice ledger: log-in, role-based access, the Operations home, the invoice ledger, Invoice 360, invoice locks, co-insurance shares, batch run reports and report access (FR-OP-001 to 009);
 - Cashiering: receipt series, ARs and ORs, cancellation and reinstatement, payment files, PDC warehouse, check pick-up, matching and application by component, pre-booked payments, AR Insurance, commission ORs, unapplied dispositions, minimal balances, search, batch printing, BIR 2307, accounting entries and reports (FR-OP-010 to 028);
@@ -64,7 +70,7 @@ The roles-and-access sheet checks each Operations action against the roles that 
 ## Out of scope
 
 - The Collection system, the Disbursement system and the GL mapping specification (OQ01, OQ02, OQ07). BRD-4 and BRD-5 test plans cover their replacements; this plan tests the hand-offs, extracts and the in-app Disbursement queue that stand in until then.
-- External transports (SFTP, APIs, shared drive folders) to insurers, BDO bank channels and the Marketing and Claims systems (OQ17, OQ22, OQ29). Files are uploaded by hand and sent by e-mail in this phase, and the cases test that route.
+- External transports (SFTP, system-to-system links, shared drive folders) to insurers, BDO bank channels and the Marketing and Claims systems (OQ17, OQ22, OQ29). Files are uploaded by hand and sent by e-mail in this phase, and the cases test that route.
 - Payout of incentives to branches (CMRID.006, OQ39). The cases stop at the posted incentive and the Disbursement hand-off.
 - Maintenance of products and incentive criteria (BRD-3), booking of new accounts (BRD-1) and renewal (BRD-6). This plan uses booked invoices as given.
 - Performance and volume testing (deliverable 28).
@@ -74,9 +80,9 @@ The roles-and-access sheet checks each Operations action against the roles that 
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-2 Operations (`BIBS_FRS_BRD-02_Operations_v1.0.docx`) | 1.0, 25 Sep 2026 |
+| R1 | Functional Requirements Specification BRD-2 Operations (`02_BIBS_FRS_BRD-02_Operations_v2.0.docx`) | 2.0, 28 Sep 2026 |
 | R2 | Operations BRD and Addendum 1 | BRD v1.0 Jul-2025; Addendum 1 18-Dec-2025 |
-| R3 | Test plan workbook BRD-2 (`BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx`) | 1.0 |
+| R3 | Test plan workbook BRD-2 (`04_BIBS_TestPlan_BRD-02_Operations_v2.0.xlsx`) | 2.0 |
 | R6 | Test plan BRD-1 New Business (booking, payment gate) | 1.0 |
 
 # Test approach
@@ -105,14 +111,16 @@ The roles-and-access sheet checks each Operations action against the roles that 
 | Positive | The normal flow succeeds with valid data |
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit |
-| Security-access | Screens, buttons and API calls are open only to the roles that hold the permission; four-eyes rules |
+| Security-access | Screens, buttons and requests made outside the screens are open only to the roles that hold the permission; four-eyes rules |
 | Workflow | A stage transition, approval, return or closure of a receipt, batch, request, cycle, billing or payment request |
 | Report-output | Reports, registers, schedules and exports; content checked against the screen |
 | Upload-download | Payment files, insurer files, DP lists, registers, slips and protected e-mails |
+| Screen | The screen matches its specification in FRS v2.0 chapter 13: fields, order, labels, mandatory markers, defaults, lists and buttons (TC-OP-SCR-nn, one per screen) |
+| Message | Every error, validation and warning message of one screen or dialog, word for word with its code (TC-OP-MSG-nn, from the messages catalogue of FRS v2.0 chapter 15) |
 
 ## Reading the workbook
 
-The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Test Data, Roles and Access. Case IDs carry their condition: TC-OP-075.1-01 is the first case of condition 1 of FR-OP-075. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Issue ID.
+The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Screens, Test Data, Roles and Access. Case IDs carry their condition: TC-OP-075.1-01 is the first case of condition 1 of FR-OP-075. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Issue ID.
 
 # Entry and exit criteria
 
@@ -122,8 +130,8 @@ The workbook has a README sheet that explains every column. The sheets are Docum
 | Level | Criteria |
 |---|---|
 | System test | BIBS is deployed on SIT with the seed data; the test mailboxes of the four seed insurers and the Operations users receive mail; the seed accounting rules of the Operations events are active; this plan is reviewed by the iorta TechNXT project manager. |
-| Persona end-to-end | All High-priority system test cases are run; no open Critical issue; the e-mail relay and the scheduled jobs (remittance extraction, PRODUCTION_EXTRACT, HOLD_EXPIRY, DP_FEEDBACK_SLA, minimal balance sweep, flow-in feeds) run on SIT. |
-| UAT | FRS BRD-2 v1.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; Comptrollership has confirmed the GL accounts of the Operations events for UAT (OQ07); receipt series match BDOI's BIR registration (OQ05). |
+| Persona end-to-end | All High-priority system test cases are run; no open Critical issue; the e-mail relay and the scheduled jobs (remittance extraction, production register extraction, hold expiry, DP feedback follow-up, minimal balance sweep, flow-in feeds) run on SIT. |
+| UAT | FRS BRD-2 v2.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; Comptrollership has confirmed the GL accounts of the Operations events for UAT (OQ07); receipt series match BDOI's BIR registration (OQ05). |
 
 ## Exit criteria
 
@@ -211,6 +219,12 @@ Every FR has at least one positive and one negative case, and every BRD ID is co
 
 <!-- tp:scenarios -->
 
+## Coverage by screen
+
+Every screen of the FRS v2.0 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
+
+<!-- tp:screens -->
+
 ## Roles and access
 
 The table shows the actions checked per role. Each Y and N is one row of the Roles and Access sheet.
@@ -226,7 +240,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 | Production GL accounts of the Operations events are not yet given (OQ07) | High | SIT uses the seed accounting rules; UAT waits for the Comptrollership accounts (entry criterion) |
 | The Collection and Disbursement systems are not known (OQ01, OQ02) | Medium | The cases test the in-app queue and hand-off extracts; interface cases are added when the systems are named |
 | Test mailboxes or the e-mail relay not reachable from SIT or UAT | High | Check the relay before the cycle; e-mail cases read the Outbound Messages log when the mailbox is down and are re-run later |
-| Time-based cases (hold expiry, 10 working-day SLA, monthly schedules, holidays, check clearing) need the clock to pass | Medium | The test lead moves dates in the test database or runs the jobs by hand, as the preconditions describe |
+| Time-based cases (hold expiry, 10 working-day SLA, monthly schedules, holidays, check clearing) need the clock to pass | Medium | The test lead sets the business date of the test environment or starts the scheduled runs by hand, as the preconditions describe |
 | Payment files and insurer feedback in BDOI's volumes are not tested before UAT | Medium | System test uses the files of TD-OP-08; UAT includes one file per type in the expected daily or monthly volume |
 | BDOI testers are not available in the UAT window | High | Agree named testers per team and dates in the UAT plan (deliverable 30) before UAT starts |
 

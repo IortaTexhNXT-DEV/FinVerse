@@ -175,7 +175,7 @@ screens:
       - Remittance Workbench › Holds for Approval and Active Holds tiles
     shots:
       - {state: list, user: mkttl, caption: "Remittance Holds, For Approval tab"}
-      - {state: new, user: mktcoll, click: "^new hold request$", fill: hold_request, caption: "New Hold Request dialog"}
+      - {state: new, user: mktcoll, fill: hold_request, caption: "New Hold Request dialog"}
     fields:
       - "Tabs | For Approval / Active Holds / Drafts / Released and Closed | Tab | - | - | Fixed | For Approval | - | - | -"
       - "Toolbar | Search Hold or Invoice No. | Text | - | N | - | Blank | - | Contains | -"
@@ -376,7 +376,7 @@ screens:
       - Remittance Workbench
     shots:
       - {state: list, user: remittl, caption: "Incentive Rules"}
-      - {state: new, user: remittl, click: "^new rule$", fill: incentive_rule, caption: "New incentive rule"}
+      - {state: new, user: remittl, fill: incentive_rule, caption: "New incentive rule"}
     fields:
       - "List | Insurer / Product Line / Segment / Rate / Window / Effective / Status | Column | Rate in %; window in days from inception or booking; period cell | - | Incentive rules | - | Read only | - | -"
       - "Rule form | Insurer Code | Text | - | Y | Insurers | Blank | - | Not blank | Insurer code is required"

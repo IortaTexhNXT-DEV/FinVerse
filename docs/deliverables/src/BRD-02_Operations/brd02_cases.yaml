@@ -11,8 +11,9 @@ meta:
   code: OP
   frs: FRS_BRD02_OPERATIONS.md
   summary: TP_BRD02_OPERATIONS.md
-  version: "1.0"
-  date: 25 September 2026
+  version: "2.0"
+  date: 28 September 2026
+  signoff: pack/pack.yaml
   verify_messages: true
 
 personas:
@@ -50,6 +51,7 @@ screens:
   RECEIPT: Cashiering > Receipts > Receipt page
   UNAPPLIED: Cashiering > Unapplied Payments
   UITEM: Cashiering > Unapplied Payments > Unapplied Payment page
+  INREQ: Cashiering > Incoming Requests
   PREBOOKED: Cashiering > Pre-booked Payments
   PAYUP: Cashiering > Payment Uploads
   PDC: Cashiering > PDC Warehouse
@@ -68,6 +70,7 @@ screens:
   HOLD: Remittance > Remittance Holds > Remittance Hold
   SPECIAL: Remittance > Special Remittance
   DTIP: Remittance > DTIP Status
+  DEDUCTIONS: Remittance > Remittance Deductions
   INCRULES: Remittance > Incentive Rules
   ADJWB: Adjustment > Adjustment Workbench
   NEWREQ: Adjustment > New Request
@@ -80,6 +83,7 @@ screens:
   CYCLE: Product Reconciliation > Reconciliation Cycles > Reconciliation Cycle
   EXTRACTS: Product Reconciliation > Production Extracts
   FEEDBACK: Product Reconciliation > Insurer Feedback
+  RECONUP: Product Reconciliation > Insurer Feedback
   UNBOOKED: Product Reconciliation > Unbooked Accounts
   SCHEDULES: Product Reconciliation > Extract Schedules
   COMMWB: Commission Receivables > Commission Workbench
@@ -91,13 +95,16 @@ screens:
   SCHEMES: Commission Receivables > Incentive Schemes
   RUNS: Commission Receivables > Incentive Runs
   CERTS: Commission Receivables > BIR Certificates
+  CERT: Commission Receivables > BIR Certificates > BIR Certificate
   ESTIMATED: Commission Receivables > Estimated Items
+  FFY: Accounts > FFY Register
   REPORTS: Reports > Report Centre (category Operations)
+  REPORT: Reports > Report Centre > Report
   AUDIT: Administration > Audit Trail
   PARAMS: Administration > System Parameters
   JOBS: Administration > Scheduled Jobs
   NOTIF: Notifications (bell icon in the page header)
-  API: Direct request outside the screens, signed in as the persona (test lead tool)
+  CHECK: Access check outside the screens, run by the test lead signed in as the persona
 
 data:
   - id: TD-OP-01
@@ -231,7 +238,7 @@ frs:
         expected: Remittance screens are listed; Cashiering Setup and the Disbursement Queue are not, and the direct links show the no-access page.
       - c: 2
         type: Security-access
-        screen: API
+        screen: CHECK
         title: Batch approval without REMIT_APPROVE
         steps:
           - As remit send a direct request to approve a batch for approval.
@@ -313,7 +320,7 @@ frs:
       - c: 3
         type: Negative
         persona: SYSADMIN
-        screen: API
+        screen: CHECK
         title: Replay without scope
         steps:
           - Send a direct request to replay invoices with no invoice, ARN or company.
@@ -611,7 +618,7 @@ frs:
         msg: [Official receipts are issued by Head Office only (CSHID.006), OR_HEAD_OFFICE_ONLY]
       - c: 2
         type: Negative
-        screen: API
+        screen: CHECK
         title: OR without a line
         steps:
           - Send a direct request to issue an OR with no line.
@@ -684,7 +691,7 @@ frs:
         msg: ["Enter the <fields> (CSHID.005)", REINSTATEMENT_FIELDS_REQUIRED]
       - c: 3
         type: Negative
-        screen: API
+        screen: CHECK
         title: Reinstate an issued receipt
         steps:
           - Call reinstate on an ISSUED AR.
@@ -1057,7 +1064,7 @@ frs:
         title: Audit rows cannot change
         steps:
           - Look for edit or delete on the receipt's audit rows.
-        expected: None is offered; the database refuses changes.
+        expected: None is offered; BIBS refuses any change.
 
   FR-OP-025:
     scenario: SC-OP-03
@@ -1083,7 +1090,7 @@ frs:
         msg: ["<batch> has no failures", PRINT_NOTHING_FAILED]
       - c: 2
         type: Negative
-        screen: API
+        screen: CHECK
         title: Empty selection
         steps:
           - Send a direct request to create a print batch with no receipt.
@@ -1151,7 +1158,7 @@ frs:
       - c: 1
         type: Negative
         persona: CASHIER
-        screen: API
+        screen: CHECK
         title: Journal without a rule is not posted silently
         pre: In SIT the test lead disables the accounting rule of OPS_PAYMENT_APPLY.
         steps:
@@ -1183,7 +1190,7 @@ frs:
       - c: 2
         type: Security-access
         persona: DISBURSEMENT
-        screen: API
+        screen: CHECK
         title: Report export without OPS_REPORT_EXPORT
         steps:
           - As disb export CSH-APPLIED-PREM.
@@ -1207,7 +1214,7 @@ frs:
         title: Scheduled extraction
         pre: An invoice of INS-MGIC paid in cash four banking days ago.
         steps:
-          - Run REMITTANCE_EXTRACTION; open Extraction, the run's tags; open Remittance Batches.
+          - Start the scheduled remittance extraction; open Extraction, the run's tags; open Remittance Batches.
         expected: The invoice is EXTRACTED into batch RMB-INS-MGIC-2026-n and its lock shows REMITTANCE.
       - c: 1
         type: Negative
@@ -1298,7 +1305,7 @@ frs:
     cases:
       - c: 1
         type: Negative
-        screen: API
+        screen: CHECK
         title: Amounts of a line cannot be edited
         steps:
           - Look for edit on a line; send a direct request to change the line amount.
@@ -1548,7 +1555,7 @@ frs:
       - c: 2
         type: Security-access
         persona: CASHIER
-        screen: API
+        screen: CHECK
         title: Search without REMIT_PROCESS
         steps:
           - As cashier send a direct request to open the DTIP search.
@@ -1609,7 +1616,7 @@ frs:
       - c: 2
         type: Security-access
         persona: MKT_COLLECTION
-        screen: API
+        screen: CHECK
         title: Export without OPS_REPORT_EXPORT
         steps:
           - As mktcoll export REM-TRACKER.
@@ -1748,7 +1755,7 @@ frs:
         expected: The request is For posting.
       - c: 2
         type: Negative
-        screen: API
+        screen: CHECK
         title: Extension with premium validated for posting
         steps:
           - Send a direct request for the action Validate for posting on a cover extension with additional premium.
@@ -2022,7 +2029,7 @@ frs:
       - c: 2
         type: Security-access
         persona: CASHIER
-        screen: API
+        screen: CHECK
         title: Workbench without ADJ permissions
         steps:
           - As cashier send a direct request to open the adjustment requests.
@@ -2077,7 +2084,7 @@ frs:
         title: Schedule on day 5 over a holiday
         pre: 5 October 2026 is set as a holiday in the calendar of SIT.
         steps:
-          - Keep the seed schedule of INS-MGIC on day 5; run PRODUCTION_EXTRACT for 5 and 6 October (clock moved).
+          - Keep the seed schedule of INS-MGIC on day 5; start the scheduled register extraction for 5 and 6 October (business date moved).
         expected: No extract on 5 October; the extract is made on 6 October.
       - c: 2
         type: Negative
@@ -2171,7 +2178,7 @@ frs:
       - c: 2
         type: Security-access
         persona: CASHIER
-        screen: API
+        screen: CHECK
         title: Send without RECON_SEND
         steps:
           - As cashier send a direct request to send an extract.
@@ -2239,7 +2246,7 @@ frs:
         expected: The booked account missing from the feedback is BDOI_ONLY.
       - c: 3
         type: Negative
-        screen: API
+        screen: CHECK
         title: Automatch a closed cycle
         steps:
           - Close a cycle; send a direct request to run the automatch on it.
@@ -2379,7 +2386,7 @@ frs:
       - c: 2
         type: Security-access
         persona: DISBURSEMENT
-        screen: API
+        screen: CHECK
         title: Export without rights
         steps:
           - As disb export PRC-SUMMARY.
@@ -2511,7 +2518,7 @@ frs:
         title: Overdue after 10 working days
         pre: The seed billing sent 11 working days ago (date moved in SIT).
         steps:
-          - Run DP_FEEDBACK_SLA; open DP Billings and the bell.
+          - Start the daily DP feedback follow-up; open DP Billings and the bell.
         expected: The billing shows overdue; the alert is raised once.
       - c: 3
         type: Negative
@@ -2675,7 +2682,7 @@ frs:
       - c: 2
         type: Security-access
         persona: MKT_COLLECTION
-        screen: API
+        screen: CHECK
         title: Export without rights
         steps:
           - As mktcoll export the CMR report.
@@ -2747,7 +2754,7 @@ frs:
         title: Expired hold released
         pre: The hold's until date set to yesterday.
         steps:
-          - Run HOLD_EXPIRY; run the extraction.
+          - Start the daily hold expiry run; run the extraction.
         expected: The hold is Released (Hold expired); the invoice is extracted.
       - c: 4
         type: Negative
@@ -2880,7 +2887,7 @@ frs:
       - c: 2
         type: Security-access
         persona: REMIT_PROCESSOR
-        screen: API
+        screen: CHECK
         title: Queue without DISB_PROCESS
         steps:
           - As remit send a direct request to create a DV for a disbursement request.

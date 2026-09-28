@@ -76,7 +76,7 @@ screens:
     shots:
       - {state: list, user: cashier, caption: "Receipts: acknowledgement and official receipts"}
       - {state: actions, user: cashtl, tab: "Cancellations and Reinstatements", caption: "Cancellations and Reinstatements tab of the Cashiering Team Leader"}
-      - {state: issue_or, user: cashier, click: "^issue official receipt$", fill: issue_or, caption: "Issue Official Receipt dialog for a service fee"}
+      - {state: issue_or, user: cashier, fill: issue_or, caption: "Issue Official Receipt dialog for a service fee"}
     fields:
       - "Tabs | Receipts / Cancellations and Reinstatements | Tab | - | - | Fixed | Receipts | - | - | -"
       - "Toolbar | Search Receipt No. | Text | Receipt number | N | Receipts | Blank | - | - | -"
@@ -324,7 +324,7 @@ screens:
       - Cashiering Workbench › Post-dated Checks in the Warehouse tile
     shots:
       - {state: list, user: cashier, caption: "PDC Warehouse by maturity month"}
-      - {state: add, user: cashier, click: "^warehouse check$", fill: pdc_check, caption: "Warehouse Post-dated Check dialog"}
+      - {state: add, user: cashier, fill: pdc_check, caption: "Warehouse Post-dated Check dialog"}
     fields:
       - "Tabs | In Warehouse / Applied / Matured (Unapplied) / All | Tab | - | - | Fixed | In Warehouse | - | - | -"
       - "List | [Maturity month and total] | Heading | Month, number of checks and total | - | PDC warehouse | - | Read only | - | -"
@@ -403,7 +403,7 @@ screens:
       - Cashiering Workbench › BIR 2307 to Validate tile
     shots:
       - {state: list, user: cashier, caption: "BIR 2307, Tagged by Marketing tab"}
-      - {state: tag, user: mktcoll, click: "^tag 2307$", fill: cwt_tag, caption: "Tag BIR 2307 dialog of Marketing Collection"}
+      - {state: tag, user: mktcoll, fill: cwt_tag, caption: "Tag BIR 2307 dialog of Marketing Collection"}
     fields:
       - "Tabs | Tagged by Marketing / Validation / Reports and Routing / Released / Settled | Tab | - | - | Fixed | Tagged by Marketing | - | - | -"
       - "Tags | Reference / Client / Insurer / Path / Amount / Checklist / Tagged / Stage | Column | CWT-yyyy-n with the invoice and ARN; path Certificate or Cash; checklist CWT Copy, Remitted | - | BIR 2307 tags | - | Read only | - | No items to display"
@@ -460,7 +460,7 @@ screens:
       - Cashiering Workbench
     shots:
       - {state: list, user: cashtl, caption: "Receipt Series with the numbers left"}
-      - {state: new, user: cashtl, click: "^new series$", fill: new_series, caption: "New Receipt Series dialog"}
+      - {state: new, user: cashtl, fill: new_series, caption: "New Receipt Series dialog"}
     fields:
       - "Toolbar | Origin | Drop-down | All origins, BIBS, Migrated | N | Fixed list | All origins | - | - | -"
       - "List | Series / Branch / Range / Next No. / Used / Status | Column | Prefix with the kind and ATP; gauge with the numbers left | - | Receipt series | - | Read only | - | No receipt series yet"

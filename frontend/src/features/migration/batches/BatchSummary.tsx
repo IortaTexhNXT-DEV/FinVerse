@@ -4,9 +4,15 @@ import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
 import { Kpi } from '@/components/ui/Kpi';
 import { formatDate, formatDateTime } from '@/utils/format';
 import { BATCH_STEPS, percent, stepDone } from '../common/migrationCodes';
+import type { ReactNode } from 'react';
+import { UserName } from '@/components/ui/UserName';
 
-function byAt(user: string | undefined, at: string | undefined): string | undefined {
-  return user === undefined ? undefined : user + ', ' + formatDateTime(at);
+function byAt(user: string | undefined, at: string | undefined): ReactNode {
+  return user === undefined ? undefined : (
+    <>
+      <UserName login={user} />, {formatDateTime(at)}
+    </>
+  );
 }
 
 function purge(b: Batch): string {
@@ -68,7 +74,10 @@ export function BatchSummary({ batch: b }: Readonly<{ batch: Batch }>) {
           { label: 'Client pairs to review', value: String(b.reviewCount) },
           { label: 'Validated by', value: byAt(b.validatedBy, b.validatedAt) },
           { label: 'Load approved by', value: byAt(b.loadApprovedBy, b.loadApprovedAt) },
-          { label: 'Loaded by', value: b.loadedBy },
+          {
+            label: 'Loaded by',
+            value: b.loadedBy === undefined ? undefined : <UserName login={b.loadedBy} />,
+          },
           { label: 'Load started', value: formatDateTime(b.startedAt) },
           { label: 'Load ended', value: formatDateTime(b.endedAt) },
           { label: 'Accepted', value: formatDateTime(b.signedOffAt) },

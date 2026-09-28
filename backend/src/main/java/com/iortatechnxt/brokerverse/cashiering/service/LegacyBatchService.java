@@ -51,12 +51,23 @@ public class LegacyBatchService {
   private static final String ENTITY = "CashLegacyBatch";
   private static final Set<String> OPEN_STAGES = Set.of(Unapplied.STAGE_INITIAL, "MONITORING");
 
+  /**
+   * The day an unapplied item was received: the legacy acknowledgement receipt date of a migrated
+   * item (received in legacy, loaded at cut-over), else the day it was created in BIBS.
+   */
+  private static final String RECEIVED_ON =
+      "coalesce(u.legacy_ar_date, cast(u.created_at at time zone 'Asia/Manila' as date))";
+
   private static final String CANDIDATES =
       "select u.id, u.reference, u.origin, u.ledger_context, u.legacy_ar_no, u.payor_name,"
           + " u.client_code, u.currency, u.balance, u.stage,"
-          + " cast(? as date) - cast(u.created_at at time zone 'Asia/Manila' as date) as age_days"
+          + " cast(? as date) - "
+          + RECEIVED_ON
+          + " as age_days"
           + " from csh_unapplied u where u.company_id = ? and u.stage in ('UNAPPLIED', 'MONITORING')"
-          + " and u.balance > 0 and u.created_at < ?"
+          + " and u.balance > 0 and "
+          + RECEIVED_ON
+          + " <= ?"
           + " and (cast(? as varchar) is null or u.origin = ?)"
           + " and not exists (select 1 from csh_legacy_batch_line l join csh_legacy_batch b"
           + " on b.id = l.batch_id where l.unapplied_id = u.id and l.status <> 'FAILED'"
@@ -153,7 +164,8 @@ public class LegacyBatchService {
 
   /**
    * The unapplied items that may be taken to income: open in the Unapplied tab, with a balance,
-   * received at least a number of days ago and not on another batch.
+   * received at least a number of days ago (a migrated item from its legacy receipt date) and not
+   * on another batch.
    *
    * @param companyId company
    * @param minAgeDays minimum age in days
@@ -180,7 +192,7 @@ public class LegacyBatchService {
                 rs.getString("stage")),
         BusinessClock.today(clock),
         companyId,
-        java.sql.Timestamp.from(before.plusDays(1).atStartOfDay(BusinessClock.zone()).toInstant()),
+        java.sql.Date.valueOf(before),
         origin,
         origin);
   }

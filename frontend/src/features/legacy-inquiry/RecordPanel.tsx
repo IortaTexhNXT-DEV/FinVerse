@@ -10,6 +10,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { OriginBadge } from '@/components/ui/OriginBadge';
 import { useDownload } from '@/features/migration/common/useDownload';
 import { formatAmount, formatDate, formatDateTime } from '@/utils/format';
+import { LegacyRecordType, LegacyStatus } from './LegacyStatus';
 
 /** A legacy archive record: its keys, all its legacy columns and its documents (read-only). */
 export function RecordPanel({
@@ -31,7 +32,7 @@ export function RecordPanel({
           'Legacy record'
         ) : (
           <span>
-            {r.recordType.replaceAll('_', ' ').toLowerCase()} {r.legacyKey}{' '}
+            <LegacyRecordType type={r.recordType} /> {r.legacyKey}{' '}
             <OriginBadge
               record={{ origin: 'MIGRATED', sourceSystem: r.sourceSystem, legacyRef: r.legacyKey }}
             />
@@ -69,7 +70,7 @@ export function RecordPanel({
                 value:
                   r.amount === undefined ? '' : `${r.currency ?? ''} ${formatAmount(r.amount)}`,
               },
-              { label: 'Legacy status', value: r.status },
+              { label: 'Legacy status', value: <LegacyStatus status={r.status} withValue /> },
               { label: 'Archived', value: formatDateTime(d.loadedAt) },
             ]}
           />

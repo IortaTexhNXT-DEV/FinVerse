@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Supplier;
 import org.springframework.core.io.ClassPathResource;
@@ -63,6 +64,14 @@ public class MigrationStoryline {
 
   /** Legacy invoice number of the storyline. */
   public static final String INVOICE = "I97000011";
+
+  /**
+   * An old legacy unapplied payment of the storyline client (received in June 2025, no invoice to
+   * match): after the load it waits in the Unapplied tab, old enough to be taken to income.
+   */
+  public static final String OLD_UPP = "UPP970002";
+
+  private static final String OLD_UPP_FILE = "F02_EBIX_20271231_02.csv";
 
   private static final String FOLDER = "db/seed/migration/";
   private static final String OPERATOR = "migops";
@@ -127,6 +136,29 @@ public class MigrationStoryline {
       batches.put(step.object(), loadAndAccept(companyId, step.object(), extracts));
     }
     return batches;
+  }
+
+  /**
+   * Loads the old legacy unapplied payment ({@link #OLD_UPP}) through the pipeline once, for the
+   * Unapplied to Income batches of Cashiering; also in a company where the storyline was loaded
+   * before it had this item.
+   *
+   * @param companyId company
+   * @return the batch, empty when the item is already loaded
+   */
+  public Optional<String> loadOldUpp(Long companyId) {
+    Integer n =
+        jdbc.queryForObject(
+            "select count(*) from csh_unapplied where company_id = ? and origin = 'MIGRATED'"
+                + " and legacy_ref = ?",
+            Integer.class,
+            companyId,
+            OLD_UPP);
+    if (n != null && n > 0) {
+      return Optional.empty();
+    }
+    return Optional.of(
+        loadAndAccept(companyId, "F02", List.of(receive(companyId, "F02", OLD_UPP_FILE))));
   }
 
   private String receive(Long companyId, String object, String file) {

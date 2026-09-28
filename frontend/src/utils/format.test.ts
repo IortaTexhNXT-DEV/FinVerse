@@ -1,4 +1,5 @@
 import {
+  countOf,
   formatAmount,
   formatCompact,
   formatDate,
@@ -66,6 +67,16 @@ describe('format', () => {
 
   it('humanizes enum codes', () => {
     expect(humanize('PENDING_APPROVAL')).toBe('Pending Approval');
+  });
+});
+
+describe('countOf', () => {
+  it('puts the noun in the right number', () => {
+    expect(countOf(1, 'row')).toBe('1 row');
+    expect(countOf(3, 'row')).toBe('3 rows');
+    expect(countOf(0, 'row')).toBe('0 rows');
+    expect(countOf(1, 'entry', 'entries')).toBe('1 entry');
+    expect(countOf(2, 'entry', 'entries')).toBe('2 entries');
   });
 });
 

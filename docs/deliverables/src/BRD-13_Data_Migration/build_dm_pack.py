@@ -53,7 +53,8 @@ import brand  # noqa: E402
 # The catalogue of the Migration Console (its seed data) and the template export of the console.
 SEED_SQL = REPO / "backend" / "src" / "main" / "resources" / "db" / "migration" / "V1081__migration_objects_maps.sql"
 # Later scripts that update the texts of the V1081 catalogue (applied in version order after the seed).
-SEED_UPDATES = [SEED_SQL.parent / "V1090__migration_catalogue_wording.sql"]
+SEED_UPDATES = [SEED_SQL.parent / "V1090__migration_catalogue_wording.sql",
+                SEED_SQL.parent / "V1091__migration_rule_wording.sql"]
 JAVA = REPO / "backend" / "src" / "main" / "java" / "com" / "iortatechnxt" / "brokerverse"
 TEMPLATE_EXPORT = JAVA / "migration" / "mapping" / "service" / "TemplateExport.java"
 CODE_MAP_EXCEL = JAVA / "migration" / "mapping" / "service" / "CodeMapExcel.java"

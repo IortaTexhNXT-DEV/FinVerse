@@ -78,8 +78,12 @@ export function approverPermission(screen: BatchScreen, batch: LegacyBatch): str
 }
 
 /** Who approved a batch, in order. */
-export function approvers(batch: LegacyBatch): string {
+export function approvers(
+  batch: LegacyBatch,
+  name: (login: string) => string = (login) => login,
+): string {
   return [batch.firstApprovedBy, batch.finalApprovedBy ?? batch.approvedBy]
     .filter((v): v is string => Boolean(v))
+    .map(name)
     .join(' / ');
 }

@@ -14,6 +14,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import { reasonLabel } from './reason';
+import { UserName } from '@/components/ui/UserName';
 
 const ACTIONS = ['SEARCH', 'VIEW', 'DOWNLOAD', 'EXPORT'];
 
@@ -24,7 +25,7 @@ const COLUMNS: Column<AccessLogEntry>[] = [
     kind: 'datetime',
     render: (a) => <CellStack main={formatDateTime(a.accessedAt)} sub={a.sourceAddress ?? ''} />,
   },
-  { key: 'user', header: 'User', render: (a) => a.username },
+  { key: 'user', header: 'User', render: (a) => <UserName login={a.username} /> },
   {
     key: 'action',
     header: 'Action',

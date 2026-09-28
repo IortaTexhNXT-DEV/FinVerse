@@ -25,8 +25,9 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * intake, validation, load, reconciliation and acceptance of reference data, a client, a policy
  * header, an open legacy invoice, a legacy unapplied payment and an archive record - then the
  * migrated data is worked in BIBS: the automatch applies the legacy payment to the legacy invoice,
- * the account is endorsed on the legacy accounts, Migration Clearing stays at zero, the legacy
- * archive is searched, and the go / no-go measures read the accepted objects.
+ * an old legacy unapplied payment waits for Unapplied to Income, the account is endorsed on the
+ * legacy accounts, Migration Clearing stays at zero, the legacy archive is searched, and the go /
+ * no-go measures read the accepted objects.
  */
 @IntegrationTest
 class MigrationEndToEndIT {
@@ -69,6 +70,24 @@ class MigrationEndToEndIT {
                 "select balance from csh_unapplied where legacy_ref = 'UPP970001'",
                 BigDecimal.class))
         .isEqualByComparingTo("0");
+
+    // The old legacy unapplied payment of the seed waits for the Unapplied to Income batches.
+    assertThat(storyline.loadOldUpp(company)).isPresent();
+    assertThat(storyline.loadOldUpp(company)).isEmpty();
+    String oldUpp =
+        jdbc.queryForObject(
+            "select reference from csh_unapplied where legacy_ref = ? and origin = 'MIGRATED'",
+            String.class,
+            MigrationStoryline.OLD_UPP);
+    JsonNode toIncome =
+        api.read(
+            api.doGet(
+                    "cashier",
+                    "/api/v1/cashiering/legacy-batches/candidates?companyId="
+                        + company
+                        + "&origin=MIGRATED&minAgeDays=365")
+                .andExpect(status().isOk()));
+    assertThat(toIncome.findValuesAsText("reference")).contains(oldUpp);
 
     JsonNode endorsed =
         api.read(

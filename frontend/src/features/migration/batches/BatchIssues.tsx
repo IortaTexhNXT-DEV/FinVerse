@@ -13,12 +13,19 @@ import { Tag } from '@/components/ui/Tag';
 import { ActionConfirm } from '../common/ActionConfirm';
 import type { MigAction } from '../common/ActionConfirm';
 import { migLabel } from '../common/migrationCodes';
+import type { ReactNode } from 'react';
+import { UserName } from '@/components/ui/UserName';
 
-function resolver(i: Issue): string | undefined {
+function resolver(i: Issue): ReactNode {
   if (i.resolvedBy === undefined) {
     return undefined;
   }
-  return i.resolutionNote ? i.resolvedBy + ': ' + i.resolutionNote : i.resolvedBy;
+  return (
+    <>
+      <UserName login={i.resolvedBy} />
+      {i.resolutionNote ? ': ' + i.resolutionNote : ''}
+    </>
+  );
 }
 
 /** The data-quality issues of a batch with the Data Steward's resolution. */

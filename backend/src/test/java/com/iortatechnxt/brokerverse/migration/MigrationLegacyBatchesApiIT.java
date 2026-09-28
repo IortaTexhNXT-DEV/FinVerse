@@ -116,6 +116,17 @@ class MigrationLegacyBatchesApiIT {
     JsonNode candidates =
         mig.get("cashier", CSH + "/candidates?companyId=" + company + "&origin=MIGRATED");
     assertThat(candidates.findValuesAsText("reference")).contains(reference);
+    // A migrated item is aged from its legacy receipt (10-Dec-2024), not from its load.
+    JsonNode old =
+        mig.get(
+            "cashier",
+            CSH + "/candidates?companyId=" + company + "&origin=MIGRATED&minAgeDays=365");
+    JsonNode aged =
+        old.findParents("reference").stream()
+            .filter(c -> reference.equals(c.get("reference").asText()))
+            .findFirst()
+            .orElseThrow();
+    assertThat(aged.get("ageDays").asInt()).isGreaterThanOrEqualTo(365);
 
     JsonNode batch =
         mig.post(

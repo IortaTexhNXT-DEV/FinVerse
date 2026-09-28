@@ -154,7 +154,8 @@ remittance register have an Origin filter.
 Seed migrations V1980 (users), V1981 (decisions, code maps), V1982 (legacy GL chart and rules). The seed runner
 `LegacyMigrationSeedData` (profile `seed`) loads the storyline of `db/seed/migration/` - reference data, a client, a
 policy header, an open legacy invoice, a legacy unapplied payment and an archive record - through the real pipeline,
-then `MigrationTabsStoryline` fills the console tabs: a mock cutover plan under way with its criteria measured, the
+and an old legacy unapplied payment (UPP970002, received June 2025, no invoice to match) that waits for the
+Unapplied to Income batches of Cashiering (a migrated item is aged from its legacy receipt date); then `MigrationTabsStoryline` fills the console tabs: a mock cutover plan under way with its criteria measured, the
 production plan, a run-off snapshot and the EBIX decommissioning checklist with its first criteria met.
 Tests: one `Migration*ApiIT` per wave, `MigrationLegacyBatchesApiIT` (the three legacy batches, the legacy reports,
 the history of a migrated invoice, the Origin filter of the remittance schedules), `MigrationEndToEndIT` (storyline,

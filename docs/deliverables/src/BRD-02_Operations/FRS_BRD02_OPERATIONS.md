@@ -1880,7 +1880,7 @@ validations:
   - [Return invoice, "<invoice> is a return invoice: raise the request on the original", ADJ_RETURN_INVOICE]
   - [Invoice cancelled or written off, "<invoice> is cancelled or written off", ADJ_INVOICE_CLOSED]
   - [Cancellation with another open financial request, "Request <no> (<type>) is still open on <invoice>: a cancellation cannot be combined with another financial change", ADJ_INCOMPATIBLE_REQUEST]
-  - [Invoice in remittance, "Invoice <no> is locked by Remittance (<reason>)", INVOICE_LOCKED]
+  - [Invoice in remittance, "Invoice <no> is locked by <team> (<reason>)", INVOICE_LOCKED]
   - [Type without class, "Endorsement type <code> has no class (FINANCIAL / NON_FINANCIAL)", ADJ_TYPE_WITHOUT_CLASS]
   - [Change after submission, "<request> is <stage> and can no longer be changed", ADJ_REQUEST_NOT_EDITABLE]
 fields_screen: New Request (request step)

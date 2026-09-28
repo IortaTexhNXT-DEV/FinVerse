@@ -49,7 +49,7 @@ class NoticeLinksTest {
   /** A route opens a link when the link is the route, or the route without its record parameter. */
   private static boolean opens(String route, String link) {
     String fixed = route.replaceAll("/:[A-Za-z]+.*$", "/");
-    return route.equals(link) || (link.endsWith("/") && fixed.equals(link));
+    return route.equals(link) || link.endsWith("/") && fixed.equals(link);
   }
 
   private static List<String> routes() {

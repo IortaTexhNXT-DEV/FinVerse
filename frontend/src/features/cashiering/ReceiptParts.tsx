@@ -70,7 +70,7 @@ export function ReceiptHeaderActions({
   return (
     <>
       <Button variant="secondary" icon={<Printer size={16} />} busy={printing} onClick={onPrint}>
-        Print
+        Print (PDF)
       </Button>
       {!cancelled && !requestOpen && can('CASH_CANCEL') && (
         <Button variant="danger" onClick={onCancel}>

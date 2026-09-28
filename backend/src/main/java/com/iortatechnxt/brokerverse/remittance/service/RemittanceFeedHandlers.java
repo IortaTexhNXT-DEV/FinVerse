@@ -16,6 +16,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 
 /**
@@ -29,6 +30,9 @@ public final class RemittanceFeedHandlers {
   private static final String INVOICE = "invoiceNo";
   private static final String REMARKS = "remarks";
 
+  /** An ISO date (2026-10-28), still read from files made before the business template. */
+  private static final Pattern ISO_DATE = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+
   /** Dates in upload files as users type them (28-Oct-2026); ISO dates are also read. */
   private static final DateTimeFormatter BUSINESS_DATE =
       new DateTimeFormatterBuilder()
@@ -40,21 +44,19 @@ public final class RemittanceFeedHandlers {
 
   private static LocalDate date(Row row, String column) {
     String text = row.require(column).strip();
+    DateTimeFormatter format =
+        ISO_DATE.matcher(text).matches() ? DateTimeFormatter.ISO_LOCAL_DATE : BUSINESS_DATE;
     try {
-      return LocalDate.parse(text, BUSINESS_DATE);
+      return LocalDate.parse(text, format);
     } catch (DateTimeParseException ex) {
-      try {
-        return LocalDate.parse(text);
-      } catch (DateTimeParseException iso) {
-        throw new BusinessRuleException(
-            "FEED_VALUE_INVALID",
-            "Line "
-                + row.lineNo()
-                + ": "
-                + CsvRows.label(column)
-                + " must be a date such as 28-Oct-2026",
-            iso);
-      }
+      throw new BusinessRuleException(
+          "FEED_VALUE_INVALID",
+          "Line "
+              + row.lineNo()
+              + ": "
+              + CsvRows.label(column)
+              + " must be a date such as 28-Oct-2026",
+          ex);
     }
   }
 

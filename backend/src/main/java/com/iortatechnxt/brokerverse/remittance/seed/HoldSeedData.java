@@ -69,14 +69,18 @@ public class HoldSeedData implements ApplicationRunner {
 
   @Override
   public void run(ApplicationArguments args) {
-    if (!ledger.forArn(HELD_ARN).isEmpty()) {
-      return;
+    if (ledger.forArn(HELD_ARN).isEmpty()) {
+      bookAndHold();
     }
+  }
+
+  private void bookAndHold() {
     try {
       LocalDate today = BusinessClock.today(clock);
       booking.book(HELD_ARN, BookingOptions.of(today, null), BookingSource.INDIVIDUAL);
       List<OpsInvoice> invoices = ledger.forArn(HELD_ARN);
       if (invoices.isEmpty()) {
+        LOG.warn("Seed hold request skipped: {} was not booked", HELD_ARN);
         return;
       }
       OpsInvoice invoice = invoices.get(0);

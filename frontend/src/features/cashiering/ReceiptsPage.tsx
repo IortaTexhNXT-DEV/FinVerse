@@ -109,7 +109,7 @@ function FilterPanel({
         value={value.kind ?? ''}
         options={['AR', 'OR']}
         empty="All"
-        labelOf={(c) => c}
+        labelOf={(c) => (c === 'AR' ? 'Acknowledgement Receipt' : 'Official Receipt')}
         onChange={(v) => onChange({ ...value, kind: v as Filters['kind'] })}
       />
       <CodeSelect

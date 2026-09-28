@@ -62,6 +62,7 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     'FILED',
   ],
   warning: [
+    'ON_HOLD',
     // sanction screening: a match not yet decided; cases waiting for a decision
     'POTENTIAL',
     'DUE_SOON',

@@ -137,7 +137,7 @@ screens:
       - "Reinstate dialog | Amount to Reinstate | Number | Above zero, at most the receipt amount | Cond.: partial | - | Blank | Cancelled | Within the receipt amount | Enter an amount above zero and at most <amount>"
       - "Reinstate dialog | Invoice No. / AR / OR No. / Assured / Payor / Account Officer / Unit Head / Team Leader / Remarks | Text | Up to 250 characters; the Account Officer, Unit Head and Team Leader for the premium group | Y (Remarks N) | - | AR / OR number and payor of the receipt | Cancelled | Not blank | <field> is required"
     actions:
-      - "Print | Every Cashiering user | Always | Downloads the receipt PDF; the print count is kept | - | -"
+      - "Print (PDF) | Every Cashiering user | Always | Downloads the receipt PDF; the print count is kept | - | -"
       - "Cancel Receipt | Cashier | Issued and no request open | Asks for the reason and submits the cancellation for approval | Cancellation for approval | Cashiering approval request (NT-07)"
       - "Reinstate | Cashier | Cancelled and no request open | Opens the reinstatement dialog and submits it for approval | Reinstatement for approval | Cashiering approval request (NT-07)"
       - "Approve and Post | Cashiering Team Leader other than the requester | Request for approval | Posts the cancellation (reverses every application and the receipt) or the reinstatement (restores the receipt and applies the amount) | Posted | Workflow notice (NT-01)"

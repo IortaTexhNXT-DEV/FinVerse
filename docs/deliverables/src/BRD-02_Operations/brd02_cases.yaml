@@ -379,7 +379,7 @@ frs:
         steps:
           - New Request on the endorsement invoice of ARN-2026-940001 (in a batch for review).
         expected: Refused.
-        msg: ["Invoice <no> is locked by Remittance (<reason>)", INVOICE_LOCKED]
+        msg: ["Invoice <no> is locked by <team> (<reason>)", INVOICE_LOCKED]
       - c: 2
         type: Positive
         persona: CASHIER

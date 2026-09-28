@@ -131,6 +131,7 @@ export function BulkUploadWizard({
           parameterFields={parameterFields}
           busy={upload.isPending}
           blocksDuplicates={definition.data?.blocksDuplicateFiles === true}
+          textFile={definition.data?.textFile === true}
           ready={file !== null && parametersReady}
           onFile={setFile}
           onUpload={() => {
@@ -167,6 +168,8 @@ interface UploadCardProps {
   parameterFields?: ReactNode;
   busy: boolean;
   blocksDuplicates: boolean;
+  /** A bank or channel text file in its own layout (Cashiering Setup), not a template sheet. */
+  textFile: boolean;
   ready: boolean;
   onFile: (file: File | null) => void;
   onUpload: () => void;
@@ -186,12 +189,16 @@ function UploadCard(p: Readonly<UploadCardProps>) {
         <Field
           label="File"
           required
-          hint="Excel (.xlsx), OpenDocument (.ods) or CSV (.csv), first sheet, headers in row 1."
+          hint={
+            p.textFile
+              ? 'The file of the bank or channel: text (.txt) in the layout set in Cashiering Setup › Payment File Layouts, or a sheet with the template headers.'
+              : 'Excel (.xlsx), OpenDocument (.ods) or CSV (.csv), first sheet, headers in row 1.'
+          }
         >
           {(id) => (
             <FileDropZone
               id={id}
-              accept=".xlsx,.ods,.csv"
+              accept={p.textFile ? '.txt,.xlsx,.ods,.csv' : '.xlsx,.ods,.csv'}
               busy={p.busy}
               onChange={(files) => p.onFile(files[0] ?? null)}
             />

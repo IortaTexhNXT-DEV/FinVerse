@@ -12,11 +12,18 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
+import { referenceText } from '@/utils/businessLabels';
+import { FREQUENCIES, readSchedule, scheduleRule } from '@/utils/schedule';
+import type { Frequency, Schedule } from '@/utils/schedule';
 import { orUndefined } from './invoiceSearch';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 
 const RECORD_COLUMNS: Column<FeedRecord>[] = [
-  { key: 'k', header: 'Record', render: (r) => r.idempotencyKey },
+  {
+    key: 'k',
+    header: 'Record',
+    render: (r) => referenceText(r.idempotencyKey) || referenceText(r.reference) || '—',
+  },
   { key: 's', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
   { key: 'r', header: 'Created', render: (r) => r.reference ?? '' },
   { key: 'm', header: 'Message', render: (r) => r.message ?? '' },
@@ -59,11 +66,13 @@ export function RunRecordsDialog({
 export function FeedConfigDialog({ feed, onClose }: Readonly<{ feed: Feed; onClose: () => void }>) {
   const toast = useToast();
   const queryClient = useQueryClient();
-  const [cron, setCron] = useState(feed.cron);
+  const [schedule, setSchedule] = useState<Schedule>(
+    () => readSchedule(feed.cron) ?? { frequency: 'DAILY', time: '08:00' },
+  );
   const [active, setActive] = useState(feed.active);
   const save = useMutation({
     mutationFn: () =>
-      opsApi.configureFeed(feed.code, cron.trim() === '' ? '-' : cron.trim(), active),
+      opsApi.configureFeed(feed.code, scheduleRule(schedule), active),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['ops', 'feeds'] });
       toast.success(`${feed.name} saved`);
@@ -88,16 +97,40 @@ export function FeedConfigDialog({ feed, onClose }: Readonly<{ feed: Feed; onClo
     >
       <div className="stack">
         <ErrorAlert error={save.error} />
-        <Field label="Schedule (Spring cron, UTC)" hint="Use - for manual runs only">
+        <Field label="Runs" required>
           {(id) => (
-            <input
+            <select
               id={id}
-              className="input"
-              value={cron}
-              onChange={(e) => setCron(e.target.value)}
-            />
+              className="select"
+              value={schedule.frequency}
+              onChange={(e) =>
+                setSchedule({ ...schedule, frequency: e.target.value as Frequency })
+              }
+            >
+              {FREQUENCIES.map((f) => (
+                <option key={f.id} value={f.id}>
+                  {f.label}
+                </option>
+              ))}
+            </select>
           )}
         </Field>
+        {schedule.frequency !== 'MANUAL' && (
+          <Field
+            label={schedule.frequency === 'HOURLY' ? 'Minute of the Hour' : 'Time'}
+            hint="Philippine time"
+          >
+            {(id) => (
+              <input
+                id={id}
+                type="time"
+                className="input"
+                value={schedule.time}
+                onChange={(e) => setSchedule({ ...schedule, time: e.target.value })}
+              />
+            )}
+          </Field>
+        )}
         <label className="ops-pref-row">
           <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} />{' '}
           Active

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { statusMessage } from '@/components/ui/statusTones';
 import { Building2, CalendarClock, Coins, ReceiptText, Send, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -18,7 +19,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDate, formatDateTime, humanize, statusPhrase } from '@/utils/format';
+import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
 import { AnswersDialog, CollectDialog, SendBillingDialog } from './BillingDialogs';
 import { BILLING_ENTITY, commissionApi } from './commissionApi';
 import type { DpBilling, DpItem } from './commissionApi';
@@ -170,7 +171,7 @@ export default function DpBillingPage() {
     onSuccess: async (b) => {
       setDialog(undefined);
       await queryClient.invalidateQueries({ queryKey: ['commission'] });
-      toast.success(`${b.billingNo} is now ${statusPhrase(b.stage)}`);
+      toast.success(statusMessage(b.billingNo, b.stage));
     },
   });
   if (billing.data === undefined) {

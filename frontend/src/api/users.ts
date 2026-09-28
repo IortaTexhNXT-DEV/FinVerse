@@ -56,6 +56,9 @@ export function displayNameOf(login: string | null | undefined): string {
   if (!login) {
     return '';
   }
+  if (login.toUpperCase() === 'SYSTEM') {
+    return 'System';
+  }
   return directory.get(login.toLowerCase())?.displayName ?? login;
 }
 

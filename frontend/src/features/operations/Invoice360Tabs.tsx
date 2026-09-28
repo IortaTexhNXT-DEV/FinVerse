@@ -14,9 +14,12 @@ import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { CellStack } from '@/components/ui/CellStack';
+import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
+import { statusLabel } from '@/components/ui/statusTones';
+import { moduleLabel, referenceText } from '@/utils/businessLabels';
 import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
 import { componentLabel, premiumTotals, visibleComponents } from './opsLabels';
-import { displayNameOf } from '@/api/users';
 import { UserName } from '@/components/ui/UserName';
 
 const COMPONENT_COLUMNS: Column<InvoiceComponentRow>[] = [
@@ -49,28 +52,37 @@ const MOVEMENT_COLUMNS: Column<Movement>[] = [
     key: 's',
     header: 'Source',
     render: (m) => (
-      <>
-        {humanize(m.sourceModule)} <span className="ops-muted">{m.sourceRef}</span>
-      </>
+      <CellStack main={moduleLabel(m.sourceModule)} sub={referenceText(m.sourceRef)} />
     ),
   },
   {
     key: 'r',
-    header: 'Documents',
-    render: (m) => [m.arNo, m.orNo, m.batchNo, m.journalBatchNo].filter(Boolean).join(' · '),
+    header: 'Document',
+    render: (m) => (
+      <CellStack
+        main={m.arNo ?? m.orNo ?? m.batchNo ?? m.journalBatchNo}
+        sub={m.arNo ?? m.orNo ?? m.batchNo ? m.journalBatchNo : undefined}
+      />
+    ),
   },
   {
     key: 'u',
     header: 'Posted',
-    render: (m) => `${formatDateTime(m.postedAt)} · ${displayNameOf(m.postedBy)}`,
+    render: (m) => (
+      <CellStack main={formatDateTime(m.postedAt)} sub={<UserName login={m.postedBy} />} />
+    ),
   },
 ];
 
 const HISTORY_COLUMNS: Column<StatusChange>[] = [
   { key: 't', header: 'When', render: (c) => formatDateTime(c.changedAt) },
   { key: 'f', header: 'What', render: (c) => humanize(c.field) },
-  { key: 'v', header: 'Change', render: (c) => `${c.from ?? '-'} → ${c.to ?? '-'}` },
-  { key: 'm', header: 'Module', render: (c) => humanize(c.module) },
+  {
+    key: 'v',
+    header: 'Change',
+    render: (c) => `${c.from ? statusLabel(c.from) : '—'} to ${c.to ? statusLabel(c.to) : '—'}`,
+  },
+  { key: 'm', header: 'Module', render: (c) => moduleLabel(c.module) },
   { key: 'r', header: 'Reason', render: (c) => c.reason ?? '' },
   { key: 'u', header: 'By', render: (c) => <UserName login={c.changedBy} /> },
 ];
@@ -134,14 +146,25 @@ export function ComponentsTab({ view }: Readonly<{ view: Invoice360 }>) {
       </Card>
       {view.adjustments !== undefined && (
         <Card title={`Adjustments of ${view.adjustments.originalInvoiceNo}`}>
-          <p>
-            {view.adjustments.adjustmentCount} adjusting invoice(s): premium{' '}
-            {formatAmount(view.adjustments.originalPremium)} adjusted by{' '}
-            {formatAmount(view.adjustments.adjustedPremium)}; DTIP{' '}
-            {formatAmount(view.adjustments.originalDtip)} adjusted by{' '}
-            {formatAmount(view.adjustments.adjustedDtip)}.
-          </p>
-          {view.adjustments.overAdjusted && <StatusBadge status="OVER_ADJUSTED" />}
+          <DefinitionGrid
+            items={[
+              { label: 'Adjusting Invoices', value: view.adjustments.adjustmentCount },
+              {
+                label: 'Original Premium',
+                value: formatAmount(view.adjustments.originalPremium),
+              },
+              {
+                label: 'Premium Adjusted by',
+                value: formatAmount(view.adjustments.adjustedPremium),
+              },
+              { label: 'Original DTIP', value: formatAmount(view.adjustments.originalDtip) },
+              { label: 'DTIP Adjusted by', value: formatAmount(view.adjustments.adjustedDtip) },
+              {
+                label: 'Over-adjusted',
+                value: view.adjustments.overAdjusted ? <StatusBadge status="OVER_ADJUSTED" /> : 'No',
+              },
+            ]}
+          />
         </Card>
       )}
     </div>

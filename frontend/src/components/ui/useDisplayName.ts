@@ -11,6 +11,9 @@ export function useDisplayName(): (login: string | null | undefined) => string {
     if (!login) {
       return '';
     }
+    if (login.toUpperCase() === 'SYSTEM') {
+      return 'System';
+    }
     return snapshot.get(login.toLowerCase())?.displayName ?? login;
   };
 }

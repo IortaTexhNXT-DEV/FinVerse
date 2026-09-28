@@ -18,7 +18,10 @@ import { formatDateTime, humanize } from '@/utils/format';
 import { CodeSelect, TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { Layout, MinimalBalanceRule } from './cashieringApi';
-import { displayNameOf } from '@/api/users';
+import { CellStack } from '@/components/ui/CellStack';
+import { RowActions } from '@/components/ui/RowActions';
+import { UserName } from '@/components/ui/UserName';
+import { fileLabel, layoutKindLabel } from './cashieringLabels';
 
 const TABS = [
   { id: 'layouts', label: 'Payment File Layouts' },
@@ -41,7 +44,7 @@ function LayoutDialog({ layout, onClose }: Readonly<{ layout: Layout; onClose: (
         fields || undefined,
       ),
     onSuccess: async () => {
-      toast.success(`Layout of ${humanize(layout.handlerCode)} saved`);
+      toast.success(`Layout of ${fileLabel(layout.handlerCode)} saved`);
       await queryClient.invalidateQueries({ queryKey: ['cashiering', 'layouts'] });
       onClose();
     },
@@ -49,7 +52,7 @@ function LayoutDialog({ layout, onClose }: Readonly<{ layout: Layout; onClose: (
   return (
     <Modal
       open
-      title={`Layout of ${humanize(layout.handlerCode)}`}
+      title={`Layout of ${fileLabel(layout.handlerCode)}`}
       onClose={onClose}
       footer={
         <>
@@ -65,7 +68,8 @@ function LayoutDialog({ layout, onClose }: Readonly<{ layout: Layout; onClose: (
       <div className="stack">
         <ErrorAlert error={save.error} />
         <CodeSelect
-          label="File Kind"
+          label="Fields"
+          labelOf={layoutKindLabel}
           required
           value={kind}
           options={['AUTO', 'DELIMITED', 'FIXED_WIDTH']}
@@ -109,12 +113,12 @@ function Layouts() {
       header: 'File',
       render: (l) => (
         <>
-          <strong>{humanize(l.handlerCode)}</strong>
+          <strong>{fileLabel(l.handlerCode)}</strong>
           <span className="cell-sub">{l.description ?? ''}</span>
         </>
       ),
     },
-    { key: 'kind', header: 'Kind', render: (l) => humanize(l.kind) },
+    { key: 'kind', header: 'Fields', render: (l) => layoutKindLabel(l.kind) },
     {
       key: 'sep',
       header: 'Separator',
@@ -124,17 +128,23 @@ function Layouts() {
       key: 'upd',
       header: 'Last Changed',
       render: (l) =>
-        l.updatedBy ? `${displayNameOf(l.updatedBy)} · ${formatDateTime(l.updatedAt)}` : '',
+        l.updatedBy ? (
+          <CellStack main={<UserName login={l.updatedBy} />} sub={formatDateTime(l.updatedAt)} />
+        ) : (
+          ''
+        ),
     },
     {
       key: 'edit',
       header: '',
-      render: (l) =>
-        can('CASH_APPROVE') && (
-          <Button size="sm" variant="secondary" onClick={() => setEditing(l)}>
-            Edit
-          </Button>
-        ),
+      render: (l) => (
+        <RowActions
+          record={fileLabel(l.handlerCode)}
+          actions={[
+            { label: 'Edit Layout', hidden: !can('CASH_APPROVE'), onSelect: () => setEditing(l) },
+          ]}
+        />
+      ),
     },
   ];
   return (

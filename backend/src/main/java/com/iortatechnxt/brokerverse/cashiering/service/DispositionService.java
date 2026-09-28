@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.Disposition.DispositionDet
 import com.iortatechnxt.brokerverse.cashiering.domain.DispositionRepository;
 import com.iortatechnxt.brokerverse.cashiering.domain.DispositionTypeRule;
 import com.iortatechnxt.brokerverse.cashiering.domain.DispositionTypeRuleRepository;
+import com.iortatechnxt.brokerverse.cashiering.domain.DispositionWords;
 import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
 import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedRepository;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
@@ -16,6 +17,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
@@ -294,7 +296,11 @@ public class DispositionService {
           APPROVE,
           new Notice(
               item.getReference() + " disposition for approval",
-              d.getDispositionType() + " " + item.getCurrency() + " " + d.getAmount(),
+              DispositionWords.of(d.getDispositionType())
+                  + " "
+                  + item.getCurrency()
+                  + " "
+                  + DisplayFormat.amount(d.getAmount()),
               "/cashiering/unapplied/" + item.getId(),
               UnappliedService.ENTITY,
               item.getId().toString()),

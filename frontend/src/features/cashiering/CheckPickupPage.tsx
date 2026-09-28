@@ -21,7 +21,9 @@ import { TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { Pickup, PickupStatus, PrintBatch } from './cashieringApi';
 import './cashiering.css';
-import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { CellStack } from '@/components/ui/CellStack';
+import { RowActions } from '@/components/ui/RowActions';
+import { UserName } from '@/components/ui/UserName';
 
 const TABS: readonly { id: PickupStatus; label: string }[] = [
   { id: 'FOR_PICKUP', label: 'For Pick-up' },
@@ -90,7 +92,9 @@ export default function CheckPickupPage() {
     {
       key: 'req',
       header: 'Requested By',
-      render: (p) => `${p.requestor} · ${formatDateTime(p.requestedAt)}`,
+      render: (p) => (
+        <CellStack main={<UserName login={p.requestor} />} sub={formatDateTime(p.requestedAt)} />
+      ),
     },
     { key: 'check', header: 'Check No.', render: (p) => p.checkNo ?? '' },
     { key: 'amount', header: 'Amount', numeric: true, render: (p) => <Amount value={p.amount} /> },
@@ -99,23 +103,25 @@ export default function CheckPickupPage() {
     {
       key: 'actions',
       header: '',
-      render: (p) =>
-        p.status === 'FOR_PICKUP' &&
-        receipt && (
-          <ConfirmButton
-            size="sm"
-            variant="ghost"
-            confirm={{
-              title: 'Cancel Check Pickup',
-              effect: 'The pickup is cancelled and the check stays with the cashier.',
-              confirmLabel: 'Cancel Pickup',
-              destructive: true,
-            }}
-            onConfirm={() => act.mutateAsync(() => cashieringApi.cancelPickup(p.id))}
-          >
-            Cancel
-          </ConfirmButton>
-        ),
+      render: (p) => (
+        <RowActions
+          record={p.collectionRef}
+          actions={[
+            {
+              label: 'Cancel Check Pick-up',
+              danger: true,
+              hidden: !(p.status === 'FOR_PICKUP' && receipt),
+              confirm: {
+                title: 'Cancel Check Pick-up',
+                effect: 'The pick-up is cancelled and the check stays with the client.',
+                confirmLabel: 'Cancel Pick-up',
+                destructive: true,
+              },
+              onSelect: () => act.mutateAsync(() => cashieringApi.cancelPickup(p.id)),
+            },
+          ]}
+        />
+      ),
     },
   ];
   return (

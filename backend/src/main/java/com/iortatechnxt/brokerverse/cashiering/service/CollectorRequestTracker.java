@@ -3,7 +3,9 @@ package com.iortatechnxt.brokerverse.cashiering.service;
 import com.iortatechnxt.brokerverse.cashiering.domain.CollectorRequest;
 import com.iortatechnxt.brokerverse.cashiering.domain.CollectorRequestRepository;
 import com.iortatechnxt.brokerverse.cashiering.domain.Disposition;
+import com.iortatechnxt.brokerverse.cashiering.domain.DispositionWords;
 import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.opsledger.service.OpsLedgerEvents.UnappliedDispositionChanged;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.time.Clock;
@@ -68,11 +70,11 @@ public class CollectorRequestTracker {
         .ifPresent(
             r -> {
               String note =
-                  d.getDispositionType()
+                  DispositionWords.of(d.getDispositionType())
                       + " "
                       + item.getCurrency()
                       + " "
-                      + d.getAmount().toPlainString()
+                      + DisplayFormat.amount(d.getAmount())
                       + " executed"
                       + (d.getDisbursementRequestNo() == null
                           ? ""

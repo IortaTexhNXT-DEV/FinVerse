@@ -3,16 +3,25 @@ import type { AccountSummary } from '@/api/accounts';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { formatDate } from '@/utils/format';
+import { periodColumn } from '@/components/ui/periodColumn';
 import { ACCOUNT_COLUMNS } from './accountColumns';
 import { AccountTable } from './AccountTable';
 import { UserName } from '@/components/ui/UserName';
 
+/**
+ * The register's columns: the account columns without the flags (every account here is FFY), the
+ * FFY period in the period cell next to the policy period, and the officer.
+ */
 const FFY_COLUMNS: Column<AccountSummary>[] = [
-  ...ACCOUNT_COLUMNS.filter((c) => c.key !== 'o'),
-  { key: 'fs', header: 'FFY Start', kind: 'date', render: (a) => formatDate(a.ffyStart) },
-  { key: 'fe', header: 'FFY End', kind: 'date', render: (a) => formatDate(a.ffyEnd) },
+  ...ACCOUNT_COLUMNS.filter((c) => c.key !== 'o' && c.key !== 'f' && c.key !== 's'),
+  periodColumn<AccountSummary>(
+    'ffy',
+    'FFY Period',
+    (a) => a.ffyStart,
+    (a) => a.ffyEnd,
+  ),
   { key: 'o', header: 'Officer', render: (a) => <UserName login={a.accountOfficer} empty="" /> },
+  ...ACCOUNT_COLUMNS.filter((c) => c.key === 's'),
 ];
 
 const CRITERIA = { ffy: true };

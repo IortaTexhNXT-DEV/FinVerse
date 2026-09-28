@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { statusMessage } from '@/components/ui/statusTones';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { ActionDialog } from '@/components/broking/ActionDialog';
@@ -10,7 +11,9 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { humanize } from '@/utils/format';
+import { referenceText } from '@/utils/businessLabels';
+import { useLovLabel } from '@/components/broking/useLabels';
+import { receiptActionLabel, receiptSourceLabel } from './cashieringLabels';
 import { cashieringApi } from './cashieringApi';
 import type { ReceiptAction, ReceiptDetail, ReinstateBody } from './cashieringApi';
 import { RECEIPT_TABS } from './cashieringLogic';
@@ -20,6 +23,12 @@ import { ReceiptHeaderActions, ReceiptSummaryCard } from './ReceiptParts';
 import { ReinstateDialog } from './ReinstateDialog';
 
 const ACTION_ENTITY = 'ReceiptAction';
+
+/** "Premium payments receipt, Over the Counter, PAY-2026-000011." */
+function receiptDescription(kind: string, source: string, reference: string): string {
+  const parts = [`${kind} receipt`, source, reference];
+  return `${parts.filter((p) => p !== '').join(', ')}.`;
+}
 
 function latestAction(r: ReceiptDetail): ReceiptAction | undefined {
   return r.actions.length === 0 ? undefined : r.actions[r.actions.length - 1];
@@ -49,10 +58,12 @@ export default function ReceiptDetailPage() {
     mutationFn: (fn: () => Promise<ReceiptAction>) => fn(),
     onSuccess: async (a) => {
       setDialog(undefined);
-      toast.success(`${a.transactionNo} is ${humanize(a.stage).toLowerCase()}`);
+      toast.success(statusMessage(a.transactionNo, a.stage, receiptActionLabel(a.action)));
       await refresh();
     },
   });
+  const arClass = useLovLabel('AR_CLASS');
+  const orType = useLovLabel('OR_TYPE');
   const r = receipt.data;
   if (r === undefined) {
     return <ErrorAlert error={receipt.error} />;
@@ -66,7 +77,11 @@ export default function ReceiptDetailPage() {
       <PageHeader
         section="Cashiering"
         title={`${s.kind === 'AR' ? 'Acknowledgement Receipt' : 'Official Receipt'} ${s.receiptNo}`}
-        description={`${humanize(s.receiptClass)} receipt from ${[humanize(s.source), r.sourceRef].filter(Boolean).join(' ')}.`}
+        description={receiptDescription(
+          s.kind === 'AR' ? arClass(s.receiptClass) : orType(s.receiptClass),
+          receiptSourceLabel(s.source),
+          referenceText(r.sourceRef),
+        )}
         backTo="/cashiering/receipts"
         actions={
           <ReceiptHeaderActions

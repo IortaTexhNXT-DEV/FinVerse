@@ -1,10 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { Download } from 'lucide-react';
 import { useState } from 'react';
 import { opsApi } from '@/api/operations';
 import type { ReportRun } from '@/api/operations';
 import { useFileDownload } from '@/components/broking/useFileDownload';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
@@ -14,18 +12,18 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDateTime } from '@/utils/format';
 import { orUndefined } from './invoiceSearch';
-import { fileAvailable, runStatus } from './reportRuns';
+import { fileAvailable, runLabel, runStatus } from './reportRuns';
 import './operations.css';
-import { displayNameOf } from '@/api/users';
+import { reportApi } from '@/api/reports';
+import { CellStack } from '@/components/ui/CellStack';
+import { Field } from '@/components/ui/Field';
+import { RowActions } from '@/components/ui/RowActions';
+import { UserName } from '@/components/ui/UserName';
 
 /** Download button of an archived file, or the time from which a scheduled file is available. */
 function FileCell({ run, onDownload }: Readonly<{ run: ReportRun; onDownload: () => void }>) {
   if (fileAvailable(run)) {
-    return (
-      <Button size="sm" variant="secondary" icon={<Download size={14} />} onClick={onDownload}>
-        Download
-      </Button>
-    );
+    return <RowActions record={run.title} actions={[{ label: 'Download', onSelect: onDownload }]} />;
   }
   return (
     <span className="ops-muted">
@@ -42,8 +40,8 @@ function FileCell({ run, onDownload }: Readonly<{ run: ReportRun; onDownload: ()
  */
 export default function ReportArchivePage() {
   const download = useFileDownload();
-  const [text, setText] = useState('');
   const [code, setCode] = useState<string>();
+  const catalogue = useQuery({ queryKey: ['reports', 'catalogue'], queryFn: reportApi.catalogue });
   const [page, setPage] = useState(0);
   const runs = useQuery({
     queryKey: ['ops', 'report-runs', code, page],
@@ -53,24 +51,21 @@ export default function ReportArchivePage() {
     {
       key: 'report',
       header: 'Report',
-      render: (r) => (
-        <>
-          <strong>{r.title}</strong>
-          <div className="ops-muted">{r.reportCode}</div>
-        </>
-      ),
+      render: (r) => <strong>{r.title}</strong>,
     },
     { key: 'params', header: 'Parameters', render: (r) => r.parameters ?? '' },
     {
       key: 'action',
       header: 'Action',
-      render: (r) => <StatusBadge status={runStatus(r)} />,
+      render: (r) => <StatusBadge status={runStatus(r)} label={runLabel(r)} />,
     },
     { key: 'rows', header: 'Rows', numeric: true, render: (r) => r.rowCount },
     {
       key: 'by',
       header: 'Generated',
-      render: (r) => `${formatDateTime(r.createdAt)} · ${displayNameOf(r.createdBy)}`,
+      render: (r) => (
+        <CellStack main={formatDateTime(r.createdAt)} sub={<UserName login={r.createdBy} />} />
+      ),
     },
     {
       key: 'file',
@@ -90,26 +85,30 @@ export default function ReportArchivePage() {
       <ErrorAlert error={runs.error ?? download.error} />
       <Card>
         <div className="stack">
-          <form
-            className="ops-toolbar"
-            onSubmit={(e) => {
-              e.preventDefault();
-              setCode(orUndefined(text));
-              setPage(0);
-            }}
-          >
-            <label className="visually-hidden" htmlFor="ops-report-code">
-              Search Report Code
-            </label>
-            <input
-              id="ops-report-code"
-              className="input"
-              placeholder="Search Report Code, e.g. CSH-APPLIED-PREM"
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-            />
-            <Button type="submit">Search</Button>
-          </form>
+          <div className="ops-toolbar">
+            <Field label="Report">
+              {(id) => (
+                <select
+                  id={id}
+                  className="select"
+                  value={code ?? ''}
+                  onChange={(e) => {
+                    setCode(orUndefined(e.target.value));
+                    setPage(0);
+                  }}
+                >
+                  <option value="">All reports</option>
+                  {[...(catalogue.data ?? [])]
+                    .sort((a, b) => a.title.localeCompare(b.title))
+                    .map((r) => (
+                      <option key={r.code} value={r.code}>
+                        {r.title}
+                      </option>
+                    ))}
+                </select>
+              )}
+            </Field>
+          </div>
           <DataTable
             caption="Archived report runs"
             columns={columns}

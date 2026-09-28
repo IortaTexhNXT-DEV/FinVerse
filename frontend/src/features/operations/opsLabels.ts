@@ -1,3 +1,4 @@
+import { moduleLabel } from '@/utils/businessLabels';
 import type {
   InvoiceComponentRow,
   InvoiceFlags,
@@ -105,7 +106,7 @@ export function flagChips(flags: InvoiceFlags): string[] {
     [flags.writtenOff, 'Written Off'],
     [flags.cancelled, 'Cancelled'],
     [flags.estimated, 'Estimated'],
-    [Boolean(flags.lockOwner), `Locked by ${flags.lockOwner ?? ''}`],
+    [Boolean(flags.lockOwner), `Locked by ${moduleLabel(flags.lockOwner)}`],
   ];
   return chips.filter(([on]) => on).map(([, label]) => label);
 }

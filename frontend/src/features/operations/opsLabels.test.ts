@@ -59,7 +59,7 @@ describe('operations labels', () => {
     expect(flagChips(noFlags)).toEqual([]);
     expect(
       flagChips({ ...noFlags, directPayment: true, hold: true, lockOwner: 'REMITTANCE' }),
-    ).toEqual(['Direct Payment', 'On Hold', 'Locked by REMITTANCE']);
+    ).toEqual(['Direct Payment', 'On Hold', 'Locked by Remittance']);
   });
 
   it('colours tiles only when they count something', () => {

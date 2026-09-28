@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { statusMessage } from '@/components/ui/statusTones';
 import { Building2, FileCheck2, Pencil, Scale, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -116,7 +117,7 @@ function useDeductionActions(id: number, done: () => void) {
         v.action === 'confirm'
           ? deductionsApi.confirm(id, v.comment)
           : deductionsApi.submit(id, v.comment),
-      onSuccess: (d) => after(d, `${d.deductionNo}: ${humanize(d.stage).toLowerCase()}`),
+      onSuccess: (d) => after(d, statusMessage(d.deductionNo, d.stage)),
     }),
   };
 }

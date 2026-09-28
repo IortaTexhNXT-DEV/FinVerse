@@ -22,3 +22,24 @@ export function fileAvailable(
   }
   return run.availableFrom === undefined || new Date(run.availableFrom) <= now;
 }
+
+const FORMAT_NAMES: Record<string, string> = {
+  XLSX: 'Excel',
+  XLS: 'Excel',
+  PDF: 'PDF',
+  CSV: 'CSV',
+  ODS: 'OpenDocument',
+  XML: 'XML',
+  DOCX: 'Word',
+  TXT: 'Text',
+};
+
+/** What happened to a run, in words: "Viewed on Screen", "Exported (Excel)", "Generated (PDF)". */
+export function runLabel(run: Pick<ReportRun, 'action' | 'format'>): string {
+  if (run.action === 'VIEW') {
+    return 'Viewed on Screen';
+  }
+  const format = run.format ? (FORMAT_NAMES[run.format.toUpperCase()] ?? run.format) : '';
+  const what = run.action === 'EXPORT' ? 'Exported' : 'Generated';
+  return format === '' ? what : `${what} (${format})`;
+}

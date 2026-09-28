@@ -162,6 +162,8 @@ export interface CwtTag {
   invoiceNo: string;
   arn: string;
   clientCode?: string;
+  /** The client's name (the payor of the invoice). */
+  clientName?: string;
   insurerCode?: string;
   amount: number;
   path: CwtPath;

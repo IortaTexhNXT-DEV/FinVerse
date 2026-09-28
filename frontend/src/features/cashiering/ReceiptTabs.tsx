@@ -3,46 +3,122 @@ import { Amount } from '@/components/ui/Amount';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { formatDate, formatDateTime } from '@/utils/format';
 import type { Application, ReceiptAction, ReceiptDetail, ReceiptLine } from './cashieringApi';
 import { allocationRows, componentLabel, journalRows } from './cashieringLogic';
 import type { JournalRow, ReceiptTabId } from './cashieringLogic';
-import { displayNameOf } from '@/api/users';
+import { useState } from 'react';
+import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
+import { CellStack } from '@/components/ui/CellStack';
+import { UserName } from '@/components/ui/UserName';
+import type { LedgerComponent } from '@/api/operations';
+import { countOf } from '@/utils/format';
+import { receiptActionLabel } from './cashieringLabels';
 
-const APPLICATION_COLUMNS: Column<Application>[] = [
-  {
-    key: 'invoice',
-    header: 'Invoice',
-    render: (a) => (
-      <>
-        <Link to={`/operations/invoices/${encodeURIComponent(a.invoiceNo)}`}>{a.invoiceNo}</Link>
-        <span className="cell-sub">{a.arn}</span>
-      </>
-    ),
-  },
-  { key: 'ref', header: 'Reference', render: (a) => <code>{a.reference}</code> },
-  {
-    key: 'alloc',
-    header: 'By Component',
-    render: (a) =>
-      allocationRows(a.allocation)
-        .map((r) => `${componentLabel(r.component)} ${r.amount.toFixed(2)}`)
-        .join(' · '),
-  },
-  { key: 'amount', header: 'Applied', numeric: true, render: (a) => <Amount value={a.amount} /> },
-  {
-    key: 'comm',
-    header: 'Commission Realized',
-    numeric: true,
-    render: (a) => <Amount value={a.realizedCommission} />,
-  },
-  { key: 'date', header: 'Value Date', render: (a) => formatDate(a.valueDate) },
-  { key: 'status', header: 'Status', render: (a) => <StatusBadge status={a.status} /> },
-];
+/** The reason of a receipt transaction, from its list (cancellation or reinstatement reasons). */
+function ReasonLabel({ action }: Readonly<{ action: ReceiptAction }>) {
+  return (
+    <LovLabel
+      type={action.action === 'CANCEL' ? 'RECEIPT_CANCEL_REASON' : 'REINSTATEMENT_REASON'}
+      code={action.reasonCode}
+    />
+  );
+}
+
+/**
+ * The applications of a receipt, one row per invoice; the split by premium component opens as a
+ * table under the row (never a sentence of amounts).
+ */
+function ApplicationsTable({ applications }: Readonly<{ applications: Application[] }>) {
+  const [open, setOpen] = useState<ReadonlySet<number>>(new Set());
+  const toggle = (id: number) =>
+    setOpen((o) => {
+      const next = new Set(o);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  const columns: Column<Application>[] = [
+    {
+      key: 'invoice',
+      header: 'Invoice',
+      render: (a) => (
+        <CellStack
+          main={
+            <Link to={`/operations/invoices/${encodeURIComponent(a.invoiceNo)}`}>{a.invoiceNo}</Link>
+          }
+          sub={a.arn}
+        />
+      ),
+    },
+    {
+      key: 'alloc',
+      header: 'By Component',
+      render: (a) => {
+        const n = allocationRows(a.allocation).length;
+        return (
+          <button
+            type="button"
+            className="link-button"
+            aria-expanded={open.has(a.id)}
+            onClick={() => toggle(a.id)}
+          >
+            {open.has(a.id) ? 'Hide' : 'Show'} {countOf(n, 'component')}
+          </button>
+        );
+      },
+    },
+    { key: 'amount', header: 'Applied', numeric: true, render: (a) => <Amount value={a.amount} /> },
+    {
+      key: 'comm',
+      header: 'Commission Realized',
+      numeric: true,
+      render: (a) => <Amount value={a.realizedCommission} />,
+    },
+    { key: 'date', header: 'Value Date', render: (a) => formatDate(a.valueDate) },
+    { key: 'status', header: 'Status', render: (a) => <StatusBadge status={a.status} /> },
+  ];
+  return (
+    <DataTable
+      caption="Applications"
+      columns={columns}
+      rows={applications}
+      rowKey={(a) => a.id}
+      expanded={open}
+      renderExpanded={(a) => (
+        <DataTable
+          caption={`Application to ${a.invoiceNo} by component`}
+          columns={[
+            {
+              key: 'c',
+              header: 'Component',
+              render: (r: { component: LedgerComponent; amount: number }) =>
+                componentLabel(r.component),
+            },
+            {
+              key: 'a',
+              header: 'Applied',
+              numeric: true,
+              render: (r: { component: LedgerComponent; amount: number }) => (
+                <Amount value={r.amount} />
+              ),
+            },
+          ]}
+          rows={allocationRows(a.allocation)}
+          rowKey={(r) => r.component}
+        />
+      )}
+      emptyMessage="Nothing applied from this receipt"
+    />
+  );
+}
 
 const LINE_COLUMNS: Column<ReceiptLine>[] = [
   { key: 'invoice', header: 'Invoice / Item', render: (l) => l.invoiceNo ?? l.description ?? '' },
-  { key: 'insurer', header: 'Insurer', render: (l) => l.insurerCode ?? '' },
+  { key: 'insurer', header: 'Insurer', render: (l) => <InsurerName code={l.insurerCode} /> },
   { key: 'gross', header: 'Gross', numeric: true, render: (l) => <Amount value={l.gross} /> },
   { key: 'vat', header: 'VAT', numeric: true, render: (l) => <Amount value={l.vat} /> },
   { key: 'wtax', header: 'WTAX', numeric: true, render: (l) => <Amount value={l.wtax} /> },
@@ -51,19 +127,25 @@ const LINE_COLUMNS: Column<ReceiptLine>[] = [
 
 const ACTION_COLUMNS: Column<ReceiptAction>[] = [
   { key: 'no', header: 'Transaction No.', render: (a) => <strong>{a.transactionNo}</strong> },
-  { key: 'action', header: 'Action', render: (a) => humanize(a.action) },
-  { key: 'reason', header: 'Reason', render: (a) => a.reasonText ?? humanize(a.reasonCode) },
+  { key: 'action', header: 'Action', render: (a) => receiptActionLabel(a.action) },
+  { key: 'reason', header: 'Reason', render: (a) => a.reasonText ?? <ReasonLabel action={a} /> },
   { key: 'amount', header: 'Amount', numeric: true, render: (a) => <Amount value={a.amount} /> },
   {
     key: 'req',
     header: 'Requested',
-    render: (a) => `${displayNameOf(a.requestedBy)} · ${formatDateTime(a.requestedAt)}`,
+    render: (a) => (
+      <CellStack main={<UserName login={a.requestedBy} />} sub={formatDateTime(a.requestedAt)} />
+    ),
   },
   {
     key: 'appr',
     header: 'Approved',
     render: (a) =>
-      a.approvedBy ? `${displayNameOf(a.approvedBy)} · ${formatDateTime(a.approvedAt)}` : '',
+      a.approvedBy ? (
+        <CellStack main={<UserName login={a.approvedBy} />} sub={formatDateTime(a.approvedAt)} />
+      ) : (
+        ''
+      ),
   },
   { key: 'stage', header: 'Status', render: (a) => <StatusBadge status={a.stage} /> },
 ];
@@ -76,13 +158,7 @@ export function ReceiptTabContent({
   switch (tab) {
     case 'applications':
       return (
-        <DataTable
-          caption="Applications"
-          columns={APPLICATION_COLUMNS}
-          rows={receipt.applications}
-          rowKey={(a) => a.id}
-          emptyMessage="Nothing applied from this receipt"
-        />
+        <ApplicationsTable applications={receipt.applications} />
       );
     case 'lines':
       return (

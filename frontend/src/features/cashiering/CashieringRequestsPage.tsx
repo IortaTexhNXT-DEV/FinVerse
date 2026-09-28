@@ -46,7 +46,7 @@ export default function CashieringRequestsPage() {
   return (
     <div className="stack">
       <PageHeader
-        section="Finance · Cashiering"
+        section="Cashiering"
         title="Incoming Requests"
         description="What Collections, Payment Requests and ACSL ask of Cashiering."
       />

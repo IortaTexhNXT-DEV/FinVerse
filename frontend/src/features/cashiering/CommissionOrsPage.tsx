@@ -13,6 +13,8 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
+import { CellStack } from '@/components/ui/CellStack';
+import { InsurerName } from '@/components/broking/LovLabel';
 import { cashieringApi } from './cashieringApi';
 import type { CommissionLine } from './cashieringApi';
 
@@ -22,10 +24,7 @@ const COLUMNS: Column<CommissionLine>[] = [
     key: 'insurer',
     header: 'Insurer / Payee',
     render: (l) => (
-      <>
-        {l.insurerCode}
-        <span className="cell-sub">{l.payeeName}</span>
-      </>
+      <CellStack main={<InsurerName code={l.insurerCode} />} sub={l.payeeName} />
     ),
   },
   { key: 'ref', header: 'Payment Ref.', render: (l) => l.paymentRef ?? l.certificateRef ?? '' },

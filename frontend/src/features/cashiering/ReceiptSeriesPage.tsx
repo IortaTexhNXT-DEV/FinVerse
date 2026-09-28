@@ -20,7 +20,7 @@ import { cashieringApi } from './cashieringApi';
 import type { ReceiptKind, Series, SeriesBody } from './cashieringApi';
 import { seriesUsedPercent } from './cashieringLogic';
 import './cashiering.css';
-import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { RowActions } from '@/components/ui/RowActions';
 
 function Gauge({ s }: Readonly<{ s: Series }>) {
   const used = seriesUsedPercent(s);
@@ -223,34 +223,34 @@ export default function ReceiptSeriesPage() {
       key: 'actions',
       header: '',
       render: (s) => (
-        <div className="row">
-          {s.recordStatus === 'PENDING_AUTHORIZATION' && (can('MASTER_AUTHORIZE') || manage) && (
-            <ConfirmButton
-              size="sm"
-              confirm={{
+        <RowActions
+          record={s.prefix}
+          actions={[
+            {
+              label: 'Authorize',
+              hidden: !(
+                s.recordStatus === 'PENDING_AUTHORIZATION' &&
+                (can('MASTER_AUTHORIZE') || manage)
+              ),
+              confirm: {
                 title: 'Authorize Receipt Series',
                 effect: 'The series becomes active for issuing receipts.',
-              }}
-              onConfirm={() => act.mutateAsync(() => cashieringApi.authorizeSeries(s.id))}
-            >
-              Authorize
-            </ConfirmButton>
-          )}
-          {s.recordStatus === 'ACTIVE' && manage && (
-            <ConfirmButton
-              size="sm"
-              variant="ghost"
-              confirm={{
+              },
+              onSelect: () => act.mutateAsync(() => cashieringApi.authorizeSeries(s.id)),
+            },
+            {
+              label: 'Deactivate',
+              danger: true,
+              hidden: !(s.recordStatus === 'ACTIVE' && manage),
+              confirm: {
                 title: 'Deactivate Receipt Series',
                 effect: 'No more receipts can be issued from this series.',
                 destructive: true,
-              }}
-              onConfirm={() => act.mutateAsync(() => cashieringApi.deactivateSeries(s.id))}
-            >
-              Deactivate
-            </ConfirmButton>
-          )}
-        </div>
+              },
+              onSelect: () => act.mutateAsync(() => cashieringApi.deactivateSeries(s.id)),
+            },
+          ]}
+        />
       ),
     },
   ];

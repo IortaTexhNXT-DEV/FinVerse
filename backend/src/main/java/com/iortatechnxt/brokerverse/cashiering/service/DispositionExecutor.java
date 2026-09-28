@@ -10,11 +10,13 @@ import com.iortatechnxt.brokerverse.cashiering.domain.Disposition;
 import com.iortatechnxt.brokerverse.cashiering.domain.Disposition.DispositionDetails;
 import com.iortatechnxt.brokerverse.cashiering.domain.Disposition.Execution;
 import com.iortatechnxt.brokerverse.cashiering.domain.DispositionTypeRule;
+import com.iortatechnxt.brokerverse.cashiering.domain.DispositionWords;
 import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
 import com.iortatechnxt.brokerverse.cashiering.service.ApplicationService.ApplyOptions;
 import com.iortatechnxt.brokerverse.cashiering.service.CashieringPosting.PostingContext;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.opsledger.domain.DisbursementRequest;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
@@ -148,7 +150,12 @@ public class DispositionExecutor {
         UnappliedService.ENTITY,
         item.getReference(),
         AuditAction.POST,
-        d.getDispositionType() + " " + d.getAmount() + " executed (" + ref + ")");
+        DispositionWords.of(d.getDispositionType())
+            + " "
+            + DisplayFormat.amount(d.getAmount())
+            + " executed ("
+            + ref
+            + ")");
     collectorRequests.executed(item, d);
   }
 
@@ -259,7 +266,7 @@ public class DispositionExecutor {
     String newClient = d.getTargetClientCode() != null ? d.getTargetClientCode() : previousClient;
     String batch =
         posting.publish(
-            context(item, d.getDispositionType() + " of unapplied payment"),
+            context(item, DispositionWords.of(d.getDispositionType()) + " of unapplied payment"),
             CashieringPosting.UNAPPLIED_RECLASS,
             ref,
             Map.of(legacy(item, RELEASED), d.getAmount(), legacy(item, ASSIGNED), d.getAmount()),

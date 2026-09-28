@@ -82,7 +82,7 @@ export function PaymentPreviewPane({
           {preview && (
             <span className="csh-rate-chip" title="BOOK rate used for the posting">
               <Coins size={14} aria-hidden="true" />
-              {preview.currency} · BOOK {preview.bookRate.toFixed(4)}
+              {preview.currency} · Book rate {preview.bookRate.toFixed(4)}
             </span>
           )}
           {totals.cwt && (

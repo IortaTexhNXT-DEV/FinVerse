@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { statusMessage } from '@/components/ui/statusTones';
 import { CalendarClock, FileText, UserRound, Building2 } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
@@ -14,7 +15,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, formatDateTime, statusPhrase } from '@/utils/format';
+import { formatDate, formatDateTime } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { Hold } from './api';
 import { AssignDialog, ExtendDialog } from './HoldDialogs';
@@ -105,7 +106,7 @@ function useHoldAction(id: number, done: () => void) {
       queryClient.setQueryData(['remittance', 'hold', id], h);
       await queryClient.invalidateQueries({ queryKey: workflowKey(ENTITY, id) });
       await queryClient.invalidateQueries({ queryKey: ['remittance', 'holds'] });
-      toast.success(`${h.requestNo}: ${statusPhrase(h.stage)}`);
+      toast.success(statusMessage(h.requestNo, h.stage));
     },
   });
 }

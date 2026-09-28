@@ -10,7 +10,8 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageFooter } from '@/components/ui/Pager';
 import { useToast } from '@/components/ui/toastContext';
-import { humanize } from '@/utils/format';
+import { statusPhrase } from '@/utils/format';
+import { dispositionLabel } from './cashieringLabels';
 import { AcceptRequestDialog, ConfirmValidationDialog, RejectDialog } from './RequestDialogs';
 import { REQUEST_COLUMNS, REVERSAL_COLUMNS, VALIDATION_COLUMNS } from './requestColumns';
 import { requestsApi } from './requestsApi';
@@ -61,7 +62,7 @@ export function CollectorRequestsPanel({
     mutationFn: (body: Parameters<typeof requestsApi.accept>[1]) =>
       requestsApi.accept(selected?.id ?? 0, body),
     onSuccess: (d) =>
-      done(`Disposition ${humanize(d.dispositionType)} assigned (${humanize(d.status)})`),
+      done(`Disposition assigned: ${dispositionLabel(d.dispositionType)} (${statusPhrase(d.status)})`),
   });
   const reject = useMutation({
     mutationFn: (reason: string) => requestsApi.rejectRequest(selected?.id ?? 0, reason),

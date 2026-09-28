@@ -13,6 +13,9 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { formatDateTime, humanize } from '@/utils/format';
+import { moduleLabel } from '@/utils/businessLabels';
+import { scheduleText } from '@/utils/schedule';
+import { RowActions } from '@/components/ui/RowActions';
 import {
   FeedConfigDialog,
   FeedUploadDialog,
@@ -33,13 +36,15 @@ type Dialog =
 
 function RunLog({ onOpen }: Readonly<{ onOpen: (run: FeedRun) => void }>) {
   const [page, setPage] = useState(0);
+  const feeds = useQuery({ queryKey: ['ops', 'feeds'], queryFn: opsApi.feeds });
+  const feedName = (code: string) => feeds.data?.find((f) => f.code === code)?.name ?? humanize(code);
   const runs = useQuery({
     queryKey: ['ops', 'runs', page],
     queryFn: () => opsApi.runs(undefined, page),
   });
   const columns: Column<FeedRun>[] = [
     { key: 'no', header: 'Run No.', render: (r) => <strong>{r.runNo}</strong> },
-    { key: 'feed', header: 'Feed', render: (r) => r.feedCode },
+    { key: 'feed', header: 'Feed', render: (r) => feedName(r.feedCode) },
     { key: 'trigger', header: 'Trigger', render: (r) => humanize(r.trigger) },
     { key: 'start', header: 'Started', render: (r) => formatDateTime(r.startedAt) },
     {
@@ -73,12 +78,7 @@ function Feeds({ onDialog }: Readonly<{ onDialog: (d: Dialog) => void }>) {
     {
       key: 'name',
       header: 'Feed',
-      render: (f) => (
-        <>
-          <strong>{f.name}</strong>
-          <div className="ops-muted">{f.code}</div>
-        </>
-      ),
+      render: (f) => <strong>{f.name}</strong>,
     },
     {
       key: 'partner',
@@ -86,8 +86,8 @@ function Feeds({ onDialog }: Readonly<{ onDialog: (d: Dialog) => void }>) {
       render: (f) => `${humanize(f.partnerSystem)} · ${humanize(f.direction)}`,
     },
     { key: 'transport', header: 'Transport', render: (f) => humanize(f.transport) },
-    { key: 'owner', header: 'Owner', render: (f) => humanize(f.ownerModule) },
-    { key: 'cron', header: 'Schedule', render: (f) => (f.cron === '-' ? 'Manual' : f.cron) },
+    { key: 'owner', header: 'Owner', render: (f) => moduleLabel(f.ownerModule) },
+    { key: 'cron', header: 'Schedule', render: (f) => scheduleText(f.cron) },
     {
       key: 'status',
       header: 'Status',
@@ -95,22 +95,20 @@ function Feeds({ onDialog }: Readonly<{ onDialog: (d: Dialog) => void }>) {
     },
     {
       key: 'actions',
-      header: 'Actions',
+      header: '',
+      kind: 'center',
       render: (f) => (
-        <div className="row">
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => onDialog({ kind: 'config', feed: f })}
-          >
-            Configure
-          </Button>
-          {f.uploadable && f.active && (
-            <Button size="sm" onClick={() => onDialog({ kind: 'upload', feed: f })}>
-              Upload File
-            </Button>
-          )}
-        </div>
+        <RowActions
+          record={f.name}
+          actions={[
+            { label: 'Configure', onSelect: () => onDialog({ kind: 'config', feed: f }) },
+            {
+              label: 'Upload File',
+              hidden: !f.uploadable || !f.active,
+              onSelect: () => onDialog({ kind: 'upload', feed: f }),
+            },
+          ]}
+        />
       ),
     },
   ];
@@ -164,8 +162,8 @@ export default function InterfacesPage() {
         </div>
       </Card>
       <p className="ops-muted">
-        <History size={12} aria-hidden="true" /> Failed or partial runs raise the OPS_FLOW_IN_FAILED
-        alert; failed records can be sent again and are processed once.
+        <History size={12} aria-hidden="true" /> A failed or partial run alerts the System
+        Administrator (Interface run failed); failed records can be sent again and are taken in once.
       </p>
       {dialog?.kind === 'config' && <FeedConfigDialog feed={dialog.feed} onClose={close} />}
       {dialog?.kind === 'upload' && <FeedUploadDialog feed={dialog.feed} onClose={close} />}

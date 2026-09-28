@@ -1,5 +1,4 @@
-import { humanize } from '@/utils/format';
-import { statusShortLabel, statusTone } from './statusTones';
+import { statusLabel, statusShortLabel, statusTone } from './statusTones';
 import type { Tone } from './statusTones';
 
 interface StatusBadgeProps {
@@ -25,7 +24,7 @@ interface StatusBadgeProps {
  * `full`: the full label is shown and the pill grows to fit it.
  */
 export function StatusBadge({ status, label, tone, full = false }: Readonly<StatusBadgeProps>) {
-  const fullLabel = label ?? humanize(status);
+  const fullLabel = label ?? statusLabel(status);
   const shown = full ? fullLabel : statusShortLabel(status, label);
   const className = `badge ${tone ?? statusTone(status)}${full ? ' badge-full' : ''}`;
   return (

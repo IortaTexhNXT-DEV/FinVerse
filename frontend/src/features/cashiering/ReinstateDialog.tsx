@@ -1,3 +1,4 @@
+import { formatAmount } from '@/utils/format';
 import { useState } from 'react';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Button } from '@/components/ui/Button';
@@ -79,7 +80,7 @@ export function ReinstateDialog({
               checked={body.full}
               onChange={() => set({ full: true, amount: undefined })}
             />
-            Full ({receipt.amount.toFixed(2)})
+            Full ({formatAmount(receipt.amount)})
           </label>
           <label className="checkbox">
             <input type="radio" checked={!body.full} onChange={() => set({ full: false })} />

@@ -270,6 +270,32 @@ const SHORT_LABELS: Record<string, string> = {
 };
 
 /**
+ * Business wording of statuses whose code does not read as the label users know (the code is
+ * never shown): the insurer-only line of a reconciliation, the pick-up of a check.
+ */
+const STATUS_LABELS: Record<string, string> = {
+  UNMATCHED_NO_BOOKING: 'Insurer Only',
+  FOR_PICKUP: 'For Pick-up',
+  PICKED_UP: 'Picked Up',
+  NON_CASH: 'Non-cash',
+  NOT_APPLICABLE: 'Not Applicable',
+};
+
+/** The full label of a status: its business wording, else the humanized code. */
+export function statusLabel(status: string): string {
+  return STATUS_LABELS[status] ?? humanize(status);
+}
+
+/**
+ * The success message of a status change, a sentence with the status as its pill reads it:
+ * "DSQ-2026-000003 is now DV Assigned." (never the code or its lower-case words).
+ */
+export function statusMessage(record: string, status: string, action?: string): string {
+  const what = action ? `${action} ${record}` : record;
+  return `${what} is now ${statusLabel(status)}.`;
+}
+
+/**
  * Longest label shown in full (fits the widest pill: "Returned to Marketing", "Pending
  * Authorization"); longer labels use the short form or are cut with an ellipsis.
  */
@@ -282,7 +308,7 @@ export function statusTone(status: string): Tone | '' {
 
 /** Label shown in the pill: the agreed short form of a long status, else the humanized status. */
 export function statusShortLabel(status: string, label?: string): string {
-  const full = label ?? humanize(status);
+  const full = label ?? statusLabel(status);
   if (full.length <= BADGE_MAX_CHARS) {
     return full;
   }

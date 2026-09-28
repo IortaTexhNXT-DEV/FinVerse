@@ -108,6 +108,11 @@ public class PaymentFileHandler implements BulkImportHandler {
   }
 
   @Override
+  public boolean textFile() {
+    return true;
+  }
+
+  @Override
   public TextLayout textLayout() {
     return layouts.layout(spec.code());
   }

@@ -7,6 +7,8 @@ import { CodeSelect, TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { DispositionBody, UnappliedItem } from './cashieringApi';
 import { dispositionErrors, dispositionFields } from './cashieringLogic';
+import { dispositionLabel } from './cashieringLabels';
+import { formatAmount } from '@/utils/format';
 
 const FIELD_LABELS: Record<ReturnType<typeof dispositionFields>[number], string> = {
   targetInvoiceNo: 'Apply to Invoice No.',
@@ -68,7 +70,7 @@ export function DispositionForm({
             options={(types.data ?? []).map((t) => t.code)}
             empty="Select…"
             error={errors.dispositionType}
-            labelOf={(code) => types.data?.find((t) => t.code === code)?.description ?? code}
+            labelOf={dispositionLabel}
             onChange={(dispositionType) => set({ dispositionType })}
           />
           <TextField
@@ -78,7 +80,7 @@ export function DispositionForm({
             value={String(body.amount)}
             onChange={(v) => set({ amount: Number(v) })}
             error={errors.amount}
-            hint={`Balance ${item.balance.toFixed(2)}`}
+            hint={`Balance ${formatAmount(item.balance)}`}
           />
           {dispositionFields(action).map((f) => (
             <TextField

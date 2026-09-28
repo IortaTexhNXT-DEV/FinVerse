@@ -1,9 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { statusMessage } from '@/components/ui/statusTones';
 import { useState } from 'react';
 import { opsApi } from '@/api/operations';
 import type { Disbursement, DisbursementStatus } from '@/api/operations';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
+import { CellStack } from '@/components/ui/CellStack';
+import { RowActions } from '@/components/ui/RowActions';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
@@ -16,7 +19,8 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime, humanize, statusPhrase } from '@/utils/format';
+import { moduleLabel, referenceText } from '@/utils/businessLabels';
+import { formatDateTime, humanize } from '@/utils/format';
 import './operations.css';
 
 const TABS: readonly { id: DisbursementStatus; label: string }[] = [
@@ -100,28 +104,24 @@ function actionsOf(
   },
 ) {
   return (
-    <div className="row">
-      {r.status === 'SENT' && (
-        <Button size="sm" variant="secondary" onClick={() => on.acknowledge(r)}>
-          Acknowledge
-        </Button>
-      )}
-      {(r.status === 'SENT' || r.status === 'ACKNOWLEDGED') && (
-        <Button size="sm" variant="secondary" onClick={() => on.dialog(r, 'dv')}>
-          Assign DV
-        </Button>
-      )}
-      {r.status === 'DV_ASSIGNED' && (
-        <Button size="sm" onClick={() => on.paid(r)}>
-          Mark Paid
-        </Button>
-      )}
-      {!CLOSED.includes(r.status) && (
-        <Button size="sm" variant="ghost" onClick={() => on.dialog(r, 'return')}>
-          Return
-        </Button>
-      )}
-    </div>
+    <RowActions
+      record={r.requestNo}
+      actions={[
+        { label: 'Acknowledge', hidden: r.status !== 'SENT', onSelect: () => on.acknowledge(r) },
+        {
+          label: 'Assign DV Number',
+          hidden: r.status !== 'SENT' && r.status !== 'ACKNOWLEDGED',
+          onSelect: () => on.dialog(r, 'dv'),
+        },
+        { label: 'Mark Paid', hidden: r.status !== 'DV_ASSIGNED', onSelect: () => on.paid(r) },
+        {
+          label: 'Return to Sender',
+          danger: true,
+          hidden: CLOSED.includes(r.status),
+          onSelect: () => on.dialog(r, 'return'),
+        },
+      ]}
+    />
   );
 }
 
@@ -147,7 +147,7 @@ export default function DisbursementQueuePage() {
     onSuccess: async (r) => {
       setDialog(undefined);
       await queryClient.invalidateQueries({ queryKey: ['ops'] });
-      toast.success(`${r.requestNo} is now ${statusPhrase(r.status)}`);
+      toast.success(statusMessage(r.requestNo, r.status));
     },
   });
   const on = {
@@ -169,19 +169,23 @@ export default function DisbursementQueuePage() {
     {
       key: 'payee',
       header: 'Payee',
+      render: (r) => r.payeeName ?? r.payeeCode,
+    },
+    {
+      key: 'src',
+      header: 'From',
       render: (r) => (
-        <>
-          {r.payeeName ?? r.payeeCode}
-          <div className="ops-muted">{r.payeeCode}</div>
-        </>
+        <CellStack
+          main={moduleLabel(r.sourceModule)}
+          sub={referenceText(r.sourceRef) || r.rootInvoiceNo}
+        />
       ),
     },
-    { key: 'src', header: 'From', render: (r) => `${humanize(r.sourceModule)} · ${r.sourceRef}` },
     { key: 'amount', header: 'Amount', numeric: true, render: (r) => <Amount value={r.amount} /> },
     { key: 'dv', header: 'DV No.', render: (r) => r.dvNo ?? r.returnReason ?? '' },
     { key: 'sent', header: 'Sent', render: (r) => formatDateTime(r.sentAt) },
     { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
-    { key: 'actions', header: 'Actions', render: (r) => actionsOf(r, on) },
+    { key: 'actions', header: '', kind: 'center', render: (r) => actionsOf(r, on) },
   ];
   return (
     <div className="stack">

@@ -111,7 +111,7 @@ public class DpFeedbackSlaJob implements ManagedJob {
         new Notice(
             "Insurer feedback overdue: " + b.getBillingNo(),
             message,
-            "/commission/billings/" + b.getId(),
+            "/commission/dp/billings/" + b.getId(),
             DpBillingService.ENTITY,
             String.valueOf(b.getId()));
     if (b.getHandler() != null) {

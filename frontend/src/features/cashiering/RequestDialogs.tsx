@@ -5,6 +5,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { formatAmount, humanize } from '@/utils/format';
+import { sourceText } from '@/utils/businessLabels';
 import { cashieringApi } from './cashieringApi';
 import { TextField } from './CashFields';
 import type { AcceptBody, AcceptForm, CollectorRequest, RefundValidation } from './requestsApi';
@@ -202,7 +203,7 @@ export function ConfirmValidationDialog({
         <ErrorAlert error={candidates.error ?? error} />
         <p className="muted">
           Refund of {task.currency} {formatAmount(task.amount)} for{' '}
-          {task.invoiceNo ?? task.clientCode} ({task.sourceModule} {task.sourceRef})
+          {task.invoiceNo ?? task.clientCode} ({sourceText(task.sourceModule, task.sourceRef)})
         </p>
         <Field label="Unapplied Item" required error={missing}>
           {(id) => (

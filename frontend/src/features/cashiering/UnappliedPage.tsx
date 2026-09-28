@@ -20,7 +20,10 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import type { RecordOriginKind } from '@/api/types';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, humanize } from '@/utils/format';
+import { formatAmount, formatDate } from '@/utils/format';
+import { CellStack } from '@/components/ui/CellStack';
+import { SalesUnitName } from '@/components/broking/LovLabel';
+import { dispositionLabel, unappliedOriginLabel } from './cashieringLabels';
 import { cashieringApi } from './cashieringApi';
 import type { BulkResult, UnappliedItem, UnappliedTab } from './cashieringApi';
 import { unappliedOrigin } from './cashieringQueueTypes';
@@ -43,7 +46,9 @@ const COLUMNS: Column<UnappliedItem>[] = [
       <>
         <strong>{u.reference}</strong> <OriginBadge record={unappliedOrigin(u)} />
         <span className="cell-sub">
-          {u.legacyArNo ? `${humanize(u.origin)} · legacy AR ${u.legacyArNo}` : humanize(u.origin)}
+          {u.legacyArNo
+            ? `${unappliedOriginLabel(u.origin)} · legacy AR ${u.legacyArNo}`
+            : unappliedOriginLabel(u.origin)}
         </span>
       </>
     ),
@@ -58,16 +63,21 @@ const COLUMNS: Column<UnappliedItem>[] = [
       </>
     ),
   },
-  { key: 'unit', header: 'Unit', render: (u) => u.salesUnit ?? '' },
+  { key: 'unit', header: 'Unit', render: (u) => <SalesUnitName code={u.salesUnit} empty="" /> },
   { key: 'amount', header: 'Amount', numeric: true, render: (u) => <Amount value={u.amount} /> },
   { key: 'balance', header: 'Balance', numeric: true, render: (u) => <Amount value={u.balance} /> },
   {
     key: 'disp',
     header: 'Disposition',
     render: (u) =>
-      u.current
-        ? `${humanize(u.current.dispositionType)} ${u.current.amount.toFixed(2)}`
-        : (u.dispositionHint ?? ''),
+      u.current ? (
+        <CellStack
+          main={dispositionLabel(u.current.dispositionType)}
+          sub={formatAmount(u.current.amount)}
+        />
+      ) : (
+        dispositionLabel(u.dispositionHint)
+      ),
   },
   { key: 'date', header: 'Received', render: (u) => formatDate(u.createdAt) },
   { key: 'stage', header: 'Stage', render: (u) => <StatusBadge status={u.stage} /> },

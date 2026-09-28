@@ -5,13 +5,14 @@ import { useAuth } from '@/auth/authContext';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDate, humanize } from '@/utils/format';
+import { formatAmount, formatDate } from '@/utils/format';
+import { modeLabel } from './cashieringLabels';
 import type { ReceiptDetail } from './cashieringApi';
 
 /** Summary card of a receipt: payor, number, status, flags and key facts. */
 export function ReceiptSummaryCard({ receipt }: Readonly<{ receipt: ReceiptDetail }>) {
   const s = receipt.summary;
-  const mode = [humanize(s.mode), receipt.checkNo].filter(Boolean).join(' · ');
+  const mode = [modeLabel(s.mode), receipt.checkNo].filter(Boolean).join(' · ');
   return (
     <RecordSummary
       title={s.payorName}
@@ -35,7 +36,7 @@ export function ReceiptSummaryCard({ receipt }: Readonly<{ receipt: ReceiptDetai
         {
           icon: Scale,
           label: 'Applied / Unapplied',
-          value: `${s.appliedAmount.toFixed(2)} / ${s.unappliedAmount.toFixed(2)}`,
+          value: `${formatAmount(s.appliedAmount)} / ${formatAmount(s.unappliedAmount)}`,
         },
         { icon: CreditCard, label: 'Mode', value: mode },
         {

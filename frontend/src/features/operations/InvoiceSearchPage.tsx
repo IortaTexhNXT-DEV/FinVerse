@@ -14,6 +14,8 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { OriginBadge } from '@/components/ui/OriginBadge';
 import { OriginFilter } from '@/components/ui/OriginFilter';
+import { DateInput } from '@/components/ui/DateInput';
+import { InsurerSelect } from '@/components/broking/InsurerSelect';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -123,15 +125,32 @@ function Filters({
     >
       {FILTER_FIELDS.map((f) => (
         <Field key={f.key} label={f.label}>
-          {(id) => (
-            <input
-              id={id}
-              type={f.date ? 'date' : 'text'}
-              className="input"
-              value={values[f.key]}
-              onChange={(e) => setValues({ ...values, [f.key]: e.target.value })}
-            />
-          )}
+          {(id) => {
+            if (f.key === 'insurer') {
+              return (
+                <InsurerSelect
+                  id={id}
+                  value={values.insurer}
+                  placeholder="All insurers"
+                  onChange={(code) => setValues({ ...values, insurer: code })}
+                />
+              );
+            }
+            return f.date ? (
+              <DateInput
+                id={id}
+                value={values[f.key]}
+                onChange={(e) => setValues({ ...values, [f.key]: e.target.value })}
+              />
+            ) : (
+              <input
+                id={id}
+                className="input"
+                value={values[f.key]}
+                onChange={(e) => setValues({ ...values, [f.key]: e.target.value })}
+              />
+            );
+          }}
         </Field>
       ))}
       <Button type="submit" variant="secondary">

@@ -1,10 +1,13 @@
-import { fileAvailable, runStatus } from './reportRuns';
+import { fileAvailable, runLabel, runStatus } from './reportRuns';
 
 describe('archived report runs', () => {
   it('labels views, exports and generated files', () => {
     expect(runStatus({ action: 'VIEW' })).toBe('VIEWED');
     expect(runStatus({ action: 'EXPORT', format: 'PDF' })).toBe('EXPORTED_PDF');
     expect(runStatus({ action: 'GENERATE', format: 'CSV' })).toBe('GENERATED_CSV');
+    expect(runLabel({ action: 'GENERATE', format: 'XLSX' })).toBe('Generated (Excel)');
+    expect(runLabel({ action: 'EXPORT', format: 'PDF' })).toBe('Exported (PDF)');
+    expect(runLabel({ action: 'VIEW' })).toBe('Viewed on Screen');
   });
 
   it('offers a generated file from its availability time only', () => {

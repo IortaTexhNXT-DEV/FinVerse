@@ -70,6 +70,9 @@ menu_personas:
   SBM_TL: {name: Submitted Policies Team Lead, user: sbmtl}
   SBM_POLICY_REVIEWER: {name: Policy Review Officer (Submitted Policies), user: polreview}
   SBM_UPP_HANDLER: {name: Handling Fee Handler (Unapplied Payments), user: sbmfee}
+  CSF_AGENT: {name: Customer Service Agent, user: csfagent}
+  CSF_SUPERVISOR: {name: Customer Service Supervisor, user: csfsup}
+  CSF_MANAGEMENT: {name: Customer Service Management, user: csfmgmt}
 
 # Packs of other BRDs whose screens a walkthrough step may show (My Approvals and Lists of Values of New Business).
 foreign_packs: [../../BRD-01_New_Business/pack/pack.yaml]
@@ -91,6 +94,7 @@ section_brd:
   nb-dashboard: BRD-1
   workspace: BRD-1
   crm: BRD-1
+  csf: BRD-9
   screening: BRD-10
   quotations: BRD-1
   accounts: BRD-1

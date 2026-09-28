@@ -18,9 +18,9 @@ import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * Invoice 360 of a migrated invoice: the invoice of a migrated policy sits on an account imported
- * from legacy, which has no account workflow (no work item). The view opens with the legacy
- * invoice card and says the account has no work item, so the screen does not ask for the
- * account's workflow panel.
+ * from legacy, which has no account workflow (no work item). The view opens with the legacy invoice
+ * card and says the account has no work item, so the screen does not ask for the account's workflow
+ * panel.
  */
 @IntegrationTest
 class MigrationInvoice360ApiIT {

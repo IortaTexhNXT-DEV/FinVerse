@@ -23,6 +23,11 @@ export interface ScreenDef {
   component: LazyExoticComponent<ComponentType>;
   /** Detail/edit screens reached from a list are not shown in the menu. */
   hidden?: boolean;
+  /**
+   * The screen is the landing page after sign-in of the users holding any of these permissions
+   * (the work permissions of the module's roles), when no general landing screen applies.
+   */
+  landingFor?: readonly string[];
 }
 
 /**

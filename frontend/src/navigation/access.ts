@@ -24,7 +24,9 @@ export function mayOpen(
 /**
  * Landing page for a user who may not open the finance dashboard: the New Business dashboard of the
  * broking roles (BRNB.012), else My Work, else the Customer Search of the contact centre roles
- * (BRD-9), otherwise the first menu screen in sidebar order the user may open.
+ * (BRD-9), else the home of a module whose work permissions the user holds (`landingFor`, e.g.
+ * Migration Home for the migration roles), otherwise the first menu screen in sidebar order the
+ * user may open.
  */
 export function landingPath(
   screens: readonly ScreenDef[],
@@ -34,6 +36,8 @@ export function landingPath(
   const menu = screens.filter(
     (s) => s.hidden !== true && !s.path.includes(':') && s.path !== '/' && mayOpen(s, can),
   );
-  const first = preferred.map((p) => menu.find((s) => s.path === p)).find((s) => s !== undefined);
+  const first =
+    preferred.map((p) => menu.find((s) => s.path === p)).find((s) => s !== undefined) ??
+    menu.find((s) => s.landingFor?.some((p) => can(p)) === true);
   return (first ?? menu[0])?.path;
 }

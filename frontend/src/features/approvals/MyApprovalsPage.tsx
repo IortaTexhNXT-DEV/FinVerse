@@ -12,7 +12,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { countOf, formatDateTime, humanize } from '@/utils/format';
 import { ageInDays, oldestAge } from './age';
 import { UserName } from '@/components/ui/UserName';
 
@@ -66,7 +66,7 @@ export default function MyApprovalsPage() {
             key={m}
             label={humanize(m)}
             value={items.filter((i) => i.module === m).length}
-            hint={`Oldest ${oldestAge(items.filter((i) => i.module === m).map((i) => i.submittedAt))} day(s)`}
+            hint={`Oldest ${countOf(oldestAge(items.filter((i) => i.module === m).map((i) => i.submittedAt)), 'day')}`}
           />
         ))}
       </div>

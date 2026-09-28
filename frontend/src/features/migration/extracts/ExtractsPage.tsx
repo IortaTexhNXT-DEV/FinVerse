@@ -12,6 +12,8 @@ import { Field } from '@/components/ui/Field';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
+import { MissingInputs } from '@/components/ui/MissingInputs';
+import { Notice } from '@/components/ui/Notice';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { countOf, formatDateTime } from '@/utils/format';
@@ -20,6 +22,15 @@ import { MIG_SECTION } from '../common/migrationCodes';
 import { useDownload } from '../common/useDownload';
 import '../migration.css';
 import { UserName } from '@/components/ui/UserName';
+
+/** Every failed intake check of a rejected extract as "Check: reason". */
+function rejectReasons(e: Extract): string[] {
+  const checks = e.rejectChecks ?? [];
+  if (checks.length > 0) {
+    return checks.map((c) => `${c.check}: ${c.reason}`);
+  }
+  return e.rejectMessage ? [e.rejectMessage] : [];
+}
 
 /**
  * Extracts (DATA_MIGRATION_DESIGN section 5): upload of a legacy extract named
@@ -38,6 +49,7 @@ export default function ExtractsPage() {
   const [data, setData] = useState<File>();
   const [control, setControl] = useState<File>();
   const [round, setRound] = useState(0);
+  const [rejected, setRejected] = useState<Extract>();
   const extracts = useQuery({
     queryKey: ['migration', 'extracts', companyId, objectFilter, page],
     queryFn: () => migrationApi.extracts(companyId, objectFilter || undefined, page),
@@ -47,8 +59,10 @@ export default function ExtractsPage() {
     mutationFn: (file: File) => migrationApi.uploadExtract(companyId, { mode, file, control }),
     onSuccess: async (e) => {
       if (e.status === 'REJECTED') {
-        toast.error(`${e.extractNo} rejected: ${e.rejectMessage ?? ''}`);
+        setRejected(e);
+        toast.error(`${e.extractNo} rejected: ${countOf(rejectReasons(e).length, 'check')} failed`);
       } else {
+        setRejected(undefined);
         toast.success(`${e.extractNo} staged with ${countOf(e.stagedRows, 'row')}`);
       }
       setData(undefined);
@@ -66,6 +80,15 @@ export default function ExtractsPage() {
       />
       <Card title="Upload an extract">
         <ErrorAlert error={upload.error} />
+        {rejected && (
+          <Notice
+            tone="error"
+            title={`${rejected.extractNo} rejected: the file was not staged`}
+            items={rejectReasons(rejected)}
+          >
+            Correct the extract or its control file and upload both again.
+          </Notice>
+        )}
         <div className="form-grid">
           <Field label="Data file" required hint="LAYOUT_SOURCE_yyyyMMdd_nn.csv or .xlsx">
             {(id) => (
@@ -117,6 +140,12 @@ export default function ExtractsPage() {
           >
             Upload and Check
           </Button>
+          <MissingInputs
+            missing={[
+              data === undefined && 'the data file',
+              control === undefined && 'the control file',
+            ]}
+          />
         </div>
       </Card>
       <Card flush>
@@ -169,10 +198,16 @@ export default function ExtractsPage() {
               render: (e) => formatDateTime(e.asOf),
             },
             {
-              key: 'rows',
-              header: 'Rows',
-              kind: 'center',
-              render: (e) => `${String(e.stagedRows)} / ${String(e.declaredRows ?? e.parsedRows)}`,
+              key: 'received-rows',
+              header: 'Rows Received',
+              numeric: true,
+              render: (e) => e.parsedRows,
+            },
+            {
+              key: 'staged-rows',
+              header: 'Rows Staged',
+              numeric: true,
+              render: (e) => e.stagedRows,
             },
             {
               key: 'masked',
@@ -182,7 +217,7 @@ export default function ExtractsPage() {
             },
             {
               key: 'received',
-              header: 'Received',
+              header: 'Received On',
               render: (e) => (
                 <CellStack
                   main={formatDateTime(e.receivedAt)}
@@ -190,7 +225,17 @@ export default function ExtractsPage() {
                 />
               ),
             },
-            { key: 'reason', header: 'Rejection reason', render: (e) => e.rejectMessage ?? '' },
+            {
+              key: 'reason',
+              header: 'Rejection Reason',
+              render: (e) =>
+                rejectReasons(e).length === 0 ? null : (
+                  <CellStack
+                    main={rejectReasons(e)[0]}
+                    sub={rejectReasons(e).slice(1).join(' · ')}
+                  />
+                ),
+            },
             {
               key: 'status',
               header: 'Status',

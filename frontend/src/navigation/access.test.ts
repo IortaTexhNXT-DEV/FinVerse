@@ -56,4 +56,14 @@ describe('landing page', () => {
       '/nb/dashboard',
     );
   });
+
+  it('lands the users of a module with work permissions on its home', () => {
+    const home: ScreenDef = {
+      ...screen('/migration', 'MIG_VIEW'),
+      landingFor: ['MIG_INTAKE'],
+    };
+    const withHome = [screen('/approvals', undefined), home];
+    expect(landingPath(withHome, (p) => p === 'MIG_VIEW' || p === 'MIG_INTAKE')).toBe('/migration');
+    expect(landingPath(withHome, (p) => p === 'MIG_VIEW')).toBe('/approvals');
+  });
 });

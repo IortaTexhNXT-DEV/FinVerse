@@ -18,6 +18,7 @@ import { formatDate } from '@/utils/format';
 import { MigStatus } from '../common/MigStatus';
 import { MIG_SECTION, migLabel } from '../common/migrationCodes';
 import { PlanPanel } from './PlanPanel';
+import { MissingInputs } from '@/components/ui/MissingInputs';
 import '../migration.css';
 
 const KINDS: { value: PlanKind; label: string }[] = [
@@ -128,6 +129,13 @@ function CreatePlanDialog({ onClose }: Readonly<{ onClose: () => void }>) {
       onClose={onClose}
       footer={
         <>
+          <MissingInputs
+            missing={[
+              name.trim() === '' && 'the name',
+              environment.trim() === '' && 'the environment',
+              goLiveDate === '' && 'the go-live date',
+            ]}
+          />
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>

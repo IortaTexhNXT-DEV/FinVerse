@@ -57,6 +57,11 @@ class MigrationFoundationApiIT {
   }
 
   private JsonNode upload(String fileName, List<String> rows, int hashTotal) throws Exception {
+    return upload(fileName, rows, hashTotal, rows.size());
+  }
+
+  private JsonNode upload(String fileName, List<String> rows, int hashTotal, int declaredRows)
+      throws Exception {
     byte[] content =
         (R01_HEADER + "\n" + String.join("\n", rows) + "\n").getBytes(StandardCharsets.UTF_8);
     String head =
@@ -66,7 +71,7 @@ class MigrationFoundationApiIT {
             + "measure,column_name,currency,filter,value\n"
             + head
             + "ROW_COUNT,,,,"
-            + rows.size()
+            + declaredRows
             + "\n"
             + head
             + "HASH_TOTAL,,,,"
@@ -268,6 +273,22 @@ class MigrationFoundationApiIT {
         upload("R01_QPS_20261122_01.csv", List.of("MARKET_SEGMENT,CORP,Corporate,,Y,,,5"), 7);
     assertThat(extract.get("status").asText()).isEqualTo("REJECTED");
     assertThat(extract.get("rejectMessage").asText()).contains("hash total");
+  }
+
+  @Test
+  void aRejectedExtractListsEveryFailedCheckWithItsReason() throws Exception {
+    JsonNode extract =
+        upload("R01_QPS_20261123_01.csv", List.of("MARKET_SEGMENT,CORP,Corporate,,Y,,,5"), 7, 3);
+    assertThat(extract.get("status").asText()).isEqualTo("REJECTED");
+    assertThat(extract.get("parsedRows").asInt()).isEqualTo(1);
+    List<String> checks = new ArrayList<>();
+    extract
+        .get("rejectChecks")
+        .forEach(c -> checks.add(c.get("check").asText() + ": " + c.get("reason").asText()));
+    assertThat(checks)
+        .hasSize(2)
+        .anySatisfy(c -> assertThat(c).startsWith("Row count: The file has 1 row;"))
+        .anySatisfy(c -> assertThat(c).startsWith("Hash total: The hash total"));
   }
 
   @Test

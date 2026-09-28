@@ -1121,3 +1121,9 @@ dl.form-grid dd {
 .param-rows .table td {
   vertical-align: top;
 }
+
+/* The reason next to a disabled button: what is still needed */
+.missing-inputs {
+  font-size: 13px;
+  margin-right: auto;
+}

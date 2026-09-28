@@ -193,12 +193,3 @@ export function joinParts(
 ): string {
   return parts.filter((p): p is string => typeof p === 'string' && p !== '').join(separator);
 }
-
-/** The insurer OR schedule template (RMTID.012; layout parked, OQ22). */
-export const OR_TEMPLATE = 'batchNo,invoiceNo,orNo,orDate,orAmount\n';
-
-/** The Collection hold file template (COLLECTION_HOLD). */
-export const HOLD_TEMPLATE = 'invoiceNo,reasonCode,holdUntil,remarks\n';
-
-/** The Collection special remittance file template (COLLECTION_SPECIAL_REMIT). */
-export const SPECIAL_TEMPLATE = 'invoiceNo,conditionCode,remarks\n';

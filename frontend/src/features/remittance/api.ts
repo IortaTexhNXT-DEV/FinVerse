@@ -310,6 +310,9 @@ export function toQuery(params: Record<string, QueryValue>): string {
   return text ? `?${text}` : '';
 }
 
+/** The remittance uploads that have an Excel template. */
+export type TemplateKind = 'insurer-or' | 'holds' | 'special';
+
 function uploadFile<T>(path: string, file: File): Promise<T> {
   const form = new FormData();
   form.append('file', file);
@@ -353,6 +356,8 @@ export const remittanceApi = {
       ? api.post<IncentiveRule>(`${BASE}/incentive-rules`, body)
       : api.put<IncentiveRule>(`${BASE}/incentive-rules/${id}`, body),
   uploadInsurerOr: (file: File) => uploadFile<OrUpload>(`${BASE}/insurer-or/upload`, file),
+  /** The guided Excel template of an upload (insurer ORs, holds, special remittances). */
+  template: (kind: TemplateKind) => api.getFile(`${BASE}/templates/${kind}`),
   insurerOrRuns: (page: number) =>
     api.get<PageResponse<FeedRun>>(`${BASE}/insurer-or/runs${toQuery({ page, size: 10 })}`),
   insurerOrRun: (id: number) => api.get<OrUpload>(`${BASE}/insurer-or/runs/${id}`),

@@ -20,7 +20,7 @@ import { remittanceApi } from './api';
 import type { Hold, HoldInput } from './api';
 import { NewHoldDialog } from './HoldDialogs';
 import { TemplateButton, UploadForm } from './RemittanceParts';
-import { HOLD_TABS, HOLD_TEMPLATE, stagesOf } from './remittanceLabels';
+import { HOLD_TABS, stagesOf } from './remittanceLabels';
 import type { HoldTab } from './remittanceLabels';
 import './remittance.css';
 import { UserName } from '@/components/ui/UserName';
@@ -109,7 +109,7 @@ export default function HoldsPage() {
       {uploading && (
         <Card
           title="Upload Collection Hold File"
-          actions={<TemplateButton name="hold-template.csv" content={HOLD_TEMPLATE} />}
+          actions={<TemplateButton kind="holds" />}
         >
           <UploadForm
             label="Hold file (invoiceNo, reasonCode, holdUntil, remarks)"

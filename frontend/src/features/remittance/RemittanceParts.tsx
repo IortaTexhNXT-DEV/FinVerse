@@ -4,7 +4,8 @@ import { saveFile } from '@/api/client';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { formatAmount } from '@/utils/format';
-import type { Amounts, RemittanceType, Settlement } from './api';
+import { remittanceApi } from './api';
+import type { Amounts, RemittanceType, Settlement, TemplateKind } from './api';
 import { TYPE_LABELS } from './remittanceLabels';
 import './remittance.css';
 import { FileDropZone } from '@/components/ui/FileDropZone';
@@ -56,13 +57,24 @@ export function TypeChip({ type }: Readonly<{ type: RemittanceType }>) {
   return <span className="tag">{TYPE_LABELS[type]}</span>;
 }
 
-/** Downloads a CSV template of an upload. */
-export function TemplateButton({ name, content }: Readonly<{ name: string; content: string }>) {
+/** Downloads the guided Excel template of an upload. */
+export function TemplateButton({ kind }: Readonly<{ kind: TemplateKind }>) {
+  const [busy, setBusy] = useState(false);
+  const download = async () => {
+    setBusy(true);
+    try {
+      const f = await remittanceApi.template(kind);
+      saveFile(f.blob, f.fileName);
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
     <Button
       variant="ghost"
       icon={<Download size={16} />}
-      onClick={() => saveFile(new Blob([content], { type: 'text/csv' }), name)}
+      busy={busy}
+      onClick={() => void download()}
     >
       Download Template
     </Button>
@@ -79,11 +91,16 @@ export function UploadForm({
   const [error, setError] = useState<string>();
   return (
     <div className="remit-form">
-      <Field label={label} required error={error} hint="CSV, semicolon or tab separated text">
+      <Field
+        label={label}
+        required
+        error={error}
+        hint="The Excel template, CSV, or semicolon or tab separated text"
+      >
         {(id) => (
           <FileDropZone
             id={id}
-            accept=".csv,.txt,text/csv,text/plain"
+            accept=".xlsx,.csv,.txt,text/csv,text/plain"
             onChange={(files) => {
               setFile(files[0]);
               setError(undefined);

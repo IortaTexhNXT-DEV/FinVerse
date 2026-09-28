@@ -22,6 +22,7 @@ const TONE_GROUPS: Record<Tone, string[]> = {
     // broking
     'SENT',
     'VALID',
+    'PASSED',
     'COMMITTED',
     'COMPLETED',
     'CONFIRMED',

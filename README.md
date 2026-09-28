@@ -25,7 +25,7 @@ SIT/UAT users are the BDOI personas, for example `ao` (Marketing account officer
 (Processing), `tsu` (TSU), `cashier`, `remittl` (Remittance team lead), `clxhandler` (Collections), `disbtl`
 (Disbursement team lead), `gltl` (FRBS / GL team lead), `acsltl` (ACSL team lead) and `badmin` (business
 administrator). The screenshot manifest [`tools/screenshots/screens.cjs`](tools/screenshots/screens.cjs) names the
-SIT/UAT user of every screen. The seed company carries the legal name of BDOI; all its records are seed data. The SIT/UAT password is held in the seed configuration and issued by the project team.
+SIT/UAT user of every screen. The seed company carries the legal name of BDOI; all its records are seed data. The SIT/UAT password is provided to testers separately; each seed environment sets its own with `BROKERVERSE_SEED_PASSWORD` (docs/operations/CONFIGURATION.md, "Seed data").
 
 ## Documentation
 

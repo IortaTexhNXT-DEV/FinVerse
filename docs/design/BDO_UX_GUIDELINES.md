@@ -127,6 +127,9 @@ Use these instead of building a screen-specific variant.
 | Empty list | `EmptyState` (the `DataTable` default message is "No items to display") |
 | Buttons | one filled primary (`accent`) per area; secondary actions outlined; destructive actions (`danger`) outlined red; labels in Title Case |
 | Workflow header and history | `components/broking/WorkflowPanel`: the stage stepper (`StageStepper`, steps from `stageSteps` over the workflow's defined stages) and one meta row (Current Stage, Since, Due with the overdue pill, Assigned To; actions on the right); `HistoryTable` for the history. Records outside the workflow engine (access requests) use `StageStepper` with their own stage list (`accessStages`) |
+| Hierarchies (regions, departments, teams and their members) | `components/ui/TreeTable` (treegrid in the table style: chevron and one indentation step per level, `aria-level` / `aria-expanded`, arrow keys, Home / End, Enter; `treeRows` `branchKeys` for Expand All), with a search that expands the matching branches, Expand All / Collapse All, Show Inactive and a summary line |
+| Row actions | `components/ui/RowActionMenu` (one "more" button per row opening a menu; destructive actions last, in red, after a separator), never inline links |
+| Outcome facts of a record (validation result, validator, time, amount) | `components/broking/RecordSummary` `KeyFacts`, the icon / label / value grid of the header card |
 | Key-value detail blocks | `components/ui/DefinitionGrid` (aligned label / value rows, dash for empty, "Not provided" collapse); existing `.detail-list` blocks share the look |
 | Record page header | `components/broking/RecordHeader` (name, reference chips, status and labelled statuses, flags, completeness, key facts) |
 | Table cell with a secondary line | `components/ui/CellStack` (`EmptyCell` for the muted dash) |

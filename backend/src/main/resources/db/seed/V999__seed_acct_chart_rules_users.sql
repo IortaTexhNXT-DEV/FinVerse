@@ -1,6 +1,6 @@
 -- =====================================================================================
 -- iNXT BrokerVerse - V999 Seed Accounting, Disbursement and ACSL (BRD-5) chart, rules and users
--- (seed profile only; password for all users: Brokerverse@2026). SEED DATA ONLY - never load in
+-- (seed profile only; the SIT/UAT password is provided to testers separately). SEED DATA ONLY - never load in
 -- production.
 --   * Seed chart (docs/architecture/ACCOUNTING_DISBURSEMENT_DESIGN.md section 3): the Operations
 --     placeholder accounts take the names BDOI uses in its reports, and the accounts the BRD

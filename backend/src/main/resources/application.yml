@@ -481,6 +481,12 @@ brokerverse:
   migration:
     # Local value for seed stacks only; set BROKERVERSE_MIGRATION_MASKING_KEY in every shared environment.
     masking-key: ${BROKERVERSE_MIGRATION_MASKING_KEY:seed-profile-local-masking-key-0123456789}
+  seed:
+    # Password of the SIT/UAT users of this environment (SeedPasswords), set at deploy from the secret
+    # store and never written into a file. Blank: the users keep the hash of the seed scripts.
+    password: ${BROKERVERSE_SEED_PASSWORD:}
+    # true: the SIT/UAT users must change the password at their first sign-in.
+    password-must-change: ${BROKERVERSE_SEED_PASSWORD_MUST_CHANGE:false}
 
 ---
 # Local transports for development, automated tests and seed stacks (INF0): plaintext PostgreSQL,

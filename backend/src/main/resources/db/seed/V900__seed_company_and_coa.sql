@@ -2,7 +2,7 @@
 -- iNXT BrokerVerse - SEED DATA (loaded only with the 'seed' Spring profile).
 -- Seed company "BDO Insurance and Reinsurance Brokers, Inc." (code FVI) with three branches,
 -- a Philippine non-life insurance chart of accounts, dimensions, FY 2026 calendar,
--- exchange rates and SIT/UAT users (password: Brokerverse@2026 - seed only).
+-- exchange rates and SIT/UAT users (their password is provided to testers separately).
 -- =====================================================================================
 insert into org_company (code, name, base_currency, tax_id, address, fiscal_year_start_month,
     back_value_days, forward_value_days, retained_earnings_account, record_status,
@@ -862,7 +862,7 @@ from (values ('USD', 57.85), ('EUR', 62.40), ('GBP', 73.10), ('JPY', 0.3850), ('
      (values ('SPOT'), ('CLOSING')) as t(rt),
      generate_series(date '2026-01-01', date '2026-09-30', interval '1 day') as d;
 
--- SIT/UAT users (password for all: Brokerverse@2026). SEED DATA ONLY - never load in production.
+-- SIT/UAT users (their password is provided to testers separately). SEED DATA ONLY - never load in production.
 insert into sec_user (username, full_name, email, password_hash, authorization_limit, home_branch_id,
     created_at, created_by)
 select u.username, u.full_name, u.email,

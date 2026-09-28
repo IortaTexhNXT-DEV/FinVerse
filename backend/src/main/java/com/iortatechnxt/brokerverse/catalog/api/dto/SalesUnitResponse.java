@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.catalog.api.dto;
 import com.iortatechnxt.brokerverse.catalog.domain.SalesLevel;
 import com.iortatechnxt.brokerverse.catalog.domain.SalesUnit;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
+import java.time.Instant;
 
 /**
  * A sales organisation unit.
@@ -17,6 +18,11 @@ import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
  * @param recordStatus maker-checker status
  * @param maker last maintainer
  * @param authorizedBy checker
+ * @param statusReason reason of the last deactivation or reactivation
+ * @param createdBy creator
+ * @param createdAt creation time
+ * @param lastChangedAt time of the last change
+ * @param authorizedAt authorization time
  */
 public record SalesUnitResponse(
     Long id,
@@ -28,7 +34,12 @@ public record SalesUnitResponse(
     String headUsername,
     RecordStatus recordStatus,
     String maker,
-    String authorizedBy) {
+    String authorizedBy,
+    String statusReason,
+    String createdBy,
+    Instant createdAt,
+    Instant lastChangedAt,
+    Instant authorizedAt) {
 
   /**
    * Maps an entity.
@@ -47,6 +58,11 @@ public record SalesUnitResponse(
         e.getHeadUsername(),
         e.getRecordStatus(),
         e.getMaker(),
-        e.getAuthorizedBy());
+        e.getAuthorizedBy(),
+        e.getStatusReason(),
+        e.getCreatedBy(),
+        e.getCreatedAt(),
+        e.getUpdatedAt() != null ? e.getUpdatedAt() : e.getCreatedAt(),
+        e.getAuthorizedAt());
   }
 }

@@ -273,7 +273,7 @@ tables of the migrated database.
 cd backend
 mvn spotless:apply            # format
 mvn verify                    # format check, compile (-Werror), tests, coverage, checkstyle, PMD, CPD, SpotBugs
-SPRING_PROFILES_ACTIVE=seed mvn spring-boot:run   # needs PostgreSQL on localhost:5432 (docker compose up db)
+SPRING_PROFILES_ACTIVE=seed BROKERVERSE_SEED_PASSWORD=... mvn spring-boot:run   # PostgreSQL on localhost:5432 (docker compose up db); SIT/UAT password issued separately
 
 # frontend (Node 22)
 cd frontend

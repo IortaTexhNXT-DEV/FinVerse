@@ -21,6 +21,27 @@ interface RecordSummaryProps {
 }
 
 /**
+ * Key facts in the record header style: icon and label over the value, four per row; an empty
+ * fact shows a muted dash. Used by the summary card and by cards that show a record's outcome in
+ * the same style (e.g. the validation of a package version).
+ */
+export function KeyFacts({ facts, label }: Readonly<{ facts: Fact[]; label?: string }>) {
+  return (
+    <dl className="key-facts" aria-label={label}>
+      {facts.map(({ icon: Icon, label: name, value }) => (
+        <div className="key-fact" key={name}>
+          <dt>
+            <Icon size={14} aria-hidden="true" />
+            {name}
+          </dt>
+          <dd>{isEmptyValue(value) || value === '—' ? <span className="muted">—</span> : value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+/**
  * Summary card of a record page (BDO Insure Record Details pattern, same layout as
  * `RecordHeader`): name, codes and status, flags, then the key facts in four columns with their
  * icons; an empty fact shows a muted dash.
@@ -34,19 +55,7 @@ export function RecordSummary({ title, chips, flags, facts }: Readonly<RecordSum
           {chips}
           {flags ? <span className="tag-list">{flags}</span> : null}
         </div>
-        <dl className="key-facts">
-          {facts.map(({ icon: Icon, label, value }) => (
-            <div className="key-fact" key={label}>
-              <dt>
-                <Icon size={14} aria-hidden="true" />
-                {label}
-              </dt>
-              <dd>
-                {isEmptyValue(value) || value === '—' ? <span className="muted">—</span> : value}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <KeyFacts facts={facts} />
       </div>
     </Card>
   );

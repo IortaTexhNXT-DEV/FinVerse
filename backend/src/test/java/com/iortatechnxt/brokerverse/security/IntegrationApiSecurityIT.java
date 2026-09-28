@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.iortatechnxt.brokerverse.support.SignInPasswords;
 import com.jayway.jsonpath.JsonPath;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
@@ -71,6 +72,7 @@ class IntegrationApiSecurityIT {
   private static final HttpServer JWKS = jwksServer();
 
   @Autowired private MockMvc mvc;
+  @Autowired private SignInPasswords passwords;
 
   @DynamicPropertySource
   static void jwks(DynamicPropertyRegistry registry) {
@@ -174,8 +176,7 @@ class IntegrationApiSecurityIT {
         mvc.perform(
                 post("/api/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        "{\"username\":\"" + username + "\",\"password\":\"Brokerverse@2026\"}"))
+                    .content(passwords.loginBody(username)))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()

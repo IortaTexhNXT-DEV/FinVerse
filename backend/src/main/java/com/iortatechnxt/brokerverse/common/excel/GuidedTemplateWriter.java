@@ -269,6 +269,12 @@ public final class GuidedTemplateWriter {
       row.setHeightInPoints(LINE_POINTS * lines(gs.intro(), START_TEXT_WIDTH) + 2);
     }
     sheet.setActiveCell(new CellAddress(0, 0));
+    PrintSetup ps = sheet.getPrintSetup();
+    ps.setLandscape(true);
+    ps.setPaperSize(PrintSetup.A4_PAPERSIZE);
+    ps.setFitWidth((short) 1);
+    ps.setFitHeight((short) 0);
+    sheet.setFitToPage(true);
   }
 
   private static void printSetup(Sheet sheet, GuidedTemplate t, int bandStart, int headerRow) {

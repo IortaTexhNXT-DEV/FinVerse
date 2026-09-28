@@ -134,7 +134,7 @@ final class LayoutTemplates {
     if ("Y".equals(mandatory)) {
       g = g.mandatory();
     } else if ("C".equals(mandatory)) {
-      g = g.when(text(c.getValidation()));
+      g = g.when(condition(text(c.getValidation())));
     }
     return kind == Kind.YES_NO ? g.format(format(c)) : allowed(g, c).format(format(c));
   }
@@ -153,6 +153,13 @@ final class LayoutTemplates {
               + (allowed.isEmpty() || allowed.startsWith("Code map") ? "" : "; " + allowed));
     }
     return g.allowed(allowed);
+  }
+
+  /** The condition of a conditional column: its check without a leading "Mandatory". */
+  private static String condition(String validation) {
+    return validation.startsWith("Mandatory ")
+        ? validation.substring("Mandatory ".length())
+        : validation;
   }
 
   private static Kind kind(LayoutColumn c) {

@@ -22,7 +22,8 @@ control:
     approver: ""
     change: First issue with the BRD-13 Data Migration business sign-off set (one handbook, one workbook and the test plan in place of the separate migration documents)
 distribution:
-  - {name: "Program Manager, Business Project Services", role: Business owner and approver, organisation: BDO Unibank ESG, purpose: Sign-off}
+  - {name: "Product Owner, Marketing Business System, and the approvers of the BRD-13 approval pages", role: Approvers, organisation: BDOI, purpose: Sign-off}
+  - {name: "Program Manager, Business Project Services", role: "BRD author; reviewer of traceability and completeness", organisation: BDO Unibank ESG, purpose: "Review; owner of the cut-over"}
   - {name: Data Migration Lead, role: Reviewer and signatory, organisation: BDOI, purpose: "Object decisions, trial migrations, cut-over plan"}
   - {name: "Data owners: Marketing Business System, Retail and Corporate Marketing, Operations, Disbursement, Compliance and Analytics", role: Reviewers and signatories, organisation: BDOI, purpose: Review of their objects, templates, code maps and reconciliation}
   - {name: "Comptrollership", role: Reviewer and signatory, organisation: BDOI, purpose: "Legacy accounts, GL opening, reconciliation, opening-balance adjustments, year-end option"}
@@ -82,6 +83,24 @@ render: guide-steps
 | Mon 26-Oct-2026 | Q&A session on the consolidated comments log |
 | Wed 28-Oct-2026 | Release set v2.1 with the agreed corrections, when needed |
 | Fri 30-Oct-2026 | Sign-off meeting (M2): objects decided, layouts frozen, owners named |
+
+# Who signs what
+
+The set holds business content only: the screens and fields, the columns of the lists, reports and templates that the user sees or fills in, the validations, business rules, messages, notifications, documents, walkthroughs and reports. The business users sign that content. Technical content (the interfaces between systems, data storage, security set-up) is not part of the set: it is in the Technical Specification, a separate document reviewed by BDOI IT. The roles are those of the approval sheet of the BRD: iorta TechNXT prepares the set, the business units provide the input and review their parts, BDOI IT reviews the interfaces, the user access and the Technical Specification, the Program Manager of Business Project Services reviews the traceability and the completeness, and the Product Owner approves the whole set.
+
+```pack
+plugin: build_dm_pack.py
+source: pack/pack.yaml
+render: owners-matrix
+```
+
+```pack
+plugin: build_dm_pack.py
+source: pack/pack.yaml
+render: owners-roles
+```
+
+The signatories sign the Sign-off certificate sheet of the Migration Workbook in the same order: prepared by, input provided by, reviewed by, approved by.
 
 # Change control after sign-off
 

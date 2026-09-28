@@ -102,7 +102,7 @@ The roles-and-access sheet checks each CSF action against the roles that may and
 | Positive | The normal flow succeeds with valid data |
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit |
-| Security-access | Screens, buttons and API calls are open only to the roles that hold the permission |
+| Security-access | Screens, buttons and system functions are open only to the roles that hold the permission |
 | Workflow | A contact change, a resend or an unlock that moves a record to its next state |
 | Report-output | Reports and exports; content checked against the screen |
 | Upload-download | Documents uploaded to the client or an account and files downloaded or previewed |
@@ -225,7 +225,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 | No renewal advices exist until the Renewal and EB modules store them (D-CSF-01) | High | The test lead loads RENEWAL_ADVICE documents on the test clients; the cases are re-run when the modules produce RAs |
 | The QPS / EBIX interface is not specified (CSQ01) | Medium | The sync-enabled cases stay Blocked; the disabled sync and the outbox are tested now |
 | Test mailboxes not reachable from SIT or UAT | High | Check the relay before the cycle (entry criterion); resend cases read the outbox when the mailbox is down and are re-run later |
-| Time-based cases (verification validity, payment window, failed verifications per day) need the clock to pass | Medium | The test lead sets verification and receipt times in the test database, as the preconditions describe |
+| Time-based cases (verification validity, payment window, failed verifications per day) need the clock to pass | Medium | The test lead sets verification and receipt times in the test environment, as the preconditions describe |
 | The restore test needs an infrastructure environment | Medium | The infrastructure team runs FR-CSF-043 on its restore environment and hands the log to QA |
 | Contact Center testers are not available in the UAT window (24 agents share the hotline) | High | Agree named testers and dates outside the peak hours 10:00-12:00 and 14:00-16:00 in the UAT plan (deliverable 30) |
 

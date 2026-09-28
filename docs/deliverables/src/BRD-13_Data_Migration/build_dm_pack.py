@@ -102,6 +102,11 @@ CLIENT_WORDING = [
     (r"\bthe crm formats\b", "the client formats of BIBS"),
     (r"\bMIG_GOLIVE_RENEWAL_TO\b", "go-live renewal window"),
     (r"\biorta \(load order\)", "iorta TechNXT (load order)"),
+    # Layout H01 (archive): the legacy details column; the platform wording fix of these texts is requested.
+    (r"^All other legacy columns as a JSON object of label and value$",
+     "All other legacy columns as label and value pairs, as in the example"),
+    (r"^JSON object$", "Label and value pairs in braces, as in the example"),
+    (r"^Valid JSON$", "Label and value pairs as in the example"),
 ]
 
 

@@ -15,7 +15,7 @@ repository.
 | `drop_index.py` | Writes the index `README.md` of every drop folder |
 | `drop_closure.py` | The closure set of a drop (`brand.DROP_SETS`): for Drop 0 the configuration inputs workbook (01) and the closure summary (02) from `docs/deliverables/src/Drop-0_Closure/`, the BRD-03 and BRD-11 templates, the BRD-13 catalogue and the platform reference data; `--check` refuses a seeded master table without exactly one register item, a list, parameter, event or document template without one route, an unknown screen, migration object or template field |
 | `sql_facts.py` | Reference rows of the migration scripts without a database (`rows`), table columns (`columns`) and the tables the seed data fills (`seed_tables`) |
-| `check_pack.py` | Fails on duplicated files (by content), older versions next to newer ones in `out/`, an issued sign-off set without its files 00-05, and restricted words; run before committing the pack |
+| `check_pack.py` | Fails on duplicated files (by content), older versions next to newer ones in `out/`, an issued sign-off set without its files 00-05, restricted words, development-status wording, and technical terms (API, endpoint, JSON, SQL, database, schema, table name, payload, Flyway, http, /api/, file-transfer protocols) in the client documents of the sign-off sets and in the client sources of every BRD, outside the allow-list `TECHNICAL_ALLOWED` (platform texts quoted word for word whose wording fix is requested, BDO system names); run before committing the pack |
 
 ## Set-up
 

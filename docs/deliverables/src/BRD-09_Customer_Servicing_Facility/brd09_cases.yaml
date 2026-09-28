@@ -19,7 +19,7 @@ personas:
   CSF_MANAGEMENT: {name: "Contact Center Management (Leads / Heads)", short: Mgmt}
   SYSADMIN: {name: System Administrator, short: Sys Admin}
   MKT_AO: {name: Marketing AO without a CSF role, short: MKT AO}
-  INFRA: {name: Infrastructure team (database administrator), short: Infra}
+  INFRA: {name: Infrastructure team (infrastructure administrator), short: Infra}
 
 screens:
   LOGIN: Login page
@@ -42,8 +42,8 @@ screens:
   ACCREQ: User Access > Access Requests
   NOTIF: Notifications (bell icon in the page header)
   MAIL: Test mailbox of the recipient
-  DB: Database restore environment (infrastructure console)
-  API: Direct request outside the screens, signed in as the persona (test lead tool)
+  RESTORE: Restore environment of the infrastructure team
+  SYS: System function check outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-CSF-01
@@ -65,7 +65,7 @@ data:
   - id: TD-CSF-05
     name: Payment history over 14 months
     content: Receipts of TD-CSF-02 spread over 14 months; one receipt applied to two invoices with a balance left on each; one receipt dated 12 months and 1 day before the test date.
-    source: Keyed in Cashiering (BRD-2) on SIT by the test lead; receipt dates set in the test database
+    source: Keyed in Cashiering (BRD-2) on SIT by the test lead; receipt dates set in the test environment
   - id: TD-CSF-06
     name: Renewal advices and e-policies
     content: One RA of the Renewal module, one RA of Employee Benefits and one RA of a submitted policy (document type RENEWAL_ADVICE); a confirmed e-policy on the CBG account; an account without a confirmed e-policy; a second client "UAT CSF Client Two" without a registered e-mail.
@@ -231,7 +231,7 @@ frs:
       - c: 2
         type: Security-access
         persona: CSF_AGENT
-        screen: API
+        screen: SYS
         title: Agent sends a resend to another address directly
         steps:
           - Sign in as agent1.
@@ -242,7 +242,7 @@ frs:
         data: [TD-CSF-06]
       - c: 2
         type: Security-access
-        screen: API
+        screen: SYS
         title: Management sends a contact update directly
         steps:
           - Sign in as mgmt1.
@@ -582,7 +582,7 @@ frs:
       - c: 4
         type: Boundary
         title: Change 29 minutes after the verification
-        pre: A PASSED verification of TD-CSF-02 was recorded 29 minutes ago (the test lead sets the time in the test database, or the tester waits).
+        pre: A PASSED verification of TD-CSF-02 was recorded 29 minutes ago (the test lead sets the time in the test environment, or the tester waits).
         steps:
           - Open step 2, change the mobile number, select a reason and save.
         expected: The change is saved without a new verification.
@@ -645,7 +645,7 @@ frs:
         expected: Both fields are saved under one change number; the Contact History shows one row per field.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Contact change without a verification
         pre: No verification of UAT CSF Client Two today.
         steps:
@@ -654,7 +654,7 @@ frs:
         msg: [Verify the caller before changing the contact details]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Civil status change is refused
         pre: A PASSED verification of TD-CSF-02.
         steps:
@@ -715,7 +715,7 @@ frs:
       - With the legacy sync disabled, each contact change is stored in the outbox with status Not configured and nothing is sent.
       - The CSF Contact Changes report lists the sync status of each change.
       - With the sync enabled, the job sends the queued rows and sets SENT; a failed sending is retried, set FAILED and raises an alert.
-      - Every outbox row keeps its payload so the outbox can be replayed.
+      - Every change waiting in the outbox keeps its content so it can be sent again.
     cases:
       - c: 1
         type: Positive
@@ -766,7 +766,7 @@ frs:
         type: Positive
         persona: SYSADMIN
         screen: JOBS
-        title: Outbox rows keep the payload for replay
+        title: Changes in the outbox keep their content to be sent again
         steps:
           - Open the outbox rows of TD-CSF-02 (Scheduled Jobs, CSF_LEGACY_SYNC, run detail or the outbox view of the job).
         expected: Each row holds the client, the fields with old and new values and the change number, so it can be sent again later.
@@ -877,7 +877,7 @@ frs:
         expected: No e-policy and no Resend button are shown for that account.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Direct resend request for an account without a confirmed e-policy
         steps:
           - Call the e-policy resend of that account signed in as agent1.
@@ -1175,28 +1175,28 @@ frs:
   FR-CSF-043:
     scenario: SC-CSF-08
     persona: INFRA
-    screen: DB
+    screen: RESTORE
     conditions:
-      - The database log is archived at least every 15 minutes, and a daily base backup runs outside the peak hours.
-      - A restore recovers the database to a point less than 15 minutes before the test.
-      - Online response times stay within the targets while the log is archived.
+      - The changes are saved to the backup storage at least every 15 minutes, and a daily full backup runs outside the peak hours.
+      - A restore recovers BIBS data to a point less than 15 minutes before the test.
+      - Online response times stay within the targets while the changes are saved.
       - A failed archive or backup alerts the infrastructure team.
     cases:
       - c: 1
         type: Positive
-        title: Archive interval and base backup schedule
+        title: Backup interval and full backup schedule
         steps:
-          - Read the archive interval of the database and the backup schedule.
-          - List the archived log segments of the last two hours.
-        expected: The archive interval is 15 minutes or less; at least one segment is archived in every 15-minute window; the daily base backup runs outside 10:00-12:00 and 14:00-16:00.
+          - Read the backup interval of the changes and the backup schedule.
+          - List the saved changes of the last two hours in the backup storage.
+        expected: The backup interval is 15 minutes or less; changes are saved in every 15-minute window; the daily full backup runs outside 10:00-12:00 and 14:00-16:00.
       - c: 2
         type: Positive
         title: Restore to a point less than 15 minutes before the test
         steps:
           - Note the time T; make a contact change on SIT at T minus 20 minutes and another at T minus 5 minutes.
-          - Restore the last base backup and the archived log on the restore environment up to the latest point.
+          - Restore the last full backup and the saved changes on the restore environment up to the latest point.
           - Check the two contact changes.
-        expected: The restored database holds the change made at T minus 20 minutes and is recovered to a point less than 15 minutes before T.
+        expected: The restored data holds the change made at T minus 20 minutes and is recovered to a point less than 15 minutes before T.
       - c: 3
         type: Positive
         persona: CSF_AGENT

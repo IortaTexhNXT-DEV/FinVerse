@@ -49,7 +49,7 @@ Every case traces to a functional requirement (FR) of FRS BRD-8 v1.0 and to the 
 In scope are all 39 FRs of FRS BRD-8 v1.0 and the 34 BRD references they trace to:
 
 - access by department, document links and access classes, audit and versions, protected outbound files (FR-EB-001 to 004);
-- the partner portal: separate realm, provisioning through User Access, staged uploads, review, the insurer task inbox and proposal form, the client HR portal (FR-EB-010 to 015);
+- the partner portal: separate sign-in, provisioning through User Access, staged uploads, review, the insurer task inbox and proposal form, the client HR portal (FR-EB-010 to 015);
 - client capture, programmes and cycles with the business type, the automatic RA, client feedback and the incumbent's indicative proposal (FR-EB-020 to 024);
 - documents, BOR, franchise, the client advice, required documents and the TOR (FR-EB-030 to 035);
 - proposals, the comparative, the value threshold, presentation, revisions and the client's confirmation with the placement trigger (FR-EB-040 to 046);
@@ -61,7 +61,7 @@ The roles-and-access sheet checks each EB and portal action against the roles th
 ## Out of scope
 
 - BRID-028, documents for high-risk accounts (out of scope per the addendum, p.13).
-- The insurer system-to-system API, e-signature verification of the BOR, HRIS master list feeds and reading insurer mailboxes (on hold, FRS section 7).
+- The insurer system-to-system interface, e-signature verification of the BOR, HRIS master list feeds and reading insurer mailboxes (on hold, FRS section 7).
 - EB renewals in the general Renewal module (decision D3); the BRD-6 test plan confirms that HMO lines are not extracted.
 - Penetration testing of the internet-facing portal. The portal security cases here check the functional rules; the penetration test is part of BDO Information Security's approval (EBQ13).
 - Performance and volume testing (deliverable 28), and BDOI's own templates and report layouts (EBQ08, EBQ21).
@@ -102,7 +102,7 @@ The roles-and-access sheet checks each EB and portal action against the roles th
 | Positive | The normal flow succeeds with valid data |
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit |
-| Security-access | Screens, documents, portal records and API calls are open only to the roles and party that allow them; segregation of duties |
+| Security-access | Screens, documents, portal records and system functions are open only to the roles and party that allow them; segregation of duties |
 | Workflow | A stage transition of the EB cycle, franchise, member change, SOA or portal upload; a job run |
 | Report-output | Reports, the comparative and exports; content checked against the data |
 | Upload-download | Portal and internal uploads, protected e-mails and downloads |

@@ -70,7 +70,7 @@ screens:
   PMEMBERS: Partner portal > Members (client HR)
   PUPLOADS: Partner portal > Uploads (client HR)
   PCOMP: Partner portal > Comparative (client HR)
-  API: Direct request outside the screens, signed in as the persona (test lead tool)
+  SYS: System function check outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-EB-01
@@ -113,7 +113,7 @@ scenarios:
     pre: Users TD-EB-01; documents TD-EB-04.
   - id: SC-EB-02
     persona: INSURER_USER
-    title: Partner portal. Portal users are provisioned through User Access requests, sign in to a separate realm, see only their own party, and every upload is staged, scanned and validated before it takes effect.
+    title: Partner portal. Portal users are provisioned through User Access requests, sign in to a separate portal, see only their own party, and every upload is staged, scanned and validated before it takes effect.
     pre: Portal users TD-EB-02 requested by eb.ao1.
   - id: SC-EB-03
     persona: EB_AO
@@ -178,7 +178,7 @@ frs:
       - c: 3
         type: Security-access
         persona: INSURER_USER
-        screen: API
+        screen: SYS
         brd: [BRID-005]
         title: Portal sign-in refused by the core BIBS services
         steps:
@@ -252,7 +252,7 @@ frs:
         expected: Version 2 is current; the changed items are highlighted.
       - c: 3
         type: Security-access
-        screen: API
+        screen: SYS
         title: History and versions cannot be changed
         steps:
           - Look for edit on the History tab and on version 1; send a direct request to change version 1.
@@ -309,7 +309,7 @@ frs:
         expected: The portal home lists INS-B's open tasks only.
       - c: 2
         type: Security-access
-        screen: API
+        screen: SYS
         brd: [BRID-005.01]
         title: Record of another insurer
         steps:

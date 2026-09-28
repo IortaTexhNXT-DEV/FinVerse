@@ -228,7 +228,7 @@ main_flow:
   - BIBS shows the menu groups and screens those permissions open.
   - The user opens a screen; BIBS checks the permission again on every call.
 alternate_flows:
-  - Screen opened by URL without permission. BIBS shows "You do not have access to this screen. Contact your administrator if you need it." and the API refuses the call.
+  - Screen opened by URL without permission. BIBS shows "You do not have access to this screen. Contact your administrator if you need it." and BIBS refuses the action, also when it is sent outside the screens.
 rules:
   - [R1, "Roles and their permissions are changed only through an approved User Access request (BRD-11).", Configurable, User Access requests]
   - [R2, "A screen without a permission of the user is never shown, even if the user knows its address.", Fixed, "-"]
@@ -328,7 +328,7 @@ actor: System; every user
 priority: Must have
 screens: Notification bell; My Work; Notification preferences (profile)
 description:
-  - Workflow steps, approvals, returns, SLA breaches and job failures create in-system notifications for the users or roles concerned; selected events are also e-mailed through the outbox (for example remittance schedules and confirmations, BR-083).
+  - Workflow steps, approvals, returns, SLA breaches and job failures create in-system notifications for the users or roles concerned; selected events are also e-mailed (for example remittance schedules and confirmations, BR-083).
   - Users choose in their profile which notifications they also receive by e-mail, within the events their roles allow.
 preconditions:
   - The event is defined in the notification set of its module.
@@ -337,7 +337,7 @@ main_flow:
   - BIBS creates a notification for the assigned user or the holders of the approving permission.
   - BIBS queues the e-mail when the event and the user's preference require it; the dispatch job sends it and logs the result.
 alternate_flows:
-  - E-mail delivery fails. The outbox retries and the failure is shown in the message log; the in-system notification stays.
+  - E-mail delivery fails. BIBS retries and the failure is shown in the message log; the in-system notification stays.
 rules:
   - [R1, "Notification events per module are those of the function FRS; the per-role catalogue is part of deliverable 15.", Configurable, Notification preferences and module parameters]
   - [R2, "Outbound documents that leave BDOI are password protected (FR-CR-071).", Fixed, "-"]
@@ -346,7 +346,7 @@ validations:
 notifications:
   - This FR is the notification service itself.
 audit:
-  - Every e-mail attempt is logged in the outbox with recipients, time and result.
+  - Every e-mail attempt is logged with recipients, time and result.
 acceptance:
   - Submitting a request for approval notifies the approvers in the bell within one minute.
   - A user who switched off e-mail for an event still sees it in the bell.
@@ -367,7 +367,7 @@ preconditions:
   - None.
 main_flow:
   - A user performs an action.
-  - BIBS records the audit entry in the same transaction as the change.
+  - BIBS records the audit entry together with the change; one is never kept without the other.
   - An authorised user searches the audit trail by user, record type, action and date, and exports the result.
 alternate_flows:
   - The action fails. No audit entry of the change is written; failed log-ins are recorded.
@@ -399,13 +399,13 @@ preconditions:
   - The master entity is registered in the change-log list.
 main_flow:
   - A user changes a master record (directly or through an approved request).
-  - BIBS writes one log line per changed field in the same transaction.
+  - BIBS writes one log line per changed field together with the change; one is never kept without the other.
   - An authorised user opens the Master Data Change Log, filters by master type, record, user and date, and exports it.
 alternate_flows:
   - Change rejected by the approver. Nothing is logged as changed; the rejection is in the audit trail.
 rules:
   - [R1, "Registered master types are listed in section 9 (default); BDOI confirms the list (CRQ07).", Configurable, Change-log registration]
-  - [R2, "Values of secret fields (passwords, tokens) are never logged; the log shows 'changed'.", Fixed, "-"]
+  - [R2, "Values of secret fields (passwords, access keys) are never logged; the log shows 'changed'.", Fixed, "-"]
   - [R3, "Retention as the audit trail (FR-CR-030 R2).", Configurable, Retention rules]
 validations:
   - [No filter on a range longer than 12 months, Narrow the date range to 12 months or less, "-"]
@@ -680,7 +680,7 @@ description:
   - A catalogue names each MIS field per core entity (user, product, insurer, claim, policy / account, transaction) with its business label, data type, list of values and the data it reads. It is delivered with the fields of BR-173 (product type, risk code, market segment, booking date, policy number, insurer, branch, account officer, status, transaction type, chart of account) and the MIS columns of the Report List (region, area, unit head, department, business origin).
   - Reports, dashboard widgets and exports offer the active MIS fields of their entity for filtering, grouping and export, with the same labels everywhere.
 preconditions:
-  - The field's data exists in BIBS; the catalogue does not create database columns (CRQ09).
+  - The field's data exists in BIBS; the catalogue does not create new data fields (CRQ09).
 main_flow:
   - The System Administrator adds or changes a catalogue entry and activates it.
   - Report users find the field in the filters and the Layout panel of the reports of that entity.
@@ -803,7 +803,7 @@ actor: System; System Administrator (configuration)
 priority: Must have
 screens: My Work; workflow panels of the records
 description:
-  - Each business record moves through stages defined as data (stages, transitions, roles, SLA). A completed step places the record in the next queue and notifies it; other modules receive business events (for example invoice booked, receipt issued, client changed) through the event outbox.
+  - Each business record moves through stages defined as data (stages, transitions, roles, SLA). A completed step places the record in the next queue and notifies it; other modules receive business events (for example invoice booked, receipt issued, client changed).
   - Files for other BDOI systems are handed to ports; their transport is configured when BDOI names the systems (Q08, PQ16).
 preconditions:
   - The workflow of the record type is defined.
@@ -811,7 +811,7 @@ main_flow:
   - A user completes a step.
   - BIBS applies the transition, assigns the next queue and publishes the business event.
 alternate_flows:
-  - Receiving system unavailable. The event stays in the outbox and is retried; failures go to the dead-letter log for support.
+  - Receiving system unavailable. The event is kept and sent again; events that still fail are listed for support.
 rules:
   - [R1, "Stages, roles and SLAs are maintained as configuration; a new stage or rule does not need a release.", Configurable, Workflow definitions]
 validations:
@@ -832,7 +832,7 @@ actor: System; Processing and Comptrollership (view)
 priority: Must have
 screens: Insurer Invoice Batches (Client & Policy > Booking)
 description:
-  - Today each service invoice is e-mailed to the insurer. A daily job (after booking closes, default 20:00) also creates for each insurer one batch of that day's service invoices (merged PDF, or ZIP with a manifest), stores it and delivers it through the insurer's configured channel. The SFTP channel is added when BDOI supplies the SFTP addresses (CRQ18). A delivery report lists each batch, invoice count, amount, channel and result.
+  - Today each service invoice is e-mailed to the insurer. A daily job (after booking closes, default 20:00) also creates for each insurer one batch of that day's service invoices (merged PDF, or ZIP with a manifest), stores it and delivers it through the insurer's configured channel. The file transfer channel is added when BDOI supplies the file transfer addresses of the insurers (CRQ18). A delivery report lists each batch, invoice count, amount, channel and result.
 preconditions:
   - Service invoices were issued for the insurer that day.
 main_flow:
@@ -989,7 +989,7 @@ main_flow:
 alternate_flows:
   - Deviation that needs a BDOI decision (for example an icon not yet supplied). It is logged in the register and closed after CRQ17.
 rules:
-  - [R1, "Brand tokens are defined once and used by screens, documents and exports.", Fixed, "-"]
+  - [R1, "Brand colours, fonts and logos are defined once and used by screens, documents and exports.", Fixed, "-"]
 validations:
   - [None, "-", "-"]
 notifications:
@@ -1040,14 +1040,14 @@ The umbrella BRD has requirements that no function BRD owns, or that conflict wi
 | CLR-CR-03 | CSF case resolution (CORE-16.06) | Out of phase 1; case logging stays in SharePoint. | BRD-9 keeps case logging in SharePoint (CRQ04). | Confirm (CRQ04). |
 | CLR-CR-04 | Master data change log (CORE-17.01; FR-CR-031) | A field-level log of registered master data. | No function BRD owns the log. | Confirm the master data in the log (CRQ07). |
 | CLR-CR-05 | Insurer management (CORE-17.02; FR-CR-061) | An insurer page with the attributes the function BRDs do not hold. | No function BRD owns the insurer record. | Confirm the insurer attributes (CRQ08). |
-| CLR-CR-06 | MIS field definition (CORE-17.04; FR-CR-062) | A catalogue names the MIS fields of the existing data; users do not add database fields. | No function BRD owns MIS fields. | Confirm the catalogue (CRQ09). |
+| CLR-CR-06 | MIS field definition (CORE-17.04; FR-CR-062) | A catalogue names the MIS fields of the existing data; users do not add data fields. | No function BRD owns MIS fields. | Confirm the catalogue (CRQ09). |
 | CLR-CR-07 | Report customisation (CORE-21.04; FR-CR-042) | The user saves the layout of a report in a variant. | No function BRD owns report customisation. | Confirm the variants. |
 | CLR-CR-08 | Scheduled reports (CORE-21.05; FR-CR-043) | The user subscribes to a report with a schedule and recipients (at most 20 active subscriptions per user by default). | No function BRD owns report scheduling. | Confirm the subscriptions. |
 | CLR-CR-09 | Emerging capabilities (CORE-18.01) | Not in scope until BDOI lists them. | The capability is not defined (CRQ10). | List the capabilities (CRQ10). |
 | CLR-CR-10 | ALeA e-mail address encoding (XC-21) | Not in scope until the requirement is defined. | The requirement is not defined (CRQ20). | Define the requirement (CRQ20). |
 | CLR-CR-11 | Role dashboards (XC-02; FR-CR-010, 011) | Each role has a home page with its counts and queues, refreshed every 5 minutes by default. | The umbrella asks for centralised dashboards for all roles; the contents per role are open (CRQ06). | Define the dashboard contents per role (CRQ06). |
 | CLR-CR-12 | Invoice Master List (XC-13; FR-CR-090) | The Invoice Master List columns are added to the invoice ledger view. | No function BRD owns the list. | Confirm the columns. |
-| CLR-CR-13 | Insurer invoice batch (XC-19; FR-CR-081) | A daily batch per insurer of the day's service invoices, stored and delivered through the insurer's channel; the SFTP channel is added when BDOI supplies the addresses. | The file format and whether the batch replaces the e-mail are open (CRQ18). | Answer CRQ18. |
+| CLR-CR-13 | Insurer invoice batch (XC-19; FR-CR-081) | A daily batch per insurer of the day's service invoices, stored and delivered through the insurer's channel; the file transfer channel is added when BDOI supplies the addresses. | The file format and whether the batch replaces the e-mail are open (CRQ18). | Answer CRQ18. |
 | CLR-CR-14 | Client migration and daily client batches (XC-20; FR-CR-082) | Clients are loaded and fed through the Data Migration programme with the duplicate check. | The migration scope and coexistence are decided by the Data Migration BRD (CRQ19). | Confirm (CRQ19). |
 | CLR-CR-15 | SOA at booking (XC-10; FR-CR-093) | Booking issues the service invoice; the SOA is issued at booking once BDOI says which SOA is meant. | The SOA of the placement report and booking is open (CRQ12). | Answer CRQ12. |
 | CLR-CR-16 | Directory sign-in (FR-CR-070) | Users sign in with user ID and password; directory sign-in is added when BDO supplies the interface. | Cross-BRD decision D6. | Confirm decision D6. |
@@ -1067,7 +1067,7 @@ Phase 1 keeps these points open so that the phase 2 module can reuse them: party
 | Response time | Under 5 seconds for every role | 2 s (BRD-12) to 10 s (BRD-1, BRD-6, BRD-11); reports 20 s to 15 min | p95 under 2 s for screens; reports and batches as jobs with progress (CRQ21) |
 | Volumes | Per BRD (p.42-45), e.g. NB 21,200 a month per transaction type, RMEL 25,800, CSF 144,400 a year, CMS reports 60,000 weekly | Same values in the BRDs | Sized in the performance plan (deliverable 28) |
 | Peak, availability, maintenance, BCP | "Refer to BRD" | 99.9%-99.99%; windows differ | Register proposal: 99.9% in service hours 06:00-22:00 Mon-Sat, maintenance 00:00-04:00, RTO 4 h |
-| Retention | Application, database and audit logs, historical data: 5 years online, 15 years offline | BRD-7 10 / 15; BRD-5, 10, 12 5 / 5 | Default 5 / 15 per record type through the retention rules; exceptions after CRQ22 |
+| Retention | Application, system and audit logs, historical data: 5 years online, 15 years offline | BRD-7 10 / 15; BRD-5, 10, 12 5 / 5 | Default 5 / 15 per record type through the retention rules; exceptions after CRQ22 |
 | Backup | Every 4 hours, kept 5 years | Daily to every 15 minutes; kept 5 or 7 years | Continuous log archiving plus a base backup every 4 hours, kept 7 years |
 | Anonymisation | No | - | Production data not anonymised; non-production data masked (hosting appendix) |
 | Hosting and access | - | - | AWS ap-southeast-1; access restricted to personnel in the Philippines; migration staging purged within 5 days |
@@ -1100,7 +1100,7 @@ Phase 1 keeps these points open so that the phase 2 module can reuse them: party
 | A-CR-03 | "Delete" of a prospect or a user means deactivation, with purge under the retention rules | CRQ05 |
 | A-CR-04 | Reinsurance is phase 2; the insurer-side reinsurance module is not used for BDOI | Section 6 |
 | A-CR-05 | BR-178 to BR-183 are vendor-qualification items; they are met by the design system, the alignment pass and the persona walk-throughs | XC-14 to XC-16 |
-| A-CR-06 | The MIS field catalogue names existing data; users do not add database fields | CRQ09 |
+| A-CR-06 | The MIS field catalogue names existing data; users do not add data fields | CRQ09 |
 
 ## Dependencies
 
@@ -1109,7 +1109,7 @@ Phase 1 keeps these points open so that the phase 2 module can reuse them: party
 |---|---|---|
 | D-CR-01 | BDOI defines the dashboard contents per role | FR-CR-010, 011 (CRQ06) |
 | D-CR-02 | BDOI confirms the master data in the change log and the insurer attributes | FR-CR-031, 061 (CRQ07, CRQ08) |
-| D-CR-03 | BDOI supplies the SFTP addresses of the insurers | FR-CR-081 (CRQ18) |
+| D-CR-03 | BDOI supplies the file transfer addresses of the insurers | FR-CR-081 (CRQ18) |
 | D-CR-04 | The Data Migration BRD decides the client migration scope and coexistence | FR-CR-082 (CRQ19) |
 | D-CR-05 | BDOI supplies the icon set and design files | FR-CR-092 (CRQ17) |
 | D-CR-06 | BDOI signs off the FRS of Renewal, Claims, Employee Benefits, CSF and Submitted Policies | Section 10 |
@@ -1136,7 +1136,7 @@ Phase 1 keeps these points open so that the phase 2 module can reuse them: party
 | CRQ15 | What does "Bank Account Operations" cover? | CORE-08.21 | OPEN |
 | CRQ16 | Do CSF agents also resend e-policies (BR-164)? | CORE-16.04 | OPEN |
 | CRQ17 | Supply the BDO icon set and design or Figma files | FR-CR-092 | OPEN |
-| CRQ18 | Insurer invoice batch: file format, SFTP addresses, replaces e-mail? | FR-CR-081 | OPEN |
+| CRQ18 | Insurer invoice batch: file format, file transfer addresses, replaces e-mail? | FR-CR-081 | OPEN |
 | CRQ19 | Client migration source, period (2020 to present) and duration of daily batches | FR-CR-082 | OPEN |
 | CRQ20 | What is ALeA and its "e-mail address encoding"? | CLR-CR-10 | OPEN |
 | CRQ21 | Response under 5 s for every role and 429 concurrent users: which values govern? | Section 7 | OPEN |
@@ -1364,7 +1364,7 @@ Every capability bullet and cross-cutting row of the umbrella BRD, the BRD that 
 | XC-16 | Vendor uses Figma for design execution (p.23) | BR-183 | None | - |
 | XC-17 | Regulatory compliance: BIR and Insurance Commission reportorial requirements (p.4) | - | BRD-5 FRBS 3.2.0 | FR-CR-040; FR-AC-060, FR-AC-061, FR-AC-062, FR-AC-063 |
 | XC-18 | Retail and wholesale business (p.4) | - | BRD-1 BRNB.001 | FR-CR-001; FR-NB-001 |
-| XC-19 | Invoice batch printing, delivery to insurers by SFTP and delivery report (daily, per insurer) (p.43) | - | None (BRNB.100 related) | FR-CR-081; FR-NB-117 |
+| XC-19 | Invoice batch printing, delivery to insurers by file transfer and delivery report (daily, per insurer) (p.43) | - | None (BRNB.100 related) | FR-CR-081; FR-NB-117 |
 | XC-20 | Client migration (one-time, 2020 to present) and daily midday / EOD client batches with modification report (p.43) | - | Data Migration BRD | FR-CR-082 |
 | XC-21 | ALeA e-mail address encoding (as needed) (p.43) | - | None | CLR-CR-10 (CRQ20) |
 | XC-22 | Daily synchronisation from source systems (CMS, Reinsurance) (p.42-43) | - | BRD-4 BRCLXN.013, BRCLXN.014, BRCLXN.015 | FR-CR-082; FR-CL-017 |

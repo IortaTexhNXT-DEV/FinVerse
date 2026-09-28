@@ -103,7 +103,7 @@ The roles-and-access sheet checks each Claims action against the roles that may 
 | Positive | The normal flow succeeds with valid data |
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit, and response times |
-| Security-access | Screens, buttons, records and API calls are open only to the roles that hold the permission; the status matrix; maker-checker |
+| Security-access | Screens, buttons, records and system functions are open only to the roles that hold the permission; the status matrix; maker-checker |
 | Workflow | A phase or status change of the claim, closure, reopen, reassignment, a job run |
 | Report-output | Reports and exports; content checked against the claims |
 | Upload-download | Bulk uploads, the loss advice and report downloads |
@@ -148,7 +148,7 @@ Non-production data is always masked. Client, claimant and third-party names, ad
 
 ## Named data sets
 
-The test lead prepares each set on SIT as its source column says; the ageing sets need reported dates in the past, which the test lead sets in the test database.
+The test lead prepares each set on SIT as its source column says; the ageing sets need reported dates in the past, which the test lead sets in the test environment.
 
 <!-- tp:data -->
 
@@ -220,7 +220,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 |---|---|---|
 | Screen names, labels or messages change after BDOI's review of the FRS | High | The cases name the FRS screens and texts; the test lead updates the workbook before the system test and records the changes in the document control |
 | Open questions change expected results (CLQ01 code, CLQ04 matrix and units, CLQ05 closing types, CLQ06 closure rights and ageing, CLQ15 Marketing rights) | High | The matrix, lists and roles are configuration; the cases use the proposed defaults and are re-run with BDOI's values |
-| Ageing and follow-up cases need past dates | Medium | The test lead sets reported and status dates in the test database and runs the jobs on demand |
+| Ageing and follow-up cases need past dates | Medium | The test lead sets reported and status dates in the test environment and runs the jobs on demand |
 | The Remittance feed and the BRD-1 endorsement events are needed by FR-CM-015, 016 and 046 | Medium | Run those cases after the BRD-2 remittance change is deployed; they are marked in their preconditions |
 | Insurer test mailboxes not reachable from SIT or UAT | Medium | Check the relay before the cycle; loss advice cases read the send log when the mailbox is down and are re-run later |
 | BDOI Claims testers from the branches are not available in the UAT window | Medium | Agree named testers and dates in the UAT plan (deliverable 30) |

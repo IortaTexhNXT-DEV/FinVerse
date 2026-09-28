@@ -25,7 +25,7 @@ walkthroughs:
     downstream:
       - "Every BIBS module now opens its screens to the new user according to the Marketing Account Officer profile: Clients, Quotation / Proposal, Accounts & Placement, Renewal and the reports of that profile (menu of chapter 12); nothing else is shown or accepted."
       - "The user appears in the User Access Report and in the Group Profile Membership of Marketing Account Officer, with the approver and the request number as Created by."
-      - "The change is logged once, insert-only: the access change log cannot be edited by any user."
+      - "The change is logged once: the access change log cannot be edited by any user."
 
   - id: WT-B
     title: A change and a revocation under four eyes, and a group-profile change approved in order and implemented

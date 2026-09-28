@@ -268,6 +268,13 @@ def module_slides(deck: GuideDeck, pack: signoff_pack.Pack, slides: Sequence[dic
 # ------------------------------------------------------------------ deck
 
 
+def _balanced(rows: list[Any], most: int) -> list[list[Any]]:
+    """The rows in as few slides of at most `most` rows as possible, of even length."""
+    n = max(1, -(-len(rows) // most))
+    size = -(-len(rows) // n)
+    return [rows[i:i + size] for i in range(0, len(rows), size)]
+
+
 def build(brd: str) -> Path:
     pack = signoff_pack.Pack(brand.src_dir(brand.brd_of_code(brd)) / "pack" / "pack.yaml")
     g = pack.guide
@@ -332,6 +339,35 @@ def build(brd: str) -> Path:
                    widths=[2.2, 3.4, 2.8, 3.2, 1.9], size=10)
         deck.notes("R responsible, A accountable, C consulted, I informed. The durations are indicative; the dates "
                    "are those of the Start Here guide.")
+
+    # Who signs what (ownership.yaml: the roles of the BRD approval sheet and the part of the set each signs)
+    if pack.ownership:
+        matrix = signoff_pack.owner_matrix(pack)
+        chunks = _balanced(matrix, 8)
+        for n, chunk in enumerate(chunks, start=1):
+            part = f" ({n} of {len(chunks)})" if len(chunks) > 1 else ""
+            deck.table(f"Who signs what: parts of the set{part}",
+                       ["Part of the set"] + [h for _, h in signoff_pack.MATRIX], chunk,
+                       widths=[4.0, 1.7, 2.3, 2.2, 2.4], size=9)
+            deck.notes(["The set holds business content only: screens, fields, rules, messages, notifications, "
+                        "documents, walkthroughs and reports. Business users sign the business content; BDOI IT reviews "
+                        "the interfaces, the user access and the Technical Specification, a separate document that "
+                        "holds the technical content; the Program Manager of Business Project Services reviews the "
+                        "traceability and the completeness; the Product Owner approves the whole set; iorta TechNXT "
+                        "prepares it.",
+                        f"The roles are those of the BRD approval sheet ({pack.ownership['source']})."])
+        people = signoff_pack.owner_signatories(pack)
+        chunks = _balanced(people, 10)
+        for n, chunk in enumerate(chunks, start=1):
+            part = f" ({n} of {len(chunks)})" if len(chunks) > 1 else ""
+            deck.table(f"Who signs what: signatories{part}",
+                       ["Capacity", "Role", "Confirms by signing"],
+                       [[r["capacity"], f"{r['role']} ({r['org']})", r["confirms"]] for r in chunk],
+                       widths=[1.9, 4.6, 6.1], size=9)
+            deck.notes(["The certificate sheet of the workbook lists the same signatories in the same order: prepared "
+                        "by, input provided by, reviewed by, approved by, as on the BRD approval sheet. A role the set "
+                        "adds to the approval sheet is marked there."] +
+                       [f"{r['role']}: {r['sheet']}." for r in chunk])
 
     # 8. Workbook
     wbm = m.get("workbook") or {}

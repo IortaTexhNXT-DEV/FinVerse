@@ -48,8 +48,8 @@ screens:
   JOBS: Administration > Scheduled Jobs
   NOTIF: Notifications (bell icon in the page header)
   MAIL: Test mailbox of the recipient
-  DB: Database console of the test environment (database administrator)
-  API: Direct request outside the screens, signed in as the persona (test lead tool)
+  ADMIN_TOOLS: Administration tools of the test environment (infrastructure administrator)
+  SYS: System function check outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-UA-01
@@ -112,7 +112,7 @@ scenarios:
     pre: Group-profile request FOR_IMPLEMENTATION of TD-UA-02.
   - id: SC-UA-07
     persona: AUDITOR
-    title: Reports and logs. The four access reports and the insert-only access-change log.
+    title: Reports and logs. The four access reports and the access-change log that no user can change.
     pre: Scenarios SC-UA-02 to SC-UA-06 ran in the test period.
   - id: SC-UA-08
     persona: SYSTEM
@@ -246,8 +246,8 @@ frs:
         pre: AUTH_MODE = DIRECTORY; the test directory of TD-UA-07 answers.
         steps:
           - Enter the Windows ID of requestor and the test directory password.
-          - As the database administrator check the password column of requestor.
-        expected: The home page opens with the Requestor menu; no password is stored for requestor.
+          - As the infrastructure administrator check the stored sign-in data of requestor.
+        expected: The home page opens with the Requestor menu; no password is kept for requestor.
       - c: 2
         type: Negative
         title: Directory refuses the password
@@ -304,9 +304,9 @@ frs:
       - c: 3
         type: Negative
         screen: Sign-in of an ended session
-        title: Token of an ended session
+        title: Action of an ended session
         steps:
-          - Keep the sign-in of requestor; log out; send a direct request with the old sign-in.
+          - Keep the sign-in of requestor; log out; repeat an action of the old session outside the screens.
         expected: The request is refused.
 
   FR-UA-005:
@@ -371,7 +371,7 @@ frs:
         neg: true
         screen: LOGIN
         title: Password 90 days old
-        pre: The password date of requestor is set 90 days back in the test database.
+        pre: The password date of requestor is set 90 days back in the test environment.
         steps:
           - Log in as requestor.
         expected: BIBS asks for a new password before opening the home page.
@@ -413,7 +413,7 @@ frs:
       - c: 1
         type: Workflow
         title: Dormant user deactivated
-        pre: The test lead sets the last sign-in of subject user a013000104 to 91 days ago (database console).
+        pre: The test lead sets the last sign-in of subject user a013000104 to 91 days ago (administration tools of the test environment).
         steps:
           - As admin run UAM_DORMANT_USERS from Scheduled Jobs.
           - As requestor open Access Requests; as a013000104 try to sign in.
@@ -461,7 +461,7 @@ frs:
       - c: 2
         type: Security-access
         persona: UAM_REQUESTOR
-        screen: API
+        screen: SYS
         title: Another Requestor cannot open the draft
         steps:
           - As requestor2 open the address of requestor's draft; send a direct request to edit it.
@@ -564,7 +564,7 @@ frs:
         expected: UAT_INACTIVE is not listed.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Inactive profile sent by a direct request
         steps:
           - Submit an enrolment with profile UAT_INACTIVE by a direct request.
@@ -610,7 +610,7 @@ frs:
         msg: [The request does not change the user]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Unknown user
         steps:
           - Submit a Modify user request for user "nosuchuser" by a direct request.
@@ -658,7 +658,7 @@ frs:
         expected: The disabled user is not offered.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Already deactivated user by a direct request
         steps:
           - Submit a deactivation of the disabled user by a direct request.
@@ -689,7 +689,7 @@ frs:
         expected: The account is unlocked and the user signs in.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Active user
         steps:
           - Submit a reactivation of requestor by a direct request.
@@ -730,7 +730,7 @@ frs:
         msg: [Select the approver]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Subject user as approver by a direct request
         steps:
           - Submit a Modify user request for uamapprover with approver uamapprover.
@@ -769,7 +769,7 @@ frs:
       - c: 3
         type: Security-access
         persona: UAM_APPROVER
-        screen: API
+        screen: SYS
         title: Correction by another user
         steps:
           - As uamapprover send a direct request to re-submit the returned request.
@@ -803,7 +803,7 @@ frs:
         expected: The request is CANCELLED and the change is not applied.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Cancel an applied request
         steps:
           - Call Cancel on the APPROVED request.
@@ -1174,7 +1174,7 @@ frs:
         expected: The code is refused (at most 40 characters).
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Unknown permission
         steps:
           - Submit a create request with permission UAT_NO_SUCH by a direct request.
@@ -1182,7 +1182,7 @@ frs:
         msg: ["Unknown permission(s): {UAT_NO_SUCH}"]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Too many permissions
         steps:
           - Submit a create request with more permissions than one request allows.
@@ -1451,7 +1451,7 @@ frs:
       - c: 2
         type: Security-access
         persona: UAM_APPROVER
-        screen: API
+        screen: SYS
         title: Cancel without UAM_CANCEL
         steps:
           - As uamapprover (no UAM_CANCEL) open an own request; send a direct request to cancel it.
@@ -1723,11 +1723,11 @@ frs:
   FR-UA-064:
     scenario: SC-UA-07
     persona: SYSTEM
-    screen: DB
+    screen: ADMIN_TOOLS
     data: [TD-UA-01]
     conditions:
       - Each attribute of a modified user has one log row with from and to values and the request number, written with the change.
-      - A database update or delete of a log row is refused.
+      - An attempt to change or delete a log entry outside the screens is refused.
     cases:
       - c: 1
         type: Positive
@@ -1739,10 +1739,10 @@ frs:
         expected: Two rows, e-mail and branch, each with from, to, request number, done by and approved by.
       - c: 2
         type: Negative
-        title: Database update of a log row
+        title: Change of a log entry outside the screens
         steps:
-          - As the database administrator run an UPDATE and a DELETE on a row of the access-change log.
-        expected: The database refuses both.
+          - As the infrastructure administrator try to change and then to delete an entry of the access-change log directly.
+        expected: Both attempts are refused and the entry is unchanged.
 
   FR-UA-070:
     scenario: SC-UA-08
@@ -1790,7 +1790,7 @@ frs:
         type: Negative
         screen: MAIL
         title: Failed run e-mailed
-        pre: The test lead makes the job fail (for example by revoking its database grant on the test environment).
+        pre: The test lead makes the job fail (for example by withdrawing its access to the records it updates in the test environment).
         steps:
           - Run UAM_EFFECTIVE_CHANGES; open the recipients' mailbox and the bell.
         expected: The e-mail gives the job, time and error; alert JOB_FAILURE is raised.

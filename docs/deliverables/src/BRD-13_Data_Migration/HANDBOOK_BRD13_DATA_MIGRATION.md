@@ -26,10 +26,11 @@ control:
     date: 5 Oct 2026
     author: iorta TechNXT Business Analysis and Solution Architect
     reviewer: iorta TechNXT Project Manager
-    approver: "Program Manager, Business Project Services (at sign-off)"
+    approver: "Product Owner, Marketing Business System (at sign-off)"
     change: "One handbook for the business sign-off of BRD-13: Part A strategy and approach, Part B functional specification of the Migration Console with one specification per screen (screenshots, fields, actions, rules, messages, outcome), the markers of migrated data and the legacy batches, Part C reconciliation and the sign-off gates per object, Part D the cut-over runbook, run-off and decommissioning; the proposed business rules and clarifications for confirmation"
 distribution:
-  - {name: "Program Manager, Business Project Services", role: "Business owner of BRD-13 and approver", organisation: BDO Unibank ESG, purpose: "Sign-off; owner of the cut-over"}
+  - {name: "Product Owner, Marketing Business System", role: Approver of the set, organisation: BDOI, purpose: "Sign-off (owns the set and approves all of its contents)"}
+  - {name: "Program Manager, Business Project Services", role: "BRD author; reviewer of traceability and completeness", organisation: BDO Unibank ESG, purpose: "Review; owner of the cut-over"}
   - {name: "Head, Comptrollership; Product Owners FRBS / ACSL and Disbursement", role: Approver, organisation: BDOI, purpose: "Open items, GL opening, legacy accounts, reconciliation, opening-balance adjustments"}
   - {name: "Head, Operations; Operations - Financial Transactions, Cashiering, Remittance, Collections", role: Data owners, organisation: BDOI, purpose: "Insurers, policy headers, legacy invoices, unapplied payments, collection state"}
   - {name: "Product Owner, Marketing Business System; Heads of Retail and Corporate Marketing; TSU", role: Data owners, organisation: BDOI, purpose: "Reference data, clients, packages, renewal transition"}
@@ -331,7 +332,7 @@ Figure 1 shows the steps every object goes through, and who does each step.
 | 8 | Load | Approved batches load through the BIBS services (G4) | Data Migration Lead approves; iorta runs | Run log of the batch; Rejected Rows report |
 | 9 | Reconciliation | L1 counts, L2 amounts, L3 hash totals, L4 fields, L5 GL; breaks explained (G5) | Reconciliation approver | Reconciliation Summary and Migration Clearing reports |
 | 10 | Acceptance | Business owner checks samples on the BIBS screens and accepts the object (G6) | Business owner; Data Migration Lead | Sign-off form |
-| 11 | Purge | Staging payloads and files are deleted within 5 days of sign-off; counts, hashes and totals are kept | BIBS (daily staging purge) | Purge date on the batch |
+| 11 | Purge | Staged records and files are deleted within 5 days of sign-off; counts, hashes and totals are kept | BIBS (daily staging purge) | Purge date on the batch |
 
 ## Extract templates
 
@@ -441,9 +442,9 @@ Pairs scoring 90 or more merge automatically; 60 to 89 go to the data steward's 
 
 ## Load through the BIBS services
 
-An approved batch is loaded in chunks of 500 rows, four partitions in parallel, one transaction per chunk; a failing chunk is retried row by row so one bad row fails alone. Loading the same batch again creates no duplicate: rows already loaded and unchanged are skipped through the key cross-reference. The planning target is 50,000 rows an hour per partition, proven in the dress rehearsal.
+An approved batch is loaded in chunks of 500 rows, four at a time; each chunk is saved as a whole; a failing chunk is retried row by row so one bad row fails alone. Loading the same batch again creates no duplicate: rows already loaded and unchanged are skipped through the key cross-reference. The planning target is 50,000 rows an hour per partition, proven in the dress rehearsal.
 
-Before sign-off a batch can be rerun (only the rejected rows, after a fix) or rolled back (the records it created are undone through the BIBS services, unless a record was changed in BIBS since the load). In the production cut-over the rollback point is a database snapshot (chapter Cut-over strategy, Rollback).
+Before sign-off a batch can be rerun (only the rejected rows, after a fix) or rolled back (the records it created are undone through the BIBS services, unless a record was changed in BIBS since the load). In the production cut-over the rollback point is a full backup (snapshot) of the production system (chapter Cut-over strategy, Rollback).
 
 ## Reconciliation and sign-off
 
@@ -698,7 +699,7 @@ GNG-1 (T-15, start the pre-load) and GNG-2 (T-5, enter the freeze) are in Part D
 
 ## Rollback
 
-Until the go / no-go decision the rollback is a restore of the production database snapshot taken at the start of the production load, and legacy is reopened for business on Monday. After go-live, until the point of no return at 18:00 on the first business day, the same restore is possible with re-keying in legacy of the transactions keyed in BIBS that day. After the point of no return, issues are fixed forward in BIBS (DMQ32, DCR-200). The steps are in Part D.
+Until the go / no-go decision the rollback is a restore of the production backup (snapshot) taken at the start of the production load, and legacy is reopened for business on Monday. After go-live, until the point of no return at 18:00 on the first business day, the same restore is possible with re-keying in legacy of the transactions keyed in BIBS that day. After the point of no return, issues are fixed forward in BIBS (DMQ32, DCR-200). The steps are in Part D.
 
 ## Hypercare
 
@@ -721,10 +722,10 @@ The migration follows the hosting appendix (R7) and the security controls of BIB
 |---|---|
 | Hosting | All migration data (intake bucket, staging, archive) is in the BIBS environment in AWS ap-southeast-1 |
 | Masked non-production data | Every non-production environment (SIT, UAT, dress rehearsal) receives data masked at intake; unmasked extracts never leave production |
-| Staging purge within 5 days | Staging payloads and extract files are deleted within 5 days of the batch sign-off or rollback, or of an extract rejection (daily staging purge and a lifecycle rule on the intake bucket); an alert is raised when a signed-off batch still has payloads after the limit. Counts, hashes and totals are kept as evidence |
-| Access restricted to the Philippines | The Migration Console, staging and the intake bucket are reachable only by migration roles and only from the Philippines (network allow-list and VPN at the infrastructure layer) |
-| Encrypted transfer and storage | Files move through the console (TLS) or the secure file drop; at rest they are encrypted with managed keys; never by e-mail or removable media |
-| Access logging | Every console action (upload, validation, load, rerun, rollback, reconciliation, sign-off, decision) is audited; every access to archived history is written to the append-only legacy access log |
+| Staging purge within 5 days | Staged records and extract files are deleted within 5 days of the batch sign-off or rollback, or of an extract rejection (daily purge of the staging area and of the file intake area); an alert is raised when a signed-off batch still has staged records after the limit. Counts, hashes and totals are kept as evidence |
+| Access restricted to the Philippines | The Migration Console, the staging area and the file intake area are reachable only by migration roles and only from the Philippines (network restrictions of the infrastructure team, specified in the Technical Specification, reviewed by BDOI IT) |
+| Encrypted transfer and storage | Files move through the console or the secure file drop over encrypted connections; stored files are encrypted; never by e-mail or removable media |
+| Access logging | Every console action (upload, validation, load, rerun, rollback, reconciliation, sign-off, decision) is audited; every access to archived history is written to the legacy access log, which no user can change |
 | Segregation of duties | The maker of a decision, map version, load or rollback never approves it; the operator of a batch cannot sign its reconciliation or acceptance |
 | Least privilege | Migration roles are granted through User Access requests for the migration period and removed at hypercare exit |
 
@@ -1245,7 +1246,7 @@ preconditions:
 main_flow:
   - The Data Migration Lead reviews the counts and clicks **Approve Load**.
   - The operator clicks **Load**, or the cutover plan starts it.
-  - BIBS loads Valid and Warning rows in chunks, several partitions in parallel, and marks each row Loaded, Skipped (already loaded, unchanged) or Rejected (with the reason).
+  - BIBS loads Valid and Warning rows in chunks, several at a time, and marks each row Loaded, Skipped (already loaded, unchanged) or Rejected (with the reason).
   - BIBS sets the batch Loaded or Loaded with rejects and starts the reconciliation (FR-DM-020).
 alternate_flows:
   - A chunk fails. BIBS retries its rows one by one so that one bad row fails alone.
@@ -2323,7 +2324,7 @@ main_flow:
   - The reviewer opens the log and filters by user, date, action or record.
   - BIBS shows the entries; the reviewer exports them.
 rules:
-  - [R1, "The log is append-only.", Fixed, "-"]
+  - [R1, "Entries can only be added; no entry can be changed or deleted.", Fixed, "-"]
   - [R2, "An alert is raised when a user exports more than the unusual-export alert limit rows in a day (default 5,000).", Configurable, "Parameters: the unusual-export alert limit"]
 validations:
   - [Access without permission, You are not permitted to perform this action, ACCESS_DENIED]
@@ -2386,7 +2387,7 @@ preconditions:
 main_flow:
   - BIBS computes the criteria and shows each with its value and status.
   - The board decides GO or NO-GO with a comment.
-  - On NO-GO the fallback task starts - the database is restored to the rollback snapshot and legacy is reopened.
+  - On NO-GO the fallback task starts - BIBS is restored to the rollback backup (snapshot) and legacy is reopened.
 rules:
   - [R1, "GO is possible only when every mandatory criterion is met; a board member may record a waiver of a non-mandatory criterion with a reason.", Configurable, "Go / no-go criteria"]
   - [R2, "Point of no return - end of the first business day after go-live (DMQ32).", Configurable, "Cutover plan"]
@@ -2677,7 +2678,7 @@ The BRD refers every usage table to "the consolidated NFR requirements for BDO I
 | Staging security | Hosting appendix | Masked data outside production; staging and files purged within 5 days of sign-off; access only for migration roles and from the Philippines; encryption at rest and in transit |
 | Audit | Not given | Every intake, validation, load, rerun, rollback, reconciliation, sign-off and archive access is audited |
 | Retention | Consolidated NFR; umbrella p.45 (5 years online, 15 years archive) | Archive and access log by retention rule; migration evidence kept as project records (proposed 10 years) |
-| Availability and recovery | Consolidated NFR | Same as BIBS; database snapshot before each production load gate |
+| Availability and recovery | Consolidated NFR | Same as BIBS; full backup (snapshot) of production before each production load gate |
 
 # Configuration items
 
@@ -3200,7 +3201,7 @@ phase: H
 
 # Rollback
 
-The rollback returns BDOI to legacy with no loss of data. It is available until the point of no return, the end-of-day review on T at 18:00 (DMQ32). The rollback point is the production database snapshot taken at T-2 02:00 (task CT-040), before any open item, header or trial balance is loaded; reference data and clients pre-loaded before it stay loaded and are harmless because legacy stays the system of record until go-live.
+The rollback returns BDOI to legacy with no loss of data. It is available until the point of no return, the end-of-day review on T at 18:00 (DMQ32). The rollback point is the production backup (snapshot) taken at T-2 02:00 (task CT-040), before any open item, header or trial balance is loaded; reference data and clients pre-loaded before it stay loaded and are harmless because legacy stays the system of record until go-live.
 
 ```pack
 plugin: build_dm_pack.py

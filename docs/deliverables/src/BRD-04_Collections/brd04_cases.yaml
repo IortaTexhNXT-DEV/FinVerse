@@ -72,7 +72,7 @@ screens:
   REPORTS: Reports > Report Centre (category Collections)
   ALERTS: Alerts (home section and bell icon in the page header)
   INV360: Operations > Invoice 360
-  API: Direct request outside the screens, signed in as the persona (test lead tool)
+  SYS: System function check outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-CL-01
@@ -178,7 +178,7 @@ frs:
       - c: 1
         type: Security-access
         persona: DISBURSEMENT
-        screen: API
+        screen: SYS
         title: Disbursement user cannot record a disposition by a direct request
         steps:
           - Signed in as disb, send a direct request to record the disposition "Coordinate further" for an open account.
@@ -262,7 +262,7 @@ frs:
         expected: The promise is CANCELLED and shows mkttl as the user of the last update, with the time.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: The recorder cannot be sent in the request
         steps:
           - Signed in as clxhandler, send a direct request to log an effort with the recorder set to mkttl.
@@ -310,7 +310,7 @@ frs:
       - c: 4
         type: Security-access
         persona: SYSADMIN
-        screen: API
+        screen: SYS
         title: Audit rows cannot be changed or deleted
         steps:
           - Open the History tab of an account and look for edit or delete actions.
@@ -538,7 +538,7 @@ frs:
         msg: ["{CLX_EDIT_LOCK_MINUTES} must be between {1} and {240}", "-"]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: A parameter of another module cannot be changed here
         steps:
           - Signed in as clxuh, send a direct request to set the parameter LOGIN_MAX_FAILED_ATTEMPTS to 5 from Collections Setup.
@@ -706,7 +706,7 @@ frs:
         type: Negative
         screen: ALERTS
         title: A failed run raises the alert
-        pre: The test lead makes the run fail on SIT (for example by stopping the database connection pool of the job).
+        pre: The test lead makes the run fail on SIT (for example by stopping the connection of the job to its records).
         steps:
           - Run CLX_DAILY_REFRESH.
           - Open the job run history and the alerts.
@@ -730,7 +730,7 @@ frs:
       - c: 4
         type: Security-access
         persona: MKT_AO
-        screen: API
+        screen: SYS
         title: Whole refresh needs CLX_SETUP
         steps:
           - Signed in as ao, send a direct request to refresh the whole worklist.
@@ -764,7 +764,7 @@ frs:
         expected: The current disposition is Request bank AO assistance; Coordinate further stays on the tab marked superseded.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: No delete of a disposition
         steps:
           - Signed in as clxhandler, send a direct request to delete a disposition of an account.
@@ -894,7 +894,7 @@ frs:
         msg: ["{disb} is not an active collection handler", CLX_HANDLER_NOT_ELIGIBLE]
       - c: 4
         type: Negative
-        screen: API
+        screen: SYS
         title: Kind missing
         steps:
           - Send a direct request to reassign accounts with accounts, reason and handler but no kind.
@@ -924,7 +924,7 @@ frs:
       - c: 2
         type: Negative
         persona: MKT_COLLECTION
-        screen: API
+        screen: SYS
         title: Value ended yesterday is refused
         pre: The test lead ends "Request bank AO assistance" yesterday.
         steps:
@@ -950,7 +950,7 @@ frs:
         msg: ["'{D}' is not a valid {category}", CLX_LOV_ATTRIBUTE_VALUE]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Unknown attribute of a value
         steps:
           - Send a direct request to set the attribute colour on a value of CLX_PR_DISPOSITION.
@@ -1003,7 +1003,7 @@ frs:
         type: Boundary
         neg: true
         persona: MKT_TL
-        screen: API
+        screen: SYS
         title: 501 accounts in one action
         steps:
           - Send a direct request to record one disposition for 501 invoice numbers.
@@ -1019,7 +1019,7 @@ frs:
         msg: [Updating several accounts at once needs CLX_BULK_UPDATE, CLX_BULK_NOT_ALLOWED]
       - c: 4
         type: Negative
-        screen: API
+        screen: SYS
         title: Disposition on a completed account
         steps:
           - POST a disposition for an account of Completed Collections.
@@ -1027,7 +1027,7 @@ frs:
         msg: ["{invoice} is {COMPLETED}", CLX_ITEM_CLOSED]
       - c: 4
         type: Negative
-        screen: API
+        screen: SYS
         title: No account selected
         steps:
           - POST a disposition with an empty invoice list.
@@ -1035,7 +1035,7 @@ frs:
         msg: [Select at least one account, CLX_NO_ACCOUNT]
       - c: 4
         type: Negative
-        screen: API
+        screen: SYS
         title: Account of another company
         pre: An invoice of the second seed company.
         steps:
@@ -1120,7 +1120,7 @@ frs:
         msg: [Give the check amount, CLX_PICKUP_AMOUNT]
       - c: 5
         type: Negative
-        screen: API
+        screen: SYS
         title: 2307 path other than CASH or CERTIFICATE
         steps:
           - POST "PR 2307 for reversal" with path CHECK.
@@ -1166,7 +1166,7 @@ frs:
         expected: The account shows category C and the new remarks.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Category D is refused
         steps:
           - Send a direct request to set the category of an account to D.
@@ -1400,7 +1400,7 @@ frs:
         expected: 2,000.00 more is allocated to the oldest open installment.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Statement for a cycle the plan does not have
         steps:
           - Send a direct request to generate a statement for the generated plan with cycle 9.
@@ -1493,7 +1493,7 @@ frs:
         msg: ["Invoice {no} has nothing to collect", CLX_PROMISE_NOTHING_DUE]
       - c: 4
         type: Negative
-        screen: API
+        screen: SYS
         title: Installment of another invoice
         steps:
           - POST a promise on invoice A with the installment id of the plan of invoice B.
@@ -1628,7 +1628,7 @@ frs:
         msg: [The amount range ends below its start, CLX_RULE_AMOUNTS]
       - c: 4
         type: Negative
-        screen: API
+        screen: SYS
         title: Rule without a code
         steps:
           - Send a direct request to save an escalation rule without a code.
@@ -1779,7 +1779,7 @@ frs:
         expected: The escalation is RETURNED in clxhandler's list, then WITH_TL again.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Unknown action
         steps:
           - Send a direct request for the action Close on an escalation (not an action of the escalation workflow).
@@ -1985,7 +1985,7 @@ frs:
       - c: 1
         type: Negative
         persona: UNAPPLIED_HANDLER
-        screen: API
+        screen: SYS
         title: Deactivated value refused
         pre: The test lead ends "For transfer to other unit" yesterday.
         steps:
@@ -2027,7 +2027,7 @@ frs:
         expected: The disposition Coordinate further of upphandler is listed with its remarks; no request to Cashiering exists.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Disposition on a fully applied payment
         steps:
           - POST a disposition on Grace Villanueva's payment.
@@ -2169,7 +2169,7 @@ frs:
         expected: Intake, the collector disposition, the request, the acceptance and the application are listed in time order.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: No delete of a collector disposition
         steps:
           - Send a direct request to delete a collector disposition of an unapplied payment.
@@ -2208,7 +2208,7 @@ frs:
       - c: 3
         type: Security-access
         persona: UNAPPLIED_HANDLER
-        screen: API
+        screen: SYS
         title: The file cannot be written without CLX_SETUP or CLX_EXPORT
         steps:
           - Signed in as upphandler, send a direct request to write the application file.

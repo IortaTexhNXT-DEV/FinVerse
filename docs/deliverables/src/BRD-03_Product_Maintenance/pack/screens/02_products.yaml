@@ -276,7 +276,7 @@ screens:
       - "New Incentive Criterion | Value | Number | Rate 0 to 100 or an amount | Cond.: rate or fixed amount | - | Blank | Pending; amendment | Zero or more; a rate up to 100 | Enter the value / A rate is between 0 and 100"
       - "New Incentive Criterion | Effective from | Date | dd-MMM-yyyy | Y | - | Blank | Pending; amendment | An amendment starts after the active row; no overlap with another row of the code | Enter the start date / The change must start after <active from> / Criterion <code> already covers part of this period"
       - "New Incentive Criterion | Effective to | Date | dd-MMM-yyyy | N | - | Blank | Pending; amendment | On or after the start | The end is before the start"
-      - "New Incentive Criterion | Rule parameters (JSON) | Text | For example {\"minimumPremium\": 5000} | N | - | Blank | Pending; amendment | Valid JSON | Enter valid JSON, e.g. {\"minimumPremium\": 5000}"
+      - "New Incentive Criterion | Rule parameters (JSON) | Text | For example {\"minimumPremium\": 5000} | N | - | Blank | Pending; amendment | Name and value pairs as in the example | Enter valid JSON, e.g. {\"minimumPremium\": 5000}"
       - "New Incentive Criterion | Description | Text | Free text | N | - | Blank | Pending; amendment | - | -"
       - "New Incentive Criterion | Products matrix | Drop-down and rows | Active product, with a segment per product (Any segment) | Y (at least one) | Active products; list MARKET_SEGMENT | None | Pending; amendment | Active products only | Select at least one product of the matrix"
     actions:

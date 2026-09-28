@@ -54,7 +54,7 @@ screens:
   AUDIT: Administration > Audit Trail
   NOTIF: Notifications (bell icon in the page header)
   MAILBOX: Test mailbox of the insurer (SIT mail relay)
-  API: Direct request outside the screens, signed in as the persona (test lead tool)
+  SYS: System function check outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-CM-01
@@ -76,7 +76,7 @@ data:
   - id: TD-CM-05
     name: Claims in every phase
     content: "BCL-2026-000101 status 1 (NEW); BCL-2026-000102 status 3 (IN_PROGRESS, 5 days in status 3 then status 8 for 2 days); BCL-2026-000103 status 11 awaiting premium remittance; BCL-2026-000104 status 18 (TEMP_CLOSED); BCL-2026-000105 closed Closed - Denied on 15 March; BCL-2026-000106 settled Settled - Signed Release Papers Returned; claims aged 45, 80 and 95 days for the ageing and past-due cases"
-    source: Recorded on SIT by the test lead; reported dates set in the test database for ageing
+    source: Recorded on SIT by the test lead; reported dates set in the test environment for ageing
   - id: TD-CM-06
     name: Lists and matrix
     content: The 18 statuses, 10 settlement types, 25 adjusters, 7 catastrophe codes of the FRS; default status access matrix (TL and TH all statuses; officers statuses 1, 2, 17 and 18); claims handler register (Motor HO, Non-Motor HO, branches)
@@ -240,7 +240,7 @@ frs:
       - c: 3
         priority: High
         type: Security-access
-        screen: API
+        screen: SYS
         brd: [BRCLM.002]
         title: Claim of another company
         steps:
@@ -283,7 +283,7 @@ frs:
         expected: The history shows 150,000, 180,000, the reason, cl.tl1 and the time; the audit entry has the same before and after values.
       - c: 3
         type: Security-access
-        screen: API
+        screen: SYS
         brd: [NFR 4.01-4.03]
         title: History cannot be changed
         steps:
@@ -693,7 +693,7 @@ frs:
         expected: One claim number with two locations; the flag Multi-location is shown.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Location of another account
         steps:
           - Send a direct request to link a location item of ARN-2026-000501.
@@ -1134,7 +1134,7 @@ frs:
     screen: SETUP
     data: [TD-CM-06]
     conditions:
-      - The status list offers the 18 BRD values on a new database, each with phase, waiting party, follow-up days and the awaiting-remittance flag.
+      - The status list offers the 18 BRD values when BIBS is first set up, each with phase, waiting party, follow-up days and the awaiting-remittance flag.
       - A new status is selectable only after authorisation and once its phase is set.
       - A status in use is end-dated, never deleted; follow-up days must be a whole number 1 to 365.
     cases:
@@ -1194,7 +1194,7 @@ frs:
       - c: 2
         priority: High
         type: Security-access
-        screen: API
+        screen: SYS
         brd: [BRCLM.013]
         title: Direct request with a status outside the matrix
         steps:
@@ -2046,7 +2046,7 @@ frs:
         expected: The file is downloaded with the rows of the screen; the export is logged.
       - c: 3
         type: Security-access
-        screen: API
+        screen: SYS
         title: AO cannot open a claim record
         steps:
           - Type the address of a claim record; send a direct request to open the claim.

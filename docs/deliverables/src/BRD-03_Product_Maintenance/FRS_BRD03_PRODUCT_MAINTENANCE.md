@@ -412,10 +412,10 @@ preconditions:
   - "None."
 main_flow:
   - A user performs an action on a request, version or master.
-  - BIBS writes an audit row (who, when, what, before and after values where applicable) in the same transaction.
+  - BIBS writes an audit row (who, when, what, before and after values where applicable) together with the change; one is never kept without the other.
   - The History tab shows the workflow history and the audit rows in time order.
 rules:
-  - [R1, "Audit rows are append-only; no user, including the System Administrator, can change or delete them.", Fixed, "-"]
+  - [R1, "Audit entries can only be added; no user, including the System Administrator, can change or delete them.", Fixed, "-"]
   - [R2, "Retention follows the BRD-1 rule (5 years online, 15 years archive) until BDOI states a Product Maintenance retention (PQ18).", Configurable, Retention parameters]
 validations: []
 notifications:
@@ -1693,7 +1693,7 @@ validations:
   - [Product not active, "Product <code> is not an active product of the matrix", INCENTIVE_PRODUCT_NOT_ACTIVE]
   - [Value missing, Enter the value of the incentive criterion, INCENTIVE_VALUE_REQUIRED]
   - [Period overlaps, "Criterion <code> already covers part of this period", INCENTIVE_PERIOD_OVERLAP]
-  - [Rule parameters not valid JSON, The rule parameters must be valid JSON, INCENTIVE_RULE_PARAMS_INVALID]
+  - [Rule parameters not in the format of the example, The rule parameters must be valid JSON, INCENTIVE_RULE_PARAMS_INVALID]
   - [Direct edit of an active row, An active criterion is changed by amending it (successor), INCENTIVE_ACTIVE_LOCKED]
 fields_screen: Incentive Criterion
 fields:
@@ -1704,7 +1704,7 @@ fields:
   - [Value, Number, Conditional, "-", Required for Rate and Fixed amount]
   - [Effective from, Date, "Yes", "-", "-"]
   - [Effective to, Date, "No", "-", On or after effective from]
-  - [Rule parameters (JSON), Text, Conditional, "-", Valid JSON; required for Rule]
+  - [Rule parameters (JSON), Text, Conditional, "-", "Name and value pairs as in the example {\"minimumPremium\": 5000}; required for Rule"]
   - [Description, Text, "No", "-", "-"]
   - [Products matrix, Picker, "Yes", "Active products; optional cover type, segment, channel, insurer", At least one]
 notifications:
@@ -1911,7 +1911,7 @@ Figure 4 shows the interfaces of Product Maintenance. Package requests talk to t
 | Client master (CRM) | In | Client look-up on client-specific requests | BRPM.008 | IN SCOPE |
 | Catalogue set-up | Out | Draft version from the proposed terms at MBS set-up; retirement | BRPM.015 | IN SCOPE |
 | Catalogue events | In | Version released, returned, product expired | PMADD06, BRPM.017 | IN SCOPE |
-| E-mail outbox | Out | Protected QS, comparative outputs and advisories; send log | BRPM.012, 016, 020 | IN SCOPE |
+| Outgoing e-mail | Out | Protected QS, comparative outputs and advisories; send log | BRPM.012, 016, 020 | IN SCOPE |
 | Notifications and alerts | Out | Stage entry, SLA, release, expiry, incentive review | BRPM.021, 022 | IN SCOPE |
 | New business (BRD-1) | Out | Scheme version and rating for quotations, accounts and invoices; incentive criteria codes | BRPM.007; PMADD07 | IN SCOPE |
 | Operations (BRD-2) | Out | Version for endorsement re-rating; criteria codes for commission schemes (OQ39) | BRPM.007 | IN SCOPE |
@@ -1935,7 +1935,7 @@ Figure 4 shows the interfaces of Product Maintenance. Package requests talk to t
 | Recovery | RTO 4 hours, RPO 24 hours | Platform backup and recovery; one BIBS-wide NFR set is being agreed (XQ08) |
 | Devices | Same performance on mobile and desktop | Responsive screens |
 | Security | Authorised users only; protected documents | Role-based access, four-eyes rules, protected e-mails (FR-PM-002, 004) |
-| Audit | All actions logged | Append-only audit and workflow history (FR-PM-005) |
+| Audit | All actions logged | Audit trail and workflow history that no user can change (FR-PM-005) |
 | Retention | Not stated | BRD-1 rule (5 years online, 15 years archive); product versions never purged (PQ18) |
 
 # Configuration items owned by the System Administrator

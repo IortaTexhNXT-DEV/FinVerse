@@ -66,7 +66,7 @@ The scope is the screening of BDOI clients against sanctions and politically exp
 - Filing the STR on the AMLC portal. The to-be diagram keeps "File STR to AMLC" in a "Via Portal" lane outside the in-system workflow (p.8). BIBS prepares, approves and extracts the STR and records the filing reference.
 - Blocking quotations, account submission, placement or booking while a match is open. The BRD asks for tags, cases and notifications, not for a stop on business. A blocking gate is a proposal behind a parameter, off by default (SQ07, section 10.3).
 - Screening of parties that BIBS does not hold today (beneficial owners, authorised signatories, beneficiaries). BDOI confirms the scope under SQ11.
-- Direct connection to BDO's Negative List Database System (NLDS) and to external list providers by API. Lists come in as files until BDOI names the sources and transports (SQ01, section 7).
+- Direct connection to BDO's Negative List Database System (NLDS) and to external list providers by system-to-system interface. Lists come in as files until BDOI names the sources and transports (SQ01, section 7).
 - Adverse-media screening. BSP M-2025-017 is cited in the objectives (p.3) but no requirement asks for it (SQ20).
 
 ## References
@@ -737,9 +737,9 @@ actor: System; Compliance Officer (upload)
 priority: Must have
 screens: Compliance Setup > List Sources and Runs
 description:
-  - Each list source has a code, name, list type (SANCTION, PEP, INTERNAL, ADVERSE_MEDIA), transport (file, API, manual), schedule and file layout. The sources provided are AML_ADVISORY (sanctions, file), NLDS_PEP (PEP, file) and INTERNAL (manual).
+  - Each list source has a code, name, list type (SANCTION, PEP, INTERNAL, ADVERSE_MEDIA), transport (file, system-to-system, manual), schedule and file layout. The sources provided are AML_ADVISORY (sanctions, file), NLDS_PEP (PEP, file) and INTERNAL (manual).
   - The ingestion job reads each active source on its schedule; the Compliance Officer can also upload a file with **Upload List File**. Each run adds new entries, updates changed entries and delists removed ones, and writes a run log - source, trigger, records received, added, updated, delisted and failed, status and reason for failure (SNSRP-201 AC).
-  - Entries loaded from a source file are active at once, as the file is the official list; manual changes go through maker-checker (FR-SS-022). Real-time or API sources wait until BDOI names them (SQ01).
+  - Entries loaded from a source file are active at once, as the file is the official list; manual changes go through maker-checker (FR-SS-022). Real-time or system-to-system sources wait until BDOI names them (SQ01).
 preconditions:
   - "The source is active; for an upload the user has SCR_LIST_MAINTAIN."
 main_flow:
@@ -764,8 +764,8 @@ fields_screen: List source / Upload list file
 fields:
   - [Code / Name, Text, "Yes", "-", Unique code]
   - [List type, List, "Yes", LOV SCR_LIST_TYPE, "-"]
-  - [Transport, List, "Yes", "File, API, Manual", API on hold]
-  - [Schedule, Text, Conditional, "-", Required for File and API]
+  - [Transport, List, "Yes", "File, system-to-system, Manual", System-to-system on hold]
+  - [Schedule, Text, Conditional, "-", Required for file and system-to-system sources]
   - [File layout, List, Conditional, "CSV / XLSX template", Required for File]
   - [Active, Check box, "Yes", "-", "-"]
   - [File (upload), Attachment, "Yes", "-", "CSV or XLSX, up to the platform size limit"]
@@ -884,7 +884,7 @@ validations:
 notifications:
   - The maker is notified of the decision.
 audit:
-  - "Decision, checker and time recorded on the change record (insert-only)."
+  - "Decision, checker and time recorded on the change record, which cannot be changed."
 acceptance:
   - An approved new entry is ACTIVE and the next delta screening matches clients against it.
   - A rejected change leaves the entry as it was and shows the checker's remarks.
@@ -937,7 +937,7 @@ actor: System
 priority: Must have
 screens: Matches; Case (Matches tab); client page (Screening tab)
 description:
-  - BIBS normalises the client's name and the entry's names and aliases, finds candidate pairs through blocking keys (name tokens and phonetic keys) and scores each pair with the algorithms of the active criteria. When a pair meets the criteria, BIBS records a match - client, entry and entry version, score, algorithm, matched fields and status POTENTIAL.
+  - BIBS normalises the client's name and the entry's names and aliases, finds candidate pairs through search keys (name parts and sound-alike keys) and scores each pair with the algorithms of the active criteria. When a pair meets the criteria, BIBS records a match - client, entry and entry version, score, algorithm, matched fields and status POTENTIAL.
   - Birth date, nationality and ID numbers, where held on both sides and selected in the criteria, raise or lower the score. A pair suppressed as a false positive for the same entry version is skipped (FR-SS-035).
 preconditions:
   - "A screening run is in progress (FR-SS-030)."
@@ -1027,7 +1027,7 @@ validations: []
 notifications:
   - "None for the tag; the case notifies (FR-SS-080)."
 audit:
-  - "Client audit - 'Risk rating X to Y (screening, rule, match)'; risk-profile history row (insert-only)."
+  - "Client audit - 'Risk rating X to Y (screening, rule, match)'; risk-profile history entry, which cannot be changed."
 acceptance:
   - A confirmed sanction match under an active High-risk rule sets the client rating and the WATCHLIST_REVIEW tag automatically.
   - The client's Screening tab shows the rule and match that caused the change.
@@ -1140,7 +1140,7 @@ validations:
 notifications:
   - "Stage entry to the next owner (FR-SS-080)."
 audit:
-  - "Every transition logged on the insert-only case timeline."
+  - "Every transition logged on the case timeline, which cannot be changed."
 acceptance:
   - After the Investigator submits, the case is read-only to the Investigator.
   - The Timeline tab lists every transition with user and time.
@@ -1650,7 +1650,7 @@ priority: Must have
 screens: STR (Extract Approved STRs)
 description:
   - The Compliance Officer starts the extraction for a period. BIBS selects only the STRs approved by the AML Committee and not yet extracted, creates the file with the active STR layout (FR-SS-017) and saves it to the designated location. The extraction is recorded (batch, period, count, file, user, time) and the STRs become EXTRACTED.
-  - Until BDOI names the designated folder (SQ16), the file is saved in the BIBS report archive and downloaded from the STR screen. A shared-folder or SFTP destination can be added later with no change to this function.
+  - Until BDOI names the designated folder (SQ16), the file is saved in the BIBS report archive and downloaded from the STR screen. A shared-folder or file transfer destination can be added later with no change to this function.
 preconditions:
   - "The user has SCR_STR_EXTRACT; at least one APPROVED STR exists in the period."
 main_flow:
@@ -1822,14 +1822,14 @@ brd: [SNSRP-902 (p.21)]
 actor: System
 priority: Must have
 screens: Case (Timeline); Audit Trail
-description: Every system and user action writes an audit entry that no user can alter or delete. The platform audit log is insert-only in the database. Screening adds structured, insert-only records - the case timeline, the configuration version differences and the list change records - which keep the before and after values. Records are retained 5 years online and 5 years in archive (p.25).
+description: Every system and user action writes an audit entry that no user can alter or delete. No entry of the platform audit log can be changed. Screening adds its own records that cannot be changed - the case timeline, the configuration version differences and the list change records - which keep the before and after values. Records are retained 5 years online and 5 years in archive (p.25).
 preconditions:
   - "None."
 main_flow:
   - A user or the system performs an action.
-  - BIBS writes the audit entry in the same transaction.
+  - BIBS writes the audit entry together with the change; one is never kept without the other.
 rules:
-  - [R1, "Audit rows, timeline events and list change records are append-only; no user, including the System Administrator, can change or delete them.", Fixed, "-"]
+  - [R1, "Audit entries, timeline events and list change records can only be added; no user, including the System Administrator, can change or delete them.", Fixed, "-"]
   - [R2, "Retention - 5 years online and 5 years archive for cases, documents and list entries (retention rules SCREENING_CASE and WATCHLIST_ENTRY); longer AMLA retention is SQ18.", Configurable, Retention rules]
 validations: []
 notifications:
@@ -1838,7 +1838,7 @@ audit:
   - "This FR is the audit."
 acceptance:
   - No screen or service allows an audit row or timeline event to be edited or deleted.
-  - A database update of a timeline row is refused.
+  - An attempt to change a timeline entry outside the screens is refused.
 ```
 
 ```fr
@@ -2104,13 +2104,13 @@ Figure 5 shows the interfaces of Sanction Screening. Screening reads the client 
 | Interface | Direction | Content and trigger | BRD | Scope |
 |---|---|---|---|---|
 | List files (AML advisory, NLDS-PEP) | In | CSV / XLSX by upload or file drop, on schedule | SNSRP-201 | IN SCOPE |
-| List feeds by API; direct NLDS query | In | Real-time or scheduled feed from list providers or BDO NLDS | SNSRP-201 | ON HOLD |
+| List feeds by system-to-system interface; direct NLDS query | In | Real-time or scheduled feed from list providers or BDO NLDS | SNSRP-201 | ON HOLD |
 | Client master | In / Out | In - client registered and identity changed events, client data. Out - risk rating, PEP and watchlist tags, KYC review date | SNSRP-302, 304, 602 | IN SCOPE |
 | Accounts (BRD-1) | In | Account submitted event; active policy (accounts POLICY_ISSUED / BOOKED) | SNSRP-303 | IN SCOPE |
 | Attachments and client KYC documents | Out | Case documents, KYC documents registered on the client | SNSRP-601 | IN SCOPE |
 | Notifications, e-mail and alerts | Out | Case, SLA, document, ingestion and list notices | SNSRP-202, 801, 802 | IN SCOPE |
 | Report archive | Out | STR extraction file for download | SNSRP-706 | IN SCOPE |
-| Designated STR folder (shared drive / SFTP) | Out | Automatic saving of the extraction file | SNSRP-706 | ON HOLD |
+| Designated STR folder (shared drive / file transfer) | Out | Automatic saving of the extraction file | SNSRP-706 | ON HOLD |
 | AMLC portal | Out | STR filing; manual, outside BIBS | p.8 | OUT |
 
 > [!NOTE] Interfaces on hold
@@ -2129,7 +2129,7 @@ Figure 5 shows the interfaces of Sanction Screening. Screening reads the client 
 | Availability | 99.9%; use 08:00-18:00 Monday to Friday; downtime at most 45 minutes a month, planned only; maintenance 00:00-04:00; BCP threshold under 3 days | Same deployment as the rest of BIBS; the service-hours variants are consolidated in one BIBS-wide NFR set (XQ08) |
 | Retention | Transaction records, KYC and supporting documents - 5 years online, 5 years archive, daily backup, daily accessibility, 5-year backup retention | Retention rules SCREENING_CASE and WATCHLIST_ENTRY (5 / 5); archive and purge follow the BIBS retention decision (Q39) |
 | Anonymisation | None | None |
-| Security | Maker-checker, immutable audit (SNSRP-109, 204, 902) | Role-based access, four-eyes rules, insert-only audit (FR-SS-001, 019, 023, 091) |
+| Security | Maker-checker, immutable audit (SNSRP-109, 204, 902) | Role-based access, four-eyes rules, an audit trail no user can change (FR-SS-001, 019, 023, 091) |
 | Regulatory | RA 9160 AMLA, BSP Circular 1182 (2023), BSP CL-2023-030, BSP M-2025-017, IC CL 2019-65 | Controls above; adverse-media screening not in scope (SQ20) |
 
 # Configuration items
@@ -2295,7 +2295,7 @@ The table lists each point where the proposed screen or rule fills a gap the BRD
 <!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
 | Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
 |---|---|---|---|---|
-| CLR-SS-01 | Lists screened (SNSRP-201; FR-SS-020, 021) | The AML advisory and NLDS-PEP lists are loaded by file upload (CSV or XLSX) on a schedule; feeds by API and a direct NLDS query are added when BDOI names them. | The lists, formats, frequency and transport are not given (SQ01). | Name the lists, formats, frequency and transport (SQ01). |
+| CLR-SS-01 | Lists screened (SNSRP-201; FR-SS-020, 021) | The AML advisory and NLDS-PEP lists are loaded by file upload (CSV or XLSX) on a schedule; system-to-system feeds and a direct NLDS query are added when BDOI names them. | The lists, formats, frequency and transport are not given (SQ01). | Name the lists, formats, frequency and transport (SQ01). |
 | CLR-SS-02 | Matching thresholds (FR-SS-011, 031) | BIBS starts with seed thresholds per method; Compliance enters the production values before go-live. | The BRD gives no values (SQ02). | Give the thresholds and the fields compared (SQ02). |
 | CLR-SS-03 | Screening does not block business (FR-SS-033) | Screening informs and does not block quotation, account submission, placement or booking; a block is added only if BDOI asks. | The BRD does not say whether an open match blocks business (SQ07). | Choose inform or block (SQ07). |
 | CLR-SS-04 | Active policy (SNSRP-303; FR-SS-034) | A client has an active policy when one of the client's accounts is POLICY_ISSUED or BOOKED; only such clients require a KYC review or EDD. | The BRD does not define an active policy (SQ10). | Give the definition of an active policy (SQ10). |

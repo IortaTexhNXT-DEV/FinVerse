@@ -59,7 +59,7 @@ screens:
   AUDIT: Administration > Audit Trail
   NOTIF: Notifications (bell icon in the page header)
   MAIL: Test mailbox of the recipient
-  API: Direct request outside the screens, signed in as the persona (test lead tool)
+  SYS: System function check outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-SP-01
@@ -419,7 +419,7 @@ frs:
       - c: 3
         type: Security-access
         persona: SBM_POLICY_REVIEWER
-        screen: API
+        screen: SYS
         title: Export without SBM_EXPORT
         steps:
           - As polreview look for Export; send a direct export request.
@@ -457,7 +457,7 @@ frs:
         expected: The records changed today, and no others.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Handler not active
         steps:
           - Assign the disabled user as handler by a direct request.
@@ -908,7 +908,7 @@ frs:
         msg: [Enter the proposed terms]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Record without a breach
         steps:
           - Call Generate TOR for the 5-year-old vehicle record.
@@ -1016,7 +1016,7 @@ frs:
       - c: 4
         type: Negative
         persona: MKT_AO
-        screen: API
+        screen: SYS
         title: Renew with BDOI on a record not For Renewal
         steps:
           - Call Renew with BDOI on an EXCLUDED record.
@@ -1232,7 +1232,7 @@ frs:
         expected: The payment is untagged and listed as ambiguous.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Manual tag of a tagged payment
         steps:
           - Tag the CLPC payment by hand.

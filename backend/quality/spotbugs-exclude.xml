@@ -32,6 +32,15 @@
     <Bug pattern="CRLF_INJECTION_LOGS"/>
   </Match>
   <!--
+    SERVLET_CONTENT_TYPE: JsonBodyLimitFilter reads the request's Content-Type only to decide whether
+    the JSON size limit applies; a false type gains nothing (the controllers parse JSON only for a
+    JSON content type, and every other body has its own limit).
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.brokerverse.config.JsonBodyLimitFilter"/>
+    <Bug pattern="SERVLET_CONTENT_TYPE"/>
+  </Match>
+  <!--
     SERVLET_HEADER: the Authorization header is read only to extract a bearer token whose HMAC
     signature, issuer and expiry are then verified; an altered header simply fails validation.
   -->

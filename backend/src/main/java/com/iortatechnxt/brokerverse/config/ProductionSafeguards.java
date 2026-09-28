@@ -168,22 +168,27 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
   }
 
   private static void requireSeparateDatabaseRoles(Environment env, List<String> problems) {
-    if (!enabled(env, "spring.flyway.enabled", true)) {
-      return;
+    if (enabled(env, "spring.flyway.enabled", true)) {
+      requireMigrationOwner(env, problems);
     }
+  }
+
+  private static void requireMigrationOwner(Environment env, List<String> problems) {
     String owner = env.getProperty(MigrationOwnerConnection.OWNER_PROPERTY, "").trim();
     if (owner.isEmpty()) {
       problems.add(
           "SPRING_FLYWAY_USER (schema owner running the migrations) is not set; the application"
               + " must connect as a least-privilege runtime login");
-      return;
+    } else {
+      if (String.CASE_INSENSITIVE_ORDER.compare(
+              owner, env.getProperty("spring.datasource.username", "").trim())
+          == 0) {
+        problems.add(
+            "SPRING_FLYWAY_USER and BROKERVERSE_DB_USER name the same login; the application must"
+                + " connect as a least-privilege runtime login, not as the schema owner");
+      }
+      require(env, "spring.flyway.password", "SPRING_FLYWAY_PASSWORD", problems);
     }
-    if (owner.equalsIgnoreCase(env.getProperty("spring.datasource.username", "").trim())) {
-      problems.add(
-          "SPRING_FLYWAY_USER and BROKERVERSE_DB_USER name the same login; the application must"
-              + " connect as a least-privilege runtime login, not as the schema owner");
-    }
-    require(env, "spring.flyway.password", "SPRING_FLYWAY_PASSWORD", problems);
   }
 
   private static void requireEncryptionInTransit(Environment env, List<String> problems) {

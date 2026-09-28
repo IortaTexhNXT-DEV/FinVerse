@@ -16,7 +16,7 @@ import java.nio.charset.StandardCharsets;
 public final class TextContent {
 
   /** Largest text file read as data (25 MiB, the upload limit of the application). */
-  public static final long MAX_TEXT_BYTES = 25L * 1024 * 1024;
+  public static final long MAX_TEXT_BYTES = 25L << 20;
 
   private static final char BOM = '\uFEFF';
   private static final int SPACE = 0x20;
@@ -24,6 +24,8 @@ public final class TextContent {
   private static final int CARRIAGE_RETURN = 0x0D;
   private static final int ESCAPE = 0x1B;
   private static final int END_OF_FILE = 0x1A;
+  private static final int BYTE_MASK = 0xFF;
+  private static final long MB = 1024L * 1024;
 
   private TextContent() {}
 
@@ -35,7 +37,7 @@ public final class TextContent {
    */
   public static boolean isText(byte[] content) {
     for (byte b : content) {
-      int c = b & 0xFF;
+      int c = b & BYTE_MASK;
       if (c < SPACE && !allowedControl(c)) {
         return false;
       }
@@ -55,7 +57,7 @@ public final class TextContent {
     if (content.length > MAX_TEXT_BYTES) {
       throw new BusinessRuleException(
           "FILE_TOO_LARGE",
-          "The text file exceeds the maximum size of " + MAX_TEXT_BYTES / (1024 * 1024) + " MB");
+          "The text file exceeds the maximum size of " + MAX_TEXT_BYTES / MB + " MB");
     }
     if (!isText(content)) {
       throw new BusinessRuleException(
@@ -81,6 +83,6 @@ public final class TextContent {
   }
 
   private static boolean allowedControl(int c) {
-    return (c >= TAB && c <= CARRIAGE_RETURN) || c == ESCAPE || c == END_OF_FILE;
+    return c >= TAB && c <= CARRIAGE_RETURN || c == ESCAPE || c == END_OF_FILE;
   }
 }

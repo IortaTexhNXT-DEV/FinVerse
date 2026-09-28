@@ -13,11 +13,11 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.Locale;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.InvalidMediaTypeException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.unit.DataSize;
@@ -52,38 +52,37 @@ public class JsonBodyLimitFilter extends OncePerRequestFilter {
       throws ServletException, IOException {
     if (!isJson(request.getContentType())) {
       chain.doFilter(request, response);
-      return;
-    }
-    if (request.getContentLengthLong() > maxBytes) {
+    } else if (request.getContentLengthLong() > maxBytes) {
       refuse(response);
-      return;
+    } else {
+      chain.doFilter(new LimitedRequest(request, maxBytes), response);
     }
-    chain.doFilter(new LimitedRequest(request, maxBytes), response);
   }
 
   private void refuse(HttpServletResponse response) throws IOException {
+    String body =
+        "{\"type\":\"about:blank\",\"title\":\"Payload Too Large\",\"status\":413,"
+            + "\"detail\":\"The request is larger than "
+            + maxBytes
+            + " bytes\",\"code\":\""
+            + RequestBodyTooLargeException.CODE
+            + "\"}";
     response.setStatus(HttpStatus.PAYLOAD_TOO_LARGE.value());
     response.setContentType(MediaType.APPLICATION_PROBLEM_JSON_VALUE);
-    response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-    response
-        .getWriter()
-        .write(
-            "{\"type\":\"about:blank\",\"title\":\"Payload Too Large\",\"status\":413,"
-                + "\"detail\":\"The request is larger than "
-                + maxBytes
-                + " bytes\",\"code\":\""
-                + RequestBodyTooLargeException.CODE
-                + "\"}");
+    response.getOutputStream().write(body.getBytes(StandardCharsets.UTF_8));
   }
 
   static boolean isJson(String contentType) {
     if (contentType == null) {
       return false;
     }
-    String type = contentType.toLowerCase(Locale.ROOT);
-    int parameters = type.indexOf(';');
-    String base = (parameters < 0 ? type : type.substring(0, parameters)).trim();
-    return base.equals(MediaType.APPLICATION_JSON_VALUE) || base.endsWith("+json");
+    try {
+      MediaType type = MediaType.parseMediaType(contentType);
+      return MediaType.APPLICATION_JSON.equalsTypeAndSubtype(type)
+          || "application".equals(type.getType()) && type.getSubtype().endsWith("+json");
+    } catch (InvalidMediaTypeException e) {
+      return false;
+    }
   }
 
   /** Counts the bytes of the body while the application reads it. */

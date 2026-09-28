@@ -128,6 +128,23 @@ confirm:
         The production register and the direct payment billing are workbooks read back by the insurers' own
         systems: their dates are yyyy-mm-dd and the remittance status and the insurer are codes.
       proposal: Confirm the layout for the insurers (CLR-OP-34), or give the layout each insurer needs.
+    - screens: [SCR-OP-02, SCR-OP-44]
+      observation: >-
+        Invoice Search and Reconciliation Cycles hold more columns than a 1440-pixel window shows: the last columns
+        (Remittance and Flags; Last Feedback) scroll inside the card.
+      proposal: >-
+        Keep the lists scrolling with the reference column fixed, or stack two facts per column (as Booked /
+        Inception already does) so that every column is in view.
+    - screens: [SCR-OP-39]
+      observation: >-
+        The accounting entries of a request and the journals of Policy Transactions show the party of a line by its
+        sub-ledger code (client or insurer code), as the journals of the General Ledger do.
+      proposal: Confirm the code, or show the party's name with the code under it.
+    - screens: [SCR-OP-01, SCR-OP-07, SCR-OP-23]
+      observation: >-
+        The Operations personas land on the New Business dashboard after sign-in, the landing page of every broking
+        role; their own home pages (Operations, Cashiering, Remittance) are one click away in the menu.
+      proposal: Confirm the landing page, or land each Operations persona on the home page of its team.
     - screens: [SCR-OP-38]
       observation: >-
         Before, Change and After of a recompute are taken on the premium in force of the policy year, so a flat

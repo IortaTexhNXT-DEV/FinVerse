@@ -177,6 +177,10 @@ const steps = {
     if (ctx.one(`select stage from rem_batch where id = ${id}`) === 'FOR_APPROVAL') {
       await act(page, 'Approve and Push', { confirm: /^approve and push$/i, comment: 'Approved' });
       await settle(page, 2000);
+      if (ctx.one(`select stage from rem_batch where id = ${id}`) === 'FOR_APPROVAL') {
+        const message = await page.locator('dialog.modal[open] [role=alert]').allInnerTexts().catch(() => []);
+        throw new Error(`batch ${id} not approved ${message.join(' ')}`);
+      }
     }
     return page;
   },
@@ -241,7 +245,13 @@ const steps = {
     await page.getByPlaceholder('Search policy, ARN, invoice or client').fill(policy);
     await button(page, /^search$/i).click();
     await settle(page, 1200);
-    await page.getByLabel(`Select ${invoice}`).check();
+    const pick = page.getByLabel(`Select ${invoice}`);
+    if (await pick.isDisabled()) {
+      // Walkthrough B starts from the remitted invoice of walkthrough A: an invoice still in a batch is locked.
+      const lock = await page.locator('table tbody tr').filter({ hasText: invoice }).first().innerText();
+      throw new Error(`invoice ${invoice} cannot be chosen (run walkthrough A to the end first): ${lock.replace(/\s+/g, ' ')}`);
+    }
+    await pick.check();
     await settle(page, 1500);
     ctx.state.requestPage = page;
     return page;

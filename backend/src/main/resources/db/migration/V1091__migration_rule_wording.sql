@@ -5,6 +5,7 @@
 -- "Target in BIBS" of the object register) or carried raw status codes; they now read as the BRD-13 business
 -- sign-off set words them (catalogue.yaml and the client wording of build_dm_pack.py, which applies this script
 -- after V1090). The column names of the extract layouts stay as they are: they are the names of the file columns.
+-- It also adds the list LEGACY_RECORD_STATUS: the labels of the legacy statuses of the archive records (Legacy Inquiry).
 -- =====================================================================================
 
 -- Object register: where each object lands in BIBS.

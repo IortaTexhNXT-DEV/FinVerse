@@ -9,7 +9,8 @@ import org.springframework.mock.env.MockEnvironment;
 
 class ProductionSafeguardsTest {
 
-  private static final String KEY = "Zq8v3N0kP1rT7yW2bX5cD9fG4hJ6mL0sQ";
+  /** A value of the required length that is no development marker; not a real key. */
+  private static final String KEY = "k".repeat(40);
 
   private static MockEnvironment completeProduction() {
     return new MockEnvironment()

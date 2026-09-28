@@ -38,3 +38,32 @@ is set, and waits for the SonarQube quality gate.
 
 The CI pipeline also runs static application security testing (SAST) of the Java and TypeScript code on every
 pipeline and weekly (`.gitlab-ci.yml`, stage `security`).
+
+## Dependency and supply-chain checks
+
+Both pipeline definitions (`.gitlab-ci.yml` and the workflow files under `.github/workflows`) run the same
+security gates on every pipeline, including merge requests:
+
+| Check | Tool | Fails on | Accepted findings |
+|---|---|---|---|
+| Java dependencies | OWASP dependency-check (`mvn org.owasp:dependency-check-maven:check`, NVD data, key in the masked variable `NVD_API_KEY`) | CVSS 7.0 or higher | `backend/quality/dependency-check-suppressions.xml` |
+| Web client dependencies | `npm audit --audit-level=high` (the install no longer hides the audit with `--no-audit`) | high or critical advisory | none; upgrade the package or pin a fixed version with `overrides` in `package.json` |
+| Container images | Trivy on the built backend and frontend images (OS packages, the application jar, secrets) | a high or critical vulnerability with a fix available | `.trivyignore.yaml` |
+| Secrets | gitleaks over the whole history | any finding | `.gitleaksignore` (fingerprints) |
+| Code | CodeQL (Java, TypeScript) on pushes and merge requests, GitLab SAST | as configured in the code scanning service | – |
+| GitLab security templates | Dependency-Scanning, Container-Scanning, Secret-Detection | reported in the security dashboard | – |
+
+**Software bill of materials.** `mvn package` writes the CycloneDX SBOM of the backend runtime
+dependencies to `backend/target/bom.json` (and `bom.xml`); the frontend job writes
+`frontend/sbom-frontend.cdx.json` (`npm sbom`, runtime dependencies). Both are kept as build artefacts of every
+pipeline and belong to the release record.
+
+**Rule for findings.** A finding is fixed by upgrading the library, the pinned base image or the package. An
+accepted finding is the exception: every entry names the reason it does not apply, the reviewer and the review
+date, and carries an expiry date at most six months ahead (`until` in the dependency-check file, `expired_at` in
+the Trivy file, a review date in the gitleaks file); after the expiry the gate fails again.
+
+**Pinning.** Pipeline actions are pinned by the commit SHA of their release and the base images of both
+Dockerfiles by digest; the scanners are downloaded as release archives and verified against their SHA-256. A
+weekly update proposal (`.github/dependabot.yml`) covers actions, base images, Maven and npm; the Dockerfile header
+says how to refresh a digest by hand.

@@ -18,6 +18,10 @@ RUN npm run build
 # Kubernetes configuration of deploy/nginx) and writes only below /tmp, /var/cache/nginx and
 # /etc/nginx/conf.d, so the container also runs with a read-only root file system.
 FROM nginxinc/nginx-unprivileged:1.30-alpine@sha256:4714e0b1b2577eaa1a6131d07c958b67f0eb68e6d0521e90c6e5287db8cf0bc5
+# Security fixes of the Alpine packages published after the pinned base image (the image scan fails
+# on a fixed high or critical vulnerability otherwise).
+USER root
+RUN apk upgrade --no-cache
 COPY --from=build /workspace/dist /usr/share/nginx/html
 # The nginx image renders templates with envsubst (only variables defined in the environment).
 COPY nginx.conf /etc/nginx/templates/default.conf.template

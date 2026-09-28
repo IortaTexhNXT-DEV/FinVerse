@@ -1,0 +1,8 @@
+# Reviewed findings of the secret scan (gitleaks). One fingerprint per line; each entry carries the
+# reason, the reviewer and a review date. An entry is removed as soon as the finding no longer
+# exists anywhere in the scanned history; review the list every 6 months.
+#
+# Test constant of ProductionSafeguardsTest in commit d566268 (a random 33-character string used to
+# test the minimum length of the signing key; never a key of any environment). The test now builds
+# its value at run time. Reviewed by the project team on 28-Sep-2026; next review by 31-Mar-2027.
+d5662688ca9997d6d1524273a8817b26e9443922:backend/src/test/java/com/iortatechnxt/brokerverse/config/ProductionSafeguardsTest.java:generic-api-key:12

@@ -13,12 +13,13 @@ RUN mvn -B -q dependency:go-offline
 COPY src src
 # Quality gates run in CI; the image build only packages the tested code.
 RUN mvn -B -q -DskipTests -Djacoco.skip=true -Dcheckstyle.skip -Dpmd.skip -Dcpd.skip \
-    -Dspotbugs.skip -Dspotless.check.skip=true package
+    -Dspotbugs.skip -Dspotless.check.skip=true -Dcyclonedx.skip=true package
 
 # ---- runtime stage -----------------------------------------------------------------
 FROM eclipse-temurin:21-jre-alpine@sha256:51ab5e3302e7141ce665ca3ea85e8b5cd648eafbc3c0c90dd79d6537684e4555
-# Fixed uid/gid 10001, the runAsUser / runAsGroup of the Kubernetes deployments.
-RUN addgroup -S -g 10001 brokerverse && adduser -S -u 10001 -G brokerverse -H -s /sbin/nologin brokerverse
+# Security fixes of the Alpine packages published after the pinned base image; fixed uid/gid 10001,
+# the runAsUser / runAsGroup of the Kubernetes deployments.
+RUN apk upgrade --no-cache && addgroup -S -g 10001 brokerverse && adduser -S -u 10001 -G brokerverse -H -s /sbin/nologin brokerverse
 WORKDIR /app
 COPY --from=build /workspace/target/brokerverse-backend.jar app.jar
 USER 10001:10001

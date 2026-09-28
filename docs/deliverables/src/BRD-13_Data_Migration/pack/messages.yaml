@@ -76,6 +76,7 @@ fixes:
   MIG_OBJECT_NOT_LOADABLE: Choose an object decided as Migrate, Carry forward or Archive.
   MIG_ASOF_MISMATCH: Plan the batch with extracts of the same as-of date.
   MIG_NO_EXTRACT: Upload and stage an extract of the object first.
+  MIG_NO_LAYOUT: Freeze a layout of the object first; only the layouts in force have load templates.
   MIG_EXTRACT_NOT_STAGED: Choose a staged extract of the object.
   MIG_EXTRACT_USED: Choose an extract that is not in another batch.
   MIG_NOTHING_TO_RERUN: No action; the batch has no rejected rows.
@@ -122,7 +123,7 @@ fixes:
   MIG_DOCUMENT_CHECKSUM: Ask BDOI IT to copy the file again; it differs from the index.
   MIG_SOURCE_REQUIRED: Give the legacy system of the documents.
   MIG_DATE_REQUIRED: Correct the extract; the date is mandatory.
-  MIG_ARCHIVE_DETAIL: Correct the legacy details of the record in the extract (label and value pairs).
+  MIG_ARCHIVE_DETAIL: Correct the other legacy fields of the record in the extract (label and value pairs separated by ;).
   MIG_F01_NOT_LOADED: Load the invoice (F01) first, or remove the row.
   MIG_BRANCH_UNKNOWN: Map the legacy branch in the branch code map, or correct the extract.
   MIG_INSURER_NOT_MAPPED: Add the insurer to the insurer code map and have it approved.

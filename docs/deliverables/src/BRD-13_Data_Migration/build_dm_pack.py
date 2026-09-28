@@ -54,7 +54,8 @@ import brand  # noqa: E402
 SEED_SQL = REPO / "backend" / "src" / "main" / "resources" / "db" / "migration" / "V1081__migration_objects_maps.sql"
 # Later scripts that update the texts of the V1081 catalogue (applied in version order after the seed).
 SEED_UPDATES = [SEED_SQL.parent / "V1090__migration_catalogue_wording.sql",
-                SEED_SQL.parent / "V1091__migration_rule_wording.sql"]
+                SEED_SQL.parent / "V1091__migration_rule_wording.sql",
+                SEED_SQL.parent / "V1092__migration_archive_details_wording.sql"]
 JAVA = REPO / "backend" / "src" / "main" / "java" / "com" / "iortatechnxt" / "brokerverse"
 TEMPLATE_EXPORT = JAVA / "migration" / "mapping" / "service" / "TemplateExport.java"
 CODE_MAP_EXCEL = JAVA / "migration" / "mapping" / "service" / "CodeMapExcel.java"
@@ -102,11 +103,6 @@ CLIENT_WORDING = [
     (r"\bthe crm formats\b", "the client formats of BIBS"),
     (r"\bMIG_GOLIVE_RENEWAL_TO\b", "go-live renewal window"),
     (r"\biorta \(load order\)", "iorta TechNXT (load order)"),
-    # Layout H01 (archive): the legacy details column; the platform wording fix of these texts is requested.
-    (r"^All other legacy columns as a JSON object of label and value$",
-     "All other legacy columns as label and value pairs, as in the example"),
-    (r"^JSON object$", "Label and value pairs in braces, as in the example"),
-    (r"^Valid JSON$", "Label and value pairs as in the example"),
 ]
 
 

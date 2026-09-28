@@ -110,8 +110,9 @@ TECHNICAL_ALLOWED: list[tuple[re.Pattern, str]] = [(re.compile(pat), why) for pa
                                   "platform wording fix requested"),
     (r"The rule parameters must be valid JSON", "Platform message INCENTIVE_RULE_PARAMS_INVALID (BRD-03), quoted word for "
                                                 "word; platform wording fix requested"),
-    (r"The legacy details are not valid JSON", "Platform message MIG_ARCHIVE_DETAIL (BRD-13 archive load), quoted word for "
-                                               "word; platform wording fix requested"),
+    (r"The legacy details are not valid JSON", "Former platform message MIG_ARCHIVE_DETAIL (BRD-13 archive load) quoted "
+                                               "in the v2.0 set; the platform wording is fixed (V1092), remove at the next "
+                                               "rebuild of the BRD-13 set"),
     (r"Negative List Database System", "Name of the BDO system NLDS (BRD-10), not a technical term"),
 ]]
 # Sources of the client documents in src/ (per BRD folder and the drop closure folders).

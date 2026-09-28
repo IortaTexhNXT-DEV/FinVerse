@@ -30,10 +30,6 @@ final class LayoutTemplates {
   private static final int MAX_SHEET_NAME = 31;
   private static final int CONTROL_ROWS = 200;
   private static final Pattern CODE_LIST = Pattern.compile("[A-Z0-9_]+(, ?[A-Z0-9_]+)+");
-  private static final String NAMING =
-      "<LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.xlsx or .csv, for example F01C_EBIX_20271231_01.xlsx: the"
-          + " layout code, the source system, the as-of date and the sequence of the day.";
-
   private LayoutTemplates() {}
 
   /**
@@ -42,22 +38,7 @@ final class LayoutTemplates {
    * @return rules
    */
   static List<String> rules() {
-    return List.of(
-        "Name the file " + NAMING,
-        "One file per layout, source system and extract; the layouts of one object carry the same"
-            + " as-of date. A workbook of several layouts is uploaded once per layout, named"
-            + " after that layout: the layout's own sheet is read.",
-        "Dates as Excel dates or yyyy-MM-dd; timestamps as text yyyy-MM-dd HH:mm:ss (Philippine"
-            + " time); amounts with a dot decimal and no thousands separators, minus sign for"
-            + " negatives; codes exactly as stored in the legacy system; a blank cell means no"
-            + " value.",
-        "Send the control file with every data file: <data file name>.ctl.xlsx or .ctl.csv with"
-            + " the row count, the hash total of the key column, the total of each amount column"
-            + " per currency and the SHA-256 of the data file (Control File Template).",
-        "A file whose checksum, header, row count, amount totals or hash total does not agree with"
-            + " its control file is rejected with the reason; nothing of it is loaded.",
-        "Large extracts: use the CSV layout of the same columns (UTF-8, comma separated, header"
-            + " row only).");
+    return TemplateExport.HOW_TO_FILL.stream().map(r -> r.get(0) + ": " + r.get(1) + ".").toList();
   }
 
   /**

@@ -42,6 +42,51 @@ public class TemplateExport {
           "filter",
           "value");
 
+  /**
+   * The rules of a delivery (topic and rule), shown on every load template (title block or Start
+   * here sheet) and in the Migration Workbook.
+   */
+  public static final List<List<String>> HOW_TO_FILL =
+      List.of(
+          List.of(
+              "File name",
+              "<LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.xlsx or .csv, for example F01C_EBIX_20271231_01.xlsx:"
+                  + " the layout code, the source system, the as-of date and the sequence of the day"),
+          List.of(
+              "One file per",
+              "Layout, source system and extract; an object with several layouts sends one file per"
+                  + " layout with the same as-of date"),
+          List.of(
+              "Excel",
+              "The load template of the console, uploaded as it is: its guide rows and example row"
+                  + " are skipped and the sheet of the layout is read; a workbook of several layouts"
+                  + " is uploaded once per layout, named after that layout. A plain workbook has the"
+                  + " header in row 1 of its first sheet, no merged cells, no formulas"),
+          List.of(
+              "CSV",
+              "For large extracts: UTF-8 without byte order mark, comma separator, double quotes"
+                  + " around values that hold a comma, a quote or a line break, one header row with"
+                  + " the column names exactly as in the template"),
+          List.of(
+              "Values",
+              "Dates as Excel dates or yyyy-MM-dd; timestamps yyyy-MM-dd HH:mm:ss (Philippine time);"
+                  + " amounts with a dot decimal, 2 decimals, no thousands separator, minus sign for"
+                  + " negatives; currency ISO 4217; codes exactly as stored in the legacy system;"
+                  + " blank means no value"),
+          List.of(
+              "Control file",
+              "<data file name>.ctl.xlsx or .ctl.csv in the control layout: the row count, the hash"
+                  + " total of the key column, the total of each amount column per currency and the"
+                  + " SHA-256 of the data file, one row per measure"),
+          List.of(
+              "Delivery",
+              "Upload the data file and its control file together on the Extracts screen of the"
+                  + " Migration Console; never by e-mail"),
+          List.of(
+              "Checks",
+              "A file whose checksum, header, row count, amount totals or hash total does not agree"
+                  + " with its control file is rejected with the reason; nothing of it is loaded"));
+
   private final LayoutService layouts;
   private final MigDataObjectRepository objects;
 

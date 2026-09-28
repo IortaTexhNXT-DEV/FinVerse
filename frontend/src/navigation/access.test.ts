@@ -62,7 +62,7 @@ describe('landing page', () => {
       ...screen('/migration', 'MIG_VIEW'),
       landingFor: ['MIG_INTAKE'],
     };
-    const withHome = [screen('/approvals', undefined), home];
+    const withHome = [screen('/approvals'), home];
     expect(landingPath(withHome, (p) => p === 'MIG_VIEW' || p === 'MIG_INTAKE')).toBe('/migration');
     expect(landingPath(withHome, (p) => p === 'MIG_VIEW')).toBe('/approvals');
   });

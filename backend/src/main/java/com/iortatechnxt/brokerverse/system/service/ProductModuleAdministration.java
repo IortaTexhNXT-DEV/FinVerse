@@ -185,7 +185,7 @@ public class ProductModuleAdministration {
   public ProductModuleSwitch reject(String code, String reason) {
     ProductModuleSwitch s = require(code);
     String requestedBy = s.getPendingBy();
-    boolean withdrawn = currentUser.username().equalsIgnoreCase(requestedBy);
+    boolean withdrawn = CurrentUser.sameUser(currentUser.username(), requestedBy);
     if (!withdrawn && (reason == null || reason.isBlank())) {
       throw new BusinessRuleException("REASON_REQUIRED", "Give the reason for the rejection");
     }

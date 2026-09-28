@@ -53,7 +53,7 @@ describe('extracts', () => {
       size: 25,
       totalElements: 1,
       totalPages: 1,
-    } as never);
+    });
     const upload = vi.spyOn(migrationApi, 'uploadExtract').mockResolvedValue(REJECTED);
     render(ebWrapper(new Set(['MIG_INTAKE']))(<ExtractsPage />));
     expect(

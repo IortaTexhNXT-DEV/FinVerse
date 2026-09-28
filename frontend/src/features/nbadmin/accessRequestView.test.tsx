@@ -14,7 +14,7 @@ const role = (code: string, name: string, module?: string, active = true): RoleI
   name,
   permissions: [],
   active,
-  privilegeLevel: 'STANDARD' as RoleInfo['privilegeLevel'],
+  privilegeLevel: 'STANDARD',
   module,
 });
 
@@ -46,7 +46,7 @@ const REQUEST: AccessRequest = {
     riskFlags: [],
     secondApprovalRequired: false,
   },
-} as AccessRequest;
+};
 
 const USER = {
   username: 'jdelacruz',

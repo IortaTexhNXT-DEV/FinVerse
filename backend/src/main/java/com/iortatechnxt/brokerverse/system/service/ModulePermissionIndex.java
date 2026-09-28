@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.springframework.beans.factory.ObjectProvider;
@@ -30,7 +31,7 @@ public class ModulePermissionIndex {
   private static final Pattern CODE = Pattern.compile("'([A-Z][A-Z0-9_]+)'");
 
   private final ObjectProvider<RequestMappingHandlerMapping> mappings;
-  private volatile Map<String, Set<String>> usage;
+  private final AtomicReference<Map<String, Set<String>>> usage = new AtomicReference<>();
 
   /**
    * Creates the index.
@@ -62,10 +63,10 @@ public class ModulePermissionIndex {
   }
 
   private Map<String, Set<String>> usage() {
-    Map<String, Set<String>> current = usage;
+    Map<String, Set<String>> current = usage.get();
     if (current == null) {
       current = build();
-      usage = current;
+      usage.compareAndSet(null, current);
     }
     return current;
   }

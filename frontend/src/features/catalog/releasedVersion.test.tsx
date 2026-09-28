@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { productCatalogApi } from '@/api/productCatalog';
 import type { Coverage } from '@/api/productCatalog';
+import type { PackageTerms } from '@/api/productmaint';
 import { ebWrapper } from '@/features/eb/testWrapper';
 import { emptyTerms, newCoverage } from '@/features/productmaint/packageRequest';
 import { TermsEditor } from '@/features/productmaint/TermsEditor';
@@ -101,7 +102,8 @@ describe('released package version and request terms', () => {
     const picker = screen.getByRole('combobox', { name: 'Coverage 1' });
     await screen.findByRole('option', { name: 'Own Damage and Theft (basic)' });
     fireEvent.change(picker, { target: { value: 'OD_THEFT' } });
-    expect(onChange.mock.calls[0]?.[0].coverages[0].coverageCode).toBe('OD_THEFT');
+    const next = onChange.mock.calls[0]?.[0] as PackageTerms | undefined;
+    expect(next?.coverages[0]?.coverageCode).toBe('OD_THEFT');
   });
 
   it('asks for the line before the coverages', () => {

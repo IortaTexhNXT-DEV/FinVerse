@@ -32,7 +32,10 @@ const screens = MODULES.flatMap((m) => m.screens);
 
 describe('product module switches in the menu', () => {
   it('knows exactly the modules of the server catalogue', () => {
-    expect(Object.keys(PRODUCT_MODULE_PATHS).sort()).toEqual([...SERVER_MODULES].sort());
+    const byName = (a: string, b: string) => a.localeCompare(b);
+    expect(Object.keys(PRODUCT_MODULE_PATHS).sort(byName)).toEqual(
+      [...SERVER_MODULES].sort(byName),
+    );
   });
 
   it('ties screens to their module by path, the longest prefix first', () => {

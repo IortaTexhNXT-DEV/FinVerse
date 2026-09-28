@@ -36,7 +36,7 @@ public class ModuleProfile extends BaseEntity {
       joinColumns = @JoinColumn(name = "profile_id"))
   @MapKeyColumn(name = "module_code", length = 40)
   @Column(name = "enabled", nullable = false)
-  private Map<String, Boolean> modules = new TreeMap<>();
+  private final Map<String, Boolean> modules = new TreeMap<>();
 
   protected ModuleProfile() {}
 

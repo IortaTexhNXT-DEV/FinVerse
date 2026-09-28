@@ -9,6 +9,21 @@ import { formatAmount } from '@/utils/format';
 
 const DASH = <span className="muted">—</span>;
 
+/** A value of a released version: an amount with separators, wrapped text, a dash when empty. */
+function ReadOnlyValue({ value, text }: Readonly<{ value: string; text: boolean }>) {
+  if (value === '') {
+    return DASH;
+  }
+  if (text) {
+    return <span style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>{value}</span>;
+  }
+  return <>{formatAmount(value)}</>;
+}
+
+function yesNo(flag: boolean): string {
+  return flag ? 'Yes' : 'No';
+}
+
 interface Props {
   form: VersionForm;
   lineCode: string;
@@ -52,14 +67,7 @@ export function VersionTermsSection({ form, lineCode, readOnly, onChange }: Read
     label: string,
   ) => {
     if (readOnly) {
-      if (row[key] === '') {
-        return DASH;
-      }
-      return key === 'deductibleText' ? (
-        <span style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>{row[key]}</span>
-      ) : (
-        formatAmount(row[key])
-      );
+      return <ReadOnlyValue value={row[key]} text={key === 'deductibleText'} />;
     }
     return (
       <input
@@ -97,11 +105,7 @@ export function VersionTermsSection({ form, lineCode, readOnly, onChange }: Read
             header: 'Covered',
             render: (t) =>
               readOnly ? (
-                t.included ? (
-                  'Yes'
-                ) : (
-                  'No'
-                )
+                yesNo(t.included)
               ) : (
                 <input
                   type="checkbox"

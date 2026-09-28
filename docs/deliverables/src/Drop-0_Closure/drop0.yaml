@@ -90,6 +90,7 @@ parameter_groups:
 parameter_text:
   AUTH_MODE: "Sign-in mode: LOCAL (BIBS passwords) or DIRECTORY (BDO directory sign-in by Windows ID, when the EIAM sign-in is specified)"
   DISB_AUTO_APPROVER_ROUTING: "Request types whose disbursement voucher is prepared automatically and routed straight to the approver"
+  CSF_SEARCH_MAX_RESULTS: "Maximum clients a customer search returns before the contact centre officer must refine it"
   EPOLICY_PASSWORD_HINT: "Text telling the client how the password of the e-policy is formed"
 
 # Module of each list of values: by the start of the list code (longest match first), then by the full code.

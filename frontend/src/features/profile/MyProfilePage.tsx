@@ -33,7 +33,7 @@ function ChangePassword({ status }: Readonly<{ status: PasswordStatus | undefine
     return (
       <Card title="Password">
         <Notice tone="info">
-          You sign in with your BDO network password. Change it through the BDO directory, not in
+          You sign in with your network password. Change it through the corporate directory, not in
           BrokerVerse.
         </Notice>
       </Card>

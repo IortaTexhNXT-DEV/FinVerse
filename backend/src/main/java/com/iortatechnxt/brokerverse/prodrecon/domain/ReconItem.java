@@ -63,16 +63,16 @@ public class ReconItem extends BaseEntity {
   private String productLine;
 
   @Embedded
-  @AttributeOverride(name = "policyNo", column = @Column(name = "bdoi_policy_no"))
-  @AttributeOverride(name = "referenceNo", column = @Column(name = "bdoi_reference_no"))
-  @AttributeOverride(name = "pnNo", column = @Column(name = "bdoi_pn_no"))
-  @AttributeOverride(name = "periodFrom", column = @Column(name = "bdoi_period_from"))
-  @AttributeOverride(name = "periodTo", column = @Column(name = "bdoi_period_to"))
-  @AttributeOverride(name = "assuredName", column = @Column(name = "bdoi_assured_name"))
-  @AttributeOverride(name = "commission", column = @Column(name = "bdoi_commission"))
-  @AttributeOverride(name = "basicPremium", column = @Column(name = "bdoi_basic_premium"))
-  @AttributeOverride(name = "grossPremium", column = @Column(name = "bdoi_gross_premium"))
-  private ReconSide bdoi;
+  @AttributeOverride(name = "policyNo", column = @Column(name = "broker_policy_no"))
+  @AttributeOverride(name = "referenceNo", column = @Column(name = "broker_reference_no"))
+  @AttributeOverride(name = "pnNo", column = @Column(name = "broker_pn_no"))
+  @AttributeOverride(name = "periodFrom", column = @Column(name = "broker_period_from"))
+  @AttributeOverride(name = "periodTo", column = @Column(name = "broker_period_to"))
+  @AttributeOverride(name = "assuredName", column = @Column(name = "broker_assured_name"))
+  @AttributeOverride(name = "commission", column = @Column(name = "broker_commission"))
+  @AttributeOverride(name = "basicPremium", column = @Column(name = "broker_basic_premium"))
+  @AttributeOverride(name = "grossPremium", column = @Column(name = "broker_gross_premium"))
+  private ReconSide broker;
 
   @Column(name = "upload_id")
   private Long uploadId;
@@ -148,11 +148,11 @@ public class ReconItem extends BaseEntity {
    * @param facts booked invoice facts
    * @return the item
    */
-  public static ReconItem booked(Long cycleId, BdoiFacts facts) {
+  public static ReconItem booked(Long cycleId, BrokerFacts facts) {
     ReconItem i = new ReconItem();
     i.cycleId = cycleId;
-    i.attachBdoi(facts);
-    i.status = ReconStatus.BDOI_ONLY;
+    i.attachBroker(facts);
+    i.status = ReconStatus.BROKER_ONLY;
     return i;
   }
 
@@ -177,7 +177,7 @@ public class ReconItem extends BaseEntity {
    *
    * @param facts booked invoice facts
    */
-  public final void attachBdoi(BdoiFacts facts) {
+  public final void attachBroker(BrokerFacts facts) {
     this.invoiceNo = facts.invoiceNo();
     this.extractLineId = facts.extractLineId();
     this.arn = facts.arn();
@@ -187,7 +187,7 @@ public class ReconItem extends BaseEntity {
     this.branchId = facts.branchId();
     this.segment = facts.segment();
     this.productLine = facts.productLine();
-    this.bdoi = facts.side();
+    this.broker = facts.side();
     if (unbookedStatus != null) {
       this.unbookedStatus = UnbookedStatus.BOOKED;
     }
@@ -219,7 +219,7 @@ public class ReconItem extends BaseEntity {
     this.matchMethod = null;
     this.matchedAt = null;
     this.matchedBy = null;
-    this.status = ReconStatus.BDOI_ONLY;
+    this.status = ReconStatus.BROKER_ONLY;
   }
 
   /**
@@ -347,8 +347,8 @@ public class ReconItem extends BaseEntity {
     return productLine;
   }
 
-  public ReconSide getBdoi() {
-    return bdoi;
+  public ReconSide getBroker() {
+    return broker;
   }
 
   public Long getUploadId() {
@@ -437,7 +437,7 @@ public class ReconItem extends BaseEntity {
    * @param productLine product line
    * @param side compared fields
    */
-  public record BdoiFacts(
+  public record BrokerFacts(
       String invoiceNo,
       Long extractLineId,
       String arn,

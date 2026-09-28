@@ -156,6 +156,7 @@ tables of the migrated database.
   | V1111–V1119 | document storage, build step ST1 (module files into the file store): V1111 platform (`doc_attachment`, `report_run`, `report_batch`, `msg_outbound_attachment`), V1112 Operations (`ops_extract_file`, `csh_print_batch`, `rem_batch_document`), V1113 broking (`plc_slip_file`, `iss_upload_item`, `iss_insurance_advice`, `bkg_service_invoice`), V1114 disbursement and collections (`dsb_eod_output`, `clx_billing_document`): `stored_file_id` added, `bytea` columns made nullable. V1115–V1119 reserved for the drop of the `bytea` columns once the copy is signed off (prepared, not applied: `docs/architecture/st1/ST1_DROP_BYTEA_COLUMNS.sql`) |
   | V1110 | platform wording (MSG0): V1110 rewrites the delivered reference texts (lists of values, parameters, notification events, exception codes, accounting events, feeds, layouts, rules) without internal references; it updates a text only where it still holds the delivered value. Its seed counterpart is V2000 in `db/seed`, after all seed data |
   | V1130–V1139 | User Access Maintenance extension (BRD-11), for changes that must run after migrations of later ranges: V1130 the User Access grants of `INFOSEC_OFFICER` (the role is created by V1101) |
+  | V1150–V1159 | platform client neutrality (no client values in platform code): V1150 client profile on `org_company` (short name, group name, logo reference, head-office code, default bank account); V1151 claim status party `BROKER`; V1152 business rules as parameters (credit days, password notice days, rate exception validity, DP premium and EWT rate tolerances, open-cover transit days); V1153 platform codes for the broker itself (`VIA_BROKER`, `BROKER`, `BROKER_NOTICE`, `BROKER_ONLY`, `prc_item.broker_*`, `plc_billing_item.broker_location`). Seed counterpart V2010–V2019 in `db/seed` (V2010 client profile of the seed companies and their input VAT tax code) |
   | V2001–V2009 | seed data corrections found by the business sign-off packs (`db/seed`, after V2000): V2001 BRD-1 and BRD-3 (package products active for testing, distinct seed clients, realistic addresses and location keys, the Unapplied Payment Handler's sign-in, placeholder texts, PAR08 version 2); V2002 BRD-3 (the seeded package release remark names the validator by display name) |
   | V900–V999 | seed data (`db/seed`, loaded only with the `seed` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989, Operations V990–V995, Product Maintenance V996–V998 (V996 catalog versions, V997 package requests, V998 Product Maintenance users), Accounting / Disbursement V999 (reference data and users only; its storyline runs as Java seed runners) (full) |
   | V1900–V1999 | seed data of the V1000+ modules, 10 versions each in the same order: Collections V1900–V1909, Renewal V1910–V1919 (V1910 used), Claims V1920–V1929, Employee Benefits V1930–V1939 (V1930–V1933 used), Customer Servicing V1940–V1949 (V1940 used), Sanctions V1950–V1959, User Access V1960–V1969 (V1960–V1961 used), Submitted Policies V1970–V1979 (V1970 used; the seed records are loaded by `SubmittedSeedData`), Data Migration V1980–V1989, Core Replacement V1990–V1999 (runs after all V9xx seed, so it can build on the Operations and booking seed) |
@@ -170,6 +171,14 @@ tables of the migrated database.
   `numeric(19,8)` rates, `varchar(3)` currencies, audit columns as in V1, foreign keys and indexes
   for every lookup path, check constraints for invariants.
 - Hibernate runs with `ddl-auto: validate`: entity and table must match exactly.
+- Client neutrality: no client name, code, logo, currency or business term in platform code. Use
+  the client profile of the company (`OrganizationDirectory.profile`, frontend `useClientNames` /
+  `groupLabel`), the base currency of the company (`OrganizationDirectory.company(id).baseCurrency()`,
+  frontend `useBaseCurrency`, `useCurrencyCodes`), business parameters (`SystemParameterService.
+  requiredInt` / `requiredDecimal`, seeded by a migration), lists of values, or the theme pack
+  (`frontend/src/theme/packs/<pack>`, `backend/src/main/resources/theme/<pack>`). Client values
+  belong in seed data (`db/seed`, `*SeedData`). `ClientNeutralityTest` and the frontend lint rule
+  enforce it (see `docs/operations/CONFIGURATION.md`, "Client-specific values").
 
 ## 5. Accounting rules for developers
 

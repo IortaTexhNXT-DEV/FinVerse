@@ -86,7 +86,7 @@ public class BookingFixtures {
 
   /** An issued MTR10 CBG motor account paid via BDOI. */
   public Account motor() {
-    return issued(spec("MTR10", "CBG", PaymentArrangement.VIA_BDOI));
+    return issued(spec("MTR10", "CBG", PaymentArrangement.VIA_BROKER));
   }
 
   /** An issued MTR10 CBG motor account paid directly to the insurer (BRNB.114). */
@@ -102,7 +102,7 @@ public class BookingFixtures {
   /** An issued multi-year PAR01 property account starting in the past (BRNB.112). */
   public Account multiYear(LocalDate from, int years) {
     return issued(
-        new Spec("PAR01", "CBG", PaymentArrangement.VIA_BDOI, from, from.plusYears(years), years));
+        new Spec("PAR01", "CBG", PaymentArrangement.VIA_BROKER, from, from.plusYears(years), years));
   }
 
   /**
@@ -112,7 +112,7 @@ public class BookingFixtures {
    * @return account
    */
   public Account renewalMotor(String renewalOf) {
-    return issued(spec("MTR10", "CBG", PaymentArrangement.VIA_BDOI), renewalOf);
+    return issued(spec("MTR10", "CBG", PaymentArrangement.VIA_BROKER), renewalOf);
   }
 
   /** Brings an account to POLICY_ISSUED by direct booking (BRNB.111) with its policy numbers. */

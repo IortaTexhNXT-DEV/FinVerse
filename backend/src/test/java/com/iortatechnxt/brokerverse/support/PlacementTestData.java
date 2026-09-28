@@ -142,7 +142,7 @@ public class PlacementTestData {
             false,
             1,
             "PHP",
-            PaymentArrangement.VIA_BDOI,
+            PaymentArrangement.VIA_BROKER,
             spec.mortgage(),
             null,
             List.of(spec.item()),

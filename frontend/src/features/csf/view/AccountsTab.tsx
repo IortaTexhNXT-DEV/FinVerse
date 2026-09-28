@@ -13,6 +13,7 @@ import { Tag } from '@/components/ui/Tag';
 import { formatAmount } from '@/utils/format';
 import { CSF_LOV, csfStatusTone } from '../csfCodes';
 import { InBaseCurrency } from '@/components/ui/InBaseCurrency';
+import { BRAND } from '@/branding';
 
 /** Title of the notice of a tab whose source module does not answer (FR-CSF-011). */
 export const TAB_UNAVAILABLE = 'Information not available now. Try again';
@@ -48,7 +49,7 @@ function useColumns(compact: boolean): Column<AccountLine>[] {
     },
     {
       key: 'stage',
-      header: 'BIBS Stage',
+      header: `${BRAND.product} Stage`,
       kind: 'status',
       render: (a) => <StatusBadge status={a.stage} />,
     },

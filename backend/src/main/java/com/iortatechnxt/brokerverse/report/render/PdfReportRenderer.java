@@ -39,10 +39,10 @@ import org.springframework.stereotype.Component;
 public class PdfReportRenderer implements ReportRenderer {
 
   // BDO style guide: Header Blue #004EA8, CTA Blue #0072D8, Background Blue #E5F5FF.
-  private static final Color BRAND_NAVY = BrandAssets.color(BrandAssets.HEADER_BLUE);
-  private static final Color BRAND_BLUE = BrandAssets.color(BrandAssets.CTA_BLUE);
-  private static final Color BRAND_GOLD = BrandAssets.color(BrandAssets.GOLD);
-  private static final Color GROUP_BG = BrandAssets.color(BrandAssets.BACKGROUND_BLUE);
+  private static final Color BRAND_NAVY = BrandAssets.color(BrandAssets.HEADER);
+  private static final Color BRAND_BLUE = BrandAssets.color(BrandAssets.PRIMARY);
+  private static final Color BRAND_GOLD = BrandAssets.color(BrandAssets.ACCENT);
+  private static final Color GROUP_BG = BrandAssets.color(BrandAssets.BACKGROUND);
   private static final Color SUBTOTAL_BG = BrandAssets.color(BrandAssets.BAND);
   private static final Color ROW_BAND = BrandAssets.color(BrandAssets.ROW_BAND);
   private static final float LOGO_HEIGHT = 22f;

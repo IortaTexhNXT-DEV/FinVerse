@@ -204,7 +204,7 @@ public class AccountUpdateBulkHandler implements BulkImportHandler {
     }
     return row.yes(Headers.DIRECT_PAYMENT)
         ? PaymentArrangement.DIRECT_TO_INSURER
-        : PaymentArrangement.VIA_BDOI;
+        : PaymentArrangement.VIA_BROKER;
   }
 
   private static List<RiskItemData> items(

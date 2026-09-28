@@ -240,7 +240,7 @@ public class RenewalAccountService {
         false,
         1,
         premium.currency(),
-        PaymentArrangement.VIA_BDOI,
+        PaymentArrangement.VIA_BROKER,
         null,
         null,
         List.of(),

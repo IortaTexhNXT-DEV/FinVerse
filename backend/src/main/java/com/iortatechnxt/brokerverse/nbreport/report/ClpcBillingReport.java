@@ -28,7 +28,7 @@ public class ClpcBillingReport implements ReportDefinition {
   private static final String SQL =
       "select b.batch_no || ' (' || to_char(b.billing_date, 'DD-MM-YYYY') || ')' as batch,"
           + " t.line_no, t.arn, t.pn_numbers as pn, t.loan_application_no as loan,"
-          + " t.borrower, t.originating_unit as unit, t.bdoi_location as location,"
+          + " t.borrower, t.originating_unit as unit, t.broker_location as location,"
           + " t.booking_date, t.premium, t.amortised, t.payment_status as payment"
           + " from plc_billing_batch b join plc_billing_item t on t.batch_id = b.id"
           + " where b.company_id = :company and b.billing_date between :from and :to"

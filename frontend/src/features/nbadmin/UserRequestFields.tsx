@@ -22,7 +22,7 @@ function UserField({ form, set, errors, users, userIdFormatText }: Readonly<Fiel
   const typed = form.type === 'CREATE_USER' || form.userType === 'EXTERNAL';
   let hint: string | undefined;
   if (typed) {
-    hint = userIdFormatText ? `BDOI format: ${userIdFormatText}` : 'BDOI format';
+    hint = userIdFormatText ? `Format: ${userIdFormatText}` : 'Format of the user ID parameter';
   }
   return (
     <Field label="User ID" required error={errors.username} hint={hint}>

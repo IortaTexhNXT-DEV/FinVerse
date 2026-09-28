@@ -60,7 +60,7 @@ export const ACCOUNTS_HELP: HelpSection = {
       workflow: ['Tag or untag direct payment from the account (Details tab) while it is open.'],
       controls: [
         'Only products that allow direct payment can be tagged.',
-        'On validation a direct payment account is released for placement without BDOI collection.',
+        'On validation a direct payment account is released for placement without collection by the broker.',
       ],
     },
   ],

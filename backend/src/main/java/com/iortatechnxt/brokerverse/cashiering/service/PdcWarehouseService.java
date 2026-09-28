@@ -81,7 +81,7 @@ public class PdcWarehouseService {
    *
    * @param companyId company
    * @param branchId branch
-   * @param check check details
+   * @param given check details (the base currency of the company when it has none)
    * @return the item
    */
   public PdcItem warehouse(Long companyId, Long branchId, PdcCheck given) {

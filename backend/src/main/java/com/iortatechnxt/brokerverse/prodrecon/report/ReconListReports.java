@@ -118,8 +118,8 @@ public class ReconListReports {
         "select c.insurer_code as insurer, "
             + MONTH
             + ", coalesce(i.invoice_no, i.ins_reference_no) as reference,"
-            + " coalesce(i.bdoi_policy_no, i.ins_policy_no) as policy,"
-            + " coalesce(i.bdoi_assured_name, i.ins_assured_name) as assured, i.status,"
+            + " coalesce(i.broker_policy_no, i.ins_policy_no) as policy,"
+            + " coalesce(i.broker_assured_name, i.ins_assured_name) as assured, i.status,"
             + " i.discrepancies, i.company_concerned, i.instruction, i.insurer_feedback,"
             + " i.marketing_feedback, i.disposition,"
             + " case when i.for_closure then 'Yes' else 'No' end as closure"

@@ -63,7 +63,7 @@ function wrap(children: ReactNode, path = '/', permissions: ReadonlySet<string> 
 const CLAIM: Claim = {
   id: 7,
   claimNo: 'BCL-2026-000007',
-  source: 'BDOI_NOTICE',
+  source: 'BROKER_NOTICE',
   handler: 'clmofficer',
   unitLabel: 'Motor HO',
   cover: {

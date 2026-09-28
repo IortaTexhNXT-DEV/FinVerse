@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -33,13 +34,14 @@ public class RateSchemeExceptionService {
   /** Error code of a deviation from the current scheme without an approved exception. */
   public static final String NOT_CURRENT = "RATE_SCHEME_NOT_CURRENT";
 
-  private static final int DEFAULT_VALIDITY_DAYS = 30;
+  private static final String DEFAULT_VALIDITY_DAYS = "RATE_EXCEPTION_VALIDITY_DAYS";
 
   private final RateOverrideRepository exceptions;
   private final ProductCatalogService catalog;
   private final DocumentNumberService numbers;
   private final AuditTrailService audit;
   private final Clock clock;
+  private final SystemParameterService parameters;
 
   /**
    * Creates the service.
@@ -49,18 +51,21 @@ public class RateSchemeExceptionService {
    * @param numbers reference numbers
    * @param audit audit trail
    * @param clock clock
+   * @param parameters business parameters
    */
   public RateSchemeExceptionService(
       RateOverrideRepository exceptions,
       ProductCatalogService catalog,
       DocumentNumberService numbers,
       AuditTrailService audit,
-      Clock clock) {
+      Clock clock,
+      SystemParameterService parameters) {
     this.exceptions = exceptions;
     this.catalog = catalog;
     this.numbers = numbers;
     this.audit = audit;
     this.clock = clock;
+    this.parameters = parameters;
   }
 
   /**
@@ -74,7 +79,9 @@ public class RateSchemeExceptionService {
     requireComplete(request);
     LocalDate today = BusinessClock.today(clock);
     LocalDate validUntil =
-        request.validUntil() != null ? request.validUntil() : today.plusDays(DEFAULT_VALIDITY_DAYS);
+        request.validUntil() != null
+            ? request.validUntil()
+            : today.plusDays(parameters.requiredInt(DEFAULT_VALIDITY_DAYS));
     if (validUntil.isBefore(today)) {
       throw new BusinessRuleException(
           "RATE_EXCEPTION_VALIDITY_PAST", "The validity date cannot be in the past");

@@ -122,7 +122,7 @@ final class AccountTerms {
         draft.multiYear() ? draft.termYears() : 1,
         currency == null || currency.isBlank() ? baseCurrency : currency,
         draft.paymentArrangement() == null
-            ? PaymentArrangement.VIA_BDOI
+            ? PaymentArrangement.VIA_BROKER
             : draft.paymentArrangement(),
         draft.mortgage() == null ? Mortgage.NONE : draft.mortgage(),
         contact,

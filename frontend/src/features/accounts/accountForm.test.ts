@@ -58,7 +58,7 @@ describe('account wizard draft', () => {
   it('starts an annual draft through BDOI in pesos', () => {
     const d = newDraft('2026-03-15');
     expect(d.periodTo).toBe('2027-03-15');
-    expect(d.paymentArrangement).toBe('VIA_BDOI');
+    expect(d.paymentArrangement).toBe('VIA_BROKER');
     expect(canSave(d)).toBe(false);
     expect(canSave({ ...d, clientId: 1, productCode: 'MTR10' })).toBe(true);
     expect(oneYearAfter('')).toBe('');

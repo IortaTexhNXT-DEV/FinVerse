@@ -48,6 +48,46 @@ export default tseslint.config(
     },
   },
   {
+    // Client neutrality (platform code): no client names and no currency codes in the screens.
+    // The client's names come from its company master (useClientNames) or its theme pack, the
+    // currency from the company (useBaseCurrency) or the currency master. Tests, fixtures and
+    // the theme packs are exempt; backend ClientNeutralityTest checks the same on every build.
+    files: ['src/**/*.{ts,tsx}'],
+    ignores: [
+      '**/*.test.{ts,tsx}',
+      'src/test/**',
+      '**/*[fF]ixtures.ts',
+      '**/testWrapper.tsx',
+      'src/theme/packs/**',
+    ],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'Literal[value=/\\bBDOI?\\b/]',
+          message: 'No client name in platform code: use useClientNames/groupLabel or the theme pack.',
+        },
+        {
+          selector: 'TemplateElement[value.raw=/\\bBDOI?\\b/]',
+          message: 'No client name in platform code: use useClientNames/groupLabel or the theme pack.',
+        },
+        {
+          selector: 'JSXText[value=/\\bBDOI?\\b/]',
+          message: 'No client name in platform code: use useClientNames/groupLabel or the theme pack.',
+        },
+        {
+          selector:
+            'Literal[value=/\\b(PHP|USD|EUR|GBP|JPY|SGD|HKD|AUD|CAD|CHF|CNY)\\b/]',
+          message: 'No currency code in the screens: use useBaseCurrency or the currency master.',
+        },
+        {
+          selector: 'JSXText[value=/\\b(PHP|USD|EUR|GBP|JPY|SGD|HKD|AUD|CAD|CHF|CNY)\\b/]',
+          message: 'No currency code in the screens: use useBaseCurrency or the currency master.',
+        },
+      ],
+    },
+  },
+  {
     files: ['**/*.test.{ts,tsx}', 'src/test/**'],
     rules: {
       'sonarjs/no-hardcoded-passwords': 'off',

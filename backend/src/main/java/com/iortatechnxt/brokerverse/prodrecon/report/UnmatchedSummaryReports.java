@@ -72,7 +72,7 @@ public class UnmatchedSummaryReports {
             + AO_AB
             + MEASURES
             + ReconReportSupport.ITEMS_OF_PERIOD
-            + " and i.status in ('BDOI_ONLY', 'MATCHED_WITH_DISCREPANCY', 'UNMATCHED_PREBOOKED')"
+            + " and i.status in ('BROKER_ONLY', 'MATCHED_WITH_DISCREPANCY', 'UNMATCHED_PREBOOKED')"
             + " group by 1, 2, 3 order by 1, 2, 3",
         SqlReport.Group.INSURER,
         List.of(

@@ -5,6 +5,9 @@ WORKDIR /workspace
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY . .
+# Theme pack of the client deployment (src/theme/packs/<pack>): branding, colours, fonts, logo.
+ARG VITE_THEME_PACK=bdoi
+ENV VITE_THEME_PACK=${VITE_THEME_PACK}
 RUN npm run build
 
 # ---- runtime stage: static files served by nginx, /api proxied to the backend -------

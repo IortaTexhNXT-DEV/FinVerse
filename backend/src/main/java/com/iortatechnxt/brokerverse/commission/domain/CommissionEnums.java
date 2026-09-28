@@ -90,8 +90,8 @@ public final class CommissionEnums {
 
   /** Who keeps the incentive. */
   public enum Beneficiary {
-    /** BDOI keeps it. */
-    BDOI,
+    /** The broker keeps it. */
+    BROKER,
     /** Passed on to the branches (Disbursement). */
     BRANCH
   }

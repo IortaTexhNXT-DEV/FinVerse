@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.tax.service;
 
 import com.iortatechnxt.brokerverse.common.util.Money;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import com.iortatechnxt.brokerverse.tax.domain.NormalBalance;
 import com.iortatechnxt.brokerverse.tax.domain.ReturnFigures;
 import com.iortatechnxt.brokerverse.tax.domain.ReturnLineValues;
@@ -49,13 +50,16 @@ public class EwtWorksheetBuilder {
   private static final String COMMISSION = "COMMISSION";
   private static final String ATC_PREFIX = "ATC:";
   private static final int RATE_SCALE = 8;
-  private static final BigDecimal RATE_TOLERANCE = new BigDecimal("0.05");
+
+  /** Parameter: tolerance in percentage points between a document rate and the ATC rate. */
+  private static final String RATE_TOLERANCE = "EWT_RATE_TOLERANCE";
 
   private final PremiumTaxSource premiums;
   private final TaxSourceQueries queries;
   private final TaxpayerDirectory directory;
   private final TaxReturnRepository returns;
   private final WorksheetSupport support;
+  private final SystemParameterService parameters;
 
   /**
    * Creates the builder.
@@ -65,18 +69,21 @@ public class EwtWorksheetBuilder {
    * @param directory payee facts
    * @param returns monthly remittances of the quarter
    * @param support shared helpers
+   * @param parameters business parameters
    */
   public EwtWorksheetBuilder(
       PremiumTaxSource premiums,
       TaxSourceQueries queries,
       TaxpayerDirectory directory,
       TaxReturnRepository returns,
-      WorksheetSupport support) {
+      WorksheetSupport support,
+      SystemParameterService parameters) {
     this.premiums = premiums;
     this.queries = queries;
     this.directory = directory;
     this.returns = returns;
     this.support = support;
+    this.parameters = parameters;
   }
 
   /**
@@ -130,7 +137,13 @@ public class EwtWorksheetBuilder {
             .stream()
             .toList();
     return new TaxWorksheet(
-        WorksheetKind.EWT, period, lines, figures, documents, controls, notes(documents, lookup));
+        WorksheetKind.EWT,
+        period,
+        lines,
+        figures,
+        documents,
+        controls,
+        notes(documents, lookup, parameters.requiredDecimal(RATE_TOLERANCE)));
   }
 
   /**
@@ -233,7 +246,8 @@ public class EwtWorksheetBuilder {
     return lines;
   }
 
-  private static List<String> notes(List<TaxDocumentLine> documents, Lookup lookup) {
+  private static List<String> notes(
+      List<TaxDocumentLine> documents, Lookup lookup, BigDecimal tolerance) {
     List<String> notes = new ArrayList<>();
     Set<String> unmapped = new TreeSet<>();
     Set<String> mismatched = new TreeSet<>();
@@ -241,7 +255,7 @@ public class EwtWorksheetBuilder {
       AtcFacts atc = lookup.atc(d.partyCode());
       if (atc.rate() == null) {
         unmapped.add(d.partyCode());
-      } else if (d.rate().subtract(atc.rate()).abs().compareTo(RATE_TOLERANCE) > 0) {
+      } else if (d.rate().subtract(atc.rate()).abs().compareTo(tolerance) > 0) {
         mismatched.add(
             d.partyCode()
                 + " ("

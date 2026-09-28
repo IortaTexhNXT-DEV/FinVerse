@@ -116,7 +116,7 @@ class ClaimsEndToEndApiIT {
     Account account =
         booking.issued(
             new BookingFixtures.Spec(
-                "MTR10", "CBG", PaymentArrangement.VIA_BDOI, from, from.plusYears(1), 1));
+                "MTR10", "CBG", PaymentArrangement.VIA_BROKER, from, from.plusYears(1), 1));
     JsonNode booked =
         api.read(
             api.doPost(
@@ -148,7 +148,7 @@ class ClaimsEndToEndApiIT {
     body.put("companyId", Long.valueOf(company));
     body.put("arn", arn);
     body.put("policyYear", 1);
-    body.put("source", "BDOI_NOTICE");
+    body.put("source", "BROKER_NOTICE");
     body.put("loss", loss);
     api.doPost("ao", BASE, body).andExpect(status().isForbidden());
     JsonNode claim = api.read(api.doPost(OFFICER, BASE, body).andExpect(status().isCreated()));

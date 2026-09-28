@@ -15,6 +15,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { MigStatus } from '../common/MigStatus';
 import { WAIVER_REASONS, migLabel } from '../common/migrationCodes';
 import { effectOf } from './rowEffect';
+import { BRAND } from '@/branding';
 
 const ROW_STATUSES = [
   'VALID',
@@ -57,7 +58,7 @@ export function BatchRows({ batch }: Readonly<{ batch: Batch }>) {
     },
     {
       key: 'target',
-      header: 'BIBS record',
+      header: `${BRAND.product} record`,
       render: (r: StageRow) => <CellStack main={r.targetCode ?? ''} sub={r.targetEntity} />,
     },
     { key: 'message', header: 'Message', render: (r: StageRow) => r.message ?? '' },

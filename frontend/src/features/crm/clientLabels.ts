@@ -1,5 +1,6 @@
 import type { ClientDetail } from '@/api/clients';
 import type { SearchCriteria } from './ClientSearchPanel';
+import { groupLabel } from '@/context/clientNames';
 
 export type QuickFilter = 'ALL' | 'PROSPECT' | 'CONFIRMED' | 'KYC_DUE';
 
@@ -76,5 +77,6 @@ export function describeBank(c: ClientDetail): string {
   if (!c.bankClient) {
     return 'Non-bank client';
   }
-  return c.bankCif === undefined ? 'BDO bank client' : `BDO bank client · CIF ${c.bankCif}`;
+  const label = groupLabel('bank client');
+  return c.bankCif === undefined ? label : `${label} · CIF ${c.bankCif}`;
 }

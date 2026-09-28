@@ -171,7 +171,7 @@ function patternError(ctx: ValidationContext, username: string): string | undefi
   }
   return ctx.userIdFormatText
     ? `The user ID must be ${ctx.userIdFormatText}`
-    : 'The user ID does not have the BDOI format';
+    : 'The user ID does not have the required format';
 }
 
 function existingUserError(f: AccessRequestForm, user: UserAccess | undefined): string | undefined {

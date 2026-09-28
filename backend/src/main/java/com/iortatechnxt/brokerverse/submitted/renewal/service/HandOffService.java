@@ -103,7 +103,7 @@ public class HandOffService {
    * @param policyId record
    * @return the hand-off
    */
-  public SbmRenewal renewWithBdoi(Long policyId) {
+  public SbmRenewal renewByHand(Long policyId) {
     SbmPolicy p = masterlist.get(policyId);
     if (p.getStatus() != SbmPolicyStatus.FOR_RENEWAL) {
       throw new BusinessRuleException(

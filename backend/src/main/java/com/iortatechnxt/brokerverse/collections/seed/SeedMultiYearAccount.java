@@ -106,7 +106,7 @@ public class SeedMultiYearAccount {
             true,
             YEARS,
             "PHP",
-            PaymentArrangement.VIA_BDOI,
+            PaymentArrangement.VIA_BROKER,
             Mortgage.NONE,
             null,
             List.of(location()),

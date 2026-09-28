@@ -12,11 +12,12 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, humanize } from '@/utils/format';
 import { TAB_UNAVAILABLE } from './AccountsTab';
 import { InBaseCurrency } from '@/components/ui/InBaseCurrency';
+import { BRAND } from '@/branding';
 
 const KIND_LABELS: Record<Payment['kind'], string> = {
   PAYMENT: 'Payment',
   REVERSAL: 'Reversal',
-  LEGACY: 'Before BIBS',
+  LEGACY: `Before ${BRAND.product}`,
 };
 
 const PAYMENT_COLUMNS: Column<Payment>[] = [

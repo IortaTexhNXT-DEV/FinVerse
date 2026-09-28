@@ -127,7 +127,7 @@ function payoutErrors(p: PayoutDraft, errors: FieldErrors): void {
     errors.paymentMode = 'Select the mode of payment';
   }
   if (p.paymentMode === 'CTA' && !ACCOUNT_NO.test(p.accountNo.trim())) {
-    errors.accountNo = 'Enter the BDO account number (10 to 16 digits)';
+    errors.accountNo = 'Enter the account number (10 to 16 digits)';
   }
   if ((p.paymentMode === 'CTA' || p.paymentMode === 'CHECK') && p.accountName.trim() === '') {
     errors.accountName =

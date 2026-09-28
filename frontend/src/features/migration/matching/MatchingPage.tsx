@@ -13,6 +13,7 @@ import { Tag } from '@/components/ui/Tag';
 import { MigStatus } from '../common/MigStatus';
 import { MIG_SECTION } from '../common/migrationCodes';
 import '../migration.css';
+import { BRAND } from '@/branding';
 
 /**
  * Client Matching (DATA_MIGRATION_DESIGN section 9): the pairs of legacy client records, or of a
@@ -53,7 +54,7 @@ export default function MatchingPage() {
               render: (p) => (
                 <CellStack
                   main={p.rightKey ?? p.rightClientCode ?? ''}
-                  sub={p.rightClientCode ? 'BIBS client' : 'Legacy client'}
+                  sub={p.rightClientCode ? `${BRAND.product} client` : 'Legacy client'}
                 />
               ),
             },

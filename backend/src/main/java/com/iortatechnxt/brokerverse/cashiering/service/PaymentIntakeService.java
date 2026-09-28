@@ -83,7 +83,7 @@ public class PaymentIntakeService {
    * source key.
    *
    * @param target company, branch, AR class and receipt source
-   * @param intake payment
+   * @param received payment (in the base currency of the company when it carries none)
    * @return what happened
    */
   public IntakeResult receive(IntakeTarget target, PaymentIntake received) {

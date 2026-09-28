@@ -104,7 +104,7 @@ public class Account extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "payment_arrangement", nullable = false, length = 20)
-  private PaymentArrangement paymentArrangement = PaymentArrangement.VIA_BDOI;
+  private PaymentArrangement paymentArrangement = PaymentArrangement.VIA_BROKER;
 
   @Column(name = "direct_payment_tagged_by", length = 50)
   private String directPaymentTaggedBy;
@@ -302,7 +302,7 @@ public class Account extends BaseEntity {
    * @param when time
    */
   public void setPaymentArrangement(PaymentArrangement arrangement, String user, Instant when) {
-    PaymentArrangement value = Objects.requireNonNullElse(arrangement, PaymentArrangement.VIA_BDOI);
+    PaymentArrangement value = Objects.requireNonNullElse(arrangement, PaymentArrangement.VIA_BROKER);
     if (value != paymentArrangement) {
       this.directPaymentTaggedBy = value == PaymentArrangement.DIRECT_TO_INSURER ? user : null;
       this.directPaymentTaggedAt = value == PaymentArrangement.DIRECT_TO_INSURER ? when : null;

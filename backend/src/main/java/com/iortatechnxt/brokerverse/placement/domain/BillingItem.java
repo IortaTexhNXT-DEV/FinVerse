@@ -58,8 +58,8 @@ public class BillingItem {
   @Column(nullable = false, precision = 19, scale = 2)
   private BigDecimal premium;
 
-  @Column(name = "bdoi_location", length = 40)
-  private String bdoiLocation;
+  @Column(name = "broker_location", length = 40)
+  private String brokerLocation;
 
   @Column(nullable = false)
   private boolean amortised;
@@ -82,7 +82,7 @@ public class BillingItem {
     this.borrower = line.borrower();
     this.originatingUnit = line.originatingUnit();
     this.premium = line.premium();
-    this.bdoiLocation = line.bdoiLocation();
+    this.brokerLocation = line.brokerLocation();
     this.amortised = line.amortised();
   }
 
@@ -163,8 +163,8 @@ public class BillingItem {
     return premium;
   }
 
-  public String getBdoiLocation() {
-    return bdoiLocation;
+  public String getBrokerLocation() {
+    return brokerLocation;
   }
 
   public boolean isAmortised() {

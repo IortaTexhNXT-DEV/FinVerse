@@ -16,7 +16,7 @@ class ClaimDomainTest {
         new Claim(
             1L,
             "BCL-2026-000001",
-            new Claim.Origin(ClaimSource.BDOI_NOTICE, "clmofficer", "MOTOR_HO", 2L, null),
+            new Claim.Origin(ClaimSource.BROKER_NOTICE, "clmofficer", "MOTOR_HO", 2L, null),
             new CoverSnapshot(),
             new LossDetails());
     assertThat(claim.getProgress().getPhase()).isEqualTo(ClaimPhase.NEW);
@@ -24,7 +24,7 @@ class ClaimDomainTest {
     assertThat(claim.isClosed()).isFalse();
     assertThat(claim.getCompanyId()).isEqualTo(1L);
     assertThat(claim.getClaimNo()).isEqualTo("BCL-2026-000001");
-    assertThat(claim.getSource()).isEqualTo(ClaimSource.BDOI_NOTICE);
+    assertThat(claim.getSource()).isEqualTo(ClaimSource.BROKER_NOTICE);
     assertThat(claim.getBranchId()).isEqualTo(2L);
     assertThat(claim.getLegacyRef()).isNull();
     assertThat(claim.getCover()).isNotNull();

@@ -224,7 +224,7 @@ class BookingBatchIT {
                     new AutoBookRule.Criteria("MTR26", "RETAIL", true, "Test auto-book MTR26")));
     try {
       Account auto =
-          fx.issued(BookingFixtures.spec("MTR26", "RETAIL", PaymentArrangement.VIA_BDOI));
+          fx.issued(BookingFixtures.spec("MTR26", "RETAIL", PaymentArrangement.VIA_BROKER));
       QueueEntry entry =
           entries.findByArnAndStatus(auto.getArn(), QueueStatus.QUEUED).orElseThrow();
       assertThat(entry.getSource()).isEqualTo(QueueSource.AUTO);

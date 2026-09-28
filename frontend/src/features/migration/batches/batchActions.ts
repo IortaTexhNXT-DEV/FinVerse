@@ -1,6 +1,7 @@
 import { migrationApi } from '@/api/migration';
 import type { Batch } from '@/api/migration';
 import type { MigAction } from '../common/ActionConfirm';
+import { BRAND } from '@/branding';
 
 /** A button of the batch page. */
 export interface BatchButton {
@@ -59,7 +60,7 @@ function load(b: Batch, can: (p: string) => boolean, user: string | undefined): 
       action: {
         title: `Approve the load of ${b.batchNo}`,
         record: b.batchNo,
-        effect: 'Gate G4: the batch may be loaded into BIBS by an operator other than you.',
+        effect: `Gate G4: the batch may be loaded into ${BRAND.product} by an operator other than you.`,
         confirmLabel: 'Approve Load',
         reason: 'optional',
         done: 'Load approved',
@@ -75,8 +76,7 @@ function load(b: Batch, can: (p: string) => boolean, user: string | undefined): 
       action: {
         title: `Load batch ${b.batchNo}`,
         record: b.batchNo,
-        effect:
-          'The valid rows are loaded through the BIBS services, without notifications or outbound events, and the batch is reconciled.',
+        effect: `The valid rows are loaded through the ${BRAND.product} services, without notifications or outbound events, and the batch is reconciled.`,
         confirmLabel: 'Load',
         done: 'Batch loaded',
         run: () => migrationApi.load(b.batchNo),
@@ -90,8 +90,7 @@ function load(b: Batch, can: (p: string) => boolean, user: string | undefined): 
       action: {
         title: `Reconcile batch ${b.batchNo}`,
         record: b.batchNo,
-        effect:
-          'Counts, amounts, hash totals and fields are compared again between source, staging and BIBS.',
+        effect: `Counts, amounts, hash totals and fields are compared again between source, staging and ${BRAND.product}.`,
         confirmLabel: 'Reconcile',
         done: 'Batch reconciled',
         run: () => migrationApi.reconcile(b.batchNo),
@@ -167,8 +166,7 @@ function rollback(b: Batch, can: (p: string) => boolean, user: string | undefine
       action: {
         title: `Request the rollback of ${b.batchNo}`,
         record: b.batchNo,
-        effect:
-          'After approval, the records loaded by this batch are undone through the BIBS services.',
+        effect: `After approval, the records loaded by this batch are undone through the ${BRAND.product} services.`,
         confirmLabel: 'Request Rollback',
         reason: 'required',
         destructive: true,

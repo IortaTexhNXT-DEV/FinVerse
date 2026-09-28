@@ -167,7 +167,7 @@ public class RenewalController {
   }
 
   /**
-   * Renew with BDOI.
+   * Starts the renewal of a record by hand.
    *
    * @param policyId record For Renewal
    * @return the hand-off
@@ -176,7 +176,7 @@ public class RenewalController {
   @PreAuthorize(RENEW)
   @Transactional
   public RenewalRow renew(@PathVariable Long policyId) {
-    SbmRenewal r = services.handOff().renewWithBdoi(policyId);
+    SbmRenewal r = services.handOff().renewByHand(policyId);
     return RenewalRow.from(r, masterlist.get(policyId));
   }
 

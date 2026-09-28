@@ -76,7 +76,7 @@ public record BillingBatchResponse(
    * @param borrower borrower
    * @param originatingUnit originating unit
    * @param premium premium
-   * @param bdoiLocation BDOI location
+   * @param brokerLocation BDOI location
    * @param amortised amortised
    * @param paymentStatus BILLED, PAID or UNPAID
    */
@@ -90,7 +90,7 @@ public record BillingBatchResponse(
       String borrower,
       String originatingUnit,
       BigDecimal premium,
-      String bdoiLocation,
+      String brokerLocation,
       boolean amortised,
       String paymentStatus) {
 
@@ -111,7 +111,7 @@ public record BillingBatchResponse(
           i.getBorrower(),
           i.getOriginatingUnit(),
           i.getPremium(),
-          i.getBdoiLocation(),
+          i.getBrokerLocation(),
           i.isAmortised(),
           i.getPaymentStatus().name());
     }

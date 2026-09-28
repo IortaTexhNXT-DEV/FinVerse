@@ -41,7 +41,7 @@ pipeline and weekly (`.gitlab-ci.yml`, stage `security`).
 
 ## Dependency and supply-chain checks
 
-Both pipeline definitions (`.gitlab-ci.yml` and the workflow files under `.github/workflows`) run the same
+Both pipeline definitions of the project (`.gitlab-ci.yml` and the workflow definition) run the same
 security gates on every pipeline, including merge requests:
 
 | Check | Tool | Fails on | Accepted findings |
@@ -65,5 +65,5 @@ the Trivy file, a review date in the gitleaks file); after the expiry the gate f
 
 **Pinning.** Pipeline actions are pinned by the commit SHA of their release and the base images of both
 Dockerfiles by digest; the scanners are downloaded as release archives and verified against their SHA-256. A
-weekly update proposal (`.github/dependabot.yml`) covers actions, base images, Maven and npm; the Dockerfile header
-says how to refresh a digest by hand.
+weekly automated update proposal covers actions, base images, Maven and npm; the Dockerfile header says how to
+refresh a digest by hand.

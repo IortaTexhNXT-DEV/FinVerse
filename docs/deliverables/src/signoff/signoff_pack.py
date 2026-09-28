@@ -1045,11 +1045,15 @@ def build_workbook(pack: Pack, extend: Any = None, out_dir: Path | None = None) 
         description=f"What {nm} takes from and hands to the other BRDs and systems; a change is a change request")
 
     comment_rows = [{"id": f"C-{i:03d}"} for i in range(1, 51)]
+    # A set with fill-in templates (BRD-13 load templates): a question names the template and the column.
+    template_cols = [Column("template", "Template", 22, "Load template (sheet) the question is about, if any"),
+                     Column("column", "Column", 18, "Column of the template, if any")] if wbm.get("comment_columns") else []
     ws = wb.sheet("Comments log", [
         Column("id", "ID", 9, "Comment identifier"),
         Column("raised_by", "Raised by", 22, "Name and unit of the reviewer"),
         Column("date", "Date", 13, "Date raised", kind="date"),
         Column("where", "Page / screen", 24, f"{doc} page or section, screen ID or workbook row"),
+        *template_cols,
         Column("type", "Type", 16, "Clarification, Correction or Change request", values=COMMENT_TYPES),
         Column("comment", "Comment", 50, "The question, the correction or the change asked for"),
         Column("response", "Response", 50, "Answer of the project team; for a change request, its register number"),

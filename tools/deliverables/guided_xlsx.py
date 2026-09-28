@@ -356,7 +356,7 @@ class GuidedBook:
         ws["A1"].font = font(15, True, brand.HEADER_BLUE)
         ws.row_dimensions[1].height = 26
         if back:
-            ws["A2"] = BACK
+            ws["A2"] = BACK if self.start == START else f"← Back to {self.start}"
             set_link(ws["A2"], self.start)
             ws["A2"].font = font(9, False, brand.CTA_BLUE, underline=True)
         if subtitle:

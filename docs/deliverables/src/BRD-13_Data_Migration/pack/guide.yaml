@@ -13,12 +13,13 @@ meta:
   process_caption: "The way of every data object: from its decision to its acceptance, with the gates G1 to G6"
   process_notes: "Each object goes through the same steps in every trial migration, the dress rehearsal and the production cut-over. The gates are signed in the Migration Console; a break sends the batch back to validation with a fix at source, a new code map version or a waiver. Gate G7 is the go / no-go of the whole cut-over."
   # The workbook slide: which sheet is pictured, with which columns, and what the reviewer does.
-  workbook_sheet: "C01 Client master"
-  workbook_columns: ["No.", "Column", "Description", "Type", "Mandatory", "BU review", "BU comment", "Reviewer", "Review date"]
-  workbook_example: "Add the maiden name of married clients for the matching"
-  workbook_caption: "Load template sheet C01 of the Migration Workbook"
+  workbook_sheet: "Object catalogue"
+  workbook_columns: ["Object", "Data object", "Decision (proposed)", "Rationale", "BU review", "BU comment", "Reviewer", "Review date"]
+  workbook_example: "Load the inactive account officers only when they still hold open items"
+  workbook_caption: "Object catalogue sheet of the Migration Workbook"
   workbook_side:
-    - "Review the rows of your objects: Object catalogue, Data owners, the load template sheets, Code maps, Validation rules, Cut-over tasks, Reconciliation sign-off"
+    - "Review the rows of your objects: Object catalogue, Data owners, Code maps, Validation rules, Cut-over tasks, Reconciliation sign-off"
+    - "Load templates: in load order; on each template sheet the BU review rows sit above the columns"
     - "BU review: Accept, Change requested or Comment"
     - "BU comment: the change asked for"
     - "Proposed rules: the BDOI decision on each rule"
@@ -266,9 +267,9 @@ next_steps:
 # How the business unit reviews the Migration Workbook (sheet How to review).
 howto:
   - "Read the Handbook part of your role with the screenshots, or walk through the Migration Console on the SIT environment during the sessions of the Start Here guide."
-  - "On the sheets of your objects (Object catalogue, Data owners, Extract planning, the load template sheets, Code maps, Validation rules, Reconciliation sign-off) and on the screen sheets, set BU review to Accept, Change requested or Comment for each row you review, and write the change in BU comment."
+  - "On the sheets of your objects (Object catalogue, Data owners, Extract planning, Code maps, Validation rules, Reconciliation sign-off) and on the screen sheets, set BU review to Accept, Change requested or Comment for each row you review, and write the change in BU comment. On a load template sheet the BU review and BU comment rows sit above each column."
   - "On the Proposed rules sheet, record the BDOI decision (Agree, Agree with change, Disagree, Need more information), the change asked for, who decided and the date."
   - "Put your name in Reviewer and the date in Review date. Leave the other columns unchanged."
-  - "The load template sheets are the layouts of the Migration Console column for column; the console exports the same templates (Layouts and Rules, Load Templates Workbook)."
+  - "The sheet Load templates lists the load templates in load order with a link to each. A load template sheet is the layout of the Migration Console column for column, with the guide of each column (Mandatory, Format, Allowed values, What to enter, the check when loaded) directly above the header row; the console exports the same templates (Layouts and Rules, Load Templates Workbook)."
   - "Return the workbook to the iorta TechNXT project team by the date of the Start Here guide. Every Change requested row is answered in the Comments log before sign-off."
-  - "Questions and change requests go to the Comments log; the project team answers each one there. On the Sign-off certificate sheet, each signatory records the decision and the date. The screenshots use fictitious seed data."
+  - "Questions and change requests go to the Comments log, with the load template and the column when they concern one; the project team answers each one there. On the Sign-off certificate sheet, each signatory records the decision and the date. The screenshots use fictitious seed data."

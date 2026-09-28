@@ -767,7 +767,7 @@ control_fields:
 file_rules_extra:
   - [Personal data, "Production extracts are loaded only in production. Every other environment receives masked data: names, addresses, TIN, ID, account and phone numbers, e-mail addresses and birth dates are masked when the file is received. Staged rows and files are deleted within 5 days of the batch sign-off"]
   - [Layout changes, "A layout is frozen at gate G2. A file whose header does not match the layout in force is rejected. A change of layout is a new layout version agreed with the Data Migration Lead"]
-  - [Load template workbook of P03, "The Renewal processing team may send the RA-sent file in the load template workbook of layout P03 exported by the Migration Console (first sheet with the header row, the Columns sheet with the allowed values, the How to fill sheet); the CSV template is also accepted"]
+  - [Load template workbook of P03, "The Renewal processing team may send the RA-sent file in the load template workbook of layout P03 exported by the Migration Console (the template sheet with the guide rows Mandatory, Format, Allowed values and What to enter directly above the header row, and the Lists sheet with the allowed values); the CSV template is also accepted"]
 
 # The BIBS values that each code map set maps to, as the business knows them (the console shows the same set).
 map_labels:

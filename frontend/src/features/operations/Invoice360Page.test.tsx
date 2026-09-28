@@ -64,7 +64,9 @@ describe('invoice 360', () => {
 
   it('shows the account workflow of a BIBS invoice', async () => {
     vi.spyOn(opsApi, 'invoice').mockResolvedValue(view(false));
-    const byRecord = vi.spyOn(workflowApi, 'byRecord').mockReturnValue(new Promise(() => {}));
+    const byRecord = vi
+      .spyOn(workflowApi, 'byRecord')
+      .mockRejectedValue(new Error('Not loaded in this test'));
     render(page());
     expect(await screen.findByText('Lea Santos')).toBeInTheDocument();
     expect(byRecord).toHaveBeenCalledWith('Account', 42);

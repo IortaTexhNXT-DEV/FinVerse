@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.bulk.service.BulkFileReader;
 import com.iortatechnxt.brokerverse.bulk.service.ParsedFile;
+import com.iortatechnxt.brokerverse.bulk.service.TextLayout;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
@@ -23,6 +24,7 @@ import com.iortatechnxt.brokerverse.migration.mapping.domain.LayoutColumn;
 import com.iortatechnxt.brokerverse.migration.mapping.domain.MaskingRule;
 import com.iortatechnxt.brokerverse.migration.mapping.domain.MaskingRuleRepository;
 import com.iortatechnxt.brokerverse.migration.mapping.service.LayoutService;
+import com.iortatechnxt.brokerverse.migration.mapping.service.TemplateExport;
 import com.iortatechnxt.brokerverse.migration.object.domain.MigDataObject;
 import com.iortatechnxt.brokerverse.migration.object.service.ObjectRegisterService;
 import com.iortatechnxt.brokerverse.storage.domain.FileOrigin;
@@ -148,7 +150,11 @@ public class IntakeService {
     String sha = Sha256.hex(upload.content());
     ControlFile control =
         ControlFile.of(
-            reader.read(ExtractNames.controlName(upload.controlName()), upload.control()));
+            reader.read(
+                ExtractNames.controlName(upload.controlName()),
+                upload.control(),
+                TextLayout.AUTO,
+                TemplateExport.CONTROL_COLUMNS));
     LocalDateTime asOf = control.asOf() != null ? control.asOf() : name.day().atStartOfDay();
     MigExtract extract =
         extracts.save(
@@ -188,9 +194,8 @@ public class IntakeService {
     if (order.isPresent()) {
       return order;
     }
-    ParsedFile parsed = reader.read(upload.fileName(), upload.content());
-    List<String> columns =
-        layouts.columns(layout.getId()).stream().map(LayoutColumn::getName).toList();
+    List<String> columns = columnNames(layout);
+    ParsedFile parsed = read(upload, columns);
     return IntakeChecks.run(extract.getSha256(), control, layout, columns, parsed);
   }
 
@@ -235,8 +240,20 @@ public class IntakeService {
     return Optional.empty();
   }
 
+  /**
+   * Reads a data file: a CSV file, or an Excel file of the layout (the guided load template is read
+   * as it is: the sheet of the layout, below its column guide, without its example row).
+   */
+  private ParsedFile read(Upload upload, List<String> columns) {
+    return reader.read(upload.fileName(), upload.content(), TextLayout.AUTO, columns);
+  }
+
+  private List<String> columnNames(Layout layout) {
+    return layouts.columns(layout.getId()).stream().map(LayoutColumn::getName).toList();
+  }
+
   private MigExtract stage(MigExtract extract, Layout layout, Upload upload, boolean production) {
-    ParsedFile parsed = reader.read(upload.fileName(), upload.content());
+    ParsedFile parsed = read(upload, columnNames(layout));
     List<MaskingRule> rules =
         production ? List.of() : masking.findByLayoutCodeAndActiveTrue(layout.getCode());
     List<String> keys = layout.keys();

@@ -59,12 +59,18 @@ public class LocationRefBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Claims officers, from the insurers' location references";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(ARN, "Account reference number of the cover", "ARN-2026-940002"),
+        BulkColumn.required(ARN, "Account reference number of the cover", "ARN-2026-940002")
+            .master("account (ARN)"),
         new BulkColumn(
             ITEM_NO, "Item number of the location on the cover", true, BulkColumn.Type.NUMBER, "1"),
-        BulkColumn.required(INSURER, "Insurer code", "INS-MGIC"),
+        BulkColumn.required(INSURER, "Insurer of the cover", "INS-MGIC").master("insurer"),
         BulkColumn.required(REFERENCE, "The insurer's reference of the location", "MGIC-LOC-0091"),
         new BulkColumn(
             EFFECTIVE_FROM,

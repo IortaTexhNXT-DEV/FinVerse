@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.collections.escalation.service.EscalationSer
 import com.iortatechnxt.brokerverse.collections.installment.service.LedgerBalances;
 import com.iortatechnxt.brokerverse.collections.promise.service.PromiseService;
 import com.iortatechnxt.brokerverse.collections.promise.service.PromiseService.PromiseInput;
+import com.iortatechnxt.brokerverse.common.excel.GuideColumn.Choice;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.lov.domain.LovValue;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
@@ -104,20 +105,41 @@ public class CollectionsBulkUpdateHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Collectors and collection team leaders";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(INVOICE, "Invoice (collection account)", "BI-MKT-2026-000001"),
-        new BulkColumn(PROMISE_DATE, "Date the client promised to pay", false, Type.DATE, ""),
+        BulkColumn.required(INVOICE, "Invoice of the collection account", "BI-MKT-2026-000001")
+            .master("invoice"),
+        new BulkColumn(PROMISE_DATE, "Date the client promised to pay", false, Type.DATE, "")
+            .when("a promise to pay is recorded"),
         new BulkColumn(
-            PROMISE_AMOUNT, "Amount promised (blank = whole outstanding)", false, Type.NUMBER, ""),
+            PROMISE_AMOUNT,
+            "Amount promised; blank for the whole outstanding",
+            false,
+            Type.NUMBER,
+            ""),
         new BulkColumn(
-            PROMISED_ON, "Day the promise was made (blank = today)", false, Type.DATE, ""),
+            PROMISED_ON, "Day the promise was made; blank for today", false, Type.DATE, ""),
         new BulkColumn(ESCALATE, "Y to escalate the account", false, Type.YES_NO, "N"),
-        BulkColumn.optional(LEVEL, "TL, UH, SECTION_HEAD or USER (blank = TL)", "TL"),
-        BulkColumn.optional(TARGET, "User receiving the escalation (required for USER)", ""),
-        BulkColumn.optional(REASON, "Escalation reason (CLX_ESCALATION_REASON)", "NO_COMMITMENT"),
-        BulkColumn.optional(DISPOSITION, "PR disposition (CLX_PR_DISPOSITION)", ""),
-        BulkColumn.optional(EFFORT, "Collection effort (CLX_EFFORT_CODE)", ""),
+        BulkColumn.optional(LEVEL, "Who the account is escalated to; blank for TL", "TL")
+            .choices(
+                List.of(
+                    new Choice("TL", "Team leader"),
+                    new Choice("UH", "Unit head"),
+                    new Choice("SECTION_HEAD", "Section head"),
+                    new Choice("USER", "A named user"))),
+        BulkColumn.optional(TARGET, "User ID of the user receiving the escalation", "")
+            .when("Level is USER"),
+        BulkColumn.optional(REASON, "Why the account is escalated", "NO_COMMITMENT")
+            .when("Escalate is Y")
+            .lov("CLX_ESCALATION_REASON"),
+        BulkColumn.optional(DISPOSITION, "Disposition of the premium receivable", "")
+            .lov("CLX_PR_DISPOSITION"),
+        BulkColumn.optional(EFFORT, "Collection effort made", "").lov("CLX_EFFORT_CODE"),
         BulkColumn.optional(REMARKS, "Remarks", ""));
   }
 

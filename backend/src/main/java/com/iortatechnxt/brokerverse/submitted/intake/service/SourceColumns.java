@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkColumn;
 import com.iortatechnxt.brokerverse.bulk.service.BulkColumn.Type;
 import com.iortatechnxt.brokerverse.bulk.service.BulkImportHandler;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
+import com.iortatechnxt.brokerverse.common.excel.GuideColumn.Choice;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmAssured;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmBusinessType;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmLoan;
@@ -55,17 +56,15 @@ public final class SourceColumns {
     List<BulkColumn> c = new ArrayList<>();
     c.add(
         BulkColumn.optional(
-            SEGMENT,
-            "CBG Motor, CBG Fire, Non-CBG Corporate or Non-CBG Retail; blank for the segment of the source",
-            "CBG Motor"));
+                SEGMENT, "Segment of the policy; blank for the segment of the source", "CBG Motor")
+            .values("CBG Motor", "CBG Fire", "Non-CBG Corporate", "Non-CBG Retail"));
     c.add(
-        BulkColumn.optional(
-            BUSINESS_TYPE, "NB (new business) or RB (renewal business); blank for NB", "NB"));
+        BulkColumn.optional(BUSINESS_TYPE, "New or renewal business; blank for NB", "NB")
+            .choices(
+                List.of(new Choice("NB", "New business"), new Choice("RB", "Renewal business"))));
     c.add(
-        BulkColumn.optional(
-            PN,
-            "Promissory note number of the loan; required for CBG Motor and CBG Fire",
-            "PN-2026-000123"));
+        BulkColumn.optional(PN, "Promissory note number of the loan", "PN-2026-000123")
+            .when("the segment is CBG Motor or CBG Fire"));
     c.add(BulkColumn.optional("Loan Application No", "Loan application number", "LA-778812"));
     c.add(BulkColumn.optional("CIF", "Bank client number", "CIF-00012345"));
     c.add(date("Value Date", "Loan value date"));
@@ -83,7 +82,8 @@ public final class SourceColumns {
     c.add(
         BulkColumn.optional(
             "Bank Counterpart Email", "E-mail of the bank counterpart", "loans@bank.ph"));
-    c.add(BulkColumn.optional("Insurer Code", "Insurer code", "INS-MGIC"));
+    c.add(
+        BulkColumn.optional("Insurer Code", "Insurer of the policy", "INS-MGIC").master("insurer"));
     c.add(BulkColumn.optional("Policy No", "Policy number", "MC-2026-001234"));
     c.add(date("Inception Date", "Policy inception"));
     c.add(new BulkColumn(EXPIRY, "Policy expiry", true, Type.DATE, "2027-03-31"));
@@ -105,11 +105,19 @@ public final class SourceColumns {
             "Property Location", "Location of the property (fire)", "Lot 5, Taguig City"));
     c.add(BulkColumn.optional("Occupancy", "Occupancy (fire)", "Residential"));
     c.add(BulkColumn.optional("Mortgagee", "Mortgagee", "BDO Unibank, Inc."));
+    c.addAll(flags());
+    c.add(
+        BulkColumn.optional(HANDLER, "User ID of the handler of the policy", "sbmhandler")
+            .allowed("User ID of an active user of Submitted Policies"));
+    return List.copyOf(c);
+  }
+
+  private static List<BulkColumn> flags() {
+    List<BulkColumn> c = new ArrayList<>();
     c.add(yesNo("FFY", "Y when the auto loan has the Free First Year promotion"));
     c.add(yesNo("Employee Account", "Y for a BDO or SM Group employee account"));
     c.add(yesNo("No Touch", "Y for a No Touch account"));
-    c.add(BulkColumn.optional(HANDLER, "Login of the handler of the policy", "sbmhandler"));
-    return List.copyOf(c);
+    return c;
   }
 
   private static BulkColumn date(String header, String description) {

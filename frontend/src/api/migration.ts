@@ -107,8 +107,11 @@ export const migrationApi = {
   layouts: () => api.get<Layout[]>(`${BASE}/layouts`),
   layoutColumns: (id: number) => api.get<LayoutColumn[]>(`${BASE}/layouts/${String(id)}/columns`),
   freezeLayout: (id: number) => api.post<Layout>(`${BASE}/layouts/${String(id)}/freeze`),
-  layoutTemplate: (code: string) => api.getFile(`${BASE}/templates/layouts/${code}`),
-  controlTemplate: () => api.getFile(`${BASE}/templates/control`),
+  /** The guided Excel load template of a layout (uploaded as it is). */
+  layoutTemplate: (code: string) => api.getFile(`${BASE}/templates/layouts/${code}?format=xlsx`),
+  /** The CSV layout of a layout (header row only, for large extracts). */
+  layoutCsv: (code: string) => api.getFile(`${BASE}/templates/layouts/${code}?format=csv`),
+  controlTemplate: () => api.getFile(`${BASE}/templates/control?format=xlsx`),
   workbook: () => api.getFile(`${BASE}/templates/workbook`),
   rules: () => api.get<Rule[]>(`${BASE}/rules`),
   updateRule: (code: string, severity: string, active: boolean) =>

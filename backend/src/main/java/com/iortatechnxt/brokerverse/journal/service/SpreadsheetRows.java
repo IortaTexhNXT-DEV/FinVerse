@@ -46,11 +46,21 @@ public final class SpreadsheetRows {
     } else {
       throw new BusinessRuleException("UNSUPPORTED_FILE", "Upload a .csv or .xlsx file");
     }
-    if (rows.size() > maxRows) {
+    if (rows.stream().filter(r -> !isBlank(r)).count() > maxRows) {
       throw new BusinessRuleException(
           "TOO_MANY_ROWS", "The file has more than " + (maxRows - 1) + " data rows");
     }
     return rows;
+  }
+
+  /**
+   * Whether a row has no value.
+   *
+   * @param row cells
+   * @return true when every cell is blank
+   */
+  public static boolean isBlank(List<String> row) {
+    return row.stream().allMatch(String::isBlank);
   }
 
   /**
@@ -122,23 +132,28 @@ public final class SpreadsheetRows {
   }
 
   /**
-   * Parses the first sheet of an XLSX workbook.
+   * Parses the first sheet of an XLSX workbook. Blank rows are kept as empty rows, so a row's index
+   * is its position on the sheet; trailing blank rows are dropped.
    *
    * @param content workbook bytes
-   * @return rows of cells (blank rows skipped)
+   * @return rows of cells
    */
   public static List<List<String>> parseXlsx(byte[] content) {
     try (Workbook workbook = new XSSFWorkbook(new ByteArrayInputStream(content))) {
       Sheet sheet = workbook.getSheetAt(0);
       List<List<String>> rows = new ArrayList<>();
       for (Row row : sheet) {
+        while (rows.size() < row.getRowNum()) {
+          rows.add(List.of());
+        }
         List<String> cells = new ArrayList<>();
         for (int c = 0; c < row.getLastCellNum(); c++) {
           cells.add(text(row.getCell(c)));
         }
-        if (cells.stream().anyMatch(s -> !s.isBlank())) {
-          rows.add(cells);
-        }
+        rows.add(cells);
+      }
+      while (!rows.isEmpty() && isBlank(rows.get(rows.size() - 1))) {
+        rows.remove(rows.size() - 1);
       }
       return rows;
     } catch (IOException | RuntimeException e) {

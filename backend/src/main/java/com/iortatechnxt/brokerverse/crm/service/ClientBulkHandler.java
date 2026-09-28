@@ -95,31 +95,52 @@ public class ClientBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Client service officers and account officers";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Clients > Clients, button Bulk Upload";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
         BulkColumn.optional(
-            CLIENT_CODE, "Prospect or client code to update; blank to create or match", ""),
-        BulkColumn.required(TYPE, "INDIVIDUAL or CORPORATE", "INDIVIDUAL"),
-        BulkColumn.optional(LAST, "Last name (individual)", "Reyes"),
-        BulkColumn.optional(FIRST, "First name (individual)", "Ana"),
+                CLIENT_CODE, "Prospect or client code to update; blank to create or match", "")
+            .master("client or prospect"),
+        BulkColumn.required(TYPE, "Individual or corporate client", "INDIVIDUAL")
+            .codes(ClientType.class),
+        BulkColumn.optional(LAST, "Last name of an individual", "Reyes")
+            .when("Client Type is INDIVIDUAL"),
+        BulkColumn.optional(FIRST, "First name of an individual", "Ana")
+            .when("Client Type is INDIVIDUAL"),
         BulkColumn.optional(MIDDLE, "Middle name", "Cruz"),
-        BulkColumn.optional(CORPORATE, "Registered name (corporate)", ""),
-        new BulkColumn(BIRTH, "Birth date (individual)", false, BulkColumn.Type.DATE, "1990-04-15"),
-        BulkColumn.optional(TIN, "TIN as 000-000-000-000", "123-456-789-000"),
-        BulkColumn.optional(ID_TYPE, "ID type code (list ID_TYPE)", "PASSPORT"),
-        BulkColumn.optional(ID_NUMBER, "ID number", "P1234567A"),
-        BulkColumn.optional(EMAIL, "E-mail", "ana.reyes@example.ph"),
-        BulkColumn.optional(MOBILE, "Mobile as 09xxxxxxxxx or +639xxxxxxxxx", "09171234567"),
+        BulkColumn.optional(CORPORATE, "Registered name of a corporate client", "")
+            .when("Client Type is CORPORATE"),
+        new BulkColumn(
+            BIRTH, "Birth date of an individual", false, BulkColumn.Type.DATE, "1990-04-15"),
+        BulkColumn.optional(TIN, "Tax identification number", "123-456-789-000")
+            .format("000-000-000-000"),
+        BulkColumn.optional(ID_TYPE, "Type of the identity document", "PASSPORT").lov("ID_TYPE"),
+        BulkColumn.optional(ID_NUMBER, "Number of the identity document", "P1234567A")
+            .when("ID Type is given"),
+        BulkColumn.optional(EMAIL, "E-mail address", "ana.reyes@example.ph"),
+        BulkColumn.optional(MOBILE, "Mobile number", "09171234567")
+            .format("09xxxxxxxxx or +639xxxxxxxxx"),
         BulkColumn.optional(ADDRESS, "Street address", "12 Rizal St."),
         BulkColumn.optional(CITY, "City / municipality", "Pasig"),
         BulkColumn.optional(PROVINCE, "Province", "Metro Manila"),
         BulkColumn.optional(POSTAL, "Postal code", "1600"),
-        BulkColumn.optional(SEGMENT, "Market segment code (list MARKET_SEGMENT)", "CBG"),
-        new BulkColumn(BANK, "BDO bank client", false, BulkColumn.Type.YES_NO, "Y"),
-        BulkColumn.optional(CIF, "BDO customer information file number", ""),
-        BulkColumn.optional(NATIONALITY, "Nationality code (list NATIONALITY)", "FILIPINO"),
-        BulkColumn.optional(SOURCE, "Source of funds code (list SOURCE_OF_FUNDS)", "SALARY"),
-        BulkColumn.optional(RISK, "Risk rating code (list KYC_RISK_RATING)", "STANDARD"));
+        BulkColumn.optional(SEGMENT, "Market segment", "CBG").lov("MARKET_SEGMENT"),
+        new BulkColumn(BANK, "Client of the bank (BDO)", false, BulkColumn.Type.YES_NO, "Y"),
+        BulkColumn.optional(CIF, "Customer information file number at the bank", "")
+            .when("Bank Client is Y"),
+        BulkColumn.optional(NATIONALITY, "Nationality", "FILIPINO").lov("NATIONALITY"),
+        BulkColumn.optional(SOURCE, "Source of funds", "SALARY").lov("SOURCE_OF_FUNDS"),
+        BulkColumn.optional(RISK, "Know-your-client risk rating", "STANDARD")
+            .lov("KYC_RISK_RATING"));
   }
 
   @Override

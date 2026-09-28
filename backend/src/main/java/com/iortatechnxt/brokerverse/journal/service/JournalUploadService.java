@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.journal.service;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.coa.domain.BalanceSide;
+import com.iortatechnxt.brokerverse.common.excel.GuidedTables;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
@@ -22,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.stereotype.Service;
@@ -108,12 +108,9 @@ public class JournalUploadService {
       throw new BusinessRuleException(
           "INVALID_UPLOAD_SIZE", "The file must contain data and be at most 5 MB");
     }
-    List<List<String>> table = SpreadsheetRows.read(fileName, content, MAX_ROWS + 1);
-    List<String> columns = columns(table);
-    List<UploadLine> lines = new ArrayList<>();
-    for (int i = 1; i < table.size(); i++) {
-      lines.add(UploadLine.parse(i + 1, cells(columns, table.get(i))));
-    }
+    List<List<String>> table =
+        SpreadsheetRows.read(fileName, content, MAX_ROWS + GuidedTables.SEARCH_ROWS);
+    List<UploadLine> lines = UploadTable.lines(table);
     Map<String, List<UploadLine>> vouchers = new LinkedHashMap<>();
     lines.stream()
         .filter(l -> !l.voucherKey().isBlank())
@@ -152,21 +149,6 @@ public class JournalUploadService {
                       + " voucher(s) created as drafts"));
     }
     return result;
-  }
-
-  /** Normalized header columns; rejects files without a header or with missing columns. */
-  private static List<String> columns(List<List<String>> table) {
-    if (table.isEmpty()) {
-      throw new BusinessRuleException("EMPTY_FILE", "The file has no header row");
-    }
-    List<String> columns = table.get(0).stream().map(JournalUploadService::column).toList();
-    List<String> missing =
-        UploadLine.REQUIRED_COLUMNS.stream().filter(c -> !columns.contains(c)).toList();
-    if (!missing.isEmpty()) {
-      throw new BusinessRuleException(
-          "MISSING_COLUMNS", "Missing column(s): " + String.join(", ", missing));
-    }
-    return columns;
   }
 
   private VoucherResult processVoucher(
@@ -310,17 +292,5 @@ public class JournalUploadService {
         .filter(l -> l != null && l.side() == BalanceSide.DEBIT)
         .map(JournalLineRequest::amount)
         .reduce(BigDecimal.ZERO, BigDecimal::add);
-  }
-
-  private static Map<String, String> cells(List<String> columns, List<String> row) {
-    Map<String, String> values = new HashMap<>();
-    for (int c = 0; c < columns.size() && c < row.size(); c++) {
-      values.put(columns.get(c), row.get(c));
-    }
-    return values;
-  }
-
-  private static String column(String header) {
-    return header.strip().toLowerCase(Locale.ROOT).replace(' ', '_').replace('-', '_');
   }
 }

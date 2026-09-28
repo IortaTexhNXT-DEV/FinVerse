@@ -10,6 +10,8 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.bulk.service.BulkFileReader;
 import com.iortatechnxt.brokerverse.bulk.service.ParsedFile;
+import com.iortatechnxt.brokerverse.bulk.service.TextLayout;
+import com.iortatechnxt.brokerverse.common.excel.GuidedTemplateWriter;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
@@ -110,7 +112,12 @@ public class SoaUploadService {
                       + earlier.getUploadNo());
             });
     SoaLayout layout = layoutOf(checked.insurerCode());
-    ParsedFile file = reader.read(fileName, content);
+    ParsedFile file =
+        reader.read(
+            fileName,
+            content,
+            TextLayout.AUTO,
+            List.of(layout.getInvoiceHeader(), layout.getBalanceHeader()));
     parser.requireHeaders(layout, file.headers());
     int max = parameters.intValue(MAX_ROWS, DEFAULT_MAX_ROWS);
     if (file.rows().size() > max) {
@@ -165,6 +172,21 @@ public class SoaUploadService {
   @Transactional(readOnly = true)
   public List<SoaLayout> layouts() {
     return layouts.findAllByOrderByInsurerCodeAsc();
+  }
+
+  /**
+   * The guided Excel template of the SOA of an insurer, in its layout (the standard layout when the
+   * insurer has none).
+   *
+   * @param insurerCode insurer, blank for the standard layout
+   * @return xlsx
+   */
+  @Transactional(readOnly = true)
+  public byte[] template(String insurerCode) {
+    String insurer = Acsl.blankToNull(insurerCode);
+    SoaLayout layout = layoutOf(insurer == null ? SoaLayout.STANDARD : insurer);
+    return GuidedTemplateWriter.write(
+        SoaTemplate.of(layout, parameters.intValue(MAX_ROWS, DEFAULT_MAX_ROWS)));
   }
 
   private SoaLayout layoutOf(String insurerCode) {

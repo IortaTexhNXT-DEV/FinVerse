@@ -58,16 +58,32 @@ public class PackageMapBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The renewal setup team (package mapping of the migrated policies)";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Renewal > Renewal Setup, tab Package Map, button Upload";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
         BulkColumn.required(PACKAGE, "Package code in the legacy system", "QPS-HOME-A"),
-        BulkColumn.optional(PACKAGE_VERSION, "Legacy version, empty for any", "3"),
-        BulkColumn.optional(RISK, "Qualifier: risk code, empty for any", "PAR01"),
-        BulkColumn.optional(INSURER, "Qualifier: insurer code, empty for any", "INS-MGIC"),
+        BulkColumn.optional(PACKAGE_VERSION, "Legacy version; blank for any", "3"),
+        BulkColumn.optional(RISK, "Qualifier: risk code; blank for any", "PAR01")
+            .master("product (risk code)"),
+        BulkColumn.optional(INSURER, "Qualifier: insurer; blank for any", "INS-MGIC")
+            .master("insurer"),
         new BulkColumn(SI_FROM, "Qualifier: sum insured from", false, BulkColumn.Type.NUMBER, ""),
         new BulkColumn(SI_TO, "Qualifier: sum insured to", false, BulkColumn.Type.NUMBER, ""),
-        BulkColumn.optional(PRODUCT, "BIBS package; empty when not renewable", "PKG-HOME"),
-        new BulkColumn(VERSION, "BIBS package version", false, BulkColumn.Type.NUMBER, "2"),
+        BulkColumn.optional(PRODUCT, "Package in BIBS; blank when not renewable", "PKG-HOME")
+            .master("package"),
+        new BulkColumn(
+                VERSION, "Version of the package in BIBS", false, BulkColumn.Type.NUMBER, "2")
+            .when("a BIBS package is given")
+            .format("Whole number, e.g. 2"),
         BulkColumn.optional(REMARKS, "Remarks", "Home package, standard"));
   }
 

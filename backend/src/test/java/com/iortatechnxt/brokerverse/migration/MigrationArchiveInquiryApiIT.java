@@ -107,6 +107,28 @@ class MigrationArchiveInquiryApiIT {
     return batch;
   }
 
+  @Test
+  void archiveRecordsAreLoadedFromTheGuidedExcelTemplate() throws Exception {
+    String t = LegacyInvoiceFixtures.token();
+    Map<String, String> invoice = record("INVOICE", "X" + t, t);
+    invoice.put("invoice_no", "X" + t);
+    invoice.put("detail_json", "Insurer: MAL; Remitted on: 01-Jul-2022");
+    Map<String, String> receipt = record("RECEIPT", "XR-" + t, t);
+    receipt.put("receipt_no", "XR-" + t);
+    JsonNode extract =
+        mig.uploadWorkbook(
+            "H01",
+            "H01",
+            "H01_EBIX_20271231_" + t.substring(t.length() - 2) + ".xlsx",
+            List.of(invoice, receipt),
+            List.of("record_type", "legacy_key"));
+    assertThat(extract.get("stagedRows").asInt()).as(extract.toString()).isEqualTo(2);
+    JsonNode batch = mig.load("H01", List.of(extract.get("extractNo").asText()));
+    assertThat(batch.get("counts").get("loaded").asInt())
+        .as(mig.rows(batch.get("batchNo").asText()))
+        .isEqualTo(2);
+  }
+
   private void stage(String fileName, byte[] content) throws Exception {
     mvc.perform(
             multipart(BASE + "/archive/documents/EBIX")

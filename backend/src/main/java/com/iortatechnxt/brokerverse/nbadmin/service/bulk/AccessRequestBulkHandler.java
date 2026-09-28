@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkColumn;
 import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkImportHandler;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
+import com.iortatechnxt.brokerverse.common.excel.GuideColumn.Choice;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
@@ -82,21 +83,41 @@ public class AccessRequestBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Access administrators and the heads of unit requesting access for their staff";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "User Access > Bulk Request";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(ACTION, "ENROL, MODIFY, DEACTIVATE or REACTIVATE", "ENROL"),
-        BulkColumn.required(USER_ID, "User ID (USER_ID_PATTERN for a new user)", "a013000201"),
-        BulkColumn.optional(FULL_NAME, "Full name (required to enrol)", "Juan Dela Cruz"),
-        BulkColumn.optional(EMAIL, "E-mail", "juan.delacruz@bdo.com.ph"),
-        BulkColumn.optional(WINDOWS_ID, "Windows ID (unique)", "JDELACRUZ"),
-        BulkColumn.optional(BRANCH, "Home branch code", "HO"),
-        BulkColumn.optional(BUSINESS_UNIT, "Business unit group (list UAM_BUSINESS_UNIT)", ""),
-        BulkColumn.optional(USER_LEVEL, "User level (list UAM_USER_LEVEL)", ""),
-        BulkColumn.optional(
-            PROFILES, "Group profile codes separated by ';' (required to enrol)", "MKT_AO"),
+        BulkColumn.required(ACTION, "What the request does for the user", "ENROL")
+            .choices(
+                List.of(
+                    new Choice("ENROL", "Enrol a new user"),
+                    new Choice("MODIFY", "Modify the user's access"),
+                    new Choice("DEACTIVATE", "Deactivate the user"),
+                    new Choice("REACTIVATE", "Reactivate the user"))),
+        BulkColumn.required(USER_ID, "User ID of the user", "a013000201")
+            .allowed("An existing user ID; a new user's ID follows the bank's user ID pattern"),
+        BulkColumn.optional(FULL_NAME, "Full name of the user", "Juan Dela Cruz")
+            .when("Action is ENROL"),
+        BulkColumn.optional(EMAIL, "E-mail address of the user", "juan.delacruz@bdo.com.ph"),
+        BulkColumn.optional(WINDOWS_ID, "Windows ID of the user; unique", "JDELACRUZ"),
+        BulkColumn.optional(BRANCH, "Home branch of the user", "HO").master("branch"),
+        BulkColumn.optional(BUSINESS_UNIT, "Business unit group", "").lov("UAM_BUSINESS_UNIT"),
+        BulkColumn.optional(USER_LEVEL, "User level", "").lov("UAM_USER_LEVEL"),
+        BulkColumn.optional(PROFILES, "Group profiles given to the user", "MKT_AO")
+            .when("Action is ENROL")
+            .master("group profile")
+            .format("Text; several codes separated by ;"),
         new BulkColumn(
             EFFECTIVE,
-            "Date the change applies (yyyy-MM-dd); blank = on approval",
+            "Date the change applies; blank to apply it on approval",
             false,
             BulkColumn.Type.DATE,
             ""),

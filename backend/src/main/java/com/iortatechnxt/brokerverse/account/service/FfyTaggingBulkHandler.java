@@ -88,13 +88,25 @@ public class FfyTaggingBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The Free First Year coordinators of the New Business team";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
         BulkColumn.required(
-            IDENTIFIER, "Chassis, engine, plate or conduction sticker", "MHF12345678"),
-        AccountBulkSupport.date(Headers.FFY_START, "FFY start (TAG)", false),
-        BulkColumn.optional(ACTION, "TAG or CANCEL (default TAG)", TAG),
-        BulkColumn.optional(REASON, "Cancellation reason (list FFY_CANCEL_REASON)", ""),
+            IDENTIFIER,
+            "Chassis (serial), engine (motor), plate or conduction sticker number of the vehicle",
+            "MHF12345678"),
+        AccountBulkSupport.date(
+                Headers.FFY_START, "Start of the Free First Year; it ends one year later", false)
+            .when("Action is TAG"),
+        BulkColumn.optional(ACTION, "Tag the account or cancel its tag; blank means TAG", TAG)
+            .codes(TAG, CANCEL),
+        BulkColumn.optional(REASON, "Why the tag is cancelled", "")
+            .when("Action is CANCEL")
+            .lov("FFY_CANCEL_REASON"),
         BulkColumn.optional(COMMENT, "Comment", ""));
   }
 

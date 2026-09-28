@@ -179,6 +179,27 @@ public class AcslReconController {
   }
 
   /**
+   * The guided Excel template of the SOA of an insurer, in its layout (the standard layout when the
+   * insurer has none).
+   *
+   * @param insurerCode insurer, blank for the standard layout
+   * @return XLSX
+   */
+  @GetMapping("/soa-layouts/template")
+  @PreAuthorize(AcslAccess.UPLOAD)
+  public ResponseEntity<byte[]> soaTemplate(@RequestParam(required = false) String insurerCode) {
+    String name = insurerCode == null || insurerCode.isBlank() ? "standard" : insurerCode.strip();
+    return ResponseEntity.ok()
+        .contentType(
+            MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION,
+            ContentDispositions.attachment("soa-template-" + name + ".xlsx"))
+        .body(soa.template(insurerCode));
+  }
+
+  /**
    * Uploads an insurer SOA and reconciles it (ACSL 2.4.0, 2.13.0).
    *
    * @param companyId company

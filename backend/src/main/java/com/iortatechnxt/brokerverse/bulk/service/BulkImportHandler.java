@@ -51,6 +51,33 @@ public interface BulkImportHandler {
   }
 
   /**
+   * Who fills the template in (title block of the template), e.g. "Account officers of the branch".
+   *
+   * @return who, in business words
+   */
+  default String filledBy() {
+    return "The team that runs the " + title() + " upload";
+  }
+
+  /**
+   * Where the file is uploaded (title block of the template): the menu path and screen in words.
+   *
+   * @return menu path, e.g. "Bulk Processing > Bulk Uploads > Bulk account creation"
+   */
+  default String uploadPath() {
+    return "Bulk Processing > Bulk Uploads > " + title();
+  }
+
+  /**
+   * Rules of the whole file added to the framework's rules (title block of the template).
+   *
+   * @return rules, one sentence each
+   */
+  default List<String> rules() {
+    return List.of();
+  }
+
+  /**
    * Normalises one value before validation (BRNB.064 "sanitise the list"). The default trims and
    * collapses inner whitespace; override to upper-case plate numbers, strip dashes, etc.
    *

@@ -20,84 +20,18 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
- * Excel files of the framework: the upload template, the result report and the error file to
- * correct and upload again.
+ * The result report of an upload and the shared cell helpers of the framework's workbooks (the
+ * template is a guided template, see {@link BulkTemplates}; the error file {@link BulkErrorFile}).
  */
 final class BulkWorkbooks {
 
   static final int WIDTH = 22 * 256;
   static final int WIDE = WIDTH * 3;
-  private static final int DESCRIPTION_COLUMN = 3;
-  private static final int EXAMPLE_COLUMN = 4;
   private static final int MESSAGES_COLUMN = 2;
   private static final int REFERENCE_COLUMN = 3;
   private static final int OUTCOME_COLUMN = 4;
 
   private BulkWorkbooks() {}
-
-  /**
-   * The template: data sheet with headers and one example row, and an instructions sheet.
-   *
-   * @param handler handler
-   * @return xlsx bytes
-   */
-  static byte[] template(BulkImportHandler handler) {
-    try (XSSFWorkbook wb = new XSSFWorkbook()) {
-      CellStyle head = headStyle(wb);
-      dataSheet(wb, head, handler.columns());
-      instructionsSheet(wb, head, handler);
-      return bytes(wb);
-    } catch (IOException e) {
-      throw new UncheckedIOException(e);
-    }
-  }
-
-  private static void dataSheet(XSSFWorkbook wb, CellStyle head, List<BulkColumn> columns) {
-    Sheet data = wb.createSheet("Data");
-    Row header = data.createRow(0);
-    Row example = data.createRow(1);
-    for (int c = 0; c < columns.size(); c++) {
-      BulkColumn col = columns.get(c);
-      var cell = header.createCell(c);
-      cell.setCellValue(col.header());
-      cell.setCellStyle(head);
-      example.createCell(c).setCellValue(textOf(col.example()));
-      data.setColumnWidth(c, WIDTH);
-    }
-    data.createFreezePane(0, 1);
-  }
-
-  private static void instructionsSheet(
-      XSSFWorkbook wb, CellStyle head, BulkImportHandler handler) {
-    Sheet help = wb.createSheet("Instructions");
-    Row h = help.createRow(0);
-    String[] titles = {"Column", "Mandatory", "Type", "What to enter", "Example"};
-    for (int i = 0; i < titles.length; i++) {
-      var cell = h.createCell(i);
-      cell.setCellValue(titles[i]);
-      cell.setCellStyle(head);
-      help.setColumnWidth(i, i == DESCRIPTION_COLUMN ? WIDE : WIDTH);
-    }
-    List<BulkColumn> columns = handler.columns();
-    for (int c = 0; c < columns.size(); c++) {
-      BulkColumn col = columns.get(c);
-      Row r = help.createRow(c + 1);
-      r.createCell(0).setCellValue(col.header());
-      r.createCell(1).setCellValue(col.required() ? "Yes" : "No");
-      r.createCell(2).setCellValue(typeText(col.type()));
-      r.createCell(DESCRIPTION_COLUMN).setCellValue(col.description());
-      r.createCell(EXAMPLE_COLUMN).setCellValue(textOf(col.example()));
-    }
-    int next = columns.size() + 2;
-    help.createRow(next)
-        .createCell(0)
-        .setCellValue(
-            "Replace the example row with your data. Keep the headers unchanged. Delete no"
-                + " columns.");
-    if (!handler.instructions().isBlank()) {
-      help.createRow(next + 1).createCell(0).setCellValue(handler.instructions());
-    }
-  }
 
   static String textOf(String value) {
     return value == null ? "" : value;
@@ -211,15 +145,6 @@ final class BulkWorkbooks {
       }
     }
     sheet.createFreezePane(0, 1);
-  }
-
-  private static String typeText(BulkColumn.Type type) {
-    return switch (type) {
-      case TEXT -> "Text";
-      case NUMBER -> "Number (e.g. 1500000.00)";
-      case DATE -> "Date (yyyy-mm-dd)";
-      case YES_NO -> "Y or N";
-    };
   }
 
   static CellStyle headStyle(XSSFWorkbook wb) {

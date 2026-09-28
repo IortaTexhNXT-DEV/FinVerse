@@ -93,6 +93,69 @@ final class MigrationTestSupport {
       distinct.add(String.join("|", hashCols.stream().map(k -> r.getOrDefault(k, "")).toList()));
     }
     byte[] content = csv.toString().getBytes(StandardCharsets.UTF_8);
+    return send(object, layout, fileName, content, rows.size(), distinct.size());
+  }
+
+  /**
+   * Uploads an extract of a layout as the guided Excel load template of the console, filled in
+   * below its example row and uploaded as it is.
+   *
+   * @return the extract
+   */
+  JsonNode uploadWorkbook(
+      String object,
+      String layout,
+      String fileName,
+      List<Map<String, String>> rows,
+      List<String> keys)
+      throws Exception {
+    byte[] template =
+        api.download("migsteward", BASE + "/templates/layouts/" + layout + "?format=xlsx")
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+    Set<String> distinct = new HashSet<>();
+    List<String> hashCols = hashColumns(layout, keys);
+    byte[] content;
+    try (org.apache.poi.xssf.usermodel.XSSFWorkbook wb =
+            new org.apache.poi.xssf.usermodel.XSSFWorkbook(
+                new java.io.ByteArrayInputStream(template));
+        java.io.ByteArrayOutputStream out = new java.io.ByteArrayOutputStream()) {
+      org.apache.poi.ss.usermodel.Sheet sheet = wb.getSheetAt(0);
+      org.apache.poi.ss.usermodel.Row header = null;
+      for (org.apache.poi.ss.usermodel.Row row : sheet) {
+        if (row.getCell(0) != null
+            && com.iortatechnxt.brokerverse.common.excel.GuidedTables.HEADER_CORNER.equals(
+                row.getCell(0).getStringCellValue())) {
+          header = row;
+        }
+      }
+      if (header == null) {
+        throw new AssertionError("The load template of " + layout + " has no header row");
+      }
+      int next = sheet.getLastRowNum() + 1;
+      for (Map<String, String> r : rows) {
+        org.apache.poi.ss.usermodel.Row row = sheet.createRow(next++);
+        for (int c = 1; c < header.getLastCellNum(); c++) {
+          String name =
+              com.iortatechnxt.brokerverse.common.excel.GuidedTables.header(
+                  header.getCell(c).getStringCellValue());
+          row.createCell(c).setCellValue(r.getOrDefault(name, ""));
+        }
+        distinct.add(String.join("|", hashCols.stream().map(k -> r.getOrDefault(k, "")).toList()));
+      }
+      wb.write(out);
+      content = out.toByteArray();
+    }
+    return send(object, layout, fileName, content, rows.size(), distinct.size());
+  }
+
+  /** Posts a data file with its control file (row count, hash total, checksum). */
+  private JsonNode send(
+      String object, String layout, String fileName, byte[] content, int rowCount, int hashTotal)
+      throws Exception {
+
     String[] parts = fileName.split("_");
     String source = parts[1];
     String day =
@@ -115,11 +178,11 @@ final class MigrationTestSupport {
             + "measure,column_name,currency,filter,value\n"
             + head
             + "ROW_COUNT,,,,"
-            + rows.size()
+            + rowCount
             + "\n"
             + head
             + "HASH_TOTAL,,,,"
-            + distinct.size()
+            + hashTotal
             + "\n"
             + head
             + "SHA256,,,,"
@@ -132,7 +195,7 @@ final class MigrationTestSupport {
                     .file(
                         new MockMultipartFile(
                             "control",
-                            fileName.replace(".csv", "_CONTROL.csv"),
+                            fileName.replaceAll("\\.(csv|xlsx)$", "_CONTROL.csv"),
                             "text/csv",
                             control.getBytes(StandardCharsets.UTF_8)))
                     .param("companyId", String.valueOf(company))

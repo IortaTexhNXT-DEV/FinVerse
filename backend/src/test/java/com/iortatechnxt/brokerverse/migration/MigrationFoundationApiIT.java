@@ -329,13 +329,49 @@ class MigrationFoundationApiIT {
             .andReturn()
             .getResponse()
             .getContentAsByteArray();
+    // Every template is a guided sheet: no separate column or instruction sheets.
     try (XSSFWorkbook wb = new XSSFWorkbook(new java.io.ByteArrayInputStream(workbook))) {
       List<String> sheets = new ArrayList<>();
       wb.forEach(s -> sheets.add(s.getSheetName()));
+      assertThat(sheets.get(0)).isEqualTo("Start here");
       assertThat(sheets).anyMatch(n -> n.startsWith("R01 ")).anyMatch(n -> n.startsWith("F01 "));
-      assertThat(String.join("|", sheets))
-          .containsIgnoringCase("control")
-          .containsIgnoringCase("how to fill");
+      assertThat(String.join("|", sheets)).doesNotContainIgnoringCase("how to fill");
+    }
+    byte[] layout =
+        api.download("migsteward", BASE + "/templates/layouts/R01?format=xlsx")
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+    try (XSSFWorkbook wb = new XSSFWorkbook(new java.io.ByteArrayInputStream(layout))) {
+      List<List<String>> table = new ArrayList<>();
+      var formatter = new org.apache.poi.ss.usermodel.DataFormatter();
+      for (var row : wb.getSheetAt(0)) {
+        List<String> cells = new ArrayList<>();
+        row.forEach(c -> cells.add(formatter.formatCellValue(c)));
+        while (table.size() < row.getRowNum()) {
+          table.add(List.of());
+        }
+        table.add(cells);
+      }
+      int header =
+          com.iortatechnxt.brokerverse.common.excel.GuidedTables.headerRow(table, List.of());
+      assertThat(table.get(header - 1).get(0)).isEqualTo("What to enter");
+      assertThat(
+              String.join(
+                  ",",
+                  com.iortatechnxt.brokerverse.common.excel.GuidedTables.headers(table.get(header))
+                      .subList(1, table.get(header).size())))
+          .isEqualTo(R01_HEADER);
+    }
+    byte[] controlXlsx =
+        api.download("migsteward", BASE + "/templates/control?format=xlsx")
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+    try (XSSFWorkbook wb = new XSSFWorkbook(new java.io.ByteArrayInputStream(controlXlsx))) {
+      assertThat(wb.getSheetAt(0).getSheetName()).isEqualTo("Control");
     }
   }
 }

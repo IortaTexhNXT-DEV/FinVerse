@@ -9,16 +9,21 @@ import com.iortatechnxt.brokerverse.budget.api.dto.VarianceLineResponse;
 import com.iortatechnxt.brokerverse.budget.service.BudgetLineService;
 import com.iortatechnxt.brokerverse.budget.service.BudgetMonitoringService;
 import com.iortatechnxt.brokerverse.budget.service.BudgetService;
+import com.iortatechnxt.brokerverse.budget.service.BudgetTemplate;
+import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +34,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 /** Budget versions (grid, import, copy, approval) and budget monitoring. */
 @RestController
@@ -125,6 +131,38 @@ public class BudgetController {
   public BudgetResponse importCsv(
       @PathVariable Long id, @RequestBody @NotBlank @Size(max = MAX_CSV) String csv) {
     return BudgetResponse.detail(lines.importCsv(id, csv));
+  }
+
+  /**
+   * Imports lines from an Excel file: the guided budget template, uploaded as it is.
+   *
+   * @param id id
+   * @param file workbook
+   * @return budget
+   * @throws IOException when the upload cannot be read
+   */
+  @PostMapping(value = "/{id}/import-file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PreAuthorize(MANAGE)
+  public BudgetResponse importFile(@PathVariable Long id, @RequestParam MultipartFile file)
+      throws IOException {
+    return BudgetResponse.detail(lines.importFile(id, file.getOriginalFilename(), file.getBytes()));
+  }
+
+  /**
+   * The guided Excel template of the budget import.
+   *
+   * @return xlsx
+   */
+  @GetMapping("/template")
+  @PreAuthorize(MANAGE)
+  public ResponseEntity<byte[]> template() {
+    return ResponseEntity.ok()
+        .contentType(
+            MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+        .header(
+            HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment("budget-template.xlsx"))
+        .body(BudgetTemplate.xlsx());
   }
 
   /**

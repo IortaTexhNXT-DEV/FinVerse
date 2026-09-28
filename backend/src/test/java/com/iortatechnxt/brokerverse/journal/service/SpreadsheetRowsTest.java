@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.journal.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.iortatechnxt.brokerverse.common.excel.GuidedTables;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
@@ -27,8 +28,18 @@ class SpreadsheetRowsTest {
     List<List<String>> xlsx = SpreadsheetRows.read("t.XLSX", JournalUploadTemplate.xlsx(date), 100);
     assertThat(csv.get(0)).isEqualTo(UploadLine.ALL_COLUMNS);
     assertThat(csv).hasSize(5);
-    assertThat(xlsx.get(1).get(3)).isEqualTo("2026-05-04");
-    assertThat(xlsx.get(1).subList(0, 9)).isEqualTo(csv.get(1).subList(0, 9));
+    // The Excel template is the guided sheet: title block and column guide above the header,
+    // then the four example rows marked to overwrite or delete, with the CSV's values.
+    int header = GuidedTables.headerRow(xlsx, List.of());
+    assertThat(header).isGreaterThan(5);
+    assertThat(GuidedTables.headers(xlsx.get(header)).subList(1, 18))
+        .isEqualTo(UploadLine.ALL_COLUMNS);
+    assertThat(xlsx.get(header).get(1)).isEqualTo("voucher_key *");
+    List<String> example = xlsx.get(header + 1);
+    assertThat(GuidedTables.isExample(example)).isTrue();
+    assertThat(example.get(4)).isEqualTo("2026-05-04");
+    assertThat(example.subList(1, 9)).isEqualTo(csv.get(1).subList(0, 8));
+    assertThat(xlsx).hasSize(header + 5);
   }
 
   @Test

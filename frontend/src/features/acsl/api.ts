@@ -317,6 +317,9 @@ export const acslApi = {
   report: (id: number): Promise<DownloadedFile> => api.getFile(`${uploadUrl(id)}/report`),
   reconcile: (id: number) => api.post<SoaUpload>(`${uploadUrl(id)}/reconcile`),
   layouts: () => api.get<SoaLayout[]>('/acsl/soa-layouts'),
+  /** The guided Excel template of the insurer's SOA layout (the standard one when it has none). */
+  soaTemplate: (insurerCode: string): Promise<DownloadedFile> =>
+    api.getFile(`/acsl/soa-layouts/template${toQuery({ insurerCode })}`),
   uploadSoa: (
     companyId: number,
     meta: { insurerCode: string; periodFrom: string; periodTo: string },

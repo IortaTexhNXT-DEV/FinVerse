@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
+import { Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { saveFile } from '@/api/client';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
@@ -48,6 +50,10 @@ export function SoaUploadDialog({ onClose }: Readonly<{ onClose: () => void }>) 
   const layout =
     layouts.data?.find((l) => l.insurerCode === insurer.trim().toUpperCase()) ??
     layouts.data?.find((l) => l.insurerCode === '*');
+  const template = useMutation({
+    mutationFn: () => acslApi.soaTemplate(insurer.trim()),
+    onSuccess: (f) => saveFile(f.blob, f.fileName),
+  });
   const upload = useMutation({
     mutationFn: (f: File) =>
       acslApi.uploadSoa(
@@ -85,7 +91,7 @@ export function SoaUploadDialog({ onClose }: Readonly<{ onClose: () => void }>) 
       }
     >
       <div className="stack">
-        <ErrorAlert error={upload.error} />
+        <ErrorAlert error={upload.error ?? template.error} />
         <Field label="Insurer Code" required error={errors.insurer}>
           {(id) => (
             <input
@@ -119,6 +125,16 @@ export function SoaUploadDialog({ onClose }: Readonly<{ onClose: () => void }>) 
             />
           )}
         </Field>
+        <div>
+          <Button
+            variant="ghost"
+            icon={<Download size={16} />}
+            busy={template.isPending}
+            onClick={() => template.mutate()}
+          >
+            Download Template
+          </Button>
+        </div>
       </div>
     </Modal>
   );

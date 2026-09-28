@@ -151,6 +151,53 @@ class AcslSoaIT {
   }
 
   @Test
+  void theGuidedTemplateOfTheStandardLayoutIsUploadedAsItIs() throws java.io.IOException {
+    OpsInvoice invoice = fx.invoice();
+    byte[] template = soa.template(null);
+    byte[] filled;
+    try (var wb =
+            new org.apache.poi.xssf.usermodel.XSSFWorkbook(
+                new java.io.ByteArrayInputStream(template));
+        var out = new java.io.ByteArrayOutputStream()) {
+      var sheet = wb.getSheet("SOA");
+      org.apache.poi.ss.usermodel.Row header = null;
+      for (var row : sheet) {
+        if (row.getCell(0) != null
+            && com.iortatechnxt.brokerverse.common.excel.GuidedTables.HEADER_CORNER.equals(
+                row.getCell(0).getStringCellValue())) {
+          header = row;
+        }
+      }
+      assertThat(header).isNotNull();
+      assertThat(header.getCell(1).getStringCellValue()).isEqualTo("Invoice No");
+      var row = sheet.createRow(sheet.getLastRowNum() + 1);
+      for (int c = 1; c < header.getLastCellNum(); c++) {
+        String name =
+            com.iortatechnxt.brokerverse.common.excel.GuidedTables.header(
+                header.getCell(c).getStringCellValue());
+        if ("Invoice No".equals(name)) {
+          row.createCell(c).setCellValue(invoice.getInvoiceNo());
+        } else if ("Balance".equals(name)) {
+          row.createCell(c).setCellValue(100d);
+        }
+      }
+      wb.write(out);
+      filled = out.toByteArray();
+    }
+    SoaUpload upload =
+        as.run(
+            "acsl",
+            () ->
+                soa.upload(
+                    fx.company(),
+                    new SoaUpload.Period(AcslFixtures.insurer(invoice), FROM, TO),
+                    "insurer-soa.xlsx",
+                    filled));
+    assertThat(upload.getRowsRead()).isEqualTo(1);
+    assertThat(upload.getRowsLoaded()).isEqualTo(1);
+  }
+
+  @Test
   void theGlSlReconciliationComparesEveryControlAccount() {
     fx.invoice();
     GlSlControl control =

@@ -691,7 +691,10 @@ class GuidedBook:
         ws.sheet_properties.outlinePr.summaryBelow = False
         ws.sheet_view.zoomScale = 90
         ws.sheet_properties.tabColor = brand.HEADER_BLUE
-        self.register(ws, f"{t.id} {t.name}: {t.purpose}"[:250], 1)
+        desc = f"{t.id} {t.name}: {t.purpose}"
+        if len(desc) > 250:
+            desc = desc[:249].rsplit(" ", 1)[0].rstrip(",;:") + " …"
+        self.register(ws, desc, 1)
         return ws
 
     def code_range_name(self, tid: str, col: str) -> str:

@@ -68,8 +68,8 @@ public class SsoController {
     try {
       return new Start(sso.start());
     } catch (SsoException ex) {
-      LOG.warn("Single sign-on not started: {}", ex.getMessage(), ex);
-      throw new BusinessRuleException(ex.getCode(), "Single sign-on is not available");
+      LOG.warn("Single sign-on not started: {}", ex.getMessage());
+      throw new BusinessRuleException(ex.getCode(), "Single sign-on is not available", ex);
     }
   }
 

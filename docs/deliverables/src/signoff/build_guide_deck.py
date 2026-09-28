@@ -333,6 +333,35 @@ def build(brd: str) -> Path:
         deck.notes("R responsible, A accountable, C consulted, I informed. The durations are indicative; the dates "
                    "are those of the Start Here guide.")
 
+    # Who signs what (ownership.yaml: the roles of the BRD approval sheet and the part of the set each signs)
+    if pack.ownership:
+        matrix = signoff_pack.owner_matrix(pack)
+        chunks = [matrix[i:i + 6] for i in range(0, len(matrix), 6)]
+        for n, chunk in enumerate(chunks, start=1):
+            part = f" ({n} of {len(chunks)})" if len(chunks) > 1 else ""
+            deck.table(f"Who signs what: responsibility per part of the set{part}",
+                       ["Part of the set"] + [h for _, h in signoff_pack.MATRIX], chunk,
+                       widths=[4.0, 1.7, 2.3, 2.2, 2.4], size=9)
+            deck.notes(["The set holds business content only: screens, fields, rules, messages, notifications, "
+                        "documents, walkthroughs and reports. Business users sign the business content; BDOI IT reviews "
+                        "the interfaces, the user access and the Technical Specification, a separate document that "
+                        "holds the technical content; the Program Manager of Business Project Services reviews the "
+                        "traceability and the completeness; the Product Owner approves the whole set; iorta TechNXT "
+                        "prepares it.",
+                        f"The roles are those of the BRD approval sheet ({pack.ownership['source']})."])
+        people = signoff_pack.owner_signatories(pack)
+        chunks = [people[i:i + 8] for i in range(0, len(people), 8)]
+        for n, chunk in enumerate(chunks, start=1):
+            part = f" ({n} of {len(chunks)})" if len(chunks) > 1 else ""
+            deck.table(f"Who signs what: signatories and what each confirms{part}",
+                       ["Capacity", "Role", "Confirms by signing"],
+                       [[r["capacity"], f"{r['role']} ({r['org']})", r["confirms"]] for r in chunk],
+                       widths=[1.9, 4.6, 6.1], size=9)
+            deck.notes(["The certificate sheet of the workbook lists the same signatories in the same order: prepared "
+                        "by, input provided by, reviewed by, approved by, as on the BRD approval sheet. A role the set "
+                        "adds to the approval sheet is marked there."] +
+                       [f"{r['role']}: {r['sheet']}." for r in chunk])
+
     # 8. Workbook
     wbm = m.get("workbook") or {}
     wb_kind, wb_name = wbm.get("kind", "Signoff"), wbm.get("name", module)

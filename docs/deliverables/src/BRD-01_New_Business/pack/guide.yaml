@@ -129,7 +129,7 @@ exit:
   - "Every row of the workbook reviewed by its unit (Accept, Change requested or Comment)."
   - "Every comments log item closed: answered, corrected in v2.1, or raised as a change request."
   - "Open questions closed or accepted as assumptions."
-  - "The sign-off certificate signed by the business owner and by Finance, Compliance and BDOI IT for their parts."
+  - "The sign-off certificate signed by every signatory of the Who signs what matrix: prepared, input, reviewed and approved as on the BRD approval sheet; the Product Owner approves the whole set."
 done:
   - "Signed certificate filed with the set; version history updated."
   - "Content frozen as signed; deltas listed in the Change Management Register with mandays."
@@ -147,10 +147,10 @@ handover_note: "After sign-off the content is frozen as signed and the approved 
 # Governance and contacts.
 governance:
   - {role: "Business owner and approver", who: "BDOI Product Owner", does: "Accountable for the sign-off; chairs the sign-off meeting"}
-  - {role: "Business owner of New Business", who: "Head, Marketing Business Services and System Support", does: "Coordinates the units' review; first signatory"}
+  - {role: "Input provider", who: "Marketing Business Services and System Support (MBS); TSU", does: "Coordinates the units' review; signs for the business input (BRD approval sheet: input)"}
   - {role: "Reviewers", who: "Marketing, TSU, Processing, Comptrollership", does: "Review their screens and rows; raise comments"}
-  - {role: "Finance, Compliance, BDOI IT", who: "Comptrollership, Compliance, BDOI IT", does: "Review and sign their parts (booking and accounting, KYC and screening, interfaces and access)"}
-  - {role: "BRD owner", who: "Business Project Services, BDO Unibank ESG", does: "Traceability to the BRD; sign-off coordination"}
+  - {role: "Finance, Compliance, BDOI IT", who: "Comptrollership, Compliance, BDOI IT", does: "Comptrollership approves booking and accounting; Compliance reviews KYC and screening; BDOI IT reviews interfaces, access and the Technical Specification"}
+  - {role: "BRD owner", who: "Business Project Services, BDO Unibank ESG", does: "Business Analyst: the BRD as written; Program Manager: traceability and completeness; sign-off coordination"}
   - {role: "Delivery", who: "iorta TechNXT Project Manager, Business Analysis, test lead", does: "Sessions, answers, comments log, revisions, change requests"}
 next_steps:
   - "Kick-off and first SIT walkthrough on Thu 1-Oct-2026"

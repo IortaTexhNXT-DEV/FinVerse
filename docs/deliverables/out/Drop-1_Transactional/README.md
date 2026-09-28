@@ -50,6 +50,17 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | Submitted Policies | BRD-12 | Test plan summary (Word) | 1.0 | [`BRD-12_Submitted_Policies/BIBS_TestPlan_BRD-12_Submitted_Policies_Summary_v1.0.docx`](BRD-12_Submitted_Policies/BIBS_TestPlan_BRD-12_Submitted_Policies_Summary_v1.0.docx) |
 | Submitted Policies | BRD-12 | Test plan workbook (Excel) | 1.0 | [`BRD-12_Submitted_Policies/BIBS_TestPlan_BRD-12_Submitted_Policies_v1.0.xlsx`](BRD-12_Submitted_Policies/BIBS_TestPlan_BRD-12_Submitted_Policies_v1.0.xlsx) |
 
+## Who signs what
+
+The sign-off sets hold business content only (screens, fields, list and template columns, validations, rules,
+messages, notifications, documents, walkthroughs, reports); the technical content is in the Technical
+Specification of each set, reviewed by BDOI IT. The signatories are the roles of the BRD approval sheet;
+the matrix per part of the set is in the 00 Start Here and the 01 guide deck of each set.
+
+| Set | Prepared by | Input provided by | Reviewed by | Approved by | Approval sheet |
+|---|---|---|---|---|---|
+| BRD-01 New Business | iorta TechNXT project team: Project Manager, Business Analysis, test lead<br>Business Analyst, Enterprise Services Group - Business Project Services (BPS) | Marketing Business Services and System Support (MBS), BU representatives<br>Technical Support Unit (TSU), BU representatives | Program Manager, Enterprise Services Group - Business Project Services (BPS)<br>BDOI Information Technology Group (BDOI IT)<br>Compliance Officer | Product Owner, Marketing Business System<br>Unit Head - Processing<br>Unit Head - Combank and Corbank<br>Head - Retail Marketing<br>Head of Institutional Banking, SM and BDO Accounts<br>Head - Comptrollership | BRD-1 approval sheets: Fire and Motor BRD ID consolidation p.128-129; Workshop Addendum p.22 (copy p.44) |
+
 ## Also part of this drop (documents kept in their primary drop)
 
 A BRD that spans drops lives in the folder of its primary drop; nothing is copied.
@@ -66,3 +77,4 @@ A BRD that spans drops lives in the folder of its primary drop; nothing is copie
 |---|---|---|
 | UAT plan and sign-off forms, Drop 1 (item 30) | - | By 16-Jul-2027; readiness statement by 30-Jul-2027 |
 | Interface specifications of the Drop 1 channels | - | After BDOI IT answers the IQ questions |
+| Technical Specification of each Drop 1 sign-off set | - | The technical content kept out of the business sets; reviewed by BDOI IT |

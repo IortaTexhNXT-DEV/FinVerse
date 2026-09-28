@@ -718,9 +718,13 @@ def render(doc: Any, render: str, **_: Any) -> None:  # noqa: A002 - block key
         for s in d["sets"]:
             folder = brand.out_dir(s["brd"], "FRS")
             files = sorted(p.name for p in folder.glob("*_v2.0.*"))
-            rows.append([f"{s['brd']} {brand.BRD_NAMES[s['brd']]}", files, s["confirms"], s["owner"], s["signoff"]])
+            # Who signs: the approvers and reviewers of the set's ownership.yaml (the BRD approval sheet)
+            owners = brand.owners_by_capacity(s["brd"])
+            signed = ([f"Approved by: {'; '.join(owners['Approved by'])}", f"Reviewed by: {'; '.join(owners['Reviewed by'])}"]
+                      if owners["Approved by"] else s["owner"])
+            rows.append([f"{s['brd']} {brand.BRD_NAMES[s['brd']]}", files, s["confirms"], signed, s["signoff"]])
         doc.table(["Sign-off set", "Files (v2.0)", "What the business confirms", "Signed by", "Sign-off"], rows,
-                  widths=[2.4, 5.4, 5.8, 2.8, 1.6], caption="The three sign-off sets of Drop 0", size=7.5, keep_rows=False)
+                  widths=[2.2, 4.4, 5.0, 4.6, 1.4], caption="The three sign-off sets of Drop 0", size=7.5, keep_rows=False)
         return
     if render == "clarifications":
         rows = [[f"{c['brd']} {c['name']}", c["rules"], c["questions"], c["open"], c["recommended"], c["answered"]]

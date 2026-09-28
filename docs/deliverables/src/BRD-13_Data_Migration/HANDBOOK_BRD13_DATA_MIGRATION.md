@@ -26,10 +26,11 @@ control:
     date: 5 Oct 2026
     author: iorta TechNXT Business Analysis and Solution Architect
     reviewer: iorta TechNXT Project Manager
-    approver: "Program Manager, Business Project Services (at sign-off)"
+    approver: "Product Owner, Marketing Business System (at sign-off)"
     change: "One handbook for the business sign-off of BRD-13: Part A strategy and approach, Part B functional specification of the Migration Console with one specification per screen (screenshots, fields, actions, rules, messages, outcome), the markers of migrated data and the legacy batches, Part C reconciliation and the sign-off gates per object, Part D the cut-over runbook, run-off and decommissioning; the proposed business rules and clarifications for confirmation"
 distribution:
-  - {name: "Program Manager, Business Project Services", role: "Business owner of BRD-13 and approver", organisation: BDO Unibank ESG, purpose: "Sign-off; owner of the cut-over"}
+  - {name: "Product Owner, Marketing Business System", role: Approver of the set, organisation: BDOI, purpose: "Sign-off (owns the set and approves all of its contents)"}
+  - {name: "Program Manager, Business Project Services", role: "BRD author; reviewer of traceability and completeness", organisation: BDO Unibank ESG, purpose: "Review; owner of the cut-over"}
   - {name: "Head, Comptrollership; Product Owners FRBS / ACSL and Disbursement", role: Approver, organisation: BDOI, purpose: "Open items, GL opening, legacy accounts, reconciliation, opening-balance adjustments"}
   - {name: "Head, Operations; Operations - Financial Transactions, Cashiering, Remittance, Collections", role: Data owners, organisation: BDOI, purpose: "Insurers, policy headers, legacy invoices, unapplied payments, collection state"}
   - {name: "Product Owner, Marketing Business System; Heads of Retail and Corporate Marketing; TSU", role: Data owners, organisation: BDOI, purpose: "Reference data, clients, packages, renewal transition"}

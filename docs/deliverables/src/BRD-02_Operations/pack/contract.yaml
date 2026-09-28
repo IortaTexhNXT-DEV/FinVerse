@@ -1,0 +1,133 @@
+# Cross-BRD dependencies and interface contract of BRD-2 Operations.
+# direction: In = Operations takes it from the other BRD or system; Out = Operations hands it over.
+# Columns: id | party | direction | what | when / how | owner of the data | Operations screens | FR
+# The technical detail of each interface is in the Technical Specification, reviewed by BDOI IT.
+contract:
+  - id: IC-01
+    party: BRD-1 New Business
+    direction: In
+    what: Every booked invoice (booking, endorsement, cancellation) with its policy, assured, insurer, premium components, commission, taxes, direct payment and CWT flags, and the insurer shares of a co-insured policy
+    how: Copied into the Operations ledger when the account or endorsement is booked; a booking that could not be copied is replayed from Interfaces
+    owner: Processing (BRD-1)
+    screens: Invoice Search, Invoice 360, Interfaces
+    frs: [FR-OP-004, FR-OP-007]
+  - id: IC-02
+    party: BRD-1 New Business
+    direction: Out
+    what: Payment confirmation of an account waiting for payment before placement or issuance, and the pre-booked payments of accounts not yet booked
+    how: When a payment is applied or taken as pre-booked, New Business is told the account is paid; a pre-booked payment is applied when the account is booked
+    owner: Cashiering
+    screens: Receive Payment, Pre-booked Payments
+    frs: [FR-OP-018, FR-OP-132]
+  - id: IC-03
+    party: BRD-1 New Business
+    direction: Out
+    what: Endorsements and cancellations raised in Operations (Adjustment) and posted as invoices
+    how: Posting a request books its endorsement or cancellation invoice through the booking of New Business; the policy transaction history of the policy shows it
+    owner: Adjustment
+    screens: Endorsement Request, Posting Batches, Invoice 360 (Policy Transactions)
+    frs: [FR-OP-056, FR-OP-061]
+  - id: IC-04
+    party: BRD-3 Product Maintenance
+    direction: In
+    what: Products, product lines, premium components and tax rates, insurers with their bank details and contacts, lists of values (reasons, conditions, disposition types)
+    how: Read at each transaction; only active values are offered
+    owner: MBS and the Business Administrator
+    screens: All Operations screens
+    frs: [FR-OP-019, FR-OP-054]
+  - id: IC-05
+    party: BRD-4 Collections
+    direction: In
+    what: Collector requests to dispose of an unapplied payment, refund validation tasks, CWT 2307 tags, hold and special remittance requests of Marketing Collection
+    how: Received on Incoming Requests (Cashiering) and on the hold and special remittance lists (Remittance); each request is accepted or rejected with its reason and the requester is told
+    owner: Marketing Collection (BRD-4)
+    screens: Incoming Requests, BIR 2307, Remittance Holds, Special Remittance
+    frs: [FR-OP-022, FR-OP-111, FR-OP-112, FR-OP-113]
+  - id: IC-06
+    party: BRD-4 Collections
+    direction: Out
+    what: Payment status, receipts and outstanding balances of every invoice; direct payment accounts and their billing status
+    how: Read from the Operations ledger by the collection worklists; changes show at once
+    owner: Cashiering, Commission Receivables
+    screens: Invoice 360, DP Items
+    frs: [FR-OP-004, FR-OP-091]
+  - id: IC-07
+    party: BRD-5 Accounting, Disbursement and ACSL
+    direction: Out
+    what: Journal entries of receipts, applications, cancellations, remittances, endorsements, write-offs, DP collections and incentives
+    how: Posted to the General Ledger when the Operations transaction is completed; each Operations record shows its entries (Accounting tab)
+    owner: Comptrollership (BRD-5)
+    screens: Receipt, Remittance Batch, Endorsement Request (Accounting tab), Minimal Balance
+    frs: [FR-OP-027, FR-OP-035, FR-OP-056]
+  - id: IC-08
+    party: BRD-5 Accounting, Disbursement and ACSL
+    direction: Out
+    what: Payment requests of approved remittance batches, refunds, BIR 2307 reversals and incentive pass-ons
+    how: Sent to the Disbursement queue at approval; Disbursement acknowledges, assigns the DV number, pays or returns the request and Operations is told
+    owner: Disbursement (BRD-5)
+    screens: Disbursement Queue, Remittance Batch, Unapplied Payment
+    frs: [FR-OP-035, FR-OP-036, FR-OP-120]
+  - id: IC-09
+    party: BRD-5 Accounting, Disbursement and ACSL
+    direction: In
+    what: Remittance deductions against an insurer (AR Insurer, ACSL items) confirmed for recovery from the insurer's next batch
+    how: Raised by ACSL on Remittance Deductions, confirmed by its Team Leader and applied to the insurer's next batch at extraction
+    owner: ACSL (BRD-5)
+    screens: Remittance Deductions, Remittance Batch
+    frs: [FR-OP-032, FR-OP-057]
+  - id: IC-10
+    party: BRD-6 Renewal
+    direction: In
+    what: Renewal invoices booked for the new policy year
+    how: Taken into the Operations ledger as any booked invoice (IC-01)
+    owner: Renewal (BRD-6)
+    screens: Invoice Search, Invoice 360
+    frs: [FR-OP-004]
+  - id: IC-11
+    party: BRD-7 Claims
+    direction: In
+    what: Special remittance of the premium of a policy with a claim filed
+    how: Requested on Special Remittance with the condition Claims; approved by the Remittance Team Leader and remitted in a special batch
+    owner: Claims (BRD-7), Remittance
+    screens: Special Remittance, Special Remittance Request
+    frs: [FR-OP-040, FR-OP-112]
+  - id: IC-12
+    party: BRD-13 Data Migration
+    direction: In
+    what: Legacy invoices, receipts and unapplied payments with their open balances
+    how: Loaded once at migration; they are worked in Operations like any invoice and keep their legacy number
+    owner: Migration team and Operations (reconciliation of the balances)
+    screens: Invoice Search, Unapplied Payments
+    frs: [FR-OP-004]
+  - id: IC-13
+    party: Insurers
+    direction: Out
+    what: Remittance schedules, production registers and direct payment commission billings
+    how: E-mailed from BIBS as password protected workbooks, the password in a separate e-mail
+    owner: Remittance, Production Reconciliation, Commission Receivables
+    screens: Remittance Batch, Production Extracts, DP Billing
+    frs: [FR-OP-110, FR-OP-073, FR-OP-092]
+  - id: IC-14
+    party: Insurers
+    direction: In
+    what: Official receipts of remitted premium, production feedback, answers to DP billings, BIR 2307 certificates
+    how: Uploaded by the Operations team from the insurer's files (Insurer OR Upload, Insurer Uploads, DP Responses) or recorded on the record
+    owner: Remittance, Production Reconciliation, Commission Receivables
+    screens: Insurer OR Upload, Insurer Uploads, DP Responses, BIR Certificates
+    frs: [FR-OP-037, FR-OP-074, FR-OP-093, FR-OP-096]
+  - id: IC-15
+    party: Banks and payment channels
+    direction: In
+    what: Payment files of bills payment, trade, CLPC and direct credit channels
+    how: Uploaded on Payment Uploads; each row is matched to its invoice and receipted; rows not matched become unapplied payments
+    owner: Cashiering
+    screens: Payment Uploads
+    frs: [FR-OP-015]
+  - id: IC-16
+    party: BDOI IT
+    direction: In
+    what: Scheduled jobs of Operations (remittance extraction, register extraction, feedback follow-up, daily reports) and the flow-in feeds
+    how: Run on the agreed schedule; each run is logged on Interfaces with its counts and failed records; a failed run alerts the System Administrator
+    owner: BDOI IT and the System Administrator
+    screens: Interfaces
+    frs: [FR-OP-008, FR-OP-131]

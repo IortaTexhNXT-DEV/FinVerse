@@ -57,7 +57,7 @@ class MetricsAccessIT {
 
   @Test
   void onTheApplicationPortTheMetricsNeedMetricsView() throws Exception {
-    mvc.perform(get("/actuator/prometheus")).andExpect(status().isUnauthorized());
+    mvc.perform(get("/actuator/metrics")).andExpect(status().isUnauthorized());
     mvc.perform(get("/actuator/health"))
         .andExpect(status().isOk())
         .andExpect(header().string("Content-Security-Policy", startsWith("default-src 'none'")));
@@ -67,21 +67,20 @@ class MetricsAccessIT {
   @Test
   @WithMockUser(authorities = "SYSTEM_PARAMETER_MANAGE")
   void aParameterAdministratorNoLongerReadsTheMetrics() throws Exception {
-    mvc.perform(get("/actuator/prometheus")).andExpect(status().isForbidden());
+    mvc.perform(get("/actuator/metrics")).andExpect(status().isForbidden());
   }
 
   @Test
   @WithMockUser(authorities = "METRICS_VIEW")
   void aServiceCredentialWithMetricsViewReadsThem() throws Exception {
-    mvc.perform(get("/actuator/prometheus")).andExpect(status().isOk());
+    mvc.perform(get("/actuator/metrics")).andExpect(status().isOk());
   }
 
   @Test
   void theManagementPortServesTheMetricsWithoutToken() throws Exception {
     listen(MANAGEMENT);
-    mvc.perform(get("/actuator/prometheus").with(onPort(MANAGEMENT))).andExpect(status().isOk());
-    mvc.perform(get("/actuator/prometheus").with(onPort(8080)))
-        .andExpect(status().isUnauthorized());
+    mvc.perform(get("/actuator/metrics").with(onPort(MANAGEMENT))).andExpect(status().isOk());
+    mvc.perform(get("/actuator/metrics").with(onPort(8080))).andExpect(status().isUnauthorized());
   }
 
   @Test

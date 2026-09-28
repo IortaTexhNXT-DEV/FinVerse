@@ -16,6 +16,7 @@ import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
  * password.
  */
 @Service
-@Transactional(propagation = Propagation.MANDATORY)
+@Transactional(propagation = Propagation.MANDATORY, noRollbackFor = AuthenticationException.class)
 public class SignInCompletion {
 
   /** Minutes the second factor may be entered after the first step. */

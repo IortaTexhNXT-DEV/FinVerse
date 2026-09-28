@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.security.service;
 
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.bind.ConstructorBinding;
 
 /**
  * Login protection settings bound from {@code brokerverse.security.login-protection.*}.
@@ -36,6 +37,7 @@ public record LoginProtectionProperties(
   public static final int DEFAULT_RESET_MAX_PER_USER = 3;
 
   /** Applies the defaults. */
+  @ConstructorBinding
   public LoginProtectionProperties {
     maxAttemptsPerWindow =
         maxAttemptsPerWindow == null

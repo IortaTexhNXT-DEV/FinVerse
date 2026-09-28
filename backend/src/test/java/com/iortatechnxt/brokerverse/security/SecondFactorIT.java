@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.test.context.TestSecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -150,8 +151,13 @@ class SecondFactorIT {
     JsonNode second = login(username);
     assertThat(second.get("mfaStep").asText()).isEqualTo("VERIFY");
     String challenge = second.get("mfaChallenge").asText();
-    mvc.perform(get("/api/v1/auth/me").header(HttpHeaders.AUTHORIZATION, BEARER + challenge))
-        .andExpect(status().isUnauthorized());
+    TestSecurityContextHolder.clearContext();
+    MvcResult withChallenge =
+        mvc.perform(get("/api/v1/auth/me").header(HttpHeaders.AUTHORIZATION, BEARER + challenge))
+            .andReturn();
+    assertThat(withChallenge.getResponse().getStatus())
+        .as(withChallenge.getResponse().getContentAsString())
+        .isEqualTo(401);
     // The code of the enrolment was used: it is never accepted again. A wrong code counts.
     post(MFA + "/verify", Map.of("challenge", challenge, "code", code(secret, 0)), 401);
     Integer failed =

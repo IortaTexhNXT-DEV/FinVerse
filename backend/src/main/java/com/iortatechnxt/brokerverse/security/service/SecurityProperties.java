@@ -8,6 +8,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.bind.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
 /**
@@ -42,6 +43,7 @@ public record SecurityProperties(
   public static final Duration DEFAULT_ACCESS_TOKEN_VALIDITY = Duration.ofMinutes(15);
 
   /** Applies the defaults. */
+  @ConstructorBinding
   public SecurityProperties {
     maxFailedAttempts = Objects.requireNonNullElse(maxFailedAttempts, DEFAULT_MAX_FAILED_ATTEMPTS);
     accessTokenValidity =

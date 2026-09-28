@@ -43,6 +43,19 @@ The drop-level set `Drop-0_Closure/` (v2.0) covers the whole drop: 01 Configurat
 | Data Migration | BRD-13 | Test plan workbook (Excel) | 2.0 | [`BRD-13_Data_Migration/04_BIBS_TestPlan_BRD-13_Data_Migration_v2.0.xlsx`](BRD-13_Data_Migration/04_BIBS_TestPlan_BRD-13_Data_Migration_v2.0.xlsx) |
 | Data Migration | BRD-13 | Test plan summary (Word) | 2.0 | [`BRD-13_Data_Migration/05_BIBS_TestPlan_BRD-13_Data_Migration_Summary_v2.0.docx`](BRD-13_Data_Migration/05_BIBS_TestPlan_BRD-13_Data_Migration_Summary_v2.0.docx) |
 
+## Who signs what
+
+The sign-off sets hold business content only (screens, fields, list and template columns, validations, rules,
+messages, notifications, documents, walkthroughs, reports); the technical content is in the Technical
+Specification of each set, reviewed by BDOI IT. The signatories are the roles of the BRD approval sheet;
+the matrix per part of the set is in the 00 Start Here and the 01 guide deck of each set.
+
+| Set | Prepared by | Input provided by | Reviewed by | Approved by | Approval sheet |
+|---|---|---|---|---|---|
+| BRD-03 Product Maintenance | iorta TechNXT project team: Project Manager, Business Analysis, test lead<br>Business Analyst, Enterprise Services Group - Business Project Services (BPS) | Technical Support Unit (TSU), BU representatives<br>Marketing Business System (MBS), BU representatives | Program Manager, Enterprise Services Group - Business Project Services (BPS)<br>BDOI Information Technology Group (BDOI IT) | Product Owner, Marketing Business System<br>Unit Head - Claims, Analytics, Risk Management, Reinsurance and Technical Underwriting<br>Unit Head - Combank and Corbank<br>Head - Retail Marketing<br>Head - Corporate and Retail Marketing<br>Head - Comptrollership | BRD-3 approval sheets: main BRD p.34-35; Workshop Addendum p.8-9 |
+| BRD-11 User Access Maintenance | iorta TechNXT project team: Project Manager, Business Analysis, test lead<br>Business Analyst, Enterprise Services - Business Process Services (BPS) | BU representative, Marketing Business System (MBS)<br>Business Administration (user access maintenance) | Program Manager, Enterprise Services - Business Process Services (BPS)<br>BDOI Information Security<br>BDOI Information Technology Group (BDOI IT) | Product Owner, Marketing Business System<br>Unit Head - Claims and Risk Management<br>Unit Head - Combank and Corbank Marketing / Corporate Processing<br>Head - Comptrollership<br>Head - Retail Marketing<br>Head - Corporate and Retail Marketing | BRD-11 sign-off sheet p.19 (Owner: "I own this document and approve all of its contents") |
+| BRD-13 Data Migration | iorta TechNXT project team: Project Manager, Business Analysis, Migration Lead, test lead<br>Program Manager, Enterprise Services Group - Business Project Services (BPS) | Data Migration Lead<br>Data owners of the objects (department representatives named per object) | Marketing Business System (MBS)<br>BDOI Information Technology Group (BDOI IT) | Product Owner, Marketing Business System<br>Product Owner - Comptrollership - Disbursement<br>Product Owner - Comptrollership - FRBS and ACSL<br>Operations: Financial Transactions and Processing<br>Head - Operations<br>Unit Head - Analytics and Risk Management<br>Unit Head - Claims, Analytics, Risk Management, Reinsurance and Technical Underwriting<br>Unit Head - Combank and Corbank<br>Head - Comptrollership<br>Head - Retail Marketing<br>Head - Corporate and Retail Marketing | BRD-13 approval pages p.15-16 (draft V0.01, not yet signed) |
+
 ## Also part of this drop (documents kept in their primary drop)
 
 A BRD that spans drops lives in the folder of its primary drop; nothing is copied.
@@ -59,3 +72,4 @@ A BRD that spans drops lives in the folder of its primary drop; nothing is copie
 | Bill of materials, technical and deployment architecture (items 4, 12) | BRD-00 | From the programme alignment pack (chapter 6), the IER and the architecture option decision |
 | Security and data-protection controls mapping (item 26) | BRD-00 | EIAM, UIDM-ISC, S3 encryption, masking |
 | Interface specifications of the Drop 0 integrations | - | After BDOI IT answers the IQ questions |
+| Technical Specification of each Drop 0 sign-off set (BRD-03, BRD-11, BRD-13) | - | The technical content kept out of the business sets (interfaces, access set-up, data storage, extract transfer); reviewed by BDOI IT |

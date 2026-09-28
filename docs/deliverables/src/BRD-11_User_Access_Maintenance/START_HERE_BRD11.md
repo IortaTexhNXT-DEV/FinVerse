@@ -71,6 +71,24 @@ render: guide-steps
 | Mon 9-Nov-2026 | 09:30-12:00 | Kick-off; a new user from the request to the first sign-in with the menu of the persona (walkthrough A); a change, a revocation and a group-profile change (walkthrough B) | Business Administration, Information Security, unit heads |
 | Tue 10-Nov-2026 | 09:30-12:00 | Refused cases and messages (walkthrough C); the reports, the matrix and the insurer roles hidden from BDOI (walkthrough D); sign-in, passwords and sessions; the configuration input templates | Information Security, BDOI IT, Business Administration, Data Migration working group |
 
+# Who signs what
+
+The set holds business content only: the screens and fields, the columns of the lists, reports and templates that the user sees or fills in, the validations, business rules, messages, notifications, documents, walkthroughs and reports. The business users sign that content. Technical content (the interfaces between systems, data storage, security set-up) is not part of the set: it is in the Technical Specification, a separate document reviewed by BDOI IT. The roles are those of the approval sheet of the BRD: iorta TechNXT prepares the set, the business units provide the input and review their parts, BDOI IT reviews the interfaces, the user access and the Technical Specification, the Program Manager of Business Project Services reviews the traceability and the completeness, and the Product Owner approves the whole set.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: owners-matrix
+```
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: owners-roles
+```
+
+The signatories sign the Sign-off certificate sheet of the sign-off workbook in the same order: prepared by, input provided by, reviewed by, approved by.
+
 # Configuration inputs
 
 The workbook of configuration input templates lists what the business provides to set up User Access Maintenance: the users and their group profiles (loaded with the bulk request), the role-to-permission matrix (implemented by group-profile requests), the approvers, approval rules and limits, the separation-of-duties rules, the password, session and sign-in values and the lists of values (FRS chapter 19). The owners start the templates during the review; the users and the role matrix are due before the first data migration mock, and the parameters agreed with Information Security before UAT.

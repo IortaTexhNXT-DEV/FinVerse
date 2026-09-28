@@ -72,6 +72,24 @@ render: guide-steps
 | Mon 5-Oct-2026 | 09:30-12:30 | Validation, payment, placement, issuance and booking; returns and messages (walkthrough A steps 10-17, walkthrough C) | Processing, Comptrollership |
 | Tue 6-Oct-2026 | 09:30-11:30 | Bulk uploads with the error file, reports and dashboard, administration screens | MBS, Business Administration, Compliance, BDOI IT |
 
+# Who signs what
+
+The set holds business content only: the screens and fields, the columns of the lists, reports and templates that the user sees or fills in, the validations, business rules, messages, notifications, documents, walkthroughs and reports. The business users sign that content. Technical content (the interfaces between systems, data storage, security set-up) is not part of the set: it is in the Technical Specification, a separate document reviewed by BDOI IT. The roles are those of the approval sheet of the BRD: iorta TechNXT prepares the set, the business units provide the input and review their parts, BDOI IT reviews the interfaces, the user access and the Technical Specification, the Program Manager of Business Project Services reviews the traceability and the completeness, and the Product Owner approves the whole set.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: owners-matrix
+```
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: owners-roles
+```
+
+The signatories sign the Sign-off certificate sheet of the sign-off workbook in the same order: prepared by, input provided by, reviewed by, approved by.
+
 # Change control after sign-off
 
 Signing freezes the New Business screens, fields, navigation, actions, business rules, messages, notifications, documents, upload templates and the cross-BRD contract as specified. Configuration values marked "default" (SLA hours, thresholds, list entries, templates) are not frozen. A change to anything frozen is raised in the Change Management Register with the screen, field, rule or message concerned, assessed with its mandays and its effect on the other BRDs, approved by the owners of every BRD it touches, and delivered as a new version of the set; only the affected pages are signed again.

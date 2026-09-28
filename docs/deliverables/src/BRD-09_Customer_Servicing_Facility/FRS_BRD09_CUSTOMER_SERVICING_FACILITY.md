@@ -514,7 +514,7 @@ main_flow:
   - With sync enabled, the job sends the rows and sets SENT or FAILED.
 rules:
   - [R1, "Sync off until the interface is specified (CSQ01).", Configurable, Parameter CSF_LEGACY_SYNC_ENABLED]
-  - [R2, "Every change keeps its payload, so the outbox can be replayed.", Fixed, "-"]
+  - [R2, "Every change keeps its content, so it can be sent again.", Fixed, "-"]
 validations: []
 notifications:
   - "CSF_SYNC_FAILED alert on a failed sending."
@@ -682,14 +682,14 @@ brd: [BRCSF-010 (p.11)]
 actor: System
 priority: Must have
 screens: Servicing View (Contact History); Audit Trail (Administration)
-description: Every change to client information is recorded with the entity, field, old and new values, user, time and source. CSF contact changes also carry the verification reference and the reason. Audit rows are append-only.
+description: Every change to client information is recorded with the entity, field, old and new values, user, time and source. CSF contact changes also carry the verification reference and the reason. Audit entries can only be added; no user can change or delete them.
 preconditions:
   - "None."
 main_flow:
   - A user changes client information.
-  - BIBS writes the audit entry in the same transaction.
+  - BIBS writes the audit entry together with the change; one is never kept without the other.
 rules:
-  - [R1, "Audit rows are append-only.", Fixed, "-"]
+  - [R1, "Audit entries can only be added; no user can change or delete them.", Fixed, "-"]
   - [R2, "Retention 5 years online, 15 years archive (p.14).", Configurable, Retention rule CSF_CONTACT_CHANGE]
 validations: []
 notifications:
@@ -749,7 +749,7 @@ validations:
 notifications:
   - "None."
 audit:
-  - "The activity log is itself append-only."
+  - "No entry of the activity log can be changed or deleted."
 acceptance:
   - An agent's search, view and resend appear in the Agent Activity report for that day.
 ```
@@ -761,15 +761,15 @@ brd: [BRCSF-011 / 11.001 (p.11)]
 actor: Infrastructure (System)
 priority: Must have
 screens: None
-description: The BIBS database is backed up continuously - write-ahead log archiving at most every 15 minutes to the designated secure storage, plus daily base backups. Each backup is time stamped, complete and restorable, and is tested monthly by a restore. Archiving runs without degrading the online response times. The requirement applies to the whole BIBS database, not only to CSF data.
+description: BIBS data is backed up continuously - the changes are saved at least every 15 minutes to the designated secure storage, plus a daily full backup. Each backup is time stamped, complete and restorable, and is tested monthly by a restore. Saving the changes does not slow down the online response times. The requirement applies to all BIBS data, not only to CSF data. The backup set-up is specified in the Technical Specification, reviewed by BDOI IT.
 preconditions:
   - "None."
 main_flow:
-  - The database archives its log at least every 15 minutes.
+  - The changes are saved to the backup storage at least every 15 minutes.
   - The daily base backup runs outside the peak hours.
   - A monthly restore test proves the backups.
 rules:
-  - [R1, "Archive interval at most 15 minutes.", Configurable, Database setting (archive interval)]
+  - [R1, "Archive interval at most 15 minutes.", Configurable, Infrastructure setting (backup interval)]
   - [R2, "Whether the 15-minute backup is BIBS-wide (RPO 15 minutes) is confirmed under CSQ11 and XQ08.", Configurable, Infrastructure decision]
 validations: []
 notifications:
@@ -777,7 +777,7 @@ notifications:
 audit:
   - "Backup and restore test logs kept by the infrastructure team."
 acceptance:
-  - A restore test recovers the database to a point less than 15 minutes before the test.
+  - A restore test recovers BIBS data to a point less than 15 minutes before the test.
   - Online response times during archiving stay within the targets of section 8.
 ```
 
@@ -928,7 +928,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 |---|---|
 | Allowed file types | Platform list plus TXT, RTF, HEIC / HEIF, GIF, BMP, TIFF, WEBP (BRCSF-007) |
 | Document access classes | Rows for RENEWAL_ADVICE and CLAIM_REPORT that let the CSF roles list and download them (XQ04) |
-| Database archive interval | At most 15 minutes (BRCSF-011 / 11.001) |
+| Backup interval of the changes | At most 15 minutes (BRCSF-011 / 11.001) |
 
 # Assumptions, dependencies and open questions
 
@@ -942,7 +942,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | A-CSF-03 | Agents change contact details only; other changes go to the fulfilment unit | E-mail topic 3 |
 | A-CSF-04 | CSF agents see every segment (CBG and non-CBG) | p.4; CQ06 |
 | A-CSF-05 | Inquiry logging and case management stay out of this phase | CSQ09 |
-| A-CSF-06 | The 15-minute backup applies to the whole BIBS database | CSQ11 |
+| A-CSF-06 | The 15-minute backup applies to all BIBS data | CSQ11 |
 
 ## Dependencies
 
@@ -1025,7 +1025,7 @@ The table lists each point where the proposed screen or rule differs from the BR
 | CLR-CSF-01 | Data source and write-back (BRCSF-002, p.3, p.5; FR-CSF-022) | BIBS is the source of the client and account data. A contact change updates the BIBS client master at once and is kept for QPS and EBIX with the status "not configured"; it is sent when BDOI specifies the interface. | The BRD reads QPS and EBIX and writes updates back to them; how long they stay systems of record is open (CSQ01). | Say until when QPS and EBIX stay systems of record and whether a write-back is needed (CSQ01). |
 | CLR-CSF-02 | Accounts not in BIBS (BRCSF-003; FR-CSF-010) | The search by PN or application number finds the accounts in BIBS; accounts that exist only in QPS, EBIX or the loan system are found once they are connected. | The legacy lookup interface is not specified (CSQ01, CSQ02). | Specify the lookup, or confirm the search in BIBS only (CSQ02). |
 | CLR-CSF-03 | Contact details (BRCSF-004) | Contact details are updated after a recorded verification of the caller; "add" means additional contacts only if BDOI confirms it. | E-mail topic 5 asks for verification; additional contacts are open (CSQ15). | Confirm the verification checks (CSQ03) and additional contacts (CSQ15). |
-| CLR-CSF-04 | Backup every 15 minutes (BRCSF-011 / 11.001; FR-CSF-043) | The database archives its log at least every 15 minutes, as an infrastructure requirement for the whole database. | The 15-minute backup conflicts with the 4-hour backup of the retention table (CSQ11, XQ08). | Confirm the backup interval (CSQ11). |
+| CLR-CSF-04 | Backup every 15 minutes (BRCSF-011 / 11.001; FR-CSF-043) | The changes are saved to the backup storage at least every 15 minutes, as an infrastructure requirement for all BIBS data. | The 15-minute backup conflicts with the 4-hour backup of the retention table (CSQ11, XQ08). | Confirm the backup interval (CSQ11). |
 | CLR-CSF-05 | Log-in (BRCSF-001; FR-CSF-001) | The BIBS sign-in applies; directory sign-in (Windows ID) is added for all BIBS users when BDO supplies the interface. | Cross-BRD decision D6. | Confirm decision D6. |
 | CLR-CSF-06 | Case management (CSF-EM10) | Out of scope for this phase. | Deferred by the e-mail of 13-Feb-2026. | Confirm the deferral. |
 

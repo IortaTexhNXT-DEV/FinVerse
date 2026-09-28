@@ -176,6 +176,6 @@ templates:
       - "Code / Name | Y | A-Z, 0-9, _ and -; text | Criterion | CPC2; CPC2 campaign 2028"
       - "Incentive type | Y | List INCENTIVE_TYPE | Type of criterion | CAMPAIGN"
       - "Value basis / Value | Y (basis) | Rate (%), Fixed amount or Rule; number | Value of the criterion | Rate (%); 1.00"
-      - "Rule parameters | N | JSON | Parameters of a rule criterion | {\"minimumPremium\": 5000}"
+      - "Rule parameters | N | Name and value pairs, as in the example | Parameters of a rule criterion | {\"minimumPremium\": 5000}"
       - "Products matrix: risk code / segment | Y (one product) | Active risk codes; segment or blank | Products and segments the criterion applies to | MTR30; COMBANK"
       - "Effective from / to | Y (from) | dd-MMM-yyyy | Validity; no overlap with another row of the code | 01-Jan-2028"

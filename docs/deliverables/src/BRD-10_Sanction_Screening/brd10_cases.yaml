@@ -57,8 +57,8 @@ screens:
   JOBS: Administration > Scheduled Jobs
   NOTIF: Notifications (bell icon in the page header)
   MAIL: Test mailbox of the recipient
-  DB: Database console of the test environment (database administrator)
-  API: Direct request outside the screens, signed in as the persona (test lead tool)
+  ADMIN_TOOLS: Administration tools of the test environment (infrastructure administrator)
+  SYS: System function check outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-SS-01
@@ -177,7 +177,7 @@ frs:
       - c: 3
         type: Security-access
         persona: SCR_INVESTIGATOR
-        screen: API
+        screen: SYS
         title: Direct committee decision request without SCR_COMMITTEE
         steps:
           - As investigator send a direct request to record a committee decision on a case in AML_COMMITTEE.
@@ -202,7 +202,7 @@ frs:
       - c: 5
         type: Negative
         persona: UNIT_COMPLIANCE_COORD
-        screen: API
+        screen: SYS
         title: Action on a case assigned to another user
         steps:
           - As the combined test user (SCR_INVESTIGATE) send a direct request to submit a case in INVESTIGATION assigned to investigator.
@@ -543,7 +543,7 @@ frs:
         pre: A version with INVESTIGATION 48 hours, calendar hours, is active.
         steps:
           - Create a case; read its due time.
-          - Move the due time into the past in the test database; run SCR_SLA_MONITOR.
+          - Move the due time into the past in the test environment; run SCR_SLA_MONITOR.
         expected: The due time is 48 hours after the stage entry; after the run the case shows the Breached badge.
       - c: 1
         type: Positive
@@ -696,7 +696,7 @@ frs:
       - c: 1
         type: Negative
         persona: SCR_INVESTIGATOR
-        screen: API
+        screen: SYS
         title: Disposition of another stage refused
         steps:
           - As investigator submit a case in INVESTIGATION with disposition CONCUR by a direct request.
@@ -739,7 +739,7 @@ frs:
         title: Approve a version effective tomorrow
         steps:
           - Open the PENDING matching-criteria version; review the changes; click Approve.
-          - Check both versions today and again tomorrow (date moved in the test database).
+          - Check both versions today and again tomorrow (date moved in the test environment).
         expected: Today the new version shows ACTIVE from tomorrow and the old one stays in force; tomorrow the old version is SUPERSEDED. compoff is notified of the approval.
       - c: 2
         type: Workflow
@@ -1262,7 +1262,7 @@ frs:
         msg: [Enter the justification of the change]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Rating outside the list
         steps:
           - Call Update Risk Tag with rating VERY_LOW.
@@ -1305,7 +1305,7 @@ frs:
       - c: 3
         type: Negative
         persona: COMPLIANCE_OFFICER
-        screen: API
+        screen: SYS
         title: Transition not in the workflow
         steps:
           - Send a direct request for the action Prepare STR on a case in UNIT_HEAD_APPROVAL.
@@ -1421,7 +1421,7 @@ frs:
         expected: investigator2 is not in the list.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Re-assign to a user without the stage permission
         steps:
           - Call Re-assign with new assignee compchk.
@@ -2129,9 +2129,9 @@ frs:
     screen: AUDIT
     data: [TD-SS-06]
     conditions:
-      - Every user and system action writes an audit entry in the same transaction, and the timeline, configuration differences and list change records keep before and after values.
+      - Every user and system action writes an audit entry together with the action, and the timeline, configuration differences and list change records keep before and after values.
       - No screen or service allows an audit row or timeline event to be edited or deleted, including by the System Administrator.
-      - A database update of a timeline row is refused.
+      - An attempt to change a timeline entry outside the screens is refused.
     cases:
       - c: 1
         type: Positive
@@ -2147,11 +2147,11 @@ frs:
         expected: No action offered; no update or delete is offered and direct requests are refused.
       - c: 3
         type: Negative
-        screen: DB
-        title: Database update of a timeline row
+        screen: ADMIN_TOOLS
+        title: Change of a timeline entry outside the screens
         steps:
-          - As the database administrator run an UPDATE on a row of the case timeline table.
-        expected: The database refuses the update.
+          - As the infrastructure administrator try to change an entry of the case timeline directly.
+        expected: The attempt is refused and the entry is unchanged.
 
   FR-SS-092:
     scenario: SC-SS-08

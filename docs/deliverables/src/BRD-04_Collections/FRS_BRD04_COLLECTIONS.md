@@ -342,12 +342,12 @@ preconditions:
   - "None."
 main_flow:
   - A user changes a Collections record.
-  - BIBS writes the change rows in the same transaction as the change.
+  - BIBS writes the change rows together with the change; one is never kept without the other.
   - The History tab and the audit log report (FR-CL-004) show the rows.
 alternate_flows:
   - Bulk change. Every account of a bulk update gets its own rows with the shared bulk reference (CLXBU-yyyy-n).
 rules:
-  - [R1, "Audit rows are append-only; no user can change or delete them.", Fixed, "-"]
+  - [R1, "Audit entries can only be added; no user can change or delete them.", Fixed, "-"]
   - [R2, "Changes made by the nightly refresh and by the inbox are system changes and carry the user SYSTEM.", Fixed, "-"]
 validations: []
 notifications:
@@ -706,7 +706,7 @@ brd: [BRCLXN.021 (p.28 / 48), BRCLXN.022 (p.28 / 48), BRCLXN.023 (p.28 / 48)]
 actor: System
 priority: High
 screens: PR Worklist (Completed Collections); Collection account (Timeline, Dispositions & Efforts, History)
-description: Collection accounts are never deleted. When the PR becomes zero or falls below the threshold, the account moves to COMPLETED and keeps its dispositions, efforts, promises, escalations, assignments and field changes. Dispositions are append-only - a new disposition supersedes the previous one, which stays in the history. Each balance change is noted on the account's Timeline.
+description: Collection accounts are never deleted. When the PR becomes zero or falls below the threshold, the account moves to COMPLETED and keeps its dispositions, efforts, promises, escalations, assignments and field changes. Dispositions are never changed - a new disposition supersedes the previous one, which stays in the history. Each balance change is noted on the account's Timeline.
 preconditions:
   - "None."
 main_flow:
@@ -886,7 +886,7 @@ alternate_flows:
 rules:
   - [R1, "At most 500 accounts in one action.", Fixed, "-"]
   - [R2, "Only active values; values with allowed roles only for those roles.", Configurable, Disposition Rules]
-  - [R3, "Dispositions are append-only (FR-CL-018).", Fixed, "-"]
+  - [R3, "Dispositions are never changed or deleted (FR-CL-018).", Fixed, "-"]
 validations:
   - [No account selected, Select at least one account, CLX_NO_ACCOUNT]
   - [More than 500 accounts, Select at most 500 accounts at once, CLX_TOO_MANY_ACCOUNTS]
@@ -1005,7 +1005,7 @@ fields:
 notifications:
   - "None."
 audit:
-  - "Efforts are append-only and kept with user and time; category and remarks changes are field change rows."
+  - "Efforts are never changed and are kept with user and time; category and remarks changes are field change rows."
 acceptance:
   - A logged call appears on the Dispositions & Efforts tab and as the last effort on the worklist row.
   - An effort dated tomorrow is refused.
@@ -1652,7 +1652,7 @@ brd: [BRCLXN.031 (p.29 / 48), BRCLXN.033 (p.29 / 48)]
 actor: Collection Handler; Unapplied Payment Handler; Marketing AO / Handler / TL
 priority: High
 screens: Unapplied Payments (Record Disposition); Unapplied Payment (Collector Dispositions)
-description: The handler documents what should happen to an unapplied payment by recording a collector disposition with remarks. When the value has a Cashiering action, the disposition also sends a request to Cashiering (FR-CL-074). Dispositions are append-only and kept after the payment is applied or refunded.
+description: The handler documents what should happen to an unapplied payment by recording a collector disposition with remarks. When the value has a Cashiering action, the disposition also sends a request to Cashiering (FR-CL-074). Dispositions are never changed and are kept after the payment is applied or refunded.
 preconditions:
   - "The user has CLX_UNAPPLIED_WORK."
   - "The payment has an unapplied balance."

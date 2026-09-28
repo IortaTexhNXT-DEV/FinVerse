@@ -64,7 +64,7 @@ In scope are all 37 FRs of FRS BRD-11 v2.0 and the BRD IDs they trace to:
 - review and approval: approve, reject, return, and the second approval of privileged and out-of-hours changes (FR-UA-030 to 034);
 - group-profile requests with ordered approvers and their implementation by the System Administrator (FR-UA-040 to 045);
 - the delivered profiles, the functions assignable to a profile and the user data (FR-UA-050 to 052);
-- the four access reports and the insert-only access-change log (FR-UA-060 to 064);
+- the four access reports and the access-change log that no user can change (FR-UA-060 to 064);
 - notifications and the e-mail of failed batch runs (FR-UA-070, 071).
 
 The roles-and-access sheet checks each access-maintenance function against the roles that may and may not perform it (the matrix of FRS section 3.3).
@@ -115,7 +115,7 @@ The roles-and-access sheet checks each access-maintenance function against the r
 | Positive | The normal flow succeeds with valid data |
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit |
-| Security-access | Screens, buttons and API calls are open only to the roles that hold the permission; four-eyes rules |
+| Security-access | Screens, buttons and system functions are open only to the roles that hold the permission; four-eyes rules |
 | Workflow | A status change of a user access request or a group-profile request (section 5 of the FRS) |
 | Report-output | The access reports and the User Access Matrix; content checked against the screen |
 | Upload-download | The bulk request template and file |
@@ -174,7 +174,7 @@ Many cases change users and profiles (enrolment, deactivation, profile changes).
 | Test lead | iorta TechNXT QA | Owns this plan and the workbook; prepares environments, test users and the clock settings; runs the daily issue triage; reports progress |
 | System testers | iorta TechNXT QA | Run the system test and the persona end-to-end scenarios; raise issues with evidence |
 | Developers | iorta TechNXT | Resolve issues; support triage |
-| Database administrator | iorta TechNXT with BDO Unibank ITIO | Runs the database checks of FR-UA-003 and FR-UA-064 and hands the evidence to QA |
+| Infrastructure administrator | iorta TechNXT with BDO Unibank ITIO | Runs the checks outside the screens of FR-UA-003 (no password kept for directory users) and FR-UA-064 (the change log cannot be altered) and hands the evidence to QA |
 | BDOI department testers | Business Administrators; Unit Heads as approvers; ITIO-SRE and ITSD-AMS as system administrators | Run the UAT scenarios of their role; confirm the expected results match the access policy; raise issues |
 | BDOI process owner | Process Owner, User Access Maintenance | Decides on disputed expected results and accepted issues; signs off UAT |
 | UAT coordinator | ES-BPDS, Business Project Services, BDO Unibank ESG | Plans the UAT sessions; checks traceability to the BRD |
@@ -242,8 +242,8 @@ The table shows the functions checked per role. Each Y and N is one row of the R
 | A screen, label or message changes after the sign-off | Medium | The signed rows are compared with the system before each release; a change is a change request and a new version of the set (FRS chapter 21) |
 | BDOI answers to open questions change expected results (UQ02 approver choice, UQ05 user ID format and lists, UQ07 privilege levels and working hours, UQ10 bulk rules, UQ16 profiles with members) | Medium | The values are parameters and lists; the affected cases name them and are re-run after the change without a change to the system |
 | The directory sign-in (EIAM on Entra ID) is not specified by BDOI IT (UQ04, IQ04) | Medium | Directory sign-in cases stay Blocked; LOCAL mode is tested now |
-| A test locks out the administrators of the environment | High | Keep a second administrator (admin2) outside the lock-out cases; the test lead can unlock through the database |
-| Time-based cases (inactivity, token expiry, password age, effective dates, out-of-hours) need the clock to pass | Medium | The test lead shortens timers and moves dates in the test environment, as the preconditions describe |
+| A test locks out the administrators of the environment | High | Keep a second administrator (admin2) outside the lock-out cases; the infrastructure administrator can unlock an account outside the screens |
+| Time-based cases (inactivity, session expiry, password age, effective dates, out-of-hours) need the clock to pass | Medium | The test lead shortens timers and moves dates in the test environment, as the preconditions describe |
 | Existing roles lose functions when the new permissions are introduced | High | FR-UA-050 cases check that ACCESS_REQUEST holders keep their request functions; the BRD-1 to BRD-5 access checks are re-run in the same cycle |
 | BDOI testers (14 Requestors and 8 Approvers, UQ01) are not named in time | High | Agree named testers per role in the UAT plan (deliverable 30) |
 

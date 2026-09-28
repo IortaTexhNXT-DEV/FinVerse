@@ -19,7 +19,17 @@ Errors:
     automated tests and test class names, code, file and API paths, Flyway versions and internal engineering codes.
     Until BDOI's business users sign off each FRS, a client document presents the proposed system only (client
     instruction of 27-Sep-2026). Matching is whole-word and case-insensitive; business words such as "building",
-    "built-in" or the design of a product do not match.
+    "built-in" or the design of a product do not match;
+  * a technical term in a client document of a business sign-off set (client decision of 28-Sep-2026: the sets hold
+    business content only; technical content goes into the Technical Specification of the set, reviewed by BDOI IT):
+    APIs and endpoints, JSON, SQL, databases, schemas, table names and the data model, payloads, Flyway and migration
+    scripts, http addresses and /api/ paths, file-transfer protocols. Checked in the Word, Excel and PowerPoint files
+    of the issued sign-off sets and of the drop-level sets in out/, and in the sources of the client documents of
+    every BRD in src/ (FRS, test plan, Start Here, handbook, test cases, pack data, drop closure sources), so that the
+    next sets start clean. A phrase is accepted only when it is on the allow-list TECHNICAL_ALLOWED with its reason (a
+    platform text quoted word for word whose wording fix is requested, or the name of a BDO system). The other
+    documents of out/ (sets not yet re-issued, programme documents) are reported as warnings: they are rebuilt from
+    the checked sources when their set is issued, and the programme alignment pack is addressed to BDOI IT.
 
 Working files that are never committed are skipped: print copies (`_print/`), page previews (`_previews/`), Python
 caches and Office lock files.
@@ -79,6 +89,37 @@ BUILD_STATUS: list[tuple[str, re.Pattern]] = [(label, re.compile(pat, re.I)) for
                            r"\bsprints?\b|\bjira\b|\bbacklog item\b|"
                            r"\bgap(?:s)? to (?:build|close)\b"),
 ]]
+# Technical terms that a business sign-off set does not contain (client decision of 28-Sep-2026). (label, pattern);
+# whole-word and case-insensitive.
+TECHNICAL: list[tuple[str, re.Pattern]] = [(label, re.compile(pat, re.I)) for label, pat in [
+    ("API or endpoint", r"\bAPIs?\b|\bend-?points?\b|/api/"),
+    ("JSON", r"\bJSONB?\b"),
+    ("SQL", r"\b(?:No)?SQL\b"),
+    ("database", r"\bdatabases?\b|\bDBAs?\b"),
+    ("schema or data model", r"\bschemas?\b|\bdata model\b|\btable names?\b|\bcolumn names? of the (?:database|data model|tables?)\b"),
+    ("payload", r"\bpayloads?\b"),
+    ("Flyway or migration script", r"\bflyway\b|\bmigration scripts?\b"),
+    ("http address", r"\bhttps?\b|://"),
+    ("file-transfer protocol", r"\bS?FTPS?\b"),
+]]
+# Phrases a client document may contain although they hold a technical term, each with its reason.
+TECHNICAL_ALLOWED: list[tuple[re.Pattern, str]] = [(re.compile(pat), why) for pat, why in [
+    (r"Rule parameters \(JSON\)", "Platform field label of New Incentive Criterion (BRD-03 SCR-PM-16), quoted word for "
+                                   "word; platform wording fix requested"),
+    (r"Enter valid JSON, e\.g\.", "Platform screen check of the rule parameters (BRD-03 SCR-PM-16), quoted word for word; "
+                                  "platform wording fix requested"),
+    (r"The rule parameters must be valid JSON", "Platform message INCENTIVE_RULE_PARAMS_INVALID (BRD-03), quoted word for "
+                                                "word; platform wording fix requested"),
+    (r"The legacy details are not valid JSON", "Platform message MIG_ARCHIVE_DETAIL (BRD-13 archive load), quoted word for "
+                                               "word; platform wording fix requested"),
+    (r"Negative List Database System", "Name of the BDO system NLDS (BRD-10), not a technical term"),
+]]
+# Sources of the client documents in src/ (per BRD folder and the drop closure folders).
+CLIENT_SOURCES = ("FRS_*.md", "TP_*.md", "START_HERE_*.md", "HANDBOOK_*.md", "*_cases.yaml", "pack/*.yaml",
+                  "pack/screens/*.yaml")
+# Configuration keys of the sources that hold paths of the toolkit, not client text.
+_CONFIG_KEY = re.compile(r"^\s*(?:menu_suites|foreign_packs|plugin|source|screens_dir|screenshot_dir|frontend_dirs|"
+                         r"test_plan|frs|summary|signoff|output|bulk_screen):")
 NAME_RE = re.compile(r"(?:(?P<order>\d\d)_)?BIBS_(?P<type>[A-Za-z_]+?)_(?P<brd>BRD-\d\d)_(?P<name>.+?)"
                      r"_v(?P<ver>\d+(?:\.\d+)*)\.(?P<ext>\w+)$")
 # A document of a drop-level set (brand.DROP_SETS): <nn>_BIBS_<Drop-n>_<Name>_v<version>.<ext>.
@@ -231,6 +272,69 @@ def build_status() -> list[str]:
     return out
 
 
+def technical_hits(lines: list[str]) -> dict[str, set[str]]:
+    """The technical terms of TECHNICAL in the lines, after the phrases of TECHNICAL_ALLOWED are taken out."""
+    hits: dict[str, set[str]] = defaultdict(set)
+    for line in lines:
+        for pattern, _ in TECHNICAL_ALLOWED:
+            line = pattern.sub(" ", line)
+        for label, pattern in TECHNICAL:
+            for m in pattern.finditer(line):
+                hits[label].add(m.group(0).strip())
+    return hits
+
+
+def source_lines(p: Path) -> list[str]:
+    """The client text of a source: without the comment lines of YAML (and of the front matter of a Word source),
+    HTML comments and the configuration keys that hold toolkit paths."""
+    text = re.sub(r"<!--.*?-->", " ", p.read_text(encoding="utf-8", errors="ignore"), flags=re.S)
+    out: list[str] = []
+    in_front = p.suffix == ".md" and text.startswith("---")
+    for i, line in enumerate(text.splitlines()):
+        if p.suffix == ".md" and in_front and i > 0 and line.strip() == "---":
+            in_front = False
+            continue
+        is_yaml = p.suffix in (".yaml", ".yml") or in_front
+        if is_yaml and (line.lstrip().startswith("#") or _CONFIG_KEY.match(line)):
+            continue
+        out.append(line)
+    return out
+
+
+def client_sources() -> list[Path]:
+    out: list[Path] = []
+    for folder in sorted(brand.SRC_DIR.glob("BRD-*")) + sorted(brand.SRC_DIR.glob("Drop-*")):
+        patterns = CLIENT_SOURCES + ("*.md", "*.yaml") if folder.name.startswith("Drop-") else CLIENT_SOURCES
+        for pattern in patterns:
+            out += [p for p in sorted(folder.glob(pattern)) if p not in out]
+    return out
+
+
+def technical_terms() -> tuple[list[str], list[str]]:
+    """Technical terms in the client documents of the sign-off sets and their sources (errors) and in the other
+    documents of out/ (warnings)."""
+    errors: list[str] = []
+    warnings: list[str] = []
+    set_dirs = {brand.out_dir(b, "FRS").resolve() for b in brand.SIGNOFF_SETS}
+    set_dirs |= {brand.drop_set_dir(d).resolve() for d in brand.DROP_SETS}
+
+    def detail(hits: dict[str, set[str]]) -> str:
+        return "; ".join(f"{label}: {', '.join(sorted(words)[:6])}" for label, words in sorted(hits.items()))
+
+    for p in files(brand.OUT_DIR):
+        if p.suffix not in OFFICE_SUFFIXES:
+            continue
+        hits = technical_hits(office_lines(p))
+        if hits:
+            msg = f"technical term in {rel(p)} ({detail(hits)})"
+            (errors if p.parent.resolve() in set_dirs else warnings).append(msg)
+    for p in client_sources():
+        hits = technical_hits(source_lines(p))
+        if hits:
+            errors.append(f"technical term in the client source {rel(p)} ({detail(hits)})")
+    return errors, warnings
+
+
 def office_text(p: Path) -> str:
     try:
         with zipfile.ZipFile(p) as z:
@@ -259,7 +363,9 @@ def restricted_words() -> list[str]:
 def main() -> int:
     errors = duplicates() + stale_versions()
     set_errors, warnings = release_sets()
-    errors += set_errors + restricted_words() + build_status()
+    tech_errors, tech_warnings = technical_terms()
+    errors += set_errors + restricted_words() + build_status() + tech_errors
+    warnings += tech_warnings
     for w in warnings:
         print(f"warning: {w}")
     for e in errors:

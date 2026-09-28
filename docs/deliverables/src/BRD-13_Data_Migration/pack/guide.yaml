@@ -45,7 +45,7 @@ documents:
 
 # Reading order per role (Handbook parts and chapter numbers of v2.0).
 reading:
-  - role: Business owner (Program Manager, Business Project Services)
+  - role: "Approver (Product Owner, Marketing Business System) and Program Manager, Business Project Services"
     order: "00 Start Here; 01 Guide deck; Handbook Part A (approach, objects and decisions, cycles, cut-over) and the chapter Proposed business rules and clarifications for confirmation; workbook sheets Object catalogue, Proposed rules and Sign-off certificate"
   - role: "Data owners per object: Marketing Business System (R01, R05, R06, C01, C03); Heads of Retail and Corporate Marketing (R03, C01); Operations (R04, R07, P01, F01-F04, F06); Comptrollership (R02, R08, F01, F02, G01, G03); Disbursement (R09, C03); Compliance and Analytics (C04, H01, H02); Renewal processing team (P03)"
     order: "Handbook Part A chapter 3 (objects and decisions) and chapter 6 (templates and mapping); the load template sheets of your objects, Code maps and Validation rules; Part C chapters 32 and 34 for the reconciliation and the samples you verify; workbook sheets Object catalogue, Data owners, Extract planning, Reconciliation sign-off"
@@ -92,7 +92,7 @@ steps:
     duration: "v2.1 on Wed 28-Oct-2026; check by the reviewers until Thu 29-Oct-2026"
   - step: 6
     name: Sign-off meeting and signature
-    who: "R: iorta TechNXT Project Manager; A: Program Manager; C: data owners, Comptrollership, Compliance, BDOI IT"
+    who: "R: iorta TechNXT Project Manager; A: Product Owner, Marketing Business System; C: Program Manager, data owners, Comptrollership, BDOI IT"
     inputs: "v2.1 (or v2.0 when no revision is needed); open decisions with their date"
     outputs: "Signed sign-off certificate; minutes; objects decided (G1) and layouts frozen, version 1 (M2)"
     duration: "Fri 30-Oct-2026 (M2)"
@@ -150,7 +150,8 @@ module_slides:
     headers: ["Role", "Who", "Does"]
     widths: [3.0, 4.0, 5.6]
     rows:
-      - ["Business owner of BRD-13", "Program Manager, Business Project Services", "Accountable for the set and the cut-over; chairs the go / no-go board"]
+      - ["Approver of the set", "Product Owner, Marketing Business System", "Owns the set and approves all of its contents, with the approvers of the BRD-13 approval pages"]
+      - ["Author of the BRD; cut-over", "Program Manager, Business Project Services", "Reviews the traceability and the completeness; accountable for the cut-over; chairs the go / no-go board"]
       - ["Data Migration Lead", "BDOI (to name)", "Object register and decisions, load approvals (G4), acceptance with the owners (G6), cut-over plan"]
       - ["Data owners", "Department heads per object (workbook sheet Data owners)", "Decide the class (G1), approve the code maps (G2), waivers, accept the object (G6)"]
       - ["Data stewards", "Named staff per object", "Profiling review, cleansing at source, code maps, client match review"]
@@ -232,7 +233,7 @@ exit:
   - "Every row of the workbook reviewed by its unit (Accept, Change requested or Comment)."
   - "Every proposed rule decided, or accepted as the working assumption with its decision date."
   - "Every comments log item closed: answered, corrected in v2.1, or raised as a change request."
-  - "The sign-off certificate signed by the business owner, the Data Migration Lead, Comptrollership, the data owners, BDOI IT and iorta TechNXT."
+  - "The sign-off certificate signed as on the BRD-13 approval pages: prepared by iorta TechNXT and the Program Manager, input from the Data Migration Lead and the data owners, reviewed by MBS and BDOI IT, approved by the Product Owner and the approvers."
 done:
   - "Signed certificate filed with the set; version history updated."
   - "Objects decided (G1) and layouts frozen, version 1, in the Migration Console (M2)."
@@ -251,7 +252,8 @@ handover_note: "Handover means the objects are decided, the layouts are frozen a
 
 # Governance and contacts.
 governance:
-  - {role: "Business owner and approver", who: "Program Manager, Business Project Services", does: "Accountable for the sign-off and the cut-over; chairs the sign-off meeting and the go / no-go board"}
+  - {role: "Approver", who: "Product Owner, Marketing Business System, with the approvers of the BRD-13 approval pages", does: "Owns the set and approves all of its contents; chairs the sign-off meeting"}
+  - {role: "BRD author and cut-over owner", who: "Program Manager, Business Project Services", does: "Reviews the traceability and the completeness; accountable for the cut-over; chairs the go / no-go board"}
   - {role: "Data owners", who: "Department heads per object", does: "Review and sign their objects, templates, code maps and reconciliation"}
   - {role: "Comptrollership", who: "Head, Comptrollership", does: "Legacy accounts, GL opening, reconciliation approver, opening-balance adjustments"}
   - {role: "BDOI IT", who: "Head, BDOI IT", does: "Extracts, transfer, freeze, read-only access, decommissioning"}

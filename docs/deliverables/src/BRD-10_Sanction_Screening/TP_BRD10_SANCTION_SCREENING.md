@@ -66,7 +66,7 @@ The roles-and-access sheet checks each screening action against the roles that m
 ## Out of scope
 
 - Filing the STR on the AMLC portal; it stays manual. The cases stop at the extraction file and the recorded AMLC reference.
-- Real-time or API list sources (SQ01); only file and manual sources are tested.
+- Real-time or system-to-system list sources (SQ01); only file and manual sources are tested.
 - The AMLC prescribed STR layout and reason codes (SQ09). The cases test the placeholder layout and test reason codes; they are re-run when BDOI supplies the AMLC content.
 - The production values of thresholds, risk categories, matrices and SLAs (SQ02-SQ08). The cases use the seed configuration; Compliance enters the production values before go-live.
 - Blocking of business on an open match (SCR_BLOCK_ON_OPEN_MATCH), which is off until SQ07 is answered; the cases check that a tag warns and does not block.
@@ -109,7 +109,7 @@ The roles-and-access sheet checks each screening action against the roles that m
 | Positive | The normal flow succeeds with valid data |
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit |
-| Security-access | Screens, buttons and API calls are open only to the roles that hold the permission; four-eyes rules |
+| Security-access | Screens, buttons and system functions are open only to the roles that hold the permission; four-eyes rules |
 | Workflow | A stage transition of the case workflow SCR_CASE, or a state change of a configuration version, list change or STR |
 | Report-output | Reports, case lists and extraction files; content checked against the screen |
 | Upload-download | List files, case documents and client files uploaded, and files downloaded |
@@ -168,7 +168,7 @@ Many cases move a case to its next stage. The test lead reloads the case seed be
 | Test lead | iorta TechNXT QA | Owns this plan and the workbook; prepares environments, users and invented list data; runs the daily issue triage; reports progress |
 | System testers | iorta TechNXT QA | Run the system test and the persona end-to-end scenarios; raise issues with evidence |
 | Developers | iorta TechNXT | Resolve issues; support triage |
-| Database administrator | iorta TechNXT with BDO Unibank ITIO | Runs the database checks of FR-SS-091 and hands the evidence to QA |
+| Infrastructure administrator | iorta TechNXT with BDO Unibank ITIO | Runs the checks outside the screens of FR-SS-091 (the timeline cannot be altered) and hands the evidence to QA |
 | BDOI department testers | Compliance unit; Combank, Corbank and Retail investigators and Unit Heads; AML Committee members | Run the UAT scenarios of their role; confirm the expected results match the compliance rules; raise issues |
 | BDOI process owner | Chief Compliance Officer | Decides on disputed expected results and accepted issues; signs off UAT |
 | UAT coordinator | Business Project Services, BDO Unibank ESG | Plans the UAT sessions; checks traceability to the BRD |
@@ -231,7 +231,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 | BDOI answers to open questions change expected results (SQ02 thresholds, SQ03 risk categories, SQ04 approval matrix, SQ06 dispositions, SQ08 SLAs, SQ15 committee rule) | Medium | The values are configuration versions, lists and parameters; the affected cases name them and are re-run after the change without a change to the system |
 | The AMLC STR layout and reason codes are not supplied (SQ09) | High | Test the placeholder layout and test reason codes now; re-run FR-SS-017, 070 and 071 when the AMLC content is entered as a new version |
 | Real list data reaches a test environment | High | Only invented names are loaded outside production; the test lead checks the list sources of SIT and UAT before each cycle |
-| Time-based cases (SLA reminders and breaches, effective dates, the batch window) need the clock to pass | Medium | The test lead moves due times and dates in the test database and runs the jobs on demand, as the preconditions describe |
+| Time-based cases (SLA reminders and breaches, effective dates, the batch window) need the clock to pass | Medium | The test lead moves due times and dates in the test environment and runs the jobs on demand, as the preconditions describe |
 | Four-eyes and committee cases need several users with specific role combinations | Medium | The test lead creates the combined users and the five committee users of TD-SS-01 and TD-SS-08 and removes them after the cycle |
 | BDOI testers from several units (Compliance, Marketing, AML Committee) are not available at the same time | High | Plan the committee cases in one session with all five members; agree named testers per unit in the UAT plan (deliverable 30) |
 

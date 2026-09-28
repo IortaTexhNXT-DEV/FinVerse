@@ -1396,7 +1396,7 @@ Figure 7 shows the interfaces. Sources arrive as uploads; the renewal is handed 
 | Placement (BRD-1) | Out | Hold cover re-assignment | BRIDSP-32 | IN SCOPE |
 | Account and booking (BRD-1) | In | Account status changes; booking with business type RENEWAL (BT0) | BRIDSP-26, 27 | IN SCOPE |
 | Cashiering and Collections | Out | Disposition request RECOGNIZE_INCOME for handling fees | BRIDSP-31 | IN SCOPE |
-| E-mail outbox | Out | IAAF, TOR, letters | BRIDSP-07, 22 | IN SCOPE |
+| Outgoing e-mail | Out | IAAF, TOR, letters | BRIDSP-07, 22 | IN SCOPE |
 | Mail house (COG) | Out | Print batches (merged PDF and control list) | BRIDSP-22 | ON HOLD |
 | E-signature | Out | Qualified e-signature of IAAF and TOR; stamped signature until then | BRIDSP-07, 18 | ON HOLD |
 | ISYS / ARF | - | Not fed; the ARN is the reference (SP SQ20) | p.5 | OUT |

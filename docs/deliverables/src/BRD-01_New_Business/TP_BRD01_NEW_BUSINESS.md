@@ -76,7 +76,7 @@ The roles-and-access sheet checks each New Business action against the roles tha
 - Maintenance of package products, versions and incentive criteria: BRD-3 test plan. This plan uses the catalogue as a given.
 - Renewal of accounts (BRD-6), post-issuance adjustments beyond the endorsements of BRNB.061 / 081 (BRD-2) and collection of premium (BRD-4).
 - Computation and payout of incentives (Q33). The cases stop at the incentive indicator on the invoice.
-- External feeds to BDOI systems (Q08), the CIF interface (Q16), SFTP and API placement channels (Q06) and BIR CAS transmission: the cases check only the manual steps and messages that the FRS states for them.
+- External feeds to BDOI systems (Q08), the CIF interface (Q16), electronic placement channels to insurers (file transfer or system-to-system, Q06) and BIR CAS transmission: the cases check only the manual steps and messages that the FRS states for them.
 - Performance and volume testing (deliverable 28).
 
 ## References
@@ -116,7 +116,7 @@ The roles-and-access sheet checks each New Business action against the roles tha
 | Positive | The normal flow succeeds with valid data |
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit |
-| Security-access | Screens, buttons and API calls are open only to the roles that hold the permission; four-eyes rules |
+| Security-access | Screens, buttons and system functions are open only to the roles that hold the permission; four-eyes rules |
 | Workflow | A stage transition, return or closure of NB_CLIENT, NB_QUOTATION, NB_PROPOSAL or NB_ACCOUNT |
 | Report-output | Reports, registers, comparative tables and exports; content checked against the screen |
 | Upload-download | Bulk uploads, documents, e-policies, billing and payment files, downloads and protected e-mails |
@@ -245,7 +245,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 | Production GL accounts of the booking entry are not yet given (OQ07) | High | SIT uses the seed booking rule; UAT waits for the Comptrollership accounts (entry criterion) |
 | Seed records are moved by earlier cases | Medium | Reload the seed between cycles; assign records to testers in the test schedule |
 | Test mailboxes or the e-mail relay not reachable from SIT or UAT | High | Check the relay before the cycle; e-mail cases read the Outbound Messages log when the mailbox is down and are re-run later |
-| Time-based cases (idle session, SLA breach, stalled 5 days, hold cover expiry, multi-year year 2, monthly KYC job) need the clock to pass | Medium | The test lead moves stage-entry times and dates in the test database or runs the jobs by hand, as the preconditions describe |
+| Time-based cases (idle session, SLA breach, stalled 5 days, hold cover expiry, multi-year year 2, monthly KYC job) need the clock to pass | Medium | The test lead moves stage-entry times and dates in the test environment or runs the jobs by hand, as the preconditions describe |
 | Bulk files in BDOI's volumes (thousands of rows) are not tested before UAT | Medium | System test uses the files of TD-NB-11; UAT includes one file per upload type in the expected monthly volume |
 | Four-eyes cases need a user holding two roles | Low | The test lead creates the combined test users listed in the preconditions and removes them after the cycle |
 | BDOI testers are not available in the UAT window | High | Agree named testers per department and dates in the UAT plan (deliverable 30) before UAT starts |

@@ -74,15 +74,15 @@ public class SeedPasswords implements ApplicationRunner {
           "{} SIT/UAT users keep the password hash of the seed scripts;"
               + " set BROKERVERSE_SEED_PASSWORD to give them the password of this environment",
           users.size());
-      return;
+    } else {
+      int updated =
+          jdbc.update(
+              "update sec_user set password_hash = ?,"
+                  + " must_change_password = must_change_password or ? where password_hash = ?",
+              encoder.encode(password),
+              mustChange,
+              SCRIPT_HASH);
+      LOG.info("Password of this environment given to {} SIT/UAT users", updated);
     }
-    int updated =
-        jdbc.update(
-            "update sec_user set password_hash = ?,"
-                + " must_change_password = must_change_password or ? where password_hash = ?",
-            encoder.encode(password),
-            mustChange,
-            SCRIPT_HASH);
-    LOG.info("Password of this environment given to {} SIT/UAT users", updated);
   }
 }

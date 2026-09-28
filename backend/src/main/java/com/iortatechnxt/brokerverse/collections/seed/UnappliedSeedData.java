@@ -58,6 +58,7 @@ public class UnappliedSeedData implements ApplicationRunner {
           + " where s.username = 'badmin'), must_change_password = false where username = ?";
 
   private static final SecureRandom RANDOM = new SecureRandom();
+  private static final int RANDOM_BYTES = 24;
 
   private static final Logger LOG = LoggerFactory.getLogger(UnappliedSeedData.class);
   private static final String HANDLER = "clxhandler";
@@ -158,7 +159,7 @@ public class UnappliedSeedData implements ApplicationRunner {
 
   /** A random initial password, replaced at once by the SIT/UAT password of {@code badmin}. */
   private static String throwAwayPassword() {
-    byte[] bytes = new byte[24];
+    byte[] bytes = new byte[RANDOM_BYTES];
     RANDOM.nextBytes(bytes);
     return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes) + "#9a";
   }

@@ -553,10 +553,7 @@ class ApiSmokeIT {
 
   @Test
   void loginReturnsTokenAndWrongPasswordIsRejected() throws Exception {
-    mvc.perform(
-            post("/api/v1/auth/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(passwords.loginBody("auditor")))
+    mvc.perform(passwords.login("auditor"))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.accessToken").isNotEmpty())
         .andExpect(jsonPath("$.user.roles[0]").value("AUDITOR"));
@@ -570,13 +567,7 @@ class ApiSmokeIT {
 
   private String bearerToken(String username) throws Exception {
     String body =
-        mvc.perform(
-                post("/api/v1/auth/login")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(passwords.loginBody(username)))
-            .andReturn()
-            .getResponse()
-            .getContentAsString();
+        mvc.perform(passwords.login(username)).andReturn().getResponse().getContentAsString();
     return JsonPath.read(body, "$.accessToken");
   }
 

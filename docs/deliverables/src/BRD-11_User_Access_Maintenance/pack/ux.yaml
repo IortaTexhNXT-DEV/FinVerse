@@ -67,4 +67,23 @@ states:
 
 confirm:
   clarifications: [CLR-UA-10, CLR-UA-11, CLR-UA-18, CLR-UA-19, CLR-UA-20]
-  findings: []
+  findings:
+    - screens: [SCR-UA-08]
+      observation: >-
+        The status of a request reads Pending in the record header, Pending Approval in the step bar and Pending
+        approval as the Current Stage.
+      proposal: Use one label, in the same case, in the three places.
+    - screens: [SCR-UA-08]
+      observation: >-
+        The key fact Requested joins the requester and the time ("Rhea Access Requestor · 27-Sep-2026 05:30"), and
+        the time wraps over two lines.
+      proposal: Show Requested By and Requested On as two key facts, each kept on one line.
+    - screens: [SCR-UA-08]
+      observation: >-
+        The Requested value of the group profiles is one sentence with the profiles added and removed in brackets.
+      proposal: >-
+        Show the profiles as tags, with the added ones marked Added and the removed ones marked Removed, or in two
+        rows Added and Removed.
+    - screens: [SCR-UA-08, SCR-UA-06]
+      observation: The request title and subtitle name the subject user by the user ID only.
+      proposal: Name the user with the full name first and the user ID as the second line or in the tooltip.

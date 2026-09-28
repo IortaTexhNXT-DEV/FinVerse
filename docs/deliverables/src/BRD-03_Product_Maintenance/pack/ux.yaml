@@ -99,4 +99,20 @@ states:
 
 confirm:
   clarifications: [CLR-PM-11, CLR-PM-12, CLR-PM-17, CLR-PM-18, CLR-PM-19, CLR-PM-20]
-  findings: []
+  findings:
+    - screens: [SCR-PM-13]
+      observation: >-
+        The Details column of the validation checks shows list codes (COMPREHENSIVE, OD_THEFT) next to the counts.
+      proposal: Show the cover type and the coverages by their names, as the other columns of the screens do.
+    - screens: [SCR-PM-13]
+      observation: >-
+        A released version shows its rate scheme and dates in read-only input boxes; the amounts read 5000 and
+        5000000 and the rate 1.2, without the separators and decimals of the screen standard.
+      proposal: >-
+        Show a released (read-only) version as a label and value grid with the amounts formatted (5,000.00;
+        5,000,000.00) and the rate as keyed with the percent sign.
+    - screens: [SCR-PM-13]
+      observation: >-
+        On a released version an empty date (Anniversary) shows the format hint dd-MMM-yyyy, and a long text
+        (Computation Basis) is cut at the edge of its box.
+      proposal: Show a dash for an empty value and the whole text of a read-only field (wrapped).

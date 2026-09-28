@@ -153,4 +153,27 @@ states:
 # Points for the UX Design team to confirm with BDOI.
 confirm:
   clarifications: [PR-DM-04, PR-DM-06, PR-DM-09, PR-DM-10]
-  findings: []
+  findings:
+    - screens: [NAV-DM-01, NAV-DM-02, NAV-DM-03, NAV-DM-04, NAV-DM-05, NAV-DM-06]
+      observation: >-
+        The migration personas land on My Approvals after sign-in, not on Migration Home, which holds the progress
+        tiles and the next cut-over tasks of their work.
+      proposal: Land the migration roles on Migration Home; keep My Approvals one click away in the menu.
+    - screens: [SCR-DM-05, SCR-DM-12]
+      observation: >-
+        Upload and Check (Extracts) and Create (New Cutover Plan) stay disabled until every mandatory input is given;
+        no message tells the user what is missing.
+      proposal: >-
+        Keep the button enabled and show the field messages and the summary of the form standard on submit, or show
+        a one-line hint of what is still needed next to the disabled button.
+    - screens: [SCR-DM-05]
+      observation: >-
+        A rejected extract shows its reason in a message at the bottom right and in the Rejection reason column; the
+        reason names one check only.
+      proposal: List every intake check that failed as bullets of the error notice, next to the upload card.
+    - screens: [SCR-DM-05]
+      observation: The Rows column reads "0 / 3" without saying which figure is which.
+      proposal: Name the column Rows staged / received, or show the two figures in two columns.
+    - screens: [NAV-DM-01]
+      observation: The tile of My Approvals reads "Oldest 0 day(s)".
+      proposal: Write day counts in words as the tables do ("0 days", "1 day", "12 days").

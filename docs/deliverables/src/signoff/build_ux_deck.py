@@ -517,6 +517,25 @@ class UxDeck(GuideDeck):
         self._text(s, x, y, w, h, f"Image to come: {name}", size=14, colour=brand.MUTED, align=PP_ALIGN.CENTER,
                    anchor=MSO_ANCHOR.MIDDLE)
 
+    def _trim(self, png: Path) -> Path:
+        """The image without the empty background below its content (a short menu in a tall window)."""
+        import numpy as np  # noqa: PLC0415
+        from PIL import Image  # noqa: PLC0415
+
+        with Image.open(png) as im:
+            gray = np.asarray(im.convert("L"), dtype=np.int16)
+            spread = gray.max(axis=1) - gray.min(axis=1)
+            used = np.where(spread >= 12)[0]
+            if not len(used):
+                return png
+            bottom = min(gray.shape[0], int(used[-1]) + 24)
+            if bottom >= gray.shape[0] * 0.95:
+                return png
+            self._crops += 1
+            out = self.tmp / f"trim-{self._crops:05d}.png"
+            im.crop((0, 0, im.width, bottom)).save(out, optimize=True)
+        return out
+
     def _slice(self, png: Path, top: int, bottom: int) -> Path:
         from PIL import Image  # noqa: PLC0415
 
@@ -528,60 +547,56 @@ class UxDeck(GuideDeck):
 
     def image_slides(self, title: str, png: Path, caption: str = "", state: str | None = None,
                      changed: Sequence[str] = (), notes: str | Sequence[str] = "",
-                     first: Any = None, first_h=Inches(0)) -> int:
+                     first: Any = None, side_w=Inches(0), fit_whole: bool = False) -> int:
         """A screen image at full slide width (never larger than MAX_SCALE), split into slices over as many slides
-        as needed; narrow slices sit side by side. `first(slide)` draws more content on the first slide below an
-        image area reduced by `first_h`. Returns the number of slides."""
+        as needed; narrow slices sit side by side. With `side_w`, the image leaves a panel of that width on the right,
+        which `first(slide)` fills on the first slide. Returns the number of slides."""
+        area_w = CW - (side_w + Inches(0.2) if side_w else 0)
+        area_h = Y1 - Y0 - CAPTION_H
         if not png.exists():
             s = self.page(title)
             self.badges(s, state, changed)
-            self.missing(s, X0, Y0, CW, Y1 - Y0 - first_h, png.name)
+            self.missing(s, X0, Y0, area_w, area_h, png.name)
             if first:
                 first(s)
             if notes:
                 self.notes(notes)
             return 1
+        png = self._trim(png)
         pw, ph = _png_size(png)
-        area_h = Y1 - Y0 - CAPTION_H
-        scale = min(CW / pw, MAX_SCALE)
+        scale = min(area_w / pw, MAX_SCALE)
+        # A screen that fits on one slide at 72 % or more of the full width is shown whole (no split); a landing
+        # page is always shown whole.
+        fit = min(scale, area_h / ph)
+        if fit >= 0.72 * scale or fit_whole:
+            scale = fit
         cols = 1
-        if pw * scale < CW / 2:
-            cols = max(1, int((CW + Inches(0.25)) // (pw * scale + Inches(0.25))))
-        cuts_first = _cut_rows(png, scale, area_h - first_h) if first else []
-        rest_top = cuts_first[0][1] if cuts_first else 0
-        cuts = [cuts_first[0]] if cuts_first else []
-        if rest_top < ph:
-            cuts += [(a + rest_top, b + rest_top) for a, b in _cut_rows_from(png, scale, area_h, rest_top)]
-        # Group the slices: the first slide (with its extra content) holds one; the others up to `cols` each.
-        groups: list[list[tuple[int, int]]] = []
-        pending = list(cuts)
-        if first:
-            groups.append([pending.pop(0)])
-        while pending:
-            groups.append(pending[:cols])
-            pending = pending[cols:]
+        if pw * scale < area_w / 2:
+            cols = max(1, int((area_w + Inches(0.25)) // (pw * scale + Inches(0.25))))
+        cuts = _cut_rows(png, scale, area_h)
+        cuts = [c for i, c in enumerate(cuts) if i == 0 or not _blank(png, *c)]
+        groups = [cuts[i:i + cols] for i in range(0, len(cuts), cols)]
         n = len(groups)
         for k, group in enumerate(groups, start=1):
             s = self.page(title if n == 1 else f"{title} ({k} of {n})")
             self.badges(s, state, changed)
-            h_avail = area_h - (first_h if (first and k == 1) else 0)
             gap = Inches(0.25)
             total_w = sum(int(pw * scale) for _ in group) + gap * (len(group) - 1)
-            x = X0 + max(0, (CW - total_w) // 2)
+            x = X0 + max(0, (area_w - total_w) // 2)
             for top, bottom in group:
                 part = png if (top, bottom) == (0, ph) else self._slice(png, top, bottom)
                 w = int(pw * scale)
                 h = int((bottom - top) * scale)
-                if h > h_avail:  # a slice may end a few pixels lower than planned
-                    w, h = int(w * h_avail / h), int(h_avail)
+                if h > area_h:  # a slice may end a few pixels lower than planned
+                    w, h = int(w * area_h / h), int(area_h)
                 pic = s.shapes.add_picture(str(part), x + (int(pw * scale) - w) // 2, Y0, width=w, height=h)
                 pic.line.color.rgb = _rgb(brand.BORDER)
                 pic.line.width = Pt(0.75)
                 x += int(pw * scale) + gap
             if caption:
-                y = Y0 + h_avail + Inches(0.02) if (first and k == 1) else Y1 - CAPTION_H
-                self._text(s, X0, y, CW, CAPTION_H, caption + ("" if n == 1 else f" (part {k} of {n})"), size=11,
-                           italic=True, colour=brand.MUTED, align=PP_ALIGN.CENTER)
+                self._text(s, X0, Y1 - CAPTION_H, area_w, CAPTION_H,
+                           caption + ("" if n == 1 else f" (part {k} of {n})"), size=11, italic=True,
+                           colour=brand.MUTED, align=PP_ALIGN.CENTER)
             if first and k == 1:
                 first(s)
             if notes:
@@ -757,20 +772,17 @@ class UxDeck(GuideDeck):
         self.notes(notes)
 
 
-def _cut_rows_from(path: Path, scale: float, height: int, top: int) -> list[tuple[int, int]]:
-    """_cut_rows of the part of an image below `top` (pixels), relative to `top`."""
+def _blank(path: Path, top: int, bottom: int) -> bool:
+    """True when the rows top..bottom of an image hold (almost) nothing but the background and card borders."""
+    import numpy as np  # noqa: PLC0415
     from PIL import Image  # noqa: PLC0415
 
     with Image.open(path) as im:
-        if top <= 0:
-            return _cut_rows(path, scale, height)
-        rest = im.crop((0, top, im.width, im.height))
-        tmp = Path(tempfile.mkstemp(suffix=".png")[1])
-        rest.save(tmp)
-    try:
-        return _cut_rows(tmp, scale, height)
-    finally:
-        tmp.unlink(missing_ok=True)
+        gray = np.asarray(im.convert("L").crop((0, top, im.width, bottom)), dtype=np.int16)
+    if gray.size == 0:
+        return True
+    rows = (gray.max(axis=1) - gray.min(axis=1)) >= 12
+    return float(rows.mean()) < 0.04
 
 
 APPROVAL = re.compile(r"\b(approv\w*|authori[sz]\w*|sign(?:s|ed)? off|validate\w*|recommend\w*|accept\w*|"
@@ -888,16 +900,16 @@ def build_deck(ux: Ux) -> tuple[Path, dict[str, int]]:
     toks = tokens()
     colours = [(n, v, c) for n, v, c in toks if v.startswith("#")]
     s = deck.page("Colour tokens")
-    per_row = 6
+    per_row = 7
     sw_w = (CW - Inches(0.2) * (per_row - 1)) / per_row
     for i, (name, value, comment) in enumerate(colours):
         r, c = divmod(i, per_row)
         x = X0 + c * (sw_w + Inches(0.2))
-        y = Y0 + r * Inches(1.25)
-        deck._rect(s, x, y, sw_w, Inches(0.55), value.lstrip("#").upper(), brand.BORDER)
-        deck._text(s, x, y + Inches(0.57), sw_w, Inches(0.25), f"{name}  {value.upper()}", size=9, bold=True,
-                   colour=brand.NEAR_BLACK)
-        deck._text(s, x, y + Inches(0.8), sw_w, Inches(0.4), comment.split(":")[0][:60], size=8, colour=brand.MUTED)
+        y = Y0 + r * Inches(1.08)
+        deck._rect(s, x, y, sw_w, Inches(0.42), value.lstrip("#").upper(), brand.BORDER)
+        deck._text(s, x, y + Inches(0.43), sw_w, Inches(0.22), name, size=8, bold=True, colour=brand.NEAR_BLACK)
+        deck._text(s, x, y + Inches(0.62), sw_w, Inches(0.4), f"{value.upper()} {comment.split(':')[0][:40]}",
+                   size=7, colour=brand.MUTED)
     deck.notes("The colour tokens of the screens (BDO Style Guide names in the comments). Blue is the dominant "
                "colour; yellow is an accent only, never a fill behind text; never pure black.")
     deck.flow_table("Type scale", ["Use", "Size / line height", "Weight and colour"], [
@@ -963,7 +975,7 @@ def build_deck(ux: Ux) -> tuple[Path, dict[str, int]]:
         menu = ux.by_slug.get(f"ux-nav-{n:02d}-menu")
         if land:
             deck.image_slides(f"{label}: landing page", land.file, f"{p.nav_id(n)} The page {label} sees after "
-                              "sign-in", "landing", land.changed, notes=f"Image {land.name}.")
+                              "sign-in", "landing", land.changed, notes=f"Image {land.name}.", fit_whole=True)
         if menu:
             deck.image_slides(f"{label}: menu", menu.file, f"{p.nav_id(n)} Every group of the menu open",
                               "menu", menu.changed, notes=f"Image {menu.name}.")
@@ -1055,16 +1067,17 @@ def build_deck(ux: Ux) -> tuple[Path, dict[str, int]]:
                       ("Next", nxt_text)]
 
             def strip(s, blocks=blocks):
-                bw = (CW - Inches(0.15) * 3) / 4
-                y = Y1 - Inches(1.5)
+                pw_ = Inches(3.55)
+                x = W - MARGIN - pw_
+                bh = (Y1 - Y0 - Inches(0.1) * 3) / 4
                 for i, (head, text) in enumerate(blocks):
-                    x = X0 + i * (bw + Inches(0.15))
-                    deck._rect(s, x, y, bw, Inches(1.5), brand.BG_BLUE)
-                    deck._rect(s, x, y, bw, Pt(3), brand.HEADER_BLUE)
-                    deck._text(s, x + Inches(0.05), y + Inches(0.05), bw - Inches(0.1), Inches(0.25), head.upper(),
+                    y = Y0 + i * (bh + Inches(0.1))
+                    deck._rect(s, x, y, pw_, bh, brand.BG_BLUE)
+                    deck._rect(s, x, y, Pt(4), bh, brand.HEADER_BLUE)
+                    deck._text(s, x + Inches(0.12), y + Inches(0.04), pw_ - Inches(0.2), Inches(0.25), head.upper(),
                                size=9, bold=True, colour=brand.HEADER_BLUE)
-                    size = 10 if len(text) <= 190 else (9 if len(text) <= 260 else 8)
-                    deck._text(s, x + Inches(0.05), y + Inches(0.3), bw - Inches(0.1), Inches(1.18), text,
+                    size = 10 if len(text) <= 170 else (9 if len(text) <= 240 else 8)
+                    deck._text(s, x + Inches(0.12), y + Inches(0.28), pw_ - Inches(0.2), bh - Inches(0.3), text,
                                size=size, colour=brand.NEAR_BLACK)
 
             title = f"{w['id']} step {n} of {len(steps)}: {scr.title if scr else st['screen']}"
@@ -1072,7 +1085,7 @@ def build_deck(ux: Ux) -> tuple[Path, dict[str, int]]:
                               if img else st["screen"], img.state if img else None, img.changed if img else (),
                               notes=[f"Image {img.name if img else png.name}.", f"Persona does: {st['does']}",
                                      f"System does: {st['system']}", f"Shown: {st['sees']}"],
-                              first=strip, first_h=Inches(1.55))
+                              first=strip, side_w=Inches(3.55))
 
     # ------------------------------------------------------------------ 6. screen catalogue
     deck.section_slide("Screen catalogue", "Every screen with its numbered callouts, fields, actions and every state")
@@ -1115,11 +1128,23 @@ def build_deck(ux: Ux) -> tuple[Path, dict[str, int]]:
                                                      "Resulting status", "Notification"],
                                 [[a["button"], a["who"], a["when"], a["what"], a["status"], a["notification"]]
                                  for a in sc.actions], [1.8, 2.0, 2.0, 4.2, 1.5, 1.8], size=8.5)
+            order = {k: i for i, k in enumerate(STATES)}
             rules = [_words(r) for r in sc.get("rules") or []]
             if rules:
                 deck.flow_table(f"{sc.id} rules the user meets", ["Rule"], [[r] for r in rules], [1], size=10)
             order = {k: i for i, k in enumerate(STATES)}
-            for img in sorted(imgs, key=lambda i: (order.get(i.state, 99), i.kind != "screen", i.slug)):
+            # The images of the captured flow steps are shown in their flow; the catalogue names them.
+            steps = [i for i in imgs if i.kind == "step"]
+            if steps:
+                deck.flow_table(f"{sc.id} states shown in the flows", ["State", "Flow and step", "What the image shows",
+                                                                     "Image"],
+                                [[i.state_label, ", ".join(f"{a} step {b}" for a, b in i.flows),
+                                  i.caption.split(": ", 1)[-1], i.name] for i in
+                                 sorted(steps, key=lambda i: (order.get(i.state, 99), i.slug))],
+                                [1.8, 1.6, 6.6, 3.0], size=9,
+                                notes="Each of these images has its slide in the end-to-end flows section.")
+            for img in sorted((i for i in imgs if i.kind != "step"),
+                              key=lambda i: (order.get(i.state, 99), i.kind != "screen", i.slug)):
                 where = f"{img.flows and ', '.join(f'{a} step {b}' for a, b in img.flows) or ''}"
                 cap = img.caption if img.kind != "step" else img.caption
                 deck.image_slides(f"{sc.id} {sc.title}: {img.state_label}", img.file, cap, img.state, img.changed,
@@ -1277,8 +1302,11 @@ def build_register(ux: Ux) -> Path:
     book = g.GuidedBook(title, ux.version)
     book.add_list("UX_STATE", "State of a screen image", [(v, "") for v in STATES.values()])
     book.add_list("UXD_STATUS", "UXD status", [(v, "") for v in UXD_STATUSES])
-    cols = [g.GuideColumn(h, mand, fmt, what, ex, check) for h, mand, fmt, what, ex, check in REGISTER_COLUMNS]
     rows = register_rows(ux)
+    # The example row shows the first image of the set.
+    first = rows[0] if rows else [None] * len(REGISTER_COLUMNS)
+    cols = [g.GuideColumn(h, mand, fmt, what, "-" if v in (None, "", "-") else str(v), check)
+            for (h, mand, fmt, what, _, check), v in zip(REGISTER_COLUMNS, first)]
     doc02 = "Data Migration Handbook" if ux.frs_name() == "Handbook" else "FRS"
     t = g.Template("UXR", "UX screen register", "UX screen register",
                    f"One row per screen image of {ux.label} {ux.module} (the 07 deck and the 09 image package): the "

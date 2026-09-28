@@ -1,199 +1,187 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, User } from 'lucide-react';
-import { useState } from 'react';
+import { ChevronsDownUp, ChevronsUpDown, FileDown, Plus, User } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { catalogApi } from '@/api/catalog';
-import type { SalesLevel, SalesOrganisation } from '@/api/catalog';
+import type { SalesOrganisation } from '@/api/catalog';
+import { saveFile } from '@/api/client';
 import { useAuth } from '@/auth/authContext';
+import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
-import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { StatusBadge } from '@/components/ui/StatusBadge';
+import { TreeTable } from '@/components/ui/TreeTable';
+import { branchKeys } from '@/components/ui/treeRows';
+import { useDisplayName } from '@/components/ui/useDisplayName';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { SelectInput, TextInput } from '@/features/assets/FormControls';
-import { enumOptions } from '@/features/assets/options';
-import { RecordActions } from './RecordActions';
-import { salesTree, unitsOf } from './salesTree';
-import type { SalesNode } from './salesTree';
+import { AddModal, UnitDetailModal } from './SalesOrgDialogs';
+import { ReasonDialog } from './SalesOrgReasonDialog';
+import { orgColumns, statusOf, summaryText, useRowActions } from './salesOrgColumns';
+import { BLANK_FORM, orgView, salesTree, unitKey } from './salesTree';
+import type { AddForm, OrgRow, ReasonAction, SalesNode } from './salesTree';
 
-const REFRESH = [['catalog', 'sales']] as const;
-const PARENT_LEVEL: Record<SalesLevel, SalesLevel | undefined> = {
-  REGION: undefined,
-  DEPARTMENT: 'REGION',
-  TEAM: 'DEPARTMENT',
-};
+const SALES = ['catalog', 'sales'] as const;
 
-function Node({ node }: Readonly<{ node: SalesNode }>) {
-  const u = node.unit;
-  return (
-    <li>
-      <div className="row">
-        <strong>{u.code}</strong> {u.name}
-        <span className="muted">
-          {u.level.toLowerCase()} · cost center {node.costCenter ?? '—'}
-          {u.costCenter ? '' : ' (inherited)'}
-        </span>
-        {u.recordStatus !== 'ACTIVE' && <StatusBadge status={u.recordStatus} />}
-        <RecordActions kind="SALES_UNIT" record={u} refresh={REFRESH} />
-      </div>
-      {node.officers.length > 0 && (
-        <ul>
-          {node.officers.map((o) => (
-            <li key={o.id} className="row">
-              <User size={12} aria-hidden="true" /> {o.username}
-              {o.recordStatus !== 'ACTIVE' && <StatusBadge status={o.recordStatus} />}
-              <RecordActions kind="SALES_OFFICER" record={o} refresh={REFRESH} />
-            </li>
-          ))}
-        </ul>
-      )}
-      {node.children.length > 0 && (
-        <ul>
-          {node.children.map((c) => (
-            <Node key={c.unit.id} node={c} />
-          ))}
-        </ul>
-      )}
-    </li>
-  );
+/** Regions expanded when the page opens, so the departments are in sight. */
+function initialExpanded(org: SalesOrganisation | undefined): Set<string> {
+  return new Set((org?.units ?? []).filter((u) => u.level !== 'TEAM').map((u) => unitKey(u.code)));
 }
 
-interface AddForm {
-  mode: 'unit' | 'officer';
-  level: SalesLevel;
-  code: string;
-  name: string;
-  parentCode: string;
-  costCenter: string;
-  username: string;
-}
-
-function AddModal({
-  org,
-  initial,
-  onClose,
-}: Readonly<{ org: SalesOrganisation | undefined; initial: AddForm; onClose: () => void }>) {
-  const companyId = useCompanyId();
+/** Authorize a unit or an officer, and the Excel export. */
+function useOrgMutations(companyId: number) {
   const toast = useToast();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState(initial);
-  const set = (patch: Partial<AddForm>) => setForm((f) => ({ ...f, ...patch }));
-  const save = useMutation({
-    mutationFn: async () => {
-      if (form.mode === 'officer') {
-        await catalogApi.assignOfficer({
-          companyId,
-          teamCode: form.parentCode,
-          username: form.username,
-        });
-        return;
-      }
-      await catalogApi.createSalesUnit({
-        companyId,
-        level: form.level,
-        code: form.code,
-        name: form.name,
-        parentCode: form.parentCode || undefined,
-        costCenter: form.costCenter || undefined,
-      });
+  const nameOf = useDisplayName();
+  const authorize = useMutation({
+    mutationFn: (row: OrgRow) =>
+      row.kind === 'officer'
+        ? catalogApi.authorize('SALES_OFFICER', row.officer.id)
+        : catalogApi.authorize('SALES_UNIT', row.node.unit.id),
+    onSuccess: async (r, row) => {
+      await queryClient.invalidateQueries({ queryKey: SALES });
+      toast.success(
+        `${row.kind === 'officer' ? nameOf(row.officer.username) : r.reference} authorized`,
+      );
     },
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ['catalog', 'sales'] });
-      toast.success('Saved – pending authorization');
-      onClose();
+    onError: (e) => toast.error(e.message),
+  });
+  const download = useMutation({
+    mutationFn: () => catalogApi.exportSalesOrganisation(companyId),
+    onSuccess: (file) => {
+      saveFile(file.blob, file.fileName);
+      toast.success(`${file.fileName} downloaded`);
     },
   });
-  const parentLevel = form.mode === 'officer' ? 'TEAM' : PARENT_LEVEL[form.level];
-  const parents = parentLevel
-    ? unitsOf(org, parentLevel).map((u) => ({ value: u.code, label: `${u.code} – ${u.name}` }))
-    : [];
+  return { authorize, download };
+}
+
+interface OrgToolbarProps {
+  onSearch: (text: string) => void;
+  onExpandAll: () => void;
+  onCollapseAll: () => void;
+  showInactive: boolean;
+  onShowInactive: (show: boolean) => void;
+  exporting: boolean;
+  onExport: () => void;
+}
+
+/** Search, Expand All / Collapse All, Show Inactive and Export to Excel. */
+function OrgToolbar(props: Readonly<OrgToolbarProps>) {
   return (
-    <Modal
-      title={form.mode === 'officer' ? 'Assign account officer' : 'New sales unit'}
-      open
-      onClose={onClose}
-      footer={
-        <Button variant="accent" busy={save.isPending} onClick={() => save.mutate()}>
-          Save for Authorization
-        </Button>
+    <WorklistToolbar
+      placeholder="Search unit code, name or officer"
+      onSearch={props.onSearch}
+      extra={
+        <>
+          <Button variant="ghost" icon={<ChevronsUpDown size={16} />} onClick={props.onExpandAll}>
+            Expand All
+          </Button>
+          <Button variant="ghost" icon={<ChevronsDownUp size={16} />} onClick={props.onCollapseAll}>
+            Collapse All
+          </Button>
+          <label className="checkbox">
+            <input
+              type="checkbox"
+              checked={props.showInactive}
+              onChange={(e) => props.onShowInactive(e.target.checked)}
+            />
+            Show Inactive
+          </label>
+        </>
       }
     >
-      <ErrorAlert error={save.error} />
-      <div className="form-grid">
-        {form.mode === 'unit' && (
-          <>
-            <SelectInput
-              label="Level"
-              value={form.level}
-              options={enumOptions(['REGION', 'DEPARTMENT', 'TEAM'])}
-              onChange={(v) => set({ level: v as SalesLevel, parentCode: '' })}
-            />
-            <TextInput
-              label="Code"
-              required
-              upper
-              value={form.code}
-              onChange={(code) => set({ code })}
-            />
-            <TextInput label="Name" required value={form.name} onChange={(name) => set({ name })} />
-            <TextInput
-              label="Cost center"
-              upper
-              hint="Blank = inherited from the parent"
-              value={form.costCenter}
-              onChange={(costCenter) => set({ costCenter })}
-            />
-          </>
-        )}
-        {parentLevel && (
-          <SelectInput
-            label={form.mode === 'officer' ? 'Team' : 'Parent'}
-            required
-            blank="Select"
-            value={form.parentCode}
-            options={parents}
-            onChange={(parentCode) => set({ parentCode })}
-          />
-        )}
-        {form.mode === 'officer' && (
-          <TextInput
-            label="User name"
-            required
-            value={form.username}
-            onChange={(username) => set({ username })}
-          />
-        )}
-      </div>
-    </Modal>
+      <Button
+        variant="secondary"
+        icon={<FileDown size={16} />}
+        busy={props.exporting}
+        onClick={props.onExport}
+      >
+        Export to Excel
+      </Button>
+    </WorklistToolbar>
   );
 }
 
-const BLANK: AddForm = {
-  mode: 'unit',
-  level: 'REGION',
-  code: '',
-  name: '',
-  parentCode: '',
-  costCenter: '',
-  username: '',
-};
+interface OrgDialogsProps {
+  org: SalesOrganisation | undefined;
+  maintain: boolean;
+  adding: AddForm | null;
+  viewing: SalesNode | null;
+  reasonAction: ReasonAction | null;
+  onClose: () => void;
+}
+
+/** The open dialog of the page: add, unit details, or an action with a reason. */
+function OrgDialogs({
+  org,
+  maintain,
+  adding,
+  viewing,
+  reasonAction,
+  onClose,
+}: Readonly<OrgDialogsProps>) {
+  return (
+    <>
+      {adding && <AddModal org={org} initial={adding} onClose={onClose} />}
+      {viewing && <UnitDetailModal node={viewing} org={org} canEdit={maintain} onClose={onClose} />}
+      {reasonAction && <ReasonDialog action={reasonAction} onClose={onClose} />}
+    </>
+  );
+}
 
 /**
- * Sales organisation (BRNB.010): regions, departments and teams with their cost centers, and
- * the account officers of each team. Accounts are stamped with the creator's units and cost
- * center when they are created.
+ * Sales organisation (BRNB.010/075/108): regions, departments and teams with their cost centers,
+ * and the account officers of each team, as one tree table. Accounts are stamped with the
+ * creator's units and cost center when they are created.
  */
 export default function SalesOrganisationPage() {
   const companyId = useCompanyId();
   const { can } = useAuth();
+  const nameOf = useDisplayName();
   const [adding, setAdding] = useState<AddForm | null>(null);
+  const [viewing, setViewing] = useState<SalesNode | null>(null);
+  const [reasonAction, setReasonAction] = useState<ReasonAction | null>(null);
+  const [search, setSearch] = useState('');
+  const [showInactive, setShowInactive] = useState(false);
+  const [expanded, setExpanded] = useState<Set<string> | null>(null);
   const org = useQuery({
-    queryKey: ['catalog', 'sales', companyId],
+    queryKey: [...SALES, companyId],
     queryFn: () => catalogApi.salesOrganisation(companyId),
   });
-  const tree = org.data ? salesTree(org.data) : [];
+  const tree = useMemo(() => (org.data ? salesTree(org.data) : []), [org.data]);
+  const view = orgView(tree, { showInactive, search, nameOf });
+  const opened = expanded ?? initialExpanded(org.data);
+  const searching = search.trim() !== '';
+  const shownExpanded = searching ? new Set([...opened, ...view.matchPath]) : opened;
+  const { authorize, download } = useOrgMutations(companyId);
+  const actionsOf = useRowActions({
+    view: setViewing,
+    add: setAdding,
+    reason: setReasonAction,
+    authorize: (row) => authorize.mutate(row),
+  });
+  const toggle = (key: string) => {
+    const next = new Set(shownExpanded);
+    if (next.has(key)) {
+      next.delete(key);
+    } else {
+      next.add(key);
+    }
+    setExpanded(next);
+  };
+  const maintain = can('MASTER_MAINTAIN');
+  const openUnit = (row: OrgRow) => {
+    if (row.kind === 'unit') {
+      setViewing(row.node);
+    }
+  };
+  const newUnit = (
+    <Button variant="accent" icon={<Plus size={16} />} onClick={() => setAdding(BLANK_FORM)}>
+      New Unit
+    </Button>
+  );
+  const emptyAction = maintain && !searching ? newUnit : undefined;
   return (
     <div className="stack">
       <PageHeader
@@ -201,33 +189,64 @@ export default function SalesOrganisationPage() {
         title="Sales Organisation"
         description="Regions, departments and teams, their cost centers and the account officers of each team."
         actions={
-          can('MASTER_MAINTAIN') && (
+          maintain && (
             <>
               <Button
                 variant="secondary"
                 icon={<User size={16} />}
-                onClick={() => setAdding({ ...BLANK, mode: 'officer' })}
+                onClick={() => setAdding({ ...BLANK_FORM, mode: 'officer' })}
               >
                 Assign Officer
               </Button>
-              <Button variant="accent" icon={<Plus size={16} />} onClick={() => setAdding(BLANK)}>
-                New Unit
-              </Button>
+              {newUnit}
             </>
           )
         }
       />
-      <ErrorAlert error={org.error} />
-      <Card>
-        {org.isLoading && <span className="spinner" aria-label="Loading" />}
-        {!org.isLoading && tree.length === 0 && <p className="muted">No sales unit defined yet.</p>}
-        <ul className="stack">
-          {tree.map((n) => (
-            <Node key={n.unit.id} node={n} />
-          ))}
-        </ul>
+      <ErrorAlert error={org.error ?? download.error} />
+      <Card flush callout="sales-organisation">
+        <OrgToolbar
+          onSearch={setSearch}
+          onExpandAll={() => setExpanded(new Set(branchKeys(view.nodes)))}
+          onCollapseAll={() => setExpanded(new Set())}
+          showInactive={showInactive}
+          onShowInactive={setShowInactive}
+          exporting={download.isPending}
+          onExport={() => download.mutate()}
+        />
+        {!org.isLoading && view.nodes.length > 0 && (
+          <p className="tree-summary" aria-live="polite">
+            {summaryText(view.counts)}
+          </p>
+        )}
+        <TreeTable
+          caption="Sales organisation"
+          callout="sales-organisation-tree"
+          columns={orgColumns(actionsOf)}
+          nodes={view.nodes}
+          expanded={shownExpanded}
+          onToggle={toggle}
+          onActivate={openUnit}
+          loading={org.isLoading}
+          emptyMessage={
+            searching ? 'No unit or officer matches the search' : 'No sales unit defined yet'
+          }
+          emptyAction={emptyAction}
+          rowClassName={(r) => (statusOf(r) === 'INACTIVE' ? 'row-inactive' : undefined)}
+        />
       </Card>
-      {adding && <AddModal org={org.data} initial={adding} onClose={() => setAdding(null)} />}
+      <OrgDialogs
+        org={org.data}
+        maintain={maintain}
+        adding={adding}
+        viewing={viewing}
+        reasonAction={reasonAction}
+        onClose={() => {
+          setAdding(null);
+          setViewing(null);
+          setReasonAction(null);
+        }}
+      />
     </div>
   );
 }

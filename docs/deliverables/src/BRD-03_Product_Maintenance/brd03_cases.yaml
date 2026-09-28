@@ -2212,7 +2212,7 @@ frs:
     data: [TD-PM-09, TD-PM-11]
     conditions:
       - A criterion is active only after another user authorises it.
-      - A criterion on an inactive product, without products or value, with invalid rule parameters or an overlapping period cannot be saved.
+      - A criterion on an inactive product, without products or value, with a rule parameter without a valid value or an overlapping period cannot be saved.
       - An amended active criterion stays active until its successor is authorised, with no gap; deactivation end-dates it.
       - The history shows every earlier version of the criterion.
     cases:
@@ -2254,11 +2254,11 @@ frs:
         msg: [Enter the value of the incentive criterion, INCENTIVE_VALUE_REQUIRED]
       - c: 2
         type: Negative
-        title: Rule parameters not in the format of the example
+        title: Rule parameter value that is not a number
         steps:
-          - Value basis Rule, rule parameters "{minimumPremium 5000"; save.
-        expected: Not saved.
-        msg: [The rule parameters must be valid JSON, INCENTIVE_RULE_PARAMS_INVALID]
+          - Value basis Rule; Add Parameter, parameter Minimum Gross Premium, value "five thousand"; save.
+        expected: Not saved; the message is under the value.
+        msg: [Minimum Gross Premium must be a number, INCENTIVE_RULE_PARAMS_INVALID]
       - c: 2
         type: Negative
         title: Overlapping period for the same code

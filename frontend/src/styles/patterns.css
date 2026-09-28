@@ -959,3 +959,165 @@ dl.form-grid dd {
   gap: var(--space-3);
   margin-bottom: var(--space-2);
 }
+
+/* ---------- Tree table (TreeTable) --------------------------------------------------------- */
+/* Hierarchies (sales organisation): chevron and one indentation step per level in the first column. */
+.tree-table tbody tr:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--brand-blue);
+}
+
+.tree-table .tree-cell-body {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.tree-table .tree-toggle,
+.tree-table .tree-toggle-spacer {
+  flex: 0 0 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.tree-table .tree-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--brand-blue);
+  cursor: pointer;
+}
+
+.tree-table .tree-toggle:hover {
+  background: var(--brand-blue-050);
+}
+
+.tree-table .tree-cell-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.tree-table .tree-cell-content > svg {
+  flex: 0 0 auto;
+  color: var(--brand-blue);
+}
+
+.tree-table .tree-code {
+  font-weight: 700;
+  color: var(--color-heading);
+  white-space: nowrap;
+}
+
+/* Inactive records stay listed (Show Inactive) in muted text next to their grey pill. */
+.tree-table tr.row-inactive td:not(.col-status) {
+  color: var(--color-placeholder);
+}
+
+.tree-table tr.row-inactive .tree-code {
+  color: var(--color-placeholder);
+}
+
+.tree-summary {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  font-size: 14px;
+}
+
+/* ---------- Row action menu (RowActionMenu) ------------------------------------------------ */
+.row-menu-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--brand-blue);
+  cursor: pointer;
+}
+
+.row-menu-button:hover,
+.row-menu-button[aria-expanded='true'] {
+  border-color: var(--brand-field-blue);
+  background: var(--color-surface);
+}
+
+.row-menu {
+  position: fixed;
+  z-index: 60;
+  min-width: 200px;
+  padding: var(--space-1) 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+}
+
+.row-menu-item {
+  display: block;
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.row-menu-item:hover:not(:disabled),
+.row-menu-item:focus-visible {
+  outline: none;
+  background: var(--brand-blue-050);
+  color: var(--brand-navy);
+}
+
+.row-menu-item.danger {
+  color: var(--color-danger);
+}
+
+.row-menu-item.separated {
+  border-top: 1px solid var(--color-border);
+}
+
+.row-menu-item:disabled {
+  color: var(--color-placeholder);
+  cursor: not-allowed;
+}
+
+@media print {
+  .row-menu-button,
+  .tree-table .tree-toggle {
+    display: none;
+  }
+}
+
+/* ---------- Parameter / value rows inside a form (IncentiveParamsTable) -------------------- */
+.param-rows {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.param-rows > legend {
+  padding: 0;
+  margin-bottom: var(--space-1);
+  font-size: 14px;
+  color: var(--color-heading);
+}
+
+.param-rows .table td {
+  vertical-align: top;
+}

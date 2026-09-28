@@ -2,6 +2,9 @@ package com.iortatechnxt.brokerverse.catalog.api.dto;
 
 import com.iortatechnxt.brokerverse.catalog.domain.SalesOfficer;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import java.time.Instant;
+import java.time.LocalDate;
 
 /**
  * An account officer of a team.
@@ -12,6 +15,10 @@ import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
  * @param recordStatus maker-checker status
  * @param maker last maintainer
  * @param authorizedBy checker
+ * @param assignedSince date of the current team assignment
+ * @param statusReason reason of the removal from the team
+ * @param lastChangedAt time of the last change
+ * @param authorizedAt authorization time
  */
 public record SalesOfficerResponse(
     Long id,
@@ -19,7 +26,11 @@ public record SalesOfficerResponse(
     String username,
     RecordStatus recordStatus,
     String maker,
-    String authorizedBy) {
+    String authorizedBy,
+    LocalDate assignedSince,
+    String statusReason,
+    Instant lastChangedAt,
+    Instant authorizedAt) {
 
   /**
    * Maps an entity.
@@ -34,6 +45,12 @@ public record SalesOfficerResponse(
         e.getUsername(),
         e.getRecordStatus(),
         e.getMaker(),
-        e.getAuthorizedBy());
+        e.getAuthorizedBy(),
+        e.getAssignedSince() != null || e.getCreatedAt() == null
+            ? e.getAssignedSince()
+            : BusinessClock.dateOf(e.getCreatedAt()),
+        e.getStatusReason(),
+        e.getUpdatedAt() != null ? e.getUpdatedAt() : e.getCreatedAt(),
+        e.getAuthorizedAt());
   }
 }

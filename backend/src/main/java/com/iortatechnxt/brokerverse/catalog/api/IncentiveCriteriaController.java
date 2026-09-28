@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.catalog.api.dto.IncentiveDtos.CriteriaRespon
 import com.iortatechnxt.brokerverse.catalog.api.dto.IncentiveDtos.DeactivateRequest;
 import com.iortatechnxt.brokerverse.catalog.domain.IncentiveCriteria;
 import com.iortatechnxt.brokerverse.catalog.service.IncentiveCriteriaService;
+import com.iortatechnxt.brokerverse.catalog.service.IncentiveRuleParameters;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -29,14 +30,31 @@ import org.springframework.web.bind.annotation.RestController;
 public class IncentiveCriteriaController {
 
   private final IncentiveCriteriaService criteria;
+  private final IncentiveRuleParameters parameters;
 
   /**
    * Creates the controller.
    *
    * @param criteria incentive criteria
+   * @param parameters rule parameters of the incentive types
    */
-  public IncentiveCriteriaController(IncentiveCriteriaService criteria) {
+  public IncentiveCriteriaController(
+      IncentiveCriteriaService criteria, IncentiveRuleParameters parameters) {
     this.criteria = criteria;
+    this.parameters = parameters;
+  }
+
+  /**
+   * The rule parameters an incentive type may carry, with their labels and kinds of value.
+   *
+   * @param incentiveType incentive type; every parameter when absent
+   * @return parameters
+   */
+  @GetMapping("/parameters")
+  @PreAuthorize(CatalogAccess.READ)
+  public List<IncentiveRuleParameters.Parameter> parameters(
+      @RequestParam(required = false) String incentiveType) {
+    return parameters.allowed(incentiveType);
   }
 
   /**

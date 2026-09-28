@@ -57,6 +57,7 @@ class CatalogAccountApiIT {
     "badmin, /api/v1/catalog/rates/short-period",
     "badmin, /api/v1/catalog/rates/motor-limits",
     "badmin, /api/v1/catalog/sales-organisation?companyId={c}",
+    "badmin, /api/v1/catalog/sales-organisation/export?companyId={c}",
     "ao, /api/v1/catalog/sales-organisation/assignment?companyId={c}&username=ao",
     "ao, /api/v1/accounts?companyId={c}",
     "ao, /api/v1/accounts?companyId={c}&mine=true&status=DRAFT&status=RETURNED_TO_MARKETING",

@@ -1,10 +1,17 @@
-import type { IncentiveCriteria, VersionDetail } from '@/api/productCatalog';
+import type {
+  IncentiveCriteria,
+  IncentiveRuleParameter,
+  VersionDetail,
+} from '@/api/productCatalog';
 import { clauseErrors, coverageErrors } from './coverageForm';
 import {
   incentiveErrors,
   incentiveFormOf,
   isCurrent,
   newIncentiveForm,
+  paramErrors,
+  paramRowsOf,
+  storedParams,
   toIncentiveInput,
 } from './incentiveForm';
 import { ageInDays, formOf, syncTerms, toInput, validateVersionForm } from './versionForm';
@@ -134,14 +141,18 @@ describe('incentive criteria form', () => {
   };
 
   it('requires products, a value and logical dates', () => {
-    const errors = incentiveErrors({ ...newIncentiveForm(), code: 'bad code', ruleParams: '{x' });
+    const errors = incentiveErrors({
+      ...newIncentiveForm(),
+      code: 'bad code',
+      params: [{ key: '', value: '' }],
+    });
     expect(Object.keys(errors)).toEqual(
       expect.arrayContaining([
         'code',
         'name',
         'incentiveType',
         'value',
-        'ruleParams',
+        'params.0',
         'products',
         'effectiveFrom',
       ]),
@@ -160,7 +171,7 @@ describe('incentive criteria form', () => {
   });
 
   it('writes the API body and tells current rows apart', () => {
-    const input = toIncentiveInput({ ...incentiveFormOf(row), ruleParams: ' ' }, 3);
+    const input = toIncentiveInput({ ...incentiveFormOf(row), params: [] }, 3);
     expect(input).toMatchObject({
       companyId: 3,
       value: 1,
@@ -173,6 +184,64 @@ describe('incentive criteria form', () => {
     expect(isCurrent(row, '2026-06-01')).toBe(true);
     expect(isCurrent({ ...row, effectiveTo: '2026-05-31' }, '2026-06-01')).toBe(false);
     expect(isCurrent({ ...row, recordStatus: 'INACTIVE' }, '2026-06-01')).toBe(false);
+  });
+});
+
+describe('incentive rule parameters', () => {
+  const definitions: IncentiveRuleParameter[] = [
+    { key: 'minimumPremium', label: 'Minimum Gross Premium', valueType: 'AMOUNT' },
+    { key: 'share', label: 'Share', valueType: 'PERCENT' },
+    { key: 'note', label: 'Note', valueType: 'TEXT' },
+  ];
+
+  it('reads the stored parameters as rows and writes them back', () => {
+    expect(paramRowsOf('{"minimumPremium": 5000, "note": "x"}')).toEqual([
+      { key: 'minimumPremium', value: '5000' },
+      { key: 'note', value: 'x' },
+    ]);
+    expect(paramRowsOf('{x')).toEqual([]);
+    expect(paramRowsOf('[1]')).toEqual([]);
+    expect(paramRowsOf(undefined)).toEqual([]);
+    expect(paramRowsOf('{"flag": true}')).toEqual([{ key: 'flag', value: '' }]);
+    expect(
+      storedParams(
+        [
+          { key: 'minimumPremium', value: '5,000' },
+          { key: 'note', value: ' Seed ' },
+          { key: '', value: '' },
+        ],
+        definitions,
+      ),
+    ).toBe('{"minimumPremium":5000,"note":"Seed"}');
+    expect(storedParams([], definitions)).toBeUndefined();
+  });
+
+  it('checks each row in business words', () => {
+    expect(
+      paramErrors(
+        [
+          { key: 'minimumPremium', value: 'abc' },
+          { key: 'share', value: '120' },
+          { key: 'note', value: '' },
+          { key: 'minimumPremium', value: '1' },
+          { key: '', value: '1' },
+          { key: 'share', value: '-1' },
+          { key: 'note', value: 'ok' },
+        ],
+        definitions,
+      ),
+    ).toEqual({
+      'params.0': 'Minimum Gross Premium must be a number',
+      'params.1': 'Share must be between 0 and 100',
+      'params.2': 'Enter a value for each parameter',
+      'params.3': 'Minimum Gross Premium is listed twice',
+      'params.4': 'Select the parameter',
+      'params.5': 'Share is listed twice',
+      'params.6': 'Note is listed twice',
+    });
+    expect(paramErrors([{ key: 'share', value: '-1' }], definitions)).toEqual({
+      'params.0': 'Share cannot be negative',
+    });
   });
 });
 

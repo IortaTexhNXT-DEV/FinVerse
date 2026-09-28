@@ -21,7 +21,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -49,9 +48,6 @@ public class PeriodCloseScheduleService {
 
   /** Alert raised when a scheduled close fails. */
   public static final String FAILED_ALERT = "GL_CLOSE_FAILED";
-
-  /** Business time zone of BDOI. */
-  public static final ZoneId MANILA = BusinessClock.zone();
 
   private static final String ENTITY = "PeriodCloseSchedule";
   private static final LocalTime DEFAULT_TIME = LocalTime.of(17, 0);
@@ -138,7 +134,7 @@ public class PeriodCloseScheduleService {
             .skip(BANKING_DAY - 1L)
             .findFirst()
             .orElse(next.atEndOfMonth());
-    return day.atTime(DEFAULT_TIME).atZone(MANILA).toInstant();
+    return day.atTime(DEFAULT_TIME).atZone(BusinessClock.zone()).toInstant();
   }
 
   /**
@@ -165,7 +161,10 @@ public class PeriodCloseScheduleService {
               ENTITY,
               period.getName(),
               AuditAction.CREATE,
-              "Close of " + period.getName() + " scheduled for " + when.atZone(MANILA));
+              "Close of "
+                  + period.getName()
+                  + " scheduled for "
+                  + when.atZone(BusinessClock.zone()));
           return saved;
         });
   }
@@ -276,12 +275,12 @@ public class PeriodCloseScheduleService {
     }
     boolean previousOnly =
         Boolean.parseBoolean(parameters.text("CLOSE_ONLY_PREVIOUS_MONTH", "true").trim());
-    YearMonth previous = YearMonth.from(when.atZone(MANILA)).minusMonths(1);
+    YearMonth previous = YearMonth.from(when.atZone(BusinessClock.zone())).minusMonths(1);
     if (previousOnly && !YearMonth.from(period.getEndDate()).equals(previous)) {
       throw new BusinessRuleException(
           "CLOSE_ONLY_PREVIOUS_MONTH",
           "On "
-              + when.atZone(MANILA).toLocalDate()
+              + when.atZone(BusinessClock.zone()).toLocalDate()
               + " only the period of "
               + previous
               + " may be closed, not "

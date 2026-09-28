@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noFields;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noMethods;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
@@ -12,10 +13,16 @@ import com.tngtech.archunit.core.domain.JavaMethodCall;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.lang.ArchRule;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.Year;
 import java.time.YearMonth;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -33,9 +40,11 @@ import org.springframework.web.bind.annotation.RestController;
  *   <li>Controllers live in {@code ..api..}; services never depend on controllers.
  *   <li>Background work is a {@code system.service.ManagedJob} (job monitor, run history, failure
  *       alert), never a {@code @Scheduled} method (developer guide section 10.3).
- *   <li>Business dates come from {@link BusinessClock} (business zone, default Asia/Manila): no
- *       {@code LocalDate.now}, {@code LocalDateTime.now}, {@code YearMonth.now} or {@code Year.now}
- *       elsewhere, as those take the date of the clock's zone (UTC).
+ *   <li>Business dates come from {@link BusinessClock} (the configured business zone): no {@code
+ *       now} of LocalDate, LocalDateTime, LocalTime, ZonedDateTime, OffsetDateTime, Instant,
+ *       YearMonth or Year elsewhere, as those take the clock's zone (UTC) or bypass the injected
+ *       clock; no {@code Clock.systemUTC()} outside the application configuration; no static {@code
+ *       ZoneId} fields.
  * </ul>
  *
  * <p>A plain JUnit Jupiter test (not the ArchUnit engine), so it runs in the alphabetical class
@@ -98,12 +107,16 @@ final class ArchitectureTest {
       Set.of(
           LocalDate.class.getName(),
           LocalDateTime.class.getName(),
+          LocalTime.class.getName(),
+          ZonedDateTime.class.getName(),
+          OffsetDateTime.class.getName(),
+          Instant.class.getName(),
           YearMonth.class.getName(),
           Year.class.getName());
 
   private static final DescribedPredicate<JavaMethodCall> CURRENT_DATE_CALL =
       DescribedPredicate.describe(
-          "LocalDate/LocalDateTime/YearMonth/Year.now",
+          "LocalDate/LocalDateTime/LocalTime/ZonedDateTime/OffsetDateTime/Instant/YearMonth/Year.now",
           call ->
               "now".equals(call.getName()) && DATE_TYPES.contains(call.getTargetOwner().getName()));
 
@@ -115,7 +128,29 @@ final class ArchitectureTest {
           .callMethodWhere(CURRENT_DATE_CALL)
           .because(
               "the business date is taken in the business zone by BusinessClock, not in the"
-                  + " zone of the injected clock (UTC)");
+                  + " zone of the injected clock (UTC), and the current instant comes from the"
+                  + " injected clock");
+
+  private static final ArchRule NO_CLOCK_OUTSIDE_THE_CONFIGURATION =
+      noClasses()
+          .that()
+          .doNotHaveFullyQualifiedName("com.iortatechnxt.brokerverse.config.ApplicationConfig")
+          .should()
+          .callMethod(Clock.class, "systemUTC")
+          .orShould()
+          .callMethod(Clock.class, "systemDefaultZone")
+          .because("the clock is injected, so tests control time");
+
+  private static final ArchRule NO_ZONE_CONSTANTS =
+      noFields()
+          .that()
+          .haveRawType(ZoneId.class)
+          .should()
+          .beStatic()
+          .because(
+              "the business zone is configured per deployment and read from BusinessClock.zone()"
+                  + " where it is used, never copied into a constant")
+          .allowEmptyShould(true);
 
   @Test
   void modulesAreFreeOfCycles() {
@@ -150,5 +185,15 @@ final class ArchitectureTest {
   @Test
   void businessDatesComeFromTheBusinessClock() {
     BUSINESS_DATES_COME_FROM_THE_BUSINESS_CLOCK.check(classes);
+  }
+
+  @Test
+  void theClockIsInjected() {
+    NO_CLOCK_OUTSIDE_THE_CONFIGURATION.check(classes);
+  }
+
+  @Test
+  void theBusinessZoneIsNotCopiedIntoConstants() {
+    NO_ZONE_CONSTANTS.check(classes);
   }
 }

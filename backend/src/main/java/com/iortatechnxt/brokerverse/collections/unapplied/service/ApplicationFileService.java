@@ -14,7 +14,6 @@ import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedDispositionR
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -44,7 +43,6 @@ public class ApplicationFileService {
       "PAYMENT_DATE|PAYMENT_FILE_NAME|TRANSACTION_NO|PAID_AMOUNT|CURRENCY|PAYMENT_TYPE|PAYOR"
           + "|REFERENCE_NO|ASSURED|INVOICE_NO|USER_ID|UNAPPLIED_REF|REQUEST_REF";
 
-  private static final ZoneId MANILA = BusinessClock.zone();
   private static final DateTimeFormatter STAMP = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
   private static final String SEPARATOR = "|";
 
@@ -93,7 +91,7 @@ public class ApplicationFileService {
         requests.findByCompanyIdAndActionAndFileRunNoIsNullAndRequestedAtBeforeOrderByIdAsc(
             companyId,
             Action.APPLY_TO_INVOICE.name(),
-            day.plusDays(1).atStartOfDay(MANILA).toInstant());
+            day.plusDays(1).atStartOfDay(BusinessClock.zone()).toInstant());
     if (due.isEmpty()) {
       return Optional.empty();
     }
@@ -101,7 +99,7 @@ public class ApplicationFileService {
         "FOR_APPLICATION_TO_INVOICE_"
             + day.format(DateTimeFormatter.BASIC_ISO_DATE)
             + "_"
-            + clock.instant().atZone(MANILA).format(STAMP)
+            + clock.instant().atZone(BusinessClock.zone()).format(STAMP)
             + ".txt";
     String content =
         Stream.concat(Stream.of(HEADER), due.stream().map(ApplicationFileService::line))

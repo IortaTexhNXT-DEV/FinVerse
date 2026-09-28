@@ -13,7 +13,6 @@ import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,8 +41,6 @@ public class AdjustmentReportSupport {
 
   /** Requester / processor filter. */
   public static final String USER = "user";
-
-  private static final ZoneId MANILA = BusinessClock.zone();
 
   private final EndorsementRequestRepository requests;
 
@@ -139,7 +136,7 @@ public class AdjustmentReportSupport {
    * @return first instant of the start date (Manila)
    */
   public static Instant start(ReportParameters p) {
-    return p.date(FROM).atStartOfDay(MANILA).toInstant();
+    return p.date(FROM).atStartOfDay(BusinessClock.zone()).toInstant();
   }
 
   /**
@@ -149,7 +146,7 @@ public class AdjustmentReportSupport {
    * @return first instant after the end date (Manila)
    */
   public static Instant end(ReportParameters p) {
-    return p.date(TO).plusDays(1).atStartOfDay(MANILA).toInstant();
+    return p.date(TO).plusDays(1).atStartOfDay(BusinessClock.zone()).toInstant();
   }
 
   /**

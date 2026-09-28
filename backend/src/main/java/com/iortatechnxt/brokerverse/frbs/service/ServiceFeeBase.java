@@ -5,7 +5,6 @@ import com.iortatechnxt.brokerverse.frbs.domain.PaidInvoice;
 import com.iortatechnxt.brokerverse.frbs.service.ServiceFeeCalculator.Unit;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class ServiceFeeBase {
-
-  /** Business time zone of BDOI: a day is a Manila day. */
-  public static final ZoneId MANILA = BusinessClock.zone();
 
   private static final String PAID =
       "select i.invoice_no, i.root_invoice_no, i.client_code, i.assured_name, i.insurer_code,"
@@ -81,10 +77,10 @@ public class ServiceFeeBase {
                 rs.getString("currency"),
                 rs.getBigDecimal("commission"),
                 rs.getBigDecimal("wtax"),
-                rs.getTimestamp("paid_at").toInstant().atZone(MANILA).toLocalDate()),
+                rs.getTimestamp("paid_at").toInstant().atZone(BusinessClock.zone()).toLocalDate()),
         companyId,
-        Timestamp.from(from.atStartOfDay(MANILA).toInstant()),
-        Timestamp.from(to.plusDays(1).atStartOfDay(MANILA).toInstant()));
+        Timestamp.from(from.atStartOfDay(BusinessClock.zone()).toInstant()),
+        Timestamp.from(to.plusDays(1).atStartOfDay(BusinessClock.zone()).toInstant()));
   }
 
   /**

@@ -4,7 +4,6 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.report.SqlReport.Spec;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
-import java.time.ZoneId;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,9 +17,6 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
  */
 @Configuration(proxyBeanMethods = false)
 public class DisbursementReports {
-
-  /** Philippine time of the report dates. */
-  static final ZoneId MANILA = BusinessClock.zone();
 
   /** Voucher columns shared by the voucher reports. */
   static final String VOUCHER_COLUMNS =

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.migration.report;
 
 import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
 import com.iortatechnxt.brokerverse.nbreport.service.SqlArgs;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
@@ -44,8 +45,12 @@ public final class MigReport implements ReportDefinition {
   public static final String BATCH_FILTER =
       " and (cast(:batch as varchar) is null or b.batch_no = :batch)";
 
-  /** Readable time in Philippine time of a timestamptz column. */
-  public static final String PHT = " at time zone 'Asia/Manila', 'YYYY-MM-DD HH24:MI')";
+  /** Named parameter carrying the business zone ({@link BusinessClock#zoneId()}). */
+  public static final String ZONE = "zone";
+
+  /** Readable time in the business zone of a timestamptz column. */
+  public static final String LOCAL_TIME =
+      " at time zone cast(:zone as text), 'YYYY-MM-DD HH24:MI')";
 
   private final ReportMetadata metadata;
   private final String sql;
@@ -90,7 +95,8 @@ public final class MigReport implements ReportDefinition {
     SqlArgs args =
         SqlArgs.company(p.longValue(COMPANY))
             .with(OBJECT, upper(p, OBJECT))
-            .with(BATCH, upper(p, BATCH));
+            .with(BATCH, upper(p, BATCH))
+            .with(ZONE, BusinessClock.zoneId());
     for (ParameterSpec spec : extra) {
       args =
           args.with(

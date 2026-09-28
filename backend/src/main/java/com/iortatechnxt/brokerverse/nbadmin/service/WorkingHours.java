@@ -3,7 +3,6 @@ package com.iortatechnxt.brokerverse.nbadmin.service;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.EnumSet;
@@ -20,9 +19,6 @@ import java.util.Set;
  * @param days working days
  */
 public record WorkingHours(LocalTime start, LocalTime end, Set<DayOfWeek> days) {
-
-  /** Time zone of BDOI. */
-  public static final ZoneId ZONE = BusinessClock.zone();
 
   /** Always within working hours. */
   public static final WorkingHours ALWAYS =
@@ -99,7 +95,7 @@ public record WorkingHours(LocalTime start, LocalTime end, Set<DayOfWeek> days) 
    * @return true within working hours
    */
   public boolean contains(ZonedDateTime moment) {
-    ZonedDateTime local = moment.withZoneSameInstant(ZONE);
+    ZonedDateTime local = moment.withZoneSameInstant(BusinessClock.zone());
     LocalTime time = local.toLocalTime();
     return days.contains(local.getDayOfWeek())
         && !time.isBefore(start)

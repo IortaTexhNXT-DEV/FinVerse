@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.api;
 
+import com.iortatechnxt.brokerverse.common.util.AsciiCase;
 import com.iortatechnxt.brokerverse.security.service.SignInResult;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -43,7 +44,7 @@ public class RefreshCookies {
   public RefreshCookies(
       Clock clock, @Value("${brokerverse.environment:local}") String environment) {
     this.clock = clock;
-    this.local = "local".equalsIgnoreCase(environment == null ? "" : environment.trim());
+    this.local = AsciiCase.equalsIgnoreCase("local", environment == null ? "" : environment.trim());
   }
 
   /**

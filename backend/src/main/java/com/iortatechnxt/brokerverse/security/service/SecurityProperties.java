@@ -42,13 +42,16 @@ public record SecurityProperties(
   /** Life of an access token when nothing is configured. */
   public static final Duration DEFAULT_ACCESS_TOKEN_VALIDITY = Duration.ofMinutes(15);
 
+  /** Grace of a replaced refresh token when nothing is configured. */
+  public static final Duration DEFAULT_REFRESH_GRACE = Duration.ofSeconds(30);
+
   /** Applies the defaults. */
   @ConstructorBinding
   public SecurityProperties {
     maxFailedAttempts = Objects.requireNonNullElse(maxFailedAttempts, DEFAULT_MAX_FAILED_ATTEMPTS);
     accessTokenValidity =
         Objects.requireNonNullElse(accessTokenValidity, DEFAULT_ACCESS_TOKEN_VALIDITY);
-    refreshGrace = Objects.requireNonNullElse(refreshGrace, Duration.ofSeconds(30));
+    refreshGrace = Objects.requireNonNullElse(refreshGrace, DEFAULT_REFRESH_GRACE);
   }
 
   /**

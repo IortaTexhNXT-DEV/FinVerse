@@ -34,6 +34,7 @@ public final class Totp {
   private static final String BASE32 = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
   private static final int BITS_PER_CHAR = 5;
   private static final int BYTE_MASK = 0xff;
+  private static final int OFFSET_MASK = 0x0f;
   private static final int CHAR_MASK = 0x1f;
   private static final SecureRandom RANDOM = new SecureRandom();
 
@@ -72,12 +73,8 @@ public final class Totp {
       Mac mac = Mac.getInstance(ALGORITHM);
       mac.init(new SecretKeySpec(secret, ALGORITHM));
       byte[] hash = mac.doFinal(ByteBuffer.allocate(Long.BYTES).putLong(step).array());
-      int offset = hash[hash.length - 1] & 0x0f;
-      int binary =
-          ((hash[offset] & 0x7f) << 24)
-              | ((hash[offset + 1] & BYTE_MASK) << 16)
-              | ((hash[offset + 2] & BYTE_MASK) << 8)
-              | (hash[offset + 3] & BYTE_MASK);
+      int offset = hash[hash.length - 1] & OFFSET_MASK;
+      int binary = ByteBuffer.wrap(hash, offset, Integer.BYTES).getInt() & Integer.MAX_VALUE;
       return String.format(Locale.ROOT, "%0" + DIGITS + "d", binary % MODULUS);
     } catch (GeneralSecurityException ex) {
       throw new IllegalStateException("HMAC-SHA1 is not available", ex);

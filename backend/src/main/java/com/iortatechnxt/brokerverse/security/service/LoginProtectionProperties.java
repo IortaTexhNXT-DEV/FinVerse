@@ -36,6 +36,9 @@ public record LoginProtectionProperties(
   /** Reset links per user and window when nothing is configured. */
   public static final int DEFAULT_RESET_MAX_PER_USER = 3;
 
+  /** Window of the "Forgot password?" limits when nothing is configured. */
+  public static final Duration DEFAULT_RESET_WINDOW = Duration.ofMinutes(15);
+
   /** Applies the defaults. */
   @ConstructorBinding
   public LoginProtectionProperties {
@@ -51,7 +54,7 @@ public record LoginProtectionProperties(
             : resetMaxPerAddress;
     resetMaxPerUser =
         resetMaxPerUser == null ? Integer.valueOf(DEFAULT_RESET_MAX_PER_USER) : resetMaxPerUser;
-    resetWindow = resetWindow == null ? Duration.ofMinutes(15) : resetWindow;
+    resetWindow = resetWindow == null ? DEFAULT_RESET_WINDOW : resetWindow;
   }
 
   /**

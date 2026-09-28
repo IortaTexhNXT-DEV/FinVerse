@@ -255,13 +255,15 @@ public class SamlResponseValidator {
   private static String username(Element assertion, String usernameAttribute) {
     if (usernameAttribute != null && !usernameAttribute.isBlank()) {
       List<String> values = attributeValues(assertion, usernameAttribute);
-      require(!values.isEmpty(), "the Assertion has no attribute " + usernameAttribute);
-      return values.get(0).trim();
+      String value = values.isEmpty() ? "" : values.get(0).trim();
+      require(!value.isEmpty(), "the Assertion has no attribute " + usernameAttribute);
+      return value;
     }
     Element subject = child(assertion, ASSERTION, "Subject");
     Element nameId = subject == null ? null : child(subject, ASSERTION, "NameID");
-    require(nameId != null && !nameId.getTextContent().isBlank(), "the Assertion has no NameID");
-    return nameId.getTextContent().trim();
+    String value = nameId == null ? "" : nameId.getTextContent().trim();
+    require(!value.isEmpty(), "the Assertion has no NameID");
+    return value;
   }
 
   private static List<String> attributeValues(Element assertion, String name) {

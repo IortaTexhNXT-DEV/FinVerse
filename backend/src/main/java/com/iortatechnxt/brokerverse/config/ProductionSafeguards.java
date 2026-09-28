@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.config;
 
 import com.iortatechnxt.brokerverse.common.runtime.RuntimeRole;
 import com.iortatechnxt.brokerverse.common.runtime.Workload;
+import com.iortatechnxt.brokerverse.common.util.AsciiCase;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
@@ -185,25 +186,41 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
    */
   public static boolean isLocal(Environment environment) {
     String kind = environment.getProperty(ENVIRONMENT_PROPERTY, "").trim();
-    return !isProduction(environment) && (kind.isEmpty() || LOCAL.equalsIgnoreCase(kind));
+    return !isProduction(environment)
+        && (kind.isEmpty() || AsciiCase.equalsIgnoreCase(LOCAL, kind));
   }
 
   private static void requireSharedEnvironmentSettings(Environment env, List<String> problems) {
-    String origins = env.getProperty("brokerverse.security.allowed-origins", "");
-    if (origins.isBlank()) {
-      problems.add("BROKERVERSE_ALLOWED_ORIGINS (address of the web client) is not set");
-    } else if (LOCAL_ADDRESS.matcher(origins).find()) {
-      problems.add("BROKERVERSE_ALLOWED_ORIGINS must name the web client, not localhost");
-    }
-    String resetUrl = env.getProperty("brokerverse.security.password-reset-url", "");
-    if (resetUrl.isBlank()) {
-      problems.add("BROKERVERSE_PASSWORD_RESET_URL (page of the password reset link) is not set");
-    } else if (LOCAL_ADDRESS.matcher(resetUrl).find()) {
-      problems.add("BROKERVERSE_PASSWORD_RESET_URL must name the web client, not localhost");
-    }
+    requireWebAddress(
+        env,
+        "brokerverse.security.allowed-origins",
+        "BROKERVERSE_ALLOWED_ORIGINS (address of the web client)",
+        "BROKERVERSE_ALLOWED_ORIGINS",
+        problems);
+    requireWebAddress(
+        env,
+        "brokerverse.security.password-reset-url",
+        "BROKERVERSE_PASSWORD_RESET_URL (page of the password reset link)",
+        "BROKERVERSE_PASSWORD_RESET_URL",
+        problems);
     if (enabled(env, "brokerverse.mail.enabled", false)) {
       require(env, "brokerverse.mail.from-address", "BROKERVERSE_MAIL_FROM", problems);
     }
+    requireKeys(env, problems);
+    requireSingleSignOnSecrets(env, problems);
+  }
+
+  private static void requireWebAddress(
+      Environment env, String property, String described, String variable, List<String> problems) {
+    String value = env.getProperty(property, "");
+    if (value.isBlank()) {
+      problems.add(described + " is not set");
+    } else if (LOCAL_ADDRESS.matcher(value).find()) {
+      problems.add(variable + " must name the web client, not localhost");
+    }
+  }
+
+  private static void requireKeys(Environment env, List<String> problems) {
     String mfaKey = env.getProperty("brokerverse.security.mfa.encryption-key", "");
     if (mfaKey.isBlank()) {
       problems.add("BROKERVERSE_MFA_ENCRYPTION_KEY (key of the second-factor secrets) is not set");
@@ -221,9 +238,11 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
               + MIN_SECRET_LENGTH
               + " characters, not a development value");
     }
+  }
+
+  private static void requireSingleSignOnSecrets(Environment env, List<String> problems) {
     if (!env.getProperty("brokerverse.security.sso.oidc.issuer", "").isBlank()) {
-      require(
-          env, "brokerverse.security.sso.oidc.client-id", "BROKERVERSE_OIDC_CLIENT_ID", problems);
+      require(env, "brokerverse.security.sso.oidc.client-id", "BROKERVERSE_OIDC_CLIENT_ID", problems);
       require(
           env,
           "brokerverse.security.sso.oidc.client-secret",

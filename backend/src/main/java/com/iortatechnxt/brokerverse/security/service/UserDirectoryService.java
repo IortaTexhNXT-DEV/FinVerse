@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.service;
 
+import com.iortatechnxt.brokerverse.common.util.AsciiCase;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import com.iortatechnxt.brokerverse.security.domain.Role;
@@ -39,7 +40,7 @@ public class UserDirectoryService {
   public List<Entry> entries(boolean withRoles, String self) {
     return users.findAll(Sort.by("username")).stream()
         .map(UserDirectoryService::entry)
-        .map(e -> withRoles || e.username().equalsIgnoreCase(self) ? e : e.withoutRole())
+        .map(e -> withRoles || AsciiCase.equalsIgnoreCase(e.username(), self) ? e : e.withoutRole())
         .toList();
   }
 

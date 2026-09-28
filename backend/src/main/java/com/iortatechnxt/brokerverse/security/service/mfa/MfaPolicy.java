@@ -1,12 +1,12 @@
 package com.iortatechnxt.brokerverse.security.service.mfa;
 
+import com.iortatechnxt.brokerverse.common.util.AsciiCase;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.PrivilegeLevel;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.service.directory.AuthMode;
 import com.iortatechnxt.brokerverse.security.service.sso.SsoProperties;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
-import java.util.Locale;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -65,7 +65,7 @@ public class MfaPolicy {
     this.parameters = parameters;
     this.sso = sso;
     this.cipher = cipher;
-    this.local = "local".equalsIgnoreCase(environment == null ? "" : environment.trim());
+    this.local = AsciiCase.equalsIgnoreCase("local", environment == null ? "" : environment.trim());
   }
 
   /** The policy values. */
@@ -81,8 +81,7 @@ public class MfaPolicy {
    * @return level; an unknown value is ALL
    */
   public Level level() {
-    String value =
-        parameters.text(PARAMETER, Level.PRIVILEGED.name()).trim().toUpperCase(Locale.ROOT);
+    String value = AsciiCase.upper(parameters.text(PARAMETER, Level.PRIVILEGED.name()).trim());
     for (Level level : Level.values()) {
       if (level.name().equals(value)) {
         return level;

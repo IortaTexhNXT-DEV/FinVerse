@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.service.directory;
 
+import com.iortatechnxt.brokerverse.common.util.AsciiCase;
 import java.util.Arrays;
 
 /**
@@ -36,7 +37,7 @@ public enum AuthMode {
       return LOCAL;
     }
     return Arrays.stream(values())
-        .filter(m -> m.name().equalsIgnoreCase(value.trim()))
+        .filter(m -> AsciiCase.equalsIgnoreCase(m.name(), value.trim()))
         .findFirst()
         .orElse(LOCAL);
   }

@@ -124,6 +124,22 @@ public class OidcClient {
    * @throws SsoException when the provider refuses or the token is not valid
    */
   public SsoIdentity exchange(String code, String codeVerifier, String nonce) {
+    Jwt idToken = idToken(tokenAnswer(code, codeVerifier));
+    if (nonce == null || !nonce.equals(idToken.getClaimAsString("nonce"))) {
+      throw new SsoException(SsoException.INVALID, "ID token refused: the nonce does not match");
+    }
+    String claim =
+        properties.usernameClaim() == null || properties.usernameClaim().isBlank()
+            ? DEFAULT_USERNAME_CLAIM
+            : properties.usernameClaim();
+    String username = idToken.getClaimAsString(claim);
+    if (username == null || username.isBlank()) {
+      throw new SsoException(SsoException.INVALID, "ID token without the claim " + claim);
+    }
+    return new SsoIdentity(username.trim(), groups(idToken));
+  }
+
+  private JsonNode tokenAnswer(String code, String codeVerifier) {
     SsoProperties.Oidc oidc = properties.oidc();
     MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
     form.add("grant_type", "authorization_code");
@@ -143,31 +159,20 @@ public class OidcClient {
               .body(JsonNode.class);
     } catch (RestClientException ex) {
       throw new SsoException(
-          SsoException.PROVIDER_ERROR,
-          "The token endpoint refused the code: " + ex.getMessage(),
-          ex);
+          SsoException.PROVIDER_ERROR, "The token endpoint refused the code: " + ex.getMessage(), ex);
     }
     if (answer == null || !answer.hasNonNull("id_token")) {
       throw new SsoException(SsoException.PROVIDER_ERROR, "The token answer has no ID token");
     }
-    Jwt idToken;
+    return answer;
+  }
+
+  private Jwt idToken(JsonNode answer) {
     try {
-      idToken = decoder().decode(answer.get("id_token").asText());
+      return decoder().decode(answer.get("id_token").asText());
     } catch (JwtException ex) {
       throw new SsoException(SsoException.INVALID, "ID token refused: " + ex.getMessage(), ex);
     }
-    if (nonce == null || !nonce.equals(idToken.getClaimAsString("nonce"))) {
-      throw new SsoException(SsoException.INVALID, "ID token refused: the nonce does not match");
-    }
-    String claim =
-        properties.usernameClaim() == null || properties.usernameClaim().isBlank()
-            ? DEFAULT_USERNAME_CLAIM
-            : properties.usernameClaim();
-    String username = idToken.getClaimAsString(claim);
-    if (username == null || username.isBlank()) {
-      throw new SsoException(SsoException.INVALID, "ID token without the claim " + claim);
-    }
-    return new SsoIdentity(username.trim(), groups(idToken));
   }
 
   /**

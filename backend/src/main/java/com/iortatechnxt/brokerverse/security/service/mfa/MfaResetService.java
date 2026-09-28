@@ -170,14 +170,10 @@ public class MfaResetService {
     MfaResetRequest request = pending(id);
     String by = currentUser.username();
     boolean withdrawn = CurrentUser.sameUser(by, request.getRequestedBy());
-    if (!withdrawn && !currentUser.hasAuthority(APPROVE)) {
-      throw new BusinessRuleException(
-          "ACCESS_DENIED", "Only an approver or the requester may close this request");
-    }
-    if (!withdrawn && (reason == null || reason.isBlank())) {
-      throw new BusinessRuleException("REASON_REQUIRED", "Give the reason for the rejection");
-    }
     String note = reason == null || reason.isBlank() ? null : reason.strip();
+    if (!withdrawn) {
+      requireRejecter(note);
+    }
     request.decide(
         withdrawn ? MfaResetRequest.WITHDRAWN : MfaResetRequest.REJECTED,
         by,
@@ -235,6 +231,16 @@ public class MfaResetService {
                   pending.contains(key));
             })
         .toList();
+  }
+
+  private void requireRejecter(String note) {
+    if (!currentUser.hasAuthority(APPROVE)) {
+      throw new BusinessRuleException(
+          "ACCESS_DENIED", "Only an approver or the requester may close this request");
+    }
+    if (note == null) {
+      throw new BusinessRuleException("REASON_REQUIRED", "Give the reason for the rejection");
+    }
   }
 
   private MfaResetRequest pending(Long id) {

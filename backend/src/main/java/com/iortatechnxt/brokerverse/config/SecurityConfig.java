@@ -2,13 +2,9 @@ package com.iortatechnxt.brokerverse.config;
 
 import com.iortatechnxt.brokerverse.security.api.RefreshCookies;
 import com.iortatechnxt.brokerverse.security.service.JwtAuthenticationFilter;
-import com.iortatechnxt.brokerverse.security.service.JwtTokenService;
 import com.iortatechnxt.brokerverse.security.service.LoginRateLimitFilter;
 import com.iortatechnxt.brokerverse.security.service.LoginRateLimiter;
 import com.iortatechnxt.brokerverse.security.service.SecurityProperties;
-import com.iortatechnxt.brokerverse.security.service.SecurityStoreAlarm;
-import com.iortatechnxt.brokerverse.security.service.TokenRevocationStore;
-import com.iortatechnxt.brokerverse.security.service.UserSessionLog;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
@@ -140,33 +136,24 @@ public class SecurityConfig {
    * Security filter chain.
    *
    * @param http http security
-   * @param tokens token service
-   * @param userDetailsService user loader
    * @param properties security properties
-   * @param revocations token denylist (logout)
    * @param loginRateLimiter login rate limit
-   * @param sessions session log (ended sessions are refused; activity is recorded)
-   * @param alarm reports an unreachable denylist or session log
+   * @param jwtFilters the bearer token filter
    * @param managementPort the separate management port, when there is one
    * @return filter chain
    * @throws Exception on configuration error
    */
   @Bean
   // Spring's builder API declares "throws Exception", which this factory method must propagate.
-  @SuppressWarnings({"PMD.SignatureDeclareThrowsException", "java:S107"})
+  @SuppressWarnings("PMD.SignatureDeclareThrowsException")
   public SecurityFilterChain filterChain(
       HttpSecurity http,
-      JwtTokenService tokens,
-      UserDetailsService userDetailsService,
       SecurityProperties properties,
-      TokenRevocationStore revocations,
       LoginRateLimiter loginRateLimiter,
-      UserSessionLog sessions,
-      SecurityStoreAlarm alarm,
+      JwtFilterFactory jwtFilters,
       ManagementPort managementPort)
       throws Exception {
-    JwtAuthenticationFilter jwt =
-        new JwtAuthenticationFilter(tokens, userDetailsService, revocations, sessions, alarm);
+    JwtAuthenticationFilter jwt = jwtFilters.create();
     RequestMatcher onManagementPort = managementPort::receives;
     http.csrf(
             c ->

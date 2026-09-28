@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.messaging.service;
 
+import com.iortatechnxt.brokerverse.common.util.AsciiCase;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageFile;
 import com.iortatechnxt.brokerverse.messaging.domain.MessageStatus;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundAttachment;
@@ -78,7 +79,7 @@ public class MailDispatcher {
       @Value("${brokerverse.environment:local}") String environment) {
     this.storedFiles = storedFiles;
     this.configuredSender = configuredSender == null ? "" : configuredSender.trim();
-    this.local = "local".equalsIgnoreCase(environment == null ? "" : environment.trim());
+    this.local = AsciiCase.equalsIgnoreCase("local", environment == null ? "" : environment.trim());
     this.messages = messages;
     this.attachments = attachments;
     this.transport = transport;

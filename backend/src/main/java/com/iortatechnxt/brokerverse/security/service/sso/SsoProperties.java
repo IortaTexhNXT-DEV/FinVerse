@@ -75,6 +75,10 @@ public record SsoProperties(
     return username != null && breakGlassUsers.contains(username.trim().toLowerCase(Locale.ROOT));
   }
 
+  private static boolean present(String value) {
+    return value != null && !value.isBlank();
+  }
+
   /**
    * The public address without a trailing slash.
    *
@@ -117,7 +121,7 @@ public record SsoProperties(
      * @return true when the issuer and client id are set
      */
     public boolean configured() {
-      return issuer != null && !issuer.isBlank() && clientId != null && !clientId.isBlank();
+      return present(issuer) && present(clientId);
     }
   }
 
@@ -145,12 +149,7 @@ public record SsoProperties(
      * @return true when the provider's entity id, address and certificate are set
      */
     public boolean configured() {
-      return idpEntityId != null
-          && !idpEntityId.isBlank()
-          && idpSsoUrl != null
-          && !idpSsoUrl.isBlank()
-          && idpCertificate != null
-          && !idpCertificate.isBlank();
+      return present(idpEntityId) && present(idpSsoUrl) && present(idpCertificate);
     }
   }
 }

@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.security.service.mfa;
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.AsciiCase;
 import com.iortatechnxt.brokerverse.security.domain.MfaRecoveryCode;
 import com.iortatechnxt.brokerverse.security.domain.MfaRecoveryCodeRepository;
 import com.iortatechnxt.brokerverse.security.domain.MfaTrustedDevice;
@@ -43,6 +44,7 @@ public class MfaService {
   private static final String ENTITY = "AppUser";
   private static final String CODE_ALPHABET = "abcdefghjkmnpqrstuvwxyz23456789";
   private static final int CODE_HALF = 5;
+  private static final int KEY_GROUP = 4;
   private static final SecureRandom RANDOM = new SecureRandom();
 
   private final UserMfaRepository enrolments;
@@ -293,7 +295,7 @@ public class MfaService {
     Instant now = clock.instant();
     return devices
         .findByTokenHash(SecureTokens.sha256(deviceToken.trim()))
-        .filter(d -> d.getUsername().equalsIgnoreCase(username))
+        .filter(d -> AsciiCase.equalsIgnoreCase(d.getUsername(), username))
         .filter(d -> now.isBefore(d.getExpiresAt()))
         .isPresent();
   }
@@ -348,11 +350,11 @@ public class MfaService {
 
   private static String groups(String base32) {
     StringBuilder out = new StringBuilder();
-    for (int i = 0; i < base32.length(); i += 4) {
+    for (int i = 0; i < base32.length(); i += KEY_GROUP) {
       if (i > 0) {
         out.append(' ');
       }
-      out.append(base32, i, Math.min(base32.length(), i + 4));
+      out.append(base32, i, Math.min(base32.length(), i + KEY_GROUP));
     }
     return out.toString();
   }

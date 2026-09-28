@@ -79,7 +79,7 @@ function unitActions(
   const childLevel = CHILD_LEVEL[u.level];
   if (childLevel) {
     actions.push({
-      label: `Add ${LEVEL_LABEL[childLevel]}`,
+      label: childLevel === 'TEAM' ? 'Add Team' : 'Add Department',
       onSelect: () => handlers.add({ ...BLANK_FORM, level: childLevel, parentCode: u.code }),
     });
   } else {
@@ -112,25 +112,28 @@ export function useRowActions(handlers: RowHandlers) {
 export const statusOf = (r: OrgRow) =>
   r.kind === 'officer' ? r.officer.recordStatus : r.node.unit.recordStatus;
 
+/** Whether a unit row has a cost centre to show (its own or inherited). */
+const hasCostCenter = (r: OrgRow) => r.kind === 'unit' && Boolean(r.node.costCenter);
+
 export function orgColumns(actionsOf: (row: OrgRow) => RowAction[]): Column<OrgRow>[] {
   return [
-    { key: 'unit', header: 'Unit', render: (r) => <UnitCell row={r} /> },
+    { key: 'unit', header: 'Unit', width: '32%', render: (r) => <UnitCell row={r} /> },
     {
       key: 'level',
       header: 'Level',
-      width: '140px',
+      width: '130px',
       render: (r) => (r.kind === 'officer' ? 'Account Officer' : LEVEL_LABEL[r.node.unit.level]),
     },
     {
       key: 'costCenter',
       header: 'Cost Center',
-      width: '180px',
-      render: (r) => <CostCenterCell row={r} />,
+      width: '150px',
+      render: (r) => (hasCostCenter(r) ? <CostCenterCell row={r} /> : ''),
     },
     {
       key: 'officers',
       header: 'Account Officers',
-      width: '150px',
+      width: '120px',
       render: (r) =>
         r.kind === 'unit' && r.node.unit.level === 'TEAM' ? String(r.activeOfficers) : '',
     },
@@ -149,7 +152,7 @@ export function orgColumns(actionsOf: (row: OrgRow) => RowAction[]): Column<OrgR
       key: 'status',
       header: 'Status',
       kind: 'status',
-      width: '184px',
+      width: '150px',
       render: (r) => <StatusBadge status={statusOf(r)} />,
     },
     {

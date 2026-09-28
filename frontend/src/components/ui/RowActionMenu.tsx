@@ -22,10 +22,16 @@ interface Position {
   right: number;
 }
 
+/** Where the menu opens: under the button, right-aligned with it. */
+function positionOf(button: HTMLButtonElement | null): Position {
+  const rect = button?.getBoundingClientRect();
+  return { top: (rect?.bottom ?? 0) + 4, right: window.innerWidth - (rect?.right ?? 0) };
+}
+
 /**
  * The actions of a table row behind one "more" button (never inline links): a menu of the row's
  * actions, destructive ones last and in red. The menu opens under the button, closes on Escape, a
- * click outside or a scroll, and moves with the arrow keys.
+ * click outside or a scroll, follows the button when the window is resized, and moves with the arrow keys.
  */
 export function RowActionMenu({ label, actions }: Readonly<RowActionMenuProps>) {
   const id = useId();
@@ -51,14 +57,16 @@ export function RowActionMenu({ label, actions }: Readonly<RowActionMenuProps>) 
       }
     };
     const dismiss = () => setPosition(null);
+    // A window resize keeps the menu open under its button.
+    const follow = () => setPosition(positionOf(button.current));
     document.addEventListener('mousedown', outside);
     window.addEventListener('scroll', dismiss, true);
-    window.addEventListener('resize', dismiss);
+    window.addEventListener('resize', follow);
     menu.current?.querySelector<HTMLButtonElement>('[role="menuitem"]:not(:disabled)')?.focus();
     return () => {
       document.removeEventListener('mousedown', outside);
       window.removeEventListener('scroll', dismiss, true);
-      window.removeEventListener('resize', dismiss);
+      window.removeEventListener('resize', follow);
     };
   }, [open]);
   if (actions.length === 0) {
@@ -69,11 +77,7 @@ export function RowActionMenu({ label, actions }: Readonly<RowActionMenuProps>) 
       close(false);
       return;
     }
-    const rect = button.current?.getBoundingClientRect();
-    setPosition({
-      top: (rect?.bottom ?? 0) + 4,
-      right: window.innerWidth - (rect?.right ?? 0),
-    });
+    setPosition(positionOf(button.current));
   };
   const menuKeys = (e: KeyboardEvent<HTMLDivElement>) => {
     const items = Array.from(

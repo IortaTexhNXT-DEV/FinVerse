@@ -167,6 +167,8 @@ describe('RowActionMenu', () => {
     expect(deactivate).toHaveBeenCalled();
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
     await user.click(button);
+    fireEvent(window, new Event('resize'));
+    expect(screen.getByRole('menu')).toBeInTheDocument();
     fireEvent.mouseDown(document.body);
     expect(screen.queryByRole('menu')).not.toBeInTheDocument();
   });

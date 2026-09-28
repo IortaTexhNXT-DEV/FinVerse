@@ -19,10 +19,16 @@ One backend image (`bibs-backend`) runs as three deployments, each with its runt
 
 All pods: HTTPS on 8443, startup / readiness / liveness probes over HTTPS (`/actuator/health/*`, `/healthz`),
 rolling updates with `maxUnavailable: 0`, a `preStop` pause so the load balancer deregisters a pod before it stops.
-Backend pods run as a non-root user with a read-only root file system, no Linux capabilities and the
-`RuntimeDefault` seccomp profile. The backend JVM takes 75 % of the container memory (`JAVA_OPTS`). The frontend
-image runs nginx as root today, so the namespace enforces the `baseline` Pod Security level (and warns on
-`restricted`); an unprivileged nginx base image for the frontend would allow `restricted` for the whole namespace.
+Every pod runs as a non-root user (backend uid/gid 10001, frontend nginx uid/gid 101) with a read-only root file
+system, no Linux capabilities, no privilege escalation and the `RuntimeDefault` seccomp profile; the namespace
+enforces the `restricted` Pod Security level. Writable paths are `emptyDir` volumes: `/tmp` for the backend; the
+rendered configuration (`/etc/nginx/conf.d`), `/var/cache/nginx`, `/var/run` and `/tmp` for nginx. The backend JVM
+takes 75 % of the container memory (`JAVA_OPTS`).
+
+Container images: the frontend runtime image is `nginxinc/nginx-unprivileged` (stable line) listening on 8080
+(plain HTTP, docker compose) and 8443 (TLS, Kubernetes); the backend runs on the Eclipse Temurin 21 JRE. Every base
+image is pinned by digest in the Dockerfiles; the header comment of each Dockerfile says how to refresh a pin. The
+pipeline scans both built images (Trivy) before they are pushed.
 
 ## 2. Manifests (`deploy/k8s`, Kustomize)
 

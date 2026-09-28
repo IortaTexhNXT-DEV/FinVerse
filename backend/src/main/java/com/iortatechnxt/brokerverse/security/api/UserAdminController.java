@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.security.api.dto.RoleResponse;
 import com.iortatechnxt.brokerverse.security.api.dto.UserProfileResponse;
 import com.iortatechnxt.brokerverse.security.api.dto.UserRequest;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
+import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.service.ChangeAuthority;
 import com.iortatechnxt.brokerverse.security.service.RoleEditGuard;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
@@ -127,7 +128,9 @@ public class UserAdminController {
   @GetMapping("/roles")
   @PreAuthorize("hasAnyAuthority('ROLE_MANAGE','USER_MANAGE')")
   public List<RoleResponse> roles() {
-    return service.listRoles().stream().map(RoleResponse::from).toList();
+    return service.listRoles().stream()
+        .map(r -> RoleResponse.from(r, modules.moduleOfProfile(permissionCodes(r))))
+        .toList();
   }
 
   /**
@@ -192,4 +195,8 @@ public class UserAdminController {
    */
   public record CreateUserRequest(
       @Valid UserRequest user, @Valid PasswordChangeRequest initialPassword) {}
+
+  private static List<String> permissionCodes(Role role) {
+    return role.getPermissions().stream().map(Enum::name).toList();
+  }
 }

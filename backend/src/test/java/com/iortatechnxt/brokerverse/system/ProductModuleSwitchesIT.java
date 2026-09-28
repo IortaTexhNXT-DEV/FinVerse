@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.system.domain.ProductModuleSwitchRepository;
 import com.iortatechnxt.brokerverse.system.service.JobRegistry;
 import com.iortatechnxt.brokerverse.system.service.JobRegistry.JobStatus;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -161,5 +162,16 @@ class ProductModuleSwitchesIT {
     JsonNode profiles =
         api.read(api.doGet("admin", "/api/v1/admin/modules/profiles").andExpect(status().isOk()));
     assertThat(profiles.findValuesAsText("code")).contains("INSURANCE_BROKER", "COMPLETE_SUITE");
+  }
+
+  @Test
+  void groupProfilesCarryTheModuleTheyBelongTo() throws Exception {
+    Map<String, String> modules = new HashMap<>();
+    api.read(api.doGet("admin", "/api/v1/nbadmin/roles").andExpect(status().isOk()))
+        .forEach(r -> modules.put(r.get("code").asText(), r.get("module").asText()));
+    assertThat(modules)
+        .containsEntry("DATA_MIGRATION_LEAD", "Data Migration")
+        .containsEntry("DATA_STEWARD", "Data Migration");
+    assertThat(modules.values()).allMatch(m -> !m.isBlank());
   }
 }

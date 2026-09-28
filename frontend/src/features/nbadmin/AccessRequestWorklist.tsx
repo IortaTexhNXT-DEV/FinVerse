@@ -26,6 +26,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { GROUP_TYPES, REQUEST_TYPE_LABELS, USER_TYPES } from './accessRequest';
+import { accessStatusLabel } from './accessStages';
 import { UserName } from '@/components/ui/UserName';
 import { TypedInput } from '@/components/ui/DateInput';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
@@ -162,7 +163,11 @@ const COLUMNS: Column<AccessRequest>[] = [
     header: 'Approver',
     render: (r) => <UserName login={r.lifecycle.assignedApprover ?? r.decidedBy} empty="" />,
   },
-  { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (r) => <StatusBadge status={r.status} label={accessStatusLabel(r.status)} />,
+  },
 ];
 
 /**

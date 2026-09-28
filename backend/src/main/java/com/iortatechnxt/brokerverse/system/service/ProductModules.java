@@ -3,7 +3,10 @@ package com.iortatechnxt.brokerverse.system.service;
 import com.iortatechnxt.brokerverse.common.exception.ModuleNotInUseException;
 import com.iortatechnxt.brokerverse.system.domain.ProductModule;
 import java.util.Collection;
+import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -117,5 +120,34 @@ public class ProductModules {
    */
   public List<String> activePermissions(Collection<String> granted) {
     return granted.stream().filter(this::isPermissionActive).toList();
+  }
+
+  /** Module name of a group profile whose permissions belong to no product module. */
+  public static final String PLATFORM_NAME = "Platform and Administration";
+
+  /**
+   * The product module a group profile belongs to, for grouping the profiles on the screens: the
+   * module most of its permissions belong to (declared by the module or checked by its screens),
+   * {@value #PLATFORM_NAME} when none does.
+   *
+   * @param permissions permission codes of the profile
+   * @return module display name
+   */
+  public String moduleOfProfile(Collection<String> permissions) {
+    Map<ProductModule, Integer> counts = new EnumMap<>(ProductModule.class);
+    for (String permission : permissions) {
+      Set<ProductModule> owners = EnumSet.noneOf(ProductModule.class);
+      ProductModule.owningPermission(permission).ifPresent(owners::add);
+      if (owners.isEmpty()) {
+        for (String code : permissionIndex.modulesUsing(permission)) {
+          ProductModule.byCode(code).ifPresent(owners::add);
+        }
+      }
+      owners.forEach(m -> counts.merge(m, 1, Integer::sum));
+    }
+    return counts.entrySet().stream()
+        .max(Map.Entry.<ProductModule, Integer>comparingByValue())
+        .map(e -> e.getKey().displayName())
+        .orElse(PLATFORM_NAME);
   }
 }

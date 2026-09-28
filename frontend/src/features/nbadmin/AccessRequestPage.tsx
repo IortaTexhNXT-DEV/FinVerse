@@ -13,7 +13,7 @@ import {
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { nbadminApi } from '@/api/nbadmin';
-import type { AccessDecision, AccessRequest } from '@/api/nbadmin';
+import type { AccessDecision, AccessRequest, UserAccess } from '@/api/nbadmin';
 import { useAuth } from '@/auth/authContext';
 import { RecordSummary } from '@/components/broking/RecordSummary';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
@@ -23,11 +23,11 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { formatDate, formatDateTime, titleCase } from '@/utils/format';
 import { requestActions } from './accessActions';
 import type { RequestAction } from './accessActions';
 import { isGroupProfile, REQUEST_TYPE_LABELS } from './accessRequest';
-import { accessRequestMoves, accessRequestStages } from './accessStages';
+import { accessRequestMoves, accessRequestStages, accessStatusLabel } from './accessStages';
 import { StageStepper } from '@/components/broking/StageStepper';
 import { stageSteps } from '@/components/broking/stageSteps';
 import { riskFlagLabel } from './riskFlags';
@@ -118,23 +118,33 @@ function perform(
 
 function decisionText(r: AccessRequest): string {
   if (!r.decidedBy) {
-    return 'Pending';
+    return r.status === 'PENDING' || r.status === 'PENDING_SECOND'
+      ? accessStatusLabel('PENDING')
+      : '';
   }
   const when = `${displayNameOf(r.decidedBy)} · ${formatDateTime(r.decidedAt)}`;
   return r.decisionComment ? `${when} – ${r.decisionComment}` : when;
 }
 
+/** The user a request is about by full name, with the login when the name is known. */
+function subjectName(r: AccessRequest, users: UserAccess[] | undefined): string {
+  const login = r.username ?? '';
+  const name = r.fullName ?? users?.find((u) => u.username === r.username)?.fullName;
+  return name && name !== login ? `${name} (${login})` : login;
+}
+
 function Summary({ request: r }: Readonly<{ request: AccessRequest }>) {
   const roles = useQuery({ queryKey: ['nbadmin', 'roles'], queryFn: nbadminApi.roles });
+  const users = useQuery({ queryKey: ['nbadmin', 'users'], queryFn: nbadminApi.users });
   const profile = roles.data?.find((x) => x.code === r.roleCode)?.name ?? r.roleCode;
-  const who = isGroupProfile(r.type) ? profile : r.username;
+  const who = isGroupProfile(r.type) ? profile : subjectName(r, users.data);
   return (
     <RecordSummary
       title={`${REQUEST_TYPE_LABELS[r.type]} · ${who ?? ''}`}
       chips={
         <>
           <ReferenceChip label="Request" value={r.requestNo} />
-          <StatusBadge status={r.status} />
+          <StatusBadge status={r.status} label={accessStatusLabel(r.status)} />
         </>
       }
       flags={r.lifecycle.riskFlags.map((f) => (
@@ -143,11 +153,8 @@ function Summary({ request: r }: Readonly<{ request: AccessRequest }>) {
         </span>
       ))}
       facts={[
-        {
-          icon: UserRound,
-          label: 'Requested',
-          value: `${displayNameOf(r.requestedBy)} · ${formatDateTime(r.requestedAt)}`,
-        },
+        { icon: UserRound, label: 'Requested By', value: <UserName login={r.requestedBy} /> },
+        { icon: CalendarClock, label: 'Requested On', value: formatDateTime(r.requestedAt) },
         {
           icon: Users,
           label: 'Approver',
@@ -235,7 +242,9 @@ function RequestWorkflow({
         <dl className="workflow-meta-row">
           <div>
             <dt>Current Stage</dt>
-            <dd className="workflow-stage-name">{current?.name ?? humanize(r.status)}</dd>
+            <dd className="workflow-stage-name">
+              {current ? titleCase(current.name) : accessStatusLabel(r.status)}
+            </dd>
           </div>
           <div>
             <dt>Submitted</dt>
@@ -305,7 +314,7 @@ function RequestView({ request: r }: Readonly<{ request: AccessRequest }>) {
       if ('request' in result) {
         setDecision(result);
       }
-      toast.success(`${done.requestNo}: ${humanize(done.status).toLowerCase()}`);
+      toast.success(`${done.requestNo}: ${accessStatusLabel(done.status).toLowerCase()}`);
       await queryClient.invalidateQueries({ queryKey: ['nbadmin'] });
       await queryClient.invalidateQueries({ queryKey: ['approvals'] });
     },

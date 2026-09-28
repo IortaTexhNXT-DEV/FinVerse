@@ -11,6 +11,7 @@ import { useLovLabel } from '@/components/broking/useLabels';
 import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
 import { permissionLabels } from '@/utils/permissionLabel';
 import { isGroupProfile, roleChanges, userStatus } from './accessRequest';
+import { accessStatusLabel } from './accessStages';
 import { UserName } from '@/components/ui/UserName';
 
 interface Row {
@@ -36,17 +37,29 @@ function profileList(codes: string[], names: Names): string {
   return codes.map(names.profile).join(', ');
 }
 
-function rolesRequested(
-  requested: string[],
-  added: string[],
-  removed: string[],
-  names: Names,
-): string {
-  if (added.length + removed.length === 0) {
-    return profileList(requested, names);
-  }
-  const change = `added: ${profileList(added, names) || '—'}; removed: ${profileList(removed, names) || '—'}`;
-  return `${profileList(requested, names)} (${change})`;
+/** A group profile the request adds to or removes from the user. */
+interface ProfileChange {
+  code: string;
+  name: string;
+  change: 'Added' | 'Removed';
+}
+
+const PROFILE_CHANGE_COLUMNS: Column<ProfileChange>[] = [
+  { key: 'n', header: 'Group Profile', render: (c) => c.name },
+  {
+    key: 'c',
+    header: 'Change',
+    render: (c) => (
+      <StatusBadge status={c.change === 'Added' ? 'ADDED' : 'REMOVED'} label={c.change} />
+    ),
+  },
+];
+
+function profileChanges(added: string[], removed: string[], names: Names): ProfileChange[] {
+  return [
+    ...added.map((code) => ({ code, name: names.profile(code), change: 'Added' as const })),
+    ...removed.map((code) => ({ code, name: names.profile(code), change: 'Removed' as const })),
+  ];
 }
 
 function amount(value: number | null | undefined): string | undefined {
@@ -62,7 +75,6 @@ function label(
 
 function userRows(r: AccessRequest, user: UserAccess | undefined, names: Names): Row[] {
   const d = r.details;
-  const { added, removed } = roleChanges(user?.roleCodes ?? [], r.roleCodes);
   const rows: Row[] = [
     { attribute: 'Full name', current: user?.fullName, requested: r.fullName },
     { attribute: 'E-mail', current: user?.email, requested: r.email },
@@ -87,7 +99,7 @@ function userRows(r: AccessRequest, user: UserAccess | undefined, names: Names):
     rows.push({
       attribute: 'Group profiles',
       current: user === undefined ? undefined : profileList(user.roleCodes, names),
-      requested: rolesRequested(r.roleCodes, added, removed, names),
+      requested: profileList(r.roleCodes, names),
     });
   }
   if (user !== undefined) {
@@ -159,6 +171,8 @@ export function RequestDetails({ request: r }: Readonly<{ request: AccessRequest
   };
   const group = isGroupProfile(r.type);
   const user = users.data?.find((u) => u.username === r.username);
+  const { added, removed } = roleChanges(user?.roleCodes ?? [], r.roleCodes);
+  const changes = group ? [] : profileChanges(added, removed, names);
   const members = (users.data ?? [])
     .filter((u) => r.roleCode !== undefined && u.roleCodes.includes(r.roleCode))
     .map((u) => u.username);
@@ -171,6 +185,19 @@ export function RequestDetails({ request: r }: Readonly<{ request: AccessRequest
           rows={group ? profileRows(r, names) : userRows(r, user, names)}
           rowKey={(row) => row.attribute}
         />
+        {changes.length > 0 && (
+          <h3 style={{ margin: 0, fontSize: 'var(--font-size-md, 15px)' }}>
+            Group Profiles Added and Removed
+          </h3>
+        )}
+        {changes.length > 0 && (
+          <DataTable<ProfileChange>
+            caption="Group profiles added and removed"
+            columns={PROFILE_CHANGE_COLUMNS}
+            rows={changes}
+            rowKey={(c) => `${c.change}-${c.code}`}
+          />
+        )}
         <dl className="detail-list">
           {extraFacts(r, members, reason).map(([label, value]) => (
             <Fragment key={label}>
@@ -214,7 +241,11 @@ export function RequestApprovers({ request: r }: Readonly<{ request: AccessReque
 const HISTORY_COLUMNS: Column<AccessRequestEvent>[] = [
   { key: 't', header: 'Date', render: (e) => formatDateTime(e.occurredAt) },
   { key: 'a', header: 'Action', render: (e) => humanize(e.action) },
-  { key: 's', header: 'Status', render: (e) => <StatusBadge full status={e.toStatus} /> },
+  {
+    key: 's',
+    header: 'Status',
+    render: (e) => <StatusBadge full status={e.toStatus} label={accessStatusLabel(e.toStatus)} />,
+  },
   { key: 'u', header: 'By', render: (e) => <UserName login={e.actor} /> },
   { key: 'r', header: 'Remarks', render: (e) => e.remarks ?? '' },
 ];

@@ -1,6 +1,21 @@
 import type { AccessRequest } from '@/api/nbadmin';
 import type { StageDef, StageMove } from '@/components/broking/stageSteps';
+import { humanize } from '@/utils/format';
 import { isGroupProfile } from './accessRequest';
+
+/**
+ * The one label of each access request status on every screen (badge, stepper, decision, history):
+ * a request waiting for its approver is "Pending Approval" everywhere.
+ */
+const ACCESS_STATUS_LABELS: Record<string, string> = {
+  PENDING: 'Pending Approval',
+  PENDING_SECOND: 'Pending Second Approval',
+};
+
+/** The label of an access request (or bulk batch) status. */
+export function accessStatusLabel(status: string): string {
+  return ACCESS_STATUS_LABELS[status] ?? humanize(status);
+}
 
 /**
  * The stages of an access request for its stepper: draft, approval, second approval when the
@@ -13,7 +28,7 @@ export function accessRequestStages(
 ): StageDef[] {
   const stages: StageDef[] = [
     { code: 'DRAFT', name: 'Draft', terminal: false },
-    { code: 'PENDING', name: 'Pending approval', terminal: false },
+    { code: 'PENDING', name: accessStatusLabel('PENDING'), terminal: false },
   ];
   if (r.lifecycle.secondApprovalRequired || r.status === 'PENDING_SECOND') {
     stages.push({ code: 'PENDING_SECOND', name: 'Second approval', terminal: false });

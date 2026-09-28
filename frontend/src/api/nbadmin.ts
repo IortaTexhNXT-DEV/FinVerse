@@ -219,6 +219,8 @@ export interface RoleInfo {
   active: boolean;
   description?: string;
   privilegeLevel: PrivilegeLevel;
+  /** Product module the profile belongs to (grouping of the profile pickers). */
+  module?: string;
 }
 
 export type ActionClass = 'VIEW' | 'CREATE' | 'AMEND' | 'APPROVE';

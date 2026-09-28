@@ -47,6 +47,11 @@ public final class PackageChecks {
 
   private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
 
+  /** Room of a check detail. */
+  private static final int DETAIL_LENGTH = 500;
+
+  private static final String ELLIPSIS = "...";
+
   private PackageChecks() {}
 
   /**
@@ -172,12 +177,16 @@ public final class PackageChecks {
     List<VersionInsurer> insurers = version.getInsurers();
     long rated = insurers.stream().filter(i -> i.rate() != null).count();
     boolean everyInsurerRated = !insurers.isEmpty() && rated == insurers.size();
-    StringBuilder detail = new StringBuilder();
+    StringBuilder detail = new StringBuilder(DETAIL_LENGTH);
     if (scheme.defaultRate() != null) {
       detail.append("Package rate ").append(percent(scheme.defaultRate()));
     } else {
-      detail.append("No package rate; ").append(rated).append(" of ");
-      detail.append(count(insurers.size(), "insurer")).append(" rated");
+      detail
+          .append("No package rate; ")
+          .append(rated)
+          .append(" of ")
+          .append(count(insurers.size(), "insurer"))
+          .append(" rated");
     }
     detail.append(", minimum premium ").append(DisplayFormat.amount(scheme.minimumPremium()));
     if (latest != null) {
@@ -211,7 +220,10 @@ public final class PackageChecks {
       problems.add("not after the start of version " + latest.getVersionNo());
     }
     StringBuilder detail =
-        new StringBuilder("Effective ").append(DisplayFormat.date(from)).append(", package end ");
+        new StringBuilder(DETAIL_LENGTH)
+            .append("Effective ")
+            .append(DisplayFormat.date(from))
+            .append(", package end ");
     if (end == null) {
       detail.append("open");
     } else {
@@ -255,7 +267,10 @@ public final class PackageChecks {
 
   private static ValidationCheck check(
       int seq, String code, String label, boolean passed, String detail) {
-    String text = detail.length() > 500 ? detail.substring(0, 497) + "..." : detail;
+    String text =
+        detail.length() > DETAIL_LENGTH
+            ? detail.substring(0, DETAIL_LENGTH - ELLIPSIS.length()) + ELLIPSIS
+            : detail;
     return new ValidationCheck(seq, code, label, passed ? Result.PASSED : Result.FAILED, text);
   }
 

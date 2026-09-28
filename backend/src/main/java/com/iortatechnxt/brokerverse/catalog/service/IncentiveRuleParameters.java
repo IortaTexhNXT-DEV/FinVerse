@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 public class IncentiveRuleParameters {
 
   private static final String INVALID = "INCENTIVE_RULE_PARAMS_INVALID";
+  private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
 
   /** Kind of value of a parameter. */
   public enum ValueType {
@@ -97,16 +99,7 @@ public class IncentiveRuleParameters {
     if (params == null || params.isBlank()) {
       return;
     }
-    JsonNode node;
-    try {
-      node = json.readTree(params);
-    } catch (JsonProcessingException e) {
-      node = null;
-    }
-    if (node == null || !node.isObject()) {
-      throw new BusinessRuleException(
-          INVALID, "Enter the rule parameters as parameter and value rows");
-    }
+    JsonNode node = rows(params);
     List<String> problems = new ArrayList<>();
     for (Map.Entry<String, JsonNode> field : node.properties()) {
       Optional<Parameter> parameter =
@@ -122,22 +115,40 @@ public class IncentiveRuleParameters {
     }
   }
 
+  private JsonNode rows(String params) {
+    JsonNode node;
+    try {
+      node = json.readTree(params);
+    } catch (JsonProcessingException e) {
+      node = null;
+    }
+    if (node == null || !node.isObject()) {
+      throw new BusinessRuleException(
+          INVALID, "Enter the rule parameters as parameter and value rows");
+    }
+    return node;
+  }
+
   private static Optional<String> problem(Parameter parameter, JsonNode value) {
+    String problem = null;
     if (value == null || value.isNull() || value.asText().isBlank()) {
-      return Optional.of("Enter a value for each parameter");
+      problem = "Enter a value for each parameter";
+    } else if (parameter.valueType() != ValueType.TEXT) {
+      problem = numberProblem(parameter, value);
     }
-    if (parameter.valueType() == ValueType.TEXT) {
-      return Optional.empty();
-    }
+    return Optional.ofNullable(problem);
+  }
+
+  private static String numberProblem(Parameter parameter, JsonNode value) {
+    String problem = null;
     if (!value.isNumber()) {
-      return Optional.of(parameter.label() + " must be a number");
+      problem = parameter.label() + " must be a number";
+    } else if (value.decimalValue().signum() < 0) {
+      problem = parameter.label() + " cannot be negative";
+    } else if (parameter.valueType() == ValueType.PERCENT
+        && value.decimalValue().compareTo(HUNDRED) > 0) {
+      problem = parameter.label() + " must be between 0 and 100";
     }
-    if (value.decimalValue().signum() < 0) {
-      return Optional.of(parameter.label() + " cannot be negative");
-    }
-    if (parameter.valueType() == ValueType.PERCENT && value.decimalValue().intValue() > 100) {
-      return Optional.of(parameter.label() + " must be between 0 and 100");
-    }
-    return Optional.empty();
+    return problem;
   }
 }

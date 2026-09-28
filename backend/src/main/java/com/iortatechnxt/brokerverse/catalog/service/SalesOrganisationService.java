@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.dimension.service.DimensionService;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import java.time.Clock;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -300,21 +301,19 @@ public class SalesOrganisationService implements CatalogRecordHook {
             .filter(o -> unit.getCode().equals(o.getTeamCode()))
             .filter(o -> o.getRecordStatus() != RecordStatus.INACTIVE)
             .count();
-    if (subUnits > 0 || teamOfficers > 0) {
-      StringBuilder open = new StringBuilder();
-      if (subUnits > 0) {
-        open.append(subUnits).append(subUnits == 1 ? " active sub-unit" : " active sub-units");
-      }
-      if (teamOfficers > 0) {
-        open.append(open.isEmpty() ? "" : " and ")
-            .append(teamOfficers)
-            .append(teamOfficers == 1 ? " account officer" : " account officers");
-      }
+    List<String> open = new ArrayList<>();
+    if (subUnits > 0) {
+      open.add(count(subUnits, "active sub-unit"));
+    }
+    if (teamOfficers > 0) {
+      open.add(count(teamOfficers, "account officer"));
+    }
+    if (!open.isEmpty()) {
       throw new BusinessRuleException(
           "SALES_UNIT_IN_USE",
           unit.getCode()
               + " still has "
-              + open
+              + String.join(" and ", open)
               + ": deactivate or move them before deactivating the unit");
     }
   }
@@ -337,6 +336,10 @@ public class SalesOrganisationService implements CatalogRecordHook {
       throw new BusinessRuleException(REASON_REQUIRED, "Enter the reason");
     }
     return reason.strip();
+  }
+
+  private static String count(long n, String noun) {
+    return n + " " + (n == 1 ? noun : noun + "s");
   }
 
   private static String label(SalesLevel level) {

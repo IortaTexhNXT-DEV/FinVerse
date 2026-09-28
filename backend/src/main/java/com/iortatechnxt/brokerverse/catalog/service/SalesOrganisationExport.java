@@ -44,6 +44,9 @@ public class SalesOrganisationExport {
           "Status",
           "Status Reason");
 
+  /** Region, department and team columns. */
+  private static final int LEVELS = SalesLevel.values().length;
+
   private final SalesOrganisationService sales;
   private final UserDirectoryService directory;
   private final DocumentComposer composer;
@@ -89,7 +92,7 @@ public class SalesOrganisationExport {
     Set<String> codes = units.stream().map(SalesUnit::getCode).collect(Collectors.toSet());
     units.stream()
         .filter(u -> u.getParentCode() == null || !codes.contains(u.getParentCode()))
-        .forEach(u -> add(tree, u, new Branch(Arrays.asList(new String[3]), null, null)));
+        .forEach(u -> add(tree, u, new Branch(Arrays.asList(new String[LEVELS]), null, null)));
     return tree.rows();
   }
 

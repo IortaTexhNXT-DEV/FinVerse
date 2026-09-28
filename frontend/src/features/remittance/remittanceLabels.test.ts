@@ -99,7 +99,7 @@ describe('remittance labels', () => {
       'On Hold',
       'Pending Negative Adjustment',
       'Written Off',
-      'Locked by ADJUSTMENT',
+      'Locked by Adjustment',
     ]);
     expect(
       dtipFlags({ hold: false, pendingNegativeAdjustment: false, writtenOff: false } as DtipRow),

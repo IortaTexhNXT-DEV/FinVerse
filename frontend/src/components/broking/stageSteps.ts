@@ -33,9 +33,12 @@ export interface StageMove {
   toStage: string;
 }
 
-/** Stages off the normal path: shown only while the record is in them. */
+/**
+ * Stages off the normal path: shown only while the record is in them (an endorsement posted with
+ * payments still to re-apply is such a detour on the way to Posted).
+ */
 const SIDE =
-  /(^|_)(RETURNED|REJECTED|CANCELLED|CANCEL|VOIDED|DECLINED|WITHDRAWN|INACTIVE|NOT|LOST|ON_HOLD|HOLD|EXTENSION|CORRECTION)(_|$)/;
+  /(^|_)(RETURNED|REJECTED|CANCELLED|CANCEL|VOIDED|DECLINED|WITHDRAWN|INACTIVE|NOT|LOST|ON_HOLD|HOLD|EXTENSION|CORRECTION|REAPPLICATION)(_|$)/;
 /** Stages that end the record off the normal path (shown red). */
 const EXIT =
   /(^|_)(REJECTED|CANCELLED|VOIDED|DECLINED|WITHDRAWN|INACTIVE|NOT_PROCEEDED|NOT_RENEWED|LOST)(_|$)/;

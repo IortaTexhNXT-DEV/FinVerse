@@ -105,7 +105,7 @@ class OpsLedgerDomainTest {
     i.lock("REMITTANCE", "Batch again", "remit", Instant.now());
     assertThat(i.getLockReason()).isEqualTo("Batch again");
     assertThatThrownBy(() -> i.lock("ADJUSTMENT", "Posting", "adjust", Instant.now()))
-        .hasMessageContaining("locked by REMITTANCE");
+        .hasMessageContaining("locked by Remittance");
     i.requireNotLockedByOther("REMITTANCE");
     assertThat(i.unlock("REMITTANCE")).isTrue();
     assertThat(i.getLockOwner()).isNull();

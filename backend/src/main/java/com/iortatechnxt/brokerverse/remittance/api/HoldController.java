@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.HoldStage;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.RequestSource;
 import com.iortatechnxt.brokerverse.remittance.service.HoldService;
 import com.iortatechnxt.brokerverse.remittance.service.RemittanceQueryService;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -43,6 +44,7 @@ public class HoldController {
   private final HoldService holds;
   private final RemittanceQueryService queries;
   private final FlowInService flowIn;
+  private final UserDirectory users;
 
   /**
    * Creates the controller.
@@ -50,11 +52,28 @@ public class HoldController {
    * @param holds hold actions
    * @param queries reads
    * @param flowIn feed uploads
+   * @param users user facts (the processors a hold can be assigned to)
    */
-  public HoldController(HoldService holds, RemittanceQueryService queries, FlowInService flowIn) {
+  public HoldController(
+      HoldService holds,
+      RemittanceQueryService queries,
+      FlowInService flowIn,
+      UserDirectory users) {
     this.holds = holds;
     this.queries = queries;
     this.flowIn = flowIn;
+    this.users = users;
+  }
+
+  /**
+   * The remittance processors an approved hold can be assigned to (MKTID.004), chosen by name.
+   *
+   * @return user names
+   */
+  @GetMapping("/processors")
+  @PreAuthorize(RemittanceAccess.HOLD_APPROVE)
+  public List<String> processors() {
+    return users.usersWithPermission("REMIT_PROCESS");
   }
 
   /**

@@ -1,3 +1,4 @@
+import { moduleLabel } from '@/utils/businessLabels';
 import type {
   Amounts,
   BatchLine,
@@ -136,7 +137,7 @@ export function dtipFlags(row: DtipRow): string[] {
     flags.push('Written Off');
   }
   if (row.lockOwner !== undefined) {
-    flags.push(`Locked by ${row.lockOwner}`);
+    flags.push(`Locked by ${moduleLabel(row.lockOwner)}`);
   }
   return flags;
 }
@@ -195,10 +196,31 @@ export function joinParts(
 }
 
 /** The insurer OR schedule template (RMTID.012; layout parked, OQ22). */
-export const OR_TEMPLATE = 'batchNo,invoiceNo,orNo,orDate,orAmount\n';
+export const OR_TEMPLATE = 'Batch No.,Invoice No.,OR No.,OR Date,OR Amount\n';
 
 /** The Collection hold file template (COLLECTION_HOLD). */
-export const HOLD_TEMPLATE = 'invoiceNo,reasonCode,holdUntil,remarks\n';
+export const HOLD_TEMPLATE = 'Invoice No.,Reason Code,Hold Until,Remarks\n';
 
 /** The Collection special remittance file template (COLLECTION_SPECIAL_REMIT). */
-export const SPECIAL_TEMPLATE = 'invoiceNo,conditionCode,remarks\n';
+export const SPECIAL_TEMPLATE = 'Invoice No.,Condition Code,Remarks\n';
+
+const TRIGGERS: Record<string, string> = {
+  SCHEDULED: 'Scheduled run',
+  MANUAL: 'Run by hand',
+  MANUAL_INVOICE: 'Run by hand for one invoice',
+  EOD_QUEUE: 'End-of-day requests',
+  SPECIAL: 'Special remittance',
+};
+
+/** What started an extraction run, in words. */
+export function triggerLabel(trigger: string): string {
+  return TRIGGERS[trigger] ?? trigger;
+}
+
+/**
+ * The status a hold shows, as its workflow stage reads it: an approved hold is "On Hold" (the
+ * ACTIVE code is never shown as "Active", which read as the record being in force for editing).
+ */
+export function holdStatus(stage: string): string {
+  return stage === 'ACTIVE' ? 'ON_HOLD' : stage;
+}

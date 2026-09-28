@@ -73,7 +73,9 @@ public class InsurerProductionHandler implements FlowInHandler {
     FileKey key = new FileKey(file.fileName(), Sha256.hex(file.content()));
     Optional<String> duplicate = recorder.blockIfDuplicate(key, context.runNo());
     if (duplicate.isPresent()) {
-      throw new BusinessRuleException(ReconUploadRecorder.DUPLICATE, duplicate.get());
+      String earlierUpload = duplicate.get();
+      throw new BusinessRuleException(
+          ReconUploadRecorder.DUPLICATE, "Upload refused: " + earlierUpload);
     }
     ParsedFile parsed;
     try {

@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { InsurerName } from '@/components/broking/LovLabel';
+import { CellStack } from '@/components/ui/CellStack';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -39,7 +41,11 @@ const COLUMNS: Column<Deduction>[] = [
       </>
     ),
   },
-  { key: 'ins', header: 'Insurer', render: (d) => `${d.insurerCode} · ${d.currency}` },
+  {
+    key: 'ins',
+    header: 'Insurer',
+    render: (d) => <CellStack main={<InsurerName code={d.insurerCode} />} sub={d.currency} />,
+  },
   {
     key: 'source',
     header: 'Source',

@@ -128,7 +128,7 @@ public class IncentiveRunService {
     if (scheme.getTiers().isEmpty()) {
       throw new BusinessRuleException(
           "INCENTIVE_SCHEME_EMPTY",
-          "Scheme " + scheme.getName() + " has no tiers yet (targets and amounts from BDOI)");
+          "Scheme " + scheme.getName() + " has no tiers yet: add its targets and amounts first");
     }
     Set<String> rules =
         lovs.activeValues("INCENTIVE_EXCLUSION_RULE", BusinessClock.today(clock)).stream()

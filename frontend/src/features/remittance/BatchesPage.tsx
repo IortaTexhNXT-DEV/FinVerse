@@ -1,4 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { InsurerSelect } from '@/components/broking/InsurerSelect';
+import { InsurerName } from '@/components/broking/LovLabel';
+import { UserName } from '@/components/ui/UserName';
 import { CheckCheck, Send } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -37,7 +40,7 @@ const COLUMNS: Column<BatchSummary>[] = [
       </>
     ),
   },
-  { key: 'ins', header: 'Insurer', render: (b) => b.insurerCode },
+  { key: 'ins', header: 'Insurer', render: (b) => <InsurerName code={b.insurerCode} /> },
   { key: 'type', header: 'Type', render: (b) => <TypeChip type={b.type} /> },
   { key: 'n', header: 'Accounts', numeric: true, render: (b) => b.lineCount },
   {
@@ -53,7 +56,11 @@ const COLUMNS: Column<BatchSummary>[] = [
     render: (b) => <Amount value={b.totals.payable} />,
   },
   { key: 'cur', header: 'Currency', render: (b) => b.currency },
-  { key: 'proc', header: 'Processor', render: (b) => b.processor ?? 'Unassigned' },
+  {
+    key: 'proc',
+    header: 'Processor',
+    render: (b) => <UserName login={b.processor} empty="Unassigned" />,
+  },
   { key: 'dv', header: 'DV No.', render: (b) => b.dvNo ?? '' },
   { key: 'stage', header: 'Status', render: (b) => <StatusBadge status={b.stage} /> },
 ];
@@ -69,16 +76,11 @@ function Filters({
 }>) {
   return (
     <div className="worklist-filters remit-form">
-      <Field label="Insurer Code">
-        {(id) => (
-          <input
-            id={id}
-            className="input"
-            value={insurer}
-            onChange={(e) => onChange(e.target.value, type)}
-          />
-        )}
-      </Field>
+      <Field label="Insurer">
+{(id) => (
+<InsurerSelect id={id} value={insurer} placeholder="All insurers" onChange={(code) => onChange(code, type)} />
+)}
+</Field>
       <Field label="Remittance Type">
         {(id) => (
           <select

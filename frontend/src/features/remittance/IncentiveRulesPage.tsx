@@ -19,6 +19,11 @@ import { remittanceApi } from './api';
 import type { IncentiveRule, IncentiveRuleInput } from './api';
 import './remittance.css';
 import { TypedInput } from '@/components/ui/DateInput';
+import { catalogApi } from '@/api/catalog';
+import { InsurerSelect } from '@/components/broking/InsurerSelect';
+import { InsurerName, LineLabel, LovLabel } from '@/components/broking/LovLabel';
+import { LovSelect } from '@/components/broking/LovSelect';
+import { useInsurerName } from '@/components/broking/useLabels';
 
 type Form = Omit<IncentiveRuleInput, 'companyId' | 'rate' | 'windowDays'> & {
   rate: string;
@@ -66,7 +71,7 @@ function errorsOf(f: Form): Partial<Record<keyof Form, string>> {
   const rate = Number(f.rate);
   const days = Number(f.windowDays);
   if (f.insurerCode.trim() === '') {
-    errors.insurerCode = 'Insurer code is required';
+    errors.insurerCode = 'Select the insurer';
   }
   if (!(rate > 0 && rate <= 100)) {
     errors.rate = 'Rate must be above 0 and at most 100';
@@ -123,6 +128,7 @@ function RuleDialog({
 }>) {
   const [form, setForm] = useState<Form>(() => formOf(rule));
   const [errors, setErrors] = useState<Partial<Record<keyof Form, string>>>({});
+  const lines = useQuery({ queryKey: ['catalog', 'lines'], queryFn: catalogApi.lines });
   const set = (key: keyof Form, value: string | boolean) => setForm({ ...form, [key]: value });
   const save = () => {
     const found = errorsOf(form);
@@ -150,22 +156,44 @@ function RuleDialog({
       <div className="stack">
         <ErrorAlert error={error} />
         <div className="remit-form">
-          <TextField
-            label="Insurer Code"
-            value={form.insurerCode}
-            error={errors.insurerCode}
-            onChange={(v) => set('insurerCode', v)}
-          />
-          <TextField
-            label="Product Line (blank = all)"
-            value={form.productLine ?? ''}
-            onChange={(v) => set('productLine', v)}
-          />
-          <TextField
-            label="Segment (blank = all)"
-            value={form.segment ?? ''}
-            onChange={(v) => set('segment', v)}
-          />
+          <Field label="Insurer" required error={errors.insurerCode}>
+            {(id) => (
+              <InsurerSelect
+                id={id}
+                value={form.insurerCode}
+                aria-invalid={errors.insurerCode !== undefined}
+                onChange={(code) => set('insurerCode', code)}
+              />
+            )}
+          </Field>
+          <Field label="Product Line">
+            {(id) => (
+              <select
+                id={id}
+                className="select"
+                value={form.productLine ?? ''}
+                onChange={(e) => set('productLine', e.target.value)}
+              >
+                <option value="">All product lines</option>
+                {(lines.data ?? []).map((l) => (
+                  <option key={l.code} value={l.code}>
+                    {l.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </Field>
+          <Field label="Segment">
+            {(id) => (
+              <LovSelect
+                id={id}
+                type="MARKET_SEGMENT"
+                value={form.segment ?? ''}
+                placeholder="All segments"
+                onChange={(code) => set('segment', code)}
+              />
+            )}
+          </Field>
           <TextField
             label="Rate (% of basic premium)"
             type="number"
@@ -226,9 +254,17 @@ function RuleDialog({
 }
 
 const COLUMNS: Column<IncentiveRule>[] = [
-  { key: 'ins', header: 'Insurer', render: (r) => r.insurerCode },
-  { key: 'line', header: 'Product Line', render: (r) => r.productLine ?? 'All' },
-  { key: 'seg', header: 'Segment', render: (r) => r.segment ?? 'All' },
+  { key: 'ins', header: 'Insurer', render: (r) => <InsurerName code={r.insurerCode} /> },
+  {
+    key: 'line',
+    header: 'Product Line',
+    render: (r) => (r.productLine ? <LineLabel code={r.productLine} /> : 'All'),
+  },
+  {
+    key: 'seg',
+    header: 'Segment',
+    render: (r) => (r.segment ? <LovLabel type="MARKET_SEGMENT" code={r.segment} /> : 'All'),
+  },
   { key: 'rate', header: 'Rate', numeric: true, render: (r) => `${formatRate(r.rate)}%` },
   {
     key: 'win',
@@ -259,6 +295,7 @@ export default function IncentiveRulesPage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<IncentiveRule | 'new'>();
+  const insurerName = useInsurerName();
   const rules = useQuery({
     queryKey: ['remittance', 'incentive-rules', companyId],
     queryFn: () => remittanceApi.incentiveRules(companyId),
@@ -278,7 +315,7 @@ export default function IncentiveRulesPage() {
     onSuccess: async (r) => {
       setEditing(undefined);
       await queryClient.invalidateQueries({ queryKey: ['remittance', 'incentive-rules'] });
-      toast.success(`Incentive rule of ${r.insurerCode} saved`);
+      toast.success(`Incentive rule of ${insurerName(r.insurerCode)} saved.`);
     },
   });
   const manage = can('REMIT_APPROVE');

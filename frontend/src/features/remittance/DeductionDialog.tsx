@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { InsurerSelect } from '@/components/broking/InsurerSelect';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -100,7 +101,16 @@ export function DeductionDialog({
       <div className="stack">
         <ErrorAlert error={error} />
         <div className="form-grid">
-          <TextField label="Insurer Code" field="insurerCode" maxLength={30} required {...common} />
+          <Field label="Insurer" required error={errors.insurerCode}>
+            {(id) => (
+              <InsurerSelect
+                id={id}
+                value={form.insurerCode}
+                aria-invalid={errors.insurerCode !== undefined}
+                onChange={(code) => common.onChange('insurerCode', code)}
+              />
+            )}
+          </Field>
           <Field label="Currency" required error={errors.currency}>
             {(id) => (
               <select

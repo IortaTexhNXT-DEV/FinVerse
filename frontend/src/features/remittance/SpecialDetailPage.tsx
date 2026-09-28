@@ -1,4 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
+import { CellStack } from '@/components/ui/CellStack';
+import { UserNames } from '@/components/ui/UserNames';
 import { statusMessage } from '@/components/ui/statusTones';
 import { Building2, ClipboardCheck, FileText, Layers, UserRound } from 'lucide-react';
 import { useState } from 'react';
@@ -19,7 +22,6 @@ import { remittanceApi } from './api';
 import type { Special } from './api';
 import { joinParts } from './remittanceLabels';
 import './remittance.css';
-import { displayNameOf } from '@/api/users';
 import { Notice } from '@/components/ui/Notice';
 
 const ENTITY = 'SpecialRemittance';
@@ -34,7 +36,11 @@ function Summary({ special }: Readonly<{ special: Special }>) {
           <StatusBadge status={special.stage} />
         </>
       }
-      flags={<span className="tag">{special.conditionCode}</span>}
+      flags={
+        <span className="tag">
+          <LovLabel type="SPECIAL_REMIT_CONDITION" code={special.conditionCode} />
+        </span>
+      }
       facts={[
         {
           icon: FileText,
@@ -44,12 +50,17 @@ function Summary({ special }: Readonly<{ special: Special }>) {
         {
           icon: Building2,
           label: 'Insurer / Segment',
-          value: `${special.insurerCode} / ${special.segment ?? '—'}`,
+          value: (
+            <CellStack
+              main={<InsurerName code={special.insurerCode} />}
+              sub={<LovLabel type="MARKET_SEGMENT" code={special.segment} />}
+            />
+          ),
         },
         {
           icon: UserRound,
           label: 'Requested / Approved By',
-          value: `${displayNameOf(special.requestedBy)} / ${special.approvedBy ?? '—'}`,
+          value: <UserNames logins={[special.requestedBy, special.approvedBy]} />,
         },
         { icon: ClipboardCheck, label: 'Validation', value: special.validationNote ?? '—' },
         {

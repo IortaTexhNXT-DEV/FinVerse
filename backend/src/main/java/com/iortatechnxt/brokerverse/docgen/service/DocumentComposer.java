@@ -14,6 +14,7 @@ import com.lowagie.text.Font;
 import com.lowagie.text.PageSize;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Phrase;
+import com.lowagie.text.Rectangle;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
@@ -37,6 +38,9 @@ import org.springframework.stereotype.Component;
 @SuppressWarnings({"PMD.LooseCoupling", "PMD.CloseResource"})
 @Component
 public class DocumentComposer {
+
+  /** The most table columns a portrait page holds; wider documents are landscape. */
+  private static final int PORTRAIT_COLUMNS = 9;
 
   private static final Color NAVY = BrandAssets.color(BrandAssets.HEADER_BLUE);
   private static final Color COMPANY_BLUE = BrandAssets.color(BrandAssets.CTA_BLUE);
@@ -113,7 +117,8 @@ public class DocumentComposer {
 
   private static byte[] pdf(DocumentSpec spec, LocalDate date) {
     ByteArrayOutputStream out = new ByteArrayOutputStream();
-    try (Document doc = new Document(PageSize.A4, MARGIN, MARGIN, MARGIN, MARGIN)) {
+    Rectangle page = isWide(spec) ? PageSize.A4.rotate() : PageSize.A4;
+    try (Document doc = new Document(page, MARGIN, MARGIN, MARGIN, MARGIN)) {
       PdfWriter writer = PdfWriter.getInstance(doc, out);
       doc.open();
       writer.setPageEvent(new PdfBrandFooter(DocumentText.pageFooter(spec), "", writer));
@@ -124,6 +129,15 @@ public class DocumentComposer {
       signatures(doc, spec.signatures());
     }
     return out.toByteArray();
+  }
+
+  /**
+   * Whether the document is printed in landscape: a table of more than {@value #PORTRAIT_COLUMNS}
+   * columns (a schedule of accounts) does not fit a portrait page without breaking words.
+   */
+  static boolean isWide(DocumentSpec spec) {
+    return spec.sections().stream()
+        .anyMatch(s -> s instanceof Table t && t.headers().size() > PORTRAIT_COLUMNS);
   }
 
   private static void letterhead(Document doc, DocumentSpec spec, LocalDate date) {

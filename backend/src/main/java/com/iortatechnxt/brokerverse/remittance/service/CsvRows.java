@@ -16,6 +16,19 @@ import java.util.Set;
  */
 public final class CsvRows {
 
+  /** The headers of the upload templates (Holds, Special Remittance, Insurer OR). */
+  private static final Map<String, String> LABELS =
+      Map.of(
+          "invoiceno", "Invoice No.",
+          "reasoncode", "Reason Code",
+          "holduntil", "Hold Until",
+          "remarks", "Remarks",
+          "conditioncode", "Condition Code",
+          "batchno", "Batch No.",
+          "orno", "OR No.",
+          "ordate", "OR Date",
+          "oramount", "OR Amount");
+
   private static final char QUOTE = '"';
 
   private CsvRows() {}
@@ -34,12 +47,13 @@ public final class CsvRows {
       throw new BusinessRuleException("FEED_FILE_EMPTY", "The file has no lines");
     }
     char separator = separatorOf(lines.get(0));
-    List<String> header =
-        split(lines.get(0), separator).stream().map(h -> h.toLowerCase(Locale.ROOT)).toList();
+    List<String> header = split(lines.get(0), separator).stream().map(CsvRows::key).toList();
     for (String column : required) {
-      if (!header.contains(column.toLowerCase(Locale.ROOT))) {
+      if (!header.contains(key(column))) {
         throw new BusinessRuleException(
-            "FEED_FILE_COLUMNS", "The file must have the columns " + String.join(", ", required));
+            "FEED_FILE_COLUMNS",
+            "The file must have the columns "
+                + String.join(", ", required.stream().map(CsvRows::label).sorted().toList()));
       }
     }
     List<Row> rows = new ArrayList<>();
@@ -52,6 +66,30 @@ public final class CsvRows {
       rows.add(new Row(i + 1, lines.get(i), values));
     }
     return rows;
+  }
+
+  /**
+   * The column a header names, whatever its spelling: "Invoice No.", "invoice no" and "invoiceNo"
+   * are the same column; a note in brackets ("Hold Until (dd-MMM-yyyy)") is ignored.
+   *
+   * @param header header text or column name
+   * @return lower-case letters and digits
+   */
+  static String key(String header) {
+    return header
+        .replaceAll("\\([^)]*\\)", "")
+        .toLowerCase(Locale.ROOT)
+        .replaceAll("[^a-z0-9]", "");
+  }
+
+  /**
+   * The header users read for a column of the upload templates.
+   *
+   * @param column column name
+   * @return business header, the column name when unknown
+   */
+  public static String label(String column) {
+    return LABELS.getOrDefault(key(column), column);
   }
 
   private static char separatorOf(String header) {
@@ -84,7 +122,7 @@ public final class CsvRows {
    *
    * @param lineNo line number in the file
    * @param raw raw line (payload of the flow-in record)
-   * @param values values by lower-case column name
+   * @param values values by column key (see {@link CsvRows#key})
    */
   public record Row(int lineNo, String raw, Map<String, String> values) {
 
@@ -100,7 +138,7 @@ public final class CsvRows {
      * @return value, empty when missing
      */
     public String get(String column) {
-      return values.getOrDefault(column.toLowerCase(Locale.ROOT), "");
+      return values.getOrDefault(key(column), "");
     }
 
     /**
@@ -113,7 +151,7 @@ public final class CsvRows {
       String value = get(column);
       if (value.isBlank()) {
         throw new BusinessRuleException(
-            "FEED_VALUE_MISSING", "Line " + lineNo + ": " + column + " is missing");
+            "FEED_VALUE_MISSING", "Line " + lineNo + ": " + label(column) + " is missing");
       }
       return value;
     }

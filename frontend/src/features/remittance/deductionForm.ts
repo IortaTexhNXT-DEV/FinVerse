@@ -66,7 +66,7 @@ export function formOf(d: Deduction): DeductionForm {
 export function deductionErrors(f: DeductionForm, today: string): DeductionErrors {
   const errors: DeductionErrors = {};
   if (f.insurerCode.trim() === '') {
-    errors.insurerCode = 'Insurer code is required';
+    errors.insurerCode = 'Select the insurer';
   }
   if (!/^[A-Z]{3}$/.test(f.currency)) {
     errors.currency = 'Choose the currency';

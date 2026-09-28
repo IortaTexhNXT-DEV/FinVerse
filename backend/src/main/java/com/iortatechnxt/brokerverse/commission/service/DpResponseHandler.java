@@ -106,7 +106,8 @@ public class DpResponseHandler implements FlowInHandler {
       return false;
     }
     throw new BusinessRuleException(
-        "DP_RESPONSE_DECISION", "Decision '" + decision + "' is neither APPROVED nor REJECTED");
+        "DP_RESPONSE_DECISION",
+        "Decision '" + decision + "' is not one of Approved or Rejected (or Yes / No)");
   }
 
   private static String text(Map<String, String> v, String header) {

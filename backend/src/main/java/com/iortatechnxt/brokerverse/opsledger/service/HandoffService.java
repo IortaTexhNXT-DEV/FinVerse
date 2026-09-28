@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsHandoff;
@@ -88,7 +89,7 @@ public class HandoffService {
     notifications.notifyPermission(
         team,
         new Notice(
-            "Work handed over: " + port,
+            "Work handed over: " + DisplayFormat.words(port),
             spec.summary(),
             "/operations/handoffs",
             ENTITY,

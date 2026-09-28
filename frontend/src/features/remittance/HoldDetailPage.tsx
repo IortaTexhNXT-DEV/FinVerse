@@ -1,4 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
+import { UserName } from '@/components/ui/UserName';
+import { UserNames } from '@/components/ui/UserNames';
 import { statusMessage } from '@/components/ui/statusTones';
 import { CalendarClock, FileText, UserRound, Building2 } from 'lucide-react';
 import { useState } from 'react';
@@ -19,9 +22,8 @@ import { formatDate, formatDateTime } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { Hold } from './api';
 import { AssignDialog, ExtendDialog } from './HoldDialogs';
-import { joinParts } from './remittanceLabels';
+import { holdStatus, joinParts } from './remittanceLabels';
 import './remittance.css';
-import { displayNameOf } from '@/api/users';
 
 const ENTITY = 'RemittanceHold';
 
@@ -62,7 +64,7 @@ function Summary({ hold }: Readonly<{ hold: Hold }>) {
       chips={
         <>
           <ReferenceChip label="Hold" value={hold.requestNo} />
-          <StatusBadge status={hold.stage} />
+          <StatusBadge status={holdStatus(hold.stage)} />
         </>
       }
       flags={
@@ -74,7 +76,12 @@ function Summary({ hold }: Readonly<{ hold: Hold }>) {
           label: 'Invoice',
           value: <Link to={remittanceApi.invoiceLink(hold.invoiceNo)}>{hold.invoiceNo}</Link>,
         },
-        { icon: Building2, label: 'Insurer', value: hold.insurerCode },
+        { icon: Building2, label: 'Insurer', value: <InsurerName code={hold.insurerCode} /> },
+        {
+          icon: FileText,
+          label: 'Reason',
+          value: <LovLabel type="HOLD_REASON" code={hold.reasonCode} />,
+        },
         {
           icon: CalendarClock,
           label: 'Hold Until',
@@ -86,9 +93,13 @@ function Summary({ hold }: Readonly<{ hold: Hold }>) {
         {
           icon: UserRound,
           label: 'Requested / Approved By',
-          value: `${displayNameOf(hold.requestedBy)} / ${hold.approvedBy ?? '—'}`,
+          value: <UserNames logins={[hold.requestedBy, hold.approvedBy]} />,
         },
-        { icon: UserRound, label: 'Processor', value: hold.assignedProcessor ?? 'Unassigned' },
+        {
+          icon: UserRound,
+          label: 'Processor',
+          value: <UserName login={hold.assignedProcessor} empty="Unassigned" />,
+        },
       ]}
     />
   );
@@ -106,7 +117,7 @@ function useHoldAction(id: number, done: () => void) {
       queryClient.setQueryData(['remittance', 'hold', id], h);
       await queryClient.invalidateQueries({ queryKey: workflowKey(ENTITY, id) });
       await queryClient.invalidateQueries({ queryKey: ['remittance', 'holds'] });
-      toast.success(statusMessage(h.requestNo, h.stage));
+      toast.success(statusMessage(h.requestNo, holdStatus(h.stage)));
     },
   });
 }

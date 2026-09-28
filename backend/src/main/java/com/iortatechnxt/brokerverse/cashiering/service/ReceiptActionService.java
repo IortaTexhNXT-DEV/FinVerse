@@ -173,7 +173,8 @@ public class ReceiptActionService {
   public ReceiptAction resubmit(Long id) {
     ReceiptAction action = get(id);
     workflow.transition(ENTITY, id.toString(), "submit", TransitionNote.NONE);
-    notifyApprovers(action);
+    notifyApprovers(
+        action, action.getAction() == ReceiptActionType.CANCEL ? "Cancellation" : "Reinstatement");
     return action;
   }
 
@@ -267,17 +268,23 @@ public class ReceiptActionService {
         CashReceiptService.ENTITY,
         receipt.getReceiptNo(),
         AuditAction.SUBMIT,
-        what + " " + action.getTransactionNo() + " requested: " + action.getReasonCode());
-    notifyApprovers(action);
+        what + " " + action.getTransactionNo() + " requested: " + reasonOf(action));
+    notifyApprovers(action, what);
     return action;
   }
 
-  private void notifyApprovers(ReceiptAction action) {
+  /** The reason of a cancellation or reinstatement as its list names it. */
+  private String reasonOf(ReceiptAction action) {
+    String lov = action.getAction() == ReceiptActionType.CANCEL ? CANCEL_REASON : REINSTATE_REASON;
+    return lovs.label(lov, action.getReasonCode());
+  }
+
+  private void notifyApprovers(ReceiptAction action, String what) {
     notifications.notifyPermission(
         "CASH_APPROVE",
         new Notice(
             action.getTransactionNo() + " for approval",
-            action.getAction() + " of receipt, reason " + action.getReasonCode(),
+            what + " of receipt, reason: " + reasonOf(action),
             "/cashiering/receipts/" + action.getReceiptId(),
             ENTITY,
             action.getId().toString()),

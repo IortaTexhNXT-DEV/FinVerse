@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { displayNameOf } from '@/api/users';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { today } from '@/utils/format';
+import { remittanceApi } from './api';
 import type { HoldInput } from './api';
 import { holdFormErrors } from './remittanceLabels';
 import { DateInput } from '@/components/ui/DateInput';
@@ -199,6 +202,10 @@ export function AssignDialog({
 }: Readonly<DialogProps & { onAssign: (username: string) => void }>) {
   const [username, setUsername] = useState('');
   const [invalid, setInvalid] = useState<string>();
+  const processors = useQuery({
+    queryKey: ['remittance', 'hold-processors'],
+    queryFn: remittanceApi.holdProcessors,
+  });
   return (
     <Modal
       title="Assign to Processor"
@@ -211,7 +218,7 @@ export function AssignDialog({
           onClose={onClose}
           onConfirm={() => {
             if (username.trim() === '') {
-              setInvalid('User ID is required');
+              setInvalid('Select the remittance processor');
               return;
             }
             onAssign(username.trim());
@@ -221,17 +228,24 @@ export function AssignDialog({
     >
       <div className="stack">
         <ErrorAlert error={error} />
-        <Field label="Remittance Processor (User ID)" required error={invalid}>
+        <Field label="Remittance Processor" required error={invalid}>
           {(id) => (
-            <input
+            <select
               id={id}
-              className="input"
+              className="select"
               value={username}
               onChange={(e) => {
                 setUsername(e.target.value);
                 setInvalid(undefined);
               }}
-            />
+            >
+              <option value="">Select…</option>
+              {(processors.data ?? []).map((login) => (
+                <option key={login} value={login}>
+                  {displayNameOf(login)}
+                </option>
+              ))}
+            </select>
           )}
         </Field>
       </div>

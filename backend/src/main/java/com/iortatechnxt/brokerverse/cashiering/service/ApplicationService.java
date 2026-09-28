@@ -261,7 +261,10 @@ public class ApplicationService {
             new Realized(app.getRealizedCommission().negate(), app.getRealizedVat().negate()));
     String batch =
         posting.publish(
-            context(invoice, today, "Reversal of " + app.reference() + ": " + reason),
+            context(
+                invoice,
+                today,
+                "Reversal of the payment applied to " + app.getInvoiceNo() + ": " + reason),
             CashieringPosting.PAYMENT_APPLY,
             reversalRef,
             amounts);

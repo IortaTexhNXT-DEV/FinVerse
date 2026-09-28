@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.adjustment.service;
 import com.iortatechnxt.brokerverse.adjustment.domain.EndorsementRequest;
 import com.iortatechnxt.brokerverse.adjustment.domain.EndorsementRequestRepository;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.opsledger.domain.InvoiceFlag;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerService;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerService.FlagChange;
@@ -75,7 +76,10 @@ public class InvoiceGuard {
       ledger.unlock(
           invoiceOf(request),
           Adjustments.MODULE,
-          "Endorsement request " + request.getRequestNo() + " " + request.getStage());
+          "Endorsement request "
+              + request.getRequestNo()
+              + " "
+              + DisplayFormat.words(request.getStage()));
     }
   }
 

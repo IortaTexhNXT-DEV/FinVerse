@@ -396,6 +396,7 @@ export const remittanceApi = {
       `${BASE}/holds${toQuery({ companyId, stage: stages, q: q || undefined, page, size: 20 })}`,
     ),
   hold: (id: number) => api.get<Hold>(`${BASE}/holds/${id}`),
+  holdProcessors: () => api.get<string[]>(`${BASE}/holds/processors`),
   createHold: (body: HoldInput) => api.post<Hold>(`${BASE}/holds`, body),
   holdAction: (id: number, action: string, body?: unknown) =>
     api.post<Hold>(`${BASE}/holds/${id}/${action}`, body),

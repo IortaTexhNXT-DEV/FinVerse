@@ -72,14 +72,26 @@ export function TemplateButton({ name, content }: Readonly<{ name: string; conte
 /** A file picker with its upload button (manual transport of the feeds). */
 export function UploadForm({
   label,
+  columns,
   busy,
   onUpload,
-}: Readonly<{ label: string; busy: boolean; onUpload: (file: File) => void }>) {
+}: Readonly<{
+  label: string;
+  /** The columns of the file as the template names them. */
+  columns: string;
+  busy: boolean;
+  onUpload: (file: File) => void;
+}>) {
   const [file, setFile] = useState<File>();
   const [error, setError] = useState<string>();
   return (
     <div className="remit-form">
-      <Field label={label} required error={error} hint="CSV, semicolon or tab separated text">
+      <Field
+        label={label}
+        required
+        error={error}
+        hint={`CSV or text file with the columns of the template: ${columns}. Dates as dd-MMM-yyyy.`}
+      >
         {(id) => (
           <FileDropZone
             id={id}

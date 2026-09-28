@@ -1,4 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { InsurerName } from '@/components/broking/LovLabel';
+import { CellStack } from '@/components/ui/CellStack';
+import { statusLabel } from '@/components/ui/statusTones';
 import {
   Building2,
   FileSpreadsheet,
@@ -26,7 +29,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDateTime, humanize } from '@/utils/format';
+import { formatAmount, formatDateTime } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { Batch, DocumentKind } from './api';
 import { ApproveDialog, PreviewDialog, SendScheduleDialog } from './BatchDialogs';
@@ -53,7 +56,7 @@ function disbursementText(batch: Batch): string {
     return d.status === 'NOT_REQUIRED' ? 'Settled by deductions' : 'Not sent';
   }
   const dv = batch.summary.dvNo === undefined ? undefined : `DV ${batch.summary.dvNo}`;
-  return joinParts([d.requestNo, humanize(d.status ?? ''), dv]);
+  return joinParts([d.requestNo, d.status ? `Disbursement ${statusLabel(d.status)}` : '', dv]);
 }
 
 /** Which batch actions the user may take now. */
@@ -84,8 +87,16 @@ function Summary({ batch }: Readonly<{ batch: Batch }>) {
         </>
       }
       facts={[
-        { icon: Building2, label: 'Insurer', value: `${s.insurerCode} · ${s.currency}` },
-        { icon: UserRound, label: 'Processor', value: s.processor ?? 'Unassigned' },
+        {
+          icon: Building2,
+          label: 'Insurer',
+          value: <CellStack main={<InsurerName code={s.insurerCode} />} sub={s.currency} />,
+        },
+        {
+          icon: UserRound,
+          label: 'Processor',
+          value: <UserName login={s.processor} empty="Unassigned" />,
+        },
         { icon: ListChecks, label: 'Accounts', value: `${s.lineCount} of ${batch.lines.length}` },
         {
           icon: Wallet,
@@ -230,7 +241,7 @@ function orText(no: string | undefined, status: string | undefined): string {
   if (no !== undefined) {
     return no;
   }
-  return status === undefined || status === 'NONE' ? '—' : humanize(status);
+  return status === undefined || status === 'NONE' ? '—' : statusLabel(status);
 }
 
 export default function BatchDetailPage() {

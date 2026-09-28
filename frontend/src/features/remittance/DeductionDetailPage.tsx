@@ -1,4 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { InsurerName } from '@/components/broking/LovLabel';
+import { useInsurerName } from '@/components/broking/useLabels';
+import { UserName } from '@/components/ui/UserName';
 import { statusMessage } from '@/components/ui/statusTones';
 import { Building2, FileCheck2, Pencil, Scale, UserRound } from 'lucide-react';
 import { useState } from 'react';
@@ -30,7 +33,6 @@ import { deductionsApi } from './deductionsApi';
 import type { Deduction, DeductionApplication } from './deductionsApi';
 import { joinParts } from './remittanceLabels';
 import './remittance.css';
-import { displayNameOf } from '@/api/users';
 
 const ENTITY = 'RemittanceDeduction';
 const TABS = [
@@ -61,9 +63,10 @@ const APPLICATION_COLUMNS: Column<DeductionApplication>[] = [
 ];
 
 function Summary({ d }: Readonly<{ d: Deduction }>) {
+  const insurerName = useInsurerName();
   return (
     <RecordSummary
-      title={`${d.insurerCode} · ${humanize(d.sourceType)}`}
+      title={`${insurerName(d.insurerCode)} · ${humanize(d.sourceType)}`}
       chips={
         <>
           <ReferenceChip label="Deduction" value={d.deductionNo} />
@@ -72,7 +75,7 @@ function Summary({ d }: Readonly<{ d: Deduction }>) {
       }
       flags={<span className="tag">{d.currency}</span>}
       facts={[
-        { icon: Building2, label: 'Insurer', value: d.insurerCode },
+        { icon: Building2, label: 'Insurer', value: <InsurerName code={d.insurerCode} /> },
         {
           icon: Scale,
           label: 'Amount / Applied / Remaining',
@@ -88,7 +91,11 @@ function Summary({ d }: Readonly<{ d: Deduction }>) {
         {
           icon: UserRound,
           label: 'Prepared / Confirmed By',
-          value: `${displayNameOf(d.createdBy)} / ${d.confirmedBy ?? '—'}`,
+          value: (
+            <>
+              <UserName login={d.createdBy} /> / {d.confirmedBy ?? '—'}
+            </>
+          ),
         },
       ]}
     />

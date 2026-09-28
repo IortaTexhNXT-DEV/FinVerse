@@ -1,3 +1,4 @@
+import { LovLabel } from '@/components/broking/LovLabel';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Ban, RotateCcw } from 'lucide-react';
 import { useState } from 'react';
@@ -18,6 +19,7 @@ import { ExcludeDialog } from './BatchDialogs';
 import { isExcluded } from './remittanceLabels';
 import './remittance.css';
 import { UserName } from '@/components/ui/UserName';
+import { CellStack } from '@/components/ui/CellStack';
 
 function amountColumn(
   key: string,
@@ -40,14 +42,35 @@ const COLUMNS: Column<BatchLine>[] = [
       </span>
     ),
   },
-  { key: 'assured', header: 'Name of Assured', render: (l) => l.assuredName },
-  { key: 'paidOn', header: 'Last Paid', render: (l) => formatDate(l.lastPaidOn) },
+  {
+    key: 'assured',
+    header: 'Assured / Last Paid',
+    render: (l) => <CellStack main={l.assuredName} sub={formatDate(l.lastPaidOn)} />,
+  },
   amountColumn('paid', 'Paid AR', (l) => l.amounts.paidAr),
-  amountColumn('comm', 'Commission', (l) => l.amounts.commission),
-  amountColumn('vat', 'VAT', (l) => l.amounts.commissionVat),
+  {
+    key: 'comm',
+    header: 'Commission / VAT',
+    numeric: true,
+    render: (l) => (
+      <CellStack
+        main={<Amount value={l.amounts.commission} />}
+        sub={<Amount value={l.amounts.commissionVat} />}
+      />
+    ),
+  },
   amountColumn('wtax', 'WTAX', (l) => l.amounts.wtax),
-  amountColumn('inc', 'Incentive', (l) => l.amounts.incentive + l.amounts.incentiveVat),
-  amountColumn('cpc2', 'CPC2', (l) => l.amounts.cpc2 + l.amounts.cpc2Vat),
+  {
+    key: 'inc',
+    header: 'Incentive / CPC2',
+    numeric: true,
+    render: (l) => (
+      <CellStack
+        main={<Amount value={l.amounts.incentive + l.amounts.incentiveVat} />}
+        sub={<Amount value={l.amounts.cpc2 + l.amounts.cpc2Vat} />}
+      />
+    ),
+  },
   amountColumn('net', 'Net Due', (l) => l.amounts.netDue),
   {
     key: 'or',
@@ -86,7 +109,7 @@ function ExclusionsPanel({
       {excluded.map((l) => (
         <div key={l.invoiceNo} className="remit-exclusion">
           <strong>{l.invoiceNo}</strong>
-          <span>{l.exclusion?.reason}</span>
+          <LovLabel type="REMIT_EXCLUSION_REASON" code={l.exclusion?.reason} />
           {l.exclusion?.comment !== undefined && (
             <span className="remit-muted">{l.exclusion.comment}</span>
           )}

@@ -33,9 +33,11 @@ public final class DisplayFormat {
       DateTimeFormatter.ofPattern(DATE_PATTERN + " HH:mm", Locale.ENGLISH);
   private static final int RATE_DECIMALS = 4;
 
-  /** Codes kept in capitals when a status is written as words. */
+  /** Codes kept in capitals when a status is written as words (DV_ASSIGNED is "DV assigned"). */
   private static final Set<String> ACRONYMS =
-      Set.of("ARN", "CBG", "FFY", "IA", "KYC", "PN", "PRF", "PS", "QS", "SI", "TSU");
+      Set.of(
+          "AP", "AR", "ARN", "BDOI", "BIR", "CBG", "CPC2", "CWT", "DST", "DTIP", "DV", "EOD", "FFY",
+          "IA", "KYC", "OR", "OTC", "PDC", "PN", "PRF", "PS", "QS", "SI", "TSU", "VAT");
 
   private DisplayFormat() {}
 

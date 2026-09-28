@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.security.domain.Permission;
 import com.iortatechnxt.brokerverse.security.service.ChangeAuthority;
 import com.iortatechnxt.brokerverse.security.service.RoleEditGuard;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
+import com.iortatechnxt.brokerverse.system.service.ProductModules;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -37,16 +38,20 @@ public class UserAdminController {
 
   private final UserAdminService service;
   private final RoleEditGuard guard;
+  private final ProductModules modules;
 
   /**
    * Creates the controller.
    *
    * @param service user administration
    * @param guard role edit guard
+   * @param modules product module switches
    */
-  public UserAdminController(UserAdminService service, RoleEditGuard guard) {
+  public UserAdminController(
+      UserAdminService service, RoleEditGuard guard, ProductModules modules) {
     this.service = service;
     this.guard = guard;
+    this.modules = modules;
   }
 
   /**
@@ -126,14 +131,17 @@ public class UserAdminController {
   }
 
   /**
-   * Lists the permissions a role can be given (the insurer-only permissions are not offered).
+   * Lists the permissions a role can be given (the insurer-only permissions and the permissions of
+   * switched-off product modules are not offered).
    *
    * @return permissions
    */
   @GetMapping("/permissions")
   @PreAuthorize(ROLES)
   public List<Permission> permissions() {
-    return Permission.offered();
+    return Permission.offered().stream()
+        .filter(p -> modules.isPermissionActive(p.name()))
+        .toList();
   }
 
   /**

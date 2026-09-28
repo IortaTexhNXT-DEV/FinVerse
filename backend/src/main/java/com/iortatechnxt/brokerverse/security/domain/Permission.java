@@ -20,6 +20,9 @@ public enum Permission {
   ROLE_MANAGE,
   SYSTEM_PARAMETER_MANAGE,
   AUDIT_VIEW,
+  // Product module switches of the deployment: request (system administrator) and approve (V1160)
+  PRODUCT_MODULE_MANAGE,
+  PRODUCT_MODULE_APPROVE,
 
   // Master data (maker / checker)
   MASTER_VIEW,

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
 import com.iortatechnxt.brokerverse.security.domain.Permission;
+import com.iortatechnxt.brokerverse.system.service.ProductModules;
 import java.util.List;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -24,14 +25,17 @@ public class PermissionActions {
       """;
 
   private final JdbcTemplate jdbc;
+  private final ProductModules modules;
 
   /**
    * Creates the reader.
    *
    * @param jdbc JDBC access
+   * @param modules product module switches (permissions of switched-off modules are not listed)
    */
-  public PermissionActions(JdbcTemplate jdbc) {
+  public PermissionActions(JdbcTemplate jdbc, ProductModules modules) {
     this.jdbc = jdbc;
+    this.modules = modules;
   }
 
   /**
@@ -51,6 +55,7 @@ public class PermissionActions {
             area)
         .stream()
         .filter(a -> Permission.isOffered(a.permission()))
+        .filter(a -> modules.isPermissionActive(a.permission()))
         .toList();
   }
 

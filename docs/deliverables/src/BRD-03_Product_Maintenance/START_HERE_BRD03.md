@@ -91,7 +91,7 @@ The signatories sign the Sign-off certificate sheet of the sign-off workbook in 
 
 # Configuration inputs
 
-The workbook of configuration input templates lists what the business provides to set up Product Maintenance and to load it at go-live: the product catalogue, coverages and rules, clauses, rate tables, insurers and commission rates, the packages in force, the package map, the document templates, the lists of values and the incentive criteria (FRS chapter 19). The owners start the templates during the review; the final content follows the data migration mocks and is due at the map freeze.
+The workbook of configuration input templates lists what the business provides to set up Product Maintenance and to load it at go-live: the product catalogue, coverages and rules, clauses, rate tables, insurers and commission rates, the packages in force, the package map, the document templates, the lists of values and the incentive criteria (FRS chapter 19). The owners start the templates during the review; the final content follows the data migration mocks and is due at the map freeze. The workbook opens on a Start here sheet with the templates in the order they are filled in and a link to each; every template sheet carries its own guide above the columns (mandatory, format, allowed values, what to enter), drop-downs and one example row, and questions are raised in the workbook on the sheet Questions and comments.
 
 # Change control after sign-off
 

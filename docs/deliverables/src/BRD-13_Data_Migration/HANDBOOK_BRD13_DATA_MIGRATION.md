@@ -64,7 +64,7 @@ source: pack/pack.yaml
 render: guide-map
 ```
 
-The load templates are not issued as loose files. The Migration Console exports them from the layouts it holds (Layouts and Rules: a CSV template per layout, a workbook per object and one workbook of all templates, with the control-file template and the filling rules); the Migration Workbook lists the same layouts column for column for the review.
+The load templates are not issued as loose files. The Migration Console exports them from the layouts it holds (Layouts and Rules: a CSV template per layout, a workbook per object and one workbook of all templates, with the control-file template and the filling rules); the Migration Workbook lists the same layouts column for column for the review: the sheet Load templates is the index in load order, and each layout has a sheet of its own with the guide of every column (mandatory, format, allowed values or code map, what to enter, the check applied when the file is loaded) directly above the header row, the BU review rows, one made-up example row and the allowed values on the sheet Reference lists.
 
 ## Scope and basis
 
@@ -336,7 +336,7 @@ Figure 1 shows the steps every object goes through, and who does each step.
 
 ## Extract templates
 
-BDOI extracts each object in its layouts. The layouts are held by the Migration Console (Layouts and Rules), which exports them as load templates: a CSV template per layout with the column names as its header row, a workbook per object and one workbook of all templates with the column descriptions, the control-file template and the filling rules. A layout gives, per column: name, description, type and length, mandatory flag, allowed values or code map, format, example and validation. The Migration Workbook lists every layout on a sheet of its own, with the same sheet name as the console workbook, for the review.
+BDOI extracts each object in its layouts. The layouts are held by the Migration Console (Layouts and Rules), which exports them as load templates: a CSV template per layout with the column names as its header row, a workbook per object and one workbook of all templates with the column descriptions, the control-file template and the filling rules. A layout gives, per column: name, description, type and length, mandatory flag, allowed values or code map, format, example and validation. The Migration Workbook lists every layout on a sheet of its own, with the same sheet name as the console workbook, for the review: the guide of each column sits directly above the header row of the file, with the BU review rows above it; the sheet Load templates lists the layouts in load order.
 
 ```pack
 plugin: build_dm_pack.py
@@ -579,7 +579,7 @@ The transition follows the renewal expiry month (RMEL, BRID 12.1). BDOI answered
 <!-- table: widths=3.2,9.6,3.8 caption="Excel intake of the RA-sent file (DMQ38)" size=8.5 -->
 | Step | What happens | Who |
 |---|---|---|
-| Template | The load template workbook of object P03, exported by the Migration Console (first sheet with the header row, the Columns sheet with the allowed values, the How to fill sheet); the CSV template is also accepted | Migration Console |
+| Template | The load template workbook of object P03, exported by the Migration Console (the template sheet with the guide rows Mandatory, Format, Allowed values and What to enter directly above the header row, and the Lists sheet with the allowed values); the CSV template is also accepted | Migration Console |
 | Compilation and check | The maker copies the RA rows of the Retail and Corporate trackers into the template; the checker compares the file with the trackers (counts per tracker, 10 sample rows) and releases it | Renewal processing team - maker, checker |
 | Validation | Header in P01; expiry equal to the header and from go-live to 31 May 2028; RA date not after the last legacy business day (warning when more than 140 days before expiry); cover not already renewed in legacy; one row per expiring term | BIBS |
 | Rejection report | The rejected rows of the P03 batch in Excel (Rejects on the batch) with the row, column, value and message, and columns for the maker's correction and the checker's review | BIBS |

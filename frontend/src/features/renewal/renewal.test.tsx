@@ -143,7 +143,8 @@ describe('Renewal module', () => {
     expect(screen.getByText('Exception')).toBeInTheDocument();
     expect(screen.getByText('Urgent')).toBeInTheDocument();
     expect(screen.getByText('Outstanding')).toBeInTheDocument();
-    expect(screen.getByText(': Blocked', { exact: false })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: 'B' })).toBeInTheDocument();
+    expect(screen.getByRole('cell', { name: 'Blocked' })).toBeInTheDocument();
     fireEvent.click(screen.getAllByRole('button', { name: 'Close' })[0]!);
     expect(onClose).toHaveBeenCalled();
   });

@@ -2377,7 +2377,7 @@ rules:
   - [R1, "Recipients from the insurer branch's placement addresses.", Configurable, Insurer master]
   - [R2, "Only the e-mail channel is available (Q06).", Fixed, "-"]
 validations:
-  - [Insurer set up for a channel other than e-mail, "<insurer> is set up for <channel> placements; only e-mail is available (Q06)", PLACEMENT_CHANNEL_PARKED]
+  - [Insurer set up for a channel other than e-mail, "<insurer> is set up for <channel> placements; only e-mail is available: set the insurer to e-mail placement", PLACEMENT_CHANNEL_PARKED]
   - [Superseded slip, "Slip <number> v<n> was replaced by a new version", SLIP_SUPERSEDED]
 notifications:
   - "Processing is notified of failed dispatches."

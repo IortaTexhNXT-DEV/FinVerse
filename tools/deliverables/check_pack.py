@@ -9,6 +9,8 @@ Errors:
   * an older version of a document next to a newer one in the same folder of out/ (only current documents remain);
   * a BRD folder of an issued sign-off release set (brand.SIGNOFF_SETS) without one of the standard files 00 to 05
     (brand.READING_ORDER); for the other BRDs a missing standard file is only a warning until their set is issued;
+  * a drop-level set (brand.DROP_SETS, for example the Drop 0 closure set) without one of its files, or with a file
+    that is not one of them in the version of the set;
   * a restricted word in a source of docs/deliverables/src, in a README of out/, or in the text of a generated Word,
     Excel or PowerPoint file;
   * development-status wording or an internal engineering reference in the text of a client document in out/ (Word
@@ -79,6 +81,8 @@ BUILD_STATUS: list[tuple[str, re.Pattern]] = [(label, re.compile(pat, re.I)) for
 ]]
 NAME_RE = re.compile(r"(?:(?P<order>\d\d)_)?BIBS_(?P<type>[A-Za-z_]+?)_(?P<brd>BRD-\d\d)_(?P<name>.+?)"
                      r"_v(?P<ver>\d+(?:\.\d+)*)\.(?P<ext>\w+)$")
+# A document of a drop-level set (brand.DROP_SETS): <nn>_BIBS_<Drop-n>_<Name>_v<version>.<ext>.
+DROP_NAME_RE = re.compile(r"(?:(?P<order>\d\d)_)?BIBS_(?P<drop>Drop-\d)_(?P<name>.+?)_v(?P<ver>\d+(?:\.\d+)*)\.(?P<ext>\w+)$")
 
 
 def files(root: Path):
@@ -110,6 +114,10 @@ def stale_versions() -> list[str]:
         m = NAME_RE.match(p.name)
         if m:
             groups[(p.parent, m["type"], m["brd"], m["name"], m["ext"])].append((m["ver"], p))
+            continue
+        m = DROP_NAME_RE.match(p.name)
+        if m:
+            groups[(p.parent, "Drop", m["drop"], m["name"], m["ext"])].append((m["ver"], p))
     for key, versions in groups.items():
         if len(versions) > 1:
             versions.sort(key=lambda x: _version(x[0]))
@@ -133,6 +141,18 @@ def release_sets() -> tuple[list[str], list[str]]:
         else:
             warnings.append(f"{brd} {name}: sign-off set not yet issued ({len(missing)} of the standard files 00-05 "
                             "to come)")
+    # drop-level sets (the closure set of a drop): every file of the set in its folder, in the version of the set
+    for drop, spec in brand.DROP_SETS.items():
+        folder = brand.drop_set_dir(drop)
+        for order, (name, ext, _) in spec["files"].items():
+            file = folder / brand.drop_output_name(drop, name, str(spec["version"]), ext)
+            if not file.exists():
+                errors.append(f"{drop} closure set: {order} {name} missing in {rel(folder)} ({file.name})")
+        for p in folder.glob("*"):
+            if p.is_file() and not p.name.startswith(("~$", ".")) and p.suffix in OFFICE_SUFFIXES:
+                m = DROP_NAME_RE.match(p.name)
+                if not m or m["ver"] != str(spec["version"]) or m["order"] not in spec["files"]:
+                    errors.append(f"{drop} closure set: {rel(p)} is not a file of the set v{spec['version']}")
     return errors, warnings
 
 

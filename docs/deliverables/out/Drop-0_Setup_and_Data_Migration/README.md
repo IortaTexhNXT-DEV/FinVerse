@@ -16,8 +16,12 @@ and signed off together; in an
 issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, "Release and
 sign-off per BRD"). Each document is kept once, in its latest version.
 
+The drop-level set `Drop-0_Closure/` (v2.0) covers the whole drop: 01 Configuration inputs workbook (Excel); 02 Closure summary (Word). Its workbook lists every configuration input BDOI provides before go-live with its owner, due date and one route (screen, template or data migration object).
+
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
+| Configuration Inputs | - | Configuration inputs workbook (Excel) | 2.0 | [`Drop-0_Closure/01_BIBS_Drop-0_Configuration_Inputs_v2.0.xlsx`](Drop-0_Closure/01_BIBS_Drop-0_Configuration_Inputs_v2.0.xlsx) |
+| Closure Summary | - | Closure summary (Word) | 2.0 | [`Drop-0_Closure/02_BIBS_Drop-0_Closure_Summary_v2.0.docx`](Drop-0_Closure/02_BIBS_Drop-0_Closure_Summary_v2.0.docx) |
 | Product Maintenance | BRD-03 | Start here guide | 2.0 | [`BRD-03_Product_Maintenance/00_BIBS_StartHere_BRD-03_Product_Maintenance_v2.0.docx`](BRD-03_Product_Maintenance/00_BIBS_StartHere_BRD-03_Product_Maintenance_v2.0.docx) |
 | Product Maintenance | BRD-03 | Sign-off pack guide deck | 2.0 | [`BRD-03_Product_Maintenance/01_BIBS_GuideDeck_BRD-03_Product_Maintenance_v2.0.pptx`](BRD-03_Product_Maintenance/01_BIBS_GuideDeck_BRD-03_Product_Maintenance_v2.0.pptx) |
 | Product Maintenance | BRD-03 | FRS | 2.0 | [`BRD-03_Product_Maintenance/02_BIBS_FRS_BRD-03_Product_Maintenance_v2.0.docx`](BRD-03_Product_Maintenance/02_BIBS_FRS_BRD-03_Product_Maintenance_v2.0.docx) |

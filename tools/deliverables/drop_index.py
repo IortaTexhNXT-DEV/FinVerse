@@ -83,10 +83,18 @@ KINDS = {
 # Order of the kinds inside a release set.
 KIND_ORDER = ["StartHere", "GuideDeck", "ReleaseNote", "FRS", "Handbook", "Signoff", "Workbook", "TestPlan"]
 NAME_RE = re.compile(r"(?:\d\d_)?BIBS_(?P<type>[A-Za-z_]+?)_(?P<brd>BRD-\d\d)_(?P<name>.+?)_v(?P<ver>\d+\.\d+)\.(?P<ext>\w+)$")
+# A document of a drop-level set (brand.DROP_SETS): <nn>_BIBS_<Drop-n>_<Name>_v<version>.<ext>.
+DROP_NAME_RE = re.compile(r"(?:(?P<order>\d\d)_)?BIBS_(?P<drop>Drop-\d)_(?P<name>.+?)_v(?P<ver>\d+\.\d+)\.(?P<ext>\w+)$")
 
 
 def describe(path: Path, kind: str | None = None) -> tuple[str, str, str, str]:
     """(document, BRD, kind, version) of an output file; the kind comes from the file name when not given."""
+    d = DROP_NAME_RE.match(path.name)
+    if d:
+        drop = d["drop"].replace("-", " ")
+        files = brand.DROP_SETS.get(drop, {}).get("files", {})
+        label = files[d["order"]][2] if d["order"] in files else "Drop document"
+        return d["name"].replace("_", " "), "-", label, d["ver"]
     m = NAME_RE.match(path.name)
     if m:
         kind = kind or m["type"]
@@ -101,6 +109,8 @@ def describe(path: Path, kind: str | None = None) -> tuple[str, str, str, str]:
 
 
 def brd_sort(row: tuple[str, str, str, str, str]) -> tuple:
+    if DROP_NAME_RE.match(row[4].rsplit("/", 1)[-1]):  # the drop-level set first, in its reading order
+        return ("", 0, row[4].rsplit("/", 1)[-1], row[0], row[2], row[3])
     m = NAME_RE.match(row[4].rsplit("/", 1)[-1])
     kind = m["type"] if m else "~"
     order = KIND_ORDER.index(kind) if kind in KIND_ORDER else len(KIND_ORDER)
@@ -118,13 +128,26 @@ def is_listed(path: Path, root: Path) -> bool:
     return not path.name.startswith(("~$", ".")) and path.suffix.lower() != ".pdf"
 
 
+def closure_note(key: str) -> list[str]:
+    """The paragraph on the drop-level set of a drop (brand.DROP_SETS), when it has one."""
+    spec = brand.DROP_SETS.get(key)
+    if not spec:
+        return []
+    files = "; ".join(f"{o} {v[2]}" for o, v in spec["files"].items())
+    return ["",
+            f"The drop-level set `{spec['folder']}/` (v{spec['version']}) covers the whole drop: {files}. Its "
+            "workbook lists every configuration input BDOI provides before go-live with its owner, due date and one "
+            "route (screen, template or data migration object)."]
+
+
 def write_index(key: str) -> Path:
     drop = brand.DROPS[key]
     root = brand.OUT_DIR / drop["folder"]
     rows = []
     for kind_dir in sorted(p for p in root.iterdir() if p.is_dir() and not p.name.startswith(("_", "."))):
-        # A BRD release-set folder (BRD-nn_Name) takes the kind from each file name; Programme keeps kind folders.
-        kind = None if kind_dir.name.startswith("BRD-") else kind_dir.name
+        # A BRD release-set folder (BRD-nn_Name) and the drop-level set folder (Drop-n_Closure) take the kind from
+        # each file name; Programme keeps kind folders.
+        kind = None if kind_dir.name.startswith(("BRD-", "Drop-")) else kind_dir.name
         for f in sorted(kind_dir.rglob("*")):
             if not is_listed(f, root):
                 continue
@@ -153,6 +176,7 @@ def write_index(key: str) -> Path:
         "and signed off together; in an",
         "issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, \"Release and",
         "sign-off per BRD\"). Each document is kept once, in its latest version.",
+        *closure_note(key),
         "",
         "| Document | BRD | Kind | Version | File |",
         "|---|---|---|---|---|",

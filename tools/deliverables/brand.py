@@ -268,3 +268,39 @@ def output_name(doc_type: str, brd: str, name: str, version: str, ext: str) -> s
     if SIGNOFF_SETS.get(brd) == str(version) and key in order:
         prefix = order[key] + "_"
     return f"{prefix}BIBS_{doc_type}_{brd}_{safe}_v{version}.{ext.lstrip('.')}"
+
+
+# Drop-level sets: documents that cover a whole drop rather than one BRD (the closure set of a drop). They live in
+# their own folder of the drop folder, carry the reading-order prefix of the set and the drop in place of the BRD in
+# their name: <nn>_BIBS_<Drop-n>_<Name>_v<version>.<ext>. check_pack requires every file of an issued set;
+# drop_index lists them.
+DROP_SETS: dict[str, dict[str, object]] = {
+    "Drop 0": {
+        "folder": "Drop-0_Closure",
+        "version": "2.0",
+        "files": {"01": ("Configuration_Inputs", "xlsx", "Configuration inputs workbook (Excel)"),
+                  "02": ("Closure_Summary", "docx", "Closure summary (Word)")},
+    },
+}
+
+
+def drop_code(drop: str) -> str:
+    """Drop-0 for "Drop 0"."""
+    return drop.replace(" ", "-")
+
+
+def drop_set_dir(drop: str) -> Path:
+    """Folder of the drop-level set of a drop: out/<drop folder>/<Drop-n>_Closure/."""
+    return OUT_DIR / DROPS[drop]["folder"] / str(DROP_SETS[drop]["folder"])
+
+
+def drop_output_name(drop: str, name: str, version: str, ext: str) -> str:
+    """File name of a document of a drop-level set, with its reading-order prefix.
+
+    >>> drop_output_name("Drop 0", "Configuration_Inputs", "2.0", "xlsx")
+    '01_BIBS_Drop-0_Configuration_Inputs_v2.0.xlsx'
+    """
+    files = DROP_SETS[drop]["files"]
+    order = next((k for k, v in files.items() if v[0] == name), None)  # type: ignore[union-attr]
+    prefix = f"{order}_" if order and str(DROP_SETS[drop]["version"]) == str(version) else ""
+    return f"{prefix}BIBS_{drop_code(drop)}_{name}_v{version}.{ext.lstrip('.')}"

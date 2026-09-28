@@ -13,6 +13,8 @@ repository.
 | `render.py` | PDF conversion with LibreOffice and page PNG previews / contact sheets |
 | `code_facts.py` | Facts read from the code for the documents: sidebar menus and screens (`frontend_menu`, `menu_for`, `menu_path`), role grants replayed from the migrations (`role_grants`), workflow stages and actions (`workflows`), server messages (`backend_messages`, `platform_messages`), screen messages (`frontend_messages`), upload templates (`bulk_templates`). `python tools/deliverables/code_facts.py --self-check`; `--menu ROLE`, `--messages PKG...`, `--ui DIR...` print them |
 | `drop_index.py` | Writes the index `README.md` of every drop folder |
+| `drop_closure.py` | The closure set of a drop (`brand.DROP_SETS`): for Drop 0 the configuration inputs workbook (01) and the closure summary (02) from `docs/deliverables/src/Drop-0_Closure/`, the BRD-03 and BRD-11 templates, the BRD-13 catalogue and the platform reference data; `--check` refuses a seeded master table without exactly one register item, a list, parameter, event or document template without one route, an unknown screen, migration object or template field |
+| `sql_facts.py` | Reference rows of the migration scripts without a database (`rows`), table columns (`columns`) and the tables the seed data fills (`seed_tables`) |
 | `check_pack.py` | Fails on duplicated files (by content), older versions next to newer ones in `out/`, an issued sign-off set without its files 00-05, and restricted words; run before committing the pack |
 
 ## Set-up

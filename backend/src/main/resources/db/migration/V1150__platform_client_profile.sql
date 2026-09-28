@@ -30,3 +30,17 @@ set head_office_code = (select b.code from org_branch b
 where c.head_office_code is null;
 
 alter table org_company alter column short_name set not null;
+
+-- A company created without a short name takes its code, as the existing companies above.
+create or replace function org_company_default_short_name() returns trigger language plpgsql as $$
+begin
+  if new.short_name is null or btrim(new.short_name) = '' then
+    new.short_name := new.code;
+  end if;
+  return new;
+end;
+$$;
+
+create trigger org_company_short_name_default
+  before insert or update of short_name on org_company
+  for each row execute function org_company_default_short_name();

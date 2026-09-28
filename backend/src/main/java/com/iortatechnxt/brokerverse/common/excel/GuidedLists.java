@@ -27,6 +27,7 @@ final class GuidedLists {
   private static final int CODE_WIDTH = 18;
   private static final int LABEL_WIDTH = 42;
   private static final int CHARACTER = 256;
+  private static final int LETTERS = 26;
 
   private final Map<List<Choice>, List<String>> lists = new LinkedHashMap<>();
 
@@ -81,22 +82,22 @@ final class GuidedLists {
     }
     Sheet sheet = wb.createSheet(SHEET);
     Row title = sheet.createRow(0);
-    set(title, 0, "Lists of values").setCellStyle(styles.title);
+    set(title, 0, "Lists of values").setCellStyle(styles.title());
     set(
             sheet.createRow(1),
             0,
             "The drop-downs of the template take their codes from here. Enter the code.")
-        .setCellStyle(styles.info);
-    Row names = sheet.createRow(2);
-    Row heads = sheet.createRow(3);
+        .setCellStyle(styles.info());
+    Row names = sheet.createRow(FIRST_VALUE_ROW - 2);
+    Row heads = sheet.createRow(FIRST_VALUE_ROW - 1);
     int block = 0;
     for (Map.Entry<List<Choice>, List<String>> e : lists.entrySet()) {
       int c = block * 2;
       sheet.setColumnWidth(c, CODE_WIDTH * CHARACTER);
       sheet.setColumnWidth(c + 1, LABEL_WIDTH * CHARACTER);
-      set(names, c, String.join(", ", e.getValue())).setCellStyle(styles.infoLabel);
-      set(heads, c, "Code").setCellStyle(styles.listHead);
-      set(heads, c + 1, "Label").setCellStyle(styles.listHead);
+      set(names, c, String.join(", ", e.getValue())).setCellStyle(styles.infoLabel());
+      set(heads, c, "Code").setCellStyle(styles.listHead());
+      set(heads, c + 1, "Label").setCellStyle(styles.listHead());
       List<Choice> values = e.getKey();
       for (int i = 0; i < values.size(); i++) {
         Row row = row(sheet, FIRST_VALUE_ROW + i);
@@ -127,9 +128,9 @@ final class GuidedLists {
     StringBuilder out = new StringBuilder();
     int n = index + 1;
     while (n > 0) {
-      int rem = (n - 1) % 26;
+      int rem = (n - 1) % LETTERS;
       out.insert(0, (char) ('A' + rem));
-      n = (n - 1) / 26;
+      n = (n - 1) / LETTERS;
     }
     return out.toString();
   }

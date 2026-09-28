@@ -123,7 +123,13 @@ public class ArchiveLoader implements MigrationLoader {
         throw detailsError(e);
       }
     }
-    for (String pair : trimmed.split(";")) {
+    return pairs(trimmed);
+  }
+
+  /** "Label: value; Label: value" as an ordered map. */
+  private static Map<String, String> pairs(String text) {
+    Map<String, String> out = new LinkedHashMap<>();
+    for (String pair : text.split(";")) {
       if (pair.isBlank()) {
         continue;
       }

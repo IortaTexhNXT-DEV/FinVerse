@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 public class CwtTagHandler implements BulkImportHandler {
 
   private static final String PATH = "Path";
+  private static final String BY_CERTIFICATE = "CERTIFICATE";
   private static final String CERTIFICATE = "Certificate no";
   private static final Set<String> PATHS = Set.of("CASH", "CERTIFICATE");
 
@@ -67,11 +68,11 @@ public class CwtTagHandler implements BulkImportHandler {
             .master("invoice"),
         new BulkColumn(
             "Amount", "Amount of the 2% tax; blank for the expected 2%", false, Type.NUMBER, ""),
-        BulkColumn.required(PATH, "How the tax is settled", "CERTIFICATE")
+        BulkColumn.required(PATH, "How the tax is settled", BY_CERTIFICATE)
             .choices(
                 List.of(
                     new Choice("CASH", "Paid in cash by the client"),
-                    new Choice("CERTIFICATE", "Covered by a BIR 2307 certificate"))),
+                    new Choice(BY_CERTIFICATE, "Covered by a BIR 2307 certificate"))),
         BulkColumn.optional(CERTIFICATE, "Number of the BIR 2307 certificate", "2307-2026-0001")
             .when("the path is CERTIFICATE"),
         new BulkColumn(

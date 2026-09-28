@@ -34,6 +34,7 @@ public final class BudgetTemplate {
   public static final String ANNUAL = "annual";
 
   private static final int MAX_ERRORS = 20;
+  private static final int MONTH_WIDTH = 12;
   private static final String BY_MONTH = "the amounts are given by month";
 
   private BudgetTemplate() {}
@@ -73,7 +74,7 @@ public final class BudgetTemplate {
       columns.add(
           GuideColumn.of(month(m), Kind.AMOUNT, "Budget of " + name)
               .when(BY_MONTH)
-              .width(12)
+              .width(MONTH_WIDTH)
               .example("300000.00"));
     }
     columns.add(
@@ -114,23 +115,27 @@ public final class BudgetTemplate {
       if (errors.size() >= MAX_ERRORS) {
         break;
       }
-      String prefix = "Row " + row.rowNo() + ": ";
-      Map<String, String> v = row.values();
-      String account = v.get(ACCOUNT);
-      if (account == null || account.isBlank()) {
-        errors.add(prefix + "account code is missing");
-        continue;
-      }
-      try {
-        lines.add(new ParsedLine(account.strip(), costCentre(v), months(v)));
-      } catch (NumberFormatException e) {
-        errors.add(prefix + "amounts must be numbers");
-      }
+      line(row, lines, errors);
     }
     if (!errors.isEmpty()) {
       throw invalid(errors);
     }
     return lines;
+  }
+
+  private static void line(ParsedFile.RawRow row, List<ParsedLine> lines, List<String> errors) {
+    String prefix = "Row " + row.rowNo() + ": ";
+    Map<String, String> v = row.values();
+    String account = v.get(ACCOUNT);
+    if (account == null || account.isBlank()) {
+      errors.add(prefix + "account code is missing");
+      return;
+    }
+    try {
+      lines.add(new ParsedLine(account.strip(), costCentre(v), months(v)));
+    } catch (NumberFormatException e) {
+      errors.add(prefix + "amounts must be numbers");
+    }
   }
 
   private static String costCentre(Map<String, String> v) {

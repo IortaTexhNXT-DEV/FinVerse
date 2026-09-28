@@ -44,9 +44,15 @@ public final class GuidedTemplateWriter {
 
   private static final int LABEL_WIDTH = 24;
   private static final int MIN_INFO_SPAN = 6;
-  private static final float LINE_POINTS = 12.5f;
+  static final float LINE_POINTS = 12.5f;
   private static final float TITLE_POINTS = 24f;
-  private static final int CHARACTER = 256;
+  static final int CHARACTER = 256;
+  private static final int HEADER_PADDING = 4;
+  private static final int MIN_WIDTH = 16;
+  private static final int MAX_WIDTH = 30;
+  private static final int START_SHEET_WIDTH = 40;
+  private static final int START_TEXT_WIDTH = 80;
+  private static final double CHARS_PER_WIDTH = 1.3;
 
   private GuidedTemplateWriter() {}
 
@@ -101,9 +107,9 @@ public final class GuidedTemplateWriter {
     int r = titleBlock(sheet, styles, t, index, span);
     r++;
     int bandStart = r;
-    r = band(sheet, styles, columns, r);
+    r = GuidedBand.band(sheet, styles, columns, r);
     int headerRow = r;
-    headerRow(sheet, styles, columns, headerRow);
+    GuidedBand.headerRow(sheet, styles, columns, headerRow);
     int firstData = examples(sheet, styles, gs, headerRow + 1);
     GuidedChecks.apply(sheet, columns, lists, headerRow + 1, headerRow + t.maxRows());
     sheet.createFreezePane(FIRST_COLUMN, headerRow + 1);
@@ -116,7 +122,7 @@ public final class GuidedTemplateWriter {
     if (c.width() > 0) {
       return c.width();
     }
-    return Math.clamp(c.shownHeader().length() + 4L, 16, 30);
+    return Math.clamp(c.shownHeader().length() + (long) HEADER_PADDING, MIN_WIDTH, MAX_WIDTH);
   }
 
   /** Title and information rows; returns the next free row. */
@@ -126,7 +132,7 @@ public final class GuidedTemplateWriter {
     boolean multi = t.sheets().size() > 1;
     Row title = sheet.createRow(0);
     title.setHeightInPoints(TITLE_POINTS);
-    text(title, 0, multi ? t.name() + " – " + gs.title() : t.name(), styles.title);
+    text(title, 0, multi ? t.name() + " – " + gs.title() : t.name(), styles.title());
     int r = 1;
     List<String[]> info = new ArrayList<>();
     if (multi) {
@@ -177,8 +183,8 @@ public final class GuidedTemplateWriter {
   private static void infoRow(
       Sheet sheet, GuidedStyles styles, int r, String label, String value, int span) {
     Row row = sheet.createRow(r);
-    text(row, 0, label, styles.infoLabel);
-    text(row, FIRST_COLUMN, value, styles.info);
+    text(row, 0, label, styles.infoLabel());
+    text(row, FIRST_COLUMN, value, styles.info());
     int last = FIRST_COLUMN + span - 1;
     if (last > FIRST_COLUMN) {
       sheet.addMergedRegion(new CellRangeAddress(r, r, FIRST_COLUMN, last));
@@ -190,68 +196,12 @@ public final class GuidedTemplateWriter {
     row.setHeightInPoints(LINE_POINTS * lines(value, chars) + 2);
   }
 
-  /** The four guide rows; returns the header row index. */
-  private static int band(Sheet sheet, GuidedStyles styles, List<GuideColumn> columns, int from) {
-    int r = from;
-    for (String label : GuidedTables.BAND_LABELS) {
-      Row row = sheet.createRow(r);
-      text(row, 0, label, styles.bandLabel);
-      int height = 1;
-      for (int c = 0; c < columns.size(); c++) {
-        GuideColumn col = columns.get(c);
-        String value = bandValue(label, col);
-        CellStyle style =
-            "Mandatory".equals(label) && col.need() != GuideColumn.Need.NO
-                ? styles.bandMandatory
-                : styles.band;
-        text(row, FIRST_COLUMN + c, value, style);
-        int width = sheet.getColumnWidth(FIRST_COLUMN + c) / CHARACTER;
-        height = Math.max(height, lines(value, width));
-      }
-      row.setHeightInPoints(LINE_POINTS * Math.min(height, maxLines(label)) + 3);
-      r++;
-    }
-    return r;
-  }
-
-  private static int maxLines(String label) {
-    return switch (label) {
-      case "Allowed values" -> 8;
-      case "What to enter" -> 6;
-      default -> 4;
-    };
-  }
-
-  private static String bandValue(String label, GuideColumn col) {
-    return switch (label) {
-      case "Mandatory" -> col.needText();
-      case "Format" -> col.formatText();
-      case "Allowed values" -> col.allowedText(GuidedLists.SHOWN_IN_BAND);
-      default -> col.whatToEnter();
-    };
-  }
-
-  private static void headerRow(
-      Sheet sheet, GuidedStyles styles, List<GuideColumn> columns, int r) {
-    Row row = sheet.createRow(r);
-    text(row, 0, GuidedTables.HEADER_CORNER, styles.headerCorner);
-    int height = 1;
-    for (int c = 0; c < columns.size(); c++) {
-      GuideColumn col = columns.get(c);
-      Cell cell = text(row, FIRST_COLUMN + c, col.shownHeader(), styles.header);
-      GuidedChecks.note(sheet, cell, col);
-      int width = sheet.getColumnWidth(FIRST_COLUMN + c) / CHARACTER;
-      height = Math.max(height, lines(col.shownHeader(), width));
-    }
-    row.setHeightInPoints((LINE_POINTS + 2) * height + 4);
-  }
-
   /** Example rows; returns the first row after them. */
   private static int examples(Sheet sheet, GuidedStyles styles, GuidedSheet gs, int from) {
     int r = from;
     for (List<String> values : gs.examples()) {
       Row row = sheet.createRow(r++);
-      text(row, 0, GuidedTables.EXAMPLE_MARKER, styles.exampleLabel);
+      text(row, 0, GuidedTables.EXAMPLE_MARKER, styles.exampleLabel());
       for (int c = 0; c < gs.columns().size(); c++) {
         Kind kind = gs.columns().get(c).kind();
         String v = c < values.size() && values.get(c) != null ? values.get(c) : "";
@@ -290,11 +240,11 @@ public final class GuidedTemplateWriter {
   private static void startSheet(XSSFWorkbook wb, GuidedStyles styles, GuidedTemplate t) {
     Sheet sheet = wb.createSheet(START_SHEET);
     sheet.setColumnWidth(0, LABEL_WIDTH * CHARACTER);
-    sheet.setColumnWidth(FIRST_COLUMN, 40 * CHARACTER);
-    sheet.setColumnWidth(FIRST_COLUMN + 1, 80 * CHARACTER);
+    sheet.setColumnWidth(FIRST_COLUMN, START_SHEET_WIDTH * CHARACTER);
+    sheet.setColumnWidth(FIRST_COLUMN + 1, START_TEXT_WIDTH * CHARACTER);
     Row title = sheet.createRow(0);
     title.setHeightInPoints(TITLE_POINTS);
-    text(title, 0, t.name(), styles.title);
+    text(title, 0, t.name(), styles.title());
     int r = 1;
     infoRow(sheet, styles, r++, "What it is for", t.purpose(), 2);
     infoRow(sheet, styles, r++, "Who fills it in", t.filledBy(), 2);
@@ -304,19 +254,19 @@ public final class GuidedTemplateWriter {
     }
     r++;
     Row head = sheet.createRow(r++);
-    text(head, 0, "Step", styles.header);
-    text(head, FIRST_COLUMN, "Sheet", styles.header);
-    text(head, FIRST_COLUMN + 1, "What it holds", styles.header);
+    text(head, 0, "Step", styles.header());
+    text(head, FIRST_COLUMN, "Sheet", styles.header());
+    text(head, FIRST_COLUMN + 1, "What it holds", styles.header());
     for (int i = 0; i < t.sheets().size(); i++) {
       GuidedSheet gs = t.sheets().get(i);
       Row row = sheet.createRow(r++);
-      text(row, 0, String.valueOf(i + 1), styles.info);
-      Cell link = text(row, FIRST_COLUMN, gs.title(), styles.link);
+      text(row, 0, String.valueOf(i + 1), styles.info());
+      Cell link = text(row, FIRST_COLUMN, gs.title(), styles.link());
       XSSFHyperlink h = wb.getCreationHelper().createHyperlink(HyperlinkType.DOCUMENT);
       h.setAddress("'" + gs.name().replace("'", "''") + "'!A1");
       link.setHyperlink(h);
-      text(row, FIRST_COLUMN + 1, gs.intro(), styles.info);
-      row.setHeightInPoints(LINE_POINTS * lines(gs.intro(), 80) + 2);
+      text(row, FIRST_COLUMN + 1, gs.intro(), styles.info());
+      row.setHeightInPoints(LINE_POINTS * lines(gs.intro(), START_TEXT_WIDTH) + 2);
     }
     sheet.setActiveCell(new CellAddress(0, 0));
   }
@@ -334,7 +284,7 @@ public final class GuidedTemplateWriter {
     sheet.getFooter().setCenter("Page &P of &N");
   }
 
-  private static Cell text(Row row, int column, String value, CellStyle style) {
+  static Cell text(Row row, int column, String value, CellStyle style) {
     Cell cell = row.createCell(column);
     cell.setCellValue(value);
     cell.setCellStyle(style);
@@ -349,7 +299,7 @@ public final class GuidedTemplateWriter {
    * @return lines, at least 1
    */
   static int lines(String text, int width) {
-    int perLine = Math.max(1, (int) (width * 1.3));
+    int perLine = Math.max(1, (int) (width * CHARS_PER_WIDTH));
     int lines = 0;
     for (String part : text.split("\n", -1)) {
       lines += Math.max(1, (part.length() + perLine - 1) / perLine);

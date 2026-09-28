@@ -102,7 +102,7 @@ public final class GuidedWorkbook implements AutoCloseable {
    * @return style
    */
   public CellStyle markedStyle(boolean date) {
-    return date ? styles.markedDate : styles.marked;
+    return date ? styles.markedDate() : styles.marked();
   }
 
   /**

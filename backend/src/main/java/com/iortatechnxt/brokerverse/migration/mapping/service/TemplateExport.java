@@ -139,7 +139,7 @@ public class TemplateExport {
    * @return XLSX bytes
    */
   public byte[] controlWorkbook() {
-    return GuidedTemplateWriter.write(LayoutTemplates.control(CONTROL_COLUMNS));
+    return GuidedTemplateWriter.write(ControlTemplate.of(CONTROL_COLUMNS));
   }
 
   /**

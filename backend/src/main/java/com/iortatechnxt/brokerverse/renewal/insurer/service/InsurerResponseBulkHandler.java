@@ -40,6 +40,7 @@ public class InsurerResponseBulkHandler implements BulkImportHandler {
   private static final String REJECT_ACTION = "Reject Action";
   private static final String REMARKS = "Remarks";
   private static final String REMARKET = "REMARKET";
+  private static final String REVISED = "Response is Revise";
 
   private final RenewalCandidateRepository candidates;
   private final RenewalInsurerResponseService responses;
@@ -90,12 +91,12 @@ public class InsurerResponseBulkHandler implements BulkImportHandler {
             .values("Renew As Is", "Revise", "Reject"),
         BulkColumn.optional(INSURER_REF, "Insurer reference", "REN-55012"),
         new BulkColumn(PREMIUM, "Revised gross premium", false, BulkColumn.Type.NUMBER, "")
-            .when("Response is Revise"),
+            .when(REVISED),
         new BulkColumn(SUM_INSURED, "Revised sum insured", false, BulkColumn.Type.NUMBER, "")
-            .when("Response is Revise"),
+            .when(REVISED),
         new BulkColumn(RATE, "Revised rate in percent", false, BulkColumn.Type.NUMBER, "")
-            .when("Response is Revise"),
-        BulkColumn.optional(TERMS, "Revised terms", "").when("Response is Revise"),
+            .when(REVISED),
+        BulkColumn.optional(TERMS, "Revised terms", "").when(REVISED),
         new BulkColumn(RECEIVED, "Date received", false, BulkColumn.Type.DATE, "2027-08-15"),
         BulkColumn.optional(
                 REJECT_ACTION, "What follows a rejection; blank for Not for renewal", "")

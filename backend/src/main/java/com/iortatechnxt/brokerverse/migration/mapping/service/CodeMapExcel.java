@@ -46,6 +46,8 @@ public class CodeMapExcel {
           "target_code",
           "remarks");
 
+  private static final String ACTION = "action";
+
   private final BulkFileReader reader;
 
   /**
@@ -115,10 +117,10 @@ public class CodeMapExcel {
         GuideColumn.of(COLUMNS.get(1), Kind.TEXT, "Code as stored in the legacy system")
             .mandatory(),
         GuideColumn.of(COLUMNS.get(2), Kind.TEXT, "Description of the code in the legacy system"),
-        GuideColumn.of(COLUMNS.get(3), Kind.TEXT, "Field that qualifies the code, when any"),
-        GuideColumn.of(COLUMNS.get(4), Kind.TEXT, "Value of the qualifier")
+        GuideColumn.of("qualifier", Kind.TEXT, "Field that qualifies the code, when any"),
+        GuideColumn.of("qualifier_value", Kind.TEXT, "Value of the qualifier")
             .when("a qualifier is given"),
-        GuideColumn.of(COLUMNS.get(5), Kind.TEXT, "What the load does with the code")
+        GuideColumn.of(ACTION, Kind.TEXT, "What the load does with the code")
             .mandatory()
             .choices(
                 List.of(
@@ -126,9 +128,9 @@ public class CodeMapExcel {
                     new Choice("DEFAULT", "Map to the default target of the set"),
                     new Choice("REJECT", "Reject the row"),
                     new Choice("CREATE", "Create a new BIBS value"))),
-        GuideColumn.of(COLUMNS.get(6), Kind.TEXT, "BIBS code the legacy code becomes")
+        GuideColumn.of("target_code", Kind.TEXT, "BIBS code the legacy code becomes")
             .when("action is MAP or CREATE"),
-        GuideColumn.of(COLUMNS.get(7), Kind.TEXT, "Remarks"));
+        GuideColumn.of("remarks", Kind.TEXT, "Remarks"));
   }
 
   private static String sheet(String setCode) {
@@ -145,7 +147,7 @@ public class CodeMapExcel {
    */
   public List<EntryData> read(String fileName, byte[] content) {
     ParsedFile parsed = reader.read(fileName, content, TextLayout.AUTO, COLUMNS);
-    if (!parsed.headers().containsAll(List.of("source_system", "legacy_code", "action"))) {
+    if (!parsed.headers().containsAll(List.of("source_system", "legacy_code", ACTION))) {
       throw new BusinessRuleException(
           "MIG_MAP_IMPORT_LAYOUT",
           "The file must have the columns source_system, legacy_code and action");
@@ -160,7 +162,7 @@ public class CodeMapExcel {
               v.get("legacy_description"),
               v.get("qualifier"),
               v.get("qualifier_value"),
-              action(row.rowNo(), v.get("action")),
+              action(row.rowNo(), v.get(ACTION)),
               v.get("target_code"),
               v.get("remarks")));
     }

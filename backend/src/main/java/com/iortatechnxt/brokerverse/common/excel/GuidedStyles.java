@@ -26,25 +26,27 @@ final class GuidedStyles {
   private static final byte[] EXAMPLE_FILL = {(byte) 0xF2, (byte) 0xF2, (byte) 0xF2};
   private static final byte[] ERROR_FILL = {(byte) 0xFF, (byte) 0xE0, (byte) 0xE0};
   private static final byte[] ERROR_TEXT = {(byte) 0x9C, 0x00, 0x06};
+  private static final byte[] LINK = {0x05, 0x63, (byte) 0xC1};
+  private static final byte[] BORDER = {(byte) 0xBF, (byte) 0xC9, (byte) 0xD6};
   private static final short TITLE_POINTS = 16;
   private static final short SMALL_POINTS = 9;
 
   private final XSSFWorkbook wb;
   private final Map<Kind, CellStyle> plain = new EnumMap<>(Kind.class);
   private final Map<Kind, CellStyle> examples = new EnumMap<>(Kind.class);
-  final CellStyle title;
-  final CellStyle infoLabel;
-  final CellStyle info;
-  final CellStyle bandLabel;
-  final CellStyle band;
-  final CellStyle bandMandatory;
-  final CellStyle header;
-  final CellStyle headerCorner;
-  final CellStyle exampleLabel;
-  final CellStyle listHead;
-  final CellStyle link;
-  final CellStyle marked;
-  final CellStyle markedDate;
+  private final CellStyle title;
+  private final CellStyle infoLabel;
+  private final CellStyle info;
+  private final CellStyle bandLabel;
+  private final CellStyle band;
+  private final CellStyle bandMandatory;
+  private final CellStyle header;
+  private final CellStyle headerCorner;
+  private final CellStyle exampleLabel;
+  private final CellStyle listHead;
+  private final CellStyle link;
+  private final CellStyle marked;
+  private final CellStyle markedDate;
 
   GuidedStyles(XSSFWorkbook wb) {
     this.wb = wb;
@@ -58,7 +60,7 @@ final class GuidedStyles {
     headerCorner = bordered(style(font(false, SMALL_POINTS, null, false), LABEL, true));
     exampleLabel = style(font(false, SMALL_POINTS, GREY, true), EXAMPLE_FILL, false);
     listHead = bordered(style(font(true, (short) 0, new byte[] {-1, -1, -1}, false), NAVY, false));
-    XSSFFont linkFont = font(false, (short) 0, new byte[] {0x05, 0x63, (byte) 0xC1}, false);
+    XSSFFont linkFont = font(false, (short) 0, LINK, false);
     linkFont.setUnderline(Font.U_SINGLE);
     link = style(linkFont, null, false);
     marked = style(font(false, (short) 0, ERROR_TEXT, false), ERROR_FILL, true);
@@ -129,11 +131,63 @@ final class GuidedStyles {
     s.setBorderTop(BorderStyle.THIN);
     s.setBorderLeft(BorderStyle.THIN);
     s.setBorderRight(BorderStyle.THIN);
-    XSSFColor line = new XSSFColor(new byte[] {(byte) 0xBF, (byte) 0xC9, (byte) 0xD6});
+    XSSFColor line = new XSSFColor(BORDER);
     s.setBottomBorderColor(line);
     s.setTopBorderColor(line);
     s.setLeftBorderColor(line);
     s.setRightBorderColor(line);
     return s;
+  }
+
+  CellStyle title() {
+    return title;
+  }
+
+  CellStyle infoLabel() {
+    return infoLabel;
+  }
+
+  CellStyle info() {
+    return info;
+  }
+
+  CellStyle bandLabel() {
+    return bandLabel;
+  }
+
+  CellStyle band() {
+    return band;
+  }
+
+  CellStyle bandMandatory() {
+    return bandMandatory;
+  }
+
+  CellStyle header() {
+    return header;
+  }
+
+  CellStyle headerCorner() {
+    return headerCorner;
+  }
+
+  CellStyle exampleLabel() {
+    return exampleLabel;
+  }
+
+  CellStyle listHead() {
+    return listHead;
+  }
+
+  CellStyle link() {
+    return link;
+  }
+
+  CellStyle marked() {
+    return marked;
+  }
+
+  CellStyle markedDate() {
+    return markedDate;
   }
 }

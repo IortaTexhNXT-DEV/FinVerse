@@ -45,31 +45,39 @@ public final class CsvRows {
       throw new BusinessRuleException("FEED_FILE_EMPTY", "The file has no lines");
     }
     int headerRow = GuidedTables.headerRow(table, required, h -> h.toLowerCase(Locale.ROOT));
+    List<String> header = header(table.get(headerRow), required);
+    List<Row> rows = new ArrayList<>();
+    for (int i = headerRow + 1; i < table.size(); i++) {
+      List<String> cells = table.get(i);
+      if (!blank(cells) && !GuidedTables.isExample(cells)) {
+        rows.add(
+            new Row(i + 1, workbook ? raw(header, cells) : lines.get(i), values(header, cells)));
+      }
+    }
+    return rows;
+  }
+
+  /** The lower-case header of the file; refuses a file without the required columns. */
+  private static List<String> header(List<String> row, Set<String> required) {
     List<String> header =
-        GuidedTables.headers(table.get(headerRow)).stream()
-            .map(h -> h.toLowerCase(Locale.ROOT))
-            .toList();
+        GuidedTables.headers(row).stream().map(h -> h.toLowerCase(Locale.ROOT)).toList();
     for (String column : required) {
       if (!header.contains(column.toLowerCase(Locale.ROOT))) {
         throw new BusinessRuleException(
             "FEED_FILE_COLUMNS", "The file must have the columns " + String.join(", ", required));
       }
     }
-    List<Row> rows = new ArrayList<>();
-    for (int i = headerRow + 1; i < table.size(); i++) {
-      List<String> cells = table.get(i);
-      if (blank(cells) || GuidedTables.isExample(cells)) {
-        continue;
+    return header;
+  }
+
+  private static Map<String, String> values(List<String> header, List<String> cells) {
+    Map<String, String> values = new LinkedHashMap<>();
+    for (int c = 0; c < header.size(); c++) {
+      if (!header.get(c).isEmpty()) {
+        values.put(header.get(c), c < cells.size() ? cells.get(c).strip() : "");
       }
-      Map<String, String> values = new LinkedHashMap<>();
-      for (int c = 0; c < header.size(); c++) {
-        if (!header.get(c).isEmpty()) {
-          values.put(header.get(c), c < cells.size() ? cells.get(c).strip() : "");
-        }
-      }
-      rows.add(new Row(i + 1, workbook ? raw(header, cells) : lines.get(i), values));
     }
-    return rows;
+    return values;
   }
 
   private static boolean isWorkbook(byte[] content) {

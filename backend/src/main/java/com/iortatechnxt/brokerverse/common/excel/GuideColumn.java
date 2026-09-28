@@ -32,6 +32,8 @@ public record GuideColumn(
     String example,
     int width) {
 
+  private static final int TEXT_SIZE = 256;
+
   /** Whether a column must be filled in. */
   public enum Need {
     /** Always mandatory. */
@@ -268,7 +270,7 @@ public record GuideColumn(
    */
   public String allowedText(int shown) {
     if (!choices.isEmpty()) {
-      StringBuilder out = new StringBuilder();
+      StringBuilder out = new StringBuilder(TEXT_SIZE);
       int n = Math.min(shown, choices.size());
       for (int i = 0; i < n; i++) {
         if (i > 0) {

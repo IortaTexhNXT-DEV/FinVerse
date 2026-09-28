@@ -28,8 +28,7 @@ final class LayoutTemplates {
           + " extracts";
 
   private static final int MAX_SHEET_NAME = 31;
-  private static final int CONTROL_ROWS = 200;
-  private static final Pattern CODE_LIST = Pattern.compile("[A-Z0-9_]+(, ?[A-Z0-9_]+)+");
+  private static final Pattern CODE = Pattern.compile("[A-Z0-9_]+");
 
   private LayoutTemplates() {}
 
@@ -137,22 +136,23 @@ final class LayoutTemplates {
     } else if ("C".equals(mandatory)) {
       g = g.when(text(c.getValidation()));
     }
+    return kind == Kind.YES_NO ? g.format(format(c)) : allowed(g, c).format(format(c));
+  }
+
+  /** Allowed values: a list of codes as a drop-down, a code map, or the text of the layout. */
+  private static GuideColumn allowed(GuideColumn g, LayoutColumn c) {
     String allowed = text(c.getAllowedValues());
-    if (kind == Kind.YES_NO) {
-      return g.format(format(c));
+    List<String> codes = Arrays.stream(allowed.split(",")).map(String::strip).toList();
+    if (codes.size() > 1 && codes.stream().allMatch(v -> CODE.matcher(v).matches())) {
+      return g.choices(codes.stream().map(v -> new Choice(v, v)).toList());
     }
-    if (CODE_LIST.matcher(allowed).matches()) {
-      g = g.choices(Arrays.stream(allowed.split(", ?")).map(v -> new Choice(v, v)).toList());
-    } else if (c.getMapSet() != null && !c.getMapSet().isBlank()) {
-      g =
-          g.allowed(
-              "Code as stored in the legacy system, translated by the code map "
-                  + c.getMapSet()
-                  + (allowed.isEmpty() || allowed.startsWith("Code map") ? "" : "; " + allowed));
-    } else {
-      g = g.allowed(allowed);
+    if (c.getMapSet() != null && !c.getMapSet().isBlank()) {
+      return g.allowed(
+          "Code as stored in the legacy system, translated by the code map "
+              + c.getMapSet()
+              + (allowed.isEmpty() || allowed.startsWith("Code map") ? "" : "; " + allowed));
     }
-    return g.format(format(c));
+    return g.allowed(allowed);
   }
 
   private static Kind kind(LayoutColumn c) {
@@ -168,25 +168,31 @@ final class LayoutTemplates {
 
   private static String format(LayoutColumn c) {
     List<String> parts = new ArrayList<>();
+    String kindFormat = kindFormat(c.getDataType());
     String format = text(c.getFormat());
-    switch (c.getDataType()) {
-      case DATE -> parts.add("Date, e.g. 31-Dec-2027 (an Excel date or yyyy-MM-dd)");
-      case TIMESTAMP -> parts.add("Text yyyy-MM-dd HH:mm:ss");
-      case AMOUNT -> parts.add("Amount with a dot decimal, e.g. 1500000.00");
-      case FLAG -> parts.add("Y or N");
-      default -> {
-        if (!format.isEmpty()) {
-          parts.add(format);
-        }
-      }
+    if (!kindFormat.isEmpty()) {
+      parts.add(kindFormat);
+    } else if (!format.isEmpty()) {
+      parts.add(format);
     }
     String length = text(c.getLength());
-    if (!length.isEmpty()
-        && (c.getDataType() == LayoutColumn.DataType.TEXT
-            || c.getDataType() == LayoutColumn.DataType.CODE)) {
+    boolean text =
+        c.getDataType() == LayoutColumn.DataType.TEXT
+            || c.getDataType() == LayoutColumn.DataType.CODE;
+    if (!length.isEmpty() && text) {
       parts.add("at most " + length + " characters");
     }
-    return parts.isEmpty() ? "" : String.join(", ", parts);
+    return String.join(", ", parts);
+  }
+
+  private static String kindFormat(LayoutColumn.DataType type) {
+    return switch (type) {
+      case DATE -> "Date, e.g. 31-Dec-2027 (an Excel date or yyyy-MM-dd)";
+      case TIMESTAMP -> "Text yyyy-MM-dd HH:mm:ss";
+      case AMOUNT -> "Amount with a dot decimal, e.g. 1500000.00";
+      case FLAG -> "Y or N";
+      default -> "";
+    };
   }
 
   private static String note(LayoutColumn c) {
@@ -200,88 +206,6 @@ final class LayoutTemplates {
       out.append("\nSource: ").append(source);
     }
     return out.toString();
-  }
-
-  /**
-   * The control file template: one row per measure of a data file.
-   *
-   * @param columns control columns
-   * @return template
-   */
-  static GuidedTemplate control(List<String> columns) {
-    List<GuideColumn> guide = new ArrayList<>();
-    for (String name : columns) {
-      guide.add(controlColumn(name));
-    }
-    return new GuidedTemplate(
-        "Control file of a migration extract",
-        "Proves that a data file arrived complete and unchanged: the intake compares every measure"
-            + " with the data file before anything is loaded.",
-        FILLED_BY,
-        "Data Migration > Extracts, box Upload an extract: upload it together with its data"
-            + " file, named <data file name>.ctl.xlsx (or .ctl.csv).",
-        List.of(
-            "One row per measure: ROW_COUNT, HASH_TOTAL of the key column, AMOUNT_TOTAL of each"
-                + " amount column per currency, and SHA256 of the data file.",
-            "The same object, layout, source system, data file and as-of date on every row."),
-        List.of(
-            new GuidedSheet(
-                "Control",
-                "Control file",
-                "One row per measure of the data file.",
-                guide,
-                List.of(
-                    List.of(
-                        "F01",
-                        "F01C",
-                        "EBIX",
-                        "F01C_EBIX_20271231_01.xlsx",
-                        "2027-12-31",
-                        "2027-12-31 18:00:00",
-                        "Maria Reyes",
-                        "ROW_COUNT",
-                        "",
-                        "",
-                        "",
-                        "1250")))),
-        CONTROL_ROWS);
-  }
-
-  private static GuideColumn controlColumn(String name) {
-    return switch (name) {
-      case "object" -> GuideColumn.of(name, Kind.TEXT, "Data object of the file").mandatory();
-      case "layout" -> GuideColumn.of(name, Kind.TEXT, "Layout code of the file").mandatory();
-      case "source_system" ->
-          GuideColumn.of(name, Kind.TEXT, "Legacy system the data comes from").mandatory();
-      case "data_file" ->
-          GuideColumn.of(name, Kind.TEXT, "File name of the data file, as uploaded").mandatory();
-      case "as_of" -> GuideColumn.of(name, Kind.DATE, "As-of date of the extract").mandatory();
-      case "extracted_at" ->
-          GuideColumn.of(name, Kind.TEXT, "When the extract was taken")
-              .format("Text yyyy-MM-dd HH:mm:ss");
-      case "extracted_by" -> GuideColumn.of(name, Kind.TEXT, "Name of who took the extract");
-      case "measure" ->
-          GuideColumn.of(name, Kind.TEXT, "Measure of the row")
-              .mandatory()
-              .choices(
-                  List.of(
-                      new Choice("ROW_COUNT", "Number of data rows"),
-                      new Choice("HASH_TOTAL", "Hash total of the key column"),
-                      new Choice("AMOUNT_TOTAL", "Total of an amount column"),
-                      new Choice("SHA256", "Checksum of the data file")));
-      case "column_name" ->
-          GuideColumn.of(name, Kind.TEXT, "Column the measure is on")
-              .when("measure is HASH_TOTAL or AMOUNT_TOTAL");
-      case "currency" ->
-          GuideColumn.of(name, Kind.TEXT, "Currency of an amount total")
-              .when("measure is AMOUNT_TOTAL and the file has a currency column");
-      case "filter" ->
-          GuideColumn.of(name, Kind.TEXT, "Filter of an amount total, when any")
-              .format("column=value, e.g. currency=USD");
-      default ->
-          GuideColumn.of(name, Kind.TEXT, "Value of the measure (the checksum for SHA256)")
-              .mandatory();
-    };
   }
 
   private static String text(String v) {

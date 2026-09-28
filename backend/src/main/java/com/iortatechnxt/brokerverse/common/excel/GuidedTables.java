@@ -2,7 +2,6 @@ package com.iortatechnxt.brokerverse.common.excel;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
@@ -158,9 +157,7 @@ public final class GuidedTables {
   }
 
   private static boolean isBandRow(List<String> row, String label) {
-    return !row.isEmpty()
-        && row.get(0) != null
-        && row.get(0).strip().toLowerCase(Locale.ROOT).equals(label.toLowerCase(Locale.ROOT));
+    return !row.isEmpty() && row.get(0) != null && label.equals(row.get(0).strip());
   }
 
   private static int nextFilled(List<List<String>> table, int from) {

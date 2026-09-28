@@ -105,13 +105,19 @@ public final class SourceColumns {
             "Property Location", "Location of the property (fire)", "Lot 5, Taguig City"));
     c.add(BulkColumn.optional("Occupancy", "Occupancy (fire)", "Residential"));
     c.add(BulkColumn.optional("Mortgagee", "Mortgagee", "BDO Unibank, Inc."));
-    c.add(yesNo("FFY", "Y when the auto loan has the Free First Year promotion"));
-    c.add(yesNo("Employee Account", "Y for a BDO or SM Group employee account"));
-    c.add(yesNo("No Touch", "Y for a No Touch account"));
+    c.addAll(flags());
     c.add(
         BulkColumn.optional(HANDLER, "User ID of the handler of the policy", "sbmhandler")
             .allowed("User ID of an active user of Submitted Policies"));
     return List.copyOf(c);
+  }
+
+  private static List<BulkColumn> flags() {
+    List<BulkColumn> c = new ArrayList<>();
+    c.add(yesNo("FFY", "Y when the auto loan has the Free First Year promotion"));
+    c.add(yesNo("Employee Account", "Y for a BDO or SM Group employee account"));
+    c.add(yesNo("No Touch", "Y for a No Touch account"));
+    return c;
   }
 
   private static BulkColumn date(String header, String description) {

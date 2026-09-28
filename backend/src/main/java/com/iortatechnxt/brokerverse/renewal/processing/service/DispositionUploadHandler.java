@@ -127,7 +127,7 @@ public class DispositionUploadHandler implements BulkImportHandler {
                 Arrays.stream(RenewalDisposition.values())
                     .map(RenewalDisposition::label)
                     .toArray(String[]::new)),
-        BulkColumn.optional(REASON, "Reason for Not for Renewal (code or label)", "Unit Sold")
+        BulkColumn.optional(REASON, "Reason for Not for Renewal (code or label)", "")
             .when("Disposition is Not for Renewal")
             .lov(RenewalCodes.LOV_NONRENEWAL_REASON),
         BulkColumn.optional(NEW_INVOICE, "New invoice number", "")

@@ -473,6 +473,16 @@ class UxDeck(GuideDeck):
         self.counts[self.part] = self.counts.get(self.part, 0) + 1
         return super()._slide()
 
+    def page(self, title: str):
+        """A content slide; a long title gets a smaller type so that it stays clear of the logo."""
+        s = super().page(title)
+        if len(title) > 46:
+            size = Pt(20) if len(title) <= 60 else Pt(17)
+            for para in s.shapes[0].text_frame.paragraphs:
+                for run in para.runs:
+                    run.font.size = size
+        return s
+
     def section_slide(self, title: str, subtitle: str = "") -> None:
         self.part = title
         self.section(title, subtitle)
@@ -558,7 +568,8 @@ class UxDeck(GuideDeck):
 
     def image_slides(self, title: str, png: Path, caption: str = "", state: str | None = None,
                      changed: Sequence[str] = (), notes: str | Sequence[str] = "",
-                     first: Any = None, side_w=Inches(0), fit_whole: bool = False) -> int:
+                     first: Any = None, side_w=Inches(0), fit_whole: bool = False,
+                     max_scale: float = MAX_SCALE) -> int:
         """A screen image at full slide width (never larger than MAX_SCALE), split into slices over as many slides
         as needed; narrow slices sit side by side. With `side_w`, the image leaves a panel of that width on the right,
         which `first(slide)` fills on the first slide. Returns the number of slides."""
@@ -573,9 +584,13 @@ class UxDeck(GuideDeck):
             if notes:
                 self.notes(notes)
             return 1
+        from PIL import Image  # noqa: PLC0415
+
+        with Image.open(png) as im:
+            fit_whole = fit_whole or im.info.get("bibs-crop") == "full"  # a whole window is shown whole
         png = self._trim(png)
         pw, ph = _png_size(png)
-        scale = min(area_w / pw, MAX_SCALE)
+        scale = min(area_w / pw, max_scale)
         # A screen that fits on one slide at 72 % or more of the full width is shown whole (no split); a landing
         # page is always shown whole.
         fit = min(scale, area_h / ph)
@@ -736,7 +751,8 @@ class UxDeck(GuideDeck):
             lane = lanes.index(st["lane"])
             bw, bh = col_w - Inches(0.22), lane_h - Inches(0.16)
             x = X0 + lane_w + c * col_w + Inches(0.11)
-            y = top + lane * lane_h + Inches(0.06)
+            y = top + lane * lane_h + Inches(0.1)
+            bh = lane_h - Inches(0.2)
             box = s.shapes.add_shape(MSO_SHAPE.ROUNDED_RECTANGLE, x, y, bw, bh)
             box.fill.solid()
             box.fill.fore_color.rgb = _rgb(brand.WHITE)
@@ -759,9 +775,9 @@ class UxDeck(GuideDeck):
             r.font.size, r.font.name = Pt(8), brand.FONT
             r.font.color.rgb = _rgb(brand.NEAR_BLACK)
             if st["approval"]:
-                tag = self.pill(s, x + bw - Inches(0.78), y - Inches(0.05), "Approval", brand.AMBER_BG, brand.AMBER,
-                                w=Inches(0.8), size=7)
-                tag.height = Inches(0.2)
+                tag = self.pill(s, x + bw - Inches(0.72), y - Inches(0.1), "Approval", brand.AMBER_BG, brand.AMBER,
+                                w=Inches(0.7), size=6)
+                tag.height = Inches(0.16)
             boxes.append((x, y, bw, bh, lane))
         for (x1, y1, w1, h1, l1), (x2, y2, w2, h2, l2) in zip(boxes, boxes[1:]):
             handoff = l1 != l2
@@ -796,8 +812,8 @@ def _blank(path: Path, top: int, bottom: int) -> bool:
     return float(rows.mean()) < 0.04
 
 
-APPROVAL = re.compile(r"\b(approv\w*|authori[sz]\w*|sign(?:s|ed)? off|validate\w*|recommend\w*|accept\w*|"
-                      r"sign(?:s)? (?:the )?(?:validation|reconciliation|mapping)|\bGO\b)", re.I)
+APPROVAL = re.compile(r"\b(?:Approve|Authori[sz]e|Sign off|Sign Validation|Sign Reconciliation|Sign Mapping|"
+                      r"Validate and Release|Recommend|Accept as|approves|authori[sz]es|accepts|signs|GO)\b")
 
 
 # ============================================================================ deck
@@ -989,7 +1005,7 @@ def build_deck(ux: Ux) -> tuple[Path, dict[str, int]]:
                               "sign-in", "landing", land.changed, notes=f"Image {land.name}.", fit_whole=True)
         if menu:
             deck.image_slides(f"{label}: menu", menu.file, f"{p.nav_id(n)} Every group of the menu open",
-                              "menu", menu.changed, notes=f"Image {menu.name}.")
+                              "menu", menu.changed, notes=f"Image {menu.name}.", max_scale=MAX_SCALE * 0.7)
         rows_ = menus.get(role) or []
         own_rows = [[r["group"], r["section"], r["screen"]] for r in rows_ if r["own"]]
         others: dict[str, int] = {}

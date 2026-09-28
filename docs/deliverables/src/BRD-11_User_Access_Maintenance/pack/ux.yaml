@@ -68,7 +68,11 @@ classify:
   wt-a-07: default
   wt-a-08: read-only
   wt-b-05: pending-approval
+  wt-b-06: success
   wt-b-10: read-only
+  wt-c-06: validation-error
+  wt-c-07: validation-error
+  wt-c-08: success
   wt-d-01: read-only
   wt-d-02: read-only
   wt-d-03: read-only

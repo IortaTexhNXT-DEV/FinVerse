@@ -81,7 +81,9 @@ classify:
   wt-a-21: success
   wt-a-22: pending-approval
   wt-a-24: success
+  wt-b-03: validation-error
   wt-b-04: rejected-returned
+  wt-b-05: validation-error
   wt-b-07: rejected-returned
   wt-b-09: rejected-returned
   wt-b-11: rejected-returned

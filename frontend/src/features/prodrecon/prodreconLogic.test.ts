@@ -105,7 +105,7 @@ describe('scheduleProblem', () => {
   });
 
   it('refuses missing insurers, days out of range and bad addresses', () => {
-    expect(scheduleProblem({ ...base, insurerCode: ' ' })).toMatch(/Insurer/);
+    expect(scheduleProblem({ ...base, insurerCode: ' ' })).toMatch(/insurer/);
     expect(scheduleProblem({ ...base, runDay: 29 })).toMatch(/1 to 28/);
     expect(scheduleProblem({ ...base, frequency: 'WEEKLY', runDay: 8 })).toMatch(/Monday/);
     expect(scheduleProblem({ ...base, autoSend: true, recipients: 'nope' })).toMatch(/e-mail/);

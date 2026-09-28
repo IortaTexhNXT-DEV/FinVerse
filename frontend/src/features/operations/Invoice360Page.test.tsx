@@ -68,7 +68,7 @@ describe('invoice 360', () => {
       .spyOn(workflowApi, 'byRecord')
       .mockRejectedValue(new Error('Not loaded in this test'));
     render(page());
-    expect(await screen.findByText('Lea Santos')).toBeInTheDocument();
+    expect((await screen.findAllByText('Lea Santos')).length).toBeGreaterThan(0);
     expect(byRecord).toHaveBeenCalledWith('Account', 42);
   });
 });

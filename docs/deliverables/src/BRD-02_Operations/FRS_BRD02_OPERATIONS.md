@@ -416,7 +416,7 @@ main_flow:
   - After the booking commits, BIBS copies it into the ledger with its components and BOOKED movements, payment status UNPAID and remittance status WITH_OUTSTANDING_BALANCE.
   - Each later Operations action posts its movement and updates the balances and statuses in the same transaction.
 alternate_flows:
-  - The copy fails. The booking is kept; the failure is a failed record of flow-in feed OPS_INVOICE_FEED and raises the alert OPS_FLOW_IN_FAILED. An administrator replays the invoice, account or company from Interfaces (job OPS_INVOICE_FEED_REPLAY).
+  - The copy fails. The booking is kept; the failure is a failed record of the feed Booked invoices from booking and raises the alert Interface run failed. An administrator replays the invoice, account or company from Interfaces (Replay Booked Invoices).
   - A direct payment invoice carries its PR and DTIP for information with payment and remittance status NOT_APPLICABLE; booking posts no PR for it.
 rules:
   - [R1, "BOOKED movements come only from the booking feed.", Fixed, "-"]
@@ -428,7 +428,7 @@ validations:
   - [BOOKED movement from a module, BOOKED movements come from the booking feed only, MOVEMENT_TYPE_RESERVED]
   - [Replay without scope, "Give an invoice number, an ARN or a company to replay", REPLAY_SCOPE]
 notifications:
-  - OPS_FLOW_IN_FAILED to the System Administrator when a copy fails.
+  - Alert Interface run failed (NT-05) to the System Administrator when a copy fails.
 audit:
   - Movements and status changes are append-only; each status change keeps the module and time.
 acceptance:
@@ -564,7 +564,7 @@ rules:
 validations:
   - [Same file uploaded again, This file was already uploaded, BULK_DUPLICATE_FILE]
 notifications:
-  - OPS_FLOW_IN_FAILED when a feed run has failed records.
+  - Alert Interface run failed (NT-05) when a feed run has failed records.
 audit:
   - The run, its counts and every record outcome are kept (bulk job and rows, flow-in runs and records).
 acceptance:
@@ -872,7 +872,7 @@ main_flow:
   - BIBS issues the ARs, matches and applies each payment and shows the run summary.
   - The cashier downloads the run report and reprocesses failed rows.
 alternate_flows:
-  - Automatic matching again. The job PAYMENT_AUTOMATCH (hourly) re-matches unapplied payments of the files (FR-OP-018).
+  - Automatic matching again. The automatic re-matching run (hourly) re-matches unapplied payments of the files (FR-OP-018).
 rules:
   - [R1, "Files are stored read-only with their SHA-256; a duplicate file is refused.", Fixed, "-"]
   - [R2, "Layouts per handler are maintained in Cashiering Setup (OQ03, OQ04).", Configurable, Cashiering Setup]
@@ -908,7 +908,7 @@ actor: Cashier; System (maturity job)
 priority: Must have
 screens: PDC Warehouse
 description:
-  - Post-dated checks are warehoused by screen or by the PDC list upload, each with a system number PDCW-yyyy-n, the client, invoice or ARN, check number, bank and branch, maturity date, amount and market segment. The job PDC_MATURITY (daily 08:30 PHT) turns each matured check into a payment with its AR, matched and applied like any payment.
+  - Post-dated checks are warehoused by screen or by the PDC list upload, each with a system number PDCW-yyyy-n, the client, invoice or ARN, check number, bank and branch, maturity date, amount and market segment. the daily PDC maturity run (daily 08:30 PHT) turns each matured check into a payment with its AR, matched and applied like any payment.
   - Before maturity a check leaves the warehouse as returned, replaced or pulled out, with a reason. The warehouse is viewed by maturity month.
 preconditions:
   - The user has CASH_UPLOAD.
@@ -921,7 +921,7 @@ alternate_flows:
   - The cashier matures checks on demand (**Mature Now**).
 rules:
   - [R1, "A check (bank and number) is warehoused once.", Fixed, "-"]
-  - [R2, "Maturity runs daily (job PDC_MATURITY).", Configurable, Job schedule]
+  - [R2, "Maturity runs daily (the daily PDC maturity run).", Configurable, Job schedule]
 validations:
   - [Check already warehoused, "Check <bank> <no> is already warehoused", PDC_DUPLICATE]
   - [Amount zero, A post-dated check needs an amount above zero, PDC_AMOUNT]
@@ -995,7 +995,7 @@ priority: Must have
 screens: Receive Payment (preview); Pre-booked Payments; Payment Uploads (run summary)
 description:
   - "Every payment except a warehoused PDC is matched at acceptance on the ARN, invoice, policy or PN number. The outcome is one category: APPLIED (booked invoice with outstanding PR; applied up to 100%, or 98% for 2% CWT clients); PREBOOKED (account found but not booked yet); UNAPPLIED_NO_MATCH (no account found); EXCESS (payment above the outstanding amount; the excess stays unapplied); CANCELLED_REFERENCE (invoice or slip cancelled)."
-  - A pre-booked payment issues its AR and waits as an unapplied item of origin PREBOOKED. It is applied when the invoice is booked (ledger event) or by the job PREBOOKED_REMATCH (every 2 hours); processed items leave the pre-booked queue. Items that wait too long raise PREBOOKED_AGEING.
+  - A pre-booked payment issues its AR and waits as an unapplied item of origin PREBOOKED. It is applied when the invoice is booked (ledger event) or by the pre-booked re-matching run (every 2 hours); processed items leave the pre-booked queue. Items that wait too long raise PREBOOKED_AGEING.
   - A pre-booked payment also opens the New Business payment gate of the account (evidence CASHIERING PRE:<id>), so placement does not wait for booking (FR-OP-132).
 preconditions:
   - "None (automatic)."
@@ -1005,7 +1005,7 @@ main_flow:
   - BIBS applies, queues as pre-booked, or creates the unapplied item.
 alternate_flows:
   - The cashier runs **Re-match Now** on a pre-booked item, or **Release** to move it to the Unapplied Payments workbench.
-  - The job PAYMENT_AUTOMATCH (hourly) matches again unapplied NO_MATCH and PREBOOKED items with their references.
+  - The automatic re-matching run (hourly) matches again unapplied NO_MATCH and PREBOOKED items with their references.
 rules:
   - [R1, "Application of 2% CWT clients is limited to 98% of the premium; the 2% waits for the BIR 2307.", Configurable, Parameter CWT_APPLICATION_PERCENT (98)]
   - [R2, "Several outstanding invoices of one reference are paid oldest first.", Fixed, "-"]
@@ -1183,7 +1183,7 @@ acceptance:
 id: FR-OP-023
 title: Reverse minimal balances automatically
 brd: [CSHID.016 (p.37-38)]
-actor: System (job MINIMAL_BALANCE_SWEEP); Cashiering TL (run now)
+actor: System (the minimal balance sweep); Cashiering TL (run now)
 priority: Must have
 screens: Cashiering Setup (Minimal Balance, Run Sweep Now); Reports CSH-MINBAL-PREMIUM, CSH-MINBAL-EXCESS
 description:
@@ -1393,7 +1393,7 @@ Remittance extracts what clients paid, groups it into batches per insurer and ty
 id: FR-OP-030
 title: Extract remittances by schedule, insurer or invoice
 brd: [RMTID.001 (p.49), RMTID.003 (p.50-51), RMTID.004 (p.51-52), RMTID.005 (p.52), RMTID.007 (p.52-53), RMTID.008 (p.53)]
-actor: System (job REMITTANCE_EXTRACTION); Remittance Processor
+actor: System (the scheduled remittance extraction); Remittance Processor
 priority: Must have
 screens: Extraction; DTIP Status; Remittance Batches
 description:
@@ -1415,7 +1415,7 @@ alternate_flows:
 rules:
   - [R1, "The remittance type is WITH_INCENTIVES when an early remittance rule covers the invoice (FR-OP-038), otherwise NORMAL_PHP or NORMAL_USD by currency.", Configurable, "Incentive rules; classification to confirm (OQ17)"]
   - [R2, "Batch numbers RMB-<insurer>-yyyy-n are unique and never reused.", Fixed, "-"]
-  - [R3, "Schedule of the job.", Configurable, "Job REMITTANCE_EXTRACTION (schedule set by the System Administrator)"]
+  - [R3, "Schedule of the job.", Configurable, "the scheduled remittance extraction (schedule set by the System Administrator)"]
   - [R4, "Extract file naming.", Configurable, Parameter REMIT_FILE_PATTERN (OQ17)]
 validations:
   - [Invoice of another insurer, "Invoice <no> is not an invoice of <insurer>", REMIT_INVOICE_INSURER]
@@ -2264,7 +2264,7 @@ actor: Adjustment users; Comptrollership
 priority: Must have
 screens: Reports (category Operations)
 description:
-  - "ADJ-DAILY: Adjustment and Daily Endorsement Report of the requests raised or posted in the period, by type and user. The job ADJ_DAILY_REPORT (18:00 PHT) exports it as Excel for the business date, archives it and notifies the holders of ADJ_APPROVE."
+  - "ADJ-DAILY: Adjustment and Daily Endorsement Report of the requests raised or posted in the period, by type and user. the daily endorsement report run (18:00 PHT) exports it as Excel for the business date, archives it and notifies the holders of ADJ_APPROVE."
   - "ADJ-VALIDATION-LIST: posted requests with one row per GL line - type of cancellation / adjustment, invoice, endorsement reference and request number, segment, requesting AO, policy, assured, insurer, GL code, debit / credit, reason, validation date, validation batch number."
   - "ADJ-REGISTER: Adjustment Report filtered by date, account, segment, AO and risk type. ADJ-AGING: ageing with buckets (ADJID.021)."
 preconditions:
@@ -2294,10 +2294,10 @@ BDOI places Production Reconciliation in **Drop 2** (drop plan of 26-Sep-2026): 
 id: FR-OP-070
 title: Schedule the automatic extraction of the production register
 brd: [PRCID.001 (p.79)]
-actor: Recon Handler (schedules); System (job PRODUCTION_EXTRACT)
+actor: Recon Handler (schedules); System (the scheduled register extraction)
 priority: Must have
 screens: Extract Schedules
-description: Each insurer has a schedule with its frequency (monthly on a day of the month, or weekly on a weekday), whether the register is sent automatically, and the recipients. The job PRODUCTION_EXTRACT (daily 09:00 PHT) extracts the booked accounts of every insurer due that day. A run date that falls on a holiday moves to the next working day of the head office calendar.
+description: Each insurer has a schedule with its frequency (monthly on a day of the month, or weekly on a weekday), whether the register is sent automatically, and the recipients. the scheduled register extraction (daily 09:00 PHT) extracts the booked accounts of every insurer due that day. A run date that falls on a holiday moves to the next working day of the head office calendar.
 preconditions:
   - The user has RECON_PROCESS to maintain schedules.
 main_flow:
@@ -2474,7 +2474,7 @@ screens: Reconciliation Cycle (Items by bucket, side-by-side comparison)
 description:
   - "BIBS pairs each insurer line with a booked line using the keys of RECON_MATCH_KEYS in order (default invoice number, then policy number). It then compares the fields: policy, reference / invoice and PN numbers and the policy period must be equal; the assured name is compared ignoring case and spacing; commission, basic premium and gross premium match when they differ by 1.00 or less, whichever side is higher."
   - "Status of each item: MATCHED; MATCHED_WITH_DISCREPANCY (the differing fields are listed); BDOI_ONLY (booked, not returned by the insurer); UNMATCHED_PREBOOKED; UNMATCHED_NO_BOOKING. Each status is a bucket tab with its count; a discrepancy row expands to a side-by-side comparison with the tolerance highlighted."
-  - Matching runs on every upload, when a later invoice is booked (waiting insurer-only lines of the same insurer), and by **Match Again** or the job RECON_AUTOMATCH for every open cycle.
+  - Matching runs on every upload, when a later invoice is booked (waiting insurer-only lines of the same insurer), and by **Match Again** or the scheduled run for every open cycle.
 preconditions:
   - A cycle has extract lines and insurer lines.
 main_flow:
@@ -2484,7 +2484,7 @@ main_flow:
 rules:
   - [R1, "Tolerance 1.00 per amount field.", Configurable, Parameter RECON_TOLERANCE]
   - [R2, "Match keys and order.", Configurable, Parameter RECON_MATCH_KEYS (OQ30)]
-  - [R3, "Automatch schedule manual until BDOI gives the frequency.", Configurable, Job RECON_AUTOMATCH (OQ30)]
+  - [R3, "Automatch schedule manual until BDOI gives the frequency.", Configurable, "Scheduled run (OQ30)"]
 validations:
   - [Action on a closed cycle, "Cycle <no> is closed", RECON_CYCLE_CLOSED]
 notifications:
@@ -2764,12 +2764,12 @@ acceptance:
 id: FR-OP-093
 title: Record insurer answers and flag late feedback
 brd: [CMRID.008 (p.109-110), CMRID.009 (p.110-111), CMRID.011 (p.111)]
-actor: Commission Handler; System (job DP_FEEDBACK_SLA)
+actor: Commission Handler; System (the daily feedback follow-up)
 priority: Must have
 screens: Insurer Responses (answers upload); DP Billing (answers); DP Billings (SLA)
 description:
   - The insurer approves or rejects each account. Answers are entered on the billing or uploaded (columns Billing No., Invoice No., Decision, Reason, Comment). A rejection needs a reason from DP_FEEDBACK_REASON. Approved accounts go to collection; rejected accounts are returned to the Collection team through the COLLECTION_DP_RETURNED extract with the time and reason. A billing whose accounts were all rejected moves to RETURNED_TO_COLLECTION.
-  - The job DP_FEEDBACK_SLA (daily) raises DP_FEEDBACK_OVERDUE for billings without an answer after the due date; the billing list shows the SLA countdown.
+  - The daily feedback follow-up raises the alert Insurer feedback overdue (NT-20) for billings without an answer after the due date; the billing list shows the SLA countdown.
 preconditions:
   - The billing is AWAITING_INSURER.
 main_flow:
@@ -3042,7 +3042,7 @@ priority: Must have
 screens: Remittance Holds; Remittance Hold (workflow panel)
 description:
   - Marketing raises a hold request HLD-yyyy-n on an invoice with a reason, hold-until date and remarks, singly or by file (invoiceNo, reasonCode, holdUntil, remarks). One live request per invoice. Submission makes the invoice REQUESTED_FOR_HOLD; approval by another user sets the HOLD flag, which excludes the invoice from extraction (FR-OP-031). The approver assigns the hold to an active remittance processor, who is notified.
-  - An active hold is extended (new hold-until date, with approval), cancelled (with approval) or released by Marketing; release makes the invoice eligible again. The job HOLD_EXPIRY (daily 08:15 PHT) releases holds whose date has passed and notifies holds that reach their date the next day. Holds from Collection arrive through the feed COLLECTION_HOLD.
+  - An active hold is extended (new hold-until date, with approval), cancelled (with approval) or released by Marketing; release makes the invoice eligible again. the scheduled run (daily 08:15 PHT) releases holds whose date has passed and notifies holds that reach their date the next day. Holds from Collection arrive through the feed COLLECTION_HOLD.
 preconditions:
   - The user has HOLD_REQUEST (request) or HOLD_APPROVE (decide, assign).
 main_flow:
@@ -3275,7 +3275,7 @@ rules:
 validations:
   - [Hand-off already closed, The hand-off is already closed, HANDOFF_CLOSED]
 notifications:
-  - OPS_FLOW_IN_FAILED on failures.
+  - Alert Interface run failed (NT-05) on failures.
 audit:
   - Every exchange is a flow-in run with its records, or a queue entry.
 acceptance:
@@ -3303,7 +3303,7 @@ main_flow:
   - BIBS validates and maps each record through the module's handler.
   - BIBS records the run and its records and alerts on failure.
 rules:
-  - [R1, "One record per idempotency key.", Fixed, "-"]
+  - [R1, "Each record is taken in once; a record sent again is recognised by its reference.", Fixed, "-"]
   - [R2, "Schedules per feed (time and frequency, UTC).", Configurable, Interfaces]
 validations:
   - [Feed inactive, "Feed <code> is inactive", FLOW_IN_FEED_INACTIVE]
@@ -3311,15 +3311,15 @@ validations:
   - [Record failed, "<message>", FLOW_IN_RECORD_FAILED]
 fields_screen: Interfaces (feed settings)
 fields:
-  - ["Schedule", Text, "No", "-", Valid schedule (time and frequency, UTC)]
+  - ["Schedule", Text, "No", "-", "Valid schedule (time and frequency, UTC)"]
   - [Active, Check box, "Yes", "-", "-"]
   - [File, File, Cond., "-", For an upload]
 notifications:
-  - OPS_FLOW_IN_FAILED (in-app and e-mail) to the administrators.
+  - Alert Interface run failed (NT-05, in-app and e-mail) to the administrators.
 audit:
   - Runs and records are kept with their outcome.
 acceptance:
-  - Uploading a hold file with one invalid row records a run with one failed record and raises OPS_FLOW_IN_FAILED.
+  - Uploading a hold file with one invalid row records a run with one failed record and raises the alert Interface run failed.
   - Uploading the same hold file again accepts no new record.
 ```
 

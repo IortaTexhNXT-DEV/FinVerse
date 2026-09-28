@@ -28,7 +28,7 @@ function requestB(ctx) {
 /** Types into the field of the label (select: option matching the text; date and text: typed). */
 async function fill(page, label, value, scope) {
   const root = scope || page;
-  const field = root.getByLabel(label instanceof RegExp ? label : new RegExp(`^${label}\\s*\\*?$`)).first();
+  const field = root.getByLabel(label instanceof RegExp ? label : new RegExp(`^${label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\*?$`)).first();
   await field.waitFor({ state: 'visible', timeout: 15000 });
   const tag = await field.evaluate((e) => e.tagName.toLowerCase());
   if (tag === 'select') {
@@ -79,6 +79,22 @@ function dateText(days) {
 
 function isoDate(days) {
   return new Date(Date.now() + days * 86400000).toISOString().slice(0, 10);
+}
+
+
+/** Brings the tab strip of a record to the top of the window, so the tab's content is captured whole. */
+async function tabsToTop(page) {
+  // The capture shows the window from the top: the record header and the stepper above the tabs are set aside
+  // (they are in the other steps of the walkthrough) so that the tab's rows fit in the window.
+  await page.evaluate(() => {
+    const t = document.querySelector('main div.tabs[role=tablist]');
+    if (!t) return;
+    for (const el of t.parentElement.children) {
+      if (el === t) break;
+      el.style.display = 'none';
+    }
+  });
+  await page.waitForTimeout(400);
 }
 
 // ------------------------------------------------------------------ walkthrough A
@@ -203,6 +219,9 @@ const steps = {
   'wt-a-10': async (ctx) => {
     const page = await go(ctx, 'remit', `/operations/invoices/${invoiceA(ctx)}`);
     await tab(page, 'Remittances');
+    await page.locator('main section.card table tbody tr').first().waitFor({ timeout: 15000 });
+    await settle(page, 800);
+    await tabsToTop(page);
     return page;
   },
 
@@ -286,6 +305,9 @@ const steps = {
       await toggles.nth(n - 1).click();
       await settle(page, 800);
     }
+    // Opening a journal scrolls the wide table: show it from its first column.
+    await page.evaluate(() => document.querySelectorAll('main *').forEach((e) => { if (e.scrollLeft) e.scrollLeft = 0; }));
+    await tabsToTop(page);
     return page;
   },
   // 8. The unapplied payment of the re-application: refund assigned and submitted.
@@ -356,6 +378,8 @@ const steps = {
   'wt-c-03': async (ctx) => {
     const page = await go(ctx, 'commrec', '/operations/invoices/BI-HO-2026-000003');
     await tab(page, 'Movements');
+    await settle(page, 800);
+    await tabsToTop(page);
     return page;
   },
   // 4. Feedback and disposition of the item with a premium difference.
@@ -403,6 +427,8 @@ const steps = {
     }
     await dialog.getByRole('button', { name: /^apply to selected$/i }).click();
     await settle(page, 1500);
+    await tab(page, 'Insurer Only');
+    await tabsToTop(page);
     return page;
   },
   // 6. Unbooked Accounts.
@@ -459,6 +485,9 @@ const steps = {
     const stage = ctx.sql(`select stage from csh_receipt_action where receipt_id = ${id} order by id desc limit 1`)[0]?.[0];
     if (stage === 'FOR_APPROVAL') {
       await act(page, 'Approve and Post', { reason: false });
+      await settle(page, 1500);
+      // The receipt page shows the posted cancellation once it is opened again.
+      await page.reload();
       await settle(page, 1500);
     }
     return page;

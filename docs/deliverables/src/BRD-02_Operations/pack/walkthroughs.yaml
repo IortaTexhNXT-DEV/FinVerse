@@ -41,9 +41,9 @@ walkthroughs:
       - [ADJUSTMENT, SCR-OP-39, "Opens the request from the workbench and clicks Validate", "The request is For Approval", Validated, wt-b-04]
       - [ADJUSTMENT_TL, SCR-OP-39, "Opens the request and clicks Approve", "The request is For Posting", Approved, wt-b-05]
       - [ADJUSTMENT, SCR-OP-40, "Ticks the request on Posting Batches and clicks Post Selected", "The batch result: the request Posted", Posted, wt-b-06]
-      - [ADJUSTMENT, SCR-OP-39, "Opens the Policy Transactions tab of the request and the journals of the cancellation", "The original booking, then the cancellation with its premium, taxes and commission change, gross premium 0.00 after it, and its journal lines", Policy history, wt-b-07]
+      - [ADJUSTMENT, SCR-OP-39, "Opens the Policy Transactions tab of the request and the journal of the last transaction", "The original booking, the cancellation with its premium, taxes and commission change and gross premium 0.00 after it, the refund of the excess payment to the client, and the journal lines of the re-applied payment", Policy history, wt-b-07]
       - [CASHIER, SCR-OP-12, "Opens the unapplied payment left by the re-application, assigns a refund to the client and submits it", "The disposition is For Approval", Refund for approval, wt-b-08]
-      - [CASHIER_TL, SCR-OP-12, "Opens the unapplied payment and clicks Approve", "The refund is sent to Disbursement; the disposition history shows the payment request", Refund approved, wt-b-09]
+      - [CASHIER_TL, SCR-OP-12, "Opens the unapplied payment and clicks Approve", "The disposition is Completed and the balance 0.00; the refund is sent to Disbursement", Refund approved, wt-b-09]
       - [DISBURSEMENT, SCR-OP-36, "Opens the Disbursement Queue", "The refund request to the client in To Acknowledge", Refund with Disbursement, wt-b-10]
     downstream:
       - "Remittance: the pending negative adjustment keeps the invoice out of the extraction; the AR Insurer set up for the remitted premium is recovered from the insurer's next batch through a confirmed remittance deduction."

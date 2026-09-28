@@ -24,9 +24,12 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | New Business | BRD-01 | Sign-off workbook (Excel) | 2.0 | [`BRD-01_New_Business/03_BIBS_Signoff_BRD-01_New_Business_v2.0.xlsx`](BRD-01_New_Business/03_BIBS_Signoff_BRD-01_New_Business_v2.0.xlsx) |
 | New Business | BRD-01 | Test plan workbook (Excel) | 2.0 | [`BRD-01_New_Business/04_BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx`](BRD-01_New_Business/04_BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx) |
 | New Business | BRD-01 | Test plan summary (Word) | 2.0 | [`BRD-01_New_Business/05_BIBS_TestPlan_BRD-01_New_Business_Summary_v2.0.docx`](BRD-01_New_Business/05_BIBS_TestPlan_BRD-01_New_Business_Summary_v2.0.docx) |
-| Operations | BRD-02 | FRS | 1.1 | [`BRD-02_Operations/BIBS_FRS_BRD-02_Operations_v1.1.docx`](BRD-02_Operations/BIBS_FRS_BRD-02_Operations_v1.1.docx) |
-| Operations | BRD-02 | Test plan summary (Word) | 1.0 | [`BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_Summary_v1.0.docx`](BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_Summary_v1.0.docx) |
-| Operations | BRD-02 | Test plan workbook (Excel) | 1.0 | [`BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx`](BRD-02_Operations/BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx) |
+| Operations | BRD-02 | Start here guide | 2.0 | [`BRD-02_Operations/00_BIBS_StartHere_BRD-02_Operations_v2.0.docx`](BRD-02_Operations/00_BIBS_StartHere_BRD-02_Operations_v2.0.docx) |
+| Operations | BRD-02 | Sign-off pack guide deck | 2.0 | [`BRD-02_Operations/01_BIBS_GuideDeck_BRD-02_Operations_v2.0.pptx`](BRD-02_Operations/01_BIBS_GuideDeck_BRD-02_Operations_v2.0.pptx) |
+| Operations | BRD-02 | FRS | 2.0 | [`BRD-02_Operations/02_BIBS_FRS_BRD-02_Operations_v2.0.docx`](BRD-02_Operations/02_BIBS_FRS_BRD-02_Operations_v2.0.docx) |
+| Operations | BRD-02 | Sign-off workbook (Excel) | 2.0 | [`BRD-02_Operations/03_BIBS_Signoff_BRD-02_Operations_v2.0.xlsx`](BRD-02_Operations/03_BIBS_Signoff_BRD-02_Operations_v2.0.xlsx) |
+| Operations | BRD-02 | Test plan workbook (Excel) | 2.0 | [`BRD-02_Operations/04_BIBS_TestPlan_BRD-02_Operations_v2.0.xlsx`](BRD-02_Operations/04_BIBS_TestPlan_BRD-02_Operations_v2.0.xlsx) |
+| Operations | BRD-02 | Test plan summary (Word) | 2.0 | [`BRD-02_Operations/05_BIBS_TestPlan_BRD-02_Operations_Summary_v2.0.docx`](BRD-02_Operations/05_BIBS_TestPlan_BRD-02_Operations_Summary_v2.0.docx) |
 | Collections | BRD-04 | FRS | 1.0 | [`BRD-04_Collections/BIBS_FRS_BRD-04_Collections_v1.0.docx`](BRD-04_Collections/BIBS_FRS_BRD-04_Collections_v1.0.docx) |
 | Collections | BRD-04 | Test plan summary (Word) | 1.0 | [`BRD-04_Collections/BIBS_TestPlan_BRD-04_Collections_Summary_v1.0.docx`](BRD-04_Collections/BIBS_TestPlan_BRD-04_Collections_Summary_v1.0.docx) |
 | Collections | BRD-04 | Test plan workbook (Excel) | 1.0 | [`BRD-04_Collections/BIBS_TestPlan_BRD-04_Collections_v1.0.xlsx`](BRD-04_Collections/BIBS_TestPlan_BRD-04_Collections_v1.0.xlsx) |

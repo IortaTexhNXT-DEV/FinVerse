@@ -118,9 +118,9 @@ async function flatCancellation(page, ctx) {
 
 const fills = {
   receive_payment: [
-    ['ARN, Invoice, Policy or PN No.', 'ARN-2026-940001'],
-    ['Payor Name', 'Maria Clara R. Santos'],
-    ['Assured Name', 'Santos, Maria Clara Reyes'],
+    ['ARN, Invoice, Policy or PN No.', 'ARN-2026-940004'],
+    ['Payor Name', 'Pacific Harbor Logistics Inc.'],
+    ['Assured Name', 'Pacific Harbor Logistics Inc.'],
     ['Amount', '5000'],
     async (page) => { await fill(page, 'Payment Date', dateText(0)); await settle(page, 2000); },
   ],
@@ -157,9 +157,9 @@ const fills = {
   ],
   new_series: [
     click('^new series$'),
-    async (page) => { await firstOption(dialog(page).getByLabel(/^Kind/).first()); },
-    async (page) => { await firstOption(dialog(page).getByLabel(/^Branch/).first()); },
-    async (page) => fill(page, 'Prefix', 'AR-HO', dialog(page)),
+    async (page) => fill(page, 'Kind', /^AR/, dialog(page)),
+    async (page) => fill(page, 'Branch', /Davao/, dialog(page)),
+    async (page) => fill(page, 'Prefix', 'AR-DVO', dialog(page)),
     async (page) => fill(page, 'From No.', '200001', dialog(page)),
     async (page) => fill(page, 'To No.', '205000', dialog(page)),
     async (page) => fill(page, 'BIR ATP No.', 'OCN-4AU0001234567', dialog(page)),
@@ -175,7 +175,7 @@ const fills = {
   incentive_rule: [
     click('^new rule$'),
     async (page) => fill(page, 'Insurer Code', 'INS-MGIC', dialog(page)),
-    async (page) => fill(page, 'Rate (% of basic premium)', '2.5', dialog(page)),
+    async (page) => fill(page, /^Rate \(% of basic premium\)/, '2.5', dialog(page)),
     async (page) => fill(page, 'Window (days)', '30', dialog(page)),
     async (page) => fill(page, 'Effective From', dateText(3), dialog(page)),
     async (page) => fill(page, 'Description', 'Early remittance incentive of Mabuhay General, 2027 agreement', dialog(page)),
@@ -201,11 +201,12 @@ const selects = {
 
 const after = {
   'scr-op-03-02-transactions': async (page) => {
-    const toggles = page.locator('main button[aria-expanded="false"]');
+    const toggles = page.locator('main section.card', { hasText: 'Policy Transactions' }).locator('button[aria-expanded="false"]');
     if ((await toggles.count()) > 0) {
-      await toggles.last().click();
+      await toggles.first().click();
       await settle(page, 800);
     }
+    await page.evaluate(() => document.querySelectorAll('main *').forEach((e) => { if (e.scrollLeft) e.scrollLeft = 0; }));
   },
   'scr-op-45-02-review': async (page) => {
     await page.getByRole('tab', { name: /^With Discrepancy/ }).first().click();
@@ -218,6 +219,10 @@ const after = {
     if ((await heading.count()) > 0) {
       await heading.scrollIntoViewIfNeeded();
     }
+  },
+  'scr-op-52-02-account': async (page) => {
+    await page.locator('main table tbody tr td').nth(1).click();
+    await settle(page, 800);
   },
   'scr-op-36-02-dv': async (page) => {
     const assign = page.getByRole('button', { name: /^assign dv$/i }).first();
@@ -240,10 +245,18 @@ const documents = {
   'doc-endorsement-slip': (ctx, out) => download(ctx, 'adjust', `/adjustment/requests/${posted(ctx)}/endorsement-slip`, out),
   'doc-validation-slip': (ctx, out) => download(ctx, 'adjust', `/adjustment/requests/${posted(ctx)}/validation-slip`, out),
   'doc-production-register': async (ctx, out) => render(await ctx.api('recon', 'GET', `/prodrecon/extracts/${ctx.one('select id from prc_extract order by id limit 1')}/file`),
-    'xlsx', out, 200, ['Month of Production', 'Invoice Number', 'Booking Date', 'Policy No.', 'Assured Name', 'Gross Premium', 'Amount Paid', 'Remittance Status']),
+    'xlsx', out, 200, ['Invoice Number', 'Policy No.', 'Gross Premium', 'Amount Paid', 'Remittance Status', 'Assured Name']),
   'doc-dp-billing': async (ctx, out) => render(await ctx.api('commrec', 'GET', `/commission/dp/billings/${ctx.one('select id from cmr_billing order by id limit 1')}/file`),
-    'xlsx', out, 200, ['Billing No.', 'Invoice No.', 'Policy No.', 'Premium', 'Commission', 'VAT', 'Withholding Tax', 'Net Commission', 'Decision', 'Reason', 'Assured Name']),
+    'xlsx', out, 200, ['Invoice No.', 'Premium', 'Net Commission', 'Decision', 'Reason', 'Assured Name']),
 };
 
-module.exports = { opens, fills, selects, after, crops: {}, custom: {}, walkthrough: walkthrough.steps, documents,
+// Walkthrough steps that show one tab of a record: the tab strip and the tab's content, below the record header.
+const TAB = 'main div.stack > div.tabs[role=tablist], main div.stack > div.tabs[role=tablist] ~ *';
+const crops = { 'wt-a-10': TAB, 'wt-b-07': TAB, 'wt-c-03': TAB, 'wt-c-05': TAB };
+// Screen shots of one tab of a long record page: the tab strip and the tab's content.
+['scr-op-03-02-transactions', 'scr-op-03-03-remittances', 'scr-op-03-04-movements', 'scr-op-26-04-documents',
+  'scr-op-39-02-policy', 'scr-op-39-03-accounting', 'scr-op-39-04-transactions', 'scr-op-45-01-items',
+  'scr-op-45-03-incentive'].forEach((slug) => { crops[slug] = TAB; });
+
+module.exports = { opens, fills, selects, after, crops, custom: {}, walkthrough: walkthrough.steps, documents,
   prepare: walkthrough.prepare };

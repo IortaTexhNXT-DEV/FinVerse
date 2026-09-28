@@ -2954,7 +2954,7 @@ frs:
     screen: INTERFACES
     data: [TD-OP-08]
     conditions:
-      - An upload with an invalid row records a run with a failed record and raises OPS_FLOW_IN_FAILED.
+      - An upload with an invalid row records a run with a failed record and raises the alert Interface run failed.
       - The same file again accepts no new record; inactive or unhandled feeds are refused.
     cases:
       - c: 1
@@ -2962,7 +2962,7 @@ frs:
         title: Hold file with an invalid row
         steps:
           - Upload the hold feed file (COLLECTION_HOLD) with one invalid row; open the run and the alerts.
-        expected: The run shows one failed record with its message; alert OPS_FLOW_IN_FAILED is raised.
+        expected: The run shows one failed record with its message; the alert Interface run failed is raised.
       - c: 2
         type: Negative
         title: Same file again

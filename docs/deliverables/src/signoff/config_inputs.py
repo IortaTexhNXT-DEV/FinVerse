@@ -194,6 +194,9 @@ def resolve_lists(data: dict[str, Any]) -> dict[str, dict[str, Any]]:
         for g in spec.get("parameter_groups") or []:
             values += [(p["param_key"], "Parameter: " + _param_label(p["param_key"], p["description"]))
                        for p in params if p["category"] == g]
+        if spec.get("accounting_events"):
+            values += [(r["code"], r["name"]) for r in sorted(sql_facts.rows("acc_event_type"),
+                                                               key=lambda x: (x["category"], x["code"]))]
         if spec.get("parameters_from_column"):
             tid, n = spec["parameters_from_column"]
             keys = [k.strip() for k in by_id[tid]["rows"][n - 1]["format"].split(",")]

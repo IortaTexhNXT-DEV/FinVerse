@@ -485,7 +485,7 @@ class GuidedBook:
                 cell.font = font(9, label == "Due", brand.NEAR_BLACK if label == "Due" else brand.TEXT)
                 cell.alignment = Alignment(vertical="top", wrap_text=True)
                 ws.merge_cells(start_row=row, start_column=2, end_row=row, end_column=span)
-                lines = max(1, math.ceil(len(str(text)) * 1.1 / max(merged_chars, 20)))
+                lines = max(1, math.ceil(len(str(text)) / max(merged_chars * 1.2, 20)))
                 ws.row_dimensions[row].height = max(15, 12.5 * lines + 3)
             ws.row_dimensions[row].outlineLevel = 1
             row += 1
@@ -615,7 +615,7 @@ class GuidedBook:
                 cell.number_format = DATE_FORMAT
             elif c.text_cell and not c.check.startswith(("number", "whole", "date")):
                 cell.number_format = "@"
-        ws.row_dimensions[row].height = max(18, 13 * max(math.ceil(len(str(c.example)) * 1.1 / widths[i])
+        ws.row_dimensions[row].height = max(18, 13 * max(math.ceil(len(str(c.example)) / widths[i])
                                                           for i, c in enumerate(t.columns, start=2)) + 4)
 
         # Input rows: number formats (text cells keep leading zeros), then the table, validations and highlights.
@@ -785,7 +785,7 @@ class GuidedBook:
             cell.font = font(10)
             cell.alignment = Alignment(wrap_text=True, vertical="top")
             ws.merge_cells(start_row=row, start_column=2, end_row=row, end_column=ncol)
-            ws.row_dimensions[row].height = max(15, 13 * math.ceil(len(s) * 1.1 / max(total - columns[0][1], 30)) + 3)
+            ws.row_dimensions[row].height = max(15, 13 * math.ceil(len(s) / max(total - columns[0][1], 30)) + 3)
             row += 1
         row += 1
         ws.cell(row=row, column=1, value=index_title).font = font(12, True, brand.HEADER_BLUE)
@@ -819,7 +819,7 @@ class GuidedBook:
                     set_link(cell, target)
                     cell.font = font(9, True, brand.CTA_BLUE, underline=True)
                 if isinstance(v, str) and not v.startswith("="):
-                    lines = max(lines, math.ceil(len(v) * 1.1 / max(w - 1, 4)))
+                    lines = max(lines, math.ceil(len(v) / max(w * 1.2 - 1, 4)))
             ws.row_dimensions[row].height = min(13 * lines + 4, 120)
             row += 1
         last = max(row - 1, first)
@@ -967,7 +967,7 @@ class GuidedBook:
                     if c == 3:
                         cell.number_format = "@"
                     if v:
-                        lines = max(lines, sum(math.ceil(max(len(x), 1) * 1.1 / widths[c - 1])
+                        lines = max(lines, sum(math.ceil(max(len(x), 1) / (widths[c - 1] * 1.2))
                                                for x in str(v).split("\n")))
                 if lines > 1:
                     ws.row_dimensions[row + j].height = 12.5 * lines + 3

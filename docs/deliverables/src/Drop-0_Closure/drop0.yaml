@@ -16,7 +16,7 @@
 #     SIT seed data fills. The check refuses a seeded master table that no item claims or that two items claim, a
 #     parameter, list, event or document template without exactly one route, a screen that is not in the menu, a
 #     migration object that is not in the catalogue and a template field that is not a column of its table.
-# Routes: screen (BDOI keys it on the named screen; the register row records the decision), template (BDOI fills the
+# Routes: screen (BDOI keys it on the named screen; its row of the Start here index records the decision), template (BDOI fills the
 # template sheet; the rows are then entered on the named screen or uploaded), migration (loaded from the legacy
 # extracts by the data migration object; prepared in the Migration Workbook, not in this workbook).
 
@@ -27,7 +27,7 @@ meta:
   date: 5 October 2026
   go_live: 2028-01-03
   go_live_text: "Go-live is proposed for Monday 3 January 2028 (T), at the year-end boundary (option A of the Data Migration set, for Comptrollership to confirm)."
-  statuses: [Open, In progress, Provided, Confirmed, Not applicable]
+  statuses: [Not started, In progress, Ready for review, Confirmed, Not applicable]
 
 # Due milestones, in date order. weeks before go-live are computed from the date.
 due:
@@ -116,6 +116,7 @@ lov_prefixes:
   SCR_: SCR
   UAM_: UAM
 lov_codes:
+  LEGACY_RECORD_STATUS: DM
   AR_CLASS: OPS
   BRANCH_EMAIL: OPS
   CANCELLATION_REASON: OPS
@@ -335,7 +336,7 @@ items:
 
   # ---------------------------------------------------------------- Lists of values
   - {id: CFG-060, area: Lists of values, module: PLATFORM, name: Lists of values (every list of the platform), due: D3, route: template, template: LIST-LOV, screen: /broking-setup/lists,
-     provides: "For every list: its owner, and the values BDOI keeps, adds or retires. The lists whose values come from the legacy systems are loaded by R01; the others are entered on Lists of Values under maker-checker (see the sheet Lists of values for the route of each list)",
+     provides: "For every list: its owner, and the values BDOI keeps, adds or retires. The lists whose values come from the legacy systems are loaded by R01; the others are entered on Lists of Values under maker-checker (see the sheet Ref Lists of values for the route of each list)",
      tables: [lov_value]}
   - {id: CFG-061, area: Lists of values, module: DM, name: Values of the lists used by migrated records, due: D4, route: migration, object: R01, screen: /migration/maps,
      provides: "The legacy values of the lists mapped by the code maps LOV and MIS, and the BIBS value of each",
@@ -343,7 +344,7 @@ items:
 
   # ---------------------------------------------------------------- System and security parameters
   - {id: CFG-070, area: System and security parameters, module: PLATFORM, name: System parameters (every parameter of the platform), due: D5, route: template, template: LIST-PARAMETERS, screen: /admin/parameters,
-     provides: "For every parameter: the value BDOI wants against the value proposed, with the reason and the approver (see the sheet System parameters)",
+     provides: "For every parameter: the value BDOI wants against the value proposed, with the reason and the approver (see the sheet Ref System parameters)",
      tables: []}
   - {id: CFG-071, area: System and security parameters, module: SEC, name: "Sign-in, password, session and access-request parameters", due: D5, route: template, template: UA-05, screen: /admin/parameters,
      provides: "The security values agreed with BDOI Information Security (BRD-11 template CI-05)",
@@ -363,13 +364,13 @@ items:
 
   # ---------------------------------------------------------------- Notifications and documents
   - {id: CFG-080, area: Notifications and documents, module: PLATFORM, name: Notification events and recipients, due: D5, route: template, template: LIST-NOTIFICATIONS, screen: /operations/notifications,
-     provides: "For every notification event: in-app and e-mail by default, and any unit mailbox that must receive it besides the users of the step (see the sheet Notifications)",
+     provides: "For every notification event: in-app and e-mail by default, and any unit mailbox that must receive it besides the users of the step (see the sheet Ref Notifications)",
      tables: []}
   - {id: CFG-081, area: Notifications and documents, module: PLATFORM, name: Fixed recipients and sender address, due: D5, route: template, template: LIST-PARAMETERS, screen: /admin/parameters,
      provides: "The sender address of BIBS e-mails and the recipients of job failures and watchlist loads (parameters MAIL_FROM_ADDRESS, JOB_FAILURE_RECIPIENTS, SCR_INGEST_ALERT_RECIPIENTS)",
      tables: []}
   - {id: CFG-082, area: Notifications and documents, module: PLATFORM, name: "Document templates (letters, slips, advices, e-mails)", due: D5, route: template, template: LIST-DOCUMENTS, screen: /broking-setup/templates,
-     provides: "The BDOI wording and layout of every generated document (see the sheet Document templates)",
+     provides: "The BDOI wording and layout of every generated document (see the sheet Ref Document templates)",
      tables: []}
   - {id: CFG-083, area: Notifications and documents, module: SCR, name: Screening forms and STR layout, due: D5, route: screen, screen: /screening-setup/templates,
      provides: "The screening forms and the STR report layout Compliance submits",
@@ -392,7 +393,7 @@ items:
      provides: "BRD-03 template CI-10",
      tables: [cat_incentive_criteria, cat_incentive_criteria_product]}
   - {id: CFG-097, area: Products and packages, module: PM, name: Lists and parameters of Product Maintenance, due: D5, route: template, template: PM-09, screen: /broking-setup/lists,
-     provides: "BRD-03 template CI-09 (the lists and parameters it names are listed with this route on the sheets Lists of values and System parameters)",
+     provides: "BRD-03 template CI-09 (the lists and parameters it names are listed with this route on the sheets Ref Lists of values and Ref System parameters)",
      tables: []}
   - {id: CFG-098, area: Products and packages, module: PM, name: Package document templates, due: D5, route: template, template: PM-08, screen: /broking-setup/templates,
      provides: "BRD-03 template CI-08: the texts of the package documents",
@@ -488,7 +489,23 @@ records_not_configuration:
 # Drop 0 templates. Columns: header | mandatory (Y, N or the condition) | format | what to enter | example, as in
 # the BRD templates. table / fields: the platform table and the column of each template column, for the check
 # (blank field = a column that is not a table column, such as a reference or a decision). upload: the template
-# columns are read from the upload of the named screen instead of being typed.
+# columns are read from the upload of the named screen instead of being typed. checks and depends: the drop-down or
+# check of a column and the templates whose codes it uses, as in the BRD templates (BRD-03 pack/config_inputs.yaml);
+# a code of a BRD template is named by its ID in this workbook (UA-02). The Start here index lists the register items
+# by due date and, within a due date, in the order the templates are filled in (dependencies first).
+lists:
+  DIMENSION: {name: Dimension, values: [[COST_CENTER, Cost centre], [BUSINESS_LINE, Business line]]}
+  ACCOUNT_CLASS: {name: Account class, values: [[ASSET, Asset], [LIABILITY, Liability], [EQUITY, Equity], [INCOME, Income], [EXPENSE, Expense]]}
+  ACCOUNT_CLASS_CHART: {name: Account class of the chart, values: [[ASSET, Asset], [LIABILITY, Liability], [EQUITY, Equity], [INCOME, Income], [EXPENSE, Expense], [MEMORANDUM, Memorandum]]}
+  ACCOUNT_LEVEL: {name: Account level, values: [[GROUP, Group], [MAIN, Main account], [SUB, Sub-account], [MICRO, Micro account]]}
+  NEGATIVE_BALANCE: {name: Negative balance, values: [[ALLOW, Allowed], [WARN, Allowed with a warning], [BLOCK, Refused]]}
+  CATEGORY_ROW: {name: Category or numbering row, values: [[CATEGORY, GL category], [NUMBERING, Numbering scheme under a parent account]]}
+  ACCOUNTING_EVENT: {name: Accounting event, accounting_events: true}
+  DEBIT_CREDIT: {name: Debit or credit, values: [[DEBIT, Debit], [CREDIT, Credit]]}
+  LEGACY_ACCOUNT: {name: Legacy control account, values: [[Premium Receivable - Legacy, Per component], [PR 2307 - Legacy, ""], [Due to Insurers - Legacy, ""], [Commission Receivable - Legacy, ""], [Unrealised Commission - Legacy, ""], [Deferred Output VAT - Legacy, ""], [Unapplied Collections - Legacy, ""], [Migration Clearing, Nets to zero after the opening]]}
+  TAX_TYPE: {name: Tax type, values: [[EWT, Expanded withholding tax], [FWT, Final withholding tax], [VAT, Value-added tax], [PT, Percentage tax]]}
+  PAYEE_CLASS: {name: Payee class, lov: PAYEE_CLASS}
+  APPROVAL_MODULE: {name: Module of an approval matrix, values: [[Submitted Policies, ""], [Employee Benefits, ""], [Sanction Screening, ""], [Disbursement, ""]]}
 templates:
   - id: D0-01
     name: Company
@@ -498,6 +515,14 @@ templates:
     load: "Companies (Setup & Administration), entered by the System Administrator and authorised by Comptrollership"
     table: org_company
     fields: [code, name, tax_id, address, base_currency, fiscal_year_start_month, back_value_days, forward_value_days, retained_earnings_account]
+    checks:
+      Company code: text:10
+      Registered name: text:200
+      Base currency: text:3
+      Fiscal year start month: whole:1-12
+      Back-value days: whole:0-365
+      Forward-value days: whole:0-365
+      Retained earnings account: code:D0-06/Account Code
     columns:
       - "Company code | Y | Up to 10 capitals | Code of the company on every record | BDOI"
       - "Registered name | Y | Up to 200 characters | Name as registered with the SEC | BDO Insurance and Reinsurance Brokers, Inc."
@@ -516,6 +541,12 @@ templates:
     load: "Branches (Setup & Administration), before the first migration mock; the legacy branches are mapped to them by the code map BRANCH (object R02)"
     table: org_branch
     fields: [code, name, region, address, opening_date, head_office, forex_authorized, contact_phone, contact_email, manager_name, weekly_holidays, ""]
+    checks:
+      Branch code: text:10
+      Branch name: text:120
+      Opening date: date
+      Head office: yn
+      Foreign currency authorised: yn
     columns:
       - "Branch code | Y | Up to 10 capitals | Code of the branch; unique | HO"
       - "Branch name | Y | Up to 120 characters | Name shown on screens and documents | Head Office"
@@ -537,6 +568,10 @@ templates:
     load: "Holiday Calendar (Setup & Administration); 2028 before the dress rehearsal, later years each December"
     table: org_holiday
     fields: ["", holiday_date, description]
+    checks:
+      Branch code: code:D0-02/Branch code
+      Date: date
+      Description: text:120
     columns:
       - "Branch code | N | Code of D0-02; blank = every branch | Branch the holiday applies to | -"
       - "Date | Y | dd-MMM-yyyy | Date of the holiday | 01-Jan-2028"
@@ -550,6 +585,11 @@ templates:
     load: "Dimensions (Setup & Administration); the legacy cost centres are mapped by the code map COST_CENTER"
     table: dim_value
     fields: [dimension_type, code, name, active]
+    checks:
+      Dimension: list:DIMENSION
+      Code: text:20
+      Name: text:120
+      Active: yn
     columns:
       - "Dimension | Y | COST_CENTER or BUSINESS_LINE | Dimension of the value | COST_CENTER"
       - "Code | Y | Up to 20 capitals or digits | Code of the value | FIN"
@@ -563,6 +603,11 @@ templates:
     load: "Employees (Setup & Administration)"
     table: org_employee
     fields: [employee_no, full_name, "", cost_center, position, email, hired_on]
+    checks:
+      Full name: text:120
+      Branch code: code:D0-02/Branch code
+      Cost centre: code:D0-04/Code
+      Hired on: date
     columns:
       - "Employee number | Y | HR number | Unique | 1203344"
       - "Full name | Y | Up to 120 characters | Name of the employee | Andrea Mercado"
@@ -577,6 +622,16 @@ templates:
     owner: "Head, Comptrollership"
     source: The BDOI chart of accounts in use, completed with the legacy control accounts (D0-09)
     load: "Chart Upload (General Ledger): the file is checked row by row and every account is created pending authorisation by Comptrollership"
+    checks:
+      Parent Code: code:D0-06/Account Code
+      Class: list:ACCOUNT_CLASS_CHART
+      Level: list:ACCOUNT_LEVEL
+      Category: code:D0-07/Category code
+      Control Account: yn
+      Manual Posting: yn
+      Cost Centre Required: yn
+      Revaluation Required: yn
+      Negative Balance: list:NEGATIVE_BALANCE
     upload: CoaUploadHandler
   - id: D0-07
     name: Account categories and numbering
@@ -587,6 +642,12 @@ templates:
     load: "Chart of Accounts (General Ledger)"
     table: coa_category
     fields: ["", code, name, account_class, bank_category, "", "", ""]
+    checks:
+      Row: list:CATEGORY_ROW
+      Category code: text:20
+      Account class: list:ACCOUNT_CLASS
+      Bank category: yn
+      Width: whole:1-6
     columns:
       - "Row | Y | CATEGORY or NUMBERING | What the row defines | CATEGORY"
       - "Category code | Cond.: CATEGORY | Up to 20 capitals | GL category | CASH_IN_BANK"
@@ -600,12 +661,19 @@ templates:
     name: Accounting rules
     content: The debit and credit accounts of each accounting event of the platform
     owner: "Head, Comptrollership"
-    source: The posting rules of EBIX and ISYS; the accounting events listed on the sheet Accounting events
+    source: The posting rules of EBIX and ISYS; the accounting events listed on the sheet Ref Accounting events
     load: "Accounting Rules (Accounting Engine), checked with the Rule Simulator and authorised by Comptrollership"
     table: acc_rule_line
     fields: ["", "", "", "", "", line_no, side, account_code, amount_component, narration]
+    checks:
+      Event type: list:ACCOUNTING_EVENT
+      Business line: code:D0-04/Code
+      Effective from: date
+      Line: whole:1-99
+      Debit or credit: list:DEBIT_CREDIT
+      Account code: code:D0-06/Account Code
     columns:
-      - "Event type | Y | Code of the sheet Accounting events | Event that the rule posts | PREMIUM_BOOKED"
+      - "Event type | Y | Code of the sheet Ref Accounting events | Event that the rule posts | PREMIUM_BOOKED"
       - "Rule name | Y | Text | Name of the rule | Premium booked - non-life"
       - "Business line | N | Code of D0-04; blank = every line | Line the rule applies to | -"
       - "Currency | N | ISO 4217; blank = every currency | Currency the rule applies to | -"
@@ -624,6 +692,9 @@ templates:
     load: "Created with the chart of accounts (D0-06); named in the accounting rules of the legacy items"
     table: ""
     fields: []
+    checks:
+      Legacy account: list:LEGACY_ACCOUNT
+      BIBS account code: code:D0-06/Account Code
     columns:
       - "Legacy account | Y | Premium Receivable - Legacy (per component), PR 2307 - Legacy, Due to Insurers - Legacy, Commission Receivable - Legacy, Unrealised Commission - Legacy, Deferred Output VAT - Legacy, Unapplied Collections - Legacy, Migration Clearing | One row per account | Migration Clearing"
       - "Component | Cond.: Premium Receivable - Legacy | Basic premium, DST, premium tax or VAT, LGT, FST, other charges | Component the account holds | -"
@@ -638,6 +709,14 @@ templates:
     load: "Tax Codes & Forms (Tax & Statutory), authorised by Comptrollership"
     table: tax_code
     fields: [code, name, tax_type, atc, payee_class, rate, gl_account_code, income_nature, effective_from, effective_to]
+    checks:
+      Tax code: text:20
+      Tax type: list:TAX_TYPE
+      Payee class: list:PAYEE_CLASS
+      Rate %: number:0-100
+      GL account: code:D0-06/Account Code
+      Effective from: date
+      Effective to: date
     columns:
       - "Tax code | Y | Up to 20 capitals | Code of the tax | EWT_WC158"
       - "Name | Y | Text | Name shown on screens | EWT 1% - goods"
@@ -658,6 +737,12 @@ templates:
     load: "Bank Accounts and Checks (Disbursement), authorised by Comptrollership"
     table: pay_bank_account
     fields: [code, name, bank_name, account_no, currency, gl_account_code, pdc_clearing_account_code, "", notification_format]
+    checks:
+      Bank account code: text:20
+      Currency: text:3
+      GL account: code:D0-06/Account Code
+      PDC clearing account: code:D0-06/Account Code
+      Branch code: code:D0-02/Branch code
     columns:
       - "Bank account code | Y | Up to 20 capitals | Code of the account in BIBS | BDO-CA-001"
       - "Name | Y | Text | Name shown on screens | BDO Makati current account"
@@ -676,6 +761,9 @@ templates:
     load: "Bank Accounts and Checks (Disbursement)"
     table: pay_cheque_book
     fields: ["", first_no, last_no, next_no, received_on]
+    checks:
+      Bank account code: code:D0-11/Bank account code
+      Received on: date
     columns:
       - "Bank account code | Y | Code of D0-11 | Account of the check book | BDO-CA-001"
       - "First check number | Y | Digits | First number of the book | 0001001"
@@ -690,6 +778,14 @@ templates:
     load: "Petty Cash (Payables & Cash)"
     table: pay_petty_cash_fund
     fields: ["", code, name, custodian, gl_account_code, "", currency, imprest_amount]
+    checks:
+      Branch code: code:D0-02/Branch code
+      Fund code: text:20
+      Custodian: code:D0-05/Employee number
+      GL account: code:D0-06/Account Code
+      Replenishment bank account: code:D0-11/Bank account code
+      Currency: text:3
+      Imprest amount: number
     columns:
       - "Branch code | Y | Code of D0-02 | Branch of the fund | HO"
       - "Fund code | Y | Up to 20 capitals | Code of the fund | PCF-HO"
@@ -708,6 +804,8 @@ templates:
     load: "Bank Statement Layouts (Setup & Administration)"
     table: brs_statement_layout
     fields: ["", name, date_column, description_column, reference_column, debit_column, credit_column, amount_column, balance_column, date_pattern]
+    checks:
+      Bank account code: code:D0-11/Bank account code
     columns:
       - "Bank account code | Y | Code of D0-11 | Account of the statement | BDO-CA-001"
       - "Layout name | Y | Text | Name of the layout | BDO CSV statement"
@@ -728,6 +826,13 @@ templates:
     load: "Submitted Policies Setup, EB Setup, Compliance Setup (Configuration Versions) and Disbursement approver routing; the authorisation limit of a user is in UA-03"
     table: sbm_approval_matrix
     fields: ["", document, segment, tsi_from, tsi_to, level, permission, approver_username, signatory_title]
+    checks:
+      Module: list:APPROVAL_MODULE
+      From amount: number
+      To amount: number
+      Approval level: whole:1-9
+      Approver role: code:UA-02/Group profile code
+      Named approver: code:UA-01/User ID
     columns:
       - "Module | Y | Submitted Policies, Employee Benefits, Sanction Screening, Disbursement | Module of the approval | Submitted Policies"
       - "Document or transaction | Y | Text | What is approved | Terms of reference"

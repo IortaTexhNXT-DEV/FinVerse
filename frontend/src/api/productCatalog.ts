@@ -89,6 +89,23 @@ export interface VersionDetail {
   validationChecklist?: string;
   testPremium?: number;
   returnedReason?: string;
+  /** Outcome of the validation checkpoint; absent before the first decision. */
+  validationResult?: ValidationResult;
+  returnedBy?: string;
+  returnedAt?: string;
+  /** Checks run at the validation or the return, in checklist order. */
+  validationChecks?: ValidationCheck[];
+}
+
+export type ValidationResult = 'PASSED' | 'RETURNED';
+
+/** One check of the validation checkpoint and the figures it compared. */
+export interface ValidationCheck {
+  seq: number;
+  code: string;
+  label: string;
+  result: 'PASSED' | 'FAILED' | 'NOT_APPLICABLE';
+  detail?: string;
 }
 
 interface Deductible {

@@ -1,6 +1,22 @@
 import { api, toQuery } from './client';
 import type { ProductLifecycle, VersionStatus } from './productCatalog';
 import type { RecordStatus, RecordOriginFields } from './types';
+import type {
+  SalesAssignment,
+  SalesOfficer,
+  SalesOrganisation,
+  SalesUnit,
+  SalesUnitInput,
+} from './salesOrganisation';
+
+export type {
+  SalesAssignment,
+  SalesLevel,
+  SalesOfficer,
+  SalesOrganisation,
+  SalesUnit,
+  SalesUnitInput,
+} from './salesOrganisation';
 
 /** Product catalog, insurer panel, rate tables, sales organisation and rating (catalog module). */
 export type RiskItemKind = 'VEHICLE' | 'PROPERTY_LOCATION' | 'PERSON' | 'GENERIC';
@@ -20,7 +36,6 @@ export type RateCode =
   | 'MOTOR_OD_MULTI_YEAR';
 export type MotorCoverage = 'BI' | 'PD';
 export type ProductClass = 'PACKAGE' | 'NON_PACKAGE' | 'ANY';
-export type SalesLevel = 'REGION' | 'DEPARTMENT' | 'TEAM';
 export type PeriodBasis = 'ANNUAL' | 'PRO_RATA' | 'SHORT_PERIOD';
 export type CatalogKind =
   | 'PRODUCT_LINE'
@@ -268,53 +283,6 @@ export interface MotorLimit extends EffectiveDated {
   coverage: MotorCoverage;
   limitAmount: number;
   premium: number;
-}
-
-export interface SalesUnitInput {
-  companyId: number;
-  level: SalesLevel;
-  code: string;
-  name: string;
-  parentCode?: string;
-  costCenter?: string;
-}
-
-export interface SalesUnit extends Authorizable {
-  level: SalesLevel;
-  code: string;
-  name: string;
-  parentCode?: string;
-  costCenter?: string;
-  headUsername?: string;
-  /** Reason of the last deactivation or reactivation. */
-  statusReason?: string;
-  createdBy?: string;
-  createdAt?: string;
-  lastChangedAt?: string;
-  authorizedAt?: string;
-}
-
-export interface SalesOfficer extends Authorizable {
-  teamCode: string;
-  username: string;
-  /** Date of the current team assignment. */
-  assignedSince?: string;
-  /** Reason of the removal from the team. */
-  statusReason?: string;
-  lastChangedAt?: string;
-  authorizedAt?: string;
-}
-
-export interface SalesOrganisation {
-  units: SalesUnit[];
-  officers: SalesOfficer[];
-}
-
-export interface SalesAssignment {
-  region?: string;
-  department?: string;
-  team?: string;
-  costCenter?: string;
 }
 
 export interface RatingItem {

@@ -88,9 +88,13 @@ public class SalesTargetService {
             + unit.periodTo()
             + ": "
             + values.count()
-            + " bookings, premium PHP "
+            + " bookings, premium "
+            + target.getCurrency()
+            + " "
             + target.getTargetPremium()
-            + ", commission PHP "
+            + ", commission "
+            + target.getCurrency()
+            + " "
             + target.getTargetCommission());
     return target;
   }

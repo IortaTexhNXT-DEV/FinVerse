@@ -60,8 +60,7 @@ public class AccountScheduleReport implements ReportDefinition {
                 + " ageing)",
             List.of(
                 ParameterSpec.required(COMPANY, "Company", ParameterType.COMPANY),
-                ParameterSpec.required(SCHEDULE, "Schedule code", ParameterType.TEXT)
-                    .withDefault("SCH-PR-PHP"),
+                ParameterSpec.required(SCHEDULE, "Schedule code", ParameterType.TEXT),
                 ParameterSpec.optional(
                     FROM, "Period from (default: first day of the month)", ParameterType.DATE),
                 ParameterSpec.required(AS_OF, "As of", ParameterType.DATE).withDefault("TODAY"),

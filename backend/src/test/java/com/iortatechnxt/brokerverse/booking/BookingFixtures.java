@@ -102,7 +102,8 @@ public class BookingFixtures {
   /** An issued multi-year PAR01 property account starting in the past (BRNB.112). */
   public Account multiYear(LocalDate from, int years) {
     return issued(
-        new Spec("PAR01", "CBG", PaymentArrangement.VIA_BROKER, from, from.plusYears(years), years));
+        new Spec(
+            "PAR01", "CBG", PaymentArrangement.VIA_BROKER, from, from.plusYears(years), years));
   }
 
   /**

@@ -38,10 +38,12 @@ class ClientNeutralityTest {
   /** Names of the client of the first deployment; its theme pack and seed data carry them. */
   private static final Pattern CLIENT =
       Pattern.compile(
-          "\\bBDOI?\\b|\\bBDO[ -]?(?:Unibank|Insure)|@bdo\\.com|bdo-insure", Pattern.CASE_INSENSITIVE);
+          "\\bBDOI?\\b|\\bBDO[ -]?(?:Unibank|Insure)|@bdo\\.com|bdo-insure",
+          Pattern.CASE_INSENSITIVE);
 
   /** The client names are upper case codes; "bdo" in lower case only as part of these. */
-  private static final Pattern CLIENT_CASE = Pattern.compile("BDOI?|(?i:bdo[ -]?(?:unibank|insure)|@bdo\\.com)");
+  private static final Pattern CLIENT_CASE =
+      Pattern.compile("BDOI?|(?i:bdo[ -]?(?:unibank|insure)|@bdo\\.com)");
 
   /** Currency codes that must come from the company master or the record, never from code. */
   private static final Set<String> CURRENCIES =
@@ -49,12 +51,16 @@ class ClientNeutralityTest {
           "PHP", "USD", "EUR", "GBP", "JPY", "SGD", "HKD", "AUD", "CAD", "CHF", "CNY", "IDR", "MYR",
           "THB", "INR", "KRW", "NZD");
 
+  /** A three-letter code standing alone (not part of a number series such as INR-2026-1). */
+  private static final Pattern CODE = Pattern.compile("(?<![-_A-Za-z0-9])[A-Z]{3}(?![-_A-Za-z0-9])");
+
   /** A Java string literal (text blocks are not used for such values). */
-  private static final Pattern JAVA_STRING = Pattern.compile("\"((?:[^\"\\\\\\n]|\\\\.)*)\"");
+  private static final Pattern JAVA_STRING = Pattern.compile("\"([^\"\\\\\\n]*+(?:\\\\.[^\"\\\\\\n]*+)*+)\"");
 
   /** A TypeScript string or template literal. */
   private static final Pattern TS_STRING =
-      Pattern.compile("'((?:[^'\\\\\\n]|\\\\.)*)'|\"((?:[^\"\\\\\\n]|\\\\.)*)\"|`((?:[^`\\\\]|\\\\.)*)`");
+      Pattern.compile(
+          "'([^'\\\\\\n]*+(?:\\\\.[^'\\\\\\n]*+)*+)'|\"([^\"\\\\\\n]*+(?:\\\\.[^\"\\\\\\n]*+)*+)\"|`([^`\\\\]*+(?:\\\\.[^`\\\\]*+)*+)`");
 
   /** JSX text between tags, e.g. {@code <th>Name</th>}. */
   private static final Pattern JSX_TEXT = Pattern.compile(">([^<>{}]*[A-Za-z][^<>{}]*)<");
@@ -109,6 +115,8 @@ class ClientNeutralityTest {
     assertThat(currency("ALL")).isFalse();
     assertThat(currency("Amount (PHP)")).isTrue();
     assertThat(currency("PHPX")).isFalse();
+    assertThat(currency("INR-")).isFalse();
+    assertThat(currency("SCH-PR-PHP")).isFalse();
   }
 
   private boolean clientName(String literal) {
@@ -122,7 +130,7 @@ class ClientNeutralityTest {
   }
 
   private static boolean currency(String literal) {
-    Matcher m = Pattern.compile("\\b[A-Z]{3}\\b").matcher(literal);
+    Matcher m = CODE.matcher(literal);
     while (m.find()) {
       if (CURRENCIES.contains(m.group())) {
         return true;

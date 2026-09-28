@@ -12,8 +12,8 @@ import java.util.Properties;
  * logo, the colours and the font of the client. Reports and business documents in PDF, Word and
  * Excel all take their brand from here, so no client logo or colour is written into the platform.
  *
- * <p>The pack is the folder {@code theme/<pack>} on the classpath with {@code brand.properties}
- * and the logo; it is chosen with the system property {@value #PACK_PROPERTY} or the environment
+ * <p>The pack is the folder {@code theme/<pack>} on the classpath with {@code brand.properties} and
+ * the logo; it is chosen with the system property {@value #PACK_PROPERTY} or the environment
  * variable {@value #PACK_ENV} ({@value #DEFAULT_PACK} unless set), read once when the class loads.
  */
 public final class BrandAssets {

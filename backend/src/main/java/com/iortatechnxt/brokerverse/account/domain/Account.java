@@ -302,7 +302,8 @@ public class Account extends BaseEntity {
    * @param when time
    */
   public void setPaymentArrangement(PaymentArrangement arrangement, String user, Instant when) {
-    PaymentArrangement value = Objects.requireNonNullElse(arrangement, PaymentArrangement.VIA_BROKER);
+    PaymentArrangement value =
+        Objects.requireNonNullElse(arrangement, PaymentArrangement.VIA_BROKER);
     if (value != paymentArrangement) {
       this.directPaymentTaggedBy = value == PaymentArrangement.DIRECT_TO_INSURER ? user : null;
       this.directPaymentTaggedAt = value == PaymentArrangement.DIRECT_TO_INSURER ? when : null;

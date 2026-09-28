@@ -331,3 +331,10 @@ written in the client documents.
   (V652, V764, V771, V870, V880, V890, V1000, V1020, V1050-V1052, V1055, V1060). No SQL statement changed, but the Flyway
   checksums did: a database migrated by an earlier build runs `flyway repair` once (or is recreated) before the
   next start.
+- **Release note: the SIT/UAT password left the seed scripts.** The header comments of 16 seed scripts (V900, V980,
+  V990, V998, V999, V1109, V1900, V1910, V1920, V1930, V1940, V1950, V1952, V1960, V1970, V1980) no longer state the
+  SIT/UAT password; it is provided to testers separately. No SQL statement changed, but the Flyway checksums did: a
+  database that applied these seed scripts (seed environments only: local stacks, SIT, UAT and training) runs
+  `flyway repair` once, or is recreated, before its next start. Never run it on production, which never applies
+  `db/seed`. `spring.flyway.validate-on-migrate` keeps its default (on) in every profile; the automated tests build
+  a fresh database on every run and need no repair.

@@ -1,6 +1,6 @@
 -- =====================================================================================
--- iNXT BrokerVerse - V1920 Seed Claims Handling (BRD-7) users (seed profile only; password for all
--- users: Brokerverse@2026). SEED DATA ONLY - never load in production.
+-- iNXT BrokerVerse - V1920 Seed Claims Handling (BRD-7) users (seed profile only; the SIT/UAT
+-- password is provided to testers separately). SEED DATA ONLY - never load in production.
 --   Users of the Claims personas (CLAIMS_BROKING_DESIGN 7.3; FRS BRD-7 section 3): clmofficer
 --   (Claims Officer, Motor HO), clmofficer2 (Claims Officer, Non-Motor HO), clmbranch (Claims
 --   Officer, Cebu branch), clmtl (Team Lead, Motor HO), clmth (Team Head, Non-Motor HO), clmuh

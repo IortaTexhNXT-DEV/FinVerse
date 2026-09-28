@@ -39,6 +39,10 @@ apply, for example, V27 on a database already at V975. `flyway_schema_history` r
   the previous release by rule (expand → migrate → contract across releases).
 - Rollback: redeploy the previous image. Never roll back a database migration by hand; fix
   forward with a new migration.
+- Seed environments only (never production): when the release notes say that seed scripts (`db/seed`) changed
+  only in comments, run `flyway repair` once against the seed database, or recreate it, before starting the new
+  release; otherwise Flyway refuses the start on the changed checksums. Current note: the SIT/UAT password left the
+  seed script comments (CONFIGURATION.md, "Seed data").
 
 ## 4. Monitoring
 

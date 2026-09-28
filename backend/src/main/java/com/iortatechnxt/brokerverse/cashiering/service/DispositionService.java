@@ -207,7 +207,7 @@ public class DispositionService {
     DispositionTypeRule rule = rule(typeCode);
     executor.validate(item, rule, details);
     Disposition d = dispositions.save(new Disposition(item.getId(), rule, details));
-    move(item, "assign_disposition", rule.getTypeCode());
+    move(item, "assign_disposition", typeLabel(rule));
     audit.record(
         UnappliedService.ENTITY,
         item.getReference(),
@@ -247,7 +247,7 @@ public class DispositionService {
         UnappliedService.ENTITY,
         key,
         "assign_disposition",
-        TransitionNote.comment(rule.getTypeCode()));
+        TransitionNote.comment(typeLabel(rule)));
     onAssigned.accept(d);
     executor.execute(item, d);
     workflow.systemTransition(UnappliedService.ENTITY, key, "complete", TransitionNote.NONE);
@@ -275,7 +275,7 @@ public class DispositionService {
     executor.validate(item, rule, details);
     Disposition d = current(item);
     d.update(rule, details);
-    move(item, "update", rule.getTypeCode());
+    move(item, "update", typeLabel(rule));
     return d;
   }
 
@@ -443,5 +443,10 @@ public class DispositionService {
           "UNAPPLIED_WRONG_STAGE",
           item.getReference() + " is " + item.getStage() + ", not " + stage);
     }
+  }
+
+  /** The name of a disposition type in the workflow history ("Refund to Payor"), not its code. */
+  private String typeLabel(DispositionTypeRule rule) {
+    return lovs.label(LOV, rule.getTypeCode());
   }
 }

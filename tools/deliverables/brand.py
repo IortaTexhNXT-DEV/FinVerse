@@ -268,22 +268,35 @@ READING_ORDER = {"StartHere": "00", "GuideDeck": "01", "FRS": "02", "Signoff": "
 # of a setup BRD (BRD-3 Product Maintenance); the Data Migration Handbook and the Migration Workbook, which are the 02
 # and 03 of the BRD-13 set in place of the FRS and the sign-off workbook.
 READING_ORDER_EXTRA = {"Templates": "06", "Handbook": "02", "Workbook": "03"}
+# The UX screen documents of a set, for the BDOI UX Design team (client request of 28-Sep-2026): 07 the UX Screen
+# Deck (PowerPoint), 08 the UX screen register (Excel) and 09 the image package (ZIP of every screen image at twice
+# the screen resolution, with the register as CSV). Two kinds share the name UXScreens, so the order is by kind and
+# extension. build_ux_deck.py builds the three; check_pack requires them in the sets of UX_SETS.
+READING_ORDER_UX = {("UXDeck", "pptx"): "07", ("UXScreens", "xlsx"): "08", ("UXScreens", "zip"): "09"}
+# Sign-off sets that carry the UX screen documents (07 to 09): the Drop 0 sets first; the Drop 1 sets follow when
+# they are re-issued.
+UX_SETS = {"BRD-03", "BRD-11", "BRD-13"}
 
 
 def output_name(doc_type: str, brd: str, name: str, version: str, ext: str) -> str:
     """File name of a client-pack document: BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>, with the reading-order
-    prefix (00_ to 06_) for the documents of a business sign-off release set.
+    prefix (00_ to 09_) for the documents of a business sign-off release set.
 
     >>> output_name("FRS", "BRD-03", "Product Maintenance", "1.0", "docx")
     'BIBS_FRS_BRD-03_Product_Maintenance_v1.0.docx'
     >>> output_name("FRS", "BRD-01", "New Business", "2.0", "docx")
     '02_BIBS_FRS_BRD-01_New_Business_v2.0.docx'
+    >>> output_name("UXScreens", "BRD-03", "Product Maintenance", "2.0", "zip")
+    '09_BIBS_UXScreens_BRD-03_Product_Maintenance_v2.0.zip'
     """
     safe = "_".join(part for part in name.replace("&", "and").replace("/", " ").split() if part)
     key = doc_type + ("Summary" if safe.endswith("_Summary") else "")
     prefix = ""
     order = {**READING_ORDER, **READING_ORDER_EXTRA}
-    if SIGNOFF_SETS.get(brd) == str(version) and key in order:
+    ux = READING_ORDER_UX.get((doc_type, ext.lstrip(".")))
+    if SIGNOFF_SETS.get(brd) == str(version) and ux:
+        prefix = ux + "_"
+    elif SIGNOFF_SETS.get(brd) == str(version) and key in order:
         prefix = order[key] + "_"
     return f"{prefix}BIBS_{doc_type}_{brd}_{safe}_v{version}.{ext.lstrip('.')}"
 

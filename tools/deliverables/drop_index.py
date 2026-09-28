@@ -81,9 +81,12 @@ KINDS = {
     "Alignment": "Alignment pack",
     "Change_Management": "Change register",
     "Change_Register": "Change register",
+    "UXDeck": "UX screen deck (PowerPoint)",
+    "UXScreens": "UX screen register (Excel)",
 }
 # Order of the kinds inside a release set.
-KIND_ORDER = ["StartHere", "GuideDeck", "ReleaseNote", "FRS", "Handbook", "Signoff", "Workbook", "TestPlan"]
+KIND_ORDER = ["StartHere", "GuideDeck", "ReleaseNote", "FRS", "Handbook", "Signoff", "Workbook", "TestPlan",
+              "Templates", "UXDeck", "UXScreens"]
 NAME_RE = re.compile(r"(?:\d\d_)?BIBS_(?P<type>[A-Za-z_]+?)_(?P<brd>BRD-\d\d)_(?P<name>.+?)_v(?P<ver>\d+\.\d+)\.(?P<ext>\w+)$")
 # A document of a drop-level set (brand.DROP_SETS): <nn>_BIBS_<Drop-n>_<Name>_v<version>.<ext>.
 DROP_NAME_RE = re.compile(r"(?:(?P<order>\d\d)_)?BIBS_(?P<drop>Drop-\d)_(?P<name>.+?)_v(?P<ver>\d+\.\d+)\.(?P<ext>\w+)$")
@@ -102,6 +105,8 @@ def describe(path: Path, kind: str | None = None) -> tuple[str, str, str, str]:
         kind = kind or m["type"]
         label = KINDS.get(kind, kind)
         name = m["name"]
+        if kind == "UXScreens" and m["ext"] == "zip":
+            label = "UX screen images, 2x PNG with the register as CSV (ZIP)"
         if kind in ("TestPlans", "TestPlan", "Change_Management", "Change_Register"):
             label = f"{label} summary (Word)" if name.endswith("_Summary") else f"{label} workbook (Excel)"
             label = label[0].upper() + label[1:]
@@ -142,6 +147,19 @@ def closure_note(key: str) -> list[str]:
             "route (screen, template or data migration object)."]
 
 
+def ux_note(key: str) -> list[str]:
+    """The UX screen documents 07 to 09 of the sets of the drop (brand.UX_SETS), for the BDOI UX Design team."""
+    sets = [b for b in sorted(brand.UX_SETS) if brand.drop_of(b) == key]
+    if not sets:
+        return []
+    return ["",
+            f"The sets of {', '.join(sets)} also carry the UX screen documents for the BDOI UX Design team: 07 the UX "
+            "Screen Deck (every screen persona by persona and flow by flow, with all its states), 08 the UX screen "
+            "register (one row per screen image with the FRS section, the UXD status and the change flag) and 09 the "
+            "image package (every screen image at twice the screen resolution, with the register as CSV). A change "
+            "of the FRS names the screens it affects, so the UX Design team revises only those screens."]
+
+
 def write_index(key: str) -> Path:
     drop = brand.DROPS[key]
     root = brand.OUT_DIR / drop["folder"]
@@ -178,6 +196,7 @@ def write_index(key: str) -> Path:
         "and signed off together; in an",
         "issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, \"Release and",
         "sign-off per BRD\"). Each document is kept once, in its latest version.",
+        *ux_note(key),
         *closure_note(key),
         "",
         "| Document | BRD | Kind | Version | File |",

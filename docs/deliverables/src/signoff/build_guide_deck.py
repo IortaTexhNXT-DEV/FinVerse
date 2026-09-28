@@ -316,11 +316,15 @@ def build(brd: str) -> Path:
 
     # 3. Pack at a glance
     rows = [[signoff_pack.doc_file(pack, d), d["what"], d["readers"], d["when"]] for d in g["documents"]]
-    deck.table("The pack at a glance", ["File", "What it is for", "Who reads it", "When"], rows,
-               widths=[3.6, 5.2, 2.6, 1.8], size=10)
-    deck.notes("The files are numbered 00 to 05 so they sort in reading order in the BRD folder. 00 Start Here is "
-               f"the short version of this deck; 02 {ch['document']} and 03 workbook carry the same rows; 04 and 05 are "
-               "the test plan traced to the screens.")
+    chunks = _balanced(rows, 6)
+    for n, chunk in enumerate(chunks, start=1):
+        part = f" ({n} of {len(chunks)})" if len(chunks) > 1 else ""
+        deck.table(f"The pack at a glance{part}", ["File", "What it is for", "Who reads it", "When"], chunk,
+                   widths=[3.6, 5.2, 2.6, 1.8], size=10)
+        deck.notes("The files are numbered in reading order so they sort that way in the BRD folder. 00 Start Here "
+                   f"is the short version of this deck; 02 {ch['document']} and 03 workbook carry the same rows; 04 and "
+                   "05 are the test plan traced to the screens; 07 to 09 are the UX screen documents for the BDOI UX "
+                   "Design team, taken from the same screens.")
 
     # 4. Where to start
     deck.table("Where to start: reading order per role", ["Role", "Read, in this order"],

@@ -16,6 +16,8 @@ and signed off together; in an
 issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, "Release and
 sign-off per BRD"). Each document is kept once, in its latest version.
 
+The sets of BRD-03, BRD-11, BRD-13 also carry the UX screen documents for the BDOI UX Design team: 07 the UX Screen Deck (every screen persona by persona and flow by flow, with all its states), 08 the UX screen register (one row per screen image with the FRS section, the UXD status and the change flag) and 09 the image package (every screen image at twice the screen resolution, with the register as CSV). A change of the FRS names the screens it affects, so the UX Design team revises only those screens.
+
 The drop-level set `Drop-0_Closure/` (v2.0) covers the whole drop: 01 Configuration inputs workbook (Excel); 02 Closure summary (Word). Its workbook lists every configuration input BDOI provides before go-live with its owner, due date and one route (screen, template or data migration object).
 
 | Document | BRD | Kind | Version | File |
@@ -29,6 +31,9 @@ The drop-level set `Drop-0_Closure/` (v2.0) covers the whole drop: 01 Configurat
 | Product Maintenance | BRD-03 | Test plan workbook (Excel) | 2.0 | [`BRD-03_Product_Maintenance/04_BIBS_TestPlan_BRD-03_Product_Maintenance_v2.0.xlsx`](BRD-03_Product_Maintenance/04_BIBS_TestPlan_BRD-03_Product_Maintenance_v2.0.xlsx) |
 | Product Maintenance | BRD-03 | Test plan summary (Word) | 2.0 | [`BRD-03_Product_Maintenance/05_BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v2.0.docx`](BRD-03_Product_Maintenance/05_BIBS_TestPlan_BRD-03_Product_Maintenance_Summary_v2.0.docx) |
 | Configuration Inputs | BRD-03 | Templates | 2.0 | [`BRD-03_Product_Maintenance/06_BIBS_Templates_BRD-03_Configuration_Inputs_v2.0.xlsx`](BRD-03_Product_Maintenance/06_BIBS_Templates_BRD-03_Configuration_Inputs_v2.0.xlsx) |
+| Product Maintenance | BRD-03 | UX screen deck (PowerPoint) | 2.0 | [`BRD-03_Product_Maintenance/07_BIBS_UXDeck_BRD-03_Product_Maintenance_v2.0.pptx`](BRD-03_Product_Maintenance/07_BIBS_UXDeck_BRD-03_Product_Maintenance_v2.0.pptx) |
+| Product Maintenance | BRD-03 | UX screen register (Excel) | 2.0 | [`BRD-03_Product_Maintenance/08_BIBS_UXScreens_BRD-03_Product_Maintenance_v2.0.xlsx`](BRD-03_Product_Maintenance/08_BIBS_UXScreens_BRD-03_Product_Maintenance_v2.0.xlsx) |
+| Product Maintenance | BRD-03 | UX screen images, 2x PNG with the register as CSV (ZIP) | 2.0 | [`BRD-03_Product_Maintenance/09_BIBS_UXScreens_BRD-03_Product_Maintenance_v2.0.zip`](BRD-03_Product_Maintenance/09_BIBS_UXScreens_BRD-03_Product_Maintenance_v2.0.zip) |
 | User Access Maintenance | BRD-11 | Start here guide | 2.0 | [`BRD-11_User_Access_Maintenance/00_BIBS_StartHere_BRD-11_User_Access_Maintenance_v2.0.docx`](BRD-11_User_Access_Maintenance/00_BIBS_StartHere_BRD-11_User_Access_Maintenance_v2.0.docx) |
 | User Access Maintenance | BRD-11 | Sign-off pack guide deck | 2.0 | [`BRD-11_User_Access_Maintenance/01_BIBS_GuideDeck_BRD-11_User_Access_Maintenance_v2.0.pptx`](BRD-11_User_Access_Maintenance/01_BIBS_GuideDeck_BRD-11_User_Access_Maintenance_v2.0.pptx) |
 | User Access Maintenance | BRD-11 | FRS | 2.0 | [`BRD-11_User_Access_Maintenance/02_BIBS_FRS_BRD-11_User_Access_Maintenance_v2.0.docx`](BRD-11_User_Access_Maintenance/02_BIBS_FRS_BRD-11_User_Access_Maintenance_v2.0.docx) |
@@ -36,12 +41,18 @@ The drop-level set `Drop-0_Closure/` (v2.0) covers the whole drop: 01 Configurat
 | User Access Maintenance | BRD-11 | Test plan workbook (Excel) | 2.0 | [`BRD-11_User_Access_Maintenance/04_BIBS_TestPlan_BRD-11_User_Access_Maintenance_v2.0.xlsx`](BRD-11_User_Access_Maintenance/04_BIBS_TestPlan_BRD-11_User_Access_Maintenance_v2.0.xlsx) |
 | User Access Maintenance | BRD-11 | Test plan summary (Word) | 2.0 | [`BRD-11_User_Access_Maintenance/05_BIBS_TestPlan_BRD-11_User_Access_Maintenance_Summary_v2.0.docx`](BRD-11_User_Access_Maintenance/05_BIBS_TestPlan_BRD-11_User_Access_Maintenance_Summary_v2.0.docx) |
 | Configuration Inputs | BRD-11 | Templates | 2.0 | [`BRD-11_User_Access_Maintenance/06_BIBS_Templates_BRD-11_Configuration_Inputs_v2.0.xlsx`](BRD-11_User_Access_Maintenance/06_BIBS_Templates_BRD-11_Configuration_Inputs_v2.0.xlsx) |
+| User Access Maintenance | BRD-11 | UX screen deck (PowerPoint) | 2.0 | [`BRD-11_User_Access_Maintenance/07_BIBS_UXDeck_BRD-11_User_Access_Maintenance_v2.0.pptx`](BRD-11_User_Access_Maintenance/07_BIBS_UXDeck_BRD-11_User_Access_Maintenance_v2.0.pptx) |
+| User Access Maintenance | BRD-11 | UX screen register (Excel) | 2.0 | [`BRD-11_User_Access_Maintenance/08_BIBS_UXScreens_BRD-11_User_Access_Maintenance_v2.0.xlsx`](BRD-11_User_Access_Maintenance/08_BIBS_UXScreens_BRD-11_User_Access_Maintenance_v2.0.xlsx) |
+| User Access Maintenance | BRD-11 | UX screen images, 2x PNG with the register as CSV (ZIP) | 2.0 | [`BRD-11_User_Access_Maintenance/09_BIBS_UXScreens_BRD-11_User_Access_Maintenance_v2.0.zip`](BRD-11_User_Access_Maintenance/09_BIBS_UXScreens_BRD-11_User_Access_Maintenance_v2.0.zip) |
 | Data Migration | BRD-13 | Start here guide | 2.0 | [`BRD-13_Data_Migration/00_BIBS_StartHere_BRD-13_Data_Migration_v2.0.docx`](BRD-13_Data_Migration/00_BIBS_StartHere_BRD-13_Data_Migration_v2.0.docx) |
 | Data Migration | BRD-13 | Sign-off pack guide deck | 2.0 | [`BRD-13_Data_Migration/01_BIBS_GuideDeck_BRD-13_Data_Migration_v2.0.pptx`](BRD-13_Data_Migration/01_BIBS_GuideDeck_BRD-13_Data_Migration_v2.0.pptx) |
 | Data Migration | BRD-13 | Data Migration Handbook | 2.0 | [`BRD-13_Data_Migration/02_BIBS_Handbook_BRD-13_Data_Migration_v2.0.docx`](BRD-13_Data_Migration/02_BIBS_Handbook_BRD-13_Data_Migration_v2.0.docx) |
 | Data Migration | BRD-13 | Migration Workbook (Excel) | 2.0 | [`BRD-13_Data_Migration/03_BIBS_Workbook_BRD-13_Data_Migration_v2.0.xlsx`](BRD-13_Data_Migration/03_BIBS_Workbook_BRD-13_Data_Migration_v2.0.xlsx) |
 | Data Migration | BRD-13 | Test plan workbook (Excel) | 2.0 | [`BRD-13_Data_Migration/04_BIBS_TestPlan_BRD-13_Data_Migration_v2.0.xlsx`](BRD-13_Data_Migration/04_BIBS_TestPlan_BRD-13_Data_Migration_v2.0.xlsx) |
 | Data Migration | BRD-13 | Test plan summary (Word) | 2.0 | [`BRD-13_Data_Migration/05_BIBS_TestPlan_BRD-13_Data_Migration_Summary_v2.0.docx`](BRD-13_Data_Migration/05_BIBS_TestPlan_BRD-13_Data_Migration_Summary_v2.0.docx) |
+| Data Migration | BRD-13 | UX screen deck (PowerPoint) | 2.0 | [`BRD-13_Data_Migration/07_BIBS_UXDeck_BRD-13_Data_Migration_v2.0.pptx`](BRD-13_Data_Migration/07_BIBS_UXDeck_BRD-13_Data_Migration_v2.0.pptx) |
+| Data Migration | BRD-13 | UX screen register (Excel) | 2.0 | [`BRD-13_Data_Migration/08_BIBS_UXScreens_BRD-13_Data_Migration_v2.0.xlsx`](BRD-13_Data_Migration/08_BIBS_UXScreens_BRD-13_Data_Migration_v2.0.xlsx) |
+| Data Migration | BRD-13 | UX screen images, 2x PNG with the register as CSV (ZIP) | 2.0 | [`BRD-13_Data_Migration/09_BIBS_UXScreens_BRD-13_Data_Migration_v2.0.zip`](BRD-13_Data_Migration/09_BIBS_UXScreens_BRD-13_Data_Migration_v2.0.zip) |
 
 ## Who signs what
 

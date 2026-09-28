@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
  * account of an earlier row of the same file. A blank account code takes the next number of the
  * parent's numbering scheme (FRBS 2.3.2). Every account is created pending authorization
  * (maker-checker), exactly as on the chart screen. Sample: {@code
- * docs/samples/coa_upload_sample.xlsx}.
+ * docs/samples/coa_upload_sample.xlsx}, the guided template filled in.
  */
 @Component
 public class CoaUploadHandler implements BulkImportHandler {

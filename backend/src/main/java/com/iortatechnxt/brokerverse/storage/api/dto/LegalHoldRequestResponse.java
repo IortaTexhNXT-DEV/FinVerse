@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.storage.api.dto;
 
 import com.iortatechnxt.brokerverse.storage.domain.LegalHoldRequest;
+import com.iortatechnxt.brokerverse.storage.domain.StoredFile;
 import java.time.Instant;
 
 /**
@@ -16,6 +17,8 @@ import java.time.Instant;
  * @param decidedBy approver
  * @param decidedAt decision time
  * @param decisionNote decision note
+ * @param fileName name of the file (null when not looked up)
+ * @param documentType document type of the file (null when not looked up)
  */
 public record LegalHoldRequestResponse(
     Long id,
@@ -27,7 +30,9 @@ public record LegalHoldRequestResponse(
     Instant requestedAt,
     String decidedBy,
     Instant decidedAt,
-    String decisionNote) {
+    String decisionNote,
+    String fileName,
+    String documentType) {
 
   /**
    * Maps a request.
@@ -36,6 +41,17 @@ public record LegalHoldRequestResponse(
    * @return response
    */
   public static LegalHoldRequestResponse from(LegalHoldRequest r) {
+    return from(r, null);
+  }
+
+  /**
+   * Maps a request with the file it concerns.
+   *
+   * @param r request
+   * @param file the file, or null
+   * @return response
+   */
+  public static LegalHoldRequestResponse from(LegalHoldRequest r, StoredFile file) {
     return new LegalHoldRequestResponse(
         r.getId(),
         r.getStoredFileId(),
@@ -46,6 +62,8 @@ public record LegalHoldRequestResponse(
         r.getRequestedAt(),
         r.getDecidedBy(),
         r.getDecidedAt(),
-        r.getDecisionNote());
+        r.getDecisionNote(),
+        file == null ? null : file.getFileName(),
+        file == null ? null : file.getDocumentType());
   }
 }

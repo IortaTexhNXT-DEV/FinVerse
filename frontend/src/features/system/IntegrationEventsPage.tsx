@@ -3,6 +3,8 @@ import { RefreshCw, RotateCcw, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { integrationEventsApi } from '@/api/integrationEvents';
 import type {
+  ArchiveFilter,
+  ArchivedEvent,
   DeadLetter,
   DeadLetterStatus,
   IntegrationTopic,
@@ -14,17 +16,22 @@ import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
+import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
+import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { Pager } from '@/components/ui/Pager';
+import { RowActionMenu } from '@/components/ui/RowActionMenu';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime } from '@/utils/format';
 
-type View = 'dead-letters' | 'outbox' | 'topics';
+type View = 'dead-letters' | 'outbox' | 'archive' | 'topics';
 
 const VIEWS = [
   { id: 'dead-letters', label: 'Dead Letters' },
   { id: 'outbox', label: 'Outbox' },
+  { id: 'archive', label: 'Event Archive' },
   { id: 'topics', label: 'Topics' },
 ] as const;
 
@@ -197,6 +204,129 @@ function OutboxCard() {
   );
 }
 
+/** The event archive: every published event, searched by topic, event key or correlation ID. */
+function ArchiveCard({ topics }: Readonly<{ topics: IntegrationTopic[] }>) {
+  const [draft, setDraft] = useState<ArchiveFilter>({});
+  const [filter, setFilter] = useState<ArchiveFilter>({});
+  const [page, setPage] = useState(0);
+  const [shown, setShown] = useState<ArchivedEvent | null>(null);
+  const events = useQuery({
+    queryKey: [...QUERY_KEY, 'archive', filter, page],
+    queryFn: () => integrationEventsApi.archive(filter, page),
+  });
+  const search = () => {
+    setPage(0);
+    setFilter(draft);
+  };
+  return (
+    <>
+      <ErrorAlert error={events.error} />
+      <Card title="Search the archive">
+        <div className="form-grid">
+          <Field label="Topic">
+            {(id) => (
+              <select
+                id={id}
+                className="select"
+                value={draft.topic ?? ''}
+                onChange={(e) => setDraft({ ...draft, topic: e.target.value || undefined })}
+              >
+                <option value="">All topics</option>
+                {topics.map((t) => (
+                  <option key={t.name} value={t.name}>
+                    {t.name}
+                  </option>
+                ))}
+              </select>
+            )}
+          </Field>
+          <Field
+            label="Event key"
+            hint="Invoice, receipt or other record number the event is about"
+          >
+            {(id) => (
+              <input
+                id={id}
+                className="input"
+                value={draft.key ?? ''}
+                onChange={(e) => setDraft({ ...draft, key: e.target.value || undefined })}
+              />
+            )}
+          </Field>
+          <Field label="Correlation ID" hint="Shown in an error message or a support log">
+            {(id) => (
+              <input
+                id={id}
+                className="input"
+                value={draft.correlationId ?? ''}
+                onChange={(e) => setDraft({ ...draft, correlationId: e.target.value || undefined })}
+              />
+            )}
+          </Field>
+        </div>
+        <div className="form-actions">
+          <Button variant="accent" onClick={search}>
+            Search
+          </Button>
+        </div>
+      </Card>
+      <Card title="Archived events" flush>
+        <DataTable<ArchivedEvent>
+          loading={events.isLoading}
+          rows={events.data?.content ?? []}
+          rowKey={(e) => e.id}
+          onRowClick={setShown}
+          emptyMessage="No archived event matches the search."
+          columns={[
+            { key: 'o', header: 'Occurred', render: (e) => formatDateTime(e.occurredAt) },
+            { key: 't', header: 'Topic', render: (e) => <code>{e.topic}</code> },
+            { key: 'y', header: 'Event Type', render: (e) => e.type },
+            { key: 'k', header: 'Event Key', render: (e) => e.key },
+            { key: 'c', header: 'Company', render: (e) => e.companyCode ?? '—' },
+            { key: 'a', header: 'Archived', render: (e) => formatDateTime(e.archivedAt) },
+            {
+              key: 'x',
+              header: <span className="visually-hidden">Actions</span>,
+              width: '64px',
+              render: (e) => (
+                <RowActionMenu
+                  label={`${e.type} ${e.key}`}
+                  actions={[{ label: 'View Event', onSelect: () => setShown(e) }]}
+                />
+              ),
+            },
+          ]}
+        />
+        <Pager
+          page={page}
+          totalPages={events.data?.totalPages ?? 0}
+          total={events.data?.totalElements ?? 0}
+          size={25}
+          onPage={setPage}
+        />
+      </Card>
+      <Modal open={shown !== null} title="Archived Event" onClose={() => setShown(null)}>
+        {shown !== null && (
+          <div className="stack">
+            <DefinitionGrid
+              label="Event"
+              items={[
+                { label: 'Event type', value: shown.type },
+                { label: 'Event key', value: shown.key },
+                { label: 'Topic', value: shown.topic },
+                { label: 'Occurred', value: formatDateTime(shown.occurredAt) },
+                { label: 'Correlation ID', value: shown.correlationId },
+                { label: 'Partition / offset', value: `${shown.partition} / ${shown.offset}` },
+              ]}
+            />
+            <pre className="message-body">{shown.envelope}</pre>
+          </div>
+        )}
+      </Modal>
+    </>
+  );
+}
+
 function TopicsCard({
   topics,
   loading,
@@ -224,7 +354,7 @@ function TopicsCard({
 
 /**
  * Support screen of the integration events (Kafka): dead letters with retry and discard, the
- * transactional outbox (send a FAILED event again) and the topic catalogue. System Administrator
+ * transactional outbox (send a FAILED event again), the event archive and the topic catalogue. System Administrator
  * only.
  */
 export default function IntegrationEventsPage() {
@@ -259,6 +389,7 @@ export default function IntegrationEventsPage() {
       <ErrorAlert error={topics.error} />
       {view === 'dead-letters' && <DeadLettersCard />}
       {view === 'outbox' && <OutboxCard />}
+      {view === 'archive' && <ArchiveCard topics={topics.data ?? []} />}
       {view === 'topics' && <TopicsCard topics={topics.data ?? []} loading={topics.isLoading} />}
     </div>
   );

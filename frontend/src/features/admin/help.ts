@@ -71,6 +71,45 @@ export const ADMIN_HELP: HelpSection = {
       controls: ['A failed run raises a JOB_FAILURE alert.'],
     },
     {
+      name: 'Caches',
+      path: '/admin/caches',
+      summary:
+        'The reference-data caches of the platform (parameters, lists of values, organisation, roles) with how long each entry is kept, where it is kept and which changes clear it.',
+      workflow: [
+        'After a change made outside the application (for example a correction in the database by the support team), choose Clear Cache in the row menu of the cache, or Clear All Caches.',
+      ],
+      controls: ['Clearing a cache drops its data on every instance; nothing else changes.'],
+    },
+    {
+      name: 'Record Classes',
+      path: '/admin/record-classes',
+      summary:
+        'Retention, legal hold and archiving of the stored documents by record class (policy documents, claims files, reports and the others).',
+      workflow: [
+        'The records hold approver chooses Change Settings in the row menu to change the retention, the legal hold of new files, the archiving of final files or whether the class accepts new files.',
+      ],
+      controls: ['Every change is kept in the audit trail.'],
+    },
+    {
+      name: 'Legal Holds',
+      path: '/admin/legal-holds',
+      summary:
+        'Requests to place or release the legal hold of a stored document, and their approval. A document under legal hold is neither deleted nor purged at the end of its retention.',
+      workflow: [
+        'The records hold officer looks up the document by its file number and requests the hold or its release with a reason.',
+        'The records hold approver approves or rejects each waiting request from the row menu, with a note.',
+      ],
+      controls: ['The requester never approves their own request.'],
+    },
+    {
+      name: 'Content Migration',
+      path: '/admin/content-migration',
+      summary:
+        'Progress of the copy of the documents kept in the database into the file store, by area: files, copied, remaining and the status of each area.',
+      workflow: ['The copy runs as a scheduled job; Refresh shows the latest counts.'],
+      controls: ['An area is complete when no file remains to copy.'],
+    },
+    {
       name: 'Product Modules',
       path: '/admin/modules',
       summary:
@@ -92,6 +131,7 @@ export const ADMIN_HELP: HelpSection = {
       workflow: [
         'Dead Letters: read the error, fix the cause, then Retry (the event is published again to its topic) or Discard it.',
         'Outbox: a FAILED event (Kafka did not acknowledge it after all attempts) can be sent again with Send Again.',
+        'Event Archive: every event published, searched by topic, event key or correlation ID; View Event shows the full event.',
         'Topics: the catalogue of topics, their event types and dead-letter topics.',
       ],
       controls: [

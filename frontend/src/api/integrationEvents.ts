@@ -48,6 +48,29 @@ export interface DeadLetter {
   payload: string;
 }
 
+/** An event kept in the event archive after it was published. */
+export interface ArchivedEvent {
+  id: number;
+  eventId: string;
+  topic: string;
+  type: string;
+  key: string;
+  companyCode?: string;
+  correlationId: string;
+  occurredAt: string;
+  partition: number;
+  offset: number;
+  archivedAt: string;
+  envelope: string;
+}
+
+/** Search of the event archive; blank fields do not filter. */
+export interface ArchiveFilter {
+  topic?: string;
+  key?: string;
+  correlationId?: string;
+}
+
 /** Support API of the integration events (System Administrator). */
 export const integrationEventsApi = {
   topics: () => api.get<IntegrationTopic[]>('/admin/events/topics'),
@@ -61,6 +84,10 @@ export const integrationEventsApi = {
       `/admin/events/dead-letters${toQuery({ status, page, size: 25 })}`,
     ),
   retryDeadLetter: (id: number) => api.post<undefined>(`/admin/events/dead-letters/${id}/retry`),
+  archive: (filter: ArchiveFilter, page = 0) =>
+    api.get<PageResponse<ArchivedEvent>>(
+      `/admin/events/archive${toQuery({ ...filter, page, size: 25 })}`,
+    ),
   discardDeadLetter: (id: number) =>
     api.post<undefined>(`/admin/events/dead-letters/${id}/discard`),
 };

@@ -1,3 +1,4 @@
+import { InsurerName } from '@/components/broking/LovLabel';
 import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
@@ -12,27 +13,30 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { humanize } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { Scheme, SchemeTerms } from './commissionApi';
 import { describeTier } from './commissionLogic';
 import { SchemeDialog } from './SchemeDialog';
+import { BENEFICIARIES, optionLabel, PERIODS, TYPES } from './schemeOptions';
 
 const COLUMNS: Column<Scheme>[] = [
   {
     key: 'name',
     header: 'Scheme',
-    render: (s) => (
-      <>
-        <strong>{s.terms.name}</strong>
-        <div className="muted">{s.code}</div>
-      </>
-    ),
+    render: (s) => <strong>{s.terms.name}</strong>,
   },
-  { key: 'type', header: 'Type', render: (s) => humanize(s.terms.schemeType) },
-  { key: 'insurer', header: 'Insurer', render: (s) => s.terms.insurerCode ?? 'All' },
-  { key: 'period', header: 'Period', render: (s) => humanize(s.terms.periodType) },
-  { key: 'beneficiary', header: 'Beneficiary', render: (s) => humanize(s.terms.beneficiary) },
+  { key: 'type', header: 'Type', render: (s) => optionLabel(TYPES, s.terms.schemeType) },
+  {
+    key: 'insurer',
+    header: 'Insurer',
+    render: (s) => (s.terms.insurerCode ? <InsurerName code={s.terms.insurerCode} /> : 'All'),
+  },
+  { key: 'period', header: 'Period', render: (s) => optionLabel(PERIODS, s.terms.periodType) },
+  {
+    key: 'beneficiary',
+    header: 'Beneficiary',
+    render: (s) => optionLabel(BENEFICIARIES, s.terms.beneficiary),
+  },
   {
     key: 'tiers',
     header: 'Tiers',

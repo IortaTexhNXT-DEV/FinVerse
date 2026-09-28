@@ -62,7 +62,9 @@ export function CollectorRequestsPanel({
     mutationFn: (body: Parameters<typeof requestsApi.accept>[1]) =>
       requestsApi.accept(selected?.id ?? 0, body),
     onSuccess: (d) =>
-      done(`Disposition assigned: ${dispositionLabel(d.dispositionType)} (${statusPhrase(d.status)})`),
+      done(
+        `Disposition assigned: ${dispositionLabel(d.dispositionType)} (${statusPhrase(d.status)})`,
+      ),
   });
   const reject = useMutation({
     mutationFn: (reason: string) => requestsApi.rejectRequest(selected?.id ?? 0, reason),

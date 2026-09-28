@@ -1,3 +1,4 @@
+import { CellStack } from '@/components/ui/CellStack';
 import { useQuery } from '@tanstack/react-query';
 import { History, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
@@ -37,22 +38,29 @@ type Dialog =
 function RunLog({ onOpen }: Readonly<{ onOpen: (run: FeedRun) => void }>) {
   const [page, setPage] = useState(0);
   const feeds = useQuery({ queryKey: ['ops', 'feeds'], queryFn: opsApi.feeds });
-  const feedName = (code: string) => feeds.data?.find((f) => f.code === code)?.name ?? humanize(code);
+  const feedName = (code: string) =>
+    feeds.data?.find((f) => f.code === code)?.name ?? humanize(code);
   const runs = useQuery({
     queryKey: ['ops', 'runs', page],
     queryFn: () => opsApi.runs(undefined, page),
   });
   const columns: Column<FeedRun>[] = [
-    { key: 'no', header: 'Run No.', render: (r) => <strong>{r.runNo}</strong> },
-    { key: 'feed', header: 'Feed', render: (r) => feedName(r.feedCode) },
-    { key: 'trigger', header: 'Trigger', render: (r) => humanize(r.trigger) },
+    {
+      key: 'no',
+      header: 'Run No. / Trigger',
+      render: (r) => <CellStack main={<strong>{r.runNo}</strong>} sub={humanize(r.trigger)} />,
+    },
+    {
+      key: 'feed',
+      header: 'Feed / File',
+      render: (r) => <CellStack main={feedName(r.feedCode)} sub={r.fileName} />,
+    },
     { key: 'start', header: 'Started', render: (r) => formatDateTime(r.startedAt) },
     {
       key: 'counts',
       header: 'Read / OK / Duplicate / Failed',
       render: (r) => `${r.readCount} / ${r.okCount} / ${r.duplicateCount} / ${r.failedCount}`,
     },
-    { key: 'file', header: 'File', render: (r) => r.fileName ?? '' },
     { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
   ];
   return (
@@ -163,7 +171,8 @@ export default function InterfacesPage() {
       </Card>
       <p className="ops-muted">
         <History size={12} aria-hidden="true" /> A failed or partial run alerts the System
-        Administrator (Interface run failed); failed records can be sent again and are taken in once.
+        Administrator (Interface run failed); failed records can be sent again and are taken in
+        once.
       </p>
       {dialog?.kind === 'config' && <FeedConfigDialog feed={dialog.feed} onClose={close} />}
       {dialog?.kind === 'upload' && <FeedUploadDialog feed={dialog.feed} onClose={close} />}

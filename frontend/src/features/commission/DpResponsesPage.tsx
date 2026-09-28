@@ -1,3 +1,4 @@
+import { InsurerName } from '@/components/broking/LovLabel';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Upload } from 'lucide-react';
 import { useState } from 'react';
@@ -23,7 +24,7 @@ import { FileDropZone } from '@/components/ui/FileDropZone';
 
 const COLUMNS: Column<DpBilling>[] = [
   { key: 'no', header: 'Billing No.', render: (b) => <strong>{b.billingNo}</strong> },
-  { key: 'insurer', header: 'Insurer', render: (b) => b.insurerCode },
+  { key: 'insurer', header: 'Insurer', render: (b) => <InsurerName code={b.insurerCode} /> },
   { key: 'items', header: 'Accounts', numeric: true, render: (b) => b.itemCount },
   {
     key: 'net',

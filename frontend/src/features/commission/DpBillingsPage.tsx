@@ -1,7 +1,8 @@
+import { InsurerName } from '@/components/broking/LovLabel';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
+import { InsurerFilter } from '@/components/broking/InsurerFilter';
 import { Amount } from '@/components/ui/Amount';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
@@ -21,7 +22,7 @@ import { UserName } from '@/components/ui/UserName';
 /** Columns of a billing list. */
 const COLUMNS: Column<DpBilling>[] = [
   { key: 'no', header: 'Billing No.', render: (b) => <strong>{b.billingNo}</strong> },
-  { key: 'insurer', header: 'Insurer', render: (b) => b.insurerCode },
+  { key: 'insurer', header: 'Insurer', render: (b) => <InsurerName code={b.insurerCode} /> },
   { key: 'items', header: 'Accounts', numeric: true, render: (b) => b.itemCount },
   {
     key: 'net',
@@ -77,10 +78,10 @@ export default function DpBillingsPage() {
               setPage(0);
             }}
           />
-          <WorklistToolbar
-            placeholder="Search Insurer Code"
-            onSearch={(text) => {
-              setInsurer(text.trim().toUpperCase());
+          <InsurerFilter
+            value={insurer}
+            onChange={(code) => {
+              setInsurer(code);
               setPage(0);
             }}
           />

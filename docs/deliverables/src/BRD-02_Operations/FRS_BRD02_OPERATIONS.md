@@ -1691,7 +1691,7 @@ validations:
   - [OR already recorded, "OR <no> was already recorded for client <client>", REMIT_OR_DUPLICATE]
   - [Missing column, "The file must have the columns <columns>", FEED_FILE_COLUMNS]
   - [Missing value, "Line <n>: <column> is missing", FEED_VALUE_MISSING]
-  - [Bad date or amount, "Line <n>: <column> must be YYYY-MM-DD / an amount", FEED_VALUE_INVALID]
+  - [Bad date or amount, "Line <n>: <column> must be a date such as 28-Oct-2026 / an amount", FEED_VALUE_INVALID]
   - [Empty file, The file has no lines, FEED_FILE_EMPTY]
 notifications:
   - "None."
@@ -1848,7 +1848,7 @@ description:
   - "Endorsement types are shown with their business labels (class, then the change): for example Financial – Change of Cover, Financial – Change of Premium Rate, Non-financial – Cover Extension, Non-financial – Assured Information, Internal Adjustment. Codes are never shown."
   - "The class comes from the endorsement type (list ENDORSEMENT_TYPE): financial (change of TSI, insured items, commission rate, premium rate or amount, extension of cover, change of cover, adjustment in charges, minimal balance), non-financial (descriptive changes, change of period cover, extension of period covered, extension of cover without premium, change of assured name or information) or internal adjustment."
   - "A financial request needs a request type of Annex V (list ENDORSEMENT_REQUEST_TYPE): Flat Cancellation; Flat Cancellation - Retain DST; Partial Cancellation; Increase / Decrease in TSI; Increase / Decrease of Premium Rate; VAT / Premium Tax exempt; Increase / Decrease of taxes; Change of Cover; Extension of Cover; Write-off; Decrease / Increase in Commission; Cancellation Reversal. A cancellation needs a reason (Annex V, 33 values). A non-financial request carries no request type, sum insured or amount."
-  - The invoice is locked by ADJUSTMENT while a request is open (FR-OP-006); a request that reduces the invoice raises PENDING_NEG_ADJ at submission.
+  - The invoice is locked by Adjustment while a request is open (FR-OP-006); a request that reduces the invoice raises PENDING_NEG_ADJ at submission.
 preconditions:
   - The user has ADJ_REQUEST or ADJ_PROCESS; the invoice is booked.
 main_flow:
@@ -1880,7 +1880,7 @@ validations:
   - [Return invoice, "<invoice> is a return invoice: raise the request on the original", ADJ_RETURN_INVOICE]
   - [Invoice cancelled or written off, "<invoice> is cancelled or written off", ADJ_INVOICE_CLOSED]
   - [Cancellation with another open financial request, "Request <no> (<type>) is still open on <invoice>: a cancellation cannot be combined with another financial change", ADJ_INCOMPATIBLE_REQUEST]
-  - [Invoice in remittance, "Invoice <no> is locked by REMITTANCE (<reason>)", INVOICE_LOCKED]
+  - [Invoice in remittance, "Invoice <no> is locked by Remittance (<reason>)", INVOICE_LOCKED]
   - [Type without class, "Endorsement type <code> has no class (FINANCIAL / NON_FINANCIAL)", ADJ_TYPE_WITHOUT_CLASS]
   - [Change after submission, "<request> is <stage> and can no longer be changed", ADJ_REQUEST_NOT_EDITABLE]
 fields_screen: New Request (request step)
@@ -2024,6 +2024,7 @@ alternate_flows:
 rules:
   - [R1, "Refund basis pro-rata or short-period, chosen per request (OQ36).", Configurable, Request field]
   - [R2, "Service invoice on an income or commission change; credit of the insurer's service invoice on a decrease (OQ34).", Fixed, "-"]
+  - [R3, "Before, Change and After are shown on one basis, the premium in force of the policy year: the invoice with the endorsements and returns of the same policy year (CLR-OP-35), so a flat cancellation of a policy with later endorsements takes the whole policy year back to zero and never shows a negative After.", Proposed, "-"]
 validations: []
 notifications:
   - "None."
@@ -2033,6 +2034,7 @@ acceptance:
   - A decrease in TSI of a 60/40 co-insured invoice shows the premium and commission change per insurer.
   - A commission increase without premium change issues a service invoice at posting.
   - The recompute of a flat cancellation equals the amounts posted by booking.
+  - A flat cancellation of a policy with a later endorsement shows Before as the premium in force of the policy year and After as zero for every component.
 ```
 
 ```fr
@@ -2451,7 +2453,7 @@ validations:
   - [Row without insurer or month, "Row <n> has no insurer or production month (yyyy-MM)", RECON_ROW_INCOMPLETE]
   - [Bad amount, "Row <n>: <column> '<value>' is not an amount", RECON_ROW_AMOUNT]
   - [Bad date, "Row <n>: <column> '<value>' is not a date", RECON_ROW_DATE]
-  - [Unknown company, "Upload the production of <insurer> from Production Reconciliation - Uploads (company not known)", RECON_COMPANY_UNKNOWN]
+  - [Unknown company, "Upload the production of <insurer> from Production Reconciliation - Insurer Feedback (company not known)", RECON_COMPANY_UNKNOWN]
 notifications:
   - RECON_FEEDBACK_UPLOADED to the handlers.
 audit:
@@ -2784,7 +2786,7 @@ validations:
   - [Billing not waiting, "Billing <no> is not waiting for the insurer", DP_BILLING_NOT_AWAITING]
   - [Invoice not on the billing, "Invoice <no> is not on billing <no>", DP_NOT_ON_BILLING]
   - [Unknown billing in the file, "Billing <no> does not exist", DP_BILLING_UNKNOWN]
-  - [Decision not APPROVED or REJECTED, "Decision '<value>' is neither APPROVED nor REJECTED", DP_RESPONSE_DECISION]
+  - [Decision not Approved or Rejected, "Decision '<value>' is not one of Approved or Rejected (or Yes / No)", DP_RESPONSE_DECISION]
   - [Column missing, "The insurer's answer has no '<column>' column", DP_RESPONSE_LAYOUT]
 notifications:
   - DP_FEEDBACK_OVERDUE to the handlers and TLs.
@@ -2864,7 +2866,7 @@ rules:
   - [R1, "Schemes are inactive without tiers until BDOI gives targets, rates and amounts (OQ39).", Configurable, Incentive Schemes]
   - [R2, "Exclusion rules NEGATIVE_AMOUNT and ERRONEOUS_BOOKING.", Configurable, LOV INCENTIVE_EXCLUSION_RULE]
 validations:
-  - [Scheme without tiers, "Scheme <name> has no tiers yet (targets and amounts from BDOI, OQ39)", INCENTIVE_SCHEME_EMPTY]
+  - [Scheme without tiers, "Scheme <name> has no tiers yet: add its targets and amounts first", INCENTIVE_SCHEME_EMPTY]
   - [Tier incomplete (tiered), Each tier needs a production target and a rate above zero, INCENTIVE_TIER_INVALID]
   - [Tier incomplete (fixed), Each tier needs a minimum basic premium and a fixed amount above zero, INCENTIVE_TIER_INVALID]
   - [Scheme dates, The scheme ends before it starts, INCENTIVE_SCHEME_DATES]
@@ -4300,14 +4302,11 @@ The table lists each point where the proposed screen or rule differs from the BR
 | CLR-OP-24 | Incentive schemes (CMRID.005, 006; FR-OP-095) | No Touch, Top Up and Motor Mania are set up as schemes; they stay inactive without tiers until BDOI gives the targets and amounts. | The targets and amounts are not given (OQ39). | Give the targets and amounts (OQ39). |
 | CLR-OP-25 | Collection and Disbursement systems (BRQID.004, CSHID.009, MKTID.010, 013, CMRID.001, DBMID.001, RMTID.034; FR-OP-130, 120) | Uploads for the Collection data and an in-app Disbursement queue, until BRD-4 Collections and BRD-5 Disbursement replace them. | The Collection and Disbursement systems are replaced by BIBS modules (OQ01, OQ02, OQ45). | Confirm the uploads and the queue until then. |
 | CLR-OP-26 | Match keys and automatch frequency (PRCID.024-027; FR-OP-075) | Lines are matched on the match keys of the reconciliation parameters in order (by default the invoice number, then the policy number); the automatch runs on every upload and when the handler clicks Match Again. | The keys and the frequency are not given (OQ30). | Give the match keys and the automatch frequency (OQ30). |
-| CLR-OP-27 | Main path of the endorsement stepper (screen standards) | The stepper of an endorsement request shows Posted - Payments to Re-apply as a stage of its path after Posted; a request whose invoice had no payment to re-apply ends at Posted. | Posting a paid invoice hands the payment back to Cashiering for re-application, which is part of the request's life. | Confirm the stage on the main path, or show it only when the request reaches it. |
 | CLR-OP-28 | Insurer in the references (screen standards) | Remittance batches, reconciliation cycles and their titles carry the insurer's short code in the reference (for example RMB-INS-MGIC-2026-000001, PRC-INS-MGIC-202609-000001); the insurer's name shows in the record facts and the documents. | The code in the reference tells the insurer at a glance in lists and file names. | Confirm the short code in the references and record titles, or ask for the name there. |
-| CLR-OP-29 | FFY period (screen standards, period cell) | The FFY Register shows the FFY Start and FFY End in two columns. | The register is sorted and filtered on either date. | Confirm two columns, or ask for the period cell (start and "to" end on two lines). |
-| CLR-OP-30 | Row actions in the queues (screen standards) | Queues whose rows carry the actions of the row's next step (Disbursement Queue: Acknowledge, Assign DV, Mark Paid, Return; reconciliation items: Pair; Production Extracts: Download, Resend; DTIP Status: Queue for End of Day) show them as buttons in the row; lists with more actions use the row action menu. | The queue actions are the daily work of the row. | Confirm buttons in the row for these queues, or ask for the row action menu. |
-| CLR-OP-31 | Column headings of the insurer upload templates (chapter 18) | The insurer OR, hold and special remittance uploads read the column headings of their templates as written (for example batchNo, invoiceNo, orNo, orDate, orAmount); the upload field shows them. | The insurer files are prepared from the template downloaded from the screen. | Confirm the column names, or give the headers BDOI and the insurers use. |
-| CLR-OP-32 | Insurer's decision in the DP billing (DO-08) | The insurer answers each account in the Decision column with APPROVED or REJECTED and gives the reason of a rejection; DP Responses reads these two values. | Two fixed values let the answer be read without interpretation. | Confirm the values, or give the insurers' wording. |
+| CLR-OP-32 | Insurer's decision in the DP billing (DO-08) | The insurer answers each account in the Decision column with Approved or Rejected (Yes or No is read the same way) and gives the reason of a rejection; DP Responses reads these values. | Fixed values let the answer be read without interpretation. | Confirm the values, or give the insurers' wording. |
 | CLR-OP-33 | Hold reasons (MKTID.003; FR-OP-111) | The hold reason list has one value, Others, with the comment, until BDOI gives its list. | The list is to be supplied by BDOI (OQ24). | Give the list of hold reasons (OQ24). |
 | CLR-OP-34 | Insurer references in the generated workbooks (DO-07, DO-08) | The production register and the DP billing show the insurer's short code, the dates as yyyy-mm-dd and the remittance status as a code, for the insurer's own systems to read. | The files are read back by the insurers and by BIBS. | Confirm the layout for the insurers, or give the layout each insurer needs. |
+| CLR-OP-35 | Basis of the recompute (ADJID.014; FR-OP-054) | Before, Change and After of a request are all taken on the premium in force of the policy year: the invoice with the endorsements and returns of the same policy year, as booking computes a cancellation. A flat cancellation of a policy with later endorsements therefore shows the whole policy year going to zero; a write-off or a non-financial request stays on the invoice alone. | The cancellation takes back the whole policy year, so a Before of the booking invoice alone would show negative After amounts. | Confirm the premium in force of the policy year as the basis. |
 
 # Appendix: Screen standards
 
@@ -4320,7 +4319,8 @@ The Operations screens follow the screen standards of BIBS. They are the same st
 | Workflow header (step bar) | Every record with a workflow shows a stepper under the record header: the stages of the main path in their order, passed stages ticked in blue, the current stage highlighted, the stages ahead in grey with their number. A returned or on-hold stage shows in amber after the stage it came from; a rejected, cancelled or voided record shows that stage in red and the path ends there; the last stage turns green when it is reached. Under the stepper one row gives Current Stage, Since, Due (with the Overdue pill) and Assigned To, with the actions of the stage on the right. The history is a table (Stage, From Stage, Action, By, Date and Time, Remarks, Duration in Stage), newest first. |
 | Messages (notice standard) | One standard for errors, warnings, information and success: a white notice with a thin bar and an icon in the colour of its kind (red, amber, blue, green), a bold short title, then the business message with one bullet per missing item. No codes, internal references or technical terms in what the user reads. Field errors appear under the field; a long form lists its errors at the top with a link to the first field. Only an unexpected system error offers Retry and a reference for support behind Details. Special instructions are one short information notice. |
 | Tables, not highlight boxes | Records and lists of records are rows of a titled table (for example the application of a receipt: Invoice, Component, Amount Applied); key data is a label and value grid. A coloured box carries a short message only, never a record. |
-| Tables | Header row in BDO blue that stays in view; text left, amounts right, dates in one format; one value per cell with at most one muted line under it; a dash for an empty value; "Showing x to y of n results" with page numbers. |
+| Tables | Header row in BDO blue that stays in view; text left, amounts right, dates in one format; one value per cell with at most one muted line under it; a dash for an empty value; "Showing x to y of n results" with page numbers. A table fits the page: related values share a column (one under the other) rather than scrolling sideways. |
+| Row actions | The actions on a record of a list are in one row action menu at the end of the row (the three-dot button), never buttons or links in the row; a destructive action is listed last, in red, and asks for confirmation. |
 | Status labels | Statuses are pills of one size and one colour per state group and never wrap. The full label is shown (for example Review in Process, With Outstanding Balance); an agreed short form, with the full label in the tooltip, only for a label longer than 21 characters. |
 | Labels and names | List values are shown by their label, never by their code; products by name with the code as a second line; insurers by name; users by their names, never by their user ID. |
 | Dates, amounts and rates | One date picker; dates entered and shown as dd-MMM-yyyy, times as dd-MMM-yyyy HH:mm (Philippine time). Amounts with two decimals and thousand separators, negatives in brackets, the currency in the column header or before the amount. Rates as percentages with two to four decimals, as keyed. |

@@ -98,7 +98,7 @@ screens:
       - {state: list, user: commrec, tab: "Awaiting Insurer", caption: "DP Billings, Awaiting Insurer tab"}
     fields:
       - "Tabs | To Send / Awaiting Insurer / To Collect / Returned to Collection / Closed / Cancelled | Tab | - | - | Fixed | To Send | - | - | -"
-      - "Toolbar | Search Insurer Code | Text | - | N | - | Blank | - | - | -"
+      - "Toolbar | Insurer | Drop-down | All insurers or one by name | N | Insurers | All insurers | - | - | -"
       - "List | Billing No. / Insurer / Accounts / Net Commission / Sent / Answer Due / Handler / Stage | Column | CRB-yyyy-n | - | DP billings | - | Read only | - | No items to display"
     actions:
       - "Open a row | Every Commission user | Always | Opens the billing | - | -"
@@ -181,11 +181,11 @@ screens:
       - {state: new, user: commtl, click: "^new scheme$", caption: "New Incentive Scheme dialog"}
     fields:
       - "List | Scheme / Type / Insurer / Period / Beneficiary / Tiers / Effective / Status | Column | - | - | Incentive schemes | - | Read only | - | No items to display"
-      - "Scheme dialog | Code / Name | Text | - | Y | - | Blank | - | Not blank | Code and name are required"
+      - "Scheme dialog | Name | Text | The scheme's reference is made from its name | Y | - | Blank | - | Not blank | The scheme name is required"
       - "Scheme dialog | Scheme Type | Drop-down | No Touch, Top Up, Motor Mania, Other | Y | Fixed list | Other | - | - | -"
       - "Scheme dialog | Calculation | Drop-down | Production Target Tiers, Fixed Amount per Policy | Y | Fixed list | Production Target Tiers | - | - | -"
       - "Scheme dialog | Period / Beneficiary | Drop-down | Monthly, Quarterly, Semi-annual, Annual, Custom / BDOI, Branch (Passed On) | Y | Fixed list | Quarterly / BDOI | - | - | -"
-      - "Scheme dialog | Insurer Code / Segments / Product Lines | Text | Blank = all | N | Insurers, segments, product lines | Blank | - | - | -"
+      - "Scheme dialog | Insurer / Segments / Product Lines | Drop-down, text | Every insurer, or one by name; blank segments and lines = all | N | Insurers, segments, product lines | Blank | - | - | -"
       - "Scheme dialog | Effective From / Effective To | Date | dd-MMM-yyyy | Y / N | - | Blank | - | The scheme cannot end before it starts | The scheme ends before it starts"
       - "Scheme dialog | Production Target / Rate % / Multiplier / Minimum Basic Premium / Amount per Policy | Number | One row per tier (Add Tier, Remove) | Cond.: an active scheme needs one tier | - | Blank | - | - | An active scheme needs at least one tier"
     actions:
@@ -237,7 +237,7 @@ screens:
     fields:
       - "Tabs | Submitted / Rejected / Acknowledged | Tab | - | - | Fixed | Submitted | - | - | -"
       - "List | Submission No. / Insurer / Period / Tax Withheld / ORs / Submitted / Status | Column | - | - | Certificate submissions | - | Read only | - | No items to display"
-      - "Submit BIR Certificate dialog | Insurer Code / BIR Form / Certificate No. | Text | - | Y | Insurers | Blank | - | Form and number given | Form and certificate number are required"
+      - "Submit BIR Certificate dialog | Insurer / BIR Form / Certificate No. | Drop-down, text | - | Y | Insurers | Blank | - | Form and number given | Form and certificate number are required"
       - "Submit BIR Certificate dialog | Tax Withheld / Period From / Period To | Number, date | Above zero; the period ends after it starts | Y | - | Blank | - | - | The tax withheld must be above zero / Enter a period that ends after it starts"
       - "Submit BIR Certificate dialog | [Official receipts covered] | Table | Add OR, Add ORs of the Insurer, Remove | Y | Official receipts | - | - | At least one OR | Tag the certificate to at least one official receipt"
     actions:

@@ -1,4 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInsurerName } from '@/components/broking/useLabels';
+import { CellStack } from '@/components/ui/CellStack';
+import { UserName } from '@/components/ui/UserName';
 import { Building2, CalendarRange, Coins, FileCheck, ReceiptText, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -24,7 +27,6 @@ import { CERTIFICATE_ENTITY, commissionApi } from './commissionApi';
 import type { Certificate, OrLink } from './commissionApi';
 import { receiptsTotal } from './commissionLogic';
 import { ReasonDialog } from './DpItemDialogs';
-import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'receipts', label: 'Official Receipts' },
@@ -45,9 +47,10 @@ const OR_COLUMNS: Column<OrLink>[] = [
 ];
 
 function Summary({ cert: c }: Readonly<{ cert: Certificate }>) {
+  const insurerName = useInsurerName();
   return (
     <RecordSummary
-      title={c.insurerCode}
+      title={insurerName(c.insurerCode)}
       chips={
         <>
           <ReferenceChip label="Submission" value={c.submissionNo} />
@@ -58,7 +61,7 @@ function Summary({ cert: c }: Readonly<{ cert: Certificate }>) {
         {
           icon: FileCheck,
           label: 'Certificate',
-          value: `${c.certificate.form} ${c.certificate.number}`,
+          value: <CellStack main={c.certificate.number} sub={`BIR Form ${c.certificate.form}`} />,
         },
         {
           icon: CalendarRange,
@@ -74,14 +77,18 @@ function Summary({ cert: c }: Readonly<{ cert: Certificate }>) {
         {
           icon: UserRound,
           label: 'Submitted',
-          value: `${formatDateTime(c.createdAt)} · ${displayNameOf(c.createdBy)}`,
+          value: (
+            <CellStack main={<UserName login={c.createdBy} />} sub={formatDateTime(c.createdAt)} />
+          ),
         },
         {
           icon: Building2,
           label: 'Decision',
-          value: c.decidedBy
-            ? `${displayNameOf(c.decidedBy)} · ${formatDateTime(c.decidedAt)}`
-            : 'Pending',
+          value: c.decidedBy ? (
+            <CellStack main={<UserName login={c.decidedBy} />} sub={formatDateTime(c.decidedAt)} />
+          ) : (
+            'Pending'
+          ),
         },
       ]}
     />
@@ -98,6 +105,7 @@ export default function CertificatePage() {
   const { can } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
+  const insurerName = useInsurerName();
   const [tab, setTab] = useState<TabId>('receipts');
   const [dialog, setDialog] = useState<DialogKind>();
   const cert = useQuery({
@@ -128,7 +136,7 @@ export default function CertificatePage() {
         section="Commission Receivables · BIR Certificates"
         backTo="/commission/certificates"
         title={c.submissionNo}
-        description={c.rejectReason ? `Rejected: ${c.rejectReason}` : c.insurerCode}
+        description={c.rejectReason ? `Rejected: ${c.rejectReason}` : insurerName(c.insurerCode)}
         actions={
           <>
             {decide && (

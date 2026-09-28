@@ -37,7 +37,7 @@ screens:
       - {state: list, user: remit, caption: "Extraction with the Run Extraction card and the extraction runs"}
       - {state: tags, user: remit, open: first, caption: "Extraction run with the tag and reasons of each invoice examined"}
     fields:
-      - "Run Extraction | Insurer Code | Text | Leave empty for every insurer | N | Insurers (BRD-3) | Blank | - | - | -"
+      - "Run Extraction | Insurer | Drop-down | Insurers by name; All insurers for every insurer | N | Insurers (BRD-3) | All insurers | - | - | -"
       - "Run Extraction | Remittance Type | Drop-down | All types, With Incentives, Normal - Peso, Normal - Dollar | N | Fixed list | All types | - | - | -"
       - "Run Extraction | Invoice No. | Text | Manual extraction of one invoice | N | Invoice ledger | Blank | - | - | -"
       - "Extraction Runs | Run No. / Scope / Status / Examined / Extracted / Due, Not Extracted / Not Yet Due / Batches / Started | Column | REX-yyyy-n with the trigger; started time and user | - | Extraction runs | - | Read only | - | -"
@@ -70,7 +70,7 @@ screens:
     fields:
       - "Tabs | Review in Process / For Approval / With Disbursement / Awaiting Insurer OR / OR Received / Returned | Tab | - | - | Fixed | Review in Process | - | - | -"
       - "Toolbar | Search Batch or Invoice No. | Text | - | N | - | Blank | - | Contains | -"
-      - "Filters | Insurer Code / Remittance Type | Text, drop-down | All types, With Incentives, Normal - Peso, Normal - Dollar, Special | N | - | Blank / All types | - | - | -"
+      - "Filters | Insurer / Remittance Type | Drop-down | All insurers or one by name; All types, With Incentives, Normal - Peso, Normal - Dollar, Special | N | - | Blank / All types | - | - | -"
       - "List | Select | Check box | Review in Process and For Approval | N | - | Not ticked | - | - | -"
       - "List | Batch No. / Insurer / Type / Accounts / Paid AR / Payable / Currency / Processor / DV No. / Status | Column | RMB-<insurer>-yyyy-n with the extraction date | - | Remittance batches | - | Read only | - | No items to display"
     actions:
@@ -150,7 +150,7 @@ screens:
       - {state: run, user: remit, open: first, caption: "Upload run with the accounts updated and the result of each record"}
     fields:
       - "Upload Insurer Schedule | Download Template | Button | Batch number, invoice number, OR number, OR date and OR amount | - | - | - | - | - | -"
-      - "Upload Insurer Schedule | [Insurer schedule file] | File | CSV, semicolon or tab separated text; max 20 MB | Y | - | - | - | A record already received is refused | -"
+      - "Upload Insurer Schedule | Insurer Schedule | File | CSV or text file with the columns of the template (Batch No., Invoice No., OR No., OR Date, OR Amount), dates as dd-MMM-yyyy; max 20 MB | Y | - | - | - | A record already received is refused | -"
       - "Upload History | Upload Run / File / Status / Accepted / Failed / Uploaded | Column | FIR-yyyy-n; uploaded time and user | - | Upload runs | - | Read only | - | -"
       - "Upload run dialog | Records Read / OR Matches Paid PR / Amount Mismatch / Refused | Tile | Counts | - | Upload run | - | Read only | - | -"
       - "Upload run dialog | Batch No. / Invoice No. / OR No. / OR Date / OR Amount / Paid PR / Status | Column | Matched or Amount Mismatch | - | Batch lines | - | Read only | - | No account was updated by this upload"
@@ -184,7 +184,7 @@ screens:
       - "New Hold Request dialog | Reason | Drop-down | - | Y | List of values hold reason | Blank | - | - | Select a reason"
       - "New Hold Request dialog | Hold Until | Date | dd-MMM-yyyy, after today | Y | - | Blank | - | A future date | Hold Until is required / Hold Until must be a future date"
       - "New Hold Request dialog | Remarks | Text area | - | N | - | Blank | - | - | -"
-      - "Upload Collection Hold File | [Hold file] | File | CSV with the invoice, reason, hold date and remarks | Y | - | - | - | - | -"
+      - "Upload Collection Hold File | Hold File | File | CSV or text file with the columns of the template (Invoice No., Reason Code, Hold Until, Remarks), dates as dd-MMM-yyyy | Y | - | - | - | - | -"
     actions:
       - "New Hold Request | Marketing Collection, Marketing Team Leader | Always | Creates the hold request in draft and submits it | Hold for approval | Hold for approval notice (NT-14)"
       - "Upload Hold File | Marketing Collection, Marketing Team Leader | Always | Creates the hold requests of the Collection file | Hold for approval | Hold for approval notice (NT-14)"
@@ -213,7 +213,7 @@ screens:
       - "Header | Invoice / Insurer / Hold Until / Requested / Approved By / Processor | Display | - | - | Hold request | - | Read only | - | -"
       - "Workflow | [Hold workflow header] | Stepper | Hold request draft, Hold for approval, On hold, Released; extension and cancellation for approval, Rejected and Cancelled when reached | - | Hold request | - | Read only | - | -"
       - "Request Extension dialog | New Hold Until / Comment | Date, text | After the current hold date | Y / N | - | Blank | On hold | A later date | -"
-      - "Assign to Processor dialog | Remittance Processor (User ID) | Text | User ID of a Remittance processor | Y | Users | Blank | On hold | Not blank | User ID is required"
+      - "Assign to Processor dialog | Remittance Processor | Drop-down | The Remittance processors by name | Y | Users | Blank | On hold | Chosen | Select the remittance processor"
     actions:
       - "Approve hold / Reject hold | Marketing Team Leader other than the requester | Hold for approval | Approves the hold (the invoice is flagged On Hold) or rejects it | On hold / Rejected | Hold decided notice (NT-14)"
       - "Request extension / Approve extension / Reject extension | Requester / Marketing Team Leader | On hold / Extension for approval | Moves the hold date on approval | Extension for approval / On hold | Hold for approval notice (NT-14)"
@@ -296,7 +296,7 @@ screens:
     fields:
       - "Tabs | DTIP Status / Accounts in Batches | Tab | - | - | Fixed | DTIP Status | - | - | -"
       - "Toolbar | Search Invoice, ARN, Policy or Assured | Text | - | N | - | Blank | - | Contains | -"
-      - "Filters | Insurer Code / Remittance Status | Text, drop-down | All statuses or one | N | - | Blank | - | - | -"
+      - "Filters | Insurer / Remittance Status | Drop-down | All statuses or one | N | - | Blank | - | - | -"
       - "DTIP Status | Invoice No. / Insurer / Payment / Paid AR / DTIP / Remitted / Outstanding DTIP / Extraction Tag / Flags / Remittance Status | Column | Invoice with the assured | - | Invoice ledger, extraction tags | - | Read only | - | -"
       - "Accounts in Batches | Batch No. / Invoice No. / Endorsement / Policy No. / Name of Assured / Paid AR / Net Due / Status | Column | - | - | Batch lines | - | Read only | - | -"
     actions:
@@ -324,7 +324,7 @@ screens:
       - "Tabs | For Confirmation / Confirmed / Drafts / Applied and Cancelled | Tab | - | - | Fixed | For Confirmation | - | - | -"
       - "Toolbar | Search Deduction No. or Source Reference | Text | - | N | - | Blank | - | Contains | -"
       - "List | Deduction No. / Insurer / Source / Insurer Confirmation / Amount / Remaining / Status | Column | RDN-yyyy-n with the preparer | - | Remittance deductions | - | Read only | - | No deductions in this status"
-      - "New Remittance Deduction dialog | Insurer Code / Currency | Text, drop-down | - | Y | Insurers, currencies | Blank / PHP | Draft | Not blank | Insurer code is required / Choose the currency"
+      - "New Remittance Deduction dialog | Insurer / Currency | Drop-down | Insurers by name | Y | Insurers, currencies | Blank / PHP | Draft | Chosen | Select the insurer / Choose the currency"
       - "New Remittance Deduction dialog | Deduction Source / Source Reference / Invoice No. | Drop-down, text | What the deduction settles | Y / Y / N | List of values deduction source | Blank | Draft | Not blank | Choose what the deduction settles / Source reference is required"
       - "New Remittance Deduction dialog | Amount | Number | Positive, at most 2 decimals | Y | - | Blank | Draft | Positive | Enter a positive amount with at most 2 decimals"
       - "New Remittance Deduction dialog | Insurer Confirmation Ref. / Confirmation Date / Remarks | Text, date | Confirmation date not in the future | N | - | Blank | Draft | - | The confirmation date cannot be in the future"
@@ -379,7 +379,7 @@ screens:
       - {state: new, user: remittl, fill: incentive_rule, caption: "New incentive rule"}
     fields:
       - "List | Insurer / Product Line / Segment / Rate / Window / Effective / Status | Column | Rate in %; window in days from inception or booking; period cell | - | Incentive rules | - | Read only | - | -"
-      - "Rule form | Insurer Code | Text | - | Y | Insurers | Blank | - | Not blank | Insurer code is required"
+      - "Rule form | Insurer / Product Line / Segment | Drop-down | Insurers, product lines and segments by name; All product lines and All segments | Y / N / N | Insurers, product lines, segments | Blank / All / All | - | Insurer chosen | Select the insurer"
       - "Rule form | Product Line (blank = all) / Segment (blank = all) | Text | - | N | Product lines, market segments | Blank | - | - | -"
       - "Rule form | Rate (% of basic premium) | Number | Above 0, at most 100 | Y | - | Blank | - | Within range | Rate must be above 0 and at most 100"
       - "Rule form | Window (days) / Window Starts From | Number, drop-down | 1 to 366 days; Inception date or Booking date | Y | Fixed list | Inception date | - | Within range | Window must be 1 to 366 days"
@@ -414,7 +414,7 @@ screens:
       - "Acknowledge | Disbursement | To acknowledge | Acknowledges the request | Acknowledged | Disbursement status (NT-04)"
       - "Assign DV / Assign DV Number | Disbursement | To acknowledge or acknowledged | Records the DV number; a remittance batch becomes fully or partially remitted and its invoices are unlocked | DV assigned | Disbursement status (NT-04)"
       - "Mark Paid | Disbursement | DV assigned | Marks the request paid; a refund disposition is completed, a 2307 batch can be released to the insurer | Paid | Disbursement status (NT-04)"
-      - "Return / Return Request | Disbursement | Not paid, returned or cancelled | Returns the request to the sending team with the reason | Returned | Disbursement status (NT-04)"
+      - "Return to Sender / Return Request | Disbursement | Not paid, returned or cancelled | Returns the request to the sending team with the reason | Returned | Disbursement status (NT-04)"
     rules:
       - "Each status of a payment request is sent back to the team that sent it: Remittance updates the invoices, Cashiering completes the refund or releases the 2307 batch (FR-OP-120, FR-OP-036)."
       - "The Disbursement module of BRD-5 takes the same requests when it is delivered (FR-OP-120)."

@@ -90,7 +90,10 @@ export default function PrebookedPage() {
         <RowActions
           record={p.arn}
           actions={[
-            { label: 'Open Receipt', onSelect: () => navigate(`/cashiering/receipts/${p.receiptId}`) },
+            {
+              label: 'Open Receipt',
+              onSelect: () => navigate(`/cashiering/receipts/${p.receiptId}`),
+            },
             {
               label: 'Re-match Now',
               hidden: !(p.status === 'OPEN' && apply),

@@ -16,13 +16,14 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { humanize } from '@/utils/format';
 import { ItemFilters } from './ItemFilters';
 import type { ItemExtraFilters } from './ItemFilters';
 import { ItemReviewDialog } from './ItemReviewDialog';
 import { prodreconApi } from './prodreconApi';
 import type { Bucket, ReconCycle, ReconFeedback, ReconItem } from './prodreconApi';
-import { bucketTabs, mayPair, maySplit } from './prodreconLogic';
+import { bucketTabs, differenceLabels, mayPair, maySplit } from './prodreconLogic';
+import { RowActions } from '@/components/ui/RowActions';
+import { LovLabel } from '@/components/broking/LovLabel';
 import { UserName } from '@/components/ui/UserName';
 
 function BulkDialog({
@@ -213,30 +214,29 @@ function itemColumns(
     {
       key: 'diff',
       header: 'Differences',
-      render: (r) => r.discrepancies.map((d) => humanize(d)).join(', '),
+      render: (r) => differenceLabels(r.discrepancies),
     },
     {
       key: 'disposition',
       header: 'Disposition',
-      render: (r) => (r.feedback?.disposition ? humanize(r.feedback.disposition) : ''),
+      render: (r) => <LovLabel type="RECON_DISPOSITION" code={r.feedback?.disposition} empty="" />,
     },
     { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
     {
       key: 'actions',
-      header: 'Actions',
-      render: (r) =>
-        selection !== undefined && mayPair(r) ? (
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={(e) => {
-              e.stopPropagation();
-              onPair(r);
-            }}
-          >
-            Pair
-          </Button>
-        ) : null,
+      header: '',
+      render: (r) => (
+        <RowActions
+          record={r.invoiceNo ?? r.insurer?.policyNo ?? `Item ${String(r.id)}`}
+          actions={[
+            {
+              label: 'Pair with Another Item',
+              hidden: !(selection !== undefined && mayPair(r)),
+              onSelect: () => onPair(r),
+            },
+          ]}
+        />
+      ),
     },
   ];
 }

@@ -22,36 +22,46 @@ export interface Schedule {
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
+const inRange = (n: number, max: number) => Number.isInteger(n) && n >= 0 && n <= max;
+
+/** The minute and hour parts of a six-part rule run at second 0 on any day of any month. */
+function ruleParts(r: string): { minute: number; hour: string; weekday: string } | undefined {
+  const parts = r.split(/\s+/);
+  if (parts.length !== 6 || parts[0] !== '0' || parts[3] !== '*' || parts[4] !== '*') {
+    return undefined;
+  }
+  const minute = Number(parts[1]);
+  return inRange(minute, 59)
+    ? { minute, hour: parts[2] ?? '', weekday: parts[5] ?? '' }
+    : undefined;
+}
+
+/** A daily or weekday rule at an hour in UTC, read in Philippine time. */
+function dayRun(minute: number, hour: number, weekday: string): Schedule | undefined {
+  const time = `${pad((hour + PHT_OFFSET) % 24)}:${pad(minute)}`;
+  if (weekday === '*') {
+    return { frequency: 'DAILY', time };
+  }
+  const nextDay = hour + PHT_OFFSET >= 24;
+  const weekdays = nextDay ? 'SUN-THU' : 'MON-FRI';
+  return weekday === weekdays ? { frequency: 'WEEKDAYS', time } : undefined;
+}
+
 /** The frequency and Philippine time of a stored rule; undefined for a rule not made on screen. */
 export function readSchedule(rule: string | null | undefined): Schedule | undefined {
   const r = (rule ?? '-').trim();
   if (r === '' || r === '-') {
     return { frequency: 'MANUAL', time: '' };
   }
-  const parts = r.split(/\s+/);
-  if (parts.length !== 6 || parts[0] !== '0' || parts[3] !== '*' || parts[4] !== '*') {
+  const p = ruleParts(r);
+  if (p === undefined) {
     return undefined;
   }
-  const minute = Number(parts[1]);
-  if (!Number.isInteger(minute) || minute < 0 || minute > 59) {
-    return undefined;
+  if (p.hour === '*') {
+    return p.weekday === '*' ? { frequency: 'HOURLY', time: `00:${pad(p.minute)}` } : undefined;
   }
-  if (parts[2] === '*' && parts[5] === '*') {
-    return { frequency: 'HOURLY', time: `00:${pad(minute)}` };
-  }
-  const hour = Number(parts[2]);
-  if (!Number.isInteger(hour) || hour < 0 || hour > 23) {
-    return undefined;
-  }
-  const local = `${pad((hour + PHT_OFFSET) % 24)}:${pad(minute)}`;
-  if (parts[5] === '*') {
-    return { frequency: 'DAILY', time: local };
-  }
-  const nextDay = hour + PHT_OFFSET >= 24;
-  if ((parts[5] === 'MON-FRI' && !nextDay) || (parts[5] === 'SUN-THU' && nextDay)) {
-    return { frequency: 'WEEKDAYS', time: local };
-  }
-  return undefined;
+  const hour = Number(p.hour);
+  return inRange(hour, 23) ? dayRun(p.minute, hour, p.weekday) : undefined;
 }
 
 /** The stored rule of a schedule chosen on screen. */

@@ -21,7 +21,7 @@ screens:
       - "Feeds | Feed / Partner / Transport / Owner / Schedule / Status | Column | Partner and direction (inbound, outbound); transport In App or Manual Upload; schedule Manual or the schedule of the feed | - | Interface feeds | - | Read only | - | -"
       - "Run Log | Run No. / Feed / Trigger / Started / Read / OK / Duplicate / Failed / File / Status | Column | Counts per outcome | - | Interface runs | - | Read only | - | No runs yet"
       - "Run dialog | Record / Status / Created / Message / Received | Column | Each record with its outcome and message | - | Interface run records | - | Read only | - | No records in this run"
-      - "Configure dialog | [Schedule] / Active | Text, check box | Manual when blank | N | - | The feed's schedule | - | - | -"
+      - "Configure dialog | Runs / Time / Active | Drop-down, time, check box | Manual runs only, Every hour, Every day, Monday to Friday; the time in Philippine time | N | - | The feed's schedule | - | - | -"
       - "Upload dialog | File | File | The file of the feed | Y | - | - | Active uploadable feed | - | Choose a file"
       - "Replay Booked Invoices dialog | [Invoice number or ARN] | Text | One invoice, one account, or the whole company when blank | N | Booking | Blank | - | - | Give an invoice number, an ARN or a company to replay"
     actions:
@@ -53,7 +53,7 @@ screens:
       - "List | ARN / Client / Product / Insurer | Column | Client name with the code; product name with the code | - | Accounts (BRD-1) | - | Read only | - | No account is tagged Free First Year."
       - "List | Period | Column | Period of cover in the period cell: the start date, then to the end date | - | Accounts (BRD-1) | - | Read only | - | -"
       - "List | Gross Premium / Status / Flags | Column | FFY and Direct Payment tags | - | Accounts (BRD-1) | - | Read only | - | -"
-      - "List | FFY Start / FFY End | Column | dd-MMM-yyyy | - | Account tag | - | Read only | - | -"
+      - "List | FFY Period | Column | Period cell: the FFY start and, under it, to the FFY end, dd-MMM-yyyy | - | Account tag | - | Read only | - | -"
       - "List | Officer | Column | User name | - | Accounts (BRD-1) | - | Read only | - | -"
     actions:
       - "Open a row | Every user of the screen | Always | Opens the account | - | -"

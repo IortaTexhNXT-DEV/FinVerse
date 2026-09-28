@@ -71,8 +71,7 @@ export function FeedConfigDialog({ feed, onClose }: Readonly<{ feed: Feed; onClo
   );
   const [active, setActive] = useState(feed.active);
   const save = useMutation({
-    mutationFn: () =>
-      opsApi.configureFeed(feed.code, scheduleRule(schedule), active),
+    mutationFn: () => opsApi.configureFeed(feed.code, scheduleRule(schedule), active),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['ops', 'feeds'] });
       toast.success(`${feed.name} saved`);
@@ -103,9 +102,7 @@ export function FeedConfigDialog({ feed, onClose }: Readonly<{ feed: Feed; onClo
               id={id}
               className="select"
               value={schedule.frequency}
-              onChange={(e) =>
-                setSchedule({ ...schedule, frequency: e.target.value as Frequency })
-              }
+              onChange={(e) => setSchedule({ ...schedule, frequency: e.target.value as Frequency })}
             >
               {FREQUENCIES.map((f) => (
                 <option key={f.id} value={f.id}>

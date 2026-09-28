@@ -257,7 +257,7 @@ fixes:
   DP_LIST_REFUSED: Correct the list as the message says and upload it again.
   DP_RESPONSE_LAYOUT: Use the answers template with its columns unchanged.
   DP_BILLING_UNKNOWN: Check the billing number of the answer.
-  DP_RESPONSE_DECISION: Write APPROVED or REJECTED in the Decision column.
+  DP_RESPONSE_DECISION: Write Approved or Rejected (or Yes / No) in the Decision column.
   INCENTIVE_RUN_NOTHING: No action; the run earned no incentive; cancel it.
   INCENTIVE_NO_HEAD_OFFICE: Ask the System Administrator to set up the Head Office branch of the company.
   INCENTIVE_RUN_PERIOD: Correct the period so that it ends after it starts.
@@ -268,7 +268,7 @@ fixes:
   COMPANY_REQUIRED: Choose the company in the header.
   RECON_SCHEDULE_INSURER: Enter the insurer of the schedule.
   "The reference belongs to a cancelled invoice: the payment goes to unapplied collections.": No action; the payment will be kept unapplied for a disposition.
-  "The pickup is cancelled and the check stays with the cashier.": Confirm to cancel the pick-up, or close the dialog.
+  "The pick-up is cancelled and the check stays with the client.": Confirm to cancel the pick-up, or close the dialog.
   "The selected certificates are validated and the 2307 report is posted.": Confirm to validate and post, or close the dialog.
   "The requested action is applied to the receipt.": Confirm to approve, or close the dialog.
   "The series becomes active for issuing receipts.": Confirm to authorise the series, or close the dialog.
@@ -283,7 +283,9 @@ fixes:
   "Prefix is required": Enter the prefix of the series.
   "The range must end at or after its start": Correct the range.
   "A reclass or transfer moves the whole balance": Enter the whole balance as the amount.
-  "Insurer code is required": Enter the insurer code.
+  "Select the insurer": Choose the insurer from the list.
+  "Select the remittance processor": Choose the processor from the list.
+  "The scheme name is required": Enter the name of the scheme.
   "Rate must be above 0 and at most 100": Enter a rate above 0 and at most 100.
   "Window must be 1 to 366 days": Enter a window of 1 to 366 days.
   "The rule cannot end before it starts": Correct the dates of the rule.

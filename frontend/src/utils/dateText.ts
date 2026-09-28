@@ -43,7 +43,20 @@ export function parseDateText(text: string): string | undefined {
   return undefined;
 }
 
-const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTH_NAMES = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
 
 /** A month (ISO yyyy-mm) as users read it: Sep-2026; '' for none. */
 export function formatMonth(month: string | null | undefined): string {
@@ -64,25 +77,23 @@ export function parseMonthText(text: string): string | undefined {
   if (t === '') {
     return '';
   }
-  let m = /^(\d{4})-(\d{1,2})$/.exec(t);
-  let year = m === null ? undefined : Number(m[1]);
-  let month = m === null ? undefined : Number(m[2]);
-  if (m === null) {
-    m = /^([A-Za-z]{3})[-/ ](\d{4})$/.exec(t);
-    if (m !== null) {
-      month = MONTHS.indexOf((m[1] ?? '').toLowerCase()) + 1;
-      year = Number(m[2]);
-    }
-  }
-  if (m === null) {
-    m = /^(\d{1,2})\/(\d{4})$/.exec(t);
-    if (m !== null) {
-      month = Number(m[1]);
-      year = Number(m[2]);
-    }
-  }
-  if (year === undefined || month === undefined || month < 1 || month > 12) {
+  const found = monthParts(t);
+  if (found === undefined || found.month < 1 || found.month > 12) {
     return undefined;
   }
-  return `${String(year)}-${String(month).padStart(2, '0')}`;
+  return `${String(found.year)}-${String(found.month).padStart(2, '0')}`;
+}
+
+/** The year and month of a typed month in one of the accepted forms. */
+function monthParts(t: string): { year: number; month: number } | undefined {
+  const iso = /^(\d{4})-(\d{1,2})$/.exec(t);
+  if (iso !== null) {
+    return { year: Number(iso[1]), month: Number(iso[2]) };
+  }
+  const named = /^([A-Za-z]{3})[-/ ](\d{4})$/.exec(t);
+  if (named !== null) {
+    return { year: Number(named[2]), month: MONTHS.indexOf((named[1] ?? '').toLowerCase()) + 1 };
+  }
+  const slashed = /^(\d{1,2})\/(\d{4})$/.exec(t);
+  return slashed === null ? undefined : { year: Number(slashed[2]), month: Number(slashed[1]) };
 }

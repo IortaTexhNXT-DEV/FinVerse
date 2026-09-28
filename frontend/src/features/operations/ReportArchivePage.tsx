@@ -23,7 +23,9 @@ import { UserName } from '@/components/ui/UserName';
 /** Download button of an archived file, or the time from which a scheduled file is available. */
 function FileCell({ run, onDownload }: Readonly<{ run: ReportRun; onDownload: () => void }>) {
   if (fileAvailable(run)) {
-    return <RowActions record={run.title} actions={[{ label: 'Download', onSelect: onDownload }]} />;
+    return (
+      <RowActions record={run.title} actions={[{ label: 'Download', onSelect: onDownload }]} />
+    );
   }
   return (
     <span className="ops-muted">

@@ -77,10 +77,15 @@ function Filters({
   return (
     <div className="worklist-filters remit-form">
       <Field label="Insurer">
-{(id) => (
-<InsurerSelect id={id} value={insurer} placeholder="All insurers" onChange={(code) => onChange(code, type)} />
-)}
-</Field>
+        {(id) => (
+          <InsurerSelect
+            id={id}
+            value={insurer}
+            placeholder="All insurers"
+            onChange={(code) => onChange(code, type)}
+          />
+        )}
+      </Field>
       <Field label="Remittance Type">
         {(id) => (
           <select

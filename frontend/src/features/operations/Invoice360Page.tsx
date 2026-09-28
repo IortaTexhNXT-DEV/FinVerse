@@ -70,7 +70,9 @@ function facts(view: Invoice360): Fact[] {
     {
       icon: UserRound,
       label: 'Client / Payor',
-      value: <CellStack main={i.parties.payorName ?? i.parties.assuredName} sub={i.parties.clientCode} />,
+      value: (
+        <CellStack main={i.parties.payorName ?? i.parties.assuredName} sub={i.parties.clientCode} />
+      ),
     },
     {
       icon: Building2,

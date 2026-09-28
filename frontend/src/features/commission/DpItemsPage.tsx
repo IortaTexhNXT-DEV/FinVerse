@@ -1,3 +1,4 @@
+import { InsurerName } from '@/components/broking/LovLabel';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -44,7 +45,7 @@ function columnsOf(rows: DpItem[], selection: RowSelection | undefined): Column<
         </>
       ),
     },
-    { key: 'insurer', header: 'Insurer', render: (r) => r.insurerCode ?? '' },
+    { key: 'insurer', header: 'Insurer', render: (r) => <InsurerName code={r.insurerCode} /> },
     { key: 'assured', header: 'Assured', render: (r) => r.assuredName ?? '' },
     { key: 'branch', header: 'Branch', render: (r) => r.branchCode ?? '' },
     {

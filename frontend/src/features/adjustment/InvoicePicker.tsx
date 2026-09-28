@@ -57,7 +57,9 @@ function columns(selected: string[], toggle: (no: string) => void): Column<OpsIn
       key: 'no',
       header: 'Invoice No. / Booked',
       kind: 'code',
-      render: (i) => <CellStack main={<strong>{i.invoiceNo}</strong>} sub={formatDate(i.bookingDate)} />,
+      render: (i) => (
+        <CellStack main={<strong>{i.invoiceNo}</strong>} sub={formatDate(i.bookingDate)} />
+      ),
     },
     {
       key: 'assured',

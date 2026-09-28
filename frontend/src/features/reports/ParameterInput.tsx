@@ -1,4 +1,5 @@
 import type { ParameterSpec } from '@/api/reports';
+import { InsurerSelect } from '@/components/broking/InsurerSelect';
 import { Field } from '@/components/ui/Field';
 import { useWorkspace } from '@/context/workspaceContext';
 import { humanize } from '@/utils/format';
@@ -59,6 +60,10 @@ export function ParameterInput({ spec, value, onChange, error }: Readonly<Props>
                 ))}
               </select>
             );
+          case 'INSURER':
+            return (
+              <InsurerSelect id={id} value={value} placeholder="All insurers" onChange={onChange} />
+            );
           case 'BRANCH':
             return (
               <select
@@ -70,7 +75,7 @@ export function ParameterInput({ spec, value, onChange, error }: Readonly<Props>
                 <option value="">All branches</option>
                 {branches.map((b) => (
                   <option key={b.id} value={b.id}>
-                    {b.code} – {b.name}
+                    {b.name}
                   </option>
                 ))}
               </select>

@@ -48,7 +48,9 @@ function ApplicationsTable({ applications }: Readonly<{ applications: Applicatio
       render: (a) => (
         <CellStack
           main={
-            <Link to={`/operations/invoices/${encodeURIComponent(a.invoiceNo)}`}>{a.invoiceNo}</Link>
+            <Link to={`/operations/invoices/${encodeURIComponent(a.invoiceNo)}`}>
+              {a.invoiceNo}
+            </Link>
           }
           sub={a.arn}
         />
@@ -157,9 +159,7 @@ export function ReceiptTabContent({
 }: Readonly<{ tab: ReceiptTabId; receipt: ReceiptDetail }>) {
   switch (tab) {
     case 'applications':
-      return (
-        <ApplicationsTable applications={receipt.applications} />
-      );
+      return <ApplicationsTable applications={receipt.applications} />;
     case 'lines':
       return (
         <DataTable

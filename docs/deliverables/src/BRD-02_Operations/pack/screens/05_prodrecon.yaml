@@ -36,7 +36,7 @@ screens:
       - {state: list, user: recon, caption: "Reconciliation Cycles"}
     fields:
       - "Tabs | All / Extracted / Sent to Insurer / Reconciling / Closed | Tab | - | - | Fixed | All | - | - | -"
-      - "Toolbar | Search Insurer Code | Text | - | N | - | Blank | - | - | -"
+      - "Toolbar | Insurer | Drop-down | All insurers or one by name | N | Insurers | All insurers | - | - | -"
       - "List | Cycle No. / Insurer / Production Month / Items / BDOI Only / Insurer Only / Matched / Sent / Last Feedback / Stage | Column | PRC-<insurer>-yyyyMM-n; matched in %; month as Mmm yyyy | - | Reconciliation cycles | - | Read only | - | No items to display"
     actions:
       - "Open a row | Production Reconciliation Handler | Always | Opens the cycle | - | -"
@@ -81,7 +81,7 @@ screens:
       - "Run Matching | Production Reconciliation Handler | Reconciling | Matches the open items again, including the accounts booked since | Unchanged | -"
       - "Save Feedback | Production Reconciliation Handler | Reconciling | Saves the feedback and disposition of the item | Unchanged | -"
       - "Set Disposition / Apply to Selected | Production Reconciliation Handler | Items selected | Sets the company concerned and disposition of the selected items | Unchanged | -"
-      - "Pair / Pair Items | Production Reconciliation Handler | BDOI-only item | Pairs it with an insurer-only line | Matched or With Discrepancy | -"
+      - "Pair with Another Item / Pair Items | Production Reconciliation Handler | BDOI-only item | Pairs it with an insurer-only line | Matched or With Discrepancy | -"
       - "Split Pairing | Production Reconciliation Handler | Manually paired item | Splits the pair back into its two sides | BDOI Only and Insurer Only | -"
       - "Close Cycle | Production Reconciliation Handler | Reconciling | Closes the cycle with a comment; the cycle also closes by itself when every item is matched or for closure | Closed | Workflow notice (NT-01)"
     rules:
@@ -106,14 +106,14 @@ screens:
       - {state: list, user: recon, caption: "Production Extracts"}
       - {state: new, user: recon, click: "^new extract$", caption: "New Production Extract dialog"}
     fields:
-      - "Toolbar | Search Insurer Code | Text | - | N | - | Blank | - | - | -"
+      - "Toolbar | Insurer | Drop-down | All insurers or one by name | N | Insurers | All insurers | - | - | -"
       - "List | Extract No. / Trigger / Booking Period / Accounts / New / Extracted / Sent | Column | PRX-yyyy-n with the file name; booking period in the period cell; sent time and user | - | Production extracts | - | Read only | - | No items to display"
-      - "New Production Extract dialog | Insurer Code / Production Month | Text, month | Accounts booked in the month | Y | Insurers | Blank | - | Both given | Insurer and production month are required"
+      - "New Production Extract dialog | Insurer / Production Month | Drop-down, month (MMM-yyyy) | Insurers by name; accounts booked in the month | Y | Insurers | Blank | - | Both given | Insurer and production month are required"
       - "Send dialog | To / Cc | Text | E-mail addresses separated by commas | Y / N | The insurer's reconciliation contacts | Proposed | - | Valid addresses | Enter valid e-mail addresses"
     actions:
       - "New Extract / Extract Register | Production Reconciliation Handler | Always | Extracts the register of the insurer and month into its file | Register extracted | -"
       - "Download | Production Reconciliation Handler | Always | Downloads the register workbook | - | -"
-      - "Send to Insurer / Resend | Production Reconciliation Handler | Extracted / sent | E-mails the register with the cover letter as a password-protected attachment; the password follows in a separate e-mail | Awaiting insurer feedback | Production register e-mail (NT-25)"
+      - "Send to Insurer / Resend to Insurer | Production Reconciliation Handler | Extracted / sent | E-mails the register with the cover letter as a password-protected attachment; the password follows in a separate e-mail | Awaiting insurer feedback | Production register e-mail (NT-25)"
     rules:
       - "The register is a protected workbook: only the Remarks and Incentive columns and 200 blank rows can be edited by the insurer (FR-OP-072)."
       - "The file is named <insurer>_PRODREG_<yyyyMM>_<sequence> (FR-OP-072)."
@@ -134,7 +134,7 @@ screens:
       - {state: list, user: recon, caption: "Insurer Feedback uploads"}
       - {state: upload, user: recon, click: "^upload feedback$", caption: "Upload Insurer Feedback dialog"}
     fields:
-      - "Toolbar | Search Insurer Code | Text | - | N | - | Blank | - | - | -"
+      - "Toolbar | Insurer | Drop-down | All insurers or one by name | N | Insurers | All insurers | - | - | -"
       - "List | File / Insurer / Production Month / Rows Read / Accepted / Failed / Message / Uploaded / Status | Column | File with the attempt number | - | Feedback uploads | - | Read only | - | No items to display"
       - "Upload Insurer Feedback dialog | Insurer Feedback File | File | The register returned by the insurer | Y | - | - | - | A file with the same content as an earlier one is refused | -"
     actions:
@@ -182,7 +182,7 @@ screens:
       - {state: new, user: recon, click: "^new schedule$", caption: "New Extract Schedule dialog"}
     fields:
       - "List | Insurer / Frequency / Next Run / Auto Send / Recipients / Last Run / Status | Column | Next run moved to the next working day | - | Extract schedules | - | Read only | - | No items to display"
-      - "Schedule dialog | Insurer Code | Text | - | Y | Insurers | Blank | - | Not blank | Insurer code is required"
+      - "Schedule dialog | Insurer | Drop-down | Insurers by name | Y | Insurers | Blank | - | Chosen | Select the insurer"
       - "Schedule dialog | Frequency / Run Day | Drop-down, number | Monthly (day 1-28) or Weekly (1 = Monday … 7 = Sunday) | Y | Fixed list | Monthly | - | Within range | Run day is a day of the month from 1 to 28 / Run day is a weekday from 1 (Monday) to 7 (Sunday)"
       - "Schedule dialog | Recipients | Text | Blank: the insurer's reconciliation contacts | N | - | Blank | - | Valid addresses | Enter valid e-mail addresses"
       - "Schedule dialog | [Send automatically] | Check box | - | N | - | Not ticked | - | - | -"

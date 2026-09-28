@@ -1,3 +1,5 @@
+import { CellStack } from '@/components/ui/CellStack';
+import { UserName } from '@/components/ui/UserName';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Upload } from 'lucide-react';
 import { useState } from 'react';
@@ -20,7 +22,6 @@ import { formatDate, formatDateTime, humanize, today } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { DpList, Submission } from './commissionApi';
 import { FileDropZone } from '@/components/ui/FileDropZone';
-import { displayNameOf } from '@/api/users';
 import { DateInput } from '@/components/ui/DateInput';
 
 const TABS = [
@@ -50,7 +51,9 @@ const LIST_COLUMNS: Column<DpList>[] = [
   {
     key: 'at',
     header: 'Taken In',
-    render: (l) => `${formatDateTime(l.createdAt)} · ${displayNameOf(l.createdBy)}`,
+    render: (l) => (
+      <CellStack main={<UserName login={l.createdBy} />} sub={formatDateTime(l.createdAt)} />
+    ),
   },
 ];
 

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useInsurerName } from '@/components/broking/useLabels';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
@@ -34,9 +35,10 @@ export function SendBillingDialog({
 }>) {
   const [to, setTo] = useState('');
   const [cc, setCc] = useState('');
+  const insurerName = useInsurerName();
   return (
     <Modal
-      title={`Send ${billing.billingNo} to ${billing.insurerCode}`}
+      title={`Send ${billing.billingNo} to ${insurerName(billing.insurerCode)}`}
       open
       onClose={onClose}
       footer={

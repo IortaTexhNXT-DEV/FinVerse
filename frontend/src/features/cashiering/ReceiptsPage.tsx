@@ -100,7 +100,10 @@ function FilterPanel({
           onChange={(v) => onChange({ ...value, [key]: v })}
         />
       ))}
-      <InsurerField value={value.insurer ?? ''} onChange={(v) => onChange({ ...value, insurer: v })} />
+      <InsurerField
+        value={value.insurer ?? ''}
+        onChange={(v) => onChange({ ...value, insurer: v })}
+      />
       <CodeSelect
         label="Kind"
         value={value.kind ?? ''}

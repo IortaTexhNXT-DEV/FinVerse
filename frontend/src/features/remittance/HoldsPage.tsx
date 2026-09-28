@@ -42,7 +42,11 @@ const COLUMNS: Column<Hold>[] = [
   { key: 'inv', header: 'Invoice No.', render: (h) => h.invoiceNo },
   { key: 'assured', header: 'Name of Assured', render: (h) => h.assuredName },
   { key: 'ins', header: 'Insurer', render: (h) => <InsurerName code={h.insurerCode} /> },
-  { key: 'reason', header: 'Reason', render: (h) => <LovLabel type="HOLD_REASON" code={h.reasonCode} /> },
+  {
+    key: 'reason',
+    header: 'Reason',
+    render: (h) => <LovLabel type="HOLD_REASON" code={h.reasonCode} />,
+  },
   { key: 'until', header: 'Hold Until', render: (h) => formatDate(h.holdUntil) },
   {
     key: 'proc',

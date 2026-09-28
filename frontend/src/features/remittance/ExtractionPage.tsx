@@ -36,9 +36,7 @@ const TAG_COLUMNS: Column<InvoiceTag>[] = [
   {
     key: 'tag',
     header: 'Tag / Type',
-    render: (t) => (
-      <CellStack main={TAG_LABELS[t.tag]} sub={t.type ? TYPE_LABELS[t.type] : ''} />
-    ),
+    render: (t) => <CellStack main={TAG_LABELS[t.tag]} sub={t.type ? TYPE_LABELS[t.type] : ''} />,
   },
   { key: 'why', header: 'Reasons', render: (t) => t.reasons ?? t.remarks ?? '' },
   { key: 'paid', header: 'Paid AR', numeric: true, render: (t) => <Amount value={t.paidAr} /> },
@@ -48,7 +46,11 @@ const TAG_COLUMNS: Column<InvoiceTag>[] = [
     numeric: true,
     render: (t) => <Amount value={t.remittable} />,
   },
-  { key: 'batch', header: 'Batch', render: (t) => <span className="nowrap">{t.batchNo ?? ''}</span> },
+  {
+    key: 'batch',
+    header: 'Batch',
+    render: (t) => <span className="nowrap">{t.batchNo ?? ''}</span>,
+  },
 ];
 
 /** The tags a run gave (RMTID.003). */
@@ -112,10 +114,15 @@ function RunForm({ companyId }: Readonly<{ companyId: number }>) {
         <ErrorAlert error={run.error} />
         <div className="remit-form">
           <Field label="Insurer">
-{(id) => (
-<InsurerSelect id={id} value={insurer} placeholder="All insurers" onChange={(code) => setInsurer(code)} />
-)}
-</Field>
+            {(id) => (
+              <InsurerSelect
+                id={id}
+                value={insurer}
+                placeholder="All insurers"
+                onChange={(code) => setInsurer(code)}
+              />
+            )}
+          </Field>
           <Field label="Remittance Type">
             {(id) => (
               <select
@@ -159,7 +166,7 @@ function RunForm({ companyId }: Readonly<{ companyId: number }>) {
 
 function scopeOf(r: ExtractionRun): ReactNode {
   if (r.invoiceNo !== undefined) {
-    return `Invoice ${r.invoiceNo}`;
+    return <>Invoice {r.invoiceNo}</>;
   }
   return (
     <>

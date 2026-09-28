@@ -10,7 +10,8 @@ export type ParameterType =
   | 'BRANCH'
   | 'ACCOUNT'
   | 'CURRENCY'
-  | 'BUSINESS_LINE';
+  | 'BUSINESS_LINE'
+  | 'INSURER';
 
 export interface ParameterSpec {
   name: string;

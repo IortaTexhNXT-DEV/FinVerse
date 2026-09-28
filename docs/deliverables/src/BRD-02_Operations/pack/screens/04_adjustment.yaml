@@ -122,7 +122,7 @@ screens:
       - "Policy | ARN / Placement Slip / Client / Insurer / Product / Period of Cover / Gross Premium | Display | Links to the account and the invoice | - | Invoice ledger, account, placement | - | Read only | - | -"
       - "Recompute | Before and After / Per Insurer | Table | As on the New Endorsement Request | - | Recompute | - | Read only | - | -"
       - "Accounting | Journal / GL Account / Party / Debit / Credit | Column | Every journal the posting wrote, including the re-application of payments | - | Journals (BRD-5) | - | Read only | - | Nothing posted yet"
-      - "Policy Transactions | Date / Transaction / Reference / Premium Change / Taxes Change / Commission Change / Gross Premium After / Status / Accounting | Column | The row of this request highlighted | - | Policy transaction history | - | Read only | - | -"
+      - "Policy Transactions | Date / Transaction / Reference / Premium Change / Taxes / Commission / Gross Premium After / Status / Accounting | Column | The row of this request highlighted; the reference under the transaction, the commission change under the taxes, the accounting under the status | - | Policy transaction history | - | Read only | - | -"
       - "Documents | [Documents panel] | Panel | Supporting Documents of the request | - | Documents | - | Until posted | File type, size and content checks | -"
       - "Link Quotation dialog | Quotation No. | Text | - | Y | Quotations (BRD-1) | Blank | For validation, quotation required | Not blank | Enter the quotation number"
     actions:

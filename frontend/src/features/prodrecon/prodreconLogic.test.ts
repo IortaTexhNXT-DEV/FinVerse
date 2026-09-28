@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   addresses,
   bucketTabs,
+  differenceLabels,
   matchedPercent,
   mayPair,
   maySplit,
@@ -25,8 +26,14 @@ describe('sideBySide', () => {
     expect(byKey.policyNo?.differs).toBe(false);
     expect(byKey.assuredName?.differs).toBe(true);
     expect(byKey.grossPremium?.differs).toBe(true);
-    expect(byKey.grossPremium?.bdoi).toBe('1000.00');
+    expect(byKey.grossPremium?.bdoi).toBe('1,000.00');
     expect(byKey.pnNo?.differs).toBe(false);
+  });
+
+  it('shows dates as dd-MMM-yyyy and names the differences by field', () => {
+    const rows = sideBySide({ bdoi: { periodFrom: '2026-09-01' }, discrepancies: [] });
+    expect(rows.find((r) => r.key === 'periodFrom')?.bdoi).toBe('01-Sep-2026');
+    expect(differenceLabels(['GROSS_PREMIUM', 'PERIOD_FROM'])).toBe('Gross Premium, Period From');
   });
 
   it('shows one side only for unpaired items', () => {

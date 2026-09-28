@@ -80,7 +80,7 @@ screens:
     fields:
       - "Tabs | Receipts / Cancellations and Reinstatements | Tab | - | - | Fixed | Receipts | - | - | -"
       - "Toolbar | Search Receipt No. | Text | Receipt number | N | Receipts | Blank | - | - | -"
-      - "Filters | Client Code / Invoice No. / Policy No. / Payor Name / Assured Name / Insurer Code | Text | - | N | - | Blank | - | Contains | -"
+      - "Filters | Client Code / Invoice No. / Policy No. / Payor Name / Assured Name / Insurer | Text, drop-down | Insurers by name | N | - | Blank | - | Contains | -"
       - "Filters | Amount / Date From / Date To | Number, Date | dd-MMM-yyyy | N | - | Blank | - | - | -"
       - "Filters | Kind / Status | Drop-down | All, AR, OR / All, Issued, Cancelled, Reinstated | N | Fixed list | All | - | - | -"
       - "List | Receipt No. / Date / Payor / Assured / Mode / Amount / Applied / Unapplied / Status | Column | Receipt number with its kind and class; payor with the assured or payor code | - | Receipts | - | Read only | - | No receipts match the search"
@@ -168,7 +168,7 @@ screens:
       - "Toolbar | Search Reference or Payor | Text | - | N | - | Blank | - | Contains | -"
       - "Toolbar | Origin | Drop-down | All origins, BIBS, Migrated | N | Fixed list | All origins | - | - | -"
       - "List | Select | Check box | On Monitoring and For Approval | N | - | Not ticked | - | - | -"
-      - "List | Reference / Payor / Client / Unit / Amount / Balance / Disposition / Received / Stage | Column | UNP-yyyy-n with its origin; the disposition type and amount | - | Unapplied payments | - | Read only | - | No items to display"
+      - "List | Reference / Payor / Client / Unit / Amount / Balance / Disposition / Received / Stage | Column | UNP-yyyy-n with why it is unapplied; the unit by name; the disposition in words with its amount | - | Unapplied payments | - | Read only | - | No items to display"
       - "Bulk Action Results dialog | [Outcome per item] | Table | Done, or the message of the item | - | - | - | Read only | - | -"
     actions:
       - "Submit Selected | Cashier | Monitoring, rows selected | Submits the disposition of each selected item on its own and lists the outcome of each | For approval | Cashiering approval request (NT-07)"
@@ -197,7 +197,7 @@ screens:
       - {state: approval, user: cashtl, open_unapplied: for_approval, caption: "Unapplied payment with a refund for approval: workflow header, Approve and the disposition history"}
     fields:
       - "Header | [Reference chip, origin tag and stage pill] | Reference chip, tag, status pill | UNP-yyyy-n; No Match, Excess, Cancelled Reference and the other origins | - | Unapplied payments | - | Read only | - | -"
-      - "Header | Amount / Balance / Payor / Client / Unit / Source / Received | Display | Amounts with two decimals | - | Unapplied payments | - | Read only | - | -"
+      - "Header | Amount / Balance / Payor / Marketing Unit / Source / Received | Display | Amounts with two decimals; the unit by name; the source by its module and document number | - | Unapplied payments | - | Read only | - | -"
       - "Workflow | [Disposition workflow header] | Stepper | Unapplied, Monitoring, For approval, In process, Completed; For reversal and Closed when reached | - | Disposition | - | Read only | - | -"
       - "Assign Disposition | Disposition Type | Drop-down | The disposition types with their description | Y | Disposition types | Blank | Unapplied, Monitoring | - | Select the disposition type"
       - "Assign Disposition | Amount | Number | Above zero, at most the balance; a reclass or transfer moves the whole balance | Y | - | The balance | Unapplied, Monitoring | Within the balance | Enter an amount above zero and at most <balance> / A reclass or transfer moves the whole balance"
@@ -274,8 +274,9 @@ screens:
       - "Release dialog | Comment | Text area | - | N | - | Released by cashier | Waiting for booking | - | -"
     actions:
       - "Run Matching Now | Cashier with the application permission | Always | Matches every waiting payment and unapplied item again and applies those whose invoice is now booked | Applied | -"
+      - "Open Receipt | Every Cashiering user | Always | Opens the AR of the payment | - | -"
       - "Re-match Now | Cashier with the application permission | Waiting for booking | Matches the payment again | Applied or unchanged | -"
-      - "Release | Cashier with the application permission | Waiting for booking | Moves the payment to the unapplied payments | Released | -"
+      - "Release to Unapplied | Cashier with the application permission | Waiting for booking | Moves the payment to the unapplied payments | Released | -"
     rules:
       - "A payment for an account not yet booked waits in the queue and opens the New Business payment gate (FR-OP-018, FR-OP-132)."
       - "It is applied when the invoice is booked, or by the scheduled re-match every two hours; an ageing item raises an alert (FR-OP-018)."
@@ -360,7 +361,7 @@ screens:
       - "Import Pending Requests | Cashier | Always | Takes in the pick-up requests waiting from Collections | For pick-up | -"
       - "Print ARs | Cashier | Rows selected | Issues and prints the ARs of the selected checks in one batch | AR printed | -"
       - "Download <batch> | Cashier | After Print ARs | Downloads the merged PDF of the batch | - | -"
-      - "Cancel | Cashier | For pick-up | Asks for confirmation and cancels the pick-up; the check stays with the cashier | Cancelled | -"
+      - "Cancel Check Pick-up | Cashier | For pick-up | Asks for confirmation and cancels the pick-up; the check stays with the client | Cancelled | -"
     rules:
       - "The ARs of the checks picked up are issued and printed in one batch (FR-OP-017)."
     outcome: Checks picked up are receipted and their ARs printed together.
@@ -378,7 +379,7 @@ screens:
     shots:
       - {state: list, user: cashier, caption: "Batch Print: receipts to print and the print batches"}
     fields:
-      - "Receipts to Print | Kind / Insurer Code / Date From / Date To | Drop-down, text, date | All, AR, OR | N | - | All | - | - | -"
+      - "Receipts to Print | Kind / Insurer / Date From / Date To | Drop-down, date | All, Acknowledgement Receipt, Official Receipt; insurers by name | N | - | All | - | - | -"
       - "Receipts to Print | Receipt No. / Date / Payor / Amount / Printed | Column | Printed <n>x or Not yet | - | Receipts | - | Read only | - | No receipts match the criteria"
       - "Print Batches | Batch No. / Criteria / Progress / Printed / Failed / Created / Status | Column | Progress bar; red when a receipt failed | - | Print batches | - | Read only | - | No print batch yet"
     actions:
@@ -407,7 +408,7 @@ screens:
     fields:
       - "Tabs | Tagged by Marketing / Validation / Reports and Routing / Released / Settled | Tab | - | - | Fixed | Tagged by Marketing | - | - | -"
       - "Tags | Reference / Client / Insurer / Path / Amount / Checklist / Tagged / Stage | Column | CWT-yyyy-n with the invoice and ARN; path Certificate or Cash; checklist CWT Copy, Remitted | - | BIR 2307 tags | - | Read only | - | No items to display"
-      - "Validation | CWT copy received | Check box | - | N | - | Not ticked | Validating | - | -"
+      - "Validation | CWT Copy Received | Row action (Mark / Clear CWT Copy Received) | - | N | - | Not received | Validating | - | -"
       - "Reports and Routing | Batch No. / Insurer / Certificates / Total / Disbursement / Status | Column | - | - | 2307 report batches | - | Read only | - | No 2307 report yet"
       - "Tag BIR 2307 dialog | Invoice No. | Text | - | Y | Invoice ledger | Blank | - | Not blank | Invoice number is required"
       - "Tag BIR 2307 dialog | Path | Drop-down | Certificate or Cash | Y | Fixed list | Certificate | - | - | -"
@@ -494,10 +495,10 @@ screens:
     fields:
       - "Tabs | Payment File Layouts / Minimal Balance | Tab | - | - | Fixed | Payment File Layouts | - | - | -"
       - "Payment File Layouts | File / Kind / Separator / Last Changed | Column | Automatic, delimited or fixed width | - | Payment file layouts | - | Read only | - | -"
-      - "Edit layout dialog | File Kind / Separator / Fields (Header:start:length separated by ;, start is 1-based) | Drop-down, text | Fields for a fixed-width file | Y | - | The current layout | - | - | -"
+      - "Edit layout dialog | Fields / Separator / Fields (Header:start:length separated by ;, start is 1-based) | Drop-down, text | Fields for a fixed-width file | Y | - | The current layout | - | - | -"
       - "Minimal Balance | Balance / Up To / Excludes / Action / Status | Column | For example premium balances up to 10.00, excluding the 2% CWT, the DST and the whole premium | - | Minimal balance rules | - | Read only | - | -"
     actions:
-      - "Edit / Save Layout | Cashiering Team Leader | Always | Changes the layout of a payment file | - | -"
+      - "Edit Layout / Save Layout | Cashiering Team Leader | Always | Changes the layout of a payment file | - | -"
       - "Run Sweep Now | Cashiering Team Leader | Always | Runs the minimal balance sweep now and reports the balances reversed and the excess moved | - | -"
     rules:
       - "Premium balances up to PHP 10.00 are reversed and excess or unapplied amounts up to PHP 10.00 are moved to AP overages by the evening sweep; a balance equal to the 2% CWT, the DST or the whole premium, and an invoice already written off, are skipped (FR-OP-023)."

@@ -53,7 +53,7 @@ screens:
       - "Tabs | All Invoices / Outstanding / Paid, Not Extracted / On Hold / Locked / Direct Payment | Tab | - | - | Fixed | All Invoices | - | A tab keeps the text and panel filters | -"
       - "Toolbar | Search Invoice No., ARN, policy, client or assured | Text | Partial, not case-sensitive | N | Invoice ledger | Blank | - | - | -"
       - "Toolbar | Origin | Drop-down | All origins, BIBS, Migrated | N | Fixed list | All origins | - | - | -"
-      - "Filters | Insurer Code / Name of Assured / Account Officer | Text | - | N | - | Blank | - | Contains | -"
+      - "Filters | Insurer / Name of Assured / Account Officer | Drop-down, text | Insurers by name | N | Insurers | Blank | - | Contains | -"
       - "Filters | Booked From / Booked To / Inception From / Inception To | Date | dd-MMM-yyyy | N | - | Blank | - | - | -"
       - "List | Invoice No. | Column | Invoice number with the ARN as the second line; migrated invoices carry the LEGACY tag | - | Invoice ledger | - | Read only | - | -"
       - "List | Assured / Client Code | Column | Assured name with the client code | - | Invoice ledger | - | Read only | - | -"
@@ -105,7 +105,7 @@ screens:
       - "Components & Balances | Insurer Shares | Table | Insurer, Share %, Lead | - | Booking | - | Read only | - | -"
       - "Movements | Value Date / Movement / Component / Amount / Source / Documents / Posted | Column | AR, OR, batch and journal numbers in Documents | - | Invoice ledger | - | Read only | - | -"
       - "Invoice Family | Invoice No. / Transaction / Booked / Gross Premium / Outstanding / Payment / Remittance | Column | The original booking first, then every endorsement and cancellation; family totals under the table | - | Invoice ledger | - | Read only | - | -"
-      - "Policy Transactions | Date / Transaction / Reference / Premium Change / Taxes Change / Commission Change / Gross Premium After / Status / Accounting | Column | Amounts in the invoice currency; Not posted for an open request; a row opens its GL journals | - | Invoice ledger, booked invoices, endorsement requests, journals | - | Read only | - | -"
+      - "Policy Transactions | Date / Transaction / Reference / Premium Change / Taxes / Commission / Gross Premium After / Status / Accounting | Column | Amounts in the invoice currency; the reference under the transaction, the commission change under the taxes, the accounting under the status; Not posted for an open request; a row opens its GL journals | - | Invoice ledger, booked invoices, endorsement requests, journals | - | Read only | - | -"
       - "Policy Transactions | GL Account / Party / Narration / Debit / Credit | Column | The lines of each journal with the totals | - | Journals (BRD-5) | - | Read only | Debits equal credits | -"
       - "Team tabs | Record / Reference / Date / Amount / Status / Description | Column | The receipts and applications, remittance batches and holds, endorsement requests, reconciliation items or direct payment accounts of the invoice | - | Operations records | - | Read only | - | No <records> for this invoice yet"
       - "History | When / What / Change / Module / Reason / By | Column | Status, flag and lock changes, newest first | - | Invoice ledger | - | Read only | - | No status changes yet"
@@ -142,7 +142,7 @@ screens:
       - "Extract Repository | Folder / File / From / Size / Stored | Column | Size in KB; stored time and user | - | Extract repository | - | Read only | - | -"
       - "Extract Repository | Download | Button | - | - | - | - | - | The stored file passes its checksum | The stored file failed its checksum verification"
     actions:
-      - "Close | Cashier, Cashiering Team Leader, System Administrator | Open hand-off | Asks what was done and closes the hand-off | Closed | -"
+      - "Close Hand-off | Cashier, Cashiering Team Leader, System Administrator | Open hand-off | Asks what was done and closes the hand-off | Closed | -"
       - "Download | Every Operations user | Always | Downloads the stored file | - | -"
     rules:
       - "A hand-off records work a team completes by hand; closing it needs a note of what was done (FR-OP-130)."
@@ -162,7 +162,7 @@ screens:
     shots:
       - {state: list, user: cashier, caption: "Report Archive with the runs and their parameters"}
     fields:
-      - "Toolbar | Search Report Code, e.g. CSH-APPLIED-PREM | Text | Report code | N | Report catalogue | Blank | - | - | -"
+      - "Toolbar | Report | Drop-down | Report titles of the catalogue | N | Report catalogue | All reports | - | - | -"
       - "List | Report | Column | Report title with its code | - | Report catalogue | - | Read only | - | -"
       - "List | Parameters | Column | The parameters of the run | - | Report run | - | Read only | - | -"
       - "List | Action | Column | Generated or exported, with the format | - | Report run | - | Read only | - | -"

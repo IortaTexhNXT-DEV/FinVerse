@@ -61,7 +61,7 @@ const MOVEMENT_COLUMNS: Column<Movement>[] = [
     render: (m) => (
       <CellStack
         main={m.arNo ?? m.orNo ?? m.batchNo ?? m.journalBatchNo}
-        sub={m.arNo ?? m.orNo ?? m.batchNo ? m.journalBatchNo : undefined}
+        sub={(m.arNo ?? m.orNo ?? m.batchNo) ? m.journalBatchNo : undefined}
       />
     ),
   },
@@ -161,7 +161,11 @@ export function ComponentsTab({ view }: Readonly<{ view: Invoice360 }>) {
               { label: 'DTIP Adjusted by', value: formatAmount(view.adjustments.adjustedDtip) },
               {
                 label: 'Over-adjusted',
-                value: view.adjustments.overAdjusted ? <StatusBadge status="OVER_ADJUSTED" /> : 'No',
+                value: view.adjustments.overAdjusted ? (
+                  <StatusBadge status="OVER_ADJUSTED" />
+                ) : (
+                  'No'
+                ),
               },
             ]}
           />

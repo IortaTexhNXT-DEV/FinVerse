@@ -1,4 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { LovLabel } from '@/components/broking/LovLabel';
+import { useInsurerName } from '@/components/broking/useLabels';
+import { CellStack } from '@/components/ui/CellStack';
+import { statusLabel } from '@/components/ui/statusTones';
 import { statusMessage } from '@/components/ui/statusTones';
 import { Building2, CalendarClock, Coins, ReceiptText, Send, UserRound } from 'lucide-react';
 import { useState } from 'react';
@@ -19,7 +23,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
+import { formatAmount, formatDate, formatDateTime } from '@/utils/format';
 import { AnswersDialog, CollectDialog, SendBillingDialog } from './BillingDialogs';
 import { BILLING_ENTITY, commissionApi } from './commissionApi';
 import type { DpBilling, DpItem } from './commissionApi';
@@ -69,17 +73,23 @@ const ITEM_COLUMNS: Column<DpItem>[] = [
     key: 'answer',
     header: 'Insurer Answer',
     render: (i) =>
-      i.feedback.feedbackReason
-        ? `${humanize(i.feedback.feedbackReason)} ${i.feedback.feedbackComment ?? ''}`
-        : '',
+      i.feedback.feedbackReason ? (
+        <CellStack
+          main={<LovLabel type="DP_FEEDBACK_REASON" code={i.feedback.feedbackReason} />}
+          sub={i.feedback.feedbackComment}
+        />
+      ) : (
+        ''
+      ),
   },
   { key: 'tag', header: 'Status', render: (i) => <StatusBadge status={i.tag} /> },
 ];
 
 function Summary({ billing: b }: Readonly<{ billing: DpBilling }>) {
+  const insurerName = useInsurerName();
   return (
     <RecordSummary
-      title={b.insurerCode}
+      title={insurerName(b.insurerCode)}
       chips={
         <>
           <ReferenceChip label="Billing" value={b.billingNo} />
@@ -92,14 +102,19 @@ function Summary({ billing: b }: Readonly<{ billing: DpBilling }>) {
         {
           icon: Coins,
           label: 'Net Commission',
-          value: `${formatAmount(b.amounts.net)} (withholding tax ${formatAmount(b.amounts.wtax)})`,
+          value: (
+            <CellStack
+              main={formatAmount(b.amounts.net)}
+              sub={`Withholding tax ${formatAmount(b.amounts.wtax)}`}
+            />
+          ),
         },
         { icon: Send, label: 'Sent', value: formatDateTime(b.sentAt) },
         { icon: CalendarClock, label: 'Answer Due', value: formatDate(b.slaDue) },
         {
           icon: ReceiptText,
           label: 'Official Receipt',
-          value: b.orNo ?? humanize(b.orStatus ?? ''),
+          value: b.orNo ?? (b.orStatus ? statusLabel(b.orStatus) : ''),
         },
         { icon: UserRound, label: 'Handler', value: <UserName login={b.handler} /> },
       ]}
@@ -151,6 +166,7 @@ function Actions({
 export default function DpBillingPage() {
   const id = Number(useParams().id);
   const toast = useToast();
+  const insurerName = useInsurerName();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<TabId>('accounts');
   const [dialog, setDialog] = useState<DialogKind>();
@@ -189,7 +205,7 @@ export default function DpBillingPage() {
         section="Commission Receivables · DP Billings"
         backTo="/commission/dp/billings"
         title={b.billingNo}
-        description={`${b.insurerCode} · ${String(b.itemCount)} account(s)`}
+        description={`${insurerName(b.insurerCode)} · ${String(b.itemCount)} account(s)`}
         actions={<Actions billing={b} onDialog={setDialog} />}
       />
       <Summary billing={b} />

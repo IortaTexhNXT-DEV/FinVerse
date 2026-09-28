@@ -15,7 +15,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, formatDateTime } from '@/utils/format';
-import { CodeSelect, TextField } from './CashFields';
+import { CodeSelect, InsurerField, TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { PrintBatch, ReceiptKind, ReceiptSummary } from './cashieringApi';
 import './cashiering.css';
@@ -188,11 +188,10 @@ export default function BatchPrintPage() {
             value={criteria.kind}
             options={['AR', 'OR']}
             empty="All"
-            labelOf={(c) => c}
+            labelOf={(c) => (c === 'AR' ? 'Acknowledgement Receipt' : 'Official Receipt')}
             onChange={(v) => setCriteria({ ...criteria, kind: v as ReceiptKind | '' })}
           />
-          <TextField
-            label="Insurer Code"
+          <InsurerField
             value={criteria.insurer}
             onChange={(insurer) => setCriteria({ ...criteria, insurer })}
           />

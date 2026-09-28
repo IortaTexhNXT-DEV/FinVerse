@@ -1,19 +1,13 @@
 import { Plus, Trash2 } from 'lucide-react';
+import { InsurerSelect } from '@/components/broking/InsurerSelect';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
-import type {
-  Beneficiary,
-  Calculation,
-  IncentiveTier,
-  PeriodType,
-  Scheme,
-  SchemeTerms,
-  SchemeType,
-} from './commissionApi';
-import { schemeProblem } from './commissionLogic';
+import type { Calculation, IncentiveTier, Scheme, SchemeTerms } from './commissionApi';
+import { schemeCode, schemeProblem } from './commissionLogic';
+import { BENEFICIARIES, CALCULATIONS, PERIODS, TYPES } from './schemeOptions';
 import { DateInput } from '@/components/ui/DateInput';
 
 const NEW_TERMS: SchemeTerms = {
@@ -153,28 +147,6 @@ function Select<T extends string>({
   );
 }
 
-const TYPES: readonly { id: SchemeType; label: string }[] = [
-  { id: 'NO_TOUCH', label: 'No Touch' },
-  { id: 'TOP_UP', label: 'Top Up' },
-  { id: 'MOTOR_MANIA', label: 'Motor Mania' },
-  { id: 'OTHER', label: 'Other' },
-];
-const CALCULATIONS: readonly { id: Calculation; label: string }[] = [
-  { id: 'TARGET_TIERED', label: 'Production Target Tiers' },
-  { id: 'FIXED_PER_POLICY', label: 'Fixed Amount per Policy' },
-];
-const PERIODS: readonly { id: PeriodType; label: string }[] = [
-  { id: 'MONTHLY', label: 'Monthly' },
-  { id: 'QUARTERLY', label: 'Quarterly' },
-  { id: 'SEMI_ANNUAL', label: 'Semi-annual' },
-  { id: 'ANNUAL', label: 'Annual' },
-  { id: 'CUSTOM', label: 'Custom' },
-];
-const BENEFICIARIES: readonly { id: Beneficiary; label: string }[] = [
-  { id: 'BDOI', label: 'BDOI' },
-  { id: 'BRANCH', label: 'Branch (Passed On)' },
-];
-
 function DateField({
   label,
   value,
@@ -211,8 +183,9 @@ export function SchemeDialog({
   onClose: () => void;
   onSave: (code: string, terms: SchemeTerms) => void;
 }>) {
-  const [code, setCode] = useState(scheme?.code ?? '');
   const [terms, setTerms] = useState<SchemeTerms>(scheme?.terms ?? NEW_TERMS);
+  // The scheme's code is made from its name when it is created (users name schemes, never code them).
+  const code = scheme?.code ?? schemeCode(terms.name);
   const [problem, setProblem] = useState<string>();
   const set = (patch: Partial<SchemeTerms>) => {
     setTerms((t) => ({ ...t, ...patch }));
@@ -246,18 +219,6 @@ export function SchemeDialog({
         <ErrorAlert error={error} />
         {problem && <p className="field-error">{problem}</p>}
         <div className="form-grid">
-          <Field label="Code" required>
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                maxLength={30}
-                disabled={scheme !== undefined}
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-              />
-            )}
-          </Field>
           <Field label="Name" required>
             {(id) => (
               <input
@@ -293,14 +254,13 @@ export function SchemeDialog({
             options={BENEFICIARIES}
             onChange={(beneficiary) => set({ beneficiary })}
           />
-          <Field label="Insurer Code" hint="Blank for every insurer">
+          <Field label="Insurer">
             {(id) => (
-              <input
+              <InsurerSelect
                 id={id}
-                className="input"
-                maxLength={30}
                 value={terms.insurerCode ?? ''}
-                onChange={(e) => set({ insurerCode: e.target.value.toUpperCase() || undefined })}
+                placeholder="Every insurer"
+                onChange={(code) => set({ insurerCode: code || undefined })}
               />
             )}
           </Field>

@@ -9,6 +9,11 @@ describe('RowActions', () => {
     const row = vi.fn();
     render(
       <table>
+        <thead>
+          <tr>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
         <tbody>
           <tr onClick={row}>
             <td>

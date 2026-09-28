@@ -83,6 +83,13 @@ function isoDate(days) {
 
 
 /** Brings the tab strip of a record to the top of the window, so the tab's content is captured whole. */
+/** Runs an action of a table row: opens the row's action menu, then chooses the action. */
+async function rowAction(row, name) {
+  await row.getByRole('button', { name: /^Actions for/ }).click();
+  await row.page().waitForTimeout(300);
+  await row.page().getByRole('menuitem', { name }).first().click();
+}
+
 async function tabsToTop(page) {
   // The capture shows the window from the top: the record header and the stepper above the tabs are set aside
   // (they are in the other steps of the walkthrough) so that the tab's rows fit in the window.
@@ -181,13 +188,13 @@ const steps = {
     const status = ctx.one(`select status from ops_disbursement_request where request_no = '${requestNo}'`);
     if (status === 'SENT') {
       const row = page.locator('table tbody tr').filter({ hasText: requestNo }).first();
-      await row.getByRole('button', { name: /^acknowledge$/i }).click();
+      await rowAction(row, /^acknowledge$/i);
       await settle(page, 1500);
     }
     if (ctx.one(`select status from ops_disbursement_request where request_no = '${requestNo}'`) === 'ACKNOWLEDGED') {
       await tab(page, 'Acknowledged');
       const row = page.locator('table tbody tr').filter({ hasText: requestNo }).first();
-      await row.getByRole('button', { name: /^assign dv$/i }).click();
+      await rowAction(row, /^assign dv/i);
       await page.waitForTimeout(500);
       const dialog = page.locator('dialog.modal[open]').last();
       await dialog.getByLabel(/^Disbursement Voucher No\./).fill('DV-2026-900101');
@@ -205,8 +212,8 @@ const steps = {
     const paid = ctx.one(`select paid_ar from rem_batch_line where batch_id = ${id} and invoice_no = '${invoice}'`);
     const page = await go(ctx, 'remit', '/remittance/insurer-or');
     if (ctx.sql(`select 1 from rem_batch_line where batch_id = ${id} and insurer_or_no is not null`).length === 0) {
-      const file = csv(`MGIC_OR_${batchNo}.csv`, [['batchNo', 'invoiceNo', 'orNo', 'orDate', 'orAmount'],
-        [batchNo, invoice, 'MGIC-OR-2026-900101', isoDate(0), paid]]);
+      const file = csv(`MGIC_OR_${batchNo}.csv`, [['Batch No.', 'Invoice No.', 'OR No.', 'OR Date', 'OR Amount'],
+        [batchNo, invoice, 'MGIC-OR-2026-900101', dateText(0), paid]]);
       await page.locator('input[type=file]').first().setInputFiles(file);
       await page.waitForTimeout(500);
       await button(page, /^upload file$/i).click();

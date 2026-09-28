@@ -174,7 +174,7 @@ const fills = {
   ],
   incentive_rule: [
     click('^new rule$'),
-    async (page) => fill(page, 'Insurer Code', 'INS-MGIC', dialog(page)),
+    async (page) => fill(page, 'Insurer', /Mabuhay/, dialog(page)),
     async (page) => fill(page, /^Rate \(% of basic premium\)/, '2.5', dialog(page)),
     async (page) => fill(page, 'Window (days)', '30', dialog(page)),
     async (page) => fill(page, 'Effective From', dateText(3), dialog(page)),
@@ -225,8 +225,10 @@ const after = {
     await settle(page, 800);
   },
   'scr-op-36-02-dv': async (page) => {
-    const assign = page.getByRole('button', { name: /^assign dv$/i }).first();
-    await assign.click();
+    // Row actions sit in the row's action menu: open the menu, then choose the action.
+    await page.locator('main table tbody tr').first().getByRole('button', { name: /^Actions for/ }).click();
+    await settle(page, 300);
+    await page.getByRole('menuitem', { name: /^assign dv/i }).first().click();
     await settle(page, 600);
   },
 };

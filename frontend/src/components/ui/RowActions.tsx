@@ -104,7 +104,7 @@ export function RowActions({ record, actions }: Readonly<RowActionsProps>) {
         <MoreHorizontal size={18} aria-hidden="true" />
       </button>
       {open && (
-        <ul
+        <div
           className="row-actions-menu"
           role="menu"
           id={menuId}
@@ -112,28 +112,27 @@ export function RowActions({ record, actions }: Readonly<RowActionsProps>) {
           style={place}
         >
           {shown.map((a) => (
-            <li key={a.label} role="none">
-              <button
-                type="button"
-                role="menuitem"
-                className={a.danger ? 'row-actions-item danger' : 'row-actions-item'}
-                disabled={a.disabledReason !== undefined}
-                title={a.disabledReason}
-                onClick={() => {
-                  setOpen(false);
-                  if (a.confirm === undefined) {
-                    a.onSelect('');
-                  } else {
-                    setAsking(a);
-                  }
-                }}
-              >
-                {a.icon}
-                {a.label}
-              </button>
-            </li>
+            <button
+              key={a.label}
+              type="button"
+              role="menuitem"
+              className={a.danger ? 'row-actions-item danger' : 'row-actions-item'}
+              disabled={a.disabledReason !== undefined}
+              title={a.disabledReason}
+              onClick={() => {
+                setOpen(false);
+                if (a.confirm === undefined) {
+                  a.onSelect('');
+                } else {
+                  setAsking(a);
+                }
+              }}
+            >
+              {a.icon}
+              {a.label}
+            </button>
           ))}
-        </ul>
+        </div>
       )}
       {asking?.confirm !== undefined && (
         <ConfirmDialog

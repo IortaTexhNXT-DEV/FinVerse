@@ -12,6 +12,8 @@ public enum ParameterType {
   ACCOUNT,
   CURRENCY,
   BUSINESS_LINE,
+  /** An insurer, chosen by name; the value is the insurer's party code. */
+  INSURER,
   /**
    * An include or exclude list of codes ("only" or "all except", BRD x.009.2): the value is a comma
    * separated list, prefixed with {@code !} for "all except"; the options come from the {@link

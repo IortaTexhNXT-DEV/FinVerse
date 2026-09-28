@@ -104,8 +104,11 @@ function HandoffTable({
   });
   const mayClose = CLOSERS.some(can);
   const columns: Column<Handoff>[] = [
-    { key: 'port', header: 'Work', render: (h) => humanize(h.port) },
-    { key: 'summary', header: 'What To Do', render: (h) => h.summary },
+    {
+      key: 'port',
+      header: 'Work / What To Do',
+      render: (h) => <CellStack main={humanize(h.port)} sub={h.summary} />,
+    },
     {
       key: 'src',
       header: 'From',
@@ -114,7 +117,7 @@ function HandoffTable({
       ),
     },
     { key: 'amount', header: 'Amount', numeric: true, render: (h) => <Amount value={h.amount} /> },
-    { key: 'at', header: 'Created', render: (h) => formatDateTime(h.createdAt) },
+    { key: 'at', header: 'Created', kind: 'date', render: (h) => formatDateTime(h.createdAt) },
     { key: 'status', header: 'Status', render: (h) => <StatusBadge status={h.status} /> },
     {
       key: 'actions',

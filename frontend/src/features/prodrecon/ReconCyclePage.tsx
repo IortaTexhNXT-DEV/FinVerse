@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInsurerName } from '@/components/broking/useLabels';
 import { statusMessage } from '@/components/ui/statusTones';
 import { Building2, CalendarRange, CheckCheck, Inbox, Send, Sigma } from 'lucide-react';
 import { useState } from 'react';
@@ -165,9 +166,10 @@ function CloseDialog({
 }
 
 function Summary({ cycle: c }: Readonly<{ cycle: ReconCycle }>) {
+  const insurerName = useInsurerName();
   return (
     <RecordSummary
-      title={c.insurerCode}
+      title={insurerName(c.insurerCode)}
       chips={
         <>
           <ReferenceChip label="Cycle" value={c.cycleNo} />
@@ -206,6 +208,7 @@ export default function ReconCyclePage() {
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<TabId>('items');
   const [closing, setClosing] = useState(false);
+  const insurerName = useInsurerName();
   const cycle = useQuery({
     queryKey: ['prodrecon', 'cycle', id],
     queryFn: () => prodreconApi.cycle(id),
@@ -227,13 +230,14 @@ export default function ReconCyclePage() {
   }
   const c = cycle.data;
   const editable = can('RECON_PROCESS') && !c.closed;
+  const cycleTitle = `${insurerName(c.insurerCode)} · ${monthLabel(c.productionMonth)}`;
   return (
     <div className="stack">
       <PageHeader
         section="Production Reconciliation · Cycles"
         backTo="/prodrecon/cycles"
         title={c.cycleNo}
-        description={`${c.insurerCode} · ${monthLabel(c.productionMonth)}`}
+        description={cycleTitle}
         actions={
           editable ? (
             <>

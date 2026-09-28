@@ -156,7 +156,7 @@ export default function InsurerOrPage() {
       <Card title="Upload Insurer Schedule">
         <UploadForm
           label="Insurer Schedule"
-            columns="Batch No., Invoice No., OR No., OR Date, OR Amount"
+          columns="Batch No., Invoice No., OR No., OR Date, OR Amount"
           busy={upload.isPending}
           onUpload={(file) => upload.mutate(file)}
         />

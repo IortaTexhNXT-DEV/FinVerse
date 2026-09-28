@@ -1,3 +1,4 @@
+import { formatAmount, formatDate, humanize } from '@/utils/format';
 import type {
   Bucket,
   BucketCounts,
@@ -29,11 +30,28 @@ const FIELDS: readonly { key: keyof ReconSide; label: string; flag: string }[] =
   { key: 'commission', label: 'Commission', flag: 'COMMISSION' },
 ];
 
+/** A compared value as users read it: amounts with separators, dates as dd-MMM-yyyy. */
 function text(value: string | number | undefined): string {
   if (value === undefined) {
     return '';
   }
-  return typeof value === 'number' ? value.toFixed(2) : value;
+  if (typeof value === 'number') {
+    return formatAmount(value);
+  }
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) ? formatDate(value) : value;
+}
+
+/**
+ * The differences the matcher reported, by the names of the compared fields: "GROSS_PREMIUM" is
+ * Gross Premium (a difference without a known field keeps its words).
+ */
+export function differenceLabels(discrepancies: readonly string[]): string {
+  return discrepancies
+    .map((d) => {
+      const flag = d.split(/[\s:]/)[0]?.toUpperCase() ?? d;
+      return FIELDS.find((f) => f.flag === flag)?.label ?? humanize(d);
+    })
+    .join(', ');
 }
 
 /**
@@ -164,7 +182,7 @@ export function scheduleForm(
 /** The first problem of a schedule, undefined when it can be saved. */
 export function scheduleProblem(input: ScheduleInput): string | undefined {
   if (input.insurerCode.trim() === '') {
-    return 'Insurer code is required';
+    return 'Select the insurer';
   }
   const max = input.frequency === 'WEEKLY' ? MAX_WEEK_DAY : MAX_MONTH_DAY;
   if (!Number.isInteger(input.runDay) || input.runDay < 1 || input.runDay > max) {

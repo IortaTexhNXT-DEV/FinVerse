@@ -516,7 +516,7 @@ public class HoldService {
         : List.of(hold.getRequestedBy(), hold.getAssignedProcessor());
   }
 
-  private static Notice notice(HoldRequest hold, String title) {
+  private Notice notice(HoldRequest hold, String title) {
     return new Notice(
         title,
         describe(hold),

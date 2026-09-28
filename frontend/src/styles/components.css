@@ -514,6 +514,19 @@
   border-right: none;
 }
 
+/* A row header (the first cell of a row that names it: a rule, a field) reads as data, never as a
+   column header: no navy band, no sticky position, the text colour of the row. */
+.table tbody th {
+  position: static;
+  background: transparent;
+  color: var(--color-text);
+  font-family: inherit;
+  font-weight: 600;
+  padding: 12px var(--space-3);
+  border-right: none;
+  white-space: normal;
+}
+
 .table th button,
 .table th a {
   color: inherit;

@@ -23,9 +23,7 @@ const COLUMNS: Column<CommissionLine>[] = [
   {
     key: 'insurer',
     header: 'Insurer / Payee',
-    render: (l) => (
-      <CellStack main={<InsurerName code={l.insurerCode} />} sub={l.payeeName} />
-    ),
+    render: (l) => <CellStack main={<InsurerName code={l.insurerCode} />} sub={l.payeeName} />,
   },
   { key: 'ref', header: 'Payment Ref.', render: (l) => l.paymentRef ?? l.certificateRef ?? '' },
   { key: 'invoice', header: 'Invoice', render: (l) => l.invoiceNo ?? '' },

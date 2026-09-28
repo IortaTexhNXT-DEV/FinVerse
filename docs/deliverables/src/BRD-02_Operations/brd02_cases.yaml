@@ -113,7 +113,7 @@ data:
     source: Seed data (Operations users, adjustment and Marketing team lead, administrator and auditor, with their grants)
   - id: TD-OP-02
     name: Booked seed invoices
-    content: ARN-2026-940001 (Motor; booking and endorsement invoices paid in full; booking invoice remitted with the insurer OR), ARN-2026-940002 (Property; requests at every adjustment stage; gross premium differs in the insurer register), ARN-2026-940003 (direct payment), ARN-2026-940004 (CGL; partly paid; hold request waiting; flat cancellation ready for posting)
+    content: ARN-2026-940001 (Motor; booking and endorsement invoices paid in full; booking invoice remitted with the insurer OR), ARN-2026-940002 (Property; requests at every adjustment stage; gross premium differs in the insurer register), ARN-2026-940003 (direct payment), ARN-2026-940004 (CGL; partly paid; flat cancellation ready for posting), ARN-2026-940008 (Motor; hold request waiting)
     source: Booking seed data, copied into the invoice ledger by the booking feed
   - id: TD-OP-03
     name: Cashiering storyline
@@ -121,7 +121,7 @@ data:
     source: Seed data (cashiering)
   - id: TD-OP-04
     name: Remittance storyline
-    content: A remitted batch of ARN-2026-940001 with its insurer OR; a batch in review with the endorsement invoice; a hold request of ARN-2026-940004 waiting for approval; a special remittance request; incentive rule INS-MGIC Property CBG 2 % within 30 days of inception
+    content: A remitted batch of ARN-2026-940001 with its insurer OR; a batch in review with the endorsement invoice; a hold request of ARN-2026-940008 waiting for approval; a special remittance request; incentive rule INS-MGIC Property CBG 2 % within 30 days of inception
     source: Seed data (remittance)
   - id: TD-OP-05
     name: Production reconciliation storyline
@@ -250,7 +250,7 @@ frs:
         screen: HOLDS
         title: Marketing Collection cannot approve a hold
         steps:
-          - As mktcoll open Remittance Holds, Special Remittance and BIR 2307; open the waiting hold of ARN-2026-940004.
+          - As mktcoll open Remittance Holds, Special Remittance and BIR 2307; open the waiting hold of ARN-2026-940008.
         expected: The three screens open; Approve hold is not offered and the direct request is refused.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
@@ -346,9 +346,9 @@ frs:
       - c: 2
         type: Positive
         title: Invoice on hold
-        pre: The hold of ARN-2026-940004 approved (TC-OP-111.1-01).
+        pre: The hold of ARN-2026-940008 approved (TC-OP-111.1-01).
         steps:
-          - Open Invoice 360 of ARN-2026-940004, Remittances tab.
+          - Open Invoice 360 of ARN-2026-940008, Remittances tab.
         expected: The hold pill and the hold request with its until date are shown.
       - c: 3
         type: Positive
@@ -379,14 +379,14 @@ frs:
         steps:
           - New Request on the endorsement invoice of ARN-2026-940001 (in a batch for review).
         expected: Refused.
-        msg: ["Invoice <no> is locked by REMITTANCE (<reason>)", INVOICE_LOCKED]
+        msg: ["Invoice <no> is locked by Remittance (<reason>)", INVOICE_LOCKED]
       - c: 2
         type: Positive
         persona: CASHIER
         screen: RECEIVE
         title: Payment on an invoice locked by Adjustment
         steps:
-          - Receive a payment on the invoice of ARN-2026-940004 (open cancellation request, locked by ADJUSTMENT).
+          - Receive a payment on the invoice of ARN-2026-940004 (open cancellation request, locked by Adjustment).
         expected: The payment is applied; the lock stays.
       - c: 3
         type: Workflow
@@ -1219,9 +1219,9 @@ frs:
       - c: 1
         type: Negative
         title: Invoice on hold not extracted
-        pre: The hold of ARN-2026-940004 approved.
+        pre: The hold of ARN-2026-940008 approved.
         steps:
-          - Run the extraction; open the tag of ARN-2026-940004.
+          - Run the extraction; open the tag of ARN-2026-940008.
         expected: UNEXTRACTED_DUE with reason ON_HOLD.
       - c: 2
         type: Negative
@@ -2527,7 +2527,7 @@ frs:
         steps:
           - Upload an answer file with decision "MAYBE".
         expected: The row is refused.
-        msg: ["Decision '<value>' is neither APPROVED nor REJECTED", DP_RESPONSE_DECISION]
+        msg: ["Decision '<value>' is not one of Approved or Rejected (or Yes / No)", DP_RESPONSE_DECISION]
 
   FR-OP-094:
     scenario: SC-OP-08
@@ -2595,7 +2595,7 @@ frs:
         steps:
           - Compute a run of No Touch (no tiers).
         expected: Refused.
-        msg: ["Scheme <name> has no tiers yet (targets and amounts from BDOI, OQ39)", INCENTIVE_SCHEME_EMPTY]
+        msg: ["Scheme <name> has no tiers yet: add its targets and amounts first", INCENTIVE_SCHEME_EMPTY]
       - c: 2
         type: Negative
         title: Fixed tier without amount
@@ -2736,7 +2736,7 @@ frs:
         screen: HOLD
         title: Approve the seed hold
         steps:
-          - As mkttl open the waiting hold of ARN-2026-940004; Approve hold; as remit run the extraction.
+          - As mkttl open the waiting hold of ARN-2026-940008; Approve hold; as remit run the extraction.
         expected: The hold is On hold with number HLD-2026-n; the invoice is UNEXTRACTED_DUE with ON_HOLD.
       - c: 2
         type: Negative
@@ -2760,7 +2760,7 @@ frs:
         type: Negative
         title: Second hold on the same invoice
         steps:
-          - Request a hold on ARN-2026-940004 again.
+          - Request a hold on ARN-2026-940008 again.
         expected: Refused.
         msg: ["Invoice <no> already has hold <no>", HOLD_DUPLICATE]
       - c: 4

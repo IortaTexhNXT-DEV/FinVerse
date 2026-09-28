@@ -181,10 +181,15 @@ function DtipTab({ companyId, canQueue }: Readonly<{ companyId: number; canQueue
       {filters && (
         <div className="worklist-filters remit-form">
           <Field label="Insurer">
-{(id) => (
-<InsurerSelect id={id} value={insurer} placeholder="All insurers" onChange={(code) => setInsurer(code)} />
-)}
-</Field>
+            {(id) => (
+              <InsurerSelect
+                id={id}
+                value={insurer}
+                placeholder="All insurers"
+                onChange={(code) => setInsurer(code)}
+              />
+            )}
+          </Field>
           <Field label="Remittance Status">
             {(id) => (
               <select

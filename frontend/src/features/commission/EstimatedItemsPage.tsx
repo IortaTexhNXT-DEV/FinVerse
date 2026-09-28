@@ -1,3 +1,4 @@
+import { InsurerName } from '@/components/broking/LovLabel';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Flag } from 'lucide-react';
 import { useState } from 'react';
@@ -113,7 +114,7 @@ export default function EstimatedItemsPage() {
   const columns: Column<EstimatedItem>[] = [
     { key: 'invoice', header: 'Invoice No.', render: (i) => <strong>{i.invoiceNo}</strong> },
     { key: 'arn', header: 'ARN', render: (i) => i.arn ?? '' },
-    { key: 'insurer', header: 'Insurer', render: (i) => i.insurerCode ?? '' },
+    { key: 'insurer', header: 'Insurer', render: (i) => <InsurerName code={i.insurerCode} /> },
     { key: 'assured', header: 'Assured', render: (i) => i.assuredName ?? '' },
     { key: 'booked', header: 'Booked', render: (i) => formatDate(i.bookingDate) },
     {

@@ -44,8 +44,8 @@ spec:
             - configMapRef: { name: bibs-backend-config }
             - secretRef: { name: bibs-backend-secrets }
           resources:
-            requests: { cpu: "1", memory: "2Gi" }
-            limits: { cpu: "2", memory: "3Gi" }
+            requests: { cpu: "1", memory: "2Gi", ephemeral-storage: "256Mi" }
+            limits: { cpu: "2", memory: "3Gi", ephemeral-storage: "2Gi" }
           startupProbe:
             httpGet: { path: /actuator/health/liveness, port: https, scheme: HTTPS }
             periodSeconds: 10

@@ -52,10 +52,12 @@ class ClientNeutralityTest {
           "THB", "INR", "KRW", "NZD");
 
   /** A three-letter code standing alone (not part of a number series such as INR-2026-1). */
-  private static final Pattern CODE = Pattern.compile("(?<![-_A-Za-z0-9])[A-Z]{3}(?![-_A-Za-z0-9])");
+  private static final Pattern CODE =
+      Pattern.compile("(?<![-_A-Za-z0-9])[A-Z]{3}(?![-_A-Za-z0-9])");
 
   /** A Java string literal (text blocks are not used for such values). */
-  private static final Pattern JAVA_STRING = Pattern.compile("\"([^\"\\\\\\n]*+(?:\\\\.[^\"\\\\\\n]*+)*+)\"");
+  private static final Pattern JAVA_STRING =
+      Pattern.compile("\"([^\"\\\\\\n]*+(?:\\\\.[^\"\\\\\\n]*+)*+)\"");
 
   /** A TypeScript string or template literal. */
   private static final Pattern TS_STRING =

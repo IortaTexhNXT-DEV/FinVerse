@@ -9,6 +9,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { today } from '@/utils/format';
 import { DateInput } from '@/components/ui/DateInput';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { useBaseCurrency } from '@/context/workspaceContext';
 
 interface Props {
   companies: Company[];
@@ -25,12 +26,13 @@ export function IcTransactionForm({ companies, companyId }: Readonly<Props>) {
   const toast = useToast();
   const queryClient = useQueryClient();
   const other = companies.find((c) => c.id !== companyId);
+  const baseCurrency = useBaseCurrency();
   const [form, setForm] = useState<Form>({
     type: 'CHARGE',
     creditorCompanyId: companyId,
     debtorCompanyId: other?.id ?? 0,
     valueDate: today(),
-    currency: 'USD',
+    currency: baseCurrency,
     amount: '',
     creditorAccount: '4700',
     debtorAccount: '5605',

@@ -11,6 +11,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import type { CoverageRow, InsurerRow, VersionForm } from './versionForm';
 import { syncTerms } from './versionForm';
 import { TypedInput } from '@/components/ui/DateInput';
+import { formatAmount, formatRate } from '@/utils/format';
 
 interface Props {
   form: VersionForm;
@@ -29,20 +30,39 @@ const ROLE_LABELS: Record<InsurerRole, string> = {
   PARTICIPANT: 'Participant',
 };
 
-/** A text or number cell input with an accessible label. */
+/** A dash for an empty value of a released version. */
+const DASH = <span className="muted">—</span>;
+
+/**
+ * A text or number cell input with an accessible label; on a released version the value as people
+ * read it (an amount with separators, a rate with its decimals, a dash when empty).
+ */
 function CellInput({
   label,
   value,
   readOnly,
   onChange,
   type = 'number',
+  format = 'amount',
 }: Readonly<{
   label: string;
   value: string;
   readOnly: boolean;
   onChange: (value: string) => void;
   type?: 'number' | 'text';
+  format?: 'amount' | 'rate';
 }>) {
+  if (readOnly) {
+    if (value === '') {
+      return DASH;
+    }
+    if (type === 'text') {
+      return <span style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>{value}</span>;
+    }
+    return (
+      <span aria-label={label}>{format === 'rate' ? formatRate(value) : formatAmount(value)}</span>
+    );
+  }
   return (
     <TypedInput
       className="input"
@@ -50,10 +70,14 @@ function CellInput({
       type={type}
       step={type === 'number' ? 'any' : undefined}
       value={value}
-      disabled={readOnly}
       onChange={(e) => onChange(e.target.value)}
     />
   );
+}
+
+/** Yes or No for a flag of a released version. */
+function yesNo(flag: boolean): string {
+  return flag ? 'Yes' : 'No';
 }
 
 function AddSelect({
@@ -164,32 +188,43 @@ export function VersionCoveragesSection({
           {
             key: 'i',
             header: 'Included',
-            render: (c) => (
-              <input
-                type="checkbox"
-                aria-label={`Include ${c.coverageCode}`}
-                checked={c.included}
-                disabled={readOnly}
-                onChange={(e) => update(form.coverages.indexOf(c), { included: e.target.checked })}
-              />
-            ),
+            render: (c) =>
+              readOnly ? (
+                yesNo(c.included)
+              ) : (
+                <input
+                  type="checkbox"
+                  aria-label={`Include ${c.coverageCode}`}
+                  checked={c.included}
+                  disabled={readOnly}
+                  onChange={(e) =>
+                    update(form.coverages.indexOf(c), { included: e.target.checked })
+                  }
+                />
+              ),
           },
           {
             key: 'o',
             header: 'Optional',
-            render: (c) => (
-              <input
-                type="checkbox"
-                aria-label={`Optional ${c.coverageCode}`}
-                checked={c.optional}
-                disabled={readOnly}
-                onChange={(e) => update(form.coverages.indexOf(c), { optional: e.target.checked })}
-              />
-            ),
+            render: (c) =>
+              readOnly ? (
+                yesNo(c.optional)
+              ) : (
+                <input
+                  type="checkbox"
+                  aria-label={`Optional ${c.coverageCode}`}
+                  checked={c.optional}
+                  disabled={readOnly}
+                  onChange={(e) =>
+                    update(form.coverages.indexOf(c), { optional: e.target.checked })
+                  }
+                />
+              ),
           },
           {
             key: 'l',
             header: 'Limit',
+            numeric: readOnly,
             render: (c) => (
               <CellInput
                 label={`Limit of ${c.coverageCode}`}
@@ -202,6 +237,7 @@ export function VersionCoveragesSection({
           {
             key: 'd',
             header: 'Deductible',
+            numeric: readOnly,
             render: (c) => (
               <CellInput
                 label={`Deductible of ${c.coverageCode}`}
@@ -268,6 +304,7 @@ export function VersionInsurersSection({ form, errors, readOnly, onChange }: Rea
   const cell = (key: 'sharePercent' | 'rate' | 'minimumPremium', label: string) => ({
     key,
     header: label,
+    numeric: readOnly,
     render: (r: InsurerRow) => {
       const index = form.insurers.indexOf(r);
       return (
@@ -275,6 +312,7 @@ export function VersionInsurersSection({ form, errors, readOnly, onChange }: Rea
           <CellInput
             label={`${label} of ${r.insurerCode}`}
             value={r[key]}
+            format={key === 'minimumPremium' ? 'amount' : 'rate'}
             readOnly={readOnly}
             onChange={(v) => update(index, { [key]: v })}
           />
@@ -308,23 +346,26 @@ export function VersionInsurersSection({ form, errors, readOnly, onChange }: Rea
           {
             key: 'r',
             header: 'Role',
-            render: (r) => (
-              <select
-                className="select"
-                aria-label={`Role of ${r.insurerCode}`}
-                value={r.role}
-                disabled={readOnly}
-                onChange={(e) =>
-                  update(form.insurers.indexOf(r), { role: e.target.value as InsurerRole })
-                }
-              >
-                {ROLES.map((role) => (
-                  <option key={role} value={role}>
-                    {ROLE_LABELS[role]}
-                  </option>
-                ))}
-              </select>
-            ),
+            render: (r) =>
+              readOnly ? (
+                ROLE_LABELS[r.role]
+              ) : (
+                <select
+                  className="select"
+                  aria-label={`Role of ${r.insurerCode}`}
+                  value={r.role}
+                  disabled={readOnly}
+                  onChange={(e) =>
+                    update(form.insurers.indexOf(r), { role: e.target.value as InsurerRole })
+                  }
+                >
+                  {ROLES.map((role) => (
+                    <option key={role} value={role}>
+                      {ROLE_LABELS[role]}
+                    </option>
+                  ))}
+                </select>
+              ),
           },
           cell('sharePercent', 'Share %'),
           cell('rate', 'Rate %'),

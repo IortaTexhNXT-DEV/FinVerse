@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 
 /**
@@ -62,13 +63,74 @@ public final class PackageChecks {
    * @param today business date
    * @param testPremium test premium on the sample item, null when not computable
    * @param sampleSumInsured sum insured of the sample item
+   * @param names names of the coverages, cover type and insurers named in the details
    */
   public record Context(
       Predicate<String> basicCoverage,
       ProductVersion latest,
       LocalDate today,
       BigDecimal testPremium,
-      BigDecimal sampleSumInsured) {}
+      BigDecimal sampleSumInsured,
+      Names names) {
+
+    /**
+     * A context whose details name records by their codes.
+     *
+     * @param basicCoverage whether a coverage code of the product line is a basic coverage
+     * @param latest latest released version (current or future), null when none
+     * @param today business date
+     * @param testPremium test premium on the sample item, null when not computable
+     * @param sampleSumInsured sum insured of the sample item
+     */
+    public Context(
+        Predicate<String> basicCoverage,
+        ProductVersion latest,
+        LocalDate today,
+        BigDecimal testPremium,
+        BigDecimal sampleSumInsured) {
+      this(basicCoverage, latest, today, testPremium, sampleSumInsured, Names.CODES);
+    }
+  }
+
+  /**
+   * The names people read in the check details ("Own Damage and Theft", not OD_THEFT). An unknown
+   * code is returned as it is.
+   */
+  public interface Names {
+
+    /** Names every record by its code. */
+    Names CODES = new Names() {};
+
+    /**
+     * The name of a coverage of the product line.
+     *
+     * @param code coverage code
+     * @return name
+     */
+    default String coverage(String code) {
+      return code;
+    }
+
+    /**
+     * The name of a cover type of the product line.
+     *
+     * @param code cover type code
+     * @return name
+     */
+    default String coverType(String code) {
+      return code;
+    }
+
+    /**
+     * The name of an insurer.
+     *
+     * @param code insurer party code
+     * @return name
+     */
+    default String insurer(String code) {
+      return code;
+    }
+  }
 
   /**
    * Runs the checks.
@@ -81,8 +143,8 @@ public final class PackageChecks {
   public static List<ValidationCheck> run(
       RiskProduct product, ProductVersion version, Context context) {
     List<ValidationCheck> checks = new ArrayList<>();
-    checks.add(hierarchy(checks.size() + 1, product, version, context.basicCoverage()));
-    checks.add(insurerTerms(checks.size() + 1, version));
+    checks.add(hierarchy(checks.size() + 1, product, version, context));
+    checks.add(insurerTerms(checks.size() + 1, version, context.names()));
     checks.add(shares(checks.size() + 1, version));
     checks.add(rates(checks.size() + 1, version, context.latest()));
     checks.add(dates(checks.size() + 1, version, context.latest(), context.today()));
@@ -98,24 +160,25 @@ public final class PackageChecks {
   }
 
   private static ValidationCheck hierarchy(
-      int seq, RiskProduct product, ProductVersion version, Predicate<String> basicCoverage) {
+      int seq, RiskProduct product, ProductVersion version, Context context) {
     List<String> included = included(version);
-    List<String> basic = included.stream().filter(basicCoverage).toList();
+    List<String> basic = included.stream().filter(context.basicCoverage()).toList();
     String coverType = product.getCoverTypeCode();
     boolean ok = coverType != null && !basic.isEmpty();
+    Names names = context.names();
     String detail =
         "Cover type "
-            + (coverType == null ? "missing" : coverType)
+            + (coverType == null ? "missing" : names.coverType(coverType))
             + "; "
             + count(included.size(), "included coverage")
             + ", "
             + (basic.isEmpty()
                 ? "no basic coverage"
-                : basic.size() + " basic (" + join(basic) + ")");
+                : basic.size() + " basic (" + join(basic, names::coverage) + ")");
     return check(seq, "HIERARCHY", HIERARCHY, ok, detail);
   }
 
-  private static ValidationCheck insurerTerms(int seq, ProductVersion version) {
+  private static ValidationCheck insurerTerms(int seq, ProductVersion version, Names names) {
     List<String> included = included(version);
     List<VersionInsurer> insurers = version.getInsurers();
     if (insurers.isEmpty()) {
@@ -138,7 +201,8 @@ public final class PackageChecks {
       if (without.isEmpty()) {
         complete++;
       } else {
-        missing.add(insurer.insurerCode() + " (" + join(without) + ")");
+        missing.add(
+            names.insurer(insurer.insurerCode()) + " (" + join(without, names::coverage) + ")");
       }
     }
     String detail =
@@ -282,7 +346,7 @@ public final class PackageChecks {
     return n + " " + (n == 1 ? noun : noun + "s");
   }
 
-  private static String join(List<String> codes) {
-    return String.join(", ", codes);
+  private static String join(List<String> codes, UnaryOperator<String> name) {
+    return codes.stream().map(name).collect(Collectors.joining(", "));
   }
 }

@@ -20,6 +20,10 @@ import { LovLabel } from '@/components/broking/LovLabel';
 const scope = (r: { scope: string; scopeCode: string }) =>
   r.scope === 'ALL' ? 'All products' : `${humanize(r.scope)} ${r.scopeCode}`;
 
+/** What the confirmation names: the rule's scope, or the TSU rule's code and description. */
+const ruleLabel = (r: FieldRule | DocumentRule | TsuRule) =>
+  'scope' in r ? scope(r) : `${r.code} ${r.description}`;
+
 function statusColumns<T extends FieldRule | DocumentRule | TsuRule>(
   kind: 'FIELD_RULE' | 'DOCUMENT_RULE' | 'TSU_RULE',
   queryKey: string,
@@ -34,7 +38,7 @@ function statusColumns<T extends FieldRule | DocumentRule | TsuRule>(
         <RecordActions
           kind={kind}
           record={r}
-          label={`${humanize(kind)} ${scope(r)}`}
+          label={`${humanize(kind)} ${ruleLabel(r)}`}
           refresh={[['catalog', queryKey]]}
         />
       ),

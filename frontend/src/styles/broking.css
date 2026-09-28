@@ -103,13 +103,26 @@
   color: var(--color-danger);
 }
 
+/* The actions stay together on one row; the whole group moves below the meta row when narrow. */
 .workflow-actions {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  flex: 0 0 auto;
   gap: var(--space-2);
   justify-content: flex-end;
   align-items: center;
   margin-left: auto;
+}
+
+.workflow-actions .btn {
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .workflow-actions {
+    flex-wrap: wrap;
+    flex: 1 1 100%;
+  }
 }
 
 /* Stage stepper: passed stages checked, the current stage highlighted, stages ahead grey */

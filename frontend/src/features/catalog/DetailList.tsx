@@ -11,7 +11,9 @@ export function DetailList({ rows }: Readonly<{ rows: readonly DetailRow[] }>) {
       {rows.map(([label, value]) => (
         <div key={label}>
           <dt className="muted">{label}</dt>
-          <dd style={{ margin: 0, fontWeight: 600 }}>
+          <dd
+            style={{ margin: 0, fontWeight: 600, overflowWrap: 'anywhere', whiteSpace: 'normal' }}
+          >
             {isEmptyValue(value) ? <span className="muted">—</span> : value}
           </dd>
         </div>

@@ -35,7 +35,7 @@ export function durationText(iso: string): string {
     return iso;
   }
   const [date, time] = iso.slice(1).split('T');
-  const d = DATE_PART.exec(date);
+  const d = DATE_PART.exec(date ?? '');
   const t = time === undefined ? null : TIME_PART.exec(time);
   if (d === null || (time !== undefined && t === null)) {
     return iso;

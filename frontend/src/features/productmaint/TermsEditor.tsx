@@ -1,5 +1,8 @@
+import { useQuery } from '@tanstack/react-query';
 import { Plus, Trash2 } from 'lucide-react';
 import type { CoverageTerm, PackageTerms } from '@/api/productmaint';
+import { productCatalogApi } from '@/api/productCatalog';
+import type { Coverage } from '@/api/productCatalog';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Field } from '@/components/ui/Field';
@@ -13,6 +16,8 @@ interface TermsEditorProps {
   errors: Record<string, string>;
   /** Hides the target insurers (retirement requests). */
   withInsurers?: boolean;
+  /** Line of the request: the coverages are picked by name from its coverages and perils. */
+  lineCode?: string;
 }
 
 function SectionsCard({ terms, onChange }: Readonly<Omit<TermsEditorProps, 'errors'>>) {
@@ -75,14 +80,54 @@ function SectionsCard({ terms, onChange }: Readonly<Omit<TermsEditorProps, 'erro
   );
 }
 
+/**
+ * The coverage of a row, picked by name from the active coverages of the line (a coverage no longer
+ * offered stays selectable under its code); before a line is chosen the picker says so.
+ */
+function CoveragePicker({
+  n,
+  value,
+  options,
+  onChange,
+}: Readonly<{
+  n: number;
+  value: string;
+  options: Coverage[] | undefined;
+  onChange: (code: string) => void;
+}>) {
+  const active = (options ?? []).filter((o) => o.recordStatus === 'ACTIVE');
+  const known = value === '' || active.some((o) => o.code === value);
+  return (
+    <select
+      className="select"
+      aria-label={`Coverage ${n}`}
+      value={value}
+      disabled={options === undefined}
+      onChange={(e) => onChange(e.target.value)}
+    >
+      <option value="">
+        {options === undefined ? 'Choose the line first' : 'Choose a coverage'}
+      </option>
+      {active.map((o) => (
+        <option key={o.code} value={o.code}>
+          {o.basic ? `${o.name} (basic)` : o.name}
+        </option>
+      ))}
+      {!known && <option value={value}>{value}</option>}
+    </select>
+  );
+}
+
 function CoverageRow({
   c,
   index,
+  options,
   onChange,
   onRemove,
 }: Readonly<{
   c: CoverageTerm;
   index: number;
+  options: Coverage[] | undefined;
   onChange: (patch: Partial<CoverageTerm>) => void;
   onRemove: () => void;
 }>) {
@@ -90,11 +135,11 @@ function CoverageRow({
   return (
     <tr>
       <td>
-        <input
-          className="input"
-          aria-label={`Coverage ${n} code`}
+        <CoveragePicker
+          n={n}
           value={c.coverageCode}
-          onChange={(e) => onChange({ coverageCode: e.target.value.toUpperCase() })}
+          options={options}
+          onChange={(coverageCode) => onChange({ coverageCode })}
         />
       </td>
       <td>
@@ -137,8 +182,14 @@ function CoverageRow({
   );
 }
 
-function CoveragesCard({ terms, onChange, errors }: Readonly<TermsEditorProps>) {
+function CoveragesCard({ terms, onChange, errors, lineCode }: Readonly<TermsEditorProps>) {
   const coverages = terms.coverages;
+  const line = lineCode ?? '';
+  const options = useQuery({
+    queryKey: ['catalog', 'coverages', line],
+    queryFn: () => productCatalogApi.coverages(line),
+    enabled: line !== '',
+  });
   const set = (index: number, patch: Partial<CoverageTerm>) =>
     onChange({
       ...terms,
@@ -172,7 +223,7 @@ function CoveragesCard({ terms, onChange, errors }: Readonly<TermsEditorProps>) 
           <table className="table">
             <thead>
               <tr>
-                <th>Coverage code</th>
+                <th>Coverage</th>
                 <th>Included</th>
                 <th className="num">Limit</th>
                 <th>Deductible</th>
@@ -185,6 +236,7 @@ function CoveragesCard({ terms, onChange, errors }: Readonly<TermsEditorProps>) 
                   key={`coverage-${index + 1}`}
                   c={c}
                   index={index}
+                  options={line === '' ? undefined : (options.data ?? [])}
                   onChange={(patch) => set(index, patch)}
                   onRemove={() =>
                     onChange({ ...terms, coverages: coverages.filter((_, i) => i !== index) })
@@ -272,11 +324,12 @@ export function TermsEditor({
   onChange,
   errors,
   withInsurers = true,
+  lineCode,
 }: Readonly<TermsEditorProps>) {
   return (
     <>
       <SectionsCard terms={terms} onChange={onChange} />
-      <CoveragesCard terms={terms} onChange={onChange} errors={errors} />
+      <CoveragesCard terms={terms} onChange={onChange} errors={errors} lineCode={lineCode} />
       <SchemeCard terms={terms} onChange={onChange} errors={errors} />
       {withInsurers && (
         <Card title="Target insurers">

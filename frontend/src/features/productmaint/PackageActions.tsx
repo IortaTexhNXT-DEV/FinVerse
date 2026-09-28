@@ -4,6 +4,7 @@ import { PACKAGE_REQUEST_ENTITY, productMaintApi } from '@/api/productmaint';
 import type { PackageRequest } from '@/api/productmaint';
 import type { ActionNote, WorkAction } from '@/api/workflow';
 import { ActionDialog } from '@/components/broking/ActionDialog';
+import { isExitStage } from '@/components/broking/stageSteps';
 import { workflowKey } from '@/components/broking/workflowKey';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/toastContext';
@@ -57,6 +58,14 @@ function offeredActions(p: PackageRequest, actions: WorkAction[]): WorkAction[] 
   });
 }
 
+/** The first action is the call to action; one that closes the request off its path is danger. */
+function actionVariant(a: WorkAction, index: number): 'accent' | 'secondary' | 'danger' {
+  if (isExitStage(a.toStage)) {
+    return 'danger';
+  }
+  return index === 0 ? 'accent' : 'secondary';
+}
+
 /**
  * Business actions of a package request offered by the workflow panel (BRPM.008-016): submit,
  * approvals, TSU recommendation, revise the quotation slip, terms final, release of the terms,
@@ -98,7 +107,7 @@ export function PackageActions({
         <Button
           key={a.action}
           size="sm"
-          variant={i === 0 ? 'accent' : 'secondary'}
+          variant={actionVariant(a, i)}
           onClick={() => setPending(a)}
         >
           {titleCase(a.label)}

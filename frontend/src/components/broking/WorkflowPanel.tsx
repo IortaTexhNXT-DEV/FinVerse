@@ -13,7 +13,7 @@ import { formatDateTime, titleCase } from '@/utils/format';
 import { ActionDialog } from './ActionDialog';
 import { HistoryTable } from './HistoryTable';
 import { StageStepper } from './StageStepper';
-import { stageSteps } from './stageSteps';
+import { isExitStage, stageSteps } from './stageSteps';
 import { workflowKey } from './workflowKey';
 
 interface WorkflowPanelProps {
@@ -113,7 +113,9 @@ function useHeaderSync(
  * The workflow header of a record (BRNB.022/115): a horizontal stepper built from the workflow's
  * defined stages (passed stages checked, the current one highlighted, returned and closed paths
  * marked), then one meta row with the current stage, since, due (overdue flagged) and assignee,
- * and the actions the current user may take on the right; the status history table below.
+ * and the actions the current user may take on the right, kept together on one row (an action
+ * that ends the record off the normal path, such as Not Proceeded, in the danger style); the
+ * status history table below.
  * Generic actions (return, void, decline) run here with their reason; business actions are
  * supplied by the page.
  */
@@ -170,7 +172,12 @@ export function WorkflowPanel({
         <div className="workflow-actions">
           {renderBusinessActions?.(business)}
           {generic.map((a) => (
-            <Button key={a.action} variant="secondary" size="sm" onClick={() => setPending(a)}>
+            <Button
+              key={a.action}
+              variant={isExitStage(a.toStage) ? 'danger' : 'secondary'}
+              size="sm"
+              onClick={() => setPending(a)}
+            >
               {titleCase(a.label)}
             </Button>
           ))}

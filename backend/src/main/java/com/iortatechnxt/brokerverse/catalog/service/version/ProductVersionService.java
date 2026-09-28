@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.ProductVersionRepository;
 import com.iortatechnxt.brokerverse.catalog.domain.ProductVersionStatus;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.catalog.domain.ValidationCheck;
+import com.iortatechnxt.brokerverse.catalog.service.CatalogNames;
 import com.iortatechnxt.brokerverse.catalog.service.CoverageService;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.catalog.service.RatingService;
@@ -54,6 +55,7 @@ public class ProductVersionService {
   private final ProductVersionQueries queries;
   private final ProductCatalogService catalog;
   private final CoverageService coverages;
+  private final CatalogNames names;
   private final RatingService rating;
   private final PackageIncentiveReview incentives;
   private final AuditTrailService audit;
@@ -69,6 +71,7 @@ public class ProductVersionService {
    * @param queries version look-ups
    * @param catalog products
    * @param coverages coverages (basic flag)
+   * @param names names of the coverages, cover types and insurers in the check details
    * @param rating rating (test premium)
    * @param incentives incentive criteria review (PMADD08)
    * @param audit audit trail
@@ -82,6 +85,7 @@ public class ProductVersionService {
       ProductVersionQueries queries,
       ProductCatalogService catalog,
       CoverageService coverages,
+      CatalogNames names,
       RatingService rating,
       PackageIncentiveReview incentives,
       AuditTrailService audit,
@@ -93,6 +97,7 @@ public class ProductVersionService {
     this.queries = queries;
     this.catalog = catalog;
     this.coverages = coverages;
+    this.names = names;
     this.rating = rating;
     this.incentives = incentives;
     this.audit = audit;
@@ -323,7 +328,31 @@ public class ProductVersionService {
         product,
         version,
         new PackageChecks.Context(
-            basic::contains, latestReleased(version), today, testPremium, sample));
+            basic::contains,
+            latestReleased(version),
+            today,
+            testPremium,
+            sample,
+            checkNames(product.getLineCode())));
+  }
+
+  private PackageChecks.Names checkNames(String lineCode) {
+    return new PackageChecks.Names() {
+      @Override
+      public String coverage(String code) {
+        return names.coverage(lineCode, code);
+      }
+
+      @Override
+      public String coverType(String code) {
+        return names.coverType(lineCode, code);
+      }
+
+      @Override
+      public String insurer(String code) {
+        return names.insurer(code);
+      }
+    };
   }
 
   private ProductVersion latestReleased(ProductVersion version) {

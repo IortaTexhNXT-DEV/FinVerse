@@ -165,8 +165,8 @@ public class RecomputeService {
    * The invoices whose amounts the request changes, so that Before and Change have the same basis
    * (proposed rule of the clarifications): a cancellation, a sum insured change or an amount change
    * acts on the premium in force of the policy year, which is the booking of the year with its
-   * endorsements and earlier returns (the invoice family of the same policy year, as booking computes
-   * the change); a write-off acts on the invoice itself.
+   * endorsements and earlier returns (the invoice family of the same policy year, as booking
+   * computes the change); a write-off acts on the invoice itself.
    *
    * @param invoice invoice of the request
    * @param computation computation

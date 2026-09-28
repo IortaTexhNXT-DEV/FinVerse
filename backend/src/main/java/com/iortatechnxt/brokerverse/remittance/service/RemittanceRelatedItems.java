@@ -79,7 +79,8 @@ public class RemittanceRelatedItems implements InvoiceRelatedItems {
     RemittanceBatch b = l.getBatch();
     StringBuilder text = new StringBuilder(BatchDocuments.typeLabel(b.getRemittanceType()));
     if (l.isExcluded()) {
-      text.append(" - excluded: ").append(lov.label("REMIT_EXCLUSION_REASON", l.getExclusionReason()));
+      text.append(" - excluded: ")
+          .append(lov.label("REMIT_EXCLUSION_REASON", l.getExclusionReason()));
     }
     if (l.getInsurerOrNo() != null) {
       text.append(" - insurer OR ").append(l.getInsurerOrNo());

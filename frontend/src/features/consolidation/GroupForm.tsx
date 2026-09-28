@@ -61,7 +61,7 @@ export function GroupForm({ open, onClose, companies, parentCompanyId }: Readonl
       consolidationApi.createGroup({
         ...form,
         parentCompanyId,
-        currency: parent?.baseCurrency ?? 'PHP',
+        currency: parent?.baseCurrency ?? '',
         active: true,
         members: members.map(toMember),
       }),

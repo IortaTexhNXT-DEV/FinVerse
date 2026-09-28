@@ -26,7 +26,7 @@ const NEW_RULE: ThresholdRuleInput = {
   benefitLine: '',
   measure: '',
   amount: '',
-  currency: 'PHP',
+  currency: '',
   approverPermission: 'EB_THRESHOLD_APPROVE',
   approvalLevel: 1,
   effectiveFrom: '',
@@ -35,9 +35,9 @@ const NEW_RULE: ThresholdRuleInput = {
 };
 
 /** The form of a rule: a new rule, or the rule being edited. */
-export function ruleInput(rule: ThresholdRule | undefined): ThresholdRuleInput {
+export function ruleInput(rule: ThresholdRule | undefined, baseCurrency = ''): ThresholdRuleInput {
   if (rule === undefined) {
-    return NEW_RULE;
+    return { ...NEW_RULE, currency: baseCurrency };
   }
   return {
     ...rule,

@@ -106,7 +106,7 @@ public class PdcFileHandler implements BulkImportHandler {
                 row.text("Check branch"),
                 row.date(MATURITY),
                 row.number(AMOUNT),
-                "PHP",
+                null,
                 row.text("Market segment")))
         .getWarehouseNo();
   }

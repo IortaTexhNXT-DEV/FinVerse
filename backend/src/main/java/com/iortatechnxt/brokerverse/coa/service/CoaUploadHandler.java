@@ -106,7 +106,10 @@ public class CoaUploadHandler implements BulkImportHandler {
         BulkColumn.optional(CATEGORY, "GL category code", ""),
         new BulkColumn(CONTROL, "Control account (Y/N)", false, Type.YES_NO, "N"),
         BulkColumn.optional(SUB_LEDGER, "Controlled sub-ledger (blank = none)", "POLICYHOLDER"),
-        BulkColumn.optional(CURRENCIES, "Allowed currencies, comma separated (blank = all)", "PHP"),
+        BulkColumn.optional(
+            CURRENCIES,
+            "Allowed currencies, comma separated (blank = all)",
+            BulkColumn.BASE_CURRENCY_EXAMPLE),
         new BulkColumn(MANUAL, "Manual journals allowed (Y/N, blank = Y)", false, Type.YES_NO, "Y"),
         new BulkColumn(COST_CENTRE, "Cost centre mandatory (Y/N)", false, Type.YES_NO, "N"),
         new BulkColumn(REVALUATION, "Revalued at month end (Y/N)", false, Type.YES_NO, "N"),

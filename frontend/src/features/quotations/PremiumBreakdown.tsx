@@ -7,6 +7,7 @@ import { DetailList } from '@/features/catalog/DetailList';
 import { formatAmount } from '@/utils/format';
 import { premiumRows } from './premium';
 import { Notice } from '@/components/ui/Notice';
+import { useBaseCurrency } from '@/context/workspaceContext';
 
 /** A premium breakdown card, or the reason why it cannot be computed yet. */
 export function PremiumCard({
@@ -43,6 +44,7 @@ export function PremiumCard({
  * every change, without saving it, and tells whether a TSU routing rule applies (BRNB.098).
  */
 export function LivePremium({ input }: Readonly<{ input: QuotationInput }>) {
+  const baseCurrency = useBaseCurrency();
   const ready = input.productCode !== '' && input.items.length > 0;
   const preview = useQuery({
     queryKey: ['quotations', 'preview', JSON.stringify(input)],
@@ -79,7 +81,13 @@ export function LivePremium({ input }: Readonly<{ input: QuotationInput }>) {
           <span className="spinner" aria-label="Rating" />
         </Card>
       ) : (
-        <PremiumCard premium={data.content.premium} currency="PHP" title="Live premium" />
+        <PremiumCard
+          premium={data.content.premium}
+          currency={
+            input.currency === undefined || input.currency === '' ? baseCurrency : input.currency
+          }
+          title="Live premium"
+        />
       )}
     </>
   );

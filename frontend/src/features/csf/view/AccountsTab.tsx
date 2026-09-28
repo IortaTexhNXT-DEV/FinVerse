@@ -12,6 +12,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tag } from '@/components/ui/Tag';
 import { formatAmount } from '@/utils/format';
 import { CSF_LOV, csfStatusTone } from '../csfCodes';
+import { InBaseCurrency } from '@/components/ui/InBaseCurrency';
 
 /** Title of the notice of a tab whose source module does not answer (FR-CSF-011). */
 export const TAB_UNAVAILABLE = 'Information not available now. Try again';
@@ -62,7 +63,7 @@ function useColumns(compact: boolean): Column<AccountLine>[] {
     columns.push(
       {
         key: 'balance',
-        header: 'Balance (PHP)',
+        header: <InBaseCurrency label="Balance" />,
         kind: 'amount',
         render: (a) => (a.balance === null ? '' : formatAmount(a.balance)),
       },

@@ -8,6 +8,7 @@ import type { TemplateField } from '../cases/api';
 import type { StrTransaction } from './api';
 import { blankTransaction, total, transactionError } from './strLogic';
 import type { EditLine } from './strLogic';
+import { useBaseCurrency } from '@/context/workspaceContext';
 
 /** The list of the STR reason codes (SQ09). */
 export const REASON_LOV = 'SCR_STR_REASON';
@@ -130,6 +131,7 @@ export function Transactions({
   error?: string;
   onChange: (lines: EditLine[]) => void;
 }>) {
+  const baseCurrency = useBaseCurrency();
   const set = (index: number, key: keyof StrTransaction, value: string) =>
     onChange(lines.map((l, i) => (i === index ? { ...l, [key]: value } : l)));
   return (
@@ -180,7 +182,7 @@ export function Transactions({
             size="sm"
             variant="secondary"
             icon={<Plus size={14} />}
-            onClick={() => onChange([...lines, blankTransaction(today())])}
+            onClick={() => onChange([...lines, blankTransaction(today(), baseCurrency)])}
           >
             Add Transaction
           </Button>

@@ -139,7 +139,7 @@ export interface SimulationHeader {
 }
 
 /** Simulation header with blanks removed and the base currency as default currency. */
-export function optionalHeader(header: SimulationHeader, baseCurrency = 'PHP') {
+export function optionalHeader(header: SimulationHeader, baseCurrency = '') {
   return {
     valueDate: header.valueDate,
     currency: header.currency.trim() === '' ? baseCurrency : header.currency.trim().toUpperCase(),

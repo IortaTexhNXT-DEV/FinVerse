@@ -69,7 +69,7 @@ public class RequestUploadHandler implements BulkImportHandler {
             TYPE, "LOV DISBURSEMENT_TYPE (SUPPLIER, EMPLOYEE, OTHER...)", "SUPPLIER"),
         BulkColumn.required("Payee code", "Party code of the payee", "SUP-0001"),
         BulkColumn.optional("Payee name", "Payee name (second match key)", "Acme Office Supply"),
-        BulkColumn.required(CURRENCY, "ISO currency", "PHP"),
+        BulkColumn.required(CURRENCY, "ISO currency", BulkColumn.BASE_CURRENCY_EXAMPLE),
         new BulkColumn(AMOUNT, "Gross amount", true, Type.NUMBER, "12500.00"),
         BulkColumn.required("Purpose", "What is paid", "Office supplies September"),
         BulkColumn.optional("Root invoice no", "Invoice family, when any", ""),

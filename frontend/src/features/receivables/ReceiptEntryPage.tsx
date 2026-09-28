@@ -24,6 +24,7 @@ import {
 } from './receiptForm';
 import { useReceivablesLookups } from './useReceivablesLookups';
 import { Notice } from '@/components/ui/Notice';
+import { useBaseCurrency } from '@/context/workspaceContext';
 
 interface AllocationCardProps {
   pdc: boolean;
@@ -66,6 +67,7 @@ export default function ReceiptEntryPage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const { companyId, branchId, bankAccounts } = useReceivablesLookups();
+  const baseCurrency = useBaseCurrency();
   const [form, setForm] = useState<ReceiptForm>(emptyReceiptForm);
   const [allocations, setAllocations] = useState<Record<number, number>>({});
   const set = (patch: Partial<ReceiptForm>) => {
@@ -74,7 +76,7 @@ export default function ReceiptEntryPage() {
       setAllocations({});
     }
   };
-  const currency = bankCurrency(bankAccounts, form.bankAccountCode);
+  const currency = bankCurrency(bankAccounts, form.bankAccountCode, baseCurrency);
   const ctx = { companyId, branchId, currency };
   const pdc = form.mode === 'PDC';
   const showAllocations = showsAllocations(form);

@@ -193,7 +193,9 @@ public class LetterContent {
     Optional<Account> renewal =
         c.getRenewalArn() == null ? Optional.empty() : accounts.findByArn(c.getRenewalArn());
     Map<String, Object> v = new HashMap<>();
-    v.put("currency", or(expiring.currency(), "PHP"));
+    v.put(
+        "currency",
+        or(expiring.currency(), organization.getCompany(c.getCompanyId()).getBaseCurrency()));
     v.put(
         "renewalFrom",
         renewal

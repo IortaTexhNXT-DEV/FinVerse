@@ -39,13 +39,16 @@ final class BulkWorkbooks {
    * The template: data sheet with headers and one example row, and an instructions sheet.
    *
    * @param handler handler
+   * @param baseCurrency base currency of the company the template is for, may be null
    * @return xlsx bytes
    */
-  static byte[] template(BulkImportHandler handler) {
+  static byte[] template(BulkImportHandler handler, String baseCurrency) {
     try (XSSFWorkbook wb = new XSSFWorkbook()) {
       CellStyle head = headStyle(wb);
-      dataSheet(wb, head, handler.columns());
-      instructionsSheet(wb, head, handler);
+      List<BulkColumn> columns =
+          handler.columns().stream().map(c -> c.forCompany(baseCurrency)).toList();
+      dataSheet(wb, head, columns);
+      instructionsSheet(wb, head, handler, columns);
       return bytes(wb);
     } catch (IOException e) {
       throw new UncheckedIOException(e);
@@ -68,7 +71,7 @@ final class BulkWorkbooks {
   }
 
   private static void instructionsSheet(
-      XSSFWorkbook wb, CellStyle head, BulkImportHandler handler) {
+      XSSFWorkbook wb, CellStyle head, BulkImportHandler handler, List<BulkColumn> columns) {
     Sheet help = wb.createSheet("Instructions");
     Row h = help.createRow(0);
     String[] titles = {"Column", "Mandatory", "Type", "What to enter", "Example"};
@@ -78,7 +81,6 @@ final class BulkWorkbooks {
       cell.setCellStyle(head);
       help.setColumnWidth(i, i == DESCRIPTION_COLUMN ? WIDE : WIDTH);
     }
-    List<BulkColumn> columns = handler.columns();
     for (int c = 0; c < columns.size(); c++) {
       BulkColumn col = columns.get(c);
       Row r = help.createRow(c + 1);

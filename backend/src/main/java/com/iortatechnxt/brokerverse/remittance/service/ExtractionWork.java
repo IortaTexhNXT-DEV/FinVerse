@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.opsledger.domain.PaymentStatus;
 import com.iortatechnxt.brokerverse.opsledger.domain.RemittanceStatus;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.opsledger.service.LedgerSearch;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLine;
 import com.iortatechnxt.brokerverse.remittance.domain.EarlyIncentiveRule;
 import com.iortatechnxt.brokerverse.remittance.domain.ExtractionRun;
@@ -58,7 +59,6 @@ public class ExtractionWork {
   public static final String WORKFLOW = "OPS_REMITTANCE";
 
   private static final String OVER_DTIP_ALERT = "REMIT_PAIDAR_OVER_DTIP";
-  private static final String PHP = "PHP";
   private static final int PAGE = 200;
   private static final Set<RemittanceStatus> ELIGIBLE =
       Set.of(
@@ -78,6 +78,7 @@ public class ExtractionWork {
   private final WorkflowService workflow;
   private final AlertService alerts;
   private final CurrentUser currentUser;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the work.
@@ -94,6 +95,7 @@ public class ExtractionWork {
    * @param workflow Process Remittance workflow
    * @param alerts alerts
    * @param currentUser current user
+   * @param organization company master (base currency)
    */
   public ExtractionWork(
       InvoiceLedgerQueryService ledger,
@@ -107,7 +109,8 @@ public class ExtractionWork {
       DocumentNumberService numbers,
       WorkflowService workflow,
       AlertService alerts,
-      CurrentUser currentUser) {
+      CurrentUser currentUser,
+      OrganizationDirectory organization) {
     this.ledger = ledger;
     this.batchLedger = batchLedger;
     this.positions = positions;
@@ -120,6 +123,7 @@ public class ExtractionWork {
     this.workflow = workflow;
     this.alerts = alerts;
     this.currentUser = currentUser;
+    this.organization = organization;
   }
 
   /**
@@ -285,11 +289,12 @@ public class ExtractionWork {
         ExtractionTag.UNEXTRACTED_NOT_DUE, List.of(), remarks, BigDecimal.ZERO, false);
   }
 
-  private static RemittanceType typeOf(OpsInvoice invoice, EarlyIncentiveRule incentive) {
+  /** Normal remittance in the base currency of the company, else in foreign currency. */
+  private RemittanceType typeOf(OpsInvoice invoice, EarlyIncentiveRule incentive) {
     if (incentive != null) {
       return RemittanceType.WITH_INCENTIVES;
     }
-    return PHP.equals(invoice.getCurrency())
+    return organization.company(invoice.getCompanyId()).baseCurrency().equals(invoice.getCurrency())
         ? RemittanceType.NORMAL_PHP
         : RemittanceType.NORMAL_USD;
   }

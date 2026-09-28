@@ -107,7 +107,7 @@ public class HandlingFeeBillingHandler implements BulkImportHandler {
                 row.text(PN),
                 row.text(LOCATION),
                 row.number(AMOUNT),
-                "PHP",
+                null,
                 row.date("Billing Date")),
             context.jobNo())
         .getFeeNo();

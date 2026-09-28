@@ -15,14 +15,14 @@ import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { useDefaultBranchId } from '@/context/workspaceContext';
+import { useDefaultBranchId, useBaseCurrency } from '@/context/workspaceContext';
 import { formatRate, today } from '@/utils/format';
 import { DateField, NumberField, SelectField, TextField } from './FormFields';
 import { oneYearFrom } from './premiumMath';
 import { useUwLookups } from './useUwLookups';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
 
-function blank(companyId: number, branchId: number): OpenCoverInput {
+function blank(companyId: number, branchId: number, currency: string): OpenCoverInput {
   return {
     companyId,
     branchId,
@@ -31,7 +31,7 @@ function blank(companyId: number, branchId: number): OpenCoverInput {
     insuredName: '',
     periodFrom: today(),
     periodTo: oneYearFrom(today()),
-    currency: 'PHP',
+    currency,
     limitPerShipment: 0,
     annualLimit: 0,
     rate: 0.25,
@@ -42,6 +42,7 @@ function blank(companyId: number, branchId: number): OpenCoverInput {
 export default function OpenCoversPage() {
   const lookups = useUwLookups();
   const defaultBranch = useDefaultBranchId();
+  const baseCurrency = useBaseCurrency();
   const { can, user } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
@@ -83,7 +84,7 @@ export default function OpenCoversPage() {
             <Button
               variant="accent"
               icon={<Plus size={16} />}
-              onClick={() => setForm(blank(companyId, defaultBranch))}
+              onClick={() => setForm(blank(companyId, defaultBranch, baseCurrency))}
             >
               New Open Cover
             </Button>

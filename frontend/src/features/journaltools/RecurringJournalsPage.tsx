@@ -125,7 +125,7 @@ export default function RecurringJournalsPage() {
             <Button
               variant="accent"
               icon={<Plus size={16} />}
-              onClick={() => setForm(newTemplate(defaultBranch, company?.baseCurrency ?? 'PHP'))}
+              onClick={() => setForm(newTemplate(defaultBranch, company?.baseCurrency ?? ''))}
             >
               New Template
             </Button>

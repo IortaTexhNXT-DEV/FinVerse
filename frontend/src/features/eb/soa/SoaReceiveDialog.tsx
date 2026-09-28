@@ -12,6 +12,7 @@ import { InsurerSelect } from '../common/EbSelects';
 import { orNone } from '../common/formValues';
 import { useEbMutation } from '../common/useEbMutation';
 import { EMPTY_SOA, soaErrors } from './soaLogic';
+import { useBaseCurrency } from '@/context/workspaceContext';
 
 /**
  * Receive SOA: an insurer's statement of account for the programme, with the invoices it bills;
@@ -22,7 +23,8 @@ export function SoaReceiveDialog({
   invoices,
   onClose,
 }: Readonly<{ programmeId: number; invoices: ProgrammeInvoice[]; onClose: () => void }>) {
-  const [input, setInput] = useState<SoaInput>(EMPTY_SOA);
+  const baseCurrency = useBaseCurrency();
+  const [input, setInput] = useState<SoaInput>({ ...EMPTY_SOA, currency: baseCurrency });
   const [chosen, setChosen] = useState<string[]>([]);
   const [file, setFile] = useState<File>();
   const [submitted, setSubmitted] = useState(false);

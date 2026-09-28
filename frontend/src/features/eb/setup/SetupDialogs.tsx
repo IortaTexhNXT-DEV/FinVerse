@@ -17,6 +17,7 @@ import { orNone } from '../common/formValues';
 import { useEbMutation } from '../common/useEbMutation';
 import { docInput, ruleErrors, ruleInput } from './setupLogic';
 import { Notice } from '@/components/ui/Notice';
+import { useBaseCurrency } from '@/context/workspaceContext';
 
 /**
  * Add or edit a value threshold rule: above the amount of total sum insured or annual premium, a
@@ -26,7 +27,8 @@ export function ThresholdRuleDialog({
   rule,
   onClose,
 }: Readonly<{ rule?: ThresholdRule; onClose: () => void }>) {
-  const [input, setInput] = useState<ThresholdRuleInput>(() => ruleInput(rule));
+  const baseCurrency = useBaseCurrency();
+  const [input, setInput] = useState<ThresholdRuleInput>(() => ruleInput(rule, baseCurrency));
   const [submitted, setSubmitted] = useState(false);
   const save = useEbMutation(
     (c, v: ThresholdRuleInput) => ebServiceApi.saveThresholdRule(c, v, rule?.id),

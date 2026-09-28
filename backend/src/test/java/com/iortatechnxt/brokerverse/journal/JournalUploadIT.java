@@ -202,7 +202,9 @@ class JournalUploadIT {
                 service.process(
                     data.company().getId(),
                     "template.xlsx",
-                    JournalUploadTemplate.xlsx(BusinessClock.today(Clock.systemUTC())),
+                    JournalUploadTemplate.xlsx(
+                        new JournalUploadTemplate.Example(
+                            BusinessClock.today(Clock.systemUTC()), "HO", "PHP")),
                     false));
     assertThat(result.vouchers()).hasSize(2).allMatch(v -> v.status() == VoucherStatus.VALID);
   }

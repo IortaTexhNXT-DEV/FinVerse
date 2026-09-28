@@ -23,6 +23,7 @@ import {
 } from './proposalForm';
 import type { AnswerRow, FactorRow, PlanRow, ProposalForm } from './proposalForm';
 import { Notice } from '@/components/ui/Notice';
+import { useBaseCurrency } from '@/context/workspaceContext';
 
 type Setter = (patch: Partial<ProposalForm>) => void;
 
@@ -230,7 +231,8 @@ export function ProposalDialog({
   items,
   onClose,
 }: Readonly<{ cycleId: number; items: TorItem[]; onClose: () => void }>) {
-  const [form, setForm] = useState<ProposalForm>(() => blankProposal(items));
+  const baseCurrency = useBaseCurrency();
+  const [form, setForm] = useState<ProposalForm>(() => blankProposal(items, '', baseCurrency));
   const [file, setFile] = useState<File>();
   const [submitted, setSubmitted] = useState(false);
   const record = useEbMutation(

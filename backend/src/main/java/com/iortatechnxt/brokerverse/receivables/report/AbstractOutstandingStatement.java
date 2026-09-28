@@ -80,9 +80,7 @@ public abstract class AbstractOutstandingStatement implements ReportDefinition {
     params.add(GlReportSupport.companyParam());
     params.add(GlReportSupport.asOfParam());
     if (foreignCurrency) {
-      params.add(
-          ParameterSpec.required(CURRENCY, "Currency Code", ParameterType.CURRENCY)
-              .withDefault("USD"));
+      params.add(ParameterSpec.required(CURRENCY, "Currency Code", ParameterType.CURRENCY));
     }
     params.addAll(ReceivablesReportSupport.partyParams());
     params.add(ReceivablesReportSupport.ageingParams().get(0));

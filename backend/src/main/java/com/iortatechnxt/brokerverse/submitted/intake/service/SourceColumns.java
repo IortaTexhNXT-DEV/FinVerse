@@ -192,7 +192,7 @@ public final class SourceColumns {
             null,
             row.number("Sum Insured"),
             row.number("Total Premium"),
-            "PHP"),
+            null),
         new SbmRisk(
             row.text("Unit Description"),
             row.text("Serial No"),

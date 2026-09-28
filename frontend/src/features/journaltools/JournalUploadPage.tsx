@@ -138,7 +138,8 @@ export default function JournalUploadPage() {
     },
   });
   const template = useMutation({
-    mutationFn: journalUploadApi.template,
+    mutationFn: (format: 'csv' | 'xlsx') =>
+      journalUploadApi.template(format, companyId > 0 ? companyId : undefined),
     onSuccess: (f) => saveFile(f.blob, f.fileName),
   });
 

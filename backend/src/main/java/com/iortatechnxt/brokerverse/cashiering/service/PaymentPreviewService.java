@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.ApplicationPlanner.Plan;
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentMatcher.Match;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class PaymentPreviewService {
   private final PaymentMatcher matcher;
   private final ApplicationService applier;
   private final CashieringSettings settings;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -32,12 +34,17 @@ public class PaymentPreviewService {
    * @param matcher matching
    * @param applier application engine (balances)
    * @param settings settings (BOOK rate, CWT percent)
+   * @param organization company master (base currency)
    */
   public PaymentPreviewService(
-      PaymentMatcher matcher, ApplicationService applier, CashieringSettings settings) {
+      PaymentMatcher matcher,
+      ApplicationService applier,
+      CashieringSettings settings,
+      OrganizationDirectory organization) {
     this.matcher = matcher;
     this.applier = applier;
     this.settings = settings;
+    this.organization = organization;
   }
 
   /**
@@ -70,7 +77,10 @@ public class PaymentPreviewService {
     String ccy =
         currency != null
             ? currency
-            : match.invoices().stream().findFirst().map(OpsInvoice::getCurrency).orElse("PHP");
+            : match.invoices().stream()
+                .findFirst()
+                .map(OpsInvoice::getCurrency)
+                .orElseGet(() -> organization.company(companyId).baseCurrency());
     return new Preview(
         match.kind().name(),
         match.reference(),

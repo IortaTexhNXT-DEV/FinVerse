@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.cashiering.service.CashReceiptService.ArIssu
 import com.iortatechnxt.brokerverse.cashiering.service.PaymentMatcher.Match;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,7 @@ public class PaymentIntakeService {
   private final ApplicationService applications;
   private final UnappliedService unappliedItems;
   private final DocumentNumberService numbers;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -55,6 +57,7 @@ public class PaymentIntakeService {
    * @param applications applications
    * @param unappliedItems unapplied workbench
    * @param numbers document numbers
+   * @param organization company master (base currency)
    */
   public PaymentIntakeService(
       PaymentRepository payments,
@@ -63,7 +66,8 @@ public class PaymentIntakeService {
       CashReceiptService receipts,
       ApplicationService applications,
       UnappliedService unappliedItems,
-      DocumentNumberService numbers) {
+      DocumentNumberService numbers,
+      OrganizationDirectory organization) {
     this.payments = payments;
     this.prebooked = prebooked;
     this.matcher = matcher;
@@ -71,6 +75,7 @@ public class PaymentIntakeService {
     this.applications = applications;
     this.unappliedItems = unappliedItems;
     this.numbers = numbers;
+    this.organization = organization;
   }
 
   /**
@@ -81,7 +86,9 @@ public class PaymentIntakeService {
    * @param intake payment
    * @return what happened
    */
-  public IntakeResult receive(IntakeTarget target, PaymentIntake intake) {
+  public IntakeResult receive(IntakeTarget target, PaymentIntake received) {
+    PaymentIntake intake =
+        received.orInCurrency(organization.company(target.companyId()).baseCurrency());
     Optional<Payment> earlier =
         payments.findByCompanyIdAndChannelAndSourceKey(
             target.companyId(), intake.channel(), intake.sourceKey());

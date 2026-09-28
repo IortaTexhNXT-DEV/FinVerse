@@ -48,7 +48,6 @@ public class PayRequestRules {
   public static final String CANCELLED_POLICY = "CANCELLED_POLICY";
 
   private static final int MAX_LINES = 50;
-  private static final String DEFAULT_CURRENCY = "PHP";
 
   private final RefundLineRepository lines;
   private final InvoiceLedgerQueryService ledger;
@@ -165,10 +164,14 @@ public class PayRequestRules {
    *
    * @param content as entered
    * @param defaultPurpose purpose when none is given
+   * @param companyId company (its base currency when none is given)
    * @return content
    */
-  public RequestContent content(RequestContent content, String defaultPurpose) {
-    String currency = blank(content.currency()) ? DEFAULT_CURRENCY : content.currency().strip();
+  public RequestContent content(RequestContent content, String defaultPurpose, Long companyId) {
+    String currency =
+        blank(content.currency())
+            ? organization.getCompany(companyId).getBaseCurrency()
+            : content.currency().strip();
     if (!currency.matches("[A-Z]{3}")) {
       throw new BusinessRuleException("PRQ_CURRENCY_INVALID", "Currency must be a 3-letter code");
     }

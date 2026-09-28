@@ -13,7 +13,7 @@ import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
-import { useCompanyId } from '@/context/workspaceContext';
+import { useCompanyId, useBaseCurrency } from '@/context/workspaceContext';
 import { formatDateTime, today } from '@/utils/format';
 import { AccountCheckPanel } from './AccountCheckPanel';
 import {
@@ -320,13 +320,14 @@ function Wizard({
 export default function AccountWizardPage() {
   const params = useParams();
   const id = params.id === undefined ? undefined : Number(params.id);
+  const baseCurrency = useBaseCurrency();
   const existing = useQuery({
     queryKey: ['account', id],
     queryFn: () => accountsApi.get(id ?? 0),
     enabled: id !== undefined,
   });
   if (id === undefined) {
-    return <Wizard initial={newDraft(today())} resubmission={false} />;
+    return <Wizard initial={newDraft(today(), baseCurrency)} resubmission={false} />;
   }
   if (existing.data === undefined) {
     return existing.error ? (

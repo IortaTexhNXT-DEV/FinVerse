@@ -38,7 +38,7 @@ export function useRiLookups() {
   const active = (s: string) => s === 'ACTIVE';
   return {
     companyId,
-    baseCurrency: company?.baseCurrency ?? 'PHP',
+    baseCurrency: company?.baseCurrency ?? '',
     treaties: treaties.data ?? [],
     treatiesLoading: treaties.isLoading,
     activeTreaties: (treaties.data ?? []).filter((t) => active(t.recordStatus)),

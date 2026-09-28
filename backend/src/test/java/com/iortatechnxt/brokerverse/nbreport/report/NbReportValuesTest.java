@@ -47,15 +47,15 @@ class NbReportValuesTest {
             LocalDate.parse("2026-01-31"));
     SalesTarget t =
         new SalesTarget(
-            1L, unit, new SalesTarget.Values(3, new BigDecimal("10.005"), BigDecimal.ONE));
+            1L, unit, new SalesTarget.Values(3, new BigDecimal("10.005"), BigDecimal.ONE), "PHP");
     assertThat(t.getUnitCode()).isEqualTo("ao");
     assertThat(t.getTargetPremium()).isEqualByComparingTo("10.01");
     assertThat(t.getCurrency()).isEqualTo("PHP");
     var negative = new SalesTarget.Values(-1, BigDecimal.ONE, BigDecimal.ONE);
-    assertThatThrownBy(() -> new SalesTarget(1L, unit, negative))
+    assertThatThrownBy(() -> new SalesTarget(1L, unit, negative, "PHP"))
         .isInstanceOf(BusinessRuleException.class);
     var nullPremium = new SalesTarget.Values(1, null, BigDecimal.ONE);
-    assertThatThrownBy(() -> new SalesTarget(1L, unit, nullPremium))
+    assertThatThrownBy(() -> new SalesTarget(1L, unit, nullPremium, "PHP"))
         .isInstanceOf(BusinessRuleException.class);
   }
 

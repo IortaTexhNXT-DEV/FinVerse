@@ -184,7 +184,8 @@ public class RequestFormService {
                 null,
                 draft.remarks(),
                 paid.getContent().currency()),
-            "Cancellation of the check of " + paid.getRequestNo());
+            "Cancellation of the check of " + paid.getRequestNo(),
+            companyId);
     request.fill(content, paid.getPayee(), paid.getAmount());
     request.aimAt(
         new CancellationTarget(
@@ -197,7 +198,8 @@ public class RequestFormService {
 
   private void fillRefund(PaymentRequest request, Refund draft, List<RefundLine> lines) {
     Payee payee = rules.refundPayee(draft.payout(), draft.lines());
-    RequestContent content = rules.content(draft.content(), "Refund to client");
+    RequestContent content =
+        rules.content(draft.content(), "Refund to client", request.getCompanyId());
     BigDecimal total =
         draft.lines().stream()
             .map(RefundLineValues::amount)
@@ -223,7 +225,8 @@ public class RequestFormService {
                 given.rfpType() == null ? "CASH_ADVANCE" : given.rfpType(),
                 given.purpose(),
                 given.currency()),
-            "Cash advance");
+            "Cash advance",
+            request.getCompanyId());
     request.fill(content, payee, rules.amount(draft.amount()));
   }
 

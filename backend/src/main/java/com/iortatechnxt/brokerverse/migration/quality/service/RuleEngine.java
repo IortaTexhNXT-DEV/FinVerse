@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.migration.mapping.domain.LayoutColumn;
 import com.iortatechnxt.brokerverse.migration.mapping.domain.MigRule;
 import com.iortatechnxt.brokerverse.migration.mapping.service.CodeMaps;
 import com.iortatechnxt.brokerverse.migration.mapping.service.RuleCatalogueService;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -55,6 +56,7 @@ public class RuleEngine {
   private final List<ObjectRules> objectRules;
   private final RuleCatalogueService catalogue;
   private final MigrationParameters parameters;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the engine.
@@ -62,14 +64,17 @@ public class RuleEngine {
    * @param objectRules object rules
    * @param catalogue rule catalogue
    * @param parameters parameters
+   * @param organization company master (base currency of the checks)
    */
   public RuleEngine(
       List<ObjectRules> objectRules,
       RuleCatalogueService catalogue,
-      MigrationParameters parameters) {
+      MigrationParameters parameters,
+      OrganizationDirectory organization) {
     this.objectRules = objectRules;
     this.catalogue = catalogue;
     this.parameters = parameters;
+    this.organization = organization;
   }
 
   /**
@@ -98,7 +103,8 @@ public class RuleEngine {
         new ValidationScope(
                 batch, input.rows(), outcome.mapped, parameters, input.loadedKeys(), input.today())
             .withMaps(input.maps())
-            .withSources(input.sources());
+            .withSources(input.sources())
+            .withBaseCurrency(organization.company(batch.getCompanyId()).baseCurrency());
     for (ObjectRules r : objectRules) {
       if (r.layouts().stream().anyMatch(input.rows()::containsKey)) {
         r.check(scope, sink);

@@ -36,8 +36,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class NbPathService {
 
-  private static final String PHP = "PHP";
-
   private final RenewalRecords records;
   private final AccountQueryService accounts;
   private final QuotationService quotations;
@@ -153,7 +151,7 @@ public class NbPathService {
         product,
         s.product() == null ? null : s.product().segment(),
         null,
-        currency == null ? PHP : currency,
+        currency,
         s.insurerCode(),
         null,
         from,

@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.renewal.submitted;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.renewal.check.service.CheckEngine;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotClient;
@@ -51,6 +52,7 @@ public class SubmittedPolicyRenewalHandOff implements RenewalHandOff {
   private final Collaborators renewal;
   private final AuditTrailService audit;
   private final TransactionTemplate tx;
+  private final OrganizationDirectory organization;
 
   /**
    * The Renewal services a hand-off goes through.
@@ -87,13 +89,15 @@ public class SubmittedPolicyRenewalHandOff implements RenewalHandOff {
       CheckEngine engine,
       InitiationService initiation,
       AuditTrailService audit,
-      PlatformTransactionManager transactions) {
+      PlatformTransactionManager transactions,
+      OrganizationDirectory organization) {
     this.candidates = candidates;
     this.handOffs = handOffs;
     this.renewal = new Collaborators(factory, flow, engine, initiation);
     this.audit = audit;
     this.tx = new TransactionTemplate(transactions);
     this.tx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+    this.organization = organization;
   }
 
   @Override
@@ -137,7 +141,7 @@ public class SubmittedPolicyRenewalHandOff implements RenewalHandOff {
                 renewal.factory().nextReference(),
                 new RenewalCandidate.Origin(
                     CandidateSource.SUBMITTED_POLICY, request.sbmNo(), null, null, null),
-                snapshot(request),
+                snapshot(request, organization.company(request.companyId()).baseCurrency()),
                 null));
     RenewalTerms terms = request.terms();
     handOffs.save(
@@ -171,9 +175,10 @@ public class SubmittedPolicyRenewalHandOff implements RenewalHandOff {
    * The listing snapshot of a handed-over policy: the assigned insurer when the rules gave one.
    *
    * @param r hand-off request
+   * @param baseCurrency base currency of the company (the premium of a submitted policy)
    * @return snapshot
    */
-  static CandidateSnapshot snapshot(HandOffRequest r) {
+  static CandidateSnapshot snapshot(HandOffRequest r, String baseCurrency) {
     PolicyData p = r.policy();
     String insurer =
         r.terms().assignedInsurer() != null ? r.terms().assignedInsurer() : p.insurerCode();
@@ -196,7 +201,7 @@ public class SubmittedPolicyRenewalHandOff implements RenewalHandOff {
         false,
         p.period().inception(),
         p.period().expiry(),
-        new SnapshotPremium(null, p.totalPremium(), p.sumInsured(), null, null, "PHP"),
+        new SnapshotPremium(null, p.totalPremium(), p.sumInsured(), null, null, baseCurrency),
         null,
         null);
   }

@@ -23,8 +23,16 @@ class SpreadsheetRowsTest {
   @Test
   void templatesRoundTrip() {
     LocalDate date = LocalDate.of(2026, 5, 4);
-    List<List<String>> csv = SpreadsheetRows.read("t.csv", JournalUploadTemplate.csv(date), 100);
-    List<List<String>> xlsx = SpreadsheetRows.read("t.XLSX", JournalUploadTemplate.xlsx(date), 100);
+    List<List<String>> csv =
+        SpreadsheetRows.read(
+            "t.csv",
+            JournalUploadTemplate.csv(new JournalUploadTemplate.Example(date, "HO", "PHP")),
+            100);
+    List<List<String>> xlsx =
+        SpreadsheetRows.read(
+            "t.XLSX",
+            JournalUploadTemplate.xlsx(new JournalUploadTemplate.Example(date, "HO", "PHP")),
+            100);
     assertThat(csv.get(0)).isEqualTo(UploadLine.ALL_COLUMNS);
     assertThat(csv).hasSize(5);
     assertThat(xlsx.get(1).get(3)).isEqualTo("2026-05-04");

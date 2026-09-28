@@ -217,7 +217,7 @@ public class Account extends BaseEntity {
     this.periodTo = data.periodTo();
     this.multiYear = data.multiYear();
     this.termYears = data.multiYear() ? data.termYears() : 1;
-    this.currency = data.currency() == null ? "PHP" : data.currency();
+    this.currency = Objects.requireNonNull(data.currency(), "currency");
     applyMortgage(data.mortgage() == null ? Mortgage.NONE : data.mortgage());
     this.contact = data.contact() == null ? AccountContact.NONE : data.contact();
     applyItems(data);

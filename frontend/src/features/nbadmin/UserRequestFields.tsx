@@ -3,10 +3,11 @@ import { nbadminApi } from '@/api/nbadmin';
 import type { UserAccess } from '@/api/nbadmin';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Field } from '@/components/ui/Field';
-import { useWorkspace } from '@/context/workspaceContext';
+import { useWorkspace, useBaseCurrency } from '@/context/workspaceContext';
 import { formatAmount } from '@/utils/format';
 import { usersFor } from './accessRequest';
 import type { AccessRequestErrors, AccessRequestForm } from './accessRequest';
+import { inCurrency } from '@/utils/currencyLabel';
 
 interface FieldsProps {
   form: AccessRequestForm;
@@ -64,6 +65,7 @@ function current(value: string | undefined): string {
 
 function DataFields({ form, set, errors, users }: Readonly<FieldsProps>) {
   const { branches } = useWorkspace();
+  const baseCurrency = useBaseCurrency();
   const modify = form.type === 'MODIFY_USER';
   const user = modify ? users.find((u) => u.username === form.username) : undefined;
   const hint = (value: string | undefined) => (modify ? current(value) : undefined);
@@ -132,7 +134,7 @@ function DataFields({ form, set, errors, users }: Readonly<FieldsProps>) {
       </Field>
       {form.userType === 'INTERNAL' && (
         <Field
-          label="Authorisation Limit (PHP)"
+          label={inCurrency('Authorisation Limit', baseCurrency)}
           error={errors.authorizationLimit}
           hint={modify ? current(limitText) : 'Blank: no limit'}
         >

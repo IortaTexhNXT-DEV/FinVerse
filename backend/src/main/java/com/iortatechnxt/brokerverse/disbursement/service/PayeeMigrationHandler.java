@@ -67,7 +67,7 @@ public class PayeeMigrationHandler implements BulkImportHandler {
         BulkColumn.required(
             DEFAULT_MODE, "CTA, ATD, MC_DD, CREDIT_TICKET, TT, ONLINE_BANKING, CHECK", "CHECK"),
         BulkColumn.required(MODES, "Allowed modes separated by '|'", "CHECK|CTA"),
-        BulkColumn.required("Currency", "ISO currency", "PHP"),
+        BulkColumn.required("Currency", "ISO currency", BulkColumn.BASE_CURRENCY_EXAMPLE),
         BulkColumn.optional("Bank", "Bank of the payee account", "Philippine National Bank"),
         BulkColumn.optional(ACCOUNT_NO, "Payee account number", "001234567890"));
   }

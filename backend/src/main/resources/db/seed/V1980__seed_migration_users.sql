@@ -1,6 +1,6 @@
 -- =====================================================================================
 -- iNXT BrokerVerse - V1980 Seed data of Data Migration (BRD-13, wave DM0): SIT/UAT users.
--- SEED DATA ONLY - never load in production. Password of the SIT/UAT users: Brokerverse@2026.
+-- SEED DATA ONLY - never load in production. The SIT/UAT password is provided to testers separately.
 --   miglead     Data Migration Lead            (DATA_MIGRATION_LEAD)
 --   migsteward  Data Steward                   (DATA_STEWARD)
 --   migowner    Business owner of the objects  (DATA_OWNER)

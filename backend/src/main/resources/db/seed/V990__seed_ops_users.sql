@@ -1,6 +1,6 @@
 -- =====================================================================================
 -- iNXT BrokerVerse - V990 Seed Operations (BRD-2) users, GL accounts and BOOK rates
--- (seed profile only; password for all users: Brokerverse@2026). SEED DATA ONLY.
+-- (seed profile only; the SIT/UAT password is provided to testers separately). SEED DATA ONLY.
 --   * Users of the Operations roles (OPERATIONS_DESIGN 6.2). adjust (ADJUSTMENT) and mkttl
 --     (MKT_TL) exist since V980 and received their Operations grants in V760.
 --   * Seed GL accounts of the Operations events (OPERATIONS_DESIGN section 5), only where

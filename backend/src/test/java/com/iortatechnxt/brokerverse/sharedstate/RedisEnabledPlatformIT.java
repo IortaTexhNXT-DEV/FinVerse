@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.sharedstate.service.RedisJobLock;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.PlatformServicesSupport;
+import com.iortatechnxt.brokerverse.support.SignInPasswords;
 import com.iortatechnxt.brokerverse.system.domain.JobRun;
 import com.iortatechnxt.brokerverse.system.domain.JobRunStatus;
 import com.iortatechnxt.brokerverse.system.domain.JobTrigger;
@@ -46,6 +47,7 @@ class RedisEnabledPlatformIT extends PlatformServicesSupport {
   @Autowired private MockMvc mvc;
   @Autowired private AsUser as;
   @Autowired private Api api;
+  @Autowired private SignInPasswords passwords;
 
   @Test
   void theRedisImplementationsAreActive() throws Exception {
@@ -107,7 +109,7 @@ class RedisEnabledPlatformIT extends PlatformServicesSupport {
   void logoutRevokesTheTokenInRedisAndFailuresAreCountedThere() throws Exception {
     login("auditor", "wrong-password", 401);
     assertThat(redis.opsForValue().get("it:counter:login-failures:auditor")).isEqualTo("1");
-    String token = JsonPath.read(login("auditor", "Brokerverse@2026", 200), "$.accessToken");
+    String token = JsonPath.read(login("auditor", passwords.of("auditor"), 200), "$.accessToken");
     assertThat(redis.hasKey("it:counter:login-failures:auditor")).isFalse();
 
     mvc.perform(post("/api/v1/auth/logout").header(HttpHeaders.AUTHORIZATION, "Bearer " + token))

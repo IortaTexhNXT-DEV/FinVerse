@@ -111,27 +111,52 @@ screens:
     title: Sales Organisation
     route: /catalog/sales-organisation
     purpose: >-
-      The sales organisation of the company: regions, departments and teams with their cost centres, and the account
-      officers of each team. Accounts are stamped with the creator's units and cost centre when they are created.
+      The sales organisation of the company as one tree table: regions, departments and teams with their cost centres,
+      and the account officers of each team by name, role and assignment date. Accounts are stamped with the creator's
+      units and cost centre when they are created.
     entry:
       - Sidebar entry Sales Organisation
     shots:
-      - {state: tree, user: badmin, caption: "Sales Organisation tree"}
+      - {state: tree, user: badmin, caption: "Sales Organisation tree table, every branch expanded"}
+      - {state: actions, user: badmin, caption: "Actions menu of a team"}
+      - {state: deactivate, user: badmin, caption: "Deactivation refused while the team still has active account officers"}
     fields:
-      - "Tree | [Unit line] | Tree | Code, name, level · cost center (inherited when blank), status | - | Sales units | - | Read only | - | No sales unit defined yet."
-      - "Tree | [Account officer line] | Tree | User name of the officer, status | - | Sales officers | - | Read only | - | -"
-      - "New sales unit | Level | Drop-down | Region, Department, Team | Y | Fixed list | Region | New unit | A department belongs to a region; a team to a department | A <level> must belong to a <parent level>"
-      - "New sales unit | Code / Name | Text | Unit code and name | Y | - | Blank | New unit | Unique | Sales unit already exists: <key>"
-      - "New sales unit | Cost center | Text | Blank = inherited from the parent | N | - | Blank | New unit | - | -"
-      - "New sales unit | Parent | Drop-down | Units of the level above | Cond.: department and team | Sales units | Select | New unit | - | -"
-      - "Assign account officer | Team | Drop-down | Teams | Y | Sales units | Select | New assignment | An existing team | Unknown team <team code>"
-      - "Assign account officer | User name | Text | BIBS user | Y | Users | Blank | New assignment | An existing user | Unknown user <username>"
+      - "Toolbar | Search unit code, name or officer | Text | Unit code or name, or the officer's name | N | - | Blank | - | Contains search; the matching branches open | No unit or officer matches the search"
+      - "Toolbar | Expand All / Collapse All | Button | Opens or closes every branch | - | - | Regions and departments open | - | - | -"
+      - "Toolbar | Show Inactive | Check box | Lists deactivated units and removed officers in grey | N | - | Not ticked | - | - | -"
+      - "Toolbar | [Summary] | Text | n regions · n departments · n teams · n officers of the rows shown | - | Sales units and officers | - | Read only | - | -"
+      - "Tree table | Unit | Column | Chevron and indentation per level; code in bold and name; an officer by full name with the role below | - | Sales units; users | - | Read only | - | No sales unit defined yet"
+      - "Tree table | Level | Column | Region, Department, Team or Account Officer | - | Sales units | - | Read only | - | -"
+      - "Tree table | Cost Center | Column | The unit's own cost centre, or the cost centre in force with Inherited from <parent code> below it | - | Sales units | - | Read only | - | -"
+      - "Tree table | Account Officers | Column | Number of active officers of a team | - | Sales officers | - | Read only | - | -"
+      - "Tree table | Assigned Since | Column | dd-MMM-yyyy, date the officer joined the team | - | Sales officers | - | Read only | - | -"
+      - "Tree table | Status | Pill | Active, Pending Authorization, Inactive | - | Sales units and officers | - | Read only | - | -"
+      - "Tree table | [Actions] | Menu | The actions of the row (see Actions) | - | - | - | - | - | -"
+      - "New unit / Add sub-unit | Level | Drop-down | Region, Department, Team; fixed to the level below when opened from a unit | Y | Fixed list | Region | New unit | A department belongs to a region; a team to a department | A <level> must belong to an active <parent level>"
+      - "New unit / Add sub-unit | Code / Name | Text | Unit code and name | Y | - | Blank | New unit | Unique | Sales unit already exists: <key>"
+      - "New unit / Add sub-unit | Cost Center | Text | Blank = inherited from the parent | N | Cost centres | Blank | New unit; edit | A cost centre of the company | -"
+      - "New unit / Add sub-unit | Parent | Drop-down | Active units of the level above | Cond.: department and team | Sales units | The unit the action was opened from | New unit; edit | - | -"
+      - "Unit details | Code, Name, Level, Parent Unit, Cost Center, Unit Head, Sub-units, Account Officers, Status, Status Reason, Created, Last Changed, Authorized | Detail | Names of users, dd-MMM-yyyy HH:mm | - | Sales units | - | Read only; Edit for name, parent and cost centre | - | -"
+      - "Assign Account Officer / Reassign | Team | Drop-down | Active teams | Y | Sales units | The team the action was opened from | New assignment | An existing, active team | Team <team code> is unknown or inactive"
+      - "Assign Account Officer / Reassign | Account Officer | Drop-down | BIBS users by name and role | Y | Users | Select; fixed on Reassign | New assignment | An existing user | Unknown user <user>"
+      - "Deactivate / Reactivate / Remove from Team | Reason | Text | Why the unit or officer changes | Y | - | Blank | Dialog | Not blank | Enter the reason."
     actions:
-      - "New Unit | MASTER_MAINTAIN | Always | Opens New sales unit; Save for Authorization | Pending Authorization | -"
-      - "Assign Officer | MASTER_MAINTAIN | Always | Opens Assign account officer; Save for Authorization | Pending Authorization | -"
-      - "Authorize / Deactivate | MASTER_AUTHORIZE / MASTER_MAINTAIN | Per unit or officer | Authorises or ends the unit or assignment | Active / Inactive | -"
+      - "New Unit | MASTER_MAINTAIN | Always | Opens New unit; Save for Authorization | Pending Authorization | -"
+      - "Assign Officer | MASTER_MAINTAIN | Always | Opens Assign Account Officer; Save for Authorization | Pending Authorization | -"
+      - "View / Edit | Every user of the screen; Edit with MASTER_MAINTAIN | Unit row | Opens the unit details; Edit changes name, parent and cost centre, Save for Authorization | Pending Authorization | -"
+      - "Add Department / Add Team | MASTER_MAINTAIN | Active region / department | Opens New unit at the level below, the parent filled | Pending Authorization | -"
+      - "Assign Officer (row) | MASTER_MAINTAIN | Active team | Opens Assign Account Officer with the team filled | Pending Authorization | -"
+      - "Authorize | MASTER_AUTHORIZE, not the maker | Pending unit or officer | Authorises the record | Active | -"
+      - "Deactivate | MASTER_MAINTAIN | Active or pending unit without active sub-units or officers | Asks the reason and deactivates the unit; refused with a notice while sub-units or officers remain | Inactive | -"
+      - "Reactivate | MASTER_MAINTAIN | Inactive unit whose parent is not inactive | Asks the reason; the unit waits for authorisation again | Pending Authorization | -"
+      - "Reassign / Assign to a Team | MASTER_MAINTAIN | Officer row | Moves the officer to another team (or places a removed officer again) from today | Pending Authorization | -"
+      - "Remove from Team | MASTER_MAINTAIN | Active or pending officer | Asks the reason and ends the officer's assignment | Inactive | -"
+      - "Export to Excel | Every user of the screen | Always | Downloads the tree in tree order with the effective cost centres and the officers by name and role | - | -"
     rules:
       - "The sales organisation is a New Business master (BRD-1, sales hierarchy and production reporting) kept in the Product Maintenance section of the menu; it is loaded at go-live by the data migration."
+      - "A unit is deactivated only when none of its sub-units and account officers is still active or pending; a unit is reactivated only under an active or pending parent, and waits for authorisation again."
+      - "Deactivation, reactivation and removal from a team need a reason, kept on the record and in the audit trail with the user and time."
+      - "A team without its own cost centre uses the cost centre of the nearest parent that has one."
     outcome: Every account and production report is attributed to the right region, department, team and officer.
     frs: []
     tests: [SALESORG]

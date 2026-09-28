@@ -1,6 +1,6 @@
 -- =====================================================================================
--- iNXT BrokerVerse - V998 Seed Product Maintenance (BRD-3) users (seed profile only; password
--- for all users: Brokerverse@2026). SEED DATA ONLY - never load in production.
+-- iNXT BrokerVerse - V998 Seed Product Maintenance (BRD-3) users (seed profile only; the SIT/UAT
+-- password is provided to testers separately). SEED DATA ONLY - never load in production.
 --   Personas of docs/architecture/PRODUCT_MAINTENANCE_DESIGN.md section 6.2. The roles and their
 --   grants are in V755. ao (MKT_AO), mkttl (MKT_TL), tsu (TSU) and badmin (BUSINESS_ADMIN) exist
 --   since V980 and received their Product Maintenance grants through their roles.

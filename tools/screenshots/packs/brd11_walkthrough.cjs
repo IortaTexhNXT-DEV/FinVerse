@@ -323,7 +323,13 @@ const steps = {
     const row = page.locator('table tbody tr').filter({ hasText: 'a013000101' }).first();
     if (await row.getByRole('button', { name: /^unlock$/i }).count()) {
       await row.getByRole('button', { name: /^unlock$/i }).click();
-      await settle(page, 1200);
+      await settle(page, 800);
+      // The unlock is confirmed in its dialog (confirmation standard).
+      const dialog = page.locator('dialog[open]');
+      if (await dialog.count()) {
+        await dialog.getByRole('button', { name: /^unlock$/i }).last().click({ timeout: 10000 });
+        await settle(page, 1200);
+      }
     }
     await page.getByLabel('Status').selectOption({ label: 'All statuses' });
     await settle(page, 600);

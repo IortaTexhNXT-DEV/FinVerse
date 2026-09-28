@@ -1,6 +1,6 @@
 -- =====================================================================================
--- iNXT BrokerVerse - V1940 Seed Customer Servicing Facility (BRD-9) (seed profile only; password
--- for all users: Brokerverse@2026). SEED DATA ONLY - never load in production.
+-- iNXT BrokerVerse - V1940 Seed Customer Servicing Facility (BRD-9) (seed profile only; the SIT/UAT
+-- password is provided to testers separately). SEED DATA ONLY - never load in production.
 --   * Users of the personas (FRS BRD-9 section 3): csfagent and csfagent2 (Contact Center
 --     Agents), csfsup (Contact Center Supervisor) and csfmgmt (Contact Center Management).
 --   * The storyline of client CL-2026-000001 (V981): a passed caller verification with the

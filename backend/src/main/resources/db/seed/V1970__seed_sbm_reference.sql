@@ -1,6 +1,6 @@
 -- =====================================================================================
 -- iNXT BrokerVerse - V1970 Seed Submitted Policies (BRD-12) reference data (seed profile only;
--- password for all users: Brokerverse@2026). SEED DATA ONLY - never load in production.
+-- the SIT/UAT password is provided to testers separately). SEED DATA ONLY - never load in production.
 --   * Users of the personas (FRS BRD-12 section 3): sbmhandler (Submitted Handler, CBG Motor),
 --     firehandler (Submitted Handler, CBG Fire), sbmchecker (Submitted Checker), sanitation
 --     (Sanitation Handler), sbmtl (Team Lead), polreview (Policy Review Officer) and sbmfee

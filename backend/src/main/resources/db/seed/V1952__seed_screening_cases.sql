@@ -1,6 +1,6 @@
 -- =====================================================================================
 -- iNXT BrokerVerse - V1952 Seed Sanction Screening (BRD-10) cases and STRs (seed profile only;
--- password for all users: Brokerverse@2026). SEED DATA ONLY - never load in production.
+-- the SIT/UAT password is provided to testers separately). SEED DATA ONLY - never load in production.
 --   Test data TD-SS-01 / TD-SS-06 / TD-SS-08 / TD-SS-09 of the test plan:
 --     users     amlcom3, amlcom4, amlcom5 (the five AML Committee members of SCR_COMMITTEE_SIZE 5)
 --               and scrdual (investigator and approver: the four-eyes refusal of FR-SS-061).

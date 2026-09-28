@@ -1,6 +1,6 @@
 -- =====================================================================================
--- iNXT BrokerVerse - V1910 Seed Renewal (BRD-6) users and rules (seed profile only; password for
--- all users: Brokerverse@2026). SEED DATA ONLY - never load in production.
+-- iNXT BrokerVerse - V1910 Seed Renewal (BRD-6) users and rules (seed profile only; the SIT/UAT
+-- password is provided to testers separately). SEED DATA ONLY - never load in production.
 --   Users of the Renewal personas (RENEWAL_DESIGN 6.2): rnwtl (Marketing Team Leader heading the
 --   Corporate Team 1, T-CORP1, with ao2 as its officer), lamd (LAMD, loan status reports) and
 --   contactc (Contact Center, follow-ups). The Marketing (ao, ao2, mkttl), Processing (proc,

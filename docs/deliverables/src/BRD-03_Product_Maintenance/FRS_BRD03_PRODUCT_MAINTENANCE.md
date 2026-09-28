@@ -1265,9 +1265,10 @@ main_flow:
   - The validator opens the version from the Validation Queue.
   - The validator ticks each checklist item and reviews the test premium.
   - The validator clicks **Validate and Release**.
-  - BIBS releases the version, records the checklist and publishes the release to Product Maintenance.
+  - BIBS releases the version, records each check with its result and the figures compared, and publishes the release to Product Maintenance.
+  - The Validation card of the version shows the result (Passed), the validator, the date and time, the test premium, and one row per check (hierarchy, insurer terms, co-insurance shares, rates and minimum premiums, dates and package term, test premium) with Passed, Failed or Not Applicable and its details, for example 3 of 3 insurers have terms for 2 included coverages.
 alternate_flows:
-  - Return. The validator clicks **Return to MBS** with a reason; the version goes back to DRAFT and the request to WITH_MBS.
+  - Return. The validator clicks **Return to MBS** with a reason; the version goes back to DRAFT and the request to WITH_MBS. The Validation card shows the result Returned, who returned it and when, the reason, and the checks as they stood, until MBS submits the version again.
   - Submission refused. The draft is incomplete; BIBS names the missing item and it stays DRAFT.
 rules:
   - [R1, "Checklist: hierarchy complete (cover type and basic coverage); every panel insurer has terms for each included coverage; rates and minimum premiums match the signed-off terms; dates and package term are correct; test premium reviewed (final list PQ09).", Configurable, Checklist (PQ09)]
@@ -1286,10 +1287,11 @@ fields_screen: Validation Checklist
 fields:
   - [Checklist items, Check boxes, "Yes", Checklist, All ticked]
   - [Return reason, Text, Conditional, "-", "Required for Return (message: Enter the reason of the return, REASON_REQUIRED)"]
+  - [Validation result, Facts and table, "-", Validation checkpoint, "Result, validator, date and time, test premium, return reason; # / Check / Result / Details per check"]
 notifications:
   - "Marketing (quotation users) on release; MBS on return."
 audit:
-  - "Submission, validation with the confirmed checklist, return with reason; release recorded on the product history."
+  - "Submission, validation with the confirmed checklist and the checks run, return with reason, validator and time; release recorded on the product history."
 acceptance:
   - The MBS user who set up the version cannot validate it.
   - A released version is used by new quotations from its effective date; before release it is not.
@@ -1693,7 +1695,10 @@ validations:
   - [Product not active, "Product <code> is not an active product of the matrix", INCENTIVE_PRODUCT_NOT_ACTIVE]
   - [Value missing, Enter the value of the incentive criterion, INCENTIVE_VALUE_REQUIRED]
   - [Period overlaps, "Criterion <code> already covers part of this period", INCENTIVE_PERIOD_OVERLAP]
-  - [Rule parameters not in the format of the example, The rule parameters must be valid JSON, INCENTIVE_RULE_PARAMS_INVALID]
+  - [Rule parameter without a value, Enter a value for each parameter, INCENTIVE_RULE_PARAMS_INVALID]
+  - [Rule parameter value not a number, "<parameter> must be a number", INCENTIVE_RULE_PARAMS_INVALID]
+  - [Rule parameter below zero, "<parameter> cannot be negative", INCENTIVE_RULE_PARAMS_INVALID]
+  - [Parameter not of the incentive type, "<parameter> is not a parameter of this incentive type", INCENTIVE_RULE_PARAMS_INVALID]
   - [Direct edit of an active row, An active criterion is changed by amending it (successor), INCENTIVE_ACTIVE_LOCKED]
 fields_screen: Incentive Criterion
 fields:
@@ -1704,7 +1709,7 @@ fields:
   - [Value, Number, Conditional, "-", Required for Rate and Fixed amount]
   - [Effective from, Date, "Yes", "-", "-"]
   - [Effective to, Date, "No", "-", On or after effective from]
-  - [Rule parameters (JSON), Text, Conditional, "-", "Name and value pairs as in the example {\"minimumPremium\": 5000}; required for Rule"]
+  - [Rule parameters, "Rows: parameter and value", "No", Rule parameters of the incentive type (Minimum Gross Premium), "Each parameter once, with a value as the parameter asks (an amount, zero or more)"]
   - [Description, Text, "No", "-", "-"]
   - [Products matrix, Picker, "Yes", "Active products; optional cover type, segment, channel, insurer", At least one]
 notifications:
@@ -1882,6 +1887,7 @@ Parameter: Product Code (optional). Layout: landscape, grouped by product, versi
 | Effective From / Effective To | Date | Period in force |
 | Package End | Date | Package end date |
 | Submitted By / Validated By / Validated On | Text / Date | Checkpoint users and date (PMADD06) |
+| Validation Result | Text | Passed or Returned, with the return reason |
 | Source Request | Text | PKR number that produced the version |
 | Change Summary | Text | Summary entered at set-up |
 

@@ -18,6 +18,15 @@ public interface CatalogRecordHook {
   default void authorized(CatalogKind kind, AuthorizableEntity entity) {}
 
   /**
+   * A record is about to be deactivated: a module refuses it by throwing a business rule exception
+   * (for example a sales unit that still has active sub-units or officers).
+   *
+   * @param kind kind
+   * @param entity the record, not yet deactivated
+   */
+  default void deactivating(CatalogKind kind, AuthorizableEntity entity) {}
+
+  /**
    * A record was deactivated.
    *
    * @param kind kind

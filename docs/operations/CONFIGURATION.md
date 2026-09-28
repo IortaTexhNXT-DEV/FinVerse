@@ -21,6 +21,8 @@ are for local development only.
 | `BROKERVERSE_MAX_FAILED_ATTEMPTS` | no | `5` | Consecutive failed logins that lock an account when the business parameter `LOGIN_MAX_FAILED_ATTEMPTS` is missing. The parameter (seeded with 3, BDOI NFR, CQ23) wins; administrators change it on *Administration › Parameters*. Property `brokerverse.security.max-failed-attempts`. |
 | `BROKERVERSE_ADMIN_USERNAME` | first start | `sysadmin` | Initial administrator (created only when no user exists). |
 | `BROKERVERSE_ADMIN_INITIAL_PASSWORD` | first start | – | Initial administrator password; remove after first login. |
+| `BROKERVERSE_SEED_PASSWORD` | no (seed profile only) | – | Password of the SIT/UAT users of this seed environment (SIT, UAT, training, local stacks), from the secret store; never written into a file. At start the seed profile gives it to every SIT/UAT user still carrying the password hash of the seed scripts (`SeedPasswords`). Blank: the users are left unchanged and a warning is logged. See "Seed data". |
+| `BROKERVERSE_SEED_PASSWORD_MUST_CHANGE` | no | `false` | `true`: the SIT/UAT users given `BROKERVERSE_SEED_PASSWORD` must change it at their first sign-in (each tester then holds an own password; shared personas and the screenshot tools need the unchanged password, hence the default). |
 | `BROKERVERSE_PORT` | no | `8080` | Listener port (`8443` in the Kubernetes deployments, where it serves HTTPS). |
 | `BROKERVERSE_JOB_RECURRING_CRON` | no | `0 0 1 * * *` | Spring cron (UTC) of `RECURRING_JOURNALS`: generates the due recurring and accrual journals. |
 | `BROKERVERSE_JOB_ALERTS_CRON` | no | `0 30 1 * * *` | Spring cron (UTC) of `ALERT_DAILY_CHECKS`: evaluates the scheduled exception codes. |
@@ -345,8 +347,19 @@ The `seed` profile adds the Flyway location `classpath:db/seed` (versions V900-V
 start-up runners (`*.seed` packages, `*SeedData` classes). It creates the seed company FVI under the client's legal
 name, BDO Insurance and Reinsurance Brokers, Inc., its branches, chart of accounts, seed records and the SIT/UAT
 users. Seed record numbers are plain sequence numbers in the 9000xx range (for example `CL-2026-900001`,
-`AR-2026-900001`). The SIT/UAT password is held in the seed configuration and issued by the project team; it is not
-written in the client documents.
+`AR-2026-900001`). The SIT/UAT password is provided to testers separately; it is written in no file of the project,
+the client documents included (a standing test refuses it, `SeedPasswordGuardTest`).
+
+- **Password per environment.** The seed scripts give every SIT/UAT user one shared password hash. Set
+  `BROKERVERSE_SEED_PASSWORD` in the secret store of each seed environment: at start, `SeedPasswords` (seed profile,
+  first runner) gives that password to every user still carrying the hash of the seed scripts, so the hash of the
+  scripts opens no account there; with `BROKERVERSE_SEED_PASSWORD_MUST_CHANGE=true` the users change it at their
+  first sign-in. Users with another password are left alone, so later starts change nothing; to issue a new
+  password, reset the users on the User Access screens or recreate the seed database. Without the variable the users
+  keep the hash of the scripts and the start logs a warning. The `upphandler` persona created at start takes the
+  password of `badmin`.
+- **Automated tests** never use the SIT/UAT password: `SignInPasswords` (test support) gives the users a test signs
+  in as a random password drawn for the test run.
 
 - **Not yet applied anywhere.** The seed migrations were renamed to `db/seed/V9xx__seed_*.sql` and
   `V19xx__seed_*.sql` (with their record codes and names) before any environment applied them, so no Flyway history
@@ -356,3 +369,10 @@ written in the client documents.
   (V652, V764, V771, V870, V880, V890, V1000, V1020, V1050-V1052, V1055, V1060). No SQL statement changed, but the Flyway
   checksums did: a database migrated by an earlier build runs `flyway repair` once (or is recreated) before the
   next start.
+- **Release note: the SIT/UAT password left the seed scripts.** The header comments of 16 seed scripts (V900, V980,
+  V990, V998, V999, V1109, V1900, V1910, V1920, V1930, V1940, V1950, V1952, V1960, V1970, V1980) no longer state the
+  SIT/UAT password; it is provided to testers separately. No SQL statement changed, but the Flyway checksums did: a
+  database that applied these seed scripts (seed environments only: local stacks, SIT, UAT and training) runs
+  `flyway repair` once, or is recreated, before its next start. Never run it on production, which never applies
+  `db/seed`. `spring.flyway.validate-on-migrate` keeps its default (on) in every profile; the automated tests build
+  a fresh database on every run and need no repair.

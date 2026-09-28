@@ -1,9 +1,16 @@
 import type {
   IncentiveCriteria,
   IncentiveInput,
+  IncentiveRuleParameter,
   IncentiveScope,
   IncentiveValueBasis,
 } from '@/api/productCatalog';
+
+/** One rule parameter row: the parameter and its value as typed. */
+export interface ParamRow {
+  key: string;
+  value: string;
+}
 
 /** Editable incentive criterion (PMADD07/08); numbers as text while editing. */
 export interface IncentiveForm {
@@ -12,7 +19,7 @@ export interface IncentiveForm {
   incentiveType: string;
   valueBasis: IncentiveValueBasis;
   value: string;
-  ruleParams: string;
+  params: ParamRow[];
   description: string;
   products: IncentiveScope[];
   effectiveFrom: string;
@@ -27,7 +34,7 @@ export function newIncentiveForm(): IncentiveForm {
     incentiveType: '',
     valueBasis: 'RATE',
     value: '',
-    ruleParams: '',
+    params: [],
     description: '',
     products: [],
     effectiveFrom: '',
@@ -43,7 +50,7 @@ export function incentiveFormOf(c: IncentiveCriteria): IncentiveForm {
     incentiveType: c.incentiveType,
     valueBasis: c.valueBasis,
     value: c.value === undefined ? '' : String(c.value),
-    ruleParams: c.ruleParams ?? '',
+    params: paramRowsOf(c.ruleParams),
     description: c.description ?? '',
     products: c.products,
     effectiveFrom: c.effectiveFrom,
@@ -51,13 +58,93 @@ export function incentiveFormOf(c: IncentiveCriteria): IncentiveForm {
   };
 }
 
-function isJson(text: string): boolean {
-  try {
-    JSON.parse(text);
-    return true;
-  } catch {
-    return false;
+/** The rows of stored rule parameters ({"minimumPremium": 5000}); none when unreadable. */
+export function paramRowsOf(stored: string | undefined): ParamRow[] {
+  if (!stored || stored.trim() === '') {
+    return [];
   }
+  try {
+    const parsed: unknown = JSON.parse(stored);
+    if (parsed === null || typeof parsed !== 'object' || Array.isArray(parsed)) {
+      return [];
+    }
+    return Object.entries(parsed as Record<string, unknown>).map(([key, value]) => ({
+      key,
+      value: typeof value === 'string' || typeof value === 'number' ? String(value) : '',
+    }));
+  } catch {
+    return [];
+  }
+}
+
+const NUMERIC = new Set(['AMOUNT', 'NUMBER', 'PERCENT']);
+
+function paramError(
+  row: ParamRow,
+  definition: IncentiveRuleParameter | undefined,
+  seen: Set<string>,
+): string | undefined {
+  if (row.key === '') {
+    return 'Select the parameter';
+  }
+  const label = definition?.label ?? row.key;
+  if (seen.has(row.key)) {
+    return `${label} is listed twice`;
+  }
+  seen.add(row.key);
+  if (row.value.trim() === '') {
+    return 'Enter a value for each parameter';
+  }
+  if (definition === undefined || !NUMERIC.has(definition.valueType)) {
+    return undefined;
+  }
+  const n = Number(row.value.replaceAll(',', ''));
+  if (Number.isNaN(n)) {
+    return `${label} must be a number`;
+  }
+  if (n < 0) {
+    return `${label} cannot be negative`;
+  }
+  return definition.valueType === 'PERCENT' && n > 100
+    ? `${label} must be between 0 and 100`
+    : undefined;
+}
+
+/** Errors of the parameter rows, keyed params.<row index>. */
+export function paramErrors(
+  rows: readonly ParamRow[],
+  definitions: readonly IncentiveRuleParameter[],
+): Record<string, string> {
+  const errors: Record<string, string> = {};
+  const seen = new Set<string>();
+  rows.forEach((row, i) => {
+    const error = paramError(
+      row,
+      definitions.find((d) => d.key === row.key),
+      seen,
+    );
+    if (error) {
+      errors[`params.${String(i)}`] = error;
+    }
+  });
+  return errors;
+}
+
+/** The stored form of the rows: one JSON object, numbers for numeric parameters. */
+export function storedParams(
+  rows: readonly ParamRow[],
+  definitions: readonly IncentiveRuleParameter[],
+): string | undefined {
+  const filled = rows.filter((r) => r.key !== '');
+  if (filled.length === 0) {
+    return undefined;
+  }
+  const entries = filled.map((r) => {
+    const definition = definitions.find((d) => d.key === r.key);
+    const numeric = definition !== undefined && NUMERIC.has(definition.valueType);
+    return [r.key, numeric ? Number(r.value.replaceAll(',', '')) : r.value.trim()] as const;
+  });
+  return JSON.stringify(Object.fromEntries(entries));
 }
 
 function valueError(form: IncentiveForm): string | undefined {
@@ -89,20 +176,19 @@ function identityErrors(form: IncentiveForm, errors: Record<string, string>): vo
  * @param form form
  * @param amending whether an active row is amended (the change must start later)
  * @param activeFrom start of the active row being amended
+ * @param definitions rule parameters of the incentive type (kinds of value)
  */
 export function incentiveErrors(
   form: IncentiveForm,
   amending = false,
   activeFrom = '',
+  definitions: readonly IncentiveRuleParameter[] = [],
 ): Record<string, string> {
-  const errors: Record<string, string> = {};
+  const errors: Record<string, string> = paramErrors(form.params, definitions);
   identityErrors(form, errors);
   const value = valueError(form);
   if (value) {
     errors.value = value;
-  }
-  if (form.ruleParams.trim() !== '' && !isJson(form.ruleParams)) {
-    errors.ruleParams = 'Enter valid JSON, e.g. {"minimumPremium": 5000}';
   }
   if (form.products.length === 0) {
     errors.products = 'Select at least one product of the matrix';
@@ -119,7 +205,11 @@ export function incentiveErrors(
 }
 
 /** The API body of a form. */
-export function toIncentiveInput(form: IncentiveForm, companyId: number): IncentiveInput {
+export function toIncentiveInput(
+  form: IncentiveForm,
+  companyId: number,
+  definitions: readonly IncentiveRuleParameter[] = [],
+): IncentiveInput {
   return {
     companyId,
     code: form.code,
@@ -127,7 +217,7 @@ export function toIncentiveInput(form: IncentiveForm, companyId: number): Incent
     incentiveType: form.incentiveType,
     valueBasis: form.valueBasis,
     value: form.valueBasis === 'RULE' ? undefined : Number(form.value),
-    ruleParams: form.ruleParams.trim() === '' ? undefined : form.ruleParams.trim(),
+    ruleParams: storedParams(form.params, definitions),
     description: form.description.trim() === '' ? undefined : form.description.trim(),
     products: form.products,
     effectiveFrom: form.effectiveFrom,

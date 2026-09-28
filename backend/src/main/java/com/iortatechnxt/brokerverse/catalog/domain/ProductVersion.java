@@ -91,6 +91,24 @@ public class ProductVersion extends BaseEntity {
   @Column(name = "returned_reason", length = 500)
   private String returnedReason;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "validation_result", length = 20)
+  private ValidationResult validationResult;
+
+  @Column(name = "returned_by", length = 50)
+  private String returnedBy;
+
+  @Column(name = "returned_at")
+  private Instant returnedAt;
+
+  @ElementCollection(fetch = FetchType.EAGER)
+  @Fetch(FetchMode.SUBSELECT)
+  @CollectionTable(
+      name = "cat_version_validation_check",
+      joinColumns = @JoinColumn(name = "version_id"))
+  @OrderBy("seq")
+  private List<ValidationCheck> validationChecks = new ArrayList<>();
+
   @ElementCollection(fetch = FetchType.EAGER)
   @Fetch(FetchMode.SUBSELECT)
   @CollectionTable(name = "cat_package_coverage", joinColumns = @JoinColumn(name = "version_id"))
@@ -162,7 +180,8 @@ public class ProductVersion extends BaseEntity {
 
   /**
    * Submits the draft for the validation checkpoint (PMADD06); the completeness checks are done by
-   * the service first.
+   * the service first. A previous return (reason, validator and checks) is cleared; the audit trail
+   * keeps it.
    *
    * @param user maker who submits
    * @param when time
@@ -173,6 +192,10 @@ public class ProductVersion extends BaseEntity {
     this.submittedBy = user;
     this.submittedAt = when;
     this.returnedReason = null;
+    this.returnedBy = null;
+    this.returnedAt = null;
+    this.validationResult = null;
+    this.validationChecks = new ArrayList<>();
   }
 
   /**
@@ -182,8 +205,14 @@ public class ProductVersion extends BaseEntity {
    * @param when time
    * @param checklist confirmed checklist items (JSON)
    * @param premium test premium computed on a sample item, null when not computable
+   * @param checks the checks run at validation
    */
-  public void release(String validator, Instant when, String checklist, BigDecimal premium) {
+  public void release(
+      String validator,
+      Instant when,
+      String checklist,
+      BigDecimal premium,
+      List<ValidationCheck> checks) {
     requireStatus(
         ProductVersionStatus.FOR_VALIDATION, "VERSION_NOT_FOR_VALIDATION", "is not submitted");
     this.status = ProductVersionStatus.RELEASED;
@@ -191,18 +220,29 @@ public class ProductVersion extends BaseEntity {
     this.validatedAt = when;
     this.validationChecklist = checklist;
     this.testPremium = premium;
+    this.validationResult = ValidationResult.PASSED;
+    this.validationChecks = new ArrayList<>(checks);
   }
 
   /**
-   * Sends the submitted version back to DRAFT (PMADD06).
+   * Sends the submitted version back to DRAFT (PMADD06), keeping who returned it, when, why and the
+   * checks as they stood.
    *
    * @param reason reason
+   * @param validator validator who returns it
+   * @param when time
+   * @param checks the checks run at the return
    */
-  public void returnToDraft(String reason) {
+  public void returnToDraft(
+      String reason, String validator, Instant when, List<ValidationCheck> checks) {
     requireStatus(
         ProductVersionStatus.FOR_VALIDATION, "VERSION_NOT_FOR_VALIDATION", "is not submitted");
     this.status = ProductVersionStatus.DRAFT;
     this.returnedReason = reason;
+    this.returnedBy = validator;
+    this.returnedAt = when;
+    this.validationResult = ValidationResult.RETURNED;
+    this.validationChecks = new ArrayList<>(checks);
   }
 
   /**
@@ -362,6 +402,22 @@ public class ProductVersion extends BaseEntity {
 
   public String getReturnedReason() {
     return returnedReason;
+  }
+
+  public ValidationResult getValidationResult() {
+    return validationResult;
+  }
+
+  public String getReturnedBy() {
+    return returnedBy;
+  }
+
+  public Instant getReturnedAt() {
+    return returnedAt;
+  }
+
+  public List<ValidationCheck> getValidationChecks() {
+    return List.copyOf(validationChecks);
   }
 
   public List<VersionCoverage> getCoverages() {

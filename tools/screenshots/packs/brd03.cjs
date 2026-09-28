@@ -138,7 +138,12 @@ const opens = {
     await ctx.api('mbs', 'POST', '/catalog/products/MTR12/versions/2/submit', {});
     return '/catalog/products/MTR12/versions/2';
   },
-  released_version: () => '/catalog/products/MTR12/versions/1',
+  // The package of walkthrough A once released (validated by the TSU Head, with its package request), else the seed
+  // version of MTR12.
+  released_version: (ctx) =>
+    ctx.sql("select 1 from cat_product_version where product_code = 'MTR30' and version_no = 1 and status = 'RELEASED'").length > 0
+      ? '/catalog/products/MTR30/versions/1'
+      : '/catalog/products/MTR12/versions/1',
   first_insurer: (ctx) => `/catalog/insurers/${ctx.one("select id from cat_insurer where party_code = 'INS-MGIC' order by id limit 1")}`,
   // A rate exception of the walkthrough A quotation waiting for approval: the one of step 22 while it is pending,
   // otherwise a second request of the Account Officer on the same quotation (seed values).
@@ -164,6 +169,50 @@ const opens = {
       throw new Error('run walkthrough A up to step 22 first: no draft quotation of MTR30');
     }
     return `/quotations/${row[0]}`;
+  },
+};
+
+// ------------------------------------------------------------------ sales organisation
+
+/** Opens every branch of the sales organisation tree. */
+async function expandAll(page) {
+  await page.getByRole('button', { name: /^expand all$/i }).first().click();
+  await page.waitForTimeout(400);
+}
+
+/** Opens the actions menu of a unit or officer row (the more button of the row). */
+async function rowMenu(page, label) {
+  await expandAll(page);
+  await page.getByRole('button', { name: `Actions for ${label}` }).first().click();
+  await page.waitForTimeout(400);
+}
+
+const after = {
+  // The dialog with an incentive type and one rule parameter row filled (fictitious values).
+  'scr-pm-16-02-new': async (page) => {
+    const dialog = page.locator('dialog[open]');
+    const type = dialog.getByLabel(/^incentive type/i);
+    const options = await type.locator('option').allTextContents();
+    await type.selectOption({ label: options.find((o) => /campaign/i.test(o)) ?? options[1] });
+    await page.waitForTimeout(600);
+    await dialog.getByRole('button', { name: /^add parameter$/i }).click();
+    await dialog.getByLabel(/^value of minimum gross premium$/i).fill('5000');
+    await page.waitForTimeout(300);
+  },
+  'scr-pm-20-01-tree': expandAll,
+  // UX deck: a search that finds no request (the empty state of the list) and the whole tree for its component crop.
+  'ux-scr-pm-02-empty': async (page) => {
+    await page.getByPlaceholder(/^search request no/i).fill('PKR-2099-999999');
+    await page.getByRole('button', { name: /^search$/i }).first().click();
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForTimeout(800);
+  },
+  'ux-scr-pm-20-cmp-tree': expandAll,
+  'scr-pm-20-02-actions': (page) => rowMenu(page, 'T-CBG1'),
+  'scr-pm-20-03-deactivate': async (page) => {
+    await rowMenu(page, 'T-CBG1');
+    await page.getByRole('menuitem', { name: /^deactivate$/i }).first().click();
+    await page.waitForTimeout(600);
   },
 };
 
@@ -201,7 +250,11 @@ const notice = { within: '[data-callout="rate-exceptions-notice"]' };
 const exceptions = { within: '[data-callout="rate-exceptions-table"]' };
 const requestDialog = { within: 'dialog[open]', title: 'Request Rate Exception' };
 const record = { within: 'main', title: 'Product Maintenance · Rate Exception' };
+// The fields of the Sales Organisation dialogs (new unit, unit details, assign officer, reason) are described only in
+// an open dialog, so their labels (Level, Team, Account Officer) never land on the cells of the tree table.
+const salesDialog = { within: 'dialog[open]' };
 const callouts = {
+  'SCR-PM-20': Object.fromEntries([12, 13, 14, 15, 16, 17, 18, 19].map((no) => [no, salesDialog])),
   'SCR-PM-22': {
     1: { ...notice, target: '.notice-text' },
     2: { ...exceptions, target: 'a[href*="/catalog/rate-exceptions/"]' },
@@ -232,6 +285,6 @@ const crops = {
 };
 
 module.exports = {
-  crops, opens, fills, selects: {}, uploads: {}, after: {}, custom: {}, walkthrough: walkthrough.steps, documents: docs, callouts,
+  crops, opens, fills, selects: {}, uploads: {}, after, custom: {}, walkthrough: walkthrough.steps, documents: docs, callouts,
   prepare: walkthrough.prepare, render,
 };

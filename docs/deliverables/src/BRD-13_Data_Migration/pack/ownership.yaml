@@ -28,6 +28,7 @@ parts:
   - {part: "Migration objects, decisions and extract planning (Handbook Part A; workbook Objects, Extract planning)", prepares: [ITN], input: [DML, DO], reviews: [PGM, MBS], approves: [PO, POD, POF, OPS, HOPS, ARM, CRT, CC, COMP, RM, CRM]}
   - {part: "Load templates, code maps and data-quality rules (the columns BDOI fills in)", prepares: [ITN], input: [DO, IT], reviews: [MBS, PGM], approves: [PO, COMP, HOPS]}
   - {part: "Screens and fields of the Migration Console and Legacy Inquiry (Handbook Part B)", prepares: [ITN], input: [DML], reviews: [PGM], approves: [PO]}
+  - {part: "UX screen deck, UX screen register and image package (07 to 09, for the BDOI UX Design team; the screens as specified in this set)", prepares: [ITN], input: [DML], reviews: [PGM], approves: [PO]}
   - {part: "Business rules, validations, messages and notifications", prepares: [ITN], input: [DML, DO], reviews: [PGM], approves: [PO]}
   - {part: "Reconciliation and migration reports", prepares: [ITN], input: [DO], reviews: [PGM], approves: [PO, COMP, POF]}
   - {part: "Cut-over plan, go / no-go and rollback", prepares: [ITN], input: [DML, IT], reviews: [PGM, IT], approves: [PO, COMP, HOPS]}

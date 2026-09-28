@@ -89,6 +89,23 @@ export interface VersionDetail {
   validationChecklist?: string;
   testPremium?: number;
   returnedReason?: string;
+  /** Outcome of the validation checkpoint; absent before the first decision. */
+  validationResult?: ValidationResult;
+  returnedBy?: string;
+  returnedAt?: string;
+  /** Checks run at the validation or the return, in checklist order. */
+  validationChecks?: ValidationCheck[];
+}
+
+export type ValidationResult = 'PASSED' | 'RETURNED';
+
+/** One check of the validation checkpoint and the figures it compared. */
+export interface ValidationCheck {
+  seq: number;
+  code: string;
+  label: string;
+  result: 'PASSED' | 'FAILED' | 'NOT_APPLICABLE';
+  detail?: string;
 }
 
 interface Deductible {
@@ -196,6 +213,13 @@ export interface IncentiveInput {
   effectiveTo?: string;
 }
 
+/** A rule parameter an incentive type may carry (e.g. the minimum gross premium). */
+export interface IncentiveRuleParameter {
+  key: string;
+  label: string;
+  valueType: 'AMOUNT' | 'NUMBER' | 'PERCENT' | 'TEXT';
+}
+
 export interface IncentiveCriteria extends Authorizable {
   companyId: number;
   code: string;
@@ -274,6 +298,10 @@ export const productCatalogApi = {
 
   incentives: (companyId: number) =>
     api.get<IncentiveCriteria[]>(`${base}/incentive-criteria${toQuery({ companyId })}`),
+  incentiveParameters: (incentiveType: string) =>
+    api.get<IncentiveRuleParameter[]>(
+      `${base}/incentive-criteria/parameters${toQuery({ incentiveType })}`,
+    ),
   incentiveHistory: (id: number) =>
     api.get<IncentiveCriteria[]>(`${base}/incentive-criteria/${id}/history`),
   createIncentive: (input: IncentiveInput) =>

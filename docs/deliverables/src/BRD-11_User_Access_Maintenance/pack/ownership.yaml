@@ -26,6 +26,7 @@ parts:
   - {part: "Messages and notifications", prepares: [ITN], input: [BAD], reviews: [PGM], approves: [PO]}
   - {part: "Documents and reports (access reports, audit log)", prepares: [ITN], input: [BUR, BAD], reviews: [PGM, SEC], approves: [PO]}
   - {part: "Walkthroughs (end-to-end, screen by screen)", prepares: [ITN], input: [BUR, BAD], reviews: [PGM], approves: [PO]}
+  - {part: "UX screen deck, UX screen register and image package (07 to 09, for the BDOI UX Design team; the screens as specified in this set)", prepares: [ITN], input: [BUR, BAD], reviews: [PGM], approves: [PO]}
   - {part: "Proposed business rules and clarifications for confirmation", prepares: [ITN], input: [BA, BUR], reviews: [PGM], approves: [PO]}
   - {part: "Role matrix and menus by persona (who may do what)", prepares: [ITN], input: [BUR, BAD], reviews: [SEC, IT], approves: [PO, CRM1, CC, COMP, RM, CRM]}
   - {part: "Interfaces and sign-in (EIAM, UIDM-ISC, directory)", prepares: [ITN], input: [BAD], reviews: [IT, SEC], approves: [PO]}

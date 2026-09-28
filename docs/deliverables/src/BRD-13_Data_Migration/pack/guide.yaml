@@ -43,6 +43,9 @@ documents:
   - {kind: Workbook, name: Data Migration, ext: xlsx, what: "Migration Workbook: object catalogue and decisions, extract planning, the load templates (one sheet per layout), code maps, validation rules, data owners, cut-over task plan, reconciliation sign-off per object, proposed rules with the BDOI decision, the screens; comments log, meeting minutes, version history, sign-off certificate", readers: "Every reviewer; the signatories sign it", when: "During the review and at sign-off"}
   - {kind: TestPlan, name: Data Migration, ext: xlsx, what: "Test plan workbook: the test cases traced to the requirements and to the screens, with the trial migration, reconciliation, rollback, rerun and cut-over rehearsal scenarios", readers: "Data owners who verify the trial migrations; BDOI IT", when: "After the handbook; used again in the trial migrations"}
   - {kind: TestPlan, name: Data Migration Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Business owner, BDOI IT", when: "Before sign-off"}
+  - {kind: UXDeck, name: Data Migration, ext: pptx, what: "UX Screen Deck for the BDOI UX Design team: design foundation, navigation and personas, every flow step by step and every screen with all its states", readers: "BDOI UX Design team", when: "From the issue, in parallel with the review; re-issued with each version of the set"}
+  - {kind: UXScreens, name: Data Migration, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, flow and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
+  - {kind: UXScreens, name: Data Migration, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG), the component crops and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
 
 # Reading order per role (Handbook parts and chapter numbers of v2.0).
 reading:
@@ -56,6 +59,8 @@ reading:
     order: "Handbook Part A chapter 8 (renewal-driven transition); Part B Batches (resubmissions of the RA-sent file); Part D tasks of the go-live renewal extraction and the day-1 queue; workbook sheet P03 and the load template workbook of P03 exported by the console"
   - role: BDOI IT
     order: "Handbook Part A chapter 6 (templates, secure transfer, masking) and chapter 12 (data security); Part B Extracts and Layouts and Rules; Part D (freeze, final extracts, rollback, decommissioning); proposed rules PR-DM-03 and PR-DM-04; workbook sheets File rules, Load templates, Control file, Cut-over tasks"
+  - role: BDOI UX Design team
+    order: "07 UX Screen Deck: design foundation and navigation first, then the personas, flows and screens of the design work; 08 UX screen register (filter Changed in this issue at each new issue); 09 image package in the design tool"
   - role: iorta TechNXT project team
     order: "All documents; keeps the comments log, the meeting minutes and the version history of the workbook, answers every comment and keeps the traceability to the trial migrations, SIT and UAT"
 

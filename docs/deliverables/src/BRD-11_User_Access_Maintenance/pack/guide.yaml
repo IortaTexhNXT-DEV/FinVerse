@@ -17,6 +17,9 @@ documents:
   - {kind: TestPlan, name: User Access Maintenance, ext: xlsx, what: "Test plan workbook: the test cases traced to the FRs and to the screens, including one screen case and one message case per screen and the access checks by persona", readers: "Business users who will run UAT; Information Security; BDOI IT", when: "After the screens; used again in SIT and UAT"}
   - {kind: TestPlan, name: User Access Maintenance Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Business owner, Information Security, BDOI IT", when: "Before sign-off"}
   - {kind: Templates, name: Configuration Inputs, ext: xlsx, what: "Configuration input templates: users and roles load, role-to-permission matrix, approval rules and limits, separation-of-duties rules, password and session parameters, lists of values", readers: "Business Administration, Information Security, BDOI IT, the unit heads who name their users", when: "During the review; filled in before the first data migration mock and final before UAT"}
+  - {kind: UXDeck, name: User Access Maintenance, ext: pptx, what: "UX Screen Deck for the BDOI UX Design team: design foundation, navigation and personas, every flow step by step and every screen with all its states", readers: "BDOI UX Design team", when: "From the issue, in parallel with the review; re-issued with each version of the set"}
+  - {kind: UXScreens, name: User Access Maintenance, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, flow and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
+  - {kind: UXScreens, name: User Access Maintenance, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG), the component crops and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
 
 # Reading order per role (FRS chapter numbers of v2.0).
 reading:
@@ -30,6 +33,8 @@ reading:
     order: "FRS chapter 7 (interfaces: EIAM on Entra ID, UIDM-ISC), chapter 8 (non-functional requirements), screens SCR-UA-01 to SCR-UA-05, SCR-UA-15 and SCR-UA-18, chapter 20 lines IC-08 to IC-11; template CI-05; the caveats of the Guide deck"
   - role: Unit heads of the other BRDs (New Business, Operations, Finance, Compliance, Claims, Employee Benefits)
     order: "FRS chapter 12, the menu table of their personas, and the workbook sheet Menu <role> of each; walkthrough A (a new user sees exactly the menu of the persona)"
+  - role: BDOI UX Design team
+    order: "07 UX Screen Deck: design foundation and navigation first, then the personas, flows and screens of the design work; 08 UX screen register (filter Changed in this issue at each new issue); 09 image package in the design tool"
   - role: iorta TechNXT project team
     order: "All documents; keeps the comments log, the meeting minutes and the version history of the workbook, answers every comment and keeps the traceability to SIT and UAT"
 

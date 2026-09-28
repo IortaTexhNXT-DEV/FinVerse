@@ -1,0 +1,138 @@
+# UX screen documents of the BRD-3 Product Maintenance set for the BDOI UX Design team: 07 UX Screen Deck, 08 UX
+# screen register, 09 image package (docs/deliverables/src/signoff/build_ux_deck.py). The screens, fields, actions,
+# walkthroughs and images come from the pack; this file holds what only the UX documents need: who each persona is,
+# the images taken for the deck only (more states, the crops of the shared components, the landing page and menu of
+# each persona), the changes of the issue and the points for the UX Design team to confirm.
+
+issue:
+  version: "2.0"
+  date: 28 September 2026
+  changes:
+    - ref: CHG-PM-2.0-01
+      what: Sales Organisation shown as a tree table, with the actions menu of each row and the refused deactivation
+      screens: [SCR-PM-20]
+    - ref: CHG-PM-2.0-02
+      what: >-
+        Package Version: the header with its package request, the Validation Checklist of the validator and the
+        Validation card of a released version with the checks and the figures compared
+      screens: [SCR-PM-13]
+      images: [scr-pm-13-01-draft, scr-pm-13-05-validation, scr-pm-13-06-released, wt-a-16, wt-a-17]
+    - ref: CHG-PM-2.0-03
+      what: The rule parameters of an incentive criterion as a table of parameters and values
+      screens: [SCR-PM-16]
+      images: [scr-pm-16-02-new]
+
+personas:
+  MKT_AO: {who: "An account officer of Retail, Corporate or Combank / Corbank Marketing who serves the clients"}
+  MKT_TL: {who: "A team lead, team head or unit head of Marketing"}
+  TSU: {who: "An officer of the Technical Support Unit who negotiates with the insurers"}
+  TSU_TL: {who: "The team lead of a TSU team"}
+  TSU_HEAD: {who: "The team head or head of the Technical Support Unit"}
+  MBS: {who: "A member of Marketing Business Services who keeps the product catalogue"}
+  MANCOM: {who: "A member of the management committee"}
+  BUSINESS_ADMIN: {who: "The business administrator of the catalogue, outside the maker's unit"}
+  NB_APPROVER:
+    who: "A New Business approver of Marketing"
+    does: "Approves or rejects the rate exceptions of the quotations; authorises commission rates as the second user"
+  SYSADMIN: {who: "The system administrator of BIBS (BDOI IT operations)"}
+  AUDITOR: {who: "An internal or external auditor with read access"}
+
+classify:
+  scr-pm-01-01-view: default
+  scr-pm-03-01-empty: default
+  scr-pm-03-02-filled: filled
+  scr-pm-04-01-record: pending-approval
+  scr-pm-04-02-approval: pending-approval
+  scr-pm-04-03-return: confirmation
+  scr-pm-04-04-history: read-only
+  scr-pm-05-02-response: filled
+  scr-pm-05-03-terms_final: confirmation
+  scr-pm-05-04-revise: filled
+  scr-pm-06-02-client_view: filled
+  scr-pm-07-02-signoff: pending-approval
+  scr-pm-08-01-setup: filled
+  scr-pm-08-03-advisories: read-only
+  scr-pm-10-02-dialog: filled
+  scr-pm-11-02-new: default
+  scr-pm-11-03-rules: pending-approval
+  scr-pm-12-02-new_version: default
+  scr-pm-13-01-draft: default
+  scr-pm-13-05-validation: pending-approval
+  scr-pm-13-06-released: read-only
+  scr-pm-14-01-list: pending-approval
+  scr-pm-15-03-new: default
+  scr-pm-16-02-new: filled
+  scr-pm-17-02-new: default
+  scr-pm-19-02-new: default
+  scr-pm-20-02-actions: default
+  scr-pm-20-03-deactivate: validation-error
+  scr-pm-21-01-filled: filled
+  scr-pm-22-01-exception: filled
+  scr-pm-22-02-deviation: pending-approval
+  scr-pm-22-03-record: pending-approval
+  scr-pm-22-04-reject: confirmation
+  wt-a-01: pending-approval
+  wt-a-03: success
+  wt-a-04: success
+  wt-a-11: default
+  wt-a-12: success
+  wt-a-13: success
+  wt-a-14: success
+  wt-a-21: success
+  wt-a-22: pending-approval
+  wt-a-24: success
+  wt-b-03: validation-error
+  wt-b-04: rejected-returned
+  wt-b-05: validation-error
+  wt-b-07: rejected-returned
+  wt-b-09: rejected-returned
+  wt-b-11: rejected-returned
+  wt-b-12: rejected-returned
+
+states:
+  - {screen: SCR-PM-02, state: empty, user: tsu, ux: empty, nocallouts: true, caption: "A search that finds no package request"}
+  - {screen: SCR-PM-03, state: saved, user: ao, fill: new_request, submit: "^save draft$", ux: success, nocallouts: true, caption: "The request saved as a draft, with the confirmation"}
+  - {screen: SCR-PM-11, state: auditor, user: auditor, ux: read-only, nocallouts: true, caption: "Products as the Auditor sees them, without the maintenance actions"}
+  - {screen: SCR-PM-17, state: auditor, user: auditor, ux: read-only, nocallouts: true, caption: "Insurers as the Auditor sees them, without the maintenance actions"}
+  # Crops of the shared components (design foundation of every deck, ux_foundation.yaml).
+  - {screen: SCR-PM-04, state: cmp-stepper, component: true, user: tsu, open: negotiation, crop: ".workflow-panel", nocallouts: true, caption: "Workflow step bar"}
+  - {screen: SCR-PM-02, state: cmp-table, component: true, user: tsu, tab: Negotiation, crop: "main .card:has(table)", nocallouts: true, caption: "Data table in a work list"}
+  - {screen: SCR-PM-20, state: cmp-tree, component: true, user: badmin, crop: ".tree-table", nocallouts: true, caption: "Tree table"}
+
+confirm:
+  clarifications: [CLR-PM-11, CLR-PM-12, CLR-PM-17, CLR-PM-18, CLR-PM-19, CLR-PM-20]
+  findings:
+    - screens: [SCR-PM-13]
+      observation: >-
+        The Details column of the validation checks shows list codes (COMPREHENSIVE, OD_THEFT) next to the counts.
+      proposal: Show the cover type and the coverages by their names, as the other columns of the screens do.
+    - screens: [SCR-PM-13]
+      observation: >-
+        A released version shows its rate scheme and dates in read-only input boxes; the amounts read 5000 and
+        5000000 and the rate 1.2, without the separators and decimals of the screen standard.
+      proposal: >-
+        Show a released (read-only) version as a label and value grid with the amounts formatted (5,000.00;
+        5,000,000.00) and the rate as keyed with the percent sign.
+    - screens: [SCR-PM-13]
+      observation: >-
+        On a released version an empty date (Anniversary) shows the format hint dd-MMM-yyyy, and a long text
+        (Computation Basis) is cut at the edge of its box.
+      proposal: Show a dash for an empty value and the whole text of a read-only field (wrapped).
+    - screens: [SCR-PM-03]
+      observation: >-
+        On the request form the coverage is keyed as a code (Coverage code) and the amounts show without separators
+        while typed (2000000, 5000000); the hint "Before submitting, complete the package end date." is plain text
+        above the form.
+      proposal: >-
+        Pick the coverage by its name from the coverage list, format the amounts when the field is left, and show
+        the hint as the one-line information notice of the notice standard.
+    - screens: [SCR-PM-04, SCR-PM-05]
+      observation: >-
+        In the workflow step bar of a request in negotiation the stage actions wrap to a second line under the meta
+        row, and Not Proceeded (which ends the request) has the look of the other secondary actions.
+      proposal: >-
+        Keep the actions on the meta row, or give them their own right-aligned row by design; show Not Proceeded as
+        the destructive action, last and in red, as the page action order asks.
+    - screens: [SCR-PM-16]
+      observation: The Actions column of Incentive Criteria shows Deactivate as a link in the row.
+      proposal: Offer the row actions through the row action menu of the table standard (Deactivate last, in red).

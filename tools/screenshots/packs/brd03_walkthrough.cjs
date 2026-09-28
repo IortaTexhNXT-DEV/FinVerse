@@ -76,7 +76,13 @@ const steps = {
     const authorize = row.getByRole('button', { name: /^authorize$/i });
     if (await authorize.count()) {
       await authorize.click();
-      await settle(page, 1200);
+      await settle(page, 800);
+      // The authorisation is confirmed in its dialog (confirmation standard).
+      const dialog = page.locator('dialog[open]');
+      if (await dialog.count()) {
+        await dialog.getByRole('button', { name: /^authori[sz]e$/i }).last().click({ timeout: 10000 });
+        await settle(page, 1200);
+      }
     }
     return page;
   },
@@ -246,7 +252,13 @@ const steps = {
     const authorize = row.getByRole('button', { name: /^authorize$/i });
     if (await authorize.count()) {
       await authorize.click();
-      await settle(page, 1200);
+      await settle(page, 800);
+      // The authorisation is confirmed in its dialog (confirmation standard).
+      const dialog = page.locator('dialog[open]');
+      if (await dialog.count()) {
+        await dialog.getByRole('button', { name: /^authori[sz]e$/i }).last().click({ timeout: 10000 });
+        await settle(page, 1200);
+      }
     }
     return page;
   },

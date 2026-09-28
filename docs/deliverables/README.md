@@ -110,6 +110,9 @@ carry a two-digit prefix so that they sort in reading order (`brand.SIGNOFF_SETS
 | 02 | FRS v2.0 (Word) | The requirements of v1.x unchanged, plus: navigation (menu by persona, screen-flow diagram); one specification per screen (purpose, who opens it, navigation, screenshots with numbered callouts, field table, actions table, business rules, expected outcome, FR and test links); end-to-end walkthroughs; messages catalogue; notifications; generated documents; upload templates; cross-BRD interface contract; sign-off and change control; screen standards appendix | `src/<BRD folder>/FRS_*.md` with ```pack blocks read from `pack/` |
 | 03 | Sign-off workbook (Excel) | Screen standards, screen catalogue, field register, actions, business rules, messages, notifications, menu by persona, upload templates and cross-BRD contract with the BU review columns (Accept / Change requested / Comment, comment, reviewer, date); comments log (clarification, defect, change request, with the response and status); meeting minutes; version history; sign-off certificate (the roles of the BRD approval sheet: prepared by, input provided by, reviewed by, approved by, and what each confirms) | `src/signoff/signoff_pack.py BRD-nn` |
 | 04, 05 | Test plan v2.0 (Excel) and its summary (Word) | The cases of v1.x re-traced to FRS v2.0 and its screens, plus screen cases (one per screen) and message cases | `src/testplans/build_test_plan.py` with `src/<BRD folder>/brdnn_cases.yaml` and `TP_*.md` |
+| 07 | UX Screen Deck (PowerPoint), for the BDOI UX Design team | Design foundation (colours, type, spacing, icons, the shared components with a real screenshot each, the screen standards); the landing page and menu of each persona; one section per persona; every end-to-end flow as a swimlane and one slide per step; the screen catalogue with every screen's callouts, fields, actions and all its states; outputs; UX points for confirmation; screen ID to FRS section map. Business and design content only | `src/signoff/build_ux_deck.py BRD-nn` from the pack and `pack/ux.yaml` (sets of `brand.UX_SETS`, Drop 0 first) |
+| 08 | UX screen register (Excel, guided workbook) | One row per screen image: screen ID and name, personas, flow and step, state, FRS section and requirements, image file, UXD status and comments, Changed in this issue with the change reference; Start here, Reference lists, Questions and comments | `src/signoff/build_ux_deck.py BRD-nn` |
+| 09 | Image package (ZIP) | Every screen image at twice the screen resolution (PNG) named `<Screen ID>_<state>.png`, the component crops, and the register as CSV | `src/signoff/build_ux_deck.py BRD-nn` |
 
 **Who signs what.** A sign-off set holds business content only: screens, fields, the columns of lists, reports and
 upload templates the user sees or fills in, validations, business rules, messages, notifications, documents,
@@ -306,7 +309,8 @@ page previews). Files are named `BIBS_<DocType>_BRD-nn_<Name>_v<version>.<ext>`,
 
 `python tools/deliverables/check_pack.py` fails on a file duplicated by content (SHA-256) in `docs/deliverables` or
 `docs/design/screenshots`, an older version of a document next to a newer one in `out/`, an issued release set without
-one of its standard files 00 to 05 (a warning for the BRDs whose set is not yet issued), a drop-level set
+one of its standard files 00 to 05 (a warning for the BRDs whose set is not yet issued), a set of `brand.UX_SETS`
+without its UX screen documents 07 to 09, a drop-level set
 (`brand.DROP_SETS`, the Drop 0 closure set) without one of its files or with a file of another version, and a
 restricted word in a source or a generated file. Run it before every commit of the pack.
 

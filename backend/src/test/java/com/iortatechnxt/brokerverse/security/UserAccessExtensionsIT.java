@@ -30,6 +30,7 @@ import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.Json;
+import com.iortatechnxt.brokerverse.support.SignInPasswords;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import com.jayway.jsonpath.JsonPath;
 import java.util.List;
@@ -71,6 +72,7 @@ class UserAccessExtensionsIT {
   @Autowired private MockMvc mvc;
   @Autowired private Api api;
   @Autowired private AsUser as;
+  @Autowired private SignInPasswords passwords;
 
   private static String unique(String prefix) {
     return prefix + IDS.incrementAndGet();
@@ -273,7 +275,7 @@ class UserAccessExtensionsIT {
         mvc.perform(
                 post("/api/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content("{\"username\":\"auditor\",\"password\":\"Brokerverse@2026\"}"))
+                    .content(passwords.loginBody("auditor")))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()

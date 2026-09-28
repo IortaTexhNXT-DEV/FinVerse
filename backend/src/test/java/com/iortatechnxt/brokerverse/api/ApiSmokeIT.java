@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.consolidation.service.ConsolidationGroupService;
 import com.iortatechnxt.brokerverse.period.service.PeriodService;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import com.iortatechnxt.brokerverse.support.SignInPasswords;
 import com.iortatechnxt.brokerverse.support.TestData;
 import com.jayway.jsonpath.JsonPath;
 import java.time.Clock;
@@ -38,6 +39,7 @@ class ApiSmokeIT {
   @Autowired private PeriodService periods;
   @Autowired private ConsolidationGroupService groups;
   @Autowired private UserDetailsService users;
+  @Autowired private SignInPasswords passwords;
 
   @ParameterizedTest
   @ValueSource(
@@ -554,7 +556,7 @@ class ApiSmokeIT {
     mvc.perform(
             post("/api/v1/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"username\":\"auditor\",\"password\":\"Brokerverse@2026\"}"))
+                .content(passwords.loginBody("auditor")))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.accessToken").isNotEmpty())
         .andExpect(jsonPath("$.user.roles[0]").value("AUDITOR"));
@@ -571,8 +573,7 @@ class ApiSmokeIT {
         mvc.perform(
                 post("/api/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        "{\"username\":\"" + username + "\",\"password\":\"Brokerverse@2026\"}"))
+                    .content(passwords.loginBody(username)))
             .andReturn()
             .getResponse()
             .getContentAsString();

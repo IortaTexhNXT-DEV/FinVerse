@@ -94,7 +94,7 @@ contract:
     party: Audit trail and reports (platform)
     direction: Out
     what: Sign-ins, failed sign-ins, sign-outs, parameter changes and every access change with its from and to values, request number, done by and approved by
-    how: Insert-only records; read by the User Access Audit Log and the Audit Trail
+    how: Records that no user can change; read by the User Access Audit Log and the Audit Trail
     owner: System Administrator; Auditor; Information Security
     screens: User access reports
     frs: [FR-UA-063, FR-UA-064]

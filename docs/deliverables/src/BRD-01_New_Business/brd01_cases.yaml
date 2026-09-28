@@ -92,7 +92,7 @@ screens:
   JOBS: Administration > Scheduled Jobs
   NOTIF: Notifications (bell icon in the page header)
   PREFS: Operations > Notification Settings
-  API: Direct request outside the screens, signed in as the persona (test lead tool)
+  SYS: System function check outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-NB-01
@@ -335,7 +335,7 @@ frs:
         msg: [The period end must be after the period start, ACCOUNT_PERIOD_INVALID]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: List value not valid on the date
         steps:
           - Send a direct request to create an account with source channel XYZ.
@@ -469,7 +469,7 @@ frs:
         expected: Every stage from Draft to Booked is listed with action, user and time; the status field cannot be edited.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         data: [TD-NB-07]
         title: Book an account in stage Placed
         steps:
@@ -478,7 +478,7 @@ frs:
         msg: ["Account ARN-2026-910001 is PLACED: only issued policies are booked", ACCOUNT_NOT_BOOKABLE]
       - c: 2
         type: Security-access
-        screen: API
+        screen: SYS
         title: Marketing runs a Processing action
         steps:
           - As ao send a direct request for the workflow action Validate on ARN-2026-900002.
@@ -486,7 +486,7 @@ frs:
         msg: ["You are not allowed to 'Validate'", WORKFLOW_ACTION_NOT_PERMITTED]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Business action from the generic panel
         steps:
           - Send a direct request for the Submit action on draft ARN-2026-900001.
@@ -530,7 +530,7 @@ frs:
       - c: 3
         type: Negative
         persona: MKT_AO
-        screen: API
+        screen: SYS
         title: Marketing claims a Processing item
         steps:
           - As ao send a direct request to claim ARN-2026-900002.
@@ -546,7 +546,7 @@ frs:
         msg: ["{ao} does not work this queue", WORK_ASSIGNEE_NOT_ELIGIBLE]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Claim a closed item
         steps:
           - Claim the work case of voided ARN-2026-900015.
@@ -579,7 +579,7 @@ frs:
         msg: ["Select a reason for 'Void'", WORKFLOW_REASON_REQUIRED]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         data: [TD-NB-07]
         title: Void a placed account
         steps:
@@ -616,7 +616,7 @@ frs:
         expected: Two e-mails arrive; the PDF asks for a password; the second e-mail holds only the password.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: A CSV file cannot be protected
         steps:
           - Send a message with a .csv attachment from the send dialog.
@@ -657,7 +657,7 @@ frs:
       - c: 4
         type: Security-access
         persona: BUSINESS_ADMIN
-        screen: API
+        screen: SYS
         title: User without account view cannot open its documents
         steps:
           - As badmin (no ACCOUNT_VIEW, no ATTACHMENT_VIEW) send a direct request to open a document of ARN-2026-900002.
@@ -676,7 +676,7 @@ frs:
     cases:
       - c: 1
         type: Negative
-        screen: API
+        screen: SYS
         title: Send a draft quotation by a direct request
         steps:
           - Send a direct request to send QT-2026-900001 (DRAFT) to the client.
@@ -764,8 +764,9 @@ frs:
         screen: AUDIT
         title: Audit rows cannot be changed
         steps:
-          - Look for edit or delete on Audit Trail rows; the DBA runs UPDATE, DELETE and TRUNCATE on the audit table in SIT.
-        expected: No such action on screen; the database refuses all three statements.
+          - Look for edit or delete on Audit Trail rows.
+          - The infrastructure administrator tries to change, delete and clear audit entries directly in the SIT environment.
+        expected: No such action on screen; every attempt is refused and the audit entries are unchanged.
 
   FR-NB-017:
     scenario: SC-NB-02
@@ -836,7 +837,7 @@ frs:
         msg: [Upload between 1 and 50 files at a time, DOCUMENT_FILE_COUNT]
       - c: 4
         type: Negative
-        screen: API
+        screen: SYS
         title: Nominated names without a reference
         steps:
           - Send a direct request to attach documents with name nomination on and no reference.
@@ -862,7 +863,7 @@ frs:
       - c: 1
         type: Boundary
         neg: true
-        screen: API
+        screen: SYS
         title: ZIP of 51 documents
         steps:
           - Send a direct request to download 51 documents as one ZIP file.
@@ -878,7 +879,7 @@ frs:
       - c: 3
         type: Negative
         title: Tampered file fails its checksum
-        pre: The DBA changes the stored bytes of one test file in SIT.
+        pre: The infrastructure administrator alters the stored copy of one test file in SIT.
         steps:
           - Download that file.
         expected: The download is refused.
@@ -1001,7 +1002,7 @@ frs:
       - c: 3
         type: Security-access
         persona: BUSINESS_ADMIN
-        screen: API
+        screen: SYS
         title: No client search without CLIENT_VIEW
         steps:
           - As badmin open the menu and send a direct request to search the clients.
@@ -1100,7 +1101,7 @@ frs:
         msg: [An inactive client cannot be changed, CLIENT_INACTIVE]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Change the type of a confirmed client
         steps:
           - Send a direct request to change the type of CL-2026-000001 to CORPORATE.
@@ -1182,7 +1183,7 @@ frs:
         expected: The client moves Prospect, KYC for verification, KYC verified, Confirmed client; it shows the PR and the new CL-2026-nnnnnn codes and the next KYC review date.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Confirm a client without verified KYC
         steps:
           - Call the confirm action on a prospect in KYC for verification.
@@ -1434,7 +1435,7 @@ frs:
         msg: [The validity date cannot be in the past, QUOTATION_VALIDITY_PAST]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Change the product after save
         steps:
           - Send a direct request to change the product of the quotation to MTR15.
@@ -1479,7 +1480,7 @@ frs:
         msg: ["Quotation QT-2026-900002 is {FOR_REVIEW}", QUOTATION_NOT_EDITABLE]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Change a submitted version
         steps:
           - Call the update of version 1 of QT-2026-900008.
@@ -1550,7 +1551,7 @@ frs:
         msg: ["Cannot send: <problems>", QUOTATION_BATCH_INVALID]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Empty selection
         steps:
           - Send a direct request to send quotations with an empty selection.
@@ -1591,7 +1592,7 @@ frs:
         msg: ["The quotation offers risk groups {1, 2} only", ACCEPTANCE_GROUP_UNKNOWN]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Create accounts before acceptance
         steps:
           - Call create-accounts on QT-2026-900004 (SENT_TO_CLIENT).
@@ -1666,7 +1667,7 @@ frs:
         expected: Each report shows only that account.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Account with a malformed ARN
         steps:
           - Send a direct request to create an account with ARN "ARN-26-1".
@@ -1674,7 +1675,7 @@ frs:
         msg: [The ARN must read ARN-yyyy-nnnnnn (or ARN-yyyy-nnnnnn-nn), ARN_INVALID]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: ARN already used
         steps:
           - Send a direct request to create an account with ARN ARN-2026-900001.
@@ -1720,7 +1721,7 @@ frs:
         msg: [The period end must be after the period start, PRF_PERIOD_INVALID]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Change the product of a saved PRF
         steps:
           - Send a direct request to change the product of the PRF to EEI01.
@@ -1805,7 +1806,7 @@ frs:
         expected: The PRF is in QS_PREPARATION and the change is saved with tsu in the history.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: TSU edits after the slip is sent
         steps:
           - Call PUT on PRF-2026-900004 (TERMS_RECEIVED).
@@ -1853,7 +1854,7 @@ frs:
         msg: ["{Mindanao Pacific Insurance Inc.} has no placement e-mail address", INSURER_NO_EMAIL]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Change insurers after submission
         steps:
           - Send a direct request to change the insurers of a slip for approval.
@@ -2010,7 +2011,7 @@ frs:
         msg: ["Attach the client's acceptance e-mail first", ACCEPTANCE_EMAIL_REQUIRED]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Create accounts before acceptance
         steps:
           - Call create-accounts on a PRF in SENT_TO_CLIENT.
@@ -2018,7 +2019,7 @@ frs:
         msg: ["Record the client's acceptance of the proposal first", PROPOSAL_NOT_ACCEPTED]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Accounts for a prospect
         pre: An accepted PRF of prospect PR-2026-000008 (Bayside Builders Co.).
         steps:
@@ -2063,7 +2064,7 @@ frs:
       - c: 3
         type: Security-access
         persona: BUSINESS_ADMIN
-        screen: API
+        screen: SYS
         title: No account search without ACCOUNT_VIEW
         steps:
           - As badmin send a direct request to search the accounts.
@@ -2443,7 +2444,7 @@ frs:
         expected: The journal holds only the commission receivable; there is no client premium receivable.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Change the arrangement after the gate
         steps:
           - Send a direct request to change the payment arrangement of an account in READY_FOR_PLACEMENT.
@@ -2484,7 +2485,7 @@ frs:
         msg: ["Placement prerequisites not met - <ARN>: <problem> | ...", SLIP_PREREQUISITES_UNMET]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Generate with nothing selected
         steps:
           - Send a direct request to generate placement slips with no ARN.
@@ -2533,11 +2534,12 @@ frs:
       - c: 2
         type: Negative
         persona: SYSADMIN
-        title: Insurer set up for SFTP
+        screen: SYS
+        title: Insurer set up for a channel other than e-mail
         steps:
-          - Set the placement channel of an insurer branch to SFTP; save.
+          - Save an insurer with a placement channel other than e-mail.
         expected: Refused; only e-mail is available.
-        msg: ["Only e-mail placement is available; SFTP and API channels await BDOI (Q06)", PLACEMENT_CHANNEL_PARKED]
+        msg: ["Only e-mail placement is available; choose the e-mail placement channel", PLACEMENT_CHANNEL_PARKED]
 
   FR-NB-082:
     scenario: SC-NB-07
@@ -2611,7 +2613,7 @@ frs:
         msg: ["The hold cover cannot expire before it starts (<date>)", HOLD_COVER_DATES]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Confirm without an open hold cover
         steps:
           - Send a direct request to confirm the hold cover of ARN-2026-910004 (no hold cover).
@@ -2651,7 +2653,7 @@ frs:
         msg: ["Select a reason for 'Returned by insurer'", WORKFLOW_REASON_REQUIRED]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Return recorded for another insurer
         steps:
           - Record an insurer return on ARN-2026-910001 with insurer INS-VMI.
@@ -2722,7 +2724,7 @@ frs:
         expected: The account is READY_FOR_PLACEMENT.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Reactivate an account that is not cancelled
         steps:
           - Call reactivate for ARN-2026-910004 (PLACED).
@@ -2752,7 +2754,7 @@ frs:
         expected: The billed accounts are not offered for a second batch.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Motor account in a billing batch
         steps:
           - Send a direct request to add ARN-2026-910006 (Motor) to a billing batch.
@@ -2760,7 +2762,7 @@ frs:
         msg: ["Not CBG Fire accounts awaiting payment, or already billed: <ARNs>", BILLING_NOT_CANDIDATE]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Unsupported file format
         steps:
           - Download the batch file with format=CSV.
@@ -2785,7 +2787,7 @@ frs:
         expected: Paid accounts move to READY_FOR_PLACEMENT; unpaid ones stay AWAITING_PAYMENT; the batch is REPORT_RECEIVED.
       - c: 2
         type: Workflow
-        screen: API
+        screen: SYS
         title: Match an unmatched line by hand
         steps:
           - Open PMT-2026-900003; match an UNMATCHED line to ARN-2026-910007; confirm.
@@ -2851,7 +2853,7 @@ frs:
         expected: The panel shows Payment matched for the two CBG accounts and Client confirmation for the Liability account.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Confirmation on an account not awaiting payment
         steps:
           - Record client confirmation on ARN-2026-910004 (PLACED).
@@ -3013,7 +3015,7 @@ frs:
         expected: Each advice is e-mailed protected and followed by its password e-mail.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Send with no advice selected
         steps:
           - Send a direct request to send Insurance Advices with an empty selection.
@@ -3022,7 +3024,7 @@ frs:
       - c: 2
         type: Security-access
         persona: MKT_AO
-        screen: API
+        screen: SYS
         title: Marketing cannot send advices
         steps:
           - As ao send a direct request to send an Insurance Advice.
@@ -3079,7 +3081,7 @@ frs:
       - c: 2
         type: Security-access
         persona: BUSINESS_ADMIN
-        screen: API
+        screen: SYS
         title: No dispatch log without ACCOUNT_VIEW
         steps:
           - As badmin send a direct request to open the dispatch log.
@@ -3092,7 +3094,7 @@ frs:
     screen: PREBOOK
     data: [TD-NB-09]
     conditions:
-      - Booking an issued account creates the invoice, the balanced journal and the service invoice in one transaction and the account shows Booked.
+      - Booking an issued account creates the invoice, the balanced journal and the service invoice together (all or nothing) and the account shows Booked.
       - If the journal cannot be posted the account stays Policy issued and no invoice exists; a second booking returns the existing invoice.
       - Only issued accounts are booked, with a cost center and a booking date that is not in the future.
     cases:
@@ -3112,7 +3114,7 @@ frs:
         expected: The booking is refused; the account stays POLICY_ISSUED and no invoice or service invoice exists.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Book the same account twice
         steps:
           - Send a direct request to book again the account booked in TC-NB-110.1-01.
@@ -3204,7 +3206,7 @@ frs:
         expected: The account stays in Ready to Book and is not queued.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Second booking of the same transaction
         steps:
           - Send two direct requests to book the same ARN.
@@ -3251,7 +3253,7 @@ frs:
         expected: Three invoices NB, NB-Y2, NB-Y3 with three policy numbers; year 1 booked, years 2 and 3 scheduled.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Book year 2 early
         steps:
           - Call the booking of policy year 2 before its start date.
@@ -3342,7 +3344,7 @@ frs:
         expected: The return equals the premium of the unexpired days.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Cancel an account that is not booked
         steps:
           - Post a cancellation for an issued, unbooked account.
@@ -3486,7 +3488,7 @@ frs:
       - c: 3
         type: Security-access
         persona: BUSINESS_ADMIN
-        screen: API
+        screen: SYS
         title: Dashboard refused without the right
         steps:
           - Send a direct request to open the New Business dashboard as a user without WORK_VIEW.
@@ -3631,7 +3633,7 @@ frs:
       - c: 2
         type: Security-access
         persona: MKT_AO
-        screen: API
+        screen: SYS
         title: Export without the permission
         steps:
           - As ao send a direct request to export the NB-CLPC-BILLING report as XLSX.
@@ -3654,7 +3656,7 @@ frs:
         expected: No Late Renewal Requests Report is listed; the FRS holds it until BDOI answers Q09.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Run the report held for Q09
         steps:
           - Send a direct request to run the late renewal report.
@@ -3765,7 +3767,7 @@ frs:
         msg: [The effective-to date is before the effective-from date, LOV_EFFECTIVITY_INVALID]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Change a system-maintained list
         steps:
           - Add a value to a system-maintained list by a direct request.
@@ -3899,7 +3901,7 @@ frs:
       - c: 2
         type: Security-access
         persona: MKT_AO
-        screen: API
+        screen: SYS
         title: AO cannot read the audit log
         steps:
           - As ao send a direct request to read the audit log.
@@ -3911,7 +3913,7 @@ frs:
         title: Rows cannot be changed
         steps:
           - Look for edit or delete on audit rows.
-        expected: None is offered; the database refuses changes.
+        expected: None is offered; an attempt to change an entry outside the screens is refused.
 
   FR-NB-137:
     scenario: SC-NB-01

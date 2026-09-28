@@ -24,6 +24,7 @@ import { formatAmount, formatDate } from '@/utils/format';
 import { RecordPanel } from './RecordPanel';
 import { ReasonCard } from './ReasonCard';
 import { keepReason, reasonLabel, sessionReason } from './reason';
+import { LegacyRecordType, LegacyStatus } from './LegacyStatus';
 
 const TYPES = [
   'CLIENT',
@@ -51,7 +52,16 @@ const COLUMNS: Column<ArchiveRecord>[] = [
   {
     key: 'record',
     header: 'Record',
-    render: (r) => <CellStack main={r.legacyKey} sub={`${r.sourceSystem} ${r.recordType}`} />,
+    render: (r) => (
+      <CellStack
+        main={r.legacyKey}
+        sub={
+          <>
+            {r.sourceSystem} <LegacyRecordType type={r.recordType} />
+          </>
+        }
+      />
+    ),
   },
   {
     key: 'client',
@@ -75,7 +85,7 @@ const COLUMNS: Column<ArchiveRecord>[] = [
     kind: 'amount',
     render: (r) => (r.amount === undefined ? '' : `${r.currency ?? ''} ${formatAmount(r.amount)}`),
   },
-  { key: 'status', header: 'Legacy Status', render: (r) => r.status ?? '' },
+  { key: 'status', header: 'Legacy Status', render: (r) => <LegacyStatus status={r.status} /> },
   { key: 'docs', header: 'Documents', kind: 'center', render: (r) => r.documentCount },
 ];
 

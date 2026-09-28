@@ -74,6 +74,24 @@ render: guide-steps
 | Thu 19-Nov-2026 | 09:30-12:00 | Production Reconciliation and Commission Receivables: registers, feedback, DP billing and collection, incentives, BIR certificates (walkthrough C) | Production Reconciliation, Commission Receivables, Comptrollership |
 | Fri 20-Nov-2026 | 09:30-11:30 | Uploads with the error file, reports, interfaces and the accounting of Operations | Operations FT&P, Comptrollership, BDOI IT |
 
+# Who signs what
+
+The set holds business content only: the screens and fields, the columns of the lists, reports and templates that the user sees or fills in, the validations, business rules, messages, notifications, documents, walkthroughs and reports. The business users sign that content. Technical content (the interfaces between systems, data storage, security set-up) is not part of the set: it is in the Technical Specification, a separate document reviewed by BDOI IT. The roles are those of the approval sheet of the Operations BRD: iorta TechNXT and the Business Analyst of Business Project Services prepare the set, Operations: Financial Transactions and Processing provides the input, BDOI IT reviews the interfaces, the user access and the Technical Specification, and the Program Manager of Business Project Services, Operations: Financial Transactions and Processing and the Product Owner approve it.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: owners-matrix
+```
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: owners-roles
+```
+
+The signatories sign the Sign-off certificate sheet of the sign-off workbook in the same order: prepared by, input provided by, reviewed by, approved by.
+
 # Change control after sign-off
 
 Signing freezes the Operations screens, fields, navigation, actions, business rules, messages, notifications, documents, upload templates and the cross-BRD contract as specified. Configuration values marked "default" (receipt series, tolerances, thresholds, schedules, list entries, templates, incentive rules) are not frozen. A change to anything frozen is raised in the Change Management Register with the screen, field, rule or message concerned, assessed with its mandays and its effect on the other BRDs (Operations feeds Collections, Accounting, Disbursement and ACSL), approved by the owners of every BRD it touches, and delivered as a new version of the set; only the affected pages are signed again.

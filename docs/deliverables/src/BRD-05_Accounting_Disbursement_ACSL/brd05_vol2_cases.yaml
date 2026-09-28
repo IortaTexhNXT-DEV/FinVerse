@@ -76,7 +76,7 @@ screens:
   APPROVALS: My Approvals (home section)
   ALERTS: Alerts (home section and bell icon in the page header)
   JOBS: Setup & Administration > Administration > Scheduled Jobs
-  API: Direct request outside the screens, signed in as the persona (test lead tool)
+  SYS: System function check outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-DPA-01
@@ -246,7 +246,7 @@ frs:
         msg: [The default mode of payment must be one of the allowed modes, PAYEE_MODE]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Payee without code
         steps:
           - Send a direct request to create a payee without a payee code.
@@ -410,7 +410,7 @@ frs:
         expected: The request waits under No Payee and DISB_PAYEE_NO_MATCH is raised; after the authorisation the DV is created.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Same source reference twice
         steps:
           - Send the same gateway request twice (test harness of the test lead).
@@ -418,7 +418,7 @@ frs:
         msg: ["Request {ref} was already received", DISB_REQUEST_DUPLICATE]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Zero amount
         steps:
           - Send a gateway request of 0.00.
@@ -623,7 +623,7 @@ frs:
         msg: ["Complete DV {no}: {paying account}", DV_INCOMPLETE]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Change terms of an approved DV
         steps:
           - Send a direct request to change the terms of an APPROVED DV.
@@ -660,7 +660,7 @@ frs:
         msg: ["{errors}", DV_ENTRY_INVALID]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Entry without lines
         steps:
           - Send a direct request to save the proforma entry with no line.
@@ -704,7 +704,7 @@ frs:
         expected: The check takes the next number of the paying account's series (for example 000124) and is PRINTED.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Print before approval
         steps:
           - Send a direct request to print the instrument of a DV For Review.
@@ -712,7 +712,7 @@ frs:
         msg: [The DV has no instrument until it is approved, DV_NOT_APPROVED]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Negotiated check released again
         steps:
           - Send a direct request to release a NEGOTIATED check.
@@ -742,7 +742,7 @@ frs:
         expected: The history shows PRINTED, EMAILED and DEBITED; the e-mail is on the E-mails tab.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: E-mail a check
         steps:
           - Send a direct request to e-mail the instrument of a check DV.
@@ -837,7 +837,7 @@ frs:
         msg: [The separation date is before the hiring date, SEPARATION_BEFORE_HIRING]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Branch of another company
         steps:
           - Send a direct request to create an employee with a branch of another company.
@@ -916,7 +916,7 @@ frs:
         msg: [The approver of a voucher cannot be its processor or checker, DV_FOUR_EYES]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Approve a DV In Process
         steps:
           - Send a direct request to approve a DV In Process.
@@ -924,7 +924,7 @@ frs:
         msg: ["DV {no} is {IN_PROCESS}", DV_NOT_FOR_APPROVAL]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: DV without entry
         steps:
           - Approve a DV whose entry is empty (prepared by the test lead).
@@ -978,7 +978,7 @@ frs:
         msg: ["Select a reason for '{cancel}'", WORKFLOW_REASON_REQUIRED]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Cancel the request of a live voucher
         steps:
           - Cancel the request of a DV In Process by a direct request.
@@ -1903,7 +1903,7 @@ frs:
         msg: [The amount must be positive with at most two decimals, PRQ_AMOUNT_INVALID]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Currency of two letters
         steps:
           - Send a direct request to create a refund with currency PH.
@@ -1911,7 +1911,7 @@ frs:
         msg: [Currency must be a 3-letter code, PRQ_CURRENCY_INVALID]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Edit a request For Approval
         steps:
           - Send a direct request to change a refund request For Approval.
@@ -1985,7 +1985,7 @@ frs:
         expected: The request is Preparing with the reason in its history.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Assign a request For Review
         steps:
           - Send a direct request to assign a request For Review.
@@ -2029,7 +2029,7 @@ frs:
       - c: 3
         type: Negative
         persona: CASHIER
-        screen: API
+        screen: SYS
         title: Result given twice
         steps:
           - Send a direct request to record the result of a validation already CONFIRMED.
@@ -2096,7 +2096,7 @@ frs:
         msg: ["AR {2026-00123} is already refunded by request {RRF-2026-12} (MKT 2.23.0)", PRQ_DUPLICATE_AR]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Endorse a request in Draft
         steps:
           - Send a direct request to endorse a Draft request.
@@ -2145,7 +2145,7 @@ frs:
       - c: 3
         type: Negative
         persona: HR_APPROVER
-        screen: API
+        screen: SYS
         title: HR approves a refund
         steps:
           - As hrappr, send a direct request to approve a refund For Approval.
@@ -2176,7 +2176,7 @@ frs:
         msg: ["Select a reason for '{cancel}'", WORKFLOW_REASON_REQUIRED]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Cancel a request sent to Disbursement
         steps:
           - Cancel a request SENT_TO_DISBURSEMENT from the workflow panel.
@@ -2220,7 +2220,7 @@ frs:
         msg: ["{RRF-2026-12} has no disbursement voucher yet", PRQ_TARGET_NOT_DISBURSED]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Target that is not a refund or cash advance
         steps:
           - Send a direct request to create a CCR naming a CCR number as target.
@@ -2362,7 +2362,7 @@ frs:
       - c: 2
         type: Negative
         persona: PRQ_PROCESSOR
-        screen: API
+        screen: SYS
         title: Payout details missing
         steps:
           - Send a direct request to create a payout account without a mode.
@@ -2448,7 +2448,7 @@ frs:
         msg: ["Comptrollership has not set the account of {LODGING} for liquidations (AQ02)", PRQ_LIQUIDATION_ACCOUNT_MISSING]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Change a posted liquidation
         steps:
           - Send a direct request to change a POSTED liquidation.
@@ -2654,7 +2654,7 @@ frs:
         msg: ["Invoice {BI-2026-999999} is not in the ledger", ACSL_INVOICE_UNKNOWN]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Findings on a case not assigned
         steps:
           - Send a direct request to record findings on a RECEIVED case.
@@ -2683,7 +2683,7 @@ frs:
         expected: The case is RESULT_PROVIDED; the ACSL validation of the RRF is CONFIRMED.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Unknown outcome
         steps:
           - Send a direct request to record the result of a case with outcome MAYBE.
@@ -2761,7 +2761,7 @@ frs:
         expected: The correction is DRAFT in the second preparer's Draft tab.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Assign a correction For Review
         steps:
           - Send a direct request to assign a correction For Review.
@@ -2835,7 +2835,7 @@ frs:
       - c: 3
         type: Boundary
         neg: true
-        screen: API
+        screen: SYS
         title: 201 lines
         steps:
           - Send a direct request to save a correction with 201 lines.
@@ -2996,7 +2996,7 @@ frs:
         msg: [A deduction needs a positive amount, REMIT_DEDUCTION_AMOUNT]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Change a submitted deduction
         steps:
           - Send a direct request to change a deduction For Confirmation.

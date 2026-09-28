@@ -12,6 +12,10 @@ What it reads
                                 action rows, rules, expected outcome, FRs and test-plan screen aliases;
   * <brd>/messages.yaml         where each message appears and the fix the user makes (texts come from the code);
   * <brd>/notifications.yaml, contract.yaml, documents.yaml, walkthroughs.yaml;
+  * <brd>/ownership.yaml        who signs what: the roles of the BRD approval sheet (prepared by, input provided by,
+                                reviewed by, approved by) and the part of the set each prepares, provides input to,
+                                reviews or approves; read by 00 Start Here, the 01 guide deck, the sign-off
+                                certificate of the workbook, the drop closure summary and the drop index;
   * the code itself through tools/deliverables/code_facts.py: sidebar menus, role grants, messages, upload templates,
     so the personas, menu paths and message texts are never typed by hand;
   * the test plan YAML of the BRD (in the BRD source folder), for the test cases of each screen.
@@ -140,6 +144,7 @@ class Pack:
         self.walkthroughs = self._load("walkthroughs.yaml").get("walkthroughs", [])
         self.msg_cfg = self._load("messages.yaml")
         self.guide = self._load("guide.yaml")
+        self.ownership = self._load("ownership.yaml")
         # Packs of other BRDs whose screens a walkthrough step may show (for example the New Business quotation
         # of a Product Maintenance walkthrough): paths relative to this pack.yaml.
         self.foreign_paths = [(self.dir / f).resolve() for f in raw.get("foreign_packs") or []]
@@ -496,6 +501,7 @@ class Pack:
         for u in getattr(code_facts.role_grants, "unread", []):
             problems.append(f"grant statement not read: {u}")
         problems += self._suite_problems()
+        problems += ownership_problems(self)
         return problems
 
     def _suite_problems(self) -> list[str]:
@@ -782,6 +788,75 @@ def r_guide_steps(doc: Any, pack: Pack, **_: Any) -> None:
               widths=[0.8, 3.0, 5.2, 5.2, 3.4], caption="From issue to closure", size=7.5, keep_rows=False)
 
 
+# ============================================================================ who signs what
+
+CAPACITIES = ["Prepared by", "Input provided by", "Reviewed by", "Approved by"]
+MATRIX = [("prepares", "Prepares"), ("input", "Provides input"), ("reviews", "Reviews"), ("approves", "Approves")]
+
+
+def owner_roles(pack: Pack) -> dict[str, dict[str, str]]:
+    """The roles of ownership.yaml by id."""
+    return {r["id"]: r for r in (pack.ownership or {}).get("roles") or []}
+
+
+def ownership_problems(pack: Pack) -> list[str]:
+    """ownership.yaml: every role with a capacity of the BRD approval sheet, every part with its four columns naming
+    known roles, a preparer and an approver, and every role used by at least one part."""
+    own = pack.ownership or {}
+    if not own:
+        return []
+    out: list[str] = []
+    roles = owner_roles(pack)
+    for r in own.get("roles") or []:
+        for key in ("id", "short", "role", "org", "capacity", "confirms", "sheet"):
+            if not r.get(key):
+                out.append(f"ownership: role {r.get('id', '?')} has no {key}")
+        if r.get("capacity") not in CAPACITIES:
+            out.append(f"ownership: role {r.get('id')} has the capacity {r.get('capacity')!r}, not one of {CAPACITIES}")
+    used: set[str] = set()
+    for part in own.get("parts") or []:
+        for key, _ in MATRIX:
+            ids = part.get(key) or []
+            if key in ("prepares", "approves") and not ids:
+                out.append(f"ownership: part {part.get('part')!r} has nobody who {key[:-1] if key.endswith('s') else key}s")
+            for i in ids:
+                used.add(i)
+                if i not in roles:
+                    out.append(f"ownership: part {part.get('part')!r} names the unknown role {i}")
+    for i in roles:
+        if i not in used:
+            out.append(f"ownership: role {i} is not used by any part")
+    if not own.get("source"):
+        out.append("ownership: no source (the approval sheet of the BRD)")
+    return out
+
+
+def owner_matrix(pack: Pack) -> list[list[str]]:
+    """One row per part of the set: part, then the short names of the roles per column of MATRIX."""
+    roles = owner_roles(pack)
+    return [[p["part"]] + [", ".join(roles[i]["short"] for i in p.get(key) or []) or "-" for key, _ in MATRIX]
+            for p in (pack.ownership or {}).get("parts") or []]
+
+
+def owner_signatories(pack: Pack) -> list[dict[str, str]]:
+    """The signatories in the order of the BRD approval sheet: prepared, input, reviewed, approved."""
+    rs = list((pack.ownership or {}).get("roles") or [])
+    return sorted(rs, key=lambda r: CAPACITIES.index(r["capacity"]) if r.get("capacity") in CAPACITIES else 9)
+
+
+def r_owners_matrix(doc: Any, pack: Pack, **_: Any) -> None:
+    doc.table(["Part of the set"] + [h for _, h in MATRIX], owner_matrix(pack), widths=[5.2, 2.4, 3.2, 3.0, 3.8],
+              caption="Who signs what: responsibility per part of the set", size=7.5, first_col_bold=True,
+              keep_rows=False)
+
+
+def r_owners_roles(doc: Any, pack: Pack, **_: Any) -> None:
+    rows = [[r["capacity"], f"{r['role']} ({r['org']})", r["confirms"], r["sheet"]] for r in owner_signatories(pack)]
+    doc.table(["Capacity", "Role", "Confirms by signing", "On the BRD approval sheet"], rows,
+              widths=[2.2, 5.0, 6.8, 3.6], caption=f"Signatories and what each confirms ({pack.ownership['source']})",
+              size=7.5, keep_rows=False)
+
+
 RENDERERS = {
     "screen-index": r_screen_index,
     "menus": r_menus,
@@ -798,6 +873,8 @@ RENDERERS = {
     "guide-map": r_guide_map,
     "guide-reading": r_guide_reading,
     "guide-steps": r_guide_steps,
+    "owners-matrix": r_owners_matrix,
+    "owners-roles": r_owners_roles,
 }
 
 
@@ -1045,11 +1122,15 @@ def build_workbook(pack: Pack, extend: Any = None, out_dir: Path | None = None) 
         description=f"What {nm} takes from and hands to the other BRDs and systems; a change is a change request")
 
     comment_rows = [{"id": f"C-{i:03d}"} for i in range(1, 51)]
+    # A set with fill-in templates (BRD-13 load templates): a question names the template and the column.
+    template_cols = [Column("template", "Template", 22, "Load template (sheet) the question is about, if any"),
+                     Column("column", "Column", 18, "Column of the template, if any")] if wbm.get("comment_columns") else []
     ws = wb.sheet("Comments log", [
         Column("id", "ID", 9, "Comment identifier"),
         Column("raised_by", "Raised by", 22, "Name and unit of the reviewer"),
         Column("date", "Date", 13, "Date raised", kind="date"),
         Column("where", "Page / screen", 24, f"{doc} page or section, screen ID or workbook row"),
+        *template_cols,
         Column("type", "Type", 16, "Clarification, Correction or Change request", values=COMMENT_TYPES),
         Column("comment", "Comment", 50, "The question, the correction or the change asked for"),
         Column("response", "Response", 50, "Answer of the project team; for a change request, its register number"),
@@ -1084,8 +1165,11 @@ def build_workbook(pack: Pack, extend: Any = None, out_dir: Path | None = None) 
         description="Versions of this release set (a revision after review is v2.1; after sign-off, a change request)",
         freeze_first_column=False)
 
-    # Signatories of the pack (pack.yaml "signatories": [role, organisation, signs for]); New Business by default.
-    signatories = [tuple(x) for x in pack.signatories] or [
+    # Signatories of the pack: the roles of ownership.yaml in the order of the BRD approval sheet (prepared, input,
+    # reviewed, approved); pack.yaml "signatories" ([role, organisation, signs for]) or the New Business list for a
+    # pack without ownership.yaml.
+    signatories = [(r["role"], r["org"], r["confirms"], r["capacity"], r["sheet"]) for r in owner_signatories(pack)]
+    signatories = signatories or [(*tuple(x), "", "") for x in pack.signatories] or [(*x, "", "") for x in [
         ("Product Owner", "BDOI", "Business owner: the whole set"),
         ("Head, Marketing Business Services and System Support", "BDOI", "Business owner of New Business"),
         ("Unit Head, Processing", "BDOI", "Payment, placement, issuance and booking screens"),
@@ -1096,17 +1180,22 @@ def build_workbook(pack: Pack, extend: Any = None, out_dir: Path | None = None) 
         ("Compliance Officer", "BDOI", "Compliance: KYC, screening hand-off, retention"),
         ("Head, BDOI IT", "BDOI", "BDOI IT: interfaces, user access and menus"),
         ("Program Manager, Business Project Services", "BDO Unibank ESG", "Traceability to the BRD"),
-        ("Project Manager", brand.VENDOR, "Delivery of the set as signed")]
+        ("Project Manager", brand.VENDOR, "Delivery of the set as signed")]]
+    source = (pack.ownership or {}).get("source", "")
     ws = wb.sheet("Sign-off certificate", [
+        Column("capacity", "Capacity", 18, "Prepared by, Input provided by, Reviewed by or Approved by, as on the BRD "
+                                           "approval sheet"),
         Column("role", "Role", 40, "Signatory role"),
         Column("org", "Organisation", 18, "Organisation"),
-        Column("scope", "Signs for", 40, "Part of the set the signatory confirms"),
+        Column("scope", "Confirms", 44, "What the signatory confirms by signing"),
+        Column("sheet", "On the BRD approval sheet", 26, f"Where the role signs the BRD ({source})" if source else
+               "Where the role signs the BRD"),
         Column("name", "Name", 26, "Name of the signatory"),
         Column("decision", "Decision", 22, "Approved, Approved with comments or Not approved", values=SIGNOFF_VALUES),
         Column("comments", "Comments", 36, "Conditions of the approval"),
         Column("signature", "Signature", 20, "Signature"),
         Column("date", "Date", 14, "Date of the decision", kind="date"),
-    ], [{"role": r, "org": o, "scope": sc} for r, o, sc in signatories],
+    ], [{"capacity": c, "role": r, "org": o, "scope": sc, "sheet": sh} for r, o, sc, c, sh in signatories],
         description=(f"By signing, the signatories confirm the {m['release_set']} v{m['version']}: its content, screens and "
                      "navigation are frozen; the screenshots use fictitious seed data; later changes go through the "
                      "Change Management Register"), freeze_first_column=False)

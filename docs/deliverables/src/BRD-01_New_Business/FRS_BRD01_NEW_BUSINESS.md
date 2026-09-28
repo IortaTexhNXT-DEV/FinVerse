@@ -185,7 +185,7 @@ The table lists the steps of the New Business process and Figure 1 shows them by
 | 6 | Payment confirmation | Processing, system | CBG Fire and Motor must be paid (CLPC billing, payment reports); Other Lines need client confirmation | BRNB.067, 068; BRD 2.3.1 |
 | 7 | Placement | Processing | Placement slip per insurer branch, sent by e-mail; hold cover request and confirmation; insurer returns | BRNB.069, 071, 072, 103, 034 |
 | 8 | Issuance | Processing, E-policy Sender | E-policy received and matched; policy number confirmed; Insurance Advice for mortgaged accounts; e-policy sent protected | BRNB.073, 074, 070, 077 |
-| 9 | Booking | Processing, Adjustment | Invoice, GL entry and service invoice in one transaction; batch, automatic or direct booking; endorsements and cancellation | BRNB.027, 036, 076, 111, 081 |
+| 9 | Booking | Processing, Adjustment | Invoice, GL entry and service invoice created together (all or nothing); batch, automatic or direct booking; endorsements and cancellation | BRNB.027, 036, 076, 111, 081 |
 | 10 | Monitoring | All | Dashboard, status and fall-out reports, production against target | BRNB.012, 075, 115 |
 
 ![New Business process by actor (BRNB.001, p.49; BRD p.134)](figures/brd01_process_flow.dot)
@@ -558,7 +558,7 @@ notifications:
   - "Stage entry: the holders of the stage's owner permission, or the assignee; the originator of the record when someone else changes it."
   - "SLA breach: alert WORK_SLA_BREACH from the daily alert check."
 audit:
-  - "The status history is insert-only; every row has the actor and time."
+  - "The status history cannot be changed or deleted; every entry has the user and the time."
 acceptance:
   - "An account's History tab shows every stage from Draft to Booked with user and time."
   - "An attempt to book an account in stage Placed is refused with WORKFLOW_TRANSITION_NOT_ALLOWED."
@@ -763,10 +763,10 @@ preconditions:
   - "None."
 main_flow:
   - "A user or the system performs an action."
-  - "BIBS writes the audit row in the same transaction as the change."
+  - "BIBS writes the audit row together with the change; one is never kept without the other."
   - "The History tab shows the workflow history and the audit rows in time order."
 rules:
-  - [R1, "Audit rows are append-only; the database refuses updates and deletes.", Fixed, "-"]
+  - [R1, "Audit entries can only be added; no user or process can change or delete them.", Fixed, "-"]
   - [R2, "Retention: 5 years online, 15 years archive (p.82).", Configurable, Retention rules (FR-NB-137)]
 validations: []
 notifications:
@@ -1765,7 +1765,7 @@ rules:
   - [R1, "Slip numbers QS-<yyyy>-nnnnnn.", Configurable, Parameter QUOTATION_SLIP_PREFIX]
   - [R2, "Reply date = send date + 5 days (default).", Configurable, Parameter QUOTATION_SLIP_REPLY_DAYS]
   - [R3, "The approver is not the preparer.", Fixed, "-"]
-  - [R4, "Insurers are reached by e-mail only (portal / API Q06).", Fixed, "-"]
+  - [R4, "Insurers are reached by e-mail only (an insurer portal or system-to-system channel: Q06).", Fixed, "-"]
 validations:
   - [No insurer, Select at least one insurer of the panel for the quotation slip, QS_NO_INSURER]
   - [Insurer change after submission, Insurers are selected before the quotation slip is submitted, QS_CLOSED]
@@ -2365,7 +2365,7 @@ priority: "Must have"
 screens: "Placement Slips (Send, Send Slips); Placement Workbench (Send Slips)"
 description:
   - "BIBS e-mails each slip to the placement mailbox of its insurer branch (from the insurer master), with the PDF and Excel protected and the password sent separately. The first send records the placement of each account (PLACED); later sends are resends, for example after a return or a failed delivery. The send log shows recipients, time and outcome per slip."
-  - "Slips are sent by e-mail when the user clicks Send. SFTP and insurer API channels are added when BDOI specifies them (Q06); until then an insurer set up for them is refused with a message (chapter 21, CLR-NB-17)."
+  - "Slips are sent by e-mail when the user clicks Send. Electronic channels to insurers (file transfer or system-to-system) are added when BDOI specifies them (Q06); until then an insurer set up for another channel is refused with a message (chapter 21, CLR-NB-17)."
 preconditions:
   - "The slip is GENERATED or SENT; the user has PLACEMENT_MANAGE."
 main_flow:
@@ -2377,7 +2377,7 @@ rules:
   - [R1, "Recipients from the insurer branch's placement addresses.", Configurable, Insurer master]
   - [R2, "Only the e-mail channel is available (Q06).", Fixed, "-"]
 validations:
-  - [Insurer on SFTP or API, "<insurer> is set up for <channel> placements; only e-mail is available (Q06)", PLACEMENT_CHANNEL_PARKED]
+  - [Insurer set up for a channel other than e-mail, "<insurer> is set up for <channel> placements; only e-mail is available: set the insurer to e-mail placement", PLACEMENT_CHANNEL_PARKED]
   - [Superseded slip, "Slip <number> v<n> was replaced by a new version", SLIP_SUPERSEDED]
 notifications:
   - "Processing is notified of failed dispatches."
@@ -2682,7 +2682,7 @@ priority: "Must have"
 screens: "E-policy Upload (single, bulk); Issuance Workbench (Placed - awaiting policy)"
 description:
   - "Processing uploads the insurer's e-policy PDF, singly or in a bulk of up to 50 files. BIBS matches each file to its account by ARN, policy number or PN number found in the file name, or the user chooses the account. The file is stored as document type EPOLICY on the account (the designated folder), and the e-policy enters review (FR-NB-101). In a bulk upload, the user reviews the matches, fixes or skips items and confirms."
-  - "E-policies are received by upload. Reading an insurer mailbox or SFTP folder automatically is added when BDOI specifies it (Q31, Q12; chapter 21, CLR-NB-19)."
+  - "E-policies are received by upload. Reading an insurer mailbox or file transfer folder automatically is added when BDOI specifies it (Q31, Q12; chapter 21, CLR-NB-19)."
 preconditions:
   - "The account is placed (PLACED, or later for a replacement)."
 main_flow:
@@ -2909,7 +2909,7 @@ actor: "Processing (BOOKING_PROCESS); System"
 priority: "Must have"
 screens: "Booking Workbench (Ready to Book); Pre-booking Confirmation; Booked Invoice"
 description:
-  - "Processing books an account whose policy is issued (or that is flagged for direct booking). The Pre-booking Confirmation shows the invoice(s) with the premium breakdown and commission, and the journal preview. On **Book Account** BIBS, in one transaction - checks the account, the cost center and the insurer shares; creates the invoice BI-<branch>-yyyy-n on the booking date; posts the BROKER_BOOKING accounting event per insurer share (premium receivable from the client unless direct payment, premium payable to the insurer, commission receivable, VAT on commission, withholding tax); opens the open items; issues the service invoice when a type is triggered on booking (FR-NB-117); and moves the account to BOOKED."
+  - "Processing books an account whose policy is issued (or that is flagged for direct booking). The Pre-booking Confirmation shows the invoice(s) with the premium breakdown and commission, and the journal preview. On **Book Account** BIBS, in one step (all or nothing) - checks the account, the cost center and the insurer shares; creates the invoice BI-<branch>-yyyy-n on the booking date; posts the BROKER_BOOKING accounting event per insurer share (premium receivable from the client unless direct payment, premium payable to the insurer, commission receivable, VAT on commission, withholding tax); opens the open items; issues the service invoice when a type is triggered on booking (FR-NB-117); and moves the account to BOOKED."
   - "If any step fails, nothing is kept and the error is shown. Booking twice returns the invoice already booked."
 preconditions:
   - "The account is POLICY_ISSUED; the user has BOOKING_PROCESS."
@@ -2918,7 +2918,7 @@ main_flow:
   - "Processing checks the booking date and cost center and clicks **Update Preview**."
   - "Processing clicks **Book Account**; BIBS shows the booked invoice."
 rules:
-  - [R1, "Booking, GL entry and service invoice are one transaction.", Fixed, "-"]
+  - [R1, "Booking, GL entry and service invoice are created together: all or nothing.", Fixed, "-"]
   - [R2, "The booking date cannot be in the future.", Fixed, "-"]
   - [R3, "Commission realisation ON_COLLECTION (default) or ON_BOOKING.", Configurable, Parameter OPS_COMMISSION_REALIZATION]
   - [R4, "Withholding tax on commission 10% (default).", Configurable, Parameter BOOKING_WTAX_RATE]
@@ -2987,7 +2987,7 @@ priority: "Must have"
 screens: "Booking Setup (Auto-book Rules)"
 description:
   - "When a policy is issued, BIBS checks the auto-book rules (product, market segment, enabled). When a rule matches, the account is queued with source AUTO and booked by the next batch run (FR-NB-111)."
-  - "Duplicate booking is prevented by the booking key ARN + transaction number (NB, NB-Y2 ... for policy years, then endorsement numbers), which is unique in the database. Endorsements are separate transactions on the same ARN, so they are not duplicates."
+  - "Duplicate booking is prevented by the booking key ARN + transaction number (NB, NB-Y2 ... for policy years, then endorsement numbers), and BIBS refuses a second booking with the same key. Endorsements are separate transactions on the same ARN, so they are not duplicates."
   - "A non-financial endorsement (no premium change) is recorded with its EN number and description but books no invoice and posts no journal (FR-NB-115)."
 preconditions:
   - "Auto-book rules are set up (none are delivered for production)."
@@ -3510,7 +3510,7 @@ main_flow:
   - "The user opens a BIBS link in a new tab."
   - "The new tab asks the open tabs for the session and opens the page."
 rules:
-  - [R1, "The session token stays in each tab's session storage; tabs share it over a browser channel.", Fixed, "-"]
+  - [R1, "The session lives only in the open BIBS tabs of the user: a new tab joins it, and closing every tab ends it.", Fixed, "-"]
 validations: []
 notifications:
   - "None."
@@ -3809,7 +3809,7 @@ The four New Business workflows are configured as stages and transitions. In the
 - SLA hours are held per stage and start when a record enters the stage. The values above are the proposed defaults until BDOI confirms the stage list and targets (Q10).
 - The daily alert check raises WORK_SLA_BREACH for work items past their stage SLA. Overdue items are counted on the NB Dashboard and listed in the Account Status Report; stalled accounts (no movement for NB_STALLED_DAYS) are flagged there too.
 - Escalation beyond the stage owners (for example to a unit head) is not in the BRD and is not proposed (chapter 21, CLR-NB-36).
-- Every transition writes an insert-only history row; the status reports of FR-NB-122 read that history.
+- Every transition adds an entry to the status history, which cannot be changed; the status reports of FR-NB-122 read that history.
 
 # Reports and documents
 
@@ -3874,9 +3874,9 @@ Figure 6 shows the interfaces of New Business. The broking modules talk to each 
 |---|---|---|---|---|
 | HLS and other source systems | In | Quotation requests; bulk quotations and accounts by upload of the extract; intake port | BRNB.023, 028, 064 | ON HOLD |
 | Shared mailboxes | In | Requests and e-policies read automatically | BRNB.041, 073 | ON HOLD |
-| E-mail outbox | Out | Protected quotations, slips, hold cover requests, advices, e-policies, service invoices; send log | BRNB.008, 013, 035, 071 | IN SCOPE |
-| Insurers | Out / In | Slips and requests by e-mail; replies keyed in; SFTP / API channels | BRNB.008, 071 | IN SCOPE |
-| CLPC | Out / In | Billing file download and payment report upload; SFTP transfer | BRNB.067 | IN SCOPE |
+| Outgoing e-mail | Out | Protected quotations, slips, hold cover requests, advices, e-policies, service invoices; send log | BRNB.008, 013, 035, 071 | IN SCOPE |
+| Insurers | Out / In | Slips and requests by e-mail; replies keyed in; electronic channels (file transfer or system-to-system) when specified (Q06) | BRNB.008, 071 | IN SCOPE |
+| CLPC | Out / In | Billing file download and payment report upload; secure file transfer | BRNB.067 | IN SCOPE |
 | Operations (BRD-2) | Out / In | Booked invoices, pre-booked look-up; cashier receipts as payment confirmations | BRNB.027, 068 | IN SCOPE |
 | Product Maintenance (BRD-3) | In | Products, package versions, rate exceptions, incentive criteria | BRNB.001, 107 | IN SCOPE |
 | Accounting engine | Out | BROKER_BOOKING events, journals, open items, cost center dimension | BRNB.027, 108 | IN SCOPE |
@@ -3899,8 +3899,8 @@ Figure 6 shows the interfaces of New Business. The broking modules talk to each 
 | Availability | 07:00-22:00, Monday to Saturday; other items "follow existing QPS set-up" | Maintenance window outside service hours; one BIBS-wide NFR set is being agreed (XQ08) |
 | Devices | Any BDO-issued device or workstation; same performance on mobile and desktop | Browser application, responsive screens; no device restriction |
 | Security | Outbound documents encrypted or password protected; insurers have no access | Protected PDF / Excel with separate passwords; no external user role; role-based access and four-eyes |
-| Audit | All actions logged | Append-only audit and workflow history (FR-NB-016) |
-| Retention | Application, database and audit logs and historical data: 5 years online, 15 years archive; backup every 4 hours kept 5 years (addendum p.82; the original BRD says "follow QPS") | Retention rules and monthly review (FR-NB-137); archive and purge wait for Q39; backups are an infrastructure setting |
+| Audit | All actions logged | Audit trail and workflow history that no user can change (FR-NB-016) |
+| Retention | Application, system and audit logs and historical data: 5 years online, 15 years archive; backup every 4 hours kept 5 years (addendum p.82; the original BRD says "follow QPS") | Retention rules and monthly review (FR-NB-137); archive and purge wait for Q39; backups are an infrastructure setting |
 
 # Configuration items owned by the System Administrator and the Business Administrator
 
@@ -4032,7 +4032,7 @@ The items below are changed in BIBS without a release. Changes to parameters, li
 | Q03 | Sample layouts of the quotation, slips, placement slip, hold cover, advice, service invoice | FR-NB-004 | OPEN |
 | Q04 | TSU involvement thresholds (fleet, locations, TSI, endorsements) | FR-NB-005 | OPEN |
 | Q05 | Approval chain and limits for PRF and quotations | FR-NB-014, 043, 051 | OPEN |
-| Q06 | Insurer channels (e-mail, SFTP, API) and branch codes | FR-NB-053, 081 | PARTIAL |
+| Q06 | Insurer channels (e-mail, file transfer, system-to-system) and branch codes | FR-NB-053, 081 | PARTIAL |
 | Q07 | Password convention for outbound documents | FR-NB-013, 105 | PARTIAL |
 | Q08 | BDOI systems that receive NB data | FR-NB-015 | PARTIAL |
 | Q09 | Late renewal requests report in NB or Renewal | FR-NB-126 | OPEN |
@@ -4197,7 +4197,7 @@ Every BRD-1 requirement is met by at least one FR. The table lists the 119 rows 
 | OOS-1 | p.83 | Section 1.2 (out of scope) | - | - |
 | OOS-2 | p.83 | Section 1.2; FR-NB-047, 090 | - | TC-NB-047.1, 047.2 (4 cases) |
 
-Page numbers are pages of the BRD PDF (R1). The traceability record R3 names the module, API and test class of each row.
+Page numbers are pages of the BRD PDF (R1). The technical trace of each row to the system functions is kept in the Technical Specification, reviewed by BDOI IT.
 
 <!-- landscape -->
 
@@ -4451,9 +4451,9 @@ The table lists each point where the proposed screen or rule differs from the BR
 | CLR-NB-14 | Dynamic reports (BRNB.057; FR-NB-123) | Users save report variants with their own column filters; there is no ad-hoc report designer. | BRD-8 and BRD-12 answer Q40 that saved variants are enough. | Confirm saved variants (Q40). |
 | CLR-NB-15 | Cancelled placement (BRNB.062; FR-NB-085, 086) | A cancelled placement stays in the stage Placement cancelled, visible and reportable, until it is reactivated to Ready for placement. | The account keeps its history and can be reactivated (BRD 2.1.16). | Confirm the stage Placement cancelled and the reactivation. |
 | CLR-NB-16 | CLPC billing file (BRNB.067; FR-NB-090) | The billing file is downloaded and forwarded to CLPC by the user, and the ARN replaces the QPS reference number. An automatic transfer is added when BDOI specifies it. | The CLPC transfer is not specified (Q28); QPS references end with the migration (OOS-2). | Specify the CLPC transfer or confirm the manual forwarding (Q28). |
-| CLR-NB-17 | Placement file to insurers (BRNB.071; FR-NB-081) | Slips are sent by e-mail when Processing clicks Send. An insurer set up for SFTP or API is refused with a message until those channels are specified. | The insurer SFTP and API channels are not specified (Q06). | Specify the insurer channels or confirm e-mail only (Q06). |
+| CLR-NB-17 | Placement file to insurers (BRNB.071; FR-NB-081) | Slips are sent by e-mail when Processing clicks Send. An insurer set up for another channel is refused with a message until the electronic channels are specified. | The electronic channels to insurers (file transfer or system-to-system) are not specified (Q06). | Specify the insurer channels or confirm e-mail only (Q06). |
 | CLR-NB-18 | Hold cover request (BRNB.072; FR-NB-082, 083) | The request is sent when Processing clicks Request Hold Cover. At expiry without a policy BIBS raises an alert. | Which accounts need an automatic request, and the outcome at expiry, are not given (Q27). | Name the accounts that need an automatic request and the outcome at expiry (Q27). |
-| CLR-NB-19 | E-policy receipt (BRNB.073; FR-NB-100) | E-policies are uploaded by Processing. Automatic reading of an insurer mailbox or SFTP folder is added when specified. | The insurer channels for e-policies are not specified (Q31, Q12). | Specify the e-policy channels or confirm the upload (Q31). |
+| CLR-NB-19 | E-policy receipt (BRNB.073; FR-NB-100) | E-policies are uploaded by Processing. Automatic reading of an insurer mailbox or file transfer folder is added when specified. | The insurer channels for e-policies are not specified (Q31, Q12). | Specify the e-policy channels or confirm the upload (Q31). |
 | CLR-NB-20 | Production reports (BRNB.075; FR-NB-122) | Production is shown per region, department, team and officer; the Placement Summary replaces the QPS Placement Report. | "Per system" is read as per officer; QPS reports end with the migration (OOS-2); the sales hierarchy and targets are not given (Q41). | Confirm the grouping and provide the sales hierarchy and targets (Q41). |
 | CLR-NB-21 | Workload allocation (BRNB.080; FR-NB-011) | Work is claimed by a user or assigned by a team lead; there is no automatic allocation. | The BRD does not define an allocation rule. | Confirm manual claim and assignment. |
 | CLR-NB-22 | Delete lists of values (BRNB.083; FR-NB-132) | A list value is deactivated, never deleted, so older records keep their labels. | Records keep their meaning over time. | Confirm deactivation in place of delete. |

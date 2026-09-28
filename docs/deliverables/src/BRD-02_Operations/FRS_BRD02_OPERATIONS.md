@@ -77,7 +77,7 @@ Operations takes over every invoice booked in New Business (BRD-1) and follows i
 **Out of scope for this phase:**
 
 - The Collection system, the Disbursement system and the Accounting (GL mapping) specification. BRD-4 Collections and BRD-5 Accounting, Disbursement and Accounting Controls answer these questions; until they are in place Operations uses the uploads and the Disbursement queue described in section 7 (OQ01, OQ02, OQ07).
-- External transports (SFTP, system-to-system links, shared drive folders) to insurers, BDO bank channels and the Marketing and Claims systems. Files are uploaded and sent by e-mail in this phase (OQ17, OQ22, OQ29).
+- Electronic transfers (file transfer, system-to-system interfaces, shared drive folders) to insurers, BDO bank channels and the Marketing and Claims systems. Files are uploaded and sent by e-mail in this phase (OQ17, OQ22, OQ29).
 - The payout of incentives to branches. Operations computes and posts them and hands the pass-on to Disbursement (CMRID.006, OQ39).
 
 ## References
@@ -382,7 +382,7 @@ alternate_flows:
   - No Operations section for the role. The home shows "No Operations section is assigned to your role".
 rules:
   - [R1, "A card is shown only for the teams whose permissions the user holds.", Fixed, "-"]
-  - [R2, "External application links are list values labelled Name|https://url.", Configurable, LOV OPS_EXTERNAL_LINK]
+  - [R2, "External application links are list values holding the name and the web address of the application.", Configurable, LOV OPS_EXTERNAL_LINK]
 validations: []
 notifications:
   - "None."
@@ -414,7 +414,7 @@ preconditions:
 main_flow:
   - New Business books an invoice.
   - After the booking commits, BIBS copies it into the ledger with its components and BOOKED movements, payment status UNPAID and remittance status WITH_OUTSTANDING_BALANCE.
-  - Each later Operations action posts its movement and updates the balances and statuses in the same transaction.
+  - Each later Operations action posts its movement and updates the balances and statuses together with it.
 alternate_flows:
   - The copy fails. The booking is kept; the failure is a failed record of the feed Booked invoices from booking and raises the alert Interface run failed. An administrator replays the invoice, account or company from Interfaces (Replay Booked Invoices).
   - A direct payment invoice carries its PR and DTIP for information with payment and remittance status NOT_APPLICABLE; booking posts no PR for it.
@@ -430,7 +430,7 @@ validations:
 notifications:
   - Alert Interface run failed (NT-05) to the System Administrator when a copy fails.
 audit:
-  - Movements and status changes are append-only; each status change keeps the module and time.
+  - Movements and status changes are only added, never changed; each status change keeps the module and time.
 acceptance:
   - A booked invoice appears in Invoice Search with its components equal to the booking, status UNPAID and WITH_OUTSTANDING_BALANCE.
   - A payment applied to the invoice shows as an APPLIED movement with the AR number, date and amount per component.
@@ -959,7 +959,7 @@ preconditions:
 main_flow:
   - Pick-up requests reach the queue from the feed or by entry.
   - The cashier filters by pick-up date and selects the checks.
-  - The cashier clicks **Print ARs**. BIBS issues the ARs in one transaction and prints them.
+  - The cashier clicks **Print ARs**. BIBS issues the ARs together (all or nothing) and prints them.
 alternate_flows:
   - The cashier cancels a request that will not be picked up.
 rules:
@@ -2442,7 +2442,7 @@ alternate_flows:
   - Duplicate file. Refused; the attempt is recorded.
   - Layout wrong. Refused with the missing column.
 rules:
-  - [R1, "Upload by the handler; automatic pick-up from a mailbox or SFTP is added when BDOI specifies the insurer channels (OQ29).", Fixed, "-"]
+  - [R1, "Upload by the handler; automatic pick-up from a mailbox or file transfer folder is added when BDOI specifies the insurer channels (OQ29).", Fixed, "-"]
   - [R2, "Duplicate by file content (SHA-256).", Fixed, "-"]
 validations:
   - [Duplicate file, "Upload refused: <earlier upload>", RECON_UPLOAD_DUPLICATE]
@@ -2462,7 +2462,7 @@ acceptance:
 ```
 
 > [!NOTE] Difference from the BRD
-> PRCID.009 asks to receive and upload the insurer report automatically. Insurer channels are not specified (OQ29); the handler uploads the file; a mailbox or SFTP pick-up is added later without a change to the matching (chapter 21, CLR-OP-03).
+> PRCID.009 asks to receive and upload the insurer report automatically. Insurer channels are not specified (OQ29); the handler uploads the file; a mailbox or file transfer pick-up is added later without a change to the matching (chapter 21, CLR-OP-03).
 
 ```fr
 id: FR-OP-075
@@ -3303,7 +3303,7 @@ main_flow:
   - BIBS validates and maps each record through the module's handler.
   - BIBS records the run and its records and alerts on failure.
 rules:
-  - [R1, "Each record is taken in once; a record sent again is recognised by its reference.", Fixed, "-"]
+  - [R1, "A record is accepted only once.", Fixed, "-"]
   - [R2, "Schedules per feed (time and frequency, UTC).", Configurable, Interfaces]
 validations:
   - [Feed inactive, "Feed <code> is inactive", FLOW_IN_FEED_INACTIVE]
@@ -3585,7 +3585,7 @@ Figure 12 shows the interfaces of Operations. The modules exchange data only thr
 | Catalogue | In | Endorsement rating, commission rates, package limits | ADJID.008, 014 | IN SCOPE |
 | Placement payment gate | Out | Applications and pre-booked payments per ARN | CSHID.020 | IN SCOPE |
 | Accounting engine | Out | Business events of section 5.3 | CSHID.012-014; ADJID.011 | IN SCOPE |
-| E-mail outbox | Out | Protected register, schedule, billing; passwords separately | PRCID.007, 008; MKTID.001; CMRID.009 | IN SCOPE |
+| Outgoing e-mail | Out | Protected register, schedule, billing; passwords separately | PRCID.007, 008; MKTID.001; CMRID.009 | IN SCOPE |
 | INSURER_REMIT_OR | In (upload) | Insurer OR schedules | RMTID.012, 013 | IN SCOPE |
 | INSURER_PRODUCTION | In (upload) | Insurer production reports | PRCID.009, 022 | IN SCOPE |
 | INSURER_DP_RESPONSE | In (upload) | Insurer answers to DP billings | CMRID.009 | IN SCOPE |
@@ -3604,7 +3604,7 @@ Figure 12 shows the interfaces of Operations. The modules exchange data only thr
 SUPERSEDED means an upload or queue in Operations that BRD-4 Collections or BRD-5 Accounting and Disbursement replaces. ON HOLD means the transfer waits for BDOI's specification (OQ17, OQ45, OQ46).
 
 > [!PARKED] Transfers on hold
-> Insurer SFTP / portal channels, BDO bank file transports (FS01 / FS04) and the shared drive are not specified in the BRD (OQ03, OQ17, OQ22, OQ29). Adding a transfer later changes none of the Operations screens.
+> Insurer file transfer and portal channels, BDO bank file transports (FS01 / FS04) and the shared drive are not specified in the BRD (OQ03, OQ17, OQ22, OQ29). Adding a transfer later changes none of the Operations screens.
 
 # Non-functional requirements
 
@@ -3617,11 +3617,11 @@ SUPERSEDED means an upload or queue in Operations that BRD-4 Collections or BRD-
 | Peak | 15th and 30th (Cashiering, Remittance); 1st-2nd week (Prod Recon); Q4 (Adjustment, Commission); 07:30-18:00 | Remittance extraction at 20:00 PHT and the minimal balance sweep at 04:00 PHT, outside the peak hours; the other jobs in section 9.3 |
 | Availability | 99.9%; use 07:00-18:30 (07:30-18:00 Adjustment / Commission); maintenance per bank standard | Same deployment as BRD-1 (window 07:00-22:00 governs, OQ44) |
 | Recovery | RTO 4 hours, RPO 24 hours | Platform backup and recovery; one BIBS-wide NFR set being agreed (XQ08) |
-| Retention | Application data, audit logs and history 5 years online, 15 years archive; backup every 4 hours kept 7 years | BRD-1 retention framework with backup retention 7 years |
+| Retention | Application, system and audit logs and history 5 years online, 15 years archive; backup every 4 hours kept 7 years | BRD-1 retention framework with backup retention 7 years |
 | Anonymisation | No | None |
 | Devices | Same performance on mobile and desktop | Responsive screens |
 | Security | Authorised users only; protected files | Role-based access, four-eyes rules, protected e-mails (FR-OP-002, 013, 035) |
-| Audit | All actions logged | Append-only audit, workflow history, ledger movements (FR-OP-004, 024) |
+| Audit | All actions logged | Audit trail, workflow history and ledger movements that no user can change (FR-OP-004, 024) |
 
 # Configuration items owned by the System Administrator
 
@@ -3669,7 +3669,7 @@ The items below are changed in BIBS without a release. Changes to parameters and
 | CANCELLATION_REASON | The 33 reasons of Annex V (shared with BRD-1) |
 | ADJ_RETURN_REASON | Not qualified for posting; Incomplete supporting documents; Incorrect request details; Incorrect amounts; Duplicate request; Others |
 | INCENTIVE_EXCLUSION_RULE | Negative production amounts; Erroneous bookings |
-| OPS_EXTERNAL_LINK | Empty; links "Name|https://url" added by the administrator |
+| OPS_EXTERNAL_LINK | Empty; links (name and web address) added by the administrator |
 
 ## Jobs
 
@@ -4276,7 +4276,7 @@ The table lists each point where the proposed screen or rule differs from the BR
 |---|---|---|---|---|
 | CLR-OP-01 | Operations sections (BRQID.003; FR-OP-003) | The Operations sections are filtered by role; a personal pin or hide of sections is not proposed. | The role filter shows each user only the sections of the user's work. | Confirm the role filter, or ask for personal pin and hide. |
 | CLR-OP-02 | Lock while with Comptrollership (RMTID.040; FR-OP-006) | Remittance and Adjustment lock the invoice while they work on it; a Comptrollership lock is added when BDOI names the activity. | The Comptrollership activity that should lock the invoice is not named (OQ28). | Name the Comptrollership activity (OQ28). |
-| CLR-OP-03 | Insurer production report (PRCID.009; FR-OP-074) | The handler uploads the insurer file; a mailbox or SFTP pick-up is added when the insurer channels are specified. | The insurer channels are not specified (OQ29). | Specify the insurer channels (OQ29), or confirm the upload. |
+| CLR-OP-03 | Insurer production report (PRCID.009; FR-OP-074) | The handler uploads the insurer file; a mailbox or file transfer pick-up is added when the insurer channels are specified. | The insurer channels are not specified (OQ29). | Specify the insurer channels (OQ29), or confirm the upload. |
 | CLR-OP-04 | Schedule to Marketing (MKTID.001; FR-OP-110) | The Remittance processor sends the approved schedule from the batch, once. | The BRD has Marketing initiate the request (OQ22). | Confirm that the processor sends the schedule. |
 | CLR-OP-05 | Edit of the extracted file (RMTID.002; FR-OP-032) | Rows of the extract are excluded and restored with a reason; financial fields cannot be edited. | The addendum (p.4) governs over the main BRD, which allowed online edits. | Confirm exclusion in place of edits. |
 | CLR-OP-06 | Receipt cancellation and reinstatement (CSHID.001-005; FR-OP-014) | A cancellation or reinstatement is a request approved by a Cashiering TL / TH (four eyes) before it posts. | The BRD does not name an approver (OQ06). | Confirm the Cashiering TL / TH approval (OQ06). |

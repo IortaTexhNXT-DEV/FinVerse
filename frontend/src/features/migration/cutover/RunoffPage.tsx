@@ -20,6 +20,7 @@ import { MigStatus } from '../common/MigStatus';
 import { MIG_SECTION } from '../common/migrationCodes';
 import { itemActions } from './cutoverActions';
 import '../migration.css';
+import { UserName } from '@/components/ui/UserName';
 
 const SYSTEMS = ['EBIX', 'QPS', 'ISYS', 'CMS'];
 
@@ -95,7 +96,15 @@ export default function RunoffPage() {
       render: (i) => (
         <CellStack
           main={i.evidence ?? ''}
-          sub={i.signedBy === undefined ? '' : `${i.signedBy}, ${formatDateTime(i.signedAt)}`}
+          sub={
+            i.signedBy === undefined ? (
+              ''
+            ) : (
+              <>
+                <UserName login={i.signedBy} />, {formatDateTime(i.signedAt)}
+              </>
+            )
+          }
         />
       ),
     },

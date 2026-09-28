@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.migration.archive.api;
 
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.migration.archive.api.dto.InquiryDtos.AccessLogResponse;
 import com.iortatechnxt.brokerverse.migration.archive.api.dto.InquiryDtos.RecordDetail;
 import com.iortatechnxt.brokerverse.migration.archive.api.dto.InquiryDtos.RecordSummary;
@@ -48,16 +49,20 @@ public class LegacyInquiryController {
 
   private final LegacyInquiryService inquiry;
   private final FileDownloads downloads;
+  private final LovService lov;
 
   /**
    * Creates the controller.
    *
    * @param inquiry inquiry
    * @param downloads file responses
+   * @param lov lists (labels of the legacy record types and statuses)
    */
-  public LegacyInquiryController(LegacyInquiryService inquiry, FileDownloads downloads) {
+  public LegacyInquiryController(
+      LegacyInquiryService inquiry, FileDownloads downloads, LovService lov) {
     this.inquiry = inquiry;
     this.downloads = downloads;
+    this.lov = lov;
   }
 
   /**
@@ -149,7 +154,7 @@ public class LegacyInquiryController {
       rows.add(
           List.of(
               r.getSourceSystem(),
-              r.getRecordType(),
+              lov.label("LEGACY_RECORD_TYPE", r.getRecordType()),
               r.getLegacyKey(),
               Objects.toString(r.getClientKey(), ""),
               Objects.toString(r.getClientName(), ""),
@@ -160,6 +165,7 @@ public class LegacyInquiryController {
               r.getDocumentDate().toString(),
               Objects.toString(r.getCurrency(), ""),
               r.getAmount() == null ? "" : r.getAmount().toPlainString(),
+              Objects.toString(lov.label("LEGACY_RECORD_STATUS", r.getStatus()), ""),
               Objects.toString(r.getStatus(), ""),
               r.getSummary().entrySet().stream()
                   .map(e -> e.getKey() + ": " + e.getValue())
@@ -182,6 +188,7 @@ public class LegacyInquiryController {
               "Currency",
               "Amount",
               "Status",
+              "Status stored in legacy",
               "Legacy details"),
           rows);
       return downloads.respond(

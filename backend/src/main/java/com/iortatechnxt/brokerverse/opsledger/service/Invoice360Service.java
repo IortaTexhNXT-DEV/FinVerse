@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceStatusChange;
 import com.iortatechnxt.brokerverse.opsledger.service.port.InvoiceRelatedItems;
 import com.iortatechnxt.brokerverse.opsledger.service.port.InvoiceRelatedItems.RelatedItem;
 import com.iortatechnxt.brokerverse.opsledger.service.port.InvoiceRelatedItems.Section;
+import com.iortatechnxt.brokerverse.workflow.domain.WorkCaseRepository;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -28,10 +29,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class Invoice360Service {
 
+  /** Work item type of an account (NB_ACCOUNT workflow). */
+  private static final String ACCOUNT = "Account";
+
   private final InvoiceLedgerQueryService ledger;
   private final BookingQueryService bookings;
   private final List<InvoiceRelatedItems> related;
   private final OpsInvoiceOriginSnapshotRepository snapshots;
+  private final WorkCaseRepository workCases;
 
   /**
    * Creates the service.
@@ -40,21 +45,26 @@ public class Invoice360Service {
    * @param bookings booked invoices
    * @param related the modules' related records
    * @param snapshots origin snapshots of legacy invoices
+   * @param workCases work items (the account's workflow panel)
    */
   public Invoice360Service(
       InvoiceLedgerQueryService ledger,
       BookingQueryService bookings,
       List<InvoiceRelatedItems> related,
-      OpsInvoiceOriginSnapshotRepository snapshots) {
+      OpsInvoiceOriginSnapshotRepository snapshots,
+      WorkCaseRepository workCases) {
     this.ledger = ledger;
     this.bookings = bookings;
     this.related = related;
     this.snapshots = snapshots;
+    this.workCases = workCases;
   }
 
   /**
    * The 360 view of an invoice. A legacy invoice has no booking in BIBS: its booking references are
-   * empty and the view carries the legacy snapshot instead (DATA_MIGRATION_DESIGN 14.1).
+   * empty and the view carries the legacy snapshot instead (DATA_MIGRATION_DESIGN 14.1). Its
+   * account, imported from legacy, has no account workflow, so the view says whether the account
+   * has a work item and the screen shows the workflow panel only then.
    *
    * @param invoiceNo invoice number
    * @return view
@@ -81,7 +91,13 @@ public class Invoice360Service {
         ledger.history(invoiceNo),
         ledger.adjustmentTotal(original).orElse(null),
         relatedItems(invoiceNo),
-        snapshot);
+        snapshot,
+        hasAccountWorkflow(invoice.getAccountId()));
+  }
+
+  private boolean hasAccountWorkflow(Long accountId) {
+    return accountId != null
+        && workCases.findByEntityTypeAndEntityId(ACCOUNT, accountId.toString()).isPresent();
   }
 
   private Map<Section, List<RelatedItem>> relatedItems(String invoiceNo) {
@@ -120,6 +136,8 @@ public class Invoice360Service {
    * @param adjustments cumulative adjustments of the original invoice, null when none
    * @param related records of the Operations modules by section
    * @param origin frozen original values of a legacy invoice, null for BIBS invoices
+   * @param accountWorkflow whether the invoice's account has a work item (none for an account
+   *     imported from legacy)
    */
   public record Invoice360(
       OpsInvoice invoice,
@@ -128,5 +146,6 @@ public class Invoice360Service {
       List<OpsInvoiceStatusChange> history,
       OpsInvoiceAdjustmentTotal adjustments,
       Map<Section, List<RelatedItem>> related,
-      OpsInvoiceOriginSnapshot origin) {}
+      OpsInvoiceOriginSnapshot origin,
+      boolean accountWorkflow) {}
 }

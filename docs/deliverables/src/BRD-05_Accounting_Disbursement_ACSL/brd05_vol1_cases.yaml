@@ -66,7 +66,7 @@ screens:
   JOBS: Setup & Administration > Administration > Scheduled Jobs
   APPROVALS: My Approvals (home section)
   ALERTS: Alerts (home section and bell icon in the page header)
-  API: Direct request outside the screens, signed in as the persona (test lead tool)
+  SYS: System function check outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-AC-01
@@ -574,7 +574,7 @@ frs:
       - c: 3
         type: Security-access
         persona: FRBS_TL
-        screen: API
+        screen: SYS
         title: Another user's batch
         steps:
           - As gltl, send a direct request to open glofficer's report batch.
@@ -603,7 +603,7 @@ frs:
         expected: The PDF is Legal portrait; columns that do not fit continue on the following pages.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Unknown paper size falls back to A4
         steps:
           - Call the PDF export with paper=B5.
@@ -726,7 +726,7 @@ frs:
         expected: The valid voucher becomes a draft journal; the invalid one is reported with its reason.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: SYSTEM journal entered by hand
         steps:
           - Send a direct request to create a journal of type SYSTEM.
@@ -877,7 +877,7 @@ frs:
       - c: 1
         type: Positive
         title: Ten journals of which one is unbalanced
-        pre: Ten submitted journals, one made unbalanced by the test lead in the database.
+        pre: Ten submitted journals, one made unbalanced by the test lead in the test environment.
         steps:
           - Select the ten journals and click Post.
         expected: Nine are POSTED; the result lists the refused one with its reason.
@@ -913,7 +913,7 @@ frs:
         msg: ["Journal total {100000.01} exceeds your authorization limit {100000.00}", AUTHORIZATION_LIMIT_EXCEEDED]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Post a journal that is already posted
         steps:
           - Send a direct request to post a journal that is already POSTED.
@@ -1000,7 +1000,7 @@ frs:
         msg: ["{September 2026} already has a scheduled close", CLOSE_ALREADY_SCHEDULED]
       - c: 4
         type: Negative
-        screen: API
+        screen: SYS
         title: Period already closed
         steps:
           - Send a direct request to close a CLOSED period now.
@@ -1136,7 +1136,7 @@ frs:
         msg: ["No CLOSING rate for {USD}", RATE_NOT_FOUND]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Period of another company
         steps:
           - Send a direct request to save the revaluation with the period of another company.
@@ -1309,7 +1309,7 @@ frs:
         msg: ["Give the segment, the rate and the start date", SERVICE_FEE_RULE]
       - c: 4
         type: Negative
-        screen: API
+        screen: SYS
         title: Submit an approved run
         steps:
           - Send a direct request to submit an APPROVED run.
@@ -1659,7 +1659,7 @@ frs:
         msg: [The effective-to date is before the effective-from date, LOV_EFFECTIVITY_INVALID]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: System list
         steps:
           - Send a direct request to add a value to a list maintained by the system.
@@ -1716,7 +1716,7 @@ frs:
         msg: [Select at least one role, ACCESS_ROLES]
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Unknown role
         steps:
           - Raise MODIFY_ROLES with role FRBS_BOSS.
@@ -1806,7 +1806,7 @@ frs:
         msg: [A request cannot be decided by the user who submitted it, ACCESS_FOUR_EYES]
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Approve a decided request
         steps:
           - Send a direct request to approve an APPROVED access request.

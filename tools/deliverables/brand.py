@@ -215,6 +215,24 @@ def src_dir(brd: str) -> Path:
     return SRC_DIR / brd_folder(brd)
 
 
+OWNER_CAPACITIES = ["Prepared by", "Input provided by", "Reviewed by", "Approved by"]
+
+
+def ownership(brd: str) -> dict:
+    """Who signs what in the sign-off set of a BRD (pack/ownership.yaml of its source folder: the roles of the BRD
+    approval sheet and the parts of the set each prepares, provides input to, reviews or approves); {} without one."""
+    import yaml  # noqa: PLC0415
+
+    path = src_dir(brd) / "pack" / "ownership.yaml"
+    return yaml.safe_load(path.read_text(encoding="utf-8")) if path.exists() else {}
+
+
+def owners_by_capacity(brd: str) -> dict[str, list[str]]:
+    """The roles of ownership(brd) per capacity of the approval sheet, in the order of OWNER_CAPACITIES."""
+    roles = ownership(brd).get("roles") or []
+    return {c: [r["role"] for r in roles if r.get("capacity") == c] for c in OWNER_CAPACITIES}
+
+
 def brd_of_code(code: str) -> str:
     """BRD-nn of a short code such as brd01 or BRD01 (or BRD-01 itself)."""
     digits = "".join(ch for ch in code if ch.isdigit())[:2]

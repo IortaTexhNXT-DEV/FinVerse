@@ -1,12 +1,33 @@
 # Configuration inputs the business provides for BRD-3 Product Maintenance (Drop 0, Setup and Data Migration).
-# Read by config_inputs.py: the FRS chapter "Configuration inputs the business provides" (```pack blocks) and the
-# workbook of input templates of the release set (one sheet per template, with the column descriptions and one
-# fictitious example row). The columns follow the fields of the screens (screens/*.yaml).
+# Read by docs/deliverables/src/signoff/config_inputs.py: the FRS chapter "Configuration inputs the business provides"
+# (```pack blocks) and the workbook of input templates of the release set (a Start here sheet with the templates in
+# the order they are filled in, one self-contained sheet per template with its guide band above the column headers
+# and one fictitious example row, the Reference lists and the Questions and comments sheets). The columns follow the
+# fields of the screens (screens/*.yaml).
 # Columns of a template: header | mandatory (Y, N or the condition) | format | what to enter | example
+# checks: the drop-down or check of a column in the workbook (header: spec), specs as in tools/deliverables/
+# guided_xlsx.py: yn, date, number[:min-max], whole[:min-max], text:max, list:LIST, code:CI-nn/Column (a code of a
+# template filled in before), ref:CI-nn/Column (codes of that template, several or mixed: guide and link only),
+# many:LIST (several codes of a list: guide and link only). depends: templates whose codes or list values the
+# template uses besides those of its checks. The fill-in order follows the dependencies.
+# lists: the lists of allowed values of the Reference lists sheet: values [code, label], or lov: a list of values
+# of the platform (its values as delivered; BDOI may add values, so a value outside the list only warns).
 meta:
   title: Configuration Input Templates
   workbook_name: Configuration Inputs
   due: "Drafts with the sign-off of this set; final content at the data migration map freeze (T-7)"
+lists:
+  MARKET_SEGMENT: {name: Market segment, lov: MARKET_SEGMENT}
+  PLACEMENT_GATE: {name: Placement after, values: [[PAID, Premium paid], [CLIENT_CONFIRMATION, Client confirmation]]}
+  TSU_REVIEW: {name: TSU review, values: [[BY_RULES, By the review rules], [ALWAYS, Always], [NEVER, Never]]}
+  CI02_RECORD: {name: Coverage and rule record, values: [[COVERAGE, Coverage or peril of a line], [FIELD_RULE, Field an account of the product needs], [DOCUMENT_RULE, Document an account of the product needs]]}
+  DOCUMENT_TYPE: {name: Document type, lov: DOCUMENT_TYPE}
+  CLAUSE_KIND: {name: Clause kind, lov: CLAUSE_KIND}
+  RATE_TABLE: {name: Rate table, values: [[TAX, Statutory charge or rating factor], [SHORT_PERIOD, Short-period table], [MOTOR_LIMIT, Motor BI / PD limit premium]]}
+  MAP_ACTION: {name: Package map action, values: [[MAP, Renew with the BIBS package version], [REJECT, Send the candidate to the Renewal Exception bucket]]}
+  PKG_DOCUMENT: {name: Package document template, values: [[PKG_REQUEST_FORM, Package Request Form], [PKG_QUOTATION_SLIP, Package quotation slip], [PKG_COMPARATIVE, Package comparative table], [PKG_SLIP, Package slip], [PKG_ADVISORY, Package advisory], [PKG_RENEWAL_ADVISORY, Package renewal advisory]]}
+  PM_LIST_OR_PARAMETER: {name: Product Maintenance list or parameter, lov_types: [PKG_REQUEST_REASON, PKG_RESPONSE_OUTCOME, PKG_ADVISORY_GROUP, PKG_NOT_PROCEEDED_REASON, PKG_REQUEST_TYPE, INCENTIVE_TYPE, COVERAGE_KIND, CLAUSE_KIND, DOCUMENT_TYPE, MARKET_SEGMENT], parameter_groups: [PRODUCT_MAINTENANCE]}
+  INCENTIVE_TYPE: {name: Incentive type, lov: INCENTIVE_TYPE}
 templates:
   - id: CI-01
     name: Product catalogue
@@ -15,6 +36,25 @@ templates:
     source: Legacy QPS and EBIX product lists, completed by MBS
     load: "Data migration object R05 (product lines, cover types, products) through the catalogue services, pending authorisation; after go-live on Products (SCR-PM-11)"
     frs: [FR-PM-010, FR-PM-012]
+    depends: [CI-09]
+    checks:
+      Line code: text:30
+      Cover type code: text:30
+      Parent cover type: code:CI-01/Cover type code
+      Risk code: text:20
+      Product name: text:200
+      Package: yn
+      Market segments: many:MARKET_SEGMENT
+      Placement after: list:PLACEMENT_GATE
+      TSU review: list:TSU_REVIEW
+      Default rate %: number:0-100
+      Default commission %: number:0-100
+      Minimum premium: number
+      Package TSI limit: number
+      Fleet: yn
+      Mortgage related: yn
+      Direct payment allowed: yn
+      Free First Year: yn
     columns:
       - "Line code | Y | Up to 30 capitals | Product line (level 1), for example MOTOR, PROPERTY | MOTOR"
       - "Line name | Y | Text | Name shown in the drop-downs | Motor"
@@ -46,6 +86,13 @@ templates:
     source: MBS and TSU (product matrix, PQ02)
     load: "Entered on Coverages & Clauses (SCR-PM-15) and on the rule tabs of Products (SCR-PM-11, SCR-PM-12) before UAT; not migrated"
     frs: [FR-PM-010, FR-PM-012, FR-PM-013]
+    depends: [CI-09]
+    checks:
+      Record: list:CI02_RECORD
+      Line code / Risk code: ref:CI-01/Risk code
+      Basic: yn
+      Document type: list:DOCUMENT_TYPE
+      Mandatory: yn
     columns:
       - "Record | Y | COVERAGE, FIELD_RULE or DOCUMENT_RULE | What the row defines | COVERAGE"
       - "Line code / Risk code | Y | Line or product the row applies to; * = every product | Scope of the row | MOTOR"
@@ -63,9 +110,13 @@ templates:
     source: Current package slips and insurer wordings
     load: "Entered on Coverages & Clauses › Clause Library (SCR-PM-15); not migrated"
     frs: [FR-PM-011]
+    depends: [CI-09]
+    checks:
+      Kind: list:CLAUSE_KIND
+      Line code: code:CI-01/Line code
     columns:
       - "Clause code | Y | A-Z, 0-9 and _ | Unique code | FLEET_REPAIR"
-      - "Kind | Y | Warranty, Clause, Exclusion, Deductible wording | List CLAUSE_KIND | Clause"
+      - "Kind | Y | WARRANTY, CLAUSE, EXCLUSION or DEDUCTIBLE_WORDING | Code of the list CLAUSE_KIND | CLAUSE"
       - "Line code | N | Line code; blank = every line | Lines the clause is offered for | MOTOR"
       - "Title | Y | Text | Title shown in the pickers | Accredited repair shops for fleets"
       - "Wording | Y | Full text | Wording printed on the package documents | Repairs are made at the accredited shops of the insurer..."
@@ -77,6 +128,11 @@ templates:
     source: BIR and LGU rates; current rating tables
     load: "Entered on Rates & Taxes (SCR-PM-19), pending authorisation; not migrated (effective-dated from go-live)"
     frs: [FR-PM-051]
+    checks:
+      Table: list:RATE_TABLE
+      Line code: code:CI-01/Line code
+      Rate %: number:0-100
+      Months covered: whole:1-12
     columns:
       - "Table | Y | TAX, SHORT_PERIOD or MOTOR_LIMIT | Table of the row | TAX"
       - "Rate | Cond.: TAX | DST, premium tax, VAT, fire service tax, motor factors | Charge or factor | DST"
@@ -93,6 +149,10 @@ templates:
     source: Legacy QPS and EBIX insurer masters
     load: "Data migration objects R04 (insurers, branches, business partners) and R07 (commission rates); after go-live on Insurers (SCR-PM-17, SCR-PM-18)"
     frs: [FR-PM-014]
+    checks:
+      Credit days: whole:0-365
+      LGT %: number:0-100
+      Commission product / Commission % / From / To: ref:CI-01/Risk code
     columns:
       - "Partner code | Y | INS- followed by capitals | Insurer code; unique | INS-MGIC"
       - "Name / Short name | Y (name) | Text | Registered and short name | Mabuhay General Insurance Corp."
@@ -111,6 +171,11 @@ templates:
     source: Signed package slips and ManCom sign-offs in force
     load: "Not migrated: TSU raises a package request per package (type New package, or Update for an existing risk code) and MBS sets up and validates the version before the map freeze; the Package Request Form accepts the same fields"
     frs: [FR-PM-020, FR-PM-042, FR-PM-050]
+    checks:
+      Risk code: code:CI-01/Risk code
+      Coverage code / Included / Optional / Limit / Deductible: ref:CI-02/Code or field key
+      Insurer code / Role / Share % / Rate % / Minimum premium: ref:CI-05/Partner code
+      "Insurer terms: insurer / coverage / limit / deductible / clauses": ref:CI-03/Clause code
     columns:
       - "Risk code | Y | Code of CI-01 | Package product | MTR30"
       - "Package name / Scope / Client code | Y (name, scope) | Text; Generic or Client-specific; client code | As on the Package Request Form | Motor Fleet Plus; Generic"
@@ -129,6 +194,11 @@ templates:
     source: QPS package list of the in-force policies expiring from go-live
     load: "Data migration object R06 (loaded as reference data and handed to the Renewal package map); new map versions until the map freeze (T-7), then maintained in Renewal"
     frs: [FR-PM-050, FR-PM-061]
+    checks:
+      "Qualifier: risk code": code:CI-01/Risk code
+      "Qualifier: insurer": code:CI-05/Partner code
+      BIBS risk code / BIBS version: ref:CI-06/Risk code
+      Action: list:MAP_ACTION
     columns:
       - "Legacy package code / Legacy version | Y | As stored in QPS | Package of the legacy policy headers | PKG-MOTOR-FLEET; 3"
       - "Legacy package name | N | Text | For reading only | Motor fleet package 2025"
@@ -145,6 +215,9 @@ templates:
     source: BDOI layouts of the current documents (Q03)
     load: "Entered on Document Templates (New Business set, SCR-NB-44) as a new template version effective from a date; not migrated"
     frs: [FR-PM-013]
+    checks:
+      Template: list:PKG_DOCUMENT
+      Effective from: date
     columns:
       - "Template | Y | PKG_REQUEST_FORM, PKG_QUOTATION_SLIP, PKG_COMPARATIVE, PKG_SLIP, PKG_ADVISORY, PKG_RENEWAL_ADVISORY | Template code | PKG_ADVISORY"
       - "Title | Y | Text | Title of the template version | Package advisory"
@@ -159,6 +232,10 @@ templates:
     source: Delivered values (FRS chapter 9) confirmed or changed by BDOI
     load: "Data migration object R01 for the values used by migrated records; the other values on Lists of Values and System Parameters"
     frs: [FR-PM-073, FR-PM-080]
+    checks:
+      List or parameter: list:PM_LIST_OR_PARAMETER
+      Value code: text:40
+      Effective from: date
     columns:
       - "List or parameter | Y | Code of the list or parameter | For example PKG_REQUEST_REASON, PKG_SLA_NEGOTIATION | PKG_REQUEST_REASON"
       - "Value code | Cond.: list | Up to 40 capitals | Code of the value | LOSS_EXPERIENCE"
@@ -172,10 +249,14 @@ templates:
     source: Current incentive programmes; the booking incentive rules copied into the catalogue
     load: "Entered on Incentive Criteria (SCR-PM-16), pending authorisation; the copied booking rules are reviewed there"
     frs: [FR-PM-080]
+    depends: [CI-09]
+    checks:
+      Incentive type: list:INCENTIVE_TYPE
+      "Products matrix: risk code / segment": ref:CI-01/Risk code
     columns:
       - "Code / Name | Y | A-Z, 0-9, _ and -; text | Criterion | CPC2; CPC2 campaign 2028"
       - "Incentive type | Y | List INCENTIVE_TYPE | Type of criterion | CAMPAIGN"
       - "Value basis / Value | Y (basis) | Rate (%), Fixed amount or Rule; number | Value of the criterion | Rate (%); 1.00"
-      - "Rule parameters | N | JSON | Parameters of a rule criterion | {\"minimumPremium\": 5000}"
+      - "Rule parameters | N | Parameter and value pairs separated by semicolons | Parameters of a rule criterion, as agreed with Comptrollership | Minimum premium 5000"
       - "Products matrix: risk code / segment | Y (one product) | Active risk codes; segment or blank | Products and segments the criterion applies to | MTR30; COMBANK"
       - "Effective from / to | Y (from) | dd-MMM-yyyy | Validity; no overlap with another row of the code | 01-Jan-2028"

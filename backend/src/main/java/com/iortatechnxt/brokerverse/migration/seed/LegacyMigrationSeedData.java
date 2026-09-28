@@ -14,7 +14,8 @@ import org.springframework.stereotype.Component;
 /**
  * Loads the SIT/UAT storyline of the data migration through the real pipeline (seed profile only,
  * idempotent; DATA_MIGRATION_DESIGN section 24): the seed extracts of {@code db/seed/migration/}
- * for the seed company, after the Operations and booking seed runners.
+ * for the seed company, after the Operations and booking seed runners, and an old legacy unapplied
+ * payment ready for the Unapplied to Income batches of Cashiering.
  */
 @Component
 @Profile("seed")
@@ -62,6 +63,9 @@ public class LegacyMigrationSeedData implements ApplicationRunner {
               if (!storyline.loaded(company.getId())) {
                 LOG.info("Migration seed storyline loaded: {}", storyline.run(company.getId()));
               }
+              storyline
+                  .loadOldUpp(company.getId())
+                  .ifPresent(b -> LOG.info("Old legacy unapplied payment loaded: {}", b));
               tabs.run(company.getId(), users::as);
             });
   }

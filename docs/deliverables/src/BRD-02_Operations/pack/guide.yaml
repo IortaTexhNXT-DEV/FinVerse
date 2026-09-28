@@ -130,9 +130,9 @@ caveats:
     handling: "Signed with this set; the Drop 2 release notes confirm any change since sign-off."
     example: "A new insurer layout for the production feedback agreed before Drop 2 is added as a delta."
   - topic: Integrations pending BDOI IT specifications
-    text: "Bank payment files, insurer SFTP transfers, the mail relay and the flow-in feeds depend on specifications from BDOI IT."
+    text: "Bank payment files, insurer file transfers, the mail relay and the flow-in feeds depend on specifications from BDOI IT."
     handling: "A file upload or download step until the specification arrives; the automatic transfer is then a change request. The technical detail is in the Technical Specification, reviewed by BDOI IT."
-    example: "Insurer ORs are uploaded from the insurer's file today; an automatic pick-up from the insurer's SFTP folder is added when the transport is agreed."
+    example: "Insurer ORs are uploaded from the insurer's file today; an automatic pick-up from the insurer's file transfer folder is added when the transport is agreed."
   - topic: Open questions and assumptions
     text: "Open questions of FRS section 10.3 follow the assumptions of section 10.1; chapter 21 lists the proposed rules and clarifications for confirmation."
     handling: "Answered as configuration where possible (lists of values, parameters, templates); otherwise a change request; the assumption stands until then."
@@ -148,7 +148,7 @@ exit:
   - "Every row of the workbook reviewed by its team (Accept, Change requested or Comment)."
   - "Every comments log item closed: answered, corrected in v2.1, or raised as a change request."
   - "Open questions closed or accepted as assumptions."
-  - "The sign-off certificate signed by the approvers of the Operations BRD and by BDOI IT for its parts."
+  - "The sign-off certificate signed by every signatory of the Who signs what matrix: prepared, input, reviewed and approved as on the Operations BRD approval sheet; the Product Owner approves the whole set."
 done:
   - "Signed certificate filed with the set; version history updated."
   - "Content frozen as signed; deltas listed in the Change Management Register with mandays."

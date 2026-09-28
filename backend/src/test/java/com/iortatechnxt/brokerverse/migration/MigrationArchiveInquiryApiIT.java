@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.common.util.Sha256;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
@@ -16,10 +17,14 @@ import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
+import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +51,7 @@ class MigrationArchiveInquiryApiIT {
           .getBytes(StandardCharsets.US_ASCII);
 
   @Autowired private Api api;
+  @Autowired private UserDisplayNames names;
   @Autowired private MockMvc mvc;
   @Autowired private UserDetailsService users;
   @Autowired private ObjectMapper json;
@@ -176,9 +182,27 @@ class MigrationArchiveInquiryApiIT {
             .getContentAsByteArray();
     assertThat(file).isEqualTo(PDF);
 
-    api.download(
-            "legacyaudit", INQUIRY + "/export?companyId=" + company + "&invoiceNo=I" + t + REASON)
-        .andExpect(status().isOk());
+    byte[] export =
+        api.download(
+                "legacyaudit",
+                INQUIRY + "/export?companyId=" + company + "&invoiceNo=I" + t + REASON)
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+    // The export shows the legacy status and record type in words, with the stored status beside.
+    try (XSSFWorkbook wb = new XSSFWorkbook(new ByteArrayInputStream(export))) {
+      Row header = wb.getSheetAt(0).getRow(0);
+      Row first = wb.getSheetAt(0).getRow(1);
+      List<String> heads = new ArrayList<>();
+      header.forEach(c -> heads.add(c.getStringCellValue()));
+      assertThat(first.getCell(heads.indexOf("Record type")).getStringCellValue())
+          .isEqualTo("Invoice");
+      assertThat(first.getCell(heads.indexOf("Status")).getStringCellValue())
+          .isEqualTo("Fully paid");
+      assertThat(first.getCell(heads.indexOf("Status stored in legacy")).getStringCellValue())
+          .isEqualTo("PAID");
+    }
     api.doGet("legacyaudit", INQUIRY + "/access-log?companyId=" + company)
         .andExpect(status().isForbidden());
 
@@ -196,7 +220,9 @@ class MigrationArchiveInquiryApiIT {
         as.run(
             "legacyrev",
             () -> reports.run("MIG-ACCESS-LOG", Map.of("companyId", String.valueOf(company))));
-    assertThat(report.rows()).anyMatch(r -> "legacyaudit".equals(r.cells().get("username")));
+    // The report names the user, never the login id.
+    String auditor = names.displayName("legacyaudit");
+    assertThat(report.rows()).anyMatch(r -> auditor.equals(r.cells().get("username")));
   }
 
   @Test

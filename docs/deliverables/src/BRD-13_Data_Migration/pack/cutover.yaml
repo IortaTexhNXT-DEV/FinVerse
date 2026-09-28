@@ -14,7 +14,7 @@ roles:
   - [MKT, Marketing (Retail and Corporate), BDOI]
   - [RNW, "Renewal processing team (makers and checkers; Head of the Renewal processing team)", BDOI]
   - [CMP, Compliance and Audit, BDOI]
-  - [BIT, "BDOI IT (legacy systems, extracts, network, SFTP)", BDOI]
+  - [BIT, "BDOI IT (legacy systems, extracts, network, secure file transfer)", BDOI]
   - [GNG, "Go / no-go board (Program Manager, heads of Operations, Comptrollership, Marketing, Compliance, IT; iorta Project Manager)", BDOI and iorta TechNXT]
   - [IPM, iorta TechNXT Project Manager, iorta TechNXT]
   - [IML, "iorta TechNXT Migration Lead (loads, reconciliation, Migration Console)", iorta TechNXT]
@@ -77,9 +77,9 @@ tasks:
   - ["CT-011", "A", "T-21", "", "Legacy December soft close - accruals and cut-offs, bank reconciliations, sub-ledger to GL reconciliations, known year-end adjustments posted - completed by 20 December 2027 (T-14)", "COMP", 56, "", "Soft-close checklist signed by the Head of Comptrollership on 20 Dec 2027", ""]
   - ["CT-012", "A", "T-20", "", "Legacy clean-up drives - UPP with no reference, invoices open more than 5 years, duplicate clients flagged in Trial migration 3, unmapped codes", "STW", 80, "", "Clean-up tracker; counts reduced against Trial migration 3 profiling", ""]
   - ["CT-013", "A", "T-20", "", "Renewal processing team ready for the January expiries - staffing plan for January (handlers, overtime, back-up) signed; BIBS Renewal training completed; day-1 priority queue worked on the Trial migration 4 and dress-rehearsal data; draft RA-sent file from the Excel trackers validated and its rejects reviewed (maker-checker)", "RNW", 16, "CT-009", "Staffing plan signed by the Head of the Renewal processing team; draft P03 validated; rejects corrected and approved", ""]
-  - ["CT-014", "A", "T-18", "", "SFTP drop or console upload path tested end to end from BDOI IT with a masked file; checksum verified", "BIT", 4, "CT-005", "Test extract accepted and purged", ""]
+  - ["CT-014", "A", "T-18", "", "Secure file drop or console upload path tested end to end from BDOI IT with a masked file; checksum verified", "BIT", 4, "CT-005", "Test extract accepted and purged", ""]
   - ["CT-015", "A", "T-15", "", "Go / no-go checkpoint GNG-1 (readiness to start the pre-load)", "GNG", 2, "CT-001, CT-004, CT-006, CT-007, CT-008, CT-013, CT-014", "Decision recorded in the console with the GNG-1 criteria", "GNG-1"]
-  - ["CT-016", "B", "T-14", "08:00", "Take a production database snapshot before the pre-load", "IDO", 1, "CT-015", "Snapshot ID recorded in the plan", ""]
+  - ["CT-016", "B", "T-14", "08:00", "Take a full backup (snapshot) of production before the pre-load", "IDO", 1, "CT-015", "Snapshot ID recorded in the plan", ""]
   - ["CT-017", "B", "T-14", "09:00", "Extract and send R01-R08 and R11 (current values; R06 is the package code map prepared by TSU) with control files", "BIT", 6, "CT-016", "Files received; intake checks passed (extract status CHECKED)", ""]
   - ["CT-018", "B", "T-14", "15:00", "Validate and load reference data R01-R08 (R06 into the Renewal package map); authorise CREATE values in each master", "IOP", 8, "CT-017", "Batches loaded; the Unmapped Legacy Codes report empty for R objects", ""]
   - ["CT-019", "B", "T-13", "", "Reconcile and sign off the reference objects (G5, G6)", "DML", 6, "CT-018", "the Sign-off Status report shows G6 for R01-R08", ""]
@@ -103,7 +103,7 @@ tasks:
   - ["CT-037", "C", "T-3", "22:15", "Final client delta (last changes of the day) extracted and loaded", "IOP", 2, "CT-036", "Last delta batch accepted", ""]
   - ["CT-038", "C", "T-3", "22:30", "Final extracts after the EOD - P01, P01S, P03 (the RA-sent file of the Renewal processing team), F01, F01S, F01C, F02, F03, F04, F06, R11 (final numbers), G01 preliminary December TB (version PROVISIONAL)", "BIT", 5, "CT-036, CT-033", "Every file and control file in the intake; SHA-256 recorded", ""]
   - ["CT-039", "C", "T-3", "23:30", "Comptrollership signs the preliminary December trial balance as the provisional opening - balanced per branch and currency, with the FY2027 result per branch and currency", "COMP", 2, "CT-035", "Signed TB totals and FY2027 result per branch and currency", ""]
-  - ["CT-040", "D", "T-2", "02:00", "Take the production database snapshot - the rollback point", "IDO", 1, "CT-037, CT-038", "Snapshot ID and restore test of the snapshot metadata recorded", "ROLLBACK POINT"]
+  - ["CT-040", "D", "T-2", "02:00", "Take the full backup (snapshot) of production - the rollback point", "IDO", 1, "CT-037, CT-038", "Snapshot ID and restore test of the snapshot metadata recorded", "ROLLBACK POINT"]
   - ["CT-041", "D", "T-2", "03:00", "Intake checks of all final extracts (checksum, layout, row count, control totals, hash totals)", "IOP", 1, "CT-040", "Every extract CHECKED; rejected files re-sent within 1 hour", ""]
   - ["CT-042", "D", "T-2", "04:00", "Validate P01 and P01S; resolve issues; approve load (G3, G4)", "IOP", 2, "CT-041", "Error rate within the master threshold; every expiry to 31-May-2028 present against the legacy in-force list; G4 signed by the Data Migration Lead", ""]
   - ["CT-043", "D", "T-2", "06:00", "Load policy headers P01; reconcile L1-L4", "IOP", 3, "CT-042", "the Reconciliation Summary report for P01 matched", ""]
@@ -138,7 +138,7 @@ tasks:
   - ["CT-072", "G", "T+1", "", "Issue triage twice a day (10:00 and 16:00) with Operations, Comptrollership, Renewal and iorta QA", "IQA", 1, "CT-070", "Issue log updated; severity agreed", ""]
   - ["CT-073", "G", "T+2", "", "First remittance extraction with legacy invoices for the main insurers; compare with the legacy remittance pattern", "OPS", 4, "CT-070", "Schedules show legacy invoice numbers; the remittance posts to DTIP - Legacy", ""]
   - ["CT-074", "G", "T+3", "", "First Collections worklist refresh with legacy invoices; collectors confirm carried promises and assignments", "OPS", 2, "CT-070", "Worklist counts agree with F03", ""]
-  - ["CT-075", "G", "T+5", "", "Staging purge - payloads and intake files of the signed-off production batches deleted within 5 days (staging purge job)", "IDO", 1, "CT-059", "No staging payload older than 5 days after sign-off; purge log", ""]
+  - ["CT-075", "G", "T+5", "", "Staging purge - staged records and intake files of the signed-off production batches deleted within 5 days (staging purge job)", "IDO", 1, "CT-059", "No staged record older than 5 days after sign-off; purge log", ""]
   - ["CT-076", "G", "T+7", "", "Week-1 review with the board - issues, volumes, performance, renewal queue, user feedback", "GNG", 2, "CT-071", "Minutes; actions", ""]
   - ["CT-077", "G", "T+10", "", "First daily Renewal extraction that creates new candidates - expiry 1-Jun-2028 on 13-Jan-2028; headers already extracted at go-live are skipped", "RNW", 1, "CT-062", "Candidates of 1-Jun-2028 created; no duplicate of a go-live candidate", ""]
   - ["CT-078", "G", "T+10", "", "First DPPR or PR2307 legacy reversal batch (if any) approved and posted", "COMP", 4, "CT-070", "Run report; legacy sub-ledgers reduced by the batch total", ""]
@@ -177,7 +177,7 @@ checkpoints:
       - Production environment, roles and PH-only access ready; masking off only in production
       - Legacy control accounts, Migration Clearing and the legacy accounting rules approved in production (DMQ18)
       - Code map versions for production approved
-      - Transfer path (SFTP or console) tested
+      - Transfer path (secure file drop or console) tested
       - December soft close on track for 20 December 2027
       - Renewal processing team ready - January staffing plan signed, training done, day-1 queue rehearsed
       - No open Critical issue of the migration or of a Day-1 module
@@ -229,7 +229,7 @@ rollback:
   - [RB-1, Stop, "The go / no-go board records NO-GO (or a failure before T 18:00 that the board judges unrecoverable). The Program Manager announces the rollback on the bridge.", GNG]
   - [RB-2, Lock BIBS, "Disable business logins to BIBS; stop the scheduled jobs (payment automatch, payment file uploads, Renewal extraction, e-mail dispatch).", IDO]
   - [RB-3, Capture, "If business transactions were keyed in BIBS after 08:00 on T, export them (receipts, applications, bookings) with the Cutover Runbook Status report and the Operations reports for re-keying in legacy.", IML]
-  - [RB-4, Restore, "Restore the production database to the rollback-point snapshot (CT-037); restore the object store for attachments of the same time; verify the restore (row counts of key tables, application start).", IDO]
+  - [RB-4, Restore, "Restore production to the rollback-point backup (CT-037); restore the stored attachments of the same time; verify the restore (record counts of the key records, application start).", IDO]
   - [RB-5, Reopen legacy, "Set EBIX, QPS and CMS back to read-write; lift the GL restriction; re-enable the legacy batch jobs; confirm the last legacy EOD is intact.", BIT]
   - [RB-6, Re-key, "Operations re-keys in legacy the transactions captured in RB-3, with the BIBS AR numbers voided in the receipt register.", OPS]
   - [RB-7, Communicate, "Send the rollback notice to users, branches, insurers and bank channels (communication plan item 7).", PM]
@@ -279,7 +279,7 @@ decommissioning:
     - No open item needs the system - no open legacy invoice or legacy UPP needs an EBIX document; the legacy context in BIBS may still be open
     - Claims tail covered - no open claim that needs EBIX (DMQ27, DMQ30)
     - Access logs archived - read-only access logs exported to the archive
-    - Retention covered - database backup retained per the retention decision (DMQ27); retention obligations covered (5 years online, 15 years archive, umbrella p.45)
+    - Retention covered - production backup retained per the retention decision (DMQ27); retention obligations covered (5 years online, 15 years archive, umbrella p.45)
     - Owners signed - EBIX system owner, Compliance and Comptrollership
   QPS:
     - Final extracts reconciled - C01, P01, P03 and the R objects signed off
@@ -287,7 +287,7 @@ decommissioning:
     - Archive reconciled - archive objects of QPS loaded and reconciled
     - Legacy Inquiry verified - by Audit / Compliance
     - Access logs archived - read-only access logs exported to the archive
-    - Retention covered - database backup retained per DMQ27
+    - Retention covered - production backup retained per DMQ27
     - Owners signed - QPS system owner, Compliance and the Heads of Marketing
   ISYS:
     - No open item needs the system - claims and ACSL reports and the Marketing Diary replaced by BIBS reports

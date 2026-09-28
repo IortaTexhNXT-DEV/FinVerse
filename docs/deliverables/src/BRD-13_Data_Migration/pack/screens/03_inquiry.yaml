@@ -64,7 +64,7 @@ screens:
     actions:
       - "[Filters] | Compliance reviewer | Always | Narrows the log | - | -"
     rules:
-      - "The access log is append-only: no entry can be changed or deleted (FR-DM-111)."
+      - "No entry of the access log can be changed or deleted (FR-DM-111)."
       - "The reviewers receive a monthly digest of the log (FR-DM-111)."
     outcome: Compliance sees who looked at which legacy records, when and why.
     frs: [FR-DM-111]

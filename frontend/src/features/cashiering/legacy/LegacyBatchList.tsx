@@ -18,11 +18,14 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import type { BatchScreen } from './batchScreens';
 import { approvers } from './batchScreens';
+import { UserName } from '@/components/ui/UserName';
+import { useDisplayName } from '@/components/ui/useDisplayName';
 
 /** The batches of one legacy batch screen, newest first, with the way to open a new one. */
 export function LegacyBatchList({ screen }: Readonly<{ screen: BatchScreen }>) {
   const companyId = useCompanyId();
   const { can } = useAuth();
+  const name = useDisplayName();
   const navigate = useNavigate();
   const [creating, setCreating] = useState(false);
   const list = useQuery({
@@ -73,7 +76,9 @@ export function LegacyBatchList({ screen }: Readonly<{ screen: BatchScreen }>) {
             {
               key: 'people',
               header: 'Requested / Approved',
-              render: (b) => <CellStack main={b.createdBy} sub={approvers(b)} />,
+              render: (b) => (
+                <CellStack main={<UserName login={b.createdBy} />} sub={approvers(b, name)} />
+              ),
             },
             {
               key: 'posted',

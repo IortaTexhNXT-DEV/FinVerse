@@ -70,7 +70,7 @@ The roles-and-access sheet checks each Operations action against the roles that 
 ## Out of scope
 
 - The Collection system, the Disbursement system and the GL mapping specification (OQ01, OQ02, OQ07). BRD-4 and BRD-5 test plans cover their replacements; this plan tests the hand-offs, extracts and the in-app Disbursement queue that stand in until then.
-- External transports (SFTP, system-to-system links, shared drive folders) to insurers, BDO bank channels and the Marketing and Claims systems (OQ17, OQ22, OQ29). Files are uploaded by hand and sent by e-mail in this phase, and the cases test that route.
+- Electronic transfers (file transfer, system-to-system interfaces, shared drive folders) to insurers, BDO bank channels and the Marketing and Claims systems (OQ17, OQ22, OQ29). Files are uploaded by hand and sent by e-mail in this phase, and the cases test that route.
 - Payout of incentives to branches (CMRID.006, OQ39). The cases stop at the posted incentive and the Disbursement hand-off.
 - Maintenance of products and incentive criteria (BRD-3), booking of new accounts (BRD-1) and renewal (BRD-6). This plan uses booked invoices as given.
 - Performance and volume testing (deliverable 28).
@@ -111,7 +111,7 @@ The roles-and-access sheet checks each Operations action against the roles that 
 | Positive | The normal flow succeeds with valid data |
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit |
-| Security-access | Screens, buttons and requests made outside the screens are open only to the roles that hold the permission; four-eyes rules |
+| Security-access | Screens, buttons and system functions are open only to the roles that hold the permission; four-eyes rules |
 | Workflow | A stage transition, approval, return or closure of a receipt, batch, request, cycle, billing or payment request |
 | Report-output | Reports, registers, schedules and exports; content checked against the screen |
 | Upload-download | Payment files, insurer files, DP lists, registers, slips and protected e-mails |
@@ -240,7 +240,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 | Production GL accounts of the Operations events are not yet given (OQ07) | High | SIT uses the seed accounting rules; UAT waits for the Comptrollership accounts (entry criterion) |
 | The Collection and Disbursement systems are not known (OQ01, OQ02) | Medium | The cases test the in-app queue and hand-off extracts; interface cases are added when the systems are named |
 | Test mailboxes or the e-mail relay not reachable from SIT or UAT | High | Check the relay before the cycle; e-mail cases read the Outbound Messages log when the mailbox is down and are re-run later |
-| Time-based cases (hold expiry, 10 working-day SLA, monthly schedules, holidays, check clearing) need the clock to pass | Medium | The test lead sets the business date of the test environment or starts the scheduled runs by hand, as the preconditions describe |
+| Time-based cases (hold expiry, 10 working-day SLA, monthly schedules, holidays, check clearing) need the clock to pass | Medium | The test lead moves dates in the test environment or runs the jobs by hand, as the preconditions describe |
 | Payment files and insurer feedback in BDOI's volumes are not tested before UAT | Medium | System test uses the files of TD-OP-08; UAT includes one file per type in the expected daily or monthly volume |
 | BDOI testers are not available in the UAT window | High | Agree named testers per team and dates in the UAT plan (deliverable 30) before UAT starts |
 

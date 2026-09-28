@@ -108,7 +108,7 @@ The roles-and-access sheet checks each Submitted Policies action against the rol
 | Positive | The normal flow succeeds with valid data |
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit |
-| Security-access | Screens, buttons and API calls are open only to the roles that hold the permission and to the user's scope; preparer and maker rules |
+| Security-access | Screens, buttons and system functions are open only to the roles that hold the permission and to the user's scope; preparer and maker rules |
 | Workflow | A status change of a masterlist record (SBM_POLICY), an IAAF, a TOR, a rule set or a handling-fee record |
 | Report-output | Reports, extracts, print batches; content checked against the screen |
 | Upload-download | Source files, policy documents, legacy masterlists, IAAF and TOR PDFs |
@@ -230,7 +230,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 | The Renewal module is not available when Submitted Policies is tested | High | Test the pending hand-off (TC-SP-060.3-01); re-run the renewal cases of SC-SP-07 when the Renewal module is available |
 | Source layouts and legacy masterlist layouts are not supplied (SP SQ01, SQ02) | High | Test with the draft templates; re-run the intake and migration cases on the BDOI layouts |
 | Real borrower data reaches a test environment through an unmasked file | High | The test lead masks every source file before upload and checks the masterlist after each intake |
-| Date-based cases (lead days, acceptance days, hold cover end) need the clock to pass | Medium | The test lead sets expiry and request dates in the test database and runs the jobs on demand |
+| Date-based cases (lead days, acceptance days, hold cover end) need the clock to pass | Medium | The test lead sets expiry and request dates in the test environment and runs the jobs on demand |
 | BDOI testers from several teams and segments are not available at the same time | High | Agree named testers per segment and role in the UAT plan (deliverable 30) |
 
 <!-- pagebreak -->

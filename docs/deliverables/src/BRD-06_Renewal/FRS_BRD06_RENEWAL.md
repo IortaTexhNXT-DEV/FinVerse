@@ -430,10 +430,10 @@ preconditions:
   - "None."
 main_flow:
   - A user or a job performs an action on a candidate.
-  - BIBS writes the history row and the audit row (who, when, what, source, before and after values) in the same transaction.
+  - BIBS writes the history row and the audit row (who, when, what, source, before and after values) together with the change; one is never kept without the other.
   - A user opens the History tab and reads the trail.
 rules:
-  - [R1, "Audit and history rows are append-only; no user can change or delete them.", Fixed, "-"]
+  - [R1, "Audit and history entries can only be added; no user can change or delete them.", Fixed, "-"]
   - [R2, "System actions are recorded with the job or rule that made them (for example matrix version and rule id).", Fixed, "-"]
 validations: []
 notifications:
@@ -1890,7 +1890,7 @@ alternate_flows:
   - Manual response. For a single account the user records the response on the Insurer tab.
   - Mismatch. The row is kept as an exception; the account stays WITH_INSURER in Exception until the file is corrected or an override is recorded (FR-RN-051).
 rules:
-  - [R1, "Responses are append-only; the latest valid response drives the account.", Fixed, "-"]
+  - [R1, "Responses are only added, never changed; the latest valid response drives the account.", Fixed, "-"]
   - [R2, "Response codes: Renew As Is, Revise, Reject (layout and codes RQ15).", Configurable, LOV RNW_INSURER_RESPONSE; bulk template]
   - [R3, "A response received after the reply due date is late and blocks STP.", Fixed, "-"]
 validations:
@@ -2393,7 +2393,7 @@ main_flow:
   - A checker compares it with the active version and activates it with an effective date.
 rules:
   - [R1, "Lead days must be configurable, never hard-coded (BRRN.030 AC2).", Fixed, "-"]
-  - [R2, "A bucket rule can never map a failed check to Clean (database and service guard).", Fixed, "-"]
+  - [R2, "A bucket rule can never map a failed check to Clean (checked whenever a rule is saved and whenever it is applied).", Fixed, "-"]
 validations:
   - [Rule maps a failure to Clean, A failed check cannot give the Clean bucket, To be confirmed]
   - [Activation by the maker, A version is activated by someone other than its maker, To be confirmed]
@@ -2655,8 +2655,8 @@ Figure 6 shows the interfaces of Renewal. Renewal reads the expiring population 
 | Claims (BRD-7) | In | Claims summary per ARN and policy year (decision D4) | BRRN.027, 031, 034 | IN SCOPE |
 | Client master | In | KYC review date | BRRN.028 | IN SCOPE |
 | Submitted Policies (BRD-12) | In | Renewal hand-off; status query back | Decision D2 | IN SCOPE |
-| E-mail outbox | Out | Protected RA, letters, insurer extract; send log | BRRN.010; BRD 3.009.5 | IN SCOPE |
-| Insurers | In | Response file by upload; no insurer API or SFTP | BRD 3.009.6; BRRN.035 | ON HOLD |
+| Outgoing e-mail | Out | Protected RA, letters, insurer extract; send log | BRRN.010; BRD 3.009.5 | IN SCOPE |
+| Insurers | In | Response file by upload; no system-to-system or file transfer channel with the insurers | BRD 3.009.6; BRRN.035 | ON HOLD |
 | LAMD | In | Paid-off and RMU reports by upload | BRRN.029 | ON HOLD |
 | Data migration (BRD-13) | In | Migrated in-force policies for the go-live and daily extraction (NB path only); legacy package codes and the package code map; no renewal carried from legacy (DMQ37) | RQ27; DMQ36, DMQ37 | IN SCOPE |
 | Renewal Advice trackers (Excel) | In | RAs sent by hand before go-live, by upload once at go-live | DMQ37, DMQ38 | IN SCOPE |
@@ -2679,7 +2679,7 @@ Figure 6 shows the interfaces of Renewal. Renewal reads the expiring population 
 | Recovery | "Follow existing QPS set up" | Platform backup and recovery; one BIBS-wide NFR set is being agreed (XQ08) |
 | Retention | "Follow existing QPS set up" | BRD-1 retention framework with record type RENEWAL_CANDIDATE; values to confirm (RQ28) |
 | Security | Encrypted, password-protected RA and insurer files; role-based access; approved domains and TLS | Protected e-mails; permissions and data scope; recipient policy (RQ16) |
-| Audit | Every action logged with user, time and source | Append-only history and audit (FR-RN-004) |
+| Audit | Every action logged with user, time and source | History and audit that no user can change (FR-RN-004) |
 
 # Configuration items owned by the Business and System Administrators
 

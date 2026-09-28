@@ -19,6 +19,7 @@ import java.util.Map;
  * @param adjustments cumulative adjustments of the original invoice, null when none
  * @param related records of the Operations modules by section
  * @param legacy frozen original values of a legacy invoice, null for BIBS invoices
+ * @param accountWorkflow whether the account has a work item (the workflow panel is shown)
  */
 public record Invoice360Response(
     OpsInvoiceResponse invoice,
@@ -27,7 +28,8 @@ public record Invoice360Response(
     List<StatusChangeResponse> history,
     Adjustments adjustments,
     Map<Section, List<RelatedItem>> related,
-    OriginSnapshotResponse legacy) {
+    OriginSnapshotResponse legacy,
+    boolean accountWorkflow) {
 
   /**
    * Maps the view.
@@ -43,7 +45,8 @@ public record Invoice360Response(
         v.history().stream().map(StatusChangeResponse::from).toList(),
         v.adjustments() == null ? null : Adjustments.from(v.adjustments()),
         v.related(),
-        v.origin() == null ? null : OriginSnapshotResponse.from(v.origin()));
+        v.origin() == null ? null : OriginSnapshotResponse.from(v.origin()),
+        v.accountWorkflow());
   }
 
   /**

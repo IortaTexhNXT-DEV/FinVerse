@@ -55,4 +55,12 @@ describe('legacy batch screens', () => {
     expect(approvers(batch({ approvedBy: 'commtl' }))).toBe('commtl');
     expect(approvers(batch({}))).toBe('');
   });
+
+  it('names the approvers when given the display names', () => {
+    const names: Record<string, string> = { cashtl: 'Carla Cash Lead', topmgmt: 'Tomas Top' };
+    const name = (login: string) => names[login] ?? login;
+    expect(approvers(batch({ firstApprovedBy: 'cashtl', finalApprovedBy: 'topmgmt' }), name)).toBe(
+      'Carla Cash Lead / Tomas Top',
+    );
+  });
 });

@@ -16,7 +16,8 @@ BRD").
 | `pack/screens/*.yaml` | One file per process area; one entry per screen |
 | `pack/messages.yaml` | Where each message appears and the fix; the texts are read from the code |
 | `pack/notifications.yaml`, `contract.yaml`, `documents.yaml`, `walkthroughs.yaml` | Notifications, cross-BRD interface contract, generated documents, end-to-end walkthroughs |
-| `config_inputs.py` | 06 Configuration input templates of a Drop 0 set and the FRS chapter "Configuration inputs the business provides", from `pack/config_inputs.yaml` of the BRD (`python docs/deliverables/src/signoff/config_inputs.py BRD-11`); BRD-03 keeps its own copy in its pack |
+| `pack/ownership.yaml` | Who signs what: the roles of the BRD approval sheet (`source`), each with its capacity (Prepared by, Input provided by, Reviewed by, Approved by), what it confirms and where it is on the sheet, and the parts of the set with the roles that prepare, provide input, review and approve them. Read by 00 Start Here (```pack blocks `owners-matrix`, `owners-roles`), the 01 guide deck, the sign-off certificate of the workbook, the drop closure summary and the drop index; the check refuses an unknown role, a part without a preparer or an approver and an unused role |
+| `config_inputs.py` | 06 Configuration input templates of a Drop 0 set and the FRS chapter "Configuration inputs the business provides", from `pack/config_inputs.yaml` of the BRD (`python docs/deliverables/src/signoff/config_inputs.py BRD-11`; `--check` also verifies the workbook written). The workbook is a guided workbook (`tools/deliverables/guided_xlsx.py`): Start here with the templates in fill-in order, one self-contained sheet per template with its guide band above the headers, Reference lists, Questions and comments. BRD-03 calls it through `pack/config_inputs.py` |
 | `screenshots/` of the BRD folder | PNG screenshots and document pages captured with seed data (`tools/screenshots/capture_pack.cjs`, recipe `tools/screenshots/packs/brdNN.cjs`; see `tools/screenshots/README.md`) |
 
 ## Build and check
@@ -34,7 +35,7 @@ python tools/deliverables/drop_index.py
 
 Optional keys of `pack.yaml`: `foreign_packs` (paths of the packs of other BRDs, relative to `pack.yaml`, whose
 screens a walkthrough step may show, for example My Approvals of New Business in a Product Maintenance walkthrough)
-and `signatories` (`[role, organisation, signs for]` of the sign-off certificate; the New Business list by default).
+and `signatories` (`[role, organisation, signs for]` of the sign-off certificate of a pack without `ownership.yaml`).
 For a set that signs the role matrix (BRD-11): `menu_personas` (`{ROLE: {name, user}}`, more personas whose sidebar
 the FRS and the workbook show; a walkthrough step may use them), `menu_suites` (the persona menu check,
 `frontend/src/navigation/personaMenus.json`: the check refuses a suite persona without a menu or with another seed

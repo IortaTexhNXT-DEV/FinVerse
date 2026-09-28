@@ -14,10 +14,11 @@ import { Modal } from '@/components/ui/Modal';
 import { formatDateTime } from '@/utils/format';
 import { MigStatus } from '../common/MigStatus';
 import { BREAK_REASONS, migLabel } from '../common/migrationCodes';
+import { useDisplayName } from '@/components/ui/useDisplayName';
 
-function explainedBy(l: ReconLine): string {
-  const who = [migLabel(l.breakReason), l.explainedBy ?? ''].join(' · ');
-  return l.approvedBy ? who + ', approved by ' + l.approvedBy : who;
+function explainedBy(l: ReconLine, name: (login: string | undefined) => string): string {
+  const who = [migLabel(l.breakReason), name(l.explainedBy)].join(' · ');
+  return l.approvedBy ? who + ', approved by ' + name(l.approvedBy) : who;
 }
 
 const LEVELS: Record<string, string> = {
@@ -35,6 +36,7 @@ const LEVELS: Record<string, string> = {
  */
 export function ReconPanel({ batchNo }: Readonly<{ batchNo: string }>) {
   const { can, user } = useAuth();
+  const name = useDisplayName();
   const client = useQueryClient();
   const [explaining, setExplaining] = useState<ReconLine>();
   const run = useQuery({
@@ -51,7 +53,7 @@ export function ReconPanel({ batchNo }: Readonly<{ batchNo: string }>) {
       flush
       title={
         r
-          ? `Reconciliation ${r.runNo} · ${formatDateTime(r.runAt)} by ${r.runBy}`
+          ? `Reconciliation ${r.runNo} · ${formatDateTime(r.runAt)} by ${name(r.runBy)}`
           : 'Reconciliation'
       }
       actions={r ? <MigStatus status={r.status} /> : undefined}
@@ -102,7 +104,7 @@ export function ReconPanel({ batchNo }: Readonly<{ batchNo: string }>) {
             key: 'explanation',
             header: 'Explanation',
             render: (l) =>
-              l.explanation ? <CellStack main={l.explanation} sub={explainedBy(l)} /> : '',
+              l.explanation ? <CellStack main={l.explanation} sub={explainedBy(l, name)} /> : '',
           },
           {
             key: 'status',

@@ -46,17 +46,6 @@ menu_personas:
 # Packs of other BRDs whose screens a walkthrough step may show (the New Business booking and account screens).
 foreign_packs: [../../BRD-01_New_Business/pack/pack.yaml]
 
-# Signatories of the sign-off certificate: role, organisation, what the signatory confirms. From the approval sheet of
-# the Operations BRD (Prepared by, Input Provided by, Reviewed by, Approved by).
-signatories:
-  - ["Product Owner", BDOI, "Business owner: the whole set"]
-  - ["Operations: Financial Transactions & Processing (approver)", BDOI, "Business owner of Operations: the Cashiering, Remittance, Production Reconciliation, Adjustment and Commission Receivables screens, fields, rules, messages, notifications and documents"]
-  - ["Operations: Financial Transactions & Processing (input providers)", BDOI, "Review of the screens and rows of their teams; the walkthroughs"]
-  - ["Information Technology Group", BDOI, "BDOI IT: interfaces and integrations, the in-app Disbursement queue and the uploads that stand in for them, user access and menus by persona; the Technical Specification"]
-  - ["Program Manager, Enterprise Services Group - Business Project Services", BDO Unibank ESG, "Traceability to the BRD"]
-  - ["Business Analyst, Enterprise Services Group - Business Project Services", BDO Unibank ESG, "Consistency with the BRD and its addendum as prepared"]
-  - [Project Manager, iorta TechNXT, "Delivery of the set as signed"]
-
 # Sidebar sections that belong to this BRD (navigation/modules.ts module ids) and the BRD of every other section,
 # used to mark each menu entry of a persona.
 own_sections: [operations, cashiering, remittance, prodrecon, adjustment, commission]

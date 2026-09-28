@@ -16,6 +16,8 @@ and signed off together; in an
 issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, "Release and
 sign-off per BRD"). Each document is kept once, in its latest version.
 
+The sets of BRD-02 also carry the UX screen documents for the BDOI UX Design team: 07 the UX Screen Deck (every screen persona by persona and flow by flow, with all its states), 08 the UX screen register (one row per screen image with the FRS section, the UXD status and the change flag) and 09 the image package (every screen image at twice the screen resolution, with the register as CSV). A change of the FRS names the screens it affects, so the UX Design team revises only those screens.
+
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
 | New Business | BRD-01 | Start here guide | 2.0 | [`BRD-01_New_Business/00_BIBS_StartHere_BRD-01_New_Business_v2.0.docx`](BRD-01_New_Business/00_BIBS_StartHere_BRD-01_New_Business_v2.0.docx) |
@@ -30,6 +32,9 @@ sign-off per BRD"). Each document is kept once, in its latest version.
 | Operations | BRD-02 | Sign-off workbook (Excel) | 2.0 | [`BRD-02_Operations/03_BIBS_Signoff_BRD-02_Operations_v2.0.xlsx`](BRD-02_Operations/03_BIBS_Signoff_BRD-02_Operations_v2.0.xlsx) |
 | Operations | BRD-02 | Test plan workbook (Excel) | 2.0 | [`BRD-02_Operations/04_BIBS_TestPlan_BRD-02_Operations_v2.0.xlsx`](BRD-02_Operations/04_BIBS_TestPlan_BRD-02_Operations_v2.0.xlsx) |
 | Operations | BRD-02 | Test plan summary (Word) | 2.0 | [`BRD-02_Operations/05_BIBS_TestPlan_BRD-02_Operations_Summary_v2.0.docx`](BRD-02_Operations/05_BIBS_TestPlan_BRD-02_Operations_Summary_v2.0.docx) |
+| Operations | BRD-02 | UX screen deck (PowerPoint) | 2.0 | [`BRD-02_Operations/07_BIBS_UXDeck_BRD-02_Operations_v2.0.pptx`](BRD-02_Operations/07_BIBS_UXDeck_BRD-02_Operations_v2.0.pptx) |
+| Operations | BRD-02 | UX screen register (Excel) | 2.0 | [`BRD-02_Operations/08_BIBS_UXScreens_BRD-02_Operations_v2.0.xlsx`](BRD-02_Operations/08_BIBS_UXScreens_BRD-02_Operations_v2.0.xlsx) |
+| Operations | BRD-02 | UX screen images, 2x PNG with the register as CSV (ZIP) | 2.0 | [`BRD-02_Operations/09_BIBS_UXScreens_BRD-02_Operations_v2.0.zip`](BRD-02_Operations/09_BIBS_UXScreens_BRD-02_Operations_v2.0.zip) |
 | Collections | BRD-04 | FRS | 1.0 | [`BRD-04_Collections/BIBS_FRS_BRD-04_Collections_v1.0.docx`](BRD-04_Collections/BIBS_FRS_BRD-04_Collections_v1.0.docx) |
 | Collections | BRD-04 | Test plan summary (Word) | 1.0 | [`BRD-04_Collections/BIBS_TestPlan_BRD-04_Collections_Summary_v1.0.docx`](BRD-04_Collections/BIBS_TestPlan_BRD-04_Collections_Summary_v1.0.docx) |
 | Collections | BRD-04 | Test plan workbook (Excel) | 1.0 | [`BRD-04_Collections/BIBS_TestPlan_BRD-04_Collections_v1.0.xlsx`](BRD-04_Collections/BIBS_TestPlan_BRD-04_Collections_v1.0.xlsx) |
@@ -63,6 +68,7 @@ the matrix per part of the set is in the 00 Start Here and the 01 guide deck of 
 | Set | Prepared by | Input provided by | Reviewed by | Approved by | Approval sheet |
 |---|---|---|---|---|---|
 | BRD-01 New Business | iorta TechNXT project team: Project Manager, Business Analysis, test lead<br>Business Analyst, Enterprise Services Group - Business Project Services (BPS) | Marketing Business Services and System Support (MBS), BU representatives<br>Technical Support Unit (TSU), BU representatives | Program Manager, Enterprise Services Group - Business Project Services (BPS)<br>BDOI Information Technology Group (BDOI IT)<br>Compliance Officer | Product Owner, Marketing Business System<br>Unit Head - Processing<br>Unit Head - Combank and Corbank<br>Head - Retail Marketing<br>Head of Institutional Banking, SM and BDO Accounts<br>Head - Comptrollership | BRD-1 approval sheets: Fire and Motor BRD ID consolidation p.128-129; Workshop Addendum p.22 (copy p.44) |
+| BRD-02 Operations | iorta TechNXT project team: Project Manager, Business Analysis, test lead<br>Business Analyst, Enterprise Services Group - Business Project Services (BPS) (Zean C. Ibay) | Operations: Financial Transactions and Processing, BU representatives (Shirley Catapang, Perjelyn Joy Gutierrez) | BDOI Information Technology Group (BDOI IT) | Program Manager, Enterprise Services Group - Business Project Services (BPS) (Dan Ace Cauton)<br>Operations: Financial Transactions and Processing (Jose Melvin M. Jarin)<br>Product Owner, AVP (Shellah Marie C. Miranda) | Operations BRD approval sheet p.6-7 (Prepared by, Input Provided by, Reviewed by, Approved by) |
 
 ## Also part of this drop (documents kept in their primary drop)
 

@@ -15,6 +15,9 @@ issue:
 navigation:
   roles: [CASHIER, CASHIER_TL, REMIT_PROCESSOR, REMIT_TL, RECON_HANDLER, ADJUSTMENT, ADJUSTMENT_TL, COMMREC_HANDLER,
           COMMREC_TL, MKT_COLLECTION, MKT_TL, COMPTROLLERSHIP, DISBURSEMENT, ACSL_PROCESSOR, ACSL_TL, SYSADMIN, AUDITOR]
+  # Identical menus are kept once: the ACSL team leader has the menu of the ACSL processor.
+  shared:
+    ux-nav-15-menu: BRD-02:ux-nav-14-menu
 
 # Who each persona is (what they do comes from the persona table of the FRS unless given here).
 personas:
@@ -31,8 +34,10 @@ personas:
   MKT_TL: {who: "A Marketing team leader or unit head, who approves the holds of the Marketing officers"}
   COMPTROLLERSHIP: {who: "A Comptrollership officer who acknowledges the BIR certificates and reads the journals and reports"}
   DISBURSEMENT: {who: "A Disbursement officer who works the payment requests of the queue until BRD-5 replaces it"}
-  ACSL_PROCESSOR: {who: "An ACSL processor who records the deductions on the remittances (BRD-5)"}
-  ACSL_TL: {who: "The ACSL team leader who confirms the deductions (BRD-5)"}
+  ACSL_PROCESSOR: {who: "An ACSL processor who records the deductions on the remittances (BRD-5)",
+                   does: "Records the amounts an insurer confirmed in writing (AR insurer refunds, over-remittances) as remittance deductions with the insurer's confirmation and submits them for confirmation"}
+  ACSL_TL: {who: "The ACSL team leader who confirms the deductions (BRD-5)",
+            does: "Confirms or returns the deductions the ACSL processors recorded; a confirmed deduction is taken from the next approved remittance batches of the insurer"}
   SYSADMIN: {who: "The system administrator of BIBS (BDOI IT operations), who keeps the feeds and the lists"}
   AUDITOR: {who: "An internal or external auditor with read access to Operations and its reports"}
 

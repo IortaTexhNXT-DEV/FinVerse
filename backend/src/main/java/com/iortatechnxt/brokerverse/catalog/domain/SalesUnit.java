@@ -37,6 +37,9 @@ public class SalesUnit extends AuthorizableEntity implements CatalogRecord {
   @Column(name = "head_username", length = 50)
   private String headUsername;
 
+  @Column(name = "status_reason", length = 500)
+  private String statusReason;
+
   protected SalesUnit() {}
 
   /**
@@ -51,6 +54,36 @@ public class SalesUnit extends AuthorizableEntity implements CatalogRecord {
 
   public String getHeadUsername() {
     return headUsername;
+  }
+
+  /**
+   * Deactivates the unit with the reason given by the maintainer; the caller has checked that no
+   * active sub-unit or officer remains.
+   *
+   * @param reason reason
+   */
+  public void deactivate(String reason) {
+    deactivate();
+    this.statusReason = reason;
+  }
+
+  /**
+   * Reactivates an inactive unit: it waits for authorization again before it is used.
+   *
+   * @param reason reason
+   */
+  public void reactivate(String reason) {
+    markModified();
+    this.statusReason = reason;
+  }
+
+  /**
+   * Reason of the last deactivation or reactivation.
+   *
+   * @return reason, null when none
+   */
+  public String getStatusReason() {
+    return statusReason;
   }
 
   /**

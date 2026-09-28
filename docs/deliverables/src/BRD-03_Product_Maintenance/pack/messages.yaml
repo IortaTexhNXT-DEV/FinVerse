@@ -21,14 +21,14 @@ places:
   - [ "^(PackageExpiryService|AdvisoryExpiryController|PackageExpiryPage)$", "Package Expiry (SCR-PM-10)" ]
   - [ "^(RiskProduct|ProductLine|CoverType|ProductCatalogService|ProductEditorModal|productForm|ProductsPage)$", "Products and the product dialog (SCR-PM-11)" ]
   - [ "^(FieldRule|FieldValueRules|ProductRuleService|RuleEditorModal|CatalogRulesPanel|ProductDetailPage|ProductVersionsTab|DetailList)$", "Product record: versions and rules (SCR-PM-12)" ]
-  - [ "^(ProductVersion|ProductVersionService|PackageCompleteness|ProductVersionQueries|VersionEditorPage|VersionSchemeSection|VersionPanelSections|VersionTermsSection|VersionCheckpoint|versionForm)$", "Package Version (SCR-PM-13)" ]
+  - [ "^(ProductVersion|ProductVersionService|PackageCompleteness|PackageChecks|ProductVersionQueries|VersionEditorPage|VersionSchemeSection|VersionPanelSections|VersionTermsSection|VersionCheckpoint|ValidationResultCard|validationOutcome|PackageRequestLink|versionForm)$", "Package Version (SCR-PM-13)" ]
   - [ "^(ValidationQueuePage)$", "Validation Queue (SCR-PM-14)" ]
   - [ "^(CoverageService|CoveragesPage|CoverageModals|coverageForm)$", "Coverages & Clauses (SCR-PM-15)" ]
-  - [ "^(IncentiveCriteria|IncentiveCriteriaService|IncentivesPage|IncentiveEditorModal|incentiveForm)$", "Incentive Criteria (SCR-PM-16)" ]
+  - [ "^(IncentiveCriteria|IncentiveCriteriaService|IncentiveRuleParameters|IncentivesPage|IncentiveEditorModal|IncentiveParamsTable|incentiveForm)$", "Incentive Criteria (SCR-PM-16)" ]
   - [ "^(InsurerProfile|InsurerBranch|InsurerService|InsurersPage|InsurerEditorModal|insurerForm)$", "Insurers (SCR-PM-17)" ]
   - [ "^(InsurerDetailPage|InsurerRatesModals)$", "Insurer record (SCR-PM-18)" ]
   - [ "^(EffectiveDatedRecord|MotorLimit|ShortPeriodRate|RateTableService|RatesPage|RateModals)$", "Rates & Taxes (SCR-PM-19)" ]
-  - [ "^(SalesOrganisationService|SalesOrganisationPage|salesTree)$", "Sales Organisation (SCR-PM-20)" ]
+  - [ "^(SalesOrganisationService|SalesOrganisationExport|SalesOrganisationPage|SalesOrgDialogs|SalesOrgReasonDialog|SalesOrgCells|salesOrgColumns|salesTree)$", "Sales Organisation (SCR-PM-20)" ]
   - [ "^(PremiumCalculator|RatingService|SchemeResolver|PremiumCalculatorPage|CalculatorResult|calculatorForm)$", "Premium Calculator (SCR-PM-21); pricing of quotations and accounts" ]
   - [ "^(RateSchemeExceptionService|RateOverride|RateExceptionDialog|RateExceptionPage|rateException)$", "Quotation: package rate scheme and rate exception (SCR-PM-22)" ]
   - [ "^(CatalogRecords|RecordActions)$", "Authorize and Deactivate on every product master (Common screen elements)" ]
@@ -93,14 +93,14 @@ fixes:
   PACKAGE_INSURER_TERMS_MISSING: Open the Insurer Terms tab and complete the terms of the insurer for that coverage.
   PACKAGE_SHARES_INVALID: Correct the shares of the lead and participant insurers so that they total 100%.
   PACKAGE_DATES_INVALID: Correct the dates on the Rate Scheme & Dates tab.
-  REASON_REQUIRED: Choose the return reason.
+  REASON_REQUIRED: Give the reason (the return reason of a package version, or why a sales unit is deactivated or reactivated or an officer removed from a team).
   # Incentive criteria
   INCENTIVE_ACTIVE_LOCKED: Open the active criterion and save the change as an amendment from a later date.
   INCENTIVE_NOT_ACTIVE: Change the pending row itself; only an active criterion is amended.
   INCENTIVE_PERIOD_INVALID: Enter an effective-from date after the start of the active criterion.
   INCENTIVE_PERIOD_OVERLAP: Choose dates that do not overlap another row of the same code, or end the other row first.
   INCENTIVE_PRODUCT_NOT_ACTIVE: Remove the product from the matrix, or choose an active product.
-  INCENTIVE_RULE_PARAMS_INVALID: 'Enter the rule parameters as name and value pairs in braces, as in the example {"minimumPremium": 5000}.'
+  INCENTIVE_RULE_PARAMS_INVALID: Choose each parameter from the list of the incentive type and enter its value as the parameter asks (an amount or a number for the minimum gross premium).
   INCENTIVE_VALUE_REQUIRED: Enter the value of the criterion.
   # Insurers, rates and sales organisation
   CREDIT_DAYS_INVALID: Enter credit days between 0 and 365.
@@ -116,7 +116,11 @@ fixes:
   LIMIT_PREMIUM_INVALID: Enter a premium of zero or more.
   SHORT_PERIOD_MONTHS_INVALID: Enter the months covered between 1 and 12.
   SALES_PARENT_INVALID: Choose a parent unit of the level above (region for a department, department for a team).
-  SALES_TEAM_UNKNOWN: Choose an existing team.
+  SALES_TEAM_UNKNOWN: Choose an existing, active team; reactivate the team first if it was deactivated.
+  SALES_UNIT_IN_USE: Deactivate the sub-units of the unit and remove or reassign its account officers first (Show Inactive lists what is already inactive).
+  SALES_UNIT_INACTIVE: No action; the unit is already inactive.
+  SALES_UNIT_NOT_INACTIVE: No action; only an inactive unit is reactivated.
+  SALES_OFFICER_INACTIVE: No action; the officer is already removed from the team. Use Assign to a Team to place the officer again.
   USER_UNKNOWN: Enter the user name of an existing BIBS user.
   # Pricing and rate exceptions
   INSURER_NOT_ON_PACKAGE: Choose an insurer of the package's panel.

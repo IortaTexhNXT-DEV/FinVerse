@@ -115,12 +115,24 @@ class CatalogProductMaintenanceApiIT {
         .andExpect(jsonPath("$[?(@.productCode == '" + code + "')]").isNotEmpty());
     api.doPost("tsuhead", base + "/return", Map.of("reason", "Check the minimum"))
         .andExpect(jsonPath("$.summary.status").value("DRAFT"))
-        .andExpect(jsonPath("$.returnedReason").value("Check the minimum"));
+        .andExpect(jsonPath("$.returnedReason").value("Check the minimum"))
+        .andExpect(jsonPath("$.validationResult").value("RETURNED"))
+        .andExpect(jsonPath("$.returnedBy").value("tsuhead"))
+        .andExpect(jsonPath("$.validationChecks[0].code").value("HIERARCHY"))
+        .andExpect(jsonPath("$.validationChecks.length()").value(6));
     api.doPost("mbs", base + "/submit", Map.of()).andExpect(status().isOk());
     api.doPost("badmin", base + "/validate", Map.of("checklist", List.of("Rates within bounds")))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.summary.status").value("RELEASED"))
-        .andExpect(jsonPath("$.summary.validatedBy").value("badmin"));
+        .andExpect(jsonPath("$.summary.validatedBy").value("badmin"))
+        .andExpect(jsonPath("$.validationResult").value("PASSED"))
+        .andExpect(jsonPath("$.returnedReason").doesNotExist())
+        .andExpect(jsonPath("$.validationChecks[1].code").value("INSURER_TERMS"))
+        .andExpect(jsonPath("$.validationChecks[1].result").value("PASSED"))
+        .andExpect(
+            jsonPath("$.validationChecks[1].detail")
+                .value("1 of 1 insurer has terms for 1 included coverage"))
+        .andExpect(jsonPath("$.validationChecks[2].result").value("NOT_APPLICABLE"));
     api.doGet("ao", "/api/v1/catalog/products?q=" + code)
         .andExpect(jsonPath("$[0].currentVersionNo").value(1))
         .andExpect(jsonPath("$[0].lifecycleStatus").value("ACTIVE"));
@@ -197,6 +209,33 @@ class CatalogProductMaintenanceApiIT {
                         "2026-01-01"))
                 .andExpect(status().isCreated()));
     long id = criterion.get("id").asLong();
+    api.doGet("mbs", "/api/v1/catalog/incentive-criteria/parameters?incentiveType=CAMPAIGN")
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].key").value("minimumPremium"))
+        .andExpect(jsonPath("$[0].label").value("Minimum Gross Premium"))
+        .andExpect(jsonPath("$[0].valueType").value("AMOUNT"));
+    api.doPost(
+            "mbs",
+            "/api/v1/catalog/incentive-criteria",
+            Map.of(
+                "companyId",
+                fx.company(),
+                "code",
+                "J" + token,
+                "name",
+                "Http incentive with parameters",
+                "incentiveType",
+                "CAMPAIGN",
+                "valueBasis",
+                "RULE",
+                "ruleParams",
+                "{\"minimumPremium\": \"five thousand\"}",
+                "products",
+                List.of(Map.of("productCode", product)),
+                "effectiveFrom",
+                "2026-01-01"))
+        .andExpect(status().isUnprocessableEntity())
+        .andExpect(jsonPath("$.detail").value("Minimum Gross Premium must be a number"));
     api.doPost(
             "approver", "/api/v1/catalog/records/INCENTIVE_CRITERIA/" + id + "/authorize", Map.of())
         .andExpect(status().isOk());

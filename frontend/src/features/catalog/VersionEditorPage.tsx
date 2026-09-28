@@ -1,5 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CalendarDays, FileSignature, Percent, Save, Send, UserRound } from 'lucide-react';
+import {
+  CalendarDays,
+  ClipboardList,
+  FileSignature,
+  Percent,
+  Save,
+  Send,
+  UserRound,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { productCatalogApi } from '@/api/productCatalog';
@@ -15,6 +23,7 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, formatRate, today } from '@/utils/format';
+import { PackageRequestLink } from './PackageRequestLink';
 import { VersionCheckpoint } from './VersionCheckpoint';
 import { VersionCoveragesSection, VersionInsurersSection } from './VersionPanelSections';
 import { VersionSchemeSection } from './VersionSchemeSection';
@@ -22,7 +31,6 @@ import { VersionTermsSection } from './VersionTermsSection';
 import { formOf, toInput, validateVersionForm } from './versionForm';
 import type { VersionForm } from './versionForm';
 import { UserName } from '@/components/ui/UserName';
-import { Notice } from '@/components/ui/Notice';
 
 const TABS = [
   { id: 'scheme', label: 'Rate Scheme & Dates' },
@@ -45,7 +53,6 @@ function Summary({ detail }: Readonly<{ detail: VersionDetail }>) {
           <StatusBadge status={s.status} />
         </>
       }
-      flags={s.sourceRequestNo && <span className="tag">Request {s.sourceRequestNo}</span>}
       facts={[
         { icon: CalendarDays, label: 'Effective', value: formatDate(s.effectiveFrom) },
         { icon: CalendarDays, label: 'Package End', value: formatDate(s.packageEndDate) },
@@ -56,6 +63,11 @@ function Summary({ detail }: Readonly<{ detail: VersionDetail }>) {
         },
         { icon: UserRound, label: 'Set Up By', value: <UserName login={s.maker} /> },
         { icon: FileSignature, label: 'ManCom Ref.', value: detail.mancomSignoffRef },
+        {
+          icon: ClipboardList,
+          label: 'Package Request',
+          value: s.sourceRequestNo && <PackageRequestLink requestNo={s.sourceRequestNo} />,
+        },
       ]}
     />
   );
@@ -124,11 +136,6 @@ function Editor({ detail }: Readonly<{ detail: VersionDetail }>) {
         </div>
       )}
       <ErrorAlert error={save.error ?? submit.error} />
-      {detail.returnedReason && s.status === 'DRAFT' && (
-        <Notice tone="warning" title="Returned by the validator">
-          {detail.returnedReason}
-        </Notice>
-      )}
       <VersionCheckpoint detail={detail} />
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       {tab === 'scheme' && <VersionSchemeSection {...props} />}

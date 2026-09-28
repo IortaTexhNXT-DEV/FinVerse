@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
-import { Copy } from 'lucide-react';
+import { Copy, Download } from 'lucide-react';
 import { useState } from 'react';
 import { budgetApi } from '@/api/budget';
+import { saveFile } from '@/api/client';
 import type { Budget } from '@/api/budget';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -22,27 +23,52 @@ export function BudgetTools({ budget, onUpdated }: Readonly<Props>) {
     mutationFn: (text: string) => budgetApi.importCsv(budget.id, text),
     onSuccess: (b) => onUpdated(b, `${b.lineCount} lines imported`),
   });
+  const importFile = useMutation({
+    mutationFn: (file: File) => budgetApi.importFile(budget.id, file),
+    onSuccess: (b) => onUpdated(b, `${b.lineCount} lines imported`),
+  });
+  const template = useMutation({
+    mutationFn: budgetApi.template,
+    onSuccess: (f) => saveFile(f.blob, f.fileName),
+  });
   const copyActuals = useMutation({
     mutationFn: () => budgetApi.copyActuals(budget.id, sourceYear, percent),
     onSuccess: (b) => onUpdated(b, `Actuals of ${sourceYear} copied`),
   });
   const onFile = (files: File[]) => {
     const file = files[0];
-    if (file) {
+    if (file?.name.toLowerCase().endsWith('.xlsx')) {
+      importFile.mutate(file);
+    } else if (file) {
       void file.text().then((text) => importCsv.mutate(text));
     }
   };
 
   return (
     <div className="grid-2">
-      <Card title="Import from CSV">
-        <ErrorAlert error={importCsv.error} />
+      <Card
+        title="Import Lines"
+        actions={
+          <Button
+            variant="ghost"
+            icon={<Download size={16} />}
+            busy={template.isPending}
+            onClick={() => template.mutate()}
+          >
+            Download Template
+          </Button>
+        }
+      >
+        <ErrorAlert error={importCsv.error ?? importFile.error ?? template.error} />
         <p className="muted">
-          Header <code>account_code,cost_centre,m01…m12</code> or{' '}
-          <code>account_code,cost_centre,annual</code> (spread evenly). Replaces all lines.
+          The Excel template (monthly or annual amounts, the annual spread evenly), or a CSV file
+          with the header <code>account_code,cost_centre,m01…m12</code> or{' '}
+          <code>account_code,cost_centre,annual</code>. Replaces all lines.
         </p>
-        <Field label="CSV file">
-          {(id) => <FileDropZone id={id} accept=".csv,text/csv" onChange={onFile} />}
+        <Field label="Excel or CSV file">
+          {(id) => (
+            <FileDropZone id={id} accept=".xlsx,.csv,text/csv" onChange={onFile} />
+          )}
         </Field>
       </Card>
       <Card title="Copy from prior-year actuals">

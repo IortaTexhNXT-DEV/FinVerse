@@ -115,7 +115,7 @@ The main BRD repeats most capabilities once per persona. The FRS traces its 1,03
 | Positive | The normal flow succeeds with valid data |
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit |
-| Security-access | Screens, buttons, records and API calls are open only to the roles and data scope that allow them; maker-checker |
+| Security-access | Screens, buttons, records and system functions are open only to the roles and data scope that allow them; maker-checker |
 | Workflow | A stage transition of RNW_CASE, an insurer batch or a letter |
 | Report-output | Lists, reports, exports, print previews and summary counters; content checked against the screen |
 | Upload-download | Dispositioned files, insurer and LAMD files, letters and documents sent or downloaded |

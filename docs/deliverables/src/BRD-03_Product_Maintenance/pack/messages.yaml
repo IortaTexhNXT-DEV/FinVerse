@@ -100,7 +100,7 @@ fixes:
   INCENTIVE_PERIOD_INVALID: Enter an effective-from date after the start of the active criterion.
   INCENTIVE_PERIOD_OVERLAP: Choose dates that do not overlap another row of the same code, or end the other row first.
   INCENTIVE_PRODUCT_NOT_ACTIVE: Remove the product from the matrix, or choose an active product.
-  INCENTIVE_RULE_PARAMS_INVALID: 'Enter the rule parameters as valid JSON, for example {"minimumPremium": 5000}.'
+  INCENTIVE_RULE_PARAMS_INVALID: 'Enter the rule parameters as name and value pairs in braces, as in the example {"minimumPremium": 5000}.'
   INCENTIVE_VALUE_REQUIRED: Enter the value of the criterion.
   # Insurers, rates and sales organisation
   CREDIT_DAYS_INVALID: Enter credit days between 0 and 365.

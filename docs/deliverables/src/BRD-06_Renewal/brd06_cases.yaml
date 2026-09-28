@@ -66,7 +66,7 @@ screens:
   QUOTE: Quotation / Proposal > Quotation or PRF page (BRD-1)
   BOOKING: Booking > Booking Workbench (BRD-1)
   SUBPOL: Submitted Policies > Masterlist (BRD-12)
-  API: Direct request outside the screens, signed in as the persona (test lead tool)
+  SYS: System function check outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-RN-01
@@ -349,7 +349,7 @@ frs:
         expected: The page shows "You do not have access to this screen. Contact your administrator if you need it." and loads no data.
       - c: 2
         type: Security-access
-        screen: API
+        screen: SYS
         title: direct request to post an account without RNW_REVIEW
         steps:
           - Signed in as rn.ao1, send a direct request to post an account in FOR_TL_REVIEW.
@@ -511,7 +511,7 @@ frs:
         expected: The history shows the REFERENCE_MATCH outcome, the response with source upload and match outcome, and the acceptance with method, evidence and user.
       - c: 4
         type: Security-access
-        screen: API
+        screen: SYS
         title: History rows cannot be changed
         steps:
           - Look for an edit or delete action on the History tab.
@@ -878,7 +878,7 @@ frs:
         msg: ["Segment {Non-Mortgage} is initiated one account at a time"]
       - c: 4
         type: Negative
-        screen: API
+        screen: SYS
         title: Initiate an already initiated candidate
         steps:
           - Send a direct request to initiate a candidate in UNASSIGNED.
@@ -1499,7 +1499,7 @@ frs:
         expected: All selected accounts except the two go to rn.ao2; the two stay Unassigned.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: Assign to an officer of another unit
         steps:
           - Check the Account Officer list for rn.ao3 (Corporate Marketing 2).
@@ -1654,7 +1654,7 @@ frs:
         msg: [You are not permitted to perform this action]
       - c: 4
         type: Negative
-        screen: API
+        screen: SYS
         title: Request already decided
         steps:
           - Call accept on a request that rn.mkttl2 already declined.
@@ -2669,7 +2669,7 @@ frs:
       - A matched Renew As Is moves the account to RA Ready with unchanged premium and terms, without re-keying.
       - Revise returns the account to In Processing and runs the financial-impact check; Reject tags it Not for Renewal or returns it to Marketing.
       - A mismatched, conflicting, unknown or late row never progresses the account; it is Exception until corrected or overridden.
-      - The user views the uploaded file and records a single response manually on the Insurer tab; every response is kept (append-only).
+      - The user views the uploaded file and records a single response manually on the Insurer tab; every response is kept; none is overwritten.
     cases:
       - c: 1
         type: Workflow
@@ -2959,7 +2959,7 @@ frs:
         expected: Three NALs are generated and sent; each account shows NAL Sent.
       - c: 2
         type: Negative
-        screen: API
+        screen: SYS
         title: NAL refused for an account with an RA
         steps:
           - Send a direct request to generate a NAL for an account in RA Sent.

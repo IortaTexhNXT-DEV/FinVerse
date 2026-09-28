@@ -107,7 +107,7 @@ The roles-and-access sheet checks each accounting and administration action agai
 | Positive | The normal flow succeeds with valid data |
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit |
-| Security-access | Screens, buttons and API calls are open only to the roles that hold the permission; maker-checker and four-eyes rules |
+| Security-access | Screens, buttons and system functions are open only to the roles that hold the permission; maker-checker and four-eyes rules |
 | Workflow | A status change of a journal, account, close schedule, service-fee run, reconciliation or request |
 | Report-output | Reports, report batches, schedules, the report pack and BIR outputs; content checked against the ledger |
 | Upload-download | Chart upload, journal upload, bank files and liquidation reports |

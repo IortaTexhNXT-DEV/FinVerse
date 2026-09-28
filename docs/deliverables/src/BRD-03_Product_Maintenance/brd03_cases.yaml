@@ -71,7 +71,7 @@ screens:
   TEMPLATES: Broking Setup > Document Templates
   MESSAGES: Broking Setup > Outbound Messages
   BOOKING: Booking > Booking Workbench > Booked Invoice
-  API: Direct request outside the screens, signed in as the persona (test lead tool)
+  SYS: System function check outside the screens, signed in as the persona (test lead tool)
 
 data:
   - id: TD-PM-01
@@ -256,7 +256,7 @@ frs:
         expected: The page shows "You do not have access to this screen. Contact your administrator if you need it." No queue data is loaded.
       - c: 2
         type: Security-access
-        screen: API
+        screen: SYS
         title: Approval requested directly by a user without the approval permission
         steps:
           - Sign in as ao.
@@ -434,8 +434,8 @@ frs:
         title: The audit trail cannot be edited or deleted
         steps:
           - Log in as admin; open Administration > Audit Trail and look for edit or delete actions on a row.
-          - Ask the DBA in the test environment to run an UPDATE and a DELETE on the audit table.
-        expected: The screen has no edit or delete action. The database refuses the UPDATE, DELETE and TRUNCATE.
+          - Ask the infrastructure administrator of the test environment to try to change, delete and clear audit entries directly.
+        expected: The screen has no edit or delete action. Every attempt outside the screen is refused and the audit entries are unchanged.
 
   FR-PM-010:
     scenario: SC-PM-02
@@ -802,7 +802,7 @@ frs:
         msg: [Rates and amounts cannot be negative, PKG_AMOUNT_NEGATIVE]
       - c: 5
         type: Negative
-        screen: API
+        screen: SYS
         title: The type of a saved request cannot change
         steps:
           - Send a direct request to change the type of the saved draft of TC-PM-020.1-01 to AMEND.
@@ -1005,7 +1005,7 @@ frs:
         expected: tsu becomes the assignee.
       - c: 4
         type: Security-access
-        screen: API
+        screen: SYS
         title: A user without PRODUCT_VIEW or PKG_REPORT_VIEW cannot list requests
         steps:
           - Send a direct request to list the package requests, signed in as a user without either permission.
@@ -1259,7 +1259,7 @@ frs:
       - c: 3
         type: Security-access
         persona: MKT_AO
-        screen: API
+        screen: SYS
         title: Marketing cannot compile a master by a direct request
         steps:
           - Send a direct request to compile the master comparative, signed in as ao2.
@@ -1446,7 +1446,7 @@ frs:
       - c: 1
         type: Negative
         persona: TSU
-        screen: API
+        screen: SYS
         title: The request cannot go to MBS without the sign-off
         steps:
           - As tsu send a direct request to sign off PKR-2026-900004.
@@ -1497,7 +1497,7 @@ frs:
     cases:
       - c: 1
         type: Negative
-        screen: API
+        screen: SYS
         data: [TD-PM-05]
         title: Set-up before sign-off
         steps:
@@ -1562,7 +1562,7 @@ frs:
       - c: 1
         type: Negative
         persona: MBS
-        screen: API
+        screen: SYS
         title: MBS cannot validate the version it made
         steps:
           - As mbs submit MTR12 v2 for validation.
@@ -1691,7 +1691,7 @@ frs:
       - c: 1
         type: Security-access
         persona: MKT_AO
-        screen: API
+        screen: SYS
         title: Marketing cannot send an advisory
         steps:
           - Send a direct request to send an advisory, signed in as ao.
@@ -1791,7 +1791,7 @@ frs:
       - c: 3
         type: Security-access
         persona: TSU_HEAD
-        screen: API
+        screen: SYS
         title: A user without PRODUCT_MAINTAIN cannot create a version
         steps:
           - As tsuhead send a direct request to create a version of MTR12.
@@ -1924,7 +1924,7 @@ frs:
       - c: 3
         type: Security-access
         persona: MKT_AO
-        screen: API
+        screen: SYS
         title: Marketing AO cannot list expired packages
         steps:
           - As ao open Products (no Expired filter shown); send a direct request to list the expired products.
@@ -1979,7 +1979,7 @@ frs:
       - c: 1
         type: Security-access
         persona: MKT_AO
-        screen: API
+        screen: SYS
         title: Marketing AO cannot open Package Expiry
         steps:
           - As ao send a direct request to open Package Expiry.
@@ -2044,7 +2044,7 @@ frs:
       - c: 1
         type: Boundary
         title: Amber at 80 % of the SLA
-        pre: A request enters FOR_MKT_APPROVAL (SLA 24 hours); the test waits 19 hours 12 minutes, or the stage entry time is moved in the test database.
+        pre: A request enters FOR_MKT_APPROVAL (SLA 24 hours); the test waits 19 hours 12 minutes, or the stage entry time is moved in the test environment.
         steps:
           - Open the home page after 80 % of the SLA and again before 100 %.
         expected: The request is counted amber at 80 % and red after 24 hours.
@@ -2063,7 +2063,7 @@ frs:
         expected: The tiles show only the stages ao can see; no Versions for validation tile.
       - c: 3
         type: Security-access
-        screen: API
+        screen: SYS
         title: A user without view permission cannot read the counts
         steps:
           - Send a direct request to read the Product Maintenance counts, signed in as a user without PRODUCT_VIEW and PKG_REPORT_VIEW.
@@ -2166,7 +2166,7 @@ frs:
       - c: 1
         type: Negative
         persona: MBS
-        screen: API
+        screen: SYS
         title: MBS set-up without the ManCom sign-off by a direct request
         steps:
           - As mbs send a direct request to set up the package version of PKR-2026-900004 (FOR_MANCOM).
@@ -2174,7 +2174,7 @@ frs:
         msg: [MBS receives signed-off requirements only (BRPM.015), PKG_NOT_WITH_MBS]
       - c: 1
         type: Security-access
-        screen: API
+        screen: SYS
         title: A user without the stage permission cannot move the case
         steps:
           - As tsu send a direct request for the workflow action Approve on a request in FOR_MKT_APPROVAL.
@@ -2190,7 +2190,7 @@ frs:
         expected: tsulead has an SLA alert for PKR-2026-900002; the request is red on the home page.
       - c: 3
         type: Negative
-        screen: API
+        screen: SYS
         title: Action not allowed in the stage
         steps:
           - Send a direct request for the workflow action Terms final on PKR-2026-900001 (DRAFT).
@@ -2254,7 +2254,7 @@ frs:
         msg: [Enter the value of the incentive criterion, INCENTIVE_VALUE_REQUIRED]
       - c: 2
         type: Negative
-        title: Rule parameters not valid JSON
+        title: Rule parameters not in the format of the example
         steps:
           - Value basis Rule, rule parameters "{minimumPremium 5000"; save.
         expected: Not saved.

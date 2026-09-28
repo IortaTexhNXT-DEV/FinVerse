@@ -112,7 +112,7 @@ caveats:
     handling: "The change is raised against the other BRD and assessed against the cross-BRD contract; when it touches this set, a delta sign-off of the affected pages only."
     example: "BRD-3 adds a mandatory field to a product: the account field rules change; the affected screen specification pages are re-issued and signed as a delta."
   - topic: Integrations pending BDOI IT specifications
-    text: "HLS, CLPC transport, insurer SFTP or API, directory sign-in and the mail relay depend on specifications from BDOI IT."
+    text: "HLS, CLPC transport, electronic channels to insurers (file transfer or system-to-system), directory sign-in and the mail relay depend on specifications from BDOI IT."
     handling: "A manual or file-based step until the specification arrives; the interface is then a change request."
     example: "CLPC billing is a download and an upload today; an automatic transfer is added when the CLPC layout and transport are agreed."
   - topic: Open questions and assumptions

@@ -58,7 +58,7 @@ screens:
       - "Confirm Upload / Discard | EPOLICY_MANAGE | Upload in review | Stores the included files as e-policies of their accounts, or discards the upload | - | In-app notice per e-policy to review"
     rules:
       - "Each file is stored as the account's e-policy document and triggers the extraction review (FR-NB-100, FR-NB-102)."
-      - "Reading the insurers' mailbox or SFTP for e-policies waits for the channel specification; e-policies are uploaded by Processing (FR-NB-100)."
+      - "Reading the insurers' mailbox or file transfer folder for e-policies waits for the channel specification; e-policies are uploaded by Processing (FR-NB-100)."
     outcome: The e-policy is stored on its account and its data is ready for review.
     frs: [FR-NB-100, FR-NB-102]
     tests: [EPUP]

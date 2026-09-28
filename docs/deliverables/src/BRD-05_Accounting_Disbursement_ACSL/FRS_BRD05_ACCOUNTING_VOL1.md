@@ -619,7 +619,7 @@ brd: [FRBS 2.5.0 (p.55), FRBS 3.1.0 (p.62)]
 actor: System
 priority: Must have
 screens: Journals; Account Inquiry; Party Statement; Accounting Engine (event log)
-description: Every BIBS module that has a financial effect publishes a business event (booking, receipt, remittance, adjustment, commission, disbursement, service fee, correction). The accounting engine creates the journal lines from the rules maintained by Comptrollership, posts them in the same transaction, and records or matches the open items of the parties in the sub-ledger. GL accounts are never chosen in code.
+description: Every BIBS module that has a financial effect publishes a business event (booking, receipt, remittance, adjustment, commission, disbursement, service fee, correction). The accounting engine creates the journal lines from the rules maintained by Comptrollership, posts them together with the event, and records or matches the open items of the parties in the sub-ledger. GL accounts are never chosen in code.
 preconditions:
   - "An active accounting rule exists for the event type."
 main_flow:
@@ -1470,7 +1470,7 @@ brd: [BASAU 2.4.1 (p.130), BASAU 2.5.0 (p.130), BASAU 2.5.1 (p.131), BASAU 2.5.2
 actor: Approver (ACCESS_APPROVE, MASTER_AUTHORIZE)
 priority: Must have
 screens: My Approvals; Access Requests
-description: The approver sees the pending LOV and user-management requests in My Approvals with a count, and is notified of new ones. The approver approves or declines a request with remarks, or returns it to the requester with remarks; the requester corrects and resubmits it. Several requests can be approved at once through the bulk approval API - each is decided on its own; a new-user request is approved on its own because its temporary password is shown once.
+description: The approver sees the pending LOV and user-management requests in My Approvals with a count, and is notified of new ones. The approver approves or declines a request with remarks, or returns it to the requester with remarks; the requester corrects and resubmits it. Several requests can be approved at once through bulk approval - each is decided on its own; a new-user request is approved on its own because its temporary password is shown once.
 preconditions:
   - "The approver is not the requester."
 main_flow:

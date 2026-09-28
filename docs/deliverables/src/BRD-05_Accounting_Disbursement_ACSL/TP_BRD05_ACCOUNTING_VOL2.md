@@ -104,7 +104,7 @@ The roles-and-access sheet checks each action against the roles that may and may
 | Positive | The normal flow succeeds with valid data |
 | Negative | Invalid data, a missing item or a broken rule is refused with its message |
 | Boundary | Values at, below and above a limit |
-| Security-access | Screens, buttons and API calls are open only to the roles that hold the permission; maker-checker and four-eyes rules |
+| Security-access | Screens, buttons and system functions are open only to the roles that hold the permission; maker-checker and four-eyes rules |
 | Workflow | A stage or status change of a payee, request, DV, instrument, funding, validation, case, correction or deduction |
 | Report-output | Reports, end-of-day outputs, the DCTF, BIR Form 2307 and the SOA reconciliation report |
 | Upload-download | Request, payee, bank and SOA uploads; documents; payment confirmations |
@@ -224,7 +224,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 | Bank layouts and interfaces are not given (AQ09); the uploads take a minimal CSV | Medium | The cases use the minimal CSV; the upload cases are re-run when BDOI gives the layouts |
 | Document layouts and signatories are drafts (AQ14, AQ18) | Medium | The Report-output and Upload-download cases are re-run when the layouts are loaded |
 | Four-eyes cases need combined test users and two users per role | Medium | The test lead creates them before the cycle (entry criterion) and removes them after it |
-| Stale-check and date-driven cases need the clock (180 days, end of day, SLA) | Medium | The test lead moves print dates and business dates in the test database and runs the jobs on demand |
+| Stale-check and date-driven cases need the clock (180 days, end of day, SLA) | Medium | The test lead moves print dates and business dates in the test environment and runs the jobs on demand |
 | Seed DVs, payees and deductions are changed by earlier cases | Medium | Reload the seed profile between cycles; cases that change a master restore it |
 | BDOI answers to open questions change expected results (approvers AQ18, role matrix AQ28, deduction sources AQ23, CPC2 base AQ24, stale-check accounting AQ02 / AQ14) | Medium | The values are configuration; the affected cases name the parameter, list or rule and are re-run after the change |
 | BDOI testers are not available in the UAT window | High | Agree named testers per department and dates in the UAT plan (deliverable 30) before UAT starts |

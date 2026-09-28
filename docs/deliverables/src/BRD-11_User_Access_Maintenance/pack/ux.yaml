@@ -6,7 +6,22 @@
 issue:
   version: "2.0"
   date: 28 September 2026
-  changes: []
+  changes:
+    - ref: CHG-UA-2.0-01
+      what: The group profiles of a request include the three contact centre profiles of Customer Servicing Facility
+      screens: [SCR-UA-07]
+      images: [scr-ua-07-01-empty, scr-ua-07-02-filled, scr-ua-07-03-error, scr-ua-07-04-modify]
+
+navigation:
+  # The same landing page and menu as in the BRD-3 set (identical images are kept once).
+  shared:
+    ux-nav-04-menu: BRD-03:ux-nav-08-menu
+    ux-nav-05-landing: BRD-03:ux-nav-10-landing
+    ux-nav-05-menu: BRD-03:ux-nav-10-menu
+    ux-nav-06-landing: BRD-03:ux-nav-11-landing
+    ux-nav-06-menu: BRD-03:ux-nav-11-menu
+    ux-nav-08-landing: BRD-03:ux-nav-09-landing
+    ux-nav-08-menu: BRD-03:ux-nav-09-menu
 
 personas:
   UAM_REQUESTOR: {who: "One of the named user access requestors of the business units"}
@@ -87,3 +102,10 @@ confirm:
     - screens: [SCR-UA-08, SCR-UA-06]
       observation: The request title and subtitle name the subject user by the user ID only.
       proposal: Name the user with the full name first and the user ID as the second line or in the tooltip.
+    - screens: [SCR-UA-07, SCR-UA-12]
+      observation: >-
+        The Group Profiles of a request are some 70 check boxes in four columns, in no visible order by area, and
+        the list grows with each module.
+      proposal: >-
+        A searchable picker of the group profiles, grouped by area (Marketing, Operations, Finance, Claims,
+        Administration), with the chosen profiles as removable tags.

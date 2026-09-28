@@ -29,6 +29,14 @@ issue:
       screens: [SCR-DM-17]
 
 # Who each persona is (the what they do comes from the persona table of the handbook unless given here).
+navigation:
+  # Identical menus are kept once: the migration roles of the same menu, and the Marketing Account Officer of BRD-3.
+  shared:
+    ux-nav-03-menu: BRD-13:ux-nav-01-menu
+    ux-nav-05-menu: BRD-13:ux-nav-01-menu
+    ux-nav-06-menu: BRD-13:ux-nav-01-menu
+    ux-nav-15-menu: BRD-03:ux-nav-01-menu
+
 personas:
   DATA_MIGRATION_LEAD: {who: "The BDOI lead of the migration, from the Business Project Services programme office"}
   DATA_STEWARD: {who: "A data specialist of the business unit that owns the legacy data (Operations, Marketing, Comptrollership)"}

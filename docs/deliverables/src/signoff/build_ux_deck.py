@@ -290,12 +290,23 @@ class Ux:
             out.append(Img(d["shot"], p.shot_file(d["shot"]), d["id"], d["name"], "document",
                            unique(f"{d['id']}_document.png"), f"{d['name']}: first page as generated", "document",
                            [], frs=list(d.get("frs") or []), section=self.section_of(d["id"])))
-        for shot in p.ux_shots():
+        shots = list(p.ux_shots())
+        # Landing pages and menus shown with the image of another persona or set (identical images are kept once).
+        for slug, target in p.nav_shared().items():
+            n = int(slug.split("-")[2])
+            role = p.nav_roles()[n - 1]
+            brd, _, other = target.partition(":")
+            shots.append({"slug": slug, "screen": p.nav_id(n), "state": slug.rsplit("-", 1)[1], "role": role,
+                          "file": brand.src_dir(brd) / "screenshots" / f"{other}.png",
+                          "caption": f"{p.persona_label(role)}: " + ("landing page after sign-in"
+                                                                     if slug.endswith("landing") else
+                                                                     "menu, every group open")})
+        for shot in sorted(shots, key=lambda x: x["slug"]):
             if shot.get("component"):
                 continue
             if shot["state"] in ("landing", "menu"):
                 n = int(shot["slug"].split("-")[2])
-                out.append(Img(shot["slug"], p.shot_file(shot["slug"]), shot["screen"],
+                out.append(Img(shot["slug"], shot.get("file") or p.shot_file(shot["slug"]), shot["screen"],
                                f"{p.persona_label(shot['role'])}: " + ("landing page" if shot["state"] == "landing"
                                                                        else "menu"),
                                shot["state"], unique(f"{p.nav_id(n)}_{shot['state']}.png"), shot["caption"], "nav",

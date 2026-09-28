@@ -116,3 +116,21 @@ confirm:
         On a released version an empty date (Anniversary) shows the format hint dd-MMM-yyyy, and a long text
         (Computation Basis) is cut at the edge of its box.
       proposal: Show a dash for an empty value and the whole text of a read-only field (wrapped).
+    - screens: [SCR-PM-03]
+      observation: >-
+        On the request form the coverage is keyed as a code (Coverage code) and the amounts show without separators
+        while typed (2000000, 5000000); the hint "Before submitting, complete the package end date." is plain text
+        above the form.
+      proposal: >-
+        Pick the coverage by its name from the coverage list, format the amounts when the field is left, and show
+        the hint as the one-line information notice of the notice standard.
+    - screens: [SCR-PM-04, SCR-PM-05]
+      observation: >-
+        In the workflow step bar of a request in negotiation the stage actions wrap to a second line under the meta
+        row, and Not Proceeded (which ends the request) has the look of the other secondary actions.
+      proposal: >-
+        Keep the actions on the meta row, or give them their own right-aligned row by design; show Not Proceeded as
+        the destructive action, last and in red, as the page action order asks.
+    - screens: [SCR-PM-16]
+      observation: The Actions column of Incentive Criteria shows Deactivate as a link in the row.
+      proposal: Offer the row actions through the row action menu of the table standard (Deactivate last, in red).

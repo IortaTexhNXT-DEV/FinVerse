@@ -447,15 +447,23 @@ class Pack:
             slug = f"ux-{scr.id.lower()}-{st['state']}"
             out.append({"slug": slug, "screen": scr.id, "route": scr.route, "caption": st.get("caption", scr.title),
                         "ux": True, **{k: v for k, v in st.items() if k not in ("caption", "screen")}})
+        shared = self.nav_shared()
         for n, role in enumerate(self.nav_roles(), start=1):
             user = self.menu_roles[role].get("user")
             for state in ("landing", "menu"):
+                if f"ux-nav-{n:02d}-{state}" in shared:
+                    continue  # the same image as another persona or set shows (ux.yaml navigation.shared)
                 out.append({"slug": f"ux-nav-{n:02d}-{state}", "screen": self.nav_id(n), "route": "", "user": user,
                             "state": state, "role": role, "ux": True, "nocallouts": True,
                             "crop": "full" if state == "landing" else "nav.app-sidebar",
                             "caption": f"{self.persona_label(role)}: "
                                        + ("landing page after sign-in" if state == "landing" else "menu, every group open")})
         return out
+
+    def nav_shared(self) -> dict[str, str]:
+        """Landing pages and menus identical to those of another persona or set, which are not captured again:
+        slug -> "BRD-nn:slug" (ux.yaml navigation.shared)."""
+        return dict((self.ux.get("navigation") or {}).get("shared") or {})
 
     def nav_roles(self) -> list[str]:
         """The personas whose landing page and menu the UX deck shows: ux.yaml navigation, else the personas."""

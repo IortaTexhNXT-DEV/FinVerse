@@ -4,6 +4,8 @@ import com.iortatechnxt.brokerverse.catalog.domain.ProductVersion;
 import com.iortatechnxt.brokerverse.catalog.domain.ProductVersionStatus;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.catalog.domain.SchemeTerms;
+import com.iortatechnxt.brokerverse.catalog.domain.ValidationCheck;
+import com.iortatechnxt.brokerverse.catalog.domain.ValidationResult;
 import com.iortatechnxt.brokerverse.catalog.domain.VersionCoverage;
 import com.iortatechnxt.brokerverse.catalog.domain.VersionInsurer;
 import com.iortatechnxt.brokerverse.catalog.domain.VersionInsurerTerm;
@@ -108,6 +110,10 @@ public final class ProductVersionDtos {
    * @param validationChecklist confirmed checklist (JSON array)
    * @param testPremium test premium computed at validation
    * @param returnedReason reason of the last return
+   * @param validationResult outcome of the checkpoint (passed or returned), null before
+   * @param returnedBy validator who returned the version
+   * @param returnedAt time of the return
+   * @param validationChecks checks run at the validation or the return
    */
   public record VersionDetail(
       VersionSummary summary,
@@ -122,7 +128,11 @@ public final class ProductVersionDtos {
       String mancomSignoffRef,
       String validationChecklist,
       BigDecimal testPremium,
-      String returnedReason) {
+      String returnedReason,
+      ValidationResult validationResult,
+      String returnedBy,
+      Instant returnedAt,
+      List<ValidationCheck> validationChecks) {
 
     /**
      * Maps a version.
@@ -145,7 +155,11 @@ public final class ProductVersionDtos {
           v.getMancomSignoffRef(),
           v.getValidationChecklist(),
           v.getTestPremium(),
-          v.getReturnedReason());
+          v.getReturnedReason(),
+          v.getValidationResult(),
+          v.getReturnedBy(),
+          v.getReturnedAt(),
+          v.getValidationChecks());
     }
   }
 

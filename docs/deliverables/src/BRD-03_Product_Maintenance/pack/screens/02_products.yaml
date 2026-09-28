@@ -134,12 +134,12 @@ screens:
       - {state: terms, user: mbs, open: draft_version, tab: Insurer Terms, caption: "Insurer Terms tab: terms and clauses per insurer and coverage"}
       - {state: error, user: mbs, open: draft_version, fill: version_invalid, submit: "^save draft$", caption: "Field messages of the version form"}
       - {state: validation, user: tsuhead, open: version_for_validation, caption: "Validation Checklist of the TSU Head"}
-      - {state: released, user: mbs, open: released_version, caption: "Released version with its validation"}
+      - {state: released, user: mbs, open: released_version, caption: "Released version: header with the package request, and the Validation card with the checks"}
     fields:
       - "Header | Product / Version | Reference chip | Risk code; version number | - | Package version | - | Read only | - | -"
       - "Header | [Version status pill] | Pill | Draft, For validation, Released, Superseded, Expired | - | Package version | - | Read only | - | -"
-      - "Header | [Request tag] | Tag | Request PKR-yyyy-nnnnnn that produced the version | - | Package version | - | Read only | - | -"
       - "Header | Effective / Package End / Rate % / Set Up By / ManCom Ref. | Fact | Rate % shows Per insurer when every insurer has its own rate | - | Package version | - | Read only | - | -"
+      - "Header | Package Request | Fact | PKR-yyyy-nnnnnn of the request that produced the version, a link to the request | - | Package version | - | Read only | - | -"
       - "Rate Scheme | Package Rate % | Number | Up to four decimals; empty when every insurer has its own rate | Cond.: or a rate for every insurer | - | Rate of the version it was copied from | Draft | 0 to 100; the package rate or a rate for every insurer | Enter a rate between 0 and 100 / Enter the package rate or a rate for every insurer"
       - "Rate Scheme | Minimum Premium | Number | Amount in PHP | Y | - | Copied value | Draft | Zero or more | Enter the minimum premium"
       - "Rate Scheme | Commission % | Number | Percentage | Y | - | Copied value | Draft | 0 to 100 | Enter a commission between 0 and 100"
@@ -166,7 +166,8 @@ screens:
       - "Insurer Terms | Limit / Deductible / Deductible Wording | Number / Text | Amounts in PHP; wording | N | - | The coverage's values | Draft | - | -"
       - "Insurer Terms | Clauses | Multi-select | Active clauses of the line or of every line | N | Clause library | None | Draft | Active clauses | -"
       - "Validation Checklist | Hierarchy complete: cover type and basic coverage / Every panel insurer has terms for each included coverage / Rates and minimum premiums match the signed-off terms / Dates and package term are correct / Test premium reviewed | Check box | Every item | Y (all five) | Fixed checklist | Not ticked | For validation | Every item confirmed | -"
-      - "Validation | [Validated by, date and test premium] | Detail | Validated by <name> on dd-MMM-yyyy HH:mm · Test premium; the confirmed checklist | - | Package version | - | Read only | - | -"
+      - "Validation | Result / Validated By / Validated On / Test Premium / Return Reason | Fact | Passed or Returned pill; validator's name; dd-MMM-yyyy HH:mm; PHP amount; the reason when returned (Returned By / Returned On) | - | Validation checkpoint | - | Read only | - | -"
+      - "Validation | # / Check / Result / Details | Table | One row per check: hierarchy, insurer terms, co-insurance shares, rates and minimum premiums, dates and package term, test premium; Passed, Failed or Not Applicable with the figures compared (for example 3 of 3 insurers have terms for 2 included coverages) | - | Validation checkpoint | - | Read only | - | -"
       - "Return Version to MBS | Return reason / Comment | Drop-down / Text | Return reason list; free text | Y (reason) | List RETURN_REASON | Select | For validation | Not blank | Enter the reason of the return"
     actions:
       - "Save Draft | MBS (PRODUCT_MAINTAIN) | Draft | Checks the fields and saves the whole draft | Draft | -"
@@ -177,6 +178,7 @@ screens:
       - "A draft is invisible to rating; only a released version prices new business (FR-PM-050, FR-PM-051)."
       - "Submission needs the cover type and at least one included basic coverage, terms for every panel insurer on every included coverage, the package rate or a rate for every insurer, co-insurance shares totalling 100%, an effective date today or later and after the start of the version in force, and a package end after the effective date (FR-PM-043, FR-PM-014)."
       - "The validator is never the maker or the submitter of the version; the validator confirms the five checklist items and a test premium is computed (FR-PM-043)."
+      - "At release and at return BIBS records each check with its result (Passed, Failed or Not Applicable) and the figures compared, with the validator, the time and, for a return, the reason; the Validation card shows them until the version is submitted again (FR-PM-043)."
       - "On release the previous version ends the day before the new one takes effect and becomes Superseded; a version whose package end has passed without a renewal becomes Expired and the product is no longer sold (FR-PM-050, FR-PM-052)."
       - "An insurer's own rate and minimum premium win over the package's; a package with a panel is placed only with its panel insurers (FR-PM-014, FR-PM-051)."
     outcome: A package version is set up once, checked by a second person and released on its effective date; every earlier version stays on record.
@@ -264,7 +266,7 @@ screens:
       - The incentive alert when a product of a criterion expires or is retired
     shots:
       - {state: list, user: mbs, caption: "Incentive Criteria, Current tab"}
-      - {state: new, user: mbs, click: "^new criterion$", caption: "New Incentive Criterion dialog"}
+      - {state: new, user: mbs, click: "^new criterion$", caption: "New Incentive Criterion dialog with its rule parameters"}
     fields:
       - "Tabs | Current / Pending Authorization / History | Tab | - | - | Fixed | Current | - | Current = active and not ended; History = ended, replaced or inactive | -"
       - "Search | Search Criterion or Product | Text | Code of a criterion or a product | N | - | Blank | - | Contains search | -"
@@ -276,7 +278,7 @@ screens:
       - "New Incentive Criterion | Value | Number | Rate 0 to 100 or an amount | Cond.: rate or fixed amount | - | Blank | Pending; amendment | Zero or more; a rate up to 100 | Enter the value / A rate is between 0 and 100"
       - "New Incentive Criterion | Effective from | Date | dd-MMM-yyyy | Y | - | Blank | Pending; amendment | An amendment starts after the active row; no overlap with another row of the code | Enter the start date / The change must start after <active from> / Criterion <code> already covers part of this period"
       - "New Incentive Criterion | Effective to | Date | dd-MMM-yyyy | N | - | Blank | Pending; amendment | On or after the start | The end is before the start"
-      - "New Incentive Criterion | Rule parameters (JSON) | Text | For example {\"minimumPremium\": 5000} | N | - | Blank | Pending; amendment | Name and value pairs as in the example | Enter valid JSON, e.g. {\"minimumPremium\": 5000}"
+      - "New Incentive Criterion | Rule Parameters | Rows: parameter and value | Parameter from the parameters of the incentive type (Minimum Gross Premium); value as the parameter asks (an amount) | N (a value per row) | Rule parameters of the incentive type | None; Add Parameter adds a row | Pending; amendment | Each parameter once; a value for each parameter; a number, zero or more | Select the parameter / <parameter> is listed twice / Enter a value for each parameter / <parameter> must be a number / <parameter> cannot be negative"
       - "New Incentive Criterion | Description | Text | Free text | N | - | Blank | Pending; amendment | - | -"
       - "New Incentive Criterion | Products matrix | Drop-down and rows | Active product, with a segment per product (Any segment) | Y (at least one) | Active products; list MARKET_SEGMENT | None | Pending; amendment | Active products only | Select at least one product of the matrix"
     actions:

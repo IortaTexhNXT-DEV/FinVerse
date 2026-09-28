@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.iortatechnxt.brokerverse.security.service.JwtTokenService;
 import com.iortatechnxt.brokerverse.security.service.SecurityProperties;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import com.iortatechnxt.brokerverse.support.SignInPasswords;
 import com.jayway.jsonpath.JsonPath;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -35,6 +36,7 @@ class LogoutIT {
   @Autowired private JdbcTemplate jdbc;
   @Autowired private JwtTokenService tokens;
   @Autowired private SecurityProperties properties;
+  @Autowired private SignInPasswords passwords;
 
   @Test
   void logoutRevokesTheTokenAndIsAudited() throws Exception {
@@ -82,8 +84,7 @@ class LogoutIT {
         mvc.perform(
                 post("/api/v1/auth/login")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(
-                        "{\"username\":\"" + username + "\",\"password\":\"Brokerverse@2026\"}"))
+                    .content(passwords.loginBody(username)))
             .andExpect(status().isOk())
             .andReturn()
             .getResponse()

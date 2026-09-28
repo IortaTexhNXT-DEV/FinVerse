@@ -17,6 +17,9 @@ documents:
   - {kind: TestPlan, name: Product Maintenance, ext: xlsx, what: "Test plan workbook: the test cases traced to the FRs and to the screens, including one screen case and one message case per screen", readers: "Business users who will run UAT; BDOI IT", when: "After the screens; used again in SIT and UAT"}
   - {kind: TestPlan, name: Product Maintenance Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Business owner, BDOI IT", when: "Before sign-off"}
   - {kind: Templates, name: Configuration Inputs, ext: xlsx, what: "Configuration input templates: product catalogue, coverages and rules, clauses, rate tables, insurers, packages in force, package map, document templates, lists of values, incentive criteria", readers: "MBS, TSU, Operations, Comptrollership (who provide the content)", when: "During the review; filled in for the data migration mocks and the map freeze"}
+  - {kind: UXDeck, name: Product Maintenance, ext: pptx, what: "UX Screen Deck for the BDOI UX Design team: design foundation, navigation and personas, every flow step by step and every screen with all its states", readers: "BDOI UX Design team", when: "From the issue, in parallel with the review; re-issued with each version of the set"}
+  - {kind: UXScreens, name: Product Maintenance, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, flow and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
+  - {kind: UXScreens, name: Product Maintenance, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG), the component crops and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
 
 # Reading order per role (FRS chapter numbers of v2.0).
 reading:
@@ -32,6 +35,8 @@ reading:
     order: "Rates & Taxes (SCR-PM-19), Insurer record commission rates (SCR-PM-18), Incentive Criteria (SCR-PM-16); contract lines IC-10 and IC-11 (chapter 20); templates CI-04 and CI-10"
   - role: BDOI IT
     order: "Interfaces and integration (chapter 7), non-functional requirements (chapter 8), menu by persona (chapter 12), cross-BRD contract (chapter 20); product master feed pending specifications (Guide deck, caveats)"
+  - role: BDOI UX Design team
+    order: "07 UX Screen Deck: design foundation and navigation first, then the personas, flows and screens of the design work; 08 UX screen register (filter Changed in this issue at each new issue); 09 image package in the design tool"
   - role: iorta TechNXT project team
     order: "All documents; keeps the comments log, the meeting minutes and the version history of the workbook, answers every comment and keeps the traceability to SIT and UAT"
 

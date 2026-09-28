@@ -1,6 +1,6 @@
 -- =====================================================================================
 -- iNXT BrokerVerse - V1950 Seed Sanction Screening (BRD-10) users and configuration (seed profile
--- only; password for all users: Brokerverse@2026). SEED DATA ONLY - never load in production.
+-- only; the SIT/UAT password is provided to testers separately). SEED DATA ONLY - never load in production.
 --   Users: design section 6.2 and test data TD-SS-01 (compoff, compchk, ucc, investigator,
 --   investigator2, scrapprover, amlcom1, amlcom2) plus compdual, a combined maker and checker that
 --   shows the four-eyes refusals (FR-SS-019, FR-SS-023). The roles and grants are in V1050.

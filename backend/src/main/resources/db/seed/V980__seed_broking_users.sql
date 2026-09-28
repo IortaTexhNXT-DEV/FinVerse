@@ -1,6 +1,6 @@
 -- =====================================================================================
--- iNXT BrokerVerse - V980 SIT/UAT users for the BDOI broking roles (password for all:
--- Brokerverse@2026). SEED DATA ONLY - never load in production.
+-- iNXT BrokerVerse - V980 SIT/UAT users for the BDOI broking roles (the SIT/UAT
+-- password is provided to testers separately). SEED DATA ONLY - never load in production.
 -- Two users for roles with maker-checker steps (Marketing AO, TSU) so four-eyes flows can
 -- be shown.
 -- =====================================================================================

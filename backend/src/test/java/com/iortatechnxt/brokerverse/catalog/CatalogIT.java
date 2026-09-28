@@ -37,10 +37,12 @@ import com.iortatechnxt.brokerverse.catalog.service.ProductRuleService;
 import com.iortatechnxt.brokerverse.catalog.service.RateResolver;
 import com.iortatechnxt.brokerverse.catalog.service.RateTableService;
 import com.iortatechnxt.brokerverse.catalog.service.RatingService;
+import com.iortatechnxt.brokerverse.catalog.service.SalesOrganisationExport;
 import com.iortatechnxt.brokerverse.catalog.service.SalesOrganisationService;
 import com.iortatechnxt.brokerverse.catalog.service.TsuRoutingService;
 import com.iortatechnxt.brokerverse.common.domain.RecordStatus;
 import com.iortatechnxt.brokerverse.party.service.PartyService;
+import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestData;
@@ -65,6 +67,8 @@ class CatalogIT {
   @Autowired private RatingService rating;
   @Autowired private TsuRoutingService tsu;
   @Autowired private SalesOrganisationService sales;
+  @Autowired private SalesOrganisationExport salesExport;
+  @Autowired private UserDirectory directory;
   @Autowired private AsUser as;
   @Autowired private TestData data;
 
@@ -436,5 +440,88 @@ class CatalogIT {
     assertThat(officer.getRecordStatus()).isEqualTo(RecordStatus.PENDING_AUTHORIZATION);
     assertThat(sales.units(company)).extracting("code").contains(team);
     assertThat(sales.officers(company)).extracting("username").contains("epol");
+  }
+
+  @Test
+  void aSalesUnitIsDeactivatedWithAReasonOnlyWhenNothingActiveHangsBelowIt() {
+    Long company = data.company().getId();
+    String region = unique("R");
+    String department = unique("D");
+    String team = unique("T");
+    var r =
+        as.run(
+            "badmin",
+            () ->
+                sales.createUnit(
+                    company, SalesLevel.REGION, region, new UnitDetails("Region", null, null)));
+    var d =
+        as.run(
+            "badmin",
+            () ->
+                sales.createUnit(
+                    company,
+                    SalesLevel.DEPARTMENT,
+                    department,
+                    new UnitDetails("Department", region, null)));
+    var t =
+        as.run(
+            "badmin",
+            () ->
+                sales.createUnit(
+                    company, SalesLevel.TEAM, team, new UnitDetails("Team", department, "MKT")));
+    assertThatThrownBy(() -> as.run("badmin", () -> sales.deactivateUnit(t.getId(), " ")))
+        .extracting("code")
+        .isEqualTo("REASON_REQUIRED");
+    assertThatThrownBy(() -> as.run("badmin", () -> sales.deactivateUnit(r.getId(), "Merged")))
+        .extracting("code")
+        .isEqualTo("SALES_UNIT_IN_USE");
+    assertThatThrownBy(
+            () -> as.run("badmin", () -> records.deactivate(CatalogKind.SALES_UNIT, d.getId())))
+        .hasMessageContaining("1 active sub-unit")
+        .extracting("code")
+        .isEqualTo("SALES_UNIT_IN_USE");
+    var officer = as.run("badmin", () -> sales.assignOfficer(company, team, "epol"));
+    assertThat(officer.getAssignedSince()).isNotNull();
+    assertThatThrownBy(() -> as.run("badmin", () -> sales.deactivateUnit(t.getId(), "Merged")))
+        .hasMessageContaining("1 account officer");
+
+    var removed = as.run("badmin", () -> sales.removeOfficer(officer.getId(), "Resigned"));
+    assertThat(removed.getRecordStatus()).isEqualTo(RecordStatus.INACTIVE);
+    assertThat(removed.getStatusReason()).isEqualTo("Resigned");
+    var inactive = as.run("badmin", () -> sales.deactivateUnit(t.getId(), "Team merged"));
+    assertThat(inactive.getRecordStatus()).isEqualTo(RecordStatus.INACTIVE);
+    assertThat(inactive.getStatusReason()).isEqualTo("Team merged");
+    as.run("badmin", () -> sales.deactivateUnit(d.getId(), "Closed"));
+    assertThatThrownBy(() -> as.run("badmin", () -> sales.reactivateUnit(t.getId(), "Reopened")))
+        .extracting("code")
+        .isEqualTo("SALES_PARENT_INVALID");
+    assertThatThrownBy(() -> as.run("badmin", () -> sales.assignOfficer(company, team, "epol")))
+        .extracting("code")
+        .isEqualTo("SALES_TEAM_UNKNOWN");
+    var reopened = as.run("badmin", () -> sales.reactivateUnit(d.getId(), "Reopened"));
+    assertThat(reopened.getRecordStatus()).isEqualTo(RecordStatus.PENDING_AUTHORIZATION);
+
+    List<List<Object>> rows = salesExport.rows(company);
+    assertThat(rows)
+        .anySatisfy(
+            row -> {
+              assertThat(row.get(4)).isEqualTo("T-CBG1");
+              assertThat(row.get(8)).isEqualTo(directory.displayName("ao"));
+            });
+    assertThat(rows)
+        .anySatisfy(
+            row -> {
+              assertThat(row.get(4)).isEqualTo(department);
+              assertThat(row.get(6)).isNull();
+              assertThat(row.get(11)).isEqualTo("Pending Authorization");
+            });
+    assertThat(rows)
+        .anySatisfy(
+            row -> {
+              assertThat(row.get(4)).isEqualTo("T-CBG1");
+              assertThat(row.get(3)).isEqualTo("Team");
+              assertThat(row.get(6)).isEqualTo("NB-CBG-M");
+              assertThat(row.get(7)).isEqualTo("Own");
+            });
   }
 }

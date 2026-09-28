@@ -36,6 +36,7 @@ const WIDTH = Number(process.env.WIDTH || 1440);
 const HEIGHT = Number(process.env.HEIGHT || 900);
 const SCALE = Number(process.env.SCALE || 2);
 const MAX_HEIGHT = Number(process.env.MAX_HEIGHT || 2000);
+const MENU_MAX_HEIGHT = Number(process.env.MENU_MAX_HEIGHT || 12000);  // the full menu of a persona (UX deck)
 const MARGIN = 12;  // CSS pixels of page kept around a cropped region
 const READY_TIMEOUT_MS = 20 * 60 * 1000;
 
@@ -596,6 +597,9 @@ async function cropOf(page, shot, recipe) {
           console.log('captured', shot.slug);
           continue;
         }
+      } else if (shot.state === 'landing' || shot.state === 'menu') {
+        // The UX deck: the page a persona lands on after sign-in (whole window), and the persona's full menu.
+        page = await navigationState(await pageOf(shot.user), shot);
       } else if (shot.state === 'walkthrough') {
         const step = recipe.walkthrough[shot.slug];
         if (!step) {
@@ -620,17 +624,22 @@ async function cropOf(page, shot, recipe) {
       // size that stays readable next to its text; the recipe sets `tall` for a step that needs the whole page.
       // A step cropped to a named region (recipe.crops) gets the whole page, so the region is in view.
       const named = recipe.crops && recipe.crops[shot.slug] && !['main', 'dialog', 'full'].includes(recipe.crops[shot.slug]);
-      await fitViewport(page, shot.state === 'walkthrough' ? (shot.tall ?? Boolean(named)) : shot.tall);
+      if (shot.state === 'menu') {
+        await fitSidebar(page);
+      } else if (shot.state !== 'landing') {
+        await fitViewport(page, shot.state === 'walkthrough' ? (shot.tall ?? Boolean(named)) : shot.tall);
+      }
       if (named) {
         // A message of the step would cover the rows of the region.
         await page.evaluate(() => document.querySelectorAll('.toast-region .toast').forEach((t) => { t.style.display = 'none'; }));
       }
-      const missing = shot.state === 'walkthrough' ? [] : await drawCallouts(page, calloutsOf[shot.screen]);
+      const bare = shot.state === 'walkthrough' || shot.nocallouts;
+      const missing = bare ? [] : await drawCallouts(page, calloutsOf[shot.screen]);
       const { kind, clip } = await cropOf(page, shot, recipe);
       await page.screenshot(clip ? { path: file, clip } : { path: file });
       await clearCallouts(page);
       optimise(file, kind);
-      const placed = shot.state === 'walkthrough' ? 0 : (calloutsOf[shot.screen] || []).length - missing.length;
+      const placed = bare ? 0 : (calloutsOf[shot.screen] || []).length - missing.length;
       const size = clip ? `${Math.round(clip.width)}x${Math.round(clip.height)}` : 'window';
       report.push(`${shot.slug}: ${new URL(page.url()).pathname}, ${kind} ${size}, ${placed} callouts`);
       console.log('captured', shot.slug, new URL(page.url()).pathname, kind, size, `${placed} callouts`);
@@ -654,6 +663,37 @@ async function cropOf(page, shot, recipe) {
   console.error(e);
   process.exit(1);
 });
+
+/**
+ * The UX deck shots of a persona: `landing` is the page after sign-in, as the persona first sees it (the whole
+ * window, menu groups as they open); `menu` opens every group of the sidebar so the whole menu is in the image.
+ */
+async function navigationState(page, shot) {
+  await page.goto(`${BASE}/`);
+  await settle(page, 1200);
+  if (shot.state === 'menu') {
+    for (let i = 0; i < 20; i += 1) {
+      const closed = page.locator('nav.app-sidebar .nav-group-toggle[aria-expanded="false"]');
+      if ((await closed.count()) === 0) {
+        break;
+      }
+      await closed.first().click();
+      await page.waitForTimeout(150);
+    }
+    await settle(page, 400);
+  }
+  return page;
+}
+
+/** Grows the viewport so the whole sidebar is in the image (up to MENU_MAX_HEIGHT). */
+async function fitSidebar(page) {
+  const height = await page.evaluate(() => {
+    const nav = document.querySelector('nav.app-sidebar');
+    return nav ? nav.scrollHeight : 0;
+  });
+  await page.setViewportSize({ width: WIDTH, height: Math.min(MENU_MAX_HEIGHT, Math.max(HEIGHT, height + 8)) });
+  await page.waitForTimeout(300);
+}
 
 /** Brings the page to the state of a screen shot: open the record, tab, fill, select, click, submit, upload. */
 async function reachState(page, shot, recipe, ctx) {

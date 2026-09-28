@@ -91,7 +91,7 @@ The signatories sign the Sign-off certificate sheet of the sign-off workbook in 
 
 # Configuration inputs
 
-The workbook of configuration input templates lists what the business provides to set up User Access Maintenance: the users and their group profiles (loaded with the bulk request), the role-to-permission matrix (implemented by group-profile requests), the approvers, approval rules and limits, the separation-of-duties rules, the password, session and sign-in values and the lists of values (FRS chapter 19). The owners start the templates during the review; the users and the role matrix are due before the first data migration mock, and the parameters agreed with Information Security before UAT.
+The workbook of configuration input templates lists what the business provides to set up User Access Maintenance: the users and their group profiles (loaded with the bulk request), the role-to-permission matrix (implemented by group-profile requests), the approvers, approval rules and limits, the separation-of-duties rules, the password, session and sign-in values and the lists of values (FRS chapter 19). The owners start the templates during the review; the users and the role matrix are due before the first data migration mock, and the parameters agreed with Information Security before UAT. The workbook opens on a Start here sheet with the templates in the order they are filled in and a link to each; every template sheet carries its own guide above the columns (mandatory, format, allowed values, what to enter), drop-downs and one example row, and questions are raised in the workbook on the sheet Questions and comments.
 
 # Change control after sign-off
 

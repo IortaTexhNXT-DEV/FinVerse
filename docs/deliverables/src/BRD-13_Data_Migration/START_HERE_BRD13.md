@@ -64,7 +64,7 @@ source: pack/pack.yaml
 render: guide-steps
 ```
 
-**How to review.** Read the Handbook part of your role, or follow the same screens on SIT during the sessions. In the Migration Workbook, set BU review to Accept, Change requested or Comment on each row of your objects (sheets Object catalogue, Data owners, Extract planning, the load template sheets, Code maps, Validation rules, Cut-over tasks, Reconciliation sign-off) and on the screen sheets, write the change in BU comment, and add your name and the date. On the sheet Proposed rules, record the BDOI decision on each proposed rule. Questions go to the Comments log sheet. One workbook per unit is enough.
+**How to review.** Read the Handbook part of your role, or follow the same screens on SIT during the sessions. In the Migration Workbook, set BU review to Accept, Change requested or Comment on each row of your objects (sheets Object catalogue, Data owners, Extract planning, Code maps, Validation rules, Cut-over tasks, Reconciliation sign-off; on the load template sheets, listed in load order on the sheet Load templates, the BU review rows above each column) and on the screen sheets, write the change in BU comment, and add your name and the date. On the sheet Proposed rules, record the BDOI decision on each proposed rule. Questions go to the Comments log sheet, with the load template and the column when they concern one. One workbook per unit is enough.
 
 <!-- table: widths=3.6,2.4,7.2,4.4 caption="SIT walkthrough sessions" -->
 | Date | Time | Session | Units |

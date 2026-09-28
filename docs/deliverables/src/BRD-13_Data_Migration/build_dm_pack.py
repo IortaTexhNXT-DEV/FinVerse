@@ -838,55 +838,7 @@ def workbook_sheets(wb: Any, pack: Any, date_sheets: list[Any]) -> None:
                       rows, description="Rules of every extract and control file: the delivery rules of the "
                                         "console workbook, then the rules of the migration"))
 
-    rows = []
-    for layout in cat.layouts.values():
-        o = cat.by_code.get(layout.object, {})
-        rows.append({"layout": layout.code, "title": layout.title, "object": layout.object,
-                     "decision": CLASS_LABEL.get(o.get("decision", ""), ""), "sheet": layout.sheet_name,
-                     "template": layout.template, "columns": len(layout.columns),
-                     "mandatory": sum(1 for c in layout.columns if c["mandatory"] == "Y"),
-                     "key": ", ".join(layout.key), "hash": f"{HASH_LABEL.get(layout.hash_rule, layout.hash_rule)}",
-                     "amounts": ", ".join(layout.amounts) or "-", "version": layout.version})
-    wb.sheet("Load templates", [
-        Column("layout", "Layout", 8, "Layout code; starts the file name"),
-        Column("title", "Content", 36, "What one row of the file holds"),
-        Column("object", "Object", 8, "Data object"),
-        Column("decision", "Decision", 12, "Proposed decision of the object"),
-        Column("sheet", "Sheet", 30, "Sheet of this workbook and of the console workbook"),
-        Column("template", "CSV template", 20, "Template the console exports (header row only)"),
-        Column("columns", "Columns", 8, "Columns of the layout", kind="number"),
-        Column("mandatory", "Mandatory", 9, "Mandatory columns", kind="number"),
-        Column("key", "Key", 26, "Legacy key of a row"),
-        Column("hash", "Hash total", 20, "How the hash total of the control file is computed"),
-        Column("amounts", "Amount totals", 26, "Amount columns totalled per currency in the control file"),
-        Column("version", "Version", 7, "Layout version in force", kind="number"),
-    ], rows, description="The extract layouts in force; each has a sheet below and a CSV template exported by the "
-                         "Migration Console (Layouts and Rules)")
-
-    for layout in cat.layouts.values():
-        rows = []
-        for c in layout.columns:
-            allowed = f"Code map {c['map_set']}" if c.get("map_set") else client_text(c.get("allowed_values"))
-            rows.append({"seq": int(c["seq"]), "name": c["name"], "description": client_text(c["description"]),
-                         "type": TYPE_LABEL.get(c["data_type"], c["data_type"]), "length": c.get("length") or "",
-                         "mandatory": c["mandatory"], "allowed": allowed, "format": client_text(c.get("format")),
-                         "example": client_text(c.get("example")), "validation": client_text(c.get("validation"))})
-        reviewed(wb.sheet(layout.sheet_name, [
-            Column("seq", "No.", 5, "Column position in the file", kind="number"),
-            Column("name", "Column", 22, "Column name in the header row of the file, exactly as written"),
-            Column("description", "Description", 40, "What the column holds"),
-            Column("type", "Type", 10, "Text, Code, Date, Timestamp, Amount (2 decimals), Integer, Decimal, Flag (Y "
-                   "or N)"),
-            Column("length", "Length", 7, "Maximum characters; for numbers the digits and decimals"),
-            Column("mandatory", "Mandatory", 9, "Y always; N optional; C when its condition holds (Validation)",
-                   values=["Y", "N", "C"]),
-            Column("allowed", "Allowed values or code map", 30, "Closed list of values, or the code map that maps "
-                   "the legacy value"),
-            Column("format", "Format", 18, "How the value is written in the file"),
-            Column("example", "Example", 18, "A made-up example"),
-            Column("validation", "Validation", 34, "Check applied when the file is validated"),
-        ] + review(), rows, description=f"Layout {layout.code} v{layout.version} of object {layout.object}: "
-                                        f"{layout.title}. Key {', '.join(layout.key)}. Template {layout.template}."))
+    load_templates(wb, cat)
 
     fields = cat.data["control_fields"]
     wb.sheet("Control file", [
@@ -1117,6 +1069,131 @@ def workbook_sheets(wb: Any, pack: Any, date_sheets: list[Any]) -> None:
     ], rows, description="Proposed business rules and clarifications for confirmation (Handbook chapter of the same "
                          "name)")
     date_sheets.append(ws)
+
+
+LOAD_INDEX = "Load templates"
+
+
+def layout_template(cat: Catalogue, layout: Layout) -> Any:
+    """The guided template of a layout: its columns with their guide, check and review rows (guided_xlsx)."""
+    import guided_xlsx as g  # noqa: PLC0415
+
+    o = cat.by_code.get(layout.object, {})
+    seed = cat.seed_objects.get(layout.object, {})
+    cols = []
+    for c in layout.columns:
+        dtype = TYPE_LABEL.get(c["data_type"], c["data_type"])
+        length = f", up to {c['length']}" if c.get("length") else ""
+        fmt = f"{dtype}{length}" + (f"; {client_text(c.get('format'))}" if c.get("format") else "")
+        validation = client_text(c.get("validation"))
+        mandatory = c["mandatory"]
+        if mandatory == "C":
+            mandatory = f"Cond.: {validation}" if validation else "C"
+        allowed_raw = client_text(c.get("allowed_values"))
+        check, allowed, target = "", "", ""
+        if c.get("map_set"):
+            allowed = f"The legacy code; mapped by the code map {c['map_set']} (sheet Code maps)"
+            target = "Code maps!A1"
+        elif c["data_type"] == "FLAG" or allowed_raw in ("Y, N", "Y or N"):
+            check = "yn"
+        elif allowed_raw and re.fullmatch(r"[A-Z0-9_]+(, [A-Z0-9_]+)+", allowed_raw):
+            check = "list:" + f"{layout.code}_{c['name']}".upper()
+        elif allowed_raw:
+            allowed = allowed_raw
+        if not check and c["data_type"] == "INTEGER":
+            check = "whole"
+        elif not check and c["data_type"] in ("AMOUNT", "DECIMAL"):
+            check = "number"
+        if not check and c["data_type"] in ("TEXT", "CODE") and str(c.get("length") or "").isdigit():
+            check = f"text:{c['length']}"
+        cols.append(g.GuideColumn(c["name"], mandatory, fmt, client_text(c["description"]),
+                                  client_text(c.get("example")) or "-", check,
+                                  extra={"Check when loaded": validation or "-"}, allowed=allowed,
+                                  allowed_link=target))
+    after = [x.strip() for x in str(seed.get("depends_on") or "").split(",") if x.strip()]
+    depends = [lc for obj in after for lc in (o2.code for o2 in cat.layouts_of(obj))]
+    first = cat.layouts_of(layout.object)[0].code
+    if first != layout.code:
+        depends.insert(0, first)
+    amounts = f"; amount totals per currency: {', '.join(layout.amounts)}" if layout.amounts else ""
+    return g.Template(
+        layout.code, layout.title, layout.sheet_name,
+        f"One row per record of {o.get('name', layout.title)} as extracted from {o.get('source', 'legacy')}. Key "
+        f"{', '.join(layout.key)}. Sent as the file {layout.template} (CSV, header row as below) with its control file "
+        f"(row count, {HASH_LABEL.get(layout.hash_rule, layout.hash_rule).lower()}{amounts}).",
+        f"{o.get('steward', '-')}; approved by {o.get('owner', '-')}; extracted by BDOI IT",
+        cat.milestone_text(o.get("due", "-")),
+        f"Data migration object {layout.object} ({CLASS_LABEL.get(o.get('decision', ''), '')}), layout "
+        f"{layout.code} version {layout.version}, through the Migration Console; lands in: {o.get('target', '-')}",
+        cols, source=o.get("source", ""), depends=depends, capacity=200,
+        extra_rows=["BU review", "BU comment", "Check when loaded"], input_rows=["BU review", "BU comment"],
+        extra_lists={"BU review": "BU_REVIEW"}, confirm=("Reviewed by (BU reviewer)", "Review date"))
+
+
+def load_templates(wb: Any, cat: Catalogue) -> None:
+    """The load templates in the guided design: the sheet Load templates (index in load order), one sheet per layout
+    with its guide band and review rows above the header row, and the Reference lists sheet. Questions go to the
+    Comments log, which names the template and the column."""
+    import guided_xlsx as g  # noqa: PLC0415
+    from bdoi_xlsx import _SheetInfo  # noqa: PLC0415
+    import signoff_pack  # noqa: PLC0415
+
+    def register(ws: Any, description: str, rows: int) -> None:
+        wb._sheets.append(_SheetInfo(ws.title, description, [], rows))
+
+    book = g.GuidedBook(wb.title, wb.version, wb=wb.wb, register=register, start=LOAD_INDEX, questions="Comments log")
+    book.add_list("BU_REVIEW", "BU review", [(v, "") for v in signoff_pack.REVIEW_VALUES])
+    templates = []
+    for layout in cat.layouts.values():
+        t = layout_template(cat, layout)
+        for c in t.columns:
+            if c.check.startswith("list:"):
+                values = [v.strip() for v in client_text(next(x for x in layout.columns if x["name"] == c.header)
+                                                         .get("allowed_values")).split(",")]
+                book.add_list(c.check[5:], f"{layout.code} {c.header}", [(v, "") for v in values])
+        templates.append(t)
+    book.plan_all(templates)
+    order = sorted(templates, key=lambda t: (int(cat.by_code.get(cat.layouts[t.id].object, {}).get("order") or 99),
+                                             cat.layouts[t.id].object, t.id))
+    idx = []
+    for i, t in enumerate(order, start=1):
+        layout = cat.layouts[t.id]
+        p = book.plans[t.id]
+        o = cat.by_code.get(layout.object, {})
+        idx.append({"Step": i, "Layout": t.id, "Object": layout.object, "Content": t.name,
+                    "Provided by": t.owner, "Due": t.due, "Decision": CLASS_LABEL.get(o.get("decision", ""), ""),
+                    "Loads after": ", ".join(t.depends) or "-", "Columns": len(layout.columns),
+                    "Mandatory": sum(1 for c in layout.columns if c["mandatory"] == "Y"),
+                    "Key": ", ".join(layout.key), "File": layout.template, "Rows entered": p.rows_formula(),
+                    "Mandatory cells missing": p.missing_formula(), "Status": "Not started", "Open": ("Open →", p.sheet)})
+    steps = [
+        "The index below lists the load templates in load order: reference data first, then clients, policies, open "
+        "items, the general ledger and the archive. Each template has a sheet of its own, named as in the workbook "
+        "the Migration Console exports (Layouts and Rules); the extracts are sent as CSV files with their control file "
+        "(sheets File rules and Control file).",
+        "On a template sheet, the header block says what one row holds, who provides it, when it is due and how it is "
+        "loaded; above each column the guide gives Mandatory, Format (type and length), Allowed values or the code map, "
+        "What to enter and the check applied when the file is loaded. The header row is the header row of the file; "
+        "* marks a mandatory column.",
+        "Review each column: set BU review (Accept, Change requested or Comment) and write the change in BU comment, "
+        "in the two rows above the guide; record your name and the date in Reviewed by and Review date.",
+        "The grey example row is made up. Test rows may be entered under it for the review: the drop-downs offer the "
+        "allowed values (sheet Reference lists) and a mandatory cell left empty turns red.",
+        "Set the Status of each template in the index. Questions go to the Comments log with the template and the "
+        "column.",
+    ]
+    identity = [("Client", brand.CLIENT), ("Release set", "BRD-13 Data Migration (Drop 0, Setup and Data Migration)"),
+                ("Version and date", f"Version {wb.version}, {wb.date}"),
+                ("Owner", "Program Manager, Business Project Services (Data Migration)"),
+                ("Due", "Per object: the Due of the index (milestones on the sheet Milestones)")]
+    columns = [("Step", 6), ("Layout", 8), ("Object", 8), ("Content", 30), ("Provided by", 30), ("Due", 18),
+               ("Decision", 12), ("Loads after", 14), ("Columns", 8), ("Mandatory", 9), ("Key", 20), ("File", 18),
+               ("Rows entered", 9), ("Mandatory cells missing", 10), ("Status", 14), ("Open", 8)]
+    book.start_sheet("Load templates – start here", "The extract layouts in force, in load order, each with its sheet",
+                     identity, steps, "Load templates in load order", columns, idx, sheet=LOAD_INDEX)
+    for i, t in enumerate(order, start=1):
+        book.template_sheet(t, i, len(order))
+    book.lists_sheet()
 
 
 def build_workbook(out_dir: Path | None = None) -> Path:

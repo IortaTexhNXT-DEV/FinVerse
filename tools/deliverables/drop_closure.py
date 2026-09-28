@@ -47,13 +47,14 @@ SUMMARY = SRC / "CLOSURE_SUMMARY_DROP0.md"
 ROUTES = {"screen": "Screen", "template": "Template", "migration": "Migration object"}
 BRD_TEMPLATE_PREFIX = {"BRD-03": "PM", "BRD-11": "UA"}
 LISTS = {
-    "LIST-LOV": "Lists of values",
-    "LIST-PARAMETERS": "System parameters",
-    "LIST-NUMBERING": "Document numbering",
-    "LIST-NOTIFICATIONS": "Notifications",
-    "LIST-DOCUMENTS": "Document templates",
-    "LIST-EVENTS": "Accounting events",
+    "LIST-LOV": "Ref Lists of values",
+    "LIST-PARAMETERS": "Ref System parameters",
+    "LIST-NUMBERING": "Ref Document numbering",
+    "LIST-NOTIFICATIONS": "Ref Notifications",
+    "LIST-DOCUMENTS": "Ref Document templates",
+    "LIST-EVENTS": "Ref Accounting events",
 }
+MIGRATION_SHEET = "Ref Migration cross-reference"
 
 
 # ============================================================================ loading
@@ -80,13 +81,24 @@ def config_inputs():
 
 @lru_cache(maxsize=1)
 def brd_templates() -> dict[str, dict[str, Any]]:
-    """The configuration input templates of the BRD-03 and BRD-11 sets, keyed PM-nn / UA-nn."""
+    """The configuration input templates of the BRD-03 and BRD-11 sets, keyed PM-nn / UA-nn; the checks and depends
+    name the templates by these IDs."""
     out: dict[str, dict[str, Any]] = {}
     for brd, prefix in BRD_TEMPLATE_PREFIX.items():
         src = brand.src_dir(brd) / "pack" / "config_inputs.yaml"
-        for t in config_inputs().load(src)["templates"]:
-            sid = f"{prefix}-{t['id'].split('-')[-1]}"
-            out[sid] = {**t, "sid": sid, "brd": brd, "ref": f"{brd} template {t['id']}"}
+        data = config_inputs().load(src)
+        sid_of = lambda tid, prefix=prefix: f"{prefix}-{tid.split('-')[-1]}"  # noqa: E731
+        for t in data["templates"]:
+            sid = sid_of(t["id"])
+            rows = []
+            for r in t["rows"]:
+                kind, _, arg = r["check"].partition(":")
+                if kind in ("code", "ref"):
+                    ref, _, col = arg.partition("/")
+                    r = {**r, "check": f"{kind}:{sid_of(ref)}/{col}"}
+                rows.append(r)
+            out[sid] = {**t, "id": sid, "sid": sid, "brd": brd, "ref": f"{brd} template {t['id']}", "rows": rows,
+                        "depends": [sid_of(d) for d in t.get("depends") or []], "lists_source": data["lists"]}
     return out
 
 
@@ -96,6 +108,7 @@ def drop_templates() -> dict[str, dict[str, Any]]:
     out: dict[str, dict[str, Any]] = {}
     for t in data()["templates"]:
         t = dict(t)
+        checks = t.get("checks") or {}
         if t.get("upload"):
             tpl = code_facts.bulk_templates([t["upload"]])[0]
             t["rows"] = [{"no": i, "header": c["header"], "mandatory": "Y" if c["required"] else "N",
@@ -110,10 +123,26 @@ def drop_templates() -> dict[str, dict[str, Any]]:
                 if len(parts) != 5:
                     raise ValueError(f"{t['id']} column {i}: {len(parts)} cells, expected 5: {raw}")
                 t["rows"].append(dict(zip(["header", "mandatory", "format", "what", "example"], parts), no=i))
+        for r in t["rows"]:
+            r["check"] = str(checks.get(r["header"], ""))
         t["sid"] = t["id"]
         t["ref"] = f"Drop 0 template {t['id']}"
         out[t["id"]] = t
     return out
+
+
+def combined() -> dict[str, Any]:
+    """Every template of the workbook with the lists of the three sources, in the form of a templates file."""
+    lists: dict[str, Any] = {}
+    for t in brd_templates().values():
+        prefix = BRD_TEMPLATE_PREFIX[t["brd"]]
+        for code, spec in t["lists_source"].items():
+            if spec.get("parameters_from_column"):
+                tid, n = spec["parameters_from_column"]
+                spec = {**spec, "parameters_from_column": [f"{prefix}-{tid.split('-')[-1]}", n]}
+            lists[code] = spec
+    lists.update(data().get("lists") or {})
+    return {"templates": list(all_templates().values()), "lists": lists}
 
 
 def all_templates() -> dict[str, dict[str, Any]]:
@@ -255,7 +284,7 @@ def lov_rows() -> list[dict[str, Any]]:
         rows.append({"code": r["code"], "name": r["name"], "module": m["name"], "drop": m["drop"], "brd": m["brd"],
                      "owner": m["owner"], "values": counts.get(r["code"], 0), "route": route, "prepared": prepared,
                      "due": dues()["D3"]["text"] if route == ROUTES["template"] else dues()["D4"]["text"],
-                     "status": "Open"})
+                     "status": "Not started"})
     return rows
 
 
@@ -276,7 +305,7 @@ def parameter_rows() -> list[dict[str, Any]]:
                      "description": d_text.get(key) or _clean(p["description"]),
                      "type": p["value_type"].replace("_", " ").lower(), "value": p.get("param_value") or "(blank)",
                      "range": rng, "route": ROUTES["template"], "template": tid, "prepared": _prepared(tid),
-                     "due": dues()["D5"]["text"], "status": "Open"})
+                     "due": dues()["D5"]["text"], "status": "Not started"})
     return rows
 
 
@@ -291,7 +320,7 @@ def event_rows() -> list[dict[str, Any]]:
         rows.append({"code": e["code"], "name": e["name"], "module": m["name"], "drop": m["drop"], "owner": m["owner"],
                      "description": _clean(e.get("description")), "in_app": "Y" if e["default_in_app"] == "true" else "N",
                      "email": "Y" if e["default_email"] == "true" else "N", "route": ROUTES["template"],
-                     "prepared": _prepared("LIST-NOTIFICATIONS"), "due": dues()["D5"]["text"], "status": "Open"})
+                     "prepared": _prepared("LIST-NOTIFICATIONS"), "due": dues()["D5"]["text"], "status": "Not started"})
     return rows
 
 
@@ -304,7 +333,7 @@ def document_rows() -> list[dict[str, Any]]:
         fields = sorted(set(re.findall(r"\{\{(\w+)\}\}", r.get("body") or "")))
         rows.append({"code": r["code"], "title": r["title"], "module": m["name"], "drop": m["drop"], "owner": m["owner"],
                      "fields": ", ".join(fields), "route": ROUTES["template"], "prepared": _prepared(tid),
-                     "due": dues()["D5"]["text"], "status": "Open"})
+                     "due": dues()["D5"]["text"], "status": "Not started"})
     return rows
 
 
@@ -314,7 +343,7 @@ def accounting_event_rows() -> list[dict[str, Any]]:
         rows.append({"code": r["code"], "name": r["name"], "category": r["category"].title(),
                      "journal": (r.get("journal_type") or "").replace("_", " ").title(),
                      "components": (r.get("amount_components") or "").replace(",", ", "),
-                     "prepared": _prepared("D0-08"), "status": "Open"})
+                     "prepared": _prepared("D0-08"), "status": "Not started"})
     return rows
 
 
@@ -343,12 +372,13 @@ def register_rows() -> list[dict[str, Any]]:
             elif it["template"] in drop_templates():
                 owner = drop_templates()[it["template"]]["owner"]
         else:
-            prepared = "The register row (decision and values in BDOI comments)"
+            prepared = "This index row (decision and values in BDOI comments)"
         d = dues()[it["due"]]
         rows.append({"id": it["id"], "area": it["area"], "name": it["name"], "provides": it["provides"],
                      "drop": m["drop"], "brd": m["brd"], "owner": owner, "due": d["label"], "due_date": fmt(d["date"]),
                      "weeks": f"T-{d['weeks']} weeks", "route": ROUTES[it["route"]], "where": where,
-                     "prepared": prepared, "status": "Open"})
+                     "prepared": prepared, "status": "Not started", "template": it.get("template"),
+                     "object": it.get("object"), "due_code": it["due"]})
     return rows
 
 
@@ -473,6 +503,8 @@ def check() -> list[str]:
         for ref in dec["refs"]:
             if not re.search(rf"\b{re.escape(ref)}\b", texts):
                 problems.append(f"{dec['id']}: {ref} is not in the clarification chapters or open decisions")
+    # the templates: checks, lists, examples of mandatory columns, dependencies without a cycle
+    problems += [f"templates: {p}" for p in config_inputs().check(combined())]
     # banned words
     banned = config_inputs().BANNED
     for text in [str(i) for i in d["items"]] + [str(t) for t in d["templates"]] + [str(x) for x in d["decisions"]]:
@@ -510,93 +542,54 @@ def clarification_counts() -> list[dict[str, Any]]:
 # ============================================================================ workbook
 
 
+def template_order() -> list[Any]:
+    """The guided templates of the workbook in the order they are filled in (dependencies first)."""
+    import guided_xlsx as g  # noqa: PLC0415
+
+    return g.fill_in_order(guided())
+
+
+@lru_cache(maxsize=1)
+def guided() -> list[Any]:
+    ci = config_inputs()
+    comb = combined()
+    deps = {t["id"]: ci.depends(t) for t in comb["templates"]}
+    dues_ = ci.template_dues([t["id"] for t in comb["templates"]], deps, ci.register_due,
+                             "With the Drop 0 sign-off")
+    return ci.guided_templates(comb, dues_, sheet_of=sheet_name)
+
+
+def due_conflicts() -> list[str]:
+    """Templates due after a template that uses their codes (for information: the index keeps the due dates)."""
+    ci = config_inputs()
+    out = []
+    for t in combined()["templates"]:
+        mine = ci.register_due(t["id"])
+        for d in ci.depends(t):
+            theirs = ci.register_due(d)
+            if mine and theirs and theirs[0] > mine[0]:
+                out.append(f"{t['id']} (due {fmt(mine[0])}) uses the codes of {d} (due {fmt(theirs[0])})")
+    return out
+
+
 def build_workbook() -> Path:
-    from bdoi_xlsx import BdoiWorkbook, Column
+    import guided_xlsx as g  # noqa: PLC0415
+    from bdoi_xlsx import Column  # noqa: PLC0415
 
     meta = data()["meta"]
-    statuses = meta["statuses"]
-    wb = BdoiWorkbook(meta["title"], doc_type=meta["doc_type"], brd="Drop 0 (BRD-03, BRD-11, BRD-13)",
-                      version=str(meta["version"]), date=str(meta["date"]),
-                      subtitle="Every configuration input BDOI provides before go-live for Drop 0 and the platform "
-                               "set-up Drop 1 depends on")
-    wb.legend = [("OPEN", "Not yet provided"), ("IN PROGRESS", "Owner preparing the input"),
-                 ("DONE", "Provided or confirmed")]
-    wb.cover_notes = [meta["go_live_text"],
-                      "Each item has one route: Screen, Template or Migration object. An item loaded by the data "
-                      "migration is prepared in the Migration Workbook of BRD-13, never typed twice.",
-                      "Example rows of the template sheets are fictitious and are deleted before the file is returned."]
-    status_col = lambda: Column("status", "Status", 14, "Status of the input", values=statuses)  # noqa: E731
+    statuses = list(meta["statuses"])
+    book = g.GuidedBook(meta["title"], str(meta["version"]))
+    ci = config_inputs()
+    for code, x in ci.resolve_lists(combined()).items():
+        book.add_list(code, x["name"], x["values"], x["note"], x["strict"])
+    templates = guided()
+    book.plan_all(templates)
+    ci.finish_checks(book, templates)
+    order = template_order()
+    for i, t in enumerate(order, start=1):
+        book.template_sheet(t, i, len(order))
+    status_col = lambda: Column("status", "Status", 14, "Status of the row", values=statuses)  # noqa: E731
     comment_col = lambda: Column("comments", "BDOI comments", 36, "Decision, value or comment of the owner")  # noqa: E731
-
-    wb.sheet("How to use", [Column("no", "No.", 6, "Step"), Column("text", "How to use this workbook", 120, "Instruction")], [
-        {"no": 1, "text": "The Register lists every configuration input of Drop 0 and of the platform set-up that Drop 1 "
-                          "depends on, one row per item, with its owner (BDOI unit), its due date relative to go-live, "
-                          "its route and where it is prepared."},
-        {"no": 2, "text": "Route Screen: the owner enters the item on the named BIBS screen under maker-checker and "
-                          "records the decision in BDOI comments. Route Template: the owner fills the template sheet "
-                          "named in Prepared in; the rows are then entered or uploaded on the named screen and "
-                          "authorised by a second user. Route Migration object: the item comes from the legacy "
-                          "systems through the named data migration object and its layout in the Migration Workbook "
-                          "of BRD-13; it is not typed in this workbook."},
-        {"no": 3, "text": "The sheets Lists of values, System parameters, Document numbering, Notifications, Document "
-                          "templates and Accounting events list every list, parameter, event and template of BIBS "
-                          "with its owner and its one route; set the value wanted, the decision or the comment on "
-                          "each row you own."},
-        {"no": 4, "text": "The template sheets PM-01 to PM-10 are the templates CI-01 to CI-10 of the BRD-03 set, UA-01 "
-                          "to UA-06 the templates CI-01 to CI-06 of the BRD-11 set, D0-01 to D0-15 the platform set-up "
-                          "templates of Drop 0. The sheet Template columns describes every column. Fill one row per "
-                          "record from row 5 and keep the headers unchanged."},
-        {"no": 5, "text": "Set Status to Open, In progress, Provided, Confirmed or Not applicable and return the "
-                          "workbook to the iorta TechNXT project team by each due date. The status is reviewed at "
-                          "the weekly programme meeting."},
-        {"no": 6, "text": "Codes must be the codes of the other sheets: branch codes of D0-02, accounts of D0-06, "
-                          "cost centres of D0-04, bank accounts of D0-11, group profiles of UA-02 and users of UA-01."},
-    ], description="How BDOI fills in and returns the configuration inputs", freeze_first_column=False)
-
-    reg = register_rows()
-    per_due: dict[str, int] = {}
-    for it in data()["items"]:
-        per_due[it["due"]] = per_due.get(it["due"], 0) + 1
-    wb.sheet("Timeline", [
-        Column("code", "Due", 7, "Due code used in the register"),
-        Column("label", "Milestone", 40, "What the inputs are needed for"),
-        Column("date", "Due date", 14, "Date the inputs are due"),
-        Column("weeks", "Before go-live", 14, "Weeks before go-live (T = 3-Jan-2028)"),
-        Column("items", "Register items", 12, "Number of register items due"),
-        Column("note", "Why this date", 70, "The programme date behind the milestone"),
-    ], [{"code": c, "label": x["label"], "date": fmt(x["date"]), "weeks": f"T-{x['weeks']} weeks",
-         "items": per_due.get(c, 0), "note": x["note"]} for c, x in dues().items()],
-        description="Due dates of the configuration inputs relative to go-live", freeze_first_column=False)
-
-    wb.sheet("Register", [
-        Column("id", "ID", 9, "Item identifier"),
-        Column("area", "Area", 20, "Area of the configuration"),
-        Column("name", "Configuration item", 32, "What is configured"),
-        Column("provides", "What BDOI provides", 60, "Content the owner provides"),
-        Column("drop", "Drop", 8, "Drop the item belongs to"),
-        Column("brd", "BRD", 8, "BRD of the item"),
-        Column("owner", "Owner (BDOI unit)", 30, "BDOI unit that provides and confirms the item"),
-        Column("due", "Due", 26, "Milestone of the due date"),
-        Column("due_date", "Due date", 13, "Date the item is due"),
-        Column("weeks", "Before go-live", 13, "Weeks before go-live"),
-        Column("route", "Route", 14, "Screen, Template or Migration object: exactly one per item",
-               values=list(ROUTES.values())),
-        Column("where", "Entered or loaded on", 40, "Screen (menu path) or data migration object"),
-        Column("prepared", "Prepared in", 40, "Template sheet, Migration Workbook layout or the register row"),
-        status_col(), comment_col(),
-        Column("provided_on", "Provided on", 13, "Date the input was provided"),
-    ], reg, description="Every configuration input BDOI provides before go-live, with its owner, due date and route")
-
-    wb.sheet("Migration cross-reference", [
-        Column("code", "Object", 8, "Data migration object of the Migration Workbook"),
-        Column("name", "Name", 40, "Object name"),
-        Column("category", "Category", 12, "Object category"),
-        Column("decision", "Proposed decision", 16, "Decision proposed in the Data Migration set"),
-        Column("owner", "Business owner", 30, "Owner of the object"),
-        Column("due", "Extracts due", 10, "Milestone of the extracts"),
-        Column("route", "Configuration route", 70, "Register items loaded by the object, or why none is"),
-        Column("rule", "Duplication rule", 22, "The item is not also typed in this workbook"),
-    ], migration_rows(), description="Reference data loaded through the migration and items entered on screens: one route per item")
 
     lov_cols = [
         Column("code", "List", 26, "Code of the list on Lists of Values"),
@@ -611,96 +604,187 @@ def build_workbook() -> Path:
         Column("keep", "Values to keep, add or retire", 40, "The owner's decision on the values"),
         status_col(), comment_col(),
     ]
-    wb.sheet("Lists of values", lov_cols, lov_rows(),
-             description="Every list of values of BIBS with its owner and its one route")
+    ref_sheets = [
+        ("LIST-LOV", "Every list of values of BIBS with its owner and its one route", lov_cols, lov_rows()),
+        ("LIST-PARAMETERS", "Every system parameter with the value proposed and the value BDOI wants", [
+            Column("key", "Parameter", 30, "Parameter on System Parameters"),
+            Column("group", "Group", 16, "Group of the parameter"),
+            Column("module", "Module", 20, "Module"),
+            Column("drop", "Drop", 8, "Drop"),
+            Column("owner", "Owner (BDOI unit)", 28, "Unit that decides the value"),
+            Column("description", "What it controls", 60, "Meaning of the parameter"),
+            Column("type", "Type", 12, "Kind of value"),
+            Column("value", "Value proposed", 22, "Value proposed with the platform"),
+            Column("range", "Allowed range", 12, "Minimum and maximum"),
+            Column("route", "Route", 12, "Template: the value is given here or in the named template",
+                   values=list(ROUTES.values())),
+            Column("prepared", "Prepared in", 34, "Where the value wanted is given"),
+            Column("due", "Due", 22, "Due date"),
+            Column("wanted", "Value wanted", 22, "Value BDOI wants"),
+            Column("reason", "Reason", 30, "Policy reference or reason of a change"),
+            Column("approver", "Approved by", 20, "BDOI approver of the value"),
+            status_col(), comment_col(),
+        ], parameter_rows()),
+        ("LIST-NUMBERING", "Prefixes of the numbered documents; receipt series come from object R11, check numbers "
+                           "from D0-12", [
+            Column("key", "Parameter", 30, "Prefix parameter"),
+            Column("module", "Module", 20, "Module of the document"),
+            Column("description", "Numbered document", 60, "Document numbered with the prefix"),
+            Column("value", "Prefix proposed", 16, "Prefix proposed with the platform"),
+            Column("prepared", "Prepared in", 34, "Where the prefix wanted is given"),
+            Column("owner", "Owner (BDOI unit)", 28, "Unit that decides the prefix"),
+            Column("wanted", "Prefix wanted", 16, "Prefix BDOI wants; the year and a running number follow it"),
+            status_col(), comment_col(),
+        ], numbering_rows()),
+        ("LIST-NOTIFICATIONS", "Every notification event with its default channels; users choose their own channels "
+                               "in Notification Settings", [
+            Column("code", "Event", 28, "Notification event"),
+            Column("name", "Name", 32, "Name shown in Notification Settings"),
+            Column("module", "Module", 20, "Module"),
+            Column("drop", "Drop", 8, "Drop"),
+            Column("owner", "Owner (BDOI unit)", 28, "Unit that confirms the event"),
+            Column("description", "Who is told and when", 50, "What the event tells the user"),
+            Column("in_app", "In-app proposed", 10, "Y or N"),
+            Column("email", "E-mail proposed", 10, "Y or N"),
+            Column("in_app_wanted", "In-app wanted", 10, "Y or N", values=["Y", "N"]),
+            Column("email_wanted", "E-mail wanted", 10, "Y or N", values=["Y", "N"]),
+            Column("mailbox", "Unit mailbox", 30, "Mailbox that also receives the e-mail (optional)"),
+            status_col(), comment_col(),
+        ], event_rows()),
+        ("LIST-DOCUMENTS", "Every generated document with the unit that gives its BDOI wording and layout", [
+            Column("code", "Template", 26, "Template code on Document Templates"),
+            Column("title", "Title", 34, "Title of the template"),
+            Column("module", "Module", 20, "Module that generates the document"),
+            Column("drop", "Drop", 8, "Drop"),
+            Column("owner", "Owner (BDOI unit)", 28, "Unit that gives the wording and layout"),
+            Column("fields", "Merge fields available", 50, "Fields BIBS fills in"),
+            Column("prepared", "Prepared in", 34, "Where the text is given"),
+            Column("due", "Due", 22, "Due date"),
+            Column("layout", "BDOI layout attached", 12, "Y when the layout is sent", values=["Y", "N"]),
+            status_col(), comment_col(),
+        ], document_rows()),
+        ("LIST-EVENTS", "The accounting events that need a rule of template D0-08; owner Head, Comptrollership", [
+            Column("code", "Event type", 30, "Accounting event of the platform"),
+            Column("name", "Name", 36, "Name of the event"),
+            Column("category", "Category", 14, "Category"),
+            Column("journal", "Journal type", 14, "Journal type of the entries"),
+            Column("components", "Amount components", 50, "Amounts the rule lines can post"),
+            Column("prepared", "Prepared in", 30, "Template of the rules"),
+            status_col(), comment_col(),
+        ], accounting_event_rows()),
+    ]
+    for tid, desc, cols, rows in ref_sheets:
+        book.table_sheet(LISTS[tid], f"Reference: {LISTS[tid][4:]}", desc, cols, rows, statuses)
+    book.table_sheet(MIGRATION_SHEET, "Reference: migration cross-reference", "Reference data loaded through the "
+                     "migration and items entered on screens: one route per item", [
+        Column("code", "Object", 8, "Data migration object of the Migration Workbook"),
+        Column("name", "Name", 40, "Object name"),
+        Column("category", "Category", 12, "Object category"),
+        Column("decision", "Proposed decision", 16, "Decision proposed in the Data Migration set"),
+        Column("owner", "Business owner", 30, "Owner of the object"),
+        Column("due", "Extracts due", 10, "Milestone of the extracts"),
+        Column("route", "Configuration route", 70, "Register items loaded by the object, or why none is"),
+        Column("rule", "Duplication rule", 22, "The item is not also typed in this workbook"),
+    ], migration_rows(), statuses)
 
-    wb.sheet("System parameters", [
-        Column("key", "Parameter", 30, "Parameter on System Parameters"),
-        Column("group", "Group", 16, "Group of the parameter"),
-        Column("module", "Module", 20, "Module"),
-        Column("drop", "Drop", 8, "Drop"),
-        Column("owner", "Owner (BDOI unit)", 28, "Unit that decides the value"),
-        Column("description", "What it controls", 60, "Meaning of the parameter"),
-        Column("type", "Type", 12, "Kind of value"),
-        Column("value", "Value proposed", 22, "Value proposed with the platform"),
-        Column("range", "Allowed range", 12, "Minimum and maximum"),
-        Column("route", "Route", 12, "Template: the value is given here or in the named template", values=list(ROUTES.values())),
-        Column("prepared", "Prepared in", 34, "Where the value wanted is given"),
-        Column("due", "Due", 22, "Due date"),
-        Column("wanted", "Value wanted", 22, "Value BDOI wants"),
-        Column("reason", "Reason", 30, "Policy reference or reason of a change"),
-        Column("approver", "Approved by", 20, "BDOI approver of the value"),
-        status_col(), comment_col(),
-    ], parameter_rows(), description="Every system parameter with the value proposed and the value BDOI wants")
+    # Start here: the register items by due date, and within a due date the templates in their fill-in order.
+    plans = book.plans
+    position = {t.id: i for i, t in enumerate(order)}
+    reg = register_rows()
+    route_rank = {ROUTES["template"]: 0, ROUTES["migration"]: 1, ROUTES["screen"]: 2}
+    reg.sort(key=lambda r: (dues()[r["due_code"]]["date"], route_rank[r["route"]],
+                            position.get(r["template"] or "", 999), r["id"]))
+    idx = []
+    for i, r in enumerate(reg, start=1):
+        tid = r["template"]
+        opens, depends_on, entered, missing = "", "-", "", ""
+        if tid in plans:
+            p = plans[tid]
+            opens = (f"{tid} →", p.sheet)
+            depends_on = ", ".join(p.template.depends) or "-"
+            entered, missing = p.rows_formula(), p.missing_formula()
+        elif tid in LISTS:
+            opens = ("Open →", LISTS[tid])
+        elif r["object"]:
+            opens = (f"{r['object']} →", MIGRATION_SHEET)
+        idx.append({"Step": i, "ID": r["id"], "Configuration item": r["name"], "What BDOI provides": r["provides"],
+                    "Owner (BDOI unit)": r["owner"], "Due": f"{r['due_date']} – {r['due']}", "Route": r["route"],
+                    "Entered or loaded on": r["where"], "Prepared in": r["prepared"], "Depends on": depends_on,
+                    "Rows entered": entered, "Mandatory cells missing": missing, "Status": "Not started",
+                    "BDOI comments": None, "Provided on": None, "Open": opens})
+    columns = [("Step", 6), ("ID", 9), ("Configuration item", 24), ("What BDOI provides", 40),
+               ("Owner (BDOI unit)", 22), ("Due", 20), ("Route", 11), ("Entered or loaded on", 28),
+               ("Prepared in", 28), ("Depends on", 12), ("Rows entered", 9), ("Mandatory cells missing", 10),
+               ("Status", 14), ("BDOI comments", 28), ("Provided on", 11), ("Open", 9)]
+    steps = [
+        "The index below lists every configuration input of Drop 0 and of the platform set-up that Drop 1 depends "
+        "on, one row per item, by due date; within a due date the templates come in the order they are filled in, "
+        "a template whose codes others use first.",
+        "Each item has one route. Template: fill in the template sheet (Open →); its rows are then entered or "
+        "uploaded on the named screen and authorised by a second user. Screen: enter the item on the named BIBS "
+        "screen and record the decision in BDOI comments. Migration object: the item comes from the legacy systems "
+        "through the named object of the Migration Workbook (BRD-13); it is not typed here.",
+        "On a template sheet, read the header block and the guide above each column (Mandatory, Format, Allowed "
+        "values, What to enter; * marks a mandatory column), overwrite or delete the grey example row and enter one "
+        "row per record. Drop-downs offer the allowed values (sheet Reference lists) and the codes of the templates "
+        "filled in before; a mandatory cell left empty turns red.",
+        "The sheets starting with Ref list every list of values, system parameter, numbering prefix, notification "
+        "event, document template and accounting event of BIBS, and the migration cross-reference; set the value "
+        "wanted, the decision or the comment on each row you own.",
+        f"Set the Status of each item, follow Rows entered and Mandatory cells missing, raise questions on the sheet "
+        f"Questions and comments, and return the workbook to the {brand.VENDOR} project team by each due date. The "
+        "status is reviewed at the weekly programme meeting. Codes must be the codes of the other sheets: branch "
+        "codes of D0-02, accounts of D0-06, cost centres of D0-04, bank accounts of D0-11, group profiles of UA-02 "
+        "and users of UA-01.",
+    ]
+    identity = [("Client", brand.CLIENT), ("Scope", "Drop 0 (BRD-03, BRD-11, BRD-13) and the platform set-up "
+                                                     "Drop 1 depends on"),
+                ("Version and date", f"Version {meta['version']}, {meta['date']}"),
+                ("Go-live", meta["go_live_text"]),
+                ("Owner", "Program Manager, Business Project Services, with the BDOI owner of each item"),
+                ("Prepared by", brand.VENDOR), ("Classification", brand.CLASSIFICATION)]
+    per_due: dict[str, int] = {}
+    for it in data()["items"]:
+        per_due[it["due"]] = per_due.get(it["due"], 0) + 1
 
-    wb.sheet("Document numbering", [
-        Column("key", "Parameter", 30, "Prefix parameter"),
-        Column("module", "Module", 20, "Module of the document"),
-        Column("description", "Numbered document", 60, "Document numbered with the prefix"),
-        Column("value", "Prefix proposed", 16, "Prefix proposed with the platform"),
-        Column("prepared", "Prepared in", 34, "Where the prefix wanted is given"),
-        Column("owner", "Owner (BDOI unit)", 28, "Unit that decides the prefix"),
-        Column("wanted", "Prefix wanted", 16, "Prefix BDOI wants; the year and a running number follow it"),
-        status_col(), comment_col(),
-    ], numbering_rows(), description="Prefixes of the numbered documents; receipt series come from object R11, check numbers from D0-12")
+    def more(ws, row):
+        row = book.small_table(ws, row, "Due milestones", ["Due", "Milestone", "Due date", "Before go-live",
+                                                            "Items", "Why this date"],
+                               [[c, x["label"], fmt(x["date"]), f"T-{x['weeks']} weeks", per_due.get(c, 0), x["note"]]
+                                for c, x in dues().items()], spans=[1, 3, 1, 1, 1, 6])
+        return book.small_table(ws, row, "Reference sheets and other sheets", ["Sheet", "What it holds"], [
+            ((name, name), desc) for name, desc in
+            [(LISTS[tid], desc) for tid, desc, _, _ in ref_sheets] +
+            [(MIGRATION_SHEET, "Reference data loaded by the migration and the register items it carries"),
+             (g.LISTS, "Every list of allowed values of the drop-downs, with code and label"),
+             (g.QUESTIONS, "Questions and comments per template and column, with the answer")]
+        ], spans=[3, 8])
 
-    wb.sheet("Notifications", [
-        Column("code", "Event", 28, "Notification event"),
-        Column("name", "Name", 32, "Name shown in Notification Settings"),
-        Column("module", "Module", 20, "Module"),
-        Column("drop", "Drop", 8, "Drop"),
-        Column("owner", "Owner (BDOI unit)", 28, "Unit that confirms the event"),
-        Column("description", "Who is told and when", 50, "What the event tells the user"),
-        Column("in_app", "In-app proposed", 10, "Y or N"),
-        Column("email", "E-mail proposed", 10, "Y or N"),
-        Column("in_app_wanted", "In-app wanted", 10, "Y or N", values=["Y", "N"]),
-        Column("email_wanted", "E-mail wanted", 10, "Y or N", values=["Y", "N"]),
-        Column("mailbox", "Unit mailbox", 30, "Mailbox that also receives the e-mail (optional)"),
-        status_col(), comment_col(),
-    ], event_rows(), description="Every notification event with its default channels; users choose their own channels in Notification Settings")
+    book.questions_sheet(order)
+    ws = book.start_sheet(meta["title"], "Every configuration input BDOI provides before go-live for Drop 0 and the "
+                                         "platform set-up Drop 1 depends on", identity, steps,
+                          "Configuration inputs by due date, templates in the order they are filled in", columns, idx,
+                          statuses=statuses, after=more)
+    # Provided on: a date
+    from openpyxl.worksheet.datavalidation import DataValidation  # noqa: PLC0415
 
-    wb.sheet("Document templates", [
-        Column("code", "Template", 26, "Template code on Document Templates"),
-        Column("title", "Title", 34, "Title of the template"),
-        Column("module", "Module", 20, "Module that generates the document"),
-        Column("drop", "Drop", 8, "Drop"),
-        Column("owner", "Owner (BDOI unit)", 28, "Unit that gives the wording and layout"),
-        Column("fields", "Merge fields available", 50, "Fields BIBS fills in"),
-        Column("prepared", "Prepared in", 34, "Where the text is given"),
-        Column("due", "Due", 22, "Due date"),
-        Column("layout", "BDOI layout attached", 12, "Y when the layout is sent", values=["Y", "N"]),
-        status_col(), comment_col(),
-    ], document_rows(), description="Every generated document with the unit that gives its BDOI wording and layout")
-
-    wb.sheet("Accounting events", [
-        Column("code", "Event type", 30, "Accounting event of the platform"),
-        Column("name", "Name", 36, "Name of the event"),
-        Column("category", "Category", 14, "Category"),
-        Column("journal", "Journal type", 14, "Journal type of the entries"),
-        Column("components", "Amount components", 50, "Amounts the rule lines can post"),
-        Column("prepared", "Prepared in", 30, "Template of the rules"),
-        status_col(), comment_col(),
-    ], accounting_event_rows(), description="The accounting events that need a rule of template D0-08; owner Head, Comptrollership")
-
-    templates = list(brd_templates().values()) + list(drop_templates().values())
-    for t in templates:
-        cols = [Column(f"c{r['no']}", r["header"], max(14, min(40, len(r["header"]) + 6)), r["what"]) for r in t["rows"]]
-        example = {f"c{r['no']}": ("" if r["example"] == "-" else r["example"]) for r in t["rows"]}
-        wb.sheet(sheet_name(t), cols, [example], description=f"{t['ref']}: {t['name']}. {t['content']}"[:250])
-    wb.sheet("Template columns", [
-        Column("template", "Template", 26, "Template"),
-        Column("sheet", "Sheet", 30, "Sheet of this workbook"),
-        Column("owner", "Provided by", 30, "BDOI owner"),
-        Column("no", "No.", 6, "Column order"),
-        Column("header", "Column", 30, "Header of the template"),
-        Column("mandatory", "Mandatory", 16, "Y, N or the condition"),
-        Column("format", "Format", 36, "Length, format or allowed values"),
-        Column("what", "What to enter", 56, "Content of the column"),
-        Column("example", "Example (fictitious)", 28, "Example value"),
-    ], [{"template": t["ref"], "sheet": sheet_name(t), "owner": t["owner"], **r} for t in templates for r in t["rows"]],
-        description="Every column of every template, with what to enter")
+    heads = {ws.cell(r, 1).value: r for r in range(1, 40)}
+    header_row = next(r for r in range(1, 60) if ws.cell(r, 1).value == "Step" and ws.cell(r, 2).value == "ID")
+    col = [h for h, _ in columns].index("Provided on") + 1
+    letter = ws.cell(header_row, col).column_letter
+    dv = DataValidation(type="date", operator="greaterThan", formula1="DATE(2026,1,1)", allow_blank=True,
+                        showErrorMessage=True, errorTitle="Provided on", error="Enter a date.")
+    ws.add_data_validation(dv)
+    dv.add(f"{letter}{header_row + 1}:{letter}{header_row + len(idx)}")
+    for r in range(header_row + 1, header_row + len(idx) + 1):
+        ws.cell(r, col).number_format = g.DATE_FORMAT
+    del heads
+    book.lists_sheet()
     file = drop_output_name("Configuration_Inputs", "xlsx")
-    return wb.save(brand.drop_set_dir(DROP) / file)
+    sheets = ([g.START] + [t.sheet for t in order] + [LISTS[tid] for tid, *_ in ref_sheets] + [MIGRATION_SHEET]
+              + [g.LISTS, g.QUESTIONS])
+    return book.save(brand.drop_set_dir(DROP) / file, sheets,
+                     {"title": meta["title"], "keywords": f"{meta['doc_type']}, Drop 0, BIBS, BDOI"})
 
 
 def drop_output_name(name: str, ext: str) -> str:
@@ -817,6 +901,17 @@ def main(argv: list[str] | None = None) -> int:
     for c in clarification_counts():
         print(f"{c['brd']}: {c['rules']} proposed rules, {c['questions']} open questions / decisions "
               f"({c['open']} open, {c['recommended']} recommended, {c['answered']} answered)")
+    for c in due_conflicts():
+        print(f"note: {c}")
+    if args.check:
+        import guided_xlsx  # noqa: PLC0415
+
+        path = brand.drop_set_dir(DROP) / drop_output_name("Configuration_Inputs", "xlsx")
+        if path.exists():
+            found = guided_xlsx.verify(path, [sheet_name(t) for t in all_templates().values()])
+            for p in found:
+                print(p)
+            problems += found
     if args.check or problems:
         return 1 if problems else 0
     print(f"xlsx: {build_workbook()}")

@@ -1,6 +1,6 @@
 -- =====================================================================================
--- iNXT BrokerVerse - V1900 Seed Collections (BRD-4) core (seed profile only; password for all
--- users: Brokerverse@2026). SEED DATA ONLY.
+-- iNXT BrokerVerse - V1900 Seed Collections (BRD-4) core (seed profile only; the SIT/UAT
+-- password is provided to testers separately). SEED DATA ONLY.
 --   * Users of the Collections personas (COLLECTIONS_DESIGN 6.2): clxhandler (Collection
 --     Handler, MKT_COLLECTION), clxtl (Collection Team Lead, CLX_TL), clxuh (Section Head,
 --     MKT_SECTION_HEAD) and mkthandler (Marketing Handler, MKT_HANDLER). mktcoll and mkttl

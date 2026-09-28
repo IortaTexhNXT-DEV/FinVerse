@@ -172,6 +172,13 @@ const custom = {
     await click(page, /^search$/i, ctx);
     return page;
   },
+  // UX deck: a search that finds nothing (the empty state of the results).
+  'ux-scr-dm-14-no-results': async (ctx) => {
+    const page = await inquiryWithReason(ctx);
+    await ctx.fillField(page, 'Invoice No.', 'I00000000');
+    await click(page, /^search$/i, ctx);
+    return page;
+  },
   // One archived invoice opened with its legacy details and documents.
   'scr-dm-14-03-record': async (ctx) => {
     const page = await inquiryWithReason(ctx);

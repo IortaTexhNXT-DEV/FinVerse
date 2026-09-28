@@ -109,8 +109,9 @@ public final class IncentiveDtos {
    * Deactivation of a criterion.
    *
    * @param lastDay last effective day, empty for today
+   * @param reason reason of the maintainer, kept in the audit trail
    */
-  public record DeactivateRequest(LocalDate lastDay) {}
+  public record DeactivateRequest(LocalDate lastDay, @Size(max = 200) String reason) {}
 
   /**
    * A criterion row.

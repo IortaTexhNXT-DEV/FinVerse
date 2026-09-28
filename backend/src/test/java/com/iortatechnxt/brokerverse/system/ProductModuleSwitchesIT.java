@@ -9,8 +9,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.iortatechnxt.brokerverse.common.exception.ModuleNotInUseException;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
-import com.iortatechnxt.brokerverse.system.domain.ProductModuleSwitchRepository;
 import com.iortatechnxt.brokerverse.system.domain.JobTrigger;
+import com.iortatechnxt.brokerverse.system.domain.ProductModuleSwitchRepository;
 import com.iortatechnxt.brokerverse.system.service.JobRegistry;
 import com.iortatechnxt.brokerverse.system.service.JobRegistry.JobStatus;
 import java.util.ArrayList;
@@ -25,9 +25,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
- * Product module switches (V1160): a switched-off module has no menu (its permissions grant
- * nothing and it is listed as switched off), its APIs refuse in business words, its jobs do not run
- * and its reports are not listed; a switch changes only on the approval of another user.
+ * Product module switches (V1160): a switched-off module has no menu (its permissions grant nothing
+ * and it is listed as switched off), its APIs refuse in business words, its jobs do not run and its
+ * reports are not listed; a switch changes only on the approval of another user.
  */
 @IntegrationTest
 class ProductModuleSwitchesIT {
@@ -95,7 +95,9 @@ class ProductModuleSwitchesIT {
         .andExpect(status().isNotFound())
         .andExpect(jsonPath("$.code").value("MODULE_NOT_IN_USE"));
     // Its job is not shown, does not run on its schedule and is refused when started by hand.
-    assertThat(jobs.statuses()).extracting(JobStatus::job).noneMatch(j -> "QUOTATION_EXPIRY".equals(j.name()));
+    assertThat(jobs.statuses())
+        .extracting(JobStatus::job)
+        .noneMatch(j -> "QUOTATION_EXPIRY".equals(j.name()));
     assertThat(jobs.runScheduled("QUOTATION_EXPIRY")).isEmpty();
     assertThatThrownBy(() -> jobs.run("QUOTATION_EXPIRY", JobTrigger.MANUAL))
         .isInstanceOf(ModuleNotInUseException.class);

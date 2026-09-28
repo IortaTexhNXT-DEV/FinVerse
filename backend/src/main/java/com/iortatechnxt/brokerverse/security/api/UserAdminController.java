@@ -139,9 +139,7 @@ public class UserAdminController {
   @GetMapping("/permissions")
   @PreAuthorize(ROLES)
   public List<Permission> permissions() {
-    return Permission.offered().stream()
-        .filter(p -> modules.isPermissionActive(p.name()))
-        .toList();
+    return Permission.offered().stream().filter(p -> modules.isPermissionActive(p.name())).toList();
   }
 
   /**

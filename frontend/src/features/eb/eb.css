@@ -62,7 +62,3 @@
   background: var(--color-warning-bg);
 }
 
-.eb-comment {
-  border-left: 3px solid var(--color-border-strong);
-  padding-left: var(--space-3);
-}

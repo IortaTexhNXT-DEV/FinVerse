@@ -24,8 +24,8 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.stereotype.Component;
 import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
 
 /**
  * Creates the tax masters of a company from {@link TaxSeedCatalog} through the services, as maker

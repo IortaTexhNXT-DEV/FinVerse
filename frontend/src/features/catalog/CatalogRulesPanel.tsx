@@ -28,8 +28,16 @@ function statusColumns<T extends FieldRule | DocumentRule | TsuRule>(
     { key: 'st', header: 'Status', render: (r) => <StatusBadge status={r.recordStatus} /> },
     {
       key: 'a',
-      header: 'Actions',
-      render: (r) => <RecordActions kind={kind} record={r} refresh={[['catalog', queryKey]]} />,
+      header: <span className="visually-hidden">Actions</span>,
+      width: '64px',
+      render: (r) => (
+        <RecordActions
+          kind={kind}
+          record={r}
+          label={`${humanize(kind)} ${scope(r)}`}
+          refresh={[['catalog', queryKey]]}
+        />
+      ),
     },
   ];
 }

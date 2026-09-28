@@ -442,6 +442,6 @@ export const catalogApi = {
 
   authorize: (kind: CatalogKind, id: number) =>
     api.post<CatalogRecordResult>(`${base}/records/${kind}/${id}/authorize`),
-  deactivate: (kind: CatalogKind, id: number) =>
-    api.post<CatalogRecordResult>(`${base}/records/${kind}/${id}/deactivate`),
+  deactivate: (kind: CatalogKind, id: number, reason: string) =>
+    api.post<CatalogRecordResult>(`${base}/records/${kind}/${id}/deactivate`, { reason }),
 };

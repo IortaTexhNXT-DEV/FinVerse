@@ -95,9 +95,7 @@ final class PermissionConsistencyTest {
         .map(PermissionConsistencyTest::read)
         .map(sql -> sql.replaceAll("--[^\n]*", ""))
         .flatMap(sql -> Arrays.stream(sql.split(";")))
-        .filter(
-            st ->
-                st.toLowerCase(Locale.ROOT).contains("insert into sec_role_permission"))
+        .filter(st -> st.toLowerCase(Locale.ROOT).contains("insert into sec_role_permission"))
         .forEach(
             st -> {
               Matcher code = QUOTED_CODE.matcher(st);
@@ -145,7 +143,9 @@ final class PermissionConsistencyTest {
   void everyCheckedPermissionIsGrantedOrUnassignedByDesign() {
     Set<String> checked = preAuthorizePermissions();
     assertThat(checked).hasSizeGreaterThan(100);
-    assertThat(checked).as("checked permissions that are not permissions").isSubsetOf(permissionNames());
+    assertThat(checked)
+        .as("checked permissions that are not permissions")
+        .isSubsetOf(permissionNames());
     Set<String> granted = grantedByMigrations();
     Set<String> ungranted = new TreeSet<>(checked);
     ungranted.removeAll(granted);
@@ -158,7 +158,9 @@ final class PermissionConsistencyTest {
   void everyWebClientPermissionIsCheckedByTheServer() {
     Set<String> used = frontendPermissions();
     assertThat(used).hasSizeGreaterThan(100);
-    assertThat(used).as("web client permissions unknown to the server").isSubsetOf(permissionNames());
+    assertThat(used)
+        .as("web client permissions unknown to the server")
+        .isSubsetOf(permissionNames());
     String server = serverCode();
     Set<String> unchecked =
         used.stream()

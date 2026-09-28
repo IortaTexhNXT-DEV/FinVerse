@@ -129,6 +129,9 @@ public class IncentiveCriteriaController {
   public CriteriaResponse deactivate(
       @PathVariable Long id, @RequestBody(required = false) DeactivateRequest request) {
     return CriteriaResponse.from(
-        criteria.deactivate(id, request == null ? null : request.lastDay()));
+        criteria.deactivate(
+            id,
+            request == null ? null : request.lastDay(),
+            request == null ? null : request.reason()));
   }
 }

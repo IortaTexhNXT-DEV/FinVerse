@@ -37,10 +37,12 @@ function Summary({ detail }: Readonly<{ detail: MatchDetail }>) {
       </dd>
       <dt>Matched On</dt>
       <dd>{matchedText(m)}</dd>
-      <dt>List Entry</dt>
-      <dd>
-        {m.sourceCode} · {humanize(m.listType)} · version {m.entryVersion}
-      </dd>
+      <dt>Source</dt>
+      <dd>{m.sourceCode}</dd>
+      <dt>List</dt>
+      <dd>{humanize(m.listType)}</dd>
+      <dt>Entry Version</dt>
+      <dd>{m.entryVersion}</dd>
       <dt>Recorded</dt>
       <dd>{formatDateTime(m.createdAt)}</dd>
       <dt>Case</dt>

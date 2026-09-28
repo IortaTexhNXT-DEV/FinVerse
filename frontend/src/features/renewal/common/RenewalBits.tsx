@@ -1,5 +1,7 @@
 import type { BatchOutcome, CandidateRow } from '@/api/renewal';
 import { Button } from '@/components/ui/Button';
+import { DataTable } from '@/components/ui/DataTable';
+import { Kpi } from '@/components/ui/Kpi';
 import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tag } from '@/components/ui/Tag';
@@ -67,19 +69,23 @@ export function OutcomeDialog({
   const refused = Object.entries(outcome.refused);
   return (
     <Modal open title={title} onClose={onClose} footer={<Button onClick={onClose}>Close</Button>}>
-      <p>
-        {outcome.done.length} renewal(s) done
-        {refused.length > 0 ? `, ${String(refused.length)} refused:` : '.'}
-      </p>
-      {refused.length > 0 && (
-        <ul className="rnw-refused">
-          {refused.map(([ref, reason]) => (
-            <li key={ref}>
-              <strong>{ref}</strong>: {reason}
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className="stack">
+        <div className="grid-2">
+          <Kpi label="Done" value={outcome.done.length} />
+          <Kpi label="Refused" value={refused.length} accent={refused.length > 0} />
+        </div>
+        {refused.length > 0 && (
+          <DataTable<{ ref: string; reason: string }>
+            caption="Renewals refused"
+            rows={refused.map(([ref, reason]) => ({ ref, reason }))}
+            rowKey={(r) => r.ref}
+            columns={[
+              { key: 'r', header: 'Renewal', kind: 'code', render: (r) => <code>{r.ref}</code> },
+              { key: 'w', header: 'Why It Was Refused', render: (r) => r.reason },
+            ]}
+          />
+        )}
+      </div>
     </Modal>
   );
 }

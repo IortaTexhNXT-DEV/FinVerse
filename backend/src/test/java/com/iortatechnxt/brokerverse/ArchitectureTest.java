@@ -40,8 +40,8 @@ import org.springframework.web.bind.annotation.RestController;
  *   <li>Background work is a {@code system.service.ManagedJob} (job monitor, run history, failure
  *       alert), never a {@code @Scheduled} method (developer guide section 10.3).
  *   <li>Seed data (SIT/UAT) is loaded only with the seed profile: every Spring bean of a {@code
- *       seed} package carries {@code @Profile("seed")} (with {@code "test"} where tests use it), and
- *       seed beans live in {@code seed} packages.
+ *       seed} package carries {@code @Profile("seed")} (with {@code "test"} where tests use it),
+ *       and seed beans live in {@code seed} packages.
  *   <li>Business dates come from {@link BusinessClock} (business zone, default Asia/Manila): no
  *       {@code LocalDate.now}, {@code LocalDateTime.now}, {@code YearMonth.now} or {@code Year.now}
  *       elsewhere, as those take the date of the clock's zone (UTC).

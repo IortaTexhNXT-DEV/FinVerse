@@ -41,8 +41,8 @@ public class ReportController {
 
   /**
    * Access to the report API: the Report Centre (REPORT_VIEW) or the report screen of a module,
-   * opened with that module's report permission. The permission of each report is checked by
-   * {@link ReportService} in every case.
+   * opened with that module's report permission. The permission of each report is checked by {@link
+   * ReportService} in every case.
    */
   public static final String REPORT_ACCESS =
       "hasAnyAuthority('REPORT_VIEW', 'OPS_REPORT_VIEW', 'DISB_REPORT_VIEW', 'SCR_REPORT_VIEW',"

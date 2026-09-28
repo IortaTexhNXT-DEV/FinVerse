@@ -211,11 +211,13 @@ function ProductList() {
           },
           {
             key: 'a',
-            header: 'Actions',
+            header: <span className="visually-hidden">Actions</span>,
+            width: '64px',
             render: (p) => (
               <RecordActions
                 kind="PRODUCT"
                 record={p}
+                label={`${p.code} ${p.name}`}
                 refresh={[['catalog', 'products']]}
                 authorizers={PRODUCT_AUTHORIZERS}
                 maintainers={PRODUCT_MAINTAINERS}

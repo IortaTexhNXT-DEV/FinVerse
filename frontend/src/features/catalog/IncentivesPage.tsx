@@ -7,6 +7,7 @@ import { useAuth } from '@/auth/authContext';
 import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { DataTable } from '@/components/ui/DataTable';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -65,13 +66,15 @@ export default function IncentivesPage() {
     queryKey: ['catalog', 'incentives', companyId],
     queryFn: () => productCatalogApi.incentives(companyId),
   });
+  const [deactivating, setDeactivating] = useState<IncentiveCriteria | null>(null);
   const deactivate = useMutation({
-    mutationFn: (id: number) => productCatalogApi.deactivateIncentive(id),
+    mutationFn: (reason: string) =>
+      productCatalogApi.deactivateIncentive(deactivating?.id ?? 0, { reason }),
     onSuccess: async (c) => {
+      setDeactivating(null);
       await queryClient.invalidateQueries({ queryKey: ['catalog', 'incentives'] });
       toast.success(`Criterion ${c.code} deactivated`);
     },
-    onError: (e) => toast.error(e.message),
   });
   const day = today();
   const needle = text.trim().toUpperCase();
@@ -135,36 +138,48 @@ export default function IncentivesPage() {
               },
               {
                 key: 'a',
-                header: 'Actions',
+                header: <span className="visually-hidden">Actions</span>,
+                width: '64px',
                 render: (c) => (
-                  <div className="row">
-                    <RecordActions
-                      kind="INCENTIVE_CRITERIA"
-                      record={c}
-                      refresh={[['catalog', 'incentives']]}
-                      authorizers={AUTHORIZERS}
-                      maintainers={NO_MAINTAINERS}
-                    />
-                    {maintain && c.recordStatus === 'ACTIVE' && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        busy={deactivate.isPending}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deactivate.mutate(c.id);
-                        }}
-                      >
-                        Deactivate
-                      </Button>
-                    )}
-                  </div>
+                  <RecordActions
+                    kind="INCENTIVE_CRITERIA"
+                    record={c}
+                    label={`${c.code} ${c.name}`}
+                    refresh={[['catalog', 'incentives']]}
+                    authorizers={AUTHORIZERS}
+                    maintainers={NO_MAINTAINERS}
+                    extra={
+                      maintain && c.recordStatus === 'ACTIVE'
+                        ? [
+                            {
+                              label: 'Deactivate',
+                              danger: true,
+                              onSelect: () => setDeactivating(c),
+                            },
+                          ]
+                        : []
+                    }
+                  />
                 ),
               },
             ]}
           />
         )}
       </Card>
+      {deactivating !== null && (
+        <ConfirmDialog
+          title="Deactivate Incentive Criterion"
+          record={`${deactivating.code} ${deactivating.name}`}
+          effect="The criterion ends today and is no longer matched by booking; it stays in the history. The reason is kept in the audit trail."
+          confirmLabel="Deactivate"
+          destructive
+          reason="required"
+          busy={deactivate.isPending}
+          error={deactivate.error}
+          onConfirm={deactivate.mutate}
+          onClose={() => setDeactivating(null)}
+        />
+      )}
       {editing && (
         <IncentiveEditorModal
           initial={editing === 'new' ? undefined : editing}

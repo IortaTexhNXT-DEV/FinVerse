@@ -43,6 +43,7 @@ public class EbSoaController {
 
   /** The SOA register: EB processing and the collection team (EB_COLLECT) read it. */
   private static final String SOA_VIEW = "hasAnyAuthority('EB_VIEW', 'EB_PROCESS', 'EB_COLLECT')";
+
   private static final String INTAKE = "hasAnyAuthority('EB_MARKET', 'EB_PROCESS')";
   private static final String PROCESS = "hasAuthority('EB_PROCESS')";
   private static final int MAX_PAGE = 200;

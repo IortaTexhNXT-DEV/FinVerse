@@ -308,8 +308,8 @@ export const productCatalogApi = {
     api.post<IncentiveCriteria>(`${base}/incentive-criteria`, input),
   updateIncentive: (id: number, input: IncentiveInput) =>
     api.put<IncentiveCriteria>(`${base}/incentive-criteria/${id}`, input),
-  deactivateIncentive: (id: number, lastDay?: string) =>
-    api.post<IncentiveCriteria>(`${base}/incentive-criteria/${id}/deactivate`, { lastDay }),
+  deactivateIncentive: (id: number, input: { lastDay?: string; reason: string }) =>
+    api.post<IncentiveCriteria>(`${base}/incentive-criteria/${id}/deactivate`, input),
 
   rateExceptions: (transactionRef?: string) =>
     api.get<RateException[]>(`${base}/rate-scheme-exceptions${toQuery({ transactionRef })}`),

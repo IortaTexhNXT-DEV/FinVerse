@@ -1449,7 +1449,7 @@ priority: Must have
 screens: Extraction (run tags); DTIP Status; Report REM-PAIDAR-OVER-DTIP; Report REM-EXCLUDED
 description:
   - "Paid AR is the net applied PR of the invoice from applied and posted payments only (cash, check and every channel). The amount to remit is paid AR less the DTIP already remitted."
-  - "An invoice is not extracted, and its tag lists the reason, when: ON_HOLD (hold flag); PENDING_NEG_ADJ (a negative adjustment request is pending); WRITTEN_OFF; CHECK_HOLDING (a payment is younger than 3 banking days or not cleared); PAID_AR_OVER_DTIP (paid AR above the DTIP balance); NOT_POSTED; OTHERS (another team holds the lock). Cancelled, direct payment and return invoices are skipped."
+  - "An invoice is not extracted, and its tag (Due - Not Extracted) lists the reasons in words: On hold (hold flag); Pending negative adjustment (a negative adjustment request is pending); Written off; Check within the holding period (a payment is younger than 3 banking days or not cleared); Paid AR above DTIP (paid AR above the DTIP balance); Locked by another team (another team holds the lock). Cancelled, direct payment and return invoices are skipped."
   - Written-off invoices are excluded from every output but remain visible and marked in Invoice 360 and the tags.
   - When a negative adjustment is requested on an invoice, Adjustment raises PENDING_NEG_ADJ and Remittance notifies the Remittance Team with the batch the invoice is in (RMTID.035).
 preconditions:

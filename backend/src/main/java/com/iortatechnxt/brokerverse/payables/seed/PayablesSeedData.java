@@ -1,4 +1,4 @@
-package com.iortatechnxt.brokerverse.payables.service;
+package com.iortatechnxt.brokerverse.payables.seed;
 
 import com.iortatechnxt.brokerverse.common.util.Money;
 import com.iortatechnxt.brokerverse.organization.domain.Branch;
@@ -10,6 +10,13 @@ import com.iortatechnxt.brokerverse.payables.domain.PaymentMode;
 import com.iortatechnxt.brokerverse.payables.domain.PaymentVoucher;
 import com.iortatechnxt.brokerverse.payables.domain.SupplierInvoice;
 import com.iortatechnxt.brokerverse.payables.domain.SupplierInvoiceRepository;
+import com.iortatechnxt.brokerverse.payables.service.BankAccountQueryService;
+import com.iortatechnxt.brokerverse.payables.service.InvoiceCommand;
+import com.iortatechnxt.brokerverse.payables.service.IssuedPdcService;
+import com.iortatechnxt.brokerverse.payables.service.PaymentApprovalService;
+import com.iortatechnxt.brokerverse.payables.service.PaymentCommand;
+import com.iortatechnxt.brokerverse.payables.service.PaymentVoucherService;
+import com.iortatechnxt.brokerverse.payables.service.SupplierInvoiceService;
 import com.iortatechnxt.brokerverse.subledger.service.OpenItemService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,6 +27,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -33,6 +41,7 @@ import org.springframework.transaction.support.TransactionTemplate;
  * exists.
  */
 @Component
+@Profile({"seed", "test"})
 public class PayablesSeedData {
 
   private static final String COMPANY = "FVI";

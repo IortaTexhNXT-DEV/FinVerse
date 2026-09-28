@@ -23,8 +23,7 @@ package com.iortatechnxt.brokerverse.catalog.service.version;
  *       type, coverage, clause or insurer.
  * </ul>
  *
- * <p>Until the catalog implementation exists, {@link PackageVersionStubDefaults} registers an
- * in-memory stub so that {@code productmaint} runs end to end.
+ * <p>Implemented by {@link CatalogPackageSetupService}.
  */
 public interface PackageSetupService {
 

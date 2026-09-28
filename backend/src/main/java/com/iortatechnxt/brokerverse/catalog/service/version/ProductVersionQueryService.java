@@ -11,8 +11,7 @@ import java.util.Optional;
  * a read-only transaction and need no permission of their own (callers check theirs). Non-packaged
  * products have no versions, so every method returns empty for them.
  *
- * <p>Until the catalog implementation exists, {@link PackageVersionStubDefaults} registers an
- * in-memory stub that knows only the versions its stub {@link PackageSetupService} created.
+ * <p>Implemented by the catalog.
  */
 public interface ProductVersionQueryService {
 

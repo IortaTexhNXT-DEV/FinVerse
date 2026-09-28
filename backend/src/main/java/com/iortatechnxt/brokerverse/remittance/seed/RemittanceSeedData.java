@@ -9,7 +9,6 @@ import com.iortatechnxt.brokerverse.opsledger.service.FlowInHandler.FlowInFile;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLine;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLineRepository;
-import com.iortatechnxt.brokerverse.remittance.domain.ExtractionRun;
 import com.iortatechnxt.brokerverse.remittance.domain.ExtractionRun.Scope;
 import com.iortatechnxt.brokerverse.remittance.domain.ExtractionRunRepository;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch;
@@ -39,12 +38,10 @@ import org.springframework.stereotype.Component;
  *       submits its batch, the team leader ({@code remittl}) approves it (four eyes), Disbursement
  *       ({@code disb}) acknowledges the payment request and assigns the DV, and the insurer's OR
  *       schedule is uploaded: the batch is remitted with its OR;
- *   <li>the processor then runs the manual extraction: the paid endorsement invoice of the same
- *       account goes into a batch waiting for review, and every other invoice gets its tag.
  * </ul>
  *
- * A step that fails is logged and skipped. The seeded hold request is made last, by {@link
- * HoldSeedData}.
+ * A step that fails is logged and skipped. The manual extraction runs after the adjustment seed, in
+ * {@link ExtractionSeedData}; the seeded hold request is made last, by {@link HoldSeedData}.
  */
 @Component
 @Profile("seed")
@@ -105,21 +102,7 @@ public class RemittanceSeedData implements ApplicationRunner {
     if (runs.count() > 0 || remitted.isEmpty()) {
       return;
     }
-    Long companyId = remitted.get(0).getCompanyId();
     original(REMITTED_ARN).ifPresent(i -> step("remitted batch", () -> remit(i)));
-    step(
-        "manual extraction",
-        () -> {
-          ExtractionRun run =
-              users.as(
-                  PROCESSOR,
-                  () ->
-                      extraction.run(
-                          companyId,
-                          new Scope(ExtractionTrigger.MANUAL, null, null, null),
-                          today()));
-          LOG.info("Remittance seed extraction {} - {}", run.getRunNo(), run.getMessage());
-        });
   }
 
   private void remit(OpsInvoice invoice) {

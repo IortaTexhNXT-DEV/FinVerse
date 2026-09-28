@@ -16,6 +16,10 @@ spec:
     rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: /actuator/prometheus
       labels: { app.kubernetes.io/name: bibs-integration, app.kubernetes.io/component: backend, bibs/tier: backend }
     spec:
       serviceAccountName: bibs-integration
@@ -34,7 +38,8 @@ spec:
       containers:
         - name: backend
           image: bibs-backend
-          ports: [{ name: https, containerPort: 8443 }]
+          # management: health and Prometheus metrics, reachable from the monitoring namespace only.
+          ports: [{ name: https, containerPort: 8443 }, { name: management, containerPort: 9090 }]
           env:
             - { name: BROKERVERSE_RUNTIME_ROLE, value: integration }
           envFrom:
@@ -44,15 +49,15 @@ spec:
             requests: { cpu: "500m", memory: "1536Mi", ephemeral-storage: "256Mi" }
             limits: { cpu: "2", memory: "2Gi", ephemeral-storage: "3Gi" }
           startupProbe:
-            httpGet: { path: /actuator/health/liveness, port: https, scheme: HTTPS }
+            httpGet: { path: /livez, port: https, scheme: HTTPS }
             periodSeconds: 10
             failureThreshold: 30
           readinessProbe:
-            httpGet: { path: /actuator/health/readiness, port: https, scheme: HTTPS }
+            httpGet: { path: /readyz, port: https, scheme: HTTPS }
             periodSeconds: 10
             failureThreshold: 3
           livenessProbe:
-            httpGet: { path: /actuator/health/liveness, port: https, scheme: HTTPS }
+            httpGet: { path: /livez, port: https, scheme: HTTPS }
             periodSeconds: 20
             failureThreshold: 3
           lifecycle:
@@ -79,7 +84,7 @@ metadata:
   name: bibs-integration
   labels: { app.kubernetes.io/name: bibs-integration }
   annotations:
-    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health/readiness
+    alb.ingress.kubernetes.io/healthcheck-path: /readyz
 spec:
   selector: { app.kubernetes.io/name: bibs-integration }
   ports: [{ name: https, port: 8443, targetPort: https }]

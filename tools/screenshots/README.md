@@ -15,8 +15,10 @@ Run it after every change that affects screens. Commit the refreshed folder in t
 1. **Add new screens to the manifest.** Put each one at its sidebar position in `screens.cjs`. The fields are `slug`, `title`, the seed `user` and `path`, plus optional `open: 'first'` or `click`.
 2. **Start the seed profile.**
    - Backend: `java -jar backend/target/brokerverse-backend.jar --spring.profiles.active=seed`, with a fresh database
-     and `BROKERVERSE_SEED_PASSWORD` set to the SIT/UAT password (the same value as `SEED_PASSWORD` below; it is
-     never written into a file).
+     and a local signing key in the environment (`BROKERVERSE_JWT_SECRET`, any value of 32 or more characters; the
+     seed profile has no default), and `BROKERVERSE_SEED_PASSWORD` set to the SIT/UAT password (the same value as
+     `SEED_PASSWORD` below; it is never written into a file). The SIT/UAT seed data switches the second factor off
+     (`MFA_POLICY` = `OFF`).
    - Frontend: `npm run dev` in `frontend`.
    - Open the app at `http://localhost:...`, not `127.0.0.1`. The backend accepts only the origins in
      `BROKERVERSE_ALLOWED_ORIGINS`, which defaults to `http://localhost:5173`. If Vite runs on another port, start the

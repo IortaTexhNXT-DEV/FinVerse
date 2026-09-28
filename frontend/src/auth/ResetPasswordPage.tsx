@@ -39,8 +39,7 @@ export default function ResetPasswordPage() {
     content = (
       <>
         <p className="login-notice">
-          New password for <strong>{link.data.username}</strong>. The link expires at{' '}
-          {formatDateTime(link.data.expiresAt)}.
+          Choose a new password. The link expires at {formatDateTime(link.data.expiresAt)}.
         </p>
         <PasswordChangeForm
           requireCurrent={false}

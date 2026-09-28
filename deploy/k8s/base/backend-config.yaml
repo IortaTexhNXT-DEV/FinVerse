@@ -9,7 +9,22 @@ data:
   SPRING_PROFILES_ACTIVE: "prod"
   BROKERVERSE_ENVIRONMENT: "production"
   BROKERVERSE_ALLOWED_ORIGINS: "https://<BIBS_HOST>"
+  BROKERVERSE_PASSWORD_RESET_URL: "https://<BIBS_HOST>/reset-password"
+  # Maximum life of a sign-in session; the 15-minute access token (ACCESS_TOKEN_MINUTES) is renewed
+  # within it while the user works.
   BROKERVERSE_TOKEN_VALIDITY: "PT8H"
+  # Health probes and Prometheus metrics on a port of their own (NetworkPolicy allow-monitoring).
+  BROKERVERSE_MANAGEMENT_PORT: "9090"
+  # Sender of the e-mails (required when BROKERVERSE_MAIL_ENABLED is true).
+  BROKERVERSE_MAIL_FROM: "<NO_REPLY_ADDRESS>"
+  # ---- Single sign-on (AUTH_MODE OIDC or SAML); leave empty while the passwords are held here ----
+  BROKERVERSE_SSO_BASE_URL: "https://<BIBS_HOST>"
+  BROKERVERSE_SSO_LABEL: ""
+  BROKERVERSE_SSO_BREAK_GLASS_USERS: ""
+  BROKERVERSE_OIDC_ISSUER: ""
+  BROKERVERSE_OIDC_CLIENT_ID: ""
+  BROKERVERSE_SAML_IDP_ENTITY_ID: ""
+  BROKERVERSE_SAML_IDP_SSO_URL: ""
   BROKERVERSE_DB_POOL_SIZE: "20"
   # Client address of the login rate limit comes from X-Forwarded-For set by the load balancer.
   SERVER_FORWARD_HEADERS_STRATEGY: "native"

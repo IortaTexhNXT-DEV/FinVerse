@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Set;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
  * Limits the HTTP surface of an instance to its runtime role, before security and the controllers:
  *
  * <ul>
- *   <li>the actuator ({@code /actuator/**}: health probes, metrics) answers on every role;
+ *   <li>the actuator ({@code /actuator/**}: health probes, metrics) and the probe paths {@code
+ *       /livez} and {@code /readyz} answer on every role;
  *   <li>{@code /integration/**} (APIs published through the API gateway) answers on the roles with
  *       the integration workload ({@code integration}, {@code all});
  *   <li>everything else (user screens and APIs, API documentation) answers on the roles with the
@@ -37,6 +39,7 @@ public class RuntimeRoleRequestFilter extends OncePerRequestFilter {
 
   private static final String ACTUATOR_PREFIX = "/actuator";
   private static final String ERROR_PATH = "/error";
+  private static final Set<String> PROBE_PATHS = Set.of("/livez", "/readyz");
 
   private final RuntimeRole role;
 
@@ -67,7 +70,7 @@ public class RuntimeRoleRequestFilter extends OncePerRequestFilter {
    * @return true when the role serves it
    */
   boolean serves(String path) {
-    if (under(path, ACTUATOR_PREFIX) || ERROR_PATH.equals(path)) {
+    if (under(path, ACTUATOR_PREFIX) || ERROR_PATH.equals(path) || PROBE_PATHS.contains(path)) {
       return true;
     }
     if (under(path, INTEGRATION_PREFIX)) {

@@ -124,4 +124,14 @@
     <Package name="~com\.iortatechnxt\.brokerverse\.submitted\..*"/>
     <Bug pattern="IMPROPER_UNICODE"/>
   </Match>
+  <!--
+    COOKIE_USAGE in RefreshCookies: the refresh token of the sign-in session is meant to live in a
+    cookie, and only there: HttpOnly (never readable by scripts), Secure outside a developer's
+    machine, SameSite=Strict, limited to /api/v1/auth, a 256-bit random value of which the server
+    keeps only the SHA-256, replaced on every use and revoked with the session.
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.brokerverse.security.api.RefreshCookies"/>
+    <Bug pattern="COOKIE_USAGE"/>
+  </Match>
 </FindBugsFilter>

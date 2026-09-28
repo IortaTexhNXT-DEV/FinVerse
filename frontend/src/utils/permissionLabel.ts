@@ -37,6 +37,7 @@ const ACRONYMS = new Set([
   'CSF',
   'ID',
   'LAMD',
+  'MFA',
 ]);
 
 /** What each action word of a permission lets the user do; {0} is the subject in words. */

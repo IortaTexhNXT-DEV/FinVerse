@@ -19,7 +19,8 @@ function show(permissions: string[]) {
   const auth = {
     user: null,
     loading: false,
-    login: () => Promise.resolve(),
+    login: () => Promise.resolve({ expiresAt: '' }),
+    completeSignIn: () => undefined,
     logout: () => undefined,
     can: (p: string) => permissions.includes(p),
     passwordChange: null,

@@ -8,9 +8,13 @@ management:
 brokerverse:
   security:
     jwt-secret: test-secret-for-automated-tests-0123456789abcdef
+    mfa:
+      # Test key of the authenticator secrets (32 random bytes, Base64); never used elsewhere.
+      encryption-key: 1WTVN7hPMSpwjq805JP6+pTepzMSTL2k9AE0QCTcV4A=
     login-protection:
       # MockMvc logs in many times from one address; the limiter has its own tests.
       max-attempts-per-window: 100000
+      reset-max-per-address: 100000
   migration:
     masking-key: test-masking-key-for-automated-tests-0123456789
   # No Redis or Kafka in the test profile: in-memory cache, database fallbacks, events LOCAL.

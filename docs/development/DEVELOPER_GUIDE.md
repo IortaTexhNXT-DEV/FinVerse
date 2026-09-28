@@ -157,6 +157,7 @@ tables of the migrated database.
   | V1110 | platform wording (MSG0): V1110 rewrites the delivered reference texts (lists of values, parameters, notification events, exception codes, accounting events, feeds, layouts, rules) without internal references; it updates a text only where it still holds the delivered value. Its seed counterpart is V2000 in `db/seed`, after all seed data |
   | V1190–V1199 | platform hardening: V1190 the least-privilege runtime role (row access only, default privileges for later tables; placeholder `runtime_role`), V1191 the UPDATE / DELETE / TRUNCATE guards of the insert-only tables (functions `platform_row_immutable()`, `platform_refuse_truncate()`) |
   | V1130–V1139 | User Access Maintenance extension (BRD-11), for changes that must run after migrations of later ranges: V1130 the User Access grants of `INFOSEC_OFFICER` (the role is created by V1101) |
+  | V1180–V1189 | Platform authentication and session security: V1180 token model (refresh token of the session, `TOKEN_REUSED`, `ACCESS_TOKEN_MINUTES`, `METRICS_VIEW`, alert `SECURITY_STORE_UNAVAILABLE`), V1181 second factor (`sec_user_mfa`, recovery codes, remembered devices, four-eyes reset, `MFA_POLICY`, `MFA_RESET` / `MFA_RESET_APPROVE`), V1182 single sign-on (`sec_sso_request`, `sec_sso_ticket`, `AUTH_MODE` OIDC / SAML); V1183–V1188 free; V1189 in `db/seed` (the SIT/UAT seed turns `MFA_POLICY` off) |
   | V2001–V2009 | seed data corrections found by the business sign-off packs (`db/seed`, after V2000): V2001 BRD-1 and BRD-3 (package products active for testing, distinct seed clients, realistic addresses and location keys, the Unapplied Payment Handler's sign-in, placeholder texts, PAR08 version 2); V2002 BRD-3 (the seeded package release remark names the validator by display name) |
   | V900–V999 | seed data (`db/seed`, loaded only with the `seed` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989, Operations V990–V995, Product Maintenance V996–V998 (V996 catalog versions, V997 package requests, V998 Product Maintenance users), Accounting / Disbursement V999 (reference data and users only; its storyline runs as Java seed runners) (full) |
   | V1900–V1999 | seed data of the V1000+ modules, 10 versions each in the same order: Collections V1900–V1909, Renewal V1910–V1919 (V1910 used), Claims V1920–V1929, Employee Benefits V1930–V1939 (V1930–V1933 used), Customer Servicing V1940–V1949 (V1940 used), Sanctions V1950–V1959, User Access V1960–V1969 (V1960–V1961 used), Submitted Policies V1970–V1979 (V1970 used; the seed records are loaded by `SubmittedSeedData`), Data Migration V1980–V1989, Core Replacement V1990–V1999 (runs after all V9xx seed, so it can build on the Operations and booking seed) |
@@ -279,7 +280,9 @@ tables of the migrated database.
 cd backend
 mvn spotless:apply            # format
 mvn verify                    # format check, compile (-Werror), tests, coverage, checkstyle, PMD, CPD, SpotBugs
-SPRING_PROFILES_ACTIVE=seed BROKERVERSE_SEED_PASSWORD=... mvn spring-boot:run   # PostgreSQL on localhost:5432 (docker compose up db); SIT/UAT password issued separately
+# PostgreSQL on localhost:5432 (docker compose up db); SIT/UAT password issued separately; the signing key
+# comes from the environment in every profile (any local value of 32+ characters)
+BROKERVERSE_JWT_SECRET=$(openssl rand -hex 32) SPRING_PROFILES_ACTIVE=seed BROKERVERSE_SEED_PASSWORD=... mvn spring-boot:run
 
 # frontend (Node 22)
 cd frontend

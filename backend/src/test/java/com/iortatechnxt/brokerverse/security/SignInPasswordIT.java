@@ -166,7 +166,8 @@ class SignInPasswordIT {
     String link = latestLink(username);
     anonymous("check", Map.of("token", link))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.username").value(username));
+        .andExpect(jsonPath("$.expiresAt").exists())
+        .andExpect(jsonPath("$.username").doesNotExist());
     anonymous("confirm", Map.of("token", link, "newPassword", P1))
         .andExpect(status().isNoContent());
     JsonNode signedIn = read(login(username, P1).andExpect(status().isOk()));

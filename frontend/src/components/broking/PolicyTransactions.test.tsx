@@ -86,7 +86,8 @@ function wrap(children: ReactNode, journalAccess = true) {
   const auth = {
     user: null,
     loading: false,
-    login: () => Promise.resolve(),
+    login: () => Promise.resolve({ expiresAt: '' }),
+    completeSignIn: () => undefined,
     logout: () => undefined,
     can: (permission: string) => journalAccess || permission !== 'JOURNAL_VIEW',
     passwordChange: null,

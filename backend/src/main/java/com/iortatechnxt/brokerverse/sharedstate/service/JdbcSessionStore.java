@@ -13,9 +13,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * Session state on PostgreSQL when Redis is disabled: the token denylist in {@code
- * sec_revoked_token} and the shared counters in {@code sys_shared_counter} (an atomic upsert that
- * restarts an expired window). Expired rows are harmless (every read checks the expiry) and are
- * deleted by the {@code SHARED_STATE_CLEANUP} job.
+ * sec_revoked_token} and the shared counters in {@code sys_shared_counter} ({@link JdbcCounters}).
+ * Expired rows are harmless (every read checks the expiry) and are deleted by the {@code
+ * SHARED_STATE_CLEANUP} job.
  */
 @Component
 @ConditionalOnProperty(
@@ -32,31 +32,21 @@ public class JdbcSessionStore implements TokenRevocationStore, SharedCounterStor
       """;
   private static final String IS_REVOKED =
       "select count(*) from sec_revoked_token where jti = ? and expires_at > ?";
-  private static final String INCREMENT =
-      """
-      insert into sys_shared_counter as c (counter_key, counter_value, expires_at)
-      values (?, 1, ?)
-      on conflict (counter_key) do update set
-        counter_value = case when c.expires_at <= ? then 1 else c.counter_value + 1 end,
-        expires_at = case when c.expires_at <= ? then excluded.expires_at else c.expires_at end
-      returning counter_value
-      """;
-  private static final String CURRENT =
-      "select counter_value from sys_shared_counter where counter_key = ? and expires_at > ?";
-  private static final String RESET = "delete from sys_shared_counter where counter_key = ?";
-
   private final JdbcTemplate jdbc;
   private final Clock clock;
+  private final JdbcCounters counters;
 
   /**
    * Creates the store.
    *
    * @param jdbc JDBC template (joins the current transaction)
    * @param clock clock
+   * @param counters the counters in {@code sys_shared_counter}
    */
-  public JdbcSessionStore(JdbcTemplate jdbc, Clock clock) {
+  public JdbcSessionStore(JdbcTemplate jdbc, Clock clock, JdbcCounters counters) {
     this.jdbc = jdbc;
     this.clock = clock;
+    this.counters = counters;
   }
 
   @Override
@@ -72,20 +62,17 @@ public class JdbcSessionStore implements TokenRevocationStore, SharedCounterStor
 
   @Override
   public long increment(String key, Duration window) {
-    Timestamp now = now();
-    Timestamp expiry = Timestamp.from(clock.instant().plus(window));
-    Long value = jdbc.queryForObject(INCREMENT, Long.class, key, expiry, now, now);
-    return value == null ? 0 : value;
+    return counters.increment(key, window);
   }
 
   @Override
   public long current(String key) {
-    return jdbc.queryForList(CURRENT, Long.class, key, now()).stream().findFirst().orElse(0L);
+    return counters.current(key);
   }
 
   @Override
   public void reset(String key) {
-    jdbc.update(RESET, key);
+    counters.reset(key);
   }
 
   private Timestamp now() {

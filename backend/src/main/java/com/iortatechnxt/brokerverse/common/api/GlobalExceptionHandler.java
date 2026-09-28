@@ -39,6 +39,10 @@ public class GlobalExceptionHandler {
   private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
   private static final String CODE = "code";
 
+  /** Answer to a request refused as invalid without a business message. */
+  static final String INVALID_REQUEST =
+      "The request is not valid. Check the values entered and try again.";
+
   /** Logging context key of the request's correlation id (set by the correlation id filter). */
   private static final String CORRELATION_KEY = "correlationId";
 
@@ -112,14 +116,17 @@ public class GlobalExceptionHandler {
   }
 
   /**
-   * Handles malformed request arguments.
+   * Handles malformed request arguments. The message of the exception may come from a library
+   * (parsers, enum lookups) and name internal types, so the answer is generic; the message is
+   * logged with the correlation id of the request.
    *
    * @param ex exception
    * @return problem detail (400)
    */
   @ExceptionHandler(IllegalArgumentException.class)
   public ProblemDetail handleIllegalArgument(IllegalArgumentException ex) {
-    return problem(HttpStatus.BAD_REQUEST, "BAD_REQUEST", ex.getMessage());
+    LOG.info("Request refused as invalid: {}", ex.getMessage());
+    return problem(HttpStatus.BAD_REQUEST, "BAD_REQUEST", INVALID_REQUEST);
   }
 
   /**

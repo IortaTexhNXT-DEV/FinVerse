@@ -17,7 +17,8 @@ One backend image (`bibs-backend`) runs as three deployments, each with its runt
 | `bibs-integration` | `integration` | Outbox relay to MSK, Kafka consumers, inbound bank / insurer / watchlist files, `/integration/**` (Apigee X) | 2 | 0.5 CPU, 1.5 GiB / 2 CPU, 2 GiB | Fixed; PDB `minAvailable: 1`; spread across zones |
 | `bibs-frontend` | – | nginx serving the React build over TLS | 2-4 | 50m, 64 MiB / 0.5 CPU, 256 MiB | HPA on CPU (70 %); PDB `minAvailable: 1`; spread across zones |
 
-All pods: HTTPS on 8443, startup / readiness / liveness probes over HTTPS (`/actuator/health/*`, `/healthz`),
+All pods: HTTPS on 8443, startup / readiness / liveness probes over HTTPS (`/livez`, `/readyz` on the backend,
+`/healthz` on the frontend),
 rolling updates with `maxUnavailable: 0`, a `preStop` pause so the load balancer deregisters a pod before it stops.
 Every pod runs as a non-root user (backend uid/gid 10001, frontend nginx uid/gid 101) with a read-only root file
 system, no Linux capabilities, no privilege escalation and the `RuntimeDefault` seccomp profile; the namespace
@@ -163,6 +164,8 @@ opening it.
 
 ## 6. Monitoring
 
-The actuator (`/actuator/health`, `/actuator/prometheus`) answers on every role over HTTPS on 8443; Prometheus
-scrapes from the `monitoring` namespace. Each deployment is sized and monitored separately; the job monitor
+The actuator (`/actuator/health`, `/actuator/prometheus`) answers on every role on the management port 9090
+(`BROKERVERSE_MANAGEMENT_PORT`), which the load balancer never publishes; the NetworkPolicy `allow-monitoring`
+admits only the `monitoring` namespace to it, so Prometheus scrapes without a user token (pod annotations
+`prometheus.io/scrape`, `port`, `path`). The probes and the load balancer use `/livez` and `/readyz` on 8443. Each deployment is sized and monitored separately; the job monitor
 (*Administration › Scheduled Jobs*) shows the runs of `bibs-jobs` and `bibs-integration`.

@@ -274,9 +274,9 @@ tables of the migrated database.
 cd backend
 mvn spotless:apply            # format
 mvn verify                    # format check, compile (-Werror), tests, coverage, checkstyle, PMD, CPD, SpotBugs
-# needs PostgreSQL on localhost:5432 (docker compose up db); the signing key comes from the environment
-# in every profile (any local value of 32+ characters; the second-factor key is optional locally)
-BROKERVERSE_JWT_SECRET=$(openssl rand -hex 32) SPRING_PROFILES_ACTIVE=seed mvn spring-boot:run
+# PostgreSQL on localhost:5432 (docker compose up db); SIT/UAT password issued separately; the signing key
+# comes from the environment in every profile (any local value of 32+ characters)
+BROKERVERSE_JWT_SECRET=$(openssl rand -hex 32) SPRING_PROFILES_ACTIVE=seed BROKERVERSE_SEED_PASSWORD=... mvn spring-boot:run
 
 # frontend (Node 22)
 cd frontend

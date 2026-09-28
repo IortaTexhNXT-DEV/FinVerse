@@ -1,6 +1,6 @@
 -- =====================================================================================
 -- iNXT BrokerVerse - V1109 Seed data of the document storage foundation (build step ST0).
--- SEED DATA ONLY - never load in production. Password of the SIT/UAT users: Brokerverse@2026.
+-- SEED DATA ONLY - never load in production. The SIT/UAT password is provided to testers separately.
 --   Users: holdofficer (RECORDS_HOLD_OFFICER, requests legal holds), holdapprover
 --          (RECORDS_HOLD_APPROVER, approves them), infosec (INFOSEC_OFFICER, quarantine alerts).
 -- =====================================================================================

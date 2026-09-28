@@ -1,6 +1,22 @@
 import { api, toQuery } from './client';
 import type { ProductLifecycle, VersionStatus } from './productCatalog';
 import type { RecordStatus, RecordOriginFields } from './types';
+import type {
+  SalesAssignment,
+  SalesOfficer,
+  SalesOrganisation,
+  SalesUnit,
+  SalesUnitInput,
+} from './salesOrganisation';
+
+export type {
+  SalesAssignment,
+  SalesLevel,
+  SalesOfficer,
+  SalesOrganisation,
+  SalesUnit,
+  SalesUnitInput,
+} from './salesOrganisation';
 
 /** Product catalog, insurer panel, rate tables, sales organisation and rating (catalog module). */
 export type RiskItemKind = 'VEHICLE' | 'PROPERTY_LOCATION' | 'PERSON' | 'GENERIC';
@@ -20,7 +36,6 @@ export type RateCode =
   | 'MOTOR_OD_MULTI_YEAR';
 export type MotorCoverage = 'BI' | 'PD';
 export type ProductClass = 'PACKAGE' | 'NON_PACKAGE' | 'ANY';
-export type SalesLevel = 'REGION' | 'DEPARTMENT' | 'TEAM';
 export type PeriodBasis = 'ANNUAL' | 'PRO_RATA' | 'SHORT_PERIOD';
 export type CatalogKind =
   | 'PRODUCT_LINE'
@@ -270,40 +285,6 @@ export interface MotorLimit extends EffectiveDated {
   premium: number;
 }
 
-export interface SalesUnitInput {
-  companyId: number;
-  level: SalesLevel;
-  code: string;
-  name: string;
-  parentCode?: string;
-  costCenter?: string;
-}
-
-export interface SalesUnit extends Authorizable {
-  level: SalesLevel;
-  code: string;
-  name: string;
-  parentCode?: string;
-  costCenter?: string;
-}
-
-export interface SalesOfficer extends Authorizable {
-  teamCode: string;
-  username: string;
-}
-
-export interface SalesOrganisation {
-  units: SalesUnit[];
-  officers: SalesOfficer[];
-}
-
-export interface SalesAssignment {
-  region?: string;
-  department?: string;
-  team?: string;
-  costCenter?: string;
-}
-
 export interface RatingItem {
   label?: string;
   sumInsured: number;
@@ -444,8 +425,18 @@ export const catalogApi = {
       .then((a) => a ?? null),
   createSalesUnit: (input: SalesUnitInput) =>
     api.post<SalesUnit>(`${base}/sales-organisation/units`, input),
+  updateSalesUnit: (id: number, input: SalesUnitInput) =>
+    api.put<SalesUnit>(`${base}/sales-organisation/units/${String(id)}`, input),
   assignOfficer: (input: { companyId: number; teamCode: string; username: string }) =>
     api.post<SalesOfficer>(`${base}/sales-organisation/officers`, input),
+  deactivateSalesUnit: (id: number, reason: string) =>
+    api.post<SalesUnit>(`${base}/sales-organisation/units/${String(id)}/deactivate`, { reason }),
+  reactivateSalesUnit: (id: number, reason: string) =>
+    api.post<SalesUnit>(`${base}/sales-organisation/units/${String(id)}/reactivate`, { reason }),
+  removeSalesOfficer: (id: number, reason: string) =>
+    api.post<SalesOfficer>(`${base}/sales-organisation/officers/${String(id)}/remove`, { reason }),
+  exportSalesOrganisation: (companyId: number) =>
+    api.getFile(`${base}/sales-organisation/export${toQuery({ companyId })}`),
 
   quote: (input: RatingInput) => api.post<RatingResult>(`${base}/rating/quote`, input),
 

@@ -11,6 +11,8 @@ import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
 import com.iortatechnxt.brokerverse.security.api.dto.UserRequest;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import java.math.BigDecimal;
+import java.security.SecureRandom;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -30,7 +32,7 @@ import org.springframework.stereotype.Component;
  *
  * <ul>
  *   <li>the Unapplied Payment Handler persona {@code upphandler} (role UNAPPLIED_HANDLER, CQ10) is
- *       created with the seed password;
+ *       created and given the password of the other SIT/UAT users (that of {@code badmin});
  *   <li>{@code upphandler} asks Cashiering to apply Grace Villanueva's payment to an open invoice
  *       outside the installment plans of the Collections seed, preferably one without promise or
  *       escalation ("For application to invoice", BRCLXN.030/047) and notes "Coordinate further" on
@@ -50,11 +52,15 @@ public class UnappliedSeedData implements ApplicationRunner {
   /** The Unapplied Payment Handler SIT/UAT user. */
   public static final String UPP_HANDLER = "upphandler";
 
-  private static final String KEEP_PASSWORD =
-      "update sec_user set must_change_password = false where username = ?";
+  /** The persona signs in with the password of the other SIT/UAT users, not a new one. */
+  private static final String SEED_PASSWORD =
+      "update sec_user set password_hash = (select s.password_hash from sec_user s"
+          + " where s.username = 'badmin'), must_change_password = false where username = ?";
+
+  private static final SecureRandom RANDOM = new SecureRandom();
+  private static final int RANDOM_BYTES = 24;
 
   private static final Logger LOG = LoggerFactory.getLogger(UnappliedSeedData.class);
-  private static final String PASSWORD = "Brokerverse@2026";
   private static final String HANDLER = "clxhandler";
   private static final BigDecimal APPLIED = new BigDecimal("1000.00");
   private static final String TARGET =
@@ -145,10 +151,17 @@ public class UnappliedSeedData implements ApplicationRunner {
                       null,
                       Set.of("UNAPPLIED_HANDLER"),
                       true),
-                  PASSWORD));
-      // Like the other seed users, the persona signs in with the seed password directly.
-      jdbc.update(KEEP_PASSWORD, UPP_HANDLER);
+                  throwAwayPassword()));
+      // Like the other seed users, the persona signs in with the SIT/UAT password directly.
+      jdbc.update(SEED_PASSWORD, UPP_HANDLER);
     }
+  }
+
+  /** A random initial password, replaced at once by the SIT/UAT password of {@code badmin}. */
+  private static String throwAwayPassword() {
+    byte[] bytes = new byte[RANDOM_BYTES];
+    RANDOM.nextBytes(bytes);
+    return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes) + "#9a";
   }
 
   private Optional<UnappliedView> find(Long companyId, String payor) {

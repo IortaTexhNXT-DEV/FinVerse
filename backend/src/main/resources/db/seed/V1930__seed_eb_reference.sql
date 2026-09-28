@@ -1,6 +1,6 @@
 -- =====================================================================================
 -- iNXT BrokerVerse - V1930 Seed Employee Benefits (BRD-8) SIT/UAT users (seed profile only;
--- password for all users: Brokerverse@2026). SEED DATA ONLY - never load in production.
+-- the SIT/UAT password is provided to testers separately). SEED DATA ONLY - never load in production.
 --   Users of the EB personas (EMPLOYEE_BENEFITS_DESIGN 6.2; FRS BRD-8 section 3): ebao and ebao2
 --   (Marketing AO, EB), ebtl (Marketing TL / UH, EB), ebmgmt (BDOI Management), ebproc (Processing,
 --   EB), ebprocsup (Processing Supervisor) and ebcoll (Collection, EB). The roles and grants are in

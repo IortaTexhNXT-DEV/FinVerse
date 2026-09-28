@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.security.service.UserSessionLog;
 import com.iortatechnxt.brokerverse.support.Api;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
+import com.iortatechnxt.brokerverse.support.SignInPasswords;
 import com.jayway.jsonpath.JsonPath;
 import java.time.Clock;
 import java.util.Map;
@@ -40,7 +41,6 @@ import org.springframework.test.web.servlet.MockMvc;
 class SessionLogIT {
 
   private static final AtomicLong IDS = new AtomicLong(System.nanoTime() % 1_000_000_000L);
-  private static final String PASSWORD = "Brokerverse@2026";
   private static final String INITIAL = "Initial!Passw0rd";
   private static final String BEARER = "Bearer ";
   private static final String ME = "/api/v1/auth/me";
@@ -54,6 +54,7 @@ class SessionLogIT {
   @Autowired private UserSessionLog sessions;
   @Autowired private UserAdminService admin;
   @Autowired private AuthSessionSweepJob sweep;
+  @Autowired private SignInPasswords passwords;
 
   private String login(String username, String password) throws Exception {
     String body =
@@ -80,7 +81,7 @@ class SessionLogIT {
 
   @Test
   void anAdministratorListsAndEndsSessionsAndTheTokenIsRefused() throws Exception {
-    String token = login("auditor", PASSWORD);
+    String token = login("auditor", passwords.of("auditor"));
     String id = sessionId(token);
     api.doGet("admin", "/api/v1/admin/sessions/online")
         .andExpect(status().isOk())
@@ -100,7 +101,7 @@ class SessionLogIT {
 
   @Test
   void theInactivitySignOutIsRecordedWithItsReason() throws Exception {
-    String token = login("auditor", PASSWORD);
+    String token = login("auditor", passwords.of("auditor"));
     mvc.perform(get("/api/v1/auth/sessions").header(HttpHeaders.AUTHORIZATION, BEARER + token))
         .andExpect(status().isOk())
         .andExpect(jsonPath("$.content[0].username").value("auditor"));
@@ -120,9 +121,9 @@ class SessionLogIT {
 
   @Test
   void theSweepEndsIdleAndExpiredSessions() throws Exception {
-    String idle = sessionId(login("auditor", PASSWORD));
-    String expired = sessionId(login("auditor", PASSWORD));
-    String active = sessionId(login("auditor", PASSWORD));
+    String idle = sessionId(login("auditor", passwords.of("auditor")));
+    String expired = sessionId(login("auditor", passwords.of("auditor")));
+    String active = sessionId(login("auditor", passwords.of("auditor")));
     jdbc.update(
         "update sec_user_session set last_seen_at = now() - interval '2 hour' where session_id = ?",
         idle);

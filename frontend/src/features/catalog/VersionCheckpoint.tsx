@@ -5,33 +5,19 @@ import { productCatalogApi } from '@/api/productCatalog';
 import type { VersionDetail } from '@/api/productCatalog';
 import { useAuth } from '@/auth/authContext';
 import { ActionDialog } from '@/components/broking/ActionDialog';
-import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime } from '@/utils/format';
+import { ValidationResultCard } from './ValidationResultCard';
+import { hasValidationOutcome } from './validationOutcome';
 import { VALIDATION_CHECKLIST } from './versionForm';
-import { UserName } from '@/components/ui/UserName';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
-
-/** The checklist confirmed at validation, from its JSON. */
-function confirmedItems(json: string | undefined): string[] {
-  if (!json) {
-    return [];
-  }
-  try {
-    const parsed: unknown = JSON.parse(json);
-    return Array.isArray(parsed) ? parsed.map(String) : [];
-  } catch {
-    return [];
-  }
-}
 
 /**
  * The post-set-up validation checkpoint of a package version (PMADD06): the validator (TSU Head
  * or Business Administrator, never the maker or submitter) confirms the checklist and releases the
- * version, or returns it to MBS with a reason. After release it shows who validated it, when, the
- * checklist and the test premium.
+ * version, or returns it to MBS with a reason. After the decision it shows the outcome and the
+ * checks run (`ValidationResultCard`).
  */
 export function VersionCheckpoint({ detail }: Readonly<{ detail: VersionDetail }>) {
   const { can, user } = useAuth();
@@ -59,29 +45,8 @@ export function VersionCheckpoint({ detail }: Readonly<{ detail: VersionDetail }
   });
   const ownVersion = user?.username === s.maker || user?.username === s.submittedBy;
   const mayValidate = s.status === 'FOR_VALIDATION' && can('PRODUCT_VALIDATE') && !ownVersion;
-  if (s.validatedBy) {
-    return (
-      <Card title="Validation">
-        <p>
-          Validated by{' '}
-          <strong>
-            <UserName login={s.validatedBy} />
-          </strong>{' '}
-          on {formatDateTime(s.validatedAt)}
-          {detail.testPremium !== undefined && (
-            <>
-              {' '}
-              · Test premium <Amount value={detail.testPremium} />
-            </>
-          )}
-        </p>
-        <ul>
-          {confirmedItems(detail.validationChecklist).map((item) => (
-            <li key={item}>{item}</li>
-          ))}
-        </ul>
-      </Card>
-    );
+  if (hasValidationOutcome(detail)) {
+    return <ValidationResultCard detail={detail} />;
   }
   if (!mayValidate) {
     return null;

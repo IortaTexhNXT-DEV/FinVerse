@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.ProductVersion;
 import com.iortatechnxt.brokerverse.catalog.domain.ProductVersionRepository;
 import com.iortatechnxt.brokerverse.catalog.domain.ProductVersionStatus;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
+import com.iortatechnxt.brokerverse.catalog.domain.ValidationCheck;
 import com.iortatechnxt.brokerverse.catalog.service.CoverageService;
 import com.iortatechnxt.brokerverse.catalog.service.ProductCatalogService;
 import com.iortatechnxt.brokerverse.catalog.service.RatingService;
@@ -148,12 +149,12 @@ public class ProductVersionService {
     checkComplete(product, version);
     LocalDate today = BusinessClock.today(clock);
     endPrevious(version, today);
+    BigDecimal sample = sampleSumInsured(version);
     BigDecimal testPremium =
-        rating
-            .testPremium(productCode, version.getScheme(), sampleSumInsured(version))
-            .orElse(null);
+        rating.testPremium(productCode, version.getScheme(), sample).orElse(null);
+    List<ValidationCheck> checks = checks(product, version, today, testPremium, sample);
     Instant now = clock.instant();
-    version.release(user, now, checklistJson(checklist), testPremium);
+    version.release(user, now, checklistJson(checklist), testPremium, checks);
     if (!version.getEffectiveFrom().isAfter(today)) {
       product.projectScheme(version.getScheme());
     }
@@ -189,7 +190,18 @@ public class ProductVersionService {
       throw new BusinessRuleException("REASON_REQUIRED", "Enter the reason of the return");
     }
     ProductVersion version = queries.require(productCode, versionNo);
-    version.returnToDraft(reason.strip());
+    RiskProduct product = catalog.requireProduct(productCode);
+    BigDecimal sample = sampleSumInsured(version);
+    BigDecimal testPremium;
+    try {
+      testPremium = rating.testPremium(productCode, version.getScheme(), sample).orElse(null);
+    } catch (BusinessRuleException notRated) {
+      // A version sent back may not rate yet; the check then reads "not computed".
+      testPremium = null;
+    }
+    List<ValidationCheck> checks =
+        checks(product, version, BusinessClock.today(clock), testPremium, sample);
+    version.returnToDraft(reason.strip(), currentUser.username(), clock.instant(), checks);
     audit.record(
         ProductVersionQueries.ENTITY,
         version.reference(),
@@ -294,6 +306,24 @@ public class ProductVersionService {
             .collect(Collectors.toSet());
     PackageCompleteness.check(
         product, version, basic::contains, latestReleased(version), BusinessClock.today(clock));
+  }
+
+  private List<ValidationCheck> checks(
+      RiskProduct product,
+      ProductVersion version,
+      LocalDate today,
+      BigDecimal testPremium,
+      BigDecimal sample) {
+    Set<String> basic =
+        coverages.coverages(product.getLineCode()).stream()
+            .filter(Coverage::isBasic)
+            .map(Coverage::getCode)
+            .collect(Collectors.toSet());
+    return PackageChecks.run(
+        product,
+        version,
+        new PackageChecks.Context(
+            basic::contains, latestReleased(version), today, testPremium, sample));
   }
 
   private ProductVersion latestReleased(ProductVersion version) {

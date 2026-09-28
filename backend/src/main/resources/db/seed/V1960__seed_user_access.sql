@@ -1,6 +1,6 @@
 -- =====================================================================================
 -- iNXT BrokerVerse - V1960 Seed data of User Access Maintenance (BRD-11, wave U1-A).
--- SEED DATA ONLY - never load in production. Password of the SIT/UAT users: Brokerverse@2026.
+-- SEED DATA ONLY - never load in production. The SIT/UAT password is provided to testers separately.
 --   Users (design 6.2):   requestor (UAM_REQUESTOR), uamapprover (UAM_APPROVER),
 --                         secapprover (UAM_SECOND_APPROVER); subject users a013000101-104.
 --   Requests (TD-UA-02):  a draft, a request pending for uamapprover, a returned request, a

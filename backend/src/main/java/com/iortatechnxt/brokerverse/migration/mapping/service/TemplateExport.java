@@ -1,5 +1,8 @@
 package com.iortatechnxt.brokerverse.migration.mapping.service;
 
+import com.iortatechnxt.brokerverse.common.excel.GuidedSheet;
+import com.iortatechnxt.brokerverse.common.excel.GuidedTemplateWriter;
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.migration.common.service.Workbooks;
 import com.iortatechnxt.brokerverse.migration.mapping.domain.Layout;
 import com.iortatechnxt.brokerverse.migration.mapping.domain.LayoutColumn;
@@ -12,15 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * The load templates generated from the layout versions in force, so the layout in the system is
- * the single source of the templates BDOI fills (DATA_MIGRATION_DESIGN section 5.1): one CSV per
- * layout (the header row only), one workbook per object, and one workbook of every object with a
- * sheet per layout, the column descriptions, the control file and the filling instructions.
+ * the single source of the templates BDOI fills (DATA_MIGRATION_DESIGN section 5.1): the guided
+ * Excel template of a layout (title block, column guide above the header, example row), one
+ * workbook per object and one of every object (a Start here sheet and one guided sheet per layout),
+ * the guided control file template, and the CSV layout of a layout or of the control file (header
+ * row only) for large extracts. The guided Excel files are uploaded as they are on the Extracts
+ * screen: the intake skips their guide and example rows.
  */
 @Service
 @Transactional(readOnly = true)
 public class TemplateExport {
-
-  private static final int MAX_SHEET_NAME = 31;
 
   /** Columns of the control file sent with every data file (one row per measure). */
   public static final List<String> CONTROL_COLUMNS =
@@ -37,55 +41,6 @@ public class TemplateExport {
           "currency",
           "filter",
           "value");
-
-  private static final List<String> COLUMN_HEADERS =
-      List.of(
-          "layout",
-          "seq",
-          "name",
-          "description",
-          "type",
-          "length",
-          "mandatory",
-          "allowed values or code map",
-          "format",
-          "example",
-          "validation");
-
-  private static final List<List<String>> HOW_TO_FILL =
-      List.of(
-          List.of(
-              "File name",
-              "<LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv or .xlsx, for example F01C_EBIX_20271231_01.csv:"
-                  + " the layout code, the source system, the as-of date and the sequence of the day"),
-          List.of(
-              "One file per",
-              "Layout, source system and extract; an object with several layouts sends one file per"
-                  + " layout with the same as-of date"),
-          List.of(
-              "CSV",
-              "UTF-8 without byte order mark, comma separator, double quotes around values that hold"
-                  + " a comma, a quote or a line break, one header row with the column names exactly"
-                  + " as in the template"),
-          List.of("Excel", "First sheet, header in row 1, no merged cells, no formulas"),
-          List.of(
-              "Values",
-              "Dates yyyy-MM-dd; timestamps yyyy-MM-dd HH:mm:ss (Philippine time); amounts with a dot"
-                  + " decimal, 2 decimals, no thousands separator, minus sign for negatives; currency"
-                  + " ISO 4217; codes exactly as stored in the legacy system; blank means no value"),
-          List.of(
-              "Control file",
-              "<data file name>.ctl.csv in the control layout: the row count, the hash total of the"
-                  + " key column, the total of each amount column per currency and the SHA-256 of the"
-                  + " data file, one row per measure"),
-          List.of(
-              "Delivery",
-              "Upload the data file and its control file together on the Extracts screen of the"
-                  + " Migration Console; never by e-mail"),
-          List.of(
-              "Checks",
-              "A file whose checksum, header, row count, amount totals or hash total does not agree"
-                  + " with its control file is rejected with the reason; nothing of it is loaded"));
 
   private final LayoutService layouts;
   private final MigDataObjectRepository objects;
@@ -113,6 +68,18 @@ public class TemplateExport {
   }
 
   /**
+   * The guided Excel template of a layout.
+   *
+   * @param layoutCode layout
+   * @return XLSX bytes
+   */
+  public byte[] layoutWorkbook(String layoutCode) {
+    Layout layout = layouts.requireCurrent(layoutCode);
+    return GuidedTemplateWriter.write(
+        LayoutTemplates.single(layout, layouts.columns(layout.getId())));
+  }
+
+  /**
    * The CSV template of the control file.
    *
    * @return CSV bytes
@@ -122,14 +89,33 @@ public class TemplateExport {
   }
 
   /**
-   * The workbook of one object: a sheet per layout in force, the columns, the control file and the
-   * filling instructions.
+   * The guided Excel template of the control file.
+   *
+   * @return XLSX bytes
+   */
+  public byte[] controlWorkbook() {
+    return GuidedTemplateWriter.write(LayoutTemplates.control(CONTROL_COLUMNS));
+  }
+
+  /**
+   * The workbook of one object: a Start here sheet and one guided sheet per layout in force (the
+   * layout's own template when the object has one layout).
    *
    * @param objectCode object
    * @return XLSX bytes
    */
   public byte[] objectWorkbook(String objectCode) {
-    return workbook(layouts.inForce(objectCode));
+    List<Layout> list = layouts.inForce(objectCode);
+    if (list.size() == 1) {
+      return GuidedTemplateWriter.write(
+          LayoutTemplates.single(list.get(0), layouts.columns(list.get(0).getId())));
+    }
+    MigDataObject object = objects.findByCode(objectCode).orElse(null);
+    String name = object == null ? objectCode : objectCode + " " + object.getName();
+    return workbook(
+        "Load templates of " + name,
+        "Delivers the legacy records of the data object " + name + ", one sheet per layout.",
+        list);
   }
 
   /**
@@ -142,51 +128,25 @@ public class TemplateExport {
     for (MigDataObject o : objects.findAllByOrderByLoadOrderAscCodeAsc()) {
       all.addAll(layouts.inForce(o.getCode()));
     }
-    return workbook(all);
+    return workbook(
+        "Migration load templates",
+        "Delivers the legacy records of every data object, one sheet per layout in force, in the"
+            + " load order of the objects.",
+        all);
   }
 
-  private byte[] workbook(List<Layout> list) {
-    try (Workbooks wb = Workbooks.create()) {
-      List<List<String>> described = new ArrayList<>();
-      for (Layout layout : list) {
-        wb.sheet(sheetName(layout), header(layout), List.of());
-        for (LayoutColumn c : layouts.columns(layout.getId())) {
-          described.add(describe(layout, c));
-        }
-      }
-      wb.sheet("Columns", COLUMN_HEADERS, described);
-      wb.sheet("Control file", CONTROL_COLUMNS, List.of());
-      wb.sheet("How to fill", List.of("Topic", "Rule"), HOW_TO_FILL);
-      return wb.bytes();
+  private byte[] workbook(String name, String purpose, List<Layout> list) {
+    if (list.isEmpty()) {
+      throw new BusinessRuleException("MIG_NO_LAYOUT", "There is no layout in force to export");
     }
-  }
-
-  private static String sheetName(Layout layout) {
-    String name = layout.getCode() + " " + layout.getTitle().replaceAll("[\\\\/?*\\[\\]:]", " ");
-    return name.length() > MAX_SHEET_NAME ? name.substring(0, MAX_SHEET_NAME).trim() : name;
+    List<GuidedSheet> sheets = new ArrayList<>();
+    for (Layout layout : list) {
+      sheets.add(LayoutTemplates.sheet(layout, layouts.columns(layout.getId())));
+    }
+    return GuidedTemplateWriter.write(LayoutTemplates.workbook(name, purpose, sheets));
   }
 
   private List<String> header(Layout layout) {
     return layouts.columns(layout.getId()).stream().map(LayoutColumn::getName).toList();
-  }
-
-  private static List<String> describe(Layout layout, LayoutColumn c) {
-    String allowed = c.getMapSet() != null ? "Code map " + c.getMapSet() : c.getAllowedValues();
-    return List.of(
-        layout.getCode(),
-        String.valueOf(c.getSeq()),
-        c.getName(),
-        c.getDescription(),
-        c.getDataType().name(),
-        value(c.getLength()),
-        c.getMandatory(),
-        value(allowed),
-        value(c.getFormat()),
-        value(c.getExample()),
-        value(c.getValidation()));
-  }
-
-  private static String value(String v) {
-    return v == null ? "" : v;
   }
 }

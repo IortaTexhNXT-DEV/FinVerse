@@ -129,7 +129,7 @@ frs:
       - A user with the Requestor profile logs in and sees the User Access screens of the Requestor only; a user with several roles sees the union of their screens.
       - Wrong credentials are refused and the attempt is counted.
       - The third wrong password locks the account and the next attempt is refused.
-      - A deactivated user is refused with its own message and the attempt is not counted.
+      - A deactivated user is refused with the same message as a wrong password and the attempt is not counted.
       - The audit trail lists the failed and successful attempts.
     cases:
       - c: 1
@@ -159,15 +159,15 @@ frs:
         title: Third wrong password locks the account
         steps:
           - Enter requestor2 with a wrong password three times; then the correct password.
-        expected: The account is locked; the fourth attempt is refused.
-        msg: [Account is locked. Contact your administrator.]
+        expected: The account is locked; the fourth attempt, with the correct password, is refused with the same message as a wrong password; Users shows the account as locked to the System Administrator.
+        msg: [Invalid user name or password]
       - c: 4
         type: Negative
         title: A deactivated user signs in
         steps:
           - Log in as the disabled user of TD-UA-01 with the right password, then with a wrong one.
-        expected: Both attempts are refused with the deactivated message; the failed-attempt count stays 0 and the account is not locked.
-        msg: [Your account is deactivated. Contact your administrator.]
+        expected: Both attempts are refused with the same message as a wrong password; the failed-attempt count stays 0 and the account is not locked.
+        msg: [Invalid user name or password]
       - c: 3
         type: Boundary
         title: Two wrong passwords do not lock

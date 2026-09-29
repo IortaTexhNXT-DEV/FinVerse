@@ -161,8 +161,8 @@ frs:
         title: The fourth attempt after three wrong passwords is refused
         steps:
           - Enter cl.officer2 with a wrong password three times, then the correct password.
-        expected: The account is locked after the third attempt and the fourth attempt is refused.
-        msg: [Account is locked. Contact your administrator.]
+        expected: The account is locked after the third attempt; the fourth attempt, with the correct password, is refused with the same message as a wrong password; the lock shows to the System Administrator in Administration > Users.
+        msg: [Invalid user name or password]
       - c: 3
         type: Boundary
         title: Two wrong passwords do not lock

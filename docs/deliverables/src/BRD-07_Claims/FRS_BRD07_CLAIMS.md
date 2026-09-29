@@ -284,14 +284,14 @@ rules:
   - [R3, "Directory sign-in (Windows ID) when BDO supplies the interface; BIBS sign-in until then (UQ04).", Configurable, Parameter AUTH_MODE]
 validations:
   - [User ID or password wrong, Invalid user name or password, AUTHENTICATION_FAILED]
-  - [Account locked, Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
+  - [Account locked (the same message as a wrong password; the lock shows to the System Administrator on Users), Invalid user name or password, AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:
   - Every successful and failed log-in is recorded with user, time and source address; the log is visible to the System Administrator only.
 acceptance:
   - A user with valid credentials and a Claims role logs in and sees the Claims Handling menu section.
-  - The fourth attempt after three wrong passwords is refused because the account is locked.
+  - The fourth attempt after three wrong passwords, with the correct password, is refused with the same message as a wrong password because the account is locked; the lock shows to the System Administrator.
   - An idle session ends after the configured timeout.
 ```
 

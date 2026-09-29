@@ -290,7 +290,7 @@ rules:
   - [R4, "BDO single sign-on with Windows credentials (NFR 1.01) is not part of this phase (Q42).", Fixed, "-"]
 validations:
   - [Action without permission, You are not permitted to perform this action, ACCESS_DENIED]
-  - [Account locked after failed log-ins, Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
+  - [Account locked after failed log-ins (the same message as a wrong password; the lock shows to the System Administrator on Users), Invalid user name or password, AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:
@@ -299,7 +299,7 @@ acceptance:
   - A Disbursement user sees the PR Worklist read only and cannot record a disposition.
   - A Marketing AO does not see Collections Setup or Assignments.
   - The User Access Matrix lists the CLX_* permissions under the area COLLECTIONS with their action classes.
-  - A user is locked after three consecutive wrong passwords.
+  - A user is locked after three consecutive wrong passwords; the correct password is then refused with the same message as a wrong password, and Users shows the lock to the System Administrator.
 ```
 
 ```fr
@@ -2572,7 +2572,7 @@ The table lists each point where the proposed screen or rule differs from the BR
 | CLR-CL-16 | Aging basis (BRCLXN.060; FR-CL-062) | The aging runs from the booking date or the inception date (CLX_AGING_BASIS); aging from the SOA due date is not proposed. | The BRD mentions billing statements, invoice dates and policy periods (CQ14). | Choose the aging basis (CQ14). |
 | CLR-CL-17 | Draft commission and incentive rows (BRCLXN.061-064; FR-CL-091 to 094) | The four draft rows are proposed as described in section 4.10; their validations and messages are confirmed with the draft. | The rows are in the unsigned draft addendum only (CQ01). | Confirm or withdraw the draft rows (CQ01). |
 | CLR-CL-18 | Several roles per user (NFR 3.04; FR-CL-001) | A user may hold several roles; segregation of duties is kept by the permission of each action. | Cross-BRD decision D5 of BRD-11. | Confirm decision D5 for Collections. |
-| CLR-CL-19 | Lock-out (NFR 1.04, 2.02; FR-CL-001) | Every BIBS user is locked out after 3 invalid attempts (LOGIN_MAX_FAILED_ATTEMPTS = 3) with "Account is locked. Contact your administrator." | Cross-BRD decision D5 of BRD-11. | Confirm the lock-out rule. |
+| CLR-CL-19 | Lock-out (NFR 1.04, 2.02; FR-CL-001) | Every BIBS user is locked out after 3 invalid attempts (LOGIN_MAX_FAILED_ATTEMPTS = 3) and the correct password is then refused with the same message as a wrong password ("Invalid user name or password"); the lock shows to the System Administrator. | Cross-BRD decision D5 of BRD-11. | Confirm the lock-out rule. |
 | CLR-CL-20 | Exports (p.93 caveat; FR-CL-084) | Exports run in the background, capped at CLX_EXPORT_MAX_ROWS, under their own permission CLX_EXPORT. | The BRD warns that exports may slow the system. | Confirm the cap and the permission. |
 | CLR-CL-21 | Edit lock (NFR 9.03; FR-CL-005) | The lock is taken when the user opens the account and is released when the user leaves it or after CLX_EDIT_LOCK_MINUTES (15). Activity on the account does not renew the lock; when it expires, the next user takes it. | The BRD does not say whether work on the account renews the lock. | Confirm the expiry, or ask for renewal while the holder works. |
 | CLR-CL-22 | Refresh after a payment (BRCLXN.013-015; FR-CL-017) | A payment applied in Cashiering updates the outstanding of the account within 5 minutes. | The BRD gives no target for the update after a payment. | Confirm the 5-minute target. |

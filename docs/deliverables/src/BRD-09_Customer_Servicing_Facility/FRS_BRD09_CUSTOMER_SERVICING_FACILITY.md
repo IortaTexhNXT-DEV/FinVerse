@@ -239,7 +239,7 @@ rules:
   - [R2, "The landing page of CSF roles is the Customer Search.", Fixed, "-"]
 validations:
   - [User ID or password wrong, Invalid user name or password, AUTHENTICATION_FAILED]
-  - [Account locked, Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
+  - [Account locked (the same message as a wrong password; the lock shows to the System Administrator on Users), Invalid user name or password, AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:

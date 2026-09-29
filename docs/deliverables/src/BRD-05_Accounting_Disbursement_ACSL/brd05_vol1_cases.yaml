@@ -178,8 +178,8 @@ frs:
         title: Third wrong password locks the account
         steps:
           - Enter a wrong password three times for gltl; then the right one.
-        expected: The account is locked until the System Administrator unlocks it.
-        msg: [Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
+        expected: The account locks at the third failure; the correct password is refused with the same message as a wrong password until the System Administrator unlocks it in Administration > Users, where the lock shows.
+        msg: [Invalid user name or password, AUTHENTICATION_FAILED]
 
   FR-AC-002:
     scenario: SC-AC-01

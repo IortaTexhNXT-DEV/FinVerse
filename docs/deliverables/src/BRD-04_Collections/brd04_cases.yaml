@@ -219,8 +219,8 @@ frs:
         steps:
           - Enter user ID mkthandler with a wrong password three times.
           - Enter the correct password.
-        expected: The third attempt locks the account; the correct password is refused until the System Administrator unlocks the user.
-        msg: [Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
+        expected: The third attempt locks the account; the correct password is refused with the same message as a wrong password until the System Administrator unlocks the user in Administration > Users, where the lock shows.
+        msg: [Invalid user name or password, AUTHENTICATION_FAILED]
       - c: 4
         type: Boundary
         persona: MKT_HANDLER

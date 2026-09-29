@@ -135,7 +135,8 @@ common:
       number; a returned stage in amber, a voided or not proceeded request in red, Released in green once reached), and
       under it one row with Current Stage, Since, Due (the service level due time, with the Overdue pill) and Assigned
       To (the user's name), with the actions the user may take now on the right. The History tab lists every step,
-      newest first: Stage, From Stage, Action, By (name and role), Date and Time, Remarks and Duration in Stage.
+      newest first: Stage, From Stage, Action, By (the user's name; the role under it for the users who may read the roles
+      of others: user administration, access review and audit), Date and Time, Remarks and Duration in Stage.
       Actions that need a reason (Return to requester, Void, Not proceeded, Request changes, Return to TSU) open a
       dialog with the mandatory reason from its list of values and an optional comment; the comment is kept in the
       history and sent with the workflow notice.

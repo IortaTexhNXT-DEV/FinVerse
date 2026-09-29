@@ -142,7 +142,8 @@ common:
       returned stage in amber, a rejected, cancelled or voided stage in red, the last stage in green once reached), and
       under it one row with Current Stage, Since, Due (with the Overdue pill) and Assigned To (the user's name), with
       the actions the user may take now on the right. The history table lists every step, newest first: Stage, From
-      Stage, Action, By (name and role), Date and Time, Remarks and Duration in Stage; the date column can be sorted.
+      Stage, Action, By (the user's name; the role under it for the users who may read the roles of others: user
+      administration, access review and audit), Date and Time, Remarks and Duration in Stage; the date column can be sorted.
       Actions that need a reason (return, void, cancel) open a dialog with the mandatory reason from its list of values
       and an optional comment; the comment is kept in the history and sent with the notification. "Workflow notice" in
       the action tables means the in-app notice NT-01.

@@ -9,9 +9,10 @@ from __future__ import annotations
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-BRAND_DIR = REPO_ROOT / "frontend" / "src" / "assets" / "brand"
-BDO_LOGO = BRAND_DIR / "bdo-insure.png"
-IORTA_LOGO = BRAND_DIR / "iorta-technxt.png"
+# The client's logo is that of the theme pack; the platform's logo that of iorta TechNXT.
+BRAND_DIR = REPO_ROOT / "frontend" / "src" / "theme" / "packs" / "bdoi"
+BDO_LOGO = BRAND_DIR / "client-logo.png"
+IORTA_LOGO = REPO_ROOT / "frontend" / "src" / "assets" / "platform" / "iorta-technxt.png"
 DELIVERABLES = REPO_ROOT / "docs" / "deliverables"
 SRC_DIR = DELIVERABLES / "src"
 OUT_DIR = DELIVERABLES / "out"

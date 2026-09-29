@@ -5,7 +5,7 @@
 #   docker buildx imagetools inspect nginxinc/nginx-unprivileged:1.30-alpine | grep -m1 Digest
 # then replace the sha256 values below, rebuild, and let the pipeline's image scan pass.
 # ---- build stage -------------------------------------------------------------------
-FROM node:22-alpine@sha256:0a7108bf6c7bf5de370ffb1a3ed6be93d405b43ff159f681a8d18c0e2bc2e402 AS build
+FROM node:26-alpine@sha256:0b36e8c136b94cd4fcf02188228e76c31ad5872eef3fec8cbd2eee500cfd9e80 AS build
 WORKDIR /workspace
 COPY package.json package-lock.json ./
 # The dependency audit runs as a gate in the pipeline (npm audit --audit-level=high).

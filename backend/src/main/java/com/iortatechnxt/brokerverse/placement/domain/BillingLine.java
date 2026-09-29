@@ -16,7 +16,7 @@ import java.util.List;
  * @param borrower borrower (client name)
  * @param originatingUnit originating unit (sales team)
  * @param premium gross premium
- * @param bdoiLocation BDOI location (sales region)
+ * @param brokerLocation BDOI location (sales region)
  * @param amortised premium amortised over a multi-year term
  */
 public record BillingLine(
@@ -28,7 +28,7 @@ public record BillingLine(
     String borrower,
     String originatingUnit,
     BigDecimal premium,
-    String bdoiLocation,
+    String brokerLocation,
     boolean amortised) {
 
   /** Defensive copy. */

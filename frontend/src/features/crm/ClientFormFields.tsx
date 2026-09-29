@@ -4,6 +4,7 @@ import { Field } from '@/components/ui/Field';
 import { formatTin } from './clientForm';
 import type { ClientForm, ClientFormErrors } from './clientForm';
 import { TypedInput } from '@/components/ui/DateInput';
+import { groupLabel } from '@/context/clientNames';
 
 type TextKey = {
   [K in keyof ClientForm]: ClientForm[K] extends string ? K : never;
@@ -155,7 +156,7 @@ export function SegmentSection(p: Readonly<SectionProps>) {
     <Card title="Segment & Bank relationship">
       <div className="form-grid">
         <LovInput {...p} name="marketSegment" label="Market segment" list="MARKET_SEGMENT" />
-        <Field label="BDO bank client">
+        <Field label={groupLabel('bank client')}>
           {(id) => (
             <label className="checkbox-field" htmlFor={id}>
               <input
@@ -164,11 +165,11 @@ export function SegmentSection(p: Readonly<SectionProps>) {
                 checked={form.bankClient}
                 onChange={(e) => set({ bankClient: e.target.checked })}
               />
-              The client banks with BDO
+              The client banks with the group bank
             </label>
           )}
         </Field>
-        {form.bankClient && <TextInput {...p} name="bankCif" label="BDO CIF number" />}
+        {form.bankClient && <TextInput {...p} name="bankCif" label={groupLabel('CIF number')} />}
         <LovInput {...p} name="sourceOfFunds" label="Source of funds" list="SOURCE_OF_FUNDS" />
         <LovInput
           {...p}

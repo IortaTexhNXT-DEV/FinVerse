@@ -1,6 +1,6 @@
 package com.iortatechnxt.brokerverse.migration.report;
 
-import static com.iortatechnxt.brokerverse.migration.report.MigReport.PHT;
+import static com.iortatechnxt.brokerverse.migration.report.MigReport.LOCAL_TIME;
 
 import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
@@ -94,13 +94,13 @@ public class GlReports {
             "select t.reference, t.trueup_no, t.as_of, t.status, b.batch_no, tb.batch_no as tb_batch,"
                 + " t.journals_posted, t.items_adjusted, t.prepared_by,"
                 + " to_char(t.prepared_at"
-                + PHT
+                + LOCAL_TIME
                 + " as prepared_at, t.approved_by, to_char(t.approved_at"
-                + PHT
+                + LOCAL_TIME
                 + " as approved_at, to_char(t.posted_at"
-                + PHT
+                + LOCAL_TIME
                 + " as posted_at, t.signed_by, to_char(t.signed_at"
-                + PHT
+                + LOCAL_TIME
                 + " as signed_at, t.remarks"
                 + " from mig_trueup t left join mig_batch b on b.id = t.batch_id"
                 + " left join mig_batch tb on tb.id = t.tb_batch_id"

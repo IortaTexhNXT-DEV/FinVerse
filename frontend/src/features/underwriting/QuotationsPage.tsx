@@ -14,7 +14,7 @@ import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { useDefaultBranchId } from '@/context/workspaceContext';
+import { useDefaultBranchId, useBaseCurrency } from '@/context/workspaceContext';
 import { formatDate, today } from '@/utils/format';
 import { SelectField } from './FormFields';
 import { newQuotation } from './policyForm';
@@ -33,6 +33,7 @@ function latest(q: Quotation) {
 export default function QuotationsPage() {
   const lookups = useUwLookups();
   const defaultBranch = useDefaultBranchId();
+  const baseCurrency = useBaseCurrency();
   const { can } = useAuth();
   const toast = useToast();
   const navigate = useNavigate();
@@ -88,7 +89,9 @@ export default function QuotationsPage() {
               <Button
                 variant="accent"
                 icon={<Plus size={16} />}
-                onClick={() => setForm(newQuotation(companyId, defaultBranch, today()))}
+                onClick={() =>
+                  setForm(newQuotation(companyId, defaultBranch, today(), baseCurrency))
+                }
               >
                 New Quotation
               </Button>

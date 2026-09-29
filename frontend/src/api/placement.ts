@@ -181,7 +181,7 @@ export interface BillingItem {
   borrower: string;
   originatingUnit?: string;
   premium: number;
-  bdoiLocation?: string;
+  brokerLocation?: string;
   amortised: boolean;
   paymentStatus: string;
 }

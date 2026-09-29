@@ -19,12 +19,14 @@ import com.iortatechnxt.brokerverse.nonpackage.domain.ProposalRequestRepository;
 import com.iortatechnxt.brokerverse.nonpackage.domain.ProposalStatus;
 import com.iortatechnxt.brokerverse.nonpackage.domain.RiskDetails;
 import com.iortatechnxt.brokerverse.nonpackage.service.ProposalRules.Checked;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import com.iortatechnxt.brokerverse.workflow.service.StartCase;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,6 +61,7 @@ public class ProposalService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -74,6 +77,7 @@ public class ProposalService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param organization company master (base currency)
    */
   public ProposalService(
       ProposalRequestRepository proposals,
@@ -86,7 +90,8 @@ public class ProposalService {
       WorkflowService workflow,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      OrganizationDirectory organization) {
     this.proposals = proposals;
     this.rules = rules;
     this.numbers = numbers;
@@ -98,6 +103,7 @@ public class ProposalService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.organization = organization;
   }
 
   /**
@@ -201,7 +207,8 @@ public class ProposalService {
         new ClientFacts(c.getId(), c.getCode(), c.getDisplayName(), c.getEmail()),
         blank(draft.marketSegment()),
         blank(draft.sourceChannel()),
-        blank(draft.currency()));
+        Objects.requireNonNullElseGet(
+            blank(draft.currency()), () -> organization.company(p.getCompanyId()).baseCurrency()));
     RiskDetails details = checked.details();
     p.describeRisk(
         draft.periodFrom(),

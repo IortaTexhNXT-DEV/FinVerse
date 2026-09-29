@@ -127,7 +127,7 @@ export default function ReconUploadsPage() {
       <PageHeader
         section="Production Reconciliation"
         title="Insurer Feedback"
-        description="Registers returned by the insurers, uploaded and matched against BDOI production."
+        description="Registers returned by the insurers, uploaded and matched against our production."
         actions={
           can('RECON_PROCESS') ? (
             <Button icon={<Upload size={16} />} onClick={() => setOpen(true)}>

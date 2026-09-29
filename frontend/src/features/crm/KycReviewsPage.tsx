@@ -21,12 +21,18 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { DateInput } from '@/components/ui/DateInput';
 import { LovLabel } from '@/components/broking/LovLabel';
+import { groupLabel } from '@/context/clientNames';
 
 type Filters = Omit<KycReviewFilters, 'companyId'>;
 
 const BANK_OPTIONS: { value: BankFilter; label: string }[] = [
   { value: 'NON_BANK', label: 'Non-bank clients' },
-  { value: 'BANK', label: 'BDO bank clients' },
+  {
+    value: 'BANK',
+    get label() {
+      return groupLabel('bank clients');
+    },
+  },
   { value: 'ALL', label: 'All clients' },
 ];
 

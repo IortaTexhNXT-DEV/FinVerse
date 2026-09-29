@@ -7,7 +7,6 @@ import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
 import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -35,8 +34,6 @@ public class PlanReportSql {
 
   /** Period end. */
   static final String TO = "to";
-
-  private static final ZoneId MANILA = BusinessClock.zone();
 
   private final NamedParameterJdbcTemplate jdbc;
 
@@ -102,7 +99,7 @@ public class PlanReportSql {
 
   private static Object localValue(Object value) {
     return switch (value) {
-      case Timestamp t -> t.toInstant().atZone(MANILA).toLocalDate();
+      case Timestamp t -> t.toInstant().atZone(BusinessClock.zone()).toLocalDate();
       case Date d -> d.toLocalDate();
       case null, default -> value;
     };

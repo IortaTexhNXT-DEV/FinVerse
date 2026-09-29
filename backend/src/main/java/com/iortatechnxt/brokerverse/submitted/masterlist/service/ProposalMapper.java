@@ -50,7 +50,7 @@ public final class ProposalMapper {
         current == null ? new SbmAssured(null, null, null, null, null, null) : current.assured();
     SbmTerms t =
         current == null
-            ? new SbmTerms(null, null, null, null, null, null, null, "PHP")
+            ? new SbmTerms(null, null, null, null, null, null, null, null)
             : current.terms();
     SbmRisk r = current == null ? SbmRisk.NONE : current.risk();
     return new SbmPolicyData(

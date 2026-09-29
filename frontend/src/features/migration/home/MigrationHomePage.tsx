@@ -14,6 +14,7 @@ import { formatDateTime } from '@/utils/format';
 import { MigStatus } from '../common/MigStatus';
 import { MIG_SECTION, migLabel } from '../common/migrationCodes';
 import '../migration.css';
+import { BRAND } from '@/branding';
 
 interface Tile {
   id: string;
@@ -101,7 +102,7 @@ export default function MigrationHomePage() {
       <PageHeader
         section={MIG_SECTION}
         title="Migration Home"
-        description="Progress of the data migration from the legacy systems to BIBS."
+        description={`Progress of the data migration from the legacy systems to ${BRAND.product}.`}
         actions={
           <>
             <Button

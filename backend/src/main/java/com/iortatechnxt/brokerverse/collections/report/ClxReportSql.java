@@ -10,7 +10,6 @@ import com.iortatechnxt.brokerverse.report.core.ReportOrigin;
 import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -70,8 +69,6 @@ public class ClxReportSql {
           + " and (cast(:salesUnit as varchar) is null or i.sales_unit = :salesUnit)"
           + " and (cast(:branchId as bigint) is null or i.branch_id = :branchId)"
           + ReportOrigin.sql("i.origin");
-
-  private static final ZoneId MANILA = BusinessClock.zone();
 
   private final NamedParameterJdbcTemplate jdbc;
 
@@ -199,7 +196,7 @@ public class ClxReportSql {
 
   private static Object localValue(Object value) {
     if (value instanceof Timestamp stamp) {
-      return stamp.toInstant().atZone(MANILA).toLocalDate();
+      return stamp.toInstant().atZone(BusinessClock.zone()).toLocalDate();
     }
     return value instanceof Date day ? day.toLocalDate() : value;
   }

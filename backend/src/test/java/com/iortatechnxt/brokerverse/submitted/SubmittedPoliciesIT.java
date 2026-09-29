@@ -145,7 +145,7 @@ class SubmittedPoliciesIT {
     assertThat(p.getClassification()).isNotNull();
     assertThat(results.findByPolicyIdOrderByIdDesc(p.getId())).hasSizeGreaterThanOrEqualTo(4);
 
-    SbmRenewal r = as.run(TL, () -> handOff.renewWithBdoi(p.getId()));
+    SbmRenewal r = as.run(TL, () -> handOff.renewByHand(p.getId()));
     assertThat(r.getInsurerAssigned()).isEqualTo("INS-MGIC");
     assertThat(r.getHandoffStatus()).isEqualTo(SbmRenewal.HANDED_OFF);
     RenewalCandidate c =
@@ -161,7 +161,7 @@ class SubmittedPoliciesIT {
         .get()
         .extracting(RenewalHandOff.HandOffStatus::state)
         .isEqualTo(RenewalHandOff.State.OPEN);
-    assertThatThrownBy(() -> as.run(TL, () -> handOff.renewWithBdoi(p.getId())))
+    assertThatThrownBy(() -> as.run(TL, () -> handOff.renewByHand(p.getId())))
         .isInstanceOf(BusinessRuleException.class);
   }
 

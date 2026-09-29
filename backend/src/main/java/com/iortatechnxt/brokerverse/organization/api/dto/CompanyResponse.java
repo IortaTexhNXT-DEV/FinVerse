@@ -16,6 +16,11 @@ import com.iortatechnxt.brokerverse.organization.domain.Company;
  * @param backValueDays back value days
  * @param forwardValueDays forward value days
  * @param retainedEarningsAccount retained earnings account code
+ * @param shortName short name in texts and labels
+ * @param groupName group name used in labels of group concepts
+ * @param logoRef logo reference of documents
+ * @param headOfficeCode head-office code in files and for records without a branch
+ * @param defaultBankCode default bank account code
  * @param recordStatus maker-checker status
  * @param createdBy creator
  * @param maker user who created or last maintained the record (unchanged by authorization)
@@ -32,6 +37,11 @@ public record CompanyResponse(
     int backValueDays,
     int forwardValueDays,
     String retainedEarningsAccount,
+    String shortName,
+    String groupName,
+    String logoRef,
+    String headOfficeCode,
+    String defaultBankCode,
     RecordStatus recordStatus,
     String createdBy,
     String maker,
@@ -55,6 +65,11 @@ public record CompanyResponse(
         c.getBackValueDays(),
         c.getForwardValueDays(),
         c.getRetainedEarningsAccount(),
+        c.getShortName(),
+        c.getGroupName(),
+        c.getLogoRef(),
+        c.getHeadOfficeCode(),
+        c.getDefaultBankCode(),
         c.getRecordStatus(),
         c.getCreatedBy(),
         c.getMaker(),

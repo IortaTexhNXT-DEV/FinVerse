@@ -36,7 +36,7 @@ export const SUBMITTED_HELP: HelpSection = {
       workflow: [
         'Validate a record received by hand, dispose a fallout for renewal, exclude it with a non-renewal reason or reinstate it.',
         'Tag it Renewable or Non-Renewable: a manual tag overrides the rules of the next runs.',
-        'Renew with BDOI hands a For Renewal record to Renewal at once.',
+        'The renew action hands a For Renewal record to Renewal at once.',
       ],
       controls: ['Every change is kept in the History tab with the old and the new value.'],
     },

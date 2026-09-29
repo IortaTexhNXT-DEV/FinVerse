@@ -10,6 +10,10 @@ import jakarta.persistence.Table;
  *
  * <p>{@code backValueDays}/{@code forwardValueDays} implement the company-level value-date window
  * for journals (supplementary / back-dated transaction control).
+ *
+ * <p>The company also carries the client profile used by documents, screens and labels (short name,
+ * group name, logo reference, head-office code, default bank account code), so no client identity
+ * is written into the platform code.
  */
 @Entity
 @Table(name = "org_company")
@@ -42,6 +46,21 @@ public class Company extends AuthorizableEntity {
   @Column(name = "retained_earnings_account", length = 30)
   private String retainedEarningsAccount;
 
+  @Column(name = "short_name", nullable = false, length = 30)
+  private String shortName;
+
+  @Column(name = "group_name", length = 60)
+  private String groupName;
+
+  @Column(name = "logo_ref", length = 300)
+  private String logoRef;
+
+  @Column(name = "head_office_code", length = 10)
+  private String headOfficeCode;
+
+  @Column(name = "default_bank_code", length = 30)
+  private String defaultBankCode;
+
   protected Company() {}
 
   /**
@@ -55,6 +74,7 @@ public class Company extends AuthorizableEntity {
     this.code = code;
     this.name = name;
     this.baseCurrency = baseCurrency;
+    this.shortName = code;
   }
 
   public String getCode() {
@@ -119,5 +139,54 @@ public class Company extends AuthorizableEntity {
 
   public void setRetainedEarningsAccount(String retainedEarningsAccount) {
     this.retainedEarningsAccount = retainedEarningsAccount;
+  }
+
+  public String getShortName() {
+    return shortName;
+  }
+
+  /**
+   * Sets the short name; the company code when blank.
+   *
+   * @param shortName short name, may be blank
+   */
+  public void setShortName(String shortName) {
+    this.shortName = shortName == null || shortName.isBlank() ? code : shortName.strip();
+  }
+
+  public String getGroupName() {
+    return groupName;
+  }
+
+  public void setGroupName(String groupName) {
+    this.groupName = blankToNull(groupName);
+  }
+
+  public String getLogoRef() {
+    return logoRef;
+  }
+
+  public void setLogoRef(String logoRef) {
+    this.logoRef = blankToNull(logoRef);
+  }
+
+  public String getHeadOfficeCode() {
+    return headOfficeCode;
+  }
+
+  public void setHeadOfficeCode(String headOfficeCode) {
+    this.headOfficeCode = blankToNull(headOfficeCode);
+  }
+
+  public String getDefaultBankCode() {
+    return defaultBankCode;
+  }
+
+  public void setDefaultBankCode(String defaultBankCode) {
+    this.defaultBankCode = blankToNull(defaultBankCode);
+  }
+
+  private static String blankToNull(String value) {
+    return value == null || value.isBlank() ? null : value.strip();
   }
 }

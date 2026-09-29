@@ -175,7 +175,7 @@ class ClaimRecordingIT {
         new NewClaim(
             arn,
             1,
-            ClaimSource.BDOI_NOTICE,
+            ClaimSource.BROKER_NOTICE,
             "NEW_COMPLETE_DOCS",
             beforeCover,
             new LossDetails.Amounts(null, null, null),

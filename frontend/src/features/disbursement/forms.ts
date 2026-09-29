@@ -47,7 +47,7 @@ export const EMPTY_FUNDING: FundingForm = {
   source: '',
   target: '',
   amount: '',
-  currency: 'PHP',
+  currency: '',
   purpose: '',
   valueDate: today(),
 };

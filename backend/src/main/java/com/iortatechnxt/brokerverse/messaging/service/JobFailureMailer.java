@@ -6,7 +6,6 @@ import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage.RecordLink;
 import com.iortatechnxt.brokerverse.system.domain.JobRun;
 import com.iortatechnxt.brokerverse.system.service.JobFailureListener;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -29,7 +28,6 @@ public class JobFailureMailer implements JobFailureListener {
   public static final String PURPOSE = "JOB_FAILURE";
 
   private static final Logger LOG = LoggerFactory.getLogger(JobFailureMailer.class);
-  private static final ZoneId MANILA = BusinessClock.zone();
   private static final DateTimeFormatter WHEN =
       DateTimeFormatter.ofPattern("d MMM yyyy HH:mm:ss", Locale.ENGLISH);
 
@@ -55,7 +53,9 @@ public class JobFailureMailer implements JobFailureListener {
       return;
     }
     String started =
-        run.getStartedAt() == null ? "-" : WHEN.format(run.getStartedAt().atZone(MANILA));
+        run.getStartedAt() == null
+            ? "-"
+            : WHEN.format(run.getStartedAt().atZone(BusinessClock.zone()));
     String body =
         "The batch job "
             + run.getJobName()

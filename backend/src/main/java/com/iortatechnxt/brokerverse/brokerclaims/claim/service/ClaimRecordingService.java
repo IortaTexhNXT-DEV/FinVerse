@@ -320,7 +320,7 @@ public class ClaimRecordingService {
 
     /** Defensive copies. */
     public NewClaim {
-      source = source == null ? ClaimSource.BDOI_NOTICE : source;
+      source = source == null ? ClaimSource.BROKER_NOTICE : source;
       locations = locations == null ? List.of() : List.copyOf(locations);
       insurers = insurers == null ? List.of() : List.copyOf(insurers);
     }

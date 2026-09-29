@@ -9,12 +9,13 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
-import { useCompanyId } from '@/context/workspaceContext';
+import { useCompanyId, useBaseCurrency } from '@/context/workspaceContext';
 import { payRequestApi } from './api';
 import type { PayRequest } from './api';
 import { PayoutFields } from './PayoutFields';
 import { cashAdvanceErrors, cashAdvanceInput } from './requestForm';
 import type { CashAdvanceDraft, FieldErrors } from './requestForm';
+import { inCurrency } from '@/utils/currencyLabel';
 
 function emptyDraft(username: string, fullName: string): CashAdvanceDraft {
   return {
@@ -93,6 +94,7 @@ export default function CashAdvanceFormPage() {
       save.mutate();
     }
   };
+  const baseCurrency = useBaseCurrency();
   const text = (key: TextKey, label: string, required: boolean, max: number) => (
     <Field label={label} required={required} error={errors[key]}>
       {(id) => (
@@ -143,7 +145,7 @@ export default function CashAdvanceFormPage() {
               />
             )}
           </Field>
-          {text('amount', 'Amount (PHP)', true, 18)}
+          {text('amount', inCurrency('Amount', baseCurrency), true, 18)}
           {text('purpose', 'Purpose', true, 500)}
           {text('segment', 'Segment', false, 40)}
           {text('requestingUnit', 'Requesting Unit', false, 60)}

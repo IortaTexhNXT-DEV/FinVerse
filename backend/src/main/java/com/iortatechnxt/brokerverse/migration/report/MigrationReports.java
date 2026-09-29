@@ -1,8 +1,8 @@
 package com.iortatechnxt.brokerverse.migration.report;
 
 import static com.iortatechnxt.brokerverse.migration.report.MigReport.BATCH_FILTER;
+import static com.iortatechnxt.brokerverse.migration.report.MigReport.LOCAL_TIME;
 import static com.iortatechnxt.brokerverse.migration.report.MigReport.OBJECT_FILTER;
-import static com.iortatechnxt.brokerverse.migration.report.MigReport.PHT;
 
 import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
@@ -98,9 +98,9 @@ public class MigrationReports {
         .sql(
             "select x.decision_no, x.object_code, x.proposed_class, x.condition_text, x.rationale,"
                 + " x.status, x.submitted_by, to_char(x.submitted_at"
-                + PHT
+                + LOCAL_TIME
                 + " as submitted_at, x.decided_by, to_char(x.decided_at"
-                + PHT
+                + LOCAL_TIME
                 + " as decided_at, x.return_reason from mig_object_decision x"
                 + " where x.company_id = :company"
                 + OBJECT_FILTER
@@ -178,7 +178,7 @@ public class MigrationReports {
             "select v.set_code, v.version_no, v.status,"
                 + " (select count(*) from mig_code_map_entry n where n.version_id = v.id) as entries,"
                 + " v.submitted_by, v.approved_by, to_char(v.approved_at"
-                + PHT
+                + LOCAL_TIME
                 + " as approved_at,"
                 + " (select string_agg(b.batch_no, ', ' order by b.batch_no) from mig_batch_map_version m"
                 + " join mig_batch b on b.id = m.batch_id where m.set_code = v.set_code"
@@ -291,9 +291,9 @@ public class MigrationReports {
                 + " b.staged_count, b.valid_count, b.invalid_count, b.loaded_count, b.skipped_count,"
                 + " b.rejected_count, b.error_rate, b.load_approved_by, b.loaded_by,"
                 + " to_char(b.started_at"
-                + PHT
+                + LOCAL_TIME
                 + " as started_at, to_char(b.ended_at"
-                + PHT
+                + LOCAL_TIME
                 + " as ended_at, round(extract(epoch from (b.ended_at - b.started_at)))::int as seconds"
                 + " from mig_batch b where b.company_id = :company"
                 + OBJECT_FILTER.replace("x.", "b.")
@@ -465,7 +465,7 @@ public class MigrationReports {
         .sql(
             "select x.object_code, coalesce(b.batch_no, '') as batch_no, x.gate, x.role_code,"
                 + " x.username, x.decision, to_char(x.signed_at"
-                + PHT
+                + LOCAL_TIME
                 + " as signed_at, x.comment, x.evidence_name from mig_signoff x"
                 + " left join mig_batch b on b.id = x.batch_id where x.company_id = :company"
                 + OBJECT_FILTER

@@ -147,7 +147,7 @@ export default function PolicyFormPage() {
     <PolicyEditor
       id={undefined}
       title="New policy"
-      initial={newPolicy(company.id, defaultBranch, today())}
+      initial={newPolicy(company.id, defaultBranch, today(), company.baseCurrency)}
     />
   );
 }

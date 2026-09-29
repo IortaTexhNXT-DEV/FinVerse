@@ -1,5 +1,6 @@
 import { isEmail } from '@/features/crm/clientForm';
 import type { ItemInput, ItemRow, Responsible } from '@/api/eb';
+import { clientShortName } from '@/context/clientNames';
 
 /** A tracked item as edited on the Add / Edit dialog (FR-EB-057). */
 export interface ItemForm {
@@ -120,5 +121,10 @@ export const ACTION_LABELS: Record<'RECEIVE' | 'RELEASE' | 'CLOSE', string> = {
 export const RESPONSIBLE: { code: Responsible; label: string }[] = [
   { code: 'INSURER', label: 'Insurer' },
   { code: 'CLIENT', label: 'Client' },
-  { code: 'BDOI', label: 'BDOI' },
+  {
+    code: 'BROKER',
+    get label() {
+      return clientShortName();
+    },
+  },
 ];

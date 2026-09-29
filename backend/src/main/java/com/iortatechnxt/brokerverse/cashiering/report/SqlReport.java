@@ -13,7 +13,6 @@ import com.iortatechnxt.brokerverse.report.core.TabularReportBuilder;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,7 +38,6 @@ public class SqlReport implements ReportDefinition {
   /** Period end. */
   static final String TO = "to";
 
-  private static final ZoneId MANILA = BusinessClock.zone();
   private static final LocalDate EARLIEST = LocalDate.of(1900, 1, 1);
   private static final LocalDate LATEST = LocalDate.of(9999, 12, 31);
 
@@ -97,7 +95,7 @@ public class SqlReport implements ReportDefinition {
                 k,
                 switch (v) {
                   case Date d -> d.toLocalDate();
-                  case Timestamp t -> t.toInstant().atZone(MANILA).toLocalDate();
+                  case Timestamp t -> t.toInstant().atZone(BusinessClock.zone()).toLocalDate();
                   case null, default -> v;
                 }));
     return out;

@@ -38,10 +38,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class DocumentComposer {
 
-  private static final Color NAVY = BrandAssets.color(BrandAssets.HEADER_BLUE);
-  private static final Color COMPANY_BLUE = BrandAssets.color(BrandAssets.CTA_BLUE);
-  private static final Color GOLD = BrandAssets.color(BrandAssets.GOLD);
-  private static final Color SHADE = BrandAssets.color(BrandAssets.BACKGROUND_BLUE);
+  private static final Color NAVY = BrandAssets.color(BrandAssets.HEADER);
+  private static final Color COMPANY_BLUE = BrandAssets.color(BrandAssets.PRIMARY);
+  private static final Color GOLD = BrandAssets.color(BrandAssets.ACCENT);
+  private static final Color SHADE = BrandAssets.color(BrandAssets.BACKGROUND);
   private static final Color GRID = BrandAssets.color(BrandAssets.GRID);
   private static final float LOGO_HEIGHT = 26f;
   private static final float MARGIN = 40f;

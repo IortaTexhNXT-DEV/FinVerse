@@ -353,7 +353,7 @@ public class AccountCreateBulkHandler implements BulkImportHandler {
         null,
         row.yes(Headers.DIRECT_PAYMENT)
             ? PaymentArrangement.DIRECT_TO_INSURER
-            : PaymentArrangement.VIA_BDOI,
+            : PaymentArrangement.VIA_BROKER,
         new Mortgage(
             row.text(Headers.MORTGAGEE),
             row.text(Headers.LOAN),

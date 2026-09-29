@@ -24,7 +24,7 @@ export interface AccessRequestForm {
   userLevel: string;
   reasonCode: string;
   unlock: boolean;
-  /** Authorisation limit (PHP); blank = none on a new user, unchanged on a modification. */
+  /** Authorisation limit (base currency); blank = none on a new user, unchanged on a modification. */
   authorizationLimit: string;
   /** Date the change applies (yyyy-MM-dd); blank = on approval (UAM-NFR-14). */
   effectiveFrom: string;
@@ -171,7 +171,7 @@ function patternError(ctx: ValidationContext, username: string): string | undefi
   }
   return ctx.userIdFormatText
     ? `The user ID must be ${ctx.userIdFormatText}`
-    : 'The user ID does not have the BDOI format';
+    : 'The user ID does not have the required format';
 }
 
 function existingUserError(f: AccessRequestForm, user: UserAccess | undefined): string | undefined {

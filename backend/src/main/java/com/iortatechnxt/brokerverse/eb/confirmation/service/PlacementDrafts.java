@@ -85,7 +85,7 @@ public class PlacementDrafts {
             false,
             1,
             proposal.getCurrency(),
-            PaymentArrangement.VIA_BDOI,
+            PaymentArrangement.VIA_BROKER,
             Mortgage.NONE,
             null,
             List.of(item(choice, proposal)),

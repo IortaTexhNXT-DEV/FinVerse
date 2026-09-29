@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.commission.domain.DpItemRepository;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,23 +26,28 @@ import org.springframework.stereotype.Component;
 public class DpValidator {
 
   /** Difference allowed between the submitted premium and the booked gross premium. */
-  static final BigDecimal PREMIUM_TOLERANCE = new BigDecimal("1.00");
+  /** Parameter: tolerance between the premium of the list and the booked gross premium. */
+  static final String PREMIUM_TOLERANCE = "DP_PREMIUM_TOLERANCE";
 
   private static final String PASS = "|PASS|";
   private static final String FAIL = "|FAIL|";
 
   private final InvoiceLedgerQueryService ledger;
   private final DpItemRepository items;
+  private final SystemParameterService parameters;
 
   /**
    * Creates the validator.
    *
    * @param ledger Operations ledger
    * @param items DP accounts (duplicates)
+   * @param parameters business parameters
    */
-  public DpValidator(InvoiceLedgerQueryService ledger, DpItemRepository items) {
+  public DpValidator(
+      InvoiceLedgerQueryService ledger, DpItemRepository items, SystemParameterService parameters) {
     this.ledger = ledger;
     this.items = items;
+    this.parameters = parameters;
   }
 
   /** The rules, in the order they are reported. */
@@ -54,7 +60,7 @@ public class DpValidator {
     NOT_CANCELLED,
     /** The insurer submitted is the invoice's. */
     INSURER,
-    /** The premium submitted is the booked gross premium (within 1.00). */
+    /** The premium submitted is the booked gross premium (within DP_PREMIUM_TOLERANCE). */
     PREMIUM,
     /** No negative adjustment is pending on the invoice (CMRID.002). */
     NO_PENDING_ADJUSTMENT,
@@ -83,7 +89,8 @@ public class DpValidator {
     String submittedInsurer = item.getInsurerCode();
     item.computed(facts(invoice));
     results.add(Rule.INVOICE_BOOKED + PASS + invoice.getInvoiceNo());
-    boolean valid = rules(item, invoice, submittedInsurer, results);
+    BigDecimal tolerance = parameters.requiredDecimal(PREMIUM_TOLERANCE);
+    boolean valid = rules(item, invoice, submittedInsurer, tolerance, results);
     boolean complete =
         check(results, Rule.COMPLETE, item.getPolicyNo() != null, "no policy number yet");
     Optional<DpItem> duplicate =
@@ -106,7 +113,11 @@ public class DpValidator {
   }
 
   private static boolean rules(
-      DpItem item, OpsInvoice invoice, String submittedInsurer, List<String> results) {
+      DpItem item,
+      OpsInvoice invoice,
+      String submittedInsurer,
+      BigDecimal tolerance,
+      List<String> results) {
     boolean ok =
         check(results, Rule.DIRECT_PAYMENT, invoice.isDpFlag(), "not tagged direct payment");
     ok &=
@@ -129,7 +140,7 @@ public class DpValidator {
                 || item.getSubmittedPremium()
                         .subtract(invoice.getGrossPremium())
                         .abs()
-                        .compareTo(PREMIUM_TOLERANCE)
+                        .compareTo(tolerance)
                     <= 0,
             "booked gross premium " + invoice.getGrossPremium());
     ok &=

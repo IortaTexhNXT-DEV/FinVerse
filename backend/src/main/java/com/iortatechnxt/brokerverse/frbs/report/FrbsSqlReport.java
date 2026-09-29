@@ -40,20 +40,23 @@ public final class FrbsSqlReport implements ReportDefinition {
   private final ReportMetadata metadata;
   private final Spec spec;
   private final NamedParameterJdbcTemplate jdbc;
+  private final Clock clock;
 
   /**
    * Creates the report.
    *
    * @param spec definition
    * @param jdbc JDBC
+   * @param clock injected clock (the current business year is the default of a yearly report)
    */
-  FrbsSqlReport(Spec spec, NamedParameterJdbcTemplate jdbc) {
-    this(spec, jdbc, false);
+  FrbsSqlReport(Spec spec, NamedParameterJdbcTemplate jdbc, Clock clock) {
+    this(spec, jdbc, clock, false);
   }
 
-  private FrbsSqlReport(Spec spec, NamedParameterJdbcTemplate jdbc, boolean document) {
+  private FrbsSqlReport(Spec spec, NamedParameterJdbcTemplate jdbc, Clock clock, boolean document) {
     this.spec = spec;
     this.jdbc = jdbc;
+    this.clock = clock;
     List<ParameterSpec> params = new ArrayList<>();
     params.add(ParameterSpec.required(COMPANY, "Company", ParameterType.COMPANY));
     switch (spec.dates()) {
@@ -67,7 +70,7 @@ public final class FrbsSqlReport implements ReportDefinition {
       default ->
           params.add(
               ParameterSpec.required(YEAR, "Year", ParameterType.NUMBER)
-                  .withDefault(BusinessClock.currentYear(Clock.systemUTC()).toString()));
+                  .withDefault(BusinessClock.currentYear(clock).toString()));
     }
     ReportMetadata m = ReportMetadata.frbs(spec.code(), spec.title(), spec.description(), params);
     this.metadata = document ? m.asDocument() : m;
@@ -80,7 +83,7 @@ public final class FrbsSqlReport implements ReportDefinition {
    * @return report
    */
   FrbsSqlReport asDocument() {
-    return new FrbsSqlReport(spec, jdbc, true);
+    return new FrbsSqlReport(spec, jdbc, clock, true);
   }
 
   @Override

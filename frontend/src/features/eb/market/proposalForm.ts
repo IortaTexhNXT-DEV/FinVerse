@@ -49,12 +49,12 @@ export const BLANK_PLAN: PlanRow = {
 };
 
 /** A blank proposal with one answer row per released TOR item. */
-export function blankProposal(items: TorItem[], benefitLine = ''): ProposalForm {
+export function blankProposal(items: TorItem[], benefitLine = '', currency = ''): ProposalForm {
   return {
     insurerCode: '',
     receivedOn: '',
     validUntil: '',
-    currency: 'PHP',
+    currency,
     terms: '',
     exclusions: '',
     plans: [{ ...BLANK_PLAN, benefitLine }],

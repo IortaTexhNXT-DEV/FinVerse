@@ -27,6 +27,7 @@ import { KycTab } from './KycTab';
 import { LinkedRecordsTab } from './LinkedRecordsTab';
 import { NotesTab } from './NotesTab';
 import { LovLabel } from '@/components/broking/LovLabel';
+import { groupLabel } from '@/context/clientNames';
 
 type TabId =
   'details' | 'kyc' | 'notes' | 'quotations' | 'proposals' | 'records' | 'screening' | 'history';
@@ -87,7 +88,7 @@ function Header({ client: c }: Readonly<{ client: ClientDetail }>) {
           {!c.infoComplete && (
             <Tag title={`Missing: ${c.missingFields.join(', ')}`}>Information Incomplete</Tag>
           )}
-          {c.bankClient && <Tag tone="info">BDO Bank Client</Tag>}
+          {c.bankClient && <Tag tone="info">{groupLabel('Bank Client')}</Tag>}
           <ClientTagFlags clientId={c.id} />
         </>
       }

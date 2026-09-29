@@ -33,12 +33,12 @@ public final class ProdReconDtos {
    *
    * @param matched matched
    * @param discrepancy matched with discrepancies
-   * @param bdoiOnly booked by BDOI only
+   * @param brokerOnly booked by BDOI only
    * @param insurerOnly insurer production without a booked invoice
    * @param total every item
    */
   public record BucketCounts(
-      long matched, long discrepancy, long bdoiOnly, long insurerOnly, long total) {
+      long matched, long discrepancy, long brokerOnly, long insurerOnly, long total) {
 
     /**
      * Counts from the counts per status.
@@ -49,12 +49,12 @@ public final class ProdReconDtos {
     public static BucketCounts from(Map<ReconStatus, Long> c) {
       long matched = c.getOrDefault(ReconStatus.MATCHED, 0L);
       long discrepancy = c.getOrDefault(ReconStatus.MATCHED_WITH_DISCREPANCY, 0L);
-      long bdoi = c.getOrDefault(ReconStatus.BDOI_ONLY, 0L);
+      long broker = c.getOrDefault(ReconStatus.BROKER_ONLY, 0L);
       long insurer =
           c.getOrDefault(ReconStatus.UNMATCHED_PREBOOKED, 0L)
               + c.getOrDefault(ReconStatus.UNMATCHED_NO_BOOKING, 0L);
       return new BucketCounts(
-          matched, discrepancy, bdoi, insurer, matched + discrepancy + bdoi + insurer);
+          matched, discrepancy, broker, insurer, matched + discrepancy + broker + insurer);
     }
   }
 
@@ -254,7 +254,7 @@ public final class ProdReconDtos {
    * @param salesUnit sales unit / AB
    * @param segment segment
    * @param productLine product line
-   * @param bdoi booked side
+   * @param broker booked side
    * @param insurer insurer side
    * @param insurerIncentive incentive reported by the insurer
    * @param insurerRemarks insurer remarks
@@ -278,7 +278,7 @@ public final class ProdReconDtos {
       String salesUnit,
       String segment,
       String productLine,
-      SideResponse bdoi,
+      SideResponse broker,
       SideResponse insurer,
       BigDecimal insurerIncentive,
       String insurerRemarks,
@@ -309,7 +309,7 @@ public final class ProdReconDtos {
           i.getSalesUnit(),
           i.getSegment(),
           i.getProductLine(),
-          SideResponse.from(i.getBdoi()),
+          SideResponse.from(i.getBroker()),
           SideResponse.from(i.getInsurer()),
           i.getInsurerIncentive(),
           i.getInsurerRemarks(),

@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.util.Money;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import com.iortatechnxt.brokerverse.underwriting.api.dto.CertificateRequest;
 import com.iortatechnxt.brokerverse.underwriting.api.dto.OpenCoverRequest;
 import com.iortatechnxt.brokerverse.underwriting.api.dto.RiskRequest;
@@ -39,7 +40,9 @@ public class OpenCoverService {
 
   static final String ENTITY = "OpenCover";
 
-  private static final int DEFAULT_TRANSIT_DAYS = 60;
+  /** Parameter: days of transit of a declaration that gives none. */
+  private static final String DEFAULT_TRANSIT_DAYS = "OPEN_COVER_TRANSIT_DAYS";
+
   private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
   private static final int RATE_SCALE = 8;
 
@@ -53,6 +56,7 @@ public class OpenCoverService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final SystemParameterService parameters;
 
   /**
    * Creates the service.
@@ -67,6 +71,7 @@ public class OpenCoverService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param parameters business parameters
    */
   public OpenCoverService(
       OpenCoverRepository covers,
@@ -78,7 +83,8 @@ public class OpenCoverService {
       OrganizationService organization,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      SystemParameterService parameters) {
     this.covers = covers;
     this.policyRepository = policyRepository;
     this.policies = policies;
@@ -89,6 +95,7 @@ public class OpenCoverService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.parameters = parameters;
   }
 
   /**
@@ -189,7 +196,8 @@ public class OpenCoverService {
     cover.requireDeclarable(sailDate, shipment.sumInsured(), declared);
     Product product = products.requireActive(cover.getCompanyId(), cover.getProduct().getId());
     SourceType source = r.sourceType() != null ? r.sourceType() : SourceType.DIRECT;
-    int transit = r.transitDays() != null ? r.transitDays() : DEFAULT_TRANSIT_DAYS;
+    int transit =
+        r.transitDays() != null ? r.transitDays() : parameters.requiredInt(DEFAULT_TRANSIT_DAYS);
     PolicyTerms terms =
         new PolicyTerms(
             cover.getBranchId(),

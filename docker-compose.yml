@@ -89,7 +89,11 @@ services:
       - "8080:8080"
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        # Theme pack of the client deployment (frontend/src/theme/packs/<pack>)
+        VITE_THEME_PACK: ${VITE_THEME_PACK:-bdoi}
     depends_on:
       - backend
     environment:

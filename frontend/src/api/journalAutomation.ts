@@ -105,6 +105,6 @@ export const journalUploadApi = {
     form.append('file', file);
     return api.upload<UploadResult>(`/journals/upload${toQuery({ companyId, mode })}`, form);
   },
-  template: (format: 'csv' | 'xlsx') =>
-    api.getFile(`/journals/upload/template${toQuery({ format })}`),
+  template: (format: 'csv' | 'xlsx', companyId?: number) =>
+    api.getFile(`/journals/upload/template${toQuery({ format, companyId })}`),
 };

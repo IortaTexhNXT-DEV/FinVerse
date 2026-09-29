@@ -9,7 +9,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
-import { useCompanyId } from '@/context/workspaceContext';
+import { useCompanyId, useBaseCurrency } from '@/context/workspaceContext';
 import { disbursementApi } from './api';
 import { encodeErrors } from './labels';
 import './disbursement.css';
@@ -31,7 +31,7 @@ const EMPTY: Form = {
   disbursementType: '',
   payeeCode: '',
   payeeName: '',
-  currency: 'PHP',
+  currency: '',
   amount: '',
   purpose: '',
   rfpNo: '',
@@ -52,7 +52,8 @@ export default function EncodeRequestPage() {
   const navigate = useNavigate();
   const toast = useToast();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState<Form>(EMPTY);
+  const baseCurrency = useBaseCurrency();
+  const [form, setForm] = useState<Form>({ ...EMPTY, currency: baseCurrency });
   const [touched, setTouched] = useState(false);
   const errors = encodeErrors(form);
   const set = (patch: Partial<Form>) => setForm({ ...form, ...patch });

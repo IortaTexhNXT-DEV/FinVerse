@@ -7,6 +7,7 @@ import { UserName } from '@/components/ui/UserName';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import type { CashieringRequest, UnappliedRow } from './api';
 import { ACTION_LABELS, TAB_LABELS, cashieringStatus } from './labels';
+import { InBaseCurrency } from '@/components/ui/InBaseCurrency';
 
 /** Table columns of the unapplied-payment screens (BRCLXN.036, 040). */
 
@@ -39,13 +40,13 @@ export const UNAPPLIED_COLUMNS: Column<UnappliedRow>[] = [
   },
   {
     key: 'amount',
-    header: 'Paid (PHP)',
+    header: <InBaseCurrency label="Paid" />,
     kind: 'amount',
     render: (r) => <Amount value={r.amount} />,
   },
   {
     key: 'balance',
-    header: 'Unapplied (PHP)',
+    header: <InBaseCurrency label="Unapplied" />,
     kind: 'amount',
     render: (r) => <Amount value={r.balance} />,
   },
@@ -131,7 +132,7 @@ export const REQUEST_COLUMNS: Column<CashieringRequest>[] = [
   },
   {
     key: 'amount',
-    header: 'Amount (PHP)',
+    header: <InBaseCurrency label="Amount" />,
     kind: 'amount',
     render: (r) =>
       r.amount === undefined ? (

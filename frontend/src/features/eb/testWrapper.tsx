@@ -32,7 +32,7 @@ export function ebWrapper(
   };
   const workspace = {
     companies: [],
-    company: { id: 1 } as Company,
+    company: { id: 1, baseCurrency: 'PHP' } as Company,
     branches: [],
     branchId: undefined,
     setCompanyId: () => undefined,

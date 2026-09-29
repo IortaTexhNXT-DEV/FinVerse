@@ -56,12 +56,13 @@ public class SalesTarget extends BaseEntity {
    * @param companyId company
    * @param unit unit and period
    * @param values target values
+   * @param currency currency of the targets (the base currency of the company)
    */
-  public SalesTarget(Long companyId, Unit unit, Values values) {
+  public SalesTarget(Long companyId, Unit unit, Values values, String currency) {
     this.companyId = companyId;
     this.unitLevel = unit.level();
     this.unitCode = unit.code().strip();
-    this.currency = "PHP";
+    this.currency = currency;
     apply(unit.periodFrom(), unit.periodTo(), values);
   }
 

@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequest;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestStatus;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
@@ -183,13 +184,13 @@ public class AccessRequestVisibility {
     if (from != null) {
       p.add(
           cb.greaterThanOrEqualTo(
-              root.<Instant>get("createdAt"), from.atStartOfDay(WorkingHours.ZONE).toInstant()));
+              root.<Instant>get("createdAt"), from.atStartOfDay(BusinessClock.zone()).toInstant()));
     }
     if (to != null) {
       p.add(
           cb.lessThan(
               root.<Instant>get("createdAt"),
-              to.plusDays(1).atStartOfDay(WorkingHours.ZONE).toInstant()));
+              to.plusDays(1).atStartOfDay(BusinessClock.zone()).toInstant()));
     }
     return p;
   }

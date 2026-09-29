@@ -111,7 +111,7 @@ final class ControlTemplate {
               .when("measure is AMOUNT_TOTAL and the file has a currency column");
       case "filter" ->
           GuideColumn.of(name, Kind.TEXT, "Filter of an amount total, when any")
-              .format("column=value, e.g. currency=USD");
+              .format("column=value, e.g. branch_code=HO");
       default ->
           GuideColumn.of(name, Kind.TEXT, "Value of the measure (the checksum for SHA256)")
               .mandatory();

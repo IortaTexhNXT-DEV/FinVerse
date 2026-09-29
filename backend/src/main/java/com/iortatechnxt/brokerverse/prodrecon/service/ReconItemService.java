@@ -80,7 +80,7 @@ public class ReconItemService {
     /** Matched with discrepancies. */
     DISCREPANCY(List.of(ReconStatus.MATCHED_WITH_DISCREPANCY)),
     /** Booked by BDOI only. */
-    BDOI_ONLY(List.of(ReconStatus.BDOI_ONLY)),
+    BROKER_ONLY(List.of(ReconStatus.BROKER_ONLY)),
     /** Insurer production without a booked invoice. */
     INSURER_ONLY(List.of(ReconStatus.UNMATCHED_PREBOOKED, ReconStatus.UNMATCHED_NO_BOOKING));
 
@@ -227,10 +227,10 @@ public class ReconItemService {
         where.add(
             cb.or(
                 cb.like(cb.lower(cb.coalesce(root.get("invoiceNo"), "")), like),
-                cb.like(cb.lower(cb.coalesce(root.get("bdoi").get("policyNo"), "")), like),
+                cb.like(cb.lower(cb.coalesce(root.get("broker").get("policyNo"), "")), like),
                 cb.like(cb.lower(cb.coalesce(root.get("insurer").get("policyNo"), "")), like),
                 cb.like(cb.lower(cb.coalesce(root.get("insurer").get("referenceNo"), "")), like),
-                cb.like(cb.lower(cb.coalesce(root.get("bdoi").get("assuredName"), "")), like),
+                cb.like(cb.lower(cb.coalesce(root.get("broker").get("assuredName"), "")), like),
                 cb.like(cb.lower(cb.coalesce(root.get("insurer").get("assuredName"), "")), like)));
       }
       return cb.and(where.toArray(Predicate[]::new));

@@ -28,6 +28,7 @@ import com.iortatechnxt.brokerverse.issuance.domain.AdviceTrigger;
 import com.iortatechnxt.brokerverse.issuance.domain.InsuranceAdvice;
 import com.iortatechnxt.brokerverse.issuance.domain.InsuranceAdviceRepository;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.storage.domain.FileOrigin;
 import com.iortatechnxt.brokerverse.storage.domain.FileOwner;
 import com.iortatechnxt.brokerverse.storage.service.FileDownload;
@@ -89,6 +90,7 @@ public class InsuranceAdviceService {
   private final LovService lovs;
   private final SystemParameterService parameters;
   private final AuditTrailService audit;
+  private final OrganizationDirectory organization;
   private final Clock clock;
 
   /**
@@ -104,6 +106,7 @@ public class InsuranceAdviceService {
    * @param lovs lists of values
    * @param parameters business parameters
    * @param audit audit trail
+   * @param organization company master (letterhead)
    * @param clock clock
    */
   public InsuranceAdviceService(
@@ -117,6 +120,7 @@ public class InsuranceAdviceService {
       LovService lovs,
       SystemParameterService parameters,
       AuditTrailService audit,
+      OrganizationDirectory organization,
       Clock clock) {
     this.advices = advices;
     this.storedFiles = storedFiles;
@@ -128,6 +132,7 @@ public class InsuranceAdviceService {
     this.lovs = lovs;
     this.parameters = parameters;
     this.audit = audit;
+    this.organization = organization;
     this.clock = clock;
   }
 
@@ -178,7 +183,13 @@ public class InsuranceAdviceService {
     values.put("periodTo", account.getPeriodTo());
     MergedText text = templates.merge(TEMPLATE, today, values);
     byte[] pdf =
-        composer.pdf(spec(iaNo, account, text, new Parties(mortgagee, insurerName, policies)));
+        composer.pdf(
+            spec(
+                organization.company(account.getCompanyId()).name(),
+                iaNo,
+                account,
+                text,
+                new Parties(mortgagee, insurerName, policies)));
     InsuranceAdvice saved =
         advices.save(
             new InsuranceAdvice(
@@ -193,6 +204,13 @@ public class InsuranceAdviceService {
                     account.getInsurerCode(),
                     policies),
                 new AdviceDocument(trigger, text.versionTag(), iaNo + ".pdf", sha256(pdf), pdf)));
+    store(account, saved, pdf);
+    audit.record(
+        ENTITY, iaNo, AuditAction.CREATE, "Insurance Advice for " + arn + " (" + trigger + ")");
+    return saved;
+  }
+
+  private void store(Account account, InsuranceAdvice saved, byte[] pdf) {
     saved.storedIn(
         storedFiles
             .storeChecked(
@@ -206,9 +224,6 @@ public class InsuranceAdviceService {
                 PDF,
                 FileOrigin.GENERATED)
             .getId());
-    audit.record(
-        ENTITY, iaNo, AuditAction.CREATE, "Insurance Advice for " + arn + " (" + trigger + ")");
-    return saved;
   }
 
   private String insurerName(Account account) {
@@ -224,7 +239,8 @@ public class InsuranceAdviceService {
     }
   }
 
-  private static DocumentSpec spec(String iaNo, Account account, MergedText text, Parties parties) {
+  private static DocumentSpec spec(
+      String companyName, String iaNo, Account account, MergedText text, Parties parties) {
     List<Field> facts =
         List.of(
             new Field("Account Reference Number", account.getArn()),
@@ -243,7 +259,7 @@ public class InsuranceAdviceService {
             .map(i -> List.of(String.valueOf(i.getItemNo()), i.label(), amount(i)))
             .toList();
     return new DocumentSpec(
-        "BDO Insurance and Reinsurance Brokers, Inc.",
+        companyName,
         text.title(),
         iaNo,
         List.of(

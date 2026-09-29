@@ -14,6 +14,7 @@ import { formatDate, today } from '@/utils/format';
 import { RevaluationRatesCard } from './RevaluationRatesCard';
 import { DateInput } from '@/components/ui/DateInput';
 import { UserName } from '@/components/ui/UserName';
+import { useCurrencyCodes } from '@/context/currencies';
 
 const RATE_TYPES: RateType[] = ['SPOT', 'CLOSING', 'AVERAGE', 'BUDGET', 'BOOK'];
 
@@ -23,8 +24,9 @@ export default function CurrencyRatesPage() {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [date, setDate] = useState(today());
+  const foreign = useCurrencyCodes()[1] ?? '';
   const [form, setForm] = useState({
-    currencyCode: 'USD',
+    currencyCode: '',
     rateType: 'SPOT' as RateType,
     effectiveDate: today(),
     rate: '',
@@ -36,7 +38,12 @@ export default function CurrencyRatesPage() {
     queryFn: () => mastersApi.rates(date, date),
   });
   const save = useMutation({
-    mutationFn: () => mastersApi.saveRate({ ...form, rate: Number(form.rate) }),
+    mutationFn: () =>
+      mastersApi.saveRate({
+        ...form,
+        currencyCode: form.currencyCode || foreign,
+        rate: Number(form.rate),
+      }),
     onSuccess: async (r) => {
       await queryClient.invalidateQueries({ queryKey: ['rates'] });
       toast.success(`${r.currencyCode} ${r.rateType} rate saved`);
@@ -60,7 +67,7 @@ export default function CurrencyRatesPage() {
                 <select
                   id={id}
                   className="select"
-                  value={form.currencyCode}
+                  value={form.currencyCode || foreign}
                   onChange={(e) => setForm({ ...form, currencyCode: e.target.value })}
                 >
                   {(currencies.data ?? []).map((c) => (

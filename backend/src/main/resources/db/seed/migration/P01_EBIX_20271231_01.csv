@@ -1,2 +1,2 @@
 legacy_policy_ref,cover_no,cover_version,policy_no,legacy_client_no,assured_name,risk_code,package_code,package_version,line_code,business_type,policy_status,inception_date,expiry_date,currency,sum_insured,net_premium,gross_premium,payment_arrangement,ao_user_id,sales_unit_code,branch_code,market_segment
-EP970001,EC970001,1,MC-970001,E970001,Carmela Villanueva,CAR-A,PKG-CAR,2,ENG,NB,IF,2027-11-01,2028-11-01,PHP,900000.00,10000.00,11200.00,VIA_BDOI,AO01,U01,MKT,CBG
+EP970001,EC970001,1,MC-970001,E970001,Carmela Villanueva,CAR-A,PKG-CAR,2,ENG,NB,IF,2027-11-01,2028-11-01,PHP,900000.00,10000.00,11200.00,VIA_BROKER,AO01,U01,MKT,CBG

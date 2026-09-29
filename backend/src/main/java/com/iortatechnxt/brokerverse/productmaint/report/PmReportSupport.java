@@ -9,7 +9,6 @@ import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,9 +27,6 @@ final class PmReportSupport {
 
   /** "Any" option of the select filters. */
   static final String ALL = "ALL";
-
-  /** Business time zone of BDOI. */
-  static final ZoneId MANILA = BusinessClock.zone();
 
   private PmReportSupport() {}
 
@@ -99,7 +95,7 @@ final class PmReportSupport {
   private static Object value(Object v) {
     return switch (v) {
       case Date d -> d.toLocalDate();
-      case Timestamp t -> t.toInstant().atZone(MANILA).toLocalDate();
+      case Timestamp t -> t.toInstant().atZone(BusinessClock.zone()).toLocalDate();
       case null, default -> v;
     };
   }

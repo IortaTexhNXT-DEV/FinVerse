@@ -240,5 +240,27 @@ public class PdcItem extends BaseEntity {
       LocalDate maturityDate,
       BigDecimal amount,
       String currency,
-      String segment) {}
+      String segment) {
+
+    /**
+     * The same check in a currency.
+     *
+     * @param code currency
+     * @return check
+     */
+    public PdcCheck inCurrency(String code) {
+      return new PdcCheck(
+          batchRef,
+          clientCode,
+          payorName,
+          reference,
+          checkNo,
+          bankCode,
+          checkBranch,
+          maturityDate,
+          amount,
+          code,
+          segment);
+    }
+  }
 }

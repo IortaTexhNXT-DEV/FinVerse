@@ -12,7 +12,6 @@ import java.sql.Timestamp;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
@@ -41,9 +40,6 @@ final class UamReportSupport {
 
   /** "Any" option of the select filters. */
   static final String ALL = "ALL";
-
-  /** Business time zone of BDOI. */
-  static final ZoneId MANILA = BusinessClock.zone();
 
   /** Text of an absent value in the from / to columns (sample D). */
   static final String NULL_TEXT = "Null";
@@ -179,7 +175,7 @@ final class UamReportSupport {
    * @return start of the next day
    */
   static Instant endOf(LocalDate date) {
-    return date.plusDays(1).atStartOfDay(MANILA).toInstant();
+    return date.plusDays(1).atStartOfDay(BusinessClock.zone()).toInstant();
   }
 
   /**
@@ -189,7 +185,7 @@ final class UamReportSupport {
    * @return start of the day
    */
   static Instant startOf(LocalDate date) {
-    return date.atStartOfDay(MANILA).toInstant();
+    return date.atStartOfDay(BusinessClock.zone()).toInstant();
   }
 
   /**
@@ -199,7 +195,7 @@ final class UamReportSupport {
    * @return date or null
    */
   static LocalDate date(Instant instant) {
-    return instant == null ? null : instant.atZone(MANILA).toLocalDate();
+    return instant == null ? null : instant.atZone(BusinessClock.zone()).toLocalDate();
   }
 
   /**
@@ -209,7 +205,7 @@ final class UamReportSupport {
    * @return text
    */
   static String dateTime(Instant instant) {
-    return DATE_TIME.format(instant.atZone(MANILA));
+    return DATE_TIME.format(instant.atZone(BusinessClock.zone()));
   }
 
   /**

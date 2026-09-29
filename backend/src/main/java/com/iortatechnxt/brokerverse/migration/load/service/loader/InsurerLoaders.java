@@ -20,6 +20,7 @@ import com.iortatechnxt.brokerverse.migration.load.service.MigrationLoader;
 import com.iortatechnxt.brokerverse.migration.mapping.domain.EntryAction;
 import com.iortatechnxt.brokerverse.migration.mapping.service.CodeMapLoader;
 import com.iortatechnxt.brokerverse.migration.mapping.service.CodeMaps;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,7 @@ import org.springframework.context.annotation.Configuration;
 public class InsurerLoaders {
 
   private static final String INSURER_MAP = "INSURER";
-  private static final int DEFAULT_CREDIT_DAYS = 30;
+  private static final String DEFAULT_CREDIT_DAYS = "INSURER_DEFAULT_CREDIT_DAYS";
 
   /**
    * R04 insurers.
@@ -49,7 +50,8 @@ public class InsurerLoaders {
    * @return loader
    */
   @Bean
-  public MigrationLoader insurerMigrationLoader(CodeMapLoader maps, InsurerService insurers) {
+  public MigrationLoader insurerMigrationLoader(
+      CodeMapLoader maps, InsurerService insurers, SystemParameterService parameters) {
     return new MigrationLoader() {
       @Override
       public String objectCode() {
@@ -72,7 +74,11 @@ public class InsurerLoaders {
           return LoadOutcome.of("Insurer", existing.getId(), existing.getPartyCode(), null);
         }
         InsurerProfile created =
-            insurers.create(ctx.companyId(), r.target(), contact(unit), details(unit));
+            insurers.create(
+                ctx.companyId(),
+                r.target(),
+                contact(unit),
+                details(unit, parameters.requiredInt(DEFAULT_CREDIT_DAYS)));
         created.markMigrated(RecordOrigin.migrated(unit.sourceSystem(), legacy, ctx.batchNo()));
         return LoadOutcome.of("Insurer", created.getId(), created.getPartyCode(), null);
       }
@@ -103,7 +109,7 @@ public class InsurerLoaders {
         null);
   }
 
-  private static InsurerDetails details(LoadUnit unit) {
+  private static InsurerDetails details(LoadUnit unit, int defaultCreditDays) {
     Map<String, String> v = unit.values();
     return new InsurerDetails(
         Values.text(v.get("insurer_name")),
@@ -114,7 +120,7 @@ public class InsurerLoaders {
         Values.items(v.get("placement_email")),
         Values.decimal(v.get("default_credit_days"))
             .map(BigDecimal::intValue)
-            .orElse(DEFAULT_CREDIT_DAYS));
+            .orElse(defaultCreditDays));
   }
 
   /**

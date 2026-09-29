@@ -134,8 +134,8 @@ public class ClientBulkHandler implements BulkImportHandler {
         BulkColumn.optional(PROVINCE, "Province", "Metro Manila"),
         BulkColumn.optional(POSTAL, "Postal code", "1600"),
         BulkColumn.optional(SEGMENT, "Market segment", "CBG").lov("MARKET_SEGMENT"),
-        new BulkColumn(BANK, "Client of the bank (BDO)", false, BulkColumn.Type.YES_NO, "Y"),
-        BulkColumn.optional(CIF, "Customer information file number at the bank", "")
+        new BulkColumn(BANK, "Client of the group's bank", false, BulkColumn.Type.YES_NO, "Y"),
+        BulkColumn.optional(CIF, "Customer information file number at the group's bank", "")
             .when("Bank Client is Y"),
         BulkColumn.optional(NATIONALITY, "Nationality", "FILIPINO").lov("NATIONALITY"),
         BulkColumn.optional(SOURCE, "Source of funds", "SALARY").lov("SOURCE_OF_FUNDS"),

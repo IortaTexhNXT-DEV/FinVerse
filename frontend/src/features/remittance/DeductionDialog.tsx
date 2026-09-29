@@ -8,8 +8,7 @@ import { today } from '@/utils/format';
 import { EMPTY_DEDUCTION, deductionErrors } from './deductionForm';
 import type { DeductionErrors, DeductionForm } from './deductionForm';
 import { TypedInput } from '@/components/ui/DateInput';
-
-const CURRENCIES = ['PHP', 'USD'];
+import { useCurrencyCodes } from '@/context/currencies';
 
 type TextKey = Exclude<keyof DeductionForm, 'currency' | 'sourceType'>;
 
@@ -70,7 +69,10 @@ export function DeductionDialog({
   onClose: () => void;
   onSave: (form: DeductionForm) => void;
 }>) {
-  const [form, setForm] = useState<DeductionForm>(initial);
+  const currencies = useCurrencyCodes();
+  const [form, setForm] = useState<DeductionForm>(
+    initial.currency === '' ? { ...initial, currency: currencies[0] ?? '' } : initial,
+  );
   const [errors, setErrors] = useState<DeductionErrors>({});
   const set = (field: keyof DeductionForm, value: string) => setForm({ ...form, [field]: value });
   const save = () => {
@@ -109,7 +111,7 @@ export function DeductionDialog({
                 value={form.currency}
                 onChange={(e) => set('currency', e.target.value)}
               >
-                {CURRENCIES.map((c) => (
+                {currencies.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>

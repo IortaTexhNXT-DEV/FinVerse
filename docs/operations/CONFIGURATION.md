@@ -429,3 +429,67 @@ the client documents included (a standing test refuses it, `SeedPasswordGuardTes
   `flyway repair` once, or is recreated, before its next start. Never run it on production, which never applies
   `db/seed`. `spring.flyway.validate-on-migrate` keeps its default (on) in every profile; the automated tests build
   a fresh database on every run and need no repair.
+
+## Client-specific values (client profile, business rules, theme pack)
+
+iNXT BrokerVerse is a product for many clients: no client name, code, logo, currency or business
+term is written into the platform code. A deployment sets them in data and in its theme pack. The
+standing checks `ClientNeutralityTest` (backend build) and the `no-restricted-syntax` rule of
+`frontend/eslint.config.js` (`npm run lint`) refuse client names and currency codes in platform
+code; seed data, tests and the theme packs are exempt.
+
+### Client profile (company master, V1150)
+
+Maintained on *Setup › Companies*: select a company to open its **Client profile** (the change
+returns the company to pending authorization). The legal name, address, TIN and base currency are
+the company's own fields.
+
+| Field | Purpose |
+|---|---|
+| Short name | Name of the company in texts and labels ("Via …", "… Only", "Renew with …"); the company code when blank. |
+| Group name | Group the company belongs to, used in labels of group concepts ("… Bank Client", "… CIF number"); blank = none. |
+| Document logo | Logo on documents: `theme:logo` (or blank) = the logo of the deployed theme pack. |
+| Head office code | Code of the head office in files exchanged with the client (DP lists `<code>_DP_<yyyyMMdd>`, collection hand-offs) and for records without a branch (incentive pass-on); the code of the head-office branch when blank. |
+| Default bank account | Bank account code proposed where a report asks for the company account (Payment Notification to the Bank). |
+
+The base currency of the company is used wherever a record or an uploaded file carries no currency
+(accounts, quotations, PRFs, payments, checks, fees, targets, renewals, submitted policies), in the
+examples of the upload templates downloaded for the company, and on the screens (proposed currency,
+amount headings); the currencies offered in lists come from the currency master.
+
+### Business rules as parameters (V1152)
+
+Seeded with the values the platform used before; changed on *Administration › Parameters*. A
+missing value stops the action with `PARAMETER_NOT_SET` instead of falling back to a coded value.
+
+| Parameter | Seeded | Used by |
+|---|---|---|
+| `CLIENT_CREDIT_DAYS` | 30 | credit days of the accounting party created for a client |
+| `SERVICE_INVOICE_CREDIT_DAYS` | 30 | credit days merged into the service invoice text |
+| `INSURER_DEFAULT_CREDIT_DAYS` | 30 | insurers loaded by data migration without credit days |
+| `PASSWORD_EXPIRY_NOTICE_DAYS` | 7 | job `PASSWORD_EXPIRY_NOTICE` (SECURITY category: second approval) |
+| `RATE_EXCEPTION_VALIDITY_DAYS` | 30 | end date of a rate-scheme exception requested without one |
+| `DP_PREMIUM_TOLERANCE` | 1.00 | direct payment list check against the booked gross premium |
+| `EWT_RATE_TOLERANCE` | 0.05 | EWT worksheet: document rate against the ATC rate (percentage points) |
+| `OPEN_COVER_TRANSIT_DAYS` | 60 | transit days of an open-cover declaration without them |
+
+The input VAT rate of supplier invoices is the rate of the company's active `VAT_INPUT` tax code on
+the invoice date (*Tax › Tax codes*); without one, a VAT-registered invoice is refused with
+`NO_INPUT_VAT_CODE`.
+
+Kept in code after review (technical limits, scales, algorithm constants and fallbacks of seeded
+parameters, not business rules): field lengths and list sizes (`MAX_TEXT`, `MAX_ERROR`,
+`MAX_ROWS`…), rate scales (`RATE_SCALE`), percent bounds (`MAX_RATE`/`MAX_PERCENT` = 100), date
+range limits of files and screens (payment notification at most 31 days, `MAX_TERM_YEARS` 10,
+`MAX_FOLLOW_UP_DAYS` 365, `MAX_CREDIT_DAYS` 365), the client matching scores of data migration, the
+letter catch-up window of submitted policies (7 days after a missed run), and the `DEFAULT_*`
+fallbacks of parameters and exception-code thresholds that the platform seeds (for example
+`QUOTATION_SLIP_REPLY_DAYS`, `HOLD_COVER_DAYS`, `DISB_STALE_DAYS`, `CWT_APPLICATION_PERCENT`).
+
+### Theme pack and business zone
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `VITE_THEME_PACK` (frontend build) | `bdoi` | Theme pack of the web application, `frontend/src/theme/packs/<pack>`: `theme.json` (product and client names, page title and description, print title), `tokens.css` (brand colours and fonts), `index.ts` (fonts, logo, sign-in photo), `favicon.svg`. Build argument of `frontend/Dockerfile` and of the `frontend` service of `docker-compose.yml`. A new client gets a new pack; components never name the client. |
+| `BROKERVERSE_THEME` (backend) | `bdoi` | Theme pack of generated files (reports and documents in PDF, Word, Excel): `backend/src/main/resources/theme/<pack>/brand.properties` (colours, font, logo size) and its logo. System property `brokerverse.theme` takes precedence. Read at start-up. |
+| `BROKERVERSE_BUSINESS_ZONE` | `Asia/Manila` | See the first table. The zone is read from `BusinessClock` where it is used and bound as a parameter of SQL that takes the business day of a timestamp; no code keeps its own copy. |

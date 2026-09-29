@@ -22,7 +22,12 @@ export function emptyRisk(): RiskInput {
   return { key: nextRowKey(), description: '', sumInsured: 0 };
 }
 
-export function newPolicy(companyId: number, branchId: number, today: string): PolicyInput {
+export function newPolicy(
+  companyId: number,
+  branchId: number,
+  today: string,
+  currency = '',
+): PolicyInput {
   return {
     companyId,
     branchId,
@@ -33,7 +38,7 @@ export function newPolicy(companyId: number, branchId: number, today: string): P
     issueDate: today,
     periodFrom: today,
     periodTo: oneYearFrom(today),
-    currency: 'PHP',
+    currency,
     businessType: 'DIRECT',
     sharePct: 100,
     coinsuranceLeader: false,
@@ -156,7 +161,12 @@ export function businessLabel(p: Policy): string {
 }
 
 /** New quotation with an empty first iteration. */
-export function newQuotation(companyId: number, branchId: number, today: string): QuotationInput {
+export function newQuotation(
+  companyId: number,
+  branchId: number,
+  today: string,
+  currency = '',
+): QuotationInput {
   return {
     companyId,
     branchId,
@@ -168,7 +178,7 @@ export function newQuotation(companyId: number, branchId: number, today: string)
     validityDays: 30,
     periodFrom: today,
     periodTo: oneYearFrom(today),
-    currency: 'PHP',
+    currency,
     sharePct: 100,
     iteration: { sumInsured: 0, grossPremium: 0 },
   };

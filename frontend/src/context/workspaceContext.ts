@@ -29,6 +29,14 @@ export function useCompanyId(): number {
 }
 
 /**
+ * Base currency of the selected company (company master); '' until the company list has loaded.
+ * Forms propose it and amount headings name it, so no currency is written into the screens.
+ */
+export function useBaseCurrency(): string {
+  return useContext(WorkspaceContext)?.company?.baseCurrency ?? '';
+}
+
+/**
  * Branch a new document is booked to unless the user picks another: the branch selected in the
  * header, else the user's home branch, else the head office, else the first branch (0 while the
  * branch list is loading). Only active branches of the selected company qualify; this is the one

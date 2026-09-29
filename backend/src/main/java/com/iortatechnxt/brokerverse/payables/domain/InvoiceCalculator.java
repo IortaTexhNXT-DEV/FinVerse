@@ -4,11 +4,12 @@ import com.iortatechnxt.brokerverse.common.util.Money;
 import java.math.BigDecimal;
 
 /**
- * Tax arithmetic of supplier invoices (Philippine practice).
+ * Tax arithmetic of supplier invoices.
  *
  * <ul>
  *   <li>Line amounts are entered net of VAT.
- *   <li>Input VAT = 12 % of the net amount when the supplier is VAT registered.
+ *   <li>Input VAT = the input VAT rate of the tax code master (percent) of the net amount when the
+ *       supplier is VAT registered.
  *   <li>Expanded withholding tax (EWT) = supplier rate (percent) of the net amount, withheld from
  *       the payment and remitted to the tax authority.
  *   <li>Payable to the supplier = net + input VAT - EWT.
@@ -19,9 +20,6 @@ import java.math.BigDecimal;
  */
 public final class InvoiceCalculator {
 
-  /** Philippine VAT rate. */
-  public static final BigDecimal VAT_RATE = new BigDecimal("0.12");
-
   private static final BigDecimal PERCENT = new BigDecimal("100");
 
   private InvoiceCalculator() {}
@@ -31,10 +29,11 @@ public final class InvoiceCalculator {
    *
    * @param net net amount
    * @param vatApplicable whether VAT applies
+   * @param ratePercent input VAT rate in percent (tax code master)
    * @return VAT, zero when not applicable
    */
-  public static BigDecimal vat(BigDecimal net, boolean vatApplicable) {
-    return vatApplicable ? Money.round(net.multiply(VAT_RATE)) : Money.zero();
+  public static BigDecimal vat(BigDecimal net, boolean vatApplicable, BigDecimal ratePercent) {
+    return vatApplicable ? withholding(net, ratePercent) : Money.zero();
   }
 
   /**

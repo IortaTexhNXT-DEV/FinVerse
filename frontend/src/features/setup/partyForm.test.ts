@@ -27,7 +27,7 @@ describe('party form', () => {
   it('accepts a valid party', () => {
     expect(
       validateParty({
-        ...emptyParty(1),
+        ...emptyParty(1, 'PHP'),
         code: 'S-0009',
         name: 'Supplier',
         email: 'ap@supplier.ph',

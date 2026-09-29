@@ -85,11 +85,13 @@ public class BulkController {
    * Template download.
    *
    * @param code handler
+   * @param companyId company the template is for (examples in its base currency), optional
    * @return xlsx
    */
   @GetMapping("/handlers/{code}/template")
-  public ResponseEntity<byte[]> template(@PathVariable String code) {
-    return xlsx(code.toLowerCase(Locale.ROOT) + "_template.xlsx", bulk.template(code));
+  public ResponseEntity<byte[]> template(
+      @PathVariable String code, @RequestParam(required = false) Long companyId) {
+    return xlsx(code.toLowerCase(Locale.ROOT) + "_template.xlsx", bulk.template(code, companyId));
   }
 
   /**

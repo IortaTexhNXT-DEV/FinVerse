@@ -91,7 +91,7 @@ public class RemittanceFixtures {
   /** A new unpaid motor invoice of a segment. */
   public OpsInvoice invoice(String segment) {
     Account account =
-        booking.issued(BookingFixtures.spec("MTR10", segment, PaymentArrangement.VIA_BDOI));
+        booking.issued(BookingFixtures.spec("MTR10", segment, PaymentArrangement.VIA_BROKER));
     var booked =
         as.run(
             "proc",

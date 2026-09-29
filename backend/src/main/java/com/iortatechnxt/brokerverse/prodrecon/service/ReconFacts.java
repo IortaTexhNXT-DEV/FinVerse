@@ -5,7 +5,7 @@ import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceMovement;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconExtractLine.LastPayment;
-import com.iortatechnxt.brokerverse.prodrecon.domain.ReconItem.BdoiFacts;
+import com.iortatechnxt.brokerverse.prodrecon.domain.ReconItem.BrokerFacts;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconSide;
 import java.util.List;
 
@@ -21,9 +21,9 @@ final class ReconFacts {
    * @param extractLineId register line it was sent on, may be null
    * @return facts
    */
-  static BdoiFacts of(OpsInvoice invoice, Long extractLineId) {
+  static BrokerFacts of(OpsInvoice invoice, Long extractLineId) {
     var c = invoice.getClassification();
-    return new BdoiFacts(
+    return new BrokerFacts(
         invoice.getInvoiceNo(),
         extractLineId,
         invoice.getArn(),

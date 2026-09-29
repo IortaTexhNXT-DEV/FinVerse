@@ -118,7 +118,7 @@ public class CheckController {
                 r.checkBranch(),
                 r.maturityDate(),
                 r.amount(),
-                "PHP",
+                null,
                 r.segment())));
   }
 
@@ -193,7 +193,7 @@ public class CheckController {
                 r.pickupDate(),
                 r.requestor(),
                 r.amount(),
-                "PHP",
+                null,
                 r.checkNo(),
                 r.checkBank())));
   }

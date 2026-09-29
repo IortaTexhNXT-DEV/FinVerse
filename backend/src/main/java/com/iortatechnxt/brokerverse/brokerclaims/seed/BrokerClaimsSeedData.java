@@ -129,7 +129,7 @@ public class BrokerClaimsSeedData implements ApplicationRunner {
             OFFICER,
             companyId,
             "ARN-2026-940001",
-            ClaimSource.BDOI_NOTICE,
+            ClaimSource.BROKER_NOTICE,
             loss(MOTOR, "Rear-ended at a stoplight on EDSA", "EDSA Guadalupe, Makati"),
             List.of(),
             List.of());
@@ -158,7 +158,7 @@ public class BrokerClaimsSeedData implements ApplicationRunner {
             NON_MOTOR,
             companyId,
             "ARN-2026-940002",
-            ClaimSource.BDOI_NOTICE,
+            ClaimSource.BROKER_NOTICE,
             loss,
             List.of(new LocationPick(1, "Roof and second-floor ceiling")),
             List.of());
@@ -193,7 +193,7 @@ public class BrokerClaimsSeedData implements ApplicationRunner {
         OFFICER,
         companyId,
         "ARN-2026-940003",
-        ClaimSource.BDOI_NOTICE,
+        ClaimSource.BROKER_NOTICE,
         loss(MOTOR, "Side mirror and door damaged in a parking lot", "SM Seaside, Cebu City"),
         List.of(),
         List.of());
@@ -221,7 +221,7 @@ public class BrokerClaimsSeedData implements ApplicationRunner {
         NON_MOTOR,
         companyId,
         "ARN-2026-940006",
-        ClaimSource.BDOI_NOTICE,
+        ClaimSource.BROKER_NOTICE,
         loss(FIRE, "Electrical fire in the stock room", "Lahug, Cebu City"),
         List.of(),
         List.of());
@@ -232,7 +232,7 @@ public class BrokerClaimsSeedData implements ApplicationRunner {
         NON_MOTOR,
         companyId,
         "ARN-2026-940007",
-        ClaimSource.BDOI_NOTICE,
+        ClaimSource.BROKER_NOTICE,
         loss(FIRE, "Kitchen fire spread to the dining area", "Kapitolyo, Pasig City"),
         List.of(),
         List.of());
@@ -243,7 +243,7 @@ public class BrokerClaimsSeedData implements ApplicationRunner {
         NON_MOTOR,
         companyId,
         "ARN-2026-940004",
-        ClaimSource.BDOI_NOTICE,
+        ClaimSource.BROKER_NOTICE,
         loss("LIABILITY", "Visitor injured by falling crates in the warehouse", "Port Area"),
         List.of(),
         List.of());

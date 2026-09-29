@@ -157,6 +157,7 @@ tables of the migrated database.
   | V1110 | platform wording (MSG0): V1110 rewrites the delivered reference texts (lists of values, parameters, notification events, exception codes, accounting events, feeds, layouts, rules) without internal references; it updates a text only where it still holds the delivered value. Its seed counterpart is V2000 in `db/seed`, after all seed data |
   | V1190–V1199 | platform hardening: V1190 the least-privilege runtime role (row access only, default privileges for later tables; placeholder `runtime_role`), V1191 the UPDATE / DELETE / TRUNCATE guards of the insert-only tables (functions `platform_row_immutable()`, `platform_refuse_truncate()`) |
   | V1130–V1139 | User Access Maintenance extension (BRD-11), for changes that must run after migrations of later ranges: V1130 the User Access grants of `INFOSEC_OFFICER` (the role is created by V1101) |
+  | V1150–V1159 | platform client neutrality (no client values in platform code): V1150 client profile on `org_company` (short name, group name, logo reference, head-office code, default bank account); V1151 claim status party `BROKER`; V1152 business rules as parameters (credit days, password notice days, rate exception validity, DP premium and EWT rate tolerances, open-cover transit days); V1153 platform codes for the broker itself (`VIA_BROKER`, `BROKER`, `BROKER_NOTICE`, `BROKER_ONLY`, `prc_item.broker_*`, `plc_billing_item.broker_location`). Seed counterpart V2010–V2019 in `db/seed` (V2010 client profile of the seed companies and their input VAT tax code) |
   | V1180–V1189 | Platform authentication and session security: V1180 token model (refresh token of the session, `TOKEN_REUSED`, `ACCESS_TOKEN_MINUTES`, `METRICS_VIEW`, alert `SECURITY_STORE_UNAVAILABLE`), V1181 second factor (`sec_user_mfa`, recovery codes, remembered devices, four-eyes reset, `MFA_POLICY`, `MFA_RESET` / `MFA_RESET_APPROVE`), V1182 single sign-on (`sec_sso_request`, `sec_sso_ticket`, `AUTH_MODE` OIDC / SAML); V1183–V1188 free; V1189 in `db/seed` (the SIT/UAT seed turns `MFA_POLICY` off) |
   | V2001–V2009 | seed data corrections found by the business sign-off packs (`db/seed`, after V2000): V2001 BRD-1 and BRD-3 (package products active for testing, distinct seed clients, realistic addresses and location keys, the Unapplied Payment Handler's sign-in, placeholder texts, PAR08 version 2); V2002 BRD-3 (the seeded package release remark names the validator by display name) |
   | V900–V999 | seed data (`db/seed`, loaded only with the `seed` profile) — same sub-ranges: underwriting V910s, claims V920s, reinsurance V930s, period-end V940s, payables V950s, receivables V955s, budget V960s, tax V975–V979, broking V980–V989, Operations V990–V995, Product Maintenance V996–V998 (V996 catalog versions, V997 package requests, V998 Product Maintenance users), Accounting / Disbursement V999 (reference data and users only; its storyline runs as Java seed runners) (full) |
@@ -177,6 +178,14 @@ tables of the migrated database.
   `numeric(19,8)` rates, `varchar(3)` currencies, audit columns as in V1, foreign keys and indexes
   for every lookup path, check constraints for invariants.
 - Hibernate runs with `ddl-auto: validate`: entity and table must match exactly.
+- Client neutrality: no client name, code, logo, currency or business term in platform code. Use
+  the client profile of the company (`OrganizationDirectory.profile`, frontend `useClientNames` /
+  `groupLabel`), the base currency of the company (`OrganizationDirectory.company(id).baseCurrency()`,
+  frontend `useBaseCurrency`, `useCurrencyCodes`), business parameters (`SystemParameterService.
+  requiredInt` / `requiredDecimal`, seeded by a migration), lists of values, or the theme pack
+  (`frontend/src/theme/packs/<pack>`, `backend/src/main/resources/theme/<pack>`). Client values
+  belong in seed data (`db/seed`, `*SeedData`). `ClientNeutralityTest` and the frontend lint rule
+  enforce it (see `docs/operations/CONFIGURATION.md`, "Client-specific values").
 
 ## 5. Accounting rules for developers
 

@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -45,6 +46,7 @@ public class PdcWarehouseService {
   private final ItemTransactions transactions;
   private final AuditTrailService audit;
   private final Clock clock;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -55,6 +57,7 @@ public class PdcWarehouseService {
    * @param transactions one transaction per item
    * @param audit audit trail
    * @param clock clock
+   * @param organization company master (base currency)
    */
   public PdcWarehouseService(
       PdcItemRepository items,
@@ -62,13 +65,15 @@ public class PdcWarehouseService {
       DocumentNumberService numbers,
       ItemTransactions transactions,
       AuditTrailService audit,
-      Clock clock) {
+      Clock clock,
+      OrganizationDirectory organization) {
     this.items = items;
     this.intake = intake;
     this.numbers = numbers;
     this.transactions = transactions;
     this.audit = audit;
     this.clock = clock;
+    this.organization = organization;
   }
 
   /**
@@ -76,10 +81,14 @@ public class PdcWarehouseService {
    *
    * @param companyId company
    * @param branchId branch
-   * @param check check details
+   * @param given check details (the base currency of the company when it has none)
    * @return the item
    */
-  public PdcItem warehouse(Long companyId, Long branchId, PdcCheck check) {
+  public PdcItem warehouse(Long companyId, Long branchId, PdcCheck given) {
+    PdcCheck check =
+        given.currency() == null
+            ? given.inCurrency(organization.company(companyId).baseCurrency())
+            : given;
     if (items.existsByCompanyIdAndBankCodeAndCheckNo(
         companyId, check.bankCode(), check.checkNo())) {
       throw new BusinessRuleException(

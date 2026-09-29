@@ -28,7 +28,6 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.EnumSet;
 import java.util.HexFormat;
 import java.util.LinkedHashMap;
@@ -51,8 +50,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class StrExtractionService {
-
-  private static final ZoneId MANILA = BusinessClock.zone();
 
   private final StrRepository strs;
   private final StrExtractionRepository extractions;
@@ -131,8 +128,8 @@ public class StrExtractionService {
     return strs.decidedIn(
         companyId,
         statuses,
-        from.atStartOfDay(MANILA).toInstant(),
-        to.plusDays(1).atStartOfDay(MANILA).toInstant());
+        from.atStartOfDay(BusinessClock.zone()).toInstant(),
+        to.plusDays(1).atStartOfDay(BusinessClock.zone()).toInstant());
   }
 
   /**

@@ -121,8 +121,11 @@ public class CoaUploadHandler implements BulkImportHandler {
                 SUB_LEDGER, "Sub-ledger the account controls; blank for none", "POLICYHOLDER")
             .when("Control is Y")
             .codes(SubLedgerType.class),
-        BulkColumn.optional(CURRENCIES, "Currencies allowed on the account; blank for all", "PHP")
-            .format("ISO currency codes separated by commas, e.g. PHP,USD"),
+        BulkColumn.optional(
+                CURRENCIES,
+                "Currencies allowed on the account; blank for all",
+                BulkColumn.BASE_CURRENCY_EXAMPLE)
+            .format("ISO currency codes of the currency master, separated by commas"),
         new BulkColumn(MANUAL, "Manual journals allowed; blank for Y", false, Type.YES_NO, "Y"),
         new BulkColumn(
             COST_CENTRE, "Cost centre mandatory on journal lines", false, Type.YES_NO, "N"),

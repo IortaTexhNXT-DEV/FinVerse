@@ -12,7 +12,7 @@ import type { LocationPick } from '../location/api';
 /** Entity type of a claim for attachments, workflow and e-mails. */
 export const CLAIM_ENTITY = 'BrokerClaim';
 
-export type ClaimSource = 'BDOI_NOTICE' | 'INSURER_REPORTED' | 'MIGRATED';
+export type ClaimSource = 'BROKER_NOTICE' | 'INSURER_REPORTED' | 'MIGRATED';
 
 export interface LossInput {
   lossDate: string;

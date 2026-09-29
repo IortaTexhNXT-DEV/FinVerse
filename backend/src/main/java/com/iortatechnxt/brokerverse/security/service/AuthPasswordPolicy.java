@@ -90,7 +90,7 @@ public class AuthPasswordPolicy {
     if (mode() == AuthMode.DIRECTORY) {
       throw new BusinessRuleException(
           "PASSWORD_MANAGED_BY_DIRECTORY",
-          "Your password is managed by the BDO directory; change it there");
+          "Your password is managed by the corporate directory; change it there");
     }
   }
 

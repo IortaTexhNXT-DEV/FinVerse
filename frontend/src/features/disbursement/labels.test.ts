@@ -87,7 +87,10 @@ describe('disbursement labels', () => {
 
 describe('payee form', () => {
   it('requires the code, class, name and a bank account for credit modes', () => {
-    const errors = payeeErrors({ ...EMPTY_PAYEE, defaultMode: 'CTA', email: 'x' }, false);
+    const errors = payeeErrors(
+      { ...EMPTY_PAYEE, currency: 'PHP', defaultMode: 'CTA', email: 'x' },
+      false,
+    );
     expect(Object.keys(errors).sort((a, b) => a.localeCompare(b))).toEqual([
       'defaultMode',
       'email',
@@ -95,7 +98,13 @@ describe('payee form', () => {
       'payeeClass',
       'payeeCode',
     ]);
-    const ok = { ...EMPTY_PAYEE, payeeCode: 'S-1', payeeClass: 'SUPPLIER', name: 'Acme' };
+    const ok = {
+      ...EMPTY_PAYEE,
+      currency: 'PHP',
+      payeeCode: 'S-1',
+      payeeClass: 'SUPPLIER',
+      name: 'Acme',
+    };
     expect(payeeErrors(ok, false)).toEqual({});
   });
 

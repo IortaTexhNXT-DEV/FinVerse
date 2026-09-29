@@ -114,7 +114,7 @@ public class PolicyHeaderLoader implements MigrationLoader {
             Values.text(v.get("source_channel")),
             "DIRECT".equalsIgnoreCase(v.get("payment_arrangement"))
                 ? PaymentArrangement.DIRECT_TO_INSURER
-                : PaymentArrangement.VIA_BDOI,
+                : PaymentArrangement.VIA_BROKER,
             new Mortgage(
                 Values.text(v.get("mortgagee_bank")),
                 Values.text(v.get("loan_application_no")),

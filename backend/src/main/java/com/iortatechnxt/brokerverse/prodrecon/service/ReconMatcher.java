@@ -39,19 +39,19 @@ public final class ReconMatcher {
     /**
      * Whether both sides carry the key and it agrees.
      *
-     * @param bdoi booked side
+     * @param broker booked side
      * @param insurer insurer side
      * @return true when paired by this key
      */
-    public boolean pairs(ReconSide bdoi, ReconSide insurer) {
+    public boolean pairs(ReconSide broker, ReconSide insurer) {
       String theirs = normalise(value.apply(insurer));
       if (theirs.isEmpty()) {
         return false;
       }
       if (this == PN_NO) {
-        return pnNumbers(bdoi.pnNo()).contains(theirs);
+        return pnNumbers(broker.pnNo()).contains(theirs);
       }
-      return theirs.equals(normalise(value.apply(bdoi)));
+      return theirs.equals(normalise(value.apply(broker)));
     }
   }
 
@@ -81,39 +81,39 @@ public final class ReconMatcher {
    * Whether an insurer line pairs with a booked invoice by the first key both sides carry.
    *
    * @param keys keys in order
-   * @param bdoi booked side
+   * @param broker booked side
    * @param insurer insurer side
    * @return true when a key agrees
    */
-  public static boolean pairs(List<MatchKey> keys, ReconSide bdoi, ReconSide insurer) {
-    return keys.stream().anyMatch(k -> k.pairs(bdoi, insurer));
+  public static boolean pairs(List<MatchKey> keys, ReconSide broker, ReconSide insurer) {
+    return keys.stream().anyMatch(k -> k.pairs(broker, insurer));
   }
 
   /**
    * The fields that differ beyond the tolerance.
    *
-   * @param bdoi booked side
+   * @param broker booked side
    * @param insurer insurer side
    * @param tolerance amount tolerance
    * @return differing fields in display order, empty when matched
    */
-  public static List<Field> differences(ReconSide bdoi, ReconSide insurer, BigDecimal tolerance) {
+  public static List<Field> differences(ReconSide broker, ReconSide insurer, BigDecimal tolerance) {
     List<Field> out = new ArrayList<>();
-    text(out, Field.POLICY_NO, bdoi.policyNo(), insurer.policyNo());
-    text(out, Field.REFERENCE_NO, bdoi.referenceNo(), insurer.referenceNo());
+    text(out, Field.POLICY_NO, broker.policyNo(), insurer.policyNo());
+    text(out, Field.REFERENCE_NO, broker.referenceNo(), insurer.referenceNo());
     if (!normalise(insurer.pnNo()).isEmpty()
-        && !pnNumbers(bdoi.pnNo()).contains(normalise(insurer.pnNo()))) {
+        && !pnNumbers(broker.pnNo()).contains(normalise(insurer.pnNo()))) {
       out.add(Field.PN_NO);
     }
-    date(out, Field.PERIOD_FROM, bdoi.periodFrom(), insurer.periodFrom());
-    date(out, Field.PERIOD_TO, bdoi.periodTo(), insurer.periodTo());
+    date(out, Field.PERIOD_FROM, broker.periodFrom(), insurer.periodFrom());
+    date(out, Field.PERIOD_TO, broker.periodTo(), insurer.periodTo());
     if (!names(insurer.assuredName()).isEmpty()
-        && !names(insurer.assuredName()).equals(names(bdoi.assuredName()))) {
+        && !names(insurer.assuredName()).equals(names(broker.assuredName()))) {
       out.add(Field.ASSURED_NAME);
     }
-    amount(out, Field.COMMISSION, bdoi.commission(), insurer.commission(), tolerance);
-    amount(out, Field.BASIC_PREMIUM, bdoi.basicPremium(), insurer.basicPremium(), tolerance);
-    amount(out, Field.GROSS_PREMIUM, bdoi.grossPremium(), insurer.grossPremium(), tolerance);
+    amount(out, Field.COMMISSION, broker.commission(), insurer.commission(), tolerance);
+    amount(out, Field.BASIC_PREMIUM, broker.basicPremium(), insurer.basicPremium(), tolerance);
+    amount(out, Field.GROSS_PREMIUM, broker.grossPremium(), insurer.grossPremium(), tolerance);
     return out;
   }
 

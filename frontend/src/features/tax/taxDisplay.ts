@@ -1,4 +1,5 @@
 import type { DueState, TaxDocument, TaxForm, Worksheet, WorksheetKind } from '@/api/tax';
+import { BRAND } from '@/branding';
 
 /** Badge tone (CSS class of `.badge`) and text of a calendar due state. */
 export function dueBadge(state: DueState, daysToDue: number): { tone: string; text: string } {
@@ -10,7 +11,7 @@ export function dueBadge(state: DueState, daysToDue: number): { tone: string; te
     case 'DUE_SOON':
       return { tone: 'warning', text: `Due in ${daysToDue} d` };
     case 'REMINDER':
-      return { tone: 'neutral', text: 'Outside BIBS' };
+      return { tone: 'neutral', text: `Outside ${BRAND.product}` };
     default:
       return { tone: 'neutral', text: `Due in ${daysToDue} d` };
   }

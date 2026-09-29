@@ -13,6 +13,7 @@ import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatAmount, formatDateTime } from '@/utils/format';
 import { ebLabel } from '../common/ebCodes';
+import { BRAND } from '@/branding';
 
 const ACCOUNT_COLUMNS: Column<CycleAccount>[] = [
   {
@@ -94,7 +95,7 @@ const ACTIVITY_COLUMNS: Column<ActivityRow>[] = [
   {
     key: 'actor',
     header: 'By',
-    render: (a) => (a.actor === 'SYSTEM' ? 'BIBS' : <UserName login={a.actor} />),
+    render: (a) => (a.actor === 'SYSTEM' ? BRAND.product : <UserName login={a.actor} />),
   },
   { key: 'remarks', header: 'Remarks', render: (a) => a.remarks ?? '' },
 ];

@@ -1,4 +1,5 @@
 import type { HelpSection } from '@/features/help/helpContent';
+import { BRAND } from '@/branding';
 
 /**
  * In-app help of the Data Migration console (BRD-13), in sidebar order.
@@ -6,8 +7,7 @@ import type { HelpSection } from '@/features/help/helpContent';
 export const MIGRATION_HELP: HelpSection = {
   id: 'migration',
   module: 'Data Migration',
-  intro:
-    'The Data Migration console moves the legacy data of EBIX, QPS and the Excel trackers into BIBS for the single go-live in January 2028. Each data object has a decided class (migrate, carry forward, archive, excluded or conditional); its extracts are checked, mapped with approved code maps, validated, loaded through the BIBS services, reconciled and accepted through the gates G1 to G7. Every migrated record keeps its source system, legacy reference and loading batch, shows a LEGACY badge in its module and raises no notification or outbound event.',
+  intro: `The Data Migration console moves the legacy data of EBIX, QPS and the Excel trackers into ${BRAND.product} for the single go-live in January 2028. Each data object has a decided class (migrate, carry forward, archive, excluded or conditional); its extracts are checked, mapped with approved code maps, validated, loaded through the ${BRAND.product} services, reconciled and accepted through the gates G1 to G7. Every migrated record keeps its source system, legacy reference and loading batch, shows a LEGACY badge in its module and raises no notification or outbound event.`,
   screens: [
     {
       name: 'Migration Home',
@@ -33,11 +33,10 @@ export const MIGRATION_HELP: HelpSection = {
     {
       name: 'Code Maps',
       path: '/migration/maps',
-      summary:
-        'The code maps from legacy codes to BIBS values, with their versions. A version is prepared as a draft (edited or imported from Excel), submitted by the Data Steward and approved by the business owner; the approved version is used by the next batches. Unmapped Codes lists the legacy codes the validation found without an entry.',
+      summary: `The code maps from legacy codes to ${BRAND.product} values, with their versions. A version is prepared as a draft (edited or imported from Excel), submitted by the Data Steward and approved by the business owner; the approved version is used by the next batches. Unmapped Codes lists the legacy codes the validation found without an entry.`,
       workflow: [
         'New Version copies the approved entries into a draft; add, change or delete entries, then Submit.',
-        'Map points a legacy code to an existing BIBS value; Create adds the value in BIBS through the reference-data load; Default uses the default value; Reject refuses the record.',
+        `Map points a legacy code to an existing ${BRAND.product} value; Create adds the value in ${BRAND.product} through the reference-data load; Default uses the default value; Reject refuses the record.`,
         'A conditional entry applies only when another column has the given value (for example the insurer of a package).',
       ],
       controls: [
@@ -77,7 +76,7 @@ export const MIGRATION_HELP: HelpSection = {
       ],
       controls: [
         'The operator who validated a batch cannot approve its load; the approver cannot run it; the operator cannot sign its reconciliation or acceptance.',
-        'The load runs through the BIBS services as the migration loader, without notifications or outbound events.',
+        `The load runs through the ${BRAND.product} services as the migration loader, without notifications or outbound events.`,
       ],
     },
     {
@@ -123,8 +122,7 @@ export const MIGRATION_HELP: HelpSection = {
     {
       name: 'Run-off and Decommissioning',
       path: '/migration/runoff',
-      summary:
-        'The monthly run-off of the legacy in-force headers by expiry month and legacy system (renewed, not renewed, lapsed, still open), and the decommissioning checklists: one per legacy system, and one for the legacy context of BIBS whose criteria (no open legacy invoice, no legacy unapplied balance, legacy accounts at zero) are measured.',
+      summary: `The monthly run-off of the legacy in-force headers by expiry month and legacy system (renewed, not renewed, lapsed, still open), and the decommissioning checklists: one per legacy system, and one for the legacy context of ${BRAND.product} whose criteria (no open legacy invoice, no legacy unapplied balance, legacy accounts at zero) are measured.`,
       workflow: [
         'The snapshot runs on the first of each month; Take Snapshot adds one now.',
         'Open the checklist of a legacy system when its decommissioning starts; record each criterion as met with its evidence, then sign it.',

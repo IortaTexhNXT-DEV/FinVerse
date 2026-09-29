@@ -22,8 +22,10 @@ class PayablesDomainTest {
   @Test
   void invoiceTaxesAreComputedPerLine() {
     BigDecimal net = new BigDecimal("1234.56");
-    assertThat(InvoiceCalculator.vat(net, true)).isEqualByComparingTo("148.15");
-    assertThat(InvoiceCalculator.vat(net, false)).isEqualByComparingTo("0.00");
+    assertThat(InvoiceCalculator.vat(net, true, new BigDecimal("12")))
+        .isEqualByComparingTo("148.15");
+    assertThat(InvoiceCalculator.vat(net, false, new BigDecimal("12")))
+        .isEqualByComparingTo("0.00");
     assertThat(InvoiceCalculator.withholding(net, new BigDecimal("2")))
         .isEqualByComparingTo("24.69");
     assertThat(InvoiceCalculator.withholding(net, null)).isEqualByComparingTo("0");

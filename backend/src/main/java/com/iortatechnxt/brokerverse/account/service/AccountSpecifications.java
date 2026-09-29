@@ -116,7 +116,7 @@ final class AccountSpecifications {
       where.add(
           Boolean.TRUE.equals(s.directPayment())
               ? cb.equal(arrangement, PaymentArrangement.DIRECT_TO_INSURER)
-              : cb.equal(arrangement, PaymentArrangement.VIA_BDOI));
+              : cb.equal(arrangement, PaymentArrangement.VIA_BROKER));
     }
   }
 

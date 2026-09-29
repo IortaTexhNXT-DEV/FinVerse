@@ -13,7 +13,7 @@ import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { useCompanyId } from '@/context/workspaceContext';
+import { useCompanyId, useBaseCurrency } from '@/context/workspaceContext';
 import { disbursementApi } from './api';
 import type { Bank, Funding } from './api';
 import { EMPTY_FUNDING, bankLabel, fundingErrors, fundingFormOf, fundingInputOf } from './forms';
@@ -129,8 +129,9 @@ function TransferCard({
 }: Readonly<{ funding?: Funding; onSaved: (f: Funding) => void }>) {
   const companyId = useCompanyId();
   const { can } = useAuth();
+  const baseCurrency = useBaseCurrency();
   const [form, setForm] = useState<FundingForm>(
-    funding === undefined ? EMPTY_FUNDING : fundingFormOf(funding),
+    funding === undefined ? { ...EMPTY_FUNDING, currency: baseCurrency } : fundingFormOf(funding),
   );
   const [touched, setTouched] = useState(false);
   const banks = useQuery({

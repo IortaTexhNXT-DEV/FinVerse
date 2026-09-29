@@ -228,5 +228,27 @@ public class PickupRequest extends BaseEntity {
       BigDecimal amount,
       String currency,
       String checkNo,
-      String checkBank) {}
+      String checkBank) {
+
+    /**
+     * The same details in a currency.
+     *
+     * @param code currency
+     * @return details
+     */
+    public PickupDetails inCurrency(String code) {
+      return new PickupDetails(
+          collectionRef,
+          reference,
+          clientCode,
+          payorName,
+          assuredName,
+          pickupDate,
+          requestor,
+          amount,
+          code,
+          checkNo,
+          checkBank);
+    }
+  }
 }

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 import { organizationApi } from '@/api/organization';
+import { useClientNamesOf } from './clientNames';
 import { WorkspaceContext } from './workspaceContext';
 
 /**
@@ -15,6 +16,7 @@ export function WorkspaceProvider({ children }: Readonly<{ children: ReactNode }
   const company =
     companies.data?.find((c) => c.id === companyId) ??
     companies.data?.find((c) => c.recordStatus === 'ACTIVE');
+  useClientNamesOf(company);
   const branches = useQuery({
     queryKey: ['branches', company?.id],
     queryFn: () => organizationApi.branches(company?.id ?? 0),

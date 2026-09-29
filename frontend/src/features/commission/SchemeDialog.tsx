@@ -15,13 +15,14 @@ import type {
 } from './commissionApi';
 import { schemeProblem } from './commissionLogic';
 import { DateInput } from '@/components/ui/DateInput';
+import { clientShortName } from '@/context/clientNames';
 
 const NEW_TERMS: SchemeTerms = {
   name: '',
   schemeType: 'OTHER',
   calculation: 'TARGET_TIERED',
   periodType: 'MONTHLY',
-  beneficiary: 'BDOI',
+  beneficiary: 'BROKER',
   segments: [],
   productLines: [],
   active: false,
@@ -171,7 +172,12 @@ const PERIODS: readonly { id: PeriodType; label: string }[] = [
   { id: 'CUSTOM', label: 'Custom' },
 ];
 const BENEFICIARIES: readonly { id: Beneficiary; label: string }[] = [
-  { id: 'BDOI', label: 'BDOI' },
+  {
+    id: 'BROKER',
+    get label() {
+      return clientShortName();
+    },
+  },
   { id: 'BRANCH', label: 'Branch (Passed On)' },
 ];
 

@@ -1,4 +1,5 @@
 /** Breadcrumb of every Data Migration screen. */
+import { BRAND } from '@/branding';
 export const MIG_SECTION = 'Data Migration';
 
 const LABELS: Record<string, string> = {
@@ -90,8 +91,8 @@ export const GATES = [
 
 /** Reasons of a waiver or exclusion (list MIG_WAIVER_REASON). */
 export const WAIVER_REASONS = [
-  { code: 'NOT_NEEDED', label: 'Record not needed in BIBS' },
-  { code: 'MANUAL_ENTRY', label: 'Entered manually in BIBS after go-live' },
+  { code: 'NOT_NEEDED', label: `Record not needed in ${BRAND.product}` },
+  { code: 'MANUAL_ENTRY', label: `Entered manually in ${BRAND.product} after go-live` },
 ];
 
 /** Reasons of a reconciliation break (list MIG_BREAK_REASON). */

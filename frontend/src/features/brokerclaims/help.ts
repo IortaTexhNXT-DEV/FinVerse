@@ -8,7 +8,7 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
   id: 'brokerclaims',
   module: 'Claims Handling',
   intro:
-    "Claims Handling is BDOI's case file for a client's claim against its insurers: the cover it is made under, the loss, the locations, the insurers' claim numbers, reserve and settlement as the insurers report them, the status, the follow-up, the diary and the documents. BDOI records and coordinates; the insurer decides and pays. Claims posts no accounting entry and keeps no reserve of its own.",
+    "Claims Handling is the broker's case file for a client's claim against its insurers: the cover it is made under, the loss, the locations, the insurers' claim numbers, reserve and settlement as the insurers report them, the status, the follow-up, the diary and the documents. The broker records and coordinates; the insurer decides and pays. Claims posts no accounting entry and keeps no reserve of its own.",
   screens: [
     {
       name: 'Claims Home',
@@ -16,7 +16,7 @@ export const BROKER_CLAIMS_HELP: HelpSection = {
       summary:
         'Your claims at a glance: open claims, follow-ups due today and overdue, claims by status and phase, ageing buckets, claims on unpaid premium and claims waiting for premium remittance.',
       workflow: [
-        'A claim moves through the phases New, In progress, Temporarily closed and Closed (workflow BCL_CLAIM). The 18 BDOI statuses each belong to one phase; a claim that has left New does not go back to a newly filed status.',
+        'A claim moves through the phases New, In progress, Temporarily closed and Closed (workflow BCL_CLAIM). The claim statuses each belong to one phase; a claim that has left New does not go back to a newly filed status.',
         'Each tile opens the worklist filtered: My Open Claims, Follow-ups Due Today, Follow-ups Overdue, My Diary Due, Temporarily Closed, Unpaid Premium and Awaiting Premium Remittance.',
         'Open Claims by Status and Outstanding Claims by Age (brackets of parameter BCL_AGEING_BUCKETS, default 0-30 / 31-60 / 61-90 / 91-180 / 181+ days) count the outstanding claims.',
         'Record Claim starts a new claim; Open Worklist lists every claim you may see.',

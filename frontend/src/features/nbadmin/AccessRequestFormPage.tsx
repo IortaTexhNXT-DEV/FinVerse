@@ -31,6 +31,7 @@ import { DateInput } from '@/components/ui/DateInput';
 import { UserName } from '@/components/ui/UserName';
 import { Notice } from '@/components/ui/Notice';
 import { FormErrorSummary } from '@/components/ui/FormErrorSummary';
+import { BRAND } from '@/branding';
 
 type Mode = 'draft' | 'submit';
 
@@ -89,7 +90,7 @@ function TypeFields({
                 set({ userType: e.target.value as AccessRequestForm['userType'], username: '' })
               }
             >
-              <option value="INTERNAL">Internal (BIBS user)</option>
+              <option value="INTERNAL">Internal ({BRAND.product} user)</option>
               <option value="EXTERNAL">External (portal user)</option>
             </select>
           )}

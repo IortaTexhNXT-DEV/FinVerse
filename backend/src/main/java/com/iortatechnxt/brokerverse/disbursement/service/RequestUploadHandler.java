@@ -81,7 +81,7 @@ public class RequestUploadHandler implements BulkImportHandler {
             "Payee name",
             "Name of the payee, checked against the payee code",
             "Acme Office Supply"),
-        BulkColumn.required(CURRENCY, "Currency of the payment", "PHP")
+        BulkColumn.required(CURRENCY, "Currency of the payment", BulkColumn.BASE_CURRENCY_EXAMPLE)
             .format("ISO currency code, 3 letters")
             .master("currency"),
         new BulkColumn(AMOUNT, "Gross amount", true, Type.NUMBER, "12500.00"),

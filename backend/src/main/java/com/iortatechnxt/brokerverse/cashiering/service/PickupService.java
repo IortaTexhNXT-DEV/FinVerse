@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.opsledger.service.port.CollectionFeed;
 import com.iortatechnxt.brokerverse.opsledger.service.port.FeedItem;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -52,6 +53,7 @@ public class PickupService {
   private final CashieringSettings settings;
   private final AuditTrailService audit;
   private final Clock clock;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -62,6 +64,7 @@ public class PickupService {
    * @param settings settings
    * @param audit audit trail
    * @param clock clock
+   * @param organization company master (base currency)
    */
   public PickupService(
       PickupRequestRepository requests,
@@ -69,13 +72,15 @@ public class PickupService {
       CollectionFeed collection,
       CashieringSettings settings,
       AuditTrailService audit,
-      Clock clock) {
+      Clock clock,
+      OrganizationDirectory organization) {
     this.requests = requests;
     this.intake = intake;
     this.collection = collection;
     this.settings = settings;
     this.audit = audit;
     this.clock = clock;
+    this.organization = organization;
   }
 
   /**
@@ -97,7 +102,14 @@ public class PickupService {
       throw new BusinessRuleException("PICKUP_AMOUNT", "The check amount must be above zero");
     }
     PickupRequest saved =
-        requests.save(new PickupRequest(companyId, branchId, details, clock.instant()));
+        requests.save(
+            new PickupRequest(
+                companyId,
+                branchId,
+                details.currency() == null
+                    ? details.inCurrency(organization.company(companyId).baseCurrency())
+                    : details,
+                clock.instant()));
     audit.record(
         ENTITY, saved.getCollectionRef(), AuditAction.CREATE, "Pick-up " + details.pickupDate());
     return saved;
@@ -209,7 +221,7 @@ public class PickupService {
           LocalDate.parse(f.get("pickupDate")),
           f.getOrDefault("requestor", "Collection"),
           new BigDecimal(f.get("amount")),
-          f.getOrDefault("currency", "PHP"),
+          f.get("currency"),
           f.get("checkNo"),
           f.get("checkBank"));
     } catch (RuntimeException ex) {

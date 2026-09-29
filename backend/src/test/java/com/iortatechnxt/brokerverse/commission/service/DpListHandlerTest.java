@@ -16,28 +16,29 @@ class DpListHandlerTest {
 
   @Test
   void theFileNameGivesTheBranchAndTheDate() {
-    Origin ho = DpListHandler.origin("HO_DP_20260930.xlsx");
+    Origin ho = DpListHandler.origin("HO_DP_20260930.xlsx", "HO");
     assertThat(ho.source()).isEqualTo(ListSource.HEAD_OFFICE);
     assertThat(ho.submissionDate()).isEqualTo(LocalDate.of(2026, 9, 30));
-    Origin branch = DpListHandler.origin("Cebu Main_DP_20260915.csv");
+    Origin branch = DpListHandler.origin("Cebu Main_DP_20260915.csv", "HO");
     assertThat(branch.source()).isEqualTo(ListSource.BRANCH);
     assertThat(branch.branchCode()).isEqualTo("CEBU MAIN");
   }
 
   @Test
   void aFileBreakingTheConventionIsRefused() {
-    assertThatThrownBy(() -> DpListHandler.origin("dp-list.xlsx"))
+    assertThatThrownBy(() -> DpListHandler.origin("dp-list.xlsx", "HO"))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("<Branch>_DP_<yyyyMMdd>");
-    assertThatThrownBy(() -> DpListHandler.origin("HO_DP_20261399.xlsx"))
+    assertThatThrownBy(() -> DpListHandler.origin("HO_DP_20261399.xlsx", "HO"))
         .isInstanceOf(BusinessRuleException.class)
         .hasMessageContaining("not a date");
-    assertThatThrownBy(() -> DpListHandler.origin(null)).isInstanceOf(BusinessRuleException.class);
+    assertThatThrownBy(() -> DpListHandler.origin(null, "HO"))
+        .isInstanceOf(BusinessRuleException.class);
   }
 
   @Test
   void rowsBecomeSubmissions() {
-    Origin origin = DpListHandler.origin("HO_DP_20260930.csv");
+    Origin origin = DpListHandler.origin("HO_DP_20260930.csv", "HO");
     Submission s =
         DpListHandler.submission(
             Map.of(

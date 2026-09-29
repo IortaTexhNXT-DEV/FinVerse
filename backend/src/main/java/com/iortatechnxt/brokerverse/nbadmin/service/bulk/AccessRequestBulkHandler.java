@@ -103,10 +103,10 @@ public class AccessRequestBulkHandler implements BulkImportHandler {
                     new Choice("DEACTIVATE", "Deactivate the user"),
                     new Choice("REACTIVATE", "Reactivate the user"))),
         BulkColumn.required(USER_ID, "User ID of the user", "a013000201")
-            .allowed("An existing user ID; a new user's ID follows the bank's user ID pattern"),
+            .allowed("An existing user ID; a new user's ID follows the user ID pattern"),
         BulkColumn.optional(FULL_NAME, "Full name of the user", "Juan Dela Cruz")
             .when("Action is ENROL"),
-        BulkColumn.optional(EMAIL, "E-mail address of the user", "juan.delacruz@bdo.com.ph"),
+        BulkColumn.optional(EMAIL, "E-mail address of the user", "juan.delacruz@company.com.ph"),
         BulkColumn.optional(WINDOWS_ID, "Windows ID of the user; unique", "JDELACRUZ"),
         BulkColumn.optional(BRANCH, "Home branch of the user", "HO").master("branch"),
         BulkColumn.optional(BUSINESS_UNIT, "Business unit group", "").lov("UAM_BUSINESS_UNIT"),

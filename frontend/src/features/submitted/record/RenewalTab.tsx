@@ -17,6 +17,7 @@ import { formatDate, formatDateTime } from '@/utils/format';
 import { letterColumns } from '../common/letterColumns';
 import { SBM_LOV } from '../common/submittedCodes';
 import { ReassignDialog } from '../renewals/ReassignDialog';
+import { clientShortName } from '@/context/clientNames';
 
 const template = (t: string) => (t === 'FFY' ? 'Free First Year' : 'Generic');
 
@@ -26,7 +27,7 @@ function RenewalFacts({ r }: Readonly<{ r: RenewalRow }>) {
       columns={2}
       items={[
         { label: 'Hand-off', value: <StatusBadge status={r.handoffStatus} /> },
-        { label: 'Started', value: r.manual ? 'Renew with BDOI' : 'Expiry scan' },
+        { label: 'Started', value: r.manual ? `Renew with ${clientShortName()}` : 'Expiry scan' },
         { label: 'Handed Over', value: formatDateTime(r.handedOffAt) },
         { label: 'Renewal Reference', value: r.renewalRef },
         { label: 'Renewal Account', value: r.arn },
@@ -73,14 +74,14 @@ export function RenewalTab({ detail }: Readonly<{ detail: PolicyDetail }>) {
           {can('SBM_PROCESS') && detail.row.status === 'FOR_RENEWAL' && (
             <ConfirmButton
               confirm={{
-                title: 'Renew with BDOI',
+                title: `Renew with ${clientShortName()}`,
                 record: `${detail.row.sbmNo} · ${detail.row.assuredName}`,
                 effect:
                   'The policy is handed to Renewal now with the insurer of the insurer rules.',
               }}
               onConfirm={() => renew.mutateAsync()}
             >
-              Renew with BDOI
+              {`Renew with ${clientShortName()}`}
             </ConfirmButton>
           )}
         </Card>

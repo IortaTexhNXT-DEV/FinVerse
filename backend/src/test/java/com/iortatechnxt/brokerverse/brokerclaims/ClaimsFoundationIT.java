@@ -258,7 +258,7 @@ class ClaimsFoundationIT {
             + " policy_no, assured_name, period_from, period_to, sum_insured, currency,"
             + " premium_status, loss_date, reported_date, loss_nature, claim_amount,"
             + " claimant_name, status_code, phase, next_follow_up_date, created_at, created_by)"
-            + " values (?, ?, 'MOTOR_HO', 'clmofficer', 'BDOI_NOTICE', 'ARN-T-1', 2026, 'MC-1',"
+            + " values (?, ?, 'MOTOR_HO', 'clmofficer', 'BROKER_NOTICE', 'ARN-T-1', 2026, 'MC-1',"
             + " 'Juan Dela Cruz', date '2026-01-01', date '2026-12-31', 1500000.00, 'PHP',"
             + " 'PAID', date '2026-09-01', date '2026-09-02', 'MOTOR_OWN_DAMAGE', 85000.50,"
             + " 'Juan Dela Cruz', 'NEW_COMPLETE_DOCS', 'NEW', date '2026-09-09', now(), 'TEST')",
@@ -269,7 +269,7 @@ class ClaimsFoundationIT {
         tx.execute(
             s -> {
               Claim claim = claims.findByCompanyIdAndClaimNo(companyId, claimNo).orElseThrow();
-              assertThat(claim.getSource()).isEqualTo(ClaimSource.BDOI_NOTICE);
+              assertThat(claim.getSource()).isEqualTo(ClaimSource.BROKER_NOTICE);
               assertThat(claim.getCover().getArn()).isEqualTo("ARN-T-1");
               assertThat(claim.getCover().getSumInsured()).isEqualByComparingTo("1500000");
               assertThat(claim.getCover().getPremiumStatus()).isEqualTo(ClaimPremiumStatus.PAID);

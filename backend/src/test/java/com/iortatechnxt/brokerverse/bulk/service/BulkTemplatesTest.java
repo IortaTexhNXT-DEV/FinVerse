@@ -92,6 +92,19 @@ class BulkTemplatesTest {
   }
 
   @Test
+  void aCurrencyExampleShowsTheBaseCurrencyOfTheCompanyAndKeepsItsGuide() {
+    BulkColumn currency =
+        BulkColumn.required("Currency", "Currency of payment", BulkColumn.BASE_CURRENCY_EXAMPLE)
+            .format("ISO currency code, 3 letters")
+            .master("currency");
+    GuideColumn forCompany = BulkTemplates.column(currency.forCompany("EUR"), LISTS);
+    assertThat(forCompany.example()).isEqualTo("EUR");
+    assertThat(forCompany.format()).isEqualTo("ISO currency code, 3 letters");
+    assertThat(forCompany.allowedText(6)).isEqualTo("Code of an existing currency");
+    assertThat(BulkTemplates.column(currency.forCompany(null), LISTS).example()).isEmpty();
+  }
+
+  @Test
   void theReaderSkipsTheGuideOfATemplateSavedAsCsvAndReadsPlainFiles() {
     BulkFileReader reader = new BulkFileReader();
     String guided =

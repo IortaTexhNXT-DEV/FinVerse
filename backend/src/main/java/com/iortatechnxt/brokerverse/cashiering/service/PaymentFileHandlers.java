@@ -27,7 +27,6 @@ public class PaymentFileHandlers {
   private static final String SAMPLE_AMOUNT = "17027.86";
   private static final String SAMPLE_DATE = "2026-09-24";
 
-  private static final String PHP = "PHP";
   private static final String AMOUNT = "Amount";
   private static final String ASSURED = "Assured";
   private static final String TX_DATE = "Transaction date";
@@ -196,7 +195,7 @@ public class PaymentFileHandlers {
         List.of(),
         new Payor(null, r.text("Assured's name")),
         r.text("Assured's name"),
-        new Money(r.number(AMOUNT), PHP, r.date("Date of payment")),
+        new Money(r.number(AMOUNT), null, r.date("Date of payment")),
         new Tender(
             PaymentMode.BILLS_PAYMENT,
             null,
@@ -225,7 +224,7 @@ public class PaymentFileHandlers {
         tokens,
         new Payor(null, description == null ? "Trade payment" : description),
         null,
-        new Money(r.number("Credit"), PHP, r.date(TX_DATE)),
+        new Money(r.number("Credit"), null, r.date(TX_DATE)),
         new Tender(PaymentMode.TRADE, r.text("Check no."), null, null, false));
   }
 
@@ -246,7 +245,7 @@ public class PaymentFileHandlers {
         r.text(PN) == null ? List.of() : List.of(r.text(PN)),
         new Payor(null, r.text(ASSURED)),
         r.text(ASSURED),
-        new Money(r.number(AMOUNT), PHP, r.date("Date credit")),
+        new Money(r.number(AMOUNT), null, r.date("Date credit")),
         Tender.of(PaymentMode.CLPC));
   }
 
@@ -260,7 +259,7 @@ public class PaymentFileHandlers {
         r.text("EBIX_RefNo") == null ? List.of() : List.of(r.text("EBIX_RefNo")),
         new Payor(null, r.text("Payor")),
         r.text(ASSURED),
-        new Money(r.number("Paid amount"), PHP, r.date(TX_DATE)),
+        new Money(r.number("Paid amount"), null, r.date(TX_DATE)),
         Tender.of(PaymentMode.DIRECT_CREDIT));
   }
 }

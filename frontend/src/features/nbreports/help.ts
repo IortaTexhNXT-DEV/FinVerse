@@ -51,7 +51,7 @@ export const NB_REPORTS_HELP: HelpSection = {
       name: 'Production Targets',
       path: '/nb/targets',
       summary:
-        'Monthly booking, premium and commission targets per region, department, team and account officer, in PHP.',
+        'Monthly booking, premium and commission targets per region, department, team and account officer, in the base currency of the company.',
       workflow: [
         'Choose the level and the month; Business Administrators add a target or click a row to change it.',
         'The dashboard and the Production Statistics report compare bookings with the targets, pro rata to the period reported.',

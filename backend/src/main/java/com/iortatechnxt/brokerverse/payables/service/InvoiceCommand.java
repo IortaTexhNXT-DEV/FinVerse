@@ -14,7 +14,7 @@ import java.util.List;
  * @param invoiceDate invoice date
  * @param dueDate due date, null = invoice date + supplier credit days
  * @param currency currency, null = supplier default currency
- * @param vatApplicable whether 12 % input VAT applies
+ * @param vatApplicable whether input VAT applies (rate of the tax code master)
  * @param narration narration
  * @param lines expense lines
  */

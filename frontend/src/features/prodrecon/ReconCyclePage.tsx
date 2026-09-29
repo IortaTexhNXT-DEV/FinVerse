@@ -26,6 +26,7 @@ import { extractColumns } from './extractColumns';
 import { CYCLE_ENTITY, prodreconApi } from './prodreconApi';
 import type { EarlyIncentiveLine, ReconCycle, ReconExtract } from './prodreconApi';
 import { matchedPercent, monthLabel } from './prodreconLogic';
+import { clientShortName } from '@/context/clientNames';
 
 const TABS = [
   { id: 'items', label: 'Items' },
@@ -183,8 +184,8 @@ function Summary({ cycle: c }: Readonly<{ cycle: ReconCycle }>) {
         },
         {
           icon: Building2,
-          label: 'BDOI Only / Insurer Only',
-          value: `${String(c.counts.bdoiOnly)} / ${String(c.counts.insurerOnly)}`,
+          label: `${clientShortName()} Only / Insurer Only`,
+          value: `${String(c.counts.brokerOnly)} / ${String(c.counts.insurerOnly)}`,
         },
         { icon: Send, label: 'Sent to Insurer', value: formatDateTime(c.sentAt) },
         { icon: Inbox, label: 'Last Feedback', value: formatDateTime(c.lastUploadAt) },

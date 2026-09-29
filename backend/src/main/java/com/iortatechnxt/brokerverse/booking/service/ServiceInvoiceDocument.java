@@ -38,7 +38,6 @@ public class ServiceInvoiceDocument {
   public static final String RECORD_CLASS = "STATEMENT_OF_ACCOUNT";
 
   private static final String PDF = "application/pdf";
-  private static final int CREDIT_DAYS = 30;
   private static final List<Integer> AMOUNT_COLUMN = List.of(1);
 
   private final DocTemplateService templates;
@@ -76,7 +75,11 @@ public class ServiceInvoiceDocument {
         templates.merge(
             templateCode,
             si.getIssueDate(),
-            Map.of("reference", si.getSiNo(), "creditDays", String.valueOf(CREDIT_DAYS)));
+            Map.of(
+                "reference",
+                si.getSiNo(),
+                "creditDays",
+                String.valueOf(settings.serviceInvoiceCreditDays())));
     boolean credit = si.getKind() == SiKind.CREDIT;
     DocumentSpec spec =
         new DocumentSpec(

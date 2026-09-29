@@ -126,7 +126,7 @@ public class AccountFixtures {
         false,
         1,
         "PHP",
-        PaymentArrangement.VIA_BDOI,
+        PaymentArrangement.VIA_BROKER,
         Mortgage.NONE,
         null,
         items,

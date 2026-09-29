@@ -24,6 +24,7 @@ import { prodreconApi } from './prodreconApi';
 import type { Bucket, ReconCycle, ReconFeedback, ReconItem } from './prodreconApi';
 import { bucketTabs, mayPair, maySplit } from './prodreconLogic';
 import { UserName } from '@/components/ui/UserName';
+import { clientShortName } from '@/context/clientNames';
 
 function BulkDialog({
   count,
@@ -139,7 +140,7 @@ function PairDialog({
         <Field
           label="Insurer Line"
           required
-          hint="Lines of this cycle the insurer sent without a BDOI booking"
+          hint={`Lines of this cycle the insurer sent without a ${clientShortName()} booking`}
         >
           {(id) => (
             <select
@@ -187,23 +188,23 @@ function itemColumns(
       render: (r) => (
         <>
           <strong>{r.invoiceNo ?? r.insurer?.referenceNo ?? '—'}</strong>
-          <div className="muted">{r.bdoi?.policyNo ?? r.insurer?.policyNo}</div>
+          <div className="muted">{r.broker?.policyNo ?? r.insurer?.policyNo}</div>
         </>
       ),
     },
     {
       key: 'assured',
       header: 'Assured',
-      render: (r) => r.bdoi?.assuredName ?? r.insurer?.assuredName ?? '',
+      render: (r) => r.broker?.assuredName ?? r.insurer?.assuredName ?? '',
     },
     { key: 'ao', header: 'AO', render: (r) => <UserName login={r.aoUsername} empty="" /> },
     {
       key: 'gross',
-      header: 'Gross Premium (BDOI / Insurer)',
+      header: `Gross Premium (${clientShortName()} / Insurer)`,
       numeric: true,
       render: (r) => (
         <>
-          <Amount value={r.bdoi?.grossPremium} />
+          <Amount value={r.broker?.grossPremium} />
           <div className="muted">
             <Amount value={r.insurer?.grossPremium} />
           </div>

@@ -81,16 +81,16 @@ public class InsurerUpdateBulkHandler implements BulkImportHandler {
   @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.optional(BulkClaimResolver.CLAIM_NO, "BDOI claim number", "BCL-2026-000001")
+        BulkColumn.optional(BulkClaimResolver.CLAIM_NO, "Broker claim number", "BCL-2026-000001")
             .when("the claim is not named by insurer and insurer claim number")
             .master("claim"),
         BulkColumn.optional(
                 BulkClaimResolver.INSURER, "Insurer, with the insurer claim number", "INS-MGIC")
-            .when("there is no BDOI claim number")
+            .when("there is no broker claim number")
             .master("insurer"),
         BulkColumn.optional(
                 BulkClaimResolver.INSURER_CLAIM_NO, "Insurer's claim number", "MGIC-CL-7781")
-            .when("there is no BDOI claim number"),
+            .when("there is no broker claim number"),
         new BulkColumn(
             UPDATE_DATE,
             "Date of the update, not in the future",
@@ -105,7 +105,7 @@ public class InsurerUpdateBulkHandler implements BulkImportHandler {
 
   @Override
   public String instructions() {
-    return "Name the claim by its BDOI claim number, or by the insurer and the insurer claim"
+    return "Name the claim by its broker claim number, or by the insurer and the insurer claim"
         + " number. Updates are added to the claim timeline and cannot be edited"
         + " afterwards.";
   }

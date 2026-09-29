@@ -1,8 +1,6 @@
 package com.iortatechnxt.brokerverse.disbursement.service;
 
-import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.LocalDate;
-import java.time.ZoneId;
 
 /**
  * Names shared by the Disbursement services (ACCOUNTING_DISBURSEMENT_DESIGN 5.1, 7, 9): module and
@@ -93,9 +91,6 @@ public final class DisbursementSettings {
 
   /** Return reason of a request whose payee is not maintained. */
   public static final String PAYEE_NOT_MAINTAINED = "PAYEE_NOT_MAINTAINED";
-
-  /** Philippine time, the business day of Disbursement. */
-  public static final ZoneId MANILA = BusinessClock.zone();
 
   private DisbursementSettings() {}
 

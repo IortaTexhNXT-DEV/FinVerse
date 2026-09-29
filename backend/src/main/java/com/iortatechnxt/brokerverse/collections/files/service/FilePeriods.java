@@ -6,7 +6,6 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.YearMonth;
-import java.time.ZoneId;
 import java.time.temporal.IsoFields;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Locale;
@@ -18,9 +17,6 @@ import java.util.function.Predicate;
  * available on the first working day at 08:00.
  */
 public final class FilePeriods {
-
-  /** Philippine time. */
-  public static final ZoneId MANILA = BusinessClock.zone();
 
   private static final LocalTime OFFICE_OPENS = LocalTime.of(8, 0);
   private static final int WEEK_DAYS = 7;
@@ -55,7 +51,7 @@ public final class FilePeriods {
     return week.to()
         .with(TemporalAdjusters.next(DayOfWeek.MONDAY))
         .atTime(OFFICE_OPENS)
-        .atZone(MANILA)
+        .atZone(BusinessClock.zone())
         .toInstant();
   }
 
@@ -96,7 +92,7 @@ public final class FilePeriods {
    * @return instant
    */
   public static Instant officeOpens(LocalDate day) {
-    return day.atTime(OFFICE_OPENS).atZone(MANILA).toInstant();
+    return day.atTime(OFFICE_OPENS).atZone(BusinessClock.zone()).toInstant();
   }
 
   /**

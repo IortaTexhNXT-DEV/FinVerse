@@ -104,7 +104,7 @@ public final class SourceColumns {
         BulkColumn.optional(
             "Property Location", "Location of the property (fire)", "Lot 5, Taguig City"));
     c.add(BulkColumn.optional("Occupancy", "Occupancy (fire)", "Residential"));
-    c.add(BulkColumn.optional("Mortgagee", "Mortgagee", "BDO Unibank, Inc."));
+    c.add(BulkColumn.optional("Mortgagee", "Mortgagee", "Philippine National Bank"));
     c.addAll(flags());
     c.add(
         BulkColumn.optional(HANDLER, "User ID of the handler of the policy", "sbmhandler")
@@ -115,7 +115,7 @@ public final class SourceColumns {
   private static List<BulkColumn> flags() {
     List<BulkColumn> c = new ArrayList<>();
     c.add(yesNo("FFY", "Y when the auto loan has the Free First Year promotion"));
-    c.add(yesNo("Employee Account", "Y for a BDO or SM Group employee account"));
+    c.add(yesNo("Employee Account", "Y for an employee account of the group"));
     c.add(yesNo("No Touch", "Y for a No Touch account"));
     return c;
   }
@@ -200,7 +200,7 @@ public final class SourceColumns {
             null,
             row.number("Sum Insured"),
             row.number("Total Premium"),
-            "PHP"),
+            null),
         new SbmRisk(
             row.text("Unit Description"),
             row.text("Serial No"),

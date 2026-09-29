@@ -52,7 +52,8 @@ public class SawtReport implements ReportDefinition {
         "TAX-SAWT",
         "Summary Alphalist of Withholding Taxes (SAWT)",
         ReportCategory.TAX_STATUTORY,
-        "Creditable taxes withheld from BDOI per withholding agent and ATC, from the certificates"
+        "Creditable taxes withheld from the company per withholding agent and ATC, from the"
+            + " certificates"
             + " received",
         List.of(
             TaxReportSupport.company(),

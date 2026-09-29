@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.nbadmin.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
@@ -12,7 +13,7 @@ class WorkingHoursTest {
 
   private static ZonedDateTime manila(int day, int hour, int minute) {
     // September 2026: the 21st is a Monday.
-    return LocalDateTime.of(2026, 9, day, hour, minute).atZone(WorkingHours.ZONE);
+    return LocalDateTime.of(2026, 9, day, hour, minute).atZone(BusinessClock.zone());
   }
 
   @Test

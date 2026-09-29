@@ -26,6 +26,7 @@ import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import com.iortatechnxt.brokerverse.security.service.AuthService;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
+import com.iortatechnxt.brokerverse.security.service.directory.LocalPasswordAuthenticator;
 import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.system.domain.SystemParameter;
@@ -44,7 +45,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.BadCredentialsException;
 
 /**
  * The controls built for the BRD-11 sign-off (V1065): separation-of-duties rules under
@@ -228,9 +229,9 @@ class UamSignoffControlsIT {
                     List.of(APPROVER)));
     as.run(APPROVER, () -> requests.approve(off.getId(), null));
     assertThatThrownBy(() -> auth.login(name, password))
-        .isInstanceOf(DisabledException.class)
-        .hasMessage(AuthService.DEACTIVATED);
-    assertThatThrownBy(() -> auth.login(name, "wrong")).isInstanceOf(DisabledException.class);
+        .isInstanceOf(BadCredentialsException.class)
+        .hasMessage(LocalPasswordAuthenticator.INVALID);
+    assertThatThrownBy(() -> auth.login(name, "wrong")).isInstanceOf(BadCredentialsException.class);
     assertThat(users.getByUsername(name).getFailedAttempts()).isZero();
     assertThat(users.getByUsername(name).isLocked()).isFalse();
   }

@@ -113,7 +113,8 @@ export function BulkUploadWizard({
           <FileSpreadsheet size={20} aria-hidden="true" />
           <span>
             Use the current template: {columns.length} columns,{' '}
-            {columns.filter((c) => c.required).length} mandatory. Keep the headers unchanged.
+            {columns.filter((c) => c.required).length} mandatory, each with its guide above the
+            header. Fill in your rows below the example row and upload the file as it is.
           </span>
           <span className="spacer" />
           <Button

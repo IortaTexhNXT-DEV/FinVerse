@@ -87,7 +87,17 @@ async function importCsv(id: number, csv: string): Promise<Budget> {
   return (await response.json()) as Budget;
 }
 
+/** Uploads an Excel file of budget lines (the guided template, as it is). */
+function importFile(id: number, file: File): Promise<Budget> {
+  const form = new FormData();
+  form.append('file', file);
+  return api.upload<Budget>(`${BASE}/${id}/import-file`, form);
+}
+
 export const budgetApi = {
+  importFile,
+  /** The guided Excel template of the budget import. */
+  template: () => api.getFile(`${BASE}/template`),
   list: (companyId: number, fiscalYear?: number) =>
     api.get<Budget[]>(`${BASE}${toQuery({ companyId, fiscalYear })}`),
   get: (id: number) => api.get<Budget>(`${BASE}/${id}`),

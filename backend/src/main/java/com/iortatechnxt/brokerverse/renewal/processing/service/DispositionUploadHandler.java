@@ -24,6 +24,7 @@ import com.iortatechnxt.brokerverse.renewal.service.UploadValues;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import java.time.Clock;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
@@ -108,16 +109,31 @@ public class DispositionUploadHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Account officers dispositioning their renewals";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Renewal > My Dispositions, button Upload Dispositions";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(REFERENCE, "Renewal reference", "RNW-2027-000001"),
-        BulkColumn.required(
-            DISPOSITION,
-            "For Renewal, Not for Renewal, For Quotation, For Proposal or Lost Business",
-            "For Renewal"),
-        BulkColumn.optional(REASON, "Reason for Not for Renewal", "Unit Sold"),
-        BulkColumn.optional(NEW_INVOICE, "New invoice number (Booked to New Invoice)", ""),
-        BulkColumn.optional(REMARKS, "Remarks, up to 200 characters", "Client confirmed"));
+        BulkColumn.required(REFERENCE, "Renewal reference", "RNW-2027-000001").master("renewal"),
+        BulkColumn.required(DISPOSITION, "Disposition of the renewal", "For Renewal")
+            .values(
+                Arrays.stream(RenewalDisposition.values())
+                    .map(RenewalDisposition::label)
+                    .toArray(String[]::new)),
+        BulkColumn.optional(REASON, "Reason for Not for Renewal (code or label)", "")
+            .when("Disposition is Not for Renewal")
+            .lov(RenewalCodes.LOV_NONRENEWAL_REASON),
+        BulkColumn.optional(NEW_INVOICE, "New invoice number", "")
+            .when("the reason is Booked to New Invoice"),
+        BulkColumn.optional(REMARKS, "Remarks", "Client confirmed")
+            .format("Text, at most 200 characters"));
   }
 
   @Override

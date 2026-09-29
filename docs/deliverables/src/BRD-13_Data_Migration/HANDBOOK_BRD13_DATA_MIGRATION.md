@@ -344,7 +344,7 @@ source: pack/pack.yaml
 render: dm-layouts
 ```
 
-Four objects have sub-layouts sent as separate files with the same as-of date: R04 and R04B (insurers and their branches), P01 and P01S (policy headers and their insurer shares), F01, F01S and F01C (invoice headers, insurer shares and components), G03 and G03D (adjustment journal lines and their open-item detail). The rules of every file (Migration Workbook sheet File rules; the first rows are the How to fill sheet of the console workbook):
+Four objects have sub-layouts sent as separate files with the same as-of date: R04 and R04B (insurers and their branches), P01 and P01S (policy headers and their insurer shares), F01, F01S and F01C (invoice headers, insurer shares and components), G03 and G03D (adjustment journal lines and their open-item detail). The rules of every file (Migration Workbook sheet File rules; the first rows are the delivery rules the console templates carry):
 
 ```pack
 plugin: build_dm_pack.py

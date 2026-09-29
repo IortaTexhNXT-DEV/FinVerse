@@ -45,6 +45,13 @@ spring:
     # Migrations are numbered in per-module ranges (see DEVELOPER_GUIDE "Migrations"), so a new
     # migration of one module can have a lower version than one already applied by another.
     out-of-order: true
+    # ---- Database roles (DEPLOYMENT.md "Database roles"): the migrations run as the schema owner
+    # given by SPRING_FLYWAY_USER / SPRING_FLYWAY_PASSWORD (required in production; unset = the
+    # application login, as in development and tests); the application login (BROKERVERSE_DB_USER)
+    # is a member of the runtime role below, which V1190 grants row access only (no DDL, no
+    # TRUNCATE, not the owner). MigrationOwnerConnection applies the TLS settings of the pool.
+    placeholders:
+      runtime_role: ${BROKERVERSE_DB_RUNTIME_ROLE:brokerverse_runtime}
   jackson:
     serialization:
       write-dates-as-timestamps: false
@@ -159,18 +166,73 @@ brokerverse:
     # Supplied via BROKERVERSE_JWT_SECRET (>= 32 random bytes); only the seed and test profiles carry
     # a local value. Production refuses to start without it (ProductionSafeguards).
     jwt-secret: ${BROKERVERSE_JWT_SECRET:}
+    # Maximum life of a sign-in session: the access token is renewed while the user works, until
+    # this time after the sign-in (then the user signs in again).
     token-validity: ${BROKERVERSE_TOKEN_VALIDITY:PT8H}
+    # Life of an access token when the parameter ACCESS_TOKEN_MINUTES is missing, and the time a
+    # replaced refresh token is still accepted (a second tab renewing at the same moment).
+    access-token-validity: ${BROKERVERSE_ACCESS_TOKEN_VALIDITY:PT15M}
+    refresh-grace: ${BROKERVERSE_REFRESH_GRACE:PT30S}
+    # Address(es) of the web client; required outside local (ProductionSafeguards).
     allowed-origins: ${BROKERVERSE_ALLOWED_ORIGINS:http://localhost:5173}
+    # Page of the "Forgot password?" link, e.g. https://bibs.example.com/reset-password; required
+    # outside local. Blank on a developer's machine = the first allowed origin + /reset-password.
+    password-reset-url: ${BROKERVERSE_PASSWORD_RESET_URL:}
     # Failed logins that lock an account when the business parameter LOGIN_MAX_FAILED_ATTEMPTS is missing.
     max-failed-attempts: ${BROKERVERSE_MAX_FAILED_ATTEMPTS:5}
+    # ---- Second factor (TOTP authenticator app); who needs it is the parameter MFA_POLICY ----
+    mfa:
+      # AES-256 key of the authenticator secrets: 32 random bytes in Base64 (openssl rand -base64 32).
+      # Required outside local; the previous key is kept during a rotation.
+      encryption-key: ${BROKERVERSE_MFA_ENCRYPTION_KEY:}
+      previous-encryption-key: ${BROKERVERSE_MFA_PREVIOUS_ENCRYPTION_KEY:}
+    # ---- Single sign-on (AUTH_MODE = OIDC or SAML), one identity provider per deployment ----
+    sso:
+      # Public address of the application; the redirect URI is <base-url>/api/v1/auth/sso/oidc/callback
+      # and the SAML assertion consumer service <base-url>/api/v1/auth/sso/saml/acs.
+      base-url: ${BROKERVERSE_SSO_BASE_URL:}
+      label: ${BROKERVERSE_SSO_LABEL:}
+      # Emergency administrators who keep a local password (comma-separated user names).
+      break-glass-users: ${BROKERVERSE_SSO_BREAK_GLASS_USERS:}
+      username-claim: ${BROKERVERSE_SSO_USERNAME_CLAIM:}
+      groups-claim: ${BROKERVERSE_SSO_GROUPS_CLAIM:}
+      require-local-mfa: ${BROKERVERSE_SSO_REQUIRE_LOCAL_MFA:false}
+      clock-skew: ${BROKERVERSE_SSO_CLOCK_SKEW:PT2M}
+      # group-roles: optional map "<provider group>: <role code>", e.g. in a deployment file.
+      oidc:
+        issuer: ${BROKERVERSE_OIDC_ISSUER:}
+        client-id: ${BROKERVERSE_OIDC_CLIENT_ID:}
+        client-secret: ${BROKERVERSE_OIDC_CLIENT_SECRET:}
+        scopes: ${BROKERVERSE_OIDC_SCOPES:openid profile email}
+        authorization-uri: ${BROKERVERSE_OIDC_AUTHORIZATION_URI:}
+        token-uri: ${BROKERVERSE_OIDC_TOKEN_URI:}
+        jwk-set-uri: ${BROKERVERSE_OIDC_JWK_SET_URI:}
+        jws-algorithm: ${BROKERVERSE_OIDC_JWS_ALGORITHM:RS256}
+      saml:
+        sp-entity-id: ${BROKERVERSE_SAML_SP_ENTITY_ID:}
+        idp-entity-id: ${BROKERVERSE_SAML_IDP_ENTITY_ID:}
+        idp-sso-url: ${BROKERVERSE_SAML_IDP_SSO_URL:}
+        idp-certificate: ${BROKERVERSE_SAML_IDP_CERTIFICATE:}
+        name-id-format: ${BROKERVERSE_SAML_NAME_ID_FORMAT:}
     login-protection:
       # Login requests accepted per client address and window (HTTP 429 above), shared by all pods.
       max-attempts-per-window: ${BROKERVERSE_LOGIN_RATE_LIMIT:20}
       rate-limit-window: ${BROKERVERSE_LOGIN_RATE_WINDOW:PT1M}
       # Life of the shared failed-login counter of a user (the user record stays the reference).
       failed-attempt-window: ${BROKERVERSE_LOGIN_FAILURE_WINDOW:P1D}
+      # "Forgot password?": requests per client address and reset links per user in one window.
+      reset-max-per-address: ${BROKERVERSE_RESET_RATE_LIMIT:10}
+      reset-max-per-user: ${BROKERVERSE_RESET_LINKS_PER_USER:3}
+      reset-window: ${BROKERVERSE_RESET_RATE_WINDOW:PT15M}
   attachments:
     max-size: ${BROKERVERSE_ATTACHMENT_MAX_SIZE:10MB}
+    # Where uploaded files are scanned for malware (MalwareScanPolicy): storage (the S3 file store
+    # with GuardDuty Malware Protection; required in production), application (a scanner bean)
+    # or none (development and tests only).
+    malware-scan: ${BROKERVERSE_MALWARE_SCAN:storage}
+  # Largest JSON request body (JsonBodyLimitFilter, 413 above); file uploads have their own limits.
+  http:
+    max-json-body-size: ${BROKERVERSE_MAX_JSON_BODY_SIZE:2MB}
   # ---- Document storage (build step ST0), docs/architecture/DOCUMENT_STORAGE_DECISION.md ----
   storage:
     # s3 (every shared environment; the local store is refused in production) or local (file system).
@@ -251,6 +313,9 @@ brokerverse:
     # true = deliver through the SMTP server configured with spring.mail.* (MAIL_HOST ...);
     # false = simulated delivery (outbox and send log only). See docs/operations/CONFIGURATION.md.
     enabled: ${BROKERVERSE_MAIL_ENABLED:false}
+    # Sender of the e-mails when the parameter MAIL_FROM_ADDRESS is not set; required outside local
+    # when mail delivery is on.
+    from-address: ${BROKERVERSE_MAIL_FROM:}
     dispatch-on-commit: ${BROKERVERSE_MAIL_DISPATCH_ON_COMMIT:true}
   # ---- Data Migration (BRD-13), docs/architecture/DATA_MIGRATION_DESIGN.md sections 5.3 and 20 ----
   migration:
@@ -425,6 +490,11 @@ brokerverse:
     csf-legacy-sync-cron: ${BROKERVERSE_JOB_CSF_LEGACY_SYNC_CRON:-}
 
 management:
+  # Separate port of the health probes and the Prometheus metrics (BROKERVERSE_MANAGEMENT_PORT, e.g.
+  # 9090 in Kubernetes: not published by the load balancer, reachable from the monitoring namespace
+  # only). Unset: the actuator shares the application port and the metrics need METRICS_VIEW.
+  server:
+    port: ${BROKERVERSE_MANAGEMENT_PORT:${server.port:8080}}
   health:
     redis:
       # Reported only when Redis is in use (a disabled Redis must not take readiness down).
@@ -441,6 +511,8 @@ management:
     health:
       probes:
         enabled: true
+        # /livez and /readyz on the application port as well, for the load balancer checks.
+        add-additional-paths: true
       show-details: when-authorized
   info:
     env:
@@ -451,6 +523,7 @@ info:
     name: iNXT BrokerVerse
     vendor: IortaTechNXT
 
+# API documentation: switched off outside local and the dev profile by ProductionSafeguards.
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
@@ -460,12 +533,15 @@ logging:
     root: INFO
     com.iortatechnxt.brokerverse: INFO
   pattern:
-    # %replace neutralises CR/LF in messages (log forging protection, see spotbugs-exclude.xml).
-    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%thread] %logger{36} - %replace(%msg){'[\\r\\n]', '_'}%n"
+    # CR/LF in messages are neutralised by the message converter of logback-spring.xml (log forging
+    # protection, see spotbugs-exclude.xml), whatever pattern is set here.
+    console: "%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX} %-5level [%thread] %logger{36} - %msg%n"
 
 ---
 # Seed profile (local development, SIT, UAT and training): loads the seed data (company, branches,
-# chart of accounts, SIT/UAT users). Refused in production by ProductionSafeguards.
+# chart of accounts, SIT/UAT users). Refused in production by ProductionSafeguards. The signing key,
+# the masking key and the key of the second-factor secrets come from the environment in every
+# profile (the local docker-compose stack sets documented local values).
 spring:
   config:
     activate:
@@ -475,12 +551,6 @@ spring:
   datasource:
     password: ${BROKERVERSE_DB_PASSWORD:brokerverse}
 brokerverse:
-  security:
-    # Local value for seed stacks only; set BROKERVERSE_JWT_SECRET in every shared environment.
-    jwt-secret: ${BROKERVERSE_JWT_SECRET:seed-profile-local-signing-key-0123456789abcdef}
-  migration:
-    # Local value for seed stacks only; set BROKERVERSE_MIGRATION_MASKING_KEY in every shared environment.
-    masking-key: ${BROKERVERSE_MIGRATION_MASKING_KEY:seed-profile-local-masking-key-0123456789}
   seed:
     # Password of the SIT/UAT users of this environment (SeedPasswords), set at deploy from the secret
     # store and never written into a file. Blank: the users keep the hash of the seed scripts.

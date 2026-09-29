@@ -122,12 +122,31 @@ Roles screen applies the approved change and marks the request IMPLEMENTED.
 ### 4.4 Sign-in, passwords and sessions (UAM-NFR-35 to 37)
 
 - `AUTH_MODE` LOCAL: BrokerVerse passwords (BCrypt). DIRECTORY: the directory port signs in by
-  Windows ID; its adapter is parked, so DIRECTORY refuses every sign-in until it exists.
-- Lockout after `LOGIN_MAX_FAILED_ATTEMPTS` (3) failed sign-ins; the third ends the user's sessions.
+  Windows ID; its adapter is parked, so DIRECTORY refuses every sign-in until it exists. OIDC or SAML:
+  single sign-on at the client's identity provider (configured per deployment, CONFIGURATION.md
+  "Authentication and session security"); the identity is linked to an existing active user only
+  (never created); only the break-glass administrators (`BROKERVERSE_SSO_BREAK_GLASS_USERS`) keep a
+  local password, with the second factor always required.
+- Lockout after `LOGIN_MAX_FAILED_ATTEMPTS` failed sign-ins (a wrong password or a wrong second-factor
+  code; the value is the client's parameter); the last one ends the user's sessions. A wrong password,
+  a locked and a deactivated account get the same message ("Invalid user name or password"); the
+  audit trail keeps the reason.
+- Second factor (TOTP authenticator app): `MFA_POLICY` ALL, PRIVILEGED (roles of privilege level HIGH
+  or ADMIN; delivered) or OFF (SIT/UAT seed). A required user without an app enrols it at the first
+  sign-in (QR code, then the first code; ten recovery codes shown once); afterwards the code is asked
+  after the password. Users manage the app on My Profile. A reset by the administrators needs two of
+  them (Administration → Second Factor: `MFA_RESET` requests, `MFA_RESET_APPROVE` approves; the
+  Information Security Officer holds the approval). Remember-device is off (`MFA_REMEMBER_DEVICE_DAYS`
+  0).
+- Access token of `ACCESS_TOKEN_MINUTES` (15), renewed in the background with a rotating refresh
+  token (HttpOnly cookie) bound to the session; the renewal stops at sign-out, idle timeout, the end
+  of the session and when a replaced token is presented again (the session ends with `TOKEN_REUSED`).
 - Password history (`PASSWORD_HISTORY_COUNT` 8), minimum age 1 day, maximum age 90 days; a
   password set by someone else must be changed at the next sign-in (`mustChangePassword`,
   reason RESET or EXPIRED).
-- "Forgot password?" sends a single-use link valid 30 minutes (LOCAL mode, users with an e-mail).
+- "Forgot password?" sends a single-use link valid 30 minutes (LOCAL mode, users with an e-mail); at
+  most 3 links per user and 10 requests per client address in 15 minutes; the link check shows no
+  user name.
 - Every sign-in opens a session row; each request touches it; sign-out, idle timeout, expiry, lock,
   deactivation and "End Session" end it. An ended session's token is refused (401).
 

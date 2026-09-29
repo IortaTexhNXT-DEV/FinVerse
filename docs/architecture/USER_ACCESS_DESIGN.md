@@ -570,10 +570,56 @@ What wave U1-B built on U0 and U1-A, and where it differs from or details sectio
   stays the direct path for internal callers.
 - **Dormant users** (`DormantUserJob`, `UAM_DORMANT_DAYS`, `UAM_DORMANT_NOTICE_DAYS`): a system
   DISABLE_USER request with reason `DORMANT`, applied by `SYSTEM`; SYSADMIN holders exempt.
-- **Deactivated users** are refused with `DisabledException` ("Your account is deactivated") before the
-  password check; the attempt is audited and not counted towards the lock-out.
+- **Deactivated users** are refused before the password check with the one sign-in failure message
+  ("Invalid user name or password", the same as a wrong password or a locked account); the reason is
+  audited and logged and the attempt is not counted towards the lock-out.
 - **Authorisation limit** on CREATE_USER and MODIFY_USER requests (`nba_access_request.authorization_limit`).
 - **Profile members** are told (`UAM_ACCESS_CHANGED`) when a DEACTIVATE_ROLE or REACTIVATE_ROLE request applies.
 - **External users** are offered only while `UAM_EXTERNAL_USERS` is true.
 - The request descriptions and notices use profile and permission names (`AccessRequestDescriber`,
   `PermissionNames`, frontend `permissionLabel`).
+
+## Platform authentication and session security (V1180 to V1182, seed V1189)
+
+Built as a platform capability for every client (no client-specific code); the design points of
+section 10.1 for the client's identity provider are covered by the generic OpenID Connect and SAML
+sign-in below.
+
+- **Token model (V1180).** `SignInSessions` opens the session (`sec_user_session` + `sign_in_method`,
+  `second_factor`, `refresh_hash`, `previous_refresh_hash`, `refreshed_at`) and issues the access token
+  (`JwtTokenService`, `use=access`, `sid`, life `ACCESS_TOKEN_MINUTES`) and a refresh token (cookie
+  `BV_REFRESH`, HttpOnly, SameSite=Strict, path `/api/v1/auth`, `RefreshCookies`). `POST
+  /api/v1/auth/refresh` (header `X-Requested-With`) renews and rotates; a replaced token is accepted for
+  `BROKERVERSE_REFRESH_GRACE` and ends the session (`TOKEN_REUSED`) afterwards. The renewal does not
+  move `last_seen_at`, so the idle timeout still applies. The web client renews one minute before the
+  expiry and once after a 401 (`api/client.ts`).
+- **Fail closed.** `JwtAuthenticationFilter` refuses tokens without a session; a denylist outage falls
+  back to the session log; a session log outage answers 503 `SIGN_IN_CHECK_UNAVAILABLE`. The rate
+  limits (`LoginRateLimiter`) fall back to `sys_shared_counter` (`sharedstate.JdbcCounters`) and refuse
+  when neither store answers. `SecurityStoreAlarm` logs, counts (`brokerverse.security.store.failures`)
+  and raises `SECURITY_STORE_UNAVAILABLE` (`alert.SecurityStoreAlertListener`).
+- **Second factor (V1181).** `security.service.mfa`: `Totp` (RFC 6238), `MfaSecretCipher` (AES-256-GCM,
+  key `BROKERVERSE_MFA_ENCRYPTION_KEY`, user name as additional data, previous key for rotation),
+  `MfaService` (enrolment, check with replay protection, recovery codes, remembered devices), `MfaPolicy`
+  (`MFA_POLICY`, `MFA_REMEMBER_DEVICE_DAYS`, `MFA_ISSUER_NAME`), `MfaResetService` (four eyes, table
+  `sec_mfa_reset_request` with a database check that the approver is not the requester). The sign-in
+  (`SignInCompletion`) answers `mfaStep` VERIFY or ENROL with a 5-minute challenge token (`use=mfa`,
+  never an access token); `SecondFactorSignIn` completes it (`/api/v1/auth/mfa/verify`,
+  `/enrolment/start`, `/enrolment/confirm`). My Profile: `/api/v1/auth/mfa/me/**`. Administration:
+  `/api/v1/admin/mfa/**`, screen Administration → Second Factor; notices and My Approvals through
+  `nbadmin.MfaResetNotices` (`MFA_RESET_TO_APPROVE`, `MFA_RESET_DONE`). Permissions `MFA_RESET`
+  (SYSADMIN) and `MFA_RESET_APPROVE` (every role holding `SECURITY_PARAMETER_APPROVE`).
+- **Single sign-on (V1182).** `security.service.sso`: `OidcClient` (discovery, authorisation code with
+  PKCE S256, `client_secret_basic`, ID token checks with `NimbusJwtDecoder`), `SamlServiceProvider`
+  (AuthnRequest HTTP-Redirect, metadata) and `SamlResponseValidator` (JDK XML signature with secure
+  validation and the configured key only; wrapping, audience, recipient, time and InResponseTo
+  checks), `SsoSignIn` (`sec_sso_request`, `sec_sso_ticket`, linking to existing users only, optional
+  group gate). Endpoints under `/api/v1/auth/sso/**`; the web client's page `/sso/callback` redeems
+  the one-time ticket. The sign-in page reads `/api/v1/auth/sign-in-options`.
+- **Account hygiene.** The initial administrator (`AdminBootstrap`) must change the password at the
+  first sign-in; "Forgot password?" is rate limited per address and per user and its check returns no
+  user name; the user directory (`/api/v1/users/directory`) gives other users' role names only to
+  holders of `USER_MANAGE`, `UAM_VIEW` or `AUDIT_VIEW`.
+- **Tests.** `SignInTokensIT`, `SecondFactorIT`, `SingleSignOnIT` (in-process OpenID Connect provider
+  and SAML identity provider: `OidcTestProvider`, `SamlTestIdp`), `SamlResponseValidatorTest`,
+  `TotpTest`, `JwtAuthenticationFilterTest`, `LoginProtectionTest`, `AdminBootstrapTest`.

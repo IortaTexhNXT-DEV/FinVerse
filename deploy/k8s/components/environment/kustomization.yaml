@@ -58,7 +58,7 @@ replacements:
     targets:
       - select: { kind: NetworkPolicy, name: backend-to-aws-endpoints }
         fieldPaths: [spec.egress.0.to.0.ipBlock.cidr]
-  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.bdoNetworkCidr }
+  - source: { kind: ConfigMap, name: bibs-environment, fieldPath: data.clientNetworkCidr }
     targets:
-      - select: { kind: NetworkPolicy, name: backend-to-bdo-network }
+      - select: { kind: NetworkPolicy, name: backend-to-client-network }
         fieldPaths: [spec.egress.0.to.0.ipBlock.cidr]

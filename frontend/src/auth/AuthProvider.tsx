@@ -28,6 +28,36 @@ async function modulesInUse(): Promise<ModulesInUse> {
 /** How long a new tab waits for an open tab to share its session (BRNB.082). */
 const HANDSHAKE_MS = 400;
 
+/** Key of the devices remembered for the second factor, by user (only when the policy allows). */
+const DEVICE_KEY = 'brokerverse.mfaDevices';
+
+function devices(): Record<string, string> {
+  try {
+    return JSON.parse(localStorage.getItem(DEVICE_KEY) ?? '{}') as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
+
+/** The token of this device for a user, when it was remembered for the second factor. */
+function rememberedDevice(username: string): string | undefined {
+  return devices()[username.trim().toLowerCase()];
+}
+
+function rememberDevice(username: string, token: string | undefined): void {
+  if (token === undefined) {
+    return;
+  }
+  try {
+    localStorage.setItem(
+      DEVICE_KEY,
+      JSON.stringify({ ...devices(), [username.trim().toLowerCase()]: token }),
+    );
+  } catch {
+    // Storage unavailable: the code is asked again next time.
+  }
+}
+
 /** The password change due for a profile: a reset one at once, an expired one from the server. */
 async function dueChange(profile: UserProfile): Promise<PasswordChangeReason | null> {
   if (profile.mustChangePassword === true) {
@@ -120,9 +150,12 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
 
   useServerKeepAlive(user !== null);
 
-  const login = useCallback(async (username: string, password: string) => {
-    const result = await api.post<LoginResponse>('/auth/login', { username, password });
-    tokenStore.set(result.accessToken, result.expiresAt);
+  const completeSignIn = useCallback((result: LoginResponse) => {
+    if (result.accessToken === undefined || result.user === undefined) {
+      return;
+    }
+    tokenStore.set(result.accessToken, result.expiresAt, result.accessTokenExpiresAt);
+    rememberDevice(result.user.username, result.deviceToken);
     setPasswordChange(
       result.mustChangePassword === true ? (result.passwordChangeReason ?? 'RESET') : null,
     );
@@ -131,6 +164,19 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     void loadUserDirectory();
     tabSession().announceLogin({ token: result.accessToken, expiresAt: result.expiresAt });
   }, []);
+
+  const login = useCallback(
+    async (username: string, password: string) => {
+      const result = await api.post<LoginResponse>('/auth/login', {
+        username,
+        password,
+        deviceToken: rememberedDevice(username),
+      });
+      completeSignIn(result);
+      return result;
+    },
+    [completeSignIn],
+  );
 
   const passwordChanged = useCallback(() => {
     setPasswordChange(null);
@@ -146,8 +192,8 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   );
 
   const value = useMemo(
-    () => ({ user, loading, login, logout, can, passwordChange, passwordChanged }),
-    [user, loading, login, logout, can, passwordChange, passwordChanged],
+    () => ({ user, loading, login, completeSignIn, logout, can, passwordChange, passwordChanged }),
+    [user, loading, login, completeSignIn, logout, can, passwordChange, passwordChanged],
   );
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

@@ -16,7 +16,7 @@ export const ADMIN_HELP: HelpSection = {
         'Raise Request opens a new access request; a row opens a Modify user request for that user. Users are enrolled and changed only through approved requests.',
       ],
       controls: [
-        'Accounts lock after three failed sign-ins; an administrator unlocks them or resets the password.',
+        'Accounts lock after the number of failed sign-ins set in the parameter LOGIN_MAX_FAILED_ATTEMPTS (a wrong code of the second factor counts too); an administrator unlocks them or resets the password.',
         'The direct create and edit of users is kept for the System Administrator while the emergency path UAM_DIRECT_ROLE_EDIT is open.',
         'Every change to a user is recorded in the audit trail and the access change log.',
       ],
@@ -33,6 +33,21 @@ export const ADMIN_HELP: HelpSection = {
       controls: [
         'A profile changes only by implementing an approved request; the implementer is never the requester.',
         'Every direct edit is audited and raises an alert; every change is in the access change log.',
+      ],
+    },
+    {
+      name: 'Second Factor',
+      path: '/admin/second-factor',
+      summary:
+        'The authenticator app of each user (the second factor asked after the password): whether it is set up, when it was last used and whether the user holds a privileged role. Who must use it is the parameter MFA_POLICY (all users, privileged users or off).',
+      workflow: [
+        'Request Reset on a user whose phone is lost or replaced, with the reason.',
+        'Another administrator approves or rejects the reset in the table of resets waiting for approval (or in My Approvals).',
+        'Once approved, the app and the recovery codes are removed, the user is signed out and sets the app up again at the next sign-in.',
+      ],
+      controls: [
+        'The requester never approves the reset; nobody approves the reset of their own second factor.',
+        'Requests, approvals and rejections are recorded in the audit trail.',
       ],
     },
     {

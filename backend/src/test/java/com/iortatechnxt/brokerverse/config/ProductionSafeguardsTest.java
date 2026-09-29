@@ -9,14 +9,37 @@ import org.springframework.mock.env.MockEnvironment;
 
 class ProductionSafeguardsTest {
 
-  private static final String KEY = "Zq8v3N0kP1rT7yW2bX5cD9fG4hJ6mL0sQ";
+  /** A value of the required length that is no development marker; not a real key. */
+  private static final String KEY = "k".repeat(40);
+
+  /** 32 bytes in Base64, built at run time; not a key of any environment. */
+  private static final String MFA_KEY = testKey();
+
+  private static String testKey() {
+    byte[] bytes = new byte[ProductionSafeguards.MFA_KEY_BYTES];
+    for (int i = 0; i < bytes.length; i++) {
+      bytes[i] = (byte) (i * 7 + 3);
+    }
+    return java.util.Base64.getEncoder().encodeToString(bytes);
+  }
+
+  /** The settings every environment except local needs, besides the secrets. */
+  private static MockEnvironment shared(MockEnvironment env) {
+    return env.withProperty("brokerverse.security.allowed-origins", "https://bibs.example.com")
+        .withProperty(
+            "brokerverse.security.password-reset-url", "https://bibs.example.com/reset-password")
+        .withProperty("brokerverse.security.mfa.encryption-key", MFA_KEY)
+        .withProperty("brokerverse.mail.from-address", "no-reply@example.com");
+  }
 
   private static MockEnvironment completeProduction() {
-    return new MockEnvironment()
+    return shared(new MockEnvironment())
         .withProperty("brokerverse.environment", "production")
         .withProperty("spring.datasource.url", "jdbc:postgresql://db:5432/bibs")
         .withProperty("spring.datasource.username", "bibs")
         .withProperty("spring.datasource.password", "from-the-vault")
+        .withProperty("spring.flyway.user", "bibs_owner")
+        .withProperty("spring.flyway.password", "from-the-vault")
         .withProperty("brokerverse.security.jwt-secret", KEY)
         .withProperty("brokerverse.mail.enabled", "true")
         .withProperty("spring.mail.host", "smtp.bdo.example")
@@ -66,8 +89,69 @@ class ProductionSafeguardsTest {
     MockEnvironment env = new MockEnvironment().withProperty("brokerverse.environment", "uat");
     env.setActiveProfiles("seed");
 
-    assertThat(ProductionSafeguards.problems(env)).isEmpty();
+    assertThat(ProductionSafeguards.problems(env)).noneMatch(p -> p.contains("seed profile"));
     assertThat(ProductionSafeguards.isProduction(env)).isFalse();
+  }
+
+  @Test
+  void aLocalEnvironmentNeedsNoSecrets() {
+    assertThat(ProductionSafeguards.problems(new MockEnvironment())).isEmpty();
+    assertThat(
+            ProductionSafeguards.problems(
+                new MockEnvironment().withProperty("brokerverse.environment", "local")))
+        .isEmpty();
+  }
+
+  @Test
+  void everyEnvironmentButLocalNeedsTheSecretsAndItsAddresses() {
+    MockEnvironment sit =
+        new MockEnvironment()
+            .withProperty("brokerverse.environment", "sit")
+            .withProperty("brokerverse.security.allowed-origins", "http://localhost:5173")
+            .withProperty("brokerverse.mail.enabled", "true")
+            .withProperty(
+                "brokerverse.migration.masking-key", "seed-profile-local-masking-key-0123456789")
+            .withProperty("brokerverse.security.sso.oidc.issuer", "https://idp.example.com");
+
+    assertThat(ProductionSafeguards.problems(sit))
+        .contains(
+            "BROKERVERSE_DB_PASSWORD is not set",
+            "BROKERVERSE_JWT_SECRET (JWT signing key) is not set",
+            "BROKERVERSE_ALLOWED_ORIGINS must name the web client, not localhost",
+            "BROKERVERSE_PASSWORD_RESET_URL (page of the password reset link) is not set",
+            "BROKERVERSE_MAIL_FROM is not set",
+            "BROKERVERSE_MFA_ENCRYPTION_KEY (key of the second-factor secrets) is not set",
+            "BROKERVERSE_OIDC_CLIENT_ID is not set",
+            "BROKERVERSE_OIDC_CLIENT_SECRET is not set")
+        .anySatisfy(p -> assertThat(p).startsWith("BROKERVERSE_MIGRATION_MASKING_KEY must be"))
+        .noneMatch(p -> p.contains("TLS") || p.contains("SASL_SSL"));
+    assertThat(ProductionSafeguards.isLocal(sit)).isFalse();
+  }
+
+  @Test
+  void aWeakSecondFactorKeyIsRefused() {
+    MockEnvironment shortKey =
+        completeProduction().withProperty("brokerverse.security.mfa.encryption-key", "c2hvcnQ=");
+    assertThat(ProductionSafeguards.problems(shortKey))
+        .singleElement()
+        .asString()
+        .startsWith("BROKERVERSE_MFA_ENCRYPTION_KEY must be 32 random bytes");
+  }
+
+  @Test
+  void theApiDocumentationIsOffOutsideLocal() {
+    MockEnvironment uat = new MockEnvironment().withProperty("brokerverse.environment", "uat");
+    ProductionSafeguards.disableApiDocsOutsideLocal(uat);
+    assertThat(uat.getProperty("springdoc.api-docs.enabled")).isEqualTo("false");
+    assertThat(uat.getProperty("springdoc.swagger-ui.enabled")).isEqualTo("false");
+
+    MockEnvironment local = new MockEnvironment();
+    ProductionSafeguards.disableApiDocsOutsideLocal(local);
+    assertThat(local.getProperty("springdoc.api-docs.enabled")).isNull();
+    MockEnvironment dev = new MockEnvironment().withProperty("brokerverse.environment", "sit");
+    dev.setActiveProfiles("dev");
+    ProductionSafeguards.disableApiDocsOutsideLocal(dev);
+    assertThat(dev.getProperty("springdoc.api-docs.enabled")).isNull();
   }
 
   @Test
@@ -90,6 +174,29 @@ class ProductionSafeguardsTest {
   }
 
   @Test
+  void theMigrationsMustRunAsASeparateSchemaOwner() {
+    MockEnvironment missing = completeProduction().withProperty("spring.flyway.user", "");
+    MockEnvironment sameLogin = completeProduction().withProperty("spring.flyway.user", " BIBS ");
+    MockEnvironment noPassword = completeProduction().withProperty("spring.flyway.password", "");
+    MockEnvironment noMigrations =
+        completeProduction()
+            .withProperty("spring.flyway.enabled", "false")
+            .withProperty("spring.flyway.user", "");
+
+    assertThat(ProductionSafeguards.problems(missing))
+        .singleElement()
+        .asString()
+        .startsWith("SPRING_FLYWAY_USER (schema owner");
+    assertThat(ProductionSafeguards.problems(sameLogin))
+        .singleElement()
+        .asString()
+        .contains("name the same login");
+    assertThat(ProductionSafeguards.problems(noPassword))
+        .containsExactly("SPRING_FLYWAY_PASSWORD is not set");
+    assertThat(ProductionSafeguards.problems(noMigrations)).isEmpty();
+  }
+
+  @Test
   void aDevelopmentOrShortSigningKeyIsRefused() {
     MockEnvironment dev =
         completeProduction()
@@ -109,10 +216,12 @@ class ProductionSafeguardsTest {
   @Test
   void disabledMailRedisAndKafkaNeedNoCredentials() {
     MockEnvironment env =
-        new MockEnvironment()
+        shared(new MockEnvironment())
             .withProperty("spring.datasource.url", "jdbc:postgresql://db:5432/bibs")
             .withProperty("spring.datasource.username", "bibs")
             .withProperty("spring.datasource.password", "from-the-vault")
+            .withProperty("spring.flyway.user", "bibs_owner")
+            .withProperty("spring.flyway.password", "from-the-vault")
             .withProperty("brokerverse.security.jwt-secret", KEY)
             .withProperty("brokerverse.redis.enabled", "false")
             .withProperty("brokerverse.kafka.enabled", "false")
@@ -217,6 +326,7 @@ class ProductionSafeguardsTest {
             .withProperty("spring.datasource.hikari.data-source-properties.sslmode", "disable")
             .withProperty("spring.kafka.properties.security.protocol", "PLAINTEXT");
 
-    assertThat(ProductionSafeguards.problems(env)).isEmpty();
+    assertThat(ProductionSafeguards.problems(env))
+        .noneMatch(p -> p.contains("TLS") || p.contains("SASL_SSL") || p.contains("sslmode"));
   }
 }

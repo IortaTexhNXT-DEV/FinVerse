@@ -102,6 +102,38 @@ class PlanningApiIT {
             .content("account_code,cost_centre,annual\n5603,FIN,1200\n"),
         MANAGER,
         200);
+    // The guided Excel template, filled in below its example row, is imported as it is.
+    byte[] template =
+        mvc.perform(get("/api/v1/budgets/template").with(as(MANAGER)))
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+    byte[] filled;
+    try (var wb =
+            new org.apache.poi.xssf.usermodel.XSSFWorkbook(
+                new java.io.ByteArrayInputStream(template));
+        var out = new java.io.ByteArrayOutputStream()) {
+      var sheet = wb.getSheet("Budget lines");
+      var row = sheet.createRow(sheet.getLastRowNum() + 1);
+      row.createCell(1).setCellValue("5603");
+      row.createCell(2).setCellValue("FIN");
+      row.createCell(15).setCellValue(2400d);
+      wb.write(out);
+      filled = out.toByteArray();
+    }
+    JsonNode imported =
+        send(
+            org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart(
+                    base + "/import-file")
+                .file(
+                    new org.springframework.mock.web.MockMultipartFile(
+                        "file", "budget.xlsx", "application/octet-stream", filled)),
+            MANAGER,
+            200);
+    assertThat(imported.get("lines")).hasSize(1);
+    assertThat(imported.get("lines").get(0).get("months").get(0).decimalValue())
+        .isEqualByComparingTo("200");
     send(
         postJson(base + "/copy-actuals", map("sourceYear", 2025, "adjustmentPercent", 5)),
         MANAGER,

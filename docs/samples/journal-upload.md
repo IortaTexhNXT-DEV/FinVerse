@@ -2,16 +2,23 @@
 
 Screen: **General Ledger → Journal Upload** (`/gl/upload`), API `POST /api/v1/journals/upload`
 (`multipart/form-data`, parameters `companyId`, `mode=VALIDATE|IMPORT`, part `file`).
-Permission: `JOURNAL_CREATE`. Templates: `GET /api/v1/journals/upload/template?format=csv|xlsx`
-(or the *CSV template* / *Excel template* buttons). A ready-made example is in
+Permission: `JOURNAL_CREATE`. Templates: `GET /api/v1/journals/upload/template?format=xlsx|csv`
+(the *Excel Template* / *CSV Layout* buttons). The Excel template is the guided sheet users fill
+in: a title block (what it is for, who fills it in, how it is uploaded, the rules of the file), the
+column guide directly above the header row (Mandatory, Format, Allowed values, What to enter), a
+note on every header, two example vouchers marked "Example – overwrite or delete", drop-downs and
+cell checks. It is uploaded as it is: the guide rows and the example rows are skipped. The CSV
+layout (header row only) is for extracts of other systems. A ready-made example is in
 [`journal-upload-sample.csv`](journal-upload-sample.csv).
 
 ## File
 
 - `.csv` (UTF-8, comma separated, RFC 4180 quoting; a BOM is accepted) or `.xlsx` (first sheet).
 - Maximum 5 MB and 5,000 data rows.
-- Row 1 is the header. Column names are case-insensitive; spaces and dashes are read as `_`.
-  Column order does not matter; unknown columns are ignored.
+- The header row is row 1 of a plain file, or the row below the column guide of the Excel
+  template (a star marks a mandatory column and is ignored). Column names are case-insensitive;
+  spaces and dashes are read as `_`. Column order does not matter; unknown columns are ignored.
+  Rows whose first cell starts with "Example –" are skipped.
 - One row per journal **line**. Rows with the same `voucher_key` form one voucher (journal).
 
 ## Columns

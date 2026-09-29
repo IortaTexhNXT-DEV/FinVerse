@@ -124,7 +124,7 @@ export default function LayoutsPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      aria-label={`Load template of ${l.code}`}
+                      aria-label={`Excel load template of ${l.code}`}
                       icon={<Download size={14} />}
                       onClick={(e) => {
                         e.stopPropagation();
@@ -160,6 +160,14 @@ export default function LayoutsPage() {
                       Freeze
                     </Button>
                   )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    icon={<Download size={14} />}
+                    onClick={() => download.run(() => migrationApi.layoutCsv(layout.code))}
+                  >
+                    CSV Layout
+                  </Button>
                   <Button
                     variant="secondary"
                     size="sm"

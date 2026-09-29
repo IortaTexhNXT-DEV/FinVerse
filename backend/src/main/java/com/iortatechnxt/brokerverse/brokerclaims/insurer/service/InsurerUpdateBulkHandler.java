@@ -74,21 +74,31 @@ public class InsurerUpdateBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Claims officers, from the insurers' claim updates";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.optional(BulkClaimResolver.CLAIM_NO, "BDOI claim number", "BCL-2026-000001"),
+        BulkColumn.optional(BulkClaimResolver.CLAIM_NO, "BDOI claim number", "BCL-2026-000001")
+            .when("the claim is not named by insurer and insurer claim number")
+            .master("claim"),
         BulkColumn.optional(
-            BulkClaimResolver.INSURER, "Insurer code, with the insurer claim number", "INS-MGIC"),
+                BulkClaimResolver.INSURER, "Insurer, with the insurer claim number", "INS-MGIC")
+            .when("there is no BDOI claim number")
+            .master("insurer"),
         BulkColumn.optional(
-            BulkClaimResolver.INSURER_CLAIM_NO, "Insurer's claim number", "MGIC-CL-7781"),
+                BulkClaimResolver.INSURER_CLAIM_NO, "Insurer's claim number", "MGIC-CL-7781")
+            .when("there is no BDOI claim number"),
         new BulkColumn(
             UPDATE_DATE,
             "Date of the update, not in the future",
             true,
             BulkColumn.Type.DATE,
             "2026-09-20"),
-        BulkColumn.required(
-            SOURCE, "Source: EMAIL, LETTER, PORTAL, CALL or FILE (BCL_UPDATE_SOURCE)", "EMAIL"),
+        BulkColumn.required(SOURCE, "How the insurer communicated the update", "EMAIL")
+            .lov("BCL_UPDATE_SOURCE"),
         BulkColumn.optional(REFERENCE, "Insurer's reference", "LTR-2026-114"),
         BulkColumn.required(REMARKS, "What the insurer communicated", "Adjuster appointed"));
   }

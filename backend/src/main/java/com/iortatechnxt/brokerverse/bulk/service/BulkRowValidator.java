@@ -3,10 +3,13 @@ package com.iortatechnxt.brokerverse.bulk.service;
 import com.iortatechnxt.brokerverse.bulk.service.ParsedFile.RawRow;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -14,6 +17,11 @@ import java.util.regex.Pattern;
 final class BulkRowValidator {
 
   private static final Pattern YES = Pattern.compile("\\s*(y|yes)\\s*", Pattern.CASE_INSENSITIVE);
+  private static final DateTimeFormatter SHOWN_DATE =
+      new DateTimeFormatterBuilder()
+          .parseCaseInsensitive()
+          .appendPattern("d-MMM-uuuu")
+          .toFormatter(Locale.ENGLISH);
   private static final Pattern NO = Pattern.compile("\\s*(n|no)\\s*", Pattern.CASE_INSENSITIVE);
 
   private BulkRowValidator() {}
@@ -43,6 +51,7 @@ final class BulkRowValidator {
     return switch (type) {
       case YES_NO -> yesNo(value);
       case NUMBER -> withoutGrouping(value);
+      case DATE -> isoDate(value);
       default -> value;
     };
   }
@@ -52,6 +61,15 @@ final class BulkRowValidator {
       return "Y";
     }
     return NO.matcher(value).matches() ? "N" : value;
+  }
+
+  /** A date entered as dd-MMM-yyyy (e.g. 15-Jan-2026) becomes yyyy-MM-dd; other text is kept. */
+  private static String isoDate(String value) {
+    try {
+      return LocalDate.parse(value, SHOWN_DATE).toString();
+    } catch (DateTimeParseException e) {
+      return value;
+    }
   }
 
   private static String withoutGrouping(String value) {
@@ -101,7 +119,7 @@ final class BulkRowValidator {
   private static String typeName(BulkColumn.Type type) {
     return switch (type) {
       case NUMBER -> "number";
-      case DATE -> "date (yyyy-mm-dd)";
+      case DATE -> "date (dd-MMM-yyyy, e.g. 15-Jan-2026)";
       case YES_NO -> "Y/N value";
       case TEXT -> "text";
     };

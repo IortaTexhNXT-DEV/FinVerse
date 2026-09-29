@@ -15,7 +15,6 @@ import { formatDate, formatDateTime } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { AccountHit, FeedRecord, FeedRun, OrUpload } from './api';
 import { TemplateButton, UploadForm } from './RemittanceParts';
-import { OR_TEMPLATE } from './remittanceLabels';
 import './remittance.css';
 import { displayNameOf } from '@/api/users';
 
@@ -129,7 +128,7 @@ export default function InsurerOrPage() {
         section="Remittance"
         title="Insurer OR Upload"
         description="Upload the remittance schedules returned by the insurers with their official receipts."
-        actions={<TemplateButton name="insurer-or-template.csv" content={OR_TEMPLATE} />}
+        actions={<TemplateButton kind="insurer-or" />}
       />
       <ErrorAlert error={upload.error ?? open.error ?? runs.error} />
       <Card title="Upload Insurer Schedule">

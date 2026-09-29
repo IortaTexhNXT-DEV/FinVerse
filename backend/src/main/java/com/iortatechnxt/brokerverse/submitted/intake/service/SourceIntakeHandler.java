@@ -74,6 +74,16 @@ public class SourceIntakeHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The Submitted Policies team, from the policy list of the source (bank unit)";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Submitted Policies > Upload & Intake, button Upload Source File (choose the source)";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return SourceColumns.columns();
   }

@@ -328,6 +328,12 @@ public enum Permission {
   UAM_SOD_AUTHORIZE,
   // Second approval of a change of a security parameter (sign-in, password, session, access), V1065
   SECURITY_PARAMETER_APPROVE,
+  // Reset of a user's second factor under four eyes: request (MFA_RESET) and approve
+  // (MFA_RESET_APPROVE), V1181
+  MFA_RESET,
+  MFA_RESET_APPROVE,
+  // The metrics of the actuator on the application port (a service credential), V1180
+  METRICS_VIEW,
 
   // Claims Handling (BDOI BRD-7, broking claims). See docs/architecture/CLAIMS_BROKING_DESIGN.md
   // section 7.1 and V1020. The insurer-side CLAIM_* permissions above stay hidden from BDOI roles.

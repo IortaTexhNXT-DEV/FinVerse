@@ -69,6 +69,24 @@ public class PaymentFileHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Cashiering officers, from the bank's " + spec.title();
+  }
+
+  @Override
+  public String uploadPath() {
+    String tab =
+        switch (spec.code()) {
+          case "PAY_BILLS" -> "Bills Payment";
+          case "PAY_TRADE" -> "Trade";
+          case "PAY_CLPC" -> "CLPC";
+          case "PAY_DIRECT_CREDIT" -> "Direct Credit";
+          default -> spec.title();
+        };
+    return "Cashiering > Payment Uploads, tab " + tab;
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return spec.columns();
   }

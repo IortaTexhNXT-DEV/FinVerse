@@ -1,0 +1,12 @@
+# Accepted findings of the container image scan (Trivy, HIGH and CRITICAL with a fix available).
+# A finding is fixed by refreshing the pinned base image digest or upgrading the package. An entry
+# here is the exception: statement = why it does not apply to BrokerVerse, who reviewed it and when;
+# expired_at = at most 6 months ahead, after which the scan fails again.
+# Example:
+#   vulnerabilities:
+#     - id: CVE-0000-00000
+#       paths: ["usr/lib/example.so"]
+#       statement: Reason, reviewer, review date.
+#       expired_at: 2027-03-31
+vulnerabilities: []
+secrets: []

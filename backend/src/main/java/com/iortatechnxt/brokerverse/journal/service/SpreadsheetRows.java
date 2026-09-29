@@ -1,10 +1,10 @@
 package com.iortatechnxt.brokerverse.journal.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
-import java.io.ByteArrayInputStream;
+import com.iortatechnxt.brokerverse.common.office.OfficeFileLimits;
+import com.iortatechnxt.brokerverse.common.util.TextContent;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -14,7 +14,6 @@ import org.apache.poi.ss.usermodel.DateUtil;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
  * Reads tabular upload files (CSV per RFC 4180, or the first sheet of an XLSX workbook) into rows
@@ -40,17 +39,27 @@ public final class SpreadsheetRows {
     String name = fileName == null ? "" : fileName.toLowerCase(Locale.ROOT);
     List<List<String>> rows;
     if (name.endsWith(".csv")) {
-      rows = parseCsv(new String(content, StandardCharsets.UTF_8));
+      rows = parseCsv(TextContent.utf8(content));
     } else if (name.endsWith(".xlsx")) {
       rows = parseXlsx(content);
     } else {
       throw new BusinessRuleException("UNSUPPORTED_FILE", "Upload a .csv or .xlsx file");
     }
-    if (rows.size() > maxRows) {
+    if (rows.stream().filter(r -> !isBlank(r)).count() > maxRows) {
       throw new BusinessRuleException(
           "TOO_MANY_ROWS", "The file has more than " + (maxRows - 1) + " data rows");
     }
     return rows;
+  }
+
+  /**
+   * Whether a row has no value.
+   *
+   * @param row cells
+   * @return true when every cell is blank
+   */
+  public static boolean isBlank(List<String> row) {
+    return row.stream().allMatch(String::isBlank);
   }
 
   /**
@@ -122,23 +131,28 @@ public final class SpreadsheetRows {
   }
 
   /**
-   * Parses the first sheet of an XLSX workbook.
+   * Parses the first sheet of an XLSX workbook. Blank rows are kept as empty rows, so a row's index
+   * is its position on the sheet; trailing blank rows are dropped.
    *
    * @param content workbook bytes
-   * @return rows of cells (blank rows skipped)
+   * @return rows of cells
    */
   public static List<List<String>> parseXlsx(byte[] content) {
-    try (Workbook workbook = new XSSFWorkbook(new ByteArrayInputStream(content))) {
+    try (Workbook workbook = OfficeFileLimits.workbook(content)) {
       Sheet sheet = workbook.getSheetAt(0);
       List<List<String>> rows = new ArrayList<>();
       for (Row row : sheet) {
+        while (rows.size() < row.getRowNum()) {
+          rows.add(List.of());
+        }
         List<String> cells = new ArrayList<>();
         for (int c = 0; c < row.getLastCellNum(); c++) {
           cells.add(text(row.getCell(c)));
         }
-        if (cells.stream().anyMatch(s -> !s.isBlank())) {
-          rows.add(cells);
-        }
+        rows.add(cells);
+      }
+      while (!rows.isEmpty() && isBlank(rows.get(rows.size() - 1))) {
+        rows.remove(rows.size() - 1);
       }
       return rows;
     } catch (IOException | RuntimeException e) {

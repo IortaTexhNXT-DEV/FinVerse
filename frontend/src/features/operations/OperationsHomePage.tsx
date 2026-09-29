@@ -63,7 +63,7 @@ function ExternalLinks({ links }: Readonly<{ links: OperationsHome['links'] }>) 
               <a
                 key={l.code}
                 className="btn btn-secondary btn-sm"
-                href={url}
+                href={safeUrl(url)}
                 target="_blank"
                 rel="noreferrer"
               >

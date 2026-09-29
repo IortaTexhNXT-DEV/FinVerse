@@ -21,4 +21,4 @@ data:
   loadBalancerCidr: "<ALB_SUBNETS_CIDR>"
   dataServicesCidr: "<DATA_SUBNETS_CIDR>"
   awsEndpointsCidr: "<VPC_ENDPOINT_SUBNETS_CIDR>"
-  bdoNetworkCidr: "<BDO_PRIVATE_ROUTE_CIDR>"
+  clientNetworkCidr: "<BDO_PRIVATE_ROUTE_CIDR>"

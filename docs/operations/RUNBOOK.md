@@ -6,9 +6,9 @@ Audience: production deployment and support teams.
 
 | Component | Image | Port | Health |
 |---|---|---|---|
-| `bibs-web` (Spring Boot, Java 21, role `web`): screens and user APIs | `bibs-backend` | 8443 (HTTPS) | `/actuator/health/liveness`, `/actuator/health/readiness` |
-| `bibs-jobs` (same image, role `jobs`): scheduled and batch jobs | `bibs-backend` | 8443 (actuator only) | same |
-| `bibs-integration` (same image, role `integration`): outbox relay, Kafka consumers, inbound files, `/integration/**` | `bibs-backend` | 8443 (HTTPS) | same |
+| `bibs-web` (Spring Boot, Java 21, role `web`): screens and user APIs | `bibs-backend` | 8443 (HTTPS); 9090 management | `/livez`, `/readyz` on 8443; `/actuator/health/**` and `/actuator/prometheus` on 9090 |
+| `bibs-jobs` (same image, role `jobs`): scheduled and batch jobs | `bibs-backend` | 8443 (probes only); 9090 management | same |
+| `bibs-integration` (same image, role `integration`): outbox relay, Kafka consumers, inbound files, `/integration/**` | `bibs-backend` | 8443 (HTTPS); 9090 management | same |
 | `bibs-frontend` (nginx + SPA) | `bibs-frontend` | 8443 (HTTPS) | `/healthz` |
 | PostgreSQL 16 | managed service | 5432 (TLS) | – |
 
@@ -27,7 +27,9 @@ apply, for example, V27 on a database already at V975. `flyway_schema_history` r
    `BROKERVERSE_ADMIN_INITIAL_PASSWORD`, and the ConfigMap `rds-ca-bundle` (DEPLOYMENT.md).
 3. Deploy the overlay of the environment (`kubectl apply -k deploy/k8s/overlays/<uat|prod>`, DEPLOYMENT.md), or
    `docker compose` for a single host.
-4. Sign in as `sysadmin`, change the password, remove `BROKERVERSE_ADMIN_INITIAL_PASSWORD`.
+4. Sign in as `sysadmin`: the initial password must be changed at once, and the authenticator app is
+   enrolled (the second factor is required of privileged users, `MFA_POLICY` = `PRIVILEGED`); keep the
+   recovery codes in the safe. Remove `BROKERVERSE_ADMIN_INITIAL_PASSWORD` from the secret.
 5. Set up in this order (each item is authorized by a second user – maker-checker):
    company → branches → currencies & rates → chart of accounts → dimensions → fiscal year & open
    periods → parties → accounting rules → users & roles.
@@ -46,8 +48,17 @@ apply, for example, V27 on a database already at V975. `flyway_schema_history` r
 
 ## 4. Monitoring
 
-- Metrics: `/actuator/prometheus` (requires `SYSTEM_PARAMETER_MANAGE`; scrape with a service
-  account token) – JVM, HTTP, Hikari pool, and `brokerverse_journals_posted_total`.
+- Metrics: `/actuator/prometheus` on the management port (`BROKERVERSE_MANAGEMENT_PORT`, 9090 in
+  Kubernetes; annotations `prometheus.io/scrape|port|path` on the pods). No token is needed there: the
+  NetworkPolicy `allow-monitoring` admits only the `monitoring` namespace to port 9090 and the load
+  balancer never publishes it. Without a separate management port (docker compose) the metrics need
+  a user holding `METRICS_VIEW` (no role holds it as delivered). JVM, HTTP, Hikari pool,
+  `brokerverse_journals_posted_total` and `brokerverse_security_store_failures_total{store}`.
+- Alert rule: any increase of `brokerverse_security_store_failures_total` (the token denylist, the
+  session log or the rate limit counters cannot be read) is critical: sign-ins are checked against the
+  database or refused (HTTP 503 `SIGN_IN_CHECK_UNAVAILABLE`). The application also raises the alert
+  `SECURITY_STORE_UNAVAILABLE`. Check Redis (`BROKERVERSE_REDIS_*`) and the database; nothing to
+  restart in the application once the store answers.
 - Logs: one line per event, ISO timestamps; CR/LF in messages are neutralised. Alert on `ERROR`.
 - Every HTTP response carries `X-Correlation-Id` (the caller's value when valid, else generated); the
   same id is in the envelope of the integration events the request published (`evt_outbox`,
@@ -95,7 +106,10 @@ apply, for example, V27 on a database already at V975. `flyway_schema_history` r
 
 | Task | Where |
 |---|---|
-| Unlock a user (locked after 5 failed logins) | Administration → Users → Unlock |
+| Unlock a user (locked after `LOGIN_MAX_FAILED_ATTEMPTS` failed sign-ins or second-factor codes) | Administration → Users → Unlock |
+| A user lost the phone of the authenticator app | Administration → Second Factor → Request Reset (reason); a second administrator (`MFA_RESET_APPROVE`) approves; the user enrols again at the next sign-in. A recovery code signs the user in meanwhile |
+| Single sign-on refused (`/sso/callback?error=...`) | `SSO_NOT_LINKED`: no active BrokerVerse user with the provider's user name (check `BROKERVERSE_SSO_USERNAME_CLAIM`); `SSO_INVALID`: signature, audience, time or state refused (check the provider certificate, the clocks, `BROKERVERSE_SSO_BASE_URL`); `SSO_PROVIDER_ERROR`: the provider's token endpoint refused (client secret). The log line of `SsoSignIn` gives the detail. The break-glass administrators sign in with their password meanwhile |
+| Users signed out with "session ended" after a renewal (`TOKEN_REUSED` in the session list) | A replaced refresh token came back: a copied browser profile or a stolen cookie. Ask the user, check the sessions of the user; sign-in works again at once |
 | Reset password | Administration → Users (API `POST /api/v1/admin/users/{id}/reset-password`) |
 | Who changed what | Administration → Audit Trail, or report `CTL-AUDIT` |
 | Failed accounting events | Accounting Engine → Event Register (status FAILED) |
@@ -103,3 +117,16 @@ apply, for example, V27 on a database already at V975. `flyway_schema_history` r
 | Integration events stuck or failed (Kafka), dead letters | Administration → Integration Events; runbook in [`PLATFORM_CACHE_AND_EVENTS.md`](../architecture/PLATFORM_CACHE_AND_EVENTS.md) §5 |
 | Reference data changed by SQL not visible (cache) | `POST /api/v1/admin/caches/{name}/clear` (§5.3 of the same document) |
 | A job shows `SKIPPED_LOCKED` | Normal with several replicas: another instance ran it (job lock, §5.4) |
+
+## 8. Security settings of a deployment
+
+- `BROKERVERSE_ENVIRONMENT` names the environment (`sit`, `uat`, `training`, `preprod`, `production`).
+  Every environment except `local` refuses to start without its secrets and with development values
+  (the log line lists every problem). Secrets and keys: [`CONFIGURATION.md`](CONFIGURATION.md)
+  "Authentication and session security".
+- Rotating the key of the second factor: set the new key in `BROKERVERSE_MFA_ENCRYPTION_KEY` and the
+  old one in `BROKERVERSE_MFA_PREVIOUS_ENCRYPTION_KEY`, restart; each secret is re-encrypted at its
+  next use. Remove the previous key once every enrolled user has signed in (or reset those who have
+  not).
+- Rotating the JWT key signs every user out once (access tokens are refused; the refresh cookies still
+  renew them, so users continue working after one renewal).

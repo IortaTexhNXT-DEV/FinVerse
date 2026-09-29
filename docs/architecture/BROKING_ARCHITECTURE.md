@@ -102,7 +102,9 @@ Business modules never call "upward". The rules for callbacks between modules ar
   - `validate(row, context)`
   - `commit(row, context)`: returns the created reference.
 - The framework does the rest:
-  - template download (XLSX with an instructions sheet);
+  - template download: one guided XLSX sheet (title block, column guide band above the header,
+    header notes, marked example row, drop-downs from a Lists sheet), shared writer
+    `common.excel.GuidedTemplateWriter`; the reader skips the guide and example rows;
   - upload of XLSX / CSV / ODS, with header checks against the template;
   - row validation;
   - review of the job;

@@ -40,7 +40,8 @@ function wrap(children: ReactNode) {
   const auth = {
     user: null,
     loading: false,
-    login: () => Promise.resolve(),
+    login: () => Promise.resolve({ expiresAt: '' }),
+    completeSignIn: () => undefined,
     logout: () => undefined,
     can: () => true,
     passwordChange: null,

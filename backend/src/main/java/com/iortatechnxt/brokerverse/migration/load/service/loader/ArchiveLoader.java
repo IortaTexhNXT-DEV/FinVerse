@@ -104,25 +104,50 @@ public class ArchiveLoader implements MigrationLoader {
     return LoadOutcome.of(MigrationCodes.ENTITY_ARCHIVE, record.getId(), type + " " + key, null);
   }
 
+  /**
+   * The other legacy fields of a record: label and value pairs separated by ; ("Insurer: MAL;
+   * Remitted on: 01-Jul-2022"), or the object notation of a system extract.
+   */
   private Map<String, String> details(String text) {
     Map<String, String> out = new LinkedHashMap<>();
     if (Values.blank(text)) {
       return out;
     }
-    try {
-      JsonNode node = json.readTree(text);
-      if (!node.isObject()) {
-        throw new BusinessRuleException(
-            "MIG_ARCHIVE_DETAIL", "The legacy details must be an object of label and value");
+    String trimmed = text.strip();
+    if (trimmed.startsWith("{")) {
+      try {
+        JsonNode node = json.readTree(trimmed);
+        node.properties().forEach(e -> out.put(e.getKey(), e.getValue().asText()));
+        return out;
+      } catch (JsonProcessingException e) {
+        throw detailsError(e);
       }
-      node.properties().forEach(e -> out.put(e.getKey(), e.getValue().asText()));
-      return out;
-    } catch (JsonProcessingException e) {
-      throw new BusinessRuleException(
-          "MIG_ARCHIVE_DETAIL",
-          "The legacy details are not valid JSON: " + e.getOriginalMessage(),
-          e);
     }
+    return pairs(trimmed);
+  }
+
+  /** "Label: value; Label: value" as an ordered map. */
+  private static Map<String, String> pairs(String text) {
+    Map<String, String> out = new LinkedHashMap<>();
+    for (String pair : text.split(";")) {
+      if (pair.isBlank()) {
+        continue;
+      }
+      int colon = pair.indexOf(':');
+      if (colon <= 0 || pair.substring(0, colon).isBlank()) {
+        throw detailsError(null);
+      }
+      out.put(pair.substring(0, colon).strip(), pair.substring(colon + 1).strip());
+    }
+    return out;
+  }
+
+  private static BusinessRuleException detailsError(Exception cause) {
+    return new BusinessRuleException(
+        "MIG_ARCHIVE_DETAIL",
+        "The other legacy fields must be label and value pairs separated by ;, for example"
+            + " Insurer: MAL; Remitted on: 01-Jul-2022",
+        cause);
   }
 
   @Override

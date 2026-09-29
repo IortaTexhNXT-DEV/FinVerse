@@ -49,6 +49,16 @@ public class WatchlistBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Compliance makers maintaining the sanctions and PEP lists";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Compliance Setup > List Sources and Runs, button Upload List File";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return ListRecord.columns();
   }
@@ -57,8 +67,8 @@ public class WatchlistBulkHandler implements BulkImportHandler {
   public String instructions() {
     return "One row per listed person or entity. Reference identifies the record in its source:"
         + " a known reference changes the entry, a new one adds it. Aliases are separated by"
-        + " semicolons; dates are yyyy-MM-dd. Invented names only in test files. Changes wait for"
-        + " a Compliance Checker before screening uses them.";
+        + " semicolons; dates are yyyy-MM-dd. Changes wait for a Compliance Checker before"
+        + " screening uses them.";
   }
 
   @Override

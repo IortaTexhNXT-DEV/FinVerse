@@ -45,6 +45,16 @@ export default tseslint.config(
       'sonarjs/cognitive-complexity': ['error', 15],
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
       '@typescript-eslint/no-confusing-void-expression': ['error', { ignoreArrowShorthand: true }],
+      // A link address that is not a literal must pass through safeUrl (web addresses only), so a
+      // value from the server or a list of values can never become a javascript: or data: link.
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector:
+            "JSXAttribute[name.name='href'] > JSXExpressionContainer > :not(Literal, CallExpression[callee.name='safeUrl'])",
+          message: 'Pass a dynamic href through safeUrl() from @/utils/safeUrl.',
+        },
+      ],
     },
   },
   {

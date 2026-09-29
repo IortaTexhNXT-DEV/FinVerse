@@ -7,6 +7,8 @@ import com.iortatechnxt.brokerverse.budget.domain.Budget;
 import com.iortatechnxt.brokerverse.budget.domain.BudgetLine;
 import com.iortatechnxt.brokerverse.budget.domain.BudgetLineValues;
 import com.iortatechnxt.brokerverse.budget.service.BudgetActualsQuery.MonthlyActual;
+import com.iortatechnxt.brokerverse.bulk.service.BulkFileReader;
+import com.iortatechnxt.brokerverse.bulk.service.TextLayout;
 import com.iortatechnxt.brokerverse.coa.domain.AccountClass;
 import com.iortatechnxt.brokerverse.coa.domain.GlAccount;
 import com.iortatechnxt.brokerverse.coa.service.ChartOfAccountsService;
@@ -46,6 +48,7 @@ public class BudgetLineService {
   private final PeriodService periods;
   private final BudgetActualsQuery actuals;
   private final AuditTrailService audit;
+  private final BulkFileReader reader;
 
   /**
    * Creates the service.
@@ -56,6 +59,7 @@ public class BudgetLineService {
    * @param periods period service
    * @param actuals ledger actuals query
    * @param audit audit trail
+   * @param reader file reader of the Excel import
    */
   public BudgetLineService(
       BudgetService budgets,
@@ -63,13 +67,15 @@ public class BudgetLineService {
       DimensionService dimensions,
       PeriodService periods,
       BudgetActualsQuery actuals,
-      AuditTrailService audit) {
+      AuditTrailService audit,
+      BulkFileReader reader) {
     this.budgets = budgets;
     this.accounts = accounts;
     this.dimensions = dimensions;
     this.periods = periods;
     this.actuals = actuals;
     this.audit = audit;
+    this.reader = reader;
   }
 
   /**
@@ -114,6 +120,34 @@ public class BudgetLineService {
         id,
         AuditAction.UPDATE,
         "Imported " + values.size() + " budget lines from CSV");
+    return budget;
+  }
+
+  /**
+   * Replaces the lines of a draft from an Excel file: the guided budget template (read as it is,
+   * its guide and example rows skipped) or a workbook with the same headers.
+   *
+   * @param id budget
+   * @param fileName file name
+   * @param content file content
+   * @return budget
+   */
+  public Budget importFile(Long id, String fileName, byte[] content) {
+    Budget budget = budgets.get(id);
+    List<BudgetLineValues> values =
+        validate(
+            budget.getCompanyId(),
+            BudgetTemplate.lines(
+                    reader.read(fileName, content, TextLayout.AUTO, BudgetTemplate.headers()))
+                .stream()
+                .map(l -> new Candidate(l.accountCode(), l.costCenter(), l.months()))
+                .toList());
+    budget.replaceLines(values);
+    audit.record(
+        BudgetService.ENTITY,
+        id,
+        AuditAction.UPDATE,
+        "Imported " + values.size() + " budget lines from " + fileName);
     return budget;
   }
 

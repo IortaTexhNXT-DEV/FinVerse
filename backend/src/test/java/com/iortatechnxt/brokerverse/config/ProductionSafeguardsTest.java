@@ -9,8 +9,19 @@ import org.springframework.mock.env.MockEnvironment;
 
 class ProductionSafeguardsTest {
 
-  private static final String KEY = "Zq8v3N0kP1rT7yW2bX5cD9fG4hJ6mL0sQ";
-  private static final String MFA_KEY = "1WTVN7hPMSpwjq805JP6+pTepzMSTL2k9AE0QCTcV4A=";
+  /** A value of the required length that is no development marker; not a real key. */
+  private static final String KEY = "k".repeat(40);
+
+  /** 32 bytes in Base64, built at run time; not a key of any environment. */
+  private static final String MFA_KEY = testKey();
+
+  private static String testKey() {
+    byte[] bytes = new byte[ProductionSafeguards.MFA_KEY_BYTES];
+    for (int i = 0; i < bytes.length; i++) {
+      bytes[i] = (byte) (i * 7 + 3);
+    }
+    return java.util.Base64.getEncoder().encodeToString(bytes);
+  }
 
   /** The settings every environment except local needs, besides the secrets. */
   private static MockEnvironment shared(MockEnvironment env) {

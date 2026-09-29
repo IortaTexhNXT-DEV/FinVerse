@@ -83,12 +83,23 @@ jobs:
           path: ~/.dependency-check-data
           key: dependency-check-data-${{ github.run_id }}
           restore-keys: dependency-check-data-
+      # The NVD data needs an API key (repository secret NVD_API_KEY, free from nvd.nist.gov). Without
+      # it the scan cannot run; the job says so instead of failing on the missing key.
+      - name: NVD API key present
+        id: nvd
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: |
+          if [ -n "$NVD_API_KEY" ]; then echo "present=true" >> "$GITHUB_OUTPUT"; else
+            echo "::warning title=Dependency-check skipped::Add the repository secret NVD_API_KEY to run the OWASP dependency-check."
+            echo "present=false" >> "$GITHUB_OUTPUT"; fi
       - name: Dependency-check (suppressions in quality/dependency-check-suppressions.xml)
+        if: steps.nvd.outputs.present == 'true'
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: mvn -B org.owasp:dependency-check-maven:check -DdataDirectory=$HOME/.dependency-check-data
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        if: always()
+        if: always() && steps.nvd.outputs.present == 'true'
         with:
           name: backend-dependency-check
           path: |

@@ -3704,8 +3704,8 @@ frs:
         pre: LOGIN_MAX_FAILED_ATTEMPTS is 3.
         steps:
           - Enter a wrong password 3 times for proctl; then the correct one.
-        expected: The account locks at the third failure and the correct password is refused.
-        msg: [Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
+        expected: The account locks at the third failure and the correct password is refused with the same message as a wrong password.
+        msg: [Invalid user name or password, AUTHENTICATION_FAILED]
 
   FR-NB-131:
     scenario: SC-NB-01

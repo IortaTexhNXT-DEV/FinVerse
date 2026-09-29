@@ -21,6 +21,12 @@ final class LegacyInvoiceFixtures {
   private static final AtomicLong SEQUENCE =
       new AtomicLong(System.currentTimeMillis() / 1000 % 900_000L);
 
+  /** Birth dates of the fixture clients (1925 to 2008). */
+  static final long BIRTH_DATE_SLOTS = 500L;
+
+  /** Days between the birth dates of consecutive tokens: more than twice the masking shift. */
+  static final long BIRTH_DATE_SPACING_DAYS = 61L;
+
   private final MigrationTestSupport mig;
   private final JdbcTemplate jdbc;
 
@@ -34,13 +40,26 @@ final class LegacyInvoiceFixtures {
     return Long.toString(100_000L + SEQUENCE.getAndIncrement() % 900_000L);
   }
 
-  String client(String t) throws Exception {
+  /**
+   * The birth date of the client of a token. Masking replaces the names by entries of short lists
+   * (the first name is always the same) and moves a birth date by at most 30 days either way, so
+   * clients born less than 61 days apart could share the masked person key (K3) and the second
+   * would merge into the first on load. Dates 61 days apart for consecutive tokens keep the masked
+   * keys of any {@value #BIRTH_DATE_SLOTS} consecutive tokens distinct.
+   */
+  static LocalDate birthDate(String t) {
+    return LocalDate.of(1925, 1, 1)
+        .plusDays(Long.parseLong(t) % BIRTH_DATE_SLOTS * BIRTH_DATE_SPACING_DAYS);
+  }
+
+  /** The C01 extract row of the client of a token. */
+  static Map<String, String> clientRow(String t) {
     Map<String, String> r = new HashMap<>();
     r.put("legacy_client_no", "E" + t);
     r.put("client_type", "I");
     r.put("last_name", "Santos" + t);
     r.put("first_name", "Lea");
-    r.put("birth_date", LocalDate.of(1960, 1, 1).plusDays(Long.parseLong(t) % 15_000L).toString());
+    r.put("birth_date", birthDate(t).toString());
     r.put("tin", "");
     r.put("market_segment", "CBG");
     r.put("email", "e" + t + "@example.ph");
@@ -50,6 +69,11 @@ final class LegacyInvoiceFixtures {
     r.put("client_status", "A");
     r.put("created_date", "2021-03-01");
     r.put("last_updated", "2027-10-01 09:00:00");
+    return r;
+  }
+
+  String client(String t) throws Exception {
+    Map<String, String> r = clientRow(t);
     JsonNode extract =
         mig.upload(
             "C01",

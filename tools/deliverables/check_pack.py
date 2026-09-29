@@ -135,7 +135,16 @@ def duplicates() -> list[str]:
     for root in ROOTS:
         for p in files(root):
             seen[hashlib.sha256(p.read_bytes()).hexdigest()].append(p)
-    return [f"duplicate content: {', '.join(rel(p) for p in ps)}" for ps in seen.values() if len(ps) > 1]
+    return [f"duplicate content: {', '.join(rel(p) for p in ps)}" for ps in seen.values()
+            if len(ps) > 1 and not _menus_of_several_sets(ps)]
+
+
+def _menus_of_several_sets(paths: list[Path]) -> bool:
+    """Identical persona menu screenshots (screenshots/ux-nav-*) of different BRD sets: the same role has
+    the same menu, and each sign-off set carries its own images so that it stands alone. Two identical
+    menu images within one set stay an error (the set keeps one through ux.yaml navigation.shared)."""
+    sets = [p.parent.parent for p in paths if p.parent.name == "screenshots" and p.name.startswith("ux-nav-")]
+    return len(sets) == len(paths) and len(set(sets)) == len(sets)
 
 
 def _version(v: str) -> tuple[int, ...]:

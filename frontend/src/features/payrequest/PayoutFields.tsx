@@ -2,6 +2,7 @@ import { LovSelect } from '@/components/broking/LovSelect';
 import { Field } from '@/components/ui/Field';
 import type { PayoutAccount } from './api';
 import type { FieldErrors, PayoutDraft } from './requestForm';
+import { groupLabel } from '@/context/clientNames';
 
 interface PayoutFieldsProps {
   value: PayoutDraft;
@@ -62,7 +63,12 @@ export function PayoutFields({ value, errors, onChange, known = [] }: Readonly<P
         </Field>
       )}
       {needsAccount && (
-        <Field label="BDO Account No." required error={errors.accountNo} hint="10 to 16 digits">
+        <Field
+          label={groupLabel('Account No.')}
+          required
+          error={errors.accountNo}
+          hint="10 to 16 digits"
+        >
           {(id) => (
             <input
               id={id}

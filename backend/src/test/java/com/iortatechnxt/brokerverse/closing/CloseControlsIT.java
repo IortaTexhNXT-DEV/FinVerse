@@ -61,7 +61,7 @@ class CloseControlsIT {
   @Autowired private AsUser as;
 
   private static YearMonth previousMonth() {
-    return YearMonth.from(Instant.now().atZone(PeriodCloseScheduleService.MANILA)).minusMonths(1);
+    return YearMonth.from(Instant.now().atZone(BusinessClock.zone())).minusMonths(1);
   }
 
   private Long companyWithOpenYears(String code) {

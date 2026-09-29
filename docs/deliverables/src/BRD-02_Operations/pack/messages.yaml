@@ -188,6 +188,7 @@ fixes:
   REMIT_SUBMISSION_INVALID: Exclude the invoices listed, or wait until their holds or adjustments are cleared, then submit again.
   FEED_FILE_EMPTY: Upload a file with at least one line.
   FEED_FILE_COLUMNS: Use the template with its columns unchanged.
+  FEED_FILE_UNREADABLE: Save the file again from the Excel template, or upload it as CSV or text.
   FEED_VALUE_MISSING: Complete the column named on the line and upload the file again.
   SPECIAL_REMIT_NOT_ELIGIBLE: Check that the invoice is paid, cleared and not on hold, and for a claims condition that the claim waits for the premium remittance.
   REMIT_INVOICE_INSURER: Choose the insurer of the invoice, or leave the insurer blank.

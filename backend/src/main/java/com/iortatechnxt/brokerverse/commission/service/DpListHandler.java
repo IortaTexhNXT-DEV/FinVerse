@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.util.Sha256;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInContext;
 import com.iortatechnxt.brokerverse.opsledger.service.FlowInHandler;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -36,9 +37,6 @@ public class DpListHandler implements FlowInHandler {
   /** Feed code. */
   public static final String FEED = "COLLECTION_DP_LIST";
 
-  /** Head Office branch code in the file names. */
-  public static final String HEAD_OFFICE = "HO";
-
   static final String INVOICE = "Invoice No.";
   static final String POLICY = "Policy No.";
   static final String INSURER = "Insurer";
@@ -53,16 +51,20 @@ public class DpListHandler implements FlowInHandler {
 
   private final BulkFileReader reader;
   private final DpIntakeService intake;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the handler.
    *
    * @param reader file reader
    * @param intake list intake
+   * @param organization company master (head-office code of the file names)
    */
-  public DpListHandler(BulkFileReader reader, DpIntakeService intake) {
+  public DpListHandler(
+      BulkFileReader reader, DpIntakeService intake, OrganizationDirectory organization) {
     this.reader = reader;
     this.intake = intake;
+    this.organization = organization;
   }
 
   @Override
@@ -85,13 +87,14 @@ public class DpListHandler implements FlowInHandler {
    * @return the list
    */
   public DpList process(Long companyId, FlowInFile file, FlowInContext context) {
-    Origin origin = origin(file.fileName());
+    origin(file.fileName(), null);
     ParsedFile parsed = reader.read(file.fileName(), file.content());
     if (!parsed.headers().contains(INVOICE)) {
       throw new BusinessRuleException(
           "DP_LIST_LAYOUT", "The DP list has no '" + INVOICE + "' column");
     }
     Long company = companyId == null ? companyOf(parsed) : companyId;
+    Origin origin = origin(file.fileName(), organization.profile(company).headOfficeCode());
     DpList list =
         intake.open(company, origin, new FileKey(file.fileName(), Sha256.hex(file.content())));
     for (RawRow row : parsed.rows()) {
@@ -107,14 +110,15 @@ public class DpListHandler implements FlowInHandler {
    * Branch and date of a list from its file name (CMRID.001 naming convention).
    *
    * @param fileName file name
+   * @param headOfficeCode code of the head office in the file names (client profile), may be null
    * @return origin
    */
-  static Origin origin(String fileName) {
+  static Origin origin(String fileName, String headOfficeCode) {
     Matcher m = NAME.matcher(fileName == null ? "" : fileName.strip());
     if (!m.matches()) {
       throw new BusinessRuleException(
           "DP_LIST_NAME",
-          "Name the DP list <Branch>_DP_<yyyyMMdd> (e.g. HO_DP_20260930.xlsx): " + fileName);
+          "Name the DP list <Branch>_DP_<yyyyMMdd> (e.g. MAIN_DP_20260930.xlsx): " + fileName);
     }
     LocalDate date;
     try {
@@ -123,14 +127,10 @@ public class DpListHandler implements FlowInHandler {
       throw new BusinessRuleException(
           "DP_LIST_NAME", "The date in " + fileName + " is not a date (yyyyMMdd)", ex);
     }
-    String raw = m.group(1).strip();
+    String code = m.group(1).strip().toUpperCase(Locale.ROOT);
     boolean headOffice =
-        raw.length() == HEAD_OFFICE.length()
-            && HEAD_OFFICE.regionMatches(true, 0, raw, 0, raw.length());
-    return new Origin(
-        headOffice ? ListSource.HEAD_OFFICE : ListSource.BRANCH,
-        raw.toUpperCase(Locale.ROOT),
-        date);
+        headOfficeCode != null && headOfficeCode.toUpperCase(Locale.ROOT).equals(code);
+    return new Origin(headOffice ? ListSource.HEAD_OFFICE : ListSource.BRANCH, code, date);
   }
 
   private Long companyOf(ParsedFile parsed) {

@@ -64,7 +64,7 @@ export function oneYearAfter(isoDate: string): string {
   return `${Number(year) + 1}${rest}`;
 }
 
-export function newDraft(today: string): AccountDraft {
+export function newDraft(today: string, currency = ''): AccountDraft {
   return {
     clientName: '',
     productCode: '',
@@ -76,8 +76,8 @@ export function newDraft(today: string): AccountDraft {
     periodTo: oneYearAfter(today),
     multiYear: false,
     termYears: 1,
-    currency: 'PHP',
-    paymentArrangement: 'VIA_BDOI',
+    currency,
+    paymentArrangement: 'VIA_BROKER',
     mortgageeBank: '',
     loanApplicationNo: '',
     pnNumbers: '',
@@ -124,7 +124,7 @@ export function draftOfAccount(a: Account): AccountDraft {
     multiYear: a.multiYear,
     termYears: a.termYears,
     currency: a.currency,
-    paymentArrangement: a.paymentArrangement ?? 'VIA_BDOI',
+    paymentArrangement: a.paymentArrangement ?? 'VIA_BROKER',
     mortgageeBank: text(a.mortgageeBank),
     loanApplicationNo: text(a.loanApplicationNo),
     pnNumbers: a.pnNumbers.join(', '),

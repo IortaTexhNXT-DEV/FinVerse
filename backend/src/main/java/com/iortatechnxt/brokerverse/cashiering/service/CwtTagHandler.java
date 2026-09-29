@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
 import com.iortatechnxt.brokerverse.bulk.service.TextLayout;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.CwtPath;
 import com.iortatechnxt.brokerverse.cashiering.domain.CwtTag.CwtDetails;
+import com.iortatechnxt.brokerverse.common.excel.GuideColumn.Choice;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
 public class CwtTagHandler implements BulkImportHandler {
 
   private static final String PATH = "Path";
+  private static final String BY_CERTIFICATE = "CERTIFICATE";
   private static final String CERTIFICATE = "Certificate no";
   private static final Set<String> PATHS = Set.of("CASH", "CERTIFICATE");
 
@@ -54,14 +56,30 @@ public class CwtTagHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Cashiering officers tagging the BIR 2307 certificates received from clients";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required("Invoice no", "Invoice of the 2% CWT", "BI-2026-000001"),
-        new BulkColumn("Amount", "2% amount (blank = expected 2%)", false, Type.NUMBER, ""),
-        BulkColumn.required(PATH, "CASH or CERTIFICATE", "CERTIFICATE"),
-        BulkColumn.optional(CERTIFICATE, "BIR 2307 certificate number", "2307-2026-0001"),
-        new BulkColumn("Period from", "Certificate period from", false, Type.DATE, "2026-07-01"),
-        new BulkColumn("Period to", "Certificate period to", false, Type.DATE, "2026-09-30"),
+        BulkColumn.required(
+                "Invoice no", "Invoice the 2% creditable withholding tax is on", "BI-2026-000001")
+            .master("invoice"),
+        new BulkColumn(
+            "Amount", "Amount of the 2% tax; blank for the expected 2%", false, Type.NUMBER, ""),
+        BulkColumn.required(PATH, "How the tax is settled", BY_CERTIFICATE)
+            .choices(
+                List.of(
+                    new Choice("CASH", "Paid in cash by the client"),
+                    new Choice(BY_CERTIFICATE, "Covered by a BIR 2307 certificate"))),
+        BulkColumn.optional(CERTIFICATE, "Number of the BIR 2307 certificate", "2307-2026-0001")
+            .when("the path is CERTIFICATE"),
+        new BulkColumn(
+                "Period from", "Start of the certificate period", false, Type.DATE, "2026-07-01")
+            .when("the path is CERTIFICATE"),
+        new BulkColumn("Period to", "End of the certificate period", false, Type.DATE, "2026-09-30")
+            .when("the path is CERTIFICATE"),
         BulkColumn.optional("Remarks", "Remarks", ""));
   }
 

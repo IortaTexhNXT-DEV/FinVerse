@@ -6,6 +6,7 @@ import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDateTime } from '@/utils/format';
+import { BRAND } from '@/branding';
 
 /** Uptime as "2d 3h 4m". */
 function uptime(seconds: number): string {
@@ -24,7 +25,7 @@ export default function ApplicationInfoPage() {
       <PageHeader
         section="Administration"
         title="Application Info"
-        description="Version, build, database migration level and health of this BIBS installation."
+        description={`Version, build, database migration level and health of this ${BRAND.product} installation.`}
       />
       <ErrorAlert error={info.error} />
       {i === undefined ? (

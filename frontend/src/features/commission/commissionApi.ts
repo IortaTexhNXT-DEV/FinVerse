@@ -32,7 +32,7 @@ export type BillingStage =
 export type SchemeType = 'NO_TOUCH' | 'TOP_UP' | 'MOTOR_MANIA' | 'OTHER';
 export type Calculation = 'TARGET_TIERED' | 'FIXED_PER_POLICY';
 export type PeriodType = 'MONTHLY' | 'QUARTERLY' | 'SEMI_ANNUAL' | 'ANNUAL' | 'CUSTOM';
-export type Beneficiary = 'BDOI' | 'BRANCH';
+export type Beneficiary = 'BROKER' | 'BRANCH';
 export type RunStatus = 'COMPUTED' | 'POSTED' | 'CANCELLED';
 
 export interface Amounts {

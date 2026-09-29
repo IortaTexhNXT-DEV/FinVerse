@@ -18,7 +18,8 @@
     "isolatedModules": true,
     "skipLibCheck": true,
     "verbatimModuleSyntax": true,
-    "paths": { "@/*": ["./src/*"] }
+    "resolveJsonModule": true,
+    "paths": { "@/*": ["./src/*"], "@theme-pack": ["./src/theme/packs/bdoi/index.ts"] }
   },
   "include": ["src"]
 }

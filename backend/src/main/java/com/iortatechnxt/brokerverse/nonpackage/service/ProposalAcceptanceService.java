@@ -216,7 +216,7 @@ public class ProposalAcceptanceService {
         false,
         1,
         p.getCurrency(),
-        PaymentArrangement.VIA_BDOI,
+        PaymentArrangement.VIA_BROKER,
         Mortgage.NONE,
         null,
         rated,

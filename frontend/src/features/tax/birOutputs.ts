@@ -61,7 +61,7 @@ export const BIR_OUTPUT_GROUPS: readonly { title: string; outputs: readonly BirO
       {
         code: 'TAX-SAWT',
         title: 'Summary Alphalist of Withholding Taxes (SAWT)',
-        text: 'Taxes withheld from BDOI per agent, from the certificates received.',
+        text: 'Taxes withheld from the company per agent, from the certificates received.',
         period: 'QUARTER',
       },
     ],

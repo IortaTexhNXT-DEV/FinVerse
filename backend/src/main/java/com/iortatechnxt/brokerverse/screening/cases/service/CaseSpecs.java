@@ -8,7 +8,6 @@ import com.iortatechnxt.brokerverse.screening.cases.service.CaseSla.SlaState;
 import jakarta.persistence.criteria.Predicate;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -20,9 +19,6 @@ import org.springframework.data.jpa.domain.Specification;
  * the tab, the search text and the filters. Dates are Philippine calendar days.
  */
 final class CaseSpecs {
-
-  /** Philippine time, the business calendar of the case list. */
-  static final ZoneId MANILA = BusinessClock.zone();
 
   private static final String STAGE = "stage";
   private static final String STATUS = "status";
@@ -140,7 +136,7 @@ final class CaseSpecs {
    * @return criteria
    */
   static Specification<ScreeningCase> createdFrom(LocalDate day) {
-    Instant start = day.atStartOfDay(MANILA).toInstant();
+    Instant start = day.atStartOfDay(BusinessClock.zone()).toInstant();
     return (root, query, cb) -> cb.greaterThanOrEqualTo(root.get(CREATED_AT), start);
   }
 
@@ -151,7 +147,7 @@ final class CaseSpecs {
    * @return criteria
    */
   static Specification<ScreeningCase> createdTo(LocalDate day) {
-    Instant end = day.plusDays(1).atStartOfDay(MANILA).toInstant();
+    Instant end = day.plusDays(1).atStartOfDay(BusinessClock.zone()).toInstant();
     return (root, query, cb) -> cb.lessThan(root.get(CREATED_AT), end);
   }
 

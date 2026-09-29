@@ -8,13 +8,22 @@ import com.iortatechnxt.brokerverse.security.api.dto.PasswordResetConfirmRequest
 import com.iortatechnxt.brokerverse.security.api.dto.PasswordResetLinkRequest;
 import com.iortatechnxt.brokerverse.security.api.dto.PasswordStatusResponse;
 import com.iortatechnxt.brokerverse.security.api.dto.ProfileUpdateRequest;
+import com.iortatechnxt.brokerverse.security.api.dto.RefreshResponse;
 import com.iortatechnxt.brokerverse.security.api.dto.SessionResponse;
+import com.iortatechnxt.brokerverse.security.api.dto.SignInOptionsResponse;
 import com.iortatechnxt.brokerverse.security.api.dto.UserProfileResponse;
 import com.iortatechnxt.brokerverse.security.domain.SessionEndReason;
+import com.iortatechnxt.brokerverse.security.service.AuthPasswordPolicy;
 import com.iortatechnxt.brokerverse.security.service.AuthPasswordService;
 import com.iortatechnxt.brokerverse.security.service.AuthProfileService;
 import com.iortatechnxt.brokerverse.security.service.AuthService;
 import com.iortatechnxt.brokerverse.security.service.AuthSessionService;
+import com.iortatechnxt.brokerverse.security.service.SignInResult;
+import com.iortatechnxt.brokerverse.security.service.SignInSessions;
+import com.iortatechnxt.brokerverse.security.service.directory.AuthMode;
+import com.iortatechnxt.brokerverse.security.service.sso.SsoProperties;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.time.Clock;
 import java.time.Instant;
@@ -22,6 +31,7 @@ import java.util.Map;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -33,9 +43,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Authentication endpoints (FR-UA-001 to 005): login, logout, the current profile and its contact
+ * Authentication endpoints (FR-UA-001 to 005): the sign-in options, login, the renewal of the
+ * access token (refresh token in an HttpOnly cookie), logout, the current profile and its contact
  * details, the own password change and password status, the own sessions, and the anonymous "Forgot
- * password?" flow ({@code /password-reset/**}).
+ * password?" flow ({@code /password-reset/**}). The second factor is in {@link MfaController}, the
+ * single sign-on in {@link SsoController}.
  */
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -50,6 +62,10 @@ public class AuthController {
   private final AuthProfileService profiles;
   private final AuthSessionService sessions;
   private final Clock clock;
+  private final SignInSessions signInSessions;
+  private final RefreshCookies cookies;
+  private final AuthPasswordPolicy passwordPolicy;
+  private final SsoProperties sso;
 
   /**
    * Creates the controller.
@@ -59,44 +75,121 @@ public class AuthController {
    * @param profiles own profile
    * @param sessions session list
    * @param clock clock
+   * @param signInSessions token model (refresh)
+   * @param cookies refresh token cookie
+   * @param passwordPolicy sign-in mode
+   * @param sso single sign-on settings
    */
+  @SuppressWarnings("java:S107") // endpoints of the sign-in
   public AuthController(
       AuthService authService,
       AuthPasswordService passwords,
       AuthProfileService profiles,
       AuthSessionService sessions,
-      Clock clock) {
+      Clock clock,
+      SignInSessions signInSessions,
+      RefreshCookies cookies,
+      AuthPasswordPolicy passwordPolicy,
+      SsoProperties sso) {
     this.authService = authService;
     this.passwords = passwords;
     this.profiles = profiles;
     this.sessions = sessions;
     this.clock = clock;
+    this.signInSessions = signInSessions;
+    this.cookies = cookies;
+    this.passwordPolicy = passwordPolicy;
+    this.sso = sso;
   }
 
   /**
-   * Logs in.
+   * How users sign in on this deployment (anonymous).
+   *
+   * @return sign-in options
+   */
+  @GetMapping("/sign-in-options")
+  @PreAuthorize(ANYONE)
+  public SignInOptionsResponse signInOptions() {
+    AuthMode mode = passwordPolicy.mode();
+    return new SignInOptionsResponse(
+        mode.name(),
+        mode.singleSignOn(),
+        mode.singleSignOn() ? sso.label() : null,
+        !mode.singleSignOn(),
+        mode == AuthMode.LOCAL);
+  }
+
+  /**
+   * Logs in with a password: opens the session (the refresh token in an HttpOnly cookie) or asks
+   * for the second factor.
    *
    * @param request credentials
-   * @return token, profile and whether the password must be changed first
+   * @param http request
+   * @param response response (the cookie)
+   * @return token and profile, or the second factor asked for
    */
   @PostMapping("/login")
   @PreAuthorize(ANYONE)
-  public LoginResponse login(@Valid @RequestBody LoginRequest request) {
-    return authService.login(request.username(), request.password());
+  public LoginResponse login(
+      @Valid @RequestBody LoginRequest request,
+      HttpServletRequest http,
+      HttpServletResponse response) {
+    SignInResult result =
+        authService.login(request.username(), request.password(), request.deviceToken());
+    cookies.write(result, http, response);
+    return result.response();
   }
 
   /**
-   * Logs out: revokes the caller's token on every instance, ends its session and audits the logout.
+   * Renews the access token with the refresh token cookie (sliding session). The request must carry
+   * the header {@code X-Requested-With}; the refresh token is replaced on each renewal.
+   *
+   * @param requestedWith header set by the web client
+   * @param http request (the cookie)
+   * @param response response (the new cookie)
+   * @return the new access token
+   */
+  @PostMapping("/refresh")
+  @PreAuthorize(ANYONE)
+  public RefreshResponse refresh(
+      @RequestHeader(name = RefreshCookies.REQUEST_HEADER, required = false) String requestedWith,
+      HttpServletRequest http,
+      HttpServletResponse response) {
+    if (requestedWith == null || requestedWith.isBlank()) {
+      throw new BadCredentialsException(SignInSessions.SESSION_OVER);
+    }
+    SignInSessions.Tokens tokens;
+    try {
+      tokens = signInSessions.refresh(RefreshCookies.read(http).orElse(null));
+    } catch (BadCredentialsException ex) {
+      cookies.clear(http, response);
+      throw ex;
+    }
+    if (tokens.refreshToken() != null) {
+      cookies.write(tokens.refreshToken(), tokens.sessionExpiresAt(), http, response);
+    }
+    return new RefreshResponse(
+        tokens.accessToken(), tokens.accessExpiresAt(), tokens.sessionExpiresAt());
+  }
+
+  /**
+   * Logs out: revokes the caller's token on every instance, ends its session (the refresh token
+   * stops working), removes the cookie and audits the logout.
    *
    * @param authorization the {@code Authorization: Bearer} header of the caller
-   * @param reason LOGOUT (default), IDLE_TIMEOUT (inactivity sign-out) or EXPIRED (end of token)
+   * @param reason LOGOUT (default), IDLE_TIMEOUT (inactivity sign-out) or EXPIRED (end of session)
+   * @param http request
+   * @param response response (the cookie is removed)
    */
   @PostMapping("/logout")
   @PreAuthorize(SIGNED_IN)
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void logout(
       @RequestHeader(HttpHeaders.AUTHORIZATION) String authorization,
-      @RequestParam(required = false) String reason) {
+      @RequestParam(required = false) String reason,
+      HttpServletRequest http,
+      HttpServletResponse response) {
+    cookies.clear(http, response);
     authService.logout(
         authorization.startsWith(BEARER) ? authorization.substring(BEARER.length()) : authorization,
         endReason(reason));
@@ -177,16 +270,17 @@ public class AuthController {
   }
 
   /**
-   * Checks a reset link before the new password is entered.
+   * Checks a reset link before the new password is entered. The answer carries the expiry only,
+   * never the user name, so a link found by someone else does not reveal whose it is.
    *
    * @param request token of the link
-   * @return user and expiry of the link
+   * @return expiry of the link
    */
   @PostMapping("/password-reset/check")
   @PreAuthorize(ANYONE)
   public Map<String, Object> checkReset(@Valid @RequestBody PasswordResetLinkRequest request) {
     AuthPasswordService.LinkStatus link = passwords.checkLink(request.token());
-    return Map.of("username", link.username(), "expiresAt", link.expiresAt());
+    return Map.of("expiresAt", link.expiresAt());
   }
 
   /**

@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -62,7 +63,7 @@ public class ProposalRequest extends BaseEntity {
   private String lineCode;
 
   @Column(nullable = false, length = 3)
-  private String currency = "PHP";
+  private String currency;
 
   @Column(name = "market_segment", length = 40)
   private String marketSegment;
@@ -196,7 +197,7 @@ public class ProposalRequest extends BaseEntity {
     this.clientEmail = client.email();
     this.marketSegment = segment;
     this.sourceChannel = channel;
-    this.currency = currencyCode == null ? "PHP" : currencyCode;
+    this.currency = Objects.requireNonNull(currencyCode, "currencyCode");
   }
 
   /**

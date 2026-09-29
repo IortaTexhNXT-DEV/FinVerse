@@ -94,6 +94,16 @@ public class MigrationHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The Submitted Policies team, from its Excel masterlists";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Submitted Policies > Upload & Intake, button Migrate Masterlist (choose the layout)";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     List<BulkColumn> c = new ArrayList<>();
     c.add(
@@ -101,7 +111,8 @@ public class MigrationHandler implements BulkImportHandler {
             LEGACY_REF, "Reference of the policy in the Excel masterlist", "NBM-2025-0457"));
     c.add(
         BulkColumn.required(
-            LEGACY_STATUS, "Submission status in the Excel masterlist", "For Renewal"));
+                LEGACY_STATUS, "Submission status in the Excel masterlist", "For Renewal")
+            .allowed("A status of the legacy status map (Submitted Policies Setup)"));
     c.add(
         new BulkColumn(
             DATE_RECEIVED, "Date the policy was received", true, Type.DATE, "2025-06-15"));

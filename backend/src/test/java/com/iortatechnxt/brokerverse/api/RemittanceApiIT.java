@@ -242,6 +242,35 @@ class RemittanceApiIT {
                 + BusinessClock.today(Clock.systemUTC()).plusDays(3)
                 + "\n")
         .andExpect(jsonPath("$.failed").value(1));
+    // The guided Excel template, filled in below its example row, is uploaded as it is.
+    byte[] template =
+        api.doGet("mktcoll", BASE + "/templates/holds")
+            .andExpect(status().isOk())
+            .andReturn()
+            .getResponse()
+            .getContentAsByteArray();
+    byte[] filled;
+    try (var wb =
+            new org.apache.poi.xssf.usermodel.XSSFWorkbook(
+                new java.io.ByteArrayInputStream(template));
+        var out = new java.io.ByteArrayOutputStream()) {
+      var sheet = wb.getSheet("Holds");
+      var row = sheet.createRow(sheet.getLastRowNum() + 1);
+      row.createCell(1).setCellValue("NO-SUCH");
+      row.createCell(2).setCellValue("OTHERS");
+      row.createCell(3).setCellValue(BusinessClock.today(Clock.systemUTC()).plusDays(3));
+      wb.write(out);
+      filled = out.toByteArray();
+    }
+    mvc.perform(
+            multipart(BASE + "/holds/upload")
+                .file(
+                    new MockMultipartFile("file", "holds.xlsx", "application/octet-stream", filled))
+                .with(user(users.loadUserByUsername("mktcoll")))
+                .with(csrf()))
+        .andExpect(jsonPath("$.failed").value(1));
+    api.doGet("mktcoll", BASE + "/templates/special").andExpect(status().isOk());
+    api.doGet("mktcoll", BASE + "/templates/insurer-or").andExpect(status().isForbidden());
   }
 
   @Test

@@ -109,6 +109,27 @@ public class OrganizationService {
   }
 
   /**
+   * The code that stands for the head office of a company in files exchanged with the client and
+   * for records without a branch: the head-office code of the client profile, else the code of the
+   * head-office branch.
+   *
+   * @param companyId company
+   * @return code, null when the company has neither
+   */
+  @Transactional(readOnly = true)
+  public String headOfficeCode(Long companyId) {
+    String code = getCompany(companyId).getHeadOfficeCode();
+    if (code != null) {
+      return code;
+    }
+    return branches.findByCompanyIdOrderByCode(companyId).stream()
+        .filter(Branch::isHeadOffice)
+        .map(Branch::getCode)
+        .findFirst()
+        .orElse(null);
+  }
+
+  /**
    * Creates a company (pending authorization).
    *
    * @param request request
@@ -316,6 +337,14 @@ public class OrganizationService {
     company.setBackValueDays(request.backValueDays());
     company.setForwardValueDays(request.forwardValueDays());
     company.setRetainedEarningsAccount(request.retainedEarningsAccount());
+    CompanyRequest.ClientProfileRequest profile = request.profile();
+    if (profile != null) {
+      company.setShortName(profile.shortName());
+      company.setGroupName(profile.groupName());
+      company.setLogoRef(profile.logoRef());
+      company.setHeadOfficeCode(profile.headOfficeCode());
+      company.setDefaultBankCode(profile.defaultBankCode());
+    }
   }
 
   private static void applyBranch(Branch branch, BranchRequest request) {

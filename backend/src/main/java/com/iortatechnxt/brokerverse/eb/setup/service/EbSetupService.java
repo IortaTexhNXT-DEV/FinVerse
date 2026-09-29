@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.eb.domain.EbRequiredDocumentRepository;
 import com.iortatechnxt.brokerverse.eb.domain.EbThresholdRule;
 import com.iortatechnxt.brokerverse.eb.domain.EbThresholdRuleRepository;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -32,14 +33,13 @@ import org.springframework.transaction.annotation.Transactional;
     "PMD.GodClass") // the two EB set-up masters, each with the same maker-checker steps
 public class EbSetupService {
 
-  private static final String DEFAULT_CURRENCY = "PHP";
-
   private final EbThresholdRuleRepository rules;
   private final EbRequiredDocumentRepository required;
   private final LovService lovs;
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -50,6 +50,7 @@ public class EbSetupService {
    * @param audit audit trail
    * @param currentUser current user (checker)
    * @param clock clock
+   * @param organization company master (base currency)
    */
   public EbSetupService(
       EbThresholdRuleRepository rules,
@@ -57,13 +58,15 @@ public class EbSetupService {
       LovService lovs,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      OrganizationDirectory organization) {
     this.rules = rules;
     this.required = required;
     this.lovs = lovs;
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.organization = organization;
   }
 
   /**
@@ -85,7 +88,7 @@ public class EbSetupService {
    * @return rule
    */
   public EbThresholdRule createRule(Long companyId, EbThresholdRule.Data data) {
-    EbThresholdRule rule = rules.save(new EbThresholdRule(companyId, check(data)));
+    EbThresholdRule rule = rules.save(new EbThresholdRule(companyId, check(companyId, data)));
     audit.record(EbCodes.ENTITY_THRESHOLD_RULE, rule.getId(), AuditAction.CREATE, describe(rule));
     return rule;
   }
@@ -100,7 +103,7 @@ public class EbSetupService {
    */
   public EbThresholdRule updateRule(Long companyId, Long id, EbThresholdRule.Data data) {
     EbThresholdRule rule = rule(companyId, id);
-    rule.update(check(data));
+    rule.update(check(companyId, data));
     audit.record(EbCodes.ENTITY_THRESHOLD_RULE, id, AuditAction.UPDATE, describe(rule));
     return rule;
   }
@@ -133,7 +136,7 @@ public class EbSetupService {
     return rule;
   }
 
-  private EbThresholdRule.Data check(EbThresholdRule.Data data) {
+  private EbThresholdRule.Data check(Long companyId, EbThresholdRule.Data data) {
     checkValues(data);
     String line = blankToNull(data.benefitLine());
     if (line != null) {
@@ -143,7 +146,9 @@ public class EbSetupService {
         line,
         data.measure(),
         data.amount(),
-        blankToNull(data.currency()) == null ? DEFAULT_CURRENCY : data.currency().strip(),
+        blankToNull(data.currency()) == null
+            ? organization.company(companyId).baseCurrency()
+            : data.currency().strip(),
         approver(data.approverPermission()),
         Math.max(1, data.approvalLevel()),
         data.effectiveFrom(),

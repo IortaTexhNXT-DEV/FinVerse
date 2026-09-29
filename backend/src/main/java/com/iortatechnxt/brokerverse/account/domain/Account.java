@@ -104,7 +104,7 @@ public class Account extends BaseEntity {
 
   @Enumerated(EnumType.STRING)
   @Column(name = "payment_arrangement", nullable = false, length = 20)
-  private PaymentArrangement paymentArrangement = PaymentArrangement.VIA_BDOI;
+  private PaymentArrangement paymentArrangement = PaymentArrangement.VIA_BROKER;
 
   @Column(name = "direct_payment_tagged_by", length = 50)
   private String directPaymentTaggedBy;
@@ -217,7 +217,7 @@ public class Account extends BaseEntity {
     this.periodTo = data.periodTo();
     this.multiYear = data.multiYear();
     this.termYears = data.multiYear() ? data.termYears() : 1;
-    this.currency = data.currency() == null ? "PHP" : data.currency();
+    this.currency = Objects.requireNonNull(data.currency(), "currency");
     applyMortgage(data.mortgage() == null ? Mortgage.NONE : data.mortgage());
     this.contact = data.contact() == null ? AccountContact.NONE : data.contact();
     applyItems(data);
@@ -302,7 +302,7 @@ public class Account extends BaseEntity {
    * @param when time
    */
   public void setPaymentArrangement(PaymentArrangement arrangement, String user, Instant when) {
-    PaymentArrangement value = Objects.requireNonNullElse(arrangement, PaymentArrangement.VIA_BDOI);
+    var value = Objects.requireNonNullElse(arrangement, PaymentArrangement.VIA_BROKER);
     if (value != paymentArrangement) {
       this.directPaymentTaggedBy = value == PaymentArrangement.DIRECT_TO_INSURER ? user : null;
       this.directPaymentTaggedAt = value == PaymentArrangement.DIRECT_TO_INSURER ? when : null;

@@ -8,7 +8,7 @@ export type Funding = 'EMPLOYER' | 'VOLUNTARY';
 export type ContactRole = 'HR_HEAD' | 'HR_OFFICER' | 'FINANCE';
 export type FeedbackChannel = 'AO' | 'EMAIL' | 'PHONE' | 'MEETING' | 'LETTER';
 export type DocumentSource = 'AO' | 'PROCESSING' | 'CLIENT' | 'INSURER' | 'SYSTEM';
-export type Responsible = 'INSURER' | 'CLIENT' | 'BDOI';
+export type Responsible = 'INSURER' | 'CLIENT' | 'BROKER';
 export type ItemAction = 'RECEIVE' | 'RELEASE' | 'CLOSE';
 
 export interface CycleRef {

@@ -44,7 +44,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class PrDispositionService implements InboxDispositions {
 
   static final String BULK_PERMISSION = "CLX_BULK_UPDATE";
-  private static final String HEAD_OFFICE = "HO";
 
   private final CollectionItems items;
   private final PrDispositionRepository dispositions;
@@ -175,7 +174,7 @@ public class PrDispositionService implements InboxDispositions {
                 details.remarks(),
                 handOff,
                 support.username(),
-                branchCode(item.getClassification().branchId())))
+                branchCode(item.getCompanyId(), item.getClassification().branchId())))
         .ifPresent(
             q -> {
               OutboxItem queued =
@@ -222,12 +221,13 @@ public class PrDispositionService implements InboxDispositions {
     }
   }
 
-  private String branchCode(Long branchId) {
+  /** Branch of the hand-off: the head-office code of the client profile for the head office. */
+  private String branchCode(Long companyId, Long branchId) {
     if (branchId == null) {
-      return HEAD_OFFICE;
+      return organization.headOfficeCode(companyId);
     }
     Branch branch = organization.getBranch(branchId);
-    return branch.isHeadOffice() ? HEAD_OFFICE : branch.getCode();
+    return branch.isHeadOffice() ? organization.headOfficeCode(companyId) : branch.getCode();
   }
 
   /**

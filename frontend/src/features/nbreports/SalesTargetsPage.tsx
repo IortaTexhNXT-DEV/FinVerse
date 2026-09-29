@@ -15,11 +15,13 @@ import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { useCompanyId } from '@/context/workspaceContext';
+import { useCompanyId, useBaseCurrency } from '@/context/workspaceContext';
 import { formatAmount, humanize, today } from '@/utils/format';
 import { emptyTarget, formOf, monthRange, targetErrors, toTarget } from './targetForm';
 import type { TargetForm } from './targetForm';
 import { DateInput } from '@/components/ui/DateInput';
+import { InBaseCurrency } from '@/components/ui/InBaseCurrency';
+import { inCurrency } from '@/utils/currencyLabel';
 
 const COLUMNS: Column<SalesTarget>[] = [
   { key: 'unit', header: 'Unit', render: (t) => t.unitCode },
@@ -32,13 +34,13 @@ const COLUMNS: Column<SalesTarget>[] = [
   { key: 'count', header: 'Bookings', numeric: true, render: (t) => t.targetCount },
   {
     key: 'premium',
-    header: 'Premium (PHP)',
+    header: <InBaseCurrency label="Premium" />,
     numeric: true,
     render: (t) => formatAmount(t.targetPremium),
   },
   {
     key: 'commission',
-    header: 'Commission (PHP)',
+    header: <InBaseCurrency label="Commission" />,
     numeric: true,
     render: (t) => formatAmount(t.targetCommission),
   },
@@ -49,8 +51,8 @@ const AMOUNT_FIELDS: {
   label: string;
 }[] = [
   { key: 'targetCount', label: 'Target Bookings' },
-  { key: 'targetPremium', label: 'Target Premium (PHP)' },
-  { key: 'targetCommission', label: 'Target Commission (PHP)' },
+  { key: 'targetPremium', label: 'Target Premium' },
+  { key: 'targetCommission', label: 'Target Commission' },
 ];
 
 function TargetDialog({
@@ -58,6 +60,7 @@ function TargetDialog({
   onClose,
 }: Readonly<{ initial: TargetForm; onClose: () => void }>) {
   const companyId = useCompanyId();
+  const baseCurrency = useBaseCurrency();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [form, setForm] = useState(initial);
@@ -128,7 +131,12 @@ function TargetDialog({
             )}
           </Field>
           {AMOUNT_FIELDS.map((f) => (
-            <Field key={f.key} label={f.label} required error={shown(f.key)}>
+            <Field
+              key={f.key}
+              label={f.key === 'targetCount' ? f.label : inCurrency(f.label, baseCurrency)}
+              required
+              error={shown(f.key)}
+            >
               {(id) => (
                 <input
                   id={id}

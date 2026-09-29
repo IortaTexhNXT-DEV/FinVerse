@@ -7,12 +7,13 @@ import type {
   ReconSide,
   ScheduleInput,
 } from './prodreconApi';
+import { clientShortName } from '@/context/clientNames';
 
 /** One compared field of the side-by-side view. */
 export interface SideRow {
   key: keyof ReconSide;
   label: string;
-  bdoi: string;
+  broker: string;
   insurer: string;
   /** The two sides disagree (flagged by the matcher or visibly different). */
   differs: boolean;
@@ -59,18 +60,20 @@ export function differenceLabels(discrepancies: readonly string[]): string {
  * flagged. A field the matcher did not compare is flagged only when both sides have a value that
  * differs.
  */
-export function sideBySide(item: Pick<ReconItem, 'bdoi' | 'insurer' | 'discrepancies'>): SideRow[] {
+export function sideBySide(
+  item: Pick<ReconItem, 'broker' | 'insurer' | 'discrepancies'>,
+): SideRow[] {
   const flagged = new Set(item.discrepancies.map((d) => d.split(/[\s:]/)[0]?.toUpperCase()));
   return FIELDS.map(({ key, label, flag }) => {
-    const bdoi = text(item.bdoi?.[key]);
+    const broker = text(item.broker?.[key]);
     const insurer = text(item.insurer?.[key]);
-    const bothGiven = bdoi !== '' && insurer !== '';
+    const bothGiven = broker !== '' && insurer !== '';
     return {
       key,
       label,
-      bdoi,
+      broker,
       insurer,
-      differs: flagged.has(flag) || (bothGiven && bdoi.toUpperCase() !== insurer.toUpperCase()),
+      differs: flagged.has(flag) || (bothGiven && broker.toUpperCase() !== insurer.toUpperCase()),
     };
   });
 }
@@ -81,7 +84,7 @@ export function bucketTabs(counts: BucketCounts): { id: Bucket; label: string }[
     { id: 'ALL', label: `All (${String(counts.total)})` },
     { id: 'MATCHED', label: `Matched (${String(counts.matched)})` },
     { id: 'DISCREPANCY', label: `With Discrepancy (${String(counts.discrepancy)})` },
-    { id: 'BDOI_ONLY', label: `BDOI Only (${String(counts.bdoiOnly)})` },
+    { id: 'BROKER_ONLY', label: `${clientShortName()} Only (${String(counts.brokerOnly)})` },
     { id: 'INSURER_ONLY', label: `Insurer Only (${String(counts.insurerOnly)})` },
   ];
 }
@@ -138,7 +141,7 @@ export function validAddresses(value: string): boolean {
 
 /** Whether an item may be paired with an insurer-only row (manual matching, PRCID.014). */
 export function mayPair(item: Pick<ReconItem, 'status'>): boolean {
-  return item.status === 'BDOI_ONLY';
+  return item.status === 'BROKER_ONLY';
 }
 
 /** Whether an item may be split back into its two sides (a wrong pairing). */

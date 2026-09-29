@@ -403,7 +403,7 @@ class CommissionIT {
                     "TT" + BookingFixtures.token(),
                     terms(
                         Calculation.TARGET_TIERED,
-                        Beneficiary.BDOI,
+                        Beneficiary.BROKER,
                         insurer,
                         List.of(
                             new IncentiveTier(BigDecimal.ONE, BigDecimal.ONE, null, null, null),
@@ -460,7 +460,7 @@ class CommissionIT {
                             fixed.getId(),
                             terms(
                                 Calculation.TARGET_TIERED,
-                                Beneficiary.BDOI,
+                                Beneficiary.BROKER,
                                 insurer,
                                 List.of(
                                     new IncentiveTier(

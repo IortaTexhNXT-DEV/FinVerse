@@ -1,6 +1,6 @@
 package com.iortatechnxt.brokerverse.migration.report;
 
-import static com.iortatechnxt.brokerverse.migration.report.MigReport.PHT;
+import static com.iortatechnxt.brokerverse.migration.report.MigReport.LOCAL_TIME;
 
 import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.nbreport.service.NbReportJdbc;
@@ -93,9 +93,9 @@ public class CutoverReports {
                 + " case when c.measure = 'MANUAL' then 'Recorded' else 'Measured' end as kind,"
                 + " c.measured_value, case when c.met then 'Met' when not c.met then 'Not met'"
                 + " else 'Open' end as result, c.manual_note, c.measured_by, to_char(c.measured_at"
-                + PHT
+                + LOCAL_TIME
                 + " as measured_at, d.decision, d.decided_by, to_char(d.decided_at"
-                + PHT
+                + LOCAL_TIME
                 + " as decided_at, d.comment"
                 + " from mig_cutover_plan p join mig_gonogo_criterion c on c.plan_id = p.id"
                 + " left join mig_gonogo_decision d on d.id = (select max(x.id)"
@@ -220,14 +220,14 @@ public class CutoverReports {
                 + " address, criteria, records and reason")
         .sql(
             "select to_char(a.accessed_at"
-                + PHT
+                + LOCAL_TIME
                 + " as accessed_at, a.username, a.source_address, a.action, a.criteria,"
                 + " a.record_keys, a.result_count, a.reason_code, a.reason_text"
                 + " from mig_access_log a where a.company_id = :company"
                 + " and (cast(:from as date) is null"
-                + " or a.accessed_at >= cast(:from as date) at time zone 'Asia/Manila')"
+                + " or a.accessed_at >= cast(:from as date) at time zone cast(:zone as text))"
                 + " and (cast(:to as date) is null"
-                + " or a.accessed_at < (cast(:to as date) + 1) at time zone 'Asia/Manila')"
+                + " or a.accessed_at < (cast(:to as date) + 1) at time zone cast(:zone as text))"
                 + " order by a.accessed_at desc, a.id desc")
         .parameter(ParameterSpec.optional(FROM, "Accessed from", ParameterType.DATE))
         .parameter(ParameterSpec.optional(TO, "Accessed to", ParameterType.DATE))

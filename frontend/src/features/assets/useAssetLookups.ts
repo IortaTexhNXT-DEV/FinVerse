@@ -33,7 +33,7 @@ export function useAssetLookups() {
   const activeParties = (parties.data ?? []).filter((p) => p.recordStatus === 'ACTIVE');
   return {
     companyId,
-    baseCurrency: company?.baseCurrency ?? 'PHP',
+    baseCurrency: company?.baseCurrency ?? '',
     branches,
     branchName: (id: number | undefined) => branches.find((b) => b.id === id)?.code ?? '',
     categories: categories.data ?? [],

@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfileRepository;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.party.api.dto.PartyRequest;
 import com.iortatechnxt.brokerverse.party.domain.Party;
 import com.iortatechnxt.brokerverse.party.domain.PartyRepository;
@@ -30,13 +31,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class InsurerService {
 
-  private static final String BASE_CURRENCY = "PHP";
-
   private final InsurerProfileRepository insurers;
   private final InsurerBranchRepository branches;
   private final PartyService parties;
   private final PartyRepository partyRepository;
   private final AuditTrailService audit;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -46,18 +46,21 @@ public class InsurerService {
    * @param parties party service
    * @param partyRepository party lookups
    * @param audit audit trail
+   * @param organization company master (base currency)
    */
   public InsurerService(
       InsurerProfileRepository insurers,
       InsurerBranchRepository branches,
       PartyService parties,
       PartyRepository partyRepository,
-      AuditTrailService audit) {
+      AuditTrailService audit,
+      OrganizationDirectory organization) {
     this.insurers = insurers;
     this.branches = branches;
     this.parties = parties;
     this.partyRepository = partyRepository;
     this.audit = audit;
+    this.organization = organization;
   }
 
   /**
@@ -129,7 +132,7 @@ public class InsurerService {
               contact.address(),
               contact.email(),
               contact.phone(),
-              BASE_CURRENCY,
+              organization.company(companyId).baseCurrency(),
               details.defaultCreditDays(),
               null,
               null,

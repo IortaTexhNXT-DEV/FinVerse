@@ -4,7 +4,6 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 public class NbReportJdbc {
-
-  /** Business time zone of BDOI (dates of timestamps). */
-  public static final ZoneId MANILA = BusinessClock.zone();
 
   private final NamedParameterJdbcTemplate jdbc;
 
@@ -75,7 +71,7 @@ public class NbReportJdbc {
   private static Object value(Object v) {
     return switch (v) {
       case Date d -> d.toLocalDate();
-      case Timestamp t -> t.toInstant().atZone(MANILA).toLocalDate();
+      case Timestamp t -> t.toInstant().atZone(BusinessClock.zone()).toLocalDate();
       case null, default -> v;
     };
   }

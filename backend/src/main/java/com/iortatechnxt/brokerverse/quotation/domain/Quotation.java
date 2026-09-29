@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -80,7 +81,7 @@ public class Quotation extends BaseEntity {
   private LocalDate validUntil;
 
   @Column(nullable = false, length = 3)
-  private String currency = "PHP";
+  private String currency;
 
   @Column(name = "direct_payment", nullable = false)
   private boolean directPayment;
@@ -175,7 +176,7 @@ public class Quotation extends BaseEntity {
     q.productCode = header.productCode();
     q.lineCode = header.lineCode();
     q.templateVersion = header.templateVersion();
-    q.currency = header.currency() == null ? "PHP" : header.currency();
+    q.currency = Objects.requireNonNull(header.currency(), "currency");
     q.describe(header.client(), header.marketSegment(), header.sourceChannel());
     return q;
   }

@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
@@ -35,6 +36,7 @@ public class AccountRules {
   private final InsurerService insurers;
   private final LovService lovs;
   private final Clock clock;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the rules.
@@ -44,18 +46,21 @@ public class AccountRules {
    * @param insurers insurers
    * @param lovs lists of values
    * @param clock clock
+   * @param organization company master (base currency)
    */
   public AccountRules(
       ClientService clients,
       ProductCatalogService catalog,
       InsurerService insurers,
       LovService lovs,
-      Clock clock) {
+      Clock clock,
+      OrganizationDirectory organization) {
     this.clients = clients;
     this.catalog = catalog;
     this.insurers = insurers;
     this.lovs = lovs;
     this.clock = clock;
+    this.organization = organization;
   }
 
   /**
@@ -119,7 +124,10 @@ public class AccountRules {
             product.getLineCode(),
             product.getCoverTypeCode(),
             line.getRiskItemKind());
-    return new Resolved(AccountTerms.dataOf(draft, client, ref, contact), product);
+    return new Resolved(
+        AccountTerms.dataOf(
+            draft, client, ref, contact, organization.company(companyId).baseCurrency()),
+        product);
   }
 
   private void checkInsurer(Long companyId, AccountDraft draft) {

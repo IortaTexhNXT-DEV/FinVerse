@@ -15,6 +15,10 @@ spec:
     rollingUpdate: { maxUnavailable: 0, maxSurge: 1 }
   template:
     metadata:
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "9090"
+        prometheus.io/path: /actuator/prometheus
       labels: { app.kubernetes.io/name: bibs-web, app.kubernetes.io/component: backend, bibs/tier: backend }
     spec:
       serviceAccountName: bibs-web
@@ -37,25 +41,26 @@ spec:
       containers:
         - name: backend
           image: bibs-backend
-          ports: [{ name: https, containerPort: 8443 }]
+          # management: health and Prometheus metrics, reachable from the monitoring namespace only.
+          ports: [{ name: https, containerPort: 8443 }, { name: management, containerPort: 9090 }]
           env:
             - { name: BROKERVERSE_RUNTIME_ROLE, value: web }
           envFrom:
             - configMapRef: { name: bibs-backend-config }
             - secretRef: { name: bibs-backend-secrets }
           resources:
-            requests: { cpu: "1", memory: "2Gi" }
-            limits: { cpu: "2", memory: "3Gi" }
+            requests: { cpu: "1", memory: "2Gi", ephemeral-storage: "256Mi" }
+            limits: { cpu: "2", memory: "3Gi", ephemeral-storage: "2Gi" }
           startupProbe:
-            httpGet: { path: /actuator/health/liveness, port: https, scheme: HTTPS }
+            httpGet: { path: /livez, port: https, scheme: HTTPS }
             periodSeconds: 10
             failureThreshold: 30
           readinessProbe:
-            httpGet: { path: /actuator/health/readiness, port: https, scheme: HTTPS }
+            httpGet: { path: /readyz, port: https, scheme: HTTPS }
             periodSeconds: 10
             failureThreshold: 3
           livenessProbe:
-            httpGet: { path: /actuator/health/liveness, port: https, scheme: HTTPS }
+            httpGet: { path: /livez, port: https, scheme: HTTPS }
             periodSeconds: 20
             failureThreshold: 3
           lifecycle:
@@ -83,7 +88,7 @@ metadata:
   name: bibs-web
   labels: { app.kubernetes.io/name: bibs-web }
   annotations:
-    alb.ingress.kubernetes.io/healthcheck-path: /actuator/health/readiness
+    alb.ingress.kubernetes.io/healthcheck-path: /readyz
 spec:
   selector: { app.kubernetes.io/name: bibs-web }
   ports: [{ name: https, port: 8443, targetPort: https }]

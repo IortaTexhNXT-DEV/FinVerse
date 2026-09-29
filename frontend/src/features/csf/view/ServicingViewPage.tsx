@@ -25,6 +25,7 @@ import { AdvicesTab, DocumentsTab } from './DocumentsTab';
 import { EpoliciesTab } from './EpoliciesTab';
 import { HistoryTab } from './HistoryTab';
 import { PaymentsTab } from './PaymentsTab';
+import { groupLabel } from '@/context/clientNames';
 
 const TABS = [
   { id: 'accounts', label: 'Accounts' },
@@ -150,7 +151,7 @@ export default function ServicingViewPage() {
             statuses={[{ label: 'KYC', status: s.kycStatus }]}
             flags={
               <>
-                {s.bankClient && <Tag>BDO Client</Tag>}
+                {s.bankClient && <Tag>{groupLabel('Client')}</Tag>}
                 {s.banner.tags.map((t) => (
                   <Tag key={t.code}>{t.label}</Tag>
                 ))}

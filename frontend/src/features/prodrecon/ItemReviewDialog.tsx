@@ -8,6 +8,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import type { ReconFeedback, ReconItem } from './prodreconApi';
 import { differenceLabels, sideBySide } from './prodreconLogic';
 import './prodrecon.css';
+import { clientShortName } from '@/context/clientNames';
 
 const EMPTY: ReconFeedback = {
   companyConcerned: '',
@@ -18,15 +19,15 @@ const EMPTY: ReconFeedback = {
   forClosure: false,
 };
 
-/** The BDOI and insurer values of an item, differences highlighted (PRCID.013). */
+/** The broker and insurer values of an item, differences highlighted (PRCID.013). */
 export function SideBySide({ item }: Readonly<{ item: ReconItem }>) {
   return (
     <table className="table prc-diff">
-      <caption className="visually-hidden">BDOI and insurer values</caption>
+      <caption className="visually-hidden">{clientShortName()} and insurer values</caption>
       <thead>
         <tr>
           <th scope="col">Field</th>
-          <th scope="col">BDOI</th>
+          <th scope="col">{clientShortName()}</th>
           <th scope="col">Insurer</th>
         </tr>
       </thead>
@@ -34,7 +35,7 @@ export function SideBySide({ item }: Readonly<{ item: ReconItem }>) {
         {sideBySide(item).map((row) => (
           <tr key={row.key} className={row.differs ? 'prc-diff-row' : undefined}>
             <th scope="row">{row.label}</th>
-            <td>{row.bdoi || '—'}</td>
+            <td>{row.broker || '—'}</td>
             <td>{row.insurer || '—'}</td>
           </tr>
         ))}

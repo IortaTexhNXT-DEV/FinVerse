@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { OriginFilter } from '@/components/ui/OriginFilter';
 import { humanize } from '@/utils/format';
+import { groupLabel } from '@/context/clientNames';
 
 export type SearchCriteria = Omit<ClientSearch, 'companyId' | 'page'>;
 
@@ -109,7 +110,7 @@ export function ClientSearchPanel({
             )}
           </Field>
           <OriginFilter value={draft.origin} onChange={(origin) => set({ origin })} />
-          <Field label="BDO Bank Client">
+          <Field label={groupLabel('Bank Client')}>
             {(id) => (
               <select
                 id={id}

@@ -67,7 +67,7 @@ describe('schemes', () => {
     schemeType: 'TOP_UP',
     calculation: 'TARGET_TIERED',
     periodType: 'MONTHLY',
-    beneficiary: 'BDOI',
+    beneficiary: 'BROKER',
     segments: [],
     productLines: [],
     active: true,

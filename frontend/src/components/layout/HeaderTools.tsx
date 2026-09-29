@@ -9,6 +9,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { AboutDialog } from '@/features/help/AboutDialog';
 import { SessionTimeoutGuard } from '@/session/SessionTimeoutGuard';
 import { NotificationBell } from './NotificationBell';
+import { BRAND } from '@/branding';
 
 const REFRESH_MS = 60_000;
 
@@ -74,7 +75,7 @@ export function HeaderTools() {
       <button
         type="button"
         className="btn btn-ghost btn-sm header-tool"
-        aria-label="About BIBS"
+        aria-label={`About ${BRAND.product}`}
         title="About"
         onClick={() => setAboutOpen(true)}
       >

@@ -116,7 +116,7 @@ public class ClaimsFixtures {
             new BookingFixtures.Spec(
                 "MTR10",
                 "CBG",
-                PaymentArrangement.VIA_BDOI,
+                PaymentArrangement.VIA_BROKER,
                 coverFrom(),
                 coverFrom().plusYears(1),
                 1));
@@ -168,7 +168,7 @@ public class ClaimsFixtures {
             false,
             1,
             "PHP",
-            PaymentArrangement.VIA_BDOI,
+            PaymentArrangement.VIA_BROKER,
             Mortgage.NONE,
             null,
             items,
@@ -224,7 +224,7 @@ public class ClaimsFixtures {
     return new NewClaim(
         arn,
         1,
-        ClaimSource.BDOI_NOTICE,
+        ClaimSource.BROKER_NOTICE,
         null,
         loss,
         new LossDetails.Amounts(new BigDecimal("150000.00"), new BigDecimal("5000.00"), null),

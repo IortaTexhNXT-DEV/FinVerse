@@ -315,7 +315,7 @@ rules:
   - [R2, "BDO single sign-on / Active Directory is not part of this phase (BRD-1 Q42).", Fixed, "-"]
 validations:
   - [User ID or password wrong, Invalid user name or password, AUTHENTICATION_FAILED]
-  - [Account locked, Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
+  - [Account locked, Invalid user name or password, AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:
@@ -2549,7 +2549,7 @@ alternate_flows:
 rules:
   - [R1, "Company-concerned and disposition lists (values from BDOI, OQ31; seed values delivered).", Configurable, LOV RECON_COMPANY_CONCERNED; LOV RECON_DISPOSITION]
 validations:
-  - [Pair across cycles or wrong sides, Pair a BDOI-only item with an insurer-only item of the same cycle, RECON_PAIR_INVALID]
+  - [Pair across cycles or wrong sides, Pair a booked-only item with an insurer-only item of the same cycle, RECON_PAIR_INVALID]
   - [Split of an unpaired item, Only a paired item can be split, RECON_SPLIT_INVALID]
 fields_screen: Item review
 fields:

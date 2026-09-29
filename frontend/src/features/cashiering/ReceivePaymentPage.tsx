@@ -9,7 +9,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
-import { useCompanyId, useDefaultBranchId } from '@/context/workspaceContext';
+import { useCompanyId, useDefaultBranchId, useBaseCurrency } from '@/context/workspaceContext';
 import { today } from '@/utils/format';
 import { CodeSelect, TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
@@ -46,7 +46,7 @@ const EMPTY: Form = {
   payorCode: '',
   payorName: '',
   assuredName: '',
-  currency: 'PHP',
+  currency: '',
   amount: '',
   paymentDate: today(),
   mode: 'CASH',
@@ -77,7 +77,9 @@ export default function ReceivePaymentPage() {
   const toast = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState<Form>(EMPTY);
+  const baseCurrency = useBaseCurrency();
+  const empty = { ...EMPTY, currency: baseCurrency };
+  const [form, setForm] = useState<Form>(empty);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const refs = parseReferences(form.references);
   const settledKey = useDebounced(JSON.stringify([refs, form.amount, form.currency]));
@@ -246,7 +248,7 @@ export default function ReceivePaymentPage() {
               <Button variant="accent" busy={save.isPending} onClick={submit}>
                 Issue AR and Apply
               </Button>
-              <Button variant="secondary" onClick={() => setForm(EMPTY)}>
+              <Button variant="secondary" onClick={() => setForm(empty)}>
                 Clear
               </Button>
             </div>

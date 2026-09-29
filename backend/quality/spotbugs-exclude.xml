@@ -23,12 +23,22 @@
     <Bug pattern="SPRING_ENDPOINT"/>
   </Match>
   <!--
-    CRLF_INJECTION_LOGS: neutralised centrally. The log layout (application.yml
-    logging.pattern.console) replaces CR/LF in every message with '_', so user data can never
-    forge log lines, whichever logger call writes it.
+    CRLF_INJECTION_LOGS: neutralised centrally. The message converter of logback-spring.xml
+    (CrlfSafeMessageConverter, bound to %m / %msg / %message) replaces CR/LF in every message with
+    '_' in every pattern layout, so user data can never forge log lines, whichever logger call
+    writes it and whatever pattern a deployment configures.
   -->
   <Match>
     <Bug pattern="CRLF_INJECTION_LOGS"/>
+  </Match>
+  <!--
+    SERVLET_CONTENT_TYPE: JsonBodyLimitFilter reads the request's Content-Type only to decide whether
+    the JSON size limit applies; a false type gains nothing (the controllers parse JSON only for a
+    JSON content type, and every other body has its own limit).
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.brokerverse.config.JsonBodyLimitFilter"/>
+    <Bug pattern="SERVLET_CONTENT_TYPE"/>
   </Match>
   <!--
     SERVLET_HEADER: the Authorization header is read only to extract a bearer token whose HMAC
@@ -113,5 +123,24 @@
   <Match>
     <Package name="~com\.iortatechnxt\.brokerverse\.submitted\..*"/>
     <Bug pattern="IMPROPER_UNICODE"/>
+  </Match>
+  <!--
+    IMPROPER_UNICODE in DpListHandler: the branch code comes from the DP list file name, which the
+    NAME pattern limits to ASCII letters, digits, spaces, dots and hyphens; it is upper-cased only to
+    compare it with the head-office code of the client profile. No security decision depends on it.
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.brokerverse.commission.service.DpListHandler"/>
+    <Bug pattern="IMPROPER_UNICODE"/>
+  </Match>
+  <!--
+    COOKIE_USAGE in RefreshCookies: the refresh token of the sign-in session is meant to live in a
+    cookie, and only there: HttpOnly (never readable by scripts), Secure outside a developer's
+    machine, SameSite=Strict, limited to /api/v1/auth, a 256-bit random value of which the server
+    keeps only the SHA-256, replaced on every use and revoked with the session.
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.brokerverse.security.api.RefreshCookies"/>
+    <Bug pattern="COOKIE_USAGE"/>
   </Match>
 </FindBugsFilter>

@@ -7,7 +7,6 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.Locale;
 
 /** Text formatting of the adjustment documents and reports. */
@@ -15,8 +14,6 @@ public final class DocText {
 
   /** Placeholder of an empty value. */
   public static final String NONE = "-";
-
-  private static final ZoneId MANILA = BusinessClock.zone();
 
   private DocText() {}
 
@@ -61,6 +58,6 @@ public final class DocText {
    * @return date, null when none
    */
   public static LocalDate date(Instant at) {
-    return at == null ? null : at.atZone(MANILA).toLocalDate();
+    return at == null ? null : at.atZone(BusinessClock.zone()).toLocalDate();
   }
 }

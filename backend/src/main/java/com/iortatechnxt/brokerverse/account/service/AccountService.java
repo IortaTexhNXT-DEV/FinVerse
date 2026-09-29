@@ -225,7 +225,7 @@ public class AccountService {
     PaymentArrangement arrangement = account.getPaymentArrangement();
     PaymentArrangement wanted =
         draft.paymentArrangement() == null
-            ? PaymentArrangement.VIA_BDOI
+            ? PaymentArrangement.VIA_BROKER
             : draft.paymentArrangement();
     if (wanted != arrangement) {
       account.setPaymentArrangement(wanted, currentUser.username(), clock.instant());

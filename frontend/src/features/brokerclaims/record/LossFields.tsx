@@ -50,7 +50,7 @@ export function LossFields({
             required
             value={form.reportedDate}
             error={errors.reportedDate}
-            hint="Date the loss was reported to BDOI; every claim age starts here"
+            hint="Date the loss was reported to us; every claim age starts here"
             onChange={(v) => onChange('reportedDate', v)}
           />
         )}

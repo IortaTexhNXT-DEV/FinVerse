@@ -21,6 +21,7 @@ import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +56,7 @@ public class LegacyAccountImport {
   private final ApplicationEventPublisher events;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -79,7 +81,8 @@ public class LegacyAccountImport {
       AuditTrailService audit,
       ApplicationEventPublisher events,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      OrganizationDirectory organization) {
     this.accounts = accounts;
     this.headers = headers;
     this.catalog = catalog;
@@ -89,6 +92,7 @@ public class LegacyAccountImport {
     this.events = events;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.organization = organization;
   }
 
   /**
@@ -242,7 +246,9 @@ public class LegacyAccountImport {
         c.periodTo(),
         false,
         1,
-        c.currency(),
+        c.currency() == null || c.currency().isBlank()
+            ? organization.company(r.companyId()).baseCurrency()
+            : c.currency(),
         c.arrangement(),
         c.mortgage(),
         AccountContact.NONE,

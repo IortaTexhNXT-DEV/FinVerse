@@ -20,6 +20,7 @@ import { PremiumCard } from './PremiumBreakdown';
 import { displayNameOf } from '@/api/users';
 import { LovLabel, ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
 import { coverPeriod } from './coverPeriod';
+import { clientShortName } from '@/context/clientNames';
 
 /** Details: client, product, terms and the workflow facts of the quotation. */
 export function DetailsTab({ quotation: q }: Readonly<{ quotation: Quotation }>) {
@@ -49,7 +50,10 @@ export function DetailsTab({ quotation: q }: Readonly<{ quotation: Quotation }>)
             ],
             ['Period', coverPeriod(q)],
             ['Valid until', formatDate(c.validUntil)],
-            ['Premium payment', c.directPayment ? 'Directly to the insurer' : 'Via BDOI'],
+            [
+              'Premium payment',
+              c.directPayment ? 'Directly to the insurer' : `Via ${clientShortName()}`,
+            ],
             ['Remarks', c.remarks],
           ]}
         />

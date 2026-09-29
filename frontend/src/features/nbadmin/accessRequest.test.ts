@@ -56,7 +56,7 @@ describe('user access request validation', () => {
     expect(
       validateAccessRequest(form({ username: 'a01300019X' }), { ...SUBMIT, userIdFormatText: '' })
         .username,
-    ).toBe('The user ID does not have the BDOI format');
+    ).toBe('The user ID does not have the required format');
     expect(
       validateAccessRequest(
         form({

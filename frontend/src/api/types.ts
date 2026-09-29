@@ -33,13 +33,28 @@ export interface UserProfile {
   permissions: string[];
 }
 
+/**
+ * Sign-in answer: either the session is open (accessToken, user; the refresh token is an HttpOnly
+ * cookie) or the second factor is asked for first (mfaStep with its challenge).
+ */
 export interface LoginResponse {
-  accessToken: string;
+  accessToken?: string;
+  /** End of the sign-in session (the access token is renewed until then). */
   expiresAt: string;
-  user: UserProfile;
+  user?: UserProfile;
   /** The password must be changed before the home page opens (RESET or EXPIRED). */
   mustChangePassword?: boolean;
   passwordChangeReason?: 'RESET' | 'EXPIRED';
+  /** Expiry of the access token; the client renews it shortly before. */
+  accessTokenExpiresAt?: string;
+  /** VERIFY: enter the code of the authenticator app; ENROL: set up the app first. */
+  mfaStep?: 'VERIFY' | 'ENROL';
+  /** Proof of the password step, sent back with the code. */
+  mfaChallenge?: string;
+  /** Days this device may be remembered for the second factor (0 = never). */
+  rememberDeviceDays?: number;
+  /** Token of this device when it is remembered for the second factor. */
+  deviceToken?: string;
 }
 
 export interface Company {
@@ -53,11 +68,30 @@ export interface Company {
   backValueDays: number;
   forwardValueDays: number;
   retainedEarningsAccount?: string;
+  /** Client profile: short name in texts and labels. */
+  shortName?: string;
+  /** Client profile: group the company belongs to, used in labels of group concepts. */
+  groupName?: string;
+  /** Client profile: logo printed on documents (theme pack logo or file store reference). */
+  logoRef?: string;
+  /** Client profile: code of the head office in files and for records without a branch. */
+  headOfficeCode?: string;
+  /** Client profile: bank account code proposed by default. */
+  defaultBankCode?: string;
   recordStatus: RecordStatus;
   createdBy: string;
   /** Creator or last maintainer; unchanged by authorization. */
   maker?: string;
   authorizedBy?: string;
+}
+
+/** The client profile part of a company update. */
+export interface ClientProfile {
+  shortName?: string;
+  groupName?: string;
+  logoRef?: string;
+  headOfficeCode?: string;
+  defaultBankCode?: string;
 }
 
 export interface Branch {

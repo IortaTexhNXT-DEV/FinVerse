@@ -10,6 +10,7 @@ import { strApi } from './api';
 import type { StrExtraction, StrRow } from './api';
 import { extractionPeriodError, filingErrors, monthStart } from './strLogic';
 import { DateInput } from '@/components/ui/DateInput';
+import { BRAND } from '@/branding';
 
 /**
  * Record Filing (SNSRP-706; FR-SS-072): the AMLC reference (unique) and the filing date, not before
@@ -49,7 +50,7 @@ export function FilingDialog({
     >
       <p className="muted">
         {str.strNo} of {str.subjectName} was extracted on {formatDate(str.extractedAt)}. Filing on
-        the AMLC portal is done outside BIBS; record its reference here.
+        the AMLC portal is done outside {BRAND.product}; record its reference here.
       </p>
       <Field label="AMLC Reference" required error={errors.reference}>
         {(id) => (

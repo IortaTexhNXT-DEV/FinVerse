@@ -13,6 +13,7 @@ import { enumOptions } from '@/features/assets/options';
 import { criteriaOf, EMPTY_PANEL as EMPTY, panelOf, QUICK_TABS } from './accountForm';
 import type { QuickFilter, SearchPanelValues as Panel } from './accountForm';
 import { AccountTable } from './AccountTable';
+import { BRAND } from '@/branding';
 
 /** Business type filter values (BRNB.097, shared work item BT0). */
 const BUSINESS_TYPE_OPTIONS = [
@@ -21,7 +22,7 @@ const BUSINESS_TYPE_OPTIONS = [
 ];
 
 const ORIGIN_OPTIONS = [
-  { value: 'BIBS', label: 'BIBS' },
+  { value: 'BIBS', label: BRAND.product },
   { value: 'MIGRATED', label: 'Migrated' },
 ];
 

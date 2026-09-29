@@ -150,7 +150,7 @@ screens:
       - {state: run, user: remit, open: first, caption: "Upload run with the accounts updated and the result of each record"}
     fields:
       - "Upload Insurer Schedule | Download Template | Button | Batch number, invoice number, OR number, OR date and OR amount | - | - | - | - | - | -"
-      - "Upload Insurer Schedule | Insurer Schedule | File | CSV or text file with the columns of the template (Batch No., Invoice No., OR No., OR Date, OR Amount), dates as dd-MMM-yyyy; max 20 MB | Y | - | - | - | A record already received is refused | -"
+      - "Upload Insurer Schedule | Insurer Schedule | File | The Excel template, or a CSV or text file with its columns (Batch No., Invoice No., OR No., OR Date, OR Amount), dates as dd-MMM-yyyy; max 20 MB | Y | - | - | - | A record already received is refused | -"
       - "Upload History | Upload Run / File / Status / Accepted / Failed / Uploaded | Column | FIR-yyyy-n; uploaded time and user | - | Upload runs | - | Read only | - | -"
       - "Upload run dialog | Records Read / OR Matches Paid PR / Amount Mismatch / Refused | Tile | Counts | - | Upload run | - | Read only | - | -"
       - "Upload run dialog | Batch No. / Invoice No. / OR No. / OR Date / OR Amount / Paid PR / Status | Column | Matched or Amount Mismatch | - | Batch lines | - | Read only | - | No account was updated by this upload"
@@ -184,7 +184,7 @@ screens:
       - "New Hold Request dialog | Reason | Drop-down | - | Y | List of values hold reason | Blank | - | - | Select a reason"
       - "New Hold Request dialog | Hold Until | Date | dd-MMM-yyyy, after today | Y | - | Blank | - | A future date | Hold Until is required / Hold Until must be a future date"
       - "New Hold Request dialog | Remarks | Text area | - | N | - | Blank | - | - | -"
-      - "Upload Collection Hold File | Hold File | File | CSV or text file with the columns of the template (Invoice No., Reason Code, Hold Until, Remarks), dates as dd-MMM-yyyy | Y | - | - | - | - | -"
+      - "Upload Collection Hold File | Hold File | File | The Excel template, or a CSV or text file with its columns (Invoice No., Reason Code, Hold Until, Remarks), dates as dd-MMM-yyyy | Y | - | - | - | - | -"
     actions:
       - "New Hold Request | Marketing Collection, Marketing Team Leader | Always | Creates the hold request in draft and submits it | Hold for approval | Hold for approval notice (NT-14)"
       - "Upload Hold File | Marketing Collection, Marketing Team Leader | Always | Creates the hold requests of the Collection file | Hold for approval | Hold for approval notice (NT-14)"

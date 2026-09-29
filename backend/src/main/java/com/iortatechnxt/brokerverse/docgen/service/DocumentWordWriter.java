@@ -81,7 +81,7 @@ final class DocumentWordWriter {
       first = false;
       row.setCantSplitRow(true);
       BrandedDocx.cell(
-          row.getCell(0), field.label(), TextStyle.LABEL, false, BrandAssets.BACKGROUND_BLUE);
+          row.getCell(0), field.label(), TextStyle.LABEL, false, BrandAssets.BACKGROUND);
       BrandedDocx.cell(row.getCell(1), field.value(), TextStyle.TABLE, false, null);
     }
   }

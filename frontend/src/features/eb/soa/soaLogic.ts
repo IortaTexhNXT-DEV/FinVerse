@@ -6,7 +6,7 @@ export const EMPTY_SOA: SoaInput = {
   periodFrom: '',
   periodTo: '',
   amount: '',
-  currency: 'PHP',
+  currency: '',
   receivedOn: '',
   remarks: '',
 };

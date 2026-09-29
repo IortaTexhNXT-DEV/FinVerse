@@ -30,6 +30,27 @@ public record SbmTerms(
     @Column(name = "currency", nullable = false, length = 3) String currency) {
 
   /**
+   * The terms in a currency when they carry none (the base currency of the company).
+   *
+   * @param code currency
+   * @return terms with a currency
+   */
+  public SbmTerms orInCurrency(String code) {
+    if (currency != null) {
+      return this;
+    }
+    return new SbmTerms(
+        insurerCode,
+        policyNo,
+        inceptionDate,
+        expiryDate,
+        coverageDays,
+        sumInsured,
+        totalPremium,
+        code);
+  }
+
+  /**
    * The terms with the days of cover computed from the period when they are not given.
    *
    * @return terms

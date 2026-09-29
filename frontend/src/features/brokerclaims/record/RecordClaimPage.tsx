@@ -16,7 +16,7 @@ import type { ClaimSource } from './api';
 import { CoverCard } from './CoverCard';
 import { DialogFooter } from './FormParts';
 import { LossFields } from './LossFields';
-import { policyYearLabel } from './recordLogic';
+import { policyYearLabel, SOURCE_LABELS } from './recordLogic';
 import type { RecordState } from './useRecordClaim';
 import { useRecordClaim } from './useRecordClaim';
 
@@ -59,7 +59,7 @@ function ClaimSetup({
             value={source}
             onChange={(e) => onSource(e.target.value as ClaimSource)}
           >
-            <option value="BDOI_NOTICE">BDOI notice</option>
+            <option value="BROKER_NOTICE">{SOURCE_LABELS.BROKER_NOTICE}</option>
             <option value="INSURER_REPORTED">Insurer-reported</option>
           </select>
         )}

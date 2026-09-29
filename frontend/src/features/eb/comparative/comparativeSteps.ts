@@ -12,8 +12,7 @@ export const STEPS: Record<
   },
   'sign-off': {
     label: 'Sign Off',
-    effect:
-      'The recommendation is signed off; above the value threshold it goes to BDOI Management.',
+    effect: 'The recommendation is signed off; above the value threshold it goes to Management.',
     reason: 'optional',
   },
   'threshold-approve': {

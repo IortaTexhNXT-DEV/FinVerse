@@ -87,19 +87,29 @@ public class AccountUpdateBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return AccountBulkSupport.FILLED_BY;
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(Headers.ARN, "Account Reference Number", "ARN-2026-000123"),
+        BulkColumn.required(
+                Headers.ARN, "Account Reference Number of the account", "ARN-2026-000123")
+            .allowed("ARN of an account in Draft, Returned or Submitted status"),
         AccountBulkSupport.date(Headers.PERIOD_FROM, "Period from", false),
         AccountBulkSupport.date(Headers.PERIOD_TO, "Period to", false),
-        BulkColumn.optional(Headers.SEGMENT, "Market segment", ""),
-        BulkColumn.optional(Headers.INSURER, "Insurer party code", ""),
-        BulkColumn.optional(Headers.BRANCH, "Insurer branch code", ""),
+        BulkColumn.optional(Headers.SEGMENT, "Market segment", "").lov("MARKET_SEGMENT"),
+        BulkColumn.optional(Headers.INSURER, "Insurer of the account", "").master("insurer"),
+        BulkColumn.optional(Headers.BRANCH, "Branch of the insurer", "")
+            .master("branch of the insurer"),
         AccountBulkSupport.number(Headers.SUM_INSURED, "Sum insured of item 1", false, ""),
         AccountBulkSupport.number(Headers.RATE, "Premium rate % of item 1", false, ""),
-        BulkColumn.optional(Headers.MORTGAGEE, "Mortgagee bank", ""),
+        BulkColumn.optional(Headers.MORTGAGEE, "Mortgagee bank", "").lov("MORTGAGEE_BANK"),
         BulkColumn.optional(Headers.LOAN, "Loan application number", ""),
-        BulkColumn.optional(Headers.PN, "PN numbers separated by ; (replace the list)", ""),
+        BulkColumn.optional(
+                Headers.PN, "Promissory note numbers; they replace the numbers on the account", "")
+            .format("Text; several numbers separated by ;"),
         BulkColumn.optional(Headers.CONTACT_EMAIL, "Account contact e-mail", ""),
         BulkColumn.optional(Headers.CONTACT_MOBILE, "Account contact mobile", ""),
         new BulkColumn(
@@ -204,7 +214,7 @@ public class AccountUpdateBulkHandler implements BulkImportHandler {
     }
     return row.yes(Headers.DIRECT_PAYMENT)
         ? PaymentArrangement.DIRECT_TO_INSURER
-        : PaymentArrangement.VIA_BDOI;
+        : PaymentArrangement.VIA_BROKER;
   }
 
   private static List<RiskItemData> items(

@@ -23,7 +23,7 @@ class AttributeRulesTest {
         .containsEntry("waiting_on", "CLAIMANT")
         .containsEntry("follow_up_days", "5")
         .containsEntry("awaiting_premium_remittance", "true");
-    assertThat(AttributeRules.status(new StatusAttributes("NEW", "BDOI", null, false)))
+    assertThat(AttributeRules.status(new StatusAttributes("NEW", "BROKER", null, false)))
         .containsEntry("follow_up_days", null)
         .containsEntry("awaiting_premium_remittance", null);
     assertThatThrownBy(

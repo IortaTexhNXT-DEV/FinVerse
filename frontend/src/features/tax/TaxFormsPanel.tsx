@@ -21,6 +21,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { humanize, today } from '@/utils/format';
 import { AuthorizeButton, SelectField, TextField } from './MasterControls';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { BRAND } from '@/branding';
 
 const AUTHORITIES: readonly TaxAuthority[] = ['BIR', 'LGU', 'BFP'];
 const FREQUENCIES: readonly FilingFrequency[] = [
@@ -210,7 +211,7 @@ export function TaxFormsPanel() {
                 checked={form.trackFiling === true}
                 onChange={(e) => set({ trackFiling: e.target.checked })}
               />
-              Returns and alerts managed in BIBS
+              Returns and alerts managed in {BRAND.product}
             </label>
           </div>
         )}

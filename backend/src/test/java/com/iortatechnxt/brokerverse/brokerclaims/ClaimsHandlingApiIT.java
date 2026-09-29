@@ -50,7 +50,7 @@ class ClaimsHandlingApiIT {
     body.put("companyId", fx.company());
     body.put("arn", arn);
     body.put("policyYear", 1);
-    body.put("source", "BDOI_NOTICE");
+    body.put("source", "BROKER_NOTICE");
     body.put("loss", loss);
     body.put("locations", List.of(Map.of("itemNo", 1, "description", "Kitchen")));
     return body;

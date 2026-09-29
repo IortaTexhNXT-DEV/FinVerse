@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.AccountStatus;
 import com.iortatechnxt.brokerverse.account.service.AccountQueryService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.screening.str.domain.StrTransaction.Line;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -31,14 +32,17 @@ public class AccountStrTransactions implements StrTransactionSource {
           AccountStatus.BOOKED);
 
   private final AccountQueryService accounts;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the adapter.
    *
    * @param accounts account reads
+   * @param organization company master (base currency)
    */
-  public AccountStrTransactions(AccountQueryService accounts) {
+  public AccountStrTransactions(AccountQueryService accounts, OrganizationDirectory organization) {
     this.accounts = accounts;
+    this.organization = organization;
   }
 
   @Override
@@ -46,7 +50,7 @@ public class AccountStrTransactions implements StrTransactionSource {
     return accounts.byClient(clientId).stream()
         .filter(a -> REPORTED.contains(a.getStatus()))
         .filter(a -> a.getPremium() != null && positive(a.getPremium().grossPremium()))
-        .map(AccountStrTransactions::line)
+        .map(this::line)
         .toList();
   }
 
@@ -54,14 +58,16 @@ public class AccountStrTransactions implements StrTransactionSource {
     return amount != null && amount.signum() > 0;
   }
 
-  private static Line line(Account a) {
+  private Line line(Account a) {
     LocalDate date =
         Objects.requireNonNullElse(a.getPeriodFrom(), BusinessClock.dateOf(a.getCreatedAt()));
     return new Line(
         a.getArn(),
         date,
         a.getPremium().grossPremium().setScale(2, RoundingMode.HALF_UP),
-        a.getCurrency() == null ? "PHP" : a.getCurrency(),
+        a.getCurrency() == null
+            ? organization.company(a.getCompanyId()).baseCurrency()
+            : a.getCurrency(),
         "ACCOUNT",
         a.getProductCode() + (a.getInsurerCode() == null ? "" : " - " + a.getInsurerCode()));
   }

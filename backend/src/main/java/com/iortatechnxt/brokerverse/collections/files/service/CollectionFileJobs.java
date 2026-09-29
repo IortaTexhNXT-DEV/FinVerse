@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.collections.files.service;
 
 import com.iortatechnxt.brokerverse.collections.files.domain.ScheduledFile;
 import com.iortatechnxt.brokerverse.collections.files.domain.ScheduledFile.Status;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
 import com.iortatechnxt.brokerverse.system.service.JobOutcome;
@@ -166,7 +167,7 @@ public final class CollectionFileJobs {
 
     @Override
     public JobOutcome execute(LocalDate businessDate) {
-      LocalDate manilaDay = clock.instant().atZone(FilePeriods.MANILA).toLocalDate();
+      LocalDate manilaDay = clock.instant().atZone(BusinessClock.zone()).toLocalDate();
       return publishAll(manilaDay, files::monthly);
     }
   }

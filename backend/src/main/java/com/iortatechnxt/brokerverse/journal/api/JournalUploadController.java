@@ -4,7 +4,10 @@ import com.iortatechnxt.brokerverse.common.api.ContentDispositions;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.service.JournalUploadService;
 import com.iortatechnxt.brokerverse.journal.service.JournalUploadTemplate;
+import com.iortatechnxt.brokerverse.journal.service.JournalUploadTemplate.Example;
 import com.iortatechnxt.brokerverse.journal.service.UploadResult;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory.ClientProfile;
 import java.io.IOException;
 import java.time.Clock;
 import java.time.LocalDate;
@@ -28,16 +31,20 @@ public class JournalUploadController {
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
   private final JournalUploadService service;
+  private final OrganizationDirectory organization;
   private final Clock clock;
 
   /**
    * Creates the controller.
    *
    * @param service upload service
+   * @param organization company master (branch and currency of the examples)
    * @param clock clock
    */
-  public JournalUploadController(JournalUploadService service, Clock clock) {
+  public JournalUploadController(
+      JournalUploadService service, OrganizationDirectory organization, Clock clock) {
     this.service = service;
+    this.organization = organization;
     this.clock = clock;
   }
 
@@ -65,22 +72,34 @@ public class JournalUploadController {
   }
 
   /**
-   * Downloads the upload template with sample vouchers.
+   * Downloads the upload template with example vouchers in the head office and base currency of the
+   * company.
    *
    * @param format csv or xlsx
+   * @param companyId company of the examples; blank branch and currency without it
    * @return template file
    */
   @GetMapping("/template")
   @PreAuthorize("hasAuthority('JOURNAL_CREATE')")
-  public ResponseEntity<byte[]> template(@RequestParam(defaultValue = "csv") String format) {
+  public ResponseEntity<byte[]> template(
+      @RequestParam(defaultValue = "csv") String format,
+      @RequestParam(required = false) Long companyId) {
     boolean excel = "xlsx".equals(format);
     LocalDate today = BusinessClock.today(clock);
-    byte[] body = excel ? JournalUploadTemplate.xlsx(today) : JournalUploadTemplate.csv(today);
+    Example example =
+        companyId == null
+            ? new Example(today, null, null)
+            : example(today, organization.profile(companyId));
+    byte[] body = excel ? JournalUploadTemplate.xlsx(example) : JournalUploadTemplate.csv(example);
     String name = "journal-upload-template." + (excel ? "xlsx" : "csv");
     return ResponseEntity.ok()
         .contentType(MediaType.parseMediaType(excel ? XLSX : "text/csv"))
         .header(HttpHeaders.CONTENT_DISPOSITION, ContentDispositions.attachment(name))
         .body(body);
+  }
+
+  private static Example example(LocalDate today, ClientProfile company) {
+    return new Example(today, company.headOfficeCode(), company.baseCurrency());
   }
 
   /** Upload processing mode. */

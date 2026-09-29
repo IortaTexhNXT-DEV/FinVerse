@@ -80,20 +80,40 @@ public class BookingUploadHandler implements BulkImportHandler {
   @Override
   public String instructions() {
     return "One row per account to book: its Account Reference Number (ARN) must be in status"
-        + " POLICY_ISSUED. Booking Date defaults to the upload date; Cost Center defaults to the"
-        + " account's (sales organisation). Insurer Billing No is required for the product lines"
-        + " of parameter BOOKING_BILLING_NO_LINES (Employee Benefits) and unique per insurer.";
+        + " Policy issued. Booking Date defaults to the upload date; Cost Center defaults to the"
+        + " account's (sales organisation). Insurer Billing No is required for the Employee"
+        + " Benefits product lines and unique per insurer.";
+  }
+
+  @Override
+  public String filledBy() {
+    return "The booking team of Processing";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Booking > Booking Workbench, button Upload Bookings";
   }
 
   @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(ARN, "Account Reference Number", "ARN-2026-000123"),
+        BulkColumn.required(
+                ARN, "Account Reference Number of the account to book", "ARN-2026-000123")
+            .allowed("ARN of an account in status Policy issued"),
         new BulkColumn(
-            BOOKING_DATE, "Booking date (optional)", false, BulkColumn.Type.DATE, "2026-09-15"),
-        BulkColumn.optional(COST_CENTER, "Cost center (optional)", "NB-CBG-M"),
+            BOOKING_DATE,
+            "Booking date; blank for the upload date",
+            false,
+            BulkColumn.Type.DATE,
+            "2026-09-15"),
+        BulkColumn.optional(COST_CENTER, "Cost center; blank for the account's", "NB-CBG-M")
+            .master("cost center"),
         BulkColumn.optional(
-            BILLING_NO, "Insurer billing number (required for EB lines)", "HMO-BILL-2026-0001"));
+                BILLING_NO,
+                "Billing number of the insurer; unique per insurer",
+                "HMO-BILL-2026-0001")
+            .when("the account is of an Employee Benefits product line"));
   }
 
   @Override

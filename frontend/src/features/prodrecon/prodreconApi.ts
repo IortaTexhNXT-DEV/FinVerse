@@ -14,10 +14,10 @@ export type ReconStage = 'EXTRACTED' | 'SENT_TO_INSURER' | 'RECONCILING' | 'CLOS
 export type ReconStatus =
   | 'MATCHED'
   | 'MATCHED_WITH_DISCREPANCY'
-  | 'BDOI_ONLY'
+  | 'BROKER_ONLY'
   | 'UNMATCHED_PREBOOKED'
   | 'UNMATCHED_NO_BOOKING';
-export type Bucket = 'ALL' | 'MATCHED' | 'DISCREPANCY' | 'BDOI_ONLY' | 'INSURER_ONLY';
+export type Bucket = 'ALL' | 'MATCHED' | 'DISCREPANCY' | 'BROKER_ONLY' | 'INSURER_ONLY';
 export type UnbookedStatus = 'OPEN' | 'PREBOOKED' | 'BOOKED' | 'CLOSED';
 export type Frequency = 'MONTHLY' | 'WEEKLY';
 export type UploadStatus = 'RECEIVED' | 'PROCESSED' | 'PARTIAL' | 'FAILED' | 'DUPLICATE_BLOCKED';
@@ -26,7 +26,7 @@ export type IncentiveOutcome = 'ELIGIBLE' | 'LATE' | 'NOT_REMITTED' | 'NO_INSURE
 export interface BucketCounts {
   matched: number;
   discrepancy: number;
-  bdoiOnly: number;
+  brokerOnly: number;
   insurerOnly: number;
   total: number;
 }
@@ -77,7 +77,7 @@ export interface ReconItem {
   salesUnit?: string;
   segment?: string;
   productLine?: string;
-  bdoi?: ReconSide;
+  broker?: ReconSide;
   insurer?: ReconSide;
   insurerIncentive?: number;
   insurerRemarks?: string;

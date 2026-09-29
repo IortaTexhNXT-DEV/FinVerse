@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.DisbursementMode;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.EventSource;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.InstrumentStatus;
@@ -176,10 +177,7 @@ public class EodService {
         vouchers.findByCompanyIdAndStageAndEodRunIdIsNullAndApprovedAtBeforeOrderByIdAsc(
             run.getCompanyId(),
             VoucherStage.APPROVED,
-            run.getBusinessDate()
-                .plusDays(1)
-                .atStartOfDay(DisbursementSettings.MANILA)
-                .toInstant());
+            run.getBusinessDate().plusDays(1).atStartOfDay(BusinessClock.zone()).toInstant());
     List<FormItem> all = new ArrayList<>();
     for (Voucher v : day) {
       v.inEod(run.getId());

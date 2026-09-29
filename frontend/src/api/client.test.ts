@@ -1,4 +1,13 @@
-import { api, ApiError, businessDetail, fileNameOf, tokenStore, toQuery } from './client';
+import {
+  api,
+  ApiError,
+  businessDetail,
+  fileNameOf,
+  onUnauthorized,
+  renewalDue,
+  tokenStore,
+  toQuery,
+} from './client';
 
 describe('api client', () => {
   afterEach(() => {
@@ -14,6 +23,53 @@ describe('api client', () => {
     tokenStore.set('def');
     expect(tokenStore.expiresAt()).toBeNull();
     tokenStore.clear();
+    expect(tokenStore.get()).toBeNull();
+  });
+
+  it('renews the access token shortly before it expires', () => {
+    const now = Date.parse('2026-09-28T10:00:00Z');
+    expect(renewalDue('2026-09-28T10:00:30Z', now)).toBe(true);
+    expect(renewalDue('2026-09-28T10:05:00Z', now)).toBe(false);
+    expect(renewalDue(null, now)).toBe(false);
+    expect(renewalDue('not a date', now)).toBe(false);
+  });
+
+  it('renews the token with the cookie before a request when it is about to expire', async () => {
+    tokenStore.set('old', '2026-09-28T18:00:00Z', new Date(Date.now() + 10_000).toISOString());
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            accessToken: 'new',
+            accessTokenExpiresAt: new Date(Date.now() + 900_000).toISOString(),
+            expiresAt: '2026-09-28T18:00:00Z',
+          }),
+          { status: 200 },
+        ),
+      )
+      .mockResolvedValueOnce(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    await expect(api.get('/x')).resolves.toEqual({ ok: true });
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('/api/v1/auth/refresh');
+    const refresh = fetchMock.mock.calls[0]?.[1];
+    expect((refresh?.headers as Record<string, string>)['X-Requested-With']).toBe('BrokerVerse');
+    const init = fetchMock.mock.calls[1]?.[1];
+    expect((init?.headers as Record<string, string>).Authorization).toBe('Bearer new');
+    expect(tokenStore.get()).toBe('new');
+  });
+
+  it('retries once after a renewal and signs out when the session cannot be renewed', async () => {
+    tokenStore.set('old', '2026-09-28T18:00:00Z');
+    const signedOut = vi.fn();
+    onUnauthorized(signedOut);
+    const fetchMock = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValueOnce(new Response('{}', { status: 401 }))
+      .mockResolvedValueOnce(new Response('{}', { status: 401 }));
+    await expect(api.get('/x')).rejects.toBeInstanceOf(ApiError);
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls[1]?.[0]).toBe('/api/v1/auth/refresh');
+    expect(signedOut).toHaveBeenCalledTimes(1);
     expect(tokenStore.get()).toBeNull();
   });
 

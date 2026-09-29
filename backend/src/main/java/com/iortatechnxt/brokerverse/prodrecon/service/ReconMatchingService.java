@@ -91,7 +91,7 @@ public class ReconMatchingService {
     Optional<ReconItem> booked =
         items.findByCycleIdOrderByIdAsc(cycleId).stream()
             .filter(i -> i.getInvoiceNo() != null && i.getInsurer() == null)
-            .filter(i -> ReconMatcher.pairs(keys, i.getBdoi(), row.side()))
+            .filter(i -> ReconMatcher.pairs(keys, i.getBroker(), row.side()))
             .findFirst();
     ReconItem item;
     if (booked.isPresent()) {
@@ -120,7 +120,7 @@ public class ReconMatchingService {
   void resolve(ReconCycle cycle, ReconItem item) {
     Optional<OpsInvoice> invoice = bookedInvoice(cycle, item.getInsurer());
     if (invoice.isPresent()) {
-      item.attachBdoi(ReconFacts.of(invoice.get(), null));
+      item.attachBroker(ReconFacts.of(invoice.get(), null));
       compare(item, MatchMethod.AUTO);
       return;
     }
@@ -150,7 +150,7 @@ public class ReconMatchingService {
 
   private void compare(ReconItem item, MatchMethod method) {
     List<Field> differing =
-        ReconMatcher.differences(item.getBdoi(), item.getInsurer(), settings.tolerance());
+        ReconMatcher.differences(item.getBroker(), item.getInsurer(), settings.tolerance());
     item.paired(
         differing.stream().map(Field::name).toList(),
         method,
@@ -175,7 +175,7 @@ public class ReconMatchingService {
     int paired = 0;
     for (ReconItem item : items.waitingFor(companyId, insurerCode, invoiceNo, policyNo)) {
       if (items.findByCycleIdAndInvoiceNo(item.getCycleId(), invoiceNo).isEmpty()) {
-        item.attachBdoi(ReconFacts.of(invoice.get(), null));
+        item.attachBroker(ReconFacts.of(invoice.get(), null));
         compare(item, MatchMethod.AUTO);
         items.flush();
         paired++;
@@ -232,7 +232,7 @@ public class ReconMatchingService {
         || insurer.getInvoiceNo() != null) {
       throw new BusinessRuleException(
           "RECON_PAIR_INVALID",
-          "Pair a BDOI-only item with an insurer-only item of the same cycle");
+          "Pair a booked-only item with an insurer-only item of the same cycle");
     }
     booked.attachInsurer(
         new InsurerRow(

@@ -99,15 +99,17 @@ public class SbmHandlingFee extends BaseEntity {
    * @param feeNo number
    * @param bill policy, keys, amount and billing date
    * @param bulkJobNo upload, may be null
+   * @param baseCurrency base currency of the company, the currency of a bill without one
    */
-  public SbmHandlingFee(Long companyId, String feeNo, Bill bill, String bulkJobNo) {
+  public SbmHandlingFee(
+      Long companyId, String feeNo, Bill bill, String bulkJobNo, String baseCurrency) {
     this.companyId = companyId;
     this.feeNo = feeNo;
     this.policyId = bill.policyId();
     this.pnNo = bill.pnNo();
     this.locationRef = bill.locationRef();
     this.amount = bill.amount();
-    this.currency = bill.currency() == null ? "PHP" : bill.currency();
+    this.currency = bill.currency() == null ? baseCurrency : bill.currency();
     this.billingDate = bill.billingDate();
     this.bulkJobNo = bulkJobNo;
   }

@@ -64,16 +64,26 @@ public class MinimalBalanceFileHandler implements BulkImportHandler {
   @Override
   public String instructions() {
     return "One row per invoice with its premium receivable balance as in the ledger. Only"
-        + " balances from 10.00 to 100.00 (parameter MIN_BALANCE_FILE_RANGE) are processed: a"
+        + " balances from 10.00 to 100.00 (the configured range) are processed: a"
         + " debit balance is written off, a credit balance (overpayment) is credited. Each invoice"
         + " is written off once.";
   }
 
   @Override
+  public String filledBy() {
+    return "Collection and accounting officers, from the premium receivable ledger";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Adjustment > Minimal Balance File";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(
-            INVOICE, "Invoice number of the Operations ledger", "BI-HO-2026-000001"),
+        BulkColumn.required(INVOICE, "Invoice number of the Operations ledger", "BI-HO-2026-000001")
+            .master("invoice"),
         new BulkColumn(
             BALANCE, "Premium receivable balance", true, BulkColumn.Type.NUMBER, "35.50"));
   }

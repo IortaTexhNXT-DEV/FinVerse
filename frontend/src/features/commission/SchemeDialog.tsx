@@ -15,7 +15,7 @@ const NEW_TERMS: SchemeTerms = {
   schemeType: 'OTHER',
   calculation: 'TARGET_TIERED',
   periodType: 'MONTHLY',
-  beneficiary: 'BDOI',
+  beneficiary: 'BROKER',
   segments: [],
   productLines: [],
   active: false,

@@ -95,7 +95,7 @@ export default function UnbookedPage() {
       <PageHeader
         section="Production Reconciliation"
         title="Unbooked Accounts"
-        description="Accounts reported by the insurers that are not booked by BDOI, followed to booking or closure."
+        description="Accounts reported by the insurers that we have not booked, followed to booking or closure."
       />
       <ErrorAlert error={items.error} />
       <Card>

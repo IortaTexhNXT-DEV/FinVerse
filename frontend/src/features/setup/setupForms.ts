@@ -1,3 +1,4 @@
+import type { ClientProfile, Company } from '@/api/types';
 import type { CostCenterRuleInput, Employee, EmployeeInput, StatementLayout } from './frbsSetupApi';
 
 /** Errors by field name. */
@@ -139,4 +140,34 @@ export function ruleCriteria(r: Omit<CostCenterRuleInput, 'companyId'>): string 
     r.partyCode === undefined || r.partyCode === '' ? undefined : `party ${r.partyCode}`,
   ].filter((p) => p !== undefined && p !== '');
   return parts.length === 0 ? 'Any posting' : parts.join(' · ');
+}
+
+/**
+ * The company update that changes the client profile only: the company values as they are, and
+ * the profile values trimmed (blank values are cleared).
+ *
+ * @param c company
+ * @param profile client profile form values
+ * @returns update request
+ */
+export function profileRequest(
+  c: Company,
+  profile: ClientProfile,
+): Partial<Company> & { profile: ClientProfile } {
+  const trimmed: ClientProfile = {};
+  for (const [key, value] of Object.entries(profile) as [keyof ClientProfile, string?][]) {
+    trimmed[key] = value?.trim() ?? '';
+  }
+  return {
+    code: c.code,
+    name: c.name,
+    baseCurrency: c.baseCurrency,
+    taxId: c.taxId,
+    address: c.address,
+    fiscalYearStartMonth: c.fiscalYearStartMonth,
+    backValueDays: c.backValueDays,
+    forwardValueDays: c.forwardValueDays,
+    retainedEarningsAccount: c.retainedEarningsAccount,
+    profile: trimmed,
+  };
 }

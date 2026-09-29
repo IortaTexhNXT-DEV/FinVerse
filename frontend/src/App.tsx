@@ -15,6 +15,7 @@ import { createQueryClient } from '@/queryClient';
 
 const LoginPage = lazy(() => import('@/auth/LoginPage'));
 const ResetPasswordPage = lazy(() => import('@/auth/ResetPasswordPage'));
+const SsoCallbackPage = lazy(() => import('@/auth/SsoCallbackPage'));
 
 const queryClient = createQueryClient();
 
@@ -48,6 +49,7 @@ export function App() {
               <Routes>
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
+                <Route path="/sso/callback" element={<SsoCallbackPage />} />
                 <Route
                   element={
                     <RequireAuth>

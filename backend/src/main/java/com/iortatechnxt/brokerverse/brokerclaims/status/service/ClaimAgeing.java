@@ -4,7 +4,6 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +17,6 @@ import java.util.List;
  * 31-60, 61-90, 91-180 and 181+).
  */
 public final class ClaimAgeing {
-
-  /** Time zone of the business dates. */
-  public static final ZoneId MANILA = BusinessClock.zone();
 
   private ClaimAgeing() {}
 
@@ -41,7 +37,7 @@ public final class ClaimAgeing {
    * @return date, null when {@code at} is null
    */
   public static LocalDate dateOf(Instant at) {
-    return at == null ? null : at.atZone(MANILA).toLocalDate();
+    return at == null ? null : at.atZone(BusinessClock.zone()).toLocalDate();
   }
 
   /**

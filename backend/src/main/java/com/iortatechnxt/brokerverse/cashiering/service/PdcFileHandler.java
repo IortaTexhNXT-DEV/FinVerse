@@ -58,17 +58,29 @@ public class PdcFileHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Cashiering officers receiving post-dated checks";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Cashiering > Payment Uploads, tab PDC";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.optional("Client code", "Client", "CL-2026-000001"),
-        BulkColumn.required("Payor", "Payor", "Maria Clara Santos"),
-        BulkColumn.required("Reference", "Invoice, ARN, policy or PN number", "ARN-2026-940001"),
-        BulkColumn.required(CHECK_NO, CHECK_NO, "0012345"),
-        BulkColumn.required(BANK, "Drawee bank", "BDO"),
-        BulkColumn.optional("Check branch", "Bank branch", "Makati"),
+        BulkColumn.optional("Client code", "Client who issued the check", "CL-2026-000001")
+            .master("client"),
+        BulkColumn.required("Payor", "Name of the payor on the check", "Maria Clara Santos"),
+        BulkColumn.required(
+            "Reference", "Invoice, ARN, policy or PN number the check pays", "ARN-2026-940001"),
+        BulkColumn.required(CHECK_NO, "Number of the check", "0012345"),
+        BulkColumn.required(BANK, "Bank the check is drawn on", "PNB"),
+        BulkColumn.optional("Check branch", "Branch of the drawee bank", "Makati"),
         new BulkColumn(MATURITY, "Maturity (check) date", true, Type.DATE, "2026-10-15"),
         new BulkColumn(AMOUNT, "Check amount", true, Type.NUMBER, "5000.00"),
-        BulkColumn.optional("Market segment", "Market segment", "CBG"));
+        BulkColumn.optional("Market segment", "Market segment", "CBG").lov("MARKET_SEGMENT"));
   }
 
   @Override
@@ -106,7 +118,7 @@ public class PdcFileHandler implements BulkImportHandler {
                 row.text("Check branch"),
                 row.date(MATURITY),
                 row.number(AMOUNT),
-                "PHP",
+                null,
                 row.text("Market segment")))
         .getWarehouseNo();
   }

@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.nbreport.domain.SalesTarget;
 import com.iortatechnxt.brokerverse.nbreport.domain.SalesTargetRepository;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import java.time.LocalDate;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -22,16 +23,20 @@ public class SalesTargetService {
 
   private final SalesTargetRepository targets;
   private final AuditTrailService audit;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
    *
    * @param targets targets
    * @param audit audit trail
+   * @param organization company master (base currency)
    */
-  public SalesTargetService(SalesTargetRepository targets, AuditTrailService audit) {
+  public SalesTargetService(
+      SalesTargetRepository targets, AuditTrailService audit, OrganizationDirectory organization) {
     this.targets = targets;
     this.audit = audit;
+    this.organization = organization;
   }
 
   /**
@@ -64,7 +69,10 @@ public class SalesTargetService {
       target = existing.get();
       target.apply(unit.periodFrom(), unit.periodTo(), values);
     } else {
-      target = targets.save(new SalesTarget(companyId, unit, values));
+      target =
+          targets.save(
+              new SalesTarget(
+                  companyId, unit, values, organization.company(companyId).baseCurrency()));
     }
     audit.record(
         ENTITY,
@@ -80,9 +88,13 @@ public class SalesTargetService {
             + unit.periodTo()
             + ": "
             + values.count()
-            + " bookings, premium PHP "
+            + " bookings, premium "
+            + target.getCurrency()
+            + " "
             + target.getTargetPremium()
-            + ", commission PHP "
+            + ", commission "
+            + target.getCurrency()
+            + " "
             + target.getTargetCommission());
     return target;
   }

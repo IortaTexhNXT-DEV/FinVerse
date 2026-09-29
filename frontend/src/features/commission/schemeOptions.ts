@@ -1,3 +1,4 @@
+import { clientShortName } from '@/context/clientNames';
 import type { Beneficiary, Calculation, PeriodType, SchemeType } from './commissionApi';
 
 /** The choices of the incentive scheme form, in words. */
@@ -19,7 +20,12 @@ export const PERIODS: readonly { id: PeriodType; label: string }[] = [
   { id: 'CUSTOM', label: 'Custom' },
 ];
 export const BENEFICIARIES: readonly { id: Beneficiary; label: string }[] = [
-  { id: 'BDOI', label: 'BDOI' },
+  {
+    id: 'BROKER',
+    get label() {
+      return clientShortName();
+    },
+  },
   { id: 'BRANCH', label: 'Branch (Passed On)' },
 ];
 

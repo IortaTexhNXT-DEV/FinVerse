@@ -53,10 +53,11 @@ public class LegacyBatchService {
 
   /**
    * The day an unapplied item was received: the legacy acknowledgement receipt date of a migrated
-   * item (received in legacy, loaded at cut-over), else the day it was created in BIBS.
+   * item (received in legacy, loaded at cut-over), else the business day it was created in BIBS;
+   * the business zone is bound as a parameter.
    */
   private static final String RECEIVED_ON =
-      "coalesce(u.legacy_ar_date, cast(u.created_at at time zone 'Asia/Manila' as date))";
+      "coalesce(u.legacy_ar_date, cast(u.created_at at time zone cast(? as text) as date))";
 
   private static final String CANDIDATES =
       "select u.id, u.reference, u.origin, u.ledger_context, u.legacy_ar_no, u.payor_name,"
@@ -191,7 +192,9 @@ public class LegacyBatchService {
                 rs.getInt("age_days"),
                 rs.getString("stage")),
         BusinessClock.today(clock),
+        BusinessClock.zoneId(),
         companyId,
+        BusinessClock.zoneId(),
         java.sql.Date.valueOf(before),
         origin,
         origin);

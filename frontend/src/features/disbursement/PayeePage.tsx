@@ -15,7 +15,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { OriginBadge } from '@/components/ui/OriginBadge';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { useCompanyId } from '@/context/workspaceContext';
+import { useCompanyId, useBaseCurrency } from '@/context/workspaceContext';
 import { disbursementApi } from './api';
 import type { AccountInput, Payee, PayeeAccount } from './api';
 import { CREDIT_MODES } from './labels';
@@ -127,12 +127,17 @@ function NewPayee() {
   const navigate = useNavigate();
   const toast = useToast();
   const [params] = useSearchParams();
+  const baseCurrency = useBaseCurrency();
   const [form, setForm] = useState<PayeeForm>({
     ...EMPTY_PAYEE,
+    currency: baseCurrency,
     payeeCode: params.get('code') ?? '',
     name: params.get('name') ?? '',
   });
-  const [account, setAccount] = useState<AccountInput>(EMPTY_ACCOUNT);
+  const [account, setAccount] = useState<AccountInput>({
+    ...EMPTY_ACCOUNT,
+    currency: baseCurrency,
+  });
   const [withAccount, setWithAccount] = useState(false);
   const [touched, setTouched] = useState(false);
   const errors = {

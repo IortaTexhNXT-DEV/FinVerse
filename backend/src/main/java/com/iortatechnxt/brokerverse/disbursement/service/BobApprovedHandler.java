@@ -47,11 +47,22 @@ public class BobApprovedHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return DisbursementUploadGuide.TREASURY;
+  }
+
+  @Override
+  public String uploadPath() {
+    return DisbursementUploadGuide.path("BOB Approvals");
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(VOUCHER, "DV number entered in BOB", "DV-2026-000001"),
+        BulkColumn.required(VOUCHER, "DV number entered in online banking", "DV-2026-000001")
+            .allowed("DV number of an online banking payment"),
         new BulkColumn(AMOUNT, "Amount approved", true, Type.NUMBER, "12500.00"),
-        BulkColumn.optional(BOB, "BOB transaction reference", "BOB-778812"));
+        BulkColumn.optional(BOB, "Transaction reference of online banking", "BOB-778812"));
   }
 
   @Override

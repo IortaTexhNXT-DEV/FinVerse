@@ -59,11 +59,24 @@ public class HandlingFeeBillingHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The Submitted Policies team, from the handling-fee billing list";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Submitted Policies > Handling Fees, button Upload Billing File";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.optional(SBM_NO, "Masterlist number of the policy, if known", "SBM-2026-000012"),
-        BulkColumn.optional(PN, "PN number carried by CLPC payments", "PN-2026-000123"),
-        BulkColumn.optional(LOCATION, "Location reference carried by OTC payments", "LOC-000451"),
+        BulkColumn.optional(SBM_NO, "Masterlist number of the policy, if known", "SBM-2026-000012")
+            .when("neither PN No nor Location Ref is given"),
+        BulkColumn.optional(PN, "PN number carried by CLPC payments", "PN-2026-000123")
+            .when("the fee is paid through CLPC"),
+        BulkColumn.optional(LOCATION, "Location reference carried by OTC payments", "LOC-000451")
+            .when("the fee is paid over the counter"),
         new BulkColumn(AMOUNT, "Handling fee billed", true, Type.NUMBER, "1500.00"),
         new BulkColumn("Billing Date", "Billing date", true, Type.DATE, "2026-09-01"));
   }
@@ -107,7 +120,7 @@ public class HandlingFeeBillingHandler implements BulkImportHandler {
                 row.text(PN),
                 row.text(LOCATION),
                 row.number(AMOUNT),
-                "PHP",
+                null,
                 row.date("Billing Date")),
             context.jobNo())
         .getFeeNo();

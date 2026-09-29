@@ -26,7 +26,7 @@ function line(patch: Partial<StrTransaction> = {}): StrTransaction {
 
 describe('transaction lines', () => {
   it('gives each line its own key and strips it for the request', () => {
-    const a = blankTransaction('2026-05-01');
+    const a = blankTransaction('2026-05-01', 'PHP');
     const lines = keyed([line(), line({ reference: 'OR-2' })]);
     expect(new Set([a.key, ...lines.map((l) => l.key)]).size).toBe(3);
     expect(a.currency).toBe('PHP');

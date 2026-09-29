@@ -2,7 +2,7 @@ package com.iortatechnxt.brokerverse.bulk.service;
 
 import com.iortatechnxt.brokerverse.bulk.service.TextLayout.FixedField;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
-import java.nio.charset.StandardCharsets;
+import com.iortatechnxt.brokerverse.common.util.TextContent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -17,7 +17,6 @@ final class TextTableReader {
   private static final String LAYOUT_ERROR = "BULK_TEXT_LAYOUT";
   private static final char[] DETECTED = {'\t', '|', ';', ','};
   private static final Pattern LINES = Pattern.compile("\\R");
-  private static final char BOM = '﻿';
 
   private TextTableReader() {}
 
@@ -39,10 +38,7 @@ final class TextTableReader {
   }
 
   private static List<String> lines(byte[] content) {
-    String text = new String(content, StandardCharsets.UTF_8);
-    if (!text.isEmpty() && text.charAt(0) == BOM) {
-      text = text.substring(1);
-    }
+    String text = TextContent.utf8(content);
     return Arrays.stream(LINES.split(text)).filter(l -> !l.isBlank()).toList();
   }
 

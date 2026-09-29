@@ -56,20 +56,35 @@ public class PayeeMigrationHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The disbursement payee maintainers, from the payee list of the former system";
+  }
+
+  @Override
+  public String uploadPath() {
+    return DisbursementUploadGuide.path("Payee Migration");
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(CODE, "Party code", "SUP-0001"),
-        BulkColumn.required("Payee class", "LOV PAYEE_CLASS", "SUPPLIER"),
+        BulkColumn.required(CODE, "Party code of the payee", "SUP-0001").master("party"),
+        BulkColumn.required("Payee class", "Class of the payee", "SUPPLIER").lov("PAYEE_CLASS"),
         BulkColumn.required("Name", "Payee name", "Acme Office Supply"),
         BulkColumn.optional("Address", "Address", "Makati City"),
         BulkColumn.optional("Email", "E-mail for payment advices", "ap@acme.example"),
         BulkColumn.optional("TIN", "Tax identification number", "123-456-789-000"),
-        BulkColumn.required(
-            DEFAULT_MODE, "CTA, ATD, MC_DD, CREDIT_TICKET, TT, ONLINE_BANKING, CHECK", "CHECK"),
-        BulkColumn.required(MODES, "Allowed modes separated by '|'", "CHECK|CTA"),
-        BulkColumn.required("Currency", "ISO currency", "PHP"),
-        BulkColumn.optional("Bank", "Bank of the payee account", "BDO Unibank"),
-        BulkColumn.optional(ACCOUNT_NO, "Payee account number", "001234567890"));
+        BulkColumn.required(DEFAULT_MODE, "Mode of payment used by default", "CHECK")
+            .choices(DisbursementUploadGuide.MODES),
+        BulkColumn.required(MODES, "Modes of payment allowed for the payee", "CHECK|CTA")
+            .format("Mode codes separated by |, e.g. CHECK|CTA")
+            .allowed("Codes of the Default mode list"),
+        BulkColumn.required("Currency", "Currency of payment", BulkColumn.BASE_CURRENCY_EXAMPLE)
+            .format("ISO currency code, 3 letters")
+            .master("currency"),
+        BulkColumn.optional("Bank", "Bank of the payee account", "Philippine National Bank"),
+        BulkColumn.optional(ACCOUNT_NO, "Account number of the payee at the bank", "001234567890")
+            .when("a mode crediting an account (CTA, TT, online banking) is allowed"));
   }
 
   @Override

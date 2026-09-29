@@ -20,7 +20,7 @@ import { remittanceApi } from './api';
 import type { Hold, HoldInput } from './api';
 import { NewHoldDialog } from './HoldDialogs';
 import { TemplateButton, UploadForm } from './RemittanceParts';
-import { HOLD_TABS, HOLD_TEMPLATE, holdStatus, stagesOf } from './remittanceLabels';
+import { HOLD_TABS, holdStatus, stagesOf } from './remittanceLabels';
 import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
 import type { HoldTab } from './remittanceLabels';
 import './remittance.css';
@@ -116,10 +116,7 @@ export default function HoldsPage() {
       />
       <ErrorAlert error={rows.error ?? upload.error} />
       {uploading && (
-        <Card
-          title="Upload Collection Hold File"
-          actions={<TemplateButton name="hold-template.csv" content={HOLD_TEMPLATE} />}
-        >
+        <Card title="Upload Collection Hold File" actions={<TemplateButton kind="holds" />}>
           <UploadForm
             label="Hold File"
             columns="Invoice No., Reason Code, Hold Until, Remarks"

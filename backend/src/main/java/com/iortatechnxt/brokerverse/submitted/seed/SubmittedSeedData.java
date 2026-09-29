@@ -377,7 +377,7 @@ public class SubmittedSeedData implements ApplicationRunner {
         .filter(
             p -> p.getStatus() == SbmPolicyStatus.FOR_RENEWAL && "CBG_FIRE".equals(p.getSegment()))
         .findFirst()
-        .ifPresent(p -> as("firehandler", () -> work.handOff().renewWithBdoi(p.getId())));
+        .ifPresent(p -> as("firehandler", () -> work.handOff().renewByHand(p.getId())));
   }
 
   private void fees(Long companyId, List<SbmPolicy> loaded, LocalDate today) {

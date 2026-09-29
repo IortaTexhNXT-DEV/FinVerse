@@ -18,11 +18,11 @@ export const PRODRECON_HELP: HelpSection = {
       name: 'Reconciliation Cycles',
       path: '/prodrecon/cycles',
       summary:
-        'One cycle per insurer and production month, from the register sent to the insurer to its closure, with the share of items matched and the BDOI-only and insurer-only counts. Open a cycle to review its items.',
+        'One cycle per insurer and production month, from the register sent to the insurer to its closure, with the share of items matched and the counts of items only booked by us and only reported by the insurer. Open a cycle to review its items.',
       workflow: [
         'A cycle opens with the first extract of the month (Extracted), moves to Sent to Insurer when the register is e-mailed and to Reconciling when the insurer feedback is uploaded.',
-        'In a cycle, the Items tab groups the items by bucket: Matched, With Discrepancy, BDOI Only and Insurer Only. Click an item to compare BDOI and insurer values side by side and record the company concerned, instruction, insurer and marketing feedback and disposition.',
-        'Pair a BDOI-only item with an insurer line the matcher missed; split a wrong pairing back into its two sides.',
+        'In a cycle, the Items tab groups the items by bucket: Matched, With Discrepancy, booked by us only and Insurer Only. Click an item to compare our values with the insurer values side by side and record the company concerned, instruction, insurer and marketing feedback and disposition.',
+        'Pair an item booked by us only with an insurer line the matcher missed; split a wrong pairing back into its two sides.',
         'Select several items and use Set Disposition to give them the same disposition.',
         'Run Matching matches again after bookings or corrections; a scheduled job does the same every night.',
         'The cycle closes by itself when every item is matched or ready for closure; Close Cycle closes it earlier with a comment.',
@@ -66,7 +66,7 @@ export const PRODRECON_HELP: HelpSection = {
       name: 'Unbooked Accounts',
       path: '/prodrecon/unbooked',
       summary:
-        'Accounts the insurers reported that BDOI has not booked, followed until they are booked or closed with a disposition.',
+        'Accounts the insurers reported that we have not booked, followed until they are booked or closed with a disposition.',
       workflow: [
         'Not Booked lists the accounts to chase; Pre-booked shows those found as an unbooked account (ARN) in Booking.',
         'When the account is booked, it is matched automatically and moves to Booked Since.',

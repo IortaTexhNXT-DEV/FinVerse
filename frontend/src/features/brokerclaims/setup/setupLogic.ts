@@ -1,4 +1,5 @@
 import type { SettlementAttributesInput, StatusAttributesInput, ValueAttributes } from './api';
+import { clientShortName } from '@/context/clientNames';
 
 /** Phases a status may belong to (CLOSED is reached only through a settlement type). */
 export const STATUS_PHASES = [
@@ -13,7 +14,12 @@ export const WAITING_ON = [
   { code: 'CLAIMANT', label: 'Claimant' },
   { code: 'ASSURED', label: 'Assured' },
   { code: 'ADJUSTER', label: 'Adjuster' },
-  { code: 'BDOI', label: 'BDOI' },
+  {
+    code: 'BROKER',
+    get label() {
+      return clientShortName();
+    },
+  },
 ] as const;
 
 /** Outcomes of a settlement type (spec 6.2). */

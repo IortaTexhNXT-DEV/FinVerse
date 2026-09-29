@@ -90,7 +90,7 @@ public class AuthPasswordPolicy {
     if (mode() == AuthMode.DIRECTORY) {
       throw new BusinessRuleException(
           "PASSWORD_MANAGED_BY_DIRECTORY",
-          "Your password is managed by the BDO directory; change it there");
+          "Your password is managed by the corporate directory; change it there");
     }
   }
 
@@ -117,7 +117,7 @@ public class AuthPasswordPolicy {
    * @return true when a change is due
    */
   public boolean isExpired(AppUser user, Instant now) {
-    return mode() == AuthMode.LOCAL && expiresAt(user).map(e -> !now.isBefore(e)).orElse(false);
+    return mode() != AuthMode.DIRECTORY && expiresAt(user).map(e -> !now.isBefore(e)).orElse(false);
   }
 
   /**
@@ -129,7 +129,7 @@ public class AuthPasswordPolicy {
    * @return RESET, EXPIRED or empty
    */
   public Optional<String> changeReason(AppUser user, Instant now) {
-    if (mode() != AuthMode.LOCAL) {
+    if (mode() == AuthMode.DIRECTORY) {
       return Optional.empty();
     }
     if (user.isMustChangePassword()) {

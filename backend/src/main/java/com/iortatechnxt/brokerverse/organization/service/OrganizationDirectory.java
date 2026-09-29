@@ -64,6 +64,39 @@ public class OrganizationDirectory {
   }
 
   /**
+   * The client profile of a company: the identity that documents, messages and labels use.
+   *
+   * @param id company id
+   * @return profile
+   */
+  @Cacheable(cacheNames = OrganizationCaches.UNITS, key = "'profile:' + #id")
+  public ClientProfile profile(Long id) {
+    Company c =
+        companies.findById(id).orElseThrow(() -> new ResourceNotFoundException(COMPANY, id));
+    String headOffice = c.getHeadOfficeCode();
+    if (headOffice == null) {
+      headOffice =
+          branches.findByCompanyIdOrderByCode(id).stream()
+              .filter(Branch::isHeadOffice)
+              .map(Branch::getCode)
+              .findFirst()
+              .orElse(null);
+    }
+    return new ClientProfile(
+        c.getId(),
+        c.getCode(),
+        c.getName(),
+        c.getShortName(),
+        c.getGroupName(),
+        c.getAddress(),
+        c.getTaxId(),
+        c.getLogoRef(),
+        headOffice,
+        c.getDefaultBankCode(),
+        c.getBaseCurrency());
+  }
+
+  /**
    * A branch.
    *
    * @param id branch id
@@ -103,6 +136,34 @@ public class OrganizationDirectory {
       return new CompanyRef(c.getId(), c.getCode(), c.getName(), c.getBaseCurrency(), c.isActive());
     }
   }
+
+  /**
+   * The client profile of a company (cached view).
+   *
+   * @param id company id
+   * @param code company code
+   * @param legalName legal name (letterheads, signatures of messages)
+   * @param shortName short name in texts and labels
+   * @param groupName group the company belongs to, null when none
+   * @param address registered address
+   * @param taxId tax identification number
+   * @param logoRef logo reference of documents, null for the theme pack logo
+   * @param headOfficeCode code of the head office in files and for records without a branch
+   * @param defaultBankCode bank account code proposed by default, may be null
+   * @param baseCurrency base currency
+   */
+  public record ClientProfile(
+      Long id,
+      String code,
+      String legalName,
+      String shortName,
+      String groupName,
+      String address,
+      String taxId,
+      String logoRef,
+      String headOfficeCode,
+      String defaultBankCode,
+      String baseCurrency) {}
 
   /**
    * A branch (cached view).

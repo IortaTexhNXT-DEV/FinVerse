@@ -11,11 +11,13 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, humanize } from '@/utils/format';
 import { TAB_UNAVAILABLE } from './AccountsTab';
+import { InBaseCurrency } from '@/components/ui/InBaseCurrency';
+import { BRAND } from '@/branding';
 
 const KIND_LABELS: Record<Payment['kind'], string> = {
   PAYMENT: 'Payment',
   REVERSAL: 'Reversal',
-  LEGACY: 'Before BIBS',
+  LEGACY: `Before ${BRAND.product}`,
 };
 
 const PAYMENT_COLUMNS: Column<Payment>[] = [
@@ -39,7 +41,12 @@ const PAYMENT_COLUMNS: Column<Payment>[] = [
       />
     ),
   },
-  { key: 'amount', header: 'Amount (PHP)', kind: 'amount', render: (p) => formatAmount(p.amount) },
+  {
+    key: 'amount',
+    header: <InBaseCurrency label="Amount" />,
+    kind: 'amount',
+    render: (p) => formatAmount(p.amount),
+  },
 ];
 
 const APPLICATION_COLUMNS: Column<PaymentApplication>[] = [
@@ -47,13 +54,13 @@ const APPLICATION_COLUMNS: Column<PaymentApplication>[] = [
   { key: 'arn', header: 'ARN', kind: 'code', render: (a) => a.arn },
   {
     key: 'applied',
-    header: 'Applied (PHP)',
+    header: <InBaseCurrency label="Applied" />,
     kind: 'amount',
     render: (a) => formatAmount(a.amount),
   },
   {
     key: 'balance',
-    header: 'Balance (PHP)',
+    header: <InBaseCurrency label="Balance" />,
     kind: 'amount',
     render: (a) => (a.invoiceBalance === null ? '' : formatAmount(a.invoiceBalance)),
   },

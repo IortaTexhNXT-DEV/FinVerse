@@ -23,7 +23,8 @@ export function ebWrapper(
       permissions: [],
     } as unknown as UserProfile,
     loading: false,
-    login: () => Promise.resolve(),
+    login: () => Promise.resolve({ expiresAt: '' }),
+    completeSignIn: () => undefined,
     logout: () => undefined,
     can: (p) => permissions.has(p),
     passwordChange: null,
@@ -31,7 +32,7 @@ export function ebWrapper(
   };
   const workspace = {
     companies: [],
-    company: { id: 1 } as Company,
+    company: { id: 1, baseCurrency: 'PHP' } as Company,
     branches: [],
     branchId: undefined,
     setCompanyId: () => undefined,

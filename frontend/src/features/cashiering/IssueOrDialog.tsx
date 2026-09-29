@@ -13,6 +13,7 @@ import { CodeSelect, TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { PaymentMode } from './cashieringApi';
 import { positive } from './cashieringLogic';
+import { useBaseCurrency } from '@/context/workspaceContext';
 
 const MODES: readonly PaymentMode[] = [
   'CASH',
@@ -40,7 +41,7 @@ const EMPTY: OrForm = {
   orType: '',
   payorName: '',
   payorCode: '',
-  currency: 'PHP',
+  currency: '',
   mode: 'CHECK',
   checkNo: '',
   gross: '',
@@ -78,7 +79,8 @@ export function IssueOrDialog({
   const toast = useToast();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState<OrForm>(EMPTY);
+  const baseCurrency = useBaseCurrency();
+  const [form, setForm] = useState<OrForm>({ ...EMPTY, currency: baseCurrency });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const issue = useMutation({
     mutationFn: () =>

@@ -14,6 +14,7 @@ import { Pager } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
+import { BRAND } from '@/branding';
 
 const STATUSES: MessageStatus[] = ['QUEUED', 'SENT', 'FAILED'];
 
@@ -44,7 +45,7 @@ export default function OutboundMessagesPage() {
       <PageHeader
         section="Broking Setup"
         title="Outbound Messages"
-        description="E-mails sent by BIBS: quotations, slips, placements, e-policies, invoices."
+        description={`E-mails sent by ${BRAND.product}: quotations, slips, placements, e-policies, invoices.`}
       />
       <ErrorAlert error={messages.error ?? retry.error} />
       <MessageFilterForm filters={filters} onChange={setFilters} />

@@ -12,6 +12,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDate, today } from '@/utils/format';
 import { frbsSetupApi } from './frbsSetupApi';
 import { UserName } from '@/components/ui/UserName';
+import { useCurrencyCodes } from '@/context/currencies';
 
 const previousMonth = (): string => {
   const d = new Date(`${today()}T00:00:00`);
@@ -31,7 +32,9 @@ export function RevaluationRatesCard({ currencies }: Readonly<{ currencies: Curr
   const queryClient = useQueryClient();
   const maintainer = can('REVALUATION_RATE_MAINTAIN');
   const [month, setMonth] = useState(previousMonth());
-  const [currency, setCurrency] = useState('USD');
+  const foreign = useCurrencyCodes()[1] ?? '';
+  const [chosen, setCurrency] = useState('');
+  const currency = chosen || foreign;
   const [rate, setRate] = useState('');
   const year = Number(month.slice(0, 4));
 

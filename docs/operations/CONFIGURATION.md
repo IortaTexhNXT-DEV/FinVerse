@@ -5,19 +5,24 @@ are for local development only.
 
 | Variable | Required in prod | Default | Purpose |
 |---|---|---|---|
-| `SPRING_PROFILES_ACTIVE` | yes | – | `prod` in production. `seed` loads the seed data of SIT, UAT and training (never in production: the start is refused, see "Production start-up safeguards"). |
-| `BROKERVERSE_ENVIRONMENT` | yes | `local` (`seed` with the seed profile) | `brokerverse.environment`: `local`, `sit`, `uat`, `training`, `preprod` or `production`. `production` (set by the `prod` profile) turns on the start-up safeguards. |
+| `SPRING_PROFILES_ACTIVE` | yes | – | `prod` in production. `seed` loads the seed data of SIT, UAT and training (never in production: the start is refused, see "Start-up safeguards"). |
+| `BROKERVERSE_ENVIRONMENT` | yes | `local` | `brokerverse.environment`: `local`, `sit`, `uat`, `training`, `preprod` or `production`. Every value except `local` turns on the secret checks of the start-up safeguards; `production` (set by the `prod` profile) adds the transport checks. |
 | `BROKERVERSE_BUSINESS_ZONE` | no | `Asia/Manila` | `brokerverse.business-zone`: time zone of the business date (`BusinessClock`). "Today", "not in the future" and cut-off checks, accounting periods, report date keywords, job run dates and the report day cuts use the calendar day of this zone; timestamps stay UTC and the job cron expressions are UTC. An unknown zone refuses the start. Change it only with a new deployment, never on a running platform. |
 | `BROKERVERSE_DB_URL` | yes | `jdbc:postgresql://localhost:5432/brokerverse`; none with `prod` | JDBC URL. Leave `sslmode` out: `BROKERVERSE_DB_SSL_MODE` applies (an `sslmode` in the URL takes precedence, and a plaintext one is refused in production). |
-| `BROKERVERSE_DB_USER` | yes | `brokerverse`; none with `prod` | Database user (owner of the schema; Flyway migrates on start). |
+| `BROKERVERSE_DB_USER` | yes | `brokerverse`; none with `prod` | Database login of the application. In production a least-privilege runtime login, member of the runtime role (`BROKERVERSE_DB_RUNTIME_ROLE`), never the schema owner; in development and tests it may be the owner (then Flyway migrates with it). See DEPLOYMENT.md "Database roles". |
 | `BROKERVERSE_DB_PASSWORD` | yes | none (a local value with the `seed` profile only) | Database password (from secret store). |
+| `SPRING_FLYWAY_USER` | yes | – (the application login) | `spring.flyway.user`: owner of the schema objects; Flyway migrates on start with this login. Must differ from `BROKERVERSE_DB_USER` in production. The migration connection uses the same URL and TLS settings (`BROKERVERSE_DB_SSL_MODE`, `BROKERVERSE_DB_SSL_ROOT_CERT`) as the application pool (`MigrationOwnerConnection`). |
+| `SPRING_FLYWAY_PASSWORD` | yes | – | `spring.flyway.password`: password of the schema owner (from secret store). |
+| `BROKERVERSE_DB_RUNTIME_ROLE` | no | `brokerverse_runtime` | Flyway placeholder `runtime_role`: the group role that migration V1190 grants row access to (SELECT, INSERT, UPDATE, DELETE, sequences; no DDL, no TRUNCATE, no triggers, read-only migration history), also for the tables of later migrations (default privileges). V1190 creates it (`NOLOGIN`) when the schema owner may create roles; otherwise the DBA creates it first. Set it before the first start; changing it later needs the grants repeated for the new role. |
 | `BROKERVERSE_DB_POOL_SIZE` | no | `20` | Hikari maximum pool size per instance. |
-| `BROKERVERSE_JWT_SECRET` | yes | none (a local value with the `seed` and test profiles only) | HMAC key for access tokens, ≥ 32 random characters. Rotating it signs everyone out. |
-| `BROKERVERSE_TOKEN_VALIDITY` | no | `PT8H` | Access token lifetime (ISO-8601 duration). |
-| `BROKERVERSE_ALLOWED_ORIGINS` | yes | `http://localhost:5173` | Comma separated browser origins allowed by CORS. |
-| `BROKERVERSE_MAX_FAILED_ATTEMPTS` | no | `5` | Consecutive failed logins that lock an account when the business parameter `LOGIN_MAX_FAILED_ATTEMPTS` is missing. The parameter (seeded with 3, BDOI NFR, CQ23) wins; administrators change it on *Administration › Parameters*. Property `brokerverse.security.max-failed-attempts`. |
+| `BROKERVERSE_JWT_SECRET` | yes (every environment but local) | none (the automated tests and the local docker compose stack carry local values; the `seed` profile has none) | HMAC key for access tokens, ≥ 32 random characters. Rotating it makes every access token invalid; the refresh cookies renew them. |
+| `BROKERVERSE_TOKEN_VALIDITY` | no | `PT8H` | Maximum life of a sign-in session (ISO-8601 duration): the access token is renewed until then. |
+| `BROKERVERSE_ACCESS_TOKEN_VALIDITY` | no | `PT15M` | Life of an access token when the security parameter `ACCESS_TOKEN_MINUTES` (15, between 5 and 60) is missing. |
+| `BROKERVERSE_REFRESH_GRACE` | no | `PT30S` | Time a replaced refresh token is still accepted (a second browser tab renewing at the same moment); later it ends the session (`TOKEN_REUSED`). |
+| `BROKERVERSE_ALLOWED_ORIGINS` | yes (every environment but local, not localhost) | `http://localhost:5173` | Comma separated browser origins allowed by CORS. |
+| `BROKERVERSE_MAX_FAILED_ATTEMPTS` | no | `5` | Consecutive failed sign-ins (wrong password or wrong second-factor code) that lock an account when the business parameter `LOGIN_MAX_FAILED_ATTEMPTS` is missing. The parameter wins (the client's value is set in its data; a security parameter, changed under a second approval on *Administration › System Parameters*). Property `brokerverse.security.max-failed-attempts`. |
 | `BROKERVERSE_ADMIN_USERNAME` | first start | `sysadmin` | Initial administrator (created only when no user exists). |
-| `BROKERVERSE_ADMIN_INITIAL_PASSWORD` | first start | – | Initial administrator password; remove after first login. |
+| `BROKERVERSE_ADMIN_INITIAL_PASSWORD` | first start | – | Initial administrator password: a one-time value that must be changed at the first sign-in (it ages like any other password); remove it from the secret afterwards. |
 | `BROKERVERSE_SEED_PASSWORD` | no (seed profile only) | – | Password of the SIT/UAT users of this seed environment (SIT, UAT, training, local stacks), from the secret store; never written into a file. At start the seed profile gives it to every SIT/UAT user still carrying the password hash of the seed scripts (`SeedPasswords`). Blank: the users are left unchanged and a warning is logged. See "Seed data". |
 | `BROKERVERSE_SEED_PASSWORD_MUST_CHANGE` | no | `false` | `true`: the SIT/UAT users given `BROKERVERSE_SEED_PASSWORD` must change it at their first sign-in (each tester then holds an own password; shared personas and the screenshot tools need the unchanged password, hence the default). |
 | `BROKERVERSE_PORT` | no | `8080` | Listener port (`8443` in the Kubernetes deployments, where it serves HTTPS). |
@@ -93,7 +98,7 @@ are for local development only.
 | `BROKERVERSE_JOB_SBM_HANDLING_FEE_TAGGER_CRON` | no | `0 */30 * * * *` | Spring cron (UTC) of `SBM_HANDLING_FEE_TAGGER` (submitted, BRIDSP-31; every 30 minutes: tags the open unapplied payments to the billed handling fees by PN (CLPC) or location (over the counter) and asks Cashiering to recognise them as income with an official receipt; payments matching several fees wait for the handler). Built by Submitted Policies (`submitted.fee.service.HandlingFeeTaggerJob`). Property `brokerverse.jobs.sbm-handling-fee-tagger-cron`. |
 | `BROKERVERSE_JOB_CSF_LEGACY_SYNC_CRON` | no | `-` (manual) | Spring cron (UTC) of `CSF_LEGACY_SYNC` (Customer Servicing Facility, FR-CSF-022; sends the contact changes of the contact centre to QPS and EBIX through the port `ContactSyncGateway`, replaying the changes kept while the sync was off). Manual until the legacy interface exists and the parameter `CSF_LEGACY_SYNC_ENABLED` is on; then `0 */15 * * * *` (every 15 minutes). Workload INTEGRATION (runs on `bibs-integration`). Built by the Customer Servicing Facility (`csf.service.LegacySyncJob`). Property `brokerverse.jobs.csf-legacy-sync-cron`. |
 | `BROKERVERSE_JOBS_USER_SESSION_SWEEP_CRON` | no | `0 */15 * * * *` | Spring cron (UTC) of `USER_SESSION_SWEEP` (security, UAM-NFR-35): ends the sign-in sessions nobody signed out of - idle longer than `SESSION_TIMEOUT_MINUTES` plus 5 minutes (IDLE_TIMEOUT), token expired (EXPIRED), user locked (LOCKED) or disabled (ADMIN_ENDED). Property `brokerverse.jobs.user-session-sweep-cron` (default in code, not in `application.yml`). |
-| `BROKERVERSE_SECURITY_PASSWORD_RESET_URL` | no | first allowed origin + `/reset-password` | Address of the web page opened by the "Forgot password?" e-mail link (UAM-NFR-37; the link carries a single-use token valid 30 minutes). Property `brokerverse.security.password-reset-url`; set it when the web client is not served from the first CORS origin. |
+| `BROKERVERSE_PASSWORD_RESET_URL` | yes (every environment but local, not localhost) | on a developer's machine the first allowed origin + `/reset-password` | Address of the web page opened by the "Forgot password?" e-mail link (UAM-NFR-37; the link carries a single-use token valid 30 minutes), e.g. `https://bibs.example.com/reset-password`. Property `brokerverse.security.password-reset-url` (the relaxed name `BROKERVERSE_SECURITY_PASSWORD_RESET_URL` works too). |
 | `BROKERVERSE_JOB_EVENT_OUTBOX_RELAY_CRON` | no | `0 * * * * *` | Spring cron (UTC) of `EVENT_OUTBOX_RELAY` (platform, every minute): sends the integration events the after-commit relay left in `evt_outbox` (broker down, instance stopped) and the retries that are due; with Kafka disabled marks leftovers `LOCAL`. Property `brokerverse.jobs.event-outbox-relay-cron`. |
 | `BROKERVERSE_JOB_EVENT_HOUSEKEEPING_CRON` | no | `0 50 0 * * *` | Spring cron (UTC) of `EVENT_HOUSEKEEPING` (platform, daily): deletes delivered outbox rows older than `BROKERVERSE_KAFKA_OUTBOX_RETENTION`, archived events and resolved dead letters older than `BROKERVERSE_KAFKA_ARCHIVE_RETENTION`. Property `brokerverse.jobs.event-housekeeping-cron`. |
 | `BROKERVERSE_JOB_SHARED_STATE_CLEANUP_CRON` | no | `0 40 0 * * *` | Spring cron (UTC) of `SHARED_STATE_CLEANUP` (platform, daily): deletes expired rows of `sec_revoked_token` and `sys_shared_counter` (database fallback of Redis). Property `brokerverse.jobs.shared-state-cleanup-cron`. |
@@ -164,7 +169,10 @@ environment must use the same settings.
 | `BROKERVERSE_CACHE_TTL_ORGANIZATION` | no | `PT1H` | `brokerverse.cache.ttl.organization-units`. |
 | `BROKERVERSE_CACHE_MAX_SIZE` | no | `10000` | `brokerverse.cache.maximum-size`: entries per cache of the in-memory fallback. |
 | `BROKERVERSE_LOGIN_RATE_LIMIT` | no | `20` | `brokerverse.security.login-protection.max-attempts-per-window`: login requests accepted per client address and window, counted across all instances; above it `POST /auth/login` answers HTTP 429 (`LOGIN_RATE_LIMITED`). Behind the ingress set `SERVER_FORWARD_HEADERS_STRATEGY=native` (or `framework`) so the address is the caller's. |
-| `BROKERVERSE_LOGIN_RATE_WINDOW` | no | `PT1M` | `brokerverse.security.login-protection.rate-limit-window`. |
+| `BROKERVERSE_LOGIN_RATE_WINDOW` | no | `PT1M` | `brokerverse.security.login-protection.rate-limit-window`. The limit covers every anonymous sign-in step: password, second-factor code and enrolment, completion of a single sign-on. |
+| `BROKERVERSE_RESET_RATE_LIMIT` | no | `10` | `brokerverse.security.login-protection.reset-max-per-address`: "Forgot password?" requests (request, check and confirm of a link) accepted per client address and reset window (HTTP 429 `RESET_RATE_LIMITED` above). |
+| `BROKERVERSE_RESET_LINKS_PER_USER` | no | `3` | `brokerverse.security.login-protection.reset-max-per-user`: reset links e-mailed for one user per reset window; further requests get the same answer and no e-mail. |
+| `BROKERVERSE_RESET_RATE_WINDOW` | no | `PT15M` | `brokerverse.security.login-protection.reset-window`. |
 | `BROKERVERSE_LOGIN_FAILURE_WINDOW` | no | `P1D` | `brokerverse.security.login-protection.failed-attempt-window`: life of the shared failed-login counter of a user. The lockout itself still follows `LOGIN_MAX_FAILED_ATTEMPTS`; `sec_user.failed_attempts` stays the record. |
 | `BROKERVERSE_KAFKA_ENABLED` | yes (`true`) | `true` | `brokerverse.kafka.enabled`. `true`: the outbox is relayed to Kafka and the consumers run (archive, e-mail dispatch, dead-letter recorder); `false`: events are recorded as delivered in-process (`LOCAL`) and e-mails are sent after commit and by `MAIL_DISPATCH`. |
 | `BROKERVERSE_KAFKA_BOOTSTRAP_SERVERS` | when enabled | `localhost:9092` | `spring.kafka.bootstrap-servers`. On AWS: the Amazon MSK bootstrap brokers (SASL/SCRAM port 9096 or TLS port 9094). |
@@ -250,17 +258,67 @@ user token issued by BIBS is refused on `/integration/**`. Stateless: no session
 Answers: no or invalid token (signature, issuer, audience, expiry) 401 with `WWW-Authenticate: Bearer`; valid token
 without a required scope, or a path without a rule, 403.
 
-## Production start-up safeguards
+## Authentication and session security
+
+| Variable | Required | Default | Purpose |
+|---|---|---|---|
+| `BROKERVERSE_MFA_ENCRYPTION_KEY` | every environment but local | – (a documented local value in docker compose, a test value in the test profile) | AES-256 key of the authenticator app secrets (second factor): 32 random bytes in Base64 (`openssl rand -base64 32`). Without it on a developer's machine the second factor is not asked. |
+| `BROKERVERSE_MFA_PREVIOUS_ENCRYPTION_KEY` | no | – | The previous key during a rotation: secrets are read with either key and re-encrypted with the current one at their next use. |
+| `BROKERVERSE_MANAGEMENT_PORT` | no (9090 in Kubernetes) | the application port | Port of the actuator (health, info, Prometheus metrics). On a separate port the metrics need no token; restrict the port to the monitoring namespace (NetworkPolicy `allow-monitoring`). `/livez` and `/readyz` stay on the application port for the probes and the load balancer. On the shared port `/actuator/prometheus` needs `METRICS_VIEW`. |
+| `BROKERVERSE_MAIL_FROM` | every environment but local, when mail delivery is on | – (`no-reply@localhost` on a developer's machine) | Sender of the e-mails (`brokerverse.mail.from-address`); it takes precedence over the parameter `MAIL_FROM_ADDRESS`. |
+| `BROKERVERSE_MIGRATION_MASKING_KEY` | no (the migration intake needs it outside production) | – (a documented local value in docker compose) | Keyed masking of personal data in non-production extracts; a development value is refused outside local. The `seed` profile has no default any more. |
+| `BROKERVERSE_SSO_BASE_URL` | with single sign-on | – | Public address of BrokerVerse, e.g. `https://bibs.example.com`. Redirect URI to register at an OpenID Connect provider: `<base>/api/v1/auth/sso/oidc/callback`; SAML assertion consumer service: `<base>/api/v1/auth/sso/saml/acs`; SAML metadata: `<base>/api/v1/auth/sso/saml/metadata`. |
+| `BROKERVERSE_SSO_LABEL` | no | `your organisation` | Name of the identity provider on the sign-in button. |
+| `BROKERVERSE_SSO_BREAK_GLASS_USERS` | recommended with single sign-on | – | Comma-separated user names that keep a local password in OIDC or SAML mode (emergency administrators); the second factor is always asked of them. |
+| `BROKERVERSE_SSO_USERNAME_CLAIM` | no | `preferred_username` (OIDC), the NameID (SAML) | Claim or attribute holding the BrokerVerse user name. The identity is linked to an existing, active user only; no user is ever created. |
+| `BROKERVERSE_SSO_GROUPS_CLAIM` | no | – | Claim or attribute holding the user's groups, for the optional group check `brokerverse.security.sso.group-roles.<group>=<ROLE_CODE>` (set in a deployment file): a single sign-on is accepted only when the provider asserts a group mapped to a role the user holds. Roles are never granted from the groups. |
+| `BROKERVERSE_SSO_REQUIRE_LOCAL_MFA` | no | `false` | `true` also asks the BrokerVerse second factor after a single sign-on (normally the provider enforces its own). |
+| `BROKERVERSE_SSO_CLOCK_SKEW` | no | `PT2M` | Tolerance on the validity times of ID tokens and assertions. |
+| `BROKERVERSE_OIDC_ISSUER` | with `AUTH_MODE=OIDC` | – | Issuer of the OpenID Connect provider; the endpoints are read from `<issuer>/.well-known/openid-configuration` unless set below. |
+| `BROKERVERSE_OIDC_CLIENT_ID` / `BROKERVERSE_OIDC_CLIENT_SECRET` | with `AUTH_MODE=OIDC` | – | Confidential client registered at the provider (`client_secret_basic`); the secret from the secret store. |
+| `BROKERVERSE_OIDC_SCOPES` | no | `openid profile email` | Scopes asked for. |
+| `BROKERVERSE_OIDC_AUTHORIZATION_URI`, `_TOKEN_URI`, `_JWK_SET_URI` | no | discovered | Endpoints when the provider has no discovery document. |
+| `BROKERVERSE_OIDC_JWS_ALGORITHM` | no | `RS256` | The only signature algorithm accepted on ID tokens. |
+| `BROKERVERSE_SAML_IDP_ENTITY_ID` | with `AUTH_MODE=SAML` | – | Entity id of the SAML provider (the Issuer of its responses). |
+| `BROKERVERSE_SAML_IDP_SSO_URL` | with `AUTH_MODE=SAML` | – | Single sign-on address of the provider (HTTP-Redirect binding). |
+| `BROKERVERSE_SAML_IDP_CERTIFICATE` | with `AUTH_MODE=SAML` | – | The provider's signing certificate or public key (PEM text, or `file:` path to it); the key inside a message is never trusted. |
+| `BROKERVERSE_SAML_SP_ENTITY_ID` | no | `BROKERVERSE_SSO_BASE_URL` | Entity id of BrokerVerse at the provider (the audience of the assertions). |
+| `BROKERVERSE_SAML_NAME_ID_FORMAT` | no | unspecified | NameID format asked for. |
+
+Business parameters of the sign-in (security parameters: a change waits for a second approval):
+
+| Parameter | Delivered | Purpose |
+|---|---|---|
+| `AUTH_MODE` | `LOCAL` | `LOCAL`, `DIRECTORY`, `OIDC` or `SAML`. Switch to `OIDC` or `SAML` only once the provider is configured and a break-glass administrator exists. |
+| `MFA_POLICY` | `PRIVILEGED` (`OFF` in the SIT/UAT seed data) | Who must confirm a sign-in with an authenticator app code: `ALL`, `PRIVILEGED` (a role of privilege level HIGH or ADMIN) or `OFF`. A user who enrolled is always asked. |
+| `MFA_REMEMBER_DEVICE_DAYS` | `0` | Days a device may be remembered after a confirmed code (0 to 30; 0 = never). |
+| `MFA_ISSUER_NAME` | `iNXT BrokerVerse` | Name shown next to the account in the authenticator app. |
+| `ACCESS_TOKEN_MINUTES` | `15` | Life of an access token (5 to 60). |
+| `SESSION_TIMEOUT_MINUTES` | (existing) | Inactivity after which a session ends; the renewal of the token stops as well. |
+| `LOGIN_MAX_FAILED_ATTEMPTS` | (existing) | Failed sign-ins (password or second-factor code) that lock an account. |
+
+## Start-up safeguards
 
 `ProductionSafeguards` (package `config`, registered in `META-INF/spring.factories`) checks the resolved
-configuration before any bean is created. A production start is one with the `prod` profile or with
-`BROKERVERSE_ENVIRONMENT=production`; the `prod` profile sets `production` itself. BIBS refuses to start, and lists
-every problem in one message, when:
+configuration before any bean is created. **Every environment except local** (`BROKERVERSE_ENVIRONMENT` other than
+`local`, or the `prod` profile) gets the secret checks; a production start (the `prod` profile or
+`BROKERVERSE_ENVIRONMENT=production`; the `prod` profile sets `production` itself) gets the transport and
+integration checks as well. BIBS refuses to start, and lists every problem in one message, when:
+
+- (every environment but local) `BROKERVERSE_ALLOWED_ORIGINS` or `BROKERVERSE_PASSWORD_RESET_URL` is missing or
+  names localhost; `BROKERVERSE_MFA_ENCRYPTION_KEY` is missing, not 32 bytes of Base64 or a development value; mail
+  delivery is on and `BROKERVERSE_MAIL_FROM` is missing; a masking key is a development value; an OpenID Connect
+  issuer is set without `BROKERVERSE_OIDC_CLIENT_ID` / `_CLIENT_SECRET`, or a SAML provider without its
+  certificate. The API documentation (springdoc) is switched off outside local and the `dev` profile;
 
 - the `seed` profile is active in production (seed data never loads in production);
 - `BROKERVERSE_DB_URL`, `BROKERVERSE_DB_USER` or `BROKERVERSE_DB_PASSWORD` is missing (the `prod` profile has no
   defaults for them);
-- `BROKERVERSE_JWT_SECRET` is missing, shorter than 32 characters or a development value;
+- `SPRING_FLYWAY_USER` or `SPRING_FLYWAY_PASSWORD` is missing, or `SPRING_FLYWAY_USER` names the same login as
+  `BROKERVERSE_DB_USER` (the application must connect as the least-privilege runtime login, not as the schema owner;
+  not checked when the migrations are switched off with `SPRING_FLYWAY_ENABLED=false`);
+- (every environment but local) `BROKERVERSE_JWT_SECRET` is missing, shorter than 32 characters or a development
+  value; the database, SMTP, Redis and Kafka credentials below are missing;
 - mail delivery is on (`BROKERVERSE_MAIL_ENABLED=true`) and `MAIL_HOST`, or with SMTP authentication
   `MAIL_USERNAME` / `MAIL_PASSWORD`, is missing;
 - Redis is on (`BROKERVERSE_REDIS_ENABLED`, default `true`) and `BROKERVERSE_REDIS_PASSWORD` is missing;
@@ -273,8 +331,9 @@ every problem in one message, when:
   `BROKERVERSE_INTEGRATION_ISSUER` or `BROKERVERSE_INTEGRATION_AUDIENCES` is missing, or the runtime role is not one
   of `web`, `jobs`, `integration`, `all`.
 
-The base `application.yml` holds no password or signing key. Only the `seed` profile (local stacks, SIT, UAT and
-training) and the automated tests carry local values, and the `seed` profile is refused in production.
+The base `application.yml` holds no password or signing key, and neither does the `seed` profile (it reads the JWT
+key, the masking key and the second-factor key from the environment like every profile). Only the automated tests
+and the local docker compose stack carry documented local values; the `seed` profile is refused in production.
 
 ## Document storage (S3, build step ST0)
 
@@ -300,6 +359,7 @@ links. All properties are under `brokerverse.storage.*`.
 | `BROKERVERSE_STORAGE_LINK_TTL` | no | `PT5M` | `brokerverse.storage.link-ttl`: fallback for the business parameter `FILE_LINK_TTL_SECONDS` (seeded 300, range 30-3600, *Administration › Parameters*), which sets the validity of presigned links. |
 | `BROKERVERSE_STORAGE_ORPHAN_AGE` | no | `PT24H` | `brokerverse.storage.orphan-age`: objects without a metadata row older than this are deleted by `FILE_ORPHAN_RECONCILIATION`. Announced uploads not confirmed within it are closed. |
 | `BROKERVERSE_STORAGE_DELETED_GRACE` | no | `P30D` | `brokerverse.storage.deleted-grace`: time between the soft delete of a file and the removal of its object by `FILE_RETENTION`. |
+| `BROKERVERSE_MALWARE_SCAN` | yes (`storage`) | `storage` | `brokerverse.attachments.malware-scan`, the explicit malware scan decision of uploaded files, checked at start-up (`MalwareScanPolicy`). `storage`: the file store scans every object (S3 with GuardDuty Malware Protection; a file cannot be downloaded before its result is `NO_THREATS_FOUND`, infected files are quarantined); in production the start is refused unless `BROKERVERSE_STORAGE_PROVIDER=s3`. `application`: an antivirus scanner bean of the deployment scans each file before it is stored; the start is refused when only the built-in no-op scanner is present. `none`: no scan, development and automated tests only; refused in production. A deployed scanner bean scans in every mode, in addition to the storage scan. |
 | `BROKERVERSE_STORAGE_SCAN_TAG` | no | `GuardDutyMalwareScanStatus` | `brokerverse.storage.scan-tag`: object tag with the malware scan result. Only `NO_THREATS_FOUND` is accepted. |
 | `BROKERVERSE_JOB_FILE_SCAN_RESULTS_CRON` | no | `0 */5 * * * *` | Spring cron (UTC) of `FILE_SCAN_RESULTS` (every 5 minutes): reads the scan results of pending files and quarantines infected ones (notification to the uploader and to `FILE_QUARANTINE_VIEW`, alert `FILE_QUARANTINED`). Property `brokerverse.storage.jobs.scan-results-cron`. |
 | `BROKERVERSE_JOB_FILE_ORPHAN_CRON` | no | `0 10 2 * * *` | Spring cron (UTC) of `FILE_ORPHAN_RECONCILIATION` (daily): deletes objects that have had no row for 24 hours and are not under legal hold. Property `brokerverse.storage.jobs.orphan-cron`. |
@@ -308,6 +368,24 @@ links. All properties are under `brokerverse.storage.*`.
 | `BROKERVERSE_STORAGE_DOWNLOAD_MODE` | no | `stream` | How the download endpoints of the modules answer for a stored file (build step ST1): `redirect` sends the browser to the presigned link, so the bytes never pass through BIBS; `stream` reads the file through BIBS with its SHA-256 re-checked. Set `redirect` in an S3 environment only once the buckets allow the web origin (CORS: `GET`, exposed `Content-Disposition` and `Content-Type`) and the web client's `connect-src` lists the bucket hosts. With the local store (`local`) `redirect` works as is. `GET /api/v1/files/{id}/link` always returns the link. Property `brokerverse.storage.downloads.mode`. |
 | `BROKERVERSE_JOB_FILE_BYTEA_MIGRATION_CRON` | no | `-` (manual) | Spring cron (UTC) of `FILE_BYTEA_MIGRATION`, the one-off copy of the files still kept in the database to the file store (build step ST1). Keep it manual and run it from the job monitor until the reconciliation report (`GET /api/v1/files/content-migration`) shows nothing left. Property `brokerverse.storage.content-migration.cron`. |
 | `BROKERVERSE_FILE_BYTEA_MIGRATION_BATCH` | no | `20` | Rows read per query by `FILE_BYTEA_MIGRATION` (1 to 500). Each row is copied and checked in its own transaction. Property `brokerverse.storage.content-migration.batch-size`. |
+
+**Content checks of uploaded files.** Every Office Open XML and OpenDocument file opened from outside (bulk and
+journal uploads, protected e-mail attachments, edited Word templates) is read within fixed decompression limits
+(`OfficeFileLimits`): at most 1,000 parts, 64 MB for one uncompressed part and an expansion of at most 100 times the
+compressed size; a larger file is refused as a possible compressed-file bomb (`FILE_ARCHIVE_LIMIT`). An OpenDocument
+sheet expands to at most 100,000 rows of 1,024 columns. CSV, TXT and EML files must be text throughout (no NUL byte
+and no binary control character anywhere in the file); CSV and TXT files read as data (bulk and journal uploads)
+must also be UTF-8 (`FILE_TEXT_ENCODING`, with a hint to save as "CSV UTF-8") and at most 25 MB.
+
+**Request size.** `BROKERVERSE_MAX_JSON_BODY_SIZE` (`brokerverse.http.max-json-body-size`, default `2MB`) limits a
+JSON request body: a larger declared length is answered with 413 before security and the controllers run, and a
+body without a length stops being read at the limit (413, `REQUEST_TOO_LARGE`). File uploads keep the multipart
+limits above.
+
+**Log forging.** Line breaks in log messages (CR, LF, NEL, Unicode line separators) are replaced by `_` by the
+message converter of `logback-spring.xml` (`%m`, `%msg`, `%message`), so the protection holds for any
+`LOGGING_PATTERN_CONSOLE` and any file appender added to that file; structured JSON logging escapes them by format.
+BIBS logs to the console only (the platform collects container output).
 
 Credentials are never configured. On EKS the pod uses the IAM role of its service account (IRSA) through the AWS
 default credential chain. For the S3 adapter's own test on a developer machine, the standard `AWS_*` variables can
@@ -351,3 +429,67 @@ the client documents included (a standing test refuses it, `SeedPasswordGuardTes
   `flyway repair` once, or is recreated, before its next start. Never run it on production, which never applies
   `db/seed`. `spring.flyway.validate-on-migrate` keeps its default (on) in every profile; the automated tests build
   a fresh database on every run and need no repair.
+
+## Client-specific values (client profile, business rules, theme pack)
+
+iNXT BrokerVerse is a product for many clients: no client name, code, logo, currency or business
+term is written into the platform code. A deployment sets them in data and in its theme pack. The
+standing checks `ClientNeutralityTest` (backend build) and the `no-restricted-syntax` rule of
+`frontend/eslint.config.js` (`npm run lint`) refuse client names and currency codes in platform
+code; seed data, tests and the theme packs are exempt.
+
+### Client profile (company master, V1150)
+
+Maintained on *Setup › Companies*: select a company to open its **Client profile** (the change
+returns the company to pending authorization). The legal name, address, TIN and base currency are
+the company's own fields.
+
+| Field | Purpose |
+|---|---|
+| Short name | Name of the company in texts and labels ("Via …", "… Only", "Renew with …"); the company code when blank. |
+| Group name | Group the company belongs to, used in labels of group concepts ("… Bank Client", "… CIF number"); blank = none. |
+| Document logo | Logo on documents: `theme:logo` (or blank) = the logo of the deployed theme pack. |
+| Head office code | Code of the head office in files exchanged with the client (DP lists `<code>_DP_<yyyyMMdd>`, collection hand-offs) and for records without a branch (incentive pass-on); the code of the head-office branch when blank. |
+| Default bank account | Bank account code proposed where a report asks for the company account (Payment Notification to the Bank). |
+
+The base currency of the company is used wherever a record or an uploaded file carries no currency
+(accounts, quotations, PRFs, payments, checks, fees, targets, renewals, submitted policies), in the
+examples of the upload templates downloaded for the company, and on the screens (proposed currency,
+amount headings); the currencies offered in lists come from the currency master.
+
+### Business rules as parameters (V1152)
+
+Seeded with the values the platform used before; changed on *Administration › Parameters*. A
+missing value stops the action with `PARAMETER_NOT_SET` instead of falling back to a coded value.
+
+| Parameter | Seeded | Used by |
+|---|---|---|
+| `CLIENT_CREDIT_DAYS` | 30 | credit days of the accounting party created for a client |
+| `SERVICE_INVOICE_CREDIT_DAYS` | 30 | credit days merged into the service invoice text |
+| `INSURER_DEFAULT_CREDIT_DAYS` | 30 | insurers loaded by data migration without credit days |
+| `PASSWORD_EXPIRY_NOTICE_DAYS` | 7 | job `PASSWORD_EXPIRY_NOTICE` (SECURITY category: second approval) |
+| `RATE_EXCEPTION_VALIDITY_DAYS` | 30 | end date of a rate-scheme exception requested without one |
+| `DP_PREMIUM_TOLERANCE` | 1.00 | direct payment list check against the booked gross premium |
+| `EWT_RATE_TOLERANCE` | 0.05 | EWT worksheet: document rate against the ATC rate (percentage points) |
+| `OPEN_COVER_TRANSIT_DAYS` | 60 | transit days of an open-cover declaration without them |
+
+The input VAT rate of supplier invoices is the rate of the company's active `VAT_INPUT` tax code on
+the invoice date (*Tax › Tax codes*); without one, a VAT-registered invoice is refused with
+`NO_INPUT_VAT_CODE`.
+
+Kept in code after review (technical limits, scales, algorithm constants and fallbacks of seeded
+parameters, not business rules): field lengths and list sizes (`MAX_TEXT`, `MAX_ERROR`,
+`MAX_ROWS`…), rate scales (`RATE_SCALE`), percent bounds (`MAX_RATE`/`MAX_PERCENT` = 100), date
+range limits of files and screens (payment notification at most 31 days, `MAX_TERM_YEARS` 10,
+`MAX_FOLLOW_UP_DAYS` 365, `MAX_CREDIT_DAYS` 365), the client matching scores of data migration, the
+letter catch-up window of submitted policies (7 days after a missed run), and the `DEFAULT_*`
+fallbacks of parameters and exception-code thresholds that the platform seeds (for example
+`QUOTATION_SLIP_REPLY_DAYS`, `HOLD_COVER_DAYS`, `DISB_STALE_DAYS`, `CWT_APPLICATION_PERCENT`).
+
+### Theme pack and business zone
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `VITE_THEME_PACK` (frontend build) | `bdoi` | Theme pack of the web application, `frontend/src/theme/packs/<pack>`: `theme.json` (product and client names, page title and description, print title), `tokens.css` (brand colours and fonts), `index.ts` (fonts, logo, sign-in photo), `favicon.svg`. Build argument of `frontend/Dockerfile` and of the `frontend` service of `docker-compose.yml`. A new client gets a new pack; components never name the client. |
+| `BROKERVERSE_THEME` (backend) | `bdoi` | Theme pack of generated files (reports and documents in PDF, Word, Excel): `backend/src/main/resources/theme/<pack>/brand.properties` (colours, font, logo size) and its logo. System property `brokerverse.theme` takes precedence. Read at start-up. |
+| `BROKERVERSE_BUSINESS_ZONE` | `Asia/Manila` | See the first table. The zone is read from `BusinessClock` where it is used and bound as a parameter of SQL that takes the business day of a timestamp; no code keeps its own copy. |

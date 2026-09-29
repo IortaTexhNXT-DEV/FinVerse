@@ -164,6 +164,7 @@
           "permissions": [
             "AUDIT_VIEW",
             "FILE_QUARANTINE_VIEW",
+            "MFA_RESET_APPROVE",
             "REPORT_VIEW",
             "SECURITY_PARAMETER_APPROVE",
             "UAM_REPORT_VIEW",

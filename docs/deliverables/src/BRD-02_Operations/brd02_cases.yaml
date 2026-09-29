@@ -217,7 +217,7 @@ frs:
         steps:
           - Enter a wrong password 3 times for recon; then the correct one.
         expected: The account is locked at the third failure; the System Administrator unlocks it in Administration > Users.
-        msg: [Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
+        msg: [Invalid user name or password, AUTHENTICATION_FAILED]
 
   FR-OP-002:
     scenario: SC-OP-01
@@ -2302,7 +2302,7 @@ frs:
         steps:
           - Pair two BDOI-only items.
         expected: Refused.
-        msg: [Pair a BDOI-only item with an insurer-only item of the same cycle, RECON_PAIR_INVALID]
+        msg: [Pair a booked-only item with an insurer-only item of the same cycle, RECON_PAIR_INVALID]
       - c: 2
         type: Negative
         title: Split an unpaired item

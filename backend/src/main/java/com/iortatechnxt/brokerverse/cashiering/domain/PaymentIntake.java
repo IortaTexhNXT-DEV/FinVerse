@@ -54,6 +54,30 @@ public record PaymentIntake(
   }
 
   /**
+   * The same payment in a currency when it arrives without one (channel files carry no currency;
+   * the payment is in the base currency of the company).
+   *
+   * @param currency currency to use when none is given
+   * @return payment with a currency
+   */
+  public PaymentIntake orInCurrency(String currency) {
+    if (money.currency() != null) {
+      return this;
+    }
+    return new PaymentIntake(
+        channel,
+        batchRef,
+        sourceKey,
+        rowNo,
+        reference,
+        otherRefs,
+        payor,
+        assuredName,
+        new Money(money.amount(), currency, money.valueDate()),
+        tender);
+  }
+
+  /**
    * Payor name.
    *
    * @return name

@@ -26,7 +26,8 @@ function wrap(children: ReactNode, path = '/', permissions: ReadonlySet<string> 
   const auth = {
     user: null,
     loading: false,
-    login: () => Promise.resolve(),
+    login: () => Promise.resolve({ expiresAt: '' }),
+    completeSignIn: () => undefined,
     logout: () => undefined,
     can: (p: string) => permissions.has(p),
     passwordChange: null,
@@ -63,7 +64,7 @@ function wrap(children: ReactNode, path = '/', permissions: ReadonlySet<string> 
 const CLAIM: Claim = {
   id: 7,
   claimNo: 'BCL-2026-000007',
-  source: 'BDOI_NOTICE',
+  source: 'BROKER_NOTICE',
   handler: 'clmofficer',
   unitLabel: 'Motor HO',
   cover: {

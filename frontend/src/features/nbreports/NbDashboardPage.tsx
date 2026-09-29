@@ -12,7 +12,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { useCompanyId, useWorkspace } from '@/context/workspaceContext';
+import { useCompanyId, useWorkspace, useBaseCurrency } from '@/context/workspaceContext';
 import { formatAmount, formatDate, today } from '@/utils/format';
 import { AgeingChart, ProductionChart } from './DashboardCharts';
 import { BarList, DrillTile } from './DashboardParts';
@@ -28,8 +28,10 @@ import {
 } from './dashboardData';
 import './nbreports.css';
 import { DateInput } from '@/components/ui/DateInput';
+import { InBaseCurrency } from '@/components/ui/InBaseCurrency';
 
 function Tiles({ d }: Readonly<{ d: NbDashboard }>) {
+  const baseCurrency = useBaseCurrency();
   const newRequests = d.requests.find((r) => r.group === 'REQUEST' && r.code === 'NEW');
   const overdue = total(d.overdue);
   return (
@@ -56,7 +58,7 @@ function Tiles({ d }: Readonly<{ d: NbDashboard }>) {
       <DrillTile
         label="Booked This Month"
         value={d.booked.count}
-        hint={`Premium PHP ${formatAmount(d.booked.premium)} · Commission PHP ${formatAmount(d.booked.commission)}`}
+        hint={`Premium ${baseCurrency} ${formatAmount(d.booked.premium)} · Commission ${baseCurrency} ${formatAmount(d.booked.commission)}`}
         to="/booking?tab=BOOKED"
       />
     </div>
@@ -133,13 +135,13 @@ const PRODUCTION_COLUMNS: Column<UnitProduction>[] = [
   },
   {
     key: 'premium',
-    header: 'Premium (PHP)',
+    header: <InBaseCurrency label="Premium" />,
     numeric: true,
     render: (u) => formatAmount(u.premium),
   },
   {
     key: 'target',
-    header: 'Target (PHP)',
+    header: <InBaseCurrency label="Target" />,
     numeric: true,
     render: (u) => formatAmount(u.targetPremium),
   },

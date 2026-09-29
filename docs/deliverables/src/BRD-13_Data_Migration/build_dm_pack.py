@@ -54,7 +54,8 @@ import brand  # noqa: E402
 SEED_SQL = REPO / "backend" / "src" / "main" / "resources" / "db" / "migration" / "V1081__migration_objects_maps.sql"
 # Later scripts that update the texts of the V1081 catalogue (applied in version order after the seed).
 SEED_UPDATES = [SEED_SQL.parent / "V1090__migration_catalogue_wording.sql",
-                SEED_SQL.parent / "V1091__migration_rule_wording.sql"]
+                SEED_SQL.parent / "V1091__migration_rule_wording.sql",
+                SEED_SQL.parent / "V1092__migration_archive_details_wording.sql"]
 JAVA = REPO / "backend" / "src" / "main" / "java" / "com" / "iortatechnxt" / "brokerverse"
 TEMPLATE_EXPORT = JAVA / "migration" / "mapping" / "service" / "TemplateExport.java"
 CODE_MAP_EXCEL = JAVA / "migration" / "mapping" / "service" / "CodeMapExcel.java"
@@ -102,9 +103,6 @@ CLIENT_WORDING = [
     (r"\bthe crm formats\b", "the client formats of BIBS"),
     (r"\bMIG_GOLIVE_RENEWAL_TO\b", "go-live renewal window"),
     (r"\biorta \(load order\)", "iorta TechNXT (load order)"),
-    (r"\bas a JSON object of label and value\b", "as label and value pairs in the structured text of the archive"),
-    (r"\bValid JSON\b", "Well-formed label and value pairs"),
-    (r"\bJSON object\b", "structured text of label and value pairs"),
 ]
 
 
@@ -837,7 +835,7 @@ def workbook_sheets(wb: Any, pack: Any, date_sheets: list[Any]) -> None:
            [{"topic": a, "rule": b} for a, b in cat.data.get("file_rules_extra") or []]
     reviewed(wb.sheet("File rules", [Column("topic", "Topic", 20, "Topic of the rule"),
                                      Column("rule", "Rule", 100, "What every extract file follows")] + review(),
-                      rows, description="Rules of every extract and control file: the How to fill sheet of the "
+                      rows, description="Rules of every extract and control file: the delivery rules of the "
                                         "console workbook, then the rules of the migration"))
 
     load_templates(wb, cat)

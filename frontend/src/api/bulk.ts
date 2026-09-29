@@ -52,7 +52,9 @@ export interface BulkRow {
 export const bulkApi = {
   handlers: () => api.get<BulkHandler[]>('/bulk/handlers'),
   handler: (code: string) => api.get<BulkHandler>(`/bulk/handlers/${code}`),
-  template: (code: string) => api.getFile(`/bulk/handlers/${code}/template`),
+  /** The template; its examples are in the base currency of the company when one is given. */
+  template: (code: string, companyId?: number) =>
+    api.getFile(`/bulk/handlers/${code}/template${toQuery({ companyId })}`),
   upload: (companyId: number, handler: string, file: File, parameters?: Record<string, string>) => {
     const form = new FormData();
     form.append('companyId', String(companyId));

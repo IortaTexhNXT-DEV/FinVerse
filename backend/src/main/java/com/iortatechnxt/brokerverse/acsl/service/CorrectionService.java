@@ -19,6 +19,7 @@ import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import com.iortatechnxt.brokerverse.workflow.service.StartCase;
@@ -46,7 +47,6 @@ public class CorrectionService {
   private static final String KIND_LOV = "ACSL_CORRECTION_KIND";
   private static final int MIN_LINES = 2;
   private static final int MAX_LINES = 200;
-  private static final String DEFAULT_CURRENCY = "PHP";
 
   private final CorrectionRepository corrections;
   private final CaseService cases;
@@ -63,6 +63,7 @@ public class CorrectionService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -82,6 +83,7 @@ public class CorrectionService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param organization company master (base currency)
    */
   public CorrectionService(
       CorrectionRepository corrections,
@@ -98,7 +100,8 @@ public class CorrectionService {
       AcslNotifier notifier,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      OrganizationDirectory organization) {
     this.corrections = corrections;
     this.cases = cases;
     this.journals = journals;
@@ -114,6 +117,7 @@ public class CorrectionService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.organization = organization;
   }
 
   /**
@@ -175,7 +179,7 @@ public class CorrectionService {
         original
             .map(JournalBatch::getCurrency)
             .or(() -> invoice.map(OpsInvoice::getCurrency))
-            .orElse(DEFAULT_CURRENCY);
+            .orElseGet(() -> organization.company(companyId).baseCurrency());
     String number = numbers.next("COR-" + BusinessClock.today(clock).getYear());
     Correction saved =
         corrections.save(

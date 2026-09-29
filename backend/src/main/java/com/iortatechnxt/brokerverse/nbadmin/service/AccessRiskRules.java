@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRiskFlag;
@@ -10,7 +11,6 @@ import com.iortatechnxt.brokerverse.security.domain.PrivilegeLevel;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
 import java.time.Clock;
-import java.time.ZonedDateTime;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -62,7 +62,7 @@ public class AccessRiskRules {
     if (raisesPrivilege(content)) {
       flags.add(AccessRiskFlag.PRIVILEGE_INCREASE);
     }
-    if (!settings.workingHours().contains(ZonedDateTime.now(clock))) {
+    if (!settings.workingHours().contains(BusinessClock.now(clock))) {
       flags.add(AccessRiskFlag.OUTSIDE_HOURS);
     }
     return flags;

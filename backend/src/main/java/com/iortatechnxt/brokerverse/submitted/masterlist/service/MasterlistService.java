@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmHistorySource;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmPolicy;
@@ -63,6 +64,7 @@ public class MasterlistService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -95,7 +97,8 @@ public class MasterlistService {
       SystemParameterService parameters,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      OrganizationDirectory organization) {
     this.policies = policies;
     this.sources = sources;
     this.history = history;
@@ -109,6 +112,7 @@ public class MasterlistService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.organization = organization;
   }
 
   /**
@@ -195,7 +199,7 @@ public class MasterlistService {
       return new Upserted(p, Outcome.DUPLICATE);
     }
     Map<String, String> before = history.snapshot(p);
-    p.apply(data);
+    p.apply(inBaseCurrency(p.getCompanyId(), data));
     int changed = history.record(p, before, context.source(), context.reference());
     if (changed > 0) {
       flow.describe(p);
@@ -241,7 +245,7 @@ public class MasterlistService {
    */
   public void write(SbmPolicy p, SbmPolicyData data, SbmHistorySource source, String reference) {
     Map<String, String> before = history.snapshot(p);
-    p.apply(data);
+    p.apply(inBaseCurrency(p.getCompanyId(), data));
     history.record(p, before, source, reference);
     flow.describe(p);
     if (p.getStatus() == SbmPolicyStatus.RECEIVED) {
@@ -421,7 +425,11 @@ public class MasterlistService {
   private SbmPolicy newRecord(Long companyId, SbmPolicyData data, SbmPolicyOrigin origin) {
     String prefix = parameters.text(NUMBER_PREFIX, "SBM");
     String no = numbers.next(prefix + "-" + BusinessClock.today(clock).getYear());
-    return new SbmPolicy(companyId, no, data, origin);
+    return new SbmPolicy(companyId, no, inBaseCurrency(companyId, data), origin);
+  }
+
+  private SbmPolicyData inBaseCurrency(Long companyId, SbmPolicyData data) {
+    return data.orInCurrency(organization.company(companyId).baseCurrency());
   }
 
   private SbmPolicy started(SbmPolicy p, SbmHistorySource source, String reference) {

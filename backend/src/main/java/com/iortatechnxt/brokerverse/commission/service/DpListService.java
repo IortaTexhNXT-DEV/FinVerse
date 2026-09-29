@@ -87,7 +87,7 @@ public class DpListService {
    * @return the list with its counts
    */
   public DpList upload(Long companyId, String fileName, byte[] content) {
-    DpListHandler.origin(fileName);
+    DpListHandler.origin(fileName, null);
     AtomicReference<DpList> taken = new AtomicReference<>();
     FlowInRun run =
         flowIn.run(
@@ -111,8 +111,9 @@ public class DpListService {
   public List<DpList> pull(Long companyId) {
     List<FeedItem> pending = collection.pending(companyId, DpListHandler.FEED);
     Map<String, List<FeedItem>> byBranch = new LinkedHashMap<>();
+    String headOffice = headOfficeCode(companyId);
     for (FeedItem item : pending) {
-      String branch = item.fields().getOrDefault("Branch", DpListHandler.HEAD_OFFICE);
+      String branch = item.fields().getOrDefault("Branch", headOffice);
       byBranch.computeIfAbsent(branch.toUpperCase(Locale.ROOT), k -> new ArrayList<>()).add(item);
     }
     List<DpList> created = new ArrayList<>();
@@ -170,8 +171,9 @@ public class DpListService {
         lists.findByCompanyIdAndSubmissionDateBetweenOrderByBranchCodeAsc(companyId, from, to);
     Map<String, Submissions> rows = new LinkedHashMap<>();
     Map<String, String> alias = new HashMap<>();
+    String headOffice = headOfficeCode(companyId);
     for (Branch b : organization.listBranches(companyId)) {
-      String code = b.isHeadOffice() ? DpListHandler.HEAD_OFFICE : key(b.getCode());
+      String code = b.isHeadOffice() ? headOffice : key(b.getCode());
       rows.put(code, Submissions.none(code, b.getName()));
       alias.put(key(b.getName()), code);
       alias.put(code, code);
@@ -181,6 +183,11 @@ public class DpListService {
       rows.merge(code, Submissions.none(code, null).with(l), (current, added) -> current.with(l));
     }
     return new ArrayList<>(rows.values());
+  }
+
+  private String headOfficeCode(Long companyId) {
+    String code = organization.headOfficeCode(companyId);
+    return code == null ? "" : key(code);
   }
 
   private static String key(String value) {

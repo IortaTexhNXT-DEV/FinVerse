@@ -13,14 +13,14 @@ export interface EditLine extends StrTransaction {
 let nextKey = 0;
 
 /** A blank transaction line. */
-export function blankTransaction(date: string): EditLine {
+export function blankTransaction(date: string, currency = ''): EditLine {
   nextKey += 1;
   return {
     key: nextKey,
     reference: '',
     date,
     amount: '',
-    currency: 'PHP',
+    currency,
     type: 'RECEIPT',
     description: '',
   };

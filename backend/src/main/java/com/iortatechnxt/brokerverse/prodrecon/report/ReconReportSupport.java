@@ -37,7 +37,7 @@ public class ReconReportSupport {
   static final String INSURER = "insurer";
 
   /** Amount of an item: the booked gross premium, else the insurer's. */
-  static final String AMOUNT = "coalesce(i.bdoi_gross_premium, i.ins_gross_premium, 0)";
+  static final String AMOUNT = "coalesce(i.broker_gross_premium, i.ins_gross_premium, 0)";
 
   /** Items of the company's cycles in the period, optionally of one insurer. */
   static final String ITEMS_OF_PERIOD =

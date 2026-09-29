@@ -1,5 +1,6 @@
 import type { PremiumStatus } from '../cover/api';
 import type { ClaimFlags, ClaimSource } from './api';
+import { clientShortName } from '@/context/clientNames';
 
 /**
  * Pure rules of the claim screens (FR-CM-011/016/020/021/033): form validation with the FRS
@@ -31,7 +32,7 @@ export type ClaimFormErrors = Partial<Record<keyof ClaimForm, string>>;
 export function emptyClaimForm(today: string): ClaimForm {
   return {
     arn: '',
-    source: 'BDOI_NOTICE',
+    source: 'BROKER_NOTICE',
     lossDate: '',
     reportedDate: today,
     lossNature: '',
@@ -156,7 +157,9 @@ export function flagLabels(flags: ClaimFlags): string[] {
 
 /** Label of a claim source. */
 export const SOURCE_LABELS: Record<ClaimSource, string> = {
-  BDOI_NOTICE: 'BDOI notice',
+  get BROKER_NOTICE() {
+    return `${clientShortName()} notice`;
+  },
   INSURER_REPORTED: 'Insurer-reported',
   MIGRATED: 'Migrated',
 };

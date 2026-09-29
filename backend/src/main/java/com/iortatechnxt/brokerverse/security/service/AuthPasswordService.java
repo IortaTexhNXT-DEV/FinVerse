@@ -12,15 +12,10 @@ import com.iortatechnxt.brokerverse.security.domain.PasswordHistoryRepository;
 import com.iortatechnxt.brokerverse.security.domain.PasswordResetToken;
 import com.iortatechnxt.brokerverse.security.domain.PasswordResetTokenRepository;
 import com.iortatechnxt.brokerverse.security.service.directory.AuthMode;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+import com.iortatechnxt.brokerverse.security.service.sso.SsoProperties;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Base64;
-import java.util.HexFormat;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -43,8 +38,6 @@ public class AuthPasswordService {
   public static final Duration LINK_VALIDITY = Duration.ofMinutes(30);
 
   private static final String ENTITY = "AppUser";
-  private static final int TOKEN_BYTES = 32;
-  private static final String DEFAULT_ORIGIN = "http://localhost:5173";
   private static final String RESET_PATH = "/reset-password";
 
   private final AppUserRepository users;
@@ -57,7 +50,8 @@ public class AuthPasswordService {
   private final ApplicationEventPublisher events;
   private final Clock clock;
   private final String resetUrl;
-  private final SecureRandom random = new SecureRandom();
+  private final LoginRateLimiter limits;
+  private final SsoProperties sso;
 
   /**
    * Creates the service.
@@ -72,8 +66,11 @@ public class AuthPasswordService {
    * @param events event publisher (the reset link e-mail)
    * @param clock clock
    * @param properties security settings (the first allowed origin is the web client)
-   * @param resetUrl address of the reset page ({@code brokerverse.security.password-reset-url});
-   *     blank = the first allowed origin + {@value #RESET_PATH}
+   * @param resetUrl address of the reset page ({@code brokerverse.security.password-reset-url},
+   *     required outside local by the start-up safeguards); blank on a developer's machine = the
+   *     first allowed origin + {@value #RESET_PATH}
+   * @param limits reset links per user and window
+   * @param sso single sign-on (break-glass administrators keep their password)
    */
   @SuppressWarnings("java:S107") // collaborators of the password functions
   public AuthPasswordService(
@@ -87,7 +84,11 @@ public class AuthPasswordService {
       ApplicationEventPublisher events,
       Clock clock,
       SecurityProperties properties,
-      @Value("${brokerverse.security.password-reset-url:}") String resetUrl) {
+      @Value("${brokerverse.security.password-reset-url:}") String resetUrl,
+      LoginRateLimiter limits,
+      SsoProperties sso) {
+    this.limits = limits;
+    this.sso = sso;
     this.users = users;
     this.history = history;
     this.links = links;
@@ -130,7 +131,8 @@ public class AuthPasswordService {
   public PasswordStatusResponse status() {
     AppUser user = currentUserEntity();
     AuthPasswordPolicy.Settings settings = policy.settings();
-    String reason = policy.changeReason(user, clock.instant()).orElse(null);
+    boolean ownPassword = !settings.mode().singleSignOn() || sso.isBreakGlass(user.getUsername());
+    String reason = ownPassword ? policy.changeReason(user, clock.instant()).orElse(null) : null;
     return new PasswordStatusResponse(
         settings.mode().name(),
         settings.historyCount(),
@@ -145,7 +147,8 @@ public class AuthPasswordService {
   /**
    * "Forgot password?": e-mails a single-use link to the registered address. The answer is the same
    * whether or not the user exists, so the screen reveals no user names; users without an e-mail
-   * address, disabled users and DIRECTORY mode get no link.
+   * address, disabled users and DIRECTORY mode get no link, and no more than the configured number
+   * of links per user and window is e-mailed ({@code reset-max-per-user}).
    *
    * @param userId user name
    */
@@ -154,6 +157,7 @@ public class AuthPasswordService {
       users
           .findByUsernameIgnoreCase(userId.trim())
           .filter(u -> u.isEnabled() && u.getEmail() != null && !u.getEmail().isBlank())
+          .filter(u -> limits.tryAcquireResetLink(u.getUsername()))
           .ifPresent(this::issueLink);
     }
   }
@@ -275,10 +279,8 @@ public class AuthPasswordService {
         .orElseThrow(() -> new BusinessRuleException("UNKNOWN_USER", "Unknown user"));
   }
 
-  private String newToken() {
-    byte[] bytes = new byte[TOKEN_BYTES];
-    random.nextBytes(bytes);
-    return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+  private static String newToken() {
+    return SecureTokens.newToken();
   }
 
   private static BusinessRuleException invalidLink() {
@@ -291,7 +293,11 @@ public class AuthPasswordService {
       return configured.trim();
     }
     List<String> origins = properties.allowedOrigins();
-    String origin = origins == null || origins.isEmpty() ? DEFAULT_ORIGIN : origins.get(0);
+    if (origins == null || origins.isEmpty() || origins.get(0).isBlank()) {
+      throw new IllegalStateException(
+          "Set BROKERVERSE_PASSWORD_RESET_URL (page of the password reset link)");
+    }
+    String origin = origins.get(0).trim();
     return (origin.endsWith("/") ? origin.substring(0, origin.length() - 1) : origin) + RESET_PATH;
   }
 
@@ -302,13 +308,7 @@ public class AuthPasswordService {
    * @return hash
    */
   static String sha256(String token) {
-    try {
-      return HexFormat.of()
-          .formatHex(
-              MessageDigest.getInstance("SHA-256").digest(token.getBytes(StandardCharsets.UTF_8)));
-    } catch (NoSuchAlgorithmException e) {
-      throw new IllegalStateException(e);
-    }
+    return SecureTokens.sha256(token);
   }
 
   /**

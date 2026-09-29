@@ -37,7 +37,7 @@ describe('business labels', () => {
 
   it('keeps business acronyms in capitals', () => {
     expect(humanize('DV_ASSIGNED')).toBe('DV Assigned');
-    expect(humanize('BDOI_ONLY')).toBe('BDOI Only');
+    expect(humanize('CWT_TAG')).toBe('CWT Tag');
     expect(humanize('OTC')).toBe('OTC');
     expect(statusPhrase('DV_ASSIGNED')).toBe('DV assigned');
   });

@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.payables.report;
 
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.payables.domain.BankAccount;
 import com.iortatechnxt.brokerverse.payables.service.BankAccountQueryService;
 import com.iortatechnxt.brokerverse.payables.service.NotificationRecord;
@@ -36,17 +38,22 @@ public class PaymentNotificationReport implements ReportDefinition {
 
   private final PaymentNotificationService notifications;
   private final BankAccountQueryService banks;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the report.
    *
    * @param notifications notification service
    * @param banks bank accounts
+   * @param organization company master (default bank account of the client profile)
    */
   public PaymentNotificationReport(
-      PaymentNotificationService notifications, BankAccountQueryService banks) {
+      PaymentNotificationService notifications,
+      BankAccountQueryService banks,
+      OrganizationDirectory organization) {
     this.notifications = notifications;
     this.banks = banks;
+    this.organization = organization;
   }
 
   @Override
@@ -58,7 +65,7 @@ public class PaymentNotificationReport implements ReportDefinition {
         "Payments advised to the bank in the notification file (record 01 / trailer 02)",
         List.of(
             GlReportSupport.companyParam(),
-            ParameterSpec.required(BANK, "Bank Code", ParameterType.TEXT).withDefault("BDO-CA"),
+            ParameterSpec.optional(BANK, "Bank Code (blank = company default)", ParameterType.TEXT),
             GlReportSupport.fromParam(),
             GlReportSupport.toParam(),
             ParameterSpec.optional(
@@ -69,7 +76,17 @@ public class PaymentNotificationReport implements ReportDefinition {
 
   @Override
   public ReportResult generate(ReportParameters p) {
-    BankAccount bank = banks.getByCode(p.longValue(GlReportSupport.COMPANY), p.text(BANK));
+    Long companyId = p.longValue(GlReportSupport.COMPANY);
+    String code =
+        p.optionalText(BANK)
+            .filter(v -> !v.isBlank())
+            .orElseGet(() -> organization.profile(companyId).defaultBankCode());
+    if (code == null) {
+      throw new BusinessRuleException(
+          "PAYNOTIFY_BANK_REQUIRED",
+          "Enter the bank code, or set the default bank account of the company");
+    }
+    BankAccount bank = banks.getByCode(companyId, code.strip());
     List<NotificationRecord> records =
         notifications.records(
             bank.getId(),

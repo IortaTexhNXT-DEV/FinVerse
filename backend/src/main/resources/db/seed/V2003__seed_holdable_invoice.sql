@@ -19,7 +19,7 @@ create temporary table bkg_seed_account_hold (
 insert into bkg_seed_account_hold values
 ('ARN-2026-940008', 'CL-2026-000002', 'MTR10', 'MOTOR', 'COMPREHENSIVE', 'RETAIL', 'INS-MGIC', 'MKT',
  date '2026-09-12', date '2027-09-12', false, 1, 1250000.00, 15450.00, 1931.25, 0.00, 1854.00, 0.00, 115.88,
- 3901.13, 19351.13, 17.5, 2703.75, 324.45, 'VIA_BDOI', 'CLIENT_CONFIRMED', 'NCR', 'CBG-NCR', 'T-CBG1', 'ao',
+ 3901.13, 19351.13, 17.5, 2703.75, 324.45, 'VIA_BROKER', 'CLIENT_CONFIRMED', 'NCR', 'CBG-NCR', 'T-CBG1', 'ao',
  'NB-CBG-M', 'VEHICLE', 'BKG9888', 1.30, 'MGIC-MC-2026-98808', date '2026-09-12',
  timestamptz '2026-08-29T09:00:00+08');
 

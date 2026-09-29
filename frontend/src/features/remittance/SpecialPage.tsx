@@ -23,7 +23,7 @@ import { formatDate } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { Special } from './api';
 import { TemplateButton, UploadForm } from './RemittanceParts';
-import { SPECIAL_TABS, SPECIAL_TEMPLATE, stagesOf } from './remittanceLabels';
+import { SPECIAL_TABS, stagesOf } from './remittanceLabels';
 import type { SpecialTab } from './remittanceLabels';
 import './remittance.css';
 import { UserName } from '@/components/ui/UserName';
@@ -202,9 +202,7 @@ export default function SpecialPage() {
       {uploading && (
         <Card
           title="Upload Collection Special Remittance File"
-          actions={
-            <TemplateButton name="special-remittance-template.csv" content={SPECIAL_TEMPLATE} />
-          }
+          actions={<TemplateButton kind="special" />}
         >
           <UploadForm
             label="Request File"

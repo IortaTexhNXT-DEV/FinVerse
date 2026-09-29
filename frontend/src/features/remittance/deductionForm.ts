@@ -32,7 +32,7 @@ export type DeductionErrors = Partial<Record<keyof DeductionForm, string>>;
 
 export const EMPTY_DEDUCTION: DeductionForm = {
   insurerCode: '',
-  currency: 'PHP',
+  currency: '',
   sourceType: '',
   sourceRef: '',
   invoiceNo: '',

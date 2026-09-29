@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.placement.service;
 import com.iortatechnxt.brokerverse.account.domain.Account;
 import com.iortatechnxt.brokerverse.account.domain.RiskItem;
 import com.iortatechnxt.brokerverse.catalog.service.CatalogNames;
+import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -25,14 +26,13 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
 
 /**
- * Renders placement documents in the BDOI layout (BRNB.069/072): the placement slip as PDF (letter
- * with the merged template and the risks) and as XLSX (one row per account for the insurer's
- * systems), and the hold cover request as PDF.
+ * Renders placement documents in the client's layout (BRNB.069/072): the placement slip as PDF
+ * (letter with the merged template and the risks) and as XLSX (one row per account for the
+ * insurer's systems), and the hold cover request as PDF.
  */
 @Component
 public class SlipDocuments {
 
-  private static final String DEFAULT_COMPANY = "BDO Insurance and Reinsurance Brokers, Inc.";
   private static final List<String> RISK_HEADERS =
       List.of("ARN", "Insured", "Product", "Period", "Sum insured", "Gross premium");
   private static final List<Integer> AMOUNT_COLUMNS = List.of(4, 5);
@@ -192,7 +192,10 @@ public class SlipDocuments {
   }
 
   private String companyName(Long companyId) {
-    return companies.findById(companyId).map(Company::getName).orElse(DEFAULT_COMPANY);
+    return companies
+        .findById(companyId)
+        .map(Company::getName)
+        .orElseThrow(() -> new ResourceNotFoundException("Company", companyId));
   }
 
   /**

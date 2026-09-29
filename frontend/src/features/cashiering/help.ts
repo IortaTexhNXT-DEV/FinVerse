@@ -1,4 +1,5 @@
 import type { HelpSection } from '@/features/help/helpContent';
+import { BRAND } from '@/branding';
 
 /** In-app help of the Cashiering screens (CSHID.001-027, MKTID.010/013, DBMID.001). */
 export const CASHIERING_HELP: HelpSection = {
@@ -57,10 +58,9 @@ export const CASHIERING_HELP: HelpSection = {
     {
       name: 'Unapplied to Income',
       path: '/cashiering/unapplied-income',
-      summary:
-        'Batches of old unapplied payments, created in BIBS or carried over from the legacy systems, reclassified to other income - unclaimed collections. Legacy items post on the legacy unapplied collections account.',
+      summary: `Batches of old unapplied payments, created in ${BRAND.product} or carried over from the legacy systems, reclassified to other income - unclaimed collections. Legacy items post on the legacy unapplied collections account.`,
       workflow: [
-        'New Batch: give the reason and the currency, then add unapplied payments received at least the number of days you choose; the Origin filter shows the migrated or BIBS items.',
+        `New Batch: give the reason and the currency, then add unapplied payments received at least the number of days you choose; the Origin filter shows the migrated or ${BRAND.product} items.`,
         'Submit the batch; the Cashiering team lead approves it, then top management.',
         'After the second approval each item posts on its own and is closed; an item whose balance changed is refused.',
       ],

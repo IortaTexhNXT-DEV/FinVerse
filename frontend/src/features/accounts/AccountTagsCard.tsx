@@ -15,6 +15,7 @@ import type { DetailRow } from '@/features/catalog/DetailList';
 import { formatDateTime, formatPeriod, today } from '@/utils/format';
 import { useAccountRefresh } from './useAccountRefresh';
 import { displayNameOf } from '@/api/users';
+import { clientShortName } from '@/context/clientNames';
 
 type Dialog = 'ffy' | 'ffy-cancel' | 'tsu' | null;
 
@@ -129,9 +130,10 @@ function TagButtons({
     mutationFn: () =>
       accountsApi.setPaymentArrangement(
         account.id,
-        account.directPayment ? 'VIA_BDOI' : 'DIRECT_TO_INSURER',
+        account.directPayment ? 'VIA_BROKER' : 'DIRECT_TO_INSURER',
       ),
-    onSuccess: (a) => done(a, a.directPayment ? 'Tagged direct payment' : 'Premium through BDOI'),
+    onSuccess: (a) =>
+      done(a, a.directPayment ? 'Tagged direct payment' : `Premium through ${clientShortName()}`),
   });
   const maintain = can('ACCOUNT_MAINTAIN') && !CLOSED.has(account.status);
   const ffy = account.freeFirstYear.active;
@@ -154,7 +156,7 @@ function TagButtons({
             busy={arrangement.isPending}
             onClick={() => arrangement.mutate()}
           >
-            {account.directPayment ? 'Pay through BDOI' : 'Tag direct payment'}
+            {account.directPayment ? `Pay through ${clientShortName()}` : 'Tag direct payment'}
           </Button>
         </>
       )}

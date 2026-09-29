@@ -138,7 +138,8 @@ export default function JournalUploadPage() {
     },
   });
   const template = useMutation({
-    mutationFn: journalUploadApi.template,
+    mutationFn: (format: 'csv' | 'xlsx') =>
+      journalUploadApi.template(format, companyId > 0 ? companyId : undefined),
     onSuccess: (f) => saveFile(f.blob, f.fileName),
   });
 
@@ -164,16 +165,16 @@ export default function JournalUploadPage() {
             <Button
               variant="secondary"
               icon={<Download size={16} />}
-              onClick={() => template.mutate('csv')}
-            >
-              CSV Template
-            </Button>
-            <Button
-              variant="secondary"
-              icon={<Download size={16} />}
               onClick={() => template.mutate('xlsx')}
             >
               Excel Template
+            </Button>
+            <Button
+              variant="ghost"
+              icon={<Download size={16} />}
+              onClick={() => template.mutate('csv')}
+            >
+              CSV Layout
             </Button>
           </>
         }

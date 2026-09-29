@@ -2,8 +2,8 @@ package com.iortatechnxt.brokerverse.brokerclaims.report;
 
 import com.iortatechnxt.brokerverse.brokerclaims.report.ClaimActivitySource.ActivityQuery;
 import com.iortatechnxt.brokerverse.brokerclaims.report.ClaimActivitySource.ClaimActivity;
-import com.iortatechnxt.brokerverse.brokerclaims.status.service.ClaimAgeing;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -153,7 +153,7 @@ public class ActivityLogReport implements ReportDefinition {
 
   private static Map<String, Object> row(ClaimActivity a) {
     Map<String, Object> row = new LinkedHashMap<>();
-    row.put("at", a.at().atZone(ClaimAgeing.MANILA).format(TIME));
+    row.put("at", a.at().atZone(BusinessClock.zone()).format(TIME));
     row.put("user", a.user());
     row.put("claim_no", a.claimNo());
     row.put("activity", a.activity());
@@ -163,6 +163,6 @@ public class ActivityLogReport implements ReportDefinition {
   }
 
   private static Instant start(LocalDate day) {
-    return day.atStartOfDay(ClaimAgeing.MANILA).toInstant();
+    return day.atStartOfDay(BusinessClock.zone()).toInstant();
   }
 }

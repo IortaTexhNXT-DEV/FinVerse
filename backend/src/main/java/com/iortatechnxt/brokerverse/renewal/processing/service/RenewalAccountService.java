@@ -42,7 +42,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class RenewalAccountService {
 
-  private static final String PHP = "PHP";
   private static final String ACCOUNT = "Account";
 
   /** Documents of the expiring term that are not carried to the renewal account. */
@@ -240,8 +239,8 @@ public class RenewalAccountService {
         from.plusYears(1),
         false,
         1,
-        premium.currency() == null ? PHP : premium.currency(),
-        PaymentArrangement.VIA_BDOI,
+        premium.currency(),
+        PaymentArrangement.VIA_BROKER,
         null,
         null,
         List.of(),

@@ -20,6 +20,7 @@ import com.iortatechnxt.brokerverse.opsledger.service.port.ReceiptIssuer.Receipt
 import com.iortatechnxt.brokerverse.opsledger.service.port.ReceiptIssuer.ReceiptRequest;
 import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedSink;
 import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedSink.UnappliedRequest;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
@@ -56,6 +57,7 @@ public class DpCollectionService {
   private final WorkflowService workflow;
   private final AuditTrailService audit;
   private final Clock clock;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -72,6 +74,7 @@ public class DpCollectionService {
    * @param audit audit trail
    * @param clock clock
    * @param insurers insurer profiles (the payor name of the commission OR)
+   * @param organization company directory (the base currency)
    */
   @SuppressWarnings("java:S107") // constructor injection
   public DpCollectionService(
@@ -86,7 +89,8 @@ public class DpCollectionService {
       WorkflowService workflow,
       AuditTrailService audit,
       Clock clock,
-      InsurerService insurers) {
+      InsurerService insurers,
+      OrganizationDirectory organization) {
     this.billings = billings;
     this.items = items;
     this.postings = postings;
@@ -99,6 +103,7 @@ public class DpCollectionService {
     this.audit = audit;
     this.clock = clock;
     this.insurers = insurers;
+    this.organization = organization;
   }
 
   /**
@@ -172,7 +177,7 @@ public class DpCollectionService {
             billing.getCompanyId(),
             "COMMISSION",
             new ReceiptIssuer.Payee(billing.getInsurerCode(), insurerName(billing)),
-            currency(approved),
+            currency(billing.getCompanyId(), approved),
             request.receiptDate() == null ? BusinessClock.today(clock) : request.receiptDate(),
             lines,
             new ReceiptIssuer.Source(
@@ -182,12 +187,12 @@ public class DpCollectionService {
                 "Direct payment commission billing " + billing.getBillingNo())));
   }
 
-  private String currency(List<DpItem> approved) {
+  private String currency(Long companyId, List<DpItem> approved) {
     return approved.stream()
         .findFirst()
         .flatMap(i -> ledger.find(i.getInvoiceNo()))
         .map(OpsInvoice::getCurrency)
-        .orElse("PHP");
+        .orElseGet(() -> organization.company(companyId).baseCurrency());
   }
 
   private void requireDirectPayment(DpItem item) {
@@ -250,7 +255,7 @@ public class DpCollectionService {
                   item.getCompanyId(),
                   "DP_REINSTATE",
                   new UnappliedSink.Party(item.getClientCode(), item.getBranchCode()),
-                  currency(List.of(item)),
+                  currency(item.getCompanyId(), List.of(item)),
                   item.getCollectedAmount(),
                   item.getInvoiceNo(),
                   null,

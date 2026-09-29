@@ -210,8 +210,10 @@ class ScreeningUserAccessFoundationIT {
                 String.class))
         .contains("SCR_CASE_ASSIGNED", "SCR_NO_POLICY_HIT", "UAM_REQUEST_TO_APPROVE")
         // + PASSWORD_EXPIRY_NOTICE (U1-B, V1063); + the dormant-user, security setting and
-        // separation-of-duties notices (V1065)
-        .hasSize(22);
+        // separation-of-duties notices (V1065); + the second factor reset notices
+        // MFA_RESET_TO_APPROVE and MFA_RESET_DONE (V1181)
+        .contains("MFA_RESET_TO_APPROVE", "MFA_RESET_DONE")
+        .hasSize(24);
     assertThat(
             jdbc.queryForList(
                 "select record_type from nba_retention_rule where years_online = 5"

@@ -15,6 +15,7 @@ import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedDispositionR
 import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedDispositionRequests.Action;
 import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedDispositionRequests.DispositionRequest;
 import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedDispositionRequests.DispositionTicket;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmHandlingFee;
 import com.iortatechnxt.brokerverse.submitted.domain.SbmHandlingFeeRepository;
 import java.time.Clock;
@@ -56,6 +57,7 @@ public class HandlingFeeService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -67,6 +69,7 @@ public class HandlingFeeService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param organization company master (base currency)
    */
   public HandlingFeeService(
       SbmHandlingFeeRepository fees,
@@ -75,7 +78,8 @@ public class HandlingFeeService {
       DocumentNumberService numbers,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      OrganizationDirectory organization) {
     this.fees = fees;
     this.directory = directory;
     this.requests = requests;
@@ -83,6 +87,7 @@ public class HandlingFeeService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.organization = organization;
   }
 
   /**
@@ -107,7 +112,8 @@ public class HandlingFeeService {
                 companyId,
                 numbers.next("SBF-" + BusinessClock.today(clock).getYear()),
                 bill,
-                bulkJobNo));
+                bulkJobNo,
+                organization.company(companyId).baseCurrency()));
     audit.record("SubmittedHandlingFee", fee.getFeeNo(), AuditAction.CREATE, "Handling fee billed");
     return fee;
   }

@@ -19,7 +19,7 @@ public enum ReportCategory {
   DISBURSEMENT("Disbursement"),
   PAYMENT_REQUESTS("Refund & Cash Advance Requests"),
   ACSL("ACSL"),
-  FRBS("BDOI Report Pack"),
+  FRBS("Company Report Pack"),
   COMPLIANCE("Compliance"),
   DATA_MIGRATION("Data Migration"),
   CLAIMS_HANDLING("Claims Handling"),

@@ -194,17 +194,72 @@ class JournalUploadIT {
   }
 
   @Test
-  void xlsxTemplateValidates() {
+  void xlsxTemplateValidates() throws java.io.IOException {
+    byte[] template = JournalUploadTemplate.xlsx(example());
+    // Uploaded as it is, the guided template has no lines: its guide and examples are skipped.
+    UploadResult untouched =
+        as.run(
+            "accountant",
+            () -> service.process(data.company().getId(), "template.xlsx", template, false));
+    assertThat(untouched.vouchers()).isEmpty();
+    byte[] filled = examplesKept(template);
     UploadResult result =
         as.run(
             "accountant",
-            () ->
-                service.process(
-                    data.company().getId(),
-                    "template.xlsx",
-                    JournalUploadTemplate.xlsx(BusinessClock.today(Clock.systemUTC())),
-                    false));
+            () -> service.process(data.company().getId(), "template.xlsx", filled, false));
     assertThat(result.vouchers()).hasSize(2).allMatch(v -> v.status() == VoucherStatus.VALID);
+    assertThat(result.rows()).extracting(r -> r.rowNumber()).doesNotContain(1, 2);
+    // A plain workbook with the header in row 1 is read as before.
+    byte[] plainFile = plainXlsx();
+    UploadResult plain =
+        as.run(
+            "accountant",
+            () -> service.process(data.company().getId(), "plain.xlsx", plainFile, false));
+    assertThat(plain.vouchers()).hasSize(2).allMatch(v -> v.status() == VoucherStatus.VALID);
+    assertThat(plain.rows()).extracting(r -> r.rowNumber()).containsExactly(2, 3, 4, 5);
+  }
+
+  /** Examples in the head office and the base currency of the test company. */
+  private static JournalUploadTemplate.Example example() {
+    return new JournalUploadTemplate.Example(BusinessClock.today(Clock.systemUTC()), "HO", "PHP");
+  }
+
+  /** The example vouchers in a plain workbook: header in row 1, no guide. */
+  private static byte[] plainXlsx() throws java.io.IOException {
+    try (var wb = new org.apache.poi.xssf.usermodel.XSSFWorkbook();
+        var out = new java.io.ByteArrayOutputStream()) {
+      var sheet = wb.createSheet("Journals");
+      var rows =
+          com.iortatechnxt.brokerverse.journal.service.SpreadsheetRows.parseCsv(
+              new String(JournalUploadTemplate.csv(example()), StandardCharsets.UTF_8));
+      for (int r = 0; r < rows.size(); r++) {
+        var row = sheet.createRow(r);
+        for (int c = 0; c < rows.get(r).size(); c++) {
+          row.createCell(c).setCellValue(rows.get(r).get(c));
+        }
+      }
+      wb.write(out);
+      return out.toByteArray();
+    }
+  }
+
+  /** The template whose example rows the user keeps as data (the example marker removed). */
+  private static byte[] examplesKept(byte[] template) throws java.io.IOException {
+    try (var wb =
+            new org.apache.poi.xssf.usermodel.XSSFWorkbook(
+                new java.io.ByteArrayInputStream(template));
+        var out = new java.io.ByteArrayOutputStream()) {
+      for (var row : wb.getSheetAt(0)) {
+        var first = row.getCell(0);
+        if (first != null
+            && com.iortatechnxt.brokerverse.common.excel.GuidedTables.EXAMPLE_MARKER.equals(
+                first.getStringCellValue())) {
+          first.setBlank();
+        }
+      }
+      wb.write(out);
+      return out.toByteArray();
+    }
   }
 
   @Test

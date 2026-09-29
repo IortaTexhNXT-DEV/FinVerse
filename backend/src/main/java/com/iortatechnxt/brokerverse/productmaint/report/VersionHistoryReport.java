@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.productmaint.report;
 
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionQueryService;
 import com.iortatechnxt.brokerverse.catalog.service.version.ProductVersionView;
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -109,6 +110,6 @@ public class VersionHistoryReport implements ReportDefinition {
   }
 
   private static LocalDate date(Instant instant) {
-    return instant == null ? null : instant.atZone(PmReportSupport.MANILA).toLocalDate();
+    return instant == null ? null : instant.atZone(BusinessClock.zone()).toLocalDate();
   }
 }

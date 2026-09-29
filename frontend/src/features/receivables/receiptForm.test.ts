@@ -79,7 +79,7 @@ describe('receipt entry form', () => {
   it('resolves the bank currency and allocation list', () => {
     const banks = [{ code: '1120', currency: 'USD' }];
     expect(bankCurrency(banks, '1120')).toBe('USD');
-    expect(bankCurrency(banks, '')).toBe('PHP');
+    expect(bankCurrency(banks, '', 'PHP')).toBe('PHP');
     expect(allocationList({ 1: 5, 2: 6 })).toHaveLength(2);
   });
 });

@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.Receipt;
 import com.iortatechnxt.brokerverse.cashiering.domain.Receipt.ReceiptTender;
 import com.iortatechnxt.brokerverse.cashiering.domain.ReceiptLine;
 import com.iortatechnxt.brokerverse.cashiering.service.CashReceiptService.OrIssue;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -30,6 +31,7 @@ public class CommissionOrService {
   private final CommissionLineRepository lines;
   private final CashReceiptService receipts;
   private final CashieringSettings settings;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -37,12 +39,17 @@ public class CommissionOrService {
    * @param lines commission payment lines
    * @param receipts receipts
    * @param settings settings
+   * @param organization company master (base currency)
    */
   public CommissionOrService(
-      CommissionLineRepository lines, CashReceiptService receipts, CashieringSettings settings) {
+      CommissionLineRepository lines,
+      CashReceiptService receipts,
+      CashieringSettings settings,
+      OrganizationDirectory organization) {
     this.lines = lines;
     this.receipts = receipts;
     this.settings = settings;
+    this.organization = organization;
   }
 
   /**
@@ -128,7 +135,7 @@ public class CommissionOrService {
         first.getPaymentDate(),
         first.getInsurerCode(),
         first.getPayeeName(),
-        "PHP",
+        organization.company(companyId).baseCurrency(),
         orLines,
         new ReceiptTender(
             PaymentMode.CHECK,

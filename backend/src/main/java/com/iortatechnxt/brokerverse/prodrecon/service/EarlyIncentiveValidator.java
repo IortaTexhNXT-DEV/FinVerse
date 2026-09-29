@@ -93,7 +93,7 @@ public class EarlyIncentiveValidator {
                 c.inceptionDate(),
                 c.bookingDate()));
     LocalDate remitted = firstRemittance(ledger.movements(invoice.getInvoiceNo()));
-    BigDecimal basic = item.getBdoi() == null ? BigDecimal.ZERO : item.getBdoi().basicPremium();
+    BigDecimal basic = item.getBroker() == null ? BigDecimal.ZERO : item.getBroker().basicPremium();
     Long days = null;
     BigDecimal expected = null;
     Outcome outcome;

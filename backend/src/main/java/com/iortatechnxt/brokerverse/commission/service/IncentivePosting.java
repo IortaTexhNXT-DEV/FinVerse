@@ -124,7 +124,8 @@ public class IncentivePosting {
                         insurer,
                         Map.of("INCENTIVE", amount))));
     if (scheme.getBeneficiary() == Beneficiary.BRANCH) {
-      group(earned, l -> l.getSalesUnit() == null ? "HO" : l.getSalesUnit())
+      String headOffice = organization.headOfficeCode(run.getCompanyId());
+      group(earned, l -> l.getSalesUnit() == null ? headOffice : l.getSalesUnit())
           .forEach((unit, amount) -> refs.addAll(passOn(ctx, scheme, unit, amount)));
     }
     run.posted(clock.instant(), currentUser.username(), String.join(", ", refs));

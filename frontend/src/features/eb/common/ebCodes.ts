@@ -1,4 +1,6 @@
 import { humanize } from '@/utils/format';
+import { clientShortName } from '@/context/clientNames';
+import { BRAND } from '@/branding';
 
 /** Lists of values of Employee Benefits (V1030). */
 export const EB_LOV = {
@@ -31,8 +33,10 @@ const LABELS: Record<string, string> = {
   PROCESSING: 'Processing',
   CLIENT: 'Client',
   INSURER: 'Insurer',
-  SYSTEM: 'BIBS',
-  BDOI: 'BDOI',
+  SYSTEM: BRAND.product,
+  get BROKER() {
+    return clientShortName();
+  },
   RENEWAL_ADVICE: 'Renewal advice',
   PLACEMENT_REQUEST: 'Placement request',
   SIGNED_DOCUMENT: 'Signed document',

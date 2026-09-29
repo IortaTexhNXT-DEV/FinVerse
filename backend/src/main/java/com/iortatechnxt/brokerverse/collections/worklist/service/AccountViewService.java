@@ -14,7 +14,6 @@ import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -36,7 +35,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class AccountViewService {
 
-  private static final ZoneId MANILA = BusinessClock.zone();
   private static final Set<MovementType> PAYMENTS =
       Set.of(MovementType.APPLIED, MovementType.UNAPPLIED);
 
@@ -240,7 +238,7 @@ public class AccountViewService {
     static LocalDate dateOf(OpsInvoiceMovement m) {
       return m.getValueDate() != null
           ? m.getValueDate()
-          : m.getPostedAt().atZone(MANILA).toLocalDate();
+          : m.getPostedAt().atZone(BusinessClock.zone()).toLocalDate();
     }
 
     PaymentLine plus(PaymentLine other) {

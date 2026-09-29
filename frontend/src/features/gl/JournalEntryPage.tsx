@@ -193,9 +193,6 @@ export default function JournalEntryPage() {
     return <span className="spinner" aria-label="Loading" />;
   }
   return (
-    <JournalForm
-      key="new"
-      initial={newJournalValues(defaultBranch, company?.baseCurrency ?? 'PHP')}
-    />
+    <JournalForm key="new" initial={newJournalValues(defaultBranch, company?.baseCurrency ?? '')} />
   );
 }

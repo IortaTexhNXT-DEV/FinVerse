@@ -33,7 +33,7 @@ export const ACCOUNT_STATUSES: AccountStatus[] = [
   'VOIDED',
 ];
 
-export type PaymentArrangement = 'VIA_BDOI' | 'DIRECT_TO_INSURER';
+export type PaymentArrangement = 'VIA_BROKER' | 'DIRECT_TO_INSURER';
 export type PaymentStatus = 'UNPAID' | 'PAID' | 'CLIENT_CONFIRMED' | 'DIRECT';
 export type HoldCoverStatus = 'REQUESTED' | 'CONFIRMED' | 'DECLINED' | 'EXPIRED' | 'REASSIGNED';
 

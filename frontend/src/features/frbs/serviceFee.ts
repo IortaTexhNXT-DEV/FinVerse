@@ -55,7 +55,7 @@ export function lineActions(line: ServiceFeeLine, runStage: RunStage): LineActio
   return actions;
 }
 
-/** Totals of the lines per currency (a run may pay in PHP and USD). */
+/** Totals of the lines per currency (a run may pay in several currencies). */
 export function totalsByCurrency(
   lines: readonly ServiceFeeLine[],
 ): { currency: string; base: number; fee: number; count: number }[] {

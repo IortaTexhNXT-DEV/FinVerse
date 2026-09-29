@@ -127,7 +127,7 @@ function payoutErrors(p: PayoutDraft, errors: FieldErrors): void {
     errors.paymentMode = 'Select the mode of payment';
   }
   if (p.paymentMode === 'CTA' && !ACCOUNT_NO.test(p.accountNo.trim())) {
-    errors.accountNo = 'Enter the BDO account number (10 to 16 digits)';
+    errors.accountNo = 'Enter the account number (10 to 16 digits)';
   }
   if ((p.paymentMode === 'CTA' || p.paymentMode === 'CHECK') && p.accountName.trim() === '') {
     errors.accountName =
@@ -189,7 +189,7 @@ export function refundInput(
     referenceText: optional(header.referenceText),
     requestingUnit: optional(header.requestingUnit),
     purpose: optional(header.purpose),
-    currency: 'PHP',
+    currency: '',
     paymentMode: payout.paymentMode,
     accountNo: optional(payout.accountNo),
     accountName: optional(payout.accountName),
@@ -245,7 +245,7 @@ export function cashAdvanceInput(d: CashAdvanceDraft): CashAdvanceInput {
     requestingUnit: optional(d.requestingUnit),
     rfpType: optional(d.rfpType) ?? 'CASH_ADVANCE',
     purpose: d.purpose.trim(),
-    currency: 'PHP',
+    currency: '',
     employeeNo: d.employeeNo.trim(),
     employeeName: d.employeeName.trim(),
     paymentMode: d.paymentMode,

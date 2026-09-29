@@ -34,7 +34,22 @@ final class BulkTemplates {
    * @return template
    */
   static GuidedTemplate of(BulkImportHandler handler, BulkTemplateLists lists, int maxRows) {
-    List<GuideColumn> columns = handler.columns().stream().map(c -> column(c, lists)).toList();
+    return of(handler, lists, maxRows, null);
+  }
+
+  /**
+   * The template of a handler for a company: currency examples show its base currency.
+   *
+   * @param handler handler
+   * @param lists platform lists of values
+   * @param maxRows largest number of rows of a file
+   * @param baseCurrency base currency of the company the template is for, may be null
+   * @return template
+   */
+  static GuidedTemplate of(
+      BulkImportHandler handler, BulkTemplateLists lists, int maxRows, String baseCurrency) {
+    List<GuideColumn> columns =
+        handler.columns().stream().map(c -> column(c.forCompany(baseCurrency), lists)).toList();
     GuidedSheet sheet =
         GuidedSheet.of(DATA_SHEET, handler.title(), handler.instructions(), columns);
     return new GuidedTemplate(

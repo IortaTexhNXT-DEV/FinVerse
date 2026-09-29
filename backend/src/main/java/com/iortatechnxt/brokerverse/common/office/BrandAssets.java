@@ -4,55 +4,73 @@ import java.awt.Color;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
+import java.util.Locale;
+import java.util.Properties;
 
 /**
- * The BDO Insure brand of generated files (BDO_UX_GUIDELINES; client requirement 16): the logo, the
- * colours of the style guide and the fonts. Reports and business documents in PDF, Word and Excel
- * all take their brand from here.
+ * The brand of generated files (client requirement 16) from the theme pack of the deployment: the
+ * logo, the colours and the font of the client. Reports and business documents in PDF, Word and
+ * Excel all take their brand from here, so no client logo or colour is written into the platform.
+ *
+ * <p>The pack is the folder {@code theme/<pack>} on the classpath with {@code brand.properties} and
+ * the logo; it is chosen with the system property {@value #PACK_PROPERTY} or the environment
+ * variable {@value #PACK_ENV} ({@value #DEFAULT_PACK} unless set), read once when the class loads.
  */
 public final class BrandAssets {
 
-  /** Header Blue, table headers and titles. */
-  public static final String HEADER_BLUE = "004EA8";
+  /** System property naming the theme pack. */
+  public static final String PACK_PROPERTY = "brokerverse.theme";
 
-  /** CTA Blue, company line. */
-  public static final String CTA_BLUE = "0072D8";
+  /** Environment variable naming the theme pack. */
+  public static final String PACK_ENV = "BROKERVERSE_THEME";
 
-  /** Background Blue, group rows and label cells. */
-  public static final String BACKGROUND_BLUE = "E5F5FF";
+  /** Theme pack used unless configured. */
+  public static final String DEFAULT_PACK = "bdoi";
 
-  /** Gold rule under the letterhead and above grand totals. */
-  public static final String GOLD = "FDB913";
+  private static final Pack PACK = Pack.load(packName());
 
-  /** Light grey of subtotal rows and banded rows. */
-  public static final String BAND = "F4F6FA";
+  /** Table headers and titles. */
+  public static final String HEADER = PACK.color("header");
+
+  /** Company line. */
+  public static final String PRIMARY = PACK.color("primary");
+
+  /** Group rows and label cells. */
+  public static final String BACKGROUND = PACK.color("background");
+
+  /** Rule under the letterhead and above grand totals. */
+  public static final String ACCENT = PACK.color("accent");
+
+  /** Subtotal rows and banded rows. */
+  public static final String BAND = PACK.color("band");
 
   /** Every second detail row of a table (banded rows). */
-  public static final String ROW_BAND = "F7FAFD";
+  public static final String ROW_BAND = PACK.color("rowBand");
 
   /** Grid lines. */
-  public static final String GRID = "D5DBE5";
+  public static final String GRID = PACK.color("grid");
 
-  /** Word and Excel font: Nunito is the brand font, Arial the approved fallback for files. */
-  public static final String FONT = "Arial";
+  /** Word and Excel font. */
+  public static final String FONT = PACK.text("font");
 
   /** Classification printed in the footer of every page. */
   public static final String CONFIDENTIAL = "Confidential";
 
-  /** Logo width / height in pixels (378 x 77). */
-  public static final float LOGO_RATIO = 378f / 77f;
+  /** Logo width / height. */
+  public static final float LOGO_RATIO = PACK.ratio();
 
-  private static final String LOGO = "/brand/bdo-insure.png";
+  /** File name of the logo in generated files. */
+  public static final String LOGO_NAME = "logo.png";
 
   private BrandAssets() {}
 
   /**
-   * The BDO Insure logo (PNG, transparent background).
+   * The logo of the theme pack (PNG, transparent background).
    *
    * @return PNG bytes
    */
   public static byte[] logoPng() {
-    return Logo.BYTES.clone();
+    return PACK.logo().clone();
   }
 
   /**
@@ -65,19 +83,61 @@ public final class BrandAssets {
     return Color.decode("#" + hex);
   }
 
-  /** Loads the logo once. */
-  private static final class Logo {
-    private static final byte[] BYTES = load();
+  private static String packName() {
+    String name = System.getProperty(PACK_PROPERTY);
+    if (name == null || name.isBlank()) {
+      name = System.getenv(PACK_ENV);
+    }
+    name = name == null || name.isBlank() ? DEFAULT_PACK : name.strip().toLowerCase(Locale.ROOT);
+    if (!name.matches("[a-z0-9-]+")) {
+      throw new IllegalStateException("Theme pack name must be a folder name: " + name);
+    }
+    return name;
+  }
 
-    private static byte[] load() {
-      try (InputStream in = BrandAssets.class.getResourceAsStream(LOGO)) {
+  /** The loaded theme pack. */
+  private record Pack(String name, Properties values, byte[] logo) {
+
+    static Pack load(String name) {
+      String base = "/theme/" + name + "/";
+      Properties values = new Properties();
+      try (InputStream in = BrandAssets.class.getResourceAsStream(base + "brand.properties")) {
         if (in == null) {
-          throw new IllegalStateException("Brand logo " + LOGO + " is missing");
+          throw new IllegalStateException("Theme pack " + name + " has no brand.properties");
         }
-        return in.readAllBytes();
+        values.load(in);
       } catch (IOException ex) {
         throw new UncheckedIOException(ex);
       }
+      String logoFile = values.getProperty("logo", "logo.png");
+      try (InputStream in = BrandAssets.class.getResourceAsStream(base + logoFile)) {
+        if (in == null) {
+          throw new IllegalStateException("Theme pack " + name + " has no logo " + logoFile);
+        }
+        return new Pack(name, values, in.readAllBytes());
+      } catch (IOException ex) {
+        throw new UncheckedIOException(ex);
+      }
+    }
+
+    String text(String key) {
+      String value = values.getProperty(key);
+      if (value == null || value.isBlank()) {
+        throw new IllegalStateException("Theme pack " + name + " has no " + key);
+      }
+      return value.strip();
+    }
+
+    String color(String key) {
+      String value = text("color." + key);
+      if (!value.matches("[0-9A-Fa-f]{6}")) {
+        throw new IllegalStateException("Colour " + key + " of theme pack " + name + " is not hex");
+      }
+      return value.toUpperCase(Locale.ROOT);
+    }
+
+    float ratio() {
+      return Float.parseFloat(text("logo.width")) / Float.parseFloat(text("logo.height"));
     }
   }
 }

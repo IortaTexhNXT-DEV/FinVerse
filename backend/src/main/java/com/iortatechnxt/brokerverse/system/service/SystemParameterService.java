@@ -2,10 +2,12 @@ package com.iortatechnxt.brokerverse.system.service;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.system.domain.ParameterValueType;
 import com.iortatechnxt.brokerverse.system.domain.SystemParameter;
 import com.iortatechnxt.brokerverse.system.domain.SystemParameterRepository;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.cache.annotation.CacheEvict;
@@ -121,6 +123,32 @@ public class SystemParameterService {
   }
 
   /**
+   * Reads a whole-number parameter that the platform seeds (a business rule without a value in the
+   * code).
+   *
+   * @param key key
+   * @return value
+   * @throws BusinessRuleException PARAMETER_NOT_SET when the parameter is missing or blank
+   */
+  @Transactional(readOnly = true)
+  public int requiredInt(String key) {
+    return Integer.parseInt(required(key));
+  }
+
+  /**
+   * Reads a decimal parameter that the platform seeds (a business rule without a value in the
+   * code).
+   *
+   * @param key key
+   * @return value
+   * @throws BusinessRuleException PARAMETER_NOT_SET when the parameter is missing or blank
+   */
+  @Transactional(readOnly = true)
+  public BigDecimal requiredDecimal(String key) {
+    return new BigDecimal(required(key));
+  }
+
+  /**
    * Reads a text parameter.
    *
    * @param key key
@@ -141,6 +169,16 @@ public class SystemParameterService {
   @Transactional(readOnly = true)
   public List<String> items(String key) {
     return raw(key).map(ParameterValueType::items).orElse(List.of());
+  }
+
+  private String required(String key) {
+    return raw(key)
+        .map(String::strip)
+        .filter(v -> !v.isEmpty())
+        .orElseThrow(
+            () ->
+                new BusinessRuleException(
+                    "PARAMETER_NOT_SET", "Business parameter " + key + " has no value"));
   }
 
   private Optional<String> raw(String key) {

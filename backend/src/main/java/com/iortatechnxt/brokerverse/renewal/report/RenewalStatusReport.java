@@ -212,7 +212,7 @@ public class RenewalStatusReport implements ReportDefinition {
                 ReportColumn.text("department_code", "Area"),
                 ReportColumn.text("branch_code", "Branch"),
                 ReportColumn.text("insurer_code", "Insurer"),
-                ReportColumn.text("mortgaged", "Mortgaged To BDO"),
+                ReportColumn.text("mortgaged", "Mortgaged To Group Bank"),
                 ReportColumn.text("mortgagee_bank", "Mortgagee Bank"),
                 ReportColumn.text("pn_nos", "PN Number"),
                 ReportColumn.text("stage", "Renewal Status"),

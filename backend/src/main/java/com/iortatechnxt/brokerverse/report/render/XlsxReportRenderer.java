@@ -222,7 +222,7 @@ public class XlsxReportRenderer implements ReportRenderer {
     private final Map<ColumnType, CellStyle> boldNumbers = new EnumMap<>(ColumnType.class);
 
     Styles(SXSSFWorkbook wb) {
-      XSSFColor brand = brandColor(BrandAssets.HEADER_BLUE);
+      XSSFColor brand = brandColor(BrandAssets.HEADER);
       XSSFFont titleFont = (XSSFFont) font(wb);
       titleFont.setBold(true);
       titleFont.setFontHeightInPoints(TITLE_POINTS);

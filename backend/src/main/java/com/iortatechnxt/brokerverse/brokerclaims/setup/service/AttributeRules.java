@@ -18,7 +18,7 @@ final class AttributeRules {
 
   /** Parties a claim waits on (spec 6.1). */
   static final Set<String> WAITING_ON =
-      Set.of("INSURER", "CLAIMANT", "ASSURED", "ADJUSTER", "BDOI");
+      Set.of("INSURER", "CLAIMANT", "ASSURED", "ADJUSTER", "BROKER");
 
   /** Outcomes of a settlement type (spec 6.2). */
   static final Set<String> OUTCOMES = Set.of("SETTLED", "CLOSED_WITHOUT_PAYMENT");

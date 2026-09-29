@@ -9,7 +9,6 @@ import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.messaging.service.OutboundEmail;
 import com.iortatechnxt.brokerverse.security.service.AuthPasswordService.PasswordExpiry;
 import com.iortatechnxt.brokerverse.security.service.PasswordResetRequested;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
@@ -31,7 +30,6 @@ public class PasswordNoticeMailer {
 
   private static final String ENTITY = "AppUser";
   private static final String PROFILE = "/profile";
-  private static final ZoneId MANILA = BusinessClock.zone();
   private static final DateTimeFormatter WHEN =
       DateTimeFormatter.ofPattern("d MMM yyyy HH:mm", Locale.ENGLISH);
 
@@ -70,7 +68,7 @@ public class PasswordNoticeMailer {
             + ". Open this link to set it:\n\n"
             + event.link()
             + "\n\nThe link works once and expires at "
-            + WHEN.format(event.expiresAt().atZone(MANILA))
+            + WHEN.format(event.expiresAt().atZone(BusinessClock.zone()))
             + " (Philippine time). If you did not ask for it, ignore this e-mail;"
             + " your password stays as it is.";
     messages.queueEmail(
@@ -93,7 +91,7 @@ public class PasswordNoticeMailer {
    * @return true when the user was told
    */
   public boolean notifyExpiry(PasswordExpiry expiry) {
-    String when = WHEN.format(expiry.expiresAt().atZone(MANILA));
+    String when = WHEN.format(expiry.expiresAt().atZone(BusinessClock.zone()));
     String body =
         "Your BrokerVerse password expires on "
             + when

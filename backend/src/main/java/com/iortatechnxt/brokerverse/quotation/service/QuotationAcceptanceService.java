@@ -228,7 +228,7 @@ public class QuotationAcceptanceService {
         false,
         1,
         q.getCurrency(),
-        c.directPayment() ? PaymentArrangement.DIRECT_TO_INSURER : PaymentArrangement.VIA_BDOI,
+        c.directPayment() ? PaymentArrangement.DIRECT_TO_INSURER : PaymentArrangement.VIA_BROKER,
         Mortgage.NONE,
         null,
         c.itemsOf(group).stream().map(QuotationItem::data).toList(),

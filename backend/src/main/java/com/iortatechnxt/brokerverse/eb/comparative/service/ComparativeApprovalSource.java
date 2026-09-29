@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.eb.domain.EbComparative;
 import com.iortatechnxt.brokerverse.eb.domain.EbComparativeRepository;
 import com.iortatechnxt.brokerverse.eb.domain.EbProgramme;
 import com.iortatechnxt.brokerverse.eb.domain.EbProgrammeRepository;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,17 +33,22 @@ public class ComparativeApprovalSource implements PendingApprovalSource {
 
   private final EbComparativeRepository comparatives;
   private final EbProgrammeRepository programmes;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the source.
    *
    * @param comparatives comparatives
    * @param programmes programmes (account officer)
+   * @param organization company master (base currency)
    */
   public ComparativeApprovalSource(
-      EbComparativeRepository comparatives, EbProgrammeRepository programmes) {
+      EbComparativeRepository comparatives,
+      EbProgrammeRepository programmes,
+      OrganizationDirectory organization) {
     this.comparatives = comparatives;
     this.programmes = programmes;
+    this.organization = organization;
   }
 
   @Override
@@ -75,7 +81,7 @@ public class ComparativeApprovalSource implements PendingApprovalSource {
             || !CurrentUser.sameUser(viewer.username(), programme.getAccountOfficer()));
   }
 
-  private static PendingApproval item(EbComparative c, EbProgramme programme) {
+  private PendingApproval item(EbComparative c, EbProgramme programme) {
     boolean threshold = c.getStatus() == EbComparative.Status.THRESHOLD_APPROVAL;
     BigDecimal total =
         c.getLines().stream()
@@ -88,7 +94,7 @@ public class ComparativeApprovalSource implements PendingApprovalSource {
         c.getComparativeNo(),
         programme.getName() + (threshold ? " - " + c.getThresholdRules() : ""),
         threshold ? total : null,
-        threshold ? "PHP" : null,
+        threshold ? organization.company(c.getCompanyId()).baseCurrency() : null,
         c.maker(),
         c.getSubmittedAt() == null ? c.getCreatedAt() : c.getSubmittedAt(),
         c.getCompanyId(),

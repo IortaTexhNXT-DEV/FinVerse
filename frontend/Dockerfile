@@ -11,6 +11,9 @@ COPY package.json package-lock.json ./
 # The dependency audit runs as a gate in the pipeline (npm audit --audit-level=high).
 RUN npm ci --no-audit --no-fund
 COPY . .
+# Theme pack of the client deployment (src/theme/packs/<pack>): branding, colours, fonts, logo.
+ARG VITE_THEME_PACK=bdoi
+ENV VITE_THEME_PACK=${VITE_THEME_PACK}
 RUN npm run build
 
 # ---- runtime stage: static files served by an unprivileged nginx, /api proxied to the backend ----

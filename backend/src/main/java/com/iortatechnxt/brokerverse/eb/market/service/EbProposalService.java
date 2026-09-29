@@ -33,6 +33,7 @@ import com.iortatechnxt.brokerverse.eb.service.EbMailer.Mail;
 import com.iortatechnxt.brokerverse.eb.service.EbParties;
 import com.iortatechnxt.brokerverse.eb.service.EbRecords;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage.RecordLink;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.List;
@@ -59,8 +60,6 @@ public class EbProposalService {
   private static final Set<EbCycleStage> ENTRY_STAGES =
       Set.of(EbCycleStage.PROPOSALS, EbCycleStage.INCUMBENT_TERMS, EbCycleStage.REVISION);
 
-  private static final String DEFAULT_CURRENCY = "PHP";
-
   private final EbProposalRepository proposals;
   private final EbInsurerRequestRepository requests;
   private final EbRevisionRequestRepository revisions;
@@ -75,6 +74,7 @@ public class EbProposalService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -109,7 +109,8 @@ public class EbProposalService {
       EbActivityLog activity,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      OrganizationDirectory organization) {
     this.proposals = proposals;
     this.requests = requests;
     this.revisions = revisions;
@@ -124,6 +125,7 @@ public class EbProposalService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.organization = organization;
   }
 
   /**
@@ -167,7 +169,7 @@ public class EbProposalService {
                 input.receivedOn() == null ? today : input.receivedOn(),
                 input.validUntil(),
                 input.currency() == null || input.currency().isBlank()
-                    ? DEFAULT_CURRENCY
+                    ? organization.company(cycle.getCompanyId()).baseCurrency()
                     : input.currency().strip(),
                 input.terms(),
                 input.exclusions(),

@@ -13,6 +13,7 @@ import com.iortatechnxt.brokerverse.payables.domain.InvoicePosting;
 import com.iortatechnxt.brokerverse.payables.domain.InvoiceStatus;
 import com.iortatechnxt.brokerverse.payables.domain.SupplierInvoice;
 import com.iortatechnxt.brokerverse.payables.domain.SupplierInvoiceRepository;
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.LocalDate;
 import java.util.EnumSet;
@@ -47,6 +48,7 @@ public class SupplierInvoiceService {
   private final PayablesSupport support;
   private final AuditTrailService audit;
   private final Clock clock;
+  private final InputVatRates vatRates;
 
   /**
    * Creates the service.
@@ -58,6 +60,7 @@ public class SupplierInvoiceService {
    * @param support shared helpers
    * @param audit audit trail
    * @param clock clock
+   * @param vatRates input VAT rate (tax code master)
    */
   public SupplierInvoiceService(
       SupplierInvoiceRepository invoices,
@@ -66,7 +69,8 @@ public class SupplierInvoiceService {
       SupplierInvoicePoster poster,
       PayablesSupport support,
       AuditTrailService audit,
-      Clock clock) {
+      Clock clock,
+      InputVatRates vatRates) {
     this.invoices = invoices;
     this.parties = parties;
     this.validator = validator;
@@ -74,6 +78,7 @@ public class SupplierInvoiceService {
     this.support = support;
     this.audit = audit;
     this.clock = clock;
+    this.vatRates = vatRates;
   }
 
   /**
@@ -124,7 +129,7 @@ public class SupplierInvoiceService {
     LocalDate date = c.invoiceDate();
     SupplierInvoice invoice =
         new SupplierInvoice(support.nextNumber("SI", c.branchId(), date), header(c, supplier));
-    invoice.replaceLines(c.lines());
+    invoice.replaceLines(c.lines(), vatRate(c));
     SupplierInvoice saved = invoices.save(invoice);
     audit.record(
         ENTITY,
@@ -149,7 +154,7 @@ public class SupplierInvoiceService {
     invoice.updateHeader(header(c, supplier));
     invoice.clearLines();
     invoices.flush();
-    invoice.replaceLines(c.lines());
+    invoice.replaceLines(c.lines(), vatRate(c));
     audit.record(ENTITY, invoice.getDocumentNo(), AuditAction.UPDATE, "Updated draft invoice");
     return invoice;
   }
@@ -255,5 +260,12 @@ public class SupplierInvoiceService {
         c.vatApplicable(),
         supplier.getWithholdingTaxRate(),
         c.narration());
+  }
+
+  /** The input VAT rate of the tax code master when VAT applies, else zero. */
+  private BigDecimal vatRate(InvoiceCommand c) {
+    return c.vatApplicable()
+        ? vatRates.ratePercent(c.companyId(), c.invoiceDate())
+        : BigDecimal.ZERO;
   }
 }

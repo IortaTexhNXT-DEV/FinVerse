@@ -195,7 +195,7 @@ class JournalUploadIT {
 
   @Test
   void xlsxTemplateValidates() throws java.io.IOException {
-    byte[] template = JournalUploadTemplate.xlsx(BusinessClock.today(Clock.systemUTC()));
+    byte[] template = JournalUploadTemplate.xlsx(example());
     // Uploaded as it is, the guided template has no lines: its guide and examples are skipped.
     UploadResult untouched =
         as.run(
@@ -219,6 +219,11 @@ class JournalUploadIT {
     assertThat(plain.rows()).extracting(r -> r.rowNumber()).containsExactly(2, 3, 4, 5);
   }
 
+  /** Examples in the head office and the base currency of the test company. */
+  private static JournalUploadTemplate.Example example() {
+    return new JournalUploadTemplate.Example(BusinessClock.today(Clock.systemUTC()), "HO", "PHP");
+  }
+
   /** The example vouchers in a plain workbook: header in row 1, no guide. */
   private static byte[] plainXlsx() throws java.io.IOException {
     try (var wb = new org.apache.poi.xssf.usermodel.XSSFWorkbook();
@@ -226,9 +231,7 @@ class JournalUploadIT {
       var sheet = wb.createSheet("Journals");
       var rows =
           com.iortatechnxt.brokerverse.journal.service.SpreadsheetRows.parseCsv(
-              new String(
-                  JournalUploadTemplate.csv(BusinessClock.today(Clock.systemUTC())),
-                  StandardCharsets.UTF_8));
+              new String(JournalUploadTemplate.csv(example()), StandardCharsets.UTF_8));
       for (int r = 0; r < rows.size(); r++) {
         var row = sheet.createRow(r);
         for (int c = 0; c < rows.get(r).size(); c++) {

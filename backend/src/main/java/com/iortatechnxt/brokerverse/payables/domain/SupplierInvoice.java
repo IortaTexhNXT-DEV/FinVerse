@@ -137,8 +137,9 @@ public class SupplierInvoice extends SubmittableDocument {
    * Replaces all lines of a draft and recomputes VAT, withholding and totals.
    *
    * @param values line values (at least one)
+   * @param vatRatePercent input VAT rate in percent (tax code master), used when VAT applies
    */
-  public void replaceLines(List<InvoiceLineValues> values) {
+  public void replaceLines(List<InvoiceLineValues> values, BigDecimal vatRatePercent) {
     requireStatus(EDITABLE, "edit");
     if (values.isEmpty()) {
       throw new BusinessRuleException(
@@ -147,7 +148,7 @@ public class SupplierInvoice extends SubmittableDocument {
     lines.clear();
     int number = 1;
     for (InvoiceLineValues v : values) {
-      BigDecimal vat = InvoiceCalculator.vat(v.netAmount(), vatApplicable);
+      BigDecimal vat = InvoiceCalculator.vat(v.netAmount(), vatApplicable, vatRatePercent);
       BigDecimal wht = InvoiceCalculator.withholding(v.netAmount(), whtRate);
       lines.add(new SupplierInvoiceLine(this, number++, v, vat, wht));
     }

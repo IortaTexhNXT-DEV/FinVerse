@@ -120,7 +120,9 @@ export function BulkUploadWizard({
           <Button
             variant="secondary"
             icon={<Download size={16} />}
-            onClick={() => void download(() => bulkApi.template(handler))}
+            onClick={() =>
+              void download(() => bulkApi.template(handler, companyId > 0 ? companyId : undefined))
+            }
           >
             Download Template
           </Button>

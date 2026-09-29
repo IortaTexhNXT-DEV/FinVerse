@@ -86,7 +86,7 @@ public class ProductionReport implements ReportDefinition {
         .presorted()
         .note(
             "Premium is the basic premium of the booked invoices, net of endorsements and"
-                + " cancellations. Targets are pro rata to the days of the period (PHP).")
+                + " cancellations. Targets are pro rata to the days of the period (base currency).")
         .build();
   }
 

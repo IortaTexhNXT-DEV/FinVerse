@@ -20,7 +20,6 @@ import java.util.List;
 final class AccountTerms {
 
   private static final String PRODUCT = "Product ";
-  private static final String BASE_CURRENCY = "PHP";
 
   private AccountTerms() {}
 
@@ -100,10 +99,15 @@ final class AccountTerms {
    * @param client client
    * @param product product
    * @param contact account contact
+   * @param baseCurrency base currency of the company, the currency when the draft has none
    * @return data
    */
   static AccountData dataOf(
-      AccountDraft draft, ClientRef client, ProductRef product, AccountContact contact) {
+      AccountDraft draft,
+      ClientRef client,
+      ProductRef product,
+      AccountContact contact,
+      String baseCurrency) {
     String currency = draft.currency();
     return new AccountData(
         client,
@@ -116,9 +120,9 @@ final class AccountTerms {
         draft.periodTo(),
         draft.multiYear(),
         draft.multiYear() ? draft.termYears() : 1,
-        currency == null || currency.isBlank() ? BASE_CURRENCY : currency,
+        currency == null || currency.isBlank() ? baseCurrency : currency,
         draft.paymentArrangement() == null
-            ? PaymentArrangement.VIA_BDOI
+            ? PaymentArrangement.VIA_BROKER
             : draft.paymentArrangement(),
         draft.mortgage() == null ? Mortgage.NONE : draft.mortgage(),
         contact,

@@ -13,7 +13,6 @@ import com.iortatechnxt.brokerverse.remittance.domain.SpecialRemittance;
 import com.iortatechnxt.brokerverse.remittance.domain.SpecialRemittanceRepository;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -27,8 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Transactional(readOnly = true)
 public class RemittanceRelatedItems implements InvoiceRelatedItems {
-
-  private static final ZoneId MANILA = BusinessClock.zone();
 
   private final BatchLineRepository lines;
   private final HoldRequestRepository holds;

@@ -4,7 +4,6 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.screening.report.ClientReports;
 import java.time.Clock;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -23,8 +22,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/screening/high-risk-clients")
 public class HighRiskController {
-
-  private static final ZoneId MANILA = BusinessClock.zone();
 
   private final ClientReports.HighRisk report;
   private final Clock clock;

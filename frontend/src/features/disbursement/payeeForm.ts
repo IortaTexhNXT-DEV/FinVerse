@@ -28,7 +28,7 @@ export const EMPTY_PAYEE: PayeeForm = {
   defaultMode: 'CHECK',
   allowedModes: ['CHECK'],
   disbursementTypes: [],
-  currency: 'PHP',
+  currency: '',
   defaultCostCenter: '',
   remarks: '',
 };
@@ -152,7 +152,7 @@ export const EMPTY_ACCOUNT: AccountInput = {
   bankBranch: '',
   accountNo: '',
   accountName: '',
-  currency: 'PHP',
+  currency: '',
   mode: 'CTA',
   primary: true,
 };

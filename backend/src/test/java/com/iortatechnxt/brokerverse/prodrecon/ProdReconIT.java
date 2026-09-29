@@ -106,7 +106,7 @@ class ProdReconIT {
     assertThat(extract.getRowCount()).isGreaterThanOrEqualTo(2);
     assertThat(extract.getFileName()).startsWith("INS-MGIC_PRODREG_202609_").endsWith(".xlsx");
     Long cycleId = extract.getCycleId();
-    assertThat(fx.item(cycleId, a.getInvoiceNo()).getStatus()).isEqualTo(ReconStatus.BDOI_ONLY);
+    assertThat(fx.item(cycleId, a.getInvoiceNo()).getStatus()).isEqualTo(ReconStatus.BROKER_ONLY);
 
     byte[] workbook = repository.content(extract.getFileId());
     try (XSSFWorkbook wb = new XSSFWorkbook(new ByteArrayInputStream(workbook))) {
@@ -206,7 +206,7 @@ class ProdReconIT {
     assertThat(fx.item(cycleId, a.getInvoiceNo()).getMatchMethod()).isEqualTo(MatchMethod.MANUAL);
 
     ReconItem split = as.run(RECON, () -> matching.split(booked.getId()));
-    assertThat(split.getStatus()).isEqualTo(ReconStatus.BDOI_ONLY);
+    assertThat(split.getStatus()).isEqualTo(ReconStatus.BROKER_ONLY);
     ReconItem again = insurerOnly(cycleId, ref).get(0);
     assertThatThrownBy(() -> as.run(RECON, () -> matching.split(again.getId())))
         .isInstanceOf(BusinessRuleException.class);

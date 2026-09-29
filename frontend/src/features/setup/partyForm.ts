@@ -18,7 +18,7 @@ export function hasWithholding(type: PartyType | undefined): boolean {
 }
 
 /** New party defaults. */
-export function emptyParty(companyId: number, baseCurrency = 'PHP'): PartyForm {
+export function emptyParty(companyId: number, baseCurrency = ''): PartyForm {
   return {
     companyId,
     partyType: 'CORPORATE_CLIENT',
@@ -93,7 +93,7 @@ export function toPartyInput(form: PartyForm): PartyInput {
     address: blankToUndefined(form.address),
     email: blankToUndefined(form.email),
     phone: blankToUndefined(form.phone),
-    defaultCurrency: form.defaultCurrency ?? 'PHP',
+    defaultCurrency: form.defaultCurrency ?? '',
     creditDays: form.creditDays ?? 0,
     commissionRate: isIntermediary(type) ? form.commissionRate : undefined,
     withholdingTaxRate: hasWithholding(type) ? form.withholdingTaxRate : undefined,

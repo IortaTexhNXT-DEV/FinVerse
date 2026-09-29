@@ -1,4 +1,5 @@
 import type { HelpScreen, HelpSection } from '@/features/help/helpContent';
+import { BRAND } from '@/branding';
 
 /** Help of the Broking Administration screens (part of the Broking Setup section). */
 export const NBADMIN_HELP_SCREENS: HelpScreen[] = [
@@ -45,8 +46,7 @@ export const USER_ACCESS_HELP: HelpSection = {
     {
       name: 'Access Requests',
       path: '/user-access/requests',
-      summary:
-        'Requests to enrol, modify, deactivate and reactivate users (internal BIBS users, or portal users of insurers and clients), by tab: My Requests, Assigned to Me, Second Approval, For Implementation and All. A row opens the request with its current and requested values, approvers and history.',
+      summary: `Requests to enrol, modify, deactivate and reactivate users (internal ${BRAND.product} users, or portal users of insurers and clients), by tab: My Requests, Assigned to Me, Second Approval, For Implementation and All. A row opens the request with its current and requested values, approvers and history.`,
       workflow: [
         'New Request: choose the type, the user and the new data or group profiles, an optional effective date, the approver and the remarks. Save Draft keeps it for later (only you see it); Submit runs the full checks and notifies the approver.',
         "The approver opens the request from My Approvals or Assigned to Me and clicks Approve and Apply, Return (remarks mandatory) or Reject (reason mandatory). A new user's temporary password is shown once.",

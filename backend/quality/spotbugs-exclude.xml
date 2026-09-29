@@ -125,6 +125,15 @@
     <Bug pattern="IMPROPER_UNICODE"/>
   </Match>
   <!--
+    IMPROPER_UNICODE in DpListHandler: the branch code comes from the DP list file name, which the
+    NAME pattern limits to ASCII letters, digits, spaces, dots and hyphens; it is upper-cased only to
+    compare it with the head-office code of the client profile. No security decision depends on it.
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.brokerverse.commission.service.DpListHandler"/>
+    <Bug pattern="IMPROPER_UNICODE"/>
+  </Match>
+  <!--
     COOKIE_USAGE in RefreshCookies: the refresh token of the sign-in session is meant to live in a
     cookie, and only there: HttpOnly (never readable by scripts), Secure outside a developer's
     machine, SameSite=Strict, limited to /api/v1/auth, a 256-bit random value of which the server

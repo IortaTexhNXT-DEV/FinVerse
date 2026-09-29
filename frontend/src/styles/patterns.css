@@ -859,7 +859,7 @@ dl.form-grid dd {
   grid-column: span 2;
 }
 
-/* ---------- Print: the BDO print layout -------------------------------------------------- */
+/* ---------- Print: the print layout of the theme pack -------------------------------------------------- */
 @media print {
   @page {
     size: A4 landscape;
@@ -921,7 +921,7 @@ dl.form-grid dd {
   }
 
   .page-header::before {
-    content: 'BIBS – BDOI Broker System';
+    content: var(--print-title);
     display: block;
     color: var(--brand-navy);
     font-weight: 800;

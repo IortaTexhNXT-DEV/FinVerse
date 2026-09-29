@@ -95,7 +95,7 @@ public class ProdReconWorkCounts implements OpsWorkCountSource, InvoiceRelatedIt
               "RECON_ITEM",
               cycle == null ? String.valueOf(item.getCycleId()) : cycle.getCycleNo(),
               cycle == null ? item.getBookingDate() : cycle.getProductionMonth(),
-              item.getBdoi() == null ? null : item.getBdoi().grossPremium(),
+              item.getBroker() == null ? null : item.getBroker().grossPremium(),
               item.getStatus().name(),
               item.getDiscrepancies() == null
                   ? "Production reconciliation"

@@ -283,7 +283,7 @@ public final class PolicyDtos {
               terms.coverageDays(),
               terms.sumInsured(),
               terms.totalPremium(),
-              terms.currency() == null ? "PHP" : terms.currency());
+              terms.currency());
       return new SbmPolicyData(segment, businessType, loan, assured, t, risk, marks);
     }
   }

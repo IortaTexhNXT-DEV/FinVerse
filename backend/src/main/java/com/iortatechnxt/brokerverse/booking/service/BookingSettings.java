@@ -33,6 +33,9 @@ public class BookingSettings {
   /** Product lines whose bookings need the insurer billing number (BRID-020). */
   public static final String BILLING_NO_LINES = "BOOKING_BILLING_NO_LINES";
 
+  /** Parameter: credit days printed on a service invoice. */
+  public static final String SERVICE_INVOICE_CREDIT_DAYS = "SERVICE_INVOICE_CREDIT_DAYS";
+
   private static final String DEFAULT_WTAX = "10";
 
   private final SystemParameterService parameters;
@@ -123,4 +126,13 @@ public class BookingSettings {
    * @param code branch code (document number series)
    */
   public record BranchRef(Long id, String code) {}
+
+  /**
+   * Credit days printed on a service invoice.
+   *
+   * @return days
+   */
+  public int serviceInvoiceCreditDays() {
+    return parameters.requiredInt(SERVICE_INVOICE_CREDIT_DAYS);
+  }
 }

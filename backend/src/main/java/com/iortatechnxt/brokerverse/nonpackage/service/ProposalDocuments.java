@@ -224,7 +224,13 @@ public class ProposalDocuments {
     return new MessageFile(p.getPsNo() + "_v" + p.getPsVersion() + ".pdf", PDF, pdf);
   }
 
-  private String company(ProposalRequest p) {
+  /**
+   * Legal name of the company of a PRF (letterhead, signature of the insurer e-mails).
+   *
+   * @param p PRF
+   * @return legal name from the company master
+   */
+  String company(ProposalRequest p) {
     return organization.getCompany(p.getCompanyId()).getName();
   }
 

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.disbursement.service;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.FundingStage;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeRequestStatus;
 import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.PayeeStage;
@@ -86,13 +87,13 @@ public class DisbursementQueryService {
             where.add(
                 cb.greaterThanOrEqualTo(
                     root.get("receivedAt"),
-                    s.from().atStartOfDay(DisbursementSettings.MANILA).toInstant()));
+                    s.from().atStartOfDay(BusinessClock.zone()).toInstant()));
           }
           if (s.to() != null) {
             where.add(
                 cb.lessThan(
                     root.get("receivedAt"),
-                    s.to().plusDays(1).atStartOfDay(DisbursementSettings.MANILA).toInstant()));
+                    s.to().plusDays(1).atStartOfDay(BusinessClock.zone()).toInstant()));
           }
           text(
               s.text(),

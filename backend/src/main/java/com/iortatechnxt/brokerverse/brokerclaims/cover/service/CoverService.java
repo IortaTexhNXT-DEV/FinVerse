@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoiceShare;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -60,6 +61,7 @@ public class CoverService {
   private final InvoiceLedgerQueryService ledger;
   private final SystemParameterService parameters;
   private final JdbcTemplate jdbc;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -69,18 +71,21 @@ public class CoverService {
    * @param ledger Operations invoice ledger
    * @param parameters default currency
    * @param jdbc policy number look-up
+   * @param organization company master (base currency)
    */
   public CoverService(
       AccountQueryService accounts,
       BookingQueryService bookings,
       InvoiceLedgerQueryService ledger,
       SystemParameterService parameters,
-      JdbcTemplate jdbc) {
+      JdbcTemplate jdbc,
+      OrganizationDirectory organization) {
     this.accounts = accounts;
     this.bookings = bookings;
     this.ledger = ledger;
     this.parameters = parameters;
     this.jdbc = jdbc;
+    this.organization = organization;
   }
 
   /**
@@ -207,7 +212,9 @@ public class CoverService {
     PolicyYear year = policyYear(account, policyYear);
     String currency =
         account.getCurrency() == null
-            ? parameters.text(ClaimCodes.PARAM_DEFAULT_CURRENCY, "PHP")
+            ? parameters.text(
+                ClaimCodes.PARAM_DEFAULT_CURRENCY,
+                organization.company(account.getCompanyId()).baseCurrency())
             : account.getCurrency();
     return new CoverSnapshot.Policy(
         account.getArn(),

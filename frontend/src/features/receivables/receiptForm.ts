@@ -58,12 +58,13 @@ export function isCheque(form: ReceiptForm): boolean {
   return form.mode === 'CHEQUE' || form.mode === 'PDC';
 }
 
-/** Currency of the selected bank account (PHP until one is chosen). */
+/** Currency of the selected bank account (the base currency until one is chosen). */
 export function bankCurrency(
   bankAccounts: { code: string; currency: string }[],
   code: string,
+  baseCurrency = '',
 ): string {
-  return bankAccounts.find((b) => b.code === code)?.currency ?? 'PHP';
+  return bankAccounts.find((b) => b.code === code)?.currency ?? baseCurrency;
 }
 
 /** Whether the payer's open debit notes are shown for manual allocation (or the PDC's cover). */

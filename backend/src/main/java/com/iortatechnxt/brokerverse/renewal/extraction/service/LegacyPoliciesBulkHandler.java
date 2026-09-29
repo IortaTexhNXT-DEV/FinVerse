@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkColumn;
 import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkImportHandler;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSource;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidateRepository;
 import com.iortatechnxt.brokerverse.renewal.service.port.LegacyPolicySource.LegacyHeader;
@@ -49,17 +50,22 @@ public class LegacyPoliciesBulkHandler implements BulkImportHandler {
 
   private final ExtractionService extraction;
   private final RenewalCandidateRepository candidates;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the handler.
    *
    * @param extraction candidate creation
    * @param candidates candidates (duplicate guard)
+   * @param organization company master (base currency)
    */
   public LegacyPoliciesBulkHandler(
-      ExtractionService extraction, RenewalCandidateRepository candidates) {
+      ExtractionService extraction,
+      RenewalCandidateRepository candidates,
+      OrganizationDirectory organization) {
     this.extraction = extraction;
     this.candidates = candidates;
+    this.organization = organization;
   }
 
   @Override
@@ -112,7 +118,7 @@ public class LegacyPoliciesBulkHandler implements BulkImportHandler {
             .allowed("User ID of an active user"),
         BulkColumn.optional(UNIT, "Sales team", "T-CBG1").master("sales team"),
         BulkColumn.optional(SEGMENT, "Market segment", "CBG").lov("MARKET_SEGMENT"),
-        BulkColumn.optional(MORTGAGEE, "Mortgagee bank when mortgaged", "BDO Unibank"),
+        BulkColumn.optional(MORTGAGEE, "Mortgagee bank when mortgaged", "Philippine National Bank"),
         new BulkColumn(URGENT, "Y to flag the renewal urgent", false, BulkColumn.Type.YES_NO, "N"));
   }
 
@@ -136,11 +142,15 @@ public class LegacyPoliciesBulkHandler implements BulkImportHandler {
   @Override
   public String commit(BulkRow row, BulkContext context) {
     return extraction
-        .createLegacy(context.companyId(), header(row), null, row.yes(URGENT))
+        .createLegacy(
+            context.companyId(),
+            header(row, organization.company(context.companyId()).baseCurrency()),
+            null,
+            row.yes(URGENT))
         .getRenewalRef();
   }
 
-  private static LegacyHeader header(BulkRow row) {
+  private static LegacyHeader header(BulkRow row, String currency) {
     String mortgagee = row.text(MORTGAGEE);
     return new LegacyHeader(
         row.text(LEGACY_REF),
@@ -157,7 +167,7 @@ public class LegacyPoliciesBulkHandler implements BulkImportHandler {
             row.date(EXPIRY),
             row.number(SUM_INSURED),
             row.number(PREMIUM),
-            "PHP",
+            currency,
             row.text(PN)),
         new LegacyParties(
             row.text(CLIENT_CODE),

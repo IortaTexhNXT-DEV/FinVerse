@@ -103,7 +103,7 @@ public final class BrandedDocx {
   }
 
   /**
-   * The page header of every page: the BDO Insure logo and the company.
+   * The page header of every page: the logo of the theme pack and the company.
    *
    * @param companyName company, blank for none
    */
@@ -115,7 +115,7 @@ public final class BrandedDocx {
           .addPicture(
               new ByteArrayInputStream(BrandAssets.logoPng()),
               Document.PICTURE_TYPE_PNG,
-              "bdo-insure.png",
+              BrandAssets.LOGO_NAME,
               Units.toEMU(LOGO_HEIGHT_POINTS * BrandAssets.LOGO_RATIO),
               Units.toEMU(LOGO_HEIGHT_POINTS));
     } catch (IOException | InvalidFormatException ex) {
@@ -232,7 +232,7 @@ public final class BrandedDocx {
     row.setRepeatHeader(true);
     row.setCantSplitRow(true);
     for (int c = 0; c < headings.size(); c++) {
-      cell(row.getCell(c), headings.get(c), TextStyle.TABLE_HEAD, false, BrandAssets.HEADER_BLUE);
+      cell(row.getCell(c), headings.get(c), TextStyle.TABLE_HEAD, false, BrandAssets.HEADER);
     }
   }
 
@@ -270,7 +270,7 @@ public final class BrandedDocx {
     CTBorder top = pr.addNewTcBorders().addNewTop();
     top.setVal(STBorder.SINGLE);
     top.setSz(BigInteger.valueOf(GOLD_RULE_SIZE));
-    top.setColor(BrandAssets.GOLD);
+    top.setColor(BrandAssets.ACCENT);
   }
 
   /**
@@ -328,7 +328,7 @@ public final class BrandedDocx {
 
   private static void goldRule(XWPFParagraph p) {
     p.setBorderBottom(Borders.THICK);
-    p.getCTP().getPPr().getPBdr().getBottom().setColor(BrandAssets.GOLD);
+    p.getCTP().getPPr().getPBdr().getBottom().setColor(BrandAssets.ACCENT);
   }
 
   private static void field(XWPFParagraph p, String instruction) {
@@ -378,13 +378,13 @@ public final class BrandedDocx {
   /** Text styles of the BDO layout. */
   public enum TextStyle {
     /** Company line. */
-    COMPANY(10, true, BrandAssets.CTA_BLUE, 0),
+    COMPANY(10, true, BrandAssets.PRIMARY, 0),
     /** Document or report title. */
-    TITLE(14, true, BrandAssets.HEADER_BLUE, 60),
+    TITLE(14, true, BrandAssets.HEADER, 60),
     /** Metadata lines (report ID, filters, reference). */
     META(8, false, "404040", 20),
     /** Section heading. */
-    HEADING(10.5, true, BrandAssets.HEADER_BLUE, 60),
+    HEADING(10.5, true, BrandAssets.HEADER, 60),
     /** Body text. */
     BODY(9.5, false, "000000", 120),
     /** Label of a field. */
@@ -394,7 +394,7 @@ public final class BrandedDocx {
     /** Table cell. */
     TABLE(8, false, "000000", 0),
     /** Emphasised table cell (group header, subtotal, total). */
-    TABLE_BOLD(8, true, BrandAssets.HEADER_BLUE, 0),
+    TABLE_BOLD(8, true, BrandAssets.HEADER, 0),
     /** Page footer. */
     FOOTER(FOOTER_SIZE, false, GREY, 0);
 

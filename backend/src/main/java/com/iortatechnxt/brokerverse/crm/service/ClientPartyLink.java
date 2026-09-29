@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.party.api.dto.PartyRequest;
 import com.iortatechnxt.brokerverse.party.domain.Party;
 import com.iortatechnxt.brokerverse.party.domain.PartyType;
 import com.iortatechnxt.brokerverse.party.service.PartyService;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -20,8 +21,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ClientPartyLink {
 
-  /** Default credit terms of a client party in days. */
-  private static final int CREDIT_DAYS = 30;
+  /** Parameter: credit terms of a client party in days. */
+  public static final String CREDIT_DAYS = "CLIENT_CREDIT_DAYS";
 
   private static final int MAX_NAME = 200;
   private static final int MAX_ADDRESS = 300;
@@ -29,16 +30,20 @@ public class ClientPartyLink {
 
   private final PartyService parties;
   private final OrganizationService organization;
+  private final SystemParameterService parameters;
 
   /**
    * Creates the component.
    *
    * @param parties party master
    * @param organization companies
+   * @param parameters business parameters
    */
-  public ClientPartyLink(PartyService parties, OrganizationService organization) {
+  public ClientPartyLink(
+      PartyService parties, OrganizationService organization, SystemParameterService parameters) {
     this.parties = parties;
     this.organization = organization;
+    this.parameters = parameters;
   }
 
   /**
@@ -64,7 +69,7 @@ public class ClientPartyLink {
             client.getEmail(),
             clip(client.getMobile() != null ? client.getMobile() : client.getPhone(), MAX_PHONE),
             currency,
-            CREDIT_DAYS,
+            parameters.requiredInt(CREDIT_DAYS),
             null,
             null,
             null,

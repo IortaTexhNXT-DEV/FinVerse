@@ -101,7 +101,7 @@ class AccountRulesIT {
             false,
             1,
             "PHP",
-            PaymentArrangement.VIA_BDOI,
+            PaymentArrangement.VIA_BROKER,
             null,
             null,
             List.of(vehicle(id, "0")),

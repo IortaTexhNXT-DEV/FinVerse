@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.eb.report;
 
 import com.iortatechnxt.brokerverse.nbreport.service.SqlArgs;
+import com.iortatechnxt.brokerverse.report.core.CodeSet;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportMetadata;
@@ -30,7 +31,8 @@ final class EbReportSupport {
 
   /** Common filters on the programme {@code p}. */
   static final String PROGRAMME_FILTERS =
-      " and (cast(:team as varchar) is null or p.team_code = :team)"
+      " and (cast(:team_all as boolean) or ((p.team_code = any(cast(:team as varchar[])))"
+          + " <> cast(:team_ex as boolean)))"
           + " and (cast(:ao as varchar) is null or lower(p.account_officer) = lower(:ao))"
           + " and (cast(:client as varchar) is null or p.client_code = :client"
           + " or lower(p.client_name) like '%' || lower(cast(:client as varchar)) || '%')";
@@ -52,12 +54,7 @@ final class EbReportSupport {
     params.add(ParameterSpec.required(COMPANY, "Company", ParameterType.COMPANY));
     params.add(ParameterSpec.required(FROM, "From", ParameterType.DATE).withDefault("MONTH_START"));
     params.add(ParameterSpec.required(TO, "To", ParameterType.DATE).withDefault("TODAY"));
-    params.add(
-        ParameterSpec.select(
-            TEAM,
-            "Team",
-            List.of(ALL, "BDO", "SM", "VOLUNTARY", "SOLICITED", "NEW_BUSINESS"),
-            ALL));
+    params.add(ParameterSpec.codeSet(TEAM, "Team", EbTeamCodes.SOURCE));
     params.add(ParameterSpec.optional(AO, "Account Officer", ParameterType.TEXT));
     params.add(ParameterSpec.optional(CLIENT, "Client", ParameterType.TEXT));
     params.add(ParameterSpec.select(LINE, "Benefit Line", List.of(ALL, "HMO", "GLI", "GPA"), ALL));
@@ -76,10 +73,13 @@ final class EbReportSupport {
    * @return bind parameters
    */
   static SqlArgs args(ReportParameters p) {
+    CodeSet teams = p.codeSet(TEAM);
     return SqlArgs.company(p.longValue(COMPANY))
         .with(FROM, p.optionalDate(FROM).orElse(null))
         .with(TO, p.optionalDate(TO).orElse(null))
-        .with(TEAM, selected(p, TEAM))
+        .with(TEAM + "_all", teams.isAll())
+        .with(TEAM, teams.array())
+        .with(TEAM + "_ex", teams.exclude())
         .with(AO, text(p, AO))
         .with(CLIENT, text(p, CLIENT))
         .with(LINE, selected(p, LINE))

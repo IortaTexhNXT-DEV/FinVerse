@@ -7,6 +7,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { ACTION_LABEL, ACTIONS, SOURCES } from './entryCodes';
+import { BRAND } from '@/branding';
 
 /** Adds or changes an entry of a draft code map version. */
 export function EntryDialog({
@@ -103,7 +104,7 @@ export function EntryDialog({
             </select>
           )}
         </Field>
-        <Field label="BIBS value" required={entry.action === 'MAP'}>
+        <Field label={`${BRAND.product} value`} required={entry.action === 'MAP'}>
           {(id) => (
             <input
               id={id}

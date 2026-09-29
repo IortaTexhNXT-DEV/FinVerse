@@ -15,6 +15,7 @@ import { formatDateTime } from '@/utils/format';
 import { prodreconApi } from './prodreconApi';
 import type { ReconCycle } from './prodreconApi';
 import { matchedPercent, monthLabel } from './prodreconLogic';
+import { clientShortName } from '@/context/clientNames';
 
 type StageTab = 'ALL' | 'EXTRACTED' | 'SENT_TO_INSURER' | 'RECONCILING' | 'CLOSED';
 
@@ -31,7 +32,12 @@ const COLUMNS: Column<ReconCycle>[] = [
   { key: 'insurer', header: 'Insurer', render: (c) => c.insurerCode },
   { key: 'month', header: 'Production Month', render: (c) => monthLabel(c.productionMonth) },
   { key: 'total', header: 'Items', numeric: true, render: (c) => c.counts.total },
-  { key: 'bdoi', header: 'BDOI Only', numeric: true, render: (c) => c.counts.bdoiOnly },
+  {
+    key: 'broker',
+    header: `${clientShortName()} Only`,
+    numeric: true,
+    render: (c) => c.counts.brokerOnly,
+  },
   { key: 'ins', header: 'Insurer Only', numeric: true, render: (c) => c.counts.insurerOnly },
   {
     key: 'pct',

@@ -372,7 +372,7 @@ class AccountIT {
                     "ao",
                     () ->
                         tagging.setPaymentArrangement(
-                            account.getId(), PaymentArrangement.VIA_BDOI)))
+                            account.getId(), PaymentArrangement.VIA_BROKER)))
         .extracting("code")
         .isEqualTo("PAYMENT_ARRANGEMENT_LOCKED");
     var search =

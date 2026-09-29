@@ -18,6 +18,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate } from '@/utils/format';
 import { journalCountLabel, transactionRowKey } from './policyTransactionRows';
+import { useBaseCurrency } from '@/context/workspaceContext';
 
 interface PolicyTransactionsProps {
   /** Any invoice of the policy (Invoice 360, endorsement request). */
@@ -225,6 +226,7 @@ export function PolicyTransactionsTable({
     }
     setExpanded(next);
   };
+  const baseCurrency = useBaseCurrency();
   const rows = history?.rows ?? [];
   const selected = rows.find(
     (r) => highlightRequestNo !== undefined && r.refs.requestNo === highlightRequestNo,
@@ -232,7 +234,7 @@ export function PolicyTransactionsTable({
   return (
     <DataTable
       caption="Policy transactions"
-      columns={columns(history?.currency ?? 'PHP', expanded, toggle)}
+      columns={columns(history?.currency ?? baseCurrency, expanded, toggle)}
       rows={rows}
       rowKey={transactionRowKey}
       loading={loading}

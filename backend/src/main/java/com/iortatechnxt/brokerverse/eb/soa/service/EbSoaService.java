@@ -22,6 +22,7 @@ import com.iortatechnxt.brokerverse.eb.domain.TatActivity;
 import com.iortatechnxt.brokerverse.eb.service.EbActivityLog;
 import com.iortatechnxt.brokerverse.eb.service.EbParties;
 import com.iortatechnxt.brokerverse.eb.service.EbRecords;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.workflow.domain.CaseRecord;
 import com.iortatechnxt.brokerverse.workflow.service.StartCase;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
@@ -64,6 +65,7 @@ public class EbSoaService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -92,7 +94,8 @@ public class EbSoaService {
       EbActivityLog activity,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      OrganizationDirectory organization) {
     this.soas = soas;
     this.records = records;
     this.parties = parties;
@@ -104,6 +107,7 @@ public class EbSoaService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.organization = organization;
   }
 
   /**
@@ -124,7 +128,7 @@ public class EbSoaService {
       UploadedFile file) {
     EbProgramme programme = records.programme(companyId, programmeId);
     InsurerProfile insurer = parties.insurer(companyId, intake.insurerCode());
-    EbSoa.Intake clean = check(intake, insurer);
+    EbSoa.Intake clean = check(intake, insurer, companyId);
     if (file == null) {
       throw new BusinessRuleException("EB_SOA_FILE_REQUIRED", "Attach the SOA file");
     }
@@ -190,7 +194,7 @@ public class EbSoaService {
         .getAttachmentId();
   }
 
-  private EbSoa.Intake check(EbSoa.Intake intake, InsurerProfile insurer) {
+  private EbSoa.Intake check(EbSoa.Intake intake, InsurerProfile insurer, Long companyId) {
     requireFields(intake);
     LocalDate today = BusinessClock.today(clock);
     LocalDate received = intake.receivedOn() == null ? today : intake.receivedOn();
@@ -205,7 +209,7 @@ public class EbSoaService {
         intake.periodTo(),
         intake.amount(),
         intake.currency() == null || intake.currency().isBlank()
-            ? "PHP"
+            ? organization.company(companyId).baseCurrency()
             : intake.currency().strip(),
         received,
         intake.remarks());

@@ -8,7 +8,7 @@ export const EB_HELP: HelpSection = {
   id: 'eb',
   module: 'Employee Benefits',
   intro:
-    "Employee Benefits runs BDOI's group health (HMO), group life (GLI) and group personal accident (GPA) programmes: the yearly renewal advice or new-business cycle, the franchise and proposals from insurers, the comparative with its sign-off and value-threshold approval, and the client's confirmation. Confirmation creates one account per benefit line, which then follows the usual placement, issuance and booking. Member changes, pending items and insurer SOAs are serviced here. Insurers and client HR send their files by e-mail; you record them on the programme.",
+    "Employee Benefits runs the broker's group health (HMO), group life (GLI) and group personal accident (GPA) programmes: the yearly renewal advice or new-business cycle, the franchise and proposals from insurers, the comparative with its sign-off and value-threshold approval, and the client's confirmation. Confirmation creates one account per benefit line, which then follows the usual placement, issuance and booking. Member changes, pending items and insurer SOAs are serviced here. Insurers and client HR send their files by e-mail; you record them on the programme.",
   screens: [
     {
       name: 'EB Home',
@@ -20,7 +20,7 @@ export const EB_HELP: HelpSection = {
         'New Programme starts a programme; Open Programmes lists every programme you may see.',
       ],
       controls: [
-        'Employee Benefits users see the screens; account officers act on programmes and cycles, the team lead signs off comparatives, BDOI Management approves above the value threshold, Processing validates and Collection follows billing.',
+        'Employee Benefits users see the screens; account officers act on programmes and cycles, the team lead signs off comparatives, Management approves above the value threshold, Processing validates and Collection follows billing.',
       ],
     },
     {
@@ -53,7 +53,7 @@ export const EB_HELP: HelpSection = {
         'Submissions: Submit to Insurer sends the documents of a process; the required documents of the process are checked first.',
       ],
       controls: [
-        "The team lead signs off the comparative; the AO who prepared it cannot. Above a value threshold of EB Setup the comparative also needs BDOI Management's approval, and placement waits for it.",
+        "The team lead signs off the comparative; the AO who prepared it cannot. Above a value threshold of EB Setup the comparative also needs Management's approval, and placement waits for it.",
         'Placement needs the required documents of the process on file, and an insurer that is not accredited needs its accreditation approval.',
       ],
     },
@@ -122,7 +122,7 @@ export const EB_HELP: HelpSection = {
       name: 'EB Setup',
       path: '/eb/setup',
       summary:
-        'Value threshold rules that send a comparative to BDOI Management (above an amount of total sum insured or annual premium) and the required documents per process and benefit line, mandatory or optional.',
+        'Value threshold rules that send a comparative to Management (above an amount of total sum insured or annual premium) and the required documents per process and benefit line, mandatory or optional.',
       controls: [
         'Each change waits for another user to authorize it; records are deactivated, never deleted.',
         'The EB parameters (renewal advice lead time, reminders, turn-around times, franchise grace days) are maintained in System Parameters.',

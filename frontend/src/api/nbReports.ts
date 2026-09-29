@@ -62,7 +62,7 @@ export type UnitLevel = 'REGION' | 'DEPARTMENT' | 'TEAM' | 'OFFICER';
 
 export const UNIT_LEVELS: UnitLevel[] = ['REGION', 'DEPARTMENT', 'TEAM', 'OFFICER'];
 
-/** A production target of a sales unit for a period (PHP). */
+/** A production target of a sales unit for a period (base currency of the company). */
 export interface SalesTarget {
   id?: number;
   unitLevel: UnitLevel;

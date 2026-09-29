@@ -193,7 +193,7 @@ class MigrationClientsHeadersApiIT {
     header.put("sum_insured", "950000.00");
     header.put("net_premium", "21375.00");
     header.put("gross_premium", "25946.25");
-    header.put("payment_arrangement", "VIA_BDOI");
+    header.put("payment_arrangement", "VIA_BROKER");
     header.put("ao_user_id", "AO01");
     header.put("sales_unit_code", "U01");
     header.put("branch_code", "MKT");

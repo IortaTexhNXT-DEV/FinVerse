@@ -12,6 +12,7 @@ import { MigStatus } from '../common/MigStatus';
 import { MIG_SECTION } from '../common/migrationCodes';
 import '../migration.css';
 import { ReconPanel } from './ReconPanel';
+import { BRAND } from '@/branding';
 
 const RECONCILABLE = ['LOADED', 'LOADED_WITH_REJECTS', 'RECONCILED', 'SIGNED_OFF'];
 
@@ -35,7 +36,7 @@ export default function ReconciliationPage() {
       <PageHeader
         section={MIG_SECTION}
         title="Reconciliation"
-        description="Source, staging and BIBS compared per batch: counts, amounts, hash totals, fields and the GL."
+        description={`Source, staging and ${BRAND.product} compared per batch: counts, amounts, hash totals, fields and the GL.`}
       />
       <Card flush>
         <ErrorAlert error={batches.error} onRetry={() => void batches.refetch()} />

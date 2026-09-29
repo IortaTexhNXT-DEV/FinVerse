@@ -16,6 +16,7 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.Sha256;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.security.service.UserDirectory;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.Clock;
@@ -54,6 +55,7 @@ public class BulkService {
   private final UserDirectory users;
   private final BulkTemplateLists lists;
   private final Clock clock;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -84,7 +86,8 @@ public class BulkService {
       PlatformTransactionManager txManager,
       UserDirectory users,
       BulkTemplateLists lists,
-      Clock clock) {
+      Clock clock,
+      OrganizationDirectory organization) {
     this.registry = registry;
     this.reader = reader;
     this.jobs = jobs;
@@ -97,16 +100,33 @@ public class BulkService {
     this.users = users;
     this.lists = lists;
     this.clock = clock;
+    this.organization = organization;
   }
 
   /**
    * The template of a handler.
    *
    * @param handlerCode handler
-   * @return xlsx bytes
+   * @return xlsx bytes (examples without a company)
    */
   public byte[] template(String handlerCode) {
-    return GuidedTemplateWriter.write(guided(registry.require(handlerCode)));
+    return template(handlerCode, null);
+  }
+
+  /**
+   * The template of a handler for a company.
+   *
+   * @param handlerCode handler
+   * @param companyId company the template is for (base currency of the examples), may be null
+   * @return xlsx bytes
+   */
+  public byte[] template(String handlerCode, Long companyId) {
+    return GuidedTemplateWriter.write(
+        BulkTemplates.of(
+            registry.require(handlerCode),
+            lists,
+            maxRows(),
+            companyId == null ? null : organization.company(companyId).baseCurrency()));
   }
 
   private GuidedTemplate guided(BulkImportHandler handler) {

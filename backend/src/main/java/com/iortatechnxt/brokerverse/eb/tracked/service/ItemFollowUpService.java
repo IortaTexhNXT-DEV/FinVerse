@@ -239,7 +239,7 @@ public class ItemFollowUpService {
                   .map(i -> i.getName())
                   .orElse(item.getPartyCode());
       case CLIENT -> programme.getClientName();
-      case BDOI -> aoName(programme);
+      case BROKER -> aoName(programme);
     };
   }
 

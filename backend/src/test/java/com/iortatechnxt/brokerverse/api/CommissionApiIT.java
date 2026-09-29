@@ -185,7 +185,7 @@ class CommissionApiIT {
     terms.put("schemeType", "OTHER");
     terms.put("calculation", "FIXED_PER_POLICY");
     terms.put("periodType", "CUSTOM");
-    terms.put("beneficiary", "BDOI");
+    terms.put("beneficiary", "BROKER");
     terms.put("insurerCode", invoice.getInsurerCode());
     terms.put("active", true);
     terms.put("tiers", List.of(tier));

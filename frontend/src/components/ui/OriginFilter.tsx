@@ -1,5 +1,6 @@
 import type { RecordOriginKind } from '@/api/types';
 import { Field } from './Field';
+import { BRAND } from '@/branding';
 
 /**
  * The Origin filter of a list that holds migrated records (BRD-13): all records, records created
@@ -24,7 +25,7 @@ export function OriginFilter({
           }
         >
           <option value="">All origins</option>
-          <option value="BIBS">BIBS</option>
+          <option value="BIBS">{BRAND.product}</option>
           <option value="MIGRATED">Migrated</option>
         </select>
       )}

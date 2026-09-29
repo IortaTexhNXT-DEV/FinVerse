@@ -8,7 +8,6 @@ import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -60,7 +59,6 @@ public class ScrReportSql {
   /** Philippine calendar day of a timestamp column (the period filter). */
   static final String DAY = " at time zone '" + BusinessClock.zoneId() + "' as date)";
 
-  private static final ZoneId MANILA = BusinessClock.zone();
   private static final DateTimeFormatter STAMP = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
   private final NamedParameterJdbcTemplate jdbc;
@@ -165,7 +163,7 @@ public class ScrReportSql {
 
   private static Object localValue(Object value) {
     if (value instanceof Timestamp stamp) {
-      return STAMP.format(stamp.toInstant().atZone(MANILA));
+      return STAMP.format(stamp.toInstant().atZone(BusinessClock.zone()));
     }
     return value instanceof Date day ? day.toLocalDate() : value;
   }

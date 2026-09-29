@@ -12,12 +12,12 @@ import {
   validAddresses,
 } from './prodreconLogic';
 
-const counts = { matched: 6, discrepancy: 1, bdoiOnly: 2, insurerOnly: 1, total: 10 };
+const counts = { matched: 6, discrepancy: 1, brokerOnly: 2, insurerOnly: 1, total: 10 };
 
 describe('sideBySide', () => {
   it('flags the fields the matcher reported and visible differences', () => {
     const rows = sideBySide({
-      bdoi: { policyNo: 'POL-1', assuredName: 'Juan Dela Cruz', grossPremium: 1000 },
+      broker: { policyNo: 'POL-1', assuredName: 'Juan Dela Cruz', grossPremium: 1000 },
       insurer: { policyNo: 'pol-1', assuredName: 'Juan Cruz', grossPremium: 1000.5 },
       discrepancies: ['GROSS_PREMIUM'],
     });
@@ -25,13 +25,13 @@ describe('sideBySide', () => {
     expect(byKey.policyNo?.differs).toBe(false);
     expect(byKey.assuredName?.differs).toBe(true);
     expect(byKey.grossPremium?.differs).toBe(true);
-    expect(byKey.grossPremium?.bdoi).toBe('1000.00');
+    expect(byKey.grossPremium?.broker).toBe('1000.00');
     expect(byKey.pnNo?.differs).toBe(false);
   });
 
   it('shows one side only for unpaired items', () => {
     const rows = sideBySide({ insurer: { policyNo: 'P' }, discrepancies: [] });
-    expect(rows.find((r) => r.key === 'policyNo')).toMatchObject({ bdoi: '', insurer: 'P' });
+    expect(rows.find((r) => r.key === 'policyNo')).toMatchObject({ broker: '', insurer: 'P' });
     expect(rows.every((r) => !r.differs)).toBe(true);
   });
 });
@@ -74,7 +74,7 @@ describe('addresses', () => {
 
 describe('item actions', () => {
   it('pairs BDOI-only items and splits paired ones', () => {
-    expect(mayPair({ status: 'BDOI_ONLY' })).toBe(true);
+    expect(mayPair({ status: 'BROKER_ONLY' })).toBe(true);
     expect(mayPair({ status: 'MATCHED' })).toBe(false);
     expect(maySplit({ status: 'MATCHED_WITH_DISCREPANCY' })).toBe(true);
     expect(maySplit({ status: 'UNMATCHED_NO_BOOKING' })).toBe(false);

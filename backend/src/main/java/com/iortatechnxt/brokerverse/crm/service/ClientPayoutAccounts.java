@@ -76,7 +76,7 @@ public class ClientPayoutAccounts {
         && (details.accountNo() == null || !ACCOUNT_NO.matcher(details.accountNo()).matches())) {
       throw new BusinessRuleException(
           "PAYOUT_ACCOUNT_INVALID",
-          "A credit to account needs the BDO account number (10 to 16 digits)");
+          "A credit to account needs the bank account number (10 to 16 digits)");
     }
   }
 

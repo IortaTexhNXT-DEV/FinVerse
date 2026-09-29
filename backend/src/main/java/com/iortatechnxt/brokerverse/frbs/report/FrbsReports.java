@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.frbs.report.FrbsSqlReport.Dates;
 import com.iortatechnxt.brokerverse.frbs.report.FrbsSqlReport.Spec;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
 import com.iortatechnxt.brokerverse.report.core.ReportDefinition;
+import java.time.Clock;
 import java.util.List;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,7 +23,7 @@ public class FrbsReports {
   private static final String SEGMENT = "segment";
   private static final String SEGMENT_LABEL = "Segment";
   private static final String UNIT = "sales_unit";
-  private static final String UNIT_LABEL = "Unit / BDO Branch";
+  private static final String UNIT_LABEL = "Unit / Bank Branch";
   private static final String UNIT_NAME = "unit_name";
   private static final String CURRENCY = "currency";
   private static final String CURRENCY_LABEL = "Currency";
@@ -42,10 +43,11 @@ public class FrbsReports {
    * Appendix A VI, report list #17).
    *
    * @param jdbc JDBC
+   * @param clock clock (default year of the yearly reports)
    * @return report
    */
   @Bean
-  public ReportDefinition frbsServiceFee(NamedParameterJdbcTemplate jdbc) {
+  public ReportDefinition frbsServiceFee(NamedParameterJdbcTemplate jdbc, Clock clock) {
     return new FrbsSqlReport(
         new Spec(
             "FRBS-SERVICE-FEE",
@@ -78,17 +80,19 @@ public class FrbsReports {
             SEGMENT,
             SEGMENT_LABEL,
             List.of("Runs whose period ends in the report period; cancelled runs excluded.")),
-        jdbc);
+        jdbc,
+        clock);
   }
 
   /**
    * {@code FRBS-SERVICE-FEE-DETAIL}: the invoices of the service fee (FRBS 2.10.0, Appendix A VI).
    *
    * @param jdbc JDBC
+   * @param clock clock (default year of the yearly reports)
    * @return report
    */
   @Bean
-  public ReportDefinition frbsServiceFeeDetail(NamedParameterJdbcTemplate jdbc) {
+  public ReportDefinition frbsServiceFeeDetail(NamedParameterJdbcTemplate jdbc, Clock clock) {
     return new FrbsSqlReport(
         new Spec(
             "FRBS-SERVICE-FEE-DETAIL",
@@ -120,7 +124,8 @@ public class FrbsReports {
             SEGMENT,
             SEGMENT_LABEL,
             List.of()),
-        jdbc);
+        jdbc,
+        clock);
   }
 
   /**
@@ -128,10 +133,11 @@ public class FrbsReports {
    * location for the month, year to date and the previous year to date (Appendix A V, list #15).
    *
    * @param jdbc JDBC
+   * @param clock clock (default year of the yearly reports)
    * @return report
    */
   @Bean
-  public ReportDefinition frbsMancomMarket(NamedParameterJdbcTemplate jdbc) {
+  public ReportDefinition frbsMancomMarket(NamedParameterJdbcTemplate jdbc, Clock clock) {
     return new FrbsSqlReport(
             new Spec(
                 "FRBS-MANCOM-MARKET",
@@ -176,7 +182,8 @@ public class FrbsReports {
                 List.of(
                     "Budget columns stay empty until the segment budgets are loaded; amounts in"
                         + " invoice currency.")),
-            jdbc)
+            jdbc,
+            clock)
         .asDocument();
   }
 
@@ -185,15 +192,16 @@ public class FrbsReports {
    * list #16).
    *
    * @param jdbc JDBC
+   * @param clock clock (default year of the yearly reports)
    * @return report
    */
   @Bean
-  public ReportDefinition frbsBranchProduction(NamedParameterJdbcTemplate jdbc) {
+  public ReportDefinition frbsBranchProduction(NamedParameterJdbcTemplate jdbc, Clock clock) {
     return new FrbsSqlReport(
         new Spec(
             "FRBS-BRANCH-PRODUCTION",
             "Branch Production Report - Detailed",
-            "Booked invoices of the period per BDO branch / unit",
+            "Booked invoices of the period per bank branch / unit",
             Dates.PERIOD,
             "select coalesce(i.sales_unit, '(none)') || ' ' || coalesce(u.name, '') unit,"
                 + " i.booking_date, i.invoice_no, i.policy_no, i.assured_name, i.product_line,"
@@ -216,7 +224,8 @@ public class FrbsReports {
             "unit",
             UNIT_LABEL,
             List.of("Units are the sales units of the booking.")),
-        jdbc);
+        jdbc,
+        clock);
   }
 
   /**
@@ -224,15 +233,17 @@ public class FrbsReports {
    * list #16).
    *
    * @param jdbc JDBC
+   * @param clock clock (default year of the yearly reports)
    * @return report
    */
   @Bean
-  public ReportDefinition frbsBranchProductionSummary(NamedParameterJdbcTemplate jdbc) {
+  public ReportDefinition frbsBranchProductionSummary(
+      NamedParameterJdbcTemplate jdbc, Clock clock) {
     return new FrbsSqlReport(
         new Spec(
             "FRBS-BRANCH-PRODUCTION-SUM",
             "Branch Production Report - Summary",
-            "Invoices, premium and commission of the period per BDO branch / unit",
+            "Invoices, premium and commission of the period per bank branch / unit",
             Dates.PERIOD,
             "select coalesce(i.sales_unit, '(none)') sales_unit, coalesce(u.name, '') unit_name,"
                 + " i.currency, count(*) policies, sum(i.gross_premium) premium,"
@@ -251,7 +262,8 @@ public class FrbsReports {
             null,
             null,
             List.of()),
-        jdbc);
+        jdbc,
+        clock);
   }
 
   /**
@@ -259,10 +271,11 @@ public class FrbsReports {
    * IV expense grouping, list #10).
    *
    * @param jdbc JDBC
+   * @param clock clock (default year of the yearly reports)
    * @return report
    */
   @Bean
-  public ReportDefinition frbsExpenseGrouping(NamedParameterJdbcTemplate jdbc) {
+  public ReportDefinition frbsExpenseGrouping(NamedParameterJdbcTemplate jdbc, Clock clock) {
     return new FrbsSqlReport(
         new Spec(
             "FRBS-EXPENSE-GROUPING",
@@ -287,7 +300,8 @@ public class FrbsReports {
             "cost_center",
             "Cost Centre",
             List.of("Amounts in base currency.")),
-        jdbc);
+        jdbc,
+        clock);
   }
 
   /**
@@ -295,10 +309,11 @@ public class FrbsReports {
    * cumulative gap (Appendix A IV GAP report).
    *
    * @param jdbc JDBC
+   * @param clock clock (default year of the yearly reports)
    * @return report
    */
   @Bean
-  public ReportDefinition frbsGap(NamedParameterJdbcTemplate jdbc) {
+  public ReportDefinition frbsGap(NamedParameterJdbcTemplate jdbc, Clock clock) {
     return new FrbsSqlReport(
         new Spec(
             "FRBS-GAP",
@@ -330,7 +345,8 @@ public class FrbsReports {
             null,
             null,
             List.of("Open sub-ledger items in base currency by due date.")),
-        jdbc);
+        jdbc,
+        clock);
   }
 
   /**
@@ -338,10 +354,11 @@ public class FrbsReports {
    * and closing balance (Appendix A IV cash flow).
    *
    * @param jdbc JDBC
+   * @param clock clock (default year of the yearly reports)
    * @return report
    */
   @Bean
-  public ReportDefinition frbsCashFlow(NamedParameterJdbcTemplate jdbc) {
+  public ReportDefinition frbsCashFlow(NamedParameterJdbcTemplate jdbc, Clock clock) {
     String cash =
         " from gl_ledger_entry e join coa_account a on a.id = e.account_id"
             + " join coa_category c on c.id = a.category_id"
@@ -373,7 +390,8 @@ public class FrbsReports {
             null,
             null,
             List.of("Accounts of the bank and cash categories, base currency.")),
-        jdbc);
+        jdbc,
+        clock);
   }
 
   /**
@@ -381,10 +399,11 @@ public class FrbsReports {
    * business for the sustainability report - risk management (report list #169).
    *
    * @param jdbc JDBC
+   * @param clock clock (default year of the yearly reports)
    * @return report
    */
   @Bean
-  public ReportDefinition frbsSustainability(NamedParameterJdbcTemplate jdbc) {
+  public ReportDefinition frbsSustainability(NamedParameterJdbcTemplate jdbc, Clock clock) {
     return new FrbsSqlReport(
         new Spec(
             "FRBS-SUSTAINABILITY-PROD",
@@ -413,6 +432,7 @@ public class FrbsReports {
             "client_type",
             "Client Type",
             List.of("Yearly extract, first Monday of January.")),
-        jdbc);
+        jdbc,
+        clock);
   }
 }

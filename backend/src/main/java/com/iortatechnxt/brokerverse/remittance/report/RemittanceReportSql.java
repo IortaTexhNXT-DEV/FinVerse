@@ -8,7 +8,6 @@ import com.iortatechnxt.brokerverse.report.core.ReportOrigin;
 import com.iortatechnxt.brokerverse.report.core.ReportParameters;
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -42,8 +41,6 @@ public class RemittanceReportSql {
 
   /** "Any" option of the select filters. */
   static final String ALL = "ALL";
-
-  private static final ZoneId MANILA = BusinessClock.zone();
 
   private final NamedParameterJdbcTemplate jdbc;
 
@@ -122,7 +119,7 @@ public class RemittanceReportSql {
       for (Map.Entry<String, Object> e : row.entrySet()) {
         Object v = e.getValue();
         if (v instanceof Timestamp t) {
-          v = t.toInstant().atZone(MANILA).toLocalDate();
+          v = t.toInstant().atZone(BusinessClock.zone()).toLocalDate();
         } else if (v instanceof Date d) {
           v = d.toLocalDate();
         }

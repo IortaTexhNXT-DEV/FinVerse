@@ -76,7 +76,7 @@ public class BrokerClaimFixtures {
             + " sales_team, account_officer, currency, loss_date, reported_date, loss_nature,"
             + " claim_type, catastrophe_code, claim_amount, deductible, initial_reserve,"
             + " claimant_name, phase, created_at, created_by)"
-            + " values (?, ?, 'MOTOR_HO', ?, 'BDOI_NOTICE', ?, 2026, ?, ?, ?, 'MOTOR', ?, 'RETAIL 1',"
+            + " values (?, ?, 'MOTOR_HO', ?, 'BROKER_NOTICE', ?, 2026, ?, ?, ?, 'MOTOR', ?, 'RETAIL 1',"
             + " 'ao', 'PHP', ?, ?, 'MOTOR_OWN_DAMAGE', 'MOTOR_OWN_DAMAGE', ?, ?, 1000.00, ?, ?,"
             + " 'NEW', now(), 'TEST') returning id",
         Long.class,

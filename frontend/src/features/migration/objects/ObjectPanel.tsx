@@ -16,6 +16,7 @@ import type { MigAction } from '../common/ActionConfirm';
 import { MigStatus } from '../common/MigStatus';
 import { migLabel, yesNo } from '../common/migrationCodes';
 import { UserName } from '@/components/ui/UserName';
+import { BRAND } from '@/branding';
 
 const HISTORY: Column<Decision>[] = [
   { key: 'no', header: 'Decision', kind: 'code', render: (d) => d.decisionNo },
@@ -48,7 +49,7 @@ function ObjectDetails({ object: o }: Readonly<{ object: DataObject }>) {
       items={[
         { label: 'Category', value: migLabel(o.category) },
         { label: 'Sources', value: o.sourceSystems.join(', ') },
-        { label: 'Target in BIBS', value: o.target, wide: true },
+        { label: `Target in ${BRAND.product}`, value: o.target, wide: true },
         { label: 'Proposed class', value: migLabel(o.proposedClass) },
         { label: 'Decided class', value: migLabel(o.decidedClass) },
         { label: 'Condition', value: o.conditionText, wide: true },

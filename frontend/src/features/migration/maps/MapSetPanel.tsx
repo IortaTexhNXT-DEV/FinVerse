@@ -18,6 +18,7 @@ import { useDownload } from '../common/useDownload';
 import { EntryDialog } from './EntryDialog';
 import { ACTION_LABEL, EMPTY } from './entryCodes';
 import { UserName } from '@/components/ui/UserName';
+import { BRAND } from '@/branding';
 
 const VERSION_COLUMNS: Column<MapVersion>[] = [
   { key: 'v', header: 'Version', kind: 'center', render: (v) => `v${String(v.versionNo)}` },
@@ -58,7 +59,12 @@ function entryColumns(onDelete: ((e: MapEntry) => void) | undefined): Column<Map
       render: (e) => (e.qualifier ? e.qualifier + ' = ' + (e.qualifierValue ?? '') : ''),
     },
     { key: 'action', header: 'Action', render: (e) => ACTION_LABEL[e.action] },
-    { key: 'target', header: 'BIBS value', kind: 'code', render: (e) => e.targetCode ?? '' },
+    {
+      key: 'target',
+      header: `${BRAND.product} value`,
+      kind: 'code',
+      render: (e) => e.targetCode ?? '',
+    },
     { key: 'remarks', header: 'Remarks', render: (e) => e.remarks ?? '' },
   ];
   if (onDelete !== undefined) {

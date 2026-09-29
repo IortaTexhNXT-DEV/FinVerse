@@ -126,7 +126,7 @@ final class LegacyInvoiceFixtures {
     h.put("sum_insured", "900000.00");
     h.put("net_premium", "10000.00");
     h.put("gross_premium", "11200.00");
-    h.put("payment_arrangement", "VIA_BDOI");
+    h.put("payment_arrangement", "VIA_BROKER");
     h.put("ao_user_id", "AO01");
     h.put("sales_unit_code", "U01");
     h.put("branch_code", "MKT");

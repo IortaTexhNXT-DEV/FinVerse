@@ -20,6 +20,7 @@ import type { BatchScreen } from './batchScreens';
 import { approvers } from './batchScreens';
 import { UserName } from '@/components/ui/UserName';
 import { useDisplayName } from '@/components/ui/useDisplayName';
+import { useCurrencyCodes } from '@/context/currencies';
 
 /** The batches of one legacy batch screen, newest first, with the way to open a new one. */
 export function LegacyBatchList({ screen }: Readonly<{ screen: BatchScreen }>) {
@@ -125,9 +126,11 @@ function CreateDialog({
   const companyId = useCompanyId();
   const client = useQueryClient();
   const [reason, setReason] = useState('');
-  const [currency, setCurrency] = useState('PHP');
+  const currencies = useCurrencyCodes();
+  const [currency, setCurrency] = useState('');
   const create = useMutation({
-    mutationFn: () => screen.api.create(companyId, reason.trim(), currency),
+    mutationFn: () =>
+      screen.api.create(companyId, reason.trim(), currency || (currencies[0] ?? '')),
     onSuccess: async (b) => {
       await client.invalidateQueries({ queryKey: ['legacy-batches'] });
       onCreated(b);
@@ -173,11 +176,14 @@ function CreateDialog({
               <select
                 id={id}
                 className="select"
-                value={currency}
+                value={currency || currencies[0]}
                 onChange={(e) => setCurrency(e.target.value)}
               >
-                <option value="PHP">PHP</option>
-                <option value="USD">USD</option>
+                {currencies.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
               </select>
             )}
           </Field>

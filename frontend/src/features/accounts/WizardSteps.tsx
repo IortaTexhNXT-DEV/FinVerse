@@ -9,6 +9,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormControls';
 import { oneYearAfter, withClient } from './accountForm';
 import type { AccountDraft } from './accountForm';
+import { clientShortName } from '@/context/clientNames';
 
 export interface StepProps {
   draft: AccountDraft;
@@ -115,7 +116,12 @@ export function ProductStep({ draft, set, saved }: Readonly<StepProps>) {
 }
 
 const ARRANGEMENTS = [
-  { value: 'VIA_BDOI', label: 'Premium paid through BDOI' },
+  {
+    value: 'VIA_BROKER',
+    get label() {
+      return `Premium paid through ${clientShortName()}`;
+    },
+  },
   { value: 'DIRECT_TO_INSURER', label: 'Direct payment to the insurer' },
 ];
 

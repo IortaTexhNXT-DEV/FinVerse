@@ -4,11 +4,12 @@ import { nbadminApi } from '@/api/nbadmin';
 import type { UserAccess } from '@/api/nbadmin';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Field } from '@/components/ui/Field';
-import { useWorkspace } from '@/context/workspaceContext';
+import { useWorkspace, useBaseCurrency } from '@/context/workspaceContext';
 import { countOf, formatAmount } from '@/utils/format';
 import { usersFor } from './accessRequest';
 import { profileGroups } from './profileGroups';
 import type { AccessRequestErrors, AccessRequestForm } from './accessRequest';
+import { inCurrency } from '@/utils/currencyLabel';
 
 interface FieldsProps {
   form: AccessRequestForm;
@@ -23,7 +24,7 @@ function UserField({ form, set, errors, users, userIdFormatText }: Readonly<Fiel
   const typed = form.type === 'CREATE_USER' || form.userType === 'EXTERNAL';
   let hint: string | undefined;
   if (typed) {
-    hint = userIdFormatText ? `BDOI format: ${userIdFormatText}` : 'BDOI format';
+    hint = userIdFormatText ? `Format: ${userIdFormatText}` : 'Format of the user ID parameter';
   }
   return (
     <Field label="User ID" required error={errors.username} hint={hint}>
@@ -66,6 +67,7 @@ function current(value: string | undefined): string {
 
 function DataFields({ form, set, errors, users }: Readonly<FieldsProps>) {
   const { branches } = useWorkspace();
+  const baseCurrency = useBaseCurrency();
   const modify = form.type === 'MODIFY_USER';
   const user = modify ? users.find((u) => u.username === form.username) : undefined;
   const hint = (value: string | undefined) => (modify ? current(value) : undefined);
@@ -134,7 +136,7 @@ function DataFields({ form, set, errors, users }: Readonly<FieldsProps>) {
       </Field>
       {form.userType === 'INTERNAL' && (
         <Field
-          label="Authorisation Limit (PHP)"
+          label={inCurrency('Authorisation Limit', baseCurrency)}
           error={errors.authorizationLimit}
           hint={modify ? current(limitText) : 'Blank: no limit'}
         >

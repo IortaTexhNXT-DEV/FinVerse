@@ -175,7 +175,11 @@ public class QuotationDocuments {
                 : names.insurer(q.getCompanyId(), c.insurerCode())),
         new Field("Period", periodText(q, c)),
         new Field("Valid until", DisplayFormat.date(c.validUntil())),
-        new Field("Premium payment", c.directPayment() ? "Directly to the insurer" : "Via BDOI"));
+        new Field(
+            "Premium payment",
+            c.directPayment()
+                ? "Directly to the insurer"
+                : "Via " + organization.getCompany(q.getCompanyId()).getShortName()));
   }
 
   private String periodText(Quotation q, QuotationContent c) {

@@ -8,7 +8,7 @@ import java.time.LocalDate;
 /**
  * The fields compared by the reconciliation (PRCID.027) as one side holds them: BDOI's booked
  * invoice or the insurer's production line. The item table stores both sides with the prefixes
- * {@code bdoi_} and {@code ins_}.
+ * {@code broker_} and {@code ins_}.
  *
  * @param policyNo policy number
  * @param referenceNo reference / invoice number

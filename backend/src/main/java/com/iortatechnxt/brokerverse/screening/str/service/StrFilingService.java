@@ -20,7 +20,6 @@ import com.iortatechnxt.brokerverse.screening.str.domain.SuspiciousTransactionRe
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import java.time.Clock;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.EnumSet;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +34,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class StrFilingService {
 
-  private static final ZoneId MANILA = BusinessClock.zone();
   private static final int MAX_REFERENCE = 60;
 
   private final StrRepository strs;

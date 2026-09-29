@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.disbursement.report;
 
+import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportColumn;
@@ -93,7 +94,7 @@ public final class SqlReport implements ReportDefinition {
 
   private static Object local(Object v) {
     if (v instanceof Timestamp t) {
-      return t.toInstant().atZone(DisbursementReports.MANILA).toLocalDate();
+      return t.toInstant().atZone(BusinessClock.zone()).toLocalDate();
     }
     return v instanceof Date d ? d.toLocalDate() : v;
   }

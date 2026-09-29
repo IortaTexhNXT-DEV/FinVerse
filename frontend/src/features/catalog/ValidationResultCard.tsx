@@ -72,7 +72,7 @@ export function ValidationResultCard({ detail }: Readonly<{ detail: VersionDetai
     {
       icon: CircleDollarSign,
       label: 'Test Premium',
-      value: premiumText(detail.testPremium, returned, company?.baseCurrency ?? 'PHP'),
+      value: premiumText(detail.testPremium, returned, company?.baseCurrency ?? ''),
     },
   ];
   if (returned) {

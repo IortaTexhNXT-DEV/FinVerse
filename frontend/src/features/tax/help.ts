@@ -81,7 +81,7 @@ export const TAX_HELP: HelpSection = {
       name: 'Certificates Received',
       path: '/tax/received-certificates',
       summary:
-        "The register of the BIR 2307 certificates the insurers issue on the tax they withheld from BDOI's commission and incentives.",
+        "The register of the BIR 2307 certificates the insurers issue on the tax they withheld from the company's commission and incentives.",
       workflow: [
         'Record the certificate with its number, agent, period covered, date received and income payments by ATC.',
         'Recording posts TAX_CWT_CERT_RECEIVED: AR-BIR on commission or on incentives moves to AR-BIR on hand.',

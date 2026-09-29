@@ -26,6 +26,7 @@ public final class ValidationScope {
   private final LocalDate today;
   private CodeMaps maps = CodeMaps.empty();
   private Map<Long, String> sources = Map.of();
+  private String baseCurrency;
 
   /**
    * Creates the scope.
@@ -82,6 +83,26 @@ public final class ValidationScope {
    * @param bySource source system by extract id
    * @return this scope
    */
+  /**
+   * Sets the base currency of the company of the batch (a foreign currency needs a booking rate).
+   *
+   * @param currency base currency
+   * @return this scope
+   */
+  public ValidationScope withBaseCurrency(String currency) {
+    this.baseCurrency = currency;
+    return this;
+  }
+
+  /**
+   * The base currency of the company of the batch.
+   *
+   * @return currency, null when not set
+   */
+  public String baseCurrency() {
+    return baseCurrency;
+  }
+
   public ValidationScope withSources(Map<Long, String> bySource) {
     this.sources = Map.copyOf(bySource);
     return this;

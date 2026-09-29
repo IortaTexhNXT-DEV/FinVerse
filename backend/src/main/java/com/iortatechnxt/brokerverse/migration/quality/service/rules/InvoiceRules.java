@@ -60,7 +60,7 @@ public class InvoiceRules implements ObjectRules {
     for (StageRow r : headers) {
       Map<String, String> v = r.getRawPayload();
       totals(r, positions.getOrDefault(v.get(KEY), List.of()), sink);
-      header(r, sink);
+      header(r, sink, scope.baseCurrency());
       if (!loadedClients.contains(v.get(CLIENT_NO))) {
         sink.error(
             r,
@@ -155,7 +155,7 @@ public class InvoiceRules implements ObjectRules {
   }
 
   /** DQ-027 and DQ-029: realised commission, deferred VAT and booking rate. */
-  private static void header(StageRow r, FindingSink sink) {
+  private static void header(StageRow r, FindingSink sink, String baseCurrency) {
     Map<String, String> v = r.getRawPayload();
     BigDecimal commission = Values.amount(v.get("commission"));
     BigDecimal realised = Values.amount(v.get("commission_realised"));
@@ -170,7 +170,9 @@ public class InvoiceRules implements ObjectRules {
           "Realised commission or deferred VAT is above the commission or its VAT");
     }
     String currency = Values.code(v.get("currency"));
-    if (currency != null && !"PHP".equals(currency) && Values.blank(v.get("booking_fx_rate"))) {
+    if (currency != null
+        && !currency.equals(baseCurrency)
+        && Values.blank(v.get("booking_fx_rate"))) {
       sink.error(
           r,
           "DQ-029",

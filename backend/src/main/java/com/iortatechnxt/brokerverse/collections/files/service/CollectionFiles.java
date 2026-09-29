@@ -195,7 +195,7 @@ public class CollectionFiles {
           rows + " accounts exceed the export limit of " + cap + "; narrow the filters");
     }
     LocalDate today = BusinessClock.today(clock);
-    String key = "E" + clock.instant().atZone(FilePeriods.MANILA).format(EXPORT_KEY);
+    String key = "E" + clock.instant().atZone(BusinessClock.zone()).format(EXPORT_KEY);
     Map<String, String> p = params(companyId, null, blank(salesUnit));
     if (blank(segment) != null) {
       p.put(ClxReportSql.SEGMENT, segment.strip());

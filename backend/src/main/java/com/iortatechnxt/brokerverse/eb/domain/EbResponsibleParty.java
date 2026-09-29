@@ -6,6 +6,6 @@ public enum EbResponsibleParty {
   INSURER,
   /** The client (HR). */
   CLIENT,
-  /** BDOI itself. */
-  BDOI
+  /** The broker itself (shown with the short name of the company). */
+  BROKER
 }

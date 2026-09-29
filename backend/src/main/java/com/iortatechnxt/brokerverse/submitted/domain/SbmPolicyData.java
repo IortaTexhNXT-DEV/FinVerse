@@ -27,4 +27,18 @@ public record SbmPolicyData(
     risk = risk == null ? SbmRisk.NONE : risk;
     marks = marks == null ? SbmMarks.NONE : marks;
   }
+
+  /**
+   * The same data with terms in a currency when they carry none.
+   *
+   * @param code currency (the base currency of the company)
+   * @return data
+   */
+  public SbmPolicyData orInCurrency(String code) {
+    if (terms == null || terms.currency() != null) {
+      return this;
+    }
+    return new SbmPolicyData(
+        segment, businessType, loan, assured, terms.orInCurrency(code), risk, marks);
+  }
 }

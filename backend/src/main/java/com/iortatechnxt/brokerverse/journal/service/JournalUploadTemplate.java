@@ -12,28 +12,45 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * Downloadable journal upload templates with two example vouchers: the guided Excel template (the
- * template users fill in) and the plain CSV layout (header row, for extracts of other systems).
+ * Downloadable journal upload templates with two example vouchers in the head-office branch and the
+ * base currency of the company: the guided Excel template (the template users fill in) and the
+ * plain CSV layout (header row, for extracts of other systems).
  */
 public final class JournalUploadTemplate {
 
   private JournalUploadTemplate() {}
 
   /**
-   * Sample rows in template column order.
+   * Values of the example vouchers.
    *
-   * @param valueDate value date of the samples
+   * @param valueDate value date
+   * @param branchCode branch (the head office of the company), may be blank
+   * @param currency currency (the base currency of the company), may be blank
+   */
+  public record Example(LocalDate valueDate, String branchCode, String currency) {
+
+    /** Blank values instead of null. */
+    public Example {
+      branchCode = branchCode == null ? "" : branchCode;
+      currency = currency == null ? "" : currency;
+    }
+  }
+
+  /**
+   * Example rows in template column order.
+   *
+   * @param example values of the examples
    * @return rows (without header)
    */
-  static List<List<String>> sampleRows(LocalDate valueDate) {
-    String date = valueDate.toString();
+  static List<List<String>> sampleRows(Example example) {
+    String date = example.valueDate().toString();
     return List.of(
         List.of(
             "V1",
-            "HO",
+            example.branchCode(),
             "MANUAL",
             date,
-            "PHP",
+            example.currency(),
             "Office rent for the month",
             "INV-2026-001",
             "5603",
@@ -49,10 +66,10 @@ public final class JournalUploadTemplate {
         List.of("V1", "", "", "", "", "", "", "1111", "", "15000.00", "", "", "", "", "", "", ""),
         List.of(
             "V2",
-            "HO",
+            example.branchCode(),
             "ACCRUAL",
             date,
-            "PHP",
+            example.currency(),
             "Accrued professional fees",
             "",
             "5605",
@@ -71,12 +88,12 @@ public final class JournalUploadTemplate {
   /**
    * CSV template.
    *
-   * @param valueDate value date of the samples
+   * @param example values of the examples
    * @return UTF-8 CSV bytes
    */
-  public static byte[] csv(LocalDate valueDate) {
+  public static byte[] csv(Example example) {
     StringBuilder text = new StringBuilder(String.join(",", UploadLine.ALL_COLUMNS)).append("\r\n");
-    for (List<String> row : sampleRows(valueDate)) {
+    for (List<String> row : sampleRows(example)) {
       text.append(row.stream().map(JournalUploadTemplate::quote).collect(Collectors.joining(",")))
           .append("\r\n");
     }
@@ -87,27 +104,27 @@ public final class JournalUploadTemplate {
    * XLSX template: the guided sheet (title block, column guide above the header, the two example
    * vouchers marked to overwrite or delete, drop-downs and cell checks).
    *
-   * @param valueDate value date of the samples
+   * @param example values of the examples
    * @return workbook bytes
    */
-  public static byte[] xlsx(LocalDate valueDate) {
-    return GuidedTemplateWriter.write(guided(valueDate));
+  public static byte[] xlsx(Example example) {
+    return GuidedTemplateWriter.write(guided(example));
   }
 
   /**
    * The guided template of the journal upload.
    *
-   * @param valueDate value date of the samples
+   * @param example values of the examples
    * @return template
    */
-  static GuidedTemplate guided(LocalDate valueDate) {
+  static GuidedTemplate guided(Example example) {
     GuidedSheet sheet =
         new GuidedSheet(
             "Journals",
             "Journal lines",
             "One row per journal line; the rows with the same voucher_key form one voucher.",
             columns(),
-            sampleRows(valueDate));
+            sampleRows(example));
     return new GuidedTemplate(
         "Journal upload",
         "Creates many manual, adjustment or accrual journals at once as draft journals for"
@@ -149,7 +166,7 @@ public final class JournalUploadTemplate {
             .when(firstRow),
         GuideColumn.of(UploadLine.CURRENCY, Kind.TEXT, "Currency of the voucher")
             .when(firstRow)
-            .format("ISO currency code, 3 letters, e.g. PHP"),
+            .format("ISO currency code, 3 letters"),
         GuideColumn.of(UploadLine.NARRATION, Kind.TEXT, "Narration of the voucher")
             .when(firstRow)
             .format("Text, at most 500 characters"),

@@ -207,7 +207,7 @@ public class QuotationSlipService {
                 + ". Kindly send your best terms on or before "
                 + p.getQsReplyBy()
                 + ". The document is password protected; the password follows separately.\n\n"
-                + "BDO Insurance and Reinsurance Brokers, Inc.",
+                + documents.company(p),
             List.of(slip),
             new Protection(null, true, null),
             new RecordLink(ProposalService.ENTITY, String.valueOf(p.getId()), p.getPrfNo())));

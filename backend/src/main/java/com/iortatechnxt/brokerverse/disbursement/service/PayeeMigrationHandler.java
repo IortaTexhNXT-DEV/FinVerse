@@ -79,10 +79,10 @@ public class PayeeMigrationHandler implements BulkImportHandler {
         BulkColumn.required(MODES, "Modes of payment allowed for the payee", "CHECK|CTA")
             .format("Mode codes separated by |, e.g. CHECK|CTA")
             .allowed("Codes of the Default mode list"),
-        BulkColumn.required("Currency", "Currency of payment", "PHP")
+        BulkColumn.required("Currency", "Currency of payment", BulkColumn.BASE_CURRENCY_EXAMPLE)
             .format("ISO currency code, 3 letters")
             .master("currency"),
-        BulkColumn.optional("Bank", "Bank of the payee account", "BDO Unibank"),
+        BulkColumn.optional("Bank", "Bank of the payee account", "Philippine National Bank"),
         BulkColumn.optional(ACCOUNT_NO, "Account number of the payee at the bank", "001234567890")
             .when("a mode crediting an account (CTA, TT, online banking) is allowed"));
   }

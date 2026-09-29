@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.docgen.domain.DocTemplate;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
+import com.iortatechnxt.brokerverse.organization.service.OrganizationDirectory;
 import com.iortatechnxt.brokerverse.quotation.domain.Quotation;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationContent;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationHeader;
@@ -28,6 +29,7 @@ import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import java.time.Clock;
 import java.util.Map;
+import java.util.Objects;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +69,7 @@ public class QuotationService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final OrganizationDirectory organization;
 
   /**
    * Creates the service.
@@ -83,6 +86,7 @@ public class QuotationService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param organization company master (base currency)
    */
   public QuotationService(
       QuotationRepository quotations,
@@ -96,7 +100,8 @@ public class QuotationService {
       WorkflowService workflow,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      OrganizationDirectory organization) {
     this.quotations = quotations;
     this.versions = versions;
     this.rules = rules;
@@ -109,6 +114,7 @@ public class QuotationService {
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.organization = organization;
   }
 
   /**
@@ -139,7 +145,9 @@ public class QuotationService {
                 product.getLineCode(),
                 QuotationRules.blankToNull(resolved.marketSegment()),
                 QuotationRules.blankToNull(draft.sourceChannel()),
-                QuotationRules.blankToNull(draft.currency()),
+                Objects.requireNonNullElseGet(
+                    QuotationRules.blankToNull(draft.currency()),
+                    () -> organization.company(companyId).baseCurrency()),
                 template.getCode() + " v" + template.getVersionNo()));
     QuotationContent priced = show(quotation, product, resolved.content());
     Quotation saved = quotations.save(quotation);

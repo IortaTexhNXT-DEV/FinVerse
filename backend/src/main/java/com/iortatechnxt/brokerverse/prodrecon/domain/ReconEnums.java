@@ -43,7 +43,7 @@ public final class ReconEnums {
     /** Keys agree, some fields differ beyond the tolerance. */
     MATCHED_WITH_DISCREPANCY,
     /** Booked by BDOI, absent from the insurer's report. */
-    BDOI_ONLY,
+    BROKER_ONLY,
     /** Insurer production matched to an account not yet booked (PRCID.023). */
     UNMATCHED_PREBOOKED,
     /** Insurer production without any BDOI account (unbooked). */

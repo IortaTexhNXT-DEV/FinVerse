@@ -17,6 +17,7 @@ import { formatDate, today } from '@/utils/format';
 import { PaymentFileModal } from './PaymentFileModal';
 import { usePayablesLookups } from './usePayablesLookups';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { useBaseCurrency } from '@/context/workspaceContext';
 
 type Form = Partial<BankAccountRequest> & { id?: number };
 
@@ -37,6 +38,7 @@ export default function BankAccountsPage() {
   const { can, user } = useAuth();
   const toast = useToast();
   const queryClient = useQueryClient();
+  const baseCurrency = useBaseCurrency();
   const [form, setForm] = useState<Form | null>(null);
   const [books, setBooks] = useState<BankAccount | null>(null);
   const [fileOpen, setFileOpen] = useState(false);
@@ -82,7 +84,9 @@ export default function BankAccountsPage() {
               <Button
                 variant="accent"
                 icon={<Plus size={16} />}
-                onClick={() => setForm({ currency: 'PHP', notificationFormat: 'FIXED_WIDTH' })}
+                onClick={() =>
+                  setForm({ currency: baseCurrency, notificationFormat: 'FIXED_WIDTH' })
+                }
               >
                 New Bank Account
               </Button>

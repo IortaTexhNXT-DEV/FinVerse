@@ -16,6 +16,7 @@ import { MigStatus } from '../common/MigStatus';
 import { MIG_SECTION, migLabel } from '../common/migrationCodes';
 import '../migration.css';
 import { MapSetPanel } from './MapSetPanel';
+import { BRAND } from '@/branding';
 
 type Tab = 'sets' | 'unmapped';
 
@@ -46,7 +47,7 @@ export default function CodeMapsPage() {
       <PageHeader
         section={MIG_SECTION}
         title="Code Maps"
-        description="Legacy codes mapped to BIBS values, versioned and approved by the business owner."
+        description={`Legacy codes mapped to ${BRAND.product} values, versioned and approved by the business owner.`}
       />
       <Tabs<Tab>
         tabs={[
@@ -84,7 +85,7 @@ export default function CodeMapsPage() {
                 },
                 {
                   key: 'target',
-                  header: 'BIBS values',
+                  header: `${BRAND.product} values`,
                   render: (s) => <CellStack main={s.targetDomain} sub={migLabel(s.targetKind)} />,
                 },
                 { key: 'used', header: 'Used by', render: (s) => s.usedBy ?? '' },

@@ -5,7 +5,7 @@ export const CATALOG_HELP: HelpSection = {
   id: 'catalog',
   module: 'Product Maintenance',
   intro:
-    'What BDOI sells and with whom: products and packages with their rules, the insurer panel, the rates and taxes used by rating, and the sales organisation.',
+    'What the company sells and with whom: products and packages with their rules, the insurer panel, the rates and taxes used by rating, and the sales organisation.',
   screens: [
     {
       name: 'Products',

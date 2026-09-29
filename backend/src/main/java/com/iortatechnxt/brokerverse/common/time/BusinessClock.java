@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.time.YearMonth;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -23,8 +24,12 @@ import java.util.concurrent.atomic.AtomicReference;
  * the instant of the given clock and ignore its zone.
  *
  * <p>The zone is set once at start-up by {@link BusinessZoneSettings}, before any bean is created.
- * The architecture test forbids {@code LocalDate.now}, {@code YearMonth.now} and {@code Year.now}
- * outside this class.
+ * Read it with {@link #zone()} or {@link #zoneId()} where it is used, never into a static field,
+ * and bind {@link #zoneId()} as a parameter of SQL that needs the business day of a timestamp. The
+ * architecture test forbids {@code LocalDate.now}, {@code LocalDateTime.now}, {@code
+ * LocalTime.now}, {@code ZonedDateTime.now}, {@code OffsetDateTime.now}, {@code YearMonth.now},
+ * {@code Year.now} and {@code Instant.now} outside this class, and a {@code ZoneId} constant
+ * anywhere.
  */
 public final class BusinessClock {
 
@@ -65,6 +70,16 @@ public final class BusinessClock {
    */
   public static LocalDate today(Clock clock) {
     return LocalDate.now(clock.withZone(zone()));
+  }
+
+  /**
+   * The current moment on the wall clock of the business zone.
+   *
+   * @param clock clock supplying the current instant
+   * @return date and time in the business zone
+   */
+  public static ZonedDateTime now(Clock clock) {
+    return clock.instant().atZone(zone());
   }
 
   /**

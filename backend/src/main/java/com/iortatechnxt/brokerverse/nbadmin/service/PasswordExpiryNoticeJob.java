@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.security.service.AuthPasswordService;
 import com.iortatechnxt.brokerverse.security.service.AuthPasswordService.PasswordExpiry;
 import com.iortatechnxt.brokerverse.system.service.JobOutcome;
 import com.iortatechnxt.brokerverse.system.service.ManagedJob;
+import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.LocalDate;
 import java.util.List;
 import org.slf4j.Logger;
@@ -15,9 +16,10 @@ import org.springframework.transaction.support.TransactionTemplate;
 
 /**
  * Job {@code PASSWORD_EXPIRY_NOTICE} (UAM-NFR-36; FR-UA-005; USER_ACCESS_DESIGN section 8): LOCAL
- * sign-in only, tells the users whose password expires within {@value #NOTICE_DAYS} days, in the
- * app and by e-mail. Daily at 06:00 PHT ({@code brokerverse.jobs.password-expiry-notice-cron}).
- * Each user is told in a transaction of its own, so one failure does not stop the others.
+ * sign-in only, tells the users whose password expires within the days of parameter {@value
+ * #NOTICE_DAYS}, in the app and by e-mail. Daily at 06:00 PHT ({@code
+ * brokerverse.jobs.password-expiry-notice-cron}). Each user is told in a transaction of its own, so
+ * one failure does not stop the others.
  */
 @Component
 public class PasswordExpiryNoticeJob implements ManagedJob {
@@ -25,14 +27,15 @@ public class PasswordExpiryNoticeJob implements ManagedJob {
   /** Job name in the job monitor. */
   public static final String JOB_NAME = "PASSWORD_EXPIRY_NOTICE";
 
-  /** Days before the expiry the notice is sent. */
-  public static final int NOTICE_DAYS = 7;
+  /** Parameter: days before the expiry the notice is sent. */
+  public static final String NOTICE_DAYS = "PASSWORD_EXPIRY_NOTICE_DAYS";
 
   private static final Logger LOG = LoggerFactory.getLogger(PasswordExpiryNoticeJob.class);
 
   private final AuthPasswordService passwords;
   private final PasswordNoticeMailer mailer;
   private final TransactionTemplate transaction;
+  private final SystemParameterService parameters;
   private final String cron;
 
   /**
@@ -41,14 +44,17 @@ public class PasswordExpiryNoticeJob implements ManagedJob {
    * @param passwords passwords that expire soon
    * @param mailer notices
    * @param transactionManager transaction manager (a transaction per user)
+   * @param parameters business parameters (notice days)
    * @param cron schedule
    */
   public PasswordExpiryNoticeJob(
       AuthPasswordService passwords,
       PasswordNoticeMailer mailer,
       PlatformTransactionManager transactionManager,
+      SystemParameterService parameters,
       @Value("${brokerverse.jobs.password-expiry-notice-cron:0 0 22 * * *}") String cron) {
     this.passwords = passwords;
+    this.parameters = parameters;
     this.mailer = mailer;
     this.transaction = new TransactionTemplate(transactionManager);
     this.cron = cron;
@@ -61,7 +67,7 @@ public class PasswordExpiryNoticeJob implements ManagedJob {
 
   @Override
   public String description() {
-    return "Tells users whose password expires within 7 days (LOCAL sign-in)";
+    return "Tells users whose password expires within the notice days (LOCAL sign-in)";
   }
 
   @Override
@@ -71,7 +77,7 @@ public class PasswordExpiryNoticeJob implements ManagedJob {
 
   @Override
   public JobOutcome execute(LocalDate businessDate) {
-    List<PasswordExpiry> expiring = passwords.expiringWithin(NOTICE_DAYS);
+    List<PasswordExpiry> expiring = passwords.expiringWithin(parameters.requiredInt(NOTICE_DAYS));
     int told = 0;
     for (PasswordExpiry expiry : expiring) {
       try {

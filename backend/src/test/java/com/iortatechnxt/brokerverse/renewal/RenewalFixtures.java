@@ -77,7 +77,7 @@ public class RenewalFixtures {
    * @return booked invoice
    */
   public BookedInvoice book(String product, String segment) {
-    return book(product, segment, PaymentArrangement.VIA_BDOI);
+    return book(product, segment, PaymentArrangement.VIA_BROKER);
   }
 
   /**

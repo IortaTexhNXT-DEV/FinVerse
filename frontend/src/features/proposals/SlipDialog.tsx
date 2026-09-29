@@ -8,6 +8,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { SelectInput, TextInput } from '@/features/assets/FormControls';
 import { formatAmount } from '@/utils/format';
+import { useBaseCurrency } from '@/context/workspaceContext';
 
 export interface SlipInput {
   replyBy?: string;
@@ -25,6 +26,7 @@ function InsurerChoice({
     queryKey: ['proposal', proposalId, 'responses'],
     queryFn: () => proposalsApi.responses(proposalId),
   });
+  const baseCurrency = useBaseCurrency();
   const received = (responses.data ?? []).filter((r) => r.status === 'RECEIVED');
   return (
     <SelectInput
@@ -33,7 +35,7 @@ function InsurerChoice({
       value={value}
       options={received.map((r) => ({
         value: r.insurerCode,
-        label: `${r.insurerName} – PHP ${formatAmount(r.premium)}${r.recommended ? ' (recommended)' : ''}`,
+        label: `${r.insurerName} – ${baseCurrency} ${formatAmount(r.premium)}${r.recommended ? ' (recommended)' : ''}`,
       }))}
       onChange={onChange}
     />

@@ -211,7 +211,7 @@ public class CaseQueries {
     }
     Instant now = clock.instant();
     Instant endOfDay =
-        BusinessClock.today(clock).plusDays(1).atStartOfDay(CaseSpecs.MANILA).toInstant();
+        BusinessClock.today(clock).plusDays(1).atStartOfDay(BusinessClock.zone()).toInstant();
     Optional<IngestionRun> lastRun =
         listFiles.runs(null, PageRequest.of(0, 1)).stream().findFirst();
     return new Tiles(

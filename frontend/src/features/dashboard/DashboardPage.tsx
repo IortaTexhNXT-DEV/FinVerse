@@ -49,7 +49,7 @@ function PendingJournals({
   );
 }
 
-/** "Financial position as of 25-Sep-2026 · amounts in PHP". */
+/** "Financial position as of 25-Sep-2026 · amounts in <base currency>". */
 function positionLine(d: { asOf: string } | undefined, ccy: string): string {
   return d === undefined
     ? 'Loading financial position…'

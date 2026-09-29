@@ -159,7 +159,7 @@ screens:
       - "Masking Rules tab | Layout, Column, Masking, Active | Columns | - | - | Masking rules | - | - | - | -"
     actions:
       - "Control File Template | Every migration role | Always | Downloads the header of the control file (CONTROL_template.ctl.csv) | - | -"
-      - "Load Templates Workbook | Every migration role | Always | Downloads one workbook with a sheet per layout, the Columns sheet, the Control file sheet and the How to fill rules | - | -"
+      - "Load Templates Workbook | Every migration role | Always | Downloads one workbook with a Start here sheet (the rules of a delivery and the order) and one guided sheet per layout (a guide above every column) | - | -"
       - "[Download on a layout row] | Every migration role | Always | Downloads the CSV template of the layout (header row only) | - | -"
       - "Object Workbook | Every migration role | A layout is open | Downloads the workbook of the object of the layout | - | -"
       - "Freeze | Data Steward | Layout version is a draft | Makes the version the one in force after a confirmation; extracts and templates follow it and the previous version is retired | Frozen | -"

@@ -12,9 +12,9 @@ export const BULK_HELP: HelpSection = {
       summary:
         'The upload types available to your role and the history of uploads with their counts and result reports.',
       workflow: [
-        'Choose an upload type and download its template (Excel with an instructions sheet).',
-        'Fill in the template and upload it as Excel (.xlsx), OpenDocument (.ods) or CSV (.csv).',
-        'Review the validation of every row; fix invalid rows in your file and upload again, or process the valid rows now.',
+        'Choose an upload type and download its template: one Excel sheet that says what the file is for, who fills it in and its rules, with a guide above every column (mandatory, format, allowed values, what to enter), drop-downs and an example row.',
+        'Fill in your rows below the example row and upload the file as it is: the guide and the example row are skipped. OpenDocument (.ods) and CSV (.csv) files with the headers in the first row are also accepted.',
+        'Review the validation of every row; correct the rows of the error file (same layout, with an Error column) and upload it again, or process the valid rows now.',
         'Processing creates or updates one record per valid row; rows that fail at that moment are reported with the reason.',
         'Download the result report (summary and every row with status, messages and the reference created).',
       ],

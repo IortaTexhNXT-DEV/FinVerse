@@ -21,6 +21,22 @@ public interface UserSessionRepository extends JpaRepository<UserSession, Long> 
   Optional<UserSession> findBySessionId(String sessionId);
 
   /**
+   * The session of a current refresh token.
+   *
+   * @param refreshHash SHA-256 of the token
+   * @return session
+   */
+  Optional<UserSession> findByRefreshHash(String refreshHash);
+
+  /**
+   * The session whose previous refresh token this is.
+   *
+   * @param previousRefreshHash SHA-256 of the token
+   * @return session
+   */
+  Optional<UserSession> findFirstByPreviousRefreshHash(String previousRefreshHash);
+
+  /**
    * The latest sessions of a user, newest first.
    *
    * @param username user

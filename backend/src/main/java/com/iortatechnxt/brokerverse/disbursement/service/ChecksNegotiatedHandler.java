@@ -48,9 +48,20 @@ public class ChecksNegotiatedHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return DisbursementUploadGuide.TREASURY;
+  }
+
+  @Override
+  public String uploadPath() {
+    return DisbursementUploadGuide.path("Negotiated Checks");
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(CHECK, "Check number as printed", "100001"),
+        BulkColumn.required(CHECK, "Check number as printed", "100001")
+            .allowed("Number of a check issued by the company"),
         new BulkColumn(AMOUNT, "Amount deposited", true, Type.NUMBER, "12500.00"),
         new BulkColumn(DATE, "Date the check was deposited", false, Type.DATE, "2026-09-25"));
   }

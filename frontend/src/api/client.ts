@@ -1,13 +1,22 @@
 /**
  * Thin, typed HTTP client for the BrokerVerse REST API.
  *
- * - Attaches the bearer token.
+ * - Attaches the bearer token and renews it shortly before it expires (the short access token is
+ *   renewed with the refresh token, an HttpOnly cookie the page never reads), and once more when a
+ *   request is refused with 401; the user is not signed out while working.
  * - Converts RFC 7807 problem responses into {@link ApiError} with the stable backend `code`.
- * - Signals an expired session through {@link onUnauthorized} so the app can return to login.
+ * - Signals an ended session through {@link onUnauthorized} so the app can return to login.
  */
 
 const TOKEN_KEY = 'brokerverse.token';
 const EXPIRES_KEY = 'brokerverse.expiresAt';
+const ACCESS_EXPIRES_KEY = 'brokerverse.accessExpiresAt';
+
+/** The access token is renewed when it expires within this time. */
+export const REFRESH_MARGIN_MS = 60_000;
+
+/** Header the server requires on the renewal (a cross-site form cannot set it). */
+const REFRESH_HEADER = 'X-Requested-With';
 
 export interface ProblemDetail {
   title?: string;
@@ -96,25 +105,97 @@ export function onUnauthorized(handler: () => void): void {
 }
 
 /**
- * The bearer token and its absolute expiry, kept per tab in sessionStorage (never localStorage);
- * other tabs obtain them through the session handshake (session/tabSync.ts, BRNB.082).
+ * The bearer token, the absolute end of the session and the expiry of the token, kept per tab in
+ * sessionStorage (never localStorage); other tabs obtain them through the session handshake
+ * (session/tabSync.ts, BRNB.082).
  */
 export const tokenStore = {
   get: (): string | null => sessionStorage.getItem(TOKEN_KEY),
+  /** End of the sign-in session. */
   expiresAt: (): string | null => sessionStorage.getItem(EXPIRES_KEY),
-  set: (token: string, expiresAt?: string): void => {
+  /** Expiry of the access token. */
+  accessExpiresAt: (): string | null => sessionStorage.getItem(ACCESS_EXPIRES_KEY),
+  set: (token: string, expiresAt?: string, accessExpiresAt?: string): void => {
     sessionStorage.setItem(TOKEN_KEY, token);
     if (expiresAt === undefined) {
       sessionStorage.removeItem(EXPIRES_KEY);
     } else {
       sessionStorage.setItem(EXPIRES_KEY, expiresAt);
     }
+    if (accessExpiresAt === undefined) {
+      sessionStorage.removeItem(ACCESS_EXPIRES_KEY);
+    } else {
+      sessionStorage.setItem(ACCESS_EXPIRES_KEY, accessExpiresAt);
+    }
   },
   clear: (): void => {
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(EXPIRES_KEY);
+    sessionStorage.removeItem(ACCESS_EXPIRES_KEY);
   },
 };
+
+/** Whether the access token expires within the margin (pure, for tests). */
+export function renewalDue(
+  accessExpiresAt: string | null,
+  now: number,
+  marginMs = REFRESH_MARGIN_MS,
+): boolean {
+  if (accessExpiresAt === null) {
+    return false;
+  }
+  const end = Date.parse(accessExpiresAt);
+  return !Number.isNaN(end) && end - now <= marginMs;
+}
+
+interface RefreshAnswer {
+  accessToken: string;
+  accessTokenExpiresAt: string;
+  expiresAt: string;
+}
+
+let renewal: Promise<boolean> | undefined;
+
+/**
+ * Renews the access token with the refresh token cookie; one renewal at a time per tab. Resolves
+ * false when the session cannot be renewed (signed out, ended, idle) and true when renewed; a
+ * network failure keeps the current token.
+ */
+export function renewAccessToken(): Promise<boolean> {
+  renewal ??= (async () => {
+    try {
+      const response = await fetch('/api/v1/auth/refresh', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { [REFRESH_HEADER]: 'BrokerVerse' },
+      });
+      if (!response.ok) {
+        return false;
+      }
+      const answer = (await response.json()) as RefreshAnswer;
+      tokenStore.set(answer.accessToken, answer.expiresAt, answer.accessTokenExpiresAt);
+      return true;
+    } catch {
+      return true;
+    } finally {
+      renewal = undefined;
+    }
+  })();
+  return renewal;
+}
+
+/** Paths that never trigger a renewal (the sign-in steps themselves). */
+function signInPath(path: string): boolean {
+  return (
+    path.startsWith('/auth/login') ||
+    path.startsWith('/auth/refresh') ||
+    path.startsWith('/auth/mfa/verify') ||
+    path.startsWith('/auth/mfa/enrolment') ||
+    path.startsWith('/auth/sso') ||
+    path.startsWith('/auth/password-reset') ||
+    path.startsWith('/auth/sign-in-options')
+  );
+}
 
 export interface DownloadedFile {
   blob: Blob;
@@ -150,7 +231,7 @@ async function problemOf(response: Response): Promise<ApiError> {
   return new ApiError(response.status, problem);
 }
 
-async function send(method: string, path: string, body?: unknown): Promise<Response> {
+function requestInit(method: string, body?: unknown): RequestInit {
   const headers: Record<string, string> = {};
   const token = tokenStore.get();
   if (token) {
@@ -166,8 +247,20 @@ async function send(method: string, path: string, body?: unknown): Promise<Respo
   } else if (body !== undefined) {
     payload = JSON.stringify(body);
   }
-  const response = await fetchOrNetworkError(`/api/v1${path}`, { method, headers, body: payload });
-  if (response.status === 401 && token) {
+  return { method, headers, body: payload };
+}
+
+async function send(method: string, path: string, body?: unknown): Promise<Response> {
+  const renewable = tokenStore.get() !== null && !signInPath(path);
+  if (renewable && renewalDue(tokenStore.accessExpiresAt(), Date.now())) {
+    await renewAccessToken();
+  }
+  const url = `/api/v1${path}`;
+  let response = await fetchOrNetworkError(url, requestInit(method, body));
+  if (response.status === 401 && renewable && (await renewAccessToken())) {
+    response = await fetchOrNetworkError(url, requestInit(method, body));
+  }
+  if (response.status === 401 && renewable) {
     tokenStore.clear();
     unauthorizedHandler?.();
   }

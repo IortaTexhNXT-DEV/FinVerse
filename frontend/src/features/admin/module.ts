@@ -1,6 +1,7 @@
 import {
   Cable,
   History,
+  KeyRound,
   Server,
   ShieldCheck,
   SlidersHorizontal,
@@ -28,6 +29,15 @@ export const adminModule: FeatureModule = {
       icon: ShieldCheck,
       permission: 'ROLE_MANAGE',
       component: lazy(() => import('./RolesPage')),
+    },
+    {
+      path: '/admin/second-factor',
+      label: 'Second Factor',
+      icon: KeyRound,
+      permission: 'MFA_RESET',
+      // The approvers of a reset open the screen to approve it.
+      alsoPermissions: ['MFA_RESET_APPROVE'],
+      component: lazy(() => import('./SecondFactorPage')),
     },
     {
       path: '/admin/audit',

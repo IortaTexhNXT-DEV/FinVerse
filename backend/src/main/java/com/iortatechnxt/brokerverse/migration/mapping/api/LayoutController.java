@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -36,6 +37,7 @@ public class LayoutController {
   private static final String VIEW = "hasAuthority('MIG_VIEW')";
   private static final String EDIT = "hasAuthority('MIG_MAPPING_EDIT')";
   private static final String CSV = "text/csv";
+  private static final String XLSX_FORMAT = "xlsx";
   private static final String XLSX =
       "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
@@ -99,29 +101,47 @@ public class LayoutController {
   }
 
   /**
-   * The CSV template of a layout.
+   * The load template of a layout: the guided Excel template ({@code format=xlsx}, the one the
+   * console offers) or the CSV layout (header row only, for large extracts; the default of the
+   * API).
    *
    * @param code layout
+   * @param format csv or xlsx
    * @param request HTTP request
-   * @return CSV
+   * @return CSV or XLSX
    */
   @GetMapping("/templates/layouts/{code}")
   @PreAuthorize(VIEW)
   public ResponseEntity<byte[]> layoutTemplate(
-      @PathVariable String code, HttpServletRequest request) {
+      @PathVariable String code,
+      @RequestParam(defaultValue = "csv") String format,
+      HttpServletRequest request) {
+    if (XLSX_FORMAT.equals(format)) {
+      return downloads.respond(
+          FileDownload.inline(code + "_template.xlsx", XLSX, templates.layoutWorkbook(code)),
+          request);
+    }
     return downloads.respond(
         FileDownload.inline(code + "_template.csv", CSV, templates.layoutCsv(code)), request);
   }
 
   /**
-   * The CSV template of the control file.
+   * The template of the control file: the guided Excel template ({@code format=xlsx}) or the CSV
+   * layout (the default of the API).
    *
+   * @param format csv or xlsx
    * @param request HTTP request
-   * @return CSV
+   * @return CSV or XLSX
    */
   @GetMapping("/templates/control")
   @PreAuthorize(VIEW)
-  public ResponseEntity<byte[]> controlTemplate(HttpServletRequest request) {
+  public ResponseEntity<byte[]> controlTemplate(
+      @RequestParam(defaultValue = "csv") String format, HttpServletRequest request) {
+    if (XLSX_FORMAT.equals(format)) {
+      return downloads.respond(
+          FileDownload.inline("CONTROL_template.ctl.xlsx", XLSX, templates.controlWorkbook()),
+          request);
+    }
     return downloads.respond(
         FileDownload.inline("CONTROL_template.ctl.csv", CSV, templates.controlCsv()), request);
   }

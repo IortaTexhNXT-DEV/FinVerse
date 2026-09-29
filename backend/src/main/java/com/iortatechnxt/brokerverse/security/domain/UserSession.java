@@ -48,6 +48,21 @@ public class UserSession {
   @Column(name = "end_reason", length = 20)
   private SessionEndReason endReason;
 
+  @Column(name = "refresh_hash", length = 64)
+  private String refreshHash;
+
+  @Column(name = "previous_refresh_hash", length = 64)
+  private String previousRefreshHash;
+
+  @Column(name = "refreshed_at")
+  private Instant refreshedAt;
+
+  @Column(name = "sign_in_method", nullable = false, updatable = false, length = 10)
+  private String signInMethod = "PASSWORD";
+
+  @Column(name = "second_factor", nullable = false, updatable = false)
+  private boolean secondFactor;
+
   protected UserSession() {}
 
   /**
@@ -64,6 +79,44 @@ public class UserSession {
     this.issuedAt = issuedAt;
     this.expiresAt = expiresAt;
     this.lastSeenAt = issuedAt;
+  }
+
+  /**
+   * Opens a session with the way it was opened (V1180).
+   *
+   * @param sessionId session id
+   * @param username user
+   * @param issuedAt sign-in time
+   * @param expiresAt absolute end of the session
+   * @param signInMethod PASSWORD, OIDC or SAML
+   * @param secondFactor whether a second factor was checked
+   * @param refreshHash SHA-256 of the first refresh token
+   */
+  public UserSession(
+      String sessionId,
+      String username,
+      Instant issuedAt,
+      Instant expiresAt,
+      String signInMethod,
+      boolean secondFactor,
+      String refreshHash) {
+    this(sessionId, username, issuedAt, expiresAt);
+    this.signInMethod = signInMethod;
+    this.secondFactor = secondFactor;
+    this.refreshHash = refreshHash;
+  }
+
+  /**
+   * Replaces the refresh token of the session: the current one becomes the previous one (still
+   * accepted during the grace period, for a second tab renewing at the same moment).
+   *
+   * @param newHash SHA-256 of the new refresh token
+   * @param when time of the renewal
+   */
+  public void rotateRefresh(String newHash, Instant when) {
+    this.previousRefreshHash = refreshHash;
+    this.refreshHash = newHash;
+    this.refreshedAt = when;
   }
 
   /**
@@ -137,5 +190,50 @@ public class UserSession {
 
   public SessionEndReason getEndReason() {
     return endReason;
+  }
+
+  /**
+   * SHA-256 of the current refresh token.
+   *
+   * @return hash, null for a session without refresh
+   */
+  public String getRefreshHash() {
+    return refreshHash;
+  }
+
+  /**
+   * SHA-256 of the refresh token the current one replaced.
+   *
+   * @return hash, null before the first renewal
+   */
+  public String getPreviousRefreshHash() {
+    return previousRefreshHash;
+  }
+
+  /**
+   * Time of the last renewal.
+   *
+   * @return time, null before the first renewal
+   */
+  public Instant getRefreshedAt() {
+    return refreshedAt;
+  }
+
+  /**
+   * How the session was opened.
+   *
+   * @return PASSWORD, OIDC or SAML
+   */
+  public String getSignInMethod() {
+    return signInMethod;
+  }
+
+  /**
+   * Whether a second factor was checked at the sign-in.
+   *
+   * @return true with a second factor
+   */
+  public boolean isSecondFactor() {
+    return secondFactor;
   }
 }

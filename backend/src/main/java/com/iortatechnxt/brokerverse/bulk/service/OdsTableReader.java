@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.bulk.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.office.OfficeFileLimits;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,13 +21,18 @@ import org.xml.sax.SAXException;
 /**
  * Reads the first table of an OpenDocument spreadsheet (content.xml) into text cells, expanding
  * repeated rows and columns (bounded) and trimming trailing blank cells. The XML parser is hardened
- * against external entities.
+ * against external entities; the archive is read within {@link OfficeFileLimits} (number of parts,
+ * uncompressed size of content.xml, expansion ratio), and the expanded table is limited to 100,000
+ * rows of 1,024 columns.
  */
 final class OdsTableReader {
 
   private static final String TABLE_NS = "urn:oasis:names:tc:opendocument:xmlns:table:1.0";
   private static final String OFFICE_NS = "urn:oasis:names:tc:opendocument:xmlns:office:1.0";
   private static final int MAX_REPEAT = 1000;
+  private static final int MAX_ROWS = 100_000;
+  private static final int MAX_COLUMNS = 1024;
+  private static final int MAX_NUMBER_DIGITS = 100;
   private static final int ISO_DATE_LENGTH = 10;
 
   private OdsTableReader() {}
@@ -43,10 +49,12 @@ final class OdsTableReader {
   static List<List<String>> read(byte[] content)
       throws IOException, SAXException, ParserConfigurationException {
     try (ZipInputStream zip = new ZipInputStream(new ByteArrayInputStream(content))) {
+      int entries = 0;
       ZipEntry entry = zip.getNextEntry();
       while (entry != null) {
+        OfficeFileLimits.requireEntryCount(++entries);
         if ("content.xml".equals(entry.getName())) {
-          return table(parse(zip));
+          return table(parse(OfficeFileLimits.boundedEntry(zip, content.length)));
         }
         entry = zip.getNextEntry();
       }
@@ -79,6 +87,10 @@ final class OdsTableReader {
       Element row = (Element) rows.item(r);
       List<String> cells = cells(row);
       int times = cells.isEmpty() ? 1 : repeat(row, "number-rows-repeated");
+      if (result.size() + times > MAX_ROWS) {
+        throw new BusinessRuleException(
+            "BULK_FILE_TOO_LARGE", "The spreadsheet has more than " + MAX_ROWS + " rows");
+      }
       for (int k = 0; k < times; k++) {
         result.add(cells);
       }
@@ -93,7 +105,7 @@ final class OdsTableReader {
       if (children.item(c) instanceof Element cell && isCell(cell)) {
         String value = value(cell);
         int times = repeat(cell, "number-columns-repeated");
-        for (int k = 0; k < times; k++) {
+        for (int k = 0; k < times && cells.size() < MAX_COLUMNS; k++) {
           cells.add(value);
         }
       }
@@ -116,11 +128,24 @@ final class OdsTableReader {
       return date.length() >= ISO_DATE_LENGTH ? date.substring(0, ISO_DATE_LENGTH) : date;
     }
     if ("float".equals(type) || "currency".equals(type) || "percentage".equals(type)) {
-      return new BigDecimal(cell.getAttributeNS(OFFICE_NS, "value"))
-          .stripTrailingZeros()
-          .toPlainString();
+      return number(cell.getAttributeNS(OFFICE_NS, "value"));
     }
     return cell.getTextContent();
+  }
+
+  /** The plain digits of a number; an extreme exponent (e.g. 1E+999999999) stays as written. */
+  private static String number(String value) {
+    BigDecimal number;
+    try {
+      number = new BigDecimal(value.trim()).stripTrailingZeros();
+    } catch (NumberFormatException e) {
+      return value;
+    }
+    if (Math.abs((long) number.scale()) > MAX_NUMBER_DIGITS
+        || number.precision() > MAX_NUMBER_DIGITS) {
+      return value;
+    }
+    return number.toPlainString();
   }
 
   private static int repeat(Element e, String attribute) {
@@ -128,6 +153,10 @@ final class OdsTableReader {
     if (v.isEmpty()) {
       return 1;
     }
-    return Math.min(Integer.parseInt(v), MAX_REPEAT);
+    try {
+      return Math.max(1, Math.min(Integer.parseInt(v.trim()), MAX_REPEAT));
+    } catch (NumberFormatException invalid) {
+      return MAX_REPEAT;
+    }
   }
 }

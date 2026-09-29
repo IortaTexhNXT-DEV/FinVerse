@@ -101,41 +101,69 @@ class BulkServiceIT {
           .isEqualTo("Completed");
     }
 
-    // Error file: the five rows not processed, in the template layout with an Error column last
-    // and the named cells highlighted, ready to correct and upload again.
-    try (XSSFWorkbook errors =
-        new XSSFWorkbook(new ByteArrayInputStream(bulk.errorFile(job.getId())))) {
+    // Error file: the five rows not processed, in the guided template layout (title block and
+    // column guide kept) with an Error column last and the named cells highlighted, ready to
+    // correct and upload again as it is.
+    byte[] errorFile = bulk.errorFile(job.getId());
+    try (XSSFWorkbook errors = new XSSFWorkbook(new ByteArrayInputStream(errorFile))) {
       var sheet = errors.getSheet("Data");
-      assertThat(sheet.getPhysicalNumberOfRows()).isEqualTo(6);
-      assertThat(sheet.getRow(0).getCell(0).getStringCellValue()).isEqualTo("Plate No");
-      assertThat(sheet.getRow(0).getCell(5).getStringCellValue()).isEqualTo("Error");
-      var missingPlate = sheet.getRow(3);
-      assertThat(missingPlate.getCell(5).getStringCellValue()).contains("Plate No is mandatory");
-      assertThat(missingPlate.getCell(0).getCellStyle().getFillPattern())
-          .isEqualTo(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND);
+      int header = headerRow(sheet);
+      assertThat(sheet.getRow(header - 1).getCell(0).getStringCellValue())
+          .isEqualTo("What to enter");
+      assertThat(sheet.getRow(header).getCell(1).getStringCellValue()).isEqualTo("Plate No *");
+      assertThat(sheet.getRow(header).getCell(6).getStringCellValue()).isEqualTo("Error");
+      assertThat(sheet.getLastRowNum()).isEqualTo(header + 5);
+      var missingPlate = sheet.getRow(header + 3);
+      assertThat(missingPlate.getCell(6).getStringCellValue()).contains("Plate No is mandatory");
       assertThat(missingPlate.getCell(1).getCellStyle().getFillPattern())
+          .isEqualTo(org.apache.poi.ss.usermodel.FillPatternType.SOLID_FOREGROUND);
+      assertThat(missingPlate.getCell(2).getCellStyle().getFillPattern())
           .isEqualTo(org.apache.poi.ss.usermodel.FillPatternType.NO_FILL);
       // Dates are date cells shown as dd-MMM-yyyy (read back as dates on upload); a value that
       // is not a date stays as the user typed it.
-      var tooHigh = sheet.getRow(2).getCell(2);
+      var tooHigh = sheet.getRow(header + 2).getCell(3);
       assertThat(tooHigh.getLocalDateTimeCellValue().toLocalDate())
           .isEqualTo(java.time.LocalDate.of(2026, 11, 15));
       assertThat(tooHigh.getCellStyle().getDataFormatString()).isEqualTo("dd-mmm-yyyy");
-      assertThat(sheet.getRow(4).getCell(2).getStringCellValue()).isEqualTo("31-12-2026");
+      assertThat(sheet.getRow(header + 4).getCell(3).getStringCellValue()).isEqualTo("31-12-2026");
     }
+    // The error file is uploaded again as it is: its guide rows are skipped, its rows read.
+    BulkJob again = upload("errors.xlsx", errorFile);
+    assertThat(again.getTotalRows()).isEqualTo(5);
+    as.run("proc", () -> bulk.cancel(again.getId()));
+  }
+
+  private static int headerRow(org.apache.poi.ss.usermodel.Sheet sheet) {
+    for (int r = 0; r <= sheet.getLastRowNum(); r++) {
+      var row = sheet.getRow(r);
+      if (row != null
+          && row.getCell(0) != null
+          && "What to enter".equals(row.getCell(0).getStringCellValue())) {
+        return r + 1;
+      }
+    }
+    throw new AssertionError("no column guide");
   }
 
   @Test
   void templateRoundTripsAsXlsxAndOdsIsAccepted() throws IOException {
     byte[] template = as.run("proc", () -> bulk.template(TestBulkHandler.CODE));
-    BulkJob fromTemplate = upload("template.xlsx", template);
+    // Uploaded untouched, the template has no data: the guide and the example row are skipped.
+    assertThatThrownBy(() -> upload("template.xlsx", template))
+        .extracting("code")
+        .isEqualTo("BULK_FILE_EMPTY");
+    BulkJob fromTemplate = upload("template.xlsx", filledIn(template));
+    assertThat(fromTemplate.getTotalRows()).isEqualTo(1);
     assertThat(fromTemplate.getValidRows()).isEqualTo(1);
-    assertThat(
-            bulk.values(
-                bulk.rows(fromTemplate.getId(), null, Pageable.ofSize(5)).getContent().get(0)))
-        .containsEntry("Plate No", "ABC1234")
-        .containsEntry("Amount", "850000.00")
-        .containsEntry("Inception", "2026-10-01");
+    var row = bulk.rows(fromTemplate.getId(), null, Pageable.ofSize(5)).getContent().get(0);
+    assertThat(bulk.values(row))
+        .containsEntry("Plate No", "XLS1")
+        .containsEntry("Amount", "850000")
+        .containsEntry("Inception", "2026-10-01")
+        .containsEntry("Fleet", "Y");
+    try (XSSFWorkbook wb = new XSSFWorkbook(new ByteArrayInputStream(template))) {
+      assertThat(row.getRowNo()).isEqualTo(headerRow(wb.getSheet("Data")) + 3);
+    }
     as.run("proc", () -> bulk.cancel(fromTemplate.getId()));
     assertThat(bulk.job(fromTemplate.getId()).getStatus()).isEqualTo(BulkJobStatus.CANCELLED);
 
@@ -186,6 +214,46 @@ class BulkServiceIT {
                                 null))))
         .extracting("code")
         .isEqualTo("BULK_NOT_PERMITTED");
+  }
+
+  /** The template with one row typed below the example row, as a user fills it in. */
+  private static byte[] filledIn(byte[] template) throws IOException {
+    try (XSSFWorkbook wb = new XSSFWorkbook(new ByteArrayInputStream(template));
+        ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+      var sheet = wb.getSheet("Data");
+      var row = sheet.createRow(headerRow(sheet) + 2);
+      row.createCell(1).setCellValue("xls 1");
+      row.createCell(2).setCellValue(850000d);
+      row.createCell(3).setCellValue(java.time.LocalDate.of(2026, 10, 1));
+      row.getCell(3).setCellStyle(sheet.getColumnStyle(3));
+      row.createCell(4).setCellValue("Y");
+      wb.write(out);
+      return out.toByteArray();
+    }
+  }
+
+  @Test
+  void aPlainWorkbookWithTheHeadersInRowOneIsStillAccepted() throws IOException {
+    try (XSSFWorkbook wb = new XSSFWorkbook();
+        ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+      var sheet = wb.createSheet("Data");
+      var header = sheet.createRow(0);
+      String[] headers = {"Plate No", "Amount", "Inception", "Fleet", "Remarks"};
+      for (int c = 0; c < headers.length; c++) {
+        header.createCell(c).setCellValue(headers[c]);
+      }
+      var row = sheet.createRow(1);
+      row.createCell(0).setCellValue("PLAIN 1");
+      row.createCell(1).setCellValue("100");
+      row.createCell(2).setCellValue("15-Jan-2027");
+      wb.write(out);
+      BulkJob plain = upload("plain.xlsx", out.toByteArray());
+      assertThat(plain.getValidRows()).isEqualTo(1);
+      var stored = bulk.rows(plain.getId(), null, Pageable.ofSize(5)).getContent().get(0);
+      assertThat(stored.getRowNo()).isEqualTo(2);
+      assertThat(bulk.values(stored)).containsEntry("Inception", "2027-01-15");
+      as.run("proc", () -> bulk.cancel(plain.getId()));
+    }
   }
 
   private static byte[] ods() throws IOException {

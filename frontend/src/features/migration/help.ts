@@ -48,7 +48,7 @@ export const MIGRATION_HELP: HelpSection = {
       name: 'Layouts and Rules',
       path: '/migration/layouts',
       summary:
-        'The extract layouts in force with their columns, types, code maps and validations - the single source of the load templates. Download the template of a layout, the object workbook, the control file template or the workbook of all objects with its control file and How to fill sheets. The data-quality rules and the masking rules of non-production extracts are listed here.',
+        'The extract layouts in force with their columns, types, code maps and validations - the single source of the load templates. Download the Excel load template of a layout (one guided sheet: what it is for, the rules of a delivery and, above each column, whether it is mandatory, its format, allowed values and what to enter), the object workbook or the workbook of all objects (a Start here sheet and one guided sheet per layout), and the control file template. A filled Excel template is uploaded as it is on Extracts; large extracts use the CSV layout of the same columns. The data-quality rules and the masking rules of non-production extracts are listed here.',
       controls: [
         'A layout is frozen before its extracts are accepted; a new version retires the previous one.',
         'Outside production the personal data of the extracts is masked on intake.',

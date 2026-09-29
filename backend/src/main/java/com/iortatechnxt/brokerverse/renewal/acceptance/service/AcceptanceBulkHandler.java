@@ -62,10 +62,21 @@ public class AcceptanceBulkHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "Account officers recording the clients' renewal acceptances";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Renewal > Letters, button Upload Acceptances";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(REFERENCE, "Renewal reference", "RNW-2027-000001"),
-        BulkColumn.required(METHOD, "E-mail or Payment", "Payment"),
+        BulkColumn.required(REFERENCE, "Renewal reference", "RNW-2027-000001").master("renewal"),
+        BulkColumn.required(METHOD, "How the client accepted", "Payment")
+            .values("E-mail", "Payment"),
         BulkColumn.required(EVIDENCE, "E-mail reference or payment reference", "OR-2027-001122"),
         new BulkColumn(ACCEPTED_ON, "Date accepted", false, BulkColumn.Type.DATE, "2027-08-20"),
         BulkColumn.optional(REMARKS, "Remarks", ""));

@@ -26,7 +26,8 @@ function wrap(children: ReactNode, path = '/', permissions: ReadonlySet<string> 
   const auth = {
     user: null,
     loading: false,
-    login: () => Promise.resolve(),
+    login: () => Promise.resolve({ expiresAt: '' }),
+    completeSignIn: () => undefined,
     logout: () => undefined,
     can: (p: string) => permissions.has(p),
     passwordChange: null,

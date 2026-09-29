@@ -65,11 +65,22 @@ public class LamdSnapshotHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The Submitted Policies team, from the LAMD loan snapshot of the bank";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Submitted Policies > Upload & Intake, button Upload LAMD Snapshot";
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
         BulkColumn.required(PN, "Promissory note number of the loan", "PN-2026-000123"),
         BulkColumn.optional("Borrower", "Borrower name", "Juan Dela Cruz"),
-        BulkColumn.required(STATUS, "Active, Open Market, Fully Paid or Remedial", "Active"),
+        BulkColumn.required(STATUS, "Status of the loan", "Active")
+            .values("Active", "Open Market", "Fully Paid", "Remedial"),
         new BulkColumn("Amortised", "Y when the loan is amortised", false, Type.YES_NO, "N"),
         new BulkColumn("Maturity Date", "Loan maturity date", false, Type.DATE, "2029-06-30"),
         BulkColumn.optional("Originating Unit", "Originating unit", "Auto Loans"),

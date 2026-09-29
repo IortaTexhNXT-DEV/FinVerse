@@ -125,10 +125,7 @@ export function tileTone(count: number, severity: Severity): string {
   }
 }
 
-/** An external link's address when it is a web address; anything else is shown as text only. */
-export function safeUrl(url: string | undefined): string | undefined {
-  return url !== undefined && /^https?:\/\//i.test(url) ? url : undefined;
-}
+export { safeUrl } from '@/utils/safeUrl';
 
 /** Tabs of Invoice 360 that list the records of one Operations module. */
 export const RELATED_TABS = [

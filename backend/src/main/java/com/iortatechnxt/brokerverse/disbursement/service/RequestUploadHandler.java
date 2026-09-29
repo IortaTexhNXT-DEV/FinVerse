@@ -61,20 +61,36 @@ public class RequestUploadHandler implements BulkImportHandler {
   }
 
   @Override
+  public String filledBy() {
+    return "The units requesting payments (their request-for-payment list)";
+  }
+
+  @Override
+  public String uploadPath() {
+    return DisbursementUploadGuide.path("Payment Requests");
+  }
+
+  @Override
   public List<BulkColumn> columns() {
     return List.of(
         BulkColumn.required(
             RFP, "Request-for-payment number of the requesting unit", "RFP-2026-0101"),
-        BulkColumn.required(
-            TYPE, "LOV DISBURSEMENT_TYPE (SUPPLIER, EMPLOYEE, OTHER...)", "SUPPLIER"),
-        BulkColumn.required("Payee code", "Party code of the payee", "SUP-0001"),
-        BulkColumn.optional("Payee name", "Payee name (second match key)", "Acme Office Supply"),
-        BulkColumn.required(CURRENCY, "ISO currency", BulkColumn.BASE_CURRENCY_EXAMPLE),
+        BulkColumn.required(TYPE, "Type of disbursement", "SUPPLIER").lov("DISBURSEMENT_TYPE"),
+        BulkColumn.required("Payee code", "Party code of the payee", "SUP-0001").master("payee"),
+        BulkColumn.optional(
+            "Payee name",
+            "Name of the payee, checked against the payee code",
+            "Acme Office Supply"),
+        BulkColumn.required(CURRENCY, "Currency of the payment", BulkColumn.BASE_CURRENCY_EXAMPLE)
+            .format("ISO currency code, 3 letters")
+            .master("currency"),
         new BulkColumn(AMOUNT, "Gross amount", true, Type.NUMBER, "12500.00"),
         BulkColumn.required("Purpose", "What is paid", "Office supplies September"),
-        BulkColumn.optional("Root invoice no", "Invoice family, when any", ""),
-        BulkColumn.optional("Expense account", "Expense account of an OTHER payment", ""),
-        BulkColumn.optional("Cost centre", "Cost centre of the expense", ""));
+        BulkColumn.optional("Root invoice no", "Root invoice of the invoice family, when any", ""),
+        BulkColumn.optional("Expense account", "GL expense account of the payment", "")
+            .when("Disbursement type is OTHER")
+            .master("GL account"),
+        BulkColumn.optional("Cost centre", "Cost centre of the expense", "").master("cost centre"));
   }
 
   @Override

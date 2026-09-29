@@ -25,7 +25,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 /**
  * Logout (UAM BRD-11): the token is revoked on every instance (denylist keyed by {@code jti}) and
- * the logout is audited; tokens issued before token ids existed stay valid until they expire.
+ * the logout is audited; a token without a sign-in session is refused.
  */
 @IntegrationTest
 class LogoutIT {
@@ -62,7 +62,7 @@ class LogoutIT {
   }
 
   @Test
-  void aTokenWithoutTokenIdIsAcceptedUntilItExpires() throws Exception {
+  void aTokenWithoutASessionIsRefused() throws Exception {
     String legacy =
         Jwts.builder()
             .issuer("inxt-brokerverse")
@@ -71,11 +71,9 @@ class LogoutIT {
             .expiration(Date.from(Instant.now().plusSeconds(600)))
             .signWith(Keys.hmacShaKeyFor(properties.jwtSecret().getBytes(StandardCharsets.UTF_8)))
             .compact();
-    assertThat(tokens.parse(legacy).orElseThrow().tokenId()).isNull();
+    assertThat(tokens.parse(legacy)).isEmpty();
     mvc.perform(get("/api/v1/auth/me").header(HttpHeaders.AUTHORIZATION, BEARER + legacy))
-        .andExpect(status().isOk());
-    mvc.perform(post("/api/v1/auth/logout").header(HttpHeaders.AUTHORIZATION, BEARER + legacy))
-        .andExpect(status().isNoContent());
+        .andExpect(status().isUnauthorized());
     assertThat(tokens.parse("not-a-token")).isEmpty();
   }
 

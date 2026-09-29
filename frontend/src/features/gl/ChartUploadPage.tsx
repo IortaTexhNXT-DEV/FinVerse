@@ -129,7 +129,7 @@ function UploadPanel() {
             <Field
               label="Chart file"
               required
-              hint="Excel (.xlsx), OpenDocument (.ods) or CSV, headers in row 1."
+              hint="The Excel template as it is, or OpenDocument (.ods) or CSV with the headers in row 1."
             >
               {(id) => (
                 <FileDropZone

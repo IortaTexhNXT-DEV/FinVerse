@@ -13,10 +13,28 @@ import { formatAmount, formatDateTime, humanize } from '@/utils/format';
 import { ContactDetailsCard } from './ContactDetailsCard';
 import { PasswordChangeForm } from './PasswordChangeForm';
 import { policyHint } from './passwordRules';
+import { SecondFactorCard } from './SecondFactorCard';
 import { SessionsTable } from './SessionsTable';
 import { Notice } from '@/components/ui/Notice';
 
 const SESSIONS_PAGE = 10;
+
+/** Whether the users sign in at the organisation's identity provider (single sign-on). */
+function signsInThroughOrganisation(status: PasswordStatus | undefined): boolean {
+  return status?.authMode === 'OIDC' || status?.authMode === 'SAML';
+}
+
+/** The dates of the password in words. */
+function passwordDates(status: PasswordStatus | undefined): string[] {
+  return [
+    status?.passwordChangedAt === undefined
+      ? undefined
+      : `Last changed ${formatDateTime(status.passwordChangedAt)}.`,
+    status?.passwordExpiresAt === undefined
+      ? undefined
+      : `Expires ${formatDateTime(status.passwordExpiresAt)}.`,
+  ].filter((t): t is string => t !== undefined);
+}
 
 function ChangePassword({ status }: Readonly<{ status: PasswordStatus | undefined }>) {
   const toast = useToast();
@@ -33,23 +51,23 @@ function ChangePassword({ status }: Readonly<{ status: PasswordStatus | undefine
     return (
       <Card title="Password">
         <Notice tone="info">
-          You sign in with your network password. Change it through the corporate directory, not in
-          BrokerVerse.
+          You sign in with your organisation&apos;s network password. Change it through your
+          organisation&apos;s directory, not here.
         </Notice>
       </Card>
     );
   }
-  const dates = [
-    status?.passwordChangedAt === undefined
-      ? undefined
-      : `Last changed ${formatDateTime(status.passwordChangedAt)}.`,
-    status?.passwordExpiresAt === undefined
-      ? undefined
-      : `Expires ${formatDateTime(status.passwordExpiresAt)}.`,
-  ].filter((t): t is string => t !== undefined);
+  const singleSignOn = signsInThroughOrganisation(status);
+  const dates = passwordDates(status);
   return (
     <Card title="Change password">
       <div className="stack">
+        {singleSignOn && (
+          <Notice tone="info">
+            You sign in through your organisation. This password is used only by the emergency
+            administrators.
+          </Notice>
+        )}
         {dates.length > 0 && <p className="muted">{dates.join(' ')}</p>}
         <PasswordChangeForm
           requireCurrent
@@ -87,7 +105,8 @@ function MySessions() {
 
 /**
  * The signed-in user's profile (FR-UA-004, FR-UA-005): details, roles and permissions, contact
- * details (UQ17), the password with its rules (UAM-NFR-36) and the recent sessions (UAM-NFR-35).
+ * details (UQ17), the second factor, the password with its rules (UAM-NFR-36) and the recent
+ * sessions (UAM-NFR-35).
  */
 export default function MyProfilePage() {
   const { user } = useAuth();
@@ -155,6 +174,7 @@ export default function MyProfilePage() {
           </div>
         </div>
       </Card>
+      <SecondFactorCard />
       <ChangePassword status={status.data} />
       <MySessions />
     </div>

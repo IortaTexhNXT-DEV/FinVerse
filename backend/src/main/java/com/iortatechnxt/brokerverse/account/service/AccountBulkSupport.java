@@ -82,6 +82,15 @@ public class AccountBulkSupport {
   /** Parameter: submit the accounts to Processing on commit. */
   static final String SUBMIT = "submit";
 
+  private static final String MOTOR =
+      "the product is a motor product and its minimum fields ask for it";
+  private static final String FIRE =
+      "the product is a fire product and its minimum fields ask for it";
+
+  /** Who fills the account templates in. */
+  static final String FILLED_BY =
+      "Account officers of the branches and the New Business processing team";
+
   private static final Set<String> IDENTIFIERS =
       Set.of(Headers.PLATE, Headers.CONDUCTION, Headers.ENGINE, Headers.CHASSIS);
   private static final String LIST_SEPARATOR = "[;|]";
@@ -145,25 +154,40 @@ public class AccountBulkSupport {
   static List<BulkColumn> itemColumns() {
     return List.of(
         number(Headers.SUM_INSURED, "Sum insured of the item", true, "850000"),
-        number(Headers.RATE, "Premium rate in percent (empty = product default)", false, "1.3"),
-        BulkColumn.optional(Headers.PLATE, "Motor: plate number", "ABC 1234"),
-        BulkColumn.optional(Headers.CONDUCTION, "Motor: conduction sticker (new vehicle)", ""),
-        BulkColumn.optional(Headers.ENGINE, "Motor: engine / motor number", "4A91-123456"),
-        BulkColumn.optional(Headers.CHASSIS, "Motor: chassis / serial number", "MHF12345678"),
-        BulkColumn.optional(Headers.MAKE, "Motor: make", "Toyota"),
-        BulkColumn.optional(Headers.MODEL, "Motor: model", "Vios 1.3 E"),
-        number(Headers.YEAR, "Motor: year model", false, "2026"),
-        BulkColumn.optional(Headers.BODY, "Motor: body type (list VEHICLE_BODY_TYPE)", "SEDAN"),
-        BulkColumn.optional(Headers.ADDRESS, "Fire: full address of risk", "12 Mabini St."),
-        BulkColumn.optional(Headers.CITY, "Fire: city / municipality", "Makati"),
-        BulkColumn.optional(Headers.PROVINCE, "Fire: province", "Metro Manila"),
-        BulkColumn.optional(Headers.OCCUPANCY, "Fire: occupancy (list OCCUPANCY)", "DWELLING"),
-        BulkColumn.optional(
-            Headers.CONSTRUCTION, "Fire: construction class (list CONSTRUCTION_CLASS)", "CLASS_1"),
+        number(Headers.RATE, "Premium rate in percent; blank for the product's rate", false, "1.3")
+            .format("Number in percent, e.g. 1.3 for 1.3%"),
+        BulkColumn.optional(Headers.PLATE, "Motor: plate number", "ABC 1234")
+            .when(MOTOR + " (plate number or conduction sticker)"),
+        BulkColumn.optional(Headers.CONDUCTION, "Motor: conduction sticker of a new vehicle", "")
+            .when(MOTOR + " (new vehicle without plate)"),
+        BulkColumn.optional(Headers.ENGINE, "Motor: engine (motor) number", "4A91-123456")
+            .when(MOTOR),
+        BulkColumn.optional(Headers.CHASSIS, "Motor: chassis (serial) number", "MHF12345678")
+            .when(MOTOR),
+        BulkColumn.optional(Headers.MAKE, "Motor: make of the vehicle", "Toyota").when(MOTOR),
+        BulkColumn.optional(Headers.MODEL, "Motor: model of the vehicle", "Vios 1.3 E").when(MOTOR),
+        number(Headers.YEAR, "Motor: year model", false, "2026")
+            .when(MOTOR)
+            .format("Year, 4 digits"),
+        BulkColumn.optional(Headers.BODY, "Motor: body type", "SEDAN")
+            .when(MOTOR)
+            .lov("VEHICLE_BODY_TYPE"),
+        BulkColumn.optional(Headers.ADDRESS, "Fire: full address of the risk", "12 Mabini St.")
+            .when(FIRE),
+        BulkColumn.optional(Headers.CITY, "Fire: city or municipality", "Makati").when(FIRE),
+        BulkColumn.optional(Headers.PROVINCE, "Fire: province", "Metro Manila").when(FIRE),
+        BulkColumn.optional(Headers.OCCUPANCY, "Fire: occupancy of the risk", "DWELLING")
+            .when(FIRE)
+            .lov("OCCUPANCY"),
+        BulkColumn.optional(Headers.CONSTRUCTION, "Fire: construction class", "CLASS_1")
+            .when(FIRE)
+            .lov("CONSTRUCTION_CLASS"),
         BulkColumn.optional(
             Headers.ITEMS_INSURED, "Fire: item insured for the sum on the row", "Building"),
-        BulkColumn.optional(Headers.DESCRIPTION, "Other lines: description of the risk", ""),
-        BulkColumn.optional(Headers.PERSON, "Personal accident: insured person", ""));
+        BulkColumn.optional(Headers.DESCRIPTION, "Other lines: description of the risk", "")
+            .when("the product is neither motor, fire nor personal accident"),
+        BulkColumn.optional(Headers.PERSON, "Personal accident: name of the insured person", "")
+            .when("the product is a personal accident product"));
   }
 
   /**

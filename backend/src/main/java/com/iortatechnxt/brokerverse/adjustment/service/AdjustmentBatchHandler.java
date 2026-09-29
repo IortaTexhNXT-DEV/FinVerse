@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.bulk.service.BulkColumn;
 import com.iortatechnxt.brokerverse.bulk.service.BulkContext;
 import com.iortatechnxt.brokerverse.bulk.service.BulkImportHandler;
 import com.iortatechnxt.brokerverse.bulk.service.BulkRow;
+import com.iortatechnxt.brokerverse.common.excel.GuideColumn.Choice;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import java.util.ArrayList;
@@ -87,25 +88,44 @@ public class AdjustmentBatchHandler implements BulkImportHandler {
 
   @Override
   public String instructions() {
-    return "One request per row on a booked invoice. Endorsement Type is a code of the list"
-        + " ENDORSEMENT_TYPE (FIN_, NF_, INT_); Request Type, Reason and Refund Basis (PRO_RATA or"
-        + " SHORT_PERIOD) are codes of their lists. Give the TSI change for a change of sum"
-        + " insured, or the premium component changes for an amount change. Each request is raised"
-        + " and submitted for validation.";
+    return "One request per row on a booked invoice. Endorsement Type, Request Type, Reason and"
+        + " Refund Basis are codes of their lists (drop-downs). Give the TSI change for a change"
+        + " of sum insured, or the premium component changes for an amount change. Each request"
+        + " is raised and submitted for validation.";
+  }
+
+  @Override
+  public String filledBy() {
+    return "Account officers and the endorsement team";
+  }
+
+  @Override
+  public String uploadPath() {
+    return "Adjustment > Batch Request Upload";
   }
 
   @Override
   public List<BulkColumn> columns() {
     return List.of(
-        BulkColumn.required(
-            INVOICE, "Invoice number of the Operations ledger", "BI-HO-2026-000001"),
-        BulkColumn.required(TYPE, "Endorsement type code", "FIN_CHANGE_COVER"),
+        BulkColumn.required(INVOICE, "Booked invoice of the Operations ledger", "BI-HO-2026-000001")
+            .master("booked invoice"),
+        BulkColumn.required(TYPE, "Endorsement type", "FIN_CHANGE_COVER")
+            .lov(RequestRules.TYPE_LOV),
         BulkColumn.optional(
-            REQUEST_TYPE, "Request type code of the endorsement slip", "FLAT_CANCELLATION"),
-        BulkColumn.optional(REASON, "Cancellation reason code", "UNIT_SOLD"),
-        BulkColumn.optional(REFERENCE, "Insurer endorsement reference", "END-2026-0001"),
-        new BulkColumn(EFFECTIVE, "Effective date", true, BulkColumn.Type.DATE, "2026-10-01"),
-        BulkColumn.optional(BASIS, "PRO_RATA or SHORT_PERIOD", "PRO_RATA"),
+                REQUEST_TYPE, "Request type of the endorsement slip", "FLAT_CANCELLATION")
+            .when("the endorsement type is financial")
+            .lov(RequestRules.REQUEST_TYPE_LOV),
+        BulkColumn.optional(REASON, "Reason of a cancellation", "UNIT_SOLD")
+            .when("the request cancels the policy")
+            .lov(RequestRules.REASON_LOV),
+        BulkColumn.optional(REFERENCE, "Endorsement reference of the insurer", "END-2026-0001"),
+        new BulkColumn(
+            EFFECTIVE, "Effective date of the change", true, BulkColumn.Type.DATE, "2026-10-01"),
+        BulkColumn.optional(BASIS, "How a refund is computed", "PRO_RATA")
+            .choices(
+                List.of(
+                    new Choice("PRO_RATA", "Pro rata: days remaining over the days of the year"),
+                    new Choice("SHORT_PERIOD", "Short-period table percentage"))),
         number(TSI, "-100000"),
         number(BASIC, "-1000.00"),
         number(DST, ""),
@@ -120,7 +140,12 @@ public class AdjustmentBatchHandler implements BulkImportHandler {
 
   private static BulkColumn number(String header, String example) {
     return new BulkColumn(
-        header, header + " change (signed)", false, BulkColumn.Type.NUMBER, example);
+            header,
+            "Change of the " + header + "; negative for a decrease",
+            false,
+            BulkColumn.Type.NUMBER,
+            example)
+        .format("Signed number without thousands separators, e.g. -1000.00");
   }
 
   @Override

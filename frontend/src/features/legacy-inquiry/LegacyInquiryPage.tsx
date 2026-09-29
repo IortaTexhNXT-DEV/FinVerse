@@ -9,6 +9,7 @@ import type {
   InquirySettings,
 } from '@/api/legacyInquiry';
 import { useAuth } from '@/auth/authContext';
+import { safeUrl } from '@/utils/safeUrl';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { CellStack } from '@/components/ui/CellStack';
@@ -155,11 +156,15 @@ function SearchCard({
       {links.length > 0 && (
         <p className="muted">
           Read-only legacy applications:{' '}
-          {links.map((l) => (
-            <a key={l.system} href={l.url} target="_blank" rel="noreferrer">
-              {l.system}{' '}
-            </a>
-          ))}
+          {links.map((l) =>
+            safeUrl(l.url) === undefined ? (
+              <span key={l.system}>{l.system} </span>
+            ) : (
+              <a key={l.system} href={safeUrl(l.url)} target="_blank" rel="noreferrer">
+                {l.system}{' '}
+              </a>
+            ),
+          )}
         </p>
       )}
     </Card>

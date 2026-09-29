@@ -20,6 +20,7 @@ import com.iortatechnxt.brokerverse.remittance.service.RemittanceRules.Position;
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 
@@ -194,10 +195,45 @@ class RemittanceRulesTest {
     assertThat(rows.get(1).get("amount")).isEmpty();
     assertThatThrownBy(() -> rows.get(1).require("amount"))
         .isInstanceOf(BusinessRuleException.class)
-        .hasMessageContaining("Line 3");
+        .hasMessageContaining("Line 4");
     assertThatThrownBy(() -> CsvRows.parse(new byte[0], Set.of()))
         .isInstanceOf(BusinessRuleException.class);
     assertThatThrownBy(() -> CsvRows.parse("a;b\n".getBytes(StandardCharsets.UTF_8), Set.of("c")))
         .isInstanceOf(BusinessRuleException.class);
+  }
+
+  @Test
+  void aGuidedTemplateIsReadBelowItsGuideWithoutItsExample() {
+    byte[] guided =
+        com.iortatechnxt.brokerverse.common.excel.GuidedTemplateWriter.write(
+            com.iortatechnxt.brokerverse.common.excel.GuidedTemplate.single(
+                "Holds",
+                "",
+                "",
+                "",
+                List.of(),
+                com.iortatechnxt.brokerverse.common.excel.GuidedSheet.of(
+                    "Holds",
+                    "Holds",
+                    "",
+                    List.of(
+                        com.iortatechnxt.brokerverse.common.excel.GuideColumn.of(
+                                "invoiceNo",
+                                com.iortatechnxt.brokerverse.common.excel.GuideColumn.Kind.TEXT,
+                                "Invoice")
+                            .mandatory()
+                            .example("INV-EXAMPLE")))));
+    assertThat(CsvRows.parse(guided, Set.of("invoiceNo"))).isEmpty();
+    String savedAsCsv =
+        "Holds\nMandatory,Yes\nWhat to enter,Invoice\n,invoiceNo *\n"
+            + "Example – overwrite or delete,INV-EXAMPLE\n,INV-9\n";
+    var rows = CsvRows.parse(savedAsCsv.getBytes(StandardCharsets.UTF_8), Set.of("invoiceNo"));
+    assertThat(rows)
+        .singleElement()
+        .satisfies(
+            r -> {
+              assertThat(r.get("invoiceNo")).isEqualTo("INV-9");
+              assertThat(r.lineNo()).isEqualTo(6);
+            });
   }
 }

@@ -106,8 +106,6 @@ TECHNICAL: list[tuple[str, re.Pattern]] = [(label, re.compile(pat, re.I)) for la
 ]]
 # Phrases a client document may contain although they hold a technical term, each with its reason.
 TECHNICAL_ALLOWED: list[tuple[re.Pattern, str]] = [(re.compile(pat), why) for pat, why in [
-    (r"The legacy details are not valid JSON", "Platform message MIG_ARCHIVE_DETAIL (BRD-13 archive load), quoted word for "
-                                               "word; platform wording fix requested"),
     (r"Negative List Database System", "Name of the BDO system NLDS (BRD-10), not a technical term"),
 ]]
 # Sources of the client documents in src/ (per BRD folder and the drop closure folders).

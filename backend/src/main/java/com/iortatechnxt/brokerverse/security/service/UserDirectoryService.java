@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.service;
 
+import com.iortatechnxt.brokerverse.common.util.AsciiCase;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import com.iortatechnxt.brokerverse.security.domain.Role;
@@ -29,13 +30,29 @@ public class UserDirectoryService {
   }
 
   /**
-   * Lists the directory entries, ordered by login id.
+   * Lists every directory entry with its role name, ordered by login id (server-side use, e.g.
+   * exports; the API gives the role names according to the caller).
    *
    * @return entries
    */
   @Transactional(readOnly = true)
   public List<Entry> entries() {
-    return users.findAll(Sort.by("username")).stream().map(UserDirectoryService::entry).toList();
+    return entries(true, null);
+  }
+
+  /**
+   * Lists the directory entries, ordered by login id.
+   *
+   * @param withRoles whether the role names of every user are given
+   * @param self login id of the caller, whose own role name is always given
+   * @return entries
+   */
+  @Transactional(readOnly = true)
+  public List<Entry> entries(boolean withRoles, String self) {
+    return users.findAll(Sort.by("username")).stream()
+        .map(UserDirectoryService::entry)
+        .map(e -> withRoles || AsciiCase.equalsIgnoreCase(e.username(), self) ? e : e.withoutRole())
+        .toList();
   }
 
   private static Entry entry(AppUser user) {
@@ -59,5 +76,15 @@ public class UserDirectoryService {
    * @param displayName full name shown on screens
    * @param roleName name of the user's main active role, null when none
    */
-  public record Entry(String username, String displayName, String roleName) {}
+  public record Entry(String username, String displayName, String roleName) {
+
+    /**
+     * The entry without its role name.
+     *
+     * @return entry
+     */
+    public Entry withoutRole() {
+      return new Entry(username, displayName, null);
+    }
+  }
 }

@@ -9,6 +9,8 @@ import com.iortatechnxt.brokerverse.bulk.domain.BulkRowRecord;
 import com.iortatechnxt.brokerverse.bulk.domain.BulkRowRepository;
 import com.iortatechnxt.brokerverse.bulk.domain.BulkRowStatus;
 import com.iortatechnxt.brokerverse.bulk.service.ParsedFile.RawRow;
+import com.iortatechnxt.brokerverse.common.excel.GuidedTemplate;
+import com.iortatechnxt.brokerverse.common.excel.GuidedTemplateWriter;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
@@ -51,6 +53,7 @@ public class BulkService {
   private final BulkRowStore store;
   private final TransactionTemplate tx;
   private final UserDirectory users;
+  private final BulkTemplateLists lists;
   private final Clock clock;
   private final OrganizationDirectory organization;
 
@@ -67,6 +70,7 @@ public class BulkService {
    * @param store stored rows (values, commit of one row, outcomes)
    * @param txManager transaction manager
    * @param users user names (result report)
+   * @param lists lists of values of the templates' drop-downs
    * @param clock clock
    */
   @SuppressWarnings("java:S107") // constructor injection
@@ -81,6 +85,7 @@ public class BulkService {
       BulkRowStore store,
       PlatformTransactionManager txManager,
       UserDirectory users,
+      BulkTemplateLists lists,
       Clock clock,
       OrganizationDirectory organization) {
     this.registry = registry;
@@ -93,6 +98,7 @@ public class BulkService {
     this.store = store;
     this.tx = new TransactionTemplate(txManager);
     this.users = users;
+    this.lists = lists;
     this.clock = clock;
     this.organization = organization;
   }
@@ -115,9 +121,20 @@ public class BulkService {
    * @return xlsx bytes
    */
   public byte[] template(String handlerCode, Long companyId) {
-    return BulkWorkbooks.template(
-        registry.require(handlerCode),
-        companyId == null ? null : organization.company(companyId).baseCurrency());
+    return GuidedTemplateWriter.write(
+        BulkTemplates.of(
+            registry.require(handlerCode),
+            lists,
+            maxRows(),
+            companyId == null ? null : organization.company(companyId).baseCurrency()));
+  }
+
+  private GuidedTemplate guided(BulkImportHandler handler) {
+    return BulkTemplates.of(handler, lists, maxRows());
+  }
+
+  private int maxRows() {
+    return parameters.intValue("BULK_MAX_ROWS", DEFAULT_MAX_ROWS);
   }
 
   /**
@@ -132,9 +149,14 @@ public class BulkService {
     if (handler.blocksDuplicateFiles()) {
       requireNewFile(upload, sha256);
     }
-    ParsedFile file = reader.read(upload.fileName(), upload.content(), handler.textLayout());
+    ParsedFile file =
+        reader.read(
+            upload.fileName(),
+            upload.content(),
+            handler.textLayout(),
+            handler.columns().stream().map(BulkColumn::header).toList());
     requireTemplateHeaders(handler, file);
-    int max = parameters.intValue("BULK_MAX_ROWS", DEFAULT_MAX_ROWS);
+    int max = maxRows();
     if (file.rows().isEmpty()) {
       throw new BusinessRuleException("BULK_FILE_EMPTY", "The file has no data rows");
     }
@@ -423,8 +445,8 @@ public class BulkService {
   }
 
   /**
-   * The error file of a job: the rows not processed, in the template layout with an Error column
-   * and the offending cells highlighted, to correct and upload again.
+   * The error file of a job: the rows not processed, in the guided template layout with an Error
+   * column and the offending cells highlighted, to correct and upload again as it is.
    *
    * @param jobId job
    * @return xlsx bytes
@@ -435,7 +457,7 @@ public class BulkService {
     List<BulkRowRecord> all = rows.findByJobIdOrderByRowNo(jobId);
     Map<Long, Map<String, String>> values = new HashMap<>();
     all.forEach(r -> values.put(r.getId(), store.read(r.getData())));
-    return BulkErrorFile.write(registry.get(job.getHandlerCode()).columns(), all, values);
+    return BulkErrorFile.write(guided(registry.get(job.getHandlerCode())), all, values);
   }
 
   private BulkJob requireOpen(Long jobId) {

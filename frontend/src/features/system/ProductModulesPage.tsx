@@ -142,8 +142,8 @@ export default function ProductModulesPage() {
   });
   const who = {
     username: user?.username ?? '',
-    mayManage: can('PRODUCT_MODULE_MANAGE'),
-    mayApprove: can('PRODUCT_MODULE_APPROVE'),
+    mayManage: can('MODULE_SWITCH_MANAGE'),
+    mayApprove: can('MODULE_SWITCH_APPROVE'),
   };
   const waiting = (modules.data ?? []).filter(isPending).length;
 

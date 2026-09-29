@@ -9,7 +9,7 @@
 -- Initial state: the insurance broker profile, the modules of the insurer suite (underwriting, insurer
 -- claims, reinsurance, actuarial reserves, consolidation, insurer tax schedules) are off; this is the
 -- state V1064 set up by withdrawing their permissions.
--- Permissions: PRODUCT_MODULE_MANAGE (system administrator, requests), PRODUCT_MODULE_APPROVE
+-- Permissions: MODULE_SWITCH_MANAGE (system administrator, requests), MODULE_SWITCH_APPROVE
 -- (information security officer, approves).
 -- =====================================================================================
 
@@ -100,14 +100,14 @@ where p.code = 'INSURANCE_BROKER';
 
 -- ---------- Permissions (area and action class) and grants ------------------------------------
 insert into sec_permission_action (permission, area, action)
-values ('PRODUCT_MODULE_MANAGE', 'ADMINISTRATION', 'AMEND'),
-       ('PRODUCT_MODULE_APPROVE', 'ADMINISTRATION', 'APPROVE')
+values ('MODULE_SWITCH_MANAGE', 'ADMINISTRATION', 'AMEND'),
+       ('MODULE_SWITCH_APPROVE', 'ADMINISTRATION', 'APPROVE')
 on conflict (permission, action) do nothing;
 
 insert into sec_role_permission (role_id, permission)
 select r.id, g.permission
 from sec_role r
-join (values ('SYSADMIN', 'PRODUCT_MODULE_MANAGE'), ('FIN_ADMIN', 'PRODUCT_MODULE_MANAGE'),
-             ('INFOSEC_OFFICER', 'PRODUCT_MODULE_APPROVE')) as g(role_code, permission)
+join (values ('SYSADMIN', 'MODULE_SWITCH_MANAGE'), ('FIN_ADMIN', 'MODULE_SWITCH_MANAGE'),
+             ('INFOSEC_OFFICER', 'MODULE_SWITCH_APPROVE')) as g(role_code, permission)
   on g.role_code = r.code
 where not exists (select 1 from sec_role_permission x where x.role_id = r.id and x.permission = g.permission);

@@ -116,8 +116,8 @@ export const adminModule: FeatureModule = {
       path: '/admin/modules',
       label: 'Product Modules',
       icon: Blocks,
-      permission: 'PRODUCT_MODULE_MANAGE',
-      alsoPermissions: ['PRODUCT_MODULE_APPROVE', 'SYSTEM_MONITOR'],
+      permission: 'MODULE_SWITCH_MANAGE',
+      alsoPermissions: ['MODULE_SWITCH_APPROVE', 'SYSTEM_MONITOR'],
       component: lazy(() => import('@/features/system/ProductModulesPage')),
     },
     {

@@ -25,10 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProductModuleController {
 
   private static final String VIEW =
-      "hasAnyAuthority('PRODUCT_MODULE_MANAGE','PRODUCT_MODULE_APPROVE','SYSTEM_MONITOR')";
-  private static final String MANAGE = "hasAuthority('PRODUCT_MODULE_MANAGE')";
+      "hasAnyAuthority('MODULE_SWITCH_MANAGE','MODULE_SWITCH_APPROVE','SYSTEM_MONITOR')";
+  private static final String MANAGE = "hasAuthority('MODULE_SWITCH_MANAGE')";
   private static final String DECIDE =
-      "hasAnyAuthority('PRODUCT_MODULE_APPROVE','PRODUCT_MODULE_MANAGE')";
+      "hasAnyAuthority('MODULE_SWITCH_APPROVE','MODULE_SWITCH_MANAGE')";
 
   private final ProductModuleAdministration modules;
 
@@ -100,7 +100,7 @@ public class ProductModuleController {
    * @return the switch
    */
   @PostMapping("/{code}/approve")
-  @PreAuthorize("hasAuthority('PRODUCT_MODULE_APPROVE')")
+  @PreAuthorize("hasAuthority('MODULE_SWITCH_APPROVE')")
   public ModuleSwitchResponse approve(@PathVariable String code) {
     return ModuleSwitchResponse.from(modules.approve(code));
   }

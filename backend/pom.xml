@@ -54,7 +54,7 @@
     <spotbugs-plugin.version>4.9.3.2</spotbugs-plugin.version>
     <findsecbugs.version>1.14.0</findsecbugs.version>
     <jacoco.version>0.8.13</jacoco.version>
-    <spotless.version>2.46.1</spotless.version>
+    <spotless.version>3.10.3</spotless.version>
     <google-java-format.version>1.28.0</google-java-format.version>
 
     <!-- Supply chain: software bill of materials and the dependency vulnerability gate

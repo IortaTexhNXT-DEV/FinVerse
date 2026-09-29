@@ -23,7 +23,7 @@
 
     <!-- Library versions -->
     <springdoc.version>2.8.9</springdoc.version>
-    <jjwt.version>0.12.6</jjwt.version>
+    <jjwt.version>0.13.0</jjwt.version>
     <openpdf.version>2.0.3</openpdf.version>
     <poi.version>5.4.1</poi.version>
     <re2j.version>1.8</re2j.version>

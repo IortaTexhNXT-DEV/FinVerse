@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.cache;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,6 +26,7 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.support.TestCompanies;
 import com.iortatechnxt.brokerverse.system.domain.SystemParameterRepository;
+import com.iortatechnxt.brokerverse.system.service.ModuleCaches;
 import com.iortatechnxt.brokerverse.system.service.SystemCaches;
 import com.iortatechnxt.brokerverse.system.service.SystemParameterService;
 import java.time.LocalDate;
@@ -150,7 +152,16 @@ class ReferenceDataCacheIT {
   void administratorsListAndFlushTheCaches() throws Exception {
     api.doGet(ADMIN, "/api/v1/admin/caches")
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$.length()").value(5))
+        .andExpect(
+            jsonPath("$[*].name")
+                .value(
+                    containsInAnyOrder(
+                        LovCaches.VALUES,
+                        SystemCaches.PARAMETERS,
+                        OrganizationCaches.UNITS,
+                        SecurityCaches.ROLE_PERMISSIONS,
+                        CatalogCaches.PRODUCT_VERSIONS,
+                        ModuleCaches.SWITCHED_OFF)))
         .andExpect(jsonPath("$[?(@.name == 'lov-values')].store").value("IN_MEMORY"));
     parameters.intValue(SystemParameterService.JOB_HISTORY_DAYS, 0);
     api.doPost(ADMIN, "/api/v1/admin/caches/system-parameters/clear", null)

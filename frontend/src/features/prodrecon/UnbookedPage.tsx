@@ -1,4 +1,5 @@
 import { PeriodCell } from '@/components/ui/PeriodCell';
+import { LovLabel } from '@/components/broking/LovLabel';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useAuth } from '@/auth/authContext';
@@ -14,7 +15,6 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { humanize } from '@/utils/format';
 import { ItemReviewDialog } from './ItemReviewDialog';
 import { prodreconApi } from './prodreconApi';
 import type { ReconItem, UnbookedStatus } from './prodreconApi';
@@ -55,7 +55,7 @@ const COLUMNS: Column<ReconItem>[] = [
   {
     key: 'disposition',
     header: 'Disposition',
-    render: (r) => (r.feedback?.disposition ? humanize(r.feedback.disposition) : ''),
+    render: (r) => <LovLabel type="RECON_DISPOSITION" code={r.feedback?.disposition} empty="" />,
   },
   {
     key: 'status',

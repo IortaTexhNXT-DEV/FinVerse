@@ -11,8 +11,9 @@ meta:
   code: OP
   frs: FRS_BRD02_OPERATIONS.md
   summary: TP_BRD02_OPERATIONS.md
-  version: "1.0"
-  date: 25 September 2026
+  version: "2.0"
+  date: 28 September 2026
+  signoff: pack/pack.yaml
   verify_messages: true
 
 personas:
@@ -50,6 +51,7 @@ screens:
   RECEIPT: Cashiering > Receipts > Receipt page
   UNAPPLIED: Cashiering > Unapplied Payments
   UITEM: Cashiering > Unapplied Payments > Unapplied Payment page
+  INREQ: Cashiering > Incoming Requests
   PREBOOKED: Cashiering > Pre-booked Payments
   PAYUP: Cashiering > Payment Uploads
   PDC: Cashiering > PDC Warehouse
@@ -68,6 +70,7 @@ screens:
   HOLD: Remittance > Remittance Holds > Remittance Hold
   SPECIAL: Remittance > Special Remittance
   DTIP: Remittance > DTIP Status
+  DEDUCTIONS: Remittance > Remittance Deductions
   INCRULES: Remittance > Incentive Rules
   ADJWB: Adjustment > Adjustment Workbench
   NEWREQ: Adjustment > New Request
@@ -80,6 +83,7 @@ screens:
   CYCLE: Product Reconciliation > Reconciliation Cycles > Reconciliation Cycle
   EXTRACTS: Product Reconciliation > Production Extracts
   FEEDBACK: Product Reconciliation > Insurer Feedback
+  RECONUP: Product Reconciliation > Insurer Feedback
   UNBOOKED: Product Reconciliation > Unbooked Accounts
   SCHEDULES: Product Reconciliation > Extract Schedules
   COMMWB: Commission Receivables > Commission Workbench
@@ -91,8 +95,11 @@ screens:
   SCHEMES: Commission Receivables > Incentive Schemes
   RUNS: Commission Receivables > Incentive Runs
   CERTS: Commission Receivables > BIR Certificates
+  CERT: Commission Receivables > BIR Certificates > BIR Certificate
   ESTIMATED: Commission Receivables > Estimated Items
+  FFY: Accounts > FFY Register
   REPORTS: Reports > Report Centre (category Operations)
+  REPORT: Reports > Report Centre > Report
   AUDIT: Administration > Audit Trail
   PARAMS: Administration > System Parameters
   JOBS: Administration > Scheduled Jobs
@@ -106,7 +113,7 @@ data:
     source: Seed data (Operations users, adjustment and Marketing team lead, administrator and auditor, with their grants)
   - id: TD-OP-02
     name: Booked seed invoices
-    content: ARN-2026-940001 (Motor; booking and endorsement invoices paid in full; booking invoice remitted with the insurer OR), ARN-2026-940002 (Property; requests at every adjustment stage; gross premium differs in the insurer register), ARN-2026-940003 (direct payment), ARN-2026-940004 (CGL; partly paid; hold request waiting; flat cancellation ready for posting)
+    content: ARN-2026-940001 (Motor; booking and endorsement invoices paid in full; booking invoice remitted with the insurer OR), ARN-2026-940002 (Property; requests at every adjustment stage; gross premium differs in the insurer register), ARN-2026-940003 (direct payment), ARN-2026-940004 (CGL; partly paid; flat cancellation ready for posting), ARN-2026-940008 (Motor; hold request waiting)
     source: Booking seed data, copied into the invoice ledger by the booking feed
   - id: TD-OP-03
     name: Cashiering storyline
@@ -114,7 +121,7 @@ data:
     source: Seed data (cashiering)
   - id: TD-OP-04
     name: Remittance storyline
-    content: A remitted batch of ARN-2026-940001 with its insurer OR; a batch in review with the endorsement invoice; a hold request of ARN-2026-940004 waiting for approval; a special remittance request; incentive rule INS-MGIC Property CBG 2 % within 30 days of inception
+    content: A remitted batch of ARN-2026-940001 with its insurer OR; a batch in review with the endorsement invoice; a hold request of ARN-2026-940008 waiting for approval; a special remittance request; incentive rule INS-MGIC Property CBG 2 % within 30 days of inception
     source: Seed data (remittance)
   - id: TD-OP-05
     name: Production reconciliation storyline
@@ -210,7 +217,7 @@ frs:
         steps:
           - Enter a wrong password 3 times for recon; then the correct one.
         expected: The account is locked at the third failure; the System Administrator unlocks it in Administration > Users.
-        msg: [Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
+        msg: [Invalid user name or password, AUTHENTICATION_FAILED]
 
   FR-OP-002:
     scenario: SC-OP-01
@@ -243,7 +250,7 @@ frs:
         screen: HOLDS
         title: Marketing Collection cannot approve a hold
         steps:
-          - As mktcoll open Remittance Holds, Special Remittance and BIR 2307; open the waiting hold of ARN-2026-940004.
+          - As mktcoll open Remittance Holds, Special Remittance and BIR 2307; open the waiting hold of ARN-2026-940008.
         expected: The three screens open; Approve hold is not offered and the direct request is refused.
         msg: [You are not permitted to perform this action, ACCESS_DENIED]
 
@@ -339,9 +346,9 @@ frs:
       - c: 2
         type: Positive
         title: Invoice on hold
-        pre: The hold of ARN-2026-940004 approved (TC-OP-111.1-01).
+        pre: The hold of ARN-2026-940008 approved (TC-OP-111.1-01).
         steps:
-          - Open Invoice 360 of ARN-2026-940004, Remittances tab.
+          - Open Invoice 360 of ARN-2026-940008, Remittances tab.
         expected: The hold pill and the hold request with its until date are shown.
       - c: 3
         type: Positive
@@ -372,14 +379,14 @@ frs:
         steps:
           - New Request on the endorsement invoice of ARN-2026-940001 (in a batch for review).
         expected: Refused.
-        msg: ["Invoice <no> is locked by REMITTANCE (<reason>)", INVOICE_LOCKED]
+        msg: ["Invoice <no> is locked by <team> (<reason>)", INVOICE_LOCKED]
       - c: 2
         type: Positive
         persona: CASHIER
         screen: RECEIVE
         title: Payment on an invoice locked by Adjustment
         steps:
-          - Receive a payment on the invoice of ARN-2026-940004 (open cancellation request, locked by ADJUSTMENT).
+          - Receive a payment on the invoice of ARN-2026-940004 (open cancellation request, locked by Adjustment).
         expected: The payment is applied; the lock stays.
       - c: 3
         type: Workflow
@@ -1207,14 +1214,14 @@ frs:
         title: Scheduled extraction
         pre: An invoice of INS-MGIC paid in cash four banking days ago.
         steps:
-          - Run REMITTANCE_EXTRACTION; open Extraction, the run's tags; open Remittance Batches.
+          - Start the scheduled remittance extraction; open Extraction, the run's tags; open Remittance Batches.
         expected: The invoice is EXTRACTED into batch RMB-INS-MGIC-2026-n and its lock shows REMITTANCE.
       - c: 1
         type: Negative
         title: Invoice on hold not extracted
-        pre: The hold of ARN-2026-940004 approved.
+        pre: The hold of ARN-2026-940008 approved.
         steps:
-          - Run the extraction; open the tag of ARN-2026-940004.
+          - Run the extraction; open the tag of ARN-2026-940008.
         expected: UNEXTRACTED_DUE with reason ON_HOLD.
       - c: 2
         type: Negative
@@ -2077,7 +2084,7 @@ frs:
         title: Schedule on day 5 over a holiday
         pre: 5 October 2026 is set as a holiday in the calendar of SIT.
         steps:
-          - Keep the seed schedule of INS-MGIC on day 5; run PRODUCTION_EXTRACT for 5 and 6 October (clock moved).
+          - Keep the seed schedule of INS-MGIC on day 5; start the scheduled register extraction for 5 and 6 October (business date moved).
         expected: No extract on 5 October; the extract is made on 6 October.
       - c: 2
         type: Negative
@@ -2295,7 +2302,7 @@ frs:
         steps:
           - Pair two BDOI-only items.
         expected: Refused.
-        msg: [Pair a BDOI-only item with an insurer-only item of the same cycle, RECON_PAIR_INVALID]
+        msg: [Pair a booked-only item with an insurer-only item of the same cycle, RECON_PAIR_INVALID]
       - c: 2
         type: Negative
         title: Split an unpaired item
@@ -2511,7 +2518,7 @@ frs:
         title: Overdue after 10 working days
         pre: The seed billing sent 11 working days ago (date moved in SIT).
         steps:
-          - Run DP_FEEDBACK_SLA; open DP Billings and the bell.
+          - Start the daily DP feedback follow-up; open DP Billings and the bell.
         expected: The billing shows overdue; the alert is raised once.
       - c: 3
         type: Negative
@@ -2520,7 +2527,7 @@ frs:
         steps:
           - Upload an answer file with decision "MAYBE".
         expected: The row is refused.
-        msg: ["Decision '<value>' is neither APPROVED nor REJECTED", DP_RESPONSE_DECISION]
+        msg: ["Decision '<value>' is not one of Approved or Rejected (or Yes / No)", DP_RESPONSE_DECISION]
 
   FR-OP-094:
     scenario: SC-OP-08
@@ -2588,7 +2595,7 @@ frs:
         steps:
           - Compute a run of No Touch (no tiers).
         expected: Refused.
-        msg: ["Scheme <name> has no tiers yet (targets and amounts from BDOI, OQ39)", INCENTIVE_SCHEME_EMPTY]
+        msg: ["Scheme <name> has no tiers yet: add its targets and amounts first", INCENTIVE_SCHEME_EMPTY]
       - c: 2
         type: Negative
         title: Fixed tier without amount
@@ -2729,7 +2736,7 @@ frs:
         screen: HOLD
         title: Approve the seed hold
         steps:
-          - As mkttl open the waiting hold of ARN-2026-940004; Approve hold; as remit run the extraction.
+          - As mkttl open the waiting hold of ARN-2026-940008; Approve hold; as remit run the extraction.
         expected: The hold is On hold with number HLD-2026-n; the invoice is UNEXTRACTED_DUE with ON_HOLD.
       - c: 2
         type: Negative
@@ -2747,13 +2754,13 @@ frs:
         title: Expired hold released
         pre: The hold's until date set to yesterday.
         steps:
-          - Run HOLD_EXPIRY; run the extraction.
+          - Start the daily hold expiry run; run the extraction.
         expected: The hold is Released (Hold expired); the invoice is extracted.
       - c: 4
         type: Negative
         title: Second hold on the same invoice
         steps:
-          - Request a hold on ARN-2026-940004 again.
+          - Request a hold on ARN-2026-940008 again.
         expected: Refused.
         msg: ["Invoice <no> already has hold <no>", HOLD_DUPLICATE]
       - c: 4
@@ -2947,7 +2954,7 @@ frs:
     screen: INTERFACES
     data: [TD-OP-08]
     conditions:
-      - An upload with an invalid row records a run with a failed record and raises OPS_FLOW_IN_FAILED.
+      - An upload with an invalid row records a run with a failed record and raises the alert Interface run failed.
       - The same file again accepts no new record; inactive or unhandled feeds are refused.
     cases:
       - c: 1
@@ -2955,7 +2962,7 @@ frs:
         title: Hold file with an invalid row
         steps:
           - Upload the hold feed file (COLLECTION_HOLD) with one invalid row; open the run and the alerts.
-        expected: The run shows one failed record with its message; alert OPS_FLOW_IN_FAILED is raised.
+        expected: The run shows one failed record with its message; the alert Interface run failed is raised.
       - c: 2
         type: Negative
         title: Same file again

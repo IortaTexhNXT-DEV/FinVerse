@@ -124,6 +124,11 @@ public class PdcFileHandler implements BulkImportHandler {
   }
 
   @Override
+  public boolean textFile() {
+    return true;
+  }
+
+  @Override
   public TextLayout textLayout() {
     return layouts.layout(code());
   }

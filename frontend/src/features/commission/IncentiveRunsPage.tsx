@@ -1,4 +1,5 @@
 import { PeriodCell } from '@/components/ui/PeriodCell';
+import { statusMessage } from '@/components/ui/statusTones';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Calculator } from 'lucide-react';
 import { useState } from 'react';
@@ -247,7 +248,7 @@ export default function IncentiveRunsPage() {
       setComputing(false);
       setOpen(r.status === 'COMPUTED' ? r : undefined);
       await queryClient.invalidateQueries({ queryKey: ['commission', 'runs'] });
-      toast.success(`${r.runNo} ${humanize(r.status).toLowerCase()}`);
+      toast.success(statusMessage(r.runNo, r.status));
     },
   });
   return (

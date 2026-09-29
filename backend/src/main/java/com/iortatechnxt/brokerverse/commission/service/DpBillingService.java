@@ -128,7 +128,7 @@ public class DpBillingService {
                 String.valueOf(billing.getId()),
                 no,
                 "Direct payment commission billing " + insurerCode,
-                "/commission/billings/" + billing.getId(),
+                "/commission/dp/billings/" + billing.getId(),
                 null),
             null));
     audit.record(

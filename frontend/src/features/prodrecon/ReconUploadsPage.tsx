@@ -2,7 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Upload } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/auth/authContext';
-import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
+import { InsurerFilter } from '@/components/broking/InsurerFilter';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
@@ -20,7 +20,9 @@ import { prodreconApi } from './prodreconApi';
 import type { ReconUpload } from './prodreconApi';
 import { monthLabel } from './prodreconLogic';
 import { FileDropZone } from '@/components/ui/FileDropZone';
-import { displayNameOf } from '@/api/users';
+import { InsurerName } from '@/components/broking/LovLabel';
+import { CellStack } from '@/components/ui/CellStack';
+import { UserName } from '@/components/ui/UserName';
 
 const COLUMNS: Column<ReconUpload>[] = [
   {
@@ -35,18 +37,32 @@ const COLUMNS: Column<ReconUpload>[] = [
       </>
     ),
   },
-  { key: 'insurer', header: 'Insurer', render: (u) => u.insurerCode ?? '' },
+  { key: 'insurer', header: 'Insurer', render: (u) => <InsurerName code={u.insurerCode} /> },
   { key: 'month', header: 'Production Month', render: (u) => monthLabel(u.productionMonth) },
   { key: 'read', header: 'Rows Read', numeric: true, render: (u) => u.rowsRead },
   { key: 'ok', header: 'Accepted', numeric: true, render: (u) => u.rowsAccepted },
   { key: 'failed', header: 'Failed', numeric: true, render: (u) => u.rowsFailed },
-  { key: 'message', header: 'Message', render: (u) => u.message ?? '' },
   {
     key: 'at',
     header: 'Uploaded',
-    render: (u) => `${formatDateTime(u.createdAt)} · ${displayNameOf(u.createdBy)}`,
+    render: (u) => (
+      <CellStack main={<UserName login={u.createdBy} />} sub={formatDateTime(u.createdAt)} />
+    ),
   },
-  { key: 'status', header: 'Status', render: (u) => <StatusBadge status={u.status} /> },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (u) => (
+      <CellStack
+        main={<StatusBadge status={u.status} />}
+        sub={
+          u.rowsFailed > 0 || u.status.includes('FAIL') || u.status.includes('BLOCK')
+            ? u.message
+            : undefined
+        }
+      />
+    ),
+  },
 ];
 
 function UploadDialog({
@@ -139,10 +155,10 @@ export default function ReconUploadsPage() {
       <ErrorAlert error={uploads.error} />
       <Card>
         <div className="stack">
-          <WorklistToolbar
-            placeholder="Search Insurer Code"
-            onSearch={(text) => {
-              setInsurer(text.trim().toUpperCase());
+          <InsurerFilter
+            value={insurer}
+            onChange={(code) => {
+              setInsurer(code);
               setPage(0);
             }}
           />

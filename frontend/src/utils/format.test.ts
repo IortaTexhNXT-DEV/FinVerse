@@ -50,6 +50,11 @@ describe('format', () => {
   it('formats ISO dates as dd-MMM-yyyy', () => {
     expect(formatDate('2026-09-23')).toBe('23-Sep-2026');
     expect(formatDate('2026-01-05T10:00:00Z')).toBe('05-Jan-2026');
+    // An instant after 16:00 UTC is already the next day in Manila, as its time is.
+    expect(formatDate('2026-09-28T17:12:00.123456Z')).toBe('29-Sep-2026');
+    expect(formatDate('2026-09-28T23:30:00+08:00')).toBe('28-Sep-2026');
+    // A local date and time without a zone keeps its own date.
+    expect(formatDate('2026-09-28T17:12:00')).toBe('28-Sep-2026');
     expect(formatDate(undefined)).toBe('');
   });
 

@@ -3,6 +3,7 @@ import { useRef, useState } from 'react';
 import type { InputHTMLAttributes } from 'react';
 import { formatDate } from '@/utils/format';
 import { parseDateText } from '@/utils/dateText';
+import { MonthInput } from './MonthInput';
 
 type DateInputProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>;
 
@@ -114,6 +115,9 @@ export function DateInput({
 export function TypedInput({ type, ...props }: Readonly<InputHTMLAttributes<HTMLInputElement>>) {
   if (type === 'date') {
     return <DateInput {...props} />;
+  }
+  if (type === 'month') {
+    return <MonthInput {...props} />;
   }
   return <input type={type} {...props} />;
 }

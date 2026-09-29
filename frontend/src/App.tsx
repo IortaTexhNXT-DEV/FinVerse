@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClientProvider } from '@tanstack/react-query';
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { AuthProvider } from '@/auth/AuthProvider';
@@ -11,16 +11,13 @@ import { WorkspaceProvider } from '@/context/WorkspaceProvider';
 import { landingPath } from '@/navigation/access';
 import { MODULES } from '@/navigation/modules';
 import type { ScreenDef } from '@/navigation/types';
+import { createQueryClient } from '@/queryClient';
 
 const LoginPage = lazy(() => import('@/auth/LoginPage'));
 const ResetPasswordPage = lazy(() => import('@/auth/ResetPasswordPage'));
 const SsoCallbackPage = lazy(() => import('@/auth/SsoCallbackPage'));
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { retry: 1, refetchOnWindowFocus: false, staleTime: 15_000 },
-  },
-});
+const queryClient = createQueryClient();
 
 const screens = MODULES.flatMap((m) => m.screens);
 

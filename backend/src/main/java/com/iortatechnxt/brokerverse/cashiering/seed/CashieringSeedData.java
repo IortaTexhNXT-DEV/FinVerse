@@ -261,7 +261,7 @@ public class CashieringSeedData implements ApplicationRunner {
                     ReceiptSource.OTC,
                     CashieringSettings.MODULE,
                     "SEED:OR-SERVICE-FEE",
-                    "Seed service fee"),
+                    "Service fee for the risk management review"),
                 false));
     LOG.info("Cashiering seed OR {}", or.getReceiptNo());
     return true;

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useAuth } from '@/auth/authContext';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
+import { RowActions } from '@/components/ui/RowActions';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
@@ -79,13 +80,19 @@ export default function PdcWarehousePage() {
     {
       key: 'actions',
       header: '',
-      render: (p) =>
-        p.status === 'WAREHOUSED' &&
-        upload && (
-          <Button size="sm" variant="ghost" onClick={() => setReleasing(p)}>
-            Release
-          </Button>
-        ),
+      render: (p) => (
+        <RowActions
+          record={p.warehouseNo}
+          actions={[
+            {
+              label: 'Release Check',
+              danger: true,
+              hidden: !(p.status === 'WAREHOUSED' && upload),
+              onSelect: () => setReleasing(p),
+            },
+          ]}
+        />
+      ),
     },
   ];
   const months = byMaturityMonth(list.data?.content ?? []);

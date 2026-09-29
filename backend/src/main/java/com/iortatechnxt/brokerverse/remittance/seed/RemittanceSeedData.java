@@ -9,16 +9,12 @@ import com.iortatechnxt.brokerverse.opsledger.service.FlowInHandler.FlowInFile;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLine;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLineRepository;
-import com.iortatechnxt.brokerverse.remittance.domain.ExtractionRun;
 import com.iortatechnxt.brokerverse.remittance.domain.ExtractionRun.Scope;
 import com.iortatechnxt.brokerverse.remittance.domain.ExtractionRunRepository;
-import com.iortatechnxt.brokerverse.remittance.domain.HoldRequest.Terms;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceBatch;
 import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.ExtractionTrigger;
-import com.iortatechnxt.brokerverse.remittance.domain.RemittanceEnums.RequestSource;
 import com.iortatechnxt.brokerverse.remittance.service.BatchService;
 import com.iortatechnxt.brokerverse.remittance.service.ExtractionService;
-import com.iortatechnxt.brokerverse.remittance.service.HoldService;
 import com.iortatechnxt.brokerverse.remittance.service.InsurerOrUploads;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
@@ -38,17 +34,14 @@ import org.springframework.stereotype.Component;
  * invoices (order 91), each step signed in as the team member who does it:
  *
  * <ul>
- *   <li>Marketing Collection ({@code mktcoll}) asks to hold the CGL invoice of ARN-2026-940004: the
- *       request waits for approval;
  *   <li>the processor ({@code remit}) extracts the paid booking invoice of ARN-2026-940001 and
  *       submits its batch, the team leader ({@code remittl}) approves it (four eyes), Disbursement
  *       ({@code disb}) acknowledges the payment request and assigns the DV, and the insurer's OR
  *       schedule is uploaded: the batch is remitted with its OR;
- *   <li>the processor then runs the manual extraction: the paid endorsement invoice of the same
- *       account goes into a batch waiting for review, and every other invoice gets its tag.
  * </ul>
  *
- * A step that fails is logged and skipped.
+ * A step that fails is logged and skipped. The manual extraction runs after the adjustment seed, in
+ * {@link ExtractionSeedData}; the seeded hold request is made last, by {@link HoldSeedData}.
  */
 @Component
 @Profile("seed")
@@ -56,13 +49,8 @@ import org.springframework.stereotype.Component;
 public class RemittanceSeedData implements ApplicationRunner {
 
   private static final Logger LOG = LoggerFactory.getLogger(RemittanceSeedData.class);
-  private static final String HELD_ARN = "ARN-2026-940004";
   private static final String REMITTED_ARN = "ARN-2026-940001";
   private static final String PROCESSOR = "remit";
-  private static final int HOLD_DAYS = 30;
-
-  /** Seed Marketing Collection user who requests the hold (holds HOLD_REQUEST). */
-  private static final String HOLD_REQUESTER = "mktcoll";
 
   private final ExtractionRunRepository runs;
   private final ExtractionService extraction;
@@ -70,7 +58,6 @@ public class RemittanceSeedData implements ApplicationRunner {
   private final BatchLineRepository lines;
   private final DisbursementQueueService disbursements;
   private final InsurerOrUploads insurerOrs;
-  private final HoldService holds;
   private final InvoiceLedgerQueryService ledger;
   private final Clock clock;
   private final SeedUsers users;
@@ -84,7 +71,6 @@ public class RemittanceSeedData implements ApplicationRunner {
    * @param lines batch lines
    * @param disbursements Disbursement queue
    * @param insurerOrs insurer OR uploads
-   * @param holds hold requests
    * @param ledger ledger reads
    * @param clock clock
    * @param users seed sign-in
@@ -96,7 +82,6 @@ public class RemittanceSeedData implements ApplicationRunner {
       BatchLineRepository lines,
       DisbursementQueueService disbursements,
       InsurerOrUploads insurerOrs,
-      HoldService holds,
       InvoiceLedgerQueryService ledger,
       Clock clock,
       SeedUsers users) {
@@ -106,7 +91,6 @@ public class RemittanceSeedData implements ApplicationRunner {
     this.lines = lines;
     this.disbursements = disbursements;
     this.insurerOrs = insurerOrs;
-    this.holds = holds;
     this.ledger = ledger;
     this.clock = clock;
     this.users = users;
@@ -114,41 +98,11 @@ public class RemittanceSeedData implements ApplicationRunner {
 
   @Override
   public void run(ApplicationArguments args) {
-    List<OpsInvoice> held = ledger.forArn(HELD_ARN);
-    if (runs.count() > 0 || held.isEmpty()) {
+    List<OpsInvoice> remitted = ledger.forArn(REMITTED_ARN);
+    if (runs.count() > 0 || remitted.isEmpty()) {
       return;
     }
-    Long companyId = held.get(0).getCompanyId();
-    step("hold request", () -> hold(held.get(0)));
     original(REMITTED_ARN).ifPresent(i -> step("remitted batch", () -> remit(i)));
-    step(
-        "manual extraction",
-        () -> {
-          ExtractionRun run =
-              users.as(
-                  PROCESSOR,
-                  () ->
-                      extraction.run(
-                          companyId,
-                          new Scope(ExtractionTrigger.MANUAL, null, null, null),
-                          today()));
-          LOG.info("Remittance seed extraction {} - {}", run.getRunNo(), run.getMessage());
-        });
-  }
-
-  private void hold(OpsInvoice invoice) {
-    users.as(
-        HOLD_REQUESTER,
-        () ->
-            holds.create(
-                invoice.getCompanyId(),
-                invoice.getInvoiceNo(),
-                new Terms(
-                    "OTHERS",
-                    "Seed: client disputes the premium; hold until Marketing confirms",
-                    today().plusDays(HOLD_DAYS)),
-                true,
-                RequestSource.SCREEN));
   }
 
   private void remit(OpsInvoice invoice) {

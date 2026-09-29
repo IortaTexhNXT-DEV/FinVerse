@@ -1,10 +1,10 @@
 import { PeriodCell } from '@/components/ui/PeriodCell';
-import { Button } from '@/components/ui/Button';
+import { CellStack } from '@/components/ui/CellStack';
+import { UserName } from '@/components/ui/UserName';
 import type { Column } from '@/components/ui/DataTable';
 import { formatDateTime, humanize } from '@/utils/format';
-import { DownloadButton } from './ExtractParts';
+import { ExtractActions } from './ExtractParts';
 import type { ReconExtract } from './prodreconApi';
-import { displayNameOf } from '@/api/users';
 
 /** Columns of an extract list. */
 export function extractColumns(
@@ -14,12 +14,7 @@ export function extractColumns(
     {
       key: 'no',
       header: 'Extract No.',
-      render: (e) => (
-        <>
-          <strong>{e.extractNo}</strong>
-          <div className="muted">{e.fileName}</div>
-        </>
-      ),
+      render: (e) => <strong>{e.extractNo}</strong>,
     },
     { key: 'trigger', header: 'Trigger', render: (e) => humanize(e.trigger) },
     {
@@ -35,21 +30,16 @@ export function extractColumns(
       key: 'sent',
       header: 'Sent',
       render: (e) =>
-        e.sentAt ? `${formatDateTime(e.sentAt)} · ${displayNameOf(e.sentBy)}` : 'Not sent',
+        e.sentAt ? (
+          <CellStack main={formatDateTime(e.sentAt)} sub={<UserName login={e.sentBy} />} />
+        ) : (
+          'Not sent'
+        ),
     },
     {
       key: 'actions',
-      header: 'Actions',
-      render: (e) => (
-        <div className="row">
-          <DownloadButton extract={e} />
-          {onSend !== undefined && (
-            <Button size="sm" variant="secondary" onClick={() => onSend(e)}>
-              {e.sentAt ? 'Resend' : 'Send'}
-            </Button>
-          )}
-        </div>
-      ),
+      header: '',
+      render: (e) => <ExtractActions extract={e} onSend={onSend} />,
     },
   ];
 }

@@ -140,10 +140,19 @@ function columns(
     },
     {
       key: 'type',
-      header: 'Transaction',
-      render: (t) => <CellStack main={t.typeLabel} sub={t.detail} />,
+      header: 'Transaction / Reference',
+      render: (t) => (
+        <CellStack
+          main={t.typeLabel}
+          sub={
+            <>
+              {t.detail !== undefined && t.detail !== '' && <span>{t.detail}</span>}{' '}
+              <Reference row={t} />
+            </>
+          }
+        />
+      ),
     },
-    { key: 'ref', header: 'Reference', kind: 'code', render: (t) => <Reference row={t} /> },
     {
       key: 'premium',
       header: `Premium Change (${currency})`,
@@ -152,15 +161,14 @@ function columns(
     },
     {
       key: 'taxes',
-      header: `Taxes Change (${currency})`,
+      header: `Taxes / Commission (${currency})`,
       kind: 'amount',
-      render: (t) => <Amount value={t.change.taxes} />,
-    },
-    {
-      key: 'commission',
-      header: `Commission Change (${currency})`,
-      kind: 'amount',
-      render: (t) => <Amount value={t.change.commission} />,
+      render: (t) => (
+        <CellStack
+          main={<Amount value={t.change.taxes} />}
+          sub={<Amount value={t.change.commission} />}
+        />
+      ),
     },
     {
       key: 'after',
@@ -178,34 +186,33 @@ function columns(
     },
     {
       key: 'status',
-      header: 'Status',
+      header: 'Status / Accounting',
       kind: 'status',
-      render: (t) => <StatusBadge status={t.status} label={t.statusLabel} />,
-    },
-    {
-      key: 'journals',
-      header: 'Accounting',
-      render: (t) =>
-        t.journals.length === 0 ? (
-          ''
-        ) : (
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
-            aria-expanded={expanded.has(t.seq)}
-            onClick={(e) => {
-              e.stopPropagation();
-              toggle(t.seq);
-            }}
-          >
-            {expanded.has(t.seq) ? (
-              <ChevronDown size={14} aria-hidden="true" />
-            ) : (
-              <ChevronRight size={14} aria-hidden="true" />
-            )}
-            {journalCountLabel(t.journals.length)}
-          </button>
-        ),
+      render: (t) => (
+        <CellStack
+          main={<StatusBadge status={t.status} label={t.statusLabel} />}
+          sub={
+            t.journals.length === 0 ? undefined : (
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                aria-expanded={expanded.has(t.seq)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggle(t.seq);
+                }}
+              >
+                {expanded.has(t.seq) ? (
+                  <ChevronDown size={14} aria-hidden="true" />
+                ) : (
+                  <ChevronRight size={14} aria-hidden="true" />
+                )}
+                {journalCountLabel(t.journals.length)}
+              </button>
+            )
+          }
+        />
+      ),
     },
   ];
 }

@@ -4,6 +4,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import type { CollectorRequest, PaymentReversal, RefundValidation } from './requestsApi';
 import { UserName } from '@/components/ui/UserName';
+import { sourceText } from '@/utils/businessLabels';
 
 /** Columns of the Incoming Requests queues (wave C1-C). */
 
@@ -60,9 +61,7 @@ export const VALIDATION_COLUMNS: Column<RefundValidation>[] = [
     render: (t) => (
       <>
         <strong>{t.taskNo}</strong>
-        <div className="muted">
-          {t.sourceModule} {t.sourceRef}
-        </div>
+        <div className="muted">{sourceText(t.sourceModule, t.sourceRef)}</div>
       </>
     ),
   },
@@ -81,9 +80,7 @@ export const REVERSAL_COLUMNS: Column<PaymentReversal>[] = [
     render: (r) => (
       <>
         <strong>{r.requestNo}</strong>
-        <div className="muted">
-          {r.sourceModule} {r.sourceRef}
-        </div>
+        <div className="muted">{sourceText(r.sourceModule, r.sourceRef)}</div>
       </>
     ),
   },

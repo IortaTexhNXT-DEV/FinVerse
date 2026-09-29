@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
+import { InsurerFilter } from '@/components/broking/InsurerFilter';
+import { InsurerName } from '@/components/broking/LovLabel';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
@@ -29,7 +30,7 @@ const TABS: readonly { id: StageTab; label: string }[] = [
 
 const COLUMNS: Column<ReconCycle>[] = [
   { key: 'no', header: 'Cycle No.', render: (c) => <strong>{c.cycleNo}</strong> },
-  { key: 'insurer', header: 'Insurer', render: (c) => c.insurerCode },
+  { key: 'insurer', header: 'Insurer', render: (c) => <InsurerName code={c.insurerCode} /> },
   { key: 'month', header: 'Production Month', render: (c) => monthLabel(c.productionMonth) },
   { key: 'total', header: 'Items', numeric: true, render: (c) => c.counts.total },
   {
@@ -93,10 +94,10 @@ export default function ReconCyclesPage() {
               setPage(0);
             }}
           />
-          <WorklistToolbar
-            placeholder="Search Insurer Code"
-            onSearch={(text) => {
-              setInsurer(text.trim().toUpperCase());
+          <InsurerFilter
+            value={insurer}
+            onChange={(code) => {
+              setInsurer(code);
               setPage(0);
             }}
           />

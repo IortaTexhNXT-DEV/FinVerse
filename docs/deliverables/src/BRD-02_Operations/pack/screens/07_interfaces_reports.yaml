@@ -1,0 +1,119 @@
+# Screen specifications of BRD-2 Operations: the interfaces (feeds with runs and records), the FFY Register as
+# Operations reads it, and the Operations reports of the Report Centre with the report screen.
+area: Interfaces, FFY register and reports
+screens:
+  - id: SCR-OP-61
+    title: Interfaces
+    route: /operations/interfaces
+    purpose: >-
+      The feeds Operations exchanges with booking, Collection, Disbursement and the insurers, with their direction,
+      transport, owner team, schedule and status; the run log lists every run with its records read, taken in,
+      duplicate and failed; files of a feed without an automatic transport are uploaded here, and the booked invoices
+      can be replayed into the ledger.
+    entry:
+      - Operations Home › Interfaces › Open
+    shots:
+      - {state: feeds, user: admin, caption: "Interfaces, Feeds tab"}
+      - {state: runs, user: admin, tab: "Run Log", caption: "Interfaces, Run Log tab"}
+      - {state: replay, user: admin, click: "^replay booked invoices$", caption: "Replay Booked Invoices dialog"}
+    fields:
+      - "Tabs | Feeds / Run Log | Tab | - | - | Fixed | Feeds | - | - | -"
+      - "Feeds | Feed / Partner / Transport / Owner / Schedule / Status | Column | Partner and direction (inbound, outbound); transport In App or Manual Upload; schedule Manual or the schedule of the feed | - | Interface feeds | - | Read only | - | -"
+      - "Run Log | Run No. / Feed / Trigger / Started / Read / OK / Duplicate / Failed / File / Status | Column | Counts per outcome | - | Interface runs | - | Read only | - | No runs yet"
+      - "Run dialog | Record / Status / Created / Message / Received | Column | Each record with its outcome and message | - | Interface run records | - | Read only | - | No records in this run"
+      - "Configure dialog | Runs / Time / Active | Drop-down, time, check box | Manual runs only, Every hour, Every day, Monday to Friday; the time in Philippine time | N | - | The feed's schedule | - | - | -"
+      - "Upload dialog | File | File | The file of the feed | Y | - | - | Active uploadable feed | - | Choose a file"
+      - "Replay Booked Invoices dialog | [Invoice number or ARN] | Text | One invoice, one account, or the whole company when blank | N | Booking | Blank | - | - | Give an invoice number, an ARN or a company to replay"
+    actions:
+      - "Configure / Save Feed | System Administrator | Always | Changes the schedule and activation of the feed | Active or Inactive | -"
+      - "Upload File | System Administrator | Active feed that accepts files | Takes in the records of the file, each once | Run done | Interface run failed (NT-05) when records fail"
+      - "Replay Booked Invoices / Replay Invoices | System Administrator | Always | Copies into the ledger every booked invoice of the scope missing from it; an invoice already there is not changed | Run done | -"
+      - "[Open a run] | System Administrator | Always | Shows the records of the run | - | -"
+    rules:
+      - "Each record of a feed is processed on its own and once; a failed record does not stop the run and can be sent again (FR-OP-131, FR-OP-008)."
+      - "A failed or partial run raises the interface alert (FR-OP-131)."
+      - "Until the systems of the other BRDs and the insurer channels are connected, their data arrives by upload here (FR-OP-130)."
+    outcome: Every exchange with the other systems is logged and can be completed by hand.
+    frs: [FR-OP-004, FR-OP-008, FR-OP-130, FR-OP-131]
+    tests: [INTERFACES]
+
+  - id: SCR-OP-62
+    title: FFY Register
+    route: /accounts/ffy
+    purpose: >-
+      The accounts tagged Free First Year (the first-year premium is not paid by the client) with their period of
+      cover in the period cell, gross premium, status and the FFY start and end; Operations reads it to know which
+      invoices carry no client collection in their first year. The register is maintained in New Business (BRD-1,
+      SCR-NB-16).
+    entry:
+      - Client & Policy › Accounts & Placement › FFY Register
+    shots:
+      - {state: list, user: cashier, caption: "FFY Register as the Operations users see it"}
+    fields:
+      - "List | ARN / Client / Product / Insurer | Column | Client name with the code; product name with the code | - | Accounts (BRD-1) | - | Read only | - | No account is tagged Free First Year."
+      - "List | Period | Column | Period of cover in the period cell: the start date, then to the end date | - | Accounts (BRD-1) | - | Read only | - | -"
+      - "List | Gross Premium / Status / Flags | Column | FFY and Direct Payment tags | - | Accounts (BRD-1) | - | Read only | - | -"
+      - "List | FFY Period | Column | Period cell: the FFY start and, under it, to the FFY end, dd-MMM-yyyy | - | Account tag | - | Read only | - | -"
+      - "List | Officer | Column | User name | - | Accounts (BRD-1) | - | Read only | - | -"
+    actions:
+      - "Open a row | Every user of the screen | Always | Opens the account | - | -"
+    rules:
+      - "A period is shown in lists on two lines, the start date and to the end date, each date kept whole (screen standards)."
+      - "The FFY tag is set and cancelled on the account in New Business (FR-OP-004)."
+    outcome: Operations sees the free first year accounts and their periods.
+    frs: [FR-OP-004]
+    tests: [FFY]
+
+  - id: SCR-OP-63
+    title: Report Centre (Operations reports)
+    route: /reports
+    purpose: >-
+      The Operations reports of the Report Centre, by team: Cashiering, Remittance, Adjustment, Production
+      Reconciliation and Commission Receivables, each card with its title, code and a one-line description; a card
+      opens the report.
+    entry:
+      - Reports › Report Centre
+    shots:
+      - {state: list, user: remittl, after: scroll_operations, caption: "Report Centre, the Operations reports"}
+    fields:
+      - "Toolbar | Search reports | Text | Search by title or code | N | Report catalogue | Blank | - | - | -"
+      - "Report cards | [Operations report cards] | Card | Title, code and description; the Operations group lists the Cashiering (CSH), Remittance (REM), Adjustment (ADJ), Production Reconciliation (PRC) and Commission Receivables (CMR) reports | - | Report catalogue | - | Read only | - | -"
+      - "My report batches | Batch No. / Run At / Output / Status | Column | Reports run in a batch | - | Report batches | - | Read only | - | -"
+    actions:
+      - "[Open a report card] | Users who may view Operations reports | Always | Opens the report with its parameters | - | -"
+      - "Report Batch | Users who may view Operations reports | Always | Runs several reports in one batch | - | -"
+    rules:
+      - "The Operations reports are in the category Operations; viewing and exporting are separate permissions (FR-OP-009)."
+      - "The layouts the BRD does not detail are proposed layouts for BDOI to confirm (FR-OP-028, FR-OP-041, FR-OP-062, FR-OP-080, FR-OP-098)."
+    outcome: Every Operations report is found in one place.
+    frs: [FR-OP-009, FR-OP-028, FR-OP-041, FR-OP-062, FR-OP-080, FR-OP-098]
+    tests: [REPORTS]
+
+  - id: SCR-OP-64
+    title: Report
+    route: /reports/:code
+    parent: /reports
+    purpose: >-
+      One Operations report: its parameters (with saved variants), run on screen, printed or exported to Excel, PDF,
+      ODS, CSV or XML; each run is archived with its parameters.
+    entry:
+      - Report Centre › a report card
+      - Report Archive › a run
+    shots:
+      - {state: record, user: remittl, open_report: remittance_tracker, click: "^run report$", caption: "Remittance Tracker run on screen"}
+    fields:
+      - "Parameters | [Report parameters] | Date, drop-down, text | For example Company, From, To, Insurer, Origin | Per report | Report parameters | The report's defaults | - | Mandatory parameters given | -"
+      - "Parameters | Saved Variant / Variant Name | Drop-down, text | The user's and the shared variants | N | Report variants | Blank | - | - | -"
+      - "Print options | Paper / Orientation / Width | Drop-down | Orientation Automatic (by width), Portrait, Landscape | N | Fixed list | Automatic (by width) | - | - | -"
+      - "Result | [Report table] | Table | The columns of the report with its totals | - | Report | - | Read only | - | -"
+    actions:
+      - "Run Report | Users who may view the report | Parameters given | Runs the report on screen and archives the run | - | -"
+      - "Print | Users who may export the report | Parameters given | Produces the printable PDF | - | -"
+      - "[Export buttons] | Users who may export the report | Report run | Downloads the report as Excel, PDF, ODS, CSV or XML | - | -"
+      - "Save Variant / Delete Variant | Every user of the screen | Always | Saves the parameters as a named variant, or deletes one's own | - | -"
+    rules:
+      - "A view-only user runs the report on screen; the export and print buttons are not offered (FR-OP-009)."
+      - "Every run and export is archived with its parameters, user and time (FR-OP-009)."
+    outcome: The user runs, prints and exports the Operations reports.
+    frs: [FR-OP-009]
+    tests: [REPORT]

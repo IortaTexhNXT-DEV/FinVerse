@@ -48,8 +48,8 @@ function ExternalLinks({ links }: Readonly<{ links: OperationsHome['links'] }>) 
     <Card title="Integrated Applications">
       {links.length === 0 ? (
         <p className="ops-muted">
-          No application links yet. The Business Administrator maintains them in the list of values
-          OPS_EXTERNAL_LINK.
+          No application links yet. The Business Administrator adds them in Lists of Values, list
+          Operations external link.
         </p>
       ) : (
         <div className="ops-links">

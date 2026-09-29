@@ -58,6 +58,31 @@ describe('stage steps', () => {
   });
 });
 
+describe('optional detour stages', () => {
+  const ENDORSEMENT: StageDef[] = [
+    { code: 'DRAFT', name: 'Draft', initial: true, terminal: false },
+    { code: 'FOR_POSTING', name: 'For Posting', terminal: false },
+    { code: 'AWAITING_REAPPLICATION', name: 'Posted - payments to re-apply', terminal: false },
+    { code: 'POSTED', name: 'Posted', terminal: true },
+  ];
+  it('leaves the re-application stage out unless the record is in it', () => {
+    expect(stageSteps(ENDORSEMENT, 'FOR_POSTING').map((s) => s.code)).toEqual([
+      'DRAFT',
+      'FOR_POSTING',
+      'POSTED',
+    ]);
+    const detour = stageSteps(ENDORSEMENT, 'AWAITING_REAPPLICATION', [
+      { fromStage: 'FOR_POSTING', toStage: 'AWAITING_REAPPLICATION' },
+    ]);
+    expect(detour.map((s) => `${s.code}:${s.state}`)).toEqual([
+      'DRAFT:done',
+      'FOR_POSTING:done',
+      'AWAITING_REAPPLICATION:current',
+      'POSTED:upcoming',
+    ]);
+  });
+});
+
 describe('StageStepper', () => {
   it('shows every stage, checks the passed ones and highlights the current one', () => {
     render(

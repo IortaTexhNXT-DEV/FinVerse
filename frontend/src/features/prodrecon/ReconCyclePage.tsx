@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInsurerName } from '@/components/broking/useLabels';
+import { statusMessage } from '@/components/ui/statusTones';
 import { Building2, CalendarRange, CheckCheck, Inbox, Send, Sigma } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -19,7 +21,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, formatDateTime, statusPhrase } from '@/utils/format';
+import { formatDate, formatDateTime } from '@/utils/format';
 import { CycleItemsTab } from './CycleItemsTab';
 import { SendExtractDialog } from './ExtractParts';
 import { extractColumns } from './extractColumns';
@@ -165,9 +167,10 @@ function CloseDialog({
 }
 
 function Summary({ cycle: c }: Readonly<{ cycle: ReconCycle }>) {
+  const insurerName = useInsurerName();
   return (
     <RecordSummary
-      title={c.insurerCode}
+      title={insurerName(c.insurerCode)}
       chips={
         <>
           <ReferenceChip label="Cycle" value={c.cycleNo} />
@@ -206,6 +209,7 @@ export default function ReconCyclePage() {
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<TabId>('items');
   const [closing, setClosing] = useState(false);
+  const insurerName = useInsurerName();
   const cycle = useQuery({
     queryKey: ['prodrecon', 'cycle', id],
     queryFn: () => prodreconApi.cycle(id),
@@ -215,7 +219,7 @@ export default function ReconCyclePage() {
     onSuccess: async (c) => {
       setClosing(false);
       await queryClient.invalidateQueries({ queryKey: ['prodrecon'] });
-      toast.success(`${c.cycleNo} is now ${statusPhrase(c.stage)}`);
+      toast.success(statusMessage(c.cycleNo, c.stage));
     },
   });
   if (cycle.data === undefined) {
@@ -227,13 +231,14 @@ export default function ReconCyclePage() {
   }
   const c = cycle.data;
   const editable = can('RECON_PROCESS') && !c.closed;
+  const cycleTitle = `${insurerName(c.insurerCode)} · ${monthLabel(c.productionMonth)}`;
   return (
     <div className="stack">
       <PageHeader
         section="Production Reconciliation · Cycles"
         backTo="/prodrecon/cycles"
         title={c.cycleNo}
-        description={`${c.insurerCode} · ${monthLabel(c.productionMonth)}`}
+        description={cycleTitle}
         actions={
           editable ? (
             <>

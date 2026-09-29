@@ -1,4 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
+import { InsurerSelect } from '@/components/broking/InsurerSelect';
+import { useInsurerName } from '@/components/broking/useLabels';
 import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
@@ -99,6 +101,7 @@ export function CertificateDialog({
   onClose: () => void;
   onSave: (input: CertificateInput) => void;
 }>) {
+  const insurerName = useInsurerName();
   const [form, setForm] = useState<CertificateInput>(
     certificate === undefined
       ? blank(companyId)
@@ -144,17 +147,24 @@ export function CertificateDialog({
         <ErrorAlert error={error ?? load.error} />
         {problem && <p className="field-error">{problem}</p>}
         <div className="form-grid">
-          <Field label="Insurer Code" required>
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                maxLength={30}
-                disabled={certificate !== undefined}
-                value={form.insurerCode ?? ''}
-                onChange={(e) => set({ insurerCode: e.target.value.toUpperCase() })}
-              />
-            )}
+          <Field label="Insurer" required>
+            {(id) =>
+              certificate === undefined ? (
+                <InsurerSelect
+                  id={id}
+                  value={form.insurerCode ?? ''}
+                  onChange={(code) => set({ insurerCode: code })}
+                />
+              ) : (
+                <input
+                  id={id}
+                  className="input"
+                  disabled
+                  readOnly
+                  value={insurerName(form.insurerCode)}
+                />
+              )
+            }
           </Field>
           <Field label="BIR Form" required>
             {(id) => (

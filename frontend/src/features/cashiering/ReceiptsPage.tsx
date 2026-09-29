@@ -17,7 +17,8 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, humanize } from '@/utils/format';
-import { CodeSelect, TextField } from './CashFields';
+import { CodeSelect, InsurerField, TextField } from './CashFields';
+import { modeLabel } from './cashieringLabels';
 import { cashieringApi } from './cashieringApi';
 import type { ReceiptCriteria, ReceiptSummary } from './cashieringApi';
 import { IssueOrDialog } from './IssueOrDialog';
@@ -38,7 +39,6 @@ const FILTER_FIELDS: readonly [keyof Filters, string, 'text' | 'number' | 'date'
   ['policyNo', 'Policy No.', 'text'],
   ['payor', 'Payor Name', 'text'],
   ['assured', 'Assured Name', 'text'],
-  ['insurer', 'Insurer Code', 'text'],
   ['amount', 'Amount', 'number'],
   ['from', 'Date From', 'date'],
   ['to', 'Date To', 'date'],
@@ -64,11 +64,11 @@ const COLUMNS: Column<ReceiptSummary>[] = [
     render: (r) => (
       <>
         {r.payorName}
-        <span className="cell-sub">{r.assuredName ?? r.payorCode ?? ''}</span>
+        <span className="cell-sub">{r.assuredName ?? ''}</span>
       </>
     ),
   },
-  { key: 'mode', header: 'Mode', render: (r) => humanize(r.mode) },
+  { key: 'mode', header: 'Mode', render: (r) => modeLabel(r.mode) },
   { key: 'amount', header: 'Amount', numeric: true, render: (r) => <Amount value={r.amount} /> },
   {
     key: 'applied',
@@ -100,12 +100,16 @@ function FilterPanel({
           onChange={(v) => onChange({ ...value, [key]: v })}
         />
       ))}
+      <InsurerField
+        value={value.insurer ?? ''}
+        onChange={(v) => onChange({ ...value, insurer: v })}
+      />
       <CodeSelect
         label="Kind"
         value={value.kind ?? ''}
         options={['AR', 'OR']}
         empty="All"
-        labelOf={(c) => c}
+        labelOf={(c) => (c === 'AR' ? 'Acknowledgement Receipt' : 'Official Receipt')}
         onChange={(v) => onChange({ ...value, kind: v as Filters['kind'] })}
       />
       <CodeSelect

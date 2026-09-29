@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.adjustment.domain.EndorsementRequestReposito
 import com.iortatechnxt.brokerverse.adjustment.domain.RequestStage;
 import com.iortatechnxt.brokerverse.adjustment.domain.RequestTerms;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import java.util.List;
 import java.util.Objects;
@@ -77,7 +78,7 @@ public class RequestConflicts {
             "Request "
                 + other.getRequestNo()
                 + " ("
-                + other.getComputation()
+                + DisplayFormat.words(other.getComputation())
                 + ") is still open on "
                 + invoiceNo
                 + ": a cancellation cannot be combined with another financial change");

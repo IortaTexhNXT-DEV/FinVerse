@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.support.AsUser;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.workflow.service.TransitionNote;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
+import com.iortatechnxt.brokerverse.workflow.service.WorkflowViewService;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,7 @@ class UnappliedDispositionIT {
   @Autowired private UnappliedService unapplied;
   @Autowired private DisbursementQueueService disbursements;
   @Autowired private WorkflowService workflow;
+  @Autowired private WorkflowViewService views;
   @Autowired private AsUser as;
 
   private Unapplied unmatched(BigDecimal amount) {
@@ -60,6 +62,16 @@ class UnappliedDispositionIT {
 
     as.run("cashier", () -> dispositions.assign(id, "REFUND", amount(new BigDecimal("420.00"))));
     assertThat(unapplied.get(id).getStage()).isEqualTo("MONITORING");
+    // The workflow history names the disposition type, not its code.
+    assertThat(
+            as.run(
+                "cashier",
+                () -> views.view(UnappliedService.ENTITY, id.toString()).orElseThrow().history()))
+        .anySatisfy(
+            h -> {
+              assertThat(h.getAction()).isEqualTo("assign_disposition");
+              assertThat(h.getComment()).isEqualTo("Refund");
+            });
     as.run("cashier", () -> dispositions.submit(id));
     assertThat(unapplied.get(id).getStage()).isEqualTo("FOR_APPROVAL");
 

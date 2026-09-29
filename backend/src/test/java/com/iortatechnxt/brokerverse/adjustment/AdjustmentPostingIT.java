@@ -10,6 +10,9 @@ import com.iortatechnxt.brokerverse.adjustment.domain.EndorsementRequest;
 import com.iortatechnxt.brokerverse.adjustment.domain.PostingBatch;
 import com.iortatechnxt.brokerverse.adjustment.domain.RequestStage;
 import com.iortatechnxt.brokerverse.adjustment.service.AdjustmentPostingService;
+import com.iortatechnxt.brokerverse.adjustment.service.EndorsementRequestService;
+import com.iortatechnxt.brokerverse.adjustment.service.Recompute;
+import com.iortatechnxt.brokerverse.adjustment.service.RequestDraft;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
 import com.iortatechnxt.brokerverse.booking.domain.PremiumComponents;
 import com.iortatechnxt.brokerverse.catalog.service.PremiumCalculator;
@@ -40,6 +43,7 @@ class AdjustmentPostingIT {
   @Autowired private InvoiceLedgerQueryService ledger;
   @Autowired private CapturedLedgerEvents events;
   @Autowired private AsUser as;
+  @Autowired private EndorsementRequestService requests;
 
   private static BigDecimal change(EndorsementRequest r, LedgerComponent component) {
     return r.getChanges().stream()
@@ -117,6 +121,39 @@ class AdjustmentPostingIT {
     assertThat(returned.getKind()).isEqualTo(InvoiceKind.ENDORSEMENT_MINUS);
     assertThat(returned.balances().values()).allSatisfy(b -> assertThat(b).isZero());
     assertThat(original.isPendingNegAdj()).isFalse();
+  }
+
+  @Test
+  void aFlatCancellationAfterAnEndorsementIsRecomputedOnThePremiumInForce() {
+    OpsInvoice invoice = fx.invoice();
+    fx.raiseAndPost(
+        invoice,
+        AdjustmentFixtures.terms("FIN_TSI", "TSI_CHANGE", null, FROM, new BigDecimal("200000")),
+        AmountInput.NONE);
+
+    Recompute recompute =
+        as.run(
+            AdjustmentFixtures.REQUESTER,
+            () ->
+                requests
+                    .preview(
+                        new RequestDraft(
+                            invoice.getInvoiceNo(),
+                            AdjustmentFixtures.cancellation("FLAT_CANCELLATION", FROM),
+                            AmountInput.NONE,
+                            null,
+                            null))
+                    .recompute());
+
+    assertThat(recompute.components()).allSatisfy(c -> assertThat(c.after()).isNotNegative());
+    assertThat(recompute.components())
+        .filteredOn(c -> c.component() == LedgerComponent.DTIP)
+        .singleElement()
+        .satisfies(
+            c -> {
+              assertThat(c.before()).isGreaterThan(invoice.getGrossPremium());
+              assertThat(c.after()).isZero();
+            });
   }
 
   @Test

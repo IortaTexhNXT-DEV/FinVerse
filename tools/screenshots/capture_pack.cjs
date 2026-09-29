@@ -151,6 +151,10 @@ function newContext(browser, options = {}) {
 
 async function signIn(browser, user) {
   const context = await newContext(browser);
+  if (process.env.TRACE_DIR) {
+    // A trace per persona for the person running the capture (TRACE_DIR set): kept when a shot fails.
+    await context.tracing.start({ screenshots: true, snapshots: true });
+  }
   const page = await context.newPage();
   page.setDefaultTimeout(20000);
   await page.goto(`${BASE}/login`);
@@ -648,6 +652,10 @@ async function cropOf(page, shot, recipe) {
       for (const [user, p] of pages.entries()) {
         await p.screenshot({ path: path.join(os.tmpdir(), `capture-pack-failed-${shot.slug}-${user}.png`) })
           .catch(() => {});
+        if (process.env.TRACE_DIR) {
+          await p.context().tracing.stop({ path: path.join(process.env.TRACE_DIR, `trace-${shot.slug}-${user}.zip`) }).catch(() => {});
+          await p.context().tracing.start({ screenshots: true, snapshots: true }).catch(() => {});
+        }
       }
       failed.push(`${shot.slug}: ${String(e.message).split('\n')[0]}`);
       console.log('FAILED', shot.slug, String(e.message).split('\n')[0]);

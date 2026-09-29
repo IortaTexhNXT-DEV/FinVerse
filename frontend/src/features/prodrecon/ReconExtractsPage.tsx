@@ -2,7 +2,9 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FilePlus2 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/auth/authContext';
-import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
+import { InsurerFilter } from '@/components/broking/InsurerFilter';
+import { InsurerSelect } from '@/components/broking/InsurerSelect';
+import { MonthInput } from '@/components/ui/MonthInput';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
@@ -60,30 +62,21 @@ function ExtractDialog({
     >
       <div className="stack">
         <ErrorAlert error={error} />
-        <Field label="Insurer Code" required error={invalid}>
+        <Field label="Insurer" required error={invalid}>
           {(id) => (
-            <input
+            <InsurerSelect
               id={id}
-              className="input"
-              maxLength={30}
               value={insurer}
-              onChange={(e) => {
-                setInsurer(e.target.value);
+              aria-invalid={invalid !== undefined}
+              onChange={(code) => {
+                setInsurer(code);
                 setInvalid(undefined);
               }}
             />
           )}
         </Field>
         <Field label="Production Month" required hint="Accounts booked in the month">
-          {(id) => (
-            <input
-              id={id}
-              type="month"
-              className="input"
-              value={month}
-              onChange={(e) => setMonth(e.target.value)}
-            />
-          )}
+          {(id) => <MonthInput id={id} value={month} onChange={(e) => setMonth(e.target.value)} />}
         </Field>
         <p className="muted">
           The register lists the accounts booked for the insurer in the month; it opens the
@@ -145,10 +138,10 @@ export default function ReconExtractsPage() {
       <ErrorAlert error={extracts.error ?? send.error} />
       <Card>
         <div className="stack">
-          <WorklistToolbar
-            placeholder="Search Insurer Code"
-            onSearch={(text) => {
-              setInsurer(text.trim().toUpperCase());
+          <InsurerFilter
+            value={insurer}
+            onChange={(code) => {
+              setInsurer(code);
               setPage(0);
             }}
           />

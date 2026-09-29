@@ -1,0 +1,423 @@
+# Screen specifications of BRD-2 Operations: Remittance to insurers (extraction, batches, insurer OR, holds, special
+# remittance, DTIP status, deductions confirmed by the insurer, early remittance incentive rules) and the Disbursement
+# queue that pays the insurers until the Disbursement module of BRD-5 takes it over.
+area: Remittance to insurers
+screens:
+  - id: SCR-OP-23
+    title: Remittance Workbench
+    route: /remittance
+    purpose: >-
+      The landing page of Remittance: paid premium not yet extracted, invoices on hold or locked, batches in review,
+      for approval and awaiting the insurer's OR, holds and special remittances for approval, each opening its list.
+    entry:
+      - Operations Home › Remittance › Open
+    shots:
+      - {state: home, user: remittl, caption: "Remittance Workbench with the work queues"}
+    fields:
+      - "Work Queues | [Work tiles: Paid, Not Yet Extracted; Invoices on Hold; Locked Invoices; Batches in Review; Batches for Approval; Awaiting Insurer OR; Holds for Approval; Active Holds; Special Remittances for Approval] | Tile | Live count; Needs attention on the queues waiting for action | - | Remittance records and the invoice ledger | - | Read only | A tile opens its list | -"
+    actions:
+      - "Search Invoices | Every Remittance user | Always | Opens Invoice Search | - | -"
+      - "[A work tile] | Every Remittance user | Always | Opens the list of the queue | - | -"
+    rules:
+      - "The tiles are counted live from the remittance records and the invoice ledger (FR-OP-003)."
+    outcome: The Remittance team sees the batches and requests waiting for it.
+    frs: [FR-OP-003]
+    tests: [REMWB]
+
+  - id: SCR-OP-24
+    title: Extraction
+    route: /remittance/extraction
+    purpose: >-
+      Extracts the paid and cleared premium due to the insurers into remittance batches per insurer and remittance
+      type, for every insurer, one insurer or one invoice, and lists the runs with what each examined, extracted and
+      left out with the reasons.
+    entry:
+      - Remittance Workbench › Paid, Not Yet Extracted tile
+    shots:
+      - {state: list, user: remit, caption: "Extraction with the Run Extraction card and the extraction runs"}
+      - {state: tags, user: remit, open: first, caption: "Extraction run with the tag and reasons of each invoice examined"}
+    fields:
+      - "Run Extraction | Insurer | Drop-down | Insurers by name; All insurers for every insurer | N | Insurers (BRD-3) | All insurers | - | - | -"
+      - "Run Extraction | Remittance Type | Drop-down | All types, With Incentives, Normal - Peso, Normal - Dollar | N | Fixed list | All types | - | - | -"
+      - "Run Extraction | Invoice No. | Text | Manual extraction of one invoice | N | Invoice ledger | Blank | - | - | -"
+      - "Extraction Runs | Run No. / Scope / Status / Examined / Extracted / Due, Not Extracted / Not Yet Due / Batches / Started | Column | REX-yyyy-n with the trigger; started time and user | - | Extraction runs | - | Read only | - | -"
+      - "Extraction run dialog | Invoice No. / Insurer / Type / Tag / Reasons / Paid AR / Remitted Now / Batch | Column | Tag Extracted, Due - Not Extracted, Not Yet Due or Returned with the reasons (on hold, pending negative adjustment, written off, check holding period, paid AR above DTIP, locked by another team) | - | Extraction tags | - | Read only | - | Only extracted and due invoices are listed; none in this run"
+    actions:
+      - "Run Extraction | Remittance Processor | Always | Examines the eligible invoices of the scope, tags each and groups the extracted ones into batches per insurer and type, each invoice locked while in its batch | Batch in Review in process | Remittance extraction completed (NT-10)"
+      - "Open a run | Every Remittance user | Always | Shows the invoices of the run with their tag and reasons | - | -"
+    rules:
+      - "An invoice is examined when its remittance status is Unprocessed, With Outstanding Balance or Partially Remitted; cancelled, direct payment and return invoices are skipped (FR-OP-031)."
+      - "Only applied and posted payments count as paid AR; the amount to remit is the paid AR less the DTIP already remitted (FR-OP-031)."
+      - "An invoice on hold, with a pending negative adjustment, written off, locked by another team, with a payment younger than the check holding period, or whose paid AR is above its DTIP balance is not extracted and is tagged with the reason (FR-OP-031)."
+      - "The scheduled extraction runs every day at noon; each insurer is processed on its own (FR-OP-030)."
+      - "An invoice covered by an early remittance incentive rule goes to a With Incentives batch (FR-OP-038)."
+    outcome: The premium due to each insurer is grouped into batches with the reasons for every invoice left out.
+    frs: [FR-OP-030, FR-OP-031, FR-OP-038]
+    tests: [EXTRACTION]
+
+  - id: SCR-OP-25
+    title: Remittance Batches
+    route: /remittance/batches
+    purpose: >-
+      Process Remittance: the batches by stage (review, approval, with Disbursement, awaiting the insurer's OR, OR
+      received, returned) with their insurer, type, accounts, paid AR and payable; selected batches are submitted or
+      approved in one action.
+    entry:
+      - Remittance Workbench › Batches in Review, Batches for Approval and Awaiting Insurer OR tiles
+    shots:
+      - {state: list, user: remit, caption: "Remittance Batches, Review in Process tab"}
+      - {state: approval, user: remittl, tab: "For Approval", caption: "Remittance Batches, For Approval tab of the Remittance Team Leader"}
+    fields:
+      - "Tabs | Review in Process / For Approval / With Disbursement / Awaiting Insurer OR / OR Received / Returned | Tab | - | - | Fixed | Review in Process | - | - | -"
+      - "Toolbar | Search Batch or Invoice No. | Text | - | N | - | Blank | - | Contains | -"
+      - "Filters | Insurer / Remittance Type | Drop-down | All insurers or one by name; All types, With Incentives, Normal - Peso, Normal - Dollar, Special | N | - | Blank / All types | - | - | -"
+      - "List | Select | Check box | Review in Process and For Approval | N | - | Not ticked | - | - | -"
+      - "List | Batch No. / Insurer / Type / Accounts / Paid AR / Payable / Currency / Processor / DV No. / Status | Column | RMB-<insurer>-yyyy-n with the extraction date | - | Remittance batches | - | Read only | - | No items to display"
+    actions:
+      - "Submit Selected | Remittance Processor | Review in Process, rows selected | Asks for confirmation and submits each selected batch on its own; a batch that cannot be submitted is reported | For approval | Remittance batch for approval (NT-11)"
+      - "Approve Selected | Remittance Team Leader | For Approval, rows selected | Asks for confirmation and approves each batch on its own (never one the approver submitted) | Approved - with Disbursement | Remittance batch approved or returned (NT-12)"
+      - "Open a row | Every Remittance user | Always | Opens the remittance batch | - | -"
+    rules:
+      - "A batch is approved by someone other than its submitter (FR-OP-035)."
+      - "Bulk submission and approval process each batch on its own (FR-OP-033, FR-OP-035)."
+    outcome: The team sees every batch by stage and moves them on in bulk.
+    frs: [FR-OP-032, FR-OP-033, FR-OP-035, FR-OP-036]
+    tests: [BATCHES]
+
+  - id: SCR-OP-26
+    title: Remittance Batch
+    route: /remittance/batches/:id
+    parent: /remittance/batches
+    purpose: >-
+      One batch: insurer, type, processor, accounts, Disbursement request and DV, the commission and incentive ORs,
+      the Process Remittance workflow with its history, the read-only totals strip, the accounts with their exclusions
+      and restore, the settlement with the insurer's deductions, and the remittance schedule and payment request.
+    entry:
+      - Remittance Batches › open a row
+      - Invoice 360 › Remittances tab
+    shots:
+      - {state: review, user: remit, open_batch: review, caption: "Remittance batch in review: workflow header, totals strip and the accounts"}
+      - {state: preview, user: remit, open_batch: review, click: "^preview and submit$", caption: "Preview Submission dialog with the totals"}
+      - {state: closed, user: remittl, open_batch: or_received, caption: "Remittance batch with the insurer's OR received: the completed workflow"}
+      - {state: documents, user: remittl, open_batch: or_received, tab: "Documents and Receipts", caption: "Documents and Receipts tab: schedule, payment request and the ORs"}
+    fields:
+      - "Header | [Batch chip, stage pill and type tag] | Reference chip, status pill, tag | RMB-<insurer>-yyyy-n; the special remittance request for a special batch | - | Remittance batch | - | Read only | - | -"
+      - "Header | Insurer / Processor / Accounts / Disbursement / Commission / Incentive OR | Display | Accounts kept of the accounts extracted; payment request, its status and DV number | - | Remittance batch | - | Read only | - | -"
+      - "Workflow | [Process Remittance workflow header] | Stepper | Review in process, For approval, Approved - with Disbursement, Partially and Fully remitted - awaiting insurer OR, Insurer OR received; Batch on hold and Returned when reached | - | Remittance batch | - | Read only | - | -"
+      - "Totals | Paid AR / Realized Commission / VAT / WTAX / DTIP / Incentive with VAT / CPC2 with VAT / Net Due / Payable / Deductions / Amount Due | Display | Amounts of the accounts kept, read only; Deductions and Amount Due when the insurer confirmed deductions | - | Computed | - | Read only | Net due = paid AR + WTAX - commission - VAT; payable = net due - incentive with VAT | -"
+      - "Tabs | Accounts / Settlement / Documents and Receipts | Tab | - | - | Fixed | Accounts | - | - | -"
+      - "Accounts | Search Invoice No. or Assured | Text | - | N | - | Blank | - | - | -"
+      - "Accounts | Invoice No. / Name of Assured / Last Paid / Paid AR / Commission / VAT / WTAX / Incentive / CPC2 / Net Due / Insurer OR | Column | Invoice with the policy number; the insurer OR with Matched or Amount Mismatch | - | Batch lines | - | Read only | - | -"
+      - "Accounts | Exclusions | Panel | Excluded accounts with the reason and Restore | - | Batch lines | - | While in review or on hold | - | No account is excluded."
+      - "Exclude dialog | Reason | Drop-down | - | Y | List of values remittance exclusion reason | Blank | Review in process, on hold | - | Select a reason"
+      - "Settlement | Deduction / Send Cycle / Applied On / Journal / Amount / Status | Column | The insurer's confirmed deductions applied to the batch | - | Remittance deductions | - | Read only | - | No deduction applied to this batch"
+      - "Documents and Receipts | Remittance Schedule (PDF) / Remittance Schedule (Excel) / Payment Request (PDF) | Button | Generated documents (chapter 17) | - | Document templates | - | - | - | -"
+      - "Documents and Receipts | Submitted by / Approved by / Payment request / ORs / Schedule sent to insurer / Return reason | Display | Names, amounts, date and time | - | Remittance batch | - | Read only | - | -"
+      - "Preview Submission / Approve dialog | Comment | Text area | Kept in the status history and sent with the notification | N | - | Blank | - | - | -"
+      - "Send Schedule to Insurer dialog | To / Subject / Message | Text | E-mail addresses separated by commas | Y / Y / N | The insurer's e-mail addresses | Proposed | Approved and later, not sent yet | Valid addresses; subject not blank | Enter valid e-mail addresses separated by commas / Subject is required"
+    actions:
+      - "Exclude Selected / Exclude Accounts | Remittance Processor | Review in process or on hold, rows selected | Excludes the accounts with the reason; each is unlocked and keeps its amounts | - | -"
+      - "Restore | Remittance Processor | Excluded account, batch still editable | Takes the account back into the batch and locks it again | - | -"
+      - "Preview and Submit / Submit for Approval | Remittance Processor | Review in process | Shows the accounts kept and excluded, the totals and any problem, and submits the batch | For approval | Remittance batch for approval (NT-11)"
+      - "Hold Batch / Release Batch | Remittance Processor | Review in process / On hold | Holds the batch with a reason, or releases it | Batch on hold / Review in process | Workflow notice (NT-01)"
+      - "Return Batch | Remittance Processor or Team Leader | Review in process, on hold or for approval | Asks for the reason; unlocks the accounts and tags them Returned | Returned | Remittance batch approved or returned (NT-12)"
+      - "Approve and Push | Remittance Team Leader other than the submitter | For approval | Posts the remittance to the ledger, sends the payment request to Disbursement and requests the commission and incentive ORs from Cashiering | Approved - with Disbursement | Remittance batch approved or returned (NT-12); Disbursement request received (NT-03)"
+      - "Send back to processor | Remittance Team Leader | For approval | Sends the batch back with a reason | Review in process | Workflow notice (NT-01)"
+      - "Send Schedule to Insurer / Send via Email | Remittance Processor | Approved or later, schedule not sent yet | E-mails the schedule to the insurer as a password-protected Excel file; the password follows in a separate e-mail | - | Remittance schedule e-mail (NT-24)"
+      - "Remittance Schedule (PDF) / Remittance Schedule (Excel) / Payment Request (PDF) | Every Remittance user | Always | Downloads the document | - | -"
+    rules:
+      - "Rows of the extract are excluded and restored with a reason while the batch is in review or on hold; amounts cannot be edited (FR-OP-032)."
+      - "Submission and approval check again every account kept: still locked by Remittance, not cancelled, on hold, written off or with a pending negative adjustment (FR-OP-033, FR-OP-035)."
+      - "Approval posts the remittance: DTIP, commission, VAT and withholding tax remitted, the incentive income of a With Incentives batch, and the payment request of the payable to Disbursement (FR-OP-035, FR-OP-038)."
+      - "The DV number of Disbursement makes each invoice Fully or Partially Remitted and releases its lock (FR-OP-036)."
+      - "The schedule is sent to the insurer once per batch (FR-OP-110)."
+      - "Deductions confirmed by the insurer are taken from the amount due of its next batch (FR-OP-035)."
+    outcome: The batch is reviewed, approved, paid through Disbursement and closed by the insurer's OR.
+    frs: [FR-OP-032, FR-OP-033, FR-OP-034, FR-OP-035, FR-OP-036, FR-OP-038, FR-OP-110]
+    tests: [BATCH]
+
+  - id: SCR-OP-27
+    title: Insurer OR Upload
+    route: /remittance/insurer-or
+    purpose: >-
+      Uploads the remittance schedules returned by the insurers with their official receipts: each row sets the
+      insurer OR on its batch line, compares the OR amount with the paid premium and closes the batch when every line
+      has its OR; the upload history lists each run with its records.
+    entry:
+      - Remittance Workbench › Awaiting Insurer OR tile
+    shots:
+      - {state: page, user: remit, caption: "Insurer OR Upload with the upload history"}
+      - {state: run, user: remit, open: first, caption: "Upload run with the accounts updated and the result of each record"}
+    fields:
+      - "Upload Insurer Schedule | Download Template | Button | Batch number, invoice number, OR number, OR date and OR amount | - | - | - | - | - | -"
+      - "Upload Insurer Schedule | Insurer Schedule | File | The Excel template, or a CSV or text file with its columns (Batch No., Invoice No., OR No., OR Date, OR Amount), dates as dd-MMM-yyyy; max 20 MB | Y | - | - | - | A record already received is refused | -"
+      - "Upload History | Upload Run / File / Status / Accepted / Failed / Uploaded | Column | FIR-yyyy-n; uploaded time and user | - | Upload runs | - | Read only | - | -"
+      - "Upload run dialog | Records Read / OR Matches Paid PR / Amount Mismatch / Refused | Tile | Counts | - | Upload run | - | Read only | - | -"
+      - "Upload run dialog | Batch No. / Invoice No. / OR No. / OR Date / OR Amount / Paid PR / Status | Column | Matched or Amount Mismatch | - | Batch lines | - | Read only | - | No account was updated by this upload"
+      - "Upload run dialog | Record / Result / Reason | Column | The records refused with the reason | - | Upload run | - | Read only | - | -"
+    actions:
+      - "Upload File | Remittance Processor | File chosen | Records the insurer ORs on the batch lines | Batch Insurer OR received when every line has its OR | -"
+      - "Open a run | Every Remittance user | Always | Shows the records of the run | - | -"
+    rules:
+      - "The OR amount is compared exactly with the paid premium of the invoice; a difference is Amount Mismatch and is listed in the exception report (FR-OP-037)."
+      - "Duplicates and lines excluded from the batch are refused record by record (FR-OP-037)."
+    outcome: The insurer's official receipts are recorded against every remitted invoice.
+    frs: [FR-OP-037]
+    tests: [ORUP]
+
+  - id: SCR-OP-28
+    title: Remittance Holds
+    route: /remittance/holds
+    purpose: >-
+      Hold requests from Marketing that keep an invoice out of remittance until a date: approval, assignment to a
+      processor, extension, cancellation and release; requests from the Collection file are uploaded here.
+    entry:
+      - Remittance Workbench › Holds for Approval and Active Holds tiles
+    shots:
+      - {state: list, user: mkttl, caption: "Remittance Holds, For Approval tab"}
+      - {state: new, user: mktcoll, fill: hold_request, caption: "New Hold Request dialog"}
+    fields:
+      - "Tabs | For Approval / Active Holds / Drafts / Released and Closed | Tab | - | - | Fixed | For Approval | - | - | -"
+      - "Toolbar | Search Hold or Invoice No. | Text | - | N | - | Blank | - | Contains | -"
+      - "List | Hold No. / Invoice No. / Name of Assured / Insurer / Reason / Hold Until / Processor / Status | Column | HLD-yyyy-n with the requester | - | Hold requests | - | Read only | - | No items to display"
+      - "New Hold Request dialog | Invoice No. | Text | - | Y | Invoice ledger | Blank | - | Not blank; one live hold per invoice | Invoice No. is required"
+      - "New Hold Request dialog | Reason | Drop-down | - | Y | List of values hold reason | Blank | - | - | Select a reason"
+      - "New Hold Request dialog | Hold Until | Date | dd-MMM-yyyy, after today | Y | - | Blank | - | A future date | Hold Until is required / Hold Until must be a future date"
+      - "New Hold Request dialog | Remarks | Text area | - | N | - | Blank | - | - | -"
+      - "Upload Collection Hold File | Hold File | File | The Excel template, or a CSV or text file with its columns (Invoice No., Reason Code, Hold Until, Remarks), dates as dd-MMM-yyyy | Y | - | - | - | - | -"
+    actions:
+      - "New Hold Request | Marketing Collection, Marketing Team Leader | Always | Creates the hold request in draft and submits it | Hold for approval | Hold for approval notice (NT-14)"
+      - "Upload Hold File | Marketing Collection, Marketing Team Leader | Always | Creates the hold requests of the Collection file | Hold for approval | Hold for approval notice (NT-14)"
+      - "Open a row | Every user of the screen | Always | Opens the hold request | - | -"
+    rules:
+      - "One live hold request per invoice (FR-OP-111)."
+      - "A hold is approved by a Marketing Team Leader other than its requester (FR-OP-111)."
+    outcome: Marketing keeps an invoice out of remittance until a date, with approval.
+    frs: [FR-OP-111]
+    tests: [HOLDS]
+
+  - id: SCR-OP-29
+    title: Remittance Hold
+    route: /remittance/holds/:id
+    parent: /remittance/holds
+    purpose: >-
+      One hold request: invoice, insurer, hold date, requester and approver, processor, the hold workflow with its
+      history and its actions (approve, reject, extend, cancel, release, assign).
+    entry:
+      - Remittance Holds › open a row
+      - Invoice 360 › Remittances tab
+    shots:
+      - {state: approval, user: mkttl, open_hold: for_approval, caption: "Hold request for approval with the workflow header"}
+    fields:
+      - "Header | [Hold chip and stage pill] | Reference chip, status pill | HLD-yyyy-n; the Collection File tag for a hold from the Collection file | - | Hold request | - | Read only | - | -"
+      - "Header | Invoice / Insurer / Hold Until / Requested / Approved By / Processor | Display | - | - | Hold request | - | Read only | - | -"
+      - "Workflow | [Hold workflow header] | Stepper | Hold request draft, Hold for approval, On hold, Released; extension and cancellation for approval, Rejected and Cancelled when reached | - | Hold request | - | Read only | - | -"
+      - "Request Extension dialog | New Hold Until / Comment | Date, text | After the current hold date | Y / N | - | Blank | On hold | A later date | -"
+      - "Assign to Processor dialog | Remittance Processor | Drop-down | The Remittance processors by name | Y | Users | Blank | On hold | Chosen | Select the remittance processor"
+    actions:
+      - "Approve hold / Reject hold | Marketing Team Leader other than the requester | Hold for approval | Approves the hold (the invoice is flagged On Hold) or rejects it | On hold / Rejected | Hold decided notice (NT-14)"
+      - "Request extension / Approve extension / Reject extension | Requester / Marketing Team Leader | On hold / Extension for approval | Moves the hold date on approval | Extension for approval / On hold | Hold for approval notice (NT-14)"
+      - "Request cancellation / Approve cancellation / Reject cancellation | Requester / Marketing Team Leader | On hold / Cancellation for approval | Ends the hold on approval | Cancellation for approval / Cancelled | Hold for approval notice (NT-14)"
+      - "Release hold | Marketing Collection, Marketing Team Leader | On hold | Releases the hold; the invoice is eligible for extraction again | Released | Workflow notice (NT-01)"
+      - "Assign to Processor | Remittance Processor or Team Leader | On hold | Assigns the hold to a remittance processor | - | -"
+    rules:
+      - "An approved hold keeps the invoice out of the extraction until the hold date; the daily expiry job releases the holds whose date has passed and warns the day before (FR-OP-111)."
+      - "The requester never approves the own hold, extension or cancellation (FR-OP-111)."
+    outcome: The hold is decided, extended, cancelled or released with its history.
+    frs: [FR-OP-111]
+    tests: [HOLD]
+
+  - id: SCR-OP-30
+    title: Special Remittance
+    route: /remittance/special
+    purpose: >-
+      Invoices Marketing asks to remit outside the regular schedule (for example for a claim), from the request to
+      Disbursement: the requests by stage, the new request and the Collection file upload.
+    entry:
+      - Remittance Workbench › Special Remittances for Approval tile
+    shots:
+      - {state: list, user: remittl, caption: "Special Remittance, For Approval tab"}
+      - {state: new, user: mktcoll, click: "^new special remittance$", caption: "New Special Remittance dialog"}
+    fields:
+      - "Tabs | For Approval / In Process Remittance / Pushed to Disbursement / Rejected and Returned | Tab | - | - | Fixed | For Approval | - | - | -"
+      - "Toolbar | Search Request or Invoice No. | Text | - | N | - | Blank | - | Contains | -"
+      - "List | Request No. / Invoice No. / Name of Assured / Insurer / Condition / Requestor / Batch / Status | Column | SPR-yyyy-n | - | Special remittance requests | - | Read only | - | No items to display"
+      - "New Special Remittance dialog | Invoice No. | Text | - | Y | Invoice ledger | Blank | - | Paid, cleared and not on hold | Invoice No. is required"
+      - "New Special Remittance dialog | Condition | Drop-down | - | Y | List of values special remittance condition | Blank | - | A claims condition needs an open claim awaiting the premium remittance | Select a condition"
+      - "New Special Remittance dialog | Remarks | Text area | - | N | - | Blank | - | - | -"
+    actions:
+      - "New Special Remittance | Marketing Collection, Marketing Team Leader | Always | Creates and validates the request | Special remittance for approval | Special remittance for approval notice (NT-15)"
+      - "Upload File | Marketing Collection, Marketing Team Leader | Always | Creates the requests of the Collection file | Special remittance for approval | Special remittance for approval notice (NT-15)"
+      - "Open a row | Every user of the screen | Always | Opens the request | - | -"
+    rules:
+      - "The invoice of a special remittance must be paid, cleared and not on hold (FR-OP-112)."
+      - "A claims condition is confirmed against the open claims awaiting the premium remittance (FR-OP-112)."
+    outcome: Marketing asks for an invoice to be remitted ahead of the schedule.
+    frs: [FR-OP-040, FR-OP-112]
+    tests: [SPECIAL]
+
+  - id: SCR-OP-31
+    title: Special Remittance Request
+    route: /remittance/special/:id
+    parent: /remittance/special
+    purpose: >-
+      One special remittance request: invoice, insurer and segment, requester and approver, the validation, the
+      special batch created on approval, and the workflow with approve and reject.
+    entry:
+      - Special Remittance › open a row
+    shots:
+      - {state: record, user: remittl, open_special: first, caption: "Special remittance request with its workflow"}
+    fields:
+      - "Header | Request / Invoice / Insurer / Segment / Requested / Approved By / Validation / Special Batch | Display | SPR-yyyy-n; the special batch once approved | - | Special remittance request | - | Read only | - | -"
+      - "Workflow | [Special remittance workflow header] | Stepper | Requested - validating, Special remittance for approval, In Process Remittance, Pushed to Disbursement; Rejected and Returned by Remittance when reached | - | Special remittance request | - | Read only | - | -"
+      - "Reject dialog | Reason / Comment | Drop-down, text | - | Y / N | List of values remittance return reason | Blank | For approval | - | Select a reason"
+    actions:
+      - "Approve special remittance | Remittance Team Leader other than the requester | For approval | Approves the request and creates its special batch at once, with no processor, so that another approver approves the batch | In Process Remittance | Special remittance decided notice (NT-15)"
+      - "Reject special remittance | Remittance Team Leader | For approval | Rejects the request with a reason | Rejected | Special remittance decided notice (NT-15)"
+    rules:
+      - "The approval creates a Special batch that follows the batch workflow (FR-OP-040)."
+      - "Every change of status is notified to the requester (FR-OP-040)."
+    outcome: The approved invoice is remitted in its own special batch.
+    frs: [FR-OP-040, FR-OP-112]
+    tests: [SPECIAL]
+
+  - id: SCR-OP-32
+    title: DTIP Status
+    route: /remittance/dtip
+    purpose: >-
+      What is due to the insurers per invoice (paid AR, DTIP, remitted and outstanding DTIP, the last extraction tag,
+      flags and remittance status) and the accounts in remittance batches; an invoice can be queued for the
+      end-of-day extraction.
+    entry:
+      - Remittance Workbench
+    shots:
+      - {state: list, user: remit, caption: "DTIP Status per invoice"}
+      - {state: batches, user: remit, tab: "Accounts in Batches", caption: "Accounts in Batches tab"}
+    fields:
+      - "Tabs | DTIP Status / Accounts in Batches | Tab | - | - | Fixed | DTIP Status | - | - | -"
+      - "Toolbar | Search Invoice, ARN, Policy or Assured | Text | - | N | - | Blank | - | Contains | -"
+      - "Filters | Insurer / Remittance Status | Drop-down | All statuses or one | N | - | Blank | - | - | -"
+      - "DTIP Status | Invoice No. / Insurer / Payment / Paid AR / DTIP / Remitted / Outstanding DTIP / Extraction Tag / Flags / Remittance Status | Column | Invoice with the assured | - | Invoice ledger, extraction tags | - | Read only | - | -"
+      - "Accounts in Batches | Batch No. / Invoice No. / Endorsement / Policy No. / Name of Assured / Paid AR / Net Due / Status | Column | - | - | Batch lines | - | Read only | - | -"
+    actions:
+      - "Queue for End of Day | Remittance Processor | Always | Queues the invoice for the evening extraction run | - | -"
+    rules:
+      - "The search finds an invoice by invoice, ARN, batch, endorsement, policy or assured (FR-OP-039)."
+      - "A searched invoice can be queued for the evening extraction (FR-OP-030)."
+    outcome: The team sees what is due to each insurer and where each account stands.
+    frs: [FR-OP-030, FR-OP-039]
+    tests: [DTIP]
+
+  - id: SCR-OP-33
+    title: Remittance Deductions
+    route: /remittance/deductions
+    purpose: >-
+      Amounts the insurer confirmed (an AR Insurer refund, a return premium and the like) to be deducted from its next
+      remittance batches: prepared by ACSL with the insurer's confirmation, confirmed by the ACSL Team Leader, then
+      applied to the insurer's batches until nothing remains.
+    entry:
+      - ACSL (BRD-5) › AR Insurer
+    shots:
+      - {state: list, user: acsltl, caption: "Remittance Deductions, For Confirmation tab"}
+      - {state: new, user: acsl, click: "^new deduction$", caption: "New Remittance Deduction dialog"}
+    fields:
+      - "Tabs | For Confirmation / Confirmed / Drafts / Applied and Cancelled | Tab | - | - | Fixed | For Confirmation | - | - | -"
+      - "Toolbar | Search Deduction No. or Source Reference | Text | - | N | - | Blank | - | Contains | -"
+      - "List | Deduction No. / Insurer / Source / Insurer Confirmation / Amount / Remaining / Status | Column | RDN-yyyy-n with the preparer | - | Remittance deductions | - | Read only | - | No deductions in this status"
+      - "New Remittance Deduction dialog | Insurer / Currency | Drop-down | Insurers by name | Y | Insurers, currencies | Blank / PHP | Draft | Chosen | Select the insurer / Choose the currency"
+      - "New Remittance Deduction dialog | Deduction Source / Source Reference / Invoice No. | Drop-down, text | What the deduction settles | Y / Y / N | List of values deduction source | Blank | Draft | Not blank | Choose what the deduction settles / Source reference is required"
+      - "New Remittance Deduction dialog | Amount | Number | Positive, at most 2 decimals | Y | - | Blank | Draft | Positive | Enter a positive amount with at most 2 decimals"
+      - "New Remittance Deduction dialog | Insurer Confirmation Ref. / Confirmation Date / Remarks | Text, date | Confirmation date not in the future | N | - | Blank | Draft | - | The confirmation date cannot be in the future"
+    actions:
+      - "New Deduction / Save Deduction | ACSL Processor | Always | Saves the deduction in draft | Draft | -"
+      - "Open a row | Every user of the screen | Always | Opens the deduction | - | -"
+    rules:
+      - "Only a deduction confirmed by the insurer is taken from its remittance batches (FR-OP-035)."
+    outcome: Amounts the insurer owes are recovered from its next remittances.
+    frs: [FR-OP-035]
+    tests: [DEDUCTIONS]
+
+  - id: SCR-OP-34
+    title: Remittance Deduction
+    route: /remittance/deductions/:id
+    parent: /remittance/deductions
+    purpose: >-
+      One deduction: insurer, amount, applied and remaining, the insurer's confirmation, preparer and confirmer, the
+      workflow (draft, for confirmation, confirmed, applied) and the batches that deducted it.
+    entry:
+      - Remittance Deductions › open a row
+    shots:
+      - {state: record, user: acsltl, open_deduction: first, caption: "Remittance deduction for confirmation"}
+    fields:
+      - "Header | Deduction / Insurer / Amount / Applied / Remaining / Insurer Confirmation / Prepared / Confirmed By | Display | Applied with its percentage | - | Remittance deduction | - | Read only | - | -"
+      - "Workflow | [Deduction workflow header] | Stepper | Draft, For confirmation, Confirmed - awaiting the next batch, Applied to a remittance batch; Cancelled when reached | - | Remittance deduction | - | Read only | - | -"
+      - "Tabs | Remittance Batches / Insurer Confirmation | Tab | - | - | Fixed | Remittance Batches | - | - | -"
+      - "Remittance Batches | Batch / Applied On / Journal / Amount / Status | Column | - | - | Batch settlements | - | Read only | - | Not yet deducted from a remittance batch"
+      - "Insurer Confirmation | [Documents panel] | Panel | The insurer's confirmation letter | - | Documents | - | Draft, for confirmation | - | -"
+    actions:
+      - "Edit Deduction | ACSL Processor | Draft | Changes the deduction | Draft | -"
+      - "Submit for Confirmation | ACSL Processor | Draft | Sends the deduction with the insurer's confirmation to the Team Leader | For confirmation | Workflow notice (NT-01)"
+      - "Confirm | ACSL Team Leader | For confirmation | Confirms the deduction; the next batches of the insurer deduct it | Confirmed - awaiting the next batch | Workflow notice (NT-01)"
+      - "Return to processor / Cancel | ACSL Team Leader / ACSL Processor | For confirmation / Draft | Returns the deduction with a reason, or cancels it | Draft / Cancelled | Workflow notice (NT-01)"
+    rules:
+      - "A deduction is confirmed by a second user before it is applied (FR-OP-035)."
+    outcome: The confirmed deduction is recovered from the insurer's batches with its journal.
+    frs: [FR-OP-035]
+    tests: [DEDUCTIONS]
+
+  - id: SCR-OP-35
+    title: Incentive Rules
+    route: /remittance/incentive-rules
+    purpose: >-
+      The early remittance incentives per insurer, product line and segment: the rate of the basic premium, the window
+      in days from inception or booking and the effective period; extraction puts the invoices a rule covers into a
+      With Incentives batch.
+    entry:
+      - Remittance Workbench
+    shots:
+      - {state: list, user: remittl, caption: "Incentive Rules"}
+      - {state: new, user: remittl, fill: incentive_rule, caption: "New incentive rule"}
+    fields:
+      - "List | Insurer / Product Line / Segment / Rate / Window / Effective / Status | Column | Rate in %; window in days from inception or booking; period cell | - | Incentive rules | - | Read only | - | -"
+      - "Rule form | Insurer / Product Line / Segment | Drop-down | Insurers, product lines and segments by name; All product lines and All segments | Y / N / N | Insurers, product lines, segments | Blank / All / All | - | Insurer chosen | Select the insurer"
+      - "Rule form | Product Line (blank = all) / Segment (blank = all) | Text | - | N | Product lines, market segments | Blank | - | - | -"
+      - "Rule form | Rate (% of basic premium) | Number | Above 0, at most 100 | Y | - | Blank | - | Within range | Rate must be above 0 and at most 100"
+      - "Rule form | Window (days) / Window Starts From | Number, drop-down | 1 to 366 days; Inception date or Booking date | Y | Fixed list | Inception date | - | Within range | Window must be 1 to 366 days"
+      - "Rule form | Effective From / Effective To / Description | Date, text | dd-MMM-yyyy; To blank = open | Y / N / N | - | Today | - | The rule cannot end before it starts | The rule cannot end before it starts"
+    actions:
+      - "New Rule / Save Rule | Remittance Team Leader | Always | Saves the rule | Active | -"
+    rules:
+      - "An invoice whose insurer, product line and segment a rule covers, remitted within the window, goes to a With Incentives batch; the incentive is the rate of the basic premium share and carries VAT (FR-OP-038)."
+      - "Production Reconciliation validates the early incentive claimed by an insurer against the same rules (FR-OP-078)."
+    outcome: The early remittance incentives agreed with the insurers are applied automatically.
+    frs: [FR-OP-038, FR-OP-078]
+    tests: [INCRULES]
+
+  - id: SCR-OP-36
+    title: Disbursement Queue
+    route: /operations/disbursements
+    purpose: >-
+      The payment requests of the Operations teams (remittance to insurers, refunds, BIR 2307 batches, incentive
+      pass-on) until the Disbursement module of BRD-5 takes them over: Disbursement acknowledges a request, assigns the
+      DV number, marks it paid or returns it, and the sending team is told each step.
+    entry:
+      - Operations Home › Disbursement › Open
+    shots:
+      - {state: list, user: disb, caption: "Disbursement Queue, To Acknowledge tab"}
+      - {state: dv, user: disb, open: first_request_dv, caption: "Assign DV Number dialog"}
+    fields:
+      - "Tabs | To Acknowledge / Acknowledged / DV Assigned / Paid / Returned / Cancelled | Tab | - | - | Fixed | To Acknowledge | - | - | -"
+      - "List | Request No. / Payee / From / Amount / DV No. / Sent / Status | Column | DSQ-yyyy-n with the type; the sending team and its reference | - | Payment requests | - | Read only | - | No items to display"
+      - "Assign DV Number dialog | Disbursement Voucher No. | Text | Up to 40 characters | Y | - | Blank | To acknowledge, acknowledged | Not blank | Disbursement Voucher No. is required"
+      - "Return dialog | Reason for Return | Text | Up to 200 characters | Y | - | Blank | Not paid, returned or cancelled | Not blank | Reason for Return is required"
+    actions:
+      - "Acknowledge | Disbursement | To acknowledge | Acknowledges the request | Acknowledged | Disbursement status (NT-04)"
+      - "Assign DV / Assign DV Number | Disbursement | To acknowledge or acknowledged | Records the DV number; a remittance batch becomes fully or partially remitted and its invoices are unlocked | DV assigned | Disbursement status (NT-04)"
+      - "Mark Paid | Disbursement | DV assigned | Marks the request paid; a refund disposition is completed, a 2307 batch can be released to the insurer | Paid | Disbursement status (NT-04)"
+      - "Return to Sender / Return Request | Disbursement | Not paid, returned or cancelled | Returns the request to the sending team with the reason | Returned | Disbursement status (NT-04)"
+    rules:
+      - "Each status of a payment request is sent back to the team that sent it: Remittance updates the invoices, Cashiering completes the refund or releases the 2307 batch (FR-OP-120, FR-OP-036)."
+      - "The Disbursement module of BRD-5 takes the same requests when it is delivered (FR-OP-120)."
+    outcome: Operations payment requests are paid and their teams informed at each step.
+    frs: [FR-OP-036, FR-OP-120, FR-OP-121]
+    tests: [DISBQ]

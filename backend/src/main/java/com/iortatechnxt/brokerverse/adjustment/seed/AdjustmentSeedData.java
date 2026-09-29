@@ -47,6 +47,11 @@ import org.springframework.stereotype.Component;
 @Order(93)
 public class AdjustmentSeedData implements ApplicationRunner {
 
+  /** Seed insurer endorsement references are four-digit numbers from 1000. */
+  private static final int REF_BASE = 1000;
+
+  private static final int REF_SPAN = 9000;
+
   private static final Logger LOG = LoggerFactory.getLogger(AdjustmentSeedData.class);
   private static final String REQUESTER = "mktcoll";
   private static final String PROCESSOR = "adjust";
@@ -173,7 +178,7 @@ public class AdjustmentSeedData implements ApplicationRunner {
           users.as(PROCESSOR, () -> workflow.validate(r.getId(), null));
           users.as(
               PROCESSOR,
-              () -> batches.post(invoice.getCompanyId(), List.of(r.getId()), "Seed posting"));
+              () -> batches.post(invoice.getCompanyId(), List.of(r.getId()), "Daily posting"));
           return r;
         });
   }
@@ -192,6 +197,14 @@ public class AdjustmentSeedData implements ApplicationRunner {
                     null)));
   }
 
+  /** An insurer endorsement reference as insurers print it, e.g. MGIC-END-2026-4821. */
+  private static String insurerRef(OpsInvoice invoice, String type) {
+    String insurer = invoice.getInsurerCode() == null ? "INS" : invoice.getInsurerCode();
+    return insurer.replace("INS-", "")
+        + "-END-2026-"
+        + (Math.floorMod(type.hashCode(), REF_SPAN) + REF_BASE);
+  }
+
   private static RequestTerms terms(
       OpsInvoice invoice, String type, String requestType, String reason, String description) {
     boolean cancellation = reason != null;
@@ -199,7 +212,7 @@ public class AdjustmentSeedData implements ApplicationRunner {
         type,
         requestType,
         reason,
-        "SEED-" + type,
+        insurerRef(invoice, type),
         cancellation
             ? invoice.getClassification().inceptionDate()
             : invoice.getClassification().inceptionDate().plusDays(DAYS_AFTER_INCEPTION),

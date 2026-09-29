@@ -8,6 +8,7 @@ import {
   describeTier,
   failedRules,
   receiptsTotal,
+  schemeCode,
   schemeProblem,
   withCount,
 } from './commissionLogic';
@@ -86,7 +87,8 @@ describe('schemes', () => {
   });
 
   it('refuses incomplete schemes', () => {
-    expect(schemeProblem(' ', terms)).toMatch(/Code/);
+    expect(schemeProblem(' ', terms)).toMatch(/name is required/);
+    expect(schemeCode(' Motor Mania 2026! ')).toBe('MOTOR_MANIA_2026');
     expect(schemeProblem('X', { ...terms, tiers: [{ minProduction: 1 }] })).toMatch(/Tier 1/);
     expect(
       schemeProblem('X', {

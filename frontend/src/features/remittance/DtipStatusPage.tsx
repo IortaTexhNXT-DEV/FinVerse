@@ -1,10 +1,14 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { InsurerSelect } from '@/components/broking/InsurerSelect';
+import { InsurerName } from '@/components/broking/LovLabel';
+import { CellStack } from '@/components/ui/CellStack';
+import { RowActions } from '@/components/ui/RowActions';
+import { statusLabel } from '@/components/ui/statusTones';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/auth/authContext';
 import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Amount } from '@/components/ui/Amount';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
@@ -16,10 +20,9 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { humanize } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { AccountHit, DtipRow } from './api';
-import { dtipFlags, joinParts, TAG_LABELS } from './remittanceLabels';
+import { dtipFlags, joinParts, reasonsText, TAG_LABELS } from './remittanceLabels';
 import './remittance.css';
 
 const TABS = [
@@ -50,15 +53,21 @@ function dtipColumns(queue: ((row: DtipRow) => void) | undefined): Column<DtipRo
         </>
       ),
     },
-    { key: 'ins', header: 'Insurer', render: (r) => r.insurerCode },
-    { key: 'pay', header: 'Payment', render: (r) => humanize(r.paymentStatus) },
-    { key: 'paid', header: 'Paid AR', numeric: true, render: (r) => <Amount value={r.paidAr} /> },
-    { key: 'due', header: 'DTIP', numeric: true, render: (r) => <Amount value={r.dtipDue} /> },
     {
-      key: 'rem',
-      header: 'Remitted',
+      key: 'ins',
+      header: 'Insurer / Payment',
+      render: (r) => (
+        <CellStack main={<InsurerName code={r.insurerCode} />} sub={statusLabel(r.paymentStatus)} />
+      ),
+    },
+    { key: 'paid', header: 'Paid AR', numeric: true, render: (r) => <Amount value={r.paidAr} /> },
+    {
+      key: 'due',
+      header: 'DTIP / Remitted',
       numeric: true,
-      render: (r) => <Amount value={r.dtipRemitted} />,
+      render: (r) => (
+        <CellStack main={<Amount value={r.dtipDue} />} sub={<Amount value={r.dtipRemitted} />} />
+      ),
     },
     {
       key: 'bal',
@@ -68,36 +77,39 @@ function dtipColumns(queue: ((row: DtipRow) => void) | undefined): Column<DtipRo
     },
     {
       key: 'tag',
-      header: 'Extraction Tag',
-      render: (r) => (r.tag ? joinParts([TAG_LABELS[r.tag], r.reasons], ': ') : ''),
-    },
-    {
-      key: 'flags',
-      header: 'Flags',
+      header: 'Extraction',
       render: (r) => (
-        <span className="tag-list">
-          {dtipFlags(r).map((f) => (
-            <span key={f} className="tag">
-              {f}
-            </span>
-          ))}
-        </span>
+        <CellStack
+          main={r.tag ? joinParts([TAG_LABELS[r.tag], reasonsText(r.reasons)], ': ') : ''}
+          sub={
+            dtipFlags(r).length > 0 && (
+              <span className="tag-list">
+                {dtipFlags(r).map((f) => (
+                  <span key={f} className="tag">
+                    {f}
+                  </span>
+                ))}
+              </span>
+            )
+          }
+        />
       ),
     },
     {
       key: 'status',
-      header: 'Remittance Status',
+      header: 'Status',
       render: (r) => <StatusBadge status={r.remittanceStatus} />,
     },
   ];
   if (queue !== undefined) {
     columns.push({
       key: 'eod',
-      header: 'Actions',
+      header: '',
       render: (r) => (
-        <Button size="sm" variant="secondary" onClick={() => queue(r)}>
-          Queue for End of Day
-        </Button>
+        <RowActions
+          record={r.invoiceNo}
+          actions={[{ label: 'Queue for End of Day', onSelect: () => queue(r) }]}
+        />
       ),
     });
   }
@@ -110,10 +122,16 @@ const ACCOUNT_COLUMNS: Column<AccountHit>[] = [
     header: 'Batch No.',
     render: (a) => <Link to={`/remittance/batches/${a.batchId}`}>{a.batchNo}</Link>,
   },
-  { key: 'inv', header: 'Invoice No.', render: (a) => a.line.invoiceNo },
-  { key: 'endt', header: 'Endorsement', render: (a) => a.line.endorsementNo ?? '' },
-  { key: 'pol', header: 'Policy No.', render: (a) => a.line.policyNo ?? '' },
-  { key: 'assured', header: 'Name of Assured', render: (a) => a.line.assuredName },
+  {
+    key: 'inv',
+    header: 'Invoice / Endorsement',
+    render: (a) => <CellStack main={a.line.invoiceNo} sub={a.line.endorsementNo} />,
+  },
+  {
+    key: 'assured',
+    header: 'Assured / Policy',
+    render: (a) => <CellStack main={a.line.assuredName} sub={a.line.policyNo} />,
+  },
   {
     key: 'paid',
     header: 'Paid AR',
@@ -162,13 +180,13 @@ function DtipTab({ companyId, canQueue }: Readonly<{ companyId: number; canQueue
       />
       {filters && (
         <div className="worklist-filters remit-form">
-          <Field label="Insurer Code">
+          <Field label="Insurer">
             {(id) => (
-              <input
+              <InsurerSelect
                 id={id}
-                className="input"
                 value={insurer}
-                onChange={(e) => setInsurer(e.target.value)}
+                placeholder="All insurers"
+                onChange={(code) => setInsurer(code)}
               />
             )}
           </Field>
@@ -183,7 +201,7 @@ function DtipTab({ companyId, canQueue }: Readonly<{ companyId: number; canQueue
                 <option value="">All statuses</option>
                 {STATUSES.map((s) => (
                   <option key={s} value={s}>
-                    {humanize(s)}
+                    {statusLabel(s)}
                   </option>
                 ))}
               </select>

@@ -26,6 +26,7 @@ public final class CwtDtos {
    * @param invoiceNo invoice
    * @param arn account
    * @param clientCode client
+   * @param clientName the client's name
    * @param insurerCode insurer
    * @param amount 2% amount
    * @param path cash or certificate
@@ -49,6 +50,7 @@ public final class CwtDtos {
       String invoiceNo,
       String arn,
       String clientCode,
+      String clientName,
       String insurerCode,
       BigDecimal amount,
       String path,
@@ -73,12 +75,24 @@ public final class CwtDtos {
      * @return response
      */
     public static CwtTagResponse from(CwtTag t) {
+      return from(t, null);
+    }
+
+    /**
+     * Maps a tag with the client's name.
+     *
+     * @param t tag
+     * @param clientName the client's name, may be null
+     * @return response
+     */
+    public static CwtTagResponse from(CwtTag t, String clientName) {
       return new CwtTagResponse(
           t.getId(),
           t.getReference(),
           t.getInvoiceNo(),
           t.getArn(),
           t.getClientCode(),
+          clientName,
           t.getInsurerCode(),
           t.getAmount(),
           t.getPath().name(),

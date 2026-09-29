@@ -96,10 +96,8 @@ public class DpListService {
             new FileRef(fileName, Sha256.hex(content)),
             ctx -> taken.set(handler.process(companyId, new FlowInFile(fileName, content), ctx)));
     if (taken.get() == null) {
-      throw new BusinessRuleException(
-          "DP_LIST_REFUSED",
-          "The DP list was not taken in: "
-              + (run.getErrorDetail() == null ? run.getMessage() : run.getErrorDetail()));
+      String reason = run.getErrorDetail() == null ? run.getMessage() : run.getErrorDetail();
+      throw new BusinessRuleException("DP_LIST_REFUSED", "The DP list was not taken in: " + reason);
     }
     return intake.requireList(taken.get().getId());
   }

@@ -33,9 +33,11 @@ public final class DisplayFormat {
       DateTimeFormatter.ofPattern(DATE_PATTERN + " HH:mm", Locale.ENGLISH);
   private static final int RATE_DECIMALS = 4;
 
-  /** Codes kept in capitals when a status is written as words. */
+  /** Codes kept in capitals when a status is written as words (DV_ASSIGNED is "DV assigned"). */
   private static final Set<String> ACRONYMS =
-      Set.of("ARN", "CBG", "FFY", "IA", "KYC", "PN", "PRF", "PS", "QS", "SI", "TSU");
+      Set.of(
+          "AP", "AR", "ARN", "BIR", "CBG", "CPC2", "CWT", "DST", "DTIP", "DV", "EOD", "FFY", "IA",
+          "KYC", "OR", "OTC", "PDC", "PN", "PRF", "PS", "QS", "SI", "TSU", "VAT");
 
   private DisplayFormat() {}
 
@@ -56,6 +58,24 @@ public final class DisplayFormat {
         out.append(' ');
       }
       out.append(ACRONYMS.contains(part) ? part : part.toLowerCase(Locale.ROOT));
+    }
+    return out.toString();
+  }
+
+  /**
+   * A status or other code as a label, each word capitalised and acronyms kept: FULLY_REMITTED
+   * becomes "Fully Remitted", QS_SENT "QS Sent".
+   *
+   * @param code enum or code, may be null
+   * @return label, empty when null
+   */
+  public static String label(Object code) {
+    StringBuilder out = new StringBuilder();
+    for (String word : words(code).split(" ")) {
+      if (!out.isEmpty()) {
+        out.append(' ');
+      }
+      out.append(word.isEmpty() ? word : Character.toUpperCase(word.charAt(0)) + word.substring(1));
     }
     return out.toString();
   }

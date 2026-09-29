@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
@@ -257,7 +258,7 @@ public class HoldService {
         ENTITY,
         hold.getRequestNo(),
         AuditAction.AUTHORIZE,
-        "Invoice on hold until " + hold.getHoldUntil());
+        "Invoice on hold until " + DisplayFormat.date(hold.getHoldUntil()));
     return hold;
   }
 
@@ -409,8 +410,8 @@ public class HoldService {
         ENTITY,
         id.toString(),
         "expire",
-        TransitionNote.comment("Hold date " + hold.getHoldUntil() + " passed"));
-    clearHold(hold, "Expired on " + hold.getHoldUntil());
+        TransitionNote.comment("Hold date " + DisplayFormat.date(hold.getHoldUntil()) + " passed"));
+    clearHold(hold, "Expired on " + DisplayFormat.date(hold.getHoldUntil()));
     return hold;
   }
 
@@ -436,7 +437,9 @@ public class HoldService {
   public HoldRequest warnExpiring(Long id) {
     HoldRequest hold = get(id);
     notifyParties(
-        hold, HOLD + hold.getRequestNo() + " expires on " + hold.getHoldUntil(), EXPIRING);
+        hold,
+        HOLD + hold.getRequestNo() + " expires on " + DisplayFormat.date(hold.getHoldUntil()),
+        EXPIRING);
     hold.expiryNotified();
     return hold;
   }
@@ -513,7 +516,7 @@ public class HoldService {
         : List.of(hold.getRequestedBy(), hold.getAssignedProcessor());
   }
 
-  private static Notice notice(HoldRequest hold, String title) {
+  private Notice notice(HoldRequest hold, String title) {
     return new Notice(
         title,
         describe(hold),
@@ -522,14 +525,14 @@ public class HoldService {
         hold.getId().toString());
   }
 
-  private static String describe(HoldRequest hold) {
+  private String describe(HoldRequest hold) {
     return hold.getInvoiceNo()
         + " ("
         + hold.getAssuredName()
         + ") until "
-        + hold.getHoldUntil()
+        + DisplayFormat.date(hold.getHoldUntil())
         + ": "
-        + hold.getReasonCode()
+        + lovs.label("HOLD_REASON", hold.getReasonCode())
         + (hold.getRemarks() == null ? "" : " - " + hold.getRemarks());
   }
 }

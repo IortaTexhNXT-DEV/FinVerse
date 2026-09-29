@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.approval.service.PendingApprovalSource;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashReceiptRepository;
 import com.iortatechnxt.brokerverse.cashiering.domain.Disposition;
 import com.iortatechnxt.brokerverse.cashiering.domain.DispositionRepository;
+import com.iortatechnxt.brokerverse.cashiering.domain.DispositionWords;
 import com.iortatechnxt.brokerverse.cashiering.domain.Receipt;
 import com.iortatechnxt.brokerverse.cashiering.domain.ReceiptAction;
 import com.iortatechnxt.brokerverse.cashiering.domain.ReceiptActionRepository;
@@ -115,7 +116,9 @@ public class CashieringApprovalSource implements PendingApprovalSource {
         MODULE,
         "Unapplied disposition",
         u.getReference(),
-        d.getDispositionType() + " - " + (u.getPayorName() == null ? "" : u.getPayorName()),
+        DispositionWords.of(d.getDispositionType())
+            + " - "
+            + (u.getPayorName() == null ? "" : u.getPayorName()),
         d.getAmount(),
         u.getCurrency(),
         d.getCreatedBy(),

@@ -72,7 +72,7 @@ public class RemittanceReportSql {
           ParameterSpec.required(FROM, "From", ParameterType.DATE).withDefault("MONTH_START"));
       params.add(ParameterSpec.required(TO, "To", ParameterType.DATE).withDefault("TODAY"));
     }
-    params.add(ParameterSpec.optional(INSURER, "Insurer code", ParameterType.TEXT));
+    params.add(ParameterSpec.optional(INSURER, "Insurer", ParameterType.INSURER));
     params.addAll(List.of(extra));
     return ReportMetadata.operations(code, title, description, params);
   }

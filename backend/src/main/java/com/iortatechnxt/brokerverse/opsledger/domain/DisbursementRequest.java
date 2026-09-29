@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.opsledger.domain;
 
 import com.iortatechnxt.brokerverse.common.domain.BaseEntity;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -258,7 +259,12 @@ public class DisbursementRequest extends BaseEntity {
     if (!allowed.contains(status)) {
       throw new BusinessRuleException(
           "DISBURSEMENT_STATUS",
-          "Payment request " + requestNo + " is " + status + " and cannot be " + action);
+          "Payment request "
+              + requestNo
+              + " is "
+              + DisplayFormat.words(status)
+              + " and cannot be "
+              + action);
     }
   }
 

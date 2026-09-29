@@ -9,9 +9,10 @@ from __future__ import annotations
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-BRAND_DIR = REPO_ROOT / "frontend" / "src" / "assets" / "brand"
-BDO_LOGO = BRAND_DIR / "bdo-insure.png"
-IORTA_LOGO = BRAND_DIR / "iorta-technxt.png"
+# The client's logo is that of the theme pack; the platform's logo that of iorta TechNXT.
+BRAND_DIR = REPO_ROOT / "frontend" / "src" / "theme" / "packs" / "bdoi"
+BDO_LOGO = BRAND_DIR / "client-logo.png"
+IORTA_LOGO = REPO_ROOT / "frontend" / "src" / "assets" / "platform" / "iorta-technxt.png"
 DELIVERABLES = REPO_ROOT / "docs" / "deliverables"
 SRC_DIR = DELIVERABLES / "src"
 OUT_DIR = DELIVERABLES / "out"
@@ -261,7 +262,7 @@ def out_path(brd: str, kind: str, filename: str) -> Path:
 # Business sign-off release sets issued so far: BRD -> version of the set. The documents of such a set carry a
 # two-digit prefix so that they sort in reading order in the BRD folder (deliverables README, "Release and sign-off
 # per BRD").
-SIGNOFF_SETS = {"BRD-01": "2.0", "BRD-03": "2.0", "BRD-11": "2.0", "BRD-13": "2.0"}
+SIGNOFF_SETS = {"BRD-01": "2.0", "BRD-02": "2.0", "BRD-03": "2.0", "BRD-11": "2.0", "BRD-13": "2.0"}
 READING_ORDER = {"StartHere": "00", "GuideDeck": "01", "FRS": "02", "Signoff": "03", "TestPlan": "04",
                  "TestPlanSummary": "05"}
 # Further documents of a set that only some BRDs have (not required by check_pack): the configuration input templates
@@ -273,9 +274,9 @@ READING_ORDER_EXTRA = {"Templates": "06", "Handbook": "02", "Workbook": "03"}
 # the screen resolution, with the register as CSV). Two kinds share the name UXScreens, so the order is by kind and
 # extension. build_ux_deck.py builds the three; check_pack requires them in the sets of UX_SETS.
 READING_ORDER_UX = {("UXDeck", "pptx"): "07", ("UXScreens", "xlsx"): "08", ("UXScreens", "zip"): "09"}
-# Sign-off sets that carry the UX screen documents (07 to 09): the Drop 0 sets first; the Drop 1 sets follow when
-# they are re-issued.
-UX_SETS = {"BRD-03", "BRD-11", "BRD-13"}
+# Sign-off sets that carry the UX screen documents (07 to 09): the Drop 0 sets and BRD-02 Operations first; the
+# other Drop 1 sets follow when they are re-issued.
+UX_SETS = {"BRD-02", "BRD-03", "BRD-11", "BRD-13"}
 
 
 def output_name(doc_type: str, brd: str, name: str, version: str, ext: str) -> str:

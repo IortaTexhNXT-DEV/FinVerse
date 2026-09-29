@@ -72,7 +72,7 @@ export const FILTER_FIELDS: readonly {
   label: string;
   date: boolean;
 }[] = [
-  { key: 'insurer', label: 'Insurer Code', date: false },
+  { key: 'insurer', label: 'Insurer', date: false },
   { key: 'assured', label: 'Name of Assured', date: false },
   { key: 'ao', label: 'Account Officer', date: false },
   { key: 'from', label: 'Booked From', date: true },

@@ -2,15 +2,18 @@ package com.iortatechnxt.brokerverse.cashiering.service;
 
 import com.iortatechnxt.brokerverse.cashiering.domain.Application;
 import com.iortatechnxt.brokerverse.cashiering.domain.ApplicationRepository;
+import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.PaymentMode;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.ReceiptKind;
 import com.iortatechnxt.brokerverse.cashiering.domain.Receipt;
 import com.iortatechnxt.brokerverse.cashiering.domain.ReceiptLine;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Field;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Fields;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Section;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec.Table;
+import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.organization.domain.CompanyRepository;
 import com.lowagie.text.Document;
 import com.lowagie.text.pdf.PdfCopy;
@@ -45,6 +48,7 @@ public class ReceiptDocument {
   private final DocumentComposer composer;
   private final CompanyRepository companies;
   private final ApplicationRepository applications;
+  private final LovService lovs;
 
   /**
    * Creates the document builder.
@@ -52,12 +56,17 @@ public class ReceiptDocument {
    * @param composer PDF composer
    * @param companies companies (letterhead)
    * @param applications applications
+   * @param lovs list labels (AR class, OR type)
    */
   public ReceiptDocument(
-      DocumentComposer composer, CompanyRepository companies, ApplicationRepository applications) {
+      DocumentComposer composer,
+      CompanyRepository companies,
+      ApplicationRepository applications,
+      LovService lovs) {
     this.composer = composer;
     this.companies = companies;
     this.applications = applications;
+    this.lovs = lovs;
   }
 
   /**
@@ -67,20 +76,26 @@ public class ReceiptDocument {
    * @return PDF
    */
   public byte[] pdf(Receipt r) {
+    List<Field> fields = new ArrayList<>();
+    fields.add(new Field("Payor", r.getPayorName()));
+    fields.add(new Field("Assured", nz(r.getAssuredName())));
+    fields.add(new Field("Date", DisplayFormat.date(r.getReceiptDate())));
+    fields.add(
+        new Field(
+            r.getKind() == ReceiptKind.OR ? "OR type" : "AR class",
+            lovs.label(
+                r.getKind() == ReceiptKind.OR
+                    ? CashReceiptService.OR_TYPE
+                    : CashReceiptService.AR_CLASS,
+                r.getReceiptClass())));
+    fields.add(new Field("Amount", r.getCurrency() + " " + amount(r.getAmount())));
+    fields.add(new Field("Mode of payment", modeText(r.getMode())));
+    if (r.getCheckNo() != null) {
+      fields.add(new Field("Check", (nz(r.getCheckBank()) + " " + r.getCheckNo()).strip()));
+    }
+    fields.add(new Field("Status", sentence(r.getStatus())));
     List<Section> sections = new ArrayList<>();
-    sections.add(
-        new Fields(
-            "Received from",
-            List.of(
-                new Field("Payor", r.getPayorName()),
-                new Field("Payor code", nz(r.getPayorCode())),
-                new Field("Assured", nz(r.getAssuredName())),
-                new Field("Date", r.getReceiptDate().toString()),
-                new Field("Class", r.getReceiptClass()),
-                new Field("Amount", r.getCurrency() + " " + amount(r.getAmount())),
-                new Field("Mode of payment", r.getMode().name()),
-                new Field("Check", nz(r.getCheckNo()) + " " + nz(r.getCheckBank())),
-                new Field("Status", r.getStatus().name()))));
+    sections.add(new Fields("Received from", fields));
     sections.add(details(r));
     return composer.pdf(
         new DocumentSpec(
@@ -89,7 +104,7 @@ public class ReceiptDocument {
             r.getReceiptNo(),
             sections,
             List.of("Cashier"),
-            "CSH_RECEIPT"));
+            null));
   }
 
   /**
@@ -112,13 +127,13 @@ public class ReceiptDocument {
                     List.of(
                         new Field("From", r.getPayorName()),
                         new Field("AR number", r.getReceiptNo()),
-                        new Field("Date paid", r.getReceiptDate().toString()),
+                        new Field("Date paid", DisplayFormat.date(r.getReceiptDate())),
                         new Field("Amount", r.getCurrency() + " " + amount(r.getAmount())),
                         new Field("Policy number", nz(policyNo)),
                         new Field("Requested by", requestingUnit))),
                 details(r)),
             List.of("Cashiering"),
-            "CSH_PAYMENT_CERTIFICATE"));
+            null));
   }
 
   /**
@@ -151,7 +166,11 @@ public class ReceiptDocument {
       for (ReceiptLine l : r.getLines()) {
         rows.add(
             List.of(
-                nz(l.getInvoiceNo()) + " " + nz(l.getDescription()),
+                String.join(
+                    " ",
+                    java.util.stream.Stream.of(l.getInvoiceNo(), l.getDescription())
+                        .filter(v -> v != null && !v.isBlank())
+                        .toList()),
                 amount(l.getNet()),
                 amount(l.getVat()),
                 amount(l.getWtax())));
@@ -169,6 +188,23 @@ public class ReceiptDocument {
 
   private String companyName(Long companyId) {
     return companies.findById(companyId).map(c -> c.getName()).orElse(DASH);
+  }
+
+  /** A mode of payment in words: ADA is "Auto-debit arrangement (ADA)". */
+  private static String modeText(PaymentMode mode) {
+    return switch (mode) {
+      case ADA -> "Auto-debit arrangement (ADA)";
+      case PDC -> "Post-dated check";
+      case NON_CASH -> "Non-cash (settlement)";
+      case CLPC -> "CLPC";
+      default -> sentence(mode);
+    };
+  }
+
+  /** A code in words, first letter capital: ISSUED is "Issued". */
+  private static String sentence(Object code) {
+    String words = DisplayFormat.words(code);
+    return words.isEmpty() ? words : Character.toUpperCase(words.charAt(0)) + words.substring(1);
   }
 
   private static String nz(String value) {

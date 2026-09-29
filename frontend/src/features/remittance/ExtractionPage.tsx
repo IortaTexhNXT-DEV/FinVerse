@@ -1,6 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { InsurerSelect } from '@/components/broking/InsurerSelect';
 import { Play } from 'lucide-react';
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import { useAuth } from '@/auth/authContext';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
@@ -15,19 +17,28 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
 import { remittanceApi } from './api';
 import type { ExtractionRun, InvoiceTag, RemittanceType } from './api';
-import { TAG_LABELS, TYPE_LABELS } from './remittanceLabels';
+import { reasonsText, TAG_LABELS, triggerLabel, TYPE_LABELS } from './remittanceLabels';
 import './remittance.css';
 import { UserName } from '@/components/ui/UserName';
+import { InsurerName } from '@/components/broking/LovLabel';
+import { CellStack } from '@/components/ui/CellStack';
+import { statusMessage } from '@/components/ui/statusTones';
 
 const TAG_COLUMNS: Column<InvoiceTag>[] = [
-  { key: 'inv', header: 'Invoice No.', render: (t) => t.invoiceNo },
-  { key: 'ins', header: 'Insurer', render: (t) => t.insurerCode },
-  { key: 'type', header: 'Type', render: (t) => (t.type ? TYPE_LABELS[t.type] : '') },
-  { key: 'tag', header: 'Tag', render: (t) => TAG_LABELS[t.tag] },
-  { key: 'why', header: 'Reasons', render: (t) => t.reasons ?? t.remarks ?? '' },
+  {
+    key: 'inv',
+    header: 'Invoice / Insurer',
+    render: (t) => <CellStack main={t.invoiceNo} sub={<InsurerName code={t.insurerCode} />} />,
+  },
+  {
+    key: 'tag',
+    header: 'Tag / Type',
+    render: (t) => <CellStack main={TAG_LABELS[t.tag]} sub={t.type ? TYPE_LABELS[t.type] : ''} />,
+  },
+  { key: 'why', header: 'Reasons', render: (t) => reasonsText(t.reasons) || (t.remarks ?? '') },
   { key: 'paid', header: 'Paid AR', numeric: true, render: (t) => <Amount value={t.paidAr} /> },
   {
     key: 'rem',
@@ -35,7 +46,11 @@ const TAG_COLUMNS: Column<InvoiceTag>[] = [
     numeric: true,
     render: (t) => <Amount value={t.remittable} />,
   },
-  { key: 'batch', header: 'Batch', render: (t) => t.batchNo ?? '' },
+  {
+    key: 'batch',
+    header: 'Batch',
+    render: (t) => <span className="nowrap">{t.batchNo ?? ''}</span>,
+  },
 ];
 
 /** The tags a run gave (RMTID.003). */
@@ -89,7 +104,7 @@ function RunForm({ companyId }: Readonly<{ companyId: number }>) {
       if (r.status === 'FAILED') {
         toast.error(`${r.runNo} failed: ${r.message ?? ''}`);
       } else {
-        toast.success(`${r.runNo}: ${r.message ?? humanize(r.status)}`);
+        toast.success(r.message ?? statusMessage(r.runNo, r.status));
       }
     },
   });
@@ -98,14 +113,13 @@ function RunForm({ companyId }: Readonly<{ companyId: number }>) {
       <div className="stack">
         <ErrorAlert error={run.error} />
         <div className="remit-form">
-          <Field label="Insurer Code" hint="Leave empty for every insurer">
+          <Field label="Insurer">
             {(id) => (
-              <input
+              <InsurerSelect
                 id={id}
-                className="input"
-                maxLength={30}
                 value={insurer}
-                onChange={(e) => setInsurer(e.target.value)}
+                placeholder="All insurers"
+                onChange={(code) => setInsurer(code)}
               />
             )}
           </Field>
@@ -150,12 +164,16 @@ function RunForm({ companyId }: Readonly<{ companyId: number }>) {
   );
 }
 
-function scopeOf(r: ExtractionRun): string {
+function scopeOf(r: ExtractionRun): ReactNode {
   if (r.invoiceNo !== undefined) {
-    return `Invoice ${r.invoiceNo}`;
+    return <>Invoice {r.invoiceNo}</>;
   }
-  const parts = [r.insurerCode ?? 'All insurers', r.type ? TYPE_LABELS[r.type] : 'all types'];
-  return parts.join(' · ');
+  return (
+    <>
+      {r.insurerCode ? <InsurerName code={r.insurerCode} /> : 'All insurers'} ·{' '}
+      {r.type ? TYPE_LABELS[r.type] : 'all types'}
+    </>
+  );
 }
 
 const RUN_COLUMNS: Column<ExtractionRun>[] = [
@@ -165,7 +183,7 @@ const RUN_COLUMNS: Column<ExtractionRun>[] = [
     render: (r) => (
       <>
         <strong>{r.runNo}</strong>
-        <div className="remit-muted">{humanize(r.trigger)}</div>
+        <div className="remit-muted">{triggerLabel(r.trigger)}</div>
       </>
     ),
   },

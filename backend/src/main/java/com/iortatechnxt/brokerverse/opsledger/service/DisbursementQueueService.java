@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.common.util.Money;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
@@ -195,7 +196,12 @@ public class DisbursementQueueService {
   public DisbursementRequest track(Long id, String dvStatus, String instrumentStatus) {
     DisbursementRequest r = get(id);
     r.track(dvStatus, instrumentStatus);
-    return changed(r, "DV stage " + r.getDvStatus() + ", instrument " + r.getInstrumentStatus());
+    return changed(
+        r,
+        "Voucher stage "
+            + DisplayFormat.words(r.getDvStatus())
+            + ", instrument "
+            + DisplayFormat.words(r.getInstrumentStatus()));
   }
 
   private DisbursementRequest changed(DisbursementRequest r, String summary) {
@@ -217,7 +223,7 @@ public class DisbursementQueueService {
     notifications.notifyUser(
         r.getCreatedBy(),
         new Notice(
-            "Payment request " + r.getRequestNo() + " " + r.getStatus(),
+            "Payment request " + r.getRequestNo() + " is now " + DisplayFormat.words(r.getStatus()),
             summary,
             LINK,
             ENTITY,

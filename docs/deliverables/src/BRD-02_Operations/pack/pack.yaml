@@ -1,0 +1,259 @@
+# BRD-2 Operations – Business Sign-off Pack, release set v2.0 (Drop 1, Transactional).
+# Built by docs/deliverables/src/signoff/signoff_pack.py (workbook, checks) and read by the FRS source through
+# ```pack blocks (tools/deliverables/bdoi_docx.py). Schema: docs/deliverables/src/signoff/README.md.
+meta:
+  brd: BRD-02
+  brd_label: BRD-2
+  name: Operations
+  code: OP
+  version: "2.0"
+  date: 28 September 2026
+  status_as_of: 28-Sep-2026
+  release_set: BRD-02 Operations – Business Sign-off Pack
+  frs: FRS_BRD02_OPERATIONS.md
+  test_plan: brd02_cases.yaml
+  screens_dir: screens
+  screenshot_dir: ../screenshots
+
+# Permissions and roles are shown by their readable names, never by their codes.
+codes: labels
+
+# The Operations personas: role code, name, SIT/UAT user of the seed profile.
+personas:
+  CASHIER: {name: Cashier, user: cashier}
+  CASHIER_TL: {name: Cashiering Team Leader / Head, user: cashtl}
+  REMIT_PROCESSOR: {name: Remittance Processor, user: remit}
+  REMIT_TL: {name: Remittance Team Leader / Head, user: remittl}
+  RECON_HANDLER: {name: Production Reconciliation Handler, user: recon}
+  ADJUSTMENT: {name: Adjustment Processor, user: adjust}
+  ADJUSTMENT_TL: {name: Adjustment Team Leader, user: adjtl}
+  COMMREC_HANDLER: {name: Commission Receivables Handler, user: commrec}
+  COMMREC_TL: {name: Commission Receivables Team Leader / Head, user: commtl}
+  MKT_COLLECTION: {name: Marketing Collection, user: mktcoll}
+  MKT_TL: {name: Marketing Team Leader / Unit Head (hold approver), user: mkttl}
+  COMPTROLLERSHIP: {name: Comptrollership, user: comptrol}
+  DISBURSEMENT: {name: Disbursement, user: disb}
+  ACSL_PROCESSOR: {name: ACSL Processor (remittance deductions), user: acsl}
+  ACSL_TL: {name: ACSL Team Leader (confirms deductions), user: acsltl}
+  SYSADMIN: {name: System Administrator, user: admin}
+  AUDITOR: {name: Auditor, user: auditor}
+
+# The other persona whose sidebar the set shows: Processing books the accounts whose invoices Operations takes over
+# (walkthrough A starts on the New Business booking screen).
+menu_personas:
+  PROCESSOR: {name: Processing (books the accounts), user: proc}
+
+# Packs of other BRDs whose screens a walkthrough step may show (the New Business booking and account screens).
+foreign_packs: [../../BRD-01_New_Business/pack/pack.yaml]
+
+# Sidebar sections that belong to this BRD (navigation/modules.ts module ids) and the BRD of every other section,
+# used to mark each menu entry of a persona.
+own_sections: [operations, cashiering, remittance, prodrecon, adjustment, commission]
+section_brd:
+  dashboard: Platform
+  nb-dashboard: BRD-1
+  workspace: BRD-1
+  crm: BRD-1
+  csf: BRD-9
+  screening: BRD-10
+  quotations: BRD-1
+  accounts: BRD-1
+  proposals: BRD-1
+  eb: BRD-8
+  placement: BRD-1
+  issuance: BRD-1
+  booking: BRD-1
+  renewal: BRD-6
+  submitted: BRD-12
+  prodrecon: BRD-2
+  adjustment: BRD-2
+  catalog: BRD-3
+  bulk: BRD-1
+  operations: BRD-2
+  collections: BRD-4
+  cashiering: BRD-2
+  remittance: BRD-2
+  commission: BRD-2
+  disbursement: BRD-5
+  payrequest: BRD-5
+  acsl: BRD-5
+  frbs: BRD-5
+  gl: BRD-5
+  receivables: BRD-5
+  payables: BRD-5
+  assets: BRD-5
+  planning: BRD-5
+  tax: BRD-5
+  accounting-engine: BRD-5
+  brokerclaims: BRD-7
+  underwriting: Platform
+  claims: Platform
+  reinsurance: Platform
+  reserves: Platform
+  migration: BRD-13
+  legacy-inquiry: BRD-13
+  nb-reports: BRD-1
+  reports: Platform
+  broking-setup: BRD-1
+  screening-setup: BRD-10
+  setup: Platform
+  user-access: BRD-11
+  admin: Platform / BRD-11
+  help: Platform
+
+# Screen-flow figure: the links between the screens (list → record → action → next screen).
+flow:
+  - [SCR-OP-01, SCR-OP-02, Find an Invoice]
+  - [SCR-OP-02, SCR-OP-03, open]
+  - [SCR-OP-01, SCR-OP-07, Cashiering]
+  - [SCR-OP-07, SCR-OP-08, receive]
+  - [SCR-OP-08, SCR-OP-10, Issue AR and Apply]
+  - [SCR-OP-09, SCR-OP-10, open]
+  - [SCR-OP-10, SCR-OP-03, invoice]
+  - [SCR-OP-08, SCR-OP-14, not booked yet]
+  - [SCR-OP-08, SCR-OP-11, no match or excess]
+  - [SCR-OP-15, SCR-OP-11, unapplied rows]
+  - [SCR-OP-11, SCR-OP-12, open]
+  - [SCR-OP-13, SCR-OP-12, Accept Request]
+  - [SCR-OP-12, SCR-OP-36, refund approved]
+  - [SCR-OP-16, SCR-OP-10, maturity]
+  - [SCR-OP-19, SCR-OP-36, Route to Disbursement]
+  - [SCR-OP-01, SCR-OP-23, Remittance]
+  - [SCR-OP-24, SCR-OP-25, batches created]
+  - [SCR-OP-25, SCR-OP-26, open]
+  - [SCR-OP-26, SCR-OP-36, Approve and Push]
+  - [SCR-OP-36, SCR-OP-26, DV assigned]
+  - [SCR-OP-27, SCR-OP-26, insurer OR]
+  - [SCR-OP-28, SCR-OP-29, open]
+  - [SCR-OP-30, SCR-OP-31, open]
+  - [SCR-OP-31, SCR-OP-26, special batch]
+  - [SCR-OP-33, SCR-OP-34, open]
+  - [SCR-OP-34, SCR-OP-26, deducted]
+  - [SCR-OP-35, SCR-OP-24, incentive rule]
+  - [SCR-OP-32, SCR-OP-24, Queue for End of Day]
+  - [SCR-OP-37, SCR-OP-38, New Request]
+  - [SCR-OP-38, SCR-OP-39, Submit for Validation]
+  - [SCR-OP-37, SCR-OP-39, open]
+  - [SCR-OP-39, SCR-OP-40, validated and approved]
+  - [SCR-OP-40, SCR-OP-39, posted]
+  - [SCR-OP-39, SCR-OP-03, Policy Transactions]
+  - [SCR-OP-39, SCR-OP-11, refund of excess]
+  - [SCR-OP-41, SCR-OP-37, requests raised]
+  - [SCR-OP-46, SCR-OP-44, register sent]
+  - [SCR-OP-47, SCR-OP-45, feedback matched]
+  - [SCR-OP-44, SCR-OP-45, open]
+  - [SCR-OP-45, SCR-OP-48, insurer only]
+  - [SCR-OP-49, SCR-OP-46, schedule]
+  - [SCR-OP-51, SCR-OP-52, validated]
+  - [SCR-OP-52, SCR-OP-53, Prepare Billing]
+  - [SCR-OP-53, SCR-OP-54, open]
+  - [SCR-OP-55, SCR-OP-54, answers]
+  - [SCR-OP-54, SCR-OP-10, commission OR]
+  - [SCR-OP-56, SCR-OP-57, scheme]
+  - [SCR-OP-57, SCR-OP-36, pass-on]
+  - [SCR-OP-58, SCR-OP-59, open]
+  - [SCR-OP-63, SCR-OP-64, report]
+  - [SCR-OP-64, SCR-OP-05, archived]
+
+# Elements shared by many screens, described once.
+common:
+  - name: Page header and company
+    text: >-
+      Every page shows its section and title, a one-line description and its actions on the right. The company in the
+      header decides the records shown; lists and reports are always of that company.
+  - name: Workbenches and work tiles
+    text: >-
+      Each team (Cashiering, Remittance, Production Reconciliation, Adjustment, Commission Receivables) has a
+      workbench with its work queues as tiles: a Title Case label and the live count; a queue that needs action has an
+      amber or red bar and "Needs attention". A tile opens the list behind it. The Operations Home shows the tiles of
+      every team the user works in.
+  - name: Work lists
+    text: >-
+      Lists show status tabs (with their counts where useful), a search box, a Filters button for the other criteria,
+      and the paged table ("Showing 1 to n of N results"). A row opens its record. Dates show as dd-MMM-yyyy and times
+      as dd-MMM-yyyy HH:mm in Philippine time. Selecting rows enables the bulk actions of the tab.
+  - name: Record summary and reference chips
+    text: >-
+      A record opens with its reference chips (invoice, ARN, policy number, receipt, batch, request, billing), its
+      status pill, its flags and the key facts. A reference chip copies the reference. An invoice number opens its
+      Invoice 360.
+  - name: Invoice statuses and flags
+    text: >-
+      Every invoice has a payment status (Unpaid, Partially Paid, Paid, Not Applicable) and a remittance status
+      (Unprocessed, Unapplied Payment, With Outstanding Balance, Review in Process, Requested for Hold, Approved,
+      Partially Remitted, Fully Remitted, Not Applicable), shown as two pills, and flags shown as tags in their own
+      column: Direct Payment, 2% CWT, Incentive, On Hold, Pending Negative Adjustment, Written Off, Cancelled,
+      Estimated and Locked by the team working on it.
+  - name: Workflow header and history
+    text: >-
+      Every Operations record with a workflow (receipt cancellation or reinstatement, disposition, BIR 2307 tag,
+      remittance batch, hold, special remittance, deduction, endorsement request, reconciliation cycle, DP billing,
+      BIR certificate) shows the workflow header under the record header: a stepper of the stages in their order
+      (passed stages ticked in blue, the current stage highlighted, the stages ahead in grey with their number; a
+      returned or on-hold stage in amber, a rejected, cancelled or returned record in red, the last stage in green once
+      reached), and one row with Current Stage, Since, Due (with the Overdue pill) and Assigned To, with the actions the
+      user may take now on the right. The history table lists every step, newest first: Stage, From Stage, Action, By
+      (name and role), Date and Time, Remarks and Duration in Stage. "Workflow notice" in the action tables means the
+      in-app notice NT-01.
+  - name: Four eyes
+    text: >-
+      Approvals are made by a second user: a receipt cancellation, reinstatement or disposition is never approved by
+      its requester; a remittance batch never by its submitter; a hold, extension, cancellation or special remittance
+      never by its requester; an endorsement request never by whoever raised, submitted or validated it; a deduction
+      is confirmed by the ACSL Team Leader. The system refuses the approval with a message even when the role holds the
+      permission.
+  - name: Status pills and tags
+    text: >-
+      Statuses are pills of one size and colour per state group; a pill never wraps. Statuses show their full label; an
+      agreed short form, with the full label in the tooltip, is used only for a label longer than 21 characters.
+      Flags are tags in the record header or in their own column.
+  - name: Dates, amounts, periods and names
+    text: >-
+      Dates are entered with one date picker and shown as dd-MMM-yyyy; times as dd-MMM-yyyy HH:mm in Philippine time.
+      Amounts show two decimals and thousand separators, negatives in brackets, with the currency in the column header
+      or before the amount. A period (period of cover, FFY period, booking period) is shown in lists on two lines, the
+      start date and "to" the end date; an open end reads "to open". Aging reads in days ("0 days", "1 day"). Lists
+      of values show their labels, and users are shown by their names.
+  - name: Policy Transactions
+    text: >-
+      One table on Invoice 360, on the endorsement request and on the account: the original booking, then every
+      endorsement, adjustment, cancellation and refund in date order, each with its date and effective date, type,
+      reference, premium, taxes and commission change, the gross premium and commission after it (Not posted for an
+      open request), its status and its accounting; a row opens its GL journals with their lines (account, party,
+      narration, debit, credit) and totals.
+  - name: Documents panel
+    text: >-
+      Lists the documents of the record (File, Type, Description, Size, Uploaded by, Uploaded, SHA-256), with the
+      upload bar, download of one file or a ZIP of the selected files, and removal. File type, size, content and
+      malware checks apply to every upload.
+  - name: Uploads
+    text: >-
+      Files are added in a drop zone (drag and drop or Browse) that states the accepted types and the maximum size.
+      Template uploads validate every row before anything is saved and show Rows Read, Valid and Rejected with the
+      rows; valid rows are processed and the rejected rows are returned in the error file. A file already uploaded is
+      refused. Payment files report applied, unapplied, pre-booked, excess and failed rows.
+  - name: Generated documents and e-mails
+    text: >-
+      Receipts, remittance schedules, payment requests, endorsement and validation slips, production registers and
+      DP billings are produced from document templates with the BDO Insure letterhead. Documents e-mailed to an
+      insurer are password protected and the password follows in a separate e-mail; the e-mail is queued and its
+      outcome is kept.
+  - name: Notifications and help
+    text: >-
+      The bell in the header shows the unread count and opens the notifications panel, grouped by day; each notice
+      shows its title, a one-line summary, the record reference and the time, and opens its record. Mark Read, Mark
+      All Read and View All are offered. Each user chooses the channels of the Operations events on Notification
+      Settings. The Help button of each page explains the screen.
+  - name: Messages
+    text: >-
+      Every message follows one notice standard: a white notice with a thin bar and an icon in the colour of its kind
+      (red error, amber warning, blue information, green success), a bold short title, then the business message with
+      one bullet per missing item. Field errors appear under the field. A refusal by a business rule shows the
+      business message only, without codes; only an unexpected system error offers Retry and a reference for support.
+      Success is confirmed by a short message in the same standard.
+  - name: Confirmations and bulk results
+    text: >-
+      Every approve, post, submit, release, cancel or reverse asks for confirmation in a dialog that names the record
+      and the effect; actions that need a reason open a dialog with the reason from its list and an optional comment.
+      An action run on several selected rows processes each record on its own and lists the outcome of each, so one
+      failure does not stop the others.

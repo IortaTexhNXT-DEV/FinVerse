@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Download, Printer, RotateCcw } from 'lucide-react';
+import { Printer } from 'lucide-react';
 import { useState } from 'react';
 import { selectionColumn, useRowSelection } from '@/components/broking/rowSelection';
 import { useFileDownload } from '@/components/broking/useFileDownload';
@@ -15,11 +15,13 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, formatDateTime } from '@/utils/format';
-import { CodeSelect, TextField } from './CashFields';
+import { CodeSelect, InsurerField, TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { PrintBatch, ReceiptKind, ReceiptSummary } from './cashieringApi';
 import './cashiering.css';
-import { displayNameOf } from '@/api/users';
+import { CellStack } from '@/components/ui/CellStack';
+import { RowActions } from '@/components/ui/RowActions';
+import { UserName } from '@/components/ui/UserName';
 
 const keyOf = (r: ReceiptSummary) => String(r.id);
 
@@ -79,35 +81,30 @@ function Batches({ companyId }: Readonly<{ companyId: number }>) {
     {
       key: 'by',
       header: 'Created',
-      render: (b) => `${displayNameOf(b.createdBy)} · ${formatDateTime(b.createdAt)}`,
+      render: (b) => (
+        <CellStack main={<UserName login={b.createdBy} />} sub={formatDateTime(b.createdAt)} />
+      ),
     },
     { key: 'status', header: 'Status', render: (b) => <StatusBadge status={b.status} /> },
     {
       key: 'actions',
       header: '',
       render: (b) => (
-        <div className="row">
-          {b.fileName && (
-            <Button
-              size="sm"
-              variant="secondary"
-              icon={<Download size={14} />}
-              onClick={() => download.mutate(() => cashieringApi.printFile(b.id))}
-            >
-              Download
-            </Button>
-          )}
-          {b.failedCount > 0 && (
-            <Button
-              size="sm"
-              variant="ghost"
-              icon={<RotateCcw size={14} />}
-              onClick={() => retry.mutate(b.id)}
-            >
-              Retry Failures
-            </Button>
-          )}
-        </div>
+        <RowActions
+          record={b.batchNo}
+          actions={[
+            {
+              label: 'Download',
+              hidden: !b.fileName,
+              onSelect: () => download.mutate(() => cashieringApi.printFile(b.id)),
+            },
+            {
+              label: 'Retry Failures',
+              hidden: b.failedCount === 0,
+              onSelect: () => retry.mutate(b.id),
+            },
+          ]}
+        />
       ),
     },
   ];
@@ -191,11 +188,10 @@ export default function BatchPrintPage() {
             value={criteria.kind}
             options={['AR', 'OR']}
             empty="All"
-            labelOf={(c) => c}
+            labelOf={(c) => (c === 'AR' ? 'Acknowledgement Receipt' : 'Official Receipt')}
             onChange={(v) => setCriteria({ ...criteria, kind: v as ReceiptKind | '' })}
           />
-          <TextField
-            label="Insurer Code"
+          <InsurerField
             value={criteria.insurer}
             onChange={(insurer) => setCriteria({ ...criteria, insurer })}
           />

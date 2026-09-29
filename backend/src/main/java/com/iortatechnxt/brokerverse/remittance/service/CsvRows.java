@@ -16,11 +16,24 @@ import java.util.Set;
 /**
  * Reads the files uploaded to the remittance feeds: the guided Excel template (header row below its
  * column guide, example rows skipped), or a delimited file (comma, semicolon or tab separated,
- * first line = column names, optional double quotes). Column names are case-insensitive. The real
- * layouts of the insurer and Collection files are parked (OQ22, OQ45); the column names are those
- * of the BRD.
+ * first line = column names, optional double quotes). Column names are matched whatever their
+ * spelling ("Invoice No.", "invoiceNo"; see {@link #key}). The real layouts of the insurer and
+ * Collection files are parked (OQ22, OQ45); the column names are those of the BRD.
  */
 public final class CsvRows {
+
+  /** The headers of the upload templates (Holds, Special Remittance, Insurer OR). */
+  private static final Map<String, String> LABELS =
+      Map.of(
+          "invoiceno", "Invoice No.",
+          "reasoncode", "Reason Code",
+          "holduntil", "Hold Until",
+          "remarks", "Remarks",
+          "conditioncode", "Condition Code",
+          "batchno", "Batch No.",
+          "orno", "OR No.",
+          "ordate", "OR Date",
+          "oramount", "OR Amount");
 
   private static final char QUOTE = '"';
   private static final byte[] ZIP = {'P', 'K', 3, 4};
@@ -44,7 +57,7 @@ public final class CsvRows {
     if (table.stream().allMatch(CsvRows::blank)) {
       throw new BusinessRuleException("FEED_FILE_EMPTY", "The file has no lines");
     }
-    int headerRow = GuidedTables.headerRow(table, required, h -> h.toLowerCase(Locale.ROOT));
+    int headerRow = GuidedTables.headerRow(table, required, CsvRows::key);
     List<String> header = header(table.get(headerRow), required);
     List<Row> rows = new ArrayList<>();
     for (int i = headerRow + 1; i < table.size(); i++) {
@@ -57,17 +70,42 @@ public final class CsvRows {
     return rows;
   }
 
-  /** The lower-case header of the file; refuses a file without the required columns. */
+  /** The column keys of the file's header; refuses a file without the required columns. */
   private static List<String> header(List<String> row, Set<String> required) {
-    List<String> header =
-        GuidedTables.headers(row).stream().map(h -> h.toLowerCase(Locale.ROOT)).toList();
+    List<String> header = GuidedTables.headers(row).stream().map(CsvRows::key).toList();
     for (String column : required) {
-      if (!header.contains(column.toLowerCase(Locale.ROOT))) {
+      if (!header.contains(key(column))) {
         throw new BusinessRuleException(
-            "FEED_FILE_COLUMNS", "The file must have the columns " + String.join(", ", required));
+            "FEED_FILE_COLUMNS",
+            "The file must have the columns "
+                + String.join(", ", required.stream().map(CsvRows::label).sorted().toList()));
       }
     }
     return header;
+  }
+
+  /**
+   * The column a header names, whatever its spelling: "Invoice No.", "invoice no" and "invoiceNo"
+   * are the same column; a note in brackets ("Hold Until (dd-MMM-yyyy)") is ignored.
+   *
+   * @param header header text or column name
+   * @return lower-case letters and digits
+   */
+  static String key(String header) {
+    return header
+        .replaceAll("\\([^)]*\\)", "")
+        .toLowerCase(Locale.ROOT)
+        .replaceAll("[^a-z0-9]", "");
+  }
+
+  /**
+   * The header users read for a column of the upload templates.
+   *
+   * @param column column name
+   * @return business header, the column name when unknown
+   */
+  public static String label(String column) {
+    return LABELS.getOrDefault(key(column), column);
   }
 
   private static Map<String, String> values(List<String> header, List<String> cells) {
@@ -139,7 +177,7 @@ public final class CsvRows {
    *
    * @param lineNo line number in the file
    * @param raw raw line (payload of the flow-in record)
-   * @param values values by lower-case column name
+   * @param values values by column key (see {@link CsvRows#key})
    */
   public record Row(int lineNo, String raw, Map<String, String> values) {
 
@@ -155,7 +193,7 @@ public final class CsvRows {
      * @return value, empty when missing
      */
     public String get(String column) {
-      return values.getOrDefault(column.toLowerCase(Locale.ROOT), "");
+      return values.getOrDefault(key(column), "");
     }
 
     /**
@@ -168,7 +206,7 @@ public final class CsvRows {
       String value = get(column);
       if (value.isBlank()) {
         throw new BusinessRuleException(
-            "FEED_VALUE_MISSING", "Line " + lineNo + ": " + column + " is missing");
+            "FEED_VALUE_MISSING", "Line " + lineNo + ": " + label(column) + " is missing");
       }
       return value;
     }

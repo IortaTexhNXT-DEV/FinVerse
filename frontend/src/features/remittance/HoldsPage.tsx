@@ -20,7 +20,8 @@ import { remittanceApi } from './api';
 import type { Hold, HoldInput } from './api';
 import { NewHoldDialog } from './HoldDialogs';
 import { TemplateButton, UploadForm } from './RemittanceParts';
-import { HOLD_TABS, stagesOf } from './remittanceLabels';
+import { HOLD_TABS, holdStatus, stagesOf } from './remittanceLabels';
+import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
 import type { HoldTab } from './remittanceLabels';
 import './remittance.css';
 import { UserName } from '@/components/ui/UserName';
@@ -40,11 +41,19 @@ const COLUMNS: Column<Hold>[] = [
   },
   { key: 'inv', header: 'Invoice No.', render: (h) => h.invoiceNo },
   { key: 'assured', header: 'Name of Assured', render: (h) => h.assuredName },
-  { key: 'ins', header: 'Insurer', render: (h) => h.insurerCode },
-  { key: 'reason', header: 'Reason', render: (h) => h.reasonCode },
+  { key: 'ins', header: 'Insurer', render: (h) => <InsurerName code={h.insurerCode} /> },
+  {
+    key: 'reason',
+    header: 'Reason',
+    render: (h) => <LovLabel type="HOLD_REASON" code={h.reasonCode} />,
+  },
   { key: 'until', header: 'Hold Until', render: (h) => formatDate(h.holdUntil) },
-  { key: 'proc', header: 'Processor', render: (h) => h.assignedProcessor ?? '' },
-  { key: 'stage', header: 'Status', render: (h) => <StatusBadge status={h.stage} /> },
+  {
+    key: 'proc',
+    header: 'Processor',
+    render: (h) => <UserName login={h.assignedProcessor} empty="" />,
+  },
+  { key: 'stage', header: 'Status', render: (h) => <StatusBadge status={holdStatus(h.stage)} /> },
 ];
 
 /**
@@ -109,7 +118,8 @@ export default function HoldsPage() {
       {uploading && (
         <Card title="Upload Collection Hold File" actions={<TemplateButton kind="holds" />}>
           <UploadForm
-            label="Hold file (invoiceNo, reasonCode, holdUntil, remarks)"
+            label="Hold File"
+            columns="Invoice No., Reason Code, Hold Until, Remarks"
             busy={upload.isPending}
             onUpload={(file) => upload.mutate(file)}
           />

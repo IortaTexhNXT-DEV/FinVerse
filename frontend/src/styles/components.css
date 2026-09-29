@@ -514,6 +514,19 @@
   border-right: none;
 }
 
+/* A row header (the first cell of a row that names it: a rule, a field) reads as data, never as a
+   column header: no navy band, no sticky position, the text colour of the row. */
+.table tbody th {
+  position: static;
+  background: transparent;
+  color: var(--color-text);
+  font-family: inherit;
+  font-weight: 600;
+  padding: 12px var(--space-3);
+  border-right: none;
+  white-space: normal;
+}
+
 .table th button,
 .table th a {
   color: inherit;
@@ -1204,4 +1217,57 @@
 
 .notice .tag-list {
   margin-top: var(--space-1);
+}
+
+/* Row action menu of a table (RowActions): one menu button at the end of a row. */
+.row-actions {
+  position: relative;
+  display: inline-block;
+}
+
+.row-actions-button {
+  padding: 0 var(--space-2);
+}
+
+.row-actions-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 4px);
+  z-index: 20;
+  min-width: 200px;
+  margin: 0;
+  padding: var(--space-1) 0;
+  list-style: none;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+}
+
+.row-actions-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  padding: var(--space-2) var(--space-4);
+  border: 0;
+  background: none;
+  text-align: left;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.row-actions-item:hover:not(:disabled),
+.row-actions-item:focus-visible {
+  background: var(--brand-blue-050);
+}
+
+.row-actions-item:disabled {
+  color: var(--color-placeholder);
+  cursor: not-allowed;
+}
+
+.row-actions-item.danger {
+  color: var(--color-danger);
 }

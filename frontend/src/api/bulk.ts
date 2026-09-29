@@ -20,6 +20,8 @@ export interface BulkHandler {
   instructions: string;
   /** Whether an identical earlier file is refused. */
   blocksDuplicateFiles?: boolean;
+  /** A bank or channel text file (.txt) in its own layout rather than a template sheet. */
+  textFile?: boolean;
 }
 
 export interface BulkJob {

@@ -121,10 +121,24 @@ async function act(page, name, opts = {}) {
     const names = await page.locator('main button:visible').allInnerTexts();
     throw new Error(`no button ${name} on ${page.url()}; buttons: ${names.map((n) => n.trim()).filter(Boolean).join(' | ')}`);
   }
-  await target.click();
-  await page.waitForTimeout(700);
   const dialog = page.locator('dialog.modal[open]').last();
-  if (await dialog.isVisible().catch(() => false)) {
+  const dialogOpen = () => dialog.isVisible().catch(() => false);
+  try {
+    await target.click({ timeout: 10000 });
+  } catch (e) {
+    // A click that Playwright retries (the button re-rendered while the page was still settling) may already have
+    // opened the confirmation: the button then lies under the dialog's backdrop and every retry fails. The dialog
+    // being open means the click was taken.
+    if (!(await dialogOpen())) {
+      throw e;
+    }
+  }
+  await page.waitForTimeout(700);
+  if (opts.confirm && !(await dialogOpen())) {
+    // A confirmation is expected: give a slow page the time to open it.
+    await dialog.waitFor({ state: 'visible', timeout: 5000 }).catch(() => {});
+  }
+  if (await dialogOpen()) {
     if (opts.fill) {
       await opts.fill(dialog);
     }
@@ -147,6 +161,10 @@ async function act(page, name, opts = {}) {
       await confirm.last().click();
     } else {
       await dialog.getByRole('button').last().click();
+    }
+    if (!opts.keepResult) {
+      // The confirmation closes when the action is done; a refusal stays in the dialog as its message.
+      await dialog.waitFor({ state: 'hidden', timeout: 20000 }).catch(() => {});
     }
   }
   await settle(page, 1200);

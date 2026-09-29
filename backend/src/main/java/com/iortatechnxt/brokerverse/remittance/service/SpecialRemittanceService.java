@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
@@ -204,7 +205,10 @@ public class SpecialRemittanceService {
               ? decision.remarks()
               : String.join(", ", decision.reasons()));
     }
-    String note = "Validated: paid AR " + decision.remittable() + " applied and cleared";
+    String note =
+        "Validated: paid AR "
+            + DisplayFormat.amount(decision.remittable())
+            + " applied and cleared";
     return CLAIMS.equals(condition) ? note + claimsNote(invoice) : note;
   }
 
@@ -316,10 +320,15 @@ public class SpecialRemittanceService {
     return requests.findByInvoiceInvoiceNoOrderByIdDesc(invoiceNo);
   }
 
-  private static Notice notice(SpecialRemittance r, String title) {
+  private Notice notice(SpecialRemittance r, String title) {
     return new Notice(
         title,
-        r.getInvoiceNo() + " - " + r.getAssuredName() + " (" + r.getConditionCode() + ")",
+        r.getInvoiceNo()
+            + " - "
+            + r.getAssuredName()
+            + " ("
+            + lovs.label("SPECIAL_REMIT_CONDITION", r.getConditionCode())
+            + ")",
         "/remittance/special/" + r.getId(),
         ENTITY,
         r.getId().toString());

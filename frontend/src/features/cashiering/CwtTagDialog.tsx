@@ -3,9 +3,11 @@ import { useState } from 'react';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
+import { InsurerName } from '@/components/broking/LovLabel';
+import { statusLabel } from '@/components/ui/statusTones';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
-import { humanize } from '@/utils/format';
 import { CodeSelect, TextField } from './CashFields';
 import { cashieringApi } from './cashieringApi';
 import type { CwtTagBody } from './cashieringApi';
@@ -139,12 +141,17 @@ export function CwtTagDialog({
           />
         </div>
         {e && (
-          <p className="muted">
-            {e.assuredName ?? e.arn} · insurer {e.insurerCode ?? ''} · expected 2307{' '}
-            <Amount value={e.expected} /> ·{' '}
-            {e.cwt ? '2% CWT client' : 'not flagged as a CWT client'} ·{' '}
-            {humanize(e.remittanceStatus)}
-          </p>
+          <DefinitionGrid
+            columns={2}
+            label="Invoice facts"
+            items={[
+              { label: 'Assured', value: e.assuredName ?? e.arn },
+              { label: 'Insurer', value: <InsurerName code={e.insurerCode} /> },
+              { label: 'Expected 2307', value: <Amount value={e.expected} /> },
+              { label: '2% CWT Client', value: e.cwt ? 'Yes' : 'No' },
+              { label: 'Remittance Status', value: statusLabel(e.remittanceStatus) },
+            ]}
+          />
         )}
       </div>
     </Modal>

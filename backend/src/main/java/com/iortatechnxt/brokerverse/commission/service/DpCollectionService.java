@@ -2,6 +2,8 @@ package com.iortatechnxt.brokerverse.commission.service;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
+import com.iortatechnxt.brokerverse.catalog.service.InsurerService;
 import com.iortatechnxt.brokerverse.commission.domain.CommissionEnums.DpTag;
 import com.iortatechnxt.brokerverse.commission.domain.DpBilling;
 import com.iortatechnxt.brokerverse.commission.domain.DpItem;
@@ -47,6 +49,7 @@ public class DpCollectionService {
   private final DpItemRepository items;
   private final DpPostings postings;
   private final ReceiptIssuer receipts;
+  private final InsurerService insurers;
   private final UnappliedSink unapplied;
   private final InvoiceLedgerQueryService ledger;
   private final LovService lovs;
@@ -70,6 +73,8 @@ public class DpCollectionService {
    * @param workflow workflow engine
    * @param audit audit trail
    * @param clock clock
+   * @param insurers insurer profiles (the payor name of the commission OR)
+   * @param organization company directory (the base currency)
    */
   @SuppressWarnings("java:S107") // constructor injection
   public DpCollectionService(
@@ -84,6 +89,7 @@ public class DpCollectionService {
       WorkflowService workflow,
       AuditTrailService audit,
       Clock clock,
+      InsurerService insurers,
       OrganizationDirectory organization) {
     this.billings = billings;
     this.items = items;
@@ -96,6 +102,7 @@ public class DpCollectionService {
     this.workflow = workflow;
     this.audit = audit;
     this.clock = clock;
+    this.insurers = insurers;
     this.organization = organization;
   }
 
@@ -169,7 +176,7 @@ public class DpCollectionService {
         new ReceiptRequest(
             billing.getCompanyId(),
             "COMMISSION",
-            new ReceiptIssuer.Payee(billing.getInsurerCode(), billing.getInsurerCode()),
+            new ReceiptIssuer.Payee(billing.getInsurerCode(), insurerName(billing)),
             currency(billing.getCompanyId(), approved),
             request.receiptDate() == null ? BusinessClock.today(clock) : request.receiptDate(),
             lines,
@@ -280,4 +287,13 @@ public class DpCollectionService {
    * @param certificateRef BIR certificate of the withholding tax, may be null
    */
   public record CollectRequest(LocalDate receiptDate, String bankAccount, String certificateRef) {}
+
+  /** The insurer's name as the OR names the payor (the code only when the insurer is unknown). */
+  private String insurerName(DpBilling billing) {
+    return insurers.insurers(billing.getCompanyId()).stream()
+        .filter(i -> i.getPartyCode().equals(billing.getInsurerCode()))
+        .map(InsurerProfile::getName)
+        .findFirst()
+        .orElse(billing.getInsurerCode());
+  }
 }

@@ -15,7 +15,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
-import { humanize } from '@/utils/format';
+import { referenceText } from '@/utils/businessLabels';
 import { cashieringApi } from './cashieringApi';
 import type { Payment } from './cashieringApi';
 import { runTiles } from './cashieringLogic';
@@ -48,7 +48,7 @@ const COLUMNS: Column<Payment>[] = [
     render: (p) => <Amount value={p.unappliedAmount} />,
   },
   { key: 'cat', header: 'Outcome', render: (p) => <StatusBadge status={p.matchCategory} /> },
-  { key: 'msg', header: 'Message', render: (p) => p.message ?? humanize(p.matchedRef ?? '') },
+  { key: 'msg', header: 'Message', render: (p) => p.message ?? referenceText(p.matchedRef) },
 ];
 
 function RunSummary({ job, companyId }: Readonly<{ job: BulkJob; companyId: number }>) {

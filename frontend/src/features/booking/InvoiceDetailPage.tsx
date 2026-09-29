@@ -22,7 +22,8 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
-import { formatAmount, formatDate } from '@/utils/format';
+import { formatAmount, formatDate, formatPeriod } from '@/utils/format';
+import { useProductName } from '@/components/broking/useLabels';
 import { PremiumTables, SummaryFact } from './BookingParts';
 import { labelOf } from './bookingForm';
 import { CancellationDialog } from './CancellationDialog';
@@ -86,7 +87,7 @@ function Summary({ invoice: i }: Readonly<{ invoice: BookedInvoice }>) {
         </div>
         <div className="summary-card">
           <SummaryFact icon={UserRound} label="Client">
-            {i.facts.clientName} <span className="muted">{i.facts.clientCode}</span>
+            {i.facts.clientName}
           </SummaryFact>
           <SummaryFact icon={Building2} label="Insurer(s)">
             {i.shares.map((s, n) => (
@@ -97,7 +98,7 @@ function Summary({ invoice: i }: Readonly<{ invoice: BookedInvoice }>) {
             ))}
           </SummaryFact>
           <SummaryFact icon={CalendarRange} label="Period">
-            {formatDate(i.inceptionDate)} – {formatDate(i.expiryDate)}
+            {formatPeriod(i.inceptionDate, i.expiryDate)}
           </SummaryFact>
           <SummaryFact icon={ReceiptText} label="Booked">
             {formatDate(i.bookingDate)}{' '}
@@ -159,6 +160,7 @@ export default function InvoiceDetailPage() {
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<TabId>('premium');
   const [cancelling, setCancelling] = useState(false);
+  const productName = useProductName();
   const invoice = useQuery({
     queryKey: ['booking', 'invoice', id],
     queryFn: () => bookingApi.invoice(id),
@@ -179,7 +181,7 @@ export default function InvoiceDetailPage() {
         title={i.invoiceNo ?? i.arn}
         description={[
           labelOf(i.kind),
-          i.facts.riskCode,
+          productName(i.facts.riskCode),
           `policy year ${String(i.policyYear)}`,
           i.policyNo,
         ]

@@ -3485,7 +3485,7 @@ rules:
   - [R2, "Lock-out after 3 failed attempts.", Configurable, Parameter LOGIN_MAX_FAILED_ATTEMPTS]
 validations:
   - [Wrong user ID or password, Invalid user name or password, AUTHENTICATION_FAILED]
-  - [Account locked, Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
+  - [Account locked, Invalid user name or password, AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:

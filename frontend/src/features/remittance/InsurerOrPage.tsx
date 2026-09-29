@@ -16,7 +16,9 @@ import { remittanceApi } from './api';
 import type { AccountHit, FeedRecord, FeedRun, OrUpload } from './api';
 import { TemplateButton, UploadForm } from './RemittanceParts';
 import './remittance.css';
-import { displayNameOf } from '@/api/users';
+import { CellStack } from '@/components/ui/CellStack';
+import { UserName } from '@/components/ui/UserName';
+import { statusLabel, statusMessage } from '@/components/ui/statusTones';
 
 const UPDATED: Column<AccountHit>[] = [
   {
@@ -46,10 +48,27 @@ const UPDATED: Column<AccountHit>[] = [
   },
 ];
 
+/** A record of the insurer's file: its batch, invoice and OR number. */
+function recordParts(key: string) {
+  const [batch = '', invoice = '', or = ''] = key.split('/');
+  return { batch, invoice, or };
+}
+
+/** The outcome of a record in words: "RMB-…/BI-…: MATCHED" → Matched. */
+function resultText(reference: string | undefined) {
+  const status = reference?.split(': ')[1];
+  return status ? statusLabel(status) : '';
+}
+
 const RECORDS: Column<FeedRecord>[] = [
-  { key: 'key', header: 'Record', render: (r) => r.key },
+  {
+    key: 'key',
+    header: 'Batch / Invoice',
+    render: (r) => <CellStack main={recordParts(r.key).batch} sub={recordParts(r.key).invoice} />,
+  },
+  { key: 'or', header: 'OR No.', render: (r) => recordParts(r.key).or },
   { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
-  { key: 'ref', header: 'Result', render: (r) => r.reference ?? '' },
+  { key: 'ref', header: 'Result', render: (r) => resultText(r.reference) },
   { key: 'msg', header: 'Reason', render: (r) => r.message ?? '' },
 ];
 
@@ -62,7 +81,9 @@ const RUNS: Column<FeedRun>[] = [
   {
     key: 'at',
     header: 'Uploaded',
-    render: (r) => `${formatDateTime(r.startedAt)} · ${displayNameOf(r.createdBy)}`,
+    render: (r) => (
+      <CellStack main={<UserName login={r.createdBy} />} sub={formatDateTime(r.startedAt)} />
+    ),
   },
 ];
 
@@ -115,7 +136,7 @@ export default function InsurerOrPage() {
     onSuccess: async (r) => {
       setResult(r);
       await queryClient.invalidateQueries({ queryKey: ['remittance'] });
-      toast.success(`${r.run.runNo}: ${r.run.message ?? r.run.status}`);
+      toast.success(r.run.message ?? statusMessage(r.run.runNo, r.run.status));
     },
   });
   const open = useMutation({
@@ -133,7 +154,8 @@ export default function InsurerOrPage() {
       <ErrorAlert error={upload.error ?? open.error ?? runs.error} />
       <Card title="Upload Insurer Schedule">
         <UploadForm
-          label="Insurer schedule (batchNo, invoiceNo, orNo, orDate, orAmount)"
+          label="Insurer Schedule"
+          columns="Batch No., Invoice No., OR No., OR Date, OR Amount"
           busy={upload.isPending}
           onUpload={(file) => upload.mutate(file)}
         />

@@ -84,9 +84,16 @@ export function TemplateButton({ kind }: Readonly<{ kind: TemplateKind }>) {
 /** A file picker with its upload button (manual transport of the feeds). */
 export function UploadForm({
   label,
+  columns,
   busy,
   onUpload,
-}: Readonly<{ label: string; busy: boolean; onUpload: (file: File) => void }>) {
+}: Readonly<{
+  label: string;
+  /** The columns of the file as the template names them. */
+  columns: string;
+  busy: boolean;
+  onUpload: (file: File) => void;
+}>) {
   const [file, setFile] = useState<File>();
   const [error, setError] = useState<string>();
   return (
@@ -95,7 +102,7 @@ export function UploadForm({
         label={label}
         required
         error={error}
-        hint="The Excel template, CSV, or semicolon or tab separated text"
+        hint={`The Excel template, or a CSV or text file with its columns: ${columns}. Dates as dd-MMM-yyyy.`}
       >
         {(id) => (
           <FileDropZone

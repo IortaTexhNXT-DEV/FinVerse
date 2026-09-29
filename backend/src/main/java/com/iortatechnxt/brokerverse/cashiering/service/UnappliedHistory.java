@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.CollectorRequest;
 import com.iortatechnxt.brokerverse.cashiering.domain.CollectorRequestRepository;
 import com.iortatechnxt.brokerverse.cashiering.domain.Disposition;
 import com.iortatechnxt.brokerverse.cashiering.domain.DispositionRepository;
+import com.iortatechnxt.brokerverse.cashiering.domain.DispositionWords;
 import com.iortatechnxt.brokerverse.cashiering.domain.Receipt;
 import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
 import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedRepository;
@@ -121,7 +122,7 @@ public class UnappliedHistory {
         new UnappliedEvent(
             d.getCreatedAt(),
             "DISPOSITION",
-            "Disposition " + d.getDispositionType() + " assigned",
+            "Disposition assigned: " + DispositionWords.of(d.getDispositionType()),
             d.getAmount(),
             d.getCreatedBy(),
             "DSP:" + d.getId()));
@@ -144,9 +145,9 @@ public class UnappliedHistory {
               d.getUpdatedAt(),
               d.getStatus().name(),
               "Disposition "
-                  + d.getDispositionType()
-                  + " "
-                  + d.getStatus().name().toLowerCase(Locale.ROOT),
+                  + d.getStatus().name().toLowerCase(Locale.ROOT)
+                  + ": "
+                  + DispositionWords.of(d.getDispositionType()),
               d.getAmount(),
               by(d.getUpdatedBy()),
               "DSP:" + d.getId()));

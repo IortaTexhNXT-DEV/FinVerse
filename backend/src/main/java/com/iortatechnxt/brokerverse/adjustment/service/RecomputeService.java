@@ -91,11 +91,11 @@ public class RecomputeService {
     OpsInvoice invoice = ledger.require(invoiceNo);
     Delta delta = deltas.compute(invoice, computation, terms, amounts);
     Map<LedgerComponent, BigDecimal> changes = changes(computation, delta);
+    List<OpsInvoice> basis = basis(invoice, computation);
     List<ComponentChange> components = new ArrayList<>();
     changes.forEach(
         (component, change) ->
-            components.add(
-                new ComponentChange(component, invoice.component(component).due(), change)));
+            components.add(new ComponentChange(component, due(basis, component), change)));
     boolean reduces = delta.premium().total().signum() < 0;
     return new Recompute(
         components,
@@ -159,6 +159,41 @@ public class RecomputeService {
     map.put(LedgerComponent.COMMISSION, delta.commission().commission());
     map.put(LedgerComponent.COMMISSION_VAT, delta.commission().vatOnCommission());
     return map;
+  }
+
+  /**
+   * The invoices whose amounts the request changes, so that Before and Change have the same basis
+   * (proposed rule of the clarifications): a cancellation, a sum insured change or an amount change
+   * acts on the premium in force of the policy year, which is the booking of the year with its
+   * endorsements and earlier returns (the invoice family of the same policy year, as booking
+   * computes the change); a write-off acts on the invoice itself.
+   *
+   * @param invoice invoice of the request
+   * @param computation computation
+   * @return the invoices of the basis, the request's invoice first
+   */
+  private List<OpsInvoice> basis(OpsInvoice invoice, Computation computation) {
+    if (computation == Computation.WRITE_OFF || computation == Computation.NONE) {
+      return List.of(invoice);
+    }
+    List<OpsInvoice> year =
+        ledger.family(invoice.getInvoiceNo()).stream()
+            .filter(i -> i.getPolicyYear() == invoice.getPolicyYear())
+            .filter(i -> !i.getInvoiceNo().equals(invoice.getInvoiceNo()))
+            .toList();
+    List<OpsInvoice> all = new ArrayList<>();
+    all.add(invoice);
+    all.addAll(year);
+    return all;
+  }
+
+  private static BigDecimal due(List<OpsInvoice> basis, LedgerComponent component) {
+    return basis.stream()
+        .flatMap(i -> i.getComponents().stream())
+        .filter(c -> c.getComponent() == component)
+        .map(OpsInvoiceComponent::due)
+        .reduce(BigDecimal.ZERO, BigDecimal::add)
+        .setScale(2, RoundingMode.HALF_UP);
   }
 
   private static Settlement settlement(

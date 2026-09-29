@@ -1,4 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { InsurerSelect } from '@/components/broking/InsurerSelect';
+import { InsurerName } from '@/components/broking/LovLabel';
+import { useInsurerName } from '@/components/broking/useLabels';
+import { CellStack } from '@/components/ui/CellStack';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/auth/authContext';
@@ -34,6 +38,7 @@ function ScheduleDialog({
   onSave: (input: ScheduleInput) => void;
 }>) {
   const [form, setForm] = useState<ScheduleInput>(() => scheduleForm(companyId, schedule));
+  const insurerName = useInsurerName();
   const [problem, setProblem] = useState<string>();
   const set = (patch: Partial<ScheduleInput>) => {
     setForm((f) => ({ ...f, ...patch }));
@@ -49,7 +54,9 @@ function ScheduleDialog({
   };
   return (
     <Modal
-      title={schedule ? `Edit Schedule of ${schedule.insurerCode}` : 'New Extract Schedule'}
+      title={
+        schedule ? `Edit Schedule of ${insurerName(schedule.insurerCode)}` : 'New Extract Schedule'
+      }
       open
       onClose={onClose}
       footer={
@@ -67,17 +74,24 @@ function ScheduleDialog({
         <ErrorAlert error={error} />
         {problem && <p className="field-error">{problem}</p>}
         <div className="form-grid">
-          <Field label="Insurer Code" required>
-            {(id) => (
-              <input
-                id={id}
-                className="input"
-                maxLength={30}
-                disabled={schedule !== undefined}
-                value={form.insurerCode}
-                onChange={(e) => set({ insurerCode: e.target.value })}
-              />
-            )}
+          <Field label="Insurer" required>
+            {(id) =>
+              schedule === undefined ? (
+                <InsurerSelect
+                  id={id}
+                  value={form.insurerCode}
+                  onChange={(code) => set({ insurerCode: code })}
+                />
+              ) : (
+                <input
+                  id={id}
+                  className="input"
+                  disabled
+                  value={insurerName(form.insurerCode)}
+                  readOnly
+                />
+              )
+            }
           </Field>
           <Field label="Frequency" required>
             {(id) => (
@@ -166,12 +180,21 @@ export default function ReconSchedulesPage() {
     onSuccess: async (s) => {
       setEditing(undefined);
       await queryClient.invalidateQueries({ queryKey: ['prodrecon', 'schedules'] });
-      toast.success(`Schedule of ${s.insurerCode} saved`);
+      toast.success(`Schedule of ${insurerName(s.insurerCode)} saved.`);
     },
   });
   const mayEdit = can('RECON_PROCESS');
+  const insurerName = useInsurerName();
   const columns: Column<ReconSchedule>[] = [
-    { key: 'insurer', header: 'Insurer', render: (s) => <strong>{s.insurerCode}</strong> },
+    {
+      key: 'insurer',
+      header: 'Insurer',
+      render: (s) => (
+        <strong>
+          <InsurerName code={s.insurerCode} />
+        </strong>
+      ),
+    },
     {
       key: 'freq',
       header: 'Frequency',
@@ -183,7 +206,7 @@ export default function ReconSchedulesPage() {
     {
       key: 'last',
       header: 'Last Run',
-      render: (s) => `${formatDateTime(s.lastRunAt)} ${s.lastExtractNo ?? ''}`,
+      render: (s) => <CellStack main={formatDateTime(s.lastRunAt)} sub={s.lastExtractNo} />,
     },
     {
       key: 'status',

@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Download } from 'lucide-react';
 import { useState } from 'react';
 import { opsApi } from '@/api/operations';
 import type { ExtractFileInfo, Handoff } from '@/api/operations';
@@ -20,8 +19,12 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime, humanize } from '@/utils/format';
+import { folderLabel, moduleLabel, referenceText } from '@/utils/businessLabels';
+import { CellStack } from '@/components/ui/CellStack';
+import { RowActions } from '@/components/ui/RowActions';
+import { UserName } from '@/components/ui/UserName';
+import { useInsurerName } from '@/components/broking/useLabels';
 import './operations.css';
-import { displayNameOf } from '@/api/users';
 
 const TABS = [
   { id: 'OPEN', label: 'Open Hand-offs' },
@@ -101,22 +104,37 @@ function HandoffTable({
   });
   const mayClose = CLOSERS.some(can);
   const columns: Column<Handoff>[] = [
-    { key: 'port', header: 'Work', render: (h) => humanize(h.port) },
-    { key: 'summary', header: 'What To Do', render: (h) => h.summary },
-    { key: 'src', header: 'From', render: (h) => `${humanize(h.sourceModule)} · ${h.sourceRef}` },
-    { key: 'amount', header: 'Amount', numeric: true, render: (h) => <Amount value={h.amount} /> },
-    { key: 'at', header: 'Created', render: (h) => formatDateTime(h.createdAt) },
     {
-      key: 'status',
-      header: 'Status',
-      render: (h) =>
-        h.status === 'OPEN' && mayClose ? (
-          <Button size="sm" variant="secondary" onClick={() => onClose(h)}>
-            Close
-          </Button>
-        ) : (
-          <StatusBadge status={h.status} />
-        ),
+      key: 'port',
+      header: 'Work / What To Do',
+      render: (h) => <CellStack main={humanize(h.port)} sub={h.summary} />,
+    },
+    {
+      key: 'src',
+      header: 'From',
+      render: (h) => (
+        <CellStack main={moduleLabel(h.sourceModule)} sub={referenceText(h.sourceRef)} />
+      ),
+    },
+    { key: 'amount', header: 'Amount', numeric: true, render: (h) => <Amount value={h.amount} /> },
+    { key: 'at', header: 'Created', kind: 'date', render: (h) => formatDateTime(h.createdAt) },
+    { key: 'status', header: 'Status', render: (h) => <StatusBadge status={h.status} /> },
+    {
+      key: 'actions',
+      header: '',
+      kind: 'center',
+      render: (h) => (
+        <RowActions
+          record={humanize(h.port)}
+          actions={[
+            {
+              label: 'Close Hand-off',
+              hidden: h.status !== 'OPEN' || !mayClose,
+              onSelect: () => onClose(h),
+            },
+          ]}
+        />
+      ),
     },
   ];
   return (
@@ -138,42 +156,51 @@ function HandoffTable({
 function Extracts() {
   const companyId = useCompanyId();
   const download = useFileDownload();
+  const insurerName = useInsurerName();
   const files = useQuery({
     queryKey: ['ops', 'extracts', companyId],
     queryFn: () => opsApi.extracts(companyId),
     enabled: companyId > 0,
   });
   const columns: Column<ExtractFileInfo>[] = [
-    { key: 'folder', header: 'Folder', render: (f) => f.folder },
-    { key: 'name', header: 'File', render: (f) => <strong>{f.fileName}</strong> },
+    {
+      key: 'name',
+      header: 'File',
+      render: (f) => (
+        <CellStack main={<strong>{f.fileName}</strong>} sub={folderLabel(f.folder, insurerName)} />
+      ),
+    },
     {
       key: 'src',
       header: 'From',
-      render: (f) => `${humanize(f.sourceModule)} ${f.sourceRef ?? ''}`,
+      render: (f) => (
+        <CellStack main={moduleLabel(f.sourceModule)} sub={referenceText(f.sourceRef)} />
+      ),
     },
     {
       key: 'size',
       header: 'Size',
       numeric: true,
-      render: (f) => `${Math.ceil(f.sizeBytes / 1024)} KB`,
+      render: (f) => `${Math.ceil(f.sizeBytes / 1024).toLocaleString('en-PH')} KB`,
     },
     {
       key: 'at',
       header: 'Stored',
-      render: (f) => `${formatDateTime(f.createdAt)} · ${displayNameOf(f.createdBy)}`,
+      render: (f) => (
+        <CellStack main={formatDateTime(f.createdAt)} sub={<UserName login={f.createdBy} />} />
+      ),
     },
     {
       key: 'dl',
-      header: 'Download',
+      header: '',
+      kind: 'center',
       render: (f) => (
-        <Button
-          size="sm"
-          variant="secondary"
-          icon={<Download size={14} />}
-          onClick={() => download.mutate(() => opsApi.extractFile(f.id))}
-        >
-          Download
-        </Button>
+        <RowActions
+          record={f.fileName}
+          actions={[
+            { label: 'Download', onSelect: () => download.mutate(() => opsApi.extractFile(f.id)) },
+          ]}
+        />
       ),
     },
   ];

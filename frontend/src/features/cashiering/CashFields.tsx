@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Field } from '@/components/ui/Field';
 import { humanize } from '@/utils/format';
 import { TypedInput } from '@/components/ui/DateInput';
+import { InsurerSelect } from '@/components/broking/InsurerSelect';
 
 interface TextFieldProps {
   label: string;
@@ -86,6 +87,37 @@ export function CodeSelect({
             </option>
           ))}
         </select>
+      )}
+    </Field>
+  );
+}
+
+/** A labelled choice of the insurer by name (the value is the insurer's code). */
+export function InsurerField({
+  label = 'Insurer',
+  value,
+  onChange,
+  error,
+  required = false,
+  empty = 'All insurers',
+}: Readonly<{
+  label?: string;
+  value: string;
+  onChange: (value: string) => void;
+  error?: string;
+  required?: boolean;
+  empty?: string;
+}>) {
+  return (
+    <Field label={label} required={required} error={error}>
+      {(id) => (
+        <InsurerSelect
+          id={id}
+          value={value}
+          placeholder={empty}
+          aria-invalid={error !== undefined}
+          onChange={onChange}
+        />
       )}
     </Field>
   );

@@ -1,6 +1,8 @@
 package com.iortatechnxt.brokerverse.remittance.service;
 
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
+import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.opsledger.service.port.InvoiceRelatedItems;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLine;
 import com.iortatechnxt.brokerverse.remittance.domain.BatchLineRepository;
@@ -31,6 +33,7 @@ public class RemittanceRelatedItems implements InvoiceRelatedItems {
   private final HoldRequestRepository holds;
   private final SpecialRemittanceRepository specials;
   private final InvoiceTagRepository tags;
+  private final LovService lov;
 
   /**
    * Creates the source.
@@ -39,16 +42,19 @@ public class RemittanceRelatedItems implements InvoiceRelatedItems {
    * @param holds hold requests
    * @param specials special remittance requests
    * @param tags extraction tags
+   * @param lov list labels (hold reasons, special remittance conditions)
    */
   public RemittanceRelatedItems(
       BatchLineRepository lines,
       HoldRequestRepository holds,
       SpecialRemittanceRepository specials,
-      InvoiceTagRepository tags) {
+      InvoiceTagRepository tags,
+      LovService lov) {
     this.lines = lines;
     this.holds = holds;
     this.specials = specials;
     this.tags = tags;
+    this.lov = lov;
   }
 
   @Override
@@ -66,17 +72,18 @@ public class RemittanceRelatedItems implements InvoiceRelatedItems {
     return items;
   }
 
-  private static RelatedItem batchItem(BatchLine l) {
+  private RelatedItem batchItem(BatchLine l) {
     RemittanceBatch b = l.getBatch();
     StringBuilder text = new StringBuilder(BatchDocuments.typeLabel(b.getRemittanceType()));
     if (l.isExcluded()) {
-      text.append(" - excluded: ").append(l.getExclusionReason());
+      text.append(" - excluded: ")
+          .append(lov.label("REMIT_EXCLUSION_REASON", l.getExclusionReason()));
     }
     if (l.getInsurerOrNo() != null) {
       text.append(" - insurer OR ").append(l.getInsurerOrNo());
     }
     if (b.getDvNo() != null) {
-      text.append(" - DV ").append(b.getDvNo());
+      text.append(b.getDvNo().startsWith("DV") ? " - " : " - DV ").append(b.getDvNo());
     }
     return new RelatedItem(
         "REMITTANCE_BATCH",
@@ -88,32 +95,36 @@ public class RemittanceRelatedItems implements InvoiceRelatedItems {
         "/remittance/batches/" + b.getId());
   }
 
-  private static RelatedItem holdItem(HoldRequest h) {
+  private RelatedItem holdItem(HoldRequest h) {
     return new RelatedItem(
         "HOLD",
         h.getRequestNo(),
         date(h.getCreatedAt()),
         null,
         h.getStage().name(),
-        "Hold until " + h.getHoldUntil() + " (" + h.getReasonCode() + ")",
+        "Hold until "
+            + DisplayFormat.date(h.getHoldUntil())
+            + " ("
+            + lov.label("HOLD_REASON", h.getReasonCode())
+            + ")",
         "/remittance/holds/" + h.getId());
   }
 
-  private static RelatedItem specialItem(SpecialRemittance s) {
+  private RelatedItem specialItem(SpecialRemittance s) {
     return new RelatedItem(
         "SPECIAL_REMITTANCE",
         s.getRequestNo(),
         date(s.getCreatedAt()),
         null,
         s.getStage().name(),
-        "Special remittance - " + s.getConditionCode(),
+        "Special remittance - " + lov.label("SPECIAL_REMIT_CONDITION", s.getConditionCode()),
         "/remittance/special/" + s.getId());
   }
 
   private static RelatedItem tagItem(InvoiceTag t) {
     return new RelatedItem(
         "EXTRACTION_TAG",
-        t.getBatchNo() == null ? t.getTag().name() : t.getBatchNo(),
+        t.getBatchNo() == null ? DisplayFormat.words(t.getTag()) : t.getBatchNo(),
         date(t.getCreatedAt()),
         t.getRemittable(),
         t.getTag().name(),

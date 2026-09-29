@@ -63,8 +63,9 @@ public class ReconUploadService {
     FileKey key = new FileKey(fileName, Sha256.hex(content));
     Optional<String> duplicate = recorder.blockIfDuplicate(key, null);
     if (duplicate.isPresent()) {
+      String earlierUpload = duplicate.get();
       throw new BusinessRuleException(
-          ReconUploadRecorder.DUPLICATE, "Upload refused: " + duplicate.get());
+          ReconUploadRecorder.DUPLICATE, "Upload refused: " + earlierUpload);
     }
     FlowInFile file = new FlowInFile(fileName, content);
     FlowInRun run =

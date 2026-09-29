@@ -1,0 +1,299 @@
+# Screen specifications of BRD-2 Operations: Commission Receivables (direct payment billing: DP lists, accounts,
+# billings to the insurers, insurer answers, collection and PR reversal; incentive schemes and runs; BIR certificates
+# submitted to Comptrollership; estimated items).
+area: Commission receivables and direct payment billing
+screens:
+  - id: SCR-OP-50
+    title: Commission Workbench
+    route: /commission
+    purpose: >-
+      The landing page of Commission Receivables: direct payment accounts to confirm and to bill, billings awaiting
+      the insurer, overdue feedback, approved billings to collect, BIR certificates to acknowledge and the direct
+      payment commission outstanding.
+    entry:
+      - Operations Home › Commission Receivables › Open
+    shots:
+      - {state: home, user: commrec, caption: "Commission Workbench with the work queues"}
+    fields:
+      - "Work Queues | [Work tiles: DP Accounts to Confirm, DP Accounts for Billing, Billings Awaiting Insurer, Insurer Feedback Overdue, Approved Billings to Collect, BIR Certificates to Acknowledge, Direct Payment Commission Outstanding] | Tile | Live count; Needs attention on the queues waiting for action | - | Commission records, invoice ledger | - | Read only | A tile opens its list | -"
+    actions:
+      - "Search Invoices | Every Commission user | Always | Opens Invoice Search | - | -"
+      - "[A work tile] | Every Commission user | Always | Opens the list of the queue | - | -"
+    rules:
+      - "The tiles are counted live from the commission records and the invoice ledger (FR-OP-003)."
+    outcome: The team sees the direct payment work waiting.
+    frs: [FR-OP-003]
+    tests: [COMMWB]
+
+  - id: SCR-OP-51
+    title: DP Lists
+    route: /commission/dp/lists
+    purpose: >-
+      The lists of direct payment accounts reported by the branches, Head Office and the collection feed, with what
+      each list held and took in, and the tracker of the branch submissions.
+    entry:
+      - Commission Workbench
+    shots:
+      - {state: list, user: commrec, caption: "DP Lists, Lists Received"}
+      - {state: upload, user: commrec, click: "^upload dp list$", caption: "Upload DP List dialog"}
+    fields:
+      - "Tabs | Lists Received / Branch Submissions | Tab | - | - | Fixed | Lists Received | - | - | -"
+      - "Lists Received | List No. / Source / Branch / Submitted / Accounts / Valid / Excluded / Taken In | Column | - | - | DP lists | - | Read only | - | No items to display"
+      - "Branch Submissions | From / To | Date | dd-MMM-yyyy | N | - | The month | - | - | -"
+      - "Branch Submissions | Code / Branch / Lists / Last Submission / Status | Column | - | - | Branches, DP lists | - | Read only | - | No items to display"
+      - "Upload DP List dialog | DP List File | File | Named <Branch>_DP_<yyyyMMdd> | Y | - | - | - | The naming convention; a file with the same content is refused | -"
+    actions:
+      - "Upload DP List / Upload and Validate | Commission Handler | File chosen | Takes in the list and validates every account | DP for confirmation | -"
+      - "Pull from Collection | Commission Handler | Always | Takes the lists waiting in the collection feed | DP for confirmation | -"
+    rules:
+      - "The file name follows <Branch>_DP_<yyyyMMdd> and a file with the same content as an earlier one is refused (FR-OP-090)."
+      - "The branch tracker shows which branches submitted their list for the period (FR-OP-090)."
+    outcome: Direct payment accounts from every branch are taken in and validated.
+    frs: [FR-OP-090, FR-OP-091]
+    tests: [DPLISTS]
+
+  - id: SCR-OP-52
+    title: DP Accounts
+    route: /commission/dp/items
+    purpose: >-
+      The direct payment accounts from confirmation to billing, collection and the reversal of the premium
+      receivable: by tag, with the validation of each account against the ledger; the handler confirms that the
+      client paid the insurer, prepares the billing per insurer, excludes an account, and reverses or reinstates the
+      premium receivable.
+    entry:
+      - Commission Workbench › DP Accounts to Confirm and DP Accounts for Billing tiles
+    shots:
+      - {state: list, user: commrec, tab: "Billed", caption: "DP Accounts, Billed tab"}
+      - {state: account, user: commrec, tab: "Billed", caption: "Account dialog of a direct payment account with its validation rules"}
+    fields:
+      - "Tabs | For Confirmation / For Billing / Billed / Approved / Rejected / Collected / PR Reversed / Excluded | Tab | With the number of accounts | - | Fixed | For Confirmation | - | - | -"
+      - "Toolbar | Search Invoice, Policy or Assured | Text | - | N | - | Blank | - | - | -"
+      - "List | Invoice No. / Insurer / Assured / Branch / Premium / Net Commission / Validation / Result | Column | Validation Valid, Duplicate, Invalid or Incomplete; the failed rules in Result | - | DP accounts, invoice ledger | - | Read only | - | No items to display"
+      - "Account dialog | [Validation rules] | Table | Booked, tagged direct payment, not cancelled, insurer and premium as listed, no pending negative adjustment, commission open | - | Validation | - | Read only | - | -"
+      - "Account dialog | Reinstatement Reason / Comment | Drop-down, text | - | Y / N | List of values reinstatement reason (direct payment group) | Blank | PR reversed | - | -"
+      - "Exclude dialog | Reason | Text | - | Y | - | Blank | For confirmation, for billing | Not blank | -"
+    actions:
+      - "Confirm Paid to Insurer | Commission Handler | For confirmation, rows selected | Confirms that the client paid the insurer in full | DP for billing | -"
+      - "Prepare Billing | Commission Handler | For billing, rows selected | Prepares one billing per insurer | Billed (billing to send) | -"
+      - "Exclude | Commission Handler | Rows selected | Excludes the accounts with a reason | Excluded | -"
+      - "Validate Again | Commission Handler | Invalid or incomplete | Runs the validation rules again | Unchanged or valid | -"
+      - "Reinstate PR / Reverse PR Again | Commission Handler | PR reversed / reinstated | Reinstates the premium receivable with a reason, or reverses it again | Reinstated / PR reversed | -"
+    rules:
+      - "An account passes when the invoice is booked, tagged direct payment, not cancelled, of the listed insurer and premium, has no pending negative adjustment and still has commission open; the same invoice active on another list is a duplicate (FR-OP-091)."
+      - "The rule results are kept per account (FR-OP-091)."
+      - "The commission party of a co-insured direct payment account is the lead insurer (FR-OP-092)."
+    outcome: Valid direct payment accounts are confirmed and billed to their insurers.
+    frs: [FR-OP-091, FR-OP-092, FR-OP-094]
+    tests: [DPITEMS]
+
+  - id: SCR-OP-53
+    title: DP Billings
+    route: /commission/dp/billings
+    purpose: >-
+      The commission billed to the insurers on direct payment accounts, by stage from sending to collection, with the
+      answer due date and the handler.
+    entry:
+      - Commission Workbench › Billings Awaiting Insurer and Approved Billings to Collect tiles
+    shots:
+      - {state: list, user: commrec, tab: "Awaiting Insurer", caption: "DP Billings, Awaiting Insurer tab"}
+    fields:
+      - "Tabs | To Send / Awaiting Insurer / To Collect / Returned to Collection / Closed / Cancelled | Tab | - | - | Fixed | To Send | - | - | -"
+      - "Toolbar | Insurer | Drop-down | All insurers or one by name | N | Insurers | All insurers | - | - | -"
+      - "List | Billing No. / Insurer / Accounts / Net Commission / Sent / Answer Due / Handler / Stage | Column | CRB-yyyy-n | - | DP billings | - | Read only | - | No items to display"
+    actions:
+      - "Open a row | Every Commission user | Always | Opens the billing | - | -"
+    rules:
+      - "The insurer's answer is due ten working days after sending, on the head office calendar (FR-OP-093)."
+    outcome: The team follows every billing to its collection.
+    frs: [FR-OP-092, FR-OP-093]
+    tests: [DPBILLINGS]
+
+  - id: SCR-OP-54
+    title: DP Billing
+    route: /commission/dp/billings/:id
+    parent: /commission/dp/billings
+    purpose: >-
+      One billing to an insurer: accounts, net commission with the withholding tax, sent date, answer due (with the
+      Answer Overdue tag), OR and handler, the billing workflow, the accounts with the insurer's answer, and the
+      actions to send, record the answers, collect and cancel.
+    entry:
+      - DP Billings › open a row
+      - Invoice 360 › Commission tab
+    shots:
+      - {state: awaiting, user: commrec, open_billing: awaiting, caption: "DP billing awaiting the insurer's answer"}
+      - {state: answers, user: commrec, open_billing: awaiting, click: "^record answers$", caption: "Record Insurer Answers dialog"}
+    fields:
+      - "Header | [Billing chip, stage pill and Answer Overdue tag] | Reference chip, status pill, tag | CRB-yyyy-n | - | DP billing | - | Read only | - | -"
+      - "Header | Accounts / Net Commission / Sent / Answer Due / Official Receipt / Handler | Display | Net commission with the withholding tax | - | DP billing | - | Read only | - | -"
+      - "Workflow | [DP billing workflow header] | Stepper | For billing, Awaiting insurer feedback, Approved by insurer - to collect, Commission collected, Closed - PR reversed; Rejected - returned to Collection and Cancelled when reached | - | DP billing | - | Read only | - | -"
+      - "Tabs | Accounts / Documents | Tab | - | - | Fixed | Accounts | - | - | -"
+      - "Accounts | Invoice No. / Assured / Premium / Commission / Withholding Tax / Net / Insurer Answer / Status | Column | Invoice with the policy number | - | DP accounts | - | Read only | - | No items to display"
+      - "Send dialog | To / Cc | Text | Leave blank to use the insurer's billing contacts | N | Insurer billing contacts | Blank | For billing | Valid addresses | -"
+      - "Record Insurer Answers dialog | [Decision per account] | Drop-down | No answer yet, Approved, Rejected; a rejection needs its reason | Y for one account at least | List of values DP feedback reason | No answer yet | Awaiting insurer | - | Record the insurer decision of at least one account"
+      - "Collect dialog | Collection Date / Bank Account / BIR Certificate No. | Date, drop-down, text | Certificate of the tax withheld, if received | Y / Y / N | Bank accounts | Today / the collection bank | Approved by insurer | - | -"
+    actions:
+      - "Download Billing | Every Commission user | Always | Downloads the billing workbook | - | -"
+      - "Send to Insurer / Send Billing | Commission Handler | For billing | E-mails the billing to the insurer as a password-protected workbook; the password follows in a separate e-mail | Awaiting insurer feedback | DP billing e-mail (NT-26)"
+      - "Record Answers / Approve All / Save Answers | Commission Handler | Awaiting insurer | Records the insurer's decision per account; rejected accounts go back to Collection; a billing whose accounts were all rejected is returned | Approved by insurer - to collect / Rejected - returned to Collection | -"
+      - "Record Collection | Commission Handler | Approved by insurer | Posts the collection (cash, withholding tax, commission and output VAT), reverses the premium receivable of each approved account and requests the OR from Cashiering | Commission collected, then Closed - PR reversed | -"
+      - "Cancel Billing | Commission Handler or Team Leader | Before sending | Asks for the reason and cancels the billing | Cancelled | -"
+    rules:
+      - "A billing holds the confirmed accounts of one insurer (FR-OP-092)."
+      - "Answers are entered on screen or uploaded on Insurer Responses; a rejection needs its reason (FR-OP-093)."
+      - "An overdue answer raises the Direct payment feedback overdue notice (FR-OP-093)."
+      - "The collection reverses the premium receivable and DTIP of each approved account in the ledger (FR-OP-094)."
+    outcome: The insurer pays BDOI's commission on the direct payment accounts and the receivable is cleared.
+    frs: [FR-OP-092, FR-OP-093, FR-OP-094]
+    tests: [DPBILLING]
+
+  - id: SCR-OP-55
+    title: Insurer Responses
+    route: /commission/dp/responses
+    purpose: >-
+      The billings waiting for the insurer's answer, and the upload of the answers received from the insurers in a
+      file (billing, invoice, decision, reason, comment).
+    entry:
+      - Commission Workbench › Insurer Feedback Overdue tile
+    shots:
+      - {state: list, user: commrec, caption: "Insurer Responses: billings waiting for the insurer"}
+    fields:
+      - "Waiting for the Insurer | Billing No. / Insurer / Accounts / Net Commission / Sent / Answer Due / Status | Column | - | - | DP billings | - | Read only | - | No items to display"
+      - "Upload Insurer Answers dialog | Answers File | File | Billing No., Invoice No., Decision, Reason, Comment | Y | - | - | - | - | -"
+    actions:
+      - "Upload Answers | Commission Handler | File chosen | Records the answers of the file on their billings | Approved by insurer - to collect / Rejected - returned to Collection | -"
+    rules:
+      - "The answers of a file are recorded record by record; a record already received is skipped (FR-OP-093)."
+    outcome: Insurer answers received by file are recorded in one step.
+    frs: [FR-OP-093]
+    tests: [DPRESP]
+
+  - id: SCR-OP-56
+    title: Incentive Schemes
+    route: /commission/incentives/schemes
+    purpose: >-
+      The insurer incentive programmes (No Touch, Top Up, Motor Mania, other) with their calculation (production
+      target tiers or a fixed amount per policy), period, beneficiary (BDOI or the branch), insurer, segments, product
+      lines and tiers.
+    entry:
+      - Commission Workbench
+    shots:
+      - {state: list, user: commtl, caption: "Incentive Schemes"}
+      - {state: new, user: commtl, click: "^new scheme$", caption: "New Incentive Scheme dialog"}
+    fields:
+      - "List | Scheme / Type / Insurer / Period / Beneficiary / Tiers / Effective / Status | Column | - | - | Incentive schemes | - | Read only | - | No items to display"
+      - "Scheme dialog | Name | Text | The scheme's reference is made from its name | Y | - | Blank | - | Not blank | The scheme name is required"
+      - "Scheme dialog | Scheme Type | Drop-down | No Touch, Top Up, Motor Mania, Other | Y | Fixed list | Other | - | - | -"
+      - "Scheme dialog | Calculation | Drop-down | Production Target Tiers, Fixed Amount per Policy | Y | Fixed list | Production Target Tiers | - | - | -"
+      - "Scheme dialog | Period / Beneficiary | Drop-down | Monthly, Quarterly, Semi-annual, Annual, Custom / BDOI, Branch (Passed On) | Y | Fixed list | Quarterly / BDOI | - | - | -"
+      - "Scheme dialog | Insurer / Segments / Product Lines | Drop-down, text | Every insurer, or one by name; blank segments and lines = all | N | Insurers, segments, product lines | Blank | - | - | -"
+      - "Scheme dialog | Effective From / Effective To | Date | dd-MMM-yyyy | Y / N | - | Blank | - | The scheme cannot end before it starts | The scheme ends before it starts"
+      - "Scheme dialog | Production Target / Rate % / Multiplier / Minimum Basic Premium / Amount per Policy | Number | One row per tier (Add Tier, Remove) | Cond.: an active scheme needs one tier | - | Blank | - | - | An active scheme needs at least one tier"
+    actions:
+      - "New Scheme / Save Scheme | Commission Team Leader | Always | Saves the scheme | Active or Inactive | -"
+      - "Add Tier / Remove | Commission Team Leader | Scheme dialog open | Adds or removes a tier | - | -"
+    rules:
+      - "The rate of the highest production target reached (times the multiplier) applies to every eligible invoice; Motor Mania pays each policy the fixed amount of the highest minimum basic premium it meets (FR-OP-095)."
+      - "The seed schemes stay inactive without tiers until BDOI gives the targets and amounts (FR-OP-095)."
+    outcome: The incentive programmes are maintained by the business.
+    frs: [FR-OP-095]
+    tests: [SCHEMES]
+
+  - id: SCR-OP-57
+    title: Incentive Runs
+    route: /commission/incentives/runs
+    purpose: >-
+      The incentive computed on the production of a period for a scheme: the eligible production, the tier applied and
+      the incentive, reviewed invoice by invoice with the exclusions, then posted or cancelled.
+    entry:
+      - Commission Workbench
+    shots:
+      - {state: list, user: commtl, caption: "Incentive Runs"}
+      - {state: compute, user: commtl, click: "^compute incentive$", caption: "Compute Incentive dialog"}
+    fields:
+      - "List | Run No. / Scheme / Period / Eligible Production / Tier Applied / Incentive / Status | Column | Computed, Posted or Cancelled | - | Incentive runs | - | Read only | - | No items to display"
+      - "Compute Incentive dialog | Scheme / Booked From / Booked To | Drop-down, date | dd-MMM-yyyy | Y | Incentive schemes | Blank | - | - | -"
+      - "Run dialog | Invoice No. / Sales Unit / Product Line / Basic Premium / Gross Premium / Excluded By / Incentive | Column | The rule that excluded an invoice | - | Incentive run lines | - | Read only | - | No items to display"
+    actions:
+      - "Compute Incentive / Compute | Commission Team Leader | Always | Computes the run of the scheme and period | Computed | -"
+      - "Post Incentive | Commission Team Leader | Computed | Posts the incentive per insurer; for a branch scheme also the pass-on per sales unit with its payment request | Posted | Disbursement request received (NT-03)"
+      - "Cancel Run | Commission Team Leader | Computed | Cancels the run | Cancelled | -"
+    rules:
+      - "Negative amounts and erroneous bookings (cancelled or written off) are excluded when the exclusion rule is active, and raise an alert (FR-OP-095)."
+    outcome: Incentives are computed, reviewed and posted with the pass-on to the branches.
+    frs: [FR-OP-095]
+    tests: [RUNS]
+
+  - id: SCR-OP-58
+    title: BIR Certificates
+    route: /commission/certificates
+    purpose: >-
+      The certificates of tax withheld on commission (BIR 2307) received from the insurers, tagged to the official
+      receipts they cover and submitted to Comptrollership, which acknowledges or rejects them.
+    entry:
+      - Commission Workbench › BIR Certificates to Acknowledge tile
+    shots:
+      - {state: list, user: comptrol, caption: "BIR Certificates of Comptrollership"}
+      - {state: new, user: commrec, click: "^submit certificate$", caption: "Submit BIR Certificate dialog"}
+    fields:
+      - "Tabs | Submitted / Rejected / Acknowledged | Tab | - | - | Fixed | Submitted | - | - | -"
+      - "List | Submission No. / Insurer / Period / Tax Withheld / ORs / Submitted / Status | Column | - | - | Certificate submissions | - | Read only | - | No items to display"
+      - "Submit BIR Certificate dialog | Insurer / BIR Form / Certificate No. | Drop-down, text | - | Y | Insurers | Blank | - | Form and number given | Form and certificate number are required"
+      - "Submit BIR Certificate dialog | Tax Withheld / Period From / Period To | Number, date | Above zero; the period ends after it starts | Y | - | Blank | - | - | The tax withheld must be above zero / Enter a period that ends after it starts"
+      - "Submit BIR Certificate dialog | [Official receipts covered] | Table | Add OR, Add ORs of the Insurer, Remove | Y | Official receipts | - | - | At least one OR | Tag the certificate to at least one official receipt"
+    actions:
+      - "Submit Certificate / Submit to Comptrollership | Commission Handler | Always | Submits the certificate with its ORs; the scanned certificate is attached on the submission once saved | Submitted to Comptrollership | BIR certificate submitted (NT-21)"
+      - "Open a row | Commission Handler, Comptrollership | Always | Opens the submission | - | -"
+    rules:
+      - "A certificate covers at least one OR (FR-OP-096)."
+    outcome: The certificates are handed to Comptrollership with the ORs they cover.
+    frs: [FR-OP-096]
+    tests: [CERTS]
+
+  - id: SCR-OP-59
+    title: BIR Certificate
+    route: /commission/certificates/:id
+    parent: /commission/certificates
+    purpose: >-
+      One certificate submission: the certificate, period, tax withheld, ORs covered, the submission and decision,
+      the workflow with acknowledge, reject and resubmit, the ORs and the scanned copy.
+    entry:
+      - BIR Certificates › open a row
+    shots:
+      - {state: record, user: comptrol, open_certificate: first, caption: "BIR certificate submission for Comptrollership"}
+    fields:
+      - "Header | Submission / Certificate / Period / Tax Withheld / ORs Covered / Submitted / Decision | Display | - | - | Certificate submission | - | Read only | - | -"
+      - "Workflow | [Certificate workflow header] | Stepper | Submitted to Comptrollership, Acknowledged; Rejected - to resubmit when reached | - | Certificate submission | - | Read only | - | -"
+      - "Tabs | Official Receipts / Documents | Tab | - | - | Fixed | Official Receipts | - | - | -"
+      - "Official Receipts | OR No. / Commission Amount | Column | - | - | Official receipts | - | Read only | - | No items to display"
+      - "Reject dialog | Reason | Text | - | Y | - | Blank | Submitted | Not blank | -"
+    actions:
+      - "Acknowledge | Comptrollership | Submitted | Acknowledges the certificate | Acknowledged | Workflow notice (NT-01)"
+      - "Reject | Comptrollership | Submitted | Rejects it with a reason | Rejected - to resubmit | Workflow notice (NT-01)"
+      - "Correct and Resubmit | Commission Handler | Rejected | Corrects the certificate and submits it again | Submitted to Comptrollership | BIR certificate submitted (NT-21)"
+    rules:
+      - "Only Comptrollership acknowledges or rejects a certificate (FR-OP-096)."
+    outcome: Comptrollership confirms the tax withheld against the ORs.
+    frs: [FR-OP-096]
+    tests: [CERT]
+
+  - id: SCR-OP-60
+    title: Estimated Items
+    route: /commission/estimated
+    purpose: >-
+      Invoices booked on an estimated premium until the final premium is known; the flag shows on the production
+      register and on the yearly production report.
+    entry:
+      - Commission Workbench
+    shots:
+      - {state: flag, user: commrec, click: "^flag invoice$", caption: "Flag Invoice as Estimated dialog"}
+    fields:
+      - "List | Invoice No. / ARN / Insurer / Assured / Booked / Gross Premium | Column | - | - | Invoice ledger | - | Read only | - | No items to display"
+      - "Flag dialog | Invoice No. / Reason | Text | - | Y | Invoice ledger | Blank | - | - | -"
+    actions:
+      - "Flag Invoice / Flag Estimated | Commission Handler | Always | Flags the invoice Estimated | Estimated | -"
+      - "Clear Estimate | Commission Handler | Flagged | Clears the flag once the final premium is known | - | -"
+    rules:
+      - "The Estimated flag is kept on the invoice ledger and shows on the production register and the yearly production report (FR-OP-097)."
+    outcome: Estimated premiums are followed until they are final.
+    frs: [FR-OP-097]
+    tests: [ESTIMATED]

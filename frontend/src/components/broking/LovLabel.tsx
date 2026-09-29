@@ -5,6 +5,7 @@ import {
   useLineName,
   useLovLabel,
   useProductName,
+  useSalesUnitName,
 } from './useLabels';
 
 interface LovLabelProps {
@@ -119,5 +120,17 @@ export function CoverageName({
   code,
 }: Readonly<{ line: string | null | undefined; code: string }>) {
   const name = useCoverageName(line);
+  return <>{name(code)}</>;
+}
+
+/** The name of a sales unit (team, department, region) from its code. */
+export function SalesUnitName({
+  code,
+  empty = '—',
+}: Readonly<{ code: string | null | undefined; empty?: string }>) {
+  const name = useSalesUnitName();
+  if (!code) {
+    return <span className="muted">{empty}</span>;
+  }
   return <>{name(code)}</>;
 }

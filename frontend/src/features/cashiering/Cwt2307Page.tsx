@@ -19,7 +19,10 @@ import { formatDateTime, humanize } from '@/utils/format';
 import { cashieringApi } from './cashieringApi';
 import type { CwtBatch, CwtTag } from './cashieringApi';
 import { CwtTagDialog } from './CwtTagDialog';
-import { displayNameOf } from '@/api/users';
+import { CellStack } from '@/components/ui/CellStack';
+import { RowActions } from '@/components/ui/RowActions';
+import { UserName } from '@/components/ui/UserName';
+import { InsurerName } from '@/components/broking/LovLabel';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const TABS = [
@@ -54,12 +57,14 @@ const TAG_COLUMNS: Column<CwtTag>[] = [
   {
     key: 'client',
     header: 'Client / Insurer',
-    render: (t) => `${t.clientCode ?? ''} · ${t.insurerCode ?? ''}`,
+    render: (t) => (
+      <CellStack main={t.clientName ?? t.clientCode} sub={<InsurerName code={t.insurerCode} />} />
+    ),
   },
   {
     key: 'path',
     header: 'Path',
-    render: (t) => [humanize(t.path), t.certificateNo].filter(Boolean).join(' '),
+    render: (t) => <CellStack main={humanize(t.path)} sub={t.certificateNo} />,
   },
   { key: 'amount', header: 'Amount', numeric: true, render: (t) => <Amount value={t.amount} /> },
   {
@@ -75,7 +80,9 @@ const TAG_COLUMNS: Column<CwtTag>[] = [
   {
     key: 'by',
     header: 'Tagged',
-    render: (t) => `${displayNameOf(t.taggedBy)} · ${formatDateTime(t.taggedAt)}`,
+    render: (t) => (
+      <CellStack main={<UserName login={t.taggedBy} />} sub={formatDateTime(t.taggedAt)} />
+    ),
   },
   { key: 'stage', header: 'Stage', render: (t) => <StatusBadge status={t.stage} /> },
 ];
@@ -92,7 +99,7 @@ function BatchList({
   });
   const columns: Column<CwtBatch>[] = [
     { key: 'no', header: 'Batch No.', render: (b) => <strong>{b.batchNo}</strong> },
-    { key: 'insurer', header: 'Insurer', render: (b) => b.insurerCode },
+    { key: 'insurer', header: 'Insurer', render: (b) => <InsurerName code={b.insurerCode} /> },
     { key: 'count', header: 'Certificates', render: (b) => b.tagCount },
     {
       key: 'amount',
@@ -106,22 +113,21 @@ function BatchList({
       key: 'actions',
       header: '',
       render: (b) => (
-        <div className="row">
-          {b.status === 'REPORT_POSTED' && can('CWT_PROCESS') && (
-            <Button size="sm" onClick={() => onChange(() => cashieringApi.routeCwt(b.id))}>
-              Route to Disbursement
-            </Button>
-          )}
-          {b.status === 'WITH_DISBURSEMENT' && can('DISB_PROCESS') && (
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => onChange(() => cashieringApi.releaseCwt(b.id))}
-            >
-              Release to Insurer
-            </Button>
-          )}
-        </div>
+        <RowActions
+          record={b.batchNo}
+          actions={[
+            {
+              label: 'Route to Disbursement',
+              hidden: !(b.status === 'REPORT_POSTED' && can('CWT_PROCESS')),
+              onSelect: () => onChange(() => cashieringApi.routeCwt(b.id)),
+            },
+            {
+              label: 'Release to Insurer',
+              hidden: !(b.status === 'WITH_DISBURSEMENT' && can('DISB_PROCESS')),
+              onSelect: () => onChange(() => cashieringApi.releaseCwt(b.id)),
+            },
+          ]}
+        />
       ),
     },
   ];
@@ -172,39 +178,28 @@ export default function Cwt2307Page() {
   const rowActions: Column<CwtTag> = {
     key: 'actions',
     header: '',
-    render: (t) =>
-      process && (
-        <div className="row">
-          {t.stage === 'TAGGED' && (
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => act.mutate(() => cashieringApi.receiveCwt(t.id, false))}
-            >
-              Receive
-            </Button>
-          )}
-          {t.stage === 'VALIDATING' && (
-            <label className="checkbox">
-              <input
-                type="checkbox"
-                checked={t.cwtCopyReceived}
-                onChange={(e) => act.mutate(() => cashieringApi.checklist(t.id, e.target.checked))}
-              />
-              CWT copy received
-            </label>
-          )}
-          {t.stage === 'VALIDATING' && t.path === 'CASH' && (
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => act.mutate(() => cashieringApi.settleCash(t.id, branchId))}
-            >
-              Settle in Cash
-            </Button>
-          )}
-        </div>
-      ),
+    render: (t) => (
+      <RowActions
+        record={t.reference}
+        actions={[
+          {
+            label: 'Receive',
+            hidden: !process || t.stage !== 'TAGGED',
+            onSelect: () => act.mutate(() => cashieringApi.receiveCwt(t.id, false)),
+          },
+          {
+            label: t.cwtCopyReceived ? 'Clear CWT Copy Received' : 'Mark CWT Copy Received',
+            hidden: !process || t.stage !== 'VALIDATING',
+            onSelect: () => act.mutate(() => cashieringApi.checklist(t.id, !t.cwtCopyReceived)),
+          },
+          {
+            label: 'Settle in Cash',
+            hidden: !process || t.stage !== 'VALIDATING' || t.path !== 'CASH',
+            onSelect: () => act.mutate(() => cashieringApi.settleCash(t.id, branchId)),
+          },
+        ]}
+      />
+    ),
   };
   const columns =
     tab === 'validating'

@@ -1,4 +1,9 @@
 import { useState } from 'react';
+import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
+import { CellStack } from '@/components/ui/CellStack';
+import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
+import type { Definition } from '@/components/ui/DefinitionGrid';
+import { UserName } from '@/components/ui/UserName';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
@@ -8,7 +13,6 @@ import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, humanize } from '@/utils/format';
 import type { DpItem } from './commissionApi';
-import { displayNameOf } from '@/api/users';
 
 /** A reason asked before an action (exclusion, cancellation). */
 export function ReasonDialog({
@@ -101,48 +105,44 @@ function Rules({ item }: Readonly<{ item: DpItem }>) {
 
 type Mode = 'view' | 'reinstate';
 
-/** What happened to an account, in words. */
-function progressOf(item: DpItem): string {
+/** What happened to an account: who confirmed it, the insurer's answer, the collection. */
+function Progress({ item }: Readonly<{ item: DpItem }>) {
   const f = item.feedback;
-  const parts = [
-    f.confirmedBy ? `Confirmed by ${displayNameOf(f.confirmedBy)}` : '',
-    f.feedbackReason ? `Insurer: ${humanize(f.feedbackReason)} ${f.feedbackComment ?? ''}` : '',
-    f.collectedOn ? `Collected ${formatDate(f.collectedOn)} (OR ${f.orNo ?? 'to follow'})` : '',
-    f.returnedRef ? `Returned to collection as ${f.returnedRef}` : '',
-    f.remarks ?? '',
+  const items: Definition[] = [
+    { label: 'Confirmed By', value: f.confirmedBy ? <UserName login={f.confirmedBy} /> : '' },
+    {
+      label: 'Insurer Answer',
+      value: f.feedbackReason ? (
+        <CellStack
+          main={<LovLabel type="DP_FEEDBACK_REASON" code={f.feedbackReason} />}
+          sub={f.feedbackComment}
+        />
+      ) : (
+        ''
+      ),
+    },
+    { label: 'Collected On', value: formatDate(f.collectedOn) },
+    { label: 'Official Receipt', value: f.collectedOn ? (f.orNo ?? 'To follow') : '' },
+    { label: 'Returned to Collection As', value: f.returnedRef ?? '' },
+    { label: 'Remarks', value: f.remarks ?? '', wide: true },
   ];
-  return parts.filter((p) => p !== '').join(' · ');
+  return <DefinitionGrid columns={2} label="Progress of the account" collapseEmpty items={items} />;
 }
 
 function Amounts({ item }: Readonly<{ item: DpItem }>) {
   const a = item.amounts;
   return (
-    <dl className="grid-4">
-      <div>
-        <dt className="muted">Premium</dt>
-        <dd>
-          <Amount value={a.premium} />
-        </dd>
-      </div>
-      <div>
-        <dt className="muted">Commission</dt>
-        <dd>
-          <Amount value={a.commission} />
-        </dd>
-      </div>
-      <div>
-        <dt className="muted">VAT / Withholding Tax</dt>
-        <dd>
-          <Amount value={a.commissionVat} /> / <Amount value={a.wtax} />
-        </dd>
-      </div>
-      <div>
-        <dt className="muted">Net Commission</dt>
-        <dd>
-          <Amount value={a.net} />
-        </dd>
-      </div>
-    </dl>
+    <DefinitionGrid
+      columns={2}
+      label="Amounts"
+      items={[
+        { label: 'Premium', value: <Amount value={a.premium} /> },
+        { label: 'Commission', value: <Amount value={a.commission} /> },
+        { label: 'VAT on Commission', value: <Amount value={a.commissionVat} /> },
+        { label: 'Withholding Tax', value: <Amount value={a.wtax} /> },
+        { label: 'Net Commission', value: <Amount value={a.net} /> },
+      ]}
+    />
   );
 }
 
@@ -286,10 +286,16 @@ export function DpItemDialog({
         <div className="row">
           <StatusBadge status={item.tag} />
           <StatusBadge status={item.sanitation} />
-          <span className="muted">
-            {[item.insurerCode, item.assuredName, item.policyNo].filter(Boolean).join(' · ')}
-          </span>
         </div>
+        <DefinitionGrid
+          columns={2}
+          label="Account"
+          items={[
+            { label: 'Insurer', value: <InsurerName code={item.insurerCode} /> },
+            { label: 'Assured', value: item.assuredName },
+            { label: 'Policy No.', value: item.policyNo ?? '' },
+          ]}
+        />
         <Amounts item={item} />
         {reinstating ? (
           <ReinstateFields
@@ -301,7 +307,7 @@ export function DpItemDialog({
         ) : (
           <>
             <Rules item={item} />
-            <p className="muted">{progressOf(item)}</p>
+            <Progress item={item} />
           </>
         )}
       </div>

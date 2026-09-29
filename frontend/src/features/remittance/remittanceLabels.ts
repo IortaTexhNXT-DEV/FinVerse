@@ -1,3 +1,4 @@
+import { moduleLabel } from '@/utils/businessLabels';
 import type {
   Amounts,
   BatchLine,
@@ -24,6 +25,26 @@ export const TAG_LABELS: Record<ExtractionTag, string> = {
   UNEXTRACTED_DUE: 'Due - Not Extracted',
   RETURNED: 'Returned',
 };
+
+/** Why a due invoice was not extracted, in words (the extraction run and DTIP Status). */
+const REASON_LABELS: Record<string, string> = {
+  ON_HOLD: 'On hold',
+  PENDING_NEG_ADJ: 'Pending negative adjustment',
+  WRITTEN_OFF: 'Written off',
+  CHECK_HOLDING: 'Check within the holding period',
+  PAID_AR_OVER_DTIP: 'Paid AR above DTIP',
+  OTHERS: 'Locked by another team',
+};
+
+/** The reasons of an extraction tag ("PENDING_NEG_ADJ,OTHERS") as words, joined by commas. */
+export function reasonsText(reasons: string | null | undefined): string {
+  return (reasons ?? '')
+    .split(',')
+    .map((r) => r.trim())
+    .filter((r) => r !== '')
+    .map((r) => REASON_LABELS[r] ?? r)
+    .join(', ');
+}
 
 export type BatchTab = 'REVIEW' | 'APPROVAL' | 'APPROVED' | 'REMITTED' | 'OR' | 'RETURNED';
 
@@ -136,7 +157,7 @@ export function dtipFlags(row: DtipRow): string[] {
     flags.push('Written Off');
   }
   if (row.lockOwner !== undefined) {
-    flags.push(`Locked by ${row.lockOwner}`);
+    flags.push(`Locked by ${moduleLabel(row.lockOwner)}`);
   }
   return flags;
 }
@@ -192,4 +213,25 @@ export function joinParts(
   separator = ' · ',
 ): string {
   return parts.filter((p): p is string => typeof p === 'string' && p !== '').join(separator);
+}
+
+const TRIGGERS: Record<string, string> = {
+  SCHEDULED: 'Scheduled run',
+  MANUAL: 'Run by hand',
+  MANUAL_INVOICE: 'Run by hand for one invoice',
+  EOD_QUEUE: 'End-of-day requests',
+  SPECIAL: 'Special remittance',
+};
+
+/** What started an extraction run, in words. */
+export function triggerLabel(trigger: string): string {
+  return TRIGGERS[trigger] ?? trigger;
+}
+
+/**
+ * The status a hold shows, as its workflow stage reads it: an approved hold is "On Hold" (the
+ * ACTIVE code is never shown as "Active", which read as the record being in force for editing).
+ */
+export function holdStatus(stage: string): string {
+  return stage === 'ACTIVE' ? 'ON_HOLD' : stage;
 }

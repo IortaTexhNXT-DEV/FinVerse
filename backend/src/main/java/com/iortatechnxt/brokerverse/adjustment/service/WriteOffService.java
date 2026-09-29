@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
 import com.iortatechnxt.brokerverse.opsledger.domain.InvoiceFlag;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
+import com.iortatechnxt.brokerverse.opsledger.domain.ModuleNames;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
@@ -142,7 +143,8 @@ public class WriteOffService {
       errors.add("Invoice " + invoiceNo + " is already written off");
     }
     if (invoice.getLockOwner() != null && !Adjustments.MODULE.equals(invoice.getLockOwner())) {
-      errors.add("Invoice " + invoiceNo + " is locked by " + invoice.getLockOwner());
+      errors.add(
+          "Invoice " + invoiceNo + " is locked by " + ModuleNames.of(invoice.getLockOwner()));
     }
     return errors;
   }

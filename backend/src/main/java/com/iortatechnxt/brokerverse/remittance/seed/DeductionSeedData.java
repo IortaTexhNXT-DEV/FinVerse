@@ -97,7 +97,7 @@ public class DeductionSeedData implements ApplicationRunner {
                         AMOUNT,
                         "LAC-CONF-2026-900001",
                         today.minusDays(CONFIRMED_DAYS_AGO),
-                        "Seed: return premium already remitted; INS-LAC confirmed the refund by"
+                        "Return premium already remitted; the insurer confirmed the refund by"
                             + " letter")));
     users.as(
         PREPARER, () -> deductions.submit(draft.getId(), "Insurer confirmation letter attached"));

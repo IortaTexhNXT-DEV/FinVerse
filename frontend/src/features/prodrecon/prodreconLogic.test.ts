@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   addresses,
   bucketTabs,
+  differenceLabels,
   matchedPercent,
   mayPair,
   maySplit,
@@ -25,8 +26,14 @@ describe('sideBySide', () => {
     expect(byKey.policyNo?.differs).toBe(false);
     expect(byKey.assuredName?.differs).toBe(true);
     expect(byKey.grossPremium?.differs).toBe(true);
-    expect(byKey.grossPremium?.broker).toBe('1000.00');
+    expect(byKey.grossPremium?.broker).toBe('1,000.00');
     expect(byKey.pnNo?.differs).toBe(false);
+  });
+
+  it('shows dates as dd-MMM-yyyy and names the differences by field', () => {
+    const rows = sideBySide({ broker: { periodFrom: '2026-09-01' }, discrepancies: [] });
+    expect(rows.find((r) => r.key === 'periodFrom')?.broker).toBe('01-Sep-2026');
+    expect(differenceLabels(['GROSS_PREMIUM', 'PERIOD_FROM'])).toBe('Gross Premium, Period From');
   });
 
   it('shows one side only for unpaired items', () => {
@@ -98,7 +105,7 @@ describe('scheduleProblem', () => {
   });
 
   it('refuses missing insurers, days out of range and bad addresses', () => {
-    expect(scheduleProblem({ ...base, insurerCode: ' ' })).toMatch(/Insurer/);
+    expect(scheduleProblem({ ...base, insurerCode: ' ' })).toMatch(/insurer/);
     expect(scheduleProblem({ ...base, runDay: 29 })).toMatch(/1 to 28/);
     expect(scheduleProblem({ ...base, frequency: 'WEEKLY', runDay: 8 })).toMatch(/Monday/);
     expect(scheduleProblem({ ...base, autoSend: true, recipients: 'nope' })).toMatch(/e-mail/);

@@ -1,20 +1,22 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { statusMessage } from '@/components/ui/statusTones';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth/authContext';
 import { Amount } from '@/components/ui/Amount';
-import { Button } from '@/components/ui/Button';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime, humanize, statusPhrase } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
+import { LovLabel } from '@/components/broking/LovLabel';
+import { RowActions } from '@/components/ui/RowActions';
+import { receiptActionLabel } from './cashieringLabels';
 import { cashieringApi } from './cashieringApi';
 import type { ReceiptAction } from './cashieringApi';
 import { UserName } from '@/components/ui/UserName';
-import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
 const OPEN_STAGES = ['REQUESTED', 'FOR_APPROVAL'];
 
@@ -36,7 +38,7 @@ export function ReceiptActionsTab({ companyId }: Readonly<{ companyId: number }>
   const act = useMutation({
     mutationFn: (fn: () => Promise<ReceiptAction>) => fn(),
     onSuccess: async (a) => {
-      toast.success(`${a.transactionNo} is now ${statusPhrase(a.stage)}`);
+      toast.success(statusMessage(a.transactionNo, a.stage, receiptActionLabel(a.action)));
       await queryClient.invalidateQueries({ queryKey: ['cashiering'] });
     },
   });
@@ -47,11 +49,21 @@ export function ReceiptActionsTab({ companyId }: Readonly<{ companyId: number }>
       render: (a) => (
         <>
           <strong>{a.transactionNo}</strong>
-          <span className="cell-sub">{humanize(a.action)}</span>
+          <span className="cell-sub">{receiptActionLabel(a.action)}</span>
         </>
       ),
     },
-    { key: 'reason', header: 'Reason', render: (a) => a.reasonText ?? humanize(a.reasonCode) },
+    {
+      key: 'reason',
+      header: 'Reason',
+      render: (a) =>
+        a.reasonText ?? (
+          <LovLabel
+            type={a.action === 'CANCEL' ? 'RECEIPT_CANCEL_REASON' : 'REINSTATEMENT_REASON'}
+            code={a.reasonCode}
+          />
+        ),
+    },
     { key: 'amount', header: 'Amount', numeric: true, render: (a) => <Amount value={a.amount} /> },
     {
       key: 'by',
@@ -66,38 +78,31 @@ export function ReceiptActionsTab({ companyId }: Readonly<{ companyId: number }>
     { key: 'stage', header: 'Status', render: (a) => <StatusBadge status={a.stage} /> },
     {
       key: 'actions',
-      header: 'Actions',
+      header: '',
       render: (a) => (
-        <div className="row">
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={() => void navigate(`/cashiering/receipts/${a.receiptId}`)}
-          >
-            Open Receipt
-          </Button>
-          {a.stage === 'FOR_APPROVAL' && can('CASH_APPROVE') && (
-            <ConfirmButton
-              size="sm"
-              confirm={{
+        <RowActions
+          record={a.transactionNo}
+          actions={[
+            {
+              label: 'Open Receipt',
+              onSelect: () => void navigate(`/cashiering/receipts/${a.receiptId}`),
+            },
+            {
+              label: 'Approve',
+              hidden: !(a.stage === 'FOR_APPROVAL' && can('CASH_APPROVE')),
+              confirm: {
                 title: 'Approve Receipt Action',
                 effect: 'The requested action is applied to the receipt.',
-              }}
-              onConfirm={() => act.mutateAsync(() => cashieringApi.approveAction(a.id))}
-            >
-              Approve
-            </ConfirmButton>
-          )}
-          {a.stage === 'REQUESTED' && (
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => act.mutate(() => cashieringApi.resubmitAction(a.id))}
-            >
-              Resubmit
-            </Button>
-          )}
-        </div>
+              },
+              onSelect: () => act.mutateAsync(() => cashieringApi.approveAction(a.id)),
+            },
+            {
+              label: 'Resubmit',
+              hidden: a.stage !== 'REQUESTED',
+              onSelect: () => act.mutate(() => cashieringApi.resubmitAction(a.id)),
+            },
+          ]}
+        />
       ),
     },
   ];

@@ -72,6 +72,14 @@ class RemittanceApiIT {
   }
 
   @ParameterizedTest
+  @CsvSource({"acsl", "acsltl"})
+  void theAcslUsersListTheInsurersOfTheirDeductions(String username) throws Exception {
+    api.doGet(username, "/api/v1/catalog/insurers?companyId=" + c())
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].name").exists());
+  }
+
+  @ParameterizedTest
   @CsvSource({
     "ao, /runs?companyId={c}",
     "cashier, /batches?companyId={c}",

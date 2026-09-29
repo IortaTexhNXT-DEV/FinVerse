@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -40,8 +41,12 @@ const COLUMNS: Column<Special>[] = [
   },
   { key: 'inv', header: 'Invoice No.', render: (s) => s.invoiceNo },
   { key: 'assured', header: 'Name of Assured', render: (s) => s.assuredName },
-  { key: 'ins', header: 'Insurer', render: (s) => s.insurerCode },
-  { key: 'cond', header: 'Condition', render: (s) => s.conditionCode },
+  { key: 'ins', header: 'Insurer', render: (s) => <InsurerName code={s.insurerCode} /> },
+  {
+    key: 'cond',
+    header: 'Condition',
+    render: (s) => <LovLabel type="SPECIAL_REMIT_CONDITION" code={s.conditionCode} />,
+  },
   { key: 'by', header: 'Requestor', render: (s) => <UserName login={s.requestedBy} /> },
   { key: 'batch', header: 'Batch', render: (s) => s.batchNo ?? '' },
   { key: 'stage', header: 'Status', render: (s) => <StatusBadge status={s.stage} /> },
@@ -200,7 +205,8 @@ export default function SpecialPage() {
           actions={<TemplateButton kind="special" />}
         >
           <UploadForm
-            label="Request file (invoiceNo, conditionCode, remarks)"
+            label="Request File"
+            columns="Invoice No., Condition Code, Remarks"
             busy={upload.isPending}
             onUpload={(f) => upload.mutate(f)}
           />

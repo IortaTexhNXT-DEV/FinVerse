@@ -1,3 +1,6 @@
+import { InsurerName } from '@/components/broking/LovLabel';
+import { CellStack } from '@/components/ui/CellStack';
+import { UserName } from '@/components/ui/UserName';
 import { PeriodCell } from '@/components/ui/PeriodCell';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { FilePlus2 } from 'lucide-react';
@@ -20,7 +23,6 @@ import { formatDateTime } from '@/utils/format';
 import { CertificateDialog } from './CertificateDialog';
 import { commissionApi } from './commissionApi';
 import type { Certificate, CertificateInput } from './commissionApi';
-import { displayNameOf } from '@/api/users';
 
 type StageTab = 'SUBMITTED' | 'REJECTED' | 'ACKNOWLEDGED';
 
@@ -43,7 +45,7 @@ const COLUMNS: Column<Certificate>[] = [
       </>
     ),
   },
-  { key: 'insurer', header: 'Insurer', render: (c) => c.insurerCode },
+  { key: 'insurer', header: 'Insurer', render: (c) => <InsurerName code={c.insurerCode} /> },
   {
     key: 'period',
     header: 'Period',
@@ -60,7 +62,9 @@ const COLUMNS: Column<Certificate>[] = [
   {
     key: 'at',
     header: 'Submitted',
-    render: (c) => `${formatDateTime(c.createdAt)} · ${displayNameOf(c.createdBy)}`,
+    render: (c) => (
+      <CellStack main={<UserName login={c.createdBy} />} sub={formatDateTime(c.createdAt)} />
+    ),
   },
   { key: 'stage', header: 'Status', render: (c) => <StatusBadge status={c.stage} /> },
 ];

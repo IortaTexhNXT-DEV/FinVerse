@@ -6,6 +6,8 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
 import com.iortatechnxt.brokerverse.prodrecon.domain.ReconCycle;
@@ -49,6 +51,7 @@ public class ReconUploadRecorder {
   private final AlertService alerts;
   private final NotificationService notifications;
   private final AuditTrailService audit;
+  private final UserDisplayNames names;
 
   /**
    * Creates the recorder.
@@ -60,6 +63,7 @@ public class ReconUploadRecorder {
    * @param alerts alerts
    * @param notifications notifications
    * @param audit audit trail
+   * @param names user names (the user of the earlier upload)
    */
   public ReconUploadRecorder(
       ReconUploadRepository uploads,
@@ -68,7 +72,8 @@ public class ReconUploadRecorder {
       ReconItemRepository items,
       AlertService alerts,
       NotificationService notifications,
-      AuditTrailService audit) {
+      AuditTrailService audit,
+      UserDisplayNames names) {
     this.uploads = uploads;
     this.cycleRows = cycleRows;
     this.cycles = cycles;
@@ -76,6 +81,7 @@ public class ReconUploadRecorder {
     this.alerts = alerts;
     this.notifications = notifications;
     this.audit = audit;
+    this.names = names;
   }
 
   /**
@@ -98,9 +104,9 @@ public class ReconUploadRecorder {
             + " is identical to "
             + first.getFileName()
             + " uploaded on "
-            + first.getCreatedAt()
+            + DisplayFormat.dateTime(first.getCreatedAt())
             + " by "
-            + first.getCreatedBy();
+            + userName(first.getCreatedBy());
     ReconUpload blocked =
         uploads.save(
             new ReconUpload(
@@ -122,6 +128,11 @@ public class ReconUploadRecorder {
             DUPLICATE + ":" + blocked.getId()));
     audit.record(ENTITY, blocked.getId(), AuditAction.CREATE, "Blocked duplicate: " + message);
     return Optional.of(message);
+  }
+
+  private String userName(String login) {
+    String name = names.displayName(login);
+    return name == null ? login : name;
   }
 
   /**
@@ -186,7 +197,7 @@ public class ReconUploadRecorder {
           "RECON_COMPANY_UNKNOWN",
           "Upload the production of "
               + period.insurerCode()
-              + " from Production Reconciliation - Uploads (company not known)");
+              + " from Production Reconciliation - Insurer Feedback (company not known)");
     }
     return open.get(0).getCompanyId();
   }

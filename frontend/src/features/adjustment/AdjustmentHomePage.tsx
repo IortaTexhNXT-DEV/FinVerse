@@ -45,7 +45,7 @@ const COLUMNS: Column<RequestSummary>[] = [
   {
     key: 'assured',
     header: 'Assured',
-    render: (r) => <CellStack main={r.assuredName} sub={r.policy?.clientCode} />,
+    render: (r) => r.assuredName,
   },
   {
     key: 'insurer',
@@ -66,25 +66,24 @@ const COLUMNS: Column<RequestSummary>[] = [
   },
   {
     key: 'effective',
-    header: 'Effective',
+    header: 'Effective / Aging',
     kind: 'date',
-    render: (r) => formatDate(r.effectiveDate),
+    render: (r) => <CellStack main={formatDate(r.effectiveDate)} sub={formatDays(r.agingDays)} />,
   },
-  { key: 'aging', header: 'Aging', kind: 'amount', render: (r) => formatDays(r.agingDays) },
   {
     key: 'status',
     header: 'Status',
     kind: 'status',
-    render: (r) => <RequestStatus stage={r.stage} />,
-  },
-  {
-    key: 'flags',
-    header: 'Flags',
     render: (r) => (
-      <RequestFlags
-        negative={r.negative}
-        quotationRequired={r.quotationRequired}
-        duplicateOverride={r.duplicateOverride}
+      <CellStack
+        main={<RequestStatus stage={r.stage} />}
+        sub={
+          <RequestFlags
+            negative={r.negative}
+            quotationRequired={r.quotationRequired}
+            duplicateOverride={r.duplicateOverride}
+          />
+        }
       />
     ),
   },

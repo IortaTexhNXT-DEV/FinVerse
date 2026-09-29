@@ -6,7 +6,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import type { ReconFeedback, ReconItem } from './prodreconApi';
-import { sideBySide } from './prodreconLogic';
+import { differenceLabels, sideBySide } from './prodreconLogic';
 import './prodrecon.css';
 import { clientShortName } from '@/context/clientNames';
 
@@ -118,7 +118,7 @@ export function ItemReviewDialog({
         <div className="row">
           <StatusBadge status={item.status} />
           {item.discrepancies.length > 0 && (
-            <span className="muted">Differences: {item.discrepancies.join(', ')}</span>
+            <span className="muted">Differences: {differenceLabels(item.discrepancies)}</span>
           )}
         </div>
         <SideBySide item={item} />

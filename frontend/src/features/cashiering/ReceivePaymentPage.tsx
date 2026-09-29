@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { modeLabel } from './cashieringLabels';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LovSelect } from '@/components/broking/LovSelect';
@@ -221,6 +222,7 @@ export default function ReceivePaymentPage() {
                 required
                 value={form.mode}
                 options={OTC_MODES}
+                labelOf={modeLabel}
                 onChange={(v) => set('mode')(v)}
               />
               {form.mode === 'CHECK' && (

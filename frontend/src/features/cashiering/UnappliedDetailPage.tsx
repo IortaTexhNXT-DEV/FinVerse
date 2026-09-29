@@ -17,33 +17,49 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { OriginBadge } from '@/components/ui/OriginBadge';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { formatDate, formatDateTime } from '@/utils/format';
+import { useLovLabel } from '@/components/broking/useLabels';
+import { sourceText } from '@/utils/businessLabels';
+import { CellStack } from '@/components/ui/CellStack';
+import { SalesUnitName } from '@/components/broking/LovLabel';
+import { UserName } from '@/components/ui/UserName';
+import { dispositionLabel, unappliedOriginLabel } from './cashieringLabels';
 import { cashieringApi } from './cashieringApi';
 import type { Disposition, DispositionBody, UnappliedItem } from './cashieringApi';
 import { unappliedOrigin } from './cashieringQueueTypes';
 import { DispositionForm } from './DispositionForm';
-import { displayNameOf } from '@/api/users';
 
 const ENTITY = 'Unapplied';
 
 const HISTORY: Column<Disposition>[] = [
-  { key: 'type', header: 'Disposition', render: (d) => humanize(d.dispositionType) },
+  { key: 'type', header: 'Disposition', render: (d) => dispositionLabel(d.dispositionType) },
   { key: 'amount', header: 'Amount', numeric: true, render: (d) => <Amount value={d.amount} /> },
   {
     key: 'target',
     header: 'Target',
-    render: (d) => d.targetInvoiceNo ?? d.targetClientCode ?? d.targetUnit ?? d.payeeName ?? '',
+    render: (d) =>
+      d.targetUnit ? (
+        <SalesUnitName code={d.targetUnit} />
+      ) : (
+        (d.targetInvoiceNo ?? d.targetClientCode ?? d.payeeName ?? '')
+      ),
   },
   {
     key: 'req',
     header: 'Requested',
-    render: (d) => `${displayNameOf(d.requestedBy)} · ${formatDateTime(d.requestedAt)}`,
+    render: (d) => (
+      <CellStack main={<UserName login={d.requestedBy} />} sub={formatDateTime(d.requestedAt)} />
+    ),
   },
   {
     key: 'appr',
     header: 'Approved',
     render: (d) =>
-      d.approvedBy ? `${displayNameOf(d.approvedBy)} · ${formatDateTime(d.approvedAt)}` : '',
+      d.approvedBy ? (
+        <CellStack main={<UserName login={d.approvedBy} />} sub={formatDateTime(d.approvedAt)} />
+      ) : (
+        ''
+      ),
   },
   {
     key: 'doc',
@@ -63,13 +79,13 @@ function facts(u: UnappliedItem) {
     { icon: User, label: 'Payor', value: u.payorName ?? '' },
     {
       icon: Users,
-      label: 'Client / Unit',
-      value: [u.clientCode, u.salesUnit].filter(Boolean).join(' · '),
+      label: 'Marketing Unit',
+      value: u.salesUnit ? <SalesUnitName code={u.salesUnit} /> : '',
     },
     {
       icon: FileText,
       label: 'Source',
-      value: u.sourceRef ? `${humanize(u.sourceModule ?? '')} ${u.sourceRef}` : humanize(u.origin),
+      value: sourceText(u.sourceModule, u.sourceRef) || unappliedOriginLabel(u.origin),
     },
     { icon: CalendarDays, label: 'Received', value: formatDate(u.createdAt) },
     ...legacyFacts(u),
@@ -101,6 +117,7 @@ function legacyFacts(u: UnappliedItem) {
  * submitted, approved, reversed) under workflow OPS_DISPOSITION, and the disposition history.
  */
 export default function UnappliedDetailPage() {
+  const returnReason = useLovLabel('RETURN_REASON');
   const id = Number(useParams().id);
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -176,7 +193,7 @@ export default function UnappliedDetailPage() {
             <StatusBadge status={u.stage} />
           </>
         }
-        flags={<span className="tag">{humanize(u.origin)}</span>}
+        flags={<span className="tag">{unappliedOriginLabel(u.origin)}</span>}
         facts={facts(u)}
       />
       <WorkflowPanel
@@ -224,7 +241,7 @@ export default function UnappliedDetailPage() {
             act.mutate(() =>
               cashieringApi.markReversal(
                 id,
-                [humanize(note.reasonCode ?? 'REVERSAL'), note.comment?.trim()]
+                [returnReason(note.reasonCode) || 'Reversal', note.comment?.trim()]
                   .filter(Boolean)
                   .join(': '),
               ),

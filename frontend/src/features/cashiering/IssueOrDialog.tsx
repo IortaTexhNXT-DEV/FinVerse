@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { modeLabel } from './cashieringLabels';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LovSelect } from '@/components/broking/LovSelect';
@@ -165,6 +166,7 @@ export function IssueOrDialog({
             label="Mode of Payment"
             value={form.mode}
             options={MODES}
+            labelOf={modeLabel}
             onChange={(v) => set('mode')(v)}
           />
           <TextField

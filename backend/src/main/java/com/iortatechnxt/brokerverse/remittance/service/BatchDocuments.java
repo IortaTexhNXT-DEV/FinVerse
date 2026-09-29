@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.remittance.service;
 
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -73,6 +74,12 @@ public class BatchDocuments {
   private static final List<String> OR_HEADERS =
       List.of("Official Receipt Number", "OR Date", "OR Amount");
   private static final int FIRST_AMOUNT_COLUMN = 9;
+
+  /** Relative widths of the schedule columns: numbers and the assured wider, codes narrower. */
+  private static final List<Float> SCHEDULE_WIDTHS =
+      List.of(
+          1.35f, 1.35f, 1.2f, 1.9f, 0.7f, 0.95f, 0.95f, 0.95f, 0.95f, 1.05f, 1.05f, 1.0f, 0.95f,
+          1.05f, 1.05f);
 
   private final DocTemplateService templates;
   private final DocumentComposer composer;
@@ -203,7 +210,8 @@ public class BatchDocuments {
                     "Accounts remitted (" + batch.getCurrency() + ")",
                     COMMON_HEADERS,
                     rows,
-                    amountColumns()),
+                    amountColumns(),
+                    SCHEDULE_WIDTHS),
                 totals(batch),
                 new Text(text.title(), text.text())),
             List.of("Prepared by", "Checked by", "Approved by"),
@@ -243,12 +251,25 @@ public class BatchDocuments {
         "Batch",
         List.of(
             new Field("Batch number", batch.getBatchNo()),
-            new Field("Insurer", insurerName(batch) + " (" + batch.getInsurerCode() + ")"),
+            new Field("Insurer", insurerName(batch)),
             new Field("Remittance type", typeLabel(batch.getRemittanceType())),
             new Field("Currency", batch.getCurrency()),
             new Field("Accounts", String.valueOf(batch.getLineCount())),
-            new Field("Processor", nz(batch.getProcessor())),
-            new Field("Stage", batch.getStage().name())));
+            new Field("Processor", processorName(batch)),
+            new Field("Stage", stageText(batch))));
+  }
+
+  private String processorName(RemittanceBatch batch) {
+    if (batch.getProcessor() == null) {
+      return NONE;
+    }
+    String name = users.displayName(batch.getProcessor());
+    return name == null ? batch.getProcessor() : name;
+  }
+
+  private static String stageText(RemittanceBatch batch) {
+    String words = DisplayFormat.words(batch.getStage());
+    return Character.toUpperCase(words.charAt(0)) + words.substring(1);
   }
 
   private static Table totals(RemittanceBatch batch) {
@@ -330,7 +351,7 @@ public class BatchDocuments {
   }
 
   private static String date(LocalDate value) {
-    return value == null ? NONE : value.toString();
+    return value == null ? NONE : DisplayFormat.date(value);
   }
 
   private static String amount(BigDecimal value) {

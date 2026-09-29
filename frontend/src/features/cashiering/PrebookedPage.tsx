@@ -1,7 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { RefreshCw } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { CellStack } from '@/components/ui/CellStack';
+import { RowActions } from '@/components/ui/RowActions';
 import { ActionDialog } from '@/components/broking/ActionDialog';
 import { useAuth } from '@/auth/authContext';
 import { Amount } from '@/components/ui/Amount';
@@ -59,6 +61,7 @@ export default function PrebookedPage() {
     },
   });
   const apply = can('CASH_APPLY');
+  const navigate = useNavigate();
   const columns: Column<Prebooked>[] = [
     { key: 'arn', header: 'Account (ARN)', render: (p) => <strong>{p.arn}</strong> },
     { key: 'ref', header: 'Reference', render: (p) => p.reference },
@@ -72,36 +75,39 @@ export default function PrebookedPage() {
     {
       key: 'rematch',
       header: 'Re-match Attempts',
-      render: (p) =>
-        [String(p.rematchCount), p.lastRematch && formatDateTime(p.lastRematch)]
-          .filter(Boolean)
-          .join(' · '),
-    },
-    {
-      key: 'receipt',
-      header: 'Receipt',
-      render: (p) => <Link to={`/cashiering/receipts/${p.receiptId}`}>Open AR</Link>,
+      render: (p) => (
+        <CellStack
+          main={String(p.rematchCount)}
+          sub={p.lastRematch ? `Last ${formatDateTime(p.lastRematch)}` : ''}
+        />
+      ),
     },
     { key: 'status', header: 'Status', render: (p) => <StatusBadge status={p.status} /> },
     {
       key: 'actions',
-      header: 'Actions',
-      render: (p) =>
-        p.status === 'OPEN' &&
-        apply && (
-          <div className="row">
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={() => act.mutate(() => cashieringApi.rematch(p.id))}
-            >
-              Re-match Now
-            </Button>
-            <Button size="sm" variant="ghost" onClick={() => setReleasing(p)}>
-              Release
-            </Button>
-          </div>
-        ),
+      header: '',
+      render: (p) => (
+        <RowActions
+          record={p.arn}
+          actions={[
+            {
+              label: 'Open Receipt',
+              onSelect: () => navigate(`/cashiering/receipts/${p.receiptId}`),
+            },
+            {
+              label: 'Re-match Now',
+              hidden: !(p.status === 'OPEN' && apply),
+              onSelect: () => act.mutate(() => cashieringApi.rematch(p.id)),
+            },
+            {
+              label: 'Release to Unapplied',
+              danger: true,
+              hidden: !(p.status === 'OPEN' && apply),
+              onSelect: () => setReleasing(p),
+            },
+          ]}
+        />
+      ),
     },
   ];
   return (

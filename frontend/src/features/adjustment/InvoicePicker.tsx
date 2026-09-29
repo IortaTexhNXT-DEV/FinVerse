@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { moduleLabel } from '@/utils/businessLabels';
 import { X } from 'lucide-react';
 import { useState } from 'react';
 import { opsApi } from '@/api/operations';
@@ -11,7 +12,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, titleCase } from '@/utils/format';
+import { formatDate } from '@/utils/format';
 import { InsurerName } from '@/components/broking/LovLabel';
 import { CellStack } from '@/components/ui/CellStack';
 import { PolicyDetails } from './PolicyDetails';
@@ -28,13 +29,22 @@ function columns(selected: string[], toggle: (no: string) => void): Column<OpsIn
       width: '44px',
       header: <span className="visually-hidden">Select</span>,
       render: (i) => (
-        <input
-          type="checkbox"
-          aria-label={`Select ${i.invoiceNo}`}
-          checked={selected.includes(i.invoiceNo)}
-          disabled={i.flags.lockOwner !== undefined && i.flags.lockOwner !== 'ADJUSTMENT'}
-          onChange={() => toggle(i.invoiceNo)}
-        />
+        // The reason of a disabled box is on its wrapper: a disabled input shows no tooltip.
+        <span
+          title={
+            lockedElsewhere(i)
+              ? `${i.invoiceNo} is locked by ${moduleLabel(i.flags.lockOwner)} until its open transaction is done`
+              : undefined
+          }
+        >
+          <input
+            type="checkbox"
+            aria-label={`Select ${i.invoiceNo}`}
+            checked={selected.includes(i.invoiceNo)}
+            disabled={lockedElsewhere(i)}
+            onChange={() => toggle(i.invoiceNo)}
+          />
+        </span>
       ),
     },
     {
@@ -45,17 +55,18 @@ function columns(selected: string[], toggle: (no: string) => void): Column<OpsIn
     },
     {
       key: 'no',
-      header: 'Invoice No.',
+      header: 'Invoice No. / Booked',
       kind: 'code',
-      render: (i) => <strong>{i.invoiceNo}</strong>,
+      render: (i) => (
+        <CellStack main={<strong>{i.invoiceNo}</strong>} sub={formatDate(i.bookingDate)} />
+      ),
     },
     {
       key: 'assured',
       header: 'Assured',
-      render: (i) => <CellStack main={i.assuredName} sub={i.clientCode} />,
+      render: (i) => i.assuredName,
     },
     { key: 'insurer', header: 'Insurer', render: (i) => <InsurerName code={i.insurerCode} /> },
-    { key: 'booked', header: 'Booked', kind: 'date', render: (i) => formatDate(i.bookingDate) },
     {
       key: 'gross',
       header: 'Gross Premium',
@@ -64,21 +75,21 @@ function columns(selected: string[], toggle: (no: string) => void): Column<OpsIn
     },
     {
       key: 'payment',
-      header: 'Payment',
+      header: 'Payment / Lock',
       kind: 'status',
-      render: (i) => <StatusBadge status={i.paymentStatus} />,
-    },
-    {
-      key: 'lock',
-      header: 'Lock',
-      render: (i) =>
-        i.flags.lockOwner ? (
-          <span className="tag">{`Locked by ${titleCase(i.flags.lockOwner.toLowerCase())}`}</span>
-        ) : (
-          ''
-        ),
+      render: (i) => (
+        <CellStack
+          main={<StatusBadge status={i.paymentStatus} />}
+          sub={i.flags.lockOwner ? `Locked by ${moduleLabel(i.flags.lockOwner)}` : undefined}
+        />
+      ),
     },
   ];
+}
+
+/** An invoice locked by another team's open transaction cannot be selected. */
+function lockedElsewhere(i: { flags: { lockOwner?: string } }): boolean {
+  return i.flags.lockOwner !== undefined && i.flags.lockOwner !== 'ADJUSTMENT';
 }
 
 /**
@@ -111,17 +122,12 @@ export function InvoicePicker({ selected, onChange }: Readonly<InvoicePickerProp
         }}
       />
       {selected.length > 0 && (
-        <div className="adj-selected" aria-label="Invoices chosen">
+        <div className="filter-chips" aria-label="Invoices chosen">
           {selected.map((no) => (
-            <span key={no} className="tag">
-              {no}{' '}
-              <button
-                type="button"
-                className="btn btn-ghost btn-sm"
-                aria-label={`Remove ${no}`}
-                onClick={() => toggle(no)}
-              >
-                <X size={12} aria-hidden="true" />
+            <span key={no} className="filter-chip">
+              {no}
+              <button type="button" aria-label={`Remove ${no}`} onClick={() => toggle(no)}>
+                <X size={14} aria-hidden="true" />
               </button>
             </span>
           ))}

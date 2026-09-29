@@ -7,7 +7,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
-import { humanize } from '@/utils/format';
+import { moduleLabel } from '@/utils/businessLabels';
 import './operations.css';
 
 /**
@@ -39,7 +39,7 @@ export default function NotificationSettingsPage() {
         </>
       ),
     },
-    { key: 'module', header: 'Module', render: (e) => humanize(e.module) },
+    { key: 'module', header: 'Module', render: (e) => moduleLabel(e.module) },
     {
       key: 'inApp',
       header: 'In-App',

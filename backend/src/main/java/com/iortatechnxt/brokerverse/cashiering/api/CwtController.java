@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.cashiering.api.dto.CwtDtos.CwtBatchResponse;
 import com.iortatechnxt.brokerverse.cashiering.api.dto.CwtDtos.CwtTagRequest;
 import com.iortatechnxt.brokerverse.cashiering.api.dto.CwtDtos.CwtTagResponse;
 import com.iortatechnxt.brokerverse.cashiering.api.dto.CwtDtos.ExpectedResponse;
+import com.iortatechnxt.brokerverse.cashiering.domain.CwtTag;
 import com.iortatechnxt.brokerverse.cashiering.domain.CwtTag.CwtDetails;
 import com.iortatechnxt.brokerverse.cashiering.service.CwtService;
 import com.iortatechnxt.brokerverse.common.api.PageResponse;
@@ -12,6 +13,8 @@ import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.opsledger.service.InvoiceLedgerQueryService;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.Map;
+import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,8 +67,10 @@ public class CwtController {
         stage == null || stage.isEmpty()
             ? List.of("TAGGED", "VALIDATING", "REPORT_POSTED", "WITH_DISBURSEMENT")
             : stage;
-    return PageResponse.of(
-        cwt.list(companyId, stages, CashAccess.page(page, size)), CwtTagResponse::from);
+    Page<CwtTag> tags = cwt.list(companyId, stages, CashAccess.page(page, size));
+    Map<String, OpsInvoice> invoices =
+        ledger.byNumbers(tags.getContent().stream().map(CwtTag::getInvoiceNo).toList());
+    return PageResponse.of(tags, t -> CwtTagResponse.from(t, clientName(invoices, t)));
   }
 
   /**
@@ -184,7 +189,10 @@ public class CwtController {
   @GetMapping("/batches/{id}/tags")
   @PreAuthorize(CashAccess.CWT_VIEW)
   public List<CwtTagResponse> batchTags(@PathVariable Long id) {
-    return cwt.tagsOf(id).stream().map(CwtTagResponse::from).toList();
+    List<CwtTag> tags = cwt.tagsOf(id);
+    Map<String, OpsInvoice> invoices =
+        ledger.byNumbers(tags.stream().map(CwtTag::getInvoiceNo).toList());
+    return tags.stream().map(t -> CwtTagResponse.from(t, clientName(invoices, t))).toList();
   }
 
   /**
@@ -209,5 +217,14 @@ public class CwtController {
   @PreAuthorize(CashAccess.DISBURSEMENT)
   public CwtBatchResponse release(@PathVariable Long id) {
     return CwtBatchResponse.from(cwt.release(cwt.batch(id).getBatchNo(), false));
+  }
+
+  /** The client's name of a tag, from its invoice (the assured when the invoice has no payor). */
+  private static String clientName(Map<String, OpsInvoice> invoices, CwtTag tag) {
+    OpsInvoice invoice = invoices.get(tag.getInvoiceNo());
+    if (invoice == null) {
+      return null;
+    }
+    return invoice.getPayorName() != null ? invoice.getPayorName() : invoice.getAssuredName();
   }
 }

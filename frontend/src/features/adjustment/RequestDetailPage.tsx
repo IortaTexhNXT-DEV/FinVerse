@@ -1,3 +1,4 @@
+import { CellStack } from '@/components/ui/CellStack';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Building2,
@@ -61,15 +62,10 @@ function facts(r: EndorsementRequest, typeLabel: string): Fact[] {
       icon: Building2,
       label: 'Insurer / Product',
       value: (
-        <>
-          <InsurerName code={r.invoice.insurerCode} />
-          {p?.productCode && (
-            <>
-              {' · '}
-              <ProductName code={p.productCode} />
-            </>
-          )}
-        </>
+        <CellStack
+          main={<InsurerName code={r.invoice.insurerCode} />}
+          sub={p?.productCode ? <ProductName code={p.productCode} /> : undefined}
+        />
       ),
     },
     {

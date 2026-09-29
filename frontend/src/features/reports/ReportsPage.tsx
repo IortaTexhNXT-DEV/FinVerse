@@ -96,7 +96,7 @@ export default function ReportsPage() {
             <input
               className="input report-search"
               aria-label="Search reports"
-              placeholder="Search by title or code"
+              placeholder="Search reports by title"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -122,7 +122,6 @@ export default function ReportsPage() {
                 <FileBarChart2 size={20} aria-hidden="true" />
                 <span>
                   <strong>{e.title}</strong>
-                  <span className="report-code">{e.code}</span>
                   <span className="muted report-desc" title={businessText(e.description)}>
                     {businessText(e.description)}
                   </span>

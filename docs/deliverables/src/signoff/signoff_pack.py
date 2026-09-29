@@ -41,7 +41,7 @@ import json
 import re
 import sys
 from dataclasses import dataclass, field
-from functools import cached_property
+from functools import cached_property, lru_cache
 from pathlib import Path
 from typing import Any
 
@@ -91,6 +91,17 @@ def split_row(text: str, cols: list[str], where: str, problems: list[str]) -> di
         problems.append(f"{where}: {len(parts)} cells, expected {len(cols)}: {str(text)[:80]}")
         parts = (parts + ["-"] * len(cols))[: len(cols)]
     return dict(zip(cols, parts))
+
+
+@lru_cache(maxsize=1)
+def _client_names() -> frozenset[str]:
+    """The client's names the screens take from the client profile or the theme pack (short name, group,
+    lower case): a label that shows them is found where the frontend writes the name from the profile."""
+    theme = REPO / "frontend" / "src" / "theme" / "packs" / "bdoi" / "theme.json"
+    if not theme.exists():
+        return frozenset()
+    data = json.loads(theme.read_text(encoding="utf-8"))
+    return frozenset(str(data.get(k) or "").lower() for k in ("clientShortName", "groupName") if data.get(k))
 
 
 @dataclass
@@ -494,7 +505,10 @@ class Pack:
         """True when the label is a text of the frontend (or a workflow stage or action of the database).
         A trailing descriptive noun (tag, banner, tiles...) is ignored; n and numbers match any value."""
         label = re.sub(r"\s+(tags?|banner|notice|tiles?|chips?|check boxes|reason|list|names)$", "", label.lower())
-        pattern = r"\s*".join(".{0,30}?" if w == "n" or w.isdigit() else re.escape(w) for w in label.split())
+        client = _client_names()
+        pattern = r"\s*".join(
+            ".{0,30}?" if w == "n" or w.isdigit() else ".{0,40}?" if w in client else re.escape(w)
+            for w in label.split())
         return re.search(pattern, self._frontend_text) is not None
 
     def check(self) -> list[str]:

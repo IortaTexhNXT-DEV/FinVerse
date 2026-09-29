@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useFileDownload } from '@/components/broking/useFileDownload';
+import { RowActions } from '@/components/ui/RowActions';
 import { Button } from '@/components/ui/Button';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
@@ -92,5 +93,29 @@ export function DownloadButton({ extract }: Readonly<{ extract: ReconExtract }>)
     >
       Download
     </Button>
+  );
+}
+
+/** The row actions of a register: download it, and send or resend it to the insurer. */
+export function ExtractActions({
+  extract,
+  onSend,
+}: Readonly<{ extract: ReconExtract; onSend?: (e: ReconExtract) => void }>) {
+  const download = useFileDownload();
+  return (
+    <RowActions
+      record={extract.extractNo}
+      actions={[
+        {
+          label: 'Download',
+          onSelect: () => download.mutate(() => prodreconApi.extractFile(extract.id)),
+        },
+        {
+          label: extract.sentAt ? 'Resend to Insurer' : 'Send to Insurer',
+          hidden: onSend === undefined,
+          onSelect: () => onSend?.(extract),
+        },
+      ]}
+    />
   );
 }

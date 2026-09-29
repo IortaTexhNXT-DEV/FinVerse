@@ -13,6 +13,8 @@ import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
 import { PolicyTransactions } from '@/components/broking/PolicyTransactions';
 import { Card } from '@/components/ui/Card';
+import { CellStack } from '@/components/ui/CellStack';
+import { useProductName } from '@/components/broking/useLabels';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { OriginBadge } from '@/components/ui/OriginBadge';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -67,8 +69,10 @@ function facts(view: Invoice360): Fact[] {
   return [
     {
       icon: UserRound,
-      label: 'Client',
-      value: [i.parties.clientCode, i.parties.payorName].filter(Boolean).join(' · payor '),
+      label: 'Client / Payor',
+      value: (
+        <CellStack main={i.parties.payorName ?? i.parties.assuredName} sub={i.parties.clientCode} />
+      ),
     },
     {
       icon: Building2,
@@ -96,14 +100,13 @@ function facts(view: Invoice360): Fact[] {
     },
     {
       icon: Landmark,
-      label: 'Booked',
-      value: [
-        formatDate(i.classification.bookingDate),
-        i.classification.costCenter,
-        displayNameOf(i.classification.aoUsername),
-      ]
-        .filter(Boolean)
-        .join(' · '),
+      label: 'Booked / Account Officer',
+      value: (
+        <CellStack
+          main={formatDate(i.classification.bookingDate)}
+          sub={displayNameOf(i.classification.aoUsername)}
+        />
+      ),
     },
   ];
 }
@@ -166,6 +169,7 @@ export default function Invoice360Page() {
   const { can } = useAuth();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<Invoice360TabId>('components');
+  const productName = useProductName();
   const view = useQuery({
     queryKey: ['ops', 'invoice', invoiceNo],
     queryFn: () => opsApi.invoice(invoiceNo),
@@ -188,7 +192,7 @@ export default function Invoice360Page() {
         title={v.invoice.keys.invoiceNo}
         description={[
           humanize(v.invoice.keys.kind),
-          v.invoice.classification.riskCode,
+          productName(v.invoice.classification.riskCode),
           v.invoice.keys.policyNo,
         ]
           .filter((part) => part !== undefined && part !== '')

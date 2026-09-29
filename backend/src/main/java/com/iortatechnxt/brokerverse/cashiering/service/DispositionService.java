@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.Disposition.DispositionDet
 import com.iortatechnxt.brokerverse.cashiering.domain.DispositionRepository;
 import com.iortatechnxt.brokerverse.cashiering.domain.DispositionTypeRule;
 import com.iortatechnxt.brokerverse.cashiering.domain.DispositionTypeRuleRepository;
+import com.iortatechnxt.brokerverse.cashiering.domain.DispositionWords;
 import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
 import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedRepository;
 import com.iortatechnxt.brokerverse.common.domain.RecordOrigin;
@@ -16,6 +17,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.service.NotificationService;
@@ -205,7 +207,7 @@ public class DispositionService {
     DispositionTypeRule rule = rule(typeCode);
     executor.validate(item, rule, details);
     Disposition d = dispositions.save(new Disposition(item.getId(), rule, details));
-    move(item, "assign_disposition", rule.getTypeCode());
+    move(item, "assign_disposition", typeLabel(rule));
     audit.record(
         UnappliedService.ENTITY,
         item.getReference(),
@@ -245,7 +247,7 @@ public class DispositionService {
         UnappliedService.ENTITY,
         key,
         "assign_disposition",
-        TransitionNote.comment(rule.getTypeCode()));
+        TransitionNote.comment(typeLabel(rule)));
     onAssigned.accept(d);
     executor.execute(item, d);
     workflow.systemTransition(UnappliedService.ENTITY, key, "complete", TransitionNote.NONE);
@@ -273,7 +275,7 @@ public class DispositionService {
     executor.validate(item, rule, details);
     Disposition d = current(item);
     d.update(rule, details);
-    move(item, "update", rule.getTypeCode());
+    move(item, "update", typeLabel(rule));
     return d;
   }
 
@@ -294,7 +296,11 @@ public class DispositionService {
           APPROVE,
           new Notice(
               item.getReference() + " disposition for approval",
-              d.getDispositionType() + " " + item.getCurrency() + " " + d.getAmount(),
+              DispositionWords.of(d.getDispositionType())
+                  + " "
+                  + item.getCurrency()
+                  + " "
+                  + DisplayFormat.amount(d.getAmount()),
               "/cashiering/unapplied/" + item.getId(),
               UnappliedService.ENTITY,
               item.getId().toString()),
@@ -437,5 +443,10 @@ public class DispositionService {
           "UNAPPLIED_WRONG_STAGE",
           item.getReference() + " is " + item.getStage() + ", not " + stage);
     }
+  }
+
+  /** The name of a disposition type in the workflow history ("Refund to Payor"), not its code. */
+  private String typeLabel(DispositionTypeRule rule) {
+    return lovs.label(LOV, rule.getTypeCode());
   }
 }

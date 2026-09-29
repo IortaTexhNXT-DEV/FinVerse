@@ -98,7 +98,7 @@ function tierValid(calculation: SchemeTerms['calculation'], t: IncentiveTier): b
 /** The first problem of a scheme, undefined when it can be saved (CMRID.005/006). */
 export function schemeProblem(code: string, terms: SchemeTerms): string | undefined {
   if (code.trim() === '' || terms.name.trim() === '') {
-    return 'Code and name are required';
+    return 'The scheme name is required';
   }
   if (
     terms.effectiveFrom !== undefined &&
@@ -149,4 +149,14 @@ export function certificateProblem(input: CertificateInput): string | undefined 
     return 'Tag the certificate to at least one official receipt';
   }
   return undefined;
+}
+
+/** The code of a new scheme, made from its name: "Motor Mania 2026" is MOTOR_MANIA_2026. */
+export function schemeCode(name: string): string {
+  return name
+    .toUpperCase()
+    .split(/[^A-Z0-9]/)
+    .filter((part) => part !== '')
+    .join('_')
+    .slice(0, 30);
 }

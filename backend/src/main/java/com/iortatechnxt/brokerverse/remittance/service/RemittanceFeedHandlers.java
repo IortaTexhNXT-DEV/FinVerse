@@ -11,8 +11,12 @@ import com.iortatechnxt.brokerverse.remittance.service.CsvRows.Row;
 import com.iortatechnxt.brokerverse.remittance.service.SpecialRemittanceService.NewRequest;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Pattern;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,14 +30,33 @@ public final class RemittanceFeedHandlers {
   private static final String INVOICE = "invoiceNo";
   private static final String REMARKS = "remarks";
 
+  /** An ISO date (2026-10-28), still read from files made before the business template. */
+  private static final Pattern ISO_DATE = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+
+  /** Dates in upload files as users type them (28-Oct-2026); ISO dates are also read. */
+  private static final DateTimeFormatter BUSINESS_DATE =
+      new DateTimeFormatterBuilder()
+          .parseCaseInsensitive()
+          .appendPattern("d-MMM-uuuu")
+          .toFormatter(Locale.ENGLISH);
+
   private RemittanceFeedHandlers() {}
 
   private static LocalDate date(Row row, String column) {
+    String text = row.require(column).strip();
+    DateTimeFormatter format =
+        ISO_DATE.matcher(text).matches() ? DateTimeFormatter.ISO_LOCAL_DATE : BUSINESS_DATE;
     try {
-      return LocalDate.parse(row.require(column));
+      return LocalDate.parse(text, format);
     } catch (DateTimeParseException ex) {
       throw new BusinessRuleException(
-          "FEED_VALUE_INVALID", "Line " + row.lineNo() + ": " + column + " must be YYYY-MM-DD", ex);
+          "FEED_VALUE_INVALID",
+          "Line "
+              + row.lineNo()
+              + ": "
+              + CsvRows.label(column)
+              + " must be a date such as 28-Oct-2026",
+          ex);
     }
   }
 
@@ -43,7 +66,9 @@ public final class RemittanceFeedHandlers {
           .setScale(2, java.math.RoundingMode.HALF_UP);
     } catch (NumberFormatException ex) {
       throw new BusinessRuleException(
-          "FEED_VALUE_INVALID", "Line " + row.lineNo() + ": " + column + " must be an amount", ex);
+          "FEED_VALUE_INVALID",
+          "Line " + row.lineNo() + ": " + CsvRows.label(column) + " must be an amount",
+          ex);
     }
   }
 

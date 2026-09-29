@@ -351,7 +351,7 @@ public class OpsInvoice extends BaseEntity {
           "Invoice "
               + invoiceNo
               + " is locked by "
-              + lockOwner
+              + ModuleNames.of(lockOwner)
               + Optional.ofNullable(lockReason).map(r -> " (" + r + ")").orElse(""));
     }
   }

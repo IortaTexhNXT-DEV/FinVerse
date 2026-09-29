@@ -166,9 +166,7 @@ export function ReportBatchDialog({ open, entries, onClose }: Readonly<Props>) {
                 checked={codes.includes(e.code)}
                 onChange={() => toggle(e.code)}
               />
-              <span>
-                <strong>{e.code}</strong> {e.title}
-              </span>
+              <span>{e.title}</span>
             </label>
           ))}
         </div>

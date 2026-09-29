@@ -154,6 +154,17 @@ public interface BulkImportHandler {
   }
 
   /**
+   * Whether the upload is a text file (.txt) in a layout of its own, as the bank and channel
+   * payment files (CSHID.008), rather than a sheet with the template headers; the upload screen
+   * names the file type accordingly.
+   *
+   * @return true for a text file
+   */
+  default boolean textFile() {
+    return false;
+  }
+
+  /**
    * Whether a file identical (same SHA-256) to an earlier upload of this handler that was not
    * cancelled is refused (CSHID.008, PRCID.010: the same payment or insurer file twice).
    *

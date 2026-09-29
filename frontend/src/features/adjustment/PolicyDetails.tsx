@@ -26,7 +26,7 @@ const COLUMNS: Column<PolicyLink>[] = [
   {
     key: 'client',
     header: 'Client',
-    render: (p) => <CellStack main={p.assuredName} sub={p.clientCode} />,
+    render: (p) => p.assuredName,
   },
   {
     key: 'insurer',

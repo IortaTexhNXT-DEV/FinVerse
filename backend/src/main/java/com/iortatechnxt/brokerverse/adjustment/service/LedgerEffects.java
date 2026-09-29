@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.booking.service.InvoiceBooked;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.journal.domain.JournalBatch;
+import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.opsledger.domain.LedgerComponent;
 import com.iortatechnxt.brokerverse.opsledger.domain.MovementType;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
@@ -60,6 +61,7 @@ public class LedgerEffects {
   private final AdjustmentEvents events;
   private final PaymentReapplier reapplier;
   private final Clock clock;
+  private final LovService lov;
 
   /**
    * Creates the helper.
@@ -69,18 +71,31 @@ public class LedgerEffects {
    * @param events accounting events
    * @param reapplier cashiering port
    * @param clock clock
+   * @param lov list labels (the endorsement type in the narration)
    */
   public LedgerEffects(
       InvoiceLedgerService ledger,
       InvoiceLedgerQueryService queries,
       AdjustmentEvents events,
       PaymentReapplier reapplier,
-      Clock clock) {
+      Clock clock,
+      LovService lov) {
     this.ledger = ledger;
     this.queries = queries;
     this.events = events;
     this.reapplier = reapplier;
     this.clock = clock;
+    this.lov = lov;
+  }
+
+  /**
+   * The narration of a request's ledger movements, in words: "Change of cover ENR-2026-000007" (the
+   * endorsement type's name, never its code).
+   */
+  private String narration(EndorsementRequest request) {
+    return lov.label(RequestRules.TYPE_LOV, request.getTerms().endorsementType())
+        + " "
+        + request.getRequestNo();
   }
 
   /**
@@ -113,7 +128,7 @@ public class LedgerEffects {
             BusinessClock.today(clock),
             amounts,
             new DocumentRefs(null, null, request.outcome().batchNo(), journalBatchNo),
-            request.getTerms().endorsementType() + " " + request.getRequestNo()));
+            narration(request)));
   }
 
   /**
@@ -184,7 +199,7 @@ public class LedgerEffects {
                   Adjustments.MODULE,
                   Adjustments.sourceRef(request.getRequestNo()),
                   BusinessClock.today(clock),
-                  request.getTerms().endorsementType() + " " + request.getRequestNo())));
+                  narration(request))));
     } catch (BusinessRuleException e) {
       if (REAPPLIER_UNAVAILABLE.equals(e.getCode())) {
         return Optional.empty();

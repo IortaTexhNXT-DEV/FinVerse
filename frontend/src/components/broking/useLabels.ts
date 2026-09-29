@@ -114,3 +114,23 @@ export function useProductName(): (code: string | null | undefined) => string {
     return products.data?.find((p) => p.code === code)?.name ?? code;
   };
 }
+
+/**
+ * Name lookup of sales units (regions, departments, teams): returns a function from unit code to
+ * its name ("CBG Metro Team 1"); the code while the organisation loads.
+ */
+export function useSalesUnitName(): (code: string | null | undefined) => string {
+  const companyId = useContext(WorkspaceContext)?.company?.id ?? 0;
+  const org = useQuery({
+    queryKey: ['catalog', 'sales-organisation', companyId],
+    queryFn: () => catalogApi.salesOrganisation(companyId),
+    staleTime: STALE,
+    enabled: companyId > 0,
+  });
+  return (code) => {
+    if (!code) {
+      return '';
+    }
+    return org.data?.units.find((u) => u.code === code)?.name ?? code;
+  };
+}

@@ -15,6 +15,11 @@ describe('user names', () => {
     expect(screen.getByText('Oscar Owner')).toHaveAttribute('title', 'migowner');
   });
 
+  it('names the platform sign-ins by what they do, not by their login', () => {
+    const { container } = render(<UserNames logins={['mig-loader', 'SYSTEM']} />);
+    expect(container.textContent).toBe('Data Migration / System');
+  });
+
   it('renders nothing without users', () => {
     const { container } = render(<UserNames logins={[null, '']} />);
     expect(container.textContent).toBe('');

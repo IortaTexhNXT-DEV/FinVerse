@@ -73,9 +73,14 @@ const steps = {
     const page = await go(ctx, 'badmin', '/catalog/coverages');
     await tab(page, 'Clause Library');
     const row = page.locator('table tbody tr').filter({ hasText: 'FLEET_REPAIR' }).first();
-    const authorize = row.getByRole('button', { name: /^authorize$/i });
+    const menu = row.getByRole('button', { name: /^Actions for / });
+    if (await menu.count()) {
+      await menu.first().click();
+      await settle(page, 400);
+    }
+    const authorize = page.getByRole('menuitem', { name: /^authorize$/i });
     if (await authorize.count()) {
-      await authorize.click();
+      await authorize.first().click();
       await settle(page, 800);
       // The authorisation is confirmed in its dialog (confirmation standard).
       const dialog = page.locator('dialog[open]');
@@ -103,7 +108,9 @@ const steps = {
     await fill(page, 'Package start', iso(start));
     await fill(page, 'Package end', iso(end));
     await button(page, /^add coverage$/i).click();
-    await fill(page, 'Coverage 1 code', 'OD_THEFT');
+    // The coverage is picked by name from the coverages of the line.
+    await page.locator('select[aria-label="Coverage 1"] option[value="OD_THEFT"]').waitFor({ state: 'attached' });
+    await page.getByLabel('Coverage 1', { exact: true }).selectOption('OD_THEFT');
     await fill(page, 'Coverage 1 limit', '2000000');
     await fill(page, 'Coverage 1 deductible', 'PHP 2,000 per claim');
     for (const insurer of ['Mabuhay General Insurance Corp.', 'Luzon Assurance Co.']) {
@@ -249,9 +256,14 @@ const steps = {
     const id = ctx.one("select id from cat_insurer where party_code = 'INS-MGIC' order by id limit 1");
     const page = await go(ctx, 'approver', `/catalog/insurers/${id}`);
     const row = page.locator('table tbody tr').filter({ hasText: RISK_CODE }).first();
-    const authorize = row.getByRole('button', { name: /^authorize$/i });
+    const menu = row.getByRole('button', { name: /^Actions for / });
+    if (await menu.count()) {
+      await menu.first().click();
+      await settle(page, 400);
+    }
+    const authorize = page.getByRole('menuitem', { name: /^authorize$/i });
     if (await authorize.count()) {
-      await authorize.click();
+      await authorize.first().click();
       await settle(page, 800);
       // The authorisation is confirmed in its dialog (confirmation standard).
       const dialog = page.locator('dialog[open]');

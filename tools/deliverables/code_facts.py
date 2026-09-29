@@ -315,7 +315,7 @@ def frontend_menu() -> list[Group]:
     """The sidebar groups in display order (navigation/modules.ts NAV_GROUPS)."""
     idx = _TsIndex()
     text = _strip_comments(MODULES_TS.read_text(encoding="utf-8"))
-    m = re.search(r"NAV_GROUPS[^=]*=\s*\[", text)
+    m = re.search(r"NAV_GROUPS[^=]*=\s*(?:\w+\()?\[", text)  # withProductModules([...])
     arr = text[m.end() - 1:matching(text, m.end() - 1) + 1]
     groups: list[Group] = []
     for g in split_top(arr[1:-1]):

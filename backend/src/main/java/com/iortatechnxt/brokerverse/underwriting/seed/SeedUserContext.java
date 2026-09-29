@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.underwriting.seed;
 
 import java.util.function.Supplier;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
  * start-up of the seed profile; the previous security context is always restored.
  */
 @Component
+@Profile({"seed", "test"})
 public class SeedUserContext {
 
   private final UserDetailsService users;

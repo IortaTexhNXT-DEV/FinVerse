@@ -150,7 +150,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
 
   useServerKeepAlive(user !== null);
 
-  const completeSignIn = useCallback((result: LoginResponse) => {
+  const completeSignIn = useCallback(async (result: LoginResponse) => {
     if (result.accessToken === undefined || result.user === undefined) {
       return;
     }
@@ -172,7 +172,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
         password,
         deviceToken: rememberedDevice(username),
       });
-      completeSignIn(result);
+      await completeSignIn(result);
       return result;
     },
     [completeSignIn],

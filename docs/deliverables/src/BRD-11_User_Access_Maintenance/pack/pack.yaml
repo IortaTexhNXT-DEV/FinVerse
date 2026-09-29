@@ -172,7 +172,7 @@ common:
       A request opens with its reference (AR-yyyy-nnnnnn for a request, BLK-yyyy-nnnnnn for a bulk batch), its status
       pill, its risk flags (Privilege Increase, Outside Hours) and the key facts: requested by and when, approver,
       effective date and decision. A reference chip copies the reference. Under the header a stepper shows the stages
-      of the request: Draft, Pending approval, Second approval (where one is needed), then Approved, or For
+      of the request: Draft, Pending Approval, Second approval (where one is needed), then Approved, or For
       implementation and Implemented for a group profile; Scheduled while an approved change waits for its effective
       date; a returned request in amber, a rejected or cancelled one in red. Under the stepper one row gives Current
       Stage, Since and Assigned To (the approver's name).
@@ -189,7 +189,7 @@ common:
       The screens offer a decision only to the users who may take it, and the server refuses it for anyone else.
   - name: Status pills and tags
     text: >-
-      Request statuses (Draft, Pending, Pending Second, Returned, Scheduled, Approved, For Implementation,
+      Request statuses (Draft, Pending Approval, Pending Second Approval, Returned, Scheduled, Approved, For Implementation,
       Implemented, Rejected, Cancelled) and user statuses (Active, Online, Disabled, Locked) are pills of one size and
       colour per state group; a pill never wraps. Risk flags are tags next to the request title.
   - name: Dates

@@ -11,6 +11,7 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Component;
  * criteria met - so every tab of the console opens on records. Idempotent.
  */
 @Component
+@Profile({"seed", "test"})
 public class MigrationTabsStoryline {
 
   private static final String LEAD = "miglead";

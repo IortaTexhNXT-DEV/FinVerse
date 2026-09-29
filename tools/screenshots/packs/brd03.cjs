@@ -92,7 +92,9 @@ const newRequest = [
   ['Commission %', '15'],
   ['Package TSI limit', '5000000'],
   click('^add coverage$'),
-  ['Coverage 1 code', 'OD_THEFT'],
+  // The coverage is picked by name once the coverages of the line are loaded.
+  (page) => page.locator('select[aria-label="Coverage 1"] option[value="OD_THEFT"]').waitFor({ state: 'attached' }),
+  ['Coverage 1', '^Own Damage and Theft'],
   ['Coverage 1 limit', '2000000'],
   ['Coverage 1 deductible', 'PHP 2,000 per claim'],
   ['Mabuhay General Insurance Corp.', true],

@@ -51,8 +51,8 @@ screens:
     actions:
       - "New Product | MBS (PRODUCT_MAINTAIN, MASTER_MAINTAIN) | Products tab | Opens New product; Save for Authorization saves it pending authorisation | Pending Authorization | -"
       - "Add Rule | MBS (PRODUCT_MAINTAIN), Business Administrator (MASTER_MAINTAIN) | Field rules, Document rules or TSU routing tab | Opens New Rule (see SCR-PM-12) | Pending Authorization | -"
-      - "Authorize | PRODUCT_AUTHORIZE or MASTER_AUTHORIZE (Business Administrator, New Business Approver), not the maker | Row pending authorisation | Authorises the record; it is used by quotations, accounts and rating from now | Active | -"
-      - "Deactivate | PRODUCT_MAINTAIN or MASTER_MAINTAIN | Active row | Ends the use of the record; its history stays | Inactive | -"
+      - "Authorize | PRODUCT_AUTHORIZE or MASTER_AUTHORIZE (Business Administrator, New Business Approver), not the maker | Row pending authorisation | From the row action menu, after the confirmation: authorises the record; it is used by quotations, accounts and rating from now | Active | -"
+      - "Deactivate | PRODUCT_MAINTAIN or MASTER_MAINTAIN | Active row | From the row action menu (last, in red); asks the reason, kept in the audit trail, and ends the use of the record; its history stays | Inactive | -"
       - "[Open a row] | Every user of the screen | Products tab | Opens the product record | - | -"
     rules:
       - "Every product and rule is maker-checker: saved changes wait for a second user's authorisation and are not used until then (FR-PM-010, FR-PM-012)."
@@ -179,6 +179,7 @@ screens:
       - "Submission needs the cover type and at least one included basic coverage, terms for every panel insurer on every included coverage, the package rate or a rate for every insurer, co-insurance shares totalling 100%, an effective date today or later and after the start of the version in force, and a package end after the effective date (FR-PM-043, FR-PM-014)."
       - "The validator is never the maker or the submitter of the version; the validator confirms the five checklist items and a test premium is computed (FR-PM-043)."
       - "At release and at return BIBS records each check with its result (Passed, Failed or Not Applicable) and the figures compared, with the validator, the time and, for a return, the reason; the Validation card shows them until the version is submitted again (FR-PM-043)."
+      - "The Details of a check name the cover type, the coverages and the insurers by their names; a released version shows its rate scheme, dates and terms as values (amounts with separators, rates with their decimals, a dash when empty, long texts wrapped) (FR-PM-043, FR-PM-050)."
       - "On release the previous version ends the day before the new one takes effect and becomes Superseded; a version whose package end has passed without a renewal becomes Expired and the product is no longer sold (FR-PM-050, FR-PM-052)."
       - "An insurer's own rate and minimum premium win over the package's; a package with a panel is placed only with its panel insurers (FR-PM-014, FR-PM-051)."
     outcome: A package version is set up once, checked by a second person and released on its effective date; every earlier version stays on record.
@@ -244,8 +245,8 @@ screens:
     actions:
       - "New Coverage / New Clause | MBS (PRODUCT_MAINTAIN) | Tab of the kind | Opens the dialog; Save for Authorization saves it pending authorisation | Pending Authorization | -"
       - "[Open a row] | MBS (PRODUCT_MAINTAIN) | Always | Opens the coverage or clause for change (code fixed) | Pending Authorization | -"
-      - "Authorize | PRODUCT_AUTHORIZE (Business Administrator, New Business Approver), not the maker | Pending row | Authorises the coverage or clause | Active | -"
-      - "Deactivate | PRODUCT_MAINTAIN | Active row | Ends its use; versions already released keep it | Inactive | -"
+      - "Authorize | PRODUCT_AUTHORIZE (Business Administrator, New Business Approver), not the maker | Pending row | From the row action menu, after the confirmation: authorises the coverage or clause | Active | -"
+      - "Deactivate | PRODUCT_MAINTAIN | Active row | From the row action menu (last, in red); asks the reason, kept in the audit trail, and ends its use; versions already released keep it | Inactive | -"
     rules:
       - "The hierarchy is line, cover type with at most one subtype level, product, and coverage or peril of the line (FR-PM-010)."
       - "A package version offers only the active coverages of its line and the active clauses of its line or of every line (FR-PM-010, FR-PM-011)."
@@ -284,8 +285,8 @@ screens:
     actions:
       - "New Criterion | MBS (INCENTIVE_CRITERIA_MAINTAIN) | Always | Opens New Incentive Criterion; Save for Authorization | Pending Authorization | -"
       - "[Open a row] | MBS (INCENTIVE_CRITERIA_MAINTAIN) | Row not inactive | Opens Change <code> (pending row) or Amend <code> (active row: a successor from a later date) | Pending Authorization | -"
-      - "Authorize | PRODUCT_AUTHORIZE (Business Administrator, New Business Approver), not the maker | Pending row | Authorises the criterion; an authorised amendment ends the active row the day before it starts | Active | -"
-      - "Deactivate | MBS (INCENTIVE_CRITERIA_MAINTAIN) | Active row | Ends the criterion; its history stays | Inactive | -"
+      - "Authorize | PRODUCT_AUTHORIZE (Business Administrator, New Business Approver), not the maker | Pending row | From the row action menu, after the confirmation: authorises the criterion; an authorised amendment ends the active row the day before it starts | Active | -"
+      - "Deactivate | MBS (INCENTIVE_CRITERIA_MAINTAIN) | Active row | From the row action menu (last, in red); asks the reason, kept in the audit trail, and ends the criterion; its history stays | Inactive | -"
     rules:
       - "A criterion names at least one active product of the matrix; a product that expires or is retired raises an alert to review or deactivate the criterion (FR-PM-080, FR-PM-081)."
       - "An active criterion is changed only by an amendment starting after it; the active row ends when the amendment is authorised, so there is never a gap or an overlap (FR-PM-080)."

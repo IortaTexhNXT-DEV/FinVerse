@@ -279,7 +279,7 @@ without a required scope, or a path without a rule, 403.
 | `BROKERVERSE_OIDC_ISSUER` | with `AUTH_MODE=OIDC` | – | Issuer of the OpenID Connect provider; the endpoints are read from `<issuer>/.well-known/openid-configuration` unless set below. |
 | `BROKERVERSE_OIDC_CLIENT_ID` / `BROKERVERSE_OIDC_CLIENT_SECRET` | with `AUTH_MODE=OIDC` | – | Confidential client registered at the provider (`client_secret_basic`); the secret from the secret store. |
 | `BROKERVERSE_OIDC_SCOPES` | no | `openid profile email` | Scopes asked for. |
-| `BROKERVERSE_OIDC_AUTHORIZATION_URI`, `_TOKEN_URI`, `_JWK_SET_URI` | no | discovered | Endpoints when the provider has no discovery document. |
+| `BROKERVERSE_OIDC_AUTHORIZATION_URI`, `BROKERVERSE_OIDC_TOKEN_URI`, `BROKERVERSE_OIDC_JWK_SET_URI` | no | discovered | Endpoints when the provider has no discovery document. |
 | `BROKERVERSE_OIDC_JWS_ALGORITHM` | no | `RS256` | The only signature algorithm accepted on ID tokens. |
 | `BROKERVERSE_SAML_IDP_ENTITY_ID` | with `AUTH_MODE=SAML` | – | Entity id of the SAML provider (the Issuer of its responses). |
 | `BROKERVERSE_SAML_IDP_SSO_URL` | with `AUTH_MODE=SAML` | – | Single sign-on address of the provider (HTTP-Redirect binding). |

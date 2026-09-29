@@ -24,7 +24,7 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
 import { GROUP_TYPES, REQUEST_TYPE_LABELS, USER_TYPES } from './accessRequest';
 import { accessStatusLabel } from './accessStages';
 import { UserName } from '@/components/ui/UserName';
@@ -114,7 +114,7 @@ function Filters({
             <option value="">All</option>
             {STATUSES.map((s) => (
               <option key={s} value={s}>
-                {humanize(s)}
+                {accessStatusLabel(s)}
               </option>
             ))}
           </select>

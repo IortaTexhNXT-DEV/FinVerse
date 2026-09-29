@@ -3,8 +3,9 @@
 # This file says where each message appears (by the class or file that raises it) and what the user does.
 sources:
   backend_packages: [nbadmin, security, system]
-  # Data retention (Broking Setup › Data Retention) belongs to the New Business set; the job monitor to the platform.
-  exclude_classes: [RetentionRule, RetentionService, JobRegistry]
+  # Data retention (Broking Setup › Data Retention) belongs to the New Business set; the job monitor and the product
+  # module switches (Administration › Product Modules) to the platform.
+  exclude_classes: [RetentionRule, RetentionService, JobRegistry, ProductModuleSwitch, ProductModuleAdministration]
   bulk_handlers: [AccessRequestBulkHandler]
   bulk_screen: Bulk Request (SCR-UA-09)
   ui_patterns: extended
@@ -72,6 +73,19 @@ fixes:
   RESET_LINK_EXPIRED: Request a new link with Forgot password? on the Login page and use it within 30 minutes.
   RESET_LINK_INVALID: Request a new link with Forgot password?; only the latest link works, once.
   UNKNOWN_USER: Sign in again; if it persists, report it to the System Administrator.
+  RESET_RATE_LIMITED: Wait a few minutes, then request the link again; use the latest e-mail only.
+  SIGN_IN_CHECK_UNAVAILABLE: Wait a moment and repeat the action; if it persists, report the time to the System Administrator.
+  "The sign-in could not be completed. Start again from the sign-in page.": Open the Login page and sign in again.
+  "Your organisation’s sign-in service could not complete the sign-in. Try again in a moment.": Try again; if it persists, report the time to BDOI IT, who look after the organisation's sign-in service.
+  "Your sign-in was accepted by your organisation, but it is not linked to an active user of this system. Contact your administrator.": Ask the System Administrator to link your organisation account to your BIBS user.
+  # Second factor (authenticator app)
+  MFA_CODE_INVALID: Enter the current six-digit code of the authenticator app; check that the time of the phone is set automatically.
+  MFA_ENROLMENT_NOT_STARTED: Start the enrolment of the authenticator app again from My Profile.
+  MFA_NOT_AVAILABLE: No action; the second factor is not switched on for this system. Ask the System Administrator if it should be.
+  MFA_NOT_ENROLLED: Set up the authenticator app from My Profile first.
+  MFA_RESET_PENDING: Wait for another administrator to approve the reset already requested.
+  FOUR_EYES: Ask another administrator to approve the reset; nobody approves a reset he requested or his own reset.
+  REQUEST_CLOSED: Refresh the list; the reset was already decided.
   PROFILE_INVALID: Correct the fields marked in red.
   SESSION_ALREADY_ENDED: No action; refresh the list of sessions.
   # Requests

@@ -159,7 +159,7 @@ fixes:
   "The version goes to the business owner for approval.": Confirm to go ahead, or cancel to leave the record as it is.
   "The version replaces the approved one for the next batches; values marked Create are created through the reference-data load.": Confirm to go ahead, or cancel to leave the record as it is.
   "The layout becomes the version in force: extracts and templates follow it and the previous version is retired.": Confirm to go ahead, or cancel to leave the record as it is.
-  "<extract no> rejected: <reject message>": Read the reason, correct the extract or its control file and upload it again.
+  "<extract no> rejected: <length> failed": Read the failed checks listed on the Upload an extract card, correct the extract or its control file and upload both again.
   "A rerun batch of the corrected rows is created for validation and load.": Confirm to go ahead, or cancel to leave the record as it is.
   "Corrected rows": No action; the screen shows the change.
   "The corrected rows go back to the maker.": Confirm to go ahead, or cancel to leave the record as it is.

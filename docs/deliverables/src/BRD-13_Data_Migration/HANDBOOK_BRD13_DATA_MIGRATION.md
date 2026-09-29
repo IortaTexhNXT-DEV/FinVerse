@@ -364,7 +364,7 @@ render: dm-control-file
 
 - Files are received through the Extracts screen of the Migration Console, or through a secure file drop once BDOI IT names it (DMQ28, PR-DM-03). E-mail is never used.
 - Files land in an encrypted intake bucket in AWS ap-southeast-1 with a 5-day lifecycle.
-- The intake checks run before any row is staged. A file that fails is rejected with the reason and the difference, and BDOI IT re-sends it.
+- The intake checks run before any row is staged. A file that fails is rejected as a whole; the rejection lists every failed check with its reason and the difference, and BDOI IT re-sends the file.
 - Staged rows keep the raw values as received and the mapped values. Outside production, names, addresses, TIN, ID, account and phone numbers, e-mail addresses and birth dates are masked at intake with a keyed, repeatable masking, so dedupe still works on masked data.
 
 ## Profiling
@@ -1080,7 +1080,7 @@ main_flow:
   - When every check passes, BIBS gives the extract a number (MGX-yyyy-nnnnnn), masks personal data when the environment is not production, and stages the rows.
   - BIBS shows the extract as Staged with its counts and control totals.
 alternate_flows:
-  - A check fails. The extract is Rejected with the failed check and the difference; nothing is staged; the Data Migration Lead is notified.
+  - Checks fail. The extract is Rejected with every failed check and its difference, listed on the Extracts screen; nothing is staged; the Data Migration Lead is notified.
   - Same file sent twice. BIBS refuses it as a duplicate.
   - Delta extract with an as-of date earlier than the last one of the object. BIBS refuses it.
 rules:

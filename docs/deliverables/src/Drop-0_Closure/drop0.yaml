@@ -59,6 +59,8 @@ modules:
   DM: {name: Data Migration, brd: BRD-13, drop: "Drop 0", owner: "Program Manager, Business Project Services (Data Migration)"}
 
 # Module of each group of system parameters (the group shown on System Parameters).
+# Parameter groups of the product modules the client does not use (the insurer suite): not asked for.
+parameter_groups_not_in_use: [UNDERWRITING]
 parameter_groups:
   ACCOUNTING: ACC
   ACSL: ACC
@@ -284,7 +286,7 @@ items:
      tables: []}
   - {id: CFG-025, area: Chart of accounts and accounting, module: ACC, name: Tax codes and forms, due: D5, route: template, template: D0-10, screen: /tax/codes,
      provides: "The withholding, VAT and percentage tax codes with their ATC, rate, GL account and effective dates; the RDO code",
-     tables: []}
+     tables: [tax_code]}
   - {id: CFG-026, area: Chart of accounts and accounting, module: ACC, name: Financial statement formats and account schedules, due: D5, route: screen, screen: /frbs/schedules,
      provides: "The lines of the financial statements and MIS formats and the accounts in each, as Comptrollership reports them",
      tables: [fin_statement_format, fin_statement_format_line]}

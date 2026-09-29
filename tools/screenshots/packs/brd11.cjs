@@ -232,7 +232,9 @@ const documents = {
 
 // Shots kept as the whole window (the sign-in pages have no menu and are always whole; the home page shows the
 // menu of the persona); every other shot is cropped to its dialog or content area (capture_pack.cjs, cropOf).
-const crops = { 'scr-ua-05-01-view': 'full' };
+// The password steps of walkthrough C show the Change password card (below the second factor card).
+const PASSWORD_CARD = 'section.card:has(> header h2:text-is("Change password"))';
+const crops = { 'scr-ua-05-01-view': 'full', 'wt-c-10': PASSWORD_CARD, 'wt-c-11': PASSWORD_CARD };
 
 // UX deck: a search of the access requests that finds nothing (the empty state of the list).
 const after = {

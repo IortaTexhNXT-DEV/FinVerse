@@ -286,7 +286,7 @@ rules:
   - [R2, "A user may hold several roles; the menu is the union of their screens (NFR 1.c-d).", Fixed, "-"]
 validations:
   - [User ID or password wrong, Invalid user name or password, AUTHENTICATION_FAILED]
-  - [Account locked (the same message as a wrong password, so a caller cannot tell a locked account; the lock shows to the System Administrator on Users), Invalid user name or password, AUTHENTICATION_FAILED]
+  - [Account locked (the same message as a wrong password; the lock shows to the System Administrator on Users), Invalid user name or password, AUTHENTICATION_FAILED]
   - [Account deactivated (the same message as a wrong password; the status shows to the System Administrator on Users), Invalid user name or password, AUTHENTICATION_FAILED]
 notifications:
   - "None."

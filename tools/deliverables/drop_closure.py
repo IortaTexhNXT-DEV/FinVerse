@@ -292,7 +292,10 @@ def parameter_rows() -> list[dict[str, Any]]:
     tl = _template_lists()["parameters"]
     d_text = data().get("parameter_text") or {}
     rows = []
+    unused = set(data().get("parameter_groups_not_in_use") or [])
     for p in sorted(sql_facts.rows("sys_parameter", "param_key"), key=lambda x: (x["category"], x["param_key"])):
+        if p["category"] in unused:
+            continue
         mod = data()["parameter_groups"][p["category"]]
         m = module(mod)
         key = p["param_key"]

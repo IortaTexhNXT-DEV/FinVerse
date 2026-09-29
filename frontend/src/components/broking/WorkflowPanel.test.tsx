@@ -74,4 +74,23 @@ describe('workflow panel and record header', () => {
     await screen.findByText('Draft', { selector: 'dd' });
     expect(byRecord).toHaveBeenCalledTimes(1);
   });
+
+  it('shows an action that closes the record off its path in the danger style', async () => {
+    vi.spyOn(workflowApi, 'byRecord').mockResolvedValue({
+      ...detail('DRAFT', 'Draft'),
+      actions: [
+        { action: 'return', label: 'Return', toStage: 'RETURNED', generic: true },
+        {
+          action: 'not_proceeded',
+          label: 'Not proceeded',
+          toStage: 'NOT_PROCEEDED',
+          generic: true,
+        },
+      ],
+    });
+    render(ebWrapper(new Set())(<WorkflowPanel entityType="Account" entityId={42} />));
+    const exit = await screen.findByRole('button', { name: 'Not Proceeded' });
+    expect(exit).toHaveClass('btn-danger');
+    expect(screen.getByRole('button', { name: 'Return' })).toHaveClass('btn-secondary');
+  });
 });

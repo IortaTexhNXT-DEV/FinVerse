@@ -208,8 +208,8 @@ frs:
         steps:
           - Enter user ID ao2 with a wrong password as many times as the threshold.
           - Enter the correct password.
-        expected: The last wrong attempt locks the account; the correct password is then refused until the System Administrator unlocks the user in Administration > Users.
-        msg: [Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
+        expected: The last wrong attempt locks the account; the correct password is then refused with the same message as a wrong password until the System Administrator unlocks the user in Administration > Users, where the lock shows.
+        msg: [Invalid user name or password, AUTHENTICATION_FAILED]
       - c: 3
         type: Boundary
         title: One attempt below the threshold does not lock the account

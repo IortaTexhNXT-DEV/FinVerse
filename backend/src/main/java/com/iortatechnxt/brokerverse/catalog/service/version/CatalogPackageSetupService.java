@@ -30,9 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Catalog implementation of {@link PackageSetupService} (BRPM.015, PMADD01/02/06;
  * PRODUCT_MAINTENANCE_DESIGN sections 5.1 and 9.1): turns negotiated package terms, or the "New
- * Version" of the catalog editor, into a DRAFT version. It replaces the in-memory stub of {@link
- * PackageVersionStubDefaults}. Every reference is checked (line coverages, clause library, insurer
- * panel), one version at a time is set up per product, and every change is audited (BRPM.024).
+ * Version" of the catalog editor, into a DRAFT version. Every reference is checked (line coverages,
+ * clause library, insurer panel), one version at a time is set up per product, and every change is
+ * audited (BRPM.024).
  */
 @Service
 @Primary

@@ -178,6 +178,8 @@ export interface Extract {
   status: string;
   rejectCode?: string;
   rejectMessage?: string;
+  /** Every failed intake check of a rejected extract with its reason. */
+  rejectChecks?: { check: string; reason: string }[];
   receivedBy: string;
   receivedAt: string;
   purgedAt?: string;

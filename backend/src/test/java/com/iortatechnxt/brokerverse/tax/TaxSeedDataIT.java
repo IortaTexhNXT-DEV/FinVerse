@@ -3,7 +3,7 @@ package com.iortatechnxt.brokerverse.tax;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
-import com.iortatechnxt.brokerverse.payables.service.SeedActor;
+import com.iortatechnxt.brokerverse.payables.seed.SeedActor;
 import com.iortatechnxt.brokerverse.support.IntegrationTest;
 import com.iortatechnxt.brokerverse.tax.domain.Certificate2307;
 import com.iortatechnxt.brokerverse.tax.domain.ReturnStatus;

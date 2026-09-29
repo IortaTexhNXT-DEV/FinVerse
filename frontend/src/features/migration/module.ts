@@ -15,6 +15,24 @@ import {
 import { lazy } from 'react';
 import type { FeatureModule } from '@/navigation/types';
 
+/** Work permissions of the migration roles: they land on Migration Home after sign-in. */
+const MIGRATION_WORK = [
+  'MIG_INTAKE',
+  'MIG_LOAD_RUN',
+  'MIG_LOAD_APPROVE',
+  'MIG_OBJECT_MANAGE',
+  'MIG_MAPPING_EDIT',
+  'MIG_MAPPING_APPROVE',
+  'MIG_DECISION_APPROVE',
+  'MIG_DQ_RESOLVE',
+  'MIG_DQ_WAIVE',
+  'MIG_MATCH_DECIDE',
+  'MIG_SIGNOFF',
+  'MIG_RECON_SIGNOFF',
+  'MIG_GONOGO_DECIDE',
+  'MIG_CUTOVER_MANAGE',
+] as const;
+
 /**
  * Data Migration (BRD-13; docs/architecture/DATA_MIGRATION_DESIGN.md section 22): the migration
  * console in its own sidebar group - home, data objects, code maps, layouts and load templates,
@@ -32,6 +50,7 @@ export const migrationModule: FeatureModule = {
       label: 'Migration Home',
       icon: Database,
       permission: 'MIG_VIEW',
+      landingFor: MIGRATION_WORK,
       component: lazy(() => import('./home/MigrationHomePage')),
     },
     {

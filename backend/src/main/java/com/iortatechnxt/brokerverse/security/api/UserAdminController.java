@@ -6,9 +6,11 @@ import com.iortatechnxt.brokerverse.security.api.dto.RoleResponse;
 import com.iortatechnxt.brokerverse.security.api.dto.UserProfileResponse;
 import com.iortatechnxt.brokerverse.security.api.dto.UserRequest;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
+import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.service.ChangeAuthority;
 import com.iortatechnxt.brokerverse.security.service.RoleEditGuard;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
+import com.iortatechnxt.brokerverse.system.service.ProductModules;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -37,16 +39,20 @@ public class UserAdminController {
 
   private final UserAdminService service;
   private final RoleEditGuard guard;
+  private final ProductModules modules;
 
   /**
    * Creates the controller.
    *
    * @param service user administration
    * @param guard role edit guard
+   * @param modules product module switches
    */
-  public UserAdminController(UserAdminService service, RoleEditGuard guard) {
+  public UserAdminController(
+      UserAdminService service, RoleEditGuard guard, ProductModules modules) {
     this.service = service;
     this.guard = guard;
+    this.modules = modules;
   }
 
   /**
@@ -122,18 +128,21 @@ public class UserAdminController {
   @GetMapping("/roles")
   @PreAuthorize("hasAnyAuthority('ROLE_MANAGE','USER_MANAGE')")
   public List<RoleResponse> roles() {
-    return service.listRoles().stream().map(RoleResponse::from).toList();
+    return service.listRoles().stream()
+        .map(r -> RoleResponse.from(r, modules.moduleOfProfile(permissionCodes(r))))
+        .toList();
   }
 
   /**
-   * Lists the permissions a role can be given (the insurer-only permissions are not offered).
+   * Lists the permissions a role can be given (the insurer-only permissions and the permissions of
+   * switched-off product modules are not offered).
    *
    * @return permissions
    */
   @GetMapping("/permissions")
   @PreAuthorize(ROLES)
   public List<Permission> permissions() {
-    return Permission.offered();
+    return Permission.offered().stream().filter(p -> modules.isPermissionActive(p.name())).toList();
   }
 
   /**
@@ -186,4 +195,8 @@ public class UserAdminController {
    */
   public record CreateUserRequest(
       @Valid UserRequest user, @Valid PasswordChangeRequest initialPassword) {}
+
+  private static List<String> permissionCodes(Role role) {
+    return role.getPermissions().stream().map(Enum::name).toList();
+  }
 }

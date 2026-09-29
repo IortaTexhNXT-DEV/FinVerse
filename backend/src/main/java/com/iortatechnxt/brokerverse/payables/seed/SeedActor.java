@@ -1,6 +1,7 @@
-package com.iortatechnxt.brokerverse.payables.service;
+package com.iortatechnxt.brokerverse.payables.seed;
 
 import java.util.function.Supplier;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
  * exercised exactly as in on-line use (maker "accountant", checker "checker").
  */
 @Component
+@Profile({"seed", "test"})
 public class SeedActor {
 
   /** Seed maker. */

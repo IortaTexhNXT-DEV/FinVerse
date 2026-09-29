@@ -22,7 +22,7 @@ screens:
     fields:
       - "Tabs | My Requests / Assigned to Me / Second Approval / For Implementation / All | Tab | - | - | Fixed; a tab is shown only to the users who work it | Assigned to Me for an approver, Second Approval for a second approver, else My Requests | - | My Requests: raised by the user; Assigned to Me: waiting for the user (approval right); Second Approval: waiting for a second approval (second approval right); For Implementation: approved group-profile requests (role management right); All: every request the user may see | -"
       - "Search | Search Request No., User or Role | Text | Part of a request number, user ID or group profile | N | - | Blank | - | Contains search | -"
-      - "Filters | Status | Drop-down | All, Draft, Pending, Pending Second, Returned, Scheduled, Approved, For Implementation, Implemented, Rejected, Cancelled | N | Fixed list | All | - | - | -"
+      - "Filters | Status | Drop-down | All, Draft, Pending Approval, Pending Second Approval, Returned, Scheduled, Approved, For Implementation, Implemented, Rejected, Cancelled | N | Fixed list | All | - | - | -"
       - "Filters | Request Type | Drop-down | All, Enrol new user, Modify user, Deactivate user, Reactivate user, Change roles, New group profile, Modify group profile, Deactivate group profile, Reactivate group profile | N | Fixed list | All | - | - | -"
       - "Filters | Requested By / Approver | Text | User ID | N | - | Blank | - | Exact user | -"
       - "Filters | Requested From / Requested To | Date | dd-MMM-yyyy | N | - | Blank | - | - | -"
@@ -36,7 +36,7 @@ screens:
       - "List | [Select] | Check box | One per row on Assigned to Me and Second Approval; disabled on a new-user request, with the tooltip Open the request to approve it: the temporary password of the new user is shown only once | N | - | Not ticked | Assigned to Me; Second Approval | - | -"
     actions:
       - "New Request | Requestor, Business Administrator, System Administrator (enrol, modify, deactivate or reactivate right) | Always | Opens New Request (SCR-UA-07) | - | -"
-      - "Approve Selected | Approver on Assigned to Me; Second Approver on Second Approval | Rows selected | Approves each selected request in turn, with the same rules as one approval; a new-user request cannot be selected. Toast: n request(s) approved | Approved, Scheduled, Pending Second or For Implementation | Decision notice to each requester; access-changed notice to each user"
+      - "Approve Selected | Approver on Assigned to Me; Second Approver on Second Approval | Rows selected | Approves each selected request in turn, with the same rules as one approval; a new-user request cannot be selected. Toast: n request(s) approved | Approved, Scheduled, Pending Second Approval or For Implementation | Decision notice to each requester; access-changed notice to each user"
       - "Filters | Every user of the screen | Always | Shows or hides the filters | - | -"
       - "[Open a row] | Every user of the screen | Always | Opens the request (SCR-UA-08) | - | -"
     rules:
@@ -78,7 +78,8 @@ screens:
       - "User data | Business Unit Group | Drop-down | Values of the list | N | List UAM_BUSINESS_UNIT (values from BDOI) | Blank | Draft; Returned | - | -"
       - "User data | User Level | Drop-down | Values of the list | N | List UAM_USER_LEVEL (values from BDOI) | Blank | Draft; Returned | - | -"
       - "User data | Authorisation Limit (PHP) | Amount | Zero or more with up to 2 decimals; Blank: no limit (new) or Current: amount (modify) | N | User master | Blank | Draft; Returned | Zero or more, 2 decimals | Enter an amount of zero or more, with up to 2 decimals"
-      - "Group Profiles | [Group profile check boxes] | Check boxes | Name of each active group profile; (current) after a profile the user holds | Cond.: enrolment (at least one) | Active group profiles | None (new); the profiles held (modify) | Draft; Returned | Active profiles only; a user cannot change his own profiles; no two profiles of an active separation-of-duties rule | Select at least one role; One user may not hold both <profile> and <profile> (separation-of-duties rule <rule>)"
+      - "Group Profiles | Search group profiles | Text | Part of a profile name, code or module | N | - | Blank | Draft; Returned | The chosen profiles stay listed | -"
+      - "Group Profiles | [Group profile check boxes] | Check boxes | Name of each active group profile, grouped by product module; the count of profiles selected; (current) after a profile the user holds | Cond.: enrolment (at least one) | Active group profiles | None (new); the profiles held (modify) | Draft; Returned | Active profiles only; a user cannot change his own profiles; no two profiles of an active separation-of-duties rule | Select at least one role; One user may not hold both <profile> and <profile> (separation-of-duties rule <rule>)"
       - "Deactivation | Reason | Drop-down | Resigned, Transferred to another unit, Long leave, Security, Others, No sign-in for the dormancy period (values to confirm with BDOI) | N | List UAM_DEACTIVATION_REASON | Blank | Draft; Returned | - | -"
       - "Reactivation | Also unlock the account | Check box | Shown when the user is locked | N | - | Not ticked | Draft; Returned | - | -"
       - "Approval | Approver | Drop-down | Name (user ID) of each eligible approver | Y | Holders of the approval right, less the requester and the user concerned | Blank | Draft; Returned | An eligible approver; one approver for a user request | Select the approver"
@@ -87,8 +88,8 @@ screens:
     actions:
       - "Cancel | The requester | Always | Leaves the form without saving | Unchanged | -"
       - "Save Draft | Requestor, Business Administrator, System Administrator (type right) | User ID in a valid format; effective date not in the past | Saves the draft with format checks only; a new request is numbered AR-yyyy-nnnnnn. Toast: AR-yyyy-nnnnnn saved as a draft | Draft (new); unchanged (edit) | -"
-      - "Submit | As Save Draft | Every field check passes | Runs the full checks (user state, format, active profiles, free Windows ID, one open request per user, eligible approver), evaluates the risk rules and sends the request to the approver. Toast: AR-yyyy-nnnnnn submitted | Pending | Access request AR-yyyy-nnnnnn to approve, to the chosen approver"
-      - "Resubmit | The requester (correction right) | Returned request with correction remarks | Resubmits the corrected request to the approver | Pending | Access request AR-yyyy-nnnnnn to approve"
+      - "Submit | As Save Draft | Every field check passes | Runs the full checks (user state, format, active profiles, free Windows ID, one open request per user, eligible approver), evaluates the risk rules and sends the request to the approver. Toast: AR-yyyy-nnnnnn submitted | Pending Approval | Access request AR-yyyy-nnnnnn to approve, to the chosen approver"
+      - "Resubmit | The requester (correction right) | Returned request with correction remarks | Resubmits the corrected request to the approver | Pending Approval | Access request AR-yyyy-nnnnnn to approve"
     rules:
       - "The type and the user of a saved request cannot change; a different change is a new request (FR-UA-010)."
       - "Only one request per user can be open (draft excluded) at a time: A request for user <user> is already waiting for approval (FR-UA-010)."
@@ -126,25 +127,27 @@ screens:
       - {state: history, user: requestor, open: returned_request, tab: History, caption: "A returned request with its remarks, History tab"}
       - {state: password, user: uamapprover, caption: "The temporary password of a new user, shown once after the approval"}
     fields:
-      - "Summary | [Title] | Text | Request type · user ID or group profile name | - | Access request | - | Read only | - | -"
+      - "Summary | [Title] | Text | Request type · full name of the user with the user ID in brackets, or group profile name | - | Access request | - | Read only | - | -"
       - "Summary | Request | Reference chip | AR-yyyy-nnnnnn | - | Access request | - | Read only | - | -"
       - "Summary | [Status and risk flags] | Pill and tags | Status; Privilege increase, Outside working hours | - | Access request | - | Read only | - | -"
-      - "Summary | Requested | Text | Name · dd-MMM-yyyy HH:mm | - | Access request | - | Read only | - | -"
+      - "Summary | Requested By | Text | Name of the requester | - | Access request | - | Read only | - | -"
+      - "Summary | Requested On | Date and time | dd-MMM-yyyy HH:mm | - | Access request | - | Read only | - | -"
       - "Summary | Approver | Text | Name of the chosen approver or of the decider; Chosen on submission for a draft | - | Access request | - | Read only | - | -"
       - "Summary | Effective | Date | dd-MMM-yyyy, or On approval | - | Access request | - | Read only | - | -"
-      - "Summary | Decision | Text | Pending, or name · dd-MMM-yyyy HH:mm – comment | - | Access request | - | Read only | - | -"
-      - "Details | Attribute / Current / Requested | Table | Full name, E-mail, Windows ID, Business unit, User level (list labels), Authorisation limit, Group profiles by name (added and removed), Status; for a group profile: Group profile (name), Name, Description, Privilege level, Permissions added, Permissions removed (permission names) | - | User or group profile; access request | - | Read only | - | -"
+      - "Summary | Decision | Text | Pending Approval, or name · dd-MMM-yyyy HH:mm – comment | - | Access request | - | Read only | - | -"
+      - "Details | Attribute / Current / Requested | Table | Full name, E-mail, Windows ID, Business unit, User level (list labels), Authorisation limit, Group profiles by name, Status; for a group profile: Group profile (name), Name, Description, Privilege level, Permissions added, Permissions removed (permission names) | - | User or group profile; access request | - | Read only | - | -"
+      - "Details | Group Profile / Change | Table | One row per group profile the request adds (Added) or removes (Removed), by name | - | User and access request | - | Read only | - | -"
       - "Details | Remarks / Effective date / Reason / Members / Could not be applied | Text | Justification; effective date (dd-MMM-yyyy); deactivation reason (list label); members of a profile to deactivate; the error of a scheduled change that failed | - | Access request | - | Read only | - | -"
       - "Approvers | Order / Approver / Decision / Remarks / Decided | Table | One row per approver in order | - | Approvers of the request | - | Read only | - | -"
       - "History | Date / Action / Status / By / Remarks | Table | Every event: saved, submitted, returned, resubmitted, cancelled, approved, second approval, rejected, scheduled, applied, failed to apply, for implementation, implemented | - | Request history (insert only) | - | Read only | - | -"
       - "Dialogs | Comment / Remarks / Reason | Text area | Up to 1,000 characters | Cond.: Return, Reject, Cancel | - | Blank | While the dialog is open | Not blank for a return, rejection or cancellation | Enter the remarks"
     actions:
       - "Edit Request | The creator (correction right for a returned request) | Draft or Returned | Opens Edit Request (SCR-UA-07) | Unchanged | -"
-      - "Cancel Request | The creator (cancel right); the approver of a scheduled request | Draft, Pending, Pending Second, Returned or Scheduled | Asks the reason and cancels the request; it is kept, never deleted | Cancelled | Access request AR-yyyy-nnnnnn cancelled, to the approver"
-      - "Approve and Apply | The chosen approver (approval right), not the requester nor the user concerned | Pending | Applies the change now, schedules it for the effective date, passes it to the next approver in order, sends it for a second approval when a risk flag is found, or (group profile) sends it to the System Administrator. For an enrolment, shows the temporary password once | Approved, Scheduled, Pending, Pending Second or For Implementation | Decision notice to the requester; Your access changed to the user (in the app and by e-mail); for a second approval or implementation, notices to the second approvers or System Administrators"
-      - "Second Approval | A second approver who did not give the first approval | Pending Second | Applies, schedules or sends for implementation as above | Approved, Scheduled or For Implementation | As Approve and Apply"
-      - "Return | The deciding approver | Pending or Pending Second | Asks the remarks and returns the request to the requester for correction | Returned | Access request AR-yyyy-nnnnnn returned, with the remarks"
-      - "Reject | The deciding approver | Pending or Pending Second | Asks the reason and closes the request; a rejection is final | Rejected | Access request AR-yyyy-nnnnnn rejected"
+      - "Cancel Request | The creator (cancel right); the approver of a scheduled request | Draft, Pending Approval, Pending Second Approval, Returned or Scheduled | Asks the reason and cancels the request; it is kept, never deleted | Cancelled | Access request AR-yyyy-nnnnnn cancelled, to the approver"
+      - "Approve and Apply | The chosen approver (approval right), not the requester nor the user concerned | Pending Approval | Applies the change now, schedules it for the effective date, passes it to the next approver in order, sends it for a second approval when a risk flag is found, or (group profile) sends it to the System Administrator. For an enrolment, shows the temporary password once | Approved, Scheduled, Pending Approval, Pending Second Approval or For Implementation | Decision notice to the requester; Your access changed to the user (in the app and by e-mail); for a second approval or implementation, notices to the second approvers or System Administrators"
+      - "Second Approval | A second approver who did not give the first approval | Pending Second Approval | Applies, schedules or sends for implementation as above | Approved, Scheduled or For Implementation | As Approve and Apply"
+      - "Return | The deciding approver | Pending Approval or Pending Second Approval | Asks the remarks and returns the request to the requester for correction | Returned | Access request AR-yyyy-nnnnnn returned, with the remarks"
+      - "Reject | The deciding approver | Pending Approval or Pending Second Approval | Asks the reason and closes the request; a rejection is final | Rejected | Access request AR-yyyy-nnnnnn rejected"
       - "Implement Request | System Administrator (role management right), not the requester | For Implementation | Applies the approved group-profile change now | Implemented | Access request AR-yyyy-nnnnnn implemented, to the requester"
     rules:
       - "The requester and the user the request is about never decide it: A request cannot be decided by the user who submitted it; You cannot decide a request about your own access (FR-UA-031)."
@@ -174,7 +177,7 @@ screens:
       - "Upload | [Upload wizard] | Upload | Template Bulk access requests (Excel); see Upload screens | Y | Upload template | - | Before the batch is saved | File checks; every row checked as a request | -"
       - "Batches | Batch | Column | BLK-yyyy-nnnnnn | - | Bulk batch | - | Read only | - | -"
       - "Batches | Lines | Column | Number of lines | - | Bulk batch | - | Read only | - | -"
-      - "Batches | Status | Column | Draft, Pending, Returned, Approved, Rejected, Cancelled | - | Bulk batch | - | Read only | - | -"
+      - "Batches | Status | Column | Draft, Pending Approval, Returned, Approved, Rejected, Cancelled | - | Bulk batch | - | Read only | - | -"
       - "Batches | Remarks | Column | Batch remarks | - | Bulk batch | - | Read only | - | -"
       - "Batches | Requested By | Column | Name | - | Bulk batch | - | Read only | - | -"
       - "Batches | Uploaded | Column | dd-MMM-yyyy HH:mm | - | Bulk batch | - | Read only | - | -"
@@ -201,16 +204,17 @@ screens:
       - {state: pending, user: uamapprover, open: seed_batch, caption: "The seed batch of three lines waiting for the Approver"}
     fields:
       - "Summary | Batch | Reference chip | BLK-yyyy-nnnnnn | - | Bulk batch | - | Read only | - | -"
-      - "Summary | Requested | Text | Name · dd-MMM-yyyy HH:mm | - | Bulk batch | - | Read only | - | -"
+      - "Summary | Requested By | Text | Name of the requester | - | Bulk batch | - | Read only | - | -"
+      - "Summary | Requested On | Date and time | dd-MMM-yyyy HH:mm | - | Bulk batch | - | Read only | - | -"
       - "Lines | Request / Type / User / Change / Status / Error | Table | One access request per line | - | Line requests | - | Read only | - | -"
       - "Submit Batch | Approver | Drop-down | Name (user ID) of each eligible approver | Y | Holders of the approval right, less the requester | Blank | Draft or Returned batch | An eligible approver | Select the approver"
       - "Submit Batch | Remarks | Text area | Up to 1,000 characters | Y | - | Blank | Draft or Returned batch | Not blank | Enter the remarks"
     actions:
-      - "Submit Batch | The creator of the batch | Draft or Returned | Submits every draft line to the chosen approver with the batch remarks | Pending | Access request AR-yyyy-nnnnnn to approve, per line"
-      - "Approve Batch | The approver (approval right), not the creator | Pending | Approves each line on its own; the outcome lists each line with its status or error and the temporary passwords of new users, shown once | Approved (lines applied, scheduled or for second approval) | As Approve and Apply, per line"
-      - "Return Batch | The approver | Pending | Returns the batch with the remarks | Returned | Returned notice per line"
-      - "Reject Batch | The approver | Pending | Rejects every line with the reason | Rejected | Rejected notice per line"
-      - "Cancel Batch | The creator of the batch | Draft, Returned or Pending | Cancels every line with the reason | Cancelled | Cancelled notice to the approver"
+      - "Submit Batch | The creator of the batch | Draft or Returned | Submits every draft line to the chosen approver with the batch remarks | Pending Approval | Access request AR-yyyy-nnnnnn to approve, per line"
+      - "Approve Batch | The approver (approval right), not the creator | Pending Approval | Approves each line on its own; the outcome lists each line with its status or error and the temporary passwords of new users, shown once | Approved (lines applied, scheduled or for second approval) | As Approve and Apply, per line"
+      - "Return Batch | The approver | Pending Approval | Returns the batch with the remarks | Returned | Returned notice per line"
+      - "Reject Batch | The approver | Pending Approval | Rejects every line with the reason | Rejected | Rejected notice per line"
+      - "Cancel Batch | The creator of the batch | Draft, Returned or Pending Approval | Cancels every line with the reason | Cancelled | Cancelled notice to the approver"
       - "[Open a line] | Every user of the screen | Always | Opens the line's request (SCR-UA-08) | - | -"
     rules:
       - "A batch is submitted only by its creator and decided by another user: Only the creator can submit batch <batch no> (FR-UA-019)."

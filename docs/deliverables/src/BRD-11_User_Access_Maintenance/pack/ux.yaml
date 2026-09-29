@@ -4,11 +4,33 @@
 # persona is, the images taken for the deck only, the changes of the issue and the points to confirm.
 
 issue:
-  version: "2.0"
-  date: 28 September 2026
+  version: "2.1"
+  date: 29 September 2026
   changes:
-    - ref: CHG-UA-2.0-01
-      what: The group profiles of a request include the three contact centre profiles of Customer Servicing Facility
+    - ref: CHG-UA-2.1-01
+      what: >-
+        One label for a request waiting for its approver, Pending Approval (Pending Second Approval for the second
+        approval), in the status pill, the step bar, the decision, the history, the lists and the status filter
+      screens: [SCR-UA-06, SCR-UA-08, SCR-UA-10, SCR-UA-11]
+      images: [scr-ua-06-01-list, scr-ua-06-02-mine, scr-ua-08-01-pending, scr-ua-08-02-approve, scr-ua-08-03-second,
+               scr-ua-08-04-history, scr-ua-10-01-pending, scr-ua-11-01-list]
+    - ref: CHG-UA-2.1-02
+      what: Requested By and Requested On as two key facts of a request and of a bulk batch
+      screens: [SCR-UA-08, SCR-UA-10]
+      images: [scr-ua-08-01-pending, scr-ua-08-03-second, scr-ua-08-04-history, scr-ua-10-01-pending]
+    - ref: CHG-UA-2.1-03
+      what: The group profiles a request adds or removes as table rows, each marked Added or Removed
+      screens: [SCR-UA-08]
+      images: [scr-ua-08-01-pending, scr-ua-08-03-second, scr-ua-08-04-history]
+    - ref: CHG-UA-2.1-04
+      what: The user a request is about named by the full name, with the user ID in brackets
+      screens: [SCR-UA-08]
+      images: [scr-ua-08-01-pending, scr-ua-08-02-approve, scr-ua-08-03-second, scr-ua-08-04-history,
+               scr-ua-08-05-password]
+    - ref: CHG-UA-2.1-05
+      what: >-
+        The group profiles of a user request grouped by product module, with a search and the count of the profiles
+        selected
       screens: [SCR-UA-07]
       images: [scr-ua-07-01-empty, scr-ua-07-02-filled, scr-ua-07-03-error, scr-ua-07-04-modify]
 
@@ -87,29 +109,6 @@ states:
 confirm:
   clarifications: [CLR-UA-10, CLR-UA-11, CLR-UA-18, CLR-UA-19, CLR-UA-20]
   findings:
-    - screens: [SCR-UA-08]
-      observation: >-
-        The status of a request reads Pending in the record header, Pending Approval in the step bar and Pending
-        approval as the Current Stage.
-      proposal: Use one label, in the same case, in the three places.
-    - screens: [SCR-UA-08]
-      observation: >-
-        The key fact Requested joins the requester and the time ("Rhea Access Requestor · 27-Sep-2026 05:30"), and
-        the time wraps over two lines.
-      proposal: Show Requested By and Requested On as two key facts, each kept on one line.
-    - screens: [SCR-UA-08]
-      observation: >-
-        The Requested value of the group profiles is one sentence with the profiles added and removed in brackets.
-      proposal: >-
-        Show the profiles as tags, with the added ones marked Added and the removed ones marked Removed, or in two
-        rows Added and Removed.
-    - screens: [SCR-UA-08, SCR-UA-06]
-      observation: The request title and subtitle name the subject user by the user ID only.
-      proposal: Name the user with the full name first and the user ID as the second line or in the tooltip.
-    - screens: [SCR-UA-07, SCR-UA-12]
-      observation: >-
-        The Group Profiles of a request are some 70 check boxes in four columns, in no visible order by area, and
-        the list grows with each module.
-      proposal: >-
-        A searchable picker of the group profiles, grouped by area (Marketing, Operations, Finance, Claims,
-        Administration), with the chosen profiles as removable tags.
+    - screens: [SCR-UA-06]
+      observation: The Change column of the request list names the subject user by the user ID only.
+      proposal: Name the user with the full name first and the user ID in brackets, as the request record does.

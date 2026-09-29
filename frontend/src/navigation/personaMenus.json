@@ -165,6 +165,7 @@
             "AUDIT_VIEW",
             "FILE_QUARANTINE_VIEW",
             "MFA_RESET_APPROVE",
+            "MODULE_SWITCH_APPROVE",
             "REPORT_VIEW",
             "SECURITY_PARAMETER_APPROVE",
             "UAM_REPORT_VIEW",
@@ -652,6 +653,7 @@
             "MIG_DECISION_APPROVE",
             "MIG_DQ_WAIVE",
             "MIG_MAPPING_APPROVE",
+            "MIG_RESUBMIT_APPROVE",
             "MIG_SIGNOFF",
             "MIG_VIEW",
             "REPORT_VIEW"

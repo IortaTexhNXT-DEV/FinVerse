@@ -1,6 +1,6 @@
 package com.iortatechnxt.brokerverse.tax.seed;
 
-import com.iortatechnxt.brokerverse.payables.service.SeedActor;
+import com.iortatechnxt.brokerverse.payables.seed.SeedActor;
 import com.iortatechnxt.brokerverse.tax.domain.IcLineItem;
 import com.iortatechnxt.brokerverse.tax.domain.PartyTaxProfile;
 import com.iortatechnxt.brokerverse.tax.domain.TaxCode;
@@ -24,6 +24,7 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,6 +34,7 @@ import org.springframework.stereotype.Component;
  * company are skipped. Used by the seed runner and by the tests.
  */
 @Component
+@Profile({"seed", "test"})
 public class TaxSeedMasters {
 
   /** First day tracked by the seed filing calendar. */

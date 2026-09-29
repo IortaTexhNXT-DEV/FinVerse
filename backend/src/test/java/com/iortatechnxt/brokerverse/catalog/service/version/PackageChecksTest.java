@@ -171,4 +171,44 @@ class PackageChecksTest {
     assertThat(checks.get(1).detail()).isEqualTo("No insurer on the panel");
     assertThat(checks.get(5).detail()).isEqualTo("Not computed for this product");
   }
+
+  @Test
+  void theDetailsNameTheCoveragesCoverTypeAndInsurers() {
+    ProductVersion v =
+        version(
+            1,
+            "1.6",
+            TODAY,
+            List.of(insurer("INS-A", PackageInsurerRole.PANEL, null)),
+            List.of(term("INS-A", "OD_THEFT")));
+    PackageChecks.Names names =
+        new PackageChecks.Names() {
+          @Override
+          public String coverage(String code) {
+            return "OD_THEFT".equals(code) ? "Own Damage and Theft" : "Acts of Nature";
+          }
+
+          @Override
+          public String coverType(String code) {
+            return "Private Car";
+          }
+
+          @Override
+          public String insurer(String code) {
+            return "Alpha Insurance";
+          }
+        };
+    List<ValidationCheck> checks =
+        PackageChecks.run(
+            product("PC"),
+            v,
+            new PackageChecks.Context(
+                "OD_THEFT"::equals, null, TODAY, null, BigDecimal.ONE, names));
+    assertThat(checks.get(0).detail())
+        .isEqualTo("Cover type Private Car; 2 included coverages, 1 basic (Own Damage and Theft)");
+    assertThat(checks.get(1).detail())
+        .isEqualTo(
+            "0 of 1 insurer has terms for 2 included coverages;"
+                + " missing: Alpha Insurance (Acts of Nature)");
+  }
 }

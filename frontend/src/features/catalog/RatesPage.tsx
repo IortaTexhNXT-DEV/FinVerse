@@ -36,8 +36,16 @@ function dated<T extends EffectiveDated>(
     { key: 's', header: 'Status', render: (r) => <StatusBadge status={r.recordStatus} /> },
     {
       key: 'x',
-      header: 'Actions',
-      render: (r) => <RecordActions kind={kind} record={r} refresh={REFRESH} />,
+      header: <span className="visually-hidden">Actions</span>,
+      width: '64px',
+      render: (r) => (
+        <RecordActions
+          kind={kind}
+          record={r}
+          label={`${humanize(kind)} from ${formatDate(r.effectiveFrom)}`}
+          refresh={REFRESH}
+        />
+      ),
     },
   ];
 }

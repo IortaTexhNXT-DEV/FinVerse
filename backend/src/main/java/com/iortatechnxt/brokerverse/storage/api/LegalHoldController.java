@@ -1,9 +1,13 @@
 package com.iortatechnxt.brokerverse.storage.api;
 
 import com.iortatechnxt.brokerverse.common.api.ReasonRequest;
+import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.storage.api.dto.HoldFileResponse;
 import com.iortatechnxt.brokerverse.storage.api.dto.LegalHoldCommand;
 import com.iortatechnxt.brokerverse.storage.api.dto.LegalHoldRequestResponse;
+import com.iortatechnxt.brokerverse.storage.domain.LegalHoldRequest;
 import com.iortatechnxt.brokerverse.storage.service.LegalHoldService;
+import com.iortatechnxt.brokerverse.storage.service.StoredFileService;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
@@ -31,14 +35,38 @@ public class LegalHoldController {
       "hasAnyAuthority('FILE_LEGAL_HOLD_REQUEST', 'FILE_LEGAL_HOLD_APPROVE', 'AUDIT_VIEW')";
 
   private final LegalHoldService holds;
+  private final StoredFileService files;
 
   /**
    * Creates the controller.
    *
    * @param holds legal hold service
+   * @param files stored files (name and type of the file of a request)
    */
-  public LegalHoldController(LegalHoldService holds) {
+  public LegalHoldController(LegalHoldService holds, StoredFileService files) {
     this.holds = holds;
+    this.files = files;
+  }
+
+  /**
+   * A file as the records officers see it before requesting a hold: name, type, record class and
+   * hold status, no content.
+   *
+   * @param id file number
+   * @return file
+   */
+  @GetMapping("/{id}/hold-status")
+  @PreAuthorize(VIEW)
+  public HoldFileResponse holdStatus(@PathVariable Long id) {
+    return HoldFileResponse.from(files.get(id));
+  }
+
+  private LegalHoldRequestResponse withFile(LegalHoldRequest r) {
+    try {
+      return LegalHoldRequestResponse.from(r, files.get(r.getStoredFileId()));
+    } catch (ResourceNotFoundException gone) {
+      return LegalHoldRequestResponse.from(r);
+    }
   }
 
   /**
@@ -65,7 +93,7 @@ public class LegalHoldController {
   @GetMapping("/{id}/legal-hold-requests")
   @PreAuthorize(VIEW)
   public List<LegalHoldRequestResponse> history(@PathVariable Long id) {
-    return holds.historyOf(id).stream().map(LegalHoldRequestResponse::from).toList();
+    return holds.historyOf(id).stream().map(this::withFile).toList();
   }
 
   /**
@@ -76,7 +104,7 @@ public class LegalHoldController {
   @GetMapping("/legal-hold-requests")
   @PreAuthorize(VIEW)
   public List<LegalHoldRequestResponse> pending() {
-    return holds.pending().stream().map(LegalHoldRequestResponse::from).toList();
+    return holds.pending().stream().map(this::withFile).toList();
   }
 
   /**

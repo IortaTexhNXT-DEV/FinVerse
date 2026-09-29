@@ -3,6 +3,7 @@ import { placementApi } from '@/api/placement';
 import type { Readiness, Slip } from '@/api/placement';
 import { Button } from '@/components/ui/Button';
 import { DataTable } from '@/components/ui/DataTable';
+import { countOf, humanize } from '@/utils/format';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -34,6 +35,9 @@ export function GenerateSlipsDialog({
   });
   const rows = readiness.data ?? [];
   const allReady = rows.length > 0 && rows.every((r) => r.ready);
+  const missing = rows.flatMap((r) =>
+    r.unmet.map((u) => ({ key: `${r.arn}:${u.code}`, arn: r.arn, ...u })),
+  );
   return (
     <Modal
       open
@@ -91,19 +95,28 @@ export function GenerateSlipsDialog({
             {
               key: 'ready',
               header: 'Prerequisites',
+              kind: 'status',
               render: (r) =>
                 r.ready ? (
-                  <StatusBadge status="VALID" />
+                  <StatusBadge status="VALID" label="Ready" />
                 ) : (
-                  <ul className="unmet-list">
-                    {r.unmet.map((u) => (
-                      <li key={u.code}>{u.message}</li>
-                    ))}
-                  </ul>
+                  <StatusBadge status="INVALID" label={countOf(r.unmet.length, 'item')} />
                 ),
             },
           ]}
         />
+        {missing.length > 0 && (
+          <DataTable<(typeof missing)[number]>
+            caption="What is still missing"
+            rows={missing}
+            rowKey={(m) => m.key}
+            columns={[
+              { key: 'arn', header: 'ARN', kind: 'code', render: (m) => <code>{m.arn}</code> },
+              { key: 'check', header: 'Check', render: (m) => humanize(m.code) },
+              { key: 'what', header: 'What Is Missing', render: (m) => m.message },
+            ]}
+          />
+        )}
       </div>
     </Modal>
   );

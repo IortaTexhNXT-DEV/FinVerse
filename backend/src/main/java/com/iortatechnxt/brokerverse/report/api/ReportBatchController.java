@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/v1/reports/batches")
-@PreAuthorize("hasAuthority('REPORT_VIEW')")
+@PreAuthorize(ReportController.REPORT_ACCESS)
 public class ReportBatchController {
 
   private static final int MAX_PAGE_SIZE = 100;

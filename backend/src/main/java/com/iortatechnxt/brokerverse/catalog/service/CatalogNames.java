@@ -134,4 +134,20 @@ public class CatalogNames {
         .map(InsurerProfile::getName)
         .orElse(partyCode);
   }
+
+  /**
+   * The name of an insurer by its party code, where no company is at hand (catalog records).
+   *
+   * @param partyCode insurer party code, may be null
+   * @return name, empty when null
+   */
+  public String insurer(String partyCode) {
+    if (partyCode == null) {
+      return "";
+    }
+    return insurers
+        .findFirstByPartyCodeOrderByIdAsc(partyCode)
+        .map(InsurerProfile::getName)
+        .orElse(partyCode);
+  }
 }

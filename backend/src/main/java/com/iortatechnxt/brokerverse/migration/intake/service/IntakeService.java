@@ -181,22 +181,26 @@ public class IntakeService {
         control.extractedAt(),
         control.extractedBy());
     store(companyId, extract, upload);
-    Optional<IntakeChecks.Failure> failure = check(extract, layout, control, upload);
-    if (failure.isPresent()) {
-      return reject(extract, failure.get(), 0);
+    Optional<IntakeChecks.Failure> order = identityChecks(extract, control);
+    if (order.isPresent()) {
+      return reject(extract, IntakeChecks.combine(List.of(order.get()), this::checkName), 0);
+    }
+    List<String> columns = columnNames(layout);
+    ParsedFile parsed = read(upload, columns);
+    List<IntakeChecks.Failure> failures =
+        IntakeChecks.run(extract.getSha256(), control, layout, columns, parsed);
+    if (!failures.isEmpty()) {
+      return reject(extract, IntakeChecks.combine(failures, this::checkName), parsed.rows().size());
     }
     return stage(extract, layout, upload, production);
   }
 
-  private Optional<IntakeChecks.Failure> check(
-      MigExtract extract, Layout layout, ControlFile control, Upload upload) {
-    Optional<IntakeChecks.Failure> order = identityChecks(extract, control);
-    if (order.isPresent()) {
-      return order;
-    }
-    List<String> columns = columnNames(layout);
-    ParsedFile parsed = read(upload, columns);
-    return IntakeChecks.run(extract.getSha256(), control, layout, columns, parsed);
+  private String checkName(String code) {
+    return switch (code) {
+      case DUPLICATE -> "Duplicate file";
+      case AS_OF_ORDER -> "As-of date";
+      default -> IntakeChecks.checkName(code);
+    };
   }
 
   private Optional<IntakeChecks.Failure> identityChecks(MigExtract extract, ControlFile control) {
@@ -286,6 +290,7 @@ public class IntakeService {
 
   private MigExtract reject(MigExtract extract, IntakeChecks.Failure failure, int parsed) {
     extract.reject(failure.code(), failure.message(), parsed, clock.instant());
+    String reasons = String.join("; ", failure.message().lines().toList());
     alerts.raise(
         MigrationCodes.ALERT_EXTRACT_REJECTED,
         new AlertFacts(
@@ -293,14 +298,14 @@ public class IntakeService {
             null,
             MigrationCodes.ENTITY_EXTRACT,
             extract.getExtractNo(),
-            "Extract " + extract.getFileName() + " rejected: " + failure.message(),
+            "Extract " + extract.getFileName() + " rejected: " + reasons,
             null,
             MigrationCodes.ALERT_EXTRACT_REJECTED + ":" + extract.getExtractNo()));
     audit.record(
         MigrationCodes.ENTITY_EXTRACT,
         extract.getExtractNo(),
         AuditAction.REJECT,
-        extract.getFileName() + ": " + failure.code() + " " + failure.message());
+        extract.getFileName() + ": " + failure.code() + " " + reasons);
     return extract;
   }
 

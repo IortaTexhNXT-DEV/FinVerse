@@ -12,19 +12,29 @@ import java.time.ZonedDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.support.CronExpression;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ClassUtils;
 
-/** Registry of all {@link ManagedJob} beans: status for the monitor and on-demand execution. */
+/**
+ * Registry of all {@link ManagedJob} beans: status for the monitor and on-demand execution. The
+ * jobs of a switched-off product module are not shown, not run on their schedule and refused when
+ * started by hand ({@link ProductModules}).
+ */
 @Service
 public class JobRegistry {
 
   /** Cron value that disables scheduling of a job. */
   public static final String DISABLED = "-";
 
+  private static final Logger LOG = LoggerFactory.getLogger(JobRegistry.class);
+
   private final List<ManagedJob> jobs;
   private final JobRunService runs;
   private final Clock clock;
+  private final ProductModules modules;
 
   /**
    * Creates the registry.
@@ -32,8 +42,11 @@ public class JobRegistry {
    * @param jobs all job beans
    * @param runs run recorder
    * @param clock clock
+   * @param modules product module switches
    */
-  public JobRegistry(List<ManagedJob> jobs, JobRunService runs, Clock clock) {
+  public JobRegistry(
+      List<ManagedJob> jobs, JobRunService runs, Clock clock, ProductModules modules) {
+    this.modules = modules;
     this.jobs = jobs.stream().sorted(Comparator.comparing(ManagedJob::name)).toList();
     this.runs = runs;
     this.clock = clock;
@@ -55,6 +68,7 @@ public class JobRegistry {
    */
   public List<JobStatus> statuses() {
     return jobs.stream()
+        .filter(j -> modules.isClassOn(ClassUtils.getUserClass(j)))
         .map(j -> new JobStatus(j, runs.latest(j.name()), nextRun(j.cron())))
         .toList();
   }
@@ -68,8 +82,24 @@ public class JobRegistry {
    */
   public JobRun run(String name, JobTrigger trigger) {
     ManagedJob job = require(name);
+    modules.requireClassOn(ClassUtils.getUserClass(job));
     LocalDate businessDate = BusinessClock.today(clock);
     return runs.execute(job.name(), trigger, () -> job.execute(businessDate));
+  }
+
+  /**
+   * Runs a job on its schedule, unless its product module is switched off.
+   *
+   * @param name job name
+   * @return the finished run, empty when the module is off and the job did not run
+   */
+  public Optional<JobRun> runScheduled(String name) {
+    ManagedJob job = require(name);
+    if (!modules.isClassOn(ClassUtils.getUserClass(job))) {
+      LOG.info("Job {} not run: its product module is switched off", name);
+      return Optional.empty();
+    }
+    return Optional.of(run(name, JobTrigger.SCHEDULED));
   }
 
   /**

@@ -7,6 +7,7 @@ import type { PackageRequest } from '@/api/productmaint';
 import { Attachments } from '@/components/attachments/Attachments';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { Notice } from '@/components/ui/Notice';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
@@ -116,9 +117,9 @@ function Form({ initial }: Readonly<{ initial: RequestForm }>) {
       />
       <ErrorAlert error={save.error ?? submit.error ?? prefill.error} />
       {gaps.length > 0 && (
-        <p className="muted" role="status">
-          Before submitting, complete {gaps.join('; ')}.
-        </p>
+        <Notice tone="info" title="Before submitting">
+          Complete {gaps.join('; ')}.
+        </Notice>
       )}
       <RequestHeaderCard form={form} set={set} errors={errors} />
       {form.type !== 'RETIRE' && (
@@ -126,6 +127,7 @@ function Form({ initial }: Readonly<{ initial: RequestForm }>) {
           terms={form.terms}
           onChange={(terms) => set({ terms })}
           errors={errors}
+          lineCode={form.lineCode}
           withInsurers={form.negotiationRequired}
         />
       )}

@@ -1,6 +1,7 @@
 # iNXT BrokerVerse - BDOI Data Migration (BRD-13) Build Design
 
-Status: **proposal for review; not built.** It extends `docs/architecture/BROKING_ARCHITECTURE.md`,
+Status: **built** (package `migration`, migrations V1080 onwards, the Data Migration screens and reports; BRD-13 Drop 0
+sign-off set), kept as the design of record and updated with each change. It extends `docs/architecture/BROKING_ARCHITECTURE.md`,
 `docs/architecture/OPERATIONS_DESIGN.md` and the Developer Guide, and it does not change them. Requirements baseline:
 [`BDOI_DM_BRD_SPEC.md`](../requirements/BDOI_DM_BRD_SPEC.md) (23 requirement rows BRID 1.1a-12.1, fit/gap and questions
 DMQ01-DMQ39). Every class, migration and screen cites its BRD ID in Javadoc or a comment, for example `BRID 5.2`.

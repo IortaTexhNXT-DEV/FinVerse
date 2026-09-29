@@ -19,12 +19,6 @@
 }
 
 /* Unmet prerequisites of a placement slip */
-.unmet-list {
-  margin: 0;
-  padding-left: var(--space-4);
-  color: var(--color-danger);
-  font-size: 13px;
-}
 
 /* Side-by-side comparison (extraction review) */
 .compare-table td.differs {

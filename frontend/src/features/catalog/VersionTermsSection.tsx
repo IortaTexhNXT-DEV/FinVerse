@@ -5,6 +5,24 @@ import { DataTable } from '@/components/ui/DataTable';
 import type { TermRow, VersionForm } from './versionForm';
 import { syncTerms } from './versionForm';
 import { CoverageName, InsurerName } from '@/components/broking/LovLabel';
+import { formatAmount } from '@/utils/format';
+
+const DASH = <span className="muted">—</span>;
+
+/** A value of a released version: an amount with separators, wrapped text, a dash when empty. */
+function ReadOnlyValue({ value, text }: Readonly<{ value: string; text: boolean }>) {
+  if (value === '') {
+    return DASH;
+  }
+  if (text) {
+    return <span style={{ whiteSpace: 'normal', overflowWrap: 'anywhere' }}>{value}</span>;
+  }
+  return <>{formatAmount(value)}</>;
+}
+
+function yesNo(flag: boolean): string {
+  return flag ? 'Yes' : 'No';
+}
 
 interface Props {
   form: VersionForm;
@@ -28,6 +46,16 @@ export function VersionTermsSection({ form, lineCode, readOnly, onChange }: Read
     (c) => c.recordStatus === 'ACTIVE' && (!c.lineCode || c.lineCode === lineCode),
   );
   const rows = syncTerms(form);
+  const clauseTitles = (codes: string[]) =>
+    codes.length === 0 ? (
+      DASH
+    ) : (
+      <span style={{ whiteSpace: 'normal' }}>
+        {codes
+          .map((code) => (clauses.data ?? []).find((c) => c.code === code)?.title ?? code)
+          .join('; ')}
+      </span>
+    );
   const update = (row: TermRow, change: Partial<TermRow>) =>
     onChange({
       ...form,
@@ -37,16 +65,20 @@ export function VersionTermsSection({ form, lineCode, readOnly, onChange }: Read
     row: TermRow,
     key: 'limitAmount' | 'deductibleAmount' | 'deductibleText',
     label: string,
-  ) => (
-    <input
-      className="input"
-      aria-label={`${label} of ${row.insurerCode} on ${row.coverageCode}`}
-      type={key === 'deductibleText' ? 'text' : 'number'}
-      value={row[key]}
-      disabled={readOnly}
-      onChange={(e) => update(row, { [key]: e.target.value })}
-    />
-  );
+  ) => {
+    if (readOnly) {
+      return <ReadOnlyValue value={row[key]} text={key === 'deductibleText'} />;
+    }
+    return (
+      <input
+        className="input"
+        aria-label={`${label} of ${row.insurerCode} on ${row.coverageCode}`}
+        type={key === 'deductibleText' ? 'text' : 'number'}
+        value={row[key]}
+        onChange={(e) => update(row, { [key]: e.target.value })}
+      />
+    );
+  };
   return (
     <Card title="Insurer Terms" flush>
       <DataTable<TermRow>
@@ -71,20 +103,29 @@ export function VersionTermsSection({ form, lineCode, readOnly, onChange }: Read
           {
             key: 'n',
             header: 'Covered',
-            render: (t) => (
-              <input
-                type="checkbox"
-                aria-label={`${t.insurerCode} covers ${t.coverageCode}`}
-                checked={t.included}
-                disabled={readOnly}
-                onChange={(e) => update(t, { included: e.target.checked })}
-              />
-            ),
+            render: (t) =>
+              readOnly ? (
+                yesNo(t.included)
+              ) : (
+                <input
+                  type="checkbox"
+                  aria-label={`${t.insurerCode} covers ${t.coverageCode}`}
+                  checked={t.included}
+                  disabled={readOnly}
+                  onChange={(e) => update(t, { included: e.target.checked })}
+                />
+              ),
           },
-          { key: 'l', header: 'Limit', render: (t) => input(t, 'limitAmount', 'Limit') },
+          {
+            key: 'l',
+            header: 'Limit',
+            numeric: readOnly,
+            render: (t) => input(t, 'limitAmount', 'Limit'),
+          },
           {
             key: 'd',
             header: 'Deductible',
+            numeric: readOnly,
             render: (t) => input(t, 'deductibleAmount', 'Deductible'),
           },
           {
@@ -95,24 +136,27 @@ export function VersionTermsSection({ form, lineCode, readOnly, onChange }: Read
           {
             key: 'k',
             header: 'Clauses',
-            render: (t) => (
-              <select
-                multiple
-                className="select"
-                aria-label={`Clauses of ${t.insurerCode} on ${t.coverageCode}`}
-                value={t.clauseCodes}
-                disabled={readOnly}
-                onChange={(e) =>
-                  update(t, { clauseCodes: [...e.target.selectedOptions].map((o) => o.value) })
-                }
-              >
-                {options.map((c) => (
-                  <option key={c.code} value={c.code}>
-                    {c.title}
-                  </option>
-                ))}
-              </select>
-            ),
+            render: (t) =>
+              readOnly ? (
+                clauseTitles(t.clauseCodes)
+              ) : (
+                <select
+                  multiple
+                  className="select"
+                  aria-label={`Clauses of ${t.insurerCode} on ${t.coverageCode}`}
+                  value={t.clauseCodes}
+                  disabled={readOnly}
+                  onChange={(e) =>
+                    update(t, { clauseCodes: [...e.target.selectedOptions].map((o) => o.value) })
+                  }
+                >
+                  {options.map((c) => (
+                    <option key={c.code} value={c.code}>
+                      {c.title}
+                    </option>
+                  ))}
+                </select>
+              ),
           },
         ]}
       />

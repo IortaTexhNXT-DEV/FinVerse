@@ -494,7 +494,10 @@ class Pack:
         parts = []
         for p in (REPO / "frontend" / "src").rglob("*.ts*"):
             if not re.search(r"\.(test|spec)\.tsx?$", p.name):
-                parts.append(code_facts._strip_comments(p.read_text(encoding="utf-8", errors="ignore")))
+                text = code_facts._strip_comments(p.read_text(encoding="utf-8", errors="ignore"))
+                # ${BRAND.product} and the other theme pack texts read as the deployment shows them.
+                parts.append(re.sub(r"\$\{\s*BRAND\.(\w+)\s*\}",
+                                    lambda m: code_facts._theme_pack().get(m.group(1), m.group(0)), text))
         for wf in code_facts.workflows().values():
             parts += [str(x.get("name") or "") for x in wf["stages"]]
             parts += [str(x.get("label") or "") for x in wf["transitions"]]

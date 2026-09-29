@@ -10,6 +10,20 @@ import { AuthContext } from './authContext';
 import type { SignOutReason } from './authContext';
 import { useServerKeepAlive } from './useServerKeepAlive';
 import { loadUserDirectory, resetUserDirectory } from '@/api/users';
+import { modulesApi } from '@/api/modules';
+import type { ModulesInUse } from '@/api/modules';
+import { mayUse } from '@/navigation/productModules';
+
+const ALL_MODULES_ON: ModulesInUse = { switchedOff: [], inactivePermissions: [] };
+
+/** The product modules switched off; all modules count as on when the server cannot say. */
+async function modulesInUse(): Promise<ModulesInUse> {
+  try {
+    return await modulesApi.inUse();
+  } catch {
+    return ALL_MODULES_ON;
+  }
+}
 
 /** How long a new tab waits for an open tab to share its session (BRNB.082). */
 const HANDSHAKE_MS = 400;
@@ -68,6 +82,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [user, setUser] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [passwordChange, setPasswordChange] = useState<PasswordChangeReason | null>(null);
+  const [modules, setModules] = useState<ModulesInUse>(ALL_MODULES_ON);
 
   const signOutHere = useCallback(() => {
     tokenStore.clear();
@@ -95,6 +110,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     try {
       const profile = await api.get<UserProfile>('/auth/me');
       setPasswordChange(await dueChange(profile));
+      setModules(await modulesInUse());
       setUser(profile);
       void loadUserDirectory();
     } catch {
@@ -134,7 +150,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
 
   useServerKeepAlive(user !== null);
 
-  const completeSignIn = useCallback((result: LoginResponse) => {
+  const completeSignIn = useCallback(async (result: LoginResponse) => {
     if (result.accessToken === undefined || result.user === undefined) {
       return;
     }
@@ -143,6 +159,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     setPasswordChange(
       result.mustChangePassword === true ? (result.passwordChangeReason ?? 'RESET') : null,
     );
+    setModules(await modulesInUse());
     setUser(result.user);
     void loadUserDirectory();
     tabSession().announceLogin({ token: result.accessToken, expiresAt: result.expiresAt });
@@ -155,7 +172,7 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
         password,
         deviceToken: rememberedDevice(username),
       });
-      completeSignIn(result);
+      await completeSignIn(result);
       return result;
     },
     [completeSignIn],
@@ -166,9 +183,12 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
     setUser((current) => (current === null ? null : { ...current, mustChangePassword: false }));
   }, []);
 
+  // Permissions of switched-off product modules grant nothing; "MODULE_OFF:<code>" asks whether a
+  // product module is switched off (menus and widgets of the module).
   const can = useCallback(
-    (permission: string) => user?.permissions.includes(permission) ?? false,
-    [user],
+    (permission: string) =>
+      user !== null && mayUse(permission, modules, (p) => user.permissions.includes(p)),
+    [user, modules],
   );
 
   const value = useMemo(

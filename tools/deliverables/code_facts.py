@@ -21,6 +21,8 @@ No build is needed: the sources are parsed as text. The parsers cover the patter
 
 from __future__ import annotations
 
+import json
+import os
 import re
 from functools import lru_cache
 import sys
@@ -315,7 +317,7 @@ def frontend_menu() -> list[Group]:
     """The sidebar groups in display order (navigation/modules.ts NAV_GROUPS)."""
     idx = _TsIndex()
     text = _strip_comments(MODULES_TS.read_text(encoding="utf-8"))
-    m = re.search(r"NAV_GROUPS[^=]*=\s*\[", text)
+    m = re.search(r"NAV_GROUPS[^=]*=\s*(?:\w+\()?\[", text)  # withProductModules([...])
     arr = text[m.end() - 1:matching(text, m.end() - 1) + 1]
     groups: list[Group] = []
     for g in split_top(arr[1:-1]):
@@ -970,10 +972,24 @@ def _ts_text(expr: str, extended: bool = False) -> str | None:
     return _ts_string(expr)
 
 
+@lru_cache(maxsize=1)
+def _theme_pack() -> dict[str, str]:
+    """The texts of the theme pack the documents are built for (VITE_THEME_PACK, "bdoi" unless set): BRAND.product,
+    BRAND.client ... of the screens read as the deployment shows them."""
+    pack = os.environ.get("VITE_THEME_PACK", "bdoi")
+    path = REPO / "frontend" / "src" / "theme" / "packs" / pack / "theme.json"
+    data = json.loads(path.read_text(encoding="utf-8")) if path.exists() else {}
+    return {k: v for k, v in data.items() if isinstance(v, str)}
+
+
 def _expr_name(expr: str) -> str:
-    """<name> for a JSX or template expression: the last member name, in words; <list> for a .map()."""
+    """<name> for a JSX or template expression: the last member name, in words; <list> for a .map(); the text of
+    the theme pack for BRAND.<text>."""
     if ".map(" in expr:
         return "<list>"
+    brand = re.fullmatch(r"\s*BRAND\.(\w+)\s*", expr)
+    if brand and brand.group(1) in _theme_pack():
+        return _theme_pack()[brand.group(1)]
     inner = expr.strip()
     for _ in range(4):
         inner = re.sub(r"\.(toLowerCase|toUpperCase|trim|toString|toFixed|toLocaleString|replace|replaceAll)\([^()]*\)$", "", inner)

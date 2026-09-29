@@ -116,18 +116,20 @@ function Rules({ detail, maintain }: Readonly<{ detail: ProductDetail; maintain:
       <Card title="Field matrix" flush actions={addButton('fields')}>
         <FieldMatrix rules={detail.fieldRules} />
       </Card>
-      <Card title="Documents required before submission" actions={addButton('documents')}>
-        {detail.requiredDocuments.length === 0 ? (
-          <p className="muted">No document is required.</p>
-        ) : (
-          <ul>
-            {detail.requiredDocuments.map((t) => (
-              <li key={t}>
-                <LovLabel type="DOCUMENT_TYPE" code={t} />
-              </li>
-            ))}
-          </ul>
-        )}
+      <Card title="Documents required before submission" flush actions={addButton('documents')}>
+        <DataTable<{ type: string }>
+          caption="Documents required before submission"
+          rows={detail.requiredDocuments.map((type) => ({ type }))}
+          rowKey={(d) => d.type}
+          emptyMessage="No document is required."
+          columns={[
+            {
+              key: 'd',
+              header: 'Document',
+              render: (d) => <LovLabel type="DOCUMENT_TYPE" code={d.type} />,
+            },
+          ]}
+        />
       </Card>
       {adding && (
         <RuleEditorModal
@@ -227,6 +229,7 @@ export default function ProductDetailPage() {
             <RecordActions
               kind="PRODUCT"
               record={d.product}
+              label={`${d.product.code} ${d.product.name}`}
               refresh={[['catalog']]}
               authorizers={PRODUCT_AUTHORIZERS}
               maintainers={PRODUCT_MAINTAINERS}

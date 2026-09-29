@@ -3,7 +3,7 @@
 # This file says where each message appears (by the class or file that raises it) and what the user does.
 sources:
   backend_packages: [productmaint, catalog]
-  exclude_classes: [PackageVersionStubDefaults]
+  exclude_classes: []
   bulk_handlers: []
   frontend_dirs: [features/productmaint, features/catalog]
 

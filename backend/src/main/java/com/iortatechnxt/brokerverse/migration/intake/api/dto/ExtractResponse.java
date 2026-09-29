@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.migration.intake.api.dto;
 import com.iortatechnxt.brokerverse.migration.intake.domain.MigExtract;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * An extract received from a legacy system (FR-DM-008).
@@ -27,7 +28,8 @@ import java.time.LocalDateTime;
  * @param masked masked on intake
  * @param status status
  * @param rejectCode rejection reason code
- * @param rejectMessage rejection message
+ * @param rejectMessage rejection message, one line per failed check
+ * @param rejectChecks every failed check with its reason (empty unless rejected)
  * @param receivedBy receiver
  * @param receivedAt time
  * @param purgedAt purge time of the staged rows
@@ -54,9 +56,12 @@ public record ExtractResponse(
     String status,
     String rejectCode,
     String rejectMessage,
+    List<RejectCheck> rejectChecks,
     String receivedBy,
     Instant receivedAt,
     Instant purgedAt) {
+
+  private static final String SEPARATOR = ": ";
 
   /**
    * Maps an extract.
@@ -87,8 +92,34 @@ public record ExtractResponse(
         e.getStatus().name(),
         e.getRejectCode(),
         e.getRejectMessage(),
+        rejectChecks(e.getRejectMessage()),
         e.getReceivedBy(),
         e.getReceivedAt(),
         e.getPurgedAt());
+  }
+
+  /**
+   * A failed intake check of a rejected extract.
+   *
+   * @param check check name (Checksum, Columns, Row count, Amount total, Hash total...)
+   * @param reason the difference found
+   */
+  public record RejectCheck(String check, String reason) {}
+
+  private static List<RejectCheck> rejectChecks(String message) {
+    if (message == null || message.isBlank()) {
+      return List.of();
+    }
+    return message
+        .lines()
+        .filter(line -> !line.isBlank())
+        .map(
+            line -> {
+              int at = line.indexOf(SEPARATOR);
+              return at < 0
+                  ? new RejectCheck("Intake check", line)
+                  : new RejectCheck(line.substring(0, at), line.substring(at + SEPARATOR.length()));
+            })
+        .toList();
   }
 }

@@ -76,11 +76,13 @@ function Coverages({ onEdit }: Readonly<{ onEdit: (c: Coverage) => void }>) {
           { key: 's', header: 'Status', render: (c) => <StatusBadge status={c.recordStatus} /> },
           {
             key: 'a',
-            header: 'Actions',
+            header: <span className="visually-hidden">Actions</span>,
+            width: '64px',
             render: (c) => (
               <RecordActions
                 kind="COVERAGE"
                 record={c}
+                label={c.name}
                 refresh={[['catalog', 'coverages']]}
                 authorizers={AUTHORIZERS}
                 maintainers={MAINTAINERS}
@@ -125,11 +127,13 @@ function Clauses({ onEdit }: Readonly<{ onEdit: (c: Clause) => void }>) {
           { key: 's', header: 'Status', render: (c) => <StatusBadge status={c.recordStatus} /> },
           {
             key: 'a',
-            header: 'Actions',
+            header: <span className="visually-hidden">Actions</span>,
+            width: '64px',
             render: (c) => (
               <RecordActions
                 kind="CLAUSE"
                 record={c}
+                label={c.title}
                 refresh={[['catalog', 'clauses']]}
                 authorizers={AUTHORIZERS}
                 maintainers={MAINTAINERS}

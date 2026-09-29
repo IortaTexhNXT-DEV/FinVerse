@@ -9,6 +9,7 @@ import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.Permission;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
+import com.iortatechnxt.brokerverse.system.service.ProductModules;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -35,6 +36,7 @@ public class AccessMatrixService {
   private final PermissionActions actions;
   private final DocumentComposer composer;
   private final AuditTrailService audit;
+  private final ProductModules modules;
 
   /**
    * Creates the service.
@@ -43,12 +45,15 @@ public class AccessMatrixService {
    * @param actions permission action classes
    * @param composer spreadsheet composer
    * @param audit audit trail
+   * @param modules product module switches (permissions of switched-off modules are not shown)
    */
   public AccessMatrixService(
       UserAdminService userAdmin,
       PermissionActions actions,
       DocumentComposer composer,
-      AuditTrailService audit) {
+      AuditTrailService audit,
+      ProductModules modules) {
+    this.modules = modules;
     this.userAdmin = userAdmin;
     this.actions = actions;
     this.composer = composer;
@@ -67,6 +72,9 @@ public class AccessMatrixService {
             .collect(Collectors.groupingBy(PermissionAction::permission, Collectors.toList()));
     List<AccessMatrix.PermissionRow> rows = new ArrayList<>();
     for (Permission p : Permission.offered()) {
+      if (!modules.isPermissionActive(p.name())) {
+        continue;
+      }
       Set<String> granted = new TreeSet<>();
       roles.stream()
           .filter(r -> r.getPermissions().contains(p))

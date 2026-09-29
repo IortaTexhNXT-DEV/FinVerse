@@ -1,12 +1,15 @@
-package com.iortatechnxt.brokerverse.payables.service;
+package com.iortatechnxt.brokerverse.payables.seed;
 
 import com.iortatechnxt.brokerverse.payables.domain.PettyCashDisbursement;
 import com.iortatechnxt.brokerverse.payables.domain.PettyCashDisbursementValues;
 import com.iortatechnxt.brokerverse.payables.domain.PettyCashFund;
 import com.iortatechnxt.brokerverse.payables.domain.PettyCashReimbursement;
+import com.iortatechnxt.brokerverse.payables.service.PettyCashFundService;
+import com.iortatechnxt.brokerverse.payables.service.PettyCashService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 /**
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Component;
  * end up to August, leaving September's vouchers pending reimbursement.
  */
 @Component
+@Profile({"seed", "test"})
 public class PettyCashSeedData {
 
   private static final int YEAR = 2026;

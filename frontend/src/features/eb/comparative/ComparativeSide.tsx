@@ -68,16 +68,31 @@ export function CommentsCard({ view }: Readonly<{ view: ComparativeView }>) {
   return (
     <Card title="Comments">
       <div className="stack">
-        {view.comments.length === 0 && <p className="muted">No comment yet</p>}
-        {view.comments.map((c) => (
-          <div key={c.id} className="eb-comment">
-            <div className="muted">
-              <UserName login={c.createdBy} /> · {formatDateTime(c.createdAt)}{' '}
-              {c.authorKind === 'CLIENT' && <Tag tone="info">Client</Tag>}
-            </div>
-            <div>{c.text}</div>
-          </div>
-        ))}
+        <DataTable<ComparativeView['comments'][number]>
+          caption="Comments"
+          rows={view.comments}
+          rowKey={(c) => c.id}
+          emptyMessage="No comment yet"
+          columns={[
+            {
+              key: 'by',
+              header: 'By',
+              render: (c) => (
+                <CellStack
+                  main={<UserName login={c.createdBy} />}
+                  sub={formatDateTime(c.createdAt)}
+                />
+              ),
+            },
+            {
+              key: 'from',
+              header: 'From',
+              kind: 'status',
+              render: (c) => (c.authorKind === 'CLIENT' ? <Tag tone="info">Client</Tag> : 'Broker'),
+            },
+            { key: 'text', header: 'Comment', render: (c) => c.text },
+          ]}
+        />
         {can('EB_VIEW') && (
           <>
             <ErrorAlert error={add.error} />

@@ -9,7 +9,7 @@ screens:
       progress, failed or with rejects, open reconciliation breaks, unmapped legacy codes, open validation errors and
       client pairs to review, with the next cut-over tasks and the run-off of the legacy policies. Each tile opens the
       screen where the item is worked.
-    entry: ["Sidebar › Data Migration › Migration Home"]
+    entry: ["Sidebar › Data Migration › Migration Home", "Landing page after sign-in of the migration roles"]
     shots:
       - {state: view, user: miglead, caption: Migration Home with the tiles, the next cut-over tasks and the run-off}
     fields:
@@ -30,6 +30,7 @@ screens:
       - "[A tile] | Every migration role | Always | Opens the screen of the tile | - | -"
     rules:
       - "A tile marked Needs attention has at least one item that blocks a gate: a failed batch, a break, an unmapped code or an open error (FR-DM-003)."
+      - "The migration roles (operator, steward, owner, lead, reconciliation approver, go / no-go board) land on Migration Home after sign-in; My Approvals stays one click away in the header (FR-DM-003)."
       - "The run-off table is the latest monthly snapshot of the legacy policies in force at go-live (FR-DM-122)."
     outcome: The Data Migration Lead sees what blocks the next gate and opens it in one click.
     frs: [FR-DM-003, FR-DM-120, FR-DM-122]
@@ -178,12 +179,12 @@ screens:
     purpose: >-
       Receives each legacy extract with its control file and runs the intake checks: file name, checksum, header,
       row count, amount totals and hash total. A file that passes is staged (masked outside production); a file that
-      fails is rejected as a whole with the reason. The list shows every extract with its layout, source, as-of date,
-      rows, masking, who received it and its status.
+      fails is rejected as a whole, with every failed check and its reason. The list shows every extract with its
+      layout, source, as-of date, rows received and staged, masking, who received it and its status.
     entry: ["Migration Home › Upload Extract"]
     shots:
-      - {state: list, user: migops, caption: Extracts with the upload card and the intake results}
-      - {state: rejected, user: migops, caption: An extract rejected at intake with its reason}
+      - {state: list, user: migops, caption: "Extracts with the upload card (Still needed: the files to choose) and the intake results"}
+      - {state: rejected, user: migops, caption: An extract rejected at intake with every failed check and its reason}
     fields:
       - "Upload an extract | Data file | File | LAYOUT_SOURCE_yyyyMMdd_nn.csv or .xlsx | Y | - | - | - | Name, layout, source system and date of the name are valid; the object is decided | Name the file <LAYOUT>_<SOURCE>_<yyyyMMdd>_<nn>.csv or .xlsx, for example F01C_EBIX_20271231_01.csv"
       - "Upload an extract | Control file | File | <data file name>.ctl.csv | Y | - | - | - | Row count, hash total, amount totals and SHA-256 agree with the data file | The file has <n> rows; the control file says <m>"
@@ -192,17 +193,18 @@ screens:
       - "Extracts | Extract | Column | MGX-yyyy-nnnnnn with the file name under it | - | Extracts | - | - | - | -"
       - "Extracts | Layout | Column | Layout and version; source system and mode under it | - | Extracts | - | - | - | -"
       - "Extracts | As of | Column | dd-MMM-yyyy HH:mm | - | Control file | - | - | - | -"
-      - "Extracts | Rows | Column | Staged / declared | - | Intake | - | - | - | -"
+      - "Extracts | Rows Received | Column | Number of rows read from the data file | - | Intake | - | - | - | -"
+      - "Extracts | Rows Staged | Column | Number of rows staged (0 when rejected) | - | Intake | - | - | - | -"
       - "Extracts | Masked | Column | Yes or No | - | Environment | - | - | - | -"
-      - "Extracts | Received | Column | Date and time, user under it | - | Intake | - | - | - | -"
-      - "Extracts | Rejection reason | Column | Text | - | Intake | - | - | - | -"
+      - "Extracts | Received On | Column | Date and time, user under it | - | Intake | - | - | - | -"
+      - "Extracts | Rejection Reason | Column | Each failed check with its reason (Row count, Checksum, Columns, Amount total, Hash total) | - | Intake | - | - | - | -"
       - "Extracts | Status | Pill | Received, Checked, Staged, Rejected, Purged | - | Intake | - | - | - | -"
     actions:
-      - "Upload and Check | Migration Operator | A data file and a control file are chosen | Receives the files and runs the intake checks; the message gives the extract number and the staged rows, or the rejection | Staged or Rejected | Alert Extract rejected to the Data Migration Lead"
+      - "Upload and Check | Migration Operator | A data file and a control file are chosen (until then the card says what is still needed) | Receives the files and runs every intake check; the message gives the extract number and the staged rows, or the rejection with the number of failed checks, listed on the card | Staged or Rejected | Alert Extract rejected to the Data Migration Lead"
       - "[Download on a row] | Migration Operator | File not yet purged | Downloads the data file as received | - | -"
     rules:
       - "The file name starts with the layout code, then the source system, the as-of date and the sequence of the day (FR-DM-010)."
-      - "A file whose checksum, header, row count, amount totals or hash total do not agree with its control file is rejected; nothing of it is staged (FR-DM-010)."
+      - "A file whose checksum, header, row count, amount totals or hash total do not agree with its control file is rejected; nothing of it is staged. Every check runs, and the rejection lists each failed check with its own reason (FR-DM-010)."
       - "Extracts are received only for objects decided for migration (FR-DM-002)."
       - "Staged rows and files are purged 5 days after the batch is accepted or rolled back, or after the rejection (FR-DM-010)."
     outcome: Every file BDOI sends is either staged exactly as extracted or rejected with the reason and the difference.

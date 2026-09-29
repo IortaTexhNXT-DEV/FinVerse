@@ -5,22 +5,39 @@
 # each persona), the changes of the issue and the points for the UX Design team to confirm.
 
 issue:
-  version: "2.0"
-  date: 28 September 2026
+  version: "2.1"
+  date: 29 September 2026
   changes:
-    - ref: CHG-PM-2.0-01
-      what: Sales Organisation shown as a tree table, with the actions menu of each row and the refused deactivation
-      screens: [SCR-PM-20]
-    - ref: CHG-PM-2.0-02
-      what: >-
-        Package Version: the header with its package request, the Validation Checklist of the validator and the
-        Validation card of a released version with the checks and the figures compared
+    - ref: CHG-PM-2.1-01
+      what: The Details of the validation checks name the cover type, the coverages and the insurers by their names
       screens: [SCR-PM-13]
-      images: [scr-pm-13-01-draft, scr-pm-13-05-validation, scr-pm-13-06-released, wt-a-16, wt-a-17]
-    - ref: CHG-PM-2.0-03
-      what: The rule parameters of an incentive criterion as a table of parameters and values
-      screens: [SCR-PM-16]
-      images: [scr-pm-16-02-new]
+      images: [scr-pm-13-05-validation, scr-pm-13-06-released, wt-a-16, wt-a-17]
+    - ref: CHG-PM-2.1-02
+      what: >-
+        A released version shows its rate scheme, dates and terms as values: amounts with separators, rates with their
+        decimals, a dash when empty and long texts wrapped
+      screens: [SCR-PM-13]
+      images: [scr-pm-13-06-released, wt-a-17]
+    - ref: CHG-PM-2.1-03
+      what: >-
+        The coverages of a request are chosen by name from the coverages of the product line, and the hint Before
+        submitting is an information notice
+      screens: [SCR-PM-03]
+      images: [scr-pm-03-01-empty, scr-pm-03-02-filled, scr-pm-03-03-error, ux-scr-pm-03-saved]
+    - ref: CHG-PM-2.1-04
+      what: >-
+        The actions of the step bar stay on one row, and an action that closes the request off its path (Not
+        Proceeded) is shown in red
+      screens: [SCR-PM-04, SCR-PM-05]
+      images: [scr-pm-04-01-record, scr-pm-04-02-approval, scr-pm-05-01-tab, ux-scr-pm-04-cmp-stepper]
+    - ref: CHG-PM-2.1-05
+      what: >-
+        Authorize and Deactivate of the catalog records (products, coverages and clauses, incentive criteria,
+        insurers, rates) through the row action menu, each confirmed in a dialog; a deactivation asks the reason, kept
+        in the audit trail; the required documents of a product as a table
+      screens: [SCR-PM-11, SCR-PM-12, SCR-PM-15, SCR-PM-16, SCR-PM-17, SCR-PM-18, SCR-PM-19]
+      images: [scr-pm-11-01-list, scr-pm-12-01-record, scr-pm-15-01-list, scr-pm-15-02-clauses, scr-pm-16-01-list,
+               scr-pm-17-01-list, scr-pm-18-01-record, scr-pm-19-01-list]
 
 personas:
   MKT_AO: {who: "An account officer of Retail, Corporate or Combank / Corbank Marketing who serves the clients"}
@@ -102,37 +119,7 @@ states:
 confirm:
   clarifications: [CLR-PM-11, CLR-PM-12, CLR-PM-17, CLR-PM-18, CLR-PM-19, CLR-PM-20]
   findings:
-    - screens: [SCR-PM-13]
-      observation: >-
-        The Details column of the validation checks shows list codes (COMPREHENSIVE, OD_THEFT) next to the counts.
-      proposal: Show the cover type and the coverages by their names, as the other columns of the screens do.
-    - screens: [SCR-PM-13]
-      observation: >-
-        A released version shows its rate scheme and dates in read-only input boxes; the amounts read 5000 and
-        5000000 and the rate 1.2, without the separators and decimals of the screen standard.
-      proposal: >-
-        Show a released (read-only) version as a label and value grid with the amounts formatted (5,000.00;
-        5,000,000.00) and the rate as keyed with the percent sign.
-    - screens: [SCR-PM-13]
-      observation: >-
-        On a released version an empty date (Anniversary) shows the format hint dd-MMM-yyyy, and a long text
-        (Computation Basis) is cut at the edge of its box.
-      proposal: Show a dash for an empty value and the whole text of a read-only field (wrapped).
     - screens: [SCR-PM-03]
       observation: >-
-        On the request form the coverage is keyed as a code (Coverage code) and the amounts show without separators
-        while typed (2000000, 5000000); the hint "Before submitting, complete the package end date." is plain text
-        above the form.
-      proposal: >-
-        Pick the coverage by its name from the coverage list, format the amounts when the field is left, and show
-        the hint as the one-line information notice of the notice standard.
-    - screens: [SCR-PM-04, SCR-PM-05]
-      observation: >-
-        In the workflow step bar of a request in negotiation the stage actions wrap to a second line under the meta
-        row, and Not Proceeded (which ends the request) has the look of the other secondary actions.
-      proposal: >-
-        Keep the actions on the meta row, or give them their own right-aligned row by design; show Not Proceeded as
-        the destructive action, last and in red, as the page action order asks.
-    - screens: [SCR-PM-16]
-      observation: The Actions column of Incentive Criteria shows Deactivate as a link in the row.
-      proposal: Offer the row actions through the row action menu of the table standard (Deactivate last, in red).
+        On the request form the amounts show without separators while typed (2000000, 5000000).
+      proposal: Format the amounts when the field is left, as the amount fields of the other forms do.

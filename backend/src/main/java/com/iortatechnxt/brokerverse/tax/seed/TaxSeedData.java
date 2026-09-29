@@ -3,7 +3,7 @@ package com.iortatechnxt.brokerverse.tax.seed;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
-import com.iortatechnxt.brokerverse.payables.service.SeedActor;
+import com.iortatechnxt.brokerverse.payables.seed.SeedActor;
 import com.iortatechnxt.brokerverse.tax.domain.RemittanceFacts;
 import com.iortatechnxt.brokerverse.tax.domain.ReturnStatus;
 import com.iortatechnxt.brokerverse.tax.domain.TaxPeriod;

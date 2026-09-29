@@ -93,17 +93,14 @@ export function MatchesTab({ detail }: Readonly<{ detail: CaseDetail }>) {
         loading={matches.isLoading}
         emptyMessage="No match is linked to this case"
         columns={[
+          { key: 'entry', header: 'List Entry', render: (m) => <strong>{m.entryName}</strong> },
+          { key: 'source', header: 'Source', render: (m) => m.sourceCode },
+          { key: 'list', header: 'List', render: (m) => humanize(m.listType) },
           {
-            key: 'entry',
-            header: 'List Entry',
-            render: (m) => (
-              <>
-                <strong>{m.entryName}</strong>
-                <span className="cell-sub">
-                  {m.sourceCode} · {humanize(m.listType)} · v{m.entryVersion}
-                </span>
-              </>
-            ),
+            key: 'version',
+            header: 'Entry Version',
+            kind: 'center',
+            render: (m) => String(m.entryVersion),
           },
           { key: 'score', header: 'Score', numeric: true, render: (m) => scoreText(m.score) },
           { key: 'fields', header: 'Matched On', render: matchedText },

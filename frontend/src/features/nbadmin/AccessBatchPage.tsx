@@ -1,5 +1,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Check, CornerUpLeft, FileSpreadsheet, Send, UserRound, X } from 'lucide-react';
+import {
+  CalendarClock,
+  Check,
+  CornerUpLeft,
+  FileSpreadsheet,
+  Send,
+  UserRound,
+  X,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { nbadminApi } from '@/api/nbadmin';
@@ -14,11 +22,12 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatDateTime, humanize } from '@/utils/format';
+import { countOf, formatDateTime, humanize } from '@/utils/format';
 import { REQUEST_TYPE_LABELS } from './accessRequest';
+import { accessStatusLabel } from './accessStages';
+import { UserName } from '@/components/ui/UserName';
 import { ApproverPicker } from './ApproverPicker';
 import { ReasonDialog } from './ReasonDialog';
-import { displayNameOf } from '@/api/users';
 import { Notice } from '@/components/ui/Notice';
 
 type BatchAction = 'submit' | 'approve' | 'return' | 'reject' | 'cancel';
@@ -170,19 +179,16 @@ export default function AccessBatchPage() {
       />
       {decision && <Outcome decision={decision} />}
       <RecordSummary
-        title={`Batch of ${String(b.lines)} line(s)`}
+        title={`Batch of ${countOf(b.lines, 'line')}`}
         chips={
           <>
             <ReferenceChip label="Batch" value={b.batchNo} />
-            <StatusBadge status={b.status} />
+            <StatusBadge status={b.status} label={accessStatusLabel(b.status)} />
           </>
         }
         facts={[
-          {
-            icon: UserRound,
-            label: 'Requested',
-            value: `${displayNameOf(b.createdBy)} · ${formatDateTime(b.createdAt)}`,
-          },
+          { icon: UserRound, label: 'Requested By', value: <UserName login={b.createdBy} /> },
+          { icon: CalendarClock, label: 'Requested On', value: formatDateTime(b.createdAt) },
           { icon: FileSpreadsheet, label: 'Lines', value: String(b.lines) },
         ]}
       />
@@ -203,7 +209,11 @@ export default function AccessBatchPage() {
             { key: 't', header: 'Type', render: (l) => REQUEST_TYPE_LABELS[l.type] },
             { key: 'u', header: 'User', render: (l) => l.username ?? '' },
             { key: 'c', header: 'Change', render: (l) => l.summary },
-            { key: 's', header: 'Status', render: (l) => <StatusBadge status={l.status} /> },
+            {
+              key: 's',
+              header: 'Status',
+              render: (l) => <StatusBadge status={l.status} label={accessStatusLabel(l.status)} />,
+            },
             { key: 'e', header: 'Error', render: (l) => l.lifecycle.applyError ?? '' },
           ]}
         />

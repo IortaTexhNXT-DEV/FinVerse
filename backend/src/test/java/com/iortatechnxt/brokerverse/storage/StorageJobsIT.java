@@ -121,7 +121,16 @@ class StorageJobsIT {
         .isEmpty();
     api.doGet("holdapprover", "/api/v1/files/legal-hold-requests")
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[?(@.id == " + requestId + ")].action").value("PLACE"));
+        .andExpect(jsonPath("$[?(@.id == " + requestId + ")].action").value("PLACE"))
+        .andExpect(jsonPath("$[?(@.id == " + requestId + ")].fileName").value("receipt.pdf"));
+    api.doGet("holdofficer", "/api/v1/files/" + file.getId() + "/hold-status")
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.fileName").value("receipt.pdf"))
+        .andExpect(jsonPath("$.recordClass").value("GENERAL_DOCUMENT"))
+        .andExpect(jsonPath("$.legalHold").value(false))
+        .andExpect(jsonPath("$.link").doesNotExist());
+    api.doGet("accountant", "/api/v1/files/" + file.getId() + "/hold-status")
+        .andExpect(status().isForbidden());
 
     String approve = "/api/v1/files/legal-hold-requests/" + requestId + "/approve";
     api.doPost("holdofficer", approve, Map.of("reason", "ok")).andExpect(status().isForbidden());

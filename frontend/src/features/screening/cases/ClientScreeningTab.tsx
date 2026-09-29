@@ -67,15 +67,10 @@ export function ClientScreeningTab({ clientId }: Readonly<{ clientId: number }>)
             {
               key: 'entry',
               header: 'List Entry',
-              render: (m) => (
-                <>
-                  <strong>{m.entryName}</strong>
-                  <span className="cell-sub">
-                    {m.sourceCode} · {humanize(m.listType)}
-                  </span>
-                </>
-              ),
+              render: (m) => <strong>{m.entryName}</strong>,
             },
+            { key: 'source', header: 'Source', render: (m) => m.sourceCode },
+            { key: 'list', header: 'List', render: (m) => humanize(m.listType) },
             { key: 'score', header: 'Score', numeric: true, render: (m) => scoreText(m.score) },
             { key: 'fields', header: 'Matched On', render: matchedText },
             { key: 'status', header: 'Status', render: (m) => <StatusBadge status={m.status} /> },

@@ -88,9 +88,15 @@ export default function InsurersPage() {
             { key: 's', header: 'Status', render: (i) => <StatusBadge status={i.recordStatus} /> },
             {
               key: 'x',
-              header: 'Actions',
+              header: <span className="visually-hidden">Actions</span>,
+              width: '64px',
               render: (i) => (
-                <RecordActions kind="INSURER" record={i} refresh={[['catalog', 'insurers']]} />
+                <RecordActions
+                  kind="INSURER"
+                  record={i}
+                  label={i.name}
+                  refresh={[['catalog', 'insurers']]}
+                />
               ),
             },
           ]}

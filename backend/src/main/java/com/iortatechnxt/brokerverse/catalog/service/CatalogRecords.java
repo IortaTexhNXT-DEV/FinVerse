@@ -107,13 +107,32 @@ public class CatalogRecords {
    * @return the record
    */
   public AuthorizableEntity deactivate(CatalogKind kind, Long id) {
+    return deactivate(kind, id, null);
+  }
+
+  /**
+   * Deactivates a record with the reason given by the maintainer; the reason is kept in the audit
+   * trail of the record.
+   *
+   * @param kind kind
+   * @param id id
+   * @param reason reason, null when none was given
+   * @return the record
+   */
+  public AuthorizableEntity deactivate(CatalogKind kind, Long id, String reason) {
     requireAny(kind.maintainers(), "deactivate");
     AuthorizableEntity entity = get(kind, id);
     hooks.forEach(h -> h.deactivating(kind, entity));
     entity.deactivate();
-    audit.record(kind.label(), reference(entity), AuditAction.DEACTIVATE, "Deactivated");
+    audit.record(
+        kind.label(), reference(entity), AuditAction.DEACTIVATE, withReason("Deactivated", reason));
     hooks.forEach(h -> h.deactivated(kind, entity));
     return entity;
+  }
+
+  /** A summary with the reason appended ("Deactivated: no longer offered"). */
+  static String withReason(String summary, String reason) {
+    return reason == null || reason.isBlank() ? summary : summary + ": " + reason.trim();
   }
 
   private void requireAny(List<String> permissions, String action) {

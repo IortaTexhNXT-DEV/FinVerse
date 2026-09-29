@@ -23,7 +23,7 @@ screens:
       - "List | Request / Type / Change / Requested By / Requested / Approver / Status | Columns | As Access Requests | - | Access request | - | Read only | - | -"
     actions:
       - "New Group Profile Request | Business Administrator, System Administrator (group-profile request right) | Always | Opens New Request on the group-profile types (SCR-UA-12) | - | -"
-      - "Approve Selected | Approver on Assigned to Me; Second Approver on Second Approval | Rows selected | Approves each selected request in turn | Pending (next approver), Pending Second or For Implementation | Notice to the next approver, second approvers or System Administrators"
+      - "Approve Selected | Approver on Assigned to Me; Second Approver on Second Approval | Rows selected | Approves each selected request in turn | Pending Approval (next approver), Pending Second Approval or For Implementation | Notice to the next approver, second approvers or System Administrators"
       - "Filters | Every user of the screen | Always | Shows or hides the filters | - | -"
       - "[Open a row] | Every user of the screen | Always | Opens the request (SCR-UA-08) | - | -"
     rules:
@@ -65,8 +65,8 @@ screens:
       - "Approval | Remarks (Justification) | Text area | Up to 1,000 characters | Y | - | Blank | Draft; Returned | Not blank on submission | Enter the justification"
     actions:
       - "Save Draft | Business Administrator, System Administrator (group-profile request right) | Profile code or profile chosen | Saves the draft with format checks only | Draft | -"
-      - "Submit | As Save Draft | Every field check passes | Runs the full checks, evaluates the risk rules and sends the request to the first approver in order | Pending | Access request AR-yyyy-nnnnnn to approve, to the first approver"
-      - "Resubmit | The requester | Returned request with correction remarks | Resubmits the corrected request to the approvers | Pending | As Submit"
+      - "Submit | As Save Draft | Every field check passes | Runs the full checks, evaluates the risk rules and sends the request to the first approver in order | Pending Approval | Access request AR-yyyy-nnnnnn to approve, to the first approver"
+      - "Resubmit | The requester | Returned request with correction remarks | Resubmits the corrected request to the approvers | Pending Approval | As Submit"
       - "Cancel | The requester | Always | Leaves the form without saving | Unchanged | -"
     rules:
       - "A group-profile request has no effective date; it applies when the System Administrator implements it: An effective date applies to user requests; group profiles are implemented (FR-UA-040)."

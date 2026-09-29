@@ -198,6 +198,18 @@ public class IncentiveCriteriaService implements CatalogRecordHook {
    * @return the row
    */
   public IncentiveCriteria deactivate(Long id, LocalDate lastDay) {
+    return deactivate(id, lastDay, null);
+  }
+
+  /**
+   * Deactivates a criterion with the reason of the maintainer, kept in the audit trail.
+   *
+   * @param id row
+   * @param lastDay last effective day, null for today
+   * @param reason reason, null when none was given
+   * @return row
+   */
+  public IncentiveCriteria deactivate(Long id, LocalDate lastDay, String reason) {
     requireMaintainer();
     IncentiveCriteria row = get(id);
     LocalDate end = lastDay != null ? lastDay : BusinessClock.today(clock);
@@ -205,7 +217,11 @@ public class IncentiveCriteriaService implements CatalogRecordHook {
       row.endOn(end.isBefore(row.getEffectiveFrom()) ? row.getEffectiveFrom() : end);
     }
     row.deactivate();
-    audit.record(LABEL, row.catalogReference(), AuditAction.DEACTIVATE, "Deactivated, ends " + end);
+    audit.record(
+        LABEL,
+        row.catalogReference(),
+        AuditAction.DEACTIVATE,
+        CatalogRecords.withReason("Deactivated, ends " + end, reason));
     publish(row, Change.DEACTIVATED);
     return row;
   }

@@ -8,9 +8,11 @@ import com.iortatechnxt.brokerverse.migration.recon.service.ReconciliationServic
 import com.iortatechnxt.brokerverse.migration.signoff.service.SignoffService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 /** The pipeline services of the migration storyline (seed runner and end-to-end test). */
 @Configuration(proxyBeanMethods = false)
+@Profile({"seed", "test"})
 public class MigrationSeedConfig {
 
   /**

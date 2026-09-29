@@ -4,8 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
-import com.iortatechnxt.brokerverse.payables.service.PayablesSeedData;
-import com.iortatechnxt.brokerverse.payables.service.PayablesSeedDataRunner;
+import com.iortatechnxt.brokerverse.payables.seed.PayablesSeedData;
+import com.iortatechnxt.brokerverse.payables.seed.PayablesSeedDataRunner;
 import com.iortatechnxt.brokerverse.report.core.ReportResult;
 import com.iortatechnxt.brokerverse.report.core.ReportService;
 import com.iortatechnxt.brokerverse.report.core.RowKind;

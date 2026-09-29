@@ -242,7 +242,10 @@ class CatalogProductMaintenanceApiIT {
     api.doGet("mbs", "/api/v1/catalog/incentive-criteria/" + id + "/history")
         .andExpect(status().isOk())
         .andExpect(jsonPath("$[0].recordStatus").value("ACTIVE"));
-    api.doPost("mbs", "/api/v1/catalog/incentive-criteria/" + id + "/deactivate", Map.of())
+    api.doPost(
+            "mbs",
+            "/api/v1/catalog/incentive-criteria/" + id + "/deactivate",
+            Map.of("reason", "Campaign ended"))
         .andExpect(jsonPath("$.recordStatus").value("INACTIVE"));
 
     JsonNode exception =
@@ -266,7 +269,7 @@ class CatalogProductMaintenanceApiIT {
             "/api/v1/catalog/records/RATE_SCHEME_EXCEPTION/"
                 + exception.get("id").asLong()
                 + "/deactivate",
-            Map.of())
+            Map.of("reason", "Exception no longer needed"))
         .andExpect(jsonPath("$.recordStatus").value("INACTIVE"));
   }
 

@@ -279,23 +279,23 @@ main_flow:
 alternate_flows:
   - Wrong credentials. BIBS refuses the log-in and counts the failed attempt.
   - Third failed attempt. The account locks; the System Administrator unlocks it (Administration > Users, Unlock) or reactivates it through a request.
-  - Deactivated account. BIBS refuses the log-in with its own message; the attempt does not count towards the lock-out and is written to the audit trail.
+  - Deactivated account. BIBS refuses the log-in with the same message as a wrong password; the attempt does not count towards the lock-out and is written to the audit trail.
   - Directory mode (FR-UA-003). The password is checked by EUA instead of BIBS.
 rules:
   - [R1, "Lock-out after LOGIN_MAX_FAILED_ATTEMPTS consecutive failures (3); applies to all users (CQ23 answered by this BRD).", Configurable, Parameter LOGIN_MAX_FAILED_ATTEMPTS]
   - [R2, "A user may hold several roles; the menu is the union of their screens (NFR 1.c-d).", Fixed, "-"]
 validations:
   - [User ID or password wrong, Invalid user name or password, AUTHENTICATION_FAILED]
-  - [Account locked, Account is locked. Contact your administrator., AUTHENTICATION_FAILED]
-  - [Account deactivated, Your account is deactivated. Contact your administrator., AUTHENTICATION_FAILED]
+  - [Account locked (the same message as a wrong password; the lock shows to the System Administrator on Users), Invalid user name or password, AUTHENTICATION_FAILED]
+  - [Account deactivated (the same message as a wrong password; the status shows to the System Administrator on Users), Invalid user name or password, AUTHENTICATION_FAILED]
 notifications:
   - "None."
 audit:
   - Every successful and failed log-in is recorded (LOGIN, LOGIN_FAILED) with user and time.
 acceptance:
   - A user with the Requestor profile logs in and sees the User Access screens of the Requestor only.
-  - The third wrong password locks the account and the fourth attempt is refused with "Account is locked".
-  - A deactivated user is refused with "Your account is deactivated" and the count of failed attempts does not change.
+  - The third wrong password locks the account; the fourth attempt, with the correct password, is refused with the same message as a wrong password ("Invalid user name or password"), and Users shows the account as locked to the System Administrator.
+  - A deactivated user is refused with the same message as a wrong password ("Invalid user name or password") and the count of failed attempts does not change.
   - The audit trail lists the failed and successful attempts.
 ```
 
@@ -2324,9 +2324,9 @@ The table lists each point where the proposed screen or rule differs from the BR
 | CLR-UA-15 | Users who already hold both profiles of a new rule (FR-UA-053) | A new separation-of-duties rule is checked on later requests; users who already hold both profiles are not changed and are found with the User Access Report. | Existing access is changed only through requests. | Information Security to confirm that it reviews the report after each new rule and raises the requests. |
 | CLR-UA-16 | Bulk requests (1.009; FR-UA-019) | A bulk request is decided as a whole. | The maximum number of rows, line-by-line decisions and mixed actions are not given (UQ10). | Give the bulk settings (UQ10). |
 | CLR-UA-17 | Access from BDO-issued devices only (1.001.1; FR-UA-001) | Access only from BDO-issued devices is enforced by the BDO network and device policy, not by BIBS. | BIBS cannot see the device a browser runs on. | BDOI IT to confirm the network and device policy that enforces it. |
-| CLR-UA-18 | Stage list of an access request | The stepper of an access request shows Draft, Pending approval, Second approval (only where one is needed), then Approved; a group-profile request ends with For implementation and Implemented. Scheduled shows while an approved change waits for its effective date; a returned request shows in amber, a rejected or cancelled one in red. | The request is not in a configured workflow; its stages are fixed for the screen. | Confirm the stage list and its names. |
+| CLR-UA-18 | Stage list of an access request | The stepper of an access request shows Draft, Pending Approval, Second approval (only where one is needed), then Approved; a group-profile request ends with For implementation and Implemented. Scheduled shows while an approved change waits for its effective date; a returned request shows in amber, a rejected or cancelled one in red. | The request is not in a configured workflow; its stages are fixed for the screen. | Confirm the stage list and its names. |
 | CLR-UA-19 | Main path with two good endings | A user request ends at Approved and a group-profile request at Implemented; the stepper shows only the ending of the request type. | Two endings on one line would read as two steps. | Confirm the ending shown for each request type. |
-| CLR-UA-20 | Full status labels | Request and user statuses show their full label (for example Pending approval, For implementation); a short form with the full label in the tooltip is used only above 21 characters. | The client asked for full labels where they fit (27-Sep-2026). | Confirm full labels. |
+| CLR-UA-20 | Full status labels | Request and user statuses show their full label (for example Pending Approval, For implementation); a short form with the full label in the tooltip is used only above 21 characters. | The client asked for full labels where they fit (27-Sep-2026). | Confirm full labels. |
 
 # Appendix: Screen standards
 

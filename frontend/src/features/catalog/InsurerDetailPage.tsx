@@ -59,7 +59,9 @@ function Branches({ rows }: Readonly<{ rows: InsurerBranch[] }>) {
         {
           key: 'x',
           header: 'Actions',
-          render: (b) => <RecordActions kind="INSURER_BRANCH" record={b} refresh={REFRESH} />,
+          render: (b) => (
+            <RecordActions kind="INSURER_BRANCH" record={b} label={b.name} refresh={REFRESH} />
+          ),
         },
       ]}
     />
@@ -81,7 +83,14 @@ function Commissions({ rows }: Readonly<{ rows: Commission[] }>) {
         {
           key: 'x',
           header: 'Actions',
-          render: (c) => <RecordActions kind="COMMISSION_RATE" record={c} refresh={REFRESH} />,
+          render: (c) => (
+            <RecordActions
+              kind="COMMISSION_RATE"
+              record={c}
+              label={`Commission rate ${c.productCode ?? 'all products'} from ${formatDate(c.effectiveFrom)}`}
+              refresh={REFRESH}
+            />
+          ),
         },
       ]}
     />
@@ -127,7 +136,12 @@ export default function InsurerDetailPage() {
         actions={
           <>
             <StatusBadge status={d.insurer.recordStatus} />
-            <RecordActions kind="INSURER" record={d.insurer} refresh={REFRESH} />
+            <RecordActions
+              kind="INSURER"
+              record={d.insurer}
+              label={d.insurer.name}
+              refresh={REFRESH}
+            />
             {maintain && (
               <Button
                 variant="secondary"

@@ -68,6 +68,7 @@ screens:
       - "Decisions | Decision, Criteria met, Decided by, At, Comment | Columns | GO or NO-GO | - | Decisions of the board | - | - | - | -"
     actions:
       - "New Plan | Data Migration Lead | Always | Creates a plan; its runbook tasks and the twelve criteria are created from the go-live date | Planned | -"
+      - "Create | Data Migration Lead | Name, environment and go-live date given (until then the dialog says what is still needed) | Creates the plan of the New Cutover Plan dialog | Planned | -"
       - "Runbook | Every migration role | A plan is open | Downloads the runbook workbook of the plan | - | -"
       - "Measure Criteria | Data Migration Lead or the board | A plan is open | Measures the criteria that BIBS measures (acceptance, counts, financial rejects, amounts, clearing, legacy accounts, client queue) | - | -"
       - "Start, Done, Block | Data Migration Lead | Task not started, in progress or blocked | Records the actual start or end; a block needs its reason | In progress, Done, Blocked | -"

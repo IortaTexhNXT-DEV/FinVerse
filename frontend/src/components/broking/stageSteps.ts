@@ -42,6 +42,11 @@ const SIDE =
 /** Stages that end the record off the normal path (shown red). */
 const EXIT =
   /(^|_)(REJECTED|CANCELLED|VOIDED|DECLINED|WITHDRAWN|INACTIVE|NOT_PROCEEDED|NOT_RENEWED|LOST)(_|$)/;
+/** Whether a stage ends the record off the normal path (not proceeded, rejected, voided...). */
+export function isExitStage(code: string | undefined): boolean {
+  return code !== undefined && EXIT.test(code);
+}
+
 /** Stages a record is sent back to (shown amber). */
 const BACK = /(^|_)(RETURNED|ON_HOLD|HOLD|CORRECTION)(_|$)/;
 

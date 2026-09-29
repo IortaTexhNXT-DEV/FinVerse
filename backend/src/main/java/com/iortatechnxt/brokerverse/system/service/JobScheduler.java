@@ -3,7 +3,6 @@ package com.iortatechnxt.brokerverse.system.service;
 import com.iortatechnxt.brokerverse.common.runtime.ConditionalOnWorkload;
 import com.iortatechnxt.brokerverse.common.runtime.CurrentRuntimeRole;
 import com.iortatechnxt.brokerverse.common.runtime.Workload;
-import com.iortatechnxt.brokerverse.system.domain.JobTrigger;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +47,7 @@ public class JobScheduler implements SchedulingConfigurer {
     for (ManagedJob job : scheduledJobs()) {
       registrar.addTriggerTask(
           new TriggerTask(
-              () -> registry.run(job.name(), JobTrigger.SCHEDULED),
-              new CronTrigger(job.cron(), utc)));
+              () -> registry.runScheduled(job.name()), new CronTrigger(job.cron(), utc)));
     }
   }
 

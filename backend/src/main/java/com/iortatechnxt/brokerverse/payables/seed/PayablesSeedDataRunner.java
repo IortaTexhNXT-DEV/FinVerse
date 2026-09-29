@@ -1,4 +1,4 @@
-package com.iortatechnxt.brokerverse.payables.service;
+package com.iortatechnxt.brokerverse.payables.seed;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

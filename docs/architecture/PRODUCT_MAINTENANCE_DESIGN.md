@@ -558,8 +558,8 @@ What the P0 wave built, and where it differs from or details the sections above.
   `PackageSpec`, `VersionRef`, `ProductVersionView`, the events `ProductVersionReleased`, `ProductVersionReturned`,
   `ProductExpired`, `IncentiveCriteriaChanged`; the enums `catalog.domain.ProductVersionStatus` and
   `PackageInsurerRole`; `RatingQuery.Purpose`. `PackageSetupService` also has `retireProduct` for RETIRE requests.
-  `PackageVersionStubDefaults` registers in-memory stubs (`@ConditionalOnMissingBean`) of both services until the
-  catalog implements them; P2 deletes it.
+  `PackageVersionStubDefaults` registered in-memory stubs (`@ConditionalOnMissingBean`) of both services until the
+  catalog implemented them; it has been deleted (platform consistency, September 2026).
 - **Frontend.** The catalog section is renamed "Product Maintenance". The package request screens are registered in
   `features/productmaint/module.ts` (`withPackageRequests(catalogModule)`, one sidebar section) and the new catalog
   screens in `features/catalog/module.ts`, all hidden with a placeholder component. Help:
@@ -743,8 +743,8 @@ this note is what the code does.
 ### 17.3 Contracts for P1-B and the integration wave
 
 - `PackageSetupService` is implemented by `catalog.service.version.CatalogPackageSetupService` and
-  `ProductVersionQueryService` by `ProductVersionQueries` (both `@Primary`, so the P0 stubs are inactive; P2 deletes
-  `PackageVersionStubDefaults`). `createDraftVersion` needs PRODUCT_MAINTAIN; with `newProduct` it creates the package
+  `ProductVersionQueryService` by `ProductVersionQueries` (both `@Primary`; the P0 stubs
+  `PackageVersionStubDefaults` have been deleted). `createDraftVersion` needs PRODUCT_MAINTAIN; with `newProduct` it creates the package
   (pending authorisation until its first version is validated).
 - `ProductVersionService`: `submitForValidation(code, n)`, `validate(code, n, checklist)`, `returnToDraft(code, n,
   reason)`, `expireDue(date)` returning `ExpiryOutcome(superseded, projected, expired)`.

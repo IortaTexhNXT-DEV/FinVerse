@@ -3,6 +3,7 @@ package com.iortatechnxt.brokerverse.common.api;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.FieldValidationException;
+import com.iortatechnxt.brokerverse.common.exception.ModuleNotInUseException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.util.BusinessText;
 import java.util.LinkedHashMap;
@@ -70,6 +71,17 @@ public class GlobalExceptionHandler {
   @ExceptionHandler(ResourceNotFoundException.class)
   public ProblemDetail handleNotFound(ResourceNotFoundException ex) {
     return problem(HttpStatus.NOT_FOUND, "NOT_FOUND", ex.getMessage());
+  }
+
+  /**
+   * Handles a request to a product module that is switched off.
+   *
+   * @param ex exception
+   * @return problem detail (404)
+   */
+  @ExceptionHandler(ModuleNotInUseException.class)
+  public ProblemDetail handleModuleNotInUse(ModuleNotInUseException ex) {
+    return problem(HttpStatus.NOT_FOUND, "MODULE_NOT_IN_USE", ex.getMessage());
   }
 
   /**

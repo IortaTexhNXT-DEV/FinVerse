@@ -254,6 +254,7 @@ const SHORT_LABELS: Record<string, string> = {
   ACCEPTED_AS_REQUESTED: 'Accepted as Req.',
   APPROVED_WITH_CHANGES: 'Appr. with Changes',
   PENDING_AUTHORIZATION: 'Pending Auth.',
+  PENDING_SECOND: 'Pending 2nd Approval',
   PLACEMENT_CANCELLED: 'Plcmt Cancelled',
   EXCLUDED_CANCELLED: 'Excl. Cancelled',
   REQUIREMENTS_PREP: 'Reqts Prep',

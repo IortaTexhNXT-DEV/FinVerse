@@ -113,6 +113,7 @@ public class IntakeController {
    * @return runs, newest first
    */
   @GetMapping("/intake-runs")
+  @PreAuthorize("hasAnyAuthority('SBM_VIEW', 'SBM_INTAKE', 'SBM_MIGRATE')")
   public PageResponse<IntakeRunView> runs(@RequestParam Long companyId, Pageable pageable) {
     return PageResponse.of(runs.list(companyId, pageable), IntakeRunView::from);
   }

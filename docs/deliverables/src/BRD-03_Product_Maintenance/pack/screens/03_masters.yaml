@@ -30,8 +30,8 @@ screens:
       - "New insurer | TIN / Address / E-mail / Phone | Text | Business partner details | N | - | Blank | New insurer only | - | -"
     actions:
       - "New Insurer | MASTER_MAINTAIN (Business Administrator) | Always | Opens New insurer; Save for Authorization | Pending Authorization | -"
-      - "Authorize | MASTER_AUTHORIZE, not the maker | Pending row | Authorises the insurer and its business partner | Active | -"
-      - "Deactivate | MASTER_MAINTAIN | Active row | The insurer is no longer offered | Inactive | -"
+      - "Authorize | MASTER_AUTHORIZE, not the maker | Pending row | From the row action menu, after the confirmation: authorises the insurer and its business partner | Active | -"
+      - "Deactivate | MASTER_MAINTAIN | Active row | From the row action menu (last, in red); asks the reason, kept in the audit trail; the insurer is no longer offered | Inactive | -"
       - "[Open a row] | Every user of the screen | Always | Opens the insurer record | - | -"
     rules:
       - "Only authorised, active insurers are offered in package requests, package versions and quotation slips (FR-PM-014, FR-PM-030)."
@@ -146,7 +146,7 @@ screens:
       - "View / Edit | Every user of the screen; Edit with MASTER_MAINTAIN | Unit row | Opens the unit details; Edit changes name, parent and cost centre, Save for Authorization | Pending Authorization | -"
       - "Add Department / Add Team | MASTER_MAINTAIN | Active region / department | Opens New unit at the level below, the parent filled | Pending Authorization | -"
       - "Assign Officer (row) | MASTER_MAINTAIN | Active team | Opens Assign Account Officer with the team filled | Pending Authorization | -"
-      - "Authorize | MASTER_AUTHORIZE, not the maker | Pending unit or officer | Authorises the record | Active | -"
+      - "Authorize | MASTER_AUTHORIZE, not the maker | Pending unit or officer | From the row action menu, after the confirmation: authorises the record | Active | -"
       - "Deactivate | MASTER_MAINTAIN | Active or pending unit without active sub-units or officers | Asks the reason and deactivates the unit; refused with a notice while sub-units or officers remain | Inactive | -"
       - "Reactivate | MASTER_MAINTAIN | Inactive unit whose parent is not inactive | Asks the reason; the unit waits for authorisation again | Pending Authorization | -"
       - "Reassign / Assign to a Team | MASTER_MAINTAIN | Officer row | Moves the officer to another team (or places a removed officer again) from today | Pending Authorization | -"

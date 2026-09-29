@@ -17,6 +17,7 @@ import com.iortatechnxt.brokerverse.nbadmin.service.AccessRequestService;
 import com.iortatechnxt.brokerverse.nbadmin.service.AccessSettings;
 import com.iortatechnxt.brokerverse.security.api.dto.RoleResponse;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
+import com.iortatechnxt.brokerverse.system.service.ProductModules;
 import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.data.domain.PageRequest;
@@ -50,7 +51,7 @@ public class AccessRequestController {
   /** Any request function (the type-specific permission is checked by the service). */
   static final String REQUEST =
       "hasAnyAuthority('ACCESS_REQUEST', 'UAM_ENROLL', 'UAM_MODIFY', 'UAM_DEACTIVATE',"
-          + " 'UAM_REACTIVATE', 'UAM_GROUP_REQUEST', 'UAM_CORRECT', 'PORTAL_USER_REQUEST')";
+          + " 'UAM_REACTIVATE', 'UAM_GROUP_REQUEST', 'UAM_CORRECT')";
 
   private static final int PAGE_SIZE = 25;
 
@@ -59,6 +60,7 @@ public class AccessRequestController {
   private final AccessSettings settings;
   private final UserAdminService userAdmin;
   private final AccessRequestDescriber describer;
+  private final ProductModules modules;
 
   /**
    * Creates the controller.
@@ -68,14 +70,17 @@ public class AccessRequestController {
    * @param settings parameters
    * @param userAdmin users and roles
    * @param describer descriptions of the requests
+   * @param modules product modules (the module of each group profile)
    */
   public AccessRequestController(
       AccessRequestService requests,
       AccessApprovers approvers,
       AccessSettings settings,
       UserAdminService userAdmin,
-      AccessRequestDescriber describer) {
+      AccessRequestDescriber describer,
+      ProductModules modules) {
     this.describer = describer;
+    this.modules = modules;
     this.requests = requests;
     this.approvers = approvers;
     this.settings = settings;
@@ -214,7 +219,13 @@ public class AccessRequestController {
   @GetMapping("/roles")
   @PreAuthorize(VIEW)
   public List<RoleResponse> roles() {
-    return userAdmin.listRoles().stream().map(RoleResponse::from).toList();
+    return userAdmin.listRoles().stream()
+        .map(
+            r ->
+                RoleResponse.from(
+                    r,
+                    modules.moduleOfProfile(r.getPermissions().stream().map(Enum::name).toList())))
+        .toList();
   }
 
   private AccessRequestResponse view(AccessRequest r) {

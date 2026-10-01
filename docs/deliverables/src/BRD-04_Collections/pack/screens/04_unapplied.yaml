@@ -28,7 +28,7 @@ screens:
       - "List | Collector Disposition | Column | Label as a tag with the user's name and date | - | Collector dispositions | - | Read only | - | -"
       - "List | Cashiering / Request | Column | Cashiering tab, and the status of the request sent | - | Cashiering, requests | - | Read only | - | -"
       - "Disposition dialog | Disposition | Drop-down | Active values of the unapplied payment disposition list; what Cashiering is asked to do shows under it | Y | Unapplied payment disposition list | Blank | Balance above zero | - | Choose the disposition"
-      - "Disposition dialog | Invoice No. | Text | EBIX I######## or BrokerVerse BI-…, checked against the invoice ledger | Cond.: For application to invoice | Invoice ledger | Matched invoice | Balance above zero | Format of the invoice number parameter; invoice in the ledger | The invoice number does not have the expected format"
+      - "Disposition dialog | Invoice No. | Text | a legacy invoice I followed by eight digits or a BIBS invoice BI-…, checked against the invoice ledger | Cond.: For application to invoice | Invoice ledger | Matched invoice | Balance above zero | Format of the invoice number parameter; invoice in the ledger | The invoice number does not have the expected format"
       - "Disposition dialog | Amount / Remarks | Number, text area | Empty for the whole unapplied balance | N | - | Blank | Balance above zero | Above zero and at most the balance | Enter an amount above zero and at most <balance>"
     actions:
       - "Requests to Cashiering | Every Collections user | Always | Opens the requests sent to Cashiering | - | -"

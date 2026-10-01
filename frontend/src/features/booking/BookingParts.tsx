@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { Commission, Premium, PreviewLine } from '@/api/booking';
-import { SalesUnitName } from '@/components/broking/LovLabel';
+import { InsurerName, SalesUnitName } from '@/components/broking/LovLabel';
 import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatRate } from '@/utils/format';
@@ -96,7 +96,13 @@ export function JournalLines({
         rowKey={(l) => l.key}
         emptyMessage={emptyMessage}
         columns={[
-          { key: 'group', header: groupHeader, render: (l) => l.insurerCode },
+          {
+            key: 'group',
+            header: groupHeader,
+            // An insurer by its name; a journal number as it is.
+            render: (l) =>
+              groupHeader === 'Insurer' ? <InsurerName code={l.insurerCode} /> : l.insurerCode,
+          },
           {
             key: 'account',
             header: 'Account',

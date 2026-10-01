@@ -295,8 +295,9 @@ async function drawCallouts(page, callouts) {
     const dialogs = [...document.querySelectorAll('dialog[open], [role=dialog]')].filter((d) => d.getBoundingClientRect().width > 0);
     const scope = dialogs.length ? dialogs[dialogs.length - 1] : null;
     // The application menu and top bar are not described; a page or card header inside the content area is.
+    // The title bar of a dialog is not a field: a dialog named after its button ("Book Now") keeps its title clear.
     const inChrome = (el) => !!el.closest('nav, aside, [data-callout-layer]') || (!!el.closest('header') && !el.closest('main'))
-      || (scope !== null && !scope.contains(el));
+      || (scope !== null && !scope.contains(el)) || (scope !== null && !!el.closest('dialog > header'));
     const byType = {
       column: ['th', '[role=columnheader]'],
       tab: ['[role=tab]'],

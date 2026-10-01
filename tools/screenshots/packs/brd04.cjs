@@ -49,11 +49,28 @@ const opens = {
 
 // ------------------------------------------------------------------ forms
 
+/**
+ * Opens the dialog of a form before its fields are filled: ticks the rows the dialog works on (a `selects` entry), then
+ * presses the button that opens it. capture_pack.cjs fills before it selects or clicks, so the dialog forms open here.
+ */
+const opening = (button, rows) => async (page, ctx) => {
+  if (rows) {
+    await selects[rows](page, ctx);
+    await settle(page, 300);
+  }
+  await ctx.clickButton(page, button);
+};
+/** Presses the button of the open dialog (not the button of the same name on the page behind it). */
+const pressing = (button) => async (page) => {
+  await dialogOf(page).getByRole('button', { name: new RegExp(button, 'i') }).last().click();
+  await settle(page, 800);
+};
 const inDialog = (label, value) => async (page) => fill(page, label, value, dialogOf(page));
 const remarks = (text) => async (page) => dialogOf(page).getByLabel(/^Remarks/).fill(text);
 
 const fills = {
   pickup_disposition: [
+    opening('^record disposition$', 'first_account'),
     inDialog('Disposition', /check pick-up/i),
     inDialog('Pick-up Date', dateText(3)),
     inDialog('Pick-up Address', '5th Floor, Harbor Point Building, Port Area, Manila'),
@@ -62,12 +79,14 @@ const fills = {
     remarks('Client will issue one check for the balance'),
   ],
   reassign_temporary: [
+    opening('^reassign$', 'two_accounts'),
     inDialog('New Handler', /Miguel/),
     inDialog('Kind', /^Temporary$/),
     inDialog('Until', dateText(14)),
     inDialog('Reason', 'Marco Marketing Handler on leave for two weeks'),
   ],
   new_plan: [
+    opening('^new installment plan$'),
     inDialog('Plan Basis', /one invoice/i),
     inDialog('Invoice No.', 'BI-HO-2026-000004'),
     inDialog('First Due Date', dateText(15)),
@@ -75,22 +94,27 @@ const fills = {
     inDialog('Billing Frequency', /^quarterly$/i),
   ],
   new_promise: [
+    opening('^record promise$'),
     inDialog(/^Invoice Nos?\.?/, 'BI-HO-2026-000004'),
     inDialog('Promised Payment Date', dateText(5)),
     inDialog('Promised Amount', '10000'),
     remarks('Client promised a partial payment by check'),
   ],
   promise_over_balance: [
+    opening('^record promise$'),
     inDialog(/^Invoice Nos?\.?/, 'BI-HO-2026-000004'),
     inDialog('Promised Payment Date', dateText(7)),
     inDialog('Promised Amount', '950000'),
+    pressing('^record promise$'),
   ],
   escalate_manual: [
+    opening('^escalate accounts$'),
     inDialog('Invoice Nos.', 'BI-HO-2026-000004'),
     inDialog('Reason', /no payment commitment/i),
     remarks('No commitment after three calls; client asks for the bank account officer'),
   ],
   new_escalation_rule: [
+    opening('^new rule$'),
     inDialog('Code', 'CLX-NO-PROMISE-30'),
     inDialog('Name', 'No promise 30 days after booking - team lead'),
     inDialog('Basis', /without a promise/i),
@@ -100,13 +124,16 @@ const fills = {
     inDialog('SLA (Hours)', '48'),
   ],
   apply_to_invoice: [
+    opening('^request application$', 'unmatched_payment'),
     inDialog('Invoice No.', 'BI-HO-2026-000004'),
     inDialog('Amount', '1000'),
     remarks('Payor confirmed the invoice by phone'),
   ],
-  apply_bad_invoice: [inDialog('Invoice No.', 'INV 2026/0417')],
+  apply_bad_invoice: [opening('^request application$', 'unmatched_payment'), inDialog('Invoice No.', 'INV 2026/0417'),
+    pressing('^request application$')],
   reassign_criteria: [async (page) => fill(page, 'Current Handler', /Marco/)],
   new_assignment_rule: [
+    opening('^new rule$'),
     inDialog('Priority', '30'),
     inDialog('Name', 'Retail branch accounts'),
     inDialog('Handler', /Miguel/),
@@ -134,7 +161,30 @@ const selects = {
   },
 };
 
+/**
+ * A dialog taller than the window scrolls inside itself; the capture grows the window to the page, so the page
+ * under the dialog is made as tall as the dialog and the whole form is in the image.
+ */
+async function roomForDialog(page) {
+  await page.evaluate(() => {
+    const dialog = document.querySelector('dialog.modal[open]');
+    const main = document.querySelector('main.app-main, main');
+    if (!dialog || !main) {
+      return;
+    }
+    let hidden = 0;
+    [dialog, ...dialog.querySelectorAll('*')].forEach((el) => {
+      if (/auto|scroll/.test(getComputedStyle(el).overflowY)) {
+        hidden = Math.max(hidden, el.scrollHeight - el.clientHeight);
+      }
+    });
+    main.style.paddingBottom = `${hidden + 120}px`;
+  });
+  await settle(page, 300);
+}
+
 const after = {
+  'scr-cl-13-02-new': roomForDialog,
   'ux-scr-cl-02-empty': async (page) => search(page, 'BI-HO-2099-999999'),
   'ux-scr-cl-13-actions': async (page) => {
     await page.locator('main table tbody tr').first().getByRole('button', { name: /^Actions for/ }).click();

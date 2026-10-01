@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.cashiering.service;
 
 import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.DispositionStatus;
+import com.iortatechnxt.brokerverse.cashiering.domain.CashCodes.UnappliedOrigin;
 import com.iortatechnxt.brokerverse.cashiering.domain.CashReceiptRepository;
 import com.iortatechnxt.brokerverse.cashiering.domain.CollectorRequest;
 import com.iortatechnxt.brokerverse.cashiering.domain.CollectorRequestRepository;
@@ -10,6 +11,7 @@ import com.iortatechnxt.brokerverse.cashiering.domain.DispositionWords;
 import com.iortatechnxt.brokerverse.cashiering.domain.Receipt;
 import com.iortatechnxt.brokerverse.cashiering.domain.Unapplied;
 import com.iortatechnxt.brokerverse.cashiering.domain.UnappliedRepository;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedDirectory.UnappliedEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -74,7 +76,7 @@ public class UnappliedHistory {
         new UnappliedEvent(
             item.getCreatedAt(),
             "RECEIVED",
-            "Unapplied " + item.getOrigin() + " from " + text(item.getPayorName()),
+            receivedText(item.getOrigin(), item.getPayorName()),
             item.getAmount(),
             item.getCreatedBy(),
             receiptNo));
@@ -97,9 +99,7 @@ public class UnappliedHistory {
         new UnappliedEvent(
             r.getCreatedAt(),
             "REQUESTED",
-            "Collector request "
-                + r.getAction()
-                + (r.getInvoiceNo() == null ? "" : " to invoice " + r.getInvoiceNo()),
+            requestText(r.getAction(), r.getInvoiceNo()),
             r.getAmount(),
             r.getRequestedBy(),
             r.getRequestNo()));
@@ -174,6 +174,32 @@ public class UnappliedHistory {
       case MANUAL -> "Released (settled outside the system)";
       case INCOME -> "Recognised as income, OR " + d.getOrNo();
     };
+  }
+
+  /**
+   * The intake of an unapplied payment, the origin in words: "Unapplied payment from Liza Manalo
+   * (no match)".
+   *
+   * @param origin why the payment is unapplied
+   * @param payor payor name, may be null
+   * @return the history text
+   */
+  static String receivedText(UnappliedOrigin origin, String payor) {
+    return "Unapplied payment from " + text(payor) + " (" + DisplayFormat.words(origin) + ")";
+  }
+
+  /**
+   * A collector request, the action in words: "Collector request: apply to invoice
+   * BI-HO-2026-000008".
+   *
+   * @param action requested action code
+   * @param invoiceNo target invoice, may be null
+   * @return the history text
+   */
+  static String requestText(String action, String invoiceNo) {
+    return "Collector request: "
+        + DisplayFormat.words(action)
+        + (invoiceNo == null ? "" : " " + invoiceNo);
   }
 
   private static String by(String user) {

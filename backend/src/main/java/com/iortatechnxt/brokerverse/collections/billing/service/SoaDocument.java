@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.collections.billing.service;
 
 import com.iortatechnxt.brokerverse.collections.billing.domain.BillingStatement;
 import com.iortatechnxt.brokerverse.collections.billing.domain.BillingStatementLine;
+import com.iortatechnxt.brokerverse.collections.common.service.ClxText;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -14,6 +15,7 @@ import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -59,18 +61,7 @@ public class SoaDocument {
    * @return PDF bytes
    */
   public byte[] render(BillingStatement soa) {
-    MergedText text =
-        templates.merge(
-            TEMPLATE,
-            soa.getCycleFrom(),
-            Map.of(
-                "arn", soa.getArn(),
-                "cycleFrom", soa.getCycleFrom().toString(),
-                "cycleTo", soa.getCycleTo().toString(),
-                "frequency", soa.getFrequency().toLowerCase(Locale.ROOT).replace('_', '-'),
-                "currency", soa.getCurrency(),
-                "balance", amount(soa.getBalance()),
-                "dueDate", soa.getDueDate().toString()));
+    MergedText text = templates.merge(TEMPLATE, soa.getCycleFrom(), mergeValues(soa));
     soa.renderedWith(text.code(), text.versionNo());
     DocumentSpec spec =
         new DocumentSpec(
@@ -84,8 +75,8 @@ public class SoaDocument {
                         new Field("Client", soa.getAssuredName()),
                         new Field("Client code", soa.getClientCode()),
                         new Field("Account (ARN)", soa.getArn()),
-                        new Field("Billing cycle", soa.getCycleFrom() + " to " + soa.getCycleTo()),
-                        new Field("Due date", soa.getDueDate().toString()),
+                        new Field("Billing cycle", period(soa.getCycleFrom(), soa.getCycleTo())),
+                        new Field("Due date", ClxText.date(soa.getDueDate())),
                         new Field(
                             "Amount due", soa.getCurrency() + " " + amount(soa.getBalance())))),
                 new Table(
@@ -106,7 +97,35 @@ public class SoaDocument {
     return composer.pdf(spec);
   }
 
-  private static List<List<String>> rows(BillingStatement soa) {
+  /**
+   * The values merged into the template text, dates and amounts as the screens show them.
+   *
+   * @param soa statement
+   * @return merge values
+   */
+  static Map<String, String> mergeValues(BillingStatement soa) {
+    return Map.of(
+        "arn", soa.getArn(),
+        "cycleFrom", ClxText.date(soa.getCycleFrom()),
+        "cycleTo", ClxText.date(soa.getCycleTo()),
+        "frequency", soa.getFrequency().toLowerCase(Locale.ROOT).replace('_', '-'),
+        "currency", soa.getCurrency(),
+        "balance", amount(soa.getBalance()),
+        "dueDate", ClxText.date(soa.getDueDate()));
+  }
+
+  /**
+   * A period as the screens show it: 17-Oct-2026 to 16-Jan-2027.
+   *
+   * @param from first day
+   * @param to last day
+   * @return the period text
+   */
+  static String period(LocalDate from, LocalDate to) {
+    return ClxText.date(from) + " to " + ClxText.date(to);
+  }
+
+  static List<List<String>> rows(BillingStatement soa) {
     List<List<String>> rows = new ArrayList<>();
     for (BillingStatementLine l : soa.getLines()) {
       rows.add(
@@ -114,8 +133,8 @@ public class SoaDocument {
               l.getInvoiceNo() == null ? "Scheduled" : l.getInvoiceNo(),
               l.getPolicyYear()
                   + (l.getKind() == BillingStatementLine.LineKind.ARREARS ? " (arrears)" : ""),
-              l.getCoverageFrom() + " to " + l.getCoverageTo(),
-              l.getDueDate().toString(),
+              period(l.getCoverageFrom(), l.getCoverageTo()),
+              ClxText.date(l.getDueDate()),
               amount(l.getAmount()),
               amount(l.getPaid()),
               amount(l.getBalance())));

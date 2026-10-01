@@ -97,11 +97,6 @@ confirm:
         The Collections personas land on the New Business dashboard after sign-in, the landing page of every broking
         role; Collections Home is one click away in the menu.
       proposal: Confirm the landing page, or land each Collections persona on Collections Home.
-    - screens: [SCR-CL-03]
-      observation: >-
-        The From and To values of the field changes on the History tab show the values as stored (a category letter,
-        a disposition or the user ID of a handler).
-      proposal: Show the labels of the values and the names of the users in the field changes, as in the other tabs.
     - screens: [SCR-CL-02, SCR-CL-14]
       observation: >-
         The PR Worklist and the Unapplied Payments hold many facts per row: related values share a column, one under
@@ -113,3 +108,29 @@ confirm:
         A migrated invoice carries the Legacy tag; when its booking date is later than today (a legacy booking dated
         ahead), its aging reads in negative days.
       proposal: Show the aging of an invoice booked ahead as 0 days, or count it from the inception date.
+    - screens: [SCR-CL-03]
+      observation: >-
+        The Hand-offs to Operations table on the Dispositions & Efforts tab shows the reference of a hand-off as
+        Operations keeps it (PU:BI-HO-2026-000007:5 for a check pick-up request).
+      proposal: Show the number of the Operations record the hand-off created (the check pick-up or reversal request).
+    - screens: [SCR-CL-15]
+      observation: >-
+        The History tab of an unapplied payment shows, in its Reference column, the internal reference of a
+        disposition (DSP:3) and of a request to Cashiering (CLX-UPP-4) next to the receipt and request numbers.
+      proposal: Show only the business numbers (AR, CRQ and invoice numbers) and leave the cell blank otherwise.
+    - screens: [SCR-CL-13, SCR-CL-02, SCR-CL-17]
+      observation: >-
+        The Segment of an escalation rule and the Market Segment, Sales Unit and Unit Head filters are typed in as
+        codes (RETAIL, T-CBG1).
+      proposal: Offer the segments, the sales units and the unit heads as drop-downs by name.
+    - screens: [SCR-CL-19]
+      observation: >-
+        The Invoice Number Format parameter holds the pattern the system checks the invoice number of "For
+        application to invoice" against, written as an expression.
+      proposal: Confirm that the System Administrator keeps the format, or offer the allowed formats as choices.
+    - screens: [SCR-CL-18]
+      observation: >-
+        The Collections report files (Outstanding PR List, Full Production Report, DP PR for Reversal) print the
+        product name and the report code in the page footer; the daily application file to Cashiering is the
+        interface file itself, with its field names and the user ID of the requester.
+      proposal: Confirm the footer of the report files (BIBS and the report title), and the layout of the application file with Cashiering.

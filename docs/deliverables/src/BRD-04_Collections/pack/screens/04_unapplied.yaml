@@ -15,8 +15,8 @@ screens:
       - Collections Home › Unapplied Awaiting Disposition tile
     shots:
       - {state: list, user: upphandler, caption: "Unapplied Payments awaiting a disposition, with the matched account and the Cashiering status"}
-      - {state: apply, user: upphandler, select: unmatched_payment, click: "^request application$", fill: apply_to_invoice, caption: "Request Application: the disposition For Application to Invoice with the invoice number"}
-      - {state: error, user: upphandler, select: unmatched_payment, click: "^request application$", fill: apply_bad_invoice, submit: "^request application$", caption: "An invoice number in the wrong format is refused under the field"}
+      - {state: apply, user: upphandler, fill: apply_to_invoice, caption: "Request Application: the disposition For Application to Invoice with the invoice number"}
+      - {state: error, user: upphandler, fill: apply_bad_invoice, caption: "An invoice number in the wrong format is refused under the field"}
     fields:
       - "Tabs | Awaiting Disposition / In Cashiering / For Approval / For Reversal / All Open | Tab | The Cashiering tab of the payment | - | Cashiering | Awaiting Disposition | - | - | -"
       - "Toolbar | Search Unapplied Reference | Text | Reference, payor, transaction, check or invoice | N | Unapplied payments | Blank | - | Contains | -"

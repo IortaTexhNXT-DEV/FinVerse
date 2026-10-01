@@ -3,8 +3,9 @@ import { Lock, Paperclip } from 'lucide-react';
 import { messagingApi } from '@/api/messaging';
 import type { OutboundMessage } from '@/api/messaging';
 import { DataTable } from '@/components/ui/DataTable';
+import { purposeLabel } from './messagePurpose';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDateTime, humanize } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
 
 /** E-mails sent (or queued) for a record, with outcome and reason (BRNB.008 send log). */
 export function SentMessages({
@@ -29,7 +30,7 @@ export function SentMessages({
           kind: 'datetime',
           render: (m) => formatDateTime(m.createdAt),
         },
-        { key: 'purpose', header: 'Purpose', render: (m) => humanize(m.purpose) },
+        { key: 'purpose', header: 'Purpose', render: (m) => purposeLabel(m.purpose) },
         { key: 'to', header: 'To', render: (m) => m.recipients },
         {
           key: 'subject',

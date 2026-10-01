@@ -22,7 +22,7 @@ import type { EscalateInput, Escalation } from './api';
 import { escalationsApi } from './api';
 import { EscalateDialog } from './EscalationDialogs';
 import type { EscalationTab } from './labels';
-import { ESCALATION_TABS, LEVEL_LABELS, stagesOf } from './labels';
+import { ESCALATION_TABS, LEVEL_LABELS, stageText, stagesOf } from './labels';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
 import { LovLabel } from '@/components/broking/LovLabel';
@@ -69,7 +69,11 @@ const COLUMNS: Column<Escalation>[] = [
       </>
     ),
   },
-  { key: 'status', header: 'Status', render: (e) => <StatusBadge status={e.status} /> },
+  {
+    key: 'status',
+    header: 'Status',
+    render: (e) => <StatusBadge status={e.status} label={stageText(e.status)} />,
+  },
 ];
 
 /**

@@ -13,7 +13,7 @@ screens:
       - Finance › Collections › Escalations
     shots:
       - {state: list, user: clxtl, caption: "Escalations with the team lead: by rule or by a user, with the reason and the time in stage"}
-      - {state: new, user: clxhandler, click: "^escalate accounts$", fill: escalate_manual, caption: "Escalate Accounts dialog: the invoices, the level and the reason"}
+      - {state: new, user: clxhandler, fill: escalate_manual, caption: "Escalate Accounts dialog: the invoices, the level and the reason"}
     fields:
       - "Tabs | With Team Lead / With Unit / Section Head / In Action / Returned / Resolved | Tab | - | - | Escalation stage | With Team Lead | - | - | -"
       - "Toolbar | Search Escalation, ARN or Invoice No. | Text | - | N | Escalations | Blank | - | Contains | -"
@@ -81,7 +81,7 @@ screens:
       - My Approvals (a rule waiting for authorization)
     shots:
       - {state: list, user: clxuh, caption: "Escalation Rules with their row menu: the rules in force and one waiting for authorization"}
-      - {state: new, user: clxuh, click: "^new rule$", fill: new_escalation_rule, caption: "New Escalation Rule dialog"}
+      - {state: new, user: clxuh, fill: new_escalation_rule, caption: "New Escalation Rule dialog"}
     fields:
       - "List | Rule | Column | Code with the name under it | - | Escalation rules | - | Read only | - | No escalation rules"
       - "List | Escalates When | Column | Basis, threshold and receiving level or user's name, for example Days since booking ≥ 45 → Team Lead | - | Escalation rules | - | Read only | - | -"

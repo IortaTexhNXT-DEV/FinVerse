@@ -12,7 +12,7 @@ screens:
       - Finance › Collections › Installment Plans
     shots:
       - {state: list, user: clxhandler, caption: "Installment Plans: the active plans with their basis, total and paid"}
-      - {state: new, user: clxhandler, click: "^new installment plan$", fill: new_plan, caption: "New Installment Plan dialog: installments of one invoice"}
+      - {state: new, user: clxhandler, fill: new_plan, caption: "New Installment Plan dialog: installments of one invoice"}
     fields:
       - "Tabs | Active Plans / Completed / Cancelled | Tab | - | - | Plan status | Active Plans | - | - | -"
       - "Toolbar | Search Plan No., ARN or Invoice No. | Text | - | N | Plans | Blank | - | Contains | -"
@@ -106,8 +106,8 @@ screens:
       - Installment Plan › installment row menu › Record Promise
     shots:
       - {state: list, user: clxhandler, caption: "Promises to Pay: the open promises with the promised date and amount"}
-      - {state: new, user: clxhandler, click: "^record promise$", fill: new_promise, caption: "Record Promise to Pay dialog"}
-      - {state: error, user: clxhandler, click: "^record promise$", fill: promise_over_balance, submit: "^record promise$", caption: "A promised amount above the outstanding is refused, with the outcome per invoice"}
+      - {state: new, user: clxhandler, fill: new_promise, caption: "Record Promise to Pay dialog"}
+      - {state: error, user: clxhandler, fill: promise_over_balance, caption: "A promised amount above the outstanding is refused, with the outcome per invoice"}
     fields:
       - "Tabs | Open Promises / Broken / Kept / Withdrawn | Tab | Kept includes partially kept | - | Promise status | Open Promises | - | - | -"
       - "Toolbar | Search Invoice No. or ARN | Text | - | N | Promises | Blank | - | Contains | -"

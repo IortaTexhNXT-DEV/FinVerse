@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { setUserDirectory } from '@/api/users';
 import type { DispositionRule } from './api';
@@ -9,16 +9,20 @@ import { SOURCE_LABELS, installmentActions } from './plans/labels';
 import type { Installment } from './plans/api';
 import {
   assignmentRuleActions,
+  changedFieldText,
+  changedValueText,
+  componentText,
   dispositionLabel,
   lockText,
   roleLabel,
   ruleSummary,
   taggingOwnerLabel,
+  templateText,
   thresholdText,
 } from './presentation';
 import { applicationFileText, paymentFacts } from './unapplied/labels';
 import type { UnappliedRow } from './unapplied/api';
-import { DetailInput, HandlerOptions } from './WorkInputs';
+import { DetailInput, HandlerOptions, LockBanner } from './WorkInputs';
 
 /** The screen standards on the Collections screens: names, labels, formats and row menus. */
 
@@ -72,6 +76,30 @@ describe('labels instead of codes', () => {
     render(<DetailInput id="p" field={path!} value="" onChange={vi.fn()} />);
     expect(screen.getByRole('option', { name: 'Paid in cash' })).toHaveValue('CASH');
     expect(screen.queryByRole('option', { name: 'CASH' })).toBeNull();
+  });
+});
+
+describe('dates as dd-MMM-yyyy', () => {
+  it('shows the pick-up date of a check pick-up on the BIBS date picker', () => {
+    const date = detailFields('CHECK_PICKUP').find((f) => f.key === 'pickupDate');
+    expect(date?.type).toBe('date');
+    const onChange = vi.fn();
+    render(<DetailInput id="pickup" field={date!} value="2026-10-04" onChange={onChange} />);
+    const input = screen.getByDisplayValue('04-Oct-2026');
+    expect(input).toHaveAttribute('id', 'pickup');
+    expect(input).not.toHaveAttribute('type', 'date');
+    expect(input).toHaveAttribute('placeholder', 'dd-MMM-yyyy');
+    expect(screen.getByRole('button', { name: 'Choose date' })).toBeInTheDocument();
+  });
+
+  it('passes the date typed as dd-MMM-yyyy on as an ISO date', () => {
+    const date = detailFields('CHECK_PICKUP').find((f) => f.key === 'pickupDate');
+    const onChange = vi.fn();
+    render(<DetailInput id="pickup" field={date!} value="" onChange={onChange} />);
+    fireEvent.change(screen.getByPlaceholderText('dd-MMM-yyyy'), {
+      target: { value: '04-Oct-2026' },
+    });
+    expect(onChange).toHaveBeenLastCalledWith('2026-10-04');
   });
 });
 
@@ -174,5 +202,51 @@ describe('row action menus', () => {
     menu[0]?.onSelect();
     expect(actions.onBill).toHaveBeenCalledWith(2);
     expect(installmentActions(installment, { ...actions, billed: new Set([2]) })).toHaveLength(1);
+  });
+});
+
+describe('the account record in words', () => {
+  it('names the premium components, never their codes in words', () => {
+    expect(componentText('FST')).toBe('FST');
+    expect(componentText('PR2307')).toBe('PR 2307');
+    expect(componentText('BASIC')).toBe('Basic Premium');
+    expect(componentText('PREMIUM_TAX_VAT')).toBe('Premium Tax / VAT');
+    expect(componentText('OTHER')).toBe('Other Charges');
+  });
+
+  it('shows the change log by field name, the handler by name and the codes by label', () => {
+    const look = {
+      name: (login: string) => (login === 'clxhandler' ? 'Clara Collection Handler' : login),
+      disposition: (code: string) => (code === 'FOR_CHECK_PICKUP' ? 'For check pick-up' : code),
+      effort: (code: string) => (code === 'CALL' ? 'Phone call' : code),
+    };
+    expect(changedFieldText('taggingOwner')).toBe('Tagging Owner');
+    expect(changedFieldText('dispositionCode')).toBe('Disposition');
+    expect(changedFieldText('lastEffortCode')).toBe('Last Effort');
+    expect(changedFieldText('currentHandler')).toBe('Handler');
+    expect(changedFieldText('someNewField')).toBe('Some New Field');
+    expect(changedValueText('currentHandler', 'clxhandler', look)).toBe('Clara Collection Handler');
+    expect(changedValueText('dispositionCode', 'FOR_CHECK_PICKUP', look)).toBe('For check pick-up');
+    expect(changedValueText('lastEffortCode', 'CALL', look)).toBe('Phone call');
+    expect(changedValueText('taggingOwner', 'MARKETING', look)).toBe('Marketing');
+    expect(changedValueText('status', 'OPEN', look)).toBe('Open');
+    expect(changedValueText('category', 'B', look)).toBe('Category B');
+    expect(changedValueText('remarks', null, look)).toBe('—');
+  });
+
+  it('names the statement template by its version, never its code', () => {
+    expect(templateText('CLX_SOA v1')).toBe('Statement template version 1.');
+    expect(templateText(undefined)).toBe('');
+  });
+
+  it('says who is editing an account in one sentence with single spaces', () => {
+    setUserDirectory([{ username: 'clxhandler', displayName: 'Clara Collection Handler' }]);
+    render(<LockBanner login="clxhandler" since="2026-10-01T17:53:00Z" />);
+    const banner = screen.getByRole('status');
+    expect(banner.children).toHaveLength(2);
+    expect(banner.textContent).toMatch(
+      /^Clara Collection Handler is editing since \d{2}-[A-Z][a-z]{2}-2026 \d{2}:\d{2}$/,
+    );
+    expect(banner.textContent).not.toMatch(/clxhandler| {2}/);
   });
 });

@@ -17,7 +17,9 @@ import com.iortatechnxt.brokerverse.opsledger.service.port.UnappliedDirectory.Un
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -120,10 +122,7 @@ public class UnappliedDispositionService {
         rule.code(),
         null);
     audit.record(
-        ENTITY,
-        unappliedRef,
-        AuditAction.UPDATE,
-        "Collector disposition " + rule.code() + (invoiceNo == null ? "" : " to " + invoiceNo));
+        ENTITY, unappliedRef, AuditAction.UPDATE, dispositionText(rule.label(), invoiceNo, null));
     return d;
   }
 
@@ -173,15 +172,16 @@ public class UnappliedDispositionService {
   public List<UnappliedEvent> history(Long companyId, String unappliedRef) {
     item(companyId, unappliedRef);
     List<UnappliedEvent> events = new ArrayList<>(directory.history(unappliedRef));
+    Map<String, String> labels = new HashMap<>();
+    rules.active().forEach(r -> labels.put(r.code(), r.label()));
     for (UnappliedDisposition d : of(companyId, unappliedRef)) {
+      String code = d.getDispositionCode();
       events.add(
           new UnappliedEvent(
               d.getCreatedAt(),
               "COLLECTOR_DISPOSITION",
-              "Collector disposition "
-                  + d.getDispositionCode()
-                  + (d.getInvoiceNo() == null ? "" : " to invoice " + d.getInvoiceNo())
-                  + (d.getRemarks() == null ? "" : ": " + d.getRemarks()),
+              dispositionText(
+                  labels.getOrDefault(code, ClxText.words(code)), d.getInvoiceNo(), d.getRemarks()),
               d.getAmount(),
               d.getCreatedBy(),
               d.getRequestId() == null ? null : ApplicationRequestService.KEY_PREFIX + d.getId()));
@@ -189,6 +189,22 @@ public class UnappliedDispositionService {
     events.sort(
         Comparator.comparing(UnappliedEvent::at, Comparator.nullsLast(Comparator.naturalOrder())));
     return events;
+  }
+
+  /**
+   * A collector disposition in the history of an item, by its label: "Collector disposition: For
+   * application to invoice, invoice BI-HO-2026-000008. Payor confirmed by e-mail".
+   *
+   * @param label label of the disposition value
+   * @param invoiceNo target invoice, may be null
+   * @param remarks remarks, may be null
+   * @return the history text
+   */
+  public static String dispositionText(String label, String invoiceNo, String remarks) {
+    return "Collector disposition: "
+        + label
+        + (invoiceNo == null ? "" : ", invoice " + invoiceNo)
+        + (remarks == null ? "" : ". " + remarks);
   }
 
   private static String blankToNull(String value) {

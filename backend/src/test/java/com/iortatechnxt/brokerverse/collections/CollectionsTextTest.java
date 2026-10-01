@@ -2,10 +2,12 @@ package com.iortatechnxt.brokerverse.collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.iortatechnxt.brokerverse.collections.bulk.service.CollectionsBulkActions;
 import com.iortatechnxt.brokerverse.collections.bulk.service.CollectionsBulkUpdateHandler;
 import com.iortatechnxt.brokerverse.collections.common.service.ClxText;
 import com.iortatechnxt.brokerverse.collections.disposition.service.DispositionSupport;
 import com.iortatechnxt.brokerverse.collections.disposition.service.PrDispositionService;
+import com.iortatechnxt.brokerverse.collections.escalation.domain.EscalationEnums.Stage;
 import com.iortatechnxt.brokerverse.collections.installment.service.InstallmentPlanService;
 import com.iortatechnxt.brokerverse.collections.promise.service.PromiseService;
 import com.iortatechnxt.brokerverse.collections.unapplied.service.UnappliedDispositionService;
@@ -44,6 +46,32 @@ class CollectionsTextTest {
     assertThat(ClxText.words("APPLY_TO_INVOICE")).isEqualTo("Apply to invoice");
     assertThat(ClxText.words("APPLIED")).isEqualTo("Applied");
     assertThat(ClxText.words(null)).isEmpty();
+  }
+
+  @Test
+  void escalationOutcomeNamesTheStageInWords() {
+    assertThat(CollectionsBulkActions.escalatedText("ESC-2026-000003", Stage.WITH_TL))
+        .isEqualTo("Escalated in ESC-2026-000003, with the team lead");
+    for (Stage stage : Stage.values()) {
+      assertThat(CollectionsBulkActions.escalatedText("ESC-2026-000001", stage))
+          .doesNotMatch(CODE)
+          .doesNotContain(stage.name());
+    }
+  }
+
+  @Test
+  void collectorDispositionHistoryNamesTheDispositionByLabel() {
+    assertThat(
+            UnappliedDispositionService.dispositionText(
+                "For application to invoice",
+                "BI-HO-2026-000008",
+                "Payor confirmed by e-mail that the payment is for this invoice"))
+        .isEqualTo(
+            "Collector disposition: For application to invoice, invoice BI-HO-2026-000008. Payor"
+                + " confirmed by e-mail that the payment is for this invoice")
+        .doesNotMatch(CODE);
+    assertThat(UnappliedDispositionService.dispositionText("For refund", null, null))
+        .isEqualTo("Collector disposition: For refund");
   }
 
   @Test

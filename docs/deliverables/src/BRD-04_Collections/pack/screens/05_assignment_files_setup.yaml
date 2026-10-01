@@ -14,7 +14,7 @@ screens:
     shots:
       - {state: list, user: clxtl, caption: "Assignments: the default assignment rules with their row menu, and Reassign by Criteria"}
       - {state: preview, user: clxtl, fill: reassign_criteria, click: "^preview accounts$", caption: "Reassign by Criteria: the accounts of a handler found by the preview"}
-      - {state: new, user: clxtl, click: "^new rule$", fill: new_assignment_rule, caption: "New Assignment Rule dialog"}
+      - {state: new, user: clxtl, fill: new_assignment_rule, caption: "New Assignment Rule dialog"}
     fields:
       - "Default Assignment Rules | Priority / Rule / Criteria / Handler / Status | Column | Lower numbers are tried first; criteria in words; handler's name; Active or Inactive | - | Assignment rules | - | Read only | - | No assignment rule: new accounts go to their account officer"
       - "Reassign by Criteria | Current Handler | Drop-down | Handlers by name, or any handler | N | Active collection handlers | Any handler | - | - | -"
@@ -82,11 +82,12 @@ screens:
       - {state: record, user: clxuh, caption: "Collections Setup: the parameters and the disposition rules"}
       - {state: change, user: clxuh, caption: "Change Parameter dialog of the minimal balance threshold"}
     fields:
-      - "Parameters | Parameter / Value / Description / Changed By | Column | The parameter, its value, what it does and the name of the last user who changed it | - | System parameters | Seeded defaults | - | Within the range of the parameter | -"
-      - "Disposition Rules | List / Disposition | Column | PR disposition or unapplied payment disposition; label with the code under it | - | Lists of values | - | Read only | - | -"
-      - "Disposition Rules | Category / Tagging Owner / Ops Action / Allowed Roles / Requires Invoice / Cashiering Action | Column | A, B or C; Marketing or Operations; the Operations action; the roles; true or false; the Cashiering action | N | Disposition attributes | Seeded defaults | - | A value of the attribute | '<value>' is not a valid <attribute>"
+      - "Parameters | Parameter / Value / Description / Changed By | Column | The parameter by name, its value, what it does and the name of the last user who changed it | - | System parameters | Seeded defaults | - | Within the range of the parameter | -"
+      - "Disposition Rules | PR Dispositions / Unapplied Payment Dispositions | Table | One table per list: the label of each disposition value with its code under it | - | Lists of values | - | Read only | - | -"
+      - "Disposition Rules | Category / Tagging Owner / Operations Action / Reserved To / Requires Invoice / Cashiering Action | Column | Category A, B or C; Marketing or Operations; the Operations action; the roles the value is reserved to (Every collector when none); Yes or No; the Cashiering action; Not set when blank | N | Disposition attributes | Seeded defaults | - | A value of the attribute | '<value>' is not a valid <attribute>"
+      - "Attribute dialog | [Attribute value] | Drop-down / check boxes | The labels of the attribute's values; the reserved roles as check boxes, none ticked for every collector | N | Disposition attributes | Current value | - | A value of the attribute | -"
       - "Unit Heads | Unit / Name / Level / Parent / Unit Head | Column | Sales unit with its level and parent; the Unit Head's name or From the parent unit | - | Sales organisation | - | - | An active user | -"
-      - "Change Parameter dialog | [Parameter value] | Text | The value with its hint | Y | - | Current value | - | Within the range of the parameter | -"
+      - "Change Parameter dialog | [Parameter value] | Text or drop-down | The value with its hint; the aging basis as a drop-down (Booking date or Inception date) | Y | - | Current value | - | Within the range of the parameter | -"
     actions:
       - "Refresh Worklist Now | Users with the Collections set-up permission | Always | Runs the refresh of the worklist from the invoice ledger at once and shows its outcome | - | -"
       - "[Parameter row] | Users with the Collections set-up permission | Always | Opens Change Parameter | - | -"

@@ -39,6 +39,12 @@ function statementOf(ctx, planId) {
 
 /** The two accounts of walkthrough A are booked by Processing (the steps before Collections). */
 async function prepare(ctx) {
+  // The seed opens the accounting periods up to the previous month; the finance manager opens the current month, the
+  // way Finance does at the start of a month, so the bookings of today are accepted.
+  const future = ctx.sql("select id from per_period where status = 'FUTURE' and start_date <= current_date order by start_date, id");
+  for (const [id] of future) {
+    await ctx.api('fmanager', 'POST', `/periods/${id}/open`);
+  }
   for (const arn of [ARN_A, ARN_C]) {
     if (!has(ctx, `select 1 from ops_invoice where arn = '${arn}'`)) {
       await ctx.api('proc', 'POST', '/booking/book', { arn });

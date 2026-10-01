@@ -1,4 +1,5 @@
 import type { Basis, EscalationStage, Rule, RuleInput, TargetLevel } from './api';
+import { humanize } from '@/utils/format';
 import { thresholdText } from '../presentation';
 
 /** Labels, tabs and form checks of the escalation screens (BRCLXN.049/050). */
@@ -16,6 +17,22 @@ export const ESCALATION_TABS: readonly {
   { id: 'RETURNED', label: 'Returned', stages: ['RETURNED'] },
   { id: 'RESOLVED', label: 'Resolved', stages: ['RESOLVED'] },
 ];
+
+/** The stages of an escalation as the status chips name them ("With Team Lead", never WITH_TL). */
+export const STAGE_LABELS: Readonly<Partial<Record<string, string>>> &
+  Record<EscalationStage, string> = {
+  RAISED: 'Raised',
+  WITH_TL: 'With Team Lead',
+  WITH_UH: 'With Unit / Section Head',
+  IN_ACTION: 'In Action',
+  RETURNED: 'Returned',
+  RESOLVED: 'Resolved',
+};
+
+/** The name of an escalation stage. */
+export function stageText(stage: string): string {
+  return STAGE_LABELS[stage] ?? humanize(stage);
+}
 
 export const LEVEL_LABELS: Record<TargetLevel, string> = {
   TL: 'Team Lead',

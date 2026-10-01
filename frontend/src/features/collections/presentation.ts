@@ -19,6 +19,11 @@ const ROLE_LABELS: Readonly<Record<string, string>> = {
   PROCESSOR: 'Processing',
 };
 
+/** The roles a disposition may be reserved to, as the choices of the set-up screen. */
+export const ROLE_OPTIONS: readonly { code: string; label: string }[] = Object.entries(
+  ROLE_LABELS,
+).map(([code, label]) => ({ code, label }));
+
 /** The name of a role, for the reserved roles of a disposition. */
 export function roleLabel(code: string): string {
   return ROLE_LABELS[code] ?? humanize(code);
@@ -82,4 +87,76 @@ export function assignmentRuleActions(
       ? { label: 'Deactivate', onSelect: on.activate, danger: true }
       : { label: 'Activate', onSelect: on.activate },
   ];
+}
+
+/** The premium components of the net PR breakdown, by name (the component codes are never shown). */
+const COMPONENT_LABELS: Readonly<Record<string, string>> = {
+  BASIC: 'Basic Premium',
+  DST: 'DST',
+  PREMIUM_TAX_VAT: 'Premium Tax / VAT',
+  LGT: 'LGT',
+  FST: 'FST',
+  PR2307: 'PR 2307',
+  OTHER: 'Other Charges',
+};
+
+/** The name of a premium component of an account. */
+export function componentText(code: string): string {
+  return COMPONENT_LABELS[code] ?? humanize(code);
+}
+
+/** The fields of the change log of an account, by name. */
+const CHANGED_FIELDS: Readonly<Record<string, string>> = {
+  status: 'Status',
+  currentHandler: 'Handler',
+  category: 'Category',
+  remarks: 'Remarks',
+  taggingOwner: 'Tagging Owner',
+  dispositionCode: 'Disposition',
+  lastEffortCode: 'Last Effort',
+};
+
+/** The name of a changed field of an account ("dispositionCode" reads "Disposition"). */
+export function changedFieldText(field: string): string {
+  return CHANGED_FIELDS[field] ?? humanize(field.replace(/([a-z])([A-Z])/g, '$1_$2'));
+}
+
+/** How the values of the change log read: the handler by name, a disposition or effort by its label. */
+export interface ValueLookups {
+  name: (login: string) => string;
+  disposition: (code: string) => string;
+  effort: (code: string) => string;
+}
+
+/** A value of the change log as the screens show it, never a code or a login. */
+export function changedValueText(
+  field: string,
+  value: string | null | undefined,
+  look: ValueLookups,
+): string {
+  if (value === null || value === undefined || value === '') {
+    return '—';
+  }
+  switch (field) {
+    case 'currentHandler':
+      return look.name(value);
+    case 'dispositionCode':
+      return look.disposition(value);
+    case 'lastEffortCode':
+      return look.effort(value);
+    case 'taggingOwner':
+      return taggingOwnerLabel(value) ?? value;
+    case 'status':
+      return humanize(value);
+    case 'category':
+      return `Category ${value}`;
+    default:
+      return value;
+  }
+}
+
+/** The template line of a statement of account: "CLX_SOA v1" reads "Statement template version 1". */
+export function templateText(version: string | undefined): string {
+  const n = /v(\d+)$/i.exec(version ?? '')?.[1];
+  return n === undefined ? '' : `Statement template version ${n}.`;
 }

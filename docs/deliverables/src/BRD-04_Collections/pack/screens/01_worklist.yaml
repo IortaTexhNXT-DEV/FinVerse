@@ -41,8 +41,8 @@ screens:
     shots:
       - {state: list, user: clxtl, caption: "PR Worklist of the Collection Team Lead: open accounts with handler, disposition and status"}
       - {state: filters, user: clxtl, click: "^filters$", caption: "PR Worklist with the Filters panel open"}
-      - {state: disposition, user: clxhandler, select: first_account, click: "^record disposition$", fill: pickup_disposition, caption: "Record Disposition of a selected account with the check pick-up details"}
-      - {state: reassign, user: clxtl, select: two_accounts, click: "^reassign$", fill: reassign_temporary, caption: "Reassign Accounts dialog for two selected accounts, temporary until an end date"}
+      - {state: disposition, user: clxhandler, fill: pickup_disposition, caption: "Record Disposition of a selected account with the check pick-up details"}
+      - {state: reassign, user: clxtl, fill: reassign_temporary, caption: "Reassign Accounts dialog for two selected accounts, temporary until an end date"}
     fields:
       - "Tabs | Open Accounts / Credit Balances / Completed Collections / Excluded / All | Tab | - | - | Collection status | Open Accounts | - | - | -"
       - "Toolbar | Search Invoice, ARN, Policy or Client | Text | Invoice, ARN, policy number or client code | N | Collection accounts | Blank | - | Contains | -"
@@ -106,7 +106,7 @@ screens:
       - "Header | [Flags] | Tag | Direct Payment, 2% CWT, On Hold, Pending Negative Adjustment, Locked by <team>, Marketing Action or Operations Action | - | Invoice ledger, disposition | - | Read only | - | -"
       - "Facts | Client / Outstanding / PR2307 / Aging / Insurer / Handler / AO / UH | Display | Client code; amounts with the currency; days with the bracket and the booking date; insurer name; names | - | Collection account | - | Read only | - | -"
       - "Summary | Booked / Endorsements / Adjustments / Payments Applied / Written Off / Reversed / Net Outstanding | Total | Two decimals | - | Invoice ledger | - | Read only | - | -"
-      - "Summary | Component / Booked / Adjusted / Applied / Written Off / Outstanding | Column | One row per premium component | - | Invoice ledger | - | Read only | - | The invoice is no longer in the ledger"
+      - "Summary | Component / Booked / Adjusted / Applied / Written Off / Outstanding | Column | One row per premium component by name (Basic Premium, DST, Premium Tax / VAT, LGT, FST, PR 2307, Other Charges) | - | Invoice ledger | - | Read only | - | The invoice is no longer in the ledger"
       - "Summary | Remarks / Last Effort / Promise / Escalation | Display | Collector's remarks; label and time of the last effort; promise and escalation status | - | Collection account | - | Read only | - | -"
       - "Payments | Premium Due / Paid / Outstanding | Total | Two decimals | - | Invoice ledger | - | Read only | - | -"
       - "Payments | Date / Type / AR / OR / Reference / Amount | Column | One row per payment applied or reversed, with the module that applied it | - | Invoice ledger (Cashiering) | - | Read only | - | No payment applied yet"
@@ -118,7 +118,7 @@ screens:
       - "Dispositions & Efforts | When / Effort / Channel / Contact / Remarks / Encoded By | Column | Label of the effort; names | - | Efforts | - | Read only | - | No effort logged yet"
       - "Dispositions & Efforts | Feed / Reference / Sent / Taken / Status | Column | Hand-offs to Cashiering and Commission | - | Hand-offs | - | Read only | - | Nothing handed to Operations"
       - "History | Date / Handler / Kind / Valid / Reason / By | Column | Assignments with the previous and new handler by name | - | Assignments | - | Read only | - | -"
-      - "History | Changed / Field / From / To / User / Source IP / Bulk Ref. | Column | One row per changed field | - | Collections audit log | - | Read only | - | -"
+      - "History | Changed / Field / From / To / User / Source IP / Bulk Ref. | Column | One row per changed field: the field by name, the values by label and the handler by name | - | Collections audit log | - | Read only | - | -"
       - "Update Remarks and Category dialog | Tagging Category / Remarks | Drop-down, text area | None, A, B or C; up to 1,000 characters | N | Fixed list | Current values | Open, Credit | Category A, B or C | The tagging category is A, B or C"
     actions:
       - "Open Invoice 360 | Users with Operations view | Always | Opens the invoice in Operations | - | -"

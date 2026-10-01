@@ -846,7 +846,7 @@ rules:
   - [R1, "Values delivered, all to be confirmed by BDOI (CQ08): DP PR for reversal; PR 2307 for reversal; For check pick-up; Cancel account; Coordinate further; Request bank AO assistance; No / missing policy number; DP returned by insurer.", Configurable, LOV CLX_PR_DISPOSITION]
   - [R2, "Only active values within their effective dates can be selected.", Fixed, "-"]
   - [R3, "The category A / B / C of each value is not seeded until BDOI gives it (CQ08).", Configurable, Collections Setup (Disposition Rules)]
-  - [R4, "No / missing policy number is reserved to PROCESSOR, MKT_COLLECTION, CLX_TL and MKT_SECTION_HEAD.", Configurable, "Disposition Rules (roles allowed)"]
+  - [R4, "No / missing policy number is reserved to Processing, the Collection Handler, the Collection Team Lead and the Section Head.", Configurable, "Disposition Rules (Reserved To)"]
 validations:
   - [Unknown value, "<code> is not a value of <type>", CLX_LOV_VALUE_UNKNOWN]
   - [Unknown attribute, "<attribute> is not an attribute of <type>", CLX_LOV_ATTRIBUTE_UNKNOWN]
@@ -855,9 +855,9 @@ fields_screen: Collections Setup, Disposition Rules
 fields:
   - [Disposition, List, "Yes", LOV CLX_PR_DISPOSITION, Existing value]
   - [Category, List, "No", "A, B, C", "-"]
-  - [Tagging Owner, List, "Yes", "MARKETING, OPERATIONS", "-"]
-  - [Operations Action, List, "Yes", "NONE, CWT2307_REVERSAL, DP_REVERSAL, CHECK_PICKUP, CANCEL_REQUEST", "-"]
-  - [Allowed Roles, Multi-select, "No", Roles, Blank = every role with CLX_WORK]
+  - [Tagging Owner, List, "Yes", "Marketing, Operations", "-"]
+  - [Operations Action, List, "Yes", "None, BIR 2307 reversal, DP reversal, Check pick-up, Cancellation request", "-"]
+  - [Reserved To, Check boxes, "No", Roles, None ticked = every collector]
 notifications:
   - "Pending LOV changes appear in My Approvals."
 audit:

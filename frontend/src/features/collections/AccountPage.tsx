@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CalendarRange, Lock, UserRound, Users, Wallet, Building2 } from 'lucide-react';
+import { CalendarRange, UserRound, Users, Wallet, Building2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '@/auth/authContext';
@@ -24,8 +24,8 @@ import { LegacyFollowUpCard } from './LegacyFollowUpCard';
 import { lockText, taggingOwnerLabel } from './presentation';
 import { InsurerName } from '@/components/broking/LovLabel';
 import { DetailsDialog, DispositionDialog, EffortDialog } from './WorkDialogs';
+import { LockBanner } from './WorkInputs';
 import './collections.css';
-import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
 
 function flags(a: Account): string[] {
@@ -278,12 +278,7 @@ export default function AccountPage() {
           />
         }
       />
-      {lockedByOther && (
-        <div className="clx-lock-banner" role="status">
-          <Lock size={16} aria-hidden="true" />
-          <UserName login={a.lock.editingBy} /> is editing since {formatDateTime(a.lock.since)}
-        </div>
-      )}
+      {lockedByOther && <LockBanner login={a.lock.editingBy} since={a.lock.since} />}
       <ErrorAlert error={refresh.error} />
       <Summary account={a} />
       <LegacyFollowUpCard item={a.item} />

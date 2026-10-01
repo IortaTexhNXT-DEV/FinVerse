@@ -11,7 +11,10 @@ import { validity } from './collectionsLogic';
 import { displayNameOf } from '@/api/users';
 import { UserName } from '@/components/ui/UserName';
 import { LovLabel } from '@/components/broking/LovLabel';
-import { dispositionLabel } from './presentation';
+import { changedFieldText, changedValueText, dispositionLabel } from './presentation';
+import type { ValueLookups } from './presentation';
+import { useLovLabel } from '@/components/broking/useLabels';
+import { useDisplayName } from '@/components/ui/useDisplayName';
 
 /** Dispositions (append-only), efforts and hand-offs to Operations (BRCLXN.016-023). */
 export function DispositionsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
@@ -124,6 +127,18 @@ export function HistoryTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
     queryKey: ['collections', 'assignments', invoiceNo],
     queryFn: () => collectionsApi.assignments(invoiceNo),
   });
+  const rules = useQuery({
+    queryKey: ['collections', 'disposition-rules'],
+    queryFn: collectionsApi.dispositionRules,
+    staleTime: 5 * 60_000,
+  });
+  const effort = useLovLabel('CLX_EFFORT_CODE');
+  const name = useDisplayName();
+  const look: ValueLookups = {
+    name,
+    disposition: (code) => dispositionLabel(rules.data, code),
+    effort,
+  };
   return (
     <div className="stack">
       <ErrorAlert error={changes.error ?? assignments.error} />
@@ -157,9 +172,13 @@ export function HistoryTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
           caption="Field changes"
           columns={[
             { key: 'd', header: 'Changed', render: (c) => formatDateTime(c.changedAt) },
-            { key: 'f', header: 'Field', render: (c) => humanize(c.field) },
-            { key: 'o', header: 'From', render: (c) => c.oldValue ?? '—' },
-            { key: 'n', header: 'To', render: (c) => c.newValue ?? '—' },
+            { key: 'f', header: 'Field', render: (c) => changedFieldText(c.field) },
+            {
+              key: 'o',
+              header: 'From',
+              render: (c) => changedValueText(c.field, c.oldValue, look),
+            },
+            { key: 'n', header: 'To', render: (c) => changedValueText(c.field, c.newValue, look) },
             {
               key: 'u',
               header: 'User / Source IP',

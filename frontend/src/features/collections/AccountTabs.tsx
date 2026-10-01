@@ -6,6 +6,7 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, formatDateTime, formatPeriod, humanize } from '@/utils/format';
+import { componentText } from './presentation';
 import { collectionsApi } from './api';
 import type { Account } from './api';
 import { TIMELINE_KINDS } from './collectionsLogic';
@@ -46,7 +47,7 @@ export function SummaryTab({ account }: Readonly<{ account: Account }>) {
         <DataTable
           caption="Breakdown"
           columns={[
-            { key: 'c', header: 'Component', render: (l) => humanize(l.component) },
+            { key: 'c', header: 'Component', render: (l) => componentText(l.component) },
             { key: 'b', header: 'Booked', numeric: true, render: (l) => formatAmount(l.booked) },
             {
               key: 'a',

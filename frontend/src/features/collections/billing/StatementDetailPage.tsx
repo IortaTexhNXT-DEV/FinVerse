@@ -25,6 +25,7 @@ import { billingApi } from './api';
 import { cycleText, statementEmail } from './labels';
 import { displayNameOf } from '@/api/users';
 import { Notice } from '@/components/ui/Notice';
+import { templateText } from '../presentation';
 
 const ENTITY = 'BillingStatement';
 
@@ -199,8 +200,8 @@ export default function StatementDetailPage() {
           rowKey={(l) => l.lineNo}
         />
         <p className="muted">
-          Template {s.templateVersion ?? '–'}. Billing is for monitoring only: this statement
-          creates no receivable and no commission billing.
+          {templateText(s.templateVersion)} Billing is for monitoring only: this statement creates
+          no receivable and no commission billing.
         </p>
       </Card>
       <Card title="E-mails Sent">

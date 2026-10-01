@@ -11,7 +11,12 @@ import { DetailList } from '@/features/catalog/DetailList';
 import type { DetailRow } from '@/features/catalog/DetailList';
 import { formatDate, formatDateTime, formatPeriod, formatRate, humanize } from '@/utils/format';
 import { displayNameOf } from '@/api/users';
-import { LovLabel, ProductLineLabel, InsurerWithBranch } from '@/components/broking/LovLabel';
+import {
+  InsurerWithBranch,
+  LovLabel,
+  ProductLineLabel,
+  SalesUnitPath,
+} from '@/components/broking/LovLabel';
 
 function detailRows(a: Account): DetailRow[] {
   return [
@@ -34,7 +39,7 @@ function detailRows(a: Account): DetailRow[] {
     ['Account officer', displayNameOf(a.sales.accountOfficer)],
     [
       'Sales unit',
-      [a.sales.region, a.sales.department, a.sales.team].filter(Boolean).join(' / ') || '—',
+      <SalesUnitPath key="u" codes={[a.sales.region, a.sales.department, a.sales.team]} />,
     ],
     ['Cost center', a.sales.costCenter],
     ['Created', `${displayNameOf(a.createdBy)} ${formatDateTime(a.createdAt)}`],

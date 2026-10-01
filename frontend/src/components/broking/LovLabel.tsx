@@ -153,3 +153,13 @@ export function InsurerWithBranch({
   }
   return <>{branch ? `${insurerName(insurer)} / ${branchName(branch)}` : insurerName(insurer)}</>;
 }
+
+/** "Consumer Banking - NCR / CBG Team 1": the sales units of a record by their names, in order. */
+export function SalesUnitPath({
+  codes,
+  empty = '—',
+}: Readonly<{ codes: readonly (string | null | undefined)[]; empty?: string }>) {
+  const name = useSalesUnitName();
+  const known = codes.filter((c): c is string => Boolean(c));
+  return <>{known.length > 0 ? known.map((c) => name(c)).join(' / ') : empty}</>;
+}

@@ -5,7 +5,7 @@ import { catalogApi } from '@/api/catalog';
 import type { Insurer, InsurerDetail } from '@/api/catalog';
 import type { Company } from '@/api/types';
 import { WorkspaceContext } from '@/context/workspaceContext';
-import { InsurerWithBranch } from './LovLabel';
+import { InsurerWithBranch, SalesUnitPath } from './LovLabel';
 
 function show(insurer: string, branch?: string) {
   const queries = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -55,5 +55,37 @@ describe('InsurerWithBranch', () => {
     } as unknown as InsurerDetail);
     show('INS-MGIC');
     expect(await screen.findByText('Mabuhay General Insurance Corp.')).toBeTruthy();
+  });
+
+  it('names the sales units of a record in order, never their codes', async () => {
+    vi.spyOn(catalogApi, 'salesOrganisation').mockResolvedValue({
+      units: [
+        { code: 'NCR', name: 'National Capital Region' },
+        { code: 'CBG-NCR', name: 'Consumer Banking - NCR' },
+        { code: 'T-CBG1', name: 'CBG Team 1' },
+      ],
+    } as unknown as Awaited<ReturnType<typeof catalogApi.salesOrganisation>>);
+    const queries = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    render(
+      <QueryClientProvider client={queries}>
+        <WorkspaceContext.Provider
+          value={{
+            companies: [],
+            company: { id: 1 } as Company,
+            branches: [],
+            branchId: undefined,
+            setCompanyId: () => undefined,
+            setBranchId: () => undefined,
+          }}
+        >
+          <p>
+            <SalesUnitPath codes={['NCR', 'CBG-NCR', null, 'T-CBG1']} />
+          </p>
+        </WorkspaceContext.Provider>
+      </QueryClientProvider>,
+    );
+    expect(
+      await screen.findByText('National Capital Region / Consumer Banking - NCR / CBG Team 1'),
+    ).toBeTruthy();
   });
 });

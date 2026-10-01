@@ -80,6 +80,10 @@ public class AppUser extends BaseEntity {
   @Column(name = "mobile_no", length = 30)
   private String mobileNo;
 
+  /** Data scope: every company and branch (the default, V1240), else the listed grants. */
+  @Column(name = "all_companies", nullable = false)
+  private boolean allCompanies = true;
+
   @ManyToMany(fetch = FetchType.EAGER)
   @JoinTable(
       name = "sec_user_role",
@@ -282,6 +286,14 @@ public class AppUser extends BaseEntity {
 
   public void setMobileNo(String mobileNo) {
     this.mobileNo = mobileNo;
+  }
+
+  public boolean isAllCompanies() {
+    return allCompanies;
+  }
+
+  public void setAllCompanies(boolean allCompanies) {
+    this.allCompanies = allCompanies;
   }
 
   /**

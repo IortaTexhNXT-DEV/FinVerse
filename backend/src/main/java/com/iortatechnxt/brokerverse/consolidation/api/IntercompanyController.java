@@ -1,5 +1,7 @@
 package com.iortatechnxt.brokerverse.consolidation.api;
 
+import com.iortatechnxt.brokerverse.common.security.CompanyScoped;
+import com.iortatechnxt.brokerverse.common.security.DataScope;
 import com.iortatechnxt.brokerverse.consolidation.api.dto.IntercompanyTransactionRequest;
 import com.iortatechnxt.brokerverse.consolidation.api.dto.IntercompanyTransactionResponse;
 import com.iortatechnxt.brokerverse.consolidation.api.dto.ReconciliationLineResponse;
@@ -32,17 +34,22 @@ public class IntercompanyController {
 
   private final IntercompanyService service;
   private final IntercompanyReconciliationService reconciliation;
+  private final DataScope dataScope;
 
   /**
    * Creates the controller.
    *
    * @param service inter-company service
    * @param reconciliation reconciliation service
+   * @param dataScope data scope guard (both companies of a relationship or transaction)
    */
   public IntercompanyController(
-      IntercompanyService service, IntercompanyReconciliationService reconciliation) {
+      IntercompanyService service,
+      IntercompanyReconciliationService reconciliation,
+      DataScope dataScope) {
     this.service = service;
     this.reconciliation = reconciliation;
+    this.dataScope = dataScope;
   }
 
   /**
@@ -66,7 +73,10 @@ public class IntercompanyController {
   @PostMapping("/relationships")
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(RUN)
+  @CompanyScoped("both companies of the relationship are checked here")
   public RelationshipResponse create(@Valid @RequestBody RelationshipRequest request) {
+    dataScope.requireCompany(request.companyAId());
+    dataScope.requireCompany(request.companyBId());
     return RelationshipResponse.from(service.createRelationship(request));
   }
 
@@ -106,8 +116,11 @@ public class IntercompanyController {
   @PostMapping("/transactions")
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(RUN)
+  @CompanyScoped("the creditor and debtor companies are checked here")
   public IntercompanyTransactionResponse post(
       @Valid @RequestBody IntercompanyTransactionRequest request) {
+    dataScope.requireCompany(request.creditorCompanyId());
+    dataScope.requireCompany(request.debtorCompanyId());
     return IntercompanyTransactionResponse.from(service.post(request));
   }
 

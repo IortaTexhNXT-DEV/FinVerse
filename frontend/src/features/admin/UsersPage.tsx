@@ -16,9 +16,11 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { RowActionMenu } from '@/components/ui/RowActionMenu';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDateTime } from '@/utils/format';
+import { DataAccessDialog } from './DataAccessDialog';
 import { UserSessionsDialog } from './UserSessionsDialog';
 import { useLovLabel } from '@/components/broking/useLabels';
 
@@ -56,11 +58,42 @@ function matches(
   return found && (status === '' || statusOf(u, online) === status);
 }
 
+/** The dialogs opened from a row menu: the sessions and the data access of a user. */
+function RowDialogs({
+  sessionsOf,
+  dataAccessOf,
+  direct,
+  onRaiseRequest,
+  onClose,
+}: Readonly<{
+  sessionsOf: string | null;
+  dataAccessOf: UserProfile | null;
+  direct: boolean;
+  onRaiseRequest: (username: string) => void;
+  onClose: () => void;
+}>) {
+  if (sessionsOf !== null) {
+    return <UserSessionsDialog username={sessionsOf} onClose={onClose} />;
+  }
+  if (dataAccessOf === null) {
+    return null;
+  }
+  return (
+    <DataAccessDialog
+      user={dataAccessOf}
+      editable={direct}
+      onRaiseRequest={() => onRaiseRequest(dataAccessOf.username)}
+      onClose={onClose}
+    />
+  );
+}
+
 const EMPTY: UserInput = { username: '', fullName: '', email: '', roleCodes: [], enabled: true };
 
 /**
- * User administration (FR-UA-052): users with their Windows ID, business unit, user level and
- * status, unlock and password reset. Creating and changing users is done through access requests
+ * User administration (FR-UA-052): users with their Windows ID, business unit, user level, data
+ * access (companies and branches, DATA_SCOPE_DESIGN.md) and status; unlock, sessions and data
+ * access in the row menu. Creating and changing users is done through access requests
  * ("Raise Request"); the direct edit stays for the System Administrator in an emergency
  * (UAM_DIRECT_ROLE_EDIT).
  */
@@ -73,6 +106,7 @@ export default function UsersPage() {
   const [text, setText] = useState('');
   const [status, setStatus] = useState('');
   const [sessionsOf, setSessionsOf] = useState<string | null>(null);
+  const [dataAccessOf, setDataAccessOf] = useState<UserProfile | null>(null);
   const users = useQuery({ queryKey: ['users'], queryFn: adminApi.users });
   const onlineUsers = useQuery({
     queryKey: ['online-users'],
@@ -215,41 +249,39 @@ export default function UsersPage() {
               render: (u) => <StatusBadge status={statusOf(u, online)} />,
             },
             {
+              key: 'da',
+              header: 'Data Access',
+              render: (u) => (u.allCompanies === false ? 'Selected companies' : 'All companies'),
+            },
+            {
               key: 'a',
               header: 'Actions',
               render: (u) => (
-                <div className="row">
-                  {u.locked && (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        unlock.mutate(u.id);
-                      }}
-                    >
-                      Unlock
-                    </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSessionsOf(u.username);
-                    }}
-                  >
-                    Sessions
-                  </Button>
-                </div>
+                <RowActionMenu
+                  label={u.username}
+                  actions={[
+                    ...(u.locked ? [{ label: 'Unlock', onSelect: () => unlock.mutate(u.id) }] : []),
+                    { label: 'Sessions', onSelect: () => setSessionsOf(u.username) },
+                    { label: 'Data access', onSelect: () => setDataAccessOf(u) },
+                  ]}
+                />
               ),
             },
           ]}
         />
       </Card>
-      {sessionsOf !== null && (
-        <UserSessionsDialog username={sessionsOf} onClose={() => setSessionsOf(null)} />
-      )}
+      <RowDialogs
+        sessionsOf={sessionsOf}
+        dataAccessOf={dataAccessOf}
+        direct={direct}
+        onRaiseRequest={(username) =>
+          void navigate(`/user-access/requests/new?type=MODIFY_USER&user=${username}`)
+        }
+        onClose={() => {
+          setSessionsOf(null);
+          setDataAccessOf(null);
+        }}
+      />
       <Modal
         title={editing?.id === undefined ? 'New user' : `Edit ${editing.user.username}`}
         open={editing !== null}

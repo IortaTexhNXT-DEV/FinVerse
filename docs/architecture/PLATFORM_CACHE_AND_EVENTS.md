@@ -69,6 +69,7 @@ from a screen) takes `JobLock.tryAcquire(jobName)` before the work:
 | `lov-values` | every value of a list, key = list type | 1 h | `LovValue`, `LovType` | `LovService.label`, `validateOptional`, `options` (pick lists, `GET /lov/{type}/options`) via `LovLookup` |
 | `system-parameters` | raw value, key = parameter key (null cached) | 15 min | `SystemParameter` | `SystemParameterService.intValue/text/items` via `SystemParameterLookup` |
 | `security-role-permissions` | permissions of a role, key = role code | 15 min | `Role` (and its grants) | `AppUserDetailsService` (every request) via `RolePermissionLookup` |
+| `security-data-scope` | company and branch data scope of a user, key = lower-case user name | 15 min | `AppUser`, `UserDataScopeGrant` | `DataScopeGuard` (every request naming a company) via `DataScopeLookup` ([`DATA_SCOPE_DESIGN.md`](DATA_SCOPE_DESIGN.md)) |
 | `catalog-product-versions` | version views `current:<p>:<date>`, `inForce:<p>:<date>`, `version:<p>:<n>`, `versions:<p>` | 1 h | `ProductVersion`, `RiskProduct` | `ProductVersionQueryService` (catalog `ProductVersionQueries`); **outside read-write transactions only** |
 | `organization-units` | `company:<id>`, `company-code:<code>`, `branch:<id>`, `branches:<companyId>` | 1 h | `Company`, `Branch` | `OrganizationDirectory` (cached records; `OrganizationService` keeps returning entities) |
 

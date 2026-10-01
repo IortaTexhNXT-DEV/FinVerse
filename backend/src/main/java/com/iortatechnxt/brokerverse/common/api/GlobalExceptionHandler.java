@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.common.api;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.exception.DataScopeDeniedException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.FieldValidationException;
 import com.iortatechnxt.brokerverse.common.exception.ModuleNotInUseException;
@@ -215,6 +216,17 @@ public class GlobalExceptionHandler {
   public ProblemDetail handleAccessDenied(AccessDeniedException ex) {
     return problem(
         HttpStatus.FORBIDDEN, "ACCESS_DENIED", "You are not permitted to perform this action");
+  }
+
+  /**
+   * Handles a company or branch outside the data scope of the user (DATA_SCOPE_DESIGN.md).
+   *
+   * @param ex exception
+   * @return problem detail (403)
+   */
+  @ExceptionHandler(DataScopeDeniedException.class)
+  public ProblemDetail handleDataScopeDenied(DataScopeDeniedException ex) {
+    return problem(HttpStatus.FORBIDDEN, DataScopeDeniedException.CODE, ex.getMessage());
   }
 
   /**

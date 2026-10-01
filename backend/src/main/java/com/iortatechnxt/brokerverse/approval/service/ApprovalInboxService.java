@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.approval.service;
 
+import com.iortatechnxt.brokerverse.common.security.DataScope;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
@@ -27,24 +28,27 @@ public class ApprovalInboxService {
           PendingApproval::submittedAt, Comparator.nullsLast(Comparator.<Instant>naturalOrder()));
 
   private final List<PendingApprovalSource> sources;
+  private final DataScope dataScope;
 
   /**
    * Creates the service.
    *
    * @param sources all inbox sources
+   * @param dataScope data scope of the current user (items of other companies are not shown)
    */
-  public ApprovalInboxService(List<PendingApprovalSource> sources) {
+  public ApprovalInboxService(List<PendingApprovalSource> sources, DataScope dataScope) {
     this.sources = List.copyOf(sources);
+    this.dataScope = dataScope;
   }
 
   /**
-   * Items waiting for the current user's approval.
+   * Items waiting for the current user's approval, of the companies of his data scope.
    *
    * @param companyId company filter (null = all companies)
    * @return items, oldest first
    */
   public List<PendingApproval> inbox(Long companyId) {
-    return collect(currentViewer(), companyId);
+    return dataScope.filter(collect(currentViewer(), companyId), PendingApproval::companyId);
   }
 
   /**

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.service;
 
+import java.util.List;
 import java.util.Optional;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -22,5 +23,27 @@ public class SecurityPortDefaults {
   @ConditionalOnMissingBean(ApprovedRoleRequests.class)
   public ApprovedRoleRequests noApprovedRoleRequests() {
     return (requestNo, roleCode) -> Optional.empty();
+  }
+
+  /**
+   * No company or branch is known until {@code organization} implements {@link OrganizationUnits}:
+   * only "All companies" can be granted and a branch without its company is refused.
+   *
+   * @return default adapter
+   */
+  @Bean
+  @ConditionalOnMissingBean(OrganizationUnits.class)
+  public OrganizationUnits noOrganizationUnits() {
+    return new OrganizationUnits() {
+      @Override
+      public List<CompanyUnit> companies() {
+        return List.of();
+      }
+
+      @Override
+      public Optional<Long> companyOfBranch(Long branchId) {
+        return Optional.empty();
+      }
+    };
   }
 }

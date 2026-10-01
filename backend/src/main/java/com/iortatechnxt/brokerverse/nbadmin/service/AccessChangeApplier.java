@@ -14,6 +14,7 @@ import com.iortatechnxt.brokerverse.security.domain.Permission;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
 import com.iortatechnxt.brokerverse.security.service.ChangeAuthority;
+import com.iortatechnxt.brokerverse.security.service.DataScopeService;
 import com.iortatechnxt.brokerverse.security.service.UserAdminService;
 import java.util.EnumSet;
 import java.util.Set;
@@ -24,7 +25,8 @@ import org.springframework.stereotype.Component;
  * rules, audit entries and access change log rows (with the request number and approver, BRD
  * 4.003.1) apply as for a change made on the Users or Roles screen. A role-permission change
  * (PMADD05) adds and removes the requested permissions on the role as it is when applied. External
- * (portal) users are provisioned through {@link ExternalUserProvisioner} (decision D7).
+ * (portal) users are provisioned through {@link ExternalUserProvisioner} (decision D7). A requested
+ * data scope (V1240) is applied with the user data, on the same authority.
  */
 @Component
 public class AccessChangeApplier {
@@ -33,6 +35,7 @@ public class AccessChangeApplier {
   private final RoleRepository roles;
   private final TemporaryPasswords passwords;
   private final ExternalUserApplier externalUsers;
+  private final DataScopeService dataScopes;
 
   /**
    * Creates the applier.
@@ -41,16 +44,19 @@ public class AccessChangeApplier {
    * @param roles roles
    * @param passwords temporary password generator
    * @param externalUsers external (portal) users
+   * @param dataScopes data scope administration
    */
   public AccessChangeApplier(
       UserAdminService userAdmin,
       RoleRepository roles,
       TemporaryPasswords passwords,
-      ExternalUserApplier externalUsers) {
+      ExternalUserApplier externalUsers,
+      DataScopeService dataScopes) {
     this.userAdmin = userAdmin;
     this.roles = roles;
     this.passwords = passwords;
     this.externalUsers = externalUsers;
+    this.dataScopes = dataScopes;
   }
 
   /**
@@ -85,20 +91,22 @@ public class AccessChangeApplier {
   private String create(AccessRequest r, ChangeAuthority authority) {
     String password = passwords.generate();
     RequestedUserData d = r.getUserData();
-    userAdmin.createUser(
-        new UserRequest(
-            r.getUsername(),
-            r.getFullName(),
-            r.getEmail(),
-            r.getHomeBranchId(),
-            d.authorizationLimit(),
-            r.roles(),
-            true,
-            d.windowsId(),
-            d.businessUnitCode(),
-            d.userLevel()),
-        password,
-        authority);
+    AppUser created =
+        userAdmin.createUser(
+            new UserRequest(
+                r.getUsername(),
+                r.getFullName(),
+                r.getEmail(),
+                r.getHomeBranchId(),
+                d.authorizationLimit(),
+                r.roles(),
+                true,
+                d.windowsId(),
+                d.businessUnitCode(),
+                d.userLevel()),
+            password,
+            authority);
+    d.requestedScope().ifPresent(scope -> dataScopes.replace(created, scope, authority));
     return password;
   }
 
@@ -129,6 +137,7 @@ public class AccessChangeApplier {
             d.businessUnitCode(),
             d.userLevel()),
         authority);
+    d.requestedScope().ifPresent(scope -> dataScopes.replace(user, scope, authority));
     if (type == AccessRequestType.ENABLE_USER && (d.unlock() || user.isLocked())) {
       userAdmin.unlock(user.getId());
     }

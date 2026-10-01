@@ -60,7 +60,8 @@ final class UamReportSupport {
           Map.entry("CREATE_ROLE", "Create Group Profile"),
           Map.entry("ROLE_PERMISSIONS", "Modify Group Profile Access of"),
           Map.entry("DEACTIVATE_ROLE", "Deactivate Group Profile"),
-          Map.entry("REACTIVATE_ROLE", "Reactivate Group Profile"));
+          Map.entry("REACTIVATE_ROLE", "Reactivate Group Profile"),
+          Map.entry("DATA_SCOPE_CHANGED", "Modify User Data Access of"));
 
   private UamReportSupport() {}
 

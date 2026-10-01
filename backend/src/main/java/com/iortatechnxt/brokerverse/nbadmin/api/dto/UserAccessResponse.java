@@ -11,6 +11,7 @@ import java.util.stream.Collectors;
  * A user as seen when preparing an access request: the current values shown next to the requested
  * ones (FR-UA-012, FR-UA-030).
  *
+ * @param id user id (the Data access of the user, DATA_SCOPE_DESIGN.md)
  * @param username user name
  * @param fullName full name
  * @param enabled enabled flag
@@ -24,6 +25,7 @@ import java.util.stream.Collectors;
  * @param authorizationLimit authorisation limit, null for none
  */
 public record UserAccessResponse(
+    Long id,
     String username,
     String fullName,
     boolean enabled,
@@ -44,6 +46,7 @@ public record UserAccessResponse(
    */
   public static UserAccessResponse from(AppUser u) {
     return new UserAccessResponse(
+        u.getId(),
         u.getUsername(),
         u.getFullName(),
         u.isEnabled(),

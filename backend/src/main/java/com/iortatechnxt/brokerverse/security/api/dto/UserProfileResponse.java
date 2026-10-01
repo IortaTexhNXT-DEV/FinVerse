@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
  * @param mustChangePassword true when the password was set by an administrator
  * @param lastLogoutAt last sign-out
  * @param mobileNo mobile number, maintained by the user (UQ17)
+ * @param allCompanies data access to every company and branch (else a list, DATA_SCOPE_DESIGN.md)
  */
 public record UserProfileResponse(
     Long id,
@@ -47,7 +48,8 @@ public record UserProfileResponse(
     String userLevel,
     boolean mustChangePassword,
     Instant lastLogoutAt,
-    String mobileNo) {
+    String mobileNo,
+    boolean allCompanies) {
 
   /**
    * Maps an entity.
@@ -73,6 +75,7 @@ public record UserProfileResponse(
         u.getUserLevel(),
         u.isMustChangePassword(),
         u.getLastLogoutAt(),
-        u.getMobileNo());
+        u.getMobileNo(),
+        u.isAllCompanies());
   }
 }

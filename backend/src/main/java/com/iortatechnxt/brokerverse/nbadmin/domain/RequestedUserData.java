@@ -1,8 +1,10 @@
 package com.iortatechnxt.brokerverse.nbadmin.domain;
 
+import com.iortatechnxt.brokerverse.common.security.UserDataScope;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import java.math.BigDecimal;
+import java.util.Optional;
 
 /**
  * User data an access request sets besides the name, e-mail, branch and roles (BRD 1.002.1.1.1,
@@ -16,6 +18,8 @@ import java.math.BigDecimal;
  * @param unlock whether a reactivation also unlocks a locked account
  * @param authorizationLimit authorisation limit of the user's approvals by amount (journals,
  *     payables), null for none / unchanged (V1065)
+ * @param dataScope companies and branches the user may act for, in the text form of {@link
+ *     UserDataScope#text()}; null for unchanged (create: all companies) (V1240)
  */
 @Embeddable
 public record RequestedUserData(
@@ -24,12 +28,12 @@ public record RequestedUserData(
     @Column(name = "user_level", length = 40) String userLevel,
     @Column(name = "reason_code", length = 40) String reasonCode,
     @Column(name = "unlock_account", nullable = false) boolean unlock,
-    @Column(name = "authorization_limit", precision = 18, scale = 2)
-        BigDecimal authorizationLimit) {
+    @Column(name = "authorization_limit", precision = 18, scale = 2) BigDecimal authorizationLimit,
+    @Column(name = "data_scope", length = 2000) String dataScope) {
 
   /** No additional data. */
   public static final RequestedUserData NONE =
-      new RequestedUserData(null, null, null, null, false, null);
+      new RequestedUserData(null, null, null, null, false, null, null);
 
   /**
    * User data without an authorisation limit.
@@ -46,7 +50,36 @@ public record RequestedUserData(
       String userLevel,
       String reasonCode,
       boolean unlock) {
-    this(windowsId, businessUnitCode, userLevel, reasonCode, unlock, null);
+    this(windowsId, businessUnitCode, userLevel, reasonCode, unlock, null, null);
+  }
+
+  /**
+   * User data without a data scope.
+   *
+   * @param windowsId Windows ID
+   * @param businessUnitCode business unit group
+   * @param userLevel user level
+   * @param reasonCode deactivation reason
+   * @param unlock whether a reactivation also unlocks the account
+   * @param authorizationLimit authorisation limit, null for none / unchanged
+   */
+  public RequestedUserData(
+      String windowsId,
+      String businessUnitCode,
+      String userLevel,
+      String reasonCode,
+      boolean unlock,
+      BigDecimal authorizationLimit) {
+    this(windowsId, businessUnitCode, userLevel, reasonCode, unlock, authorizationLimit, null);
+  }
+
+  /**
+   * The requested data scope.
+   *
+   * @return scope, empty when the request leaves it unchanged
+   */
+  public Optional<UserDataScope> requestedScope() {
+    return dataScope == null ? Optional.empty() : Optional.of(UserDataScope.parse(dataScope));
   }
 
   /** Blank values are absent. */
@@ -55,6 +88,7 @@ public record RequestedUserData(
     businessUnitCode = clean(businessUnitCode);
     userLevel = clean(userLevel);
     reasonCode = clean(reasonCode);
+    dataScope = dataScope == null ? null : dataScope.trim();
   }
 
   private static String clean(String value) {

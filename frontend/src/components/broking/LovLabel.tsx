@@ -1,6 +1,7 @@
 import {
   useCoverTypeName,
   useCoverageName,
+  useInsurerBranchName,
   useInsurerName,
   useLineName,
   useLovLabel,
@@ -133,4 +134,21 @@ export function SalesUnitName({
     return <span className="muted">{empty}</span>;
   }
   return <>{name(code)}</>;
+}
+
+/**
+ * "Mabuhay General Insurance Corp. / Makati": the insurer and its branch by their names (the branch
+ * left out when there is none), never their codes.
+ */
+export function InsurerWithBranch({
+  insurer,
+  branch,
+  empty = '—',
+}: Readonly<{ insurer: string | null | undefined; branch?: string | null; empty?: string }>) {
+  const insurerName = useInsurerName();
+  const branchName = useInsurerBranchName(insurer);
+  if (!insurer) {
+    return <span className="muted">{empty}</span>;
+  }
+  return <>{branch ? `${insurerName(insurer)} / ${branchName(branch)}` : insurerName(insurer)}</>;
 }

@@ -846,6 +846,16 @@ const bulk = {
   },
 };
 
-async function prepare() {}
+/**
+ * Before the capture: the accounting period of today (Philippine date) is opened by the finance
+ * manager when the seed calendar still has it in the future (a capture on the first days of a month
+ * books into that month).
+ */
+async function prepare(ctx) {
+  const due = ctx.sql("select id from per_period where status = 'FUTURE' and start_date <= (now() at time zone 'Asia/Manila')::date order by start_date");
+  for (const [id] of due) {
+    await ctx.api('fmanager', 'POST', `/periods/${id}/open`);
+  }
+}
 
 module.exports = { steps, bulk, prepare, rowAction, rowOffers, addItem, bulkClientFile, pdf, csv, act, press, tab, go, button, settle, uploadDocument, TMP };

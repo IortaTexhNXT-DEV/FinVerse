@@ -104,7 +104,7 @@ screens:
       - "Tabs | All Slips / To Send / Sent / Superseded | Tab | - | - | Fixed | All Slips | - | - | -"
       - "List | Slip | Column | PL-yyyy-nnnnnn with its version | - | Numbering | - | Read only | - | -"
       - "List | Status | Column | Generated, Sent, Superseded | - | Placement slip | - | Read only | - | -"
-      - "List | Insurer / Branch | Column | Codes | - | Insurer master | - | Read only | - | -"
+      - "List | Insurer / Branch | Column | Insurer and branch names | - | Insurer master | - | Read only | - | -"
       - "List | Accounts | Column | ARNs, each opening the account placement | - | Placement slip | - | Read only | - | -"
       - "List | Sent | Column | Time sent, recipients and number of sends | - | Outbound messages | - | Read only | - | -"
       - "List | Actions | Row action menu | Download PDF, Download Excel, Send or Resend, Regenerate: the actions the user may take now | - | - | - | - | - | -"

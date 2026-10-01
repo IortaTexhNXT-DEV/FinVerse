@@ -71,6 +71,35 @@ export function useInsurerName(): (code: string | null | undefined) => string {
 }
 
 /**
+ * Name lookup of the branches of one insurer: returns a function from the branch code to its name
+ * ("Makati"); the code while the insurer loads.
+ */
+export function useInsurerBranchName(
+  insurerCode: string | null | undefined,
+): (code: string | null | undefined) => string {
+  const companyId = useContext(WorkspaceContext)?.company?.id ?? 0;
+  const insurers = useQuery({
+    queryKey: ['catalog', 'insurers', companyId],
+    queryFn: () => catalogApi.insurers(companyId),
+    staleTime: STALE,
+    enabled: companyId > 0,
+  });
+  const id = insurers.data?.find((i) => i.partyCode === insurerCode)?.id;
+  const detail = useQuery({
+    queryKey: ['catalog', 'insurer', id],
+    queryFn: () => catalogApi.insurer(id ?? 0),
+    staleTime: STALE,
+    enabled: id !== undefined,
+  });
+  return (code) => {
+    if (!code) {
+      return '';
+    }
+    return detail.data?.branches.find((b) => b.code === code)?.name ?? code;
+  };
+}
+
+/**
  * Name lookup of cover types: returns a function from a line and cover type code to the cover type
  * name ("Comprehensive"); the humanized code while the list loads.
  */

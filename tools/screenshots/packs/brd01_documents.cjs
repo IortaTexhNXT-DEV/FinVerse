@@ -89,12 +89,12 @@ function extOf(buffer) {
 }
 
 /** Downloads a file from the API as `user` and renders its first page. */
-async function download(ctx, user, url, out, ext) {
+async function download(ctx, user, url, out, ext, keep = []) {
   const data = await ctx.api(user, 'GET', url);
   if (!Buffer.isBuffer(data)) {
     throw new Error(`${url} did not return a file`);
   }
-  render(data, ext || extOf(data), out);
+  render(data, ext || extOf(data), out, undefined, keep);
 }
 
 const one = (ctx, q) => ctx.one(q);
@@ -132,7 +132,8 @@ const shots = {
   'doc-service-invoice': (ctx, out) => download(ctx, 'proc',
     `/booking/service-invoices/${one(ctx, 'select id from bkg_service_invoice order by id desc limit 1')}/pdf`, out),
   'doc-clpc-billing': (ctx, out) => download(ctx, 'proc',
-    `/placement/billing/batches/${one(ctx, 'select id from plc_billing_batch order by id desc limit 1')}/file?format=XLSX`, out, 'xlsx'),
+    `/placement/billing/batches/${one(ctx, 'select id from plc_billing_batch order by id desc limit 1')}/file?format=XLSX`, out, 'xlsx',
+    ['PN No.', 'Loan Application No.', 'Booking Date', 'Borrower', 'Premium', 'Reference']),
   'doc-report': async (ctx, out) => {
     const company = ctx.one("select id from org_company where code = 'FVI'");
     const data = await ctx.api('mkttl', 'POST', '/reports/NB-ACC-STATUS/export?format=PDF', { companyId: company });

@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { DateInput } from '@/components/ui/DateInput';
 import { useState } from 'react';
 import { lovApi } from '@/api/lov';
 import type { LovType, LovValue } from '@/api/lov';
@@ -50,16 +51,25 @@ export function LovValueDialog({ type, value, nextOrder, onClose }: Readonly<Lov
     props: { type?: string; required?: boolean; hint?: string } = {},
   ) => (
     <Field label={label} required={props.required} error={errors[name]} hint={props.hint}>
-      {(id) => (
-        <input
-          id={id}
-          className="input"
-          type={props.type ?? 'text'}
-          value={form[name]}
-          disabled={name === 'code' && value !== undefined}
-          onChange={(e) => setForm((f) => ({ ...f, [name]: e.target.value }))}
-        />
-      )}
+      {(id) =>
+        props.type === 'date' ? (
+          // The one date picker of BIBS (dd-MMM-yyyy), never the browser's own date field.
+          <DateInput
+            id={id}
+            value={form[name]}
+            onChange={(e) => setForm((f) => ({ ...f, [name]: e.target.value }))}
+          />
+        ) : (
+          <input
+            id={id}
+            className="input"
+            type={props.type ?? 'text'}
+            value={form[name]}
+            disabled={name === 'code' && value !== undefined}
+            onChange={(e) => setForm((f) => ({ ...f, [name]: e.target.value }))}
+          />
+        )
+      }
     </Field>
   );
   return (

@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.party.service;
 
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.approval.service.ApprovalViewer;
 import com.iortatechnxt.brokerverse.approval.service.MasterRecordApprovals;
 import com.iortatechnxt.brokerverse.approval.service.MasterRecordApprovals.RecordFacts;
@@ -31,7 +32,7 @@ public class PartyApprovalSource implements PendingApprovalSource {
         Party.class,
         p ->
             new RecordFacts(
-                "Party (" + p.getPartyType() + ")",
+                "Party (" + DisplayFormat.words(p.getPartyType()) + ")",
                 p.getCode(),
                 p.getName(),
                 p.getCompanyId(),

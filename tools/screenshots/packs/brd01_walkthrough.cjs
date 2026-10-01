@@ -173,7 +173,10 @@ async function act(page, name, opts = {}) {
 
 /** Runs an action of a table row: opens the row's action menu, then chooses the action. */
 async function rowAction(row, name) {
-  await row.getByRole('button', { name: /^Actions for/ }).click();
+  const menu = row.getByRole('button', { name: /^Actions for/ });
+  await menu.scrollIntoViewIfNeeded();
+  await row.page().waitForTimeout(200);
+  await menu.click();
   await row.page().waitForTimeout(300);
   await row.page().getByRole('menuitem', { name }).first().click();
 }
@@ -181,12 +184,15 @@ async function rowAction(row, name) {
 /** Whether the row's action menu offers the action (the menu is closed again). */
 async function rowOffers(row, name) {
   const menu = row.getByRole('button', { name: /^Actions for/ });
-  if (!(await menu.isVisible().catch(() => false))) {
+  if ((await menu.count()) === 0) {
     return false;
   }
-  await menu.click();
-  await row.page().waitForTimeout(300);
-  const offered = await row.page().getByRole('menuitem', { name }).first().isVisible().catch(() => false);
+  // The menu closes on any scroll: bring the button into view first, then open the menu.
+  await menu.first().scrollIntoViewIfNeeded();
+  await row.page().waitForTimeout(200);
+  await menu.first().click();
+  const offered = await row.page().getByRole('menuitem', { name }).first()
+    .waitFor({ state: 'visible', timeout: 2000 }).then(() => true).catch(() => false);
   await row.page().keyboard.press('Escape');
   await row.page().waitForTimeout(200);
   return offered;
@@ -345,6 +351,7 @@ const steps = {
     const page = await go(ctx, 'ao', `/quotations/${quotationId(ctx)}`);
     await act(page, 'Send via Email', { confirm: /^send$/i });
     await tab(page, 'E-mails');
+    await tabsToTop(page);
     return page;
   },
   // 8. Acceptance recorded and the account created.
@@ -555,6 +562,7 @@ const steps = {
     const page = await go(ctx, 'tsulead', `/proposals/${prfId(ctx)}`);
     await act(page, /^Approve and send to insurers$/i, { reason: false });
     await tab(page, 'E-mails');
+    await tabsToTop(page);
     return page;
   },
   // 6. Insurer terms keyed in (one insurer declines), the lowest premium recommended, terms complete.
@@ -597,6 +605,7 @@ const steps = {
     }
     await act(page, /^Insurer terms complete$/i, { reason: false });
     await tab(page, 'Comparative Table');
+    await tabsToTop(page);
     return page;
   },
   // 7. Proposal slip submitted for the recommended insurer, approved and released by a second TSU officer.
@@ -606,6 +615,7 @@ const steps = {
     const lead = await go(ctx, 'tsulead', `/proposals/${prfId(ctx)}`);
     await act(lead, /^Approve and release to Marketing$/i, { reason: false });
     await tab(lead, 'Proposal Slip');
+    await tabsToTop(lead);
     return lead;
   },
   // 8. Proposal slip and comparative table sent to the client.
@@ -688,6 +698,7 @@ const steps = {
     const page = await go(ctx, 'mkttl', `/quotations/${id}`);
     await act(page, /^Return to Maker$/i, { reason: 'rate or terms', comment: 'Apply the rate of the CBG property tariff and resubmit.' });
     await tab(page, 'History');
+    await tabsToTop(page);
     return page;
   },
   // 5. Validate refused: the client of the account is not confirmed.
@@ -733,6 +744,7 @@ const steps = {
     const page = await go(ctx, 'proc', `/placement/accounts/${arn}`);
     await act(page, /^Record Insurer Return$/i, { reason: 'additional', comment: 'The insurer asks for the updated fire safety certificate.' });
     await tab(page, 'Insurer Returns');
+    await tabsToTop(page);
     return page;
   },
   // 9. Account resubmitted for placement; the slip regenerated and resent.
@@ -757,6 +769,7 @@ const steps = {
       await settle(page, 1500);
       await tab(page, 'Placement Slips');
     }
+    await tabsToTop(page);
     return page;
   },
 };

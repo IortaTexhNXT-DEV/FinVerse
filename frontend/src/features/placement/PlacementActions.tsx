@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { GenerateSlipsDialog } from './GenerateSlipsDialog';
+import { placementActionMessage } from './placementLogic';
 
 type Handler = (arn: string, note: ActionNote) => Promise<unknown>;
 
@@ -52,7 +53,7 @@ export function PlacementActions({
       HANDLED[action]?.run(arn, note) ?? Promise.reject(new Error('Not available here')),
     onSuccess: (_, { action }) => {
       setPending(null);
-      toast.success(`${HANDLED[action]?.label ?? action}: done`);
+      toast.success(placementActionMessage(action, arn));
       onChanged();
     },
   });

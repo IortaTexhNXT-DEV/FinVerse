@@ -60,7 +60,7 @@ const newClient = [
   ['Province', 'Metro Manila'],
   ['Postal code', '1605'],
   ['Market segment', 'CBG'],
-  ['The client banks with BDO', true],
+  ['The client banks with the group bank', true],
   ['BDO CIF number', '0041723890'],
   ['Source of funds', 'Salary'],
 ];

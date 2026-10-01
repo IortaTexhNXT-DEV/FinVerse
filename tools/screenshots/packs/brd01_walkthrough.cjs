@@ -262,7 +262,7 @@ const steps = {
       ['E-mail', `${p.first}.${p.last}@seed-client.ph`.toLowerCase()], ['Mobile', p.mobile],
       ['Street address', '12 Mabini Street, Barangay San Antonio'], ['City / municipality', 'Pasig City'],
       ['Province', 'Metro Manila'], ['Postal code', '1605'], ['Market segment', 'CBG'],
-      ['The client banks with BDO', true], ['BDO CIF number', '0041723890'], ['Source of funds', 'Salary'],
+      ['The client banks with the group bank', true], ['BDO CIF number', '0041723890'], ['Source of funds', 'Salary'],
     ]);
     await button(page, 'Save as Prospect').click();
     await settle(page, 1500);

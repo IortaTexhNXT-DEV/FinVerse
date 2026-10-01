@@ -91,7 +91,7 @@ screens:
       - "Contact & Address | Province | Text | Up to 80 characters | N | - | Blank | Prospect, confirmed | - | -"
       - "Contact & Address | Postal code | Text | Up to 10 characters | N | - | Blank | Prospect, confirmed | - | -"
       - "Segment & Bank relationship | Market segment | Drop-down | - | Cond.: before the KYC is submitted | List of values MARKET_SEGMENT | Not specified | Prospect, confirmed | An active value of the list | '<code>' is not a valid value of MARKET_SEGMENT on <date>"
-      - "Segment & Bank relationship | BDO bank client | Check box | The client banks with BDO | N | - | Not ticked | Prospect, confirmed | - | -"
+      - "Segment & Bank relationship | BDO bank client | Check box | The client banks with the group bank | N | - | Not ticked | Prospect, confirmed | - | -"
       - "Segment & Bank relationship | BDO CIF number | Text | Up to 40 characters | N (shown when BDO bank client is ticked) | - | Blank | Prospect, confirmed | - | -"
       - "Segment & Bank relationship | Source of funds | Drop-down | - | Cond.: when set as a minimum field | List of values SOURCE_OF_FUNDS | Not specified | Prospect, confirmed | An active value of the list | -"
       - "Segment & Bank relationship | KYC risk rating | Drop-down | Low, Standard, High | N | List of values KYC_RISK_RATING | Not specified | Prospect, confirmed | An active value of the list; High sets the 12-month review cycle | -"

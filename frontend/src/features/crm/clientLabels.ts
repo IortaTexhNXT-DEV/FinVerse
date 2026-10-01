@@ -1,6 +1,7 @@
 import type { ClientDetail } from '@/api/clients';
 import type { SearchCriteria } from './ClientSearchPanel';
 import { groupLabel } from '@/context/clientNames';
+import { formatDate } from '@/utils/format';
 
 export type QuickFilter = 'ALL' | 'PROSPECT' | 'CONFIRMED' | 'KYC_DUE';
 
@@ -79,4 +80,10 @@ export function describeBank(c: ClientDetail): string {
   }
   const label = groupLabel('bank client');
   return c.bankCif === undefined ? label : `${label} · CIF ${c.bankCif}`;
+}
+
+/** The confirmation of Verify KYC, with the next review date as dd-MMM-yyyy. */
+export function kycVerifiedMessage(c: ClientDetail): string {
+  const due = c.kyc.reviewDue ? `, next review ${formatDate(c.kyc.reviewDue)}` : '';
+  return `${c.code}: KYC verified${due}`;
 }

@@ -1,15 +1,18 @@
 package com.iortatechnxt.brokerverse;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.methods;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noFields;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noMethods;
 import static com.tngtech.archunit.library.dependencies.SlicesRuleDefinition.slices;
 
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.security.DataScopeMappings;
 import com.tngtech.archunit.base.DescribedPredicate;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.domain.JavaMethod;
 import com.tngtech.archunit.core.domain.JavaMethodCall;
 import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
@@ -54,6 +57,10 @@ import org.springframework.web.bind.annotation.RestController;
  *       YearMonth or Year elsewhere, as those take the clock's zone (UTC) or bypass the injected
  *       clock; no {@code Clock.systemUTC()} outside the application configuration; no static {@code
  *       ZoneId} fields.
+ *   <li>Every controller method that takes a company is checked against the user's data scope
+ *       (DATA_SCOPE_DESIGN.md): by the interceptor ({@code companyId} query parameter or path
+ *       variable), by the body advice (a body with {@code companyId}), or explicitly ({@code
+ *       CompanyScoped}).
  * </ul>
  *
  * <p>A plain JUnit Jupiter test (not the ArchUnit engine), so it runs in the alphabetical class
@@ -200,6 +207,37 @@ final class ArchitectureTest {
           .should()
           .resideInAPackage("..seed..")
           .because("seed beans are kept apart from the production services");
+
+  private static final ArchCondition<JavaMethod> CHECK_THE_DATA_SCOPE =
+      new ArchCondition<>("check the company it takes against the data scope") {
+        @Override
+        public void check(JavaMethod item, ConditionEvents events) {
+          if (!DataScopeMappings.covered(item.reflect())) {
+            events.add(
+                SimpleConditionEvent.violated(
+                    item,
+                    item.getFullName()
+                        + " takes a company that neither the data scope interceptor nor the body"
+                        + " advice reads: bind it as companyId or mark the method @CompanyScoped"
+                        + " and call DataScope.requireCompany"));
+          }
+        }
+      };
+
+  private static final ArchRule COMPANY_ENDPOINTS_ARE_DATA_SCOPED =
+      methods()
+          .that()
+          .areDeclaredInClassesThat()
+          .areAnnotatedWith(RestController.class)
+          .and()
+          .arePublic()
+          .should(CHECK_THE_DATA_SCOPE)
+          .because("a user may act only for the companies and branches of his data scope");
+
+  @Test
+  void companyEndpointsAreDataScoped() {
+    COMPANY_ENDPOINTS_ARE_DATA_SCOPED.check(classes);
+  }
 
   @Test
   void seedBeansCarryTheSeedProfile() {

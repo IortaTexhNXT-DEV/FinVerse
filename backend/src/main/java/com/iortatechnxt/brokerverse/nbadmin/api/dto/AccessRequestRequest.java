@@ -7,7 +7,9 @@ import com.iortatechnxt.brokerverse.nbadmin.domain.ExternalPartyKind;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedRole;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedUserData;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RolePermissionChange;
+import com.iortatechnxt.brokerverse.security.api.dto.DataScopeRequest;
 import com.iortatechnxt.brokerverse.security.domain.PrivilegeLevel;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Email;
@@ -50,6 +52,8 @@ import java.util.Set;
  * @param approvers approvers in order (submission; a user request has one)
  * @param authorizationLimit authorisation limit of the user (enrol, modify), null for none /
  *     unchanged
+ * @param dataScope companies and branches the user may act for (enrol, modify), null for unchanged
+ *     (a new user gets all companies)
  */
 public record AccessRequestRequest(
     @NotNull AccessRequestType type,
@@ -75,7 +79,8 @@ public record AccessRequestRequest(
     @Size(max = 40) String portalRole,
     LocalDate effectiveFrom,
     List<@Size(max = 50) String> approvers,
-    @DecimalMin("0") @Digits(integer = 16, fraction = 2) BigDecimal authorizationLimit) {
+    @DecimalMin("0") @Digits(integer = 16, fraction = 2) BigDecimal authorizationLimit,
+    @Valid DataScopeRequest dataScope) {
 
   /**
    * Request content.
@@ -105,7 +110,8 @@ public record AccessRequestRequest(
                     userLevel,
                     reasonCode,
                     Boolean.TRUE.equals(unlock),
-                    authorizationLimit))
+                    authorizationLimit,
+                    dataScope == null ? null : dataScope.toScope().text()))
             .withEffectiveFrom(effectiveFrom);
     return partyKind == null && partyCode == null
         ? user

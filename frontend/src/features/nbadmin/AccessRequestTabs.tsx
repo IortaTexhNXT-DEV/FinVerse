@@ -10,8 +10,10 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useLovLabel } from '@/components/broking/useLabels';
 import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
 import { permissionLabels } from '@/utils/permissionLabel';
-import { isGroupProfile, roleChanges, userStatus } from './accessRequest';
+import { isGroupProfile, roleChanges } from './accessRequest';
+import { userStatus } from './accessUsers';
 import { accessStatusLabel } from './accessStages';
+import { RequestedDataAccess } from './DataAccessFields';
 import { UserName } from '@/components/ui/UserName';
 
 interface Row {
@@ -198,6 +200,7 @@ export function RequestDetails({ request: r }: Readonly<{ request: AccessRequest
             rowKey={(c) => `${c.change}-${c.code}`}
           />
         )}
+        {!group && <RequestedDataAccess text={r.details.dataScope} />}
         <dl className="detail-list">
           {extraFacts(r, members, reason).map(([label, value]) => (
             <Fragment key={label}>

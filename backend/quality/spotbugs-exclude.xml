@@ -67,6 +67,16 @@
     <Bug pattern="SERVLET_HEADER"/>
   </Match>
   <!--
+    SERVLET_PARAMETER in DataScopeInterceptor: the companyId and branchId parameters are read only to
+    refuse a company or branch outside the user's data scope. They are parsed as numbers (anything
+    else is ignored and refused later by the request binding), compared with the user's granted ids
+    and never used in a query, a path or a response.
+  -->
+  <Match>
+    <Class name="com.iortatechnxt.brokerverse.security.api.DataScopeInterceptor"/>
+    <Bug pattern="SERVLET_PARAMETER"/>
+  </Match>
+  <!--
     SERVLET_HEADER in CorrelationIdFilter: X-Correlation-Id is only a log / event correlation label.
     It is used only when it matches [A-Za-z0-9_-]{1,64} (otherwise a new UUID is generated), carries
     no authority and is never used in a query or a file name.

@@ -160,6 +160,7 @@ class ReferenceDataCacheIT {
                         SystemCaches.PARAMETERS,
                         OrganizationCaches.UNITS,
                         SecurityCaches.ROLE_PERMISSIONS,
+                        SecurityCaches.DATA_SCOPE,
                         CatalogCaches.PRODUCT_VERSIONS,
                         ModuleCaches.SWITCHED_OFF)))
         .andExpect(jsonPath("$[?(@.name == 'lov-values')].store").value("IN_MEMORY"));

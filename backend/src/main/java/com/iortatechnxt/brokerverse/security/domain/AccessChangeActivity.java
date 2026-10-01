@@ -15,5 +15,7 @@ public enum AccessChangeActivity {
   CREATE_ROLE,
   ROLE_PERMISSIONS,
   DEACTIVATE_ROLE,
-  REACTIVATE_ROLE
+  REACTIVATE_ROLE,
+  /** The companies and branches the user may act for (V1240, DATA_SCOPE_DESIGN.md). */
+  DATA_SCOPE_CHANGED
 }

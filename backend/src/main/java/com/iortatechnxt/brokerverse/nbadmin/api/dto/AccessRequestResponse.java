@@ -122,6 +122,8 @@ public record AccessRequestResponse(
    * @param effectiveFrom date the change applies
    * @param batchId bulk batch
    * @param authorizationLimit authorisation limit requested, null for none / unchanged
+   * @param dataScope data scope requested in its text form ({@code ALL} or {@code
+   *     company:*;company:branch,branch}), null for unchanged
    */
   public record Details(
       String windowsId,
@@ -137,7 +139,8 @@ public record AccessRequestResponse(
       String portalRole,
       LocalDate effectiveFrom,
       Long batchId,
-      BigDecimal authorizationLimit) {
+      BigDecimal authorizationLimit,
+      String dataScope) {
 
     static Details from(AccessRequest r) {
       RequestedUserData d = r.getUserData();
@@ -157,7 +160,8 @@ public record AccessRequestResponse(
           party.map(ExternalParty::portalRole).orElse(null),
           r.getEffectiveFrom(),
           r.getBatchId(),
-          d.authorizationLimit());
+          d.authorizationLimit(),
+          d.dataScope());
     }
   }
 

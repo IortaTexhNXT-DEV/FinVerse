@@ -192,6 +192,13 @@ common:
       its errors in a notice at the top with a link to the first field. A refusal by a business rule shows the business
       message only, without codes or references; only an unexpected system error offers Retry and a reference for
       support behind Details. Success is confirmed by a short message in the same standard.
+  - name: Row action menus
+    text: >-
+      The actions on a record of a list (Claim and Assign of a work item, Terms and Recommend of an insurer response,
+      the downloads, Send and Regenerate of a placement slip, Upload Report of a billing batch, Match of a payment
+      report line, Edit and Remove of a queued booking, Authorize, Edit and Deactivate of a list value) are in one row
+      action menu at the end of the row (the three-dot button), never buttons or links in the row; a destructive or
+      reversing action is listed last, in red, and asks for confirmation.
   - name: Bulk action results
     text: >-
       An action run on several selected rows processes each record on its own and lists the outcome of each (done or

@@ -80,7 +80,7 @@ export default function SlipsPage() {
               render: (s) => (
                 <span className="stack">
                   {s.accounts.map((a) => (
-                    <Link key={a.arn} to={placementLink(a.arn)}>
+                    <Link key={a.arn} className="nowrap" to={placementLink(a.arn)}>
                       {a.arn}
                     </Link>
                   ))}

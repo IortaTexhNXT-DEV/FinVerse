@@ -6,13 +6,14 @@ import { MemoryRouter } from 'react-router-dom';
 import { catalogApi } from '@/api/catalog';
 import { issuanceApi } from '@/api/issuance';
 import { placementApi } from '@/api/placement';
-import type { WorkbenchRow } from '@/api/placement';
+import type { Slip, WorkbenchRow } from '@/api/placement';
 import type { Company } from '@/api/types';
 import { AuthContext } from '@/auth/authContext';
 import { ToastContext } from '@/components/ui/toastContext';
 import { WorkspaceContext } from '@/context/workspaceContext';
 import IssuanceWorkbenchPage from '@/features/issuance/IssuanceWorkbenchPage';
 import PlacementWorkbenchPage from './PlacementWorkbenchPage';
+import SlipsPage from './SlipsPage';
 
 const page = <T,>(content: T[]) => ({
   content,
@@ -137,6 +138,30 @@ describe('placement and issuance workbenches', () => {
     render(wrap(<PlacementWorkbenchPage />));
     expect(await screen.findByText('Consumer Banking - NCR')).toBeInTheDocument();
     expect(screen.queryByText('CBG-NCR')).toBeNull();
+  });
+
+  it('keeps the account references of a placement slip on one line', async () => {
+    vi.spyOn(placementApi, 'slips').mockResolvedValue(
+      page([
+        {
+          id: 5,
+          slipNo: 'PL-2026-900003',
+          versionNo: 1,
+          displayNo: 'PL-2026-900003',
+          insurerCode: 'INS-MGIC',
+          branchCode: 'MKT',
+          status: 'SENT',
+          templateVersion: '1',
+          sendCount: 1,
+          createdAt: '2026-09-16T06:00:00Z',
+          createdBy: 'proc',
+          accounts: [{ arn: 'ARN-2026-910003' }, { arn: 'ARN-2026-910005' }],
+        } as unknown as Slip,
+      ]),
+    );
+    render(wrap(<SlipsPage />));
+    expect(await screen.findByRole('link', { name: 'ARN-2026-910003' })).toHaveClass('nowrap');
+    expect(screen.getByRole('link', { name: 'ARN-2026-910005' })).toHaveClass('nowrap');
   });
 
   it('lists the issuance work by tab', async () => {

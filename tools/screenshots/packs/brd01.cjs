@@ -235,6 +235,17 @@ const after = {
     await walkthrough.rowAction(page.locator('main table tbody tr').first(), /^close$/i);
     await page.waitForTimeout(800);
   },
+  // The send dialog of the first sent slip (Resend), from the row action menu.
+  'scr-nb-20-02-send': async (page) => {
+    const row = page.locator('main table tbody tr').filter({ hasText: 'Sent' }).first();
+    await walkthrough.rowAction(row, /^resend$/i);
+    await page.waitForTimeout(1200);
+  },
+  // The Match Row dialog of the first unmatched line, from the row action menu.
+  'scr-nb-22-02-match': async (page) => {
+    await walkthrough.rowAction(page.locator('main table tbody tr').first(), /^match$/i);
+    await page.waitForTimeout(800);
+  },
   // UX deck: the row action menu of the first request, opened.
   'ux-scr-nb-08-actions': async (page) => {
     await page.locator('main table tbody tr').first().getByRole('button', { name: /^Actions for/ }).click();

@@ -63,7 +63,7 @@ screens:
       - "Payment Gate tab | Evidence | Table | Evidence, Source, Detail, Amount, Recorded, Opened Gate | - | Payment evidence | - | Read only | - | -"
       - "Client confirmation dialog | Confirmation channel | Drop-down | - | Y | List of values CLIENT_CONFIRMATION_CHANNEL | Blank | Awaiting payment; rule is client confirmation | An active value; the account's rule is not payment matched | Account <ARN> must be paid: match its payment from a payment report"
       - "Client confirmation dialog | Remarks | Text area | Up to 500 characters | N | - | Blank | Awaiting payment | - | -"
-      - "Placement Slips tab | Placement slips | Table | Slip, Status, Insurer, Sent, actions | - | Placement slips | - | Read only | - | -"
+      - "Placement Slips tab | Placement slips | Table | Slip, Status, Insurer, Sent, row action menu | - | Placement slips | - | Read only | - | -"
       - "Hold Cover tab | Hold covers | Table | Status, Insurer, Period, Insurer Reference, Confirmed On, Expiry Alert | - | Hold covers | - | Read only | - | -"
       - "Hold cover dialog | Hold cover starts on / Confirmed on | Date | dd-MMM-yyyy; today when empty | N | - | Today | Ready for placement, placed, returned by insurer | The expiry is not before the start | The hold cover cannot expire before it starts (<date>)"
       - "Hold cover dialog | Insurer reference | Text | Up to 60 characters | Y to record a confirmation | - | Blank | Any stage | Needed for a confirmation | Enter the insurer's reference"
@@ -73,7 +73,7 @@ screens:
       - "Open Account | Every user of the screen | Always | Opens the account record | - | -"
       - "Record Client Confirmation / Release Direct Payment | BILLING_MANAGE | Awaiting payment; the rule is client confirmation or direct payment | Records the evidence and opens the payment gate | Ready for placement | Workflow notice"
       - "Generate Placement Slip | PLACEMENT_MANAGE | Ready for placement | Opens Generate Placement Slips for this account | Unchanged | -"
-      - "Send / Resend, Regenerate, PDF, Excel (slip) | PLACEMENT_MANAGE (downloads: every user) | As on Placement Slips | As on Placement Slips | Placed (first send) | E-mail to the insurer"
+      - "Send / Resend, Regenerate, Download PDF, Download Excel (slip) | PLACEMENT_MANAGE (downloads: every user) | As on Placement Slips (row action menu) | As on Placement Slips | Placed (first send) | E-mail to the insurer"
       - "Request Hold Cover | PLACEMENT_MANAGE | Ready for placement, placed or returned by insurer; no open hold cover | E-mails the hold cover request (PDF) to the insurer branch's placement address | Unchanged (hold cover Requested) | E-mail to the insurer"
       - "Record Confirmation | PLACEMENT_MANAGE or ACCOUNT_MAINTAIN | Always | Records the insurer's confirmation, reference and expiry (creates the hold cover when none was requested) | Unchanged (hold cover Confirmed) | -"
       - "Record Decline | PLACEMENT_MANAGE or ACCOUNT_MAINTAIN | Hold cover requested or confirmed | Records the insurer's decline | Unchanged (hold cover Declined) | -"
@@ -99,7 +99,7 @@ screens:
       - Account Placement › Placement Slips tab
     shots:
       - {state: list, user: proc, caption: "Placement Slips, All Slips tab"}
-      - {state: send, user: proc, click: "^resend$", caption: "Send placement slip dialog (Resend of a sent slip)"}
+      - {state: send, user: proc, caption: "Send placement slip dialog (Resend of a sent slip, from the row action menu)"}
     fields:
       - "Tabs | All Slips / To Send / Sent / Superseded | Tab | - | - | Fixed | All Slips | - | - | -"
       - "List | Slip | Column | PL-yyyy-nnnnnn with its version | - | Numbering | - | Read only | - | -"
@@ -107,12 +107,13 @@ screens:
       - "List | Insurer / Branch | Column | Codes | - | Insurer master | - | Read only | - | -"
       - "List | Accounts | Column | ARNs, each opening the account placement | - | Placement slip | - | Read only | - | -"
       - "List | Sent | Column | Time sent, recipients and number of sends | - | Outbound messages | - | Read only | - | -"
+      - "List | Actions | Row action menu | Download PDF, Download Excel, Send or Resend, Regenerate: the actions the user may take now | - | - | - | - | - | -"
       - "Send dialog | To, Cc, Subject, Message | Text | As on Send via Email | To, Subject and Message Y | Insurer branch placement e-mail and standard text | Proposed by the system | Generated or sent slip | At least one valid address; the slip is not superseded | Slip <slip> v<version> was replaced by a new version"
       - "Send dialog | Password-protect the attachments | Check box | Optional for insurers | N | - | Ticked | Generated or sent slip | - | -"
     actions:
-      - "PDF / Excel | Every user of the screen | Always | Downloads the slip file | - | -"
-      - "Send / Resend | PLACEMENT_MANAGE | Slip not superseded | Opens the send dialog and e-mails the slip; the first send places the accounts | Placed (first send) | E-mail to the insurer (and the password e-mail when protected)"
-      - "Regenerate | PLACEMENT_MANAGE | Sent slip | Generates the next version from the current account data; the old version becomes superseded | Unchanged | -"
+      - "Download PDF / Download Excel | Every user of the screen | Always (row action menu) | Downloads the slip file | - | -"
+      - "Send / Resend | PLACEMENT_MANAGE | Slip not superseded (row action menu) | Opens the send dialog and e-mails the slip; the first send places the accounts | Placed (first send) | E-mail to the insurer (and the password e-mail when protected)"
+      - "Regenerate | PLACEMENT_MANAGE | Sent slip (row action menu) | Generates the next version from the current account data; the old version becomes superseded | Unchanged | -"
     rules:
       - "The send log of each slip is kept with the message and its outcome (FR-NB-081)."
       - "Insurers have no access to BIBS; slips reach them by e-mail only (FR-NB-081)."
@@ -164,13 +165,13 @@ screens:
       - Opened automatically after an upload
     shots:
       - {state: review, user: proc, open_report: review, caption: "Payment Report match review"}
-      - {state: match, user: proc, open_report: review, tab: "Unmatched", click: "^match$", caption: "Match Row dialog"}
+      - {state: match, user: proc, open_report: review, tab: "Unmatched", caption: "Match Row dialog, opened from the row action menu"}
     fields:
       - "Tiles | Matched / Unpaid / Unmatched / Ambiguous | Tile | Counts | - | Report lines | - | - | A tile opens its tab | -"
-      - "Lines | Row, Reported Reference, Paid, Amount, Payment Date, Account, Detail | Column | - | - | Report lines | - | Read only | - | -"
+      - "Lines | Row, Reported Reference, Paid, Amount, Payment Date, Account, Detail, Actions | Column | Match in the row action menu while the report is reviewed | - | Report lines | - | Read only | - | -"
       - "Match Row dialog | Account (ARN) | Drop-down or Text | The candidate ARNs of an ambiguous line, otherwise an ARN | Y | Accounts awaiting payment | First candidate | Report in review | The account is awaiting payment and the line is not already matched | Row <n> is already matched to <ARN> / <ARN> is <status>, not awaiting payment"
     actions:
-      - "Match | BILLING_MANAGE | Report in review; unmatched or ambiguous line | Matches the line to the chosen account | Unchanged | -"
+      - "Match | BILLING_MANAGE | Report in review; unmatched or ambiguous line (row action menu) | Matches the line to the chosen account | Unchanged | -"
       - "Confirm Matches | BILLING_MANAGE | Report in review | Opens the payment gate of every matched, paid account; each outcome is shown on its line | Ready for placement for each account opened | Workflow notice per account"
       - "Discard | BILLING_MANAGE | Report in review | Discards the report without opening any gate | - | -"
     rules:

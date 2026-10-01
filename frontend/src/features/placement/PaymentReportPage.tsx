@@ -11,9 +11,11 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDate } from '@/utils/format';
+import { lineActions } from './batchActions';
 import { candidatesOf, linesOf, placementLink, REPORT_TABS } from './placementLogic';
 
 function MatchDialog({
@@ -199,13 +201,13 @@ export default function PaymentReportPage() {
             { key: 'message', header: 'Detail', render: (l) => l.applyMessage ?? l.message ?? '' },
             {
               key: 'act',
-              header: '',
-              render: (l) =>
-                reviewable ? (
-                  <Button size="sm" variant="secondary" onClick={() => setMatching(l)}>
-                    Match
-                  </Button>
-                ) : null,
+              header: 'Actions',
+              render: (l) => (
+                <RowActions
+                  record={`row ${String(l.rowNo)}`}
+                  actions={lineActions(reviewable, () => setMatching(l))}
+                />
+              ),
             },
           ]}
         />

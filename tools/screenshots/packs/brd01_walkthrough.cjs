@@ -730,8 +730,8 @@ const steps = {
     }
     await tab(page, 'Placement Slips');
     const generated = page.locator('main table tbody tr').filter({ hasText: 'Generated' }).first();
-    if (await button(generated, 'Send').isVisible().catch(() => false)) {
-      await button(generated, 'Send').click();
+    if (await rowOffers(generated, /^send$/i)) {
+      await rowAction(generated, /^send$/i);
       await page.waitForTimeout(800);
       const dialog = page.locator('dialog.modal[open]').last();
       if (await dialog.isVisible().catch(() => false)) {

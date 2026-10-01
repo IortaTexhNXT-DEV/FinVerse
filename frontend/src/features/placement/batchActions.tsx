@@ -1,4 +1,4 @@
-import { FileSpreadsheet, Upload } from 'lucide-react';
+import { FileSpreadsheet, Link2, Upload } from 'lucide-react';
 import type { BillingBatch } from '@/api/placement';
 import type { RowAction } from '@/components/ui/RowActions';
 
@@ -28,4 +28,9 @@ export function batchActions(
       onSelect: on.upload,
     },
   ];
+}
+
+/** The row action of a payment report line while the report is reviewed: Match it to an account. */
+export function lineActions(reviewable: boolean, onMatch: () => void): RowAction[] {
+  return [{ label: 'Match', icon: <Link2 size={14} />, hidden: !reviewable, onSelect: onMatch }];
 }

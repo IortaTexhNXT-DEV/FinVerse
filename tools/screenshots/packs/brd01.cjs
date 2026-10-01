@@ -200,7 +200,15 @@ const opens = {
     return `/crm/clients/${ctx.one(q)}`;
   },
   // A quotation for review made by someone other than the approver (the one walkthrough C-03 makes is the approver's).
-  for_review_by_other: (ctx) => `/quotations/${ctx.one("select id from quo_quotation where status = 'FOR_REVIEW' and created_by <> 'mkttl' order by id limit 1")}`,
+  // When walkthrough C returned the seeded one, the Account Officer submits the seeded draft QT-2026-900001 again.
+  for_review_by_other: async (ctx) => {
+    const q = "select id from quo_quotation where status = 'FOR_REVIEW' and created_by <> 'mkttl' order by id limit 1";
+    if (ctx.sql(q).length === 0) {
+      const id = ctx.one("select id from quo_quotation where quotation_no = 'QT-2026-900001' and status = 'DRAFT'");
+      await ctx.api('ao', 'POST', `/quotations/${id}/submit`, { comment: 'Comprehensive cover with acts of nature' });
+    }
+    return `/quotations/${ctx.one(q)}`;
+  },
   approved: (ctx) => `/quotations/${ctx.one("select id from quo_quotation where status = 'APPROVED' order by id limit 1")}`,
   with_tsu: (ctx) => `/proposals/${ctx.one("select id from npk_proposal where status = 'WITH_TSU' order by id limit 1")}`,
   terms_received: (ctx) => `/proposals/${ctx.one("select id from npk_proposal where status = 'TERMS_RECEIVED' order by id limit 1")}`,

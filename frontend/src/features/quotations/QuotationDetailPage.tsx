@@ -36,6 +36,8 @@ import { DetailsTab, HistoryTab, ItemsTab, VersionsTab } from './QuotationTabs';
 import { RecordSummary } from '@/components/broking/RecordSummary';
 import type { Fact } from '@/components/broking/RecordSummary';
 import { ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
+import { recordDescription } from '@/components/broking/recordDescription';
+import { useProductName } from '@/components/broking/useLabels';
 import { coverPeriod } from './coverPeriod';
 
 const TABS = [
@@ -201,6 +203,7 @@ function Downloads({ id }: Readonly<{ id: number }>) {
 export default function QuotationDetailPage() {
   const id = Number(useParams().id);
   const { can } = useAuth();
+  const productName = useProductName();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<TabId>('details');
   const [version, setVersion] = useState<number>();
@@ -221,7 +224,7 @@ export default function QuotationDetailPage() {
         backTo="/quotations"
         section="Quotation / Proposal · Quotation"
         title={q.quotationNo}
-        description={`${q.productCode} quotation for ${q.clientName}`}
+        description={recordDescription(productName(q.productCode), 'quotation', q.clientName)}
         actions={
           <>
             <VersionSelect quotation={q} value={shown} onChange={setVersion} />

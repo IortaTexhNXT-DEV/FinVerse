@@ -38,6 +38,8 @@ import {
 import { ResponsesTab } from './ResponsesTab';
 import '@/styles/quotation.css';
 import { ProductLineLabel, InsurerNames } from '@/components/broking/LovLabel';
+import { recordDescription } from '@/components/broking/recordDescription';
+import { useProductName } from '@/components/broking/useLabels';
 
 const TABS = [
   { id: 'details', label: 'Details' },
@@ -134,6 +136,7 @@ function TabBody({ tab, proposal }: Readonly<{ tab: TabId; proposal: Proposal }>
 export default function ProposalDetailPage() {
   const id = Number(useParams().id);
   const { can } = useAuth();
+  const productName = useProductName();
   const queryClient = useQueryClient();
   const [tab, setTab] = useState<TabId>('details');
   const proposal = useQuery({ queryKey: ['proposal', id], queryFn: () => proposalsApi.get(id) });
@@ -151,7 +154,11 @@ export default function ProposalDetailPage() {
         backTo="/proposals"
         section="Non-Package Management · Proposal Request"
         title={p.prfNo}
-        description={`${p.productCode} proposal request for ${p.clientName}`}
+        description={recordDescription(
+          productName(p.productCode),
+          'proposal request',
+          p.clientName,
+        )}
         actions={
           canEdit(p, can) && (
             <Link className="btn btn-secondary" to={`/proposals/${p.id}/edit`}>

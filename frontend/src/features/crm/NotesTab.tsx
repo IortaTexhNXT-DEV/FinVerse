@@ -16,6 +16,8 @@ import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
+import { RowActions } from '@/components/ui/RowActions';
+import { instructionActions } from './instructionActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize, today } from '@/utils/format';
@@ -176,22 +178,17 @@ export function NotesTab({ client }: Readonly<{ client: ClientDetail }>) {
             },
             {
               key: 'actions',
-              header: '',
-              render: (i) =>
-                editable && i.active ? (
-                  <div className="row">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setEditing({ instruction: i })}
-                    >
-                      Change
-                    </Button>
-                    <Button size="sm" variant="ghost" onClick={() => end.mutate(i)}>
-                      End
-                    </Button>
-                  </div>
-                ) : null,
+              header: 'Actions',
+              render: (i) => (
+                <RowActions
+                  record={humanize(i.type)}
+                  actions={instructionActions(
+                    editable && i.active,
+                    () => setEditing({ instruction: i }),
+                    () => end.mutate(i),
+                  )}
+                />
+              ),
             },
           ]}
         />

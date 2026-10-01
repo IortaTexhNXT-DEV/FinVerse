@@ -138,7 +138,7 @@ screens:
       - "KYC & Documents tab | Document type | Drop-down | - | Y | List of values DOCUMENT_TYPE | Blank | Prospect, confirmed | An active value | -"
       - "KYC & Documents tab | File | File | PDF, image or office document; size limit of the document store | Y | - | - | Prospect, confirmed | Allowed type, not empty, within the size limit, content matches the extension | Only these file types are allowed: <extensions>"
       - "Tags & Instructions tab | Add a tag | Drop-down | - | N | List of values CLIENT_TAG | Blank | Prospect, confirmed | A tag once per client | The client is already tagged <tag>"
-      - "Tags & Instructions tab | Special instructions | Table | Type, Instruction, Effective, Status (Active, Future, Inactive) | - | Client instructions | - | Read only (changed through the dialog) | - | -"
+      - "Tags & Instructions tab | Special instructions | Table | Type, Instruction, Effective, Status (Active, Future, Inactive), Change and End in the row action menu | - | Client instructions | - | Read only (changed through the dialog) | - | -"
       - "Tags & Instructions tab | Type | Drop-down (dialog) | - | Y | List of values INSTRUCTION_TYPE | Blank | Prospect, confirmed | - | Select the instruction type"
       - "Tags & Instructions tab | Instruction | Text area (dialog) | Up to 1,000 characters | Y | - | Blank | Prospect, confirmed | Not blank | Enter the instruction"
       - "Tags & Instructions tab | Effective from | Date (dialog) | dd-MMM-yyyy | Y | - | Today | Prospect, confirmed | - | Enter the first day"
@@ -160,7 +160,7 @@ screens:
       - "Deactivate | CLIENT_MAINTAIN or CLIENT_APPROVE | Client not inactive | Asks for the deactivation reason and a comment | Inactive | In-app notice to the creator"
       - "Upload KYC Document | CLIENT_MAINTAIN | Client not inactive; document type and file chosen | Stores the file against the client and ticks the checklist line | Unchanged | -"
       - "Add Tag / remove tag | CLIENT_MAINTAIN | Client not inactive | Adds or removes the tag; the change is kept in the change history | Unchanged | -"
-      - "New Instruction / Change / End | CLIENT_MAINTAIN | Client not inactive; the instruction is active | Adds, changes or ends a special instruction | Unchanged | -"
+      - "New Instruction / Change / End | CLIENT_MAINTAIN | Client not inactive; the instruction is active (Change and End in the row action menu) | Adds, changes or ends a special instruction | Unchanged | -"
     rules:
       - "The KYC is never verified by the user who created the client or submitted the KYC (FR-NB-034)."
       - "A client is confirmed only after its KYC is verified; accounts need a confirmed client (FR-NB-034, FR-NB-061)."

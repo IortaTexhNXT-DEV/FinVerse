@@ -114,6 +114,34 @@ describe('HistoryTable', () => {
     expect(cells[6]).toHaveTextContent('—');
   });
 
+  it('names the reason of a step by the label of its list, never the code in words', () => {
+    render(
+      <HistoryTable
+        history={[
+          {
+            toStage: 'WITH_TL',
+            toStageName: 'With the Team Lead',
+            action: 'ROUTE',
+            actor: 'clxhandler',
+            automatic: false,
+            occurredAt: '2026-10-01T17:51:00Z',
+            reasonCode: 'CTE_REFUSED',
+            comment: 'Client asks for installments',
+          },
+        ]}
+        reasonLabel={(code) =>
+          code === 'CTE_REFUSED' ? 'Credit term extension refused by the insurer' : code
+        }
+      />,
+    );
+    expect(
+      screen.getByText(
+        'Credit term extension refused by the insurer · Client asks for installments',
+      ),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Cte Refused/)).not.toBeInTheDocument();
+  });
+
   it('shows the full stage name of a long stage, never the short pill', () => {
     render(
       <HistoryTable

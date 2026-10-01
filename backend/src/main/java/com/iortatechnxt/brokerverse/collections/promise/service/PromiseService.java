@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.collections.promise.service;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.collections.common.service.ClxText;
 import com.iortatechnxt.brokerverse.collections.installment.domain.Installment;
 import com.iortatechnxt.brokerverse.collections.installment.domain.InstallmentRepository;
 import com.iortatechnxt.brokerverse.collections.installment.service.LedgerBalances;
@@ -206,9 +207,7 @@ public class PromiseService {
     }
     BigDecimal amount = input.amount() == null ? outstanding : input.amount();
     if (amount.compareTo(outstanding) > 0) {
-      throw new BusinessRuleException(
-          "CLX_PROMISE_OVER_BALANCE",
-          "The promised amount " + amount + " is above the outstanding " + outstanding);
+      throw new BusinessRuleException("CLX_PROMISE_OVER_BALANCE", overBalance(amount, outstanding));
     }
     return new Terms(promisedOn, input.promisedDate(), amount, input.installmentId());
   }
@@ -304,11 +303,9 @@ public class PromiseService {
             PROMISE_OF + promise.getAssuredName() + " broken",
             promise.getInvoiceNo()
                 + ": "
-                + promise.getCurrency()
-                + " "
-                + promise.getPromisedAmount()
+                + ClxText.amount(promise.getCurrency(), promise.getPromisedAmount())
                 + " promised by "
-                + promise.getPromisedDate()
+                + ClxText.date(promise.getPromisedDate())
                 + " was not paid",
             "/collections/promises?q=" + promise.getInvoiceNo(),
             ENTITY,
@@ -354,4 +351,18 @@ public class PromiseService {
       BigDecimal amount,
       Long installmentId,
       String remarks) {}
+
+  /**
+   * The refusal of a promise above the outstanding, with the amounts as the screens show them.
+   *
+   * @param amount promised amount
+   * @param outstanding outstanding of the invoice
+   * @return the message
+   */
+  public static String overBalance(BigDecimal amount, BigDecimal outstanding) {
+    return "The promised amount "
+        + ClxText.amount(null, amount)
+        + " is above the outstanding "
+        + ClxText.amount(null, outstanding);
+  }
 }

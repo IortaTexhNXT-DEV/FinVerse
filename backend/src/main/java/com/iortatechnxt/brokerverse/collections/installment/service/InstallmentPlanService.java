@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.booking.domain.BookedInvoice;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceKind;
 import com.iortatechnxt.brokerverse.booking.domain.InvoiceStatus;
 import com.iortatechnxt.brokerverse.booking.service.BookingQueryService;
+import com.iortatechnxt.brokerverse.collections.common.service.ClxText;
 import com.iortatechnxt.brokerverse.collections.installment.domain.BillingFrequency;
 import com.iortatechnxt.brokerverse.collections.installment.domain.Installment;
 import com.iortatechnxt.brokerverse.collections.installment.domain.InstallmentPlan;
@@ -429,9 +430,7 @@ public class InstallmentPlanService {
         previous = e.dueDate();
       }
       if (sum.compareTo(outstanding) != 0) {
-        throw new BusinessRuleException(
-            "CLX_PLAN_TOTAL_MISMATCH",
-            "The installments add up to " + sum + " but the outstanding premium is " + outstanding);
+        throw new BusinessRuleException("CLX_PLAN_TOTAL_MISMATCH", totalMismatch(sum, outstanding));
       }
     }
 
@@ -442,5 +441,19 @@ public class InstallmentPlanService {
             "Installment amounts must be positive and due dates increasing");
       }
     }
+  }
+
+  /**
+   * The refusal of installments that do not add up to the outstanding, amounts as on the screens.
+   *
+   * @param sum total of the installments
+   * @param outstanding outstanding premium
+   * @return the message
+   */
+  public static String totalMismatch(BigDecimal sum, BigDecimal outstanding) {
+    return "The installments add up to "
+        + ClxText.amount(null, sum)
+        + " but the outstanding premium is "
+        + ClxText.amount(null, outstanding);
   }
 }

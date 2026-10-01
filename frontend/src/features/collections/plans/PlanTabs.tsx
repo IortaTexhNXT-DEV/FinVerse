@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Amount } from '@/components/ui/Amount';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
@@ -13,36 +12,12 @@ import { formatDate } from '@/utils/format';
 import type { Statement } from '../billing/api';
 import type { Installment, PaymentPromise, Plan } from './api';
 import { plansApi } from './api';
+import { installmentActions } from './labels';
+import type { InstallmentActions } from './labels';
 import { UserName } from '@/components/ui/UserName';
+import { RowActionMenu } from '@/components/ui/RowActionMenu';
 
 /** Tabs of the installment plan record (BRCLXN.053/055/058). */
-
-/** What the user may do on an installment. */
-export interface InstallmentActions {
-  billed: Set<number>;
-  canBill: boolean;
-  canPromise: boolean;
-  busy: boolean;
-  onBill: (seq: number) => void;
-  onPromise: (installment: Installment) => void;
-}
-
-function actionsOf(i: Installment, a: InstallmentActions) {
-  return (
-    <span className="row">
-      {a.canBill && !a.billed.has(i.seq) && (
-        <Button size="sm" variant="secondary" busy={a.busy} onClick={() => a.onBill(i.seq)}>
-          Generate SOA
-        </Button>
-      )}
-      {a.canPromise && i.invoiceNo !== undefined && i.status !== 'PAID' && (
-        <Button size="sm" variant="secondary" onClick={() => a.onPromise(i)}>
-          Record Promise
-        </Button>
-      )}
-    </span>
-  );
-}
 
 /** The installments (billing cycles) with their allocation and status. */
 export function InstallmentsTab({
@@ -66,7 +41,14 @@ export function InstallmentsTab({
     { key: 'status', header: 'Status', render: (i) => <StatusBadge status={i.status} /> },
   ];
   if (plan.status !== 'CANCELLED') {
-    columns.push({ key: 'act', header: 'Actions', render: (i) => actionsOf(i, actions) });
+    columns.push({
+      key: 'act',
+      header: <span className="visually-hidden">Actions</span>,
+      width: '64px',
+      render: (i) => (
+        <RowActionMenu label={`cycle ${String(i.seq)}`} actions={installmentActions(i, actions)} />
+      ),
+    });
   }
   return (
     <DataTable

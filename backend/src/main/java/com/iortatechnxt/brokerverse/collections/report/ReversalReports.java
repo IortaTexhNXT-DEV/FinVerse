@@ -29,7 +29,9 @@ public final class ReversalReports {
 
   private static final String SQL =
       ClxReportSql.ITEM_SELECT
-          + ", d.created_at as tagged_at, d.created_by as tagged_by, d.remarks as tag_remarks,"
+          + ", d.created_at as tagged_at, "
+          + "coalesce((select u.full_name from sec_user u where u.username = d.created_by),"
+          + " d.created_by) as tagged_by, d.remarks as tag_remarks,"
           + " o.commission, o.vat_on_commission, o.wtax_rate, i.net_outstanding"
           + " - i.outstanding_pr2307 as diff_balance"
           + " from clx_disposition d join clx_item i on i.id = d.item_id"

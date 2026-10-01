@@ -38,6 +38,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class CollectionsBulkUpdateHandler implements BulkImportHandler {
 
+  /** The row refusal of an escalation by a user who may not escalate accounts. */
+  public static final String NOT_ALLOWED_TO_ESCALATE = "You are not allowed to escalate accounts";
+
   /** Handler code. */
   public static final String CODE = "CLX_BULK_UPDATE";
 
@@ -189,7 +192,7 @@ public class CollectionsBulkUpdateHandler implements BulkImportHandler {
   private List<String> escalationErrors(BulkRow row, BulkContext context) {
     List<String> errors = new ArrayList<>();
     if (!currentUser.hasAuthority("CLX_ESCALATE")) {
-      errors.add("You are not allowed to escalate accounts (CLX_ESCALATE)");
+      errors.add(NOT_ALLOWED_TO_ESCALATE);
     }
     TargetLevel level = level(row);
     if (level == null) {
@@ -207,7 +210,7 @@ public class CollectionsBulkUpdateHandler implements BulkImportHandler {
             .map(LovValue::getCode)
             .anyMatch(c -> c.equals(row.text(REASON)));
     if (!validReason) {
-      errors.add(REASON + " must be a value of " + EscalationNotices.REASON_LOV);
+      errors.add(REASON + " must be a code of the escalation reason list");
     }
     return errors;
   }

@@ -7,6 +7,7 @@ import { ActionDialog } from '@/components/broking/ActionDialog';
 import { RecordSummary } from '@/components/broking/RecordSummary';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
+import { useLovLabel } from '@/components/broking/useLabels';
 import { workflowKey } from '@/components/broking/workflowKey';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
@@ -16,11 +17,11 @@ import { DataTable } from '@/components/ui/DataTable';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDateTime, humanize } from '@/utils/format';
+import { formatAmount, formatDateTime } from '@/utils/format';
 import { ReasonDialog, RecordLoading } from '../plans/Parts';
 import type { Escalation, EscalationItem } from './api';
 import { escalationsApi } from './api';
-import { LEVEL_LABELS } from './labels';
+import { LEVEL_LABELS, stageText } from './labels';
 import { displayNameOf } from '@/api/users';
 import { LovLabel } from '@/components/broking/LovLabel';
 import { Notice } from '@/components/ui/Notice';
@@ -41,7 +42,7 @@ const ITEM_COLUMNS: Column<EscalationItem>[] = [
 ];
 
 function Summary({ e }: Readonly<{ e: Escalation }>) {
-  const origin = e.kind === 'AUTO' ? 'Rule ' + (e.ruleCode ?? '') : e.raisedBy;
+  const origin = e.kind === 'AUTO' ? 'Rule ' + (e.ruleCode ?? '') : displayNameOf(e.raisedBy);
   return (
     <RecordSummary
       title={e.assuredName}
@@ -49,7 +50,7 @@ function Summary({ e }: Readonly<{ e: Escalation }>) {
         <>
           <ReferenceChip label="Escalation" value={e.escalationNo} />
           <ReferenceChip label="ARN" value={e.arn} />
-          <StatusBadge status={e.status} />
+          <StatusBadge status={e.status} label={stageText(e.status)} />
         </>
       }
       flags={
@@ -98,6 +99,7 @@ export default function EscalationDetailPage() {
   const id = Number(useParams().id);
   const toast = useToast();
   const queryClient = useQueryClient();
+  const reasonLabel = useLovLabel('CLX_ESCALATION_REASON');
   const [asking, setAsking] = useState<WorkAction>();
   const escalation = useQuery({
     queryKey: ['collections', 'escalation', id],
@@ -111,7 +113,7 @@ export default function EscalationDetailPage() {
       queryClient.setQueryData(['collections', 'escalation', id], e);
       await queryClient.invalidateQueries({ queryKey: workflowKey(ENTITY, id) });
       await queryClient.invalidateQueries({ queryKey: ['collections', 'escalations'] });
-      toast.success(`${e.escalationNo}: ${humanize(e.status)}`);
+      toast.success(`${e.escalationNo}: ${stageText(e.status)}`);
     },
   });
   if (escalation.data === undefined) {
@@ -131,6 +133,7 @@ export default function EscalationDetailPage() {
         entityType={ENTITY}
         entityId={id}
         recordStatus={e.status}
+        reasonLabel={reasonLabel}
         onChanged={() => void queryClient.invalidateQueries({ queryKey: ['collections'] })}
         renderBusinessActions={(actions) =>
           actions

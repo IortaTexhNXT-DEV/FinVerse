@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.collections.bulk.service;
 
 import com.iortatechnxt.brokerverse.collections.escalation.domain.Escalation;
+import com.iortatechnxt.brokerverse.collections.escalation.domain.EscalationEnums.Stage;
 import com.iortatechnxt.brokerverse.collections.escalation.service.EscalationCandidates.Candidate;
 import com.iortatechnxt.brokerverse.collections.escalation.service.EscalationService;
 import com.iortatechnxt.brokerverse.collections.escalation.service.EscalationService.ManualEscalation;
@@ -92,8 +93,7 @@ public class CollectionsBulkActions {
                 c ->
                     results.add(
                         ItemResult.done(
-                            c.invoiceNo(),
-                            "Escalated in " + e.getEscalationNo() + " (" + e.getStatus() + ")")));
+                            c.invoiceNo(), escalatedText(e.getEscalationNo(), e.getStatus()))));
           } catch (BusinessRuleException | ResourceNotFoundException ex) {
             invoices.forEach(c -> results.add(ItemResult.refused(c.invoiceNo(), ex.getMessage())));
           }
@@ -147,6 +147,18 @@ public class CollectionsBulkActions {
 
   private <T> T inTx(Supplier<T> work) {
     return tx.execute(s -> work.get());
+  }
+
+  /**
+   * The outcome of an invoice escalated by hand, the stage in words: "Escalated in ESC-2026-000003,
+   * with the team lead".
+   *
+   * @param escalationNo escalation number
+   * @param stage stage the escalation is in
+   * @return the outcome text
+   */
+  public static String escalatedText(String escalationNo, Stage stage) {
+    return "Escalated in " + escalationNo + ", " + stage.words();
   }
 
   private static List<String> distinct(List<String> invoiceNos) {

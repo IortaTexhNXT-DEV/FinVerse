@@ -74,5 +74,21 @@ public final class EscalationEnums {
     public boolean isOpen() {
       return this != RESOLVED;
     }
+
+    /**
+     * The stage in words inside a sentence, as the screens name it ("with the team lead").
+     *
+     * @return words, never the stage code
+     */
+    public String words() {
+      return switch (this) {
+        case RAISED -> "raised";
+        case WITH_TL -> "with the team lead";
+        case WITH_UH -> "with the unit / section head";
+        case IN_ACTION -> "in action";
+        case RETURNED -> "returned to the handler";
+        case RESOLVED -> "resolved";
+      };
+    }
   }
 }

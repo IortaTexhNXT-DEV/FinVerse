@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CalendarRange, Lock, UserRound, Users, Wallet, Building2 } from 'lucide-react';
+import { CalendarRange, UserRound, Users, Wallet, Building2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useAuth } from '@/auth/authContext';
@@ -21,9 +21,11 @@ import type { Account } from './api';
 import { ACCOUNT_TABS } from './collectionsLogic';
 import type { AccountTabId } from './collectionsLogic';
 import { LegacyFollowUpCard } from './LegacyFollowUpCard';
+import { lockText, taggingOwnerLabel } from './presentation';
+import { InsurerName } from '@/components/broking/LovLabel';
 import { DetailsDialog, DispositionDialog, EffortDialog } from './WorkDialogs';
+import { LockBanner } from './WorkInputs';
 import './collections.css';
-import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
 
 function flags(a: Account): string[] {
@@ -42,10 +44,11 @@ function flags(a: Account): string[] {
     out.push('Pending Negative Adjustment');
   }
   if (l?.lockOwner !== undefined) {
-    out.push(`Locked by ${l.lockOwner}`);
+    out.push(lockText(l.lockOwner));
   }
-  if (a.item.taggingOwner !== undefined) {
-    out.push(`${a.item.taggingOwner === 'OPERATIONS' ? 'Operations' : 'Marketing'} Action`);
+  const owner = taggingOwnerLabel(a.item.taggingOwner);
+  if (owner !== undefined) {
+    out.push(`${owner} Action`);
   }
   return out;
 }
@@ -90,7 +93,7 @@ function Summary({ account }: Readonly<{ account: Account }>) {
           label: 'Aging',
           value: `${i.agingDays} days (${i.agingBracket ?? '—'}) · booked ${formatDate(i.bookingDate)}`,
         },
-        { icon: Building2, label: 'Insurer', value: i.insurerCode },
+        { icon: Building2, label: 'Insurer', value: <InsurerName code={i.insurerCode} /> },
         {
           icon: UserRound,
           label: 'Handler / AO / UH',
@@ -275,12 +278,7 @@ export default function AccountPage() {
           />
         }
       />
-      {lockedByOther && (
-        <div className="clx-lock-banner" role="status">
-          <Lock size={16} aria-hidden="true" />
-          <UserName login={a.lock.editingBy} /> is editing since {formatDateTime(a.lock.since)}
-        </div>
-      )}
+      {lockedByOther && <LockBanner login={a.lock.editingBy} since={a.lock.since} />}
       <ErrorAlert error={refresh.error} />
       <Summary account={a} />
       <LegacyFollowUpCard item={a.item} />

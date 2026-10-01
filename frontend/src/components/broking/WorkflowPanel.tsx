@@ -33,6 +33,8 @@ interface WorkflowPanelProps {
    * a save, a refresh) the stepper is reloaded, so the header and the stepper never disagree.
    */
   recordStatus?: string;
+  /** The name of a reason code in the history remarks (the record's list of reasons). */
+  reasonLabel?: (code: string) => string;
 }
 
 /** Current stage, since, due date with the overdue indicator and assignee, on one row. */
@@ -126,6 +128,7 @@ export function WorkflowPanel({
   onChanged,
   showHistory = true,
   recordStatus,
+  reasonLabel,
 }: Readonly<WorkflowPanelProps>) {
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -183,7 +186,9 @@ export function WorkflowPanel({
           ))}
         </div>
       </div>
-      {showHistory && <HistoryTable history={history} terminal={stageTerminal} />}
+      {showHistory && (
+        <HistoryTable history={history} terminal={stageTerminal} reasonLabel={reasonLabel} />
+      )}
       {pending && (
         <ActionDialog
           title={titleCase(pending.label)}

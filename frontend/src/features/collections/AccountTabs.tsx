@@ -6,12 +6,14 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, formatDateTime, formatPeriod, humanize } from '@/utils/format';
+import { componentText } from './presentation';
 import { collectionsApi } from './api';
 import type { Account } from './api';
 import { TIMELINE_KINDS } from './collectionsLogic';
 import { CellStack, EmptyCell } from '@/components/ui/CellStack';
 import { Tag } from '@/components/ui/Tag';
 import { UserName } from '@/components/ui/UserName';
+import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
 
 function Total({
   label,
@@ -45,7 +47,7 @@ export function SummaryTab({ account }: Readonly<{ account: Account }>) {
         <DataTable
           caption="Breakdown"
           columns={[
-            { key: 'c', header: 'Component', render: (l) => humanize(l.component) },
+            { key: 'c', header: 'Component', render: (l) => componentText(l.component) },
             { key: 'b', header: 'Booked', numeric: true, render: (l) => formatAmount(l.booked) },
             {
               key: 'a',
@@ -84,9 +86,14 @@ export function SummaryTab({ account }: Readonly<{ account: Account }>) {
             <span>
               <span className="fact-label">Last Effort</span>
               <span className="fact-value">
-                {i.lastEffortCode === undefined
-                  ? '—'
-                  : `${i.lastEffortCode} · ${formatDateTime(i.lastEffortAt)}`}
+                {i.lastEffortCode === undefined ? (
+                  '—'
+                ) : (
+                  <>
+                    <LovLabel type="CLX_EFFORT_CODE" code={i.lastEffortCode} /> ·{' '}
+                    {formatDateTime(i.lastEffortAt)}
+                  </>
+                )}
               </span>
             </span>
           </div>
@@ -94,7 +101,10 @@ export function SummaryTab({ account }: Readonly<{ account: Account }>) {
             <span>
               <span className="fact-label">Promise / Escalation</span>
               <span className="fact-value">
-                {[i.promiseStatus, i.escalationLevel].filter(Boolean).join(' · ') || '—'}
+                {[i.promiseStatus, i.escalationLevel]
+                  .filter((v): v is string => Boolean(v))
+                  .map(humanize)
+                  .join(' · ') || '—'}
               </span>
             </span>
           </div>
@@ -139,7 +149,11 @@ export function PaymentsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
               header: 'AR / OR',
               render: (l) => [l.arNo, l.orNo].filter(Boolean).join(' / '),
             },
-            { key: 'r', header: 'Reference', render: (l) => `${l.sourceModule} ${l.reference}` },
+            {
+              key: 'r',
+              header: 'Reference',
+              render: (l) => <CellStack main={l.reference} sub={humanize(l.sourceModule)} />,
+            },
             { key: 'a', header: 'Amount', numeric: true, render: (l) => formatAmount(l.amount) },
           ]}
           rows={q.data.lines}
@@ -275,7 +289,7 @@ export function PolicyTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
           <DataTable
             caption="Insurer shares"
             columns={[
-              { key: 'i', header: 'Insurer', render: (s) => s.insurerCode },
+              { key: 'i', header: 'Insurer', render: (s) => <InsurerName code={s.insurerCode} /> },
               {
                 key: 'p',
                 header: 'Share %',

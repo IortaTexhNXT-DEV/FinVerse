@@ -24,13 +24,19 @@ function render(buffer, ext, out, dpi = Number(process.env.DOC_DPI || 200), keep
       '    ws.sheet_properties.pageSetUpPr.fitToPage = True',
       '    ws.page_setup.fitToWidth = 1',
       '    ws.page_setup.fitToHeight = 0',
-      // Only the named columns are shown (a wide file would print too small to read).
+      // Only the named columns are shown (a wide file would print too small to read). The column names are in the
+      // first row that holds one of them: row 1, or the row under the title block of a report.
       'keep = [k for k in sys.argv[2].split("|") if k]',
       'if keep:',
       '    from openpyxl.utils import get_column_letter',
+      '    from openpyxl.worksheet.header_footer import HeaderFooter',
       '    for ws in wb.worksheets:',
+      '        head = next((r for r in range(1, min(ws.max_row, 40) + 1)',
+      '                     if any(str(ws.cell(r, c).value or "") in keep for c in range(1, ws.max_column + 1))), 1)',
+      // The page header and footer of the print are not part of the report table the image shows.
+      '        ws.HeaderFooter = HeaderFooter()',
       '        for c in range(1, ws.max_column + 1):',
-      '            name = str(ws.cell(1, c).value or "")',
+      '            name = str(ws.cell(head, c).value or "")',
       '            dim = ws.column_dimensions[get_column_letter(c)]',
       '            dim.hidden = name not in keep',
       '            dim.width = 60 if name == keep[-1] else 20',

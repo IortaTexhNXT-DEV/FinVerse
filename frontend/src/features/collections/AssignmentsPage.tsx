@@ -17,6 +17,9 @@ import type { Criteria, ReassignInput, Rule, RuleInput } from './api';
 import { ReassignDialog } from './WorkDialogs';
 import './collections.css';
 import { UserName } from '@/components/ui/UserName';
+import { RowActionMenu } from '@/components/ui/RowActionMenu';
+import { HandlerOptions } from './WorkInputs';
+import { assignmentRuleActions } from './presentation';
 
 const CRITERIA_FIELDS: readonly { key: keyof Criteria; label: string; numeric?: boolean }[] = [
   { key: 'segment', label: 'Market Segment' },
@@ -165,11 +168,7 @@ function RuleDialog({
                 onChange={(e) => setForm({ ...form, handler: e.target.value })}
               >
                 <option value="">Select…</option>
-                {handlers.map((h) => (
-                  <option key={h} value={h}>
-                    {h}
-                  </option>
-                ))}
+                <HandlerOptions handlers={handlers} />
               </select>
             )}
           </Field>
@@ -184,7 +183,10 @@ function RuleDialog({
 }
 
 /** Reassignment by criteria with a preview of the affected accounts (BRCLXN.052). */
-function ReassignByCriteria({ companyId }: Readonly<{ companyId: number }>) {
+function ReassignByCriteria({
+  companyId,
+  handlers,
+}: Readonly<{ companyId: number; handlers: readonly string[] }>) {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [criteria, setCriteria] = useState<Criteria>({});
@@ -216,12 +218,15 @@ function ReassignByCriteria({ companyId }: Readonly<{ companyId: number }>) {
         <ErrorAlert error={preview.error} />
         <Field label="Current Handler">
           {(id) => (
-            <input
+            <select
               id={id}
-              className="input"
+              className="select"
               value={criteria.handler ?? ''}
               onChange={(e) => setCriteria({ ...criteria, handler: e.target.value || undefined })}
-            />
+            >
+              <option value="">Any handler</option>
+              <HandlerOptions handlers={handlers} />
+            </select>
           )}
         </Field>
         <CriteriaFields value={criteria} onChange={setCriteria} />
@@ -233,7 +238,11 @@ function ReassignByCriteria({ companyId }: Readonly<{ companyId: number }>) {
               columns={[
                 { key: 'i', header: 'Invoice No.', render: (i) => i.invoiceNo },
                 { key: 'a', header: 'Assured', render: (i) => i.assuredName },
-                { key: 'h', header: 'Handler', render: (i) => i.currentHandler ?? 'Unassigned' },
+                {
+                  key: 'h',
+                  header: 'Handler',
+                  render: (i) => <UserName login={i.currentHandler} empty="Unassigned" />,
+                },
                 {
                   key: 'n',
                   header: 'Outstanding',
@@ -329,18 +338,16 @@ export default function AssignmentsPage() {
             },
             {
               key: 'a',
-              header: '',
+              header: <span className="visually-hidden">Actions</span>,
+              width: '64px',
               render: (r) => (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    activate.mutate(r);
-                  }}
-                >
-                  {r.active ? 'Deactivate' : 'Activate'}
-                </Button>
+                <RowActionMenu
+                  label={r.name}
+                  actions={assignmentRuleActions(r, {
+                    change: () => setEditing(r),
+                    activate: () => activate.mutate(r),
+                  })}
+                />
               ),
             },
           ]}
@@ -351,7 +358,7 @@ export default function AssignmentsPage() {
           onRowClick={(r) => setEditing(r)}
         />
       </Card>
-      <ReassignByCriteria companyId={companyId} />
+      <ReassignByCriteria companyId={companyId} handlers={handlers.data ?? []} />
       {editing !== undefined && (
         <RuleDialog
           rule={editing === 'new' ? undefined : editing}

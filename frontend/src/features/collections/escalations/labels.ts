@@ -1,4 +1,6 @@
 import type { Basis, EscalationStage, Rule, RuleInput, TargetLevel } from './api';
+import { humanize } from '@/utils/format';
+import { thresholdText } from '../presentation';
 
 /** Labels, tabs and form checks of the escalation screens (BRCLXN.049/050). */
 
@@ -15,6 +17,22 @@ export const ESCALATION_TABS: readonly {
   { id: 'RETURNED', label: 'Returned', stages: ['RETURNED'] },
   { id: 'RESOLVED', label: 'Resolved', stages: ['RESOLVED'] },
 ];
+
+/** The stages of an escalation as the status chips name them ("With Team Lead", never WITH_TL). */
+export const STAGE_LABELS: Readonly<Partial<Record<string, string>>> &
+  Record<EscalationStage, string> = {
+  RAISED: 'Raised',
+  WITH_TL: 'With Team Lead',
+  WITH_UH: 'With Unit / Section Head',
+  IN_ACTION: 'In Action',
+  RETURNED: 'Returned',
+  RESOLVED: 'Resolved',
+};
+
+/** The name of an escalation stage. */
+export function stageText(stage: string): string {
+  return STAGE_LABELS[stage] ?? humanize(stage);
+}
 
 export const LEVEL_LABELS: Record<TargetLevel, string> = {
   TL: 'Team Lead',
@@ -37,12 +55,21 @@ export function stagesOf(tab: EscalationTab): EscalationStage[] {
   return ESCALATION_TABS.find((t) => t.id === tab)?.stages ?? [];
 }
 
-/** How a rule reads: "Days since booking ≥ 45 → Team Lead". */
+/**
+ * How a rule reads: "Days since booking ≥ 45 → Team Lead", "Outstanding at or above 1,000,000.00 →
+ * Section Head"; a designated user by name (`name` turns the login into the name shown).
+ */
 export function describeRule(
   rule: Pick<Rule, 'basis' | 'threshold' | 'targetLevel' | 'targetUsername'>,
+  name: (login: string) => string = (login) => login,
 ): string {
-  const target = rule.targetUsername ?? LEVEL_LABELS[rule.targetLevel];
-  return `${BASIS_LABELS[rule.basis]} ≥ ${rule.threshold} → ${target}`;
+  const target =
+    rule.targetUsername === undefined ? LEVEL_LABELS[rule.targetLevel] : name(rule.targetUsername);
+  const when =
+    rule.basis === 'AMOUNT_OVER'
+      ? `${BASIS_LABELS[rule.basis]} ${thresholdText(rule.basis, rule.threshold)}`
+      : `${BASIS_LABELS[rule.basis]} ≥ ${rule.threshold}`;
+  return `${when} → ${target}`;
 }
 
 export interface RuleForm {

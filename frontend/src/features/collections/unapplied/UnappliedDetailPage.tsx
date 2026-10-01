@@ -30,6 +30,8 @@ import { REQUEST_COLUMNS } from './columns';
 import { DispositionDialog } from './DispositionDialog';
 import { ACTION_LABELS, TAB_LABELS, cashieringStatus, paymentFacts } from './labels';
 import { UserName } from '@/components/ui/UserName';
+import { displayNameOf } from '@/api/users';
+import { useInsurerName } from '@/components/broking/useLabels';
 
 type DetailTab = 'DETAILS' | 'DISPOSITIONS' | 'REQUESTS' | 'HISTORY';
 
@@ -70,12 +72,13 @@ const HISTORY_COLUMNS: Column<HistoryEvent>[] = [
 ];
 
 function Facts({ row }: Readonly<{ row: UnappliedRow }>) {
+  const insurerName = useInsurerName();
   return (
     <DefinitionGrid
       columns={2}
       collapseEmpty
       label="Payment and account"
-      items={paymentFacts(row).map(([label, value]) => ({ label, value }))}
+      items={paymentFacts(row, insurerName).map(([label, value]) => ({ label, value }))}
     />
   );
 }
@@ -107,7 +110,11 @@ function Summary({ row }: Readonly<{ row: UnappliedRow }>) {
         },
         { icon: Landmark, label: 'Transaction', value: row.transactionNo ?? '—' },
         { icon: FileText, label: 'Collector Disposition', value: disposition },
-        { icon: UserRound, label: 'Account Officer', value: row.account?.aoUsername ?? '—' },
+        {
+          icon: UserRound,
+          label: 'Account Officer',
+          value: displayNameOf(row.account?.aoUsername) || '—',
+        },
       ]}
     />
   );

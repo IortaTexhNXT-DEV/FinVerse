@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { Rule } from './api';
-import { describeRule, ruleFormErrors, ruleFormOf, ruleInputOf, stagesOf } from './labels';
+import {
+  describeRule,
+  ruleFormErrors,
+  ruleFormOf,
+  ruleInputOf,
+  stageText,
+  stagesOf,
+} from './labels';
 
 const RULE: Rule = {
   id: 1,
@@ -70,5 +77,16 @@ describe('escalation labels', () => {
       },
     );
     expect(ruleFormErrors(ruleFormOf(RULE, '2026-09-25'), false)).toEqual({});
+  });
+});
+
+describe('stage names', () => {
+  it('names every escalation stage in words, never the stage code', () => {
+    expect(stageText('WITH_TL')).toBe('With Team Lead');
+    expect(stageText('WITH_UH')).toBe('With Unit / Section Head');
+    expect(stageText('IN_ACTION')).toBe('In Action');
+    expect(stageText('RAISED')).toBe('Raised');
+    expect(stageText('RESOLVED')).toBe('Resolved');
+    expect(stageText('WITH_TL')).not.toMatch(/Tl\b/);
   });
 });

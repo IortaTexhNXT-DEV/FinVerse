@@ -43,6 +43,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class PrDispositionService implements InboxDispositions {
 
+  /** The refusal of a disposition reserved to other roles (no codes in what the user reads). */
+  public static final String RESERVED = "This disposition is reserved to other roles";
+
   static final String BULK_PERMISSION = "CLX_BULK_UPDATE";
 
   private final CollectionItems items;
@@ -212,12 +215,7 @@ public class PrDispositionService implements InboxDispositions {
     }
     Set<String> roles = users.roleCodes(support.username());
     if (Collections.disjoint(roles, rule.allowedRoles())) {
-      throw new BusinessRuleException(
-          "CLX_DISPOSITION_NOT_ALLOWED",
-          "Disposition "
-              + rule.code()
-              + " is reserved to "
-              + String.join(", ", rule.allowedRoles()));
+      throw new BusinessRuleException("CLX_DISPOSITION_NOT_ALLOWED", RESERVED);
     }
   }
 

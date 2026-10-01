@@ -1,0 +1,108 @@
+# Notifications catalogue of BRD-4 Collections: in-app notices (bell in the page header), alerts (Alert inbox of the
+# administrators and team leads) and e-mails. Texts are those of the platform; <name> is filled in by BIBS.
+# Each user chooses the in-app and e-mail channels of the Collections events on Notification Settings.
+notifications:
+  - id: NT-01
+    channel: In-app
+    trigger: An escalation moves to another stage by a workflow action (acknowledge, escalate to the unit / section head, return to the handler, resubmit, resolve)
+    recipient: The creator of the escalation and its current assignee, unless they made the move themselves
+    template: "Title: <escalation no>: <new stage name>. Text: <escalation description> - <comment>"
+    content: The new stage, the escalation and the comment typed with the action; the notice opens the escalation
+    screen: Escalation
+    frs: [FR-CL-053]
+  - id: NT-02
+    channel: In-app, e-mail
+    trigger: An account is escalated by a rule or by a user (event Account escalated)
+    recipient: The designated user of the escalation, or every user who handles escalations; the account officers of the invoices, other than the user who escalated
+    template: "Title: <escalation no>: <assured> escalated. Text: Escalated by <name> (or Rule <rule code>) - <currency> <amount> outstanding on <n> invoice(s)"
+    content: The escalation; the notice opens the escalation
+    screen: Escalations, Escalation
+    frs: [FR-CL-051, FR-CL-052]
+  - id: NT-03
+    channel: In-app
+    trigger: Collection accounts are reassigned (event Account reassigned)
+    recipient: The new handler; each previous handler of the accounts taken
+    template: "Title: <n> collection account(s) assigned to you [until <date>], or <n> collection account(s) reassigned to <handler> [until <date>]. Text: the reason"
+    content: The number of accounts, the end date of a temporary reassignment and the reason; the notice opens the PR Worklist
+    screen: PR Worklist, Assignments
+    frs: [FR-CL-021]
+  - id: NT-04
+    channel: In-app
+    trigger: The nightly promise check finds a promise to pay broken (event Promise to pay broken)
+    recipient: The user who recorded the promise and the account officer of the invoice
+    template: "Title: Promise of <assured> broken. Text: <invoice>: <currency> <amount> promised by <date> was not paid"
+    content: The promise; the notice opens Promises to Pay on the invoice
+    screen: Promises to Pay
+    frs: [FR-CL-042]
+  - id: NT-05
+    channel: In-app
+    trigger: An insurer returns a direct payment account to Collections (event Direct payment returned by insurer)
+    recipient: The handler of the account
+    template: "Title: Direct payment returned: <invoice>. Text: the remarks of Commission Receivables"
+    content: The account, reopened with the disposition DP returned by insurer; the notice opens the collection account
+    screen: Collection Account
+    frs: [FR-CL-032]
+  - id: NT-06
+    channel: In-app
+    trigger: A scheduled Collections file is published (event Collections file ready)
+    recipient: The users who may download the Collections files (export permission)
+    template: "Title: <report> <period> is ready. Text: Available from <date and time> [<unit and branch>]"
+    content: The file; the notice opens Collections Files
+    screen: Collections Files
+    frs: [FR-CL-080, FR-CL-081, FR-CL-082, FR-CL-083]
+  - id: NT-07
+    channel: In-app
+    trigger: Cashiering accepts, rejects or carries out a request sent on a collector disposition
+    recipient: The user who requested it
+    template: "Title: <unapplied reference> <request> <status>. Text: the message of Cashiering, or Cashiering decided the request"
+    content: The request and the Cashiering reference; the notice opens the unapplied payment
+    screen: Requests to Cashiering, Unapplied Payment
+    frs: [FR-CL-074]
+  - id: NT-08
+    channel: Alert
+    trigger: The nightly refresh of the worklist fails for a company (Collections refresh failed)
+    recipient: The administrators who receive the alerts of Collections
+    template: "The collection worklist refresh of <date> failed: <reason>"
+    content: The company and the date; the worklist keeps the figures of the last refresh
+    screen: Alerts
+    frs: [FR-CL-017]
+  - id: NT-09
+    channel: Alert
+    trigger: An escalation stays in a stage beyond the SLA of its rule (Collections escalation overdue)
+    recipient: The receiving level of the escalation and the administrators who receive the alerts of Collections
+    template: "<escalation no> (<assured>) is past its <hours>-hour SLA in stage <stage>"
+    content: The escalation; the alert opens it
+    screen: Alerts, Escalation
+    frs: [FR-CL-053]
+  - id: NT-10
+    channel: Alert
+    trigger: A scheduled file (daily, weekly, monthly or the application file) is not generated on time (Collections file not published)
+    recipient: The administrators who receive the alerts of Collections
+    template: "<report> for <period> was not published: <reason>"
+    content: The file and the reason; Generate Files publishes it again
+    screen: Alerts, Collections Files
+    frs: [FR-CL-077, FR-CL-083]
+  - id: NT-11
+    channel: E-mail
+    trigger: Send via Email on a statement of account
+    recipient: The client's e-mail address (To and Cc as entered)
+    template: "Subject: Statement of Account <soa no> – <assured>. Body: Dear <assured>, please find attached your statement of account <soa no> for account <ARN>, billing cycle <period>. The amount due is <currency> <amount>, payable on or before <due date>. The attachment is protected; the password follows in a separate e-mail. Please disregard this statement if payment has been made."
+    content: "<soa no>.pdf, password protected; the e-mail and its outcome are kept on the statement"
+    screen: Statement of Account
+    frs: [FR-CL-061]
+  - id: NT-12
+    channel: E-mail
+    trigger: Follows every protected statement of account e-mail
+    recipient: The same recipients
+    template: "The password of the attachment of the e-mail <subject>, with the password hint for the recipient"
+    content: The password only
+    screen: Statement of Account
+    frs: [FR-CL-061]
+  - id: NT-13
+    channel: Alert
+    trigger: An item handed to Cashiering or Commission Receivables (check pick-up, BIR 2307 tag, direct payment account) is still not taken after the threshold (Collections item not taken)
+    recipient: The administrators who receive the alerts of Collections
+    template: "<feed> item of <invoice> not taken by Operations since <date and time>"
+    content: The hand-off; it shows on the Dispositions & Efforts tab of the account
+    screen: Alerts, Collection Account
+    frs: [FR-CL-032]

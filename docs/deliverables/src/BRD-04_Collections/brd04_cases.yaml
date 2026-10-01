@@ -10,8 +10,9 @@ meta:
   code: CL
   frs: FRS_BRD04_COLLECTIONS.md
   summary: TP_BRD04_COLLECTIONS.md
-  version: "1.0"
-  date: 25 September 2026
+  version: "2.0"
+  date: 1 October 2026
+  signoff: pack/pack.yaml
   verify_messages: true
 
 personas:
@@ -899,7 +900,7 @@ frs:
         steps:
           - Send a direct request to reassign accounts with accounts, reason and handler but no kind.
         expected: The request is refused.
-        msg: [A reassignment is PERMANENT or TEMPORARY, CLX_REASSIGN_KIND]
+        msg: [Choose a permanent or a temporary reassignment, CLX_REASSIGN_KIND]
 
   FR-CL-030:
     scenario: SC-CL-04
@@ -964,7 +965,7 @@ frs:
         steps:
           - Log in as mkthandler, select an own account and record "No / missing policy number".
         expected: The disposition is refused.
-        msg: ["Disposition {NO_POLICY_NUMBER} is reserved to {PROCESSOR, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD}", CLX_DISPOSITION_NOT_ALLOWED]
+        msg: [This disposition is reserved to other roles, CLX_DISPOSITION_NOT_ALLOWED]
       - c: 4
         type: Security-access
         neg: false
@@ -1016,7 +1017,7 @@ frs:
         steps:
           - Log in as ao, select two own accounts and record "Coordinate further".
         expected: The action is refused; neither account changes.
-        msg: [Updating several accounts at once needs CLX_BULK_UPDATE, CLX_BULK_NOT_ALLOWED]
+        msg: [You are not allowed to update several accounts at once, CLX_BULK_NOT_ALLOWED]
       - c: 4
         type: Negative
         screen: SYS
@@ -1121,11 +1122,11 @@ frs:
       - c: 5
         type: Negative
         screen: SYS
-        title: 2307 path other than CASH or CERTIFICATE
+        title: 2307 path other than the two paths
         steps:
           - POST "PR 2307 for reversal" with path CHECK.
         expected: The disposition is refused.
-        msg: [The 2307 path is CASH or CERTIFICATE, CLX_CWT_PATH]
+        msg: ["Choose the 2307 path: certificate received or paid in cash", CLX_CWT_PATH]
       - c: 5
         type: Negative
         title: Certificate number missing on the CERTIFICATE path
@@ -1179,7 +1180,7 @@ frs:
         steps:
           - As ao, select two accounts and click Log Effort.
         expected: The action is refused.
-        msg: [Updating several accounts at once needs CLX_BULK_UPDATE, CLX_BULK_NOT_ALLOWED]
+        msg: [You are not allowed to update several accounts at once, CLX_BULK_NOT_ALLOWED]
 
   FR-CL-034:
     scenario: SC-CL-04
@@ -1240,7 +1241,7 @@ frs:
         steps:
           - Upload a row with Escalate = Y, level TL and a reason.
         expected: The row is rejected.
-        msg: [You are not allowed to escalate accounts (CLX_ESCALATE), "-"]
+        msg: [You are not allowed to escalate accounts, "-"]
       - c: 3
         type: Negative
         screen: BULK
@@ -1722,7 +1723,7 @@ frs:
         steps:
           - Escalate one invoice to level USER, user ao.
         expected: The escalation is refused.
-        msg: ["{ao} does not handle escalations (CLX_ESCALATION_HANDLE)", CLX_ESCALATION_TARGET]
+        msg: ["{ao} does not handle escalations", CLX_ESCALATION_TARGET]
       - c: 3
         type: Negative
         title: One paid invoice among three

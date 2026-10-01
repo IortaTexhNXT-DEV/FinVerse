@@ -8,11 +8,10 @@ doc_code: FRS
 brd: BRD-04
 name: Collections
 doc_id: BIBS-FRS-BRD-04
-version: "1.0"
-date: 25 September 2026
-status: Issued for BDOI review
+version: "2.0"
+date: 1 October 2026
+status: Issued for BDOI business sign-off
 header_title: FRS BRD-4 Collections
-output: FRS/BIBS_FRS_BRD-04_Collections_v1.0.docx
 control:
   - version: "0.9"
     date: 18 Sep 2026
@@ -26,15 +25,22 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Operations Head (pending)
     change: First issue for BDOI review; aligned with the Collections screens and the cross-BRD decisions
+  - version: "2.0"
+    date: 1 Oct 2026
+    author: iorta TechNXT Business Analysis
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Business sign-off pack: navigation by persona, 19 screen specifications with screenshots, five walkthroughs, messages, notifications, document outputs, the upload template, cross-BRD contract, sign-off and change control (chapters 12-20); proposed business rules and clarifications for confirmation extended with the screen presentation items (chapter 21); screen standards (appendix). Messages quoted as the screens show them. Issued 01-Oct-2026. Chapters 1-11 unchanged in substance; FR, BRD and test IDs kept"
 distribution:
-  - {name: "VP and Head, BDOI Operations", role: Approver, organisation: BDOI, purpose: Review and sign-off}
-  - {name: "Section Heads, Corporate and Retail Marketing", role: Business owner, organisation: BDOI, purpose: Review of all FRs}
-  - {name: "Collection Team Leads and Collection Handlers", role: Business user, organisation: BDOI, purpose: "Review of the worklist, disposition, promise and escalation FRs"}
-  - {name: "Marketing Account Officers and Marketing Handlers", role: Business user, organisation: BDOI, purpose: Review of the collector FRs}
-  - {name: "Operations Cashiering", role: Business user, organisation: BDOI, purpose: Review of the unapplied-payment and hand-off FRs}
-  - {name: "Commission Receivables Unit (CRU)", role: Business user, organisation: BDOI, purpose: "Review of the DP list and commission receivable FRs"}
-  - {name: "Comptrollership, Disbursement and ACSL", role: Viewer, organisation: BDOI, purpose: Review of the read access and reports}
-  - {name: Business Project Services, role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
+  - {name: "Shellah Marie C. Miranda, AVP, Product Owner", role: Approver, organisation: BDOI, purpose: Review and sign-off}
+  - {name: "Jose Melvin Jarin, AVP, Product Owner", role: Approver, organisation: BDOI, purpose: Review and sign-off of the addendum functions}
+  - {name: "Mark Joseph C. Makalintal (Combank and Corbank), Edmundante F. Ramirez and Roderick Lim (Retail Marketing)", role: Approver, organisation: BDOI, purpose: Review and sign-off for Marketing}
+  - {name: "Ronald Allan E. De Leon, Head - Comptrollership", role: Approver, organisation: BDOI, purpose: "Review and sign-off of the commission receivable rows (section 4.10)"}
+  - {name: "John Benedict S. Santos, VP and Head, BDOI Operations", role: Reviewer, organisation: BDOI, purpose: "Review of the process with Operations and of the exports (caveat p.93)"}
+  - {name: "Collections and Marketing Support, HO Marketing Support BBG, Marketing (Pia Grace M. Pinili, Maria Victoria Evangelista, Grace Tordesillas, Ma. Fides E. Rivera, Arra R. Rivera, Rhommel Mark Galler)", role: Business user, organisation: BDOI, purpose: Review of the screens and rows (input providers of the BRD)}
+  - {name: "Operations: Financial Transactions and Processing (Perjelyn Joy Gutierrez); Cashiering and Commission Receivables", role: Business user, organisation: BDOI, purpose: "Review of the hand-offs, the requests on unapplied payments and the reversal files"}
+  - {name: "Information Technology Group (IT Core Business Delivery; IT AIO Core Business Delivery - Insurance)", role: Reviewer, organisation: BDOI, purpose: "Review of the scheduled runs, files, access and the Technical Specification"}
+  - {name: "Dan Ace Cauton, Program Manager, and Zean C. Ibay, Business Analyst, ESG - Business Project Services", role: BRD owner, organisation: BDO Unibank ESG, purpose: Traceability check against the BRD}
   - {name: Project team, role: Delivery, organisation: iorta TechNXT, purpose: "Delivery, test and UAT preparation"}
 ---
 
@@ -46,7 +52,7 @@ This Functional Requirements Specification (FRS) states how BIBS (BDOI Broker Sy
 
 BDOI uses this document to confirm that the system behaves as the business expects. The project team uses it to test and to prepare user acceptance testing (UAT). Every functional requirement (FR) cites the BRD requirement it meets and the BRD page.
 
-The FRs describe the proposed behaviour of the Collections screens. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, the FR says so in a note and chapter 12 lists each such point for confirmation.
+The FRs describe the proposed behaviour of the Collections screens. Where the proposed rule or screen differs from the BRD text, or needs a decision of BDOI, the FR says so in a note and chapter 21 lists each such point for confirmation. Chapters 12 to 19 give the business view of the system: the navigation, the specification of every screen with its screenshots, the walkthroughs, the messages, notifications, documents, the upload template and the contract with the other BRDs; chapter 20 describes the sign-off.
 
 ## Scope
 
@@ -231,7 +237,7 @@ Every new Collections role also holds WORK_VIEW, ATTACHMENT_VIEW, REPORT_VIEW, C
 | CLX_UNAPPLIED_WORK | CREATE | Collector disposition and application request on unapplied payments (BRCLXN.030-033) |
 | CLX_BILLING | CREATE | Installment plans and billing statements (BRCLXN.053, 058) |
 | CLX_SETUP | AMEND | Threshold and other parameters, disposition rules, Unit Heads, escalation rules (BRCLXN.007, 017, 037, 049) |
-| CLX_EXPORT | VIEW | Download of scheduled files and exports (caveat p.93) |
+| CLX_EXPORT | VIEW | Download of scheduled files and exports |
 | CLX_REPORT_VIEW | VIEW | Collections reports and the Files screen |
 | CLX_AUDIT_VIEW | VIEW | Collections audit log (BRCLXN.044) |
 
@@ -285,7 +291,7 @@ alternate_flows:
   - Reserved disposition. A disposition value reserved to other roles is refused even when the user holds CLX_WORK (FR-CL-031).
 rules:
   - [R1, "Roles are granted permissions as in section 3.3 until BDOI confirms the matrix (OQ48).", Configurable, Role-permission change request]
-  - [R2, "A user may hold several roles. The BRD rule of one role per user (NFR 3.04) is not applied (decision D5; chapter 12, CLR-CL-18).", Fixed, "-"]
+  - [R2, "A user may hold several roles. The BRD rule of one role per user (NFR 3.04) is not applied (decision D5; chapter 21, CLR-CL-18).", Fixed, "-"]
   - [R3, "Lock-out after LOGIN_MAX_FAILED_ATTEMPTS consecutive failed log-ins (default 3).", Configurable, Parameter LOGIN_MAX_FAILED_ATTEMPTS]
   - [R4, "BDO single sign-on with Windows credentials (NFR 1.01) is not part of this phase (Q42).", Fixed, "-"]
 validations:
@@ -608,7 +614,7 @@ main_flow:
   - BIBS returns the matching accounts and their totals.
   - The user saves the filter set as a quick filter for later use.
 rules:
-  - [R1, "Every CLX_VIEW user sees every account and narrows it with the filters; a default scope per user is not proposed (CQ06; chapter 12, CLR-CL-03).", Fixed, "-"]
+  - [R1, "Every CLX_VIEW user sees every account and narrows it with the filters; a default scope per user is not proposed (CQ06; chapter 21, CLR-CL-03).", Fixed, "-"]
   - [R2, "Unit Head resolution: sales unit head, else department head, else region head.", Configurable, Collections Setup (Unit Heads)]
 validations: []
 fields_screen: PR Worklist, filters
@@ -697,7 +703,7 @@ acceptance:
 ```
 
 > [!NOTE] Difference from the BRD
-> The BRD (p.27, FRID-015 as edited by hand on p.78) describes a nightly extraction from EBIX. In BIBS the booking is internal, so the refresh reads the BIBS ledger. Open EBIX items, their disposition history and unapplied items at go-live need a one-time migration; its scope and format are open (CQ07; chapter 12, CLR-CL-01).
+> The BRD (p.27, FRID-015 as edited by hand on p.78) describes a nightly extraction from EBIX. In BIBS the booking is internal, so the refresh reads the BIBS ledger. Open EBIX items, their disposition history and unapplied items at go-live need a one-time migration; its scope and format are open (CQ07; chapter 21, CLR-CL-01).
 
 ```fr
 id: FR-CL-018
@@ -797,7 +803,7 @@ rules:
 validations:
   - [No account selected or matched, No account matches the selection, CLX_REASSIGN_EMPTY]
   - [Reason blank, Give the reason of the reassignment, CLX_REASSIGN_REASON]
-  - [Kind not given, A reassignment is PERMANENT or TEMPORARY, CLX_REASSIGN_KIND]
+  - [Kind not given, Choose a permanent or a temporary reassignment, CLX_REASSIGN_KIND]
   - [Temporary without a future end date, A temporary reassignment needs an end date after today, CLX_REASSIGN_END_DATE]
   - [New handler not eligible, "<user> is not an active collection handler", CLX_HANDLER_NOT_ELIGIBLE]
 fields_screen: Reassign Accounts
@@ -840,7 +846,7 @@ rules:
   - [R1, "Values delivered, all to be confirmed by BDOI (CQ08): DP PR for reversal; PR 2307 for reversal; For check pick-up; Cancel account; Coordinate further; Request bank AO assistance; No / missing policy number; DP returned by insurer.", Configurable, LOV CLX_PR_DISPOSITION]
   - [R2, "Only active values within their effective dates can be selected.", Fixed, "-"]
   - [R3, "The category A / B / C of each value is not seeded until BDOI gives it (CQ08).", Configurable, Collections Setup (Disposition Rules)]
-  - [R4, "No / missing policy number is reserved to PROCESSOR, MKT_COLLECTION, CLX_TL and MKT_SECTION_HEAD.", Configurable, "Disposition Rules (roles allowed)"]
+  - [R4, "No / missing policy number is reserved to Processing, the Collection Handler, the Collection Team Lead and the Section Head.", Configurable, "Disposition Rules (Reserved To)"]
 validations:
   - [Unknown value, "<code> is not a value of <type>", CLX_LOV_VALUE_UNKNOWN]
   - [Unknown attribute, "<attribute> is not an attribute of <type>", CLX_LOV_ATTRIBUTE_UNKNOWN]
@@ -849,9 +855,9 @@ fields_screen: Collections Setup, Disposition Rules
 fields:
   - [Disposition, List, "Yes", LOV CLX_PR_DISPOSITION, Existing value]
   - [Category, List, "No", "A, B, C", "-"]
-  - [Tagging Owner, List, "Yes", "MARKETING, OPERATIONS", "-"]
-  - [Operations Action, List, "Yes", "NONE, CWT2307_REVERSAL, DP_REVERSAL, CHECK_PICKUP, CANCEL_REQUEST", "-"]
-  - [Allowed Roles, Multi-select, "No", Roles, Blank = every role with CLX_WORK]
+  - [Tagging Owner, List, "Yes", "Marketing, Operations", "-"]
+  - [Operations Action, List, "Yes", "None, BIR 2307 reversal, DP reversal, Check pick-up, Cancellation request", "-"]
+  - [Reserved To, Check boxes, "No", Roles, None ticked = every collector]
 notifications:
   - "Pending LOV changes appear in My Approvals."
 audit:
@@ -890,10 +896,10 @@ rules:
 validations:
   - [No account selected, Select at least one account, CLX_NO_ACCOUNT]
   - [More than 500 accounts, Select at most 500 accounts at once, CLX_TOO_MANY_ACCOUNTS]
-  - [Several accounts without the bulk permission, Updating several accounts at once needs CLX_BULK_UPDATE, CLX_BULK_NOT_ALLOWED]
+  - [Several accounts without the bulk permission, You are not allowed to update several accounts at once, CLX_BULK_NOT_ALLOWED]
   - [Account not open, "<invoice> is <status>", CLX_ITEM_CLOSED]
   - [Account of another company, "<invoice> belongs to another company", CLX_ITEM_OTHER_COMPANY]
-  - [Value reserved to other roles, "Disposition <code> is reserved to <roles>", CLX_DISPOSITION_NOT_ALLOWED]
+  - [Value reserved to other roles, This disposition is reserved to other roles, CLX_DISPOSITION_NOT_ALLOWED]
   - [Account locked by another user, "<user> is editing <invoice>", CLX_ITEM_LOCKED]
 fields_screen: Record Disposition
 fields:
@@ -937,12 +943,12 @@ alternate_flows:
 rules:
   - [R1, "Collections posts no journal and no ledger movement; Cashiering and Commission post the effects.", Fixed, "-"]
   - [R2, "The pick-up date is today or later; the check amount is required.", Fixed, "-"]
-  - [R3, "The 2307 path is CASH or CERTIFICATE.", Fixed, "-"]
+  - [R3, "The 2307 path is a certificate received or a payment in cash.", Fixed, "-"]
   - [R4, "Stale threshold 1 day.", Configurable, Exception code CLX_OUTBOX_STALE]
 validations:
   - [Pick-up date in the past, Give a pick-up date from today on for the check pick-up, CLX_PICKUP_DATE]
   - [Check amount missing, Give the check amount, CLX_PICKUP_AMOUNT]
-  - [2307 path not CASH or CERTIFICATE, The 2307 path is CASH or CERTIFICATE, CLX_CWT_PATH]
+  - [2307 path not one of the two paths, "Choose the 2307 path: certificate received or paid in cash", CLX_CWT_PATH]
   - [Required detail missing, "Give <detail>", CLX_DISPOSITION_DETAIL]
   - [Detail not a date, "'<value>' is not a date (yyyy-mm-dd)", CLX_DISPOSITION_DETAIL]
   - [Detail not an amount, "'<value>' is not an amount", CLX_DISPOSITION_DETAIL]
@@ -969,7 +975,7 @@ acceptance:
 ```
 
 > [!NOTE] For confirmation
-> Cashiering takes the COLLECTION_CWT2307 items in its 2307 intake; an item not taken within one day raises CLX_OUTBOX_STALE (chapter 12, CLR-CL-06).
+> Cashiering takes the COLLECTION_CWT2307 items in its 2307 intake; an item not taken within one day raises CLX_OUTBOX_STALE (chapter 21, CLR-CL-06).
 
 ```fr
 id: FR-CL-033
@@ -994,7 +1000,7 @@ rules:
 validations:
   - [Effort dated in the future, An effort cannot be in the future, CLX_EFFORT_FUTURE]
   - [Category not A B or C, "The tagging category is A, B or C", CLX_CATEGORY]
-  - [Several accounts without the bulk permission, Updating several accounts at once needs CLX_BULK_UPDATE, CLX_BULK_NOT_ALLOWED]
+  - [Several accounts without the bulk permission, You are not allowed to update several accounts at once, CLX_BULK_NOT_ALLOWED]
 fields_screen: Log Collection Effort
 fields:
   - [Effort, List, "Yes", LOV CLX_EFFORT_CODE, Active value]
@@ -1042,7 +1048,7 @@ validations:
   - [Promise amount without date, A promise amount needs the promise date, "-"]
   - [Invoice not in the ledger, "Invoice <no> is not in the ledger", "-"]
   - [Nothing to collect, "Invoice <no> has nothing to collect", CLX_NOTHING_TO_COLLECT]
-  - [Escalation without permission, You are not allowed to escalate accounts (CLX_ESCALATE), "-"]
+  - [Escalation without permission, You are not allowed to escalate accounts, "-"]
   - [USER escalation without user, "Name the user in Escalate To for a USER escalation", "-"]
 fields_screen: Collections Bulk Update (template)
 fields:
@@ -1371,7 +1377,7 @@ rules:
   - [R3, "The designated user must hold CLX_ESCALATION_HANDLE.", Fixed, "-"]
 validations:
   - [Level or user missing, "Choose the level, and the user for a designated authority", CLX_ESCALATION_TARGET]
-  - [User cannot handle escalations, "<user> does not handle escalations (CLX_ESCALATION_HANDLE)", CLX_ESCALATION_TARGET]
+  - [User cannot handle escalations, "<user> does not handle escalations", CLX_ESCALATION_TARGET]
   - [Invoice with nothing to collect, "Invoice <no> has nothing to collect", CLX_NOTHING_TO_COLLECT]
 fields_screen: Escalate Accounts
 fields:
@@ -1519,7 +1525,7 @@ main_flow:
   - The worklist and aging are unchanged.
 rules:
   - [R1, "An SOA never creates a receivable or a CR billing.", Fixed, "-"]
-  - [R2, "Aging basis BOOKING or INCEPTION; aging from the SOA due date is not proposed (CQ14; chapter 12, CLR-CL-16).", Configurable, Parameter CLX_AGING_BASIS]
+  - [R2, "Aging basis BOOKING or INCEPTION; aging from the SOA due date is not proposed (CQ14; chapter 21, CLR-CL-16).", Configurable, Parameter CLX_AGING_BASIS]
 validations: []
 notifications:
   - "None."
@@ -1983,7 +1989,7 @@ acceptance:
 
 ## Commission receivable and incentives
 
-BRCLXN.059 is signed. BRCLXN.061-064 are only in the unsigned draft of the workshop addendum (p.8-12) and their scope is confirmed through CQ01. The Commission Receivables Unit is the Operations Commission team, so these rows belong to the Commission module of BRD-2, not to Collections. FR-CL-091 to FR-CL-094 are proposed for confirmation (chapter 12, CLR-CL-17); their messages are confirmed with the draft.
+BRCLXN.059 is signed. BRCLXN.061-064 are only in the unsigned draft of the workshop addendum (p.8-12) and their scope is confirmed through CQ01. The Commission Receivables Unit is the Operations Commission team, so these rows belong to the Commission module of BRD-2, not to Collections. FR-CL-091 to FR-CL-094 are proposed for confirmation (chapter 21, CLR-CL-17); their messages are confirmed with the draft.
 
 ```fr
 id: FR-CL-090
@@ -2547,9 +2553,261 @@ Every BRD-4 requirement is met by at least one FR. The test cases are listed by 
 | G. Commission receivable (059, 061-064) | 5 | 5 |
 | **Total** | **64** | **64** |
 
+<!-- pagebreak -->
+
+# Navigation
+
+This chapter shows how each Collections user reaches the screens. The sidebar shows a screen only when the user's role holds its permission (section 3.2), so each persona sees a different menu. The tables follow the proposed role grants.
+
+## Screens of Collections
+
+The 19 screens specified in chapter 13, with the menu path and the roles that can open them. A screen without its own menu entry (a record, a client view) is reached from the screen before it; its path ends with that screen.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: screen-index
+```
+
+## Screen flow
+
+How the screens link: from a list to its record, from a record action to the next screen, and from one area of Collections to the next. The walkthroughs of chapter 14 follow these links with real steps.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: flow
+```
+
+<!-- portrait -->
+
+## Menu by persona
+
+For each Collections persona, the SIT and UAT user of the seed data and the sidebar that user sees, section by section. The BRD column shows which BRD owns a section; entries of other BRDs are listed so the business unit sees the whole menu of its users.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: menus
+```
+
+## Common screen elements
+
+Elements that behave the same on every Collections screen are described once here and not repeated in the screen specifications.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: common
+```
+
+<!-- landscape -->
+
+# Screen specifications
+
+One specification per screen, grouped by area: the home, worklist and collection account; installments, promises and billing statements; escalation; unapplied payments; assignment, files and set-up. Each gives:
+
+- **Purpose**, **who can open it** (personas and the permission), **navigation** (menu path and the other ways in) and the related **FRs**;
+- **screenshots** of the SIT environment with seed data; the numbered markers on the first screenshot match the **No.** column of the field table;
+- the **field table**: section of the screen, label as shown, type, length or format, mandatory (Y, N or the condition), source list or master, default, the statuses in which the field can be changed, the validation and the message shown when it fails, word for word;
+- the **actions table**: button, who sees it, when it is enabled, what happens, the resulting status and the notification sent;
+- the **business rules** of the screen with their FRs, the **expected outcome** and the **test cases** of the test plan that run on the screen.
+
+A message in angle brackets (`<invoice>`) is completed by the system with the value shown. "Workflow notice" means the in-app notification NT-01 of chapter 16.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: screens
+```
+
+<!-- portrait -->
+
+# End-to-end walkthroughs
+
+Five walkthroughs follow a case through the screens, persona by persona, with what the user does, what the user sees and the result of each step. They use seed data only and run in this order on the SIT environment: walkthroughs B, D and E work on the account that walkthrough A brings into the worklist. They are the script of the SIT review sessions of the Start Here guide.
+
+## WT-A A new outstanding account from the refresh of the worklist to the check pick-up in Cashiering
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-A
+```
+
+## WT-B A promise to pay, the escalation of the account and its resolution
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-B
+```
+
+## WT-C An unapplied payment applied to an invoice at the collector's request
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-C
+```
+
+## WT-D An installment plan and the statement of account of its first cycle
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-D
+```
+
+## WT-E Controls and the messages the user sees
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: walkthrough
+id: WT-E
+```
+
+<!-- landscape -->
+
+# Messages catalogue
+
+Every message a Collections user can see, grouped by the screen or dialog that shows it, with its code, its type and what the user does. The texts are quoted exactly as the screens show them.
+
+- **Validation**: shown on the screen while the user fills in a field or before the form is sent.
+- **Error**: the system refused the action; nothing was saved. The code is shown under the message as the Reference.
+- **Warning**: the action is possible, but the user should check something first.
+- **Confirmation** and **Information**: the outcome of an action, or a hint on the screen.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: messages
+```
+
+# Notifications catalogue
+
+The in-app notifications, alerts and e-mails that Collections sends: what triggers each, who receives it and what it contains. Each user chooses the in-app and e-mail channels of the Collections events on Notification Settings. A statement of account e-mailed to a client is password protected; the password follows in a separate e-mail.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: notifications
+```
+
+<!-- portrait -->
+
+# Document outputs
+
+The documents and files Collections generates: the statement of account with the BDO Insure letterhead, the "Confidential" footer and page numbers, and the files published on Collections Files. For each: the template, the format, the screen that produces it, the password protection, where every field comes from and the first page as generated from seed data. The workbooks are shown with a selection of their columns.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: documents
+```
+
+# Upload screens
+
+Collections has one bulk upload, Collections Bulk Update, run on the Bulk Uploads screen of BRD-1 (SCR-NB-36): download the template, upload the filled file, review every row with its message, then process the valid rows. A file uploaded before is refused. The column checks (mandatory, number, date, Y/N) apply to every row, and the row checks listed below come on top. The values of the Escalation Level, Escalation Reason, Disposition and Effort Code columns are the codes of their lists, as the template states.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: uploads
+```
+
+<!-- landscape -->
+
+# Cross-BRD dependencies and interface contract
+
+Collections reads every booked invoice from the Operations invoice ledger and New Business, and hands its work to Cashiering, Commission Receivables and Adjustment of Operations; it takes the sales organisation of Product Maintenance, the users of User Access Maintenance and the legacy follow-up of Data Migration. The contract below lists each exchange: the BRD or system, the direction, what is exchanged, when and how, and who owns the data. Section 7 describes the interfaces; the technical detail is in the Technical Specification, reviewed by BDOI IT.
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: contract
+```
+
+<!-- portrait -->
+
+# Sign-off and change control
+
+## What is signed
+
+The business sign-off covers the release set BRD-04 Collections v2.0:
+
+<!-- table: widths=6,11.6 caption="Documents of the release set" -->
+| Document | Content |
+|---|---|
+| 00 Start Here | The map of the pack, the reading order per role, the steps up to closure and the dates |
+| 01 Sign-off Pack Guide (deck) | Purpose, approach and steps with who does what, the module at a glance, caveats and impacts on other modules, entry and exit criteria, handover and change control |
+| 02 This FRS v2.0 | Requirements (chapters 1-11), the business view of the system (chapters 12-19), sign-off (chapter 20), the proposed rules for confirmation (chapter 21) and the screen standards (appendix) |
+| 03 Sign-off workbook v2.0 | The screen standards, screens, fields, actions, rules, messages, notifications, menus, the upload template and the contract of this FRS, one row each, with the BU review columns; the comments log, meeting minutes, version history and sign-off certificate |
+| 04 and 05 Test plan v2.0 and its summary | The test cases traced to the FRs and to the screens of chapter 13 |
+
+```pack
+plugin: ../signoff/signoff_pack.py
+source: pack/pack.yaml
+render: counts
+```
+
+## How the review is recorded
+
+Each team records its review in the sign-off workbook: Accept, Change requested or Comment on each row of the screen standards, screen catalogue, field register, business rules and messages, with the comment, the reviewer and the date. Questions, corrections and change requests go to the comments log of the workbook, where the project team answers them. The project team answers every Change requested row in the comments log before sign-off: either the row is corrected in the next version of the set, or the change is raised as a change request (below) and the row is signed as specified.
+
+## What signing freezes
+
+Signing this release set freezes, for Collections:
+
+- the screens and their navigation (chapters 12 and 13), the fields with their order, labels, types, mandatory rules, lists and validations;
+- the actions with their conditions and resulting statuses, and the business rules;
+- the messages (chapter 15), the notifications (chapter 16) and the generated documents and files (chapter 17);
+- the upload template (chapter 18) and the interface contract with the other BRDs (chapter 19).
+
+Configuration values marked "default" (threshold, aging basis and brackets, edit-lock time, export cap, invoice number format, promise grace days, list entries, disposition attributes, escalation and assignment rules, the statement template, section 9) are not frozen; the Section Heads, the Business Administrator and the System Administrator change them in the system without a change request.
+
+## Change after sign-off
+
+A change to anything frozen is raised in the Change Management Register. The request states the screen, field, rule or message concerned, the reason and the business priority. The project team assesses it, including its effect on the other BRDs through the interface contract of chapter 19 (for example a new disposition with an Operations action changes what Cashiering or Commission Receivables receives), and the owners of every BRD it touches approve it. An approved change is delivered as a new version of this release set (v2.1, v2.2 and so on) with its own Start Here guide, and only the changed pages and rows are reviewed and signed again (delta sign-off).
+
+## Proposed rules for confirmation
+
+Chapter 21 lists the proposed business rules and screen behaviour that differ from the BRD or need a decision of BDOI. BDOI records its decision on each item with its review; a decision that changes a screen, field, rule or message is applied in the next version of this set.
+
+<!-- pagebreak -->
+
+## Signatures
+
+By signing, BDOI confirms that this FRS and the sign-off workbook describe the Collections functions, screens and messages it expects in BIBS, accepts the assumptions in section 10.1 and records its decisions on the items of chapter 21. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request. The signatories are those of the approval sheets of the Collections BRD.
+
+```signoff
+rows:
+  - {name: "Shellah Marie C. Miranda", role: "AVP, Product Owner", organisation: BDOI}
+  - {name: "Jose Melvin Jarin", role: "AVP, Product Owner", organisation: BDOI}
+  - {name: "Mark Joseph C. Makalintal", role: "SAVP, Unit Head - Combank and Corbank", organisation: BDOI}
+  - {name: "Edmundante F. Ramirez", role: "VP, Head - Retail Marketing", organisation: BDOI}
+  - {name: "Roderick Lim", role: "FVP, Head - Retail Marketing", organisation: BDOI}
+  - {name: "Ronald Allan E. De Leon", role: "VP, Head - Comptrollership", organisation: BDOI}
+  - {name: "John Benedict S. Santos", role: "VP and Head, BDOI Operations (reviewer)", organisation: BDOI}
+  - {name: "Pia Grace M. Pinili", role: "Collections and Marketing Support (input provider)", organisation: BDOI}
+  - {name: "Maria Victoria Evangelista", role: "Collections and Marketing Support (input provider)", organisation: BDOI}
+  - {name: "Perjelyn Joy Gutierrez", role: "Operations: Financial Transactions and Processing (input provider)", organisation: BDOI}
+  - {name: "", role: "Information Technology Group (reviewer)", organisation: BDOI}
+  - {name: "Dan Ace Cauton", role: "Program Manager, ESG - Business Project Services", organisation: BDO Unibank ESG}
+  - {name: "Zean C. Ibay", role: "Business Analyst, ESG - Business Project Services", organisation: BDO Unibank ESG}
+  - {name: "", role: Project Manager, organisation: iorta TechNXT}
+```
+
+<!-- pagebreak -->
+
 # Proposed business rules and clarifications for confirmation
 
-The table lists each point where the proposed screen or rule differs from the BRD text, fills a gap the BRD leaves open, or needs a decision of BDOI. None of them removes a BRD requirement; most are settled by an answer of BDOI that is applied as configuration. BDOI records its decision with the sign-off of this FRS (chapter 13); a decision that changes a screen, field, rule or message is applied in the next version of the FRS.
+The table lists each point where the proposed screen or rule differs from the BRD text, fills a gap the BRD leaves open, or needs a decision of BDOI. None of them removes a BRD requirement; most are settled by an answer of BDOI that is applied as configuration. BDOI records its decision with the review of this set (section 20.5); a decision that changes a screen, field, rule or message is applied in the next version of the set, and an answer that only sets a value (a list, a parameter, a template) is applied as configuration.
 
 <!-- table: widths=1.7,2.9,6.1,3.5,3.4 caption="Proposed business rules and clarifications for confirmation" size=8 -->
 | Ref | Topic | Proposed rule or screen behaviour | Reason | Decision requested from BDOI |
@@ -2577,18 +2835,36 @@ The table lists each point where the proposed screen or rule differs from the BR
 | CLR-CL-21 | Edit lock (NFR 9.03; FR-CL-005) | The lock is taken when the user opens the account and is released when the user leaves it or after CLX_EDIT_LOCK_MINUTES (15). Activity on the account does not renew the lock; when it expires, the next user takes it. | The BRD does not say whether work on the account renews the lock. | Confirm the expiry, or ask for renewal while the holder works. |
 | CLR-CL-22 | Refresh after a payment (BRCLXN.013-015; FR-CL-017) | A payment applied in Cashiering updates the outstanding of the account within 5 minutes. | The BRD gives no target for the update after a payment. | Confirm the 5-minute target. |
 | CLR-CL-23 | Report period check (FR-CL-004) | The report parameters check that the end date is on or after the start date; the message text is the one of the Report Centre, confirmed at the first test run. | The Report Centre checks the period for every report. | Confirm the check of the period. |
-| CLR-CL-24 | Details of an Operations action (FR-CL-032) | A check pick-up needs the pick-up date and the check amount; a 2307 disposition needs the path CASH or CERTIFICATE; a DP reversal needs no detail. A date detail is checked as yyyy-mm-dd and an amount as a number. | The BRD names the dispositions but not the details each needs. | Confirm the details per action. |
+| CLR-CL-24 | Details of an Operations action (FR-CL-032) | A check pick-up needs the pick-up date and the check amount; a 2307 disposition needs the path, certificate received or paid in cash; a DP reversal needs no detail. A date detail is checked as yyyy-mm-dd and an amount as a number. | The BRD names the dispositions but not the details each needs. | Confirm the details per action. |
+| CLR-CL-25 | Client on the worklist (screen standards; SCR-CL-02 to 04) | The client of an account is shown by its client code, a link to the client view, with the name of the assured under it; the client's own name is shown on the client view. | The client code is the reference the collectors quote to Cashiering and in the files. | Confirm the client code, or ask for the client's name with the code under it. |
+| CLR-CL-26 | Filters and criteria typed (screen standards; SCR-CL-02, SCR-CL-17) | The filters of the PR Worklist and the criteria of the assignment rules and of Reassign by Criteria are text fields where the user types a segment, unit, Unit Head, handler or account officer; the handler of a reassignment is chosen by name. | The filters were kept as in the BRD's list of filter fields (BRCLXN.011-012). | Confirm, or ask for drop-downs of the segments, units and users by name. |
+| CLR-CL-27 | Collections Setup values (screen standards; SCR-CL-19) | The parameters are listed by name with a business description, and the attributes of a disposition are shown by label and chosen from drop-downs (the reserved roles as check boxes). The Invoice Number Format parameter is kept as the pattern the invoice number is checked against. | The set-up is maintained by the Section Heads and the Business Administrator; the invoice number format follows the numbering of the legacy and the BIBS invoices. | Confirm the names and descriptions of the parameters, and whether the invoice number format stays a pattern kept by the System Administrator or becomes a choice of formats. |
+| CLR-CL-28 | Designated user of an escalation (screen standards; SCR-CL-11, SCR-CL-13) | The designated user of a manual escalation and of an escalation rule is typed as the user ID; a user who does not handle escalations is refused. | The level (team lead, unit head, section head) is the usual target; a designated user is the exception. | Confirm, or ask for a drop-down of the users who handle escalations, by name. |
+| CLR-CL-29 | Values of the upload template (FR-CL-034; chapter 18) | The Collections Bulk Update template takes the codes of its lists (escalation level TL, UH, SECTION_HEAD or USER; the codes of the escalation reasons, dispositions and efforts), as the template instructions state. | A template is filled in a spreadsheet and read back by the system without interpretation. | Confirm the codes in the template, or ask for the labels. |
+| CLR-CL-30 | Disposition and effort values to confirm (FR-CL-030, 033, 072; CQ08) | The seeded dispositions, effort codes and escalation reasons are the values implied by the BRD; BDOI replaces them with its lists as configuration. | The lists are to be supplied by BDOI (CQ08). | Give the lists of dispositions, effort codes and escalation reasons (CQ08). |
+| CLR-CL-31 | Authorization of escalation rules (BRCLXN.049; FR-CL-050) | A new or changed escalation rule is authorized by an authorizer of master data (the Authorizer role of the platform) other than its maker; no Collections role authorizes master data. | The BRD asks for maker-checker on the rules without naming the checker. | Name the role that authorizes the escalation rules (for example the Section Head), or confirm the authorizers of master data. |
 
-# Sign-off
+# Appendix: Screen standards
 
-By signing, BDOI confirms that this FRS describes the Collections functions it expects in BIBS, accepts the assumptions in section 10.1 and records its decisions on the items of chapter 12. Open questions in section 10.3 stay open; their answers are applied as configuration or through a change request.
+The Collections screens follow the screen standards of BIBS. They are the same standards in every FRS and are listed here so that BDOI can agree the look of the screens once and check the screenshots against it; they are not repeated in each screen specification.
 
-```signoff
-rows:
-  - {name: "", role: "VP and Head, BDOI Operations", organisation: BDOI}
-  - {name: "", role: "Section Head, Corporate Marketing", organisation: BDOI}
-  - {name: "", role: "Section Head, Retail Marketing", organisation: BDOI}
-  - {name: "", role: "Head, Commission Receivables Unit", organisation: BDOI}
-  - {name: "", role: "Program Manager, Business Project Services", organisation: BDO Unibank ESG}
-  - {name: "", role: Project Manager, organisation: iorta TechNXT}
-```
+<!-- table: widths=4.2,13.4 caption="Screen standards of BIBS" -->
+| Area | Standard |
+|---|---|
+| Record pages | Back arrow and breadcrumb, title, then the record header: name, reference chips, status pill, flags (for example On Hold or Locked by Adjustment on a collection account) and the key facts. Page actions on the right in one order: secondary, primary, and the destructive action last and apart. |
+| Workflow header (step bar) | Every record with a workflow shows a stepper under the record header: the stages of the main path in their order, passed stages ticked in blue, the current stage highlighted, the stages ahead in grey with their number. A returned stage shows in amber after the stage it came from; the last stage turns green when it is reached. Under the stepper one row gives Current Stage, Since, Due (with the Overdue pill) and Assigned To, with the actions of the stage on the right. The history is a table (Stage, From Stage, Action, By, Date and Time, Remarks, Duration in Stage), newest first. |
+| Messages (notice standard) | One standard for errors, warnings, information and success: a white notice with a thin bar and an icon in the colour of its kind (red, amber, blue, green), a bold short title, then the business message with one bullet per missing item. No codes, internal references or technical terms in what the user reads. Field errors appear under the field; a long form lists its errors at the top with a link to the first field. Only an unexpected system error offers Retry and a reference for support behind Details. Special instructions are one short information notice. |
+| Tables, not highlight boxes | Records and lists of records are rows of a titled table (for example the hand-offs of an account: Feed, Reference, Sent, Taken, Status); key data is a label and value grid. A coloured box carries a short message only, never a record. |
+| Tables | Header row in BDO blue that stays in view; text left, amounts right, dates in one format; one value per cell with at most one muted line under it; a dash for an empty value; "Showing x to y of n results" with page numbers. A table fits the page: related values share a column (one under the other) rather than scrolling sideways. |
+| Row actions | The actions on a record of a list are in one row action menu at the end of the row (the three-dot button), never buttons or links in the row; a destructive action is listed last, in red, and asks for confirmation. |
+| Status labels | Statuses are pills of one size and one colour per state group and never wrap. The full label is shown (for example Pending Authorization, With Outstanding Balance); an agreed short form, with the full label in the tooltip, only for a label longer than 21 characters. |
+| Labels and names | List values are shown by their label, never by their code; insurers by name; users by their names, never by their user ID. |
+| Dates, amounts and rates | One date picker; dates entered and shown as dd-MMM-yyyy, times as dd-MMM-yyyy HH:mm (Philippine time). Amounts with two decimals and thousand separators, negatives in brackets, the currency in the column header or before the amount. Rates as percentages with two to four decimals, as keyed. |
+| Period cell | A period (coverage, billing cycle, the period of a file) is shown in lists on two lines, the start date and "to" the end date, each date kept whole; an open end reads "to open". In a sentence or a label and value grid it is one line: "01-Sep-2026 to 30-Nov-2026". |
+| Forms | Labels above the fields, fields of one height on one line, required fields marked, the error under the field, and the actions in one place (Cancel, then the main action). Format hints only; other guidance is in the tooltip of the label. |
+| Uploads | Download Template next to the upload; a drop zone with the accepted types and maximum size; every row checked before anything is saved; Rows Read, Valid and Rejected with the rows; valid rows are processed and the rejected rows are returned in the error file (the template layout with an Error column and the wrong cells highlighted); Upload Corrected File keeps the link to the first upload; a file uploaded before is refused. |
+| Confirmations and reasons | Every approve, authorize, post, release, cancel, void or deactivate asks for confirmation in a dialog that names the record and the effect. Every reject, return, cancel and void needs a reason (from its list where there is one) before it can be confirmed. Destructive actions are confirmed with the red button. The reason is kept in the history and sent with the notification. |
+| Notifications | The bell shows the unread count and opens the panel grouped by day (Today, Yesterday, then the date), each notice with its title, one-line summary, record reference and time; Mark Read, Mark All Read and View All; the Notifications page lists every notice with filters. |
+| Documents | Generated documents carry the BDO Insure letterhead, the document name and reference, and a business footer with "Confidential" and page x of y. |
+
+The project team checks each screen against these standards before UAT and records the result in the screen readiness checklist. A screen found not to follow a standard during the review is recorded as Change requested in the sign-off workbook and corrected before UAT without a change request. The presentation choices that BDOI is asked to confirm are items of the clarifications chapter.

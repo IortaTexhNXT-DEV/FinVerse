@@ -1,0 +1,139 @@
+# UX screen documents of the BRD-4 Collections set for the BDOI UX Design team: 07 UX Screen Deck, 08 UX screen
+# register, 09 image package (docs/deliverables/src/signoff/build_ux_deck.py). The screens, fields, actions,
+# walkthroughs and images come from the pack; this file holds what only the UX documents need: who each persona is,
+# the images taken for the deck only (more states of a screen, the landing page and menu of each persona), the
+# changes of the issue and the points for the UX Design team to confirm.
+
+issue:
+  version: "2.0"
+  date: 1 October 2026
+  # First issue of the UX screen documents of the set: every screen is new to the UX Design team.
+  changes: []
+
+# The personas whose landing page and full menu the deck shows.
+navigation:
+  roles: [MKT_AO, MKT_TL, MKT_HANDLER, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD, UNAPPLIED_HANDLER, PROCESSOR, CASHIER,
+          DISBURSEMENT, COMPTROLLERSHIP, BUSINESS_ADMIN, SYSADMIN, AUDITOR]
+  # The Unapplied Payment Handler has the same menu as the Marketing Handler.
+  shared:
+    ux-nav-07-menu: BRD-04:ux-nav-03-menu
+
+# Who each persona is (what they do comes from the persona table of the FRS unless given here).
+personas:
+  MKT_AO: {who: "A Marketing account officer who follows up the premium of the own accounts"}
+  MKT_TL: {who: "A Marketing team lead who acts on escalations, reassigns accounts and updates several accounts at once"}
+  MKT_HANDLER: {who: "A Marketing handler who follows up the accounts of the unit, also several at once"}
+  MKT_COLLECTION: {who: "A collection handler who works the accounts assigned to her: efforts, dispositions, promises, installment plans and statements"}
+  CLX_TL: {who: "The team lead of the collection handlers, who assigns the accounts and acts on the escalations"}
+  MKT_SECTION_HEAD: {who: "The head of the Corporate or Retail section, who keeps the Collections set-up and reads the audit log"}
+  UNAPPLIED_HANDLER: {who: "A handler of the unapplied payments, who records the dispositions and the requests to Cashiering"}
+  PROCESSOR: {who: "A Processing officer, who records the disposition No / missing policy number"}
+  CASHIER: {who: "A cashier who reads the Collections screens and carries out the check pick-ups and the collector requests"}
+  DISBURSEMENT: {who: "A Disbursement officer with read access to Collections and its files"}
+  COMPTROLLERSHIP: {who: "A Comptrollership officer with read access to Collections"}
+  BUSINESS_ADMIN: {who: "The business administrator who keeps the Collections set-up and the escalation rules"}
+  SYSADMIN: {who: "The system administrator of BIBS (BDOI IT operations)"}
+  AUDITOR: {who: "An internal or external auditor with read access to Collections and its audit log"}
+
+# The UX state of an image when its name does not say it.
+classify:
+  scr-cl-02-02-filters: filled
+  scr-cl-02-03-disposition: filled
+  scr-cl-02-04-reassign: filled
+  scr-cl-03-02-dispositions: read-only
+  scr-cl-03-03-history: read-only
+  scr-cl-03-04-locked: read-only
+  scr-cl-04-01-client: default
+  scr-cl-05-02-new: filled
+  scr-cl-06-02-actions: default
+  scr-cl-08-02-new: filled
+  scr-cl-09-02-run: filled
+  scr-cl-10-02-send: filled
+  scr-cl-11-02-new: filled
+  scr-cl-12-02-resolve: confirmation
+  scr-cl-13-02-new: filled
+  scr-cl-14-02-apply: filled
+  scr-cl-15-02-history: read-only
+  scr-cl-17-02-preview: filled
+  scr-cl-17-03-new: filled
+  scr-cl-18-02-generate: filled
+  scr-cl-19-02-change: filled
+  wt-a-01: success
+  wt-a-02: default
+  wt-a-03: default
+  wt-a-04: success
+  wt-a-05: success
+  wt-a-06: default
+  wt-b-01: success
+  wt-b-02: success
+  wt-b-03: success
+  wt-b-04: success
+  wt-b-05: success
+  wt-c-01: success
+  wt-c-02: pending-approval
+  wt-c-03: success
+  wt-c-04: success
+  wt-c-05: read-only
+  wt-d-01: success
+  wt-d-02: success
+  wt-d-03: filled
+  wt-d-04: success
+  wt-e-01: validation-error
+  wt-e-02: read-only
+  wt-e-03: validation-error
+  wt-e-04: validation-error
+
+# Images taken for the deck only: states the screen specifications do not show.
+states:
+  - {screen: SCR-CL-02, state: empty, user: clxtl, ux: empty, nocallouts: true, caption: "A search that finds no account"}
+  - {screen: SCR-CL-03, state: auditor, user: auditor, open_item: handled, ux: read-only, nocallouts: true, caption: "The collection account as the Auditor sees it, without the actions"}
+  - {screen: SCR-CL-11, state: empty, user: clxtl, tab: "Returned", ux: empty, nocallouts: true, caption: "An escalation tab without escalations"}
+  - {screen: SCR-CL-13, state: actions, user: clxuh, ux: default, nocallouts: true, caption: "The row action menu of an escalation rule, opened from the more button of its row"}
+  - {screen: SCR-CL-14, state: filters, user: upphandler, click: "^filters$", ux: filled, nocallouts: true, caption: "Unapplied Payments with the Filters panel open"}
+
+# Points for the UX Design team to confirm with BDOI.
+confirm:
+  clarifications: [CLR-CL-25, CLR-CL-26, CLR-CL-27, CLR-CL-28, CLR-CL-29, CLR-CL-30]
+  findings:
+    - screens: [SCR-CL-01]
+      observation: >-
+        The Collections personas land on the New Business dashboard after sign-in, the landing page of every broking
+        role; Collections Home is one click away in the menu.
+      proposal: Confirm the landing page, or land each Collections persona on Collections Home.
+    - screens: [SCR-CL-02, SCR-CL-14]
+      observation: >-
+        The PR Worklist and the Unapplied Payments hold many facts per row: related values share a column, one under
+        the other (Booked / Aging, Payment / Transaction, Unapplied / Paid, Matched Account / Segment, Cashiering /
+        Request), so that every column is in view at 1440 pixels.
+      proposal: Confirm the stacked columns, or choose the columns to keep in view and move the others to the record.
+    - screens: [SCR-CL-02]
+      observation: >-
+        A migrated invoice carries the Legacy tag; when its booking date is later than today (a legacy booking dated
+        ahead), its aging reads in negative days.
+      proposal: Show the aging of an invoice booked ahead as 0 days, or count it from the inception date.
+    - screens: [SCR-CL-03]
+      observation: >-
+        The Hand-offs to Operations table on the Dispositions & Efforts tab shows the reference of a hand-off as
+        Operations keeps it (PU:BI-HO-2026-000009:5 for a check pick-up request).
+      proposal: Show the number of the Operations record the hand-off created (the check pick-up or reversal request).
+    - screens: [SCR-CL-15]
+      observation: >-
+        The History tab of an unapplied payment shows, in its Reference column, the internal reference of a
+        disposition (DSP:3) and of a request to Cashiering (CLX-UPP-4) next to the receipt and request numbers.
+      proposal: Show only the business numbers (AR, CRQ and invoice numbers) and leave the cell blank otherwise.
+    - screens: [SCR-CL-13, SCR-CL-02, SCR-CL-17]
+      observation: >-
+        The Segment of an escalation rule and the Market Segment, Sales Unit and Unit Head filters are typed in as
+        codes (RETAIL, T-CBG1).
+      proposal: Offer the segments, the sales units and the unit heads as drop-downs by name.
+    - screens: [SCR-CL-19]
+      observation: >-
+        The Invoice Number Format parameter holds the pattern the system checks the invoice number of "For
+        application to invoice" against, written as an expression.
+      proposal: Confirm that the System Administrator keeps the format, or offer the allowed formats as choices.
+    - screens: [SCR-CL-18]
+      observation: >-
+        The Collections report files (Outstanding PR List, Full Production Report, DP PR for Reversal) print the
+        product name and the report code in the page footer; the daily application file to Cashiering is the
+        interface file itself, with its field names and the user ID of the requester.
+      proposal: Confirm the footer of the report files (BIBS and the report title), and the layout of the application file with Cashiering.

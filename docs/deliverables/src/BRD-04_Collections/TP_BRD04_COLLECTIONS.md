@@ -8,9 +8,9 @@ doc_code: TestPlan
 brd: BRD-04
 name: Collections Summary
 doc_id: BIBS-TP-BRD-04
-version: "1.0"
-date: 25 September 2026
-status: Issued for BDOI review
+version: "2.0"
+date: 1 October 2026
+status: Issued for BDOI business sign-off
 header_title: Test Plan BRD-4 Collections
 h1_page_break: false
 control:
@@ -26,6 +26,12 @@ control:
     reviewer: iorta TechNXT Project Manager
     approver: BDOI Marketing Head (pending)
     change: First issue for BDOI review, with the Excel workbook of the same version
+  - version: "2.0"
+    date: 1 Oct 2026
+    author: iorta TechNXT QA
+    reviewer: iorta TechNXT Project Manager
+    approver: BDOI business units (sign-off)
+    change: "Release set v2.0: cases re-traced to FRS v2.0 and its screen specifications (Screen ID on every case, Screens sheet); one screen case per screen and one message case per screen or dialog of the messages catalogue added; message texts as the screens show them. Status as of 01-Oct-2026"
 distribution:
   - {name: "Head, Marketing (Corporate and Retail Section Heads)", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: "Collection Handlers and Collection Team Leads", role: Business tester, organisation: BDOI, purpose: "Worklist, dispositions, plans, promises, escalations, billing statements"}
@@ -41,13 +47,13 @@ distribution:
 
 ## Purpose
 
-This document summarises the test plan for BRD-4 Collections in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `BIBS_TestPlan_BRD-04_Collections_v1.0.xlsx`, which the testers use during execution.
+This document summarises the test plan for BRD-4 Collections in BIBS (BDOI Broker System, on iNXT BrokerVerse). It tells the BDOI departments what will be tested, how, with which data and by whom, and when testing is complete. The test conditions, scenarios and cases themselves are in the Excel workbook of the same version, `04_BIBS_TestPlan_BRD-04_Collections_v2.0.xlsx`, which the testers use during execution.
 
-Every case traces to a functional requirement (FR) of FRS BRD-4 v1.0 and to the BRD requirement IDs (BRCLXN.001-064, NFRs and the stakeholder functions of the CMS BRD) that the FR meets. The expected results quote the messages, with their codes, as BIBS shows them.
+Every case traces to a functional requirement (FR) of FRS BRD-4 v2.0 and to the BRD requirement IDs (BRCLXN.001-064, NFRs and the stakeholder functions of the CMS BRD) that the FR meets. The expected results quote the messages, with their codes, as BIBS shows them.
 
 ## Scope
 
-In scope are all 52 FRs of FRS BRD-4 v1.0 and the BRD references they trace to:
+In scope are all 52 FRs of FRS BRD-4 v2.0 and the BRD references they trace to:
 
 - access, record keeping, the field-level audit log and its extraction, and the record lock (FR-CL-001 to 005);
 - the outstanding PR worklist at invoice level - threshold, exclusions, totals, filters, net PR breakdown, daily refresh and history (FR-CL-010 to 018);
@@ -76,10 +82,10 @@ The roles-and-access sheet checks each Collections action against the roles that
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-4 Collections (`BIBS_FRS_BRD-04_Collections_v1.0.docx`) | 1.0, 25 Sep 2026 |
+| R1 | Functional Requirements Specification BRD-4 Collections (`02_BIBS_FRS_BRD-04_Collections_v2.0.docx`) | 2.0, 1 Oct 2026 |
 | R2 | Collections (CLXN) BRD pack: CMS BRD, renumbering addendum, signed and draft Collections Addendum | CMS BRD v1 Jan-Mar 2025; addendum v1.0 10-Apr-2026 |
-| R3 | Test plan workbook BRD-4 (`BIBS_TestPlan_BRD-04_Collections_v1.0.xlsx`) | 1.0 |
-| R5 | Test plan BRD-2 Operations (Cashiering, Commission) (`BIBS_TestPlan_BRD-02_Operations_v1.0.xlsx`) | 1.0 |
+| R3 | Test plan workbook BRD-4 (`04_BIBS_TestPlan_BRD-04_Collections_v2.0.xlsx`) | 2.0 |
+| R5 | Test plan BRD-2 Operations (Cashiering, Commission) (`04_BIBS_TestPlan_BRD-02_Operations_v2.0.xlsx`) | 2.0 |
 | R6 | BRD discrepancy and clarification register (`BIBS_Register_BRD-00_Discrepancies_and_Clarifications_v1.0.xlsx`) | 1.0 |
 
 # Test approach
@@ -112,10 +118,12 @@ The roles-and-access sheet checks each Collections action against the roles that
 | Workflow | A status change of an account, hand-off, plan, promise, escalation, statement or collector request |
 | Report-output | Scheduled files, reports, statements of account and exports; content checked against the screen |
 | Upload-download | The Collections Bulk Update upload, file downloads and e-mailed statements |
+| Screen | The screen matches its specification in FRS v2.0 chapter 13: fields, order, labels, mandatory markers, defaults, lists and buttons (TC-CL-SCR-nn, one per screen) |
+| Message | Every error, validation and warning message of one screen or dialog, word for word with its code (TC-CL-MSG-nn, from the messages catalogue of FRS v2.0 chapter 15) |
 
 ## Reading the workbook
 
-The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Test Data, Roles and Access. Case IDs carry their condition: TC-CL-031.2-01 is the first case of condition 2 of FR-CL-031. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Issue ID.
+The workbook has a README sheet that explains every column. The sheets are Document Control, Test Conditions, Scenarios, Test Cases, Coverage, Screens, Test Data, Roles and Access. Case IDs carry their condition: TC-CL-031.2-01 is the first case of condition 2 of FR-CL-031. Status starts as Not run; testers fill Status, Actual result, Tester, Date and Issue ID.
 
 Several cases depend on time: the nightly refresh (22:15), the promise check (22:45), the escalation job (23:00), the daily application file (05:00), the weekly files (Friday 22:30) and the monthly files (first working day). The test lead runs these jobs on demand on SIT, or moves the dates in the test environment, as the preconditions describe.
 
@@ -128,7 +136,7 @@ Several cases depend on time: the nightly refresh (22:15), the promise check (22
 |---|---|
 | System test | BIBS is deployed on SIT with the seed data; the Operations seed has booked the seed invoices; the test mailboxes receive mail; this plan is reviewed by the iorta TechNXT project manager. |
 | Persona end-to-end | All High-priority system test cases are run; no open Critical issue; the Cashiering and Commission screens of BRD-2 pass their own entry criteria. |
-| UAT | FRS BRD-4 v1.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; BDOI has given the disposition values, categories and escalation defaults it wants tested (CQ08, CQ14) or accepts the delivered placeholders. |
+| UAT | FRS BRD-4 v2.0 is signed off or its open comments are agreed; the system test exit criteria are met; the UAT environment holds masked data (section 4.1); BDOI testers have user IDs with the roles of section 5; BDOI has given the disposition values, categories and escalation defaults it wants tested (CQ08, CQ14) or accepts the delivered placeholders. |
 
 ## Exit criteria
 
@@ -218,6 +226,12 @@ The BRD references are read from the FR headers of the FRS.
 
 <!-- tp:scenarios -->
 
+## Coverage by screen
+
+Every screen of the FRS v2.0 screen specifications has its screen case and the cases that start on it. A case is linked to the screen where the tester starts; the steps may go on to other screens.
+
+<!-- tp:screens -->
+
 ## Roles and access
 
 The table shows the actions checked per role. Each Y and N is one row of the Roles and Access sheet.
@@ -233,7 +247,7 @@ The table shows the actions checked per role. Each Y and N is one row of the Rol
 |---|---|---|
 | BDOI answers to open questions change expected results (threshold CQ03, disposition values and categories CQ08, escalation defaults CQ14, kept / broken rule CQ16, SOA layout and recipients CQ18) | Medium | The values are configuration; the affected cases name the parameter, list or rule and are re-run after the change without a change to the system |
 | Time-based cases (nightly jobs, promise dates, file availability, lock expiry, SLA) need the clock to pass | Medium | The test lead runs the jobs on demand and moves dates in the test environment, as the preconditions describe |
-| Cashiering does not yet pull the PR 2307 hand-offs (FRS 1.6) | Medium | The cases check the pending item and the CLX_OUTBOX_STALE alert; the 2307 reversal itself is tested through Cashiering's upload in BRD-2 |
+| A PR 2307 hand-off is not taken by Cashiering | Medium | The cases check the pending item and the CLX_OUTBOX_STALE alert; the 2307 reversal itself is tested through Cashiering's upload in BRD-2 |
 | Seed accounts are changed by earlier cases | Medium | Reload the seed profile between cycles; cases that change a seed account or a parameter say so in their preconditions or expected result |
 | BDOI has not yet confirmed the draft addendum rows (BRCLXN.061-064, CQ01) | Low | Their cases are marked "run after CQ01" and excluded from the exit criteria until BDOI confirms the draft |
 | Test mailboxes not reachable from SIT or UAT | Medium | Check the relay before the cycle; statement cases read the E-mails Sent tab when the mailbox is down and are re-run later |

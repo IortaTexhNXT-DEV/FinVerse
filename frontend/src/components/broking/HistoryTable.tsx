@@ -14,6 +14,8 @@ interface HistoryTableProps {
   terminal?: boolean;
   /** Accessible name of the table. */
   label?: string;
+  /** The name of a reason code of the record's list of reasons; the code in words by default. */
+  reasonLabel?: (code: string) => string;
 }
 
 function stageLabel(code: string | undefined, name: string | undefined): string {
@@ -23,8 +25,8 @@ function stageLabel(code: string | undefined, name: string | undefined): string 
   return code ? humanize(code) : '';
 }
 
-function remarks(entry: HistoryEntry): string {
-  const parts = [entry.reasonCode ? humanize(entry.reasonCode) : '', entry.comment ?? ''];
+function remarks(entry: HistoryEntry, reasonLabel: (code: string) => string): string {
+  const parts = [entry.reasonCode ? reasonLabel(entry.reasonCode) : '', entry.comment ?? ''];
   return parts.filter((p) => p !== '').join(' · ');
 }
 
@@ -37,6 +39,7 @@ export function HistoryTable({
   history,
   terminal = false,
   label = 'Status history',
+  reasonLabel = humanize,
 }: Readonly<HistoryTableProps>) {
   const [newestFirst, setNewestFirst] = useState(true);
   const name = useDisplayName();
@@ -102,7 +105,7 @@ export function HistoryTable({
                 </td>
                 <td className="num nowrap">{formatDateTime(entry.occurredAt)}</td>
                 <td className="cell-remarks">
-                  {remarks(entry) || <span className="muted">—</span>}
+                  {remarks(entry, reasonLabel) || <span className="muted">—</span>}
                 </td>
                 <td className="num nowrap">{duration || <span className="muted">—</span>}</td>
               </tr>

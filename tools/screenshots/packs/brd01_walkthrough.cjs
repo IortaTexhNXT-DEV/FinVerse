@@ -800,6 +800,9 @@ const steps = {
       await settle(page, 1500);
       await tab(page, 'Placement Slips');
     }
+    // The slips of the account load after the tab opens.
+    await page.locator('main table tbody tr').filter({ hasText: 'PL-' }).first().waitFor({ timeout: 15000 }).catch(() => {});
+    await settle(page, 800);
     await tabsToTop(page);
     return page;
   },

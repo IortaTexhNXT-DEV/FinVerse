@@ -58,13 +58,15 @@ export const QUOTATION_COLUMNS: Column<QuotationListItem>[] = [
   },
   {
     key: 'product',
-    header: 'Product',
-    render: (q) => <ProductName code={q.productCode} withCode />,
-  },
-  {
-    key: 'insurer',
-    header: 'Insurer',
-    render: (q) => <InsurerName code={q.insurerCode} empty="To be advised" />,
+    header: 'Product / Insurer',
+    render: (q) => (
+      <span className="cell-stack">
+        <ProductName code={q.productCode} />
+        <span className="muted">
+          <InsurerName code={q.insurerCode} empty="To be advised" />
+        </span>
+      </span>
+    ),
   },
   {
     key: 'gross',
@@ -72,7 +74,7 @@ export const QUOTATION_COLUMNS: Column<QuotationListItem>[] = [
     numeric: true,
     render: (q) => <Amount value={q.grossPremium} />,
   },
-  { key: 'valid', header: 'Valid Until', render: validity },
+  { key: 'valid', header: 'Valid Until', kind: 'date', render: validity },
   {
     key: 'status',
     header: 'Status',

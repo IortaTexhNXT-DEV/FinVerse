@@ -70,7 +70,8 @@ export function ProductName({
     return <span className="muted">{empty}</span>;
   }
   const shown = name(code);
-  if (!withCode || shown === code) {
+  // A product name that already carries its code ("Motor Comprehensive Package MTR10") is not repeated.
+  if (!withCode || shown.includes(code)) {
     return <span title={code}>{shown}</span>;
   }
   return (

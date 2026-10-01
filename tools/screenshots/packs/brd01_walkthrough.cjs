@@ -215,6 +215,7 @@ async function rowAction(row, name) {
 /** Whether the row's action menu offers the action (the menu is closed again). */
 async function rowOffers(row, name) {
   const menu = row.getByRole('button', { name: /^Actions for/ });
+  await menu.first().waitFor({ timeout: 5000 }).catch(() => {});
   if ((await menu.count()) === 0) {
     return false;
   }
@@ -785,11 +786,13 @@ const steps = {
     if (await button(page, /^Resubmit for Placement$/i).isVisible().catch(() => false)) {
       await act(page, /^Resubmit for Placement$/i, { reason: false });
     }
-    if (await button(page, /^Generate Placement Slip$/i).isVisible().catch(() => false)) {
+    const unsent = ctx.sql(`select 1 from plc_slip s join plc_slip_account a on a.slip_id = s.id where a.arn = '${arn}' and s.status = 'GENERATED'`).length > 0;
+    if (!unsent && (await button(page, /^Generate Placement Slip$/i).isVisible().catch(() => false))) {
       await act(page, /^Generate Placement Slip$/i, { reason: false, confirm: /^Generate/i });
     }
     await tab(page, 'Placement Slips');
     const generated = page.locator('main table tbody tr').filter({ hasText: 'Generated' }).first();
+    await generated.waitFor({ timeout: 15000 }).catch(() => {});
     if (await rowOffers(generated, /^send$/i)) {
       await rowAction(generated, /^send$/i);
       // The send dialog opens once the proposed e-mail is loaded.

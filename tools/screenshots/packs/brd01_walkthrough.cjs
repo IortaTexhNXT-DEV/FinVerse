@@ -792,11 +792,11 @@ const steps = {
     const generated = page.locator('main table tbody tr').filter({ hasText: 'Generated' }).first();
     if (await rowOffers(generated, /^send$/i)) {
       await rowAction(generated, /^send$/i);
-      await page.waitForTimeout(800);
+      // The send dialog opens once the proposed e-mail is loaded.
       const dialog = page.locator('dialog.modal[open]').last();
-      if (await dialog.isVisible().catch(() => false)) {
-        await dialog.getByRole('button', { name: /^Send/ }).last().click();
-      }
+      await dialog.getByRole('button', { name: /^Send$/ }).waitFor({ state: 'visible', timeout: 15000 });
+      await dialog.getByRole('button', { name: /^Send$/ }).click();
+      await dialog.waitFor({ state: 'hidden', timeout: 20000 }).catch(() => {});
       await settle(page, 1500);
       await tab(page, 'Placement Slips');
     }

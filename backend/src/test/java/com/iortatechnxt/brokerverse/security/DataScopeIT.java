@@ -176,6 +176,9 @@ class DataScopeIT {
     // The company list shows the allowed companies only.
     JsonNode companies = api.read(api.doGet(user, "/api/v1/organization/companies"));
     assertThat(companies.findValuesAsText("id")).containsExactly(String.valueOf(companyA));
+    JsonNode branches =
+        api.read(api.doGet(user, "/api/v1/organization/branches?companyId=" + companyA));
+    assertThat(branches.findValuesAsText("code")).containsExactly("A1");
     // Every change is in the access change log, in business words.
     assertThat(
             jdbc.queryForObject(

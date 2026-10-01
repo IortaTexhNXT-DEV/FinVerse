@@ -45,7 +45,7 @@ The contract is the interface `common.security.DataScope`, so any module can cal
 |---|---|
 | `requireCompany(Long companyId)` | Refuses when the company is outside the user's scope. Null is not checked (an optional filter that is absent). |
 | `requireBranch(Long companyId, Long branchId)` | Refuses when the branch is outside the scope. With a null company the branch's company is looked up. |
-| `allowed()` | The allowed sets for list queries: `AllowedScope.all()` or the allowed company ids and, per company, the allowed branch ids. |
+| `allowed()` | The allowed sets for list queries, as a `UserDataScope`: `allCompanies`, or the allowed company ids (`companyIds()`) and, per company, all or the listed branch ids (`allowsCompany`, `allowsBranch`). |
 | `filter(List<T>, Function<T, Long> companyOf)` | Keeps the rows of allowed companies (rows without a company stay). |
 
 Resolution is cached per user (`security-data-scope`, 15 minutes, platform cache conventions of `PLATFORM_CACHE_AND_EVENTS.md`). Any change of `AppUser` or `UserDataScopeGrant` clears the cache on every instance; the scope service also evicts it explicitly.
@@ -59,25 +59,28 @@ One mechanism per way a company reaches a controller, instead of 194 hand edits:
 | Query parameter `companyId` | `HandlerInterceptor` on `/api/**`, before the controller | `security.api.DataScopeInterceptor` |
 | Path variable `{companyId}` | same interceptor (URI template variables) | same |
 | Query parameter `branchId` (company branches) | same interceptor: `requireBranch(companyId, branchId)` | same |
-| Request body with a `companyId` (and `branchId`) component, also inside a list of items | `RequestBodyAdvice` after the body is read | `security.api.DataScopeBodyAdvice` |
-| Anything else (a body the advice cannot see, a parameter bound under another name) | explicit `dataScope.requireCompany(...)` in the method, marked `@CompanyScoped` | `common.security.CompanyScoped` |
+| Request body with a `companyId` (and `branchId`) accessor, a list of such items, or a record body with a list component of such items (bulk requests) | `RequestBodyAdvice` after the body is read | `security.api.DataScopeBodyAdvice` (rules in `DataScopeTargets`) |
+| Anything else (a company under another name such as `parentCompanyId`, `companyAId`, `creditorCompanyId`; a multipart part; a header; a parameter bound under another name) | explicit `dataScope.requireCompany(...)` in the method, marked `@CompanyScoped` (consolidation groups, inter-company relationships and transactions) | `common.security.CompanyScoped` |
 
 Path variables named `branchId` are not checked as company branches: the insurer branch maintenance (`/catalog/insurers/branches/{branchId}`) uses that name for the branches of an insurer.
 
 **List and search endpoints** that return several companies' data filter on `allowed()` in the service, never only on the screen:
 
-- company list (`OrganizationService.listCompanies`; the company picker of every screen),
+- company list and branch list of a company (`OrganizationService.listCompaniesInScope`, `listBranchesInScope`; the company and branch pickers of every screen; jobs keep using the unfiltered `listCompanies`),
 - approval inbox and counts without a company filter (`ApprovalInboxService`),
-- intercompany relationships and reconciliation without a company filter (`IntercompanyService`, `IntercompanyReconciliationService`).
+- inter-company relationships and reconciliation: only relationships whose two companies are both allowed (`IntercompanyService.relationships`, used by the reconciliation),
+- consolidation groups: only groups whose parent company is allowed (`ConsolidationController.groups`).
 
-**Enforcement.** `ArchitectureTest` fails the build when a controller method takes a `companyId` that none of the mechanisms covers and the method is not `@CompanyScoped`. `DataScopeCoverageTest` walks every request mapping of every controller, lists the endpoints that take a company and proves each one is covered (interceptor, body advice or `@CompanyScoped`) or exempt.
+**Enforcement.** `ArchitectureTest.companyEndpointsAreDataScoped` fails the build when a controller method takes a company that none of the mechanisms reads and the method is not `@CompanyScoped`. `DataScopeCoverageIT` walks every request mapping of the running application, lists the endpoints that take a company and proves each one is covered (the interceptor is in the handler chain of its path, the body advice reads its body, or the method is `@CompanyScoped`) or exempt; it writes the figures to `target/data-scope-coverage.txt`.
+
+Coverage at delivery: 1,965 request mappings, **747 take a company, 747 guarded** (560 by the interceptor, 183 by the body advice, 4 explicitly); none under `/integration/**` takes a company.
 
 ## 5. Administration and audit
 
 - **Who changes a scope.** User changes go through the access request flow (maker-checker): a *Create user* or *Modify user* request carries the requested data scope; on approval `AccessChangeApplier` applies it with the request number and the approver. The emergency direct edit of the Users screen (`USER_MANAGE`, shown only when `UAM_DIRECT_ROLE_EDIT` is on) can also change it, as it can change the other user data.
-- **No escalation.** An administrator can grant only companies and branches inside his own scope.
+- **No escalation.** An administrator, a requester and an approver can grant only companies and branches inside their own scope; nobody changes his own scope.
 - **Audit.** Every change writes the access change log (`sec_access_change_log`, activity `DATA_SCOPE_CHANGED`, attribute `dataScope`, from / to in text form, request number and approver) and the audit trail, in the same transaction.
-- **Screen.** User Maintenance (Users) shows a *Data access* section per user: a tree table of companies and their branches with "All companies" and "All branches" as the default. It is editable only on an access request (requester) or in the emergency direct edit, and read-only for everyone else.
+- **Screen.** User Maintenance (Users) shows a *Data Access* column and, in the row action menu, a *Data access* dialog per user: a tree table of companies and their branches with "All companies" and "All branches" as the default. It is editable only in the emergency direct edit and read-only otherwise, with *Raise Request* to change it. The *Enrol new user* and *Modify user* requests carry an editable *Data Access* section (current data access shown on a modification); the request details show the requested data access read-only to the approver.
 
 API (`/api/v1/admin`): `GET /data-scope/units` (companies and branches the viewer may grant), `GET /users/{id}/data-scope`, `PUT /users/{id}/data-scope` (direct change, `USER_MANAGE`).
 

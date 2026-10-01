@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.security.DataScope;
+import com.iortatechnxt.brokerverse.common.security.UserDataScope;
 import com.iortatechnxt.brokerverse.organization.api.dto.BranchRequest;
 import com.iortatechnxt.brokerverse.organization.api.dto.CompanyRequest;
 import com.iortatechnxt.brokerverse.organization.api.dto.HolidayRequest;
@@ -205,6 +206,21 @@ public class OrganizationService {
   @Transactional(readOnly = true)
   public List<Branch> listBranches(Long companyId) {
     return branches.findByCompanyIdOrderByCode(companyId);
+  }
+
+  /**
+   * Lists the branches of a company within the current user's data scope (branch pickers; every
+   * branch for the system).
+   *
+   * @param companyId company id
+   * @return branches ordered by code
+   */
+  @Transactional(readOnly = true)
+  public List<Branch> listBranchesInScope(Long companyId) {
+    UserDataScope scope = dataScope.allowed();
+    return listBranches(companyId).stream()
+        .filter(b -> scope.allowsBranch(companyId, b.getId()))
+        .toList();
   }
 
   /**

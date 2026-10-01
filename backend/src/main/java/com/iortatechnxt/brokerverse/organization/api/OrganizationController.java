@@ -100,7 +100,7 @@ public class OrganizationController {
   }
 
   /**
-   * Lists branches of a company.
+   * Lists the branches of a company within the user's data scope.
    *
    * @param companyId company id
    * @return branches
@@ -108,7 +108,7 @@ public class OrganizationController {
   @GetMapping("/branches")
   @PreAuthorize(WORKSPACE)
   public List<BranchResponse> branches(@RequestParam Long companyId) {
-    return service.listBranches(companyId).stream().map(BranchResponse::from).toList();
+    return service.listBranchesInScope(companyId).stream().map(BranchResponse::from).toList();
   }
 
   /**

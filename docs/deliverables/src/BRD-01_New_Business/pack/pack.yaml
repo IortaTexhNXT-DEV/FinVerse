@@ -7,8 +7,8 @@ meta:
   name: New Business
   code: NB
   version: "2.0"
-  date: 27 September 2026
-  status_as_of: 27-Sep-2026
+  date: 1 October 2026
+  status_as_of: 1-Oct-2026
   release_set: BRD-01 New Business – Business Sign-off Pack
   frs: FRS_BRD01_NEW_BUSINESS.md
   test_plan: brd01_cases.yaml

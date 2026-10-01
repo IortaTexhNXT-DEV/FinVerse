@@ -9,7 +9,7 @@ brd: BRD-01
 name: New Business
 doc_id: BIBS-FRS-BRD-01
 version: "2.0"
-date: 27 September 2026
+date: 1 October 2026
 status: Issued for BDOI business sign-off
 header_title: FRS BRD-1 New Business
 control:
@@ -26,11 +26,11 @@ control:
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review; aligned with the screens, message codes and the cross-BRD decisions
   - version: "2.0"
-    date: 27 Sep 2026
+    date: 1 Oct 2026
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Project Manager
     approver: BDOI business units (sign-off)
-    change: "Business sign-off pack: proposed business rules and clarifications for confirmation (chapter 21), navigation by persona, screen specifications with screenshots, walkthroughs, messages, notifications, document outputs, upload templates, cross-BRD contract, sign-off and change control (chapters 12-20). Issued 27-Sep-2026. Chapters 1-11 unchanged; FR, BRD and test IDs kept"
+    change: "Business sign-off pack: proposed business rules and clarifications for confirmation (chapter 21), navigation by persona, screen specifications with screenshots, walkthroughs, messages, notifications, document outputs, upload templates, cross-BRD contract, sign-off and change control (chapters 12-20). Issued 1-Oct-2026 with the screenshots retaken on the current platform. Chapters 1-11 unchanged; FR, BRD and test IDs kept"
 distribution:
   - {name: "Product Owner, BDOI", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: Marketing Business Services and System Support (MBS), role: Business owner, organisation: BDOI, purpose: Review of all FRs}

@@ -382,7 +382,7 @@ const steps = {
       [pnNo(ctx), loanNo(ctx), `${person(ctx).last}, ${person(ctx).first}`, 'PAID',
         ctx.one(`select gross_premium from acc_account where arn = '${arn}'`), new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10)],
     ]);
-    await button(page.locator('table tbody tr').filter({ hasText: batch }).first(), 'Upload Report').click();
+    await rowAction(page.locator('table tbody tr').filter({ hasText: batch }).first(), /^upload report$/i);
     await page.waitForTimeout(700);
     const dialog = page.locator('dialog.modal[open]').last();
     await dialog.locator('input[type=file]').first().setInputFiles(report);

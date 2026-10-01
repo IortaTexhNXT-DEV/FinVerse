@@ -135,15 +135,15 @@ screens:
       - "Tabs | Billing Batches / Payment Reports | Tab | - | - | Fixed | Billing Batches | - | - | -"
       - "CBG Fire Awaiting Payment | Reference, Borrower, PN No., Loan Application No., Premium | Column | - | - | Accounts | - | Read only | - | Every CBG Fire account awaiting payment is billed."
       - "CBG Fire Awaiting Payment | Select | Check box | - | N | - | Not ticked | - | Only CBG Fire accounts awaiting payment and not yet billed | Not CBG Fire accounts awaiting payment, or already billed: <ARNs>"
-      - "Billing Batches | Batch, Billing Date, Status, Accounts, Total Premium | Column | BILL-yyyy-nnnnnn | - | Billing batches | - | Read only | - | -"
+      - "Billing Batches | Batch, Billing Date, Status, Accounts, Total Premium, Actions | Column | BILL-yyyy-nnnnnn; Download Excel, Download ODS and Upload Report in the row action menu | - | Billing batches | - | Read only | - | -"
       - "Payment Reports | Report, Kind, File, Status, Matched / Unpaid / Unmatched / Ambiguous, Uploaded | Column | PMT-yyyy-nnnnnn | - | Payment reports | - | Read only | - | -"
       - "Upload dialog | Report | Drop-down | CLPC payment report (CBG Fire, PN / loan application no.); Payment report of other segments (ARN) | Y | Fixed list | CLPC | - | - | -"
       - "Upload dialog | Billing batch | Drop-down | Open batches | Y for a CLPC report | Billing batches | The batch chosen from the list | - | The batch is open | Choose the CLPC billing batch the report answers / Billing batch <batch> is closed"
       - "Upload dialog | File | File | .xlsx, .csv or .ods; columns PN No. / Loan Application No. (CLPC) or ARN, Status (PAID / UNPAID), Amount, Payment Date | Y | - | - | - | The reference column exists; amounts and dates are valid | The CLPC report needs a 'PN No.' or 'Loan Application No.' column / Row <n>: '<value>' is not an amount / Row <n>: '<value>' is not a date (yyyy-mm-dd)"
     actions:
       - "Bill Selected (n) / Bill All | BILLING_MANAGE | At least one account to bill | Creates a billing batch with the selected (or all) accounts | Unchanged (billed) | -"
-      - "Excel / ODS | BILLING_MANAGE | Always | Downloads the billing file of the batch | - | -"
-      - "Upload Payment Report / Upload Report | BILLING_MANAGE | Always / open batch | Opens the upload dialog; Upload and Match reads the file, matches each line and opens the match review | - | -"
+      - "Download Excel / Download ODS | BILLING_MANAGE | Always (row action menu) | Downloads the billing file of the batch | - | -"
+      - "Upload Payment Report / Upload Report | BILLING_MANAGE | Always / open batch (row action menu) | Opens the upload dialog; Upload and Match reads the file, matches each line and opens the match review | - | -"
     rules:
       - "The billing file uses the ARN in place of the QPS reference number (FR-NB-090)."
       - "The file is exchanged with CLPC outside BIBS until the CLPC transfer is specified (FR-NB-090)."

@@ -1,3 +1,4 @@
+import { displayNameOf } from '@/api/users';
 import { formatAmount, formatDate, humanize } from '@/utils/format';
 import type {
   CashieringAction,
@@ -152,9 +153,37 @@ function mapped<T>(value: T | undefined, format: (v: T) => string): string | und
   return value === undefined ? undefined : format(value);
 }
 
-/** The payment and account fields of an item (BRCLXN.036), as label and value. */
-export function paymentFacts(row: UnappliedRow): [string, string | undefined][] {
+/** The account fields of an item, with names instead of logins and the insurer's name. */
+function accountFacts(
+  row: UnappliedRow,
+  insurerName: (code: string) => string,
+): [string, string | undefined][] {
   const a = row.account;
+  if (a === undefined) {
+    return [
+      ['Name of Assured', undefined],
+      ['Sales Unit', row.salesUnit],
+    ];
+  }
+  return [
+    ['Name of Assured', a.assuredName],
+    ['PR Balance', mapped(a.prBalance, formatAmount)],
+    ['Inception', mapped(a.inceptionDate, formatDate)],
+    ['Market Segment', a.segment],
+    ['Sales Unit', a.salesUnit ?? row.salesUnit],
+    ['Unit Head', mapped(a.unitHead, displayNameOf)],
+    ['Account Officer', mapped(a.aoUsername, displayNameOf)],
+    ['Insurer', mapped(a.insurerCode, insurerName)],
+    ['Invoice Category', mapped(a.invoiceCategory, humanize)],
+    ['Collection Handler', mapped(a.handler, displayNameOf)],
+  ];
+}
+
+/** The payment and account fields of an item (BRCLXN.036), as label and value. */
+export function paymentFacts(
+  row: UnappliedRow,
+  insurerName: (code: string) => string = (code) => code,
+): [string, string | undefined][] {
   return [
     ['Payment File', row.paymentFileName],
     ['Transaction No.', row.transactionNo],
@@ -164,15 +193,20 @@ export function paymentFacts(row: UnappliedRow): [string, string | undefined][] 
     ['Payor Reference', row.reference],
     ['Matched Client', row.clientCode],
     ['Matched Invoice', row.invoiceNo],
-    ['Name of Assured', a?.assuredName],
-    ['PR Balance', mapped(a?.prBalance, formatAmount)],
-    ['Inception', mapped(a?.inceptionDate, formatDate)],
-    ['Market Segment', a?.segment],
-    ['Sales Unit', a?.salesUnit ?? row.salesUnit],
-    ['Unit Head', a?.unitHead],
-    ['Account Officer', a?.aoUsername],
-    ['Insurer', a?.insurerCode],
-    ['Invoice Category', mapped(a?.invoiceCategory, humanize)],
-    ['Collection Handler', a?.handler],
+    ...accountFacts(row, insurerName),
   ];
+}
+
+/**
+ * The daily application file that listed a request, by its business date ("File of 01-Oct-2026"),
+ * never by the name of the stored file.
+ */
+export function applicationFileText(fileRunNo: string): string {
+  const match = /_(\d{4})(\d{2})(\d{2})(?:_|\.|$)/.exec(fileRunNo);
+  if (match === null) {
+    return humanize(fileRunNo);
+  }
+  const [, year = '', month = '', day = ''] = match;
+  const iso = [year, month, day].join('-');
+  return `File of ${formatDate(iso)}`;
 }

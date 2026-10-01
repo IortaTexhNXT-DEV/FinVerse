@@ -1,4 +1,5 @@
 import type { AgingCell, DispositionRule, ItemStatus } from './api';
+import { CWT_PATHS } from './presentation';
 
 /** Pure rules of the Collections screens (BRCLXN.001-029), tested with Vitest. */
 
@@ -99,9 +100,11 @@ export function tabFromSearch(search: URLSearchParams): WorklistTab {
 export interface DetailField {
   key: string;
   label: string;
-  type: 'text' | 'date' | 'number';
+  type: 'text' | 'date' | 'number' | 'select';
   required: boolean;
   hint?: string;
+  /** The choices of a drop-down, shown by their label. */
+  options?: readonly { code: string; label: string }[];
 }
 
 const PICKUP_FIELDS: DetailField[] = [
@@ -116,10 +119,11 @@ const PICKUP_FIELDS: DetailField[] = [
 const CWT_FIELDS: DetailField[] = [
   {
     key: 'path',
-    label: 'Path (CASH or CERTIFICATE)',
-    type: 'text',
+    label: '2307 Path',
+    type: 'select',
     required: true,
-    hint: 'CERTIFICATE once the BIR 2307 is received; CASH when the client pays the 2% in cash',
+    hint: 'Certificate once the BIR 2307 is received; cash when the client pays the 2% in cash',
+    options: CWT_PATHS,
   },
   { key: 'certificateNo', label: 'Certificate No.', type: 'text', required: false },
   { key: 'periodFrom', label: 'Certificate Period From', type: 'date', required: false },

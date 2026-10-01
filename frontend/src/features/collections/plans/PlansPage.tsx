@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth/authContext';
 import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Amount } from '@/components/ui/Amount';
+import { CellStack } from '@/components/ui/CellStack';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
@@ -44,9 +45,20 @@ const COLUMNS: Column<Plan>[] = [
   },
   { key: 'first', header: 'First Due', render: (p) => formatDate(p.firstDue) },
   { key: 'count', header: 'Installments', numeric: true, render: (p) => p.installmentCount },
-  { key: 'total', header: 'Total', numeric: true, render: (p) => <Amount value={p.total} /> },
-  { key: 'paid', header: 'Paid', numeric: true, render: (p) => <Amount value={p.paidTotal} /> },
-  { key: 'status', header: 'Status', render: (p) => <StatusBadge status={p.status} /> },
+  {
+    key: 'total',
+    header: 'Total / Paid',
+    numeric: true,
+    render: (p) => (
+      <CellStack main={<Amount value={p.total} />} sub={<Amount value={p.paidTotal} />} />
+    ),
+  },
+  {
+    key: 'status',
+    header: 'Status',
+    kind: 'status',
+    render: (p) => <StatusBadge status={p.status} />,
+  },
 ];
 
 /**

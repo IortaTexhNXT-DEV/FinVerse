@@ -6,7 +6,7 @@ import { Tag } from '@/components/ui/Tag';
 import { UserName } from '@/components/ui/UserName';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import type { CashieringRequest, UnappliedRow } from './api';
-import { ACTION_LABELS, TAB_LABELS, cashieringStatus } from './labels';
+import { ACTION_LABELS, TAB_LABELS, applicationFileText, cashieringStatus } from './labels';
 import { InBaseCurrency } from '@/components/ui/InBaseCurrency';
 
 /** Table columns of the unapplied-payment screens (BRCLXN.036, 040). */
@@ -23,61 +23,46 @@ export const UNAPPLIED_COLUMNS: Column<UnappliedRow>[] = [
   },
   {
     key: 'date',
-    header: 'Payment Date',
+    header: 'Payment / Transaction',
     kind: 'date',
-    render: (r) => <CellStack main={formatDate(r.paymentDate)} sub={`${String(r.ageDays)} days`} />,
-  },
-  {
-    key: 'txn',
-    header: 'Transaction',
-    kind: 'code',
     render: (r) => (
       <CellStack
-        main={r.transactionNo}
-        sub={[r.paymentType, r.bankCode, r.checkNo].filter(Boolean).join(' · ')}
+        main={`${formatDate(r.paymentDate)} (${String(r.ageDays)} days)`}
+        sub={[r.transactionNo, r.paymentType && humanize(r.paymentType), r.bankCode, r.checkNo]
+          .filter(Boolean)
+          .join(' · ')}
       />
     ),
   },
   {
-    key: 'amount',
-    header: <InBaseCurrency label="Paid" />,
-    kind: 'amount',
-    render: (r) => <Amount value={r.amount} />,
-  },
-  {
     key: 'balance',
-    header: <InBaseCurrency label="Unapplied" />,
+    header: <InBaseCurrency label="Unapplied / Paid" />,
     kind: 'amount',
-    render: (r) => <Amount value={r.balance} />,
+    render: (r) => (
+      <CellStack main={<Amount value={r.balance} />} sub={<Amount value={r.amount} />} />
+    ),
   },
   {
     key: 'match',
-    header: 'Matched Account',
-    kind: 'code',
+    header: 'Matched Account / Segment',
     render: (r) => {
       const matched = r.invoiceNo ?? r.clientCode;
-      return matched === undefined ? (
-        <StatusBadge status="UNMATCHED" label="Not Matched" tone="neutral" />
-      ) : (
-        <CellStack main={matched} sub={r.account?.assuredName} />
-      );
-    },
-  },
-  {
-    key: 'segment',
-    header: 'Segment / AO',
-    render: (r) => {
-      const segment = r.account?.segment ?? r.salesUnit;
-      if (segment === undefined && r.account?.aoUsername === undefined) {
-        return DASH;
+      if (matched === undefined) {
+        return <StatusBadge status="UNMATCHED" label="Not Matched" tone="neutral" />;
       }
+      const segment = r.account?.segment ?? r.salesUnit;
       return (
         <CellStack
-          main={segment ?? '—'}
+          main={<span className="nowrap">{matched}</span>}
           sub={
-            r.account?.aoUsername === undefined ? undefined : (
-              <UserName login={r.account.aoUsername} />
-            )
+            <>
+              {[r.account?.assuredName, segment].filter(Boolean).join(' · ')}
+              {r.account?.aoUsername !== undefined && (
+                <div>
+                  <UserName login={r.account.aoUsername} />
+                </div>
+              )}
+            </>
           }
         />
       );
@@ -102,17 +87,16 @@ export const UNAPPLIED_COLUMNS: Column<UnappliedRow>[] = [
   },
   {
     key: 'tab',
-    header: 'Cashiering',
-    kind: 'status',
-    render: (r) => <StatusBadge status={r.cashieringTab} label={TAB_LABELS[r.cashieringTab]} />,
-  },
-  {
-    key: 'request',
-    header: 'Request Status',
+    header: 'Cashiering / Request',
     kind: 'status',
     render: (r) => {
       const status = cashieringStatus(r.cashieringStatus);
-      return status === undefined ? DASH : <StatusBadge status={status} />;
+      return (
+        <CellStack
+          main={<StatusBadge status={r.cashieringTab} label={TAB_LABELS[r.cashieringTab]} />}
+          sub={status === undefined ? undefined : <StatusBadge status={status} />}
+        />
+      );
     },
   },
 ];
@@ -159,7 +143,12 @@ export const REQUEST_COLUMNS: Column<CashieringRequest>[] = [
         <CellStack main={r.cashieringRef} sub={r.statusMessage} />
       ),
   },
-  { key: 'file', header: 'Application File', kind: 'code', render: (r) => r.fileRunNo ?? DASH },
+  {
+    key: 'file',
+    header: 'Application File',
+    kind: 'date',
+    render: (r) => (r.fileRunNo === undefined ? DASH : applicationFileText(r.fileRunNo)),
+  },
   {
     key: 'status',
     header: 'Status',

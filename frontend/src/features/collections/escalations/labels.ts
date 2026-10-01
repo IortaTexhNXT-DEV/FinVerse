@@ -1,4 +1,5 @@
 import type { Basis, EscalationStage, Rule, RuleInput, TargetLevel } from './api';
+import { thresholdText } from '../presentation';
 
 /** Labels, tabs and form checks of the escalation screens (BRCLXN.049/050). */
 
@@ -37,12 +38,21 @@ export function stagesOf(tab: EscalationTab): EscalationStage[] {
   return ESCALATION_TABS.find((t) => t.id === tab)?.stages ?? [];
 }
 
-/** How a rule reads: "Days since booking ≥ 45 → Team Lead". */
+/**
+ * How a rule reads: "Days since booking ≥ 45 → Team Lead", "Outstanding at or above 1,000,000.00 →
+ * Section Head"; a designated user by name (`name` turns the login into the name shown).
+ */
 export function describeRule(
   rule: Pick<Rule, 'basis' | 'threshold' | 'targetLevel' | 'targetUsername'>,
+  name: (login: string) => string = (login) => login,
 ): string {
-  const target = rule.targetUsername ?? LEVEL_LABELS[rule.targetLevel];
-  return `${BASIS_LABELS[rule.basis]} ≥ ${rule.threshold} → ${target}`;
+  const target =
+    rule.targetUsername === undefined ? LEVEL_LABELS[rule.targetLevel] : name(rule.targetUsername);
+  const when =
+    rule.basis === 'AMOUNT_OVER'
+      ? `${BASIS_LABELS[rule.basis]} ${thresholdText(rule.basis, rule.threshold)}`
+      : `${BASIS_LABELS[rule.basis]} ≥ ${rule.threshold}`;
+  return `${when} → ${target}`;
 }
 
 export interface RuleForm {

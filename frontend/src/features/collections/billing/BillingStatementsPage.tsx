@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth/authContext';
 import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { Amount } from '@/components/ui/Amount';
+import { PeriodCell } from '@/components/ui/PeriodCell';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
@@ -22,7 +23,7 @@ import { DialogFooter, InputField } from '../plans/Parts';
 import type { Statement } from './api';
 import { billingApi } from './api';
 import type { StatementTab } from './labels';
-import { STATEMENT_TABS, cycleText, periodError, statusesOfTab } from './labels';
+import { STATEMENT_TABS, periodError, statusesOfTab } from './labels';
 
 const COLUMNS: Column<Statement>[] = [
   {
@@ -38,7 +39,12 @@ const COLUMNS: Column<Statement>[] = [
   { key: 'arn', header: 'ARN', render: (s) => s.arn },
   { key: 'assured', header: 'Name of Assured', render: (s) => s.assuredName },
   { key: 'freq', header: 'Frequency', render: (s) => humanize(s.frequency) },
-  { key: 'cycle', header: 'Billing Cycle', render: (s) => cycleText(s) },
+  {
+    key: 'cycle',
+    header: 'Billing Cycle',
+    kind: 'period',
+    render: (s) => <PeriodCell from={s.cycleFrom} to={s.cycleTo} />,
+  },
   { key: 'due', header: 'Due Date', render: (s) => formatDate(s.dueDate) },
   { key: 'bal', header: 'Amount Due', numeric: true, render: (s) => <Amount value={s.balance} /> },
   { key: 'status', header: 'Status', render: (s) => <StatusBadge status={s.status} /> },

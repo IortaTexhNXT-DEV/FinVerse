@@ -21,6 +21,8 @@ import type { Account } from './api';
 import { ACCOUNT_TABS } from './collectionsLogic';
 import type { AccountTabId } from './collectionsLogic';
 import { LegacyFollowUpCard } from './LegacyFollowUpCard';
+import { lockText, taggingOwnerLabel } from './presentation';
+import { InsurerName } from '@/components/broking/LovLabel';
 import { DetailsDialog, DispositionDialog, EffortDialog } from './WorkDialogs';
 import './collections.css';
 import { UserName } from '@/components/ui/UserName';
@@ -42,10 +44,11 @@ function flags(a: Account): string[] {
     out.push('Pending Negative Adjustment');
   }
   if (l?.lockOwner !== undefined) {
-    out.push(`Locked by ${l.lockOwner}`);
+    out.push(lockText(l.lockOwner));
   }
-  if (a.item.taggingOwner !== undefined) {
-    out.push(`${a.item.taggingOwner === 'OPERATIONS' ? 'Operations' : 'Marketing'} Action`);
+  const owner = taggingOwnerLabel(a.item.taggingOwner);
+  if (owner !== undefined) {
+    out.push(`${owner} Action`);
   }
   return out;
 }
@@ -90,7 +93,7 @@ function Summary({ account }: Readonly<{ account: Account }>) {
           label: 'Aging',
           value: `${i.agingDays} days (${i.agingBracket ?? '—'}) · booked ${formatDate(i.bookingDate)}`,
         },
-        { icon: Building2, label: 'Insurer', value: i.insurerCode },
+        { icon: Building2, label: 'Insurer', value: <InsurerName code={i.insurerCode} /> },
         {
           icon: UserRound,
           label: 'Handler / AO / UH',

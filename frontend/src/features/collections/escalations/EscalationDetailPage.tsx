@@ -41,7 +41,7 @@ const ITEM_COLUMNS: Column<EscalationItem>[] = [
 ];
 
 function Summary({ e }: Readonly<{ e: Escalation }>) {
-  const origin = e.kind === 'AUTO' ? 'Rule ' + (e.ruleCode ?? '') : e.raisedBy;
+  const origin = e.kind === 'AUTO' ? 'Rule ' + (e.ruleCode ?? '') : displayNameOf(e.raisedBy);
   return (
     <RecordSummary
       title={e.assuredName}

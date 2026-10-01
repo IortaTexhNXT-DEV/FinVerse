@@ -49,6 +49,12 @@ function DispositionCell({ code, category }: Readonly<{ code?: string; category?
   );
 }
 
+/** Aging of an account with its bracket: "16 days (0-30)". */
+function agingText(i: CollectionItem): string {
+  const days = formatDays(i.agingDays);
+  return i.agingBracket === undefined ? days : `${days} (${i.agingBracket})`;
+}
+
 const COLUMNS: Column<CollectionItem>[] = [
   {
     key: 'inv',
@@ -80,11 +86,11 @@ const COLUMNS: Column<CollectionItem>[] = [
     header: 'Segment / Unit',
     render: (i) => [i.segment, i.salesUnit].filter(Boolean).join(' / '),
   },
-  { key: 'booked', header: 'Booked', render: (i) => formatDate(i.bookingDate) },
   {
     key: 'aging',
-    header: 'Aging',
-    render: (i) => <CellStack main={formatDays(i.agingDays)} sub={i.agingBracket} />,
+    header: 'Booked / Aging',
+    kind: 'date',
+    render: (i) => <CellStack main={formatDate(i.bookingDate)} sub={agingText(i)} />,
   },
   {
     key: 'net',
@@ -102,7 +108,12 @@ const COLUMNS: Column<CollectionItem>[] = [
     header: 'Disposition',
     render: (i) => <DispositionCell code={i.dispositionCode} category={i.category} />,
   },
-  { key: 'status', header: 'Status', render: (i) => <StatusBadge status={i.status} /> },
+  {
+    key: 'status',
+    header: 'Status',
+    kind: 'status',
+    render: (i) => <StatusBadge status={i.status} />,
+  },
 ];
 
 type Dialog = 'disposition' | 'effort' | 'reassign';

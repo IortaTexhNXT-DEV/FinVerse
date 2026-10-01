@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Download } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/auth/authContext';
 import { useFileDownload } from '@/components/broking/useFileDownload';
@@ -16,13 +15,15 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDateTime, formatPeriod, today } from '@/utils/format';
+import { formatDateTime, today } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { ScheduledFile } from './api';
 import { reportTitle } from './collectionsLogic';
 import './collections.css';
 import { displayNameOf } from '@/api/users';
 import { DateInput } from '@/components/ui/DateInput';
+import { PeriodCell } from '@/components/ui/PeriodCell';
+import { RowActionMenu } from '@/components/ui/RowActionMenu';
 
 type FileTab = '' | 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'ON_REQUEST';
 
@@ -140,7 +141,8 @@ export default function FilesPage() {
     {
       key: 'p',
       header: 'Period',
-      render: (f) => `${f.periodKey} (${formatPeriod(f.periodFrom, f.periodTo)})`,
+      kind: 'period',
+      render: (f) => <PeriodCell from={f.periodFrom} to={f.periodTo} />,
     },
     { key: 'n', header: 'Rows', numeric: true, render: (f) => f.rowCount },
     {
@@ -159,19 +161,20 @@ export default function FilesPage() {
       header: '',
       render: (f) =>
         mayDownload && f.available && f.reportRunId !== undefined ? (
-          <Button
-            size="sm"
-            variant="secondary"
-            icon={<Download size={14} />}
-            onClick={() => {
-              const id = f.reportRunId;
-              if (id !== undefined) {
-                download.mutate(() => collectionsApi.downloadFile(id));
-              }
-            }}
-          >
-            Download
-          </Button>
+          <RowActionMenu
+            label={reportTitle(f.reportCode)}
+            actions={[
+              {
+                label: 'Download',
+                onSelect: () => {
+                  const id = f.reportRunId;
+                  if (id !== undefined) {
+                    download.mutate(() => collectionsApi.downloadFile(id));
+                  }
+                },
+              },
+            ]}
+          />
         ) : (
           <span className="clx-muted">
             {f.status === 'FAILED' ? f.message : 'Not yet available'}

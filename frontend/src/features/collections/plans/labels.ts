@@ -1,4 +1,5 @@
-import type { InstallmentStatus, PlanSource, PlanStatus, PromiseStatus } from './api';
+import type { RowAction } from '@/components/ui/RowActionMenu';
+import type { Installment, InstallmentStatus, PlanSource, PlanStatus, PromiseStatus } from './api';
 
 /** Labels, work list tabs and form checks of the plans and promises screens (BRCLXN.053/055). */
 
@@ -23,7 +24,7 @@ export const PROMISE_TABS: readonly { id: PromiseTab; label: string; statuses: P
 export const SOURCE_LABELS: Record<PlanSource, string> = {
   POLICY_YEARS: 'Policy Years',
   GENERATED: 'Generated',
-  MANUAL: 'Entered',
+  MANUAL: 'Manual',
 };
 
 /** Installment statuses that still need follow-up. */
@@ -125,4 +126,26 @@ export function optionalAmount(text: string): number | undefined {
 export function optionalText(text: string): string | undefined {
   const t = text.trim();
   return t === '' ? undefined : t;
+}
+
+/** What the user may do on an installment. */
+export interface InstallmentActions {
+  billed: Set<number>;
+  canBill: boolean;
+  canPromise: boolean;
+  busy: boolean;
+  onBill: (seq: number) => void;
+  onPromise: (installment: Installment) => void;
+}
+
+/** The row actions of an installment: bill its cycle, record a promise on its invoice. */
+export function installmentActions(i: Installment, a: InstallmentActions): RowAction[] {
+  const actions: RowAction[] = [];
+  if (a.canBill && !a.billed.has(i.seq)) {
+    actions.push({ label: 'Generate SOA', onSelect: () => a.onBill(i.seq), disabled: a.busy });
+  }
+  if (a.canPromise && i.invoiceNo !== undefined && i.status !== 'PAID') {
+    actions.push({ label: 'Record Promise', onSelect: () => a.onPromise(i) });
+  }
+  return actions;
 }

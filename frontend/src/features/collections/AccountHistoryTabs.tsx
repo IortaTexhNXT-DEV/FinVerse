@@ -10,6 +10,8 @@ import { collectionsApi } from './api';
 import { validity } from './collectionsLogic';
 import { displayNameOf } from '@/api/users';
 import { UserName } from '@/components/ui/UserName';
+import { LovLabel } from '@/components/broking/LovLabel';
+import { dispositionLabel } from './presentation';
 
 /** Dispositions (append-only), efforts and hand-offs to Operations (BRCLXN.016-023). */
 export function DispositionsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) {
@@ -20,6 +22,11 @@ export function DispositionsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) 
   const efforts = useQuery({
     queryKey: ['collections', 'efforts', invoiceNo],
     queryFn: () => collectionsApi.efforts(invoiceNo),
+  });
+  const rules = useQuery({
+    queryKey: ['collections', 'disposition-rules'],
+    queryFn: collectionsApi.dispositionRules,
+    staleTime: 5 * 60_000,
   });
   const handoffs = useQuery({
     queryKey: ['collections', 'handoffs', invoiceNo],
@@ -32,7 +39,11 @@ export function DispositionsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) 
         <DataTable
           caption="Dispositions"
           columns={[
-            { key: 'c', header: 'Disposition', render: (d) => d.code },
+            {
+              key: 'c',
+              header: 'Disposition',
+              render: (d) => dispositionLabel(rules.data, d.code),
+            },
             { key: 'r', header: 'Remarks', render: (d) => d.remarks ?? '' },
             { key: 'a', header: 'Hand-off', render: (d) => humanize(d.opsAction) },
             {
@@ -59,7 +70,11 @@ export function DispositionsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) 
           caption="Efforts"
           columns={[
             { key: 'd', header: 'When', render: (e) => formatDateTime(e.at) },
-            { key: 'c', header: 'Effort', render: (e) => e.code },
+            {
+              key: 'c',
+              header: 'Effort',
+              render: (e) => <LovLabel type="CLX_EFFORT_CODE" code={e.code} />,
+            },
             {
               key: 'p',
               header: 'Channel / Contact',

@@ -19,7 +19,10 @@ import { escalationsApi } from './api';
 import { RuleDialog } from './EscalationDialogs';
 import { describeRule } from './labels';
 import { LovLabel } from '@/components/broking/LovLabel';
-import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
+import { RowActionMenu } from '@/components/ui/RowActionMenu';
+import { displayNameOf } from '@/api/users';
+import { escalationRuleActions } from './ruleActions';
 
 const MATCH_COLUMNS: Column<RuleMatch>[] = [
   { key: 'inv', header: 'Invoice No.', render: (m) => <strong>{m.invoiceNo}</strong> },
@@ -49,7 +52,7 @@ function PreviewDialog({ rule, onClose }: Readonly<{ rule: Rule; onClose: () => 
     >
       <div className="stack">
         <p className="muted">
-          {describeRule(rule)} – as of today, before authorization and deduplication.
+          {describeRule(rule, displayNameOf)} – as of today, before authorization and deduplication.
         </p>
         <ErrorAlert error={matches.error} />
         <DataTable
@@ -77,6 +80,7 @@ export default function EscalationRulesPage() {
   const queryClient = useQueryClient();
   const [editing, setEditing] = useState<Rule | 'new'>();
   const [previewing, setPreviewing] = useState<Rule>();
+  const [deciding, setDeciding] = useState<{ rule: Rule; authorize: boolean }>();
   const rules = useQuery({
     queryKey: ['collections', 'rules', companyId],
     queryFn: () => escalationsApi.rules(companyId),
@@ -101,7 +105,10 @@ export default function EscalationRulesPage() {
       v.authorize
         ? escalationsApi.authorizeRule(v.rule.id)
         : escalationsApi.deactivateRule(v.rule.id),
-    onSuccess: (r) => done(`${r.code}: ${humanize(r.recordStatus)}`),
+    onSuccess: async (r) => {
+      setDeciding(undefined);
+      await done(`${r.code}: ${humanize(r.recordStatus)}`);
+    },
   });
   const columns: Column<Rule>[] = [
     {
@@ -114,7 +121,7 @@ export default function EscalationRulesPage() {
         </>
       ),
     },
-    { key: 'what', header: 'Escalates When', render: (r) => describeRule(r) },
+    { key: 'what', header: 'Escalates When', render: (r) => describeRule(r, displayNameOf) },
     { key: 'segment', header: 'Segment', render: (r) => r.segment ?? 'All' },
     {
       key: 'reason',
@@ -126,49 +133,26 @@ export default function EscalationRulesPage() {
     { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.recordStatus} /> },
     {
       key: 'actions',
-      header: 'Actions',
+      header: <span className="visually-hidden">Actions</span>,
+      width: '64px',
       render: (r) => (
-        <span className="row">
-          {(can('CLX_SETUP') || can('MASTER_AUTHORIZE')) && (
-            <Button size="sm" variant="ghost" onClick={() => setPreviewing(r)}>
-              Preview
-            </Button>
+        <RowActionMenu
+          label={r.code}
+          actions={escalationRuleActions(
+            r,
+            {
+              preview: can('CLX_SETUP') || can('MASTER_AUTHORIZE'),
+              setup: can('CLX_SETUP'),
+              authorize: can('MASTER_AUTHORIZE') && r.maker !== user?.username,
+            },
+            {
+              preview: () => setPreviewing(r),
+              change: () => setEditing(r),
+              authorize: () => setDeciding({ rule: r, authorize: true }),
+              deactivate: () => setDeciding({ rule: r, authorize: false }),
+            },
           )}
-          {can('CLX_SETUP') && r.recordStatus !== 'INACTIVE' && (
-            <Button size="sm" variant="secondary" onClick={() => setEditing(r)}>
-              Change
-            </Button>
-          )}
-          {can('MASTER_AUTHORIZE') &&
-            r.recordStatus === 'PENDING_AUTHORIZATION' &&
-            r.maker !== user?.username && (
-              <ConfirmButton
-                size="sm"
-                busy={decide.isPending}
-                confirm={{
-                  title: 'Authorize Escalation Rule',
-                  effect: 'The rule takes effect for new escalations.',
-                }}
-                onConfirm={() => decide.mutateAsync({ rule: r, authorize: true })}
-              >
-                Authorize
-              </ConfirmButton>
-            )}
-          {can('CLX_SETUP') && r.recordStatus === 'ACTIVE' && (
-            <ConfirmButton
-              size="sm"
-              variant="danger"
-              confirm={{
-                title: 'Deactivate Escalation Rule',
-                effect: 'The rule no longer applies to new escalations.',
-                destructive: true,
-              }}
-              onConfirm={() => decide.mutateAsync({ rule: r, authorize: false })}
-            >
-              Deactivate
-            </ConfirmButton>
-          )}
-        </span>
+        />
       ),
     },
   ];
@@ -209,6 +193,23 @@ export default function EscalationRulesPage() {
       )}
       {previewing !== undefined && (
         <PreviewDialog rule={previewing} onClose={() => setPreviewing(undefined)} />
+      )}
+      {deciding !== undefined && (
+        <ConfirmDialog
+          title={deciding.authorize ? 'Authorize Escalation Rule' : 'Deactivate Escalation Rule'}
+          record={deciding.rule.code}
+          effect={
+            deciding.authorize
+              ? 'The rule takes effect for new escalations.'
+              : 'The rule no longer applies to new escalations.'
+          }
+          confirmLabel={deciding.authorize ? 'Authorize' : 'Deactivate'}
+          destructive={!deciding.authorize}
+          busy={decide.isPending}
+          error={decide.error}
+          onClose={() => setDeciding(undefined)}
+          onConfirm={() => decide.mutate(deciding)}
+        />
       )}
     </div>
   );

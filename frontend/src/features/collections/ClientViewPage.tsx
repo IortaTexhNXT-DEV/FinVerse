@@ -8,6 +8,8 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatAmount, formatDate, formatDays } from '@/utils/format';
 import { collectionsApi } from './api';
+import { dispositionLabel } from './presentation';
+import { UserName } from '@/components/ui/UserName';
 import './collections.css';
 
 /**
@@ -22,6 +24,11 @@ export default function ClientViewPage() {
     queryKey: ['collections', 'client', companyId, clientCode],
     queryFn: () => collectionsApi.client(companyId, clientCode),
     enabled: companyId > 0,
+  });
+  const rules = useQuery({
+    queryKey: ['collections', 'disposition-rules'],
+    queryFn: collectionsApi.dispositionRules,
+    staleTime: 5 * 60_000,
   });
   const v = view.data;
   const open = v?.items.filter((i) => i.status === 'OPEN').length ?? 0;
@@ -66,8 +73,16 @@ export default function ClientViewPage() {
               numeric: true,
               render: (i) => `${i.currency} ${formatAmount(i.netOutstanding)}`,
             },
-            { key: 'h', header: 'Handler', render: (i) => i.currentHandler ?? 'Unassigned' },
-            { key: 'd', header: 'Disposition', render: (i) => i.dispositionCode ?? '—' },
+            {
+              key: 'h',
+              header: 'Handler',
+              render: (i) => <UserName login={i.currentHandler} empty="Unassigned" />,
+            },
+            {
+              key: 'd',
+              header: 'Disposition',
+              render: (i) => dispositionLabel(rules.data, i.dispositionCode),
+            },
             { key: 's', header: 'Status', render: (i) => <StatusBadge status={i.status} /> },
           ]}
           rows={v?.items ?? []}

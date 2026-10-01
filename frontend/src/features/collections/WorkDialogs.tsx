@@ -9,6 +9,8 @@ import { today } from '@/utils/format';
 import { collectionsApi } from './api';
 import type { DispositionInput, EffortInput, ReassignInput } from './api';
 import { cleanDetails, detailFields, dispositionErrors, handoffText } from './collectionsLogic';
+import { ruleSummary } from './presentation';
+import { DetailInput, HandlerOptions } from './WorkInputs';
 import { DateInput } from '@/components/ui/DateInput';
 
 interface DialogProps {
@@ -132,17 +134,7 @@ export function DispositionDialog({
             </select>
           )}
         </Field>
-        {rule !== undefined && (
-          <p className="clx-muted">
-            {[
-              rule.category && `Category ${rule.category}`,
-              rule.taggingOwner && `Owner ${rule.taggingOwner}`,
-              rule.allowedRoles.length > 0 && `Reserved to ${rule.allowedRoles.join(', ')}`,
-            ]
-              .filter(Boolean)
-              .join(' · ')}
-          </p>
-        )}
+        {rule !== undefined && <p className="clx-muted">{ruleSummary(rule)}</p>}
         {handoff !== undefined && <div className="clx-info">{handoff}</div>}
         <div className="form-grid">
           {detailFields(rule?.opsAction).map((f) => (
@@ -154,12 +146,11 @@ export function DispositionDialog({
               hint={f.hint}
             >
               {(id) => (
-                <input
+                <DetailInput
                   id={id}
-                  className="input"
-                  type={f.type}
+                  field={f}
                   value={details[f.key] ?? ''}
-                  onChange={(e) => setDetails({ ...details, [f.key]: e.target.value })}
+                  onChange={(v) => setDetails({ ...details, [f.key]: v })}
                 />
               )}
             </Field>
@@ -317,11 +308,7 @@ export function ReassignDialog({
                 onChange={(e) => setForm({ ...form, handler: e.target.value })}
               >
                 <option value="">Select…</option>
-                {(handlers.data ?? []).map((h) => (
-                  <option key={h} value={h}>
-                    {h}
-                  </option>
-                ))}
+                <HandlerOptions handlers={handlers.data ?? []} />
               </select>
             )}
           </Field>

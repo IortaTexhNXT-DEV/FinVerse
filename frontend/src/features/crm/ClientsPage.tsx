@@ -100,7 +100,12 @@ export default function ClientsPage() {
           onRowClick={open}
           emptyMessage="No items to display"
           columns={[
-            { key: 'code', header: 'Code', render: (c) => <span className="mono">{c.code}</span> },
+            {
+              key: 'code',
+              header: 'Code',
+              kind: 'code',
+              render: (c) => <span className="mono">{c.code}</span>,
+            },
             {
               key: 'name',
               header: 'Name',

@@ -17,6 +17,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatDate, humanize } from '@/utils/format';
 import { JournalLines } from './BookingParts';
 import { labelOf } from './bookingForm';
+import { useServiceInvoiceTypeName } from './serviceInvoiceLabels';
 import { UserName } from '@/components/ui/UserName';
 
 /** Posted journal lines of an invoice, with links to the journals. */
@@ -102,6 +103,7 @@ export function ServiceInvoiceTable({
   rows,
   loading,
 }: Readonly<{ rows: ServiceInvoice[]; loading: boolean }>) {
+  const typeName = useServiceInvoiceTypeName();
   return (
     <DataTable<ServiceInvoice>
       caption="Service invoices"
@@ -115,8 +117,18 @@ export function ServiceInvoiceTable({
           header: 'Service Invoice No.',
           render: (s) => <Link to={`/booking/service-invoices/${String(s.id)}`}>{s.siNo}</Link>,
         },
-        { key: 'kind', header: 'Kind', render: (s) => <StatusBadge status={s.kind} /> },
-        { key: 'type', header: 'Type', render: (s) => s.typeCode },
+        {
+          key: 'type',
+          header: 'Kind / Type',
+          render: (s) => (
+            <span className="cell-stack">
+              <span>
+                <StatusBadge status={s.kind} />
+              </span>
+              <span className="muted">{typeName(s.typeCode)}</span>
+            </span>
+          ),
+        },
         { key: 'recipient', header: 'Recipient', render: (s) => s.recipientName },
         { key: 'invoice', header: 'Invoice No.', render: (s) => s.invoiceNo ?? '' },
         { key: 'date', header: 'Issue Date', render: (s) => formatDate(s.issueDate) },

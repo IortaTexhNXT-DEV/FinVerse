@@ -163,7 +163,7 @@ screens:
     fields:
       - "Tabs | All / Service Invoices / Credits | Tab | - | - | Fixed | All | - | - | -"
       - "Search | Search Service Invoice No., invoice, ARN or recipient | Text | - | N | - | Blank | - | Contains search | -"
-      - "List | Service Invoice No., Issue Date, Kind, Type, Booked Invoice, ARN, Recipient, Net, Dispatch | Column | - | - | Service invoices | - | Read only | - | -"
+      - "List | Service Invoice No., Kind / Type, Recipient, Invoice No., Issue Date, Net, E-mail | Column | Kind pill with the type name under it | - | Service invoices | - | Read only | - | -"
       - "Record | Service invoice, Invoice, ARN | Reference | - | - | Service invoice | - | Read only | - | -"
       - "Record | Recipient, Billing e-mail, Issue date, Template, Owner, Credit of | Display | - | - | Service invoice types, insurer master | - | Read only | - | -"
       - "Record | Lines | Display | Brokerage commission, VAT on commission, less withholding tax, net amount | - | Booking | - | Read only | - | -"

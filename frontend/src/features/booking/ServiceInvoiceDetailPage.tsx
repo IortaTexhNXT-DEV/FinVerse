@@ -25,9 +25,11 @@ import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDate } from '@/utils/format';
+import { formatAmount, formatDate, humanize } from '@/utils/format';
 import { SummaryFact } from './BookingParts';
 import { UserName } from '@/components/ui/UserName';
+import { permissionLabel } from '@/utils/permissionLabel';
+import { useServiceInvoiceTypeName } from './serviceInvoiceLabels';
 import { Notice } from '@/components/ui/Notice';
 
 function CreditDialog({ si, onClose }: Readonly<{ si: ServiceInvoice; onClose: () => void }>) {
@@ -156,10 +158,14 @@ function Facts({ si: s }: Readonly<{ si: ServiceInvoice }>) {
             {formatDate(s.issueDate)}
           </SummaryFact>
           <SummaryFact icon={FileText} label="Template">
-            {s.templateCode} v{s.templateVersion}
+            {humanize(s.templateCode)} v{s.templateVersion}
           </SummaryFact>
           <SummaryFact icon={UserRound} label="Owner">
-            {s.ownerUsername ? <UserName login={s.ownerUsername} /> : (s.ownerPermission ?? '')}
+            {s.ownerUsername ? (
+              <UserName login={s.ownerUsername} />
+            ) : (
+              permissionLabel(s.ownerPermission ?? '')
+            )}
           </SummaryFact>
           <SummaryFact icon={Receipt} label="Credit of">
             {s.creditOf ?? '-'}
@@ -180,6 +186,7 @@ function Facts({ si: s }: Readonly<{ si: ServiceInvoice }>) {
  * outcome and send log; download the PDF as issued, send it again or credit it.
  */
 export default function ServiceInvoiceDetailPage() {
+  const typeName = useServiceInvoiceTypeName();
   const id = Number(useParams().id);
   const { can } = useAuth();
   const toast = useToast();
@@ -214,7 +221,7 @@ export default function ServiceInvoiceDetailPage() {
         section="Booking · Service Invoice"
         backTo="/booking/service-invoices"
         title={s.siNo}
-        description={`${s.kind === 'CREDIT' ? 'Credit' : 'Service invoice'} · ${s.typeCode}`}
+        description={`${s.kind === 'CREDIT' ? 'Credit' : 'Service invoice'} · ${typeName(s.typeCode)}`}
         actions={
           <>
             <Button

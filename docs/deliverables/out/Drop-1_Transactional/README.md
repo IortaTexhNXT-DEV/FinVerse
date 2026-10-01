@@ -16,7 +16,7 @@ and signed off together; in an
 issued sign-off set the files carry the reading-order prefix 00_ to 05_ (deliverables README, "Release and
 sign-off per BRD"). Each document is kept once, in its latest version.
 
-The sets of BRD-02 also carry the UX screen documents for the BDOI UX Design team: 07 the UX Screen Deck (every screen persona by persona and flow by flow, with all its states), 08 the UX screen register (one row per screen image with the FRS section, the UXD status and the change flag) and 09 the image package (every screen image at twice the screen resolution, with the register as CSV). A change of the FRS names the screens it affects, so the UX Design team revises only those screens.
+The sets of BRD-01, BRD-02 also carry the UX screen documents for the BDOI UX Design team: 07 the UX Screen Deck (every screen persona by persona and flow by flow, with all its states), 08 the UX screen register (one row per screen image with the FRS section, the UXD status and the change flag) and 09 the image package (every screen image at twice the screen resolution, with the register as CSV). A change of the FRS names the screens it affects, so the UX Design team revises only those screens.
 
 | Document | BRD | Kind | Version | File |
 |---|---|---|---|---|
@@ -26,6 +26,9 @@ The sets of BRD-02 also carry the UX screen documents for the BDOI UX Design tea
 | New Business | BRD-01 | Sign-off workbook (Excel) | 2.0 | [`BRD-01_New_Business/03_BIBS_Signoff_BRD-01_New_Business_v2.0.xlsx`](BRD-01_New_Business/03_BIBS_Signoff_BRD-01_New_Business_v2.0.xlsx) |
 | New Business | BRD-01 | Test plan workbook (Excel) | 2.0 | [`BRD-01_New_Business/04_BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx`](BRD-01_New_Business/04_BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx) |
 | New Business | BRD-01 | Test plan summary (Word) | 2.0 | [`BRD-01_New_Business/05_BIBS_TestPlan_BRD-01_New_Business_Summary_v2.0.docx`](BRD-01_New_Business/05_BIBS_TestPlan_BRD-01_New_Business_Summary_v2.0.docx) |
+| New Business | BRD-01 | UX screen deck (PowerPoint) | 2.0 | [`BRD-01_New_Business/07_BIBS_UXDeck_BRD-01_New_Business_v2.0.pptx`](BRD-01_New_Business/07_BIBS_UXDeck_BRD-01_New_Business_v2.0.pptx) |
+| New Business | BRD-01 | UX screen register (Excel) | 2.0 | [`BRD-01_New_Business/08_BIBS_UXScreens_BRD-01_New_Business_v2.0.xlsx`](BRD-01_New_Business/08_BIBS_UXScreens_BRD-01_New_Business_v2.0.xlsx) |
+| New Business | BRD-01 | UX screen images, 2x PNG with the register as CSV (ZIP) | 2.0 | [`BRD-01_New_Business/09_BIBS_UXScreens_BRD-01_New_Business_v2.0.zip`](BRD-01_New_Business/09_BIBS_UXScreens_BRD-01_New_Business_v2.0.zip) |
 | Operations | BRD-02 | Start here guide | 2.0 | [`BRD-02_Operations/00_BIBS_StartHere_BRD-02_Operations_v2.0.docx`](BRD-02_Operations/00_BIBS_StartHere_BRD-02_Operations_v2.0.docx) |
 | Operations | BRD-02 | Sign-off pack guide deck | 2.0 | [`BRD-02_Operations/01_BIBS_GuideDeck_BRD-02_Operations_v2.0.pptx`](BRD-02_Operations/01_BIBS_GuideDeck_BRD-02_Operations_v2.0.pptx) |
 | Operations | BRD-02 | FRS | 2.0 | [`BRD-02_Operations/02_BIBS_FRS_BRD-02_Operations_v2.0.docx`](BRD-02_Operations/02_BIBS_FRS_BRD-02_Operations_v2.0.docx) |

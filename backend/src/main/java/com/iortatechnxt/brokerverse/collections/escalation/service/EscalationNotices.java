@@ -84,7 +84,7 @@ public class EscalationNotices {
     }
     if (named && !users.usersWithPermission(HANDLER).contains(username.strip())) {
       throw new BusinessRuleException(
-          "CLX_ESCALATION_TARGET", username + " does not handle escalations (" + HANDLER + ")");
+          "CLX_ESCALATION_TARGET", username + " does not handle escalations");
     }
   }
 

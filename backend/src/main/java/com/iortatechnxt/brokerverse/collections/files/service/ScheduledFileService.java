@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.collections.files.service;
 
 import com.iortatechnxt.brokerverse.alert.domain.AlertFacts;
 import com.iortatechnxt.brokerverse.alert.service.AlertService;
+import com.iortatechnxt.brokerverse.collections.common.service.ClxText;
 import com.iortatechnxt.brokerverse.collections.files.domain.ScheduledFile;
 import com.iortatechnxt.brokerverse.collections.files.domain.ScheduledFile.Frequency;
 import com.iortatechnxt.brokerverse.collections.files.domain.ScheduledFile.Spec;
@@ -125,7 +126,9 @@ public class ScheduledFileService {
           EXPORT_PERMISSION,
           new Notice(
               run.getTitle() + " " + spec.periodKey() + " is ready",
-              "Available from " + from + (spec.scope() == null ? "" : " " + spec.scope()),
+              "Available from "
+                  + ClxText.dateTime(from)
+                  + (spec.scope() == null ? "" : " " + spec.scope()),
               "/collections/files",
               "CollectionFile",
               String.valueOf(saved.getId())),

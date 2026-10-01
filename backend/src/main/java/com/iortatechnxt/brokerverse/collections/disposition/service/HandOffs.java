@@ -31,6 +31,9 @@ import java.util.Set;
  */
 final class HandOffs {
 
+  /** The refusal of a BIR 2307 path that is not one of the two paths. */
+  static final String CWT_PATH = "Choose the 2307 path: certificate received or paid in cash";
+
   static final String PICKUP_DATE = "pickupDate";
   static final String PICKUP_ADDRESS = "pickupAddress";
   static final String CONTACT_PERSON = "contactPerson";
@@ -80,7 +83,7 @@ final class HandOffs {
   private static void validateCwt(Map<String, String> details) {
     String path = details.getOrDefault(PATH, CERTIFICATE);
     if (!PATHS.contains(path)) {
-      throw new BusinessRuleException("CLX_CWT_PATH", "The 2307 path is CASH or CERTIFICATE");
+      throw new BusinessRuleException("CLX_CWT_PATH", CWT_PATH);
     }
     if (CERTIFICATE.equals(path)) {
       require(details, CERTIFICATE_NO, "the BIR 2307 certificate number");

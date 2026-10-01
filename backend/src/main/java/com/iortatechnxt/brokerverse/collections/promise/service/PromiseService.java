@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.collections.promise.service;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.collections.common.service.ClxText;
 import com.iortatechnxt.brokerverse.collections.installment.domain.Installment;
 import com.iortatechnxt.brokerverse.collections.installment.domain.InstallmentRepository;
 import com.iortatechnxt.brokerverse.collections.installment.service.LedgerBalances;
@@ -304,11 +305,9 @@ public class PromiseService {
             PROMISE_OF + promise.getAssuredName() + " broken",
             promise.getInvoiceNo()
                 + ": "
-                + promise.getCurrency()
-                + " "
-                + promise.getPromisedAmount()
+                + ClxText.amount(promise.getCurrency(), promise.getPromisedAmount())
                 + " promised by "
-                + promise.getPromisedDate()
+                + ClxText.date(promise.getPromisedDate())
                 + " was not paid",
             "/collections/promises?q=" + promise.getInvoiceNo(),
             ENTITY,

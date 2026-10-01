@@ -7,6 +7,7 @@ import com.iortatechnxt.brokerverse.collections.common.domain.CollectionItem;
 import com.iortatechnxt.brokerverse.collections.common.domain.CollectionItemRepository;
 import com.iortatechnxt.brokerverse.collections.common.domain.FieldChange.Target;
 import com.iortatechnxt.brokerverse.collections.common.service.ChangeRecorder;
+import com.iortatechnxt.brokerverse.collections.common.service.ClxText;
 import com.iortatechnxt.brokerverse.collections.common.service.CollectionItems;
 import com.iortatechnxt.brokerverse.collections.worklist.domain.Assignment;
 import com.iortatechnxt.brokerverse.collections.worklist.domain.Assignment.Handlers;
@@ -41,6 +42,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class AssignmentService {
+
+  /** The refusal of a reassignment that is neither permanent nor temporary. */
+  public static final String REASSIGN_KIND = "Choose a permanent or a temporary reassignment";
 
   /** Permission of the handlers who may receive accounts. */
   public static final String HANDLER_PERMISSION = "CLX_WORK";
@@ -167,9 +171,7 @@ public class AssignmentService {
         // no end date
       }
       case TEMPORARY -> requireEndDate(command.validTo(), today);
-      default ->
-          throw new BusinessRuleException(
-              "CLX_REASSIGN_KIND", "A reassignment is PERMANENT or TEMPORARY");
+      default -> throw new BusinessRuleException("CLX_REASSIGN_KIND", REASSIGN_KIND);
     }
   }
 
@@ -205,7 +207,7 @@ public class AssignmentService {
   }
 
   private void notifyHandlers(String handler, int count, Map<String, Integer> taken, Terms terms) {
-    String until = terms.validTo() == null ? "" : " until " + terms.validTo();
+    String until = terms.validTo() == null ? "" : " until " + ClxText.date(terms.validTo());
     notifications.notifyUser(
         handler,
         new Notice(
@@ -220,7 +222,10 @@ public class AssignmentService {
             notifications.notifyUser(
                 user,
                 new Notice(
-                    n + " collection account(s) reassigned to " + handler + until,
+                    n
+                        + " collection account(s) reassigned to "
+                        + users.displayName(handler)
+                        + until,
                     terms.reason(),
                     "/collections/worklist",
                     CollectionItems.ENTITY,

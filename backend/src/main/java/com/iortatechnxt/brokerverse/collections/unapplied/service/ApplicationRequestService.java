@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.collections.unapplied.service;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.collections.common.service.ClxText;
 import com.iortatechnxt.brokerverse.collections.unapplied.domain.ApplicationRequest;
 import com.iortatechnxt.brokerverse.collections.unapplied.domain.ApplicationRequest.Status;
 import com.iortatechnxt.brokerverse.collections.unapplied.domain.ApplicationRequestRepository;
@@ -148,9 +149,9 @@ public class ApplicationRequestService {
         new Notice(
             r.getUnappliedRef()
                 + " "
-                + r.getAction().toLowerCase(Locale.ROOT).replace('_', ' ')
-                + " "
-                + next.name().toLowerCase(Locale.ROOT),
+                + ClxText.words(r.getAction())
+                + ": "
+                + ClxText.words(next.name()),
             event.message() == null ? "Cashiering decided the request" : event.message(),
             "/collections/unapplied/" + r.getUnappliedRef(),
             ENTITY,

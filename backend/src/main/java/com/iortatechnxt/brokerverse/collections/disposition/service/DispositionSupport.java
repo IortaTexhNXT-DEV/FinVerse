@@ -25,6 +25,10 @@ import org.springframework.stereotype.Component;
 @Component
 public class DispositionSupport {
 
+  /** The refusal of an update of several accounts without the bulk update permission. */
+  public static final String BULK_NOT_ALLOWED =
+      "You are not allowed to update several accounts at once";
+
   /** Most accounts in one bulk action. */
   static final int MAX_ACCOUNTS = 500;
 
@@ -90,8 +94,7 @@ public class DispositionSupport {
           "CLX_TOO_MANY_ACCOUNTS", "Select at most " + MAX_ACCOUNTS + " accounts at once");
     }
     if (unique.size() > 1 && !currentUser.hasAuthority(bulkPermission)) {
-      throw new BusinessRuleException(
-          "CLX_BULK_NOT_ALLOWED", "Updating several accounts at once needs " + bulkPermission);
+      throw new BusinessRuleException("CLX_BULK_NOT_ALLOWED", BULK_NOT_ALLOWED);
     }
     return List.copyOf(unique);
   }

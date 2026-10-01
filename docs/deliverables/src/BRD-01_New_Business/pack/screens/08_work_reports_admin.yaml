@@ -245,7 +245,7 @@ screens:
     shots:
       - {state: list, user: approver, caption: "Data Retention"}
     fields:
-      - "List | Record Type, Statuses, Years Online, Years Archive, Action, Rule, Last Review, Eligible Records | Column | Eligible: Not reviewed yet, Module not yet reporting, or a count | - | Retention rules | - | Read only | - | -"
+      - "List | Record Type, Statuses, Years Online, Years Archive, Action, Rule, Last Review, Eligible Records, Actions | Column | Records and Edit in the row action menu; Eligible: Not reviewed yet, Module not yet reporting, or a count | - | Retention rules | - | Read only | - | -"
       - "Rule dialog | Statuses | Text | Comma separated, e.g. NOT_PROCEEDED,VOIDED | Y | Record statuses | As set | Always | At least one status | Enter at least one status"
       - "Rule dialog | Years online | Number | 1 to 50 | Y | - | 5 | Always | 1 to 50 | Between 1 and 50 years"
       - "Rule dialog | Years in archive | Number | 0 to 50 | Y | - | 15 | Always | 0 to 50 | Between 0 and 50 years"
@@ -255,8 +255,8 @@ screens:
       - "Eligible records dialog | Reference, Description, Status, Last Activity | Column | - | - | Records of the type | - | Read only | - | -"
     actions:
       - "Run Review Now | MASTER_MAINTAIN | Always | Counts the eligible records of every active rule | - | -"
-      - "Records (row) | Every user of the screen | Always | Lists the eligible records | - | -"
-      - "Edit (row) | MASTER_MAINTAIN | Always | Opens the rule dialog | - | -"
+      - "Records (row action menu) | Every user of the screen | Always | Lists the eligible records | - | -"
+      - "Edit (row action menu) | MASTER_MAINTAIN | Always | Opens the rule dialog | - | -"
     rules:
       - "Archive and purge wait for BDOI's retention decision per record type; the rules count eligible records meanwhile (FR-NB-137)."
     outcome: BDOI sees which records its retention policy makes eligible.
@@ -276,14 +276,14 @@ screens:
     fields:
       - "Templates | Template list | List | One per document (quotation letter, slips, hold cover request, Insurance Advice, e-policy e-mail, service invoice note...) | - | Document templates | The first template | - | - | -"
       - "Template | Current version | Display | Title and text with {{placeholders}} | - | Template versions | - | Read only | - | -"
-      - "Version history | Version, Title, Effective from, Status, Created | Column | - | - | Template versions | - | Read only | - | -"
+      - "Version history | Version, Title, Effective from, Status, Created, Actions | Column | Created: name with the time under it; Download Word in the row action menu | - | Template versions | - | Read only | - | -"
       - "New version dialog | Load from Word | File | A .docx: the first paragraph is the title, the others the text | N | - | - | Always | A Word document with a title and text | The file is not a Word (.docx) document / The Word file needs the title in its first paragraph and the text below it"
       - "New version dialog | Title | Text | - | Y | - | The current title | Always | Not blank | -"
       - "New version dialog | Effective from | Date | dd-MMM-yyyy | Y | - | Today | Always | - | -"
       - "New version dialog | Text | Text area | Keep the {{placeholders}} of the current version | Y | - | The current text | Always | Not blank | Enter the template text"
     actions:
       - "New Version | MASTER_MAINTAIN or LOV_MANAGE | Always | Opens the new version dialog; Save stores the version effective from its date | - | -"
-      - "[Download icon of a version (as Word)] | Every user of the screen | Always | Downloads the version as Word | - | -"
+      - "Download Word (row action menu of a version) | Every user of the screen | Always | Downloads the version as Word | - | -"
     rules:
       - "Documents use the template version in force on their date (FR-NB-004)."
       - "BDOI's own layouts replace the delivered texts when provided (FR-NB-004)."

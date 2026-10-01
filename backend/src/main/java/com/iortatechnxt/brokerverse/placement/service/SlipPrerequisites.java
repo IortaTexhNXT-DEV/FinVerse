@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.catalog.service.ProductRuleService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
+import com.iortatechnxt.brokerverse.lov.service.LovService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,6 +33,7 @@ public class SlipPrerequisites {
   private final ProductRuleService productRules;
   private final DocumentService documents;
   private final InsurerDirectory insurers;
+  private final LovService lovs;
 
   /**
    * Creates the check.
@@ -40,16 +42,19 @@ public class SlipPrerequisites {
    * @param productRules required documents per product
    * @param documents account documents
    * @param insurers insurer addressing
+   * @param lovs lists of values (the names of the document types)
    */
   public SlipPrerequisites(
       ProductCatalogService catalog,
       ProductRuleService productRules,
       DocumentService documents,
-      InsurerDirectory insurers) {
+      InsurerDirectory insurers,
+      LovService lovs) {
     this.catalog = catalog;
     this.productRules = productRules;
     this.documents = documents;
     this.insurers = insurers;
+    this.lovs = lovs;
   }
 
   /**
@@ -93,10 +98,12 @@ public class SlipPrerequisites {
             new AttachmentTarget(AccountService.ENTITY, String.valueOf(account.getId())));
     Set<String> missing = new TreeSet<>(required);
     missing.removeAll(present);
+    // The documents by the names of their types (Valid ID), never their codes.
+    List<String> names = missing.stream().map(t -> lovs.label("DOCUMENT_TYPE", t)).toList();
     return missing.isEmpty()
         ? Optional.empty()
         : Optional.of(
-            new Unmet("DOCUMENTS_MISSING", "Missing documents: " + String.join(", ", missing)));
+            new Unmet("DOCUMENTS_MISSING", "Missing documents: " + String.join(", ", names)));
   }
 
   private Optional<Unmet> insurer(Account account) {

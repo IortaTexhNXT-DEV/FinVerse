@@ -105,22 +105,8 @@ public record UserDataScope(boolean allCompanies, List<CompanyScope> companies) 
    * @return true when every company and branch of this scope is in {@code outer}
    */
   public boolean within(UserDataScope outer) {
-    if (outer.allCompanies()) {
-      return true;
-    }
-    if (allCompanies) {
-      return false;
-    }
-    return companies.stream()
-        .allMatch(
-            c ->
-                outer
-                    .company(c.companyId())
-                    .map(
-                        o ->
-                            o.allBranches()
-                                || !c.allBranches() && o.branchIds().containsAll(c.branchIds()))
-                    .orElse(false));
+    return outer.allCompanies()
+        || !allCompanies && companies.stream().allMatch(c -> c.within(outer));
   }
 
   /**
@@ -207,6 +193,13 @@ public record UserDataScope(boolean allCompanies, List<CompanyScope> companies) 
      */
     public boolean allowsBranch(Long branchId) {
       return allBranches || branchIds.contains(branchId);
+    }
+
+    private boolean within(UserDataScope outer) {
+      return outer
+          .company(companyId)
+          .map(o -> o.allBranches() || !allBranches && o.branchIds().containsAll(branchIds))
+          .orElse(false);
     }
 
     private CompanyScope merge(CompanyScope other) {

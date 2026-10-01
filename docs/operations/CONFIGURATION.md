@@ -166,6 +166,7 @@ environment must use the same settings.
 | `BROKERVERSE_CACHE_TTL_LOV` | no | `PT1H` | `brokerverse.cache.ttl.lov-values`: time to live of the list-of-values cache. |
 | `BROKERVERSE_CACHE_TTL_PARAMETERS` | no | `PT15M` | `brokerverse.cache.ttl.system-parameters`. |
 | `BROKERVERSE_CACHE_TTL_ROLE_PERMISSIONS` | no | `PT15M` | `brokerverse.cache.ttl.security-role-permissions`. |
+| `BROKERVERSE_CACHE_TTL_DATA_SCOPE` | no | `PT15M` | `brokerverse.cache.ttl.security-data-scope`: time to live of a user's company and branch data scope (`docs/architecture/DATA_SCOPE_DESIGN.md`); any change of a user or of a data scope grant clears the cache at once. |
 | `BROKERVERSE_CACHE_TTL_CATALOG` | no | `PT1H` | `brokerverse.cache.ttl.catalog-product-versions`. |
 | `BROKERVERSE_CACHE_TTL_ORGANIZATION` | no | `PT1H` | `brokerverse.cache.ttl.organization-units`. |
 | `BROKERVERSE_CACHE_MAX_SIZE` | no | `10000` | `brokerverse.cache.maximum-size`: entries per cache of the in-memory fallback. |

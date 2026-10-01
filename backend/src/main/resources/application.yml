@@ -290,6 +290,7 @@ brokerverse:
       lov-values: ${BROKERVERSE_CACHE_TTL_LOV:PT1H}
       system-parameters: ${BROKERVERSE_CACHE_TTL_PARAMETERS:PT15M}
       security-role-permissions: ${BROKERVERSE_CACHE_TTL_ROLE_PERMISSIONS:PT15M}
+      security-data-scope: ${BROKERVERSE_CACHE_TTL_DATA_SCOPE:PT15M}
       catalog-product-versions: ${BROKERVERSE_CACHE_TTL_CATALOG:PT1H}
       organization-units: ${BROKERVERSE_CACHE_TTL_ORGANIZATION:PT1H}
     # Entries per cache of the in-memory fallback.

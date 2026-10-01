@@ -551,10 +551,10 @@ const steps = {
     ];
     for (const [insurer, response, premium, rate, deductibles, conditions, remarks] of terms) {
       const row = page.locator('main table tbody tr').filter({ hasText: insurer }).first();
-      if (!(await button(row, 'Terms').isVisible().catch(() => false))) {
+      if (!(await rowOffers(row, /^terms$/i))) {
         continue;
       }
-      await button(row, 'Terms').click();
+      await rowAction(row, /^terms$/i);
       await page.waitForTimeout(700);
       const dialog = page.locator('dialog.modal[open]').last();
       const select = dialog.locator('select').first();
@@ -574,8 +574,8 @@ const steps = {
       await settle(page, 1000);
     }
     const lowest = page.locator('main table tbody tr').filter({ hasText: 'Mabuhay General' }).first();
-    if (await button(lowest, 'Recommend').isVisible().catch(() => false)) {
-      await button(lowest, 'Recommend').click();
+    if (await rowOffers(lowest, /^recommend$/i)) {
+      await rowAction(lowest, /^recommend$/i);
       await settle(page, 1000);
     }
     await act(page, /^Insurer terms complete$/i, { reason: false });

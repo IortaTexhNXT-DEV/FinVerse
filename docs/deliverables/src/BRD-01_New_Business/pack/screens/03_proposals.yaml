@@ -91,7 +91,7 @@ screens:
       - {state: qs, user: tsu, open: with_tsu, tab: "Quotation Slip", caption: "Quotation Slip tab: insurers approached"}
       - {state: responses, user: tsu, open: terms_received, tab: "Insurer Responses", caption: "Insurer Responses tab with the terms received"}
       - {state: comparative, user: tsu, open: terms_received, tab: "Comparative Table", caption: "Comparative Table tab"}
-      - {state: terms, user: tsu, open: terms_received, tab: "Insurer Responses", click: "^terms$", caption: "Terms dialog of one insurer"}
+      - {state: terms, user: tsu, open: terms_received, tab: "Insurer Responses", caption: "Terms dialog of one insurer, opened from the row action menu"}
     fields:
       - "Summary | Client, Product, Period, Total sum insured, Insurers, Slips | Display | - | - | PRF | - | Read only | - | -"
       - "Summary | TSU tag | Tag | The TSU routing reason on hover | - | TSU routing rules | - | Read only | - | -"
@@ -99,7 +99,7 @@ screens:
       - "Quotation Slip tab | Insurers approached | Check boxes | Active insurers of the panel | Y (at least one) | Insurer master | The insurers requested by Marketing | With TSU; quotation slip in preparation (TSU_PROCESS) | Insurers are chosen before the slip is submitted; each needs a placement e-mail address | Select at least one insurer of the panel for the quotation slip / <insurer> has no placement e-mail address"
       - "Quotation Slip tab | Quotation slip | Display | QS number, reply date, PDF per insurer | - | Numbering (QUOTATION_SLIP_PREFIX) | - | Read only | - | -"
       - "Quotation slip dialog | Insurers reply by | Date | dd-MMM-yyyy | N | - | Blank = today plus QUOTATION_SLIP_REPLY_DAYS (5) | Quotation slip in preparation | - | -"
-      - "Insurer Responses tab | Responses | Table | Insurer, Response, Premium, Rate %, Deductibles, Conditions, Valid Until, Document | - | Insurer responses | Pending per insurer | Read only (changed through the Terms dialog) | - | -"
+      - "Insurer Responses tab | Responses | Table | Insurer, Response (with the Recommended pill under it), Premium, Rate %, Deductibles, Conditions, Valid Until, Document, Actions | - | Insurer responses | Pending per insurer | Read only (changed through the Terms dialog of the row action menu) | - | -"
       - "Terms dialog | Response | Drop-down | Terms received, Declined to quote | Y | Fixed list | Terms received | Awaiting insurer terms; terms received (TSU_PROCESS) | Terms are keyed in after the quotation slip is sent | Insurer terms are keyed in after the quotation slip is sent"
       - "Terms dialog | Premium | Amount | 0 or more | Y when terms are received | - | Blank | As above | Needed for received terms | Enter the premium quoted"
       - "Terms dialog | Rate %, Valid until, Deductibles, Conditions, Remarks | Number / Date / Text | Rate 4 decimals | N | - | Blank | As above | - | -"
@@ -121,7 +121,7 @@ screens:
       - "Submit quotation slip | TSU_PROCESS | Quotation slip in preparation | Asks for the reply date; numbers the quotation slip and sends it for approval | Quotation slip for approval | Workflow notice"
       - "Approve and send to insurers | TSU_APPROVE; not the preparer | Quotation slip for approval | Approves the slip and e-mails it to each insurer's placement address | Awaiting insurer terms | E-mail to each insurer; workflow notice"
       - "Return for correction | TSU_APPROVE | Quotation slip or proposal slip for approval | Asks for the return reason and a comment | Previous preparation stage | Workflow notice"
-      - "Terms / Recommend | TSU_PROCESS | Awaiting insurer terms; insurer terms received | Records or changes one insurer's terms (each change is a revision); marks the recommended insurer | Unchanged | -"
+      - "Terms / Recommend | TSU_PROCESS | Awaiting insurer terms; insurer terms received (row action menu) | Records or changes one insurer's terms (each change is a revision); marks the recommended insurer | Unchanged | -"
       - "Insurer terms complete | TSU_PROCESS | Awaiting insurer terms | Closes the request for terms; with the option ticked, closes it although insurers have not answered | Insurer terms received | Workflow notice"
       - "Submit proposal slip | TSU_PROCESS | Insurer terms received | Asks for the insurer of the slip; generates the proposal slip for approval | Proposal slip for approval | Workflow notice"
       - "Approve and release to Marketing | TSU_APPROVE; not the preparer | Proposal slip for approval | Releases the proposal slip to Marketing | Proposal slip released to Marketing | Workflow notice to the maker"

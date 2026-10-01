@@ -225,6 +225,11 @@ const after = {
     await walkthrough.rowAction(page.locator('main table tbody tr').first(), /^assign$/i);
     await page.waitForTimeout(800);
   },
+  // The terms dialog of the first insurer, from the row action menu.
+  'scr-nb-11-05-terms': async (page) => {
+    await walkthrough.rowAction(page.locator('main table tbody tr').first(), /^terms$/i);
+    await page.waitForTimeout(800);
+  },
   // UX deck: the row action menu of the first request, opened.
   'ux-scr-nb-08-actions': async (page) => {
     await page.locator('main table tbody tr').first().getByRole('button', { name: /^Actions for/ }).click();

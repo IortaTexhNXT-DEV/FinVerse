@@ -230,6 +230,11 @@ const after = {
     await walkthrough.rowAction(page.locator('main table tbody tr').first(), /^terms$/i);
     await page.waitForTimeout(800);
   },
+  // The Close dialog of the first new request, from the row action menu.
+  'scr-nb-08-03-close': async (page) => {
+    await walkthrough.rowAction(page.locator('main table tbody tr').first(), /^close$/i);
+    await page.waitForTimeout(800);
+  },
   // UX deck: the row action menu of the first request, opened.
   'ux-scr-nb-08-actions': async (page) => {
     await page.locator('main table tbody tr').first().getByRole('button', { name: /^Actions for/ }).click();

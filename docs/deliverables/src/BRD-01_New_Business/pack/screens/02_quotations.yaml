@@ -170,7 +170,7 @@ screens:
     shots:
       - {state: list, user: ao, caption: "Quotation Requests, To Quote tab"}
       - {state: capture, user: ao, click: "^capture request$", caption: "Capture Quotation Request dialog"}
-      - {state: close, user: ao, click: "^close$", caption: "Close dialog with the required Reason for Closing"}
+      - {state: close, user: ao, caption: "Close dialog with the required Reason for Closing, opened from the row action menu"}
     fields:
       - "Tabs | To Quote / Quoted / Closed | Tab | - | - | Fixed | To Quote | - | - | -"
       - "Search | Search Request No. | Text | Request No., prospect or cover | N | - | Blank | - | Contains search | -"
@@ -180,6 +180,7 @@ screens:
       - "List | Product | Column | Requested product | - | Product catalogue | - | Read only | - | -"
       - "List | Requested Cover | Column | Text | - | Request | - | Read only | - | -"
       - "List | Status | Column | New, Quoted, Closed with the close reason | - | Request | - | Read only | - | -"
+      - "List | Actions | Row action menu | The actions of the request the user may take now: Create Prospect or Create Quotation, Close (last, in red); Open Quotation once quoted | - | - | - | - | - | -"
       - "Capture dialog | Channel | Drop-down | - | Y | List of values SOURCE_CHANNEL | E-mail | New | - | -"
       - "Capture dialog | Source reference | Text | E-mail subject or source-system reference, up to 60 characters | N | - | Blank | New | A reference already received on the same channel is refused | Request <reference> of <channel> was already received"
       - "Capture dialog | Existing client | Look-up | Code or name | Cond.: the client or the prospect name | Client master | Blank | New | A client or a prospect name is given | Choose the client or give the prospect name"

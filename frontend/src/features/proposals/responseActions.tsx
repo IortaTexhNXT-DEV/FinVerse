@@ -1,4 +1,4 @@
-import { Pencil, Star } from 'lucide-react';
+import { Download, Pencil, Star } from 'lucide-react';
 import type { InsurerResponse } from '@/api/proposals';
 import type { RowAction } from '@/components/ui/RowActions';
 
@@ -21,4 +21,9 @@ export function responseActions(
       onSelect: () => onRecommend(r),
     },
   ];
+}
+
+/** The row action of an archived proposal slip version: download its file. */
+export function archivedSlipActions(onDownload: () => void): RowAction[] {
+  return [{ label: 'Download', icon: <Download size={14} />, onSelect: onDownload }];
 }

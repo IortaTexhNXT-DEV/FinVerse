@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { InsurerResponse } from '@/api/proposals';
-import { responseActions } from './responseActions';
+import { archivedSlipActions, responseActions } from './responseActions';
 
 const response = (over: Partial<InsurerResponse>): InsurerResponse => ({
   id: 1,
@@ -38,5 +38,15 @@ describe('responseActions', () => {
     responseActions(r, true, terms, recommend).forEach((a) => void a.onSelect(''));
     expect(terms).toHaveBeenCalledWith(r);
     expect(recommend).toHaveBeenCalledWith(r);
+  });
+});
+
+describe('archivedSlipActions', () => {
+  it('offers the download of an archived slip version in the row menu', () => {
+    const download = vi.fn();
+    const [action] = archivedSlipActions(download);
+    expect(action?.label).toBe('Download');
+    void action?.onSelect('');
+    expect(download).toHaveBeenCalledOnce();
   });
 });

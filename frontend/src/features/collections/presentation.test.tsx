@@ -13,6 +13,7 @@ import {
   changedValueText,
   componentText,
   dispositionLabel,
+  handOffLabel,
   lockText,
   roleLabel,
   ruleSummary,
@@ -232,6 +233,14 @@ describe('the account record in words', () => {
     expect(changedValueText('status', 'OPEN', look)).toBe('Open');
     expect(changedValueText('category', 'B', look)).toBe('Category B');
     expect(changedValueText('remarks', null, look)).toBe('—');
+  });
+
+  it('names the hand-off to Operations and its feed, never the code in words', () => {
+    expect(handOffLabel('CHECK_PICKUP')).toBe('Check pick-up');
+    expect(handOffLabel('COLLECTION_CHECK_PICKUP')).toBe('Check pick-up');
+    expect(handOffLabel('COLLECTION_CWT')).toBe('BIR 2307 reversal');
+    expect(handOffLabel('DP_REVERSAL')).toBe('DP reversal');
+    expect(handOffLabel('CHECK_PICKUP')).not.toBe('Check Pickup');
   });
 
   it('names the statement template by its version, never its code', () => {

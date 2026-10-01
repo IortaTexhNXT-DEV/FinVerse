@@ -11,7 +11,7 @@ import { validity } from './collectionsLogic';
 import { displayNameOf } from '@/api/users';
 import { UserName } from '@/components/ui/UserName';
 import { LovLabel } from '@/components/broking/LovLabel';
-import { changedFieldText, changedValueText, dispositionLabel } from './presentation';
+import { changedFieldText, changedValueText, dispositionLabel, handOffLabel } from './presentation';
 import type { ValueLookups } from './presentation';
 import { useLovLabel } from '@/components/broking/useLabels';
 import { useDisplayName } from '@/components/ui/useDisplayName';
@@ -48,7 +48,7 @@ export function DispositionsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) 
               render: (d) => dispositionLabel(rules.data, d.code),
             },
             { key: 'r', header: 'Remarks', render: (d) => d.remarks ?? '' },
-            { key: 'a', header: 'Hand-off', render: (d) => humanize(d.opsAction) },
+            { key: 'a', header: 'Hand-off', render: (d) => handOffLabel(d.opsAction) },
             {
               key: 'b',
               header: 'Encoded By',
@@ -99,7 +99,7 @@ export function DispositionsTab({ invoiceNo }: Readonly<{ invoiceNo: string }>) 
             {
               key: 'f',
               header: 'Feed',
-              render: (h) => humanize(h.feedCode.replace('COLLECTION_', '')),
+              render: (h) => handOffLabel(h.feedCode),
             },
             { key: 'k', header: 'Reference', render: (h) => h.key },
             { key: 'd', header: 'Sent', render: (h) => formatDateTime(h.createdAt) },

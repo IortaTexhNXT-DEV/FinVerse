@@ -160,3 +160,22 @@ export function templateText(version: string | undefined): string {
   const n = /v(\d+)$/i.exec(version ?? '')?.[1];
   return n === undefined ? '' : `Statement template version ${n}.`;
 }
+
+/** What a disposition hands to Operations, and the feed Operations takes it from, by name. */
+const HAND_OFF_LABELS: Readonly<Record<string, string>> = {
+  NONE: 'None',
+  CHECK_PICKUP: 'Check pick-up',
+  CWT2307_REVERSAL: 'BIR 2307 reversal',
+  CWT: 'BIR 2307 reversal',
+  DP_REVERSAL: 'DP reversal',
+  DP_LIST: 'DP reversal',
+  DP_RETURNED: 'DP returned by insurer',
+  CANCEL_REQUEST: 'Cancellation request',
+  REFUND: 'Refund',
+};
+
+/** The name of a hand-off to Operations or of its feed ("Check pick-up", never CHECK_PICKUP). */
+export function handOffLabel(code: string): string {
+  const key = code.replace(/^COLLECTION_/, '');
+  return HAND_OFF_LABELS[key] ?? humanize(key);
+}

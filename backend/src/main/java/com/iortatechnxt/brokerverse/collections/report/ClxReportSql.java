@@ -49,15 +49,29 @@ public class ClxReportSql {
   /** Invoicing branch filter. */
   public static final String BRANCH = "branchId";
 
-  /** Item columns selected by the item reports. */
+  /**
+   * Item columns selected by the item reports, as the screens show them: the users by name, the
+   * disposition by its label, the tagging owner and the status in words.
+   */
   static final String ITEM_SELECT =
       "select i.client_code, i.assured_name, i.invoice_no, i.policy_no, i.arn, i.booking_date,"
           + " i.aging_days, i.aging_bracket, b.code as branch_code, i.insurer_code,"
           + " i.product_line, i.inception_date, i.expiry_date, i.currency, i.gross_premium,"
-          + " i.net_outstanding, i.outstanding_pr2307, i.segment, i.sales_unit,"
-          + " i.unit_head_username, i.ao_username, i.current_handler, i.payment_status,"
-          + " i.invoice_category, i.disposition_code, i.category, i.tagging_owner,"
-          + " i.last_effort_at, i.last_effort_code, i.remarks, i.status, i.completed_on";
+          + " i.net_outstanding, i.outstanding_pr2307, i.segment, i.sales_unit, "
+          + "coalesce((select u.full_name from sec_user u where u.username = i.unit_head_username),"
+          + " i.unit_head_username)"
+          + " as unit_head_username, "
+          + "coalesce((select u.full_name from sec_user u where u.username = i.ao_username),"
+          + " i.ao_username)"
+          + " as ao_username, "
+          + "coalesce((select u.full_name from sec_user u where u.username = i.current_handler),"
+          + " i.current_handler)"
+          + " as current_handler, i.payment_status, i.invoice_category,"
+          + " coalesce((select v.label from lov_value v where v.type_code = 'CLX_PR_DISPOSITION'"
+          + " and v.code = i.disposition_code order by v.id desc limit 1), i.disposition_code)"
+          + " as disposition_code, i.category, initcap(i.tagging_owner) as tagging_owner,"
+          + " i.last_effort_at, i.last_effort_code, i.remarks,"
+          + " initcap(replace(i.status, '_', ' ')) as status, i.completed_on";
 
   /** Items with their branch. */
   static final String ITEM_FROM =

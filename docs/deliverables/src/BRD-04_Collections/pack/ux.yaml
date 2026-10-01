@@ -14,6 +14,9 @@ issue:
 navigation:
   roles: [MKT_AO, MKT_TL, MKT_HANDLER, MKT_COLLECTION, CLX_TL, MKT_SECTION_HEAD, UNAPPLIED_HANDLER, PROCESSOR, CASHIER,
           DISBURSEMENT, COMPTROLLERSHIP, BUSINESS_ADMIN, SYSADMIN, AUDITOR]
+  # The Unapplied Payment Handler has the same menu as the Marketing Handler.
+  shared:
+    ux-nav-07-menu: BRD-04:ux-nav-03-menu
 
 # Who each persona is (what they do comes from the persona table of the FRS unless given here).
 personas:
@@ -111,7 +114,7 @@ confirm:
     - screens: [SCR-CL-03]
       observation: >-
         The Hand-offs to Operations table on the Dispositions & Efforts tab shows the reference of a hand-off as
-        Operations keeps it (PU:BI-HO-2026-000007:5 for a check pick-up request).
+        Operations keeps it (PU:BI-HO-2026-000009:5 for a check pick-up request).
       proposal: Show the number of the Operations record the hand-off created (the check pick-up or reversal request).
     - screens: [SCR-CL-15]
       observation: >-

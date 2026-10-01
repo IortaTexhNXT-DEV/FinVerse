@@ -49,7 +49,7 @@ screens:
       - Statement of Account › Open Installment Plan
     shots:
       - {state: record, user: clxhandler, open_plan: seed, caption: "Installment Plan: the installments with their coverage, due date, amounts and status"}
-      - {state: actions, user: clxhandler, open_plan: seed, caption: "The row menu of an installment: Generate SOA and Record Promise"}
+      - {state: actions, user: clxhandler, open_plan: walkthrough, caption: "The row menu of an installment: Generate SOA and Record Promise"}
     fields:
       - "Header | [Plan and ARN chips, status pill, basis tag] | Reference chip, status pill, tag | Active, Completed or Cancelled | - | Plan | - | Read only | - | -"
       - "Facts | Invoice / Billing Frequency / Total / Paid / First Due / Created By | Display | Amounts with the currency; names | - | Plan | - | Read only | - | -"

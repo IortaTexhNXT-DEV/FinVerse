@@ -38,6 +38,7 @@ const opens = {
     return `/collections/items/${accountA(ctx)}`;
   },
   'open_client:first': () => '/collections/clients/CL-2026-000005',
+  'open_plan:walkthrough': (ctx) => `/collections/plans/${planD(ctx)}`,
   'open_plan:seed': (ctx) => `/collections/plans/${ctx.one("select id from clx_installment_plan where plan_no = 'IPL-2026-000001'")}`,
   'open_statement:first': (ctx) => `/collections/billing/${ctx.one("select id from clx_billing_statement where status = 'SENT' order by id limit 1")}`,
   'open_statement:to_send': async (ctx) => `/collections/billing/${await statementToSend(ctx)}`,
@@ -191,6 +192,7 @@ const after = {
     await settle(page, 300);
   },
   'scr-cl-06-02-actions': async (page) => {
+    // The installment of cycle 2 of the plan of walkthrough D: not billed yet, so both actions are offered.
     await page.locator('main table tbody tr').nth(1).getByRole('button', { name: /^Actions for/ }).click();
     await settle(page, 300);
   },
@@ -203,7 +205,7 @@ const after = {
     await dialogOf(page).getByLabel(/^Resolution/).fill('Client paid the first half; the balance is on a promise to pay');
   },
   'scr-cl-19-02-change': async (page) => {
-    await page.locator('main table tbody tr').filter({ hasText: 'CLX_MIN_BALANCE_THRESHOLD' }).first().click();
+    await page.locator('main table tbody tr').filter({ hasText: 'Minimal Balance Threshold' }).first().click();
     await settle(page, 600);
   },
 };

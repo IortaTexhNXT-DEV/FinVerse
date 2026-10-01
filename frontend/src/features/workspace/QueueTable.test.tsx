@@ -7,6 +7,10 @@ import { lovApi } from '@/api/lov';
 import type { WorkItem } from '@/api/workflow';
 import type { Company } from '@/api/types';
 import { WorkspaceContext } from '@/context/workspaceContext';
+import { setUserDirectory } from '@/api/users';
+import { workflowApi } from '@/api/workflow';
+import { ToastContext } from '@/components/ui/toastContext';
+import { AssignDialog } from './AssignDialog';
 import { QueueTable } from './QueueTable';
 
 const item = (over: Partial<WorkItem>): WorkItem => ({
@@ -99,5 +103,22 @@ describe('QueueTable', () => {
         .getAllByRole('menuitem')
         .map((m) => m.textContent),
     ).toEqual(['Assign']);
+  });
+
+  it('names the users of the Assign dialog, never by their login', async () => {
+    setUserDirectory([{ username: 'ao', displayName: 'Aileen Account Officer' }]);
+    vi.spyOn(workflowApi, 'assignees').mockResolvedValue(['ao']);
+    render(
+      <QueryClientProvider client={new QueryClient()}>
+        <ToastContext.Provider
+          value={{ success: vi.fn(), error: vi.fn(), warning: vi.fn(), info: vi.fn() }}
+        >
+          <AssignDialog item={item({})} onClose={vi.fn()} onDone={() => Promise.resolve()} />
+        </ToastContext.Provider>
+      </QueryClientProvider>,
+    );
+    expect(await screen.findByRole('option', { name: 'Aileen Account Officer' })).toBeTruthy();
+    expect(screen.queryByRole('option', { name: 'ao' })).toBeNull();
+    setUserDirectory([]);
   });
 });

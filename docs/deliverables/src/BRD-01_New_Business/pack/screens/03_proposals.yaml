@@ -20,10 +20,9 @@ screens:
       - "List | PRF No. | Column | PRF-yyyy-nnnnnn and the creation date | - | Numbering (PROPOSAL_NUMBER_PREFIX) | - | Read only | - | -"
       - "List | ARN | Column | ARN-yyyy-nnnnnn | - | Numbering | - | Read only | - | -"
       - "List | Client | Column | Name and code | - | Client master | - | Read only | - | -"
-      - "List | Product | Column | Product code | - | Product catalogue | - | Read only | - | -"
+      - "List | Product | Column | Product name | - | Product catalogue | - | Read only | - | -"
       - "List | Sum Insured | Column | Total sum insured | - | PRF items | - | Read only | - | -"
-      - "List | Slips | Column | QS-yyyy-nnnnnn / PS-yyyy-nnnnnn | - | Numbering | - | Read only | - | -"
-      - "List | Chosen Insurer | Column | Insurer of the proposal slip | - | Insurer responses | - | Read only | - | -"
+      - "List | Slips / Chosen Insurer | Column | QS-yyyy-nnnnnn / PS-yyyy-nnnnnn, with the insurer of the proposal slip under them | - | Numbering, insurer responses | - | Read only | - | -"
       - "List | Stage | Column | Stage badge | - | Workflow NB_PROPOSAL | - | Read only | - | -"
     actions:
       - "TSU Workbench | TSU_PROCESS or TSU_APPROVE | Always | Opens the TSU Workbench | - | -"

@@ -189,7 +189,10 @@ describe('placement and issuance workbenches', () => {
     );
     render(wrap(<IssuanceWorkbenchPage />));
     expect(await screen.findByText('Issued Client')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Upload E-policy' })).toBeInTheDocument();
+    // Upload E-policy is offered in the row action menu of the placed account.
+    await user.click(screen.getByRole('button', { name: 'Actions for ARN-2026-000003' }));
+    expect(screen.getByRole('menuitem', { name: 'Upload E-policy' })).toBeInTheDocument();
+    await user.keyboard('{Escape}');
     await user.click(screen.getByRole('tab', { name: 'IA to Generate' }));
     await waitFor(() => expect(workbench).toHaveBeenLastCalledWith(1, 'IA_TO_GENERATE', '', 0));
   });

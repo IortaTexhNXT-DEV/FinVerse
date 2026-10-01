@@ -22,10 +22,10 @@ screens:
       - "List | Status | Column | Account stage or e-policy status | - | Workflow NB_ACCOUNT, e-policy | - | Read only | - | -"
       - "List | Product Line | Column | Line, product and insurer | - | Product catalogue | - | Read only | - | -"
       - "List | Policy No. | Column | Policy number(s) | - | Account | - | Read only | - | -"
-      - "List | E-policy / Mortgagee / Upload E-policy | Column | File name and time received (review, dispatch); mortgagee bank (IA to Generate); upload link (awaiting policy) | - | E-policy, account | - | Read only | - | -"
+      - "List | E-policy / Mortgagee / Actions | Column | File name and time received (review, dispatch); mortgagee bank (IA to Generate); row action menu with Upload E-policy (awaiting policy) | - | E-policy, account | - | Read only | - | -"
     actions:
       - "Upload E-policies | EPOLICY_MANAGE | Always | Opens E-policy Upload | - | -"
-      - "Upload E-policy (row) | EPOLICY_MANAGE | Placed – Awaiting Policy | Opens E-policy Upload with the ARN filled in | - | -"
+      - "Upload E-policy (row action menu) | EPOLICY_MANAGE | Placed – Awaiting Policy | Opens E-policy Upload with the ARN filled in | - | -"
       - "Generate Insurance Advice | EPOLICY_MANAGE | IA to Generate, at least one row selected | Generates the Insurance Advice of each selected mortgaged account; the outcome of each is listed | Unchanged | -"
       - "Send E-policies | EPOLICY_SEND | Ready to Dispatch, at least one row selected | Asks for an optional password hint and sends each e-policy to the account contact, encrypted | Unchanged (e-policy dispatched) | E-mail to each client and the password e-mail"
     rules:
@@ -42,7 +42,7 @@ screens:
       Stores the e-policies received from the insurers on their accounts: one e-policy matched by the ARN, the policy
       number or the ARN in the file, or up to 50 at once with a match review. Each stored file opens an extraction review.
     entry:
-      - Issuance Workbench › Upload E-policies, or Upload E-policy on a row
+      - Issuance Workbench › Upload E-policies, or Upload E-policy in the row action menu
     shots:
       - {state: empty, user: proc, caption: "E-policy Upload: single and bulk"}
       - {state: bulk, user: proc, fill: epolicy_bulk, caption: "Bulk upload match review"}

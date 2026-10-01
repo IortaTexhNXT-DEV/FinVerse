@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { adviceActions, dispatchActions } from './issuanceRowActions';
+import { adviceActions, awaitingPolicyActions, dispatchActions } from './issuanceRowActions';
 
 describe('issuance row actions', () => {
   it('offers Send to the E-policy Sender only', () => {
@@ -18,5 +18,13 @@ describe('issuance row actions', () => {
     expect(action?.label).toBe('Download PDF');
     void action?.onSelect('');
     expect(download).toHaveBeenCalledOnce();
+  });
+
+  it('opens the e-policy upload of a placed account from its row menu', () => {
+    const open = vi.fn();
+    const [action] = awaitingPolicyActions('ARN-2026-910001', open);
+    expect(action?.label).toBe('Upload E-policy');
+    void action?.onSelect('');
+    expect(open).toHaveBeenCalledWith('/issuance/upload?arn=ARN-2026-910001');
   });
 });

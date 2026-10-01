@@ -1,10 +1,10 @@
 import { Hand, UserPlus } from 'lucide-react';
-import type { MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { WORKFLOW_NAMES } from '@/api/workflow';
 import type { WorkItem } from '@/api/workflow';
-import { Button } from '@/components/ui/Button';
+import { useLovLabelOrNull, useSalesUnitName } from '@/components/broking/useLabels';
 import { DataTable } from '@/components/ui/DataTable';
+import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDateTime } from '@/utils/format';
 import { ageText } from './age';
@@ -20,13 +20,10 @@ interface QueueTableProps {
   onAssign: (item: WorkItem) => void;
 }
 
-/** Runs a row button without also opening the row. */
-const only = (action: () => void) => (e: MouseEvent) => {
-  e.stopPropagation();
-  action();
-};
-
-/** Work items with reference, stage, origin, age, due time, assignee and claim / assign. */
+/**
+ * Work items with reference, stage, origin, age, due time, assignee, and Claim / Assign in the
+ * row action menu (screen standard: one menu button at the end of the row).
+ */
 export function QueueTable(p: Readonly<QueueTableProps>) {
   return (
     <DataTable<WorkItem>
@@ -46,8 +43,10 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
           key: 'stage',
           header: 'Stage',
           render: (i) => (
-            <span>
-              <StatusBadge status={i.stageCode} />{' '}
+            <span className="cell-stack">
+              <span>
+                <StatusBadge status={i.stageCode} />
+              </span>
               <span className="muted">{WORKFLOW_NAMES[i.workflowCode]}</span>
             </span>
           ),
@@ -55,7 +54,12 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
         {
           key: 'unit',
           header: 'From',
-          render: (i) => i.originatingUnit ?? <UserName login={i.createdBy} />,
+          render: (i) =>
+            i.originatingUnit ? (
+              <OriginUnit code={i.originatingUnit} />
+            ) : (
+              <UserName login={i.createdBy} />
+            ),
         },
         { key: 'age', header: 'In Stage', render: (i) => ageText(i.stageEnteredAt) },
         { key: 'due', header: 'Due', render: (i) => <DueCell item={i} /> },
@@ -68,29 +72,24 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
           key: 'actions',
           header: '',
           render: (i) => (
-            <span className="row">
-              {!i.assignee && (
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  icon={<Hand size={14} />}
-                  busy={p.claiming}
-                  onClick={only(() => p.onClaim(i))}
-                >
-                  Claim
-                </Button>
-              )}
-              {p.canAssign && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  icon={<UserPlus size={14} />}
-                  onClick={only(() => p.onAssign(i))}
-                >
-                  Assign
-                </Button>
-              )}
-            </span>
+            <RowActions
+              record={i.reference}
+              actions={[
+                {
+                  label: 'Claim',
+                  icon: <Hand size={14} />,
+                  hidden: Boolean(i.assignee),
+                  disabledReason: p.claiming ? 'A claim is in progress' : undefined,
+                  onSelect: () => p.onClaim(i),
+                },
+                {
+                  label: 'Assign',
+                  icon: <UserPlus size={14} />,
+                  hidden: !p.canAssign,
+                  onSelect: () => p.onAssign(i),
+                },
+              ]}
+            />
           ),
         },
       ]}
@@ -103,4 +102,14 @@ function DueCell({ item }: Readonly<{ item: WorkItem }>) {
     return <span className="muted">—</span>;
   }
   return <span className={item.overdue ? 'text-danger' : ''}>{formatDateTime(item.dueAt)}</span>;
+}
+
+/**
+ * The unit a work item comes from, by its name: the label of a market segment (Corporate
+ * Banking), else the name of a sales unit (team, department or region); never the code.
+ */
+function OriginUnit({ code }: Readonly<{ code: string }>) {
+  const segment = useLovLabelOrNull('MARKET_SEGMENT');
+  const unit = useSalesUnitName();
+  return <>{segment(code) ?? unit(code)}</>;
 }

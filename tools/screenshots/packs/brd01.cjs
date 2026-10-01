@@ -220,6 +220,11 @@ const after = {
     await page.waitForLoadState('networkidle').catch(() => {});
     await page.waitForTimeout(1200);
   },
+  // The Assign dialog of a team leader, from the row action menu of the first item.
+  'scr-nb-38-02-assign': async (page) => {
+    await walkthrough.rowAction(page.locator('main table tbody tr').first(), /^assign$/i);
+    await page.waitForTimeout(800);
+  },
   // UX deck: the row action menu of the first request, opened.
   'ux-scr-nb-08-actions': async (page) => {
     await page.locator('main table tbody tr').first().getByRole('button', { name: /^Actions for/ }).click();

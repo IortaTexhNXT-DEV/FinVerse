@@ -105,17 +105,17 @@ screens:
       - Notification links
     shots:
       - {state: list, user: ao, caption: "My Work, All my queues"}
-      - {state: assign, user: mkttl, click: "^assign$", caption: "Assign dialog of a team leader"}
+      - {state: assign, user: mkttl, caption: "Assign dialog of a team leader, opened from the row action menu"}
     fields:
       - "Summary | Assigned to me / Open in my queues / Overdue / Queues I work | Figure | Counts; a figure filters the list | - | Work items | - | Read only | - | -"
       - "Stage tiles | [One tile per stage of each workflow the user works] | Tile | Open and overdue counts | - | Workflows NB_CLIENT, NB_QUOTATION, NB_PROPOSAL, NB_ACCOUNT | - | - | - | -"
       - "Toolbar | Assigned to me / Team queue / All my queues | Tab | - | - | Fixed | All my queues | - | - | -"
       - "Toolbar | Overdue only | Check box | - | N | - | Not ticked | - | - | -"
       - "Toolbar | Reference or name | Text | - | N | - | Blank | - | Contains search | -"
-      - "List | Reference, Description, Stage, From, In Stage, Due, Assignee | Column | Due in red when overdue; Unassigned | - | Work items | - | Read only | - | Nothing waiting here."
+      - "List | Reference, Description, Stage, From, In Stage, Due, Assignee, Actions | Column | Stage with the workflow under it; From names the segment or sales unit; Due in red when overdue; Unassigned; Claim and Assign in the row action menu | - | Work items | - | Read only | - | Nothing waiting here."
       - "Assign dialog | Assignee | Drop-down | Users of the team that works the stage, or Team queue (unassigned) | N | Users holding the stage's permission | The current assignee | Open item | Only a user of the stage's team | <user> does not work this queue"
     actions:
-      - "Claim | Holder of the stage's permission | Unassigned item | Assigns the item to the user | Unchanged | -"
+      - "Claim | Holder of the stage's permission | Unassigned item (row action menu) | Assigns the item to the user | Unchanged | -"
       - "Assign | WORK_ASSIGN | Open item | Assigns the item or returns it to the team queue | Unchanged | In-app notice to the new assignee"
       - "Clear Stage Filter | Every user of the screen | A stage filter is set | Clears the stage filter | - | -"
       - "Open a row | Every user of the screen | Always | Opens the record | - | -"

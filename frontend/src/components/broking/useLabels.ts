@@ -23,6 +23,21 @@ export function useLovLabel(type: string): (code: string | null | undefined) => 
   };
 }
 
+/**
+ * Label lookup of a list of values that tells an unknown code apart: the label, or null when the
+ * code is not a value of the list (so the caller can try another list).
+ */
+export function useLovLabelOrNull(
+  type: string,
+): (code: string | null | undefined) => string | null {
+  const options = useQuery({
+    queryKey: ['lov', type],
+    queryFn: () => lovApi.options(type),
+    staleTime: STALE,
+  });
+  return (code) => (code ? (options.data?.find((o) => o.code === code)?.label ?? null) : null);
+}
+
 /** Name lookup of product lines: returns a function from line code to its name. */
 export function useLineName(): (code: string | null | undefined) => string {
   const lines = useQuery({

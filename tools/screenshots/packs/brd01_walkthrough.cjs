@@ -171,6 +171,27 @@ async function act(page, name, opts = {}) {
   return page;
 }
 
+/** Runs an action of a table row: opens the row's action menu, then chooses the action. */
+async function rowAction(row, name) {
+  await row.getByRole('button', { name: /^Actions for/ }).click();
+  await row.page().waitForTimeout(300);
+  await row.page().getByRole('menuitem', { name }).first().click();
+}
+
+/** Whether the row's action menu offers the action (the menu is closed again). */
+async function rowOffers(row, name) {
+  const menu = row.getByRole('button', { name: /^Actions for/ });
+  if (!(await menu.isVisible().catch(() => false))) {
+    return false;
+  }
+  await menu.click();
+  await row.page().waitForTimeout(300);
+  const offered = await row.page().getByRole('menuitem', { name }).first().isVisible().catch(() => false);
+  await row.page().keyboard.press('Escape');
+  await row.page().waitForTimeout(200);
+  return offered;
+}
+
 async function tab(page, name) {
   await page.getByRole('tab', { name: new RegExp(`^${name}`) }).first().click();
   await settle(page, 600);
@@ -490,12 +511,9 @@ const steps = {
   'wt-b-03': async (ctx) => {
     const page = await go(ctx, 'tsu', '/proposals/tsu');
     const row = page.locator('table tbody tr').filter({ hasText: prfNo(ctx) }).first();
-    if (await row.isVisible().catch(() => false)) {
-      const claim = button(row, 'Claim');
-      if (await claim.isVisible().catch(() => false)) {
-        await claim.click();
-        await settle(page, 1200);
-      }
+    if ((await row.isVisible().catch(() => false)) && (await rowOffers(row, /^claim$/i))) {
+      await rowAction(row, /^claim$/i);
+      await settle(page, 1200);
     }
     return page;
   },
@@ -830,4 +848,4 @@ const bulk = {
 
 async function prepare() {}
 
-module.exports = { steps, bulk, prepare, addItem, bulkClientFile, pdf, csv, act, press, tab, go, button, settle, uploadDocument, TMP };
+module.exports = { steps, bulk, prepare, rowAction, rowOffers, addItem, bulkClientFile, pdf, csv, act, press, tab, go, button, settle, uploadDocument, TMP };

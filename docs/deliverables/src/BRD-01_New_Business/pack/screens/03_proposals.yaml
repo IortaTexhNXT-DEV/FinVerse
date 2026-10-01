@@ -151,9 +151,9 @@ screens:
       - {state: list, user: tsu, caption: "TSU Workbench"}
     fields:
       - "Stage tiles | Received by TSU, Quotation slip in preparation, Quotation slip for approval, Awaiting insurer terms, Insurer terms received, Proposal slip for approval | Tile | Open and overdue counts | - | Workflow NB_PROPOSAL | - | - | A tile filters the list to its stage | -"
-      - "List | Reference, Description, Stage, From, In Stage, Due, Assignee | Column | Due in red when overdue | - | Work items | - | Read only | - | -"
+      - "List | Reference, Description, Stage, From, In Stage, Due, Assignee, Actions | Column | Stage with the workflow under it; From names the segment or sales unit; Due in red when overdue; Claim and Assign in the row action menu | - | Work items | - | Read only | - | -"
     actions:
-      - "Claim | Holder of the stage's permission | Unassigned item | Assigns the item to the user | Unchanged | -"
+      - "Claim | Holder of the stage's permission | Unassigned item (row action menu) | Assigns the item to the user | Unchanged | -"
       - "Assign | WORK_ASSIGN | Always | Opens the Assign dialog: a user of the stage's team, or back to the team queue | Unchanged | In-app notice to the new assignee"
       - "Open a row | Every user of the screen | Always | Opens the PRF record | - | -"
     rules:

@@ -29,6 +29,8 @@ export interface UserProfile {
   lastLogoutAt?: string;
   /** Mobile number, maintained by the user on My Profile (UQ17). */
   mobileNo?: string;
+  /** Data access to every company and branch; false when limited to selected companies. */
+  allCompanies?: boolean;
   roles: string[];
   permissions: string[];
 }

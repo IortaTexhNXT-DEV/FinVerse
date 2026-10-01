@@ -1,3 +1,4 @@
+import type { DataScopeValue } from './dataScope';
 import { api, toQuery } from './client';
 import type { PageResponse } from './types';
 
@@ -43,6 +44,8 @@ export interface AccessRequestDetails {
   effectiveFrom?: string;
   batchId?: number;
   authorizationLimit?: number | null;
+  /** Requested data access in its text form ("ALL" or "12:*;14:3,5"); absent = unchanged. */
+  dataScope?: string;
 }
 
 export interface ApproverStep {
@@ -123,6 +126,7 @@ export interface AccessRequestInput {
   portalRole?: string;
   effectiveFrom?: string;
   authorizationLimit?: number;
+  dataScope?: DataScopeValue;
   approvers?: string[];
 }
 
@@ -198,6 +202,8 @@ export interface AccessBatchDecision {
 }
 
 export interface UserAccess {
+  /** User id (Data access of the user). */
+  id?: number;
   username: string;
   fullName: string;
   enabled: boolean;

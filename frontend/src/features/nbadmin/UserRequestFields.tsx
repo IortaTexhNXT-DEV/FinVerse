@@ -6,7 +6,8 @@ import { LovSelect } from '@/components/broking/LovSelect';
 import { Field } from '@/components/ui/Field';
 import { useWorkspace, useBaseCurrency } from '@/context/workspaceContext';
 import { countOf, formatAmount } from '@/utils/format';
-import { usersFor } from './accessRequest';
+import { usersFor } from './accessUsers';
+import { DataAccessFields } from './DataAccessFields';
 import { profileGroups } from './profileGroups';
 import type { AccessRequestErrors, AccessRequestForm } from './accessRequest';
 import { inCurrency } from '@/utils/currencyLabel';
@@ -285,7 +286,7 @@ function StateFields({ form, set, users }: Readonly<FieldsProps>) {
 
 /**
  * The fields of a user request (BRD 1.002-1.005; FR-UA-011 to FR-UA-014): the user, the new data
- * with the current values, the group profiles, the reason of a deactivation, the unlock of a
+ * with the current values, the group profiles, the data access (companies and branches), the reason of a deactivation, the unlock of a
  * reactivation, or the party of an external (portal) user.
  */
 export function UserRequestFields(props: Readonly<FieldsProps>) {
@@ -300,6 +301,7 @@ export function UserRequestFields(props: Readonly<FieldsProps>) {
       {!internal && <ExternalParty {...props} />}
       {withData && <DataFields {...props} />}
       {withData && internal && <RolePicker {...props} />}
+      {withData && internal && <DataAccessFields {...props} />}
       {(form.type === 'DISABLE_USER' || form.type === 'ENABLE_USER') && internal && (
         <StateFields {...props} />
       )}

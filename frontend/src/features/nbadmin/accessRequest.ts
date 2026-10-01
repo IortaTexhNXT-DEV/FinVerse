@@ -8,6 +8,9 @@ import type {
   RoleInfo,
   UserAccess,
 } from '@/api/nbadmin';
+import { parseScopeText } from '@/api/dataScope';
+import type { DataScopeValue } from '@/api/dataScope';
+import { scopeError } from '@/features/admin/dataAccess';
 
 /** An access request as edited on the New / Edit Request page (BRD 1.002-1.005, 3.002). */
 export interface AccessRequestForm {
@@ -42,6 +45,8 @@ export interface AccessRequestForm {
   partyKind: '' | 'INSURER' | 'CLIENT';
   partyCode: string;
   portalRole: string;
+  /** Companies and branches the user may act for; undefined = unchanged (a new user: all). */
+  dataScope?: DataScopeValue;
 }
 
 export type AccessRequestErrors = Partial<Record<keyof AccessRequestForm, string>>;
@@ -216,6 +221,7 @@ function userErrors(f: AccessRequestForm, ctx: ValidationContext): AccessRequest
     errors.roleCodes = 'Select at least one role';
   }
   errors.authorizationLimit = limitError(f.authorizationLimit);
+  errors.dataScope = f.dataScope === undefined ? undefined : scopeError(f.dataScope, []);
   if (f.userType === 'EXTERNAL') {
     errors.partyKind = f.partyKind === '' ? 'Select the insurer or client' : undefined;
     errors.partyCode = f.partyCode.trim() === '' ? 'Enter the party code' : undefined;
@@ -342,6 +348,7 @@ function userDataInput(f: AccessRequestForm): Partial<AccessRequestInput> {
     businessUnitCode: text(f.businessUnitCode),
     userLevel: text(f.userLevel),
     authorizationLimit: amountOf(f.authorizationLimit),
+    dataScope: f.userType === 'INTERNAL' ? f.dataScope : undefined,
   };
 }
 
@@ -411,6 +418,7 @@ function savedUser(r: AccessRequest): Partial<AccessRequestForm> {
     partyKind: d.partyKind ?? '',
     partyCode: blank(d.partyCode),
     portalRole: blank(d.portalRole),
+    dataScope: parseScopeText(d.dataScope),
   };
 }
 
@@ -438,25 +446,6 @@ export function fromAccessRequest(r: AccessRequest, roles: RoleInfo[]): AccessRe
     justification: blank(r.justification),
     approvers: r.lifecycle.approvers.map((a) => a.approver),
   };
-}
-
-/** Status shown for a user (FR-UA-052): Active, Disabled or Locked. */
-export function userStatus(user: Pick<UserAccess, 'enabled' | 'locked'>): string {
-  if (user.locked) {
-    return 'LOCKED';
-  }
-  return user.enabled ? 'ACTIVE' : 'DISABLED';
-}
-
-/** Users offered for a request type: enabled users to deactivate, disabled or locked to reactivate. */
-export function usersFor(form: AccessRequestForm, users: UserAccess[]): UserAccess[] {
-  if (form.type === 'DISABLE_USER') {
-    return users.filter((u) => u.enabled);
-  }
-  if (form.type === 'ENABLE_USER') {
-    return users.filter((u) => !u.enabled || u.locked);
-  }
-  return users;
 }
 
 /** A new request, preset from the link (Users screen: ?type=MODIFY_USER&user=...). */

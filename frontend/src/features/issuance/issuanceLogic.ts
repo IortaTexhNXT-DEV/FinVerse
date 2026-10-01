@@ -79,3 +79,15 @@ export function matchText(method: string | null | undefined): string {
   }
   return MATCH_TEXTS[method] ?? humanize(method).toLowerCase();
 }
+
+/**
+ * The notes of an extraction as sentences, one per note ("Premium not found."): the notes are
+ * written lower case and separated by semicolons.
+ */
+export function extractionNotes(note: string): string[] {
+  return note
+    .split(';')
+    .map((n) => n.trim())
+    .filter((n) => n !== '')
+    .map((n) => `${n.charAt(0).toUpperCase()}${n.slice(1)}${n.endsWith('.') ? '' : '.'}`);
+}

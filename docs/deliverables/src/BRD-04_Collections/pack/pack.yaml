@@ -35,6 +35,11 @@ personas:
   SYSADMIN: {name: System Administrator, user: admin}
   AUDITOR: {name: Auditor, user: auditor}
 
+# The other persona whose sidebar the set shows: the authorizer of master data authorizes the escalation rules
+# (walkthrough B); no Collections role holds the authorization of master data (CLR-CL-31).
+menu_personas:
+  AUTHORIZER: {name: Authorizer of master data, user: checker}
+
 # Packs of other BRDs whose screens a walkthrough step may show (Check Pick-up and Incoming Requests of Cashiering).
 foreign_packs: [../../BRD-02_Operations/pack/pack.yaml]
 

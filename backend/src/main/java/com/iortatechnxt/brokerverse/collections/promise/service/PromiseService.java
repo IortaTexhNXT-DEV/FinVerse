@@ -207,9 +207,7 @@ public class PromiseService {
     }
     BigDecimal amount = input.amount() == null ? outstanding : input.amount();
     if (amount.compareTo(outstanding) > 0) {
-      throw new BusinessRuleException(
-          "CLX_PROMISE_OVER_BALANCE",
-          "The promised amount " + amount + " is above the outstanding " + outstanding);
+      throw new BusinessRuleException("CLX_PROMISE_OVER_BALANCE", overBalance(amount, outstanding));
     }
     return new Terms(promisedOn, input.promisedDate(), amount, input.installmentId());
   }
@@ -353,4 +351,18 @@ public class PromiseService {
       BigDecimal amount,
       Long installmentId,
       String remarks) {}
+
+  /**
+   * The refusal of a promise above the outstanding, with the amounts as the screens show them.
+   *
+   * @param amount promised amount
+   * @param outstanding outstanding of the invoice
+   * @return the message
+   */
+  public static String overBalance(BigDecimal amount, BigDecimal outstanding) {
+    return "The promised amount "
+        + ClxText.amount(null, amount)
+        + " is above the outstanding "
+        + ClxText.amount(null, outstanding);
+  }
 }

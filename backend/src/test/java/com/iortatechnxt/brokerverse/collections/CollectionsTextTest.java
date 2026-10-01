@@ -6,6 +6,9 @@ import com.iortatechnxt.brokerverse.collections.bulk.service.CollectionsBulkUpda
 import com.iortatechnxt.brokerverse.collections.common.service.ClxText;
 import com.iortatechnxt.brokerverse.collections.disposition.service.DispositionSupport;
 import com.iortatechnxt.brokerverse.collections.disposition.service.PrDispositionService;
+import com.iortatechnxt.brokerverse.collections.installment.service.InstallmentPlanService;
+import com.iortatechnxt.brokerverse.collections.promise.service.PromiseService;
+import com.iortatechnxt.brokerverse.collections.unapplied.service.UnappliedDispositionService;
 import com.iortatechnxt.brokerverse.collections.worklist.service.AssignmentService;
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -55,5 +58,18 @@ class CollectionsTextTest {
     assertThat(PrDispositionService.RESERVED)
         .isEqualTo("This disposition is reserved to other roles");
     assertThat(AssignmentService.REASSIGN_KIND).contains("permanent").contains("temporary");
+  }
+
+  @Test
+  void refusalsShowAmountsAsOnTheScreens() {
+    assertThat(PromiseService.overBalance(new BigDecimal("30000"), new BigDecimal("22268.75")))
+        .isEqualTo("The promised amount 30,000.00 is above the outstanding 22,268.75");
+    assertThat(
+            InstallmentPlanService.totalMismatch(
+                new BigDecimal("1000"), new BigDecimal("1234567.5")))
+        .isEqualTo(
+            "The installments add up to 1,000.00 but the outstanding premium is 1,234,567.50");
+    assertThat(UnappliedDispositionService.amountOverBalance(new BigDecimal("1200")))
+        .isEqualTo("The amount must be above zero and at most the balance 1,200.00");
   }
 }

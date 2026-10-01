@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.collections.common.domain.FieldChange.Target;
 import com.iortatechnxt.brokerverse.collections.common.service.ChangeRecorder;
+import com.iortatechnxt.brokerverse.collections.common.service.ClxText;
 import com.iortatechnxt.brokerverse.collections.unapplied.domain.UnappliedDisposition;
 import com.iortatechnxt.brokerverse.collections.unapplied.domain.UnappliedDispositionRepository;
 import com.iortatechnxt.brokerverse.collections.unapplied.service.UnappliedRules.Rule;
@@ -132,9 +133,7 @@ public class UnappliedDispositionService {
           "CLX_UNAPPLIED_NO_BALANCE", item.unappliedRef() + " has no unapplied balance left");
     }
     if (amount != null && (amount.signum() <= 0 || amount.compareTo(item.balance()) > 0)) {
-      throw new BusinessRuleException(
-          "CLX_UNAPPLIED_AMOUNT",
-          "The amount must be above zero and at most the balance " + item.balance());
+      throw new BusinessRuleException("CLX_UNAPPLIED_AMOUNT", amountOverBalance(item.balance()));
     }
   }
 
@@ -206,4 +205,14 @@ public class UnappliedDispositionService {
    */
   public record DispositionInput(
       String dispositionCode, String invoiceNo, BigDecimal amount, String remarks) {}
+
+  /**
+   * The refusal of an amount above the unapplied balance, the balance as on the screens.
+   *
+   * @param balance unapplied balance
+   * @return the message
+   */
+  public static String amountOverBalance(BigDecimal balance) {
+    return "The amount must be above zero and at most the balance " + ClxText.amount(null, balance);
+  }
 }

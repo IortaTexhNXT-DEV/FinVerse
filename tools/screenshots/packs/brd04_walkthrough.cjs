@@ -221,9 +221,9 @@ const steps = {
     }
     return page;
   },
-  // 5. The Section Head authorizes the rule set up by the Business Administrator.
+  // 5. The authorizer of master data authorizes the rule set up by the Business Administrator.
   'wt-b-05': async (ctx) => {
-    const page = await go(ctx, 'clxuh', '/collections/escalation-rules');
+    const page = await go(ctx, 'checker', '/collections/escalation-rules');
     if (ctx.one(`select record_status from clx_escalation_rule where code = '${RULE_B}'`) === 'PENDING_AUTHORIZATION') {
       await rowAction(page.locator('main table tbody tr').filter({ hasText: RULE_B }).first(), /^authorize$/i);
       await confirmDialog(page, /^authorize$/i);

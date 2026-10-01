@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { Commission, Premium, PreviewLine } from '@/api/booking';
+import { SalesUnitName } from '@/components/broking/LovLabel';
 import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatRate } from '@/utils/format';
@@ -132,5 +133,22 @@ export function JournalLines({
         </div>
       )}
     </div>
+  );
+}
+
+/** The cost center of a booking with the department it belongs to by name, never its code. */
+export function CostCenter({
+  costCenter,
+  department,
+}: Readonly<{ costCenter?: string | null; department?: string | null }>) {
+  return (
+    <span className="cell-stack">
+      <span>{costCenter ?? '—'}</span>
+      {department && (
+        <span className="muted">
+          <SalesUnitName code={department} />
+        </span>
+      )}
+    </span>
   );
 }

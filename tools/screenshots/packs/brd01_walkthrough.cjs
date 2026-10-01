@@ -192,6 +192,22 @@ async function rowOffers(row, name) {
   return offered;
 }
 
+/**
+ * Brings the tab strip of a record to the top of the window, so the tab's content is captured whole:
+ * the record header and the stepper above the tabs (shown in the other steps) are set aside.
+ */
+async function tabsToTop(page) {
+  await page.evaluate(() => {
+    const t = document.querySelector('main div.tabs[role=tablist]');
+    if (!t) return;
+    for (const el of t.parentElement.children) {
+      if (el === t) break;
+      el.style.display = 'none';
+    }
+  });
+  await page.waitForTimeout(400);
+}
+
 async function tab(page, name) {
   await page.getByRole('tab', { name: new RegExp(`^${name}`) }).first().click();
   await settle(page, 600);
@@ -466,6 +482,7 @@ const steps = {
     const id = ctx.one(`select id from bkg_invoice where arn = '${accountArn(ctx)}' and status = 'BOOKED' order by id desc limit 1`);
     const page = await go(ctx, 'proc', `/booking/invoices/${id}`);
     await tab(page, 'Journal');
+    await tabsToTop(page);
     return page;
   },
   // ---------------------------------------------------------------- walkthrough B
@@ -858,4 +875,4 @@ async function prepare(ctx) {
   }
 }
 
-module.exports = { steps, bulk, prepare, rowAction, rowOffers, addItem, bulkClientFile, pdf, csv, act, press, tab, go, button, settle, uploadDocument, TMP };
+module.exports = { steps, bulk, prepare, rowAction, rowOffers, tabsToTop, addItem, bulkClientFile, pdf, csv, act, press, tab, go, button, settle, uploadDocument, TMP };

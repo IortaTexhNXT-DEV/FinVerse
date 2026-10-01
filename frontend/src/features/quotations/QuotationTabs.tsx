@@ -18,7 +18,7 @@ import { DetailList } from '@/features/catalog/DetailList';
 import { formatDate, formatDateTime, formatRate, humanize, versionLabel } from '@/utils/format';
 import { PremiumCard } from './PremiumBreakdown';
 import { displayNameOf } from '@/api/users';
-import { LovLabel, ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
+import { LovLabel, ProductLineLabel, InsurerWithBranch } from '@/components/broking/LovLabel';
 import { coverPeriod } from './coverPeriod';
 import { clientShortName } from '@/context/clientNames';
 
@@ -40,10 +40,7 @@ export function DetailsTab({ quotation: q }: Readonly<{ quotation: Quotation }>)
             [
               'Insurer',
               c.insurerCode ? (
-                <span key="i">
-                  <InsurerName code={c.insurerCode} />
-                  {c.insurerBranch ? ` / ${c.insurerBranch}` : ''}
-                </span>
+                <InsurerWithBranch key="i" insurer={c.insurerCode} branch={c.insurerBranch} />
               ) : (
                 'To be advised'
               ),

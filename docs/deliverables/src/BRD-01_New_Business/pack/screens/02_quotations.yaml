@@ -112,7 +112,7 @@ screens:
     shots:
       - {state: record, user: ao, open: first, caption: "Quotation record, Details tab"}
       - {state: items, user: ao, open: first, tab: "Items & Premium", caption: "Items & Premium tab"}
-      - {state: approval, user: mkttl, path: "/quotations?tab=review", open: first, caption: "Quotation for review as seen by the approver (Approve, Return To Maker)"}
+      - {state: approval, user: mkttl, open: for_review_by_other, caption: "Quotation for review as seen by the approver (Approve, Return To Maker)"}
       - {state: send, user: ao, open: approved, click: "^send via email$", caption: "Send via Email dialog of an approved quotation"}
     fields:
       - "Header | Version | Drop-down | v1 ... vn, current marked | N | Quotation versions | Current version | Always | - | -"

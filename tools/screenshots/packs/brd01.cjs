@@ -199,6 +199,8 @@ const opens = {
     }
     return `/crm/clients/${ctx.one(q)}`;
   },
+  // A quotation for review made by someone other than the approver (the one walkthrough C-03 makes is the approver's).
+  for_review_by_other: (ctx) => `/quotations/${ctx.one("select id from quo_quotation where status = 'FOR_REVIEW' and created_by <> 'mkttl' order by id limit 1")}`,
   approved: (ctx) => `/quotations/${ctx.one("select id from quo_quotation where status = 'APPROVED' order by id limit 1")}`,
   with_tsu: (ctx) => `/proposals/${ctx.one("select id from npk_proposal where status = 'WITH_TSU' order by id limit 1")}`,
   terms_received: (ctx) => `/proposals/${ctx.one("select id from npk_proposal where status = 'TERMS_RECEIVED' order by id limit 1")}`,

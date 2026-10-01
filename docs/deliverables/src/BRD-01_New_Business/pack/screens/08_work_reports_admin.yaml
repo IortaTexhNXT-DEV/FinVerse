@@ -218,7 +218,7 @@ screens:
       - {state: new, user: badmin, click: "^new value$", caption: "New value dialog"}
     fields:
       - "Lists | List names | List | One entry per list | - | List types | The first list | - | - | -"
-      - "Values | Code, Label, Order, Parent, Effective, Status, Maker / Checker | Column | Status From a future date, In force, Ended, Pending authorization, Inactive | - | List values | - | Read only | - | -"
+      - "Values | Code, Label, Order, Parent, Effective, Status, Maker / Checker, Actions | Column | Authorize, Edit and Deactivate in the row action menu; status From a future date, In force, Ended, Pending authorization, Inactive | - | List values | - | Read only | - | -"
       - "Value dialog | Code | Text | Capital letters, digits and _, up to 40 | Y | - | Blank | New value | Format; unique in the list | Use capital letters, digits and _ (up to 40) / <list> already exists: <code>"
       - "Value dialog | Label | Text | - | Y | - | Blank | Always | Not blank | Enter the label"
       - "Value dialog | Sort order | Number | Whole number | Y | - | Next number | Always | A whole number | Enter a whole number"
@@ -227,8 +227,8 @@ screens:
       - "Value dialog | Effective to | Date | dd-MMM-yyyy; blank = no end date | N | - | Blank | Always | Not before Effective from | Must not be before the first valid date"
     actions:
       - "New Value | LOV_MANAGE | List maintained by the business | Opens the value dialog; Save stores the value pending authorization | Pending authorization | Pending item in My Approvals"
-      - "Edit / Deactivate | LOV_MANAGE | Value not inactive | Changes the value (pending authorization) or deactivates it | Pending authorization / Inactive | -"
-      - "Authorize | MASTER_AUTHORIZE; not the maker | Value pending authorization | Authorises the value | In force from its date | -"
+      - "Edit / Deactivate | LOV_MANAGE | Value not inactive (row action menu) | Changes the value (pending authorization) or deactivates it | Pending authorization / Inactive | -"
+      - "Authorize | MASTER_AUTHORIZE; not the maker | Value pending authorization (row action menu) | Authorises the value | In force from its date | -"
     rules:
       - "Lists maintained by the system cannot be changed (FR-NB-132)."
       - "A value is never authorised by its maker (FR-NB-132)."

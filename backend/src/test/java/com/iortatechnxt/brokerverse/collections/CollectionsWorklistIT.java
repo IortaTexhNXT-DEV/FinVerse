@@ -266,7 +266,10 @@ class CollectionsWorklistIT {
                                 null,
                                 null,
                                 Map.of()))))
-        .hasMessageContaining("CLX_BULK_UPDATE");
+        .isInstanceOf(BusinessRuleException.class)
+        .hasMessage("You are not allowed to update several accounts at once")
+        .extracting(e -> ((BusinessRuleException) e).getCode())
+        .isEqualTo("CLX_BULK_NOT_ALLOWED");
     List<PrDisposition> bulk =
         as.run(
             CollectionsFixtures.HANDLER,

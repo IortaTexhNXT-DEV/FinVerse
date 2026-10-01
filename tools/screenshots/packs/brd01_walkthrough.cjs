@@ -445,7 +445,7 @@ const steps = {
     const page = await go(ctx, 'epol', '/issuance/dispatch');
     const row = page.locator('table tbody tr').filter({ hasText: arn }).first();
     if (await row.isVisible().catch(() => false)) {
-      await button(row, 'Send').click();
+      await rowAction(row, /^send$/i);
       await page.waitForTimeout(800);
       const dialog = page.locator('dialog.modal[open]').last();
       await dialog.getByRole('button', { name: /^Send/ }).last().click();

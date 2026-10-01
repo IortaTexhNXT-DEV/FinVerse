@@ -4,6 +4,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'nb-pack-'));
 
@@ -54,21 +55,51 @@ const CLIENT_HEADERS = ['Client Code', 'Client Type', 'Last Name', 'First Name',
 function clientRows(ctx, errors, runNo) {
   const n = String(runNo).padStart(2, '0');
   const rows = [
-    ['', 'INDIVIDUAL', 'Dela Paz', 'Rosario', 'Villareal', '', '1984-07-21', `512-3${n}-101-000`, 'PASSPORT', `P51231${n}01`, `rosario.delapaz${n}@seed-client.ph`, '09175551201', '8 Sampaguita Street, Barangay Malamig', 'Mandaluyong City', 'Metro Manila', '1550', 'CBG', 'Y', '', 'FILIPINO', 'SALARY', 'STANDARD'],
+    ['', 'INDIVIDUAL', 'Dela Paz', 'Rosario', 'Villareal', '', '21-Jul-1984', `512-3${n}-101-000`, 'PASSPORT', `P51231${n}01`, `rosario.delapaz${n}@seed-client.ph`, '09175551201', '8 Sampaguita Street, Barangay Malamig', 'Mandaluyong City', 'Metro Manila', '1550', 'CBG', 'Y', '', 'FILIPINO', 'SALARY', 'STANDARD'],
     ['', 'CORPORATE', '', '', '', `Tanglaw Printing Services ${n} Inc.`, '', `512-3${n}-102-000`, '', '', `accounts${n}@tanglawprinting.example`, '09175551202', 'Unit 5, 21 Shaw Boulevard', 'Pasig City', 'Metro Manila', '1603', 'COMBANK', 'N', '', '', '', 'STANDARD'],
-    ['', 'INDIVIDUAL', 'Macaraeg', 'Leonora', 'Santos', '', errors ? '21/09/1979' : '1979-09-21', `512-3${n}-103-000`, 'PASSPORT', `P51231${n}03`, `leonora.macaraeg${n}@seed-client.ph`, '09175551203', '44 Kamagong Street, San Antonio Village', 'Makati City', 'Metro Manila', '1203', 'CBG', 'N', '', 'FILIPINO', 'BUSINESS', 'STANDARD'],
-    ['', errors ? '' : 'INDIVIDUAL', 'Buenaventura', 'Ramil', 'Ocampo', '', '1990-02-11', `512-3${n}-104-000`, 'PASSPORT', `P51231${n}04`, `ramil.buenaventura${n}@seed-client.ph`, '09175551204', '17 Molave Road, Project 3', 'Quezon City', 'Metro Manila', '1102', 'CBG', 'Y', '', 'FILIPINO', 'SALARY', 'STANDARD'],
-    ['', 'INDIVIDUAL', 'Galang', 'Theresa', 'Manalo', '', '1987-12-03', `512-3${n}-105-000`, 'PASSPORT', `P51231${n}05`, `theresa.galang${n}@seed-client.ph`, '09175551205', '9 Acacia Drive, Barangay Lahug', 'Cebu City', 'Cebu', '6000', 'RETAIL', 'N', '', 'FILIPINO', 'SALARY', 'STANDARD'],
+    ['', 'INDIVIDUAL', 'Macaraeg', 'Leonora', 'Santos', '', errors ? '21/09/1979' : '21-Sep-1979', `512-3${n}-103-000`, 'PASSPORT', `P51231${n}03`, `leonora.macaraeg${n}@seed-client.ph`, '09175551203', '44 Kamagong Street, San Antonio Village', 'Makati City', 'Metro Manila', '1203', 'CBG', 'N', '', 'FILIPINO', 'BUSINESS', 'STANDARD'],
+    ['', errors ? '' : 'INDIVIDUAL', 'Buenaventura', 'Ramil', 'Ocampo', '', '11-Feb-1990', `512-3${n}-104-000`, 'PASSPORT', `P51231${n}04`, `ramil.buenaventura${n}@seed-client.ph`, '09175551204', '17 Molave Road, Project 3', 'Quezon City', 'Metro Manila', '1102', 'CBG', 'Y', '', 'FILIPINO', 'SALARY', 'STANDARD'],
+    ['', 'INDIVIDUAL', 'Galang', 'Theresa', 'Manalo', '', '03-Dec-1987', `512-3${n}-105-000`, 'PASSPORT', `P51231${n}05`, `theresa.galang${n}@seed-client.ph`, '09175551205', '9 Acacia Drive, Barangay Lahug', 'Cebu City', 'Cebu', '6000', 'RETAIL', 'N', '', 'FILIPINO', 'SALARY', 'STANDARD'],
   ];
   return rows;
 }
 
-/** The client bulk file: all five rows (two with errors), or only the two corrected rows. */
+/**
+ * Fills the Excel template of an upload type as a user does: the rows go from the example row (overwritten) down,
+ * under the headers of the template (matched by their text, the mandatory mark left aside).
+ */
+function fillTemplate(template, out, headers, rows) {
+  const script = [
+    'import json, sys, openpyxl',
+    'src, out, headers, rows = sys.argv[1], sys.argv[2], json.loads(sys.argv[3]), json.loads(sys.argv[4])',
+    'wb = openpyxl.load_workbook(src)',
+    'ws = wb.worksheets[0]',
+    'clean = lambda v: str(v or "").replace("*", "").strip()',
+    'hr = next(r for r in range(1, ws.max_row + 1) if headers[0] in [clean(ws.cell(r, c).value) for c in range(1, ws.max_column + 1)])',
+    'cols = {clean(ws.cell(hr, c).value): c for c in range(1, ws.max_column + 1)}',
+    'for r in range(hr + 1, ws.max_row + 1):',
+    '    for c in range(1, ws.max_column + 1):',
+    '        ws.cell(r, c).value = None',
+    'for i, row in enumerate(rows):',
+    '    for h, v in zip(headers, row):',
+    '        if h in cols:',
+    '            ws.cell(hr + 1 + i, cols[h]).value = v if v != "" else None',
+    'wb.save(out)',
+  ].join('\n');
+  execFileSync(process.env.PYTHON || 'python3', ['-c', script, template, out, JSON.stringify(headers), JSON.stringify(rows)]);
+  return out;
+}
+
+/** The client bulk file: the Excel template with all five rows (two with errors), or only the two corrected rows. */
 async function bulkClientFile(ctx, corrected) {
   const runNo = ctx.state.bulkRun ?? (ctx.state.bulkRun = Number(ctx.one('select count(*) from bulk_job')) + 1);
   const rows = clientRows(ctx, !corrected, runNo);
   const data = corrected ? rows.slice(2, 4) : rows;
-  return csv(corrected ? `clients-corrected-${runNo}.csv` : `clients-${runNo}.csv`, [CLIENT_HEADERS, ...data]);
+  const company = ctx.one("select id from org_company where code = 'FVI'");
+  const template = path.join(TMP, `client-template-${runNo}.xlsx`);
+  fs.writeFileSync(template, await ctx.api('ao', 'GET', `/bulk/handlers/CLIENT_CREATE/template?companyId=${company}`));
+  const name = corrected ? `clients-corrected-${runNo}.xlsx` : `clients-${runNo}.xlsx`;
+  return fillTemplate(template, path.join(TMP, name), CLIENT_HEADERS, data);
 }
 
 // ------------------------------------------------------------------ page helpers

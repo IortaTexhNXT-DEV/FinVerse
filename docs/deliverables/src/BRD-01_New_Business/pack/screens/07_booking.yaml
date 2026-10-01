@@ -33,7 +33,7 @@ screens:
       - "Book Now | BOOKING_PROCESS | Rows selected (not on Booked Account) | Asks for the booking date and books each account on its own; the run is listed in Batch Runs | Booked | Service invoice e-mails per the service invoice types"
       - "Confirm Batch | BOOKING_PROCESS | Queued for Batch, rows selected | Asks for the booking date and books the selected queued accounts; accounts with their own date keep it | Booked | As Book Now"
       - "Cancel Batch | BOOKING_PROCESS | Queued for Batch | Asks for confirmation and removes every queued account from the batch | Unchanged (back to Ready to Book) | -"
-      - "Edit / Remove (row) | BOOKING_PROCESS | Queued for Batch | Changes the booking date and cost center of a queued account, or removes it from the queue | Unchanged | -"
+      - "Edit / Remove (row action menu) | BOOKING_PROCESS | Queued for Batch | Changes the booking date and cost center of a queued account, or removes it from the queue | Unchanged | -"
       - "Open a row | Every user of the screen | Always | Opens the Pre-booking Confirmation (ready) or the booked invoice (booked) | - | -"
     rules:
       - "An account is booked once only; a second booking is refused (FR-NB-112)."

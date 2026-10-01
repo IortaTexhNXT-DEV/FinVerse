@@ -1,13 +1,13 @@
-import { Pencil, Trash2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import type { WorkbenchRow, WorkbenchTab } from '@/api/booking';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
-import { Button } from '@/components/ui/Button';
 import { DataTable } from '@/components/ui/DataTable';
 import type { Column } from '@/components/ui/DataTable';
+import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate } from '@/utils/format';
 import { rowLink, toggle, toggleAll } from './bookingForm';
+import { queuedActions } from './bookingRowActions';
 import { LineLabel } from '@/components/broking/LovLabel';
 
 interface Props {
@@ -125,32 +125,13 @@ export function WorkbenchTable({
       key: 'actions',
       header: 'Actions',
       render: (r) => (
-        <div className="row">
-          <Button
-            size="sm"
-            variant="ghost"
-            icon={<Pencil size={14} />}
-            aria-label={`Edit ${r.arn}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onEdit(r);
-            }}
-          >
-            Edit
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            icon={<Trash2 size={14} />}
-            aria-label={`Remove ${r.arn}`}
-            onClick={(e) => {
-              e.stopPropagation();
-              onRemove(r);
-            }}
-          >
-            Remove
-          </Button>
-        </div>
+        <RowActions
+          record={r.arn}
+          actions={queuedActions(
+            () => onEdit(r),
+            () => onRemove(r),
+          )}
+        />
       ),
     });
   }

@@ -268,7 +268,15 @@ const steps = {
   },
   // 4. The request executed.
   'wt-c-04': async (ctx) => {
-    const page = await go(ctx, 'upphandler', '/collections/unapplied/requests');
+    let page = await go(ctx, 'upphandler', '/collections/unapplied/requests');
+    const status = ctx.one(`select status from clx_application_request where unapplied_ref = '${PAYMENT_C}' order by id desc limit 1`);
+    if (!['APPLIED', 'EXECUTED', 'REJECTED'].includes(status)) {
+      const ref = ctx.one(`select cashiering_ref from clx_application_request where unapplied_ref = '${PAYMENT_C}' order by id desc limit 1`);
+      await tickRow(page, ref || PAYMENT_C);
+      await button(page, /^check status$/i).click();
+      await settle(page, 1500);
+      page = await go(ctx, 'upphandler', '/collections/unapplied/requests');
+    }
     await tab(page, 'Executed');
     return page;
   },

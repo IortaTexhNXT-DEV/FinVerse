@@ -189,7 +189,16 @@ const fills = {
 // ------------------------------------------------------------------ records by status
 
 const opens = {
-  kyc_review: (ctx) => `/crm/clients/${ctx.one("select id from crm_client where onboarding_stage = 'KYC_REVIEW' order by id limit 1")}`,
+  // A client in KYC review. Walkthrough C (step 2) returns the seeded one to the Account Officer; when it ran first,
+  // the Account Officer submits that client's KYC again (its documents are on file).
+  kyc_review: async (ctx) => {
+    const q = "select id from crm_client where onboarding_stage = 'KYC_REVIEW' order by id limit 1";
+    if (ctx.sql(q).length === 0) {
+      const id = ctx.one("select id from crm_client where prospect_code = 'PR-2026-000007' and onboarding_stage = 'PROSPECT'");
+      await ctx.api('ao', 'POST', `/crm/clients/${id}/submit-kyc`, { comment: 'Current valid ID uploaded' });
+    }
+    return `/crm/clients/${ctx.one(q)}`;
+  },
   approved: (ctx) => `/quotations/${ctx.one("select id from quo_quotation where status = 'APPROVED' order by id limit 1")}`,
   with_tsu: (ctx) => `/proposals/${ctx.one("select id from npk_proposal where status = 'WITH_TSU' order by id limit 1")}`,
   terms_received: (ctx) => `/proposals/${ctx.one("select id from npk_proposal where status = 'TERMS_RECEIVED' order by id limit 1")}`,

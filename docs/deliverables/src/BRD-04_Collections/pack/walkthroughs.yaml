@@ -1,0 +1,86 @@
+# End-to-end walkthroughs of BRD-4 Collections, shown step by step with screenshots of the seed profile.
+# Each step: persona (role code), screen (SCR id), what the user does, what the user sees, the result, and the
+# screenshot taken after the step (captured live by tools/screenshots/capture_pack.cjs, which performs the steps).
+walkthroughs:
+  - id: WT-A
+    title: A new outstanding account from the refresh of the worklist to the check pick-up in Cashiering
+    summary: >-
+      Two accounts booked by Processing are in the Operations invoice ledger, unpaid. The refresh of the worklist
+      (every night; here run on demand from Collections Setup) lists their invoices and assigns them by the
+      assignment rules. The Collection Handler finds the new account in her worklist, logs a phone call and records
+      the disposition For check pick-up with the pick-up details; the pick-up request reaches Cashiering at once.
+    data: "Seed data: accounts ARN-2026-940007 and ARN-2026-940008 booked by Processing (Mabuhay General Insurance Corp.); assignment rule Consumer banking accounts (segment CBG) to Clara Collection Handler"
+    steps:
+      - [MKT_SECTION_HEAD, SCR-CL-19, "Clicks Refresh Worklist Now on Collections Setup", "Message with the outcome of the refresh: the accounts listed and updated", Worklist refreshed, wt-a-01]
+      - [MKT_COLLECTION, SCR-CL-01, "Opens Collections Home", "My Open Accounts counts the new account assigned to her by the rule; the open amounts by aging bracket", Assigned, wt-a-02]
+      - [MKT_COLLECTION, SCR-CL-02, "Opens the PR Worklist with Only mine ticked", "The new invoice with the client, segment, booking date and aging, outstanding premium, her name as handler and no disposition yet", In the worklist, wt-a-03]
+      - [MKT_COLLECTION, SCR-CL-03, "Opens the account and clicks Log Effort: Phone call to the client's finance officer", "Message: Effort logged; the Summary tab shows the last effort", Effort logged, wt-a-04]
+      - [MKT_COLLECTION, SCR-CL-03, "Clicks Record Disposition, chooses For check pick-up and enters the pick-up date, address, contact person and check amount", "Message: Disposition recorded; Dispositions & Efforts shows the disposition and the hand-off Check Pickup sent to Cashiering", Handed to Cashiering, wt-a-05]
+      - [CASHIER, SCR-OP-17, "Opens Check Pick-up in Cashiering", "The pick-up request of the account with its date, address, contact and amount, to be scheduled", With Cashiering, wt-a-06]
+    downstream:
+      - "Cashiering prints the pick-up list, collects the check and receipts it; the payment is applied by component in the invoice ledger and the next refresh updates the outstanding of the account."
+      - "When the account is paid, it moves to Completed Collections; it reopens if the balance comes back."
+
+  - id: WT-B
+    title: A promise to pay, the escalation of the account and its resolution
+    summary: >-
+      The client of walkthrough A promises to pay half of the premium in ten days. The insurer refuses a credit term
+      extension, so the Collection Handler escalates the account to the Collection Team Lead, who acknowledges it and
+      resolves it with the agreed arrangement. The Section Head then authorizes the escalation rule for accounts of one
+      million or more that the Business Administrator set up.
+    data: "Seed data: the account of walkthrough A; escalation rule CLX-AMOUNT-1M waiting for authorization (made by the Business Administrator)"
+    steps:
+      - [MKT_COLLECTION, SCR-CL-08, "Clicks Record Promise and enters the invoice, the promised payment date in ten days and half of the outstanding", "Promises Recorded: the promise of the invoice recorded; it is on Open Promises", Promise open, wt-b-01]
+      - [MKT_COLLECTION, SCR-CL-11, "Clicks Escalate Accounts and enters the invoice, Team Lead and the reason Credit term extension refused by the insurer", "Escalation Results: one escalation raised for the account", Escalated, wt-b-02]
+      - [CLX_TL, SCR-CL-12, "Opens the escalation from With Team Lead and clicks Acknowledge", "The escalation is In action with the step in its history", In action, wt-b-03]
+      - [CLX_TL, SCR-CL-12, "Clicks Resolve and gives the resolution", "The escalation is Resolved with the resolution", Resolved, wt-b-04]
+      - [MKT_SECTION_HEAD, SCR-CL-13, "Opens Escalation Rules and, from the row menu of CLX-AMOUNT-1M, authorizes the rule", "The rule is Active", Rule in force, wt-b-05]
+    downstream:
+      - "The nightly promise check marks the promise kept, partially kept or broken against the payments applied by the promised date; a broken promise notifies the handler and escalates the account through the broken-promise rule."
+      - "From the next escalation run, an account of one million or more is escalated to the Section Head."
+
+  - id: WT-C
+    title: An unapplied payment applied to an invoice at the collector's request
+    summary: >-
+      A payment that Cashiering could not match waits in the unapplied payments. The Unapplied Payment Handler finds
+      the invoice the client paid and requests its application; Cashiering accepts the request on its Incoming
+      Requests and the payment is applied to the invoice; the collector sees the request executed and the whole
+      history of the payment.
+    data: "Seed data: unapplied payment UNP-2026-000008 (Liza Manalo, 1,200.00, not matched); the invoice of account ARN-2026-940008"
+    steps:
+      - [UNAPPLIED_HANDLER, SCR-CL-14, "Selects the payment, clicks Request Application and enters the invoice number", "Message: Disposition recorded; request sent to Cashiering", Request sent, wt-c-01]
+      - [UNAPPLIED_HANDLER, SCR-CL-16, "Opens Requests to Cashiering", "The request Sent with the Cashiering reference of the request", With Cashiering, wt-c-02]
+      - [CASHIER, SCR-OP-13, "Opens Incoming Requests, selects the collector request and clicks Accept Request with Submit the disposition now", "The request accepted; the application of the payment is processed at once", Applied, wt-c-03]
+      - [UNAPPLIED_HANDLER, SCR-CL-16, "Opens the Executed tab of Requests to Cashiering", "The request Applied with the Cashiering reference", Executed, wt-c-04]
+      - [UNAPPLIED_HANDLER, SCR-CL-15, "Opens the unapplied payment, History tab", "The payment, the collector disposition, the request and its application, kept after the payment is applied", History kept, wt-c-05]
+    downstream:
+      - "The application reduces the outstanding of the invoice in the ledger; the next refresh updates the collection account."
+      - "The daily For Application To Invoice file of the next morning lists the request."
+
+  - id: WT-D
+    title: An installment plan and the statement of account of its first cycle
+    summary: >-
+      The client of walkthrough A agrees to pay the premium in four quarterly installments. The Collection Handler
+      creates the plan on the invoice, generates the statement of account of the first cycle and sends it to the
+      client by e-mail, the PDF protected by a password sent separately.
+    data: "Seed data: the invoice of walkthrough A; the client's e-mail address from the client profile"
+    steps:
+      - [MKT_COLLECTION, SCR-CL-05, "Clicks New Installment Plan: installments of one invoice, the invoice, the first due date, 4 installments, Quarterly", "Message: <plan> created with 4 installments; the plan opens with its installments", Plan active, wt-d-01]
+      - [MKT_COLLECTION, SCR-CL-06, "Opens the row menu of cycle 1 and clicks Generate SOA, then the Statements of Account tab", "Message: <SOA> generated; the statement of cycle 1 To Send", Billed, wt-d-02]
+      - [MKT_COLLECTION, SCR-CL-10, "Opens the statement and clicks Send via Email", "The e-mail with the client's address, the proposed subject and message and the protected attachment", Ready to send, wt-d-03]
+      - [MKT_COLLECTION, SCR-CL-10, "Clicks Send", "Message: <SOA> sent to <address>; the statement is Sent and E-mails Sent lists the e-mail", Sent, wt-d-04]
+    downstream:
+      - "The payments applied in the ledger are allocated to the installments, oldest first; an installment past its due date is Overdue and can escalate the account."
+      - "Billing is monitoring only: the statement creates no receivable and no commission billing."
+
+  - id: WT-E
+    title: Controls and the messages the user sees
+    summary: >-
+      Four controls of Collections, each with the message the user sees: a disposition reserved to other roles, an
+      account another user is working on, a promise above the outstanding, and an invoice number in the wrong format.
+    data: "Seed data: the open accounts of the seed data; the account of walkthrough A held by the Collection Handler"
+    steps:
+      - [MKT_AO, SCR-CL-03, "The account officer records the disposition No / missing policy number on an account", "The refusal: the disposition is reserved to other roles", Refused, wt-e-01]
+      - [CLX_TL, SCR-CL-03, "Opens the account the Collection Handler is working on", "<name> is editing since <time>; Update Remarks, Log Effort and Record Disposition are not offered", Read only, wt-e-02]
+      - [MKT_COLLECTION, SCR-CL-08, "Records a promise of an amount above the outstanding of the account", "Promises Recorded with the outcome of the invoice: the promised amount is above the outstanding", Refused, wt-e-03]
+      - [UNAPPLIED_HANDLER, SCR-CL-14, "Requests the application of a payment to an invoice number in the wrong format", "Under the field: The invoice number does not have the expected format", Refused, wt-e-04]

@@ -1,0 +1,107 @@
+# Screen specifications of BRD-4 Collections: the collector side of the unapplied payments (the payments Cashiering
+# could not apply), the unapplied payment record and the requests sent to Cashiering.
+area: Unapplied payments
+screens:
+  - id: SCR-CL-14
+    title: Unapplied Payments
+    route: /collections/unapplied
+    purpose: >-
+      The payments Cashiering could not apply to an invoice, as of today, read from Cashiering (never copied), by
+      Cashiering tab: the payment and its transaction, the unapplied balance, the matched account, the latest collector
+      disposition and where the payment stands in Cashiering. The collector records a disposition on the selected
+      payment, or asks Cashiering to apply it to an invoice.
+    entry:
+      - Finance › Collections › Unapplied Payments
+      - Collections Home › Unapplied Awaiting Disposition tile
+    shots:
+      - {state: list, user: upphandler, caption: "Unapplied Payments awaiting a disposition, with the matched account and the Cashiering status"}
+      - {state: apply, user: upphandler, select: unmatched_payment, click: "^request application$", fill: apply_to_invoice, caption: "Request Application: the disposition For Application to Invoice with the invoice number"}
+      - {state: error, user: upphandler, select: unmatched_payment, click: "^request application$", fill: apply_bad_invoice, submit: "^request application$", caption: "An invoice number in the wrong format is refused under the field"}
+    fields:
+      - "Tabs | Awaiting Disposition / In Cashiering / For Approval / For Reversal / All Open | Tab | The Cashiering tab of the payment | - | Cashiering | Awaiting Disposition | - | - | -"
+      - "Toolbar | Search Unapplied Reference | Text | Reference, payor, transaction, check or invoice | N | Unapplied payments | Blank | - | Contains | -"
+      - "Filters | Market Segment / Collector Disposition / Age | Text, drop-down | Segment; any, no disposition yet or a value; up to 7, 8 to 30, 31 to 90, over 90 days | N | Unapplied payment disposition list | Any | - | - | -"
+      - "List | Unapplied Reference | Column | UNP-yyyy-nnnnnn with the payor | - | Cashiering | - | Read only | - | No unapplied payments to display"
+      - "List | Payment / Transaction | Column | Payment date with its age in days; transaction number, payment type, bank and check | - | Cashiering | - | Read only | - | -"
+      - "List | Unapplied / Paid | Column | Unapplied balance with the amount paid under it, in the base currency | - | Cashiering | - | Read only | - | -"
+      - "List | Matched Account / Segment | Column | Invoice or client matched, assured, segment and account officer; Not Matched | - | Invoice ledger | - | Read only | - | -"
+      - "List | Collector Disposition | Column | Label as a tag with the user's name and date | - | Collector dispositions | - | Read only | - | -"
+      - "List | Cashiering / Request | Column | Cashiering tab, and the status of the request sent | - | Cashiering, requests | - | Read only | - | -"
+      - "Disposition dialog | Disposition | Drop-down | Active values of the unapplied payment disposition list; what Cashiering is asked to do shows under it | Y | Unapplied payment disposition list | Blank | Balance above zero | - | Choose the disposition"
+      - "Disposition dialog | Invoice No. | Text | EBIX I######## or BrokerVerse BI-…, checked against the invoice ledger | Cond.: For application to invoice | Invoice ledger | Matched invoice | Balance above zero | Format of the invoice number parameter; invoice in the ledger | The invoice number does not have the expected format"
+      - "Disposition dialog | Amount / Remarks | Number, text area | Empty for the whole unapplied balance | N | - | Blank | Balance above zero | Above zero and at most the balance | Enter an amount above zero and at most <balance>"
+    actions:
+      - "Requests to Cashiering | Every Collections user | Always | Opens the requests sent to Cashiering | - | -"
+      - "Record Disposition | Users with the unapplied work permission | One payment selected | Opens the disposition dialog | - | -"
+      - "Request Application | Users with the unapplied work permission | One payment selected | Opens the dialog with For Application to Invoice chosen | - | -"
+      - "Save Disposition / Request Application (dialog) | Users with the unapplied work permission | The form is complete | Records the disposition; a value with a Cashiering action sends a request to the Incoming Requests of Cashiering | Request Sent | -"
+      - "[Row] | Every Collections user | Always | Opens the unapplied payment | - | -"
+    rules:
+      - "Only active values of the unapplied payment disposition list can be chosen (FR-CL-072, FR-CL-073)."
+      - "For Application to Invoice needs an invoice number in the format of the invoice number parameter that exists in the invoice ledger (FR-CL-075)."
+      - "A value with a Cashiering action sends a request to Cashiering, which applies, refunds, reclassifies or transfers the payment with its own approvals (FR-CL-074)."
+      - "Dispositions are never deleted; the history stays after the payment is applied or refunded (FR-CL-076)."
+    outcome: Every unapplied payment has the collector's disposition and, where needed, a request to Cashiering.
+    frs: [FR-CL-070, FR-CL-071, FR-CL-072, FR-CL-073, FR-CL-074, FR-CL-075, FR-CL-076]
+    tests: [UPP]
+
+  - id: SCR-CL-15
+    title: Unapplied Payment
+    route: /collections/unapplied/:ref
+    parent: /collections/unapplied
+    purpose: >-
+      One unapplied payment as the collector sees it: the payment and the matched account, the collector
+      dispositions, the requests sent to Cashiering with their status, and the whole history kept after the payment is
+      applied or refunded.
+    entry:
+      - Unapplied Payments › open a row
+      - Requests to Cashiering › open a row
+    shots:
+      - {state: record, user: upphandler, open_unapplied: matched, caption: "Unapplied payment: the payment and the matched account"}
+      - {state: history, user: upphandler, open_unapplied: requested, tab: "History", caption: "History of an unapplied payment with the dispositions and the request to Cashiering"}
+    fields:
+      - "Header | [Unapplied chip, Cashiering tab, request status] | Reference chip, tag, status pill | - | - | Cashiering | - | Read only | - | -"
+      - "Facts | Payment Date / Paid / Unapplied / Transaction / Collector Disposition / Account Officer | Display | Date with the age; amounts with the currency; label; name | - | Cashiering, invoice ledger | - | Read only | - | -"
+      - "Tabs | Payment & Account / Collector Dispositions / Requests to Cashiering / History | Tab | - | - | Fixed | Payment & Account | - | - | -"
+      - "Payment & Account | Payment File / Transaction No. / Payment Type / Bank / Check No. / Payor Reference | Display | - | - | Cashiering | - | Read only | - | -"
+      - "Payment & Account | Matched Client / Matched Invoice / Name of Assured / PR Balance / Inception / Market Segment / Sales Unit / Unit Head / Account Officer / Insurer / Invoice Category / Collection Handler | Display | Names of the users; insurer name | - | Invoice ledger, collection account | - | Read only | - | -"
+      - "Collector Dispositions | Recorded / Disposition / Cashiering / Invoice No. / Amount / By / Remarks | Column | Whole balance when no amount | - | Collector dispositions | - | Read only | - | No collector disposition yet"
+      - "Requests to Cashiering | Unapplied Reference / Request / Amount / Requested By / Cashiering Reference / Application File / Status | Column | - | - | Requests | - | Read only | - | No request sent to Cashiering"
+      - "History | When / Event / Description / Amount / By / Reference | Column | - | - | Cashiering, Collections | - | Read only | - | No history"
+    actions:
+      - "Record Disposition | Users with the unapplied work permission | Balance above zero | Opens the disposition dialog | - | -"
+      - "Request Application | Users with the unapplied work permission | Balance above zero | Opens the dialog with For Application to Invoice chosen | Request Sent | -"
+    rules:
+      - "The payment is read from Cashiering as of today; the collector never changes the payment itself (FR-CL-070)."
+      - "The history keeps every disposition and request after the payment is applied or refunded (FR-CL-076)."
+    outcome: The collector sees the payment, what was decided and where Cashiering is with it.
+    frs: [FR-CL-070, FR-CL-073, FR-CL-074, FR-CL-076]
+    tests: [UPPD]
+
+  - id: SCR-CL-16
+    title: Requests to Cashiering
+    route: /collections/unapplied/requests
+    purpose: >-
+      The status of every request sent to Cashiering on a collector disposition: sent, handed over, accepted, executed
+      or rejected, with the Cashiering reference and message and the daily application file that listed it; Check
+      Status asks Cashiering again for the selected open requests.
+    entry:
+      - Finance › Collections › Requests to Cashiering
+      - Unapplied Payments › Requests to Cashiering
+      - Collections Home › My Requests in Cashiering tile
+    shots:
+      - {state: list, user: upphandler, caption: "Requests to Cashiering: the open requests with the Cashiering reference"}
+    fields:
+      - "Tabs | Open / Executed / Rejected / All Requests | Tab | - | - | Request status | Open | - | - | -"
+      - "Toolbar | Search Unapplied Reference | Text | - | N | Requests | Blank | - | Contains | -"
+      - "List | Unapplied Reference / Request / Amount / Requested By | Column | Reference with the payor; Apply to Invoice, Refund, Reclass or Transfer to Unit with the invoice; amount or Whole Balance; name and time | - | Requests | - | Read only | - | No requests to display"
+      - "List | Cashiering Reference / Application File / Status | Column | Reference and message of Cashiering; the date of the daily file; Sent, Deferred, Accepted, Applied or Rejected | - | Cashiering | - | Read only | - | -"
+    actions:
+      - "Check Status | Users with the unapplied work permission | Open requests selected | Asks Cashiering for the status of each selected request | - | -"
+      - "[Row] | Every Collections user | Always | Opens the unapplied payment | - | -"
+    rules:
+      - "The requester is notified when Cashiering accepts, rejects or executes a request (FR-CL-074)."
+      - "The daily For Application To Invoice file of the previous day lists the application requests before 06:00 (FR-CL-077)."
+    outcome: The collector follows each request to its execution.
+    frs: [FR-CL-074, FR-CL-077]
+    tests: [CREQ]

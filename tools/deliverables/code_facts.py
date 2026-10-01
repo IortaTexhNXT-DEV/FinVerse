@@ -931,7 +931,7 @@ def bulk_templates(class_names: Iterable[str]) -> list[BulkTemplate]:
         rows = []
         for m in re.finditer(r"(?:errors|problems)\.add\(", text):
             arg = text[m.end():matching(text, m.end() - 1)]
-            if '"' in arg:
+            if '"' in arg or arg.strip() in consts:  # a literal, or a text constant of the handler
                 rows.extend(java_texts(arg, consts, p.stem))
         out.append(BulkTemplate(code=ret("code"), title=ret("title"), permission=ret("permission"),
                                 instructions=ret("instructions"), columns=cols, row_messages=rows,

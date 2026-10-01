@@ -29,6 +29,8 @@ COPY --from=build /workspace/dist /usr/share/nginx/html
 # The nginx image renders templates with envsubst (only variables defined in the environment).
 COPY nginx.conf /etc/nginx/templates/default.conf.template
 ENV BROKERVERSE_BACKEND_HOST=backend
+# The entrypoint reads the container's resolvers into NGINX_LOCAL_RESOLVERS (used by nginx.conf).
+ENV NGINX_ENTRYPOINT_LOCAL_RESOLVERS=1
 USER 101:101
 EXPOSE 8080 8443
 HEALTHCHECK --interval=30s --timeout=5s CMD wget -qO- http://localhost:8080/healthz || exit 1

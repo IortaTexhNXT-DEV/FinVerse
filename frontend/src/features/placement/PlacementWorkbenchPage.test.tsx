@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
+import { catalogApi } from '@/api/catalog';
 import { issuanceApi } from '@/api/issuance';
 import { placementApi } from '@/api/placement';
 import type { WorkbenchRow } from '@/api/placement';
@@ -115,6 +116,28 @@ describe('placement and issuance workbenches', () => {
     await user.click(confirm);
     await waitFor(() => expect(generate).toHaveBeenCalledWith(1, ['ARN-2026-000001']));
   }, 20_000);
+
+  it('names the department of each account, never its code', async () => {
+    vi.spyOn(placementApi, 'counts').mockResolvedValue({
+      awaitingPayment: 0,
+      readyForPlacement: 1,
+      placed: 0,
+      returnedByInsurer: 0,
+      holdCoverExpiring: 0,
+      placementCancelled: 0,
+      policyIssued: 0,
+      booked: 0,
+    });
+    vi.spyOn(placementApi, 'workbench').mockResolvedValue(
+      page([row('ARN-2026-000001', 'READY_FOR_PLACEMENT')]),
+    );
+    vi.spyOn(catalogApi, 'salesOrganisation').mockResolvedValue({
+      units: [{ code: 'CBG-NCR', name: 'Consumer Banking - NCR' }],
+    } as unknown as Awaited<ReturnType<typeof catalogApi.salesOrganisation>>);
+    render(wrap(<PlacementWorkbenchPage />));
+    expect(await screen.findByText('Consumer Banking - NCR')).toBeInTheDocument();
+    expect(screen.queryByText('CBG-NCR')).toBeNull();
+  });
 
   it('lists the issuance work by tab', async () => {
     const user = userEvent.setup();

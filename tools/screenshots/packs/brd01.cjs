@@ -212,7 +212,20 @@ const selects = {
 };
 
 // Extra steps after the standard ones, by slug.
-const after = {};
+const after = {
+  // UX deck: a search that finds nothing.
+  'ux-scr-nb-01-empty': async (page) => {
+    await page.getByPlaceholder(/^search/i).first().fill('Zamboanga Lighthouse Holdings');
+    await page.keyboard.press('Enter');
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForTimeout(1200);
+  },
+  // UX deck: the row action menu of the first request, opened.
+  'ux-scr-nb-08-actions': async (page) => {
+    await page.locator('main table tbody tr').first().getByRole('button', { name: /^Actions for/ }).click();
+    await page.waitForTimeout(400);
+  },
+};
 
 // Shots kept as the whole window (menu and header give the navigation context); every other shot is cropped to
 // its dialog or content area (capture_pack.cjs, cropOf).

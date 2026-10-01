@@ -1,0 +1,45 @@
+# UX screen documents of the BRD-1 New Business set for the BDOI UX Design team: 07 UX Screen Deck, 08 UX screen
+# register, 09 image package (docs/deliverables/src/signoff/build_ux_deck.py). The screens, fields, actions,
+# walkthroughs and images come from the pack; this file holds what only the UX documents need: who each persona is,
+# the images taken for the deck only (more states of a screen, the landing page and menu of each persona), the
+# changes of the issue and the points for the UX Design team to confirm.
+
+issue:
+  version: "2.0"
+  date: 1 October 2026
+  # First issue of the UX screen documents of the set: every screen is new to the UX Design team.
+  changes: []
+
+# The personas whose landing page and full menu the deck shows.
+navigation:
+  roles: [MKT_AO, MKT_TL, TSU, PROCESSOR, PROCESSING_TL, NB_APPROVER, EPOLICY_SENDER, ADJUSTMENT, BUSINESS_ADMIN,
+          SYSADMIN, AUDITOR]
+
+# Who each persona is (what they do comes from the persona table of the FRS unless given here).
+personas:
+  MKT_AO: {who: "A Marketing Account Officer of the head office or of a branch who serves the clients and brings in the business"}
+  MKT_TL: {who: "A Marketing team leader, team head or unit head, who approves the quotations and proposal requests of the team and verifies the KYC"}
+  TSU: {who: "An underwriter of the Technical Support Unit who prepares the quotation and proposal slips of the non-package risks"}
+  PROCESSOR: {who: "A Processing officer who validates the accounts, confirms the payments, places the accounts, receives the e-policies and books the accounts"}
+  PROCESSING_TL: {who: "The team leader of Processing, who assigns the work of the team"}
+  NB_APPROVER: {who: "A New Business approver who authorises the master records and the changes that need a second user"}
+  EPOLICY_SENDER: {who: "An officer who sends the e-policies and Insurance Advices to the clients"}
+  ADJUSTMENT: {who: "An Adjustment officer who cancels bookings and posts the endorsements of booked accounts"}
+  BUSINESS_ADMIN: {who: "The business administrator of New Business, who keeps the lists of values, the targets and the message texts"}
+  SYSADMIN: {who: "The system administrator of BIBS (BDOI IT operations), who keeps the users, the parameters and the jobs"}
+  AUDITOR: {who: "An internal or external auditor with read access to the clients, quotations, accounts and work queues"}
+
+# The UX state of an image when its name does not say it.
+classify: {}
+
+# Images taken for the deck only: states the screen specifications do not show.
+states:
+  - {screen: SCR-NB-01, state: empty, user: ao, ux: empty, nocallouts: true, caption: "A search that finds no client"}
+  - {screen: SCR-NB-07, state: auditor, user: auditor, open: first, ux: read-only, nocallouts: true, caption: "A quotation as the Auditor sees it, without the actions"}
+  - {screen: SCR-NB-08, state: actions, user: ao, ux: default, nocallouts: true, caption: "The row action menu of a request, opened from the more button of its row"}
+  - {screen: SCR-NB-15, state: auditor, user: auditor, open: first, ux: read-only, nocallouts: true, caption: "An account as the Auditor sees it, without the actions"}
+
+# Points for the UX Design team to confirm with BDOI.
+confirm:
+  clarifications: [CLR-NB-38, CLR-NB-39, CLR-NB-40, CLR-NB-41, CLR-NB-42, CLR-NB-43]
+  findings: []

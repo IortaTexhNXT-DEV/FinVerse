@@ -70,6 +70,23 @@ class SignoffCorrectionsIT {
   }
 
   @Test
+  void newBusinessWorkItemsNameTheProduct() {
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from wf_case w join cat_product p on w.title like '% - ' || p.code"
+                    + " where w.workflow_code in ('NB_QUOTATION', 'NB_PROPOSAL', 'NB_ACCOUNT')"
+                    + " and p.name <> p.code",
+                Integer.class))
+        .isZero();
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from wf_case w where w.workflow_code = 'NB_ACCOUNT'"
+                    + " and w.title like '% - Motor Comprehensive Package MTR10'",
+                Integer.class))
+        .isPositive();
+  }
+
+  @Test
   void seedClientsAreDistinctAndHaveRealisticAddresses() {
     assertThat(
             jdbc.queryForList(

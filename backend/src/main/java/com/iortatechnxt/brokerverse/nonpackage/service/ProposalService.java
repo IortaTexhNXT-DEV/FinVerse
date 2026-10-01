@@ -317,8 +317,8 @@ public class ProposalService {
    * @param p PRF
    * @return title
    */
-  static String title(ProposalRequest p) {
-    return p.getClientName() + " - " + p.getProductCode();
+  private String title(ProposalRequest p) {
+    return p.getClientName() + " - " + catalog.productName(p.getProductCode());
   }
 
   private static String blank(String value) {

@@ -416,7 +416,7 @@ public class AccountService {
     return new Terms(draft.ratingBasis(), draft.commissionRate());
   }
 
-  private static String title(Account account) {
-    return account.getClientName() + " - " + account.getProductCode();
+  private String title(Account account) {
+    return account.getClientName() + " - " + rules.productName(account.getProductCode());
   }
 }

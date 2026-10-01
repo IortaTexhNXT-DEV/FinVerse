@@ -180,4 +180,14 @@ public class AccountRules {
    * @param product product
    */
   public record Resolved(AccountData data, RiskProduct product) {}
+
+  /**
+   * The name of a product for the work item of an account.
+   *
+   * @param code risk code
+   * @return product name, or the code when unknown
+   */
+  public String productName(String code) {
+    return catalog.productName(code);
+  }
 }

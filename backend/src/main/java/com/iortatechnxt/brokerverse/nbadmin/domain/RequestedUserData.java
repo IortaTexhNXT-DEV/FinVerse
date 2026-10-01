@@ -74,6 +74,16 @@ public record RequestedUserData(
   }
 
   /**
+   * The same data without a data scope.
+   *
+   * @return data
+   */
+  public RequestedUserData withoutDataScope() {
+    return new RequestedUserData(
+        windowsId, businessUnitCode, userLevel, reasonCode, unlock, authorizationLimit, null);
+  }
+
+  /**
    * The requested data scope.
    *
    * @return scope, empty when the request leaves it unchanged

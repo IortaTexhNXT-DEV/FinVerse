@@ -50,14 +50,14 @@ public class OrganizationController {
   }
 
   /**
-   * Lists companies.
+   * Lists the companies of the user's data scope.
    *
    * @return companies
    */
   @GetMapping("/companies")
   @PreAuthorize(WORKSPACE)
   public List<CompanyResponse> companies() {
-    return service.listCompanies().stream().map(CompanyResponse::from).toList();
+    return service.listCompaniesInScope().stream().map(CompanyResponse::from).toList();
   }
 
   /**

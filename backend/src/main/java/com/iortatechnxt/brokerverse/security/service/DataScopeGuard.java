@@ -10,15 +10,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.HandlerMapping;
 
 /**
  * The central data scope guard (docs/architecture/DATA_SCOPE_DESIGN.md): checks that the signed-in
  * user may act for the company or branch a request names. Fail closed: a user request without a
  * known signed-in user is refused.
  *
- * <p>Exempt, explicitly ({@link #systemProcessing()}): processing with no HTTP request bound to the
- * thread (scheduled jobs, event consumers, the outbox relay, seed and migration loaders) and the
- * system-to-system APIs under {@value #INTEGRATION_PATH}; both run as the system for every company.
+ * <p>Exempt, explicitly ({@link #systemProcessing()}): processing that is not an HTTP request
+ * dispatched to a controller (scheduled jobs, event consumers, the outbox relay, seed and migration
+ * loaders) and the system-to-system APIs under {@value #INTEGRATION_PATH}; both run as the system
+ * for every company.
  */
 @Service
 public class DataScopeGuard implements DataScope {
@@ -84,13 +86,14 @@ public class DataScopeGuard implements DataScope {
   }
 
   /**
-   * Whether the current work runs as the system: no HTTP request is bound to the thread, or the
-   * request is a system-to-system API call.
+   * Whether the current work runs as the system: no HTTP request is being dispatched to a
+   * controller on this thread, or the request is a system-to-system API call.
    *
    * @return true for system processing
    */
   public static boolean systemProcessing() {
     return currentRequest()
+        .filter(r -> r.getAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE) != null)
         .map(r -> r.getRequestURI().substring(r.getContextPath().length()))
         .map(path -> path.startsWith(INTEGRATION_PATH))
         .orElse(true);

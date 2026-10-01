@@ -6,6 +6,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
+import com.iortatechnxt.brokerverse.common.security.DataScope;
 import com.iortatechnxt.brokerverse.organization.api.dto.BranchRequest;
 import com.iortatechnxt.brokerverse.organization.api.dto.CompanyRequest;
 import com.iortatechnxt.brokerverse.organization.api.dto.HolidayRequest;
@@ -45,6 +46,7 @@ public class OrganizationService {
   private final AuditTrailService audit;
   private final CurrentUser currentUser;
   private final Clock clock;
+  private final DataScope dataScope;
 
   /**
    * Creates the service.
@@ -55,6 +57,7 @@ public class OrganizationService {
    * @param audit audit trail
    * @param currentUser current user
    * @param clock clock
+   * @param dataScope data scope of the current user (company list)
    */
   public OrganizationService(
       CompanyRepository companies,
@@ -62,13 +65,15 @@ public class OrganizationService {
       HolidayRepository holidays,
       AuditTrailService audit,
       CurrentUser currentUser,
-      Clock clock) {
+      Clock clock,
+      DataScope dataScope) {
     this.companies = companies;
     this.branches = branches;
     this.holidays = holidays;
     this.audit = audit;
     this.currentUser = currentUser;
     this.clock = clock;
+    this.dataScope = dataScope;
   }
 
   /**
@@ -79,6 +84,17 @@ public class OrganizationService {
   @Transactional(readOnly = true)
   public List<Company> listCompanies() {
     return companies.findAll(Sort.by("code"));
+  }
+
+  /**
+   * Lists the companies of the current user's data scope (company pickers; every company for the
+   * system).
+   *
+   * @return companies ordered by code
+   */
+  @Transactional(readOnly = true)
+  public List<Company> listCompaniesInScope() {
+    return dataScope.filter(listCompanies(), Company::getId);
   }
 
   /**

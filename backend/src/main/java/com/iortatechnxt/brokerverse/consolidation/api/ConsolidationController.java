@@ -1,8 +1,11 @@
 package com.iortatechnxt.brokerverse.consolidation.api;
 
+import com.iortatechnxt.brokerverse.common.security.CompanyScoped;
+import com.iortatechnxt.brokerverse.common.security.DataScope;
 import com.iortatechnxt.brokerverse.consolidation.api.dto.ConsolidationRunResponse;
 import com.iortatechnxt.brokerverse.consolidation.api.dto.GroupRequest;
 import com.iortatechnxt.brokerverse.consolidation.api.dto.GroupResponse;
+import com.iortatechnxt.brokerverse.consolidation.domain.ConsolidationGroup;
 import com.iortatechnxt.brokerverse.consolidation.service.ConsolidationGroupService;
 import com.iortatechnxt.brokerverse.consolidation.service.ConsolidationRunService;
 import jakarta.validation.Valid;
@@ -31,16 +34,20 @@ public class ConsolidationController {
 
   private final ConsolidationGroupService groups;
   private final ConsolidationRunService runs;
+  private final DataScope dataScope;
 
   /**
    * Creates the controller.
    *
    * @param groups group service
    * @param runs run service
+   * @param dataScope data scope guard (parent company of a group)
    */
-  public ConsolidationController(ConsolidationGroupService groups, ConsolidationRunService runs) {
+  public ConsolidationController(
+      ConsolidationGroupService groups, ConsolidationRunService runs, DataScope dataScope) {
     this.groups = groups;
     this.runs = runs;
+    this.dataScope = dataScope;
   }
 
   /**
@@ -51,7 +58,9 @@ public class ConsolidationController {
   @GetMapping("/groups")
   @PreAuthorize(VIEW)
   public List<GroupResponse> groups() {
-    return groups.list().stream().map(GroupResponse::from).toList();
+    return dataScope.filter(groups.list(), ConsolidationGroup::getParentCompanyId).stream()
+        .map(GroupResponse::from)
+        .toList();
   }
 
   /**
@@ -63,7 +72,9 @@ public class ConsolidationController {
   @PostMapping("/groups")
   @ResponseStatus(HttpStatus.CREATED)
   @PreAuthorize(RUN)
+  @CompanyScoped("the parent company is checked here, the members by the body advice")
   public GroupResponse create(@Valid @RequestBody GroupRequest request) {
+    dataScope.requireCompany(request.parentCompanyId());
     return GroupResponse.from(groups.create(request));
   }
 
@@ -76,7 +87,9 @@ public class ConsolidationController {
    */
   @PutMapping("/groups/{id}")
   @PreAuthorize(RUN)
+  @CompanyScoped("the parent company is checked here, the members by the body advice")
   public GroupResponse update(@PathVariable Long id, @Valid @RequestBody GroupRequest request) {
+    dataScope.requireCompany(request.parentCompanyId());
     return GroupResponse.from(groups.update(id, request));
   }
 

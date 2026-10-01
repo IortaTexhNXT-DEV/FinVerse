@@ -87,7 +87,7 @@ Explicit, in `DataScopeGuard.systemProcessing()` and in the interceptor registra
 
 | Exempt | Why | How |
 |---|---|---|
-| Background processing: scheduled jobs (`ManagedJob`), event consumers, outbox relay, seed and migration loaders | They run as the system for every company | No HTTP request bound to the thread: the guard answers "all" |
+| Background processing: scheduled jobs (`ManagedJob`), event consumers, outbox relay, seed and migration loaders | They run as the system for every company | Not an HTTP request dispatched to a controller (no request on the thread, or no handler chosen for it): the guard answers "all" |
 | System-to-system APIs `/integration/**` | Gateway-authenticated systems, own security chain | The interceptor is registered on `/api/**` only; the guard answers "all" for a request under `/integration/` |
 | Sign-in, session and profile endpoints (`/api/v1/auth/**`) | Take no company | Not matched (no `companyId`) |
 

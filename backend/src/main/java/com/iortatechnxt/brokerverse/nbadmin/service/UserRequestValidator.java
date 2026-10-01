@@ -12,6 +12,7 @@ import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import com.iortatechnxt.brokerverse.security.domain.Role;
 import com.iortatechnxt.brokerverse.security.domain.RoleRepository;
+import com.iortatechnxt.brokerverse.security.service.DataScopeService;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -27,8 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
  * Full checks of a request about an internal user on submission and again at approval (BRD
  * 1.002-1.005; FR-UA-011 to FR-UA-014): the user ID format for a new user (USER_ID_PATTERN), the
  * user exists or not, is enabled or not, the group profiles exist and are active, the Windows ID is
- * free, a modification changes something, nobody requests a change of their own roles, and the
- * group profiles break no active separation-of-duties rule (V1065).
+ * free, a modification changes something, nobody requests a change of their own roles, the group
+ * profiles break no active separation-of-duties rule (V1065), and a requested data scope names
+ * known companies and branches within the scope of the requester or approver (V1240).
  */
 @Component
 @Transactional(readOnly = true)
@@ -44,6 +46,7 @@ public class UserRequestValidator {
   private final AccessSettings settings;
   private final CurrentUser currentUser;
   private final SodRuleRepository sodRules;
+  private final DataScopeService dataScopes;
 
   /**
    * Creates the validator.
@@ -53,14 +56,17 @@ public class UserRequestValidator {
    * @param settings parameters (user ID format)
    * @param currentUser current user (the requester)
    * @param sodRules separation-of-duties rules
+   * @param dataScopes data scope administration
    */
   public UserRequestValidator(
       AppUserRepository users,
       RoleRepository roles,
       AccessSettings settings,
       CurrentUser currentUser,
-      SodRuleRepository sodRules) {
+      SodRuleRepository sodRules,
+      DataScopeService dataScopes) {
     this.sodRules = sodRules;
+    this.dataScopes = dataScopes;
     this.users = users;
     this.roles = roles;
     this.settings = settings;
@@ -84,6 +90,7 @@ public class UserRequestValidator {
     }
     Set<String> roleCodes = requireRoles(c);
     requireFreeWindowsId(c.userData(), user);
+    RequestedUserData data = RequestedScopeRule.check(c.type(), c.userData(), dataScopes);
     AccessRequestContent clean =
         new AccessRequestContent(
             c.type(),
@@ -94,13 +101,13 @@ public class UserRequestValidator {
             c.homeBranchId(),
             c.justification(),
             null,
-            c.userData(),
+            data,
             null,
             null,
             c.effectiveFrom());
     if (user != null) {
       requireNotOwnRoles(clean, user);
-      UserStateRules.requireChange(clean, user);
+      UserStateRules.requireChange(clean, user, dataScopes.scopeOf(user.getId()));
     }
     return clean;
   }

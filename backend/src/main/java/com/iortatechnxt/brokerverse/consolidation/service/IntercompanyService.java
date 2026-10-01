@@ -8,6 +8,8 @@ import com.iortatechnxt.brokerverse.coa.service.ChartOfAccountsService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.security.DataScope;
+import com.iortatechnxt.brokerverse.common.security.UserDataScope;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.consolidation.api.dto.IntercompanyTransactionRequest;
 import com.iortatechnxt.brokerverse.consolidation.api.dto.RelationshipRequest;
@@ -53,6 +55,7 @@ public class IntercompanyService {
   private final OrganizationService organization;
   private final DocumentNumberService numbers;
   private final AuditTrailService audit;
+  private final DataScope dataScope;
 
   /**
    * Creates the service.
@@ -64,7 +67,9 @@ public class IntercompanyService {
    * @param organization organization service
    * @param numbers document numbering
    * @param audit audit trail
+   * @param dataScope data scope of the current user
    */
+  @SuppressWarnings("java:S107")
   public IntercompanyService(
       IntercompanyRelationshipRepository relationships,
       IntercompanyTransactionRepository transactions,
@@ -72,7 +77,8 @@ public class IntercompanyService {
       ChartOfAccountsService accounts,
       OrganizationService organization,
       DocumentNumberService numbers,
-      AuditTrailService audit) {
+      AuditTrailService audit,
+      DataScope dataScope) {
     this.relationships = relationships;
     this.transactions = transactions;
     this.journals = journals;
@@ -80,19 +86,30 @@ public class IntercompanyService {
     this.organization = organization;
     this.numbers = numbers;
     this.audit = audit;
+    this.dataScope = dataScope;
   }
 
   /**
-   * Lists relationships.
+   * Lists relationships whose two companies are both in the data scope of the current user.
    *
    * @param companyId company, or null for all
    * @return relationships
    */
   @Transactional(readOnly = true)
   public List<IntercompanyRelationship> relationships(Long companyId) {
-    return companyId == null
-        ? relationships.findAllByOrderById()
-        : relationships.findInvolving(companyId);
+    List<IntercompanyRelationship> found =
+        companyId == null
+            ? relationships.findAllByOrderById()
+            : relationships.findInvolving(companyId);
+    UserDataScope scope = dataScope.allowed();
+    return scope.allCompanies()
+        ? found
+        : found.stream()
+            .filter(
+                r ->
+                    scope.allowsCompany(r.getCompanyAId())
+                        && scope.allowsCompany(r.getCompanyBId()))
+            .toList();
   }
 
   /**

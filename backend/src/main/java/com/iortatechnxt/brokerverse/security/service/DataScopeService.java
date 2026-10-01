@@ -136,6 +136,26 @@ public class DataScopeService {
     }
   }
 
+  /**
+   * Checks a data scope requested on an access request, in its text form, against the units and the
+   * scope of the requester (or approver).
+   *
+   * @param text text form of the scope
+   * @return the scope
+   */
+  @Transactional(readOnly = true)
+  public UserDataScope validateRequested(String text) {
+    UserDataScope scope;
+    try {
+      scope = UserDataScope.parse(text);
+    } catch (IllegalArgumentException ex) {
+      throw new BusinessRuleException(
+          "DATA_SCOPE_INVALID", "The requested data access is not valid", ex);
+    }
+    validate(scope, true);
+    return scope;
+  }
+
   private void requireKnownUnits(UserDataScope scope) {
     if (scope.companies().isEmpty()) {
       throw new BusinessRuleException(

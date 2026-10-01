@@ -19,6 +19,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.HandlerMapping;
 
 class DataScopeGuardTest {
 
@@ -38,6 +39,7 @@ class DataScopeGuardTest {
 
   private void userRequest(String path, String username, UserDataScope scope) {
     MockHttpServletRequest request = new MockHttpServletRequest("GET", path);
+    request.setAttribute(HandlerMapping.BEST_MATCHING_HANDLER_ATTRIBUTE, new Object());
     RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
     when(currentUser.optionalUsername()).thenReturn(Optional.ofNullable(username));
     if (username != null) {
@@ -50,6 +52,13 @@ class DataScopeGuardTest {
     assertThat(DataScopeGuard.systemProcessing()).isTrue();
     assertThat(guard.allowed()).isEqualTo(UserDataScope.ALL);
     assertThatCode(() -> guard.requireCompany(5L)).doesNotThrowAnyException();
+  }
+
+  @Test
+  void aBoundRequestNotDispatchedToAControllerRunsAsTheSystem() {
+    RequestContextHolder.setRequestAttributes(
+        new ServletRequestAttributes(new MockHttpServletRequest("GET", "/api/v1/x")));
+    assertThat(DataScopeGuard.systemProcessing()).isTrue();
   }
 
   @Test

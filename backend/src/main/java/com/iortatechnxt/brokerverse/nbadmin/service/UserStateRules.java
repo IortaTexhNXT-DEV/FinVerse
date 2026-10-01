@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.security.UserDataScope;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestContent;
 import com.iortatechnxt.brokerverse.nbadmin.domain.AccessRequestType;
 import com.iortatechnxt.brokerverse.nbadmin.domain.RequestedUserData;
@@ -14,7 +15,7 @@ import java.util.stream.Collectors;
 /**
  * Rules on the state of an existing user (FR-UA-012 to FR-UA-014): the user exists, a deactivation
  * needs an enabled user and a reactivation a disabled or locked one, and a modification changes at
- * least one attribute or the roles.
+ * least one attribute, the roles or the data scope.
  */
 final class UserStateRules {
 
@@ -40,8 +41,10 @@ final class UserStateRules {
     return user.isEnabled() && !user.isLocked();
   }
 
-  static void requireChange(AccessRequestContent c, AppUser user) {
-    if (c.type() == AccessRequestType.MODIFY_USER && !changes(c, user)) {
+  static void requireChange(AccessRequestContent c, AppUser user, UserDataScope currentScope) {
+    if (c.type() == AccessRequestType.MODIFY_USER
+        && !changes(c, user)
+        && !scopeChanges(c.userData(), currentScope)) {
       throw new BusinessRuleException(
           "ACCESS_NOTHING_CHANGED", "The request does not change the user");
     }
@@ -49,6 +52,10 @@ final class UserStateRules {
 
   private static boolean changes(AccessRequestContent c, AppUser user) {
     return dataChanges(c, user) || attributesChange(c.userData(), user) || rolesChange(c, user);
+  }
+
+  private static boolean scopeChanges(RequestedUserData d, UserDataScope current) {
+    return d.requestedScope().map(s -> !s.equals(current)).orElse(false);
   }
 
   private static boolean rolesChange(AccessRequestContent c, AppUser user) {

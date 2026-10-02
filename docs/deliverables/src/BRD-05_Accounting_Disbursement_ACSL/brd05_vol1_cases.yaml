@@ -1610,7 +1610,7 @@ frs:
         steps:
           - Open the worksheet of a form that BIBS does not prepare.
         expected: No worksheet is produced.
-        msg: [This form is prepared outside BrokerVerse and has no worksheet, NO_WORKSHEET]
+        msg: [This form is prepared outside BIBS and has no worksheet, NO_WORKSHEET]
       - c: 3
         type: Negative
         title: Form without lines

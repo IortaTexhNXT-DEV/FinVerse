@@ -912,7 +912,8 @@ validations:
 fields_screen: Schedule Close
 fields:
   - [Period, List, "Yes", Open periods, Previous month]
-  - [Close on, Date-time, "Yes", "-", "In the future; default 2nd banking day 17:00"]
+  - [Close on (date), Date, "Yes", "-", "dd-MMM-yyyy; with the time, in the future; default 2nd banking day"]
+  - [Close on (time), Time, "Yes", "-", "HH:mm, next to the date; default 17:00"]
 notifications:
   - Alert GL_CLOSE_FAILED when a scheduled close fails.
 audit:
@@ -1373,7 +1374,7 @@ rules:
   - [R3, "HDMF, SSS, PhilHealth, 1601-C and 1604-C are payroll outputs and out of scope (AQ06); 2550-M only if BDOI still needs it (AQ07).", Fixed, "-"]
 validations:
   - [Form without lines, "Form <code> has no lines", FORM_NOT_DEFINED]
-  - [Form prepared outside BIBS, This form is prepared outside BrokerVerse and has no worksheet, NO_WORKSHEET]
+  - [Form prepared outside BIBS, This form is prepared outside BIBS and has no worksheet, NO_WORKSHEET]
   - [Period end before start, Tax period end precedes its start, INVALID_TAX_PERIOD]
 notifications:
   - "None."

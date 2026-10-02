@@ -3419,7 +3419,7 @@ frs:
         type: Positive
         title: Incentive indicator on the invoice
         steps:
-          - Book an account on a Motor package covered by CPC2 (seed); open the invoice and the Booked Accounts Register.
+          - Book an account on a Motor package covered by CPC2; open the invoice and the Booked Accounts Register.
         expected: Incentive = Yes with code CPC2; the field is read only.
       - c: 1
         type: Negative

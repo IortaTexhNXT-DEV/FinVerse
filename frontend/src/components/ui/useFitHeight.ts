@@ -29,6 +29,27 @@ export function fittedHeight(m: FitMeasures): number | null {
 const DEFAULT_MIN = 240;
 
 /**
+ * How far the content of the page overflows its scroll area, negative for the room left below it.
+ * The scroll height never falls below the visible height, so when the page fits, the room left is
+ * measured from the content itself (top of the first block to the bottom of the last, with the
+ * padding of the area): a capped list then grows again when the window grows or content above it
+ * is closed.
+ */
+export function pageOverflow(main: HTMLElement): number {
+  const over = main.scrollHeight - main.clientHeight;
+  const first = main.firstElementChild;
+  const last = main.lastElementChild;
+  if (over > 0 || first === null || last === null) {
+    return over;
+  }
+  const style = getComputedStyle(main);
+  const padding =
+    (Number.parseFloat(style.paddingTop) || 0) + (Number.parseFloat(style.paddingBottom) || 0);
+  const content = last.getBoundingClientRect().bottom - first.getBoundingClientRect().top + padding;
+  return Math.min(0, content - main.clientHeight);
+}
+
+/**
  * Caps the height of the list in `ref` to the room left in the window when it is the only list of
  * the page: its header row stays sticky inside the card and the page shows one vertical scroll bar.
  * A page with several lists scrolls as a whole.
@@ -62,7 +83,7 @@ export function useFitHeight(ref: RefObject<HTMLDivElement | null>): void {
       const cap = fittedHeight({
         wrap: wrap.getBoundingClientRect().height,
         table: table.offsetHeight + (wrap.offsetHeight - wrap.clientHeight),
-        overflow: main.scrollHeight - main.clientHeight,
+        overflow: pageOverflow(main),
         min: Number.isFinite(min) ? min : DEFAULT_MIN,
       });
       apply(cap === null ? '' : `${String(cap)}px`);

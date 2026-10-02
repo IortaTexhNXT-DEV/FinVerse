@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.tax.service;
 
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.tax.domain.TaxPeriod;
 import com.iortatechnxt.brokerverse.tax.domain.WorksheetKind;
 import org.springframework.stereotype.Service;
@@ -48,7 +49,8 @@ public class TaxWorksheetService {
       case EWT -> ewt.build(companyId, period);
       case NONE ->
           throw new BusinessRuleException(
-              "NO_WORKSHEET", "This form is prepared outside BrokerVerse and has no worksheet");
+              "NO_WORKSHEET",
+              "This form is prepared outside " + BrandAssets.SYSTEM_NAME + " and has no worksheet");
       default -> levies.build(companyId, kind.premiumLevy(), period);
     };
   }

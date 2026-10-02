@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage.RecordLink;
@@ -63,7 +64,9 @@ public class PasswordNoticeMailer {
     String body =
         "Dear "
             + event.fullName()
-            + ",\n\nA new BrokerVerse password was requested for user "
+            + ",\n\nA new "
+            + BrandAssets.SYSTEM_NAME
+            + " password was requested for user "
             + event.username()
             + ". Open this link to set it:\n\n"
             + event.link()
@@ -77,7 +80,7 @@ public class PasswordNoticeMailer {
             "PASSWORD_RESET",
             List.of(event.email()),
             List.of(),
-            "BrokerVerse: reset your password",
+            BrandAssets.SYSTEM_NAME + ": reset your password",
             body,
             List.of(),
             null,
@@ -93,7 +96,9 @@ public class PasswordNoticeMailer {
   public boolean notifyExpiry(PasswordExpiry expiry) {
     String when = WHEN.format(expiry.expiresAt().atZone(BusinessClock.zone()));
     String body =
-        "Your BrokerVerse password expires on "
+        "Your "
+            + BrandAssets.SYSTEM_NAME
+            + " password expires on "
             + when
             + " (Philippine time). Change it on My Profile before then.";
     boolean told =
@@ -110,7 +115,7 @@ public class PasswordNoticeMailer {
               EXPIRY_EVENT,
               List.of(expiry.email()),
               List.of(),
-              "BrokerVerse: your password expires soon",
+              BrandAssets.SYSTEM_NAME + ": your password expires soon",
               body,
               List.of(),
               null,

@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.report.core;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.organization.domain.BranchRepository;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
@@ -30,7 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class ReportService {
 
-  private static final String DEFAULT_COMPANY = "iNXT BrokerVerse";
+  private static final String DEFAULT_COMPANY = BrandAssets.SYSTEM_NAME;
   private static final String COMPANY_PARAM = "companyId";
   private static final String ID_SEPARATOR = " – ";
 

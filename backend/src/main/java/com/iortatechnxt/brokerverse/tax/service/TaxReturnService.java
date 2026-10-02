@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.DuplicateResourceException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.tax.domain.RemittanceFacts;
@@ -144,7 +145,8 @@ public class TaxReturnService {
     TaxForm form = forms.requireActive(companyId, formCode);
     if (!form.isTrackFiling()) {
       throw new BusinessRuleException(
-          "FORM_NOT_TRACKED", "Form " + formCode + " is prepared outside BrokerVerse");
+          "FORM_NOT_TRACKED",
+          "Form " + formCode + " is prepared outside " + BrandAssets.SYSTEM_NAME);
     }
     TaxPeriod period = form.schedule().periodStarting(periodStart);
     returns

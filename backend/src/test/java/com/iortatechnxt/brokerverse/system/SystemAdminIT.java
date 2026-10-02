@@ -58,7 +58,7 @@ class SystemAdminIT {
   @Test
   void applicationInformation() {
     var about = info.about();
-    assertThat(about.product()).isEqualTo("iNXT BrokerVerse");
+    assertThat(about.product()).isEqualTo("BIBS");
     assertThat(about.vendor()).isEqualTo("IortaTechNXT");
     assertThat(about.version()).isNotBlank();
     var details = info.info();

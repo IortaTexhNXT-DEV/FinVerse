@@ -4,6 +4,7 @@ import static com.iortatechnxt.brokerverse.reinsurance.report.RiReportSupport.K_
 import static com.iortatechnxt.brokerverse.reinsurance.report.RiReportSupport.K_CLASS;
 import static com.iortatechnxt.brokerverse.reinsurance.report.RiReportSupport.K_UW_YEAR;
 
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.util.Money;
 import com.iortatechnxt.brokerverse.reinsurance.domain.Cession;
 import com.iortatechnxt.brokerverse.reinsurance.domain.CessionLine;
@@ -28,9 +29,9 @@ import org.springframework.stereotype.Component;
 
 /**
  * PGIR0637 Reinsurance Premium Register: one row per risk of every ceded transaction with an RI
- * accounting date in the period: sum insured (100 % and ours), PML (BrokerVerse rule: the sum
- * insured when no PML is captured), premium, and the premium and SI % of the retention, quota
- * share, surplus and facultative layers. UW Year &gt; Branch &gt; Class. Only policies with an RI
+ * accounting date in the period: sum insured (100 % and ours), PML (platform rule: the sum insured
+ * when no PML is captured), premium, and the premium and SI % of the retention, quota share,
+ * surplus and facultative layers. UW Year &gt; Branch &gt; Class. Only policies with an RI
  * allocation.
  */
 @Component
@@ -104,7 +105,10 @@ public class RiPremiumRegisterReport implements ReportDefinition {
         .groupBy(K_CLASS, "Class")
         .rows(rows)
         .note("Premium amounts in base currency; % columns are shares of the company sum insured.")
-        .note("PML = sum insured when no probable maximum loss is recorded (BrokerVerse rule).")
+        .note(
+            "PML = sum insured when no probable maximum loss is recorded ("
+                + BrandAssets.SYSTEM_NAME
+                + " rule).")
         .build();
   }
 

@@ -9,8 +9,9 @@ import java.util.Properties;
 
 /**
  * The brand of generated files (client requirement 16) from the theme pack of the deployment: the
- * logo, the colours and the font of the client. Reports and business documents in PDF, Word and
- * Excel all take their brand from here, so no client logo or colour is written into the platform.
+ * logo, the colours and the font of the client, and the name of the system in texts to users.
+ * Reports and business documents in PDF, Word and Excel all take their brand from here, so no
+ * client logo or colour is written into the platform.
  *
  * <p>The pack is the folder {@code theme/<pack>} on the classpath with {@code brand.properties} and
  * the logo; it is chosen with the system property {@value #PACK_PROPERTY} or the environment
@@ -28,6 +29,12 @@ public final class BrandAssets {
   public static final String DEFAULT_PACK = "bdoi";
 
   private static final Pack PACK = Pack.load(packName());
+
+  /**
+   * Name of the system in texts to users (e-mails and their subjects, notifications, messages,
+   * report footers, document properties), e.g. "BIBS"; the platform never names itself there.
+   */
+  public static final String SYSTEM_NAME = PACK.text("system.name");
 
   /** Table headers and titles. */
   public static final String HEADER = PACK.color("header");

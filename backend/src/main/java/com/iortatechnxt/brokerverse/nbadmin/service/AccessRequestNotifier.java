@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.nbadmin.service;
 
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.messaging.domain.Notice;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage.RecordLink;
@@ -207,7 +208,7 @@ public class AccessRequestNotifier {
         ACCESS_CHANGED);
     email(
         username,
-        "BrokerVerse: your access changed",
+        BrandAssets.SYSTEM_NAME + ": your access changed",
         body,
         "ACCESS_CHANGED",
         new RecordLink(AccessRequestService.ENTITY, idOf(r), r.getRequestNo()));
@@ -221,7 +222,9 @@ public class AccessRequestNotifier {
    */
   public void dormantWarning(String username, LocalDate deactivationDate) {
     String body =
-        "You have not signed in to BrokerVerse for a long time. Sign in before "
+        "You have not signed in to "
+            + BrandAssets.SYSTEM_NAME
+            + " for a long time. Sign in before "
             + DisplayFormat.date(deactivationDate)
             + ", or your account is deactivated and a new access request is needed.";
     notifications.notifyUser(
@@ -230,7 +233,7 @@ public class AccessRequestNotifier {
         DORMANT_WARNING);
     email(
         username,
-        "BrokerVerse: sign in to keep your account",
+        BrandAssets.SYSTEM_NAME + ": sign in to keep your account",
         body,
         DORMANT_WARNING,
         new RecordLink("AppUser", username, "Dormant account"));

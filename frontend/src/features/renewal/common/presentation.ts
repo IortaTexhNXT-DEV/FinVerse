@@ -284,3 +284,11 @@ const ACCOUNT_TYPES: Readonly<Record<string, string>> = {
 export function accountTypeLabel(code: string | null | undefined): string {
   return labelOf(ACCOUNT_TYPES, code);
 }
+
+/** A rate in percent: "18%", "0.25%"; empty when not known. */
+export function rateText(rate: number | null | undefined): string {
+  if (rate === null || rate === undefined) {
+    return '';
+  }
+  return `${rate.toLocaleString('en-US', { maximumFractionDigits: 4 })}%`;
+}

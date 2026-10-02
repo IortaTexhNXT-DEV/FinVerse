@@ -208,7 +208,13 @@ export interface ChecksView {
     by: string;
     at: string;
   }[];
-  endorsements: { reference: string; source: string; status: string; linkedAt: string }[];
+  endorsements: {
+    reference: string;
+    source: string | null;
+    /** The status of the endorsement when it was linked; absent when not known. */
+    status?: string | null;
+    linkedAt: string;
+  }[];
 }
 
 export interface HistoryView {

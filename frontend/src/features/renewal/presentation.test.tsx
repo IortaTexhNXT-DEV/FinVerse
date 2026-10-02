@@ -22,6 +22,7 @@ import MyDispositionsPage from './mine/MyDispositionsPage';
 import ProcessingPage from './processing/ProcessingPage';
 import { detail, row } from './renewalFixtures';
 import CandidatePage from './record/CandidatePage';
+import { ChecksTab } from './record/RecordTabs';
 import { Route, Routes } from 'react-router-dom';
 import RenewalSetupPage from './setup/RenewalSetupPage';
 import { renewalWrapper } from './testWrapper';
@@ -246,5 +247,30 @@ describe('renewal record words', () => {
     expect(businessOriginLabel('BANK')).toBe('Bank referral');
     expect(accountTypeLabel('CORPORATE')).toBe('Corporate');
     expect(accountTypeLabel(null)).toBe('');
+  });
+});
+
+describe('renewal checks tab', () => {
+  it('shows an endorsement linked without its status', async () => {
+    vi.spyOn(renewalApi, 'checks').mockResolvedValue({
+      results: [],
+      runs: [],
+      buckets: [],
+      endorsements: [
+        { reference: 'ENR-2026-000005', source: 'BOOKING', linkedAt: '2026-10-01T02:00:00Z' },
+      ],
+    });
+    render(renewalWrapper(new Set(['RNW_VIEW']))(<ChecksTab detail={detail()} />));
+    expect(await screen.findByText('ENR-2026-000005')).toBeInTheDocument();
+    expect(screen.getByText('Booking')).toBeInTheDocument();
+  });
+});
+
+describe('renewal rates', () => {
+  it('shows a rate in percent', async () => {
+    const { rateText } = await import('./common/presentation');
+    expect(rateText(18)).toBe('18%');
+    expect(rateText(0.25)).toBe('0.25%');
+    expect(rateText(null)).toBe('');
   });
 });

@@ -11,7 +11,12 @@ import { Card } from '@/components/ui/Card';
 import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
 import { UserName } from '@/components/ui/UserName';
 import { formatDate, formatDateTime } from '@/utils/format';
-import { accountTypeLabel, businessOriginLabel, closedAsLabel } from '../common/presentation';
+import {
+  accountTypeLabel,
+  businessOriginLabel,
+  closedAsLabel,
+  rateText,
+} from '../common/presentation';
 import { RenewalInsurer, RenewalProduct, RenewalUnit } from '../common/RenewalBits';
 import { RNW_LOV, dispositionLabel } from '../common/renewalCodes';
 
@@ -121,8 +126,8 @@ function AmountsCard({ detail }: Props) {
           { label: 'Basic Premium', value: <Amount value={m.basicPremium} /> },
           { label: 'Gross Premium', value: <Amount value={m.grossPremium} /> },
           { label: 'Sum Insured', value: <Amount value={m.sumInsured} /> },
-          { label: 'Premium Rate', value: m.premiumRate },
-          { label: 'Commission Rate', value: m.commissionRate },
+          { label: 'Premium Rate', value: rateText(m.premiumRate) || null },
+          { label: 'Commission Rate', value: rateText(m.commissionRate) || null },
           {
             label: 'Outstanding',
             value: m.outstanding === null ? null : <Amount value={m.outstanding} />,

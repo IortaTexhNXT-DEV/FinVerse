@@ -16,6 +16,7 @@ import {
   acceptanceMethodLabel,
   bucketCauseLabel,
   letterTypeLabel,
+  rateText,
   responseLabel,
 } from '../common/presentation';
 import { BucketPill } from '../common/RenewalBits';
@@ -78,12 +79,12 @@ export function ChecksTab({ detail }: Props) {
           emptyMessage="No endorsements in the term"
           columns={[
             { key: 'ref', header: 'Reference', kind: 'code', render: (e) => e.reference },
-            { key: 'src', header: 'Source', render: (e) => humanize(e.source) },
+            { key: 'src', header: 'Source', render: (e) => (e.source ? humanize(e.source) : '') },
             {
               key: 'status',
               header: 'Status',
               kind: 'status',
-              render: (e) => <StatusBadge status={e.status} />,
+              render: (e) => (e.status ? <StatusBadge status={e.status} /> : ''),
             },
             {
               key: 'at',
@@ -108,7 +109,7 @@ function TermsGrid({ title, t }: Readonly<{ title: string; t: Terms }>) {
           { label: 'Charges', value: <Amount value={t.charges} /> },
           { label: 'Gross Premium', value: <Amount value={t.grossPremium} /> },
           { label: 'Sum Insured', value: <Amount value={t.sumInsured} /> },
-          { label: 'Commission Rate', value: t.commissionRate ?? '' },
+          { label: 'Commission Rate', value: rateText(t.commissionRate) },
           { label: 'Commission', value: <Amount value={t.commission} /> },
         ]}
       />

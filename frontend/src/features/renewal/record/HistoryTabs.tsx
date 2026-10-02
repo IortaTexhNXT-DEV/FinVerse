@@ -124,7 +124,7 @@ export function AccountHistoryTab({ detail }: Props) {
         <p>
           {h.claims.connected
             ? `${String(h.claims.count)} claim(s), ${String(h.claims.open)} open`
-            : 'Claims are not connected yet; the claims shown on the renewal come from the extraction.'}
+            : 'The claims of the expiring term are those read when the renewal was extracted: see the Claims flag and the claims check on the Checks tab.'}
         </p>
       </Card>
     </div>

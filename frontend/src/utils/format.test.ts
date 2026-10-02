@@ -65,9 +65,12 @@ describe('format', () => {
   });
 
   it('formats elapsed time', () => {
-    expect(formatDuration('2026-09-25T10:00:00Z', '2026-09-25T10:45:00Z')).toBe('45m');
-    expect(formatDuration('2026-09-25T10:00:00Z', '2026-09-25T13:30:00Z')).toBe('3h 30m');
-    expect(formatDuration('2026-09-23T10:00:00Z', '2026-09-25T13:00:00Z')).toBe('2d 3h');
+    expect(formatDuration('2026-09-25T10:00:00Z', '2026-09-25T10:45:00Z')).toBe('45 min');
+    expect(formatDuration('2026-09-25T10:00:00Z', '2026-09-25T13:30:00Z')).toBe('3 hrs 30 min');
+    expect(formatDuration('2026-09-25T10:00:00Z', '2026-09-25T11:00:00Z')).toBe('1 hr');
+    expect(formatDuration('2026-09-23T10:00:00Z', '2026-09-25T13:00:00Z')).toBe('2 days 3 hrs');
+    expect(formatDuration('2026-09-24T10:00:00Z', '2026-09-25T10:00:00Z')).toBe('1 day');
+    expect(formatDuration('2026-09-25T10:00:00Z', '2026-09-24T10:00:00Z')).toBe('');
   });
 
   it('humanizes enum codes', () => {

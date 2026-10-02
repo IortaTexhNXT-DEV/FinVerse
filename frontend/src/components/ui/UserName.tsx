@@ -7,13 +7,23 @@ interface UserNameProps {
   withRole?: boolean;
   /** Text when there is no user (e.g. an automatic system step). */
   empty?: string;
+  /**
+   * Keep the name on one line in a list column, cut with an ellipsis at the column width; the
+   * tooltip then gives the full name with the login id.
+   */
+  truncate?: boolean;
 }
 
 /**
  * A user's display name (never the login id), with the login id in the tooltip; optionally the
  * main role on a muted second line.
  */
-export function UserName({ login, withRole = false, empty = '—' }: Readonly<UserNameProps>) {
+export function UserName({
+  login,
+  withRole = false,
+  empty = '—',
+  truncate = false,
+}: Readonly<UserNameProps>) {
   const name = useDisplayName();
   const role = useRoleName();
   if (!login) {
@@ -21,7 +31,16 @@ export function UserName({ login, withRole = false, empty = '—' }: Readonly<Us
   }
   const roleName = withRole ? role(login) : undefined;
   if (roleName === undefined) {
-    return <span title={login}>{name(login)}</span>;
+    const shown = name(login);
+    return truncate ? (
+      <span className="user-name truncate" title={shown === login ? login : `${shown} (${login})`}>
+        {shown}
+      </span>
+    ) : (
+      <span className="user-name" title={login}>
+        {shown}
+      </span>
+    );
   }
   return (
     <span className="cell-stack" title={login}>

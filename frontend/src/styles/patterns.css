@@ -5,13 +5,59 @@
    ========================================================================== */
 
 /* ---------- Tables ---------------------------------------------------------------------- */
-/* The header row stays visible while a long table scrolls inside its card. */
-.table-wrap {
-  max-height: var(--table-max-height);
+/* The header row stays visible at the top of the page while a long list scrolls with the page;
+   lists never scroll inside a box of their own (no nested scroll bars, no dead space under the
+   card). */
+.table thead th {
+  z-index: 2;
 }
 
-.table thead th {
-  z-index: 1;
+/* Text kept on one line and cut with an ellipsis at the column width; the full text is in the
+   tooltip (names, record types, units). */
+.truncate {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.table td.col-truncate {
+  max-width: 0;
+  white-space: nowrap;
+}
+
+.table td.col-truncate > .truncate,
+.table td.col-truncate > .user-name {
+  display: block;
+}
+
+/* User names never wrap inside a list cell. */
+.table td .user-name {
+  white-space: nowrap;
+}
+
+/* Row action menu column: as narrow as the menu button. */
+.table th.col-actions,
+.table td.col-actions {
+  width: 1%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* A due date or time on one line; past due in red with the warning icon (never colour alone). */
+.due-date {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.due-date.overdue {
+  color: var(--color-danger);
+  font-weight: 700;
 }
 
 .table th.num,
@@ -98,9 +144,12 @@
   line-height: 16px;
 }
 
+/* The selected row: Background Blue with the CTA Blue bar, distinct from the neutral hover. */
 .table tbody tr[aria-selected='true'],
-.table tbody tr.selected {
-  background: #cfeaff;
+.table tbody tr.selected,
+.table tbody tr[aria-selected='true']:hover,
+.table tbody tr.selected:hover {
+  background: var(--table-row-selected);
   box-shadow: inset 4px 0 0 var(--brand-blue);
 }
 
@@ -915,7 +964,7 @@ dl.form-grid dd {
   }
 
   .table tbody tr:nth-child(even) {
-    background: var(--brand-blue-050) !important;
+    background: var(--table-row-alt) !important;
     print-color-adjust: exact;
     -webkit-print-color-adjust: exact;
   }

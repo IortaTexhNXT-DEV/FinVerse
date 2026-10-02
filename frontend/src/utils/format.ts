@@ -1,47 +1,4 @@
-/** Codes shown in capitals inside labels (BDO style guide: Title Case, acronyms kept). */
-const ACRONYMS = new Set([
-  'ACSL',
-  'ADA',
-  'ARN',
-  'BIR',
-  'CPC2',
-  'DTIP',
-  'DV',
-  'EOD',
-  'HO',
-  'OTC',
-  'PDC',
-  'TSI',
-  'WTAX',
-  'AR',
-  'OR',
-  'CL',
-  'CLPC',
-  'CTPL',
-  'CWT',
-  'DP',
-  'DST',
-  'FFY',
-  'GL',
-  'IA',
-  'ID',
-  'IBNR',
-  'KYC',
-  'LGT',
-  'LOV',
-  'NB',
-  'PN',
-  'PR',
-  'PRF',
-  'PS',
-  'QS',
-  'SI',
-  'SLA',
-  'TIN',
-  'TSU',
-  'UPR',
-  'VAT',
-]);
+import { acronymOf } from './acronyms';
 
 /** Short words kept in lower case inside Title Case labels ("Ready for Placement"). */
 const MINOR_WORDS = new Set([
@@ -209,23 +166,60 @@ export function formatDateTime(iso: string | null | undefined): string {
   return `${part('day')}-${month}-${part('year')} ${part('hour')}:${part('minute')}`;
 }
 
-/** Whole days elapsed between two timestamps, for "duration in stage" columns. */
+const MINUTE_MS = 60_000;
+
+/** A count with its unit in the right number: "1 hr", "3 hrs", "1 day", "12 days". */
+function unitText(count: number, singular: string, plural: string): string {
+  return `${String(count)} ${count === 1 ? singular : plural}`;
+}
+
+/**
+ * Elapsed time in words, for "duration in stage" and age columns: "45 min", "3 hrs 30 min",
+ * "2 days 3 hrs" (never "2d 3h"). An end before the start, or an invalid time, gives the empty text.
+ */
 export function formatDuration(fromIso: string, toIso: string | null | undefined): string {
   const start = new Date(fromIso).getTime();
   const end = toIso ? new Date(toIso).getTime() : Date.now();
   if (Number.isNaN(start) || Number.isNaN(end) || end < start) {
     return '';
   }
-  const minutes = Math.floor((end - start) / 60000);
+  const minutes = Math.floor((end - start) / MINUTE_MS);
   if (minutes < 60) {
-    return `${String(minutes)}m`;
+    return `${String(minutes)} min`;
   }
   const hours = Math.floor(minutes / 60);
   if (hours < 24) {
-    return `${String(hours)}h ${String(minutes % 60)}m`;
+    const rest = minutes % 60;
+    const hrs = unitText(hours, 'hr', 'hrs');
+    return rest === 0 ? hrs : `${hrs} ${String(rest)} min`;
   }
   const days = Math.floor(hours / 24);
-  return `${String(days)}d ${String(hours % 24)}h`;
+  const rest = hours % 24;
+  const dayText = unitText(days, 'day', 'days');
+  return rest === 0 ? dayText : `${dayText} ${unitText(rest, 'hr', 'hrs')}`;
+}
+
+/**
+ * The age of an item since a time, as an aging column reads it: whole days from one day on ("1
+ * day", "22 days"); under a day the hours or minutes ("5 hrs", "45 min").
+ */
+export function formatAge(fromIso: string | null | undefined, now: number = Date.now()): string {
+  if (!fromIso) {
+    return '';
+  }
+  const start = new Date(fromIso).getTime();
+  if (Number.isNaN(start)) {
+    return '';
+  }
+  const minutes = Math.floor(Math.max(0, now - start) / MINUTE_MS);
+  if (minutes < 60) {
+    return `${String(minutes)} min`;
+  }
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) {
+    return unitText(hours, 'hr', 'hrs');
+  }
+  return formatDays(Math.floor(hours / 24));
 }
 
 const businessDateFormat = new Intl.DateTimeFormat('en-CA', {
@@ -255,11 +249,11 @@ export function humanize(code: string): string {
   return code
     .split('_')
     .map((word, i) => {
-      const w = word.toUpperCase();
-      if (ACRONYMS.has(w)) {
-        return w;
+      const fixed = acronymOf(word);
+      if (fixed !== null) {
+        return fixed;
       }
-      const lower = w.toLowerCase();
+      const lower = word.toLowerCase();
       return i > 0 && MINOR_WORDS.has(lower)
         ? lower
         : lower.charAt(0).toUpperCase() + lower.slice(1);
@@ -280,6 +274,12 @@ function titleWord(word: string, first: boolean): string {
   const lower = core.toLowerCase();
   if (!first && start === 0 && MINOR_WORDS.has(lower)) {
     return lower;
+  }
+  // An acronym written in lower or title case ("Ra sent", "Soa"): in capitals, as the map says.
+  const letters = /^[A-Za-z0-9]+/.exec(core)?.[0] ?? '';
+  const fixed = acronymOf(letters);
+  if (fixed !== null) {
+    return lead + fixed + core.slice(letters.length);
   }
   return lead + lower.charAt(0).toUpperCase() + lower.slice(1);
 }
@@ -318,10 +318,7 @@ export function statusPhrase(code: string | null | undefined): string {
   }
   return code
     .split('_')
-    .map((word) => {
-      const w = word.toUpperCase();
-      return ACRONYMS.has(w) ? w : w.toLowerCase();
-    })
+    .map((word) => acronymOf(word) ?? word.toLowerCase())
     .join(' ');
 }
 

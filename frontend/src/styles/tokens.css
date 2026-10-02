@@ -67,8 +67,11 @@
   --code-col-width: 168px;
   /* Period column: "to 20-Oct-2027" on one line (PeriodCell) */
   --period-col-width: 132px;
-  /* Tables scroll inside their card so the header row stays visible */
-  --table-max-height: 70vh;
+  /* Tables: one text size, neutral zebra rows, a hover distinct from the selected row */
+  --table-font-size: 14px;
+  --table-row-alt: #fafafa;
+  --table-row-hover: #f0f2f5;
+  --table-row-selected: var(--brand-blue-050);
   /* Label column of definition grids */
   --def-label-width: 168px;
   --focus-ring: 0 0 0 3px rgba(47, 109, 181, 0.35);

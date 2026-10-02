@@ -79,6 +79,92 @@ describe('QueueTable', () => {
     expect(screen.queryByText('T-CBG1')).toBeNull();
   });
 
+  it('names employee benefits teams, and shows an unknown unit code muted', async () => {
+    vi.spyOn(lovApi, 'options').mockImplementation((type: string) =>
+      Promise.resolve(
+        type === 'EB_TEAM'
+          ? [
+              { code: 'NEW_BUSINESS', label: 'New Business' },
+              { code: 'BDO', label: 'BDO' },
+            ]
+          : [],
+      ),
+    );
+    vi.spyOn(catalogApi, 'salesOrganisation').mockResolvedValue({
+      units: [],
+    } as unknown as Awaited<ReturnType<typeof catalogApi.salesOrganisation>>);
+    show([
+      item({ id: 1, workflowCode: 'EB_CYCLE', originatingUnit: 'NEW_BUSINESS' }),
+      item({ id: 2, reference: 'EBC-2026-000002', originatingUnit: 'X-UNKNOWN' }),
+    ]);
+    expect(await screen.findByText('New Business')).toBeTruthy();
+    expect(screen.queryByText('NEW_BUSINESS')).toBeNull();
+    expect(screen.getByText('X-UNKNOWN')).toHaveClass('muted');
+  });
+
+  it('shows the record type in its own column and the stage pill alone', () => {
+    vi.spyOn(lovApi, 'options').mockResolvedValue([]);
+    show([
+      item({ id: 1, workflowCode: 'NB_ACCOUNT', stageCode: 'RETURNED_TO_MARKETING' }),
+      item({ id: 2, reference: 'EBC-2026-000001', workflowCode: 'EB_CYCLE', stageCode: 'RA_SENT' }),
+      item({ id: 3, reference: 'X-1', workflowCode: 'SOMETHING_NEW', stageCode: 'DRAFT' }),
+    ]);
+    expect(screen.getByRole('columnheader', { name: 'Type' })).toBeTruthy();
+    expect(screen.getByText('Account')).toHaveAttribute('title', 'Account');
+    expect(screen.getByText('EB Cycle')).toBeTruthy();
+    expect(screen.queryByText('Accounts')).toBeNull();
+    const pill = screen.getByText('RA Sent');
+    expect(pill).toHaveClass('badge');
+    expect(pill.parentElement?.tagName).toBe('TD');
+    expect(screen.queryByText('Ra Sent')).toBeNull();
+    expect(screen.getByText('Returned to Marketing')).toHaveClass('badge', 'danger');
+    // An unknown workflow is a dash, never a blank cell or its code.
+    const unknownRow = screen.getByText('X-1').closest('tr');
+    expect(unknownRow?.textContent).toContain('—');
+    expect(screen.queryByText('SOMETHING_NEW')).toBeNull();
+  });
+
+  it('shows age in days right-aligned and the due time on one line, red only when overdue', () => {
+    vi.spyOn(lovApi, 'options').mockResolvedValue([]);
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-09-24T02:00:00Z'));
+    show([
+      item({
+        id: 1,
+        stageEnteredAt: '2026-09-02T01:00:00Z',
+        dueAt: '2026-09-10T02:00:00Z',
+        overdue: true,
+      }),
+      item({ id: 2, reference: 'PRF-2026-900004', dueAt: '2026-10-10T02:00:00Z' }),
+      item({ id: 3, reference: 'PRF-2026-900005' }),
+    ]);
+    vi.useRealTimers();
+    const age = screen.getByText('22 days');
+    expect(age.closest('td')).toHaveClass('num');
+    const late = screen.getByText('10-Sep-2026 10:00').closest('.due-date');
+    expect(late).toHaveClass('overdue');
+    expect(late?.textContent).toContain('Overdue');
+    expect(late?.querySelector('svg')).not.toBeNull();
+    expect(late?.closest('td')).toHaveClass('col-datetime');
+    const onTime = screen.getByText('10-Oct-2026 10:00');
+    expect(onTime).not.toHaveClass('overdue');
+    expect(onTime.textContent).not.toContain('Overdue');
+    expect(screen.getByText('PRF-2026-900005').closest('tr')?.textContent).toContain('—');
+  });
+
+  it('keeps names on one line, cut at the column width with the full name in the tooltip', () => {
+    vi.spyOn(lovApi, 'options').mockResolvedValue([]);
+    setUserDirectory([{ username: 'ao', displayName: 'Aileen Account Officer' }]);
+    show([item({ id: 1, assignee: 'ao' })]);
+    const names = screen.getAllByText('Aileen Account Officer');
+    for (const name of names) {
+      expect(name).toHaveClass('truncate');
+      expect(name).toHaveAttribute('title', 'Aileen Account Officer (ao)');
+      expect(name.closest('td')).toHaveClass('col-truncate');
+    }
+    setUserDirectory([]);
+  });
+
   it('offers Claim and Assign in the row action menu, Claim only while unassigned', () => {
     vi.spyOn(lovApi, 'options').mockResolvedValue([]);
     const claim = vi.fn();

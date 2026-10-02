@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
-import { Fragment } from 'react';
+import { Fragment, useLayoutEffect, useRef, useState } from 'react';
 import type { KeyboardEvent, ReactNode } from 'react';
 import { EmptyState } from './EmptyState';
 import { PeriodCell } from './PeriodCell';
@@ -10,7 +10,7 @@ import { PeriodCell } from './PeriodCell';
  * (`PeriodCell`), status pills centred.
  */
 export type ColumnKind =
-  'text' | 'amount' | 'code' | 'date' | 'datetime' | 'period' | 'status' | 'center';
+  'text' | 'amount' | 'code' | 'date' | 'datetime' | 'period' | 'status' | 'center' | 'actions';
 
 export interface Column<T> {
   key: string;
@@ -22,6 +22,11 @@ export interface Column<T> {
   width?: string;
   /** Sort key sent to the API; the header becomes a sort button when the table has `onSort`. */
   sortKey?: string;
+  /**
+   * Keep a text value on one line, cut with an ellipsis at the column width, the full text in the
+   * tooltip (names, record types, units), instead of wrapping.
+   */
+  truncate?: boolean;
 }
 
 export type SortDirection = 'asc' | 'desc';
@@ -67,6 +72,7 @@ const KIND_CLASS: Record<ColumnKind, string | undefined> = {
   period: 'col-period',
   status: 'col-status',
   center: 'center',
+  actions: 'col-actions',
 };
 
 /** Dates (23-Sep-2026, 23-Sep-2026 19:32) and codes (PAY-2026-000010, T-CBG1): never wrapped. */
@@ -114,10 +120,28 @@ function keepTogether(value: ReactNode): ReactNode {
 }
 
 function cellClass<T>(c: Column<T>): string | undefined {
+  let kind: string | undefined = c.kind === undefined ? undefined : KIND_CLASS[c.kind];
   if (c.numeric) {
-    return 'num';
+    kind = 'num';
   }
-  return c.kind === undefined ? undefined : KIND_CLASS[c.kind];
+  if (c.truncate) {
+    return kind === undefined ? 'col-truncate' : `${kind} col-truncate`;
+  }
+  return kind;
+}
+
+/** A cell's value in a truncating column: one line with the full text in the tooltip. */
+function truncated(value: ReactNode): ReactNode {
+  const text = typeof value === 'string' && value !== '';
+  return keepTogether(
+    text ? (
+      <span className="truncate" title={value}>
+        {value}
+      </span>
+    ) : (
+      value
+    ),
+  );
 }
 
 function ariaSort<T>(c: Column<T>, sort: SortState | undefined) {
@@ -239,7 +263,7 @@ function TableBody<T>({
             >
               {columns.map((c) => (
                 <td key={c.key} className={cellClass(c)}>
-                  {keepTogether(c.render(row))}
+                  {c.truncate ? truncated(c.render(row)) : keepTogether(c.render(row))}
                 </td>
               ))}
             </tr>
@@ -256,9 +280,37 @@ function TableBody<T>({
 }
 
 /**
- * Accessible data table (BDO): Header Blue sticky header, zebra rows, row hover and selection,
- * keyboard-operable row click, sortable headers where the API sorts, skeleton rows while loading,
- * a designed empty state and a totals footer.
+ * Whether a table is wider than its card: such a table scrolls sideways inside its card (and its
+ * header then sticks within it); every other table uses the page scroll with its header sticky at
+ * the top of the page, with no scroll box of its own.
+ */
+function useWide() {
+  const ref = useRef<HTMLDivElement>(null);
+  const [wide, setWide] = useState(false);
+  useLayoutEffect(() => {
+    const wrap = ref.current;
+    if (wrap === null || typeof ResizeObserver === 'undefined') {
+      return undefined;
+    }
+    const measure = () => {
+      const table = wrap.firstElementChild;
+      setWide(table !== null && table.scrollWidth > wrap.clientWidth + 1);
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(wrap);
+    if (wrap.firstElementChild !== null) {
+      observer.observe(wrap.firstElementChild);
+    }
+    measure();
+    return () => observer.disconnect();
+  }, []);
+  return { ref, wide };
+}
+
+/**
+ * Accessible data table (BDO): Header Blue header sticky at the top of the page, neutral zebra
+ * rows, a row hover distinct from the selected row, keyboard-operable row click, sortable headers
+ * where the API sorts, skeleton rows while loading, a designed empty state and a totals footer.
  */
 export function DataTable<T>({
   columns,
@@ -278,8 +330,9 @@ export function DataTable<T>({
   expanded,
   callout,
 }: Readonly<DataTableProps<T>>) {
+  const { ref, wide } = useWide();
   return (
-    <div className="table-wrap" data-callout={callout}>
+    <div ref={ref} className={wide ? 'table-wrap' : 'table-wrap table-page'} data-callout={callout}>
       <table className="table" aria-busy={loading || undefined}>
         {caption !== undefined && <caption className="visually-hidden">{caption}</caption>}
         <thead>

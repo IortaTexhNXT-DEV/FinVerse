@@ -106,7 +106,68 @@ export const WORKFLOW_NAMES: Record<string, string> = {
   REM_DEDUCTION: 'Remittance deductions',
   FRBS_SERVICE_FEE: 'Service fee runs',
   SCR_CASE: 'Screening cases',
+  EB_CYCLE: 'EB cycles',
+  EB_FRANCHISE: 'EB franchise requests',
+  EB_MEMBER_CHANGE: 'EB member changes',
+  EB_SOA: 'EB statements of account',
+  BCL_CLAIM: 'Claims',
+  RNW_CASE: 'Renewals',
+  SBM_POLICY: 'Submitted policies',
 };
+
+/**
+ * The record type of a work item, one per workflow, as the Type column of My Work shows it
+ * ("Account", "EB Cycle"); never the workflow code.
+ */
+export const WORKFLOW_RECORD_TYPES: Record<string, string> = {
+  NB_QUOTATION: 'Quotation',
+  NB_PROPOSAL: 'Proposal Request',
+  NB_ACCOUNT: 'Account',
+  NB_CLIENT: 'Client Onboarding',
+  PM_PACKAGE_REQUEST: 'Package Request',
+  CLX_ESCALATION: 'Collection Escalation',
+  DISB_VOUCHER: 'Disbursement Voucher',
+  DISB_STATUS_EDIT: 'Instrument Status Change',
+  DISB_FUNDING: 'Account Funding',
+  DISB_PAYEE: 'Payee',
+  PRQ_REFUND: 'Refund Request',
+  PRQ_CASH_ADVANCE: 'Cash Advance Request',
+  PRQ_CHECK_CANCEL: 'Check Cancellation',
+  ACSL_CASE: 'ACSL Case',
+  ACSL_CORRECTION: 'ACSL Correction Entry',
+  REM_DEDUCTION: 'Remittance Deduction',
+  FRBS_SERVICE_FEE: 'Service Fee Run',
+  SCR_CASE: 'Screening Case',
+  EB_CYCLE: 'EB Cycle',
+  EB_FRANCHISE: 'EB Franchise Request',
+  EB_MEMBER_CHANGE: 'EB Member Change',
+  EB_SOA: 'EB Statement of Account',
+  BCL_CLAIM: 'Claim',
+  RNW_CASE: 'Renewal',
+  SBM_POLICY: 'Submitted Policy',
+  SBM_IAAF: 'IAAF Review',
+  SBM_TOR: 'Terms of Reference',
+  OPS_BIR_CERT: 'BIR Certificate',
+  OPS_CWT_2307: 'CWT Certificate (2307)',
+  OPS_DISPOSITION: 'Payment Disposition',
+  OPS_DP_BILLING: 'Direct Payment Billing',
+  OPS_ENDORSEMENT: 'Endorsement Request',
+  OPS_HOLD: 'Remittance Hold',
+  OPS_RECEIPT_ACTION: 'Receipt Action',
+  OPS_RECON: 'Production Reconciliation',
+  OPS_REMITTANCE: 'Remittance',
+  OPS_SPECIAL_REMIT: 'Special Remittance',
+  MIG_OPENING_TRUEUP: 'Opening Balance True-up',
+  MIG_OBJECT_DECISION: 'Migration Object Decision',
+  MIG_RESUBMISSION: 'Migration Resubmission',
+  MIG_BATCH_ROLLBACK: 'Migration Batch Rollback',
+  MIG_MAP_VERSION: 'Code Map Version',
+};
+
+/** The record type of a workflow by its name; an unknown workflow reads as the muted dash. */
+export function workflowRecordType(code: string | null | undefined): string {
+  return code ? (WORKFLOW_RECORD_TYPES[code] ?? '') : '';
+}
 
 /** Workflow engine: My Work queues, record workflow panel, generic actions, assignment. */
 export const workflowApi = {

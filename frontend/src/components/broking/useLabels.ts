@@ -164,6 +164,15 @@ export function useProductName(): (code: string | null | undefined) => string {
  * its name ("CBG Metro Team 1"); the code while the organisation loads.
  */
 export function useSalesUnitName(): (code: string | null | undefined) => string {
+  const name = useSalesUnitNameOrNull();
+  return (code) => (code ? (name(code) ?? code) : '');
+}
+
+/**
+ * Name lookup of sales units that tells an unknown code apart: the unit's name, or null when the
+ * code is not a unit of the company (or the organisation is not loaded).
+ */
+export function useSalesUnitNameOrNull(): (code: string | null | undefined) => string | null {
   const companyId = useContext(WorkspaceContext)?.company?.id ?? 0;
   const org = useQuery({
     queryKey: ['catalog', 'sales-organisation', companyId],
@@ -171,10 +180,5 @@ export function useSalesUnitName(): (code: string | null | undefined) => string 
     staleTime: STALE,
     enabled: companyId > 0,
   });
-  return (code) => {
-    if (!code) {
-      return '';
-    }
-    return org.data?.units.find((u) => u.code === code)?.name ?? code;
-  };
+  return (code) => (code ? (org.data?.units.find((u) => u.code === code)?.name ?? null) : null);
 }

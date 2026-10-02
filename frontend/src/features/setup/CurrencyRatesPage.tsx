@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { mastersApi } from '@/api/masters';
 import type { ExchangeRate, RateType } from '@/api/masters';
+import { rateTypeLabel } from './rateLabels';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -46,7 +47,7 @@ export default function CurrencyRatesPage() {
       }),
     onSuccess: async (r) => {
       await queryClient.invalidateQueries({ queryKey: ['rates'] });
-      toast.success(`${r.currencyCode} ${r.rateType} rate saved`);
+      toast.success(`${r.currencyCode} ${rateTypeLabel(r.rateType)} rate saved`);
     },
   });
 
@@ -87,7 +88,9 @@ export default function CurrencyRatesPage() {
                   onChange={(e) => setForm({ ...form, rateType: e.target.value as RateType })}
                 >
                   {RATE_TYPES.map((t) => (
-                    <option key={t}>{t}</option>
+                    <option key={t} value={t}>
+                      {rateTypeLabel(t)}
+                    </option>
                   ))}
                 </select>
               )}
@@ -142,7 +145,7 @@ export default function CurrencyRatesPage() {
           rowKey={(r) => r.id}
           columns={[
             { key: 'c', header: 'Currency', render: (r) => <strong>{r.currencyCode}</strong> },
-            { key: 't', header: 'Type', render: (r) => r.rateType },
+            { key: 't', header: 'Type', render: (r) => rateTypeLabel(r.rateType) },
             { key: 'd', header: 'Effective', render: (r) => formatDate(r.effectiveDate) },
             { key: 'r', header: 'Rate', numeric: true, render: (r) => r.rate.toFixed(6) },
             { key: 'b', header: 'Maintained by', render: (r) => <UserName login={r.createdBy} /> },

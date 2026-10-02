@@ -141,9 +141,7 @@ export default function BirOutputsPage() {
       render: (o) => (
         <>
           <Link to={`/reports/${o.code}`}>{o.title}</Link>
-          <span className="cell-sub">
-            {o.code} · {o.text}
-          </span>
+          <span className="cell-sub">{o.text}</span>
         </>
       ),
     },

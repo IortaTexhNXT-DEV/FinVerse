@@ -78,7 +78,7 @@ function Summary({ voucher }: Readonly<{ voucher: Voucher }>) {
         </>
       }
       facts={[
-        { icon: UserRound, label: 'Payee', value: s.payeeCode },
+        { icon: UserRound, label: 'Payee', value: s.payeeName },
         { icon: FileText, label: 'Type', value: humanize(s.disbursementType) },
         { icon: Landmark, label: 'Mode', value: s.mode ? MODE_LABELS[s.mode] : '—' },
         { icon: Banknote, label: 'Net Amount', value: `${s.currency} ${formatAmount(s.net)}` },

@@ -88,6 +88,13 @@ describe('api client', () => {
     expect((init?.headers as Record<string, string>).Authorization).toBe('Bearer abc');
   });
 
+  it('takes an accepted request without a body as done, never as a reading error', async () => {
+    vi.spyOn(globalThis, 'fetch').mockResolvedValue(new Response(null, { status: 202 }));
+    await expect(
+      api.post('/auth/password-reset/request', { userId: 'u' }),
+    ).resolves.toBeUndefined();
+  });
+
   it('sends multipart forms without a JSON content type and downloads files', async () => {
     const fetchMock = vi
       .spyOn(globalThis, 'fetch')

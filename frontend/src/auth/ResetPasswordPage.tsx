@@ -4,6 +4,7 @@ import { authApi } from '@/api/auth';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PasswordChangeForm } from '@/features/profile/PasswordChangeForm';
 import { formatDateTime } from '@/utils/format';
+import { BRAND } from '@/branding';
 import { SignInFrame } from './SignInFrame';
 import { Notice } from '@/components/ui/Notice';
 
@@ -53,7 +54,7 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <SignInFrame title="Set a New Password" subtitle="BrokerVerse password reset">
+    <SignInFrame title="Set a New Password" subtitle={BRAND.productName}>
       {content}
       <Link to="/login" className="login-notice">
         Back to Login

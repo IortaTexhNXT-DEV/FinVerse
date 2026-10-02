@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { authApi } from '@/api/auth';
+import { displayNameOf } from '@/api/users';
 import type { UserSessionEntry } from '@/api/auth';
 import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -36,7 +37,7 @@ export function UserSessionsDialog({
   });
   return (
     <Modal
-      title={`Sessions of ${username}`}
+      title={sessionsTitle(username)}
       open
       onClose={onClose}
       footer={
@@ -56,4 +57,12 @@ export function UserSessionsDialog({
       </div>
     </Modal>
   );
+}
+
+/** The title of the dialog: the user by name with the user ID, never the user ID alone. */
+function sessionsTitle(username: string): string {
+  const name = displayNameOf(username);
+  return name && name !== username
+    ? `Sessions of ${name} (${username})`
+    : `Sessions of ${username}`;
 }

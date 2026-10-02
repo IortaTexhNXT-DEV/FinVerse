@@ -95,7 +95,7 @@ export function DispositionDialog({
             value={form.invoiceNo}
             onChange={(v) => set({ invoiceNo: v })}
             error={errors.invoiceNo}
-            hint="EBIX I######## or BrokerVerse BI-… (checked against the invoice ledger)"
+            hint="EBIX I######## or BIBS BI-… (checked against the invoice ledger)"
             maxLength={40}
           />
         )}

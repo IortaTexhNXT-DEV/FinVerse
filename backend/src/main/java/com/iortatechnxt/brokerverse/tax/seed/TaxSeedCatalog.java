@@ -152,7 +152,7 @@ final class TaxSeedCatalog {
       List.of(
           corporate("S-0001", "METRO OFFICE SUPPLIES CO.", SERVICES_ATC, "1550"),
           corporate("S-0002", "CLOUD SYSTEMS PHILIPPINES INC.", SERVICES_ATC, "1634"),
-          corporate("S-0003", "AYALA PROPERTY LEASING (SEED)", "WC100", "1226"),
+          corporate("S-0003", "AYALA PROPERTY LEASING", "WC100", "1226"),
           corporate("G-0001", "AUTOFIX SERVICE CENTER", "WC120", "1100"),
           corporate("G-0002", "CEBU MOTOR WORKS", "WC120", "6000"),
           corporate("A-0001", "ROSA MENDOZA INSURANCE AGENCY", COMMISSION_ATC, "1226"),

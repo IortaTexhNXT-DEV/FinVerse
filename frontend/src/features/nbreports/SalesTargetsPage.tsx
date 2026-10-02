@@ -1,4 +1,5 @@
 import { PeriodCell } from '@/components/ui/PeriodCell';
+import { MonthInput } from '@/components/ui/MonthInput';
 import { UserName } from '@/components/ui/UserName';
 import { SalesUnitName } from '@/components/broking/LovLabel';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -212,9 +213,8 @@ export default function SalesTargetsPage() {
         <div className="worklist-toolbar">
           <Field label="Month">
             {(id) => (
-              <input
+              <MonthInput
                 id={id}
-                type="month"
                 className="input"
                 value={month}
                 onChange={(e) => setMonth(e.target.value || today().slice(0, 7))}

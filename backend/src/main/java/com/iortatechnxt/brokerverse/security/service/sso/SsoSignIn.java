@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.security.service.sso;
 
 import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.AppUserRepository;
 import com.iortatechnxt.brokerverse.security.domain.Role;
@@ -274,7 +275,8 @@ public class SsoSignIn {
             .orElseThrow(
                 () ->
                     notLinked(
-                        identity.username(), "no user " + identity.username() + " in BrokerVerse"));
+                        identity.username(),
+                        "no user " + identity.username() + " in " + BrandAssets.SYSTEM_NAME));
     if (!user.isEnabled() || user.isLocked()) {
       throw notLinked(
           user.getUsername(), user.isLocked() ? "account locked" : "account deactivated");

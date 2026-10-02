@@ -146,6 +146,19 @@ public final class DisplayFormat {
   }
 
   /**
+   * A share in percent with two decimals and the percent sign, e.g. 0.00% or 12.35%.
+   *
+   * @param percent value in percent, may be null
+   * @return text, empty when null
+   */
+  public static String percent(BigDecimal percent) {
+    if (percent == null) {
+      return "";
+    }
+    return percent.setScale(2, RoundingMode.HALF_UP).toPlainString() + "%";
+  }
+
+  /**
    * Any value as users read it: dates as dd-MMM-yyyy, amounts (two decimals) with thousands
    * separators, other decimals without trailing zeros, other values as text.
    *

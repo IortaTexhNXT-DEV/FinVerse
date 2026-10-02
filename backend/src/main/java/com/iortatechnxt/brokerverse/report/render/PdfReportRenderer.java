@@ -84,7 +84,7 @@ public class PdfReportRenderer implements ReportRenderer {
       // has not ended yet, so the footer still applies to every page.
       writer.setPageEvent(
           new PdfBrandFooter(
-              context.footerText(), "iNXT BrokerVerse  |  " + result.code(), writer));
+              context.footerText(), BrandAssets.SYSTEM_NAME + "  |  " + result.code(), writer));
       addHeader(doc, result, context);
       doc.add(table(result, context.print().fitToWidth(), size.getWidth() - 2 * MARGIN));
       for (String note : result.notes()) {

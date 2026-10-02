@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.system.service;
 
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import java.lang.management.ManagementFactory;
 import java.time.Clock;
 import java.time.Duration;
@@ -22,8 +23,8 @@ import org.springframework.stereotype.Service;
 @Service
 public class SystemInfoService {
 
-  /** Product name shown in the About dialog. */
-  public static final String PRODUCT = "iNXT BrokerVerse";
+  /** Name of the system shown in the About dialog (theme pack). */
+  public static final String PRODUCT = BrandAssets.SYSTEM_NAME;
 
   /** Vendor. */
   public static final String VENDOR = "IortaTechNXT";

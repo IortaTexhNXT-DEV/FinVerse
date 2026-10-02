@@ -1,6 +1,7 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
+import { DateInput } from '@/components/ui/DateInput';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
@@ -90,13 +91,20 @@ export function ScheduleCloseDialog({ open, picker, onDone, onClose }: Readonly<
           hint="Proposed: the 2nd banking day of the next month, 17:00. The checklist runs at that time."
         >
           {(id) => (
-            <input
-              id={id}
-              className="input"
-              type="datetime-local"
-              value={chosen}
-              onChange={(e) => setWhen(e.target.value)}
-            />
+            <div className="row">
+              <DateInput
+                id={id}
+                value={chosen.slice(0, 10)}
+                onChange={(e) => setWhen(`${e.target.value}T${chosen.slice(11, 16) || '17:00'}`)}
+              />
+              <input
+                className="input"
+                type="time"
+                aria-label="Close time"
+                value={chosen.slice(11, 16)}
+                onChange={(e) => setWhen(`${chosen.slice(0, 10)}T${e.target.value}`)}
+              />
+            </div>
           )}
         </Field>
         <p className="muted">

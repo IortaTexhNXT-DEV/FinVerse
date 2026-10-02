@@ -151,7 +151,7 @@ public class FrbsSeedData implements ApplicationRunner {
             today,
             "DISBURSEMENT",
             null,
-            "Seed certificate on commission and incentives"),
+            "Certificate on commission and incentives"),
         List.of(
             new ReceivedCertificateLine(
                 1,

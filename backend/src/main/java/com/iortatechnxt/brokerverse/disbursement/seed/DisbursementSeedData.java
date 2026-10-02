@@ -174,7 +174,7 @@ public class DisbursementSeedData implements ApplicationRunner {
   }
 
   private void masters(Long companyId) {
-    payee(companyId, INSURER, "INSURER", "MAPFRE Insular (Seed)", DisbursementMode.CHECK, null);
+    payee(companyId, INSURER, "INSURER", "MAPFRE Insular", DisbursementMode.CHECK, null);
     payee(companyId, CLIENT, "CLIENT", "Client Refund Payee", DisbursementMode.CTA, "001122334455");
     payee(
         companyId, SUPPLIER, "SUPPLIER", "Metro Office Supplies Co.", DisbursementMode.CHECK, null);
@@ -235,7 +235,7 @@ public class DisbursementSeedData implements ApplicationRunner {
         batch.getInsurerCode(),
         DisbursementMode.CHECK,
         null);
-    users.run("remit", () -> batchService.submit(batch.getId(), "Checked for Disbursement seed"));
+    users.run("remit", () -> batchService.submit(batch.getId(), "Checked for disbursement"));
     RemittanceBatch approved =
         users.as("remittl", () -> batchService.approve(batch.getId(), APPROVED));
     IntakeRequest request =
@@ -281,10 +281,7 @@ public class DisbursementSeedData implements ApplicationRunner {
                     PROCESSOR,
                     () ->
                         uploads.negotiated(
-                            check.getInstrumentNo(),
-                            check.getAmount(),
-                            "Deposited (seed)",
-                            "SEED")));
+                            check.getInstrumentNo(), check.getAmount(), "Deposited", "SEED")));
   }
 
   private void refund(Long companyId) {

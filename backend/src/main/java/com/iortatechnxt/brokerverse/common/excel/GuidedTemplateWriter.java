@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.common.excel;
 
 import com.iortatechnxt.brokerverse.common.excel.GuideColumn.Kind;
 import com.iortatechnxt.brokerverse.common.excel.GuidedWorkbook.Placed;
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -89,7 +90,7 @@ public final class GuidedTemplateWriter {
     lists.write(wb, styles);
     wb.setActiveSheet(0);
     wb.getProperties().getCoreProperties().setTitle(template.name());
-    wb.getProperties().getCoreProperties().setCreator("BIBS");
+    wb.getProperties().getCoreProperties().setCreator(BrandAssets.SYSTEM_NAME);
     return new GuidedWorkbook(wb, styles, placed);
   }
 

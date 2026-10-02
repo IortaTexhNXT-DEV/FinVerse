@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.config;
 
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.runtime.RuntimeRole;
 import com.iortatechnxt.brokerverse.common.runtime.Workload;
 import com.iortatechnxt.brokerverse.common.util.AsciiCase;
@@ -140,7 +141,7 @@ public final class ProductionSafeguards implements EnvironmentPostProcessor, Ord
     List<String> problems = problems(environment);
     if (!problems.isEmpty()) {
       throw new IllegalStateException(
-          "BIBS refuses to start: " + String.join("; ", problems) + ".");
+          BrandAssets.SYSTEM_NAME + " refuses to start: " + String.join("; ", problems) + ".");
     }
   }
 

@@ -8,6 +8,7 @@ import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
+import { TypedInput } from '@/components/ui/DateInput';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -93,7 +94,7 @@ export default function SimulatorPage() {
           {(['valueDate', 'currency', 'businessLine', 'partyCode'] as const).map((key) => (
             <Field key={key} label={FIELD_LABELS[key]}>
               {(id) => (
-                <input
+                <TypedInput
                   id={id}
                   className="input"
                   type={key === 'valueDate' ? 'date' : 'text'}

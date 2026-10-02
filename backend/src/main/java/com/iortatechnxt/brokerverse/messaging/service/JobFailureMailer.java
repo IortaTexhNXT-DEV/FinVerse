@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.messaging.service;
 
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.common.util.EmailAddresses;
 import com.iortatechnxt.brokerverse.messaging.domain.OutboundMessage.RecordLink;
@@ -75,7 +76,7 @@ public class JobFailureMailer implements JobFailureListener {
             PURPOSE,
             recipients,
             List.of(),
-            "BrokerVerse: batch job " + run.getJobName() + " failed",
+            BrandAssets.SYSTEM_NAME + ": batch job " + run.getJobName() + " failed",
             body,
             List.of(),
             null,

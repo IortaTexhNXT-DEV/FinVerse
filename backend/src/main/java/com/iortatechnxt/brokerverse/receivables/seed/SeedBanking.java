@@ -129,7 +129,7 @@ public class SeedBanking {
                             r.getId(),
                             new ReversalRequest(
                                 r.getReceiptDate().plusDays(WEEK + CLEARING_DAYS),
-                                "Drawer's account closed (seed)"))))
+                                "Drawer's account closed"))))
         .orElse(null);
   }
 

@@ -508,7 +508,7 @@ frs:
         title: Approve F01 load with one Invalid row
         steps:
           - Click Approve Load on the F01 batch.
-        expected: Refused while the row is Invalid; after migowner excludes it with a manual-entry plan, the batch shows an error rate of 0 percent (the excluded row is neither an error nor in the base) and approval is possible.
+        expected: Refused while the row is Invalid; after migowner excludes it with a manual-entry plan, the batch shows an error rate of 0.00% (the excluded row is neither an error nor in the base) and approval is possible.
         msg: ["{0.1} percent of rows have errors; the limit for this object is {0} percent"]
       - c: 4
         type: Boundary

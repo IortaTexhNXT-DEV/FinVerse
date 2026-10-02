@@ -1228,7 +1228,7 @@ audit:
 acceptance:
   - A legacy invoice whose components do not add up to its gross premium is Invalid with that message.
   - A waived row shows the waiver reason and the data owner who approved it.
-  - A batch of open invoices with one Invalid row cannot be approved for load unless the row is excluded by the data owner; once it is excluded, the error rate shown is 0 percent.
+  - A batch of open invoices with one Invalid row cannot be approved for load unless the row is excluded by the data owner; once it is excluded, the error rate shown is 0.00%.
 ```
 
 ```fr

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Card } from '@/components/ui/Card';
+import { TypedInput } from '@/components/ui/DateInput';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
@@ -44,7 +45,7 @@ function controlOf(field: ConfigRow, id: string) {
     AMOUNT: 'number',
     ATTACHMENT: 'file',
   };
-  return <input id={id} className="input" type={inputType[type] ?? 'text'} disabled />;
+  return <TypedInput id={id} className="input" type={inputType[type] ?? 'text'} disabled />;
 }
 
 /** Read-only preview of the review form as the investigator will see it (FR-SS-016). */

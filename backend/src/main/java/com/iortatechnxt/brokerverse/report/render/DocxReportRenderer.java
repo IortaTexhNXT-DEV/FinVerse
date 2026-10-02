@@ -58,7 +58,7 @@ public class DocxReportRenderer implements ReportRenderer {
     PrintOptions print = context.print();
     BrandedDocx docx = new BrandedDocx(page(result, print), result.title());
     docx.pageHeader(context.companyName());
-    docx.pageFooter(context.footerText(), "iNXT BrokerVerse  |  " + result.code());
+    docx.pageFooter(context.footerText(), BrandAssets.SYSTEM_NAME + "  |  " + result.code());
     docx.paragraph(result.title(), TextStyle.TITLE);
     docx.paragraph(
         "Report ID: "

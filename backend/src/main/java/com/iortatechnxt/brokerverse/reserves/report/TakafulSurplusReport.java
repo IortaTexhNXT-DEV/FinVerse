@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.reserves.report;
 
 import static com.iortatechnxt.brokerverse.reserves.report.ReserveReportSupport.K_BRANCH;
 
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.report.core.ParameterSpec;
 import com.iortatechnxt.brokerverse.report.core.ParameterType;
 import com.iortatechnxt.brokerverse.report.core.ReportCategory;
@@ -26,7 +27,7 @@ import org.springframework.stereotype.Component;
 /**
  * PGIBR074 Surplus / Mudharabah Payment: the takaful surplus of policies expiring in the months of
  * the valuation runs whose date falls in the range, posted (run posted) or unposted (run not yet
- * posted). BrokerVerse rule: applicable contribution = gross − discount + loading − commission −
+ * posted). Platform rule: applicable contribution = gross − discount + loading − commission −
  * claims; payable = (applicable − retakaful) × participants' share %, less tax, when positive.
  */
 @Component
@@ -110,7 +111,9 @@ public class TakafulSurplusReport implements ReportDefinition {
         .groupBy(K_BRANCH, "Branch")
         .rows(rows)
         .note(
-            "Applicable = gross - discount + loading - commission - claims (BrokerVerse rule);"
+            "Applicable = gross - discount + loading - commission - claims ("
+                + BrandAssets.SYSTEM_NAME
+                + " rule);"
                 + " payable = (applicable - retakaful) x participants' share, less tax.")
         .build();
   }

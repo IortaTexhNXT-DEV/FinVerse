@@ -108,7 +108,7 @@ data:
     source: Seed data
   - id: TD-PM-09
     name: Active incentive criterion
-    content: CPC2 (seed), type CAMPAIGN, value basis RATE 1.00, on Motor and Property packages, ACTIVE
+    content: CPC2, type CAMPAIGN, value basis RATE 1.00, on Motor and Property packages, ACTIVE
     source: Seed data
   - id: TD-PM-10
     name: Package ending in 45 days
@@ -2220,7 +2220,7 @@ frs:
         type: Workflow
         title: New criterion authorised by badmin
         steps:
-          - Click New Criterion; code UAT1, name "UAT campaign", type Sales campaign (seed), value basis Fixed amount, value 500, effective from today; products MTR12; save.
+          - Click New Criterion; code UAT1, name "UAT campaign", type Sales campaign, value basis Fixed amount, value 500, effective from today; products MTR12; save.
           - As badmin authorise it in My Approvals.
         expected: Saved as Pending authorisation; after authorisation Active.
       - c: 1

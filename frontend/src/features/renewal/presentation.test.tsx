@@ -339,3 +339,13 @@ describe('renewal first classification', () => {
     expect(await screen.findByText('Classification rules')).toBeInTheDocument();
   });
 });
+
+describe('renewal stage pills', () => {
+  it('shows the long stages in their short form in a list, the full label in the tooltip', async () => {
+    const { statusShortLabel } = await import('@/components/ui/statusTones');
+    expect(statusShortLabel('UNASSIGNED', 'Unassigned Disposition')).toBe('Unassigned');
+    expect(statusShortLabel('FOR_PLACEMENT_BOOKING', 'For Placement and Booking')).toBe(
+      'For Placement',
+    );
+  });
+});

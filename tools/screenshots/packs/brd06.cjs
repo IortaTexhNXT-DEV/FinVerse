@@ -163,7 +163,12 @@ const crops = { 'wt-a-03': TAB, 'wt-c-02': TAB, 'wt-c-04': TAB, 'wt-d-04': TAB }
 
 // The record tabs: a field badge goes in the card that shows it, never on the flag chips of the header.
 const card = (title) => ({ within: 'main section.card', title });
+// The Expiry List: the list columns in the list card (not the recent extractions), the dialog fields in their dialog.
+const list = { within: 'main section.card', title: 'Renewal Reference' };
+const dialog = { within: 'dialog[open]' };
 const callouts = {
+  'SCR-RN-02': { 3: list, 4: list, 5: list, 6: list, 7: list, 8: list, 9: list, 10: list, 11: list,
+    14: dialog, 15: dialog, 16: dialog, 17: dialog, 18: card('Recent extractions') },
   'SCR-RN-04': {
     1: card('Check results'),
     2: card('Classification history'),

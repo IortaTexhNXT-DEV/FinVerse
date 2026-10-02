@@ -125,7 +125,7 @@ export function AssignDialog({
             <option value="">Select the officer</option>
             {(officers.data ?? []).map((o) => (
               <option key={o.username} value={o.username}>
-                {o.fullName} ({o.unit})
+                {o.fullName}
               </option>
             ))}
           </select>

@@ -272,6 +272,9 @@ const SHORT_LABELS: Record<string, string> = {
   PARTIALLY_PAID: 'Partially Paid',
   PARTIALLY_KEPT: 'Partially Kept',
   SKIPPED_LOCKED: 'Skipped',
+  // Renewal stages (BRD-06 FRS, "Stages of RNW_CASE")
+  UNASSIGNED: 'Unassigned',
+  FOR_PLACEMENT_BOOKING: 'For Placement',
 };
 
 /**

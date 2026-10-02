@@ -238,3 +238,13 @@ describe('the actions of a Contact Center user on a renewal', () => {
     expect(screen.queryByText(/not permitted/i)).toBeNull();
   });
 });
+
+describe('renewal record words', () => {
+  it('shows the business origin and account type in words', async () => {
+    const { accountTypeLabel, businessOriginLabel } = await import('./common/presentation');
+    expect(businessOriginLabel('EBIX')).toBe('EBIX (migrated)');
+    expect(businessOriginLabel('BANK')).toBe('Bank referral');
+    expect(accountTypeLabel('CORPORATE')).toBe('Corporate');
+    expect(accountTypeLabel(null)).toBe('');
+  });
+});

@@ -13,7 +13,7 @@ walkthroughs:
       Account Officer, who reads the account history, gives the disposition For Renewal and pushes it. The Team
       Leader's post is refused while the blocking checks fail; she overrides them with a reason and posts the
       renewal to Processing.
-    data: "Seed data: renewal of account ARN-2026-940004 (Pacific Harbor Logistics Inc., Luzon Assurance Corporation), Corporate Team 1"
+    data: "Seed data: renewal of account ARN-2026-940004 (Pacific Harbor Logistics Inc., Luzon Assurance Co.), Corporate Team 1"
     steps:
       - [MKT_TL, SCR-RN-02, "Opens the Expiry List, tab Unassigned Disposition, ticks the renewal of Pacific Harbor Logistics Inc. and clicks Assign Disposition: Arnel Account Officer, then Assign and Push", "Message: 1 assigned; the renewal leaves the tab", Assigned, wt-a-01]
       - [MKT_AO, SCR-RN-06, "Opens My Dispositions", "The renewal assigned to him with its expiry, the Review classification and the flags Outstanding and Claims", For disposition, wt-a-02]
@@ -36,7 +36,7 @@ walkthroughs:
     data: "Seed data: the renewal posted in walkthrough A; Patricia Processing Lead and Paolo Processor"
     steps:
       - [PROCESSING_TL, SCR-RN-10, "Opens the Processing Worklist, tab For Processing, ticks the renewal and clicks Assign PO: Paolo Processor, then Assign", "Message: 1 assigned; the renewal In Processing", In processing, wt-b-01]
-      - [PROCESSOR, SCR-RN-11, "Opens Insurer Batches, clicks New Batch with Luzon Assurance Corporation and the expiry date of the renewal, then Create Batch, and opens the batch", "The batch Draft with the renewal and the columns of the insurer extract", Batch ready, wt-b-02]
+      - [PROCESSOR, SCR-RN-11, "Opens Insurer Batches, clicks New Batch with Luzon Assurance Co. and the expiry date of the renewal, then Create Batch, and opens the batch", "The batch Draft with the renewal and the columns of the insurer extract", Batch ready, wt-b-02]
       - [PROCESSOR, SCR-RN-11, "Clicks Send to Insurer and confirms", "Message: Batch sent to the insurer; the batch Sent with its reply date", With the insurer, wt-b-03]
       - [PROCESSOR, SCR-RN-12, "Opens the renewal and clicks Record Insurer Response: Renew as is with the insurer reference, then Record", "Message: Saved; the renewal RA Ready", RA ready, wt-b-04]
       - [MKT_AO, SCR-RN-13, "Opens Letters, tab RA Ready, ticks the renewal, clicks Generate RA: First notice, then Generate", "Message: 1 generated; the renewal in RA Generated, locked on the Marketing side", RA generated, wt-b-05]

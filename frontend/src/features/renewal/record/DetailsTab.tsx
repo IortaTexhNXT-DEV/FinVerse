@@ -11,7 +11,7 @@ import { Card } from '@/components/ui/Card';
 import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
 import { UserName } from '@/components/ui/UserName';
 import { formatDate, formatDateTime } from '@/utils/format';
-import { closedAsLabel } from '../common/presentation';
+import { accountTypeLabel, businessOriginLabel, closedAsLabel } from '../common/presentation';
 import { RenewalInsurer, RenewalProduct, RenewalUnit } from '../common/RenewalBits';
 import { RNW_LOV, dispositionLabel } from '../common/renewalCodes';
 
@@ -91,9 +91,12 @@ function PartiesCard({ detail }: Props) {
             ),
           },
           { label: 'Assured', value: q.assuredName },
-          { label: 'Segment', value: q.segment },
-          { label: 'Business Origin', value: q.businessOrigin },
-          { label: 'Account Type', value: q.accountType },
+          {
+            label: 'Segment',
+            value: q.segment ? <LovLabel type="MARKET_SEGMENT" code={q.segment} /> : null,
+          },
+          { label: 'Business Origin', value: businessOriginLabel(q.businessOrigin) || null },
+          { label: 'Account Type', value: accountTypeLabel(q.accountType) || null },
           { label: 'Branch', value: q.branchCode ? <BranchName code={q.branchCode} /> : null },
           { label: 'Region', value: unit(q.regionCode) },
           { label: 'Department', value: unit(q.departmentCode) },

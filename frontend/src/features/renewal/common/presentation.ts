@@ -261,3 +261,26 @@ export function decisionActions(on: { approve: () => void; reject: () => void })
     { label: 'Reject', onSelect: on.reject, danger: true },
   ];
 }
+
+const ORIGINS: Readonly<Record<string, string>> = {
+  EBIX: 'EBIX (migrated)',
+  QPS: 'QPS (migrated)',
+  BIBS: 'BIBS',
+  BANK: 'Bank referral',
+};
+
+/** Where the expiring business came from (the system of a migrated policy, or the channel). */
+export function businessOriginLabel(code: string | null | undefined): string {
+  return labelOf(ORIGINS, code);
+}
+
+const ACCOUNT_TYPES: Readonly<Record<string, string>> = {
+  CORPORATE: 'Corporate',
+  INDIVIDUAL: 'Individual',
+  RETAIL: 'Retail',
+};
+
+/** The account type of the client of a renewal. */
+export function accountTypeLabel(code: string | null | undefined): string {
+  return labelOf(ACCOUNT_TYPES, code);
+}

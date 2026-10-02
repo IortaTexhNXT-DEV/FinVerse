@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DataTable } from './DataTable';
 import type { Column } from './DataTable';
 import { DueDate } from './DueDate';
+import { fittedHeight } from './useFitHeight';
 import { StatusBadge } from './StatusBadge';
 
 interface Row {
@@ -30,13 +31,22 @@ const ROWS: Row[] = [
 describe('DataTable list presentation', () => {
   afterEach(() => vi.unstubAllGlobals());
 
-  it('uses the page scroll with no scroll box of its own when the table fits its card', () => {
-    const { container } = render(<DataTable columns={COLUMNS} rows={ROWS} rowKey={(r) => r.id} />);
-    expect(container.querySelector('.table-wrap')).toHaveClass('table-page');
+  it('fits the card to its rows when the page has room: no fixed-height box', () => {
+    expect(fittedHeight({ wrap: 300, table: 300, overflow: -200, min: 240 })).toBeNull();
+    expect(fittedHeight({ wrap: 300, table: 300, overflow: 0, min: 240 })).toBeNull();
   });
 
-  it('scrolls sideways inside its card only when the table is wider than the card', () => {
-    class WideObserver {
+  it('caps a long list to the room left in the window, so the page keeps one scroll bar', () => {
+    expect(fittedHeight({ wrap: 1500, table: 1500, overflow: 700, min: 240 })).toBe(800);
+    // A capped list grows again when the window grows, up to its rows.
+    expect(fittedHeight({ wrap: 800, table: 1500, overflow: -300, min: 240 })).toBe(1100);
+    expect(fittedHeight({ wrap: 800, table: 1000, overflow: -300, min: 240 })).toBeNull();
+    // Never smaller than the least list height.
+    expect(fittedHeight({ wrap: 400, table: 1500, overflow: 380, min: 240 })).toBe(240);
+  });
+
+  it('scrolls inside its card with the cap set from the page, the header sticky inside it', () => {
+    class Observer {
       constructor(private readonly callback: () => void) {}
       observe() {
         this.callback();
@@ -45,13 +55,39 @@ describe('DataTable list presentation', () => {
         return undefined;
       }
     }
-    vi.stubGlobal('ResizeObserver', WideObserver);
-    const width = vi.spyOn(HTMLElement.prototype, 'scrollWidth', 'get').mockReturnValue(2000);
-    const client = vi.spyOn(HTMLElement.prototype, 'clientWidth', 'get').mockReturnValue(800);
-    const { container } = render(<DataTable columns={COLUMNS} rows={ROWS} rowKey={(r) => r.id} />);
-    expect(container.querySelector('.table-wrap')).not.toHaveClass('table-page');
-    width.mockRestore();
-    client.mockRestore();
+    vi.stubGlobal('ResizeObserver', Observer);
+    vi.stubGlobal('requestAnimationFrame', (run: () => void) => {
+      run();
+      return 1;
+    });
+    const rect = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockReturnValue({ height: 1500 } as DOMRect);
+    const offset = vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(1500);
+    const scroll = vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(2400);
+    const client = vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(1500);
+    const { container } = render(
+      <main className="app-main">
+        <DataTable columns={COLUMNS} rows={ROWS} rowKey={(r) => r.id} />
+      </main>,
+    );
+    const wrap = container.querySelector<HTMLElement>('.table-wrap');
+    expect(wrap).toHaveAttribute('data-fit');
+    // The page overflows by 900 px: the list takes 1500 - 900 = 600 px and scrolls inside.
+    expect(wrap?.style.maxHeight).toBe('600px');
+    [rect, offset, scroll, client].forEach((m) => m.mockRestore());
+  });
+
+  it('leaves a page with several lists to scroll as a whole', () => {
+    const { container } = render(
+      <main className="app-main">
+        <DataTable columns={COLUMNS} rows={ROWS} rowKey={(r) => r.id} />
+        <DataTable columns={COLUMNS} rows={ROWS} rowKey={(r) => r.id} />
+      </main>,
+    );
+    container.querySelectorAll<HTMLElement>('.table-wrap').forEach((w) => {
+      expect(w.style.maxHeight).toBe('');
+    });
   });
 
   it('keeps a truncating column on one line with the full text in the tooltip', () => {

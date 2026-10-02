@@ -1,8 +1,9 @@
 import { ChevronDown, ChevronUp, ChevronsUpDown } from 'lucide-react';
-import { Fragment, useLayoutEffect, useRef, useState } from 'react';
+import { Fragment, useRef } from 'react';
 import type { KeyboardEvent, ReactNode } from 'react';
 import { EmptyState } from './EmptyState';
 import { PeriodCell } from './PeriodCell';
+import { useFitHeight } from './useFitHeight';
 
 /**
  * Kind of a column, which fixes its alignment and width (BDO table conventions): text left,
@@ -280,37 +281,11 @@ function TableBody<T>({
 }
 
 /**
- * Whether a table is wider than its card: such a table scrolls sideways inside its card (and its
- * header then sticks within it); every other table uses the page scroll with its header sticky at
- * the top of the page, with no scroll box of its own.
- */
-function useWide() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [wide, setWide] = useState(false);
-  useLayoutEffect(() => {
-    const wrap = ref.current;
-    if (wrap === null || typeof ResizeObserver === 'undefined') {
-      return undefined;
-    }
-    const measure = () => {
-      const table = wrap.firstElementChild;
-      setWide(table !== null && table.scrollWidth > wrap.clientWidth + 1);
-    };
-    const observer = new ResizeObserver(measure);
-    observer.observe(wrap);
-    if (wrap.firstElementChild !== null) {
-      observer.observe(wrap.firstElementChild);
-    }
-    measure();
-    return () => observer.disconnect();
-  }, []);
-  return { ref, wide };
-}
-
-/**
- * Accessible data table (BDO): Header Blue header sticky at the top of the page, neutral zebra
- * rows, a row hover distinct from the selected row, keyboard-operable row click, sortable headers
- * where the API sorts, skeleton rows while loading, a designed empty state and a totals footer.
+ * Accessible data table (BDO): the list scrolls inside its card with the Header Blue header row
+ * sticky, the card as high as its rows (capped to the room left in the window, `useFitHeight`),
+ * alternating white / Background Blue rows, a subtle hover and a distinct selected row,
+ * keyboard-operable row click, sortable headers where the API sorts, skeleton rows while loading,
+ * a designed empty state and a totals footer.
  */
 export function DataTable<T>({
   columns,
@@ -330,9 +305,10 @@ export function DataTable<T>({
   expanded,
   callout,
 }: Readonly<DataTableProps<T>>) {
-  const { ref, wide } = useWide();
+  const ref = useRef<HTMLDivElement>(null);
+  useFitHeight(ref);
   return (
-    <div ref={ref} className={wide ? 'table-wrap' : 'table-wrap table-page'} data-callout={callout}>
+    <div ref={ref} className="table-wrap" data-fit="" data-callout={callout}>
       <table className="table" aria-busy={loading || undefined}>
         {caption !== undefined && <caption className="visually-hidden">{caption}</caption>}
         <thead>

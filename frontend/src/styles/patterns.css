@@ -5,9 +5,7 @@
    ========================================================================== */
 
 /* ---------- Tables ---------------------------------------------------------------------- */
-/* The header row stays visible at the top of the page while a long list scrolls with the page;
-   lists never scroll inside a box of their own (no nested scroll bars, no dead space under the
-   card). */
+/* The header row stays visible while a long list scrolls inside its card. */
 .table thead th {
   z-index: 2;
 }
@@ -144,7 +142,7 @@
   line-height: 16px;
 }
 
-/* The selected row: Background Blue with the CTA Blue bar, distinct from the neutral hover. */
+/* The selected row: a stronger blue than the alternate rows and the hover, with the CTA Blue bar. */
 .table tbody tr[aria-selected='true'],
 .table tbody tr.selected,
 .table tbody tr[aria-selected='true']:hover,

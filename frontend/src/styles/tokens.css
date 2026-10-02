@@ -67,11 +67,14 @@
   --code-col-width: 168px;
   /* Period column: "to 20-Oct-2027" on one line (PeriodCell) */
   --period-col-width: 132px;
-  /* Tables: one text size, neutral zebra rows, a hover distinct from the selected row */
+  /* Tables (BDO style guide): one text size, alternating white / Background Blue rows, a subtle
+     hover and a selected row in a stronger blue with the CTA Blue bar */
   --table-font-size: 14px;
-  --table-row-alt: #fafafa;
-  --table-row-hover: #f0f2f5;
-  --table-row-selected: var(--brand-blue-050);
+  --table-row-alt: var(--brand-blue-050);
+  --table-row-hover: color-mix(in srgb, var(--brand-blue) 9%, var(--color-surface));
+  --table-row-selected: color-mix(in srgb, var(--brand-blue) 20%, var(--color-surface));
+  /* Least height of a list that scrolls inside its card */
+  --table-min-height: 240px;
   /* Label column of definition grids */
   --def-label-width: 168px;
   --focus-ring: 0 0 0 3px rgba(47, 109, 181, 0.35);

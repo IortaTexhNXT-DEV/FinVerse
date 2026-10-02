@@ -75,7 +75,7 @@ describe('list presentation', () => {
     expect(findings(/<span className="badge">\{\w+\.\w+\}<\/span>/)).toEqual([]);
   });
 
-  it('lets lists use the page scroll: no table scroll box of a fixed height', () => {
+  it('never gives a list a fixed-height scroll box (the card is as high as its rows)', () => {
     const boxed = Object.entries(styles).filter(([, css]) =>
       /\.table-wrap[^{]*\{[^}]*max-height:\s*(?!\s|none)/.test(css),
     );
@@ -84,12 +84,23 @@ describe('list presentation', () => {
     expect(reports).not.toMatch(/\.report-result \{[^}]*max-height/);
   });
 
-  it('keeps neutral zebra rows and a hover distinct from the selected row', () => {
+  it('keeps the guide alternating Background Blue rows, a subtle hover and a distinct selection', () => {
     const css = Object.values(styles).join('\n');
     expect(css).toMatch(
       /\.table tbody tr:nth-child\(even\) \{\s*background: var\(--table-row-alt\);/,
     );
+    expect(css).toMatch(/--table-row-alt: var\(--brand-blue-050\);/);
     expect(css).toMatch(/\.table tbody tr:hover \{\s*background: var\(--table-row-hover\);/);
-    expect(css).toMatch(/--table-row-selected: var\(--brand-blue-050\);/);
+    expect(css).toMatch(/--table-row-hover: color-mix\(in srgb, var\(--brand-blue\) 9%/);
+    expect(css).toMatch(/--table-row-selected: color-mix\(in srgb, var\(--brand-blue\) 20%/);
+    expect(css).toMatch(
+      /background: var\(--table-row-selected\);\s*box-shadow: inset 4px 0 0 var\(--brand-blue\);/,
+    );
+  });
+
+  it('draws the status pills outlined and tinted, as the guide says', () => {
+    const css = Object.values(styles).join('\n');
+    expect(css).toMatch(/border: 1px solid var\(--pill-border, var\(--pill-fg\)\);/);
+    expect(css).toMatch(/\.table-wrap \{\s*overflow: auto;\s*\}/);
   });
 });

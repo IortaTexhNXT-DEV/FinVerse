@@ -486,14 +486,11 @@
 }
 
 /* ---------- Tables ---------------------------------------------------------------------- */
+/* A table scrolls inside its card (BDO style guide) with its header row sticky. The card is as
+   high as its rows; a long list is capped so that the page keeps one vertical scroll bar
+   (DataTable sets the cap from the room left in the window, never a fixed share of it). */
 .table-wrap {
-  overflow-x: auto;
-}
-
-/* A list table that fits its card (DataTable): no scroll box of its own; the page scrolls and the
-   header row sticks to the top of the page. Only a table wider than its card scrolls sideways. */
-.table-wrap.table-page {
-  overflow: visible;
+  overflow: auto;
 }
 
 .table {
@@ -545,7 +542,7 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-/* Neutral zebra rows with a row divider: never a blue band, which would read as a selection. */
+/* BDO style guide: alternating white / Background Blue rows with a row divider. */
 .table tbody tr:nth-child(even) {
   background: var(--table-row-alt);
 }
@@ -645,7 +642,7 @@
  */
 .badge {
   --pill-fg: var(--brand-navy);
-  --pill-bg: var(--brand-blue-050);
+  --pill-bg: var(--color-surface);
   display: inline-block;
   box-sizing: border-box;
   height: 24px;
@@ -653,7 +650,7 @@
   max-width: var(--badge-max-width);
   padding: 0 10px;
   border-radius: var(--radius-sm);
-  border: 1px solid color-mix(in srgb, var(--pill-fg) 28%, transparent);
+  border: 1px solid var(--pill-border, var(--pill-fg));
   font-size: 12px;
   font-weight: 700;
   line-height: 22px;
@@ -690,7 +687,7 @@
   gap: var(--space-1);
 }
 
-/* One pill style (soft fill, a hairline of the same tone): only the tone changes between states. */
+/* One pill style (BDO style guide: outlined and tinted): only the tone changes between states. */
 .badge.success {
   --pill-fg: var(--color-success);
   --pill-bg: var(--color-success-bg);
@@ -704,14 +701,16 @@
 .badge.warning {
   --pill-fg: var(--color-warning);
   --pill-bg: var(--color-warning-bg);
+  --pill-border: var(--brand-gold);
 }
 
 .badge.neutral {
   --pill-fg: var(--color-text-muted);
   --pill-bg: var(--color-surface-alt);
+  --pill-border: var(--color-border-strong);
 }
 
-/* In process (e.g. "Ready for Placement"): CTA Blue (BDO status pill colours) */
+/* In process (e.g. "Ready for Placement"): CTA Blue outline (BDO status pill colours) */
 .badge.info {
   --pill-fg: var(--brand-blue);
   --pill-bg: var(--color-info-bg);

@@ -4,8 +4,10 @@
 -- screens show these values, so they now read as business data: the marker is dropped and the remarks say what
 -- happened. The seed scripts of the data are not changed (applied migrations); the start-up seed classes write the
 -- new wording, and this script corrects the rows they wrote before. Only a value still in its seeded form is
--- changed; a value a user has since changed is kept. Rows of insert-only audit trails that cannot be changed keep
--- their wording (a notice names them).
+-- changed; a value a user has since changed is kept.
+-- Known limitation: insert-only audit trails keep their seeded wording. The script never switches a guard off, so a
+-- table with a guard against updates is left out: the screening case timeline (scr_case_event) keeps its seeded
+-- "Opened by <trigger> (seed)" entries.
 
 create temporary table seed_wording (old_text text primary key, new_text text not null);
 
@@ -62,11 +64,8 @@ set mailing_address = 'Ayala Avenue, Makati City'
 where mailing_address like 'Seed address of %';
 
 -- Every other text: the seeded values above, and names and remarks ending in a "(seed)" marker
--- ("(seed)", "(Seed)", "(SEED)", "(Seed issuer)", "(seed proposal)", "(seed data)").
--- The screening case timeline is insert-only; its seeded "Opened by ... (seed)" entries are corrected with the
--- guard off for this script only.
-alter table scr_case_event disable trigger trg_scr_case_event_insert_only;
-
+-- ("(seed)", "(Seed)", "(SEED)", "(Seed issuer)", "(seed proposal)", "(seed data)"), in every table except the
+-- insert-only audit trails (a table with an update trigger that refuses the change; see the known limitation above).
 do $$
 declare
   c record;
@@ -81,24 +80,25 @@ begin
      and tab.table_type = 'BASE TABLE'
     where col.table_schema = current_schema()
       and col.data_type in ('text', 'character varying')
-      and col.table_name not in ('flyway_schema_history', 'seed_wording')
+      and col.table_name <> 'flyway_schema_history'
+      and not exists (
+        select 1
+        from pg_trigger tg
+        join pg_proc fn on fn.oid = tg.tgfoid
+        where tg.tgrelid = format('%I.%I', col.table_schema, col.table_name)::regclass
+          and not tg.tgisinternal
+          and tg.tgtype & 16 = 16
+          and fn.prosrc ilike '%raise exception%')
     order by col.table_name, col.column_name
   loop
-    begin
-      execute format(
-          'update %I t set %I = coalesce((select w.new_text from seed_wording w where w.old_text = t.%I),'
-          || ' regexp_replace(t.%I, %L, %L))'
-          || ' where t.%I in (select old_text from seed_wording) or t.%I ~ %L',
-          c.table_name, c.column_name, c.column_name, c.column_name, marker, '\1',
-          c.column_name, c.column_name, marker);
-    exception
-      when others then
-        raise notice 'Seed wording of %.% kept: %', c.table_name, c.column_name, sqlerrm;
-    end;
+    execute format(
+        'update %I t set %I = coalesce((select w.new_text from seed_wording w where w.old_text = t.%I),'
+        || ' regexp_replace(t.%I, %L, %L))'
+        || ' where t.%I in (select old_text from seed_wording) or t.%I ~ %L',
+        c.table_name, c.column_name, c.column_name, c.column_name, marker, '\1',
+        c.column_name, c.column_name, marker);
   end loop;
 end
 $$;
-
-alter table scr_case_event enable trigger trg_scr_case_event_insert_only;
 
 drop table seed_wording;

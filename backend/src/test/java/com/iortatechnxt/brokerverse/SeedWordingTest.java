@@ -46,6 +46,19 @@ class SeedWordingTest {
           "Seed batch ", "failure of the seed loader at start-up, written to the log only",
           "seed", "action code of the seeded workflow entries, corrected by V2090 to start");
 
+  /**
+   * Seeded values of insert-only audit trails, left as they are (known limitation): V2090 never
+   * switches a guard off, so the screening case timeline (scr_case_event, insert-only by trigger)
+   * keeps its "Opened by ... (seed)" entries. Keyed by script and literal.
+   */
+  private static final Set<String> AUDIT_TRAIL_KEPT =
+      Set.of("V1952__seed_screening_cases.sql: (seed)");
+
+  /** Statements that would switch a table guard off. */
+  private static final Pattern GUARD_OFF =
+      Pattern.compile(
+          "(?i)disable\\s+trigger|session_replication_role|drop\\s+trigger|alter\\s+table\\s+\\S+\\s+disable");
+
   private static final Pattern SQL_STRING = Pattern.compile("'([^']*+(?:''[^']*+)*+)'");
   private static final Pattern SQL_COMMENT = Pattern.compile("--[^\\n]*");
   private static final Pattern JAVA_STRING =
@@ -93,6 +106,9 @@ class SeedWordingTest {
         continue;
       }
       for (String text : literals(read(file))) {
+        if (AUDIT_TRAIL_KEPT.contains(file.getFileName() + ": " + text.strip())) {
+          continue;
+        }
         boolean covered =
             corrected.contains(text)
                 || corrected.contains(text + "%")
@@ -105,6 +121,18 @@ class SeedWordingTest {
       }
     }
     assertThat(uncovered).as("seeded values with a marker that V2090 does not correct").isEmpty();
+  }
+
+  @Test
+  void theCorrectionNeverSwitchesAGuardOff() {
+    String sql = SQL_COMMENT.matcher(read(CORRECTION)).replaceAll("");
+    assertThat(GUARD_OFF.matcher(sql).find())
+        .as("trigger or guard switched off in V2090")
+        .isFalse();
+    assertThat(sql)
+        .as("audit trails with an update guard are left out")
+        .contains("raise exception");
+    assertThat(sql).doesNotContain("scr_case_event");
   }
 
   @Test

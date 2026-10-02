@@ -1,6 +1,7 @@
 import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { Commission, Premium, PreviewLine } from '@/api/booking';
+import { InsurerName, SalesUnitName } from '@/components/broking/LovLabel';
 import { DataTable } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatAmount, formatRate } from '@/utils/format';
@@ -95,7 +96,13 @@ export function JournalLines({
         rowKey={(l) => l.key}
         emptyMessage={emptyMessage}
         columns={[
-          { key: 'group', header: groupHeader, render: (l) => l.insurerCode },
+          {
+            key: 'group',
+            header: groupHeader,
+            // An insurer by its name; a journal number as it is.
+            render: (l) =>
+              groupHeader === 'Insurer' ? <InsurerName code={l.insurerCode} /> : l.insurerCode,
+          },
           {
             key: 'account',
             header: 'Account',
@@ -132,5 +139,22 @@ export function JournalLines({
         </div>
       )}
     </div>
+  );
+}
+
+/** The cost center of a booking with the department it belongs to by name, never its code. */
+export function CostCenter({
+  costCenter,
+  department,
+}: Readonly<{ costCenter?: string | null; department?: string | null }>) {
+  return (
+    <span className="cell-stack">
+      <span>{costCenter ?? '—'}</span>
+      {department && (
+        <span className="muted">
+          <SalesUnitName code={department} />
+        </span>
+      )}
+    </span>
   );
 }

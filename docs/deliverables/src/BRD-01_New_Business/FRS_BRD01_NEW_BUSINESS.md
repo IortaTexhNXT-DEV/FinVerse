@@ -9,7 +9,7 @@ brd: BRD-01
 name: New Business
 doc_id: BIBS-FRS-BRD-01
 version: "2.0"
-date: 27 September 2026
+date: 1 October 2026
 status: Issued for BDOI business sign-off
 header_title: FRS BRD-1 New Business
 control:
@@ -26,11 +26,11 @@ control:
     approver: BDOI Product Owner (pending)
     change: First issue for BDOI review; aligned with the screens, message codes and the cross-BRD decisions
   - version: "2.0"
-    date: 27 Sep 2026
+    date: 1 Oct 2026
     author: iorta TechNXT Business Analysis
     reviewer: iorta TechNXT Project Manager
     approver: BDOI business units (sign-off)
-    change: "Business sign-off pack: proposed business rules and clarifications for confirmation (chapter 21), navigation by persona, screen specifications with screenshots, walkthroughs, messages, notifications, document outputs, upload templates, cross-BRD contract, sign-off and change control (chapters 12-20). Issued 27-Sep-2026. Chapters 1-11 unchanged; FR, BRD and test IDs kept"
+    change: "Business sign-off pack: proposed business rules and clarifications for confirmation (chapter 21), navigation by persona, screen specifications with screenshots, walkthroughs, messages, notifications, document outputs, upload templates, cross-BRD contract, sign-off and change control (chapters 12-20). Issued 1-Oct-2026 with the screenshots retaken on the current platform. Chapters 1-11 unchanged; FR, BRD and test IDs kept"
 distribution:
   - {name: "Product Owner, BDOI", role: Approver, organisation: BDOI, purpose: Review and sign-off}
   - {name: Marketing Business Services and System Support (MBS), role: Business owner, organisation: BDOI, purpose: Review of all FRs}
@@ -1802,7 +1802,7 @@ preconditions:
 main_flow:
   - TSU opens the response of an insurer and clicks **Terms** (or Declined).
   - TSU enters the terms, attaches the document and clicks **Save Terms**.
-  - TSU flags the recommended insurer with **Recommend**.
+  - TSU flags the recommended insurer with **Recommend** in the row action menu of its response; **Terms** in the same menu keys in or revises the terms of an insurer.
   - TSU clicks **Insurer terms complete**.
 alternate_flows:
   - Correction of saved terms. The history shows both revisions.
@@ -4491,6 +4491,7 @@ The New Business screens follow the screen standards of BIBS. They are listed he
 | Messages (notice standard) | One standard for errors, warnings, information and success: a white notice with a thin bar and an icon in the colour of its kind (red, amber, blue, green), a bold short title, then the business message with one bullet per missing item. No codes, internal references or technical terms in what the user reads. Field errors appear under the field; a long form lists its errors at the top with a link to the first field. Only an unexpected system error offers Retry and a reference for support behind Details. Special instructions are one short information notice. |
 | Tables, not highlight boxes | Records and lists of records are rows of a titled table (for example the Rate Exceptions of a quotation: Exception No., Requested Rate, Scheme Rate, Difference, Valid Until, Requested By, Decided By, Status); key data is a label and value grid. A coloured box carries a short message only, never a record. |
 | Tables | Header row in BDO blue that stays in view; text left, amounts right, dates in one format; one value per cell with at most one muted line under it; a dash for an empty value; "Showing x to y of n results" with page numbers. |
+| Row actions | The actions on a record of a list are in one row action menu at the end of the row (the three-dot button), never buttons or links in the row; a destructive action is listed last, in red, and asks for confirmation. |
 | Status labels | Statuses are pills of one size and one colour per state group and never wrap. The full label is shown (for example Returned to Marketing, Pending Authorization); an agreed short form, with the full label in the tooltip, only for a label longer than 21 characters. |
 | Labels and names | List values are shown by their label, never by their code; products by name with the code as a second line; insurers by name; users by their names, never by their user ID. |
 | Dates, amounts and rates | One date picker; dates entered and shown as dd-MMM-yyyy, times as dd-MMM-yyyy HH:mm (Philippine time). Amounts with two decimals and thousand separators, negatives in brackets, the currency in the column header or before the amount. Rates as percentages with two to four decimals, as keyed. |

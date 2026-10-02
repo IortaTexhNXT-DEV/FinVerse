@@ -1,6 +1,7 @@
 import {
   useCoverTypeName,
   useCoverageName,
+  useInsurerBranchName,
   useInsurerName,
   useLineName,
   useLovLabel,
@@ -69,7 +70,8 @@ export function ProductName({
     return <span className="muted">{empty}</span>;
   }
   const shown = name(code);
-  if (!withCode || shown === code) {
+  // A product name that already carries its code ("Motor Comprehensive Package MTR10") is not repeated.
+  if (!withCode || shown.includes(code)) {
     return <span title={code}>{shown}</span>;
   }
   return (
@@ -133,4 +135,31 @@ export function SalesUnitName({
     return <span className="muted">{empty}</span>;
   }
   return <>{name(code)}</>;
+}
+
+/**
+ * "Mabuhay General Insurance Corp. / Makati": the insurer and its branch by their names (the branch
+ * left out when there is none), never their codes.
+ */
+export function InsurerWithBranch({
+  insurer,
+  branch,
+  empty = '—',
+}: Readonly<{ insurer: string | null | undefined; branch?: string | null; empty?: string }>) {
+  const insurerName = useInsurerName();
+  const branchName = useInsurerBranchName(insurer);
+  if (!insurer) {
+    return <span className="muted">{empty}</span>;
+  }
+  return <>{branch ? `${insurerName(insurer)} / ${branchName(branch)}` : insurerName(insurer)}</>;
+}
+
+/** "Consumer Banking - NCR / CBG Team 1": the sales units of a record by their names, in order. */
+export function SalesUnitPath({
+  codes,
+  empty = '—',
+}: Readonly<{ codes: readonly (string | null | undefined)[]; empty?: string }>) {
+  const name = useSalesUnitName();
+  const known = codes.filter((c): c is string => Boolean(c));
+  return <>{known.length > 0 ? known.map((c) => name(c)).join(' / ') : empty}</>;
 }

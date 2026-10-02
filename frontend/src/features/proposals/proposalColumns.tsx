@@ -51,13 +51,17 @@ export const PROPOSAL_COLUMNS: Column<ProposalListItem>[] = [
   },
   {
     key: 'slips',
-    header: 'Slips',
-    render: (p) => [p.qsNo, p.psNo].filter(Boolean).join(' / ') || '—',
-  },
-  {
-    key: 'insurer',
-    header: 'Chosen Insurer',
-    render: (p) => <InsurerName code={p.chosenInsurer} />,
+    header: 'Slips / Chosen Insurer',
+    render: (p) => (
+      <span className="cell-stack">
+        <span>{[p.qsNo, p.psNo].filter(Boolean).join(' / ') || '—'}</span>
+        {p.chosenInsurer && (
+          <span className="muted">
+            <InsurerName code={p.chosenInsurer} />
+          </span>
+        )}
+      </span>
+    ),
   },
   { key: 'status', header: 'Stage', render: (p) => <StatusBadge status={p.status} /> },
 ];

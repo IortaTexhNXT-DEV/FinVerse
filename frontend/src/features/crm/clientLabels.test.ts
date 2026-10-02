@@ -1,5 +1,5 @@
 import type { ClientDetail } from '@/api/clients';
-import { applyQuickFilter, clientActions, describeBank } from './clientLabels';
+import { applyQuickFilter, clientActions, describeBank, kycVerifiedMessage } from './clientLabels';
 
 const client = (patch: Partial<ClientDetail>): ClientDetail =>
   ({
@@ -69,5 +69,20 @@ describe('client actions', () => {
     expect(describeBank(client({ bankClient: true, bankCif: 'C1' }))).toBe(
       'BDO bank client · CIF C1',
     );
+  });
+});
+
+describe('kycVerifiedMessage', () => {
+  it('gives the next review date as dd-MMM-yyyy', () => {
+    const c = client({
+      code: 'PR-2026-000101',
+      kyc: { status: 'VERIFIED', reviewDue: '2029-10-01' },
+    });
+    expect(kycVerifiedMessage(c)).toBe('PR-2026-000101: KYC verified, next review 01-Oct-2029');
+  });
+
+  it('leaves the date out when no review is due', () => {
+    const c = client({ code: 'PR-2026-000101', kyc: { status: 'VERIFIED' } });
+    expect(kycVerifiedMessage(c)).toBe('PR-2026-000101: KYC verified');
   });
 });

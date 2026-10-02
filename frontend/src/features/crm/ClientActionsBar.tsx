@@ -10,7 +10,7 @@ import { ActionDialog } from '@/components/broking/ActionDialog';
 import { workflowKey } from '@/components/broking/workflowKey';
 import { Button } from '@/components/ui/Button';
 import { useToast } from '@/components/ui/toastContext';
-import { clientActions } from './clientLabels';
+import { clientActions, kycVerifiedMessage } from './clientLabels';
 
 type ActionId = 'submitKyc' | 'verifyKyc' | 'confirm' | 'deactivate';
 
@@ -36,7 +36,7 @@ const ACTIONS: Record<ActionId, ActionDef> = {
     confirmLabel: 'Verify KYC',
     icon: <ShieldCheck size={16} />,
     run: clientsApi.verifyKyc,
-    done: (c) => `${c.code}: KYC verified, next review ${c.kyc.reviewDue ?? ''}`,
+    done: kycVerifiedMessage,
   },
   confirm: {
     title: 'Confirm the client',

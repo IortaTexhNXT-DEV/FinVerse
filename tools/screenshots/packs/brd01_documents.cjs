@@ -24,19 +24,32 @@ function render(buffer, ext, out, dpi = Number(process.env.DOC_DPI || 200), keep
       '    ws.sheet_properties.pageSetUpPr.fitToPage = True',
       '    ws.page_setup.fitToWidth = 1',
       '    ws.page_setup.fitToHeight = 0',
-      // Only the named columns are shown (a wide file would print too small to read). The column names are in the
-      // first row that holds one of them: row 1, or the row under the title block of a report.
+      // Only the named columns are shown (a wide file would print too small to read). A file in the template layout
+      // has its headers under the guide band: the guide rows are left out so that the rows show at a readable size.
       'keep = [k for k in sys.argv[2].split("|") if k]',
       'if keep:',
       '    from openpyxl.utils import get_column_letter',
-      '    from openpyxl.worksheet.header_footer import HeaderFooter',
+      '    clean = lambda v: str(v or "").replace("*", "").strip()',
       '    for ws in wb.worksheets:',
-      '        head = next((r for r in range(1, min(ws.max_row, 40) + 1)',
-      '                     if any(str(ws.cell(r, c).value or "") in keep for c in range(1, ws.max_column + 1))), 1)',
-      // The page header and footer of the print are not part of the report table the image shows.
-      '        ws.HeaderFooter = HeaderFooter()',
+      '        hr = next((r for r in range(1, ws.max_row + 1) if any(clean(ws.cell(r, c).value) in keep for c in range(1, ws.max_column + 1))), None)',
+      '        if hr is None:',
+      '            continue',
+      '        for m in list(ws.merged_cells.ranges):',
+      '            ws.unmerge_cells(str(m))',
+      '        if hr > 1:',
+      '            ws.delete_rows(1, hr - 1)',
+      '        from openpyxl.worksheet.pagebreak import RowBreak',
+      '        ws.print_title_rows = None',
+      '        ws.print_area = None',
+      '        ws.row_breaks = RowBreak()',
+      '        ws.freeze_panes = None',
+      '        for part in (ws.oddHeader, ws.oddFooter, ws.evenHeader, ws.evenFooter, ws.firstHeader, ws.firstFooter):',
+      '            part.left.text = part.center.text = part.right.text = None',
+      '        for r in range(1, ws.max_row + 1):',
+      '            ws.row_dimensions[r].hidden = False',
+      '            ws.row_dimensions[r].height = None',
       '        for c in range(1, ws.max_column + 1):',
-      '            name = str(ws.cell(head, c).value or "")',
+      '            name = clean(ws.cell(1, c).value)',
       '            dim = ws.column_dimensions[get_column_letter(c)]',
       '            dim.hidden = name not in keep',
       '            dim.width = 60 if name == keep[-1] else 20',
@@ -76,12 +89,12 @@ function extOf(buffer) {
 }
 
 /** Downloads a file from the API as `user` and renders its first page. */
-async function download(ctx, user, url, out, ext) {
+async function download(ctx, user, url, out, ext, keep = []) {
   const data = await ctx.api(user, 'GET', url);
   if (!Buffer.isBuffer(data)) {
     throw new Error(`${url} did not return a file`);
   }
-  render(data, ext || extOf(data), out);
+  render(data, ext || extOf(data), out, undefined, keep);
 }
 
 const one = (ctx, q) => ctx.one(q);
@@ -119,7 +132,8 @@ const shots = {
   'doc-service-invoice': (ctx, out) => download(ctx, 'proc',
     `/booking/service-invoices/${one(ctx, 'select id from bkg_service_invoice order by id desc limit 1')}/pdf`, out),
   'doc-clpc-billing': (ctx, out) => download(ctx, 'proc',
-    `/placement/billing/batches/${one(ctx, 'select id from plc_billing_batch order by id desc limit 1')}/file?format=XLSX`, out, 'xlsx'),
+    `/placement/billing/batches/${one(ctx, 'select id from plc_billing_batch order by id desc limit 1')}/file?format=XLSX`, out, 'xlsx',
+    ['PN No.', 'Loan Application No.', 'Booking Date', 'Borrower', 'Premium', 'Reference']),
   'doc-report': async (ctx, out) => {
     const company = ctx.one("select id from org_company where code = 'FVI'");
     const data = await ctx.api('mkttl', 'POST', '/reports/NB-ACC-STATUS/export?format=PDF', { companyId: company });

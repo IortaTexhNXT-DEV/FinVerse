@@ -1,5 +1,5 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { FilePlus2, FileSpreadsheet, Upload } from 'lucide-react';
+import { FilePlus2 } from 'lucide-react';
 import { placementApi } from '@/api/placement';
 import type { BillingBatch, BillingCandidate } from '@/api/placement';
 import { selectionColumn, useRowSelection } from '@/components/broking/rowSelection';
@@ -9,9 +9,11 @@ import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageFooter } from '@/components/ui/Pager';
+import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatAmount, formatDate } from '@/utils/format';
+import { batchActions } from './batchActions';
 
 interface BatchesProps {
   companyId: number;
@@ -123,36 +125,16 @@ export function BillingBatches({
             },
             {
               key: 'actions',
-              header: '',
+              header: 'Actions',
               render: (b) => (
-                <span className="row">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    icon={<FileSpreadsheet size={14} />}
-                    onClick={() => download.mutate(() => placementApi.batchFile(b.id, 'XLSX'))}
-                  >
-                    Excel
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    icon={<FileSpreadsheet size={14} />}
-                    onClick={() => download.mutate(() => placementApi.batchFile(b.id, 'ODS'))}
-                  >
-                    ODS
-                  </Button>
-                  {b.status !== 'CLOSED' && (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      icon={<Upload size={14} />}
-                      onClick={() => onUploadFor(b)}
-                    >
-                      Upload Report
-                    </Button>
-                  )}
-                </span>
+                <RowActions
+                  record={b.batchNo}
+                  actions={batchActions(b, {
+                    download: (format) =>
+                      download.mutate(() => placementApi.batchFile(b.id, format)),
+                    upload: () => onUploadFor(b),
+                  })}
+                />
               ),
             },
           ]}

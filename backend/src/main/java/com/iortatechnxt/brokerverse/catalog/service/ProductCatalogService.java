@@ -227,6 +227,18 @@ public class ProductCatalogService {
   }
 
   /**
+   * The name of a product for the texts a user reads (work item descriptions); the code when the
+   * product is not in the catalogue.
+   *
+   * @param code risk code
+   * @return product name
+   */
+  @Transactional(readOnly = true)
+  public String productName(String code) {
+    return code == null ? "" : products.findByCode(code).map(RiskProduct::getName).orElse(code);
+  }
+
+  /**
    * A product that may be used for new business: authorized and active.
    *
    * @param code risk code

@@ -1,14 +1,14 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
-import { FileSpreadsheet, FileText, RefreshCw, Send } from 'lucide-react';
 import { useState } from 'react';
 import { placementApi } from '@/api/placement';
 import type { Slip, SlipEmail } from '@/api/placement';
 import { useAuth } from '@/auth/authContext';
 import { SendEmailDialog } from '@/components/broking/SendEmailDialog';
 import { useFileDownload } from '@/components/broking/useFileDownload';
-import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { RowActions } from '@/components/ui/RowActions';
 import { useToast } from '@/components/ui/toastContext';
+import { slipActions } from './slipRowActions';
 
 function SendSlipDialog({
   slip,
@@ -47,9 +47,9 @@ function SendSlipDialog({
 }
 
 /**
- * Actions on a placement slip (BRNB.069/071): download the PDF and Excel files, send or resend it
- * to the insurer's placement mailbox (optionally password protected) and regenerate it after a
- * return (new version, the old one kept).
+ * Actions on a placement slip (BRNB.069/071), in the row action menu: download the PDF and Excel
+ * files, send or resend it to the insurer's placement mailbox (optionally password protected) and
+ * regenerate it after a return (new version, the old one kept).
  */
 export function SlipActions({ slip, onChanged }: Readonly<{ slip: Slip; onChanged: () => void }>) {
   const { can } = useAuth();
@@ -66,43 +66,14 @@ export function SlipActions({ slip, onChanged }: Readonly<{ slip: Slip; onChange
   const manage = can('PLACEMENT_MANAGE') && slip.status !== 'SUPERSEDED';
   return (
     <span className="row">
-      <Button
-        size="sm"
-        variant="ghost"
-        icon={<FileText size={14} />}
-        onClick={() => download.mutate(() => placementApi.slipFile(slip.id, 'pdf'))}
-      >
-        PDF
-      </Button>
-      <Button
-        size="sm"
-        variant="ghost"
-        icon={<FileSpreadsheet size={14} />}
-        onClick={() => download.mutate(() => placementApi.slipFile(slip.id, 'xlsx'))}
-      >
-        Excel
-      </Button>
-      {manage && (
-        <Button
-          size="sm"
-          variant="secondary"
-          icon={<Send size={14} />}
-          onClick={() => setSending(true)}
-        >
-          {slip.status === 'SENT' ? 'Resend' : 'Send'}
-        </Button>
-      )}
-      {manage && slip.status === 'SENT' && (
-        <Button
-          size="sm"
-          variant="ghost"
-          icon={<RefreshCw size={14} />}
-          busy={regenerate.isPending}
-          onClick={() => regenerate.mutate()}
-        >
-          Regenerate
-        </Button>
-      )}
+      <RowActions
+        record={slip.displayNo}
+        actions={slipActions(slip, manage, {
+          download: (format) => download.mutate(() => placementApi.slipFile(slip.id, format)),
+          send: () => setSending(true),
+          regenerate: () => regenerate.mutate(),
+        })}
+      />
       <ErrorAlert error={download.error ?? regenerate.error} />
       {sending && (
         <SendSlipDialog

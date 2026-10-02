@@ -6,6 +6,7 @@ import {
   matchText,
   numbersError,
   proposedNumbers,
+  extractionNotes,
 } from './issuanceLogic';
 
 const review = (termYears: number, extracted: string[], onAccount: string[] = []): Review => ({
@@ -69,5 +70,14 @@ describe('how an e-policy was matched', () => {
     expect(matchText('MANUAL')).toBe('the account chosen at upload');
     expect(matchText('POLICY_NUMBER')).toBe('the policy number');
     expect(matchText(undefined)).toBe('—');
+  });
+});
+
+describe('extractionNotes', () => {
+  it('writes each note of an extraction as a sentence', () => {
+    expect(extractionNotes('premium not found; period end not found')).toEqual([
+      'Premium not found.',
+      'Period end not found.',
+    ]);
   });
 });

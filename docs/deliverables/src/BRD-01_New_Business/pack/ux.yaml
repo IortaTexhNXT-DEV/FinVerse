@@ -1,0 +1,106 @@
+# UX screen documents of the BRD-1 New Business set for the BDOI UX Design team: 07 UX Screen Deck, 08 UX screen
+# register, 09 image package (docs/deliverables/src/signoff/build_ux_deck.py). The screens, fields, actions,
+# walkthroughs and images come from the pack; this file holds what only the UX documents need: who each persona is,
+# the images taken for the deck only (more states of a screen, the landing page and menu of each persona), the
+# changes of the issue and the points for the UX Design team to confirm.
+
+issue:
+  version: "2.0"
+  date: 1 October 2026
+  # First issue of the UX screen documents of the set: every screen is new to the UX Design team.
+  changes: []
+
+# The personas whose landing page and full menu the deck shows.
+navigation:
+  roles: [MKT_AO, MKT_TL, TSU, PROCESSOR, PROCESSING_TL, NB_APPROVER, EPOLICY_SENDER, ADJUSTMENT, BUSINESS_ADMIN,
+          SYSADMIN, AUDITOR]
+
+# Who each persona is (what they do comes from the persona table of the FRS unless given here).
+personas:
+  MKT_AO: {who: "A Marketing Account Officer of the head office or of a branch who serves the clients and brings in the business"}
+  MKT_TL: {who: "A Marketing team leader, team head or unit head, who approves the quotations and proposal requests of the team and verifies the KYC"}
+  TSU: {who: "An underwriter of the Technical Support Unit who prepares the quotation and proposal slips of the non-package risks"}
+  PROCESSOR: {who: "A Processing officer who validates the accounts, confirms the payments, places the accounts, receives the e-policies and books the accounts"}
+  PROCESSING_TL: {who: "The team leader of Processing, who assigns the work of the team"}
+  NB_APPROVER: {who: "A New Business approver who authorises the master records and the changes that need a second user"}
+  EPOLICY_SENDER: {who: "An officer who sends the e-policies and Insurance Advices to the clients"}
+  ADJUSTMENT: {who: "An Adjustment officer who cancels bookings and posts the endorsements of booked accounts"}
+  BUSINESS_ADMIN: {who: "The business administrator of New Business, who keeps the lists of values, the targets and the message texts"}
+  SYSADMIN: {who: "The system administrator of BIBS (BDOI IT operations), who keeps the users, the parameters and the jobs"}
+  AUDITOR: {who: "An internal or external auditor with read access to the clients, quotations, accounts and work queues"}
+
+# The UX state of an image when its name does not say it.
+classify:
+  scr-nb-02-04-duplicate: validation-error
+  scr-nb-03-04-approval: pending-approval
+  scr-nb-07-03-approval: pending-approval
+  scr-nb-07-04-send: filled
+  scr-nb-08-03-close: confirmation
+  scr-nb-11-05-terms: filled
+  scr-nb-14-03-review: success
+  scr-nb-14-04-duplicate: validation-error
+  scr-nb-15-02-processing: pending-approval
+  scr-nb-15-03-return: confirmation
+  scr-nb-18-02-generate: validation-error
+  scr-nb-18-03-cancelled: empty
+  scr-nb-19-03-confirm: confirmation
+  scr-nb-20-02-send: filled
+  scr-nb-22-01-review: pending-approval
+  scr-nb-25-01-review: pending-approval
+  scr-nb-26-02-send: confirmation
+  scr-nb-28-03-booknow: confirmation
+  scr-nb-30-02-cancel: confirmation
+  scr-nb-33-01-list: empty
+  scr-nb-36-02-review: validation-error
+  scr-nb-36-03-processed: success
+  scr-nb-36-04-errorfile: document
+  scr-nb-36-05-corrected: success
+  scr-nb-38-02-assign: filled
+  scr-nb-42-02-new: default
+
+# Images taken for the deck only: states the screen specifications do not show.
+states:
+  - {screen: SCR-NB-01, state: empty, user: ao, ux: empty, nocallouts: true, caption: "A search that finds no client"}
+  - {screen: SCR-NB-07, state: auditor, user: auditor, open: first, ux: read-only, nocallouts: true, caption: "A quotation as the Auditor sees it, without the actions"}
+  - {screen: SCR-NB-08, state: actions, user: ao, ux: default, nocallouts: true, caption: "The row action menu of a request, opened from the more button of its row"}
+  - {screen: SCR-NB-15, state: auditor, user: auditor, open: first, ux: read-only, nocallouts: true, caption: "An account as the Auditor sees it, without the actions"}
+
+# Points for the UX Design team to confirm with BDOI.
+confirm:
+  clarifications: [CLR-NB-38, CLR-NB-39, CLR-NB-40, CLR-NB-41, CLR-NB-42, CLR-NB-43]
+  findings:
+    - screens: [SCR-NB-37]
+      observation: >-
+        Every New Business persona lands on the New Business Dashboard after sign-in; the System Administrator and the
+        Auditor land on the home page of the platform.
+      proposal: Confirm the landing page of each persona, or land the Processing and TSU personas on their workbench.
+    - screens: [SCR-NB-29, SCR-NB-30]
+      observation: >-
+        The journal preview and the journal of a booked invoice show the ledger account by its number and name and the
+        party of a line by its sub-ledger code (client or insurer code), as the journals of the General Ledger do.
+      proposal: Confirm the account number and the party code, or show the party's name with the code under it.
+    - screens: [SCR-NB-40]
+      observation: >-
+        The Account Status Report lists the product by its code and wraps the ARN over three lines in its narrow column;
+        the printed report has the same layout.
+      proposal: Show the product name with the code under it and keep the ARN on one line, or confirm the compact layout.
+    - screens: [SCR-NB-43]
+      observation: >-
+        The record types of the retention rules are shown in words made from their internal names (for example Csf
+        Contact Change, Eb Programme).
+      proposal: Give each record type a business name (for example Customer servicing contact change, Employee Benefits programme).
+    - screens: [SCR-NB-42]
+      observation: >-
+        Lists of Values shows the code of each list under its name and the code of each value in its own column; these
+        codes are what the upload templates and interfaces carry.
+      proposal: Keep the codes for the Business Administrator, or show them only in the tooltip.
+    - screens: [SCR-NB-45]
+      observation: >-
+        In the SIT environment no mail server is connected: the Reason column of Outbound Messages and the Dispatch
+        Report show the SIT delivery note instead of the mail server's answer.
+      proposal: No change; the column shows the mail server's answer in production.
+    - screens: [SCR-NB-25]
+      observation: >-
+        The Extraction Review compares the policy numbers read from the e-policy with the number expected on the account
+        ("1 expected"), not with a policy number, which the account does not have yet.
+      proposal: Confirm the wording, or write "One policy number expected".

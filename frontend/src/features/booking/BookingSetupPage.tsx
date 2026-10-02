@@ -18,7 +18,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { humanize } from '@/utils/format';
 import { AutoBookRuleDialog, ServiceInvoiceTypeDialog } from './SetupDialogs';
 import { UserName } from '@/components/ui/UserName';
-import { LovLabel } from '@/components/broking/LovLabel';
+import { LovLabel, ProductName } from '@/components/broking/LovLabel';
 
 type TabId = 'auto' | 'incentive' | 'types';
 
@@ -79,7 +79,11 @@ function AutoBookTab({ companyId, canEdit }: Readonly<{ companyId: number; canEd
         onRowClick={canEdit ? setEditing : undefined}
         emptyMessage="No auto-book rule: every issued account waits in Ready to Book."
         columns={[
-          { key: 'product', header: 'Product', render: (r) => r.productCode ?? ANY },
+          {
+            key: 'product',
+            header: 'Product',
+            render: (r) => <ProductName code={r.productCode} withCode empty={ANY} />,
+          },
           {
             key: 'segment',
             header: 'Market Segment',
@@ -131,7 +135,11 @@ function IncentiveTab({ companyId }: Readonly<{ companyId: number }>) {
         rowKey={(r) => r.id ?? 0}
         emptyMessage="No incentive rules"
         columns={[
-          { key: 'product', header: 'Product', render: (r) => r.productCode ?? ANY },
+          {
+            key: 'product',
+            header: 'Product',
+            render: (r) => <ProductName code={r.productCode} withCode empty={ANY} />,
+          },
           {
             key: 'segment',
             header: 'Segment',

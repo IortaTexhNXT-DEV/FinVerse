@@ -42,12 +42,12 @@ screens:
       - {state: errorfile, user: ao, path: "/bulk/CLIENT_CREATE", caption: "The error file: the rejected rows with their messages, to correct and upload again"}
       - {state: corrected, user: ao, path: "/bulk/CLIENT_CREATE", caption: "Upload Corrected File: the corrected rows validated and processed"}
     fields:
-      - "1. Template | Download Template | Button | Excel template with the headers, a description row per column and an example | - | Upload type | - | - | Keep the headers unchanged | The file does not follow the current template; missing column(s): <columns>"
+      - "1. Template | Download Template | Button | Excel template: title block, guide band above the headers (Mandatory, Format, Allowed values, What to enter), mandatory headers marked *, an example row to overwrite, drop-downs from the Lists sheet | - | Upload type | - | - | Keep the headers unchanged | The file does not follow the current template; missing column(s): <columns>"
       - "2. Upload | Product | Drop-down | Code – name (quotation and account creation) | Y for those types | Active products | Select | - | - | Choose the product of the upload"
       - "2. Upload | Default market segment | Drop-down | - | N | List of values MARKET_SEGMENT | Blank | - | Applies to rows without a segment | -"
       - "2. Upload | Submit complete accounts to Processing | Check box | Account creation only | N | - | Not ticked | - | - | -"
       - "2. Upload | Create accounts | Check box | Quotation acceptance only | N | - | Not ticked | - | Accounts are created for confirmed clients | -"
-      - "2. Upload | File | Drop zone | Excel (.xlsx), OpenDocument (.ods) or CSV (.csv), first sheet, headers in row 1; up to BULK_MAX_ROWS (5,000) data rows | Y | - | - | - | Readable file with data rows, not uploaded before | Upload an Excel (.xlsx), OpenDocument (.ods), CSV (.csv) or text (.txt) file / The file has no data rows / The file has <n> rows; the maximum is 5000 / This file was already uploaded as <upload> (<file>)"
+      - "2. Upload | File | Drop zone | The filled Excel template as downloaded (the guide rows are skipped), or OpenDocument (.ods) or CSV (.csv) with the headers in row 1; up to BULK_MAX_ROWS (5,000) data rows | Y | - | - | - | Readable file with data rows, not uploaded before | Upload an Excel (.xlsx), OpenDocument (.ods), CSV (.csv) or text (.txt) file / The file has no data rows / The file has <n> rows; the maximum is 5000 / This file was already uploaded as <upload> (<file>)"
       - "3. Review | Rows Read, Valid, Rejected, To process | Figure | Counts; after processing: Processed / failed | - | Upload job | - | Read only | - | -"
       - "3. Review | [Row filter] | Drop-down | All rows, Invalid, Valid, Committed, Failed | N | Fixed list | All rows | - | - | -"
       - "3. Review | Rows | Table | Row, Status, the first five columns, Messages / Reference | - | Upload rows | - | Read only | Each row is checked against the column rules and the type's business rules | <Column> is mandatory / <Column> '<value>' is not a valid <number, date (yyyy-mm-dd), Y/N value>"
@@ -105,17 +105,17 @@ screens:
       - Notification links
     shots:
       - {state: list, user: ao, caption: "My Work, All my queues"}
-      - {state: assign, user: mkttl, click: "^assign$", caption: "Assign dialog of a team leader"}
+      - {state: assign, user: mkttl, caption: "Assign dialog of a team leader, opened from the row action menu"}
     fields:
       - "Summary | Assigned to me / Open in my queues / Overdue / Queues I work | Figure | Counts; a figure filters the list | - | Work items | - | Read only | - | -"
       - "Stage tiles | [One tile per stage of each workflow the user works] | Tile | Open and overdue counts | - | Workflows NB_CLIENT, NB_QUOTATION, NB_PROPOSAL, NB_ACCOUNT | - | - | - | -"
       - "Toolbar | Assigned to me / Team queue / All my queues | Tab | - | - | Fixed | All my queues | - | - | -"
       - "Toolbar | Overdue only | Check box | - | N | - | Not ticked | - | - | -"
       - "Toolbar | Reference or name | Text | - | N | - | Blank | - | Contains search | -"
-      - "List | Reference, Description, Stage, From, In Stage, Due, Assignee | Column | Due in red when overdue; Unassigned | - | Work items | - | Read only | - | Nothing waiting here."
+      - "List | Reference, Description, Stage, From, In Stage, Due, Assignee, Actions | Column | Stage with the workflow under it; From names the segment or sales unit; Due in red when overdue; Unassigned; Claim and Assign in the row action menu | - | Work items | - | Read only | - | Nothing waiting here."
       - "Assign dialog | Assignee | Drop-down | Users of the team that works the stage, or Team queue (unassigned) | N | Users holding the stage's permission | The current assignee | Open item | Only a user of the stage's team | <user> does not work this queue"
     actions:
-      - "Claim | Holder of the stage's permission | Unassigned item | Assigns the item to the user | Unchanged | -"
+      - "Claim | Holder of the stage's permission | Unassigned item (row action menu) | Assigns the item to the user | Unchanged | -"
       - "Assign | WORK_ASSIGN | Open item | Assigns the item or returns it to the team queue | Unchanged | In-app notice to the new assignee"
       - "Clear Stage Filter | Every user of the screen | A stage filter is set | Clears the stage filter | - | -"
       - "Open a row | Every user of the screen | Always | Opens the record | - | -"
@@ -218,7 +218,7 @@ screens:
       - {state: new, user: badmin, click: "^new value$", caption: "New value dialog"}
     fields:
       - "Lists | List names | List | One entry per list | - | List types | The first list | - | - | -"
-      - "Values | Code, Label, Order, Parent, Effective, Status, Maker / Checker | Column | Status From a future date, In force, Ended, Pending authorization, Inactive | - | List values | - | Read only | - | -"
+      - "Values | Code, Label, Order, Parent, Effective, Status, Maker / Checker, Actions | Column | Authorize, Edit and Deactivate in the row action menu; status From a future date, In force, Ended, Pending authorization, Inactive | - | List values | - | Read only | - | -"
       - "Value dialog | Code | Text | Capital letters, digits and _, up to 40 | Y | - | Blank | New value | Format; unique in the list | Use capital letters, digits and _ (up to 40) / <list> already exists: <code>"
       - "Value dialog | Label | Text | - | Y | - | Blank | Always | Not blank | Enter the label"
       - "Value dialog | Sort order | Number | Whole number | Y | - | Next number | Always | A whole number | Enter a whole number"
@@ -227,8 +227,8 @@ screens:
       - "Value dialog | Effective to | Date | dd-MMM-yyyy; blank = no end date | N | - | Blank | Always | Not before Effective from | Must not be before the first valid date"
     actions:
       - "New Value | LOV_MANAGE | List maintained by the business | Opens the value dialog; Save stores the value pending authorization | Pending authorization | Pending item in My Approvals"
-      - "Edit / Deactivate | LOV_MANAGE | Value not inactive | Changes the value (pending authorization) or deactivates it | Pending authorization / Inactive | -"
-      - "Authorize | MASTER_AUTHORIZE; not the maker | Value pending authorization | Authorises the value | In force from its date | -"
+      - "Edit / Deactivate | LOV_MANAGE | Value not inactive (row action menu) | Changes the value (pending authorization) or deactivates it | Pending authorization / Inactive | -"
+      - "Authorize | MASTER_AUTHORIZE; not the maker | Value pending authorization (row action menu) | Authorises the value | In force from its date | -"
     rules:
       - "Lists maintained by the system cannot be changed (FR-NB-132)."
       - "A value is never authorised by its maker (FR-NB-132)."
@@ -245,7 +245,7 @@ screens:
     shots:
       - {state: list, user: approver, caption: "Data Retention"}
     fields:
-      - "List | Record Type, Statuses, Years Online, Years Archive, Action, Rule, Last Review, Eligible Records | Column | Eligible: Not reviewed yet, Module not yet reporting, or a count | - | Retention rules | - | Read only | - | -"
+      - "List | Record Type, Statuses, Years Online, Years Archive, Action, Rule, Last Review, Eligible Records, Actions | Column | Records and Edit in the row action menu; Eligible: Not reviewed yet, Module not yet reporting, or a count | - | Retention rules | - | Read only | - | -"
       - "Rule dialog | Statuses | Text | Comma separated, e.g. NOT_PROCEEDED,VOIDED | Y | Record statuses | As set | Always | At least one status | Enter at least one status"
       - "Rule dialog | Years online | Number | 1 to 50 | Y | - | 5 | Always | 1 to 50 | Between 1 and 50 years"
       - "Rule dialog | Years in archive | Number | 0 to 50 | Y | - | 15 | Always | 0 to 50 | Between 0 and 50 years"
@@ -255,8 +255,8 @@ screens:
       - "Eligible records dialog | Reference, Description, Status, Last Activity | Column | - | - | Records of the type | - | Read only | - | -"
     actions:
       - "Run Review Now | MASTER_MAINTAIN | Always | Counts the eligible records of every active rule | - | -"
-      - "Records (row) | Every user of the screen | Always | Lists the eligible records | - | -"
-      - "Edit (row) | MASTER_MAINTAIN | Always | Opens the rule dialog | - | -"
+      - "Records (row action menu) | Every user of the screen | Always | Lists the eligible records | - | -"
+      - "Edit (row action menu) | MASTER_MAINTAIN | Always | Opens the rule dialog | - | -"
     rules:
       - "Archive and purge wait for BDOI's retention decision per record type; the rules count eligible records meanwhile (FR-NB-137)."
     outcome: BDOI sees which records its retention policy makes eligible.
@@ -276,14 +276,14 @@ screens:
     fields:
       - "Templates | Template list | List | One per document (quotation letter, slips, hold cover request, Insurance Advice, e-policy e-mail, service invoice note...) | - | Document templates | The first template | - | - | -"
       - "Template | Current version | Display | Title and text with {{placeholders}} | - | Template versions | - | Read only | - | -"
-      - "Version history | Version, Title, Effective from, Status, Created | Column | - | - | Template versions | - | Read only | - | -"
+      - "Version history | Version, Title, Effective from, Status, Created, Actions | Column | Created: name with the time under it; Download Word in the row action menu | - | Template versions | - | Read only | - | -"
       - "New version dialog | Load from Word | File | A .docx: the first paragraph is the title, the others the text | N | - | - | Always | A Word document with a title and text | The file is not a Word (.docx) document / The Word file needs the title in its first paragraph and the text below it"
       - "New version dialog | Title | Text | - | Y | - | The current title | Always | Not blank | -"
       - "New version dialog | Effective from | Date | dd-MMM-yyyy | Y | - | Today | Always | - | -"
       - "New version dialog | Text | Text area | Keep the {{placeholders}} of the current version | Y | - | The current text | Always | Not blank | Enter the template text"
     actions:
       - "New Version | MASTER_MAINTAIN or LOV_MANAGE | Always | Opens the new version dialog; Save stores the version effective from its date | - | -"
-      - "[Download icon of a version (as Word)] | Every user of the screen | Always | Downloads the version as Word | - | -"
+      - "Download Word (row action menu of a version) | Every user of the screen | Always | Downloads the version as Word | - | -"
     rules:
       - "Documents use the template version in force on their date (FR-NB-004)."
       - "BDOI's own layouts replace the delivered texts when provided (FR-NB-004)."

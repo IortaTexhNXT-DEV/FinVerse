@@ -1,11 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Paperclip, Pencil, Star } from 'lucide-react';
+import { Paperclip } from 'lucide-react';
 import { useState } from 'react';
 import { proposalsApi } from '@/api/proposals';
 import type { InsurerResponse, Proposal, ResponseStatus, TermsInput } from '@/api/proposals';
 import { useAuth } from '@/auth/authContext';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
+import { RowActions } from '@/components/ui/RowActions';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -16,6 +17,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { NumberInput, SelectInput, TextInput } from '@/features/assets/FormControls';
 import { formatDate, formatDateTime, formatRate } from '@/utils/format';
 import { RESPONSE_STAGES } from './proposalList';
+import { responseActions } from './responseActions';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { displayNameOf } from '@/api/users';
 import { CellStack } from '@/components/ui/CellStack';
@@ -227,7 +229,22 @@ export function ResponsesTab({ proposal }: Readonly<{ proposal: Proposal }>) {
           emptyMessage="The quotation slip has not been sent to the insurers yet."
           columns={[
             { key: 'i', header: 'Insurer', render: (r) => <strong>{r.insurerName}</strong> },
-            { key: 's', header: 'Response', render: (r) => <StatusBadge status={r.status} /> },
+            {
+              key: 's',
+              header: 'Response',
+              render: (r) => (
+                <span className="cell-stack">
+                  <span>
+                    <StatusBadge status={r.status} />
+                  </span>
+                  {r.recommended && (
+                    <span>
+                      <StatusBadge status="RECOMMENDED" />
+                    </span>
+                  )}
+                </span>
+              ),
+            },
             {
               key: 'p',
               header: 'Premium',
@@ -252,29 +269,10 @@ export function ResponsesTab({ proposal }: Readonly<{ proposal: Proposal }>) {
               key: 'a',
               header: 'Actions',
               render: (r) => (
-                <div className="row">
-                  {r.recommended && <StatusBadge status="RECOMMENDED" />}
-                  {editable && (
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      icon={<Pencil size={14} />}
-                      onClick={() => setEditing(r)}
-                    >
-                      Terms
-                    </Button>
-                  )}
-                  {editable && r.status === 'RECEIVED' && !r.recommended && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      icon={<Star size={14} />}
-                      onClick={() => recommend.mutate(r)}
-                    >
-                      Recommend
-                    </Button>
-                  )}
-                </div>
+                <RowActions
+                  record={r.insurerName}
+                  actions={responseActions(r, editable, setEditing, (x) => recommend.mutate(x))}
+                />
               ),
             },
           ]}

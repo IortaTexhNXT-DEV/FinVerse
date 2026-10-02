@@ -5,6 +5,7 @@ import com.iortatechnxt.brokerverse.approval.service.MasterRecordApprovals;
 import com.iortatechnxt.brokerverse.approval.service.MasterRecordApprovals.RecordFacts;
 import com.iortatechnxt.brokerverse.approval.service.PendingApproval;
 import com.iortatechnxt.brokerverse.approval.service.PendingApprovalSource;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.party.domain.Party;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,7 @@ public class PartyApprovalSource implements PendingApprovalSource {
         Party.class,
         p ->
             new RecordFacts(
-                "Party (" + p.getPartyType() + ")",
+                "Party (" + DisplayFormat.words(p.getPartyType()) + ")",
                 p.getCode(),
                 p.getName(),
                 p.getCompanyId(),

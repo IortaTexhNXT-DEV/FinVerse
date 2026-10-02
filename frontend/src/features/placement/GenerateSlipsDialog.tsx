@@ -7,7 +7,7 @@ import { countOf, humanize } from '@/utils/format';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { InsurerName } from '@/components/broking/LovLabel';
+import { InsurerWithBranch } from '@/components/broking/LovLabel';
 
 /**
  * "For Placement" (BRNB.069): shows every prerequisite of the selected accounts (payment
@@ -85,12 +85,7 @@ export function GenerateSlipsDialog({
             {
               key: 'insurer',
               header: 'Insurer',
-              render: (r) => (
-                <>
-                  <InsurerName code={r.insurerCode} />
-                  {r.insurerBranch ? ` / ${r.insurerBranch}` : ''}
-                </>
-              ),
+              render: (r) => <InsurerWithBranch insurer={r.insurerCode} branch={r.insurerBranch} />,
             },
             {
               key: 'ready',

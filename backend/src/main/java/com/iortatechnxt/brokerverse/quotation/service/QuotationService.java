@@ -396,8 +396,8 @@ public class QuotationService {
    * @param q quotation
    * @return title
    */
-  static String title(Quotation q) {
-    return q.getClientName() + " - " + q.getProductCode();
+  private String title(Quotation q) {
+    return q.getClientName() + " - " + catalog.productName(q.getProductCode());
   }
 
   /**

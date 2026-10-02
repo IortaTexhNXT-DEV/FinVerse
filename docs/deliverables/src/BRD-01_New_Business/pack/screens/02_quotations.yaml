@@ -22,8 +22,7 @@ screens:
       - "List | Quotation No. | Column | QT-yyyy-nnnnnn with its version (v1, v2...) | - | Numbering | - | Read only | - | -"
       - "List | ARN | Column | ARN-yyyy-nnnnnn, copy chip | - | Numbering | - | Read only | - | -"
       - "List | Client | Column | Name and code | - | Client master | - | Read only | - | -"
-      - "List | Product | Column | Product code | - | Product catalogue (BRD-3) | - | Read only | - | -"
-      - "List | Insurer | Column | Insurer code or To be advised | - | Insurer master | - | Read only | - | -"
+      - "List | Product / Insurer | Column | Product name, with the insurer's name or To be advised under it | - | Product catalogue (BRD-3), insurer master | - | Read only | - | -"
       - "List | Gross Premium | Column | Amount, 2 decimals | - | Premium computation | - | Read only | - | -"
       - "List | Valid Until | Column | dd-MMM-yyyy; days left or Expired when 7 days or less remain on an approved or sent quotation | - | Quotation | - | Read only | - | -"
       - "List | Status | Column | Status badge; Direct Payment badge when paid directly to the insurer | - | Workflow NB_QUOTATION | - | Read only | - | -"
@@ -113,7 +112,7 @@ screens:
     shots:
       - {state: record, user: ao, open: first, caption: "Quotation record, Details tab"}
       - {state: items, user: ao, open: first, tab: "Items & Premium", caption: "Items & Premium tab"}
-      - {state: approval, user: mkttl, path: "/quotations?tab=review", open: first, caption: "Quotation for review as seen by the approver (Approve, Return To Maker)"}
+      - {state: approval, user: mkttl, open: for_review_by_other, caption: "Quotation for review as seen by the approver (Approve, Return To Maker)"}
       - {state: send, user: ao, open: approved, click: "^send via email$", caption: "Send via Email dialog of an approved quotation"}
     fields:
       - "Header | Version | Drop-down | v1 ... vn, current marked | N | Quotation versions | Current version | Always | - | -"
@@ -170,7 +169,7 @@ screens:
     shots:
       - {state: list, user: ao, caption: "Quotation Requests, To Quote tab"}
       - {state: capture, user: ao, click: "^capture request$", caption: "Capture Quotation Request dialog"}
-      - {state: close, user: ao, click: "^close$", caption: "Close dialog with the required Reason for Closing"}
+      - {state: close, user: ao, caption: "Close dialog with the required Reason for Closing, opened from the row action menu"}
     fields:
       - "Tabs | To Quote / Quoted / Closed | Tab | - | - | Fixed | To Quote | - | - | -"
       - "Search | Search Request No. | Text | Request No., prospect or cover | N | - | Blank | - | Contains search | -"
@@ -180,6 +179,7 @@ screens:
       - "List | Product | Column | Requested product | - | Product catalogue | - | Read only | - | -"
       - "List | Requested Cover | Column | Text | - | Request | - | Read only | - | -"
       - "List | Status | Column | New, Quoted, Closed with the close reason | - | Request | - | Read only | - | -"
+      - "List | Actions | Row action menu | The actions of the request the user may take now: Create Prospect or Create Quotation, Close (last, in red); Open Quotation once quoted | - | - | - | - | - | -"
       - "Capture dialog | Channel | Drop-down | - | Y | List of values SOURCE_CHANNEL | E-mail | New | - | -"
       - "Capture dialog | Source reference | Text | E-mail subject or source-system reference, up to 60 characters | N | - | Blank | New | A reference already received on the same channel is refused | Request <reference> of <channel> was already received"
       - "Capture dialog | Existing client | Look-up | Code or name | Cond.: the client or the prospect name | Client master | Blank | New | A client or a prospect name is given | Choose the client or give the prospect name"

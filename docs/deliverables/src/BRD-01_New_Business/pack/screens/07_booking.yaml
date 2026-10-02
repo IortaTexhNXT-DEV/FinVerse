@@ -33,7 +33,7 @@ screens:
       - "Book Now | BOOKING_PROCESS | Rows selected (not on Booked Account) | Asks for the booking date and books each account on its own; the run is listed in Batch Runs | Booked | Service invoice e-mails per the service invoice types"
       - "Confirm Batch | BOOKING_PROCESS | Queued for Batch, rows selected | Asks for the booking date and books the selected queued accounts; accounts with their own date keep it | Booked | As Book Now"
       - "Cancel Batch | BOOKING_PROCESS | Queued for Batch | Asks for confirmation and removes every queued account from the batch | Unchanged (back to Ready to Book) | -"
-      - "Edit / Remove (row) | BOOKING_PROCESS | Queued for Batch | Changes the booking date and cost center of a queued account, or removes it from the queue | Unchanged | -"
+      - "Edit / Remove (row action menu) | BOOKING_PROCESS | Queued for Batch | Changes the booking date and cost center of a queued account, or removes it from the queue | Unchanged | -"
       - "Open a row | Every user of the screen | Always | Opens the Pre-booking Confirmation (ready) or the booked invoice (booked) | - | -"
     rules:
       - "An account is booked once only; a second booking is refused (FR-NB-112)."
@@ -163,7 +163,7 @@ screens:
     fields:
       - "Tabs | All / Service Invoices / Credits | Tab | - | - | Fixed | All | - | - | -"
       - "Search | Search Service Invoice No., invoice, ARN or recipient | Text | - | N | - | Blank | - | Contains search | -"
-      - "List | Service Invoice No., Issue Date, Kind, Type, Booked Invoice, ARN, Recipient, Net, Dispatch | Column | - | - | Service invoices | - | Read only | - | -"
+      - "List | Service Invoice No., Kind / Type, Recipient, Invoice No., Issue Date, Net, E-mail | Column | Kind pill with the type name under it | - | Service invoices | - | Read only | - | -"
       - "Record | Service invoice, Invoice, ARN | Reference | - | - | Service invoice | - | Read only | - | -"
       - "Record | Recipient, Billing e-mail, Issue date, Template, Owner, Credit of | Display | - | - | Service invoice types, insurer master | - | Read only | - | -"
       - "Record | Lines | Display | Brokerage commission, VAT on commission, less withholding tax, net amount | - | Booking | - | Read only | - | -"

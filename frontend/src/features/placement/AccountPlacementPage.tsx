@@ -23,7 +23,7 @@ import { HoldCoverPanel } from './HoldCoverPanel';
 import { PlacementActions } from './PlacementActions';
 import { SlipActions } from './SlipActions';
 import { displayNameOf } from '@/api/users';
-import { ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
+import { ProductLineLabel, InsurerWithBranch } from '@/components/broking/LovLabel';
 
 const TABS = [
   { id: 'gate', label: 'Payment Gate' },
@@ -58,8 +58,7 @@ function Summary({ account, view }: Readonly<{ account: Account; view: Placement
           <ProductLineLabel product={account.productCode} line={account.lineCode} />
         </Fact>
         <Fact icon={<Building2 size={16} aria-hidden="true" />} label="Insurer">
-          <InsurerName code={account.insurerCode} />
-          {account.insurerBranch ? ` / ${account.insurerBranch}` : ''}
+          <InsurerWithBranch insurer={account.insurerCode} branch={account.insurerBranch} />
         </Fact>
         <Fact icon={<Wallet size={16} aria-hidden="true" />} label="Gross premium">
           {account.currency} {formatAmount(account.premium.grossPremium)}
@@ -92,11 +91,7 @@ function SlipsTable({ slips, onChanged }: Readonly<{ slips: Slip[]; onChanged: (
           {
             key: 'insurer',
             header: 'Insurer',
-            render: (s) => (
-              <>
-                <InsurerName code={s.insurerCode} /> / {s.branchCode}
-              </>
-            ),
+            render: (s) => <InsurerWithBranch insurer={s.insurerCode} branch={s.branchCode} />,
           },
           {
             key: 'sent',

@@ -1,5 +1,12 @@
 import type { LovValue } from '@/api/lov';
-import { effectivity, lovForm, nextSortOrder, toLovRequest, validateLov } from './lovForm';
+import {
+  effectivity,
+  lovForm,
+  nextSortOrder,
+  toLovRequest,
+  validateLov,
+  valueActions,
+} from './lovForm';
 
 const VALUE: LovValue = {
   id: 1,
@@ -63,5 +70,30 @@ describe('list value form', () => {
     expect(effectivity(VALUE, '2026-01-01')).toBe('ACTIVE');
     expect(effectivity({ ...VALUE, effectiveFrom: '2027-01-01' }, '2026-01-01')).toBe('FUTURE');
     expect(effectivity({ ...VALUE, effectiveTo: '2025-12-31' }, '2026-01-01')).toBe('EXPIRED');
+  });
+});
+
+describe('list value row actions', () => {
+  const shown = (v: LovValue, manage: boolean, authorize: boolean) =>
+    valueActions(v, manage, authorize, () => undefined)
+      .filter((a) => !a.hidden)
+      .map((a) => a.label);
+
+  it('offers Edit and Deactivate to the maintainer, Deactivate as the reversing action', () => {
+    expect(shown(VALUE, true, false)).toEqual(['Edit', 'Deactivate']);
+    expect(valueActions(VALUE, true, false, () => undefined).at(-1)?.danger).toBe(true);
+  });
+
+  it('offers Authorize to the checker and nothing on an inactive value', () => {
+    expect(shown({ ...VALUE, status: 'PENDING_AUTHORIZATION' }, false, true)).toEqual([
+      'Authorize',
+    ]);
+    expect(shown({ ...VALUE, status: 'INACTIVE' }, true, false)).toEqual([]);
+  });
+
+  it('passes the chosen action', () => {
+    const chosen: string[] = [];
+    valueActions(VALUE, true, true, (a) => chosen.push(a)).forEach((a) => void a.onSelect(''));
+    expect(chosen).toEqual(['authorize', 'edit', 'deactivate']);
   });
 });

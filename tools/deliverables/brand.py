@@ -274,9 +274,9 @@ READING_ORDER_EXTRA = {"Templates": "06", "Handbook": "02", "Workbook": "03"}
 # the screen resolution, with the register as CSV). Two kinds share the name UXScreens, so the order is by kind and
 # extension. build_ux_deck.py builds the three; check_pack requires them in the sets of UX_SETS.
 READING_ORDER_UX = {("UXDeck", "pptx"): "07", ("UXScreens", "xlsx"): "08", ("UXScreens", "zip"): "09"}
-# Sign-off sets that carry the UX screen documents (07 to 09): the Drop 0 sets, BRD-02 Operations and BRD-04
-# Collections first; the other Drop 1 sets follow when they are re-issued.
-UX_SETS = {"BRD-02", "BRD-03", "BRD-04", "BRD-11", "BRD-13"}
+# Sign-off sets that carry the UX screen documents (07 to 09): the Drop 0 sets, BRD-02 Operations, BRD-04 Collections
+# and BRD-01 New Business first; the other Drop 1 sets follow when they are re-issued.
+UX_SETS = {"BRD-01", "BRD-02", "BRD-03", "BRD-04", "BRD-11", "BRD-13"}
 
 
 def output_name(doc_type: str, brd: str, name: str, version: str, ext: str) -> str:

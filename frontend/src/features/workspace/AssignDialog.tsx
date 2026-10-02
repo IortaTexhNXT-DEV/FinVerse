@@ -8,6 +8,7 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { displayNameOf } from '@/api/users';
+import { useDisplayName } from '@/components/ui/useDisplayName';
 
 interface AssignDialogProps {
   item: WorkItem;
@@ -17,6 +18,7 @@ interface AssignDialogProps {
 
 /** Team leader: assign an item to a user of the stage's team, or back to the team queue. */
 export function AssignDialog({ item, onClose, onDone }: Readonly<AssignDialogProps>) {
+  const name = useDisplayName();
   const toast = useToast();
   const [assignee, setAssignee] = useState(item.assignee ?? '');
   const users = useQuery({
@@ -67,7 +69,7 @@ export function AssignDialog({ item, onClose, onDone }: Readonly<AssignDialogPro
               <option value="">Team queue (unassigned)</option>
               {(users.data ?? []).map((u) => (
                 <option key={u} value={u}>
-                  {u}
+                  {name(u)}
                 </option>
               ))}
             </select>

@@ -24,7 +24,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { formatAmount, formatDate, formatPeriod } from '@/utils/format';
 import { useProductName } from '@/components/broking/useLabels';
-import { PremiumTables, SummaryFact } from './BookingParts';
+import { CostCenter, PremiumTables, SummaryFact } from './BookingParts';
 import { labelOf } from './bookingForm';
 import { CancellationDialog } from './CancellationDialog';
 import {
@@ -112,7 +112,7 @@ function Summary({ invoice: i }: Readonly<{ invoice: BookedInvoice }>) {
             {i.currency} {formatAmount(i.premium.total)}
           </SummaryFact>
           <SummaryFact icon={Landmark} label="Cost center">
-            {i.facts.costCenter} <span className="muted">{i.facts.department}</span>
+            <CostCenter costCenter={i.facts.costCenter} department={i.facts.department} />
           </SummaryFact>
           {i.insurerBillingNo && (
             <SummaryFact icon={ReceiptText} label="Insurer billing no.">

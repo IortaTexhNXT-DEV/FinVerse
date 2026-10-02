@@ -11,7 +11,12 @@ import { DetailList } from '@/features/catalog/DetailList';
 import type { DetailRow } from '@/features/catalog/DetailList';
 import { formatDate, formatDateTime, formatPeriod, formatRate, humanize } from '@/utils/format';
 import { displayNameOf } from '@/api/users';
-import { LovLabel, ProductLineLabel, InsurerName } from '@/components/broking/LovLabel';
+import {
+  InsurerWithBranch,
+  LovLabel,
+  ProductLineLabel,
+  SalesUnitPath,
+} from '@/components/broking/LovLabel';
 
 function detailRows(a: Account): DetailRow[] {
   return [
@@ -19,13 +24,7 @@ function detailRows(a: Account): DetailRow[] {
     ['Product', <ProductLineLabel key="p" product={a.productCode} line={a.lineCode} />],
     ['Market segment', <LovLabel key="m" type="MARKET_SEGMENT" code={a.marketSegment} />],
     ['Source', <LovLabel key="s" type="SOURCE_CHANNEL" code={a.sourceChannel} />],
-    [
-      'Insurer',
-      <span key="i">
-        <InsurerName code={a.insurerCode} />
-        {a.insurerBranch ? ` / ${a.insurerBranch}` : ''}
-      </span>,
-    ],
+    ['Insurer', <InsurerWithBranch key="i" insurer={a.insurerCode} branch={a.insurerBranch} />],
     ['Period', formatPeriod(a.periodFrom, a.periodTo)],
     ['Term', a.multiYear ? `${a.termYears} years` : '1 year'],
     ['Total sum insured', <Amount key="tsi" value={a.totalSumInsured} />],
@@ -40,7 +39,7 @@ function detailRows(a: Account): DetailRow[] {
     ['Account officer', displayNameOf(a.sales.accountOfficer)],
     [
       'Sales unit',
-      [a.sales.region, a.sales.department, a.sales.team].filter(Boolean).join(' / ') || '—',
+      <SalesUnitPath key="u" codes={[a.sales.region, a.sales.department, a.sales.team]} />,
     ],
     ['Cost center', a.sales.costCenter],
     ['Created', `${displayNameOf(a.createdBy)} ${formatDateTime(a.createdAt)}`],

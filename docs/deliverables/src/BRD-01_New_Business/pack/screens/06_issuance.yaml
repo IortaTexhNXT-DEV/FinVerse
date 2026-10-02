@@ -22,10 +22,10 @@ screens:
       - "List | Status | Column | Account stage or e-policy status | - | Workflow NB_ACCOUNT, e-policy | - | Read only | - | -"
       - "List | Product Line | Column | Line, product and insurer | - | Product catalogue | - | Read only | - | -"
       - "List | Policy No. | Column | Policy number(s) | - | Account | - | Read only | - | -"
-      - "List | E-policy / Mortgagee / Upload E-policy | Column | File name and time received (review, dispatch); mortgagee bank (IA to Generate); upload link (awaiting policy) | - | E-policy, account | - | Read only | - | -"
+      - "List | E-policy / Mortgagee / Actions | Column | File name and time received (review, dispatch); mortgagee bank (IA to Generate); row action menu with Upload E-policy (awaiting policy) | - | E-policy, account | - | Read only | - | -"
     actions:
       - "Upload E-policies | EPOLICY_MANAGE | Always | Opens E-policy Upload | - | -"
-      - "Upload E-policy (row) | EPOLICY_MANAGE | Placed – Awaiting Policy | Opens E-policy Upload with the ARN filled in | - | -"
+      - "Upload E-policy (row action menu) | EPOLICY_MANAGE | Placed – Awaiting Policy | Opens E-policy Upload with the ARN filled in | - | -"
       - "Generate Insurance Advice | EPOLICY_MANAGE | IA to Generate, at least one row selected | Generates the Insurance Advice of each selected mortgaged account; the outcome of each is listed | Unchanged | -"
       - "Send E-policies | EPOLICY_SEND | Ready to Dispatch, at least one row selected | Asks for an optional password hint and sends each e-policy to the account contact, encrypted | Unchanged (e-policy dispatched) | E-mail to each client and the password e-mail"
     rules:
@@ -42,7 +42,7 @@ screens:
       Stores the e-policies received from the insurers on their accounts: one e-policy matched by the ARN, the policy
       number or the ARN in the file, or up to 50 at once with a match review. Each stored file opens an extraction review.
     entry:
-      - Issuance Workbench › Upload E-policies, or Upload E-policy on a row
+      - Issuance Workbench › Upload E-policies, or Upload E-policy in the row action menu
     shots:
       - {state: empty, user: proc, caption: "E-policy Upload: single and bulk"}
       - {state: bulk, user: proc, fill: epolicy_bulk, caption: "Bulk upload match review"}
@@ -118,13 +118,14 @@ screens:
       - "List | Policy No. | Column | Policy number or 'to follow' | - | Account | - | Read only | - | -"
       - "List | Generated | Column | Trigger and time | - | Insurance Advice | - | Read only | - | -"
       - "List | Status / Last Sent | Column | Generated or Sent; time and recipient of the last send | - | Insurance Advice, outbound messages | - | Read only | - | -"
+      - "List | Actions | Row action menu | Download PDF | - | - | - | - | - | -"
       - "Generate dialog | Accounts (ARN) | Text area | ARNs separated by commas or new lines | Y | Accounts | Blank | - | The account has a mortgagee and is placed or issued | Account <ARN> has no mortgagee bank: no Insurance Advice / Account <ARN> is <status>; it must be placed first"
       - "Send dialog | To | Text | The mortgagee bank unit; several addresses separated by commas | Y | - | Blank | - | At least one valid address | Enter at least one recipient"
       - "Send dialog | Cc, Password hint | Text | - | N | - | Blank | - | - | -"
     actions:
       - "Generate Insurance Advice | EPOLICY_MANAGE | Always | Opens the generate dialog; the outcome of each ARN is listed | Unchanged | -"
       - "Send Selected | EPOLICY_MANAGE, EPOLICY_SEND or ACCOUNT_MAINTAIN | At least one advice selected | Sends one e-mail per advice with the PDF encrypted; the password follows separately | Unchanged (advice Sent) | E-mail to the mortgagee bank and the password e-mail"
-      - "PDF | Every user of the screen | Always | Downloads the advice | - | -"
+      - "Download PDF | Every user of the screen | Always (row action menu) | Downloads the advice | - | -"
     rules:
       - "The advice is generated from the Insurance Advice template (FR-NB-103, FR-NB-104)."
       - "Documents that leave BIBS are password protected (FR-NB-013)."
@@ -145,12 +146,12 @@ screens:
       - {state: report, user: epol, tab: "Dispatch Report", caption: "Dispatch Report tab"}
     fields:
       - "Tabs | Ready to Dispatch / Dispatch Report | Tab | - | - | Fixed | Ready to Dispatch | - | - | -"
-      - "Ready to Dispatch | Name / Client Code, ARN, Policy No., E-policy | Column | - | - | Confirmed e-policies not yet sent | - | Read only | - | -"
+      - "Ready to Dispatch | Name / Client Code, ARN, Policy No., E-policy, Actions | Column | Send in the row action menu | - | Confirmed e-policies not yet sent | - | Read only | - | -"
       - "Send dialog | To, Cc, Subject, Message | Text | As on Send via Email | To, Subject and Message Y | The account contact e-mail and the EPOLICY_EMAIL template | Proposed by the system | Confirmed e-policy | A recipient is known or entered | Account <ARN> has no contact e-mail: enter the recipient"
       - "Send dialog | Password hint | Text | Up to 300 characters | N | Parameter EPOLICY_PASSWORD_HINT | The configured hint | Confirmed e-policy | - | -"
       - "Dispatch Report | Queued, Reference No., To, Subject, Outcome, Delivered | Column | Outcome Queued, Sent or Failed with the error | - | Outbound messages | - | Read only | - | -"
     actions:
-      - "Send (row) | EPOLICY_SEND | Ready to Dispatch | Opens the send dialog for the e-policy | Unchanged (e-policy Dispatched) | E-mail to the client and the password e-mail"
+      - "Send (row action menu) | EPOLICY_SEND | Ready to Dispatch | Opens the send dialog for the e-policy | Unchanged (e-policy Dispatched) | E-mail to the client and the password e-mail"
       - "Send Selected | EPOLICY_SEND | At least one e-policy selected | Asks for an optional hint and sends each e-policy; the outcome of each is listed | Unchanged | E-mail to each client and the password e-mail"
     rules:
       - "The e-policy is sent only after its policy data is confirmed (FR-NB-105)."

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import type { ReactNode } from 'react';
 import type { VersionView } from '@/api/renewal';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
@@ -17,6 +18,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
 import { RowActions } from '@/components/ui/RowActions';
 import { versionActions } from '../common/presentation';
+import { ruleValue } from './ruleFields';
 
 /** An editable column of a rule. */
 export interface RuleField<R> {
@@ -27,6 +29,8 @@ export interface RuleField<R> {
   /** Choices; an input when absent. */
   options?: { code: string; label: string }[];
   numeric?: boolean;
+  /** The value in words in the list of rules (a name for a code); the value itself when absent. */
+  display?: (code: string) => ReactNode;
 }
 
 interface Api<R> {
@@ -284,7 +288,7 @@ export function RuleVersionsTab<R>({
             columns={fields.map((f) => ({
               key: f.key,
               header: f.label,
-              render: (r: R) => f.options?.find((o) => o.code === f.get(r))?.label ?? f.get(r),
+              render: (r: R) => ruleValue(f, r),
             }))}
           />
         </Card>

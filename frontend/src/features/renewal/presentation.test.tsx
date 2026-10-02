@@ -380,3 +380,20 @@ describe('renewal list without amounts', () => {
     expect(screen.queryByText('Gross Premium / Outstanding')).toBeNull();
   });
 });
+
+describe('renewal decision matrix rules', () => {
+  it('shows Any for the criteria a rule leaves out, never undefined', async () => {
+    const { MATRIX_FIELDS, ruleValue } = await import('./setup/ruleFields');
+    const rule = {
+      priority: 20,
+      criteria: { claims: 'OPEN' },
+      outcome: 'FOR_QUOTATION',
+      automation: 'MANUAL',
+      letter: null,
+    } as unknown as Parameters<(typeof MATRIX_FIELDS)[number]['get']>[0];
+    const shown = MATRIX_FIELDS.map((f) => ruleValue(f, rule));
+    expect(shown).not.toContain('undefined');
+    expect(shown[1]).toBe('Any');
+    expect(shown).toContain('Open');
+  });
+});

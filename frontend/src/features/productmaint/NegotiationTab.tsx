@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FileDown, Pencil, Send } from 'lucide-react';
+import { FileDown } from 'lucide-react';
 import { useState } from 'react';
 import { productMaintApi } from '@/api/productmaint';
 import type { InsurerResponse, NegotiationRound, PackageRequest } from '@/api/productmaint';
@@ -7,7 +7,6 @@ import { useAuth } from '@/auth/authContext';
 import { useFileDownload } from '@/components/broking/useFileDownload';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -15,8 +14,9 @@ import { Field } from '@/components/ui/Field';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { InsurerChoices } from '@/features/proposals/ProposalFormParts';
-import { formatAmount, formatDate, formatDateTime, formatRate } from '@/utils/format';
+import { formatDate, formatDateTime } from '@/utils/format';
 import { ResponseDialog } from './ResponseDialog';
+import { responseColumns } from './responseColumns';
 import { displayNameOf } from '@/api/users';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
 
@@ -73,44 +73,6 @@ function SlipPreparation({ request, round, onChanged }: Readonly<RoundProps>) {
       </div>
     </div>
   );
-}
-
-function responseColumns(
-  canEdit: boolean,
-  onEdit: (r: InsurerResponse) => void,
-  onResend: (r: InsurerResponse) => void,
-): Column<InsurerResponse>[] {
-  return [
-    { key: 'insurer', header: 'Insurer', render: (r) => <strong>{r.insurerName}</strong> },
-    { key: 'outcome', header: 'Outcome', render: (r) => <StatusBadge status={r.outcome} /> },
-    { key: 'rate', header: 'Rate %', numeric: true, render: (r) => formatRate(r.rate, '—') },
-    {
-      key: 'min',
-      header: 'Minimum',
-      numeric: true,
-      render: (r) => (r.minimumPremium === undefined ? '—' : formatAmount(r.minimumPremium)),
-    },
-    { key: 'conditions', header: 'Conditions', render: (r) => r.conditions ?? '—' },
-    { key: 'valid', header: 'Valid Until', render: (r) => formatDate(r.validUntil) },
-    { key: 'rev', header: 'Rev.', numeric: true, render: (r) => r.revision },
-    {
-      key: 'actions',
-      header: 'Actions',
-      render: (r) =>
-        canEdit ? (
-          <span className="row">
-            <Button size="sm" variant="ghost" icon={<Pencil size={14} />} onClick={() => onEdit(r)}>
-              Key In
-            </Button>
-            <Button size="sm" variant="ghost" icon={<Send size={14} />} onClick={() => onResend(r)}>
-              Resend
-            </Button>
-          </span>
-        ) : (
-          '—'
-        ),
-    },
-  ];
 }
 
 function roundTitle(round: NegotiationRound): string {

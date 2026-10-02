@@ -322,7 +322,9 @@ async function json<T>(method: string, path: string, body?: unknown): Promise<T>
   if (response.status === 204) {
     return undefined as T;
   }
-  return (await response.json()) as T;
+  // An accepted request without a body (202, e.g. a password reset request) has nothing to read.
+  const text = await response.text();
+  return (text.trim() === '' ? undefined : JSON.parse(text)) as T;
 }
 
 export const api = {

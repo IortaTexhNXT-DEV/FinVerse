@@ -34,7 +34,9 @@ describe('Separation of Duties actions', () => {
       .spyOn(nbadminApi, 'authorizeSodRule')
       .mockResolvedValue({ ...PENDING, status: 'ACTIVE', pendingAction: 'NONE' });
     renderPage();
-    await userEvent.click(await screen.findByRole('button', { name: 'Authorise' }));
+    // The actions of a rule are in its row action menu.
+    await userEvent.click(await screen.findByRole('button', { name: 'Actions for Rule SOD-0004' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Authorise' }));
     expect(authorize).not.toHaveBeenCalled();
     expect(screen.getByText('Authorise Rule SOD-0004')).toBeInTheDocument();
     expect(screen.getByText('Cashier and Cash Approver')).toBeInTheDocument();
@@ -48,7 +50,8 @@ describe('Separation of Duties actions', () => {
       .spyOn(nbadminApi, 'rejectSodRule')
       .mockResolvedValue({ ...PENDING, status: 'INACTIVE' });
     renderPage();
-    await userEvent.click(await screen.findByRole('button', { name: 'Reject' }));
+    await userEvent.click(await screen.findByRole('button', { name: 'Actions for Rule SOD-0004' }));
+    await userEvent.click(screen.getByRole('menuitem', { name: 'Reject' }));
     const title = screen.getByText('Reject Rule SOD-0004');
     const dialog = title.closest<HTMLElement>('.modal')!;
     await userEvent.click(within(dialog).getByRole('button', { name: 'Reject' }));

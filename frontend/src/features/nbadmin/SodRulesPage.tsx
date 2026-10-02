@@ -6,7 +6,7 @@ import type { SodRule, SodRuleInput } from '@/api/nbadmin';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { RowActions } from '@/components/ui/RowActions';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
@@ -148,63 +148,58 @@ export default function SodRulesPage() {
   });
   const mine = (r: SodRule) =>
     user !== null && r.maker.toLowerCase() === user.username.toLowerCase();
+  // The actions of a rule in its row action menu (screen standard), each confirmed in a dialog.
   const actions = (r: SodRule) => {
     const pending = r.pendingAction !== 'NONE' && r.status !== 'INACTIVE';
     const pair = `${r.profileAName} and ${r.profileBName}`;
-    if (pending && authorise && !mine(r)) {
-      const change = pendingText(r) || 'The change';
-      return (
-        <div className="row">
-          <ConfirmButton
-            size="sm"
-            icon={<Check size={14} />}
-            confirm={{
+    const change = pendingText(r) || 'The change';
+    const decide = pending && authorise && !mine(r);
+    return (
+      <RowActions
+        record={`Rule ${r.ruleCode}`}
+        actions={[
+          {
+            label: 'Authorise',
+            icon: <Check size={14} />,
+            hidden: !decide,
+            confirm: {
               title: `Authorise Rule ${r.ruleCode}`,
               record: pair,
               effect: `${change} takes effect: requests and bulk lines are checked against the active rules.`,
-            }}
-            onConfirm={() => act.mutateAsync({ rule: r, action: 'authorize' })}
-          >
-            Authorise
-          </ConfirmButton>
-          <ConfirmButton
-            size="sm"
-            variant="secondary"
-            icon={<X size={14} />}
-            confirm={{
+            },
+            onSelect: () => act.mutateAsync({ rule: r, action: 'authorize' }),
+          },
+          {
+            label: 'Reject',
+            icon: <X size={14} />,
+            hidden: !decide,
+            danger: true,
+            confirm: {
               title: `Reject Rule ${r.ruleCode}`,
               record: pair,
               effect: 'The pending change is rejected and the rule stays as it was.',
               reason: 'required',
               destructive: true,
-            }}
-            onConfirm={(reason) => act.mutateAsync({ rule: r, action: 'reject', reason })}
-          >
-            Reject
-          </ConfirmButton>
-        </div>
-      );
-    }
-    if (!pending && r.status === 'ACTIVE' && maintain) {
-      return (
-        <ConfirmButton
-          size="sm"
-          variant="secondary"
-          icon={<Ban size={14} />}
-          confirm={{
-            title: `Deactivate Rule ${r.ruleCode}`,
-            record: pair,
-            effect:
-              'The deactivation is sent to Information Security; the rule stays active until it is authorised.',
-            destructive: true,
-          }}
-          onConfirm={() => act.mutateAsync({ rule: r, action: 'deactivate' })}
-        >
-          Deactivate
-        </ConfirmButton>
-      );
-    }
-    return null;
+            },
+            onSelect: (reason) => act.mutateAsync({ rule: r, action: 'reject', reason }),
+          },
+          {
+            label: 'Deactivate',
+            icon: <Ban size={14} />,
+            hidden: pending || r.status !== 'ACTIVE' || !maintain,
+            danger: true,
+            confirm: {
+              title: `Deactivate Rule ${r.ruleCode}`,
+              record: pair,
+              effect:
+                'The deactivation is sent to Information Security; the rule stays active until it is authorised.',
+              destructive: true,
+            },
+            onSelect: () => act.mutateAsync({ rule: r, action: 'deactivate' }),
+          },
+        ]}
+      />
+    );
   };
   return (
     <div className="stack">
@@ -256,7 +251,7 @@ export default function SodRulesPage() {
                   ''
                 ),
             },
-            { key: 'x', header: 'Actions', render: actions },
+            { key: 'x', header: '', kind: 'actions', render: actions },
           ]}
         />
       </Card>

@@ -12,6 +12,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tag } from '@/components/ui/Tag';
 import { useToast } from '@/components/ui/toastContext';
@@ -137,7 +138,7 @@ export function LegacyBatchDetail({
   );
 }
 
-function BatchLines({
+export function BatchLines({
   screen,
   lines,
   loading,
@@ -192,21 +193,25 @@ function BatchLines({
             render: (l) => <StatusBadge status={l.status} />,
           },
           {
+            // Remove is in the row action menu of the line (screen standard), never a button in the row.
             key: 'remove',
             header: '',
-            render: (l) =>
-              onRemove ? (
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  icon={<Trash2 size={14} />}
-                  aria-label={`Remove line ${String(l.lineNo)}`}
-                  busy={removing}
-                  onClick={() => onRemove(l.id)}
-                >
-                  Remove
-                </Button>
-              ) : null,
+            kind: 'actions',
+            render: (l) => (
+              <RowActions
+                record={`line ${String(l.lineNo)}`}
+                actions={[
+                  {
+                    label: 'Remove',
+                    icon: <Trash2 size={14} />,
+                    danger: true,
+                    hidden: onRemove === undefined,
+                    disabledReason: removing ? 'A line is being removed' : undefined,
+                    onSelect: () => onRemove?.(l.id),
+                  },
+                ]}
+              />
+            ),
           },
         ]}
       />

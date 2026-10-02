@@ -203,7 +203,11 @@ const custom = {
     await page.goto(`${ctx.BASE}/admin/users`);
     await ctx.settle(page);
     const row = page.locator('table tbody tr').filter({ hasText: 'requestor' }).first();
-    await row.getByRole('button', { name: /^sessions$/i }).click();
+    // Sessions is in the row action menu of the user.
+    const menu = row.getByRole('button', { name: /^Actions for/ });
+    await menu.evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' }));
+    await menu.click();
+    await page.getByRole('menuitem', { name: /^sessions$/i }).click();
     await ctx.settle(page, 800);
     return page;
   },

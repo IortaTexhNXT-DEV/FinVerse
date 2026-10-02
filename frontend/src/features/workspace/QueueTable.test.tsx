@@ -79,6 +79,19 @@ describe('QueueTable', () => {
     expect(screen.queryByText('T-CBG1')).toBeNull();
   });
 
+  it('names the product line a package request comes from', async () => {
+    vi.spyOn(lovApi, 'options').mockResolvedValue([]);
+    vi.spyOn(catalogApi, 'salesOrganisation').mockResolvedValue({
+      units: [],
+    } as unknown as Awaited<ReturnType<typeof catalogApi.salesOrganisation>>);
+    vi.spyOn(catalogApi, 'lines').mockResolvedValue([
+      { code: 'PROPERTY', name: 'Property' },
+    ] as unknown as Awaited<ReturnType<typeof catalogApi.lines>>);
+    show([item({ id: 1, workflowCode: 'PM_PACKAGE_REQUEST', originatingUnit: 'PROPERTY' })]);
+    expect(await screen.findByText('Property')).toBeTruthy();
+    expect(screen.queryByText('PROPERTY')).toBeNull();
+  });
+
   it('names employee benefits teams, and shows an unknown unit code muted', async () => {
     vi.spyOn(lovApi, 'options').mockImplementation((type: string) =>
       Promise.resolve(

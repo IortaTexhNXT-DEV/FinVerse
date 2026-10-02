@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
+import { DateInput } from '@/components/ui/DateInput';
 import { useState } from 'react';
 import { legacyInquiryApi } from '@/api/legacyInquiry';
 import type { AccessLogEntry, AccessLogFilter } from '@/api/legacyInquiry';
@@ -105,10 +106,8 @@ export default function AccessLogPage() {
           </Field>
           <Field label="From">
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={filter.from ?? ''}
                 onChange={(e) => set('from', e.target.value)}
               />
@@ -116,10 +115,8 @@ export default function AccessLogPage() {
           </Field>
           <Field label="To">
             {(id) => (
-              <input
+              <DateInput
                 id={id}
-                type="date"
-                className="input"
                 value={filter.to ?? ''}
                 onChange={(e) => set('to', e.target.value)}
               />

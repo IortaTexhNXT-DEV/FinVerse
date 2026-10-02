@@ -16,9 +16,18 @@ import { RecordActions } from './RecordActions';
 import { RuleEditorModal } from './RuleEditorModal';
 import type { RuleKind } from './RuleEditorModal';
 import { LovLabel } from '@/components/broking/LovLabel';
+import { useLineName, useProductName } from '@/components/broking/useLabels';
+import { scopeText } from './ruleScope';
 
 const scope = (r: { scope: string; scopeCode: string }) =>
-  r.scope === 'ALL' ? 'All products' : `${humanize(r.scope)} ${r.scopeCode}`;
+  scopeText(r.scope, r.scopeCode, humanize);
+
+/** The scope of a rule with the line or product by its name ("Line Property"). */
+function ScopeName({ r }: Readonly<{ r: { scope: string; scopeCode: string } }>) {
+  const line = useLineName();
+  const product = useProductName();
+  return <>{scopeText(r.scope, r.scopeCode, r.scope === 'PRODUCT' ? product : line)}</>;
+}
 
 /** What the confirmation names: the rule's scope, or the TSU rule's code and description. */
 const ruleLabel = (r: FieldRule | DocumentRule | TsuRule) =>
@@ -56,7 +65,7 @@ function FieldRules() {
         rows={rules.data ?? []}
         rowKey={(r) => r.id}
         columns={[
-          { key: 's', header: 'Applies to', render: scope },
+          { key: 's', header: 'Applies to', render: (r) => <ScopeName r={r} /> },
           {
             key: 't',
             header: 'Level',
@@ -85,7 +94,7 @@ function DocumentRules() {
         rows={rules.data ?? []}
         rowKey={(r) => r.id}
         columns={[
-          { key: 's', header: 'Applies to', render: scope },
+          { key: 's', header: 'Applies to', render: (r) => <ScopeName r={r} /> },
           {
             key: 'd',
             header: 'Document',

@@ -148,7 +148,11 @@ export function stepDone(status: string, step: string): boolean {
  * @returns text
  */
 export function percent(value: number | undefined): string {
-  return value === undefined ? '' : `${String(value)}%`;
+  if (value === undefined) {
+    return '';
+  }
+  // Two decimals at most, without trailing zeros: 33.3333 reads 33.33%, 0 reads 0%.
+  return `${String(Math.round(value * 100) / 100)}%`;
 }
 
 /**

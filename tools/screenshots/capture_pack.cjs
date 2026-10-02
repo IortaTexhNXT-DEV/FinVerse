@@ -190,9 +190,26 @@ function rx(text) {
 
 async function clickButton(page, name) {
   const button = page.getByRole('button', { name: rx(name) }).first();
-  await button.waitFor({ state: 'visible', timeout: 15000 });
-  await button.click();
-  await settle(page);
+  const shown = await button.waitFor({ state: 'visible', timeout: 5000 }).then(() => true).catch(() => false);
+  if (shown) {
+    await button.click();
+    await settle(page);
+    return;
+  }
+  // An action of a row is in the row action menu: the first row whose menu offers it.
+  const menus = page.locator('main table tbody tr').getByRole('button', { name: /^Actions for/ });
+  for (let i = 0; i < Math.min(await menus.count(), 20); i += 1) {
+    await menus.nth(i).evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await menus.nth(i).click();
+    const item = page.getByRole('menuitem', { name: rx(name) }).first();
+    if (await item.waitFor({ state: 'visible', timeout: 1500 }).then(() => true).catch(() => false)) {
+      await item.click();
+      await settle(page);
+      return;
+    }
+    await page.keyboard.press('Escape');
+  }
+  throw new Error('no button or row action ' + name);
 }
 
 /** Opens a tab (or a tab-like filter button) whose name starts with `name` (a regular expression text). */
@@ -709,11 +726,13 @@ async function cropOf(page, shot, recipe) {
           await page.setViewportSize({ width, height: HEIGHT });
           await page.waitForTimeout(500);
         }
-        // A list that still scrolls sideways inside its card is taken in a window wide enough for all its columns.
-        const over = await page.evaluate(() => Math.max(0, ...[...document.querySelectorAll('main .table-wrap')]
+        // A list that still scrolls sideways inside its card is taken in a window wide enough for all its columns
+        // (lists only: a report grid keeps its own sideways scroll).
+        const over = await page.evaluate(() => Math.max(0, ...[...document.querySelectorAll('main .table-wrap[data-fit]')]
           .filter((w) => w.getBoundingClientRect().width > 0)
           .map((w) => w.scrollWidth - w.clientWidth)));
-        const wide = over > 1 ? Math.min(MAX_WIDTH, width + over + 24) : width;
+        // A matrix far wider than any window (the role matrix) keeps the standard window and its own scroll.
+        const wide = over > 1 && width + over + 24 <= MAX_WIDTH ? width + over + 24 : width;
         if (wide !== width) {
           await page.setViewportSize({ width: wide, height: HEIGHT });
           await page.waitForTimeout(500);

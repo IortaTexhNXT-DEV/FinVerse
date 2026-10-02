@@ -13,7 +13,7 @@ import { RowActions } from '@/components/ui/RowActions';
 import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
+import { countOf, formatDate } from '@/utils/format';
 import { TextDialog } from '../common/ActionDialogs';
 import { decisionActions } from '../common/presentation';
 import { UploadPanel } from '../common/UploadPanel';
@@ -27,7 +27,7 @@ function TakeOver() {
   const run = useMutation({
     mutationFn: () => renewalApi.goLive(companyId, date),
     onSuccess: async (r) => {
-      toast.success(`${String(r.counts.created)} renewal(s) taken over`);
+      toast.success(`${countOf(r.counts.created, 'renewal')} taken over`);
       await queryClient.invalidateQueries({ queryKey: ['renewal'] });
     },
   });

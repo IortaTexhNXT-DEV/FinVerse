@@ -5,6 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.iortatechnxt.brokerverse.brokerclaims.service.ClaimExperienceQueryService;
+import com.iortatechnxt.brokerverse.brokerclaims.service.ClaimExperienceQueryService.ClaimExperience;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.domain.ClientRepository;
 import com.iortatechnxt.brokerverse.crm.service.KycReviewPolicy;
@@ -20,6 +22,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.ObjectProvider;
 
 /** The messages of the renewal checks as the Checks tab shows them: dates and amounts formatted. */
 class CheckMessageWordsTest {
@@ -83,5 +86,30 @@ class CheckMessageWordsTest {
     RenewalCheck.Verdict verdict = new KycDueCheck(clients, kyc, parameters).evaluate(context);
 
     assertThat(verdict.message()).isEqualTo("KYC review due on 28-Jun-2029");
+  }
+
+  @Test
+  @SuppressWarnings("unchecked")
+  void theOpenClaimsReadInWords() {
+    RenewalCandidate c =
+        new RenewalCandidate(
+            1L,
+            "RNW-2027-000002",
+            new RenewalCandidate.Origin(
+                CandidateSource.BIBS_INVOICE, "BI-2", null, "ARN-2027-000001", 2026),
+            candidate().getSnapshot(),
+            null);
+    ClaimExperience experience = mock(ClaimExperience.class);
+    when(experience.openCount()).thenReturn(1);
+    when(experience.claimCount()).thenReturn(1);
+    ClaimExperienceQueryService service = mock(ClaimExperienceQueryService.class);
+    when(service.summary(any(), any())).thenReturn(experience);
+    ObjectProvider<ClaimExperienceQueryService> provider = mock(ObjectProvider.class);
+    when(provider.getIfAvailable()).thenReturn(service);
+    CheckContext context = mock(CheckContext.class);
+    when(context.candidate()).thenReturn(c);
+
+    assertThat(new ClaimsCheck(provider).evaluate(context).message())
+        .isEqualTo("1 open claim on the expiring term");
   }
 }

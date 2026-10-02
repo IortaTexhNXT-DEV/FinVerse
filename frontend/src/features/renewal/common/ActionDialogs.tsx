@@ -8,6 +8,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useCompanyId } from '@/context/workspaceContext';
+import { countOf } from '@/utils/format';
 import { RNW_LOV } from './renewalCodes';
 
 interface BaseProps {
@@ -105,7 +106,7 @@ export function AssignDialog({
   return (
     <Modal
       open
-      title={`Assign ${String(count)} renewal(s)`}
+      title={`Assign ${countOf(count, 'renewal')}`}
       onClose={onClose}
       footer={
         <Footer

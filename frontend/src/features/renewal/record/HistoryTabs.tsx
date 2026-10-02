@@ -1,3 +1,4 @@
+import { claimsText } from '../common/candidateColumns';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { History } from 'lucide-react';
 import { renewalApi } from '@/api/renewal';
@@ -123,7 +124,7 @@ export function AccountHistoryTab({ detail }: Props) {
       <Card title="Claims">
         <p>
           {h.claims.connected
-            ? `${String(h.claims.count)} claim(s), ${String(h.claims.open)} open`
+            ? `${claimsText(h.claims.count)}, ${String(h.claims.open)} open`
             : 'The claims of the expiring term are those read when the renewal was extracted: see the Claims flag and the claims check on the Checks tab.'}
         </p>
       </Card>

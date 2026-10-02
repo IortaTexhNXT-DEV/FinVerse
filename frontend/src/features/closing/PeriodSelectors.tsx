@@ -1,5 +1,6 @@
 import { Field } from '@/components/ui/Field';
 import type { usePeriodPicker } from './usePeriodPicker';
+import { periodOption, yearOption } from './closeTexts';
 
 type Picker = ReturnType<typeof usePeriodPicker>;
 
@@ -20,7 +21,7 @@ export function PeriodSelectors({
           >
             {picker.years.map((y) => (
               <option key={y.id} value={y.id}>
-                FY {y.yearCode} ({y.status})
+                {yearOption(y.yearCode, y.status)}
               </option>
             ))}
           </select>
@@ -37,7 +38,7 @@ export function PeriodSelectors({
             >
               {picker.periods.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.name} ({p.status})
+                  {periodOption(p.name, p.status)}
                 </option>
               ))}
             </select>

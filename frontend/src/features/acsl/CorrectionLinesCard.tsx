@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { useToast } from '@/components/ui/toastContext';
-import { emptyLine, lineErrors, toDraft, toLine, totals } from './acsl';
+import { emptyLine, lineErrors, lineOriginLabel, toDraft, toLine, totals } from './acsl';
 import type { LineDraft } from './acsl';
 import { acslApi } from './api';
 import type { Correction, Side } from './api';
@@ -45,7 +45,7 @@ function LineRow({
     <tr>
       <td>
         {n}
-        {line.origin && <span className="cell-sub">{line.origin.toLowerCase()}</span>}
+        {line.origin && <span className="cell-sub">{lineOriginLabel(line.origin)}</span>}
       </td>
       <td>
         <select

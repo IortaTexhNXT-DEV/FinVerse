@@ -4,6 +4,7 @@ import {
   assigneeField,
   caseRequestFacts,
   correctionKind,
+  lineOriginLabel,
   originalLineActions,
   soaUploadProblems,
   correctionActions,
@@ -129,5 +130,12 @@ describe('case request facts', () => {
     } as unknown as AcslCase;
     const facts = caseRequestFacts(c, (code) => (code === 'INS-MGIC' ? 'MAPFRE Insular' : code));
     expect(facts.find(([label]) => label === 'Insurer')?.[1]).toBe('MAPFRE Insular');
+  });
+});
+
+describe('correction line origin', () => {
+  it('names where a correction line comes from in words', () => {
+    expect(lineOriginLabel('REVERSAL')).toBe('Reversal');
+    expect(lineOriginLabel('REPOST')).toBe('Re-post');
   });
 });

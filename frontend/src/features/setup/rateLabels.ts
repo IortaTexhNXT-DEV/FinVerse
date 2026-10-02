@@ -21,3 +21,12 @@ export function rateTypeLabel(type: RateType): string {
 export function revaluationRateActions(maintainer: boolean, copy: () => unknown): RowAction[] {
   return maintainer ? [{ label: 'Copy to Book Rates', onSelect: () => copy() }] : [];
 }
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** A month of the form value (2026-09) as the screens show it (Sep-2026). */
+export function monthText(month: string): string {
+  const [year, no] = month.split('-');
+  const name = MONTHS[Number(no) - 1];
+  return name === undefined || year === undefined ? month : `${name}-${year}`;
+}

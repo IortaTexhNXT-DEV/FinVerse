@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { rateTypeLabel, revaluationRateActions } from './rateLabels';
+import { monthText, rateTypeLabel, revaluationRateActions } from './rateLabels';
 
 describe('exchange rate texts', () => {
   it('names the rate types in words', () => {
@@ -14,5 +14,11 @@ describe('exchange rate texts', () => {
     actions[0]?.onSelect('');
     expect(copy).toHaveBeenCalled();
     expect(revaluationRateActions(false, copy)).toEqual([]);
+  });
+});
+
+describe('month of a revaluation rate', () => {
+  it('reads as MMM-yyyy', () => {
+    expect(monthText('2026-09')).toBe('Sep-2026');
   });
 });

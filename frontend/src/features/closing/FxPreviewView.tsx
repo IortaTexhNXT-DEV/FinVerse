@@ -8,6 +8,7 @@ import { useWorkspace } from '@/context/workspaceContext';
 import { formatAmount, formatDate } from '@/utils/format';
 import { UserName } from '@/components/ui/UserName';
 import { Notice } from '@/components/ui/Notice';
+import { missingRateNotice, openItemDocument } from './closeTexts';
 
 function reversalText(r: FxRun): string {
   if (r.reversalBatchNo) {
@@ -26,9 +27,7 @@ export function FxPreviewView({
   const missing = preview?.missingRates ?? [];
   return (
     <>
-      {missing.length > 0 && (
-        <Notice tone="error">No CLOSING rate for {missing.join(', ')}: posting is blocked.</Notice>
-      )}
+      {missing.length > 0 && <Notice tone="error">{missingRateNotice(missing)}</Notice>}
       {preview && (
         <div className="grid-4">
           <Kpi label="Revaluation date" value={formatDate(preview.revaluationDate)} />
@@ -95,7 +94,11 @@ export function FxPreviewView({
           emptyMessage="No outstanding foreign currency open items."
           columns={[
             { key: 'p', header: 'Party', render: (o) => o.partyCode },
-            { key: 'd', header: 'Document', render: (o) => `${o.documentNo} (${o.direction})` },
+            {
+              key: 'd',
+              header: 'Document',
+              render: (o) => openItemDocument(o.documentNo, o.direction),
+            },
             { key: 'c', header: 'Ccy', render: (o) => o.currency },
             {
               key: 'o',

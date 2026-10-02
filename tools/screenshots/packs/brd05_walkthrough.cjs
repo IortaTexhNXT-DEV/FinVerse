@@ -17,8 +17,8 @@ const ACCRUED = '2502';
 const REFUND_AR = 'AR-HO-000002';
 const REFUND_CLIENT = 'CL-2026-000001';
 const REFUND_REF = '2026_118 Refund';
-const SOA_FILE = path.join(os.tmpdir(), 'bibs-brd05-soa', 'MAPFRE_Insular_SOA_September_2026.csv');
-const CASE_SUBJECT = 'Premium per the MAPFRE Insular statement differs from the books';
+const SOA_FILE = path.join(os.tmpdir(), 'bibs-brd05-soa', 'Mabuhay_General_SOA_September_2026.csv');
+const CASE_SUBJECT = 'Premium per the Mabuhay General statement differs from the books';
 const NO_PAYEE = 'S-0417';
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -55,11 +55,11 @@ const refundId = (ctx) => ctx.one(`select id from prq_request where reference_te
 const refundNo = (ctx) => ctx.one(`select request_no from prq_request where reference_text = '${REFUND_REF}' order by id limit 1`);
 const refundStage = (ctx) => ctx.one(`select stage from prq_request where reference_text = '${REFUND_REF}' order by id limit 1`);
 const voucherOfRefund = (ctx) => ctx.sql(`select v.id, v.stage from dsb_voucher v join dsb_request r on r.id = v.request_id where r.source_ref = '${refundNo(ctx)}' order by v.id desc limit 1`)[0];
-const soaUpload = (ctx) => ctx.one("select id from acsl_soa_upload where file_name like 'MAPFRE_Insular_SOA_%' order by id limit 1");
+const soaUpload = (ctx) => ctx.one("select id from acsl_soa_upload where file_name like 'Mabuhay_General_SOA_%' order by id limit 1");
 const caseId = (ctx) => ctx.one(`select id from acsl_case where subject = '${q(CASE_SUBJECT)}' order by id desc limit 1`);
 const correctionOfCase = (ctx) => ctx.one(`select id from acsl_correction where case_id = ${caseId(ctx)} order by id desc limit 1`);
 
-/** The open invoices of MAPFRE Insular as the insurer states them on its statement of account. */
+/** The open invoices of Mabuhay General as the insurer states them on its statement of account. */
 function writeSoaFile(ctx) {
   if (fs.existsSync(SOA_FILE)) {
     return SOA_FILE;
@@ -208,7 +208,7 @@ async function refundForm(page, reference) {
   await page.getByLabel('Branch / Unit 1').fill('Head Office');
   await settle(page, 600);
   await fill(page, 'Mode of Payment', /credit to CA/i);
-  const account = page.getByLabel(/^(CA \/ SA )?Account No\./).first();
+  const account = page.locator('main input[inputmode=numeric][maxlength="16"]').first();
   if ((await account.inputValue()) === '') {
     await account.fill('001122334455');
   }
@@ -317,39 +317,15 @@ const steps = {
     }
     return page;
   },
-  // 5. The refund request on the Disbursement Workbench.
+  // 5. The voucher of the refund on the Disbursement Workbench, created from the request and routed to the approver.
   'wt-b-05': async (ctx) => {
     const page = await go(ctx, 'disb', '/disbursement');
-    const no = refundNo(ctx);
-    await page.getByPlaceholder(/search/i).first().fill(no);
-    await button(page, /^search$/i).click();
-    await settle(page, 900);
-    const row = page.locator('main table tbody tr').filter({ hasText: /refund/i }).first();
-    await row.click();
-    await dialogOf(page).waitFor({ timeout: 10000 }).catch(() => {});
-    await settle(page, 600);
+    const stage = (voucherOfRefund(ctx) || [])[1];
+    await tab(page, stage === 'APPROVED' ? 'Approved' : 'For Approval');
     return page;
   },
-  // 6. The voucher created and routed to the approver.
-  'wt-b-06': async (ctx) => {
-    let voucher = voucherOfRefund(ctx);
-    let page = await ctx.pageOf('disb');
-    if (!voucher) {
-      if (!(await dialogOf(page).isVisible().catch(() => false))) {
-        page = await steps['wt-b-05'](ctx);
-      }
-      await dialogOf(page).getByRole('button', { name: /^create voucher$/i }).click();
-      await page.waitForURL(/\/disbursement\/vouchers\/\d+/, { timeout: 30000 }).catch(() => {});
-      await settle(page, 1500);
-      voucher = voucherOfRefund(ctx);
-    }
-    page = await go(ctx, 'disb', `/disbursement/vouchers/${voucher[0]}`);
-    if (voucher[1] === 'IN_PROCESS') {
-      await act(page, /^route to approver$/i, { reason: false, confirm: /^route to approver$/i });
-      await settle(page, 1500);
-    }
-    return page;
-  },
+  // 6. The voucher with its payee, mode, paying account and entry.
+  'wt-b-06': async (ctx) => go(ctx, 'disb', `/disbursement/vouchers/${voucherOfRefund(ctx)[0]}`),
   // 7. Approved and posted by the Disbursement Approver.
   'wt-b-07': async (ctx) => {
     const [id, stage] = voucherOfRefund(ctx);
@@ -372,10 +348,10 @@ const steps = {
   // 1. The statement of account uploaded and reconciled.
   'wt-c-01': async (ctx) => {
     const page = await go(ctx, 'acsl', '/acsl/soa');
-    if (!has(ctx, "select 1 from acsl_soa_upload where file_name like 'MAPFRE_Insular_SOA_%'")) {
+    if (!has(ctx, "select 1 from acsl_soa_upload where file_name like 'Mabuhay_General_SOA_%'")) {
       const month = previousMonth();
       const d = await openDialog(page, /^upload soa$/i);
-      await choose(d.getByLabel(/^Insurer/), /MAPFRE/i);
+      await choose(d.getByLabel(/^Insurer/), /Mabuhay General/i);
       await fill(page, 'Period From', month.from, d);
       await fill(page, 'Period To', month.to, d);
       await d.locator('input[type=file]').setInputFiles(writeSoaFile(ctx));
@@ -413,10 +389,14 @@ const steps = {
   'wt-c-05': async (ctx) => {
     let page = await go(ctx, 'acsl', `/acsl/cases/${caseId(ctx)}`);
     if (!has(ctx, `select 1 from acsl_correction where case_id = ${caseId(ctx)}`)) {
+      if (ctx.one(`select stage from acsl_case where id = ${caseId(ctx)}`) === 'ASSIGNED') {
+        await act(page, /^start investigation$/i, { reason: false, confirm: /^start investigation$/i });
+        await settle(page, 1200);
+      }
       if (!has(ctx, `select 1 from acsl_case where id = ${caseId(ctx)} and findings is not null`)) {
         const d = await openDialog(page, /^record findings$/i);
-        await d.getByLabel(/^Findings/).fill('The insurer states the premium of the policy schedule; the booking used the premium of the quotation and the insurer corrects it on its next statement. The review also found the commission of the invoice posted to Commission Income - Brokerage instead of Commission Income.');
-        await confirmDialog(page, /^record findings$/i);
+        await d.getByLabel(/^Findings/).fill('The insurer states the premium of the policy schedule; the booking used the premium of the quotation and the insurer corrects it on its next statement. The review also found the commission of the invoice still in Unrealized Commission although the premium is fully paid, so the commission is earned.');
+        await confirmDialog(page, /^save findings$/i);
       }
       const d = await openDialog(page, /^raise correction$/i);
       await choose(d.getByLabel(/^Correction Kind/), /wrong GL account/i);
@@ -445,8 +425,8 @@ const steps = {
       if (!has(ctx, `select 1 from acsl_correction_line where correction_id = ${id}`)) {
         const card = page.locator('.card').filter({ hasText: 'Posted Lines of the Invoice Family' }).first();
         const rows = card.locator('table tbody tr');
-        const brokerage = rows.filter({ hasText: '4101' });
-        await rowAction((await brokerage.count()) > 0 ? brokerage.first() : rows.first(), /^correct$/i);
+        const unrealized = rows.filter({ hasText: 'Unrealized Commission' });
+        await rowAction((await unrealized.count()) > 0 ? unrealized.first() : rows.last(), /^correct$/i);
         await dialogOf(page).getByLabel(/^Right GL Account/).fill('4400');
         await confirmDialog(page, /^add correction lines$/i);
       }
@@ -481,7 +461,7 @@ const steps = {
   'wt-d-01': async (ctx) => {
     const page = await go(ctx, 'glhead', '/setup/currencies');
     const month = previousMonth();
-    if (!has(ctx, `select 1 from cur_exchange_rate where rate_type = 'CLOSING' and currency_code = 'USD' and to_char(effective_date, 'YYYY-MM') = '${month.iso}' and created_by = 'glhead'`)) {
+    if (!has(ctx, `select 1 from cur_exchange_rate where rate_type = 'CLOSING' and currency_code = 'USD' and to_char(effective_date, 'YYYY-MM') = '${month.iso}' and rate = 58.105`)) {
       await fill(page, 'Month', month.month);
       await fill(page, 'Currency', /^USD/);
       await fill(page, 'Month-end rate', '58.105000');
@@ -494,7 +474,7 @@ const steps = {
   'wt-d-02': async (ctx) => {
     const page = await go(ctx, 'gltl', '/planning/fx-revaluation');
     const month = previousMonth();
-    await fill(page, 'Period', new RegExp(month.month.replace('-', '.*'), 'i')).catch(() => {});
+    await fill(page, 'Period', new RegExp(`^${month.iso}`));
     await settle(page, 1500);
     if (!has(ctx, `select 1 from fx_revaluation_run r join per_period p on p.id = r.period_id where to_char(p.start_date, 'YYYY-MM') = '${month.iso}' and r.status <> 'REVERSED'`)) {
       await act(page, /^post revaluation$/i, { reason: false, confirm: /post/i });
@@ -506,8 +486,10 @@ const steps = {
   'wt-d-03': async (ctx) => {
     const page = await go(ctx, 'gltl', '/planning/gl-close');
     if (!has(ctx, "select 1 from acc_period_close_schedule where status = 'SCHEDULED'")) {
-      await openDialog(page, /^schedule close$/i);
-      await confirmDialog(page, /^schedule/i);
+      const d = await openDialog(page, /^schedule close$/i);
+      await fill(page, 'Period', new RegExp(`^${previousMonth().iso}`), d);
+      await settle(page, 600);
+      await confirmDialog(page, /^schedule close$/i);
     }
     return page;
   },
@@ -550,7 +532,7 @@ const steps = {
     const page = await go(ctx, 'acsl', '/acsl/soa');
     const month = previousMonth();
     const d = await openDialog(page, /^upload soa$/i);
-    await choose(d.getByLabel(/^Insurer/), /MAPFRE/i);
+    await choose(d.getByLabel(/^Insurer/), /Mabuhay General/i);
     await fill(page, 'Period From', month.from, d);
     await fill(page, 'Period To', month.to, d);
     await d.locator('input[type=file]').setInputFiles(writeSoaFile(ctx));
@@ -566,7 +548,6 @@ const steps = {
       await fill(page, 'Disbursement Type', /supplier/i);
       await fill(page, 'Payee Code', NO_PAYEE);
       await fill(page, 'Payee Name', 'Northpoint Courier Services, Inc.');
-      await fill(page, 'Currency', /PHP/).catch(async () => fill(page, 'Currency', 'PHP'));
       await fill(page, 'Amount', '18450.00');
       await fill(page, 'RFP No.', 'RFP-2026-0417');
       await fill(page, 'Purpose', 'Courier services for the September policy deliveries');

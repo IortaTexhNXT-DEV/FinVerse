@@ -24,8 +24,8 @@ walkthroughs:
     summary: >-
       A client overpaid an account. The Marketing Processor raises the Refund Request Form with the AR of the payment,
       to be credited to the client's account; the Marketing Reviewer endorses it and the Marketing Approver approves
-      it, which sends it to Disbursement. The Disbursement Processor creates the voucher, which is routed straight to
-      the approver as a refund; the approver approves it, the entry posts and the credit to the account is issued.
+      it, which sends it to Disbursement. BIBS creates the voucher of the refund at once and routes it straight to the
+      Disbursement Approver; the approver approves it, the entry posts and the credit to the account is issued.
       Marketing follows the payment on the request.
     data: "Seed data: client CL-2026-000001 maintained as a payee of Disbursement with a credit-to-account account; an AR of the cashiering seed"
     steps:
@@ -33,8 +33,8 @@ walkthroughs:
       - [PRQ_PROCESSOR, SCR-AC-43, "Clicks Submit for Review and confirms", "The request For Review in the workflow header", For review, wt-b-02]
       - [PRQ_REVIEWER, SCR-AC-43, "Opens the request and clicks Endorse for Approval", "The request For Approval with the step in its history", For approval, wt-b-03]
       - [PRQ_APPROVER, SCR-AC-43, "Clicks Approve and Send", "The request With Disbursement", Sent to Disbursement, wt-b-04]
-      - [DISBURSEMENT, SCR-AC-25, "Opens the refund request on System Requests", "Payment Request: source Payment Requests, the client as payee, Refund, the amount and purpose, with Create Voucher", Received, wt-b-05]
-      - [DISBURSEMENT, SCR-AC-27, "Clicks Create Voucher, then Route to Approver", "The voucher For Approval with its credit to account, paying account and entry from the rule", For approval, wt-b-06]
+      - [DISBURSEMENT, SCR-AC-25, "Opens For Approval on the Disbursement Workbench", "The voucher of the refund, created automatically from the request with the client as payee and routed straight to the approver", Voucher created, wt-b-05]
+      - [DISBURSEMENT, SCR-AC-27, "Opens the voucher", "The voucher For Approval: the client as payee, credit to account, the paying account, the net amount and the history that shows the automatic routing", For approval, wt-b-06]
       - [DISB_APPROVER, SCR-AC-27, "Clicks Approve and Post and confirms", "The voucher Approved; the journal posted and the credit to account issued", Approved, wt-b-07]
       - [PRQ_PROCESSOR, SCR-AC-43, "Opens the Disbursement tab of the request", "The voucher number and its status in Disbursement", Followed, wt-b-08]
     downstream:
@@ -54,7 +54,7 @@ walkthroughs:
       - [ACSL_PROCESSOR, SCR-AC-50, "Opens the upload", "The counts per result and the lines with their premium and balance variances", Variances known, wt-c-02]
       - [ACSL_TL, SCR-AC-45, "Clicks Open a Case: investigation of the invoice with a variance", "Message: <case> opened; the case is Received", Case opened, wt-c-03]
       - [ACSL_TL, SCR-AC-46, "Opens the case and assigns it to the ACSL Processor", "The case Assigned with the step in its history", Assigned, wt-c-04]
-      - [ACSL_PROCESSOR, SCR-AC-46, "Records the findings and clicks Raise Correction (posting to a wrong GL account)", "The correction entry opens, raised from the case", Correction raised, wt-c-05]
+      - [ACSL_PROCESSOR, SCR-AC-46, "Clicks Start Investigation, records the findings and clicks Raise Correction (posting to a wrong GL account)", "The correction entry opens, raised from the case", Correction raised, wt-c-05]
       - [ACSL_TL, SCR-AC-48, "Assigns the correction to the ACSL Processor as its preparer", "The correction in Draft", Draft, wt-c-06]
       - [ACSL_PROCESSOR, SCR-AC-48, "Picks the wrong line among the posted lines of the invoice family, clicks Correct with the right account, saves the lines and clicks Submit for Review", "The correction For Review with its reversal and re-post lines", For review, wt-c-07]
       - [ACSL_TL, SCR-AC-48, "Clicks Endorse for Approval", "The correction For Approval", For approval, wt-c-08]

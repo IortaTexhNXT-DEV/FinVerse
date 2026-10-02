@@ -13,7 +13,7 @@ import { RowActions } from '@/components/ui/RowActions';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate, today } from '@/utils/format';
 import { frbsSetupApi } from './frbsSetupApi';
-import { revaluationRateActions } from './rateLabels';
+import { monthText, revaluationRateActions } from './rateLabels';
 import { UserName } from '@/components/ui/UserName';
 import { useCurrencyCodes } from '@/context/currencies';
 
@@ -52,7 +52,7 @@ export function RevaluationRatesCard({ currencies }: Readonly<{ currencies: Curr
     onSuccess: async (r) => {
       setRate('');
       await refresh();
-      toast.success(`${r.currencyCode} revaluation rate of ${month} saved`);
+      toast.success(`${r.currencyCode} revaluation rate of ${monthText(month)} saved`);
     },
   });
   const copy = useMutation({

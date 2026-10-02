@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Fragment, useState } from 'react';
 import { useAuth } from '@/auth/authContext';
+import { useLovLabel } from '@/components/broking/useLabels';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -78,6 +79,7 @@ function Facts({ items }: Readonly<{ items: [string, string | undefined][] }>) {
 
 /** The form of the request: accounts of a refund, facts of a cash advance or check cancellation. */
 export function DetailsTab({ request: r }: Readonly<{ request: PayRequest }>) {
+  const modeLabel = useLovLabel('PRQ_PAYMENT_MODE');
   return (
     <div className="stack">
       <Card title="Request">
@@ -88,7 +90,7 @@ export function DetailsTab({ request: r }: Readonly<{ request: PayRequest }>) {
             ['Requesting Unit', r.content.requestingUnit],
             ['Purpose', r.content.purpose],
             ['Type', r.content.rfpType ? humanize(r.content.rfpType) : undefined],
-            ['Mode of Payment', humanize(r.payee.mode)],
+            ['Mode of Payment', modeLabel(r.payee.mode)],
             ['Account No.', r.payee.accountNo],
             ['Account / Check Name', r.payee.accountName],
             ['CA / SA on Client Record', r.payoutRecorded ? 'Recorded' : undefined],

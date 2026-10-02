@@ -274,3 +274,15 @@ describe('renewal rates', () => {
     expect(rateText(null)).toBe('');
   });
 });
+
+describe('renewal values not given', () => {
+  it('shows nothing for claims the server does not give', () => {
+    expect(claimsText(undefined)).toBe('');
+    const premium = candidateColumns(true).find((c) => c.key === 'premium');
+    const r = row();
+    const money = { ...r.money } as Partial<typeof r.money>;
+    delete money.claimCount;
+    render(<>{premium?.render({ ...r, money: money as typeof r.money }, 0)}</>);
+    expect(screen.queryByText(/undefined/)).toBeNull();
+  });
+});

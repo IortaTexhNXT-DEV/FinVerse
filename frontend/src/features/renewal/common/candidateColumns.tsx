@@ -9,8 +9,8 @@ import { BucketPill, FlagChips, RenewalInsurer, RenewalProduct, RenewalUnit } fr
 import { dispositionLabel } from './renewalCodes';
 
 /** "1 claim" / "3 claims": the claims of the expiring term in words; empty when unknown. */
-export function claimsText(count: number | null): string {
-  if (count === null) {
+export function claimsText(count: number | null | undefined): string {
+  if (count === null || count === undefined) {
     return '';
   }
   return count === 1 ? '1 claim' : `${String(count)} claims`;
@@ -105,12 +105,12 @@ export function candidateColumns(showMoney: boolean): Column<CandidateRow>[] {
         <CellStack
           main={<Amount value={r.money.grossPremium} />}
           sub={
-            r.money.outstanding === null ? (
+            typeof r.money.outstanding !== 'number' ? (
               claimsText(r.money.claimCount)
             ) : (
               <>
                 <Amount value={r.money.outstanding} />
-                {r.money.claimCount === null ? '' : ` · ${claimsText(r.money.claimCount)}`}
+                {claimsText(r.money.claimCount) ? ` · ${claimsText(r.money.claimCount)}` : ''}
               </>
             )
           }

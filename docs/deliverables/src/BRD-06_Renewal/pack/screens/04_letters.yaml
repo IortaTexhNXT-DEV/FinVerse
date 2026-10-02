@@ -50,7 +50,7 @@ screens:
     entry:
       - Renewal (RA Sent / Awaiting Response) › Record Acceptance
     shots:
-      - {state: accept, user: ao, open_renewal: ra_sent, fill: acceptance_payment, caption: "Record Acceptance dialog: acceptance by payment with its reference"}
+      - {state: accept, user: ao2, open_renewal: ra_sent, fill: acceptance_payment, caption: "Record Acceptance dialog: acceptance by payment with its reference"}
     fields:
       - "Record Acceptance dialog | Method | Drop-down | E-mail from the client, Signed Renewal Advice, Payment | Y | Fixed list | E-mail from the client | RA Sent / Awaiting Response | - | Select the acceptance method"
       - "Record Acceptance dialog | Evidence | Drop-down | A document of the renewal (Documents tab) | Cond.: e-mail or signed Renewal Advice | Documents of the renewal | Blank | RA Sent / Awaiting Response | A document of this renewal | The evidence is not a document of this renewal"

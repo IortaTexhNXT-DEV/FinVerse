@@ -156,9 +156,9 @@ export default function CandidatePage() {
         title={d.row.parties.clientName}
         chips={
           <>
-            {d.row.policy.expiringArn !== null && (
+            {d.row.policy.expiringArn ? (
               <ReferenceChip label="ARN" value={d.row.policy.expiringArn} />
-            )}
+            ) : null}
             <StatusBadge status={d.row.stage} label={d.row.stageLabel} />
             <BucketPill bucket={d.row.bucket} />
             {d.row.disposition !== null && (

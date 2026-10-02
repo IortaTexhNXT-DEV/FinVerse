@@ -161,6 +161,18 @@ const after = {
 const TAB = 'main div.stack > div.tabs[role=tablist], main div.stack > div.tabs[role=tablist] ~ *';
 const crops = { 'wt-a-03': TAB, 'wt-c-02': TAB, 'wt-c-04': TAB, 'wt-d-04': TAB };
 
+// The record tabs: a field badge goes in the card that shows it, never on the flag chips of the header.
+const card = (title) => ({ within: 'main section.card', title });
+const callouts = {
+  'SCR-RN-04': {
+    1: card('Check results'),
+    2: card('Classification history'),
+    3: card('Endorsements linked'),
+    5: card('Prior renewals'),
+    6: card('Expiring'),
+  },
+};
+
 // ------------------------------------------------------------------ documents
 
 const year = () => new Date().getUTCFullYear();
@@ -194,5 +206,5 @@ const documents = {
   },
 };
 
-module.exports = { opens, fills, selects, after, crops, custom: {}, walkthrough: walkthrough.steps, documents,
+module.exports = { opens, fills, selects, after, crops, callouts, custom: {}, walkthrough: walkthrough.steps, documents,
   prepare: walkthrough.prepare, year, tickRow };

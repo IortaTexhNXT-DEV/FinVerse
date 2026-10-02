@@ -29,7 +29,7 @@ screens:
       - "List | Amount | Column | Total debit, two decimals | - | Journals | - | Read only | - | -"
       - "List | Status | Column | Draft, Pending Approval, Posted, Rejected, Cancelled, Reversed | - | Journals | - | Read only | - | -"
       - "Assign journal(s) dialog | Assign to | Drop-down | The users who may post journals, or No one (clear the assignment) | N | Users with the journal authorize permission | No one | Pending approval | Not the submitter of the voucher | A journal is never assigned to its submitter"
-      - "Post selected journals dialog | Journals to post / Total debit / Selected but not pending | Display | Counts and the total of the selected pending vouchers | - | Selection | - | Read only | - | -"
+      - "Post selected journals dialog | Journals to post, Total debit, Selected but not pending | Display | Counts and the total of the selected pending vouchers | - | Selection | - | Read only | - | -"
     actions:
       - "New Journal | GL Officer, GL Team Lead (journal create) | Always | Opens New Journal | - | -"
       - "Assign (n) | GL Team Lead, GL Section Head (journal assign) | Vouchers selected | Assigns the selected vouchers to the user chosen, or clears the assignment | Pending Approval | -"

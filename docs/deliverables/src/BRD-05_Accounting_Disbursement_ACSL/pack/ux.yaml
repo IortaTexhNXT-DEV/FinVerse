@@ -24,7 +24,8 @@ personas:
   FRBS_PROCESSOR: {who: "A GL Officer of FRBS who prepares the manual entries, runs the report pack and the BIR forms and follows the service fee"}
   FRBS_TL: {who: "The GL Team Lead who assigns and posts the entries, keeps the chart, closes the month and the year and approves the service fee"}
   FRBS_HEAD: {who: "The GL Section Head who enters the monthly revaluation rate, authorises the chart and posts and reverses entries"}
-  ACCOUNTANT: {who: "An accountant who imports the bank statements and reconciles the bank accounts"}
+  ACCOUNTANT: {who: "An accountant who imports the bank statements and reconciles the bank accounts",
+               does: "Imports the statements of the bank accounts, matches the bank lines with the book entries and prepares the bank reconciliation statement of the month"}
   FIN_ADMIN: {who: "A Comptrollership administrator who keeps the accounting and cost-centre rules, the employees and the liquidation accounts"}
   DISBURSEMENT: {who: "A Disbursement Processor who encodes and uploads requests, prepares the vouchers, follows the instruments and tags the receipts and certificates"}
   DISB_TL: {who: "The Disbursement Team Leader who reviews the vouchers, keeps the payees, runs the end of day and requests and verifies the fundings"}

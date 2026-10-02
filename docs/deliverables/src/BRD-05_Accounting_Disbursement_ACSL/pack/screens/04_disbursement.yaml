@@ -104,8 +104,8 @@ screens:
       - "OR / AR and CWT | Tag / Received / Released / Number / Date / Period / Received / Released On / Amount / Tagged By | Column | The tags of the voucher | - | Tags | - | Read only | - | -"
       - "Tag dialog | Received / Released / OR / AR No. / Certificate No. / Receipt Date / Period From / Period To / Amount | Drop-down, text, date, number | Received from insurer or Released to supplier | Y | - | - | Approved | - | -"
     actions:
-      - "Save Terms | Disbursement Processor | In process | Saves the terms; the entry is rebuilt from the rule | In Process | -"
-      - "Save Entry / Rebuild from Rule / Add Line / Allocate Expenses | Disbursement Processor | In process | Saves the edited entry (marked Entry Edited), rebuilds it from the rule, or allocates the expenses by cost centre | In Process | -"
+      - "Save Terms | Disbursement Processor | In process | Saves the terms; the entry is prepared again from the rule | In Process | -"
+      - "Save Entry / Rebuild from Rule / Add Line / Allocate Expenses | Disbursement Processor | In process | Saves the edited entry (marked Entry Edited), prepares it again from the rule, or allocates the expenses by cost centre | In Process | -"
       - "Submit for Review | Disbursement Processor | In process and nothing missing | Sends the voucher to the team leader | For Review | Workflow notice"
       - "Route to Approver | Disbursement Processor | In process, refund or remittance | Sends the voucher straight to the approver | For Approval | Workflow notice"
       - "Submit for Approval | Disbursement Team Leader (disbursement review), not the processor | For review | Sends the voucher to the approver | For Approval | Workflow notice"

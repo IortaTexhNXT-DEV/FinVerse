@@ -173,7 +173,7 @@ fixes:
   "The withholding tax must be at least zero and below the gross": Enter a withholding tax of zero or more and below the gross amount.
   DV_ALLOCATION_TOTAL: Correct the rows so that they add up to the gross amount.
   DV_BANK_CURRENCY: Choose a paying account in the currency of the voucher.
-  DV_ENTRY_EMPTY: Rebuild the entry from the rule, or add its lines.
+  DV_ENTRY_EMPTY: Use Rebuild from Rule, or add the lines of the entry.
   DV_FOUR_EYES: Ask another user with the review or approval right to take the action.
   DV_MODE: Choose a mode allowed for the payee, or ask the team leader to allow the mode on the payee.
   DV_NOT_EDITABLE: Ask the approver to return the voucher; it can no longer be changed in its stage.

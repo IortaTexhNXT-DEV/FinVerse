@@ -227,7 +227,7 @@ function AllocationDialog({
 /**
  * The proforma entry of a voucher (DIS 2.7.6, 2.7.10): built from the accounting rule, editable
  * line by line by the processor while the voucher is in process (lines that differ from the rule
- * are marked Edited for the approver), rebuilt from the rule, or built from an expense allocation.
+ * are marked Edited for the approver), prepared again from the rule, or made from an expense allocation.
  */
 export function ProformaTab({
   voucher,
@@ -250,7 +250,7 @@ export function ProformaTab({
     onSuccess: (v) => {
       setLines(v.lines);
       onSaved(v);
-      toast.success('Entry rebuilt from the rule');
+      toast.success('Entry prepared again from the rule');
     },
   });
   const title = voucher.summary.proformaEdited ? 'Accounting Entry (Edited)' : 'Accounting Entry';
@@ -263,7 +263,7 @@ export function ProformaTab({
             columns={READ_COLUMNS}
             rows={voucher.lines}
             rowKey={(l) => `${l.side}-${l.accountCode}-${l.amount}-${l.component ?? ''}`}
-            emptyMessage="The rule could not build the entry yet; complete the details."
+            emptyMessage="The rule could not prepare the entry yet; complete the details."
           />
           <Balance lines={voucher.lines} />
         </div>

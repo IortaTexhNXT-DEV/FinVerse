@@ -14,6 +14,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatAmount, formatDateTime } from '@/utils/format';
 import { ebLabel } from '../common/ebCodes';
 import { BRAND } from '@/branding';
+import { InsurerName, ProductName } from '@/components/broking/LovLabel';
 
 const ACCOUNT_COLUMNS: Column<CycleAccount>[] = [
   {
@@ -28,8 +29,12 @@ const ACCOUNT_COLUMNS: Column<CycleAccount>[] = [
     header: 'Business Type',
     render: (a) => <CellStack main={ebLabel(a.businessType)} sub={a.renewalOfRef ?? undefined} />,
   },
-  { key: 'product', header: 'Product', kind: 'code', render: (a) => a.productCode ?? '' },
-  { key: 'insurer', header: 'Insurer', kind: 'code', render: (a) => a.insurerCode ?? '' },
+  {
+    key: 'product',
+    header: 'Product',
+    render: (a) => <ProductName code={a.productCode} withCode />,
+  },
+  { key: 'insurer', header: 'Insurer', render: (a) => <InsurerName code={a.insurerCode} /> },
   {
     key: 'period',
     header: 'Period',

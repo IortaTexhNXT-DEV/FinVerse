@@ -19,6 +19,7 @@ import { PolicyCessionsCard } from './PolicyCessionsCard';
 import { previewTotals } from './allocation';
 import { Notice } from '@/components/ui/Notice';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 /** RI allocation run (preview, then post) and the per-policy cession view. */
 export default function AllocationPage() {
@@ -111,7 +112,11 @@ export default function AllocationPage() {
             columns={[
               { key: 'd', header: 'Document', render: (r) => <strong>{r.documentNo}</strong> },
               { key: 'k', header: 'Kind', render: (r) => humanize(r.kind) },
-              { key: 'l', header: 'Class', render: (r) => r.businessLine },
+              {
+                key: 'l',
+                header: 'Class',
+                render: (r) => (r.businessLine ? <LineLabel code={r.businessLine} /> : ''),
+              },
               { key: 'a', header: 'Approved', render: (r) => formatDate(r.approvalDate) },
               { key: 'c', header: 'Ccy', render: (r) => r.currency },
               {

@@ -23,6 +23,7 @@ import { formatDate, formatDateTime } from '@/utils/format';
 import { RENEWAL_SECTION } from '../common/renewalCodes';
 import { UploadPanel } from '../common/UploadPanel';
 import '../renewal.css';
+import { InsurerName } from '@/components/broking/LovLabel';
 
 function CreateBatchDialog({ onClose }: Readonly<{ onClose: () => void }>) {
   const companyId = useCompanyId();
@@ -240,7 +241,11 @@ export default function InsurerBatchesPage() {
           emptyMessage="No insurer batches"
           columns={[
             { key: 'no', header: 'Batch', kind: 'code', render: (b) => b.batchNo },
-            { key: 'insurer', header: 'Insurance Company', render: (b) => b.insurerCode },
+            {
+              key: 'insurer',
+              header: 'Insurance Company',
+              render: (b) => <InsurerName code={b.insurerCode} />,
+            },
             {
               key: 'range',
               header: 'Expiry range',

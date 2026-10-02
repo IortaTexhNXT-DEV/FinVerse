@@ -11,6 +11,7 @@ import type { StrExtraction, StrRow } from './api';
 import { extractionPeriodError, filingErrors, monthStart } from './strLogic';
 import { DateInput } from '@/components/ui/DateInput';
 import { BRAND } from '@/branding';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 
 /**
  * Record Filing (SNSRP-706; FR-SS-072): the AMLC reference (unique) and the filing date, not before
@@ -167,7 +168,12 @@ export function ExtractDialog({
               header: 'Committee Decision',
               render: (s) => formatDateTime(s.committeeDecidedAt),
             },
-            { key: 'status', header: 'Status', render: (s) => s.status },
+            {
+              key: 'status',
+              header: 'Status',
+              kind: 'status',
+              render: (s) => <StatusBadge status={s.status} />,
+            },
           ]}
         />
       )}

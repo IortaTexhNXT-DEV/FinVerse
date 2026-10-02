@@ -129,7 +129,7 @@ export default function TaxReturnsPage() {
             {
               key: 'b',
               header: 'Filed by',
-              render: (r) => <UserName login={r.filedBy} empty="" />,
+              render: (r) => <UserName login={r.filedBy} />,
             },
             {
               key: 'x',

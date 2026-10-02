@@ -84,7 +84,7 @@ The roles-and-access sheet checks each New Business action against the roles tha
 <!-- table: widths=1.2,8.6,4.2 caption="Reference documents" -->
 | Ref. | Document | Version |
 |---|---|---|
-| R1 | Functional Requirements Specification BRD-1 New Business (`02_BIBS_FRS_BRD-01_New_Business_v2.0.docx`) | 2.0, 27 Sep 2026 |
+| R1 | Functional Requirements Specification BRD-1 New Business (`02_BIBS_FRS_BRD-01_New_Business_v2.0.docx`) | 2.0, 1 Oct 2026 |
 | R2 | New Business BRD pack | Addendum signed Apr-2026; Other Lines Dec-2025; Fire and Motor V06162025 |
 | R3 | Test plan workbook BRD-1 (`04_BIBS_TestPlan_BRD-01_New_Business_v2.0.xlsx`) | 2.0 |
 | R5 | Test plan BRD-3 Product Maintenance (catalogue, versions, incentive criteria) | 1.0 |

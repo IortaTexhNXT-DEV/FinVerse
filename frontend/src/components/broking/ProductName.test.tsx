@@ -20,6 +20,21 @@ describe('product names', () => {
     expect(screen.getByText('MTR15')).toHaveClass('muted');
   });
 
+  it('does not repeat a code the product name already carries', () => {
+    const queries = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+    queries.setQueryData(
+      ['catalog', 'products', 'names'],
+      [{ code: 'MTR10', name: 'Motor Comprehensive Package MTR10', lineCode: 'MOTOR' }],
+    );
+    render(
+      <QueryClientProvider client={queries}>
+        <ProductName code="MTR10" withCode />
+      </QueryClientProvider>,
+    );
+    expect(screen.getByText('Motor Comprehensive Package MTR10')).toBeInTheDocument();
+    expect(screen.queryByText('MTR10')).toBeNull();
+  });
+
   it('keeps the code in the tooltip where only the name is shown', () => {
     render(wrap(<ProductName code="MTR15" />));
     expect(screen.getByText('Motor Comprehensive – Private Car')).toHaveAttribute('title', 'MTR15');

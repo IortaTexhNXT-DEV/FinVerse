@@ -1,7 +1,8 @@
 import { AlarmClock } from 'lucide-react';
-import { WORKFLOW_NAMES } from '@/api/workflow';
+import { WORKFLOW_NAMES, workflowRecordType } from '@/api/workflow';
 import type { QueueCount, QueueFilters } from '@/api/workflow';
 import { Card } from '@/components/ui/Card';
+import { humanize, titleCase } from '@/utils/format';
 
 type Filters = Omit<QueueFilters, 'companyId'>;
 
@@ -62,6 +63,12 @@ interface TilesProps {
   onFilter: (patch: Partial<Filters>) => void;
 }
 
+/** The title of a workflow's tiles in Title Case, never its code ("Proposal Requests"). */
+function workflowTitle(workflow: string): string {
+  const name = WORKFLOW_NAMES[workflow] ?? workflowRecordType(workflow);
+  return name === '' ? humanize(workflow) : titleCase(name);
+}
+
 /** One tile per stage the user works, grouped by workflow. */
 export function StageTiles({ counts, filters, onFilter }: Readonly<TilesProps>) {
   const groups = new Map<string, QueueCount[]>();
@@ -69,7 +76,7 @@ export function StageTiles({ counts, filters, onFilter }: Readonly<TilesProps>) 
   return (
     <>
       {[...groups.entries()].map(([workflow, stages]) => (
-        <Card key={workflow} title={WORKFLOW_NAMES[workflow] ?? workflow}>
+        <Card key={workflow} title={workflowTitle(workflow)}>
           <div className="stage-tiles">
             {stages.map((s) => (
               <StageTile
@@ -93,7 +100,7 @@ function StageTile({
 }: Readonly<{ count: QueueCount; active: boolean; onClick: () => void }>) {
   return (
     <button type="button" className={active ? 'stage-tile active' : 'stage-tile'} onClick={onClick}>
-      <span className="stage-tile-name">{count.stageName}</span>
+      <span className="stage-tile-name">{titleCase(count.stageName)}</span>
       <span className="stage-tile-count">{count.open}</span>
       <span className="stage-tile-meta">
         {count.overdue > 0 && (

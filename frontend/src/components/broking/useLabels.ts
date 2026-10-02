@@ -23,6 +23,21 @@ export function useLovLabel(type: string): (code: string | null | undefined) => 
   };
 }
 
+/**
+ * Label lookup of a list of values that tells an unknown code apart: the label, or null when the
+ * code is not a value of the list (so the caller can try another list).
+ */
+export function useLovLabelOrNull(
+  type: string,
+): (code: string | null | undefined) => string | null {
+  const options = useQuery({
+    queryKey: ['lov', type],
+    queryFn: () => lovApi.options(type),
+    staleTime: STALE,
+  });
+  return (code) => (code ? (options.data?.find((o) => o.code === code)?.label ?? null) : null);
+}
+
 /** Name lookup of product lines: returns a function from line code to its name. */
 export function useLineName(): (code: string | null | undefined) => string {
   const lines = useQuery({
@@ -52,6 +67,35 @@ export function useInsurerName(): (code: string | null | undefined) => string {
       return '';
     }
     return insurers.data?.find((i) => i.partyCode === code)?.name ?? code;
+  };
+}
+
+/**
+ * Name lookup of the branches of one insurer: returns a function from the branch code to its name
+ * ("Makati"); the code while the insurer loads.
+ */
+export function useInsurerBranchName(
+  insurerCode: string | null | undefined,
+): (code: string | null | undefined) => string {
+  const companyId = useContext(WorkspaceContext)?.company?.id ?? 0;
+  const insurers = useQuery({
+    queryKey: ['catalog', 'insurers', companyId],
+    queryFn: () => catalogApi.insurers(companyId),
+    staleTime: STALE,
+    enabled: companyId > 0,
+  });
+  const id = insurers.data?.find((i) => i.partyCode === insurerCode)?.id;
+  const detail = useQuery({
+    queryKey: ['catalog', 'insurer', id],
+    queryFn: () => catalogApi.insurer(id ?? 0),
+    staleTime: STALE,
+    enabled: id !== undefined,
+  });
+  return (code) => {
+    if (!code) {
+      return '';
+    }
+    return detail.data?.branches.find((b) => b.code === code)?.name ?? code;
   };
 }
 
@@ -120,6 +164,15 @@ export function useProductName(): (code: string | null | undefined) => string {
  * its name ("CBG Metro Team 1"); the code while the organisation loads.
  */
 export function useSalesUnitName(): (code: string | null | undefined) => string {
+  const name = useSalesUnitNameOrNull();
+  return (code) => (code ? (name(code) ?? code) : '');
+}
+
+/**
+ * Name lookup of sales units that tells an unknown code apart: the unit's name, or null when the
+ * code is not a unit of the company (or the organisation is not loaded).
+ */
+export function useSalesUnitNameOrNull(): (code: string | null | undefined) => string | null {
   const companyId = useContext(WorkspaceContext)?.company?.id ?? 0;
   const org = useQuery({
     queryKey: ['catalog', 'sales-organisation', companyId],
@@ -127,10 +180,5 @@ export function useSalesUnitName(): (code: string | null | undefined) => string 
     staleTime: STALE,
     enabled: companyId > 0,
   });
-  return (code) => {
-    if (!code) {
-      return '';
-    }
-    return org.data?.units.find((u) => u.code === code)?.name ?? code;
-  };
+  return (code) => (code ? (org.data?.units.find((u) => u.code === code)?.name ?? null) : null);
 }

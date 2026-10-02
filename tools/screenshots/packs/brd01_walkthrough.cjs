@@ -4,6 +4,7 @@
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
+const { execFileSync } = require('child_process');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'nb-pack-'));
 
@@ -54,21 +55,51 @@ const CLIENT_HEADERS = ['Client Code', 'Client Type', 'Last Name', 'First Name',
 function clientRows(ctx, errors, runNo) {
   const n = String(runNo).padStart(2, '0');
   const rows = [
-    ['', 'INDIVIDUAL', 'Dela Paz', 'Rosario', 'Villareal', '', '1984-07-21', `512-3${n}-101-000`, 'PASSPORT', `P51231${n}01`, `rosario.delapaz${n}@seed-client.ph`, '09175551201', '8 Sampaguita Street, Barangay Malamig', 'Mandaluyong City', 'Metro Manila', '1550', 'CBG', 'Y', '', 'FILIPINO', 'SALARY', 'STANDARD'],
+    ['', 'INDIVIDUAL', 'Dela Paz', 'Rosario', 'Villareal', '', '21-Jul-1984', `512-3${n}-101-000`, 'PASSPORT', `P51231${n}01`, `rosario.delapaz${n}@seed-client.ph`, '09175551201', '8 Sampaguita Street, Barangay Malamig', 'Mandaluyong City', 'Metro Manila', '1550', 'CBG', 'Y', '', 'FILIPINO', 'SALARY', 'STANDARD'],
     ['', 'CORPORATE', '', '', '', `Tanglaw Printing Services ${n} Inc.`, '', `512-3${n}-102-000`, '', '', `accounts${n}@tanglawprinting.example`, '09175551202', 'Unit 5, 21 Shaw Boulevard', 'Pasig City', 'Metro Manila', '1603', 'COMBANK', 'N', '', '', '', 'STANDARD'],
-    ['', 'INDIVIDUAL', 'Macaraeg', 'Leonora', 'Santos', '', errors ? '21/09/1979' : '1979-09-21', `512-3${n}-103-000`, 'PASSPORT', `P51231${n}03`, `leonora.macaraeg${n}@seed-client.ph`, '09175551203', '44 Kamagong Street, San Antonio Village', 'Makati City', 'Metro Manila', '1203', 'CBG', 'N', '', 'FILIPINO', 'BUSINESS', 'STANDARD'],
-    ['', errors ? '' : 'INDIVIDUAL', 'Buenaventura', 'Ramil', 'Ocampo', '', '1990-02-11', `512-3${n}-104-000`, 'PASSPORT', `P51231${n}04`, `ramil.buenaventura${n}@seed-client.ph`, '09175551204', '17 Molave Road, Project 3', 'Quezon City', 'Metro Manila', '1102', 'CBG', 'Y', '', 'FILIPINO', 'SALARY', 'STANDARD'],
-    ['', 'INDIVIDUAL', 'Galang', 'Theresa', 'Manalo', '', '1987-12-03', `512-3${n}-105-000`, 'PASSPORT', `P51231${n}05`, `theresa.galang${n}@seed-client.ph`, '09175551205', '9 Acacia Drive, Barangay Lahug', 'Cebu City', 'Cebu', '6000', 'RETAIL', 'N', '', 'FILIPINO', 'SALARY', 'STANDARD'],
+    ['', 'INDIVIDUAL', 'Macaraeg', 'Leonora', 'Santos', '', errors ? '21/09/1979' : '21-Sep-1979', `512-3${n}-103-000`, 'PASSPORT', `P51231${n}03`, `leonora.macaraeg${n}@seed-client.ph`, '09175551203', '44 Kamagong Street, San Antonio Village', 'Makati City', 'Metro Manila', '1203', 'CBG', 'N', '', 'FILIPINO', 'BUSINESS', 'STANDARD'],
+    ['', errors ? '' : 'INDIVIDUAL', 'Buenaventura', 'Ramil', 'Ocampo', '', '11-Feb-1990', `512-3${n}-104-000`, 'PASSPORT', `P51231${n}04`, `ramil.buenaventura${n}@seed-client.ph`, '09175551204', '17 Molave Road, Project 3', 'Quezon City', 'Metro Manila', '1102', 'CBG', 'Y', '', 'FILIPINO', 'SALARY', 'STANDARD'],
+    ['', 'INDIVIDUAL', 'Galang', 'Theresa', 'Manalo', '', '03-Dec-1987', `512-3${n}-105-000`, 'PASSPORT', `P51231${n}05`, `theresa.galang${n}@seed-client.ph`, '09175551205', '9 Acacia Drive, Barangay Lahug', 'Cebu City', 'Cebu', '6000', 'RETAIL', 'N', '', 'FILIPINO', 'SALARY', 'STANDARD'],
   ];
   return rows;
 }
 
-/** The client bulk file: all five rows (two with errors), or only the two corrected rows. */
+/**
+ * Fills the Excel template of an upload type as a user does: the rows go from the example row (overwritten) down,
+ * under the headers of the template (matched by their text, the mandatory mark left aside).
+ */
+function fillTemplate(template, out, headers, rows) {
+  const script = [
+    'import json, sys, openpyxl',
+    'src, out, headers, rows = sys.argv[1], sys.argv[2], json.loads(sys.argv[3]), json.loads(sys.argv[4])',
+    'wb = openpyxl.load_workbook(src)',
+    'ws = wb.worksheets[0]',
+    'clean = lambda v: str(v or "").replace("*", "").strip()',
+    'hr = next(r for r in range(1, ws.max_row + 1) if headers[0] in [clean(ws.cell(r, c).value) for c in range(1, ws.max_column + 1)])',
+    'cols = {clean(ws.cell(hr, c).value): c for c in range(1, ws.max_column + 1)}',
+    'for r in range(hr + 1, ws.max_row + 1):',
+    '    for c in range(1, ws.max_column + 1):',
+    '        ws.cell(r, c).value = None',
+    'for i, row in enumerate(rows):',
+    '    for h, v in zip(headers, row):',
+    '        if h in cols:',
+    '            ws.cell(hr + 1 + i, cols[h]).value = v if v != "" else None',
+    'wb.save(out)',
+  ].join('\n');
+  execFileSync(process.env.PYTHON || 'python3', ['-c', script, template, out, JSON.stringify(headers), JSON.stringify(rows)]);
+  return out;
+}
+
+/** The client bulk file: the Excel template with all five rows (two with errors), or only the two corrected rows. */
 async function bulkClientFile(ctx, corrected) {
   const runNo = ctx.state.bulkRun ?? (ctx.state.bulkRun = Number(ctx.one('select count(*) from bulk_job')) + 1);
   const rows = clientRows(ctx, !corrected, runNo);
   const data = corrected ? rows.slice(2, 4) : rows;
-  return csv(corrected ? `clients-corrected-${runNo}.csv` : `clients-${runNo}.csv`, [CLIENT_HEADERS, ...data]);
+  const company = ctx.one("select id from org_company where code = 'FVI'");
+  const template = path.join(TMP, `client-template-${runNo}.xlsx`);
+  fs.writeFileSync(template, await ctx.api('ao', 'GET', `/bulk/handlers/CLIENT_CREATE/template?companyId=${company}`));
+  const name = corrected ? `clients-corrected-${runNo}.xlsx` : `clients-${runNo}.xlsx`;
+  return fillTemplate(template, path.join(TMP, name), CLIENT_HEADERS, data);
 }
 
 // ------------------------------------------------------------------ page helpers
@@ -171,6 +202,50 @@ async function act(page, name, opts = {}) {
   return page;
 }
 
+/** Runs an action of a table row: opens the row's action menu, then chooses the action. */
+async function rowAction(row, name) {
+  const menu = row.getByRole('button', { name: /^Actions for/ });
+  await menu.scrollIntoViewIfNeeded();
+  await row.page().waitForTimeout(200);
+  await menu.click();
+  await row.page().waitForTimeout(300);
+  await row.page().getByRole('menuitem', { name }).first().click();
+}
+
+/** Whether the row's action menu offers the action (the menu is closed again). */
+async function rowOffers(row, name) {
+  const menu = row.getByRole('button', { name: /^Actions for/ });
+  await menu.first().waitFor({ timeout: 5000 }).catch(() => {});
+  if ((await menu.count()) === 0) {
+    return false;
+  }
+  // The menu closes on any scroll: bring the button into view first, then open the menu.
+  await menu.first().scrollIntoViewIfNeeded();
+  await row.page().waitForTimeout(200);
+  await menu.first().click();
+  const offered = await row.page().getByRole('menuitem', { name }).first()
+    .waitFor({ state: 'visible', timeout: 2000 }).then(() => true).catch(() => false);
+  await row.page().keyboard.press('Escape');
+  await row.page().waitForTimeout(200);
+  return offered;
+}
+
+/**
+ * Brings the tab strip of a record to the top of the window, so the tab's content is captured whole:
+ * the record header and the stepper above the tabs (shown in the other steps) are set aside.
+ */
+async function tabsToTop(page) {
+  await page.evaluate(() => {
+    const t = document.querySelector('main div.tabs[role=tablist]');
+    if (!t) return;
+    for (const el of t.parentElement.children) {
+      if (el === t) break;
+      el.style.display = 'none';
+    }
+  });
+  await page.waitForTimeout(400);
+}
+
 async function tab(page, name) {
   await page.getByRole('tab', { name: new RegExp(`^${name}`) }).first().click();
   await settle(page, 600);
@@ -241,7 +316,7 @@ const steps = {
       ['E-mail', `${p.first}.${p.last}@seed-client.ph`.toLowerCase()], ['Mobile', p.mobile],
       ['Street address', '12 Mabini Street, Barangay San Antonio'], ['City / municipality', 'Pasig City'],
       ['Province', 'Metro Manila'], ['Postal code', '1605'], ['Market segment', 'CBG'],
-      ['The client banks with BDO', true], ['BDO CIF number', '0041723890'], ['Source of funds', 'Salary'],
+      ['The client banks with the group bank', true], ['BDO CIF number', '0041723890'], ['Source of funds', 'Salary'],
     ]);
     await button(page, 'Save as Prospect').click();
     await settle(page, 1500);
@@ -308,6 +383,7 @@ const steps = {
     const page = await go(ctx, 'ao', `/quotations/${quotationId(ctx)}`);
     await act(page, 'Send via Email', { confirm: /^send$/i });
     await tab(page, 'E-mails');
+    await tabsToTop(page);
     return page;
   },
   // 8. Acceptance recorded and the account created.
@@ -361,7 +437,7 @@ const steps = {
       [pnNo(ctx), loanNo(ctx), `${person(ctx).last}, ${person(ctx).first}`, 'PAID',
         ctx.one(`select gross_premium from acc_account where arn = '${arn}'`), new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10)],
     ]);
-    await button(page.locator('table tbody tr').filter({ hasText: batch }).first(), 'Upload Report').click();
+    await rowAction(page.locator('table tbody tr').filter({ hasText: batch }).first(), /^upload report$/i);
     await page.waitForTimeout(700);
     const dialog = page.locator('dialog.modal[open]').last();
     await dialog.locator('input[type=file]').first().setInputFiles(report);
@@ -424,7 +500,7 @@ const steps = {
     const page = await go(ctx, 'epol', '/issuance/dispatch');
     const row = page.locator('table tbody tr').filter({ hasText: arn }).first();
     if (await row.isVisible().catch(() => false)) {
-      await button(row, 'Send').click();
+      await rowAction(row, /^send$/i);
       await page.waitForTimeout(800);
       const dialog = page.locator('dialog.modal[open]').last();
       await dialog.getByRole('button', { name: /^Send/ }).last().click();
@@ -445,6 +521,7 @@ const steps = {
     const id = ctx.one(`select id from bkg_invoice where arn = '${accountArn(ctx)}' and status = 'BOOKED' order by id desc limit 1`);
     const page = await go(ctx, 'proc', `/booking/invoices/${id}`);
     await tab(page, 'Journal');
+    await tabsToTop(page);
     return page;
   },
   // ---------------------------------------------------------------- walkthrough B
@@ -490,12 +567,9 @@ const steps = {
   'wt-b-03': async (ctx) => {
     const page = await go(ctx, 'tsu', '/proposals/tsu');
     const row = page.locator('table tbody tr').filter({ hasText: prfNo(ctx) }).first();
-    if (await row.isVisible().catch(() => false)) {
-      const claim = button(row, 'Claim');
-      if (await claim.isVisible().catch(() => false)) {
-        await claim.click();
-        await settle(page, 1200);
-      }
+    if ((await row.isVisible().catch(() => false)) && (await rowOffers(row, /^claim$/i))) {
+      await rowAction(row, /^claim$/i);
+      await settle(page, 1200);
     }
     return page;
   },
@@ -520,6 +594,7 @@ const steps = {
     const page = await go(ctx, 'tsulead', `/proposals/${prfId(ctx)}`);
     await act(page, /^Approve and send to insurers$/i, { reason: false });
     await tab(page, 'E-mails');
+    await tabsToTop(page);
     return page;
   },
   // 6. Insurer terms keyed in (one insurer declines), the lowest premium recommended, terms complete.
@@ -533,10 +608,10 @@ const steps = {
     ];
     for (const [insurer, response, premium, rate, deductibles, conditions, remarks] of terms) {
       const row = page.locator('main table tbody tr').filter({ hasText: insurer }).first();
-      if (!(await button(row, 'Terms').isVisible().catch(() => false))) {
+      if (!(await rowOffers(row, /^terms$/i))) {
         continue;
       }
-      await button(row, 'Terms').click();
+      await rowAction(row, /^terms$/i);
       await page.waitForTimeout(700);
       const dialog = page.locator('dialog.modal[open]').last();
       const select = dialog.locator('select').first();
@@ -556,12 +631,13 @@ const steps = {
       await settle(page, 1000);
     }
     const lowest = page.locator('main table tbody tr').filter({ hasText: 'Mabuhay General' }).first();
-    if (await button(lowest, 'Recommend').isVisible().catch(() => false)) {
-      await button(lowest, 'Recommend').click();
+    if (await rowOffers(lowest, /^recommend$/i)) {
+      await rowAction(lowest, /^recommend$/i);
       await settle(page, 1000);
     }
     await act(page, /^Insurer terms complete$/i, { reason: false });
     await tab(page, 'Comparative Table');
+    await tabsToTop(page);
     return page;
   },
   // 7. Proposal slip submitted for the recommended insurer, approved and released by a second TSU officer.
@@ -571,6 +647,7 @@ const steps = {
     const lead = await go(ctx, 'tsulead', `/proposals/${prfId(ctx)}`);
     await act(lead, /^Approve and release to Marketing$/i, { reason: false });
     await tab(lead, 'Proposal Slip');
+    await tabsToTop(lead);
     return lead;
   },
   // 8. Proposal slip and comparative table sent to the client.
@@ -653,6 +730,7 @@ const steps = {
     const page = await go(ctx, 'mkttl', `/quotations/${id}`);
     await act(page, /^Return to Maker$/i, { reason: 'rate or terms', comment: 'Apply the rate of the CBG property tariff and resubmit.' });
     await tab(page, 'History');
+    await tabsToTop(page);
     return page;
   },
   // 5. Validate refused: the client of the account is not confirmed.
@@ -698,6 +776,7 @@ const steps = {
     const page = await go(ctx, 'proc', `/placement/accounts/${arn}`);
     await act(page, /^Record Insurer Return$/i, { reason: 'additional', comment: 'The insurer asks for the updated fire safety certificate.' });
     await tab(page, 'Insurer Returns');
+    await tabsToTop(page);
     return page;
   },
   // 9. Account resubmitted for placement; the slip regenerated and resent.
@@ -707,21 +786,27 @@ const steps = {
     if (await button(page, /^Resubmit for Placement$/i).isVisible().catch(() => false)) {
       await act(page, /^Resubmit for Placement$/i, { reason: false });
     }
-    if (await button(page, /^Generate Placement Slip$/i).isVisible().catch(() => false)) {
+    const unsent = ctx.sql(`select 1 from plc_slip s join plc_slip_account a on a.slip_id = s.id where a.arn = '${arn}' and s.status = 'GENERATED'`).length > 0;
+    if (!unsent && (await button(page, /^Generate Placement Slip$/i).isVisible().catch(() => false))) {
       await act(page, /^Generate Placement Slip$/i, { reason: false, confirm: /^Generate/i });
     }
     await tab(page, 'Placement Slips');
     const generated = page.locator('main table tbody tr').filter({ hasText: 'Generated' }).first();
-    if (await button(generated, 'Send').isVisible().catch(() => false)) {
-      await button(generated, 'Send').click();
-      await page.waitForTimeout(800);
+    await generated.waitFor({ timeout: 15000 }).catch(() => {});
+    if (await rowOffers(generated, /^send$/i)) {
+      await rowAction(generated, /^send$/i);
+      // The send dialog opens once the proposed e-mail is loaded.
       const dialog = page.locator('dialog.modal[open]').last();
-      if (await dialog.isVisible().catch(() => false)) {
-        await dialog.getByRole('button', { name: /^Send/ }).last().click();
-      }
+      await dialog.getByRole('button', { name: /^Send$/ }).waitFor({ state: 'visible', timeout: 15000 });
+      await dialog.getByRole('button', { name: /^Send$/ }).click();
+      await dialog.waitFor({ state: 'hidden', timeout: 20000 }).catch(() => {});
       await settle(page, 1500);
       await tab(page, 'Placement Slips');
     }
+    // The slips of the account load after the tab opens.
+    await page.locator('main table tbody tr').filter({ hasText: 'PL-' }).first().waitFor({ timeout: 15000 }).catch(() => {});
+    await settle(page, 800);
+    await tabsToTop(page);
     return page;
   },
 };
@@ -828,6 +913,16 @@ const bulk = {
   },
 };
 
-async function prepare() {}
+/**
+ * Before the capture: the accounting period of today (Philippine date) is opened by the finance
+ * manager when the seed calendar still has it in the future (a capture on the first days of a month
+ * books into that month).
+ */
+async function prepare(ctx) {
+  const due = ctx.sql("select id from per_period where status = 'FUTURE' and start_date <= (now() at time zone 'Asia/Manila')::date order by start_date");
+  for (const [id] of due) {
+    await ctx.api('fmanager', 'POST', `/periods/${id}/open`);
+  }
+}
 
-module.exports = { steps, bulk, prepare, addItem, bulkClientFile, pdf, csv, act, press, tab, go, button, settle, uploadDocument, TMP };
+module.exports = { steps, bulk, prepare, rowAction, rowOffers, tabsToTop, addItem, bulkClientFile, pdf, csv, act, press, tab, go, button, settle, uploadDocument, TMP };

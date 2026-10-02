@@ -26,6 +26,7 @@ import { LiquidateDialog, ReleaseDialog } from './LineDialogs';
 import { lineActions, tagProgress, totalsByCurrency } from './serviceFee';
 import './frbs.css';
 import { UserName } from '@/components/ui/UserName';
+import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
 
 type TabId = 'lines' | 'invoices';
 type Pending = { kind: 'release' | 'liquidate'; line: ServiceFeeLine } | undefined;
@@ -41,8 +42,12 @@ const INVOICE_COLUMNS: Column<ServiceFeeInvoice>[] = [
       </>
     ),
   },
-  { key: 'insurer', header: 'Insurer', render: (i) => i.insurerCode },
-  { key: 'segment', header: 'Segment', render: (i) => i.marketSegment ?? '—' },
+  { key: 'insurer', header: 'Insurer', render: (i) => <InsurerName code={i.insurerCode} /> },
+  {
+    key: 'segment',
+    header: 'Segment',
+    render: (i) => <LovLabel type="MARKET_SEGMENT" code={i.marketSegment} />,
+  },
   { key: 'paid', header: 'Fully Paid', render: (i) => formatDate(i.paidOn) },
   {
     key: 'commission',

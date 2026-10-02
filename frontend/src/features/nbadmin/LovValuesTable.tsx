@@ -1,13 +1,15 @@
 import type { LovValue } from '@/api/lov';
-import { Button } from '@/components/ui/Button';
 import { DataTable } from '@/components/ui/DataTable';
 import type { Column } from '@/components/ui/DataTable';
+import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, today } from '@/utils/format';
-import { effectivity } from './lovForm';
+import { effectivity, valueActions } from './lovForm';
 import { UserName } from '@/components/ui/UserName';
 
-export type LovAction = 'edit' | 'deactivate' | 'authorize';
+import type { LovAction } from './lovForm';
+
+export type { LovAction };
 
 interface LovValuesTableProps {
   values: LovValue[];
@@ -17,39 +19,6 @@ interface LovValuesTableProps {
   /** Whether the user may authorize a value (checker, not its maker). */
   mayAuthorize: (value: LovValue) => boolean;
   onAction: (value: LovValue, action: LovAction) => void;
-}
-
-function ValueActions({
-  value,
-  manage,
-  authorize,
-  onAction,
-}: Readonly<{
-  value: LovValue;
-  manage: boolean;
-  authorize: boolean;
-  onAction: (value: LovValue, action: LovAction) => void;
-}>) {
-  const editable = manage && value.status !== 'INACTIVE';
-  return (
-    <div className="row">
-      {editable && (
-        <Button size="sm" variant="ghost" onClick={() => onAction(value, 'edit')}>
-          Edit
-        </Button>
-      )}
-      {editable && (
-        <Button size="sm" variant="ghost" onClick={() => onAction(value, 'deactivate')}>
-          Deactivate
-        </Button>
-      )}
-      {authorize && (
-        <Button size="sm" variant="primary" onClick={() => onAction(value, 'authorize')}>
-          Authorize
-        </Button>
-      )}
-    </div>
-  );
 }
 
 const IN_FORCE: Record<ReturnType<typeof effectivity>, string> = {
@@ -101,9 +70,12 @@ export function LovValuesTable({
     },
     {
       key: 'actions',
-      header: '',
+      header: 'Actions',
       render: (v) => (
-        <ValueActions value={v} manage={manage} authorize={mayAuthorize(v)} onAction={onAction} />
+        <RowActions
+          record={v.label}
+          actions={valueActions(v, manage, mayAuthorize(v), (action) => onAction(v, action))}
+        />
       ),
     },
   ];

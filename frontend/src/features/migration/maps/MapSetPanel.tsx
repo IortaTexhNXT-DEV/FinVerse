@@ -31,7 +31,7 @@ const VERSION_COLUMNS: Column<MapVersion>[] = [
   {
     key: 'approvedBy',
     header: 'Approved by',
-    render: (v) => <UserName login={v.approvedBy} empty="" />,
+    render: (v) => <UserName login={v.approvedBy} />,
   },
   {
     key: 'approvedAt',

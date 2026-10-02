@@ -3,15 +3,17 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { MemoryRouter } from 'react-router-dom';
+import { catalogApi } from '@/api/catalog';
 import { issuanceApi } from '@/api/issuance';
 import { placementApi } from '@/api/placement';
-import type { WorkbenchRow } from '@/api/placement';
+import type { Slip, WorkbenchRow } from '@/api/placement';
 import type { Company } from '@/api/types';
 import { AuthContext } from '@/auth/authContext';
 import { ToastContext } from '@/components/ui/toastContext';
 import { WorkspaceContext } from '@/context/workspaceContext';
 import IssuanceWorkbenchPage from '@/features/issuance/IssuanceWorkbenchPage';
 import PlacementWorkbenchPage from './PlacementWorkbenchPage';
+import SlipsPage from './SlipsPage';
 
 const page = <T,>(content: T[]) => ({
   content,
@@ -116,6 +118,52 @@ describe('placement and issuance workbenches', () => {
     await waitFor(() => expect(generate).toHaveBeenCalledWith(1, ['ARN-2026-000001']));
   }, 20_000);
 
+  it('names the department of each account, never its code', async () => {
+    vi.spyOn(placementApi, 'counts').mockResolvedValue({
+      awaitingPayment: 0,
+      readyForPlacement: 1,
+      placed: 0,
+      returnedByInsurer: 0,
+      holdCoverExpiring: 0,
+      placementCancelled: 0,
+      policyIssued: 0,
+      booked: 0,
+    });
+    vi.spyOn(placementApi, 'workbench').mockResolvedValue(
+      page([row('ARN-2026-000001', 'READY_FOR_PLACEMENT')]),
+    );
+    vi.spyOn(catalogApi, 'salesOrganisation').mockResolvedValue({
+      units: [{ code: 'CBG-NCR', name: 'Consumer Banking - NCR' }],
+    } as unknown as Awaited<ReturnType<typeof catalogApi.salesOrganisation>>);
+    render(wrap(<PlacementWorkbenchPage />));
+    expect(await screen.findByText('Consumer Banking - NCR')).toBeInTheDocument();
+    expect(screen.queryByText('CBG-NCR')).toBeNull();
+  });
+
+  it('keeps the account references of a placement slip on one line', async () => {
+    vi.spyOn(placementApi, 'slips').mockResolvedValue(
+      page([
+        {
+          id: 5,
+          slipNo: 'PL-2026-900003',
+          versionNo: 1,
+          displayNo: 'PL-2026-900003',
+          insurerCode: 'INS-MGIC',
+          branchCode: 'MKT',
+          status: 'SENT',
+          templateVersion: '1',
+          sendCount: 1,
+          createdAt: '2026-09-16T06:00:00Z',
+          createdBy: 'proc',
+          accounts: [{ arn: 'ARN-2026-910003' }, { arn: 'ARN-2026-910005' }],
+        } as unknown as Slip,
+      ]),
+    );
+    render(wrap(<SlipsPage />));
+    expect(await screen.findByRole('link', { name: 'ARN-2026-910003' })).toHaveClass('nowrap');
+    expect(screen.getByRole('link', { name: 'ARN-2026-910005' })).toHaveClass('nowrap');
+  });
+
   it('lists the issuance work by tab', async () => {
     const user = userEvent.setup();
     vi.spyOn(issuanceApi, 'counts').mockResolvedValue({
@@ -141,7 +189,10 @@ describe('placement and issuance workbenches', () => {
     );
     render(wrap(<IssuanceWorkbenchPage />));
     expect(await screen.findByText('Issued Client')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Upload E-policy' })).toBeInTheDocument();
+    // Upload E-policy is offered in the row action menu of the placed account.
+    await user.click(screen.getByRole('button', { name: 'Actions for ARN-2026-000003' }));
+    expect(screen.getByRole('menuitem', { name: 'Upload E-policy' })).toBeInTheDocument();
+    await user.keyboard('{Escape}');
     await user.click(screen.getByRole('tab', { name: 'IA to Generate' }));
     await waitFor(() => expect(workbench).toHaveBeenLastCalledWith(1, 'IA_TO_GENERATE', '', 0));
   });

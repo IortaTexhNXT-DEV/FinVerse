@@ -20,10 +20,9 @@ screens:
       - "List | PRF No. | Column | PRF-yyyy-nnnnnn and the creation date | - | Numbering (PROPOSAL_NUMBER_PREFIX) | - | Read only | - | -"
       - "List | ARN | Column | ARN-yyyy-nnnnnn | - | Numbering | - | Read only | - | -"
       - "List | Client | Column | Name and code | - | Client master | - | Read only | - | -"
-      - "List | Product | Column | Product code | - | Product catalogue | - | Read only | - | -"
+      - "List | Product | Column | Product name | - | Product catalogue | - | Read only | - | -"
       - "List | Sum Insured | Column | Total sum insured | - | PRF items | - | Read only | - | -"
-      - "List | Slips | Column | QS-yyyy-nnnnnn / PS-yyyy-nnnnnn | - | Numbering | - | Read only | - | -"
-      - "List | Chosen Insurer | Column | Insurer of the proposal slip | - | Insurer responses | - | Read only | - | -"
+      - "List | Slips / Chosen Insurer | Column | QS-yyyy-nnnnnn / PS-yyyy-nnnnnn, with the insurer of the proposal slip under them | - | Numbering, insurer responses | - | Read only | - | -"
       - "List | Stage | Column | Stage badge | - | Workflow NB_PROPOSAL | - | Read only | - | -"
     actions:
       - "TSU Workbench | TSU_PROCESS or TSU_APPROVE | Always | Opens the TSU Workbench | - | -"
@@ -91,7 +90,7 @@ screens:
       - {state: qs, user: tsu, open: with_tsu, tab: "Quotation Slip", caption: "Quotation Slip tab: insurers approached"}
       - {state: responses, user: tsu, open: terms_received, tab: "Insurer Responses", caption: "Insurer Responses tab with the terms received"}
       - {state: comparative, user: tsu, open: terms_received, tab: "Comparative Table", caption: "Comparative Table tab"}
-      - {state: terms, user: tsu, open: terms_received, tab: "Insurer Responses", click: "^terms$", caption: "Terms dialog of one insurer"}
+      - {state: terms, user: tsu, open: terms_received, tab: "Insurer Responses", caption: "Terms dialog of one insurer, opened from the row action menu"}
     fields:
       - "Summary | Client, Product, Period, Total sum insured, Insurers, Slips | Display | - | - | PRF | - | Read only | - | -"
       - "Summary | TSU tag | Tag | The TSU routing reason on hover | - | TSU routing rules | - | Read only | - | -"
@@ -99,7 +98,7 @@ screens:
       - "Quotation Slip tab | Insurers approached | Check boxes | Active insurers of the panel | Y (at least one) | Insurer master | The insurers requested by Marketing | With TSU; quotation slip in preparation (TSU_PROCESS) | Insurers are chosen before the slip is submitted; each needs a placement e-mail address | Select at least one insurer of the panel for the quotation slip / <insurer> has no placement e-mail address"
       - "Quotation Slip tab | Quotation slip | Display | QS number, reply date, PDF per insurer | - | Numbering (QUOTATION_SLIP_PREFIX) | - | Read only | - | -"
       - "Quotation slip dialog | Insurers reply by | Date | dd-MMM-yyyy | N | - | Blank = today plus QUOTATION_SLIP_REPLY_DAYS (5) | Quotation slip in preparation | - | -"
-      - "Insurer Responses tab | Responses | Table | Insurer, Response, Premium, Rate %, Deductibles, Conditions, Valid Until, Document | - | Insurer responses | Pending per insurer | Read only (changed through the Terms dialog) | - | -"
+      - "Insurer Responses tab | Responses | Table | Insurer, Response (with the Recommended pill under it), Premium, Rate %, Deductibles, Conditions, Valid Until, Document, Actions | - | Insurer responses | Pending per insurer | Read only (changed through the Terms dialog of the row action menu) | - | -"
       - "Terms dialog | Response | Drop-down | Terms received, Declined to quote | Y | Fixed list | Terms received | Awaiting insurer terms; terms received (TSU_PROCESS) | Terms are keyed in after the quotation slip is sent | Insurer terms are keyed in after the quotation slip is sent"
       - "Terms dialog | Premium | Amount | 0 or more | Y when terms are received | - | Blank | As above | Needed for received terms | Enter the premium quoted"
       - "Terms dialog | Rate %, Valid until, Deductibles, Conditions, Remarks | Number / Date / Text | Rate 4 decimals | N | - | Blank | As above | - | -"
@@ -107,7 +106,7 @@ screens:
       - "Insurer Responses tab | Version history | Table | Changed, Response / Revision, Status, Premium, Valid Until, Recommended | - | Response history | - | Read only | - | -"
       - "Comparative Table tab | Comparative table | Table | Insurer, Response, Premium (lowest marked), Rate %, Deductibles, Conditions, Valid Until, Remarks | - | Insurer responses | - | Read only | - | -"
       - "Proposal slip dialog | Insurer of the proposal slip | Drop-down | Insurers with terms received, with premium; recommended marked | N | Insurer responses | The recommended insurer | Insurer terms received | An insurer with terms must be chosen or recommended | Choose the insurer (or flag the recommended one) for the proposal slip"
-      - "Proposal Slip tab | [Proposal slip and archived versions] | Display / Table | PS number and version, chosen insurer; File, Description, Archived, Download | - | Documents | - | Read only | - | -"
+      - "Proposal Slip tab | [Proposal slip and archived versions] | Display / Table | PS number and version, chosen insurer; File, Description, Archived (name and time), Download in the row action menu | - | Documents | - | Read only | - | -"
       - "Send via Email dialog | To, Cc, Subject, Message, Password hint | Text | As on the quotation | To, Subject and Message Y | Client e-mail; standard text | Insurance proposal <PS No.> – <product> | Proposal slip released | At least one valid address | Enter at least one recipient"
       - "Record Acceptance dialog | Client's acceptance e-mail, Risk groups accepted, Comment | File / Check boxes / Text area | As on the quotation | As on the quotation | - | - | Sent to client | The acceptance e-mail is attached first | Attach the client's acceptance e-mail first"
     actions:
@@ -121,7 +120,7 @@ screens:
       - "Submit quotation slip | TSU_PROCESS | Quotation slip in preparation | Asks for the reply date; numbers the quotation slip and sends it for approval | Quotation slip for approval | Workflow notice"
       - "Approve and send to insurers | TSU_APPROVE; not the preparer | Quotation slip for approval | Approves the slip and e-mails it to each insurer's placement address | Awaiting insurer terms | E-mail to each insurer; workflow notice"
       - "Return for correction | TSU_APPROVE | Quotation slip or proposal slip for approval | Asks for the return reason and a comment | Previous preparation stage | Workflow notice"
-      - "Terms / Recommend | TSU_PROCESS | Awaiting insurer terms; insurer terms received | Records or changes one insurer's terms (each change is a revision); marks the recommended insurer | Unchanged | -"
+      - "Terms / Recommend | TSU_PROCESS | Awaiting insurer terms; insurer terms received (row action menu) | Records or changes one insurer's terms (each change is a revision); marks the recommended insurer | Unchanged | -"
       - "Insurer terms complete | TSU_PROCESS | Awaiting insurer terms | Closes the request for terms; with the option ticked, closes it although insurers have not answered | Insurer terms received | Workflow notice"
       - "Submit proposal slip | TSU_PROCESS | Insurer terms received | Asks for the insurer of the slip; generates the proposal slip for approval | Proposal slip for approval | Workflow notice"
       - "Approve and release to Marketing | TSU_APPROVE; not the preparer | Proposal slip for approval | Releases the proposal slip to Marketing | Proposal slip released to Marketing | Workflow notice to the maker"
@@ -151,9 +150,9 @@ screens:
       - {state: list, user: tsu, caption: "TSU Workbench"}
     fields:
       - "Stage tiles | Received by TSU, Quotation slip in preparation, Quotation slip for approval, Awaiting insurer terms, Insurer terms received, Proposal slip for approval | Tile | Open and overdue counts | - | Workflow NB_PROPOSAL | - | - | A tile filters the list to its stage | -"
-      - "List | Reference, Description, Stage, From, In Stage, Due, Assignee | Column | Due in red when overdue | - | Work items | - | Read only | - | -"
+      - "List | Reference, Description, Stage, From, In Stage, Due, Assignee, Actions | Column | Stage with the workflow under it; From names the segment or sales unit; Due in red when overdue; Claim and Assign in the row action menu | - | Work items | - | Read only | - | -"
     actions:
-      - "Claim | Holder of the stage's permission | Unassigned item | Assigns the item to the user | Unchanged | -"
+      - "Claim | Holder of the stage's permission | Unassigned item (row action menu) | Assigns the item to the user | Unchanged | -"
       - "Assign | WORK_ASSIGN | Always | Opens the Assign dialog: a user of the stage's team, or back to the team queue | Unchanged | In-app notice to the new assignee"
       - "Open a row | Every user of the screen | Always | Opens the PRF record | - | -"
     rules:

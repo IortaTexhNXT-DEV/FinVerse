@@ -119,7 +119,7 @@ export default function BankReconciliationPage() {
               {
                 key: 'by',
                 header: 'Finalized by',
-                render: (r) => <UserName login={r.finalizedBy} empty="" />,
+                render: (r) => <UserName login={r.finalizedBy} />,
               },
             ]}
           />

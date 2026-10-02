@@ -20,6 +20,7 @@ import { SelectField } from './FormFields';
 import { newQuotation } from './policyForm';
 import { QuotationForm } from './QuotationForm';
 import { useUwLookups } from './useUwLookups';
+import { ProductName } from '@/components/broking/LovLabel';
 
 const STATUSES = ['DRAFT', 'PENDING_APPROVAL', 'APPROVED', 'REJECTED', 'CONVERTED', 'EXPIRED'].map(
   (s) => ({ value: s, label: s.replace('_', ' ') }),
@@ -121,7 +122,11 @@ export default function QuotationsPage() {
           columns={[
             { key: 'no', header: 'Quotation', render: (q) => <strong>{q.quotationNo}</strong> },
             { key: 'it', header: 'Iteration', numeric: true, render: (q) => q.currentIteration },
-            { key: 'prod', header: 'Product', render: (q) => q.productCode },
+            {
+              key: 'prod',
+              header: 'Product',
+              render: (q) => <ProductName withCode code={q.productCode} />,
+            },
             { key: 'ins', header: 'Insured', render: (q) => q.insuredName },
             { key: 'iss', header: 'Issued', render: (q) => formatDate(q.issueDate) },
             { key: 'exp', header: 'Valid Until', render: (q) => formatDate(q.expiryDate) },

@@ -13,6 +13,8 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
+import { RowActions } from '@/components/ui/RowActions';
+import { dispatchActions } from './issuanceRowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
@@ -153,18 +155,10 @@ function ReadyToDispatch({ companyId }: Readonly<{ companyId: number }>) {
           { key: 'file', header: 'E-policy', render: (r) => r.epolicyFile ?? '' },
           {
             key: 'send',
-            header: '',
-            render: (r) =>
-              sender && (
-                <Button
-                  size="sm"
-                  variant="secondary"
-                  icon={<Send size={14} />}
-                  onClick={() => setSingle(r)}
-                >
-                  Send
-                </Button>
-              ),
+            header: 'Actions',
+            render: (r) => (
+              <RowActions record={r.arn} actions={dispatchActions(sender, () => setSingle(r))} />
+            ),
           },
         ]}
       />

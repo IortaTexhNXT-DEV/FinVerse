@@ -8,6 +8,7 @@ import {
   selectionFor,
   tilesOf,
   WORKBENCH_TABS,
+  placementActionMessage,
 } from './placementLogic';
 
 const row = (arn: string, status: string, slipStatus?: string): WorkbenchRow => ({
@@ -88,5 +89,17 @@ describe('placement workbench logic', () => {
     expect(linesOf(lines, 'MATCHED')).toHaveLength(1);
     expect(candidatesOf(lines[1]!)).toEqual(['ARN-1', 'ARN-2']);
     expect(candidatesOf(lines[2]!)).toEqual([]);
+  });
+});
+
+describe('placementActionMessage', () => {
+  it('confirms each placement action in words with the ARN', () => {
+    expect(placementActionMessage('insurer_return', 'ARN-2026-910001')).toBe(
+      'ARN-2026-910001 returned by the insurer',
+    );
+    expect(placementActionMessage('resubmit', 'ARN-2026-910001')).toBe(
+      'ARN-2026-910001 resubmitted for placement',
+    );
+    expect(placementActionMessage('other', 'ARN-2026-910001')).toBe('ARN-2026-910001 updated');
   });
 });

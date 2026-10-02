@@ -39,7 +39,12 @@ function Lines({ reportNo }: Readonly<{ reportNo: string }>) {
           { key: 'row', header: 'Row', kind: 'amount', render: (l) => l.rowNo },
           { key: 'pn', header: 'PN', kind: 'code', render: (l) => l.pnNo },
           { key: 'borrower', header: 'Borrower', render: (l) => l.borrower ?? '' },
-          { key: 'status', header: 'Loan status', render: (l) => l.status },
+          {
+            key: 'status',
+            header: 'Loan Status',
+            kind: 'status',
+            render: (l) => <StatusBadge status={l.status} />,
+          },
           {
             key: 'date',
             header: 'Status date',

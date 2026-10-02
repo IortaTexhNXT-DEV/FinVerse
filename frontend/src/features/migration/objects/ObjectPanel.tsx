@@ -31,7 +31,7 @@ const HISTORY: Column<Decision>[] = [
   {
     key: 'decidedBy',
     header: 'Decided by',
-    render: (d) => <UserName login={d.decidedBy} empty="" />,
+    render: (d) => <UserName login={d.decidedBy} />,
   },
   { key: 'reason', header: 'Return reason', render: (d) => d.returnReason ?? '' },
   {

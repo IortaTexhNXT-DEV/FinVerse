@@ -22,6 +22,7 @@ import { currentCycleOf, useCycleList } from '../common/useCycleList';
 import { useEbMutation } from '../common/useEbMutation';
 import { savedRecommendation } from '../comparative/comparativeSteps';
 import { ConfirmationDialog } from './ConfirmationDialog';
+import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
 
 type Line = Confirmation['lines'][number];
 
@@ -30,8 +31,12 @@ const VOIDABLE = new Set(['CONFIRMED', 'THRESHOLD_APPROVAL']);
 
 const LINE_COLUMNS: Column<Line>[] = [
   { key: 'line', header: 'Line', kind: 'center', render: (l) => l.lineNo },
-  { key: 'benefit', header: 'Benefit Line', render: (l) => l.benefitLine },
-  { key: 'insurer', header: 'Insurer', kind: 'code', render: (l) => l.insurerCode },
+  {
+    key: 'benefit',
+    header: 'Benefit Line',
+    render: (l) => <LovLabel type="EB_BENEFIT_LINE" code={l.benefitLine} />,
+  },
+  { key: 'insurer', header: 'Insurer', render: (l) => <InsurerName code={l.insurerCode} /> },
   {
     key: 'premium',
     header: 'Annual Premium',

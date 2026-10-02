@@ -1,4 +1,6 @@
 import { PeriodCell } from '@/components/ui/PeriodCell';
+import { UserName } from '@/components/ui/UserName';
+import { SalesUnitName } from '@/components/broking/LovLabel';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -24,7 +26,17 @@ import { InBaseCurrency } from '@/components/ui/InBaseCurrency';
 import { inCurrency } from '@/utils/currencyLabel';
 
 const COLUMNS: Column<SalesTarget>[] = [
-  { key: 'unit', header: 'Unit', render: (t) => t.unitCode },
+  {
+    key: 'unit',
+    header: 'Unit',
+    // A sales unit by its name; an account officer by the user's name.
+    render: (t) =>
+      t.unitLevel === 'OFFICER' ? (
+        <UserName login={t.unitCode} />
+      ) : (
+        <SalesUnitName code={t.unitCode} />
+      ),
+  },
   {
     key: 'period',
     header: 'Period',

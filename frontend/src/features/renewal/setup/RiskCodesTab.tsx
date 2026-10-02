@@ -17,6 +17,7 @@ import { formatDate } from '@/utils/format';
 import { ApprovalCell } from './setupBits';
 import { pending } from './setupCodes';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 function blankToUndefined(value: string): string | undefined {
   return value.trim() === '' ? undefined : value.trim();
@@ -165,7 +166,11 @@ export function RiskCodesTab() {
         emptyMessage="No non-renewable risk codes"
         columns={[
           { key: 'code', header: 'Risk Code', kind: 'code', render: (r) => r.riskCode },
-          { key: 'line', header: 'Line', render: (r) => r.lineCode ?? 'All' },
+          {
+            key: 'line',
+            header: 'Line',
+            render: (r) => (r.lineCode ? <LineLabel code={r.lineCode} /> : 'All'),
+          },
           { key: 'reason', header: 'Reason', render: (r) => r.reason },
           { key: 'from', header: 'From', kind: 'date', render: (r) => formatDate(r.effectiveFrom) },
           { key: 'to', header: 'To', kind: 'date', render: (r) => formatDate(r.effectiveTo) },

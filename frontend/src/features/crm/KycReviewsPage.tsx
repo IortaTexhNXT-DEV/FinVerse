@@ -179,7 +179,7 @@ export default function KycReviewsPage() {
             {
               key: 'segment',
               header: 'Segment',
-              render: (c) => <LovLabel type="MARKET_SEGMENT" code={c.marketSegment} empty="" />,
+              render: (c) => <LovLabel type="MARKET_SEGMENT" code={c.marketSegment} />,
             },
             {
               key: 'risk',

@@ -53,6 +53,40 @@ class SignoffCorrectionsIT {
   }
 
   @Test
+  void seedOnboardingHistoryCarriesBusinessRemarks() {
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from wf_case_history h join wf_case w on w.id = h.case_id"
+                    + " where w.workflow_code = 'NB_CLIENT' and h.comment like 'Seed %'",
+                Integer.class))
+        .isZero();
+    assertThat(
+            jdbc.queryForList(
+                "select distinct h.comment from wf_case_history h join wf_case w on w.id = h.case_id"
+                    + " where w.workflow_code = 'NB_CLIENT' and h.action = 'submit_kyc'"
+                    + " and h.comment is not null",
+                String.class))
+        .contains("KYC form and valid ID uploaded");
+  }
+
+  @Test
+  void newBusinessWorkItemsNameTheProduct() {
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from wf_case w join cat_product p on w.title like '% - ' || p.code"
+                    + " where w.workflow_code in ('NB_QUOTATION', 'NB_PROPOSAL', 'NB_ACCOUNT')"
+                    + " and p.name <> p.code",
+                Integer.class))
+        .isZero();
+    assertThat(
+            jdbc.queryForObject(
+                "select count(*) from wf_case w where w.workflow_code = 'NB_ACCOUNT'"
+                    + " and w.title like '% - Motor Comprehensive Package MTR10'",
+                Integer.class))
+        .isPositive();
+  }
+
+  @Test
   void seedClientsAreDistinctAndHaveRealisticAddresses() {
     assertThat(
             jdbc.queryForList(

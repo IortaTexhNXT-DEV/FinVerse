@@ -100,7 +100,12 @@ export default function ClientsPage() {
           onRowClick={open}
           emptyMessage="No items to display"
           columns={[
-            { key: 'code', header: 'Code', render: (c) => <span className="mono">{c.code}</span> },
+            {
+              key: 'code',
+              header: 'Code',
+              kind: 'code',
+              render: (c) => <span className="mono">{c.code}</span>,
+            },
             {
               key: 'name',
               header: 'Name',
@@ -115,7 +120,7 @@ export default function ClientsPage() {
             {
               key: 'segment',
               header: 'Segment',
-              render: (c) => <LovLabel type="MARKET_SEGMENT" code={c.marketSegment} empty="" />,
+              render: (c) => <LovLabel type="MARKET_SEGMENT" code={c.marketSegment} />,
             },
             { key: 'bank', header: 'Bank', render: (c) => (c.bankClient ? 'Yes' : 'No') },
             { key: 'status', header: 'Status', render: (c) => <StatusBadge status={c.status} /> },

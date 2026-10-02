@@ -17,6 +17,7 @@ import { useWorkspace } from '@/context/workspaceContext';
 import { DateField, SelectField, TextField } from '@/features/underwriting/FormFields';
 import { formatDate } from '@/utils/format';
 import { useClaimLookups } from './useClaimLookups';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 type Filters = Omit<ClaimFilters, 'companyId'>;
 
@@ -114,7 +115,11 @@ export default function ClaimsPage() {
             { key: 'no', header: 'Claim No.', render: (c) => <strong>{c.claimNo}</strong> },
             { key: 'pol', header: 'Policy', render: (c) => c.policyNo },
             { key: 'ins', header: 'Insured', render: (c) => c.insuredName },
-            { key: 'lob', header: 'Class', render: (c) => c.businessLine },
+            {
+              key: 'lob',
+              header: 'Class',
+              render: (c) => (c.businessLine ? <LineLabel code={c.businessLine} /> : ''),
+            },
             { key: 'loss', header: 'Loss Date', render: (c) => formatDate(c.lossDate) },
             { key: 'nat', header: 'Nature', render: (c) => c.natureOfLoss },
             { key: 'ccy', header: 'Ccy', render: (c) => c.currency },

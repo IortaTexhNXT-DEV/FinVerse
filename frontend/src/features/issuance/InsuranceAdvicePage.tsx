@@ -1,5 +1,5 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { FileBadge, FileText, Send } from 'lucide-react';
+import { FileBadge, Send } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { issuanceApi } from '@/api/issuance';
@@ -15,6 +15,8 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
+import { RowActions } from '@/components/ui/RowActions';
+import { adviceActions } from './issuanceRowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
@@ -132,16 +134,12 @@ export default function InsuranceAdvicePage() {
             },
             {
               key: 'pdf',
-              header: '',
+              header: 'Actions',
               render: (a) => (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  icon={<FileText size={14} />}
-                  onClick={() => download.mutate(() => issuanceApi.adviceFile(a.id))}
-                >
-                  PDF
-                </Button>
+                <RowActions
+                  record={a.iaNo}
+                  actions={adviceActions(() => download.mutate(() => issuanceApi.adviceFile(a.id)))}
+                />
               ),
             },
           ]}

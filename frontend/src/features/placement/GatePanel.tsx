@@ -125,7 +125,7 @@ export function GatePanel({ gate, onChanged }: Readonly<{ gate: Gate; onChanged:
           <dd>
             <StatusBadge status={gate.open ? 'OPEN' : 'PENDING'} /> {humanize(gate.paymentStatus)}
             {gate.paymentSource !== undefined && (
-              <span className="muted"> · {gate.paymentSource}</span>
+              <span className="muted"> · {humanize(gate.paymentSource)}</span>
             )}
           </dd>
           <dt>Segment / line</dt>

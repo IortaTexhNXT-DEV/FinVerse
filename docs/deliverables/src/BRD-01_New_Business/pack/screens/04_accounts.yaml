@@ -30,9 +30,9 @@ screens:
       - "Filters | Include Voided | Check box | - | N | - | Not ticked | - | Voided accounts are hidden unless ticked | -"
       - "List | ARN | Column | ARN-yyyy-nnnnnn, copy chip | - | Numbering | - | Read only | - | -"
       - "List | Client | Column | Name and client code, or Prospect | - | Client master | - | Read only | - | -"
-      - "List | Product / Insurer / Period / Gross Premium | Column | Period dd-MMM-yyyy – dd-MMM-yyyy | - | Account | - | Read only | - | -"
-      - "List | Status | Column | Stage badge | - | Workflow NB_ACCOUNT | - | Read only | - | -"
-      - "List | Flags | Column | FFY, Direct Payment | - | Account tags | - | Read only | - | -"
+      - "List | Product / Insurer | Column | Product name with the insurer's name (or To be advised) under it | - | Account | - | Read only | - | -"
+      - "List | Period / Gross Premium | Column | Period dd-MMM-yyyy – dd-MMM-yyyy; amount with 2 decimals | - | Account | - | Read only | - | -"
+      - "List | Status / Flags | Column | Stage badge with the FFY and Direct Payment tags under it | - | Workflow NB_ACCOUNT, account tags | - | Read only | - | -"
       - "List | Officer | Column | Account Officer | - | Sales organisation | - | Read only | - | -"
     actions:
       - "Bulk Upload | ACCOUNT_MAINTAIN and BULK_PROCESS | Always | Opens the Bulk Account Creation upload | - | -"

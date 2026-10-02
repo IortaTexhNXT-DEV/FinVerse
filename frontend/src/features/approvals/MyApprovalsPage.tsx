@@ -12,9 +12,10 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
-import { countOf, formatDateTime, humanize } from '@/utils/format';
+import { countOf, formatDateTime, titleCase } from '@/utils/format';
 import { ageInDays, oldestAge } from './age';
 import { UserName } from '@/components/ui/UserName';
+import { moduleLabel } from '@/utils/businessLabels';
 
 /**
  * Universal approval inbox: everything waiting for the signed-in user's authorization across
@@ -64,7 +65,7 @@ export default function MyApprovalsPage() {
         {modules.map((m) => (
           <Kpi
             key={m}
-            label={humanize(m)}
+            label={moduleLabel(m)}
             value={items.filter((i) => i.module === m).length}
             hint={`Oldest ${countOf(oldestAge(items.filter((i) => i.module === m).map((i) => i.submittedAt)), 'day')}`}
           />
@@ -82,8 +83,8 @@ export default function MyApprovalsPage() {
             }
           }}
           columns={[
-            { key: 'm', header: 'Module', render: (i) => humanize(i.module) },
-            { key: 't', header: 'Type', render: (i) => i.type },
+            { key: 'm', header: 'Module', render: (i) => moduleLabel(i.module) },
+            { key: 't', header: 'Type', render: (i) => titleCase(i.type) },
             { key: 'r', header: 'Reference', render: (i) => <strong>{i.reference}</strong> },
             { key: 'd', header: 'Description', render: (i) => i.description ?? '' },
             {
@@ -102,7 +103,7 @@ export default function MyApprovalsPage() {
             {
               key: 'b',
               header: 'Submitted by',
-              render: (i) => <UserName login={i.submittedBy} empty="" />,
+              render: (i) => <UserName login={i.submittedBy} />,
             },
             { key: 's', header: 'Submitted', render: (i) => formatDateTime(i.submittedAt) },
             {

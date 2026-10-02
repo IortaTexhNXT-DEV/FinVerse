@@ -13,6 +13,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDate, formatDateTime } from '@/utils/format';
 import { ageInDays } from './versionForm';
 import { UserName } from '@/components/ui/UserName';
+import { CellStack } from '@/components/ui/CellStack';
 
 /**
  * Validation Queue (PMADD06): package versions submitted by MBS and waiting for the post-set-up
@@ -53,8 +54,11 @@ export default function ValidationQueuePage() {
               void navigate(`/catalog/products/${v.productCode}/versions/${v.versionNo}`)
             }
             columns={[
-              { key: 'p', header: 'Product', render: (v) => <strong>{v.productCode}</strong> },
-              { key: 'n', header: 'Name', render: (v) => v.productName },
+              {
+                key: 'p',
+                header: 'Product',
+                render: (v) => <CellStack main={v.productName} sub={v.productCode} />,
+              },
               { key: 'v', header: 'Version', render: (v) => `v${v.versionNo}` },
               { key: 's', header: 'Status', render: (v) => <StatusBadge status={v.status} /> },
               { key: 'e', header: 'Effective From', render: (v) => formatDate(v.effectiveFrom) },
@@ -62,7 +66,7 @@ export default function ValidationQueuePage() {
               {
                 key: 'b',
                 header: 'Submitted By',
-                render: (v) => <UserName login={v.submittedBy} empty="" />,
+                render: (v) => <UserName login={v.submittedBy} />,
               },
               { key: 'a', header: 'Submitted', render: (v) => formatDateTime(v.submittedAt) },
               {

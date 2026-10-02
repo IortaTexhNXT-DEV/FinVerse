@@ -161,7 +161,7 @@ const COLUMNS: Column<AccessRequest>[] = [
   {
     key: 'approver',
     header: 'Approver',
-    render: (r) => <UserName login={r.lifecycle.assignedApprover ?? r.decidedBy} empty="" />,
+    render: (r) => <UserName login={r.lifecycle.assignedApprover ?? r.decidedBy} />,
   },
   {
     key: 'status',

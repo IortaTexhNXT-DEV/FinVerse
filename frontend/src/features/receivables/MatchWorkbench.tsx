@@ -10,7 +10,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDate } from '@/utils/format';
+import { formatAmount, formatDate, humanize } from '@/utils/format';
 import { selectionBalance } from './receivablesMath';
 import { UserName } from '@/components/ui/UserName';
 
@@ -195,7 +195,7 @@ export function MatchWorkbench({ companyId, bank, asOf }: Readonly<WorkbenchProp
           caption="Matches"
           columns={[
             { key: 'id', header: 'Match', render: (m) => `#${m.id}` },
-            { key: 'method', header: 'Method', render: (m) => m.method },
+            { key: 'method', header: 'Method', render: (m) => humanize(m.method) },
             { key: 'date', header: 'Date', render: (m) => formatDate(m.matchDate) },
             {
               key: 'amt',

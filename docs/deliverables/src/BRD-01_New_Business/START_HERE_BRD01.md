@@ -10,13 +10,13 @@ brd: BRD-01
 name: New Business
 doc_id: BIBS-SH-BRD-01
 version: "2.0"
-date: 27 September 2026
+date: 1 October 2026
 status: Issued for BDOI business sign-off
 header_title: Start Here BRD-1 New Business
 h1_page_break: false
 control:
   - version: "2.0"
-    date: 27 Sep 2026
+    date: 1 Oct 2026
     author: iorta TechNXT Project Manager
     reviewer: iorta TechNXT Business Analysis
     approver: ""
@@ -52,7 +52,7 @@ source: pack/pack.yaml
 render: guide-reading
 ```
 
-SIT users of the seed data for the review: ao and mkttl (Marketing), tsu (TSU), proc, proctl and epol (Processing), badmin (Business Administration). The passwords are sent separately to the named reviewers.
+SIT users of the seed data for the review: ao and mkttl (Marketing), tsu and tsulead (TSU), proc, proctl and epol (Processing), approver (New Business Approver), adjust (Adjustment), badmin (Business Administration), admin (System Administrator) and auditor. The passwords are sent separately to the named reviewers.
 
 # Steps up to closure
 

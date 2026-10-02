@@ -9,6 +9,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate } from '@/utils/format';
+import { CoverTypeLabel } from '@/components/broking/LovLabel';
 
 interface Props {
   lpos: Lpo[];
@@ -39,7 +40,7 @@ export function LpoTable({
     { key: 'no', header: 'LPO No.', render: (l: Lpo) => <strong>{l.lpoNo}</strong> },
     ...(showClaim ? [{ key: 'claim', header: 'Claim', render: (l: Lpo) => l.claimNo }] : []),
     { key: 'garage', header: 'Garage', render: (l: Lpo) => l.garageName },
-    { key: 'cover', header: 'Cover', render: (l: Lpo) => l.coverType },
+    { key: 'cover', header: 'Cover', render: (l: Lpo) => <CoverTypeLabel code={l.coverType} /> },
     { key: 'date', header: 'Issued', render: (l: Lpo) => formatDate(l.issueDate) },
     {
       key: 'gross',

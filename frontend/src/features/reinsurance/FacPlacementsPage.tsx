@@ -14,6 +14,7 @@ import { today } from '@/utils/format';
 import { ageInDays } from './fac';
 import { FacSlipDialog } from './FacSlipDialog';
 import { useRiLookups } from './useRiLookups';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 type Filter = FacStatus | 'ALL';
 
@@ -59,7 +60,11 @@ export default function FacPlacementsPage() {
           columns={[
             { key: 'n', header: 'Placement', render: (p) => <strong>{p.placementNo}</strong> },
             { key: 'p', header: 'Policy', render: (p) => p.policyNo },
-            { key: 'l', header: 'Class', render: (p) => p.businessLine },
+            {
+              key: 'l',
+              header: 'Class',
+              render: (p) => (p.businessLine ? <LineLabel code={p.businessLine} /> : ''),
+            },
             { key: 'r', header: 'Risk', render: (p) => `${p.riskLineNo} ${p.riskDescription}` },
             {
               key: 'si',

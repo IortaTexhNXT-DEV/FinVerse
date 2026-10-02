@@ -42,24 +42,25 @@ const NEXT = click('^next$');
 
 const newClient = [
   ['Client type', 'Individual'],
-  ['Last name', 'Bautista'],
-  ['First name', 'Carmela'],
-  ['Middle name', 'Reyes'],
+  // A person the walkthroughs do not create, so the form shows no duplicate warning.
+  ['Last name', 'Mercado'],
+  ['First name', 'Josefina'],
+  ['Middle name', 'Alvarez'],
   ['Birth date', '14-Mar-1988'],
   ['Nationality', 'Filipino'],
   ['Civil status', 'Married'],
   ['Occupation', 'Architect'],
-  ['TIN', '417-238-906-000'],
+  ['TIN', '417-238-990-000'],
   ['ID type', 'Passport'],
-  ['ID number', 'P4172389A'],
-  ['E-mail', 'carmela.bautista@seed-client.ph'],
-  ['Mobile', '09175550417'],
+  ['ID number', 'P4172399Z'],
+  ['E-mail', 'josefina.mercado@seed-client.ph'],
+  ['Mobile', '09175550499'],
   ['Street address', '12 Mabini Street, Barangay San Antonio'],
   ['City / municipality', 'Pasig City'],
   ['Province', 'Metro Manila'],
   ['Postal code', '1605'],
   ['Market segment', 'CBG'],
-  ['The client banks with BDO', true],
+  ['The client banks with the group bank', true],
   ['BDO CIF number', '0041723890'],
   ['Source of funds', 'Salary'],
 ];
@@ -188,7 +189,26 @@ const fills = {
 // ------------------------------------------------------------------ records by status
 
 const opens = {
-  kyc_review: (ctx) => `/crm/clients/${ctx.one("select id from crm_client where onboarding_stage = 'KYC_REVIEW' order by id limit 1")}`,
+  // A client in KYC review. Walkthrough C (step 2) returns the seeded one to the Account Officer; when it ran first,
+  // the Account Officer submits that client's KYC again (its documents are on file).
+  kyc_review: async (ctx) => {
+    const q = "select id from crm_client where onboarding_stage = 'KYC_REVIEW' order by id limit 1";
+    if (ctx.sql(q).length === 0) {
+      const id = ctx.one("select id from crm_client where prospect_code = 'PR-2026-000007' and onboarding_stage = 'PROSPECT'");
+      await ctx.api('ao', 'POST', `/crm/clients/${id}/submit-kyc`, { comment: 'Current valid ID uploaded' });
+    }
+    return `/crm/clients/${ctx.one(q)}`;
+  },
+  // A quotation for review made by someone other than the approver (the one walkthrough C-03 makes is the approver's).
+  // When walkthrough C returned the seeded one, the Account Officer submits the seeded draft QT-2026-900001 again.
+  for_review_by_other: async (ctx) => {
+    const q = "select id from quo_quotation where status = 'FOR_REVIEW' and created_by <> 'mkttl' order by id limit 1";
+    if (ctx.sql(q).length === 0) {
+      const id = ctx.one("select id from quo_quotation where quotation_no = 'QT-2026-900001' and status = 'DRAFT'");
+      await ctx.api('ao', 'POST', `/quotations/${id}/submit`, { comment: 'Comprehensive cover with acts of nature' });
+    }
+    return `/quotations/${ctx.one(q)}`;
+  },
   approved: (ctx) => `/quotations/${ctx.one("select id from quo_quotation where status = 'APPROVED' order by id limit 1")}`,
   with_tsu: (ctx) => `/proposals/${ctx.one("select id from npk_proposal where status = 'WITH_TSU' order by id limit 1")}`,
   terms_received: (ctx) => `/proposals/${ctx.one("select id from npk_proposal where status = 'TERMS_RECEIVED' order by id limit 1")}`,
@@ -212,7 +232,46 @@ const selects = {
 };
 
 // Extra steps after the standard ones, by slug.
-const after = {};
+const after = {
+  // UX deck: a search that finds nothing.
+  'ux-scr-nb-01-empty': async (page) => {
+    await page.getByPlaceholder(/^search/i).first().fill('Zamboanga Lighthouse Holdings');
+    await page.keyboard.press('Enter');
+    await page.waitForLoadState('networkidle').catch(() => {});
+    await page.waitForTimeout(1200);
+  },
+  // The Assign dialog of a team leader, from the row action menu of the first item.
+  'scr-nb-38-02-assign': async (page) => {
+    await walkthrough.rowAction(page.locator('main table tbody tr').first(), /^assign$/i);
+    await page.waitForTimeout(800);
+  },
+  // The terms dialog of the first insurer, from the row action menu.
+  'scr-nb-11-05-terms': async (page) => {
+    await walkthrough.rowAction(page.locator('main table tbody tr').first(), /^terms$/i);
+    await page.waitForTimeout(800);
+  },
+  // The Close dialog of the first new request, from the row action menu.
+  'scr-nb-08-03-close': async (page) => {
+    await walkthrough.rowAction(page.locator('main table tbody tr').first(), /^close$/i);
+    await page.waitForTimeout(800);
+  },
+  // The send dialog of the first sent slip (Resend), from the row action menu.
+  'scr-nb-20-02-send': async (page) => {
+    const row = page.locator('main table tbody tr').filter({ hasText: 'Sent' }).first();
+    await walkthrough.rowAction(row, /^resend$/i);
+    await page.waitForTimeout(1200);
+  },
+  // The Match Row dialog of the first unmatched line, from the row action menu.
+  'scr-nb-22-02-match': async (page) => {
+    await walkthrough.rowAction(page.locator('main table tbody tr').first(), /^match$/i);
+    await page.waitForTimeout(800);
+  },
+  // UX deck: the row action menu of the first request, opened.
+  'ux-scr-nb-08-actions': async (page) => {
+    await page.locator('main table tbody tr').first().getByRole('button', { name: /^Actions for/ }).click();
+    await page.waitForTimeout(400);
+  },
+};
 
 // Shots kept as the whole window (menu and header give the navigation context); every other shot is cropped to
 // its dialog or content area (capture_pack.cjs, cropOf).

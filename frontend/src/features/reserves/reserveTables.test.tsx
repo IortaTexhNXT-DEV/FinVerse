@@ -1,3 +1,4 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen } from '@testing-library/react';
 import type { TriangleData } from '@/api/reserves';
 import { RESERVES_HELP } from './help';
@@ -71,7 +72,7 @@ describe('reserve tables', () => {
       },
     ];
     render(
-      <>
+      <QueryClientProvider client={new QueryClient()}>
         <TotalsTable
           totals={[{ type: 'UPR', label: 'Unearned premium', gross: 5, ri: 1, net: 4 }]}
         />
@@ -109,10 +110,12 @@ describe('reserve tables', () => {
             },
           ]}
         />
-      </>,
+      </QueryClientProvider>,
     );
     expect(screen.getByText('Unearned premium')).toBeInTheDocument();
-    expect(screen.getByText('IBNR_CHANGE')).toBeInTheDocument();
+    expect(screen.getByText('IBNR Change')).toBeInTheDocument();
+    expect(screen.getByText('IBNR Provision')).toBeInTheDocument();
+    expect(screen.queryByText('IBNR_CHANGE')).toBeNull();
     expect(screen.getByText('P-1')).toBeInTheDocument();
     expect(screen.getByText('Rate')).toBeInTheDocument();
   });

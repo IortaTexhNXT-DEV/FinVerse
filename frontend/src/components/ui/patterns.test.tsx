@@ -177,7 +177,7 @@ describe('HistoryTable', () => {
 
   it('computes the time spent in each stage', () => {
     const rows = historyRows(HISTORY, true);
-    expect(rows.map((r) => r.duration)).toEqual(['30m', '1h 2m', '']);
+    expect(rows.map((r) => r.duration)).toEqual(['30 min', '1 hr 2 min', '']);
   });
 
   it('shows an empty state without history', () => {

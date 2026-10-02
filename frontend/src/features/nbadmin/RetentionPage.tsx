@@ -9,7 +9,9 @@ import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { retentionActions } from './retentionActions';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { EligibleDialog, RuleDialog } from './RetentionDialogs';
@@ -97,18 +99,16 @@ export default function RetentionPage() {
             { key: 'eligible', header: 'Eligible Records', render: eligibleText },
             {
               key: 'actions',
-              header: '',
+              header: 'Actions',
               render: (r) => (
-                <div className="row">
-                  <Button size="sm" variant="ghost" onClick={() => setDrill(r)}>
-                    Records
-                  </Button>
-                  {maintain && (
-                    <Button size="sm" variant="ghost" onClick={() => setEditing(r)}>
-                      Edit
-                    </Button>
+                <RowActions
+                  record={humanize(r.recordType)}
+                  actions={retentionActions(
+                    maintain,
+                    () => setDrill(r),
+                    () => setEditing(r),
                   )}
-                </div>
+                />
               ),
             },
           ]}

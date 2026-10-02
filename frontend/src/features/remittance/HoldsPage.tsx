@@ -51,7 +51,7 @@ const COLUMNS: Column<Hold>[] = [
   {
     key: 'proc',
     header: 'Processor',
-    render: (h) => <UserName login={h.assignedProcessor} empty="" />,
+    render: (h) => <UserName login={h.assignedProcessor} />,
   },
   { key: 'stage', header: 'Status', render: (h) => <StatusBadge status={holdStatus(h.stage)} /> },
 ];

@@ -1,3 +1,4 @@
+import type { RowAction } from '@/components/ui/RowActions';
 import type { LovValue, LovValueRequest } from '@/api/lov';
 
 export interface LovForm {
@@ -78,4 +79,24 @@ export function effectivity(v: LovValue, today: string): 'FUTURE' | 'ACTIVE' | '
     return 'FUTURE';
   }
   return v.effectiveTo !== undefined && v.effectiveTo < today ? 'EXPIRED' : 'ACTIVE';
+}
+
+export type LovAction = 'edit' | 'deactivate' | 'authorize';
+
+/**
+ * The row actions of a list value: Authorize for its checker; Edit and Deactivate (a reversing
+ * action: last, in red) for a user who maintains the list while the value is not inactive.
+ */
+export function valueActions(
+  v: LovValue,
+  manage: boolean,
+  authorize: boolean,
+  on: (action: LovAction) => void,
+): RowAction[] {
+  const editable = manage && v.status !== 'INACTIVE';
+  return [
+    { label: 'Authorize', hidden: !authorize, onSelect: () => on('authorize') },
+    { label: 'Edit', hidden: !editable, onSelect: () => on('edit') },
+    { label: 'Deactivate', hidden: !editable, danger: true, onSelect: () => on('deactivate') },
+  ];
 }

@@ -4,6 +4,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { formatDate, formatRate, humanize } from '@/utils/format';
 import { reserveLabel, summarizeLines } from './reserveMath';
 import type { LineSummary } from './reserveMath';
+import { LineLabel, ProductName } from '@/components/broking/LovLabel';
 
 const GROSS = 'Gross';
 const RI_SHARE = 'RI share';
@@ -39,7 +40,11 @@ export function LineSummaryTable({ lines }: Readonly<{ lines: ReserveLine[] }>) 
       rowKey={(s) => s.key}
       columns={[
         { key: 't', header: 'Reserve', render: (s) => reserveLabel(s.type) },
-        { key: 'l', header: 'Line of Business', render: (s) => s.businessLine },
+        {
+          key: 'l',
+          header: 'Line of Business',
+          render: (s) => (s.businessLine ? <LineLabel code={s.businessLine} /> : ''),
+        },
         { key: 'g', header: GROSS, numeric: true, render: (s) => <Amount value={s.gross} /> },
         { key: 'r', header: RI_SHARE, numeric: true, render: (s) => <Amount value={s.ri} /> },
         { key: 'n', header: NET, numeric: true, render: (s) => <Amount value={s.net} /> },
@@ -57,8 +62,16 @@ export function LinesTable({ lines }: Readonly<{ lines: ReserveLine[] }>) {
       columns={[
         { key: 't', header: 'Reserve', render: (l) => l.type },
         { key: 'b', header: 'Branch', render: (l) => l.branchCode },
-        { key: 'l', header: 'Line', render: (l) => l.businessLine },
-        { key: 'p', header: 'Product', render: (l) => l.productCode },
+        {
+          key: 'l',
+          header: 'Line',
+          render: (l) => (l.businessLine ? <LineLabel code={l.businessLine} /> : ''),
+        },
+        {
+          key: 'p',
+          header: 'Product',
+          render: (l) => <ProductName withCode code={l.productCode} />,
+        },
         { key: 's', header: 'Channel', render: (l) => humanize(l.sourceType) },
         { key: 'm', header: 'Method', render: (l) => (l.method ? humanize(l.method) : '') },
         { key: 'x', header: 'Base', numeric: true, render: (l) => <Amount value={l.base} /> },
@@ -80,9 +93,13 @@ export function MovementsTable({ movements }: Readonly<{ movements: ReserveMovem
       emptyMessage="No movement against the previous posted run."
       columns={[
         { key: 'b', header: 'Branch', render: (m) => m.branchCode },
-        { key: 'l', header: 'Line', render: (m) => m.businessLine },
-        { key: 'e', header: 'Accounting Event', render: (m) => m.eventType },
-        { key: 'c', header: 'Component', render: (m) => m.component },
+        {
+          key: 'l',
+          header: 'Line',
+          render: (m) => (m.businessLine ? <LineLabel code={m.businessLine} /> : ''),
+        },
+        { key: 'e', header: 'Accounting Event', render: (m) => humanize(m.eventType) },
+        { key: 'c', header: 'Component', render: (m) => humanize(m.component) },
         { key: 'a', header: 'Movement', numeric: true, render: (m) => <Amount value={m.amount} /> },
       ]}
     />

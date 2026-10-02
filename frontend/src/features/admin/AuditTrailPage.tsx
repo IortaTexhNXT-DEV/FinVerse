@@ -8,10 +8,11 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
-import { formatDateTime, today } from '@/utils/format';
+import { formatDateTime, humanize, today } from '@/utils/format';
 import { AuditExportButtons } from './AuditExportButtons';
 import { DateInput } from '@/components/ui/DateInput';
 import { UserName } from '@/components/ui/UserName';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 
 /** Audit trail inquiry: originator, modifier and authorizer activity with timestamps. */
 export default function AuditTrailPage() {
@@ -80,14 +81,20 @@ export default function AuditTrailPage() {
           rows={data?.content ?? []}
           rowKey={(a) => a.id}
           columns={[
-            { key: 't', header: 'When', render: (a) => formatDateTime(a.occurredAt) },
+            {
+              key: 't',
+              header: 'When',
+              kind: 'datetime',
+              render: (a) => formatDateTime(a.occurredAt),
+            },
             { key: 'u', header: 'User', render: (a) => <UserName login={a.username} /> },
             {
               key: 'a',
               header: 'Action',
-              render: (a) => <span className="badge">{a.action}</span>,
+              kind: 'status',
+              render: (a) => <StatusBadge status={a.action} tone="neutral" />,
             },
-            { key: 'e', header: 'Entity', render: (a) => a.entityType },
+            { key: 'e', header: 'Record Type', render: (a) => humanize(a.entityType) },
             { key: 'k', header: 'Reference', render: (a) => a.entityId ?? '' },
             { key: 's', header: 'Details', render: (a) => a.summary },
           ]}

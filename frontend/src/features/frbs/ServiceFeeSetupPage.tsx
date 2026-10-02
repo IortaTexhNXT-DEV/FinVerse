@@ -17,16 +17,21 @@ import type { ServiceFeeRecipient, ServiceFeeRule } from './api';
 import { RecipientDialog, RuleDialog } from './SetupDialogs';
 import './frbs.css';
 import { formatRate } from '@/utils/format';
+import { LovLabel, LovLabels } from '@/components/broking/LovLabel';
 
 const RULE_COLUMNS: Column<ServiceFeeRule>[] = [
   {
     key: 'segment',
     header: 'Segment',
     render: (r) => (
-      <>
-        <strong>{r.segment}</strong>
-        <span className="cell-sub">{r.marketSegments.join(', ')}</span>
-      </>
+      <span className="cell-stack">
+        <span>
+          <LovLabel type="SERVICE_FEE_SEGMENT" code={r.segment} />
+        </span>
+        <span className="muted">
+          <LovLabels type="MARKET_SEGMENT" codes={r.marketSegments} empty="" />
+        </span>
+      </span>
     ),
   },
   { key: 'rate', header: 'Rate', numeric: true, render: (r) => `${formatRate(r.rate)}%` },

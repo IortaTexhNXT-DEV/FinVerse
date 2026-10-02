@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FilePlus2, Plus, Search, UserPlus, XCircle } from 'lucide-react';
+import { Plus, Search } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { quotationRequestsApi } from '@/api/quotations';
@@ -12,6 +12,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { RowActions } from '@/components/ui/RowActions';
 import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
@@ -19,7 +20,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime } from '@/utils/format';
 import { CaptureRequestDialog } from './CaptureRequestDialog';
-import { quotationLinkOf } from './requestForm';
+import { requestActions } from './requestActions';
 import '@/styles/quotation.css';
 import { ClientLabel } from '@/components/broking/ClientLabel';
 import { LovLabel, ProductName } from '@/components/broking/LovLabel';
@@ -31,55 +32,6 @@ const TABS: readonly { id: RequestStatus; label: string }[] = [
   { id: 'CLOSED', label: 'Closed' },
 ];
 
-function RowActions({
-  request,
-  canMaintain,
-  onProspect,
-  onClose,
-}: Readonly<{
-  request: QuotationRequest;
-  canMaintain: boolean;
-  onProspect: () => void;
-  onClose: () => void;
-}>) {
-  const navigate = useNavigate();
-  if (request.status === 'QUOTED' && request.quotationId !== undefined) {
-    return (
-      <Button
-        size="sm"
-        variant="ghost"
-        onClick={() => void navigate(`/quotations/${request.quotationId}`)}
-      >
-        Open Quotation
-      </Button>
-    );
-  }
-  if (request.status !== 'NEW' || !canMaintain) {
-    return null;
-  }
-  return (
-    <div className="row">
-      {request.clientId === undefined ? (
-        <Button size="sm" variant="secondary" icon={<UserPlus size={14} />} onClick={onProspect}>
-          Create Prospect
-        </Button>
-      ) : (
-        <Button
-          size="sm"
-          variant="primary"
-          icon={<FilePlus2 size={14} />}
-          onClick={() => void navigate(quotationLinkOf(request))}
-        >
-          Create Quotation
-        </Button>
-      )}
-      <Button size="sm" variant="ghost" icon={<XCircle size={14} />} onClick={onClose}>
-        Close
-      </Button>
-    </div>
-  );
-}
-
 /**
  * Quotation request inbox (BRNB.041, BRNB.023 staging): requests received by e-mail (captured with
  * the e-mail attached), uploaded in bulk or delivered by a source system, waiting to be quoted. A
@@ -88,6 +40,7 @@ function RowActions({
 export default function RequestsPage() {
   const companyId = useCompanyId();
   const { can } = useAuth();
+  const navigate = useNavigate();
   const toast = useToast();
   const queryClient = useQueryClient();
   const [status, setStatus] = useState<RequestStatus>('NEW');
@@ -224,10 +177,12 @@ export default function RequestsPage() {
               header: 'Actions',
               render: (r) => (
                 <RowActions
-                  request={r}
-                  canMaintain={canMaintain}
-                  onProspect={() => prospect.mutate(r)}
-                  onClose={() => setClosing(r)}
+                  record={r.requestNo}
+                  actions={requestActions(r, canMaintain, {
+                    open: (to) => void navigate(to),
+                    prospect: () => prospect.mutate(r),
+                    close: () => setClosing(r),
+                  })}
                 />
               ),
             },

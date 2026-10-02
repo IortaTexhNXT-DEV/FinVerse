@@ -16,6 +16,7 @@ import { today } from '@/utils/format';
 import { components, optionalHeader, roles, toAmounts, unbalancedWarning } from './ruleModel';
 import { useAccountingLookups } from './useAccountingLookups';
 import { Notice } from '@/components/ui/Notice';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 /**
  * Rule simulator: enter sample amounts for an event and preview the journal lines the engine would
@@ -170,7 +171,11 @@ export default function SimulatorPage() {
               },
               { key: 'c', header: 'Currency', render: (l) => l.currency ?? '' },
               { key: 'p', header: 'Party', render: (l) => l.partyCode ?? '' },
-              { key: 'b', header: 'LoB', render: (l) => l.businessLine ?? '' },
+              {
+                key: 'b',
+                header: 'LoB',
+                render: (l) => (l.businessLine ? <LineLabel code={l.businessLine} /> : ''),
+              },
               { key: 'r', header: 'Narration', render: (l) => l.narration ?? '' },
             ]}
           />

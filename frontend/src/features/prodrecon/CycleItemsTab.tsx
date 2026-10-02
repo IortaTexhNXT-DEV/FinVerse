@@ -198,7 +198,7 @@ function itemColumns(
       header: 'Assured',
       render: (r) => r.broker?.assuredName ?? r.insurer?.assuredName ?? '',
     },
-    { key: 'ao', header: 'AO', render: (r) => <UserName login={r.aoUsername} empty="" /> },
+    { key: 'ao', header: 'AO', render: (r) => <UserName login={r.aoUsername} /> },
     {
       key: 'gross',
       header: `Gross Premium (${clientShortName()} / Insurer)`,
@@ -220,7 +220,7 @@ function itemColumns(
     {
       key: 'disposition',
       header: 'Disposition',
-      render: (r) => <LovLabel type="RECON_DISPOSITION" code={r.feedback?.disposition} empty="" />,
+      render: (r) => <LovLabel type="RECON_DISPOSITION" code={r.feedback?.disposition} />,
     },
     { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
     {

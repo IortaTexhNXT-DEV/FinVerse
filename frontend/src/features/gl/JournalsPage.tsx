@@ -160,12 +160,12 @@ export default function JournalsPage() {
             {
               key: 'to',
               header: 'Assigned To',
-              render: (j) => <UserName login={j.assignedTo} empty="" />,
+              render: (j) => <UserName login={j.assignedTo} />,
             },
             {
               key: 'auth',
               header: 'Authorizer',
-              render: (j) => <UserName login={j.authorizedBy} empty="" />,
+              render: (j) => <UserName login={j.authorizedBy} />,
             },
             {
               key: 'amt',

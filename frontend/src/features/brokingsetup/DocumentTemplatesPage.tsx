@@ -12,7 +12,10 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { CellStack } from '@/components/ui/CellStack';
+import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { templateVersionActions } from './templateActions';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate, formatDateTime, today } from '@/utils/format';
 import { FileDropZone } from '@/components/ui/FileDropZone';
@@ -121,21 +124,21 @@ export default function DocumentTemplatesPage() {
                 {
                   key: 'by',
                   header: 'Created',
-                  render: (v) => `${displayNameOf(v.createdBy)} · ${formatDateTime(v.createdAt)}`,
+                  render: (v) => (
+                    <CellStack
+                      main={displayNameOf(v.createdBy)}
+                      sub={formatDateTime(v.createdAt)}
+                    />
+                  ),
                 },
                 {
                   key: 'word',
-                  header: '',
+                  header: 'Actions',
                   render: (v) => (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      icon={<FileType2 size={14} />}
-                      aria-label={`Download version ${v.versionNo} as Word`}
-                      onClick={() => downloadWord(v)}
-                    >
-                      Word
-                    </Button>
+                    <RowActions
+                      record={`version ${String(v.versionNo)}`}
+                      actions={templateVersionActions(() => downloadWord(v))}
+                    />
                   ),
                 },
               ]}

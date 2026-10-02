@@ -124,3 +124,16 @@ export function candidatesOf(line: ReportLine): string[] {
     .map((c) => c.trim())
     .filter((c) => c.length > 0);
 }
+
+const ACTION_DONE: Record<string, string> = {
+  insurer_return: 'returned by the insurer',
+  resubmit: 'resubmitted for placement',
+  cancel_placement: 'placement cancelled',
+  reactivate: 'reactivated for placement',
+};
+
+/** The confirmation of a placement action of an account ("ARN-2026-910001 returned by the insurer"). */
+export function placementActionMessage(action: string, arn: string): string {
+  const done = ACTION_DONE[action];
+  return done === undefined ? `${arn} updated` : `${arn} ${done}`;
+}

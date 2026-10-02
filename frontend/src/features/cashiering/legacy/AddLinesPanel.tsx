@@ -15,6 +15,7 @@ import { OriginFilter } from '@/components/ui/OriginFilter';
 import { Tag } from '@/components/ui/Tag';
 import { useCompanyId } from '@/context/workspaceContext';
 import type { BatchScreen } from './batchScreens';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 
 function useAddLine<T>(run: (value: T) => Promise<unknown>) {
   const client = useQueryClient();
@@ -96,7 +97,12 @@ function UnappliedLines({ batch }: Readonly<{ batch: LegacyBatch }>) {
             render: (c) => <CellStack main={c.payorName ?? ''} sub={c.clientCode ?? ''} />,
           },
           { key: 'age', header: 'Age (days)', numeric: true, render: (c) => String(c.ageDays) },
-          { key: 'stage', header: 'Stage', render: (c) => c.stage },
+          {
+            key: 'stage',
+            header: 'Stage',
+            kind: 'status',
+            render: (c) => <StatusBadge status={c.stage} />,
+          },
           {
             key: 'balance',
             header: 'Balance',

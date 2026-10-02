@@ -34,97 +34,102 @@ function FilterPanel({
   const [panel, setPanel] = useState(initial);
   const set = (patch: Partial<Panel>) => setPanel((p) => ({ ...p, ...patch }));
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        onSearch(panel);
-      }}
-      className="worklist-filters stack"
-    >
-      <div className="form-grid">
-        <TextInput label="PN Number" value={panel.pn} onChange={(pn) => set({ pn })} />
-        <TextInput
-          label="Plate, Conduction, Engine or Chassis"
-          value={panel.vehicle}
-          onChange={(vehicle) => set({ vehicle })}
-        />
-        <TextInput
-          label="Location of Risk"
-          value={panel.location}
-          onChange={(location) => set({ location })}
-        />
-        <TextInput
-          label="Product"
-          upper
-          value={panel.product}
-          onChange={(product) => set({ product })}
-        />
-        <TextInput
-          label="Insurer"
-          upper
-          value={panel.insurer}
-          onChange={(insurer) => set({ insurer })}
-        />
-        <SelectInput
-          label="Status"
-          blank="Any status"
-          value={panel.status}
-          options={enumOptions(ACCOUNT_STATUSES)}
-          onChange={(status) => set({ status })}
-        />
-        <SelectInput
-          label="Business Type"
-          blank="New business and renewal"
-          value={panel.businessType}
-          options={BUSINESS_TYPE_OPTIONS}
-          onChange={(businessType) => set({ businessType })}
-        />
-        <SelectInput
-          label="Origin"
-          blank="All origins"
-          value={panel.origin}
-          options={ORIGIN_OPTIONS}
-          onChange={(origin) => set({ origin })}
-        />
-        <TextInput
-          label="Starts On or After"
-          type="date"
-          value={panel.periodFrom}
-          onChange={(periodFrom) => set({ periodFrom })}
-        />
-        <TextInput
-          label="Starts On or Before"
-          type="date"
-          value={panel.periodTo}
-          onChange={(periodTo) => set({ periodTo })}
-        />
-      </div>
-      <div className="row">
-        <label className="checkbox">
-          <input
-            type="checkbox"
-            checked={panel.includeVoided}
-            onChange={(e) => set({ includeVoided: e.target.checked })}
+    // The filter band holds the form, as on the other work lists: the form itself is no flex band,
+    // so its grid keeps its rows together.
+    <div className="worklist-filters">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          onSearch(panel);
+        }}
+        className="stack"
+        aria-label="Account filters"
+      >
+        <div className="form-grid">
+          <TextInput label="PN Number" value={panel.pn} onChange={(pn) => set({ pn })} />
+          <TextInput
+            label="Plate, Conduction, Engine or Chassis"
+            value={panel.vehicle}
+            onChange={(vehicle) => set({ vehicle })}
           />
-          Include Voided
-        </label>
-        <div className="spacer" />
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => {
-            const cleared = { ...EMPTY, text: panel.text };
-            setPanel(cleared);
-            onSearch(cleared);
-          }}
-        >
-          Clear Filters
-        </Button>
-        <Button type="submit" variant="secondary">
-          Apply Filters
-        </Button>
-      </div>
-    </form>
+          <TextInput
+            label="Location of Risk"
+            value={panel.location}
+            onChange={(location) => set({ location })}
+          />
+          <TextInput
+            label="Product"
+            upper
+            value={panel.product}
+            onChange={(product) => set({ product })}
+          />
+          <TextInput
+            label="Insurer"
+            upper
+            value={panel.insurer}
+            onChange={(insurer) => set({ insurer })}
+          />
+          <SelectInput
+            label="Status"
+            blank="Any status"
+            value={panel.status}
+            options={enumOptions(ACCOUNT_STATUSES)}
+            onChange={(status) => set({ status })}
+          />
+          <SelectInput
+            label="Business Type"
+            blank="New business and renewal"
+            value={panel.businessType}
+            options={BUSINESS_TYPE_OPTIONS}
+            onChange={(businessType) => set({ businessType })}
+          />
+          <SelectInput
+            label="Origin"
+            blank="All origins"
+            value={panel.origin}
+            options={ORIGIN_OPTIONS}
+            onChange={(origin) => set({ origin })}
+          />
+          <TextInput
+            label="Starts On or After"
+            type="date"
+            value={panel.periodFrom}
+            onChange={(periodFrom) => set({ periodFrom })}
+          />
+          <TextInput
+            label="Starts On or Before"
+            type="date"
+            value={panel.periodTo}
+            onChange={(periodTo) => set({ periodTo })}
+          />
+        </div>
+        <div className="row">
+          <label className="checkbox">
+            <input
+              type="checkbox"
+              checked={panel.includeVoided}
+              onChange={(e) => set({ includeVoided: e.target.checked })}
+            />
+            Include Voided
+          </label>
+          <div className="spacer" />
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => {
+              const cleared = { ...EMPTY, text: panel.text };
+              setPanel(cleared);
+              onSearch(cleared);
+            }}
+          >
+            Clear Filters
+          </Button>
+          <Button type="submit" variant="secondary">
+            Apply Filters
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }
 

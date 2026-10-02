@@ -13,14 +13,17 @@ import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
+import { CellStack } from '@/components/ui/CellStack';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useAuth } from '@/auth/authContext';
 import { DetailList } from '@/features/catalog/DetailList';
-import { formatDate, formatDateTime, formatRate, humanize, versionLabel } from '@/utils/format';
+import { formatDate, formatDateTime, formatRate, versionLabel } from '@/utils/format';
 import { DocumentChecklist, InsurerChoices } from './ProposalFormParts';
 import { SLIP_EDIT_STAGES, slipSent } from './proposalList';
+import { archivedSlipActions } from './responseActions';
 import { displayNameOf } from '@/api/users';
 import { InsurerNames, InsurerName } from '@/components/broking/LovLabel';
 import { UserName } from '@/components/ui/UserName';
@@ -299,19 +302,20 @@ export function ProposalSlipTab({ proposal: p }: Readonly<{ proposal: Proposal }
             {
               key: 'u',
               header: 'Archived',
-              render: (a) => `${displayNameOf(a.uploadedBy)} ${formatDateTime(a.uploadedAt)}`,
+              render: (a) => (
+                <CellStack main={displayNameOf(a.uploadedBy)} sub={formatDateTime(a.uploadedAt)} />
+              ),
             },
             {
               key: 'x',
-              header: 'Download',
+              header: 'Actions',
               render: (a) => (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => download.mutate(() => attachmentsApi.download(a.id))}
-                >
-                  {humanize('DOWNLOAD')}
-                </Button>
+                <RowActions
+                  record={a.fileName}
+                  actions={archivedSlipActions(() =>
+                    download.mutate(() => attachmentsApi.download(a.id)),
+                  )}
+                />
               ),
             },
           ]}

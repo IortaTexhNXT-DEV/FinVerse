@@ -1,12 +1,14 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { IssuanceRow, IssuanceTab } from '@/api/issuance';
 import { selectionColumn } from '@/components/broking/rowSelection';
 import type { RowSelection } from '@/components/broking/rowSelection';
 import { DataTable } from '@/components/ui/DataTable';
 import type { Column } from '@/components/ui/DataTable';
+import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDateTime } from '@/utils/format';
 import { rowKeyOf } from './issuanceLogic';
+import { awaitingPolicyActions } from './issuanceRowActions';
 import { InsurerName, LineLabel, LovLabel, ProductName } from '@/components/broking/LovLabel';
 
 function tabColumn(tab: IssuanceTab): Column<IssuanceRow> {
@@ -30,18 +32,22 @@ function tabColumn(tab: IssuanceTab): Column<IssuanceRow> {
     return {
       key: 'mortgagee',
       header: 'Mortgagee',
-      render: (r) => <LovLabel type="MORTGAGEE_BANK" code={r.mortgageeBank} empty="" />,
+      render: (r) => <LovLabel type="MORTGAGEE_BANK" code={r.mortgageeBank} />,
     };
   }
   return {
     key: 'upload',
-    header: '',
-    render: (r) => (
-      <Link className="btn btn-secondary btn-sm" to={`/issuance/upload?arn=${r.arn}`}>
-        Upload E-policy
-      </Link>
-    ),
+    header: 'Actions',
+    render: (r) => <AwaitingPolicyActions arn={r.arn} />,
   };
+}
+
+/** The row action menu of a placed account awaiting its policy: Upload E-policy. */
+function AwaitingPolicyActions({ arn }: Readonly<{ arn: string }>) {
+  const navigate = useNavigate();
+  return (
+    <RowActions record={arn} actions={awaitingPolicyActions(arn, (to) => void navigate(to))} />
+  );
 }
 
 /**

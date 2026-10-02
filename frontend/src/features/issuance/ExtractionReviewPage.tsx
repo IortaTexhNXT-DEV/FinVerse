@@ -16,7 +16,7 @@ import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/form
 import { ConfirmPolicyCard } from './ConfirmPolicyCard';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
-import { matchText } from './issuanceLogic';
+import { matchText, extractionNotes } from './issuanceLogic';
 import { Notice } from '@/components/ui/Notice';
 
 interface Row {
@@ -136,7 +136,7 @@ export default function ExtractionReviewPage() {
       <ErrorAlert error={download.error} />
       {r.epolicy.extractionNote !== undefined && (
         <Notice tone="info" title="Extraction">
-          {r.epolicy.extractionNote}
+          {extractionNotes(r.epolicy.extractionNote).join(' ')}
         </Notice>
       )}
       {r.differences.length > 0 && (

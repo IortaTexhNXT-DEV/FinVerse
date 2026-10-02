@@ -8,6 +8,7 @@ import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.migration.common.service.MigrationCodes;
 import com.iortatechnxt.brokerverse.migration.intake.domain.MigExtract;
 import com.iortatechnxt.brokerverse.migration.intake.domain.MigExtractRepository;
@@ -26,6 +27,7 @@ import com.iortatechnxt.brokerverse.migration.mapping.service.CodeMaps;
 import com.iortatechnxt.brokerverse.migration.mapping.service.LayoutService;
 import com.iortatechnxt.brokerverse.migration.matching.service.ClientMatcher;
 import com.iortatechnxt.brokerverse.migration.quality.service.RuleEngine;
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.util.ArrayList;
 import java.util.EnumSet;
@@ -166,17 +168,31 @@ public class ValidationService {
     log.info(
         batch,
         "VALIDATE",
-        "Validated with map versions "
-            + approved.versions()
-            + "; error rate "
-            + batch.getErrorRate()
-            + " percent; "
-            + unmapped
-            + " unmapped codes; "
-            + review
-            + " client pairs to review");
+        validatedNote(approved.versions(), batch.getErrorRate(), unmapped, review));
     raiseUnmapped(batch, unmapped);
     return batch;
+  }
+
+  /**
+   * The run log entry of a validation, the error rate with two decimals (0.00%).
+   *
+   * @param versions code map versions used
+   * @param errorRate error rate in percent
+   * @param unmapped unmapped codes
+   * @param review client pairs to review
+   * @return text of the run log
+   */
+  static String validatedNote(
+      Map<String, Integer> versions, BigDecimal errorRate, long unmapped, int review) {
+    return "Validated with map versions "
+        + versions
+        + "; error rate "
+        + DisplayFormat.percent(errorRate)
+        + "; "
+        + unmapped
+        + " unmapped codes; "
+        + review
+        + " client pairs to review";
   }
 
   /** The columns of the layouts in force and the code map sets they use (all lists for R01). */

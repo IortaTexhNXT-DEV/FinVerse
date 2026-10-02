@@ -145,7 +145,13 @@ public class XlsxReportRenderer implements ReportRenderer {
     Footer footer = sheet.getFooter();
     footer.setLeft(PdfBrandFooter.classified(ctx.footerText()));
     footer.setRight(
-        "iNXT BrokerVerse | " + result.code() + " | Page " + PAGE_CODE + " of " + PAGES_CODE);
+        BrandAssets.SYSTEM_NAME
+            + " | "
+            + result.code()
+            + " | Page "
+            + PAGE_CODE
+            + " of "
+            + PAGES_CODE);
   }
 
   private static int writeHeader(Sheet sheet, ReportResult result, ReportContext ctx, Styles s) {

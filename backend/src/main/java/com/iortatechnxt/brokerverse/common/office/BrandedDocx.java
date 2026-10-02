@@ -90,7 +90,7 @@ public final class BrandedDocx {
     fonts.setCs(BrandAssets.FONT);
     doc.createStyles().setDefaultFonts(fonts);
     doc.getProperties().getCoreProperties().setTitle(title);
-    doc.getProperties().getCoreProperties().setCreator("iNXT BrokerVerse");
+    doc.getProperties().getCoreProperties().setCreator(BrandAssets.SYSTEM_NAME);
   }
 
   /**

@@ -6,6 +6,7 @@ import { renewalApi } from '@/api/renewal';
 import type { LamdLineView, LamdReportView } from '@/api/renewal';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
+import { MonthInput } from '@/components/ui/MonthInput';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -133,9 +134,8 @@ export default function LamdPage() {
               </Field>
               <Field label="Month" required>
                 {(id) => (
-                  <input
+                  <MonthInput
                     id={id}
-                    type="month"
                     className="input"
                     value={period}
                     onChange={(e) => setPeriod(e.target.value)}

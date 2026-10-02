@@ -14,7 +14,7 @@ import java.util.Map;
  */
 final class SeedReserveParameters {
 
-  private static final String REMARKS = "Seed actuarial basis 2026";
+  private static final String REMARKS = "Actuarial basis 2026";
   private static final int ACCIDENT_YEARS = 5;
   private static final int ACCIDENT_QUARTERS = 8;
 

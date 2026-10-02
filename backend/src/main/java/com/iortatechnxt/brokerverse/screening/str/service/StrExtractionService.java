@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.security.CurrentUser;
 import com.iortatechnxt.brokerverse.common.sequence.DocumentNumberService;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
@@ -273,7 +274,10 @@ public class StrExtractionService {
     if (extraction.getReportRunId() == null) {
       throw new BusinessRuleException(
           "SCR_STR_FILE_ELSEWHERE",
-          "The file of " + extraction.getBatchNo() + " was saved outside BIBS");
+          "The file of "
+              + extraction.getBatchNo()
+              + " was saved outside "
+              + BrandAssets.SYSTEM_NAME);
     }
     return archive.download(extraction.getReportRunId());
   }

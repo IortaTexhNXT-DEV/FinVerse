@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.security.service.mfa;
 
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import com.iortatechnxt.brokerverse.common.util.AsciiCase;
 import com.iortatechnxt.brokerverse.security.domain.AppUser;
 import com.iortatechnxt.brokerverse.security.domain.PrivilegeLevel;
@@ -160,7 +161,7 @@ public class MfaPolicy {
    */
   public String issuer() {
     String issuer = parameters.text(ISSUER, "").trim();
-    return issuer.isEmpty() ? "iNXT BrokerVerse" : issuer;
+    return issuer.isEmpty() ? BrandAssets.SYSTEM_NAME : issuer;
   }
 
   /**

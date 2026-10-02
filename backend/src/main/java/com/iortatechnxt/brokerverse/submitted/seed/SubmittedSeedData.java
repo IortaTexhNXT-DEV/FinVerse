@@ -166,7 +166,7 @@ public class SubmittedSeedData implements ApplicationRunner {
                         new RunRequest(
                             companyId,
                             SbmRun.Trigger.MANUAL,
-                            "Seed intake",
+                            "Daily intake",
                             loaded.stream().map(SbmPolicy::getId).toList()))));
     step("reviews and IAAF", () -> reviews(loaded, today));
     step("TOR", () -> tor(loaded));
@@ -207,7 +207,7 @@ public class SubmittedSeedData implements ApplicationRunner {
                 today.minusDays(2),
                 SbmPolicyStatus.RECEIVED,
                 SbmHistorySource.INTAKE,
-                "Seed " + source))
+                "Received from " + source))
         .policy();
   }
 
@@ -228,7 +228,7 @@ public class SubmittedSeedData implements ApplicationRunner {
   private static SbmAssured assured(SeedRow r) {
     return new SbmAssured(
         r.assured(),
-        "Seed address of " + r.assured() + ", Makati City",
+        "Ayala Avenue, Makati City",
         null,
         "0917" + (MOBILE_BASE + Math.floorMod(r.assured().hashCode(), MOBILE_SPAN)),
         r.assured().toLowerCase(java.util.Locale.ROOT).replace(' ', '.') + "@example.ph",

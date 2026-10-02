@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.common.excel;
 
 import com.iortatechnxt.brokerverse.common.excel.GuideColumn.Kind;
+import com.iortatechnxt.brokerverse.common.office.BrandAssets;
 import java.util.List;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.ClientAnchor;
@@ -127,7 +128,7 @@ final class GuidedChecks {
     Comment comment = drawing.createCellComment(anchor);
     comment.setString(
         sheet.getWorkbook().getCreationHelper().createRichTextString(text.toString()));
-    comment.setAuthor("BIBS");
+    comment.setAuthor(BrandAssets.SYSTEM_NAME);
     cell.setCellComment(comment);
   }
 

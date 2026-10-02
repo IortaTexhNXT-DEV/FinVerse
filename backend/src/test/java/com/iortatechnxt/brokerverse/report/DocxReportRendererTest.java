@@ -99,7 +99,7 @@ class DocxReportRendererTest {
       String footer = doc.getFooterList().get(0).getText();
       assertThat(footer)
           .contains("Confidential  |  Footer note")
-          .contains("iNXT BrokerVerse  |  T-DOCX  |  Page");
+          .contains("BIBS  |  T-DOCX  |  Page");
       assertThat(doc.getFooterList().get(0).getParagraphs().get(1).getCTP().xmlText())
           .contains("NUMPAGES");
       assertThat(doc.getHeaderList().get(0).getText()).contains("BDO Insurance Brokers");

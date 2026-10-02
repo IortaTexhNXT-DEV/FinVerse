@@ -52,7 +52,7 @@ screens:
       a New Password, where the user chooses the new password under the password rules.
     entry:
       - Login › Forgot password?
-      - "The link in the e-mail BrokerVerse: reset your password"
+      - "The link in the e-mail BIBS: reset your password"
     shots:
       - {state: request, path: /login, fill: forgot_user, caption: "Forgot Password with the user ID entered"}
       - {state: sent, path: /login, fill: forgot_user, submit: "^send reset link$", caption: "Confirmation on the Login page after the request"}
@@ -63,7 +63,7 @@ screens:
       - "Set a New Password | Confirm new password | Password | Same as New password | Y | - | Blank | While the link is valid | Both new passwords must match | Both new passwords must match"
       - "Set a New Password | Still needed | Checklist | At least 10 characters; An upper-case letter; A lower-case letter; A digit; A symbol | - | Password rules | - | Read only | Shown until every rule is met | -"
     actions:
-      - "Send Reset Link | Every user | User ID entered | Withdraws the older links of the user and e-mails a new single-use link to the registered address; the same confirmation is shown for every user ID, so the page never reveals whether a user exists | - | E-mail BrokerVerse: reset your password"
+      - "Send Reset Link | Every user | User ID entered | Withdraws the older links of the user and e-mails a new single-use link to the registered address; the same confirmation is shown for every user ID, so the page never reveals whether a user exists | - | E-mail BIBS: reset your password"
       - "Back to Login | Every user | Always | Returns to the Login page | - | -"
       - "Set Password | Holder of a valid link | New password meets the rules and is confirmed | Sets the password, marks the link used and confirms: Your password was changed. Sign in with the new password. | Password changed | -"
     rules:
@@ -165,7 +165,7 @@ screens:
       - "Change Password | The signed-in user (local sign-in) | Current password entered and the new password meets the rules | Saves the new password; the dates under the card are updated | - | -"
     rules:
       - "Users update their own e-mail address and mobile number without a request; every other attribute changes only through an approved access request (FR-UA-005, FR-UA-012)."
-      - "With directory sign-in the password card reads: You sign in with your BDO network password. Change it through the BDO directory, not in BrokerVerse. (FR-UA-003, FR-UA-005)."
+      - "With directory sign-in the password card reads: You sign in with your organisation's network password. Change it through your organisation's directory, not here. (FR-UA-003, FR-UA-005)."
       - "A password cannot be changed twice within PASSWORD_MIN_AGE_DAYS (one day as delivered) and must differ from the last PASSWORD_HISTORY_COUNT passwords (8) (FR-UA-005)."
       - "The recent sessions show how each session ended; a session the user does not recognise is reported to the System Administrator (FR-UA-004)."
     outcome: Each user sees exactly which access is held, keeps the contact details current and changes the password under the password rules.

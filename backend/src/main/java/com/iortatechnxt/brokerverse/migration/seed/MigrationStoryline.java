@@ -125,10 +125,7 @@ public class MigrationStoryline {
     for (Step step : STEPS) {
       as.as(
           OWNER,
-          () ->
-              services
-                  .signoffs()
-                  .signMapping(companyId, step.object(), true, "Seed maps reviewed"));
+          () -> services.signoffs().signMapping(companyId, step.object(), true, "Maps reviewed"));
       List<String> extracts = new ArrayList<>();
       for (String file : step.files()) {
         extracts.add(receive(companyId, step.object(), file));
@@ -191,8 +188,8 @@ public class MigrationStoryline {
     String batchNo = planned.getBatchNo();
     as.as(OPERATOR, () -> services.validation().validate(batchNo));
     try {
-      as.as(STEWARD, () -> services.signoffs().signValidation(batchNo, true, "Seed rows valid"));
-      as.as(LEAD, () -> services.signoffs().approveLoad(batchNo, "Seed load"));
+      as.as(STEWARD, () -> services.signoffs().signValidation(batchNo, true, "Rows valid"));
+      as.as(LEAD, () -> services.signoffs().approveLoad(batchNo, "Load approved"));
     } catch (BusinessRuleException e) {
       throw new BusinessRuleException(
           "MIG_SEED_INVALID",
@@ -285,7 +282,7 @@ public class MigrationStoryline {
             + day
             + " 18:00:00,"
             + day
-            + " 19:00:00,seed,";
+            + " 19:00:00,Legacy IT,";
     return ("object,layout,source_system,data_file,as_of,extracted_at,extracted_by,"
             + "measure,column_name,currency,filter,value\n"
             + head

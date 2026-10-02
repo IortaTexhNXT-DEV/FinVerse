@@ -62,7 +62,7 @@ notifications:
     channel: In-app and e-mail
     trigger: An approved change to a user is applied (at approval, or on the effective date)
     recipient: The user whose access changed (e-mail to the user's registered address)
-    template: "In-app title: Your access changed. Text: Your access changed: <description of the change> (request <request no>). E-mail subject: BrokerVerse: your access changed; body: the same text"
+    template: "In-app title: Your access changed. Text: Your access changed: <description of the change> (request <request no>). E-mail subject: BIBS: your access changed; body: the same text"
     content: What changed and the request number; the password of a new user is never e-mailed
     screen: Home page (bell); e-mail
     frs: [FR-UA-070]
@@ -71,7 +71,7 @@ notifications:
     channel: In-app and e-mail
     trigger: A request that deactivates or reactivates a group profile is implemented (or applied on approval)
     recipient: Each active member of the group profile (e-mail to the member's registered address)
-    template: "In-app title: Your access changed. Text: Your access changed: <description of the change>, a group profile you hold (request <request no>). E-mail subject: BrokerVerse: your access changed; body: the same text"
+    template: "In-app title: Your access changed. Text: Your access changed: <description of the change>, a group profile you hold (request <request no>). E-mail subject: BIBS: your access changed; body: the same text"
     content: The profile deactivated or reactivated and the request number
     screen: Home page (bell); e-mail
     frs: [FR-UA-042, FR-UA-043, FR-UA-070]
@@ -80,7 +80,7 @@ notifications:
     channel: In-app and e-mail
     trigger: The daily job UAM_DORMANT_USERS (00:15) finds a user whose deactivation date is UAM_DORMANT_NOTICE_DAYS days away (7)
     recipient: The dormant user
-    template: "Title: Your account will be deactivated. Text: You have not signed in to BrokerVerse for a long time. Sign in before <dd-MMM-yyyy>, or your account is deactivated and a new access request is needed. E-mail subject: BrokerVerse: sign in to keep your account"
+    template: "Title: Your account will be deactivated. Text: You have not signed in to BIBS for a long time. Sign in before <dd-MMM-yyyy>, or your account is deactivated and a new access request is needed. E-mail subject: BIBS: sign in to keep your account"
     content: The deactivation date; the notice opens My Profile
     screen: My Profile; e-mail
     frs: [FR-UA-006]
@@ -98,7 +98,7 @@ notifications:
     channel: E-mail
     trigger: A user asks for a reset link (Forgot password?, local sign-in)
     recipient: The registered e-mail address of the user, when the user is active and has one
-    template: "Subject: BrokerVerse: reset your password. Body: Dear <full name>, A new BrokerVerse password was requested for user <user ID>. Open this link to set it: <link>. The link works once and expires at <date and time> (Philippine time). If you did not ask for it, ignore this e-mail; your password stays as it is."
+    template: "Subject: BIBS: reset your password. Body: Dear <full name>, A new BIBS password was requested for user <user ID>. Open this link to set it: <link>. The link works once and expires at <date and time> (Philippine time). If you did not ask for it, ignore this e-mail; your password stays as it is."
     content: The single-use link, valid for 30 minutes
     screen: Forgot Password and Set a New Password
     frs: [FR-UA-005]
@@ -107,7 +107,7 @@ notifications:
     channel: In-app and e-mail (by preference)
     trigger: The daily job PASSWORD_EXPIRY_NOTICE (06:00) finds a password that expires within 7 days (local sign-in)
     recipient: The user whose password expires
-    template: "Title: Your password expires soon. Text: Your BrokerVerse password expires on <date and time> (Philippine time). Change it on My Profile before then. E-mail subject: BrokerVerse: your password expires soon"
+    template: "Title: Your password expires soon. Text: Your BIBS password expires on <date and time> (Philippine time). Change it on My Profile before then. E-mail subject: BIBS: your password expires soon"
     content: The expiry date; the notice opens My Profile
     screen: My Profile
     frs: [FR-UA-005]
@@ -116,7 +116,7 @@ notifications:
     channel: E-mail
     trigger: A scheduled batch job fails (for example the daily application of dated access changes)
     recipient: The addresses of the parameter JOB_FAILURE_RECIPIENTS
-    template: "Subject: BrokerVerse: batch job <job> failed. Body: The batch job <job> failed. Run: <run>. Started: <date and time> (Philippine time). Trigger: <trigger>. Error: <message>. Open Administration > Scheduled Jobs to see the run history and run the job again."
+    template: "Subject: BIBS: batch job <job> failed. Body: The batch job <job> failed. Run: <run>. Started: <date and time> (Philippine time). Trigger: <trigger>. Error: <message>. Open Administration > Scheduled Jobs to see the run history and run the job again."
     content: The failed run and its error
     screen: Scheduled Jobs
     frs: [FR-UA-071]

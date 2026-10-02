@@ -6,6 +6,7 @@ import type { NoTouchBatch, NoTouchLine } from '@/api/submitted';
 import { InsurerName } from '@/components/broking/LovLabel';
 import { useFileDownload } from '@/components/broking/useFileDownload';
 import { Button } from '@/components/ui/Button';
+import { MonthInput } from '@/components/ui/MonthInput';
 import { Card } from '@/components/ui/Card';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
 import { DataTable } from '@/components/ui/DataTable';
@@ -121,9 +122,8 @@ export default function NoTouchPage() {
           </Field>
           <Field label="Month" required>
             {(id) => (
-              <input
+              <MonthInput
                 id={id}
-                type="month"
                 className="input"
                 value={period}
                 onChange={(e) => setPeriod(e.target.value)}

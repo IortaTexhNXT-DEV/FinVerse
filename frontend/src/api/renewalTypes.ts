@@ -136,7 +136,7 @@ export interface CandidateRow {
   expiry: string;
   daysToExpiry: number;
   /** Names of the insurer and the owner unit, read by the server for every Renewal user. */
-  names?: { insurer: string | null; ownerUnit: string | null };
+  names?: { insurer: string | null; ownerUnit: string | null; product?: string | null };
 }
 
 export interface Lifecycle {

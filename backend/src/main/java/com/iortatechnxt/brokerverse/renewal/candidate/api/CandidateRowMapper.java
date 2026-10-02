@@ -2,6 +2,8 @@ package com.iortatechnxt.brokerverse.renewal.candidate.api;
 
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfileRepository;
+import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
+import com.iortatechnxt.brokerverse.catalog.domain.RiskProductRepository;
 import com.iortatechnxt.brokerverse.catalog.domain.SalesUnit;
 import com.iortatechnxt.brokerverse.catalog.domain.SalesUnitRepository;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
@@ -46,6 +48,7 @@ public class CandidateRowMapper {
   private final Clock clock;
   private final InsurerProfileRepository insurers;
   private final SalesUnitRepository units;
+  private final RiskProductRepository products;
 
   /**
    * Creates the mapper.
@@ -54,16 +57,19 @@ public class CandidateRowMapper {
    * @param clock clock
    * @param insurers insurers (names)
    * @param units sales units (names)
+   * @param products products (names)
    */
   public CandidateRowMapper(
       CheckResultRepository results,
       Clock clock,
       InsurerProfileRepository insurers,
-      SalesUnitRepository units) {
+      SalesUnitRepository units,
+      RiskProductRepository products) {
     this.results = results;
     this.clock = clock;
     this.insurers = insurers;
     this.units = units;
+    this.products = products;
   }
 
   /**
@@ -104,10 +110,11 @@ public class CandidateRowMapper {
     return rows(List.of(candidate), scope).get(0);
   }
 
-  /** The insurer and owner unit names of a renewal, looked up once per chunk. */
+  /** The insurer, owner unit and product names of a renewal, looked up once per chunk. */
   private Names names(RenewalCandidate c, Map<String, String> cache) {
     String insurer = c.getSnapshot().insurerCode();
     String unit = c.getOwnerUnit();
+    var product = c.getSnapshot().product();
     return new Names(
         insurer == null
             ? null
@@ -126,7 +133,17 @@ public class CandidateRowMapper {
                     units
                         .findByCompanyIdAndCode(c.getCompanyId(), unit)
                         .map(SalesUnit::getName)
-                        .orElse(unit)));
+                        .orElse(unit)),
+        product == null ? null : productName(product.productCode(), product.productName(), cache));
+  }
+
+  /** The name kept with the renewal, else the catalogue's name of the risk code. */
+  private String productName(String code, String kept, Map<String, String> cache) {
+    if (kept != null || code == null) {
+      return kept;
+    }
+    return cache.computeIfAbsent(
+        "P:" + code, k -> products.findByCode(code).map(RiskProduct::getName).orElse(code));
   }
 
   private Map<Long, Map<String, CheckResult>> latest(List<RenewalCandidate> candidates) {

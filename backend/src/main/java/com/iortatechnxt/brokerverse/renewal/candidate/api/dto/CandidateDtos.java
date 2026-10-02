@@ -91,8 +91,9 @@ public final class CandidateDtos {
    *
    * @param insurer insurer name, the code when the insurer is not known
    * @param ownerUnit name of the owner unit, the code when the unit is not known
+   * @param product name of the product (risk), the code when the product is not known
    */
-  public record Names(String insurer, String ownerUnit) {}
+  public record Names(String insurer, String ownerUnit, String product) {}
 
   /**
    * Policy columns.

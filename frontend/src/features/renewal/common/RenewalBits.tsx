@@ -35,8 +35,9 @@ export function RenewalUnit({ row }: Readonly<{ row: CandidateRow }>) {
 /** The product of a renewal by name (the name kept with the renewal, else the catalogue's). */
 export function RenewalProduct({ row }: Readonly<{ row: CandidateRow }>) {
   const p = row.policy;
-  if (p.productName) {
-    return <span title={p.productCode ?? undefined}>{p.productName}</span>;
+  const name = p.productName ?? row.names?.product;
+  if (name) {
+    return <span title={p.productCode ?? undefined}>{name}</span>;
   }
   return <ProductName code={p.productCode} />;
 }

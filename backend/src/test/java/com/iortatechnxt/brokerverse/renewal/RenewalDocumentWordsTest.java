@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 import com.iortatechnxt.brokerverse.alert.service.AlertCheck.AlertSignal;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfileRepository;
+import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
+import com.iortatechnxt.brokerverse.catalog.domain.RiskProductRepository;
 import com.iortatechnxt.brokerverse.catalog.domain.SalesUnit;
 import com.iortatechnxt.brokerverse.catalog.domain.SalesUnitRepository;
 import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
@@ -200,20 +202,48 @@ class RenewalDocumentWordsTest {
   }
 
   @Test
-  void aRenewalRowNamesTheInsurerAndTheUnitForEveryUser() {
+  void aRenewalRowNamesTheInsurerTheUnitAndTheProductForEveryUser() {
     SalesUnitRepository units = mock(SalesUnitRepository.class);
     SalesUnit unit = mock(SalesUnit.class);
     when(unit.getName()).thenReturn("Corporate Marketing Team 1");
     when(units.findByCompanyIdAndCode(1L, "T-CORP1")).thenReturn(Optional.of(unit));
+    RiskProductRepository products = mock(RiskProductRepository.class);
+    RiskProduct product = mock(RiskProduct.class);
+    when(product.getName()).thenReturn("Comprehensive General Liability");
+    when(products.findByCode("CGL01")).thenReturn(Optional.of(product));
     RenewalCandidate c = candidate();
     ReflectionTestUtils.setField(c, "ownerUnit", "T-CORP1");
+    ReflectionTestUtils.setField(
+        c,
+        "snapshot",
+        new CandidateSnapshot(
+            "POL-1",
+            null,
+            null,
+            null,
+            new SnapshotClient(null, null, "Maria Clara Santos", "Maria Clara Santos", null),
+            new CandidateSnapshot.SnapshotProduct("CGL01", null, "LIABILITY", null, null, null),
+            null,
+            "INS-MGIC",
+            new SnapshotMortgage(false, null),
+            false,
+            EXPIRY.minusYears(1),
+            EXPIRY,
+            null,
+            null,
+            null));
     CandidateRowMapper mapper =
         new CandidateRowMapper(
-            mock(CheckResultRepository.class), java.time.Clock.systemUTC(), insurers, units);
+            mock(CheckResultRepository.class),
+            java.time.Clock.systemUTC(),
+            insurers,
+            units,
+            products);
 
     CandidateRow row = mapper.rows(List.of(c), new Scope(null, null, "contactc", true)).get(0);
 
     assertThat(row.names().insurer()).isEqualTo("Mabuhay General Insurance Corp.");
     assertThat(row.names().ownerUnit()).isEqualTo("Corporate Marketing Team 1");
+    assertThat(row.names().product()).isEqualTo("Comprehensive General Liability");
   }
 }

@@ -25,6 +25,7 @@ import CandidatePage from './record/CandidatePage';
 import { ChecksTab } from './record/RecordTabs';
 import { Route, Routes } from 'react-router-dom';
 import RenewalSetupPage from './setup/RenewalSetupPage';
+import { ApprovalCell } from './setup/setupBits';
 import { renewalWrapper } from './testWrapper';
 import TransfersPage from './transfers/TransfersPage';
 
@@ -284,5 +285,42 @@ describe('renewal values not given', () => {
     delete money.claimCount;
     render(<>{premium?.render({ ...r, money: money as typeof r.money }, 0)}</>);
     expect(screen.queryByText(/undefined/)).toBeNull();
+  });
+});
+
+describe('renewal setup status', () => {
+  it('shows the maker under the status, not beside it', () => {
+    const { container } = render(
+      renewalWrapper(new Set(['RNW_SETUP']))(
+        <ApprovalCell
+          approval={
+            { recordStatus: 'ACTIVE', maker: 'badmin' } as Parameters<
+              typeof ApprovalCell
+            >[0]['approval']
+          }
+        />,
+      ),
+    );
+    expect(container.querySelector('.rnw-flags')).toBeNull();
+    expect(screen.getByText('Active')).toBeInTheDocument();
+  });
+});
+
+describe('renewal product name', () => {
+  it('names the product from the server when the catalogue is not readable', async () => {
+    const { RenewalProduct } = await import('./common/RenewalBits');
+    const r = row();
+    render(
+      renewalWrapper(new Set(['RNW_VIEW']))(
+        <RenewalProduct
+          row={{
+            ...r,
+            policy: { ...r.policy, productCode: 'CGL01', productName: null },
+            names: { insurer: null, ownerUnit: null, product: 'Comprehensive General Liability' },
+          }}
+        />,
+      ),
+    );
+    expect(await screen.findByText('Comprehensive General Liability')).toBeInTheDocument();
   });
 });

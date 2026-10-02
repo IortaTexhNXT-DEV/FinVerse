@@ -170,7 +170,7 @@ common:
   - name: Work lists
     text: >-
       Lists show status tabs (with their counts where useful), a search box, a Filters button for the other criteria,
-      and the paged table ("Showing 1 to n of N results"). A row opens its record. Dates show as dd-MMM-yyyy and times
+      and the paged table ("Showing 1 to n of N results"). Rows alternate white and Background Blue; a long list scrolls inside its card with the header row in view. A row opens its record. Dates show as dd-MMM-yyyy and times
       as dd-MMM-yyyy HH:mm in Philippine time. Selecting rows enables the bulk actions of the tab.
   - name: Record summary and reference chips
     text: >-
@@ -205,7 +205,7 @@ common:
       permission.
   - name: Status pills and tags
     text: >-
-      Statuses are pills of one size and colour per state group; a pill never wraps. Statuses show their full label; an
+      Statuses are outlined pills of one size and colour per state group; a pill never wraps. Statuses show their full label; an
       agreed short form, with the full label in the tooltip, is used only for a label longer than 21 characters.
       Flags are tags in the record header or in their own column.
   - name: Dates, amounts, periods and names

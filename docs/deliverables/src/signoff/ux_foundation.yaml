@@ -46,6 +46,7 @@ components:
     what: Every list of records is a table in a titled card, with the status tabs and the toolbar above it.
     rules:
       - "Header row in Header Blue with white bold text that stays in view; rows alternate white and Background Blue"
+      - "A long list scrolls inside its card with the header row in view; the card is as high as its rows, never higher than the window"
       - "Text left, amounts right with two decimals, dates dd-MMM-yyyy; codes in a fixed column that never wraps"
       - "One value per cell with at most one muted line under it; a dash for an empty value"
       - "Showing x to y of n results with the page numbers; Enter on a row opens it"
@@ -102,6 +103,7 @@ components:
     caption: The Status column of the access requests
     what: One pill per record status, in its own column.
     rules:
+      - "Outlined: a border and text in the colour of the state group on a light tint of it"
       - "One size everywhere: 24 px high, 12 px bold, centred, 112 to 184 px wide; a pill never wraps"
       - "Green done or approved; yellow waiting for review or approval; blue in process; red exception or rejected; grey draft or inactive"
       - "The full label up to 21 characters; a longer label has its agreed short form with the full label in the tooltip"

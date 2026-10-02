@@ -149,13 +149,13 @@ common:
       the company chosen in the header.
   - name: Work lists and record panels
     text: >-
-      Lists show a filter row where the list has filters and a paged table ("Showing 1 to n of N results"). A row
+      Lists show a filter row where the list has filters and a paged table ("Showing 1 to n of N results"). Rows alternate white and Background Blue; a long list scrolls inside its card with the header row in view. A row
       opens its record in a panel under the list (object, code map, layout, reconciliation, cut-over plan, legacy
       record) or on a page of its own (batch, legacy batch). Dates show as dd-MMM-yyyy and times as dd-MMM-yyyy HH:mm
       in Philippine time; amounts with two decimals and thousand separators.
   - name: Status pills and the batch steps
     text: >-
-      Statuses are pills of one colour per state group (Proposed, For decision, Decided; Planned, Validated, Loaded,
+      Statuses are outlined pills of one colour per state group (Proposed, For decision, Decided; Planned, Validated, Loaded,
       Loaded with rejects, Reconciled, Accepted, Rolled back; Matched, Break, Explained). A batch shows its steps as a
       stepper: Planned, Validated, Load approved, Loaded, Reconciled, Accepted, with the steps done marked.
   - name: Confirmation and reason

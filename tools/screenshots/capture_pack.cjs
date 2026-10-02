@@ -410,22 +410,47 @@ async function clearCallouts(page) {
 async function fitViewport(page, tall) {
   // A list sets its cap again on a window resize: after a recipe set content aside (the record header above the
   // tabs of a walkthrough step), the list takes the room freed.
-  await page.evaluate(() => window.dispatchEvent(new Event('resize')));
-  await page.waitForTimeout(200);
+  // An open row action menu closes on any scroll, so a shot of the menu leaves the page as it is.
+  const menuOpen = (await page.locator('[role=menu]').count()) > 0;
+  if (!menuOpen) {
+    await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+    await page.waitForTimeout(200);
+  }
   const extra = await page.evaluate(() => {
     const main = document.querySelector('main.app-main, main');
     const doc = document.documentElement;
     const inner = main ? main.scrollHeight - main.clientHeight : 0;
     const cards = [...document.querySelectorAll('main .table-wrap[data-fit]')]
       .reduce((sum, w) => sum + Math.max(0, w.scrollHeight - w.clientHeight), 0);
-    return { all: Math.max(inner + cards, doc.scrollHeight - doc.clientHeight, 0), cards };
+    // A little more than the hidden rows (a sideways scroll bar, rounding), so the last row is never cut; the crop
+    // trims the window to what is drawn.
+    const room = cards > 0 ? cards + 48 : 0;
+    return { all: Math.max(inner + room, doc.scrollHeight - doc.clientHeight, 0), cards: room };
   });
   // A walkthrough step keeps the top of its page, but a list capped in its card is shown with all its rows.
   const grow = tall === false ? extra.cards : extra.all;
+  if (extra.cards > 0 && HEIGHT + grow > MAX_HEIGHT && !menuOpen) {
+    // The window cannot grow enough (a long page beside the list): the page scrolls as a whole, as the screen does
+    // for a page with several lists, so the list's rows run down the page instead of being held in a short card.
+    await page.evaluate(() => {
+      const main = document.querySelector('main.app-main, main');
+      if (main && !main.querySelector('[data-capture-whole]')) {
+        const marker = document.createElement('div');
+        marker.setAttribute('data-fit', '');
+        marker.setAttribute('data-capture-whole', '');
+        marker.hidden = true;
+        main.appendChild(marker);
+      }
+      window.dispatchEvent(new Event('resize'));
+    });
+    await page.waitForTimeout(300);
+  }
   const height = Math.min(MAX_HEIGHT, HEIGHT + grow);
   await page.setViewportSize({ width: WIDTH, height });
   await page.waitForTimeout(grow > 0 ? 600 : 300);
-  await page.evaluate(() => document.querySelectorAll('main .table-wrap[data-fit]').forEach((w) => w.scrollTo(0, 0)));
+  if (!menuOpen) {
+    await page.evaluate(() => document.querySelectorAll('main .table-wrap[data-fit]').forEach((w) => w.scrollTo(0, 0)));
+  }
 }
 
 /**
@@ -531,7 +556,10 @@ async function cropOf(page, shot, recipe) {
           return;
         }
         const r = region.getBoundingClientRect();
-        if (r.top > contentBottom + 24) {
+        // Below a short page it moves up; over the last rows of a page it moves down when the window has room.
+        const below = r.top > contentBottom + 24;
+        const over = r.top < contentBottom && contentBottom + 8 + r.height <= window.innerHeight;
+        if (below || over) {
           region.style.top = `${Math.round(contentBottom + 8)}px`;
           region.style.bottom = 'auto';
         }

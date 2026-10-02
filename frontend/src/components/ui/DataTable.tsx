@@ -317,7 +317,9 @@ export function DataTable<T>({
               <th
                 key={c.key}
                 className={cellClass(c)}
-                style={{ width: c.width }}
+                // A truncating column keeps its width as its least width: its cells carry no width
+                // of their own, so a crowded table would otherwise squeeze it to a few letters.
+                style={{ width: c.width, minWidth: c.truncate ? c.width : undefined }}
                 aria-sort={ariaSort(c, sort)}
                 scope="col"
               >

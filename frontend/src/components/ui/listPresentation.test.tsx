@@ -133,6 +133,8 @@ describe('DataTable list presentation', () => {
     expect(type).toHaveClass('truncate');
     expect(type).toHaveAttribute('title', 'Disbursement Voucher');
     expect(type.closest('td')).toHaveClass('col-truncate');
+    // The column keeps its width as its least width, so a crowded table cannot squeeze the name.
+    expect(screen.getByRole('columnheader', { name: 'Type' })).toHaveStyle({ minWidth: '160px' });
   });
 
   it('shows one muted dash for every empty cell, never a blank', () => {

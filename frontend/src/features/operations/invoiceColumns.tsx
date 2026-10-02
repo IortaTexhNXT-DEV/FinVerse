@@ -48,7 +48,7 @@ export const INVOICE_COLUMNS: Column<OpsInvoiceSummary>[] = [
   {
     key: 'ao',
     header: 'Account Officer',
-    width: '150px',
+    width: '180px',
     truncate: true,
     render: (i) => <UserName login={i.aoUsername} truncate />,
   },

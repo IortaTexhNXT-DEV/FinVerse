@@ -52,6 +52,15 @@ class DisplayFormatTest {
   }
 
   @Test
+  void writesPercentWithTwoDecimalsAndTheSign() {
+    assertThat(DisplayFormat.percent(new BigDecimal("0.0000"))).isEqualTo("0.00%");
+    assertThat(DisplayFormat.percent(new BigDecimal("12.3456"))).isEqualTo("12.35%");
+    assertThat(DisplayFormat.percent(new BigDecimal("0.5"))).isEqualTo("0.50%");
+    assertThat(DisplayFormat.percent(new BigDecimal("100"))).isEqualTo("100.00%");
+    assertThat(DisplayFormat.percent(null)).isEmpty();
+  }
+
+  @Test
   void writesAnyValue() {
     assertThat(DisplayFormat.value(LocalDate.of(2026, 1, 5))).isEqualTo("05-Jan-2026");
     assertThat(DisplayFormat.value(new BigDecimal("1500.00"))).isEqualTo("1,500.00");

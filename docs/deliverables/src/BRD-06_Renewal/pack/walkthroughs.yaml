@@ -56,7 +56,7 @@ walkthroughs:
       - [CONTACT_CENTER, SCR-RN-15, "Opens Follow-ups, tab RA Sent", "The renewal waiting for the client's reply", Awaiting response, wt-c-01]
       - [CONTACT_CENTER, SCR-RN-15, "Opens the renewal and clicks Add Follow-up: Call, Client will renew, the next action date and the remarks, then Save", "Message: Saved; the follow-up on the Remarks & Follow-ups tab", Followed up, wt-c-02]
       - [MKT_AO, SCR-RN-14, "Opens the renewal and clicks Record Acceptance: Payment with the payment reference, then Record", "Message: Saved; the renewal For Placement and Booking", Accepted, wt-c-03]
-      - [MKT_AO, SCR-RN-05, "Opens the tab Letters", "The Renewal Advice sent and the acceptance by payment", Kept, wt-c-04]
+      - [MKT_AO, SCR-RN-05, "Opens the tab Letters", "The Renewal Advice in the e-mail queue to the client and the acceptance by payment", Kept, wt-c-04]
     downstream:
       - "The renewal account is fast-tracked to the payment gate, placed and booked through New Business as business type Renewal; the booking closes the renewal as renewed."
 
@@ -71,7 +71,7 @@ walkthroughs:
       - [MKT_AO, SCR-RN-07, "Opens the renewal, views its account history, clicks Set Disposition: Not for Renewal, reason Loan fully paid, with remarks, then Save", "Message: Saved; the disposition Not for Renewal with its reason", Dispositioned, wt-d-01]
       - [MKT_TL, SCR-RN-08, "After the Account Officer's push, ticks the renewal on TL Review, clicks Post and confirms", "Message: 1 posted; the renewal goes to the closing letters", Letter pending, wt-d-02]
       - [MKT_AO, SCR-RN-13, "Opens Letters, tab NAL / NFR, ticks the renewal, clicks Send Letters and confirms", "Message: 1 sent; the renewal is closed", Closed, wt-d-03]
-      - [MKT_AO, SCR-RN-05, "Opens the renewal, tab Letters", "The Not for Renewal Letter with its delivery", Letter kept, wt-d-04]
+      - [MKT_AO, SCR-RN-05, "Opens the renewal, tab Letters", "The Not for Renewal Letter in the e-mail queue to the client", Letter kept, wt-d-04]
     downstream:
       - "Until the re-open days after expiry, the Account Officer may re-open the renewal for a new disposition."
 

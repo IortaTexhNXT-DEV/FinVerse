@@ -378,6 +378,8 @@ const documents = {
 // A walkthrough step or screen shot that shows one tab of a long record page: the tab strip and the tab's content.
 const TAB = 'main div.stack > div.tabs[role=tablist], main div.stack > div.tabs[role=tablist] ~ *';
 const crops = {
+  // The posted accrual: its audit with the automatic reversal date.
+  'wt-a-04': 'section.card:has(h2:text-is("Audit"))',
   'scr-ac-27-02-entry': TAB, 'scr-ac-27-03-instrument': TAB, 'scr-ac-27-04-tags': TAB,
   'scr-ac-43-02-disbursement': TAB, 'scr-ac-46-02-family': TAB,
 };

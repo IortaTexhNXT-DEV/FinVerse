@@ -9,7 +9,7 @@ import { today } from '@/utils/format';
 import { PeriodSelectors } from './PeriodSelectors';
 import { closeControlsApi } from './closeControlsApi';
 import type { CloseSchedule } from './closeControlsApi';
-import { closeGuards, fromLocalInput, toLocalInput } from './closeTimes';
+import { closeGuards, fromLocalInput, joinWhen, splitWhen, toLocalInput } from './closeTimes';
 import type { usePeriodPicker } from './usePeriodPicker';
 import { SCHEDULE_NOTE } from './closeTexts';
 
@@ -20,16 +20,29 @@ interface Props {
   onClose: () => void;
 }
 
-/** The chosen close time: the proposal of the period until the user picks another. */
+/**
+ * The chosen close date and time, each the proposal of the period until the user picks another;
+ * the date and the time are kept apart so that clearing or retyping one never spoils the other.
+ */
 function useCloseTime(companyId: number, periodId: number, open: boolean) {
-  const [when, setWhen] = useState('');
+  const [day, setDay] = useState('');
+  const [hour, setHour] = useState('');
   const proposal = useQuery({
     queryKey: ['close-proposal', companyId, periodId],
     queryFn: () => closeControlsApi.proposal(companyId, periodId),
     enabled: open && periodId > 0,
   });
-  const chosen = when === '' ? toLocalInput(proposal.data?.scheduledAt) : when;
-  return { chosen, setWhen, proposalError: proposal.error };
+  const proposed = splitWhen(toLocalInput(proposal.data?.scheduledAt));
+  const date = day || proposed.date;
+  const time = hour || proposed.time;
+  return {
+    date,
+    time,
+    chosen: joinWhen(date, time),
+    setDay,
+    setHour,
+    proposalError: proposal.error,
+  };
 }
 
 /**
@@ -39,7 +52,11 @@ function useCloseTime(companyId: number, periodId: number, open: boolean) {
 export function ScheduleCloseDialog({ open, picker, onDone, onClose }: Readonly<Props>) {
   const { companyId } = picker;
   const periodId = picker.period?.id ?? 0;
-  const { chosen, setWhen, proposalError } = useCloseTime(companyId, periodId, open);
+  const { date, time, chosen, setDay, setHour, proposalError } = useCloseTime(
+    companyId,
+    periodId,
+    open,
+  );
   const guards = closeGuards(picker.period?.endDate, chosen, today());
   const schedule = useMutation({
     mutationFn: () => closeControlsApi.schedule(companyId, periodId, fromLocalInput(chosen)),
@@ -93,17 +110,13 @@ export function ScheduleCloseDialog({ open, picker, onDone, onClose }: Readonly<
         >
           {(id) => (
             <div className="row">
-              <DateInput
-                id={id}
-                value={chosen.slice(0, 10)}
-                onChange={(e) => setWhen(`${e.target.value}T${chosen.slice(11, 16) || '17:00'}`)}
-              />
+              <DateInput id={id} value={date} onChange={(e) => setDay(e.target.value)} />
               <input
                 className="input"
                 type="time"
                 aria-label="Close time"
-                value={chosen.slice(11, 16)}
-                onChange={(e) => setWhen(`${chosen.slice(0, 10)}T${e.target.value}`)}
+                value={time}
+                onChange={(e) => setHour(e.target.value)}
               />
             </div>
           )}

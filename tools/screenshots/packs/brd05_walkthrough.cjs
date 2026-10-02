@@ -358,7 +358,8 @@ const steps = {
       await page.waitForTimeout(500);
       await confirmDialog(page, /^upload and reconcile$/i);
     }
-    return page;
+    // The statement listed with its counts on the uploads of the insurers.
+    return go(ctx, 'acsl', '/acsl/soa');
   },
   // 2. The upload with its results.
   'wt-c-02': async (ctx) => go(ctx, 'acsl', `/acsl/soa/${soaUpload(ctx)}`),
@@ -489,7 +490,12 @@ const steps = {
       const d = await openDialog(page, /^schedule close$/i);
       await fill(page, 'Period', new RegExp(`^${previousMonth().iso}`), d);
       await settle(page, 600);
-      await fill(page, 'Close on', dateText(1), d);
+      // The close date is retyped over the proposal (a cleared date falls back to the proposal).
+      const closeOn = d.getByLabel(/^Close on/).first();
+      await closeOn.click();
+      await closeOn.press('Control+A');
+      await closeOn.pressSequentially(dateText(1), { delay: 20 });
+      await closeOn.press('Tab');
       await d.getByLabel('Close time').fill('17:00');
       await settle(page, 400);
       await confirmDialog(page, /^schedule close$/i);

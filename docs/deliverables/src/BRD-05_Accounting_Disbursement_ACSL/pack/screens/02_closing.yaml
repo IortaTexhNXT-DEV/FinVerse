@@ -46,7 +46,7 @@ screens:
       - "Scheduled and past closes | Period / Scheduled For / Status / Run At / Outcome / Scheduled By | Column | Scheduled, Completed, Failed or Cancelled; dates and times dd-MMM-yyyy HH:mm; the name of the scheduler | - | Close schedules | - | Read only | - | -"
       - "Broking books by period | Period / Books / Closed / Reopened / Note | Column | Open or Closed; who closed or reopened them and when | - | Broking books | - | Read only | - | -"
       - "Schedule month-end close dialog | Fiscal year / Period | Drop-down | The previous month by default | Y | Periods | Previous month | - | Previous month only, unless the parameter allows another | Only the previous month can be closed"
-      - "Schedule month-end close dialog | Close on | Date and time | dd-MMM-yyyy HH:mm, in the future | Y | - | 2nd banking day of the next month, 17:00 | - | In the future | -"
+      - "Schedule month-end close dialog | Close on | Date and time | dd-MMM-yyyy date and HH:mm time, in the future | Y | - | 2nd banking day of the next month, 17:00 | - | In the future | -"
       - "Close or reopen the broking books dialog | Reason | Text area | Mandatory to reopen the books | Cond.: reopen | - | Blank | - | - | Enter the reason"
     actions:
       - "Schedule Close | GL Team Lead, GL Section Head (GL close schedule) | Always | Schedules the close of the period; the job runs the checklist at that time | Scheduled | -"

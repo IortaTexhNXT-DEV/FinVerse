@@ -1044,7 +1044,8 @@ validations:
 fields_screen: Schedule Close
 fields:
   - [Period, List, "Yes", Open periods, Previous month]
-  - [Close on, Date-time, "Yes", "-", "In the future; default 2nd banking day 17:00"]
+  - [Close on (date), Date, "Yes", "-", "dd-MMM-yyyy; with the time, in the future; default 2nd banking day"]
+  - [Close on (time), Time, "Yes", "-", "HH:mm, next to the date; default 17:00"]
 notifications:
   - Alert GL_CLOSE_FAILED when a scheduled close fails.
 audit:

@@ -595,6 +595,7 @@
   font-size: 14px;
   color: var(--color-text);
   border-top: 1px solid var(--color-border);
+  font-variant-numeric: tabular-nums;
 }
 
 .pagination-summary {

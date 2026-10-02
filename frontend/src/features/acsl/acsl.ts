@@ -305,7 +305,7 @@ export function caseRequestFacts(
 const LINE_ORIGINS: Record<LineOrigin, string> = {
   REVERSAL: 'Reversal',
   REPOST: 'Re-post',
-  MANUAL: 'Added by the preparer',
+  MANUAL: 'Manual line of the preparer',
 };
 
 /** Where a correction line comes from, in words. */

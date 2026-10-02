@@ -138,6 +138,7 @@ describe('correction line origin', () => {
   it('names where a correction line comes from in words', () => {
     expect(lineOriginLabel('REVERSAL')).toBe('Reversal');
     expect(lineOriginLabel('REPOST')).toBe('Re-post');
+    expect(lineOriginLabel('MANUAL')).toBe('Manual line of the preparer');
   });
 });
 

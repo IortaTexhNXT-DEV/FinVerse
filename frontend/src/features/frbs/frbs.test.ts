@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import type { PackEntry, Schedule, ScheduleValues, ServiceFeeLine } from './api';
 import {
   emptySchedule,
@@ -14,6 +14,8 @@ import {
 } from './schedules';
 import {
   lineActions,
+  lineMenu,
+  payoutNote,
   periodErrors,
   ruleErrors,
   tabOf,
@@ -212,5 +214,31 @@ describe('account schedules and report pack', () => {
   it('exports board schedules to Word as well as Excel and PDF (client requirement 16)', () => {
     expect(packFormats(entry({ wordRequested: true }))).toEqual(['XLSX', 'PDF', 'DOCX']);
     expect(packFormats(entry({}))).toEqual(['XLSX', 'PDF']);
+  });
+});
+
+describe('service fee line row menu', () => {
+  it('names the tags in words and keeps Send Again for the run manager', () => {
+    const onAction = vi.fn();
+    const sent = lineMenu(
+      line({ status: 'SENT' }),
+      'APPROVED',
+      { tag: true, manage: false },
+      onAction,
+    );
+    expect(sent.map((a) => a.label)).toEqual(['Tag Released']);
+    sent[0]?.onSelect('');
+    expect(onAction).toHaveBeenCalledWith('release');
+    const returned = line({ status: 'RETURNED' });
+    expect(lineMenu(returned, 'APPROVED', { tag: true, manage: false }, onAction)).toEqual([]);
+    expect(
+      lineMenu(returned, 'APPROVED', { tag: false, manage: true }, onAction).map((a) => a.label),
+    ).toEqual(['Send Again']);
+  });
+});
+
+describe('service fee payout note', () => {
+  it('gives the status in Disbursement in words', () => {
+    expect(payoutNote({ dvNo: 'DSQ-2026-000002', gatewayStatus: 'SENT' })).not.toContain('SENT');
   });
 });

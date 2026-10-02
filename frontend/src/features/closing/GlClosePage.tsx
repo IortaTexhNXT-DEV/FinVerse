@@ -13,6 +13,7 @@ import { ScheduleCloseDialog } from './ScheduleCloseDialog';
 import { closeControlsApi } from './closeControlsApi';
 import type { BooksCutoff, CloseSchedule } from './closeControlsApi';
 import { usePeriodPicker } from './usePeriodPicker';
+import { CLOSE_JOBS_NOTE } from './rowActions';
 
 type Tab = 'close' | 'broking';
 type Dialog = 'schedule' | 'closeBooks' | 'reopenBooks' | null;
@@ -105,8 +106,7 @@ export default function GlClosePage() {
           rows={schedules.data ?? []}
           loading={schedules.isLoading}
           canWithdraw={scheduler}
-          withdrawing={cancel.isPending}
-          onWithdraw={(s) => cancel.mutate(s)}
+          onWithdraw={(s) => cancel.mutateAsync(s)}
         />
       ) : (
         <BooksCard
@@ -117,8 +117,7 @@ export default function GlClosePage() {
         />
       )}
       <p className="muted">
-        <PlayCircle size={14} aria-hidden="true" /> A scheduled job runs due closes every 15
-        minutes; BROKING_BOOKS_CLOSE cuts off the broking books on the last day of the month.
+        <PlayCircle size={14} aria-hidden="true" /> {CLOSE_JOBS_NOTE}
       </p>
       <ScheduleCloseDialog
         open={dialog === 'schedule'}

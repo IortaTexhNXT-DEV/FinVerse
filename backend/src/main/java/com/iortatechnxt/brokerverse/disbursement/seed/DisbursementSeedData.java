@@ -174,8 +174,20 @@ public class DisbursementSeedData implements ApplicationRunner {
   }
 
   private void masters(Long companyId) {
-    payee(companyId, INSURER, "INSURER", "MAPFRE Insular", DisbursementMode.CHECK, null);
-    payee(companyId, CLIENT, "CLIENT", "Client Refund Payee", DisbursementMode.CTA, "001122334455");
+    payee(
+        companyId,
+        INSURER,
+        "INSURER",
+        "Mabuhay General Insurance Corp.",
+        DisbursementMode.CHECK,
+        null);
+    payee(
+        companyId,
+        CLIENT,
+        "CLIENT",
+        "Santos, Maria Clara Reyes",
+        DisbursementMode.CTA,
+        "001122334455");
     payee(
         companyId, SUPPLIER, "SUPPLIER", "Metro Office Supplies Co.", DisbursementMode.CHECK, null);
   }
@@ -201,7 +213,7 @@ public class DisbursementSeedData implements ApplicationRunner {
                         klass,
                         name,
                         "Makati City",
-                        "disbursement-seed@brokerverse-seed.ph",
+                        "accounts.payable@payee.example",
                         null,
                         mode,
                         List.of(mode, DisbursementMode.CHECK, DisbursementMode.CTA).stream()
@@ -281,7 +293,10 @@ public class DisbursementSeedData implements ApplicationRunner {
                     PROCESSOR,
                     () ->
                         uploads.negotiated(
-                            check.getInstrumentNo(), check.getAmount(), "Deposited", "SEED")));
+                            check.getInstrumentNo(),
+                            check.getAmount(),
+                            "Deposited",
+                            "DEP-2026-0930")));
   }
 
   private void refund(Long companyId) {

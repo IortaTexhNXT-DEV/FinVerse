@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { BIR_OUTPUT_GROUPS, initialChoice, outputParams, periodLabel } from './birOutputs';
+import {
+  BIR_OUTPUT_GROUPS,
+  initialChoice,
+  monthName,
+  outputParams,
+  periodLabel,
+} from './birOutputs';
 import type { BirOutput } from './birOutputs';
 import { draftErrors, draftTax, emptyDraft, toBody } from './receivedCertificates';
 
@@ -32,11 +38,11 @@ describe('BIR outputs', () => {
       toDate: '2026-08-15',
     });
     expect(outputParams(output('LEDGER'), 1, c).accountClass).toBe('ASSET');
-    expect(periodLabel(output('MONTH'), c)).toBe('2026-08');
+    expect(periodLabel(output('MONTH'), c)).toBe('Aug-2026');
     expect(periodLabel(output('QUARTER'), c)).toBe('Q3 2026');
     expect(periodLabel(output('YEAR'), c)).toBe('2026');
-    expect(periodLabel(output('RANGE'), c)).toBe('2026-01-01 to 2026-08-15');
-    expect(periodLabel(output('LEDGER'), c)).toContain('ASSET');
+    expect(periodLabel(output('RANGE'), c)).toBe('01-Jan-2026 to 15-Aug-2026');
+    expect(periodLabel(output('LEDGER'), c)).toContain('Asset');
   });
 });
 
@@ -78,5 +84,11 @@ describe('certificates received', () => {
       income: 500,
       tax: 10,
     });
+  });
+});
+
+describe('month names', () => {
+  it('names a month of the selector', () => {
+    expect(monthName('10')).toBe('Oct');
   });
 });

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Copy, Save } from 'lucide-react';
+import { Save } from 'lucide-react';
 import { useState } from 'react';
 import type { Currency, ExchangeRate } from '@/api/masters';
 import { useAuth } from '@/auth/authContext';
@@ -9,9 +9,11 @@ import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
+import { RowActions } from '@/components/ui/RowActions';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate, today } from '@/utils/format';
 import { frbsSetupApi } from './frbsSetupApi';
+import { monthText, revaluationRateActions } from './rateLabels';
 import { UserName } from '@/components/ui/UserName';
 import { useCurrencyCodes } from '@/context/currencies';
 
@@ -50,14 +52,14 @@ export function RevaluationRatesCard({ currencies }: Readonly<{ currencies: Curr
     onSuccess: async (r) => {
       setRate('');
       await refresh();
-      toast.success(`${r.currencyCode} revaluation rate of ${month} saved`);
+      toast.success(`${r.currencyCode} revaluation rate of ${monthText(month)} saved`);
     },
   });
   const copy = useMutation({
     mutationFn: (m: string) => frbsSetupApi.copyToBook(m),
     onSuccess: async (created) => {
       await queryClient.invalidateQueries({ queryKey: ['rates'] });
-      toast.success(`${created.length} BOOK rate(s) created for the next month`);
+      toast.success(`${created.length} Book rate(s) created for the next month`);
     },
   });
   const rateOk = Number(rate) > 0;
@@ -132,20 +134,16 @@ export function RevaluationRatesCard({ currencies }: Readonly<{ currencies: Curr
           { key: 'r', header: 'Rate', numeric: true, render: (r) => r.rate.toFixed(6) },
           { key: 'b', header: 'Entered By', render: (r) => <UserName login={r.createdBy} /> },
           {
-            key: 'copy',
-            header: '',
-            render: (r) =>
-              maintainer && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  icon={<Copy size={14} />}
-                  busy={copy.isPending}
-                  onClick={() => copy.mutate(r.effectiveDate.slice(0, 7))}
-                >
-                  Copy to BOOK
-                </Button>
-              ),
+            key: 'actions',
+            header: 'Actions',
+            render: (r) => (
+              <RowActions
+                record={`${r.currencyCode} ${formatDate(r.effectiveDate)}`}
+                actions={revaluationRateActions(maintainer, () =>
+                  copy.mutateAsync(r.effectiveDate.slice(0, 7)),
+                )}
+              />
+            ),
           },
         ]}
       />

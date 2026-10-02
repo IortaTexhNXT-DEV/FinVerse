@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { WorkAction } from '@/api/workflow';
@@ -10,15 +10,9 @@ import { acslApi, CASE_ENTITY } from './api';
 import type { AcslCase, CaseOutcome } from './api';
 import { FormDialog } from './FormDialog';
 import type { DialogField } from './FormDialog';
+import { CORRECTION_KINDS, assigneeField } from './acsl';
 
 type Dialog = 'assign' | 'findings' | 'result' | 'correction' | 'reversal' | 'message';
-
-const KINDS = [
-  { value: 'WRONG_ACCOUNT', label: 'Posting to a wrong GL account' },
-  { value: 'AMOUNT', label: 'Wrong amount' },
-  { value: 'RECLASS', label: 'Reclassification' },
-  { value: 'OTHER', label: 'Other correction' },
-];
 
 const OUTCOMES = [
   { value: 'CONFIRMED', label: 'Confirmed' },
@@ -28,12 +22,16 @@ const OUTCOMES = [
 
 const DIALOGS: Record<
   Dialog,
-  { title: string; confirm: string; fields: (c: AcslCase) => DialogField[] }
+  {
+    title: string;
+    confirm: string;
+    fields: (c: AcslCase, users: readonly string[]) => DialogField[];
+  }
 > = {
   assign: {
     title: 'Assign the Case',
     confirm: 'Assign',
-    fields: () => [{ key: 'username', label: 'Processor (User ID)', required: true }],
+    fields: (_c, users) => [assigneeField('Processor', users)],
   },
   findings: {
     title: 'Record Findings',
@@ -54,7 +52,7 @@ const DIALOGS: Record<
     title: 'Raise a Correction Entry',
     confirm: 'Raise Correction',
     fields: () => [
-      { key: 'kind', label: 'Correction Kind', required: true, options: KINDS },
+      { key: 'kind', label: 'Correction Kind', required: true, options: CORRECTION_KINDS },
       { key: 'originalBatchNo', label: 'Journal to Correct', hint: 'Journal batch no., if known' },
       { key: 'description', label: 'Description', required: true },
     ],
@@ -143,6 +141,11 @@ export function CaseActions({ c, actions }: Readonly<{ c: AcslCase; actions: Wor
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [dialog, setDialog] = useState<Dialog | null>(null);
+  const processors = useQuery({
+    queryKey: ['acsl', 'processors'],
+    queryFn: acslApi.processors,
+    enabled: dialog === 'assign',
+  });
   const act = useMutation({
     mutationFn: ({ d, values }: { d: Dialog; values: Record<string, string> }) => run(c, d, values),
     onSuccess: async (result, { d }) => {
@@ -170,7 +173,7 @@ export function CaseActions({ c, actions }: Readonly<{ c: AcslCase; actions: Wor
         <FormDialog
           title={`${DIALOGS[dialog].title} · ${c.caseNo}`}
           confirmLabel={DIALOGS[dialog].confirm}
-          fields={DIALOGS[dialog].fields(c)}
+          fields={DIALOGS[dialog].fields(c, processors.data ?? [])}
           busy={act.isPending}
           error={act.error}
           onConfirm={(values) => act.mutate({ d: dialog, values })}

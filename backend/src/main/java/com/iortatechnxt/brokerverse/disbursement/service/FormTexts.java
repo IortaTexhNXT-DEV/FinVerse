@@ -1,6 +1,7 @@
 package com.iortatechnxt.brokerverse.disbursement.service;
 
 import com.iortatechnxt.brokerverse.coa.domain.BalanceSide;
+import com.iortatechnxt.brokerverse.disbursement.domain.DisbursementEnums.DisbursementMode;
 import com.iortatechnxt.brokerverse.disbursement.domain.PayeeAccount;
 import com.iortatechnxt.brokerverse.disbursement.domain.Voucher;
 import com.iortatechnxt.brokerverse.disbursement.domain.VoucherLine;
@@ -10,6 +11,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -20,14 +22,18 @@ final class FormTexts {
   /** Printed for a missing value. */
   static final String DASH = "-";
 
+  /** Dates as every BIBS document prints them: 03-Oct-2026. */
+  private static final DateTimeFormatter DATE =
+      DateTimeFormatter.ofPattern("dd-MMM-yyyy", Locale.ENGLISH);
+
   private FormTexts() {}
 
   static List<Field> voucherFields(Voucher v, DisbursementForms.FormFacts f) {
     return List.of(
         new Field("Request", f.requestNo()),
         new Field("Payee", v.getPayeeCode() + " - " + v.getPayeeName()),
-        new Field("Disbursement type", v.getDisbursementType()),
-        new Field("Mode of payment", v.getMode() == null ? DASH : v.getMode().name()),
+        new Field("Disbursement type", words(v.getDisbursementType())),
+        new Field("Mode of payment", mode(v.getMode())),
         new Field("Paying account", bankText(f.bank())),
         new Field("Value date", text(v.getValueDate())),
         new Field("Gross", v.getCurrency() + " " + amount(v.getGross())),
@@ -45,7 +51,7 @@ final class FormTexts {
         orEmpty(l.getCostCenter()),
         debit ? amount(l.getAmount()) : "",
         debit ? "" : amount(l.getAmount()),
-        l.getOrigin().name());
+        words(l.getOrigin().name()));
   }
 
   static Map<String, Object> accountValues(DisbursementForms.FormFacts f) {
@@ -79,7 +85,40 @@ final class FormTexts {
   }
 
   static String text(LocalDate date) {
-    return date == null ? DASH : date.toString();
+    return date == null ? DASH : DATE.format(date);
+  }
+
+  /**
+   * A mode of payment in words, as the documents print it: CTA is "Credit to account".
+   *
+   * @param mode mode
+   * @return the mode in words, a dash when there is none
+   */
+  static String mode(DisbursementMode mode) {
+    if (mode == null) {
+      return DASH;
+    }
+    return switch (mode) {
+      case CTA -> "Credit to account";
+      case ATD -> "Authority to debit";
+      case MC_DD -> "Manager's check / demand draft";
+      case TT -> "Telegraphic transfer";
+      default -> words(mode.name());
+    };
+  }
+
+  /**
+   * A code in words (see {@link #mode} for the modes of payment).
+   *
+   * @param code code
+   * @return the code in words, a dash when there is none
+   */
+  static String words(String code) {
+    if (code == null || code.isBlank()) {
+      return DASH;
+    }
+    String w = code.toLowerCase(Locale.ROOT).replace('_', ' ');
+    return Character.toUpperCase(w.charAt(0)) + w.substring(1);
   }
 
   /**

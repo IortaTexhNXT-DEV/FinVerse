@@ -17,7 +17,12 @@ import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { disbursementApi } from './api';
 import type { Instrument, InstrumentStatus, StatusEdit, Voucher } from './api';
-import { INSTRUMENT_ACTION_LABELS, MODE_LABELS, instrumentActions } from './labels';
+import {
+  BRANCH_EMAIL_HINT,
+  INSTRUMENT_ACTION_LABELS,
+  MODE_LABELS,
+  instrumentActions,
+} from './labels';
 import type { InstrumentAction } from './labels';
 import { DialogFooter, TextDialog } from './VoucherDialogs';
 import './disbursement.css';
@@ -33,7 +38,7 @@ const PROMPTS: Partial<
   email: {
     field: 'Branch E-mail',
     required: true,
-    hint: 'Mailbox of the processing branch (list BRANCH_EMAIL); several addresses separated by commas.',
+    hint: BRANCH_EMAIL_HINT,
   },
   debited: { field: 'Branch or BOB Reference', required: false },
   received: { field: "Manager's Check / Demand Draft No.", required: false },

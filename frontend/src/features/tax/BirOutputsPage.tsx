@@ -15,7 +15,13 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { DEFAULT_PRINT, reportOptionsApi } from '@/features/reports/reportOptions';
 import { today } from '@/utils/format';
-import { BIR_OUTPUT_GROUPS, initialChoice, outputParams, periodLabel } from './birOutputs';
+import {
+  BIR_OUTPUT_GROUPS,
+  initialChoice,
+  monthName,
+  outputParams,
+  periodLabel,
+} from './birOutputs';
 import type { BirOutput, PeriodChoice } from './birOutputs';
 import { DateInput } from '@/components/ui/DateInput';
 
@@ -70,7 +76,7 @@ function PeriodFields({
           >
             {MONTHS.map((m) => (
               <option key={m} value={m}>
-                {m.padStart(2, '0')}
+                {monthName(m)}
               </option>
             ))}
           </select>
@@ -141,9 +147,7 @@ export default function BirOutputsPage() {
       render: (o) => (
         <>
           <Link to={`/reports/${o.code}`}>{o.title}</Link>
-          <span className="cell-sub">
-            {o.code} · {o.text}
-          </span>
+          <span className="cell-sub">{o.text}</span>
         </>
       ),
     },

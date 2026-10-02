@@ -277,6 +277,7 @@ export const payRequestApi = {
   counts: (companyId: number) =>
     api.get<StageCounts>(`${BASE}/requests/counts${toQuery({ companyId })}`),
   get: (id: number) => api.get<PayRequest>(request(id)),
+  preparers: () => api.get<string[]>(`${BASE}/preparers`),
   validations: (id: number) => api.get<ValidationView[]>(`${request(id)}/validations`),
   form: (id: number): Promise<DownloadedFile> => api.getFile(`${request(id)}/form`),
   liquidationForm: (id: number): Promise<DownloadedFile> =>

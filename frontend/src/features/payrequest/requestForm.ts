@@ -1,3 +1,6 @@
+import { statusLabel } from '@/components/ui/statusTones';
+import type { RowAction } from '@/components/ui/RowActions';
+import { displayNameOf } from '@/api/users';
 import type {
   CashAdvanceInput,
   ExpenseInput,
@@ -307,3 +310,50 @@ export function expenseInputs(days: readonly DayDraft[]): ExpenseInput[] {
     others: money(d.others),
   }));
 }
+
+/** The Marketing users a request may be assigned to, by name and sorted, never typed as IDs. */
+export function preparerOptions(users: readonly string[]): { value: string; label: string }[] {
+  return users
+    .map((u) => ({ value: u, label: displayNameOf(u) || u }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+/**
+ * The row menu of a validation task: a result handed over outside the system is recorded while the
+ * request waits for validation.
+ */
+export function validationActions(
+  task: { status: string },
+  stage: string,
+  mayAssign: boolean,
+  record: () => void,
+): RowAction[] {
+  const open = task.status === 'DEFERRED' || task.status === 'OPEN';
+  return open && mayAssign && stage === 'FOR_VALIDATION'
+    ? [{ label: 'Record Result', onSelect: record }]
+    : [];
+}
+
+/** Where a request is in Disbursement, in words: the instrument status, else the request status. */
+export function disbursementNote(r: {
+  instrumentStatus?: string | null;
+  disbursementStatus?: string | null;
+}): string {
+  const status = r.instrumentStatus ?? r.disbursementStatus;
+  return status ? statusLabel(status) : '';
+}
+
+/**
+ * Smallest width (pixels) of each column of the accounts to refund, so an AR number, a client
+ * number, a name and a reason stay readable; the table scrolls inside its card when narrower.
+ */
+export const REFUND_LINE_WIDTHS: Record<string, number> = {
+  arNo: 150,
+  invoiceNo: 200,
+  clientCode: 160,
+  assuredName: 220,
+  amount: 130,
+  reasonCode: 210,
+  branchUnit: 150,
+  category: 200,
+};

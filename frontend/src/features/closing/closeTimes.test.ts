@@ -1,4 +1,11 @@
-import { closeGuards, fromLocalInput, isPreviousMonth, toLocalInput } from './closeTimes';
+import {
+  closeGuards,
+  fromLocalInput,
+  isPreviousMonth,
+  joinWhen,
+  splitWhen,
+  toLocalInput,
+} from './closeTimes';
 
 describe('close times', () => {
   it('round-trips a datetime-local value', () => {
@@ -27,5 +34,15 @@ describe('close times', () => {
     const late = closeGuards('2030-03-31', '2030-06-02T17:00', '2030-06-01');
     expect(late.schedule).toContain('2030-06');
     expect(late.now).toBeDefined();
+  });
+});
+
+describe('close date and time kept apart', () => {
+  it('splits and joins the close time, never mixing a time into the date', () => {
+    expect(splitWhen('2026-11-03T17:00')).toEqual({ date: '2026-11-03', time: '17:00' });
+    expect(splitWhen('')).toEqual({ date: '', time: '' });
+    expect(joinWhen('2026-10-04', '17:00')).toBe('2026-10-04T17:00');
+    expect(joinWhen('', '17:00')).toBe('');
+    expect(joinWhen('2026-10-04', '')).toBe('');
   });
 });

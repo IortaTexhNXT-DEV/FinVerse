@@ -7,6 +7,7 @@ import { RecordSummary } from '@/components/broking/RecordSummary';
 import type { Fact } from '@/components/broking/RecordSummary';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
 import { WorkflowPanel } from '@/components/broking/WorkflowPanel';
+import { useInsurerName } from '@/components/broking/useLabels';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
@@ -15,7 +16,7 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { formatAmount, formatDate, formatDateTime, humanize } from '@/utils/format';
-import { CASE_TYPE_LABELS } from './acsl';
+import { CASE_TYPE_LABELS, caseRequestFacts } from './acsl';
 import { acslApi, CASE_ENTITY } from './api';
 import type { AcslCase } from './api';
 import { CaseActions } from './CaseActions';
@@ -60,20 +61,11 @@ function facts(c: AcslCase): Fact[] {
 }
 
 function DetailsTab({ c }: Readonly<{ c: AcslCase }>) {
+  const insurerName = useInsurerName();
   return (
     <div className="stack">
       <Card title="Request">
-        <Facts
-          items={[
-            ['Subject', c.subject],
-            ['Details', c.details],
-            ['Requesting Module', c.requesterModule ? humanize(c.requesterModule) : undefined],
-            ['Requester Reference', c.requesterRef],
-            ['Client', c.account.clientCode],
-            ['Insurer', c.account.insurerCode],
-            ['Root Invoice', c.account.rootInvoiceNo],
-          ]}
-        />
+        <Facts items={caseRequestFacts(c, insurerName)} />
       </Card>
       <Card title="Investigation">
         <Facts

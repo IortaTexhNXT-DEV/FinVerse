@@ -1,14 +1,14 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Amount } from '@/components/ui/Amount';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { RowActions } from '@/components/ui/RowActions';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDate, humanize } from '@/utils/format';
-import { optionalText } from './acsl';
+import { optionalText, originalLineActions } from './acsl';
 import { acslApi } from './api';
 import type { Correction, OriginalLine } from './api';
 import { FormDialog } from './FormDialog';
@@ -73,12 +73,13 @@ export function OriginalLinesCard({
   ];
   if (editable) {
     columns.push({
-      key: 'act',
-      header: 'Action',
+      key: 'actions',
+      header: 'Actions',
       render: (o) => (
-        <Button variant="secondary" size="sm" onClick={() => setPicked(o)}>
-          Correct
-        </Button>
+        <RowActions
+          record={`${o.batchNo} line ${String(o.lineNo)}`}
+          actions={originalLineActions(editable, () => setPicked(o))}
+        />
       ),
     });
   }

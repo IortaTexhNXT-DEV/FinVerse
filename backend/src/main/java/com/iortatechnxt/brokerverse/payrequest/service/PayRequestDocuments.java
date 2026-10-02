@@ -4,6 +4,7 @@ import com.iortatechnxt.brokerverse.audit.domain.AuditAction;
 import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentSpec;
@@ -170,7 +171,7 @@ public class PayRequestDocuments {
     Map<String, String> values = new HashMap<>();
     values.put("requestNo", r.getRequestNo());
     values.put("reference", text(r.getContent().referenceText()));
-    values.put("requestDate", r.getRequestDate().toString());
+    values.put("requestDate", DisplayFormat.date(r.getRequestDate()));
     values.put("segment", text(r.getContent().segment()));
     values.put("currency", r.getContent().currency());
     values.put("amount", r.getAmount().toPlainString());
@@ -184,7 +185,7 @@ public class PayRequestDocuments {
   private List<Field> requestFields(PaymentRequest r) {
     return List.of(
         new Field("Request No.", r.getRequestNo()),
-        new Field("Request Date", r.getRequestDate().toString()),
+        new Field("Request Date", DisplayFormat.date(r.getRequestDate())),
         new Field("Reference", text(r.getContent().referenceText())),
         new Field("Segment", text(r.getContent().segment())),
         new Field("Requesting Unit", text(r.getContent().requestingUnit())),
@@ -235,7 +236,7 @@ public class PayRequestDocuments {
             .map(
                 (LiquidationLine d) ->
                     List.of(
-                        d.getFieldworkDate().toString(),
+                        DisplayFormat.date(d.getFieldworkDate()),
                         d.getParticulars(),
                         plain(d.getPerDiem()),
                         plain(d.getRepresentation()),

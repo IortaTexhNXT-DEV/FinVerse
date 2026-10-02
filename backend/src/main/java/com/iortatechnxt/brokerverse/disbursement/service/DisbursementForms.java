@@ -109,7 +109,7 @@ public class DisbursementForms {
             v.getDvNo(),
             voucherSections(v, facts),
             SIGNATURES,
-            "DSB_VOUCHER"));
+            v.getDvNo()));
   }
 
   /**
@@ -129,7 +129,7 @@ public class DisbursementForms {
             reference,
             sections,
             SIGNATURES,
-            "DSB_VOUCHER"));
+            reference));
   }
 
   private List<Section> voucherSections(Voucher v, FormFacts f) {
@@ -162,7 +162,7 @@ public class DisbursementForms {
             i.getInstrumentNo() == null ? v.getDvNo() : i.getInstrumentNo(),
             instrumentSections(v, i, facts),
             BANK_SIGNATURES,
-            TEMPLATES.get(i.getMode())));
+            v.getDvNo()));
   }
 
   /**
@@ -184,7 +184,7 @@ public class DisbursementForms {
             reference,
             sections,
             BANK_SIGNATURES,
-            TEMPLATES.get(mode)));
+            reference));
   }
 
   private List<Section> instrumentSections(Voucher v, Instrument i, FormFacts f) {
@@ -249,7 +249,7 @@ public class DisbursementForms {
     m.put("currency", v.getCurrency());
     m.put("netAmount", FormTexts.amount(v.getNet()));
     m.put("purpose", v.getPurpose());
-    m.put("mode", v.getMode() == null ? FormTexts.DASH : v.getMode().name().replace('_', ' '));
+    m.put("mode", FormTexts.mode(v.getMode()));
     m.put("valueDate", FormTexts.text(v.getValueDate()));
     m.putAll(instrumentValues(i));
     m.putAll(FormTexts.accountValues(f));

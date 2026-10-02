@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Fragment, useState } from 'react';
 import { useAuth } from '@/auth/authContext';
+import { useLovLabel } from '@/components/broking/useLabels';
 import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
@@ -10,10 +11,12 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { RowActions } from '@/components/ui/RowActions';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { payRequestApi } from './api';
 import type { PayRequest, RefundLineView, ValidationView } from './api';
+import { validationActions } from './requestForm';
 
 const LINE_COLUMNS: Column<RefundLineView>[] = [
   { key: 'no', header: 'Item', render: (l) => l.lineNo },
@@ -76,6 +79,7 @@ function Facts({ items }: Readonly<{ items: [string, string | undefined][] }>) {
 
 /** The form of the request: accounts of a refund, facts of a cash advance or check cancellation. */
 export function DetailsTab({ request: r }: Readonly<{ request: PayRequest }>) {
+  const modeLabel = useLovLabel('PRQ_PAYMENT_MODE');
   return (
     <div className="stack">
       <Card title="Request">
@@ -86,7 +90,7 @@ export function DetailsTab({ request: r }: Readonly<{ request: PayRequest }>) {
             ['Requesting Unit', r.content.requestingUnit],
             ['Purpose', r.content.purpose],
             ['Type', r.content.rfpType ? humanize(r.content.rfpType) : undefined],
-            ['Mode of Payment', humanize(r.payee.mode)],
+            ['Mode of Payment', modeLabel(r.payee.mode)],
             ['Account No.', r.payee.accountNo],
             ['Account / Check Name', r.payee.accountName],
             ['CA / SA on Client Record', r.payoutRecorded ? 'Recorded' : undefined],
@@ -124,7 +128,7 @@ export function DisbursementTab({ request: r }: Readonly<{ request: PayRequest }
       <Facts
         items={[
           ['Payment Request', t.requestNo],
-          ['Gateway Status', t.status ? humanize(t.status) : undefined],
+          ['Request Status', t.status ? humanize(t.status) : undefined],
           ['DV No.', t.dvNo],
           ['DV Stage', t.dvStatus ? humanize(t.dvStatus) : undefined],
           ['Instrument Status', t.instrumentStatus ? humanize(t.instrumentStatus) : undefined],
@@ -256,16 +260,14 @@ export function ValidationTab({ request }: Readonly<{ request: PayRequest }>) {
       ),
     },
     {
-      key: 'act',
-      header: '',
-      render: (v) =>
-        (v.status === 'DEFERRED' || v.status === 'OPEN') &&
-        can('PRQ_ASSIGN') &&
-        request.stage === 'FOR_VALIDATION' ? (
-          <Button size="sm" variant="secondary" onClick={() => setTask(v)}>
-            Record Result
-          </Button>
-        ) : null,
+      key: 'actions',
+      header: 'Actions',
+      render: (v) => (
+        <RowActions
+          record={`Item ${String(v.lineNo)}`}
+          actions={validationActions(v, request.stage, can('PRQ_ASSIGN'), () => setTask(v))}
+        />
+      ),
     },
   ];
   return (

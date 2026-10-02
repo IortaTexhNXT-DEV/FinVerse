@@ -1,3 +1,5 @@
+import { statusLabel } from '@/components/ui/statusTones';
+import type { RowAction } from '@/components/ui/RowActions';
 import type { LineStatus, RuleBody, RunStage, ServiceFeeLine } from './api';
 
 /** Work list tabs of the service-fee runs (FRBS 2.10.0), in workflow order. */
@@ -108,4 +110,36 @@ export function ruleErrors(
     errors.effectiveTo = 'Ends before it starts';
   }
   return errors;
+}
+
+const LINE_ACTION_LABELS: Record<LineAction, string> = {
+  release: 'Tag Released',
+  liquidate: 'Tag Liquidated',
+  resend: 'Send Again',
+};
+
+/**
+ * The row menu of a service fee line: the tags for the user who may tag, Send Again for the user
+ * who manages the runs.
+ */
+export function lineMenu(
+  line: ServiceFeeLine,
+  runStage: RunStage,
+  may: { tag: boolean; manage: boolean },
+  onAction: (action: LineAction) => void,
+): RowAction[] {
+  return lineActions(line, runStage)
+    .filter((a) => (a === 'resend' ? may.manage : may.tag))
+    .map((a) => ({ label: LINE_ACTION_LABELS[a], onSelect: () => onAction(a) }));
+}
+
+/** The payout of a line under its request: the voucher, the status in Disbursement in words, the message. */
+export function payoutNote(p: {
+  dvNo?: string | null;
+  gatewayStatus?: string | null;
+  message?: string | null;
+}): string {
+  return [p.dvNo, p.gatewayStatus ? statusLabel(p.gatewayStatus) : undefined, p.message]
+    .filter(Boolean)
+    .join(' · ');
 }

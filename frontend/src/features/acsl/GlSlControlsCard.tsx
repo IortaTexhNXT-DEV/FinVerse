@@ -11,6 +11,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { humanize } from '@/utils/format';
+import { codesInWords } from './acsl';
 import { optionalText } from './acsl';
 import { acslApi } from './api';
 import type { GlSlControl, SlSource } from './api';
@@ -88,8 +89,8 @@ export function GlSlControlsCard() {
   const columns: Column<GlSlControl>[] = [
     { key: 'account', header: 'Control Account', render: (c) => <strong>{c.accountCode}</strong> },
     { key: 'source', header: 'Sub-ledger', render: (c) => humanize(c.source) },
-    { key: 'components', header: 'Components', render: (c) => c.components ?? '—' },
-    { key: 'types', header: 'Document Types', render: (c) => c.documentTypes ?? '—' },
+    { key: 'components', header: 'Components', render: (c) => codesInWords(c.components) },
+    { key: 'types', header: 'Document Types', render: (c) => codesInWords(c.documentTypes) },
     { key: 'currency', header: 'Currency', render: (c) => c.currency ?? 'All' },
     {
       key: 'status',

@@ -16,6 +16,7 @@ import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
@@ -23,7 +24,7 @@ import { formatAmount, formatDate, formatPeriod, formatRate, humanize } from '@/
 import { RUN_ENTITY, frbsApi } from './api';
 import type { ServiceFeeInvoice, ServiceFeeLine, ServiceFeeRun } from './api';
 import { LiquidateDialog, ReleaseDialog } from './LineDialogs';
-import { lineActions, tagProgress, totalsByCurrency } from './serviceFee';
+import { lineMenu, payoutNote, tagProgress, totalsByCurrency } from './serviceFee';
 import './frbs.css';
 import { UserName } from '@/components/ui/UserName';
 import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
@@ -104,9 +105,7 @@ function lineColumns(
       render: (l) => (
         <>
           {l.payout.requestNo ?? '—'}
-          <span className="cell-sub">
-            {[l.payout.dvNo, l.payout.gatewayStatus, l.payout.message].filter(Boolean).join(' · ')}
-          </span>
+          <span className="cell-sub">{payoutNote(l.payout)}</span>
         </>
       ),
     },
@@ -125,19 +124,14 @@ function lineColumns(
     { key: 'status', header: 'Status', render: (l) => <StatusBadge status={l.status} /> },
     {
       key: 'actions',
-      header: '',
+      header: 'Actions',
       render: (l) => (
-        <span className="frbs-actions">
-          {lineActions(l, run.stage)
-            .filter((a) => (a === 'resend' ? mayManage : mayTag))
-            .map((a) => (
-              <Button key={a} size="sm" variant="secondary" onClick={() => onAction(a, l)}>
-                {a === 'release' && 'Tag Released'}
-                {a === 'liquidate' && 'Tag Liquidated'}
-                {a === 'resend' && 'Send Again'}
-              </Button>
-            ))}
-        </span>
+        <RowActions
+          record={l.payeeName}
+          actions={lineMenu(l, run.stage, { tag: mayTag, manage: mayManage }, (a) =>
+            onAction(a, l),
+          )}
+        />
       ),
     },
   ];

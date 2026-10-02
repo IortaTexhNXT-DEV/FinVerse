@@ -1,0 +1,181 @@
+# Guide to the BRD-5 Accounting, Disbursement and ACSL business sign-off pack: the content of the Sign-off Pack Guide
+# deck (signoff/build_guide_deck.py) and of the Start Here guide (START_HERE_BRD05.md, ```pack blocks "guide-*").
+# The same layout is used for every BRD set; only this file changes.
+meta:
+  deck_title: Sign-off Pack Guide
+  module: Accounting, Disbursement and ACSL
+  owner: "Comptrollership (FRBS, Disbursement, ACSL), with Marketing for the refund and cash-advance requests"
+  issued: Fri 2-Oct-2026
+  signoff_date: Wed 23-Dec-2026
+
+# The documents of the set in reading order. kind = doc type of the file name (brand.READING_ORDER).
+documents:
+  - {kind: StartHere, name: Accounting Disbursement ACSL, ext: docx, what: "Start Here: the map of the pack, who reads what, who signs what, the steps and the dates", readers: Everyone, when: "First, on issue"}
+  - {kind: GuideDeck, name: Accounting Disbursement ACSL, ext: pptx, what: "Sign-off Pack Guide: purpose, approach, the module at a glance, caveats and impacts on other modules, entry and exit criteria, change control", readers: "Head of Comptrollership, the product owners of FRBS, Disbursement, ACSL and Marketing; presented at the kick-off", when: "Kick-off session"}
+  - {kind: FRS, name: Accounting Disbursement ACSL, ext: docx, what: "Functional Requirements Specification v2.0: requirements of the two former volumes in one document, navigation, 51 screen specifications with screenshots, five walkthroughs, messages, notifications, documents, upload templates, cross-BRD contract", readers: "The GL team, Disbursement, ACSL and the Marketing requesters for their sections; Operations and BDOI IT for their chapters", when: "During the review, with the SIT walkthroughs"}
+  - {kind: Signoff, name: Accounting Disbursement ACSL, ext: xlsx, what: "Sign-off workbook: one row per screen, field, rule and message with the BU review columns; comments log, meeting minutes, version history, sign-off certificate", readers: "Every reviewer; the approvers sign it", when: "During the review and at sign-off"}
+  - {kind: TestPlan, name: Accounting Disbursement ACSL, ext: xlsx, what: "Test plan workbook: the test cases of both former volumes traced to the FRs and to the screens, including one screen case and one message case per screen", readers: "Business users who will run UAT; BDOI IT", when: "After the screens; used again in SIT and UAT"}
+  - {kind: TestPlan, name: Accounting Disbursement ACSL Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Product owners, BDOI IT", when: "Before sign-off"}
+  - {kind: UXDeck, name: Accounting Disbursement ACSL, ext: pptx, what: "UX Screen Deck for the BDOI UX Design team: design foundation, navigation and personas, every walkthrough step by step and every screen with all its states", readers: "BDOI UX Design team", when: "From the issue, in parallel with the review; re-issued with each version of the set"}
+  - {kind: UXScreens, name: Accounting Disbursement ACSL, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, walkthrough and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
+  - {kind: UXScreens, name: Accounting Disbursement ACSL, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG), the component crops and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
+
+# Reading order per role (FRS chapter numbers of v2.0).
+reading:
+  - role: "Approvers (Head of Comptrollership; product owners of FRBS and ACSL, Disbursement, Comptrollership and Operations, Marketing)"
+    order: "00 Start Here; 01 Guide deck; FRS chapters 1-3 (context and personas), 14 (walkthroughs), 20 (sign-off) and 21 (proposed rules for confirmation); workbook Sign-off certificate"
+  - role: "GL team (GL Officers, GL Team Lead, GL Section Head)"
+    order: "FRS sections 4.1 to 4.10; the screens SCR-AC-01 to 24 of chapter 13; walkthroughs A and D; messages in chapter 15; configuration in chapter 9"
+  - role: "Disbursement (Processors, Team Leaders, Approvers)"
+    order: "FRS section 4.11; the screens SCR-AC-25 to 38; walkthroughs B and E; the documents DO-01 to DO-03 and DO-05 in chapter 17; the upload templates in chapter 18"
+  - role: "Marketing (Processors, Reviewers, Approvers) and Human Resources"
+    order: "FRS section 4.12; the screens SCR-AC-39 to 44; walkthrough B (steps 1 to 4 and 8) and E; the Refund Request Form DO-04"
+  - role: "ACSL (Processors, Team Leader, Head)"
+    order: "FRS section 4.13; the screens SCR-AC-45 to 51; walkthrough C; the reconciliation report DO-06"
+  - role: "Operations (Cashiering and Remittance, BRD-2)"
+    order: "The hand-offs of chapter 19 (remittance payments, refund validations, payment reversals, remittance deductions); walkthrough B; FRS sections 4.11 and 4.13"
+  - role: "Business and System Administrators"
+    order: "FRS section 4.10 (administration) and configuration in chapter 9; the lists of values and access screens of the BRD-1 and BRD-11 sets; Menu by persona in chapter 12"
+  - role: BDOI IT
+    order: "Interfaces and integration (chapter 7), non-functional requirements (chapter 8), configuration and jobs (chapter 9), cross-BRD contract (chapter 19), the bank files of chapter 17; the Technical Specification, reviewed by BDOI IT"
+  - role: BDOI UX Design team
+    order: "07 UX Screen Deck: design foundation and navigation first, then the personas, walkthroughs and screens of the design work; 08 UX screen register (filter Changed in this issue at each new issue); 09 image package in the design tool"
+  - role: iorta TechNXT project team
+    order: "All documents; keeps the comments log, the meeting minutes and the version history of the workbook, answers every comment and keeps the traceability to SIT and UAT"
+
+# Approach and step-by-step flow up to closure. raci: R responsible, A accountable, C consulted, I informed.
+steps:
+  - step: 1
+    name: Pack issued
+    who: "R: iorta TechNXT Project Manager; A: iorta TechNXT delivery lead; I: all reviewers"
+    inputs: "FRS v2.0, workbook, test plan, guide and deck"
+    outputs: "Release set v2.0 in the BRD-05 folder; invitations to the sessions"
+    duration: "Day 0 (Fri 2-Oct-2026); sessions scheduled after the BRD-4 Collections walkthroughs"
+  - step: 2
+    name: Kick-off and screen walkthrough on SIT
+    who: "R: iorta TechNXT Business Analysis; A: Head of Comptrollership; C: product owners of FRBS, ACSL, Disbursement and Marketing; I: Operations, BDOI IT"
+    inputs: "Guide deck; SIT users with seed data; walkthroughs A to E"
+    outputs: "Screens shown live (general ledger and closing, reports and service fee, Disbursement, the Marketing requests, ACSL); first questions logged in the comments log; minutes"
+    duration: "5 sessions, 25-Nov to 1-Dec-2026"
+  - step: 3
+    name: Review with the workbook
+    who: "R: GL team, Disbursement, ACSL and Marketing reviewers; A: the product owners; C: iorta TechNXT (questions)"
+    inputs: "FRS chapters of the area; workbook sheets with the BU review columns"
+    outputs: "Every row marked Accept, Change requested or Comment; comments log entries"
+    duration: "10 working days after the walkthroughs, until Mon 14-Dec-2026"
+  - step: 4
+    name: Comments consolidated and a Q&A session
+    who: "R: iorta TechNXT Project Manager and Business Analysis; A: Head of Comptrollership; C: reviewers"
+    inputs: "Returned workbooks"
+    outputs: "One consolidated comments log, each item typed (clarification, correction, change request) and answered; Q&A minutes"
+    duration: "2 working days, Q&A on Wed 16-Dec-2026"
+  - step: 5
+    name: One revision cycle (v2.1)
+    who: "R: iorta TechNXT Business Analysis; A: iorta TechNXT delivery lead; C: reviewers who raised the items"
+    inputs: "Agreed clarifications and corrections"
+    outputs: "Release set v2.1 with the changed rows marked; change requests raised for the rest"
+    duration: "2 working days, v2.1 on Fri 18-Dec-2026; check by the reviewers until Tue 22-Dec-2026"
+  - step: 6
+    name: Sign-off meeting and signature
+    who: "R: iorta TechNXT Project Manager; A: Head of Comptrollership; C: the product owners, BDOI IT, Business Project Services"
+    inputs: "v2.1 (or v2.0 when no revision is needed); open items with their decision"
+    outputs: "Signed sign-off certificate; minutes; open items accepted as assumptions or change requests"
+    duration: "Wed 23-Dec-2026"
+  - step: 7
+    name: Content freeze
+    who: "R: iorta TechNXT delivery lead; A: Head of Comptrollership; I: BDOI IT, other BRD owners"
+    inputs: "Signed set; change requests with mandays"
+    outputs: "Content frozen as signed; approved deltas scheduled in the Change Management Register"
+    duration: "From Mon 28-Dec-2026"
+  - step: 8
+    name: Traceability into SIT and UAT
+    who: "R: iorta TechNXT test lead; A: Head of Comptrollership; C: business users"
+    inputs: "Signed FRS rows and test plan"
+    outputs: "SIT and UAT runs traced to the signed screens, rules and messages; results against each row"
+    duration: "SIT Jan - Jul 2027; UAT Aug - Dec 2027"
+
+# The module at a glance: key screenshots (file names in the screenshot folder of the pack).
+key_screens:
+  - {image: wt-a-03, caption: "Journals: the accrual posted from the list of the journals assigned"}
+  - {image: wt-b-06, caption: "A refund voucher routed to the approver with its entry"}
+  - {image: wt-c-02, caption: "An insurer statement reconciled line by line with the books"}
+  - {image: wt-c-07, caption: "A correction entry with the reversal and the re-post of a wrong line"}
+
+# Key business rules and validations (highlights; the full list is in the workbook and FRS chapter 13).
+rules:
+  - "Every amount posts through the accounting rules of its business event; a journal posts only when it balances, and posted entries are reversed, never changed."
+  - "Four eyes everywhere: journals, vouchers, payees, bank accounts, fundings, corrections and service-fee runs are approved by another user than their maker; a funding needs a verifier and two approvers."
+  - "Accruals reverse themselves on their reversal date; the broking books close at month end and the GL month closes on the date the GL Team Lead schedules."
+  - "Disbursement pays what the units request: each request becomes a voucher with its proforma entry; refunds and remittances go straight to the approver; approval posts the entry and issues the instrument of the mode."
+  - "A cancelled approved voucher is reversed and its request goes back to its source to be regularised; an approved voucher counts as unregularised until its OR / AR is tagged."
+  - "Marketing refunds and cash advances are reviewed and approved in BIBS (cash advances also by HR) and reach Disbursement on approval; an AR is refunded once."
+  - "ACSL reconciles the insurer statements and the GL with the sub-ledgers, investigates cases and corrects wrong postings with a preparer, a reviewer and an approver."
+
+# Caveats and possibilities, and how each is handled.
+caveats:
+  - topic: Additional requirements
+    text: "New needs can surface during the review, SIT or UAT."
+    handling: "In-scope clarification when the signed text already covers it; otherwise a change request with mandays."
+    example: "A reviewer asks for the cost centre on the Disbursement Workbench list: a new column, so a change request; asking which vouchers count as unregularised is a clarification."
+  - topic: Impacts on other modules
+    text: "Disbursement pays the remittances, refunds and commission refunds of Operations and the Marketing requests; ACSL corrects the postings of every module; every module posts through the accounting rules."
+    handling: "Each change is assessed against the cross-BRD contract (FRS chapter 19); when it touches another set, a delta sign-off of the affected pages of both sets."
+    example: "A new disbursement type for claims payments needs the request of Claims and its accounting rule: both owners confirm the delta."
+  - topic: Other BRDs change Accounting and Disbursement
+    text: "Operations (remittance batches, cashiering validations, remittance deductions), New Business (clients, booking, root invoices), User Access (roles) and Data Migration (opening balances, payees) change what this set shows."
+    handling: "The change is raised against the other BRD and assessed against the contract; when it touches this set, a delta sign-off of the affected pages only."
+    example: "Operations changes the remittance schedule columns: the remittance voucher and its documents are re-issued and signed as a delta."
+  - topic: BDOI data still to give
+    text: "The chart of accounts, the accounting entries of the transactions, the report layouts, the bank file layouts, the check and form layouts and several rates are BDOI data not given yet (AQ01-AQ31)."
+    handling: "BIBS holds them as configuration with provisional values; the answer is loaded as configuration, without a change request."
+    example: "BDOI gives the layout of a GARD schedule: the schedule definition is changed on Account Schedules and the report is issued with it."
+  - topic: Role matrix to confirm
+    text: "The grants follow the role matrices read from the scanned pages; the bank reconciliation is held today by the Accountant and Finance Manager roles (AQ28, CLR-AC-15)."
+    handling: "BDOI confirms the matrix; a change of a grant is applied through an access request, without a change to the screens."
+    example: "BDOI confirms that the GL Officer reconciles the bank accounts: the permission is added to the role."
+  - topic: Integrations pending BDOI IT specifications
+    text: "The DCTF to TPD, BDO Business Online Banking, the e-filing of the BIR forms and the GARD transmission depend on BDOI IT and the bank (AQ09, AQ07, AQ31)."
+    handling: "Files are produced and uploaded by the users until the transfers are specified; an automatic transfer is then a change request. The technical detail is in the Technical Specification, reviewed by BDOI IT."
+    example: "The DCTF is downloaded from the end of day and forwarded to TPD until the transfer is agreed."
+  - topic: Open questions and assumptions
+    text: "Open questions of FRS section 10.3 follow the assumptions of section 10.1; chapter 21 lists the proposed rules and clarifications for confirmation."
+    handling: "Answered as configuration where possible (lists of values, parameters, templates, rules); otherwise a change request; the assumption stands until then."
+    example: "A check goes stale after 180 days until BDOI confirms the period; the answer is a parameter value."
+
+# Entry and exit criteria of the sign-off, and the definition of done.
+entry:
+  - "Every screenshot of the set is taken on the SIT environment with seed data."
+  - "Reviewers have their SIT users and the walkthrough sessions are held."
+  - "The test plan is traced to the FRS and to the screens."
+  - "The BRD-2 Operations walkthroughs are held (the remittance batches, refunds and cashiering validations are the input of Disbursement and ACSL)."
+exit:
+  - "Every row of the workbook reviewed by its unit (Accept, Change requested or Comment)."
+  - "Every comments log item closed: answered, corrected in v2.1, or raised as a change request."
+  - "Open questions closed or accepted as assumptions."
+  - "The sign-off certificate signed by every signatory of the Who signs what matrix: prepared, input, reviewed and approved as on the BRD-5 approval sheets; the Head of Comptrollership approves the whole set."
+done:
+  - "Signed certificate filed with the set; version history updated."
+  - "Content frozen as signed; deltas listed in the Change Management Register with mandays."
+  - "Test plan agreed for SIT and UAT."
+
+# Handover checklist.
+handover:
+  - "Signed FRS, sign-off workbook and screens"
+  - "Open questions closed or accepted as assumptions"
+  - "Configuration inputs from the business: the chart of accounts and its mapping, the accounting entries of every transaction, the cost-centre rules and the employees, the report and schedule layouts, the payees, the bank accounts and check series, the bank file and form layouts, the service-fee rates and recipients, the SOA layouts of the insurers, the lists of values, users and roles"
+  - "Agreed test plan"
+  - "Migration mapping of the opening balances, the open items and the payees signed (BRD-13)"
+handover_note: "After sign-off the content is frozen as signed and the approved deltas are scheduled."
+
+# Governance and contacts (from the approval sheets of the BRD-5 documents).
+governance:
+  - {role: "Business owner and approver", who: "Ronald Allan E. De Leon, VP, Head - Comptrollership", does: "Accountable for the sign-off; chairs the sign-off meeting"}
+  - {role: "Approvers", who: "Iris S. Marquez (FRBS and ACSL), Rodrigo R. Dela Cruz (Disbursement), Perjelyn Joy R. Gutierrez (Comptrollership and Operations), Shellah Marie C. Miranda (Marketing, Processing and Collections), Roderick L. Lim (Institutional Banking, SM and BDO Accounts)", does: "Approve the screens and rules of their units"}
+  - {role: "Reviewers", who: "Freddie A. Atanque and Jennifer T. Lugtu (ACSL); Rhommel Mark Galler (MBS); Ma. Fides Rivera, Ruby Evangelista and Darryl Castillo (MBS input)", does: "Review their screens and rows; raise comments"}
+  - {role: "BDOI IT", who: "Information Technology Group (Carmela A. Morfe, Yonille D. Guy, Abegail R. Panghulan, Nelda R. Ranchez)", does: "Reviews the scheduled runs, files, access and the Technical Specification"}
+  - {role: "BRD owner", who: "Dan Ace R. Cauton, Program Manager, and Roda Lyn D. Gallardo, Zean C. Ibay and Jane Tagle, Business Analysts, ESG-BPS", does: "Traceability to the BRD; sign-off coordination"}
+  - {role: "Delivery", who: "iorta TechNXT Project Manager, Business Analysis, test lead", does: "Sessions, answers, comments log, revisions, change requests"}
+next_steps:
+  - "Kick-off and first SIT walkthrough on Wed 25-Nov-2026"
+  - "Workbooks returned by Mon 14-Dec-2026; Q&A on Wed 16-Dec-2026; sign-off on Wed 23-Dec-2026"
+  - "BRD-13 Data Migration follows (opening balances, open items and payees), then BRD-7 and BRD-8"

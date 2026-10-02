@@ -12,25 +12,8 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { acslApi } from './api';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { DateInput } from '@/components/ui/DateInput';
-
-type Key = 'insurer' | 'from' | 'to' | 'file';
-
-function problems(insurer: string, from: string, to: string, file: File | undefined) {
-  const found: Partial<Record<Key, string>> = {};
-  if (insurer.trim() === '') {
-    found.insurer = 'Enter the insurer code';
-  }
-  if (from === '') {
-    found.from = 'Enter the start of the period';
-  }
-  if (to === '' || (from !== '' && to < from)) {
-    found.to = 'Enter an end on or after the start';
-  }
-  if (!file) {
-    found.file = 'Choose the statement file';
-  }
-  return found;
-}
+import { InsurerSelect } from '@/components/broking/InsurerSelect';
+import { soaUploadProblems } from './acsl';
 
 /**
  * Uploads an insurer statement of account (ACSL 2.14.0): the insurer, the period and the file in
@@ -45,7 +28,7 @@ export function SoaUploadDialog({ onClose }: Readonly<{ onClose: () => void }>) 
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [file, setFile] = useState<File>();
-  const [errors, setErrors] = useState<Partial<Record<Key, string>>>({});
+  const [errors, setErrors] = useState<ReturnType<typeof soaUploadProblems>>({});
   const layouts = useQuery({ queryKey: ['acsl', 'layouts'], queryFn: acslApi.layouts });
   const layout =
     layouts.data?.find((l) => l.insurerCode === insurer.trim().toUpperCase()) ??
@@ -68,7 +51,7 @@ export function SoaUploadDialog({ onClose }: Readonly<{ onClose: () => void }>) 
     },
   });
   const submit = () => {
-    const found = problems(insurer, from, to, file);
+    const found = soaUploadProblems(insurer, from, to, file);
     setErrors(found);
     if (Object.keys(found).length === 0 && file) {
       upload.mutate(file);
@@ -92,14 +75,13 @@ export function SoaUploadDialog({ onClose }: Readonly<{ onClose: () => void }>) 
     >
       <div className="stack">
         <ErrorAlert error={upload.error ?? template.error} />
-        <Field label="Insurer Code" required error={errors.insurer}>
+        <Field label="Insurer" required error={errors.insurer}>
           {(id) => (
-            <input
+            <InsurerSelect
               id={id}
-              className="input"
               aria-invalid={errors.insurer !== undefined}
               value={insurer}
-              onChange={(e) => setInsurer(e.target.value)}
+              onChange={setInsurer}
             />
           )}
         </Field>

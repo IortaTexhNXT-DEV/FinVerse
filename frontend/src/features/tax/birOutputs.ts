@@ -1,3 +1,4 @@
+import { formatDate, humanize } from '@/utils/format';
 /**
  * The new BIR outputs of the report pack (FRBS 3.2.0, Appendix A VII): monthly and annual
  * alphalists, SAWT, the 0619-F, 1603, 1702-Q and 1702 worksheets, the books of accounts and the IC
@@ -166,17 +167,37 @@ export function outputParams(
 }
 
 /** A label of the period an output is exported for. */
+export const MONTH_NAMES = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
+];
+
 export function periodLabel(output: BirOutput, c: PeriodChoice): string {
   switch (output.period) {
     case 'MONTH':
-      return `${c.year}-${c.month.padStart(2, '0')}`;
+      return `${MONTH_NAMES[Number(c.month) - 1] ?? c.month}-${c.year}`;
     case 'QUARTER':
       return `Q${c.quarter} ${c.year}`;
     case 'YEAR':
       return c.year;
     case 'LEDGER':
-      return `${c.from} to ${c.to} · ${c.accountClass}`;
+      return `${formatDate(c.from)} to ${formatDate(c.to)} · ${humanize(c.accountClass)}`;
     default:
-      return `${c.from} to ${c.to}`;
+      return `${formatDate(c.from)} to ${formatDate(c.to)}`;
   }
+}
+
+/** A month number (1-12) as its short name. */
+export function monthName(month: string): string {
+  return MONTH_NAMES[Number(month) - 1] ?? month;
 }

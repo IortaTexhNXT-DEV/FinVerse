@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import type { ActionNote, WorkAction } from '@/api/workflow';
 import { ActionDialog } from '@/components/broking/ActionDialog';
@@ -11,7 +11,13 @@ import { useToast } from '@/components/ui/toastContext';
 import { humanize } from '@/utils/format';
 import { payRequestApi, REQUEST_ENTITY } from './api';
 import type { PayRequest } from './api';
-import { ACTION_LABELS, approveLabel, businessActions, submitLabel } from './requestForm';
+import {
+  ACTION_LABELS,
+  approveLabel,
+  businessActions,
+  preparerOptions,
+  submitLabel,
+} from './requestForm';
 import type { BusinessAction } from './requestForm';
 
 function AssignDialog({
@@ -20,6 +26,10 @@ function AssignDialog({
   onClose,
 }: Readonly<{ request: PayRequest; onDone: (r: PayRequest) => void; onClose: () => void }>) {
   const [username, setUsername] = useState('');
+  const preparers = useQuery({
+    queryKey: ['payrequest', 'preparers'],
+    queryFn: payRequestApi.preparers,
+  });
   const assign = useMutation({
     mutationFn: () => payRequestApi.assign(request.id, username.trim()),
     onSuccess: onDone,
@@ -47,15 +57,21 @@ function AssignDialog({
     >
       <div className="stack">
         <ErrorAlert error={assign.error} />
-        <Field label="Preparer (User ID)" required hint="A Marketing user who prepares refunds">
+        <Field label="Preparer" required hint="A Marketing user who prepares refunds">
           {(id) => (
-            <input
+            <select
               id={id}
               className="input"
-              maxLength={50}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-            />
+            >
+              <option value="">Select a preparer</option>
+              {preparerOptions(preparers.data ?? []).map((o) => (
+                <option key={o.value} value={o.value}>
+                  {o.label}
+                </option>
+              ))}
+            </select>
           )}
         </Field>
       </div>

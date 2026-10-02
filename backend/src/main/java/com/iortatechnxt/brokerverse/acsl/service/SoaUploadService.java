@@ -11,6 +11,7 @@ import com.iortatechnxt.brokerverse.audit.service.AuditTrailService;
 import com.iortatechnxt.brokerverse.bulk.service.BulkFileReader;
 import com.iortatechnxt.brokerverse.bulk.service.ParsedFile;
 import com.iortatechnxt.brokerverse.bulk.service.TextLayout;
+import com.iortatechnxt.brokerverse.catalog.service.CatalogNames;
 import com.iortatechnxt.brokerverse.common.excel.GuidedTemplateWriter;
 import com.iortatechnxt.brokerverse.common.exception.BusinessRuleException;
 import com.iortatechnxt.brokerverse.common.exception.ResourceNotFoundException;
@@ -48,6 +49,7 @@ public class SoaUploadService {
   private final SystemParameterService parameters;
   private final DocumentNumberService numbers;
   private final AuditTrailService audit;
+  private final CatalogNames names;
   private final Clock clock;
 
   /**
@@ -62,6 +64,7 @@ public class SoaUploadService {
    * @param parameters parameters
    * @param numbers upload numbers
    * @param audit audit trail
+   * @param names names of the insurers in messages
    * @param clock clock
    */
   public SoaUploadService(
@@ -74,6 +77,7 @@ public class SoaUploadService {
       SystemParameterService parameters,
       DocumentNumberService numbers,
       AuditTrailService audit,
+      CatalogNames names,
       Clock clock) {
     this.uploads = uploads;
     this.lines = lines;
@@ -84,7 +88,19 @@ public class SoaUploadService {
     this.parameters = parameters;
     this.numbers = numbers;
     this.audit = audit;
+    this.names = names;
     this.clock = clock;
+  }
+
+  /**
+   * The refusal of a file already uploaded, naming the insurer as people know it.
+   *
+   * @param insurer insurer name
+   * @param uploadNo the earlier upload
+   * @return message
+   */
+  static String duplicateMessage(String insurer, String uploadNo) {
+    return "This file was already uploaded for " + insurer + " as " + uploadNo;
   }
 
   /**
@@ -106,10 +122,8 @@ public class SoaUploadService {
             earlier -> {
               throw new BusinessRuleException(
                   "ACSL_SOA_DUPLICATE",
-                  "This file was already uploaded for "
-                      + checked.insurerCode()
-                      + " as "
-                      + earlier.getUploadNo());
+                  duplicateMessage(
+                      names.insurer(companyId, checked.insurerCode()), earlier.getUploadNo()));
             });
     SoaLayout layout = layoutOf(checked.insurerCode());
     ParsedFile file =

@@ -1,6 +1,8 @@
 import type { Journal, JournalInput, JournalLineInput, ManualJournalType } from '@/api/gl';
-import type { FrbsJournal } from './glPlatformApi';
-import { today } from '@/utils/format';
+import type { BulkPostOutcome, FrbsJournal } from './glPlatformApi';
+import { displayNameOf } from '@/api/users';
+import { statusLabel } from '@/components/ui/statusTones';
+import { humanize, today } from '@/utils/format';
 import { emptyLine, isBlankLine } from './journalMath';
 
 export interface JournalHeaderValues {
@@ -76,3 +78,50 @@ export function toJournalInput(
     lines: v.lines.filter((l) => !isBlankLine(l)),
   };
 }
+
+/** A journal status as the filter offers it: the label of its pill, or All. */
+export function journalStatusOption(status: string): string {
+  return status === '' ? 'All' : statusLabel(status);
+}
+
+/** Why a selected journal was not posted, naming it by its batch number. */
+export function notPostedText(o: BulkPostOutcome): string {
+  const name = o.batchNo ?? 'Journal ' + String(o.id);
+  return `${name}: ${o.message}`;
+}
+
+/** The users a journal may be assigned to, by name and sorted. */
+export function assigneeOptions(users: readonly string[]): { value: string; label: string }[] {
+  return users
+    .map((u) => ({ value: u, label: displayNameOf(u) || u }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+const JOURNAL_TYPE_LABELS: Record<string, string> = {
+  MANUAL: 'Manual journal',
+  ADJUSTMENT: 'Adjustment',
+  ACCRUAL: 'Accrual',
+};
+
+/** The type of a journal in words (Accrual, Premium...), never its code. */
+export function journalTypeLabel(type: string): string {
+  return JOURNAL_TYPE_LABELS[type] ?? humanize(type);
+}
+
+/** The message after a journal is saved, with its status as its pill reads it. */
+export function journalSavedText(batchNo: string, status: string): string {
+  return `Journal ${batchNo} saved (${statusLabel(status)})`;
+}
+
+/**
+ * Smallest width (pixels) of each input column of the journal lines, so a full amount, the side
+ * and the cost centre stay readable; the table scrolls inside its card when the page is narrower.
+ */
+export const LINE_MIN_WIDTHS = {
+  side: 110,
+  amount: 150,
+  costCentre: 200,
+  lineOfBusiness: 140,
+  reference: 150,
+  narration: 220,
+} as const;

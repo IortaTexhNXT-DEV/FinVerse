@@ -1,0 +1,124 @@
+# Notifications catalogue of BRD-5 Accounting, Disbursement and ACSL: in-app notices (bell in the page header),
+# alerts (Alert inbox of the team leads and administrators) and e-mails. Texts are those of the platform; <name> is
+# filled in by BIBS. Each user chooses the in-app and e-mail channels of the events on Notification Settings.
+notifications:
+  - id: NT-01
+    channel: In-app
+    trigger: A record with a workflow moves to another stage by a user action (a disbursement voucher, a payee, a funding request, a service-fee run, an ACSL case or correction)
+    recipient: The users of the next stage and the creator of the record, unless they made the move themselves
+    template: "Title: <reference>: <new stage name>. Text: <description of the record> - <comment>"
+    content: The new stage, the record and the comment or reason typed with the action; the notice opens the record
+    screen: Disbursement Voucher, Payee, Funding Request, Service Fee Run, ACSL Case, Correction Entry
+    frs: [FR-DS-036, FR-DS-040, FR-DS-064, FR-AC-052, FR-AS-020, FR-AS-021, FR-AS-022, FR-AS-023]
+  - id: NT-02
+    channel: In-app
+    trigger: A Marketing request changes stage (assigned, submitted, sent for validation, endorsed, approved, returned, cancelled, sent to Disbursement, disbursed)
+    recipient: The next handler (the preparer, the reviewers, the approvers, HR) and the requester
+    template: "Title: <request no>: <stage>. Text: <kind> of <payee> - <amount>"
+    content: The request and its new stage; the notice opens the request
+    screen: Requests Home, Request
+    frs: [FR-PQ-005, FR-PQ-008, FR-PQ-009, FR-PQ-013]
+  - id: NT-03
+    channel: In-app
+    trigger: A payment request of another unit changes stage in Disbursement (voucher created, approved, paid, returned, cancelled)
+    recipient: The source unit of the request (Remittance, Cashiering, Marketing, Comptrollership)
+    template: "Title: <request no>: <status>. Text: <payee> - <amount> - <DV no>"
+    content: The status of the voucher and of its instrument; the request of the source shows it on its Disbursement tab
+    screen: Disbursement Workbench, Disbursement Voucher, Request
+    frs: [FR-DS-020, FR-DS-041, FR-DS-042, FR-DS-043, FR-DS-044, FR-DS-050]
+  - id: NT-04
+    channel: Alert
+    trigger: A payment request names a payee that is not maintained (alert Payment request without payee)
+    recipient: The Disbursement team leaders
+    template: "Title: Payment request without payee. Text: the request, its source and the payee named"
+    content: The request waits under No Payee and a payee request is raised
+    screen: Disbursement Workbench, Payees
+    frs: [FR-DS-012, FR-DS-020, FR-DS-022]
+  - id: NT-05
+    channel: Alert
+    trigger: An approved voucher was cancelled and its source has not restored its records (alert Cancelled DV not regularised)
+    recipient: The Disbursement team leaders and Comptrollership
+    template: "Title: Cancelled DV not regularised. Text: the voucher, its source and the days since the cancellation"
+    content: The voucher to regularise
+    screen: Disbursement Workbench (Unregularised)
+    frs: [FR-DS-044, FR-DS-045]
+  - id: NT-06
+    channel: Alert
+    trigger: A printed or released check reached the stale period, 180 days by default (alert Check staled)
+    recipient: The Disbursement team leaders
+    template: "Title: Check staled. Text: the check, the payee and the amount moved to Miscellaneous Liability - stale checks"
+    content: The check to re-issue on request
+    screen: Disbursement Voucher (Instrument)
+    frs: [FR-DS-054]
+  - id: NT-07
+    channel: Alert
+    trigger: A check series of a paying account reached its warning threshold of remaining checks (alert Check series running low)
+    recipient: The Disbursement team leaders and approvers
+    template: "Title: Check series running low. Text: the bank account and the checks left"
+    content: The series to replenish
+    screen: Bank Accounts and Checks
+    frs: [FR-DS-062, FR-DS-070]
+  - id: NT-08
+    channel: E-mail
+    trigger: The end of day of a business date is confirmed (Send Confirmations)
+    recipient: Each payee of the day with an e-mail address
+    template: "Subject: Payment confirmation <DV no>. Body: the amount, the mode, the value date and the reference of the payment"
+    content: The payment advice of the payee; the e-mail is listed on the E-mails tab of the voucher
+    screen: Disbursement End of Day, Disbursement Voucher (E-mails)
+    frs: [FR-DS-063]
+  - id: NT-09
+    channel: E-mail
+    trigger: An authority to debit is e-mailed to the branch (Email to Branch)
+    recipient: The mailbox of the processing branch, the requester in copy
+    template: "Subject: Authority to Debit <ATD no>. Body: the account to debit, the amount and the value date, with the ATD form attached"
+    content: The ATD form
+    screen: Disbursement Voucher (Instrument)
+    frs: [FR-DS-034]
+  - id: NT-10
+    channel: Alert
+    trigger: A scheduled month-end close or the broking books close did not complete (alert Scheduled close failed)
+    recipient: The GL Team Lead and the GL Section Head
+    template: "Title: Scheduled close failed. Text: the period and the blocking items of the checklist"
+    content: The close to correct and schedule again
+    screen: GL Close & Cut-Off
+    frs: [FR-AC-040, FR-AC-042]
+  - id: NT-11
+    channel: Alert
+    trigger: The previous year is not closed and the year-end deadline is near (alert Year-end close due)
+    recipient: The GL Team Lead and the GL Section Head
+    template: "Title: Year-end close due. Text: the fiscal year and the deadline"
+    content: The year to close
+    screen: Period-End & Year-End
+    frs: [FR-AC-041]
+  - id: NT-12
+    channel: Alert
+    trigger: A posting to an account that requires a cost centre found no cost-centre rule (alert Cost centre missing)
+    recipient: The GL team and the Comptrollership administrators
+    template: "Title: Cost centre missing. Text: the event, the account and the source of the posting"
+    content: The rule to add on Cost-Centre Rules
+    screen: Cost-Centre Rules
+    frs: [FR-AC-054]
+  - id: NT-13
+    channel: Alert
+    trigger: The GL-SL reconciliation found a control account whose sub-ledger differs from the general ledger (alert GL and sub-ledger differ)
+    recipient: The ACSL team
+    template: "Title: GL and sub-ledger differ. Text: the control account, the GL and SL balances and the difference"
+    content: The difference to investigate
+    screen: GL-SL Reconciliation
+    frs: [FR-AS-004]
+  - id: NT-14
+    channel: In-app
+    trigger: An ACSL case is opened, assigned or given its result; an account officer is messaged from a case
+    recipient: The ACSL team (new case), the assignee, the requester of the case (result) and the account officer of the invoice (message)
+    template: "Title: <case no>: <stage> or Message from ACSL. Text: <subject> - <result or message>"
+    content: The case; the notice opens it
+    screen: ACSL Cases, ACSL Case
+    frs: [FR-AS-010, FR-AS-011, FR-AS-013]
+  - id: NT-15
+    channel: In-app
+    trigger: A journal is submitted, assigned or returned to its maker
+    recipient: The users who post journals (submitted), the assignee (assigned), the maker (returned)
+    template: "My Approvals and the list Assigned to me show the journal; a returned journal shows its remarks in the journal list"
+    content: The journal and its remarks
+    screen: Journals, Journal, My Approvals
+    frs: [FR-AC-031, FR-AC-032, FR-AC-036]

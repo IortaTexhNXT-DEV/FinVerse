@@ -1,0 +1,149 @@
+# UX screen documents of the BRD-5 Accounting, Disbursement and ACSL set for the BDOI UX Design team: 07 UX Screen
+# Deck, 08 UX screen register, 09 image package (docs/deliverables/src/signoff/build_ux_deck.py). The screens,
+# fields, actions, walkthroughs and images come from the pack; this file holds what only the UX documents need: who
+# each persona is, the images taken for the deck only (more states of a screen, the landing page and menu of each
+# persona), the changes of the issue and the points for the UX Design team to confirm.
+
+issue:
+  version: "2.0"
+  date: 2 October 2026
+  # First issue of the UX screen documents of the set: every screen is new to the UX Design team.
+  changes: []
+
+# The personas whose landing page and full menu the deck shows.
+navigation:
+  roles: [FRBS_PROCESSOR, FRBS_TL, FRBS_HEAD, ACCOUNTANT, FIN_ADMIN, DISBURSEMENT, DISB_TL, DISB_APPROVER, PRQ_PROCESSOR,
+          PRQ_REVIEWER, PRQ_APPROVER, HR_APPROVER, ACSL_PROCESSOR, ACSL_TL, ACSL_HEAD, COMPTROLLERSHIP, BUSINESS_ADMIN,
+          SYSADMIN, AUDITOR]
+
+# Who each persona is (what they do comes from the persona table of the FRS unless given here).
+personas:
+  FRBS_PROCESSOR: {who: "A GL Officer of FRBS who prepares the manual entries, runs the report pack and the BIR forms and follows the service fee"}
+  FRBS_TL: {who: "The GL Team Lead who assigns and posts the entries, keeps the chart, closes the month and the year and approves the service fee"}
+  FRBS_HEAD: {who: "The GL Section Head who enters the monthly revaluation rate, authorises the chart and posts and reverses entries"}
+  ACCOUNTANT: {who: "An accountant who imports the bank statements and reconciles the bank accounts"}
+  FIN_ADMIN: {who: "A Comptrollership administrator who keeps the accounting and cost-centre rules, the employees and the liquidation accounts"}
+  DISBURSEMENT: {who: "A Disbursement Processor who encodes and uploads requests, prepares the vouchers, follows the instruments and tags the receipts and certificates"}
+  DISB_TL: {who: "The Disbursement Team Leader who reviews the vouchers, keeps the payees, runs the end of day and requests and verifies the fundings"}
+  DISB_APPROVER: {who: "A Disbursement Approver who approves the vouchers, authorises the payees and bank accounts and approves the fundings"}
+  PRQ_PROCESSOR: {who: "A Marketing account officer who raises the refund, cash-advance and check-cancellation requests"}
+  PRQ_REVIEWER: {who: "A Marketing reviewer who assigns, validates and endorses the requests"}
+  PRQ_APPROVER: {who: "A Marketing approver who approves the requests and sends them to Disbursement"}
+  HR_APPROVER: {who: "The Human Resources approver of the employee cash advances"}
+  ACSL_PROCESSOR: {who: "An ACSL processor who uploads the insurer statements, investigates the cases and prepares the corrections"}
+  ACSL_TL: {who: "The ACSL Team Leader who assigns the cases and corrections, endorses the corrections and confirms the remittance deductions"}
+  ACSL_HEAD: {who: "The ACSL Head who approves the corrections"}
+  COMPTROLLERSHIP: {who: "A Comptrollership officer with read access to the journals, Disbursement and ACSL"}
+  BUSINESS_ADMIN: {who: "The business administrator who keeps the lists of values and the employees"}
+  SYSADMIN: {who: "The system administrator of BIBS (BDOI IT operations)"}
+  AUDITOR: {who: "An internal or external auditor with read access to the ledger, the reports and the records"}
+
+# The UX state of an image when its name does not say it.
+classify:
+  scr-ac-01-02-assign: filled
+  scr-ac-01-03-post: confirmation
+  scr-ac-02-02-confirm: confirmation
+  scr-ac-03-01-posted: read-only
+  scr-ac-03-02-pending: pending-approval
+  scr-ac-03-03-reverse: filled
+  scr-ac-04-01-statement: read-only
+  scr-ac-05-01-statement: read-only
+  scr-ac-06-02-form: filled
+  scr-ac-07-02-numbering: default
+  scr-ac-08-01-rates: default
+  scr-ac-09-02-form: filled
+  scr-ac-11-02-schedule: filled
+  scr-ac-11-03-books: read-only
+  scr-ac-12-01-period: default
+  scr-ac-12-02-year: default
+  scr-ac-13-01-preview: default
+  scr-ac-14-02-form: filled
+  scr-ac-16-01-match: default
+  scr-ac-16-02-brs: read-only
+  scr-ac-17-02-batch: filled
+  scr-ac-18-01-result: default
+  scr-ac-18-02-export: filled
+  scr-ac-19-01-pack: default
+  scr-ac-20-01-run: default
+  scr-ac-20-02-definitions: default
+  scr-ac-21-02-compute: filled
+  scr-ac-22-01-run: default
+  scr-ac-22-02-invoices: read-only
+  scr-ac-23-01-rates: default
+  scr-ac-23-02-new_rate: filled
+  scr-ac-24-01-outputs: default
+  scr-ac-25-01-requests: default
+  scr-ac-25-02-request: default
+  scr-ac-25-03-approval: pending-approval
+  scr-ac-27-01-details: default
+  scr-ac-27-02-entry: default
+  scr-ac-27-03-instrument: read-only
+  scr-ac-27-04-tags: read-only
+  scr-ac-27-05-approve: confirmation
+  scr-ac-28-02-requests: default
+  scr-ac-29-01-payee: default
+  scr-ac-29-02-new: filled
+  scr-ac-30-01-upload: default
+  scr-ac-31-01-runs: default
+  scr-ac-31-02-run: filled
+  scr-ac-33-01-approved: read-only
+  scr-ac-33-02-new: filled
+  scr-ac-34-01-banks: default
+  scr-ac-34-02-series: filled
+  scr-ac-39-02-approve: pending-approval
+  scr-ac-43-01-details: default
+  scr-ac-43-02-disbursement: read-only
+  scr-ac-43-03-assign: filled
+  scr-ac-45-02-new: filled
+  scr-ac-46-01-case: default
+  scr-ac-46-02-family: read-only
+  scr-ac-48-01-draft: default
+  scr-ac-48-02-posted: read-only
+  scr-ac-49-02-upload: filled
+  scr-ac-50-01-results: default
+  scr-ac-50-02-log: read-only
+  scr-ac-51-01-runs: default
+  wt-a-01: pending-approval
+  wt-a-02: success
+  wt-a-03: success
+  wt-a-04: read-only
+  wt-a-05: read-only
+  wt-b-01: success
+  wt-b-02: success
+  wt-b-03: success
+  wt-b-04: success
+  wt-b-05: default
+  wt-b-06: pending-approval
+  wt-b-07: success
+  wt-b-08: read-only
+  wt-c-01: success
+  wt-c-02: default
+  wt-c-03: success
+  wt-c-04: success
+  wt-c-05: success
+  wt-c-06: success
+  wt-c-07: success
+  wt-c-08: success
+  wt-c-09: success
+  wt-d-01: success
+  wt-d-02: success
+  wt-d-03: success
+  wt-d-04: read-only
+  wt-d-05: success
+  wt-e-01: validation-error
+  wt-e-02: validation-error
+  wt-e-03: validation-error
+  wt-e-04: default
+
+# Images taken for the deck only: states the screen specifications do not show.
+states:
+  - {screen: SCR-AC-01, state: empty, user: gltl, fill: journals_none, ux: empty, nocallouts: true, caption: "A search that finds no journal"}
+  - {screen: SCR-AC-25, state: auditor, user: auditor, ux: read-only, nocallouts: true, caption: "The Disbursement Workbench as the Auditor sees it, without Encode Request"}
+  - {screen: SCR-AC-28, state: actions, user: disbtl, tab: "Payee Requests", ux: default, nocallouts: true, caption: "The row action menu of a payee request, opened from the more button of its row"}
+  - {screen: SCR-AC-39, state: filters, user: mktrev, click: "^filters$", ux: filled, nocallouts: true, caption: "Requests Home with the Filters panel open"}
+  - {screen: SCR-AC-45, state: empty, user: acsltl, tab: "Sent for Correction", ux: empty, nocallouts: true, caption: "A case tab without cases"}
+
+# Points for the UX Design team to confirm with BDOI.
+confirm:
+  clarifications: [CLR-AC-15]
+  findings: []

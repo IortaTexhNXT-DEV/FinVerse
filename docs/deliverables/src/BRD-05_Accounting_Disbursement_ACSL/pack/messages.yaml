@@ -1,0 +1,280 @@
+# Messages catalogue of BRD-5 Accounting, Disbursement and ACSL: sources, places and the fix the user makes.
+# The message texts are read from the platform at every build (never typed here). This file says where each message
+# appears (by the class or file that raises it) and what the user does. The administration messages of BASAU are
+# specified in the BRD-1 (lists of values) and BRD-11 (users, roles and access requests) sets.
+sources:
+  backend_packages: [disbursement, payrequest, acsl, frbs, journal, coa, closing, currency, period]
+  backend_classes_extra: [ScheduleRules, ScheduleDefinitionService, ScheduleEngine, BankMatchingService,
+                          BankStatementParser, StatementFileImportService, BankReconciliation, BankAccountDirectory,
+                          ReceivedCertificateService, Certificate2307Service, Certificate2307, EmployeeService,
+                          CostCenterRuleService, ReportBatchService, ReportParameters, BankAccountService, ChequeBook]
+  exclude_classes: [RecurringJournalService, RecurringJournalTemplate, JournalUploadService, SpreadsheetRows,
+                    UploadTable, PeriodModuleLockService, RecurringLines]
+  exclude_codes: [NOT_FOUND]
+  exclude_texts: ["^<message>$", "^<errors>$", "^<detail>$"]
+  bulk_handlers: [CoaUploadHandler, RequestUploadHandler, ChecksNegotiatedHandler, CtaCreditedHandler,
+                  BobApprovedHandler, PayeeMigrationHandler]
+  bulk_screen: "Disbursement Uploads (SCR-AC-30) and Chart Upload (SCR-AC-07)"
+  frontend_dirs: [features/disbursement, features/payrequest, features/acsl, features/frbs, features/gl,
+                  features/closing, features/receivables/BankStatementsPage.tsx,
+                  features/receivables/BankReconciliationPage.tsx, features/receivables/MatchWorkbench.tsx,
+                  features/receivables/BrsView.tsx, features/setup/CostCentreRulesPage.tsx,
+                  features/setup/RevaluationRatesCard.tsx, features/setup/CurrencyRatesPage.tsx,
+                  features/setup/StatementLayoutsPage.tsx, features/setup/LayoutFields.tsx,
+                  features/setup/EmployeesPage.tsx, features/tax/ReceivedCertificatesPage.tsx,
+                  features/tax/RecordCertificateDialog.tsx, features/tax/Certificates2307Page.tsx,
+                  features/tax/BirOutputsPage.tsx, features/reports]
+
+# Where a message appears: the first rule whose pattern matches the class (backend) or file (frontend) wins.
+places:
+  - [ "^(labels)$", "Encode Payment Request and the Disbursement forms (SCR-AC-26, SCR-AC-27)" ]
+  - [ "^(SoaRowParser)$", "Insurer SOA Reconciliation (SCR-AC-49)" ]
+  - [ "^(DisbursementForms)$", "Disbursement Voucher, Instrument tab (SCR-AC-27)" ]
+  - [ "^(IntakeRequest)$", "Disbursement Workbench (SCR-AC-25)" ]
+  - [ "^(Voucher)$", "Disbursement Voucher (SCR-AC-27)" ]
+  - [ "^(FundingController)$", "Funding Request (SCR-AC-33)" ]
+  - [ "^(PayeeController)$", "Payee (SCR-AC-29)" ]
+  - [ "^(PayeeRequest)$", "Payees (SCR-AC-28)" ]
+  - [ "^(JournalsPage|JournalFiltersCard|AssignJournalsDialog|JournalBulkApprovals|JournalAssignmentService|glPlatformApi)$", "Journals (SCR-AC-01)" ]
+  - [ "^(JournalEntryPage|JournalHeaderFields|JournalLinesEditor|journalForm|journalMath|useJournalSave|JournalEntryService|JournalValidator|JournalLineResolver|JournalLine|ShortCodes|NegativeBalanceGuard)$", "New Journal and Edit Journal (SCR-AC-02)" ]
+  - [ "^(JournalDetailPage|JournalActions|PostingConfirmation|ConfirmPostingDialog|JournalAuthorizationService|JournalBatch|JournalAutoReversalService|journalSource)$", "Journal (SCR-AC-03)" ]
+  - [ "^(AccountInquiryPage)$", "Account Inquiry (SCR-AC-04)" ]
+  - [ "^(PartyLedgerPage|PartyStatementParts|partyStatement)$", "Party Statement (SCR-AC-05)" ]
+  - [ "^(ChartOfAccountsPage|AccountForm|accountModel|chartRules|ChartOfAccountsService|GlAccount)$", "Chart of Accounts (SCR-AC-06)" ]
+  - [ "^(ChartUploadPage|NumberingPanel|CoaNumberingService|CoaUploadController|CoaUploadHandler)$", "Chart Upload (SCR-AC-07)" ]
+  - [ "^(CurrencyRatesPage|RevaluationRatesCard|CurrencyService)$", "Currencies & Rates (SCR-AC-08)" ]
+  - [ "^(CostCentreRulesPage|CostCenterRuleService)$", "Cost-Centre Rules (SCR-AC-09)" ]
+  - [ "^(PeriodsPage|PeriodActionDialog|periodActions|PeriodService|AccountingPeriod)$", "Financial Periods (SCR-AC-10)" ]
+  - [ "^(GlClosePage|CloseTables|ScheduleCloseDialog|BooksDialog|closeControlsApi|closeTimes|PeriodCloseScheduleService|PeriodCloseSchedule|BrokingBooks)$", "GL Close & Cut-Off (SCR-AC-11)" ]
+  - [ "^(PeriodEndPage|PeriodEndPanel|ChecklistView|YearEndPanel|YearEndService|ClosingChecklistService|ClosingLines|PeriodSelectors|usePeriodPicker|periodDefaults)$", "Period-End & Year-End (SCR-AC-12)" ]
+  - [ "^(FxRevaluationPage|FxPreviewView|FxRevaluationService|FxRevaluationCalculator)$", "FX Revaluation (SCR-AC-13)" ]
+  - [ "^(StatementLayoutsPage|LayoutFields|StatementFileImportService|BankStatementParser)$", "Bank Statement Layouts (SCR-AC-14)" ]
+  - [ "^(BankStatementsPage)$", "Bank Statements (SCR-AC-15)" ]
+  - [ "^(BankReconciliationPage|MatchWorkbench|BrsView|BankMatchingService|BankReconciliation|BankAccountDirectory)$", "Bank Reconciliation (SCR-AC-16)" ]
+  - [ "^(ReportsPage|ReportBatchDialog|ReportBatchService)$", "Report Centre, Report Batch and Disbursement Reports (SCR-AC-17, SCR-AC-38)" ]
+  - [ "^(ReportRunnerPage|ReportTable|ReportVariants|ExportButtons|ParameterInput|PrintOptionsFields|exportFormats|reportOptions|reportParams|ReportParameters)$", "Report (SCR-AC-18)" ]
+  - [ "^(FrbsHomePage)$", "Report Pack (SCR-AC-19)" ]
+  - [ "^(SchedulesPage|ScheduleRunner|ScheduleEditor|ScheduleCommentary|schedules|ScheduleRules|ScheduleDefinitionService|ScheduleEngine)$", "Account Schedules (SCR-AC-20)" ]
+  - [ "^(ServiceFeeRunsPage|ServiceFeeRunService|ServiceFeeQueryService)$", "Service Fee Runs (SCR-AC-21)" ]
+  - [ "^(ServiceFeeRunPage|LineDialogs|serviceFee|ServiceFeeRun|ServiceFeeLine|ServiceFeeTagService)$", "Service Fee Run (SCR-AC-22)" ]
+  - [ "^(ServiceFeeSetupPage|SetupDialogs|ServiceFeeSetupService)$", "Service Fee Rates (SCR-AC-23)" ]
+  - [ "^(BirOutputsPage)$", "BIR Forms & Books (SCR-AC-24)" ]
+  - [ "^(DisbursementHomePage|WorkbenchParts|columns|RequestIntakeService|RequestRouting|PayeeMatcher|DisbursementGatewayAdapter|SystemRequests)$", "Disbursement Workbench (SCR-AC-25)" ]
+  - [ "^(EncodeRequestPage)$", "Encode Payment Request (SCR-AC-26)" ]
+  - [ "^(VoucherPage|VoucherDetailsTab|VoucherDialogs|forms|VoucherService|VoucherActions|VoucherTerms|DisbursementVoucher|VoucherCancellation|VoucherPosting|BulkVoucherApprovals)$", "Disbursement Voucher (SCR-AC-27)" ]
+  - [ "^(ProformaTab|ProformaBuilder|ProformaService|ExpenseAllocation|AllocationService)$", "Disbursement Voucher, Entry tab (SCR-AC-27)" ]
+  - [ "^(InstrumentTab|InstrumentService|InstrumentActions|StatusEditService|StaleCheckService|Instrument|InstrumentStatus)$", "Disbursement Voucher, Instrument tab (SCR-AC-27)" ]
+  - [ "^(TagsTab|TagService|VoucherTags)$", "Disbursement Voucher, OR / AR and CWT tab (SCR-AC-27)" ]
+  - [ "^(PayeesPage|PayeeRequestService)$", "Payees (SCR-AC-28)" ]
+  - [ "^(PayeePage|PayeeParts|payeeForm|PayeeService|Payee|PayeeAccount)$", "Payee (SCR-AC-29)" ]
+  - [ "^(UploadsPage|InstrumentUploads|RequestUploadHandler|ChecksNegotiatedHandler|CtaCreditedHandler|BobApprovedHandler|PayeeMigrationHandler)$", "Disbursement Uploads (SCR-AC-30)" ]
+  - [ "^(EodPage|EodService|EodOutputs|DctfWriter|EodConfirmations)$", "Disbursement End of Day (SCR-AC-31)" ]
+  - [ "^(FundingPage)$", "Account Funding (SCR-AC-32)" ]
+  - [ "^(FundingDetailPage|FundingRequest|FundingService)$", "Funding Request (SCR-AC-33)" ]
+  - [ "^(BanksPage|BankAccountService|ChequeBook|CheckSeriesService)$", "Bank Accounts and Checks (SCR-AC-34)" ]
+  - [ "^(EmployeesPage|EmployeeService)$", "Employees (SCR-AC-35)" ]
+  - [ "^(ReceivedCertificatesPage|RecordCertificateDialog|ReceivedCertificateService)$", "Certificates Received (SCR-AC-36)" ]
+  - [ "^(Certificates2307Page|Certificate2307Service|Certificate2307)$", "BIR Form 2307 (SCR-AC-37)" ]
+  - [ "^(ReportsPage)$", "Disbursement Reports (SCR-AC-38)" ]
+  - [ "^(PayRequestsHomePage|PayRequestQueryService)$", "Requests Home (SCR-AC-39)" ]
+  - [ "^(RefundFormPage|RefundLinesEditor|PayoutFields)$", "New Refund Request (SCR-AC-40)" ]
+  - [ "^(CashAdvanceFormPage)$", "New Cash Advance (SCR-AC-41)" ]
+  - [ "^(CheckCancellationPage)$", "Cancel a Check (SCR-AC-42)" ]
+  - [ "^(RequestDetailPage|RequestActions|RequestTabs|requestForm|PayRequestWorkflowService|PayRequestRules|RequestFormService|RefundValidationService|PayRequestDocuments|PayRequests|RequestDrafts)$", "Request (SCR-AC-43)" ]
+  - [ "^(LiquidationTab|LiquidationService)$", "Request, Liquidation tab (SCR-AC-43)" ]
+  - [ "^(LiquidationAccountsPage|LiquidationAccounts)$", "Liquidation Accounts (SCR-AC-44)" ]
+  - [ "^(AcslHomePage|NewCaseDialog|AcslQueryService|Acsl)$", "ACSL Cases (SCR-AC-45)" ]
+  - [ "^(CaseDetailPage|CaseActions|CaseService|CaseLinks|FormDialog)$", "ACSL Case (SCR-AC-46)" ]
+  - [ "^(CorrectionsPage)$", "Correction Entries (SCR-AC-47)" ]
+  - [ "^(CorrectionDetailPage|CorrectionLinesCard|OriginalLinesCard|CorrectionService|CorrectionLineRules|CorrectionJournals|CorrectionOpenItems|CorrectionPosting|acsl)$", "Correction Entry (SCR-AC-48)" ]
+  - [ "^(SoaUploadsPage|SoaUploadDialog|SoaUploadService)$", "Insurer SOA Reconciliation (SCR-AC-49)" ]
+  - [ "^(SoaUploadDetailPage|SoaReconciliationService|AcslReconController)$", "Insurer SOA (SCR-AC-50)" ]
+  - [ "^(GlSlPage|GlSlControlsCard|GlSlReconciliationService)$", "GL-SL Reconciliation (SCR-AC-51)" ]
+
+# The fix the user makes. Messages that tell the user what to do ("Enter ...", "Choose ...") are their own fix and are
+# not repeated here. Keys are message codes; frontend messages without a code use their text.
+fixes:
+  VALIDATION_FAILED: Correct the fields listed under the message.
+  CONCURRENT_MODIFICATION: Reload the record; another user changed it. Enter the change again.
+  ACCESS_DENIED: Ask for the permission; the menu shows only the screens of your role.
+  INTERNAL_ERROR: Report the message with its reference to the System Administrator.
+  MALFORMED_REQUEST: Reload the screen and try again; if it persists, report it with the time to the System Administrator.
+  UPLOAD_TOO_LARGE: Reduce the file (split it) and upload it again.
+  "<Column> '<value>' is not a valid <number, date (yyyy-mm-dd), Y/N value>": Correct the value in the file in the format of the column and upload the file again.
+  "<Column> is mandatory": Fill in the column in the file and upload the file again.
+  # General ledger, chart, rates and periods
+  ASSIGNEE_IS_MAKER: Assign the journal to another user than the one who submitted it.
+  ASSIGNEE_NOT_AUTHORIZER: Choose a user who may post journals.
+  INVALID_JOURNAL_TYPE: Choose Manual journal, Adjustment or Accrual.
+  NOT_MAKER: Ask the maker named to change the journal, or copy it into a new draft.
+  SHORT_CODE_TAKEN: Choose another short code; the one typed belongs to the account named.
+  UNKNOWN_ACCOUNT: Enter an account of the chart, by its code or short code.
+  ALREADY_REVERSED: No action; the journal is reversed already.
+  AUTHORIZATION_LIMIT_EXCEEDED: Assign the journal to a user whose limit covers the total.
+  INVALID_JOURNAL_STATUS: Refresh the journal and use an action offered in its status.
+  MAKER_CHECKER_VIOLATION: Ask another user with the approval right to take the action.
+  REVERSAL_DATE_INVALID: Enter a reversal date after the value date.
+  REVERSAL_DATE_NOT_ALLOWED: Leave Reverse on empty, or enter the voucher as a manual accrual.
+  REVERSAL_PENDING: Open the reversal journal already raised.
+  UNBALANCED_JOURNAL: Correct the lines so that the debits equal the credits.
+  CLASS_MISMATCH: Choose a parent of the same class, or change the class of the account.
+  DUPLICATE: Use another code or name; the record exists already.
+  INVALID_TIER: Choose a parent of a higher tier (a main account above a sub account, a sub account above a micro account).
+  PARENT_HAS_POSTINGS: Choose a parent without postings, or keep the account postable.
+  PARENT_REQUIRED: Choose the parent account of the sub or micro account.
+  INVALID_NUMBERING: Choose no separator, a dot or a dash, and 1 to 6 digits.
+  NUMBERING_EXHAUSTED: Widen the digits of the numbering scheme, or key the code of the account.
+  INACTIVE_CURRENCY: Choose an active currency, or ask the System Administrator to activate it.
+  INVALID_RATE: Enter a rate above zero.
+  RATE_NOT_FOUND: Ask the GL Section Head to enter the month-end rate of the currency, then try again.
+  BOOKS_CLOSED: Post in the next open month, or ask the GL Team Lead to reopen the books.
+  INVALID_PERIOD_TRANSITION: Refresh the periods and use an action offered for the status of the period.
+  NO_FISCAL_YEAR: Ask the GL Team Lead to create the fiscal year of the date.
+  NO_PERIOD: Use a date of a defined period, or ask the GL Team Lead to create the fiscal year.
+  PERIOD_NOT_OPEN: Use a date of an open period, or ask the GL Team Lead to open the period.
+  YEAR_ALREADY_CLOSED: No action; the fiscal year is closed already.
+  YEAR_CLOSED: No action; post the adjustment in an open period of the next year.
+  YEAR_PERIODS_OPEN: Close every period of the year first.
+  CLOSE_ALREADY_SCHEDULED: Withdraw the close already scheduled before scheduling another.
+  CLOSE_ONLY_PREVIOUS_MONTH: Schedule the close of the previous month only.
+  CLOSE_SCHEDULE_NOT_ACTIVE: No action; the scheduled close is no longer waiting.
+  PERIOD_NOT_CLOSABLE: Choose a period that is open or closing.
+  NO_BRANCH: Ask the System Administrator to set up an active branch of the company.
+  PERIOD_OTHER_COMPANY: Change the company in the header to the company of the period.
+  YEAR_NOT_CLOSED: Close the fiscal year first, then verify it.
+  "Must be after the value date": Enter a reversal date after the value date.
+  "Only the month before <0> may be closed on that date": Choose the previous month, or another close date.
+  # Reports and service fee
+  "Only a balance schedule can be aged": Choose a balance basis, or remove the ageing buckets.
+  "Starts after the as-of date": Enter a period start on or before the as-of date.
+  SERVICE_FEE_EMPTY: Recompute the run, or cancel it; no invoice qualifies for a fee.
+  SERVICE_FEE_FOUR_EYES: Ask another user with the approval right to approve the run.
+  SERVICE_FEE_NOTHING: Choose another period, or add the rate of the segments of the paid invoices.
+  "Ends before it starts": Correct the dates so that the end is not before the start.
+  "List the market segments covered": Tick the market segments the rate covers.
+  "The period cannot end after today": Enter an end date of today or earlier.
+  "The period ends before it starts": Correct the dates so that the period does not end before it starts.
+  SERVICE_FEE_DATES: Correct the dates so that the end is not before the start.
+  SERVICE_FEE_LINE_STATUS: Refresh the run and use an action offered for the line.
+  SERVICE_FEE_STAGE: Refresh the run and use an action offered in its stage.
+  SERVICE_FEE_RATE: Enter a rate above zero.
+  SERVICE_FEE_RULE: Tick the market segments the rate covers.
+  # Disbursement
+  "<ok> approved; <length> failed: <failed[0]>": Open each voucher that failed and correct the point named, then approve it again.
+  DISB_AMOUNT: Enter an amount above zero.
+  DISB_NOT_A_RELEASE: Create the voucher of the request instead.
+  DISB_PAYEE_NOT_MAINTAINED: Create and authorise the payee on Payees, then create the voucher.
+  DISB_REQUEST_DUPLICATE: No action; the request was received before.
+  DISB_REQUEST_IN_VOUCHER: Cancel or reject the voucher of the request first.
+  DISB_REQUEST_STATUS: Refresh the workbench; the request has moved on.
+  "The withholding tax must be at least zero and below the gross": Enter a withholding tax of zero or more and below the gross amount.
+  DV_ALLOCATION_TOTAL: Correct the rows so that they add up to the gross amount.
+  DV_BANK_CURRENCY: Choose a paying account in the currency of the voucher.
+  DV_ENTRY_EMPTY: Rebuild the entry from the rule, or add its lines.
+  DV_FOUR_EYES: Ask another user with the review or approval right to take the action.
+  DV_MODE: Choose a mode allowed for the payee, or ask the team leader to allow the mode on the payee.
+  DV_NOT_EDITABLE: Ask the approver to return the voucher; it can no longer be changed in its stage.
+  DV_NOT_FOR_APPROVAL: Refresh the workbench; the voucher is not waiting for approval.
+  DV_POSTING_FAILED: Correct the point named in the message (account, period or rule) and approve again; if it persists, ask Comptrollership.
+  DV_EWT: Enter a withholding tax of zero or more and below the gross amount.
+  CHECK_NOT_STALE: No action; only a stale check is re-issued.
+  DISB_NOT_ATD: No action; only an authority to debit is e-mailed to the branch.
+  DISB_NO_FORM: No action; the mode is processed by file, without a printed form.
+  DV_NOT_APPROVED: Approve the voucher first.
+  INSTRUMENT_FINAL: No action; the instrument is final.
+  INSTRUMENT_STATUS: Refresh the voucher and use an action offered for the status of the instrument.
+  STATUS_EDIT_INVALID: Choose another status of the mode.
+  STATUS_EDIT_PENDING: Wait for the team leader's decision on the edit already requested.
+  STATUS_EDIT_STALE: Request the status edit again from the current status.
+  CWT_PERIOD: Correct the period so that it does not end before it starts.
+  "A credit mode needs a bank account of the payee": Add an active bank account of the payee for the credit mode.
+  PAYEE_IN_USE: Request the deactivation of the payee instead.
+  PAYEE_MODE: Choose a default mode among the allowed modes.
+  PAYEE_NOT_EDITABLE: Wait until the payee is authorised or returned, then change it.
+  PAYEE_NOT_MIGRATED: No action; the payee was not loaded by the migration.
+  PAYEE_CODE: Enter the payee code and choose the company in the header.
+  PAYEE_REQUEST_CLOSED: No action; the payee request is closed already.
+  CHECK_NOT_FOUND: Correct the check number of the row; it must be a printed or released check.
+  DV_NOT_FOUND: Correct the voucher number of the row.
+  INSTRUMENT_AMOUNT: Correct the amount of the row to the amount of the instrument.
+  INSTRUMENT_MODE: Upload the row in the file of the voucher's mode of payment.
+  EOD_ALREADY_RUN: No action; open the run of the date already processed.
+  EOD_CONFIRMED: No action; the confirmations were sent.
+  FUNDING_AMOUNT: Enter an amount above zero.
+  FUNDING_CURRENCY: Choose two accounts in the same currency.
+  FUNDING_FOUR_EYES: Ask another team leader or approver to take the action.
+  FUNDING_NOT_EDITABLE: No action; the funding request can no longer be changed in its stage.
+  FUNDING_SAME_ACCOUNT: Choose a target account other than the source.
+  FUNDING_COMPANY: Choose the company in the header.
+  # Payment Requests
+  "All accounts of a refund request belong to one client": Remove the accounts of the other client and raise a separate request.
+  PRQ_AMOUNT_INVALID: Enter an amount above zero with at most two decimals.
+  PRQ_CANCELLATION_PENDING: Open the cancellation already in progress.
+  PRQ_CURRENCY_INVALID: Enter a three-letter currency.
+  PRQ_DUPLICATE_AR: Remove the AR number from this request; it is refunded on the request named.
+  PRQ_FOUR_EYES: Ask another Marketing user with the right to decide.
+  PRQ_INVOICE_UNKNOWN: Correct the invoice number; it must be an invoice of the ledger.
+  PRQ_LINES_REQUIRED: Enter between 1 and 50 accounts to refund.
+  PRQ_LINE_INCOMPLETE: Enter the AR number and the assured name of every line.
+  PRQ_NO_BRANCH: Ask the System Administrator to set up a branch of the company.
+  PRQ_NO_FORM: Print the form of the paid request instead.
+  PRQ_NO_LIQUIDATION: Record the liquidation first.
+  PRQ_ONE_CLIENT: Remove the accounts of the other client and raise a separate request.
+  PRQ_TARGET_NOT_CHECK: No action; only a request paid by check is cancelled this way.
+  PRQ_TARGET_NOT_DISBURSED: Wait until Disbursement creates the voucher of the request.
+  PRQ_TARGET_UNKNOWN: Enter the number of a refund or cash-advance request.
+  PRQ_VALIDATION_DONE: No action; the validation was recorded already.
+  PRQ_WRONG_STAGE: Refresh the request and use an action offered in its stage.
+  PRQ_LIQUIDATION_LINE: Enter the date and the particulars of every fieldwork day.
+  PRQ_LIQUIDATION_LINES: Keep the liquidation to at most 60 fieldwork days.
+  PRQ_LIQUIDATION_LOCKED: Ask the reviewer to return the liquidation before changing it.
+  PRQ_NOT_LIQUIDABLE: Wait until the cash advance is disbursed.
+  PRQ_LIQUIDATION_ACCOUNT_MISSING: Ask Comptrollership to set the account of the category on Liquidation Accounts.
+  # ACSL
+  ACSL_WRONG_STAGE: Refresh the case or correction and use an action offered in its stage.
+  "Required": Complete the field.
+  ACSL_INVOICE_UNKNOWN: Correct the invoice number; it must be an invoice of the ledger.
+  ACSL_NO_ACCOUNT_OFFICER: Write the message, or contact the account officer of the client outside BIBS when the invoice has none.
+  ACSL_REVERSAL_INCOMPLETE: Enter the invoice of the case and the AR or OR number.
+  ACSL_ACCOUNT_NOT_POSTABLE: Choose a postable account under the heading.
+  ACSL_ACCOUNT_UNKNOWN: Enter an account of the chart.
+  ACSL_COMPONENT_INVALID: Enter the invoice of the line, or leave the ledger component empty.
+  ACSL_CORRECTION_UNBALANCED: Enter at least two lines with equal debits and credits.
+  ACSL_FOUR_EYES: Ask another ACSL user with the review or approval right to take the action.
+  ACSL_JOURNAL_UNKNOWN: Correct the journal batch number, or leave it empty.
+  ACSL_LINE_INVALID: Complete the account, the side and the amount of every line.
+  ACSL_LINE_UNKNOWN: Pick the line from the posted lines of the invoice family.
+  ACSL_NO_BRANCH: Ask the System Administrator to set up a branch of the company.
+  ACSL_PARTY_REQUIRED: Enter the sub-ledger party of the control account line.
+  ACSL_PARTY_UNKNOWN: Enter the code of a maintained party.
+  ACSL_TOO_MANY_LINES: Split the correction into corrections of at most 200 lines.
+  ACSL_SOA_DUPLICATE: No action; open the upload of the same file already made.
+  ACSL_SOA_NO_LAYOUT: Ask the System Administrator to set up the SOA layout.
+  ACSL_SOA_PERIOD: Correct the period so that it does not end before it starts.
+  ACSL_SOA_TOO_LARGE: Split the statement into files within the limit and upload each.
+  ACSL_SOA_LAYOUT_MISMATCH: Use the standard layout (Download Template) with every column named.
+  # Upload rows
+  "<header> must be one of <details>": Enter one of the values named in the column of the row.
+  "Account <code> already exists": Remove the row, or change the code of the account.
+  "Account Code may hold digits, capital letters, '.' and '-' only": Correct the account code of the row.
+  "Currencies must be three-letter codes separated by commas": Correct the currencies of the row.
+  "Parent <parent> is neither an account nor an earlier row of the file": Add the parent above the row, or correct the parent code.
+  "The amount must be positive": Enter an amount above zero in the row.
+  "The currency must be a 3-letter code": Enter a three-letter currency in the row.
+  "The default mode must be one of the allowed modes": Correct the default mode or the allowed modes of the row.
+  "Unknown disbursement type <type>": Enter a disbursement type of the list in the row.
+  "Unknown mode of payment: <message>": Enter a mode of payment of the list in the row.
+  # Effects named in the confirmation dialogs and texts of the screens
+  "The draft voucher is cancelled and can no longer be submitted.": Confirm to cancel the draft, or close the dialog to keep it.
+  "The journal goes to an authorizer and can no longer be edited unless it is returned.": Check the totals, then confirm to submit the journal.
+  "The account becomes active and can be posted to.": Confirm to authorise the account.
+  "The revaluation journals of the period are posted.": Check the preview, then confirm to post the revaluation.
+  "Checks past the stale period and their re-issue.": No action.
+  "The saved parameter variant is deleted.": Confirm to delete the variant.
+  "The documents are released to the payee.": Confirm to release the documents.
+  "The instrument status is changed as requested.": Confirm to approve the status edit.
+  "The request is closed without creating a payee.": Confirm to close the payee request.
+  "The payee is deleted; it was never used on a payment.": Confirm to delete the payee.
+  "The bank account change takes effect.": Confirm to authorise the change.
+  "The status change is sent for authorisation.": Confirm to send the change for authorisation.
+  "The issued certificate is cancelled.": Confirm to cancel the certificate.

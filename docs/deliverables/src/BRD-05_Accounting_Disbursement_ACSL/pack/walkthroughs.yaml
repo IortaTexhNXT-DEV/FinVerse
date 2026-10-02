@@ -1,0 +1,93 @@
+# End-to-end walkthroughs of BRD-5 Accounting, Disbursement and ACSL, shown step by step with screenshots of the seed
+# profile. Each step: persona (role code), screen (SCR id), what the user does, what the user sees, the result, and
+# the screenshot taken after the step (captured live by tools/screenshots/capture_pack.cjs, which performs the steps).
+walkthroughs:
+  - id: WT-A
+    title: A manual accrual from the voucher to its posting and automatic reversal
+    summary: >-
+      The GL Officer accrues an expense of the month with a voucher that reverses itself on the first day of the next
+      month. The GL Team Lead assigns it to the GL Section Head, who posts it from the list of the journals assigned
+      to her; the posted voucher shows its audit and its reversal date, and the expense is in the account.
+    data: "Seed data: the seed chart of accounts of the company (accrued expenses and an expense account with its cost centre); the open periods of the current year"
+    steps:
+      - [FRBS_PROCESSOR, SCR-AC-02, "Enters an accrual on New Journal (value date today, Reverse on the first day of next month, a debit to the expense with its cost centre and a credit to accrued expenses), clicks Save & Submit and confirms", "The journal with its batch number, Pending Approval, the lines and the automatic reversal date", Submitted, wt-a-01]
+      - [FRBS_TL, SCR-AC-01, "Selects the voucher on Journals, clicks Assign and chooses the GL Section Head", "Message: 1 journal(s) assigned; Assigned To shows her name", Assigned, wt-a-02]
+      - [FRBS_HEAD, SCR-AC-01, "Chooses Assigned to me, selects the voucher, clicks Post Selected and confirms", "Message: 1 of 1 journal(s) posted; the voucher is Posted", Posted, wt-a-03]
+      - [FRBS_HEAD, SCR-AC-03, "Opens the journal", "The posted voucher with Input by, Submitted by and Authorized by, and Automatic reversal on the first day of next month", In the ledger, wt-a-04]
+      - [FRBS_PROCESSOR, SCR-AC-04, "Opens Account Inquiry for the expense account of the month", "The accrual among the posted lines, with the running balance", Reported, wt-a-05]
+    downstream:
+      - "On the reversal date the automatic reversal posts the mirror of the accrual and the voucher shows Reversed."
+      - "The accrual is in the trial balance and the schedules of the report pack of the month."
+
+  - id: WT-B
+    title: A client refund from the Refund Request Form to the payment
+    summary: >-
+      A client overpaid an account. The Marketing Processor raises the Refund Request Form with the AR of the payment,
+      to be credited to the client's account; the Marketing Reviewer endorses it and the Marketing Approver approves
+      it, which sends it to Disbursement. The Disbursement Processor creates the voucher, which is routed straight to
+      the approver as a refund; the approver approves it, the entry posts and the credit to the account is issued.
+      Marketing follows the payment on the request.
+    data: "Seed data: client CL-2026-000001 maintained as a payee of Disbursement with a credit-to-account account; an AR of the cashiering seed"
+    steps:
+      - [PRQ_PROCESSOR, SCR-AC-40, "Fills in New Refund Request (segment, reference, purpose, credit to the client's account) with one account to refund (AR number, client, assured, amount, reason Overpayment) and clicks Save Request", "Message: <request> saved; the request opens in Draft with its account to refund", Draft, wt-b-01]
+      - [PRQ_PROCESSOR, SCR-AC-43, "Clicks Submit for Review and confirms", "The request For Review in the workflow header", For review, wt-b-02]
+      - [PRQ_REVIEWER, SCR-AC-43, "Opens the request and clicks Endorse for Approval", "The request For Approval with the step in its history", For approval, wt-b-03]
+      - [PRQ_APPROVER, SCR-AC-43, "Clicks Approve and Send", "The request With Disbursement", Sent to Disbursement, wt-b-04]
+      - [DISBURSEMENT, SCR-AC-25, "Opens the refund request on System Requests", "Payment Request: source Payment Requests, the client as payee, Refund, the amount and purpose, with Create Voucher", Received, wt-b-05]
+      - [DISBURSEMENT, SCR-AC-27, "Clicks Create Voucher, then Route to Approver", "The voucher For Approval with its credit to account, paying account and entry from the rule", For approval, wt-b-06]
+      - [DISB_APPROVER, SCR-AC-27, "Clicks Approve and Post and confirms", "The voucher Approved; the journal posted and the credit to account issued", Approved, wt-b-07]
+      - [PRQ_PROCESSOR, SCR-AC-43, "Opens the Disbursement tab of the request", "The voucher number and its status in Disbursement", Followed, wt-b-08]
+    downstream:
+      - "The end of day of the date puts the credit in the Direct Credit Transaction File and e-mails the payment confirmation to the client."
+      - "The client's account is recorded on the client record for the next refund."
+
+  - id: WT-C
+    title: An insurer's statement of account reconciled and a wrong posting corrected
+    summary: >-
+      The ACSL Processor uploads an insurer's statement of account; BIBS reconciles every line with the books. A line
+      shows a variance, so the ACSL Team Leader opens a case on the invoice and assigns it. The processor records the
+      findings and raises a correction entry; the correction is prepared by the processor, endorsed by the team leader
+      and approved by the ACSL Head, which posts it.
+    data: "Seed data: the booked invoices of the insurer in the Operations invoice ledger; the statement file prepared from the standard layout with lines of the insurer"
+    steps:
+      - [ACSL_PROCESSOR, SCR-AC-49, "Clicks Upload SOA, chooses the insurer, the period and the statement file, and clicks Upload and Reconcile", "Message: <upload>: n of n rows loaded; the upload is listed with its results", Reconciled, wt-c-01]
+      - [ACSL_PROCESSOR, SCR-AC-50, "Opens the upload", "The counts per result and the lines with their premium and balance variances", Variances known, wt-c-02]
+      - [ACSL_TL, SCR-AC-45, "Clicks Open a Case: investigation of the invoice with a variance", "Message: <case> opened; the case is Received", Case opened, wt-c-03]
+      - [ACSL_TL, SCR-AC-46, "Opens the case and assigns it to the ACSL Processor", "The case Assigned with the step in its history", Assigned, wt-c-04]
+      - [ACSL_PROCESSOR, SCR-AC-46, "Records the findings and clicks Raise Correction (posting to a wrong GL account)", "The correction entry opens, raised from the case", Correction raised, wt-c-05]
+      - [ACSL_TL, SCR-AC-48, "Assigns the correction to the ACSL Processor as its preparer", "The correction in Draft", Draft, wt-c-06]
+      - [ACSL_PROCESSOR, SCR-AC-48, "Picks the wrong line among the posted lines of the invoice family, clicks Correct with the right account, saves the lines and clicks Submit for Review", "The correction For Review with its reversal and re-post lines", For review, wt-c-07]
+      - [ACSL_TL, SCR-AC-48, "Clicks Endorse for Approval", "The correction For Approval", For approval, wt-c-08]
+      - [ACSL_HEAD, SCR-AC-48, "Clicks Approve and Post and confirms", "The correction Posted with its journal", Posted, wt-c-09]
+    downstream:
+      - "The correction journal reverses the wrong line and posts it to the right account; the invoice ledger is corrected with it."
+      - "The next GL-SL reconciliation shows the control account in agreement."
+
+  - id: WT-D
+    title: "Month end: the revaluation rate, the revaluation, the GL close and the service fee"
+    summary: >-
+      At the month end the GL Section Head enters the month-end rate of the US dollar; the GL Team Lead revalues the
+      foreign-currency balances, schedules the close of the month and checks the cut-off of the broking books. The GL
+      Officer tags the payout of the service fee released to its recipient.
+    data: "Seed data: the foreign-currency accounts of the seed chart; the service-fee run of the month computed and approved by the seed GL team"
+    steps:
+      - [FRBS_HEAD, SCR-AC-08, "Enters the month-end rate of USD for the previous month on Monthly revaluation rates and clicks Save Rate", "The rate listed with the month end and her name", Rate in force, wt-d-01]
+      - [FRBS_TL, SCR-AC-13, "Chooses the previous month, checks the preview and clicks Post revaluation", "The revaluation run of the month with its journal and its reversal", Revalued, wt-d-02]
+      - [FRBS_TL, SCR-AC-11, "Clicks Schedule Close for the previous month at the proposed date and time", "Message: the close of the month scheduled; listed as Scheduled", Close scheduled, wt-d-03]
+      - [FRBS_TL, SCR-AC-11, "Opens Broking Books Cut-Off", "The broking books of each period with who closed them and when", Cut-off checked, wt-d-04]
+      - [FRBS_PROCESSOR, SCR-AC-22, "Opens the service-fee run of the month and tags a line Released with the date the recipient was credited", "The line Released with its date", Released, wt-d-05]
+    downstream:
+      - "At the scheduled time the checklist runs and the month closes, or the alert Scheduled close failed lists the blocking items."
+      - "The revaluation reverses on the first day of the next month."
+
+  - id: WT-E
+    title: Controls and the messages the user sees
+    summary: >-
+      Four controls of the set, each with what the user sees: a voucher that does not balance, an AR refunded twice,
+      an insurer statement uploaded twice and a payment request for a payee that is not maintained.
+    data: "Seed data: the refund of walkthrough B; the statement uploaded in walkthrough C"
+    steps:
+      - [FRBS_PROCESSOR, SCR-AC-02, "Enters a voucher whose debit and credit differ", "Under the lines: Difference with the amount; Save & Submit is not offered", Refused, wt-e-01]
+      - [PRQ_PROCESSOR, SCR-AC-40, "Raises a refund with the AR of the refund of walkthrough B", "The refusal: the AR is already refunded by the request named", Refused, wt-e-02]
+      - [ACSL_PROCESSOR, SCR-AC-49, "Uploads the statement of walkthrough C again", "The refusal: the file was already uploaded for the insurer as the upload named", Refused, wt-e-03]
+      - [DISBURSEMENT, SCR-AC-25, "Encodes a payment request for a payee code that is not maintained", "The request on the No Payee tab, waiting for its payee; a payee request is raised", Waiting for payee, wt-e-04]

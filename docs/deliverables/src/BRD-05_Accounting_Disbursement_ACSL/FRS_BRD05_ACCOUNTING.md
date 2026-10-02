@@ -5146,7 +5146,7 @@ render: walkthrough
 id: WT-C
 ```
 
-## WT-D Month end: the revaluation rate, the service fee and the GL close
+## WT-D Month end: the revaluation rate, the revaluation, the GL close and the service fee
 
 ```pack
 plugin: ../signoff/signoff_pack.py

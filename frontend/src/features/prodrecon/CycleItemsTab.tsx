@@ -1,19 +1,15 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { LovSelect } from '@/components/broking/LovSelect';
-import { selectionColumn, useRowSelection } from '@/components/broking/rowSelection';
-import type { RowSelection } from '@/components/broking/rowSelection';
+import { useRowSelection } from '@/components/broking/rowSelection';
 import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
-import { Amount } from '@/components/ui/Amount';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { PageFooter } from '@/components/ui/Pager';
-import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { ItemFilters } from './ItemFilters';
@@ -21,10 +17,8 @@ import type { ItemExtraFilters } from './ItemFilters';
 import { ItemReviewDialog } from './ItemReviewDialog';
 import { prodreconApi } from './prodreconApi';
 import type { Bucket, ReconCycle, ReconFeedback, ReconItem } from './prodreconApi';
-import { bucketTabs, differenceLabels, mayPair, maySplit } from './prodreconLogic';
-import { RowActions } from '@/components/ui/RowActions';
-import { LovLabel } from '@/components/broking/LovLabel';
-import { UserName } from '@/components/ui/UserName';
+import { itemColumns } from './cycleItemColumns';
+import { bucketTabs, maySplit } from './prodreconLogic';
 import { clientShortName } from '@/context/clientNames';
 
 function BulkDialog({
@@ -164,82 +158,6 @@ function PairDialog({
       </div>
     </Modal>
   );
-}
-
-/** Columns of the items; the selection and Pair action only when the cycle can be worked. */
-function itemColumns(
-  rows: ReconItem[],
-  selection: RowSelection | undefined,
-  onPair: (item: ReconItem) => void,
-): Column<ReconItem>[] {
-  return [
-    ...(selection === undefined
-      ? []
-      : [
-          selectionColumn(
-            rows,
-            (r) => String(r.id),
-            selection,
-            (r) => r.invoiceNo ?? String(r.id),
-          ),
-        ]),
-    {
-      key: 'invoice',
-      header: 'Invoice / Policy',
-      render: (r) => (
-        <>
-          <strong>{r.invoiceNo ?? r.insurer?.referenceNo ?? '—'}</strong>
-          <div className="muted">{r.broker?.policyNo ?? r.insurer?.policyNo}</div>
-        </>
-      ),
-    },
-    {
-      key: 'assured',
-      header: 'Assured',
-      render: (r) => r.broker?.assuredName ?? r.insurer?.assuredName ?? '',
-    },
-    { key: 'ao', header: 'AO', render: (r) => <UserName login={r.aoUsername} /> },
-    {
-      key: 'gross',
-      header: `Gross Premium (${clientShortName()} / Insurer)`,
-      numeric: true,
-      render: (r) => (
-        <>
-          <Amount value={r.broker?.grossPremium} />
-          <div className="muted">
-            <Amount value={r.insurer?.grossPremium} />
-          </div>
-        </>
-      ),
-    },
-    {
-      key: 'diff',
-      header: 'Differences',
-      render: (r) => differenceLabels(r.discrepancies),
-    },
-    {
-      key: 'disposition',
-      header: 'Disposition',
-      render: (r) => <LovLabel type="RECON_DISPOSITION" code={r.feedback?.disposition} />,
-    },
-    { key: 'status', header: 'Status', render: (r) => <StatusBadge status={r.status} /> },
-    {
-      key: 'actions',
-      header: '',
-      render: (r) => (
-        <RowActions
-          record={r.invoiceNo ?? r.insurer?.policyNo ?? `Item ${String(r.id)}`}
-          actions={[
-            {
-              label: 'Pair with Another Item',
-              hidden: !(selection !== undefined && mayPair(r)),
-              onSelect: () => onPair(r),
-            },
-          ]}
-        />
-      ),
-    },
-  ];
 }
 
 type Dialog = { kind: 'review' | 'pair'; item: ReconItem } | { kind: 'bulk' };

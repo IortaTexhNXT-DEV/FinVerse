@@ -1,69 +1,26 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { InsurerSelect } from '@/components/broking/InsurerSelect';
-import { InsurerName } from '@/components/broking/LovLabel';
-import { UserName } from '@/components/ui/UserName';
 import { CheckCheck, Send } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/auth/authContext';
 import { WorklistToolbar } from '@/components/broking/WorklistToolbar';
 import { selectionColumn, useRowSelection } from '@/components/broking/rowSelection';
-import { Amount } from '@/components/ui/Amount';
 import { Card } from '@/components/ui/Card';
-import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
-import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
 import { remittanceApi } from './api';
-import type { BatchSummary } from './api';
-import { TypeChip } from './RemittanceParts';
+import { BATCH_COLUMNS } from './batchColumns';
 import { BATCH_TABS, batchTabOf, stagesOf, TYPE_LABELS } from './remittanceLabels';
 import type { BatchTab } from './remittanceLabels';
 import './remittance.css';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
-
-const COLUMNS: Column<BatchSummary>[] = [
-  {
-    key: 'no',
-    header: 'Batch No.',
-    render: (b) => (
-      <>
-        <strong>{b.batchNo}</strong>
-        <div className="remit-muted">{b.specialRequestNo ?? formatDate(b.createdAt)}</div>
-      </>
-    ),
-  },
-  { key: 'ins', header: 'Insurer', render: (b) => <InsurerName code={b.insurerCode} /> },
-  { key: 'type', header: 'Type', render: (b) => <TypeChip type={b.type} /> },
-  { key: 'n', header: 'Accounts', numeric: true, render: (b) => b.lineCount },
-  {
-    key: 'paid',
-    header: 'Paid AR',
-    numeric: true,
-    render: (b) => <Amount value={b.totals.paidAr} />,
-  },
-  {
-    key: 'pay',
-    header: 'Payable',
-    numeric: true,
-    render: (b) => <Amount value={b.totals.payable} />,
-  },
-  { key: 'cur', header: 'Currency', render: (b) => b.currency },
-  {
-    key: 'proc',
-    header: 'Processor',
-    render: (b) => <UserName login={b.processor} empty="Unassigned" />,
-  },
-  { key: 'dv', header: 'DV No.', render: (b) => b.dvNo ?? '' },
-  { key: 'stage', header: 'Status', render: (b) => <StatusBadge status={b.stage} /> },
-];
 
 function Filters({
   insurer,
@@ -179,9 +136,9 @@ export default function BatchesPage() {
             selection,
             (b) => b.batchNo,
           ),
-          ...COLUMNS,
+          ...BATCH_COLUMNS,
         ]
-      : COLUMNS;
+      : BATCH_COLUMNS;
   return (
     <div className="stack">
       <PageHeader

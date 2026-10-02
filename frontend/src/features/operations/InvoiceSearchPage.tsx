@@ -1,28 +1,22 @@
-import { InsurerName } from '@/components/broking/LovLabel';
 import { useQuery } from '@tanstack/react-query';
 import { Filter, Search } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { opsApi } from '@/api/operations';
-import type { InvoiceSearch, OpsInvoiceSummary } from '@/api/operations';
-import { Amount } from '@/components/ui/Amount';
+import type { InvoiceSearch } from '@/api/operations';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
-import { OriginBadge } from '@/components/ui/OriginBadge';
 import { OriginFilter } from '@/components/ui/OriginFilter';
 import { DateInput } from '@/components/ui/DateInput';
 import { InsurerSelect } from '@/components/broking/InsurerSelect';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
-import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate } from '@/utils/format';
-import { FlagChips } from './OpsParts';
+import { INVOICE_COLUMNS } from './invoiceColumns';
 import {
   FILTER_FIELDS,
   SEARCH_TABS,
@@ -34,69 +28,6 @@ import {
   tabOf,
 } from './invoiceSearch';
 import type { SearchTab } from './invoiceSearch';
-import { UserName } from '@/components/ui/UserName';
-
-const COLUMNS: Column<OpsInvoiceSummary>[] = [
-  {
-    key: 'no',
-    header: 'Invoice No.',
-    render: (i) => (
-      <>
-        <strong>{i.invoiceNo}</strong> <OriginBadge record={i} />
-        <div className="ops-muted">
-          {i.legacyInvoiceNo && i.legacyInvoiceNo !== i.invoiceNo
-            ? `${i.arn} · legacy ${i.legacyInvoiceNo}`
-            : i.arn}
-        </div>
-      </>
-    ),
-  },
-  {
-    key: 'client',
-    header: 'Assured / Client Code',
-    render: (i) => (
-      <>
-        {i.assuredName}
-        <div className="ops-muted">{i.clientCode}</div>
-      </>
-    ),
-  },
-  { key: 'insurer', header: 'Insurer', render: (i) => <InsurerName code={i.insurerCode} /> },
-  {
-    key: 'date',
-    header: 'Booked / Inception',
-    render: (i) => (
-      <>
-        {formatDate(i.bookingDate)}
-        <div className="ops-muted">{formatDate(i.inceptionDate)}</div>
-      </>
-    ),
-  },
-  {
-    key: 'ao',
-    header: 'Account Officer',
-    render: (i) => <UserName login={i.aoUsername} />,
-  },
-  {
-    key: 'gross',
-    header: 'Gross Premium',
-    numeric: true,
-    render: (i) => <Amount value={i.grossPremium} />,
-  },
-  {
-    key: 'balance',
-    header: 'Outstanding',
-    numeric: true,
-    render: (i) => <Amount value={i.premiumBalance} />,
-  },
-  { key: 'status', header: 'Status', render: (i) => <StatusBadge status={i.paymentStatus} /> },
-  {
-    key: 'remit',
-    header: 'Remittance',
-    render: (i) => <StatusBadge status={i.remittanceStatus} />,
-  },
-  { key: 'flags', header: 'Flags', render: (i) => <FlagChips flags={i.flags} /> },
-];
 
 type FilterKey = (typeof FILTER_FIELDS)[number]['key'];
 
@@ -238,7 +169,7 @@ export default function InvoiceSearchPage() {
           )}
           <DataTable
             caption="Operations invoices"
-            columns={COLUMNS}
+            columns={INVOICE_COLUMNS}
             rows={rows.data?.content ?? []}
             rowKey={(i) => i.invoiceNo}
             loading={rows.isLoading}

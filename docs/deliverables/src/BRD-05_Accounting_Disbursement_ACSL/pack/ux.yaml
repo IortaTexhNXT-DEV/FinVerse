@@ -146,4 +146,96 @@ states:
 # Points for the UX Design team to confirm with BDOI.
 confirm:
   clarifications: [CLR-AC-15]
-  findings: []
+  findings:
+    - screens: [SCR-AC-02, SCR-AC-27]
+      observation: >-
+        The lines of a journal voucher and the accounting entry of a disbursement voucher take the GL account by its
+        code (with a list of accounts as the user types); the account name shows under the code once it is entered.
+      proposal: >-
+        Offer the account as a search by number or name that shows both, as the account inquiry does, and keep the
+        code typed by the users who know it.
+    - screens: [SCR-AC-09]
+      observation: >-
+        A cost-centre rule shows what it applies to as the source module and event codes of the accounting engine
+        (the service-fee accrual of FRBS shows as two codes), and the form takes the source module, GL account and
+        party as typed codes.
+      proposal: >-
+        Name the module and the event in words in the list, and offer them, the GL account and the party as
+        drop-downs or searches by name in the form.
+    - screens: [SCR-AC-05, SCR-AC-13, SCR-AC-25, SCR-AC-46, SCR-AC-48]
+      observation: >-
+        Parties appear by their codes in several tables: the party code to look up on Party Statement, the party of
+        the foreign-currency open items of FX Revaluation, the payee code under the payee name on the workbench and
+        the client and party codes of the ACSL case and the posted lines of a correction.
+      proposal: >-
+        Show the party name first with the code as a second line, and let Party Statement search by name as well as
+        by code.
+    - screens: [SCR-AC-06, SCR-AC-35, SCR-AC-15, SCR-AC-22]
+      observation: >-
+        Some masters show short codes where the business knows a name: the tier of an account (GROUP, MAIN, SUB),
+        the branch and cost centre of an employee (HO, MKT), the bank account of an imported statement (1111) and
+        the segment, sales unit and cost centre under the recipient of a service-fee line.
+      proposal: >-
+        Show the names (Head Office, Marketing, Cash in Bank - BDO Current Account) with the code in a second line or
+        a tooltip.
+    - screens: [SCR-AC-19, SCR-AC-24]
+      observation: >-
+        Report Pack and BIR Forms and Books show the formats of each report as tags and again as one export button
+        per format in every row.
+      proposal: >-
+        Keep one Export action per row (a menu with the formats offered), or keep the buttons and drop the format
+        tags.
+    - screens: [SCR-AC-16]
+      observation: >-
+        The match workbench shows the book entries and the bank lines side by side; with long narrations the two
+        tables are narrow and the amounts are cut at the standard window width. The matches table has an Undo
+        column of buttons.
+      proposal: >-
+        Stack the two lists on narrow windows or let the narration wrap under the reference; move Undo into a row
+        menu with a confirmation, as on the other lists.
+    - screens: [SCR-AC-22, SCR-AC-23]
+      observation: >-
+        The service-fee rate form takes the market segments as comma-separated codes (CBG,RETAIL).
+      proposal: >-
+        Offer the market segments as a multi-select of their names.
+    - screens: [SCR-AC-40]
+      observation: >-
+        On New Refund Request the segment is free text, and the accounts to refund are a wide table of inputs that
+        scrolls inside its card at the standard window width.
+      proposal: >-
+        Offer the segment as a drop-down of the segments of the list of values, and consider one card per account
+        to refund (or a dialog per line) instead of a table of inputs.
+    - screens: [SCR-AC-36]
+      observation: >-
+        Record Certificate Received asks for the withholding agent as an insurer code.
+      proposal: >-
+        Offer the insurer by name, as the insurer statement upload does.
+    - screens: [SCR-AC-03, SCR-AC-43, SCR-AC-46]
+      observation: >-
+        The attachments panel of a record lists the SHA-256 checksum of each file; the panel is shared by every
+        record of BIBS.
+      proposal: >-
+        Keep the checksum in the audit trail and leave it out of the table the business reads, for every set at
+        once.
+    - screens: [SCR-AC-46]
+      observation: >-
+        A case sent for correction shows the status pill Correction while its stepper shows Sent for Correction.
+      proposal: >-
+        Use the stepper's wording on the status pill.
+    - screens: [SCR-AC-27]
+      observation: >-
+        A refund voucher created automatically from a Marketing request shows the Marketing approver as Assigned To
+        once it is approved, because the approver's action started it.
+      proposal: >-
+        Show no assignee on an approved voucher, or the Disbursement Approver who approved it.
+    - screens: [SCR-AC-08]
+      observation: >-
+        Monthly revaluation rates lists every month-end rate of the year for every currency, the latest month first;
+        a rate the GL Section Head enters over a rate loaded by the system keeps System as Entered By.
+      proposal: >-
+        Group the list by month (or filter by the month chosen) and show who last changed the rate.
+    - screens: [SCR-AC-48]
+      observation: >-
+        The correction lines keep their input fields, greyed, after the correction is submitted for review.
+      proposal: >-
+        Show the lines as a read-only table once the correction leaves Draft.

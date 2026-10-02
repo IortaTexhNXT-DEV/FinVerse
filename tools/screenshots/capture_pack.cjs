@@ -36,6 +36,7 @@ const WIDTH = Number(process.env.WIDTH || 1440);
 const HEIGHT = Number(process.env.HEIGHT || 900);
 const SCALE = Number(process.env.SCALE || 2);
 const MAX_HEIGHT = Number(process.env.MAX_HEIGHT || 2000);
+const MAX_WIDTH = Number(process.env.MAX_WIDTH || 1920);  // a list wider than its card widens the window up to this
 const MENU_MAX_HEIGHT = Number(process.env.MENU_MAX_HEIGHT || 12000);  // the full menu of a persona (UX deck)
 const MARGIN = 12;  // CSS pixels of page kept around a cropped region
 const READY_TIMEOUT_MS = 20 * 60 * 1000;
@@ -425,7 +426,14 @@ async function fitViewport(page, tall, width = WIDTH) {
     // A little more than the hidden rows (a sideways scroll bar, rounding), so the last row is never cut; the crop
     // trims the window to what is drawn.
     const room = cards > 0 ? cards + 48 : 0;
-    return { all: Math.max(inner + room, doc.scrollHeight - doc.clientHeight, 0), cards: room };
+    // An open dialog taller than the window: the window grows so the whole dialog, title to buttons, is in view.
+    const dialogs = [...document.querySelectorAll('dialog[open], [role=dialog]')]
+      .filter((d) => d.getBoundingClientRect().width > 0);
+    const dialog = dialogs[dialogs.length - 1];
+    // (a dialog is at most 90% of the window high and scrolls inside beyond that)
+    const tallDialog = dialog && dialog.scrollHeight > dialog.clientHeight + 1
+      ? Math.max(0, Math.ceil(dialog.scrollHeight / 0.9) + 16 - window.innerHeight) : 0;
+    return { all: Math.max(inner + room, doc.scrollHeight - doc.clientHeight, tallDialog, 0), cards: Math.max(room, tallDialog) };
   });
   // A walkthrough step keeps the top of its page, but a list capped in its card is shown with all its rows.
   const grow = tall === false ? extra.cards : extra.all;
@@ -701,7 +709,16 @@ async function cropOf(page, shot, recipe) {
           await page.setViewportSize({ width, height: HEIGHT });
           await page.waitForTimeout(500);
         }
-        await fitViewport(page, shot.state === 'walkthrough' ? (shot.tall ?? Boolean(named)) : shot.tall, width);
+        // A list that still scrolls sideways inside its card is taken in a window wide enough for all its columns.
+        const over = await page.evaluate(() => Math.max(0, ...[...document.querySelectorAll('main .table-wrap')]
+          .filter((w) => w.getBoundingClientRect().width > 0)
+          .map((w) => w.scrollWidth - w.clientWidth)));
+        const wide = over > 1 ? Math.min(MAX_WIDTH, width + over + 24) : width;
+        if (wide !== width) {
+          await page.setViewportSize({ width: wide, height: HEIGHT });
+          await page.waitForTimeout(500);
+        }
+        await fitViewport(page, shot.state === 'walkthrough' ? (shot.tall ?? Boolean(named)) : shot.tall, wide);
       }
       if (named) {
         // A message of the step would cover the rows of the region.

@@ -64,13 +64,70 @@ async function draftRefund(ctx) {
 
 /** A second case of the invoice family, assigned to the processor and under investigation. */
 async function investigatingCase(ctx) {
-  const query = "select id from acsl_case where subject = 'Payment of the assured not applied to the endorsement' order by id limit 1";
+  const query = "select id, stage, findings is not null from acsl_case where subject = 'Payment of the assured not applied to the endorsement' order by id limit 1";
   if (ctx.sql(query).length === 0) {
     const c = await ctx.api('acsltl', 'POST', `/acsl/cases?companyId=${COMPANY(ctx)}`, { type: 'ANALYSIS_REQUEST',
       invoiceNo: walkthrough.varianceInvoice(ctx), subject: 'Payment of the assured not applied to the endorsement',
       details: 'Collections asks whether the payment of 30-Sep is for the endorsement or for the original invoice.' });
     await ctx.api('acsltl', 'POST', `/acsl/cases/${c.id}/assign`, { username: 'acsl' });
-    await ctx.api('acsl', 'PUT', `/acsl/cases/${c.id}/findings`, { findings: 'The payment matches the premium of the endorsement; the application to the original invoice is being checked with Cashiering.' });
+  }
+  let [id, stage, findings] = ctx.sql(query)[0];
+  if (stage === 'ASSIGNED') {
+    await workflowAction(ctx, 'acsl', 'AcslCase', id, /start/i);
+    [id, stage, findings] = ctx.sql(query)[0];
+  }
+  if (findings !== 't') {
+    await ctx.api('acsl', 'PUT', `/acsl/cases/${id}/findings`, { findings: 'The payment matches the premium of the endorsement; the application to the original invoice is being checked with Cashiering.' });
+  }
+  return id;
+}
+
+/** Runs a workflow action of a record as a user, the way the record page does (Start Investigation...). */
+async function workflowAction(ctx, user, entityType, entityId, action) {
+  const detail = await ctx.api(user, 'GET', `/workflow/cases/by-record?entityType=${entityType}&entityId=${entityId}`);
+  const pick = detail.actions.find((a) => action.test(a.action) || action.test(a.label));
+  if (!pick) {
+    throw new Error(`no action ${action} on ${entityType} ${entityId}: ${detail.actions.map((a) => a.action).join(', ')}`);
+  }
+  await ctx.api(user, 'POST', `/workflow/cases/${detail.item.caseId ?? detail.item.id}/actions/${pick.action}`, {});
+}
+
+/** A supplier payment by authority to debit, approved, so its bank form can be printed. */
+async function atdVoucher(ctx) {
+  const query = "select id from dsb_voucher where mode = 'ATD' and stage = 'APPROVED' order by id limit 1";
+  if (ctx.sql(query).length === 0) {
+    // The building administrator is paid by authority to debit; the team leader keeps the payee, the approver
+    // authorises it.
+    if (ctx.sql("select 1 from dsb_payee where payee_code = 'S-0271' and stage = 'ACTIVE'").length === 0) {
+      if (ctx.sql("select 1 from dsb_payee where payee_code = 'S-0271'").length === 0) {
+        await ctx.api('disbtl', 'POST', '/disbursement/payees', { companyId: COMPANY(ctx), payeeCode: 'S-0271',
+          payeeClass: 'SUPPLIER', name: 'Pacific Facilities Management Corp.', tin: '009-221-845-000',
+          address: '18/F Ayala Tower One, Ayala Avenue, Makati City', defaultMode: 'ATD', allowedModes: ['ATD', 'CHECK'],
+          disbursementTypes: ['SUPPLIER'], currency: 'PHP' });
+      }
+      const payee = ctx.one("select id from dsb_payee where payee_code = 'S-0271'");
+      if (ctx.one(`select stage from dsb_payee where id = ${payee}`) === 'DRAFT') {
+        await ctx.api('disbtl', 'POST', `/disbursement/payees/${payee}/submit`);
+      }
+      await ctx.api('disbappr', 'POST', `/disbursement/payees/${payee}/authorize`);
+    }
+    const request = "select id, status, voucher_id from dsb_request where rfp_no = 'RFP-2026-0413' order by id limit 1";
+    if (ctx.sql(request).length === 0) {
+      await ctx.api('disb', 'POST', '/disbursement/requests', { companyId: COMPANY(ctx), disbursementType: 'SUPPLIER',
+        payeeCode: 'S-0271', currency: 'PHP', amount: 48250, purpose: 'Building maintenance dues of the head office for October',
+        rfpNo: 'RFP-2026-0413' });
+    }
+    const [requestId, status] = ctx.sql(request)[0];
+    if (status !== 'IN_VOUCHER') {
+      await ctx.api('disb', 'POST', `/disbursement/requests/${requestId}/voucher`);
+    }
+    const voucherId = ctx.one(`select voucher_id from dsb_request where id = ${requestId}`);
+    const bank = Number(ctx.one("select id from pay_bank_account where code = 'BDO-CA'"));
+    await ctx.api('disb', 'PUT', `/disbursement/vouchers/${voucherId}/terms`, { mode: 'ATD', bankAccountId: bank, ewt: 0,
+      purpose: 'Building maintenance dues of the head office for October', valueDate: new Date(Date.now() + 8 * 3600000).toISOString().slice(0, 10) });
+    await ctx.api('disb', 'POST', `/disbursement/vouchers/${voucherId}/submit`, {});
+    await ctx.api('disbtl', 'POST', `/disbursement/vouchers/${voucherId}/submit-for-approval`, {});
+    await ctx.api('disbappr', 'POST', `/disbursement/vouchers/${voucherId}/approve`, {});
   }
   return ctx.one(query);
 }
@@ -157,7 +214,7 @@ const fills = {
       await settle(page, 1500);
     },
   ],
-  recon_account: [async (page) => { await fill(page, 'Bank account', /BDO-CA|0012/); await settle(page, 1500); }],
+  recon_account: [async (page) => { await fill(page, 'Bank account', /^1111 /); await settle(page, 1500); }],
   run_schedule: [
     async (page) => {
       const select = page.getByLabel(/^Schedule/).first();
@@ -239,7 +296,10 @@ const after = {
     await dialogOf(page).waitFor({ timeout: 10000 }).catch(() => {});
     await settle(page, 600);
   },
-  'scr-ac-11-02-schedule': async (page) => settle(page, 800),
+  'scr-ac-11-02-schedule': async (page) => {
+    await fill(page, 'Period', new RegExp(`^${previousMonth().iso}`), dialogOf(page));
+    await settle(page, 800);
+  },
   'ux-scr-ac-28-actions': async (page) => {
     await page.locator('main table tbody tr').first().getByRole('button', { name: /^Actions for/ }).click();
     await settle(page, 300);
@@ -254,7 +314,7 @@ const documents = {
     render(await ctx.api('disb', 'GET', `/disbursement/vouchers/${id}/document`), 'pdf', out);
   },
   'doc-atd': async (ctx, out) => {
-    const id = ctx.one("select v.id from dsb_voucher v join dsb_instrument i on i.voucher_id = v.id where v.mode <> 'CHECK' order by v.id limit 1");
+    const id = await atdVoucher(ctx);
     render(await ctx.api('disb', 'GET', `/disbursement/vouchers/${id}/instrument/document`), 'pdf', out);
   },
   'doc-dctf': async (ctx, out) => {
@@ -278,8 +338,11 @@ const documents = {
 const TAB = 'main div.stack > div.tabs[role=tablist], main div.stack > div.tabs[role=tablist] ~ *';
 const crops = {
   'scr-ac-27-02-entry': TAB, 'scr-ac-27-03-instrument': TAB, 'scr-ac-27-04-tags': TAB,
-  'scr-ac-43-02-disbursement': TAB, 'scr-ac-46-02-family': TAB, 'scr-ac-50-02-log': TAB,
+  'scr-ac-43-02-disbursement': TAB, 'scr-ac-46-02-family': TAB,
 };
 
-module.exports = { opens, fills, selects: {}, after, crops, custom: {}, walkthrough: walkthrough.steps, documents,
+// Lists wider than their card at the standard window are taken in a wider window (CSS pixels).
+const widths = { 'scr-ac-16-01-match': 1900 };
+
+module.exports = { opens, fills, selects: {}, after, crops, widths, custom: {}, walkthrough: walkthrough.steps, documents,
   prepare, previousMonth, button };

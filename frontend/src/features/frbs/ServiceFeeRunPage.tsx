@@ -24,7 +24,7 @@ import { formatAmount, formatDate, formatPeriod, formatRate, humanize } from '@/
 import { RUN_ENTITY, frbsApi } from './api';
 import type { ServiceFeeInvoice, ServiceFeeLine, ServiceFeeRun } from './api';
 import { LiquidateDialog, ReleaseDialog } from './LineDialogs';
-import { lineMenu, tagProgress, totalsByCurrency } from './serviceFee';
+import { lineMenu, payoutNote, tagProgress, totalsByCurrency } from './serviceFee';
 import './frbs.css';
 import { UserName } from '@/components/ui/UserName';
 import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
@@ -105,9 +105,7 @@ function lineColumns(
       render: (l) => (
         <>
           {l.payout.requestNo ?? '—'}
-          <span className="cell-sub">
-            {[l.payout.dvNo, l.payout.gatewayStatus, l.payout.message].filter(Boolean).join(' · ')}
-          </span>
+          <span className="cell-sub">{payoutNote(l.payout)}</span>
         </>
       ),
     },

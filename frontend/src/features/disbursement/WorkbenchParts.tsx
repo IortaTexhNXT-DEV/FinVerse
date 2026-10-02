@@ -15,6 +15,7 @@ import type { PaymentRequest } from './api';
 import { requestActions } from './labels';
 import './disbursement.css';
 import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { payeeText } from './labels';
 
 type RequestDialogMode = 'details' | 'return';
 
@@ -123,9 +124,7 @@ export function RequestDialog({
           <dt>RFP No.</dt>
           <dd>{request.rfpNo ?? '—'}</dd>
           <dt>Payee</dt>
-          <dd>
-            {request.payeeCode} {request.payeeName ?? ''}
-          </dd>
+          <dd>{payeeText(request.payeeName, request.payeeCode)}</dd>
           <dt>Type</dt>
           <dd>{humanize(request.disbursementType)}</dd>
           <dt>Amount</dt>

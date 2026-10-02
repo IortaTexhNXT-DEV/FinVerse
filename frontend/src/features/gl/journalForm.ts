@@ -112,3 +112,16 @@ export function journalTypeLabel(type: string): string {
 export function journalSavedText(batchNo: string, status: string): string {
   return `Journal ${batchNo} saved (${statusLabel(status)})`;
 }
+
+/**
+ * Smallest width (pixels) of each input column of the journal lines, so a full amount, the side
+ * and the cost centre stay readable; the table scrolls inside its card when the page is narrower.
+ */
+export const LINE_MIN_WIDTHS = {
+  side: 110,
+  amount: 150,
+  costCentre: 200,
+  lineOfBusiness: 140,
+  reference: 150,
+  narration: 220,
+} as const;

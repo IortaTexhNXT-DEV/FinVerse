@@ -11,6 +11,7 @@ import { closeControlsApi } from './closeControlsApi';
 import type { CloseSchedule } from './closeControlsApi';
 import { closeGuards, fromLocalInput, toLocalInput } from './closeTimes';
 import type { usePeriodPicker } from './usePeriodPicker';
+import { SCHEDULE_NOTE } from './closeTexts';
 
 interface Props {
   open: boolean;
@@ -107,10 +108,7 @@ export function ScheduleCloseDialog({ open, picker, onDone, onClose }: Readonly<
             </div>
           )}
         </Field>
-        <p className="muted">
-          At the chosen time the period-end checklist runs; when a control fails the close is
-          recorded as failed with the blocking items and the GL_CLOSE_FAILED alert is raised.
-        </p>
+        <p className="muted">{SCHEDULE_NOTE}</p>
       </div>
     </Modal>
   );

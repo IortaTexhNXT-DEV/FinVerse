@@ -43,8 +43,8 @@ screens:
       - Report Centre › a report
       - Report Pack, Disbursement Reports › a report
     shots:
-      - {state: result, user: glofficer, open_report: trial_balance, caption: "A report run on screen with its parameters and the column filters"}
-      - {state: export, user: glofficer, open_report: trial_balance, click: "^export$", caption: "Export of a report with the print options: paper, orientation and width"}
+      - {state: params, user: glofficer, open_report: trial_balance, caption: "A report before it is run: its parameters, the print options and the export formats"}
+      - {state: result, user: glofficer, open_report: trial_balance, click: "^run report$", caption: "The report run on screen with the column filters and the export buttons"}
     fields:
       - "Parameters | [Report parameters] | Date, drop-down, text | The parameters of the report: dates, company, branch, account, party, status | Cond.: report | Report definition | Report defaults | - | Mandatory parameters filled | -"
       - "Parameters | Saved Variant | Drop-down | The variants saved by the user or shared | N | Report variants | Blank | - | - | -"

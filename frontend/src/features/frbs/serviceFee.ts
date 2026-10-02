@@ -1,3 +1,4 @@
+import { statusLabel } from '@/components/ui/statusTones';
 import type { RowAction } from '@/components/ui/RowActions';
 import type { LineStatus, RuleBody, RunStage, ServiceFeeLine } from './api';
 
@@ -130,4 +131,15 @@ export function lineMenu(
   return lineActions(line, runStage)
     .filter((a) => (a === 'resend' ? may.manage : may.tag))
     .map((a) => ({ label: LINE_ACTION_LABELS[a], onSelect: () => onAction(a) }));
+}
+
+/** The payout of a line under its request: the voucher, the status in Disbursement in words, the message. */
+export function payoutNote(p: {
+  dvNo?: string | null;
+  gatewayStatus?: string | null;
+  message?: string | null;
+}): string {
+  return [p.dvNo, p.gatewayStatus ? statusLabel(p.gatewayStatus) : undefined, p.message]
+    .filter(Boolean)
+    .join(' · ');
 }

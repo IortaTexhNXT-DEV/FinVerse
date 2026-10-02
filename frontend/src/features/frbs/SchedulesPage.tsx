@@ -28,8 +28,8 @@ const COLUMNS: Column<Schedule>[] = [
     header: 'Schedule',
     render: (s) => (
       <>
-        <strong>{s.code}</strong>
-        <span className="cell-sub">{s.values.name}</span>
+        <strong>{s.values.name}</strong>
+        <span className="cell-sub">{s.code}</span>
       </>
     ),
   },

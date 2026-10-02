@@ -15,6 +15,7 @@ import {
 import {
   lineActions,
   lineMenu,
+  payoutNote,
   periodErrors,
   ruleErrors,
   tabOf,
@@ -233,5 +234,11 @@ describe('service fee line row menu', () => {
     expect(
       lineMenu(returned, 'APPROVED', { tag: false, manage: true }, onAction).map((a) => a.label),
     ).toEqual(['Send Again']);
+  });
+});
+
+describe('service fee payout note', () => {
+  it('gives the status in Disbursement in words', () => {
+    expect(payoutNote({ dvNo: 'DSQ-2026-000002', gatewayStatus: 'SENT' })).not.toContain('SENT');
   });
 });

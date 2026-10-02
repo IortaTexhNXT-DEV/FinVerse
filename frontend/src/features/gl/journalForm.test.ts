@@ -3,6 +3,7 @@ import {
   journalSavedText,
   journalStatusOption,
   journalTypeLabel,
+  LINE_MIN_WIDTHS,
   newJournalValues,
   notPostedText,
   toJournalInput,
@@ -56,5 +57,13 @@ describe('journal type and saved message', () => {
 
   it('gives the status of a saved journal as its pill reads it', () => {
     expect(journalSavedText('ACR-HO-2026-000001', 'PENDING_APPROVAL')).not.toMatch(/_|PENDING/);
+  });
+});
+
+describe('journal line columns', () => {
+  it('keep the amount, side and cost centre wide enough to read', () => {
+    expect(LINE_MIN_WIDTHS.amount).toBeGreaterThanOrEqual(150);
+    expect(LINE_MIN_WIDTHS.side).toBeGreaterThanOrEqual(100);
+    expect(LINE_MIN_WIDTHS.costCentre).toBeGreaterThanOrEqual(200);
   });
 });

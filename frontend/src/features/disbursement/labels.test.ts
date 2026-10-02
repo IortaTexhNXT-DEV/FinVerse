@@ -9,6 +9,7 @@ import {
   entryOrigin,
   entryTotals,
   instrumentActions,
+  payeeText,
   requestActions,
   workbenchTab,
   workbenchTabOf,
@@ -205,5 +206,14 @@ describe('texts of the Disbursement screens', () => {
       }
     }
     expect(BRANCH_EMAIL_HINT).not.toMatch(/[A-Z]_[A-Z]/);
+  });
+});
+
+describe('payee of a request', () => {
+  it('reads by name first', () => {
+    expect(payeeText('Mabuhay General Insurance Corp.', 'INS-MGIC')).toBe(
+      'Mabuhay General Insurance Corp. (INS-MGIC)',
+    );
+    expect(payeeText(undefined, 'S-0417')).toBe('S-0417');
   });
 });

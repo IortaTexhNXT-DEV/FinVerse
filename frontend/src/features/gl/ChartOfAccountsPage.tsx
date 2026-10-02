@@ -126,7 +126,7 @@ export default function ChartOfAccountsPage() {
               ),
             },
             { key: 'class', header: 'Class', render: (a) => accountWord(a.accountClass) },
-            { key: 'tier', header: 'Tier', render: (a) => a.level },
+            { key: 'tier', header: 'Tier', render: (a) => accountWord(a.level) },
             { key: 'post', header: 'Postable', render: (a) => (a.postable ? 'Yes' : 'Heading') },
             {
               key: 'sl',

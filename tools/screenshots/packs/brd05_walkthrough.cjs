@@ -489,6 +489,9 @@ const steps = {
       const d = await openDialog(page, /^schedule close$/i);
       await fill(page, 'Period', new RegExp(`^${previousMonth().iso}`), d);
       await settle(page, 600);
+      await fill(page, 'Close on', dateText(1), d);
+      await d.getByLabel('Close time').fill('17:00');
+      await settle(page, 400);
       await confirmDialog(page, /^schedule close$/i);
     }
     return page;

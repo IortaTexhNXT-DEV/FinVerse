@@ -234,3 +234,8 @@ export const UPLOADS: readonly {
     permission: 'DISB_PAYEE_MAINTAIN',
   },
 ];
+
+/** A payee as a request shows it: the name, then the code in brackets (the code alone when unnamed). */
+export function payeeText(name: string | null | undefined, code: string): string {
+  return name ? `${name} (${code})` : code;
+}

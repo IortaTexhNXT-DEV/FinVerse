@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  SCHEDULE_NOTE,
   dayOfYear,
   missingRateNotice,
   openItemDocument,
@@ -24,5 +25,11 @@ describe('year-end deadline', () => {
   it('reads as dd-MMM', () => {
     expect(dayOfYear('04-15')).toBe('15-Apr');
     expect(dayOfYear(undefined)).toBe('—');
+  });
+});
+
+describe('scheduled close note', () => {
+  it('names the alert in words, not by its code', () => {
+    expect(SCHEDULE_NOTE).not.toMatch(/[A-Z]_[A-Z]/);
   });
 });

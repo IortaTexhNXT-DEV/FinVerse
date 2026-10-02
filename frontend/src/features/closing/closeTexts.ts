@@ -29,3 +29,7 @@ export function dayOfYear(monthDay: string | undefined): string {
   const name = MONTHS[Number(month) - 1];
   return name === undefined || day === undefined ? (monthDay ?? '—') : `${day}-${name}`;
 }
+
+/** What happens at the time of a scheduled close, in the words of the business. */
+export const SCHEDULE_NOTE =
+  'At the chosen time the period-end checklist runs; when a control fails, the close is recorded as failed with the blocking items and the alert Scheduled close failed is sent.';

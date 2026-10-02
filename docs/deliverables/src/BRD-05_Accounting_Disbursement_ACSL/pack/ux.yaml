@@ -61,8 +61,8 @@ classify:
   scr-ac-16-01-match: default
   scr-ac-16-02-brs: read-only
   scr-ac-17-02-batch: filled
-  scr-ac-18-01-result: default
-  scr-ac-18-02-export: filled
+  scr-ac-18-01-params: default
+  scr-ac-18-02-result: read-only
   scr-ac-19-01-pack: default
   scr-ac-20-01-run: default
   scr-ac-20-02-definitions: default

@@ -255,7 +255,7 @@ public class SeedCollections {
             ? request("R-0001", date, ReceiptMode.BANK_TRANSFER, SeedContext.BANK, PHP, RI_AMOUNT)
                 .method(AllocationMethod.FIFO)
             : request(null, date, ReceiptMode.CASH, SeedContext.BANK, PHP, OTHER_INCOME)
-                .other("Sale of salvage (seed)", "4700");
+                .other("Sale of salvage", "4700");
     save(draft, approve);
   }
 
@@ -429,7 +429,7 @@ public class SeedCollections {
           bank,
           incomeAccount,
           method,
-          "Seed collection",
+          "Collection",
           allocations);
     }
   }

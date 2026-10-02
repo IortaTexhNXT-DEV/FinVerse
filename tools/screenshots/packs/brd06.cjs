@@ -157,8 +157,9 @@ const after = {
   },
 };
 
-/** The Expiry List with the Filters panel open, and the record states that need an action button. */
-const crops = {};
+// A step or shot that shows one tab of a long record page: the tab strip and the tab's content, whole.
+const TAB = 'main div.stack > div.tabs[role=tablist], main div.stack > div.tabs[role=tablist] ~ *';
+const crops = { 'wt-a-03': TAB, 'wt-c-02': TAB, 'wt-c-04': TAB, 'wt-d-04': TAB };
 
 // ------------------------------------------------------------------ documents
 
@@ -166,11 +167,11 @@ const year = () => new Date().getUTCFullYear();
 
 const documents = {
   'doc-renewal-advice': async (ctx, out) => {
-    const no = ctx.one(`select l.letter_no from rnw_letter l join rnw_candidate c on c.id = l.candidate_id where c.renewal_ref = '${refA(ctx)}' and l.type = 'RA' order by l.id desc limit 1`);
+    const no = ctx.one(`select l.letter_no from rnw_letter l join rnw_candidate c on c.id = l.candidate_id where c.renewal_ref = '${refA(ctx)}' and l.letter_type = 'RA' order by l.id desc limit 1`);
     render(await ctx.api('ao2', 'GET', `/renewal/letters/${no}/file.pdf?companyId=${company(ctx)}`), 'pdf', out);
   },
   'doc-closing-letter': async (ctx, out) => {
-    const query = "select l.letter_no from rnw_letter l where l.type in ('NFR', 'NAL') order by l.id desc limit 1";
+    const query = "select l.letter_no from rnw_letter l where l.letter_type in ('NFR', 'NAL') order by l.id desc limit 1";
     if (ctx.sql(query).length === 0) {
       const ref = ctx.one("select renewal_ref from rnw_candidate where stage = 'LETTER_PENDING' order by id limit 1");
       await ctx.api('mkttl', 'POST', '/renewal/letters/closing', { companyId: company(ctx), renewalRefs: [ref] });

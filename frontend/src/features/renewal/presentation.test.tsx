@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { catalogApi } from '@/api/catalog';
 import { renewalApi } from '@/api/renewal';
 import { CandidateList } from './common/CandidateList';
+import { candidateColumns, claimsText } from './common/candidateColumns';
 import {
   acceptanceMethodLabel,
   bucketCauseLabel,
@@ -188,5 +189,29 @@ describe('where each persona finds its uploads', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Upload RAs Already Sent' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Run Take-over' })).toBeNull();
+  });
+});
+
+describe('renewal lists that fit their card', () => {
+  it('pairs related values in one column instead of scrolling sideways', () => {
+    const headers = candidateColumns(true).map((c) => c.header);
+    expect(headers).toEqual([
+      'Renewal Reference',
+      'Client',
+      'Expiring Policy / Invoice',
+      'Risk / Insurance Company',
+      'Unit / Officer',
+      'Expiry',
+      'Status / Classification',
+      'Disposition',
+      'Gross Premium / Outstanding',
+    ]);
+    expect(candidateColumns(false)).toHaveLength(8);
+  });
+
+  it('counts the claims in words', () => {
+    expect(claimsText(1)).toBe('1 claim');
+    expect(claimsText(3)).toBe('3 claims');
+    expect(claimsText(null)).toBe('');
   });
 });

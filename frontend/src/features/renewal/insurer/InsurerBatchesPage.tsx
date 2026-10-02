@@ -160,7 +160,9 @@ function BatchDetail({ batchNo, onClose }: Readonly<{ batchNo: string; onClose: 
                 <tr key={l.renewalRef ?? String(i)}>
                   <td>{l.responded ? 'Yes' : 'No'}</td>
                   {l.columns.map((c, j) => (
-                    <td key={d.headers[j] ?? String(j)}>{c ?? ''}</td>
+                    <td key={d.headers[j] ?? String(j)}>
+                      <span className="nowrap">{c ?? ''}</span>
+                    </td>
                   ))}
                 </tr>
               ))}

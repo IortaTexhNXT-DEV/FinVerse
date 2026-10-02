@@ -9,7 +9,19 @@ import { formatDate } from '@/utils/format';
 import { BucketPill, FlagChips } from './RenewalBits';
 import { dispositionLabel } from './renewalCodes';
 
-/** The columns of a renewal list (FRS "Expiring list columns"). */
+/** "1 claim" / "3 claims": the claims of the expiring term in words; empty when unknown. */
+export function claimsText(count: number | null): string {
+  if (count === null) {
+    return '';
+  }
+  return count === 1 ? '1 claim' : `${String(count)} claims`;
+}
+
+/**
+ * The columns of a renewal list (FRS "Expiring list columns"). The list fits its card: related
+ * values share a column, one under the other (Risk / Insurance Company, Status / Classification,
+ * Gross Premium / Outstanding), instead of scrolling sideways.
+ */
 export function candidateColumns(showMoney: boolean): Column<CandidateRow>[] {
   const columns: Column<CandidateRow>[] = [
     {
@@ -18,7 +30,7 @@ export function candidateColumns(showMoney: boolean): Column<CandidateRow>[] {
       kind: 'code',
       render: (r) => (
         <span className="rnw-ref">
-          {r.renewalRef}
+          <span className="nowrap">{r.renewalRef}</span>
           <FlagChips row={r} />
         </span>
       ),
@@ -26,7 +38,12 @@ export function candidateColumns(showMoney: boolean): Column<CandidateRow>[] {
     {
       key: 'client',
       header: 'Client',
-      render: (r) => <CellStack main={r.parties.clientName} sub={r.parties.clientCode ?? ''} />,
+      render: (r) => (
+        <CellStack
+          main={r.parties.clientName}
+          sub={r.parties.clientCode ? <span className="nowrap">{r.parties.clientCode}</span> : ''}
+        />
+      ),
     },
     {
       key: 'policy',
@@ -40,18 +57,19 @@ export function candidateColumns(showMoney: boolean): Column<CandidateRow>[] {
     },
     {
       key: 'risk',
-      header: 'Risk',
-      render: (r) =>
-        r.policy.productCode ? (
-          <ProductName code={r.policy.productCode} withCode />
-        ) : (
-          (r.policy.productName ?? '')
-        ),
-    },
-    {
-      key: 'insurer',
-      header: 'Insurance Company',
-      render: (r) => <InsurerName code={r.policy.insurerCode} />,
+      header: 'Risk / Insurance Company',
+      render: (r) => (
+        <CellStack
+          main={
+            r.policy.productCode ? (
+              <ProductName code={r.policy.productCode} />
+            ) : (
+              (r.policy.productName ?? '')
+            )
+          }
+          sub={<InsurerName code={r.policy.insurerCode} />}
+        />
+      ),
     },
     {
       key: 'officer',
@@ -73,42 +91,42 @@ export function candidateColumns(showMoney: boolean): Column<CandidateRow>[] {
     },
     {
       key: 'stage',
-      header: 'Status',
+      header: 'Status / Classification',
       kind: 'status',
-      render: (r) => <StatusBadge status={r.stage} label={r.stageLabel} />,
+      render: (r) => (
+        <span className="rnw-ref">
+          <StatusBadge status={r.stage} label={r.stageLabel} />
+          <BucketPill bucket={r.bucket} />
+        </span>
+      ),
     },
     {
       key: 'disposition',
       header: 'Disposition',
       render: (r) => <CellStack main={dispositionLabel(r.disposition)} sub={r.remarks ?? ''} />,
     },
-    {
-      key: 'bucket',
-      header: 'Classification',
-      kind: 'status',
-      render: (r) => <BucketPill bucket={r.bucket} />,
-    },
   ];
   if (showMoney) {
-    columns.push(
-      {
-        key: 'premium',
-        header: 'Gross Premium',
-        kind: 'amount',
-        render: (r) => <Amount value={r.money.grossPremium} />,
-      },
-      {
-        key: 'outstanding',
-        header: 'Outstanding',
-        kind: 'amount',
-        render: (r) => (r.money.outstanding === null ? '' : <Amount value={r.money.outstanding} />),
-      },
-      {
-        key: 'claims',
-        header: 'Claims',
-        render: (r) => r.money.claimStatus ?? '',
-      },
-    );
+    columns.push({
+      key: 'premium',
+      header: 'Gross Premium / Outstanding',
+      kind: 'amount',
+      render: (r) => (
+        <CellStack
+          main={<Amount value={r.money.grossPremium} />}
+          sub={
+            r.money.outstanding === null ? (
+              claimsText(r.money.claimCount)
+            ) : (
+              <>
+                <Amount value={r.money.outstanding} />
+                {r.money.claimCount === null ? '' : ` · ${claimsText(r.money.claimCount)}`}
+              </>
+            )
+          }
+        />
+      ),
+    });
   }
   return columns;
 }

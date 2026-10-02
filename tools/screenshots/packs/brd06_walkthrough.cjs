@@ -179,7 +179,7 @@ const steps = {
       await button(page, /^new batch$/i).click();
       await settle(page, 600);
       const d = dialogOf(page);
-      const name = ctx.one(`select name from cat_insurer_profile where party_code = '${insurer}' limit 1`);
+      const name = ctx.one(`select name from cat_insurer where party_code = '${insurer}' limit 1`);
       await fill(page, 'Insurance Company', new RegExp(name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')), d);
       await fill(page, 'Expiry From', expiry, d);
       await fill(page, 'Expiry To', expiry, d);

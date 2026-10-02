@@ -6,8 +6,8 @@
 # issue, and the points for the UX Design team to confirm.
 
 issue:
-  version: "2.1"
-  date: 29 September 2026
+  version: "2.2"
+  date: 2 October 2026
   changes:
     - ref: CHG-DM-2.1-01
       what: The migration roles land on Migration Home after sign-in; My Approvals stays one click away in the header
@@ -30,6 +30,14 @@ issue:
     - ref: CHG-DM-2.1-05
       what: Day counts in words on the tiles of My Approvals ("0 days", "1 day")
       screens: [NAV-DM-01]
+    - ref: CHG-DM-2.2-01
+      what: >-
+        Lists in the BDO style guide: outlined status pills, alternating white and Background Blue rows, a long
+        list scrolling inside its card with the header row in view, names instead of codes, due dates on one line
+        with the overdue icon and ages in words; every image of the set retaken
+      screens: [SCR-DM-01, SCR-DM-02, SCR-DM-03, SCR-DM-04, SCR-DM-05, SCR-DM-06, SCR-DM-07, SCR-DM-08, SCR-DM-09,
+                SCR-DM-10, SCR-DM-11, SCR-DM-12, SCR-DM-13, SCR-DM-14, SCR-DM-15, SCR-DM-16, SCR-DM-17, SCR-DM-18,
+                SCR-DM-19, SCR-DM-20]
 
 # Who each persona is (the what they do comes from the persona table of the handbook unless given here).
 navigation:

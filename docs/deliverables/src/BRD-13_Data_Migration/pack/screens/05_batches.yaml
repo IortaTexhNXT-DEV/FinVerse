@@ -33,7 +33,7 @@ screens:
     actions:
       - "New Batch | Cashiering user | Always | Opens a draft batch | Draft | -"
       - "Add | Cashiering user | Draft | Adds the payment as a line | Draft | -"
-      - "Remove | Cashiering user | Draft | Removes a line | Draft | -"
+      - "Remove | Cashiering user | Draft | From the row action menu of the line: removes the line | Draft | -"
       - "Submit | Cashiering user | Draft with lines | Sends the batch to the Cashiering team lead | For approval | -"
       - "Cancel Batch | Cashiering user | Draft | Closes the batch without posting; its lines may be taken again | Cancelled | -"
       - "Approve | Cashiering team lead, then top management | For approval, For top management; never the requester | First approval sends the batch to top management; the second posts each line in its own transaction | For top management, Posted | -"

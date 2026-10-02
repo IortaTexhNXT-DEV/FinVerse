@@ -192,3 +192,4 @@ fixes:
   UPLOAD_TOO_LARGE: Split the file (for example by branch) and upload the parts, or use the secure file drop when it is named.
   VALIDATION_FAILED: Correct the fields listed under the message.
   NOT_FOUND: Refresh the screen; the record was changed or removed. Report the message with its reference if it persists.
+  "A line is being removed": No action; wait until the line being removed is gone, then choose the next action.

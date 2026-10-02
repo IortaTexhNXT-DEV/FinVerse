@@ -2,7 +2,7 @@ import type { Journal, JournalInput, JournalLineInput, ManualJournalType } from 
 import type { BulkPostOutcome, FrbsJournal } from './glPlatformApi';
 import { displayNameOf } from '@/api/users';
 import { statusLabel } from '@/components/ui/statusTones';
-import { today } from '@/utils/format';
+import { humanize, today } from '@/utils/format';
 import { emptyLine, isBlankLine } from './journalMath';
 
 export interface JournalHeaderValues {
@@ -95,4 +95,20 @@ export function assigneeOptions(users: readonly string[]): { value: string; labe
   return users
     .map((u) => ({ value: u, label: displayNameOf(u) || u }))
     .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+const JOURNAL_TYPE_LABELS: Record<string, string> = {
+  MANUAL: 'Manual journal',
+  ADJUSTMENT: 'Adjustment',
+  ACCRUAL: 'Accrual',
+};
+
+/** The type of a journal in words (Accrual, Premium...), never its code. */
+export function journalTypeLabel(type: string): string {
+  return JOURNAL_TYPE_LABELS[type] ?? humanize(type);
+}
+
+/** The message after a journal is saved, with its status as its pill reads it. */
+export function journalSavedText(batchNo: string, status: string): string {
+  return `Journal ${batchNo} saved (${statusLabel(status)})`;
 }

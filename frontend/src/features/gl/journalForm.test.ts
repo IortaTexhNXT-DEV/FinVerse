@@ -1,6 +1,8 @@
 import {
   assigneeOptions,
+  journalSavedText,
   journalStatusOption,
+  journalTypeLabel,
   newJournalValues,
   notPostedText,
   toJournalInput,
@@ -42,5 +44,17 @@ describe('journal texts', () => {
     expect(options).toHaveLength(2);
     const labels = options.map((o) => o.label);
     expect([...labels].sort((a, b) => a.localeCompare(b))).toEqual(labels);
+  });
+});
+
+describe('journal type and saved message', () => {
+  it('names the journal type in words', () => {
+    expect(journalTypeLabel('ACCRUAL')).toBe('Accrual');
+    expect(journalTypeLabel('MANUAL')).toBe('Manual journal');
+    expect(journalTypeLabel('PREMIUM')).toBe('Premium');
+  });
+
+  it('gives the status of a saved journal as its pill reads it', () => {
+    expect(journalSavedText('ACR-HO-2026-000001', 'PENDING_APPROVAL')).not.toMatch(/_|PENDING/);
   });
 });

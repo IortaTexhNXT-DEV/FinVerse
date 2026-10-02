@@ -20,7 +20,7 @@ interface Props {
 /** Filter bar of the journal list with the bulk actions on the right. */
 export function JournalFiltersCard({ filters, username, onChange, actions }: Readonly<Props>) {
   return (
-    <Card actions={actions}>
+    <Card title="Find Journals" actions={actions}>
       <div className="form-grid">
         <Field label="Status">
           {(id) => (

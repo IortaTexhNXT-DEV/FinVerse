@@ -79,7 +79,7 @@ export const ACCOUNT_COLUMNS: Column<AccountSummary>[] = [
     // and the officer's name is never cut off at the card's edge.
     key: 'o',
     header: 'Officer',
-    width: '150px',
+    width: '180px',
     truncate: true,
     render: (a) => <UserName login={a.accountOfficer} truncate />,
   },

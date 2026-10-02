@@ -126,7 +126,15 @@ export default function ClientsPage() {
             { key: 'status', header: 'Status', render: (c) => <StatusBadge status={c.status} /> },
             { key: 'kyc', header: 'KYC', render: (c) => <StatusBadge status={c.kycStatus} /> },
             { key: 'due', header: 'KYC Review', render: (c) => formatDate(c.kycReviewDue) },
-            { key: 'contact', header: 'Contact', render: (c) => c.mobile ?? c.email ?? '' },
+            {
+              // A long e-mail address stays on one line within the card, the full address in
+              // the tooltip, so the last column is never cut off at the card's edge.
+              key: 'contact',
+              header: 'Contact',
+              width: '200px',
+              truncate: true,
+              render: (c) => c.mobile ?? c.email ?? '',
+            },
           ]}
         />
         <PageFooter data={clients.data} noun="clients" onPage={setPage} />

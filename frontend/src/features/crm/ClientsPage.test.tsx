@@ -23,6 +23,7 @@ describe('ClientsPage', () => {
           status: 'PROSPECT',
           kycStatus: 'NOT_STARTED',
           bankClient: false,
+          email: 'lorna.aquino.contact-address@seed-client.ph',
         },
       ],
       page: 0,
@@ -61,5 +62,9 @@ describe('ClientsPage', () => {
     );
     const code = await screen.findByText('PR-2026-000009');
     expect(code.closest('td')?.classList.contains('col-code')).toBe(true);
+    // A long e-mail address stays on one line within the list, the full address in the tooltip.
+    const email = screen.getByText('lorna.aquino.contact-address@seed-client.ph');
+    expect(email).toHaveAttribute('title', 'lorna.aquino.contact-address@seed-client.ph');
+    expect(email.closest('td')).toHaveClass('col-truncate');
   });
 });

@@ -21,11 +21,16 @@ import { formatAmount, humanize, today } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { IncentiveRun, RunLine, Scheme } from './commissionApi';
 import { DateInput } from '@/components/ui/DateInput';
+import { LineLabel, SalesUnitName } from '@/components/broking/LovLabel';
 
 const LINE_COLUMNS: Column<RunLine>[] = [
   { key: 'invoice', header: 'Invoice No.', render: (l) => <strong>{l.invoiceNo}</strong> },
-  { key: 'unit', header: 'Sales Unit', render: (l) => l.salesUnit ?? '' },
-  { key: 'line', header: 'Product Line', render: (l) => l.productLine ?? '' },
+  { key: 'unit', header: 'Sales Unit', render: (l) => <SalesUnitName code={l.salesUnit} /> },
+  {
+    key: 'line',
+    header: 'Product Line',
+    render: (l) => (l.productLine ? <LineLabel code={l.productLine} /> : ''),
+  },
   {
     key: 'basic',
     header: 'Basic Premium',

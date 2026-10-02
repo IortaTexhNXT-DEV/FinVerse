@@ -173,7 +173,7 @@ export function MatrixTab() {
           { key: 'role', header: 'Role', render: (r) => r.roleCode },
           { key: 'unit', header: 'Unit', render: (r) => r.unitCode ?? 'Any unit' },
           { key: 'rec', header: 'Record', render: (r) => <StatusBadge status={r.status} /> },
-          { key: 'maker', header: 'Maker', render: (r) => <UserName login={r.maker} empty="" /> },
+          { key: 'maker', header: 'Maker', render: (r) => <UserName login={r.maker} /> },
           {
             key: 'act',
             header: '',

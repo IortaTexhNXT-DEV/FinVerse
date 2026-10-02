@@ -18,6 +18,7 @@ import { acslApi } from './api';
 import type { SoaUpload } from './api';
 import { SoaUploadDialog } from './SoaUploadDialog';
 import { UserName } from '@/components/ui/UserName';
+import { InsurerName } from '@/components/broking/LovLabel';
 
 const COLUMNS: Column<SoaUpload>[] = [
   {
@@ -30,7 +31,7 @@ const COLUMNS: Column<SoaUpload>[] = [
       </>
     ),
   },
-  { key: 'insurer', header: 'Insurer', render: (u) => u.insurerCode },
+  { key: 'insurer', header: 'Insurer', render: (u) => <InsurerName code={u.insurerCode} /> },
   {
     key: 'period',
     header: 'Period',

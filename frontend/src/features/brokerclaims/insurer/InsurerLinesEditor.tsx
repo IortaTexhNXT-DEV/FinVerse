@@ -1,5 +1,6 @@
 import { DataTable } from '@/components/ui/DataTable';
 import { TypedInput } from '@/components/ui/DateInput';
+import { InsurerName } from '@/components/broking/LovLabel';
 
 /** An insurer line as typed on Record Claim. */
 export interface LineDraft {
@@ -40,7 +41,7 @@ export function InsurerLinesEditor({
       rowKey={(l) => `${l.insurerCode}-${l.index}`}
       emptyMessage="The cover has no insurer shares; the lead insurer is used."
       columns={[
-        { key: 'i', header: 'Insurer', render: (l) => l.insurerCode },
+        { key: 'i', header: 'Insurer', render: (l) => <InsurerName code={l.insurerCode} /> },
         {
           key: 's',
           header: 'Share %',

@@ -5,15 +5,12 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Kpi } from '@/components/ui/Kpi';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
-import { formatDateTime } from '@/utils/format';
+import { formatDateTime, formatDuration } from '@/utils/format';
 import { BRAND } from '@/branding';
 
-/** Uptime as "2d 3h 4m". */
+/** Uptime in words: "2 days 3 hrs", "4 hrs 5 min". */
 function uptime(seconds: number): string {
-  const days = Math.floor(seconds / 86_400);
-  const hours = Math.floor((seconds % 86_400) / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  return `${days}d ${hours}h ${minutes}m`;
+  return formatDuration(new Date(0).toISOString(), new Date(seconds * 1000).toISOString());
 }
 
 /** Application information: version and build, database migration level and health. */

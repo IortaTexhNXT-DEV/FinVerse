@@ -159,7 +159,7 @@ export default function BatchesPage() {
               {
                 key: 'decided',
                 header: 'Decided by',
-                render: (r) => <UserName login={r.decidedBy} empty="" />,
+                render: (r) => <UserName login={r.decidedBy} />,
               },
               { key: 'note', header: 'Note', render: (r) => r.decisionNote ?? '' },
               {

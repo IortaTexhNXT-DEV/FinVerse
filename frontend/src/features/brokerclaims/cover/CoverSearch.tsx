@@ -12,6 +12,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useCompanyId } from '@/context/workspaceContext';
 import type { CoverHit, SearchBy } from './api';
 import { coverApi } from './api';
+import { InsurerName, ProductName } from '@/components/broking/LovLabel';
 
 const SEARCH_BY: { id: SearchBy; label: string }[] = [
   { id: 'ARN', label: 'ARN' },
@@ -107,8 +108,16 @@ export function CoverSearch({
             columns={[
               { key: 'arn', header: 'ARN', render: (c) => <span className="mono">{c.arn}</span> },
               { key: 'assured', header: 'Assured', render: (c) => c.assuredName },
-              { key: 'product', header: 'Product', render: (c) => c.productCode },
-              { key: 'insurer', header: 'Insurer', render: (c) => c.insurerCode ?? '' },
+              {
+                key: 'product',
+                header: 'Product',
+                render: (c) => <ProductName withCode code={c.productCode} />,
+              },
+              {
+                key: 'insurer',
+                header: 'Insurer',
+                render: (c) => <InsurerName code={c.insurerCode} />,
+              },
               {
                 key: 'policy',
                 header: 'Policy No.',

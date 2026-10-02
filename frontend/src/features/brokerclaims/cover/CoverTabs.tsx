@@ -14,6 +14,7 @@ import type {
   Endorsement,
   PolicyYear,
 } from './api';
+import { InsurerName } from '@/components/broking/LovLabel';
 
 type TabId = 'years' | 'items' | 'endorsements' | 'invoices' | 'claims' | 'refs';
 
@@ -150,7 +151,7 @@ export function RefsTable({ rows }: Readonly<{ rows: LocationRef[] }>) {
       columns={[
         { key: 'a', header: 'ARN', render: (r) => r.arn },
         { key: 'i', header: 'Location Item', render: (r) => r.itemNo },
-        { key: 'n', header: 'Insurer', render: (r) => r.insurerCode },
+        { key: 'n', header: 'Insurer', render: (r) => <InsurerName code={r.insurerCode} /> },
         { key: 'r', header: 'Insurer Reference', render: (r) => r.reference },
         { key: 'f', header: 'From', render: (r) => formatDate(r.effectiveFrom) },
         {

@@ -15,6 +15,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { DateField } from '@/features/underwriting/FormFields';
 import { formatDate, humanize, today } from '@/utils/format';
 import { sharesByLayer } from './allocation';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 /** Reinsurers' share of claim reserves, recoveries on payments and salvage shared back. */
 export default function ClaimRecoveriesPage() {
@@ -72,7 +73,11 @@ export default function ClaimRecoveriesPage() {
           emptyMessage="No claim movement in the period."
           columns={[
             { key: 'c', header: 'Claim', render: (m) => <strong>{m.claimNo}</strong> },
-            { key: 'l', header: 'Class', render: (m) => m.businessLine },
+            {
+              key: 'l',
+              header: 'Class',
+              render: (m) => (m.businessLine ? <LineLabel code={m.businessLine} /> : ''),
+            },
             { key: 'd', header: 'Loss Date', render: (m) => formatDate(m.lossDate) },
             { key: 'md', header: 'Date', render: (m) => formatDate(m.movementDate) },
             { key: 't', header: 'Movement', render: (m) => humanize(m.movementType) },

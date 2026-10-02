@@ -120,7 +120,7 @@ export default function ClientsPage() {
             {
               key: 'segment',
               header: 'Segment',
-              render: (c) => <LovLabel type="MARKET_SEGMENT" code={c.marketSegment} empty="" />,
+              render: (c) => <LovLabel type="MARKET_SEGMENT" code={c.marketSegment} />,
             },
             { key: 'bank', header: 'Bank', render: (c) => (c.bankClient ? 'Yes' : 'No') },
             { key: 'status', header: 'Status', render: (c) => <StatusBadge status={c.status} /> },

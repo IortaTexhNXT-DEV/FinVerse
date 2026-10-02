@@ -15,6 +15,7 @@ import type { FrbsJournal } from './glPlatformApi';
 import { journalSource } from './journalSource';
 import { UserName } from '@/components/ui/UserName';
 import { displayNameOf } from '@/api/users';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 function Summary({ journal: j }: Readonly<{ journal: Journal }>) {
   const source = journalSource(j);
@@ -140,7 +141,11 @@ export default function JournalDetailPage() {
             { key: 'no', header: '#', render: (l) => l.lineNo },
             { key: 'acc', header: 'Account', render: (l) => `${l.accountCode} – ${l.accountName}` },
             { key: 'cc', header: 'Cost Centre', render: (l) => l.costCenter ?? '' },
-            { key: 'lob', header: 'LOB', render: (l) => l.businessLine ?? '' },
+            {
+              key: 'lob',
+              header: 'LOB',
+              render: (l) => (l.businessLine ? <LineLabel code={l.businessLine} /> : ''),
+            },
             { key: 'ccy', header: 'Ccy', render: (l) => l.currency },
             {
               key: 'dr',

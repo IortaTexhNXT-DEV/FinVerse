@@ -55,7 +55,7 @@ const COLUMNS: Column<ReconItem>[] = [
   {
     key: 'disposition',
     header: 'Disposition',
-    render: (r) => <LovLabel type="RECON_DISPOSITION" code={r.feedback?.disposition} empty="" />,
+    render: (r) => <LovLabel type="RECON_DISPOSITION" code={r.feedback?.disposition} />,
   },
   {
     key: 'status',

@@ -63,7 +63,7 @@ const COLUMNS: Column<UnappliedItem>[] = [
       </>
     ),
   },
-  { key: 'unit', header: 'Unit', render: (u) => <SalesUnitName code={u.salesUnit} empty="" /> },
+  { key: 'unit', header: 'Unit', render: (u) => <SalesUnitName code={u.salesUnit} /> },
   { key: 'amount', header: 'Amount', numeric: true, render: (u) => <Amount value={u.amount} /> },
   { key: 'balance', header: 'Balance', numeric: true, render: (u) => <Amount value={u.balance} /> },
   {

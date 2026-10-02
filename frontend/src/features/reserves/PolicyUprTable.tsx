@@ -9,6 +9,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { SelectInput } from '@/features/assets/FormControls';
 import { humanize } from '@/utils/format';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 /** Policy-level UPR of a run (drill-down), paged, optionally for one line of business. */
 export function PolicyUprTable({ runId, lines }: Readonly<{ runId: number; lines: string[] }>) {
@@ -46,7 +47,11 @@ export function PolicyUprTable({ runId, lines }: Readonly<{ runId: number; lines
             render: (d) => <strong>{d.documentNo}</strong>,
           },
           { key: 'k', header: 'Kind', render: (d) => humanize(d.kind) },
-          { key: 'l', header: 'Line', render: (d) => d.businessLine },
+          {
+            key: 'l',
+            header: 'Line',
+            render: (d) => (d.businessLine ? <LineLabel code={d.businessLine} /> : ''),
+          },
           {
             key: 'c',
             header: 'Cover',

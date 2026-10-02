@@ -91,7 +91,7 @@ export default function ValuationRunsPage() {
             {
               key: 'a',
               header: 'Approved by',
-              render: (r) => <UserName login={r.approvedBy} empty="" />,
+              render: (r) => <UserName login={r.approvedBy} />,
             },
             { key: 'j', header: 'Journals', numeric: true, render: (r) => r.journalCount },
             { key: 'c', header: 'Calculated', render: (r) => formatDateTime(r.calculatedAt) },

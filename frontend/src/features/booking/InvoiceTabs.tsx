@@ -118,17 +118,12 @@ export function ServiceInvoiceTable({
           render: (s) => <Link to={`/booking/service-invoices/${String(s.id)}`}>{s.siNo}</Link>,
         },
         {
-          key: 'type',
-          header: 'Kind / Type',
-          render: (s) => (
-            <span className="cell-stack">
-              <span>
-                <StatusBadge status={s.kind} />
-              </span>
-              <span className="muted">{typeName(s.typeCode)}</span>
-            </span>
-          ),
+          key: 'kind',
+          header: 'Kind',
+          kind: 'status',
+          render: (s) => <StatusBadge status={s.kind} />,
         },
+        { key: 'type', header: 'Type', render: (s) => typeName(s.typeCode) },
         { key: 'recipient', header: 'Recipient', render: (s) => s.recipientName },
         { key: 'invoice', header: 'Invoice No.', render: (s) => s.invoiceNo ?? '' },
         { key: 'date', header: 'Issue Date', render: (s) => formatDate(s.issueDate) },

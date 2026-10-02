@@ -180,7 +180,7 @@ export default function AlertsPage() {
             {
               key: 'h',
               header: 'Handled by',
-              render: (a) => <UserName login={a.resolvedBy ?? a.acknowledgedBy} empty="" />,
+              render: (a) => <UserName login={a.resolvedBy ?? a.acknowledgedBy} />,
             },
             {
               key: 'x',

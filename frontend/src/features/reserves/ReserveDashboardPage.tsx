@@ -26,6 +26,7 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { SelectInput, TextInput } from '@/features/assets/FormControls';
 import { formatAmount, formatCompact, today, formatDate } from '@/utils/format';
 import { RESERVE_ORDER, reserveByLine, reserveLabel, totalsByReserve } from './reserveMath';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 const CHART_HEIGHT = 300;
 const RESERVE_OPTIONS = RESERVE_ORDER.map((r) => ({ value: r, label: reserveLabel(r) }));
@@ -149,7 +150,11 @@ export default function ReserveDashboardPage() {
           emptyMessage="No reserves: prepare a valuation run first."
           columns={[
             { key: 'r', header: 'Reserve', render: (r) => reserveLabel(r.reserve) },
-            { key: 'l', header: 'Line of Business', render: (r) => r.businessLine },
+            {
+              key: 'l',
+              header: 'Line of Business',
+              render: (r) => (r.businessLine ? <LineLabel code={r.businessLine} /> : ''),
+            },
             { key: 'g', header: 'Gross', numeric: true, render: (r) => <Amount value={r.gross} /> },
             { key: 'i', header: 'RI Share', numeric: true, render: (r) => <Amount value={r.ri} /> },
             { key: 'n', header: 'Net', numeric: true, render: (r) => <Amount value={r.net} /> },

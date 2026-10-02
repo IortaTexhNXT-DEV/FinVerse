@@ -17,6 +17,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useWorkspace } from '@/context/workspaceContext';
 import { DateField, SelectField, TextField } from './FormFields';
 import { useUwLookups } from './useUwLookups';
+import { ProductName } from '@/components/broking/LovLabel';
 
 type Filters = Omit<PolicyFilters, 'companyId'>;
 
@@ -119,7 +120,11 @@ export default function PoliciesPage() {
           caption="Policies"
           columns={[
             { key: 'no', header: 'Policy No.', render: (p) => <strong>{p.policyNo}</strong> },
-            { key: 'prod', header: 'Product', render: (p) => p.productCode },
+            {
+              key: 'prod',
+              header: 'Product',
+              render: (p) => <ProductName withCode code={p.productCode} />,
+            },
             { key: 'ins', header: 'Insured', render: (p) => p.insuredName },
             { key: 'src', header: 'Source', render: (p) => p.intermediaryName ?? 'Direct' },
             {

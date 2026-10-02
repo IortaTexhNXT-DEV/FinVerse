@@ -136,7 +136,7 @@ export function ProductVersionsTab({ product }: Readonly<{ product: Product }>) 
           {
             key: 'v',
             header: 'Validated By',
-            render: (v) => <UserName login={v.validatedBy} empty="" />,
+            render: (v) => <UserName login={v.validatedBy} />,
           },
           { key: 'c', header: 'Change', render: (v) => v.changeSummary ?? '' },
         ]}

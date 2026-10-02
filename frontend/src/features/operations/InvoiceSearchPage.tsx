@@ -75,7 +75,7 @@ const COLUMNS: Column<OpsInvoiceSummary>[] = [
   {
     key: 'ao',
     header: 'Account Officer',
-    render: (i) => <UserName login={i.aoUsername} empty="" />,
+    render: (i) => <UserName login={i.aoUsername} />,
   },
   {
     key: 'gross',

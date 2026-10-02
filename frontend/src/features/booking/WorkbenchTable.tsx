@@ -117,7 +117,7 @@ export function WorkbenchTable({
     {
       key: 'department',
       header: 'Department',
-      render: (r) => <SalesUnitName code={r.department} empty="" />,
+      render: (r) => <SalesUnitName code={r.department} />,
     },
     { key: 'date', header: 'Booking Date', render: (r) => formatDate(r.bookingDate) },
   ];

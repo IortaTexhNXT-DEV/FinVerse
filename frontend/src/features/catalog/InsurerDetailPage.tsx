@@ -19,6 +19,7 @@ import { BranchModal, CommissionModal } from './InsurerRatesModals';
 import { RecordActions } from './RecordActions';
 import { UserName } from '@/components/ui/UserName';
 import { placementChannelLabel } from './insurerForm';
+import { ProductName } from '@/components/broking/LovLabel';
 
 type Dialog = 'edit' | 'branch' | 'commission' | null;
 
@@ -75,7 +76,11 @@ function Commissions({ rows }: Readonly<{ rows: Commission[] }>) {
       rowKey={(c) => c.id}
       emptyMessage="No commission rate: the product default applies."
       columns={[
-        { key: 'p', header: 'Product', render: (c) => c.productCode ?? 'All products' },
+        {
+          key: 'p',
+          header: 'Product',
+          render: (c) => <ProductName withCode code={c.productCode} empty="All products" />,
+        },
         { key: 'r', header: 'Commission %', numeric: true, render: (c) => formatRate(c.rate) },
         { key: 'f', header: 'From', render: (c) => formatDate(c.effectiveFrom) },
         { key: 't', header: 'To', render: (c) => formatDate(c.effectiveTo) || 'Open' },

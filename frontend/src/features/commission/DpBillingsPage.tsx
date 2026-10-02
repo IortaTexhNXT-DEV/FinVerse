@@ -13,11 +13,12 @@ import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { formatDateTime } from '@/utils/format';
 import { commissionApi } from './commissionApi';
 import type { BillingStage, DpBilling } from './commissionApi';
 import { STAGE_TABS } from './commissionLogic';
 import { UserName } from '@/components/ui/UserName';
+import { DueDate } from '@/components/ui/DueDate';
 
 /** Columns of a billing list. */
 const COLUMNS: Column<DpBilling>[] = [
@@ -34,13 +35,10 @@ const COLUMNS: Column<DpBilling>[] = [
   {
     key: 'sla',
     header: 'Answer Due',
-    render: (b) => (
-      <>
-        {formatDate(b.slaDue)} {b.overdue && <StatusBadge status="OVERDUE" />}
-      </>
-    ),
+    kind: 'date',
+    render: (b) => <DueDate at={b.slaDue} overdue={b.overdue} dateOnly />,
   },
-  { key: 'handler', header: 'Handler', render: (b) => <UserName login={b.handler} empty="" /> },
+  { key: 'handler', header: 'Handler', render: (b) => <UserName login={b.handler} /> },
   { key: 'stage', header: 'Stage', render: (b) => <StatusBadge status={b.stage} /> },
 ];
 

@@ -62,7 +62,7 @@ export default function ValidationQueuePage() {
               {
                 key: 'b',
                 header: 'Submitted By',
-                render: (v) => <UserName login={v.submittedBy} empty="" />,
+                render: (v) => <UserName login={v.submittedBy} />,
               },
               { key: 'a', header: 'Submitted', render: (v) => formatDateTime(v.submittedAt) },
               {

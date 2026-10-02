@@ -21,6 +21,7 @@ import { UserName } from '@/components/ui/UserName';
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 import { Notice } from '@/components/ui/Notice';
 import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 /** Income and expense balances the closing journal will transfer to retained earnings. */
 function ClosingPreview({ companyId, yearId }: Readonly<{ companyId: number; yearId: number }>) {
@@ -46,7 +47,11 @@ function ClosingPreview({ companyId, yearId }: Readonly<{ companyId: number; yea
           { key: 'b', header: 'Branch', render: (b) => branch(b.branchId) },
           { key: 'a', header: 'Account', render: (b) => b.accountCode },
           { key: 'c', header: 'Cost Centre', render: (b) => b.costCenter ?? '' },
-          { key: 'l', header: 'Line of Business', render: (b) => b.businessLine ?? '' },
+          {
+            key: 'l',
+            header: 'Line of Business',
+            render: (b) => (b.businessLine ? <LineLabel code={b.businessLine} /> : ''),
+          },
           {
             key: 'n',
             header: 'Balance (Dr +)',

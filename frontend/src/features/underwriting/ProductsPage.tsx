@@ -17,6 +17,7 @@ import { CheckboxField, NumberField, SelectField, TextField } from './FormFields
 import { useUwLookups } from './useUwLookups';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
 import { formatRate } from '@/utils/format';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 type ProductForm = ProductInput & { id?: number };
 
@@ -110,7 +111,11 @@ export default function ProductsPage() {
           columns={[
             { key: 'c', header: 'Code', render: (p) => <strong>{p.code}</strong> },
             { key: 'n', header: 'Name', render: (p) => p.name },
-            { key: 'l', header: 'Class', render: (p) => p.businessLine },
+            {
+              key: 'l',
+              header: 'Class',
+              render: (p) => (p.businessLine ? <LineLabel code={p.businessLine} /> : ''),
+            },
             {
               key: 'cm',
               header: 'Comm. %',

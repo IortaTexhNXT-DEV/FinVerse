@@ -32,7 +32,7 @@ function tabColumn(tab: IssuanceTab): Column<IssuanceRow> {
     return {
       key: 'mortgagee',
       header: 'Mortgagee',
-      render: (r) => <LovLabel type="MORTGAGEE_BANK" code={r.mortgageeBank} empty="" />,
+      render: (r) => <LovLabel type="MORTGAGEE_BANK" code={r.mortgageeBank} />,
     };
   }
   return {

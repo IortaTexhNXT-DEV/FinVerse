@@ -19,6 +19,7 @@ import type { TreatyForm } from './treatyForm';
 import { useRiLookups } from './useRiLookups';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
 import { Notice } from '@/components/ui/Notice';
+import { LineLabel } from '@/components/broking/LovLabel';
 
 /** Treaty programme per class and underwriting year (maker-checker master data). */
 export default function TreatiesPage() {
@@ -77,7 +78,11 @@ export default function TreatiesPage() {
             { key: 'c', header: 'Code', render: (t) => <strong>{t.code}</strong> },
             { key: 'n', header: 'Name', render: (t) => t.name },
             { key: 'y', header: 'UW Year', render: (t) => t.uwYear },
-            { key: 'l', header: 'Class', render: (t) => t.businessLine },
+            {
+              key: 'l',
+              header: 'Class',
+              render: (t) => (t.businessLine ? <LineLabel code={t.businessLine} /> : ''),
+            },
             { key: 't', header: 'Type', render: (t) => humanize(t.treatyType) },
             { key: 'k', header: 'Capacity', render: (t) => capacityLabel(t) },
             {

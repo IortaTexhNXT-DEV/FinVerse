@@ -117,7 +117,7 @@ export default function ObjectsPage() {
             {
               key: 'owner',
               header: 'Business owner',
-              render: (o) => <UserName login={o.businessOwner} empty="" />,
+              render: (o) => <UserName login={o.businessOwner} />,
             },
             {
               key: 'status',

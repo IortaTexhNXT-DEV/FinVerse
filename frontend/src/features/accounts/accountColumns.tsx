@@ -74,5 +74,5 @@ export const ACCOUNT_COLUMNS: Column<AccountSummary>[] = [
       </span>
     ),
   },
-  { key: 'o', header: 'Officer', render: (a) => <UserName login={a.accountOfficer} empty="" /> },
+  { key: 'o', header: 'Officer', render: (a) => <UserName login={a.accountOfficer} /> },
 ];

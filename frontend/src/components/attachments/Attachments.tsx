@@ -48,7 +48,7 @@ const INFO_COLUMNS: Column<AttachmentInfo>[] = [
   {
     key: 'k',
     header: 'Type',
-    render: (a) => <LovLabel type="DOCUMENT_TYPE" code={a.documentType} empty="" />,
+    render: (a) => <LovLabel type="DOCUMENT_TYPE" code={a.documentType} />,
   },
   { key: 'd', header: 'Description', render: (a) => a.description ?? '' },
   { key: 's', header: 'Size', numeric: true, render: (a) => formatBytes(a.sizeBytes) },

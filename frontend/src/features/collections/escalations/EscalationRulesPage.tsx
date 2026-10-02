@@ -122,7 +122,11 @@ export default function EscalationRulesPage() {
       ),
     },
     { key: 'what', header: 'Escalates When', render: (r) => describeRule(r, displayNameOf) },
-    { key: 'segment', header: 'Segment', render: (r) => r.segment ?? 'All' },
+    {
+      key: 'segment',
+      header: 'Segment',
+      render: (r) => <LovLabel type="MARKET_SEGMENT" code={r.segment} empty="All" />,
+    },
     {
       key: 'reason',
       header: 'Reason',

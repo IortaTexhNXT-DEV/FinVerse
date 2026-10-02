@@ -20,7 +20,7 @@ const FFY_COLUMNS: Column<AccountSummary>[] = [
     (a) => a.ffyStart,
     (a) => a.ffyEnd,
   ),
-  { key: 'o', header: 'Officer', render: (a) => <UserName login={a.accountOfficer} empty="" /> },
+  { key: 'o', header: 'Officer', render: (a) => <UserName login={a.accountOfficer} /> },
   ...ACCOUNT_COLUMNS.filter((c) => c.key === 's'),
 ];
 

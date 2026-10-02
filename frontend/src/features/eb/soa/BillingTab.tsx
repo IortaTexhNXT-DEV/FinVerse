@@ -16,11 +16,12 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
 import { SoaReceiveDialog } from './SoaReceiveDialog';
 import { SoaTable } from './SoaTable';
+import { InsurerName } from '@/components/broking/LovLabel';
 
 const INVOICE_COLUMNS: Column<ProgrammeInvoice>[] = [
   { key: 'no', header: 'Invoice', kind: 'code', render: (i) => i.invoiceNo },
   { key: 'arn', header: 'Account', kind: 'code', render: (i) => i.arn },
-  { key: 'insurer', header: 'Insurer', kind: 'code', render: (i) => i.insurerCode },
+  { key: 'insurer', header: 'Insurer', render: (i) => <InsurerName code={i.insurerCode} /> },
   { key: 'date', header: 'Booked', kind: 'date', render: (i) => formatDate(i.bookingDate) },
   {
     key: 'gross',

@@ -217,6 +217,7 @@ screens:
       - "Rules | Reason | Column | Why one user may not hold both | - | Rules | - | Read only | - | -"
       - "Rules | Status | Column | Pending Authorization, Active, Inactive; under it New rule to authorise or Deactivation to authorise | - | Rules | - | Read only | - | -"
       - "Rules | Maker / Authorised | Columns | Name; name and dd-MMM-yyyy HH:mm | - | Rules | - | Read only | - | -"
+      - "Rules | [Row action menu] | Row action menu | Authorise and Reject of a waiting change, Deactivate of an active rule, each confirmed in a dialog | - | - | - | - | - | -"
       - "New Rule | Group Profile | Drop-down | Active group profiles by name | Y | Group profiles | Blank | New rule | - | Select the first group profile"
       - "New Rule | May Not Be Held With | Drop-down | Active group profiles by name | Y | Group profiles | Blank | New rule | Different from the first | Choose two different group profiles"
       - "New Rule | Reason | Text area | Up to 500 characters | Y | - | Blank | New rule | Not blank | Enter why the two profiles are not held together"

@@ -76,7 +76,7 @@ this order, BRD-01 first:
 |---|---|
 | brd01 | `'^wt-(a|b)-|^wt-c-01$'`, then `'^(scr|doc)-'` (the KYC approval shot needs the client that step C-01 submits), then `'^wt-c-(0[2-9]|1)'` |
 | brd03 | `'^wt-a-'`, then `'^(scr|doc)-'` (the set-up shot needs the seed request that walkthrough B returns), then `'^wt-b-'` |
-| brd11 | `'^wt-'`, then `'^(scr|doc)-'` |
+| brd11 | `'^scr-ua-08-03'` (the seeded request waiting for its second approval, which walkthrough B approves), then `'^wt-'`, then the other `'^(scr|doc)-'` shots, then `'^ux-'` |
 
 A run with a slug filter keeps the other images; a run without a filter deletes the images that are no longer in the
 pack. Recipes exist for `brd01`, `brd03` and `brd11` (`packs/brdNN.cjs`). The BRD-11 recipe also signs in users that are

@@ -54,7 +54,7 @@ places:
   - [ "^(GroupProfileFields|RolePermissionFields|GroupProfileRequestValidator|RolePermissionChangeValidator)$", "New Group Profile Request (SCR-UA-12)" ]
   - [ "^(AccessMatrixPage|AccessMatrixService)$", "User Access Matrix (SCR-UA-13)" ]
   - [ "^(UserAccessReportsPage|UamReportSupport)$", "User access reports (SCR-UA-14, SCR-UA-17)" ]
-  - [ "^(UsersPage|UserSessionsDialog|UserAdminService)$", "Users (SCR-UA-15)" ]
+  - [ "^(UsersPage|UserSessionsDialog|UserAdminService|DataScopeService)$", "Users (SCR-UA-15)" ]
   - [ "^(RolesPage|RoleEditGuard|Role|AccessImplementationService)$", "Roles & Permissions: implementation (SCR-UA-16)" ]
   - [ "^(SystemParametersPage|SecurityParameterApprovals|SystemParameter)$", "System Parameters (SCR-UA-18)" ]
   - [ "^(SodRulesPage|sodRules|SodRuleService|SodRule)$", "Separation of Duties (SCR-UA-19)" ]
@@ -199,3 +199,9 @@ fixes:
   "The approvers are chosen on submission.": No action; the approvers are listed once the request is submitted.
   "The deactivation is sent to Information Security; the rule stays active until it is authorised.": Confirm to send the deactivation for authorisation, or cancel to keep the rule.
   "The pending change is rejected and the rule stays as it was.": Enter the reason and confirm the rejection, or cancel to leave the change pending.
+  "Selected companies": No action; the user sees only the companies and branches of the user's data access (Users › Data Access).
+  DATA_SCOPE_BEYOND_OWN: Grant only companies and branches within your own data access, or ask an administrator with wider access.
+  DATA_SCOPE_INVALID: Choose All companies, or at least one company with its branches, and save again.
+  DATA_SCOPE_SELF_CHANGE: Ask another administrator to change your data access.
+  DATA_SCOPE_UNKNOWN_BRANCH: Choose the branches again from the list of the company and save.
+  DATA_SCOPE_UNKNOWN_COMPANY: Refresh the page and choose the companies again from the list.

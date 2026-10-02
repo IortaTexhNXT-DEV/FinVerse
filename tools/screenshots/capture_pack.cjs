@@ -726,11 +726,13 @@ async function cropOf(page, shot, recipe) {
           await page.setViewportSize({ width, height: HEIGHT });
           await page.waitForTimeout(500);
         }
-        // A list that still scrolls sideways inside its card is taken in a window wide enough for all its columns.
-        const over = await page.evaluate(() => Math.max(0, ...[...document.querySelectorAll('main .table-wrap')]
+        // A list that still scrolls sideways inside its card is taken in a window wide enough for all its columns
+        // (lists only: a report grid keeps its own sideways scroll).
+        const over = await page.evaluate(() => Math.max(0, ...[...document.querySelectorAll('main .table-wrap[data-fit]')]
           .filter((w) => w.getBoundingClientRect().width > 0)
           .map((w) => w.scrollWidth - w.clientWidth)));
-        const wide = over > 1 ? Math.min(MAX_WIDTH, width + over + 24) : width;
+        // A matrix far wider than any window (the role matrix) keeps the standard window and its own scroll.
+        const wide = over > 1 && width + over + 24 <= MAX_WIDTH ? width + over + 24 : width;
         if (wide !== width) {
           await page.setViewportSize({ width: wide, height: HEIGHT });
           await page.waitForTimeout(500);

@@ -72,7 +72,8 @@ class YearEndIT {
     assertThat(before).anyMatch(c -> c.code().equals("PERIODS_CLOSED") && !c.passed());
     assertThatThrownBy(() -> asUser.run("fmanager", () -> yearEnd.close(companyId, year.getId())))
         .isInstanceOf(BusinessRuleException.class)
-        .hasMessageContaining("CLOSED or CLOSING");
+        .hasMessageContaining("All periods closed or closing")
+        .hasMessageContaining("2025-01 open");
 
     asUser.run(
         "fmanager",

@@ -7,10 +7,12 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
+import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
-import { dispositionLabel } from '../common/renewalCodes';
+import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import { RNW_LOV, dispositionLabel } from '../common/renewalCodes';
+import { LovLabel } from '@/components/broking/LovLabel';
 
 type Props = Readonly<{ detail: CandidateDetail }>;
 
@@ -58,7 +60,11 @@ export function AccountHistoryTab({ detail }: Props) {
               header: 'Expiring / Renewal ARN',
               render: (r) => `${r.expiringArn ?? ''} → ${r.renewalArn ?? ''}`,
             },
-            { key: 'out', header: 'Outcome', render: (r) => r.outcome },
+            {
+              key: 'out',
+              header: 'Outcome',
+              render: (r) => (r.outcome ? humanize(r.outcome) : ''),
+            },
           ]}
         />
       </Card>
@@ -69,7 +75,7 @@ export function AccountHistoryTab({ detail }: Props) {
           emptyMessage="No endorsements"
           columns={[
             { key: 'inv', header: 'Invoice', kind: 'code', render: (e) => e.invoiceNo },
-            { key: 'kind', header: 'Kind', render: (e) => e.kind },
+            { key: 'kind', header: 'Kind', render: (e) => (e.kind ? humanize(e.kind) : '') },
             { key: 'no', header: 'Endorsement', render: (e) => e.endorsementNo ?? '' },
             { key: 'on', header: 'Booked', kind: 'date', render: (e) => formatDate(e.bookedOn) },
             {
@@ -96,8 +102,12 @@ export function AccountHistoryTab({ detail }: Props) {
               kind: 'date',
               render: (p) => formatDate(p.valueDate),
             },
-            { key: 'type', header: 'Type', render: (p) => p.type },
-            { key: 'comp', header: 'Component', render: (p) => p.component ?? '' },
+            { key: 'type', header: 'Type', render: (p) => humanize(p.type) },
+            {
+              key: 'comp',
+              header: 'Component',
+              render: (p) => (p.component ? humanize(p.component) : ''),
+            },
             { key: 'or', header: 'OR No.', render: (p) => p.orNo ?? '' },
             {
               key: 'amt',
@@ -142,7 +152,12 @@ export function NotesTab({ detail }: Props) {
           columns={[
             { key: 'at', header: 'When', kind: 'datetime', render: (r) => formatDateTime(r.at) },
             { key: 'by', header: 'By', render: (r) => <UserName login={r.by} /> },
-            { key: 'stage', header: 'Stage', render: (r) => r.stage },
+            {
+              key: 'stage',
+              header: 'Stage',
+              kind: 'status',
+              render: (r) => <StatusBadge status={r.stage} />,
+            },
             { key: 'text', header: 'Remark', render: (r) => r.text },
           ]}
         />
@@ -154,8 +169,16 @@ export function NotesTab({ detail }: Props) {
           emptyMessage="No follow-ups"
           columns={[
             { key: 'at', header: 'When', kind: 'datetime', render: (f) => formatDateTime(f.at) },
-            { key: 'ch', header: 'Channel', render: (f) => f.channel },
-            { key: 'out', header: 'Outcome', render: (f) => f.outcome },
+            {
+              key: 'ch',
+              header: 'Channel',
+              render: (f) => <LovLabel type={RNW_LOV.followupChannel} code={f.channel} />,
+            },
+            {
+              key: 'out',
+              header: 'Outcome',
+              render: (f) => <LovLabel type={RNW_LOV.followupOutcome} code={f.outcome} />,
+            },
             { key: 'rem', header: 'Remarks', render: (f) => f.remarks },
             {
               key: 'next',

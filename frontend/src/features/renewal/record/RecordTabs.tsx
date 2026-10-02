@@ -12,7 +12,7 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, formatDateTime } from '@/utils/format';
+import { formatDate, formatDateTime, humanize } from '@/utils/format';
 import { BucketPill } from '../common/RenewalBits';
 
 type Props = Readonly<{ detail: CandidateDetail }>;
@@ -72,8 +72,13 @@ export function ChecksTab({ detail }: Props) {
           emptyMessage="No endorsements in the term"
           columns={[
             { key: 'ref', header: 'Reference', kind: 'code', render: (e) => e.reference },
-            { key: 'src', header: 'Source', render: (e) => e.source },
-            { key: 'status', header: 'Status', render: (e) => e.status },
+            { key: 'src', header: 'Source', render: (e) => humanize(e.source) },
+            {
+              key: 'status',
+              header: 'Status',
+              kind: 'status',
+              render: (e) => <StatusBadge status={e.status} />,
+            },
             {
               key: 'at',
               header: 'Linked',
@@ -273,7 +278,7 @@ export function LettersTab({ detail }: Props) {
               kind: 'date',
               render: (a) => formatDate(a.acceptedOn),
             },
-            { key: 'method', header: 'Method', render: (a) => a.method },
+            { key: 'method', header: 'Method', render: (a) => humanize(a.method) },
             { key: 'ref', header: 'Reference', render: (a) => a.reference ?? '' },
             {
               key: 'ack',

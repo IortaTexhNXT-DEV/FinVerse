@@ -43,6 +43,12 @@ describe('list presentation', () => {
     expect(findings(rawCode)).toEqual([]);
   });
 
+  it('shows statuses, stages, outcomes and methods by label, never as the raw code', () => {
+    const rawStatus =
+      /render: \((\w+)(: \w+)?\) => \1\.(status|stage|outcome|channel|method|eventType|component|action|entityType|disposition)\b( \?\? '[^']*')?( \}|,|$)/;
+    expect(findings(rawStatus)).toEqual([]);
+  });
+
   it('never puts the record type as a loose word beside a status pill', () => {
     const joined = screens.map(([path, source]) => [path, source.replace(/\s+/g, ' ')] as const);
     const loose = /<StatusBadge [^>]*\/> <\/span> <span className="muted">\{WORKFLOW_NAMES/;

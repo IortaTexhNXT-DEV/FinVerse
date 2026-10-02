@@ -1,3 +1,5 @@
+import { useContext } from 'react';
+import { WorkspaceContext } from '@/context/workspaceContext';
 import {
   useCoverTypeName,
   useCoverageName,
@@ -162,4 +164,49 @@ export function SalesUnitPath({
   const name = useSalesUnitName();
   const known = codes.filter((c): c is string => Boolean(c));
   return <>{known.length > 0 ? known.map((c) => name(c)).join(' / ') : empty}</>;
+}
+
+/**
+ * A branch of the company by its name with the code muted after it; the code alone, muted, when
+ * it is not one of the company's branches.
+ */
+export function BranchName({
+  code,
+  empty = '—',
+}: Readonly<{ code: string | null | undefined; empty?: string }>) {
+  const branches = useContext(WorkspaceContext)?.branches ?? [];
+  if (!code) {
+    return <span className="muted">{empty}</span>;
+  }
+  const name = branches.find((b) => b.code === code)?.name;
+  if (name === undefined) {
+    return <span className="muted">{code}</span>;
+  }
+  return (
+    <span className="nowrap" title={code}>
+      {name} <span className="muted">{code}</span>
+    </span>
+  );
+}
+
+/** Business type of a submitted policy as the BRD-12 FRS names it. */
+const BUSINESS_TYPES: Readonly<Record<string, string>> = {
+  NB: 'New Business',
+  RB: 'Renewal Business',
+};
+
+/** The business type by its FRS name with the code muted after it ("New Business NB"). */
+export function BusinessTypeName({ code }: Readonly<{ code: string | null | undefined }>) {
+  if (!code) {
+    return <span className="muted">—</span>;
+  }
+  const name = BUSINESS_TYPES[code];
+  if (name === undefined) {
+    return <span className="muted">{code}</span>;
+  }
+  return (
+    <span className="nowrap">
+      {name} <span className="muted">{code}</span>
+    </span>
+  );
 }

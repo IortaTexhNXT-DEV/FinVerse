@@ -319,7 +319,7 @@ public class RenewalSeedData implements ApplicationRunner {
                         new TransferService.Request(
                             "T-CORP1",
                             "WRONG_UNIT",
-                            "Corporate client handled by Corporate Team 1"))));
+                            "Corporate client handled by Corporate Marketing Team 1"))));
   }
 
   private void processing(Long co) {

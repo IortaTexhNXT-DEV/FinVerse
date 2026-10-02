@@ -5,6 +5,9 @@ import type { Column } from './DataTable';
 import { DueDate } from './DueDate';
 import { fittedHeight } from './useFitHeight';
 import { StatusBadge } from './StatusBadge';
+import { BranchName, BusinessTypeName } from '@/components/broking/LovLabel';
+import { WorkspaceContext } from '@/context/workspaceContext';
+import type { Branch } from '@/api/types';
 
 interface Row {
   id: number;
@@ -146,5 +149,83 @@ describe('StatusBadge', () => {
     expect(screen.getByText('RA Sent')).toHaveClass('badge', 'info');
     expect(screen.getByText('Draft')).toHaveClass('badge', 'neutral');
     expect(screen.getByText('Returned to Marketing')).toHaveClass('badge', 'danger');
+  });
+});
+
+describe('FRS wording of the status pills', () => {
+  it('uses the workflow wording of the Renewal FRS, with the agreed short form', () => {
+    render(
+      <>
+        <StatusBadge status="RA_SENT" workflow="RNW_CASE" />
+        <StatusBadge status="NB_PATH" workflow="RNW_CASE" />
+        <StatusBadge status="FOR_TL_REVIEW" workflow="RNW_CASE" />
+      </>,
+    );
+    expect(screen.getByText('RA Sent')).toHaveAttribute('title', 'RA Sent / Awaiting Response');
+    expect(screen.getByText('New Business Path')).toHaveAttribute(
+      'title',
+      'For Proposal / New Business Path',
+    );
+    expect(screen.getByText('Review in Progress')).toBeInTheDocument();
+  });
+
+  it('writes the abbreviated codes out as the FRS does', () => {
+    render(
+      <>
+        <StatusBadge status="FOR_MKT_APPROVAL" />
+        <StatusBadge status="FOR_MKT_REVIEW" />
+        <StatusBadge status="REQUIREMENTS_PREP" />
+      </>,
+    );
+    expect(screen.getByText('For Mktg Approval')).toHaveAttribute(
+      'title',
+      'For Marketing Approval',
+    );
+    expect(screen.getByText('For Marketing Review')).toBeInTheDocument();
+    expect(screen.getByText('Reqts Prep')).toHaveAttribute('title', 'Requirements Preparation');
+  });
+});
+
+describe('names of branches and business types', () => {
+  const workspace = {
+    companies: [],
+    company: undefined,
+    branches: [
+      {
+        id: 1,
+        companyId: 1,
+        code: 'MKT',
+        name: 'Makati',
+        openingDate: '2020-01-01',
+        headOffice: false,
+      } as unknown as Branch,
+    ],
+    branchId: undefined,
+    setCompanyId: () => undefined,
+    setBranchId: () => undefined,
+  };
+
+  it('names a branch with its code muted after it, and keeps an unknown code muted', () => {
+    render(
+      <WorkspaceContext.Provider value={workspace}>
+        <BranchName code="MKT" />
+        <BranchName code="ZZ9" />
+      </WorkspaceContext.Provider>,
+    );
+    expect(screen.getByText('Makati', { exact: false })).toHaveAttribute('title', 'MKT');
+    expect(screen.getByText('MKT')).toHaveClass('muted');
+    expect(screen.getByText('ZZ9')).toHaveClass('muted');
+  });
+
+  it('names the business types as the BRD-12 FRS does', () => {
+    render(
+      <>
+        <BusinessTypeName code="NB" />
+        <BusinessTypeName code="RB" />
+      </>,
+    );
+    expect(screen.getByText('New Business', { exact: false })).toBeInTheDocument();
+    expect(screen.getByText('Renewal Business', { exact: false })).toBeInTheDocument();
+    expect(screen.getByText('RB')).toHaveClass('muted');
   });
 });

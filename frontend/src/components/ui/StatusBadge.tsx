@@ -8,6 +8,8 @@ interface StatusBadgeProps {
   label?: string;
   /** Tone to use instead of the status's own tone. */
   tone?: Tone;
+  /** Workflow of the stage, for the stages its FRS words differently (RNW_CASE RA_SENT). */
+  workflow?: string;
   /**
    * Show the full label, never the short form (history tables, where each row is read as a record
    * of what happened); the pill grows to fit and may wrap.
@@ -23,9 +25,15 @@ interface StatusBadgeProps {
  * agreed short form, with the full label in the tooltip; the pill never wraps. History tables pass
  * `full`: the full label is shown and the pill grows to fit it.
  */
-export function StatusBadge({ status, label, tone, full = false }: Readonly<StatusBadgeProps>) {
-  const fullLabel = label ?? statusLabel(status);
-  const shown = full ? fullLabel : statusShortLabel(status, label);
+export function StatusBadge({
+  status,
+  label,
+  tone,
+  workflow,
+  full = false,
+}: Readonly<StatusBadgeProps>) {
+  const fullLabel = label ?? statusLabel(status, workflow);
+  const shown = full ? fullLabel : statusShortLabel(status, fullLabel);
   const className = `badge ${tone ?? statusTone(status)}${full ? ' badge-full' : ''}`;
   return (
     <span className={className} title={fullLabel}>

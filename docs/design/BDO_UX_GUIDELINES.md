@@ -168,6 +168,7 @@ Use these instead of building a screen-specific variant.
 - Labels are shown in full up to 21 characters, the width of the widest pill: "Returned to Marketing", "Pending Authorization", "Ready for Placement" (client feedback of 27-Sep-2026: no abbreviated status where the full label fits). The agreed short forms are kept only for longer labels, with the full label in the tooltip: For Mktg Approval (For Marketing Head Approval), Skipped (Skipped Locked) and the like. Other labels longer than 21 characters are cut with an ellipsis and keep the tooltip.
 - One colour tone per state group (section 4). Two statuses of one record (e.g. Unapplied and a Queued request) are two columns, or two aligned pills (`.badge-pair`), never a word above a pill.
 - Flags (FFY, Direct Payment, Information Incomplete) are `Tag` chips in their own column or in the record header's flag list.
+- Pill labels use the FRS wording of each status: abbreviated codes are written out as the FRS writes them (For Marketing Approval, Requirements Preparation), and a stage the FRS of its workflow words differently uses that wording (Renewal, "Stages of RNW_CASE", Screen label: RA Sent / Awaiting Response, short form RA Sent). `StatusBadge` takes the `workflow` for these; codes the FRS writes in capitals stay in capitals (acronym map).
 
 ### 8.3 Tables
 

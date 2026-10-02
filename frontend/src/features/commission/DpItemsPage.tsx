@@ -22,6 +22,7 @@ import { commissionApi } from './commissionApi';
 import type { DpItem, DpTag } from './commissionApi';
 import { bulkActions, failedRules, TAG_TABS, withCount } from './commissionLogic';
 import { DpItemDialog, ReasonDialog } from './DpItemDialogs';
+import { BranchName } from '@/components/broking/LovLabel';
 
 function columnsOf(rows: DpItem[], selection: RowSelection | undefined): Column<DpItem>[] {
   return [
@@ -47,7 +48,7 @@ function columnsOf(rows: DpItem[], selection: RowSelection | undefined): Column<
     },
     { key: 'insurer', header: 'Insurer', render: (r) => <InsurerName code={r.insurerCode} /> },
     { key: 'assured', header: 'Assured', render: (r) => r.assuredName ?? '' },
-    { key: 'branch', header: 'Branch', render: (r) => r.branchCode ?? '' },
+    { key: 'branch', header: 'Branch', render: (r) => <BranchName code={r.branchCode} /> },
     {
       key: 'premium',
       header: 'Premium',

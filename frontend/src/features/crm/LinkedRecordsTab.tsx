@@ -59,7 +59,16 @@ export function LinkedRecordsTab({ clientId }: Readonly<{ clientId: number }>) {
             {
               key: 'status',
               header: 'Status',
-              render: (r) => (r.status ? <StatusBadge status={r.status} /> : ''),
+              kind: 'status',
+              render: (r) =>
+                r.status ? (
+                  <StatusBadge
+                    status={r.status}
+                    workflow={r.kind === 'Renewal' ? 'RNW_CASE' : undefined}
+                  />
+                ) : (
+                  ''
+                ),
             },
             { key: 'date', header: 'Date', render: (r) => formatDate(r.date) },
           ]}

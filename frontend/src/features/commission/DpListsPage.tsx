@@ -23,6 +23,7 @@ import { commissionApi } from './commissionApi';
 import type { DpList, Submission } from './commissionApi';
 import { FileDropZone } from '@/components/ui/FileDropZone';
 import { DateInput } from '@/components/ui/DateInput';
+import { BranchName } from '@/components/broking/LovLabel';
 
 const TABS = [
   { id: 'lists', label: 'Lists Received' },
@@ -43,7 +44,7 @@ const LIST_COLUMNS: Column<DpList>[] = [
     ),
   },
   { key: 'source', header: 'Source', render: (l) => humanize(l.source) },
-  { key: 'branch', header: 'Branch', render: (l) => l.branchCode ?? '' },
+  { key: 'branch', header: 'Branch', render: (l) => <BranchName code={l.branchCode} /> },
   { key: 'date', header: 'Submitted', render: (l) => formatDate(l.submissionDate) },
   { key: 'items', header: 'Accounts', numeric: true, render: (l) => l.itemCount },
   { key: 'valid', header: 'Valid', numeric: true, render: (l) => l.validCount },

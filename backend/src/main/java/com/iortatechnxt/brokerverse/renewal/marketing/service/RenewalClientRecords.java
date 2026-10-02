@@ -2,6 +2,7 @@ package com.iortatechnxt.brokerverse.renewal.marketing.service;
 
 import com.iortatechnxt.brokerverse.crm.service.ClientRecord;
 import com.iortatechnxt.brokerverse.crm.service.ClientRecordsProvider;
+import com.iortatechnxt.brokerverse.crm.service.RecordDescriptions;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidateRepository;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalCodes;
@@ -38,8 +39,8 @@ public class RenewalClientRecords implements ClientRecordsProvider {
     return new ClientRecord(
         "Renewal",
         c.getRenewalRef(),
-        (policy == null ? c.getExpiringArn() : policy) + " expiring " + c.getExpiryDate(),
-        c.getStage().label(),
+        RecordDescriptions.renewal(policy == null ? c.getExpiringArn() : policy, c.getExpiryDate()),
+        c.getStage().name(),
         c.getExpiryDate(),
         RenewalCodes.LINK + c.getRenewalRef());
   }

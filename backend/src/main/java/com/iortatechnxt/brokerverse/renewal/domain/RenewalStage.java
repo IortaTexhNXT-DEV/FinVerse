@@ -21,7 +21,7 @@ public enum RenewalStage {
   /** Dispositioned; Team Leader review in progress. */
   FOR_TL_REVIEW("Review in Progress"),
   /** Renewal on the New Business path (quotation or PRF). */
-  NB_PATH("New Business Path"),
+  NB_PATH("For Proposal / New Business Path"),
   /** Posted For Renewal; waiting for a Processing Officer. */
   FOR_PROCESSING("For Processing"),
   /** With a Processing Officer. */
@@ -33,7 +33,7 @@ public enum RenewalStage {
   /** Renewal Advice generated; Marketing side locked. */
   RA_GENERATED("RA Generated"),
   /** Renewal Advice sent; awaiting the client's response. */
-  RA_SENT("Awaiting Response"),
+  RA_SENT("RA Sent / Awaiting Response"),
   /** Accepted by the client. */
   ACCEPTED("Accepted"),
   /** Renewal account in placement, issuance and booking. */

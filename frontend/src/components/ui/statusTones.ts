@@ -266,6 +266,8 @@ const SHORT_LABELS: Record<string, string> = {
   FOR_REACTIVATION: 'For Reactivation',
   STR_PREPARATION: 'STR Preparation',
   READY_FOR_PLACEMENT: 'For Placement',
+  RA_SENT: 'RA Sent',
+  NB_PATH: 'New Business Path',
   REVERSAL_FAILED: 'Reversal Failed',
   PARTIALLY_PAID: 'Partially Paid',
   PARTIALLY_KEPT: 'Partially Kept',
@@ -277,6 +279,13 @@ const SHORT_LABELS: Record<string, string> = {
  * never shown): the insurer-only line of a reconciliation, the pick-up of a check.
  */
 const STATUS_LABELS: Record<string, string> = {
+  // FRS wording of the statuses whose code is abbreviated (BRD-01 and BRD-03 FRS; BRD-06 FRS,
+  // "Stages of RNW_CASE", Screen label)
+  FOR_MKT_APPROVAL: 'For Marketing Approval',
+  FOR_MKT_REVIEW: 'For Marketing Review',
+  REQUIREMENTS_PREP: 'Requirements Preparation',
+  FOR_TL_REVIEW: 'Review in Progress',
+  NB_PATH: 'For Proposal / New Business Path',
   UNMATCHED_NO_BOOKING: 'Insurer Only',
   FOR_PICKUP: 'For Pick-up',
   PICKED_UP: 'Picked Up',
@@ -284,9 +293,25 @@ const STATUS_LABELS: Record<string, string> = {
   NOT_APPLICABLE: 'Not Applicable',
 };
 
-/** The full label of a status: its business wording, else the humanized code. */
-export function statusLabel(status: string): string {
-  return STATUS_LABELS[status] ?? humanize(status);
+/**
+ * Wording of a stage that differs between workflows, as the FRS of the workflow writes it: the
+ * Renewal FRS (BRD-06, "Stages of RNW_CASE", Screen label) shows RA_SENT as "RA Sent / Awaiting
+ * Response", where the employee benefits cycle shows "RA Sent".
+ */
+const WORKFLOW_STAGE_LABELS: Record<string, Record<string, string>> = {
+  RNW_CASE: {
+    RA_SENT: 'RA Sent / Awaiting Response',
+    UNASSIGNED: 'Unassigned Disposition',
+  },
+};
+
+/**
+ * The full label of a status: the wording of its workflow when the FRS gives one, its business
+ * wording, else the humanized code (with the acronym map).
+ */
+export function statusLabel(status: string, workflow?: string): string {
+  const own = workflow === undefined ? undefined : WORKFLOW_STAGE_LABELS[workflow]?.[status];
+  return own ?? STATUS_LABELS[status] ?? humanize(status);
 }
 
 /**
@@ -310,8 +335,8 @@ export function statusTone(status: string): Tone | '' {
 }
 
 /** Label shown in the pill: the agreed short form of a long status, else the humanized status. */
-export function statusShortLabel(status: string, label?: string): string {
-  const full = label ?? statusLabel(status);
+export function statusShortLabel(status: string, label?: string, workflow?: string): string {
+  const full = label ?? statusLabel(status, workflow);
   if (full.length <= BADGE_MAX_CHARS) {
     return full;
   }

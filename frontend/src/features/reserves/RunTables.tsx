@@ -4,7 +4,7 @@ import { DataTable } from '@/components/ui/DataTable';
 import { formatDate, formatRate, humanize } from '@/utils/format';
 import { reserveLabel, summarizeLines } from './reserveMath';
 import type { LineSummary } from './reserveMath';
-import { LineLabel, ProductName } from '@/components/broking/LovLabel';
+import { BranchName, LineLabel, ProductName } from '@/components/broking/LovLabel';
 
 const GROSS = 'Gross';
 const RI_SHARE = 'RI share';
@@ -61,7 +61,7 @@ export function LinesTable({ lines }: Readonly<{ lines: ReserveLine[] }>) {
       rowKey={(l) => `${l.type}|${l.branchId}|${l.businessLine}|${l.productCode}|${l.sourceType}`}
       columns={[
         { key: 't', header: 'Reserve', render: (l) => l.type },
-        { key: 'b', header: 'Branch', render: (l) => l.branchCode },
+        { key: 'b', header: 'Branch', render: (l) => <BranchName code={l.branchCode} /> },
         {
           key: 'l',
           header: 'Line',
@@ -92,7 +92,7 @@ export function MovementsTable({ movements }: Readonly<{ movements: ReserveMovem
       rowKey={(m) => `${m.branchCode}|${m.businessLine}|${m.eventType}|${m.component}`}
       emptyMessage="No movement against the previous posted run."
       columns={[
-        { key: 'b', header: 'Branch', render: (m) => m.branchCode },
+        { key: 'b', header: 'Branch', render: (m) => <BranchName code={m.branchCode} /> },
         {
           key: 'l',
           header: 'Line',

@@ -2,10 +2,12 @@ package com.iortatechnxt.brokerverse.brokerclaims.claim.service;
 
 import com.iortatechnxt.brokerverse.brokerclaims.domain.BrokerClaimRepository;
 import com.iortatechnxt.brokerverse.brokerclaims.domain.Claim;
+import com.iortatechnxt.brokerverse.catalog.service.CatalogNames;
 import com.iortatechnxt.brokerverse.crm.domain.Client;
 import com.iortatechnxt.brokerverse.crm.service.ClientRecord;
 import com.iortatechnxt.brokerverse.crm.service.ClientRecordsProvider;
 import com.iortatechnxt.brokerverse.crm.service.ClientService;
+import com.iortatechnxt.brokerverse.crm.service.RecordDescriptions;
 import java.util.List;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,14 +21,18 @@ public class BrokerClaimClientRecords implements ClientRecordsProvider {
 
   private final BrokerClaimRepository claims;
   private final ClientService clients;
+  private final CatalogNames names;
 
   /**
    * Creates the provider.
    *
    * @param claims claims
    * @param clients client codes
+   * @param names product names
    */
-  public BrokerClaimClientRecords(BrokerClaimRepository claims, ClientService clients) {
+  public BrokerClaimClientRecords(
+      BrokerClaimRepository claims, ClientService clients, CatalogNames names) {
+    this.names = names;
     this.claims = claims;
     this.clients = clients;
   }
@@ -39,11 +45,11 @@ public class BrokerClaimClientRecords implements ClientRecordsProvider {
         .findByCompanyIdAndCoverClientCodeOrderByIdDesc(
             client.getCompanyId(), client.getClientCode())
         .stream()
-        .map(BrokerClaimClientRecords::record)
+        .map(this::record)
         .toList();
   }
 
-  private static ClientRecord record(Claim c) {
+  private ClientRecord record(Claim c) {
     String status =
         c.getProgress().getStatusCode() == null
             ? c.getProgress().getPhase().name()
@@ -51,11 +57,10 @@ public class BrokerClaimClientRecords implements ClientRecordsProvider {
     return new ClientRecord(
         "Claim",
         c.getClaimNo(),
-        c.getCover().getArn()
-            + " - "
-            + c.getCover().getProductCode()
-            + " - loss "
-            + c.getLoss().getLossDate(),
+        RecordDescriptions.claim(
+            c.getCover().getArn(),
+            names.productName(c.getCover().getProductCode()),
+            c.getLoss().getLossDate()),
         status,
         c.getLoss().getReportedDate(),
         "/claims-handling/" + c.getId());

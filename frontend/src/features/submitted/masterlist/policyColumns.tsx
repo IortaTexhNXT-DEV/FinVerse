@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { PolicyRow } from '@/api/submitted';
-import { InsurerName, LovLabel } from '@/components/broking/LovLabel';
+import { BusinessTypeName, InsurerName, LovLabel } from '@/components/broking/LovLabel';
 import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
@@ -22,7 +22,11 @@ export const policyColumns: Column<PolicyRow>[] = [
     header: 'Segment',
     render: (p) => <LovLabel type={SBM_LOV.segment} code={p.segment} />,
   },
-  { key: 'bt', header: 'NB / RB', render: (p) => p.businessType },
+  {
+    key: 'bt',
+    header: 'Business Type',
+    render: (p) => <BusinessTypeName code={p.businessType} />,
+  },
   { key: 'pn', header: 'PN No.', kind: 'code', render: (p) => p.pnNo ?? '—' },
   { key: 'insurer', header: 'Insurer', render: (p) => <InsurerName code={p.insurerCode} /> },
   { key: 'expiry', header: 'Expiry', kind: 'date', render: (p) => formatDate(p.expiryDate) },

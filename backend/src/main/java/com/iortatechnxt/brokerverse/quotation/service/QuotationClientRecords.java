@@ -1,8 +1,10 @@
 package com.iortatechnxt.brokerverse.quotation.service;
 
+import com.iortatechnxt.brokerverse.catalog.service.CatalogNames;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.crm.service.ClientRecord;
 import com.iortatechnxt.brokerverse.crm.service.ClientRecordsProvider;
+import com.iortatechnxt.brokerverse.crm.service.RecordDescriptions;
 import com.iortatechnxt.brokerverse.quotation.domain.Quotation;
 import com.iortatechnxt.brokerverse.quotation.domain.QuotationRepository;
 import java.util.List;
@@ -14,31 +16,36 @@ import org.springframework.transaction.annotation.Transactional;
 public class QuotationClientRecords implements ClientRecordsProvider {
 
   private final QuotationRepository quotations;
+  private final CatalogNames names;
 
   /**
    * Creates the provider.
    *
    * @param quotations quotations
+   * @param names product names
    */
-  public QuotationClientRecords(QuotationRepository quotations) {
+  public QuotationClientRecords(QuotationRepository quotations, CatalogNames names) {
     this.quotations = quotations;
+    this.names = names;
   }
 
   @Override
   @Transactional(readOnly = true)
   public List<ClientRecord> recordsOf(Long clientId) {
     return quotations.findByClientIdOrderByCreatedAtDesc(clientId).stream()
-        .map(QuotationClientRecords::record)
+        .map(this::record)
         .toList();
   }
 
-  private static ClientRecord record(Quotation q) {
-    String premium =
-        q.getGrossPremium() == null ? "not rated" : q.getGrossPremium().toPlainString();
+  private ClientRecord record(Quotation q) {
     return new ClientRecord(
         "Quotation",
         q.getQuotationNo(),
-        q.getArn() + " - " + q.getProductCode() + " - gross premium " + premium,
+        RecordDescriptions.quotation(
+            q.getArn(),
+            names.productName(q.getProductCode()),
+            q.getCurrency(),
+            q.getGrossPremium()),
         q.getStatus().name(),
         BusinessClock.dateOf(q.getCreatedAt()),
         "/quotations/" + q.getId());

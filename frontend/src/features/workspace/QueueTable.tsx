@@ -53,7 +53,7 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
           key: 'stage',
           header: 'Stage',
           kind: 'status',
-          render: (i) => <StatusBadge status={i.stageCode} />,
+          render: (i) => <StatusBadge status={i.stageCode} workflow={i.workflowCode} />,
         },
         {
           key: 'unit',

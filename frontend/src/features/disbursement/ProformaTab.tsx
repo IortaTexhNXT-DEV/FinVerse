@@ -12,7 +12,7 @@ import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { disbursementApi } from './api';
 import type { AllocationRow, Line, Side, Voucher } from './api';
-import { entryTotals } from './labels';
+import { entryOrigin, entryTotals } from './labels';
 import { DialogFooter } from './VoucherDialogs';
 import './disbursement.css';
 
@@ -36,7 +36,12 @@ const READ_COLUMNS: Column<Line>[] = [
   {
     key: 'origin',
     header: 'Origin',
-    render: (l) => (l.origin === 'RULE' ? 'From rule' : <span className="tag">{l.origin}</span>),
+    render: (l) =>
+      l.origin === undefined || l.origin === 'RULE' ? (
+        entryOrigin(l.origin)
+      ) : (
+        <span className="tag">{entryOrigin(l.origin)}</span>
+      ),
   },
   { key: 'narration', header: 'Narration', render: (l) => l.narration ?? '' },
 ];

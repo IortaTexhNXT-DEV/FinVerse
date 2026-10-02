@@ -3,6 +3,7 @@ import type { JournalFilters } from '@/api/gl';
 import { Card } from '@/components/ui/Card';
 import { Field } from '@/components/ui/Field';
 import { DateInput } from '@/components/ui/DateInput';
+import { journalStatusOption } from './journalForm';
 
 /** Filters of the journal list, including the entries assigned to the user (FRBS 2.5.1). */
 export type ListFilters = Omit<JournalFilters, 'companyId'> & { assignedTo?: string };
@@ -31,7 +32,7 @@ export function JournalFiltersCard({ filters, username, onChange, actions }: Rea
             >
               {STATUSES.map((s) => (
                 <option key={s} value={s}>
-                  {s === '' ? 'All' : s.replace('_', ' ')}
+                  {journalStatusOption(s)}
                 </option>
               ))}
             </select>

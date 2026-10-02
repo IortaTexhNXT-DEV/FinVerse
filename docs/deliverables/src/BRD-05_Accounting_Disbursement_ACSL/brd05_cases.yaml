@@ -1729,7 +1729,7 @@ frs:
         steps:
           - Open the worksheet of a form that BIBS does not prepare.
         expected: No worksheet is produced.
-        msg: [This form is prepared outside BrokerVerse and has no worksheet, NO_WORKSHEET]
+        msg: [This form is prepared outside BIBS and has no worksheet, NO_WORKSHEET]
       - c: 3
         type: Negative
         title: Form without lines
@@ -3876,7 +3876,7 @@ frs:
         steps:
           - Submit a second RRF with an AR of the first live RRF.
         expected: The submission is refused.
-        msg: ["AR {2026-00123} is already refunded by request {RRF-2026-12} (MKT 2.23.0)", PRQ_DUPLICATE_AR]
+        msg: ["AR {2026-00123} is already refunded by request {RRF-2026-12}", PRQ_DUPLICATE_AR]
       - c: 2
         type: Negative
         screen: SYS
@@ -4080,7 +4080,7 @@ frs:
         steps:
           - Raise a second RRF with AR 2026-00123 while the first is live.
         expected: The request is refused.
-        msg: ["AR {2026-00123} is already refunded by request {RRF-2026-12} (MKT 2.23.0)", PRQ_DUPLICATE_AR]
+        msg: ["AR {2026-00123} is already refunded by request {RRF-2026-12}", PRQ_DUPLICATE_AR]
       - c: 1
         type: Positive
         title: AR free again after cancellation
@@ -4093,7 +4093,7 @@ frs:
         steps:
           - Enter AR 2026-00124 on two lines of one RRF.
         expected: The request is refused.
-        msg: ["AR {2026-00124} appears twice on the request (MKT 2.23.0)", PRQ_DUPLICATE_AR]
+        msg: ["AR {2026-00124} appears twice on the request", PRQ_DUPLICATE_AR]
 
   FR-PQ-015:
     scenario: SC-DPA-07

@@ -1505,7 +1505,7 @@ rules:
   - [R3, "HDMF, SSS, PhilHealth, 1601-C and 1604-C are payroll outputs and out of scope (AQ06); 2550-M only if BDOI still needs it (AQ07).", Fixed, "-"]
 validations:
   - [Form without lines, "Form <code> has no lines", FORM_NOT_DEFINED]
-  - [Form prepared outside BIBS, This form is prepared outside BrokerVerse and has no worksheet, NO_WORKSHEET]
+  - [Form prepared outside BIBS, This form is prepared outside BIBS and has no worksheet, NO_WORKSHEET]
   - [Period end before start, Tax period end precedes its start, INVALID_TAX_PERIOD]
 notifications:
   - "None."
@@ -3378,7 +3378,7 @@ rules:
 validations:
   - [Same user, "You raised or already moved <request>: another user decides", PRQ_FOUR_EYES]
   - [Wrong stage, "<request> is <stage> for this action", PRQ_WRONG_STAGE]
-  - [AR already refunded, "AR <no> is already refunded by request <no> (MKT 2.23.0)", PRQ_DUPLICATE_AR]
+  - [AR already refunded, "AR <no> is already refunded by request <no>", PRQ_DUPLICATE_AR]
 notifications:
   - "The next handler is notified (PRQ_REQUEST_STATUS)."
 audit:
@@ -3539,8 +3539,8 @@ main_flow:
 rules:
   - [R1, "Unique live AR number.", Fixed, "-"]
 validations:
-  - [AR twice on the request, "AR <no> appears twice on the request (MKT 2.23.0)", PRQ_DUPLICATE_AR]
-  - [AR on another request, "AR <no> is already refunded by request <no> (MKT 2.23.0)", PRQ_DUPLICATE_AR]
+  - [AR twice on the request, "AR <no> appears twice on the request", PRQ_DUPLICATE_AR]
+  - [AR on another request, "AR <no> is already refunded by request <no>", PRQ_DUPLICATE_AR]
 notifications:
   - "None."
 audit:

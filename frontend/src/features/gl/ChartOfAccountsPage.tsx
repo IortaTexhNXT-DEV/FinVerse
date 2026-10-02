@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Plus, ShieldCheck, Snowflake, Upload } from 'lucide-react';
+import { Plus, Upload } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { glApi } from '@/api/gl';
@@ -18,7 +18,8 @@ import { AccountForm } from './AccountForm';
 import { blankAccount, toRequest } from './accountModel';
 import { useGlLookups } from './useLookups';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
-import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { RowActions } from '@/components/ui/RowActions';
+import { accountRowActions, accountWord } from './rowActions';
 
 const INDENT: Record<string, number> = { GROUP: 0, MAIN: 1, SUB: 2, MICRO: 3 };
 
@@ -124,13 +125,13 @@ export default function ChartOfAccountsPage() {
                 </span>
               ),
             },
-            { key: 'class', header: 'Class', render: (a) => a.accountClass },
+            { key: 'class', header: 'Class', render: (a) => accountWord(a.accountClass) },
             { key: 'tier', header: 'Tier', render: (a) => a.level },
             { key: 'post', header: 'Postable', render: (a) => (a.postable ? 'Yes' : 'Heading') },
             {
               key: 'sl',
               header: 'Sub-ledger',
-              render: (a) => (a.controlAccount ? a.subLedgerType : ''),
+              render: (a) => (a.controlAccount ? accountWord(a.subLedgerType) : ''),
             },
             { key: 'grp', header: 'Statement Line', render: (a) => a.reportGroup ?? '' },
             {
@@ -139,62 +140,24 @@ export default function ChartOfAccountsPage() {
               render: (a) => <StatusBadge status={a.frozen ? 'FROZEN' : a.recordStatus} />,
             },
             {
-              key: 'act',
+              key: 'actions',
               header: 'Actions',
               render: (a) => (
-                <div
-                  className="row"
-                  role="presentation"
-                  onClick={(e) => e.stopPropagation()}
-                  onKeyDown={(e) => e.stopPropagation()}
-                >
-                  {awaitsOtherChecker(a, user?.username) && can('MASTER_AUTHORIZE') && (
-                    <ConfirmButton
-                      size="sm"
-                      variant="secondary"
-                      icon={<ShieldCheck size={14} />}
-                      confirm={{
-                        title: `Authorize Account ${a.code}`,
-                        record: a.name,
-                        effect: 'The account becomes active and can be posted to.',
-                      }}
-                      onConfirm={() => act.mutateAsync(() => glApi.authorizeAccount(a.id))}
-                    >
-                      Authorize
-                    </ConfirmButton>
+                <RowActions
+                  record={`${a.code} ${a.name}`}
+                  actions={accountRowActions(
+                    a,
+                    {
+                      authorize: can('MASTER_AUTHORIZE'),
+                      awaitsMe: awaitsOtherChecker(a, user?.username),
+                    },
+                    {
+                      authorize: () => act.mutateAsync(() => glApi.authorizeAccount(a.id)),
+                      freeze: (reason) => act.mutateAsync(() => glApi.freezeAccount(a.id, reason)),
+                      unfreeze: () => act.mutateAsync(() => glApi.unfreezeAccount(a.id)),
+                    },
                   )}
-                  {a.recordStatus === 'ACTIVE' && can('MASTER_AUTHORIZE') && (
-                    <ConfirmButton
-                      size="sm"
-                      variant="ghost"
-                      icon={<Snowflake size={14} />}
-                      confirm={
-                        a.frozen
-                          ? {
-                              title: `Unfreeze Account ${a.code}`,
-                              record: a.name,
-                              effect: 'Postings to the account are allowed again.',
-                            }
-                          : {
-                              title: `Freeze Account ${a.code}`,
-                              record: a.name,
-                              effect: 'Postings to the account are refused until it is unfrozen.',
-                              reason: 'required',
-                              destructive: true,
-                            }
-                      }
-                      onConfirm={(reason) =>
-                        act.mutateAsync(() =>
-                          a.frozen
-                            ? glApi.unfreezeAccount(a.id)
-                            : glApi.freezeAccount(a.id, reason),
-                        )
-                      }
-                    >
-                      {a.frozen ? 'Unfreeze' : 'Freeze'}
-                    </ConfirmButton>
-                  )}
-                </div>
+                />
               ),
             },
           ]}

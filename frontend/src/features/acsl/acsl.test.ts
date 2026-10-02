@@ -1,6 +1,11 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   CASE_TABS,
+  assigneeField,
+  caseRequestFacts,
+  correctionKind,
+  originalLineActions,
+  soaUploadProblems,
   correctionActions,
   emptyLine,
   hasVariance,
@@ -11,7 +16,7 @@ import {
   totals,
   wrongAccountDrafts,
 } from './acsl';
-import type { OriginalLine } from './api';
+import type { AcslCase, OriginalLine } from './api';
 
 const original: OriginalLine = {
   batchNo: 'PRM-1',
@@ -74,5 +79,55 @@ describe('boards', () => {
     expect(hasVariance(0)).toBe(false);
     expect(hasVariance(-0.5)).toBe(true);
     expect(hasVariance(undefined)).toBe(false);
+  });
+});
+
+describe('assignee and kind texts', () => {
+  it('offers the assignees by name, sorted, never as a typed user ID', () => {
+    const field = assigneeField('Processor', ['acsltl', 'acsl']);
+    expect(field.label).toBe('Processor');
+    expect(field.required).toBe(true);
+    expect(field.options?.map((o) => o.value)).toHaveLength(2);
+    expect(field.options?.every((o) => o.label.length > 0)).toBe(true);
+    const labels = field.options?.map((o) => o.label) ?? [];
+    expect([...labels].sort((a, b) => a.localeCompare(b))).toEqual(labels);
+  });
+
+  it('names the kind of a correction in words', () => {
+    expect(correctionKind('WRONG_ACCOUNT')).toBe('Posting to a wrong GL account');
+    expect(correctionKind('RECLASS')).toBe('Reclassification');
+  });
+});
+
+describe('posted line row menu', () => {
+  it('offers Correct only on a draft the user may edit', () => {
+    const correct = vi.fn();
+    const actions = originalLineActions(true, correct);
+    expect(actions.map((a) => a.label)).toEqual(['Correct']);
+    actions[0]?.onSelect('');
+    expect(correct).toHaveBeenCalled();
+    expect(originalLineActions(false, correct)).toEqual([]);
+  });
+});
+
+describe('insurer statement upload', () => {
+  it('asks to select the insurer by name, never for a code', () => {
+    const found = soaUploadProblems('', '2026-09-01', '2026-09-30', undefined);
+    expect(found.insurer).toBe('Select the insurer');
+    expect(found.file).toBe('Choose the statement file');
+    expect(soaUploadProblems('MGIC', '2026-09-30', '2026-09-01', undefined).to).toBe(
+      'Enter an end on or after the start',
+    );
+  });
+});
+
+describe('case request facts', () => {
+  it('shows the insurer by name', () => {
+    const c = {
+      subject: 'Premium variance',
+      account: { insurerCode: 'INS-MGIC', clientCode: 'CL-2026-000001' },
+    } as unknown as AcslCase;
+    const facts = caseRequestFacts(c, (code) => (code === 'INS-MGIC' ? 'MAPFRE Insular' : code));
+    expect(facts.find(([label]) => label === 'Insurer')?.[1]).toBe('MAPFRE Insular');
   });
 });

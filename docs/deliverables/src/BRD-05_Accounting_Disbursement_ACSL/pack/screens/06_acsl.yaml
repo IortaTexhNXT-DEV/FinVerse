@@ -51,7 +51,7 @@ screens:
       - "Investigation | Findings / Result / Remarks / Result By / Result Date | Display | The findings; Confirmed, Rejected or No action needed; the name and time | - | Case | - | Read only | - | -"
       - "Follow-up | Payment Reversal / Reversal Status / Reversal Message | Display | The reversal requested to Cashiering and its status; the correction entry raised | - | Case | - | Read only | - | -"
       - "Invoice Family Cases | Case No. / Type / Invoice / Subject / Received / Status | Column | The cases of the invoice family | - | Cases | - | Read only | - | -"
-      - "Assign the Case dialog | Processor (User ID) | Text | The ACSL processor | Y | Users | Blank | Received | - | -"
+      - "Assign the Case dialog | Processor | Drop-down | The ACSL processor, by name | Y | Users | Blank | Received | - | -"
       - "Provide the Result dialog | Result / Remarks | Drop-down, text | Confirmed, Rejected, No action needed | Y / N | Fixed list | - | Investigating | - | -"
       - "Raise a Correction Entry dialog | Correction Kind / Journal to Correct / Description | Drop-down, text | Posting to a wrong GL account, Wrong amount, Reclassification, Other correction; the journal batch if known | Y / N / Y | Fixed list | - | Investigating | - | -"
       - "Request a Payment Reversal dialog | AR / OR No. / Amount / Reason | Text, number | Leave the amount empty to reverse the whole application | Y / N / Y | - | The AR of the case | Investigating | - | -"
@@ -116,7 +116,7 @@ screens:
       - "Posted Lines of the Invoice Family | Journal / Account / Party / Dr / Cr / Amount | Column | The posted lines of the invoice and its family | - | General ledger | - | Read only | - | -"
       - "Correct dialog | Right GL Account / Right Party / Ledger Component / Right Ledger Component | Text | The account, party and component the line should have posted to | Y / N / N / N | Chart, business partners | The line's party | Draft | - | -"
       - "Correction Lines | [Side] / GL Account / Amount / Party / Invoice / Component / Cost Centre / Narration | Row | The reversal and the re-post; debits equal credits | Y / Y / Y / N / N / N / N / N | Chart | - | Draft | A positive amount with two decimals; balanced | Enter a positive amount with at most two decimals"
-      - "Assign dialog | Preparer (User ID) | Text | The ACSL processor who prepares the correction | Y | Users | Blank | To assign | - | -"
+      - "Assign dialog | Preparer | Drop-down | The ACSL processor who prepares the correction, by name | Y | Users | Blank | To assign | - | -"
     actions:
       - "Assign Preparer | ACSL Team Leader (ACSL assign) | To assign | Assigns the correction to a preparer | Draft | Workflow notice"
       - "[Correct] | Preparer (ACSL process) | Draft | Adds the reversal of the posted line and its re-post to the right account | Draft | -"
@@ -146,7 +146,7 @@ screens:
     fields:
       - "Toolbar | Search Upload No. or Insurer | Text | - | N | - | Blank | - | Contains | -"
       - "List | Upload No. / Insurer / Period / File / Loaded / Failed / With Variance / Not Found / Uploaded By | Column | The upload number with its date; the insurer by name; the period on two lines; the uploader's name | - | SOA uploads | - | Read only | - | -"
-      - "Upload dialog | Insurer Code | Text | The insurer of the statement | Y | Insurers | Blank | - | - | Enter the insurer code"
+      - "Upload dialog | Insurer | Drop-down | The insurer of the statement, by name | Y | Insurers | Blank | - | - | Select the insurer"
       - "Upload dialog | Period From / Period To | Date | dd-MMM-yyyy | Y | - | Blank | - | To on or after From | Enter an end on or after the start"
       - "Upload dialog | Statement File | File | The statement in the standard layout (template) | Y | - | - | - | - | Choose the statement file"
     actions:

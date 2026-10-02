@@ -10,10 +10,12 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { StatusBadge } from '@/components/ui/StatusBadge';
+import { RowActions } from '@/components/ui/RowActions';
 import { useToast } from '@/components/ui/toastContext';
 import { formatDateTime, humanize } from '@/utils/format';
 import { payRequestApi } from './api';
 import type { PayRequest, RefundLineView, ValidationView } from './api';
+import { validationActions } from './requestForm';
 
 const LINE_COLUMNS: Column<RefundLineView>[] = [
   { key: 'no', header: 'Item', render: (l) => l.lineNo },
@@ -256,16 +258,14 @@ export function ValidationTab({ request }: Readonly<{ request: PayRequest }>) {
       ),
     },
     {
-      key: 'act',
-      header: '',
-      render: (v) =>
-        (v.status === 'DEFERRED' || v.status === 'OPEN') &&
-        can('PRQ_ASSIGN') &&
-        request.stage === 'FOR_VALIDATION' ? (
-          <Button size="sm" variant="secondary" onClick={() => setTask(v)}>
-            Record Result
-          </Button>
-        ) : null,
+      key: 'actions',
+      header: 'Actions',
+      render: (v) => (
+        <RowActions
+          record={`Item ${String(v.lineNo)}`}
+          actions={validationActions(v, request.stage, can('PRQ_ASSIGN'), () => setTask(v))}
+        />
+      ),
     },
   ];
   return (

@@ -11,7 +11,10 @@ sources:
   exclude_classes: [RecurringJournalService, RecurringJournalTemplate, JournalUploadService, SpreadsheetRows,
                     UploadTable, PeriodModuleLockService, RecurringLines]
   exclude_codes: [NOT_FOUND]
-  exclude_texts: ["^<message>$", "^<errors>$", "^<detail>$"]
+  # The descriptions of the upload types and the effect of a confirmation are screen texts, not messages.
+  exclude_texts: ["^<message>$", "^<errors>$", "^<detail>$",
+                  "^The (approvals exported|checks deposited|credit-to-account confirmation|payment requests|payees)",
+                  "^The close will not run"]
   bulk_handlers: [CoaUploadHandler, RequestUploadHandler, ChecksNegotiatedHandler, CtaCreditedHandler,
                   BobApprovedHandler, PayeeMigrationHandler]
   bulk_screen: "Disbursement Uploads (SCR-AC-30) and Chart Upload (SCR-AC-07)"

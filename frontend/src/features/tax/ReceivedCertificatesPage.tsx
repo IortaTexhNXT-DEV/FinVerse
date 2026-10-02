@@ -12,6 +12,7 @@ import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
+import { RowActions } from '@/components/ui/RowActions';
 import { PageFooter } from '@/components/ui/Pager';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Tabs } from '@/components/ui/Tabs';
@@ -19,6 +20,7 @@ import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
 import { RecordCertificateDialog } from './RecordCertificateDialog';
+import { receivedCertificateActions } from './rowActions';
 import { receivedApi } from './receivedCertificates';
 import type { CertificateStatus, ReceivedCertificate } from './receivedCertificates';
 
@@ -85,13 +87,13 @@ function columns(
     { key: 'status', header: 'Status', render: (c) => <StatusBadge status={c.status} /> },
     {
       key: 'actions',
-      header: '',
-      render: (c) =>
-        mayCancel && c.status === 'RECORDED' ? (
-          <Button size="sm" variant="secondary" onClick={() => onCancel(c)}>
-            Cancel Certificate
-          </Button>
-        ) : null,
+      header: 'Actions',
+      render: (c) => (
+        <RowActions
+          record={c.certificateNo}
+          actions={receivedCertificateActions(c, mayCancel, () => onCancel(c))}
+        />
+      ),
     },
   ];
 }

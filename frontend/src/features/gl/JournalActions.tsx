@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
+import { statusLabel } from '@/components/ui/statusTones';
 import { useToast } from '@/components/ui/toastContext';
 import { today } from '@/utils/format';
 import { PostingConfirmation } from './PostingConfirmation';
@@ -71,7 +72,7 @@ export function JournalActions({ journal }: Readonly<{ journal: Journal }>) {
       setReason('');
       await queryClient.invalidateQueries({ queryKey: ['journals'] });
       await queryClient.invalidateQueries({ queryKey: ['journal'] });
-      toast.success(`${result.batchNo}: ${result.status.replace('_', ' ')}`);
+      toast.success(`${result.batchNo}: ${statusLabel(result.status)}`);
       if (result.id !== id) {
         await navigate(`/gl/journals/${result.id}`);
       }

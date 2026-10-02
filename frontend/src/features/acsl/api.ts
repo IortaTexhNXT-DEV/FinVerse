@@ -272,6 +272,8 @@ export const acslApi = {
   familyCases: (invoiceNo: string) => api.get<AcslCase[]>(`/acsl/invoices/${enc(invoiceNo)}/cases`),
   openCase: (companyId: number, input: CaseInput) =>
     api.post<AcslCase>(`/acsl/cases${toQuery({ companyId })}`, input),
+  /** The ACSL users a case or a correction may be assigned to (user IDs). */
+  processors: () => api.get<string[]>('/acsl/processors'),
   assignCase: (id: number, username: string) =>
     api.post<AcslCase>(`${caseUrl(id)}/assign`, { username }),
   findings: (id: number, findings: string) =>

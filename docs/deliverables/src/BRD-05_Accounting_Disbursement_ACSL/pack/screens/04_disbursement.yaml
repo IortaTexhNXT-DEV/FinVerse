@@ -163,7 +163,7 @@ screens:
       - Payees › New Payee, Create Payee or open a row
     shots:
       - {state: payee, user: disbtl, open_payee: active, caption: "An active payee: details, allowed modes and bank accounts"}
-      - {state: new, user: disbtl, fill: new_payee, caption: "New Payee: the payee saved as a draft and submitted for authorisation"}
+      - {state: new, user: disbtl, open_payee: new, fill: new_payee, caption: "New Payee: the payee saved as a draft and submitted for authorisation"}
     fields:
       - "Payee | Payee Code | Text | The party code of the client, insurer, supplier or employee | Y | Business partners | Blank | New | Unique | Enter the payee code"
       - "Payee | Payee Class | Drop-down | Supplier, Insurer, Employee, Client, Others | Y | Payee class list | Blank | Draft, Active | - | -"
@@ -268,7 +268,7 @@ screens:
       - Account Funding › New Funding Request or open a row
     shots:
       - {state: approved, user: disbtl, open_funding: approved, caption: "An approved funding: the transfer and the workflow history of maker, verifier and two approvers"}
-      - {state: new, user: disbtl, fill: new_funding, caption: "New Funding Request: from and to accounts, amount, value date and purpose"}
+      - {state: new, user: disbtl, open_funding: new, fill: new_funding, caption: "New Funding Request: from and to accounts, amount, value date and purpose"}
     fields:
       - "Transfer | From Account / To Account | Drop-down | Active BDOIR accounts; the target other than the source | Y | Bank accounts | Blank | Created | Different accounts | Select a target account other than the source"
       - "Transfer | Amount / Currency | Number, text | Above zero; the currency of the accounts | Y | - | Blank | Created | Above zero | Enter an amount above zero"

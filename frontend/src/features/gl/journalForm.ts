@@ -1,5 +1,7 @@
 import type { Journal, JournalInput, JournalLineInput, ManualJournalType } from '@/api/gl';
-import type { FrbsJournal } from './glPlatformApi';
+import type { BulkPostOutcome, FrbsJournal } from './glPlatformApi';
+import { displayNameOf } from '@/api/users';
+import { statusLabel } from '@/components/ui/statusTones';
 import { today } from '@/utils/format';
 import { emptyLine, isBlankLine } from './journalMath';
 
@@ -75,4 +77,22 @@ export function toJournalInput(
     reverseOn: v.header.reverseOn || undefined,
     lines: v.lines.filter((l) => !isBlankLine(l)),
   };
+}
+
+/** A journal status as the filter offers it: the label of its pill, or All. */
+export function journalStatusOption(status: string): string {
+  return status === '' ? 'All' : statusLabel(status);
+}
+
+/** Why a selected journal was not posted, naming it by its batch number. */
+export function notPostedText(o: BulkPostOutcome): string {
+  const name = o.batchNo ?? 'Journal ' + String(o.id);
+  return `${name}: ${o.message}`;
+}
+
+/** The users a journal may be assigned to, by name and sorted. */
+export function assigneeOptions(users: readonly string[]): { value: string; label: string }[] {
+  return users
+    .map((u) => ({ value: u, label: displayNameOf(u) || u }))
+    .sort((a, b) => a.label.localeCompare(b.label));
 }

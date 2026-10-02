@@ -1,3 +1,5 @@
+import type { RowAction } from '@/components/ui/RowActions';
+import { displayNameOf } from '@/api/users';
 import type {
   CashAdvanceInput,
   ExpenseInput,
@@ -306,4 +308,27 @@ export function expenseInputs(days: readonly DayDraft[]): ExpenseInput[] {
     lodging: money(d.lodging),
     others: money(d.others),
   }));
+}
+
+/** The Marketing users a request may be assigned to, by name and sorted, never typed as IDs. */
+export function preparerOptions(users: readonly string[]): { value: string; label: string }[] {
+  return users
+    .map((u) => ({ value: u, label: displayNameOf(u) || u }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
+/**
+ * The row menu of a validation task: a result handed over outside the system is recorded while the
+ * request waits for validation.
+ */
+export function validationActions(
+  task: { status: string },
+  stage: string,
+  mayAssign: boolean,
+  record: () => void,
+): RowAction[] {
+  const open = task.status === 'DEFERRED' || task.status === 'OPEN';
+  return open && mayAssign && stage === 'FOR_VALIDATION'
+    ? [{ label: 'Record Result', onSelect: record }]
+    : [];
 }

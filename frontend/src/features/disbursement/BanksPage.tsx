@@ -1,8 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { BookPlus, Pencil, Power } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '@/auth/authContext';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import type { Column } from '@/components/ui/DataTable';
 import { DataTable } from '@/components/ui/DataTable';
@@ -19,7 +17,8 @@ import type { Bank, CheckBook } from './api';
 import { DialogFooter } from './VoucherDialogs';
 import './disbursement.css';
 import { displayNameOf } from '@/api/users';
-import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { RowActions } from '@/components/ui/RowActions';
+import { bankActions, seriesActions } from './rowActions';
 
 interface BookTarget {
   bank: Bank;
@@ -126,19 +125,14 @@ function Books({
     },
     { key: 'status', header: 'Status', render: (b) => <StatusBadge status={b.status} /> },
     {
-      key: 'act',
-      header: 'Action',
-      render: (b) =>
-        canEdit && b.status === 'ACTIVE' && b.nextNo === b.firstNo ? (
-          <Button
-            size="sm"
-            variant="secondary"
-            icon={<Pencil size={16} />}
-            onClick={() => onEdit({ bank, book: b })}
-          >
-            Edit
-          </Button>
-        ) : null,
+      key: 'actions',
+      header: 'Actions',
+      render: (b) => (
+        <RowActions
+          record={`${b.firstNo} - ${b.lastNo}`}
+          actions={seriesActions(b, canEdit, { edit: () => onEdit({ bank, book: b }) })}
+        />
+      ),
     },
   ];
   return (
@@ -197,50 +191,21 @@ export default function BanksPage() {
       render: (b) => <StatusBadge status={shownStatus(b)} />,
     },
     {
-      key: 'act',
-      header: 'Action',
+      key: 'actions',
+      header: 'Actions',
       render: (b) => (
-        <div className="dsb-actions">
-          {review && b.requestedStatus === undefined && (
-            <ConfirmButton
-              size="sm"
-              variant="secondary"
-              icon={<Power size={16} />}
-              busy={status.isPending}
-              confirm={{
-                title: `${b.status === 'ACTIVE' ? 'Deactivate' : 'Activate'} Bank ${b.code}`,
-                effect: 'The status change is sent for authorisation.',
-                destructive: b.status === 'ACTIVE',
-              }}
-              onConfirm={() => status.mutateAsync(b)}
-            >
-              {b.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
-            </ConfirmButton>
+        <RowActions
+          record={b.code}
+          actions={bankActions(
+            b,
+            { review, approve: can('DISB_APPROVE') },
+            {
+              addSeries: () => setBook({ bank: b }),
+              changeStatus: () => status.mutateAsync(b),
+              authorize: () => authorize.mutateAsync(b),
+            },
           )}
-          {can('DISB_APPROVE') && b.recordStatus === 'PENDING_AUTHORIZATION' && (
-            <ConfirmButton
-              size="sm"
-              busy={authorize.isPending}
-              confirm={{
-                title: 'Authorise Bank Account',
-                effect: 'The bank account change takes effect.',
-              }}
-              onConfirm={() => authorize.mutateAsync(b)}
-            >
-              Authorise
-            </ConfirmButton>
-          )}
-          {review && (
-            <Button
-              size="sm"
-              variant="secondary"
-              icon={<BookPlus size={16} />}
-              onClick={() => setBook({ bank: b })}
-            >
-              Add Series
-            </Button>
-          )}
-        </div>
+        />
       ),
     },
   ];

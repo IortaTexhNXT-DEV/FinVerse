@@ -21,6 +21,7 @@ import { ConfirmPostingDialog } from './ConfirmPostingDialog';
 import { JournalFiltersCard } from './JournalFiltersCard';
 import type { ListFilters } from './JournalFiltersCard';
 import { glPlatformApi } from './glPlatformApi';
+import { notPostedText } from './journalForm';
 import type { BulkPostOutcome, FrbsJournal } from './glPlatformApi';
 import { UserName } from '@/components/ui/UserName';
 import { Notice } from '@/components/ui/Notice';
@@ -131,9 +132,7 @@ export default function JournalsPage() {
           tone="warning"
           title="Not posted"
           items={outcomes.map((o) => (
-            <span key={o.id}>
-              Journal {o.id}: {o.message}
-            </span>
+            <span key={o.id}>{notPostedText(o)}</span>
           ))}
         />
       )}

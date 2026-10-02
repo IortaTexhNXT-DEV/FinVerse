@@ -18,7 +18,8 @@ import { useCompanyId } from '@/context/workspaceContext';
 import { formatDateTime, today } from '@/utils/format';
 import { defaultChoice, quarterOf } from './taxPeriods';
 import { displayNameOf } from '@/api/users';
-import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { RowActions } from '@/components/ui/RowActions';
+import { issuedCertificateActions } from './rowActions';
 
 /** BIR Form 2307: batch generation per quarter, the certificate register and PDF downloads. */
 export default function Certificates2307Page() {
@@ -182,31 +183,13 @@ export default function Certificates2307Page() {
               key: 'x',
               header: 'Actions',
               render: (c) => (
-                <div className="row">
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    icon={<FileDown size={14} />}
-                    onClick={() => download.mutate({ kind: 'certificate', id: c.id })}
-                  >
-                    PDF
-                  </Button>
-                  {c.status === 'ISSUED' && can('TAX_MANAGE') && (
-                    <ConfirmButton
-                      size="sm"
-                      variant="ghost"
-                      confirm={{
-                        title: 'Cancel Certificate',
-                        effect: 'The issued certificate is cancelled.',
-                        confirmLabel: 'Cancel Certificate',
-                        destructive: true,
-                      }}
-                      onConfirm={() => cancel.mutateAsync(c.id)}
-                    >
-                      Cancel
-                    </ConfirmButton>
-                  )}
-                </div>
+                <RowActions
+                  record={c.certificateNo}
+                  actions={issuedCertificateActions(c, can('TAX_MANAGE'), {
+                    download: () => download.mutate({ kind: 'certificate', id: c.id }),
+                    cancel: () => cancel.mutateAsync(c.id),
+                  })}
+                />
               ),
             },
           ]}

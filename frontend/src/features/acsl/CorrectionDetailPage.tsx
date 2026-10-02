@@ -14,8 +14,15 @@ import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
-import { formatAmount, formatDate, humanize } from '@/utils/format';
-import { CORRECTION_LABELS, correctionActions, totals, optionalText } from './acsl';
+import { formatAmount, formatDate } from '@/utils/format';
+import {
+  CORRECTION_LABELS,
+  assigneeField,
+  correctionActions,
+  correctionKind,
+  totals,
+  optionalText,
+} from './acsl';
 import type { CorrectionAction } from './acsl';
 import { acslApi, CORRECTION_ENTITY } from './api';
 import type { Correction } from './api';
@@ -26,9 +33,9 @@ import { OriginalLinesCard } from './OriginalLinesCard';
 import { UserName } from '@/components/ui/UserName';
 import { Notice } from '@/components/ui/Notice';
 
-function fieldsOf(action: CorrectionAction): DialogField[] {
+function fieldsOf(action: CorrectionAction, users: readonly string[]): DialogField[] {
   return action === 'assign'
-    ? [{ key: 'username', label: 'Preparer (User ID)', required: true }]
+    ? [assigneeField('Preparer', users)]
     : [{ key: 'comment', label: 'Comment', multiline: true }];
 }
 
@@ -51,6 +58,11 @@ function CorrectionActions({ c, actions }: Readonly<{ c: Correction; actions: Wo
   const toast = useToast();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState<CorrectionAction | null>(null);
+  const processors = useQuery({
+    queryKey: ['acsl', 'processors'],
+    queryFn: acslApi.processors,
+    enabled: open === 'assign',
+  });
   const act = useMutation({
     mutationFn: ({ a, v }: { a: CorrectionAction; v: Record<string, string> }) => perform(c, a, v),
     onSuccess: async (_r, { a }) => {
@@ -78,7 +90,7 @@ function CorrectionActions({ c, actions }: Readonly<{ c: Correction; actions: Wo
         <FormDialog
           title={`${CORRECTION_LABELS[open]} · ${c.correctionNo}`}
           confirmLabel={CORRECTION_LABELS[open]}
-          fields={fieldsOf(open)}
+          fields={fieldsOf(open, processors.data ?? [])}
           busy={act.isPending}
           error={act.error}
           onConfirm={(v) => act.mutate({ a: open, v })}
@@ -91,7 +103,7 @@ function CorrectionActions({ c, actions }: Readonly<{ c: Correction; actions: Wo
 
 function facts(c: Correction): Fact[] {
   return [
-    { icon: Layers, label: 'Kind', value: humanize(c.kind) },
+    { icon: Layers, label: 'Kind', value: correctionKind(c.kind) },
     { icon: FileText, label: 'Invoice', value: c.invoiceNo ?? '—' },
     { icon: BookOpen, label: 'Journal Corrected', value: c.originalBatchNo ?? '—' },
     { icon: Banknote, label: 'Total', value: `${c.currency} ${formatAmount(c.totalDebit)}` },

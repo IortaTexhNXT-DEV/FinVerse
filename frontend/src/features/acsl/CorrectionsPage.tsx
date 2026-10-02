@@ -15,20 +15,13 @@ import { StatusBadge } from '@/components/ui/StatusBadge';
 import { useToast } from '@/components/ui/toastContext';
 import { Tabs } from '@/components/ui/Tabs';
 import { useCompanyId } from '@/context/workspaceContext';
-import { formatDate, humanize } from '@/utils/format';
-import { CORRECTION_TABS, tabParam, optionalText } from './acsl';
+import { formatDate } from '@/utils/format';
+import { CORRECTION_KINDS, CORRECTION_TABS, correctionKind, tabParam, optionalText } from './acsl';
 import type { CorrectionTab } from './acsl';
 import { acslApi } from './api';
 import type { CorrectionStage, CorrectionSummary, Counts } from './api';
 import { FormDialog } from './FormDialog';
 import { UserName } from '@/components/ui/UserName';
-
-const KINDS = [
-  { value: 'WRONG_ACCOUNT', label: 'Posting to a wrong GL account' },
-  { value: 'AMOUNT', label: 'Wrong amount' },
-  { value: 'RECLASS', label: 'Reclassification' },
-  { value: 'OTHER', label: 'Other correction' },
-];
 
 const COLUMNS: Column<CorrectionSummary>[] = [
   {
@@ -41,7 +34,7 @@ const COLUMNS: Column<CorrectionSummary>[] = [
       </>
     ),
   },
-  { key: 'kind', header: 'Kind', render: (c) => humanize(c.kind) },
+  { key: 'kind', header: 'Kind', render: (c) => correctionKind(c.kind) },
   { key: 'invoice', header: 'Invoice', render: (c) => c.invoiceNo ?? '—' },
   { key: 'description', header: 'Description', render: (c) => c.description },
   { key: 'journal', header: 'Journal', render: (c) => c.journalBatchNo ?? '—' },
@@ -149,7 +142,7 @@ export default function CorrectionsPage() {
           title="New Correction"
           confirmLabel="Create Correction"
           fields={[
-            { key: 'kind', label: 'Correction Kind', required: true, options: KINDS },
+            { key: 'kind', label: 'Correction Kind', required: true, options: CORRECTION_KINDS },
             { key: 'invoiceNo', label: 'Invoice No.', required: true },
             {
               key: 'originalBatchNo',

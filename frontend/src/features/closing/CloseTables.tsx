@@ -3,11 +3,13 @@ import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { Kpi } from '@/components/ui/Kpi';
+import { RowActions } from '@/components/ui/RowActions';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatDateTime } from '@/utils/format';
 import type { BooksCutoff, CloseSchedule, CloseSettings } from './closeControlsApi';
 import { displayNameOf } from '@/api/users';
 import { UserName } from '@/components/ui/UserName';
+import { scheduleRowActions } from './rowActions';
 
 /** Close settings and the number of scheduled closes (AQ04). */
 export function CloseSettingsKpis({
@@ -35,8 +37,7 @@ interface SchedulesProps {
   rows: CloseSchedule[];
   loading: boolean;
   canWithdraw: boolean;
-  withdrawing: boolean;
-  onWithdraw: (schedule: CloseSchedule) => void;
+  onWithdraw: (schedule: CloseSchedule) => unknown;
 }
 
 /** Scheduled and past month-end closes with their outcome (FRBS 2.6.0). */
@@ -57,20 +58,14 @@ export function SchedulesCard(p: Readonly<SchedulesProps>) {
           { key: 'res', header: 'Outcome', render: (s) => s.result ?? '' },
           { key: 'by', header: 'Scheduled By', render: (s) => <UserName login={s.scheduledBy} /> },
           {
-            key: 'act',
-            header: '',
-            render: (s) =>
-              p.canWithdraw &&
-              s.status === 'SCHEDULED' && (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  busy={p.withdrawing}
-                  onClick={() => p.onWithdraw(s)}
-                >
-                  Withdraw
-                </Button>
-              ),
+            key: 'actions',
+            header: 'Actions',
+            render: (s) => (
+              <RowActions
+                record={s.periodName}
+                actions={scheduleRowActions(s, p.canWithdraw, () => p.onWithdraw(s))}
+              />
+            ),
           },
         ]}
       />

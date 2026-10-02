@@ -138,7 +138,7 @@ screens:
       - "Disbursement | [DV, status and payment] | Display | The voucher of the request with its stage and the payment | - | Disbursement | - | Read only | - | -"
       - "Liquidation | Job Level / Cost Centre / Cash Advanced / Over / (Short) | Drop-down, display | The job level and cost centre; the amounts | Y / Y / - / - | Liquidation accounts | - | Disbursed cash advance | - | -"
       - "Liquidation | Date / Particulars / [Expense categories] | Row | One line per day with the per diem, representation, transport, lodging and others | Y | - | - | Disbursed cash advance | - | -"
-      - "Assign dialog | Preparer (User ID) | Text | A Marketing user who prepares refunds | Y | Users | Blank | Preparing | A user who may create requests | -"
+      - "Assign dialog | Preparer | Drop-down | A Marketing user who prepares refunds, by name | Y | Users who may create requests | Blank | Preparing | A user who may create requests | -"
     actions:
       - "Assign Preparer | Marketing Reviewer (request assign) | Received refund | Assigns the request to a preparer | Preparing | Workflow notice"
       - "Submit for Review / Send for Validation | Preparer (request create) | Draft or preparing | Sends the request for review, or first to ACSL and Cashiering for a refund of a cancelled policy | For Review or For Validation | Workflow notice"

@@ -203,9 +203,17 @@ async function act(page, name, opts = {}) {
 }
 
 /** Runs an action of a table row: opens the row's action menu, then chooses the action. */
+/**
+ * Brings a row's menu button to the middle of the window (and of the card when the list scrolls inside it), so the
+ * menu that opens under it is in view and nothing scrolls while an item is clicked (the menu closes on a scroll).
+ */
+async function centre(button) {
+  await button.evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' }));
+}
+
 async function rowAction(row, name) {
   const menu = row.getByRole('button', { name: /^Actions for/ });
-  await menu.scrollIntoViewIfNeeded();
+  await centre(menu);
   await row.page().waitForTimeout(200);
   await menu.click();
   await row.page().waitForTimeout(300);
@@ -220,7 +228,7 @@ async function rowOffers(row, name) {
     return false;
   }
   // The menu closes on any scroll: bring the button into view first, then open the menu.
-  await menu.first().scrollIntoViewIfNeeded();
+  await centre(menu.first());
   await row.page().waitForTimeout(200);
   await menu.first().click();
   const offered = await row.page().getByRole('menuitem', { name }).first()

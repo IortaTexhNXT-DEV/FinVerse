@@ -404,20 +404,28 @@ async function clearCallouts(page) {
 /**
  * Grows the viewport so the whole scrolling content area is in the image (up to MAX_HEIGHT). A list that scrolls
  * inside its card (capped to the room left in the window) counts with the rows hidden in its card: in the taller
- * window the list lifts its cap and shows every row, so the image holds the whole card.
+ * window the list lifts its cap and shows every row, so the image holds the whole card. A walkthrough step (`tall`
+ * false) keeps the top of its page and grows only by the hidden rows of such a list.
  */
 async function fitViewport(page, tall) {
+  // A list sets its cap again on a window resize: after a recipe set content aside (the record header above the
+  // tabs of a walkthrough step), the list takes the room freed.
+  await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+  await page.waitForTimeout(200);
   const extra = await page.evaluate(() => {
     const main = document.querySelector('main.app-main, main');
     const doc = document.documentElement;
     const inner = main ? main.scrollHeight - main.clientHeight : 0;
     const cards = [...document.querySelectorAll('main .table-wrap[data-fit]')]
       .reduce((sum, w) => sum + Math.max(0, w.scrollHeight - w.clientHeight), 0);
-    return Math.max(inner + cards, doc.scrollHeight - doc.clientHeight, 0);
+    return { all: Math.max(inner + cards, doc.scrollHeight - doc.clientHeight, 0), cards };
   });
-  const height = Math.min(MAX_HEIGHT, HEIGHT + (tall === false ? 0 : extra));
+  // A walkthrough step keeps the top of its page, but a list capped in its card is shown with all its rows.
+  const grow = tall === false ? extra.cards : extra.all;
+  const height = Math.min(MAX_HEIGHT, HEIGHT + grow);
   await page.setViewportSize({ width: WIDTH, height });
-  await page.waitForTimeout(extra > 0 && tall !== false ? 600 : 300);
+  await page.waitForTimeout(grow > 0 ? 600 : 300);
+  await page.evaluate(() => document.querySelectorAll('main .table-wrap[data-fit]').forEach((w) => w.scrollTo(0, 0)));
 }
 
 /**
@@ -513,6 +521,23 @@ async function cropOf(page, shot, recipe) {
       return { x: m.left, y: m.top, width: right - m.left, height: bottom - m.top };
     });
     boxes = box ? [box] : [];
+    if (box) {
+      // The message of the step sits at the bottom right of the window; under a short page it is moved up to just
+      // below the content, so the image has no empty band between the content and the message.
+      await page.evaluate((contentBottom) => {
+        const region = document.querySelector('.toast-region');
+        const shown = region && [...region.querySelectorAll('.toast')].filter((t) => t.style.display !== 'none');
+        if (!shown || shown.length === 0) {
+          return;
+        }
+        const r = region.getBoundingClientRect();
+        if (r.top > contentBottom + 24) {
+          region.style.top = `${Math.round(contentBottom + 8)}px`;
+          region.style.bottom = 'auto';
+        }
+      }, box.y + box.height);
+      await page.waitForTimeout(100);
+    }
   }
   if (boxes.length === 0) {
     return { kind: 'full', clip: null };

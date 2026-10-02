@@ -25,6 +25,7 @@ import com.iortatechnxt.brokerverse.workflow.service.WorkflowService;
 import com.iortatechnxt.brokerverse.workflow.service.WorkflowViewService;
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.util.List;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +39,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 public class CaseService {
+
+  /** The permission of the ACSL users a case or a correction is assigned to. */
+  private static final String PROCESSOR_PERMISSION = "ACSL_PROCESS";
 
   private final AcslCaseRepository cases;
   private final InvoiceLedgerQueryService ledger;
@@ -185,6 +189,16 @@ public class CaseService {
   }
 
   /**
+   * The ACSL users a case or a correction may be assigned to, offered by name in the assign
+   * dialogs.
+   *
+   * @return user IDs
+   */
+  public List<String> processors() {
+    return users.usersWithPermission(PROCESSOR_PERMISSION);
+  }
+
+  /**
    * Assigns or re-assigns a case to a processor (team leader).
    *
    * @param id case
@@ -204,7 +218,7 @@ public class CaseService {
             .view(Acsl.CASE_ENTITY, key(c))
             .map(v -> v.workCase().getId())
             .orElseThrow(() -> new ResourceNotFoundException(Acsl.CASE_ENTITY, id));
-    assignments.assign(caseId, username, users.usersWithPermission("ACSL_PROCESS"));
+    assignments.assign(caseId, username, users.usersWithPermission(PROCESSOR_PERMISSION));
     audit.record(
         Acsl.CASE_ENTITY,
         c.getCaseNo(),

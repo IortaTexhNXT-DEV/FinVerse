@@ -276,7 +276,7 @@ public class PayRequestRules {
     for (RefundLineValues v : values) {
       if (!blank(v.arNo()) && !ars.add(v.arNo().strip().toUpperCase(Locale.ROOT))) {
         throw new BusinessRuleException(
-            "PRQ_DUPLICATE_AR", "AR " + v.arNo() + " appears twice on the request (MKT 2.23.0)");
+            "PRQ_DUPLICATE_AR", "AR " + v.arNo() + " appears twice on the request");
       }
     }
     List<String> entered = values.stream().map(RefundLineValues::arNo).toList();
@@ -284,8 +284,7 @@ public class PayRequestRules {
     if (!live.isEmpty()) {
       Object[] first = live.get(0);
       throw new BusinessRuleException(
-          "PRQ_DUPLICATE_AR",
-          "AR " + first[0] + " is already refunded by request " + first[1] + " (MKT 2.23.0)");
+          "PRQ_DUPLICATE_AR", "AR " + first[0] + " is already refunded by request " + first[1]);
     }
   }
 

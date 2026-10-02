@@ -63,6 +63,17 @@ public class PayRequestActionController {
   }
 
   /**
+   * The users a refund may be assigned to for preparation (MKT 1.9.0).
+   *
+   * @return user IDs
+   */
+  @GetMapping("/preparers")
+  @PreAuthorize(PayRequestAccess.ASSIGN)
+  public List<String> preparers() {
+    return workflow.preparers();
+  }
+
+  /**
    * Assigns a refund to a preparer (MKT 1.9.0).
    *
    * @param id request

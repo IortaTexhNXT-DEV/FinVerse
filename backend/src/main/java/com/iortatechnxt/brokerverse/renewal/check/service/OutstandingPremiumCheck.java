@@ -1,5 +1,6 @@
 package com.iortatechnxt.brokerverse.renewal.check.service;
 
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import com.iortatechnxt.brokerverse.opsledger.domain.OpsInvoice;
 import com.iortatechnxt.brokerverse.renewal.domain.OverrideKind;
 import com.iortatechnxt.brokerverse.renewal.service.RenewalParameters;
@@ -44,7 +45,7 @@ public class OutstandingPremiumCheck implements RenewalCheck {
             .map(OpsInvoice::premiumBalance)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     if (open.compareTo(parameters.outstandingThreshold()) > 0) {
-      String text = "Outstanding premium " + open.toPlainString();
+      String text = "Outstanding premium " + DisplayFormat.amount(open);
       return context.overridden(OverrideKind.OUTSTANDING_BALANCE, null)
           ? Verdict.fail(text + " (overridden by the Team Leader)", open.toPlainString())
           : Verdict.fail(text, open.toPlainString());

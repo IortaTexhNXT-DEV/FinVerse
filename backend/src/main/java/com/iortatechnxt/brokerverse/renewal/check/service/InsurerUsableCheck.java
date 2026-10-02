@@ -40,8 +40,8 @@ public class InsurerUsableCheck implements RenewalCheck {
       return Verdict.fail("The renewal has no insurer", null);
     }
     try {
-      insurers.requireUsableInsurer(c.getCompanyId(), insurer);
-      return Verdict.pass("Insurer " + insurer + " is usable");
+      String name = insurers.requireUsableInsurer(c.getCompanyId(), insurer).getName();
+      return Verdict.pass("Insurer " + (name == null ? insurer : name) + " is usable");
     } catch (BusinessRuleException | ResourceNotFoundException e) {
       return Verdict.fail(e.getMessage(), insurer);
     }

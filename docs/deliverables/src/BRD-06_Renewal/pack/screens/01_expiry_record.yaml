@@ -157,7 +157,7 @@ screens:
     entry:
       - Renewal › Insurer, Letters, Documents, Remarks & Follow-ups or History tab
     shots:
-      - {state: letters, user: ao, open_renewal: ra_sent, tab: Letters, caption: "Letters tab: the Renewal Advice sent and the acceptance"}
+      - {state: letters, user: ao, open_renewal: ra_sent, tab: Letters, caption: "Letters tab: the Renewal Advice sent to the client"}
       - {state: history, user: ao, open_renewal: review, tab: History, caption: "History tab: the dispositions, assignments and overrides of the renewal"}
     fields:
       - "Insurer responses | Received / Response / Insurer Ref / Revised Premium / Revised Sum Insured / Match / Used / Source / By | Column | dd-MMM-yyyy; Renew as is, Renew with revised terms or Declined; two decimals; Matched or the mismatch; Latest valid or Late; Manual or the upload; the user's name | - | Insurer responses | - | Read only | - | No response from the insurer"

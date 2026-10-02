@@ -17,7 +17,7 @@ screens:
     shots:
       - {state: list, user: proctl, caption: "Processing Worklist of the Processing Team Leader with the actions of the tab"}
       - {state: assign, user: proctl, fill: assign_po, caption: "Assign Processing Officer dialog"}
-      - {state: return, user: proc, tab: In Processing, fill: return_marketing, caption: "Return to Marketing dialog: to the officer or the Team Leader, with the reason"}
+      - {state: return, user: proc, fill: return_marketing, caption: "Return to Marketing dialog: to the officer or the Team Leader, with the reason"}
     fields:
       - "Tabs | For Processing / In Processing / With Insurer / Insurer Responded / Returned | Tab | - | - | Processing stage | For Processing | - | - | -"
       - "Quick filters | Assigned to me / Due in 30 days | Toggle button | One at a time | - | - | None | - | - | -"
@@ -86,7 +86,7 @@ screens:
     entry:
       - Renewal (With Insurer) › Record Insurer Response
     shots:
-      - {state: response, user: proc, open_renewal: with_insurer, click: "^record insurer response$", fill: response_revise, caption: "Record Insurer Response dialog: renew with revised terms"}
+      - {state: response, user: proc, open_renewal: with_insurer, fill: response_revise, caption: "Record Insurer Response dialog: renew with revised terms"}
     fields:
       - "Record Insurer Response dialog | Response | Drop-down | Renew as is, Renew with revised terms, Declined | Y | Insurer renewal response | Renew as is | With Insurer | - | -"
       - "Record Insurer Response dialog | Insurer Reference | Text | Reference of the insurer | N | - | Blank | With Insurer | - | -"

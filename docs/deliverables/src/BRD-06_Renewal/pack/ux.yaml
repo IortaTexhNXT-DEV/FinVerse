@@ -1,0 +1,98 @@
+# UX screen documents of the BRD-6 Renewal set for the BDOI UX Design team: 07 UX Screen Deck, 08 UX screen register,
+# 09 image package (docs/deliverables/src/signoff/build_ux_deck.py). The screens, fields, actions, walkthroughs and
+# images come from the pack; this file holds what only the UX documents need: who each persona is, the images taken
+# for the deck only (more states of a screen, the landing page and menu of each persona), the changes of the issue
+# and the points for the UX Design team to confirm.
+
+issue:
+  version: "2.0"
+  date: 2 October 2026
+  # First issue of the UX screen documents of the set: every screen is new to the UX Design team.
+  changes: []
+
+# The personas whose landing page and full menu the deck shows.
+navigation:
+  roles: [MKT_TL, MKT_AO, PROCESSING_TL, PROCESSOR, CONTACT_CENTER, LAMD, BUSINESS_ADMIN, SYSADMIN, AUDITOR]
+
+# Who each persona is (what they do comes from the persona table of the FRS unless given here).
+personas:
+  MKT_TL: {who: "A Marketing Team Leader who extracts the expiring accounts, assigns them, reviews and posts the dispositions and decides the transfers of the unit"}
+  MKT_AO: {who: "A Marketing Account Officer (Account Broker) who gives the disposition of the assigned renewals, sends the Renewal Advice and records the client's acceptance"}
+  PROCESSING_TL: {who: "The Processing Team Leader who assigns the posted renewals to the Processing Officers and approves the package choices of migrated policies"}
+  PROCESSOR: {who: "A Processing Officer who creates the renewal account, sends the renewals to the insurer and records the insurer's answer"}
+  CONTACT_CENTER: {who: "A Contact Center agent who follows up the clients who have not answered the Renewal Advice"}
+  LAMD: {who: "A LAMD officer of the bank who uploads the monthly paid-off and past-due loan reports"}
+  BUSINESS_ADMIN: {who: "The business administrator (MBS) who keeps the Renewal set-up, the lists of values and the letter templates"}
+  SYSADMIN: {who: "The system administrator of BIBS (BDOI IT operations), who keeps the roles and their functions"}
+  AUDITOR: {who: "An internal or external auditor with read access to Renewal and its reports"}
+
+# The UX state of an image when its name does not say it.
+classify:
+  scr-rn-01-01-home: default
+  scr-rn-02-02-generate: filled
+  scr-rn-02-03-filters: filled
+  scr-rn-02-04-assign: filled
+  scr-rn-03-01-record: read-only
+  scr-rn-04-01-checks: read-only
+  scr-rn-04-02-history: read-only
+  scr-rn-04-03-computations: read-only
+  scr-rn-05-01-letters: read-only
+  scr-rn-05-02-history: read-only
+  scr-rn-07-01-disposition: filled
+  scr-rn-08-02-override: filled
+  scr-rn-08-03-return: filled
+  scr-rn-09-01-incoming: default
+  scr-rn-10-02-assign: filled
+  scr-rn-10-03-return: filled
+  scr-rn-11-02-new: filled
+  scr-rn-12-01-response: filled
+  scr-rn-13-02-generate: filled
+  scr-rn-13-03-closing: default
+  scr-rn-14-01-accept: filled
+  scr-rn-15-02-followup: filled
+  scr-rn-17-01-risk: default
+  scr-rn-17-02-checks: default
+  scr-rn-17-03-new: filled
+  scr-rn-18-01-matrix: default
+  scr-rn-18-02-rules: default
+  scr-rn-19-01-map: default
+  scr-rn-19-02-choices: pending-approval
+  scr-rn-20-01-golive: default
+  scr-rn-20-02-takeover: default
+  wt-a-01: success
+  wt-a-02: default
+  wt-a-03: read-only
+  wt-a-04: success
+  wt-a-05: success
+  wt-a-06: validation-error
+  wt-a-07: success
+  wt-a-08: success
+  wt-b-01: success
+  wt-b-02: success
+  wt-b-03: success
+  wt-b-04: success
+  wt-b-05: success
+  wt-b-06: success
+  wt-c-01: default
+  wt-c-02: success
+  wt-c-03: success
+  wt-c-04: read-only
+  wt-d-01: success
+  wt-d-02: success
+  wt-d-03: success
+  wt-d-04: read-only
+  wt-e-01: success
+  wt-e-02: validation-error
+  wt-e-03: validation-error
+
+# Images taken for the deck only: states the screen specifications do not show.
+states:
+  - {screen: SCR-RN-02, state: empty, user: mkttl, ux: empty, nocallouts: true, caption: "A search that finds no renewal"}
+  - {screen: SCR-RN-03, state: auditor, user: auditor, open_renewal: review, ux: read-only, nocallouts: true, caption: "The renewal as the Auditor sees it, without the actions"}
+  - {screen: SCR-RN-09, state: actions, user: rnwtl, ux: default, nocallouts: true, caption: "The row action menu of a transfer request, opened from the more button of its row"}
+  - {screen: SCR-RN-17, state: actions, user: badmin, ux: default, nocallouts: true, caption: "The row action menu of a non-renewable risk code"}
+
+# Points for the UX Design team to confirm with BDOI.
+confirm:
+  clarifications: []
+  findings: []

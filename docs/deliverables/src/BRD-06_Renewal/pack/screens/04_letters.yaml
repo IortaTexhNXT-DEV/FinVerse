@@ -14,8 +14,8 @@ screens:
       - Client & Policy › Renewal › Letters
       - Renewal Home › NRNS or Letters failed
     shots:
-      - {state: list, user: ao, caption: "Letters, tab RA Ready: the renewals whose Renewal Advice can be generated"}
-      - {state: generate, user: ao, select: first_renewal, click: "^generate ra$", caption: "Generate Renewal Advice dialog: first or second notice and the confirmation of a late Renewal Advice"}
+      - {state: list, user: proc, caption: "Letters, tab RA Ready: the renewals whose Renewal Advice can be generated"}
+      - {state: generate, user: proc, select: first_renewal, click: "^generate ra$", caption: "Generate Renewal Advice dialog: first or second notice and the confirmation of a late Renewal Advice"}
       - {state: closing, user: ao, tab: "NAL / NFR", caption: "Letters, tab NAL / NFR: the renewals waiting for their closing letter"}
     fields:
       - "Tabs | RA Ready / RA Generated / RA Sent / NAL / NFR / NRNS | Tab | - | - | Letter stage of the renewal | RA Ready | - | - | -"
@@ -50,7 +50,7 @@ screens:
     entry:
       - Renewal (RA Sent / Awaiting Response) › Record Acceptance
     shots:
-      - {state: accept, user: ao, open_renewal: ra_sent, click: "^record acceptance$", fill: acceptance_payment, caption: "Record Acceptance dialog: acceptance by payment with its reference"}
+      - {state: accept, user: ao, open_renewal: ra_sent, fill: acceptance_payment, caption: "Record Acceptance dialog: acceptance by payment with its reference"}
     fields:
       - "Record Acceptance dialog | Method | Drop-down | E-mail from the client, Signed Renewal Advice, Payment | Y | Fixed list | E-mail from the client | RA Sent / Awaiting Response | - | Select the acceptance method"
       - "Record Acceptance dialog | Evidence | Drop-down | A document of the renewal (Documents tab) | Cond.: e-mail or signed Renewal Advice | Documents of the renewal | Blank | RA Sent / Awaiting Response | A document of this renewal | The evidence is not a document of this renewal"
@@ -78,7 +78,7 @@ screens:
       - Client & Policy › Renewal › Follow-ups
     shots:
       - {state: list, user: contactc, caption: "Follow-ups of the Contact Center, tab RA Sent"}
-      - {state: followup, user: contactc, open_renewal: ra_sent, click: "^add follow-up$", fill: followup_call, caption: "Add Follow-up dialog: the channel, outcome, next action date and remarks"}
+      - {state: followup, user: contactc, open_renewal: ra_sent, fill: followup_call, caption: "Add Follow-up dialog: the channel, outcome, next action date and remarks"}
     fields:
       - "Tabs | RA Sent / NRNS / Quotation / Proposal | Tab | - | - | Stage of the renewal | RA Sent | - | - | -"
       - "Quick filters | Due in 30 days / KYC due | Toggle button | One at a time | - | - | None | - | - | -"
@@ -106,7 +106,7 @@ screens:
     entry:
       - Client & Policy › Renewal › LAMD Reports
     shots:
-      - {state: list, user: lamd, caption: "LAMD Reports with the upload of a report and the lines of the report opened"}
+      - {state: list, user: lamd, click: "^upload lamd report$", caption: "LAMD Reports with the upload of a paid-off or past-due loan report"}
     fields:
       - "Upload LAMD Report | Report / Month | Drop-down, month | Paid-off loans or RMU (past due); the month of the report | Y / Y | Fixed list | Paid-off loans | New | - | Choose the period of the report"
       - "Upload LAMD Report | [Upload wizard: PN Number, Status Date, Borrower] | Upload | Template of the LAMD loan report | - | - | - | New | Every row checked before anything is saved | The row has no PN number"

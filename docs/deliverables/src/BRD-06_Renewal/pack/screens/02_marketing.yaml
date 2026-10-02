@@ -44,7 +44,7 @@ screens:
     entry:
       - Renewal › Set Disposition, Add Remark, Re-open or Start Quotation / Proposal
     shots:
-      - {state: disposition, user: ao, open_renewal: for_disposition, click: "^set disposition$", fill: disposition_nfr, caption: "Set Disposition dialog: Not for Renewal with its reason and remarks"}
+      - {state: disposition, user: ao, open_renewal: for_disposition, fill: disposition_nfr, caption: "Set Disposition dialog: Not for Renewal with its reason and remarks"}
     fields:
       - "Set Disposition dialog | Disposition | Drop-down | For Renewal, Not for Renewal, For Quotation, For Proposal, Lost Business | Y | Renewal disposition list | The current disposition | For Disposition | Account history viewed | Select the disposition"
       - "Set Disposition dialog | Reason for Not for Renewal | Drop-down | Reason for Not for Renewal list | Cond.: Not for Renewal | Reason for Not for Renewal | Blank | For Disposition | - | Select the reason for Not for Renewal"

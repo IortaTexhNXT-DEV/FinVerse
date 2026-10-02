@@ -1,0 +1,180 @@
+# Guide to the BRD-6 Renewal business sign-off pack: the content of the Sign-off Pack Guide deck
+# (signoff/build_guide_deck.py) and of the Start Here guide (START_HERE_BRD06.md, ```pack blocks "guide-*").
+# The same layout is used for every BRD set; only this file changes.
+meta:
+  deck_title: Sign-off Pack Guide
+  module: Renewal
+  owner: "Marketing (Retail, Corporate and Commercial), Processing and Marketing Business Services and System Support"
+  issued: Fri 2-Oct-2026
+  signoff_date: Fri 27-Nov-2026
+
+# The documents of the set in reading order. kind = doc type of the file name (brand.READING_ORDER).
+documents:
+  - {kind: StartHere, name: Renewal, ext: docx, what: "Start Here: the map of the pack, who reads what, the steps and the dates", readers: Everyone, when: "First, on issue"}
+  - {kind: GuideDeck, name: Renewal, ext: pptx, what: "Sign-off Pack Guide: purpose, approach, the module at a glance, caveats and impacts on other modules, entry and exit criteria, change control", readers: "Product Owners, Marketing heads and the Combank / Corbank Unit Head; presented at the kick-off", when: "Kick-off session"}
+  - {kind: FRS, name: Renewal, ext: docx, what: "Functional Requirements Specification v2.0: requirements, navigation, 20 screen specifications with screenshots, five walkthroughs, messages, notifications, documents, uploads, cross-BRD contract", readers: "Marketing Team Leaders and Account Officers, Processing Team Leaders and Officers, MBS; Contact Center, LAMD and BDOI IT for their chapters", when: "During the review, with the SIT walkthroughs"}
+  - {kind: Signoff, name: Renewal, ext: xlsx, what: "Sign-off workbook: one row per screen, field, rule and message with the BU review columns; comments log, meeting minutes, version history, sign-off certificate", readers: "Every reviewer; the business owner signs it", when: "During the review and at sign-off"}
+  - {kind: TestPlan, name: Renewal, ext: xlsx, what: "Test plan workbook: the test cases traced to the FRs and to the screens, including one screen case and one message case per screen", readers: "Business users who will run UAT; BDOI IT", when: "After the screens; used again in SIT and UAT"}
+  - {kind: TestPlan, name: Renewal Summary, ext: docx, what: "Test plan summary: scope, approach, coverage and the cases by area", readers: "Business owner, BDOI IT", when: "Before sign-off"}
+  - {kind: UXDeck, name: Renewal, ext: pptx, what: "UX Screen Deck for the BDOI UX Design team: design foundation, navigation and personas, every walkthrough step by step and every screen with all its states", readers: "BDOI UX Design team", when: "From the issue, in parallel with the review; re-issued with each version of the set"}
+  - {kind: UXScreens, name: Renewal, ext: xlsx, what: "UX screen register: one row per screen image with the screen, personas, walkthrough and step, state, FRS section and requirements, UXD status and comments, and the Changed in this issue flag", readers: "BDOI UX Design team", when: "Kept by the UX Design team; the changed rows are flagged at each issue"}
+  - {kind: UXScreens, name: Renewal, ext: zip, what: "Image package: every screen image at twice the screen resolution (PNG), the component crops and the register as CSV", readers: "BDOI UX Design team", when: "Imported into the design tool at each issue"}
+
+# Reading order per role (FRS chapter numbers of v2.0).
+reading:
+  - role: Business owner (Product Owners; Marketing heads; Combank / Corbank Unit Head)
+    order: "00 Start Here; 01 Guide deck; FRS chapters 1-3 (context and personas), 14 (walkthroughs), 20 (sign-off) and 21 (proposed rules for confirmation); workbook Sign-off certificate"
+  - role: Marketing Team Leaders
+    order: "FRS sections 4.2 to 4.6; Expiry List, TL Review and Transfers (SCR-RN-02, 08, 09); walkthroughs A, D and E; messages in chapter 15"
+  - role: Marketing Account Officers (Account Brokers)
+    order: "My Dispositions, the renewal and its tabs, Set Disposition (SCR-RN-03 to 07); Letters and Record Acceptance (SCR-RN-13, 14); walkthroughs A, B and D"
+  - role: Processing Team Leaders and Processing Officers
+    order: "FRS sections 4.7 and 4.8; Processing Worklist, Insurer Batches and Record Insurer Response (SCR-RN-10 to 12); Package Map and Go-live (SCR-RN-19, 20); walkthrough B; the insurer extract DO-03 in chapter 17"
+  - role: "Contact Center and LAMD"
+    order: "Follow-ups (SCR-RN-15) and walkthrough C for the Contact Center; LAMD Reports (SCR-RN-16) and FRS FR-RN-025 for LAMD; the uploads in chapter 18"
+  - role: Marketing Business Services and System Support (Business Administrator)
+    order: "Renewal Setup (SCR-RN-17 to 20); configuration in chapter 9; the letters DO-01 and DO-02; the menus by persona in chapter 12"
+  - role: BDOI IT
+    order: "Interfaces and integration (chapter 7), non-functional requirements (chapter 8), configuration (chapter 9), cross-BRD contract (chapter 19); the Technical Specification, reviewed by BDOI IT"
+  - role: BDOI UX Design team
+    order: "07 UX Screen Deck: design foundation and navigation first, then the personas, walkthroughs and screens of the design work; 08 UX screen register (filter Changed in this issue at each new issue); 09 image package in the design tool"
+  - role: iorta TechNXT project team
+    order: "All documents; keeps the comments log, the meeting minutes and the version history of the workbook, answers every comment and keeps the traceability to SIT and UAT"
+
+# Approach and step-by-step flow up to closure. raci: R responsible, A accountable, C consulted, I informed.
+steps:
+  - step: 1
+    name: Pack issued
+    who: "R: iorta TechNXT Project Manager; A: iorta TechNXT delivery lead; I: all reviewers"
+    inputs: "FRS v2.0, workbook, test plan, guide and deck"
+    outputs: "Release set v2.0 in the BRD-06 folder; invitations to the sessions"
+    duration: "Day 0 (Fri 2-Oct-2026); sessions in the Drop 1 window of November 2026"
+  - step: 2
+    name: Kick-off and screen walkthrough on SIT
+    who: "R: iorta TechNXT Business Analysis; A: BDOI Product Owner; C: Marketing and Processing input providers, MBS; I: Contact Center, LAMD, BDOI IT"
+    inputs: "Guide deck; SIT users with seed data; walkthroughs A to E"
+    outputs: "Screens shown live (expiry list and disposition, review and transfers, processing and the insurer, letters and acceptance, set-up); first questions logged in the comments log; minutes"
+    duration: "3 sessions, 4 to 6-Nov-2026"
+  - step: 3
+    name: Review with the workbook
+    who: "R: Marketing Team Leaders and Account Officers, Processing Team Leaders and Officers, MBS; A: Marketing Business Services and System Support; C: iorta TechNXT (questions)"
+    inputs: "FRS chapters of the area; workbook sheets with the BU review columns"
+    outputs: "Every row marked Accept, Change requested or Comment; comments log entries"
+    duration: "10 working days after the walkthroughs, until Fri 20-Nov-2026"
+  - step: 4
+    name: Comments consolidated and a Q&A session
+    who: "R: iorta TechNXT Project Manager and Business Analysis; A: BDOI Product Owner; C: reviewers"
+    inputs: "Returned workbooks"
+    outputs: "One consolidated comments log, each item typed (clarification, correction, change request) and answered; Q&A minutes"
+    duration: "2 working days, Q&A on Tue 24-Nov-2026"
+  - step: 5
+    name: One revision cycle (v2.1)
+    who: "R: iorta TechNXT Business Analysis; A: iorta TechNXT delivery lead; C: reviewers who raised the items"
+    inputs: "Agreed clarifications and corrections"
+    outputs: "Release set v2.1 with the changed rows marked; change requests raised for the rest"
+    duration: "1 working day, v2.1 on Wed 25-Nov-2026; check by the reviewers until Thu 26-Nov-2026"
+  - step: 6
+    name: Sign-off meeting and signature
+    who: "R: iorta TechNXT Project Manager; A: BDOI Product Owner; C: Product Owners, Marketing heads, Combank / Corbank Unit Head, BDOI IT"
+    inputs: "v2.1 (or v2.0 when no revision is needed); open items with their decision"
+    outputs: "Signed sign-off certificate; minutes; open items accepted as assumptions or change requests"
+    duration: "Fri 27-Nov-2026"
+  - step: 7
+    name: Content freeze
+    who: "R: iorta TechNXT delivery lead; A: BDOI Product Owner; I: BDOI IT, other BRD owners"
+    inputs: "Signed set; change requests with mandays"
+    outputs: "Content frozen as signed; approved deltas scheduled in the Change Management Register"
+    duration: "From Mon 30-Nov-2026"
+  - step: 8
+    name: Traceability into SIT and UAT
+    who: "R: iorta TechNXT test lead; A: BDOI Product Owner; C: business users"
+    inputs: "Signed FRS rows and test plan"
+    outputs: "SIT and UAT runs traced to the signed screens, rules and messages; results against each row"
+    duration: "SIT Jan - Jul 2027; UAT Aug - Dec 2027"
+
+# The module at a glance: key screenshots (file names in the screenshot folder of the pack).
+key_screens:
+  - {image: scr-rn-02-01-list, caption: "Expiry List: the expiring accounts with their classification and flags"}
+  - {image: wt-a-04, caption: "The disposition of the Account Officer after the account history"}
+  - {image: wt-b-02, caption: "An insurer batch with the columns of the insurer extract"}
+  - {image: wt-b-05, caption: "The Renewal Advice generated for the client"}
+
+# Key business rules and validations (highlights; the full list is in the workbook and FRS chapter 13).
+rules:
+  - "The booked accounts expiring at the lead days (140 by default) are extracted every day, once per policy year; Generate Expiry List takes any range. Extraction does not start the renewal: it is initiated explicitly."
+  - "On initiation the checks run (reference, PN, risk code, LAMD, claims, endorsements, outstanding premium, KYC and others): a failed check never gives the Clean classification; the decision matrix proposes the disposition, automatic for a Clean renewal when the rule says so."
+  - "The Account Officer gives the disposition only after viewing the account history; Not for Renewal needs its reason. The Team Leader posts, returns or overrides with remarks."
+  - "A renewal For Renewal or on the New Business path is not posted while a blocking check fails."
+  - "Processing sends the renewals to the insurer in batches, protected; the insurer's response is captured once; Renew As Is with a match moves the renewal to the Renewal Advice without re-keying."
+  - "The Renewal Advice is generated from the latest template and e-mailed protected; fewer than 30 days before expiry it needs a recorded confirmation; it locks the renewal on the Marketing side."
+  - "The client's acceptance (e-mail, signed Renewal Advice or payment) moves the renewal account to placement and booking; it books as business type Renewal."
+  - "Risk codes, checks and package mappings are maker-checker; the classification rules and the decision matrix are versions activated by another user."
+
+# Caveats and possibilities, and how each is handled.
+caveats:
+  - topic: Additional requirements
+    text: "New needs can surface during the review, SIT or UAT."
+    handling: "In-scope clarification when the signed text already covers it; otherwise a change request with mandays."
+    example: "A reviewer asks for the bank officer on the Expiry List: a new column, so a change request; asking which renewals the Exceptions tab shows is a clarification."
+  - topic: Impacts on other modules
+    text: "Renewal reads the Operations ledger and the New Business account, and hands the renewal back to New Business as an account of business type Renewal for placement and booking. A change of a disposition path or of the acceptance can change what New Business receives."
+    handling: "Each change is assessed against the cross-BRD contract (FRS chapter 19); when it touches another set, a delta sign-off of the affected pages of both sets."
+    example: "Booking the renewal under its own business type changes the New Business booking screens: both owners confirm the delta."
+  - topic: Other BRDs change Renewal
+    text: "New Business (account, booking), Operations (balances, endorsements), Product Maintenance (packages), Claims (claims summary), Submitted Policies (hand-off), User Access (roles) and Data Migration (go-live) can change what Renewal shows."
+    handling: "The change is raised against the other BRD and assessed against the contract; when it touches this set, a delta sign-off of the affected pages only."
+    example: "Product Maintenance withdraws a package version: the product-renewable check fails for its renewals and they go to Review; signed as a delta."
+  - topic: Lists of values and rules still to confirm
+    text: "The reasons for Not for Renewal, the return, transfer and override reasons, the follow-up channels and outcomes, the check severities, the classification rules and the decision matrix carry provisional values marked to confirm (RQ01, RQ24)."
+    handling: "BDOI gives its lists and rules; they are loaded as configuration on Lists of Values and Renewal Setup, without a change request."
+    example: "BDOI adds the reason Client moved abroad: a list value, maintained by MBS."
+  - topic: Letters and their wording
+    text: "The Renewal Advice and the other letters use draft templates until BDOI gives its own wording (RQ26)."
+    handling: "The templates are versioned on Document Templates; the new wording is a new version, without a change request."
+    example: "Marketing adds the payment channels to the Renewal Advice: a new template version, approved by MBS."
+  - topic: Integrations pending BDOI IT specifications
+    text: "Insurer responses and LAMD reports are uploaded until a channel is agreed; the approved domains of the Renewal Advice e-mails are to confirm (RQ16)."
+    handling: "Uploads are in scope now; an automatic channel later is a change request. The technical detail is in the Technical Specification, reviewed by BDOI IT."
+    example: "LAMD sends its monthly report as a file; the LAMD user uploads it on LAMD Reports."
+  - topic: Open questions and assumptions
+    text: "Open questions of FRS section 10.3 follow the assumptions of section 10.1; chapter 21 lists the proposed rules and clarifications for confirmation."
+    handling: "Answered as configuration where possible (lists of values, parameters, templates, rules); otherwise a change request; the assumption stands until then."
+    example: "The lead days are 140 until BDOI confirms them; the answer is a parameter value."
+
+# Entry and exit criteria of the sign-off, and the definition of done.
+entry:
+  - "Every screenshot of the set is taken on the SIT environment with seed data."
+  - "Reviewers have their SIT users and the walkthrough sessions are held."
+  - "The test plan is traced to the FRS and to the screens."
+  - "The BRD-1 New Business walkthroughs are held (the expiring account and the renewal account are New Business screens)."
+exit:
+  - "Every row of the workbook reviewed by its team (Accept, Change requested or Comment)."
+  - "Every comments log item closed: answered, corrected in v2.1, or raised as a change request."
+  - "Open questions closed or accepted as assumptions."
+  - "The sign-off certificate signed by every signatory of the Who signs what matrix: prepared, input, reviewed and approved as on the Renewal BRD approval sheets; the Product Owner approves the whole set."
+done:
+  - "Signed certificate filed with the set; version history updated."
+  - "Content frozen as signed; deltas listed in the Change Management Register with mandays."
+  - "Test plan agreed for SIT and UAT."
+
+# Handover checklist.
+handover:
+  - "Signed FRS, sign-off workbook and screens"
+  - "Open questions closed or accepted as assumptions"
+  - "Configuration inputs from the business: the reasons and lists of values of Renewal, the lead days and the other parameters, the check severities, the classification rules and the decision matrix, the non-renewable risk codes, the package map of the migrated policies, the letter templates, the insurers' renewal e-mail addresses, users and roles"
+  - "Agreed test plan"
+  - "Migration of the in-force policies of the go-live window and of the Renewal Advices sent before go-live signed (BRD-13)"
+handover_note: "After sign-off the content is frozen as signed and the approved deltas are scheduled."
+
+# Governance and contacts (from the approval sheets of the Renewal BRD).
+governance:
+  - {role: "Business owner and approver", who: "Shellah Marie C. Miranda, AVP, Product Owner", does: "Accountable for the sign-off; chairs the sign-off meeting"}
+  - {role: "Approvers", who: "Jose Melvin Jarin, AVP, Product Owner; Mark Joseph C. Makalintal, SAVP, Unit Head - Combank and Corbank; Edmundante F. Ramirez, VP, and Roderick Lim, FVP, Retail and Corporate Marketing", does: "Approve the set for their units"}
+  - {role: "Reviewers", who: "Rhommel Mark Galler, Marketing Business Services and System Support; the Marketing and Processing input providers of the BRD (Ma. Fides R. Rivera, Rose Marie Lique, Jackie Lyn Serrano and others)", does: "Review their screens and rows; raise comments"}
+  - {role: "BDOI IT", who: "Information Technology Group (Angela Villamarzo Ramirez, Ma. Carmela Austria Morfe)", does: "Reviews the scheduled runs, uploads, access and the Technical Specification"}
+  - {role: "BRD owner", who: "Dan Ace R. Cauton, Program Manager, and Zean C. Ibay, Roda Lyn D. Gallardo, Jane Tagle, Business Analysts, ESG-BPS", does: "Traceability to the BRD; sign-off coordination"}
+  - {role: "Delivery", who: "iorta TechNXT Project Manager, Business Analysis, test lead", does: "Sessions, answers, comments log, revisions, change requests"}
+next_steps:
+  - "Kick-off and first SIT walkthrough on Wed 4-Nov-2026"
+  - "Workbooks returned by Fri 20-Nov-2026; Q&A on Tue 24-Nov-2026; sign-off on Fri 27-Nov-2026"
+  - "BRD-12 Submitted Policies, BRD-9 Customer Servicing Facility and BRD-10 Sanction Screening follow in the same window of November 2026"

@@ -362,3 +362,21 @@ describe('renewal acceptance dialog', () => {
     expect(ack.closest('label')?.className).toContain('rnw-ack');
   });
 });
+
+describe('renewal list without amounts', () => {
+  it('has no amount column when the server leaves the amounts out', async () => {
+    const r = row();
+    const money = { ...r.money } as Partial<typeof r.money>;
+    delete money.currency;
+    vi.spyOn(renewalApi, 'list').mockResolvedValue({
+      content: [{ ...r, money: money as typeof r.money }],
+      totalElements: 1,
+      totalPages: 1,
+      number: 0,
+      size: 25,
+    } as unknown as Awaited<ReturnType<typeof renewalApi.list>>);
+    render(renewalWrapper(new Set(['RNW_VIEW']))(<CandidateList />));
+    expect(await screen.findByText('Client')).toBeInTheDocument();
+    expect(screen.queryByText('Gross Premium / Outstanding')).toBeNull();
+  });
+});

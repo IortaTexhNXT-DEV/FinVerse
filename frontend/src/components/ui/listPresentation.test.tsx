@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DataTable } from './DataTable';
 import type { Column } from './DataTable';
 import { DueDate } from './DueDate';
-import { fittedHeight } from './useFitHeight';
+import { fittedHeight, pageOverflow } from './useFitHeight';
 import { StatusBadge } from './StatusBadge';
 import { BranchName, BusinessTypeName } from '@/components/broking/LovLabel';
 import { WorkspaceContext } from '@/context/workspaceContext';
@@ -81,6 +81,40 @@ describe('DataTable list presentation', () => {
     [rect, offset, scroll, client].forEach((m) => m.mockRestore());
   });
 
+  it('lets a capped list take the room left when the window grows', () => {
+    class Observer {
+      constructor(private readonly callback: () => void) {}
+      observe() {
+        this.callback();
+      }
+      disconnect() {
+        return undefined;
+      }
+    }
+    vi.stubGlobal('ResizeObserver', Observer);
+    vi.stubGlobal('requestAnimationFrame', (run: () => void) => {
+      run();
+      return 1;
+    });
+    // The list shows 600 px of its 1500 px of rows; the page ends 1100 px down a 1500 px window.
+    const rect = vi
+      .spyOn(HTMLElement.prototype, 'getBoundingClientRect')
+      .mockReturnValue({ top: 0, bottom: 1100, height: 600 } as DOMRect);
+    const offset = vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(1500);
+    const scroll = vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(1500);
+    const client = vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(1500);
+    const { container } = render(
+      <main className="app-main">
+        <DataTable columns={COLUMNS} rows={ROWS} rowKey={(r) => r.id} />
+      </main>,
+    );
+    const main = container.querySelector<HTMLElement>('main');
+    expect(main && pageOverflow(main)).toBe(-400);
+    // 400 px are left below the page: the list grows from 600 to 1000 px.
+    expect(container.querySelector<HTMLElement>('.table-wrap')?.style.maxHeight).toBe('1000px');
+    [rect, offset, scroll, client].forEach((m) => m.mockRestore());
+  });
+
   it('leaves a page with several lists to scroll as a whole', () => {
     const { container } = render(
       <main className="app-main">
@@ -99,6 +133,8 @@ describe('DataTable list presentation', () => {
     expect(type).toHaveClass('truncate');
     expect(type).toHaveAttribute('title', 'Disbursement Voucher');
     expect(type.closest('td')).toHaveClass('col-truncate');
+    // The column keeps its width as its least width, so a crowded table cannot squeeze the name.
+    expect(screen.getByRole('columnheader', { name: 'Type' })).toHaveStyle({ minWidth: '160px' });
   });
 
   it('shows one muted dash for every empty cell, never a blank', () => {

@@ -74,5 +74,13 @@ export const ACCOUNT_COLUMNS: Column<AccountSummary>[] = [
       </span>
     ),
   },
-  { key: 'o', header: 'Officer', render: (a) => <UserName login={a.accountOfficer} /> },
+  {
+    // One line cut at the column width with the full name in the tooltip, so the list fits its card
+    // and the officer's name is never cut off at the card's edge.
+    key: 'o',
+    header: 'Officer',
+    width: '180px',
+    truncate: true,
+    render: (a) => <UserName login={a.accountOfficer} truncate />,
+  },
 ];

@@ -36,6 +36,7 @@ const WIDTH = Number(process.env.WIDTH || 1440);
 const HEIGHT = Number(process.env.HEIGHT || 900);
 const SCALE = Number(process.env.SCALE || 2);
 const MAX_HEIGHT = Number(process.env.MAX_HEIGHT || 2000);
+const MAX_WIDTH = Number(process.env.MAX_WIDTH || 1920);  // a list wider than its card widens the window up to this
 const MENU_MAX_HEIGHT = Number(process.env.MENU_MAX_HEIGHT || 12000);  // the full menu of a persona (UX deck)
 const MARGIN = 12;  // CSS pixels of page kept around a cropped region
 const READY_TIMEOUT_MS = 20 * 60 * 1000;
@@ -401,17 +402,63 @@ async function clearCallouts(page) {
 
 // ------------------------------------------------------------------ capture and optimise
 
-/** Grows the viewport so the whole scrolling content area is in the image (up to MAX_HEIGHT). */
-async function fitViewport(page, tall) {
+/**
+ * Grows the viewport so the whole scrolling content area is in the image (up to MAX_HEIGHT). A list that scrolls
+ * inside its card (capped to the room left in the window) counts with the rows hidden in its card: in the taller
+ * window the list lifts its cap and shows every row, so the image holds the whole card. A walkthrough step (`tall`
+ * false) keeps the top of its page and grows only by the hidden rows of such a list.
+ */
+async function fitViewport(page, tall, width = WIDTH) {
+  // A list sets its cap again on a window resize: after a recipe set content aside (the record header above the
+  // tabs of a walkthrough step), the list takes the room freed.
+  // An open row action menu closes on any scroll, so a shot of the menu leaves the page as it is.
+  const menuOpen = (await page.locator('[role=menu]').count()) > 0;
+  if (!menuOpen) {
+    await page.evaluate(() => window.dispatchEvent(new Event('resize')));
+    await page.waitForTimeout(200);
+  }
   const extra = await page.evaluate(() => {
     const main = document.querySelector('main.app-main, main');
     const doc = document.documentElement;
     const inner = main ? main.scrollHeight - main.clientHeight : 0;
-    return Math.max(inner, doc.scrollHeight - doc.clientHeight, 0);
+    const cards = [...document.querySelectorAll('main .table-wrap[data-fit]')]
+      .reduce((sum, w) => sum + Math.max(0, w.scrollHeight - w.clientHeight), 0);
+    // A little more than the hidden rows (a sideways scroll bar, rounding), so the last row is never cut; the crop
+    // trims the window to what is drawn.
+    const room = cards > 0 ? cards + 48 : 0;
+    // An open dialog taller than the window: the window grows so the whole dialog, title to buttons, is in view.
+    const dialogs = [...document.querySelectorAll('dialog[open], [role=dialog]')]
+      .filter((d) => d.getBoundingClientRect().width > 0);
+    const dialog = dialogs[dialogs.length - 1];
+    // (a dialog is at most 90% of the window high and scrolls inside beyond that)
+    const tallDialog = dialog && dialog.scrollHeight > dialog.clientHeight + 1
+      ? Math.max(0, Math.ceil(dialog.scrollHeight / 0.9) + 16 - window.innerHeight) : 0;
+    return { all: Math.max(inner + room, doc.scrollHeight - doc.clientHeight, tallDialog, 0), cards: Math.max(room, tallDialog) };
   });
-  const height = Math.min(MAX_HEIGHT, HEIGHT + (tall === false ? 0 : extra));
-  await page.setViewportSize({ width: WIDTH, height });
-  await page.waitForTimeout(300);
+  // A walkthrough step keeps the top of its page, but a list capped in its card is shown with all its rows.
+  const grow = tall === false ? extra.cards : extra.all;
+  if (extra.cards > 0 && HEIGHT + grow > MAX_HEIGHT && !menuOpen) {
+    // The window cannot grow enough (a long page beside the list): the page scrolls as a whole, as the screen does
+    // for a page with several lists, so the list's rows run down the page instead of being held in a short card.
+    await page.evaluate(() => {
+      const main = document.querySelector('main.app-main, main');
+      if (main && !main.querySelector('[data-capture-whole]')) {
+        const marker = document.createElement('div');
+        marker.setAttribute('data-fit', '');
+        marker.setAttribute('data-capture-whole', '');
+        marker.hidden = true;
+        main.appendChild(marker);
+      }
+      window.dispatchEvent(new Event('resize'));
+    });
+    await page.waitForTimeout(300);
+  }
+  const height = Math.min(MAX_HEIGHT, HEIGHT + grow);
+  await page.setViewportSize({ width, height });
+  await page.waitForTimeout(grow > 0 ? 600 : 300);
+  if (!menuOpen) {
+    await page.evaluate(() => document.querySelectorAll('main .table-wrap[data-fit]').forEach((w) => w.scrollTo(0, 0)));
+  }
 }
 
 /**
@@ -498,12 +545,35 @@ async function cropOf(page, shot, recipe) {
         if (r.width < 1 || r.height < 1 || getComputedStyle(el).visibility === 'hidden') {
           continue;
         }
+        // Rows scrolled out of a list that scrolls inside its card are not drawn below the card.
+        const box = el.parentElement && el.parentElement.closest('.table-wrap');
+        const limit = box ? box.getBoundingClientRect().bottom : Infinity;
         right = Math.max(right, Math.min(r.right, m.right));
-        bottom = Math.max(bottom, r.bottom);
+        bottom = Math.max(bottom, Math.min(r.bottom, limit));
       }
       return { x: m.left, y: m.top, width: right - m.left, height: bottom - m.top };
     });
     boxes = box ? [box] : [];
+    if (box) {
+      // The message of the step sits at the bottom right of the window; under a short page it is moved up to just
+      // below the content, so the image has no empty band between the content and the message.
+      await page.evaluate((contentBottom) => {
+        const region = document.querySelector('.toast-region');
+        const shown = region && [...region.querySelectorAll('.toast')].filter((t) => t.style.display !== 'none');
+        if (!shown || shown.length === 0) {
+          return;
+        }
+        const r = region.getBoundingClientRect();
+        // Below a short page it moves up; over the last rows of a page it moves down when the window has room.
+        const below = r.top > contentBottom + 24;
+        const over = r.top < contentBottom && contentBottom + 8 + r.height <= window.innerHeight;
+        if (below || over) {
+          region.style.top = `${Math.round(contentBottom + 8)}px`;
+          region.style.bottom = 'auto';
+        }
+      }, box.y + box.height);
+      await page.waitForTimeout(100);
+    }
   }
   if (boxes.length === 0) {
     return { kind: 'full', clip: null };
@@ -632,7 +702,23 @@ async function cropOf(page, shot, recipe) {
       if (shot.state === 'menu') {
         await fitSidebar(page);
       } else if (shot.state !== 'landing') {
-        await fitViewport(page, shot.state === 'walkthrough' ? (shot.tall ?? Boolean(named)) : shot.tall);
+        // A list wider than its card at the standard window (recipe.widths[slug], CSS pixels) is taken in a wider
+        // window, so every column is in the image.
+        const width = (recipe.widths && recipe.widths[shot.slug]) || WIDTH;
+        if (width !== WIDTH) {
+          await page.setViewportSize({ width, height: HEIGHT });
+          await page.waitForTimeout(500);
+        }
+        // A list that still scrolls sideways inside its card is taken in a window wide enough for all its columns.
+        const over = await page.evaluate(() => Math.max(0, ...[...document.querySelectorAll('main .table-wrap')]
+          .filter((w) => w.getBoundingClientRect().width > 0)
+          .map((w) => w.scrollWidth - w.clientWidth)));
+        const wide = over > 1 ? Math.min(MAX_WIDTH, width + over + 24) : width;
+        if (wide !== width) {
+          await page.setViewportSize({ width: wide, height: HEIGHT });
+          await page.waitForTimeout(500);
+        }
+        await fitViewport(page, shot.state === 'walkthrough' ? (shot.tall ?? Boolean(named)) : shot.tall, wide);
       }
       if (named) {
         // A message of the step would cover the rows of the region.

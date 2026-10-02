@@ -88,7 +88,11 @@ function isoDate(days) {
 /** Brings the tab strip of a record to the top of the window, so the tab's content is captured whole. */
 /** Runs an action of a table row: opens the row's action menu, then chooses the action. */
 async function rowAction(row, name) {
-  await row.getByRole('button', { name: /^Actions for/ }).click();
+  // The menu closes on any scroll: the button is brought to the middle of the window (and of its card) first, so the
+  // menu opens in view.
+  const button = row.getByRole('button', { name: /^Actions for/ });
+  await button.evaluate((el) => el.scrollIntoView({ block: 'center', inline: 'nearest' }));
+  await button.click();
   await row.page().waitForTimeout(300);
   await row.page().getByRole('menuitem', { name }).first().click();
 }

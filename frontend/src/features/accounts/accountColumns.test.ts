@@ -13,4 +13,10 @@ describe('account list columns', () => {
       'Officer',
     ]);
   });
+
+  it('keeps the officer on one line within the list, the full name in the tooltip', () => {
+    const officer = ACCOUNT_COLUMNS.find((c) => c.header === 'Officer');
+    expect(officer?.truncate).toBe(true);
+    expect(officer?.width).toBe('180px');
+  });
 });

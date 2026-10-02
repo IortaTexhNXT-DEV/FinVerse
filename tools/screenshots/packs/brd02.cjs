@@ -271,5 +271,14 @@ const crops = { 'wt-a-10': TAB, 'wt-b-07': TAB, 'wt-c-03': TAB, 'wt-c-05': TAB }
   'scr-op-39-02-policy', 'scr-op-39-03-accounting', 'scr-op-39-04-transactions', 'scr-op-45-01-items',
   'scr-op-45-03-incentive'].forEach((slug) => { crops[slug] = TAB; });
 
-module.exports = { opens, fills, selects, after, crops, custom: {}, walkthrough: walkthrough.steps, documents,
+// Lists wider than their card at 1440 pixels (invoice search, reconciliation cycles, the accounts of a batch beside
+// its exclusions): taken in a wider window so that every column is in the image.
+const widths = {};
+['scr-op-02-01-list', 'scr-op-02-02-filters', 'wt-a-02', 'ux-scr-op-02-empty', 'scr-op-44-01-list',
+  'scr-op-26-01-review', 'scr-op-26-03-closed'].forEach((slug) => { widths[slug] = 1760; });
+['scr-op-25-01-list', 'scr-op-25-02-approval', 'scr-op-45-01-items'].forEach((slug) => {
+  widths[slug] = 1600;
+});
+
+module.exports = { opens, fills, selects, after, crops, widths, custom: {}, walkthrough: walkthrough.steps, documents,
   prepare: walkthrough.prepare };

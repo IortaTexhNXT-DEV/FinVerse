@@ -5,6 +5,7 @@ import { ApiError } from '@/api/client';
 import { LovSelect } from '@/components/broking/LovSelect';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { TypedInput } from '@/components/ui/DateInput';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { Field } from '@/components/ui/Field';
@@ -78,7 +79,7 @@ function FieldInput({ field, id, value, disabled, documents, onChange }: Readonl
       );
     default:
       return (
-        <input
+        <TypedInput
           id={id}
           className="input"
           type={field.dataType === 'DATE' ? 'date' : 'text'}

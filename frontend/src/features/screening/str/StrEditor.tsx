@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Plus, Trash2 } from 'lucide-react';
 import { lovApi } from '@/api/lov';
 import { Button } from '@/components/ui/Button';
+import { TypedInput } from '@/components/ui/DateInput';
 import { Field } from '@/components/ui/Field';
 import { formatAmount, today } from '@/utils/format';
 import type { TemplateField } from '../cases/api';
@@ -151,7 +152,7 @@ export function Transactions({
             <tr key={line.key} title={transactionError(line)}>
               {COLUMNS.map((c) => (
                 <td key={c.key}>
-                  <input
+                  <TypedInput
                     className="input"
                     aria-label={`${c.label} of line ${index + 1}`}
                     type={c.type ?? 'text'}

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { Currency, ExchangeRate } from '@/api/masters';
 import { useAuth } from '@/auth/authContext';
 import { Button } from '@/components/ui/Button';
+import { MonthInput } from '@/components/ui/MonthInput';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
@@ -70,10 +71,9 @@ export function RevaluationRatesCard({ currencies }: Readonly<{ currencies: Curr
           <div className="form-grid">
             <Field label="Month" required>
               {(id) => (
-                <input
+                <MonthInput
                   id={id}
                   className="input"
-                  type="month"
                   value={month}
                   onChange={(e) => setMonth(e.target.value)}
                 />

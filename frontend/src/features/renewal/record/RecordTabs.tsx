@@ -1,19 +1,25 @@
 import { useQuery } from '@tanstack/react-query';
-import { Download } from 'lucide-react';
 import { renewalApi } from '@/api/renewal';
 import type { CandidateDetail, CheckResultView, LetterView, Terms } from '@/api/renewal';
 import { useFileDownload } from '@/components/broking/useFileDownload';
 import { Amount } from '@/components/ui/Amount';
-import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { DataTable } from '@/components/ui/DataTable';
 import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
+import { RowActions } from '@/components/ui/RowActions';
 import { ErrorAlert } from '@/components/ui/ErrorAlert';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate, formatDateTime, humanize } from '@/utils/format';
+import {
+  acceptanceMethodLabel,
+  bucketCauseLabel,
+  letterTypeLabel,
+  responseLabel,
+} from '../common/presentation';
 import { BucketPill } from '../common/RenewalBits';
+import { severityLabel } from '../setup/setupCodes';
 
 type Props = Readonly<{ detail: CandidateDetail }>;
 
@@ -45,7 +51,7 @@ export function ChecksTab({ detail }: Props) {
               kind: 'status',
               render: (r) => <StatusBadge status={r.outcome} />,
             },
-            { key: 'sev', header: 'Severity', render: (r) => r.severity },
+            { key: 'sev', header: 'Severity', render: (r) => severityLabel(r.severity) },
             { key: 'msg', header: 'Message', render: (r) => r.message },
           ]}
         />
@@ -59,7 +65,7 @@ export function ChecksTab({ detail }: Props) {
             { key: 'at', header: 'When', kind: 'datetime', render: (b) => formatDateTime(b.at) },
             { key: 'from', header: 'From', render: (b) => <BucketPill bucket={b.from} /> },
             { key: 'to', header: 'To', render: (b) => <BucketPill bucket={b.to} /> },
-            { key: 'cause', header: 'Cause', render: (b) => b.cause },
+            { key: 'cause', header: 'Cause', render: (b) => bucketCauseLabel(b.cause) },
             { key: 'remarks', header: 'Remarks', render: (b) => b.remarks ?? '' },
             { key: 'by', header: 'By', render: (b) => <UserName login={b.by} /> },
           ]}
@@ -161,7 +167,7 @@ export function InsurerTab({ detail }: Props) {
         emptyMessage="No response from the insurer"
         columns={[
           { key: 'on', header: 'Received', kind: 'date', render: (r) => formatDate(r.receivedOn) },
-          { key: 'resp', header: 'Response', render: (r) => r.response },
+          { key: 'resp', header: 'Response', render: (r) => responseLabel(r.response) },
           { key: 'ref', header: 'Insurer Ref', render: (r) => r.insurerRef ?? '' },
           {
             key: 'gp',
@@ -225,7 +231,7 @@ export function LettersTab({ detail }: Props) {
             {
               key: 'type',
               header: 'Type',
-              render: (l) => (l.notice ? `${l.type} (${l.notice.toLowerCase()} notice)` : l.type),
+              render: (l) => letterTypeLabel(l.type, l.notice),
             },
             {
               key: 'status',
@@ -249,19 +255,19 @@ export function LettersTab({ detail }: Props) {
             {
               key: 'file',
               header: '',
-              render: (l) =>
-                l.attachmentId !== null && (
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    icon={<Download size={14} />}
-                    onClick={() =>
-                      download.mutate(() => renewalApi.letterFile(companyId, l.letterNo))
-                    }
-                  >
-                    PDF
-                  </Button>
-                ),
+              render: (l) => (
+                <RowActions
+                  record={l.letterNo}
+                  actions={[
+                    {
+                      label: 'Download PDF',
+                      hidden: l.attachmentId === null,
+                      onSelect: () =>
+                        download.mutate(() => renewalApi.letterFile(companyId, l.letterNo)),
+                    },
+                  ]}
+                />
+              ),
             },
           ]}
         />
@@ -278,7 +284,7 @@ export function LettersTab({ detail }: Props) {
               kind: 'date',
               render: (a) => formatDate(a.acceptedOn),
             },
-            { key: 'method', header: 'Method', render: (a) => humanize(a.method) },
+            { key: 'method', header: 'Method', render: (a) => acceptanceMethodLabel(a.method) },
             { key: 'ref', header: 'Reference', render: (a) => a.reference ?? '' },
             {
               key: 'ack',

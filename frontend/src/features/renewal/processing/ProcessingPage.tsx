@@ -1,4 +1,5 @@
-import { Undo2, UserCheck, UserPlus } from 'lucide-react';
+import { Undo2, Upload, UserCheck, UserPlus } from 'lucide-react';
+import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { renewalApi } from '@/api/renewal';
 import { useAuth } from '@/auth/authContext';
@@ -6,6 +7,8 @@ import { Button } from '@/components/ui/Button';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { useCompanyId } from '@/context/workspaceContext';
 import { CandidateList } from '../common/CandidateList';
+import { CompleteFileForm } from '../common/CompleteFileForm';
+import { UploadPanel } from '../common/UploadPanel';
 import type { QuickFilter } from '../common/CandidateList';
 import { PoAssignDialog, ReturnToMarketingDialog } from '../common/MoreDialogs';
 import { PROCESSING_TABS, RENEWAL_SECTION, tabOf } from '../common/renewalCodes';
@@ -19,13 +22,15 @@ type Open = 'assign' | 'return';
  * Processing Worklist (FR-RN-061-065): the posted renewals for the Renewal processing team. The
  * lead assigns a Processing Officer (or an officer takes a renewal), the officer creates the
  * renewal account, sends the insurer batch, records the insurer's reply and returns a renewal to
- * Marketing with a reason when it cannot proceed.
+ * Marketing with a reason when it cannot proceed. The dispositioned files of Marketing are
+ * uploaded here (FR-RN-060).
  */
 export default function ProcessingPage() {
   const companyId = useCompanyId();
   const { can, user } = useAuth();
   const [params] = useSearchParams();
   const { open, refs, close, done, show } = useListDialogs<Open>();
+  const [upload, setUpload] = useState(false);
   const assign = useBatchAction<string | undefined>(
     'Assign Processing Officer',
     'assigned',
@@ -51,7 +56,22 @@ export default function ProcessingPage() {
         section={RENEWAL_SECTION}
         title="Processing Worklist"
         description="Posted renewals: renewal accounts, insurer batches and replies."
+        actions={
+          can('RNW_UPLOAD') && (
+            <Button variant="secondary" icon={<Upload size={16} />} onClick={() => setUpload(true)}>
+              Upload Dispositions
+            </Button>
+          )
+        }
       />
+      {upload && (
+        <UploadPanel
+          label="Upload Dispositions"
+          handler="RNW_DISPOSITION_UPLOAD"
+          onClose={() => setUpload(false)}
+          after={(job) => <CompleteFileForm job={job} />}
+        />
+      )}
       <CandidateList
         tabs={PROCESSING_TABS}
         initialTab={tabOf(PROCESSING_TABS, params.get('tab'))}

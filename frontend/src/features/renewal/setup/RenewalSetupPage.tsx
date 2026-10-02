@@ -15,13 +15,15 @@ import { MATRIX_FIELDS, blankBucketRule, blankDecisionRule, bucketFields } from 
 import '../renewal.css';
 
 const TABS = [
-  { id: 'risk', label: 'Non-renewable Risk Codes', permission: 'RNW_SETUP' },
-  { id: 'checks', label: 'Checks', permission: 'RNW_SETUP' },
-  { id: 'buckets', label: 'Classification Rules', permission: 'RNW_SETUP' },
-  { id: 'matrix', label: 'Decision Matrix', permission: 'RNW_SETUP' },
-  { id: 'packages', label: 'Package Map', permission: 'RNW_PACKAGE_REMAP' },
-  { id: 'choices', label: 'Package Choices', permission: 'RNW_PACKAGE_REMAP' },
-  { id: 'golive', label: 'Go-live', permission: 'RNW_SETUP' },
+  { id: 'risk', label: 'Non-renewable Risk Codes', permissions: ['RNW_SETUP'] },
+  { id: 'checks', label: 'Checks', permissions: ['RNW_SETUP'] },
+  { id: 'buckets', label: 'Classification Rules', permissions: ['RNW_SETUP'] },
+  { id: 'matrix', label: 'Decision Matrix', permissions: ['RNW_SETUP'] },
+  { id: 'packages', label: 'Package Map', permissions: ['RNW_PACKAGE_REMAP'] },
+  { id: 'choices', label: 'Package Choices', permissions: ['RNW_PACKAGE_REMAP'] },
+  // The take-over is set-up work; the uploads of the go-live are done by the Renewal processing
+  // team (FR-RN-016), so the tab is shown to every user who may do one of its parts.
+  { id: 'golive', label: 'Go-live', permissions: ['RNW_SETUP', 'RNW_EXTRACT', 'RNW_RA_SEND'] },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -84,7 +86,7 @@ function Body({ tab }: Readonly<{ tab: TabId }>) {
  */
 export default function RenewalSetupPage() {
   const { can } = useAuth();
-  const tabs = TABS.filter((t) => can(t.permission));
+  const tabs = TABS.filter((t) => t.permissions.some((p) => can(p)));
   const ids = tabs.map((t) => t.id);
   const [tab, setTab] = useTabParam<TabId>(ids, ids[0] ?? 'risk');
   return (

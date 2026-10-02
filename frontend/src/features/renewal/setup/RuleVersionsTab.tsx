@@ -15,7 +15,8 @@ import { UserName } from '@/components/ui/UserName';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatDate } from '@/utils/format';
-import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { RowActions } from '@/components/ui/RowActions';
+import { versionActions } from '../common/presentation';
 
 /** An editable column of a rule. */
 export interface RuleField<R> {
@@ -259,45 +260,17 @@ export function RuleVersionsTab<R>({
             {
               key: 'act',
               header: '',
-              render: (v) =>
-                maintain && (
-                  <span className="rnw-actions">
-                    {v.status === 'DRAFT' && (
-                      <Button size="sm" onClick={() => step.mutate({ id: v.id, name: 'SUBMIT' })}>
-                        Submit
-                      </Button>
-                    )}
-                    {v.status === 'SUBMITTED' && (
-                      <>
-                        <ConfirmButton
-                          size="sm"
-                          confirm={{
-                            title: `Activate Version ${String(v.versionNo)}`,
-                            effect: 'The version replaces the active one from its effective date.',
-                          }}
-                          onConfirm={() => step.mutateAsync({ id: v.id, name: 'ACTIVATE' })}
-                        >
-                          Activate
-                        </ConfirmButton>
-                        <ConfirmButton
-                          size="sm"
-                          variant="ghost"
-                          confirm={{
-                            title: `Reject Version ${String(v.versionNo)}`,
-                            effect: 'The version is rejected and returns to its maker.',
-                            destructive: true,
-                            reason: 'required',
-                          }}
-                          onConfirm={(reason) =>
-                            step.mutateAsync({ id: v.id, name: 'REJECT', remarks: reason })
-                          }
-                        >
-                          Reject
-                        </ConfirmButton>
-                      </>
-                    )}
-                  </span>
-                ),
+              render: (v) => (
+                <RowActions
+                  record={`Version ${String(v.versionNo)}`}
+                  actions={versionActions(v.status, v.versionNo, maintain, {
+                    submit: () => step.mutate({ id: v.id, name: 'SUBMIT' }),
+                    activate: () => step.mutateAsync({ id: v.id, name: 'ACTIVATE' }),
+                    reject: (reason) =>
+                      step.mutateAsync({ id: v.id, name: 'REJECT', remarks: reason }),
+                  })}
+                />
+              ),
             },
           ]}
         />

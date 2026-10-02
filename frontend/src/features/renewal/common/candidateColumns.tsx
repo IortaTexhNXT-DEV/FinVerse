@@ -1,5 +1,6 @@
 import type { CandidateRow } from '@/api/renewal';
 import { Amount } from '@/components/ui/Amount';
+import { InsurerName, ProductName, SalesUnitName } from '@/components/broking/LovLabel';
 import { CellStack } from '@/components/ui/CellStack';
 import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
@@ -40,17 +41,24 @@ export function candidateColumns(showMoney: boolean): Column<CandidateRow>[] {
     {
       key: 'risk',
       header: 'Risk',
-      render: (r) => (
-        <CellStack main={r.policy.productCode ?? ''} sub={r.policy.productName ?? ''} />
-      ),
+      render: (r) =>
+        r.policy.productCode ? (
+          <ProductName code={r.policy.productCode} withCode />
+        ) : (
+          (r.policy.productName ?? '')
+        ),
     },
-    { key: 'insurer', header: 'Insurance Company', render: (r) => r.policy.insurerCode ?? '' },
+    {
+      key: 'insurer',
+      header: 'Insurance Company',
+      render: (r) => <InsurerName code={r.policy.insurerCode} />,
+    },
     {
       key: 'officer',
       header: 'Unit / Officer',
       render: (r) => (
         <CellStack
-          main={r.parties.ownerUnit ?? ''}
+          main={<SalesUnitName code={r.parties.ownerUnit} />}
           sub={<UserName login={r.parties.assignedAo ?? r.parties.accountOfficer ?? ''} />}
         />
       ),

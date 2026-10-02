@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { renewalApi } from '@/api/renewal';
 import type { CandidateDetail } from '@/api/renewal';
 import { Attachments } from '@/components/attachments/Attachments';
+import { InsurerName, ProductName, SalesUnitName } from '@/components/broking/LovLabel';
 import { RecordSummary } from '@/components/broking/RecordSummary';
 import type { Fact } from '@/components/broking/RecordSummary';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
@@ -47,8 +48,16 @@ function facts(d: CandidateDetail): Fact[] {
   const { row } = d;
   return [
     { icon: User, label: 'Client', value: row.parties.clientName },
-    { icon: Layers, label: 'Product', value: row.policy.productCode ?? '' },
-    { icon: Building2, label: 'Insurer', value: row.policy.insurerCode ?? '' },
+    {
+      icon: Layers,
+      label: 'Product',
+      value: row.policy.productCode ? (
+        <ProductName code={row.policy.productCode} />
+      ) : (
+        (row.policy.productName ?? '')
+      ),
+    },
+    { icon: Building2, label: 'Insurer', value: <InsurerName code={row.policy.insurerCode} /> },
     {
       icon: CalendarClock,
       label: 'Expiry',
@@ -62,7 +71,7 @@ function facts(d: CandidateDetail): Fact[] {
           ? ''
           : `${row.money.currency ?? ''} ${formatAmount(row.money.grossPremium)}`,
     },
-    { icon: Users, label: 'Unit', value: row.parties.ownerUnit ?? '' },
+    { icon: Users, label: 'Unit', value: <SalesUnitName code={row.parties.ownerUnit} /> },
   ];
 }
 

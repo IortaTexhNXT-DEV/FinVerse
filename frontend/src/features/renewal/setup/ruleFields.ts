@@ -143,7 +143,7 @@ export const MATRIX_FIELDS: RuleField<DecisionRuleData>[] = [
       { code: '', label: 'None' },
       { code: 'RA', label: 'Renewal Advice' },
       { code: 'NFR', label: 'Not for Renewal' },
-      { code: 'NAL', label: 'Not Acceptable' },
+      { code: 'NAL', label: 'No Advice Letter' },
     ],
     get: (r) => r.letterHint ?? '',
     set: (r, v) => ({ ...r, letterHint: textOrNull(v) }),

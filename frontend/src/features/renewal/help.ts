@@ -103,10 +103,10 @@ export const RENEWAL_HELP: HelpSection = {
       name: 'Letters',
       path: '/renewal/letters',
       summary:
-        'Renewal Advices ready, generated and sent, the Not Acceptable and Not for Renewal letters and the renewals with no response.',
+        'Renewal Advices ready, generated and sent, the No Advice and Not for Renewal letters and the renewals with no response.',
       workflow: [
         'Generate RA for the renewals with their terms (first or second notice), then Send.',
-        'Send Letters generates and sends the Not Acceptable and Not for Renewal letters and closes the renewals.',
+        'Send Letters generates and sends the No Advice and Not for Renewal letters and closes the renewals.',
         'Upload Acceptances records client acceptances from a file.',
       ],
       controls: [

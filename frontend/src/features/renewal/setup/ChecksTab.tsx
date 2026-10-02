@@ -11,8 +11,9 @@ import { Field } from '@/components/ui/Field';
 import { Modal } from '@/components/ui/Modal';
 import { useToast } from '@/components/ui/toastContext';
 import { ApprovalCell } from './setupBits';
-import { SEVERITIES, pending, severityLabel } from './setupCodes';
-import { ConfirmButton } from '@/components/ui/ConfirmButton';
+import { SEVERITIES, severityLabel } from './setupCodes';
+import { RowActions } from '@/components/ui/RowActions';
+import { setupRecordActions } from '../common/presentation';
 
 function CheckDialog({ row, onClose }: Readonly<{ row: CheckSettingView; onClose: () => void }>) {
   const queryClient = useQueryClient();
@@ -121,26 +122,15 @@ export function ChecksTab() {
           {
             key: 'act',
             header: '',
-            render: (r) =>
-              maintain && (
-                <span className="rnw-actions">
-                  {pending(r.approval) && (
-                    <ConfirmButton
-                      size="sm"
-                      confirm={{
-                        title: 'Authorize Check',
-                        effect: 'The renewal check change takes effect.',
-                      }}
-                      onConfirm={() => authorize.mutateAsync(r.checkCode)}
-                    >
-                      Authorize
-                    </ConfirmButton>
-                  )}
-                  <Button size="sm" variant="ghost" onClick={() => setEditing(r)}>
-                    Edit
-                  </Button>
-                </span>
-              ),
+            render: (r) => (
+              <RowActions
+                record={r.checkName}
+                actions={setupRecordActions(r.approval.recordStatus, maintain, 'Check', {
+                  authorize: () => authorize.mutateAsync(r.checkCode),
+                  edit: () => setEditing(r),
+                })}
+              />
+            ),
           },
         ]}
       />

@@ -349,3 +349,16 @@ describe('renewal stage pills', () => {
     );
   });
 });
+
+describe('renewal acceptance dialog', () => {
+  it('keeps the acknowledgement apart from the remarks under it', async () => {
+    const { AcceptanceDialog } = await import('./record/ClientDialogs');
+    render(
+      renewalWrapper(new Set(['RNW_ACCEPT']))(
+        <AcceptanceDialog entityId={1} busy={false} error={null} onClose={noop} onConfirm={noop} />,
+      ),
+    );
+    const ack = await screen.findByText(/acknowledged the change of premium/);
+    expect(ack.closest('label')?.className).toContain('rnw-ack');
+  });
+});

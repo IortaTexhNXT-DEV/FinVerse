@@ -169,6 +169,16 @@ const dialog = { within: 'dialog[open]' };
 const callouts = {
   'SCR-RN-02': { 3: list, 4: list, 5: list, 6: list, 7: list, 8: list, 9: list, 10: list, 11: list,
     14: dialog, 15: dialog, 16: dialog, 17: dialog, 18: card('Recent extractions') },
+  'SCR-RN-05': {
+    1: card('Insurer responses'),
+    2: card('Letters'),
+    3: card('Acceptance'),
+    5: card('Remarks'),
+    6: card('Follow-ups'),
+    7: card('Dispositions'),
+    8: card('Assignments'),
+    9: card('Overrides'),
+  },
   'SCR-RN-04': {
     1: card('Check results'),
     2: card('Classification history'),

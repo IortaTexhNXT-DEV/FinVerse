@@ -43,8 +43,8 @@ export function RenewalProduct({ row }: Readonly<{ row: CandidateRow }>) {
 }
 
 /** The Classification pill of a renewal. */
-export function BucketPill({ bucket }: Readonly<{ bucket: string | null }>) {
-  if (bucket === null) {
+export function BucketPill({ bucket }: Readonly<{ bucket?: string | null }>) {
+  if (!bucket) {
     return null;
   }
   return (

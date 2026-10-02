@@ -324,3 +324,18 @@ describe('renewal product name', () => {
     expect(await screen.findByText('Comprehensive General Liability')).toBeInTheDocument();
   });
 });
+
+describe('renewal first classification', () => {
+  it('shows the first classification of a renewal without a previous one', async () => {
+    vi.spyOn(renewalApi, 'checks').mockResolvedValue({
+      results: [],
+      runs: [],
+      buckets: [
+        { to: 'CLEAN', cause: 'RULE', by: 'proctl', at: '2026-10-02T21:02:27Z' },
+      ] as unknown as Awaited<ReturnType<typeof renewalApi.checks>>['buckets'],
+      endorsements: [],
+    });
+    render(renewalWrapper(new Set(['RNW_VIEW']))(<ChecksTab detail={detail()} />));
+    expect(await screen.findByText('Classification rules')).toBeInTheDocument();
+  });
+});

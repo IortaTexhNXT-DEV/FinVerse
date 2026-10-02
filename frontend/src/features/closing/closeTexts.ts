@@ -20,3 +20,12 @@ export function openItemDocument(documentNo: string, direction: string): string 
 export function missingRateNotice(currencies: readonly string[]): string {
   return `No month-end rate for ${currencies.join(', ')}: posting is blocked.`;
 }
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+/** A day of the year kept as MM-dd (04-15) as the screens show it: 15-Apr. */
+export function dayOfYear(monthDay: string | undefined): string {
+  const [month, day] = (monthDay ?? '').split('-');
+  const name = MONTHS[Number(month) - 1];
+  return name === undefined || day === undefined ? (monthDay ?? '—') : `${day}-${name}`;
+}

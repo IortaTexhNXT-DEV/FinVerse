@@ -10,6 +10,7 @@ import type { BooksCutoff, CloseSchedule, CloseSettings } from './closeControlsA
 import { displayNameOf } from '@/api/users';
 import { UserName } from '@/components/ui/UserName';
 import { scheduleRowActions } from './rowActions';
+import { dayOfYear } from './closeTexts';
 
 /** Close settings and the number of scheduled closes (AQ04). */
 export function CloseSettingsKpis({
@@ -23,7 +24,7 @@ export function CloseSettingsKpis({
         value={settings?.closeOnlyPreviousMonth === 'false' ? 'No' : 'Yes'}
       />
       <Kpi label="Broking books close (Manila)" value={settings?.brokingCloseTime ?? '—'} />
-      <Kpi label="Year-end close deadline" value={settings?.yearEndDeadline ?? '—'} />
+      <Kpi label="Year-end close deadline" value={dayOfYear(settings?.yearEndDeadline)} />
       <Kpi
         label="Scheduled closes"
         value={schedules.filter((s) => s.status === 'SCHEDULED').length}

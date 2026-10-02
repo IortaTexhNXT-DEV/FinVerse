@@ -35,3 +35,28 @@ export function checksOf(detail: VersionDetail): ValidationCheck[] {
     ? detail.validationChecks
     : legacyChecks(detail.validationChecklist);
 }
+
+/**
+ * A return reason as people read it: the reason of the list by its label, then the comment
+ * ("Incomplete or incorrect details: The rate of ..."), never the list code.
+ */
+export function reasonText(
+  raw: string | null | undefined,
+  labelOf: (code: string) => string | null,
+): string {
+  if (!raw) {
+    return '';
+  }
+  const text = raw.trim();
+  const colon = text.indexOf(':');
+  const code = colon < 0 ? text : text.slice(0, colon);
+  if (!/^[A-Z][A-Z0-9_]*$/.test(code)) {
+    return raw;
+  }
+  const label = labelOf(code);
+  if (label === null) {
+    return raw;
+  }
+  const comment = colon < 0 ? '' : text.slice(colon + 1).trim();
+  return comment ? `${label}: ${comment}` : label;
+}

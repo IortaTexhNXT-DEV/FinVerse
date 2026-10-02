@@ -80,13 +80,13 @@ public class PackageRequests {
   }
 
   /**
-   * Work case title of a request.
+   * Work case title of a request: the request type in words and the package title ("New package:
+   * Motor Fleet Plus"), never the type code.
    *
    * @param p request
    * @return title
    */
   public static String title(PackageRequest p) {
-    String product = p.getTargetProductCode() == null ? "new package" : p.getTargetProductCode();
-    return p.getRequestType() + " " + product + " - " + p.getTitle();
+    return p.getRequestType().label() + ": " + p.getTitle();
   }
 }

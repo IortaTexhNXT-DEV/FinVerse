@@ -8,6 +8,8 @@ import { RowActionMenu } from '@/components/ui/RowActionMenu';
 import type { RowAction } from '@/components/ui/RowActionMenu';
 import { useToast } from '@/components/ui/toastContext';
 import { awaitsOtherChecker } from '@/utils/makerChecker';
+import { actionMessage } from './recordActionMessage';
+import type { RecordAction } from './recordActionMessage';
 
 interface Props {
   kind: CatalogKind;
@@ -27,7 +29,7 @@ interface Props {
 const MASTER_AUTHORIZERS = ['MASTER_AUTHORIZE'] as const;
 const MASTER_MAINTAINERS = ['MASTER_MAINTAIN'] as const;
 
-type Pending = 'authorize' | 'deactivate';
+type Pending = RecordAction;
 
 /**
  * Row action menu of a catalog record: Authorize (a checker other than the maker) and Deactivate
@@ -56,7 +58,7 @@ export function RecordActions({
     onSuccess: async (r) => {
       setPending(null);
       await Promise.all(refresh.map((queryKey) => queryClient.invalidateQueries({ queryKey })));
-      toast.success(`${r.reference} ${pending === 'authorize' ? 'authorized' : 'deactivated'}`);
+      toast.success(actionMessage(r.reference, label, pending ?? 'authorize'));
     },
   });
   const canAuthorize =

@@ -2,7 +2,11 @@ import { Hand, UserPlus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { workflowRecordType } from '@/api/workflow';
 import type { WorkItem } from '@/api/workflow';
-import { useLovLabelOrNull, useSalesUnitNameOrNull } from '@/components/broking/useLabels';
+import {
+  useLineNameOrNull,
+  useLovLabelOrNull,
+  useSalesUnitNameOrNull,
+} from '@/components/broking/useLabels';
 import { DataTable } from '@/components/ui/DataTable';
 import { DueDate } from '@/components/ui/DueDate';
 import { RowActions } from '@/components/ui/RowActions';
@@ -119,14 +123,16 @@ export function QueueTable(p: Readonly<QueueTableProps>) {
 
 /**
  * The unit a work item comes from, by its name: the label of a market segment (Corporate
- * Banking), of an employee benefits team (Voluntary), else the name of a sales unit (team,
- * department or region). A code without a name is shown muted, never as a value.
+ * Banking), of an employee benefits team (Voluntary), the name of a sales unit (team, department
+ * or region), else of a product line (a package request comes from its line). A code without a
+ * name is shown muted, never as a value.
  */
 function OriginUnit({ code }: Readonly<{ code: string }>) {
   const segment = useLovLabelOrNull('MARKET_SEGMENT');
   const ebTeam = useLovLabelOrNull('EB_TEAM');
   const unit = useSalesUnitNameOrNull();
-  const name = segment(code) ?? ebTeam(code) ?? unit(code);
+  const line = useLineNameOrNull();
+  const name = segment(code) ?? ebTeam(code) ?? unit(code) ?? line(code);
   if (name === null) {
     return <span className="muted">{code}</span>;
   }

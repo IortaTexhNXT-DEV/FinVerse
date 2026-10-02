@@ -6,7 +6,8 @@ import {
   UserRound,
 } from 'lucide-react';
 import type { ValidationCheck, VersionDetail } from '@/api/productCatalog';
-import { checksOf } from './validationOutcome';
+import { checksOf, reasonText } from './validationOutcome';
+import { useLovLabelOrNull } from '@/components/broking/useLabels';
 import { KeyFacts } from '@/components/broking/RecordSummary';
 import type { Fact } from '@/components/broking/RecordSummary';
 import { Card } from '@/components/ui/Card';
@@ -47,6 +48,7 @@ function premiumText(premium: number | undefined, returned: boolean, currency: s
  */
 export function ValidationResultCard({ detail }: Readonly<{ detail: VersionDetail }>) {
   const { company } = useWorkspace();
+  const reasonLabel = useLovLabelOrNull('RETURN_REASON');
   const s = detail.summary;
   const returned = s.validatedBy === undefined;
   const facts: Fact[] = [
@@ -79,7 +81,7 @@ export function ValidationResultCard({ detail }: Readonly<{ detail: VersionDetai
     facts.push({
       icon: MessageSquareWarning,
       label: 'Return Reason',
-      value: detail.returnedReason,
+      value: reasonText(detail.returnedReason, reasonLabel),
     });
   }
   const checks = checksOf(detail);

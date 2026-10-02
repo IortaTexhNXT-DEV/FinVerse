@@ -10,6 +10,7 @@ import com.iortatechnxt.brokerverse.catalog.domain.ProductLine;
 import com.iortatechnxt.brokerverse.catalog.domain.ProductLineRepository;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProduct;
 import com.iortatechnxt.brokerverse.catalog.domain.RiskProductRepository;
+import com.iortatechnxt.brokerverse.common.util.DisplayFormat;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,8 +52,9 @@ public class CatalogNames {
   }
 
   /**
-   * The name of a coverage or peril of a line ("Fire and lightning"), the code when the line has no
-   * such coverage.
+   * The name of a coverage or peril of a line ("Fire and lightning"); a coverage the line's catalog
+   * does not hold (an insurer's own peril, a legacy code) reads as words ("Riot Strike"), never as
+   * its raw code.
    *
    * @param lineCode line
    * @param code coverage code, may be null
@@ -62,7 +64,10 @@ public class CatalogNames {
     if (code == null) {
       return "";
     }
-    return coverages.findByLineCodeAndCode(lineCode, code).map(Coverage::getName).orElse(code);
+    return coverages
+        .findByLineCodeAndCode(lineCode, code)
+        .map(Coverage::getName)
+        .orElseGet(() -> DisplayFormat.label(code));
   }
 
   /**

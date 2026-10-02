@@ -53,6 +53,16 @@ export function useLineName(): (code: string | null | undefined) => string {
   };
 }
 
+/** Name lookup of product lines that answers null for a code that is not a line. */
+export function useLineNameOrNull(): (code: string | null | undefined) => string | null {
+  const lines = useQuery({
+    queryKey: ['catalog', 'lines'],
+    queryFn: catalogApi.lines,
+    staleTime: STALE,
+  });
+  return (code) => (code ? (lines.data?.find((l) => l.code === code)?.name ?? null) : null);
+}
+
 /** Name lookup of insurers: returns a function from insurer party code to its name. */
 export function useInsurerName(): (code: string | null | undefined) => string {
   const companyId = useContext(WorkspaceContext)?.company?.id ?? 0;
@@ -140,8 +150,19 @@ export function useCoverageName(
     if (!code) {
       return '';
     }
-    return coverages.data?.find((c) => c.code === code)?.name ?? code;
+    return coverageLabel(coverages.data, code);
   };
+}
+
+/**
+ * The name of a coverage from the coverages of its line; a coverage not in the catalog of the line
+ * (an insurer's own peril, a legacy code) reads as words, never as its raw code.
+ */
+export function coverageLabel(
+  coverages: readonly { code: string; name: string }[] | undefined,
+  code: string,
+): string {
+  return coverages?.find((c) => c.code === code)?.name ?? humanize(code);
 }
 
 /** Name lookup of products: returns a function from product code to its name (the code while loading). */

@@ -43,7 +43,6 @@ export const RENEWAL_HELP: HelpSection = {
       workflow: [
         'Open a renewal, view its Account History, then Set Disposition: For Renewal, For Quotation, For Proposal, Not for Renewal (with a reason) or Lost Business.',
         'Select the dispositioned renewals and Push them to your Team Leader.',
-        'Upload Dispositions sets the dispositions of many renewals from a file; declare the file complete to tag the renewals missing from it.',
       ],
       controls: [
         'The disposition is refused until you have opened the Account History of the renewal.',
@@ -83,6 +82,7 @@ export const RENEWAL_HELP: HelpSection = {
         'Assign a Processing Officer, or Assign to Me.',
         'Open a renewal to create the renewal account; it carries the terms of the expiring account and the documents of the term.',
         'Return to Marketing sends a renewal back to the officer or the Team Leader with a reason.',
+        'Upload Dispositions sets the dispositions of many renewals from the file of Marketing; declare the file complete to tag the renewals missing from it.',
       ],
       controls: ['The renewal account is created once and linked to the expiring account.'],
     },

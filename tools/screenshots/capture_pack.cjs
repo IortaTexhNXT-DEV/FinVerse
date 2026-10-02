@@ -407,7 +407,7 @@ async function clearCallouts(page) {
  * window the list lifts its cap and shows every row, so the image holds the whole card. A walkthrough step (`tall`
  * false) keeps the top of its page and grows only by the hidden rows of such a list.
  */
-async function fitViewport(page, tall) {
+async function fitViewport(page, tall, width = WIDTH) {
   // A list sets its cap again on a window resize: after a recipe set content aside (the record header above the
   // tabs of a walkthrough step), the list takes the room freed.
   // An open row action menu closes on any scroll, so a shot of the menu leaves the page as it is.
@@ -446,7 +446,7 @@ async function fitViewport(page, tall) {
     await page.waitForTimeout(300);
   }
   const height = Math.min(MAX_HEIGHT, HEIGHT + grow);
-  await page.setViewportSize({ width: WIDTH, height });
+  await page.setViewportSize({ width, height });
   await page.waitForTimeout(grow > 0 ? 600 : 300);
   if (!menuOpen) {
     await page.evaluate(() => document.querySelectorAll('main .table-wrap[data-fit]').forEach((w) => w.scrollTo(0, 0)));
@@ -694,7 +694,14 @@ async function cropOf(page, shot, recipe) {
       if (shot.state === 'menu') {
         await fitSidebar(page);
       } else if (shot.state !== 'landing') {
-        await fitViewport(page, shot.state === 'walkthrough' ? (shot.tall ?? Boolean(named)) : shot.tall);
+        // A list wider than its card at the standard window (recipe.widths[slug], CSS pixels) is taken in a wider
+        // window, so every column is in the image.
+        const width = (recipe.widths && recipe.widths[shot.slug]) || WIDTH;
+        if (width !== WIDTH) {
+          await page.setViewportSize({ width, height: HEIGHT });
+          await page.waitForTimeout(500);
+        }
+        await fitViewport(page, shot.state === 'walkthrough' ? (shot.tall ?? Boolean(named)) : shot.tall, width);
       }
       if (named) {
         // A message of the step would cover the rows of the region.

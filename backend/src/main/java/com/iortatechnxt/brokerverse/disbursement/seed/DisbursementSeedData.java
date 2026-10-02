@@ -213,7 +213,7 @@ public class DisbursementSeedData implements ApplicationRunner {
                         klass,
                         name,
                         "Makati City",
-                        "disbursement-seed@brokerverse-seed.ph",
+                        "accounts.payable@payee.example",
                         null,
                         mode,
                         List.of(mode, DisbursementMode.CHECK, DisbursementMode.CTA).stream()
@@ -293,7 +293,10 @@ public class DisbursementSeedData implements ApplicationRunner {
                     PROCESSOR,
                     () ->
                         uploads.negotiated(
-                            check.getInstrumentNo(), check.getAmount(), "Deposited", "SEED")));
+                            check.getInstrumentNo(),
+                            check.getAmount(),
+                            "Deposited",
+                            "DEP-2026-0930")));
   }
 
   private void refund(Long companyId) {

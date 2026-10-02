@@ -29,7 +29,10 @@ class SeedPayeeNamesTest {
         .contains("\"Mabuhay General Insurance Corp.\"")
         .contains("\"Santos, Maria Clara Reyes\"")
         .doesNotContain("MAPFRE")
-        .doesNotContain("Client Refund Payee");
+        .doesNotContain("Client Refund Payee")
+        .as("the deposited-checks file of the seed has a bank reference, not a seed marker")
+        .doesNotContain("\"SEED\"")
+        .doesNotContain("brokerverse-seed");
   }
 
   @Test

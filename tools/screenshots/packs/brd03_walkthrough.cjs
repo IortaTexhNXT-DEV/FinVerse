@@ -152,7 +152,11 @@ const steps = {
     ];
     for (const [insurer, outcome, rate, minimum] of replies) {
       const row = page.locator('table tbody tr').filter({ hasText: insurer }).first();
-      await row.getByRole('button', { name: /^key in$/i }).click();
+      // Key In is in the row action menu of the insurer's row.
+      const menu = row.getByRole('button', { name: /^Actions for/ });
+      await menu.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+      await menu.click();
+      await page.getByRole('menuitem', { name: /^key in$/i }).click();
       await page.waitForTimeout(600);
       const d = dialog(page);
       const select = d.getByLabel(/^Outcome/);

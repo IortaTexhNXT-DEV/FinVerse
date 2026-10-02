@@ -4,7 +4,6 @@ import { useParams } from 'react-router-dom';
 import { renewalApi } from '@/api/renewal';
 import type { CandidateDetail } from '@/api/renewal';
 import { Attachments } from '@/components/attachments/Attachments';
-import { InsurerName, ProductName, SalesUnitName } from '@/components/broking/LovLabel';
 import { RecordSummary } from '@/components/broking/RecordSummary';
 import type { Fact } from '@/components/broking/RecordSummary';
 import { ReferenceChip } from '@/components/broking/ReferenceChip';
@@ -19,8 +18,15 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useTabParam } from '@/components/ui/useTabParam';
 import { useCompanyId } from '@/context/workspaceContext';
 import { formatAmount, formatDate } from '@/utils/format';
-import { BucketPill, FlagChips } from '../common/RenewalBits';
+import {
+  BucketPill,
+  FlagChips,
+  RenewalInsurer,
+  RenewalProduct,
+  RenewalUnit,
+} from '../common/RenewalBits';
 import { RENEWAL_SECTION, dispositionLabel } from '../common/renewalCodes';
+import { WORKFLOW_VIEW } from '../common/presentation';
 import { RecordActions } from './RecordActions';
 import { DetailsTab } from './DetailsTab';
 import { AccountHistoryTab, HistoryTab, NotesTab } from './HistoryTabs';
@@ -48,16 +54,8 @@ function facts(d: CandidateDetail): Fact[] {
   const { row } = d;
   return [
     { icon: User, label: 'Client', value: row.parties.clientName },
-    {
-      icon: Layers,
-      label: 'Product',
-      value: row.policy.productCode ? (
-        <ProductName code={row.policy.productCode} />
-      ) : (
-        (row.policy.productName ?? '')
-      ),
-    },
-    { icon: Building2, label: 'Insurer', value: <InsurerName code={row.policy.insurerCode} /> },
+    { icon: Layers, label: 'Product', value: <RenewalProduct row={row} /> },
+    { icon: Building2, label: 'Insurer', value: <RenewalInsurer row={row} /> },
     {
       icon: CalendarClock,
       label: 'Expiry',
@@ -71,7 +69,7 @@ function facts(d: CandidateDetail): Fact[] {
           ? ''
           : `${row.money.currency ?? ''} ${formatAmount(row.money.grossPremium)}`,
     },
-    { icon: Users, label: 'Unit', value: <SalesUnitName code={row.parties.ownerUnit} /> },
+    { icon: Users, label: 'Unit', value: <RenewalUnit row={row} /> },
   ];
 }
 
@@ -174,14 +172,22 @@ export default function CandidatePage() {
       {d.blocking.length > 0 && (
         <Notice tone="warning" title="Blocking checks" items={d.blocking} />
       )}
-      <WorkflowPanel
-        entityType={ENTITY}
-        entityId={d.lifecycle.id}
-        recordStatus={d.row.stage}
-        showHistory={false}
-        onChanged={refresh}
-        renderBusinessActions={() => <RecordActions detail={d} />}
-      />
+      {WORKFLOW_VIEW.some((p) => can(p)) ? (
+        <WorkflowPanel
+          entityType={ENTITY}
+          entityId={d.lifecycle.id}
+          recordStatus={d.row.stage}
+          showHistory={false}
+          onChanged={refresh}
+          renderBusinessActions={() => <RecordActions detail={d} />}
+        />
+      ) : (
+        // Users who do not read the work queues (Contact Center, LAMD) still have the actions of
+        // their role on the renewal.
+        <div className="rnw-actions">
+          <RecordActions detail={d} />
+        </div>
+      )}
       <Tabs tabs={TABS} active={tab} onChange={setTab} />
       <Body tab={tab} detail={d} />
     </div>

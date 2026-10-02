@@ -1,12 +1,11 @@
 import type { CandidateRow } from '@/api/renewal';
 import { Amount } from '@/components/ui/Amount';
-import { InsurerName, ProductName, SalesUnitName } from '@/components/broking/LovLabel';
 import { CellStack } from '@/components/ui/CellStack';
 import type { Column } from '@/components/ui/DataTable';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { UserName } from '@/components/ui/UserName';
 import { formatDate } from '@/utils/format';
-import { BucketPill, FlagChips } from './RenewalBits';
+import { BucketPill, FlagChips, RenewalInsurer, RenewalProduct, RenewalUnit } from './RenewalBits';
 import { dispositionLabel } from './renewalCodes';
 
 /** "1 claim" / "3 claims": the claims of the expiring term in words; empty when unknown. */
@@ -59,16 +58,7 @@ export function candidateColumns(showMoney: boolean): Column<CandidateRow>[] {
       key: 'risk',
       header: 'Risk / Insurance Company',
       render: (r) => (
-        <CellStack
-          main={
-            r.policy.productCode ? (
-              <ProductName code={r.policy.productCode} />
-            ) : (
-              (r.policy.productName ?? '')
-            )
-          }
-          sub={<InsurerName code={r.policy.insurerCode} />}
-        />
+        <CellStack main={<RenewalProduct row={r} />} sub={<RenewalInsurer row={r} />} />
       ),
     },
     {
@@ -76,7 +66,7 @@ export function candidateColumns(showMoney: boolean): Column<CandidateRow>[] {
       header: 'Unit / Officer',
       render: (r) => (
         <CellStack
-          main={<SalesUnitName code={r.parties.ownerUnit} />}
+          main={<RenewalUnit row={r} />}
           sub={<UserName login={r.parties.assignedAo ?? r.parties.accountOfficer ?? ''} />}
         />
       ),

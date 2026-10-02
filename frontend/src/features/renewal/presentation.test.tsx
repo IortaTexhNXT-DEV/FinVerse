@@ -20,7 +20,9 @@ import {
 } from './common/presentation';
 import MyDispositionsPage from './mine/MyDispositionsPage';
 import ProcessingPage from './processing/ProcessingPage';
-import { row } from './renewalFixtures';
+import { detail, row } from './renewalFixtures';
+import CandidatePage from './record/CandidatePage';
+import { Route, Routes } from 'react-router-dom';
 import RenewalSetupPage from './setup/RenewalSetupPage';
 import { renewalWrapper } from './testWrapper';
 import TransfersPage from './transfers/TransfersPage';
@@ -132,23 +134,25 @@ describe('row action menus', () => {
 });
 
 describe('names in the renewal lists', () => {
-  it('shows the insurer and the product by name, the product code muted under it', async () => {
+  it('shows the insurer, the product and the unit by name, also without the catalogue', async () => {
     vi.spyOn(renewalApi, 'list').mockResolvedValue({
-      content: [row()],
+      content: [
+        row({ names: { insurer: 'Luzon Assurance Co.', ownerUnit: 'Corporate Marketing Team 1' } }),
+        row({ renewalRef: 'RNW-2026-000002' }),
+      ],
       page: 0,
       size: 200,
-      totalElements: 1,
+      totalElements: 2,
       totalPages: 1,
     });
     vi.spyOn(catalogApi, 'insurers').mockResolvedValue([
       { partyCode: 'INS1', name: 'Mabuhay General Insurance Corp.' },
     ] as unknown as Awaited<ReturnType<typeof catalogApi.insurers>>);
-    vi.spyOn(catalogApi, 'products').mockResolvedValue([
-      { code: 'MTR12', name: 'Motor Car Comprehensive' },
-    ] as unknown as Awaited<ReturnType<typeof catalogApi.products>>);
     render(renewalWrapper(new Set(['RNW_VIEW']))(<CandidateList />));
+    expect(await screen.findByText('Luzon Assurance Co.')).toBeInTheDocument();
+    expect(screen.getByText('Corporate Marketing Team 1')).toBeInTheDocument();
     expect(await screen.findByText('Mabuhay General Insurance Corp.')).toBeInTheDocument();
-    expect(await screen.findByText('Motor Car Comprehensive')).toBeInTheDocument();
+    expect(screen.getAllByText('Motor')).toHaveLength(2);
     expect(screen.queryByText('INS1')).toBeNull();
   });
 });
@@ -213,5 +217,24 @@ describe('renewal lists that fit their card', () => {
     expect(claimsText(1)).toBe('1 claim');
     expect(claimsText(3)).toBe('3 claims');
     expect(claimsText(null)).toBe('');
+  });
+});
+
+describe('the actions of a Contact Center user on a renewal', () => {
+  it('shows the actions of the role when the user does not read the work queues', async () => {
+    vi.spyOn(renewalApi, 'get').mockResolvedValue(detail({ stage: 'RA_SENT' }));
+    render(
+      renewalWrapper(
+        new Set(['RNW_VIEW', 'RNW_FOLLOWUP']),
+        'contactc',
+        '/renewal/candidates/RNW-1',
+      )(
+        <Routes>
+          <Route path="/renewal/candidates/:ref" element={<CandidatePage />} />
+        </Routes>,
+      ),
+    );
+    expect(await screen.findByRole('button', { name: 'Add Follow-up' })).toBeInTheDocument();
+    expect(screen.queryByText(/not permitted/i)).toBeNull();
   });
 });

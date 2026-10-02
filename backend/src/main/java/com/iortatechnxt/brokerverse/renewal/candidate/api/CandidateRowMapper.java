@@ -1,8 +1,13 @@
 package com.iortatechnxt.brokerverse.renewal.candidate.api;
 
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
+import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfileRepository;
+import com.iortatechnxt.brokerverse.catalog.domain.SalesUnit;
+import com.iortatechnxt.brokerverse.catalog.domain.SalesUnitRepository;
 import com.iortatechnxt.brokerverse.common.time.BusinessClock;
 import com.iortatechnxt.brokerverse.renewal.candidate.api.dto.CandidateDtos.CandidateRow;
 import com.iortatechnxt.brokerverse.renewal.candidate.api.dto.CandidateDtos.MoneyColumns;
+import com.iortatechnxt.brokerverse.renewal.candidate.api.dto.CandidateDtos.Names;
 import com.iortatechnxt.brokerverse.renewal.check.service.ClaimsCheck;
 import com.iortatechnxt.brokerverse.renewal.check.service.OutstandingPremiumCheck;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotPremium;
@@ -39,16 +44,26 @@ public class CandidateRowMapper {
 
   private final CheckResultRepository results;
   private final Clock clock;
+  private final InsurerProfileRepository insurers;
+  private final SalesUnitRepository units;
 
   /**
    * Creates the mapper.
    *
    * @param results check results
    * @param clock clock
+   * @param insurers insurers (names)
+   * @param units sales units (names)
    */
-  public CandidateRowMapper(CheckResultRepository results, Clock clock) {
+  public CandidateRowMapper(
+      CheckResultRepository results,
+      Clock clock,
+      InsurerProfileRepository insurers,
+      SalesUnitRepository units) {
     this.results = results;
     this.clock = clock;
+    this.insurers = insurers;
+    this.units = units;
   }
 
   /**
@@ -60,9 +75,10 @@ public class CandidateRowMapper {
    */
   public List<CandidateRow> rows(List<RenewalCandidate> candidates, Scope scope) {
     LocalDate today = BusinessClock.today(clock);
+    Map<String, String> names = new HashMap<>();
     if (scope.hidePremium()) {
       return candidates.stream()
-          .map(c -> CandidateRow.of(c, MoneyColumns.HIDDEN, c.daysToExpiry(today)))
+          .map(c -> CandidateRow.of(c, MoneyColumns.HIDDEN, c.daysToExpiry(today), names(c, names)))
           .toList();
     }
     Map<Long, Map<String, CheckResult>> latest = latest(candidates);
@@ -70,7 +86,10 @@ public class CandidateRowMapper {
         .map(
             c ->
                 CandidateRow.of(
-                    c, money(c, latest.getOrDefault(c.getId(), Map.of())), c.daysToExpiry(today)))
+                    c,
+                    money(c, latest.getOrDefault(c.getId(), Map.of())),
+                    c.daysToExpiry(today),
+                    names(c, names)))
         .toList();
   }
 
@@ -83,6 +102,31 @@ public class CandidateRowMapper {
    */
   public CandidateRow row(RenewalCandidate candidate, Scope scope) {
     return rows(List.of(candidate), scope).get(0);
+  }
+
+  /** The insurer and owner unit names of a renewal, looked up once per chunk. */
+  private Names names(RenewalCandidate c, Map<String, String> cache) {
+    String insurer = c.getSnapshot().insurerCode();
+    String unit = c.getOwnerUnit();
+    return new Names(
+        insurer == null
+            ? null
+            : cache.computeIfAbsent(
+                "I:" + insurer,
+                k ->
+                    insurers
+                        .findByCompanyIdAndPartyCode(c.getCompanyId(), insurer)
+                        .map(InsurerProfile::getName)
+                        .orElse(insurer)),
+        unit == null
+            ? null
+            : cache.computeIfAbsent(
+                "U:" + unit,
+                k ->
+                    units
+                        .findByCompanyIdAndCode(c.getCompanyId(), unit)
+                        .map(SalesUnit::getName)
+                        .orElse(unit)));
   }
 
   private Map<Long, Map<String, CheckResult>> latest(List<RenewalCandidate> candidates) {

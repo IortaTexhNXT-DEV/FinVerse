@@ -7,6 +7,15 @@ import { humanize } from '@/utils/format';
  * row, never buttons in the row).
  */
 
+/** The permissions that read the workflow header of a record (the work queues). */
+export const WORKFLOW_VIEW = [
+  'WORK_VIEW',
+  'CLIENT_VIEW',
+  'QUOTE_VIEW',
+  'ACCOUNT_VIEW',
+  'TSU_PROCESS',
+];
+
 /** A label of a fixed list, the humanized code for a value the list does not know. */
 function labelOf(
   labels: Readonly<Record<string, string>>,

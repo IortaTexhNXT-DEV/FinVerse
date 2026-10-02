@@ -53,7 +53,8 @@ public final class CandidateDtos {
       MoneyColumns money,
       FlagChips flags,
       LocalDate expiry,
-      long daysToExpiry) {
+      long daysToExpiry,
+      Names names) {
 
     /**
      * Maps a candidate.
@@ -61,9 +62,11 @@ public final class CandidateDtos {
      * @param c candidate
      * @param money premium, outstanding and claims columns
      * @param daysToExpiry days to expiry
+     * @param names names of the insurer and the owner unit
      * @return row
      */
-    public static CandidateRow of(RenewalCandidate c, MoneyColumns money, long daysToExpiry) {
+    public static CandidateRow of(
+        RenewalCandidate c, MoneyColumns money, long daysToExpiry, Names names) {
       return new CandidateRow(
           c.getRenewalRef(),
           c.getStage().name(),
@@ -77,9 +80,19 @@ public final class CandidateDtos {
           money,
           FlagChips.of(c),
           c.getExpiryDate(),
-          daysToExpiry);
+          daysToExpiry,
+          names);
     }
   }
+
+  /**
+   * The names the lists show for the codes of a renewal, read by the server so that every user of
+   * Renewal (Contact Center and LAMD included) sees them, whatever master data the user may read.
+   *
+   * @param insurer insurer name, the code when the insurer is not known
+   * @param ownerUnit name of the owner unit, the code when the unit is not known
+   */
+  public record Names(String insurer, String ownerUnit) {}
 
   /**
    * Policy columns.

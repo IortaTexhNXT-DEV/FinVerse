@@ -1,7 +1,6 @@
 import type { CandidateDetail } from '@/api/renewal';
 import {
   BranchName,
-  InsurerName,
   LovLabel,
   LineLabel,
   ProductName,
@@ -13,6 +12,7 @@ import { DefinitionGrid } from '@/components/ui/DefinitionGrid';
 import { UserName } from '@/components/ui/UserName';
 import { formatDate, formatDateTime } from '@/utils/format';
 import { closedAsLabel } from '../common/presentation';
+import { RenewalInsurer, RenewalProduct, RenewalUnit } from '../common/RenewalBits';
 import { RNW_LOV, dispositionLabel } from '../common/renewalCodes';
 
 type Props = Readonly<{ detail: CandidateDetail }>;
@@ -33,12 +33,12 @@ function PolicyCard({ detail }: Props) {
           { label: 'Cover No.', value: p.coverNo },
           {
             label: 'Product',
-            value: p.productCode ? <ProductName code={p.productCode} withCode /> : p.productName,
+            value: <RenewalProduct row={row} />,
           },
           { label: 'Line', value: p.lineCode ? <LineLabel code={p.lineCode} /> : null },
           {
             label: 'Insurance Company',
-            value: p.insurerCode ? <InsurerName code={p.insurerCode} /> : null,
+            value: p.insurerCode ? <RenewalInsurer row={row} /> : null,
           },
           { label: 'Inception', value: formatDate(p.inception) },
           { label: 'Expiry', value: formatDate(row.expiry) },
@@ -97,7 +97,7 @@ function PartiesCard({ detail }: Props) {
           { label: 'Branch', value: q.branchCode ? <BranchName code={q.branchCode} /> : null },
           { label: 'Region', value: unit(q.regionCode) },
           { label: 'Department', value: unit(q.departmentCode) },
-          { label: 'Owner Unit', value: unit(q.ownerUnit) },
+          { label: 'Owner Unit', value: q.ownerUnit ? <RenewalUnit row={detail.row} /> : null },
           { label: 'Unit Head', value: officer(q.unitHead) },
           { label: 'Account Officer', value: officer(q.assignedAo) },
           { label: 'Processing Officer', value: officer(q.assignedPo) },

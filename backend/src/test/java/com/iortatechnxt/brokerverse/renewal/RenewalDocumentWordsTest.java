@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when;
 import com.iortatechnxt.brokerverse.alert.service.AlertCheck.AlertSignal;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfile;
 import com.iortatechnxt.brokerverse.catalog.domain.InsurerProfileRepository;
+import com.iortatechnxt.brokerverse.catalog.domain.SalesUnit;
+import com.iortatechnxt.brokerverse.catalog.domain.SalesUnitRepository;
 import com.iortatechnxt.brokerverse.common.security.UserDisplayNames;
 import com.iortatechnxt.brokerverse.docgen.service.DocTemplateService;
 import com.iortatechnxt.brokerverse.docgen.service.DocumentComposer;
@@ -21,6 +23,8 @@ import com.iortatechnxt.brokerverse.lov.service.LovService;
 import com.iortatechnxt.brokerverse.organization.domain.Company;
 import com.iortatechnxt.brokerverse.organization.service.OrganizationService;
 import com.iortatechnxt.brokerverse.renewal.alert.RenewalAlertCheck;
+import com.iortatechnxt.brokerverse.renewal.candidate.api.CandidateRowMapper;
+import com.iortatechnxt.brokerverse.renewal.candidate.api.dto.CandidateDtos.CandidateRow;
 import com.iortatechnxt.brokerverse.renewal.candidate.service.CandidateDocuments;
 import com.iortatechnxt.brokerverse.renewal.candidate.service.CandidateQueryService;
 import com.iortatechnxt.brokerverse.renewal.domain.Bucket;
@@ -29,6 +33,7 @@ import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotClient;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSnapshot.SnapshotMortgage;
 import com.iortatechnxt.brokerverse.renewal.domain.CandidateSource;
+import com.iortatechnxt.brokerverse.renewal.domain.CheckResultRepository;
 import com.iortatechnxt.brokerverse.renewal.domain.InsurerBatch;
 import com.iortatechnxt.brokerverse.renewal.domain.InsurerBatchRepository;
 import com.iortatechnxt.brokerverse.renewal.domain.RenewalCandidate;
@@ -192,5 +197,23 @@ class RenewalDocumentWordsTest {
         .isEqualTo(
             "Insurer Mabuhay General Insurance Corp. has not answered batch RIB-2027-000001"
                 + " due 10-Aug-2027");
+  }
+
+  @Test
+  void aRenewalRowNamesTheInsurerAndTheUnitForEveryUser() {
+    SalesUnitRepository units = mock(SalesUnitRepository.class);
+    SalesUnit unit = mock(SalesUnit.class);
+    when(unit.getName()).thenReturn("Corporate Marketing Team 1");
+    when(units.findByCompanyIdAndCode(1L, "T-CORP1")).thenReturn(Optional.of(unit));
+    RenewalCandidate c = candidate();
+    ReflectionTestUtils.setField(c, "ownerUnit", "T-CORP1");
+    CandidateRowMapper mapper =
+        new CandidateRowMapper(
+            mock(CheckResultRepository.class), java.time.Clock.systemUTC(), insurers, units);
+
+    CandidateRow row = mapper.rows(List.of(c), new Scope(null, null, "contactc", true)).get(0);
+
+    assertThat(row.names().insurer()).isEqualTo("Mabuhay General Insurance Corp.");
+    assertThat(row.names().ownerUnit()).isEqualTo("Corporate Marketing Team 1");
   }
 }

@@ -15,6 +15,9 @@ navigation:
   roles: [FRBS_PROCESSOR, FRBS_TL, FRBS_HEAD, ACCOUNTANT, FIN_ADMIN, DISBURSEMENT, DISB_TL, DISB_APPROVER, PRQ_PROCESSOR,
           PRQ_REVIEWER, PRQ_APPROVER, HR_APPROVER, ACSL_PROCESSOR, ACSL_TL, ACSL_HEAD, COMPTROLLERSHIP, BUSINESS_ADMIN,
           SYSADMIN, AUDITOR]
+  # Identical menus are kept once: the ACSL Team Leader has the menu of the ACSL processor.
+  shared:
+    ux-nav-14-menu: BRD-05:ux-nav-13-menu
 
 # Who each persona is (what they do comes from the persona table of the FRS unless given here).
 personas:

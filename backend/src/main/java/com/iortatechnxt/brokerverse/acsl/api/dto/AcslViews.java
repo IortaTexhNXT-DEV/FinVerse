@@ -220,6 +220,7 @@ public interface AcslViews {
    * @param totalCredit total credit
    * @param lines lines
    * @param createdBy raised by
+   * @param createdAt raised at
    */
   record CorrectionView(
       Long id,
@@ -241,7 +242,8 @@ public interface AcslViews {
       BigDecimal totalDebit,
       BigDecimal totalCredit,
       List<LineView> lines,
-      String createdBy) {
+      String createdBy,
+      Instant createdAt) {
 
     /**
      * Maps a correction.
@@ -276,7 +278,8 @@ public interface AcslViews {
           c.totalDebit(),
           c.totalCredit(),
           c.getLines().stream().map(LineView::from).toList(),
-          c.getCreatedBy());
+          c.getCreatedBy(),
+          c.getCreatedAt());
     }
   }
 

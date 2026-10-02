@@ -44,7 +44,7 @@ function elements(source: string): Element[] {
       else if (c === '>' && depth === 0) break;
     }
     found.push({
-      tag: match[1],
+      tag: match[1] ?? '',
       attributes: source.slice(start + match[0].length, end),
       line: source.slice(0, start).split('\n').length,
     });
@@ -56,7 +56,7 @@ function elements(source: string): Element[] {
 function typeOf(attributes: string): string {
   const literal = /\btype=("[^"]*")/.exec(attributes);
   if (literal !== null) {
-    return literal[1];
+    return literal[1] ?? '';
   }
   const expression = /\btype=\{/.exec(attributes);
   if (expression === null) {
@@ -99,7 +99,8 @@ function definitionOf(path: string, source: string, component: string): string |
   const imported = new RegExp(
     `import\\s*\\{[^}]*\\b${component}\\b[^}]*\\}\\s*from\\s*'([^']+)'`,
   ).exec(source);
-  return imported === null ? undefined : resolve(path, imported[1]);
+  const specifier = imported?.[1];
+  return specifier === undefined ? undefined : resolve(path, specifier);
 }
 
 /** Why an element would show the browser's own date field, or undefined when it does not. */
@@ -111,7 +112,7 @@ function problemOf(path: string, source: string, { tag, attributes, line }: Elem
   if (!/^[A-Z]/.test(tag) || PICKERS.test(tag) || !/['"]date['"]/.test(type)) {
     return undefined;
   }
-  const defined = definitionOf(path, source, tag.split('.')[0]);
+  const defined = definitionOf(path, source, tag.split('.')[0] ?? tag);
   const picked = defined !== undefined && PICKERS.test(sources.get(defined) ?? '');
   return picked ? undefined : `${path}:${line} <${tag}> takes a date without the date picker`;
 }

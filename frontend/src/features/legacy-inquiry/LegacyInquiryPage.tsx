@@ -21,7 +21,8 @@ import { PageHeader } from '@/components/ui/PageHeader';
 import { PageFooter } from '@/components/ui/Pager';
 import { useCompanyId } from '@/context/workspaceContext';
 import { useDownload } from '@/features/migration/common/useDownload';
-import { formatAmount, formatDate } from '@/utils/format';
+import { formatAmount, formatDate, humanize } from '@/utils/format';
+import { DateInput } from '@/components/ui/DateInput';
 import { RecordPanel } from './RecordPanel';
 import { ReasonCard } from './ReasonCard';
 import { keepReason, reasonLabel, sessionReason } from './reason';
@@ -104,15 +105,19 @@ function SearchCard({
     setDraft((d) => ({ ...d, [key]: value === '' ? undefined : value }));
   const input = (key: keyof ArchiveCriteria, label: string, type = 'text') => (
     <Field key={key} label={label}>
-      {(id) => (
-        <input
-          id={id}
-          type={type}
-          className="input"
-          value={draft[key] ?? ''}
-          onChange={(e) => set(key, e.target.value)}
-        />
-      )}
+      {(id) =>
+        type === 'date' ? (
+          <DateInput id={id} value={draft[key] ?? ''} onChange={(e) => set(key, e.target.value)} />
+        ) : (
+          <input
+            id={id}
+            type={type}
+            className="input"
+            value={draft[key] ?? ''}
+            onChange={(e) => set(key, e.target.value)}
+          />
+        )
+      }
     </Field>
   );
   return (
@@ -136,7 +141,7 @@ function SearchCard({
               <option value="">All</option>
               {TYPES.map((t) => (
                 <option key={t} value={t}>
-                  {t.replaceAll('_', ' ').toLowerCase()}
+                  {humanize(t)}
                 </option>
               ))}
             </select>

@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { DateInput } from '@/components/ui/DateInput';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
@@ -209,9 +210,8 @@ function CreatePlanDialog({ onClose }: Readonly<{ onClose: () => void }>) {
         </Field>
         <Field label="Go-live Date" required>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              type="date"
               className="input"
               value={goLiveDate}
               onChange={(e) => setGoLiveDate(e.target.value)}

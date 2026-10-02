@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { DateInput } from '@/components/ui/DateInput';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { migrationApi } from '@/api/migration';
@@ -208,9 +209,8 @@ function PrepareDialog({ onClose }: Readonly<{ onClose: () => void }>) {
         </Field>
         <Field label="Legacy Trial Balance As Of" required>
           {(id) => (
-            <input
+            <DateInput
               id={id}
-              type="date"
               className="input"
               value={asOf}
               onChange={(e) => setAsOf(e.target.value)}

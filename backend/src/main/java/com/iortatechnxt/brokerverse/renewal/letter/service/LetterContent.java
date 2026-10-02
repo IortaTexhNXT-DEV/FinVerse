@@ -196,13 +196,8 @@ public class LetterContent {
     v.put(
         "currency",
         or(expiring.currency(), organization.getCompany(c.getCompanyId()).getBaseCurrency()));
-    v.put(
-        "renewalFrom",
-        renewal
-            .map(Account::getPeriodFrom)
-            .map(Object::toString)
-            .orElse(c.getExpiryDate().toString()));
-    v.put("renewalTo", renewal.map(Account::getPeriodTo).map(Object::toString).orElse(EMPTY));
+    v.put("renewalFrom", renewal.map(Account::getPeriodFrom).orElse(c.getExpiryDate()));
+    v.put("renewalTo", renewal.map(Account::getPeriodTo).map(Object.class::cast).orElse(EMPTY));
     v.put(
         "sumInsured",
         amount(renewal.map(Account::getTotalSumInsured).orElse(expiring.totalSumInsured())));

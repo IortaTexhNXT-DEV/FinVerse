@@ -20,6 +20,7 @@ import {
 } from './incentiveForm';
 import type { IncentiveForm } from './incentiveForm';
 import { IncentiveParamsTable } from './IncentiveParamsTable';
+import { ProductName } from '@/components/broking/LovLabel';
 
 const BASES = [
   { value: 'RATE', label: 'Rate (%)' },
@@ -85,7 +86,9 @@ function ProductMatrix({
           </div>
           {products.map((s) => (
             <div className="row" key={s.productCode}>
-              <strong>{s.productCode}</strong>
+              <strong>
+                <ProductName code={s.productCode} withCode />
+              </strong>
               <Field label={`Segment for ${s.productCode}`}>
                 {(segmentId) => (
                   <LovSelect

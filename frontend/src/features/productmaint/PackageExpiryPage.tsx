@@ -19,9 +19,10 @@ import { Tabs } from '@/components/ui/Tabs';
 import { useToast } from '@/components/ui/toastContext';
 import { useCompanyId } from '@/context/workspaceContext';
 import { NumberInput } from '@/features/assets/FormControls';
-import { formatDate } from '@/utils/format';
+import { formatDate, formatDays } from '@/utils/format';
 import { expiryRows, expiryTone } from './packageRequest';
 import type { ExpiryTab } from './packageRequest';
+import { CellStack } from '@/components/ui/CellStack';
 
 const TABS: { id: ExpiryTab; label: string }[] = [
   { id: 'expiring', label: 'Expiring' },
@@ -36,18 +37,17 @@ const COLUMNS: Column<ExpiryRow>[] = [
     key: 'product',
     header: 'Package',
     render: (r) => (
-      <>
-        <strong className="mono">{r.productCode}</strong> v{r.versionNo}
-        <div className="muted">{r.productName}</div>
-      </>
+      <CellStack main={r.productName} sub={`${r.productCode} · Version ${String(r.versionNo)}`} />
     ),
   },
   { key: 'end', header: 'Package End', render: (r) => formatDate(r.packageEndDate) },
   {
     key: 'days',
     header: 'Days Left',
-    numeric: true,
-    render: (r) => <span className={`badge ${expiryTone(r.daysLeft)}`}>{r.daysLeft}</span>,
+    kind: 'status',
+    render: (r) => (
+      <span className={`badge ${expiryTone(r.daysLeft)}`}>{formatDays(r.daysLeft)}</span>
+    ),
   },
   { key: 'anniversary', header: 'Anniversary', render: (r) => formatDate(r.anniversaryDate) },
   {

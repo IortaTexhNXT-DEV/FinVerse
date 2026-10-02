@@ -49,6 +49,14 @@ describe('list presentation', () => {
     expect(findings(rawStatus)).toEqual([]);
   });
 
+  it('puts the name first and any code after it, muted, never the code as the main value', () => {
+    expect(
+      findings(
+        /<strong( className="mono")?>\{\w+\.(productCode|insurerCode|segment|teamCode)\}<\/strong>/,
+      ),
+    ).toEqual([]);
+  });
+
   it('never puts the record type as a loose word beside a status pill', () => {
     const joined = screens.map(([path, source]) => [path, source.replace(/\s+/g, ' ')] as const);
     const loose = /<StatusBadge [^>]*\/> <\/span> <span className="muted">\{WORKFLOW_NAMES/;
